@@ -26,7 +26,7 @@ export type {
  * drag-to-terminal. Rows navigate the workspace's diff pane through
  * onSelectFile, and the pane's target comes back as selectedDiffTarget so the
  * list highlights what the pane is showing. A workspace with several
- * repositories shows one list with each repository as a top-level folder,
+ * repositories shows that list once per repository, in collapsible sections,
  * following the repositories and scope picked in the Changes pane.
  */
 export function useChangesTab(

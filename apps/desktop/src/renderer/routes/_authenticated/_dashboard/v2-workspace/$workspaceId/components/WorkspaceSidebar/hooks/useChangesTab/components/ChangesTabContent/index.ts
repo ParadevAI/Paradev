@@ -1,1 +1,1 @@
-export { ChangesTabContent } from "./ChangesTabContent";
+export { type ChangesListView, ChangesTabContent } from "./ChangesTabContent";

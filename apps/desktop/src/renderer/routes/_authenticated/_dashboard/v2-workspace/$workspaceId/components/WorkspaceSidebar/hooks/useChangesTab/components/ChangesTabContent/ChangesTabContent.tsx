@@ -10,16 +10,30 @@ import {
 } from "react";
 import { ChangesListHeader } from "renderer/routes/_authenticated/_dashboard/components/ChangesListHeader";
 import { ChangesSearchInput } from "renderer/routes/_authenticated/_dashboard/components/ChangesSearchInput";
-import { useFoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
+import {
+	type FoldSignal,
+	useFoldSignal,
+} from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import { filterChangedFiles } from "renderer/routes/_authenticated/_dashboard/utils/filterChangedFiles";
 import type { ChangesetFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
 import type { ChangesViewMode } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 import { FailedRepositoryRows } from "../../../../../FailedRepositoryRows";
 import type { SelectDiffFile } from "../../hooks/useChangesContent";
 import { ChangesFileList } from "../ChangesFileList";
-import type { RepositoryRoot } from "../ChangesFileList/utils/repositoryTree";
 import { ChangesToolbar } from "../ChangesToolbar";
 import { shouldShowChangesLoading } from "./shouldShowChangesLoading";
+
+interface FailedRepository {
+	repositoryId: string;
+	name: string;
+}
+
+export interface ChangesListView {
+	/** The files that match the search. */
+	files: ChangesetFile[];
+	isFiltered: boolean;
+	foldSignal: FoldSignal;
+}
 
 interface ChangesTabContentProps {
 	workspaceId: string;
@@ -35,9 +49,10 @@ interface ChangesTabContentProps {
 	files: ChangesetFile[];
 	isLoading: boolean;
 	worktreePath?: string;
-	repositories?: RepositoryRoot[];
 	/** Shown repositories whose changes failed to load. */
-	failedRepositories?: RepositoryRoot[];
+	failedRepositories?: FailedRepository[];
+	/** Replaces the one-checkout list, for a list of several repositories. */
+	renderList?: (view: ChangesListView) => ReactNode;
 	selectedFilePath?: string;
 	selectedChangeKey?: string;
 	onSelectFile?: SelectDiffFile;
@@ -47,7 +62,7 @@ interface ChangesTabContentProps {
 	compact?: boolean;
 }
 
-const NO_REPOSITORIES: RepositoryRoot[] = [];
+const NO_REPOSITORIES: FailedRepository[] = [];
 
 export const ChangesTabContent = memo(function ChangesTabContent({
 	workspaceId,
@@ -58,8 +73,8 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 	files,
 	isLoading,
 	worktreePath,
-	repositories,
 	failedRepositories = NO_REPOSITORIES,
+	renderList,
 	selectedFilePath,
 	selectedChangeKey,
 	onSelectFile,
@@ -146,22 +161,25 @@ export const ChangesTabContent = memo(function ChangesTabContent({
 				</>
 			)}
 			<FailedRepositoryRows repositories={failedRepositories} />
-			<ChangesFileList
-				files={visibleFiles}
-				isFiltered={isFiltered}
-				workspaceId={workspaceId}
-				repositoryId={repositoryId}
-				isLoading={isLoading}
-				viewMode={viewMode}
-				worktreePath={worktreePath}
-				repositories={repositories}
-				selectedFilePath={selectedFilePath}
-				selectedChangeKey={selectedChangeKey}
-				foldSignal={foldSignal}
-				onSelectFile={onSelectFile}
-				onOpenFile={onOpenFile}
-				onOpenInEditor={onOpenInEditor}
-			/>
+			{renderList ? (
+				renderList({ files: visibleFiles, isFiltered, foldSignal })
+			) : (
+				<ChangesFileList
+					files={visibleFiles}
+					isFiltered={isFiltered}
+					workspaceId={workspaceId}
+					repositoryId={repositoryId}
+					isLoading={isLoading}
+					viewMode={viewMode}
+					worktreePath={worktreePath}
+					selectedFilePath={selectedFilePath}
+					selectedChangeKey={selectedChangeKey}
+					foldSignal={foldSignal}
+					onSelectFile={onSelectFile}
+					onOpenFile={onOpenFile}
+					onOpenInEditor={onOpenInEditor}
+				/>
+			)}
 		</div>
 	);
 });

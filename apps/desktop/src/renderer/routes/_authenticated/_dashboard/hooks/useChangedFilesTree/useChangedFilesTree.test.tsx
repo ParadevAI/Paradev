@@ -90,24 +90,4 @@ describe("useChangedFilesTree", () => {
 		expect(result.current.model.getSelectedPaths()).toEqual(["a/x.ts"]);
 		expect(onSelectFile).not.toHaveBeenCalled();
 	});
-
-	test("without flattening, a folder whose files sit under one chain keeps its own row", () => {
-		const files = [
-			file("web/src/components/a.ts"),
-			file("web/src/components/b.ts"),
-			file("api/x.ts"),
-		];
-		const { result } = renderHook(() =>
-			useChangedFilesTree({
-				files,
-				foldSignal: NO_FOLD,
-				onSelectFile: () => {},
-				flattenEmptyDirectories: false,
-			}),
-		);
-		const rows = result.current.model.getVisibleRows(0, 20);
-		const webRow = rows.find((row) => row.path === "web/");
-		expect(webRow?.kind).toBe("directory");
-		expect(webRow?.isFlattened ?? false).toBe(false);
-	});
 });

@@ -4,16 +4,13 @@ import { useChangesRepositoryPicker } from "renderer/routes/_authenticated/_dash
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRepositoryChangesets } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRepositoryChangesets";
 import { useCheckoutGitStatuses } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/WorkspaceGitStatusProvider";
-import {
-	useWorkspaceFolder,
-	type WorkspaceCheckout,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
+import type { WorkspaceCheckout } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/activeRepositoryStore";
 import { useChangesFilter } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/state/repositoryChangesFilterStore";
 import { changesFilterLabel } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/changesFilterLabel";
-import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
 import type { ChangesContentParams } from "../../hooks/useChangesContent";
-import type { RepositoryRoot } from "../ChangesFileList/utils/repositoryTree";
 import { ChangesTabContent } from "../ChangesTabContent";
+import { RepositoryChangesSection } from "./components/RepositoryChangesSection";
+import { changedPathCountByRepository } from "./utils/changedPathCountByRepository";
 import { everyStatusFailed } from "./utils/everyStatusFailed";
 
 const FAILED_STATUS = { data: undefined, isLoading: false };
@@ -23,9 +20,9 @@ interface MultiRepoChangesProps extends ChangesContentParams {
 }
 
 /**
- * The changes of a multi-repo workspace as one list, each repository a
- * top-level folder. It shows the repositories and the scope picked in the
- * Changes pane header.
+ * The changes of a multi-repo workspace, one collapsible section per
+ * repository under one search, view mode and fold header. It shows the
+ * repositories and the scope picked in the Changes pane header.
  */
 export function MultiRepoChanges({
 	checkouts,
@@ -37,42 +34,42 @@ export function MultiRepoChanges({
 }: MultiRepoChangesProps) {
 	const { preferences, setChangesViewMode } = useV2UserPreferences();
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
-	const folder = useWorkspaceFolder(workspaceId);
 	const picker = useChangesRepositoryPicker(workspaceId);
-	const repositories = useMemo<RepositoryRoot[]>(
+	const shownCheckouts = useMemo(
 		() =>
-			checkouts
-				.filter((checkout) => picker.shown.has(checkout.repositoryId))
-				.map(({ repositoryId, name, path }) => ({ repositoryId, name, path })),
+			checkouts.filter((checkout) => picker.shown.has(checkout.repositoryId)),
 		[checkouts, picker.shown],
 	);
 	const repositoryIds = useMemo(
-		() => repositories.map((repository) => repository.repositoryId),
-		[repositories],
+		() => shownCheckouts.map((checkout) => checkout.repositoryId),
+		[shownCheckouts],
 	);
 	const changesets = useRepositoryChangesets(workspaceId, repositoryIds);
 	const statuses = useCheckoutGitStatuses(repositoryIds);
 	const failedRepositories = useMemo(
 		() =>
-			repositories.filter((repository) =>
-				changesets.failedRepositoryIds.includes(repository.repositoryId),
+			shownCheckouts.filter((checkout) =>
+				changesets.failedRepositoryIds.includes(checkout.repositoryId),
 			),
-		[repositories, changesets.failedRepositoryIds],
+		[shownCheckouts, changesets.failedRepositoryIds],
+	);
+	const sectionCheckouts = useMemo(
+		() =>
+			shownCheckouts.filter(
+				(checkout) =>
+					!changesets.failedRepositoryIds.includes(checkout.repositoryId),
+			),
+		[shownCheckouts, changesets.failedRepositoryIds],
+	);
+	const changedPathCounts = useMemo(
+		() => changedPathCountByRepository(changesets.files),
+		[changesets.files],
 	);
 	const onlyFilter = useChangesFilter(workspaceId, repositoryIds[0]);
 	const scopeLabel = changesFilterLabel(
 		repositoryIds.length === 1 ? onlyFilter : { kind: picker.scopeKind },
 		[],
 	);
-
-	const selectedCheckout = repositories.find(
-		(repository) =>
-			repository.repositoryId === selectedDiffTarget?.repositoryId,
-	);
-	const selectedFilePath =
-		selectedDiffTarget && selectedCheckout
-			? toAbsoluteWorkspacePath(selectedCheckout.path, selectedDiffTarget.path)
-			: undefined;
 
 	return (
 		<>
@@ -88,19 +85,38 @@ export function MultiRepoChanges({
 				}
 				viewMode={preferences.changesViewMode}
 				files={changesets.files}
-				isLoading={changesets.isLoading && changesets.files.length === 0}
-				worktreePath={folder}
-				repositories={repositories}
+				isLoading={changesets.isLoading}
 				failedRepositories={failedRepositories}
-				selectedFilePath={selectedFilePath}
-				selectedChangeKey={
-					selectedCheckout ? selectedDiffTarget?.changeKey : undefined
-				}
-				onSelectFile={onSelectFile}
-				onOpenFile={onOpenFile}
-				onOpenInEditor={openInExternalEditor}
 				onViewModeChange={setChangesViewMode}
 				compact={compact}
+				renderList={({ files, isFiltered, foldSignal }) => (
+					<div className="min-h-0 flex-1 overflow-y-auto">
+						{sectionCheckouts.map((checkout) => {
+							const changedPathCount =
+								changedPathCounts.get(checkout.repositoryId) ?? 0;
+							return (
+								<RepositoryChangesSection
+									key={checkout.repositoryId}
+									workspaceId={workspaceId}
+									checkout={checkout}
+									visibleFiles={files}
+									changedPathCount={changedPathCount}
+									isLoading={
+										changedPathCount === 0 &&
+										changesets.isRepositoryLoading(checkout.repositoryId)
+									}
+									isFiltered={isFiltered}
+									viewMode={preferences.changesViewMode}
+									foldSignal={foldSignal}
+									selectedDiffTarget={selectedDiffTarget}
+									onSelectFile={onSelectFile}
+									onOpenFile={onOpenFile}
+									onOpenInEditor={openInExternalEditor}
+								/>
+							);
+						})}
+					</div>
+				)}
 			/>
 		</>
 	);

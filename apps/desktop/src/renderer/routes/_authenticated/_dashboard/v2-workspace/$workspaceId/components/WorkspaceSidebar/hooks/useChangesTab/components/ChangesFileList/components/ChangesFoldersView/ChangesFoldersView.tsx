@@ -5,22 +5,15 @@ import {
 	type ChangesetFile,
 	getChangesetFileKey,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useChangeset";
-import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import { toRelativeWorkspacePath } from "shared/absolute-paths";
 import type { SelectDiffFile } from "../../../../hooks/useChangesContent";
-import {
-	groupFilesByRepository,
-	type RepositoryRoot,
-} from "../../utils/repositoryTree";
 import { FileRow } from "../FileRow";
-import { RepositoryFolderGroup } from "./components/RepositoryFolderGroup";
 
 interface ChangesFoldersViewProps {
 	files: ChangesetFile[];
 	workspaceId: string;
 	repositoryId: string | undefined;
 	worktreePath?: string;
-	/** Set when the list shows several checkouts: files group by repository first. */
-	repositories?: RepositoryRoot[];
 	/** Absolute path of the diff pane's open file — highlights its row. */
 	selectedFilePath?: string;
 	/** Disambiguates a path present in several sections (staged + unstaged). */
@@ -41,7 +34,6 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 	workspaceId,
 	repositoryId,
 	worktreePath,
-	repositories,
 	selectedFilePath,
 	selectedChangeKey,
 	foldSignal,
@@ -49,25 +41,25 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 	onOpenFile,
 	onOpenInEditor,
 }: ChangesFoldersViewProps) {
-	const folderList = (
-		groupFiles: ChangesetFile[],
-		checkout: { repositoryId: string | undefined; worktreePath?: string },
-	) => (
+	const selectedRelPath =
+		selectedFilePath && worktreePath
+			? toRelativeWorkspacePath(worktreePath, selectedFilePath)
+			: selectedFilePath;
+
+	return (
 		<ChangedFileFolderList
-			files={groupFiles}
+			files={files}
 			getFileKey={getChangesetFileKey}
 			foldSignal={foldSignal}
 			renderFile={(file) => (
 				<FileRow
 					file={file}
 					workspaceId={workspaceId}
-					repositoryId={checkout.repositoryId}
-					worktreePath={checkout.worktreePath}
+					repositoryId={repositoryId}
+					worktreePath={worktreePath}
 					hideDir
 					isSelected={
-						!!checkout.worktreePath &&
-						toAbsoluteWorkspacePath(checkout.worktreePath, file.path) ===
-							selectedFilePath &&
+						file.path === selectedRelPath &&
 						(selectedChangeKey == null ||
 							getChangesetFileKey(file) === selectedChangeKey)
 					}
@@ -78,21 +70,4 @@ export const ChangesFoldersView = memo(function ChangesFoldersView({
 			)}
 		/>
 	);
-
-	if (!repositories) return folderList(files, { repositoryId, worktreePath });
-
-	return groupFilesByRepository(files, repositories).map((group) => (
-		<RepositoryFolderGroup
-			key={group.repository.repositoryId}
-			name={group.repository.name}
-			additions={group.additions}
-			deletions={group.deletions}
-			foldSignal={foldSignal}
-		>
-			{folderList(group.files, {
-				repositoryId: group.repository.repositoryId,
-				worktreePath: group.repository.path,
-			})}
-		</RepositoryFolderGroup>
-	));
 });

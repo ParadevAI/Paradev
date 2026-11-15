@@ -13,6 +13,7 @@ interface UseRepositoryChangesetsResult {
 	/** Every checkout's files in repository order, each tagged with its checkout. */
 	files: ChangesetFile[];
 	isLoading: boolean;
+	isRepositoryLoading: (repositoryId: string) => boolean;
 	/** The checkouts whose files failed to load, in repository order. */
 	failedRepositoryIds: string[];
 	/** Each checkout's diff scope, once its source has reported it. */
@@ -36,7 +37,11 @@ export function useRepositoryChangesets(
 		() => repositoryIds.flatMap((id) => byId[id]?.files ?? []),
 		[repositoryIds, byId],
 	);
-	const isLoading = repositoryIds.some((id) => byId[id]?.isLoading ?? true);
+	const isRepositoryLoading = useCallback(
+		(id: string) => byId[id]?.isLoading ?? true,
+		[byId],
+	);
+	const isLoading = repositoryIds.some(isRepositoryLoading);
 	const failedRepositoryIds = useMemo(
 		() => failedRepositoryIdsOf(repositoryIds, byId),
 		[repositoryIds, byId],
@@ -59,6 +64,7 @@ export function useRepositoryChangesets(
 	return {
 		files,
 		isLoading,
+		isRepositoryLoading,
 		failedRepositoryIds,
 		refByRepositoryId,
 		sources,

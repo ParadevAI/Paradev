@@ -1,6 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { formatList } from "@superset/i18n/format";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -17,6 +16,7 @@ import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/componen
 import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
 import { checkoutInput } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/checkoutInput";
 import {
+	repositoryCollapseKey,
 	useV2ChangesSectionsStore,
 	type V2ChangesSectionKey,
 } from "renderer/stores/v2-changes-sections";
@@ -25,10 +25,8 @@ type SectionKind = "unstaged" | "staged";
 
 interface ChangesSectionProps {
 	sectionKey: V2ChangesSectionKey;
-	/** The checkouts with files in the section; the bulk actions act on each. */
-	repositoryIds: Array<string | undefined>;
-	/** Set when the list shows several repositories, for the confirm copy. */
-	repositoryNames?: string[];
+	repositoryId: string | undefined;
+	repositoryName?: string;
 	title: string;
 	count: number;
 	/** Section-wide +/− totals, right-aligned on the header. */
@@ -43,8 +41,8 @@ interface ChangesSectionProps {
 
 export function ChangesSection({
 	sectionKey,
-	repositoryIds,
-	repositoryNames,
+	repositoryId,
+	repositoryName,
 	title,
 	count,
 	additions = 0,
@@ -53,25 +51,33 @@ export function ChangesSection({
 	children,
 }: ChangesSectionProps) {
 	const { t } = useLingui();
-	const repositoryName =
-		repositoryNames && repositoryNames.length > 0
-			? formatList(repositoryNames)
-			: undefined;
+	const perRepositoryId = repositoryName ? repositoryId : undefined;
 	const collapsed = useV2ChangesSectionsStore(
-		(state) => state.collapsed[sectionKey] ?? false,
+		(state) =>
+			(perRepositoryId
+				? state.repositoryCollapsed[
+						repositoryCollapseKey(perRepositoryId, sectionKey)
+					]
+				: undefined) ??
+			state.collapsed[sectionKey] ??
+			false,
 	);
 	const setCollapsed = useV2ChangesSectionsStore((state) => state.setCollapsed);
+	const setRepositoryCollapsed = useV2ChangesSectionsStore(
+		(state) => state.setRepositoryCollapsed,
+	);
 	const open = !collapsed;
 	const [showConfirm, setShowConfirm] = useState(false);
 	const utils = workspaceTrpc.useUtils();
 
-	const invalidate = (
-		_data: unknown,
-		scope: { workspaceId: string; repositoryId?: string },
-	) => {
-		const input = checkoutInput(scope.workspaceId, scope.repositoryId);
-		void utils.git.getStatus.invalidate(input);
-		void utils.git.getDiff.invalidate(input);
+	const invalidate = () => {
+		if (!stagingActions) return;
+		void utils.git.getStatus.invalidate(
+			checkoutInput(stagingActions.workspaceId, repositoryId),
+		);
+		void utils.git.getDiff.invalidate(
+			checkoutInput(stagingActions.workspaceId, repositoryId),
+		);
 	};
 
 	const discardAllUnstaged = workspaceTrpc.git.discardAllUnstaged.useMutation({
@@ -130,18 +136,22 @@ export function ChangesSection({
 	const runDiscardAll = () => {
 		if (!stagingActions) return;
 		const { kind, workspaceId } = stagingActions;
-		const discard = kind === "unstaged" ? discardAllUnstaged : discardAllStaged;
-		for (const repositoryId of repositoryIds) {
-			discard.mutate(checkoutInput(workspaceId, repositoryId));
+		const scope = checkoutInput(workspaceId, repositoryId);
+		if (kind === "unstaged") {
+			discardAllUnstaged.mutate(scope);
+		} else {
+			discardAllStaged.mutate(scope);
 		}
 	};
 
 	const runStagingToggle = () => {
 		if (!stagingActions) return;
 		const { kind, workspaceId } = stagingActions;
-		const toggle = kind === "unstaged" ? stageAll : unstageAll;
-		for (const repositoryId of repositoryIds) {
-			toggle.mutate(checkoutInput(workspaceId, repositoryId));
+		const scope = checkoutInput(workspaceId, repositoryId);
+		if (kind === "unstaged") {
+			stageAll.mutate(scope);
+		} else {
+			unstageAll.mutate(scope);
 		}
 	};
 
@@ -183,7 +193,11 @@ export function ChangesSection({
 	return (
 		<Collapsible
 			open={open}
-			onOpenChange={(next) => setCollapsed(sectionKey, !next)}
+			onOpenChange={(next) =>
+				perRepositoryId
+					? setRepositoryCollapsed(perRepositoryId, sectionKey, !next)
+					: setCollapsed(sectionKey, !next)
+			}
 		>
 			<div className="flex items-center">
 				<CollapsibleTrigger className="flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1 text-left text-xs hover:bg-accent/30">

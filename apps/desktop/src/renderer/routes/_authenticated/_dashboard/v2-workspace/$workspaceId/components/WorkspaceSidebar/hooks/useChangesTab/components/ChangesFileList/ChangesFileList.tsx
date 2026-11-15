@@ -11,10 +11,6 @@ import type { SelectDiffFile } from "../../hooks/useChangesContent";
 import { ChangesFoldersView } from "./components/ChangesFoldersView";
 import { ChangesSection } from "./components/ChangesSection";
 import { ChangesTreeView } from "./components/ChangesTreeView";
-import {
-	groupFilesByRepository,
-	type RepositoryRoot,
-} from "./utils/repositoryTree";
 
 interface ChangesFileListProps {
 	files: ChangesetFile[];
@@ -22,12 +18,10 @@ interface ChangesFileListProps {
 	isFiltered?: boolean;
 	workspaceId: string;
 	repositoryId: string | undefined;
+	repositoryName?: string;
 	isLoading?: boolean;
 	viewMode: ChangesViewMode;
-	/** The folder the list's paths start from: the checkout, or the workspace folder for several. */
 	worktreePath?: string;
-	/** Set when the list shows several checkouts, each as a top-level folder. */
-	repositories?: RepositoryRoot[];
 	selectedFilePath?: string;
 	selectedChangeKey?: string;
 	foldSignal: FoldSignal;
@@ -63,10 +57,10 @@ export const ChangesFileList = memo(function ChangesFileList({
 	isFiltered,
 	workspaceId,
 	repositoryId,
+	repositoryName,
 	isLoading,
 	viewMode,
 	worktreePath,
-	repositories,
 	selectedFilePath,
 	selectedChangeKey,
 	foldSignal,
@@ -117,21 +111,12 @@ export const ChangesFileList = memo(function ChangesFileList({
 				const groupFiles = grouped[key];
 				if (groupFiles.length === 0) return null;
 				const hasStagingActions = key === "unstaged" || key === "staged";
-				const groupRepositories = repositories
-					? groupFilesByRepository(groupFiles, repositories).map(
-							({ repository }) => repository,
-						)
-					: undefined;
 				return (
 					<ChangesSection
 						key={key}
 						sectionKey={key}
-						repositoryIds={
-							groupRepositories?.map(({ repositoryId: id }) => id) ?? [
-								repositoryId,
-							]
-						}
-						repositoryNames={groupRepositories?.map(({ name }) => name)}
+						repositoryId={repositoryId}
+						repositoryName={repositoryName}
 						title={i18n._(GROUP_TITLES[key])}
 						count={groupFiles.length}
 						additions={groupFiles.reduce(
@@ -158,7 +143,6 @@ export const ChangesFileList = memo(function ChangesFileList({
 								workspaceId={workspaceId}
 								repositoryId={repositoryId}
 								worktreePath={worktreePath}
-								repositories={repositories}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}
 								foldSignal={foldSignal}
@@ -172,7 +156,6 @@ export const ChangesFileList = memo(function ChangesFileList({
 								workspaceId={workspaceId}
 								repositoryId={repositoryId}
 								worktreePath={worktreePath}
-								repositories={repositories}
 								selectedFilePath={selectedFilePath}
 								selectedChangeKey={selectedChangeKey}
 								foldSignal={foldSignal}
