@@ -9,4 +9,3 @@ export {
 } from "./mount";
 export { promptChatSession } from "./promptChatSession";
 export { ChatWorkspaceNotFoundError, createResolveCwd } from "./resolveCwd";
-export { sendToAgent } from "./sendToAgent";

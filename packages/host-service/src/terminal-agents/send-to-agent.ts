@@ -1,11 +1,11 @@
 import type { ChatRuntime } from "@superset/chat-runtime";
+import { promptChatSession } from "../chat-v3/promptChatSession";
 import {
 	sendAgentMessage,
 	type TerminalSessionError,
 } from "../terminal/terminal";
-import { matchesAgentBinding } from "../terminal-agents/matches-agent-binding";
-import type { TerminalAgentStore } from "../terminal-agents/store";
-import { promptChatSession } from "./promptChatSession";
+import { matchesAgentBinding } from "./matches-agent-binding";
+import type { TerminalAgentStore } from "./store";
 
 type TerminalAgentMessage = Parameters<typeof sendAgentMessage>[0];
 

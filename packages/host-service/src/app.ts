@@ -23,7 +23,6 @@ import {
 	createChatAgentBridge,
 	createChatV3Mount,
 	registerChatV3Routes,
-	sendToAgent,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
 import { EventBus, GitWatcher, registerEventBusRoute } from "./events";
@@ -60,6 +59,7 @@ import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
 import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
@@ -303,15 +303,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});

@@ -1,8 +1,8 @@
 import { describe, expect, it, mock } from "bun:test";
 import type { ChatRuntime } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
-import type { TerminalAgentBinding } from "../terminal-agents/types";
-import { sendToAgent } from "./sendToAgent";
+import { sendToAgent } from "./send-to-agent";
+import type { TerminalAgentBinding } from "./types";
 
 const chatBinding = {
 	terminalId: "term-chat",
