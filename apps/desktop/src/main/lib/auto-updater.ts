@@ -29,7 +29,19 @@ import { PLATFORM } from "shared/constants";
 // failed Squirrel install) gets retried indefinitely until the user
 // manually reinstalls. Reach into the protected helper to clear it.
 interface AppUpdaterInternals {
-	downloadedUpdateHelper: { clear(): Promise<void> } | null;
+	downloadedUpdateHelper: {
+		clear(): Promise<void>;
+		file: string | null;
+	} | null;
+}
+
+// Squirrel.Mac keeps its own staged copy. Elsewhere the installer is the cached
+// file, which electron-updater deletes when a replacement download starts.
+function isStagedInstallerIntact(): boolean {
+	if (PLATFORM.IS_MAC) return true;
+	const helper = (autoUpdater as unknown as AppUpdaterInternals)
+		.downloadedUpdateHelper;
+	return Boolean(helper?.file);
 }
 
 async function clearCachedUpdate(reason: string): Promise<void> {
@@ -46,6 +58,8 @@ async function clearCachedUpdate(reason: string): Promise<void> {
 
 const UPDATE_CHECK_INTERVAL_MS = 1000 * 60 * 60 * 4; // 4 hours
 const INSTALL_TIME_CHECK_TIMEOUT_MS = 2000;
+// The message electron-updater attaches to the `error` event of a failed check.
+const FEED_READ_ERROR_PREFIX = "Cannot check for updates";
 
 /**
  * Detect if this is a prerelease build from app version using semver.
@@ -156,8 +170,8 @@ function emitStatus(
 	if (status === AUTO_UPDATE_STATUS.READY) {
 		stagedVersion = version;
 	} else if (
-		status === AUTO_UPDATE_STATUS.ERROR ||
-		status === AUTO_UPDATE_STATUS.UPDATED
+		status !== AUTO_UPDATE_STATUS.DOWNLOADING &&
+		status !== AUTO_UPDATE_STATUS.CHECKING
 	) {
 		stagedVersion = undefined;
 	}
@@ -263,7 +277,15 @@ async function downloadNewerThanStaged(
 			log.info(`[auto-updater] ${version} replaces staged ${replacedVersion}`);
 			isDismissed = false;
 			emitStatus(AUTO_UPDATE_STATUS.DOWNLOADING, version);
-			autoUpdater.downloadUpdate().catch(() => {});
+			// The quit-time install on Linux deletes the running AppImage before
+			// it moves the installer, and the staged installer is gone by now.
+			if (!PLATFORM.IS_MAC) autoUpdater.autoInstallOnAppQuit = false;
+			autoUpdater
+				.downloadUpdate()
+				.catch(() => {})
+				.finally(() => {
+					autoUpdater.autoInstallOnAppQuit = true;
+				});
 		},
 	});
 }
@@ -548,19 +570,31 @@ export function setupAutoUpdater(): void {
 		`[auto-updater] Initialized: version=${app.getVersion()}, channel=${IS_PRERELEASE ? "canary" : "stable"}, feedURL=${UPDATE_FEED_URL}`,
 	);
 
-	autoUpdater.on("error", (error) => {
-		if (isCheckingForNewerThanStaged) return;
+	autoUpdater.on("error", (error, message?: string) => {
+		if (
+			isCheckingForNewerThanStaged &&
+			message?.startsWith(FEED_READ_ERROR_PREFIX)
+		) {
+			return;
+		}
 		// Allow retry if Squirrel surfaces an error instead of actually quitting.
 		isInstalling = false;
 		isInstallPendingOnSquirrel = false;
 		isSquirrelStaging = false;
+		const isReplacingStaged =
+			currentStatus === AUTO_UPDATE_STATUS.DOWNLOADING &&
+			stagedVersion !== undefined;
+		const survivingVersion =
+			isReplacingStaged && isStagedInstallerIntact()
+				? stagedVersion
+				: undefined;
 		if (isTransientError(error)) {
 			log.info(
 				"[auto-updater] Update server unreachable, will retry later:",
 				error?.message,
 			);
-			if (stagedVersion) {
-				emitStatus(AUTO_UPDATE_STATUS.READY, stagedVersion);
+			if (survivingVersion) {
+				emitStatus(AUTO_UPDATE_STATUS.READY, survivingVersion);
 			} else {
 				emitStatus(AUTO_UPDATE_STATUS.IDLE);
 			}
@@ -570,8 +604,12 @@ export function setupAutoUpdater(): void {
 			`[auto-updater] Error during update (currentVersion=${app.getVersion()}):`,
 			error?.message || error,
 		);
-		void clearCachedUpdate(`error: ${error?.message ?? "unknown"}`);
-		emitStatus(AUTO_UPDATE_STATUS.ERROR, undefined, error.message);
+		if (survivingVersion) {
+			emitStatus(AUTO_UPDATE_STATUS.READY, survivingVersion);
+		} else {
+			void clearCachedUpdate(`error: ${error?.message ?? "unknown"}`);
+			emitStatus(AUTO_UPDATE_STATUS.ERROR, undefined, error.message);
+		}
 		const freeBytes = freeStagingBytes();
 		if (!isEnvironmentUpdateError(error?.message ?? String(error), freeBytes)) {
 			// Squirrel unpacks the archive beside itself under the same volume, so
