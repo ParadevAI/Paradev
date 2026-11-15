@@ -4921,6 +4921,9 @@ msgstr "Nastavení cloudového prostředí"
 msgid "Cloud environments"
 msgstr "Cloudová prostředí"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Cloudová prostředí nejsou součástí vašeho tarifu."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Cloudová prostředí si stahují vaše repozitáře z GitHubu. Nejdřív je propojte; děláte to jen jednou."
 
@@ -23362,6 +23365,9 @@ msgstr "Vaše organizace dosáhla limitu využití cloudu."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Vaše organizace dosáhla limitu využití cloudu. Tento pracovní prostor se za několik minut zastaví, pokud limit nezvýšíte."
+
+msgid "Your organization reached its environment limit."
+msgstr "Vaše organizace dosáhla limitu prostředí."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."

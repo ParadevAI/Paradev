@@ -4915,6 +4915,9 @@ msgstr "Налаштування хмарного середовища"
 msgid "Cloud environments"
 msgstr "Хмарні середовища"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Хмарні середовища не входять у ваш тариф."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Хмарні середовища клонують ваші репозиторії з GitHub. Спершу підключіть їх; це потрібно зробити лише один раз."
 
@@ -23356,6 +23359,9 @@ msgstr "Ваша організація досягла ліміту викори
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Ваша організація досягла ліміту хмарного використання. Цей робочий простір зупиниться за кілька хвилин, якщо ліміт не підвищать."
+
+msgid "Your organization reached its environment limit."
+msgstr "Ваша організація досягла ліміту середовищ."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."

@@ -4921,6 +4921,9 @@ msgstr "云环境设置"
 msgid "Cloud environments"
 msgstr "云端环境"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "您的方案不包含云环境。"
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "云环境从 GitHub 检出你的仓库。请先连接这些;只需操作一次。"
 
@@ -23362,6 +23365,9 @@ msgstr "您的组织已达到云使用上限。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "你的组织已达到云端用量上限。除非提高上限，此工作区将在几分钟后停止。"
+
+msgid "Your organization reached its environment limit."
+msgstr "您的组织已达到环境数量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接你自己的账户后，Paradev 为你完成的工作会以你的名义显示。"

@@ -4921,6 +4921,9 @@ msgstr "Penyiapan environment cloud"
 msgid "Cloud environments"
 msgstr "Environment cloud"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Lingkungan cloud tidak termasuk dalam paket Anda."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Environment cloud mengambil repositori Anda dari GitHub. Hubungkan ini dulu; Anda hanya melakukannya sekali."
 
@@ -23362,6 +23365,9 @@ msgstr "Organisasi Anda telah mencapai batas penggunaan cloud."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini akan berhenti dalam beberapa menit kecuali batasnya dinaikkan."
+
+msgid "Your organization reached its environment limit."
+msgstr "Organisasi Anda telah mencapai batas lingkungan."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."

@@ -7,14 +7,14 @@ import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import { getCloudWorkspacesQueryKey } from "@/hooks/useCloudWorkspaces";
 import { useSession } from "@/lib/auth/client";
-import { errorCopy, transportFailureKind } from "@/lib/errors";
+import {
+	billingRefusalKey,
+	errorCopy,
+	transportFailureKind,
+} from "@/lib/errors";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
-import {
-	cloudRefusalMessage,
-	recordUpgradeIntent,
-	useUpgrade,
-} from "@/lib/upgrade";
+import { recordUpgradeIntent, useUpgrade } from "@/lib/upgrade";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 
 interface CreateCloudWorkspaceArgs {
@@ -116,7 +116,7 @@ export function useCreateCloudWorkspace() {
 				// Stable English, never the display copy below.
 				failure_kind: transportFailureKind(error) ?? "server",
 			});
-			const refusal = cloudRefusalMessage(error);
+			const refusal = billingRefusalKey(error) !== null;
 			if (refusal && !linksAllowed) recordUpgradeIntent("cloud-workspaces");
 			Alert.alert(
 				i18n._(
@@ -124,7 +124,7 @@ export function useCreateCloudWorkspace() {
 						message: "Could not create cloud workspace",
 					}),
 				),
-				refusal ?? errorCopy(error),
+				errorCopy(error),
 				refusal && linksAllowed
 					? [
 							{ style: "cancel", text: i18n._(msg({ message: "Dismiss" })) },

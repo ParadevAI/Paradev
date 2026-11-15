@@ -28,7 +28,7 @@ export function useShareDirectory() {
 	const organizationId = session?.session?.activeOrganizationId ?? null;
 	const members = useOrgMembers();
 	const { activeOrganization } = useOrganizations();
-	const { canUpgrade, upgrade } = useUpgrade();
+	const { isResolved, canUpgrade, upgrade } = useUpgrade();
 	const teams = useQuery({
 		queryKey: ["cloud", "organization", "listTeams", organizationId],
 		enabled: organizationId !== null,
@@ -70,7 +70,7 @@ export function useShareDirectory() {
 	const organizationName = activeOrganization?.name ?? "";
 
 	const onUpgrade = () => {
-		if (!canUpgrade) recordUpgradeIntent("invite-members");
+		if (isResolved && !canUpgrade) recordUpgradeIntent("invite-members");
 		Alert.alert(
 			t({ message: "Not included in your plan" }),
 			t({ message: `Adding people to ${organizationName} needs a paid plan.` }),

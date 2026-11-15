@@ -4921,6 +4921,9 @@ msgstr "クラウド環境のセットアップ"
 msgid "Cloud environments"
 msgstr "クラウド環境"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "クラウド環境はご利用のプランに含まれていません。"
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "クラウド環境は GitHub からリポジトリをチェックアウトします。まずこれらを接続してください。一度だけで済みます。"
 
@@ -23362,6 +23365,9 @@ msgstr "組織がクラウドの使用上限に達しました。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"
+
+msgid "Your organization reached its environment limit."
+msgstr "組織が環境の上限に達しました。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "あなた自身のアカウントです。組織の連携は Paradev がそのツールにアクセスするためのもので、あなたのアカウントを接続すると、Paradev があなたのために行った作業があなたの名前で表示されます。"

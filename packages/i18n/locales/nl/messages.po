@@ -4921,6 +4921,9 @@ msgstr "Cloudomgeving instellen"
 msgid "Cloud environments"
 msgstr "Cloudomgevingen"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Cloudomgevingen zijn niet inbegrepen in je plan."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Cloudomgevingen halen je repositories op van GitHub. Verbind deze eerst; dat doe je maar één keer."
 
@@ -23362,6 +23365,9 @@ msgstr "Je organisatie heeft de limiet voor cloudgebruik bereikt."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkruimte stopt over een paar minuten, tenzij de limiet wordt verhoogd."
+
+msgid "Your organization reached its environment limit."
+msgstr "Je organisatie heeft de limiet voor omgevingen bereikt."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Je eigen accounts. De integraties van je organisatie geven Paradev toegang tot haar tools; als je die van jou koppelt, verschijnt het werk dat Paradev voor je doet onder jouw naam."

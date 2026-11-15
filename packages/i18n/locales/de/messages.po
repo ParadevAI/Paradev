@@ -4921,6 +4921,9 @@ msgstr "Einrichtung der Cloud-Umgebung"
 msgid "Cloud environments"
 msgstr "Cloud-Umgebungen"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Cloud-Umgebungen sind in Ihrem Tarif nicht enthalten."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Cloud-Umgebungen checken deine Repositories von GitHub aus. Verbinde zuerst diese beiden; das machst du nur einmal."
 
@@ -23362,6 +23365,9 @@ msgstr "Ihre Organisation hat ihr Cloud-Nutzungslimit erreicht."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Deine Organisation hat ihr Cloud-Nutzungslimit erreicht. Dieser Arbeitsbereich stoppt in wenigen Minuten, wenn das Limit nicht erhöht wird."
+
+msgid "Your organization reached its environment limit."
+msgstr "Ihre Organisation hat ihr Umgebungslimit erreicht."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Deine eigenen Konten. Die Integrationen deiner Organisation lassen Paradev ihre Tools erreichen; wenn du deine verbindest, erscheint die Arbeit, die Paradev für dich erledigt, unter deinem Namen."

@@ -4921,6 +4921,9 @@ msgstr "Bulut ortamı kurulumu"
 msgid "Cloud environments"
 msgstr "Bulut ortamları"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Bulut ortamları planınıza dahil değil."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Bulut ortamları depolarınızı GitHub'dan alır. Önce bunları bağlayın; bunu yalnızca bir kez yaparsınız."
 
@@ -23362,6 +23365,9 @@ msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Sınır artırılmazsa bu çalışma alanı birkaç dakika içinde durdurulacak."
+
+msgid "Your organization reached its environment limit."
+msgstr "Kuruluşunuz ortam sınırına ulaştı."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlarına erişmesini sağlar; kendi hesaplarını bağladığında Paradev'in senin için yaptığı işler senin adınla görünür."

@@ -4921,6 +4921,9 @@ msgstr "Thiết lập environment đám mây"
 msgid "Cloud environments"
 msgstr "Môi trường đám mây"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Gói của bạn không bao gồm môi trường đám mây."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Environment đám mây lấy các repository của bạn từ GitHub. Hãy kết nối những thứ này trước; bạn chỉ làm một lần."
 
@@ -23362,6 +23365,9 @@ msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng đám mây.
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Workspace này sẽ dừng sau vài phút nếu giới hạn không được tăng."
+
+msgid "Your organization reached its environment limit."
+msgstr "Tổ chức của bạn đã đạt giới hạn môi trường."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Paradev truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Paradev làm cho bạn hiển thị dưới tên bạn."

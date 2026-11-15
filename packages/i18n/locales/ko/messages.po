@@ -4921,6 +4921,9 @@ msgstr "클라우드 환경 설정"
 msgid "Cloud environments"
 msgstr "클라우드 환경"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "클라우드 환경은 현재 플랜에 포함되어 있지 않습니다."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "클라우드 환경은 GitHub에서 리포지토리를 체크아웃합니다. 먼저 이것들을 연결하세요. 한 번만 하면 됩니다."
 
@@ -23362,6 +23365,9 @@ msgstr "조직이 클라우드 사용 한도에 도달했습니다."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 올리지 않으면 이 워크스페이스는 몇 분 후에 중지됩니다."
+
+msgid "Your organization reached its environment limit."
+msgstr "조직이 환경 한도에 도달했습니다."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."

@@ -4921,6 +4921,9 @@ msgstr "Настройка облачного окружения"
 msgid "Cloud environments"
 msgstr "Облачные окружения"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Облачные окружения не входят в ваш тариф."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Облачные окружения получают ваши репозитории из GitHub. Сначала подключите их; это нужно сделать один раз."
 
@@ -23362,6 +23365,9 @@ msgstr "Ваша организация достигла лимита испол
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."
+
+msgid "Your organization reached its environment limit."
+msgstr "Ваша организация достигла лимита окружений."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваши собственные учётные записи. Интеграции вашей организации дают Paradev доступ к её инструментам; подключив свои, вы увидите работу, которую Paradev делает для вас, под своим именем."

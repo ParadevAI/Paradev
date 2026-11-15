@@ -4921,6 +4921,9 @@ msgstr "Configuración del entorno en la nube"
 msgid "Cloud environments"
 msgstr "Entornos en la nube"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "Los entornos en la nube no están incluidos en tu plan."
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Los entornos en la nube obtienen tus repositorios de GitHub. Conecta esto primero; solo lo haces una vez."
 
@@ -23362,6 +23365,9 @@ msgstr "Tu organización alcanzó su límite de uso de la nube."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tu organización alcanzó su límite de uso en la nube. Este espacio de trabajo se detendrá en unos minutos si no se aumenta el límite."
+
+msgid "Your organization reached its environment limit."
+msgstr "Tu organización alcanzó su límite de entornos."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Tus propias cuentas. Las integraciones de tu organización permiten a Paradev acceder a sus herramientas; conectar las tuyas hace que el trabajo que Paradev hace por ti aparezca a tu nombre."

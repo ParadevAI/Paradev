@@ -4921,6 +4921,9 @@ msgstr "雲端環境設定"
 msgid "Cloud environments"
 msgstr "雲端環境"
 
+msgid "Cloud environments are not included in your plan."
+msgstr "您的方案不包含雲端環境。"
+
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "雲端環境會從 GitHub 檢出你的儲存庫。請先連結這些;只需操作一次。"
 
@@ -23362,6 +23365,9 @@ msgstr "您的組織已達到雲端使用上限。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "你的組織已達到雲端用量上限。除非提高上限，此工作區將在幾分鐘後停止。"
+
+msgid "Your organization reached its environment limit."
+msgstr "您的組織已達到環境數量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"
