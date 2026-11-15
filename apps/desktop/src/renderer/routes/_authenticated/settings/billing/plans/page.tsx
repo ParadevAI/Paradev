@@ -29,6 +29,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { PlanChangeDialog } from "renderer/routes/_authenticated/components/PlanChangeDialog";
 import { useBillingActions } from "renderer/routes/_authenticated/hooks/useBillingActions";
 import { usePlanCatalog } from "renderer/routes/_authenticated/hooks/usePlanCatalog";
+import { resolveSubscriptionIsYearly } from "../utils/resolveSubscriptionIsYearly";
 
 export const Route = createFileRoute("/_authenticated/settings/billing/plans/")(
 	{
@@ -324,32 +325,6 @@ const COMPARISON_SECTIONS: ComparisonSection[] = [
 		],
 	},
 ];
-
-/**
- * Whether the subscription bills yearly, or null when there is nothing to read
- * it from — no subscription yet, or a row predating `billingInterval`, where
- * the period length is the only signal.
- */
-function resolveSubscriptionIsYearly(activePlan: {
-	billingInterval?: string | null;
-	periodStart?: Date | null;
-	periodEnd?: Date | null;
-}): boolean | null {
-	const interval = activePlan.billingInterval;
-	if (interval === "year" || interval === "yearly") return true;
-	if (interval === "month" || interval === "monthly") return false;
-
-	if (activePlan.periodStart && activePlan.periodEnd) {
-		return (
-			differenceInDays(
-				new Date(activePlan.periodEnd),
-				new Date(activePlan.periodStart),
-			) > 60
-		);
-	}
-
-	return null;
-}
 
 function PlansPage() {
 	// Seeded from the subscription, not hardcoded: showing Annual to a monthly

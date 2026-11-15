@@ -124,7 +124,7 @@ export function CloudUpsellDialog({
 							)}
 						</div>
 					)}
-					{catalogQuery.isPending && (
+					{catalogQuery.isLoading && (
 						<p className="text-sm text-muted-foreground">
 							<Trans>Loading plans...</Trans>
 						</p>

@@ -26,6 +26,7 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../utils/settings-search";
+import { resolveSubscriptionIsYearly } from "../../utils/resolveSubscriptionIsYearly";
 import { BillingDetails } from "./components/BillingDetails";
 import { CloudPlansBanner } from "./components/CloudPlansBanner";
 import { CloudUsageCard } from "./components/CloudUsageCard";
@@ -109,11 +110,15 @@ export function BillingOverview({
 		plan === "pro"
 			? (familyForPlan(catalog, activePlan?.autumnPlanId)?.family ?? null)
 			: null;
+	const subscriptionIsYearly = activePlan
+		? resolveSubscriptionIsYearly(activePlan)
+		: null;
 	const subscriptionInterval =
-		activePlan?.billingInterval === "year" ||
-		activePlan?.billingInterval === "month"
-			? activePlan.billingInterval
-			: null;
+		subscriptionIsYearly === null
+			? null
+			: subscriptionIsYearly
+				? "year"
+				: "month";
 	const cloudFamilies = catalog.filter(
 		(family) => advertisedGbMinutesPerSeat(family) !== null,
 	);

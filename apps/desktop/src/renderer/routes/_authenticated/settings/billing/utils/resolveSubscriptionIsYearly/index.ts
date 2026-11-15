@@ -1,0 +1,1 @@
+export { resolveSubscriptionIsYearly } from "./resolveSubscriptionIsYearly";
