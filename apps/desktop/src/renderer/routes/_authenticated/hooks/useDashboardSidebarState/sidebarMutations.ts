@@ -92,13 +92,15 @@ export function tombstoneSidebarWorkspaceRecord(
  * opening one of its workspaces) reveals it again, the same way re-adding a
  * removed project used to. Background placement passes `reveal: false`: a
  * workspace created by the CLI or an agent must not undo an explicit hide.
- * Adding a project passes `expand: true`: a row left collapsed before it was
- * hidden would otherwise come back closed.
+ * Adding a project passes `expand: true` so it opens expanded.
  */
 export function ensureSidebarProjectRecord(
 	collections: Pick<AppCollections, "v2SidebarProjects">,
 	projectId: string,
-	{ reveal = true, expand = false }: { reveal?: boolean; expand?: boolean } = {},
+	{
+		reveal = true,
+		expand = false,
+	}: { reveal?: boolean; expand?: boolean } = {},
 ): void {
 	const existing = collections.v2SidebarProjects.get(projectId);
 	if (existing) {

@@ -127,7 +127,7 @@ export function SetupProjectModal({
 					message: `Cloned to ${result.repoPath}`,
 				}),
 			);
-			ensureProjectInSidebar(projectId);
+			ensureProjectInSidebar(projectId, { expand: true });
 			onChanged?.();
 			reset();
 			onOpenChange(false);
@@ -173,7 +173,7 @@ export function SetupProjectModal({
 					message: `Project set up at ${result.repoPath}`,
 				}),
 			);
-			ensureProjectInSidebar(projectId);
+			ensureProjectInSidebar(projectId, { expand: true });
 			onChanged?.();
 			reset();
 			onOpenChange(false);
