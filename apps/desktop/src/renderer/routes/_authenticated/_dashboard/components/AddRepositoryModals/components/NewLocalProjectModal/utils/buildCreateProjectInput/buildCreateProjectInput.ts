@@ -4,24 +4,38 @@ import type { inferRouterInputs } from "@trpc/server";
 export type CreateProjectInput =
 	inferRouterInputs<AppRouter>["project"]["create"];
 
-/** Local folders first, then clones; the first repository is the primary. */
+export type ProjectSource =
+	| { kind: "local"; path: string }
+	| { kind: "clone"; url: string; label: string };
+
+export const sourceKey = (source: ProjectSource) =>
+	source.kind === "local" ? source.path : source.url;
+
+/** The host makes the first repository the primary, so the picked one leads. */
 export function buildCreateProjectInput({
 	name,
-	repoPaths,
-	cloneUrls,
+	sources,
+	primaryKey,
 	cloneDir,
 }: {
 	name: string;
-	repoPaths: string[];
-	cloneUrls: string[];
+	sources: ProjectSource[];
+	primaryKey: string | undefined;
 	cloneDir: string;
 }): CreateProjectInput {
+	const primary = sources.find((source) => sourceKey(source) === primaryKey);
+	const ordered = primary
+		? [primary, ...sources.filter((source) => source !== primary)]
+		: sources;
 	return {
 		name: name.trim(),
-		repositories: [
-			...repoPaths.map((path) => ({ kind: "local" as const, path })),
-			...cloneUrls.map((url) => ({ kind: "clone" as const, url })),
-		],
-		...(cloneUrls.length > 0 ? { parentDir: cloneDir } : {}),
+		repositories: ordered.map((source) =>
+			source.kind === "local"
+				? { kind: "local" as const, path: source.path }
+				: { kind: "clone" as const, url: source.url },
+		),
+		...(sources.some((source) => source.kind === "clone")
+			? { parentDir: cloneDir }
+			: {}),
 	};
 }

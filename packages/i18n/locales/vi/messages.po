@@ -12765,9 +12765,6 @@ msgstr "Người mới sẽ nhận email mời tham gia {organizationName}. Họ
 msgid "New project"
 msgstr "Dự án mới"
 
-msgid "New project of several repositories"
-msgstr "Dự án mới từ nhiều kho lưu trữ"
-
 msgid "New push to branch"
 msgstr "Push mới lên nhánh"
 
@@ -14440,9 +14437,6 @@ msgstr "Mở PR #{0}"
 
 msgid "Open Preview"
 msgstr "Mở bản xem trước"
-
-msgid "Open project"
-msgstr "Mở dự án"
 
 msgid "Open Project"
 msgstr "Mở dự án"
@@ -23065,6 +23059,9 @@ msgstr "Lệnh chạy của workspace: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Cài đặt workspace"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Lệnh thiết lập và lệnh chạy của workspace, cài đặt agent và máy chủ MCP lấy từ repository chính."
 
 msgid "Workspace views"
 msgstr "Chế độ xem workspace"

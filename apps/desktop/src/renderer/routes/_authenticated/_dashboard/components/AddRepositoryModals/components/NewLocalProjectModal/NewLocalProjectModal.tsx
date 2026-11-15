@@ -24,9 +24,15 @@ import {
 	AddRepositoryMenu,
 	type CloneSource,
 } from "renderer/routes/_authenticated/components/AddRepositoryMenu";
+import { PrimaryRepositoryBadge } from "renderer/routes/_authenticated/components/PrimaryRepositoryBadge";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { buildCreateProjectInput } from "./utils/buildCreateProjectInput";
-import { defaultProjectName, parentOf } from "./utils/defaultProjectName";
+import {
+	buildCreateProjectInput,
+	type ProjectSource,
+	sourceKey,
+} from "./utils/buildCreateProjectInput";
+import { defaultProjectName } from "./utils/defaultProjectName";
+import { parentOf } from "./utils/parentOf";
 import { projectFolderName } from "./utils/projectFolderName";
 
 interface NewLocalProjectModalProps {
@@ -46,33 +52,38 @@ export function NewLocalProjectModal({
 	const finalizeSetup = useFinalizeProjectSetup();
 	const selectDirectory = electronTrpc.window.selectDirectory.useMutation();
 	const { data: homeDir } = electronTrpc.window.getHomeDir.useQuery();
-	const [repoPaths, setRepoPaths] = useState<string[]>([]);
-	const [clones, setClones] = useState<CloneSource[]>([]);
+	const [sources, setSources] = useState<ProjectSource[]>([]);
+	const [pickedPrimaryKey, setPickedPrimaryKey] = useState<string | null>(null);
 	const [typedName, setTypedName] = useState<string | null>(null);
 	const [working, setWorking] = useState(false);
-	const name =
-		typedName ??
-		defaultProjectName(
-			repoPaths,
-			clones.map((clone) => clone.url),
-		);
+	const name = typedName ?? defaultProjectName(sources[0]);
 	const cloneDir = homeDir
 		? `${homeDir}/.paradev/projects/${projectFolderName(name)}`
 		: "";
-	const repositoryCount = repoPaths.length + clones.length;
+	const keys = sources.map(sourceKey);
+	const primaryKey =
+		pickedPrimaryKey && keys.includes(pickedPrimaryKey)
+			? pickedPrimaryKey
+			: keys[0];
+	const hasClones = sources.some((source) => source.kind === "clone");
 
 	const reset = () => {
-		setRepoPaths([]);
-		setClones([]);
+		setSources([]);
+		setPickedPrimaryKey(null);
 		setTypedName(null);
 		setWorking(false);
 	};
 
-	const toggleClone = (source: CloneSource) =>
-		setClones((current) =>
-			current.some((clone) => clone.url === source.url)
-				? current.filter((clone) => clone.url !== source.url)
-				: [...current, source],
+	const removeSource = (key: string) =>
+		setSources((current) =>
+			current.filter((source) => sourceKey(source) !== key),
+		);
+
+	const toggleClone = (clone: CloneSource) =>
+		setSources((current) =>
+			current.some((source) => sourceKey(source) === clone.url)
+				? current.filter((source) => sourceKey(source) !== clone.url)
+				: [...current, { kind: "clone", url: clone.url, label: clone.label }],
 		);
 
 	const handleOpenChange = (next: boolean) => {
@@ -88,14 +99,20 @@ export function NewLocalProjectModal({
 				multiple: true,
 			});
 			if (picked.canceled) return;
-			setRepoPaths((paths) => [...new Set([...paths, ...picked.paths])]);
+			setSources((current) => {
+				const known = new Set(current.map(sourceKey));
+				const added = [...new Set(picked.paths)]
+					.filter((path) => !known.has(path))
+					.map((path): ProjectSource => ({ kind: "local", path }));
+				return [...current, ...added];
+			});
 		} catch (err) {
 			toast.error(errorMessage(err));
 		}
 	};
 
 	const create = async () => {
-		if (repositoryCount === 0 || !name.trim()) return;
+		if (sources.length === 0 || !name.trim()) return;
 		if (!activeHostUrl) {
 			showHostServiceUnavailableToast(hostService, { action: "createProject" });
 			return;
@@ -105,12 +122,7 @@ export function NewLocalProjectModal({
 			const result = await getHostServiceClientByUrl(
 				activeHostUrl,
 			).project.create.mutate(
-				buildCreateProjectInput({
-					name,
-					repoPaths,
-					cloneUrls: clones.map((clone) => clone.url),
-					cloneDir,
-				}),
+				buildCreateProjectInput({ name, sources, primaryKey, cloneDir }),
 			);
 			finalizeSetup(activeHostUrl, {
 				projectId: result.id,
@@ -160,62 +172,68 @@ export function NewLocalProjectModal({
 						<Label className="text-xs">
 							<Trans>Repositories</Trans>
 						</Label>
-						{repoPaths.map((repoPath) => (
-							<div
-								key={repoPath}
-								className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm"
-							>
-								<LuFolderGit2 className="size-3.5 shrink-0 text-muted-foreground" />
-								<span className="shrink-0">{getBaseName(repoPath)}</span>
-								<span
-									className="min-w-0 flex-1 truncate text-xs text-muted-foreground"
-									title={repoPath}
+						{sources.map((source) => {
+							const key = sourceKey(source);
+							const repositoryName =
+								source.kind === "local"
+									? getBaseName(source.path)
+									: source.label;
+							return (
+								<div
+									key={key}
+									className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm"
 								>
-									{parentOf(repoPath)}
-								</span>
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									className="size-6"
-									aria-label={t({ message: "Remove repository" })}
-									disabled={working}
-									onClick={() =>
-										setRepoPaths((paths) =>
-											paths.filter((path) => path !== repoPath),
-										)
-									}
-								>
-									<LuX className="size-3.5" />
-								</Button>
-							</div>
-						))}
-						{clones.map((clone) => (
-							<div
-								key={clone.url}
-								className="flex h-10 items-center gap-2 rounded-md border px-3 text-sm"
-							>
-								<LuGithub className="size-3.5 shrink-0 text-muted-foreground" />
-								<span className="min-w-0 flex-1 truncate" title={clone.url}>
-									{clone.label}
-								</span>
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									className="size-6"
-									aria-label={t({ message: "Remove repository" })}
-									disabled={working}
-									onClick={() => toggleClone(clone)}
-								>
-									<LuX className="size-3.5" />
-								</Button>
-							</div>
-						))}
+									{source.kind === "local" ? (
+										<LuFolderGit2 className="size-3.5 shrink-0 text-muted-foreground" />
+									) : (
+										<LuGithub className="size-3.5 shrink-0 text-muted-foreground" />
+									)}
+									<span
+										className="min-w-0 shrink truncate"
+										title={source.kind === "clone" ? source.url : undefined}
+									>
+										{repositoryName}
+									</span>
+									<span
+										className="min-w-0 flex-1 truncate text-xs text-muted-foreground"
+										title={source.kind === "local" ? source.path : undefined}
+									>
+										{source.kind === "local" ? parentOf(source.path) : null}
+									</span>
+									{key === primaryKey ? (
+										<PrimaryRepositoryBadge />
+									) : (
+										<Button
+											type="button"
+											variant="ghost"
+											size="sm"
+											className="h-6 shrink-0 px-2 text-xs text-muted-foreground"
+											disabled={working}
+											onClick={() => setPickedPrimaryKey(key)}
+										>
+											<Trans>Make primary</Trans>
+										</Button>
+									)}
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										className="size-6 shrink-0"
+										aria-label={t({ message: "Remove repository" })}
+										disabled={working}
+										onClick={() => removeSource(key)}
+									>
+										<LuX className="size-3.5" />
+									</Button>
+								</div>
+							);
+						})}
 						<AddRepositoryMenu
 							hostUrl={activeHostUrl}
 							disabled={working || selectDirectory.isPending}
-							selectedCloneUrls={clones.map((clone) => clone.url)}
+							selectedCloneUrls={sources.flatMap((source) =>
+								source.kind === "clone" ? [source.url] : [],
+							)}
 							onAddLocal={() => void addRepository()}
 							onToggleClone={toggleClone}
 						/>
@@ -235,9 +253,9 @@ export function NewLocalProjectModal({
 						onClick={() => void create()}
 						disabled={
 							working ||
-							repositoryCount === 0 ||
+							sources.length === 0 ||
 							!name.trim() ||
-							(clones.length > 0 && !cloneDir)
+							(hasClones && !cloneDir)
 						}
 					>
 						{working ? (

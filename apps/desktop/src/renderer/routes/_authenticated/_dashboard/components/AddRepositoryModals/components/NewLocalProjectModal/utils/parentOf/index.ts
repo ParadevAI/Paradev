@@ -1,0 +1,1 @@
+export { parentOf } from "./parentOf";

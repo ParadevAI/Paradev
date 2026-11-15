@@ -12765,9 +12765,6 @@ msgstr "新成員會收到加入 {organizationName} 的電子郵件邀請，加�
 msgid "New project"
 msgstr "新建專案"
 
-msgid "New project of several repositories"
-msgstr "包含多個儲存庫的新專案"
-
 msgid "New push to branch"
 msgstr "向分支推送了新提交"
 
@@ -14440,9 +14437,6 @@ msgstr "開啟PR #{0}"
 
 msgid "Open Preview"
 msgstr "開啟預覽"
-
-msgid "Open project"
-msgstr "開啟專案"
 
 msgid "Open Project"
 msgstr "開啟專案"
@@ -23065,6 +23059,9 @@ msgstr "工作區執行：{workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "工作區設定"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "工作區的初始化和執行命令、代理程式設定以及 MCP 伺服器都來自主要儲存庫。"
 
 msgid "Workspace views"
 msgstr "工作區檢視"

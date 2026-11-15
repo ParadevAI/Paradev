@@ -12765,9 +12765,6 @@ msgstr "新しいユーザーには{organizationName}への招待メールが届
 msgid "New project"
 msgstr "新規プロジェクト"
 
-msgid "New project of several repositories"
-msgstr "複数リポジトリの新規プロジェクト"
-
 msgid "New push to branch"
 msgstr "ブランチへの新規プッシュ"
 
@@ -14440,9 +14437,6 @@ msgstr "PR #{0} を開く"
 
 msgid "Open Preview"
 msgstr "プレビューを開く"
-
-msgid "Open project"
-msgstr "プロジェクトを開く"
 
 msgid "Open Project"
 msgstr "プロジェクトを開く"
@@ -23065,6 +23059,9 @@ msgstr "ワークスペース実行: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "ワークスペース設定"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "ワークスペースのセットアップと実行のコマンド、エージェントの設定、MCPサーバーはメインのリポジトリから取得します。"
 
 msgid "Workspace views"
 msgstr "ワークスペースのビュー"

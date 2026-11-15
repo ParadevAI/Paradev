@@ -10,7 +10,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
-import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
@@ -27,6 +26,7 @@ import { LuFolderGit2 } from "react-icons/lu";
 import type { HostRepository } from "renderer/hooks/host-projects/useHostProjects";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { hostRefusalReason } from "renderer/lib/hostRefusalReason";
+import { PrimaryRepositoryBadge } from "renderer/routes/_authenticated/components/PrimaryRepositoryBadge";
 import { AddProjectRepository } from "../AddProjectRepository";
 
 interface RepositoriesSectionProps {
@@ -98,11 +98,7 @@ export function RepositoriesSection({
 				>
 					<LuFolderGit2 className="size-3.5 shrink-0 text-muted-foreground" />
 					<span className="shrink-0">{repository.name}</span>
-					{repository.isPrimary && (
-						<Badge variant="secondary" className="shrink-0">
-							<Trans>Primary</Trans>
-						</Badge>
-					)}
+					{repository.isPrimary && <PrimaryRepositoryBadge />}
 					<span
 						className={cn(
 							"min-w-0 flex-1 truncate text-xs",

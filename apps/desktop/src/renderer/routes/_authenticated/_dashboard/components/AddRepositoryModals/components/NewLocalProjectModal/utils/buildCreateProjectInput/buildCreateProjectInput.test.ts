@@ -1,20 +1,27 @@
 import { describe, expect, test } from "bun:test";
 import { buildCreateProjectInput } from "./buildCreateProjectInput";
 
+const web = { kind: "local" as const, path: "/src/web" };
+const api = {
+	kind: "clone" as const,
+	url: "https://github.com/acme/api",
+	label: "acme/api",
+};
+
 describe("buildCreateProjectInput", () => {
-	test("local folders come first and lead as the primary", () => {
+	test("the picked primary leads, the rest keep the order they were added in", () => {
 		expect(
 			buildCreateProjectInput({
 				name: " orbit ",
-				repoPaths: ["/src/web"],
-				cloneUrls: ["https://github.com/acme/api"],
+				sources: [web, api],
+				primaryKey: api.url,
 				cloneDir: "/home/me/.paradev/projects/orbit",
 			}),
 		).toEqual({
 			name: "orbit",
 			repositories: [
-				{ kind: "local", path: "/src/web" },
 				{ kind: "clone", url: "https://github.com/acme/api" },
+				{ kind: "local", path: "/src/web" },
 			],
 			parentDir: "/home/me/.paradev/projects/orbit",
 		});
@@ -24,8 +31,8 @@ describe("buildCreateProjectInput", () => {
 		expect(
 			buildCreateProjectInput({
 				name: "web",
-				repoPaths: ["/src/web"],
-				cloneUrls: [],
+				sources: [web],
+				primaryKey: undefined,
 				cloneDir: "/home/me/.paradev/projects/web",
 			}),
 		).toEqual({

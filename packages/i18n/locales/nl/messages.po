@@ -12765,9 +12765,6 @@ msgstr "Nieuwe personen krijgen een uitnodiging per e-mail voor {organizationNam
 msgid "New project"
 msgstr "Nieuw project"
 
-msgid "New project of several repositories"
-msgstr "Nieuw project van meerdere repository's"
-
 msgid "New push to branch"
 msgstr "Nieuwe push naar branch"
 
@@ -14440,9 +14437,6 @@ msgstr "PR #{0} openen"
 
 msgid "Open Preview"
 msgstr "Preview openen"
-
-msgid "Open project"
-msgstr "Project openen"
 
 msgid "Open Project"
 msgstr "Project openen"
@@ -23065,6 +23059,9 @@ msgstr "Werkruimte-run: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Instellingen van werkruimte"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Setup- en uitvoeropdrachten van de werkruimte, agentinstellingen en MCP-servers komen uit de primaire repository."
 
 msgid "Workspace views"
 msgstr "Werkruimteweergaven"

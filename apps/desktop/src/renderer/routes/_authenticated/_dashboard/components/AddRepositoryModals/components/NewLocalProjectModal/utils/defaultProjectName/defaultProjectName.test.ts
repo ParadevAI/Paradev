@@ -1,26 +1,16 @@
 import { expect, test } from "bun:test";
 import { defaultProjectName } from "./defaultProjectName";
 
-test("local repositories in one folder are named after that folder", () => {
-	expect(defaultProjectName(["/work/orbit/web", "/work/orbit/api"], [])).toBe(
-		"orbit",
+test("a project is named after the first repository added", () => {
+	expect(defaultProjectName({ kind: "local", path: "/work/orbit/web" })).toBe(
+		"web",
 	);
-});
-
-test("cloned repositories are named after the name they share", () => {
 	expect(
-		defaultProjectName(
-			[],
-			[
-				"https://github.com/acme/orbit-web.git",
-				"https://github.com/acme/orbit-api.git",
-			],
-		),
-	).toBe("orbit");
-	expect(
-		defaultProjectName(
-			[],
-			["https://github.com/acme/web.git", "git@github.com:acme/api.git"],
-		),
-	).toBe("web");
+		defaultProjectName({
+			kind: "clone",
+			url: "git@github.com:acme/orbit-api.git",
+			label: "acme/orbit-api",
+		}),
+	).toBe("orbit-api");
+	expect(defaultProjectName(undefined)).toBe("");
 });

@@ -12765,9 +12765,6 @@ msgstr "Les nouvelles personnes reçoivent une invitation par e-mail à rejoindr
 msgid "New project"
 msgstr "Nouveau projet"
 
-msgid "New project of several repositories"
-msgstr "Nouveau projet de plusieurs dépôts"
-
 msgid "New push to branch"
 msgstr "Nouveau push sur une branche"
 
@@ -14440,9 +14437,6 @@ msgstr "Ouvrir la PR #{0}"
 
 msgid "Open Preview"
 msgstr "Ouvrir l'aperçu"
-
-msgid "Open project"
-msgstr "Ouvrir le projet"
 
 msgid "Open Project"
 msgstr "Ouvrir un projet"
@@ -23065,6 +23059,9 @@ msgstr "Exécution de l'espace de travail : {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Paramètres de l'espace de travail"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Les commandes de configuration et d'exécution de l'espace de travail, les paramètres des agents et les serveurs MCP viennent du dépôt principal."
 
 msgid "Workspace views"
 msgstr "Vues des espaces de travail"

@@ -12765,9 +12765,6 @@ msgstr "Новые люди получат приглашение в {organizati
 msgid "New project"
 msgstr "Новый проект"
 
-msgid "New project of several repositories"
-msgstr "Новый проект из нескольких репозиториев"
-
 msgid "New push to branch"
 msgstr "Новый push в ветку"
 
@@ -14440,9 +14437,6 @@ msgstr "Открыть PR #{0}"
 
 msgid "Open Preview"
 msgstr "Открыть предпросмотр"
-
-msgid "Open project"
-msgstr "Открыть проект"
 
 msgid "Open Project"
 msgstr "Открыть проект"
@@ -23065,6 +23059,9 @@ msgstr "Запуск рабочей области: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Настройки рабочей области"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Команды установки и запуска рабочей области, настройки агентов и MCP-серверы берутся из основного репозитория."
 
 msgid "Workspace views"
 msgstr "Виды рабочих областей"

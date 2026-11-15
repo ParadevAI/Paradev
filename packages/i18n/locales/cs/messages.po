@@ -12765,9 +12765,6 @@ msgstr "Noví lidé dostanou e-mailem pozvánku do {organizationName}. Uvidí to
 msgid "New project"
 msgstr "Nový projekt"
 
-msgid "New project of several repositories"
-msgstr "Nový projekt z více repozitářů"
-
 msgid "New push to branch"
 msgstr "Nový push do větve"
 
@@ -14440,9 +14437,6 @@ msgstr "Otevřít PR #{0}"
 
 msgid "Open Preview"
 msgstr "Otevřít náhled"
-
-msgid "Open project"
-msgstr "Otevřít projekt"
 
 msgid "Open Project"
 msgstr "Otevřít projekt"
@@ -23065,6 +23059,9 @@ msgstr "Spuštění pracovního prostoru: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Nastavení pracovního prostoru"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Příkazy pro setup a spuštění pracovního prostoru, nastavení agentů a MCP servery pocházejí z hlavního repozitáře."
 
 msgid "Workspace views"
 msgstr "Pohledy pracovních prostorů"

@@ -12765,9 +12765,6 @@ msgstr "Yeni kişiler {organizationName} kuruluşuna katılmak için e-posta dav
 msgid "New project"
 msgstr "Yeni proje"
 
-msgid "New project of several repositories"
-msgstr "Birden çok depodan yeni proje"
-
 msgid "New push to branch"
 msgstr "Dala yeni push"
 
@@ -14440,9 +14437,6 @@ msgstr "PR #{0} aç"
 
 msgid "Open Preview"
 msgstr "Önizlemeyi aç"
-
-msgid "Open project"
-msgstr "Projeyi aç"
 
 msgid "Open Project"
 msgstr "Proje aç"
@@ -23065,6 +23059,9 @@ msgstr "Çalışma alanı çalıştırması: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Çalışma alanı ayarları"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Çalışma alanının kurulum ve çalıştırma komutları, ajan ayarları ve MCP sunucuları birincil depodan gelir."
 
 msgid "Workspace views"
 msgstr "Çalışma alanı görünümleri"

@@ -1,1 +1,1 @@
-export { defaultProjectName, parentOf } from "./defaultProjectName";
+export { defaultProjectName } from "./defaultProjectName";

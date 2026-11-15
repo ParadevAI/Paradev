@@ -1,6 +1,5 @@
 import { getBaseName } from "renderer/lib/pathBasename";
-
-const parentOf = (path: string) => path.replace(/[/\\]+[^/\\]+[/\\]*$/, "");
+import type { ProjectSource } from "../buildCreateProjectInput";
 
 const repositoryNameOf = (url: string) =>
 	url
@@ -9,30 +8,10 @@ const repositoryNameOf = (url: string) =>
 		.filter(Boolean)
 		.pop() ?? "";
 
-function sharedPrefix(names: string[]): string {
-	const [first = "", ...rest] = names;
-	let prefix = first;
-	for (const name of rest) {
-		while (!name.startsWith(prefix)) prefix = prefix.slice(0, -1);
-	}
-	return prefix.replace(/[-_.]+$/, "");
+/** The name of the first repository added. */
+export function defaultProjectName(first: ProjectSource | undefined): string {
+	if (!first) return "";
+	return first.kind === "local"
+		? getBaseName(first.path)
+		: repositoryNameOf(first.url);
 }
-
-/** The folder that holds every local repository, else the name the cloned repositories share. */
-export function defaultProjectName(
-	repoPaths: string[],
-	cloneUrls: string[],
-): string {
-	const [first] = repoPaths;
-	if (first) {
-		const parent = parentOf(first);
-		const shareParent =
-			repoPaths.length > 1 &&
-			repoPaths.every((path) => parentOf(path) === parent);
-		return getBaseName(shareParent ? parent : first);
-	}
-	const names = cloneUrls.map(repositoryNameOf);
-	return (names.length > 1 && sharedPrefix(names)) || (names[0] ?? "");
-}
-
-export { parentOf };

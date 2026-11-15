@@ -12765,9 +12765,6 @@ msgstr "새로운 사람은 {organizationName} 가입 초대 이메일을 받습
 msgid "New project"
 msgstr "새 프로젝트"
 
-msgid "New project of several repositories"
-msgstr "여러 저장소로 새 프로젝트"
-
 msgid "New push to branch"
 msgstr "브랜치에 새 푸시"
 
@@ -14440,9 +14437,6 @@ msgstr "PR #{0} 열기"
 
 msgid "Open Preview"
 msgstr "미리보기 열기"
-
-msgid "Open project"
-msgstr "프로젝트 열기"
 
 msgid "Open Project"
 msgstr "프로젝트 열기"
@@ -23065,6 +23059,9 @@ msgstr "워크스페이스 실행: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "워크스페이스 설정"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "워크스페이스 설정 및 실행 명령, 에이전트 설정, MCP 서버는 기본 리포지토리에서 가져옵니다."
 
 msgid "Workspace views"
 msgstr "워크스페이스 뷰"

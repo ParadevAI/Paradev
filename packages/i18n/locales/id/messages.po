@@ -12765,9 +12765,6 @@ msgstr "Orang baru akan menerima undangan email untuk bergabung ke {organization
 msgid "New project"
 msgstr "Proyek baru"
 
-msgid "New project of several repositories"
-msgstr "Proyek baru dari beberapa repositori"
-
 msgid "New push to branch"
 msgstr "Push baru ke branch"
 
@@ -14440,9 +14437,6 @@ msgstr "Buka PR #{0}"
 
 msgid "Open Preview"
 msgstr "Buka Pratinjau"
-
-msgid "Open project"
-msgstr "Buka proyek"
 
 msgid "Open Project"
 msgstr "Buka Proyek"
@@ -23065,6 +23059,9 @@ msgstr "Run workspace: {workspaceRunState}"
 
 msgid "Workspace settings"
 msgstr "Pengaturan workspace"
+
+msgid "Workspace setup and run commands, agent settings and MCP servers come from the primary repository."
+msgstr "Perintah setup dan run workspace, pengaturan agen, dan server MCP berasal dari repositori utama."
 
 msgid "Workspace views"
 msgstr "Tampilan workspace"
