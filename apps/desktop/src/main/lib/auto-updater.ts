@@ -3,12 +3,13 @@ import { statfsSync } from "node:fs";
 import { msg } from "@lingui/core/macro";
 import * as Sentry from "@sentry/electron/main";
 import { i18n } from "@superset/i18n";
-import { app, dialog } from "electron";
+import { app, dialog, autoUpdater as nativeUpdater } from "electron";
 import log from "electron-log/main";
 import { autoUpdater, type UpdateCheckResult } from "electron-updater";
 import { env } from "main/env.main";
 import { setSkipQuitConfirmation } from "main/index";
 import { appState } from "main/lib/app-state";
+import { supersedeStagedUpdate } from "main/lib/supersede-staged-update";
 import {
 	isEnvironmentUpdateError,
 	isUpstreamServerError,
@@ -44,6 +45,7 @@ async function clearCachedUpdate(reason: string): Promise<void> {
 }
 
 const UPDATE_CHECK_INTERVAL_MS = 1000 * 60 * 60 * 4; // 4 hours
+const INSTALL_TIME_CHECK_TIMEOUT_MS = 2000;
 
 /**
  * Detect if this is a prerelease build from app version using semver.
@@ -136,6 +138,10 @@ let currentError: string | undefined;
 let currentProgress: AutoUpdateProgress | undefined;
 let isDismissed = false;
 let isInstalling = false;
+let stagedVersion: string | undefined;
+let isCheckingForNewerThanStaged = false;
+let isSquirrelStaging = false;
+let isInstallPendingOnSquirrel = false;
 
 function emitStatus(
 	status: AutoUpdateStatus,
@@ -147,6 +153,14 @@ function emitStatus(
 	currentVersion = version;
 	currentError = error;
 	currentProgress = progress;
+	if (status === AUTO_UPDATE_STATUS.READY) {
+		stagedVersion = version;
+	} else if (
+		status === AUTO_UPDATE_STATUS.ERROR ||
+		status === AUTO_UPDATE_STATUS.UPDATED
+	) {
+		stagedVersion = undefined;
+	}
 
 	if (isDismissed && status === AUTO_UPDATE_STATUS.READY) {
 		return;
@@ -168,15 +182,8 @@ export function getUpdateStatus(): AutoUpdateStatusEvent {
 	};
 }
 
-// True from the moment electron-updater hands the archive to Squirrel.Mac,
-// which unpacks ~2GB into ~/Library/Caches/<appId>.ShipIt and then verifies it.
-// That work outlives the download promise, so it is also the window in which a
-// second check must not start: Squirrel gates its own check on a ReactiveObjC
-// command that is disabled until the app relaunches, so a repeat check cannot
-// stage anything newer — it only re-downloads the archive and points a second
-// staging run at the same cache directory.
 export function isUpdateReadyToInstall(): boolean {
-	return isInstalling || currentStatus === AUTO_UPDATE_STATUS.READY;
+	return isInstalling || stagedVersion !== undefined;
 }
 
 export function isInstallingUpdate(): boolean {
@@ -214,13 +221,87 @@ export function installUpdate(): void {
 		return;
 	}
 	isInstalling = true;
+	void installUnlessSuperseded();
+}
+
+async function installUnlessSuperseded(): Promise<void> {
+	const isDownloadingNewer = await downloadNewerThanStaged({
+		timeoutMs: INSTALL_TIME_CHECK_TIMEOUT_MS,
+	});
+	if (isDownloadingNewer) {
+		isInstalling = false;
+		return;
+	}
 	setSkipQuitConfirmation();
+	if (isSquirrelStaging) {
+		isInstallPendingOnSquirrel = true;
+		return;
+	}
 	autoUpdater.quitAndInstall(false, true);
 }
 
 export function dismissUpdate(): void {
 	isDismissed = true;
 	autoUpdateEmitter.emit("status-changed", { status: AUTO_UPDATE_STATUS.IDLE });
+}
+
+// READY comes before Squirrel.Mac finishes staging, and Squirrel refuses a
+// second check until it has.
+async function downloadNewerThanStaged(
+	options: { isAbandoned?: () => boolean; timeoutMs?: number } = {},
+): Promise<boolean> {
+	if (currentStatus !== AUTO_UPDATE_STATUS.READY) return true;
+	if (!stagedVersion || isCheckingForNewerThanStaged || isSquirrelStaging) {
+		return false;
+	}
+	const replacedVersion = stagedVersion;
+	return supersedeStagedUpdate({
+		...options,
+		stagedVersion: replacedVersion,
+		fetchLatestVersion: fetchLatestVersionWithoutDownloading,
+		startDownload: (version) => {
+			log.info(`[auto-updater] ${version} replaces staged ${replacedVersion}`);
+			isDismissed = false;
+			emitStatus(AUTO_UPDATE_STATUS.DOWNLOADING, version);
+			autoUpdater.downloadUpdate().catch(() => {});
+		},
+	});
+}
+
+async function fetchLatestVersionWithoutDownloading(): Promise<string | null> {
+	isCheckingForNewerThanStaged = true;
+	autoUpdater.autoDownload = false;
+	try {
+		const result = await autoUpdater.checkForUpdates();
+		return result?.isUpdateAvailable ? result.updateInfo.version : null;
+	} catch (error) {
+		log.info(
+			`[auto-updater] Could not look for a release newer than staged ${stagedVersion}:`,
+			error instanceof Error ? error.message : error,
+		);
+		return null;
+	} finally {
+		autoUpdater.autoDownload = true;
+		isCheckingForNewerThanStaged = false;
+	}
+}
+
+function showUpdateStagedDialog(): void {
+	dialog.showMessageBox({
+		type: "info",
+		title: i18n._(msg({ message: "Updates" })),
+		message: i18n._(
+			msg({
+				message: "An update is ready to install.",
+			}),
+		),
+		detail: i18n._({
+			...msg({
+				message: "Version {version} installs the next time you restart.",
+			}),
+			values: { version: stagedVersion },
+		}),
+	});
 }
 
 export function checkForUpdates(): void {
@@ -233,10 +314,12 @@ export function checkForUpdates(): void {
 		);
 		return;
 	}
-	if (isUpdateReadyToInstall()) {
-		log.info(
-			`[auto-updater] Check skipped: ${currentVersion} is already staged and installs on restart`,
-		);
+	if (isInstalling) {
+		log.info(`[auto-updater] Check skipped: ${stagedVersion} is installing`);
+		return;
+	}
+	if (stagedVersion) {
+		void downloadNewerThanStaged({ isAbandoned: () => isInstalling });
 		return;
 	}
 	isDismissed = false;
@@ -298,21 +381,15 @@ export function checkForUpdatesInteractive(): void {
 		return;
 	}
 
-	if (isUpdateReadyToInstall()) {
-		dialog.showMessageBox({
-			type: "info",
-			title: i18n._(msg({ message: "Updates" })),
-			message: i18n._(
-				msg({
-					message: "An update is ready to install.",
-				}),
-			),
-			detail: i18n._({
-				...msg({
-					message: "Version {version} installs the next time you restart.",
-				}),
-				values: { version: currentVersion },
-			}),
+	if (isInstalling) {
+		showUpdateStagedDialog();
+		return;
+	}
+	if (stagedVersion) {
+		void downloadNewerThanStaged({
+			isAbandoned: () => isInstalling,
+		}).then((isDownloading) => {
+			if (!isDownloading) showUpdateStagedDialog();
 		});
 		return;
 	}
@@ -472,14 +549,21 @@ export function setupAutoUpdater(): void {
 	);
 
 	autoUpdater.on("error", (error) => {
+		if (isCheckingForNewerThanStaged) return;
 		// Allow retry if Squirrel surfaces an error instead of actually quitting.
 		isInstalling = false;
+		isInstallPendingOnSquirrel = false;
+		isSquirrelStaging = false;
 		if (isTransientError(error)) {
 			log.info(
 				"[auto-updater] Update server unreachable, will retry later:",
 				error?.message,
 			);
-			emitStatus(AUTO_UPDATE_STATUS.IDLE);
+			if (stagedVersion) {
+				emitStatus(AUTO_UPDATE_STATUS.READY, stagedVersion);
+			} else {
+				emitStatus(AUTO_UPDATE_STATUS.IDLE);
+			}
 			return;
 		}
 		log.error(
@@ -505,6 +589,7 @@ export function setupAutoUpdater(): void {
 		log.info(
 			`[auto-updater] Checking for updates... (currentVersion=${app.getVersion()}, feedURL=${UPDATE_FEED_URL})`,
 		);
+		if (isCheckingForNewerThanStaged) return;
 		emitStatus(AUTO_UPDATE_STATUS.CHECKING);
 	});
 
@@ -512,6 +597,7 @@ export function setupAutoUpdater(): void {
 		log.info(
 			`[auto-updater] Update available: ${app.getVersion()} → ${info.version} (files: ${info.files?.map((f: { url: string }) => f.url).join(", ")})`,
 		);
+		if (isCheckingForNewerThanStaged) return;
 		emitStatus(AUTO_UPDATE_STATUS.DOWNLOADING, info.version);
 	});
 
@@ -519,6 +605,7 @@ export function setupAutoUpdater(): void {
 		log.info(
 			`[auto-updater] No updates available (currentVersion=${app.getVersion()}, latestVersion=${info.version})`,
 		);
+		if (isCheckingForNewerThanStaged) return;
 		emitStatus(AUTO_UPDATE_STATUS.IDLE);
 	});
 
@@ -543,8 +630,18 @@ export function setupAutoUpdater(): void {
 		log.info(
 			`[auto-updater] Update downloaded: ${app.getVersion()} → ${info.version}. Ready to install.`,
 		);
+		isSquirrelStaging = PLATFORM.IS_MAC;
 		emitStatus(AUTO_UPDATE_STATUS.READY, info.version);
 	});
+
+	if (PLATFORM.IS_MAC) {
+		nativeUpdater.on("update-downloaded", () => {
+			isSquirrelStaging = false;
+			if (!isInstallPendingOnSquirrel) return;
+			isInstallPendingOnSquirrel = false;
+			autoUpdater.quitAndInstall(false, true);
+		});
+	}
 
 	// If the version changed since the last launch, an update was just
 	// installed — surface a transient confirmation before the first check.
