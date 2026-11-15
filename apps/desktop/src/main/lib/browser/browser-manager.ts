@@ -126,21 +126,25 @@ const DEEP_LINK_SCHEMES = new Set([
 ]);
 
 /**
- * Resolves the next `mousedown` in the guest's current document. Installs a
- * single capture-phase listener the first time (idempotent across repeated
- * injections into the same document) and queues a resolver per call so a
- * fresh `executeJavaScript` await always gets the *next* press, not a stale
- * one. Never calls `stopPropagation`/`preventDefault` — purely observes.
+ * Resolves `true` on the next `mousedown` in the guest's current document, or
+ * `false` on `pagehide`. Installs its listeners the first time (idempotent
+ * across repeated injections into the same document) and queues a resolver per
+ * call so a fresh `executeJavaScript` await always gets the *next* press, not a
+ * stale one. Never calls `stopPropagation`/`preventDefault` — purely observes.
+ * The `pagehide` settle is required: a pending `executeJavaScript` keeps its
+ * document alive after navigation, so each guest reload would leak one.
  */
 const NEXT_MOUSEDOWN_SCRIPT = `(() => {
 	if (!window.__supersetMousedownHook) {
 		window.__supersetMousedownHook = { resolvers: [] };
-		document.addEventListener("mousedown", () => {
+		const settle = (pressed) => {
 			const hook = window.__supersetMousedownHook;
 			const resolvers = hook.resolvers;
 			hook.resolvers = [];
-			for (const resolve of resolvers) resolve();
-		}, true);
+			for (const resolve of resolvers) resolve(pressed);
+		};
+		document.addEventListener("mousedown", () => settle(true), true);
+		window.addEventListener("pagehide", () => settle(false));
 	}
 	return new Promise((resolve) => {
 		window.__supersetMousedownHook.resolvers.push(resolve);
@@ -1351,25 +1355,23 @@ class BrowserManager extends EventEmitter {
 	 */
 	private setupFocusForward(paneId: string, wc: Electron.WebContents): void {
 		let cancelled = false;
-		// Bumped on every main-frame document. A navigation does not reject
-		// the executeJavaScript that was awaiting a mousedown in the old
-		// document — that promise simply never settles — so a loop tied to the
-		// old generation can never notice on its own. dom-ready starts a fresh
-		// loop for the new document; the stale one exits at its next check and
-		// a late resolution from it is dropped rather than emitted.
+		// Bumped on every main-frame document. dom-ready starts a fresh loop
+		// for the new document; the stale one exits at its next check and a
+		// late resolution from it is dropped rather than emitted.
 		let generation = 0;
 		const loop = async (gen: number): Promise<void> => {
 			while (!cancelled && gen === generation) {
 				if (wc.isDestroyed()) return;
+				let pressed: unknown;
 				try {
-					await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
+					pressed = await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
 				} catch {
 					// Script failed to run (mid-navigation, crashed renderer):
 					// retry, but not in a hot spin.
 					await new Promise((resolve) => setTimeout(resolve, 100));
 					continue;
 				}
-				if (cancelled || gen !== generation) return;
+				if (pressed === false || cancelled || gen !== generation) return;
 				this.emit(`pane-focus:${paneId}`);
 				this.emit("pane-focused", { paneId });
 			}
