@@ -72,12 +72,14 @@ rejections in this category are one of these.
       (the headings in that file map to the guidelines reviewers check:
       payments, Sign in with Apple, account deletion, on-device code execution,
       permissions).
-- [ ] No in-app button, link, or copy points at a web page where a plan can be
-      bought (guideline 3.1.1 outside the US storefront; we ship one build
-      worldwide). Mentioning that plans are managed on the web is fine;
-      linking to it is not. `no-purchase-links.test.ts` fails on billing paths.
+- [ ] Outside the US App Store storefront, and on Android, no button, link, or
+      copy points at a web page where a plan can be bought, or says how to
+      upgrade (guideline 3.1.1; one build ships worldwide). The US storefront
+      may link to checkout (3.1.1(a)). Billing URLs live only in
+      `lib/upgrade/checkout`, opened only through `useUpgrade`, which asks
+      StoreKit for the storefront; `no-purchase-links.test.ts` enforces it.
       Reviewers sign in with Sign in with Apple as a new free account every
-      time, so they always see this screen.
+      time, so they always see the paywall.
 - [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, or
       a screen recording on a physical device in `APP_REVIEW_VOICE_VIDEO_URL`
       and in the review attachment (2.5.4).

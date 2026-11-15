@@ -2343,9 +2343,8 @@ msgstr "Aggiunto all'input dell'agente"
 msgid "Added to merge queue"
 msgstr "Aggiunta alla coda di unione"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento. Il piano della tua organizzazione è gestito dal suo proprietario su {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento."
 
 msgid "Adding to queue…"
 msgstr "Aggiunta alla coda…"
@@ -4955,6 +4954,9 @@ msgstr "Spazi di lavoro cloud"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "I workspace cloud non sono attivi per {account}. Sono inclusi nei piani Team e Ultra: passa a un piano superiore in Impostazioni, Fatturazione."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Gli spazi di lavoro cloud non sono inclusi nel tuo piano."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "I workspace cloud fanno commit, push e aprono pull request a tuo nome"
@@ -10765,9 +10767,6 @@ msgstr "Invita un membro"
 msgid "Invite pending"
 msgstr "Invito in attesa"
 
-msgid "Invite people on a paid plan"
-msgstr "Invita persone con un piano a pagamento"
-
 msgid "Invite teammate"
 msgstr "Invita un collega"
 
@@ -11876,15 +11875,11 @@ msgstr "Gestisci le chiavi per l'accesso ai server MCP e per le integrazioni est
 msgid "Manage members"
 msgstr "Gestisci i membri"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Gestisci su {0}"
+msgid "Manage plan"
+msgstr "Gestisci il piano"
 
 msgid "Manage Plan"
 msgstr "Gestisci il piano"
-
-msgid "Manage plan on the web"
-msgstr "Gestisci il piano sul web"
 
 msgid "Manage plugins…"
 msgstr "Gestisci i plugin…"
@@ -13588,6 +13583,9 @@ msgstr "Non nel canale"
 
 msgid "Not included"
 msgstr "Non incluso"
+
+msgid "Not included in your plan"
+msgstr "Non incluso nel tuo piano"
 
 msgid "Not installed"
 msgstr "Non installato"
@@ -22000,10 +21998,6 @@ msgstr "Passa a Pro"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aggiorna una dipendenza e correggi ciò che si rompe…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Esegui l'upgrade su {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Passa a {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "Puoi visualizzare questa pagina ma non modificarla"
 msgid "You can view this page but not comment on it"
 msgstr "Puoi visualizzare questa pagina ma non commentarla"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Non puoi modificare questo abbonamento nell'app. Il piano della tua organizzazione è gestito dal proprietario su {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Non puoi annullare questa azione. I pannelli del terminale mostreranno \"Processo terminato\" e potranno essere riavviati."
 
@@ -23366,6 +23356,9 @@ msgstr "La tua organizzazione installa {plugin} per te, quindi non può essere d
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "La tua organizzazione installa questo plugin per te. Puoi disattivarlo, ma non rimuoverlo."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "La tua organizzazione ha raggiunto il limite di utilizzo del cloud."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "La tua organizzazione ha raggiunto il limite di utilizzo del cloud. Questo workspace si fermerà tra pochi minuti se il limite non viene aumentato."

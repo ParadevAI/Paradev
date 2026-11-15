@@ -2343,9 +2343,8 @@ msgstr "エージェントの入力欄に追加しました"
 msgid "Added to merge queue"
 msgstr "マージキューに追加しました"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "{organizationName} にメンバーを追加するには有料プランが必要です。組織のプランはオーナーが {0} で管理しています。"
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "{organizationName} にメンバーを追加するには有料プランが必要です。"
 
 msgid "Adding to queue…"
 msgstr "キューに追加中…"
@@ -4955,6 +4954,9 @@ msgstr "クラウドワークスペース"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "{account} ではクラウドワークスペースが有効になっていません。Team と Ultra プランで利用できます。設定の請求からアップグレードしてください。"
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "クラウドワークスペースはご利用のプランに含まれていません。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
@@ -10765,9 +10767,6 @@ msgstr "メンバーを招待"
 msgid "Invite pending"
 msgstr "招待中"
 
-msgid "Invite people on a paid plan"
-msgstr "有料プランでメンバーを招待"
-
 msgid "Invite teammate"
 msgstr "メンバーを招待"
 
@@ -11876,15 +11875,11 @@ msgstr "MCPサーバーアクセスやClaude Desktop・Claude Codeなどの外�
 msgid "Manage members"
 msgstr "メンバーを管理"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "{0}で管理"
+msgid "Manage plan"
+msgstr "プランを管理"
 
 msgid "Manage Plan"
 msgstr "プランを管理"
-
-msgid "Manage plan on the web"
-msgstr "プランはWebで管理"
 
 msgid "Manage plugins…"
 msgstr "プラグインを管理…"
@@ -13588,6 +13583,9 @@ msgstr "チャンネル外"
 
 msgid "Not included"
 msgstr "含まれない"
+
+msgid "Not included in your plan"
+msgstr "ご利用のプランに含まれていません"
 
 msgid "Not installed"
 msgstr "未インストール"
@@ -22000,10 +21998,6 @@ msgstr "アップグレード"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "依存関係を更新して壊れた箇所を直す…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "{0} でアップグレード"
-
 msgid "Upgrade to {planName}"
 msgstr "{planName} にアップグレード"
 
@@ -23173,10 +23167,6 @@ msgstr "このページは閲覧できますが、変更はできません"
 msgid "You can view this page but not comment on it"
 msgstr "このページは閲覧できますが、コメントはできません"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "このサブスクリプションはアプリでは変更できません。組織のプランは{0}でオーナーが管理しています。"
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "この操作は元に戻せません。ターミナルペインに「Process exited」と表示され、再起動できます。"
 
@@ -23366,6 +23356,9 @@ msgstr "{plugin} は組織によってインストールされているため、
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "このプラグインは組織によってインストールされています。無効にはできますが、削除はできません。"
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "組織がクラウドの使用上限に達しました。"
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"

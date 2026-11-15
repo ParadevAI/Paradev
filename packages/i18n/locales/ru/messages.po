@@ -2343,9 +2343,8 @@ msgstr "Добавлено в поле ввода агента"
 msgid "Added to merge queue"
 msgstr "Добавлено в очередь объединения"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Чтобы добавлять людей в {organizationName}, нужен платный тариф. Тарифом вашей организации управляет её владелец на {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Чтобы добавлять людей в {organizationName}, нужен платный тариф."
 
 msgid "Adding to queue…"
 msgstr "Добавление в очередь…"
@@ -4955,6 +4954,9 @@ msgstr "Облачные рабочие области"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Облачные рабочие пространства не включены для {account}. Они входят в планы Team и Ultra: повысьте план в разделе Настройки, Оплата."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Облачные рабочие пространства не входят в ваш тариф."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
@@ -10765,9 +10767,6 @@ msgstr "Пригласить участника"
 msgid "Invite pending"
 msgstr "Приглашение ожидает ответа"
 
-msgid "Invite people on a paid plan"
-msgstr "Приглашайте людей на платном тарифе"
-
 msgid "Invite teammate"
 msgstr "Пригласить коллегу"
 
@@ -11876,15 +11875,11 @@ msgstr "Управляйте ключами для доступа к серве�
 msgid "Manage members"
 msgstr "Управление участниками"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Управлять на {0}"
+msgid "Manage plan"
+msgstr "Управление тарифом"
 
 msgid "Manage Plan"
 msgstr "Управление тарифом"
-
-msgid "Manage plan on the web"
-msgstr "Управление тарифом в веб-версии"
 
 msgid "Manage plugins…"
 msgstr "Управление плагинами…"
@@ -13588,6 +13583,9 @@ msgstr "Не в канале"
 
 msgid "Not included"
 msgstr "Не входит"
+
+msgid "Not included in your plan"
+msgstr "Не входит в ваш тариф"
 
 msgid "Not installed"
 msgstr "Не установлено"
@@ -22000,10 +21998,6 @@ msgstr "Перейти"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Обнови зависимость и почини то, что сломается…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Перейти на Pro на {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Перейти на {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "Вы можете просматривать эту страницу, н
 msgid "You can view this page but not comment on it"
 msgstr "Вы можете просматривать эту страницу, но не комментировать её"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Изменить эту подписку в приложении нельзя. Тарифом вашей организации управляет её владелец на {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Это действие нельзя отменить. В панелях терминала появится «Process exited», их можно перезапустить."
 
@@ -23366,6 +23356,9 @@ msgstr "Ваша организация устанавливает {plugin} дл
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Ваша организация устанавливает этот плагин для вас. Его можно отключить, но нельзя удалить."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Ваша организация достигла лимита использования облака."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."

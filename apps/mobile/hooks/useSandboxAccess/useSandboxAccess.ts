@@ -5,6 +5,7 @@ import { AppState } from "react-native";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import { errorCopy } from "@/lib/errors";
 import { addressSandboxAccess, wakeSandboxAccess } from "@/lib/sandbox-access";
+import { cloudRefusalMessage } from "@/lib/upgrade";
 
 /**
  * A wake is also what extends the sandbox's session: it stops after hours of
@@ -125,7 +126,9 @@ export function useSandboxAccess(
 					: null,
 			isError: address.isError || refused,
 			isWaking: ready !== null && wake.data === undefined && !refused,
-			refusalMessage: refused ? errorCopy(wake.error) : null,
+			refusalMessage: refused
+				? (cloudRefusalMessage(wake.error) ?? errorCopy(wake.error))
+				: null,
 			retry: () => {
 				void address.refetch();
 				void wake.refetch();

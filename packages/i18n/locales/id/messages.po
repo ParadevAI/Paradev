@@ -2343,9 +2343,8 @@ msgstr "Ditambahkan ke input agen"
 msgid "Added to merge queue"
 msgstr "Ditambahkan ke antrean merge"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar."
 
 msgid "Adding to queue…"
 msgstr "Menambahkan ke antrean…"
@@ -4955,6 +4954,9 @@ msgstr "Workspace cloud"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersedia di paket Team dan Ultra: upgrade di Pengaturan, Penagihan."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Ruang kerja cloud tidak termasuk dalam paket Anda."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
@@ -10765,9 +10767,6 @@ msgstr "Undang Anggota"
 msgid "Invite pending"
 msgstr "Undangan tertunda"
 
-msgid "Invite people on a paid plan"
-msgstr "Undang orang dengan paket berbayar"
-
 msgid "Invite teammate"
 msgstr "Undang rekan tim"
 
@@ -11876,15 +11875,11 @@ msgstr "Kelola kunci untuk akses server MCP dan integrasi eksternal seperti Clau
 msgid "Manage members"
 msgstr "Kelola anggota"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Kelola di {0}"
+msgid "Manage plan"
+msgstr "Kelola paket"
 
 msgid "Manage Plan"
 msgstr "Kelola Paket"
-
-msgid "Manage plan on the web"
-msgstr "Kelola paket lewat web"
 
 msgid "Manage plugins…"
 msgstr "Kelola plugin…"
@@ -13588,6 +13583,9 @@ msgstr "Tidak di kanal"
 
 msgid "Not included"
 msgstr "Tidak termasuk"
+
+msgid "Not included in your plan"
+msgstr "Tidak termasuk dalam paket Anda"
 
 msgid "Not installed"
 msgstr "Belum terpasang"
@@ -22000,10 +21998,6 @@ msgstr "Upgrade"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Upgrade di {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Tingkatkan ke {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "Anda dapat melihat halaman ini tetapi tidak dapat mengubahnya"
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Anda tidak bisa mengubah langganan ini di aplikasi. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tindakan ini tidak bisa dibatalkan. Panel terminal akan menampilkan \"Process exited\" dan bisa dijalankan ulang."
 
@@ -23366,6 +23356,9 @@ msgstr "Organisasi Anda memasang {plugin} untuk Anda, jadi plugin ini tidak dapa
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Organisasi Anda memasang plugin ini untuk Anda. Anda dapat menonaktifkannya, tetapi tidak dapat menghapusnya."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Organisasi Anda telah mencapai batas penggunaan cloud."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini akan berhenti dalam beberapa menit kecuali batasnya dinaikkan."

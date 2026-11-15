@@ -2343,9 +2343,8 @@ msgstr "Ajan girişine eklendi"
 msgid "Added to merge queue"
 msgstr "Birleştirme kuyruğuna eklendi"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "{organizationName} kuruluşuna kişi eklemek için ücretli bir plan gerekir. Kuruluşunuzun planını sahibi {0} adresinde yönetir."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "{organizationName} kuruluşuna kişi eklemek için ücretli bir plan gerekir."
 
 msgid "Adding to queue…"
 msgstr "Kuyruğa ekleniyor…"
@@ -4955,6 +4954,9 @@ msgstr "Bulut çalışma alanları"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Bulut çalışma alanları {account} için etkin değil. Team ve Ultra planlarıyla gelir: Ayarlar, Faturalandırma bölümünden yükseltin."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Bulut çalışma alanları planınıza dahil değil."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Bulut çalışma alanları sizin adınıza commit, push yapar ve pull request açar"
@@ -10765,9 +10767,6 @@ msgstr "Üye davet et"
 msgid "Invite pending"
 msgstr "Davet bekliyor"
 
-msgid "Invite people on a paid plan"
-msgstr "Ücretli bir planla kişi davet edin"
-
 msgid "Invite teammate"
 msgstr "Takım arkadaşı davet et"
 
@@ -11876,15 +11875,11 @@ msgstr "MCP sunucusu erişimi ve Claude Desktop veya Claude Code gibi harici ent
 msgid "Manage members"
 msgstr "Üyeleri yönet"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "{0} adresinde yönet"
+msgid "Manage plan"
+msgstr "Planı yönet"
 
 msgid "Manage Plan"
 msgstr "Planı yönet"
-
-msgid "Manage plan on the web"
-msgstr "Planı web'den yönet"
 
 msgid "Manage plugins…"
 msgstr "Eklentileri yönet…"
@@ -13588,6 +13583,9 @@ msgstr "Kanalda değil"
 
 msgid "Not included"
 msgstr "Dahil değil"
+
+msgid "Not included in your plan"
+msgstr "Planınıza dahil değil"
 
 msgid "Not installed"
 msgstr "Yüklü değil"
@@ -22000,10 +21998,6 @@ msgstr "Yükselt"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Bir bağımlılığı yükselt ve bozulanları düzelt…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "{0} üzerinden yükselt"
-
 msgid "Upgrade to {planName}"
 msgstr "{planName} planına yükselt"
 
@@ -23173,10 +23167,6 @@ msgstr "Bu sayfayı görüntüleyebilirsiniz ancak değiştiremezsiniz"
 msgid "You can view this page but not comment on it"
 msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Bu aboneliği uygulamada değiştiremezsiniz. Kuruluşunuzun planı, {0} adresinde sahibi tarafından yönetiliyor."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Bu işlemi geri alamazsınız. Terminal bölmelerinde \"Process exited\" görünür ve yeniden başlatılabilirler."
 
@@ -23366,6 +23356,9 @@ msgstr "Kuruluşunuz {plugin} eklentisini sizin için yüklüyor, bu yüzden kal
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Kuruluşunuz bu eklentiyi sizin için yüklüyor. Devre dışı bırakabilirsiniz ama kaldıramazsınız."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Sınır artırılmazsa bu çalışma alanı birkaç dakika içinde durdurulacak."

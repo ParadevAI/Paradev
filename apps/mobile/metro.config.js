@@ -40,6 +40,7 @@ config.resolver.extraNodeModules = {
 		projectRoot,
 		"modules/google-credential",
 	),
+	"@superset/storefront": path.resolve(projectRoot, "modules/storefront"),
 	"@superset/symbol-button": path.resolve(projectRoot, "modules/symbol-button"),
 	"@superset/attachments-sheet": path.resolve(
 		projectRoot,

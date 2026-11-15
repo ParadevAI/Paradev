@@ -2343,9 +2343,8 @@ msgstr "Added to agent input"
 msgid "Added to merge queue"
 msgstr "Added to merge queue"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Adding people to {organizationName} needs a paid plan."
 
 msgid "Adding to queue…"
 msgstr "Adding to queue…"
@@ -4955,6 +4954,9 @@ msgstr "Cloud Workspaces"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloud workspaces are not enabled for {account}. They come with the Team and Ultra plans: upgrade in Settings, Billing."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Cloud workspaces are not included in your plan."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloud workspaces commit, push and open pull requests as you"
@@ -10765,9 +10767,6 @@ msgstr "Invite Member"
 msgid "Invite pending"
 msgstr "Invite pending"
 
-msgid "Invite people on a paid plan"
-msgstr "Invite people on a paid plan"
-
 msgid "Invite teammate"
 msgstr "Invite teammate"
 
@@ -11876,15 +11875,11 @@ msgstr "Manage keys for MCP server access and external integrations like Claude 
 msgid "Manage members"
 msgstr "Manage members"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Manage on {0}"
+msgid "Manage plan"
+msgstr "Manage plan"
 
 msgid "Manage Plan"
 msgstr "Manage Plan"
-
-msgid "Manage plan on the web"
-msgstr "Manage plan on the web"
 
 msgid "Manage plugins…"
 msgstr "Manage plugins…"
@@ -13588,6 +13583,9 @@ msgstr "Not in channel"
 
 msgid "Not included"
 msgstr "Not included"
+
+msgid "Not included in your plan"
+msgstr "Not included in your plan"
 
 msgid "Not installed"
 msgstr "Not installed"
@@ -22000,10 +21998,6 @@ msgstr "Upgrade"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade a dependency and fix what breaks…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Upgrade on {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Upgrade to {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "You can view this page but not change it"
 msgid "You can view this page but not comment on it"
 msgstr "You can view this page but not comment on it"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 
@@ -23366,6 +23356,9 @@ msgstr "Your organization installs {plugin} for you, so it cannot be uninstalled
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Your organization installs this plugin for you. You can disable it, but not remove it."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Your organization reached its cloud usage limit."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."

@@ -31,7 +31,7 @@ const reviewNotes = [
 		: null,
 	"",
 	"GUIDELINES WE EXPECT YOU TO CHECK",
-	"Payments (3.1): Paradev is sold to organizations. A Pro plan is purchased by the organization on the web and unlocks Paradev Mobile for every member. The app sells nothing and has no purchase buttons, links, or calls to action for buying outside the app. Free accounts see an informational screen that explains Pro is required.",
+	"Payments (3.1): A Pro plan bought on the web unlocks Paradev Mobile for every member of an organization. Nothing is sold in-app. Only on the US storefront (3.1.1(a)) does the owner of a Free organization see an Upgrade button that opens checkout in Safari; elsewhere there are no purchase buttons, links, or calls to action.",
 	`Background audio (2.5.4): Voice mode is a live spoken conversation with the user's coding agent, and it keeps running while the phone is locked or the app is in the background.${voiceVideoUrl ? ` Screen recording on a physical device: ${voiceVideoUrl}` : ""}`,
 	"Sign-in (4.8): Sign in with Apple is offered alongside GitHub, Google, and email. Any of them creates a free account instantly, which lands on the Pro-required screen described above; the demo account is the one with a paid workspace.",
 	"Account deletion (5.1.1 v): Settings > Danger Zone > Delete account, in-app, no email or web visit required.",

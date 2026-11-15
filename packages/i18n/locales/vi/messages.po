@@ -2343,9 +2343,8 @@ msgstr "Đã thêm vào ô nhập của agent"
 msgid "Added to merge queue"
 msgstr "Đã thêm vào hàng đợi merge"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Để thêm người vào {organizationName}, bạn cần gói trả phí. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Cần gói trả phí để thêm người vào {organizationName}."
 
 msgid "Adding to queue…"
 msgstr "Đang thêm vào hàng đợi…"
@@ -4955,6 +4954,9 @@ msgstr "Không gian làm việc đám mây"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Không gian làm việc trên đám mây chưa được bật cho {account}. Tính năng này có trong gói Team và Ultra: nâng cấp trong Cài đặt, Thanh toán."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Gói của bạn không bao gồm không gian làm việc đám mây."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace đám mây commit, push và mở pull request với tư cách là bạn"
@@ -10765,9 +10767,6 @@ msgstr "Mời thành viên"
 msgid "Invite pending"
 msgstr "Đang chờ chấp nhận lời mời"
 
-msgid "Invite people on a paid plan"
-msgstr "Mời mọi người với gói trả phí"
-
 msgid "Invite teammate"
 msgstr "Mời đồng đội"
 
@@ -11876,15 +11875,11 @@ msgstr "Quản lý khóa để truy cập server MCP và các tích hợp bên n
 msgid "Manage members"
 msgstr "Quản lý thành viên"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Quản lý tại {0}"
+msgid "Manage plan"
+msgstr "Quản lý gói"
 
 msgid "Manage Plan"
 msgstr "Quản lý gói"
-
-msgid "Manage plan on the web"
-msgstr "Quản lý gói trên web"
 
 msgid "Manage plugins…"
 msgstr "Quản lý plugin…"
@@ -13588,6 +13583,9 @@ msgstr "Không ở trong kênh"
 
 msgid "Not included"
 msgstr "Không có"
+
+msgid "Not included in your plan"
+msgstr "Không có trong gói của bạn"
 
 msgid "Not installed"
 msgstr "Chưa cài đặt"
@@ -22000,10 +21998,6 @@ msgstr "Nâng cấp"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Nâng cấp một dependency và sửa những gì hỏng…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Nâng cấp trên {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Nâng cấp lên {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "Bạn có thể xem trang này nhưng không thể thay đổi"
 msgid "You can view this page but not comment on it"
 msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Bạn không thể thay đổi gói đăng ký này trong ứng dụng. Gói của tổ chức bạn do chủ sở hữu quản lý tại {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Không thể hoàn tác thao tác này. Các khung terminal sẽ hiện \"Process exited\" và có thể khởi động lại."
 
@@ -23366,6 +23356,9 @@ msgstr "Tổ chức của bạn cài {plugin} cho bạn nên không thể gỡ c
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Tổ chức của bạn cài plugin này cho bạn. Bạn có thể tắt nhưng không thể gỡ nó."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng đám mây."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Workspace này sẽ dừng sau vài phút nếu giới hạn không được tăng."

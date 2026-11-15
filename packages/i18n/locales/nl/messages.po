@@ -2343,9 +2343,8 @@ msgstr "Toegevoegd aan de invoer van de agent"
 msgid "Added to merge queue"
 msgstr "Toegevoegd aan mergewachtrij"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Voor het toevoegen van mensen aan {organizationName} is een betaald abonnement nodig. Het abonnement van je organisatie wordt beheerd door de eigenaar op {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Voor het toevoegen van mensen aan {organizationName} is een betaald plan nodig."
 
 msgid "Adding to queue…"
 msgstr "Toevoegen aan wachtrij…"
@@ -4955,6 +4954,9 @@ msgstr "Cloudwerkruimtes"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Cloudwerkruimtes zijn niet ingeschakeld voor {account}. Ze horen bij de Team- en Ultra-abonnementen: upgrade in Instellingen, Facturering."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Cloudwerkruimtes zijn niet inbegrepen in je plan."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudwerkruimtes committen, pushen en openen pull requests als jou"
@@ -10765,9 +10767,6 @@ msgstr "Lid uitnodigen"
 msgid "Invite pending"
 msgstr "Uitnodiging openstaand"
 
-msgid "Invite people on a paid plan"
-msgstr "Nodig mensen uit met een betaald abonnement"
-
 msgid "Invite teammate"
 msgstr "Teamgenoot uitnodigen"
 
@@ -11876,15 +11875,11 @@ msgstr "Beheer sleutels voor toegang tot MCP-servers en externe integraties zoal
 msgid "Manage members"
 msgstr "Leden beheren"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Beheren op {0}"
+msgid "Manage plan"
+msgstr "Plan beheren"
 
 msgid "Manage Plan"
 msgstr "Plan beheren"
-
-msgid "Manage plan on the web"
-msgstr "Plan beheren op het web"
 
 msgid "Manage plugins…"
 msgstr "Plug-ins beheren…"
@@ -13588,6 +13583,9 @@ msgstr "Niet in kanaal"
 
 msgid "Not included"
 msgstr "Niet inbegrepen"
+
+msgid "Not included in your plan"
+msgstr "Niet inbegrepen in je plan"
 
 msgid "Not installed"
 msgstr "Niet geïnstalleerd"
@@ -22000,10 +21998,6 @@ msgstr "Upgraden"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Werk een dependency bij en fix wat er stukgaat…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Upgraden op {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Upgraden naar {planName}"
 
@@ -23173,10 +23167,6 @@ msgstr "Je kunt deze pagina bekijken, maar niet wijzigen"
 msgid "You can view this page but not comment on it"
 msgstr "Je kunt deze pagina bekijken, maar er niet op reageren"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Je kunt dit abonnement niet in de app wijzigen. Het plan van je organisatie wordt beheerd door de eigenaar op {0}."
-
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Dit kun je niet ongedaan maken. Terminalpanelen tonen \"Process exited\" en zijn opnieuw te starten."
 
@@ -23366,6 +23356,9 @@ msgstr "Je organisatie installeert {plugin} voor je, dus het kan niet worden ver
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Je organisatie installeert deze plugin voor je. Je kunt hem uitschakelen, maar niet verwijderen."
+
+msgid "Your organization reached its cloud usage limit."
+msgstr "Je organisatie heeft de limiet voor cloudgebruik bereikt."
 
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkruimte stopt over een paar minuten, tenzij de limiet wordt verhoogd."
