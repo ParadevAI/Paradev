@@ -4,6 +4,7 @@ import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner"
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { sendToAgent } from "../../../chat-v3/sendToAgent";
 import { getSupervisor, waitForDaemonReady } from "../../../daemon";
 import { terminalSessions, workspaces } from "../../../db/schema";
 import {
@@ -15,7 +16,6 @@ import {
 	listLiveTerminalSessions,
 	parseThemeType,
 	renameTerminalSession,
-	sendAgentMessage,
 	sessionHasRunningProcess,
 	snapshotSession,
 	transcriptSession,
@@ -193,12 +193,15 @@ export const terminalRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const message = { ...input, db: ctx.db, eventBus: ctx.eventBus };
-			const binding = ctx.terminalAgentStore.get(input.terminalId);
+			const binding =
+				ctx.terminalAgentStore.getChat(input.terminalId) ??
+				ctx.terminalAgentStore.get(input.terminalId);
 			const result =
 				binding && binding.endedAt === undefined
-					? await sendAgentMessage({
+					? await sendToAgent({
 							...message,
 							terminalAgentStore: ctx.terminalAgentStore,
+							chatRuntime: () => ctx.runtime.chat?.(),
 						})
 					: await writeFramedInputToSession(message);
 			if ("error" in result) {
