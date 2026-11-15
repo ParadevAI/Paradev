@@ -22007,6 +22007,9 @@ msgstr "Tingkatkan ke {planName}"
 msgid "Upgrade to Pro"
 msgstr "Upgrade ke Pro"
 
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Tingkatkan ke Pro di {upgradeHost}"
+
 msgid "Upgrade to Team"
 msgstr "Upgrade ke Team"
 

@@ -22007,6 +22007,9 @@ msgstr "{planName} planına yükselt"
 msgid "Upgrade to Pro"
 msgstr "Pro'ya yükselt"
 
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "{upgradeHost} adresinden Pro'ya yükseltin"
+
 msgid "Upgrade to Team"
 msgstr "Team'e yükselt"
 

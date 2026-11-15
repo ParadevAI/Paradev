@@ -4,14 +4,7 @@ import {
 	planForInterval,
 } from "@superset/shared/billing";
 import { authClient } from "@/lib/auth/client";
-import { env } from "@/lib/env";
-
-/** Only `useUpgrade` may import this: it opens these URLs only where `billingLinksAllowed`. */
-export function billingSettingsUrl(organizationId: string | null): string {
-	const url = new URL("/settings/billing", env.EXPO_PUBLIC_WEB_URL);
-	if (organizationId) url.searchParams.set("organization", organizationId);
-	return url.toString();
-}
+import { billingSettingsUrl } from "@/lib/web-links";
 
 async function monthlyProPlanId(organizationId: string): Promise<string> {
 	const { data, error } = await authClient.$fetch<{
@@ -29,7 +22,7 @@ async function monthlyProPlanId(organizationId: string): Promise<string> {
 }
 
 /**
- * The Stripe Checkout URL that moves a Free organization to Pro. The session
+ * Only `useUpgrade` may import this. The Stripe Checkout URL that moves a Free organization to Pro. The session
  * is created by the API for the signed-in owner, so the browser needs no
  * sign-in. Without `confirmed` the attach always answers with a checkout
  * page and never charges a saved card.

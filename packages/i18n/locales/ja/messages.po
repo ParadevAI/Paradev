@@ -22007,6 +22007,9 @@ msgstr "{planName} にアップグレード"
 msgid "Upgrade to Pro"
 msgstr "Pro にアップグレード"
 
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "{upgradeHost} で Pro にアップグレード"
+
 msgid "Upgrade to Team"
 msgstr "Team にアップグレード"
 

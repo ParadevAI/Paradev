@@ -22007,6 +22007,9 @@ msgstr "Přejít na {planName}"
 msgid "Upgrade to Pro"
 msgstr "Přejít na Pro"
 
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Přejděte na Pro na {upgradeHost}"
+
 msgid "Upgrade to Team"
 msgstr "Přejít na Team"
 

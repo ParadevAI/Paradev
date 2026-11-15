@@ -22007,6 +22007,9 @@ msgstr "升級至 {planName}"
 msgid "Upgrade to Pro"
 msgstr "升級至 Pro"
 
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "在 {upgradeHost} 升級至 Pro"
+
 msgid "Upgrade to Team"
 msgstr "升級到 Team"
 

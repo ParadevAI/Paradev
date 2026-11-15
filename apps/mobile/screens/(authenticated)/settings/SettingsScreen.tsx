@@ -58,7 +58,7 @@ export function SettingsScreen() {
 	const { data: session } = useSession();
 	const queryClient = useQueryClient();
 	const { activeOrganization } = useOrganizations();
-	const { linksAllowed, openBillingSettings } = useUpgrade();
+	const { canManagePlan, openBillingSettings } = useUpgrade();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
@@ -320,12 +320,14 @@ export function SettingsScreen() {
 							/>
 						}
 						label={
-							linksAllowed
+							canManagePlan
 								? t({ message: "Manage Plan" })
 								: t({ message: "Plan", context: "billing" })
 						}
-						trailing={<ListRowValue value={planLabel} chevron={linksAllowed} />}
-						onPress={linksAllowed ? openBillingSettings : undefined}
+						trailing={
+							<ListRowValue value={planLabel} chevron={canManagePlan} />
+						}
+						onPress={canManagePlan ? openBillingSettings : undefined}
 						isLast
 					/>
 				</SettingsSection>

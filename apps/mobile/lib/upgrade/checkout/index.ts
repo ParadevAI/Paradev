@@ -1,1 +1,1 @@
-export { billingSettingsUrl, proCheckoutUrl } from "./checkout";
+export { proCheckoutUrl } from "./checkout";

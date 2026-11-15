@@ -26,7 +26,8 @@ export function HomePaywallScreen() {
 	const router = useRouter();
 	const { refetch } = useSession();
 	const { activeOrganization } = useOrganizations();
-	const { isResolved, canUpgrade, upgrade, isUpgrading } = useUpgrade();
+	const { isResolved, canUpgrade, upgradeHost, upgrade, isUpgrading } =
+		useUpgrade();
 
 	useEffect(() => {
 		if (isResolved && !canUpgrade) recordUpgradeIntent("mobile-app");
@@ -77,6 +78,11 @@ export function HomePaywallScreen() {
 									message: `This organization is on the Free plan. ${appName} Mobile is available for organizations on Pro.`,
 								})}
 					</Text>
+					{upgradeHost ? (
+						<Text className="text-center text-base text-muted-foreground">
+							<Trans>Upgrade to Pro at {upgradeHost}</Trans>
+						</Text>
+					) : null}
 				</View>
 
 				{canUpgrade ? (

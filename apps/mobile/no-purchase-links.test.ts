@@ -3,18 +3,25 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { BILLING_REFUSAL_KEYS } from "./lib/errors/billingRefusalKeys";
 
-// App Review 3.1.1: only the US App Store storefront may link to a page where a
-// plan is bought, and one build ships worldwide. Every billing URL lives in
-// CHECKOUT_MODULE, and only GATE opens it, behind `billingLinksAllowed`.
+// App Review 3.1.1 and Google Play Payments: one build ships to every
+// storefront. Billing URLs and the web host live in BILLING_SOURCES, and only
+// GATE reads them, behind `billingAccess` (unit-tested per mode).
 const CHECKOUT_MODULE = "lib/upgrade/checkout/";
+const WEB_LINKS = "lib/web-links.ts";
 const GATE = "lib/upgrade/useUpgrade/useUpgrade.ts";
+const BILLING_SOURCES = (file: string) =>
+	file === WEB_LINKS || file.startsWith(CHECKOUT_MODULE);
+const BILLING_HELPER = /\b(billingSettingsUrl|proCheckoutUrl|webHost)\b/;
+const HARDCODED_HOST = /(?:^|[^@\w-])(?:superset\.sh|paradev\.com)\b/i;
+const HOST_COPY = /Upgrade to Pro at|Manage at/;
+const COMMENT = /^\s*(\/\/|\*|\/\*)/;
 const IMPORT_SPECIFIER =
 	/(from\s*|import\s*\(\s*|require\s*\(\s*)["'][^"']*["']/g;
 const PURCHASE_PATH =
 	/(settings\/billing|\/pricing|\/checkout|\/upgrade\b|autumn\/)/;
 const CHECKOUT_IMPORT =
 	/(from\s*|import\s*\(\s*|require\s*\(\s*)["'][^"']*checkout[^"']*["']/;
-const WEBSITE_COPY = /\bwebHost\(|on the web\b|\bwebsite\b/i;
+const WEBSITE_COPY = /on the web\b|\bwebsite\b/i;
 const SOURCE_DIRS = ["app", "screens", "lib", "components", "hooks", "modules"];
 const SOURCE_FILE = /\.(ts|tsx)$/;
 const SKIPPED_FILE = /(\.test\.tsx?|\.generated\.ts)$/;
@@ -53,7 +60,34 @@ describe("purchase links", () => {
 		expect(
 			matchingLines(
 				(line) => PURCHASE_PATH.test(line.replace(IMPORT_SPECIFIER, "")),
-				(file) => file.startsWith(CHECKOUT_MODULE),
+				BILLING_SOURCES,
+			),
+		).toEqual([]);
+	});
+
+	test("only the gate reads billing URLs or the web host", () => {
+		expect(
+			matchingLines(
+				(line) => BILLING_HELPER.test(line) && !COMMENT.test(line),
+				(file) => file === GATE || BILLING_SOURCES(file),
+			),
+		).toEqual([]);
+	});
+
+	test("no source hardcodes a product host", () => {
+		expect(
+			matchingLines(
+				(line) => HARDCODED_HOST.test(line),
+				(file) => file === "lib/env.ts" || file.endsWith(".stories.tsx"),
+			),
+		).toEqual([]);
+	});
+
+	test("copy names a host only through the gate's upgradeHost", () => {
+		expect(
+			matchingLines(
+				(line) => HOST_COPY.test(line) && !/\bupgradeHost\b/.test(line),
+				() => false,
 			),
 		).toEqual([]);
 	});
@@ -70,7 +104,7 @@ describe("purchase links", () => {
 	test("no copy names the website", () => {
 		expect(
 			matchingLines(
-				(line) => WEBSITE_COPY.test(line) && !/^\s*(\/\/|\*|\/\*)/.test(line),
+				(line) => WEBSITE_COPY.test(line) && !COMMENT.test(line),
 				() => false,
 			),
 		).toEqual([]);

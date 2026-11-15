@@ -19,11 +19,11 @@ export function CloudRefusalPlaceholder({
 	onRefresh: () => void;
 }) {
 	const { t } = useLingui();
-	const { isResolved, linksAllowed, openBillingSettings } = useUpgrade();
+	const { isResolved, canManagePlan, openBillingSettings } = useUpgrade();
 
 	useEffect(() => {
-		if (isResolved && !linksAllowed) recordUpgradeIntent("cloud-workspaces");
-	}, [isResolved, linksAllowed]);
+		if (isResolved && !canManagePlan) recordUpgradeIntent("cloud-workspaces");
+	}, [isResolved, canManagePlan]);
 
 	return (
 		<WorkspacePlaceholder
@@ -38,7 +38,7 @@ export function CloudRefusalPlaceholder({
 							<Trans>Try again</Trans>
 						</Text>
 					</Pressable>
-					{linksAllowed ? (
+					{canManagePlan ? (
 						<Pressable
 							accessibilityRole="button"
 							className="bg-primary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"

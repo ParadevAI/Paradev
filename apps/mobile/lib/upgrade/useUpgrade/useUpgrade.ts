@@ -1,32 +1,37 @@
 import { useLingui } from "@lingui/react/macro";
+import { isPaidPlanTier } from "@superset/shared/billing";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import { useSession } from "@/lib/auth/client";
 import { openUrl } from "@/lib/open-url";
-import { billingLinksAllowed } from "../billingLinksAllowed";
-import { billingSettingsUrl, proCheckoutUrl } from "../checkout";
+import { billingSettingsUrl, webHost } from "@/lib/web-links";
+import { billingAccess, billingMode } from "../billingMode";
+import { proCheckoutUrl } from "../checkout";
 
-const BILLING_LINKS_QUERY_KEY = ["billing-links-allowed"] as const;
+const BILLING_MODE_QUERY_KEY = ["billing-mode"] as const;
 
 /**
- * Whether this build may link to billing, and the links it may open. Until
- * the answer arrives, and when it fails, links count as not allowed.
+ * What this build may offer for billing, and the links it may open. Until the
+ * mode is known, and when it fails, nothing links and no host is named.
  */
 export function useUpgrade() {
 	const { t } = useLingui();
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
-	const isOwner = session?.session?.role === "owner";
 
-	const links = useQuery({
-		queryKey: BILLING_LINKS_QUERY_KEY,
-		queryFn: () => billingLinksAllowed(),
+	const mode = useQuery({
+		queryKey: BILLING_MODE_QUERY_KEY,
+		queryFn: () => billingMode(),
 		networkMode: "always",
 		staleTime: Number.POSITIVE_INFINITY,
 		gcTime: Number.POSITIVE_INFINITY,
 		retry: false,
 	});
-	const linksAllowed = links.data === true;
+	const access = billingAccess(mode.data ?? "none", {
+		isOwner: session?.session?.role === "owner" && organizationId !== null,
+		isPaid: isPaidPlanTier(session?.session?.plan),
+		host: webHost(),
+	});
 
 	const checkout = useMutation({
 		mutationFn: () => proCheckoutUrl(organizationId as string),
@@ -38,15 +43,15 @@ export function useUpgrade() {
 	});
 
 	return {
-		/** False until the storefront is known, so a caller does not count a paywall that is about to show a link. */
-		isResolved: !links.isPending,
-		linksAllowed,
-		/** Only an owner may buy a plan; the API refuses everyone else. */
-		canUpgrade: linksAllowed && isOwner && organizationId !== null,
-		upgrade: () => checkout.mutate(),
+		/** False until the mode is known, so a caller does not count a paywall that is about to show a link. */
+		isResolved: !mode.isPending,
+		...access,
+		upgrade: () => {
+			if (access.canUpgrade) checkout.mutate();
+		},
 		isUpgrading: checkout.isPending,
 		openBillingSettings: () => {
-			if (linksAllowed) openUrl(billingSettingsUrl(organizationId));
+			if (access.canManagePlan) openUrl(billingSettingsUrl(organizationId));
 		},
 	};
 }

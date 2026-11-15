@@ -44,7 +44,7 @@ export function useCreateCloudWorkspace() {
 	const queryClient = useQueryClient();
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
-	const { linksAllowed, openBillingSettings } = useUpgrade();
+	const { canManagePlan, openBillingSettings } = useUpgrade();
 
 	return useMutation({
 		mutationFn: async ({
@@ -117,7 +117,7 @@ export function useCreateCloudWorkspace() {
 				failure_kind: transportFailureKind(error) ?? "server",
 			});
 			const refusal = billingRefusalKey(error) !== null;
-			if (refusal && !linksAllowed) recordUpgradeIntent("cloud-workspaces");
+			if (refusal && !canManagePlan) recordUpgradeIntent("cloud-workspaces");
 			Alert.alert(
 				i18n._(
 					msg({
@@ -125,7 +125,7 @@ export function useCreateCloudWorkspace() {
 					}),
 				),
 				errorCopy(error),
-				refusal && linksAllowed
+				refusal && canManagePlan
 					? [
 							{ style: "cancel", text: i18n._(msg({ message: "Dismiss" })) },
 							{
