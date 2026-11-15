@@ -153,17 +153,18 @@ export function DesignModePopover({
 				return;
 			}
 
+			const isChat = resolved.chatSessionId !== undefined;
 			try {
 				await sendToTerminalAgent({
 					workspaceId,
 					terminalId: resolved.terminalId,
 					text: prompt,
-					submit: false,
+					submit: isChat,
 				});
 				toast.success(
-					t({
-						message: "Added to agent input",
-					}),
+					isChat
+						? t({ message: "Sent to agent" })
+						: t({ message: "Added to agent input" }),
 				);
 				onFocusAgentTerminal?.(resolved.terminalId);
 				onSent();

@@ -22,7 +22,6 @@ import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
-	promptChatSession,
 	registerChatV3Routes,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
@@ -55,13 +54,12 @@ import {
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
-	sendAgentMessage,
 } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
-import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
 import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
@@ -277,22 +275,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
-			const chat = terminalAgentStore.getChat(terminalId);
-			const chatSessionId = chat?.chatSessionId;
-			if (chatSessionId) {
-				if (!matchesAgentBinding(chat, expectedAgent)) {
-					throw new Error("The chat's agent changed before delivery");
-				}
-				await promptChatSession({
-					runtime: chatV3.runtime(),
-					chatSessionId,
-					text,
-					acquireDelivery,
-					signal,
-				});
-				return;
-			}
-			const result = await sendAgentMessage({
+			const result = await sendToAgent({
 				terminalId,
 				workspaceId,
 				text,
@@ -301,6 +284,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				acquireDelivery,
 				signal,
 				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
 				db,
 				eventBus,
 			});
@@ -319,15 +303,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
