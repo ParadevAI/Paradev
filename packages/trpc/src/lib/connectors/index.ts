@@ -688,6 +688,7 @@ export {
 	grantSharedWithAnotherConnection,
 	orgConnection,
 	userConnection,
+	userConnections,
 } from "./lookup";
 export {
 	ConnectorUnavailableError,
