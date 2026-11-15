@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export const FINISHED_LIMIT = 20;
 
@@ -18,8 +19,6 @@ interface ActivityPanelStore {
 	asideNodes: Record<string, HTMLElement>;
 	fits: Record<string, true>;
 	setFits: (workspaceId: string, fits: boolean) => void;
-	hidden: Record<string, true>;
-	setHidden: (workspaceId: string, hidden: boolean) => void;
 	floatingOpen: Record<string, true>;
 	setFloatingOpen: (workspaceId: string, open: boolean) => void;
 	subagentsCollapsed: Record<string, true>;
@@ -47,13 +46,6 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 			if ((state.fits[workspaceId] === true) === fits) return state;
 			const { [workspaceId]: _previous, ...rest } = state.fits;
 			return { fits: fits ? { ...rest, [workspaceId]: true } : rest };
-		}),
-	hidden: {},
-	setHidden: (workspaceId, hidden) =>
-		set((state) => {
-			if ((state.hidden[workspaceId] === true) === hidden) return state;
-			const { [workspaceId]: _previous, ...rest } = state.hidden;
-			return { hidden: hidden ? { ...rest, [workspaceId]: true } : rest };
 		}),
 	floatingOpen: {},
 	setFloatingOpen: (workspaceId, open) =>
@@ -127,3 +119,22 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 
 export const useFinishedSubagents = (workspaceId: string) =>
 	useActivityPanelStore((state) => state.finished[workspaceId] ?? NO_FINISHED);
+
+interface ActivityPanelVisibilityState {
+	hidden: boolean;
+	setHidden: (hidden: boolean) => void;
+}
+
+export const useActivityPanelVisibilityStore =
+	create<ActivityPanelVisibilityState>()(
+		persist(
+			(set) => ({
+				hidden: false,
+				setHidden: (hidden) => set({ hidden }),
+			}),
+			{
+				name: "workspace-activity-panel",
+				partialize: ({ hidden }) => ({ hidden }),
+			},
+		),
+	);

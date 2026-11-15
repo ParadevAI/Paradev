@@ -9,7 +9,10 @@ import {
 	PANEL_TOP_GAP_PX,
 	PANEL_WIDTH_PX,
 } from "../../constants";
-import { useActivityPanelStore } from "../../stores/activityPanelStore";
+import {
+	useActivityPanelStore,
+	useActivityPanelVisibilityStore,
+} from "../../stores/activityPanelStore";
 
 const INSET_PX = PANEL_WIDTH_PX + PANEL_EDGE_GAP_PX + PANEL_CONTENT_GAP_PX;
 
@@ -25,9 +28,7 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 	const clearAnchorNode = useActivityPanelStore(
 		(state) => state.clearAnchorNode,
 	);
-	const hidden = useActivityPanelStore(
-		(state) => state.hidden[workspaceId] === true,
-	);
+	const hidden = useActivityPanelVisibilityStore((state) => state.hidden);
 	const fits = hasRoom && isTabVisible;
 	const shown = fits && !hidden;
 

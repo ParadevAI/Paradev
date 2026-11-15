@@ -99,7 +99,10 @@ import {
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
-import { useActivityPanelStore } from "./stores/activityPanelStore";
+import {
+	useActivityPanelStore,
+	useActivityPanelVisibilityStore,
+} from "./stores/activityPanelStore";
 import {
 	usePagesMenuSeenAt,
 	usePagesMenuSeenStore,
@@ -172,10 +175,8 @@ export function WorkspaceActivityMenu({
 	const fits = useActivityPanelStore(
 		(state) => state.fits[workspaceId] === true,
 	);
-	const hidden = useActivityPanelStore(
-		(state) => state.hidden[workspaceId] === true,
-	);
-	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const hidden = useActivityPanelVisibilityStore((state) => state.hidden);
+	const setHidden = useActivityPanelVisibilityStore((state) => state.setHidden);
 	const subagentsCollapsed = useActivityPanelStore(
 		(state) => state.subagentsCollapsed[workspaceId] === true,
 	);
@@ -562,7 +563,7 @@ export function WorkspaceActivityMenu({
 				: null;
 	const onTriggerClick = () => {
 		if (fits) {
-			setHidden(workspaceId, !hidden);
+			setHidden(!hidden);
 			return;
 		}
 		setFloating(!popoverOpen);

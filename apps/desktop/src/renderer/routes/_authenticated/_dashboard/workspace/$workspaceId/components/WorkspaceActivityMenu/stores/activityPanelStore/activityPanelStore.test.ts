@@ -1,5 +1,14 @@
-import { expect, test } from "bun:test";
-import { FINISHED_LIMIT, useActivityPanelStore } from "./activityPanelStore";
+import { afterEach, expect, test } from "bun:test";
+import {
+	FINISHED_LIMIT,
+	useActivityPanelStore,
+	useActivityPanelVisibilityStore,
+} from "./activityPanelStore";
+
+afterEach(() => {
+	useActivityPanelVisibilityStore.getState().setHidden(false);
+	localStorage.removeItem("workspace-activity-panel");
+});
 
 const finished = (n: number) => ({
 	key: `chat:${n}`,
@@ -48,22 +57,33 @@ test("fits and stopped keys are tracked per call and cleared on demand", () => {
 	);
 });
 
-test("hiding the docked card is per workspace", () => {
-	const { setHidden } = useActivityPanelStore.getState();
-	setHidden("ws-a", true);
-	expect(useActivityPanelStore.getState().hidden["ws-a"]).toBe(true);
-	expect(useActivityPanelStore.getState().hidden["ws-b"]).toBeUndefined();
-	setHidden("ws-a", false);
-	expect("ws-a" in useActivityPanelStore.getState().hidden).toBe(false);
+test.each([
+	true,
+	false,
+])("restores the shared hidden preference: %s", async (hidden) => {
+	useActivityPanelVisibilityStore.getState().setHidden(hidden);
+	const saved = localStorage.getItem("workspace-activity-panel");
+	expect(JSON.parse(saved ?? "null")).toEqual({
+		state: { hidden },
+		version: 0,
+	});
+
+	useActivityPanelVisibilityStore.setState({ hidden: !hidden });
+	localStorage.setItem("workspace-activity-panel", saved as string);
+	await useActivityPanelVisibilityStore.persist.rehydrate();
+
+	expect(useActivityPanelVisibilityStore.getState().hidden).toBe(hidden);
 });
 
 test("the floating popover stays open per workspace and closing removes the key", () => {
+	useActivityPanelVisibilityStore.getState().setHidden(true);
 	const { setFloatingOpen } = useActivityPanelStore.getState();
 	setFloatingOpen("ws-a", true);
 	expect(useActivityPanelStore.getState().floatingOpen["ws-a"]).toBe(true);
 	expect(useActivityPanelStore.getState().floatingOpen["ws-b"]).toBeUndefined();
 	setFloatingOpen("ws-a", false);
 	expect("ws-a" in useActivityPanelStore.getState().floatingOpen).toBe(false);
+	expect(useActivityPanelVisibilityStore.getState().hidden).toBe(true);
 });
 
 test("collapsing the subagents group is per workspace", () => {
