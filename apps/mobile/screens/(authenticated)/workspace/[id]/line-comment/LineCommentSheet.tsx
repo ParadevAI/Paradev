@@ -1,8 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
 import * as Crypto from "expo-crypto";
 import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
-import { ScrollView, TextInput, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+	ScrollView,
+	TextInput,
+	type TextInputInstance,
+	View,
+} from "react-native";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
 import { HeaderToolbar } from "@/lib/navigation";
@@ -11,6 +16,7 @@ import { PressableScale } from "@/screens/(authenticated)/components/PressableSc
 import { useCommentComposerStore } from "../stores/commentComposerStore";
 import { useDraftCommentsStore } from "../stores/draftCommentsStore";
 import { AnchorLineRow } from "./components/AnchorLineRow";
+import { useSheetAutoFocus } from "./hooks/useSheetAutoFocus";
 
 export function LineCommentSheet() {
 	const { t } = useLingui();
@@ -21,6 +27,8 @@ export function LineCommentSheet() {
 	const updateComment = useDraftCommentsStore((state) => state.updateComment);
 
 	const theme = useTheme();
+	const inputRef = useRef<TextInputInstance>(null);
+	const autoFocus = useSheetAutoFocus(inputRef);
 	const [body, setBody] = useState(anchor?.initialBody ?? "");
 	const trimmed = body.trim();
 
@@ -96,7 +104,8 @@ export function LineCommentSheet() {
 					</Text>
 				) : null}
 				<TextInput
-					autoFocus
+					ref={inputRef}
+					autoFocus={autoFocus}
 					className="border-border text-foreground mx-3 min-h-32 rounded-xl border px-3.5 py-3 text-[15px]"
 					multiline
 					textAlignVertical="top"
