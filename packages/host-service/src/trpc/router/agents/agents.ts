@@ -778,15 +778,19 @@ function launchChatAgent(
  * Every rejection falls through to a launch rather than failing: the caller's
  * candidate is a hint, and a stale one must cost nothing.
  */
-async function continueAgent(
+export async function continueAgent(
 	ctx: Pick<
 		HostServiceContext,
 		"db" | "eventBus" | "runtime" | "terminalAgentStore"
 	>,
 	input: AgentRunInput,
 ): Promise<AgentRunResult | null> {
-	if (!input.continueTerminalId) return null;
-	const chat = ctx.runtime.chat?.();
+	const terminalId = input.continueTerminalId;
+	if (!terminalId) return null;
+	// `runtime.chat()` opens chat.db on first use, so only a chat asks for it.
+	const chat = ctx.terminalAgentStore.hasChat(terminalId)
+		? ctx.runtime.chat?.()
+		: undefined;
 	const chatTarget = chat
 		? chatContinuationTarget(ctx.db, ctx.terminalAgentStore, chat.live, input)
 		: null;
