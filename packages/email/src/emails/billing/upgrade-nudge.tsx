@@ -2,33 +2,28 @@ import { Section, Text } from "@react-email/components";
 import { Button, EmailLayout } from "../../components";
 
 interface UpgradeNudgeEmailProps {
-	recipientName?: string | null;
 	featureName: string;
-	organizationName?: string | null;
 	upgradeUrl: string;
+	unsubscribeUrl?: string;
 }
 
 export function UpgradeNudgeEmail({
-	recipientName = "there",
 	featureName = "Paradev Mobile",
-	organizationName = "Acme Inc",
 	upgradeUrl = "https://app.superset.sh/settings/billing",
+	unsubscribeUrl,
 }: UpgradeNudgeEmailProps) {
 	return (
-		<EmailLayout preview={`${featureName} is part of Paradev Pro.`}>
+		<EmailLayout
+			preview={`${featureName} is part of Paradev Pro.`}
+			unsubscribeUrl={unsubscribeUrl}
+		>
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-				Hi {recipientName ?? "there"},
+				Hi there,
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				You tried to use <strong>{featureName}</strong> on your phone. It's part
-				of Pro
-				{organizationName ? (
-					<>
-						, and <strong>{organizationName}</strong> is on the Free plan
-					</>
-				) : null}
-				.
+				of Pro, and your organization is on the Free plan.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">

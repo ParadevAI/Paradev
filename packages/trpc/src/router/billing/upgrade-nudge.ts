@@ -18,9 +18,7 @@ export function upgradeNudgeFeatureName(feature: string): string {
 
 export interface UpgradeNudgeMessage {
 	to: string;
-	recipientName: string | null;
 	featureName: string;
-	organizationId: string | null;
 }
 
 export interface UpgradeNudgeDeps {
@@ -35,6 +33,7 @@ export interface UpgradeNudgeDeps {
 	/** Takes the user's slot for the next 7 days; false when it is taken. */
 	claim(userId: string): Promise<boolean>;
 	release(userId: string): Promise<void>;
+	/** Hands the nudge to the Resend automation, which adds the unsubscribe link. */
 	send(message: UpgradeNudgeMessage): Promise<void>;
 }
 
@@ -47,7 +46,7 @@ export type UpgradeNudgeOutcome =
 
 export async function recordUpgradeIntent(
 	input: {
-		user: { id: string; email: string; name: string | null };
+		user: { id: string; email: string };
 		organizationId: string | null;
 		feature: string;
 	},
@@ -77,9 +76,7 @@ async function nudge(
 		if (!claimed) return "rate_limited";
 		await deps.send({
 			to: user.email,
-			recipientName: user.name,
 			featureName: upgradeNudgeFeatureName(feature),
-			organizationId,
 		});
 		return "sent";
 	} catch (error) {

@@ -1,9 +1,4 @@
-import { db } from "@superset/db/client";
-import { organizations } from "@superset/db/schema";
-import { UpgradeNudgeEmail } from "@superset/email/emails/billing/upgrade-nudge";
-import { NOREPLY_FROM } from "@superset/email/sender";
 import { Redis } from "@upstash/redis";
-import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
@@ -12,6 +7,8 @@ import {
 	UPGRADE_NUDGE_INTERVAL_SECONDS,
 	type UpgradeNudgeDeps,
 } from "./upgrade-nudge";
+
+export const UPGRADE_NUDGE_EVENT = "billing.upgrade_nudge_due";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const redis =
@@ -58,31 +55,21 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		await requireRedis().del(claimKey(userId));
 	},
 
-	async send({ to, recipientName, featureName, organizationId }) {
-		const organization = organizationId
-			? await db.query.organizations.findFirst({
-					where: eq(organizations.id, organizationId),
-					columns: { name: true },
-				})
-			: null;
-		const message = {
-			from: NOREPLY_FROM,
-			to,
-			subject: `${featureName} is part of Paradev Pro`,
-			react: UpgradeNudgeEmail({
-				recipientName,
-				featureName,
-				organizationName: organization?.name ?? null,
-				upgradeUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
-			}),
-		};
+	async send({ to, featureName }) {
 		if (env.NODE_ENV !== "production") {
 			console.info(
-				`[billing/upgrade-nudge] not sending outside production: ${message.subject}`,
+				`[billing/upgrade-nudge] not emitting ${UPGRADE_NUDGE_EVENT} outside production`,
 			);
 			return;
 		}
-		const { error } = await resend.emails.send(message);
+		const { error } = await resend.events.send({
+			event: UPGRADE_NUDGE_EVENT,
+			email: to,
+			payload: {
+				featureName,
+				upgradeUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
+			},
+		});
 		if (error) throw new Error(error.message);
 	},
 };

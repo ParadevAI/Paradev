@@ -3,6 +3,7 @@ import {
 	recordUpgradeIntent,
 	type UpgradeNudgeDeps,
 	type UpgradeNudgeMessage,
+	upgradeNudgeFeatureName,
 } from "./upgrade-nudge";
 
 function fakeDeps({ paid = false }: { paid?: boolean } = {}) {
@@ -29,7 +30,7 @@ function fakeDeps({ paid = false }: { paid?: boolean } = {}) {
 }
 
 const input = {
-	user: { id: "user-1", email: "ada@example.com", name: "Ada" },
+	user: { id: "user-1", email: "ada@example.com" },
 	organizationId: "org-1",
 	feature: "mobile",
 };
@@ -41,12 +42,7 @@ describe("recordUpgradeIntent", () => {
 		expect(await recordUpgradeIntent(input, deps)).toBe("sent");
 		expect(captured).toEqual(["sent"]);
 		expect(sent).toEqual([
-			{
-				to: "ada@example.com",
-				recipientName: "Ada",
-				featureName: "Paradev Mobile",
-				organizationId: "org-1",
-			},
+			{ to: "ada@example.com", featureName: "Paradev Mobile" },
 		]);
 	});
 
@@ -69,5 +65,10 @@ describe("recordUpgradeIntent", () => {
 		expect(await recordUpgradeIntent(input, deps)).toBe("paid");
 		expect(sent).toHaveLength(0);
 		expect(captured).toEqual(["paid"]);
+	});
+
+	test("names unknown features without passing client text through", () => {
+		expect(upgradeNudgeFeatureName("voice_mode")).toBe("Voice mode");
+		expect(upgradeNudgeFeatureName("<a href=x>win</a>")).toBe("a Pro feature");
 	});
 });

@@ -113,6 +113,29 @@ const desired: DesiredAutomation[] = [
 		],
 	},
 	{
+		// Mobile paywall hits. The API claims a 7-day KV key per user before it
+		// emits, so each trigger is already deduplicated.
+		name: "upgrade-nudge",
+		steps: [
+			{
+				key: "start",
+				type: "trigger",
+				config: { eventName: "billing.upgrade_nudge_due" },
+			},
+			{
+				key: "send_upgrade_nudge",
+				type: "send_email",
+				config: {
+					template: template("billing-upgrade-nudge", {
+						featureName: { var: "event.featureName" },
+						upgradeUrl: { var: "event.upgradeUrl" },
+					}),
+				},
+			},
+		],
+		connections: [{ from: "start", to: "send_upgrade_nudge", type: "default" }],
+	},
+	{
 		// Signup drip. Listens for first-open from minute zero; a user with no
 		// first-open event by day 1 cannot have activated (onboarding precedes
 		// workspace creation), so the download branch needs no activation guard.
