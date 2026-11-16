@@ -135,8 +135,8 @@ export function MoveProgress({
 						moveId,
 						error:
 							toHostId === machineId
-								? "This computer's host is not running"
-								: "The computer this chat moves to can't be reached",
+								? "This device's host is not running"
+								: "The device this chat moves to can't be reached",
 					})
 					.catch((error: unknown) =>
 						console.warn(
@@ -236,7 +236,7 @@ export function MoveProgress({
 	const current = ready ? STEPS.length : stepIndex(move);
 	const labels: Record<(typeof STEPS)[number], ReactNode> = {
 		pending: move?.toHostId ? (
-			<Trans>Getting the computer ready</Trans>
+			<Trans>Getting the device ready</Trans>
 		) : (
 			<Trans>Starting the workspace</Trans>
 		),

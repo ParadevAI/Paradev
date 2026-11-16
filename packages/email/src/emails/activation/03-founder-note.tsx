@@ -28,10 +28,7 @@ export function ActivationNudge2({
 					I&apos;m Kiet, one of the founders of Paradev. Looks like you signed
 					up last week but haven&apos;t started a workspace yet.
 				</Text>
-				<Text style={paragraph}>
-					Did something break? Even one word helps: download, setup, trust, or
-					busy.
-				</Text>
+				<Text style={paragraph}>Did something break?</Text>
 				<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
 			</Body>
 		</Html>

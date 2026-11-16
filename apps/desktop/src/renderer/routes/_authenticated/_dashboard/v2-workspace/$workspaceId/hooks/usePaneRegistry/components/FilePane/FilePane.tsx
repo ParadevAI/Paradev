@@ -46,11 +46,12 @@ export function FilePane({
 		absolutePath: filePath,
 	});
 
+	const documentId = document.id;
 	useEffect(
 		() => () => {
-			if (context.isActive) fileAutoSave.onFocusChange(document);
+			if (context.isActive) fileAutoSave.onFocusChange(documentId);
 		},
-		[context.isActive, document],
+		[context.isActive, documentId],
 	);
 
 	// Images a markdown file points at load through the workspace
@@ -172,7 +173,7 @@ export function FilePane({
 			}}
 			onBlurCapture={(event) => {
 				if (!event.currentTarget.contains(event.relatedTarget as Node)) {
-					fileAutoSave.onFocusChange(document);
+					fileAutoSave.onFocusChange(documentId);
 				}
 			}}
 		>

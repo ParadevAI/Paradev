@@ -472,6 +472,86 @@ export const gitRenameBranchTask = defineWorkerTask<
 	},
 });
 
+/** Branch names `git switch` can resolve without a fetch: local, or tracked from origin. */
+async function knownBranchNames(
+	git: ReturnType<typeof createUserSimpleGit>,
+): Promise<Set<string>> {
+	const refs = await git.raw([
+		"for-each-ref",
+		"--format=%(refname)",
+		"refs/heads",
+		"refs/remotes/origin",
+	]);
+	return new Set(
+		refs
+			.split("\n")
+			.map((ref) => ref.replace(/^refs\/(heads|remotes\/origin)\//, "").trim())
+			.filter(Boolean),
+	);
+}
+
+export const gitCheckoutBranchTask = defineWorkerTask<
+	{ worktreePath: string; branch: string; gitEnv: GitTaskEnv },
+	| { ok: true }
+	| {
+			ok: false;
+			reason: "dirty" | "held-elsewhere" | "fetch-failed" | "not-found";
+	  }
+>({
+	type: "git/checkoutBranch",
+	handler: async ({ worktreePath, branch, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		if (!(await git.status()).isClean()) return { ok: false, reason: "dirty" };
+		const holder = parseWorktreeList(
+			await git.raw(["worktree", "list", "--porcelain"]),
+		).find((worktree) => worktree.branch === branch);
+		if (
+			holder &&
+			normalizeWorktreePath(holder.path) !== normalizeWorktreePath(worktreePath)
+		) {
+			return { ok: false, reason: "held-elsewhere" };
+		}
+		if (!(await knownBranchNames(git)).has(branch)) {
+			try {
+				await git.fetch(["origin", branch]);
+			} catch (error) {
+				if (!/couldn't find remote ref/i.test(String(error))) {
+					return { ok: false, reason: "fetch-failed" };
+				}
+			}
+		}
+		try {
+			await git.raw(["switch", branch]);
+		} catch {
+			return { ok: false, reason: "not-found" };
+		}
+		return { ok: true };
+	},
+});
+
+export const gitFetchBranchesTask = defineWorkerTask<
+	{
+		worktreePath: string;
+		branches: string[];
+		/** Skip the branches `git switch` can already resolve. */
+		missingOnly: boolean;
+		gitEnv: GitTaskEnv;
+	},
+	{ fetched: string[] }
+>({
+	type: "git/fetchBranches",
+	handler: async ({ worktreePath, branches, missingOnly, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
+		let wanted = branches;
+		if (missingOnly) {
+			const known = await knownBranchNames(git);
+			wanted = branches.filter((branch) => !known.has(branch));
+		}
+		if (wanted.length > 0) await git.fetch(["origin", ...wanted]);
+		return { fetched: wanted };
+	},
+});
+
 export const gitStagePathsTask = defineWorkerTask<
 	{
 		worktreePath: string;
@@ -850,6 +930,8 @@ export const gitTasks = [
 	gitDeleteBranchTask,
 	gitAutomaticBranchRenamableTask,
 	gitRenameBranchTask,
+	gitCheckoutBranchTask,
+	gitFetchBranchesTask,
 	gitStagePathsTask,
 	gitCommitTask,
 	gitPushTask,

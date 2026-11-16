@@ -1,5 +1,6 @@
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef } from "react";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useHotkey } from "renderer/hotkeys";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";

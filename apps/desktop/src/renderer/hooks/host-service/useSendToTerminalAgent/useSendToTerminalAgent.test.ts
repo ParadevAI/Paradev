@@ -42,13 +42,18 @@ describe("text never reaches a terminal through the raw keystroke channel", () =
 const V2_PANES =
 	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components";
 
-// Design mode stages a note in the agent's input so the user can add more
-// before sending (#8566). Every other caller sends right away.
-const EXPECTED_SUBMIT: Record<string, boolean> = {
-	[`${V2_PANES}/BrowserPane/components/DesignModePopover/DesignModePopover.tsx`]: false,
-	[`${V2_PANES}/DiffPane/hooks/useDiffCommentComposer/useDiffCommentComposer.ts`]: true,
-	[`${V2_PANES}/TerminalPane/components/TerminalRichInput/TerminalRichInput.tsx`]: true,
-	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/NewPageComposer/NewPageComposer.tsx": true,
+// Design mode stages a note in a terminal agent's input so the user can add
+// more before sending (#8566). A chat has no input to stage in, so it sends.
+// Every other caller sends right away.
+const EXPECTED_SUBMIT: Record<string, string> = {
+	[`${V2_PANES}/BrowserPane/components/DesignModePopover/DesignModePopover.tsx`]:
+		"isChat",
+	[`${V2_PANES}/DiffPane/hooks/useDiffCommentComposer/useDiffCommentComposer.ts`]:
+		"true",
+	[`${V2_PANES}/TerminalPane/components/TerminalRichInput/TerminalRichInput.tsx`]:
+		"true",
+	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/NewPageComposer/NewPageComposer.tsx":
+		"true",
 };
 
 describe("submit on the shared agent writer", () => {
@@ -59,14 +64,12 @@ describe("submit on the shared agent writer", () => {
 		expect(source).not.toMatch(/submit:\s*(?:true|false)/);
 	});
 
-	test("design mode stages the note and every other caller submits", async () => {
+	test("design mode stages the note unless the target is a chat, and every other caller submits", async () => {
 		for (const [file, submit] of Object.entries(EXPECTED_SUBMIT)) {
 			const source = await Bun.file(`${RENDERER_ROOT}/${file}`).text();
 			const calls = [
-				...source.matchAll(
-					/sendToTerminalAgent\(\{[^}]*?submit:\s*(true|false)/g,
-				),
-			].map((match) => match[1] === "true");
+				...source.matchAll(/sendToTerminalAgent\(\{[^}]*?submit:\s*(\w+)/g),
+			].map((match) => match[1]);
 			expect({ file, calls }).toEqual({ file, calls: [submit] });
 		}
 	});

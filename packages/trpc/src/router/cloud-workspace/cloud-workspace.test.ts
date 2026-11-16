@@ -1,11 +1,17 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
+import * as attachments from "../../lib/attachments";
 import * as plan from "../../lib/billing/plan";
 import * as guards from "../../lib/cloud-guards";
+import * as githubUser from "../../lib/github-user";
 import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
+import * as userSettings from "../../lib/user-settings";
+import * as workspaceAccess from "../../lib/workspace-access";
 import * as access from "./access";
+import * as activity from "./activity";
+import * as jobs from "./jobs";
 import * as meter from "./meter";
 import * as wake from "./wake";
 
@@ -22,13 +28,47 @@ let running = false;
 let boxVcpus = 8;
 let restartedWith: string[] = [];
 
+const ENVIRONMENT_ID = "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b";
+let inserted: unknown[] = [];
+let queuedJobs: { launch?: { surface?: string; effort?: string } }[] = [];
+let environmentSize: string | null = null;
+let sizeLookups: (string | null | undefined)[] = [];
+
 stub(db.query.cloudWorkspaces, { findFirst: async () => ROW });
+stub(db.query.environments, {
+	findFirst: async () => ({
+		id: ENVIRONMENT_ID,
+		scope: "organization",
+		machineSize: environmentSize,
+	}),
+});
+stub(db.query.users, {
+	findFirst: async () => ({ id: "user-1", name: "Ana", image: null }),
+});
 stub(db, {
 	update: () => ({
 		set: (values: Record<string, unknown>) => ({
 			where: () => ({ returning: async () => [{ ...ROW, ...values }] }),
 		}),
 	}),
+	insert: () => ({
+		values: (values: Record<string, unknown> | unknown[]) => {
+			inserted.push(values);
+			return Object.assign(Promise.resolve(), {
+				returning: async () => [{ ...ROW, ...values }],
+			});
+		},
+	}),
+});
+stub(githubUser, { githubUserTokenFor: async () => null });
+stub(attachments, { anchorAttachments: async () => {} });
+stub(activity, { recordCloudWorkspaceActivity: async () => {} });
+stub(workspaceAccess, { pushWorkspaceAccess: () => {} });
+stub(userSettings, { acpChatEnabled: async () => true });
+stub(jobs, {
+	publishCloudWorkspaceJob: async (job: { body: (typeof queuedJobs)[0] }) => {
+		queuedJobs.push(job.body);
+	},
 });
 stub(guards, {
 	assertMember: async () => {},
@@ -36,8 +76,14 @@ stub(guards, {
 });
 stub(access, { canOpenWorkspace: async () => true });
 stub(plan, {
-	resolveMachineSize: async (_: string, name: string) =>
-		name === "xlarge" ? { name, vcpus: 16 } : null,
+	resolveMachineSize: async (_: string, name: string | null | undefined) => {
+		sizeLookups.push(name);
+		return name === "xlarge"
+			? { name, vcpus: 16 }
+			: name == null
+				? { name: "medium", vcpus: 4 }
+				: null;
+	},
 });
 stub(meter, { assertMayBoot: async () => {} });
 const FORWARD = {
@@ -56,6 +102,12 @@ stub(sandbox, {
 		running,
 		vcpus: boxVcpus,
 	}),
+	environmentRepositoryRows: async () => [
+		{ id: "repo-1", defaultBranch: "main" },
+	],
+	primaryRepository: (rows: unknown[]) => rows[0],
+	recordWorkspaceRepositories: async () => {},
+	workspaceBranchName: () => "paradev/ws-1",
 });
 stub(wake, {
 	restartCloudWorkspace: async (row: { machineSize: string }) => {
@@ -90,6 +142,64 @@ beforeEach(() => {
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
+	inserted = [];
+	queuedJobs = [];
+	environmentSize = null;
+	sizeLookups = [];
+});
+
+describe("cloudWorkspace.create", () => {
+	const create = (input: Record<string, unknown>) =>
+		caller.cloudWorkspace.create({
+			organizationId: "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+			environmentId: ENVIRONMENT_ID,
+			machineSize: "xlarge",
+			...input,
+		} as never);
+
+	test("files the new workspace under the caller's tags", async () => {
+		const row = await create({ tags: ["Fleet", "migration"] });
+		expect(inserted).toContainEqual([
+			expect.objectContaining({ tag: "fleet", createdByUserId: "user-1" }),
+			expect.objectContaining({ tag: "migration", createdByUserId: "user-1" }),
+		]);
+		expect(row.tags).toEqual(["fleet", "migration"]);
+	});
+
+	test("opens a chat that carries the agent's effort and mode to the box", async () => {
+		const row = await create({
+			agent: "claude",
+			prompt: "Fix the build",
+			effort: "high",
+			mode: "plan",
+		});
+		expect(queuedJobs[0]?.launch).toMatchObject({
+			surface: "chat",
+			effort: "high",
+			mode: "plan",
+		});
+		expect(row.initialLaunch).toMatchObject({ surface: "chat" });
+	});
+
+	test("boots at the environment's size when the create names none", async () => {
+		environmentSize = "xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(row.machineSize).toBe("xlarge");
+	});
+
+	test("falls back to the organization's default when the environment's size is no longer offered", async () => {
+		environmentSize = "2xlarge";
+		const row = await create({ machineSize: undefined });
+		expect(sizeLookups).toEqual(["2xlarge", undefined]);
+		expect(row.machineSize).toBe("medium");
+	});
+
+	test("refuses a size the caller names that the plan does not offer, whatever the environment's", async () => {
+		environmentSize = "xlarge";
+		await expect(create({ machineSize: "2xlarge" })).rejects.toMatchObject({
+			code: "BAD_REQUEST",
+		});
+	});
 });
 
 describe("cloudWorkspace.setMachineSize", () => {

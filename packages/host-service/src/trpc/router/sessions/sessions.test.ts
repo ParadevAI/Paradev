@@ -5,6 +5,7 @@ import {
 	type ChatRuntime,
 	FakeHarness,
 	type HarnessFactoryOptions,
+	type HarnessStartOptions,
 } from "@superset/chat-runtime";
 import { createTestRuntime, waitFor } from "@superset/chat-runtime/testing";
 import { eq } from "drizzle-orm";
@@ -23,12 +24,14 @@ let runtime: ChatRuntime;
 let db: HostDb;
 let startDead: boolean;
 let launches: HarnessFactoryOptions[];
+let starts: HarnessStartOptions[];
 let caller: ReturnType<typeof sessionsRouter.createCaller>;
 let ctx: HostServiceContext;
 
 beforeEach(() => {
 	startDead = false;
 	launches = [];
+	starts = [];
 	const sqlite = new Database(":memory:");
 	db = drizzle(sqlite, { schema }) as unknown as HostDb;
 	migrate(db as never, {
@@ -77,7 +80,7 @@ beforeEach(() => {
 				"claude-acp",
 				(options: HarnessFactoryOptions) => {
 					launches.push(options);
-					return new FakeHarness({
+					const harness = new FakeHarness({
 						start: [
 							{
 								kind: "session",
@@ -91,6 +94,12 @@ beforeEach(() => {
 						],
 						turns: [[], []],
 					});
+					const start = harness.start.bind(harness);
+					harness.start = (startOptions) => {
+						starts.push(startOptions);
+						return start(startOptions);
+					};
+					return harness;
 				},
 			],
 		]),
@@ -205,6 +214,18 @@ describe("sessions router", () => {
 						entry.event.item.kind === "user_message",
 				),
 		).toHaveLength(1);
+	});
+
+	test("starts the agent at the reasoning effort the caller asked for", async () => {
+		const created = await createChatSessionInWorkspace(ctx, {
+			workspaceId: WORKSPACE,
+			agent: "claude",
+			prompt: "go",
+			effort: "high",
+		});
+		expect(created.kind).toBe("chat");
+		await waitFor(() => starts.length > 0);
+		expect(starts[0]?.effortId).toBe("high");
 	});
 
 	test("launches under the terminal id a cloud launch was promised", async () => {

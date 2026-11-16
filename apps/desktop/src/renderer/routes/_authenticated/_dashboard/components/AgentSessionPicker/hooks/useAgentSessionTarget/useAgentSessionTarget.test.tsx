@@ -49,7 +49,7 @@ test("the currently open chat takes priority over an old selection", () => {
 	).toBe("chat-a");
 });
 
-test("does not send to a different chat while the current chat is missing", () => {
+test("falls back to the usual default when the open chat is not a live session", () => {
 	const sessions = [
 		{ terminalId: "term-a", chatSessionId: "chat-a" },
 	] as TerminalAgentBinding[];
@@ -60,35 +60,9 @@ test("does not send to a different chat while the current chat is missing", () =
 			preferredTerminalId: "term-b",
 		}),
 	);
-	expect(result.current.resolved).toBeNull();
-	act(() => result.current.onValueChange("existing:term-a"));
-	expect(
-		result.current.resolved?.kind === "existing" &&
-			result.current.resolved.chatSessionId,
-	).toBe("chat-a");
-});
-
-test("requires a choice when the intended chat is unknown or a chosen chat disappears", () => {
-	window.localStorage.setItem("lastSelectedDiffCommentTerminalId", "term-a");
-	const sessions = [
-		{ terminalId: "term-a", chatSessionId: "chat-a" },
-		{ terminalId: "term-b", chatSessionId: "chat-b" },
-	] as TerminalAgentBinding[];
-	const { result, rerender } = renderHook(
-		({ available }) =>
-			useAgentSessionTarget({
-				sessions: available,
-				configs: [],
-				preferredTerminalId: null,
-			}),
-		{ initialProps: { available: sessions } },
-	);
-	expect(result.current.resolved).toBeNull();
-	act(() => result.current.onValueChange("existing:term-b"));
-	expect(
-		result.current.resolved?.kind === "existing" &&
-			result.current.resolved.chatSessionId,
-	).toBe("chat-b");
-	rerender({ available: sessions.slice(0, 1) });
-	expect(result.current.resolved).toBeNull();
+	expect(result.current.resolved).toEqual({
+		kind: "existing",
+		terminalId: "term-a",
+		chatSessionId: "chat-a",
+	});
 });

@@ -67,13 +67,16 @@ export function ProjectSection({
 	index,
 	isCollapsed: isSidebarCollapsed = false,
 }: ProjectSectionProps) {
-	const { isProjectCollapsed, toggleProjectCollapsed } =
-		useWorkspaceSidebarStore();
+	const isCollapsed = useWorkspaceSidebarStore((state) =>
+		state.isProjectCollapsed(projectId),
+	);
+	const toggleProjectCollapsed = useWorkspaceSidebarStore(
+		(state) => state.toggleProjectCollapsed,
+	);
 	const openNewWorkspace = useOpenNewWorkspace();
 	const reorderProjects = useReorderProjects();
 	const utils = electronTrpc.useUtils();
 
-	const isCollapsed = isProjectCollapsed(projectId);
 	const totalWorkspaceCount =
 		workspaces.length +
 		sections.reduce((sum, s) => sum + s.workspaces.length, 0);

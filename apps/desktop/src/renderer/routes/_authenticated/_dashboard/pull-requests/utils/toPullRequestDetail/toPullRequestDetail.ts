@@ -90,5 +90,11 @@ export function toPullRequestDetail(
 		labels: activity?.labels ?? [],
 		capabilities: read.capabilities,
 		mergeMethods: mergeMethodChoices(read.mergeability),
+		mergeQueue: {
+			enabled:
+				read.mergeability.queueEnabled === true ||
+				read.mergeability.queue !== null,
+			entry: read.mergeability.queue,
+		},
 	};
 }

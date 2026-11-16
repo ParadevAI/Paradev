@@ -12,6 +12,7 @@ interface DashboardSidebarWorkspaceHostGlyphProps {
 	hostType: DashboardSidebarWorkspaceHostType;
 	hostIsOnline: boolean | null;
 	cloudState?: CloudGlyphState;
+	pressure?: "busy" | "critical" | null;
 }
 
 /** Marks where a workspace runs; this device is the default and gets nothing. */
@@ -19,6 +20,7 @@ export function DashboardSidebarWorkspaceHostGlyph({
 	hostType,
 	hostIsOnline,
 	cloudState = "on",
+	pressure = null,
 }: DashboardSidebarWorkspaceHostGlyphProps) {
 	if (hostType === "local-device") return null;
 	const isOffline = hostType === "remote-device" && hostIsOnline === false;
@@ -28,12 +30,22 @@ export function DashboardSidebarWorkspaceHostGlyph({
 			<TooltipTrigger asChild>
 				<span
 					className={cn(
-						"flex size-5 shrink-0 items-center justify-center",
+						"relative flex size-5 shrink-0 items-center justify-center",
 						isOffline ? "text-muted-foreground/40" : "text-muted-foreground/70",
 					)}
 				>
 					{hostType === "cloud" ? (
-						<CloudGlyph className="size-3" state={cloudState} />
+						<>
+							<CloudGlyph className="size-3" state={cloudState} />
+							{pressure ? (
+								<span
+									className={cn(
+										"absolute right-0.5 bottom-0.5 size-1.5 rounded-full",
+										pressure === "critical" ? "bg-destructive" : "bg-amber-500",
+									)}
+								/>
+							) : null}
+						</>
 					) : isOffline ? (
 						<LuMonitorOff className="size-3" strokeWidth={2} />
 					) : (
@@ -45,6 +57,10 @@ export function DashboardSidebarWorkspaceHostGlyph({
 				{hostType === "cloud" ? (
 					cloudState === "connecting" ? (
 						<Trans>Cloud workspace: connecting</Trans>
+					) : pressure === "critical" ? (
+						<Trans>Cloud workspace: out of memory</Trans>
+					) : pressure === "busy" ? (
+						<Trans>Cloud workspace: under heavy load</Trans>
 					) : (
 						<Trans>Cloud workspace</Trans>
 					)

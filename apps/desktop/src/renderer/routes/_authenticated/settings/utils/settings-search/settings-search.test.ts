@@ -138,29 +138,22 @@ describe("settings search - auto save", () => {
 	});
 });
 
-describe("settings search - mobile rollout", () => {
-	it("excludes mobile matches until the feature flag is enabled", () => {
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false).mobile,
-		).toBeUndefined();
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false, true).mobile,
-		).toBe(1);
-		expect(
-			getVisibleMatchCountBySection("iPhone", false, false, true).mobile,
-		).toBe(1);
+describe("settings search - mobile", () => {
+	it("finds the mobile section in both variants", () => {
+		expect(getVisibleMatchCountBySection("iPhone", true, false).mobile).toBe(1);
+		expect(getVisibleMatchCountBySection("iPhone", false, false).mobile).toBe(
+			1,
+		);
 	});
 });
 
 describe("settings search - plugins visibility", () => {
 	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, false)
-				.plugins,
+			getVisibleMatchCountBySection("marketplace", true, false, false).plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, true)
-				.plugins,
+			getVisibleMatchCountBySection("marketplace", true, false, true).plugins,
 		).toBeGreaterThan(0);
 	});
 });

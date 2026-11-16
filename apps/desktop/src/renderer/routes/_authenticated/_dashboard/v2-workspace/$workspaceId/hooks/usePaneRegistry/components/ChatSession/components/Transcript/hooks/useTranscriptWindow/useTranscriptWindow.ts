@@ -15,13 +15,13 @@ const REVEAL_MARGIN_PX = 1200;
 const ESTIMATED_ROW_HEIGHT_PX = 120;
 const MAX_REVEAL_HOLD_MS = 1500;
 
-type RowRef = (element: HTMLElement | null) => void;
+export type RegisterRow = (rowKey: string, element: HTMLElement | null) => void;
 
 export type TranscriptWindow = {
 	startIndex: number;
 	spacerHeight: number;
 	spacerRef: (element: HTMLDivElement | null) => void;
-	rowRef: (rowKey: string) => RowRef;
+	registerRow: RegisterRow;
 	resetToTail: () => void;
 	holdRevealUntilScrollEnds: () => void;
 };
@@ -51,7 +51,7 @@ export function useTranscriptWindow({
 	viewport: HTMLElement | null;
 	sessionId: string;
 	pinnedRowKeys: readonly (string | null)[];
-	observeRow: (rowKey: string) => RowRef;
+	observeRow: RegisterRow;
 	find?: { isOpen: boolean; mountsAll: boolean; awayFromEnd: boolean };
 }): TranscriptWindow {
 	const heights = useMemo(() => rowHeightsFor(sessionId), [sessionId]);
@@ -197,28 +197,19 @@ export function useTranscriptWindow({
 		};
 	}, [heights]);
 
-	const rowRefs = useRef(new Map<string, RowRef>());
-	const rowRef = useCallback(
-		(rowKey: string) => {
-			const cached = rowRefs.current.get(rowKey);
-			if (cached) return cached;
-			const near = observeRow(rowKey);
-			const ref: RowRef = (element) => {
-				near(element);
-				const previous = elements.current.get(rowKey);
-				if (previous === element) return;
-				if (previous) resizeObserverRef.current?.unobserve(previous);
-				if (!element) {
-					elements.current.delete(rowKey);
-					rowRefs.current.delete(rowKey);
-					return;
-				}
-				element.dataset.windowRowKey = rowKey;
-				elements.current.set(rowKey, element);
-				resizeObserverRef.current?.observe(element);
-			};
-			rowRefs.current.set(rowKey, ref);
-			return ref;
+	const registerRow = useCallback<RegisterRow>(
+		(rowKey, element) => {
+			observeRow(rowKey, element);
+			const previous = elements.current.get(rowKey);
+			if (previous === element) return;
+			if (previous) resizeObserverRef.current?.unobserve(previous);
+			if (!element) {
+				elements.current.delete(rowKey);
+				return;
+			}
+			element.dataset.windowRowKey = rowKey;
+			elements.current.set(rowKey, element);
+			resizeObserverRef.current?.observe(element);
 		},
 		[observeRow],
 	);
@@ -227,7 +218,7 @@ export function useTranscriptWindow({
 		startIndex,
 		spacerHeight: spacerHeightFor(rows, startIndex, heights),
 		spacerRef: setSpacer,
-		rowRef,
+		registerRow,
 		resetToTail,
 		holdRevealUntilScrollEnds,
 	};

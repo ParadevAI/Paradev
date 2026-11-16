@@ -25,7 +25,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import { ASSET_CACHE, BUNDLE_SRC, PACKAGE_ROOT } from "../build";
 import {
 	type Asset,

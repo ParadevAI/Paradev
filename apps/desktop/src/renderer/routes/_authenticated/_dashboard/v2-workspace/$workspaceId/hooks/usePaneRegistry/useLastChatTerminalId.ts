@@ -4,10 +4,11 @@ import type { StoreApi } from "zustand/vanilla";
 import type { ChatPaneData, PaneViewerData } from "../../types";
 
 export function useLastChatTerminalId(
-	store: StoreApi<WorkspaceStore<PaneViewerData>>,
+	store: StoreApi<WorkspaceStore<PaneViewerData>> | undefined,
 ) {
 	const [lastChat, setLastChat] = useState<string | null>(null);
 	useEffect(() => {
+		if (!store) return;
 		const update = (state: WorkspaceStore<PaneViewerData>) => {
 			const pane = state.getActivePane()?.pane;
 			if (pane?.kind === "chat-v3")

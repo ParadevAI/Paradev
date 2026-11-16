@@ -37,3 +37,28 @@ test("remembers the selected chat when a diff takes focus and clears it for an u
 	});
 	expect(result.current).toBeNull();
 });
+
+test("remembers chats independently when the diff is in the right area", () => {
+	const main = createWorkspaceStore<PaneViewerData>();
+	const right = createWorkspaceStore<PaneViewerData>();
+	const { result } = renderHook(() => ({
+		main: useLastChatTerminalId(main),
+		right: useLastChatTerminalId(right),
+	}));
+	act(() => {
+		main.getState().addTab({
+			panes: [
+				{ kind: "chat-v3", data: { terminalId: "claude", sessionId: "a" } },
+			],
+		});
+		right.getState().addTab({
+			panes: [
+				{ kind: "chat-v3", data: { terminalId: "codex", sessionId: "b" } },
+			],
+		});
+		right.getState().addTab({
+			panes: [{ kind: "diff", data: { path: "", collapsedFiles: [] } }],
+		});
+	});
+	expect(result.current).toEqual({ main: "claude", right: "codex" });
+});

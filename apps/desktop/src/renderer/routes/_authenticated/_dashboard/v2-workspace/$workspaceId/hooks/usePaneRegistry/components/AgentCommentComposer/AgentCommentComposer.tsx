@@ -19,7 +19,7 @@ export type {
 
 interface AgentCommentComposerProps {
 	workspaceId: string;
-	preferredTerminalId?: string | null;
+	preferredTerminalId?: string;
 	/** Short description of what the comment is anchored to ("Lines 3–7",
 	 *  a selected element, …), shown in the composer header. */
 	contextLabel: string;

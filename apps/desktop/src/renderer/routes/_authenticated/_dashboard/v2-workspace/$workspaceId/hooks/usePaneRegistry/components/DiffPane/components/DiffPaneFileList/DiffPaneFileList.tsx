@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { ResizablePanel } from "renderer/screens/main/components/ResizablePanel";
 import { useChangesTab } from "../../../../../../components/WorkspaceSidebar/hooks/useChangesTab";
@@ -14,14 +14,13 @@ import {
 const DEFAULT_WIDTH = 260;
 const MAX_WIDTH = 480;
 const OVERLAY_WIDTH = 300;
-// Keeps a strip of the diff visible beside the overlay to click back to it.
+// Keeps a strip of the diff visible beside the list.
 const OVERLAY_GUTTER = 48;
 
 interface DiffPaneFileListProps {
 	context: RendererContext<PaneViewerData>;
 	layout: "docked" | "overlay";
 	containerWidth: number;
-	onClose: () => void;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 }
@@ -30,7 +29,6 @@ export function DiffPaneFileList({
 	context,
 	layout,
 	containerWidth,
-	onClose,
 	workspaceId,
 	onOpenFile,
 }: DiffPaneFileListProps) {
@@ -74,15 +72,9 @@ export function DiffPaneFileList({
 							: undefined,
 				} as DiffPaneData);
 			}
-			if (layout === "overlay") onClose();
 		},
-		[store, actions, data, layout, onClose],
+		[store, actions, data],
 	);
-
-	const overlayRef = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		if (layout === "overlay") overlayRef.current?.focus();
-	}, [layout]);
 
 	const changesTab = useChangesTab({
 		workspaceId,
@@ -105,29 +97,15 @@ export function DiffPaneFileList({
 
 	if (layout === "overlay") {
 		return (
-			<>
-				<button
-					type="button"
-					aria-label={t({ message: "Hide file tree" })}
-					className="absolute inset-0 z-20 cursor-default bg-background/40"
-					onClick={onClose}
-				/>
-				<div
-					ref={overlayRef}
-					role="dialog"
-					tabIndex={-1}
-					aria-label={t({ message: "Files" })}
-					className="absolute inset-y-0 right-0 z-30 border-l border-border bg-background shadow-lg outline-none"
-					style={{
-						width: Math.min(OVERLAY_WIDTH, containerWidth - OVERLAY_GUTTER),
-					}}
-					onKeyDown={(event) => {
-						if (event.key === "Escape") onClose();
-					}}
-				>
-					{list}
-				</div>
-			</>
+			<aside
+				aria-label={t({ message: "Files" })}
+				className="absolute inset-y-0 right-0 z-30 border-l border-border bg-background shadow-lg"
+				style={{
+					width: Math.min(OVERLAY_WIDTH, containerWidth - OVERLAY_GUTTER),
+				}}
+			>
+				{list}
+			</aside>
 		);
 	}
 

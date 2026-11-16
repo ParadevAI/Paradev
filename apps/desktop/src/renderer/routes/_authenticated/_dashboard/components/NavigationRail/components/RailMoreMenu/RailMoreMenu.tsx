@@ -14,12 +14,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { Ellipsis, FolderPlus, Gauge, Layers } from "lucide-react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
-import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import {
 	RAIL_ICON_CLASS,
 	RAIL_ICON_STROKE_WIDTH,
 	railButtonClass,
-} from "../RailButton";
+} from "renderer/routes/_authenticated/_dashboard/components/RailButton";
+import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 
 export function RailMoreMenu() {
 	const { t } = useLingui();

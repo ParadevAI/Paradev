@@ -160,6 +160,9 @@ export function useWorkspaceWsUrl(
 	path: string,
 	params?: Record<string, string>,
 ): string {
+	// getWsToken is one stable function over a token that changes, so React
+	// Compiler would cache the first URL.
+	"use no memo";
 	const { hostUrl, getWsToken } = useWorkspaceClient();
 	const url = new URL(`${hostUrl}${path}`);
 	url.protocol = url.protocol === "https:" ? "wss:" : "ws:";

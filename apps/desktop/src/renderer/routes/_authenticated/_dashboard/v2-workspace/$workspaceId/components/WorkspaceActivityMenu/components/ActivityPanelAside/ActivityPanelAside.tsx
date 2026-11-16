@@ -36,7 +36,6 @@ export function ActivityPanelAside({ workspaceId }: { workspaceId: string }) {
 		if (!host) return;
 		const measure = () =>
 			setHasRoom(host.clientWidth >= CENTERED_CONTENT_WIDTH_PX + 2 * INSET_PX);
-		measure();
 		const observer = new ResizeObserver(measure);
 		observer.observe(host);
 		return () => observer.disconnect();

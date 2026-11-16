@@ -1,8 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
 import { Stack } from "expo-router";
-import { glassHeaderOptions, sheetDetents } from "@/lib/navigation";
+import {
+	glassHeaderOptions,
+	sheetDetents,
+	sheetHeaderOptions,
+} from "@/lib/navigation";
 
 const accessSheetOptions = {
+	...sheetHeaderOptions,
 	presentation: "formSheet",
 	sheetAllowedDetents: sheetDetents([0.45]),
 	sheetGrabberVisible: true,

@@ -19,7 +19,7 @@ function makeCloudWorkspace(
 		createdAt: DATE,
 		updatedAt: DATE,
 		agentStatusAt: null,
-		createdBy: { userId: ME },
+		createdBy: { userId: ME, name: "Me", image: null },
 		...overrides,
 	};
 }
@@ -143,13 +143,18 @@ describe("buildCloudSidebarWorkspaces", () => {
 				makeCloudWorkspace({ id: "mine" }),
 				makeCloudWorkspace({
 					id: "theirs-opted-in",
-					createdBy: { userId: "user-other" },
+					createdBy: { userId: "user-other", name: "Other", image: null },
 				}),
 			],
 		});
 
 		const rows = layout.repoProjects[0]?.cloudWorkspaces ?? [];
 		expect(rows.map((row) => row.isMine)).toEqual([true, false]);
+		expect(rows[1]?.creator).toEqual({
+			userId: "user-other",
+			name: "Other",
+			image: null,
+		});
 	});
 
 	it("orders rows by latest agent message first", () => {

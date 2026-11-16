@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { auth, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,

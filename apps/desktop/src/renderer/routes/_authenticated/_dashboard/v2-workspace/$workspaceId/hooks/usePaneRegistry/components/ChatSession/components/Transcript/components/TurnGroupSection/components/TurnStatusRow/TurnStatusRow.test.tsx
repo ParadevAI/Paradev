@@ -3,12 +3,12 @@ import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { pageLinkFinder } from "../../../../../../../../utils/pageLinks";
 import { ChatPaneActionsProvider } from "../../../../../../providers/ChatPaneActionsProvider";
 import {
 	type TurnFailureActions,
 	TurnFailureActionsProvider,
 } from "../../../../../../providers/TurnFailureActionsProvider";
-import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { transcriptRows } from "../../../../utils/transcriptRows";
 import { TurnStatusRow } from "./TurnStatusRow";
 
@@ -138,6 +138,43 @@ test("a turn the usage limit stopped is one quiet line, not a failure card", () 
 	expect(view.queryByText("Copy error")).toBeNull();
 });
 
+test("a spend limit the host did not classify is a limit notice, not a red failure", () => {
+	const view = render(
+		<TurnFailureActionsProvider
+			value={{
+				blocked: false,
+				continueTask: () => {},
+				dismissed: new Set(),
+				setDismissed: () => {},
+				changeModel: () => {},
+			}}
+		>
+			<TurnStatusRow
+				error={{
+					message:
+						"You have reached your specified workspace API usage limits.",
+					kind: "unknown",
+				}}
+				latest
+				status="failed"
+				turnId="t1"
+			/>
+		</TurnFailureActionsProvider>,
+	);
+	const card = view.container.querySelector(
+		'[data-turn-failure="usage_limit"]',
+	);
+	expect(card?.getAttribute("role")).toBe("status");
+	expect(card?.textContent).toContain("Usage limit reached");
+	expect(card?.className).not.toContain("destructive");
+	for (const action of ["Usage settings", "Change model", "Continue"]) {
+		expect(view.getByText(action)).toBeTruthy();
+	}
+	expect(card?.textContent).not.toContain("workspace API usage limits");
+	fireEvent.click(view.getByText("Show details"));
+	expect(card?.textContent).toContain("workspace API usage limits");
+});
+
 function authCard(actions: Partial<TurnFailureActions>) {
 	return render(
 		<TurnFailureActionsProvider
@@ -241,6 +278,7 @@ test("a cloud workspace shows no paused row", () => {
 				isReady: true,
 				agentCredentialsChangedWorkspaceId: null,
 				usageRefusal: null,
+				wakeOpenWorkspace: async () => {},
 			}}
 		>
 			<ChatPaneActionsProvider workspaceId="w1">

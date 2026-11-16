@@ -3,7 +3,7 @@
  *
  *   dist/bundle/<sha256>/
  *     setup, steps/, rootfs/          copied
- *     rootfs/etc/superset/contract.sh rendered from @superset/shared/sandbox-contract
+ *     rootfs/etc/superset/contract.sh rendered from @superset/shared/sandbox/contract
  *     tools.tsv, assets.tsv, steps.tsv derived
  *   dist/bundle.tar.gz                the same tree, named by its sha in the bucket
  *
@@ -26,7 +26,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { renderContractShell } from "@superset/shared/sandbox-contract";
+import { renderContractShell } from "@superset/shared/sandbox/contract";
 import { bucketFromEnv, contentTypeFor } from "./bucket";
 import {
 	type Assets,

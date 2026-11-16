@@ -43,8 +43,12 @@ export class FileAutoSaveController {
 		this.reconcile();
 	}
 
-	onFocusChange(document: SharedFileDocument): void {
-		if (this.mode === "onFocusChange") this.request(document);
+	onFocusChange(documentId: string): void {
+		if (this.mode !== "onFocusChange") return;
+		const document = this.source
+			.getDocuments()
+			.find((candidate) => candidate.id === documentId);
+		if (document) this.request(document);
 	}
 
 	onWindowChange(): void {

@@ -116,8 +116,6 @@ const NON_ROUTABLE_ESCAPE_PARENTS = new Set([
 
 function SettingsLayout() {
 	const isV2CloudEnabled = useIsV2CloudEnabled();
-	const mobileEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.MOBILE_LAUNCH) === true;
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const pluginsVisible = usePluginsSettingsVisible();
@@ -140,7 +138,6 @@ function SettingsLayout() {
 						normalizedSearchQuery,
 						isV2CloudEnabled,
 						cloudWorkspacesEnabled,
-						mobileEnabled,
 						pluginsVisible,
 					)
 				: {},
@@ -149,7 +146,6 @@ function SettingsLayout() {
 			normalizedSearchQuery,
 			isV2CloudEnabled,
 			cloudWorkspacesEnabled,
-			mobileEnabled,
 			pluginsVisible,
 		],
 	);

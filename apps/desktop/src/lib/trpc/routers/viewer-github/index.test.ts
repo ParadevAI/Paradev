@@ -70,6 +70,50 @@ describe("viewer GitHub on this machine", () => {
 		expect(tokensUsed).toEqual(["local-token"]);
 	});
 
+	test("losing the connection to GitHub is unavailability, not a bug", async () => {
+		const { call } = caller("local-token", {
+			graphql: (async () => {
+				throw Object.assign(new Error("Connect Timeout Error"), {
+					status: 500,
+					cause: Object.assign(new TypeError("fetch failed"), {
+						cause: Object.assign(new Error("Connect Timeout Error"), {
+							code: "UND_ERR_CONNECT_TIMEOUT",
+						}),
+					}),
+				});
+			}) as unknown as Octokit["graphql"],
+		});
+		await expect(
+			call.getPullRequestStack({ repoFullName: "acme/widgets", number: 7 }),
+		).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+	});
+
+	test("a server error that GitHub answers with stays an internal error", async () => {
+		const { call } = caller("local-token", {
+			graphql: (async () => {
+				throw Object.assign(new Error("Server Error"), { status: 502 });
+			}) as unknown as Octokit["graphql"],
+		});
+		await expect(
+			call.getPullRequestStack({ repoFullName: "acme/widgets", number: 7 }),
+		).rejects.toMatchObject({ code: "INTERNAL_SERVER_ERROR" });
+	});
+
+	test("a background merge that GitHub rejects surfaces GitHub's reason as a conflict", async () => {
+		const { call } = caller("local-token", {
+			request: (async () => ({
+				data: { status: "failed", details: { message: "#12 is a draft" } },
+			})) as unknown as Octokit["request"],
+		});
+		await expect(
+			call.requestPullRequestMerge({
+				repoFullName: "acme/widgets",
+				number: 7,
+				mergeAction: "merge_queue",
+			}),
+		).rejects.toMatchObject({ code: "CONFLICT", message: "#12 is a draft" });
+	});
+
 	test("signs a private attachment with the local token, and gives null without one", async () => {
 		const attachment =
 			"https://github.com/user-attachments/assets/eba1526e-7388-4ed6-b058-c2ffcca091dd";

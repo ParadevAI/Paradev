@@ -1,5 +1,5 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { type QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useSyncExternalStore } from "react";
 import {
 	getV2NotificationSourceKey,
 	getV2NotificationSourcesForPane,
@@ -71,44 +71,53 @@ export function useV2AttentionWorkspaceCount(): number {
 	const terminalSeenAt = useV2NotificationStore(
 		(state) => state.terminalSeenAt,
 	);
-	const [cacheVersion, setCacheVersion] = useState(0);
 
-	useEffect(() => {
-		return queryClient.getQueryCache().subscribe((event) => {
-			// `added` fires synchronously inside the render that first builds a
-			// query — setState there is a render-phase update. Data-bearing
-			// events (`updated`/`removed`) are the only ones that move the count.
-			if (event.type !== "updated" && event.type !== "removed") {
-				return;
-			}
-			if (event.query.queryKey[0] === "terminal-agent-bindings") {
-				setCacheVersion((version) => version + 1);
-			}
-		});
-	}, [queryClient]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: cacheVersion re-reads the query cache
-	return useMemo(() => {
-		const workspaceIds = new Set(Object.keys(manualUnread));
-		const entries = queryClient.getQueriesData<TerminalAgentBinding[]>({
-			queryKey: ["terminal-agent-bindings"],
-		});
-		for (const [, bindings] of entries) {
-			for (const binding of bindings ?? []) {
-				const status = deriveTerminalAgentStatus({
-					lastEventType: binding.lastEventType,
-					lastEventAt: binding.lastEventAt,
-					lastSeenAt: terminalSeenAt[binding.terminalId],
-				});
-				if (
-					status === "permission" ||
-					status === "review" ||
-					status === "failed"
-				) {
-					workspaceIds.add(binding.workspaceId);
+	const subscribe = useCallback(
+		(onChange: () => void) =>
+			queryClient.getQueryCache().subscribe((event) => {
+				// `added` fires synchronously inside the render that first builds a
+				// query, and notifying React there is a render-phase update.
+				// Data-bearing events (`updated`/`removed`) are the only ones that
+				// move the count.
+				if (event.type !== "updated" && event.type !== "removed") {
+					return;
 				}
+				if (event.query.queryKey[0] === "terminal-agent-bindings") {
+					onChange();
+				}
+			}),
+		[queryClient],
+	);
+
+	return useSyncExternalStore(subscribe, () =>
+		countAttentionWorkspaces(queryClient, manualUnread, terminalSeenAt),
+	);
+}
+
+function countAttentionWorkspaces(
+	queryClient: QueryClient,
+	manualUnread: Record<string, true>,
+	terminalSeenAt: Record<string, number>,
+): number {
+	const workspaceIds = new Set(Object.keys(manualUnread));
+	const entries = queryClient.getQueriesData<TerminalAgentBinding[]>({
+		queryKey: ["terminal-agent-bindings"],
+	});
+	for (const [, bindings] of entries) {
+		for (const binding of bindings ?? []) {
+			const status = deriveTerminalAgentStatus({
+				lastEventType: binding.lastEventType,
+				lastEventAt: binding.lastEventAt,
+				lastSeenAt: terminalSeenAt[binding.terminalId],
+			});
+			if (
+				status === "permission" ||
+				status === "review" ||
+				status === "failed"
+			) {
+				workspaceIds.add(binding.workspaceId);
 			}
 		}
-		return workspaceIds.size;
-	}, [cacheVersion, manualUnread, terminalSeenAt, queryClient]);
+	}
+	return workspaceIds.size;
 }

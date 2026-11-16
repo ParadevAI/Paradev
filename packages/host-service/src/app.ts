@@ -7,7 +7,7 @@ import {
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
-import { SANDBOX_PORTS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PORTS } from "@superset/shared/sandbox/contract";
 
 /** One frame of a 1920x1200 display is ~9 MB; this is a stalled reader, not a burst. */
 const MAX_DISPLAY_BUFFER_BYTES = 32 * 1024 * 1024;
@@ -22,7 +22,6 @@ import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
-	promptChatSession,
 	registerChatV3Routes,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
@@ -49,18 +48,18 @@ import { waitForSandboxManagedEnv } from "./runtime/sandbox-managed-env";
 import {
 	launchSandboxAgentOnce,
 	readSandboxIdentity,
+	resumeSandboxStartHookRun,
 	runSandboxSelfSeed,
 } from "./runtime/sandbox-self-seed";
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
-	sendAgentMessage,
 } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
-import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
 import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
@@ -276,22 +275,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
-			const chat = terminalAgentStore.getChat(terminalId);
-			const chatSessionId = chat?.chatSessionId;
-			if (chatSessionId) {
-				if (!matchesAgentBinding(chat, expectedAgent)) {
-					throw new Error("The chat's agent changed before delivery");
-				}
-				await promptChatSession({
-					runtime: chatV3.runtime(),
-					chatSessionId,
-					text,
-					acquireDelivery,
-					signal,
-				});
-				return;
-			}
-			const result = await sendAgentMessage({
+			const result = await sendToAgent({
 				terminalId,
 				workspaceId,
 				text,
@@ -300,6 +284,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				acquireDelivery,
 				signal,
 				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
 				db,
 				eventBus,
 			});
@@ -318,15 +303,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});
@@ -710,7 +690,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			isAuthenticated: true,
 			browserBridge: config.browserBridge,
 		} as HostServiceContext;
-		await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		try {
+			await resumeCrashedAgentSessions(resumeSessionDepsFor(ctx));
+		} finally {
+			if (sandboxIdentity)
+				await resumeSandboxStartHookRun(ctx, sandboxIdentity);
+		}
 	};
 
 	return {

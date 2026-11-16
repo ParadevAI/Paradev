@@ -32,12 +32,12 @@ import {
 	useState,
 } from "react";
 import { env } from "renderer/env.renderer";
+import { pageLinkFinder } from "../../../../utils/pageLinks";
 import {
 	CHAT_COLUMN_CLASSNAME,
 	CHAT_SCROLLER_GUTTER_CLASSNAME,
 } from "../../constants";
 import type { ChatForkTarget } from "../../types";
-import { pageLinkFinder } from "../../utils/pageLinks";
 import { TranscriptFindBar } from "./components/TranscriptFindBar";
 import { TranscriptRowItem } from "./components/TranscriptRowItem";
 import { useCarriedReaderPosition } from "./hooks/useCarriedReaderPosition";
@@ -108,12 +108,25 @@ function isWork(row: TranscriptRow | undefined): boolean {
 	);
 }
 
+function isPrompt(row: TranscriptRow | undefined): boolean {
+	if (!row) return false;
+	return (
+		row.kind === "outbox" ||
+		(row.kind === "item" && row.item.kind === "user_message")
+	);
+}
+
 function proseTopPadding(
 	row: TranscriptRow,
 	previous: TranscriptRow | undefined,
 ): string | false {
+	if (row.kind === "working")
+		return previous?.kind === "changed_files" ||
+			(previous?.kind === "item" && previous.item.kind === "agent_message")
+			? "pt-2"
+			: false;
 	if (row.kind !== "item" || row.item.kind !== "agent_message") return false;
-	return isWork(previous) ? "pt-1" : "pt-3";
+	return isWork(previous) || isPrompt(previous) ? "pt-1" : "pt-3";
 }
 
 export function Transcript({
@@ -380,7 +393,7 @@ export function Transcript({
 						row.key === carriedRowKey
 					}
 					row={row}
-					rowRef={transcriptWindow.rowRef(row.key)}
+					registerRow={transcriptWindow.registerRow}
 					snapshot={snapshot}
 				/>
 			);

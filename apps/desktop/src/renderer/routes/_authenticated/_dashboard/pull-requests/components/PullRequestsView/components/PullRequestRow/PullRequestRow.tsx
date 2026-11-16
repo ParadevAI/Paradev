@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@superset/ui/avatar";
 import { cn } from "@superset/ui/utils";
 import { useEffect, useRef } from "react";
+import { useNow } from "renderer/hooks/useNow";
 import { formatRelativeTime } from "renderer/lib/formatRelativeTime";
 import { PullRequestChecksSummary } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestChecksSummary";
 import { PullRequestSkeleton as Skeleton } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestSkeleton";
@@ -53,6 +54,7 @@ export function PullRequestRow({
 	onClick,
 	onHoverIntent,
 }: PullRequestRowProps) {
+	const now = useNow(60_000);
 	const pending = !!pr.detailsPending;
 	const showPlaceholders = pending && !pr.detailsCarried && detailsLoading;
 	// Nothing left to confirm them, so the checks are unknown, not current.
@@ -155,7 +157,7 @@ export function PullRequestRow({
 						<PullRequestChecksSummary checks={pr.checks} />
 					)}
 					{updatedAtMs != null && (
-						<span>{formatRelativeTime(updatedAtMs)}</span>
+						<span>{formatRelativeTime(updatedAtMs, now)}</span>
 					)}
 				</div>
 				{showPlaceholders ? (

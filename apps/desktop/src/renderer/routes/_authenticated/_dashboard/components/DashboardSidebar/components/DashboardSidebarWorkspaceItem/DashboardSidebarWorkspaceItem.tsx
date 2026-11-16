@@ -28,6 +28,7 @@ import {
 	useWorkspaceRowContextMenu,
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
+import { ManageEnvironmentItem } from "./components/ManageEnvironmentItem";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
 
 interface DashboardSidebarWorkspaceItemProps {
@@ -73,6 +74,9 @@ export function DashboardSidebarWorkspaceItem({
 	} = workspace;
 	const isSessionWorkspace = workspace.type === "session";
 	const isCloudWorkspace = hostType === "cloud";
+	const environmentItem = isCloudWorkspace ? (
+		<ManageEnvironmentItem workspaceId={id} />
+	) : undefined;
 	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
 	const move =
 		moveDirections.length > 0
@@ -92,7 +96,6 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyWorkspaceId,
 		handleCreateSection,
 		handleMoveToSection,
-		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,
@@ -288,7 +291,6 @@ export function DashboardSidebarWorkspaceItem({
 							onCreateSection={handleCreateSection}
 							showDeleteHotkey={isActive}
 							onMoveToSection={handleMoveToSection}
-							onOpenInFinder={handleOpenInFinder}
 							onCopyPath={handleCopyPath}
 							onCopyBranchName={handleCopyBranchName}
 							onCopyWorkspaceId={handleCopyWorkspaceId}
@@ -296,6 +298,7 @@ export function DashboardSidebarWorkspaceItem({
 							onRemovePullRequest={handleRemovePullRequest}
 							onRename={startRename}
 							onDelete={requestDelete}
+							environmentItem={environmentItem}
 							onToggleUnread={handleToggleUnread}
 							onClearStatus={handleClearStatus}
 						>
@@ -378,7 +381,6 @@ export function DashboardSidebarWorkspaceItem({
 						isCloudWorkspace={isCloudWorkspace}
 						isPinned={workspace.isPinned}
 						onTogglePin={handleTogglePin}
-						onOpenInFinder={handleOpenInFinder}
 						showDeleteHotkey={isActive}
 						onCopyPath={handleCopyPath}
 						onCopyBranchName={handleCopyBranchName}
@@ -387,6 +389,7 @@ export function DashboardSidebarWorkspaceItem({
 						onRemovePullRequest={handleRemovePullRequest}
 						onRename={startRename}
 						onDelete={requestDelete}
+						environmentItem={environmentItem}
 						onToggleUnread={handleToggleUnread}
 						onClearStatus={handleClearStatus}
 					>

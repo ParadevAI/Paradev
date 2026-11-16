@@ -49,6 +49,7 @@ async function initPosthog() {
 		app_locale: document.documentElement.lang,
 		app_locale_source: "url",
 	});
+	posthog.capture("$pageview");
 
 	setPosthogInstance(posthog);
 }

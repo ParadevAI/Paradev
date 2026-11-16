@@ -251,6 +251,23 @@ test("enter steers a queued prompt and backspace removes one", () => {
 	expect(queue.remove).toHaveBeenCalledWith("q1");
 });
 
+test("a prompt still on its way to the queue shows without actions", () => {
+	const queue = {
+		...queueOf([prompt("q1", "first")]),
+		sending: [prompt("s1", "second")],
+	};
+	const { view } = renderDrawer({ queue });
+	expect(rowNames(view)).toEqual(["first", "second"]);
+	const [queued, sending] = view.getAllByRole("option");
+	expect(queued?.querySelectorAll("button").length).toBeGreaterThan(0);
+	expect(sending?.querySelectorAll("button")).toHaveLength(0);
+	if (!sending) throw new Error("no sending row");
+	fireEvent.keyDown(sending, { key: "Enter" });
+	fireEvent.keyDown(sending, { key: "Backspace" });
+	expect(queue.steer).not.toHaveBeenCalled();
+	expect(queue.remove).not.toHaveBeenCalled();
+});
+
 test("e edits a queued prompt in place and keeps its attachments", () => {
 	const queue = queueOf([
 		{

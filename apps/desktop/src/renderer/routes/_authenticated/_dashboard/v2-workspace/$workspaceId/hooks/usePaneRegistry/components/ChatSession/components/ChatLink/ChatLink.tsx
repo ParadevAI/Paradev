@@ -48,7 +48,7 @@ function openInApp(
 			return;
 		case "environment":
 			void navigate({
-				to: "/environments/$environmentId",
+				to: "/settings/environments/$environmentId",
 				params: { environmentId: link.environmentId },
 			});
 			return;

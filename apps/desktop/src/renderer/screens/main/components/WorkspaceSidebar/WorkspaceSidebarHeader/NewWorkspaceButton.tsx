@@ -1,7 +1,7 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { useMatchRoute } from "@tanstack/react-router";
 import { LuPlus } from "react-icons/lu";
 import { SidebarKbdHint } from "renderer/components/SidebarKbdHint";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";

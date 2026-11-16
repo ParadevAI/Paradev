@@ -780,6 +780,7 @@ function PlansPage() {
 														variant={action.variant}
 														size={action.size ?? "sm"}
 														className={cn(
+															"h-auto min-h-8 whitespace-normal py-1",
 															action.fullWidth === false ? "w-fit" : "w-full",
 															action.align === "center" && "self-center",
 															action.align === "start" && "self-start",

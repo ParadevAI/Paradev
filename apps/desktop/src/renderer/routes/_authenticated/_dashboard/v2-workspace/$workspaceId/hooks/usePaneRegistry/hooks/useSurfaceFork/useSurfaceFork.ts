@@ -11,6 +11,7 @@ import type { ChatPaneData, PaneViewerData } from "../../../../types";
 import { ignoreChatTerminal } from "../../../../utils/closedChatSessions";
 import type { CreateNewAgentSession } from "../../../useAgentSessionLauncher";
 import { useChatWiring } from "../../components/ChatSession/hooks/useSessionClient";
+import { chatHasMessages } from "../../utils/chatHasMessages";
 import { readSavedChatMode } from "../../utils/savedChatMode";
 
 export type SurfaceForkSource =
@@ -37,18 +38,7 @@ export function useSurfaceFork(
 	const hostInfo = useHostServiceInfo(hostUrl);
 
 	const hasMessages = useCallback(
-		async (sessionId: string) => {
-			const page = await transport.getItems({ sessionId });
-			return (
-				!page.ok ||
-				page.nextBefore !== null ||
-				page.envelopes.some(
-					(envelope) =>
-						envelope.event.type === "item" &&
-						envelope.event.item.kind === "user_message",
-				)
-			);
-		},
+		(sessionId: string) => chatHasMessages(transport, sessionId),
 		[transport],
 	);
 

@@ -50,25 +50,27 @@ export function DraftChat({
 	);
 
 	return (
-		<ComposerDropZone
-			className="flex h-full min-h-0 w-full min-w-0 flex-col"
-			ref={paneRef}
+		<ChatPaneActionsProvider
+			getOpenFilePaths={getOpenFilePaths}
+			workspaceId={workspaceId}
 		>
-			{transcript ??
-				(prompts.length > 0 ? (
-					<PendingPromptsView prompts={prompts} />
-				) : (
-					<div className="min-h-0 flex-1" />
-				))}
-			<WorkDrawer
-				onExit={(exit) => composerRef.current?.returnFocus(exit === "history")}
-				paneRef={paneRef}
-				ref={drawerRef}
-			/>
-			<ChatPaneActionsProvider
-				getOpenFilePaths={getOpenFilePaths}
-				workspaceId={workspaceId}
+			<ComposerDropZone
+				className="flex h-full min-h-0 w-full min-w-0 flex-col"
+				ref={paneRef}
 			>
+				{transcript ??
+					(prompts.length > 0 ? (
+						<PendingPromptsView prompts={prompts} />
+					) : (
+						<div className="min-h-0 flex-1" />
+					))}
+				<WorkDrawer
+					onExit={(exit) =>
+						composerRef.current?.returnFocus(exit === "history")
+					}
+					paneRef={paneRef}
+					ref={drawerRef}
+				/>
 				<Composer
 					availableCommands={NO_COMMANDS}
 					draftKey={draftKey}
@@ -80,7 +82,7 @@ export function DraftChat({
 					onSend={(content) => onQueue(content)}
 					workspaceId={workspaceId}
 				/>
-			</ChatPaneActionsProvider>
-		</ComposerDropZone>
+			</ComposerDropZone>
+		</ChatPaneActionsProvider>
 	);
 }

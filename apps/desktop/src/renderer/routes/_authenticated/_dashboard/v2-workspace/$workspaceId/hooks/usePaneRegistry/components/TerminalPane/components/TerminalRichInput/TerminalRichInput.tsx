@@ -14,7 +14,7 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { FileUIPart } from "ai";
 import { ArrowUpIcon } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSendToTerminalAgent } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useHotkeyDisplay } from "renderer/hotkeys";
@@ -70,6 +70,9 @@ const draftsByTerminalId = new Map<string, string>();
  * terminal.
  */
 export function TerminalRichInput(props: TerminalRichInputProps) {
+	const [opened, setOpened] = useState(props.isOpen);
+	if (props.isOpen && !opened) setOpened(true);
+	if (!opened) return null;
 	// Keyed by terminalId: composer state (draft, mention popover, undo
 	// history) is scoped to one terminal and rebuilt from the draft map when
 	// the pane switches terminals. The provider stays mounted while the

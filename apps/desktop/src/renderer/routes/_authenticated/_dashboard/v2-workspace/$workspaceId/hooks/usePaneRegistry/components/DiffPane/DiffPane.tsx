@@ -32,6 +32,8 @@ import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
 import {
 	createPaneScrollStateKey,
@@ -87,7 +89,7 @@ import {
 	isDiffContentStale,
 	isDiffContentTooLarge,
 } from "./utils/diffLoadingGuards";
-import { fileListLayout, toggledFileListOpen } from "./utils/fileListLayout";
+import { fileListLayout } from "./utils/fileListLayout";
 import { getCharacterOffsetAtPoint } from "./utils/getCharacterOffsetAtPoint";
 import {
 	diffPaneActionsSlotId,
@@ -156,11 +158,11 @@ export function DiffPane({
 	const showFileList = useRightPaneLinkTarget() !== null;
 	const [rowElement, setRowElement] = useState<HTMLDivElement | null>(null);
 	const containerWidth = useElementWidth(rowElement);
-	const [fileListOpen, setFileListOpen] = useState<boolean | null>(null);
+	const { preferences, setChangesFileListOpen } = useV2UserPreferences();
+	const fileListOpen = preferences.changesFileListOpen;
 	const listLayout = showFileList
 		? fileListLayout({ containerWidth, open: fileListOpen })
 		: "hidden";
-	const closeOverlayFileList = useCallback(() => setFileListOpen(null), []);
 
 	const sidebarRef = useSidebarDiffRef(workspaceId);
 	const filter = data.filter;
@@ -750,6 +752,7 @@ export function DiffPane({
 		[getFile],
 	);
 
+	const sidebarFilePolicy = useSidebarFilePolicy();
 	const renderHeaderMetadata = useCallback(
 		(item: CodeViewItem<DiffAnnotationMetadata>) => {
 			const file = getFile(item.id);
@@ -775,10 +778,12 @@ export function DiffPane({
 					onCancelEditing={
 						isEditing ? () => requestExitEditing(item.id) : undefined
 					}
+					policy={sidebarFilePolicy}
 				/>
 			);
 		},
 		[
+			sidebarFilePolicy,
 			getFile,
 			workspaceId,
 			setCollapsed,
@@ -886,7 +891,7 @@ export function DiffPane({
 				return (
 					<AgentCommentComposer
 						workspaceId={workspaceId}
-						preferredTerminalId={activeChatTerminalId ?? lastChatTerminalId}
+						preferredTerminalId={lastChatTerminalId ?? activeChatTerminalId}
 						contextLabel={
 							m.startLine === m.endLine
 								? t({
@@ -983,13 +988,7 @@ export function DiffPane({
 								? {
 										fileCount: totals.fileCount,
 										isCollapsed: listLayout === "hidden",
-										onToggle: () =>
-											setFileListOpen(
-												toggledFileListOpen({
-													containerWidth,
-													open: fileListOpen,
-												}),
-											),
+										onToggle: () => setChangesFileListOpen(!fileListOpen),
 									}
 								: undefined
 						}
@@ -1061,7 +1060,6 @@ export function DiffPane({
 					context={context}
 					layout={listLayout}
 					containerWidth={containerWidth}
-					onClose={closeOverlayFileList}
 					workspaceId={workspaceId}
 					onOpenFile={onOpenFile}
 				/>

@@ -3,13 +3,22 @@ import { COMPANY } from "@superset/shared/constants";
 import { AppStoreQr } from "@superset/ui/app-store-qr";
 import { Button } from "@superset/ui/button";
 import { Label } from "@superset/ui/label";
+import { useEffect } from "react";
 import { LuArrowUpRight } from "react-icons/lu";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { RemoteAccessSwitch } from "renderer/routes/_authenticated/settings/components/RemoteAccessSwitch";
+import { useGettingStartedStore } from "renderer/stores/getting-started";
+
+const MOBILE_STEP = 0;
 
 export function MobileSettings() {
 	const { t } = useLingui();
 	const { hasAccess, isReady, gateFeature } = usePaywall();
+	const markTried = useGettingStartedStore((state) => state.markTried);
+	const showsQr = isReady && hasAccess(GATED_FEATURES.MOBILE_APP);
+	useEffect(() => {
+		if (showsQr) markTried(MOBILE_STEP);
+	}, [showsQr, markTried]);
 	return (
 		<div className="w-full max-w-4xl p-6">
 			<div className="mb-8">

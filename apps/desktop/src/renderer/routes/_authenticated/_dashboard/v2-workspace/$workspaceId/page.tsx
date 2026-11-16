@@ -89,6 +89,7 @@ import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
 import { useV2WorkspaceRun } from "./hooks/useV2WorkspaceRun";
 import { useWorkspaceFileNavigation } from "./hooks/useWorkspaceFileNavigation";
 import { useWorkspaceHotkeys } from "./hooks/useWorkspaceHotkeys";
+import { useWorkspaceOpenInHotkey } from "./hooks/useWorkspaceOpenInHotkey";
 import { useWorkspacePaneOpeners } from "./hooks/useWorkspacePaneOpeners";
 import { useWorkspaceRightPane } from "./hooks/useWorkspaceRightPane";
 import { RightPaneLinkTargetProvider } from "./providers/RightPaneLinkTargetProvider";
@@ -106,6 +107,7 @@ import {
 	findVisibleChangesPane,
 	openChangesPaneInStore,
 } from "./utils/openChangesPaneInStore";
+import { findVisiblePullRequestNumber } from "./utils/openPullRequestPaneInStore";
 import { openSubagentPaneInStore } from "./utils/openSubagentPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
 
@@ -452,6 +454,10 @@ function V2WorkspaceContent() {
 		store,
 		(state) => findVisibleChangesPane(state) != null,
 	);
+	const viewingPullRequestNumber = useStore(
+		store,
+		findVisiblePullRequestNumber,
+	);
 	const isRightChangesTabOpen = useStore(
 		rightStore,
 		(state) => findVisibleChangesPane(state) != null,
@@ -565,6 +571,7 @@ function V2WorkspaceContent() {
 		isSandbox,
 		isMobilePaneEnabled,
 	});
+	useWorkspaceOpenInHotkey(workspaceId);
 	useRightSidebarHotkeys({
 		centerStore: store,
 		rightStore,
@@ -769,6 +776,9 @@ function V2WorkspaceContent() {
 															isChangesOpen={isChangesOpen}
 															onToggleChanges={toggleChanges}
 															onOpenPullRequest={openPullRequestPane}
+															viewingPullRequestNumber={
+																viewingPullRequestNumber
+															}
 														/>
 													)}
 													{/* Open-in must not depend on the right sidebar being open,

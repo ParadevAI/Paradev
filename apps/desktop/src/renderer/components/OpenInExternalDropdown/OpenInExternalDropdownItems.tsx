@@ -1,18 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import type { ExternalApp } from "@superset/local-db";
-import {
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-} from "@superset/ui/dropdown-menu";
 import { cn } from "@superset/ui/utils";
 import type { ReactNode } from "react";
 import { LuCopy } from "react-icons/lu";
 import jetbrainsIcon from "renderer/assets/app-icons/jetbrains.svg";
 import terminalIcon from "renderer/assets/app-icons/terminal.png";
 import vscodeIcon from "renderer/assets/app-icons/vscode.svg";
+import { DROPDOWN_MENU_PARTS, type MenuParts } from "renderer/lib/menuParts";
 import {
 	FINDER_OPTIONS,
 	IDE_OPTIONS,
@@ -30,10 +24,12 @@ export type OpenInExternalAppGroup =
 	| "jetbrains";
 
 interface OpenInExternalDropdownItemsProps {
+	parts?: MenuParts;
 	isDark: boolean;
 	activeApp?: ExternalApp;
 	onOpenIn: (app: ExternalApp) => void;
-	onCopyPath: () => void;
+	/** Absent hides the copy-path item. */
+	onCopyPath?: () => void;
 	renderAppTrailing?: (
 		appId: ExternalApp,
 		group: OpenInExternalAppGroup,
@@ -54,6 +50,7 @@ interface OpenInExternalDropdownItemsProps {
 }
 
 export function OpenInExternalDropdownItems({
+	parts = DROPDOWN_MENU_PARTS,
 	isDark,
 	activeApp,
 	onOpenIn,
@@ -73,12 +70,13 @@ export function OpenInExternalDropdownItems({
 	copyPathIconClassName,
 	copyPathLabelClassName,
 }: OpenInExternalDropdownItemsProps) {
+	const { Item, Separator, Sub, SubTrigger, SubContent } = parts;
 	const renderAppOptions = (
 		apps: OpenInExternalAppOption[],
 		group: OpenInExternalAppGroup,
 	) =>
 		apps.map((app) => (
-			<DropdownMenuItem
+			<Item
 				key={app.id}
 				onClick={() => onOpenIn(app.id)}
 				className={appItemClassName}
@@ -92,7 +90,7 @@ export function OpenInExternalDropdownItems({
 					<span className={appLabelClassName}>{app.label}</span>
 				</div>
 				{renderAppTrailing?.(app.id, group)}
-			</DropdownMenuItem>
+			</Item>
 		));
 
 	const activeIdeOption = activeApp
@@ -107,8 +105,8 @@ export function OpenInExternalDropdownItems({
 	return (
 		<>
 			{renderAppOptions(FINDER_OPTIONS, "finder")}
-			<DropdownMenuSub>
-				<DropdownMenuSubTrigger className={subTriggerClassName}>
+			<Sub>
+				<SubTrigger className={subTriggerClassName}>
 					<div
 						className={cn(
 							"flex items-center gap-2",
@@ -130,11 +128,11 @@ export function OpenInExternalDropdownItems({
 							<Trans>IDE</Trans>
 						</span>
 					</div>
-				</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent sideOffset={8} className={subContentClassName}>
+				</SubTrigger>
+				<SubContent sideOffset={8} className={subContentClassName}>
 					{renderAppOptions(IDE_OPTIONS, "ide")}
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger className={subTriggerClassName}>
+					<Sub>
+						<SubTrigger className={subTriggerClassName}>
 							<div
 								className={cn(
 									"flex items-center gap-2",
@@ -153,13 +151,13 @@ export function OpenInExternalDropdownItems({
 									<Trans>VS Code</Trans>
 								</span>
 							</div>
-						</DropdownMenuSubTrigger>
-						<DropdownMenuSubContent className={subContentClassName}>
+						</SubTrigger>
+						<SubContent className={subContentClassName}>
 							{renderAppOptions(VSCODE_OPTIONS, "vscode")}
-						</DropdownMenuSubContent>
-					</DropdownMenuSub>
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger className={subTriggerClassName}>
+						</SubContent>
+					</Sub>
+					<Sub>
+						<SubTrigger className={subTriggerClassName}>
 							<div
 								className={cn(
 									"flex items-center gap-2",
@@ -178,15 +176,15 @@ export function OpenInExternalDropdownItems({
 									<Trans>JetBrains</Trans>
 								</span>
 							</div>
-						</DropdownMenuSubTrigger>
-						<DropdownMenuSubContent className={subContentClassName}>
+						</SubTrigger>
+						<SubContent className={subContentClassName}>
 							{renderAppOptions(JETBRAINS_OPTIONS, "jetbrains")}
-						</DropdownMenuSubContent>
-					</DropdownMenuSub>
-				</DropdownMenuSubContent>
-			</DropdownMenuSub>
-			<DropdownMenuSub>
-				<DropdownMenuSubTrigger className={subTriggerClassName}>
+						</SubContent>
+					</Sub>
+				</SubContent>
+			</Sub>
+			<Sub>
+				<SubTrigger className={subTriggerClassName}>
 					<div
 						className={cn(
 							"flex items-center gap-2",
@@ -208,23 +206,30 @@ export function OpenInExternalDropdownItems({
 							<Trans>Terminal</Trans>
 						</span>
 					</div>
-				</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent sideOffset={8} className={subContentClassName}>
+				</SubTrigger>
+				<SubContent sideOffset={8} className={subContentClassName}>
 					{renderAppOptions(TERMINAL_OPTIONS, "terminal")}
-				</DropdownMenuSubContent>
-			</DropdownMenuSub>
-			<DropdownMenuSeparator />
-			<DropdownMenuItem onClick={onCopyPath} className={copyPathItemClassName}>
-				<div
-					className={cn("flex items-center gap-2", copyPathContentClassName)}
-				>
-					<LuCopy className={cn("size-4", copyPathIconClassName)} />
-					<span className={copyPathLabelClassName}>
-						<Trans>Copy path</Trans>
-					</span>
-				</div>
-				{copyPathTrailing}
-			</DropdownMenuItem>
+				</SubContent>
+			</Sub>
+			{onCopyPath && (
+				<>
+					<Separator />
+					<Item onClick={onCopyPath} className={copyPathItemClassName}>
+						<div
+							className={cn(
+								"flex items-center gap-2",
+								copyPathContentClassName,
+							)}
+						>
+							<LuCopy className={cn("size-4", copyPathIconClassName)} />
+							<span className={copyPathLabelClassName}>
+								<Trans>Copy path</Trans>
+							</span>
+						</div>
+						{copyPathTrailing}
+					</Item>
+				</>
+			)}
 		</>
 	);
 }

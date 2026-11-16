@@ -1,4 +1,4 @@
-import { SANDBOX_API_CREDENTIAL_HEADER } from "./sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "./sandbox/gate";
 
 /**
  * Routing key the relay uses to identify a host service tunnel. The same

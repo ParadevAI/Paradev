@@ -19,10 +19,7 @@ export function ProCancellationFeedbackEmail() {
 					I&apos;m Kiet, one of the founders of Paradev. I saw you cancelled
 					Pro.
 				</Text>
-				<Text style={paragraph}>
-					What made you cancel? Even one word helps: missing feature, bug,
-					price, or didn&apos;t need it.
-				</Text>
+				<Text style={paragraph}>What made you cancel?</Text>
 				<Text style={paragraph}>Thanks for giving Paradev a try.</Text>
 				<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
 			</Body>

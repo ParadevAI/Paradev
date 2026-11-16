@@ -1,5 +1,6 @@
 export interface ProtectedResourceMetadataOptions {
 	authorizationServerUrl?: string;
+	resourceUrl?: string;
 	resourceName?: string;
 	resourceDocumentation?: string;
 	scopesSupported?: string[];
@@ -77,7 +78,7 @@ export function buildProtectedResourceMetadata(
 	const normalizedResourcePath = normalizeResourcePath(resourcePath);
 
 	return {
-		resource: `${origin}${normalizedResourcePath}`,
+		resource: options.resourceUrl ?? `${origin}${normalizedResourcePath}`,
 		...(options.authorizationServerUrl
 			? { authorization_servers: [options.authorizationServerUrl] }
 			: {}),

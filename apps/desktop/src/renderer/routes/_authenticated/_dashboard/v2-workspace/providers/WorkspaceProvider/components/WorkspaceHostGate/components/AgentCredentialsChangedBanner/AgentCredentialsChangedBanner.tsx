@@ -4,6 +4,7 @@ import { toast } from "@superset/ui/sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LuTriangleAlert } from "react-icons/lu";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { refreshSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
 
 export function AgentCredentialsChangedBanner({
 	workspaceId,
@@ -15,14 +16,7 @@ export function AgentCredentialsChangedBanner({
 	const restart = useMutation({
 		mutationFn: () =>
 			apiTrpcClient.cloudWorkspace.restart.mutate({ id: workspaceId }),
-		onSuccess: () =>
-			Promise.all(
-				(["access", "wake"] as const).map((kind) =>
-					queryClient.invalidateQueries({
-						queryKey: ["cloud-workspace", kind, workspaceId],
-					}),
-				),
-			),
+		onSuccess: () => refreshSandboxAccess(queryClient, workspaceId),
 		onError: (error) => {
 			toast.error(
 				t({

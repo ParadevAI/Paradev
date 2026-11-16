@@ -1,4 +1,3 @@
-import type { MachineSize } from "@superset/shared/billing";
 import {
 	type CloudCreateChoice,
 	latestCloudChoice,
@@ -13,8 +12,8 @@ interface ResolvableEnvironment {
 }
 
 /**
- * What the cloud pills show for a project. A project gets the environment and
- * size last used with it, else its first linked environment. Without a
+ * What the cloud pills show for a project. A project gets the environment
+ * last used with it, else its first linked environment. Without a
  * project it gets the newest environment used anywhere. An unlinked project
  * never inherits another project's environment: that would clone the wrong
  * repository.
@@ -24,20 +23,15 @@ export function resolveCloudChoices<T extends ResolvableEnvironment>({
 	projectId,
 	repositoryFullName,
 	choices,
-	offeredSizes,
-	defaultSize,
 }: {
 	environments: readonly T[];
 	projectId: string | null;
 	repositoryFullName: string | null;
 	choices: Record<string, CloudCreateChoice>;
-	offeredSizes: readonly MachineSize[];
-	defaultSize: MachineSize;
 }): {
 	linked: T[];
 	other: T[];
 	environment: T | null;
-	machineSize: MachineSize;
 } {
 	const remembered = choices[projectId ?? NO_PROJECT_KEY];
 	const byId = new Map(environments.map((row) => [row.id, row]));
@@ -63,13 +57,5 @@ export function resolveCloudChoices<T extends ResolvableEnvironment>({
 				other[0])) ??
 		null;
 
-	const isOffered = (size: MachineSize) => offeredSizes.includes(size);
-	const machineSize =
-		(remembered?.machineSize && isOffered(remembered.machineSize)
-			? remembered.machineSize
-			: null) ??
-		latestCloudChoice(choices, "machineSize", isOffered) ??
-		defaultSize;
-
-	return { linked, other, environment, machineSize };
+	return { linked, other, environment };
 }
