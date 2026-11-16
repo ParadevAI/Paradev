@@ -1,0 +1,40 @@
+name: Publish Cloud Workspace Job
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: Which one-off job under /api/cloud-workspaces/jobs/ to publish to QStash.
+        type: choice
+        options:
+          - backfill-status
+        default: backfill-status
+
+jobs:
+  publish:
+    name: Publish ${{ inputs.job }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    concurrency:
+      group: publish-cloud-workspace-job-${{ inputs.job }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Publish the job through QStash
+        env:
+          QSTASH_TOKEN: ${{ secrets.QSTASH_TOKEN }}
+          API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          JOB: ${{ inputs.job }}
+        run: |
+          set -euo pipefail
+          target="${API_URL%/}/api/cloud-workspaces/jobs/${JOB}"
+          echo "publishing to ${target}"
+          response=$(curl -sS --fail-with-body -X POST \
+            "https://qstash.upstash.io/v2/publish/${target}" \
+            -H "Authorization: Bearer ${QSTASH_TOKEN}" \
+            -H "Upstash-Method: POST" \
+            -H "Upstash-Retries: 0" \
+            -H "Content-Type: application/json" \
+            --data '{}')
+          echo "${response}"
