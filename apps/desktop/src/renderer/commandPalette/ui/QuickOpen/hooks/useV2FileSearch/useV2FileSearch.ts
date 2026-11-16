@@ -14,16 +14,18 @@ export function useV2FileSearch(
 	query: string,
 ) {
 	const trimmedQuery = query.trim();
+	const workspaceId = provider?.workspaceId ?? "";
 	const canSearch = provider?.canSearch === true && trimmedQuery.length > 0;
 
 	const { data, isFetching } = useQuery({
-		queryKey: ["v2-file-search", provider?.workspaceId ?? "", trimmedQuery],
+		queryKey: ["v2-file-search", workspaceId, trimmedQuery],
 		queryFn: () => {
 			if (!provider) throw new Error("no workspace page to search");
 			return provider.searchFiles(trimmedQuery);
 		},
 		enabled: canSearch,
-		placeholderData: (previous) => previous ?? [],
+		placeholderData: (previous, previousQuery) =>
+			previousQuery?.queryKey[1] === workspaceId ? (previous ?? []) : [],
 	});
 
 	// placeholderData carries the last matches over to a query that will not run.

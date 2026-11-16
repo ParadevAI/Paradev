@@ -58,11 +58,16 @@ export function WorkspaceSwitcherList({
 	const listRef = useRef<HTMLDivElement>(null);
 	const listKey = `${parsed.scope}|${parsed.creator ?? ""}|${trimmed}`;
 	// cmdk selects the first row of a changed list but leaves the scroll where
-	// the old selection was. A frame later, so its own scroll runs first.
+	// the old selection was. A frame later, so its own scroll runs first; by
+	// then a key press may have moved the selection, and that scroll stands.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: listKey is the trigger
 	useEffect(() => {
 		const frame = requestAnimationFrame(() => {
-			if (listRef.current) listRef.current.scrollTop = 0;
+			const list = listRef.current;
+			const first = list?.querySelector("[cmdk-item]");
+			if (list && first?.getAttribute("data-selected") === "true") {
+				list.scrollTop = 0;
+			}
 		});
 		return () => cancelAnimationFrame(frame);
 	}, [listKey]);

@@ -97,10 +97,11 @@ interface UseAccessibleV2WorkspacesOptions {
 	includeArchived?: boolean;
 	/**
 	 * Where pull requests, agent status and diff totals come from. `full`
-	 * queries each host for all three, `status` leaves out diff totals, and
-	 * `cached` queries nothing: it reads what the sidebar already loaded, so
-	 * only sidebar workspaces have any. Defaults to `full` with a where filter
-	 * and to none without one.
+	 * queries each host for all three, and `status` leaves out diff totals.
+	 * `cached` queries no host: it reads what the sidebar already loaded, so
+	 * only sidebar workspaces have any, and it shares the sidebar's cloud
+	 * pull request query. Defaults to `full` with a where filter and to none
+	 * without one.
 	 */
 	liveState?: "full" | "status" | "cached";
 }
