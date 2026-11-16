@@ -64,12 +64,11 @@ export function chatDevs(state: ChatState, chat: Chat): Dev[] {
 }
 
 /**
- * The Devs a person can mention, and so wake, in a chat: a 1:1's Dev; in a group its own and the ones added to
- * it. Members' Devs sit in a group to be asked by its Dev (`dev ask`), never tagged by people.
+ * The Devs a person can mention, and so wake, in a chat: every Dev in it. A member who adds their own Dev to a
+ * group lets the group call on it.
  */
 export function mentionableDevs(state: ChatState, chat: Chat): Dev[] {
-	const devs = chatDevs(state, chat);
-	return chat.kind === "group" ? devs.filter(ownedByGroup) : devs;
+	return chatDevs(state, chat);
 }
 
 /** Who a Dev belongs to, so two Devs with the same name can be told apart: "Yours", "Priya's", "This group's". */

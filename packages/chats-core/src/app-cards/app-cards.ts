@@ -133,7 +133,7 @@ export function appMaker(state: ChatState, appId: string): Dev | undefined {
 
 /**
  * Who "Ask … to change it" asks (a mention): the app's maker while one can mention it in the chat, else the chat's own
- * Dev. In a group that's always the group's Dev, since members' Devs can't be tagged there.
+ * Dev. In a group that's the group's own Dev.
  */
 export function appChangeDev(
 	state: ChatState,
