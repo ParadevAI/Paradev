@@ -1,4 +1,5 @@
 import type { Tab } from "@superset/panes";
+import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner";
 import type { PaneViewerData, TerminalPaneData } from "../../../../types";
 
 /** A tab split across several terminals names none of them. */
@@ -19,6 +20,7 @@ interface SessionName {
 	customTitle: string | null;
 }
 
+/** A name another session already has is not given twice. */
 export function tabNamesToBackfill(
 	tabs: readonly Tab<PaneViewerData>[],
 	sessions: readonly SessionName[],
@@ -29,11 +31,18 @@ export function tabNamesToBackfill(
 			.filter((session) => session.customTitle === null)
 			.map((session) => session.terminalId),
 	);
+	const taken = new Set(
+		sessions.flatMap((session) =>
+			session.customTitle ? [session.customTitle] : [],
+		),
+	);
 	return tabs.flatMap((tab) => {
-		const title = tab.titleOverride?.trim();
+		const title = normalizeTerminalTitle(tab.titleOverride ?? "");
 		const terminalId = soleTerminalId(tab);
 		if (!title || !terminalId) return [];
 		if (!unnamed.has(terminalId) || skip.has(terminalId)) return [];
+		if (taken.has(title)) return [];
+		taken.add(title);
 		return [{ terminalId, title }];
 	});
 }
@@ -43,6 +52,6 @@ export function shouldClearSessionName(
 	previousTabTitle: string | undefined,
 	sessionCustomTitle: string | null | undefined,
 ): boolean {
-	const previous = previousTabTitle?.trim();
+	const previous = normalizeTerminalTitle(previousTabTitle ?? "");
 	return !!previous && sessionCustomTitle === previous;
 }

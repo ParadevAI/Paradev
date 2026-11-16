@@ -9,7 +9,7 @@ import {
 	tabNamesToBackfill,
 } from "./utils/tabSessionNames";
 
-// Per app run: a later launch names a session again if it is still unnamed.
+// Per app run: a session seen once is not backfilled again until relaunch.
 const backfilledTerminalIds = new Set<string>();
 
 interface UseTabSessionNamesArgs {
@@ -54,23 +54,28 @@ export function useTabSessionNames({
 		void enqueue(async () => {
 			const sessions = await freshSessions();
 			if (cancelled) return;
-			const candidates = () =>
-				tabNamesToBackfill(
-					store.getState().tabs,
-					sessions,
-					backfilledTerminalIds,
-				);
-			for (const { terminalId } of candidates()) {
+			const initial = tabNamesToBackfill(
+				store.getState().tabs,
+				sessions,
+				backfilledTerminalIds,
+			);
+			for (const session of sessions) {
+				backfilledTerminalIds.add(session.terminalId);
+			}
+			for (const { terminalId } of initial) {
 				if (cancelled) return;
-				const current = candidates().find((n) => n.terminalId === terminalId);
-				if (!current) continue;
 				try {
+					const current = tabNamesToBackfill(
+						store.getState().tabs,
+						await freshSessions(),
+						new Set(),
+					).find((n) => n.terminalId === terminalId);
+					if (!current) continue;
 					await renameSession({
 						workspaceId,
 						terminalId,
 						title: current.title,
 					});
-					backfilledTerminalIds.add(terminalId);
 				} catch (error) {
 					console.warn("[useTabSessionNames] backfill failed", {
 						terminalId,

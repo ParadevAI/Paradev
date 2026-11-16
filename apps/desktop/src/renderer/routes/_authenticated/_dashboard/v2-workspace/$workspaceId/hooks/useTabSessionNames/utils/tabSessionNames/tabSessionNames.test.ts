@@ -75,6 +75,23 @@ describe("tabNamesToBackfill", () => {
 			{ terminalId: "term-a", title: "API server" },
 		]);
 	});
+
+	test("does not give a name another session already has", () => {
+		const tabs = [
+			tab("a", "API server", [pane("pa", "terminal", "term-new")]),
+			tab("b", "Logs", [pane("pb", "terminal", "term-b")]),
+			tab("c", "Logs", [pane("pc", "terminal", "term-c")]),
+		];
+		const sessions = [
+			{ terminalId: "term-old", customTitle: "API server" },
+			{ terminalId: "term-new", customTitle: null },
+			{ terminalId: "term-b", customTitle: null },
+			{ terminalId: "term-c", customTitle: null },
+		];
+		expect(tabNamesToBackfill(tabs, sessions, new Set())).toEqual([
+			{ terminalId: "term-b", title: "Logs" },
+		]);
+	});
 });
 
 describe("shouldClearSessionName", () => {
@@ -84,5 +101,8 @@ describe("shouldClearSessionName", () => {
 		expect(shouldClearSessionName("API", "build")).toBe(false);
 		expect(shouldClearSessionName("API", null)).toBe(false);
 		expect(shouldClearSessionName(undefined, null)).toBe(false);
+		expect(shouldClearSessionName("API\u2807 server\u0007", "API server")).toBe(
+			true,
+		);
 	});
 });
