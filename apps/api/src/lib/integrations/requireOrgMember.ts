@@ -4,6 +4,7 @@ import {
 	OWN_ROOT_DOMAINS,
 	withOwnDomainTwins,
 } from "@superset/shared/own-domains";
+import { getSessionCookie } from "better-auth/cookies";
 import { env } from "@/env";
 
 export type OrgMember = {
@@ -27,6 +28,8 @@ function signInUrl(request: Request): URL {
 		) ?? env.NEXT_PUBLIC_WEB_URL;
 	const signIn = new URL("/sign-in", web);
 	signIn.searchParams.set("redirect", request.url);
+	if (getSessionCookie(request))
+		signIn.searchParams.set("reason", "session_expired");
 	return signIn;
 }
 

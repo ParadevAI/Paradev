@@ -18763,6 +18763,9 @@ msgstr "Đăng nhập vào {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Đăng nhập để thay đổi plugin của tổ chức."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Đăng nhập để kết nối {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Đăng nhập để tiếp tục"
 
@@ -20768,6 +20771,9 @@ msgstr "Tự động hóa này đã được lưu trữ. Hãy khôi phục nó t
 
 msgid "This automation is in another organization"
 msgstr "Tự động hóa này nằm trong một tổ chức khác"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Trình duyệt này chưa đăng nhập vào Paradev. Hãy đăng nhập để tiếp tục đến {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Không thể hoàn tác."
@@ -23386,6 +23392,9 @@ msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giú
 
 msgid "Your Paradev download is starting."
 msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Phiên Paradev của bạn trong trình duyệt này đã hết hạn. Hãy đăng nhập lại để tiếp tục đến {connectorName}."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Gói của bạn không bao gồm môi trường đám mây."

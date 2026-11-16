@@ -18763,6 +18763,9 @@ msgstr "Bei {label} anmelden"
 msgid "Sign in to change your organization's plugins."
 msgstr "Melde dich an, um die Plugins deiner Organisation zu ändern."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Melde dich an, um {connectorName} zu verbinden"
+
 msgid "Sign in to continue"
 msgstr "Melde dich an, um fortzufahren"
 
@@ -20768,6 +20771,9 @@ msgstr "Diese Automatisierung ist archiviert. Stelle sie zuerst wieder her."
 
 msgid "This automation is in another organization"
 msgstr "Diese Automatisierung befindet sich in einer anderen Organisation"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Dieser Browser ist nicht bei Paradev angemeldet. Melde dich an, um mit {connectorName} fortzufahren."
 
 msgid "This cannot be undone."
 msgstr "Das lässt sich nicht rückgängig machen."
@@ -23386,6 +23392,9 @@ msgstr "Deine eigenen Konten. Die Integrationen deiner Organisation lassen Parad
 
 msgid "Your Paradev download is starting."
 msgstr "Dein Paradev-Download startet."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Deine Paradev-Sitzung in diesem Browser ist abgelaufen. Melde dich erneut an, um mit {connectorName} fortzufahren."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Dein Plan enthält keine Cloud-Umgebungen."

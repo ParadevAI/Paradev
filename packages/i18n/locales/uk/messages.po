@@ -18757,6 +18757,9 @@ msgstr "Увійти в {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Увійдіть, щоб змінити плагіни організації."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Увійдіть, щоб підключити {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Увійдіть, щоб продовжити"
 
@@ -20762,6 +20765,9 @@ msgstr "Цю автоматизацію архівовано. Спочатку �
 
 msgid "This automation is in another organization"
 msgstr "Ця автоматизація в іншій організації"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "У цьому браузері не виконано вхід у Paradev. Увійдіть, щоб перейти до {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Цю дію неможливо скасувати."
@@ -23380,6 +23386,9 @@ msgstr "Ваші власні облікові записи. Інтеграці�
 
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Ваш сеанс Paradev у цьому браузері завершився. Увійдіть знову, щоб перейти до {connectorName}."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Ваш тариф не передбачає хмарних середовищ."

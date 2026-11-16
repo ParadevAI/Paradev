@@ -18763,6 +18763,9 @@ msgstr "登入 {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "登入後才能變更組織的外掛。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "登入以連接 {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "登入以繼續"
 
@@ -20768,6 +20771,9 @@ msgstr "此自動化已歸檔。請先恢復。"
 
 msgid "This automation is in another organization"
 msgstr "此自動化位於其他組織"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "此瀏覽器未登入 Paradev。請登入以繼續前往 {connectorName}。"
 
 msgid "This cannot be undone."
 msgstr "此操作無法復原。"
@@ -23386,6 +23392,9 @@ msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結
 
 msgid "Your Paradev download is starting."
 msgstr "您的 Paradev 下載即將開始。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "此瀏覽器中的 Paradev 工作階段已過期。請重新登入以繼續前往 {connectorName}。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的方案不包含雲端環境。"

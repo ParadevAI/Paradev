@@ -18763,6 +18763,9 @@ msgstr "{label}에 로그인"
 msgid "Sign in to change your organization's plugins."
 msgstr "조직 플러그인을 변경하려면 로그인하세요."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName}을(를) 연결하려면 로그인하세요"
+
 msgid "Sign in to continue"
 msgstr "계속하려면 로그인하세요"
 
@@ -20768,6 +20771,9 @@ msgstr "이 자동화는 보관되었습니다. 먼저 복원하세요."
 
 msgid "This automation is in another organization"
 msgstr "이 자동화는 다른 조직에 있습니다"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "이 브라우저는 Paradev에 로그인되어 있지 않습니다. 로그인하여 {connectorName}(으)로 계속하세요."
 
 msgid "This cannot be undone."
 msgstr "되돌릴 수 없습니다."
@@ -23386,6 +23392,9 @@ msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구�
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "이 브라우저의 Paradev 세션이 만료되었습니다. 다시 로그인하여 {connectorName}(으)로 계속하세요."
 
 msgid "Your plan does not include cloud environments."
 msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니다."

@@ -18763,6 +18763,9 @@ msgstr "Iniciar sesión en {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Inicia sesión para cambiar los plugins de tu organización."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Inicia sesión para conectar {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Inicia sesión para continuar"
 
@@ -20768,6 +20771,9 @@ msgstr "Esta automatización está archivada. Restáurala primero."
 
 msgid "This automation is in another organization"
 msgstr "Esta automatización está en otra organización"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Este navegador no ha iniciado sesión en Paradev. Inicia sesión para continuar a {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Esto no se puede deshacer."
@@ -23386,6 +23392,9 @@ msgstr "Tus propias cuentas. Las integraciones de tu organización permiten a Pa
 
 msgid "Your Paradev download is starting."
 msgstr "Tu descarga de Paradev está comenzando."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Tu sesión de Paradev en este navegador ha caducado. Vuelve a iniciar sesión para continuar a {connectorName}."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Tu plan no incluye entornos en la nube."

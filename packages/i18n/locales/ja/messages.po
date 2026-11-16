@@ -18763,6 +18763,9 @@ msgstr "{label}にサインイン"
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} に接続するにはサインインしてください"
+
 msgid "Sign in to continue"
 msgstr "続行するにはサインインしてください"
 
@@ -20768,6 +20771,9 @@ msgstr "このオートメーションはアーカイブ済みです。先に復
 
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "このブラウザは Paradev にサインインしていません。サインインして {connectorName} に進んでください。"
 
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
@@ -23386,6 +23392,9 @@ msgstr "あなた自身のアカウントです。組織の連携は Paradev が
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "このブラウザの Paradev セッションは期限切れです。もう一度サインインして {connectorName} に進んでください。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。"

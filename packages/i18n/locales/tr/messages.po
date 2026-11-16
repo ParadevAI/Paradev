@@ -18763,6 +18763,9 @@ msgstr "{label} ile oturum aç"
 msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} bağlamak için oturum açın"
+
 msgid "Sign in to continue"
 msgstr "Devam etmek için oturum açın"
 
@@ -20768,6 +20771,9 @@ msgstr "Bu otomasyon arşivlendi. Önce geri yükleyin."
 
 msgid "This automation is in another organization"
 msgstr "Bu otomasyon başka bir kuruluşta"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Bu tarayıcıda Paradev oturumu açık değil. {connectorName} ile devam etmek için oturum açın."
 
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."
@@ -23386,6 +23392,9 @@ msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlar
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Bu tarayıcıdaki Paradev oturumunuzun süresi doldu. {connectorName} ile devam etmek için yeniden oturum açın."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Planınız bulut ortamlarını içermiyor."
