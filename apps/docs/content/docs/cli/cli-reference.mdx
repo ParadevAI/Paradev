@@ -2429,18 +2429,21 @@ Linear, Paradev tasks are not listed or resolved, and the reverse. Pass
 		{ flag: "--due-to <date>", description: "Tasks due on or before this date (YYYY-MM-DD)." },
 		{ flag: "--sort-by <field>", description: "createdAt | updatedAt | dueDate | priority. Default: createdAt." },
 		{ flag: "--sort-order <dir>", description: "asc | desc." },
-		{ flag: "--limit <n>", description: "Default 50." },
-		{ flag: "--offset <n>", description: "Default 0." },
+		{ flag: "--limit <n>", description: "Results per page, from 1 to 500. Default: 50." },
+		{ flag: "--offset <n>", description: "Skip this many results. Default: 0." },
 	]}
 	output="Array<Task>"
 	humanColumns={["SLUG", "TITLE", "PRIORITY", "ASSIGNEE", "PROJECT"]}
 	quiet="task IDs"
 >
-List tasks in the active organization.
+List one page of tasks in the active organization. To retrieve the next page,
+keep the same filters and increase `--offset` by `--limit`.
 
 ```bash
 paradev tasks list --assignee-me
 paradev t list -s "auth" --json
+paradev tasks list --limit 500 --offset 0 --json
+paradev tasks list --limit 500 --offset 500 --json
 ```
 </Command>
 
