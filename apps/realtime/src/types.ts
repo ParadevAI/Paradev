@@ -1,4 +1,5 @@
 import type { AgentSessionHub } from "./agent-session-hub";
+import type { ChatsChannel } from "./chats-channel";
 import type { MoveHub } from "./move-hub";
 import type { OrgHub } from "./org-hub";
 import type { PageHub } from "./page-hub";
@@ -19,6 +20,7 @@ export interface RealtimeEnv {
 	UserHub: DurableObjectNamespace<UserHub>;
 	AgentSessionHub: DurableObjectNamespace<AgentSessionHub>;
 	MoveHub: DurableObjectNamespace<MoveHub>;
+	ChatsChannel: DurableObjectNamespace<ChatsChannel>;
 	PRIVATE: R2Bucket;
 	GUEST_PRESENCE_BY_IP: RateLimit;
 	GUEST_PRESENCE_BY_PAGE: RateLimit;

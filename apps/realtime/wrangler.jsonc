@@ -24,7 +24,8 @@
 			{ "name": "WorkspaceHub", "class_name": "WorkspaceHub" },
 			{ "name": "UserHub", "class_name": "UserHub" },
 			{ "name": "AgentSessionHub", "class_name": "AgentSessionHub" },
-			{ "name": "MoveHub", "class_name": "MoveHub" }
+			{ "name": "MoveHub", "class_name": "MoveHub" },
+			{ "name": "ChatsChannel", "class_name": "ChatsChannel" }
 		]
 	},
 	// Read-only: a page's hub reads its manifest to decide who may connect.
@@ -52,7 +53,8 @@
 		{ "tag": "v3", "new_sqlite_classes": ["WorkspaceHub"] },
 		{ "tag": "v4", "new_sqlite_classes": ["UserHub"] },
 		{ "tag": "v5", "new_sqlite_classes": ["AgentSessionHub"] },
-		{ "tag": "v6", "new_sqlite_classes": ["MoveHub"] }
+		{ "tag": "v6", "new_sqlite_classes": ["MoveHub"] },
+		{ "tag": "v7", "new_sqlite_classes": ["ChatsChannel"] }
 	],
 	"observability": { "enabled": true }
 }

@@ -472,6 +472,10 @@
 			"types": "./src/channels.ts",
 			"default": "./src/channels.ts"
 		},
+		"./chats-realtime": {
+			"types": "./src/chats-realtime/index.ts",
+			"default": "./src/chats-realtime/index.ts"
+		},
 		"./dev-avatar": {
 			"types": "./src/dev-avatar.ts",
 			"default": "./src/dev-avatar.ts"
