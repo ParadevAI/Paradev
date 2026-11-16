@@ -3825,9 +3825,6 @@ msgstr "Wdróż {companyName} w swoim zespole. Skontaktuj się z nami, aby dowie
 msgid "Bring a link to something you built recently."
 msgstr "Podeślij link do czegoś, co niedawno zbudowałeś."
 
-msgid "Bring in an agent"
-msgstr "Dodaj agenta"
-
 msgid "Bring over your projects"
 msgstr "Przenieś swoje projekty"
 

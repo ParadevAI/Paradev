@@ -3819,9 +3819,6 @@ msgstr "Запровадьте {companyName} у своїй команді. Зв'
 msgid "Bring a link to something you built recently."
 msgstr "Підготуйте посилання на щось, що ви нещодавно створили."
 
-msgid "Bring in an agent"
-msgstr "Підключіть агента"
-
 msgid "Bring over your projects"
 msgstr "Перенесіть свої проєкти"
 

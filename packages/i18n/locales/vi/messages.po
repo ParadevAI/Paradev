@@ -3825,9 +3825,6 @@ msgstr "Đưa {companyName} đến với đội của bạn. Liên hệ với ch
 msgid "Bring a link to something you built recently."
 msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần đây."
 
-msgid "Bring in an agent"
-msgstr "Chọn một agent"
-
 msgid "Bring over your projects"
 msgstr "Nhập các dự án của bạn"
 

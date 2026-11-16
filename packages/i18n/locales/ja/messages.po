@@ -3825,9 +3825,6 @@ msgstr "{companyName}をチームに導入しましょう。エンタープラ�
 msgid "Bring a link to something you built recently."
 msgstr "最近作ったもののリンクをお持ちください。"
 
-msgid "Bring in an agent"
-msgstr "エージェントを選択"
-
 msgid "Bring over your projects"
 msgstr "プロジェクトを引き継ぐ"
 

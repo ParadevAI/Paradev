@@ -3825,9 +3825,6 @@ msgstr "Porta {companyName} nel tuo team. Contattaci per saperne di più sui pia
 msgid "Bring a link to something you built recently."
 msgstr "Porta il link a qualcosa che hai costruito di recente."
 
-msgid "Bring in an agent"
-msgstr "Coinvolgi un agente"
-
 msgid "Bring over your projects"
 msgstr "Importa i tuoi progetti"
 

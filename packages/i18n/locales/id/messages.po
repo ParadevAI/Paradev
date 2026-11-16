@@ -3825,9 +3825,6 @@ msgstr "Bawa {companyName} ke tim Anda. Hubungi kami untuk mempelajari lebih lan
 msgid "Bring a link to something you built recently."
 msgstr "Bawa tautan ke sesuatu yang baru-baru ini Anda bangun."
 
-msgid "Bring in an agent"
-msgstr "Libatkan agen"
-
 msgid "Bring over your projects"
 msgstr "Impor proyek Anda"
 

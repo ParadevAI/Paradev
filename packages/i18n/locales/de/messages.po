@@ -3825,9 +3825,6 @@ msgstr "Hol {companyName} in dein Team. Kontaktiere uns, um mehr über Enterpris
 msgid "Bring a link to something you built recently."
 msgstr "Bring einen Link zu etwas mit, das du kürzlich gebaut hast."
 
-msgid "Bring in an agent"
-msgstr "Einen Agenten hinzuziehen"
-
 msgid "Bring over your projects"
 msgstr "Projekte übernehmen"
 

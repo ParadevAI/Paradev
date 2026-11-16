@@ -3825,9 +3825,6 @@ msgstr "把 {companyName} 带给你的团队。联系我们，了解企业版方
 msgid "Bring a link to something you built recently."
 msgstr "请带上你最近做的作品链接。"
 
-msgid "Bring in an agent"
-msgstr "引入智能体"
-
 msgid "Bring over your projects"
 msgstr "迁入项目"
 
