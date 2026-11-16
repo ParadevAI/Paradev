@@ -97,6 +97,37 @@ async function assertMember(userId: string, groupId: string) {
 	return row.role;
 }
 
+/**
+ * An agent the person may change: their own, or the own agent of a group they are in. Someone who can see it but not
+ * change it is refused; anyone else hears "not found".
+ */
+async function editableAgent(userId: string, agentId: string) {
+	const [agent] = await db
+		.select()
+		.from(chatsAgents)
+		.where(eq(chatsAgents.id, agentId));
+	if (!agent) throw notFound("Dev not found");
+	if (agent.kind === "group" && agent.groupId) {
+		await assertMember(userId, agent.groupId);
+		return agent;
+	}
+	if (agent.ownerUserId === userId) return agent;
+	const [shared] = await db
+		.select({ groupId: chatsGroupAgents.groupId })
+		.from(chatsGroupAgents)
+		.innerJoin(
+			chatsGroupMembers,
+			and(
+				eq(chatsGroupMembers.groupId, chatsGroupAgents.groupId),
+				eq(chatsGroupMembers.userId, userId),
+			),
+		)
+		.where(eq(chatsGroupAgents.agentId, agentId))
+		.limit(1);
+	if (shared) throw forbidden("Only its owner can change this Dev");
+	throw notFound("Dev not found");
+}
+
 async function groupIdsOf(userId: string, organizationId: string) {
 	const rows = await db
 		.select({ groupId: chatsGroupMembers.groupId })
@@ -906,6 +937,94 @@ export const chatsRouter = {
 				group: await loadGroup(created.groupId),
 				groupDev: toGroupAgent(created.link),
 			} satisfies CreatedChat;
+		}),
+
+	updateDev: personProcedure
+		.input(
+			z.object({
+				devId: z.string().uuid(),
+				name: z.string().trim().min(1).max(TITLE_MAX).optional(),
+				color: colorInput.optional(),
+				description: z.string().trim().max(2_000).optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const user = ctx.session.user;
+			const { devId, ...patch } = input;
+			const existing = await editableAgent(user.id, devId);
+			if (patch.description === "" && existing.kind !== "personal") {
+				throw invalid("A description is required");
+			}
+			const changes = Object.fromEntries(
+				Object.entries(patch).filter(([, value]) => value !== undefined),
+			);
+			const [updated = existing] = Object.keys(changes).length
+				? await db
+						.update(chatsAgents)
+						.set(changes)
+						.where(eq(chatsAgents.id, devId))
+						.returning()
+				: [];
+			const links = await db
+				.select({ groupId: chatsGroupAgents.groupId })
+				.from(chatsGroupAgents)
+				.where(eq(chatsGroupAgents.agentId, devId));
+			const [owner] = updated.ownerUserId
+				? await db.select().from(users).where(eq(users.id, updated.ownerUserId))
+				: [];
+			const shared = agentView(updated, {
+				owner: false,
+				ownerName: owner ? toUser(owner).displayName : null,
+			});
+			for (const link of links) {
+				publishChats(chatsGroupChannel(link.groupId), {
+					type: "dev.updated",
+					dev: shared,
+				});
+			}
+			if (!updated.ownerUserId) return shared;
+			const owned = agentView(updated, { owner: true });
+			publishChats(chatsUserChannel(updated.ownerUserId), {
+				type: "dev.updated",
+				dev: owned,
+			});
+			return updated.ownerUserId === user.id ? owned : shared;
+		}),
+
+	/** Deletes an agent a person made, with its 1:1. It leaves every group it was in. */
+	deleteDev: personProcedure
+		.input(z.object({ devId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const agent = await editableAgent(userId, input.devId);
+			if (agent.kind !== "custom") {
+				throw invalid("Only Devs you made can be deleted");
+			}
+			const links = await db
+				.select({ groupId: chatsGroupAgents.groupId, kind: chatsGroups.kind })
+				.from(chatsGroupAgents)
+				.innerJoin(chatsGroups, eq(chatsGroups.id, chatsGroupAgents.groupId))
+				.where(eq(chatsGroupAgents.agentId, input.devId));
+			const directIds = links
+				.filter((link) => link.kind === "direct")
+				.map((link) => link.groupId);
+			await dbWs.transaction(async (tx) => {
+				if (directIds.length > 0) {
+					await tx
+						.delete(chatsGroups)
+						.where(inArray(chatsGroups.id, directIds));
+				}
+				await tx.delete(chatsAgents).where(eq(chatsAgents.id, input.devId));
+			});
+			const event = { type: "dev.deleted", devId: input.devId } as const;
+			for (const link of links) {
+				if (link.kind === "group") {
+					publishChats(chatsGroupChannel(link.groupId), event);
+				}
+			}
+			publishChats(chatsUserChannel(userId), event);
+			publishChats(chatsUserChannel(userId), { type: "groups.changed" });
+			return { devId: input.devId };
 		}),
 
 	/** Lets one of the person's own agents into a group they are in. */
