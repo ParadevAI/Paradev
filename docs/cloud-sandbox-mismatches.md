@@ -903,6 +903,16 @@ and provider. Keep the workspace id on both sides: a provisioning failure is
 recorded against the API and a runtime failure against the sandbox, and that id
 is the only thing that joins the two halves of one broken workspace.
 
+**A drive mount lasts one session and a fork does not inherit it — open.**
+Behind `SANDBOX_AGENT_TOOLS_DRIVE`, the agent CLIs come from the region's
+`agent-tools-<region>` drive, mounted read-only at `/opt/agents`. A machine
+someone owns keeps a mount; a sandbox gets one only from `Sandbox.create`,
+`Sandbox.fork` or `sandbox.update({ mounts })` before the session starts, so
+`provisionSandbox` and `wakeSandbox` both pass it. A drive lives in one region
+and mounts only in that region. A session without the mount leaves links in
+`/usr/local/bin` that point nowhere; `superset-boot` re-runs
+`install-agent-clis` to put the image's agents back. Untested on Vercel.
+
 ## Running this repo's own dev stack inside a sandbox
 
 Reproducing an app bug end to end from a cloud workspace means bringing up

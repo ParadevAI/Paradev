@@ -17,11 +17,13 @@ import {
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
+	sandboxAgentToolsDrive,
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
 	type NetworkPolicy,
 	Sandbox,
+	type SandboxMounts,
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
@@ -137,6 +139,26 @@ function sandboxTags(
 	};
 }
 
+/**
+ * The region's agent-tools drive, read-only, when the flag is on. Mounts are
+ * per session and a fork does not inherit them, so every create and every
+ * wake passes them.
+ */
+export function agentToolsMounts(
+	region: string,
+	enabled = env.SANDBOX_AGENT_TOOLS_DRIVE === "true",
+): { mounts: SandboxMounts } | Record<string, never> {
+	if (!enabled) return {};
+	return {
+		mounts: {
+			[SANDBOX_PATHS.agents]: {
+				drive: sandboxAgentToolsDrive(region),
+				mode: "snapshot",
+			},
+		},
+	};
+}
+
 function publishedPorts(extra: readonly number[] = []): number[] {
 	return [...new Set([...SANDBOX_PUBLISHED_PORTS, ...extra])];
 }
@@ -221,6 +243,7 @@ export async function provisionSandbox(args: {
 			kind === "environment" ? 0 : WORKSPACE_SNAPSHOT_EXPIRATION_MS,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
+		...agentToolsMounts(args.environment.region),
 	};
 	const sandbox =
 		(await getSandbox(args.name)) ??
@@ -476,6 +499,17 @@ export async function wakeSandbox(args: {
 						),
 					),
 			);
+		}
+		const { mounts } = agentToolsMounts(sandbox.region);
+		if (!wasRunning && mounts) {
+			await sandbox
+				.update({ mounts })
+				.catch((error) =>
+					console.warn(
+						`[sandbox] mount update failed for ${args.providerSandboxId}`,
+						error,
+					),
+				);
 		}
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });

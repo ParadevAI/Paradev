@@ -9,6 +9,7 @@ import {
 import { Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
+	agentToolsMounts,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	SESSION_TIMEOUT_MS,
@@ -158,5 +159,19 @@ describe("topUpSandboxSession", () => {
 		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS - 30_000);
 		await topUpSandboxSession("sbx");
 		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
+	});
+});
+
+describe("agentToolsMounts", () => {
+	test("mounts nothing while the flag is off", () => {
+		expect(agentToolsMounts("sfo1", false)).toEqual({});
+	});
+
+	test("mounts the region's drive read-only at the agents path", () => {
+		expect(agentToolsMounts("iad1", true)).toEqual({
+			mounts: {
+				"/opt/agents": { drive: "agent-tools-iad1", mode: "snapshot" },
+			},
+		});
 	});
 });
