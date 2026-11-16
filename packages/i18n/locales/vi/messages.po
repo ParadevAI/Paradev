@@ -22898,10 +22898,6 @@ msgstr "Hành động workspace"
 msgid "Workspace activity"
 msgstr "Hoạt động của không gian làm việc"
 
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "Hoạt động của workspace, pull request #{0}"
-
 msgid "Workspace agents"
 msgstr "Agent của workspace"
 

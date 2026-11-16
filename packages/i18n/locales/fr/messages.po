@@ -22898,10 +22898,6 @@ msgstr "Actions de l'espace de travail"
 msgid "Workspace activity"
 msgstr "Activité de l'espace de travail"
 
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "Activité de l'espace de travail, pull request #{0}"
-
 msgid "Workspace agents"
 msgstr "Agents des espaces de travail"
 

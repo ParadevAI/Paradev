@@ -22898,10 +22898,6 @@ msgstr "工作区操作"
 msgid "Workspace activity"
 msgstr "工作区活动"
 
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "工作区动态，拉取请求 #{0}"
-
 msgid "Workspace agents"
 msgstr "工作区智能体"
 
