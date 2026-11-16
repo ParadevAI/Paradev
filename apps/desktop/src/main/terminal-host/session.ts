@@ -125,6 +125,7 @@ export interface SessionOptions {
 	command?: string;
 	scrollbackLines?: number;
 	spawnProcess?: SpawnProcess;
+	killProcessTree?: (pid: number, signal: string) => Promise<void>;
 }
 
 export interface AttachedClient {
@@ -146,6 +147,10 @@ export class Session {
 	readonly command?: string;
 	readonly createdAt: Date;
 	private readonly spawnProcess: SpawnProcess;
+	private readonly killProcessTree: (
+		pid: number,
+		signal: string,
+	) => Promise<void>;
 
 	private subprocess: ChildProcess | null = null;
 	private subprocessReady = false;
@@ -215,6 +220,7 @@ export class Session {
 		this.createdAt = new Date();
 		this.lastAttachedAt = new Date();
 		this.spawnProcess = options.spawnProcess ?? spawn;
+		this.killProcessTree = options.killProcessTree ?? treeKillAsync;
 
 		// Initialize PTY ready promise
 		this.ptyReadyPromise = new Promise((resolve) => {
@@ -1054,7 +1060,7 @@ export class Session {
 
 		// Must await: treeKill enumerates descendants via ps/pgrep before signaling
 		return Promise.all(
-			pidsToKill.map((pid) => treeKillAsync(pid, "SIGKILL")),
+			pidsToKill.map((pid) => this.killProcessTree(pid, "SIGKILL")),
 		).then(() => {});
 	}
 
