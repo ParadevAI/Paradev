@@ -3637,9 +3637,6 @@ msgstr "Berdasarkan {0} token dalam 30 hari terakhir, menghitung {1}."
 msgid "Before"
 msgstr "Sebelum"
 
-msgid "Behavior"
-msgstr "Perilaku"
-
 msgid "Behind base"
 msgstr "Tertinggal dari base"
 
@@ -5085,6 +5082,9 @@ msgstr "Perintah..."
 
 msgid "Commands"
 msgstr "Perintah"
+
+msgid "Commands only"
+msgstr "Hanya perintah"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Perintah yang dijalankan untuk setup workspace, teardown, dan tombol Run."
@@ -9655,9 +9655,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Pemicu ghost: ikon + label terpotong + chevron atas-bawah (pola didemokan di halaman Primitives)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git & worktree"
 
@@ -12847,9 +12844,6 @@ msgstr "Tidak ada layanan aktif"
 msgid "No active terminal sessions"
 msgstr "Tidak ada sesi terminal aktif"
 
-msgid "No active workspaces"
-msgstr "Tidak ada workspace aktif"
-
 msgid "No agent"
 msgstr "Tanpa agen"
 
@@ -12952,9 +12946,6 @@ msgstr "Tanpa warna"
 
 msgid "No command configured."
 msgstr "Tidak ada perintah yang dikonfigurasi."
-
-msgid "No commands found."
-msgstr "Tidak ada perintah ditemukan."
 
 msgid "No comment body"
 msgstr "Tidak ada isi komentar"
@@ -15243,9 +15234,6 @@ msgstr "Pilih tema atau ikuti tampilan sistem Anda. Jelajahi <0>marketplace<1/><
 msgid "Pick a workspace"
 msgstr "Pilih workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Pilih workspace yang agennya menunggu input Anda, sudah selesai sejak terakhir Anda melihatnya, atau masih berjalan"
-
 msgid "Pick an environment"
 msgstr "Pilih lingkungan"
 
@@ -16247,6 +16235,9 @@ msgstr "Rebase dan merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
+
+msgid "Recent"
+msgstr "Terbaru"
 
 msgid "Recent Activity"
 msgstr "Aktivitas Terbaru"
@@ -17271,9 +17262,6 @@ msgstr "panel kanan"
 msgid "Right-click here"
 msgstr "Klik kanan di sini"
 
-msgid "Ringtones"
-msgstr "Nada dering"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17513,6 +17501,9 @@ msgstr "Dijalankan saat ruang kerja dihapus."
 
 msgid "Runs while you sleep"
 msgstr "Berjalan saat Anda tidur"
+
+msgid "Same as Switch Workspace"
+msgstr "Sama seperti “Ganti workspace”"
 
 msgid "Same session"
 msgstr "Sesi yang sama"
@@ -17889,6 +17880,9 @@ msgstr "Cari pemicu..."
 msgid "Search workspaces"
 msgstr "Cari workspace"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Cari workspace, perintah, file…"
+
 msgid "Search workspaces..."
 msgstr "Cari workspace..."
 
@@ -17897,6 +17891,9 @@ msgstr "Cari workspace…"
 
 msgid "Search your meeting notes"
 msgstr "Cari catatan rapat Anda"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Cari workspace Anda dan buka salah satunya, atau mulai workspace baru"
 
 msgid "Search..."
 msgstr "Cari..."
@@ -19825,6 +19822,15 @@ msgstr "Beralih ke Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Beralih ke Workspace 9"
+
+msgid "Switch to…"
+msgstr "Beralih ke…"
+
+msgid "Switch workspace"
+msgstr "Ganti workspace"
+
+msgid "Switch Workspace"
+msgstr "Ganti workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

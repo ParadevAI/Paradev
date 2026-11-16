@@ -3631,9 +3631,6 @@ msgstr "На основі {0} токенів за останні 30 днів з 
 msgid "Before"
 msgstr "До"
 
-msgid "Behavior"
-msgstr "Поведінка"
-
 msgid "Behind base"
 msgstr "Відстає від бази"
 
@@ -5079,6 +5076,9 @@ msgstr "Команда..."
 
 msgid "Commands"
 msgstr "Команди"
+
+msgid "Commands only"
+msgstr "Лише команди"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Команди для налаштування та очищення робочого простору і для кнопки «Запустити»."
@@ -9649,9 +9649,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Ghost-тригер: значок + обрізаний підпис + шеврон угору-вниз (патерн показано на сторінці Primitives)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git і worktree"
 
@@ -12841,9 +12838,6 @@ msgstr "Немає активних служб"
 msgid "No active terminal sessions"
 msgstr "Немає активних сеансів термінала"
 
-msgid "No active workspaces"
-msgstr "Немає активних робочих просторів"
-
 msgid "No agent"
 msgstr "Без агента"
 
@@ -12946,9 +12940,6 @@ msgstr "Без кольору"
 
 msgid "No command configured."
 msgstr "Команду не налаштовано."
-
-msgid "No commands found."
-msgstr "Команд не знайдено."
 
 msgid "No comment body"
 msgstr "Коментар без тексту"
@@ -15237,9 +15228,6 @@ msgstr "Виберіть тему або використовуйте вигля
 msgid "Pick a workspace"
 msgstr "Виберіть робочий простір"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Виберіть робочий простір, агент якого чекає на ваше введення, завершив роботу після вашого останнього перегляду або ще працює"
-
 msgid "Pick an environment"
 msgstr "Виберіть середовище"
 
@@ -16241,6 +16229,9 @@ msgstr "Зробити ребейз і злити"
 
 msgid "Recall what was said in meetings"
 msgstr "Згадати, що говорили на зустрічах"
+
+msgid "Recent"
+msgstr "Нещодавні"
 
 msgid "Recent Activity"
 msgstr "Нещодавня активність"
@@ -17265,9 +17256,6 @@ msgstr "права панель"
 msgid "Right-click here"
 msgstr "Клацніть тут правою кнопкою"
 
-msgid "Ringtones"
-msgstr "Мелодії"
-
 msgid "Roadmap"
 msgstr "Дорожня карта"
 
@@ -17507,6 +17495,9 @@ msgstr "Виконується під час видалення робочого
 
 msgid "Runs while you sleep"
 msgstr "Працює, поки ви спите"
+
+msgid "Same as Switch Workspace"
+msgstr "Те саме, що «Змінити робочий простір»"
 
 msgid "Same session"
 msgstr "Той самий сеанс"
@@ -17883,6 +17874,9 @@ msgstr "Пошук тригерів..."
 msgid "Search workspaces"
 msgstr "Пошук робочих просторів"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Пошук робочих просторів, команд, файлів…"
+
 msgid "Search workspaces..."
 msgstr "Пошук робочих просторів..."
 
@@ -17891,6 +17885,9 @@ msgstr "Пошук робочих просторів…"
 
 msgid "Search your meeting notes"
 msgstr "Пошук у ваших нотатках із зустрічей"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Знайдіть робочий простір і відкрийте його або створіть новий"
 
 msgid "Search..."
 msgstr "Пошук..."
@@ -19819,6 +19816,15 @@ msgstr "Перейти до робочого простору 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Перейти до робочого простору 9"
+
+msgid "Switch to…"
+msgstr "Перейти до…"
+
+msgid "Switch workspace"
+msgstr "Змінити робочий простір"
+
+msgid "Switch Workspace"
+msgstr "Змінити робочий простір"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

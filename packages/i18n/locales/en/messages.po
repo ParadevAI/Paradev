@@ -3637,9 +3637,6 @@ msgstr "Based on {0} tokens in the last 30 days, counting {1}."
 msgid "Before"
 msgstr "Before"
 
-msgid "Behavior"
-msgstr "Behavior"
-
 msgid "Behind base"
 msgstr "Behind base"
 
@@ -5085,6 +5082,9 @@ msgstr "Command..."
 
 msgid "Commands"
 msgstr "Commands"
+
+msgid "Commands only"
+msgstr "Commands only"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Commands run for workspace setup, teardown, and the Run button."
@@ -9655,9 +9655,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git & worktrees"
 
@@ -12847,9 +12844,6 @@ msgstr "No active services"
 msgid "No active terminal sessions"
 msgstr "No active terminal sessions"
 
-msgid "No active workspaces"
-msgstr "No active workspaces"
-
 msgid "No agent"
 msgstr "No agent"
 
@@ -12952,9 +12946,6 @@ msgstr "No color"
 
 msgid "No command configured."
 msgstr "No command configured."
-
-msgid "No commands found."
-msgstr "No commands found."
 
 msgid "No comment body"
 msgstr "No comment body"
@@ -15243,9 +15234,6 @@ msgstr "Pick a theme or follow your system appearance. Browse the <0>marketplace
 msgid "Pick a workspace"
 msgstr "Pick a workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-
 msgid "Pick an environment"
 msgstr "Pick an environment"
 
@@ -16247,6 +16235,9 @@ msgstr "Rebase and merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Recall what was said in meetings"
+
+msgid "Recent"
+msgstr "Recent"
 
 msgid "Recent Activity"
 msgstr "Recent Activity"
@@ -17271,9 +17262,6 @@ msgstr "right pane"
 msgid "Right-click here"
 msgstr "Right-click here"
 
-msgid "Ringtones"
-msgstr "Ringtones"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17513,6 +17501,9 @@ msgstr "Runs when a workspace is deleted."
 
 msgid "Runs while you sleep"
 msgstr "Runs while you sleep"
+
+msgid "Same as Switch Workspace"
+msgstr "Same as Switch Workspace"
 
 msgid "Same session"
 msgstr "Same session"
@@ -17889,6 +17880,9 @@ msgstr "Search triggers..."
 msgid "Search workspaces"
 msgstr "Search workspaces"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Search workspaces, commands, files…"
+
 msgid "Search workspaces..."
 msgstr "Search workspaces..."
 
@@ -17897,6 +17891,9 @@ msgstr "Search workspaces…"
 
 msgid "Search your meeting notes"
 msgstr "Search your meeting notes"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Search your workspaces and open one, or start a new workspace"
 
 msgid "Search..."
 msgstr "Search..."
@@ -19825,6 +19822,15 @@ msgstr "Switch to Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Switch to Workspace 9"
+
+msgid "Switch to…"
+msgstr "Switch to…"
+
+msgid "Switch workspace"
+msgstr "Switch workspace"
+
+msgid "Switch Workspace"
+msgstr "Switch Workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)

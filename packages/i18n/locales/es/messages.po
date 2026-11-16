@@ -3637,9 +3637,6 @@ msgstr "Según {0} tokens en los últimos 30 días, contando {1}."
 msgid "Before"
 msgstr "Antes"
 
-msgid "Behavior"
-msgstr "Comportamiento"
-
 msgid "Behind base"
 msgstr "Por detrás de la base"
 
@@ -5085,6 +5082,9 @@ msgstr "Comando..."
 
 msgid "Commands"
 msgstr "Comandos"
+
+msgid "Commands only"
+msgstr "Solo comandos"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Comandos que se ejecutan al preparar y desmontar un espacio de trabajo y con el botón Ejecutar."
@@ -9655,9 +9655,6 @@ msgstr "Fantasma"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Disparador fantasma: icono + etiqueta truncada + chevrón arriba-abajo (patrón mostrado en la página de primitivos)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git y worktrees"
 
@@ -12847,9 +12844,6 @@ msgstr "No hay servicios activos"
 msgid "No active terminal sessions"
 msgstr "No hay sesiones de terminal activas"
 
-msgid "No active workspaces"
-msgstr "No hay espacios de trabajo activos"
-
 msgid "No agent"
 msgstr "Sin agente"
 
@@ -12952,9 +12946,6 @@ msgstr "Sin color"
 
 msgid "No command configured."
 msgstr "No hay ningún comando configurado."
-
-msgid "No commands found."
-msgstr "No se encontraron comandos."
 
 msgid "No comment body"
 msgstr "Sin cuerpo del comentario"
@@ -15243,9 +15234,6 @@ msgstr "Elige un tema o sigue la apariencia del sistema. Explora el <0>marketpla
 msgid "Pick a workspace"
 msgstr "Elige un espacio de trabajo"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Elige un espacio de trabajo cuyo agente espera tu respuesta, terminó desde la última vez que lo miraste o sigue en ejecución"
-
 msgid "Pick an environment"
 msgstr "Elige un entorno"
 
@@ -16247,6 +16235,9 @@ msgstr "Rebase y fusión"
 
 msgid "Recall what was said in meetings"
 msgstr "Recordar lo que se dijo en las reuniones"
+
+msgid "Recent"
+msgstr "Recientes"
 
 msgid "Recent Activity"
 msgstr "Actividad reciente"
@@ -17271,9 +17262,6 @@ msgstr "panel derecho"
 msgid "Right-click here"
 msgstr "Haz clic derecho aquí"
 
-msgid "Ringtones"
-msgstr "Tonos"
-
 msgid "Roadmap"
 msgstr "Hoja de ruta"
 
@@ -17513,6 +17501,9 @@ msgstr "Se ejecuta al eliminar un espacio de trabajo."
 
 msgid "Runs while you sleep"
 msgstr "Funciona mientras duermes"
+
+msgid "Same as Switch Workspace"
+msgstr "Igual que «Cambiar de espacio de trabajo»"
 
 msgid "Same session"
 msgstr "Misma sesión"
@@ -17889,6 +17880,9 @@ msgstr "Buscar disparadores..."
 msgid "Search workspaces"
 msgstr "Buscar espacios de trabajo"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Buscar espacios de trabajo, comandos, archivos…"
+
 msgid "Search workspaces..."
 msgstr "Buscar espacios de trabajo..."
 
@@ -17897,6 +17891,9 @@ msgstr "Buscar espacios de trabajo…"
 
 msgid "Search your meeting notes"
 msgstr "Busca en tus notas de reuniones"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Busca en tus espacios de trabajo y abre uno, o crea un espacio de trabajo nuevo"
 
 msgid "Search..."
 msgstr "Buscar..."
@@ -19825,6 +19822,15 @@ msgstr "Ir al espacio de trabajo 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Ir al espacio de trabajo 9"
+
+msgid "Switch to…"
+msgstr "Cambiar a…"
+
+msgid "Switch workspace"
+msgstr "Cambiar de espacio de trabajo"
+
+msgid "Switch Workspace"
+msgstr "Cambiar de espacio de trabajo"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
