@@ -90,7 +90,6 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
-import { AgentPickerPill } from "./components/AgentPickerPill";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
@@ -1258,16 +1257,12 @@ export function NewWorkspaceScreen({
 						<div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1">
 							<div className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
 								{modePicker}
-								<AgentPickerPill
-									agents={v2Agents}
-									selectedAgentId={selectedAgent}
-									onSelect={setSelectedAgent}
-								/>
 							</div>
 							<div className="flex shrink-0 items-center gap-1.5">
 								{setupButton}
-								{selectedAgent !== "none" && (
+								{agentSwitcher && (
 									<ModelPicker
+										agentSwitcher={agentSwitcher}
 										configOptions={launchOptions}
 										onOpenChange={setModelPickerOpen}
 										onSelect={selectLaunchOption}

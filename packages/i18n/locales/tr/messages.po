@@ -3825,9 +3825,6 @@ msgstr "{companyName}'i ekibinize getirin. Kurumsal planlar ve dağıtım seçen
 msgid "Bring a link to something you built recently."
 msgstr "Yakın zamanda geliştirdiğiniz bir şeyin bağlantısını getirin."
 
-msgid "Bring in an agent"
-msgstr "Bir ajan getir"
-
 msgid "Bring over your projects"
 msgstr "Projelerinizi aktarın"
 

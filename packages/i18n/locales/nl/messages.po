@@ -3825,9 +3825,6 @@ msgstr "Breng {companyName} naar je team. Neem contact op voor meer informatie o
 msgid "Bring a link to something you built recently."
 msgstr "Neem een link mee naar iets wat je onlangs hebt gebouwd."
 
-msgid "Bring in an agent"
-msgstr "Een agent erbij halen"
-
 msgid "Bring over your projects"
 msgstr "Neem je projecten over"
 

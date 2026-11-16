@@ -3825,9 +3825,6 @@ msgstr "Leve o {companyName} para sua equipe. Entre em contato para saber mais s
 msgid "Bring a link to something you built recently."
 msgstr "Traga o link de algo que você construiu recentemente."
 
-msgid "Bring in an agent"
-msgstr "Escolher um agente"
-
 msgid "Bring over your projects"
 msgstr "Importe seus projetos"
 

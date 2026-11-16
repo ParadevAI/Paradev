@@ -3825,9 +3825,6 @@ msgstr "將 {companyName} 引入您的團隊。與我們聯繫以進一步瞭解
 msgid "Bring a link to something you built recently."
 msgstr "請帶上你最近做的作品連結。"
 
-msgid "Bring in an agent"
-msgstr "選擇代理程式"
-
 msgid "Bring over your projects"
 msgstr "遷入專案"
 

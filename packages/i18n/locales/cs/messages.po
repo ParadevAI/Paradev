@@ -3825,9 +3825,6 @@ msgstr "Přineste {companyName} svému týmu. Ozvěte se nám a zjistěte více 
 msgid "Bring a link to something you built recently."
 msgstr "Přineste odkaz na něco, co jste nedávno vytvořili."
 
-msgid "Bring in an agent"
-msgstr "Přizvat agenta"
-
 msgid "Bring over your projects"
 msgstr "Převeďte své projekty"
 

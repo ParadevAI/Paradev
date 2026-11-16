@@ -3825,9 +3825,6 @@ msgstr "{companyName}을 팀에 도입하세요. 엔터프라이즈 플랜과 �
 msgid "Bring a link to something you built recently."
 msgstr "최근에 만든 결과물의 링크를 가져오세요."
 
-msgid "Bring in an agent"
-msgstr "에이전트 불러오기"
-
 msgid "Bring over your projects"
 msgstr "프로젝트 가져오기"
 
