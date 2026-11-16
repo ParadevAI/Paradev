@@ -52,6 +52,7 @@ import { applyAppLanguage, languageEvents } from "main/lib/language";
 import { localDb } from "main/lib/local-db";
 import {
 	DEFAULT_AUTO_APPLY_DEFAULT_PRESET,
+	DEFAULT_CLOSE_SETUP_ON_SUCCESS,
 	DEFAULT_CONFIRM_ON_QUIT,
 	DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY,
 	DEFAULT_FILE_AUTO_SAVE,
@@ -912,6 +913,27 @@ export const createSettingsRouter = () => {
 					.onConflictDoUpdate({
 						target: settings.id,
 						set: { waitForSetupBeforeAgent: input.enabled },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getCloseSetupOnSuccess: publicProcedure.query(() => {
+			const row = getSettings();
+			return row.closeSetupOnSuccess ?? DEFAULT_CLOSE_SETUP_ON_SUCCESS;
+		}),
+
+		setCloseSetupOnSuccess: publicProcedure
+			.input(z.object({ enabled: z.boolean() }))
+			.mutation(({ input }) => {
+				const { id } = getSettings();
+				localDb
+					.insert(settings)
+					.values({ id, closeSetupOnSuccess: input.enabled })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { closeSetupOnSuccess: input.enabled },
 					})
 					.run();
 

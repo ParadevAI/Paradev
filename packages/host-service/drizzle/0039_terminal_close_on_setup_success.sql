@@ -1,0 +1,1 @@
+ALTER TABLE `terminal_sessions` ADD `close_on_setup_success` integer;

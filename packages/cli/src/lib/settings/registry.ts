@@ -240,6 +240,13 @@ export const SETTINGS: SettingDefinition[] = [
 		description: "Wait for workspace setup to finish before starting agents",
 		defaultValue: false,
 	},
+	{
+		key: "closeSetupOnSuccess",
+		type: "boolean",
+		section: "terminal",
+		description: "Close the Workspace Setup tab when setup succeeds",
+		defaultValue: false,
+	},
 	// Terminal appearance
 	{
 		key: "terminalFontFamily",

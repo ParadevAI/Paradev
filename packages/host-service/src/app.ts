@@ -75,6 +75,7 @@ import {
 	resumeSessionDepsFor,
 } from "./trpc/router/terminal-agents/terminal-agents";
 import { provisionSelectedAccounts } from "./trpc/router/usage/account-provisioning";
+import { registerSetupPaneCloser } from "./trpc/router/workspace-creation/shared/setup-terminal";
 import {
 	execGh as defaultExecGh,
 	type ExecGh,
@@ -355,6 +356,22 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		isAuthenticated: true,
 		browserBridge: config.browserBridge,
 	};
+	if (config.browserBridge) {
+		registerSetupPaneCloser({
+			git,
+			credentials: providers.credentials,
+			github,
+			execGh,
+			api,
+			db,
+			runtime,
+			eventBus,
+			terminalAgentStore,
+			organizationId: config.organizationId,
+			isAuthenticated: true,
+			browserBridge: config.browserBridge,
+		});
+	}
 	const chatV3 = createChatV3Mount({
 		db,
 		api,

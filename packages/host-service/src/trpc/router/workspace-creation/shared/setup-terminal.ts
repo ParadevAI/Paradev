@@ -6,9 +6,20 @@ import {
 	loadProjectConfig,
 } from "../../../../runtime/setup/config";
 import { trackConfigResolved } from "../../../../runtime/setup/track-config-resolved";
-import { createTerminalSessionInternal } from "../../../../terminal/terminal";
+import {
+	createTerminalSessionInternal,
+	setSetupSucceededHandler,
+} from "../../../../terminal/terminal";
 import type { HostServiceContext } from "../../../../types";
+import { createCallerFactory } from "../../../index";
+import { panesRouter } from "../../panes";
+import { closeSetupPane } from "./close-setup-pane";
 import type { TerminalDescriptor } from "./types";
+
+const createPanesCaller = createCallerFactory(panesRouter);
+
+const CLOSE_SETUP_PANE_ATTEMPTS = 30;
+const CLOSE_SETUP_PANE_RETRY_DELAY_MS = 1_000;
 
 interface StartSetupTerminalArgs {
 	ctx: HostServiceContext;
@@ -19,6 +30,11 @@ interface StartSetupTerminalArgs {
 	 * resolves — the caller must then dispatch it separately.
 	 */
 	chainCommand?: string;
+	/**
+	 * Close the setup pane once setup exits 0. Ignored when `chainCommand` is
+	 * set, because the agent then runs in that terminal.
+	 */
+	closeOnSuccess?: boolean;
 }
 
 interface StartSetupTerminalResult {
@@ -76,6 +92,11 @@ export async function startSetupTerminalIfPresent(
 		return { terminal: null, warning: null, chained: false };
 	}
 
+	const closeOnSuccess = shouldCloseOnSuccess({
+		closeOnSuccess: args.closeOnSuccess,
+		chainCommand: args.chainCommand,
+		hasPaneBridge: Boolean(args.ctx.browserBridge),
+	});
 	const initialCommand = args.chainCommand
 		? `${resolved.initialCommand} && ${args.chainCommand}`
 		: resolved.initialCommand;
@@ -88,6 +109,7 @@ export async function startSetupTerminalIfPresent(
 		eventBus: args.ctx.eventBus,
 		initialCommand,
 		...(resolved.cwd && { cwd: resolved.cwd }),
+		closeOnSetupSuccess: closeOnSuccess,
 	});
 	if ("error" in result) {
 		return {
@@ -106,6 +128,35 @@ export async function startSetupTerminalIfPresent(
 		warning: null,
 		chained: Boolean(args.chainCommand),
 	};
+}
+
+/** Exported for tests. */
+export function shouldCloseOnSuccess(args: {
+	closeOnSuccess?: boolean;
+	chainCommand?: string;
+	hasPaneBridge: boolean;
+}): boolean {
+	return (
+		Boolean(args.closeOnSuccess) && !args.chainCommand && args.hasPaneBridge
+	);
+}
+
+/**
+ * Closes a setup pane when its terminal reports success. The context must
+ * reach the desktop's pane-layout bridge; it outlives any one request so a
+ * session adopted after a host restart still closes.
+ */
+export function registerSetupPaneCloser(ctx: HostServiceContext): void {
+	const panes = createPanesCaller(ctx);
+	setSetupSucceededHandler(({ workspaceId, terminalId }) => {
+		void closeSetupPane({
+			panes,
+			workspaceId,
+			terminalId,
+			attempts: CLOSE_SETUP_PANE_ATTEMPTS,
+			retryDelayMs: CLOSE_SETUP_PANE_RETRY_DELAY_MS,
+		});
+	});
 }
 
 /** Exported for tests. Resolves the initial command for the setup terminal. */
