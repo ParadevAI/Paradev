@@ -19847,6 +19847,9 @@ msgstr "Các quỹ và nhà đầu tư thiên thần đồng hành cùng đội 
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Nơi sẽ chứa các cấu hình agent, prompt và hướng dẫn thiết lập Paradev có thể tái sử dụng."
 
+msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
+msgstr "Dev của nhóm có thể nhờ Dev bạn thêm vào giúp đỡ. Mọi người ở đây không thể nhắn tin cho nó."
+
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Máy chủ đã trở lại với {0}, không phải {targetVersion}."

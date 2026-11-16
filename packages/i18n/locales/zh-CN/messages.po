@@ -19847,6 +19847,9 @@ msgstr "支持我们团队的基金和天使投资人。"
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "未来用于存放可复用的 Paradev 智能体配置、提示词与安装指南。"
 
+msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
+msgstr "群组的 Dev 可以向你添加的 Dev 求助。这里的成员无法直接给它发消息。"
+
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "主机以 {0} 而非 {targetVersion} 恢复。"

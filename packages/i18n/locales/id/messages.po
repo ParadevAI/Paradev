@@ -19847,6 +19847,9 @@ msgstr "Dana ventura dan angel investor yang mendukung tim kami."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Rumah masa depan untuk konfigurasi agen Paradev, prompt, dan panduan penyiapan yang dapat digunakan ulang."
 
+msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
+msgstr "Dev grup dapat meminta bantuan Dev yang Anda tambahkan. Orang di sini tidak dapat mengiriminya pesan."
+
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Host kembali dengan {0}, bukan {targetVersion}."

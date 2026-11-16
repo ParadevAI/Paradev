@@ -19847,6 +19847,9 @@ msgstr "Ekibimizi destekleyen fonlar ve melek yatırımcılar."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Yeniden kullanılabilir Paradev ajan yapılandırmaları, istemleri ve kurulum kılavuzları için gelecekteki adres."
 
+msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
+msgstr "Grubun Dev'i, eklediğiniz bir Dev'den yardım isteyebilir. Buradaki kişiler ona mesaj gönderemez."
+
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Ana makine {targetVersion} yerine {0} ile geri döndü."

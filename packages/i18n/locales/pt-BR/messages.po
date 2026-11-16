@@ -19847,6 +19847,9 @@ msgstr "Os fundos e investidores-anjo que apoiam nosso time."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "O futuro lar de configurações de agentes, prompts e guias de configuração reutilizáveis do Paradev."
 
+msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
+msgstr "O Dev do grupo pode pedir ajuda a um Dev que você adicionar. As pessoas aqui não podem enviar mensagens para ele."
+
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "O host voltou na {0}, não na {targetVersion}."

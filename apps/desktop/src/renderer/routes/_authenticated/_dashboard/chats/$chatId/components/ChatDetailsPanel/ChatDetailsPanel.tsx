@@ -136,6 +136,12 @@ export function ChatDetailsPanel({
 						<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
 							<Trans>Add your Devs</Trans>
 						</h3>
+						<p className="px-1 pb-1 text-xs text-muted-foreground">
+							<Trans>
+								The group's Dev can ask a Dev you add for help. People here
+								cannot message it.
+							</Trans>
+						</p>
 						{addableDevs.map((dev) => (
 							<div
 								key={dev.id}
