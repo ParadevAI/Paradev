@@ -1,0 +1,1 @@
+export { NameDevCard } from "./NameDevCard";

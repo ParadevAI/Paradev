@@ -199,14 +199,6 @@ msgstr "{0, plural, other {# 個のラベル}}"
 msgid "{0, plural, one {# login} other {# logins}}"
 msgstr "{0, plural, one {#件のログイン情報} other {#件のログイン情報}}"
 
-#. placeholder {0}: thread.unreadCount
-msgid "{0, plural, one {# new reply} other {# new replies}}"
-msgstr "{0, plural, other {# 件の新しい返信}}"
-
-#. placeholder {0}: actorIds.length
-msgid "{0, plural, one {# other} other {# others}}"
-msgstr "{0, plural, other {他 # 人}}"
-
 #. placeholder {0}: summary.passed
 msgid "{0, plural, one {# passed} other {# passed}}"
 msgstr "{0, plural, one {#件成功} other {#件成功}}"
@@ -232,11 +224,6 @@ msgstr "{0, plural, one {# 件のプロジェクト} other {# 件のプロジェ
 #. placeholder {0}: stack.layers.length
 msgid "{0, plural, one {# pull request} other {# pull requests}}"
 msgstr "{0, plural, other {# 件のプルリクエスト}}"
-
-#. placeholder {0}: data.replies.length
-#. placeholder {0}: message.replyCount
-msgid "{0, plural, one {# reply} other {# replies}}"
-msgstr "{0, plural, other {# 件の返信}}"
 
 #. placeholder {0}: repositories.length
 #. placeholder {0}: selectedProjects.length
@@ -456,10 +443,6 @@ msgstr "{0} の分岐"
 msgid "{0} cannot be signed in this way yet."
 msgstr "{0}はまだこの方法ではサインインできません。"
 
-#. placeholder {0}: creator.name
-msgid "{0} created this channel on {created}."
-msgstr "{0} が {created} にこのチャンネルを作成しました。"
-
 #. placeholder {0}: formatNumber(participants)
 msgid "{0} developers are ranked by agent usage. Your last 30 days are already counted, just hidden. Token counts and model names only, no repo names, file paths or prompts."
 msgstr "{0}人の開発者がエージェント利用量でランク付けされています。あなたの直近30日はすでに集計済みで、非表示になっているだけです。公開されるのはトークン数とモデル名のみで、リポジトリ名・ファイルパス・プロンプトは含まれません。"
@@ -571,10 +554,6 @@ msgstr "{0} / {1} GB"
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{totalCount}件中{0}件目"
-
-#. placeholder {0}: creator.name
-msgid "{0} on {created}"
-msgstr "{0}（{created}）"
 
 #. placeholder {0}: plugin.interface.displayName
 msgid "{0} options"
@@ -890,9 +869,6 @@ msgstr "{count, plural, one {#件のコメント} other {#件のコメント}}"
 msgid "{count, plural, one {# file} other {# files}}"
 msgstr "{count, plural, one {#件のファイル} other {#件のファイル}}"
 
-msgid "{count, plural, one {# new message} other {# new messages}}"
-msgstr "{count, plural, other {# 件の新着メッセージ}}"
-
 msgid "{count, plural, one {# search} other {# searches}}"
 msgstr "{count, plural, one {#件の検索} other {#件の検索}}"
 
@@ -1079,9 +1055,6 @@ msgstr "{hidden, plural, one {非表示の#行} other {非表示の#行}}"
 
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {非表示の#行を表示} other {非表示の#行を表示}}"
-
-msgid "{hidden, plural, one {Show # more reply} other {Show # more replies}}"
-msgstr "{hidden, plural, other {さらに # 件の返信を表示}}"
 
 msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
 msgstr "{hidden, plural, one {#件の返信を表示} other {#件の返信を表示}}"
@@ -1461,30 +1434,6 @@ msgstr "{size} トークン中 {used}"
 msgid "{used} used"
 msgstr "{used} 使用済み"
 
-msgid "{user} and {others} joined and left."
-msgstr "{user} と {others} が参加して退出しました。"
-
-msgid "{user} and {others} joined."
-msgstr "{user} と {others} が参加しました。"
-
-msgid "{user} and {others} left."
-msgstr "{user} と {others} が退出しました。"
-
-msgid "{user} and {others} rejoined."
-msgstr "{user} と {others} が再参加しました。"
-
-msgid "{user} joined and left."
-msgstr "{user} が参加して退出しました。"
-
-msgid "{user} joined."
-msgstr "{user} が参加しました。"
-
-msgid "{user} left."
-msgstr "{user} が退出しました。"
-
-msgid "{user} rejoined."
-msgstr "{user} が再参加しました。"
-
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
 
@@ -1609,9 +1558,6 @@ msgstr "<0>{displayName}</0>があなたのParadevアカウントへのアクセ
 
 msgid "<0>{primaryFont}</0> is not installed on this system. Falling back to the next available font."
 msgstr "<0>{primaryFont}</0>はこのシステムにインストールされていません。次に利用可能なフォントにフォールバックします。"
-
-msgid "<0>{who}</0> reacted with {shortcode}"
-msgstr "<0>{who}</0> が {shortcode} でリアクションしました"
 
 #. placeholder {0}: formatNumber(rank)
 #. placeholder {1}: formatNumber(total)
@@ -1836,6 +1782,9 @@ msgstr "友人・同僚"
 msgid "A gateway is signed in with an API key."
 msgstr "ゲートウェイは API キーでサインインします。"
 
+msgid "A group comes with a Dev of its own."
+msgstr "グループには専用のDevが付きます。"
+
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "夜中にアイデアが浮かんで目が覚めると、ついアプリを開いてしまいます。朝にはレビューできる状態になっています。"
 
@@ -1853,9 +1802,6 @@ msgstr "本番への変更の過半数が、人間が差分を読まないまま
 
 msgid "A manifest and a few skill files. Paradev puts it where every agent looks."
 msgstr "マニフェストと数個のスキルファイルだけ。Paradevが各エージェントの参照する場所に置きます。"
-
-msgid "a message from {authorName}"
-msgstr "{authorName}からのメッセージ"
 
 msgid "A new version of Paradev is out. Reload to continue."
 msgstr "Paradev の新しいバージョンがあります。続けるには再読み込みしてください。"
@@ -1920,10 +1866,6 @@ msgstr "タスクキーは英字で始まる 1〜5 文字の英数字です。"
 
 msgid "a teammate"
 msgstr "チームメンバー"
-
-#. placeholder {0}: routine.room.name
-msgid "A thread in #{0}"
-msgstr "#{0} のスレッド"
 
 msgid "A unique identifier for your organization (auto-generated from name)"
 msgstr "組織の一意の識別子(名前から自動生成)"
@@ -2055,9 +1997,6 @@ msgstr "APIキーの作成にはアクティブな組織が必要です"
 msgid "Active sessions"
 msgstr "アクティブなセッション"
 
-msgid "Activities"
-msgstr "アクティビティ"
-
 msgid "Activity"
 msgstr "アクティビティ"
 
@@ -2089,9 +2028,6 @@ msgstr "#{prNumber} をマージキューに追加しますか?"
 
 msgid "Add a comment…"
 msgstr "コメントを追加…"
-
-msgid "Add a description"
-msgstr "説明を追加"
 
 msgid "Add a description…"
 msgstr "説明を追加…"
@@ -2162,9 +2098,6 @@ msgstr "コメントを追加"
 msgid "Add custom audio"
 msgstr "カスタム音声を追加"
 
-msgid "Add Description"
-msgstr "説明を追加"
-
 msgid "Add description..."
 msgstr "説明を追加..."
 
@@ -2185,9 +2118,6 @@ msgstr "ファイルやアプリなどを追加(@)"
 
 msgid "Add GitHub organization"
 msgstr "GitHub 組織を追加"
-
-msgid "Add instructions"
-msgstr "指示を追加"
 
 #. placeholder {0}: issue.issueNumber
 msgid "Add issue #{0} to workspace"
@@ -2217,9 +2147,6 @@ msgstr "ユーザーを追加"
 msgid "Add people or teams by name or email"
 msgstr "名前またはメールアドレスでユーザーやチームを追加"
 
-msgid "Add People to Channel"
-msgstr "チャンネルにメンバーを追加"
-
 msgid "Add photos or files"
 msgstr "写真やファイルを追加"
 
@@ -2234,9 +2161,6 @@ msgstr "フォルダからプロジェクトを追加..."
 
 msgid "Add prompt e.g. look for crashes in $sentry"
 msgstr "プロンプトを追加 例: $sentryでクラッシュを探す"
-
-msgid "Add reaction…"
-msgstr "リアクションを追加…"
 
 msgid "Add repository"
 msgstr "リポジトリを追加"
@@ -2274,14 +2198,8 @@ msgstr "テストが不足している箇所に追加"
 msgid "Add the /automation prompt back to your message?"
 msgstr "/automation のプロンプトをメッセージに戻しますか？"
 
-msgid "Add them"
-msgstr "追加する"
-
 msgid "Add this label"
 msgstr "このラベルを追加"
-
-msgid "Add to channel"
-msgstr "チャンネルに追加"
 
 msgid "Add to Dictionary"
 msgstr "辞書に追加"
@@ -2303,9 +2221,6 @@ msgstr "サイドバーに追加"
 
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
-
-msgid "Add what it does"
-msgstr "役割を追加"
 
 msgid "Add your first project"
 msgstr "最初のプロジェクトを追加"
@@ -2629,14 +2544,8 @@ msgstr "すべて現在のタブで(ペイン分割)"
 msgid "All labels"
 msgstr "すべてのラベル"
 
-msgid "All messages"
-msgstr "すべてのメッセージ"
-
 msgid "All models"
 msgstr "すべてのモデル"
-
-msgid "All new messages"
-msgstr "すべての新着メッセージ"
 
 msgid "All objectives cleared. Top rung, nothing left to reach for."
 msgstr "すべての目標をクリア。最上段で、これ以上目指すものはありません。"
@@ -2779,35 +2688,8 @@ msgstr "ローカルブランチも削除"
 msgid "Also delete the local git branch when deleting a worktree workspace"
 msgstr "ワークツリーワークスペースを削除するときにローカルのgitブランチも削除する"
 
-msgid "Also edit the channel and its members"
-msgstr "チャンネルとメンバーも編集できます"
-
 msgid "Also viewing this page"
 msgstr "このページを見ている他のユーザー"
-
-msgid "Also, {user} and {others} joined and left."
-msgstr "また、{user} と {others} が参加して退出しました。"
-
-msgid "Also, {user} and {others} joined."
-msgstr "また、{user} と {others} が参加しました。"
-
-msgid "Also, {user} and {others} left."
-msgstr "また、{user} と {others} が退出しました。"
-
-msgid "Also, {user} and {others} rejoined."
-msgstr "また、{user} と {others} が再参加しました。"
-
-msgid "Also, {user} joined and left."
-msgstr "また、{user} が参加して退出しました。"
-
-msgid "Also, {user} joined."
-msgstr "また、{user} が参加しました。"
-
-msgid "Also, {user} left."
-msgstr "また、{user} が退出しました。"
-
-msgid "Also, {user} rejoined."
-msgstr "また、{user} が再参加しました。"
 
 msgid "Also: @superset/ui/ai-elements/braille-spinner"
 msgstr "その他: @superset/ui/ai-elements/braille-spinner"
@@ -2866,9 +2748,6 @@ msgstr "アップデートをインストールする準備ができました。
 msgid "Android is on the way. Be first to know when it ships."
 msgstr "Android 版を準備中です。リリース時にいち早くお知らせします。"
 
-msgid "Animals & Nature"
-msgstr "動物と自然"
-
 msgid "Animate the active terminal cursor."
 msgstr "アクティブなターミナルカーソルをアニメーションします。"
 
@@ -2910,12 +2789,6 @@ msgstr "この質問はデスクトップで回答するか、スキップして
 
 msgid "Answered"
 msgstr "回答済み"
-
-msgid "Answered {who} in #{channel}"
-msgstr "#{channel} で {who} に回答しました"
-
-msgid "Answered you in #{channel}"
-msgstr "#{channel} であなたに回答しました"
 
 msgid "Anthropic rejected this API key."
 msgstr "AnthropicがこのAPIキーを拒否しました。"
@@ -3149,18 +3022,8 @@ msgstr "アーカイブ"
 msgid "Archive {environmentName}?"
 msgstr "{environmentName} をアーカイブしますか？"
 
-msgid "Archive {name}?"
-msgstr "{name} をアーカイブしますか？"
-
-#. placeholder {0}: channel.name
-msgid "Archive #{0}?"
-msgstr "#{0} をアーカイブしますか？"
-
 msgid "Archive automation"
 msgstr "オートメーションをアーカイブ"
-
-msgid "Archive channel"
-msgstr "チャンネルをアーカイブ"
 
 msgid "Archive environment"
 msgstr "環境をアーカイブ"
@@ -3525,9 +3388,6 @@ msgstr "自分のレビュー待ち"
 msgid "Awaiting review from you or your team"
 msgstr "自分またはチームのレビュー待ち"
 
-msgid "Away"
-msgstr "離席中"
-
 msgid "Back"
 msgstr "戻る"
 
@@ -3746,9 +3606,6 @@ msgstr "下部ドロワー。タッチデバイスではスワイプで操作で
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "購入済み GB 時間の残り: {prepaid}"
-
-msgid "Bounce the Dock icon"
-msgstr "Dockアイコンを弾ませる"
 
 msgid "Box"
 msgstr "Box"
@@ -4054,9 +3911,6 @@ msgstr "コンフリクトなしでマージできます"
 msgid "Can my team share workspaces?"
 msgstr "チームでワークスペースを共有できますか？"
 
-msgid "Can only be viewed or joined by invitation"
-msgstr "招待された人のみ表示・参加できます"
-
 msgid "Can the headline say what happens after sign-up?"
 msgstr "登録後に何が起きるか見出しで伝えられますか？"
 
@@ -4299,29 +4153,11 @@ msgstr "{label} に変更中…"
 msgid "Changing..."
 msgstr "変更中..."
 
-msgid "Channel"
-msgstr "チャンネル"
-
 msgid "Channel created"
 msgstr "チャンネル作成"
 
-msgid "Channel details"
-msgstr "チャンネルの詳細"
-
-msgid "Channel Manager"
-msgstr "チャンネル管理者"
-
-msgid "Channel name"
-msgstr "チャンネル名"
-
 msgid "Channel not found"
 msgstr "チャンネルが見つかりません"
-
-msgid "Channel options"
-msgstr "チャンネルのオプション"
-
-msgid "Channels"
-msgstr "チャンネル"
 
 msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
 msgstr "購入した GB 時間が少なくなると、保存済みのカードに追加の GB 時間を請求します。"
@@ -4331,6 +4167,9 @@ msgstr "チャット"
 
 msgid "Chat closed"
 msgstr "チャットを閉じました"
+
+msgid "Chat details"
+msgstr "チャットの詳細"
 
 msgid "Chat history"
 msgstr "チャット履歴"
@@ -4346,6 +4185,9 @@ msgstr "チャット起動"
 
 msgid "Chat name"
 msgstr "チャット名"
+
+msgid "Chat not found"
+msgstr "チャットが見つかりません"
 
 msgid "Chat session not found"
 msgstr "チャットセッションが見つかりません"
@@ -4543,9 +4385,6 @@ msgstr "Paradevから通知するタイミングを選びます。"
 
 msgid "Choose where agents started from comments, design mode, and Pages open."
 msgstr "コメント、デザインモード、Pages から起動したエージェントを開く場所を選択します。"
-
-msgid "Choose your default skin tone"
-msgstr "デフォルトの肌の色を選択"
 
 msgid "Choosing this removes any credential saved here for {label}."
 msgstr "これを選ぶと、ここに保存されている {label} の認証情報は削除されます。"
@@ -4748,9 +4587,6 @@ msgstr "{0}を閉じる"
 msgid "Close {displayName}"
 msgstr "{displayName}を閉じる"
 
-msgid "Close {label} tab"
-msgstr "{label} タブを閉じる"
-
 #. placeholder {0}: data.number
 msgid "Close #{0}?"
 msgstr "#{0}をクローズしますか?"
@@ -4813,9 +4649,6 @@ msgstr "現在のワークスペースを閉じるか削除する"
 msgid "Close other apps using the microphone"
 msgstr "マイクを使用中の他のアプリを閉じてください"
 
-msgid "Close other tabs"
-msgstr "他のタブを閉じる"
-
 msgid "Close Others"
 msgstr "他を閉じる"
 
@@ -4858,9 +4691,6 @@ msgstr "タブを閉じる"
 
 msgid "Close Tab"
 msgstr "タブを閉じる"
-
-msgid "Close tabs to the right"
-msgstr "右側のタブを閉じる"
 
 msgid "Close terminal"
 msgstr "ターミナルを閉じる"
@@ -5526,9 +5356,6 @@ msgstr "制約"
 msgid "Contact"
 msgstr "お問い合わせ"
 
-msgid "Contact information"
-msgstr "連絡先"
-
 msgid "Contact sales"
 msgstr "営業に問い合わせる"
 
@@ -5728,9 +5555,6 @@ msgstr "リンクをコピー"
 msgid "Copy Link"
 msgstr "リンクをコピー"
 
-msgid "Copy link address"
-msgstr "リンクのアドレスをコピー"
-
 msgid "Copy Link Address"
 msgstr "リンクアドレスをコピー"
 
@@ -5752,9 +5576,6 @@ msgstr "Markdownをコピー"
 
 msgid "Copy message"
 msgstr "メッセージをコピー"
-
-msgid "Copy name"
-msgstr "名前をコピー"
 
 msgid "Copy on select"
 msgstr "選択でコピー"
@@ -6151,8 +5972,8 @@ msgstr "ブランチを更新できませんでした"
 msgid "serverError.plugins.credentialUnverified"
 msgstr "認証情報を確認できませんでした: {reason}"
 
-msgid "Couldn't add them to the channel"
-msgstr "チャンネルに追加できませんでした"
+msgid "Couldn't add them to the group"
+msgstr "グループに追加できませんでした"
 
 msgid "Couldn't add this repo"
 msgstr "このリポジトリを追加できませんでした"
@@ -6178,9 +5999,6 @@ msgstr "移動をキャンセルできませんでした"
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "マシンサイズを変更できませんでした: {0}"
-
-msgid "Couldn't change the routine"
-msgstr "ルーティンを変更できませんでした"
 
 msgid "Couldn't check"
 msgstr "確認できませんでした"
@@ -6217,9 +6035,6 @@ msgstr "スクリーンショットをコピーできませんでした"
 
 msgid "Couldn't create stack"
 msgstr "スタックを作成できませんでした"
-
-msgid "Couldn't create the channel"
-msgstr "チャンネルを作成できませんでした"
 
 msgid "Couldn't create workspace"
 msgstr "ワークスペースを作成できませんでした"
@@ -6277,9 +6092,6 @@ msgstr "以前のメッセージを読み込めませんでした。再試行"
 msgid "Couldn’t load environments. Try again"
 msgstr "環境を読み込めませんでした。再試行"
 
-msgid "Couldn't load its activity"
-msgstr "アクティビティを読み込めませんでした"
-
 msgid "Couldn't load pages"
 msgstr "ページを読み込めませんでした"
 
@@ -6291,6 +6103,9 @@ msgstr "実行履歴を読み込めませんでした"
 
 msgid "Couldn't load this run's payload."
 msgstr "この実行のペイロードを読み込めませんでした。"
+
+msgid "Couldn't load your chats. Trying again…"
+msgstr "チャットを読み込めませんでした。再試行しています…"
 
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "プロフィールを読み込めなかったため、編集は無効です。"
@@ -6385,12 +6200,6 @@ msgstr "編集を保存できませんでした"
 msgid "Couldn't save the change"
 msgstr "変更を保存できませんでした"
 
-msgid "Couldn't save the Dev"
-msgstr "Devを保存できませんでした"
-
-msgid "Couldn't save the routine"
-msgstr "ルーティンを保存できませんでした"
-
 msgid "Couldn't save your choice. Try again."
 msgstr "選択を保存できませんでした。もう一度お試しください。"
 
@@ -6407,15 +6216,6 @@ msgid "Couldn't send comment"
 msgstr "コメントを送信できませんでした"
 
 msgid "Couldn't send reply"
-msgstr "返信を送信できませんでした"
-
-msgid "Couldn't send the message"
-msgstr "メッセージを送信できませんでした"
-
-msgid "Couldn't send the message. Attach the files again."
-msgstr "メッセージを送信できませんでした。ファイルをもう一度添付してください。"
-
-msgid "Couldn't send the reply"
 msgstr "返信を送信できませんでした"
 
 msgid "Couldn't send to agent"
@@ -6522,9 +6322,6 @@ msgstr "作成"
 msgid "Create \"{newLabel}\""
 msgstr "「{newLabel}」を作成"
 
-msgid "Create a channel"
-msgstr "チャンネルを作成"
-
 msgid "Create a cloud environment"
 msgstr "クラウド環境を作成"
 
@@ -6575,6 +6372,9 @@ msgstr "環境を作成"
 
 msgid "Create failed: {message}"
 msgstr "作成に失敗しました: {message}"
+
+msgid "Create group"
+msgstr "グループを作成"
 
 msgid "Create group <0>\"{name}\"</0>"
 msgstr "グループ<0>「{name}」</0>を作成"
@@ -6697,9 +6497,6 @@ msgstr "作成 {0} · 最終使用 {1}"
 
 msgid "Created {ago}"
 msgstr "{ago}に作成"
-
-msgid "Created {created}"
-msgstr "{created} に作成"
 
 msgid "Created {createdAgo}"
 msgstr "{createdAgo}に作成"
@@ -6868,12 +6665,6 @@ msgstr "カスタムプロバイダー"
 msgid "Custom themes"
 msgstr "カスタムテーマ"
 
-msgid "Customize"
-msgstr "カスタマイズ"
-
-msgid "Customize {devName}"
-msgstr "{devName} をカスタマイズ"
-
 msgid "Customize commands"
 msgstr "コマンドをカスタマイズ"
 
@@ -6939,9 +6730,6 @@ msgstr "データとAPI"
 msgid "Data display"
 msgstr "データ表示"
 
-msgid "Date"
-msgstr "日付"
-
 msgid "Date created"
 msgstr "作成日"
 
@@ -6950,9 +6738,6 @@ msgstr "期間"
 
 msgid "Day"
 msgstr "日"
-
-msgid "Day of the month"
-msgstr "日にち"
 
 msgid "Day One"
 msgstr "デイワン"
@@ -6989,9 +6774,6 @@ msgstr "default · secondary · outline · ghost · link · destructive"
 
 msgid "Default ({defaultWorktreePath})"
 msgstr "デフォルト({defaultWorktreePath})"
-
-msgid "Default ({fallback})"
-msgstr "デフォルト ({fallback})"
 
 msgid "Default base for new workspaces. Override per-workspace at creation."
 msgstr "新しいワークスペースの既定のベース。作成時に個別に変更できます。"
@@ -7047,7 +6829,6 @@ msgid "Delete “{title}”?"
 msgstr "「{title}」を削除しますか?"
 
 #. placeholder {0}: organization.name
-#. placeholder {0}: routine.title
 #. placeholder {0}: secret.key
 msgid "Delete {0}?"
 msgstr "{0}を削除しますか?"
@@ -7119,9 +6900,6 @@ msgstr "プロジェクトを削除"
 
 msgid "Delete Project…"
 msgstr "プロジェクトを削除…"
-
-msgid "Delete routine"
-msgstr "ルーティンを削除"
 
 msgid "Delete script"
 msgstr "スクリプトを削除"
@@ -7349,9 +7127,6 @@ msgstr "現在地を検出する"
 msgid "Dev"
 msgstr "開発"
 
-msgid "Dev options"
-msgstr "Devのオプション"
-
 msgid "Dev sign in"
 msgstr "開発用サインイン"
 
@@ -7447,9 +7222,6 @@ msgstr "ワークスペースが起動すると差分が開きます"
 
 msgid "Digital Product Designer"
 msgstr "デジタルプロダクトデザイナー"
-
-msgid "Direct messages"
-msgstr "ダイレクトメッセージ"
 
 msgid "Direct mode"
 msgstr "ダイレクトモード"
@@ -7861,9 +7633,6 @@ msgstr "例: Engineering"
 msgid "e.g. My cloud reviews"
 msgstr "例: クラウドのレビュー"
 
-msgid "e.g. plan-budget"
-msgstr "例: plan-budget"
-
 #. placeholder {0}: formatNumber(MAX_ATTACHMENT_BYTES / 1024 / 1024)
 msgid "Each attachment is at most {0} MB."
 msgstr "添付ファイルは1件あたり最大{0} MBです。"
@@ -7923,17 +7692,8 @@ msgstr "編集"
 msgid "Edit {selectedName}"
 msgstr "{selectedName} を編集"
 
-msgid "Edit Channel Name"
-msgstr "チャンネル名を編集"
-
 msgid "Edit comment"
 msgstr "コメントを編集"
-
-msgid "Edit description"
-msgstr "説明を編集"
-
-msgid "Edit Description"
-msgstr "説明を編集"
 
 msgid "Edit Environment Variable"
 msgstr "環境変数を編集"
@@ -7952,9 +7712,6 @@ msgstr "GitHubで編集"
 
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
-
-msgid "Edit routine"
-msgstr "ルーティンを編集"
 
 msgid "Edit Run Script"
 msgstr "実行スクリプトを編集"
@@ -7996,6 +7753,9 @@ msgstr "編集中"
 
 msgid "Editing file..."
 msgstr "ファイルを編集中..."
+
+msgid "Editing message"
+msgstr "メッセージを編集中"
 
 msgid "editor"
 msgstr "エディタ"
@@ -8081,9 +7841,6 @@ msgstr "リモートアクセスを有効にし、Paradevを起動したまま�
 
 msgid "Enable skill"
 msgstr "スキルを有効にする"
-
-msgid "End repeat"
-msgstr "繰り返しの終了"
 
 msgid "End voice session"
 msgstr "音声セッションを終了"
@@ -8184,9 +7941,6 @@ msgstr "escで閉じる"
 msgid "esc to exit"
 msgstr "escで終了"
 
-msgid "Event"
-msgstr "イベント"
-
 msgid "Event log"
 msgstr "イベントログ"
 
@@ -8204,12 +7958,6 @@ msgstr "各エージェントは専用の Git worktree とブランチで動作�
 
 msgid "Every axis is carrying its weight for the next tier. Hold it and the tier follows."
 msgstr "すべての軸が次のティアのために働いています。これを維持すればティアは付いてきます。"
-
-msgid "Every channel and thread you follow."
-msgstr "フォロー中のすべてのチャンネルとスレッド。"
-
-msgid "Every day"
-msgstr "毎日"
 
 msgid "Every day at <0>9:00 AM</0>"
 msgstr "毎日 <0>午前9:00</0>"
@@ -8429,9 +8177,6 @@ msgstr "極小"
 
 msgid "Extra usage limit reached"
 msgstr "追加使用量の上限に達しました"
-
-msgid "Eyes"
-msgstr "目"
 
 msgid "F4 gate · {F4_GATE_SHARE}%"
 msgstr "F4ゲート · {F4_GATE_SHARE}%"
@@ -9141,9 +8886,6 @@ msgstr "チームを検索…"
 msgid "Find and fix a small bug"
 msgstr "小さなバグを見つけて修正"
 
-msgid "Find another reaction"
-msgstr "他のリアクションを探す"
-
 msgid "Find in Changes"
 msgstr "変更内を検索"
 
@@ -9167,9 +8909,6 @@ msgstr "このチャット内を検索"
 
 msgid "Find is not available for this page"
 msgstr "このページでは検索を使用できません"
-
-msgid "Find people and Devs"
-msgstr "メンバーと Dev を検索"
 
 msgid "Finder"
 msgstr "Finder"
@@ -9227,9 +8966,6 @@ msgstr "FK"
 
 msgid "Flag"
 msgstr "フラグ"
-
-msgid "Flags"
-msgstr "旗"
 
 msgid "Flame"
 msgstr "炎"
@@ -9294,9 +9030,6 @@ msgstr "新しいワークツリーにチェックアウトするフォルダを
 msgid "FOLLOW ON X"
 msgstr "Xでフォロー"
 
-msgid "Follow thread"
-msgstr "スレッドをフォロー"
-
 msgid "FOLLOW US"
 msgstr "フォローする"
 
@@ -9306,12 +9039,6 @@ msgstr "LinkedInでフォロー"
 msgid "Follow us on X/Twitter"
 msgstr "X/Twitterでフォロー"
 
-msgid "Followed up with {who} in #{channel}"
-msgstr "#{channel} で {who} へのフォローアップを行いました"
-
-msgid "Followed up with you in #{channel}"
-msgstr "#{channel} であなたへのフォローアップを行いました"
-
 msgid "Font family"
 msgstr "フォントファミリー"
 
@@ -9320,18 +9047,6 @@ msgstr "フォントサイズ"
 
 msgid "Font weight"
 msgstr "フォントウェイト"
-
-msgid "Food & Drink"
-msgstr "食べ物と飲み物"
-
-msgid "For 1 hour"
-msgstr "1時間"
-
-msgid "For 2 hours"
-msgstr "2時間"
-
-msgid "For 30 minutes"
-msgstr "30分"
 
 msgid "For a project, open the importer to link it."
 msgstr "プロジェクトの場合は、インポーターを開いてリンクしてください。"
@@ -9475,9 +9190,6 @@ msgstr "1ユーザーなら無料。Pro は {proPrice}/ユーザー/月から"
 msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
 msgstr "1ユーザーは無料。Pro は1ユーザーあたり月額 {proPrice} で、オートメーションとモバイルアプリが追加されます。Team は {teamPrice}です。有料プランでクラウドのワークスペースを利用できます。含まれる利用枠と超過分の従量料金は料金ページをご確認ください。"
 
-msgid "Frequently Used"
-msgstr "よく使う絵文字"
-
 msgid "Frequently<0/>asked questions"
 msgstr "よくある<0/>ご質問"
 
@@ -9607,9 +9319,6 @@ msgstr "{plan} を始める"
 msgid "Get an API key"
 msgstr "APIキーを取得"
 
-msgid "Get channel details"
-msgstr "チャンネルの詳細を表示"
-
 msgid "Get extensions"
 msgstr "拡張機能を入手"
 
@@ -9651,9 +9360,6 @@ msgstr "{organizationName}への招待が届きます"
 
 msgid "Getting the device ready"
 msgstr "デバイスを準備しています"
-
-msgid "Getting Work Done"
-msgstr "仕事に役立つ"
 
 msgid "Ghost"
 msgstr "Ghost"
@@ -9751,6 +9457,9 @@ msgstr "GitHubユーザー名…"
 msgid "Give Claude Code, Codex, or any CLI agent its own workspace and branch, then review every change in one place."
 msgstr "Claude Code、Codex、その他の CLI エージェントそれぞれに専用のワークスペースとブランチを用意し、すべての変更を一か所でレビューできます。"
 
+msgid "Give it a name and say what it is for."
+msgstr "名前を付けて、何のためのものか伝えてください。"
+
 msgid "Give me an example"
 msgstr "例を挙げて"
 
@@ -9841,11 +9550,17 @@ msgstr "グループの操作"
 msgid "Group by"
 msgstr "グループ化"
 
+msgid "Group name"
+msgstr "グループ名"
+
 msgid "Group new branches under a folder."
 msgstr "新しいブランチをフォルダにまとめます。"
 
 msgid "Grouping"
 msgstr "グループ化"
+
+msgid "Groups"
+msgstr "グループ"
 
 msgid "GTM & AI Automation Architect, Mistral AI"
 msgstr "GTM・AI自動化アーキテクト、Mistral AI"
@@ -9986,9 +9701,6 @@ msgstr "サイドバーから非表示"
 msgid "Hide log"
 msgstr "ログを隠す"
 
-msgid "Hide panel"
-msgstr "パネルを隠す"
-
 msgid "Hide Preview"
 msgstr "プレビューを隠す"
 
@@ -10124,9 +9836,6 @@ msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU /
 msgid "Hours assume a standard {vcpus} vCPU / {memoryGb} GB workspace. We meter GB-hours, the memory of the machine times the hours it runs, so a machine with twice the memory uses hours twice as fast."
 msgstr "時間は標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしています。計測単位は GB 時間（マシンのメモリ × 稼働時間）なので、メモリが 2 倍のマシンは時間を 2 倍の速さで消費します。"
 
-msgid "Hours between runs"
-msgstr "実行の間隔（時間）"
-
 msgid "Hover Card"
 msgstr "Hover Card"
 
@@ -10168,9 +9877,6 @@ msgstr "グループ化されたコマンドの開き方。"
 
 msgid "How is Paradev different from just running Claude Code in a terminal?"
 msgstr "ターミナルでClaude Codeを動かすのと何が違いますか?"
-
-msgid "How it should work and what to avoid"
-msgstr "作業の進め方と避けること"
 
 msgid "How it works"
 msgstr "仕組み"
@@ -10294,9 +10000,6 @@ msgstr "移行する場合は、ブランチを保存し、残したいデータ
 
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Paradevを気に入っていただけたら、GitHubスターが他の開発者の発見につながります。"
-
-msgid "Ignore @channel and @here"
-msgstr "@channel と @here を無視"
 
 msgid "Illegal content"
 msgstr "違法なコンテンツ"
@@ -10503,9 +10206,6 @@ msgstr "アプリ内ブラウザ"
 msgid "In-app PR merge"
 msgstr "アプリ内でのPRマージ"
 
-msgid "Include a preview of the message"
-msgstr "メッセージのプレビューを表示"
-
 msgid "Include the Linear ticket id from the prompt in the branch name (e.g. bin-344-fix-login). Prefix branches with fix/ or feat/ based on the task."
 msgstr "プロンプトのLinearチケットIDをブランチ名に含める(例: bin-344-fix-login)。タスクに応じてブランチにfix/またはfeat/を付ける。"
 
@@ -10701,9 +10401,6 @@ msgstr "インターネットが切断されています"
 msgid "Interrupt"
 msgstr "中断"
 
-msgid "Interval"
-msgstr "間隔"
-
 msgid "Intro call"
 msgstr "カジュアル面談"
 
@@ -10878,11 +10575,11 @@ msgstr "元に戻すことはできません。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "\"{profileName}\" プロファイルの Cookie をアプリ内ブラウザにコピーします。エージェントはその後、あなたがログインしているサイトで操作できます。"
 
+msgid "It is yours alone. Talk to it here, and add it to groups when you want its help there."
+msgstr "あなた専用です。ここで話しかけ、手伝ってほしいときはグループに追加してください。"
+
 msgid "It keeps the title from your prompt."
 msgstr "プロンプトから付けたタイトルのままになります。"
-
-msgid "It loses all its access at once. Its chats and the work it made are kept."
-msgstr "すべてのアクセス権がただちに失われます。チャットと作成した成果物は残ります。"
 
 msgid "It may be asleep"
 msgstr "スリープ中かもしれません"
@@ -10901,9 +10598,6 @@ msgstr "接続が戻ると開きます。"
 
 msgid "It will reconnect on its own once the machine is back. Pull to check again."
 msgstr "マシンが復帰すれば自動的に再接続します。引っ張って再確認できます。"
-
-msgid "It's private, so you'll need an invitation to rejoin."
-msgstr "非公開のため、再参加するには招待が必要です。"
 
 msgid "Italic"
 msgstr "斜体"
@@ -10953,9 +10647,6 @@ msgstr "JetBrains"
 msgid "Join"
 msgstr "参加"
 
-msgid "Join channel"
-msgstr "チャンネルに参加"
-
 msgid "Join Discord"
 msgstr "Discordに参加"
 
@@ -10995,30 +10686,8 @@ msgstr "ウェイトリストに登録"
 msgid "Joined"
 msgstr "参加日"
 
-#. placeholder {0}: formatDate(member.createdAt, { month: "long", year: "numeric" })
-msgid "Joined {0}"
-msgstr "{0} に参加"
-
-msgid "joined {channel} along with {others}."
-msgstr "{others} と一緒に {channel} に参加しました。"
-
-msgid "joined {channel}."
-msgstr "{channel} に参加しました。"
-
-msgid "joined and left {channel} along with {others}."
-msgstr "{others} と一緒に {channel} に参加して退出しました。"
-
-msgid "joined and left {channel}."
-msgstr "{channel} に参加して退出しました。"
-
 msgid "Joining…"
 msgstr "参加中…"
-
-msgid "Jump"
-msgstr "移動"
-
-msgid "Jump to a specific date"
-msgstr "特定の日付に移動"
 
 msgid "Jump to file"
 msgstr "ファイルへジャンプ"
@@ -11026,17 +10695,11 @@ msgstr "ファイルへジャンプ"
 msgid "Jump to user message {position}"
 msgstr "ユーザーメッセージ{position}に移動"
 
-msgid "Jump to…"
-msgstr "移動先…"
-
 msgid "Just ask"
 msgstr "頼むだけ"
 
 msgid "Just me"
 msgstr "自分のみ"
-
-msgid "Just mentions"
-msgstr "メンションのみ"
 
 msgid "just now"
 msgstr "たった今"
@@ -11197,13 +10860,6 @@ msgstr "毎月末日"
 msgid "Last day of each month at {time}"
 msgstr "毎月末日 {time}"
 
-msgid "Last month"
-msgstr "先月"
-
-#. placeholder {0}: formatRelativeTime( Math.min(message.lastReplyAt.getTime(), now.getTime()), now, )
-msgid "Last reply {0}"
-msgstr "最後の返信 {0}"
-
 msgid "Last run"
 msgstr "最終実行"
 
@@ -11233,9 +10889,6 @@ msgstr "最終更新: {lastUpdated}"
 
 msgid "Last used"
 msgstr "前回使用"
-
-msgid "Last week"
-msgstr "先週"
 
 msgid "Late 2026"
 msgstr "2026年後半"
@@ -11294,13 +10947,6 @@ msgstr "スクリプトの使い方を見る"
 msgid "Learn more"
 msgstr "詳しく見る"
 
-msgid "Leave"
-msgstr "退出"
-
-#. placeholder {0}: channel.name
-msgid "Leave #{0}?"
-msgstr "#{0} から退出しますか？"
-
 msgid "Leave a comment"
 msgstr "コメントを残す"
 
@@ -11318,9 +10964,6 @@ msgstr "要約を入力…"
 
 msgid "Leave and delete"
 msgstr "退出して削除"
-
-msgid "Leave channel"
-msgstr "チャンネルから退出"
 
 msgid "Leave comment mode"
 msgstr "コメントモードを終了"
@@ -11357,12 +11000,6 @@ msgstr "組織から退出中..."
 
 msgid "Leaving..."
 msgstr "退出中..."
-
-msgid "left {channel} along with {others}."
-msgstr "{others} と一緒に {channel} から退出しました。"
-
-msgid "left {channel}."
-msgstr "{channel} から退出しました。"
 
 msgid "Left alone, changed since this turn: {skippedNames}"
 msgstr "このターンの後に変更されたため、そのままにしました: {skippedNames}"
@@ -11475,9 +11112,6 @@ msgstr "Linearがリクエストを制限しています。数分後にもう一
 
 msgid "Linear issues"
 msgstr "Linear issue"
-
-msgid "Linear project"
-msgstr "Linear プロジェクト"
 
 #. placeholder {0}: m.startLine
 #. placeholder {0}: metadata.startLine
@@ -11917,9 +11551,6 @@ msgstr "組織のブランディングとメンバーを管理します。"
 msgid "Managed"
 msgstr "管理対象"
 
-msgid "Managed by"
-msgstr "管理者"
-
 msgid "Managed by your organization admin."
 msgstr "組織の管理者によって管理されています。"
 
@@ -11938,14 +11569,8 @@ msgstr "手動サインイン"
 msgid "Manual sign-in"
 msgstr "手動サインイン"
 
-msgid "Mark all read"
-msgstr "すべて既読にする"
-
 msgid "Mark as not viewed"
 msgstr "未確認にする"
-
-msgid "Mark as read"
-msgstr "既読にする"
 
 msgid "Mark as Read"
 msgstr "既読にする"
@@ -11956,14 +11581,8 @@ msgstr "未読にする"
 msgid "Mark as viewed"
 msgstr "確認済みにする"
 
-msgid "Mark everything as read?"
-msgstr "すべて既読にしますか？"
-
 msgid "Mark Ready"
 msgstr "レビュー可能にする"
-
-msgid "Mark unread"
-msgstr "未読にする"
 
 msgid "Markdown"
 msgstr "Markdown"
@@ -12167,15 +11786,11 @@ msgstr "マージ中…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
-msgid "Message {name}"
-msgstr "{name} にメッセージを送信"
-
 msgid "Message {name}…"
 msgstr "{name} へのメッセージ…"
 
-#. placeholder {0}: channel.name
-msgid "Message #{0}"
-msgstr "#{0} へのメッセージ"
+msgid "Message {title}"
+msgstr "{title} にメッセージ"
 
 msgid "Message in channel"
 msgstr "チャンネルのメッセージ"
@@ -12188,9 +11803,6 @@ msgstr "メッセージ..."
 
 msgid "Messages"
 msgstr "メッセージ"
-
-msgid "Messages with these words notify you like a mention. Separate them with commas."
-msgstr "これらの語句を含むメッセージはメンションと同様に通知されます。カンマで区切って入力してください。"
 
 msgid "Microphone"
 msgstr "マイク"
@@ -12478,9 +12090,6 @@ msgstr "複数のプロジェクトがこのリポジトリ({0})を使用して�
 msgid "Mute"
 msgstr "ミュート"
 
-msgid "Mute channel"
-msgstr "チャンネルをミュート"
-
 msgid "Mute notifications"
 msgstr "通知をミュート"
 
@@ -12489,9 +12098,6 @@ msgstr "ミュート中"
 
 msgid "My Agent"
 msgstr "マイエージェント"
-
-msgid "My keywords"
-msgstr "マイキーワード"
 
 msgid "My Tasks"
 msgstr "マイタスク"
@@ -12517,6 +12123,9 @@ msgstr "名前を解決できません"
 
 msgid "Name updated!"
 msgstr "名前を更新しました!"
+
+msgid "Name your Dev"
+msgstr "Devに名前を付ける"
 
 msgid "Name, email, or team"
 msgstr "名前、メール、またはチーム"
@@ -12647,6 +12256,9 @@ msgstr "新しいチャット"
 msgid "New Chat"
 msgstr "新規チャット"
 
+msgid "New Dev"
+msgstr "新しいDev"
+
 msgid "New environment"
 msgstr "新しい環境"
 
@@ -12676,9 +12288,6 @@ msgstr "新しいグループ…"
 
 msgid "New issue"
 msgstr "新規issue"
-
-msgid "New messages"
-msgstr "新着メッセージ"
 
 msgid "New page"
 msgstr "新しいページ"
@@ -12816,9 +12425,6 @@ msgstr "良いアプローチ"
 msgid "Nice, open a PR when ready."
 msgstr "いいですね。準備ができたらPRを作成してください。"
 
-msgid "Nicely done"
-msgstr "よくできました"
-
 msgid "Nightly audit"
 msgstr "夜間監査"
 
@@ -12911,12 +12517,6 @@ msgstr "このブランチにはまだ変更がありません。"
 msgid "No changes to display."
 msgstr "表示する変更がありません。"
 
-msgid "No channel"
-msgstr "チャンネルなし"
-
-msgid "No channels"
-msgstr "チャンネルがありません"
-
 msgid "No chats found"
 msgstr "チャットが見つかりません"
 
@@ -12997,6 +12597,9 @@ msgstr "実行中のデバイスはありません。"
 
 msgid "No devices yet"
 msgstr "デバイスはまだありません"
+
+msgid "No Devs yet"
+msgstr "Devはまだいません"
 
 msgid "No downloads yet"
 msgstr "ダウンロードはまだありません"
@@ -13187,17 +12790,8 @@ msgstr "ここで利用できるモバイルシミュレーターがありませ
 msgid "No name on file"
 msgstr "登録された名前はありません"
 
-msgid "No one can post in it, and it leaves everyone's sidebar."
-msgstr "誰も投稿できなくなり、全員のサイドバーから消えます。"
-
 msgid "No one in {organizationName} matches. Type a full email to invite someone new."
 msgstr "{organizationName}に一致するユーザーはいません。新しいユーザーを招待するには、メールアドレスをすべて入力してください。"
-
-msgid "No one matches"
-msgstr "一致するメンバーはいません"
-
-msgid "No one to mention"
-msgstr "メンションできる人がいません"
 
 msgid "No open issues."
 msgstr "オープンなissueはありません。"
@@ -13401,9 +12995,6 @@ msgstr "タスクが見つかりません"
 msgid "No tasks found."
 msgstr "タスクが見つかりません。"
 
-msgid "No tasks in this channel yet."
-msgstr "このチャンネルにはまだタスクがありません。"
-
 msgid "No tasks in this project yet."
 msgstr "このプロジェクトにはまだタスクがありません。"
 
@@ -13436,15 +13027,6 @@ msgstr "テーマが見つかりません。"
 
 msgid "No themes were imported"
 msgstr "インポートされたテーマはありません"
-
-msgid "No threads or tasks match"
-msgstr "一致するスレッドやタスクはありません"
-
-msgid "No threads or tasks yet"
-msgstr "スレッドやタスクはまだありません"
-
-msgid "No threads yet"
-msgstr "スレッドはまだありません"
 
 msgid "No triggers"
 msgstr "トリガーなし"
@@ -13566,6 +13148,9 @@ msgstr "未接続"
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未接続 · クラウドワークスペースは組織の GitHub App としてプッシュします"
 
+msgid "Not delivered"
+msgstr "未配信"
+
 msgid "Not demoed here"
 msgstr "ここではデモしていません"
 
@@ -13577,9 +13162,6 @@ msgstr "見つかりません"
 
 msgid "Not granted"
 msgstr "未許可"
-
-msgid "Not in channel"
-msgstr "チャンネル外"
 
 msgid "Not included"
 msgstr "含まれない"
@@ -13645,9 +13227,6 @@ msgstr "メモ"
 msgid "Notes"
 msgstr "ノート"
 
-msgid "Nothing"
-msgstr "なし"
-
 msgid "Nothing here yet."
 msgstr "まだ何もありません。"
 
@@ -13672,14 +13251,8 @@ msgstr "まだ開く内容がありません。先にメッセージを送信し
 msgid "Nothing was missed"
 msgstr "未実行はありません"
 
-msgid "Nothing yet"
-msgstr "まだありません"
-
 msgid "Notice"
 msgstr "お知らせ"
-
-msgid "Notification schedule"
-msgstr "通知スケジュール"
 
 msgid "Notification sound"
 msgstr "通知サウンド"
@@ -13689,15 +13262,6 @@ msgstr "通知サウンド"
 
 msgid "Notifications"
 msgstr "通知"
-
-msgid "Notify every online member in this channel"
-msgstr "このチャンネルのオンラインのメンバー全員に通知"
-
-msgid "Notify everyone in this channel"
-msgstr "このチャンネルの全員に通知"
-
-msgid "Notify me about"
-msgstr "通知の対象"
 
 msgid "Notion is not configured for this environment."
 msgstr "この環境ではNotionが設定されていません。"
@@ -13732,9 +13296,6 @@ msgstr "OAuth 2.0"
 
 msgid "OAuth by default, API keys for CI"
 msgstr "既定はOAuth、CIにはAPIキー"
-
-msgid "Objects"
-msgstr "物"
 
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
@@ -13787,9 +13348,6 @@ msgstr "オン"
 msgid "on {offScopeHostName}, won't run here"
 msgstr "{offScopeHostName}上、ここでは実行されません"
 
-msgid "On a date"
-msgstr "指定日"
-
 msgid "On a Mac, Git comes with Apple's Command Line Tools."
 msgstr "Macでは、GitはAppleのCommand Line Toolsに含まれています。"
 
@@ -13825,9 +13383,6 @@ msgstr "オンスクリーンキーボード"
 
 msgid "Onboarding redesign"
 msgstr "オンボーディングの再設計"
-
-msgid "Once"
-msgstr "1回"
 
 msgid "One chat that plans a task, fans out parallel agents across worktrees, and brings the results back together."
 msgstr "1つのチャットがタスクを計画し、ワークツリーをまたいで並列エージェントに展開し、結果をまとめて返します。"
@@ -13994,9 +13549,6 @@ msgstr "このワークスペースを作成した人だけが変更できます
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "スレッドを削除できるのはスレッドの投稿者かページのオーナーのみです"
 
-msgid "Only visible to you"
-msgstr "あなただけに表示されています"
-
 msgid "Only want it out of your sidebar? Hide it instead. Nobody else is affected."
 msgstr "サイドバーから外したいだけですか？代わりに非表示にしてください。他のユーザーには影響しません。"
 
@@ -14111,12 +13663,6 @@ msgstr "変更を開く"
 
 msgid "Open Changes"
 msgstr "変更を開く"
-
-msgid "Open channel"
-msgstr "チャンネルを開く"
-
-msgid "Open channel details"
-msgstr "チャンネルの詳細を開く"
 
 msgid "Open Chat"
 msgstr "チャットを開く"
@@ -14287,9 +13833,6 @@ msgstr "T3 Chatで開く"
 msgid "Open in tab"
 msgstr "タブで開く"
 
-msgid "Open in Tasks"
-msgstr "タスクで開く"
-
 msgid "Open in…"
 msgstr "アプリで開く…"
 
@@ -14305,9 +13848,6 @@ msgstr "Linearでissueを開く"
 
 msgid "Open leaderboard"
 msgstr "リーダーボードを開く"
-
-msgid "Open link"
-msgstr "リンクを開く"
 
 msgid "Open Link as New Split"
 msgstr "リンクを新規分割で開く"
@@ -14683,9 +14223,6 @@ msgstr "出力スキーマ"
 
 msgid "Output truncated"
 msgstr "出力は省略されました"
-
-msgid "Outside these hours, channels do not notify you."
-msgstr "この時間外はチャンネルから通知されません。"
 
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
@@ -15076,9 +14613,6 @@ msgstr "一時停止"
 msgid "Pause automation"
 msgstr "オートメーションを一時停止"
 
-msgid "Pause notifications"
-msgstr "通知を一時停止"
-
 msgid "Pause the animation"
 msgstr "アニメーションを一時停止"
 
@@ -15091,10 +14625,6 @@ msgstr "一時停止中"
 msgctxt "project state"
 msgid "Paused"
 msgstr "一時停止"
-
-#. placeholder {0}: formatDateTime(pausedUntil, { timeStyle: "short" })
-msgid "Paused until {0}"
-msgstr "{0}まで一時停止中"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev の終了時に一時停止しました"
@@ -15627,9 +15157,6 @@ msgstr "プライベート"
 msgid "Private by default.<0/>You're in control."
 msgstr "既定でプライベート。<0/>主導権はあなたに。"
 
-msgid "Private: only specific people"
-msgstr "非公開：特定のメンバーのみ"
-
 msgid "Pro"
 msgstr "Pro"
 
@@ -15826,9 +15353,6 @@ msgstr "パブリック"
 
 msgid "Public leaderboard"
 msgstr "公開リーダーボード"
-
-msgid "Public: anyone in <0>{organizationName}</0>"
-msgstr "公開：<0>{organizationName}</0> の全員"
 
 msgid "Publish again and the link stays the same. Earlier versions are kept in the history."
 msgstr "もう一度公開してもリンクは変わりません。以前のバージョンは履歴に残ります。"
@@ -16080,9 +15604,6 @@ msgstr "共有のペイン/ワークスペースレイアウトエンジンのRe
 msgid "React Native"
 msgstr "React Native"
 
-msgid "React with {name}"
-msgstr "{name} でリアクション"
-
 msgid "Reaction added"
 msgstr "リアクション追加"
 
@@ -16116,9 +15637,6 @@ msgstr "{site} 上にある自分のデータの読み取りと変更"
 
 msgid "Read and plan without changing anything"
 msgstr "何も変更せずに読み取りと計画のみ"
-
-msgid "Read and post messages"
-msgstr "メッセージの閲覧と投稿"
 
 msgid "Read and send mail"
 msgstr "メールの閲覧と送信"
@@ -16192,12 +15710,6 @@ msgstr "使用量を取得中…"
 
 msgid "Reading your local usage…"
 msgstr "ローカルの使用量を読み取り中…"
-
-msgid "Reads and posts"
-msgstr "閲覧・投稿"
-
-msgid "Ready"
-msgstr "準備完了"
 
 msgid "Ready for review"
 msgstr "レビュー可能"
@@ -16375,18 +15887,6 @@ msgstr "このエージェントのグローバル設定にライフサイクル
 msgid "Reinstall {name}"
 msgstr "{name} を再インストール"
 
-msgid "rejoined {channel} by invitation from {inviter}, along with {others}."
-msgstr "{inviter} の招待で {others} と一緒に {channel} に再参加しました。"
-
-msgid "rejoined {channel} by invitation from {inviter}."
-msgstr "{inviter} の招待で {channel} に再参加しました。"
-
-msgid "rejoined {channel}, along with {others}."
-msgstr "{others} と一緒に {channel} に再参加しました。"
-
-msgid "rejoined {channel}."
-msgstr "{channel} に再参加しました。"
-
 msgid "Related Posts"
 msgstr "関連記事"
 
@@ -16497,9 +15997,6 @@ msgstr "添付ファイルを削除"
 
 msgid "Remove filter"
 msgstr "フィルターを削除"
-
-msgid "Remove from channel"
-msgstr "チャンネルから削除"
 
 msgid "Remove from favorites"
 msgstr "お気に入りから削除"
@@ -16640,9 +16137,6 @@ msgstr "セッションの名前を変更"
 msgid "rename the branch"
 msgstr "ブランチ名を変更する"
 
-msgid "Rename this channel"
-msgstr "このチャンネルの名前を変更"
-
 msgid "Rename workspace"
 msgstr "ワークスペースの名前を変更"
 
@@ -16693,12 +16187,6 @@ msgstr "再オープン中…"
 msgid "reorder agents"
 msgstr "エージェントを並べ替える"
 
-msgid "Repeat"
-msgstr "繰り返し"
-
-msgid "Repeat routine"
-msgstr "ルーティンを繰り返す"
-
 msgid "Replace"
 msgstr "置き換える"
 
@@ -16717,29 +16205,18 @@ msgstr "{replaced}件のファイルを{where}で置き換えました"
 msgid "Replaced 1 file in {where}"
 msgstr "1件のファイルを{where}で置き換えました"
 
-msgid "Replied to your DM"
-msgstr "あなたのダイレクトメッセージに返信しました"
-
 msgid "Reply"
 msgstr "返信"
-
-msgid "Reply in thread"
-msgstr "スレッドで返信"
 
 msgid "Reply to thread…"
 msgstr "スレッドに返信…"
 
-msgid "Reply…"
-msgstr "返信…"
-
-msgid "Replying in a thread"
-msgstr "スレッドで返信中"
+#. placeholder {0}: replyingTo.name
+msgid "Replying to {0}"
+msgstr "{0} に返信中"
 
 msgid "Replying to {replyingTo}"
 msgstr "{replyingTo} に返信"
-
-msgid "Replying to a DM"
-msgstr "ダイレクトメッセージに返信中"
 
 msgid "repo"
 msgstr "リポジトリ"
@@ -16890,9 +16367,6 @@ msgstr "Paradevと監視対象のターミナルプロセスツリーが使用�
 
 msgid "Resizable"
 msgstr "Resizable"
-
-msgid "Resize panel"
-msgstr "パネルのサイズを変更"
 
 msgid "Resize to {suggestedName}"
 msgstr "{suggestedName} に変更"
@@ -17108,9 +16582,6 @@ msgstr "リセット時に再開"
 msgid "Resume automation"
 msgstr "オートメーションを再開"
 
-msgid "Resume notifications"
-msgstr "通知を再開"
-
 #. placeholder {0}: candidate.agentLabel
 msgid "Resuming {0}…"
 msgstr "{0}を再開中…"
@@ -17281,10 +16752,6 @@ msgstr "ロール"
 msgid "Role changed to {newRoleName}"
 msgstr "ロールを{newRoleName}に変更しました"
 
-#. placeholder {0}: member.name
-msgid "Role for {0}"
-msgstr "{0} の役割"
-
 msgid "Role updated"
 msgstr "ロールを更新しました"
 
@@ -17306,9 +16773,6 @@ msgstr "自分で運用するプロバイダーと自分が持つ認証情報を
 msgid "Routine not found"
 msgstr "ルーティンが見つかりません"
 
-msgid "Routine options"
-msgstr "ルーティンのオプション"
-
 msgid "Routine tickets with no mid-task intervention"
 msgstr "途中の介入なしで完了する定型チケット"
 
@@ -17320,9 +16784,6 @@ msgstr "行の操作"
 
 msgid "Rows changed"
 msgstr "行の変更"
-
-msgid "Rule"
-msgstr "ルール"
 
 msgid "Run"
 msgstr "実行"
@@ -17482,9 +16943,6 @@ msgstr "マシン上でローカルコマンドを実行します"
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
 
-msgid "Runs in"
-msgstr "実行場所"
-
 msgid "Runs inside the Paradev app on that device, so updating it means updating the app there."
 msgstr "そのデバイスのParadevアプリ内で動作しているため、更新するにはそのデバイスのアプリを更新する必要があります。"
 
@@ -17550,9 +17008,6 @@ msgstr "環境として保存"
 
 msgid "Save as view"
 msgstr "ビューとして保存"
-
-msgid "Save Changes"
-msgstr "変更を保存"
 
 msgid "Save checkpoint"
 msgstr "チェックポイントを保存"
@@ -17719,9 +17174,6 @@ msgstr "ファイルの中身も、すべてのワークスペースも、まと
 msgid "Search all chats…"
 msgstr "すべてのチャットを検索…"
 
-msgid "Search all emoji"
-msgstr "すべての絵文字を検索"
-
 msgid "Search and open files in the current workspace"
 msgstr "現在のワークスペース内のファイルを検索して開く"
 
@@ -17839,9 +17291,6 @@ msgstr "プルリクエストを検索…"
 msgid "Search repositories..."
 msgstr "リポジトリを検索..."
 
-msgid "Search results"
-msgstr "検索結果"
-
 msgid "Search reviewers…"
 msgstr "レビュアーを検索…"
 
@@ -17877,9 +17326,6 @@ msgstr "ランキングで対戦相手を検索"
 
 msgid "Search the web"
 msgstr "Webを検索"
-
-msgid "Search threads and tasks"
-msgstr "スレッドとタスクを検索"
 
 msgid "Search triggers..."
 msgstr "トリガーを検索..."
@@ -18316,12 +17762,6 @@ msgstr "セッション"
 msgid "Sessions · top {0} by cost"
 msgstr "セッション · コスト上位{0}件"
 
-msgid "Set a notification schedule"
-msgstr "通知スケジュールを設定"
-
-msgid "Set channel…"
-msgstr "チャンネルを設定…"
-
 #. placeholder {0}: color.name
 msgid "Set color to {0}"
 msgstr "色を{0}に設定"
@@ -18429,9 +17869,6 @@ msgstr "shadcn/uiのtooltipレシピ"
 
 msgid "Shade is relative to this developer's busiest day"
 msgstr "濃さはこの開発者の最も活動量が多い日を基準にしています"
-
-msgid "Shape"
-msgstr "形"
 
 msgid "Share"
 msgstr "共有"
@@ -18637,9 +18074,6 @@ msgstr "Paradev CLI で何ができるか見せてください。`superset --hel
 
 msgid "Show more"
 msgstr "もっと見る"
-
-msgid "Show older"
-msgstr "以前のものを表示"
 
 msgid "Show on Sidebar"
 msgstr "サイドバーに表示"
@@ -18942,9 +18376,6 @@ msgstr "エージェント向けのスキルとMCPツール。自分のプラグ
 msgid "Skills ship with the Paradev plugin and are kept up to date automatically in every agent you use. Click one to preview it."
 msgstr "スキルはParadevプラグインに同梱され、使用するすべてのエージェントで自動的に最新の状態に保たれます。クリックしてプレビューできます。"
 
-msgid "Skin Tone"
-msgstr "肌の色"
-
 msgid "Skip"
 msgstr "スキップ"
 
@@ -19000,9 +18431,6 @@ msgstr "小、中、大から選べ、最大 8 vCPU・16 GB です。使用量�
 #. Footer call to action. Use the natural idiom for clearing a work backlog fast, not a literal translation of “smash”.
 msgid "Smash your backlog."
 msgstr "バックログを、一気に片付けよう。"
-
-msgid "Smileys & People"
-msgstr "スマイリーと人"
 
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
@@ -19068,10 +18496,6 @@ msgstr "一部の v1 の作業に対応が必要です"
 msgid "someone"
 msgstr "誰か"
 
-msgid "Someone"
-msgstr "誰か"
-
-msgctxt "reaction tooltip"
 msgid "Someone"
 msgstr "誰か"
 
@@ -19504,12 +18928,6 @@ msgstr "軌道修正"
 msgid "Step {0} of 2"
 msgstr "ステップ {0} / 2"
 
-msgid "Step 1 of 2"
-msgstr "ステップ 1/2"
-
-msgid "Step 2 of 2"
-msgstr "ステップ 2/2"
-
 msgid "Steps 3 and 4 repeat until the page is right."
 msgstr "ページが仕上がるまでステップ3と4を繰り返します。"
 
@@ -19725,9 +19143,6 @@ msgstr "GitHubスターでプロジェクトを応援"
 msgid "Supported agents"
 msgstr "対応エージェント"
 
-msgid "Surprise me"
-msgstr "おまかせ"
-
 msgid "Suspended"
 msgstr "停止中"
 
@@ -19847,9 +19262,6 @@ msgstr "{0} に {nextPlanName} に切り替わります。"
 msgid "Symbol, light"
 msgstr "シンボル（明色）"
 
-msgid "Symbols"
-msgstr "記号"
-
 msgid "Sync"
 msgstr "同期"
 
@@ -19943,14 +19355,8 @@ msgstr "使用済み"
 msgid "Takes effect in new agent sessions."
 msgstr "新しいエージェントセッションから有効になります。"
 
-msgid "Taking a look…"
-msgstr "確認中…"
-
 msgid "Taking longer than usual. It keeps going if you leave."
 msgstr "いつもより時間がかかっています。画面を離れても処理は続きます。"
-
-msgid "Talk to it"
-msgstr "話しかける"
 
 msgid "Talk to Paradev"
 msgstr "Paradevに相談する"
@@ -20654,9 +20060,6 @@ msgstr "ターンが失敗しました"
 msgid "The update can also:"
 msgstr "この更新では次の操作も可能になります:"
 
-msgid "The very beginning"
-msgstr "最初"
-
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "ワークスペースに接続できませんでした。起動していることを確認してから、もう一度お試しください。"
 
@@ -20889,9 +20292,6 @@ msgstr "通常より時間がかかっています。セッションはすでに
 msgid "This is taking longer than usual. The workspace may already be ready. Reloading can pick it up."
 msgstr "通常より時間がかかっています。ワークスペースはすでに準備できているかもしれません。再読み込みで表示される場合があります。"
 
-msgid "This is the very beginning of the {name} channel."
-msgstr "ここが {name} チャンネルの始まりです。"
-
 msgid "This issue link is invalid."
 msgstr "このissueリンクは無効です。"
 
@@ -20915,9 +20315,6 @@ msgstr "このマシンサイズは組織で利用できません。別のサイ
 
 msgid "This message is too long"
 msgstr "このメッセージは長すぎます"
-
-msgid "This message was deleted"
-msgstr "このメッセージは削除されました"
 
 msgid "This Microsoft tenant is already connected by {detail}. Ask them to disconnect first."
 msgstr "このMicrosoftテナントは{detail}がすでに接続しています。先に接続を解除してもらってください。"
@@ -21121,9 +20518,6 @@ msgstr "#{prNumber} をリベースで {base} にマージします。"
 msgid "This will merge #{prNumber} into {base} using squash."
 msgstr "#{prNumber} をスカッシュで {base} にマージします。"
 
-msgid "This will permanently delete the routine and stop future runs."
-msgstr "ルーティンは完全に削除され、今後の実行は停止します。"
-
 msgid "This will permanently delete this file. This action cannot be undone."
 msgstr "このファイルを完全に削除します。この操作は元に戻せません。"
 
@@ -21190,17 +20584,8 @@ msgstr "徹底的な推論"
 msgid "Thought for a few seconds"
 msgstr "数秒間思考しました"
 
-msgid "Thread"
-msgstr "スレッド"
-
-msgid "Thread in #{channelName}"
-msgstr "#{channelName} のスレッド"
-
 msgid "Thread not found"
 msgstr "スレッドが見つかりません"
-
-msgid "Threads"
-msgstr "スレッド"
 
 msgid "Three steps · touches packages/ui and apps/desktop"
 msgstr "3ステップ · packages/uiとapps/desktopに変更"
@@ -21220,9 +20605,6 @@ msgstr "時間"
 msgid "Time to first workspace"
 msgstr "最初のワークスペースまでの時間"
 
-msgid "Time zone"
-msgstr "タイムゾーン"
-
 msgid "Tinted"
 msgstr "色合い調整"
 
@@ -21231,9 +20613,6 @@ msgstr "ヒント"
 
 msgid "Title"
 msgstr "タイトル"
-
-msgid "to"
-msgstr "〜"
 
 msgid "To"
 msgstr "移動先"
@@ -21462,9 +20841,6 @@ msgstr "文字起こし中…"
 
 msgid "Translated"
 msgstr "翻訳済み"
-
-msgid "Travel & Places"
-msgstr "旅行と場所"
 
 msgid "Tree view"
 msgstr "ツリー表示"
@@ -21717,9 +21093,6 @@ msgstr "このカードのファイル変更を取り消しますか？"
 msgid "Undo the last archived workspace or closed chats"
 msgstr "直前のワークスペースのアーカイブまたはチャットのクローズを元に戻す"
 
-msgid "Unfollow thread"
-msgstr "スレッドのフォローを解除"
-
 msgid "Ungroup"
 msgstr "グループ解除"
 
@@ -21812,9 +21185,6 @@ msgstr "タスクのリンクを解除"
 msgid "Unmute"
 msgstr "ミュート解除"
 
-msgid "Unmute channel"
-msgstr "チャンネルのミュートを解除"
-
 msgid "Unmute notifications"
 msgstr "通知のミュートを解除"
 
@@ -21865,12 +21235,6 @@ msgstr "未ステージ"
 #. placeholder {0}: item.kind
 msgid "Unsupported item \"{0}\""
 msgstr "未対応のアイテム「{0}」"
-
-msgid "Until I open the app"
-msgstr "アプリを開くまで"
-
-msgid "Until tomorrow"
-msgstr "明日まで"
 
 msgid "Untitled"
 msgstr "無題"
@@ -22301,9 +21665,6 @@ msgstr "すべて表示"
 msgid "View All"
 msgstr "すべて表示"
 
-msgid "View all members of this channel"
-msgstr "このチャンネルのメンバーをすべて表示"
-
 #. placeholder {0}: comment.authorLogin
 msgid "View comment by {0}"
 msgstr "{0}のコメントを表示"
@@ -22347,9 +21708,6 @@ msgstr "Y Combinatorで募集中のポジションを見る"
 msgid "View Paradev repository on GitHub"
 msgstr "GitHubでParadevのリポジトリを見る"
 
-msgid "View profile"
-msgstr "プロフィールを表示"
-
 msgid "View pull request"
 msgstr "プルリクエストを表示"
 
@@ -22374,9 +21732,6 @@ msgstr "表示中"
 
 msgid "Violence or harassment"
 msgstr "暴力または嫌がらせ"
-
-msgid "Visibility"
-msgstr "公開範囲"
 
 msgid "Visible to"
 msgstr "公開範囲"
@@ -22455,18 +21810,6 @@ msgstr "警告"
 
 msgid "Warning occurred."
 msgstr "警告が発生しました。"
-
-msgid "was added to {channel} by {inviter}, along with {others}."
-msgstr "{inviter} により {others} と一緒に {channel} に追加されました。"
-
-msgid "was added to {channel} by {inviter}."
-msgstr "{inviter} により {channel} に追加されました。"
-
-msgid "was added to this conversation by {inviter}."
-msgstr "{inviter} によりこの会話に追加されました。"
-
-msgid "was removed from this conversation by {inviter}."
-msgstr "{inviter} によりこの会話から削除されました。"
 
 msgid "Watch a design review go from comment to new version."
 msgstr "デザインレビューがコメントから新しいバージョンになるまでをご覧ください。"
@@ -22667,8 +22010,8 @@ msgstr "Paradev Enterpriseとは何ですか?"
 msgid "What is wrong?"
 msgstr "何が問題ですか？"
 
-msgid "What it does"
-msgstr "役割"
+msgid "What it does, and how you want it to work"
+msgstr "何をするか、どのように動いてほしいか"
 
 msgid "What platforms does Paradev run on?"
 msgstr "Paradevはどのプラットフォームで動きますか?"
@@ -22723,9 +22066,6 @@ msgstr "新着情報"
 
 msgid "What's next"
 msgstr "今後の予定"
-
-msgid "When a channel notifies you"
-msgstr "チャンネルから通知されるとき"
 
 msgid "When a trigger fires, the Mac you picked opens a new workspace and the agent starts on your prompt. Event runs include the event, so the agent knows what to look at. Reply to the run to keep going."
 msgstr "トリガーが発火すると、選んだMacが新しいワークスペースを開き、エージェントがプロンプトに取りかかります。イベントによる実行にはそのイベントが含まれるので、エージェントは何を見ればよいか分かります。続けるには実行に返信します。"
@@ -22864,9 +22204,6 @@ msgstr "作業時間 {0}分{1}秒"
 
 msgid "Working for {seconds}s"
 msgstr "作業時間 {seconds}秒"
-
-msgid "Working on a mention"
-msgstr "メンションに対応中"
 
 msgid "Working…"
 msgstr "処理中…"
@@ -23117,10 +22454,6 @@ msgstr "自分"
 msgid "You"
 msgstr "あなた"
 
-msgctxt "reaction tooltip"
-msgid "You"
-msgstr "あなた"
-
 msgid "YOU"
 msgstr "あなた"
 
@@ -23188,9 +22521,6 @@ msgstr "この操作は元に戻せません。ターミナルペインに「Pro
 msgid "You control the access"
 msgstr "アクセス権はあなたが管理します"
 
-msgid "You created this channel on {created}."
-msgstr "{created} にこのチャンネルを作成しました。"
-
 msgid "You declined the {plugin} authorization request."
 msgstr "{plugin} の認可リクエストを拒否しました。"
 
@@ -23211,9 +22541,6 @@ msgstr "保存していない環境変数があります。閉じてもよろし
 
 msgid "You install and connect once per account."
 msgstr "インストールと接続は、アカウントごとに一度だけです。"
-
-msgid "You mentioned {names}, but they're not in #{channelName}. Add them to the channel?"
-msgstr "{names}をメンションしましたが、#{channelName} のメンバーではありません。チャンネルに追加しますか？"
 
 msgid "You need to be part of an organization to connect accounts."
 msgstr "アカウントを接続するには、組織に所属している必要があります。"
@@ -23272,9 +22599,6 @@ msgstr "サインインしました"
 
 msgid "You're up to date!"
 msgstr "最新の状態です!"
-
-msgid "You're viewing #{channelName}"
-msgstr "#{channelName} を表示しています"
 
 msgid "You've been invited to join {organization}"
 msgstr "{organization}への招待が届いています"

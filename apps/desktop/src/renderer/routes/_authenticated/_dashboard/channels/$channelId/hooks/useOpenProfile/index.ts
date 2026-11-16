@@ -1,1 +1,0 @@
-export { useOpenProfile } from "./useOpenProfile";

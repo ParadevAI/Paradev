@@ -1,1 +1,0 @@
-export { MessageAttachments } from "./MessageAttachments";

@@ -1,5 +1,4 @@
 import { Trans } from "@lingui/react/macro";
-import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 import {
@@ -67,7 +66,6 @@ export function TaskTimelineEvent({
 	onOpenWorkspace,
 }: TaskTimelineEventProps) {
 	const priorityLabels = usePriorityLabels();
-	const navigate = useNavigate();
 	const actor = (
 		<TimelineActor actor={event.actor} onOpenPerson={onOpenPerson} />
 	);
@@ -108,17 +106,10 @@ export function TaskTimelineEvent({
 	);
 
 	const channel = (value: TaskChannelValue) => (
-		<RecordInlineLink
-			icon={<LuHash className="size-3.5 text-muted-foreground" />}
-			onClick={() =>
-				void navigate({
-					to: "/channels/$channelId",
-					params: { channelId: value.id },
-				})
-			}
-		>
+		<span className="inline-flex items-center gap-1 font-medium">
+			<LuHash className="size-3.5 text-muted-foreground" />
 			{value.name}
-		</RecordInlineLink>
+		</span>
 	);
 
 	let sentence: ReactNode;

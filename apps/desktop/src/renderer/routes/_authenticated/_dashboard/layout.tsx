@@ -17,7 +17,6 @@ import { WorkspaceSidebarPanel } from "renderer/routes/_authenticated/_dashboard
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
 import { useResumeMovesToThisComputer } from "renderer/routes/_authenticated/_dashboard/hooks/useResumeMovesToThisComputer";
-import { useChatTabsStore } from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDevSeedV2Sidebar } from "renderer/routes/_authenticated/hooks/useDevSeedV2Sidebar";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
@@ -32,8 +31,8 @@ import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedSt
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { ContentBoundary } from "../components/ContentBoundary";
+import { ChatsStoreBridge } from "./chats/components/ChatsStoreBridge";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
-import { ChatTabs } from "./components/ChatTabs";
 import { ContentCard } from "./components/ContentCard";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
 import { NavigationRail } from "./components/NavigationRail";
@@ -85,7 +84,6 @@ function DashboardLayout() {
 		const stopAutomationFailuresSync = syncPersistedStoreAcrossWindows(
 			useAutomationFailuresStore,
 		);
-		const stopChatTabsSync = syncPersistedStoreAcrossWindows(useChatTabsStore);
 
 		return () => {
 			stopWorkspaceSidebarSync();
@@ -93,7 +91,6 @@ function DashboardLayout() {
 			stopAgentStateSync();
 			stopCloudSidebarSync();
 			stopAutomationFailuresSync();
-			stopChatTabsSync();
 		};
 	}, []);
 	// Get current workspace from route to pre-select project in new workspace modal
@@ -279,13 +276,13 @@ function DashboardLayout() {
 		>
 			<PortForwardsProvider>
 				<RemotePortForwarder />
+				<ChatsStoreBridge />
 				{isParadevShell ? (
 					<>
 						<CommandPaletteHost />
 						<TitleBarSlotsProvider>
 							<div className="flex h-full w-full flex-col overflow-hidden bg-shell-frame">
 								<TitleBar />
-								<ChatTabs />
 								<div className="flex min-h-0 flex-1">
 									<NavigationRail />
 									<WorkspaceSidebarPanel

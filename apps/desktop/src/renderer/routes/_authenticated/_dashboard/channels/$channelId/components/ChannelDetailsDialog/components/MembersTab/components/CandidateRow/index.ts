@@ -1,1 +1,0 @@
-export { CandidateRow } from "./CandidateRow";

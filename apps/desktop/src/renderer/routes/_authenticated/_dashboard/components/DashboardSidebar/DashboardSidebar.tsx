@@ -25,6 +25,7 @@ import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
+import { ChatsSidebar } from "renderer/routes/_authenticated/_dashboard/chats/components/ChatsSidebar";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
@@ -35,8 +36,6 @@ import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-section
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
-import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
-import { DashboardSidebarDevsSection } from "./components/DashboardSidebarDevsSection";
 import { DashboardSidebarGithubNotice } from "./components/DashboardSidebarGithubNotice";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHiddenProjects } from "./components/DashboardSidebarHiddenProjects";
@@ -541,12 +540,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 												fadeEdges={["top", "bottom"]}
 												className="flex-1 overflow-y-auto hide-scrollbar"
 											>
-												{isChannelsEnabled && isChatSection && (
-													<>
-														<DashboardSidebarChannelsSection />
-														<DashboardSidebarDevsSection />
-													</>
-												)}
+												{isChannelsEnabled && isChatSection && <ChatsSidebar />}
 												{!isChatSection && (
 													<>
 														<DashboardSidebarGithubNotice
@@ -572,12 +566,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 												status={githubStatus}
 												isCollapsed={isCollapsed}
 											/>
-											{isChannelsEnabled && !isCollapsed && (
-												<>
-													<DashboardSidebarChannelsSection />
-													<DashboardSidebarDevsSection />
-												</>
-											)}
+											{isChannelsEnabled && !isCollapsed && <ChatsSidebar />}
 											{workspaceList}
 										</OverflowFadeContainer>
 										{cardSlot}

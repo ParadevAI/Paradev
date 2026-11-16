@@ -1,1 +1,0 @@
-export { ThreadCard } from "./ThreadCard";

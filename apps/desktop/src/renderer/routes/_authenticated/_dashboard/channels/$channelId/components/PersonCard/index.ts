@@ -1,1 +1,0 @@
-export { PersonCard } from "./PersonCard";

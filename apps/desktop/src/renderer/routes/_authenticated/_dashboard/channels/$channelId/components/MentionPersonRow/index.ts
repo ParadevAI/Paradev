@@ -1,1 +1,0 @@
-export { MentionPersonRow } from "./MentionPersonRow";
