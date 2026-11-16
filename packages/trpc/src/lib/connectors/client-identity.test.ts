@@ -36,6 +36,8 @@ stub(crypto, {
 const { ForgottenClientError, resolveClientIdentity } = await import(
 	"./client-identity"
 );
+const { exchangeCode } = await import("./index");
+const { connectorMethod, requireConnector } = await import("./index");
 
 const ISSUER = "https://api.useautumn.com/api/auth";
 const REDIRECT = "https://api.test/api/connectors/callback/autumn_mcp";
@@ -178,6 +180,156 @@ describe("an issued grant", () => {
 		await expect(resolve({ issuedTo: "old-client" })).rejects.toBeInstanceOf(
 			ForgottenClientError,
 		);
+		expect(registrations).toHaveLength(0);
+	});
+});
+
+describe("ahrefs_mcp, which declares client_secret_post", () => {
+	const AHREFS = "https://api.ahrefs.com/";
+	const AHREFS_REDIRECT = "https://api.test/api/connectors/callback/ahrefs_mcp";
+	const ahrefs = connectorMethod(requireConnector("ahrefs_mcp"));
+	let tokenRequests: Array<{ headers: Headers; body: URLSearchParams }> = [];
+
+	const routes: Record<string, unknown> = {
+		"https://api.ahrefs.com/.well-known/oauth-protected-resource/mcp/mcp": {
+			resource: AHREFS,
+			authorization_servers: [AHREFS],
+		},
+		"https://api.ahrefs.com/.well-known/oauth-authorization-server": {
+			issuer: AHREFS,
+			authorization_endpoint: "https://app.ahrefs.com/web/oauth/authorize",
+			token_endpoint: "https://ahrefs.com/oauth/token",
+			registration_endpoint: "https://api.ahrefs.com/mcp/register",
+			code_challenge_methods_supported: ["S256"],
+			grant_types_supported: ["implicit", "authorization_code"],
+		},
+	};
+
+	beforeEach(() => {
+		tokenRequests = [];
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const url = String(input);
+			if (url === "https://api.ahrefs.com/mcp/register") {
+				const body = JSON.parse(String(init?.body));
+				registrations.push(body);
+				return Response.json({
+					client_id: "s0+9mC/zxw==",
+					client_secret: "Fbmr+ShP/caa==",
+					token_endpoint_auth_method: body.token_endpoint_auth_method,
+				});
+			}
+			if (url === "https://ahrefs.com/oauth/token") {
+				tokenRequests.push({
+					headers: new Headers(init?.headers),
+					body: new URLSearchParams(String(init?.body)),
+				});
+				return Response.json({
+					access_token: "ahrefs-token",
+					token_type: "Bearer",
+				});
+			}
+			const route = routes[url];
+			return route === undefined
+				? new Response("no route", { status: 404 })
+				: Response.json(route);
+		}) as typeof fetch;
+	});
+
+	const exchange = (clientId: string | null) =>
+		exchangeCode("ahrefs_mcp", ahrefs, {
+			code: "the-code",
+			redirectUri: AHREFS_REDIRECT,
+			codeVerifier: "the-verifier",
+			clientId,
+		});
+
+	const ahrefsClient = (overrides: Record<string, unknown> = {}) =>
+		client({
+			issuer: AHREFS,
+			redirectUri: AHREFS_REDIRECT,
+			scopes: ["apiv3-mcp"],
+			...overrides,
+		});
+
+	test("registers with the declared method, not the default basic", async () => {
+		const identity = await resolveClientIdentity(
+			"ahrefs_mcp",
+			{
+				resource: AHREFS,
+				issuer: AHREFS,
+				metadata:
+					routes[
+						"https://api.ahrefs.com/.well-known/oauth-authorization-server"
+					],
+			} as never,
+			ahrefs,
+			AHREFS_REDIRECT,
+			{ newGrant: true },
+		);
+
+		expect(registrations[0]?.token_endpoint_auth_method).toBe(
+			"client_secret_post",
+		);
+		expect(identity.authentication).toBe("post");
+	});
+
+	test("replaces a stored basic client on a new connect", async () => {
+		rows = [ahrefsClient({ tokenEndpointAuthMethod: "client_secret_basic" })];
+
+		const identity = await resolveClientIdentity(
+			"ahrefs_mcp",
+			{
+				resource: AHREFS,
+				issuer: AHREFS,
+				metadata:
+					routes[
+						"https://api.ahrefs.com/.well-known/oauth-authorization-server"
+					],
+			} as never,
+			ahrefs,
+			AHREFS_REDIRECT,
+			{ newGrant: true },
+		);
+
+		expect(identity.clientId).toBe("s0+9mC/zxw==");
+		expect(registrations).toHaveLength(1);
+	});
+
+	test("sends the client id and secret in the body, with no Basic header", async () => {
+		rows = [
+			ahrefsClient({
+				clientId: "s0+9mC/zxw==",
+				clientSecret: "Fbmr+ShP/caa==",
+			}),
+		];
+
+		const tokens = await exchange("s0+9mC/zxw==");
+
+		expect(tokens.accessToken).toBe("ahrefs-token");
+		const [request] = tokenRequests;
+		expect(request?.headers.get("authorization")).toBeNull();
+		expect(request?.body.get("client_id")).toBe("s0+9mC/zxw==");
+		expect(request?.body.get("client_secret")).toBe("Fbmr+ShP/caa==");
+		expect(request?.body.get("code")).toBe("the-code");
+		expect(request?.body.get("code_verifier")).toBe("the-verifier");
+		expect(request?.body.get("redirect_uri")).toBe(AHREFS_REDIRECT);
+	});
+
+	test("a code issued to a stored basic client is still redeemed in the body", async () => {
+		rows = [
+			ahrefsClient({
+				clientId: "basic+client",
+				clientSecret: "basic/secret=",
+				tokenEndpointAuthMethod: "client_secret_basic",
+			}),
+		];
+
+		await exchange("basic+client");
+
+		const [request] = tokenRequests;
+		expect(request?.headers.get("authorization")).toBeNull();
+		expect(request?.body.get("client_id")).toBe("basic+client");
+		expect(request?.body.get("client_secret")).toBe("basic/secret=");
 		expect(registrations).toHaveLength(0);
 	});
 });

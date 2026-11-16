@@ -50,10 +50,14 @@ export function issuedGrantRedirectUris(
 	]);
 }
 
+type DeclaredAuthMethod = ConnectorMethod["token_request_auth_method"];
+
 function pickAuthMethod(
 	supported: string[] | undefined,
 	issuer: string,
+	declared: DeclaredAuthMethod,
 ): "client_secret_post" | "client_secret_basic" | "none" {
+	if (declared) return declared;
 	const methods = supported ?? ["client_secret_basic"];
 	if (methods.includes("client_secret_post")) return "client_secret_post";
 	if (methods.includes("client_secret_basic")) return "client_secret_basic";
@@ -92,6 +96,7 @@ function unexpired(row: StoredClientRow): boolean {
 async function storedClient(
 	issuer: string,
 	redirectUri: string | string[],
+	declared: DeclaredAuthMethod,
 	pick: { clientId: string } | { coveringScopes: string[] } | { legacy: true },
 ): Promise<ClientIdentity | null> {
 	const rows = await db
@@ -123,6 +128,7 @@ async function storedClient(
 					rows.find(
 						(candidate) =>
 							unexpired(candidate) &&
+							authenticates(candidate, declared) &&
 							pick.coveringScopes.every((scope) =>
 								candidate.scopes?.includes(scope),
 							),
@@ -132,6 +138,18 @@ async function storedClient(
 		row.clientId,
 		await decryptOptional(row.clientSecret),
 		row.tokenEndpointAuthMethod,
+		declared,
+	);
+}
+
+function authenticates(
+	row: StoredClientRow,
+	declared: DeclaredAuthMethod,
+): boolean {
+	return (
+		!declared ||
+		!authenticationFor(row.tokenEndpointAuthMethod) ||
+		row.tokenEndpointAuthMethod === declared
 	);
 }
 
@@ -139,8 +157,11 @@ function identity(
 	clientId: string,
 	secret: string | null | undefined,
 	tokenEndpointAuthMethod: string | null,
+	declared: DeclaredAuthMethod,
 ): ClientIdentity {
-	const authentication = authenticationFor(tokenEndpointAuthMethod);
+	const authentication = authenticationFor(
+		secret && declared ? declared : tokenEndpointAuthMethod,
+	);
 	return {
 		clientId,
 		...(secret ? { clientSecret: secret } : {}),
@@ -164,6 +185,7 @@ async function register(
 	const tokenEndpointAuthMethod = pickAuthMethod(
 		server.metadata.token_endpoint_auth_methods_supported,
 		server.issuer,
+		method.token_request_auth_method,
 	);
 	const response = await credentialFetch(
 		endpoint,
@@ -243,7 +265,12 @@ async function register(
 			set: row,
 		});
 
-	return identity(payload.client_id, payload.client_secret, resolvedAuthMethod);
+	return identity(
+		payload.client_id,
+		payload.client_secret,
+		resolvedAuthMethod,
+		method.token_request_auth_method,
+	);
 }
 
 const registering = new Map<string, Promise<ClientIdentity>>();
@@ -257,11 +284,13 @@ export async function resolveClientIdentity(
 ): Promise<ClientIdentity> {
 	const metadataUrl = clientMetadataUrl(connectorSlug);
 	const issuedTo = "issuedTo" in client ? client.issuedTo : null;
+	const declared = method.token_request_auth_method;
 	if (issuedTo === metadataUrl) return { clientId: metadataUrl };
 	if (issuedTo) {
 		const bound = await storedClient(
 			server.issuer,
 			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
 			{
 				clientId: issuedTo,
 			},
@@ -283,6 +312,7 @@ export async function resolveClientIdentity(
 		const legacy = await storedClient(
 			server.issuer,
 			issuedGrantRedirectUris(connectorSlug, redirectUri),
+			declared,
 			{
 				legacy: true,
 			},
@@ -291,7 +321,7 @@ export async function resolveClientIdentity(
 		return legacy;
 	}
 
-	const existing = await storedClient(server.issuer, redirectUri, {
+	const existing = await storedClient(server.issuer, redirectUri, declared, {
 		coveringScopes: scopes,
 	});
 	if (existing) return existing;
