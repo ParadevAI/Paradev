@@ -273,6 +273,44 @@ async function register(
 	);
 }
 
+const CLIENT_REJECTION =
+	/invalid_client|(unrecognized|unknown|unregistered|invalid)[ _]client|client(_id)?( is)? not (found|registered|recognized)/i;
+const PROBE_TIMEOUT_MS = 5000;
+const PROBE_CODE_CHALLENGE = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM";
+
+// A server may delete a registration it issued (Supabase does when the first
+// approval takes over 15 minutes), and says so only on its authorize page.
+async function authorizationRejectsClient(
+	server: DiscoveredServer,
+	client: ClientIdentity,
+	redirectUri: string,
+	method: ConnectorMethod,
+): Promise<boolean> {
+	const url = new URL(server.metadata.authorization_endpoint);
+	url.searchParams.set("client_id", client.clientId);
+	url.searchParams.set("redirect_uri", redirectUri);
+	url.searchParams.set("response_type", "code");
+	url.searchParams.set("state", "probe");
+	url.searchParams.set("code_challenge", PROBE_CODE_CHALLENGE);
+	url.searchParams.set("code_challenge_method", "S256");
+	if (method.scopes?.length)
+		url.searchParams.set(
+			"scope",
+			method.scopes.join(method.scope_separator ?? " "),
+		);
+	try {
+		const response = await fetch(url, {
+			method: "GET",
+			redirect: "manual",
+			signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
+		});
+		if (response.status < 400 || response.status >= 500) return false;
+		return CLIENT_REJECTION.test((await response.text()).slice(0, 2000));
+	} catch {
+		return false;
+	}
+}
+
 const registering = new Map<string, Promise<ClientIdentity>>();
 
 export async function resolveClientIdentity(
@@ -324,7 +362,13 @@ export async function resolveClientIdentity(
 	const existing = await storedClient(server.issuer, redirectUri, declared, {
 		coveringScopes: scopes,
 	});
-	if (existing) return existing;
+	if (existing) {
+		if (
+			!(await authorizationRejectsClient(server, existing, redirectUri, method))
+		)
+			return existing;
+		await forgetClient(server.issuer, redirectUri, existing.clientId);
+	}
 
 	const key = `${server.issuer}\n${redirectUri}\n${scopes.join(" ")}`;
 	const pending = registering.get(key);
