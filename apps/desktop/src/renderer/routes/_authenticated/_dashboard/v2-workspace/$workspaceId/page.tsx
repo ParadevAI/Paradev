@@ -16,6 +16,7 @@ import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { useBareContentCard } from "renderer/routes/_authenticated/_dashboard/components/ContentCard";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
@@ -213,6 +214,7 @@ function V2WorkspaceContent() {
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
 	const isParadevShell = useParadevShell();
+	useBareContentCard();
 	const isWorkspaceSidebarCollapsed = useWorkspaceSidebarStore((s) =>
 		s.isCollapsed(),
 	);

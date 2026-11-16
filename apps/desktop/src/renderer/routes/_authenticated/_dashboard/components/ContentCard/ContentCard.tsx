@@ -1,8 +1,8 @@
 import { cn } from "@superset/ui/utils";
-import { useLocation } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+import { BareContentCardContext } from "./context";
 
-/** Holds the open screen beside the sidebar. A workspace draws its pane areas as their own cards, so behind it this is only frame. */
+/** Holds the open screen beside the sidebar. A screen that draws its own cards on the frame turns the card off with useBareContentCard. */
 export function ContentCard({
 	joinsSidebar,
 	children,
@@ -10,18 +10,18 @@ export function ContentCard({
 	joinsSidebar: boolean;
 	children: ReactNode;
 }) {
-	const isCard = useLocation({
-		select: (location) => !location.pathname.startsWith("/v2-workspace/"),
-	});
+	const [isBare, setIsBare] = useState(false);
 	return (
 		<div
 			className={cn(
 				"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-[10px]",
 				joinsSidebar && "rounded-l-none",
-				isCard ? "border border-border bg-background" : "bg-shell-frame",
+				isBare ? "bg-shell-frame" : "border border-border bg-background",
 			)}
 		>
-			<div className="relative flex min-h-0 min-w-0 flex-1">{children}</div>
+			<BareContentCardContext.Provider value={setIsBare}>
+				<div className="relative flex min-h-0 min-w-0 flex-1">{children}</div>
+			</BareContentCardContext.Provider>
 		</div>
 	);
 }
