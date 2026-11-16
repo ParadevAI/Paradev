@@ -3,6 +3,7 @@ import {
 	directDev,
 	lastEditableMessage,
 	type Message,
+	mentionCandidates,
 	renderMentions,
 	typingLabel,
 } from "@superset/chats-core";
@@ -121,6 +122,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					: undefined) ?? t({ message: "Unknown" }))
 		: "";
 	const typing = typingLabel(state, chatId, typists);
+	const candidates = mentionCandidates(state, chat);
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -175,6 +177,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					)}
 					<ChatComposer
 						placeholder={t({ message: `Message ${title}` })}
+						candidates={candidates}
 						replyingTo={
 							replyTo
 								? {
