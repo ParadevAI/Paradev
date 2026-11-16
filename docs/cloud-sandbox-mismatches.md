@@ -563,6 +563,22 @@ one. Opening an `asleep` workspace wakes it like an `awake` one
 (`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`, `sandbox-expiry.ts`;
 model: `.agents/skills/verify-sandbox-asleep`.
 
+**Deleting a file does not shrink a snapshot.** On a machine someone owns,
+`rm` frees the space. A Vercel sandbox snapshot is a full block-level copy of
+the disk, not a delta over its parent, and the disk has no discard, so blocks a
+deleted file freed stay in every later snapshot. At stop, processes get SIGTERM
+and at least 10 s before the snapshot is taken. Zero-filling freed space
+shrinks the stored snapshot (measured 4.06 GB → 0.84 GB) but slows every
+restore of it: the same box resumed in 12 s and 20 s after a fill, against
+about 1.5 s before (2026-11-16). Restore time follows how many blocks were ever
+written, not the stored size. So the only fix is to not write the bytes to the
+root disk: tmpfs for throwaway data, a drive for large state. A golden is
+forked by every workspace of its environment, so each of its blocks is paid
+once per fork. **What we did:** the golden setup hook
+(`packages/sandbox/src/environments/satya-setup.sh`) keeps its npm, Electron
+and node-gyp download caches in `/dev/shm`. **Open:** workspace snapshots
+carry every block a box ever wrote, swap included.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination
