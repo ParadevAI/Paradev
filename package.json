@@ -85,7 +85,7 @@
 		"hono": "4.13.11",
 		"kysely": "0.28.17",
 		"mdast-util-to-markdown": "2.1.2",
-		"next": "16.4.1",
+		"next": "16.4.5",
 		"rollup": "4.62.3",
 		"shell-quote": "1.11.0"
 	},
