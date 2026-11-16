@@ -6131,6 +6131,9 @@ msgstr "\"{name}\" otomatik olarak adlandırılamadı"
 msgid "Couldn't open in Chat Interface"
 msgstr "Sohbet arayüzünde açılamadı"
 
+msgid "Couldn't open the file"
+msgstr "Dosya açılamadı"
+
 msgid "Couldn't open the screenshot"
 msgstr "Ekran görüntüsü açılamadı"
 
@@ -15979,6 +15982,7 @@ msgstr "Uzak çalışma alanı: cihaz çevrimdışı"
 msgid "Remove"
 msgstr "Kaldır"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

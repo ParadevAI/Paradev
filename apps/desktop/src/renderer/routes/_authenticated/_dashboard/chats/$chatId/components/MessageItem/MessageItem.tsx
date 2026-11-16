@@ -6,6 +6,7 @@ import {
 	canEditMessage,
 	type Message,
 	renderMentions,
+	type SharedFile,
 } from "@superset/chats-core";
 import { formatClockTime, formatDateTime } from "@superset/i18n/format";
 import { Avatar } from "@superset/ui/atoms/Avatar";
@@ -14,6 +15,7 @@ import { cn } from "@superset/ui/utils";
 import { memo } from "react";
 import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
 import { mentionMarkdown } from "./utils/mentionMarkdown";
 
@@ -32,6 +34,8 @@ export interface MessageActions {
 	retry: (message: Message) => void;
 	discard: (message: Message) => void;
 	jumpTo: (messageId: string) => void;
+	fileLink: (fileId: string) => Promise<string>;
+	openFile: (file: SharedFile) => void;
 }
 
 interface MessageItemProps {
@@ -144,9 +148,22 @@ export const MessageItem = memo(function MessageItem({
 							<span className="block truncate">{message.replyTo.text}</span>
 						</button>
 					)}
-					<ChatMarkdown components={MARKDOWN_COMPONENTS}>
-						{mentionMarkdown(message.text, nameOf)}
-					</ChatMarkdown>
+					{message.file && (
+						<div className={cn("py-1", message.text && "pb-1.5")}>
+							<MessageFile
+								file={message.file}
+								localUri={message.localUri}
+								upload={message.upload}
+								link={actions.fileLink}
+								onOpen={actions.openFile}
+							/>
+						</div>
+					)}
+					{message.text && (
+						<ChatMarkdown components={MARKDOWN_COMPONENTS}>
+							{mentionMarkdown(message.text, nameOf)}
+						</ChatMarkdown>
+					)}
 				</div>
 				{message.editedAt && (
 					<span className="px-1.5 text-[11px] text-muted-foreground">

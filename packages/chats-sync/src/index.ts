@@ -4,6 +4,7 @@ export * from "./chat-actions/chat-actions.ts";
 export * from "./chat-file-upload/chat-file-upload.ts";
 export * from "./deleted-group-notice/deleted-group-notice.ts";
 export * from "./field-draft/field-draft.ts";
+export * from "./file-links/file-links.ts";
 export * from "./file-sends/file-sends.ts";
 export * from "./from-api/from-api.ts";
 export * from "./http/http.ts";

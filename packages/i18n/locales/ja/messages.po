@@ -6131,6 +6131,9 @@ msgstr "「{name}」に自動で名前を付けられませんでした"
 msgid "Couldn't open in Chat Interface"
 msgstr "チャット画面で開けませんでした"
 
+msgid "Couldn't open the file"
+msgstr "ファイルを開けませんでした"
+
 msgid "Couldn't open the screenshot"
 msgstr "スクリーンショットを開けませんでした"
 
@@ -15979,6 +15982,7 @@ msgstr "リモートワークスペース：デバイスがオフライン"
 msgid "Remove"
 msgstr "削除"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

@@ -8,6 +8,7 @@ import {
 	renderMentions,
 	typingLabel,
 } from "@superset/chats-core";
+import { toast } from "@superset/ui/sonner";
 import {
 	useCallback,
 	useEffect,
@@ -19,6 +20,7 @@ import {
 import { LuChevronRight } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useNow } from "renderer/hooks/useNow";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { ChatFace } from "../../../components/ChatFace";
@@ -96,12 +98,26 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			remove: (message) =>
 				dispatch?.({ type: "delete-message", messageId: message.id }),
 			retry: (message) =>
-				dispatch?.({ type: "retry-send", messageId: message.id }),
+				message.file
+					? live?.files.retry(message.id)
+					: dispatch?.({ type: "retry-send", messageId: message.id }),
 			discard: (message) =>
-				dispatch?.({ type: "discard-send", messageId: message.id }),
+				message.file
+					? live?.files.discard(message.id)
+					: dispatch?.({ type: "discard-send", messageId: message.id }),
 			jumpTo,
+			fileLink: async (fileId) => {
+				if (!live) throw new Error("Chats are not loaded");
+				return (await live.fileLink(fileId)).url;
+			},
+			openFile: (file) => {
+				void live
+					?.fileLink(file.id)
+					.then((link) => electronTrpcClient.external.openUrl.mutate(link.url))
+					.catch(() => toast.error(t({ message: "Couldn't open the file" })));
+			},
 		}),
-		[dispatch, copyToClipboard, jumpTo],
+		[dispatch, live, copyToClipboard, jumpTo, t],
 	);
 
 	const loadOlder = useCallback(
@@ -119,6 +135,30 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			</StateScreenShell>
 		);
 	}
+
+	/** Each file goes as its own message; the text is the first one's caption. */
+	const sendFiles = (text: string, files: File[]) => {
+		files.forEach((file, index) => {
+			const localUri = file.type.startsWith("image/")
+				? URL.createObjectURL(file)
+				: undefined;
+			live?.files.send({
+				chatId,
+				name: file.name,
+				size: file.size,
+				caption: index === 0 ? text : undefined,
+				localUri,
+				read: async () => ({
+					sha256: "",
+					readPart: async (_part, start, end) =>
+						new Uint8Array(await file.slice(start, end).arrayBuffer()),
+				}),
+				onDone: () => {
+					if (localUri) URL.revokeObjectURL(localUri);
+				},
+			});
+		});
+	};
 
 	const agent = directDev(state, chat);
 	const title = agent?.name ?? chat.title;
@@ -203,8 +243,10 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 							setReplyTo(null);
 							setEditing(null);
 						}}
-						onSend={(text) => {
-							if (editing) {
+						onSend={(text, files) => {
+							if (files.length > 0) {
+								sendFiles(text, files);
+							} else if (editing) {
 								dispatch?.({
 									type: "edit-message",
 									messageId: editing.id,

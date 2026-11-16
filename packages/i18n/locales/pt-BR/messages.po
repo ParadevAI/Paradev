@@ -6131,6 +6131,9 @@ msgstr "Não foi possível nomear \"{name}\" automaticamente"
 msgid "Couldn't open in Chat Interface"
 msgstr "Não foi possível abrir na interface de chat"
 
+msgid "Couldn't open the file"
+msgstr "Não foi possível abrir o arquivo"
+
 msgid "Couldn't open the screenshot"
 msgstr "Não foi possível abrir a captura de tela"
 
@@ -15979,6 +15982,7 @@ msgstr "Área de trabalho remota: dispositivo offline"
 msgid "Remove"
 msgstr "Remover"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

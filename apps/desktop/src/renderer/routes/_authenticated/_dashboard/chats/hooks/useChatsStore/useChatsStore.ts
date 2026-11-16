@@ -3,6 +3,7 @@ import {
 	applyEvent,
 	type ConnectionState,
 	createChatDispatch,
+	createFileSends,
 	createMessageHistory,
 	createReadMarker,
 	createTypingReporter,
@@ -89,6 +90,8 @@ export function useChatsStore(organizationId: string) {
 				getState: () => stateRef.current,
 				update,
 			}),
+			files: createFileSends({ api, update }),
+			fileLink: api.fileLink,
 			typing: {
 				watch: createTypingWatch({ subscribe }),
 				reporter: createTypingReporter({ send: api.reportTyping }),

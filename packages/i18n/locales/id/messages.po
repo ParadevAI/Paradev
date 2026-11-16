@@ -6131,6 +6131,9 @@ msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
 msgid "Couldn't open in Chat Interface"
 msgstr "Tidak dapat membuka di antarmuka chat"
 
+msgid "Couldn't open the file"
+msgstr "Tidak dapat membuka file"
+
 msgid "Couldn't open the screenshot"
 msgstr "Tidak dapat membuka tangkapan layar"
 
@@ -15979,6 +15982,7 @@ msgstr "Workspace jarak jauh: perangkat offline"
 msgid "Remove"
 msgstr "Hapus"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

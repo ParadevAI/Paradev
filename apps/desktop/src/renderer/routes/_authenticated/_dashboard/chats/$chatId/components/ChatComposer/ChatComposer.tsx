@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+	acceptFiles,
 	type MentionCandidate,
 	matchMentions,
 	mentionToken,
@@ -8,10 +9,12 @@ import {
 	splitMentions,
 } from "@superset/chats-core";
 import { Avatar } from "@superset/ui/atoms/Avatar";
+import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { LuArrowUp, LuPencil, LuReply, LuX } from "react-icons/lu";
+import { LuArrowUp, LuPaperclip, LuPencil, LuReply, LuX } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { AttachmentChip } from "./components/AttachmentChip";
 import { withMentionTokens } from "./utils/withMentionTokens";
 
 const MAX_HEIGHT_PX = 240;
@@ -28,7 +31,8 @@ interface ChatComposerProps {
 	/** The viewer's own message whose words the composer holds. */
 	editing: { text: string } | null;
 	onCancel: () => void;
-	onSend: (text: string) => void;
+	/** Each file goes as its own message; the text is the first one's caption. */
+	onSend: (text: string, files: File[]) => void;
 	/** Up in an empty composer: edit the last message you sent. */
 	onEditLast: () => void;
 }
@@ -49,6 +53,14 @@ export function ChatComposer({
 	const [picked, setPicked] = useState<MentionCandidate[]>([]);
 	const [mentionIndex, setMentionIndex] = useState(0);
 	const [isMentionClosed, setMentionClosed] = useState(false);
+	const [files, setFiles] = useState<File[]>([]);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const attach = (picked: File[]) => {
+		if (editing || picked.length === 0) return;
+		const accepted = acceptFiles(files, picked);
+		setFiles(accepted.files);
+		if (accepted.problem) toast.error(accepted.problem);
+	};
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const candidatesRef = useRef(candidates);
 	candidatesRef.current = candidates;
@@ -113,12 +125,13 @@ export function ChatComposer({
 		input.style.height = `${Math.min(input.scrollHeight, MAX_HEIGHT_PX)}px`;
 	}, [text]);
 
-	const ready = text.trim() !== "";
+	const ready = text.trim() !== "" || files.length > 0;
 	const send = () => {
 		if (!ready) return;
-		onSend(withMentionTokens(text.trim(), picked));
+		onSend(withMentionTokens(text.trim(), picked), files);
 		setText("");
 		setPicked([]);
+		setFiles([]);
 	};
 	const cancel = () => {
 		if (editing) {
@@ -138,7 +151,18 @@ export function ChatComposer({
 			: null;
 
 	return (
-		<div className="relative rounded-[14px] bg-fill-selected">
+		// biome-ignore lint/a11y/noStaticElementInteractions: files dropped anywhere on the card are attached
+		<div
+			className="relative rounded-[14px] bg-fill-selected"
+			onDragOver={(event) => {
+				if (event.dataTransfer.types.includes("Files")) event.preventDefault();
+			}}
+			onDrop={(event) => {
+				if (event.dataTransfer.files.length === 0) return;
+				event.preventDefault();
+				attach([...event.dataTransfer.files]);
+			}}
+		>
 			{matches.length > 0 && (
 				<div
 					role="listbox"
@@ -189,7 +213,43 @@ export function ChatComposer({
 					</button>
 				</div>
 			)}
+			{files.length > 0 && (
+				<div className="flex flex-wrap gap-1.5 px-2 pt-2">
+					{files.map((file, index) => (
+						<AttachmentChip
+							// biome-ignore lint/suspicious/noArrayIndexKey: two picked files can share a name and size
+							key={index}
+							file={file}
+							onRemove={() =>
+								setFiles((current) => current.filter((_, at) => at !== index))
+							}
+						/>
+					))}
+				</div>
+			)}
 			<div className="flex items-end gap-1.5 p-1.5">
+				{!editing && (
+					<>
+						<input
+							ref={fileInputRef}
+							type="file"
+							multiple
+							hidden
+							onChange={(event) => {
+								attach([...(event.target.files ?? [])]);
+								event.target.value = "";
+							}}
+						/>
+						<button
+							type="button"
+							aria-label={t({ message: "Attach files" })}
+							onClick={() => fileInputRef.current?.click()}
+							className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-fill-hover hover:text-foreground"
+						>
+							<LuPaperclip className="size-4" />
+						</button>
+					</>
+				)}
 				<textarea
 					ref={inputRef}
 					value={text}
@@ -202,6 +262,11 @@ export function ChatComposer({
 						setMentionIndex(0);
 					}}
 					onSelect={(event) => setCaret(event.currentTarget.selectionStart)}
+					onPaste={(event) => {
+						if (event.clipboardData.files.length === 0) return;
+						event.preventDefault();
+						attach([...event.clipboardData.files]);
+					}}
 					onKeyDown={(event) => {
 						if (event.nativeEvent.isComposing) return;
 						if (matches.length > 0) {

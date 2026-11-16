@@ -6131,6 +6131,9 @@ msgstr "Couldn't name \"{name}\" automatically"
 msgid "Couldn't open in Chat Interface"
 msgstr "Couldn't open in Chat Interface"
 
+msgid "Couldn't open the file"
+msgstr "Couldn't open the file"
+
 msgid "Couldn't open the screenshot"
 msgstr "Couldn't open the screenshot"
 
@@ -15979,6 +15982,7 @@ msgstr "Remote workspace: device offline"
 msgid "Remove"
 msgstr "Remove"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

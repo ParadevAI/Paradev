@@ -6131,6 +6131,9 @@ msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
 msgid "Couldn't open in Chat Interface"
 msgstr "채팅 인터페이스에서 열 수 없습니다"
 
+msgid "Couldn't open the file"
+msgstr "파일을 열 수 없습니다"
+
 msgid "Couldn't open the screenshot"
 msgstr "스크린샷을 열 수 없습니다"
 
@@ -15979,6 +15982,7 @@ msgstr "원격 워크스페이스: 기기 오프라인"
 msgid "Remove"
 msgstr "제거"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

@@ -6131,6 +6131,9 @@ msgstr "Không thể tự động đặt tên cho \"{name}\""
 msgid "Couldn't open in Chat Interface"
 msgstr "Không thể mở trong giao diện chat"
 
+msgid "Couldn't open the file"
+msgstr "Không mở được tệp"
+
 msgid "Couldn't open the screenshot"
 msgstr "Không thể mở ảnh chụp màn hình"
 
@@ -15979,6 +15982,7 @@ msgstr "Workspace từ xa: thiết bị ngoại tuyến"
 msgid "Remove"
 msgstr "Gỡ"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

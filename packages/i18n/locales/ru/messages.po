@@ -6131,6 +6131,9 @@ msgstr "Не удалось автоматически назвать «{name}»
 msgid "Couldn't open in Chat Interface"
 msgstr "Не удалось открыть в интерфейсе чата"
 
+msgid "Couldn't open the file"
+msgstr "Не удалось открыть файл"
+
 msgid "Couldn't open the screenshot"
 msgstr "Не удалось открыть снимок экрана"
 
@@ -15979,6 +15982,7 @@ msgstr "Удалённая рабочая область: устройство �
 msgid "Remove"
 msgstr "Удалить"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

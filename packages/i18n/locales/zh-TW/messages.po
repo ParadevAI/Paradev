@@ -6131,6 +6131,9 @@ msgstr "無法自動命名「{name}」"
 msgid "Couldn't open in Chat Interface"
 msgstr "無法在聊天介面中開啟"
 
+msgid "Couldn't open the file"
+msgstr "無法開啟檔案"
+
 msgid "Couldn't open the screenshot"
 msgstr "無法開啟螢幕擷取畫面"
 
@@ -15979,6 +15982,7 @@ msgstr "遠端工作區，裝置離線"
 msgid "Remove"
 msgstr "移除"
 
+#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

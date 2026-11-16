@@ -1,4 +1,5 @@
-import { ApiError, type SyncApi } from "@superset/chats-sync";
+import { fileTypeFor } from "@superset/chats-core";
+import { ApiError, cachedFileLinks, type SyncApi } from "@superset/chats-sync";
 import type { AppRouter } from "@superset/trpc";
 import { type createTRPCProxyClient, TRPCClientError } from "@trpc/client";
 
@@ -24,6 +25,10 @@ export type ChatsApi = Pick<
 	| "deleteGroup"
 	| "addGroupDev"
 	| "removeGroupDev"
+	| "beginFileUpload"
+	| "putFilePart"
+	| "finishFileUpload"
+	| "fileLink"
 >;
 
 /**
@@ -52,7 +57,49 @@ export function createChatsApi(
 	organizationId: string,
 ): ChatsApi {
 	const { chats } = client;
+	/** Where each open upload's bytes go: storage takes them straight from this device, in one part. */
+	const uploads = new Map<
+		string,
+		{ url: string; headers: Record<string, string> }
+	>();
 	return {
+		beginFileUpload: async (_groupId, body) => {
+			const { fileId, upload } = await call(
+				client.attachment.createUpload.mutate({
+					name: body.name,
+					contentType:
+						fileTypeFor(body.name)?.mime ?? "application/octet-stream",
+					sizeBytes: body.size,
+				}),
+			);
+			uploads.set(fileId, upload);
+			return { uploadId: fileId, partBytes: body.size, parts: 1 };
+		},
+		putFilePart: async (_groupId, uploadId, _index, bytes) => {
+			const upload = uploads.get(uploadId);
+			if (!upload) throw new Error("Upload not found");
+			const response = await fetch(upload.url, {
+				method: "PUT",
+				headers: upload.headers,
+				body: new Blob([bytes as BlobPart]),
+			});
+			if (!response.ok) throw new Error(`Upload failed (${response.status})`);
+		},
+		finishFileUpload: async (groupId, body) => {
+			const sent = await call(
+				chats.sendFile.mutate({
+					groupId,
+					fileId: body.uploadId,
+					text: body.message,
+					clientId: body.clientId,
+				}),
+			);
+			uploads.delete(body.uploadId);
+			return sent;
+		},
+		fileLink: cachedFileLinks((fileId) =>
+			call(chats.fileLink.mutate({ fileId })),
+		),
 		bootstrap: () => call(chats.bootstrap.query({ organizationId })),
 		realtimeToken: () => call(chats.realtimeTicket.query({ organizationId })),
 		sendMessage: (groupId, body) =>
