@@ -355,7 +355,11 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 			upstreamBranch: "refs/pull/42/head",
 		});
 		const paths: string[] = [];
-		const network = { offline: false };
+		const network = {
+			offline: false,
+			headSha: "abc123",
+			beforeLookup: undefined as (() => Promise<void>) | undefined,
+		};
 		const manager = createManager(db, {
 			readWorkspaceRefs: async () => {
 				const workspace = getWorkspace(db, "ws");
@@ -378,10 +382,11 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 				const path = args.find((arg) => arg.startsWith("repos/")) ?? "";
 				paths.push(path);
 				if (path === `repos/${REPO.owner}/${REPO.name}/pulls/42`) {
+					await network.beforeLookup?.();
 					return makePrNode({
 						number: 42,
 						headRef: "deleted-feature",
-						headSha: "abc123",
+						headSha: network.headSha,
 						state: "closed",
 						mergedAt: "2026-05-01T10:00:00Z",
 					});
@@ -469,6 +474,42 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 		expect(paths).not.toContain(`repos/${REPO.owner}/${REPO.name}/pulls/42`);
+	});
+
+	test("a failed old project lookup preserves the newer scoped refresh's matching PR link", async () => {
+		const { db, manager, network } = setup();
+		seedPullRequest(db, {
+			id: "pr-existing",
+			prNumber: 42,
+			headBranch: "deleted-feature",
+			headSha: "abc123",
+		});
+		db.update(workspaces)
+			.set({ pullRequestId: "pr-existing" })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeLookup = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		await withSilencedWarnings(async () => {
+			const fullRefresh = projectRefresher(manager)(PROJECT_ID);
+			await entered.promise;
+			network.beforeLookup = undefined;
+			network.headSha = "def456";
+			db.update(workspaces)
+				.set({ headSha: "def456" })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			await manager.refreshPullRequestsByWorkspaces(["ws"]);
+			expect(getPrById(db, "pr-existing")?.headSha).toBe("def456");
+			pending.reject(new Error("old lookup failed"));
+			await fullRefresh;
+		});
+		expect(getWorkspace(db, "ws")?.headSha).toBe("def456");
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("pr-existing");
 	});
 });
 
