@@ -62,6 +62,7 @@ import {
 	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
+import { nullOnRejectedApiKey } from "./lib/rejected-api-key";
 import { resend } from "./lib/resend";
 import {
 	resolveSessionOrganizationState,
@@ -1279,6 +1280,11 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+
+/** `auth.api.getSession` for a request, where a rejected API key means no session instead of a thrown error. */
+export function getRequestSession(headers: Headers) {
+	return nullOnRejectedApiKey(auth.api.getSession({ headers }));
+}
 
 /**
  * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
