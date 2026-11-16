@@ -23396,6 +23396,9 @@ msgstr "Unduhan Paradev Anda sedang dimulai."
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan ke {connectorName}."
 
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan."
+
 msgid "Your plan does not include cloud environments."
 msgstr "Paket Anda tidak mencakup lingkungan cloud."
 

@@ -23396,6 +23396,9 @@ msgstr "Paradev 下载即将开始。"
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续前往 {connectorName}。"
 
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续。"
+
 msgid "Your plan does not include cloud environments."
 msgstr "你的套餐不包含云端环境。"
 

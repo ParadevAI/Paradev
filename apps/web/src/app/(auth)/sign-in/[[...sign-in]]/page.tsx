@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import { SignInForm } from "./components/SignInForm";
-import { connectSignInContext } from "./utils/connectSignInContext";
+import { connectorNameFromRedirect } from "./utils/connectorNameFromRedirect";
 
 export default async function SignInPage({
 	searchParams,
@@ -18,11 +18,11 @@ export default async function SignInPage({
 		<SignInForm
 			redirect={redirect}
 			callbackErrorParam={param("error")}
-			connect={connectSignInContext({
+			connectorName={connectorNameFromRedirect({
 				redirect,
-				reason: param("reason"),
 				apiUrl: env.NEXT_PUBLIC_API_URL,
 			})}
+			sessionExpired={param("reason") === "session_expired"}
 		/>
 	);
 }

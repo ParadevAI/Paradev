@@ -14,7 +14,6 @@ import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { env } from "@/env";
 import { resolveCallbackUrl } from "../../../../utils/resolveCallbackUrl";
-import type { ConnectSignIn } from "../../utils/connectSignInContext";
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
 const ERROR_CODE = /^[A-Za-z0-9_-]{1,64}$/;
@@ -43,14 +42,15 @@ function rememberLastUsedMethod(method: AuthMethod) {
 export function SignInForm({
 	redirect,
 	callbackErrorParam,
-	connect,
+	connectorName,
+	sessionExpired,
 }: {
 	redirect: string | null;
 	callbackErrorParam: string | null;
-	connect: ConnectSignIn | null;
+	connectorName: string | null;
+	sessionExpired: boolean;
 }) {
 	const { t } = useLingui();
-	const connectorName = connect?.connectorName;
 	const callbackURL = resolveCallbackUrl({
 		redirect,
 		webUrl: env.NEXT_PUBLIC_WEB_URL,
@@ -176,25 +176,30 @@ export function SignInForm({
 		<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 			<div className="flex flex-col space-y-2 text-center">
 				<h1 className="text-2xl font-semibold tracking-tight">
-					{connect ? (
+					{connectorName ? (
 						<Trans>Sign in to connect {connectorName}</Trans>
 					) : (
 						<Trans>Welcome back</Trans>
 					)}
 				</h1>
 				<p className="text-muted-foreground text-sm">
-					{!connect ? (
-						<Trans>Sign in to continue to Paradev</Trans>
-					) : connect.sessionExpired ? (
+					{connectorName && sessionExpired ? (
 						<Trans>
 							Your Paradev session in this browser has expired. Sign in again to
 							continue to {connectorName}.
 						</Trans>
-					) : (
+					) : connectorName ? (
 						<Trans>
 							This browser is not signed in to Paradev. Sign in to continue to{" "}
 							{connectorName}.
 						</Trans>
+					) : sessionExpired ? (
+						<Trans>
+							Your Paradev session in this browser has expired. Sign in again to
+							continue.
+						</Trans>
+					) : (
+						<Trans>Sign in to continue to Paradev</Trans>
 					)}
 				</p>
 			</div>

@@ -23396,6 +23396,9 @@ msgstr "Paradev 다운로드가 시작됩니다."
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "이 브라우저의 Paradev 세션이 만료되었습니다. 다시 로그인하여 {connectorName}(으)로 계속하세요."
 
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "이 브라우저의 Paradev 세션이 만료되었습니다. 계속하려면 다시 로그인하세요."
+
 msgid "Your plan does not include cloud environments."
 msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니다."
 

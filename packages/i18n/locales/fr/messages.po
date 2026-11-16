@@ -23396,6 +23396,9 @@ msgstr "Votre téléchargement de Paradev démarre."
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer vers {connectorName}."
 
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer."
+
 msgid "Your plan does not include cloud environments."
 msgstr "Votre forfait n'inclut pas d'environnements cloud."
 

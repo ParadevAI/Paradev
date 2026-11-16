@@ -1,6 +1,7 @@
 import { auth } from "@superset/auth/server";
 import { isStaffEmail } from "@superset/shared/constants";
 import { withDomainMove } from "@superset/shared/domain-move";
+import { getSessionCookie } from "better-auth/cookies";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -72,6 +73,8 @@ async function legacyProxy(
 	if (!session && !isPublicRoute(pathname)) {
 		const signInUrl = new URL("/sign-in", req.url);
 		signInUrl.searchParams.set("redirect", pathname + req.nextUrl.search);
+		if (getSessionCookie(req))
+			signInUrl.searchParams.set("reason", "session_expired");
 		return NextResponse.redirect(signInUrl);
 	}
 
