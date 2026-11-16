@@ -33,6 +33,7 @@ export function Workspace<TData>({
 	renderTabIcon,
 	isPreviewTab,
 	renameTabs = true,
+	onTabRenamed,
 	onTabClick,
 	renderEmptyState,
 	renderAddTabMenu,
@@ -178,10 +179,12 @@ export function Workspace<TData>({
 			}}
 			onRenameTab={
 				renameTabs
-					? (tabId, title) =>
-							store
-								.getState()
-								.setTabTitleOverride({ tabId, titleOverride: title })
+					? (tabId, title) => {
+							const state = store.getState();
+							const tab = state.tabs.find((t) => t.id === tabId);
+							state.setTabTitleOverride({ tabId, titleOverride: title });
+							if (tab) onTabRenamed?.(tab, title);
+						}
 					: undefined
 			}
 			onTabClick={onTabClick}

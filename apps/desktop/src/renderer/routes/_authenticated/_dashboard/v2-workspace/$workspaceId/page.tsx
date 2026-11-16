@@ -89,6 +89,7 @@ import { useRunWorkspaceCreationPresets } from "./hooks/useRunWorkspaceCreationP
 import { useShellInteractionPassthrough } from "./hooks/useShellInteractionPassthrough";
 import { useSyncChatSessionTabs } from "./hooks/useSyncChatSessionTabs";
 import { useTabCloseGuard } from "./hooks/useTabCloseGuard";
+import { useTabSessionNames } from "./hooks/useTabSessionNames";
 import { useV2PresetExecution } from "./hooks/useV2PresetExecution";
 import { useV2TerminalLauncher } from "./hooks/useV2TerminalLauncher";
 import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
@@ -366,6 +367,11 @@ function V2WorkspaceContent() {
 		linkedStores: linkedPaneStores,
 		workspaceId,
 		isLayoutReady: isLayoutReady && isRightLayoutReady,
+	});
+	const onTabRenamed = useTabSessionNames({
+		store,
+		workspaceId,
+		isLayoutReady,
 	});
 	useSyncChatSessionTabs({
 		store,
@@ -769,6 +775,7 @@ function V2WorkspaceContent() {
 										contextMenuActions={centerContextMenuActions}
 										onPaneError={reportRendererError}
 										renderTabIcon={renderBrowserTabIcon}
+										onTabRenamed={onTabRenamed}
 										renderTabAccessory={(tab) => (
 											<V2NotificationStatusIndicator
 												sources={getV2NotificationSourcesForTab(tab)}

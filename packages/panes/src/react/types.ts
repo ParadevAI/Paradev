@@ -147,6 +147,8 @@ export interface WorkspaceProps<TData> {
 	isPreviewTab?: (tab: Tab<TData>) => boolean;
 	/** Defaults to true. When false, tabs can't be renamed. */
 	renameTabs?: boolean;
+	/** Runs after the user renames a tab. `tab` is the tab as it was before. */
+	onTabRenamed?: (tab: Tab<TData>, title: string | undefined) => void;
 	/** Runs when a tab is clicked, after it is selected. */
 	onTabClick?: (tab: Tab<TData>) => void;
 	renderEmptyState?: () => ReactNode;
