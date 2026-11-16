@@ -1,5 +1,6 @@
 import {
 	type CryptoKey,
+	exportPKCS8,
 	exportSPKI,
 	generateKeyPair,
 	importPKCS8,
@@ -35,12 +36,19 @@ export async function loadBoxKeys(
 	};
 }
 
-/** A fresh pair for a process that has none configured. Boxes woken under it stop working when the process ends. */
-export async function generateBoxKeys(): Promise<BoxKeys> {
+/** A fresh pair, with its private key as PEM so it can be kept and loaded again. */
+export async function generateBoxKeys(): Promise<
+	BoxKeys & { privateKeyText: string }
+> {
 	const { privateKey, publicKey } = await generateKeyPair("ES256", {
 		extractable: true,
 	});
-	return { privateKey, publicKey, publicKeyText: await exportSPKI(publicKey) };
+	return {
+		privateKey,
+		publicKey,
+		publicKeyText: await exportSPKI(publicKey),
+		privateKeyText: await exportPKCS8(privateKey),
+	};
 }
 
 /** A token a box accepts: `control` (the API runs a turn) or `watch` (a member streams one session). */

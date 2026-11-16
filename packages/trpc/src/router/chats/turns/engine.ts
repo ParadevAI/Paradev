@@ -4,6 +4,7 @@ import {
 	chatsAgentReads,
 	chatsAgents,
 	chatsGroupAgents,
+	chatsGroupMembers,
 	chatsGroups,
 	chatsMessages,
 	chatsTurns,
@@ -287,7 +288,31 @@ export async function wakeForTurn(
 	return true;
 }
 
-/** What a message turn is told: who wrote what, in which chat. Null when the message is gone. */
+/**
+ * The last line of a turn's header when the turn may answer in the chat: only
+ * `reply` speaks there.
+ */
+const REPLY_HINT =
+	"To answer in the chat, call `reply` with your message (or run `dev reply \"<message>\"`). Keep it short: a sentence or two, about 60 words unless they asked for detail. If nothing here needs you, don't reply. Your final text isn't shown.";
+
+const formatTime = (at: Date) =>
+	`${at.toISOString().slice(0, 16).replace("T", " ")} UTC`;
+
+/** What happened, as a title, then one `Field: value` line each, empty ones left out. */
+const turnHeader = (
+	title: string,
+	fields: [string, string | null | undefined][],
+) =>
+	[
+		`## ${title}`,
+		...fields.flatMap(([name, value]) => (value ? [`${name}: ${value}`] : [])),
+	].join("\n");
+
+/**
+ * A new message's turn: where and from whom, whether this Dev was mentioned
+ * or why it was picked, when, then the message with mentions as names. Null
+ * when the message is gone.
+ */
 async function messageTurnText(turn: TurnRow) {
 	if (!turn.messageId) return null;
 	const [row] = await db
@@ -297,22 +322,55 @@ async function messageTurnText(turn: TurnRow) {
 		.leftJoin(users, eq(users.id, chatsMessages.authorId))
 		.where(eq(chatsMessages.id, turn.messageId));
 	if (!row) return null;
-	const roster = await loadRoster(turn.groupId);
-	const names = new Map(roster.map((dev) => [dev.id, dev.name]));
-	const from = row.author ? toUser(row.author).displayName : "someone";
-	const text = renderMentions(
+	const [roster, people] = await Promise.all([
+		loadRoster(turn.groupId),
+		db
+			.select({ user: users })
+			.from(chatsGroupMembers)
+			.innerJoin(users, eq(users.id, chatsGroupMembers.userId))
+			.where(eq(chatsGroupMembers.groupId, turn.groupId)),
+	]);
+	const names = new Map<string, string>([
+		...roster.map((dev) => [dev.id, dev.name] as const),
+		...people.map(({ user }) => [user.id, toUser(user).displayName] as const),
+	]);
+	let mentions: string | null = null;
+	let why: string | null = null;
+	if (row.chat.kind !== "direct") {
+		const mentioned = resolveMentions(
+			row.message.text,
+			mentionableDevs(roster),
+		).ids;
+		const me = mentioned.includes(turn.agentId);
+		const others = roster
+			.filter((dev) => dev.id !== turn.agentId && mentioned.includes(dev.id))
+			.map((dev) => dev.name);
+		mentions = [...(me ? ["you"] : []), ...others].join(", ") || null;
+		if (!me) {
+			why =
+				"not mentioned, but it follows your reply here a moment ago. Reply only if it asks something of you; when people are talking to each other, don't reply";
+		}
+	}
+	const header = turnHeader("New message", [
+		[
+			"Chat",
+			row.chat.kind === "direct"
+				? `your 1:1 with ${people.map(({ user }) => toUser(user).displayName).join(", ") || "its owner"}`
+				: `the group "${row.chat.title}"`,
+		],
+		["From", row.author ? toUser(row.author).displayName : "someone"],
+		["Message id", `#${row.message.id.slice(0, 8)}`],
+		["Mentions", mentions],
+		["Why you", why],
+		["Time", formatTime(row.message.createdAt)],
+	]);
+	const body = renderMentions(
 		row.message.text,
 		(ref) => names.get(ref.id) ?? "someone",
 	);
 	return {
 		userId: row.message.authorId,
-		text: [
-			"New message",
-			`Chat: ${row.chat.kind === "direct" ? "your 1:1" : row.chat.title}`,
-			`From: ${from}`,
-			"",
-			text,
-		].join("\n"),
+		text: `${header}\n${REPLY_HINT}\n\n${body}`,
 	};
 }
 

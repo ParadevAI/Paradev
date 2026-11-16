@@ -1,9 +1,7 @@
 import { env } from "../../../env";
 import { handleBoxRequest } from "./box-api";
+import { CHATS_BOX_API_PATH } from "./box-path";
 import { chatsTurnRuntime } from "./runtime";
-
-/** Where the API serves boxes, under its own origin. */
-export const CHATS_BOX_API_PATH = "/api/chats/box";
 
 /** A box's request to the API, or a 404 where no Devs run. */
 export async function chatsBoxRoute(request: Request): Promise<Response> {
