@@ -6093,6 +6093,9 @@ msgstr "No se pudo establecer el icono"
 msgid "Could not share"
 msgstr "No se pudo compartir"
 
+msgid "Could not sign out. Please try again."
+msgstr "No se pudo cerrar sesión. Inténtalo de nuevo."
+
 msgid "Could not start agent"
 msgstr "No se pudo iniciar el agente"
 

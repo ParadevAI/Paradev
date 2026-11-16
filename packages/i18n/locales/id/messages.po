@@ -6093,6 +6093,9 @@ msgstr "Tidak bisa menyetel ikon"
 msgid "Could not share"
 msgstr "Tidak bisa membagikan"
 
+msgid "Could not sign out. Please try again."
+msgstr "Tidak dapat keluar. Coba lagi."
+
 msgid "Could not start agent"
 msgstr "Tidak bisa memulai agen"
 

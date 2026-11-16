@@ -1,6 +1,6 @@
 "use client";
 
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { authClient } from "@superset/auth/client";
 import { Button } from "@superset/ui/button";
 import { useState } from "react";
@@ -14,18 +14,23 @@ export function SwitchAccount({
 	redirect: string | null;
 	connectorName: string | null;
 }) {
+	const { t } = useLingui();
 	const [isSigningOut, setIsSigningOut] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const signInHref = redirect
 		? `/sign-in?redirect=${encodeURIComponent(redirect)}`
 		: "/sign-in";
 
 	const signInWithAnotherAccount = async () => {
 		setIsSigningOut(true);
-		try {
-			await authClient.signOut();
-		} finally {
-			window.location.assign(signInHref);
+		setError(null);
+		const result = await authClient.signOut().catch(() => null);
+		if (!result || result.error) {
+			setError(t({ message: "Could not sign out. Please try again." }));
+			setIsSigningOut(false);
+			return;
 		}
+		window.location.assign(signInHref);
 	};
 
 	return (
@@ -57,6 +62,7 @@ export function SwitchAccount({
 					</Trans>
 				</p>
 			</div>
+			{error && <p className="text-destructive text-sm">{error}</p>}
 			<div className="flex gap-2">
 				<Button disabled={isSigningOut} onClick={signInWithAnotherAccount}>
 					{isSigningOut ? (

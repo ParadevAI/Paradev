@@ -6093,6 +6093,9 @@ msgstr "無法設定圖示"
 msgid "Could not share"
 msgstr "無法分享"
 
+msgid "Could not sign out. Please try again."
+msgstr "無法登出。請再試一次。"
+
 msgid "Could not start agent"
 msgstr "無法啟動代理程式"
 

@@ -6093,6 +6093,9 @@ msgstr "Impossible de définir l'icône"
 msgid "Could not share"
 msgstr "Impossible de partager"
 
+msgid "Could not sign out. Please try again."
+msgstr "Impossible de se déconnecter. Veuillez réessayer."
+
 msgid "Could not start agent"
 msgstr "Impossible de démarrer l'agent"
 

@@ -5,7 +5,7 @@ import { accountConnection } from "@superset/trpc/connectors";
 import { headers } from "next/headers";
 import { env } from "@/env";
 import { upsertIdentity } from "@/lib/integrations/upsertIdentity";
-import { signInUrl } from "@/lib/signInRedirect";
+import { signInUrl, wrongAccountResponse } from "@/lib/signInRedirect";
 import { unfurlLinks } from "../events/process-link-shared";
 import type { ConnectPayload } from "../events/utils/generate-connect-url";
 
@@ -66,9 +66,12 @@ export async function GET(request: Request) {
 	});
 
 	if (!membership) {
-		return new Response(
-			"You are not a member of the organization connected to this Slack workspace.",
-			{ status: 403 },
+		return wrongAccountResponse(
+			request,
+			new Response(
+				"You are not a member of the organization connected to this Slack workspace.",
+				{ status: 403 },
+			),
 		);
 	}
 

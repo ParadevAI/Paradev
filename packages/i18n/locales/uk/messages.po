@@ -6087,6 +6087,9 @@ msgstr "Не вдалося встановити значок"
 msgid "Could not share"
 msgstr "Не вдалося поділитися"
 
+msgid "Could not sign out. Please try again."
+msgstr "Не вдалося вийти. Спробуйте ще раз."
+
 msgid "Could not start agent"
 msgstr "Не вдалося запустити агента"
 
