@@ -1,13 +1,20 @@
 import { useSwitcherGroups } from "renderer/commandPalette/ui/WorkspaceList/hooks/useSwitcherGroups";
 
-export type WaitingWorkspaceBucket = "needsInput" | "completed";
+export type WaitingWorkspaceBucket = "needsInput" | "failed" | "completed";
 
 /** Null when no sidebar workspace other than the current one waits on the user. */
 export function useWaitingWorkspaceBucket(): WaitingWorkspaceBucket | null {
 	const { groups } = useSwitcherGroups("");
-	for (const bucket of ["needsInput", "completed"] as const) {
-		const group = groups.find((candidate) => candidate.bucket === bucket);
-		if (group?.rows.some((row) => !row.isCurrent)) return bucket;
+	const waiting = (bucket: "needsInput" | "completed") =>
+		groups
+			.find((candidate) => candidate.bucket === bucket)
+			?.rows.filter((row) => !row.isCurrent) ?? [];
+	if (waiting("needsInput").length > 0) return "needsInput";
+	// The switcher lists a failed agent under Completed; the dot must not
+	// show it as a success.
+	const completed = waiting("completed");
+	if (completed.some((row) => row.workspace.agentStatus === "failed")) {
+		return "failed";
 	}
-	return null;
+	return completed.length > 0 ? "completed" : null;
 }

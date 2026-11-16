@@ -15,6 +15,7 @@ import {
 
 const WAITING_DOT_CLASS: Record<WaitingWorkspaceBucket, string> = {
 	needsInput: "bg-amber-400",
+	failed: "bg-red-500",
 	completed: "bg-green-500",
 };
 

@@ -6,7 +6,10 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
-import { TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX } from "renderer/hooks/host-service/useTerminalAgentBindings";
+import {
+	TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+	type TerminalAgentBinding,
+} from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { useHostWorkspacesSource } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
@@ -527,9 +530,10 @@ export function useAccessibleV2Workspaces(
 		(state) => state.terminalSeenAt,
 	);
 	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
-	const cachedBindings = useQueryCacheData<
-		NonNullable<(typeof terminalAgentQueries)[number]["data"]>
-	>(TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX, liveState === "cached");
+	const cachedBindings = useQueryCacheData<TerminalAgentBinding[]>(
+		TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+		liveState === "cached",
+	);
 	const agentActivityEntries = useMemo<
 		[
 			string,

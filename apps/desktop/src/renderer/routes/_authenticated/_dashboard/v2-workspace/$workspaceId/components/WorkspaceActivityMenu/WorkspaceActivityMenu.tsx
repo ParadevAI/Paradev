@@ -861,13 +861,7 @@ export function WorkspaceActivityMenu({
 							ref={triggerRef}
 							type="button"
 							onClick={onTriggerClick}
-							aria-label={
-								changes && currentPr
-									? t({
-											message: `Workspace activity, pull request #${currentPr.number}`,
-										})
-									: t({ message: "Workspace activity" })
-							}
+							aria-label={t({ message: "Workspace activity" })}
 							aria-expanded={open}
 							aria-controls={open ? panelId : undefined}
 							aria-describedby={hasNew ? newPageStatusId : undefined}

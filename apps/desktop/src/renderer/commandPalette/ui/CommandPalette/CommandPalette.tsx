@@ -158,13 +158,13 @@ export function CommandPalette() {
 	}, [root]);
 
 	// A frame can also be opened from outside (⌘P over an open palette).
+	// Reset during render, so the new frame never renders the old query.
 	const frameId = currentFrame?.command.id;
-	const previousFrameId = useRef(frameId);
-	useEffect(() => {
-		if (previousFrameId.current === frameId) return;
-		previousFrameId.current = frameId;
+	const [seenFrameId, setSeenFrameId] = useState(frameId);
+	if (seenFrameId !== frameId) {
+		setSeenFrameId(frameId);
 		setQuery("");
-	}, [frameId]);
+	}
 
 	const frameTitle = currentFrame ? i18n._(currentFrame.command.title) : null;
 	const placeholder = currentFrame?.command.framePlaceholder
