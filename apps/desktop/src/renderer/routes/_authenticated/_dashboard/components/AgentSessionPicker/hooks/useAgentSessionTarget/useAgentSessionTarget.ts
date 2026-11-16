@@ -67,7 +67,7 @@ interface UseAgentSessionTargetResult {
  * existing-session and new-session preferences don't clobber each other.
  *
  * Priority for the default selection:
- *   1. the caller's preferred session, if still alive
+ *   1. the caller's preferred session, or no selection if it is unavailable
  *   2. last picked terminal session, if still alive
  *   3. most recent active session
  *   4. last picked new-agent config, if still listed
@@ -82,6 +82,12 @@ export function useAgentSessionTarget({
 	const placement = useAgentSessionPlacement();
 
 	const computedDefault = useMemo<string | null>(() => {
+		if (
+			preferredTerminalId &&
+			!sessions.some((s) => s.terminalId === preferredTerminalId)
+		) {
+			return null;
+		}
 		if (sessions.length > 0) {
 			const isAlive = (terminalId: string | null | undefined) =>
 				!!terminalId && sessions.some((s) => s.terminalId === terminalId);
