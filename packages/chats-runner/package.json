@@ -6,6 +6,7 @@
 	"description": "Runs inside a Dev's box: serves its turns and streams them, with pi as the agent.",
 	"scripts": {
 		"build": "bun build.ts",
+		"image:build": "bun build.ts && docker build -t paradev-dev-box:dev .",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
 		"test": "bun test"
 	},

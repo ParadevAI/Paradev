@@ -104,7 +104,7 @@ const pkg = { private: true, type: "module", version: pi.version };
 writeFileSync(join(out, "package.json"), `${JSON.stringify(pkg, null, 2)}\n`);
 check(
 	await Bun.build({
-		entrypoints: [join(import.meta.dir, "../cli/src/main.ts")],
+		entrypoints: [join(import.meta.dir, "cli/main.ts")],
 		outdir: out,
 		naming: "cli.js",
 		target: "node",
