@@ -17,6 +17,12 @@ export function openWorkspaceList(
 	});
 }
 
+export function toggleWorkspaceList(): void {
+	const { open, root, setOpen } = useFrameStackStore.getState();
+	if (open && root === "switcher") setOpen(false);
+	else openWorkspaceList({ via: "pill" });
+}
+
 export const navigationProvider: CommandProvider = {
 	id: "navigation",
 	provide: () => {

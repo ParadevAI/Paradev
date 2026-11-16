@@ -12,6 +12,8 @@ export type PaletteRoot = "commands" | "switcher";
 
 export type SwitcherOpenedVia = "hotkey" | "pill" | "command";
 
+export const PALETTE_TOGGLE_ATTRIBUTE = "data-command-palette-toggle";
+
 export interface SwitcherSelection {
 	id: string;
 	name: string;
