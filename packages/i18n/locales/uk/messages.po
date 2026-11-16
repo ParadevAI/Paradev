@@ -2926,6 +2926,9 @@ msgstr "Будь-який агент, якого ви налаштували в 
 msgid "Any channel"
 msgstr "Будь-який канал"
 
+msgid "Any comment"
+msgstr "Будь-який коментар"
+
 msgid "Any conclusion"
 msgstr "Будь-який результат"
 
@@ -3957,6 +3960,9 @@ msgstr "Купити за {total}"
 
 msgid "Buy GB-hours"
 msgstr "Купити ГБ-години"
+
+msgid "by"
+msgstr "від"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5098,6 +5104,15 @@ msgstr "Дії з коментарем"
 msgid "Comment added"
 msgstr "Коментар додано"
 
+msgid "Comment added in"
+msgstr "Коментар додано в"
+
+msgid "Comment edited"
+msgstr "Коментар відредаговано"
+
+msgid "Comment edited in"
+msgstr "Коментар відредаговано в"
+
 msgid "Comment mentions user"
 msgstr "Коментар згадує користувача"
 
@@ -5534,6 +5549,9 @@ msgstr "Зв'язатися з підтримкою"
 
 msgid "Contact Us"
 msgstr "Зв'яжіться з нами"
+
+msgid "Contains \"{pattern}\""
+msgstr "Містить \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Містить цей текст..."
@@ -10437,6 +10455,9 @@ msgstr "Покращ інструкції агента"
 
 msgid "Improved diff viewer"
 msgstr "Покращений переглядач diff"
+
+msgid "in"
+msgstr "у"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22811,6 +22832,9 @@ msgstr "Зі стрілкою"
 
 msgid "With icon"
 msgstr "Зі значком"
+
+msgid "with label"
+msgstr "з міткою"
 
 msgid "With label"
 msgstr "З підписом"

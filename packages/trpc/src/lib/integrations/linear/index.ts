@@ -1,4 +1,5 @@
 export {
+	isLinearNotFoundError,
 	mapPriorityFromLinear,
 	mapPriorityToLinear,
 } from "../../../router/integration/linear/api";

@@ -1,8 +1,12 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { useLingui } from "@lingui/react";
 import type { ReactNode } from "react";
 
 interface SentenceProps<Slot extends string> {
 	/** The grammar's parts for the config's event; undefined for an unknown event. */
-	parts: readonly ({ text: string } | { slot: Slot })[] | undefined;
+	parts:
+		| readonly ({ text: string | MessageDescriptor } | { slot: Slot })[]
+		| undefined;
 	/**
 	 * Rendered raw when `parts` is missing. The event comes from a persisted
 	 * config; if its grammar entry is ever removed or renamed, the row must
@@ -19,6 +23,7 @@ export function Sentence<Slot extends string>({
 	fallback,
 	renderSlot,
 }: SentenceProps<Slot>) {
+	const { _ } = useLingui();
 	if (!parts) {
 		return (
 			<span className="text-[13px] text-muted-foreground">{fallback}</span>
@@ -30,7 +35,7 @@ export function Sentence<Slot extends string>({
 				"text" in part ? (
 					// biome-ignore lint/suspicious/noArrayIndexKey: grammar parts are a static sentence that never reorders
 					<span key={index} className="text-[13px] text-muted-foreground">
-						{part.text}
+						{typeof part.text === "string" ? part.text : _(part.text)}
 					</span>
 				) : (
 					renderSlot(part.slot, index)

@@ -20,11 +20,35 @@ export type Slot =
 	| "projects"
 	| "labels"
 	| "toStatus"
-	| "assignee";
+	| "assignee"
+	| "actor"
+	| "commentFilter";
 
-export type SentencePart = { text: string } | { slot: Slot };
+export type SentencePart =
+	| { text: string | MessageDescriptor }
+	| { slot: Slot };
+
+const COMMENT_FILTERS: SentencePart[] = [
+	{ slot: "account" },
+	{ slot: "teams" },
+	{ text: msg({ message: "in" }) },
+	{ slot: "projects" },
+	{ text: msg({ message: "with label" }) },
+	{ slot: "labels" },
+	{ text: msg({ message: "by" }) },
+	{ slot: "actor" },
+	{ slot: "commentFilter" },
+];
 
 export const LINEAR_SENTENCES: Record<LinearTriggerEvent, SentencePart[]> = {
+	"comment.created": [
+		{ text: msg({ message: "Comment added in" }) },
+		...COMMENT_FILTERS,
+	],
+	"comment.updated": [
+		{ text: msg({ message: "Comment edited in" }) },
+		...COMMENT_FILTERS,
+	],
 	"issue.created": [
 		{ text: "Issue created in" },
 		{ slot: "account" },
@@ -89,6 +113,8 @@ export const LINEAR_MENU: TriggerMenuEntry<LinearConfig>[] = [
 				}),
 				"issue.assigned",
 			),
+			leaf(msg({ message: "Comment added" }), "comment.created"),
+			leaf(msg({ message: "Comment edited" }), "comment.updated"),
 		],
 	},
 	leaf(
@@ -118,5 +144,7 @@ export function createLinearConfig(event: LinearTriggerEvent): LinearConfig {
 		labels: { mode: "any" },
 		toStatus: { mode: "any" },
 		assignee: { mode: "any" },
+		actor: { mode: "any" },
+		commentFilter: null,
 	};
 }

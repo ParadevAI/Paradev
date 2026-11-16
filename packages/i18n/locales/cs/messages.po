@@ -2932,6 +2932,9 @@ msgstr "Jakýkoli agent, kterého máte v Paradevu nastaveného, například Cla
 msgid "Any channel"
 msgstr "Jakýkoli kanál"
 
+msgid "Any comment"
+msgstr "Libovolný komentář"
+
 msgid "Any conclusion"
 msgstr "Jakýkoli výsledek"
 
@@ -3963,6 +3966,9 @@ msgstr "Koupit za {total}"
 
 msgid "Buy GB-hours"
 msgstr "Koupit GB-hodiny"
+
+msgid "by"
+msgstr "od"
 
 #. placeholder {0}: data.author
 msgid "by {0}"
@@ -5104,6 +5110,15 @@ msgstr "Akce komentáře"
 msgid "Comment added"
 msgstr "Přidán komentář"
 
+msgid "Comment added in"
+msgstr "Komentář přidán v"
+
+msgid "Comment edited"
+msgstr "Komentář upraven"
+
+msgid "Comment edited in"
+msgstr "Komentář upraven v"
+
 msgid "Comment mentions user"
 msgstr "Komentář zmiňuje uživatele"
 
@@ -5540,6 +5555,9 @@ msgstr "Kontaktovat podporu"
 
 msgid "Contact Us"
 msgstr "Kontaktujte nás"
+
+msgid "Contains \"{pattern}\""
+msgstr "Obsahuje \"{pattern}\""
 
 msgid "Contains this text..."
 msgstr "Obsahuje tento text..."
@@ -10443,6 +10461,9 @@ msgstr "Vylepšit instrukce pro agenty"
 
 msgid "Improved diff viewer"
 msgstr "Vylepšený prohlížeč rozdílů"
+
+msgid "in"
+msgstr "v"
 
 #. placeholder {0}: intent.path
 msgid "in {0}"
@@ -22817,6 +22838,9 @@ msgstr "Se šipkou"
 
 msgid "With icon"
 msgstr "S ikonou"
+
+msgid "with label"
+msgstr "se štítkem"
 
 msgid "With label"
 msgstr "S popiskem"
