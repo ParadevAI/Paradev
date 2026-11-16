@@ -1387,6 +1387,13 @@
       "when": 1794866006035,
       "tag": "0197_chats_message_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1794872286770,
+      "tag": "0198_chats_model_usage",
+      "breakpoints": true
     }
   ]
 }

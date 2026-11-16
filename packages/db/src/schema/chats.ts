@@ -4,6 +4,7 @@ import {
 	boolean,
 	check,
 	index,
+	integer,
 	jsonb,
 	pgSchema,
 	primaryKey,
@@ -428,4 +429,35 @@ export const chatsBriefs = chatsSchema.table(
 			.defaultNow(),
 	},
 	(t) => [primaryKey({ columns: [t.groupId, t.agentId] })],
+);
+
+/** Model tokens spent through the proxy, per call, charged to a person: the agent's owner, else who started the turn. */
+export const chatsModelUsage = chatsSchema.table(
+	"model_usage",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		userId: uuid("user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		agentId: uuid("agent_id").references(() => chatsAgents.id, {
+			onDelete: "set null",
+		}),
+		model: text("model").notNull(),
+		/** All the input, cached included. */
+		inputTokens: integer("input_tokens").notNull(),
+		outputTokens: integer("output_tokens").notNull(),
+		cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
+		cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
+		createdAt: createdAt(),
+	},
+	(t) => [
+		index("model_usage_organization_created_idx").on(
+			t.organizationId,
+			t.createdAt,
+		),
+		index("model_usage_user_created_idx").on(t.userId, t.createdAt),
+	],
 );
