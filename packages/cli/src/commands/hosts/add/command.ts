@@ -17,6 +17,7 @@ import {
 	hostKeyName,
 	revokeKeysNamed,
 } from "../../../lib/ssh-host-setup/host-key";
+import { installCliScript } from "../../../lib/ssh-host-setup/install";
 import { log } from "../../../lib/ssh-host-setup/log";
 import {
 	MACHINE_ID_FIX,
@@ -74,12 +75,13 @@ async function install(
 			"Install curl there, then run this again.",
 		);
 	}
-	const tag = wanted ? `cli-v${wanted}` : "latest";
-	const exitCode = await ssh.stream(`set -e
-script=$(mktemp)
-trap 'rm -f "$script"' EXIT
-curl -fsSL ${INSTALL_URL} -o "$script"
-SUPERSET_HOME="$HOME/superset" SUPERSET_VERSION=${tag} sh "$script" --no-next-steps`);
+	const exitCode = await ssh.stream(
+		installCliScript({
+			installerUrl: INSTALL_URL,
+			installDir: `${facts.home}/superset`,
+			version: wanted,
+		}),
+	);
 	if (exitCode !== 0) {
 		throw new CLIError(`Installing the Paradev CLI on ${ssh.target} failed`);
 	}
