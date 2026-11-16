@@ -6858,6 +6858,9 @@ msgstr "„Usuń mimo to” całkowicie pominie skrypt sprzątający."
 msgid "Delete command {0}"
 msgstr "Usuń polecenie {0}"
 
+msgid "Delete Dev"
+msgstr "Usuń Dev"
+
 msgid "Delete failed"
 msgstr "Usuwanie nie powiodło się"
 
@@ -7689,11 +7692,18 @@ msgstr "Zdobyto: {name} ×{tier}"
 msgid "Edit"
 msgstr "Edytuj"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Edytuj {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Edytuj {selectedName}"
 
 msgid "Edit comment"
 msgstr "Edytuj komentarz"
+
+msgid "Edit Dev"
+msgstr "Edytuj Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Edytuj zmienną środowiskową"
@@ -20219,6 +20229,9 @@ msgstr "Ten obszar roboczy w chmurze jest wybudzany. Po okresie bezczynności mo
 
 msgid "This conversation is too long for the model"
 msgstr "Ta rozmowa jest za długa dla modelu"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Spowoduje to usunięcie Dev i Twojego czatu z nim oraz usunięcie go ze wszystkich grup. Tej czynności nie można cofnąć."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Usuwa to zapisany bufor przewijania używany do odzyskiwania po restarcie lub awarii."

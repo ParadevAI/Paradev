@@ -6858,6 +6858,9 @@ msgstr "Excluir mesmo assim vai pular completamente o script de teardown."
 msgid "Delete command {0}"
 msgstr "Excluir o comando {0}"
 
+msgid "Delete Dev"
+msgstr "Excluir Dev"
+
 msgid "Delete failed"
 msgstr "Falha ao excluir"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} conquistado"
 msgid "Edit"
 msgstr "Editar"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Editar {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Editar {selectedName}"
 
 msgid "Edit comment"
 msgstr "Editar comentário"
+
+msgid "Edit Dev"
+msgstr "Editar Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Editar variável de ambiente"
@@ -20219,6 +20229,9 @@ msgstr "Este workspace na nuvem está sendo ativado, o que pode levar até 30 se
 
 msgid "This conversation is too long for the model"
 msgstr "Esta conversa é longa demais para o modelo"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Isso exclui o Dev e seu chat com ele, e o remove de todos os grupos. Não é possível desfazer."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Isso apaga o scrollback salvo usado para recuperação após reinício ou travamento."

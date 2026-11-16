@@ -6858,6 +6858,9 @@ msgstr "Supprimer quand même ignorera entièrement le script de nettoyage."
 msgid "Delete command {0}"
 msgstr "Supprimer la commande {0}"
 
+msgid "Delete Dev"
+msgstr "Supprimer le Dev"
+
 msgid "Delete failed"
 msgstr "Échec de la suppression"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} obtenu"
 msgid "Edit"
 msgstr "Modifier"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Modifier {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Modifier {selectedName}"
 
 msgid "Edit comment"
 msgstr "Modifier le commentaire"
+
+msgid "Edit Dev"
+msgstr "Modifier le Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Modifier la variable d’environnement"
@@ -20219,6 +20229,9 @@ msgstr "Cet espace de travail cloud est en train de se réveiller, ce qui peut p
 
 msgid "This conversation is too long for the model"
 msgstr "Cette conversation est trop longue pour le modèle"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Cela supprime le Dev et votre discussion avec lui, et le retire de tous les groupes. Cette action est irréversible."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Cette action supprime l'historique de défilement enregistré, utilisé pour la reprise après redémarrage ou plantage."

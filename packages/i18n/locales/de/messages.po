@@ -6858,6 +6858,9 @@ msgstr "\"Trotzdem löschen\" überspringt das Teardown-Skript vollständig."
 msgid "Delete command {0}"
 msgstr "Befehl {0} löschen"
 
+msgid "Delete Dev"
+msgstr "Dev löschen"
+
 msgid "Delete failed"
 msgstr "Löschen fehlgeschlagen"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} erhalten"
 msgid "Edit"
 msgstr "Bearbeiten"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "{0} bearbeiten"
+
 msgid "Edit {selectedName}"
 msgstr "{selectedName} bearbeiten"
 
 msgid "Edit comment"
 msgstr "Kommentar bearbeiten"
+
+msgid "Edit Dev"
+msgstr "Dev bearbeiten"
 
 msgid "Edit Environment Variable"
 msgstr "Umgebungsvariable bearbeiten"
@@ -20219,6 +20229,9 @@ msgstr "Dieser Cloud-Workspace wird gerade aufgeweckt. Nach Inaktivität kann da
 
 msgid "This conversation is too long for the model"
 msgstr "Diese Unterhaltung ist zu lang für das Modell"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Dadurch werden der Dev und dein Chat mit ihm gelöscht, und er wird aus allen Gruppen entfernt. Das kann nicht rückgängig gemacht werden."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Damit wird der gespeicherte Scrollback gelöscht, der für Neustart- und Absturzwiederherstellung genutzt wird."

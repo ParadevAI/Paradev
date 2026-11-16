@@ -18,6 +18,8 @@ export type ChatsApi = Pick<
 	| "createGroup"
 	| "createPersonalDev"
 	| "createAgent"
+	| "updateDev"
+	| "deleteDev"
 	| "renameGroup"
 	| "deleteGroup"
 	| "addGroupDev"
@@ -100,6 +102,18 @@ export function createChatsApi(
 					description: body.description,
 				}),
 			),
+		updateDev: (devId, patch) =>
+			call(
+				chats.updateDev.mutate({
+					devId,
+					name: patch.name,
+					color: patch.color,
+					description: patch.description,
+				}),
+			),
+		deleteDev: async (devId) => {
+			await call(chats.deleteDev.mutate({ devId }));
+		},
 		renameGroup: (groupId, title) =>
 			call(chats.renameGroup.mutate({ groupId, title })),
 		deleteGroup: async (groupId) => {

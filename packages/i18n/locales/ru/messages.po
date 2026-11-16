@@ -6858,6 +6858,9 @@ msgstr "«Всё равно удалить» полностью пропусти
 msgid "Delete command {0}"
 msgstr "Удалить команду {0}"
 
+msgid "Delete Dev"
+msgstr "Удалить Dev"
+
 msgid "Delete failed"
 msgstr "Не удалось удалить"
 
@@ -7689,11 +7692,18 @@ msgstr "Получено: {name} ×{tier}"
 msgid "Edit"
 msgstr "Изменить"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Изменить {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Изменить {selectedName}"
 
 msgid "Edit comment"
 msgstr "Изменить комментарий"
+
+msgid "Edit Dev"
+msgstr "Изменить Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Изменить переменную окружения"
@@ -20219,6 +20229,9 @@ msgstr "Облачное рабочее пространство запуска�
 
 msgid "This conversation is too long for the model"
 msgstr "Этот разговор слишком длинный для модели"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Dev и ваш чат с ним будут удалены, и он будет убран из всех групп. Это действие нельзя отменить."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Это удалит сохранённую прокрутку, используемую для восстановления после перезагрузки или сбоя."

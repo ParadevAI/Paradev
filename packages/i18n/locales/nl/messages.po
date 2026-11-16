@@ -6858,6 +6858,9 @@ msgstr "Met Toch verwijderen wordt het teardown-script volledig overgeslagen."
 msgid "Delete command {0}"
 msgstr "Commando {0} verwijderen"
 
+msgid "Delete Dev"
+msgstr "Dev verwijderen"
+
 msgid "Delete failed"
 msgstr "Verwijderen mislukt"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} behaald"
 msgid "Edit"
 msgstr "Bewerken"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "{0} bewerken"
+
 msgid "Edit {selectedName}"
 msgstr "{selectedName} bewerken"
 
 msgid "Edit comment"
 msgstr "Opmerking bewerken"
+
+msgid "Edit Dev"
+msgstr "Dev bewerken"
 
 msgid "Edit Environment Variable"
 msgstr "Omgevingsvariabele bewerken"
@@ -20219,6 +20229,9 @@ msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 second
 
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Hiermee verwijder je de Dev en je chat ermee, en haal je hem uit alle groepen. Dit kan niet ongedaan worden gemaakt."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Hiermee wordt de opgeslagen scrollback voor herstel na herstart of crash verwijderd."

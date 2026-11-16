@@ -6858,6 +6858,9 @@ msgstr "「それでも削除」はティアダウンスクリプトを完全に
 msgid "Delete command {0}"
 msgstr "コマンド{0}を削除"
 
+msgid "Delete Dev"
+msgstr "Dev を削除"
+
 msgid "Delete failed"
 msgstr "削除に失敗しました"
 
@@ -7689,11 +7692,18 @@ msgstr "「{name}」×{tier} を獲得"
 msgid "Edit"
 msgstr "編集"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "{0} を編集"
+
 msgid "Edit {selectedName}"
 msgstr "{selectedName} を編集"
 
 msgid "Edit comment"
 msgstr "コメントを編集"
+
+msgid "Edit Dev"
+msgstr "Dev を編集"
 
 msgid "Edit Environment Variable"
 msgstr "環境変数を編集"
@@ -20219,6 +20229,9 @@ msgstr "このクラウドワークスペースを起動しています。しば
 
 msgid "This conversation is too long for the model"
 msgstr "この会話はモデルには長すぎます"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Dev とそのチャットが削除され、すべてのグループから外されます。この操作は元に戻せません。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "再起動やクラッシュからの復旧に使う保存済みスクロールバックを削除します。"

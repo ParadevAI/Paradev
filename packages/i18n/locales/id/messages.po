@@ -6858,6 +6858,9 @@ msgstr "Tetap hapus akan melewati skrip teardown sepenuhnya."
 msgid "Delete command {0}"
 msgstr "Hapus perintah {0}"
 
+msgid "Delete Dev"
+msgstr "Hapus Dev"
+
 msgid "Delete failed"
 msgstr "Penghapusan gagal"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} diraih"
 msgid "Edit"
 msgstr "Edit"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Edit {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Edit {selectedName}"
 
 msgid "Edit comment"
 msgstr "Edit komentar"
+
+msgid "Edit Dev"
+msgstr "Edit Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Edit variabel environment"
@@ -20219,6 +20229,9 @@ msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 3
 
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Tindakan ini menghapus Dev dan chat Anda dengannya, serta mengeluarkannya dari semua grup. Tindakan ini tidak dapat dibatalkan."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Ini menghapus scrollback tersimpan yang dipakai untuk pemulihan setelah reboot/crash."

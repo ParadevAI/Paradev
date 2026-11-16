@@ -6858,6 +6858,9 @@ msgstr "„Přesto smazat“ teardown skript úplně přeskočí."
 msgid "Delete command {0}"
 msgstr "Smazat příkaz {0}"
 
+msgid "Delete Dev"
+msgstr "Smazat Dev"
+
 msgid "Delete failed"
 msgstr "Mazání selhalo"
 
@@ -7689,11 +7692,18 @@ msgstr "Získáno: {name} ×{tier}"
 msgid "Edit"
 msgstr "Upravit"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Upravit {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Upravit {selectedName}"
 
 msgid "Edit comment"
 msgstr "Upravit komentář"
+
+msgid "Edit Dev"
+msgstr "Upravit Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Upravit proměnnou prostředí"
@@ -20219,6 +20229,9 @@ msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat
 
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Tím smažete Dev i váš chat s ním a odeberete ho ze všech skupin. Tuto akci nelze vrátit zpět."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Tímto se smaže uložený scrollback používaný k obnovení po restartu nebo pádu."

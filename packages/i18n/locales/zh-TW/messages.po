@@ -6858,6 +6858,9 @@ msgstr "「仍然刪除」將完全跳過清理指令碼。"
 msgid "Delete command {0}"
 msgstr "刪除命令{0}"
 
+msgid "Delete Dev"
+msgstr "刪除 Dev"
+
 msgid "Delete failed"
 msgstr "刪除失敗"
 
@@ -7689,11 +7692,18 @@ msgstr "已獲得「{name}」×{tier}"
 msgid "Edit"
 msgstr "編輯"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "編輯 {0}"
+
 msgid "Edit {selectedName}"
 msgstr "編輯 {selectedName}"
 
 msgid "Edit comment"
 msgstr "編輯評論"
+
+msgid "Edit Dev"
+msgstr "編輯 Dev"
 
 msgid "Edit Environment Variable"
 msgstr "編輯環境變數"
@@ -20219,6 +20229,9 @@ msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能
 
 msgid "This conversation is too long for the model"
 msgstr "此對話對模型來說太長了"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "這會刪除該 Dev 以及你與它的聊天，並將它移出所有群組。此操作無法復原。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "這將刪除用於重啟/崩潰恢復的已儲存回滾緩衝。"

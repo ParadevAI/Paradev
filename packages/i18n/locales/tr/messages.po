@@ -6858,6 +6858,9 @@ msgstr "Yine de sil, kapatma betiğini tamamen atlar."
 msgid "Delete command {0}"
 msgstr "{0} numaralı komutu sil"
 
+msgid "Delete Dev"
+msgstr "Dev'i sil"
+
 msgid "Delete failed"
 msgstr "Silinemedi"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} kazanıldı"
 msgid "Edit"
 msgstr "Düzenle"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "{0} öğesini düzenle"
+
 msgid "Edit {selectedName}"
 msgstr "{selectedName} ortamını düzenle"
 
 msgid "Edit comment"
 msgstr "Yorumu düzenle"
+
+msgid "Edit Dev"
+msgstr "Dev'i düzenle"
 
 msgid "Edit Environment Variable"
 msgstr "Ortam değişkenini düzenle"
@@ -20219,6 +20229,9 @@ msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa
 
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Bu işlem Dev'i ve onunla olan sohbetinizi siler ve onu tüm gruplardan çıkarır. Geri alınamaz."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Bu işlem, yeniden başlatma/çökme kurtarma için saklanan kaydırma geçmişini siler."

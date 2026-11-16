@@ -6858,6 +6858,9 @@ msgstr "「仍然删除」将完全跳过清理脚本。"
 msgid "Delete command {0}"
 msgstr "删除命令{0}"
 
+msgid "Delete Dev"
+msgstr "删除 Dev"
+
 msgid "Delete failed"
 msgstr "删除失败"
 
@@ -7689,11 +7692,18 @@ msgstr "已获得「{name}」×{tier}"
 msgid "Edit"
 msgstr "编辑"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "编辑 {0}"
+
 msgid "Edit {selectedName}"
 msgstr "编辑 {selectedName}"
 
 msgid "Edit comment"
 msgstr "编辑评论"
+
+msgid "Edit Dev"
+msgstr "编辑 Dev"
 
 msgid "Edit Environment Variable"
 msgstr "编辑环境变量"
@@ -20219,6 +20229,9 @@ msgstr "正在唤醒此云工作区。如果它已闲置一段时间，可能需
 
 msgid "This conversation is too long for the model"
 msgstr "此对话对模型来说太长了"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "这会删除该 Dev 以及你与它的聊天，并将它移出所有群组。此操作无法撤销。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "这将删除用于重启/崩溃恢复的已保存回滚缓冲。"

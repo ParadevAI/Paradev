@@ -4,12 +4,15 @@ import { errorMessage } from "@superset/i18n/errors";
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { LuX } from "react-icons/lu";
+import { LuPencil, LuX } from "react-icons/lu";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
 import { ChatFace } from "../../../components/ChatFace";
+import { useChats } from "../../../hooks/useChats";
+import { EditDevDialog } from "./components/EditDevDialog";
 
 interface ChatDetailsPanelProps {
 	state: ChatState;
@@ -36,6 +39,10 @@ export function ChatDetailsPanel({
 	});
 	const organization = useOrganizationPeople();
 	const [addingId, setAddingId] = useState<string | null>(null);
+	const [editingId, setEditingId] = useState<string | null>(null);
+	const chats = useChats();
+	const navigate = useNavigate();
+	const editing = editingId ? state.devs[editingId] : undefined;
 	const candidates =
 		chat.kind === "group"
 			? organization.people.filter(
@@ -87,7 +94,7 @@ export function ChatDetailsPanel({
 							className="flex items-center gap-2.5 rounded-lg px-1 py-1"
 						>
 							<FaceAvatar seed={agent.id} size={28} />
-							<div className="min-w-0">
+							<div className="min-w-0 flex-1">
 								<div className="truncate text-sm font-medium">{agent.name}</div>
 								{agent.description && (
 									<div className="truncate text-xs text-muted-foreground">
@@ -95,6 +102,16 @@ export function ChatDetailsPanel({
 									</div>
 								)}
 							</div>
+							{agent.descriptionText !== undefined && (
+								<button
+									type="button"
+									aria-label={t({ message: `Edit ${agent.name}` })}
+									onClick={() => setEditingId(agent.id)}
+									className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-fill-hover hover:text-foreground"
+								>
+									<LuPencil className="size-3.5" />
+								</button>
+							)}
 						</div>
 					))}
 				</section>
@@ -139,6 +156,27 @@ export function ChatDetailsPanel({
 					</section>
 				)}
 			</div>
+			{editing && chats && (
+				<EditDevDialog
+					key={editing.id}
+					dev={editing}
+					onOpenChange={(open) => {
+						if (!open) setEditingId(null);
+					}}
+					onSave={(patch) => chats.actions.updateDev(editing.id, patch)}
+					onDelete={
+						editing.kind === "custom" && editing.ownerId === state.meId
+							? async () => {
+									const deleted = await chats.actions.deleteAgent(editing.id);
+									if (deleted && chat.kind === "direct") {
+										void navigate({ to: "/chats" });
+									}
+									return deleted;
+								}
+							: undefined
+					}
+				/>
+			)}
 		</aside>
 	);
 }

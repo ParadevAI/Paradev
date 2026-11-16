@@ -6858,6 +6858,9 @@ msgstr "Vẫn xóa sẽ bỏ qua hoàn toàn script teardown."
 msgid "Delete command {0}"
 msgstr "Xóa lệnh {0}"
 
+msgid "Delete Dev"
+msgstr "Xóa Dev"
+
 msgid "Delete failed"
 msgstr "Xóa thất bại"
 
@@ -7689,11 +7692,18 @@ msgstr "Đã đạt {name} ×{tier}"
 msgid "Edit"
 msgstr "Sửa"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Sửa {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Chỉnh sửa {selectedName}"
 
 msgid "Edit comment"
 msgstr "Sửa bình luận"
+
+msgid "Edit Dev"
+msgstr "Sửa Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Sửa biến môi trường"
@@ -20219,6 +20229,9 @@ msgstr "Không gian làm việc đám mây này đang được đánh thức, c�
 
 msgid "This conversation is too long for the model"
 msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Thao tác này xóa Dev và cuộc trò chuyện của bạn với nó, đồng thời gỡ nó khỏi mọi nhóm. Không thể hoàn tác."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Thao tác này xóa phần scrollback đã lưu dùng để khôi phục sau khi khởi động lại hoặc crash."

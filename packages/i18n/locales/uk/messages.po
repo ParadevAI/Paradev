@@ -6852,6 +6852,9 @@ msgstr "«Усе одно видалити» повністю пропустит
 msgid "Delete command {0}"
 msgstr "Видалити команду {0}"
 
+msgid "Delete Dev"
+msgstr "Видалити Dev"
+
 msgid "Delete failed"
 msgstr "Не вдалося видалити"
 
@@ -7683,11 +7686,18 @@ msgstr "Отримано: {name} ×{tier}"
 msgid "Edit"
 msgstr "Редагувати"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "Змінити {0}"
+
 msgid "Edit {selectedName}"
 msgstr "Редагувати {selectedName}"
 
 msgid "Edit comment"
 msgstr "Редагувати коментар"
+
+msgid "Edit Dev"
+msgstr "Змінити Dev"
 
 msgid "Edit Environment Variable"
 msgstr "Редагувати змінну середовища"
@@ -20213,6 +20223,9 @@ msgstr "Цей хмарний робочий простір прокидаєть
 
 msgid "This conversation is too long for the model"
 msgstr "Ця розмова задовга для моделі"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Dev і ваш чат із ним буде видалено, і його буде прибрано з усіх груп. Цю дію не можна скасувати."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Буде видалено збережений буфер прокручування, який використовується для відновлення після перезавантаження чи збою."

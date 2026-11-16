@@ -6858,6 +6858,9 @@ msgstr "그래도 삭제하면 정리 스크립트를 완전히 건너뜁니다.
 msgid "Delete command {0}"
 msgstr "명령 {0} 삭제"
 
+msgid "Delete Dev"
+msgstr "Dev 삭제"
+
 msgid "Delete failed"
 msgstr "삭제 실패"
 
@@ -7689,11 +7692,18 @@ msgstr "{name} ×{tier} 획득"
 msgid "Edit"
 msgstr "편집"
 
+#. placeholder {0}: agent.name
+msgid "Edit {0}"
+msgstr "{0} 편집"
+
 msgid "Edit {selectedName}"
 msgstr "{selectedName} 편집"
 
 msgid "Edit comment"
 msgstr "코멘트 수정"
+
+msgid "Edit Dev"
+msgstr "Dev 편집"
 
 msgid "Edit Environment Variable"
 msgstr "환경 변수 편집"
@@ -20219,6 +20229,9 @@ msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안
 
 msgid "This conversation is too long for the model"
 msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
+
+msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+msgstr "Dev와 해당 채팅이 삭제되고 모든 그룹에서 제거됩니다. 이 작업은 되돌릴 수 없습니다."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "재부팅/충돌 복구에 사용하는 저장된 스크롤백을 삭제합니다."
