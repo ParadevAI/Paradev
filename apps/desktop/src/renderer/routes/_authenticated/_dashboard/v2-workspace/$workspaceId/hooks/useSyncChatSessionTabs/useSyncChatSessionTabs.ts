@@ -7,14 +7,13 @@ import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import type { StoreApi } from "zustand/vanilla";
-import type { ChatPaneData, PaneViewerData } from "../../types";
+import type { PaneViewerData } from "../../types";
 import { addChatTab } from "../../utils/focusChatSession";
 import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/useSessionClient";
 import { CHAT_ADOPT_POLL_MS, CHAT_ADOPT_SESSIONS_LIMIT } from "./constants";
 import { chatPanesClosedElsewhere } from "./utils/chatPanesClosedElsewhere";
-import { chatPanesResumedElsewhere } from "./utils/chatPanesResumedElsewhere";
 import { chatSessionsToAdopt } from "./utils/chatSessionsToAdopt";
-import { duplicateChatPanes } from "./utils/duplicateChatPanes";
+import { healChatPanes } from "./utils/healChatPanes";
 import { storedChatsAsListed } from "./utils/storedChatsAsListed";
 import { storedPanesTheHostClosed } from "./utils/storedPanesTheHostClosed";
 
@@ -123,31 +122,7 @@ export function useSyncChatSessionTabs({
 			}
 		}
 		storedSessionIds.current.clear();
-		const paneStores = [store, ...linkedStores];
-		for (const paneStore of paneStores) {
-			const state = paneStore.getState();
-			for (const { paneId, sessionId } of chatPanesResumedElsewhere(
-				sessions,
-				state.tabs,
-			)) {
-				const data = state.getPane(paneId)?.pane.data as ChatPaneData;
-				state.setPaneData({ paneId, data: { ...data, sessionId } });
-			}
-		}
-		const duplicates = duplicateChatPanes(
-			paneStores.map((paneStore) => paneStore.getState().tabs),
-		);
-		for (const { store: index, tabId, paneId, kept } of duplicates) {
-			const paneStore = paneStores[index];
-			if (!paneStore) continue;
-			const wasActive = paneStore.getState().activeTabId === tabId;
-			paneStore.getState().closePane({ tabId, paneId, intent: "remove" });
-			const tabRemoved = !paneStore
-				.getState()
-				.tabs.some((tab) => tab.id === tabId);
-			if (wasActive && tabRemoved && kept.store === index)
-				paneStore.getState().setActiveTab(kept.tabId);
-		}
+		healChatPanes({ paneStores: [store, ...linkedStores], sessions });
 		const { version, tabs, activeTabId } = store.getState();
 		const toAdopt = chatSessionsToAdopt({
 			sessions,

@@ -21,10 +21,8 @@ function agentSessionKey(session: ResumableChatSession): string | null {
 }
 
 /**
- * Chat panes whose chat the host closed because another device resumed its
- * agent session under a new chat, such as mobile, with the chat to show
- * instead: the newest open chat on that agent session. A chat on the pane's
- * own terminal is the pane's own recovery, which the pane commits itself.
+ * Panes whose chat the host closed when another device resumed its agent
+ * session, with the newest open chat on that session to show instead.
  */
 export function chatPanesResumedElsewhere(
 	sessions: readonly ResumableChatSession[],
@@ -44,18 +42,25 @@ export function chatPanesResumedElsewhere(
 			resumedBy.set(key, session);
 	}
 	if (resumedBy.size === 0) return [];
-	return tabs.flatMap((tab) =>
-		Object.values(tab.panes).flatMap((pane) => {
-			if (pane.kind !== "chat-v3") return [];
-			const { sessionId, terminalId, awaitingMove } = pane.data as ChatPaneData;
-			const shown = sessionId ? sessionsById.get(sessionId) : undefined;
-			if (!shown?.closedAt || shown.closedByUser === true || awaitingMove)
-				return [];
-			const key = agentSessionKey(shown);
-			const resumed = key ? resumedBy.get(key) : undefined;
-			if (!resumed || resumed.sessionId === shown.sessionId) return [];
-			if (resumed.terminalId === terminalId) return [];
-			return [{ paneId: pane.id, sessionId: resumed.sessionId }];
-		}),
+	const chatPanes = tabs.flatMap((tab) =>
+		Object.values(tab.panes).flatMap((pane) =>
+			pane.kind === "chat-v3"
+				? [{ id: pane.id, data: pane.data as ChatPaneData }]
+				: [],
+		),
 	);
+	const paneTerminalIds = new Set(
+		chatPanes.map((pane) => pane.data.terminalId),
+	);
+	return chatPanes.flatMap(({ id, data }) => {
+		const shown = data.sessionId ? sessionsById.get(data.sessionId) : undefined;
+		if (!shown?.closedAt || shown.closedByUser === true || data.awaitingMove)
+			return [];
+		const key = agentSessionKey(shown);
+		const resumed = key ? resumedBy.get(key) : undefined;
+		if (!resumed || resumed.sessionId === shown.sessionId) return [];
+		if (resumed.terminalId && paneTerminalIds.has(resumed.terminalId))
+			return [];
+		return [{ paneId: id, sessionId: resumed.sessionId }];
+	});
 }
