@@ -1,5 +1,9 @@
 import { auth } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
+import {
+	OWN_ROOT_DOMAINS,
+	withOwnDomainTwins,
+} from "@superset/shared/own-domains";
 import { env } from "@/env";
 
 export type OrgMember = {
@@ -7,6 +11,24 @@ export type OrgMember = {
 	userId: string;
 	role: string;
 };
+
+function ownRootOf(hostname: string): string | undefined {
+	return OWN_ROOT_DOMAINS.find(
+		(root) => hostname === root || hostname.endsWith(`.${root}`),
+	);
+}
+
+/** The session cookie is scoped to one root domain, so sign in on the request's. */
+function signInUrl(request: Request): URL {
+	const root = ownRootOf(new URL(request.url).hostname);
+	const web =
+		withOwnDomainTwins([env.NEXT_PUBLIC_WEB_URL]).find(
+			(url) => ownRootOf(new URL(url).hostname) === root,
+		) ?? env.NEXT_PUBLIC_WEB_URL;
+	const signIn = new URL("/sign-in", web);
+	signIn.searchParams.set("redirect", request.url);
+	return signIn;
+}
 
 /**
  * The connect-route preamble: who is asking, for which organization, and
@@ -21,9 +43,7 @@ export async function requireOrgMember(
 ): Promise<OrgMember | Response> {
 	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session?.user) {
-		const signIn = new URL("/sign-in", env.NEXT_PUBLIC_WEB_URL);
-		signIn.searchParams.set("redirect", request.url);
-		return Response.redirect(signIn.toString(), 302);
+		return Response.redirect(signInUrl(request).toString(), 302);
 	}
 
 	const organizationId = new URL(request.url).searchParams.get(
