@@ -34,7 +34,7 @@ describe("probeTerminalRunning", () => {
 			expect(timeout).toHaveBeenCalledWith(2_000);
 			expect(query).toHaveBeenCalledWith(
 				{ terminalId: "term", workspaceId: "workspace" },
-				{ signal: controller.signal },
+				{ signal: controller.signal, context: { skipBatch: true } },
 			);
 			controller.abort(new DOMException("Timed out", "TimeoutError"));
 			expect(await result).toBe(false);
