@@ -2347,6 +2347,8 @@ export const attachmentParentKind = pgEnum("attachment_parent_kind", [
 	"project_description",
 	// A file sent in a channel; the parent id is the channel_messages row's.
 	"channel_message",
+	// A file sent in a chat; the parent id is the chats.messages row's.
+	"chats_message",
 ]);
 
 /**

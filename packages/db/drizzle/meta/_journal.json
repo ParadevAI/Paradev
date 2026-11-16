@@ -1380,6 +1380,13 @@
       "when": 1794855931835,
       "tag": "0196_chats_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1794866006035,
+      "tag": "0197_chats_message_attachments",
+      "breakpoints": true
     }
   ]
 }
