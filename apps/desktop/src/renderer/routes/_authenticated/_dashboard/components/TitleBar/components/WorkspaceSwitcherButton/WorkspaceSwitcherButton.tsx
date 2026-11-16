@@ -34,7 +34,7 @@ export function WorkspaceSwitcherButton() {
 					aria-label={label}
 					{...{ [PALETTE_TOGGLE_ATTRIBUTE]: "" }}
 					onClick={toggleWorkspaceList}
-					className="no-drag relative mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-card text-foreground ring-1 ring-input transition-colors hover:bg-[image:linear-gradient(var(--fill-hover),var(--fill-hover))]"
+					className="no-drag relative mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--header-tab-selected,var(--card))] text-foreground ring-1 ring-input transition-colors hover:bg-[image:linear-gradient(var(--fill-hover),var(--fill-hover))]"
 				>
 					<WorkspacesIcon className="size-4" />
 					{waiting ? (

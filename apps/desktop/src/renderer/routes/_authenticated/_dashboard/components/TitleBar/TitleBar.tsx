@@ -78,7 +78,7 @@ export function TitleBar() {
 
 	return (
 		<div
-			className="flex h-11 shrink-0 items-stretch"
+			className="flex h-11 shrink-0 items-stretch [--header-tab-selected:var(--shell-tab-selected)]"
 			style={isMac ? { height: `${ROW_HEIGHT / zoomFactor}px` } : undefined}
 		>
 			{isMac ? (
