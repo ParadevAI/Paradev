@@ -175,6 +175,12 @@ export function WorkspaceActivityMenu({
 		(state) => state.hidden[workspaceId] === true,
 	);
 	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const subagentsCollapsed = useActivityPanelStore(
+		(state) => state.subagentsCollapsed[workspaceId] === true,
+	);
+	const setSubagentsCollapsed = useActivityPanelStore(
+		(state) => state.setSubagentsCollapsed,
+	);
 	const popoverOpen = useActivityPanelStore(
 		(state) => state.floatingOpen[workspaceId] === true,
 	);
@@ -772,20 +778,27 @@ export function WorkspaceActivityMenu({
 							<MenuGroup
 								title={<Trans>Subagents</Trans>}
 								count={agentWork.subagents.length}
-							>
-								<div>
-									{agentRows(agentWork.subagents)}
-									{agentWork.finished.map((entry) => (
-										<FinishedSubagentRow
-											key={entry.key}
-											entry={entry}
-											source={sourceOf(entry.terminalId)}
-											onOpen={(target) =>
-												agentActions.open(target, { subagent: true })
+								collapse={
+									agentWork.finished.length > 0
+										? {
+												collapsed: subagentsCollapsed,
+												onChange: (collapsed) =>
+													setSubagentsCollapsed(workspaceId, collapsed),
 											}
-										/>
-									))}
-								</div>
+										: undefined
+								}
+								pinned={agentRows(agentWork.subagents)}
+							>
+								{agentWork.finished.map((entry) => (
+									<FinishedSubagentRow
+										key={entry.key}
+										entry={entry}
+										source={sourceOf(entry.terminalId)}
+										onOpen={(target) =>
+											agentActions.open(target, { subagent: true })
+										}
+									/>
+								))}
 							</MenuGroup>
 						)}
 						{processes.length + agentWork.shells.length > 0 && (
