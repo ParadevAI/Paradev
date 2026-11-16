@@ -98,7 +98,7 @@ function queueWatch(cloudWorkspaceId: string, expiresAt: Date): Promise<void> {
 		path: "/api/cloud-workspaces/sandbox-expiry",
 		body: { cloudWorkspaceId },
 		delaySeconds: Math.max(1, Math.ceil(delayMs / 1000)),
-		deduplicationId: `${cloudWorkspaceId}:${expiresAt.getTime()}`,
+		deduplicationId: `${cloudWorkspaceId}-${expiresAt.getTime()}`,
 		runLocally: watchSandboxExpiry,
 	}).catch((error) =>
 		console.error(
