@@ -5,10 +5,12 @@ import { useTerminalCloseConfirmStore } from "renderer/stores/terminal-close-con
 
 type WorkspaceTrpcUtils = ReturnType<typeof workspaceTrpc.useUtils>;
 
+const RUNNING_PROCESS_PROBE_TIMEOUT_MS = 2_000;
+
 /**
  * Fetch whether a foreground process is running in a terminal. Probes live
- * state (staleTime: 0), and reports "not running" on any error so a failed
- * probe never blocks the close.
+ * state without the query cache, and reports "not running" on errors or
+ * timeouts so a failed probe never blocks the close.
  */
 export async function probeTerminalRunning(
 	utils: WorkspaceTrpcUtils,
@@ -16,9 +18,9 @@ export async function probeTerminalRunning(
 	terminalId: string,
 ): Promise<boolean> {
 	try {
-		const { running } = await utils.terminal.hasRunningProcess.fetch(
+		const { running } = await utils.client.terminal.hasRunningProcess.query(
 			{ terminalId, workspaceId },
-			{ staleTime: 0 },
+			{ signal: AbortSignal.timeout(RUNNING_PROCESS_PROBE_TIMEOUT_MS) },
 		);
 		return running;
 	} catch (error) {
