@@ -13254,9 +13254,6 @@ msgstr "Keine Plugins passen zu \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Noch keine Plugins. Fügen Sie ein Repository hinzu, um sie zu synchronisieren."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Noch keine Ports. Starte einen Dev-Server in einem Terminal, dann erscheint er hier."
-
 msgid "No posts yet."
 msgstr "Noch keine Beiträge."
 

@@ -13254,9 +13254,6 @@ msgstr "Không có plugin nào khớp \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Chưa có plugin nào. Thêm một repository để đồng bộ."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Chưa có cổng nào. Hãy chạy máy chủ phát triển trong terminal và cổng sẽ hiện ở đây."
-
 msgid "No posts yet."
 msgstr "Chưa có bài viết nào."
 

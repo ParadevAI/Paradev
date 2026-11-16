@@ -13254,9 +13254,6 @@ msgstr "沒有匹配「{0}」的外掛"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "尚無外掛。新增一個儲存庫來同步外掛。"
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "尚無連接埠。在終端機中啟動開發伺服器後會顯示在這裡。"
-
 msgid "No posts yet."
 msgstr "暫無文章。"
 

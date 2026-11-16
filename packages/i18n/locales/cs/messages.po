@@ -13254,9 +13254,6 @@ msgstr "Žádný plugin neodpovídá „{0}“"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Zatím žádné pluginy. Přidejte repozitář a synchronizujte je."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Zatím žádné porty. Spusťte vývojový server v terminálu a objeví se tady."
-
 msgid "No posts yet."
 msgstr "Zatím žádné články."
 

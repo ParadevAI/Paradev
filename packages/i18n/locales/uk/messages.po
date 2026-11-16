@@ -13248,9 +13248,6 @@ msgstr "Немає плагінів, що відповідають «{0}»"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Плагінів ще немає. Додайте репозиторій, щоб синхронізувати їх."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Портів ще немає. Запустіть сервер розробки в терміналі, і він з’явиться тут."
-
 msgid "No posts yet."
 msgstr "Публікацій ще немає."
 

@@ -13254,9 +13254,6 @@ msgstr "没有匹配“{0}”的插件"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "暂无插件。添加一个仓库来同步插件。"
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "还没有端口。在终端中启动开发服务器后会显示在这里。"
-
 msgid "No posts yet."
 msgstr "暂无文章。"
 
