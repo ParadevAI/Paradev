@@ -186,12 +186,7 @@ async function request<T>(
 
 export async function listIssues(
 	client: LinearClient,
-	input: {
-		filter: LinearIssueFilter;
-		cursor?: string;
-		search?: string;
-		orderBy?: "createdAt";
-	},
+	input: { filter: LinearIssueFilter; cursor?: string; search?: string },
 ): Promise<LinearIssuePage> {
 	const variables = {
 		filter: input.filter,
@@ -201,29 +196,25 @@ export async function listIssues(
 	if (input.search) {
 		const data = await request<{ searchIssues: RawConnection<RawIssue> }>(
 			client,
-			`query SupersetSearchIssues($term: String!, $filter: IssueFilter, $first: Int!, $after: String, $orderBy: PaginationOrderBy) {
-				searchIssues(term: $term, filter: $filter, first: $first, after: $after, orderBy: $orderBy) {
+			`query SupersetSearchIssues($term: String!, $filter: IssueFilter, $first: Int!, $after: String) {
+				searchIssues(term: $term, filter: $filter, first: $first, after: $after) {
 					nodes { ${ISSUE_FIELDS} }
 					pageInfo { hasNextPage endCursor }
 				}
 			}`,
-			{
-				...variables,
-				term: input.search,
-				...(input.orderBy ? { orderBy: input.orderBy } : {}),
-			},
+			{ ...variables, term: input.search },
 		);
 		return toPage(data.searchIssues);
 	}
 	const data = await request<{ issues: RawConnection<RawIssue> }>(
 		client,
-		`query SupersetIssues($filter: IssueFilter, $first: Int!, $after: String, $orderBy: PaginationOrderBy!) {
-			issues(filter: $filter, first: $first, after: $after, orderBy: $orderBy) {
+		`query SupersetIssues($filter: IssueFilter, $first: Int!, $after: String) {
+			issues(filter: $filter, first: $first, after: $after, orderBy: updatedAt) {
 				nodes { ${ISSUE_FIELDS} }
 				pageInfo { hasNextPage endCursor }
 			}
 		}`,
-		{ ...variables, orderBy: input.orderBy ?? "updatedAt" },
+		variables,
 	);
 	return toPage(data.issues);
 }

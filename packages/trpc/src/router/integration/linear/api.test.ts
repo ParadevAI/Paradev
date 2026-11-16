@@ -83,19 +83,7 @@ describe("listIssues", () => {
 		expect(page.issues[0]?.labels).toEqual([
 			{ id: "l1", name: "Bug", color: "#f00" },
 		]);
-		expect(rawRequest.mock.calls[0]?.[1]).toMatchObject({
-			orderBy: "updatedAt",
-		});
-	});
-
-	test("asks Linear for the newest issues first when ordered by createdAt", async () => {
-		const { client, rawRequest } = clientReturning({
-			issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
-		});
-		await listIssues(client, { filter: {}, orderBy: "createdAt" });
-		expect(rawRequest.mock.calls[0]?.[1]).toMatchObject({
-			orderBy: "createdAt",
-		});
+		expect(rawRequest.mock.calls[0]?.[0]).toContain("orderBy: updatedAt");
 	});
 
 	test("uses Linear's search when there is a term, one request per page", async () => {
@@ -110,25 +98,6 @@ describe("listIssues", () => {
 		expect(rawRequest).toHaveBeenCalledTimes(1);
 		expect(rawRequest.mock.calls[0]?.[0]).toContain("searchIssues");
 		expect(rawRequest.mock.calls[0]?.[1]).toMatchObject({ term: "relay" });
-		expect(rawRequest.mock.calls[0]?.[1]).not.toHaveProperty("orderBy");
-	});
-
-	test("keeps the requested order when searching", async () => {
-		const { client, rawRequest } = clientReturning({
-			searchIssues: {
-				nodes: [],
-				pageInfo: { hasNextPage: false, endCursor: null },
-			},
-		});
-		await listIssues(client, {
-			filter: {},
-			search: "relay",
-			orderBy: "createdAt",
-		});
-		expect(rawRequest.mock.calls[0]?.[1]).toMatchObject({
-			term: "relay",
-			orderBy: "createdAt",
-		});
 	});
 });
 

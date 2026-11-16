@@ -73,7 +73,6 @@ export const linearLiveRouter = {
 				assignee: z.string().nullish(),
 				search: z.string().trim().max(200).nullish(),
 				cursor: z.string().nullish(),
-				orderBy: z.literal("createdAt").optional(),
 			}),
 		)
 		.query(({ ctx, input }) =>
@@ -82,7 +81,6 @@ export const linearLiveRouter = {
 					filter: issueFilterFor(input),
 					cursor: input.cursor ?? undefined,
 					search: input.search || undefined,
-					orderBy: input.orderBy,
 				}),
 			),
 		),
