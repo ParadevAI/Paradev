@@ -18764,7 +18764,7 @@ msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
 
 msgid "Sign in to connect {connectorName}"
-msgstr "{connectorName} bağlamak için oturum açın"
+msgstr "{connectorName} bağlantısı için oturum açın"
 
 msgid "Sign in to continue"
 msgstr "Devam etmek için oturum açın"

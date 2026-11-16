@@ -29,6 +29,7 @@ describe("connectSignInContext", () => {
 			"not a url",
 			"https://evil.test/api/connectors/ahrefs_mcp/connect",
 			"https://api.paradev.com/api/connectors/not_a_connector/connect",
+			"https://api.paradev.com/api/connectors/constructor/connect",
 			"https://api.paradev.com/api/connectors/ahrefs_mcp/callback",
 		])
 			expect(

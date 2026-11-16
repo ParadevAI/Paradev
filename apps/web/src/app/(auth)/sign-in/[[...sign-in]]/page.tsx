@@ -7,12 +7,22 @@ export default async function SignInPage({
 }: {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-	const { redirect, reason } = await searchParams;
-	const connect = connectSignInContext({
-		redirect: typeof redirect === "string" ? redirect : null,
-		reason: typeof reason === "string" ? reason : null,
-		apiUrl: env.NEXT_PUBLIC_API_URL,
-	});
+	const params = await searchParams;
+	const param = (name: string) => {
+		const value = params[name];
+		return typeof value === "string" ? value : null;
+	};
+	const redirect = param("redirect");
 
-	return <SignInForm connect={connect} />;
+	return (
+		<SignInForm
+			redirect={redirect}
+			callbackErrorParam={param("error")}
+			connect={connectSignInContext({
+				redirect,
+				reason: param("reason"),
+				apiUrl: env.NEXT_PUBLIC_API_URL,
+			})}
+		/>
+	);
 }

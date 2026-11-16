@@ -9,7 +9,6 @@ import {
 } from "@superset/shared/dev-credentials";
 import { Button } from "@superset/ui/button";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -41,18 +40,23 @@ function rememberLastUsedMethod(method: AuthMethod) {
 	}
 }
 
-export function SignInForm({ connect }: { connect: ConnectSignIn | null }) {
+export function SignInForm({
+	redirect,
+	callbackErrorParam,
+	connect,
+}: {
+	redirect: string | null;
+	callbackErrorParam: string | null;
+	connect: ConnectSignIn | null;
+}) {
 	const { t } = useLingui();
 	const connectorName = connect?.connectorName;
-	const searchParams = useSearchParams();
-	const redirect = searchParams.get("redirect");
 	const callbackURL = resolveCallbackUrl({
 		redirect,
 		webUrl: env.NEXT_PUBLIC_WEB_URL,
 		trustedOrigins: [env.NEXT_PUBLIC_API_URL],
 	});
 
-	const callbackErrorParam = searchParams.get("error");
 	const callbackError =
 		callbackErrorParam && ERROR_CODE.test(callbackErrorParam)
 			? callbackErrorParam
