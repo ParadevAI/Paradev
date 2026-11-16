@@ -2,6 +2,7 @@ import type { Pty } from "../Pty/index.ts";
 import type { SessionInfo } from "../protocol/index.ts";
 import { TerminalModes } from "../TerminalModes/index.ts";
 import { TerminalColors } from "./TerminalColors/index.ts";
+import { TerminalIdentityQueries } from "./TerminalIdentityQueries/index.ts";
 
 const DEFAULT_BUFFER_BYTES = 64 * 1024;
 
@@ -10,6 +11,8 @@ export interface Session {
 	pty: Pty;
 	modes: TerminalModes;
 	colors: TerminalColors;
+	/** Answers timing-sensitive identity queries at the PTY, not in a renderer. */
+	identity: TerminalIdentityQueries;
 	/** ring buffer for replay-on-attach; in-memory only, never persisted. */
 	buffer: Buffer[];
 	bufferBytes: number;
@@ -58,6 +61,7 @@ export class SessionStore {
 				pty.meta.env?.TERM_THEME === "light" ||
 					pty.meta.env?.COLORFGBG === "0;15",
 			),
+			identity: new TerminalIdentityQueries(),
 			buffer: [],
 			bufferBytes: 0,
 			bufferCap: this.bufferCap,
