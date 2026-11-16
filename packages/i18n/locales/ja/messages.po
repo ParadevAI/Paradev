@@ -18787,6 +18787,9 @@ msgstr "サインインしてこのページを表示"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} でサインインしてから、ここに戻ってください。"
 
+msgid "Sign in with another account"
+msgstr "別のアカウントでサインイン"
+
 msgid "Sign in with email"
 msgstr "メールでサインイン"
 
@@ -18872,6 +18875,9 @@ msgstr "サインイン中..."
 
 msgid "Signing in…"
 msgstr "サインインしています…"
+
+msgid "Signing out..."
+msgstr "サインアウトしています..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "登録は正常に動いています。ウェルカム画面が表示され、コンソールにエラーはありません。"
@@ -19742,6 +19748,9 @@ msgstr "継続 · 30日間のアクティブ日数"
 
 msgid "Switch account"
 msgstr "アカウントを切り替え"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "アカウントを切り替えて {connectorName} を接続"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "エージェントは替える。ワークフローはそのまま"
@@ -23148,6 +23157,9 @@ msgstr "オフラインです"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "現在<0>{currentPlanLabel}プラン</0>をご利用中です。プランについてご質問やサポートが必要な場合は、<1>お問い合わせ<2/></1>ください。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "{email} としてサインインしています。このアカウントは、このリンクの対象となる組織のメンバーではありません。続行するには、その組織のアカウントでサインインしてください。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "他にメンバーがいる組織の唯一のオーナーです。先にオーナー権限を移譲するか、組織を削除してください。"
 
@@ -23395,6 +23407,9 @@ msgstr "Paradevのダウンロードを開始しています。"
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "このブラウザの Paradev セッションは期限切れです。もう一度サインインして {connectorName} に進んでください。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "このブラウザーの Paradev セッションの有効期限が切れました。続行するには、もう一度サインインしてください。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。"

@@ -17,6 +17,7 @@ const retained = [
 	"/.well-known",
 	"/mcp",
 	"/accept-invitation",
+	"/switch-account",
 	"/settings/billing",
 	"/_next",
 	"/ingest",
@@ -69,6 +70,16 @@ function safePage(url: URL, depth = 0): boolean {
 	return true;
 }
 
+export function acceptsHtml(request: Request): boolean {
+	return (request.headers.get("accept") ?? "")
+		.split(",")
+		.some(
+			(type) =>
+				/^\s*text\/html(?:\s*;|\s*$)/i.test(type) &&
+				!/;\s*q=0(?:\.0*)?(?:;|\s*$)/i.test(type),
+		);
+}
+
 export function domainMoveTarget(
 	request: Request,
 	surface: "web" | "desktop",
@@ -115,16 +126,7 @@ export function domainMoveTarget(
 		const dest = request.headers.get("sec-fetch-dest");
 		if ((mode && mode !== "navigate") || (dest && dest !== "document"))
 			return null;
-		if (
-			!(request.headers.get("accept") ?? "")
-				.split(",")
-				.some(
-					(type) =>
-						/^\s*text\/html(?:\s*;|\s*$)/i.test(type) &&
-						!/;\s*q=0(?:\.0*)?(?:;|\s*$)/i.test(type),
-				)
-		)
-			return null;
+		if (!acceptsHtml(request)) return null;
 	}
 	const target = new URL(
 		surface === "web" ? "https://app.paradev.com" : "https://api.paradev.com",

@@ -18787,6 +18787,9 @@ msgstr "Log in om deze pagina te bekijken"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Log in met {browserProviderLabel} en kom dan hier terug."
 
+msgid "Sign in with another account"
+msgstr "Inloggen met een ander account"
+
 msgid "Sign in with email"
 msgstr "Inloggen met e-mail"
 
@@ -18872,6 +18875,9 @@ msgstr "Inloggen..."
 
 msgid "Signing in…"
 msgstr "Inloggen…"
+
+msgid "Signing out..."
+msgstr "Uitloggen..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Aanmelden werkt. Het welkomstscherm laadt en de console is schoon."
@@ -19742,6 +19748,9 @@ msgstr "Continuïteit · actieve dagen van 30"
 
 msgid "Switch account"
 msgstr "Van account wisselen"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "Wissel van account om {connectorName} te koppelen"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Wissel van agent. Houd je workflow"
@@ -23148,6 +23157,9 @@ msgstr "Je bent offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Je zit op het <0>{currentPlanLabel}-plan</0>. Heb je vragen of wil je meer hulp bij je plan, <1>neem dan contact op<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "Je bent ingelogd als {email}. Dit account is geen lid van de organisatie waarvoor deze link is bedoeld. Log in met een account van die organisatie om door te gaan."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Je bent de enige eigenaar van een organisatie met andere leden. Draag het eigendom over of verwijder de organisatie eerst."
 
@@ -23395,6 +23407,9 @@ msgstr "Je Paradev-download start."
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Je Paradev-sessie in deze browser is verlopen. Meld je opnieuw aan om door te gaan naar {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Je Paradev-sessie in deze browser is verlopen. Log opnieuw in om door te gaan."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Je abonnement bevat geen cloudomgevingen."

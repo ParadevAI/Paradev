@@ -18787,6 +18787,9 @@ msgstr "Đăng nhập để xem trang này"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Đăng nhập bằng {browserProviderLabel}, rồi quay lại đây."
 
+msgid "Sign in with another account"
+msgstr "Đăng nhập bằng tài khoản khác"
+
 msgid "Sign in with email"
 msgstr "Đăng nhập bằng email"
 
@@ -18872,6 +18875,9 @@ msgstr "Đang đăng nhập..."
 
 msgid "Signing in…"
 msgstr "Đang đăng nhập…"
+
+msgid "Signing out..."
+msgstr "Đang đăng xuất..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Đăng ký hoạt động tốt. Màn hình chào mừng tải xong và console không có lỗi."
@@ -19742,6 +19748,9 @@ msgstr "Duy trì · số ngày hoạt động trong 30 ngày"
 
 msgid "Switch account"
 msgstr "Chuyển tài khoản"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "Chuyển tài khoản để kết nối {connectorName}"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Đổi agent. Giữ nguyên quy trình"
@@ -23148,6 +23157,9 @@ msgstr "Bạn đang ngoại tuyến"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Bạn đang dùng <0>gói {currentPlanLabel}</0>. Nếu có thắc mắc hoặc cần hỗ trợ thêm về gói của mình, hãy <1>liên hệ với chúng tôi<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "Bạn đang đăng nhập bằng {email}. Tài khoản này không phải là thành viên của tổ chức mà liên kết này dành cho. Hãy đăng nhập bằng một tài khoản trong tổ chức đó để tiếp tục."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Bạn là chủ sở hữu duy nhất của một tổ chức còn thành viên khác. Hãy chuyển quyền sở hữu hoặc xóa tổ chức trước."
 
@@ -23395,6 +23407,9 @@ msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Phiên Paradev của bạn trong trình duyệt này đã hết hạn. Hãy đăng nhập lại để tiếp tục đến {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Phiên Paradev của bạn trong trình duyệt này đã hết hạn. Hãy đăng nhập lại để tiếp tục."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Gói của bạn không bao gồm môi trường đám mây."

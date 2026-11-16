@@ -18787,6 +18787,9 @@ msgstr "Masuk untuk melihat halaman ini"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Masuk dengan {browserProviderLabel}, lalu kembali ke sini."
 
+msgid "Sign in with another account"
+msgstr "Masuk dengan akun lain"
+
 msgid "Sign in with email"
 msgstr "Masuk dengan email"
 
@@ -18872,6 +18875,9 @@ msgstr "Sedang masuk..."
 
 msgid "Signing in…"
 msgstr "Sedang masuk…"
+
+msgid "Signing out..."
+msgstr "Sedang keluar..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Pendaftaran berhasil. Layar sambutan termuat dan konsol bersih."
@@ -19742,6 +19748,9 @@ msgstr "Konsistensi · hari aktif dari 30"
 
 msgid "Switch account"
 msgstr "Ganti akun"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "Ganti akun untuk menghubungkan {connectorName}"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Ganti agen. Pertahankan alur kerja Anda"
@@ -23148,6 +23157,9 @@ msgstr "Anda sedang offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Anda memakai <0>paket {currentPlanLabel}</0>. Kalau ada pertanyaan atau butuh bantuan lebih lanjut soal paket Anda, <1>hubungi kami<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "Anda masuk sebagai {email}. Akun ini bukan anggota organisasi yang dituju tautan ini. Masuk dengan akun di organisasi tersebut untuk melanjutkan."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Anda satu-satunya pemilik organisasi yang punya anggota lain. Alihkan kepemilikan atau hapus organisasinya dulu."
 
@@ -23395,6 +23407,9 @@ msgstr "Unduhan Paradev Anda sedang dimulai."
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan ke {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Sesi Paradev Anda di browser ini telah berakhir. Masuk lagi untuk melanjutkan."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Paket Anda tidak mencakup lingkungan cloud."

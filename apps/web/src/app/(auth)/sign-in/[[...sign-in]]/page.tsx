@@ -1,6 +1,6 @@
+import { connectSignInContext } from "@/app/utils/connectSignInContext";
 import { env } from "@/env";
 import { SignInForm } from "./components/SignInForm";
-import { connectSignInContext } from "./utils/connectSignInContext";
 
 export default async function SignInPage({
 	searchParams,
@@ -23,6 +23,7 @@ export default async function SignInPage({
 				reason: param("reason"),
 				apiUrl: env.NEXT_PUBLIC_API_URL,
 			})}
+			sessionExpired={param("reason") === "session_expired"}
 		/>
 	);
 }

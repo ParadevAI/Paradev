@@ -2,8 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { auth } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
 import { accountConnection } from "@superset/trpc/connectors";
-import { headers } from "next/headers";
 import { env } from "@/env";
+import { signedOut, wrongAccount } from "@/lib/browserAuth";
 import { upsertIdentity } from "@/lib/integrations/upsertIdentity";
 import { unfurlLinks } from "../events/process-link-shared";
 import type { ConnectPayload } from "../events/utils/generate-connect-url";
@@ -45,13 +45,9 @@ export async function GET(request: Request) {
 		return new Response("Invalid token", { status: 400 });
 	}
 
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session?.user) {
-		// Redirect to login, then back here
-		const returnUrl = encodeURIComponent(request.url);
-		return Response.redirect(
-			`${env.NEXT_PUBLIC_WEB_URL}/sign-in?redirect=${returnUrl}`,
-		);
+		return signedOut(request, new Response("Unauthorized", { status: 401 }));
 	}
 
 	const connection = await accountConnection("slack", payload.teamId);
@@ -69,9 +65,12 @@ export async function GET(request: Request) {
 	});
 
 	if (!membership) {
-		return new Response(
-			"You are not a member of the organization connected to this Slack workspace.",
-			{ status: 403 },
+		return wrongAccount(
+			request,
+			new Response(
+				"You are not a member of the organization connected to this Slack workspace.",
+				{ status: 403 },
+			),
 		);
 	}
 

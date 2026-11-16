@@ -67,6 +67,7 @@ describe("domain move policy", () => {
 			"/.well-known",
 			"/mcp",
 			"/accept-invitation",
+			"/switch-account",
 			"/settings/billing",
 			"/_next",
 			"/ingest",

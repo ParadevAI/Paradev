@@ -12,9 +12,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import type { ConnectSignIn } from "@/app/utils/connectSignInContext";
+import { resolveCallbackUrl } from "@/app/utils/resolveCallbackUrl";
 import { env } from "@/env";
-import { resolveCallbackUrl } from "../../../../utils/resolveCallbackUrl";
-import type { ConnectSignIn } from "../../utils/connectSignInContext";
 
 const LAST_USED_METHOD_KEY = "superset-last-auth-method";
 const ERROR_CODE = /^[A-Za-z0-9_-]{1,64}$/;
@@ -44,10 +44,12 @@ export function SignInForm({
 	redirect,
 	callbackErrorParam,
 	connect,
+	sessionExpired,
 }: {
 	redirect: string | null;
 	callbackErrorParam: string | null;
 	connect: ConnectSignIn | null;
+	sessionExpired: boolean;
 }) {
 	const { t } = useLingui();
 	const connectorName = connect?.connectorName;
@@ -184,7 +186,14 @@ export function SignInForm({
 				</h1>
 				<p className="text-muted-foreground text-sm">
 					{!connect ? (
-						<Trans>Sign in to continue to Paradev</Trans>
+						sessionExpired ? (
+							<Trans>
+								Your Paradev session in this browser has expired. Sign in again
+								to continue.
+							</Trans>
+						) : (
+							<Trans>Sign in to continue to Paradev</Trans>
+						)
 					) : connect.sessionExpired ? (
 						<Trans>
 							Your Paradev session in this browser has expired. Sign in again to

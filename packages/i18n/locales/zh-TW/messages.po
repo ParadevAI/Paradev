@@ -18787,6 +18787,9 @@ msgstr "登入以檢視此頁面"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "使用 {browserProviderLabel} 登入後，再回到這裡。"
 
+msgid "Sign in with another account"
+msgstr "使用其他帳號登入"
+
 msgid "Sign in with email"
 msgstr "使用電子郵件登入"
 
@@ -18872,6 +18875,9 @@ msgstr "正在登入..."
 
 msgid "Signing in…"
 msgstr "正在登入…"
+
+msgid "Signing out..."
+msgstr "正在登出..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "註冊正常。歡迎畫面已載入，主控台沒有錯誤。"
@@ -19742,6 +19748,9 @@ msgstr "持續性 · 30 天內的活躍天數"
 
 msgid "Switch account"
 msgstr "切換帳號"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "切換帳號以連接 {connectorName}"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "換代理程式，不換工作流"
@@ -23148,6 +23157,9 @@ msgstr "你已離線"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "你目前使用的是<0>{currentPlanLabel}方案</0>。如有任何疑問，或希望就方案獲得進一步支援，請<1>聯絡我們<2/></1>。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "你目前以 {email} 登入。此帳號不是該連結所屬組織的成員。請使用該組織中的帳號登入以繼續。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "你是某個仍有其他成員的組織的唯一擁有者。請先轉移所有權或刪除該組織。"
 
@@ -23395,6 +23407,9 @@ msgstr "您的 Paradev 下載即將開始。"
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "此瀏覽器中的 Paradev 工作階段已過期。請重新登入以繼續前往 {connectorName}。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "你在此瀏覽器中的 Paradev 工作階段已過期。請重新登入以繼續。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的方案不包含雲端環境。"

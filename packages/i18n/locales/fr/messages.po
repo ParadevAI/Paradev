@@ -18787,6 +18787,9 @@ msgstr "Connectez-vous pour voir cette page"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Connectez-vous avec {browserProviderLabel}, puis revenez ici."
 
+msgid "Sign in with another account"
+msgstr "Se connecter avec un autre compte"
+
 msgid "Sign in with email"
 msgstr "Se connecter par e-mail"
 
@@ -18872,6 +18875,9 @@ msgstr "Connexion..."
 
 msgid "Signing in…"
 msgstr "Connexion…"
+
+msgid "Signing out..."
+msgstr "Déconnexion..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "L'inscription fonctionne. L'écran d'accueil se charge et la console est propre."
@@ -19742,6 +19748,9 @@ msgstr "Régularité · jours actifs sur 30"
 
 msgid "Switch account"
 msgstr "Changer de compte"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "Changez de compte pour connecter {connectorName}"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Changez d'agent. Gardez votre flux de travail"
@@ -23148,6 +23157,9 @@ msgstr "Vous êtes hors ligne"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Vous êtes sur le <0>forfait {currentPlanLabel}</0>. Si vous avez des questions ou souhaitez une aide supplémentaire concernant votre forfait, <1>contactez-nous<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "Vous êtes connecté en tant que {email}. Ce compte n'est pas membre de l'organisation à laquelle ce lien est destiné. Connectez-vous avec un compte de cette organisation pour continuer."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Vous êtes le seul propriétaire d'une organisation qui compte d'autres membres. Transférez la propriété ou supprimez l'organisation d'abord."
 
@@ -23395,6 +23407,9 @@ msgstr "Votre téléchargement de Paradev démarre."
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer vers {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Votre forfait n'inclut pas d'environnements cloud."

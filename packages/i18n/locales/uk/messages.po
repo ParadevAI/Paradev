@@ -18781,6 +18781,9 @@ msgstr "Увійдіть, щоб переглянути цю сторінку"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Увійдіть через {browserProviderLabel} і поверніться сюди."
 
+msgid "Sign in with another account"
+msgstr "Увійти з іншим обліковим записом"
+
 msgid "Sign in with email"
 msgstr "Увійти через email"
 
@@ -18866,6 +18869,9 @@ msgstr "Вхід..."
 
 msgid "Signing in…"
 msgstr "Виконується вхід…"
+
+msgid "Signing out..."
+msgstr "Вихід..."
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Реєстрація працює. Екран привітання завантажується, у консолі немає помилок."
@@ -19736,6 +19742,9 @@ msgstr "Регулярність · активних днів із 30"
 
 msgid "Switch account"
 msgstr "Змінити обліковий запис"
+
+msgid "Switch account to connect {connectorName}"
+msgstr "Змініть обліковий запис, щоб підключити {connectorName}"
 
 msgid "Switch agents. Keep your workflow"
 msgstr "Змінюйте агентів. Робочий процес залишається"
@@ -23142,6 +23151,9 @@ msgstr "Ви офлайн"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Ви на <0>тарифі {currentPlanLabel}</0>. Якщо у вас є запитання або вам потрібна додаткова допомога з тарифом, <1>зв'яжіться з нами<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for. Sign in with an account in that organization to continue."
+msgstr "Ви увійшли як {email}. Цей обліковий запис не є учасником організації, для якої призначене це посилання. Увійдіть з обліковим записом цієї організації, щоб продовжити."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Ви єдиний власник організації, у якій є інші учасники. Спершу передайте право власності або видаліть організацію."
 
@@ -23389,6 +23401,9 @@ msgstr "Завантаження Paradev починається."
 
 msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
 msgstr "Ваш сеанс Paradev у цьому браузері завершився. Увійдіть знову, щоб перейти до {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Ваш сеанс Paradev у цьому браузері закінчився. Увійдіть знову, щоб продовжити."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Ваш тариф не передбачає хмарних середовищ."

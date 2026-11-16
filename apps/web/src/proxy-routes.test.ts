@@ -23,6 +23,7 @@ describe("isPublicRoute", () => {
 		"/accept-invitation/invitation-123",
 		"/cli/auth/code",
 		"/cli/auth/code/success",
+		"/switch-account",
 		"/tasks/my-slug",
 		"/automations/automation-123",
 		"/workspaces/f48e8a62-ac73-4e31-b9bd-7477932fd0ee",

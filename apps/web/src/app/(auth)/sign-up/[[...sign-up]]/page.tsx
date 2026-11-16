@@ -8,8 +8,8 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { resolveCallbackUrl } from "@/app/utils/resolveCallbackUrl";
 import { env } from "@/env";
-import { resolveCallbackUrl } from "../../utils/resolveCallbackUrl";
 
 export default function SignUpPage() {
 	"use no memo";
