@@ -18,6 +18,7 @@ import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useBareContentCard } from "renderer/routes/_authenticated/_dashboard/components/ContentCard";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
+import { RoundedClip } from "renderer/routes/_authenticated/_dashboard/components/RoundedClip";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
 import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
@@ -736,7 +737,7 @@ function V2WorkspaceContent() {
 					>
 						<div
 							className={cn(
-								"relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+								"relative flex min-h-0 min-w-0 flex-1",
 								isParadevShell &&
 									"rounded-r-[10px] border border-border bg-background",
 								isParadevShell &&
@@ -746,116 +747,126 @@ function V2WorkspaceContent() {
 							data-workspace-id={workspaceId}
 							data-pane-area="center"
 						>
-							{rightPaneMode !== "expanded" && <HostConnectionPill />}
-							<WorkspaceMoveBanner workspaceId={workspaceId} />
-							{
-								<Workspace<PaneViewerData>
-									key={workspaceId}
-									{...titleBarTabBarProps(titleBarMainSlot, {
-										paneArea: "center",
-										inert: rightPaneMode === "expanded",
-									})}
-									appearance={isParadevShell ? "cards" : "default"}
-									flush={isParadevShell}
-									isFocused={!isRightAreaFocused}
-									registry={paneRegistry}
-									paneActions={defaultPaneActions}
-									contextMenuActions={centerContextMenuActions}
-									onPaneError={reportRendererError}
-									renderTabIcon={renderBrowserTabIcon}
-									renderTabAccessory={(tab) => (
-										<V2NotificationStatusIndicator
-											sources={getV2NotificationSourcesForTab(tab)}
-										/>
-									)}
-									renderBelowTabBar={() =>
-										showPresetsBar ? (
-											<V2PresetsBar
-												matchedPresets={matchedPresets}
-												executePreset={executePreset}
+							<RoundedClip
+								squareLeft={isParadevShell && !isWorkspaceSidebarCollapsed}
+								radiusClassName={isParadevShell ? "rounded-[9px]" : ""}
+								className="flex-col"
+							>
+								{rightPaneMode !== "expanded" && <HostConnectionPill />}
+								<WorkspaceMoveBanner workspaceId={workspaceId} />
+								{
+									<Workspace<PaneViewerData>
+										key={workspaceId}
+										{...titleBarTabBarProps(titleBarMainSlot, {
+											paneArea: "center",
+											inert: rightPaneMode === "expanded",
+										})}
+										appearance={isParadevShell ? "cards" : "default"}
+										flush={isParadevShell}
+										isFocused={!isRightAreaFocused}
+										registry={paneRegistry}
+										paneActions={defaultPaneActions}
+										contextMenuActions={centerContextMenuActions}
+										onPaneError={reportRendererError}
+										renderTabIcon={renderBrowserTabIcon}
+										renderTabAccessory={(tab) => (
+											<V2NotificationStatusIndicator
+												sources={getV2NotificationSourcesForTab(tab)}
+											/>
+										)}
+										renderBelowTabBar={() =>
+											showPresetsBar ? (
+												<V2PresetsBar
+													matchedPresets={matchedPresets}
+													executePreset={executePreset}
+													showPresetsBar={showPresetsBar}
+													onToggleShowPresetsBar={setShowPresetsBar}
+												/>
+											) : null
+										}
+										renderAddTabMenu={({ runAfterClose }) => (
+											<AddTabMenu
+												onAddTerminal={addTerminalTab}
+												runAfterClose={runAfterClose}
+												onAddChat={addChatTab}
+												onAddBrowser={
+													isRightPaneAreaEnabled ? undefined : addBrowserTab
+												}
+												onAddChanges={
+													isRightPaneAreaEnabled ? undefined : openChanges
+												}
+												onAddDesktop={
+													isSandbox && !isRightPaneAreaEnabled
+														? addDesktopTab
+														: undefined
+												}
+												rightPaneOptions={rightPaneOptions}
+												onOpenInRightPane={openInRightPane}
 												showPresetsBar={showPresetsBar}
 												onToggleShowPresetsBar={setShowPresetsBar}
 											/>
-										) : null
-									}
-									renderAddTabMenu={({ runAfterClose }) => (
-										<AddTabMenu
-											onAddTerminal={addTerminalTab}
-											runAfterClose={runAfterClose}
-											onAddChat={addChatTab}
-											onAddBrowser={
-												isRightPaneAreaEnabled ? undefined : addBrowserTab
-											}
-											onAddChanges={
-												isRightPaneAreaEnabled ? undefined : openChanges
-											}
-											onAddDesktop={
-												isSandbox && !isRightPaneAreaEnabled
-													? addDesktopTab
-													: undefined
-											}
-											rightPaneOptions={rightPaneOptions}
-											onOpenInRightPane={openInRightPane}
-											showPresetsBar={showPresetsBar}
-											onToggleShowPresetsBar={setShowPresetsBar}
-										/>
-									)}
-									renderPaneAside={() => (
-										<ActivityPanelAside workspaceId={workspaceId} />
-									)}
-									renderTabBarLeading={() => <WindowChrome />}
-									renderTabBarTrailing={() => (
-										<div
-											className={cn(
-												"flex items-center gap-1",
-												isRightPaneAreaEnabled && "pr-1",
-											)}
-										>
-											<CloudWorkspaceTabBarControls workspaceId={workspaceId} />
-											{activityMenu}
-											{isRightPaneAreaEnabled ? (
-												!sidebarOpen && renderWorkspaceToolbar(false)
-											) : (
-												<>
-													{isLayoutReady && (
-														<ChangesControl
-															workspaceId={workspaceId}
-															isChangesOpen={isChangesOpen}
-															onToggleChanges={toggleChanges}
-															onOpenPullRequest={openPullRequestPane}
-															viewingPullRequestNumber={
-																viewingPullRequestNumber
-															}
-														/>
-													)}
-													{/* Open-in must not depend on the right sidebar being open,
+										)}
+										renderPaneAside={() => (
+											<ActivityPanelAside workspaceId={workspaceId} />
+										)}
+										renderTabBarLeading={() => <WindowChrome />}
+										renderTabBarTrailing={() => (
+											<div
+												className={cn(
+													"flex items-center gap-1",
+													isRightPaneAreaEnabled && "pr-1",
+												)}
+											>
+												<CloudWorkspaceTabBarControls
+													workspaceId={workspaceId}
+												/>
+												{activityMenu}
+												{isRightPaneAreaEnabled ? (
+													!sidebarOpen && renderWorkspaceToolbar(false)
+												) : (
+													<>
+														{isLayoutReady && (
+															<ChangesControl
+																workspaceId={workspaceId}
+																isChangesOpen={isChangesOpen}
+																onToggleChanges={toggleChanges}
+																onOpenPullRequest={openPullRequestPane}
+																viewingPullRequestNumber={
+																	viewingPullRequestNumber
+																}
+															/>
+														)}
+														{/* Open-in must not depend on the right sidebar being open,
 											    so it lives here rather than in the sidebar's top strip
 											    (#7167). Without an @container ancestor its branch label
 											    stays hidden, which keeps it compact for the tab bar. */}
-													<V2WorkspaceOpenInButton workspaceId={workspaceId} />
-													<RightSidebarToggle
-														isOpen={sidebarOpen}
-														onToggle={toggleRightSidebar}
-													/>
-													{!isMac && !sidebarOpen && <WindowControlsInset />}
-												</>
-											)}
-										</div>
-									)}
-									renderEmptyState={() => (
-										<WorkspaceEmptyState
-											onOpenBrowser={addBrowserTab}
-											onOpenChanges={openChanges}
-											onOpenChat={addChatTab}
-											onOpenQuickOpen={handleQuickOpen}
-											onOpenTerminal={addTerminalTab}
-										/>
-									)}
-									onBeforeCloseTab={onBeforeCloseTab}
-									onInteractionStateChange={onWorkspaceInteractionStateChange}
-									store={store}
-								/>
-							}
+														<V2WorkspaceOpenInButton
+															workspaceId={workspaceId}
+														/>
+														<RightSidebarToggle
+															isOpen={sidebarOpen}
+															onToggle={toggleRightSidebar}
+														/>
+														{!isMac && !sidebarOpen && <WindowControlsInset />}
+													</>
+												)}
+											</div>
+										)}
+										renderEmptyState={() => (
+											<WorkspaceEmptyState
+												onOpenBrowser={addBrowserTab}
+												onOpenChanges={openChanges}
+												onOpenChat={addChatTab}
+												onOpenQuickOpen={handleQuickOpen}
+												onOpenTerminal={addTerminalTab}
+											/>
+										)}
+										onBeforeCloseTab={onBeforeCloseTab}
+										onInteractionStateChange={onWorkspaceInteractionStateChange}
+										store={store}
+									/>
+								}
+							</RoundedClip>
 						</div>
 					</WorkspaceSplitLayout>
 				</WorkspaceGitStatusProvider>
