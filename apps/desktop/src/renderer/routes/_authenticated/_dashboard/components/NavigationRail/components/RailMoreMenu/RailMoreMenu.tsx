@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,8 +13,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
-import { useFeatureFlagEnabled } from "posthog-js/react";
-import { PiChatsCircle } from "react-icons/pi";
+import { LuPin } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import {
@@ -24,12 +22,17 @@ import {
 	railButtonClass,
 } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
+import type { RailDestination } from "../../hooks/useRailDestinations";
+import { useRailPinsStore } from "../../stores/railPinsStore";
 
-export function RailMoreMenu() {
+interface RailMoreMenuProps {
+	destinations: RailDestination[];
+}
+
+export function RailMoreMenu({ destinations }: RailMoreMenuProps) {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
-	const isChannelsEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
+	const setPinned = useRailPinsStore((state) => state.setPinned);
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 	return (
@@ -40,8 +43,7 @@ export function RailMoreMenu() {
 						<button
 							type="button"
 							aria-label={t({ message: "More" })}
-							aria-current={navigation.isChannelsOpen ? "page" : undefined}
-							className={railButtonClass(navigation.isChannelsOpen)}
+							className={railButtonClass(false)}
 						>
 							<Ellipsis
 								className={RAIL_ICON_CLASS}
@@ -59,15 +61,35 @@ export function RailMoreMenu() {
 				align="start"
 				onCloseAutoFocus={(event) => event.preventDefault()}
 			>
-				{isChannelsEnabled && (
-					<DropdownMenuItem
-						onSelect={navigation.openChannels}
-						aria-current={navigation.isChannelsOpen ? "page" : undefined}
-						className={cn(navigation.isChannelsOpen && "bg-fill-selected")}
-					>
-						<PiChatsCircle className="size-4" />
-						<Trans>Chat</Trans>
-					</DropdownMenuItem>
+				{destinations.map(
+					({ id, label, icon: Icon, isIconFilled, isActive, onClick }) => (
+						<DropdownMenuItem
+							key={id}
+							onSelect={onClick}
+							aria-current={isActive ? "page" : undefined}
+							className={cn("group/item", isActive && "bg-fill-selected")}
+						>
+							<Icon
+								className="size-4"
+								{...(isIconFilled
+									? {}
+									: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
+							/>
+							<span className="flex-1">{label}</span>
+							<button
+								type="button"
+								aria-label={t({ message: "Pin" })}
+								title={t({ message: "Pin" })}
+								onClick={(event) => {
+									event.stopPropagation();
+									setPinned(id, true);
+								}}
+								className="-my-1 -mr-1 ml-3 flex size-6 items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity hover:bg-fill-hover hover:text-foreground focus-visible:opacity-100 group-hover/item:opacity-100 group-focus/item:opacity-100"
+							>
+								<LuPin className="size-3.5" />
+							</button>
+						</DropdownMenuItem>
+					),
 				)}
 				{isUsageInSidebarEnabled && (
 					<DropdownMenuItem onSelect={navigation.openUsage}>
@@ -75,7 +97,7 @@ export function RailMoreMenu() {
 						<Trans>Usage</Trans>
 					</DropdownMenuItem>
 				)}
-				{(isChannelsEnabled || isUsageInSidebarEnabled) && (
+				{(destinations.length > 0 || isUsageInSidebarEnabled) && (
 					<DropdownMenuSeparator />
 				)}
 				<DropdownMenuSub>
