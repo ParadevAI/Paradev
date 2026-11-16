@@ -22,6 +22,14 @@ export {
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
+	deleteWorkspaceDrive,
+	ensureWorkspaceDrive,
+	WORKSPACE_DRIVE_MOUNT_PATH,
+	workspaceDriveMounts,
+	workspaceDriveNameFor,
+	workspaceDrivesEnabled,
+} from "./drives";
+export {
 	listRemoteBranches,
 	type RemoteBranch,
 	type RemoteBranchPage,

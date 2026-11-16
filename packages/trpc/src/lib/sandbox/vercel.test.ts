@@ -1,6 +1,7 @@
 import {
 	afterAll,
 	beforeAll,
+	beforeEach,
 	describe,
 	expect,
 	setSystemTime,
@@ -14,6 +15,7 @@ import {
 	listActiveWorkspaceSandboxes,
 	SESSION_TIMEOUT_MS,
 	topUpSandboxSession,
+	wakeSandbox,
 } from "./vercel";
 
 type ListOptions = NonNullable<Parameters<typeof Sandbox.list>[0]>;
@@ -129,6 +131,75 @@ describe("listActiveWorkspaceSandboxes", () => {
 			sortOrder: "desc",
 		});
 		expect(listOptions).not.toHaveProperty("tags");
+	});
+});
+
+describe("wakeSandbox mounts", () => {
+	const RESUMED = new Error("resumed");
+	let status: "running" | "stopped";
+	let updates: Array<Record<string, unknown>>;
+	stub(Sandbox, {
+		get: async () => ({
+			get status() {
+				return status;
+			},
+			vcpus: 4,
+			domain: () => "https://box.invalid",
+			update: async (params: Record<string, unknown>) => {
+				updates.push(params);
+			},
+			extendTimeout: async () => {},
+			writeFiles: async () => {
+				throw RESUMED;
+			},
+		}),
+	});
+	stub(globalThis, {
+		fetch: async () => {
+			throw new Error("no network in tests");
+		},
+	});
+	const mounts = { "/mnt/drive": { drive: "drive-1", mode: "read-write" } };
+	const claim = { vcpus: 4, files: [], networkPolicy: {} } as never;
+	const stopAtResume = async () => {
+		throw RESUMED;
+	};
+
+	beforeEach(() => {
+		updates = [];
+	});
+
+	test("a stopped box gets its mounts before it resumes", async () => {
+		status = "stopped";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates).toEqual([{ mounts }]);
+	});
+
+	test("a box without a drive gets no mount update", async () => {
+		status = "stopped";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates).toEqual([]);
+	});
+
+	test("a running box keeps the mounts its session started with", async () => {
+		status = "running";
+		await expect(
+			wakeSandbox({ providerSandboxId: "sbx", claim, mounts: mounts as never }),
+		).rejects.toThrow();
+		expect(updates).toEqual([{ networkPolicy: {} }]);
 	});
 });
 

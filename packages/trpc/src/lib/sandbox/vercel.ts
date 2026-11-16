@@ -17,6 +17,7 @@ import {
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
+	sandboxDrivePathOf,
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
@@ -26,13 +27,20 @@ import {
 	type SandboxMounts,
 	type SandboxRegion,
 } from "@vercel/sandbox";
-import { env } from "../../env";
 import { bootStampsFrom, type HostAnswer } from "./boot-trace";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
 	type SandboxFile,
 } from "./credentials";
+import {
+	type DriveHost,
+	goldenDriveNameFor,
+	vercelDrives,
+	waitForDriveDetached,
+	workspaceDriveMounts,
+} from "./drives";
+import { credentials } from "./vercel-credentials";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
@@ -51,14 +59,6 @@ export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const BOOT_COMMAND = "/usr/local/bin/superset-boot";
 const HOST_PROBE_TIMEOUT_MS = 1_500;
-
-function credentials() {
-	return {
-		token: env.VERCEL_SANDBOX_TOKEN,
-		teamId: env.VERCEL_SANDBOX_TEAM_ID,
-		projectId: env.VERCEL_SANDBOX_PROJECT_ID,
-	};
-}
 
 function isNotFound(error: unknown): boolean {
 	return error instanceof APIError && error.response.status === 404;
@@ -176,6 +176,21 @@ export async function agentToolsMounts(
 	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
 }
 
+/** One `mounts` object for a session; a later part wins a path both name. */
+export function composeMounts(
+	...parts: Array<SandboxMounts | undefined>
+): SandboxMounts | undefined {
+	const mounts = Object.assign({}, ...parts.filter(Boolean)) as SandboxMounts;
+	return Object.keys(mounts).length > 0 ? mounts : undefined;
+}
+
+function readWriteDriveAt(mounts: SandboxMounts, path: string): string | null {
+	const mount = mounts[path];
+	if (!mount) return null;
+	if (mount instanceof Drive) return mount.name;
+	return mount.mode === "read-write" ? mount.drive : null;
+}
+
 function publishedPorts(extra: readonly number[] = []): number[] {
 	return [...new Set([...SANDBOX_PUBLISHED_PORTS, ...extra])];
 }
@@ -240,6 +255,7 @@ export async function provisionSandbox(args: {
 	claim: SandboxClaim;
 	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
+	mounts?: SandboxMounts;
 }): Promise<{
 	providerSandboxId: string;
 	sandboxUrl: string;
@@ -261,7 +277,10 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
-	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
+	const mounts = composeMounts(
+		args.mounts,
+		await agentToolsMounts(args.claim.agentToolsDrive),
+	);
 	const sandbox =
 		(await getSandbox(args.name)) ??
 		(await Sentry.startSpan(
@@ -483,6 +502,8 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
+	/** Replaces the box's mounts before a stopped session resumes; a running one keeps its own. */
+	mounts?: SandboxMounts;
 	/** Runs once the box is known to be stopped, before anything resumes it. */
 	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
 }): Promise<{
@@ -520,13 +541,26 @@ export async function wakeSandbox(args: {
 			);
 		}
 		if (!wasRunning) {
-			const { [SANDBOX_PATHS.agents]: previous, ...others } =
+			const { [SANDBOX_PATHS.agents]: previousAgents, ...kept } =
 				sandbox.mounts ?? {};
 			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
-			if (agents || previous) {
-				await sandbox
-					.update({ mounts: { ...others, ...agents } })
-					.catch((error) =>
+			const mounts = composeMounts(kept, args.mounts, agents) ?? {};
+			const drive = readWriteDriveAt(mounts, SANDBOX_PATHS.drive);
+			if (drive) {
+				await Sentry.startSpan(
+					{ name: "drive detach", op: "sandbox.provider" },
+					() => waitForDriveDetached(drive),
+				);
+			}
+			if (agents || previousAgents || args.mounts) {
+				const update = Sentry.startSpan(
+					{ name: "mount", op: "sandbox.provider" },
+					() => sandbox.update({ mounts }),
+				);
+				// Without its drive the workspace would boot on an empty /workspace.
+				if (args.mounts) await update;
+				else
+					await update.catch((error) =>
 						console.warn(
 							`[sandbox] mount update failed for ${args.providerSandboxId}`,
 							error,
@@ -616,11 +650,31 @@ const INHERITED_IDENTITY = [
 	CODEX_SYSTEM_CONFIG_PATH,
 ];
 
+/** Agent sessions are the person's; on a drive they would reach every fork. */
+const DRIVE_IDENTITY = [
+	`${SANDBOX_PATHS.home}/.claude/projects`,
+	`${SANDBOX_PATHS.home}/.codex/sessions`,
+];
+
+/**
+ * The paths to remove so a fork starts clean. With a drive, also where those
+ * paths sit on the drive itself, for a box no boot has laid out.
+ */
+export function inheritedIdentityPaths(withDrive: boolean): string[] {
+	if (!withDrive) return INHERITED_IDENTITY;
+	const paths = [...INHERITED_IDENTITY, ...DRIVE_IDENTITY];
+	const onDrive = paths.flatMap((path) => sandboxDrivePathOf(path) ?? []);
+	return [...paths, ...onDrive];
+}
+
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
-export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
+export async function stripWorkspaceIdentity(
+	sandbox: Sandbox,
+	options: { withDrive?: boolean } = {},
+): Promise<void> {
 	await sandbox.runCommand({
 		cmd: "rm",
-		args: ["-rf", ...INHERITED_IDENTITY],
+		args: ["-rf", ...inheritedIdentityPaths(options.withDrive ?? false)],
 		sudo: true,
 	});
 }
@@ -647,13 +701,23 @@ export async function stopAndSnapshot(
  * would start from the source's last stop) and created with an empty env.
  * Taking that snapshot ends the source's session, so a running source is
  * started again before this returns.
+ *
+ * A source with a drive gives the golden a fork of it, taken once the source
+ * has released it; the golden drive is stripped and released the same way.
  */
 export async function promoteSandboxToEnvironment(args: {
 	sourceSandbox: string;
 	goldenName: string;
 	/** What restarts the source: it boots the same way a wake does. */
 	claim: SandboxClaim;
-}): Promise<{ goldenName: string; region: string }> {
+	sourceDriveName?: string | null;
+	drives?: DriveHost;
+}): Promise<{
+	goldenName: string;
+	region: string;
+	goldenDriveName: string | null;
+}> {
+	const drives = args.drives ?? vercelDrives();
 	const source = await Sandbox.get({
 		...credentials(),
 		name: args.sourceSandbox,
@@ -661,6 +725,12 @@ export async function promoteSandboxToEnvironment(args: {
 	});
 	const wasRunning = source.status === "running";
 	const snapshot = await source.snapshot();
+	let goldenDriveName: string | null = null;
+	if (args.sourceDriveName) {
+		goldenDriveName = goldenDriveNameFor(args.goldenName);
+		await waitForDriveDetached(args.sourceDriveName, { drives });
+		await drives.fork(args.sourceDriveName, goldenDriveName);
+	}
 	const golden = await Sandbox.create({
 		...credentials(),
 		name: args.goldenName,
@@ -674,17 +744,33 @@ export async function promoteSandboxToEnvironment(args: {
 		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags("environment", args.claim.identity),
+		...(goldenDriveName
+			? { mounts: workspaceDriveMounts(goldenDriveName) }
+			: {}),
 	});
-	await stripWorkspaceIdentity(golden);
+	await stripWorkspaceIdentity(golden, { withDrive: goldenDriveName !== null });
 	const created = golden.currentSnapshotId;
 	await golden.stop();
 	await waitForStopSnapshot(args.goldenName, created);
+	if (goldenDriveName) await waitForDriveDetached(goldenDriveName, { drives });
 	if (wasRunning) {
+		if (args.sourceDriveName) {
+			await source.update({
+				mounts: composeMounts(
+					source.mounts,
+					workspaceDriveMounts(args.sourceDriveName),
+				),
+			});
+		}
 		await writeIdentity(source, args.claim.identity);
 		await writeSignInFiles(source, args.claim.files);
 		await runBoot(source, args.claim.hostSecret);
 	}
-	return { goldenName: args.goldenName, region: source.region };
+	return {
+		goldenName: args.goldenName,
+		region: source.region,
+		goldenDriveName,
+	};
 }
 
 /**

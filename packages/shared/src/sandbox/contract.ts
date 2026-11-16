@@ -37,7 +37,49 @@ export const SANDBOX_PATHS = {
 	backgrounds: "/usr/share/backgrounds/superset",
 	/** A read-only snapshot of the region's agent-tools drive, when one is mounted. */
 	agents: "/opt/agents",
+	/** The workspace's own drive, read-write, when its environment is in drive mode. */
+	drive: "/mnt/superset-drive",
 } as const;
+
+/**
+ * Home subtrees that live on the workspace drive, relative to the home
+ * directory. Each is bind-mounted from `<drive>/home/<subtree>`.
+ */
+export const SANDBOX_DRIVE_HOME_SUBTREES = [
+	".cache",
+	".local/share",
+	".local/state",
+	".npm",
+	".cargo/registry",
+	".rustup",
+	".claude",
+	".codex/sessions",
+	"go/pkg",
+] as const;
+
+/** Package stores inside the `/workspace` bind mount: a hardlink across two mounts fails with EXDEV. */
+export const SANDBOX_DRIVE_STORES = {
+	bun: `${SANDBOX_PATHS.workspace}/.superset/stores/bun`,
+	pnpm: `${SANDBOX_PATHS.workspace}/.superset/stores/pnpm`,
+} as const;
+
+/**
+ * Where a path of the laid-out box lives on the drive while no boot has
+ * bind-mounted it; null for a path on the root disk.
+ */
+export function sandboxDrivePathOf(path: string): string | null {
+	const workspace = SANDBOX_PATHS.workspace;
+	if (path === workspace || path.startsWith(`${workspace}/`)) {
+		return `${SANDBOX_PATHS.drive}/workspace${path.slice(workspace.length)}`;
+	}
+	for (const subtree of SANDBOX_DRIVE_HOME_SUBTREES) {
+		const mounted = `${SANDBOX_PATHS.home}/${subtree}`;
+		if (path === mounted || path.startsWith(`${mounted}/`)) {
+			return `${SANDBOX_PATHS.drive}/home${path.slice(SANDBOX_PATHS.home.length)}`;
+		}
+	}
+	return null;
+}
 
 /**
  * The agent CLIs of one bundle in one region: written once by the release,
@@ -237,6 +279,10 @@ export function renderContractShell(): string {
 		SUPERSET_DESKTOP_TEMPLATES: SANDBOX_PATHS.desktopTemplates,
 		SUPERSET_BACKGROUNDS_DIR: SANDBOX_PATHS.backgrounds,
 		SUPERSET_AGENTS_DIR: SANDBOX_PATHS.agents,
+		SUPERSET_DRIVE_DIR: SANDBOX_PATHS.drive,
+		SUPERSET_DRIVE_HOME_SUBTREES: SANDBOX_DRIVE_HOME_SUBTREES.join(" "),
+		SUPERSET_BUN_STORE: SANDBOX_DRIVE_STORES.bun,
+		SUPERSET_PNPM_STORE: SANDBOX_DRIVE_STORES.pnpm,
 		SUPERSET_HOST_SERVICE_PORT: SANDBOX_PORTS.hostService,
 		SUPERSET_DESKTOP_PORT: SANDBOX_PORTS.desktop,
 		SUPERSET_VNC_PORT: SANDBOX_PORTS.vnc,

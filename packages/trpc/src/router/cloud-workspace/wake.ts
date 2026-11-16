@@ -15,6 +15,7 @@ import {
 	recordBootSpans,
 	stopAndSnapshot,
 	wakeSandbox,
+	workspaceDriveMounts,
 } from "../../lib/sandbox";
 import {
 	attachBootSession,
@@ -78,6 +79,7 @@ async function wake(
 		await wakeSandbox({
 			providerSandboxId: row.providerSandboxId,
 			claim,
+			mounts: workspaceDriveMounts(row.driveName),
 			beforeResume: async (box) => {
 				({ bootId } = await Sentry.startSpan(
 					{ name: "authorize boot", op: "billing" },

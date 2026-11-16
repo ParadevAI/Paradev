@@ -201,6 +201,13 @@ export const FEATURE_FLAGS = {
 	 */
 	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
 	/**
+	 * Lets a golden build or a promote put an organization's environment in
+	 * drive mode (`environments.golden_drive_name`). Evaluated per organization.
+	 * Workspaces follow their environment, never this flag. Unloaded or
+	 * offline means no drive.
+	 */
+	CLOUD_WORKSPACE_DRIVES: "cloud-workspace-drives",
+	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:
 	 * shows the Move items, and gates
 	 * `workspaceMove.begin` server-side. Moving to the cloud also needs
