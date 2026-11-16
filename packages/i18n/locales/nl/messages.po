@@ -14669,6 +14669,9 @@ msgstr "Openstaande uitnodigingen"
 msgid "People"
 msgstr "Personen"
 
+msgid "People and Devs"
+msgstr "Personen en Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Personen buiten {organizationName} verliezen de toegang en de openbare link werkt niet meer."
 
@@ -15982,7 +15985,6 @@ msgstr "Externe werkruimte: apparaat offline"
 msgid "Remove"
 msgstr "Verwijderen"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

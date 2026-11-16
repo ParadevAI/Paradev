@@ -14669,6 +14669,9 @@ msgstr "Convites pendentes"
 msgid "People"
 msgstr "Pessoas"
 
+msgid "People and Devs"
+msgstr "Pessoas e Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Pessoas de fora de {organizationName} perdem o acesso, e o link público deixa de funcionar."
 
@@ -15982,7 +15985,6 @@ msgstr "Área de trabalho remota: dispositivo offline"
 msgid "Remove"
 msgstr "Remover"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

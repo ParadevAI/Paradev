@@ -14663,6 +14663,9 @@ msgstr "Очікувані запрошення"
 msgid "People"
 msgstr "Люди"
 
+msgid "People and Devs"
+msgstr "Люди та Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Люди поза {organizationName} втратять доступ, а публічне посилання перестане працювати."
 
@@ -15976,7 +15979,6 @@ msgstr "Віддалений робочий простір: пристрій о�
 msgid "Remove"
 msgstr "Видалити"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

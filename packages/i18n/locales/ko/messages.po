@@ -14669,6 +14669,9 @@ msgstr "대기 중인 초대"
 msgid "People"
 msgstr "사람"
 
+msgid "People and Devs"
+msgstr "사람 및 Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "{organizationName} 외부 사람은 접근 권한을 잃고 공개 링크가 작동하지 않습니다."
 
@@ -15982,7 +15985,6 @@ msgstr "원격 워크스페이스: 기기 오프라인"
 msgid "Remove"
 msgstr "제거"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

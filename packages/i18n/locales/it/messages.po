@@ -14669,6 +14669,9 @@ msgstr "Inviti in sospeso"
 msgid "People"
 msgstr "Persone"
 
+msgid "People and Devs"
+msgstr "Persone e Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Le persone esterne a {organizationName} perdono l’accesso e il link pubblico smette di funzionare."
 
@@ -15982,7 +15985,6 @@ msgstr "Workspace remoto: dispositivo offline"
 msgid "Remove"
 msgstr "Rimuovi"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

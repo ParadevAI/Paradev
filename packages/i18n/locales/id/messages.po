@@ -14669,6 +14669,9 @@ msgstr "Undangan Tertunda"
 msgid "People"
 msgstr "Orang"
 
+msgid "People and Devs"
+msgstr "Orang dan Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Orang di luar {organizationName} kehilangan akses, dan tautan publik berhenti berfungsi."
 
@@ -15982,7 +15985,6 @@ msgstr "Workspace jarak jauh: perangkat offline"
 msgid "Remove"
 msgstr "Hapus"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

@@ -14669,6 +14669,9 @@ msgstr "待处理邀请"
 msgid "People"
 msgstr "人员"
 
+msgid "People and Devs"
+msgstr "成员和 Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "{organizationName} 以外的人将失去访问权限，公开链接也将失效。"
 
@@ -15982,7 +15985,6 @@ msgstr "远程工作区，设备离线"
 msgid "Remove"
 msgstr "移除"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

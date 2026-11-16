@@ -14669,6 +14669,9 @@ msgstr "Oczekujące zaproszenia"
 msgid "People"
 msgstr "Osoby"
 
+msgid "People and Devs"
+msgstr "Osoby i Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Osoby spoza {organizationName} stracą dostęp, a publiczny link przestanie działać."
 
@@ -15982,7 +15985,6 @@ msgstr "Zdalny obszar roboczy: urządzenie offline"
 msgid "Remove"
 msgstr "Usuń"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

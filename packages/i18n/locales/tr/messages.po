@@ -14669,6 +14669,9 @@ msgstr "Bekleyen davetler"
 msgid "People"
 msgstr "Kişiler"
 
+msgid "People and Devs"
+msgstr "Kişiler ve Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "{organizationName} dışındaki kişiler erişimini kaybeder ve herkese açık bağlantı çalışmayı durdurur."
 
@@ -15982,7 +15985,6 @@ msgstr "Uzak çalışma alanı: cihaz çevrimdışı"
 msgid "Remove"
 msgstr "Kaldır"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

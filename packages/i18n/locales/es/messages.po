@@ -14669,6 +14669,9 @@ msgstr "Invitaciones pendientes"
 msgid "People"
 msgstr "Personas"
 
+msgid "People and Devs"
+msgstr "Personas y Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Las personas ajenas a {organizationName} perderán el acceso y el enlace público dejará de funcionar."
 
@@ -15982,7 +15985,6 @@ msgstr "Espacio de trabajo remoto: dispositivo sin conexión"
 msgid "Remove"
 msgstr "Quitar"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

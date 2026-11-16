@@ -1,26 +1,42 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import type {
+	ComposerDraft,
+	ComposerMentionProvider,
+	PromptInputHandle,
+} from "@superset/chat-ui/PromptInput";
 import {
-	acceptFiles,
 	type MentionCandidate,
-	matchMentions,
 	mentionToken,
-	moveSelection,
-	parseMentionTokens,
 	splitMentions,
 } from "@superset/chats-core";
 import { Avatar } from "@superset/ui/atoms/Avatar";
-import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { LuArrowUp, LuPaperclip, LuPencil, LuReply, LuX } from "react-icons/lu";
+import { useEffect, useMemo, useRef } from "react";
+import { LuPencil, LuReply, LuX } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
-import { AttachmentChip } from "./components/AttachmentChip";
-import { withMentionTokens } from "./utils/withMentionTokens";
+import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 
-const MAX_HEIGHT_PX = 240;
-const MAX_MENTION_ROWS = 6;
-/** An @ and what follows it up to the caret, when the caret sits in one. */
-const MENTION_QUERY = /(^|\s)@([^\s@]*)$/;
+const MENTION_PRIORITY = -1;
+
+const chipFor = (candidate: MentionCandidate) => ({
+	label: candidate.label,
+	serialized: mentionToken(candidate),
+});
+
+/** A sent message as a draft: its words, with each mention as the chip it was picked as. */
+function draftOf(text: string, candidates: MentionCandidate[]): ComposerDraft {
+	return {
+		attachments: [],
+		segments: splitMentions(text).map((segment) => {
+			if (segment.type === "text") return segment;
+			const candidate = candidates.find(
+				(entry) => entry.kind === segment.kind && entry.id === segment.id,
+			);
+			return candidate
+				? { type: "chip", chip: chipFor(candidate) }
+				: { type: "text", text: mentionToken(segment) };
+		}),
+	};
+}
 
 interface ChatComposerProps {
 	placeholder: string;
@@ -37,7 +53,7 @@ interface ChatComposerProps {
 	onEditLast: () => void;
 }
 
-/** The composer as one card: the text, and send only once there is something to send. */
+/** The app's composer, in a chat: @ names its people and Devs, and a strip says what a send answers or changes. */
 export function ChatComposer({
 	placeholder,
 	candidates,
@@ -48,96 +64,52 @@ export function ChatComposer({
 	onEditLast,
 }: ChatComposerProps) {
 	const { t } = useLingui();
-	const [text, setText] = useState("");
-	const [caret, setCaret] = useState(0);
-	const [picked, setPicked] = useState<MentionCandidate[]>([]);
-	const [mentionIndex, setMentionIndex] = useState(0);
-	const [isMentionClosed, setMentionClosed] = useState(false);
-	const [files, setFiles] = useState<File[]>([]);
-	const fileInputRef = useRef<HTMLInputElement>(null);
-	const attach = (picked: File[]) => {
-		if (editing || picked.length === 0) return;
-		const accepted = acceptFiles(files, picked);
-		setFiles(accepted.files);
-		if (accepted.problem) toast.error(accepted.problem);
-	};
-	const inputRef = useRef<HTMLTextAreaElement>(null);
+	const composer = useRef<PromptInputHandle>(null);
 	const candidatesRef = useRef(candidates);
 	candidatesRef.current = candidates;
+
 	const editingText = editing?.text;
 	useEffect(() => {
 		if (editingText !== undefined) {
-			const named = parseMentionTokens(editingText).flatMap((ref) => {
-				const candidate = candidatesRef.current.find(
-					(entry) => entry.kind === ref.kind && entry.id === ref.id,
-				);
-				return candidate ? [candidate] : [];
-			});
-			setPicked(named);
-			setText(
-				splitMentions(editingText)
-					.map((segment) => {
-						if (segment.type === "text") return segment.text;
-						const candidate = named.find(
-							(entry) => entry.kind === segment.kind && entry.id === segment.id,
-						);
-						return candidate ? `@${candidate.label}` : mentionToken(segment);
-					})
-					.join(""),
+			composer.current?.restoreDraft(
+				draftOf(editingText, candidatesRef.current),
 			);
 		}
-		inputRef.current?.focus();
+		composer.current?.focus();
 	}, [editingText]);
 
-	const query = MENTION_QUERY.exec(text.slice(0, caret))?.[2];
-	const matches =
-		query === undefined || isMentionClosed
-			? []
-			: matchMentions(candidates, query).slice(0, MAX_MENTION_ROWS);
-	const pick = (candidate: MentionCandidate) => {
-		const start = caret - (query?.length ?? 0) - 1;
-		const inserted = `@${candidate.label} `;
-		const next = text.slice(0, start) + inserted + text.slice(caret);
-		setText(next);
-		setPicked((current) =>
-			current.some(
-				(entry) => entry.kind === candidate.kind && entry.id === candidate.id,
-			)
-				? current
-				: [...current, candidate],
-		);
-		const position = start + inserted.length;
-		setCaret(position);
-		requestAnimationFrame(() => {
-			inputRef.current?.focus();
-			inputRef.current?.setSelectionRange(position, position);
-		});
-	};
-	const hasReply = replyingTo !== null;
-	useEffect(() => {
-		if (hasReply) inputRef.current?.focus();
-	}, [hasReply]);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: the height follows the text
-	useLayoutEffect(() => {
-		const input = inputRef.current;
-		if (!input) return;
-		input.style.height = "auto";
-		input.style.height = `${Math.min(input.scrollHeight, MAX_HEIGHT_PX)}px`;
-	}, [text]);
+	const title = t({ message: "People and Devs" });
+	const mentionProviders = useMemo<ComposerMentionProvider[]>(
+		() => [
+			{
+				id: "chat-members",
+				title,
+				priority: MENTION_PRIORITY,
+				source: {
+					kind: "static",
+					load: () =>
+						candidatesRef.current.map((candidate) => ({
+							id: `${candidate.kind}:${candidate.id}`,
+							label: candidate.label,
+							description: candidate.owner,
+							keywords: [candidate.name],
+							icon:
+								candidate.kind === "dev" ? (
+									<FaceAvatar seed={candidate.id} size={16} />
+								) : (
+									<Avatar size="xs" fullName={candidate.name} image={null} />
+								),
+							select: (ctx) => ctx.insertChip(chipFor(candidate)),
+						})),
+				},
+			},
+		],
+		[title],
+	);
 
-	const ready = text.trim() !== "" || files.length > 0;
-	const send = () => {
-		if (!ready) return;
-		onSend(withMentionTokens(text.trim(), picked), files);
-		setText("");
-		setPicked([]);
-		setFiles([]);
-	};
 	const cancel = () => {
-		if (editing) {
-			setText("");
-			setPicked([]);
-		}
+		if (editing)
+			composer.current?.restoreDraft({ segments: [], attachments: [] });
 		onCancel();
 	};
 	const strip = editing
@@ -151,53 +123,25 @@ export function ChatComposer({
 			: null;
 
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: files dropped anywhere on the card are attached
+		// biome-ignore lint/a11y/noStaticElementInteractions: keys the editor left alone act on the strip
 		<div
-			className="relative rounded-[14px] bg-fill-selected"
-			onDragOver={(event) => {
-				if (event.dataTransfer.types.includes("Files")) event.preventDefault();
-			}}
-			onDrop={(event) => {
-				if (event.dataTransfer.files.length === 0) return;
-				event.preventDefault();
-				attach([...event.dataTransfer.files]);
+			onKeyDown={(event) => {
+				if (event.defaultPrevented) return;
+				if (event.key === "Escape" && strip) {
+					event.preventDefault();
+					cancel();
+				} else if (
+					event.key === "ArrowUp" &&
+					!strip &&
+					composer.current?.isEmpty()
+				) {
+					event.preventDefault();
+					onEditLast();
+				}
 			}}
 		>
-			{matches.length > 0 && (
-				<div
-					role="listbox"
-					className="absolute bottom-full left-2 z-20 mb-2 w-80 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg"
-				>
-					{matches.map((candidate, index) => (
-						<button
-							key={`${candidate.kind}:${candidate.id}`}
-							type="button"
-							role="option"
-							aria-selected={index === mentionIndex}
-							onMouseDown={(event) => {
-								event.preventDefault();
-								pick(candidate);
-							}}
-							onMouseEnter={() => setMentionIndex(index)}
-							className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm aria-selected:bg-fill-selected"
-						>
-							{candidate.kind === "dev" ? (
-								<FaceAvatar seed={candidate.id} size={20} />
-							) : (
-								<Avatar size="xs" fullName={candidate.name} image={null} />
-							)}
-							<span className="min-w-0 flex-1 truncate font-medium">
-								{candidate.label}
-							</span>
-							<span className="shrink-0 text-xs text-muted-foreground">
-								{candidate.owner}
-							</span>
-						</button>
-					))}
-				</div>
-			)}
 			{strip && (
-				<div className="flex items-center gap-2 border-b border-border/60 py-1.5 pr-1.5 pl-3.5 text-xs">
+				<div className="mb-1.5 flex items-center gap-2 rounded-lg bg-fill-selected py-1.5 pr-1.5 pl-3.5 text-xs">
 					<strip.icon className="size-3.5 shrink-0 text-highlight" />
 					<span className="shrink-0 font-medium">{strip.label}</span>
 					<span className="min-w-0 flex-1 truncate text-muted-foreground">
@@ -213,116 +157,18 @@ export function ChatComposer({
 					</button>
 				</div>
 			)}
-			{files.length > 0 && (
-				<div className="flex flex-wrap gap-1.5 px-2 pt-2">
-					{files.map((file, index) => (
-						<AttachmentChip
-							// biome-ignore lint/suspicious/noArrayIndexKey: two picked files can share a name and size
-							key={index}
-							file={file}
-							onRemove={() =>
-								setFiles((current) => current.filter((_, at) => at !== index))
-							}
-						/>
-					))}
-				</div>
-			)}
-			<div className="flex items-end gap-1.5 p-1.5">
-				{!editing && (
-					<>
-						<input
-							ref={fileInputRef}
-							type="file"
-							multiple
-							hidden
-							onChange={(event) => {
-								attach([...(event.target.files ?? [])]);
-								event.target.value = "";
-							}}
-						/>
-						<button
-							type="button"
-							aria-label={t({ message: "Attach files" })}
-							onClick={() => fileInputRef.current?.click()}
-							className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-fill-hover hover:text-foreground"
-						>
-							<LuPaperclip className="size-4" />
-						</button>
-					</>
-				)}
-				<textarea
-					ref={inputRef}
-					value={text}
-					rows={1}
-					placeholder={placeholder}
-					onChange={(event) => {
-						setText(event.target.value);
-						setCaret(event.target.selectionStart);
-						setMentionClosed(false);
-						setMentionIndex(0);
-					}}
-					onSelect={(event) => setCaret(event.currentTarget.selectionStart)}
-					onPaste={(event) => {
-						if (event.clipboardData.files.length === 0) return;
-						event.preventDefault();
-						attach([...event.clipboardData.files]);
-					}}
-					onKeyDown={(event) => {
-						if (event.nativeEvent.isComposing) return;
-						if (matches.length > 0) {
-							const move =
-								event.key === "ArrowDown"
-									? 1
-									: event.key === "ArrowUp"
-										? -1
-										: 0;
-							const chosen = matches[mentionIndex] ?? matches[0];
-							if (move !== 0) {
-								event.preventDefault();
-								setMentionIndex(
-									moveSelection(mentionIndex, move, matches.length),
-								);
-								return;
-							}
-							if ((event.key === "Enter" || event.key === "Tab") && chosen) {
-								event.preventDefault();
-								pick(chosen);
-								return;
-							}
-							if (event.key === "Escape") {
-								event.preventDefault();
-								setMentionClosed(true);
-								return;
-							}
-						}
-						if (event.key === "Enter" && !event.shiftKey) {
-							event.preventDefault();
-							send();
-						} else if (event.key === "Escape" && strip) {
-							event.preventDefault();
-							cancel();
-						} else if (event.key === "ArrowUp" && text === "" && !strip) {
-							event.preventDefault();
-							onEditLast();
-						}
-					}}
-					className="min-h-8 min-w-0 flex-1 resize-none bg-transparent px-2 py-[5px] text-sm leading-[22px] outline-none placeholder:text-muted-foreground/80"
-				/>
-				<button
-					type="button"
-					aria-label={t({ message: "Send" })}
-					disabled={!ready}
-					onClick={send}
-					className={cn(
-						"flex size-8 shrink-0 items-center justify-center rounded-lg transition-opacity",
-						ready
-							? "bg-highlight text-highlight-foreground"
-							: "pointer-events-none opacity-0",
-					)}
-				>
-					<LuArrowUp className="size-4" strokeWidth={2.5} />
-				</button>
-			</div>
+			<AgentComposer
+				ref={composer}
+				layout="inline"
+				placeholder={placeholder}
+				mentionProviders={mentionProviders}
+				autoFocus
+				onSubmit={(payload) => {
+					const text = payload.text.trim();
+					if (text === "" && payload.files.length === 0) return false;
+					onSend(text, payload.files);
+				}}
+			/>
 		</div>
 	);
 }

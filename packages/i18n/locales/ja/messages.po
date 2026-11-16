@@ -14669,6 +14669,9 @@ msgstr "保留中の招待"
 msgid "People"
 msgstr "メンバー"
 
+msgid "People and Devs"
+msgstr "メンバーと Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "{organizationName}外のユーザーはアクセスできなくなり、公開リンクは無効になります。"
 
@@ -15982,7 +15985,6 @@ msgstr "リモートワークスペース：デバイスがオフライン"
 msgid "Remove"
 msgstr "削除"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"

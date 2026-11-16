@@ -14669,6 +14669,9 @@ msgstr "Lời mời đang chờ"
 msgid "People"
 msgstr "Mọi người"
 
+msgid "People and Devs"
+msgstr "Người và Devs"
+
 msgid "People outside {organizationName} lose access, and the public link stops working."
 msgstr "Người ngoài {organizationName} sẽ mất quyền truy cập và liên kết công khai sẽ ngừng hoạt động."
 
@@ -15982,7 +15985,6 @@ msgstr "Workspace từ xa: thiết bị ngoại tuyến"
 msgid "Remove"
 msgstr "Gỡ"
 
-#. placeholder {0}: file.name
 #. placeholder {0}: member.name
 #. placeholder {0}: source.repo
 msgid "Remove {0}"
