@@ -2,7 +2,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useSwitcherGroups } from "../../hooks/useSwitcherGroups";
 import { useSwitchToWorkspace } from "../../hooks/useSwitchToWorkspace";
@@ -55,6 +55,18 @@ export function WorkspaceSwitcherList({
 
 	useSwitcherCycle(cycle, ordered, trimmed, select);
 
+	const listRef = useRef<HTMLDivElement>(null);
+	const listKey = `${parsed.scope}|${parsed.creator ?? ""}|${trimmed}`;
+	// cmdk selects the first row of a changed list but leaves the scroll where
+	// the old selection was. A frame later, so its own scroll runs first.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: listKey is the trigger
+	useEffect(() => {
+		const frame = requestAnimationFrame(() => {
+			if (listRef.current) listRef.current.scrollTop = 0;
+		});
+		return () => cancelAnimationFrame(frame);
+	}, [listKey]);
+
 	const renderRows = (
 		rows: SwitcherRow<AccessibleV2Workspace>[],
 		offset: number,
@@ -71,7 +83,7 @@ export function WorkspaceSwitcherList({
 
 	let offset = 0;
 	return (
-		<CommandList>
+		<CommandList ref={listRef}>
 			<CommandEmpty>
 				<Trans>No workspaces found.</Trans>
 			</CommandEmpty>
