@@ -21,6 +21,7 @@ export function useSwitcherCycle(
 	const step = useFrameStackStore((s) => s.switcherStep);
 	const hold = useFrameStackStore((s) => s.switcherHold);
 	const releaseHold = useFrameStackStore((s) => s.releaseSwitcherHold);
+	const setSelection = useFrameStackStore((s) => s.setSwitcherSelection);
 	const latest = useRef({ cycle, ordered, select });
 	latest.current = { cycle, ordered, select };
 	const selectedValue = cycle?.selectedValue;
@@ -32,6 +33,22 @@ export function useSwitcherCycle(
 		if (!cycling || ordered.length === 0 || selectedIndex >= 0) return;
 		latest.current.cycle?.onSelectedValueChange(ordered[0].workspace.id);
 	}, [cycling, ordered, selectedIndex]);
+
+	useEffect(() => {
+		if (!cycling) return;
+		const row = selectedIndex >= 0 ? ordered[selectedIndex] : undefined;
+		setSelection(
+			row
+				? {
+						id: row.workspace.id,
+						name: row.workspace.name,
+						hostType: row.workspace.hostType,
+						bucket: row.bucket,
+						index: selectedIndex,
+					}
+				: null,
+		);
+	}, [cycling, ordered, selectedIndex, setSelection]);
 
 	const seenStep = useRef(step);
 	useEffect(() => {

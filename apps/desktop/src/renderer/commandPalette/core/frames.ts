@@ -1,5 +1,7 @@
 import { track } from "renderer/lib/analytics";
+import type { V2WorkspaceHostType } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { create } from "zustand";
+import type { SwitcherBucket } from "../ui/WorkspaceList/utils/bucketWorkspaces";
 import type { Command } from "./types";
 
 export interface Frame {
@@ -12,6 +14,16 @@ export type SwitcherOpenedVia = "hotkey" | "pill" | "command";
 
 export const PALETTE_TOGGLE_ATTRIBUTE = "data-command-palette-toggle";
 
+export const SWITCHER_ROW_LEAVE_MS = 160;
+
+export interface SwitcherSelection {
+	id: string;
+	name: string;
+	hostType: V2WorkspaceHostType;
+	bucket: SwitcherBucket;
+	index: number;
+}
+
 interface FrameStackState {
 	open: boolean;
 	root: PaletteRoot;
@@ -20,6 +32,11 @@ interface FrameStackState {
 	switcherStep: number;
 	/** Armed once a further hotkey press steps while the modifier is held: releasing it then switches. */
 	switcherHold: boolean;
+	switcherSelection: SwitcherSelection | null;
+	/** The row that is animating out before it is archived. */
+	switcherLeavingId: string | null;
+	/** What the switcher is searching for, without the "#" scope or a creator filter. */
+	switcherSearchText: string;
 	setOpen: (open: boolean) => void;
 	openSwitcher: (options: {
 		via: SwitcherOpenedVia;
@@ -27,6 +44,9 @@ interface FrameStackState {
 	}) => void;
 	stepSwitcher: (holdsModifier: boolean) => void;
 	releaseSwitcherHold: () => void;
+	setSwitcherSelection: (selection: SwitcherSelection | null) => void;
+	setSwitcherLeavingId: (workspaceId: string | null) => void;
+	setSwitcherSearchText: (text: string) => void;
 	pushFrame: (command: Command) => void;
 	popFrame: () => void;
 	reset: () => void;
@@ -38,6 +58,9 @@ const CLOSED = {
 	frames: [],
 	switcherStep: 0,
 	switcherHold: false,
+	switcherSelection: null,
+	switcherLeavingId: null,
+	switcherSearchText: "",
 };
 
 export const useFrameStackStore = create<FrameStackState>((set) => ({
@@ -61,6 +84,7 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 				frames: [],
 				switcherStep: 0,
 				switcherHold: false,
+				switcherSelection: null,
 			};
 		}),
 	stepSwitcher: (holdsModifier) =>
@@ -69,6 +93,16 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 			switcherHold: holdsModifier,
 		})),
 	releaseSwitcherHold: () => set({ switcherHold: false }),
+	setSwitcherSelection: (switcherSelection) =>
+		set((state) =>
+			state.switcherSelection?.id === switcherSelection?.id &&
+			state.switcherSelection?.index === switcherSelection?.index &&
+			state.switcherSelection?.name === switcherSelection?.name
+				? state
+				: { switcherSelection },
+		),
+	setSwitcherLeavingId: (switcherLeavingId) => set({ switcherLeavingId }),
+	setSwitcherSearchText: (switcherSearchText) => set({ switcherSearchText }),
 	pushFrame: (command) =>
 		set((state) => ({ frames: [...state.frames, { command }] })),
 	popFrame: () => set((state) => ({ frames: state.frames.slice(0, -1) })),
