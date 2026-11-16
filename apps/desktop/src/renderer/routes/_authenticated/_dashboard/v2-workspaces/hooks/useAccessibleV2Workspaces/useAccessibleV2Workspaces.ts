@@ -90,6 +90,11 @@ interface UseAccessibleV2WorkspacesOptions {
 	 * where filter — the archived fetch rides the scoped host source.
 	 */
 	includeArchived?: boolean;
+	/**
+	 * Load pull requests, agent status and diff totals from each host.
+	 * Defaults to on with a where filter and off without one.
+	 */
+	liveState?: boolean;
 }
 
 function workspaceMatchesSearch(
@@ -368,12 +373,13 @@ export function useAccessibleV2Workspaces(
 	// The authoritative link lives in host.db (`workspace.pullRequestId`), not
 	// any collection. With host-scoped rows this derives a single target
 	// ("Anywhere" derives one per host with visible rows); a client-side
-	// `repositoryId::branch` map mistracks on fork branch collisions. Unscoped
-	// callers (palette, dev seeding) don't render PR data, so skip the queries
-	// entirely rather than fanning them out per host.
+	// `repositoryId::branch` map mistracks on fork branch collisions. A caller
+	// that renders no live state (dev seeding) skips the queries entirely
+	// rather than fanning them out per host.
+	const loadsLiveState = options.liveState ?? whereFilter !== undefined;
 	const pullRequestQueryTargets = useMemo(
 		() =>
-			whereFilter === undefined
+			!loadsLiveState
 				? []
 				: derivePullRequestQueryTargets({
 						activeHostUrl,
@@ -382,7 +388,7 @@ export function useAccessibleV2Workspaces(
 						relayUrl,
 						workspaces: rows,
 					}),
-		[whereFilter, activeHostUrl, hostRows, machineId, relayUrl, rows],
+		[loadsLiveState, activeHostUrl, hostRows, machineId, relayUrl, rows],
 	);
 
 	const pullRequestQueries = useQueries({
