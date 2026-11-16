@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {파일 #개 더 보기} other {파일 #개 �
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {프레임 #개 더 보기} other {프레임 #개 더 보기}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel}개 더 있음. 입력하여 목록을 좁히세요."
+
 msgid "{hostName} is offline"
 msgstr "{hostName}이(가) 오프라인입니다"
 

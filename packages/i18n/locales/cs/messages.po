@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Zobrazit další # soubor} few {Zobrazit dal�
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Zobrazit ještě # rámec} few {Zobrazit ještě # rámce} many {Zobrazit ještě # rámce} other {Zobrazit ještě # rámců}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel} dalších. Pište pro zúžení seznamu."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} je offline"
 

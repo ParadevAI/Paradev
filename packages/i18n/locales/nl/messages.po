@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Nog # bestand tonen} other {Nog # bestanden t
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# frame meer tonen} other {# frames meer tonen}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Nog {hiddenLabel}. Typ om de lijst te verfijnen."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} is offline"
 

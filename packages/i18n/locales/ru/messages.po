@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Показать ещё # файл} few {По
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Показать ещё # кадр} few {Показать ещё # кадра} many {Показать ещё # кадров} other {Показать ещё # кадра}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Ещё {hiddenLabel}. Начните вводить текст, чтобы сузить список."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} офлайн"
 

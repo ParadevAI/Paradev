@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {# dosya daha göster} other {# dosya daha gö
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {# çerçeve daha göster} other {# çerçeve daha göster}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel} tane daha. Listeyi daraltmak için yazın."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} çevrimdışı"
 

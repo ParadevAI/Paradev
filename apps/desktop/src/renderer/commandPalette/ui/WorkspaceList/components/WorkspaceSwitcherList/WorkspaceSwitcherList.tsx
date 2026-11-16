@@ -1,6 +1,7 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
@@ -13,6 +14,9 @@ import {
 } from "../../utils/bucketWorkspaces";
 import { WorkspaceSwitcherRow } from "../WorkspaceSwitcherRow";
 import { type SwitcherCycle, useSwitcherCycle } from "./hooks/useSwitcherCycle";
+
+/** Every row is a full React row and the list is not virtualised: "#" can match thousands. */
+const MAX_ROWS = 150;
 
 const BUCKET_LABELS: Record<SwitcherBucket, MessageDescriptor> = {
 	needsInput: msg({ message: "Needs input" }),
@@ -30,18 +34,41 @@ export function WorkspaceSwitcherList({
 	query,
 	cycle,
 }: WorkspaceSwitcherListProps) {
-	const { i18n } = useLingui();
-	const { groups, query: parsed } = useSwitcherGroups(query);
+	const { i18n, t } = useLingui();
+	const { formatNumber } = useFormat();
+	const { groups: allGroups, query: parsed } = useSwitcherGroups(query);
 	const trimmed = parsed.text;
 
-	const results = useMemo(
-		() => (trimmed ? rankSwitcherRows(groups, trimmed) : null),
-		[groups, trimmed],
-	);
+	const { results, groups, hiddenCount } = useMemo(() => {
+		if (trimmed) {
+			const ranked = rankSwitcherRows(allGroups, trimmed);
+			return {
+				results: ranked.slice(0, MAX_ROWS),
+				groups: [],
+				hiddenCount: Math.max(0, ranked.length - MAX_ROWS),
+			};
+		}
+		let room = MAX_ROWS;
+		let total = 0;
+		const shown: typeof allGroups = [];
+		for (const group of allGroups) {
+			total += group.rows.length;
+			if (room <= 0) continue;
+			const rows = group.rows.slice(0, room);
+			room -= rows.length;
+			shown.push({ ...group, rows });
+		}
+		return {
+			results: null,
+			groups: shown,
+			hiddenCount: Math.max(0, total - MAX_ROWS),
+		};
+	}, [allGroups, trimmed]);
 	const ordered = useMemo(
 		() => results ?? groups.flatMap((group) => group.rows),
 		[results, groups],
 	);
+	const hiddenLabel = formatNumber(hiddenCount);
 
 	const switchTo = useSwitchToWorkspace("switcher");
 	const select = useCallback(
@@ -108,6 +135,11 @@ export function WorkspaceSwitcherList({
 					);
 				})
 			)}
+			{hiddenCount > 0 ? (
+				<p className="px-4 pt-1 pb-2 text-[11.5px] text-muted-foreground">
+					{t({ message: `${hiddenLabel} more. Type to narrow the list.` })}
+				</p>
+			) : null}
 		</CommandList>
 	);
 }

@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Hiện thêm # tệp} other {Hiện thêm # t
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Hiện thêm # frame} other {Hiện thêm # frame}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Còn {hiddenLabel} mục nữa. Nhập để thu hẹp danh sách."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} đang ngoại tuyến"
 

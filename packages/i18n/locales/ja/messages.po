@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {さらに#件のファイルを表示} other 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {さらに#件のフレームを表示} other {さらに#件のフレームを表示}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "他 {hiddenLabel} 件。入力してリストを絞り込みます。"
+
 msgid "{hostName} is offline"
 msgstr "{hostName}はオフラインです"
 

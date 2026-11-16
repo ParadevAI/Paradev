@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Tampilkan # file lagi} other {Tampilkan # fil
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Tampilkan # frame lagi} other {Tampilkan # frame lagi}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel} lainnya. Ketik untuk mempersempit daftar."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} sedang offline"
 

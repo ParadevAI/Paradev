@@ -1089,6 +1089,9 @@ msgstr "{hiddenCount, plural, one {Показати ще # файл} few {Пок
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Показати ще # кадр} few {Показати ще # кадри} many {Показати ще # кадрів} other {Показати ще # кадру}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Ще {hiddenLabel}. Почніть вводити текст, щоб звузити список."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} не в мережі"
 

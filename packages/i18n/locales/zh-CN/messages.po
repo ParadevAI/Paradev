@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {再显示 # 个文件} other {再显示 # 个
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {再显示#个栈帧} other {再显示#个栈帧}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "还有 {hiddenLabel} 个。输入以缩小列表范围。"
+
 msgid "{hostName} is offline"
 msgstr "{hostName}已离线"
 

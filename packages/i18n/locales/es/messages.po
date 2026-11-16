@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Mostrar # archivo más} other {Mostrar # arch
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Mostrar # marco más} other {Mostrar # marcos más}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel} más. Escribe para acotar la lista."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} está sin conexión"
 
