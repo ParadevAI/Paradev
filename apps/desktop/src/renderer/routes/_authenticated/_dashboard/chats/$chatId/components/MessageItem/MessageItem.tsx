@@ -14,10 +14,13 @@ import { cn } from "@superset/ui/utils";
 import { memo } from "react";
 import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { MessageLink } from "./components/MessageLink";
+import { mentionMarkdown } from "./utils/mentionMarkdown";
 
 const MINE =
 	"bg-[color-mix(in_oklab,var(--color-highlight)_22%,var(--color-background))] rounded-br-md";
 const THEIRS = "bg-fill-selected rounded-bl-md";
+const MARKDOWN_COMPONENTS = { a: MessageLink };
 const ACTION =
 	"flex size-6 items-center justify-center rounded-md text-muted-foreground hover:bg-fill-hover hover:text-foreground";
 
@@ -61,8 +64,9 @@ export const MessageItem = memo(function MessageItem({
 }: MessageItemProps) {
 	const { t } = useLingui();
 	const nameOf = (ref: { kind: "dev" | "user"; id: string }) =>
-		`@${(ref.kind === "dev" ? state.devs[ref.id]?.name : state.members[ref.id]?.name) ?? t({ message: "someone" })}`;
-	const text = renderMentions(message.text, nameOf);
+		(ref.kind === "dev"
+			? state.devs[ref.id]?.name
+			: state.members[ref.id]?.name) ?? t({ message: "someone" });
 	const agent = message.authorDevId
 		? state.devs[message.authorDevId]
 		: undefined;
@@ -71,7 +75,7 @@ export const MessageItem = memo(function MessageItem({
 		return (
 			<div className="flex items-center justify-center gap-1.5 px-8 py-2 text-center text-xs text-muted-foreground">
 				<LuInfo className="size-3 shrink-0" />
-				{text}
+				{renderMentions(message.text, nameOf)}
 			</div>
 		);
 	}
@@ -140,7 +144,9 @@ export const MessageItem = memo(function MessageItem({
 							<span className="block truncate">{message.replyTo.text}</span>
 						</button>
 					)}
-					<ChatMarkdown>{text}</ChatMarkdown>
+					<ChatMarkdown components={MARKDOWN_COMPONENTS}>
+						{mentionMarkdown(message.text, nameOf)}
+					</ChatMarkdown>
 				</div>
 				{message.editedAt && (
 					<span className="px-1.5 text-[11px] text-muted-foreground">

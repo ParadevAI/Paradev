@@ -4,6 +4,7 @@ import {
 	lastEditableMessage,
 	type Message,
 	mentionCandidates,
+	messageCopyText,
 	renderMentions,
 	typingLabel,
 } from "@superset/chats-core";
@@ -11,6 +12,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 	useSyncExternalStore,
 } from "react";
@@ -64,6 +66,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 		() => live?.typing.watch.typists(chatId) ?? NOBODY,
 	);
 
+	const stateRef = useRef(state);
+	stateRef.current = state;
+
 	const jumpTo = useCallback((messageId: string) => {
 		document
 			.querySelector(`[data-message-id="${CSS.escape(messageId)}"]`)
@@ -82,7 +87,12 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 				setReplyTo(null);
 				setEditing(message);
 			},
-			copy: (message) => void copyToClipboard(message.text),
+			copy: (message) => {
+				const current = stateRef.current;
+				void copyToClipboard(
+					current ? messageCopyText(current, message) : message.text,
+				);
+			},
 			remove: (message) =>
 				dispatch?.({ type: "delete-message", messageId: message.id }),
 			retry: (message) =>
@@ -113,7 +123,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const agent = directDev(state, chat);
 	const title = agent?.name ?? chat.title;
 	const nameOf = (ref: { kind: "dev" | "user"; id: string }) =>
-		`@${(ref.kind === "dev" ? state.devs[ref.id]?.name : state.members[ref.id]?.name) ?? ""}`;
+		(ref.kind === "dev"
+			? state.devs[ref.id]?.name
+			: state.members[ref.id]?.name) ?? "";
 	const replyName = replyTo
 		? ((replyTo.authorDevId
 				? state.devs[replyTo.authorDevId]?.name
