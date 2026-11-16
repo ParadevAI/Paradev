@@ -6,16 +6,13 @@ import {
 	setSystemTime,
 	test,
 } from "bun:test";
-import { spawnSync } from "node:child_process";
 import { Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	SESSION_TIMEOUT_MS,
-	stripWorkspaceIdentity,
 	topUpSandboxSession,
-	zeroFreeSpace,
 } from "./vercel";
 
 type ListOptions = NonNullable<Parameters<typeof Sandbox.list>[0]>;
@@ -161,70 +158,5 @@ describe("topUpSandboxSession", () => {
 		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS - 30_000);
 		await topUpSandboxSession("sbx");
 		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
-	});
-});
-
-type RunCommandArgs = { cmd: string; args: string[]; sudo?: boolean };
-
-function recordingSandbox(answer: () => Promise<{ exitCode: number }>) {
-	const calls: RunCommandArgs[] = [];
-	const sandbox = {
-		runCommand: async (params: RunCommandArgs) => {
-			calls.push(params);
-			return answer();
-		},
-	} as unknown as Sandbox;
-	return { sandbox, calls };
-}
-
-describe("stripWorkspaceIdentity", () => {
-	test("removes memguard's swapfiles so a golden does not carry them", async () => {
-		const { sandbox, calls } = recordingSandbox(async () => ({ exitCode: 0 }));
-		await stripWorkspaceIdentity(sandbox);
-		expect(calls[0]?.args).toContain("/var/swap");
-	});
-});
-
-describe("zeroFreeSpace", () => {
-	async function scriptOf(): Promise<string> {
-		const { sandbox, calls } = recordingSandbox(async () => ({ exitCode: 0 }));
-		await zeroFreeSpace(sandbox);
-		expect(calls[0]).toMatchObject({ cmd: "bash", sudo: true });
-		return calls[0]?.args[1] ?? "";
-	}
-
-	function runWithFakes(script: string, ddExit: number) {
-		const fakes = [
-			"df() { echo Avail; echo 3221225472; }",
-			'timeout() { shift; "$@"; }',
-			`dd() { echo "dd $*"; return ${ddExit}; }`,
-			'rm() { echo "rm $*"; }',
-			"sync() { echo sync; }",
-		].join("; ");
-		return spawnSync("bash", ["-c", `${fakes}; ${script}`], {
-			encoding: "utf8",
-		});
-	}
-
-	test("fills all but 1 GiB of free space with zeros, then removes the file", async () => {
-		const result = runWithFakes(await scriptOf(), 0);
-		const lines = result.stdout.trim().split("\n");
-		expect(lines[0]).toContain("if=/dev/zero");
-		expect(lines[0]).toContain("bs=1M count=2048 conv=fsync");
-		expect(lines.slice(1)).toEqual(["rm -f /superset-zero-fill", "sync"]);
-		expect(result.status).toBe(0);
-	});
-
-	test("removes the file and reports the exit when the fill is cut short", async () => {
-		const result = runWithFakes(await scriptOf(), 124);
-		expect(result.stdout).toContain("rm -f /superset-zero-fill");
-		expect(result.status).toBe(124);
-	});
-
-	test("a failed fill does not fail the caller", async () => {
-		const { sandbox } = recordingSandbox(async () => {
-			throw new Error("aborted");
-		});
-		await expect(zeroFreeSpace(sandbox)).resolves.toBeUndefined();
 	});
 });
