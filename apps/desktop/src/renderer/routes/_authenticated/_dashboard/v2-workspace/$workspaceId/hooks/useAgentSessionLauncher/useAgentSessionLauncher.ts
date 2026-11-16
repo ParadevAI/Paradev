@@ -21,6 +21,7 @@ import type {
 } from "../../types";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 import { readLastChatAgent } from "../../utils/lastChatAgent";
+import { terminalFallbackLaunch } from "./utils/terminalFallbackLaunch";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
@@ -135,6 +136,17 @@ export function useAgentSessionLauncher({
 				if (chat) return chat;
 			}
 
+			const fallback = terminalFallbackLaunch(input);
+			if (fallback.kind === "chat-unavailable") {
+				toast.error(t({ message: "Couldn't open chat" }), {
+					description: t({
+						message:
+							"Chat is off, its settings didn't load, or this agent can't open as a chat. Check Chat in Settings > Behavior and your connection, then try again.",
+					}),
+				});
+				return null;
+			}
+
 			try {
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
@@ -142,20 +154,7 @@ export function useAgentSessionLauncher({
 				const result = await runAgent({
 					workspaceId,
 					colors: terminalQueryColors(appearance.theme),
-					agent: input.configId,
-					prompt: input.prompt,
-					...(input.attachments?.length
-						? {
-								attachmentIds: input.attachments.map(
-									(attachment) => attachment.attachmentId,
-								),
-							}
-						: {}),
-					...(input.modelId ? { model: input.modelId } : {}),
-					...(input.modeId ? { mode: input.modeId } : {}),
-					...(input.forkSessionId
-						? { forkSessionId: input.forkSessionId }
-						: {}),
+					...fallback.launch,
 				});
 				if (result.kind !== "terminal") {
 					toast.error(
