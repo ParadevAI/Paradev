@@ -12,6 +12,7 @@ import type {
 	Bootstrap,
 	CreatedChat,
 	SendResult,
+	SharedFileResult,
 } from "@superset/chats-sync";
 import { db, dbWs } from "@superset/db/client";
 import {
@@ -24,6 +25,7 @@ import {
 	chatsMessages,
 	chatsQuestions,
 	chatsReads,
+	files,
 	users,
 } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
@@ -33,6 +35,7 @@ import {
 	chatsUserChannel,
 	signChatsRealtimeTicket,
 } from "@superset/shared/chats-realtime";
+import { fileOriginalKey } from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import {
 	and,
@@ -45,16 +48,21 @@ import {
 	isNotNull,
 	lte,
 	or,
+	type SQL,
 	sql,
 } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
+import { anchorAttachments } from "../../lib/attachments/attachments";
+import { detachAll, reapOrphanFiles } from "../../lib/files";
+import { presignedGetUrl } from "../../lib/r2";
 import { personProcedure } from "../../trpc";
 import { publishChats } from "./publish";
 import {
 	agentView,
 	messageView,
 	replyQuotes,
+	sharedFiles,
 	toGroupAgent,
 	toMessage,
 	toQuestion,
@@ -64,6 +72,7 @@ import {
 const RECENT_MESSAGES = 200;
 const TITLE_MAX = 60;
 const TEXT_MAX = 10_000;
+const FILE_LINK_SECONDS = 60 * 60;
 
 const notFound = (message: string) =>
 	new TRPCError({ code: "NOT_FOUND", message });
@@ -215,7 +224,7 @@ async function withCards(rows: (typeof chatsMessages.$inferSelect)[]) {
 	const questionIds = rows.flatMap((row) =>
 		row.questionId ? [row.questionId] : [],
 	);
-	const [questions, quotes] = await Promise.all([
+	const [questions, quotes, fileById] = await Promise.all([
 		questionIds.length
 			? db
 					.select()
@@ -223,6 +232,7 @@ async function withCards(rows: (typeof chatsMessages.$inferSelect)[]) {
 					.where(inArray(chatsQuestions.id, questionIds))
 			: [],
 		replyQuotes(rows.map((row) => row.replyToId)),
+		sharedFiles(rows),
 	]);
 	const questionById = new Map(questions.map((q) => [q.id, q]));
 	return rows.map((row) =>
@@ -230,6 +240,7 @@ async function withCards(rows: (typeof chatsMessages.$inferSelect)[]) {
 			row,
 			row.questionId ? questionById.get(row.questionId) : null,
 			quotes.get(row.replyToId ?? ""),
+			fileById.get(row.fileId ?? ""),
 		),
 	);
 }
@@ -345,6 +356,19 @@ async function unreadCounts(userId: string, groupIds: string[]) {
 			Number(rows.find((row) => row.groupId === id)?.unread ?? 0),
 		]),
 	);
+}
+
+/** Lets go of the files the named messages shared. Call it before the messages are deleted. */
+async function releaseFiles(where: SQL | undefined) {
+	const shared = await db
+		.select({ id: chatsMessages.id })
+		.from(chatsMessages)
+		.where(and(where, isNotNull(chatsMessages.fileId)));
+	const fileIds = await detachAll({
+		parentKind: "chats_message",
+		parentIds: shared.map((message) => message.id),
+	});
+	return () => reapOrphanFiles(fileIds);
 }
 
 async function memberMessage(userId: string, messageId: string) {
@@ -534,6 +558,115 @@ export const chatsRouter = {
 			return payload;
 		}),
 
+	/**
+	 * Posts a file the person uploaded through `attachment.createUpload`, with
+	 * `text` as its caption. A repeat with the same `clientId` answers with the
+	 * message already posted.
+	 */
+	sendFile: personProcedure
+		.input(
+			groupInput.extend({
+				fileId: z.string().uuid(),
+				text: z.string().trim().max(TEXT_MAX).default(""),
+				clientId: z.string().min(1).max(100).optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }): Promise<SharedFileResult> => {
+			const userId = ctx.session.user.id;
+			await assertMember(userId, input.groupId);
+			const result = async (message: typeof chatsMessages.$inferSelect) => {
+				const view = await messageView(message);
+				if (!view.file) throw invalid("The file did not finish uploading");
+				return { file: view.file, message: view };
+			};
+			if (input.clientId) {
+				const [sent] = await db
+					.select()
+					.from(chatsMessages)
+					.where(
+						and(
+							eq(chatsMessages.groupId, input.groupId),
+							eq(chatsMessages.clientId, input.clientId),
+						),
+					);
+				if (sent) return result(sent);
+			}
+			const [found] = await db
+				.select({ organizationId: chatsGroups.organizationId, file: files })
+				.from(chatsGroups)
+				.innerJoin(
+					files,
+					and(
+						eq(files.id, input.fileId),
+						eq(files.organizationId, chatsGroups.organizationId),
+						eq(files.createdByUserId, userId),
+						eq(files.status, "pending"),
+					),
+				)
+				.where(eq(chatsGroups.id, input.groupId));
+			if (!found) throw notFound("File not found");
+			const [message] = await db
+				.insert(chatsMessages)
+				.values({
+					groupId: input.groupId,
+					authorId: userId,
+					text: input.text,
+					fileId: input.fileId,
+					clientId: input.clientId,
+				})
+				.returning();
+			if (!message) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+			await anchorAttachments({
+				parentKind: "chats_message",
+				parentId: message.id,
+				organizationId: found.organizationId,
+				fileIds: [input.fileId],
+			});
+			const [anchored] = await db
+				.select({ id: files.id })
+				.from(files)
+				.where(and(eq(files.id, input.fileId), eq(files.status, "ready")));
+			if (!anchored) {
+				await db.delete(chatsMessages).where(eq(chatsMessages.id, message.id));
+				throw invalid("The file did not finish uploading");
+			}
+			const payload = await result(message);
+			publishChats(chatsGroupChannel(input.groupId), {
+				type: "message.created",
+				message: payload.message,
+				task: null,
+			});
+			return payload;
+		}),
+
+	/** A short-lived link to a file shared in a chat the person is in. A mutation, because the link is a credential. */
+	fileLink: personProcedure
+		.input(z.object({ fileId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const [shared] = await db
+				.select({ id: chatsMessages.id })
+				.from(chatsMessages)
+				.innerJoin(
+					chatsGroupMembers,
+					and(
+						eq(chatsGroupMembers.groupId, chatsMessages.groupId),
+						eq(chatsGroupMembers.userId, ctx.session.user.id),
+					),
+				)
+				.where(eq(chatsMessages.fileId, input.fileId))
+				.limit(1);
+			if (!shared) throw notFound("File not found");
+			return {
+				url: await presignedGetUrl(
+					fileOriginalKey(input.fileId),
+					FILE_LINK_SECONDS,
+				),
+				expiresAt: new Date(
+					Date.now() + FILE_LINK_SECONDS * 1000,
+				).toISOString(),
+			};
+		}),
+
 	/** Up to `limit` messages of the group from before `beforeId`, oldest first. */
 	olderMessages: personProcedure
 		.input(
@@ -588,9 +721,11 @@ export const chatsRouter = {
 					"Only its author or the chat's owner can delete this message",
 				);
 			}
+			const reap = await releaseFiles(eq(chatsMessages.id, input.messageId));
 			await db
 				.delete(chatsMessages)
 				.where(eq(chatsMessages.id, input.messageId));
+			await reap();
 			const channel = chatsGroupChannel(message.groupId);
 			publishChats(channel, {
 				type: "message.deleted",
@@ -798,7 +933,9 @@ export const chatsRouter = {
 				.select({ userId: chatsGroupMembers.userId })
 				.from(chatsGroupMembers)
 				.where(eq(chatsGroupMembers.groupId, input.groupId));
+			const reap = await releaseFiles(eq(chatsMessages.groupId, input.groupId));
 			await db.delete(chatsGroups).where(eq(chatsGroups.id, input.groupId));
+			await reap();
 			for (const member of members) {
 				publishChats(chatsUserChannel(member.userId), {
 					type: "group.deleted",
@@ -1008,6 +1145,10 @@ export const chatsRouter = {
 			const directIds = links
 				.filter((link) => link.kind === "direct")
 				.map((link) => link.groupId);
+			const reap =
+				directIds.length > 0
+					? await releaseFiles(inArray(chatsMessages.groupId, directIds))
+					: null;
 			await dbWs.transaction(async (tx) => {
 				if (directIds.length > 0) {
 					await tx
@@ -1016,6 +1157,7 @@ export const chatsRouter = {
 				}
 				await tx.delete(chatsAgents).where(eq(chatsAgents.id, input.devId));
 			});
+			await reap?.();
 			const event = { type: "dev.deleted", devId: input.devId } as const;
 			for (const link of links) {
 				if (link.kind === "group") {

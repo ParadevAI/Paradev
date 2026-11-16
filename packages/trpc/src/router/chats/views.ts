@@ -5,6 +5,7 @@ import {
 	quoteText,
 	type ReplyQuote,
 	renderMentions,
+	type SharedFile,
 } from "@superset/chats-core";
 import type {
 	ApiDev,
@@ -19,6 +20,7 @@ import {
 	type chatsGroupAgents,
 	chatsMessages,
 	chatsQuestions,
+	files,
 	tasks,
 	users,
 } from "@superset/db/schema";
@@ -27,6 +29,7 @@ import { eq, inArray } from "drizzle-orm";
 type UserRow = Pick<typeof users.$inferSelect, "id" | "email" | "name">;
 type AgentRow = typeof chatsAgents.$inferSelect;
 type MessageRow = typeof chatsMessages.$inferSelect;
+type FileRow = typeof files.$inferSelect;
 type QuestionRow = typeof chatsQuestions.$inferSelect;
 
 export const toUser = (user: UserRow): ApiUser => ({
@@ -90,10 +93,37 @@ export const toQuestion = (question: QuestionRow): ApiQuestion => ({
 	expiresAt: question.expiresAt.toISOString(),
 });
 
+const toSharedFile = (message: MessageRow, file: FileRow): SharedFile => ({
+	id: file.id,
+	chatId: message.groupId,
+	name: file.name,
+	title: "",
+	mime: file.contentType,
+	size: file.sizeBytes,
+	sharedBy: message.authorAgentId
+		? { kind: "dev", id: message.authorAgentId }
+		: message.authorId
+			? { kind: "user", id: message.authorId }
+			: null,
+	preview: "",
+	createdAt: file.createdAt.toISOString(),
+});
+
+/** The file each message shares, by the file's id. */
+export async function sharedFiles(
+	rows: Pick<MessageRow, "fileId">[],
+): Promise<Map<string, FileRow>> {
+	const ids = rows.flatMap((row) => (row.fileId ? [row.fileId] : []));
+	if (ids.length === 0) return new Map();
+	const found = await db.select().from(files).where(inArray(files.id, ids));
+	return new Map(found.map((file) => [file.id, file]));
+}
+
 export const toMessage = (
 	message: MessageRow,
 	question?: QuestionRow | null,
 	quote?: ReplyQuote,
+	file?: FileRow,
 ): ApiMessage => ({
 	id: message.id,
 	groupId: message.groupId,
@@ -104,6 +134,7 @@ export const toMessage = (
 	turnId: message.turnId,
 	...(question ? { question: toQuestion(question) } : {}),
 	...(message.replyToId ? { replyTo: quote ?? null } : {}),
+	...(file ? { file: toSharedFile(message, file) } : {}),
 	...(message.editedAt ? { editedAt: message.editedAt.toISOString() } : {}),
 	clientId: message.clientId,
 	at: message.createdAt.toISOString(),
@@ -152,12 +183,14 @@ export async function replyQuotes(
 			agent: chatsAgents.name,
 			task: tasks.title,
 			question: chatsQuestions.title,
+			file: files.name,
 		})
 		.from(chatsMessages)
 		.leftJoin(users, eq(users.id, chatsMessages.authorId))
 		.leftJoin(chatsAgents, eq(chatsAgents.id, chatsMessages.authorAgentId))
 		.leftJoin(tasks, eq(tasks.id, chatsMessages.taskId))
 		.leftJoin(chatsQuestions, eq(chatsQuestions.id, chatsMessages.questionId))
+		.leftJoin(files, eq(files.id, chatsMessages.fileId))
 		.where(inArray(chatsMessages.id, wanted));
 	const names = await mentionNames(rows.map((row) => row.message.text));
 	return new Map(
@@ -188,7 +221,7 @@ export async function replyQuotes(
 					taskTitle: row.task,
 					appName: null,
 					questionTitle: row.question,
-					fileName: null,
+					fileName: row.file,
 				}),
 			} satisfies ReplyQuote,
 		]),
@@ -199,5 +232,6 @@ export async function messageView(message: MessageRow): Promise<ApiMessage> {
 	const quote = message.replyToId
 		? (await replyQuotes([message.replyToId])).get(message.replyToId)
 		: undefined;
-	return toMessage(message, null, quote);
+	const file = (await sharedFiles([message])).get(message.fileId ?? "");
+	return toMessage(message, null, quote, file);
 }
