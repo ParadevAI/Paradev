@@ -61,6 +61,19 @@
 	},
 	"overrides": [
 		{
+			"includes": ["packages/chats-core/**", "packages/chats-sync/**"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noNonNullAssertion": "off"
+					},
+					"complexity": {
+						"noCommaOperator": "off"
+					}
+				}
+			}
+		},
+		{
 			"includes": ["packages/cli-framework/**", "packages/cli/**"],
 			"linter": {
 				"rules": {

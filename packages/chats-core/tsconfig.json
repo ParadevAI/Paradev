@@ -1,0 +1,10 @@
+{
+	"extends": "@superset/typescript/internal-package.json",
+	"compilerOptions": {
+		"lib": ["ES2022", "DOM"],
+		"types": ["bun-types"],
+		"verbatimModuleSyntax": true
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", "dist"]
+}

@@ -177,6 +177,8 @@
         "@superset/chat": "workspace:*",
         "@superset/chat-runtime": "workspace:*",
         "@superset/chat-ui": "workspace:*",
+        "@superset/chats-core": "workspace:*",
+        "@superset/chats-sync": "workspace:*",
         "@superset/cloud-client": "workspace:*",
         "@superset/db": "workspace:*",
         "@superset/host-service": "workspace:*",
@@ -895,6 +897,29 @@
         "react": "19.3.0",
       },
     },
+    "packages/chats-core": {
+      "name": "@superset/chats-core",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@superset/typescript": "workspace:*",
+        "bun-types": "1.4.3",
+        "typescript": "7.0.2",
+      },
+    },
+    "packages/chats-sync": {
+      "name": "@superset/chats-sync",
+      "version": "0.0.1",
+      "dependencies": {
+        "@agentclientprotocol/sdk": "1.8.0",
+        "@superset/chats-core": "workspace:*",
+        "zod": "4.6.6",
+      },
+      "devDependencies": {
+        "@superset/typescript": "workspace:*",
+        "bun-types": "1.4.3",
+        "typescript": "7.0.2",
+      },
+    },
     "packages/cli": {
       "name": "@superset/cli",
       "version": "2.0.9",
@@ -1275,6 +1300,8 @@
         "@superset/agent-harness": "workspace:*",
         "@superset/auth": "workspace:*",
         "@superset/chat": "workspace:*",
+        "@superset/chats-core": "workspace:*",
+        "@superset/chats-sync": "workspace:*",
         "@superset/db": "workspace:*",
         "@superset/email": "workspace:*",
         "@superset/i18n": "workspace:*",
@@ -1507,7 +1534,7 @@
 
     "@agentclientprotocol/codex-acp": ["@agentclientprotocol/codex-acp@2.1.0", "", { "dependencies": { "@agentclientprotocol/sdk": "^1.5.0", "@openai/codex": "^0.159.1", "diff": "^9.0.0", "open": "^11.0.1", "vscode-jsonrpc": "^9.0.1", "zod": "^4.0.0" }, "bin": { "codex-acp": "dist/index.js" } }, "sha512-MJv/+hcnutTkUFdJj7ETwshyqOx1mMw+Q7Oaol2V3bnhudhz/wfG3L11IZI47+H2mryCB3FYHzZssc2fxtgXcg=="],
 
-    "@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@2.6.0", "", { "peerDependencies": { "@modelcontextprotocol/server": "^2.4.0", "zod": "^3.25.76 || ^4.0.0" }, "optionalPeers": ["@modelcontextprotocol/server"] }, "sha512-3FtL6MkAV5F9qxg0FQV8wmBszIm2xuVPoDWOILIFSDQ+Vq3Twdh7Cw6Hk2GOPUbevgrTUpUAqZXQy7Geaj79mw=="],
+    "@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@1.8.0", "", { "peerDependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-fbP7qHZsFyTJVT0/RPrcWJ8An26qLXHEuGCHHEKDyxD1xpXV+Ejyh2LAE6vBAFePkpVjZeeohnbgvuEhZ7wLMg=="],
 
     "@ai-sdk/gateway": ["@ai-sdk/gateway@3.0.157", "", { "dependencies": { "@ai-sdk/provider": "3.0.14", "@ai-sdk/provider-utils": "4.0.40", "@vercel/oidc": "3.2.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-jO0LUsIQC+FeJRQI1KFiNcfTGp6a0lXrymekaXfBIvhVEOyt0NUyc9wiVi/dYGHQmWFXUo8QgmghgGAGLOPTAA=="],
 
@@ -3284,6 +3311,10 @@
     "@superset/chat-runtime": ["@superset/chat-runtime@workspace:packages/chat-runtime"],
 
     "@superset/chat-ui": ["@superset/chat-ui@workspace:packages/chat-ui"],
+
+    "@superset/chats-core": ["@superset/chats-core@workspace:packages/chats-core"],
+
+    "@superset/chats-sync": ["@superset/chats-sync@workspace:packages/chats-sync"],
 
     "@superset/cli": ["@superset/cli@workspace:packages/cli"],
 
@@ -6782,6 +6813,8 @@
     "zwitch": ["zwitch@2.0.4", "", {}, "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="],
 
     "zx": ["zx@8.8.5", "", { "bin": { "zx": "build/cli.js" } }, "sha512-SNgDF5L0gfN7FwVOdEFguY3orU5AkfFZm9B5YSHog/UDHv+lvmd82ZAsOenOkQixigwH2+yyH198AwNdKhj+RA=="],
+
+    "@agentclientprotocol/claude-agent-acp/@agentclientprotocol/sdk": ["@agentclientprotocol/sdk@2.6.0", "", { "peerDependencies": { "@modelcontextprotocol/server": "^2.4.0", "zod": "^3.25.76 || ^4.0.0" }, "optionalPeers": ["@modelcontextprotocol/server"] }, "sha512-3FtL6MkAV5F9qxg0FQV8wmBszIm2xuVPoDWOILIFSDQ+Vq3Twdh7Cw6Hk2GOPUbevgrTUpUAqZXQy7Geaj79mw=="],
 
     "@agentclientprotocol/claude-agent-acp/diff": ["diff@9.0.0", "", {}, "sha512-svtcdpS8CgJyqAjEQIXdb3OjhFVVYjzGAPO8WGCmRbrml64SPw/jJD4GoE98aR7r25A0XcgrK3F02yw9R/vhQw=="],
 
