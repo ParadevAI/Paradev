@@ -34,18 +34,20 @@ export function WorkspaceSwitcherButton() {
 					aria-label={label}
 					{...{ [PALETTE_TOGGLE_ATTRIBUTE]: "" }}
 					onClick={toggleWorkspaceList}
-					className="no-drag relative mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--header-tab-selected,var(--card))] text-foreground ring-1 ring-input transition-colors hover:bg-[image:linear-gradient(var(--fill-hover),var(--fill-hover))]"
+					className="no-drag mx-1.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-[var(--header-tab-selected,var(--card))] text-foreground ring-1 ring-input transition-colors hover:bg-[image:linear-gradient(var(--fill-hover),var(--fill-hover))]"
 				>
-					<WorkspacesIcon className="size-4" />
-					{waiting ? (
-						<span
-							aria-hidden="true"
-							className={cn(
-								"-top-0.5 -right-0.5 absolute size-2 rounded-full ring-2 ring-shell-frame",
-								WAITING_DOT_CLASS[waiting],
-							)}
-						/>
-					) : null}
+					<span className="relative flex">
+						<WorkspacesIcon className="size-4" />
+						{waiting ? (
+							<span
+								aria-hidden="true"
+								className={cn(
+									"-top-0.5 -right-0.5 absolute size-1.5 rounded-full ring-[1.5px] ring-[var(--header-tab-selected,var(--card))]",
+									WAITING_DOT_CLASS[waiting],
+								)}
+							/>
+						) : null}
+					</span>
 				</button>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">
