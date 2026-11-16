@@ -789,6 +789,37 @@ export async function listActiveWorkspaceSandboxes(
 	return found;
 }
 
+export interface ListedSandbox extends ActiveWorkspaceSandbox {
+	/** Starting, stopping or snapshotting: its state is about to change. */
+	settling: boolean;
+}
+
+/**
+ * Every sandbox of the team by name, however long ago it last changed. It
+ * reads the whole team, so it is for one-off jobs, not the reconcile.
+ */
+export async function listAllSandboxes(): Promise<ListedSandbox[]> {
+	const found: ListedSandbox[] = [];
+	for await (const sandbox of await Sandbox.list({
+		...credentials(),
+		sortBy: "statusUpdatedAt",
+		sortOrder: "desc",
+	})) {
+		found.push({
+			name: sandbox.name,
+			expiresAt:
+				sandbox.status === "running" && sandbox.expiresAt
+					? new Date(sandbox.expiresAt)
+					: null,
+			sessionId: sandbox.currentSessionId ?? null,
+			settling:
+				sandbox.status !== "running" &&
+				UNSETTLED_SANDBOX_STATUSES.has(sandbox.status),
+		});
+	}
+	return found;
+}
+
 /** Best-effort: a sandbox already gone is the state we wanted. */
 export async function deleteSandbox(providerSandboxId: string): Promise<void> {
 	const sandbox = await getSandbox(providerSandboxId);

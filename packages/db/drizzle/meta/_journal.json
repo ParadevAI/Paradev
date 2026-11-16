@@ -1366,6 +1366,13 @@
       "when": 1794799483177,
       "tag": "0194_cloud_workspace_sleep_state",
       "breakpoints": true
+    },
+    {
+      "idx": 195,
+      "version": "7",
+      "when": 1794806184119,
+      "tag": "0195_cloud_workspace_status_archived",
+      "breakpoints": true
     }
   ]
 }
