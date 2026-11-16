@@ -15,7 +15,6 @@ import { WorkspaceSwitcherRowLead } from "./components/WorkspaceSwitcherRowLead"
 interface WorkspaceSwitcherRowProps {
 	workspace: AccessibleV2Workspace;
 	isCurrent: boolean;
-	isLeaving?: boolean;
 	query: string;
 	onSelect: () => void;
 }
@@ -23,7 +22,6 @@ interface WorkspaceSwitcherRowProps {
 export function WorkspaceSwitcherRow({
 	workspace,
 	isCurrent,
-	isLeaving = false,
 	query,
 	onSelect,
 }: WorkspaceSwitcherRowProps) {
@@ -45,10 +43,8 @@ export function WorkspaceSwitcherRow({
 			value={workspace.id}
 			onSelect={onSelect}
 			className={cn(
-				"max-h-10 gap-2.5 text-[13px] transition-[max-height,opacity,padding] duration-150 motion-reduce:transition-none",
+				"gap-2.5 text-[13px]",
 				isCurrent ? "text-muted-foreground" : "text-foreground",
-				isLeaving &&
-					"pointer-events-none !max-h-0 overflow-hidden !py-0 opacity-0",
 			)}
 		>
 			<span className="flex size-4 shrink-0 items-center justify-center">

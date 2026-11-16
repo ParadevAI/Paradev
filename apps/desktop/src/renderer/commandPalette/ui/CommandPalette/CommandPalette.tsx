@@ -19,12 +19,10 @@ import {
 } from "react";
 import { resolveHotkeyFromEvent } from "renderer/hotkeys";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
-import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useCommandContext } from "../../core/ContextProvider";
 import { executeCommand } from "../../core/execute";
 import {
 	PALETTE_TOGGLE_ATTRIBUTE,
-	SWITCHER_ROW_LEAVE_MS,
 	useFrameStackStore,
 } from "../../core/frames";
 import type { Command as CommandType } from "../../core/types";
@@ -125,37 +123,6 @@ export function CommandPalette() {
 	// defaultPrevented.
 	const handleRootKeyDown = useCallback(
 		(event: React.KeyboardEvent) => {
-			const modifier = event.metaKey || event.ctrlKey;
-			if (isSwitcher && modifier && !event.shiftKey && !event.altKey) {
-				if (event.key === "Backspace") {
-					const {
-						switcherSelection: selection,
-						switcherLeavingId,
-						switcherSearchText,
-						setSwitcherLeavingId,
-					} = useFrameStackStore.getState();
-					// With search text typed, the chord edits the text. "#" and a
-					// creator filter choose the list; they are not search text.
-					if (switcherSearchText) return;
-					if (!selection || switcherLeavingId) return;
-					event.preventDefault();
-					event.stopPropagation();
-					const request = () =>
-						useDeleteWorkspaceIntent.getState().request({
-							workspaceId: selection.id,
-							workspaceName: selection.name,
-						});
-					// A cloud workspace is archived with no confirmation, so its
-					// row leaves first. A delete asks in a dialog over the palette.
-					if (selection.hostType !== "cloud") {
-						request();
-						return;
-					}
-					setSwitcherLeavingId(selection.id);
-					window.setTimeout(request, SWITCHER_ROW_LEAVE_MS);
-					return;
-				}
-			}
 			if (
 				isSwitcher &&
 				resolveHotkeyFromEvent(event.nativeEvent) === "NEW_WORKSPACE"
@@ -189,18 +156,6 @@ export function CommandPalette() {
 		setQuery("");
 		setSwitcherValue(undefined);
 	}, [root]);
-
-	// The delete confirmation opens over the palette and takes focus; typing
-	// must work again once it closes.
-	const isConfirmingDelete = useDeleteWorkspaceIntent((s) => s.open);
-	const wasConfirmingDelete = useRef(isConfirmingDelete);
-	useEffect(() => {
-		const closed = wasConfirmingDelete.current && !isConfirmingDelete;
-		wasConfirmingDelete.current = isConfirmingDelete;
-		if (!closed || !open) return;
-		const frame = requestAnimationFrame(() => inputRef.current?.focus());
-		return () => cancelAnimationFrame(frame);
-	}, [isConfirmingDelete, open]);
 
 	// A frame can also be opened from outside (⌘P over an open palette).
 	const frameId = currentFrame?.command.id;
@@ -247,12 +202,9 @@ export function CommandPalette() {
 				onOpenAutoFocus={focusInput}
 				onInteractOutside={(event) => {
 					// The toggle's own click closes the palette; closing here too would reopen it.
-					// The delete confirmation opens over the palette.
 					if (
 						event.target instanceof Element &&
-						event.target.closest(
-							`[${PALETTE_TOGGLE_ATTRIBUTE}], [data-slot^="alert-dialog"]`,
-						)
+						event.target.closest(`[${PALETTE_TOGGLE_ATTRIBUTE}]`)
 					) {
 						event.preventDefault();
 					}
