@@ -59,6 +59,22 @@ A staged archive or lone sidecar under the media directory that the current mani
 name is an earlier build's; `sync-assets` prunes it before fetching, and a step that needs its asset
 picks it by the manifest's hash rather than by listing the directory.
 
+## Measuring size
+
+A snapshot is a full block-level copy of the box's disk, so every byte the
+image or a boot writes is paid for in every snapshot.
+
+- `bun run image --local` ends with the image's total size and one row per
+  layer (size, then the layer's command cut to 90 characters), from
+  `docker history`. Compare it before and after an image change.
+- `bun run inventory` lists every stored snapshot in the sandbox project
+  (`VERCEL_SANDBOX_TOKEN`, `VERCEL_SANDBOX_TEAM_ID`,
+  `VERCEL_SANDBOX_PROJECT_ID`) and names it by the sandbox whose current
+  snapshot it is. It prints count, median, p90 and max size for goldens
+  (`env-*`) and workspaces (everything else, including snapshots no sandbox
+  points at), the 20 largest, and the total stored. `--json` prints one row
+  per snapshot. Without real credentials it exits 64.
+
 ## Versioning
 
 - A rootfs file: its sha256, compared to the `.hash` sidecar beside it on the box.

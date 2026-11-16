@@ -115,6 +115,66 @@ WORKDIR ${SANDBOX_PATHS.workspace}
 `;
 }
 
+type HistoryLayer = { CreatedBy: string; Size: string };
+
+const DOCKER_UNITS: Record<string, number> = {
+	B: 1,
+	kB: 1e3,
+	KB: 1e3,
+	MB: 1e6,
+	GB: 1e9,
+	TB: 1e12,
+};
+
+function parseDockerSize(size: string): number {
+	const match = /^([\d.]+)\s*([kKMGT]?B)?$/.exec(size.trim());
+	if (!match) throw new Error(`unreadable layer size: ${size}`);
+	return Number(match[1]) * (DOCKER_UNITS[match[2] ?? "B"] ?? 1);
+}
+
+function formatBytes(bytes: number): string {
+	if (bytes >= 1e9) return `${(bytes / 1e9).toFixed(2)} GB`;
+	if (bytes >= 1e6) return `${(bytes / 1e6).toFixed(1)} MB`;
+	if (bytes >= 1e3) return `${(bytes / 1e3).toFixed(1)} kB`;
+	return `${bytes} B`;
+}
+
+/** Renders `docker history --format '{{json .}}'` output, one JSON object per line, as a size table. */
+export function formatImageReport(history: string): string {
+	const layers = history
+		.split("\n")
+		.filter((line) => line.trim())
+		.map((line) => JSON.parse(line) as HistoryLayer)
+		.map((layer) => ({
+			bytes: parseDockerSize(layer.Size),
+			command: layer.CreatedBy.replace(/\s+/g, " ").trim(),
+		}));
+	const total = layers.reduce((sum, layer) => sum + layer.bytes, 0);
+	const rows = layers.map(
+		({ bytes, command }) =>
+			`${formatBytes(bytes).padStart(10)}  ${command.length > 90 ? `${command.slice(0, 89)}…` : command}`,
+	);
+	return [`image size: ${formatBytes(total)}`, ...rows].join("\n");
+}
+
+function printImageReport(image: string): void {
+	const history = Bun.spawnSync(
+		[
+			"docker",
+			"history",
+			"--no-trunc",
+			"--human=false",
+			"--format",
+			"{{json .}}",
+			image,
+		],
+		{ stdout: "pipe", stderr: "inherit" },
+	);
+	if (history.exitCode !== 0)
+		throw new Error(`docker history exited ${history.exitCode}`);
+	console.log(formatImageReport(history.stdout.toString()));
+}
+
 function assembleContext(bundle: BuiltBundle): string {
 	const context = mkdtempSync(join(tmpdir(), "superset-sandbox-image-"));
 	cpSync(bundle.dir, join(context, "bundle"), { recursive: true });
@@ -163,6 +223,7 @@ export async function buildImage(
 		if (build.exitCode !== 0)
 			throw new Error(`image build exited ${build.exitCode}`);
 		console.log(`built: ${local ? LOCAL_IMAGE : imageRef}`);
+		if (local) printImageReport(LOCAL_IMAGE);
 		return local ? LOCAL_IMAGE : imageRef;
 	} finally {
 		rmSync(context, { recursive: true, force: true });
