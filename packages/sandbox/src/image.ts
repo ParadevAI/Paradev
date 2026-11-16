@@ -31,7 +31,7 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_USER,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { type BuiltBundle, buildBundle, PACKAGE_ROOT } from "./build";
 import { loginToRegistry } from "./registry";
 

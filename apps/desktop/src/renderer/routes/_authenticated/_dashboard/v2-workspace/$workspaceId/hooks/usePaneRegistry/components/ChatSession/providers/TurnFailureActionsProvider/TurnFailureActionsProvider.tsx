@@ -1,34 +1,32 @@
 import { createContext, useContext } from "react";
 
-export type SignedInAccount = { accountLabel: string | null };
-
-export type DeviceCode = { userCode: string; verificationUrl: string };
-
-type SharedSignIn = {
-	label: string;
-	saveApiKey: (value: string) => Promise<SignedInAccount>;
-	openUrl: (url: string) => void;
+export type DeviceCode = {
+	userCode: string;
+	verificationUrl: string;
+	handle: string;
+	intervalSeconds: number;
 };
 
-/** Signs the cloud workspace's agent in for its creator, without leaving the chat. */
-export type AgentSignIn = SharedSignIn &
-	(
-		| {
-				agent: "claude";
-				/** Returns the claude.ai page that shows the code to paste back. */
-				startOauth: () => Promise<{ url: string }>;
-				finishOauth: (code: string) => Promise<SignedInAccount>;
-		  }
-		| {
-				agent: "codex";
-				startDeviceCode: (plan: "personal" | "business") => Promise<DeviceCode>;
-				/** Resolves once the person approves this code on OpenAI's page; stops on abort. */
-				waitForDeviceCode: (
-					code: DeviceCode,
-					signal: AbortSignal,
-				) => Promise<SignedInAccount>;
-		  }
-	);
+/** How the chat signs its agent in: a login run on the agent's own host, or a credential saved for a cloud box. */
+export type AgentSignIn = { label: string } & (
+	| { mode: "command"; command: string }
+	| {
+			mode: "token";
+			saveToken: (value: string) => Promise<void>;
+			saveApiKey: (value: string) => Promise<void>;
+	  }
+	| {
+			mode: "device";
+			openUrl: (url: string) => void;
+			startDeviceCode: () => Promise<DeviceCode>;
+			/** Resolves once the person approves this code on OpenAI's page; stops on abort. */
+			waitForDeviceCode: (
+				code: DeviceCode,
+				signal: AbortSignal,
+			) => Promise<void>;
+			saveApiKey: (value: string) => Promise<void>;
+	  }
+);
 
 export type TurnFailureActions = {
 	/** A turn is running, a prompt is on its way, or the chat is resuming. */

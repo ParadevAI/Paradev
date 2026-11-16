@@ -1,7 +1,22 @@
 name: Deploy Paradev Staging
 
 on:
+  workflow_call:
+    inputs:
+      mode:
+        type: string
+        required: true
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Stage aliases, prepare final artifacts without routing changes, or deploy to the final hosts
+        type: choice
+        required: true
+        default: stage
+        options:
+          - stage
+          - prepare-final
+          - final
 
 permissions:
   contents: read
@@ -20,11 +35,12 @@ env:
 jobs:
   deploy-staging:
     name: Deploy isolated Paradev API and web
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'ParadevAI/Paradev'
+    if: github.ref == 'refs/heads/main' && github.repository == 'ParadevAI/Paradev'
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 30
     environment: production
     env:
+      DEPLOY_MODE: ${{ inputs.mode }}
       VERCEL_PARADEV_API_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
       VERCEL_PARADEV_WEB_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
 
@@ -61,13 +77,21 @@ jobs:
           from urllib.request import Request, urlopen
 
           TARGETS = (
-              ("API", "prj_MmAnFWXbST3HSeLr313KNqZ00Pve", "api-paradev", "api.stage.paradev.com", "apps/api"),
-              ("WEB", "prj_7XZEFgKHMki81K1bTCl0JCG4lToQ", "web-paradev", "app.stage.paradev.com", "apps/web"),
+              ("API", "prj_MmAnFWXbST3HSeLr313KNqZ00Pve", "api-paradev", "api", "apps/api"),
+              ("WEB", "prj_7XZEFgKHMki81K1bTCl0JCG4lToQ", "web-paradev", "app", "apps/web"),
           )
 
           def require(condition, message):
               if not condition:
                   sys.exit(message)
+
+          MODE = os.environ["DEPLOY_MODE"]
+          require(MODE in ("stage", "prepare-final", "final"), "Unknown deployment mode")
+          require(sys.argv[1] in ("check", "alias", "report"), "Unknown guard command")
+          require(sys.argv[1] != "alias" or MODE != "prepare-final", "Final preparation cannot assign aliases")
+          ROOT = "stage.paradev.com" if MODE == "stage" else "paradev.com"
+          TARGETS = tuple((kind, project_id, name, f"{label}.{ROOT}", root)
+                          for kind, project_id, name, label, root in TARGETS)
 
           for kind, project_id, *_ in TARGETS:
               require(os.environ.get(f"VERCEL_PARADEV_{kind}_PROJECT_ID") == project_id,
@@ -96,10 +120,12 @@ jobs:
               require(project["id"] == project_id and project["name"] == name
                       and project["accountId"] == os.environ["VERCEL_ORG_ID"]
                       and project["rootDirectory"] == root, f"Unexpected project identity for {kind}")
+              if MODE == "prepare-final":
+                  return None
               domain = request(f"/v9/projects/{project_id}/domains/{host}")
               require(domain["name"] == host and domain.get("verified") is True
                       and not domain.get("redirect") and not domain.get("gitBranch")
-                      and not domain.get("customEnvironmentId"), f"Stage domain must already belong to {name}")
+                      and not domain.get("customEnvironmentId"), f"{host} must already belong to {name}")
               alias = request(f"/v4/aliases/{host}", allow_missing=True)
               if alias is not None:
                   require(alias.get("projectId") == project_id and not alias.get("redirect"),
@@ -109,7 +135,7 @@ jobs:
           for target in TARGETS:
               check_target(target)
 
-          if sys.argv[1] == "alias":
+          if sys.argv[1] in ("alias", "report"):
               deployments = []
               for target in TARGETS:
                   kind, project_id, name, host, root = target
@@ -122,6 +148,13 @@ jobs:
                   require(deployment["projectId"] == project_id and deployment["readyState"] == "READY"
                           and deployment["target"] == "production", f"Unexpected deployment for {kind}")
                   deployments.append(deployment["id"])
+                  if sys.argv[1] == "report":
+                      with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+                          summary.write(f"{kind}: {deployment['id']} {url}\n\n")
+              if sys.argv[1] == "report":
+                  with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+                      summary.write(f"Commit: {os.environ['GITHUB_SHA']}\n")
+                  sys.exit(0)
               for target, deployment_id in zip(TARGETS, deployments):
                   alias = check_target(target)
                   host = target[3]
@@ -153,13 +186,14 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PARADEV_API_PROJECT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
-          BROWSER_API_URL: https://api.stage.paradev.com
+          DOMAIN_MOVE_ENABLED: "false"
+          BROWSER_API_URL: ${{ inputs.mode != 'stage' && 'https://api.paradev.com' || 'https://api.stage.paradev.com' }}
           NEXT_PUBLIC_API_URL: https://api.superset.sh
-          NEXT_PUBLIC_WEB_URL: https://app.stage.paradev.com
+          NEXT_PUBLIC_WEB_URL: ${{ inputs.mode != 'stage' && 'https://app.paradev.com' || 'https://app.stage.paradev.com' }}
           NEXT_PUBLIC_MARKETING_URL: https://paradev.com
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: stage.paradev.com
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ inputs.mode != 'stage' && 'paradev.com' || 'stage.paradev.com' }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -275,6 +309,7 @@ jobs:
             --env TEMPORAL_NAMESPACE=$TEMPORAL_NAMESPACE \
             --env TEMPORAL_API_KEY=$TEMPORAL_API_KEY \
             --env CLOUDFLARE_BROWSER_RENDERING_TOKEN=$CLOUDFLARE_BROWSER_RENDERING_TOKEN \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
@@ -365,9 +400,10 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PARADEV_WEB_PROJECT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
-          BROWSER_API_URL: https://api.stage.paradev.com
-          NEXT_PUBLIC_API_URL: https://api.stage.paradev.com
-          NEXT_PUBLIC_WEB_URL: https://app.stage.paradev.com
+          DOMAIN_MOVE_ENABLED: "false"
+          BROWSER_API_URL: ${{ inputs.mode != 'stage' && 'https://api.paradev.com' || 'https://api.stage.paradev.com' }}
+          NEXT_PUBLIC_API_URL: ${{ inputs.mode != 'stage' && 'https://api.paradev.com' || 'https://api.stage.paradev.com' }}
+          NEXT_PUBLIC_WEB_URL: ${{ inputs.mode != 'stage' && 'https://app.paradev.com' || 'https://app.stage.paradev.com' }}
           NEXT_PUBLIC_MARKETING_URL: https://paradev.com
           NEXT_PUBLIC_ROOT_DOMAIN: ${{ secrets.NEXT_PUBLIC_ROOT_DOMAIN }}
           NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
@@ -378,7 +414,7 @@ jobs:
           MEDIA_URL: ${{ secrets.MEDIA_URL }}
           STATIC_URL: ${{ secrets.STATIC_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          NEXT_PUBLIC_COOKIE_DOMAIN: stage.paradev.com
+          NEXT_PUBLIC_COOKIE_DOMAIN: ${{ inputs.mode != 'stage' && 'paradev.com' || 'stage.paradev.com' }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: ${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           NEXT_PUBLIC_SENTRY_DSN_WEB: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN_WEB }}
@@ -412,6 +448,7 @@ jobs:
             --env DATABASE_URL=$DATABASE_URL \
             --env DATABASE_URL_UNPOOLED=$DATABASE_URL_UNPOOLED \
             --env BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
+            --env DOMAIN_MOVE_ENABLED="$DOMAIN_MOVE_ENABLED" \
             --env BROWSER_API_URL="$BROWSER_API_URL" \
             --env NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --env NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL \
@@ -443,8 +480,16 @@ jobs:
             --env SECRETS_ENCRYPTION_KEY=$SECRETS_ENCRYPTION_KEY \
             --env SERVER_ANTHROPIC_API_KEY=$SERVER_ANTHROPIC_API_KEY > "$RUNNER_TEMP/paradev-web-url"
 
-      - name: Assign only staging aliases after both deployments succeed
+      - name: Assign aliases after both deployments succeed
+        if: inputs.mode != 'prepare-final'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: python3 "$RUNNER_TEMP/paradev-staging-guard.py" alias
+
+      - name: Record final artifacts for routing approval
+        if: inputs.mode == 'prepare-final'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: python3 "$RUNNER_TEMP/paradev-staging-guard.py" report

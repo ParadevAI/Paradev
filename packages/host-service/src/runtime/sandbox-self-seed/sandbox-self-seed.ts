@@ -15,7 +15,7 @@ import {
 	type SandboxRepository,
 	sandboxCheckoutDir,
 	sandboxRepositoriesSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";

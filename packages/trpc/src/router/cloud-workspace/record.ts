@@ -33,6 +33,7 @@ import { primaryRepository } from "../../lib/sandbox";
 import { personProcedure } from "../../trpc";
 import { loadVisibleWorkspace, visibleTo } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { cloudWorkspaceStatusFor } from "./client-status";
 import {
 	recordPullRequests,
 	reportedPullRequestsSchema,
@@ -318,7 +319,7 @@ export const cloudWorkspaceRecordRouter = {
 				organizationId: row.organizationId,
 				name: row.name,
 				branch: row.branch,
-				status: row.status,
+				status: cloudWorkspaceStatusFor(ctx.client, row.status),
 				visibility: row.visibility,
 				agentStatus: row.agentStatus,
 				agentStatusAt: row.agentStatusAt,
@@ -686,7 +687,7 @@ export const cloudWorkspaceRecordRouter = {
 				});
 			}
 			const row = await loadVisibleWorkspace(ctx, input.id);
-			if (row.status === "deleted") {
+			if (row.status === "archived") {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Workspace not found",

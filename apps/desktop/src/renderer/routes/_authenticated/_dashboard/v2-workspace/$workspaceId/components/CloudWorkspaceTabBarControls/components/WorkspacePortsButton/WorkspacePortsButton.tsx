@@ -6,7 +6,6 @@ import { cn } from "@superset/ui/utils";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
 import { useExplicitForwards } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
-import { usePortsDisplayMode } from "renderer/stores/inline-workspace-ports";
 import { portForwardId } from "shared/types";
 import { WorkspacePortRow } from "./components/WorkspacePortRow";
 import { WorkspaceStaleForwardRow } from "./components/WorkspaceStaleForwardRow";
@@ -33,9 +32,6 @@ export function WorkspacePortsButton({
 		(forward) => !detected.has(forward.id),
 	);
 	const totalPortCount = ports.length;
-	const portsDisplayMode = usePortsDisplayMode();
-
-	if (portsDisplayMode === "topbar" && stale.length === 0) return null;
 
 	return (
 		<Popover>

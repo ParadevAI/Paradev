@@ -52,6 +52,25 @@ describe("chatRows", () => {
 		]);
 	});
 
+	test("prompts that share a client id still get distinct keys", () => {
+		const groups: TurnGroup[] = [
+			{
+				turn: turn("t1", "completed"),
+				turnId: "t1",
+				entries: [{ kind: "item", item: user("u1", "shared") }],
+			},
+			{
+				turn: turn("t2", "completed"),
+				turnId: "t2",
+				entries: [{ kind: "item", item: user("u2", "shared") }],
+			},
+		];
+		expect(chatRows(groups, []).map((row) => row.key)).toEqual([
+			"shared",
+			"u2",
+		]);
+	});
+
 	test("a running turn with nothing live ends with a working line", () => {
 		const groups: TurnGroup[] = [
 			{

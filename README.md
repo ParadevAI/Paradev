@@ -16,7 +16,7 @@ Run Claude Code, Codex, or another CLI agent with terminals, code review, and br
 
 ## What is Paradev?
 
-Paradev is a desktop app for running CLI coding agents in parallel. Each task gets its own Git worktree, branch, and terminals, so Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, or any other CLI agent can work on several tasks in one repository at the same time.
+Paradev is an open-source desktop app for running CLI coding agents in parallel, released under the [MIT License](LICENSE.md). Each task gets its own Git worktree, branch, and terminals, so Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, or any other CLI agent can work on several tasks in one repository at the same time.
 
 Paradev is for developers who already use a coding agent in the terminal and want to run more than one task at once, without juggling terminal tabs and branches by hand.
 

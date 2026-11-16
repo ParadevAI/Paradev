@@ -58,7 +58,7 @@ export function describeMoveError(raw: string | null): MoveErrorDescription {
 			reason: i18n._(
 				msg({
 					message:
-						"The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again.",
+						"The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again.",
 				}),
 			),
 			details: text,

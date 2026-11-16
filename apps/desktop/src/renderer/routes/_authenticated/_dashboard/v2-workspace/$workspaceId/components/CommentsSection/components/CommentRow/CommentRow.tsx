@@ -17,6 +17,7 @@ import {
 	SquarePlus,
 } from "lucide-react";
 import { LuArrowUpRight, LuCheck } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { getMarkdownPreviewText } from "renderer/utils/markdownPreview";
 import type { CommentPaneData, DiffFocusSide } from "../../../../types";
 import type { NormalizedComment } from "../../types";
@@ -41,11 +42,12 @@ export function CommentRow({
 	onOpen,
 	onOpenInDiff,
 }: CommentRowProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const createdAt = comment.createdAt ? new Date(comment.createdAt) : null;
 	const age =
 		createdAt && Number.isFinite(createdAt.getTime())
-			? formatCompactRelativeTime(createdAt)
+			? formatCompactRelativeTime(createdAt, now)
 			: null;
 	const isCopied = copiedActionKey === `comment:${comment.id}`;
 

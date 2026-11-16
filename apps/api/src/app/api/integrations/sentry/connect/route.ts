@@ -1,3 +1,4 @@
+import { withLegacyIntegrationConnect } from "@superset/shared/legacy-integration-connect";
 import { env } from "@/env";
 import { beginOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
@@ -13,19 +14,21 @@ import { requireOrgMember } from "@/lib/integrations/requireOrgMember";
  * state cookie rather than through Sentry.
  */
 export async function GET(request: Request) {
-	const member = await requireOrgMember(request);
-	if (member instanceof Response) return member;
+	return withLegacyIntegrationConnect(request, async () => {
+		const member = await requireOrgMember(request);
+		if (member instanceof Response) return member;
 
-	if (!env.SENTRY_APP_SLUG || !env.SENTRY_CLIENT_ID) {
-		return Response.redirect(
-			`${env.NEXT_PUBLIC_WEB_URL}/integrations/sentry?error=not_configured`,
-		);
-	}
+		if (!env.SENTRY_APP_SLUG || !env.SENTRY_CLIENT_ID) {
+			return Response.redirect(
+				`${env.NEXT_PUBLIC_WEB_URL}/integrations/sentry?error=not_configured`,
+			);
+		}
 
-	return beginOAuthFlow({
-		cookie: STATE_COOKIES.sentry,
-		payload: { organizationId: member.organizationId, userId: member.userId },
-		authorizeUrl: () =>
-			`https://sentry.io/sentry-apps/${env.SENTRY_APP_SLUG}/external-install/`,
+		return beginOAuthFlow({
+			cookie: STATE_COOKIES.sentry,
+			payload: { organizationId: member.organizationId, userId: member.userId },
+			authorizeUrl: () =>
+				`https://sentry.io/sentry-apps/${env.SENTRY_APP_SLUG}/external-install/`,
+		});
 	});
 }

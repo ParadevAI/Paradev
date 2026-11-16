@@ -79,6 +79,18 @@
 	/* Sidebar row fills: low-opacity foreground washes so they track any theme */
 	--fill-hover: color-mix(in oklab, var(--foreground) 7%, transparent);
 	--fill-selected: color-mix(in oklab, var(--foreground) 10%, transparent);
+	/* The redesigned shell's frame (title bar, rail, gaps) and open sidebar.
+	   Themes set --sidebar inline on <html>, so the shell needs its own tokens,
+	   mixed from the theme so custom themes keep frame > sidebar > panes.
+	   TitleBar's shellFrameColor repeats the frame mix for the window controls. */
+	--shell-frame: color-mix(in oklab, var(--foreground) 15%, var(--background));
+	--shell-sidebar: color-mix(in oklab, var(--foreground) 5%, var(--background));
+	/* The open tab on the frame: lighter than the frame in dark themes. */
+	--shell-tab-selected: color-mix(
+		in oklab,
+		var(--foreground) 15%,
+		var(--shell-frame)
+	);
 }
 
 /* Light theme fallback values - applied before hydration if user has light theme saved */
@@ -128,6 +140,7 @@
 	--highlight-foreground: oklch(0.985 0 0);
 	--fill-hover: color-mix(in oklab, var(--foreground) 4%, transparent);
 	--fill-selected: color-mix(in oklab, var(--foreground) 6%, transparent);
+	--shell-tab-selected: var(--card);
 }
 
 @theme inline {
@@ -166,6 +179,7 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--color-shell-frame: var(--shell-frame);
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);
@@ -309,14 +323,8 @@
 	}
 
 	/* The OS eats clicks on drag regions, so an open overlay could never be
-	   dismissed by clicking a header. */
-	body:has(
-		[role="menu"][data-state="open"],
-		[role="listbox"][data-state="open"],
-		[role="dialog"][data-state="open"],
-		[role="alertdialog"][data-state="open"]
-	)
-	.drag {
+	   dismissed by clicking a header. lib/overlayOpenClass sets the class. */
+	body.overlay-open .drag {
 		-webkit-app-region: no-drag;
 	}
 

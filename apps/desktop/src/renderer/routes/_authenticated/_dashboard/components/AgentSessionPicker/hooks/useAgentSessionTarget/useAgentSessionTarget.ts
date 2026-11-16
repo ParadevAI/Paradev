@@ -10,7 +10,7 @@ import {
 export type { AgentSessionPlacement } from "renderer/hooks/useAgentSessionPlacement";
 
 export type AgentTarget =
-	| { kind: "existing"; terminalId: string }
+	| { kind: "existing"; terminalId: string; chatSessionId?: string }
 	| { kind: "new"; configId: string; placement: AgentSessionPlacement };
 
 export interface DecodedSelection {
@@ -47,6 +47,7 @@ export function decodeSelection(value: string): DecodedSelection | null {
 interface UseAgentSessionTargetArgs {
 	sessions: TerminalAgentBinding[];
 	configs: HostAgentConfig[];
+	preferredTerminalId?: string;
 }
 
 interface UseAgentSessionTargetResult {
@@ -66,23 +67,28 @@ interface UseAgentSessionTargetResult {
  * existing-session and new-session preferences don't clobber each other.
  *
  * Priority for the default selection:
- *   1. last picked terminal session, if still alive
- *   2. most recent active session
- *   3. last picked new-agent config, if still listed
- *   4. first config
+ *   1. the caller's preferred session, if still alive
+ *   2. last picked terminal session, if still alive
+ *   3. most recent active session
+ *   4. last picked new-agent config, if still listed
+ *   5. first config
  */
 export function useAgentSessionTarget({
 	sessions,
 	configs,
+	preferredTerminalId,
 }: UseAgentSessionTargetArgs): UseAgentSessionTargetResult {
 	const [override, setOverride] = useState<string | null>(null);
 	const placement = useAgentSessionPlacement();
 
 	const computedDefault = useMemo<string | null>(() => {
 		if (sessions.length > 0) {
+			const isAlive = (terminalId: string | null | undefined) =>
+				!!terminalId && sessions.some((s) => s.terminalId === terminalId);
 			const stored = readStorage(LAST_TERMINAL_ID_KEY);
-			const alive =
-				stored && sessions.some((s) => s.terminalId === stored)
+			const alive = isAlive(preferredTerminalId)
+				? preferredTerminalId
+				: isAlive(stored)
 					? stored
 					: sessions[0]?.terminalId;
 			if (alive) return `${EXISTING_PREFIX}${alive}`;
@@ -94,7 +100,7 @@ export function useAgentSessionTarget({
 				? storedConfigId
 				: configs[0]?.id;
 		return fromStorage ? `${NEW_PREFIX}${fromStorage}` : null;
-	}, [sessions, configs]);
+	}, [sessions, configs, preferredTerminalId]);
 
 	// Validate the user's override against current data — if their pick is
 	// now gone (terminal died, config deleted), fall back to the default.
@@ -115,10 +121,17 @@ export function useAgentSessionTarget({
 		const decoded = decodeSelection(value);
 		if (!decoded) return null;
 		if (decoded.kind === "existing") {
-			return { kind: "existing", terminalId: decoded.id };
+			const binding = sessions.find(
+				(session) => session.terminalId === decoded.id,
+			);
+			return {
+				kind: "existing",
+				terminalId: decoded.id,
+				chatSessionId: binding?.chatSessionId,
+			};
 		}
 		return { kind: "new", configId: decoded.id, placement };
-	}, [value, placement]);
+	}, [value, placement, sessions]);
 
 	const onValueChange = useCallback((next: string) => {
 		setOverride(next);

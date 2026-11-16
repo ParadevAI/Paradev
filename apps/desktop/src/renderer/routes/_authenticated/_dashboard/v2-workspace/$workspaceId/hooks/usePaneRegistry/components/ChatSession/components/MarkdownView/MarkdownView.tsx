@@ -5,8 +5,8 @@ import {
 import { cn } from "@superset/ui/utils";
 import { memo, type ReactNode, useMemo } from "react";
 import { env } from "renderer/env.renderer";
+import { pageLinkFinder } from "../../../../utils/pageLinks";
 import { CHAT_MARKDOWN_COMPONENTS, CHAT_REMARK_PLUGINS } from "../../constants";
-import { pageLinkFinder } from "../../utils/pageLinks";
 import { CODE_CARD_CLASSNAME } from "../ChatCodeBlock";
 import { PageLinkCard } from "../PageLinkCard";
 import { pageLinksByBlock } from "./utils/pageLinksByBlock";

@@ -16,6 +16,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RenameDialog";
 import type {
 	ChatPaneData,
 	PaneViewerData,
@@ -30,7 +31,6 @@ import {
 import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
 import { AccountUsageMenuSection } from "../AccountUsageMenuSection";
 import { ForkMenuItems } from "../ForkMenuItems";
-import { RenameDialog } from "../RenameDialog";
 import { StopHeaderEvents } from "../StopHeaderEvents";
 import { UsageWarningDot } from "../UsageWarningDot";
 import { ChatHistoryPicker } from "./components/ChatHistoryPicker";
@@ -125,6 +125,7 @@ export function ChatPaneTitle({
 				)}
 				onClick={stopHeaderClick}
 			>
+				<span className="shrink-0 text-muted-foreground">{icon}</span>
 				<span className="truncate">{title}</span>
 				<ChevronDown className="size-3 shrink-0 opacity-60" />
 				<UsageWarningDot workspaceId={workspaceId} terminalId={chatKey} />
@@ -134,7 +135,6 @@ export function ChatPaneTitle({
 
 	return (
 		<>
-			<span className="shrink-0 text-muted-foreground">{icon}</span>
 			<ChatHistoryPicker
 				current={data}
 				workspaceId={workspaceId}

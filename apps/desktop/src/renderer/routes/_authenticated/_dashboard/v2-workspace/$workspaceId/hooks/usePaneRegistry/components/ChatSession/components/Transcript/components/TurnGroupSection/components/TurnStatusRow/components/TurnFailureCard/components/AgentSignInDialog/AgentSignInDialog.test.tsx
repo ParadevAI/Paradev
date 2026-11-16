@@ -1,48 +1,49 @@
 import { afterEach, expect, mock, test } from "bun:test";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
-import type {
-	AgentSignIn,
-	SignedInAccount,
-} from "../../../../../../../../../../providers/TurnFailureActionsProvider";
+import type { AgentSignIn } from "../../../../../../../../../../providers/TurnFailureActionsProvider";
 import { AgentSignInDialog } from "./AgentSignInDialog";
 
 afterEach(cleanup);
 
-function deferred<T>() {
-	let resolve!: (value: T) => void;
-	let reject!: (reason: unknown) => void;
-	const promise = new Promise<T>((res, rej) => {
+function deferred() {
+	let resolve!: () => void;
+	const promise = new Promise<void>((res) => {
 		resolve = res;
-		reject = rej;
 	});
-	return { promise, resolve, reject };
+	return { promise, resolve };
 }
 
-const account: SignedInAccount = { accountLabel: "person@example.com" };
+function cloudClaude(save: () => Promise<void>): AgentSignIn {
+	return { label: "Claude", mode: "token", saveToken: save, saveApiKey: save };
+}
 
-function claude(finish: Promise<SignedInAccount>): AgentSignIn {
+function codex(signals: AbortSignal[]): AgentSignIn {
 	return {
-		agent: "claude",
-		label: "Claude",
+		label: "Codex",
+		mode: "device",
 		openUrl: () => {},
-		startOauth: async () => ({ url: "https://claude.ai/oauth" }),
-		finishOauth: () => finish,
-		saveApiKey: () => finish,
+		startDeviceCode: async () => ({
+			userCode: "K7QM-4XPD",
+			verificationUrl: "https://auth.openai.com/codex/device",
+			handle: "handle",
+			intervalSeconds: 5,
+		}),
+		waitForDeviceCode: (_code, signal) => {
+			signals.push(signal);
+			return new Promise<void>(() => {});
+		},
+		saveApiKey: async () => {},
 	};
 }
 
-async function pasteCode(view: ReturnType<typeof render>) {
-	await act(async () => {
-		fireEvent.click(view.getByText("Open claude.ai to sign in"));
-	});
-	fireEvent.change(view.getByLabelText("Code"), {
-		target: { value: "code#state" },
+function pasteToken(view: ReturnType<typeof render>) {
+	fireEvent.change(view.getByLabelText("Token"), {
+		target: { value: "sk-ant-oat01-x" },
 	});
 	fireEvent.click(view.getByText("Sign in"));
 }
 
-test("a sign-in cannot be closed mid-way, and a saved one still restarts the agent", async () => {
-	const finish = deferred<SignedInAccount>();
+test("a local sign-in shows the login command, then restarts the agent once", async () => {
 	const onOpenChange = mock((_open: boolean) => {});
 	const restartAndContinue = mock(async () => true);
 	const view = render(
@@ -50,17 +51,38 @@ test("a sign-in cannot be closed mid-way, and a saved one still restarts the age
 			onOpenChange={onOpenChange}
 			open
 			restartAndContinue={restartAndContinue}
-			signIn={claude(finish.promise)}
+			signIn={{ label: "Codex", mode: "command", command: "codex login" }}
 		/>,
 	);
-	await pasteCode(view);
+	expect(view.getByText("codex login")).toBeTruthy();
+	await act(async () => {
+		fireEvent.click(view.getByText("I've signed in"));
+	});
+	expect(restartAndContinue).toHaveBeenCalledTimes(1);
+	expect(onOpenChange).toHaveBeenCalledWith(false);
+});
+
+test("a sign-in cannot be closed mid-way, and a saved token still restarts the agent", async () => {
+	const save = deferred();
+	const onOpenChange = mock((_open: boolean) => {});
+	const restartAndContinue = mock(async () => true);
+	const view = render(
+		<AgentSignInDialog
+			onOpenChange={onOpenChange}
+			open
+			restartAndContinue={restartAndContinue}
+			signIn={cloudClaude(() => save.promise)}
+		/>,
+	);
+	expect(view.getByText("claude setup-token")).toBeTruthy();
+	pasteToken(view);
 	expect(view.getByText("Signing in…")).toBeTruthy();
 
 	fireEvent.keyDown(document.body, { key: "Escape" });
 	expect(onOpenChange).not.toHaveBeenCalled();
 	expect(view.queryByRole("button", { name: "Close" })).toBeNull();
 
-	await act(async () => finish.resolve(account));
+	await act(async () => save.resolve());
 	expect(restartAndContinue).toHaveBeenCalledTimes(1);
 	expect(onOpenChange).toHaveBeenCalledWith(false);
 });
@@ -73,42 +95,24 @@ test("a restart that throws keeps the sign-in and offers to restart again", asyn
 			restartAndContinue={async () => {
 				throw new Error("transport closed");
 			}}
-			signIn={claude(Promise.resolve(account))}
+			signIn={cloudClaude(async () => {})}
 		/>,
 	);
-	await pasteCode(view);
+	pasteToken(view);
 	await act(async () => {});
 	expect(view.getByText("Signed in, but Claude did not restart.")).toBeTruthy();
-	expect(view.queryByLabelText("Code")).toBeNull();
+	expect(view.queryByLabelText("Token")).toBeNull();
 });
-
-function codex(signals: AbortSignal[]): AgentSignIn {
-	return {
-		agent: "codex",
-		label: "Codex",
-		openUrl: () => {},
-		startDeviceCode: async () => ({
-			userCode: "K7QM-4XPD",
-			verificationUrl: "https://auth.openai.com/codex/device",
-		}),
-		waitForDeviceCode: (_code, signal) => {
-			signals.push(signal);
-			return new Promise<SignedInAccount>(() => {});
-		},
-		saveApiKey: async () => account,
-	};
-}
 
 test("going back from a Codex device code stops waiting for its approval", async () => {
 	const signals: AbortSignal[] = [];
 	const restartAndContinue = mock(async () => true);
-	const signIn = codex(signals);
 	const view = render(
 		<AgentSignInDialog
 			onOpenChange={() => {}}
 			open
 			restartAndContinue={restartAndContinue}
-			signIn={signIn}
+			signIn={codex(signals)}
 		/>,
 	);
 	await act(async () => {

@@ -6,6 +6,7 @@ import { cn } from "@superset/ui/utils";
 import { memo } from "react";
 import { CgLaptop } from "react-icons/cg";
 import { LuGitBranch, LuMonitor } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { V2WorkspaceContextMenu } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceContextMenu";
 import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceChecksDot";
 import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceOwnerAvatar";
@@ -57,6 +58,7 @@ function BoardCardBody({
 	// ContextMenuTrigger asChild merges its handlers/ref in here; they must
 	// reach the real <button> or right-click never opens the menu.
 } & React.ComponentPropsWithRef<"button">) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const { formatCompactRelativeTime } = useFormat();
 	const isArchived = workspace.archivedAt != null;
@@ -72,6 +74,7 @@ function BoardCardBody({
 		(workspace.diffStats.additions > 0 || workspace.diffStats.deletions > 0);
 	const timeLabel = formatCompactRelativeTime(
 		workspace.archivedAt ?? workspaceActivityAt(workspace),
+		now,
 	);
 
 	return (

@@ -23,6 +23,7 @@ import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
+import { useBoxPressure } from "renderer/stores/box-pressure";
 import { useInlineWorkspacePortsEnabled } from "renderer/stores/inline-workspace-ports";
 import { usePullRequestPaneIntent } from "renderer/stores/pull-request-pane-intent";
 import type { ActivePaneStatus } from "shared/tabs-types";
@@ -121,16 +122,19 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 		} = useFocusVisible();
 
 		useEffect(() => {
-			if (isActive) {
+			if (!isActive) return;
+			const frame = requestAnimationFrame(() => {
 				localRef.current?.scrollIntoView({
 					block: "nearest",
 					behavior: "smooth",
 				});
-			}
+			});
+			return () => cancelAnimationFrame(frame);
 		}, [isActive]);
 
 		const creationStatusText = isPending ? t({ message: "Creating…" }) : null;
 		const isCloudWorkspace = hostType === "cloud";
+		const boxPressure = useBoxPressure(isCloudWorkspace ? workspace.id : null);
 		const closeLabel = isCloudWorkspace
 			? t({ message: "Archive workspace" })
 			: t({ message: "Delete workspace" });
@@ -369,6 +373,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 										<DashboardSidebarWorkspaceHostGlyph
 											hostType={hostType}
 											hostIsOnline={hostIsOnline}
+											pressure={boxPressure?.level ?? null}
+											cloudState={
+												workspace.sandboxStatus === "asleep" ? "asleep" : "on"
+											}
 										/>
 									)}
 								</span>

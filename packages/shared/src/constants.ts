@@ -3,7 +3,15 @@ import type { TriggerConfigInput } from "./automation-triggers";
 import { BRAND } from "./brand";
 import { OWN_ROOT_DOMAINS } from "./own-domains";
 
-export { CANONICAL_URLS, IOS_APP } from "./app-identity";
+export { ANDROID_APP, CANONICAL_URLS, IOS_APP } from "./app-identity";
+
+// SHA-256 of the certificates that sign the Android app: the EAS upload key and
+// the Play App Signing key. Not in app-identity.ts, so adding one leaves the
+// mobile runtime version alone.
+export const ANDROID_SIGNING_CERT_SHA256: readonly string[] = [
+	"07:4D:2F:5A:8E:53:60:69:9C:D8:BE:92:D6:DC:8C:88:45:2D:C1:EF:B7:F7:DE:D7:38:60:7F:32:96:7E:DD:27",
+	"9F:06:C7:55:C5:46:BD:18:7A:3A:A9:28:63:71:50:1F:E4:5E:DE:F5:57:B2:5C:BE:9F:46:27:BA:C6:8B:43:80",
+];
 
 // Auth
 export const AUTH_PROVIDERS = ["github", "google"] as const;
@@ -146,6 +154,8 @@ export const V2_NEW_USER_V1_EXPERIMENT_START = "2026-06-08T06:59:00.000Z";
 export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
 
 export const FEATURE_FLAGS = {
+	WEB_DOMAIN_MOVE: "web-domain-move",
+	WEB_PAGES_DOMAIN_MOVE: "web-pages-domain-move",
 	/**
 	 * Shows the `.paradev/config.toml` editor in project settings in place of
 	 * the config.json form. host-service reads a config.toml wherever one

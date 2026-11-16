@@ -1,15 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import {
-	Cable,
-	GitPullRequest,
-	Hash,
-	House,
-	SquareCheckBig,
-	StickyNote,
-	TimerReset,
-} from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
+import { PiChatsCircle, PiClockClockwise } from "react-icons/pi";
+import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
+import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
@@ -18,6 +12,7 @@ import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { RailMoreMenu } from "./components/RailMoreMenu";
+import { SolarCheckCircleIcon } from "./components/SolarCheckCircleIcon";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
 
@@ -43,28 +38,30 @@ export function NavigationRail() {
 		>
 			<RailButton
 				label={t({ message: "Home" })}
-				icon={House}
+				icon={TbSmartHome}
 				isActive={navigation.isHomeOpen}
 				onClick={navigation.openHome}
 			/>
 			{isChannelsEnabled && (
 				<RailButton
 					label={t({ message: "Chat" })}
-					icon={Hash}
+					icon={PiChatsCircle}
+					isIconFilled
 					isActive={navigation.isChannelsOpen}
 					onClick={navigation.openChannels}
 				/>
 			)}
 			<RailButton
 				label={t({ message: "Pages" })}
-				icon={StickyNote}
+				icon={TbNote}
 				isActive={navigation.isPagesOpen}
 				onClick={navigation.openPages}
 			/>
 			{isPluginsEnabled && (
 				<RailButton
 					label={t({ message: "Plugins" })}
-					icon={Cable}
+					icon={VscExtensions}
+					isIconFilled
 					isActive={navigation.isPluginsOpen}
 					onClick={navigation.openPlugins}
 				/>
@@ -75,7 +72,8 @@ export function NavigationRail() {
 						? t({ message: `Automations (${myFailedCount} failing)` })
 						: t({ message: "Automations" })
 				}
-				icon={TimerReset}
+				icon={PiClockClockwise}
+				isIconFilled
 				isActive={navigation.isAutomationsOpen}
 				onClick={
 					myFailedCount > 0
@@ -93,13 +91,13 @@ export function NavigationRail() {
 			/>
 			<RailButton
 				label={t({ message: "Tasks" })}
-				icon={SquareCheckBig}
+				icon={SolarCheckCircleIcon}
 				isActive={navigation.isTasksOpen}
 				onClick={navigation.openTasks}
 			/>
 			<RailButton
 				label={t({ message: "Pull requests" })}
-				icon={GitPullRequest}
+				icon={TbGitPullRequest}
 				isActive={navigation.isPullRequestsOpen}
 				onClick={navigation.openPullRequests}
 			/>

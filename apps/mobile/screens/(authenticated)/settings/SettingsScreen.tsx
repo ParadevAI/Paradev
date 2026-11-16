@@ -23,7 +23,7 @@ import { useSession } from "@/lib/auth/client";
 import { useGithubConnection } from "@/lib/github-connection";
 import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl } from "@/lib/web-links";
+import { useUpgrade } from "@/lib/upgrade";
 import { ListRow } from "@/screens/(authenticated)/components/ListRow";
 import { ListRowValue } from "@/screens/(authenticated)/components/ListRowValue";
 import { OrganizationAvatar } from "@/screens/(authenticated)/components/OrganizationAvatar";
@@ -57,7 +57,8 @@ export function SettingsScreen() {
 	const insets = useSafeAreaInsets();
 	const { data: session } = useSession();
 	const queryClient = useQueryClient();
-	const { activeOrganization, activeOrganizationId } = useOrganizations();
+	const { activeOrganization } = useOrganizations();
+	const { canManagePlan, openBillingSettings } = useUpgrade();
 	const { signOut, isSigningOut } = useSignOut();
 	const { deleteAccount, isDeleting } = useDeleteAccount();
 	const github = useGithubConnection();
@@ -94,27 +95,6 @@ export function SettingsScreen() {
 				text: t({ message: "Log out" }),
 			},
 		]);
-	};
-
-	const handleManagePlan = () => {
-		Alert.alert(
-			t({
-				message: "Manage plan on the web",
-			}),
-			t({
-				message: `You can't change this subscription in the app. Your organization's plan is managed by its owner at ${COMPANY.DOMAIN}.`,
-			}),
-			[
-				{
-					style: "cancel",
-					text: t({ message: "Dismiss" }),
-				},
-				{
-					onPress: () => openUrl(billingSettingsUrl(activeOrganizationId)),
-					text: t({ message: `Manage on ${COMPANY.DOMAIN}` }),
-				},
-			],
-		);
 	};
 
 	const handleDeleteAccount = () => {
@@ -339,11 +319,15 @@ export function SettingsScreen() {
 								color={theme.mutedForeground}
 							/>
 						}
-						label={t({
-							message: "Manage Plan",
-						})}
-						trailing={<ListRowValue value={planLabel} />}
-						onPress={handleManagePlan}
+						label={
+							canManagePlan
+								? t({ message: "Manage Plan" })
+								: t({ message: "Plan", context: "billing" })
+						}
+						trailing={
+							<ListRowValue value={planLabel} chevron={canManagePlan} />
+						}
+						onPress={canManagePlan ? openBillingSettings : undefined}
 						isLast
 					/>
 				</SettingsSection>

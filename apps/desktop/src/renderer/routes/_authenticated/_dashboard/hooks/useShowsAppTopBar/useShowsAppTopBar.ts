@@ -1,5 +1,5 @@
-import { useMatchRoute } from "@tanstack/react-router";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 
 /** The app-wide top bar is left only on v1 screens; every other screen draws its own headers. */
 export function useShowsAppTopBar(): boolean {

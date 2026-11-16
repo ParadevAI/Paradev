@@ -15,6 +15,7 @@ import {
 	type LucideIcon,
 } from "lucide-react";
 import type { MouseEvent } from "react";
+import { useNow } from "renderer/hooks/useNow";
 import { useChatPaneActions } from "../../../../providers/ChatPaneActionsProvider";
 import type { GithubWorkItemLink } from "../../../../utils/githubWorkItem";
 import {
@@ -139,6 +140,7 @@ export function GithubWorkItemCard({
 	url: string;
 	onOpen?: () => void;
 }) {
+	const now = useNow(60_000);
 	const { i18n, t } = useLingui();
 	const { openLink } = useChatPaneActions();
 	const open = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -230,7 +232,7 @@ export function GithubWorkItemCard({
 					{item.author && <span aria-hidden="true">·</span>}
 					<span className="shrink-0">
 						<Trans>
-							Updated {formatRelativeTime(new Date(item.updatedAt))}
+							Updated {formatRelativeTime(new Date(item.updatedAt), now)}
 						</Trans>
 					</span>
 				</div>

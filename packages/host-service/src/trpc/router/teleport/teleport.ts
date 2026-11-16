@@ -4,9 +4,13 @@ import { promisify } from "node:util";
 import { sessionSelections } from "@superset/chat/core";
 import type { DurableEvent } from "@superset/chat/protocol";
 import type { ChatRuntime } from "@superset/chat-runtime";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
+import { getHostId } from "@superset/shared/host-info";
 import { TRPCError } from "@trpc/server";
+import { eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { projects, workspaces } from "../../../db/schema";
 import { createGitEnvResolver } from "../../../runtime/git";
 import {
 	downloadBundle,
@@ -14,7 +18,12 @@ import {
 	withStage,
 } from "../../../teleport/bundle";
 import {
+	beginWorkspaceMove,
+	createRelayHostClient,
+} from "../../../teleport/moveWorkspace";
+import {
 	type BundleManifest,
+	isPlainSessionId,
 	teleportProviderFor,
 } from "../../../teleport/providers";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
@@ -26,7 +35,12 @@ import {
 	harnessPlaceSessionTask,
 	harnessSessionFileTask,
 } from "../../../workers/tasks/harness";
-import { machineOnlyProcedure, protectedProcedure, router } from "../../index";
+import {
+	createCallerFactory,
+	machineOnlyProcedure,
+	protectedProcedure,
+	router,
+} from "../../index";
 import { rethrowEnvironmentalGitError } from "../git/utils/classify-git-error";
 import { resolveWorktreePath } from "../git/utils/resolve-worktree";
 import { requireChatRuntime } from "../sessions/session-service";
@@ -35,6 +49,17 @@ import {
 	requireLocalProject,
 	requireProjectRepoPath,
 } from "../workspace-creation/shared/local-project";
+import { resolveGithubRepo } from "../workspace-creation/shared/project-helpers";
+import {
+	importTerminalSession,
+	listMovableTerminals,
+	type MovedTerminal,
+	packStoppedTerminal,
+	resumeStoppedTerminals,
+	type SkippedTerminal,
+	type StopState,
+	stopTerminalsForMove,
+} from "./terminal-sessions";
 
 const execFileAsync = promisify(execFile);
 const BUSY_STATUSES = new Set(["starting", "running", "awaiting_input"]);
@@ -42,6 +67,8 @@ const STOP_TIMEOUT_MS = 20_000;
 const STOP_POLL_MS = 200;
 /** As many chats as `workspaceMove.attach` takes in one workspace move. */
 const MAX_MOVED_CHATS = 50;
+/** The most `listSessions` returns at once. */
+const MAX_LISTED_CHATS = 200;
 
 type MovableChat = {
 	sessionId: string;
@@ -60,7 +87,12 @@ type PreparedChat = {
 type SkippedChat = {
 	chatSessionId: string;
 	title: string | null;
-	reason: "unsupported_agent" | "not_started" | "moved_away" | "failed";
+	reason:
+		| "unsupported_agent"
+		| "not_started"
+		| "moved_away"
+		| "failed"
+		| "too_many";
 };
 
 function errorCode(error: unknown): string | undefined {
@@ -90,6 +122,30 @@ function busyError() {
 		code: "PRECONDITION_FAILED",
 		message: "Wait for the agent to finish, or stop it, before moving",
 	});
+}
+
+/** The remote a workspace's work is pushed to when it moves, and its GitHub repository. */
+async function resolveSnapshotTarget(
+	ctx: Parameters<typeof resolveWorktreePath>[0],
+	workspaceId: string,
+) {
+	const worktreePath = resolveWorktreePath(ctx, workspaceId);
+	const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
+	const target = await getHostWorkerPool()
+		.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
+		.catch((error: unknown) => {
+			rethrowEnvironmentalGitError(error);
+			throw error;
+		});
+	const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
+	const repository = repositories[0];
+	if (!target || !repository || repositories.some((repo) => !repo)) {
+		throw new TRPCError({
+			code: "PRECONDITION_FAILED",
+			message: "Moving a workspace needs a GitHub repository",
+		});
+	}
+	return { worktreePath, gitEnv, target, repository };
 }
 
 /** The bundle's manifest with the chat's mode and model, which its history does not carry. */
@@ -141,15 +197,19 @@ export const teleportRouter = router({
 	/**
 	 * Gets a workspace ready to continue on another host: the worktree,
 	 * uncommitted work included, goes to one new branch, and each chat's
-	 * history and its agent's session files to the cloud. The caller starts
-	 * the other side from all of them. A chat that cannot move is returned in
-	 * `skipped` and stays here.
+	 * history and its agent's session files to the cloud. With `moveTerminals`,
+	 * each terminal agent that can move is stopped and its session files
+	 * uploaded too; a caller that does not ask never has a terminal stopped,
+	 * since it could not hand it off. The caller starts the other side from
+	 * all of them. A chat that cannot move is returned in `skipped` and stays
+	 * here; a terminal, in `skippedTerminals`.
 	 */
 	prepareWorkspace: protectedProcedure
 		.input(
 			z.object({
 				workspaceId: z.string(),
 				stopIfBusy: z.boolean().optional(),
+				moveTerminals: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -161,15 +221,21 @@ export const teleportRouter = router({
 					message: "Chat sync is not available on this host",
 				});
 			}
-			const sessions = chat.commands.listSessions({
-				scopeId: input.workspaceId,
-				limit: MAX_MOVED_CHATS,
-			});
+			const sessions = chat.commands
+				.listSessions({ scopeId: input.workspaceId, limit: MAX_LISTED_CHATS })
+				// A chat closed here is gone for the person; moving it would open it again.
+				.filter((session) => !session.closedAt);
 			const skipped: SkippedChat[] = [];
 			const movable: MovableChat[] = [];
-			for (const session of sessions) {
-				// A chat closed here is gone for the person; moving it would open it again.
-				if (session.closedAt) continue;
+			for (const [index, session] of sessions.entries()) {
+				if (index >= MAX_MOVED_CHATS) {
+					skipped.push({
+						chatSessionId: session.sessionId,
+						title: session.title,
+						reason: "too_many",
+					});
+					continue;
+				}
 				const provider = teleportProviderFor(session.harness);
 				if (!provider || !session.harnessSessionId) {
 					skipped.push({
@@ -193,26 +259,17 @@ export const teleportRouter = router({
 						requireChat(chat, input.workspaceId, sessionId).status,
 					),
 				);
-			if (busy().length > 0 && !input.stopIfBusy) throw busyError();
+			const { movable: terminals, overflow } = input.moveTerminals
+				? listMovableTerminals(ctx, input.workspaceId)
+				: { movable: [], overflow: [] };
+			const anyBusy =
+				busy().length > 0 || terminals.some((terminal) => terminal.busy);
+			if (anyBusy && !input.stopIfBusy) throw busyError();
 
-			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
 			const env = resolveDefaultAccountTerminalEnv(ctx.db);
 			const pool = getHostWorkerPool();
-			const gitEnv = await createGitEnvResolver(ctx.credentials)(worktreePath);
-			const target = await pool
-				.run(gitSnapshotRemoteTask, { worktreePath, gitEnv })
-				.catch((error: unknown) => {
-					rethrowEnvironmentalGitError(error);
-					throw error;
-				});
-			const repositories = (target?.pushUrls ?? []).map(parseGitHubRemote);
-			const repository = repositories[0];
-			if (!target || !repository || repositories.some((repo) => !repo)) {
-				throw new TRPCError({
-					code: "PRECONDITION_FAILED",
-					message: "Moving a workspace needs a GitHub repository",
-				});
-			}
+			const { worktreePath, gitEnv, target, repository } =
+				await resolveSnapshotTarget(ctx, input.workspaceId);
 
 			for (const { sessionId } of busy()) {
 				await stopRunningTurn(chat, sessionId);
@@ -222,23 +279,64 @@ export const teleportRouter = router({
 			};
 			assertIdle();
 
+			const stopState: StopState = {
+				stopped: [],
+				skipped: overflow.map(
+					(terminal): SkippedTerminal => ({
+						terminalId: terminal.terminalId,
+						title: terminal.title,
+						reason: "too_many",
+					}),
+				),
+			};
+			const skippedTerminals = stopState.skipped;
+			const movedTerminals: MovedTerminal[] = [];
 			const branch = `superset/teleport-${randomUUID().slice(0, 8)}`;
-			await pool
-				.run(
-					gitPushSnapshotTask,
-					{ worktreePath, remote: target.remote, branch, gitEnv },
-					{ timeoutMs: 150_000 },
-				)
-				.catch((error: unknown) => {
-					rethrowEnvironmentalGitError(error);
-					throw error;
-				});
-
-			assertIdle();
 			const prepared: PreparedChat[] = [];
 			const followed: string[] = [];
 			let firstFailure: unknown = null;
 			try {
+				await stopTerminalsForMove(ctx, terminals, stopState);
+				await pool
+					.run(
+						gitPushSnapshotTask,
+						{ worktreePath, remote: target.remote, branch, gitEnv },
+						{ timeoutMs: 150_000 },
+					)
+					.catch((error: unknown) => {
+						rethrowEnvironmentalGitError(error);
+						throw error;
+					});
+
+				for (const { terminal, sessionFile } of stopState.stopped) {
+					try {
+						movedTerminals.push(
+							await packStoppedTerminal(ctx, {
+								terminal,
+								sessionFile,
+								worktreePath,
+							}),
+						);
+					} catch (error) {
+						console.warn(
+							`[teleport] could not pack terminal ${terminal.terminalId}; it stays here`,
+							error,
+						);
+						const restart = await resumeStoppedTerminals(
+							ctx,
+							input.workspaceId,
+							[terminal.terminalId],
+						);
+						skippedTerminals.push({
+							terminalId: terminal.terminalId,
+							title: terminal.title,
+							reason: "failed",
+							...(restart.failed.length > 0 ? { stopped: true } : {}),
+						});
+					}
+				}
+
+				assertIdle();
 				for (const session of movable) {
 					try {
 						await chatSync.syncSession(session.sessionId);
@@ -306,6 +404,16 @@ export const teleportRouter = router({
 				if (prepared.length === 0 && firstFailure) throw firstFailure;
 			} catch (error) {
 				for (const sessionId of followed) chatSync.forget(sessionId);
+				await resumeStoppedTerminals(
+					ctx,
+					input.workspaceId,
+					stopState.stopped.map(({ terminal }) => terminal.terminalId),
+				).catch((resumeError: unknown) =>
+					console.warn(
+						"[teleport] could not restart terminals after a failed prepare",
+						resumeError,
+					),
+				);
 				throw error;
 			}
 
@@ -314,7 +422,118 @@ export const teleportRouter = router({
 				repositoryFullName: `${repository.owner}/${repository.name}`,
 				chats: prepared,
 				skipped,
+				terminals: movedTerminals,
+				skippedTerminals,
 			};
+		}),
+
+	/**
+	 * Moves a workspace on this computer to the cloud or to another of the
+	 * person's computers, and carries the move out here, so the client that
+	 * asked (a phone, say) need not stay open. Answers once the move is
+	 * recorded; `workspaceMove.latest` follows it from there.
+	 */
+	moveWorkspace: machineOnlyProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				/** What the destination workspace is called; defaults to this one's name. */
+				name: z.string().min(1).max(200).optional(),
+				destination: z.discriminatedUnion("kind", [
+					z.object({
+						kind: z.literal("cloud"),
+						environmentId: z.string().uuid(),
+						machineSize: z.enum(MACHINE_SIZES).optional(),
+					}),
+					z.object({
+						kind: z.literal("computer"),
+						hostId: z.string().min(1).max(200),
+					}),
+				]),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const workspace = ctx.db.query.workspaces
+				.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+				.sync();
+			if (!workspace) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Workspace not found",
+				});
+			}
+			const fromHostId = getHostId();
+			const { destination } = input;
+			if (
+				destination.kind === "computer" &&
+				destination.hostId === fromHostId
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "The workspace is already on this device",
+				});
+			}
+			const auth = ctx.apiAuth;
+			if (destination.kind === "computer" && !auth) {
+				throw new TRPCError({
+					code: "PRECONDITION_FAILED",
+					message: "This device cannot reach your other devices",
+				});
+			}
+			if (movesInFlight.has(input.workspaceId)) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "This workspace is already moving",
+				});
+			}
+			movesInFlight.add(input.workspaceId);
+			const teleport = createTeleportCaller(ctx);
+			try {
+				const { workspaceMoveId, done } = await beginWorkspaceMove(
+					{
+						api: ctx.api,
+						organizationId: ctx.organizationId,
+						fromHostId,
+						repositoryOf: async (workspaceId) => {
+							const { repository } = await resolveSnapshotTarget(
+								ctx,
+								workspaceId,
+							);
+							return `${repository.owner}/${repository.name}`;
+						},
+						prepare: (workspaceId) =>
+							teleport.prepareWorkspace({ workspaceId, stopIfBusy: true }),
+						releaseChats: async (chatSessionIds) => {
+							if (chatSessionIds.length === 0) return;
+							await teleport.releaseChats({ chatSessionIds });
+						},
+						destinationHost: async (hostId) => {
+							const endpoint = await ctx.api.host.relayEndpoint.query();
+							if (!endpoint?.url || !auth) {
+								throw new Error("This device cannot reach the relay");
+							}
+							return createRelayHostClient({
+								relayUrl: endpoint.url,
+								organizationId: ctx.organizationId,
+								hostId,
+								auth,
+							});
+						},
+					},
+					{
+						workspaceId: input.workspaceId,
+						name: input.name ?? (workspace.name || workspace.branch),
+						destination,
+					},
+				);
+				void done
+					.catch(() => {})
+					.finally(() => movesInFlight.delete(input.workspaceId));
+				return { workspaceMoveId };
+			} catch (error) {
+				movesInFlight.delete(input.workspaceId);
+				throw error;
+			}
 		}),
 
 	/** The move of these chats failed or was abandoned: they stay here and stop being pushed for it. */
@@ -330,6 +549,49 @@ export const teleportRouter = router({
 			}
 			return { ok: true };
 		}),
+
+	/** The move of these terminals failed or was abandoned: their agents start here again. */
+	releaseTerminals: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				terminalIds: z.array(z.string().min(1)).max(200),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { resumed, failed } = await resumeStoppedTerminals(
+				ctx,
+				input.workspaceId,
+				input.terminalIds,
+			);
+			return { resumedTerminalIds: resumed, failedTerminalIds: failed };
+		}),
+
+	/**
+	 * Brings in a terminal agent's session moving here from another host and
+	 * starts the agent on it in a new terminal, which the desktop opens as a
+	 * pane when it shows the workspace.
+	 */
+	importTerminalSession: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				agent: z.string().min(1).max(200),
+				agentId: z.string().min(1).max(100),
+				harnessSessionId: z.string().refine(isPlainSessionId),
+				bundle: z.object({
+					url: z.string().url(),
+					sha256: z.string().min(1),
+					byteLength: z.number().int().nonnegative(),
+				}),
+			}),
+		)
+		.mutation(({ ctx, input }) =>
+			importTerminalSession(ctx, {
+				...input,
+				worktreePath: resolveWorktreePath(ctx, input.workspaceId),
+			}),
+		),
 
 	/** Stops the copy left behind and says in it where the chat went. */
 	markMoved: protectedProcedure
@@ -359,6 +621,25 @@ export const teleportRouter = router({
 				},
 			});
 			return { ok: true };
+		}),
+
+	/** The project here whose live GitHub remote is `repositoryFullName`, for a workspace moving in. */
+	findProject: machineOnlyProcedure
+		.input(z.object({ repositoryFullName: z.string().min(3).max(300) }))
+		.query(async ({ ctx, input }) => {
+			const wanted = input.repositoryFullName.toLowerCase();
+			const rows = ctx.db
+				.select({ id: projects.id })
+				.from(projects)
+				.where(isNull(projects.deletedAt))
+				.all();
+			for (const { id } of rows) {
+				const repo = await resolveGithubRepo(ctx, id).catch(() => null);
+				if (repo && `${repo.owner}/${repo.name}`.toLowerCase() === wanted) {
+					return { projectId: id };
+				}
+			}
+			return { projectId: null };
 		}),
 
 	/** Makes a branch another host pushed available to create a worktree from. */
@@ -505,3 +786,9 @@ export const teleportRouter = router({
 			};
 		}),
 });
+
+/** Workspaces whose move this host is carrying out. */
+const movesInFlight = new Set<string>();
+
+// Declared after the router; the procedures dereference it only at request time.
+const createTeleportCaller = createCallerFactory(teleportRouter);

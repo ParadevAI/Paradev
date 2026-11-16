@@ -895,7 +895,9 @@ export type TerminalSessionErrorKind =
 	 * Retrying will fail the same way; this is the only kind that means "we
 	 * have a bug or a broken install".
 	 */
-	| "TERMINAL_START_FAILED";
+	| "TERMINAL_START_FAILED"
+	/** The target is a chat, which has no input to hold unsent or empty text. */
+	| "CHAT_NEEDS_SUBMITTED_TEXT";
 
 export type TerminalSessionError = {
 	inputStaged?: true;

@@ -1,6 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
-import { useWorkspaceHostUrl } from "@superset/workspace-client";
+import {
+	reconnectEventBusIfDown,
+	useWorkspaceHostUrl,
+} from "@superset/workspace-client";
 import { Link } from "@tanstack/react-router";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -29,7 +32,11 @@ export function HostConnectionPill() {
 	const { failing: checksFailing, retry: retryChecks } =
 		useChatSessionChecksFailing(hostUrl);
 	const { hosts: hostRows } = useKnownHosts();
-	const { targets: sandboxes, usageRefusal } = useSandboxAccess();
+	const {
+		targets: sandboxes,
+		usageRefusal,
+		wakeOpenWorkspace,
+	} = useSandboxAccess();
 	const isSandbox = sandboxes.some(
 		(sandbox) => sandbox.workspaceId === workspace.hostId,
 	);
@@ -120,7 +127,19 @@ export function HostConnectionPill() {
 					</Link>
 				) : null
 			}
-			onRetry={isCheckFailing ? retryChecks : onRetry}
+			onRetry={
+				isCheckFailing
+					? retryChecks
+					: isSandbox
+						? () => {
+								onRetry();
+								void wakeOpenWorkspace().then(
+									() => reconnectEventBusIfDown(hostUrl),
+									() => {},
+								);
+							}
+						: onRetry
+			}
 		/>
 	);
 }

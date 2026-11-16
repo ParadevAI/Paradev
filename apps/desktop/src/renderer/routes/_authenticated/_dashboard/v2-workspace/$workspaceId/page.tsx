@@ -1,17 +1,22 @@
 import { Workspace } from "@superset/panes";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
+import {
+	useMaybeWorkspaceClient,
+	workspaceTrpc,
+} from "@superset/workspace-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen/quickOpenStore";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { openQuickOpen } from "renderer/commandPalette";
+import { useQuickOpenStore } from "renderer/commandPalette/ui/QuickOpen";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { useBareContentCard } from "renderer/routes/_authenticated/_dashboard/components/ContentCard";
 import { RightSidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/RightSidebarToggle";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { WindowChrome } from "renderer/routes/_authenticated/_dashboard/components/WindowChrome";
@@ -24,9 +29,9 @@ import {
 	parseSubagentSearch,
 	readSubagentSearch,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { CommandPalette } from "renderer/screens/main/components/CommandPalette";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getV2NotificationSourcesForTab } from "renderer/stores/v2-notifications";
+import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { useStore } from "zustand";
 import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
 import { useWorkspace } from "../providers/WorkspaceProvider";
@@ -89,6 +94,7 @@ import { useV2WorkspacePaneLayout } from "./hooks/useV2WorkspacePaneLayout";
 import { useV2WorkspaceRun } from "./hooks/useV2WorkspaceRun";
 import { useWorkspaceFileNavigation } from "./hooks/useWorkspaceFileNavigation";
 import { useWorkspaceHotkeys } from "./hooks/useWorkspaceHotkeys";
+import { useWorkspaceOpenInHotkey } from "./hooks/useWorkspaceOpenInHotkey";
 import { useWorkspacePaneOpeners } from "./hooks/useWorkspacePaneOpeners";
 import { useWorkspaceRightPane } from "./hooks/useWorkspaceRightPane";
 import { RightPaneLinkTargetProvider } from "./providers/RightPaneLinkTargetProvider";
@@ -109,6 +115,8 @@ import {
 import { findVisiblePullRequestNumber } from "./utils/openPullRequestPaneInStore";
 import { openSubagentPaneInStore } from "./utils/openSubagentPaneInStore";
 import type { V2WorkspaceUrlOpenTarget } from "./utils/openUrlInV2Workspace";
+
+const QUICK_OPEN_SEARCH_LIMIT = 50;
 
 const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 
@@ -206,6 +214,10 @@ function V2WorkspaceContent() {
 	const navigate = Route.useNavigate();
 	const titleBarMainSlot = useTitleBarMainSlot();
 	const isParadevShell = useParadevShell();
+	useBareContentCard();
+	const isWorkspaceSidebarCollapsed = useWorkspaceSidebarStore((s) =>
+		s.isCollapsed(),
+	);
 	const consumeSearch = useCallback<ConsumeSearch>(
 		(keys) => {
 			void navigate({
@@ -398,21 +410,9 @@ function V2WorkspaceContent() {
 		executePreset,
 		setRightSidebarOpen,
 	});
-	const quickOpenOpen = useQuickOpenStore(
-		(s) => s.open && s.target?.workspaceId === workspaceId,
-	);
-	const closeQuickOpen = useQuickOpenStore((s) => s.close);
-	const openQuickOpenFor = useQuickOpenStore((s) => s.openFor);
-	const handleQuickOpen = useCallback(
-		() => openQuickOpenFor({ workspaceId }),
-		[openQuickOpenFor, workspaceId],
-	);
-	const handleQuickOpenChange = useCallback(
-		(next: boolean) => {
-			if (!next) closeQuickOpen();
-		},
-		[closeQuickOpen],
-	);
+	const registerQuickOpen = useQuickOpenStore((s) => s.register);
+	const unregisterQuickOpen = useQuickOpenStore((s) => s.unregister);
+	const handleQuickOpen = useCallback(() => openQuickOpen(), []);
 	// Picking a file from Quick Open should surface the sidebar/Files tab so
 	// the reveal (expand + highlight + scroll) is actually visible.
 	const handleQuickOpenSelectFile = useCallback(
@@ -432,6 +432,43 @@ function V2WorkspaceContent() {
 			isRightPaneAreaEnabled,
 		],
 	);
+	// The palette's files frame searches whichever workspace page is open,
+	// through this page's client: the palette mounts above the provider.
+	const workspaceClient = useMaybeWorkspaceClient();
+	const searchFiles = useCallback(
+		async (query: string) => {
+			if (!workspaceClient) return [];
+			const { matches } =
+				await workspaceClient.trpcClient.filesystem.searchFiles.query({
+					workspaceId,
+					query,
+					limit: QUICK_OPEN_SEARCH_LIMIT,
+				});
+			return matches;
+		},
+		[workspaceClient, workspaceId],
+	);
+	const canSearchFiles = workspaceClient !== null;
+	useEffect(() => {
+		registerQuickOpen({
+			workspaceId,
+			recentFiles,
+			openFilePaths,
+			canSearch: canSearchFiles,
+			searchFiles,
+			onSelectFile: handleQuickOpenSelectFile,
+		});
+		return () => unregisterQuickOpen(workspaceId);
+	}, [
+		registerQuickOpen,
+		unregisterQuickOpen,
+		canSearchFiles,
+		workspaceId,
+		recentFiles,
+		openFilePaths,
+		searchFiles,
+		handleQuickOpenSelectFile,
+	]);
 	const paneRegistry = usePaneRegistry({
 		onOpenDiff: openDiffPane,
 		onOpenFile: openFilePaneFromTreeClick,
@@ -570,6 +607,7 @@ function V2WorkspaceContent() {
 		isSandbox,
 		isMobilePaneEnabled,
 	});
+	useWorkspaceOpenInHotkey(workspaceId);
 	useRightSidebarHotkeys({
 		centerStore: store,
 		rightStore,
@@ -671,6 +709,9 @@ function V2WorkspaceContent() {
 						onResizingChange={onSidebarResizeDragging}
 						onLayoutFrame={relayoutBrowserPanes}
 						keepMounted={isRightPaneAreaEnabled}
+						sidePanelClassName={
+							isParadevShell ? "border-l-0 pl-1.5" : undefined
+						}
 						side={
 							isRightPaneAreaEnabled ? (
 								<>
@@ -694,7 +735,14 @@ function V2WorkspaceContent() {
 						}
 					>
 						<div
-							className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+							className={cn(
+								"relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+								isParadevShell &&
+									"rounded-r-[10px] border border-border bg-background",
+								isParadevShell &&
+									isWorkspaceSidebarCollapsed &&
+									"rounded-l-[10px]",
+							)}
 							data-workspace-id={workspaceId}
 							data-pane-area="center"
 						>
@@ -708,6 +756,7 @@ function V2WorkspaceContent() {
 										inert: rightPaneMode === "expanded",
 									})}
 									appearance={isParadevShell ? "cards" : "default"}
+									flush={isParadevShell}
 									isFocused={!isRightAreaFocused}
 									registry={paneRegistry}
 									paneActions={defaultPaneActions}
@@ -811,15 +860,6 @@ function V2WorkspaceContent() {
 					</WorkspaceSplitLayout>
 				</WorkspaceGitStatusProvider>
 			</RightPaneLinkTargetProvider>
-			<CommandPalette
-				workspaceId={workspaceId}
-				open={quickOpenOpen}
-				onOpenChange={handleQuickOpenChange}
-				onSelectFile={handleQuickOpenSelectFile}
-				variant="v2"
-				recentlyViewedFiles={recentFiles}
-				openFilePaths={openFilePaths}
-			/>
 		</FileDocumentStoreProvider>
 	);
 }

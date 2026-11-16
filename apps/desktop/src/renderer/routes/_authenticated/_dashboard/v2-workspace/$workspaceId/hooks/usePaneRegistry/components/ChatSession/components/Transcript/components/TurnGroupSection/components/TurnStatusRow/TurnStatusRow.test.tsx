@@ -3,12 +3,12 @@ import { deriveTimeline, emptySnapshot, reduceMany } from "@superset/chat/core";
 import type { DurableEnvelope, DurableEvent } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { SandboxAccessContext } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
+import { pageLinkFinder } from "../../../../../../../../utils/pageLinks";
 import { ChatPaneActionsProvider } from "../../../../../../providers/ChatPaneActionsProvider";
 import {
 	type TurnFailureActions,
 	TurnFailureActionsProvider,
 } from "../../../../../../providers/TurnFailureActionsProvider";
-import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { transcriptRows } from "../../../../utils/transcriptRows";
 import { TurnStatusRow } from "./TurnStatusRow";
 
@@ -278,6 +278,7 @@ test("a cloud workspace shows no paused row", () => {
 				isReady: true,
 				agentCredentialsChangedWorkspaceId: null,
 				usageRefusal: null,
+				wakeOpenWorkspace: async () => {},
 			}}
 		>
 			<ChatPaneActionsProvider workspaceId="w1">

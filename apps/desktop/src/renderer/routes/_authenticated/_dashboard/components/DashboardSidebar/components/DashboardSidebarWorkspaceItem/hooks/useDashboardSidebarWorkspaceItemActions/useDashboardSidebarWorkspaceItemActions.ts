@@ -1,31 +1,15 @@
-import { useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
-import { toast } from "@superset/ui/sonner";
-import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-import { getTerminalAgentBindingsQueryKey } from "renderer/hooks/host-service/useTerminalAgentBindings";
-import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
-import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
-import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
-import { DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
 import { useDashboardSidebarActions } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarActionsProvider";
 import {
 	useMarkSidebarWorkspaceTerminalsSeen,
 	useSidebarWorkspaceStatus,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarWorkspaceStatusProvider";
-import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
+import { useWorkspaceMenuActions } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMenuActions";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { applyFolderTagChange } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
-import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
-import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 
 interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	workspaceId: string;
@@ -49,27 +33,32 @@ export function useDashboardSidebarWorkspaceItemActions({
 	branch,
 	isPinned = false,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
-	const { t } = useLingui();
-	const organizationId = useActiveOrganizationId();
-	const setCloudInSidebar = useCloudSidebarStore((s) => s.setInSidebar);
 	const navigate = useNavigate();
-	const hostService = useLocalHostService();
-	const { activeHostUrl } = hostService;
-	const { copyToClipboard } = useCopyToClipboard();
 	const { v2Workspaces: workspaceActions } = useOptimisticActions();
 	const { requestSectionRename } = useDashboardSidebarSectionRename();
-	const setManualUnread = useV2NotificationStore((s) => s.setManualUnread);
-	const clearManualUnread = useV2NotificationStore((s) => s.clearManualUnread);
 	const markWorkspaceTerminalsSeen =
 		useMarkSidebarWorkspaceTerminalsSeen(workspaceId);
 	const { isUnread } = useSidebarWorkspaceStatus(workspaceId);
-	const workspaceHostUrl = useWorkspaceHostUrl(workspaceId);
-	const queryClient = useQueryClient();
 
-	const clearWorkspaceAttention = () => {
-		clearManualUnread(workspaceId);
-		markWorkspaceTerminalsSeen();
-	};
+	const {
+		clearWorkspaceAttention,
+		handleClearStatus,
+		handleCopyBranchName,
+		handleCopyPath,
+		handleCopyWorkspaceId,
+		handleRemoveFromSidebar,
+		handleRemovePullRequest,
+		handleToggleUnread,
+		requestDelete,
+	} = useWorkspaceMenuActions({
+		workspaceId,
+		projectId,
+		isCloudWorkspace,
+		workspaceName,
+		branch,
+		isUnread,
+		markTerminalsSeen: markWorkspaceTerminalsSeen,
+	});
 	const {
 		createSection,
 		getHostWorkspaces,
@@ -135,28 +124,6 @@ export function useDashboardSidebarWorkspaceItemActions({
 		});
 	};
 
-	// The delete dialog is globally mounted (archive-first tombstoning drops
-	// this row the moment the destroy starts, which would unmount a
-	// row-local dialog mid-flight).
-	const requestDelete = () => {
-		useDeleteWorkspaceIntent.getState().request({
-			workspaceId,
-			workspaceName: workspaceName || branch,
-		});
-	};
-
-	const handleRemoveFromSidebar = () => {
-		if (isCloudWorkspace) {
-			if (organizationId) setCloudInSidebar(organizationId, workspaceId, false);
-			return;
-		}
-		useRemoveFromSidebarIntent.getState().request({
-			workspaceId,
-			workspaceName,
-			projectId,
-		});
-	};
-
 	const handleCreateSection = () => {
 		if (projectId === null && !isSessionWorkspace) return;
 		const sectionId = createSection(projectId, { workspaceIds: [workspaceId] });
@@ -190,153 +157,8 @@ export function useDashboardSidebarWorkspaceItemActions({
 		});
 	};
 
-	const resolveWorktreePath = async (): Promise<string | null> => {
-		if (!activeHostUrl) {
-			showHostServiceUnavailableToast(hostService, {
-				action: "resolveWorkspacePath",
-			});
-			return null;
-		}
-		const workspace = await getHostServiceClientByUrl(
-			activeHostUrl,
-		).workspace.get.query({ id: workspaceId });
-		if (!workspace?.worktreePath) {
-			toast.error(
-				t({
-					message: "Workspace path is not available",
-				}),
-			);
-			return null;
-		}
-		return workspace.worktreePath;
-	};
-
-	const handleOpenInFinder = async () => {
-		try {
-			const path = await resolveWorktreePath();
-			if (!path) return;
-			await electronTrpcClient.external.openInFinder.mutate(path);
-		} catch (error) {
-			toast.error(
-				t({
-					message: `Failed to open in Finder: ${errorMessage(error, "Unknown error")}`,
-				}),
-			);
-		}
-	};
-
-	const handleCopyPath = async () => {
-		try {
-			const path = await resolveWorktreePath();
-			if (!path) return;
-			await copyToClipboard(path);
-			toast.success(
-				t({
-					message: "Path copied",
-				}),
-			);
-		} catch (error) {
-			toast.error(
-				t({
-					message: `Failed to copy path: ${errorMessage(error, "Unknown error")}`,
-				}),
-			);
-		}
-	};
-
-	const handleToggleUnread = () => {
-		if (isUnread) {
-			clearWorkspaceAttention();
-		} else {
-			setManualUnread(workspaceId);
-		}
-	};
-
 	const handleTogglePin = () => {
 		setWorkspacePinned(workspaceId, projectId, !isPinned);
-	};
-
-	// Clears manual + review marks locally, then forces the host's bindings
-	// to Stop — the escape hatch for a wedged working/permission dot (an
-	// interrupted agent fires no Stop hook). Live agents re-assert on their
-	// next hook event, so this is safe to run on a genuinely busy workspace.
-	const handleClearStatus = async () => {
-		clearWorkspaceAttention();
-		if (!workspaceHostUrl) return;
-		try {
-			await getHostServiceClientByUrl(
-				workspaceHostUrl,
-			).terminalAgents.clearWorkspaceStatuses.mutate({ workspaceId });
-			await queryClient.invalidateQueries({
-				queryKey: getTerminalAgentBindingsQueryKey(workspaceId),
-			});
-		} catch (error) {
-			toast.error(
-				t({
-					message: `Failed to clear agent status: ${errorMessage(error, "Unknown error")}`,
-				}),
-			);
-		}
-	};
-
-	const handleRemovePullRequest = async () => {
-		if (!workspaceHostUrl) {
-			showHostServiceUnavailableToast(hostService, {
-				action: "removePrLink",
-			});
-			return;
-		}
-		try {
-			await getHostServiceClientByUrl(
-				workspaceHostUrl,
-			).pullRequests.unlinkFromWorkspace.mutate({ workspaceId });
-			await queryClient.invalidateQueries({
-				queryKey: DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX,
-			});
-		} catch (error) {
-			toast.error(
-				t({
-					message: `Failed to remove PR link: ${errorMessage(error, "Unknown error")}`,
-				}),
-			);
-		}
-	};
-
-	const handleCopyBranchName = async () => {
-		if (!branch) {
-			toast.error(
-				t({
-					message: "Branch name is not available",
-				}),
-			);
-			return;
-		}
-		try {
-			await copyToClipboard(branch);
-			toast.success(
-				t({
-					message: "Branch name copied",
-				}),
-			);
-		} catch (error) {
-			toast.error(
-				t({
-					message: `Failed to copy branch name: ${errorMessage(error, "Unknown error")}`,
-				}),
-			);
-		}
-	};
-
-	const handleCopyWorkspaceId = () => {
-		toast.promise(copyToClipboard(workspaceId), {
-			success: t({
-				message: "Workspace ID copied",
-			}),
-			error: (error) =>
-				t({
-					message: `Failed to copy workspace ID: ${errorMessage(error, "Unknown error")}`,
-				}),
-		});
 	};
 
 	return {
@@ -348,7 +170,6 @@ export function useDashboardSidebarWorkspaceItemActions({
 		handleCopyWorkspaceId,
 		handleCreateSection,
 		handleMoveToSection,
-		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,

@@ -3,7 +3,7 @@ import {
 	buildUpstreamHeaders,
 	parseHostRoutingKey,
 } from "@superset/shared/host-routing";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import { RELAY_CLOSE } from "@superset/shared/tunnel-protocol";
 import { type AuthContext, verifyJWT } from "@superset/shared/verify-jwt";
 import type { Context, MiddlewareHandler } from "hono";

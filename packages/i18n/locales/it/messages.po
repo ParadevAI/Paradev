@@ -563,6 +563,11 @@ msgstr "{0} controlli su {1} falliti"
 msgid "{0} of {1} checks running"
 msgstr "{0} controlli su {1} in esecuzione"
 
+#. placeholder {0}: gb(resources.memoryUsedMb)
+#. placeholder {1}: gb(resources.memoryLimitMb)
+msgid "{0} of {1} GB"
+msgstr "{0} di {1} GB"
+
 #. placeholder {0}: issues.length
 msgid "{0} of {totalCount}"
 msgstr "{0} di {totalCount}"
@@ -855,9 +860,6 @@ msgstr "{completed} controlli su {0} completati"
 msgid "{completed} of {total} completed"
 msgstr "{completed} di {total} completati"
 
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
-
 msgid "{configTitle} font size"
 msgstr "Dimensione del font di {configTitle}"
 
@@ -896,6 +898,12 @@ msgstr "{count, plural, one {# ricerca} other {# ricerche}}"
 
 msgid "{count, plural, one {# step} other {# steps}}"
 msgstr "{count, plural, one {# passaggio} other {# passaggi}}"
+
+msgid "{count, plural, one {# terminal stayed in the old workspace.} other {# terminals stayed in the old workspace.}}"
+msgstr "{count, plural, one {# terminale è rimasto nel workspace precedente.} other {# terminali sono rimasti nel workspace precedente.}}"
+
+msgid "{count, plural, one {# terminal stopped and could not start again.} other {# terminals stopped and could not start again.}}"
+msgstr "{count, plural, one {# terminale si è fermato e non è stato possibile riavviarlo.} other {# terminali si sono fermati e non è stato possibile riavviarli.}}"
 
 msgid "{count, plural, one {# worktree in this repository has no workspace. It will be imported as a workspace.} other {# worktrees in this repository have no workspace. They will be imported as workspaces.}}"
 msgstr "{count, plural, one {# worktree in questo repository non ha un workspace. Verrà importato come workspace.} other {# worktree in questo repository non hanno un workspace. Verranno importati come workspace.}}"
@@ -1086,6 +1094,9 @@ msgstr "{hiddenCount, plural, one {Mostra # altro file} other {Mostra altri # fi
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Mostra # altro frame} other {Mostra altri # frame}}"
+
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Altri {hiddenLabel}. Digita per restringere l'elenco."
 
 msgid "{hostName} is offline"
 msgstr "{hostName} è offline"
@@ -1407,6 +1418,9 @@ msgstr "{teardownFailureCount, plural, one {Elimina comunque} other {Elimina com
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, one {# PR dell'agente unita} other {# PR dell'agente unite}}"
+
+msgid "{title} (copy)"
+msgstr "{title} (copia)"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} interrotto"
@@ -1843,6 +1857,9 @@ msgstr "Un manifest e qualche file di skill. Paradev lo mette dove ogni agente l
 msgid "a message from {authorName}"
 msgstr "un messaggio da {authorName}"
 
+msgid "A new version of Paradev is out. Reload to continue."
+msgstr "È disponibile una nuova versione di Paradev. Ricarica per continuare."
+
 msgid "A new version of Paradev is required to continue. Please update to the latest version."
 msgstr "Per continuare è necessaria una nuova versione di Paradev. Aggiorna all'ultima versione."
 
@@ -1884,6 +1901,9 @@ msgstr "Una routine ha bisogno di una pianificazione o di qualcosa da osservare.
 
 msgid "A run for this automation is already in progress."
 msgstr "Un'esecuzione di questa automazione è già in corso."
+
+msgid "A running box restarts. Files and uncommitted changes are kept. The project's start services and agent sessions start again; anything else running in a terminal stops."
+msgstr "Una macchina in esecuzione si riavvia. I file e le modifiche non salvate in commit vengono conservati. I servizi di avvio del progetto e le sessioni degli agenti ripartono; tutto il resto in esecuzione in un terminale si ferma."
 
 msgid "A selection of integrations curated by our team."
 msgstr "Una selezione di integrazioni curata dal nostro team."
@@ -2061,8 +2081,8 @@ msgstr "Aggiungere {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Aggiungi prima {repositoryName} come progetto su {computer}"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Aggiungi prima {repositoryName} come progetto su questo computer"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Aggiungi prima {repositoryName} come progetto su questo dispositivo"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Aggiungere #{prNumber} alla coda di unione?"
@@ -2120,6 +2140,9 @@ msgstr "Aggiungi un’altra"
 
 msgid "Add another account, or disconnect one you no longer use."
 msgstr "Collega un altro account o scollega quello che non usi più."
+
+msgid "Add attachment"
+msgstr "Aggiungi un allegato"
 
 msgid "Add Attachment"
 msgstr "Aggiungi allegato"
@@ -2323,9 +2346,8 @@ msgstr "Aggiunto all'input dell'agente"
 msgid "Added to merge queue"
 msgstr "Aggiunta alla coda di unione"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento. Il piano della tua organizzazione è gestito dal suo proprietario su {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Per aggiungere persone a {organizationName} serve un piano a pagamento."
 
 msgid "Adding to queue…"
 msgstr "Aggiunta alla coda…"
@@ -2709,6 +2731,9 @@ msgstr "Consenti l'accesso tramite il relay"
 msgid "Allow for session"
 msgstr "Consenti per la sessione"
 
+msgid "Allow microphone access in Settings to dictate."
+msgstr "Consenti l’accesso al microfono nelle Impostazioni per dettare."
+
 msgid "Allow microphone access to use dictation"
 msgstr "Consenti l'accesso al microfono per usare la dettatura"
 
@@ -2804,6 +2829,9 @@ msgstr "Sai sempre quale agente ha bisogno di te, con notifiche che portano drit
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Un agente completa modifiche su più file dall'inizio alla fine."
+
+msgid "An agent here is still working. Try again to stop it and move."
+msgstr "Un agente sta ancora lavorando qui. Riprova per fermarlo e spostare."
 
 msgid "An agent sets up this environment in a cloud workspace (about 20 minutes or more): it installs dependencies, writes the setup config and asks for any secrets it needs. Interrupt it at any time, or take over in the workspace to finish setup yourself."
 msgstr "Un agente configura questo ambiente in un workspace cloud (circa 20 minuti o più): installa le dipendenze, scrive la configurazione e chiede i segreti necessari. Puoi interromperlo in qualsiasi momento o subentrare nel workspace per completare tu la configurazione."
@@ -3612,9 +3640,6 @@ msgstr "In base a {0} token negli ultimi 30 giorni, contando {1}."
 msgid "Before"
 msgstr "Prima"
 
-msgid "Behavior"
-msgstr "Comportamento"
-
 msgid "Behind base"
 msgstr "Indietro rispetto alla base"
 
@@ -3903,9 +3928,6 @@ msgstr "Incluso nell'app Paradev su questo dispositivo."
 msgid "Bundled with the Paradev app on this device. Updates with the app."
 msgstr "Incluso nell'app Paradev su questo dispositivo. Si aggiorna con l'app."
 
-msgid "Business"
-msgstr "Business"
-
 msgid "Business plan"
 msgstr "Piano Business"
 
@@ -3998,6 +4020,9 @@ msgstr "Calendar"
 
 msgid "Calendar and Gmail triggers in this organization will stop firing until an account is connected again."
 msgstr "I trigger di Calendar e Gmail in questa organizzazione smetteranno di scattare finché non verrà collegato di nuovo un account."
+
+msgid "Camera"
+msgstr "Fotocamera"
 
 msgid "Camera access is not allowed"
 msgstr "L'accesso alla fotocamera non è consentito"
@@ -4185,6 +4210,9 @@ msgstr "Cambia icona"
 msgid "Change location"
 msgstr "Cambia posizione"
 
+msgid "Change machine size"
+msgstr "Cambia dimensione della macchina"
+
 msgid "Change model"
 msgstr "Cambia modello"
 
@@ -4226,6 +4254,9 @@ msgstr "Cambia stato (attuale: {0})"
 msgid "Change to {0}"
 msgstr "Cambia in {0}"
 
+msgid "Change to {pendingName}"
+msgstr "Passa a {pendingName}"
+
 msgid "Change to Annual"
 msgstr "Passa all'annuale"
 
@@ -4261,6 +4292,9 @@ msgstr "Modifiche richieste"
 
 msgid "Changes saved"
 msgstr "Modifiche salvate"
+
+msgid "Changing to {label}…"
+msgstr "Passaggio a {label}…"
 
 msgid "Changing..."
 msgstr "Modifica in corso..."
@@ -4416,7 +4450,7 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · prima del refactor dei tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
 msgid "Checkpoint saved {0}"
 msgstr "Checkpoint salvato {0}"
 
@@ -4658,9 +4692,6 @@ msgstr "Clicca su un elemento."
 msgid "Click any element to send it to an agent."
 msgstr "Clicca su qualsiasi elemento per inviarlo a un agente."
 
-msgid "Click Authorize on claude.ai. Anthropic then shows a code. Paste it here."
-msgstr "Fai clic su Authorize su claude.ai. Anthropic mostra poi un codice. Incollalo qui."
-
 msgid "Click here if not redirected"
 msgstr "Clicca qui se non vieni reindirizzato"
 
@@ -4884,20 +4915,14 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Credenziali di Cloud"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "I dati di Cloud vengono eliminati. Prima fai il push dei tuoi branch."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud termina il {shutdownDate}. L'app per Mac termina a inizio 2027"
-
 msgid "Cloud environment setup"
 msgstr "Configurazione dell'ambiente cloud"
 
 msgid "Cloud environments"
 msgstr "Ambienti cloud"
+
+msgid "Cloud environments are not included in your plan."
+msgstr "Gli ambienti cloud non sono inclusi nel tuo piano."
 
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Gli ambienti cloud recuperano i tuoi repository da GitHub. Collega prima questi; lo fai una sola volta."
@@ -4905,14 +4930,8 @@ msgstr "Gli ambienti cloud recuperano i tuoi repository da GitHub. Collega prima
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-ore cloud per postazione al mese"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud passa in sola lettura"
-
 msgid "Cloud sandboxes"
 msgstr "Sandbox nel cloud"
-
-msgid "Cloud shuts down"
-msgstr "Cloud chiude"
 
 msgid "Cloud usage"
 msgstr "Utilizzo del cloud"
@@ -4920,8 +4939,17 @@ msgstr "Utilizzo del cloud"
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
+msgid "Cloud workspace: asleep"
+msgstr "Workspace cloud: in sospensione"
+
 msgid "Cloud workspace: connecting"
 msgstr "Workspace cloud: connessione in corso"
+
+msgid "Cloud workspace: out of memory"
+msgstr "Workspace cloud: memoria esaurita"
+
+msgid "Cloud workspace: under heavy load"
+msgstr "Workspace cloud: carico elevato"
 
 msgid "Cloud workspaces"
 msgstr "Spazi di lavoro cloud"
@@ -4932,6 +4960,9 @@ msgstr "Spazi di lavoro cloud"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "I workspace cloud non sono attivi per {account}. Sono inclusi nei piani Team e Ultra: passa a un piano superiore in Impostazioni, Fatturazione."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Gli spazi di lavoro cloud non sono inclusi nel tuo piano."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "I workspace cloud fanno commit, push e aprono pull request a tuo nome"
@@ -5058,6 +5089,9 @@ msgstr "Comando..."
 msgid "Commands"
 msgstr "Comandi"
 
+msgid "Commands only"
+msgstr "Solo comandi"
+
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Comandi eseguiti per il setup del workspace, il teardown e il pulsante Esegui."
 
@@ -5183,21 +5217,8 @@ msgstr "Layout di form componibile — si abbina a @superset/ui/form per react-h
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Cronologia delle chat di Conductor. Esportala in Conductor da Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud termina il {shutdownDate}. Passa a {0} in pochi minuti."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud termina il {shutdownDate}. Passa a {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Guida a Conductor Cloud"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud chiude il {shutdownDateLong}. Sposta i tuoi worktree e agenti su {companyName} in pochi minuti. Gratuito e open source."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor li elimina dopo il {shutdownDate}, e {companyName} non può accedervi. Fai il push dei tuoi branch ed esporta le tue chat prima di quella data."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Le informazioni su Conductor provengono dalla sua documentazione pubblica. Vedi il <0>confronto completo</0>."
@@ -5205,9 +5226,6 @@ msgstr "Le informazioni su Conductor provengono dalla sua documentazione pubblic
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor è un marchio del rispettivo proprietario. {0} non è affiliato a Conductor o Meta né approvato da loro."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor entra in Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5271,9 +5289,6 @@ msgstr "Conflitti"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Conflitti con {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Congratulazioni al team di Conductor per l'ingresso in Meta. Le date provengono dal <0>loro annuncio</0>."
 
 msgid "Connect"
 msgstr "Collega"
@@ -5547,6 +5562,9 @@ msgstr "Continua"
 msgctxt "automation session mode"
 msgid "Continue"
 msgstr "Continua"
+
+msgid "Continue in browser"
+msgstr "Continua nel browser"
 
 msgid "Continue in your browser"
 msgstr "Continua nel browser"
@@ -5900,6 +5918,9 @@ msgstr "Impossibile scaricare {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Impossibile scaricare il modello. Controlla la connessione a internet e riprova."
 
+msgid "Could not duplicate this page"
+msgstr "Impossibile duplicare questa pagina"
+
 msgid "Could not forget {domain}"
 msgstr "Impossibile dimenticare {domain}"
 
@@ -5963,6 +5984,9 @@ msgstr "Impossibile aprire il link"
 
 msgid "Could not open Photos"
 msgstr "Impossibile aprire Foto"
+
+msgid "Could not open this file"
+msgstr "Impossibile aprire questo file"
 
 #. placeholder {0}: params?.remote
 #. placeholder {1}: params?.branch
@@ -6078,6 +6102,9 @@ msgstr "Impossibile avviare il checkout. Riprova."
 msgid "Could not start cloud workspace provisioning"
 msgstr "Impossibile avviare il provisioning del workspace cloud"
 
+msgid "Could not start dictation"
+msgstr "Impossibile avviare la dettatura"
+
 msgid "Could not start session"
 msgstr "Impossibile avviare la sessione"
 
@@ -6147,6 +6174,10 @@ msgstr "Non è stato possibile diramare la conversazione"
 
 msgid "Couldn't cancel the move"
 msgstr "Impossibile annullare lo spostamento"
+
+#. placeholder {0}: errorMessage(error)
+msgid "Couldn't change the machine size: {0}"
+msgstr "Impossibile cambiare la dimensione della macchina: {0}"
 
 msgid "Couldn't change the routine"
 msgstr "Impossibile modificare la routine"
@@ -6242,6 +6273,9 @@ msgstr "Impossibile caricare i contributori. Digita invece un nome utente."
 
 msgid "Couldn't load earlier messages. Retry"
 msgstr "Impossibile caricare i messaggi precedenti. Riprova"
+
+msgid "Couldn’t load environments. Try again"
+msgstr "Impossibile caricare gli ambienti. Riprova"
 
 msgid "Couldn't load its activity"
 msgstr "Impossibile caricare la sua attività"
@@ -6471,8 +6505,16 @@ msgstr "Conteggiato dalle modifiche ai file dell'agente. Le modifiche fatte con 
 msgid "CPU"
 msgstr "CPU"
 
+#. placeholder {0}: formatNumber(resources.vcpus)
+msgid "CPU · {0} vCPU"
+msgstr "CPU · {0} vCPU"
+
 msgid "CPU cores"
 msgstr "Core CPU"
+
+msgctxt "machine pressure"
+msgid "CPU-bound"
+msgstr "Limitata dalla CPU"
 
 msgid "Create"
 msgstr "Crea"
@@ -6642,7 +6684,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Creato"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt))
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7367,11 +7409,20 @@ msgstr "Detta"
 msgid "Dictation"
 msgstr "Dettatura"
 
+msgid "Dictation is not available in this language."
+msgstr "La dettatura non è disponibile in questa lingua."
+
 msgid "Dictation is not available on this device"
 msgstr "La dettatura non è disponibile su questo dispositivo"
 
 msgid "Dictation is not available right now"
 msgstr "La dettatura non è disponibile al momento"
+
+msgid "Dictation needs a network connection."
+msgstr "La dettatura richiede una connessione di rete."
+
+msgid "Dictation stopped. What was heard so far is in your message."
+msgstr "La dettatura si è interrotta. Quanto ascoltato finora è nel tuo messaggio."
 
 msgid "Didn't hear back"
 msgstr "Nessuna risposta"
@@ -7776,6 +7827,9 @@ msgstr "Menu a discesa, contestuali e dell'applicazione"
 
 msgid "Due today"
 msgstr "Da pagare oggi"
+
+msgid "Duplicate"
+msgstr "Duplica"
 
 msgid "Duration"
 msgstr "Durata"
@@ -9412,14 +9466,14 @@ msgstr "Gratuito per un utente. Open source con licenza MIT."
 msgid "Free for one user. Paid plans per user"
 msgstr "Gratuito per un utente. Piani a pagamento per utente"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Gratuito per un utente. Pro aggiunge le automazioni e l'app mobile. Team aggiunge i workspace cloud."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis per un utente. Pro aggiunge le automazioni e l'app mobile. I piani a pagamento danno accesso agli spazi di lavoro cloud. Consulta i prezzi per l'utilizzo incluso e gli extra a consumo."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Gratuito per un utente. Pro da {proPrice}/utente/mese"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Gratuito per un utente. Pro costa {proPrice} per utente al mese e aggiunge le automazioni e l'app mobile. Team costa {teamPrice} e aggiunge i workspace cloud."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis per un utente. Pro costa {proPrice} per utente al mese e aggiunge le automazioni e l'app mobile. Team costa {teamPrice}. I piani a pagamento danno accesso agli spazi di lavoro cloud. Consulta i prezzi per l'utilizzo incluso e gli extra a consumo."
 
 msgid "Frequently Used"
 msgstr "Usati di frequente"
@@ -9595,8 +9649,8 @@ msgstr "Scarica l'app per iPhone e iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Riceverà un invito a unirsi a {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Preparazione del computer"
+msgid "Getting the device ready"
+msgstr "Preparazione del dispositivo"
 
 msgid "Getting Work Done"
 msgstr "Per lavorare"
@@ -9606,9 +9660,6 @@ msgstr "Ghost"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Trigger ghost: icona + etichetta troncata + chevron su-giù (pattern mostrato nella pagina Primitives)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git e worktree"
@@ -10211,6 +10262,9 @@ msgstr "Inizio le mie passeggiate mattutine con un’idea e le concludo con una 
 msgid "I'm #{rank} on the {company} leaderboard with {tokens} tokens of agent usage."
 msgstr "Sono #{rank} nella classifica di {company} con {tokens} token di utilizzo degli agenti."
 
+msgid "I've signed in"
+msgstr "Ho effettuato l'accesso"
+
 msgid "Icon"
 msgstr "Icona"
 
@@ -10234,6 +10288,9 @@ msgstr "Inattivo"
 
 msgid "Idle · branch pushed"
 msgstr "Inattivo · branch pushato"
+
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Se decidi di cambiare, salva i branch ed esporta i dati da conservare. Le esportazioni non importano le chat di Conductor in {companyName}."
 
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Se Paradev ti sta piacendo, una star su GitHub aiuta altri sviluppatori a scoprirlo."
@@ -10716,9 +10773,6 @@ msgstr "Invita un membro"
 msgid "Invite pending"
 msgstr "Invito in attesa"
 
-msgid "Invite people on a paid plan"
-msgstr "Invita persone con un piano a pagamento"
-
 msgid "Invite teammate"
 msgstr "Invita un collega"
 
@@ -10740,8 +10794,8 @@ msgstr "Fatture e metodo di pagamento"
 msgid "iOS app"
 msgstr "App iOS"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "App iOS, fino al {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "App iOS; cloud e controllo remoto sperimentale del Mac locale"
 
 msgid "iOS Simulator"
 msgstr "Simulatore iOS"
@@ -10878,8 +10932,8 @@ msgstr "I suoi plugin compaiono al termine della sincronizzazione."
 msgid "Its replies go with it."
 msgstr "Anche le risposte verranno eliminate."
 
-msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on the computer you pick starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
-msgstr "Il suo lavoro, comprese le modifiche non committate, viene inviato a un nuovo branch. Un workspace sul computer che scegli parte da quel branch, e ogni chat di Claude continua lì. Gli agenti al lavoro si fermano prima. I terminali e le altre chat restano dove sono."
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Il suo lavoro, comprese le modifiche non committate, viene inviato a un nuovo branch. Un workspace su {computerName} parte da quel branch, e ogni chat di Claude continua lì. Gli agenti al lavoro si fermano prima. I terminali e le altre chat restano dove sono."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "I suoi workspace e terminali non sono disponibili finché non si riavvia. Usa il menu della barra di stato di Paradev > Servizio host > Riavvia."
@@ -11025,9 +11079,6 @@ msgstr "Nuova cartella mantenuta, non è più vuota"
 
 msgid "Key"
 msgstr "Chiave"
-
-msgid "Key dates"
-msgstr "Date principali"
 
 msgid "Key name"
 msgstr "Nome della chiave"
@@ -11660,9 +11711,6 @@ msgstr "Local first"
 msgid "Local Network"
 msgstr "Rete locale"
 
-msgid "Local work can move at your own pace."
-msgstr "Il lavoro locale può essere spostato con calma."
-
 msgid "Local workspace"
 msgstr "Workspace locale"
 
@@ -11755,9 +11803,6 @@ msgstr "Bassa"
 msgid "Low severity"
 msgstr "Gravità bassa"
 
-msgid "Mac app winds down"
-msgstr "L'app per Mac viene dismessa gradualmente"
-
 msgid "Machine resources"
 msgstr "Risorse della macchina"
 
@@ -11836,15 +11881,11 @@ msgstr "Gestisci le chiavi per l'accesso ai server MCP e per le integrazioni est
 msgid "Manage members"
 msgstr "Gestisci i membri"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Manage on {0}"
-msgstr "Gestisci su {0}"
+msgid "Manage plan"
+msgstr "Gestisci il piano"
 
 msgid "Manage Plan"
 msgstr "Gestisci il piano"
-
-msgid "Manage plan on the web"
-msgstr "Gestisci il piano sul web"
 
 msgid "Manage plugins…"
 msgstr "Gestisci i plugin…"
@@ -12042,6 +12083,10 @@ msgstr "Memoria"
 
 msgid "Memory share"
 msgstr "Quota di memoria"
+
+msgctxt "machine pressure"
+msgid "Memory-bound"
+msgstr "Limitata dalla memoria"
 
 msgid "Mention."
 msgstr "Menziona."
@@ -12365,17 +12410,17 @@ msgstr "Sposta il lavoro nel cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Sposta il focus tra le schede principali e la barra laterale destra, e apri la barra laterale se è chiusa"
 
-msgid "Move this workspace to a computer?"
-msgstr "Spostare questo workspace su un computer?"
+msgid "Move this workspace to {computerName}?"
+msgstr "Spostare questo workspace su {computerName}?"
 
 msgid "Move this workspace to the cloud?"
 msgstr "Spostare questo workspace nel cloud?"
 
-msgid "Move to a computer"
-msgstr "Sposta su un computer"
+msgid "Move to"
+msgstr "Sposta su"
 
-msgid "Move to another computer"
-msgstr "Sposta su un altro computer"
+msgid "Move to {companyName} in minutes."
+msgstr "Passa a {companyName} in pochi minuti."
 
 msgid "Move to background"
 msgstr "Sposta in background"
@@ -12395,8 +12440,11 @@ msgstr "Sposta a destra"
 msgid "Move to Tab"
 msgstr "Sposta in una scheda"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Sposta i tuoi agenti prima del {shutdownDate}."
+msgid "Move your agents."
+msgstr "Sposta i tuoi agenti."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Sposta i tuoi worktree e agenti su {companyName} in pochi minuti. Gratuito e open source."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" spostata in {group}"
@@ -12406,6 +12454,9 @@ msgstr "{name} spostato in {destination}"
 
 msgid "Moving {name} to {destination}"
 msgstr "Spostamento di {name} in {destination}"
+
+msgid "Moving its terminals…"
+msgstr "Spostamento dei suoi terminali…"
 
 msgid "Moving this chat here"
 msgstr "Spostamento di questa chat qui"
@@ -12799,9 +12850,6 @@ msgstr "Nessun servizio attivo"
 msgid "No active terminal sessions"
 msgstr "Nessuna sessione del terminale attiva"
 
-msgid "No active workspaces"
-msgstr "Nessun workspace attivo"
-
 msgid "No agent"
 msgstr "Nessun agente"
 
@@ -12887,6 +12935,9 @@ msgstr "Non sono stati trovati Chrome, Brave, Arc o altri browser Chromium."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Nessun utilizzo di Claude o Codex trovato su questa macchina. Unisciti ora e comparirai dopo aver usato un agente."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Nessun ambiente cloud apre {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Nessun workspace cloud"
 
@@ -12901,9 +12952,6 @@ msgstr "Nessun colore"
 
 msgid "No command configured."
 msgstr "Nessun comando configurato."
-
-msgid "No commands found."
-msgstr "Nessun comando trovato."
 
 msgid "No comment body"
 msgstr "Nessun corpo del commento"
@@ -13082,9 +13130,6 @@ msgstr "nessun accesso"
 msgid "No longer in source"
 msgstr "Non più nella sorgente"
 
-msgid "No longer on sale"
-msgstr "Non più in vendita"
-
 msgid "No match"
 msgstr "Nessuna corrispondenza"
 
@@ -13169,8 +13214,8 @@ msgstr "Nessuna organizzazione selezionata"
 msgid "No other chats here"
 msgstr "Nessun'altra chat qui"
 
-msgid "No other computer is set up for this account."
-msgstr "Nessun altro computer è configurato per questo account."
+msgid "No other device is set up for this account."
+msgstr "Nessun altro dispositivo è configurato per questo account."
 
 msgid "No pages match"
 msgstr "Nessuna pagina corrisponde"
@@ -13461,6 +13506,9 @@ msgstr "Ancora nessun workspace"
 msgid "No-Prompt Launch"
 msgstr "Avvio senza prompt"
 
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "No. {companyName} non fa mai da proxy alle chiamate ai modelli. Gli agenti usano i tuoi abbonamenti e le tue chiavi."
+
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "No. I tuoi agenti restano indipendenti; Paradev è il livello di orchestrazione intorno a loro. Ogni attività ha il proprio worktree Git e il proprio branch, sessioni persistenti, revisione dei diff e automazioni che partono su eventi o secondo una pianificazione, senza legare il flusso di lavoro a un solo fornitore."
 
@@ -13536,6 +13584,9 @@ msgstr "Non nel canale"
 msgid "Not included"
 msgstr "Non incluso"
 
+msgid "Not included in your plan"
+msgstr "Non incluso nel tuo piano"
+
 msgid "Not installed"
 msgstr "Non installato"
 
@@ -13550,9 +13601,6 @@ msgstr "Non sei in classifica. Attiva prima l'adesione."
 
 msgid "Not on this version"
 msgstr "Non presente in questa versione"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Non sulla tua macchina. Gli agenti chiamano direttamente i loro provider, che ti addebitano i costi. Nei workspace cloud, le tue chiavi non entrano mai nella sandbox. {companyName} aggiunge il tuo accesso alle richieste in uscita."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Non stai ancora ricevendo eventi: Microsoft Graph ha rifiutato le sottoscrizioni alle notifiche. Controlla il consenso amministrativo dell'app e l'approvazione delle API protette, poi ricollegati."
@@ -13726,6 +13774,9 @@ msgstr "Offline"
 
 msgid "Offline / local-first mode"
 msgstr "Modalità offline / local-first"
+
+msgid "OK"
+msgstr "OK"
 
 msgid "Older"
 msgstr "Più vecchi"
@@ -14082,12 +14133,6 @@ msgstr "Apri ChatGPT per accedere"
 msgid "Open Claude Code, Codex, OpenCode, and Pi sessions as chats"
 msgstr "Apri le sessioni di Claude Code, Codex, OpenCode e Pi come chat"
 
-msgid "Open claude.ai again"
-msgstr "Riapri claude.ai"
-
-msgid "Open claude.ai to sign in"
-msgstr "Apri claude.ai per accedere"
-
 msgid "Open Command Palette"
 msgstr "Apri la palette dei comandi"
 
@@ -14323,6 +14368,7 @@ msgstr "Apri la pull request"
 msgid "Open Pull Request"
 msgstr "Apri la pull request"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
@@ -14602,6 +14648,18 @@ msgstr "I nostri investitori"
 msgid "Our read as of August 2026, based on our own team and the teams we watch closely. F3 is mostly open. F4 is mostly closed. That gap is the work."
 msgstr "La nostra lettura ad agosto 2026, basata sul nostro team e sui team che seguiamo da vicino. F3 è quasi tutto aperto. F4 è quasi tutto chiuso. Quel divario è il lavoro da fare."
 
+msgctxt "machine pressure"
+msgid "Out of memory"
+msgstr "Memoria esaurita"
+
+msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
+msgstr "Memoria esaurita: la macchina sta per smettere di rispondere. {sizeName} ha {memoryGb} GB."
+
+#. placeholder {0}: reap.processName
+#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
+msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
+msgstr "Memoria esaurita: la macchina ha fermato {0} ({1} GB) per continuare a funzionare. {sizeName} ha {memoryGb} GB."
+
 msgid "Out of scope"
 msgstr "Fuori ambito"
 
@@ -14678,6 +14736,9 @@ msgstr "Il contenuto della pagina non è disponibile"
 msgid "Page deleted"
 msgstr "Pagina eliminata"
 
+msgid "Page duplicated"
+msgstr "Pagina duplicata"
+
 msgid "Page has no versions"
 msgstr "La pagina non ha versioni"
 
@@ -14719,6 +14780,9 @@ msgstr "impaginazione"
 
 msgid "Pagination"
 msgstr "Pagination"
+
+msgid "Paid plans"
+msgstr "Piani a pagamento"
 
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "I piani a pagamento hanno un prezzo per utente al mese e sono fatturati per ogni postazione attiva del team. {planPrices}."
@@ -14985,8 +15049,8 @@ msgstr "Incolla un link"
 msgid "Paste an API key instead"
 msgstr "Incolla invece una chiave API"
 
-msgid "Paste the code"
-msgstr "Incolla il codice"
+msgid "Paste attachment"
+msgstr "Incolla allegato"
 
 msgid "Paste this into Paradev CLI:"
 msgstr "Incolla questo nella CLI di Paradev:"
@@ -15129,6 +15193,9 @@ msgstr "Telefono"
 msgid "Phone number"
 msgstr "Numero di telefono"
 
+msgid "Photos"
+msgstr "Foto"
+
 msgid "Pick {name} from the theme grid to apply it."
 msgstr "Scegli {name} dalla griglia dei temi per applicarlo."
 
@@ -15174,8 +15241,8 @@ msgstr "Scegli un tema o segui l'aspetto del sistema. Sfoglia il <0>marketplace<
 msgid "Pick a workspace"
 msgstr "Scegli un workspace"
 
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Scegli un workspace il cui agente attende un tuo input, ha finito dall'ultima volta che l'hai guardato o è ancora in esecuzione"
+msgid "Pick an environment"
+msgstr "Scegli un ambiente"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Scegli un'icona e un colore oppure carica un'immagine personalizzata. Per impostazione predefinita usa l'avatar del proprietario GitHub collegato."
@@ -15879,6 +15946,9 @@ msgstr "Domande"
 msgid "Questions, feedback, support, or anything else. Send a note and we'll route it to the right person."
 msgstr "Domande, feedback, supporto o altro. Mandaci un messaggio e lo inoltreremo alla persona giusta."
 
+msgid "Queue a message · {SEND_NOW_KEYS} to send now"
+msgstr "Metti in coda un messaggio · {SEND_NOW_KEYS} per inviarlo ora"
+
 msgid "Queue message"
 msgstr "Metti il messaggio in coda"
 
@@ -16172,6 +16242,9 @@ msgstr "Rebase e merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Ritrova ciò che è stato detto nelle riunioni"
+
+msgid "Recent"
+msgstr "Recenti"
 
 msgid "Recent Activity"
 msgstr "Attività recente"
@@ -16821,6 +16894,9 @@ msgstr "Resizable"
 msgid "Resize panel"
 msgstr "Ridimensiona pannello"
 
+msgid "Resize to {suggestedName}"
+msgstr "Passa a {suggestedName}"
+
 msgid "Resolve"
 msgstr "Risolvi"
 
@@ -16917,6 +16993,9 @@ msgstr "Riavviati {restartedOrgCount} servizi host"
 
 msgid "Restarted 1 host service"
 msgstr "Riavviato 1 servizio host"
+
+msgid "Restarted at {label}"
+msgstr "Riavviata con {label}"
 
 msgid "Restarting"
 msgstr "Riavvio in corso"
@@ -17190,9 +17269,6 @@ msgstr "riquadro destro"
 msgid "Right-click here"
 msgstr "Clicca qui con il tasto destro"
 
-msgid "Ringtones"
-msgstr "Suonerie"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17238,9 +17314,6 @@ msgstr "Ticket di routine senza interventi a metà task"
 
 msgid "Routines"
 msgstr "Routine"
-
-msgid "Routines, ending with Cloud"
-msgstr "Routine, che terminano con Cloud"
 
 msgid "Row actions"
 msgstr "Azioni della riga"
@@ -17364,6 +17437,9 @@ msgstr "Eseguire questo comando?"
 msgid "Run this in a terminal, then continue:"
 msgstr "Esegui questo in un terminale, poi continua:"
 
+msgid "Run this in a terminal, then paste the token it prints:"
+msgstr "Esegui questo comando in un terminale, poi incolla il token che stampa:"
+
 msgid "Run workspace command"
 msgstr "Esegui il comando del workspace"
 
@@ -17432,6 +17508,9 @@ msgstr "Eseguito quando viene eliminato uno spazio di lavoro."
 
 msgid "Runs while you sleep"
 msgstr "Lavora mentre dormi"
+
+msgid "Same as Switch Workspace"
+msgstr "Come “Cambia workspace”"
 
 msgid "Same session"
 msgstr "Stessa sessione"
@@ -17808,6 +17887,9 @@ msgstr "Cerca trigger..."
 msgid "Search workspaces"
 msgstr "Cerca workspace"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Cerca workspace, comandi, file…"
+
 msgid "Search workspaces..."
 msgstr "Cerca nei workspace..."
 
@@ -17816,6 +17898,9 @@ msgstr "Cerca workspace…"
 
 msgid "Search your meeting notes"
 msgstr "Cerca nelle note delle riunioni"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Cerca tra i tuoi workspace e aprine uno, oppure avviane uno nuovo"
 
 msgid "Search..."
 msgstr "Cerca..."
@@ -17860,6 +17945,9 @@ msgstr "Vedi tutte le statistiche →"
 
 msgid "See Changes"
 msgstr "Guarda le modifiche"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Consulta Conductor per i piani e l'accesso agli account attuali"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Scopri come sono cresciute nel tempo le stelle GitHub di {companyName}."
@@ -18435,6 +18523,10 @@ msgstr "Scorciatoia già in uso"
 msgid "Show"
 msgstr "Mostra"
 
+#. placeholder {0}: formatNumber(moreCount)
+msgid "Show {0} more"
+msgstr "Mostra altri {0}"
+
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Mostra una finestra di conferma quando esci dall'app"
 
@@ -18624,9 +18716,6 @@ msgstr "Mostrato pubblicamente accanto al tuo nome."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Spegni {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Chiude il {shutdownDate}"
 
 msgid "Side by side"
 msgstr "A confronto"
@@ -19380,6 +19469,9 @@ msgstr "inizia il {date}"
 msgid "Starts a fresh session in this workspace"
 msgstr "Avvia una nuova sessione in questo workspace"
 
+msgid "Starts at {label} when it next wakes"
+msgstr "Si avvierà con {label} al prossimo risveglio"
+
 msgid "State"
 msgstr "Stato"
 
@@ -19483,6 +19575,11 @@ msgstr "arrestato"
 msgid "Stopped"
 msgstr "Interrotto"
 
+#. placeholder {0}: pressure.reap.processName
+#. placeholder {1}: gb(pressure.reap.rssMb)
+msgid "Stopped {0} ({1} GB) to free memory"
+msgstr "{0} ({1} GB) fermato per liberare memoria"
+
 msgid "Stopped by the usage limit"
 msgstr "Fermato dal limite di utilizzo"
 
@@ -19563,6 +19660,10 @@ msgstr "Esecuzioni riuscite <0>· 7g</0>"
 
 msgid "Suggested"
 msgstr "Suggeriti"
+
+msgctxt "machine size"
+msgid "Suggested"
+msgstr "Consigliata"
 
 msgid "Suggestions"
 msgstr "Suggerimenti"
@@ -19663,6 +19764,9 @@ msgstr "Cambia accesso"
 msgid "Switch sign-in…"
 msgstr "Cambia accesso…"
 
+msgid "Switch to {companyName}"
+msgstr "Passa a {companyName}"
+
 msgid "Switch to {planName}"
 msgstr "Passa a {planName}"
 
@@ -19725,6 +19829,15 @@ msgstr "Passa al workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Passa al workspace 9"
+
+msgid "Switch to…"
+msgstr "Passa a…"
+
+msgid "Switch workspace"
+msgstr "Cambia workspace"
+
+msgid "Switch Workspace"
+msgstr "Cambia workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
@@ -19924,9 +20037,6 @@ msgstr "Team"
 msgid "Team activity feed"
 msgstr "Feed attività del team"
 
-msgid "Team and Ultra plans"
-msgstr "Piani Team e Ultra"
-
 msgid "Team collaboration"
 msgstr "Collaborazione di team"
 
@@ -20086,8 +20196,11 @@ msgstr "Questo account non è più connesso — scegline un altro."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Quella sessione dell'agente non ha ancora una conversazione da aprire: è stata avviata ma non ha mai ricevuto una richiesta."
 
-msgid "That computer can't be reached"
-msgstr "Quel computer non è raggiungibile"
+msgid "that device"
+msgstr "quel dispositivo"
+
+msgid "That device can't be reached"
+msgstr "Quel dispositivo non è raggiungibile"
 
 msgid "That endpoint could not be resolved."
 msgstr "Impossibile risolvere questo endpoint."
@@ -20176,6 +20289,9 @@ msgstr "Il proprietario dell'automazione non può più usare i workspace cloud i
 
 msgid "The best agent will change.<0/>Your workflow shouldn't."
 msgstr "Il miglior agente cambierà.<0/>Il tuo flusso di lavoro no."
+
+msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
+msgstr "La macchina è ripartita con {actual} vCPU invece di {wanted}. Riavviala per riprovare."
 
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Ora il pulsante risalta. L'ho verificato nel tuo riquadro."
@@ -20382,8 +20498,14 @@ msgstr "Lo spostamento è scaduto."
 msgid "The move was cancelled."
 msgstr "Lo spostamento è stato annullato."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Lo spazio di lavoro spostato apparirà nella Home quando sarà pronto."
+
 msgid "The name of your organization or team"
 msgstr "Il nome della tua organizzazione o del tuo team"
+
+msgid "The name shows in the sidebar."
+msgstr "Il nome compare nella barra laterale."
 
 msgid "The network connection changed"
 msgstr "La connessione di rete è cambiata"
@@ -20394,8 +20516,8 @@ msgstr "Il workspace open source per Claude Code, Codex e qualsiasi agente di pr
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Il workspace open source per Claude Code, Codex, OpenCode e qualsiasi agente di coding. Esegui le attività in parallelo su branch separati e revisiona tutto in un unico posto."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "L'altro lato dello spostamento usa una versione precedente. Riavvia un workspace cloud o aggiorna l'host del computer, poi riprova."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "L'altro lato dello spostamento usa una versione precedente. Riavvia un workspace cloud o aggiorna l'host del dispositivo, poi riprova."
 
 msgid "The overnight shift"
 msgstr "Il turno di notte"
@@ -20519,9 +20641,6 @@ msgstr "l'host di destinazione"
 
 msgid "The team"
 msgstr "Il team"
-
-msgid "The team announced the news."
-msgstr "Il team ha dato l'annuncio."
 
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "L'invito al team è scaduto oppure non esiste. Chiedi un nuovo link al proprietario del team o controlla che l'URL sia corretto."
@@ -20695,15 +20814,6 @@ msgstr "Impossibile avviare questo workspace cloud"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Questo workspace cloud si sta riattivando: dopo un periodo di inattività possono volerci fino a 30 secondi."
 
-msgid "this computer"
-msgstr "questo computer"
-
-msgid "This computer"
-msgstr "Questo computer"
-
-msgid "This computer's host is not running"
-msgstr "L'host di questo computer non è in esecuzione"
-
 msgid "This conversation is too long for the model"
 msgstr "Questa conversazione è troppo lunga per il modello"
 
@@ -20724,6 +20834,9 @@ msgstr "questo dispositivo ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Questo dispositivo non è connesso al relay di Paradev, quindi le esecuzioni delle automazioni verranno saltate."
+
+msgid "This device's host is not running"
+msgstr "L'host di questo dispositivo non è in esecuzione"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Questa directory non esiste. Lo script del terminale userà la radice del workspace."
@@ -21067,6 +21180,9 @@ msgstr "L'host di questo workspace è offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "L'host di questo workspace esegue un servizio host più vecchio di quello supportato da questa app. Aggiornalo per riconnetterti; il workspace e i suoi file restano intatti."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Il progetto di questo spazio di lavoro non è su GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Ragionamento approfondito"
@@ -21718,8 +21834,8 @@ msgstr "Pubblicazione annullata"
 msgid "Unpushed"
 msgstr "Non pushato"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Lavoro su Cloud non pushato. Fai il push prima del {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Modifiche nel cloud non ancora inviate. Salva ed esegui il push del lavoro da trasferire."
 
 msgid "Unranked"
 msgstr "Non classificato"
@@ -21823,6 +21939,15 @@ msgstr "Aggiorna le istruzioni di denominazione"
 msgid "Update naming instructions for {0}"
 msgstr "Aggiorna le istruzioni di denominazione per {0}"
 
+msgid "Update on Google Play"
+msgstr "Aggiorna su Google Play"
+
+msgid "Update Paradev from Google Play to continue."
+msgstr "Aggiorna Paradev da Google Play per continuare."
+
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Aggiorna Paradev su {sourceName} per spostarne gli spazi di lavoro da questo telefono."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Aggiorna Paradev su quel dispositivo. Gli aggiornamenti dall’app richiedono un’installazione autonoma supportata e una versione rilasciata dell’app."
 
@@ -21856,7 +21981,7 @@ msgstr "Aggiorna questo host per spostare i sottoagenti in background"
 msgid "Updated"
 msgstr "Aggiornato"
 
-#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt))
+#. placeholder {0}: formatRelativeTime(new Date(item.updatedAt), now)
 msgid "Updated {0}"
 msgstr "Ultimo aggiornamento {0}"
 
@@ -21889,15 +22014,14 @@ msgstr "Passa a Pro"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Aggiorna una dipendenza e correggi ciò che si rompe…"
 
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "Upgrade on {0}"
-msgstr "Esegui l'upgrade su {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Passa a {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Passa a Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Passa a Pro su {upgradeHost}"
 
 msgid "Upgrade to Team"
 msgstr "Passa a Team"
@@ -22041,9 +22165,6 @@ msgstr "Usare la trascrizione vocale e le funzioni push-to-talk."
 msgid "Use your ChatGPT plan."
 msgstr "Usa il tuo piano ChatGPT."
 
-msgid "Use your Claude Pro or Max plan."
-msgstr "Usa il tuo piano Claude Pro o Max."
-
 msgid "Used"
 msgstr "Utilizzato"
 
@@ -22180,9 +22301,6 @@ msgstr "Vedi tutti"
 msgid "View All"
 msgstr "Vedi tutti"
 
-msgid "View all (+{moreCount} more)"
-msgstr "Mostra tutto (+{moreCount} in più)"
-
 msgid "View all members of this channel"
 msgstr "Vedi tutti i membri di questo canale"
 
@@ -22284,6 +22402,10 @@ msgstr "VS Code"
 msgid "Wait for workspace setup before starting agents"
 msgstr "Attendi la configurazione del workspace prima di avviare gli agenti"
 
+#. placeholder {0}: formatNumber(Math.round(resources.cpuWaitingPercent))
+msgid "Waiting {0}% of the last minute"
+msgstr "In attesa della CPU per il {0}% dell'ultimo minuto"
+
 #. placeholder {0}: names.a
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
@@ -22315,6 +22437,9 @@ msgstr "In attesa del primo messaggio del sottoagente…"
 
 msgid "Waiting for your input"
 msgstr "In attesa del tuo input"
+
+msgid "Waiting on background work"
+msgstr "In attesa del lavoro in background"
 
 msgid "Waking up workspace"
 msgstr "Riattivazione del workspace"
@@ -22773,10 +22898,6 @@ msgstr "Azioni workspace"
 msgid "Workspace activity"
 msgstr "Attività del workspace"
 
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "Attività del workspace, pull request #{0}"
-
 msgid "Workspace agents"
 msgstr "Agenti del workspace"
 
@@ -23049,9 +23170,6 @@ msgstr "Puoi modificare solo i tuoi messaggi"
 msgid "You can only share with people and teams in this organization"
 msgstr "Puoi condividere solo con persone e team di questa organizzazione"
 
-msgid "You can read and export, but not run agents."
-msgstr "Puoi leggere ed esportare, ma non eseguire agenti."
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Puoi ripristinarlo da Impostazioni → Progetti per 30 giorni. La cartella del repository non viene mai eliminata."
 
@@ -23063,10 +23181,6 @@ msgstr "Puoi visualizzare questa pagina ma non modificarla"
 
 msgid "You can view this page but not comment on it"
 msgstr "Puoi visualizzare questa pagina ma non commentarla"
-
-#. placeholder {0}: COMPANY.DOMAIN
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Non puoi modificare questo abbonamento nell'app. Il piano della tua organizzazione è gestito dal proprietario su {0}."
 
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Non puoi annullare questa azione. I pannelli del terminale mostreranno \"Processo terminato\" e potranno essere riavviati."
@@ -23258,8 +23372,14 @@ msgstr "La tua organizzazione installa {plugin} per te, quindi non può essere d
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "La tua organizzazione installa questo plugin per te. Puoi disattivarlo, ma non rimuoverlo."
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "La tua organizzazione ha raggiunto il limite di utilizzo del cloud."
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "La tua organizzazione ha raggiunto il limite di utilizzo del cloud. Questo workspace si fermerà tra pochi minuti se il limite non viene aumentato."
+
+msgid "Your organization reached its environment limit."
+msgstr "La tua organizzazione ha raggiunto il limite di ambienti."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "I tuoi account. Le integrazioni della tua organizzazione permettono a Paradev di raggiungere i suoi strumenti; collegare i tuoi fa apparire a tuo nome il lavoro che Paradev svolge per te."

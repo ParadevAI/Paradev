@@ -4,6 +4,7 @@
  * nobody uses lapses, and a renewal one box triggers leaves the person's other
  * boxes on the old token until their next keepalive.
  */
+
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { agentCredentials, cloudWorkspaces } from "@superset/db/schema";
@@ -49,7 +50,7 @@ export async function renewChatgptSignInsAndBoxes(args: {
 					cloudWorkspaces.createdByUserId,
 					recent.map((row) => row.userId),
 				),
-				eq(cloudWorkspaces.status, "ready"),
+				eq(cloudWorkspaces.status, "awake"),
 				isNull(cloudWorkspaces.deletedAt),
 			),
 		);

@@ -117,6 +117,7 @@ test("a cloud workspace's stored chat renders while its box wakes, with no works
 							isReady: true,
 							agentCredentialsChangedWorkspaceId: null,
 							usageRefusal: null,
+							wakeOpenWorkspace: async () => {},
 						}}
 					>
 						<StoredChatTranscript

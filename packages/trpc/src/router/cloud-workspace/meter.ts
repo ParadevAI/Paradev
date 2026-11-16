@@ -18,19 +18,20 @@ import { and, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { nudge } from "../../lib/realtime";
 import {
+	type ActiveWorkspaceSandbox,
 	findSandboxSession,
-	listActiveWorkspaceSandboxes,
 	MEMORY_MB_PER_VCPU,
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 
 const LOCK_WINDOW_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 70 * 60 * 1000;
 const CAP_GRACE_MS = 10 * 60 * 1000;
 const SETTLE_LEASE_MS = 2 * 60 * 1000;
 const UNATTACHED_BOOT_GRACE_MS = 60 * 60 * 1000;
-const RECONCILE_LOOKBACK_MS = 60 * 60 * 1000;
+export const RECONCILE_LOOKBACK_MS = 60 * 60 * 1000;
 const RECONCILE_CONCURRENCY = 25;
 
 export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
@@ -468,7 +469,10 @@ export async function settleBoot(
 			return "warned";
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
-		await stopSandbox(workspace.providerSandboxId);
+		const stopped = await stopSandbox(workspace.providerSandboxId);
+		await recordSandboxAsleep(boot.cloudWorkspaceId, {
+			sessionId: stopped.sessionId ?? boot.vercelSessionId,
+		});
 		await setUsageStopAt(boot, null);
 		return "stopped";
 	} catch (error) {
@@ -551,6 +555,8 @@ export async function settleOrganizationNow(
 	const rows = await db
 		.select({
 			id: cloudWorkspaceBoots.id,
+			vercelSessionId: cloudWorkspaceBoots.vercelSessionId,
+			cloudWorkspaceId: cloudWorkspaces.id,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 		})
 		.from(cloudWorkspaceBoots)
@@ -562,11 +568,17 @@ export async function settleOrganizationNow(
 			and(eq(cloudWorkspaceBoots.organizationId, organizationId), OPEN_BOOT),
 		);
 	await Promise.all(
-		rows.map(({ id, providerSandboxId }) =>
-			providerSandboxId
-				? stopSandbox(providerSandboxId).catch((error) =>
-						Sentry.captureException(error, { extra: { bootId: id } }),
-					)
+		rows.map(({ id, vercelSessionId, cloudWorkspaceId, providerSandboxId }) =>
+			cloudWorkspaceId && providerSandboxId
+				? stopSandbox(providerSandboxId)
+						.then((stopped) =>
+							recordSandboxAsleep(cloudWorkspaceId, {
+								sessionId: stopped.sessionId ?? vercelSessionId,
+							}),
+						)
+						.catch((error) =>
+							Sentry.captureException(error, { extra: { bootId: id } }),
+						)
 				: undefined,
 		),
 	);
@@ -590,10 +602,10 @@ export async function settleWorkspaceNow(
 	}
 }
 
-async function adoptRunningBoxes(): Promise<number> {
-	const names = await listActiveWorkspaceSandboxes(
-		Date.now() - RECONCILE_LOOKBACK_MS,
-	);
+async function adoptRunningBoxes(
+	active: ActiveWorkspaceSandbox[],
+): Promise<number> {
+	const names = active.map((box) => box.name);
 	if (names.length === 0) return 0;
 	const unmetered = await db
 		.select({
@@ -654,7 +666,10 @@ async function adoptRunningBoxes(): Promise<number> {
 			console.error(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
-			await stopSandbox(workspace.providerSandboxId);
+			const stopped = await stopSandbox(workspace.providerSandboxId);
+			await recordSandboxAsleep(workspace.id, {
+				sessionId: stopped.sessionId ?? session.id,
+			});
 		}
 	}
 	return adopted;
@@ -664,16 +679,23 @@ async function adoptRunningBoxes(): Promise<number> {
  * Queues a settle for every open boot, and starts metering boxes running
  * without one (boxes already up when metering shipped).
  */
-export async function reconcileCloudWorkspaceUsage(): Promise<{
+export async function reconcileCloudWorkspaceUsage({
+	active = null,
+}: {
+	/** Workspace boxes whose state changed lately; null when the listing failed. */
+	active?: ActiveWorkspaceSandbox[] | null;
+} = {}): Promise<{
 	adopted: number;
 	queued: number;
 	failed: number;
 }> {
 	if (!billingUsesAutumn) return { adopted: 0, queued: 0, failed: 0 };
-	const adopted = await adoptRunningBoxes().catch((error) => {
-		Sentry.captureException(error);
-		return 0;
-	});
+	const adopted = active
+		? await adoptRunningBoxes(active).catch((error) => {
+				Sentry.captureException(error);
+				return 0;
+			})
+		: 0;
 	const ids = await openBootIds();
 	let failed = 0;
 	for (let i = 0; i < ids.length; i += RECONCILE_CONCURRENCY) {

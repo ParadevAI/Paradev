@@ -122,8 +122,12 @@ export function TurnFailureCard({
 		});
 	};
 	const restart = kind === "auth" ? recovery?.restartAndContinue : undefined;
-	const agentSignIn =
+	const offeredSignIn =
 		restart && !manualSignIn ? recovery?.agentSignIn : undefined;
+	const agentSignIn =
+		offeredSignIn?.mode === "command" && error?.loginCommand
+			? { ...offeredSignIn, command: error.loginCommand }
+			: offeredSignIn;
 	const label = agentSignIn?.label;
 	const changeModel = recovery?.changeModel;
 	const newChat = recovery?.startNewChat;

@@ -50,7 +50,7 @@ stub(access, {
 		id: WORKSPACE_ID,
 		organizationId: ORGANIZATION_ID,
 		environmentId: ENVIRONMENT_ID,
-		status: "ready",
+		status: "awake",
 		baseBranch: "main",
 		branch: "main",
 	}),
