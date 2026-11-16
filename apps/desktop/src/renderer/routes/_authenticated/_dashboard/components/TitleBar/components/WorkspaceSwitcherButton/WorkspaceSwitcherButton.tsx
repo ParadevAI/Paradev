@@ -7,7 +7,7 @@ import {
 	useFrameStackStore,
 } from "renderer/commandPalette";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { WorkspacesIcon } from "./components/WorkspacesIcon";
+import { WorkspacesIcon } from "renderer/routes/_authenticated/_dashboard/components/WorkspacesIcon";
 import {
 	useWaitingWorkspaceBucket,
 	type WaitingWorkspaceBucket,

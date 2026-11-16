@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,7 +12,9 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { Ellipsis, FolderPlus, Gauge, Layers } from "lucide-react";
+import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
+import { PiChatsCircle } from "react-icons/pi";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import {
@@ -24,6 +27,8 @@ import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboar
 export function RailMoreMenu() {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
+	const isChannelsEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 	return (
@@ -34,7 +39,7 @@ export function RailMoreMenu() {
 						<button
 							type="button"
 							aria-label={t({ message: "More" })}
-							className={railButtonClass(navigation.isWorkspacesOpen)}
+							className={railButtonClass(navigation.isChannelsOpen)}
 						>
 							<Ellipsis
 								className={RAIL_ICON_CLASS}
@@ -52,17 +57,21 @@ export function RailMoreMenu() {
 				align="start"
 				onCloseAutoFocus={(event) => event.preventDefault()}
 			>
-				<DropdownMenuItem onSelect={navigation.openWorkspaces}>
-					<Layers className="size-4" />
-					<Trans>Workspaces</Trans>
-				</DropdownMenuItem>
+				{isChannelsEnabled && (
+					<DropdownMenuItem onSelect={navigation.openChannels}>
+						<PiChatsCircle className="size-4" />
+						<Trans>Chat</Trans>
+					</DropdownMenuItem>
+				)}
 				{isUsageInSidebarEnabled && (
 					<DropdownMenuItem onSelect={navigation.openUsage}>
 						<Gauge className="size-4" />
 						<Trans>Usage</Trans>
 					</DropdownMenuItem>
 				)}
-				<DropdownMenuSeparator />
+				{(isChannelsEnabled || isUsageInSidebarEnabled) && (
+					<DropdownMenuSeparator />
+				)}
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
 						<FolderPlus className="size-4" />

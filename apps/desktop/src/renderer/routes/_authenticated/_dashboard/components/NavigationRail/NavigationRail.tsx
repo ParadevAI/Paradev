@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { PiChatsCircle, PiClockClockwise } from "react-icons/pi";
+import { PiClockClockwise } from "react-icons/pi";
 import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
@@ -9,6 +9,7 @@ import { env } from "renderer/env.renderer";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
+import { WorkspacesIcon } from "renderer/routes/_authenticated/_dashboard/components/WorkspacesIcon";
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { RailMoreMenu } from "./components/RailMoreMenu";
@@ -20,8 +21,6 @@ export const NAVIGATION_RAIL_WIDTH = 52;
 export function NavigationRail() {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
-	const isChannelsEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	// `?? false`: the hook returns undefined until PostHog flags resolve.
 	// Dev builds bypass the flag — the local dev account isn't in the
 	// @superset.sh release condition.
@@ -42,15 +41,13 @@ export function NavigationRail() {
 				isActive={navigation.isHomeOpen}
 				onClick={navigation.openHome}
 			/>
-			{isChannelsEnabled && (
-				<RailButton
-					label={t({ message: "Chat" })}
-					icon={PiChatsCircle}
-					isIconFilled
-					isActive={navigation.isChannelsOpen}
-					onClick={navigation.openChannels}
-				/>
-			)}
+			<RailButton
+				label={t({ message: "Workspaces" })}
+				icon={WorkspacesIcon}
+				isIconFilled
+				isActive={navigation.isWorkspacesOpen}
+				onClick={navigation.openWorkspaces}
+			/>
 			<RailButton
 				label={t({ message: "Pages" })}
 				icon={TbNote}
