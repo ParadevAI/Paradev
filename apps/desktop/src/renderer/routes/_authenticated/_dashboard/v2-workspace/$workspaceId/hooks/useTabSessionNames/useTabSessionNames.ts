@@ -54,14 +54,29 @@ export function useTabSessionNames({
 		void enqueue(async () => {
 			const sessions = await freshSessions();
 			if (cancelled) return;
-			const names = tabNamesToBackfill(
-				store.getState().tabs,
-				sessions,
-				backfilledTerminalIds,
-			);
-			for (const { terminalId, title } of names) {
-				await renameSession({ workspaceId, terminalId, title });
-				backfilledTerminalIds.add(terminalId);
+			const candidates = () =>
+				tabNamesToBackfill(
+					store.getState().tabs,
+					sessions,
+					backfilledTerminalIds,
+				);
+			for (const { terminalId } of candidates()) {
+				if (cancelled) return;
+				const current = candidates().find((n) => n.terminalId === terminalId);
+				if (!current) continue;
+				try {
+					await renameSession({
+						workspaceId,
+						terminalId,
+						title: current.title,
+					});
+					backfilledTerminalIds.add(terminalId);
+				} catch (error) {
+					console.warn("[useTabSessionNames] backfill failed", {
+						terminalId,
+						error,
+					});
+				}
 			}
 		});
 		return () => {
