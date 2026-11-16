@@ -68,6 +68,8 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 		() => live?.typing.watch.typists(chatId) ?? NOBODY,
 	);
 
+	useEffect(() => () => live?.typing.reporter.stopped(chatId), [live, chatId]);
+
 	const stateRef = useRef(state);
 	stateRef.current = state;
 
@@ -243,7 +245,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 							setReplyTo(null);
 							setEditing(null);
 						}}
+						onTextChange={(text) => live?.typing.reporter.changed(chatId, text)}
 						onSend={(text, files) => {
+							live?.typing.reporter.stopped(chatId);
 							if (files.length > 0) {
 								sendFiles(text, files);
 							} else if (editing) {

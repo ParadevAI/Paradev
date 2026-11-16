@@ -4,6 +4,7 @@ import type {
 	ComposerMentionProvider,
 	PromptInputHandle,
 } from "@superset/chat-ui/PromptInput";
+import { draftText } from "@superset/chat-ui/PromptInput";
 import {
 	type MentionCandidate,
 	mentionToken,
@@ -49,6 +50,8 @@ interface ChatComposerProps {
 	onCancel: () => void;
 	/** Each file goes as its own message; the text is the first one's caption. */
 	onSend: (text: string, files: File[]) => void;
+	/** The draft's words after each edit, for telling the chat someone is typing. */
+	onTextChange: (text: string) => void;
 	/** Up in an empty composer: edit the last message you sent. */
 	onEditLast: () => void;
 }
@@ -61,6 +64,7 @@ export function ChatComposer({
 	editing,
 	onCancel,
 	onSend,
+	onTextChange,
 	onEditLast,
 }: ChatComposerProps) {
 	const { t } = useLingui();
@@ -163,6 +167,7 @@ export function ChatComposer({
 				placeholder={placeholder}
 				mentionProviders={mentionProviders}
 				autoFocus
+				onDraftChange={(draft) => onTextChange(draftText(draft.segments))}
 				onSubmit={(payload) => {
 					const text = payload.text.trim();
 					if (text === "" && payload.files.length === 0) return false;
