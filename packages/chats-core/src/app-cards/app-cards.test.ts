@@ -173,7 +173,8 @@ describe("app cards", () => {
 
 	test("asking for a change goes to the maker while it can be mentioned in the chat, else the chat's own Dev", () => {
 		const s = state();
-		expect(appChangeDev(s, s.chats[0]!, ID)?.id).toBe("juniper");
+		// A member's Dev can't be tagged in a group, so its sketch's change goes to the group's Dev.
+		expect(appChangeDev(s, s.chats[0]!, ID)?.id).toBe("wren");
 		const madeByWren = {
 			...s,
 			messages: [{ ...s.messages[0]!, authorDevId: "wren" }],
