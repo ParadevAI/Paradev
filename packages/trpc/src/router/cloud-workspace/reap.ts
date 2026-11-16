@@ -12,6 +12,7 @@ import {
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -33,7 +34,7 @@ function isStillArchived(
 ): row is CloudWorkspaceRow {
 	return (
 		row !== undefined &&
-		row.status === "deleted" &&
+		row.status === "archived" &&
 		row.deletedAt?.toISOString() === input.archivedAt &&
 		row.provider === "vercel"
 	);
@@ -95,7 +96,10 @@ export async function reapArchivedCloudWorkspace(
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
-	await stopSandbox(row.providerSandboxId);
+	const stopped = await stopSandbox(row.providerSandboxId);
+	await recordSandboxAsleep(row.id, {
+		sessionId: stopped.sessionId ?? row.sandboxSessionId,
+	});
 	await queueSettleWorkspace(row.id);
 	return "stopped";
 }
@@ -134,7 +138,7 @@ function queueReapStage(
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
-	providerSandboxId: string,
+	box: { providerSandboxId: string; sandboxSessionId: string | null },
 ): Promise<void> {
 	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
@@ -145,6 +149,9 @@ export async function queueReap(
 			`[cloud-workspace] could not queue the stop for ${input.cloudWorkspaceId}`,
 			error,
 		);
-		await stopSandbox(providerSandboxId);
+		const stopped = await stopSandbox(box.providerSandboxId);
+		await recordSandboxAsleep(input.cloudWorkspaceId, {
+			sessionId: stopped.sessionId ?? box.sandboxSessionId,
+		});
 	});
 }

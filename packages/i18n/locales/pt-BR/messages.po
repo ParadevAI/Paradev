@@ -4939,6 +4939,9 @@ msgstr "Uso da nuvem"
 msgid "Cloud workspace"
 msgstr "Área de trabalho na nuvem"
 
+msgid "Cloud workspace: asleep"
+msgstr "Área de trabalho na nuvem: em repouso"
+
 msgid "Cloud workspace: connecting"
 msgstr "Área de trabalho na nuvem: conectando"
 

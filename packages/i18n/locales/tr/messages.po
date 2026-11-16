@@ -4939,6 +4939,9 @@ msgstr "Bulut kullanımı"
 msgid "Cloud workspace"
 msgstr "Bulut çalışma alanı"
 
+msgid "Cloud workspace: asleep"
+msgstr "Bulut çalışma alanı: uykuda"
+
 msgid "Cloud workspace: connecting"
 msgstr "Bulut çalışma alanı: bağlanılıyor"
 

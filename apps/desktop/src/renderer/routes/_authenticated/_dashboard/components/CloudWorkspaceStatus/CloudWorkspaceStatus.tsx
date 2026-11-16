@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { WaveSpinner } from "@superset/ui/atoms/WaveSpinner";
 import { LuArchive, LuInfo } from "react-icons/lu";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
@@ -32,7 +33,7 @@ export function CloudWorkspaceStatus({
 			</span>
 		);
 	}
-	if (workspace.status === "deleted") {
+	if (isArchivedCloudWorkspaceStatus(workspace.status)) {
 		return (
 			<LuArchive
 				role="img"

@@ -1,3 +1,4 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
@@ -97,7 +98,9 @@ function V2WorkspaceLayout() {
 				? { ...hostWorkspace, name: cloudWorkspace.name }
 				: hostWorkspace;
 		}
-		return isCloud && cloudWorkspace?.status === "ready"
+		return isCloud &&
+			cloudWorkspace &&
+			isLiveCloudWorkspaceStatus(cloudWorkspace.status)
 			? hostShapedCloudWorkspace(cloudWorkspace)
 			: null;
 	}, [hostWorkspace, isCloud, cloudWorkspace]);
@@ -156,7 +159,7 @@ function V2WorkspaceLayout() {
 		cache.refetchAll,
 	);
 
-	// A `ready` row only means the box has started booting. Its address request
+	// An `awake` row only means the box has started booting. Its address request
 	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
 		const provisioning = (
@@ -168,7 +171,7 @@ function V2WorkspaceLayout() {
 		);
 		return (
 			<StateScreenShell>
-				{cloudWorkspace.status === "ready" ? (
+				{isLiveCloudWorkspaceStatus(cloudWorkspace.status) ? (
 					<StoredCloudChat
 						fallback={provisioning}
 						workspaceId={cloudWorkspace.id}

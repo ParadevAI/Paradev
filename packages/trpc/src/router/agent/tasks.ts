@@ -315,7 +315,8 @@ async function withUsableBox(sessionId: string): Promise<SelectAgentSession> {
 	if (!row) throw new Error("task session is gone");
 	if (
 		row.session.cloudWorkspaceId &&
-		(row.boxStatus === "failed" || row.boxStatus === "deleted")
+		row.boxStatus !== null &&
+		(row.boxStatus === "failed" || row.boxStatus === "archived")
 	) {
 		const [cleared] = await db
 			.update(agentSessions)
@@ -436,7 +437,8 @@ async function relaunchedOnNewBox(
 		.from(cloudWorkspaces)
 		.where(eq(cloudWorkspaces.id, session.cloudWorkspaceId))
 		.limit(1);
-	if (box?.status !== "failed" && box?.status !== "deleted") return false;
+	if (!box || (box.status !== "failed" && box.status !== "archived"))
+		return false;
 	const [starts] = await db
 		.select({ n: count() })
 		.from(agentTurns)

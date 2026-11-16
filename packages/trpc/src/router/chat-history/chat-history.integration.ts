@@ -232,7 +232,7 @@ beforeAll(async () => {
 			branch: "b",
 			baseBranch: "main",
 			providerSandboxId: `ws-${id}`,
-			status: "ready" as const,
+			status: "awake" as const,
 			environmentId: environment?.id as string,
 			createdByUserId: userId,
 		})),
@@ -861,7 +861,7 @@ describe("workspace move safety", () => {
 		} finally {
 			await db
 				.update(cloudWorkspaces)
-				.set({ status: "ready" })
+				.set({ status: "awake" })
 				.where(eq(cloudWorkspaces.id, MY_CLOUD));
 		}
 	});

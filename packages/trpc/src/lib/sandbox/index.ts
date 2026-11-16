@@ -48,6 +48,7 @@ export {
 	workspaceRepositories,
 } from "./repositories";
 export {
+	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
