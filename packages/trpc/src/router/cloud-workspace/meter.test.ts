@@ -20,6 +20,7 @@ import {
 	releaseBoot,
 	settleBoot,
 } from "./meter";
+import * as sandboxSleep from "./sandbox-sleep";
 
 const MINUTE = 60_000;
 const NOW = Date.now();
@@ -98,9 +99,19 @@ stub(sandbox, {
 	findSandboxSession: async () => ({ session }),
 	stopSandbox: async (id: string) => {
 		stopped.push(id);
+		return { sessionId: "session_1" };
 	},
 });
 stub(realtime, { nudge: () => {} });
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: async (
+		id: string,
+		stopped: { sessionId: string | null },
+	) => {
+		recordedAsleep.push([id, stopped]);
+	},
+});
 stub(jobs, {
 	publishCloudWorkspaceJob: async (job: { delaySeconds?: number }) => {
 		delayedSettles.push(job.delaySeconds ?? 0);
@@ -194,6 +205,7 @@ beforeEach(() => {
 	writes = [];
 	autumnCalls = [];
 	stopped = [];
+	recordedAsleep = [];
 	usageStopAt = null;
 	delayedSettles = [];
 	usageEvents = null;
@@ -291,11 +303,12 @@ describe("settleBoot", () => {
 		);
 	});
 
-	test("a box still refused once its grace ends is stopped and the warning cleared", async () => {
+	test("a box still refused once its grace ends is stopped, recorded asleep for the session it stopped, and the warning cleared", async () => {
 		renewalAllowed = false;
 		usageStopAt = new Date(NOW - MINUTE);
 		expect(await settleBoot("boot_1")).toBe("stopped");
 		expect(stopped).toEqual(["ws-box"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "session_1" }]]);
 		expect(writes.at(-1)).toEqual({ usageStopAt: null });
 	});
 

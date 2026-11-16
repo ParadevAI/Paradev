@@ -14,7 +14,10 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
-import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
+import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
 import {
 	normalizeWorkspaceTags,
 	workspaceTagsInputSchema,
@@ -67,6 +70,7 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { withClientStatus } from "./client-status";
 import {
 	assertMayBoot,
 	queueSettleWorkspace,
@@ -145,10 +149,11 @@ async function addressSandbox(
 	try {
 		if (mode === "address") {
 			const described = await describeSandbox(row.providerSandboxId);
-			if (described.expiresAt) {
-				await recordSandboxAwake(row.id, described.expiresAt);
+			const { expiresAt, sessionId } = described;
+			if (expiresAt) {
+				await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			} else {
-				await recordSandboxAsleep(row.id);
+				await recordSandboxAsleep(row.id, { sessionId });
 			}
 			return {
 				hostTarget: described.hostTarget,
@@ -269,7 +274,7 @@ export const cloudWorkspaceRouter = {
 				ctx.principal.userId,
 			);
 			return rows.map(({ workspace, createdBy }) => ({
-				...workspace,
+				...withClientStatus(ctx.client, workspace),
 				createdBy,
 				presence: NO_PRESENCE,
 				tags: tagsByWorkspaceId.get(workspace.id) ?? [],
@@ -528,7 +533,7 @@ export const cloudWorkspaceRouter = {
 				columns: { id: true, name: true, image: true },
 			});
 			return {
-				...row,
+				...withClientStatus(ctx.client, row),
 				createdBy: creator
 					? { userId: creator.id, name: creator.name, image: creator.image }
 					: null,
@@ -564,7 +569,7 @@ export const cloudWorkspaceRouter = {
 				);
 			}
 			nudge(row.organizationId, "cloud_workspaces");
-			return renamed ?? row;
+			return withClientStatus(ctx.client, renamed ?? row);
 		}),
 
 	/**
@@ -605,7 +610,7 @@ export const cloudWorkspaceRouter = {
 			// Tags are personal, but the caller's other windows learn of the
 			// change only through the organization channel.
 			nudge(row.organizationId, "cloud_workspaces");
-			return { ...row, tags: input.tags };
+			return { ...withClientStatus(ctx.client, row), tags: input.tags };
 		}),
 
 	/**
@@ -744,8 +749,8 @@ export const cloudWorkspaceRouter = {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
-				await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id);
+				const stopped = await stopAndSnapshot(row.providerSandboxId);
+				await recordSandboxAsleep(row.id, stopped);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -859,8 +864,8 @@ export const cloudWorkspaceRouter = {
 			// The box keeps running until the reap stops it, so an undo is instant.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
-				from: ["provisioning", "ready", "asleep", "failed"],
-				to: "deleted",
+				from: ["provisioning", "awake", "ready", "asleep", "failed"],
+				to: "archived",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
@@ -914,7 +919,7 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
 			const resumable =
-				row.status === "deleted" &&
+				isArchivedCloudWorkspaceStatus(row.status) &&
 				row.provider === "vercel" &&
 				(await sandboxExists(row.providerSandboxId));
 			// Inside the grace period the box is still there, running for the
@@ -924,17 +929,17 @@ export const cloudWorkspaceRouter = {
 				resumable
 					? {
 							id: row.id,
-							from: ["deleted"],
+							from: ["archived", "deleted"],
 							to:
 								row.sandboxExpiresAt &&
 								row.sandboxExpiresAt.getTime() <= Date.now()
 									? "asleep"
-									: "ready",
+									: "awake",
 							set: { deletedAt: null },
 						}
 					: {
 							id: row.id,
-							from: ["deleted"],
+							from: ["archived", "deleted"],
 							to: "provisioning",
 							set: {
 								provider: "vercel",

@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { AWAKE_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
 import { and, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
@@ -28,33 +29,44 @@ export interface WatchSandboxExpiryInput {
 }
 
 /**
- * For a box we know runs until `expiresAt`. Seeing it wake starts its expiry
- * watch; an extension only moves the expiry, and the watch follows it.
+ * For a box we know runs `sessionId` until `expiresAt`. A new session starts
+ * the expiry watch; an extension only moves the expiry, and the watch follows
+ * it. A report for a session already recorded asleep is stale: Vercel never
+ * resumes a session, it starts a new one.
  */
 export async function recordSandboxAwake(
 	cloudWorkspaceId: string,
-	expiresAt: Date,
+	session: { expiresAt: Date; sessionId: string | null },
 ): Promise<void> {
-	await markAwake(cloudWorkspaceId, expiresAt).catch((error) =>
+	await markAwake(cloudWorkspaceId, session).catch((error) =>
 		reportSleepWriteFailure(cloudWorkspaceId, error),
 	);
 }
 
 async function markAwake(
 	cloudWorkspaceId: string,
-	expiresAt: Date,
+	{ expiresAt, sessionId }: { expiresAt: Date; sessionId: string | null },
 ): Promise<void> {
+	const newSession = sql`${cloudWorkspaces.sandboxSessionId} is distinct from ${sessionId}`;
 	const [woke] = await db
 		.update(cloudWorkspaces)
-		.set({ status: "ready", sandboxExpiresAt: expiresAt, ...keepUpdatedAt })
+		.set({
+			status: "awake",
+			sandboxExpiresAt: expiresAt,
+			sandboxSessionId: sessionId,
+			...keepUpdatedAt,
+		})
 		.where(
 			and(
 				eq(cloudWorkspaces.id, cloudWorkspaceId),
 				or(
-					eq(cloudWorkspaces.status, "asleep"),
+					and(eq(cloudWorkspaces.status, "asleep"), newSession),
 					and(
-						eq(cloudWorkspaces.status, "ready"),
+						inArray(cloudWorkspaces.status, [
+							...AWAKE_CLOUD_WORKSPACE_STATUSES,
+						]),
 						or(
+							newSession,
 							isNull(cloudWorkspaces.sandboxExpiresAt),
 							lte(cloudWorkspaces.sandboxExpiresAt, sql`now()`),
 						),
@@ -70,6 +82,10 @@ async function markAwake(
 			.where(
 				and(
 					eq(cloudWorkspaces.id, cloudWorkspaceId),
+					inArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+					sessionId === null
+						? undefined
+						: eq(cloudWorkspaces.sandboxSessionId, sessionId),
 					lt(cloudWorkspaces.sandboxExpiresAt, expiresAt),
 				),
 			);
@@ -117,10 +133,15 @@ export async function watchSandboxExpiry({
 		throw error;
 	});
 	if (live?.expiresAt && live.expiresAt.getTime() > Date.now()) {
-		await recordSandboxAwake(cloudWorkspaceId, live.expiresAt);
+		await recordSandboxAwake(cloudWorkspaceId, {
+			expiresAt: live.expiresAt,
+			sessionId: live.sessionId,
+		});
 		return "rewatched";
 	}
-	await recordSandboxAsleep(cloudWorkspaceId);
+	await recordSandboxAsleep(cloudWorkspaceId, {
+		sessionId: live?.sessionId ?? null,
+	});
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
 }
@@ -149,12 +170,14 @@ export async function syncSandboxExpiries(
 		);
 	const now = Date.now();
 	for (const row of rows) {
-		const expiresAt = liveByName.get(row.providerSandboxId)?.expiresAt;
+		const listed = liveByName.get(row.providerSandboxId);
+		if (!listed) continue;
+		const { expiresAt, sessionId } = listed;
 		if (expiresAt && expiresAt.getTime() > now) {
-			await recordSandboxAwake(row.id, expiresAt);
+			await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			await queueWatch(row.id, expiresAt);
 		} else {
-			await recordSandboxAsleep(row.id);
+			await recordSandboxAsleep(row.id, { sessionId });
 		}
 	}
 }

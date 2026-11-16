@@ -5,6 +5,7 @@ import {
 	v2UsersHosts,
 	v2Workspaces,
 } from "@superset/db/schema";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import type { NewChatMove } from "@superset/shared/move-book";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
@@ -175,8 +176,11 @@ export async function retryChatMove(
 			columns: { status: true },
 		});
 		if (
-			destination?.status !== "ready" &&
-			destination?.status !== "provisioning"
+			!(
+				destination &&
+				(isLiveCloudWorkspaceStatus(destination.status) ||
+					destination.status === "provisioning")
+			)
 		) {
 			throw new TRPCError({
 				code: "PRECONDITION_FAILED",

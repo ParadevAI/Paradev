@@ -4939,6 +4939,9 @@ msgstr "Penggunaan cloud"
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
+msgid "Cloud workspace: asleep"
+msgstr "Workspace cloud: tertidur"
+
 msgid "Cloud workspace: connecting"
 msgstr "Workspace cloud: menghubungkan"
 

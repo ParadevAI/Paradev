@@ -469,8 +469,8 @@ export async function settleBoot(
 			return "warned";
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
-		await stopSandbox(workspace.providerSandboxId);
-		await recordSandboxAsleep(boot.cloudWorkspaceId);
+		const stopped = await stopSandbox(workspace.providerSandboxId);
+		await recordSandboxAsleep(boot.cloudWorkspaceId, stopped);
 		await setUsageStopAt(boot, null);
 		return "stopped";
 	} catch (error) {
@@ -568,7 +568,7 @@ export async function settleOrganizationNow(
 		rows.map(({ id, cloudWorkspaceId, providerSandboxId }) =>
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
-						.then(() => recordSandboxAsleep(cloudWorkspaceId))
+						.then((stopped) => recordSandboxAsleep(cloudWorkspaceId, stopped))
 						.catch((error) =>
 							Sentry.captureException(error, { extra: { bootId: id } }),
 						)
@@ -659,8 +659,8 @@ async function adoptRunningBoxes(
 			console.error(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
-			await stopSandbox(workspace.providerSandboxId);
-			await recordSandboxAsleep(workspace.id);
+			const stopped = await stopSandbox(workspace.providerSandboxId);
+			await recordSandboxAsleep(workspace.id, stopped);
 		}
 	}
 	return adopted;

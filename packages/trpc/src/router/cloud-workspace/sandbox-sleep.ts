@@ -1,7 +1,18 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
+import { AWAKE_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
+import {
+	and,
+	eq,
+	gt,
+	inArray,
+	isNull,
+	notInArray,
+	or,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
@@ -23,22 +34,46 @@ export function reportSleepWriteFailure(
 	Sentry.captureException(error, { extra: { cloudWorkspaceId } });
 }
 
+/**
+ * The row still records the session that stopped. A wake between the stop
+ * and this write recorded its own, newer session, and asleep would then mark
+ * a running box. A null session id means the box has none left to compare.
+ */
+export function stillStoppedSession(sessionId: string | null): SQL | undefined {
+	if (sessionId === null) return undefined;
+	return or(
+		isNull(cloudWorkspaces.sandboxSessionId),
+		eq(cloudWorkspaces.sandboxSessionId, sessionId),
+	);
+}
+
+/** `sessionId` is the session the caller saw stopped, read before or at the stop. */
 export async function recordSandboxAsleep(
 	cloudWorkspaceId: string,
+	{ sessionId }: { sessionId: string | null },
 ): Promise<void> {
-	await markAsleep(cloudWorkspaceId).catch((error) =>
+	await markAsleep(cloudWorkspaceId, sessionId).catch((error) =>
 		reportSleepWriteFailure(cloudWorkspaceId, error),
 	);
 }
 
-async function markAsleep(cloudWorkspaceId: string): Promise<void> {
+async function markAsleep(
+	cloudWorkspaceId: string,
+	sessionId: string | null,
+): Promise<void> {
+	const recorded = {
+		sandboxExpiresAt: sql`now()`,
+		...(sessionId ? { sandboxSessionId: sessionId } : {}),
+		...keepUpdatedAt,
+	};
 	const [slept] = await db
 		.update(cloudWorkspaces)
-		.set({ status: "asleep", sandboxExpiresAt: sql`now()`, ...keepUpdatedAt })
+		.set({ status: "asleep", ...recorded })
 		.where(
 			and(
 				eq(cloudWorkspaces.id, cloudWorkspaceId),
-				eq(cloudWorkspaces.status, "ready"),
+				inArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+				stillStoppedSession(sessionId),
 			),
 		)
 		.returning({ organizationId: cloudWorkspaces.organizationId });
@@ -48,10 +83,12 @@ async function markAsleep(cloudWorkspaceId: string): Promise<void> {
 	}
 	await db
 		.update(cloudWorkspaces)
-		.set({ sandboxExpiresAt: sql`now()`, ...keepUpdatedAt })
+		.set(recorded)
 		.where(
 			and(
 				eq(cloudWorkspaces.id, cloudWorkspaceId),
+				notInArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+				stillStoppedSession(sessionId),
 				or(
 					isNull(cloudWorkspaces.sandboxExpiresAt),
 					gt(cloudWorkspaces.sandboxExpiresAt, sql`now()`),

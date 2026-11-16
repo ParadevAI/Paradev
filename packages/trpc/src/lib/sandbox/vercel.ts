@@ -83,6 +83,15 @@ function isUnavailable(error: unknown): boolean {
 	);
 }
 
+/** Vercel starts a new session on every resume, so the id tells a stale record from a fresh one. */
+function sessionIdOf(sandbox: Sandbox): string | null {
+	try {
+		return sandbox.currentSession().sessionId;
+	} catch {
+		return null;
+	}
+}
+
 async function getSandbox(name: string): Promise<Sandbox | null> {
 	try {
 		return await Sandbox.get({ ...credentials(), name, resume: false });
@@ -197,6 +206,7 @@ export async function provisionSandbox(args: {
 	sandboxUrl: string;
 	hostTarget: string;
 	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	const kind = args.kind ?? "workspace";
 	const config = {
@@ -252,6 +262,7 @@ export async function provisionSandbox(args: {
 		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
 		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
 		expiresAt: sandbox.expiresAt ?? null,
+		sessionId: sessionIdOf(sandbox),
 	};
 }
 
@@ -361,6 +372,7 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	vcpus: number | undefined;
 	/** When the running session ends unless extended; null when stopped. */
 	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -375,6 +387,7 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 			// `sandbox.vcpus` is the configured size, which a running session does not pick up.
 			vcpus: running ? sandbox.currentSession().vcpus : sandbox.vcpus,
 			expiresAt: running ? (sandbox.expiresAt ?? null) : null,
+			sessionId: sessionIdOf(sandbox),
 		};
 	} catch (error) {
 		if (isUnavailable(error))
@@ -391,7 +404,7 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
  */
 export async function topUpSandboxSession(
 	providerSandboxId: string,
-): Promise<{ expiresAt: Date } | null> {
+): Promise<{ expiresAt: Date; sessionId: string | null } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
 	if (sandbox?.status !== "running" || !sandbox.expiresAt) return null;
 	const extension =
@@ -399,7 +412,9 @@ export async function topUpSandboxSession(
 	if (extension > MIN_TOP_UP_MS) {
 		await sandbox.currentSession().extendTimeout(extension);
 	}
-	return sandbox.expiresAt ? { expiresAt: sandbox.expiresAt } : null;
+	return sandbox.expiresAt
+		? { expiresAt: sandbox.expiresAt, sessionId: sessionIdOf(sandbox) }
+		: null;
 }
 
 /** Whether host-service is already serving, so a wake can skip the boot. */
@@ -436,6 +451,7 @@ export async function wakeSandbox(args: {
 	rebooted: boolean;
 	answer: HostAnswer;
 	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -511,6 +527,7 @@ export async function wakeSandbox(args: {
 			rebooted: !serving,
 			answer,
 			expiresAt: sandbox.expiresAt ?? null,
+			sessionId: sessionIdOf(sandbox),
 		};
 	} catch (error) {
 		if (isUnavailable(error))
@@ -555,11 +572,16 @@ export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
  * Stops a sandbox and returns once the snapshot forks would start from is
  * current. What a release does to a golden it has finished building.
  */
-export async function stopAndSnapshot(name: string): Promise<void> {
+/** Returns the session it stopped. */
+export async function stopAndSnapshot(
+	name: string,
+): Promise<{ sessionId: string | null }> {
 	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
 	const before = sandbox.currentSnapshotId;
+	const sessionId = sessionIdOf(sandbox);
 	await sandbox.stop();
 	await waitForStopSnapshot(name, before);
+	return { sessionId };
 }
 
 /**
@@ -641,10 +663,15 @@ export async function sandboxExists(
 	return (await getSandbox(providerSandboxId)) !== null;
 }
 
-export async function stopSandbox(providerSandboxId: string): Promise<void> {
+/** Returns the session that is now stopped: the one it stopped, or the one it found stopped. */
+export async function stopSandbox(
+	providerSandboxId: string,
+): Promise<{ sessionId: string | null }> {
 	const sandbox = await getSandbox(providerSandboxId);
-	if (!sandbox || sandbox.status !== "running") return;
-	await sandbox.stop();
+	if (!sandbox) return { sessionId: null };
+	const sessionId = sessionIdOf(sandbox);
+	if (sandbox.status === "running") await sandbox.stop();
+	return { sessionId };
 }
 
 export interface BoxSession {
@@ -731,6 +758,7 @@ export interface ActiveWorkspaceSandbox {
 	name: string;
 	/** When the running session ends unless extended; null when it is not running. */
 	expiresAt: Date | null;
+	sessionId: string | null;
 }
 
 export async function listActiveWorkspaceSandboxes(
@@ -754,6 +782,7 @@ export async function listActiveWorkspaceSandboxes(
 					sandbox.status === "running" && sandbox.expiresAt
 						? new Date(sandbox.expiresAt)
 						: null,
+				sessionId: sandbox.currentSessionId ?? null,
 			});
 		}
 	}

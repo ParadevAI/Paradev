@@ -4939,6 +4939,9 @@ msgstr "Využití cloudu"
 msgid "Cloud workspace"
 msgstr "Cloudový pracovní prostor"
 
+msgid "Cloud workspace: asleep"
+msgstr "Cloudový pracovní prostor: uspaný"
+
 msgid "Cloud workspace: connecting"
 msgstr "Cloudový pracovní prostor: připojuji"
 

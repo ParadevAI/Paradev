@@ -549,15 +549,19 @@ webhook for that or for a crash. The client cannot ask either: one
 provider read per row per client costs a `Sandbox.get` and a ticket mint, and
 an org-wide `Sandbox.list` pages 50 boxes at a time in creation order.
 **What we did:** every path that starts, extends or stops a box records when
-its session ends (`cloud_workspaces.sandbox_expires_at`) and moves the row
-between `ready` and `asleep`; our own stops write `asleep` at once. A QStash
-watch runs just after each expiry, confirms the stop with one provider read,
-writes `asleep` and nudges clients; an extension only moves the expiry, which
-the watch follows. A stop we did not cause (about 0.5% of sessions end
-`failed`), or a lost watch, is corrected by the 30-minute reconcile. Opening
-an `asleep` workspace wakes it like a `ready` one
-(`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`,
-`sandbox-expiry.ts`.
+its session ends (`cloud_workspaces.sandbox_expires_at`) and which Vercel
+session it is (`sandbox_session_id`), and moves the row between `awake` and
+`asleep`; our own stops write `asleep` at once. A QStash watch runs just after
+each expiry, confirms the stop with one provider read, writes `asleep` and
+nudges clients; an extension only moves the expiry, which the watch follows. A
+stop we did not cause (about 0.5% of sessions end `failed`), or a lost watch,
+is corrected by the 30-minute reconcile. Every write is decided from a Vercel
+read that can be stale by the time it lands, so an `asleep` write needs the row
+to still record the session that stopped, and an `awake` write flips an asleep
+row only for a new session: Vercel never resumes a session, it starts a new
+one. Opening an `asleep` workspace wakes it like an `awake` one
+(`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`, `sandbox-expiry.ts`;
+model: `.agents/skills/verify-sandbox-asleep`.
 
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum

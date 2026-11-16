@@ -4939,6 +4939,9 @@ msgstr "クラウド使用量"
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
+msgid "Cloud workspace: asleep"
+msgstr "クラウドワークスペース：スリープ中"
+
 msgid "Cloud workspace: connecting"
 msgstr "クラウドワークスペース：接続中"
 

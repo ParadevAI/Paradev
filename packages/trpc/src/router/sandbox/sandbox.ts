@@ -13,7 +13,7 @@ export const sandboxRouter = {
 				ctx.sandboxWorkspace.providerSandboxId,
 			);
 			if (session) {
-				await recordSandboxAwake(ctx.sandboxWorkspace.id, session.expiresAt);
+				await recordSandboxAwake(ctx.sandboxWorkspace.id, session);
 			}
 		}
 		return { success: true };

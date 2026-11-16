@@ -9,6 +9,7 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
 import { resolveMachineSize } from "../../lib/billing/plan";
@@ -259,7 +260,11 @@ async function reachablePin(
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 	});
-	if (!row || row.status === "deleted" || row.status === "failed") {
+	if (
+		!row ||
+		isArchivedCloudWorkspaceStatus(row.status) ||
+		row.status === "failed"
+	) {
 		return null;
 	}
 	if (row.status === "provisioning") {

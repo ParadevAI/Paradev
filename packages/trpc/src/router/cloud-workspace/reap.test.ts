@@ -28,11 +28,17 @@ let onArchiveHook: () => void = () => {};
 let reapedFiles: string[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
-stub(sandboxSleep, { recordSandboxAsleep: () => Promise.resolve() });
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: (id: string, stopped: { sessionId: string | null }) => {
+		recordedAsleep.push([id, stopped]);
+		return Promise.resolve();
+	},
+});
 stub(sandbox, {
 	stopSandbox: (id: string) => {
 		sandboxCalls.push(`stop:${id}`);
-		return Promise.resolve();
+		return Promise.resolve({ sessionId: "session_1" });
 	},
 	deleteSandbox: (id: string) => {
 		sandboxCalls.push(`delete:${id}`);
@@ -103,6 +109,7 @@ describe("queueReap", () => {
 		sandboxCalls = [];
 		queued = [];
 		failingStage = null;
+		recordedAsleep = [];
 	});
 
 	test("queues the delete after seven days and the stop after a minute", async () => {
@@ -122,10 +129,13 @@ describe("queueReap", () => {
 		expect(sandboxCalls).toEqual([]);
 	});
 
-	test("a stop that could not be queued stops the box now and keeps the disk", async () => {
+	test("a stop that could not be queued stops the box now, keeps the disk and records the stop", async () => {
 		failingStage = "stop";
 		await queueReap(input, "ws-box");
 		expect(sandboxCalls).toEqual(["stop:ws-box"]);
+		expect(recordedAsleep).toEqual([
+			[input.cloudWorkspaceId, { sessionId: "session_1" }],
+		]);
 		expect(queued.map((job) => (job.body as { stage: Stage }).stage)).toEqual([
 			"delete",
 		]);
@@ -142,7 +152,7 @@ describe("reapArchivedCloudWorkspace", () => {
 	beforeEach(() => {
 		row = {
 			id: input.cloudWorkspaceId,
-			status: "deleted",
+			status: "archived",
 			deletedAt: archivedAt,
 			provider: "vercel",
 			providerSandboxId: "ws-box",
@@ -155,6 +165,7 @@ describe("reapArchivedCloudWorkspace", () => {
 		archiveHook = { kind: "ran", status: "ok" };
 		onArchiveHook = () => {};
 		reapedFiles = [];
+		recordedAsleep = [];
 	});
 
 	test("the stop stage runs the archive hook, stops the box and queues its final settle", async () => {
@@ -162,6 +173,9 @@ describe("reapArchivedCloudWorkspace", () => {
 			"stopped",
 		);
 		expect(sandboxCalls).toEqual(["archive-hook", "stop:ws-box"]);
+		expect(recordedAsleep).toEqual([
+			[input.cloudWorkspaceId, { sessionId: "session_1" }],
+		]);
 		expect(meterCalls).toEqual(["queue"]);
 		expect(queued).toEqual([]);
 		expect(reapedFiles).toEqual([]);
@@ -194,7 +208,7 @@ describe("reapArchivedCloudWorkspace", () => {
 
 	test("an undo during the hook re-runs setup and leaves the box running", async () => {
 		onArchiveHook = () => {
-			row = { ...(row as Row), status: "ready", deletedAt: null };
+			row = { ...(row as Row), status: "awake", deletedAt: null };
 		};
 		expect(await reapArchivedCloudWorkspace({ ...input, stage: "stop" })).toBe(
 			"skipped",
@@ -226,7 +240,7 @@ describe("reapArchivedCloudWorkspace", () => {
 
 	for (const stage of ["stop", "delete"] as const) {
 		test(`the ${stage} stage leaves an unarchived workspace alone`, async () => {
-			row = { ...(row as Row), status: "ready", deletedAt: null };
+			row = { ...(row as Row), status: "awake", deletedAt: null };
 			expect(await reapArchivedCloudWorkspace({ ...input, stage })).toBe(
 				"skipped",
 			);
@@ -253,7 +267,7 @@ describe("reapArchivedCloudWorkspace", () => {
 		).toBe("skipped");
 		row = {
 			id: input.cloudWorkspaceId,
-			status: "deleted",
+			status: "archived",
 			deletedAt: archivedAt,
 			provider: "e2b",
 			providerSandboxId: "old-box",

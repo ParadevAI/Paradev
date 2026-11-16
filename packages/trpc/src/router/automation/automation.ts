@@ -22,6 +22,7 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
+import { ARCHIVED_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
 import {
 	FAILED_RUN_STATUSES,
 	MISSED_RUN_STATUSES,
@@ -361,7 +362,10 @@ async function ownCloudWorkspaceEnvironment(
 		where: and(
 			eq(cloudWorkspaces.id, cloudWorkspaceId),
 			eq(cloudWorkspaces.organizationId, organizationId),
-			notInArray(cloudWorkspaces.status, ["deleted", "failed"]),
+			notInArray(cloudWorkspaces.status, [
+				...ARCHIVED_CLOUD_WORKSPACE_STATUSES,
+				"failed",
+			]),
 		),
 		columns: { environmentId: true, createdByUserId: true },
 	});

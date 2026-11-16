@@ -202,6 +202,7 @@
 		"google-auth-library": "10.5.0",
 		"posthog-node": "5.28.8",
 		"resend": "6.18.0",
+		"semver": "7.7.4",
 		"superjson": "2.2.6",
 		"undici": "7.30.0",
 		"zod": "4.6.6"
@@ -210,6 +211,7 @@
 		"@microsoft/microsoft-graph-types": "2.43.1",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
+		"@types/semver": "7.7.1",
 		"typescript": "7.0.2"
 	}
 }

@@ -58,7 +58,7 @@ describe("buildCloudSidebarWorkspaces", () => {
 		const layout = build({
 			cloudWorkspaces: [
 				makeCloudWorkspace({ id: "asleep", status: "asleep" }),
-				makeCloudWorkspace({ id: "ready", status: "ready" }),
+				makeCloudWorkspace({ id: "awake", status: "awake" }),
 				makeCloudWorkspace({ id: "older-api" }),
 				makeCloudWorkspace({ id: "provisioning", status: "provisioning" }),
 			],
@@ -70,7 +70,7 @@ describe("buildCloudSidebarWorkspaces", () => {
 		);
 		expect(statusById).toEqual({
 			asleep: "asleep",
-			ready: null,
+			awake: null,
 			"older-api": null,
 			provisioning: "provisioning",
 		});

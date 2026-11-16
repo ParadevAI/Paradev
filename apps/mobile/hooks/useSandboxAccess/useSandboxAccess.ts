@@ -55,7 +55,7 @@ export function useSandboxAccess(
 ): SandboxAccessValue {
 	const queryClient = useQueryClient();
 
-	// Only a `ready` or `asleep` row has a sandbox to address: `access` refuses anything
+	// Only an `awake` or `asleep` row has a sandbox to address: `access` refuses anything
 	// else, and a provisioning workspace asking for a ticket every few seconds
 	// would be a retry loop against a guaranteed rejection.
 	const ready =

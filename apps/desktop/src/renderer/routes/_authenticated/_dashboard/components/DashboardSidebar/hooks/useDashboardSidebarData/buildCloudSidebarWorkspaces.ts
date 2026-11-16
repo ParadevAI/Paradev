@@ -1,3 +1,4 @@
+import type { CloudWorkspaceStatus } from "@superset/db/schema";
 import { sortByLastAgentMessage } from "@superset/shared/cloud-workspace-groups";
 import type {
 	PullRequestCheck,
@@ -21,7 +22,7 @@ export interface CloudSidebarWorkspaceInput {
 	updatedAt: Date;
 	agentStatusAt: Date | null;
 	createdBy: { userId: string; name: string; image: string | null } | null;
-	status?: "provisioning" | "ready" | "asleep" | "failed" | "deleted";
+	status?: CloudWorkspaceStatus;
 }
 
 export interface CloudSidebarPullRequestInput {

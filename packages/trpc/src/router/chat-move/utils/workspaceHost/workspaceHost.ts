@@ -1,6 +1,7 @@
 import { mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	buildHostRoutingKey,
 	SUPERSET_USER_ID_HEADER,
@@ -61,7 +62,7 @@ export async function workspaceHost(args: {
 		),
 	});
 	if (!cloud) throw new Error("The cloud workspace is gone");
-	if (cloud.status !== "ready") {
+	if (!isLiveCloudWorkspaceStatus(cloud.status)) {
 		throw new Error(`The cloud workspace is ${cloud.status}`);
 	}
 	const { hostTarget } = await wakeCloudWorkspace(cloud);

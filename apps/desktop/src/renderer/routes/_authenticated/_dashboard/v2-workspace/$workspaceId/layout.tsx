@@ -159,7 +159,7 @@ function V2WorkspaceLayout() {
 		cache.refetchAll,
 	);
 
-	// A `ready` row only means the box has started booting. Its address request
+	// An `awake` row only means the box has started booting. Its address request
 	// is batched with the wake, which waits for host-service to answer.
 	if (!workspace && cloudWorkspace) {
 		const provisioning = (

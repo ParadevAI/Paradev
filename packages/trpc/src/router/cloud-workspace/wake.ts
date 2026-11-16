@@ -74,30 +74,31 @@ async function wake(
 	);
 	let bootId: string | null = null;
 	const wakeStartedAt = Date.now();
-	const { hostTarget, booted, rebooted, answer, expiresAt } = await wakeSandbox({
-		providerSandboxId: row.providerSandboxId,
-		claim,
-		beforeResume: async (box) => {
-			({ bootId } = await Sentry.startSpan(
-				{ name: "authorize boot", op: "billing" },
-				() =>
-					authorizeBoot({
-						organizationId: row.organizationId,
-						cloudWorkspaceId: row.id,
-						createdByUserId: row.createdByUserId,
-						...box,
-					}),
-			));
-		},
-	}).catch(async (error) => {
-		if (bootId) {
-			await attachBootSession({
-				bootId,
-				providerSandboxId: row.providerSandboxId,
-			}).catch(() => {});
-		}
-		throw error;
-	});
+	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
+		await wakeSandbox({
+			providerSandboxId: row.providerSandboxId,
+			claim,
+			beforeResume: async (box) => {
+				({ bootId } = await Sentry.startSpan(
+					{ name: "authorize boot", op: "billing" },
+					() =>
+						authorizeBoot({
+							organizationId: row.organizationId,
+							cloudWorkspaceId: row.id,
+							createdByUserId: row.createdByUserId,
+							...box,
+						}),
+				));
+			},
+		}).catch(async (error) => {
+			if (bootId) {
+				await attachBootSession({
+					bootId,
+					providerSandboxId: row.providerSandboxId,
+				}).catch(() => {});
+			}
+			throw error;
+		});
 	if (bootId) {
 		await attachBootSession({
 			bootId,
@@ -126,7 +127,7 @@ async function wake(
 			.set(set)
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
-	if (expiresAt) await recordSandboxAwake(row.id, expiresAt);
+	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
 	return {
 		hostTarget,
 		booted,
@@ -145,15 +146,15 @@ export async function restartCloudWorkspace(
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
 	if (running) {
-		await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id);
+		const stopped = await stopAndSnapshot(row.providerSandboxId);
+		await recordSandboxAsleep(row.id, stopped);
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);
 }
 
 /**
- * For a sandbox that is gone or can never resume. A `ready` row nothing can
+ * For a sandbox that is gone or can never resume. An `awake` row nothing can
  * open would sit in the sidebar forever; failed is the state the client
  * already renders with a way out.
  */
@@ -163,7 +164,7 @@ export async function markSandboxUnavailable(
 ): Promise<void> {
 	await transitionCloudWorkspace({
 		id: row.id,
-		from: ["ready", "asleep"],
+		from: ["awake", "ready", "asleep"],
 		to: "failed",
 		set: { sandboxUrl: null },
 	});

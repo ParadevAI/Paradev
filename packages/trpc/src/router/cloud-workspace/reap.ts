@@ -1,5 +1,6 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { eq } from "drizzle-orm";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
@@ -34,7 +35,7 @@ function isStillArchived(
 ): row is CloudWorkspaceRow {
 	return (
 		row !== undefined &&
-		row.status === "deleted" &&
+		isArchivedCloudWorkspaceStatus(row.status) &&
 		row.deletedAt?.toISOString() === input.archivedAt &&
 		row.provider === "vercel"
 	);
@@ -96,8 +97,8 @@ export async function reapArchivedCloudWorkspace(
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
-	await stopSandbox(row.providerSandboxId);
-	await recordSandboxAsleep(row.id);
+	const stopped = await stopSandbox(row.providerSandboxId);
+	await recordSandboxAsleep(row.id, stopped);
 	await queueSettleWorkspace(row.id);
 	return "stopped";
 }
@@ -147,6 +148,7 @@ export async function queueReap(
 			`[cloud-workspace] could not queue the stop for ${input.cloudWorkspaceId}`,
 			error,
 		);
-		await stopSandbox(providerSandboxId);
+		const stopped = await stopSandbox(providerSandboxId);
+		await recordSandboxAsleep(input.cloudWorkspaceId, stopped);
 	});
 }

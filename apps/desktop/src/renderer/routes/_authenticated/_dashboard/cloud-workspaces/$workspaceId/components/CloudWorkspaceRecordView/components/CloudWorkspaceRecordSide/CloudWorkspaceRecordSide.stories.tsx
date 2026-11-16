@@ -27,7 +27,7 @@ const meta = {
 		workspace: {
 			id: "lag-repro-01",
 			name: "lag-repro-01",
-			status: "ready",
+			status: "awake",
 			agentStatus: "working",
 			agentStatusAt: ago(2),
 			createdAt: ago(240),

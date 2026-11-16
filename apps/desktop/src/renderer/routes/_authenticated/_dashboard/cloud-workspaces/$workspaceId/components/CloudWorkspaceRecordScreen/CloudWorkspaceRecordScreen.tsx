@@ -1,6 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
-import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
+import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { TRPCClientError } from "@trpc/client";
@@ -119,8 +122,8 @@ export function CloudWorkspaceRecordScreen({
 	const data = record.data;
 	const listed = workspaces?.find((row) => row.id === workspaceId);
 	const { byWorkspace: pullRequestsById } = useCloudPullRequests({
-		active: data !== undefined && data.status !== "deleted",
-		archived: data?.status === "deleted",
+		active: data !== undefined && !isArchivedCloudWorkspaceStatus(data.status),
+		archived: isArchivedCloudWorkspaceStatus(data?.status),
 	});
 	const pullRequests: CloudPullRequest[] =
 		pullRequestsById.get(workspaceId) ?? [];
