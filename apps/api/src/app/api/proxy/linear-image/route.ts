@@ -3,6 +3,7 @@ import {
 	connectionAccessToken,
 	userConnection,
 } from "@superset/trpc/connectors";
+import { unauthenticatedResponse } from "@/lib/signInRedirect";
 
 const LINEAR_IMAGE_HOST = "uploads.linear.app";
 const CACHE_MAX_AGE = 31536000; // 1 year (Linear URLs are content-addressed)
@@ -13,7 +14,10 @@ export async function GET(request: Request): Promise<Response> {
 	});
 
 	if (!sessionData?.user) {
-		return new Response("Unauthorized", { status: 401 });
+		return unauthenticatedResponse(
+			request,
+			new Response("Unauthorized", { status: 401 }),
+		);
 	}
 
 	const organizationId = sessionData.session.activeOrganizationId;

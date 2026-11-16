@@ -6093,6 +6093,9 @@ msgstr "Tidak bisa menyetel ikon"
 msgid "Could not share"
 msgstr "Tidak bisa membagikan"
 
+msgid "Could not sign out. Please try again."
+msgstr "Tidak dapat keluar. Coba lagi."
+
 msgid "Could not start agent"
 msgstr "Tidak bisa memulai agen"
 
@@ -18766,6 +18769,9 @@ msgstr "Masuk ke {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Masuk untuk mengubah plugin organisasi Anda."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Masuk untuk menghubungkan {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Masuk untuk melanjutkan"
 
@@ -18786,6 +18792,12 @@ msgstr "Masuk untuk melihat halaman ini"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Masuk dengan {browserProviderLabel}, lalu kembali ke sini."
+
+msgid "Sign in with another account"
+msgstr "Masuk dengan akun lain"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Masuk dengan akun lain, atau minta admin organisasi untuk mengundang Anda."
 
 msgid "Sign in with email"
 msgstr "Masuk dengan email"
@@ -18872,6 +18884,9 @@ msgstr "Sedang masuk..."
 
 msgid "Signing in…"
 msgstr "Sedang masuk…"
+
+msgid "Signing out…"
+msgstr "Sedang keluar…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Pendaftaran berhasil. Layar sambutan termuat dan konsol bersih."
@@ -20775,6 +20790,9 @@ msgstr "Otomatisasi ini diarsipkan. Pulihkan terlebih dahulu."
 msgid "This automation is in another organization"
 msgstr "Otomatisasi ini berada di organisasi lain"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Browser ini belum masuk ke Paradev. Masuk untuk melanjutkan ke {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."
 
@@ -22096,6 +22114,12 @@ msgstr "Pakai “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Pakai path relatif terhadap workspace atau folder absolut."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Gunakan akun lain untuk menghubungkan {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Gunakan akun lain untuk melanjutkan"
+
 msgid "Use another port"
 msgstr "Gunakan port lain"
 
@@ -23148,6 +23172,9 @@ msgstr "Anda sedang offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Anda memakai <0>paket {currentPlanLabel}</0>. Kalau ada pertanyaan atau butuh bantuan lebih lanjut soal paket Anda, <1>hubungi kami<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Anda masuk sebagai {email}. Akun ini bukan anggota organisasi untuk tautan ini."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Anda satu-satunya pemilik organisasi yang punya anggota lain. Alihkan kepemilikan atau hapus organisasinya dulu."
 
@@ -23297,6 +23324,9 @@ msgstr "Akun Anda dinonaktifkan dan akan segera dihapus permanen. Aktifkan kemba
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Akun Anda dikelola oleh organisasi Anda. Hubungi admin Anda untuk membuat organisasi baru."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Akun Anda bukan anggota organisasi untuk tautan ini."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agen Anda bisa membuka halaman apa pun dan menjelajahinya dengan perintah superset browser. Agen memakai panel yang sedang Anda lihat, jadi Anda melihat setiap langkah."
 
@@ -23392,6 +23422,12 @@ msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menja
 
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan ke {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Paket Anda tidak mencakup lingkungan cloud."

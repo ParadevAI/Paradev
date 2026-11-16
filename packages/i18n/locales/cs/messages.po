@@ -6093,6 +6093,9 @@ msgstr "Nepodařilo se nastavit ikonu"
 msgid "Could not share"
 msgstr "Nepodařilo se sdílet"
 
+msgid "Could not sign out. Please try again."
+msgstr "Odhlášení se nezdařilo. Zkuste to znovu."
+
 msgid "Could not start agent"
 msgstr "Nepodařilo se spustit agenta"
 
@@ -18766,6 +18769,9 @@ msgstr "Přihlásit se do {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Pro změnu pluginů organizace se přihlaste."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Přihlaste se a připojte {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Pro pokračování se přihlaste"
 
@@ -18786,6 +18792,12 @@ msgstr "Přihlaste se, abyste zobrazili tuto stránku"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Přihlaste se přes {browserProviderLabel} a pak se sem vraťte."
+
+msgid "Sign in with another account"
+msgstr "Přihlásit se jiným účtem"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Přihlaste se jiným účtem, nebo požádejte správce organizace o pozvánku."
 
 msgid "Sign in with email"
 msgstr "Přihlásit se e-mailem"
@@ -18872,6 +18884,9 @@ msgstr "Přihlašuji..."
 
 msgid "Signing in…"
 msgstr "Přihlašování…"
+
+msgid "Signing out…"
+msgstr "Odhlašování…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Registrace funguje. Uvítací obrazovka se načte a konzole je čistá."
@@ -20775,6 +20790,9 @@ msgstr "Tato automatizace je archivovaná. Nejprve ji obnovte."
 msgid "This automation is in another organization"
 msgstr "Tato automatizace je v jiné organizaci"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Tento prohlížeč není přihlášen do Paradevu. Přihlaste se a pokračujte do {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "Nelze vrátit zpět."
 
@@ -22096,6 +22114,12 @@ msgstr "Použít „{0}“"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Použijte cestu relativní k pracovnímu prostoru nebo absolutní složku."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Použijte jiný účet k připojení {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Pokračujte s jiným účtem"
+
 msgid "Use another port"
 msgstr "Použít jiný port"
 
@@ -23148,6 +23172,9 @@ msgstr "Jste offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Máte <0>tarif {currentPlanLabel}</0>. Pokud máte dotazy nebo potřebujete s tarifem pomoct, <1>ozvěte se nám<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Jste přihlášeni jako {email}. Tento účet není členem organizace, pro kterou je tento odkaz."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Jste jediný vlastník organizace, která má další členy. Nejprve převeďte vlastnictví nebo organizaci smažte."
 
@@ -23297,6 +23324,9 @@ msgstr "Váš účet je deaktivovaný a brzy bude trvale smazán. Obnovte ho a b
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Váš účet spravuje vaše organizace. O vytvoření nové organizace požádejte svého správce."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Váš účet není členem organizace, pro kterou je tento odkaz."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent může otevřít libovolnou stránku a projít ji pomocí příkazů superset browser. Používá panel, na který se díváte, takže vidíte každý krok."
 
@@ -23392,6 +23422,12 @@ msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu 
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Vaše relace Paradev v tomto prohlížeči vypršela. Přihlaste se znovu a pokračujte do {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Vaše relace Paradev v tomto prohlížeči vypršela. Pro pokračování se přihlaste znovu."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Váš plán nezahrnuje cloudová prostředí."

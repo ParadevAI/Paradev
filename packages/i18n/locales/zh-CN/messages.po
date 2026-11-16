@@ -6093,6 +6093,9 @@ msgstr "无法设置图标"
 msgid "Could not share"
 msgstr "无法分享"
 
+msgid "Could not sign out. Please try again."
+msgstr "无法退出登录。请重试。"
+
 msgid "Could not start agent"
 msgstr "无法启动智能体"
 
@@ -18766,6 +18769,9 @@ msgstr "登录 {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "登录后才能更改组织的插件。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "登录以连接 {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "登录以继续"
 
@@ -18786,6 +18792,12 @@ msgstr "登录以查看此页面"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "使用 {browserProviderLabel} 登录后，再回到这里。"
+
+msgid "Sign in with another account"
+msgstr "使用其他账号登录"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "请使用其他账号登录，或请该组织的管理员邀请你。"
 
 msgid "Sign in with email"
 msgstr "使用邮箱登录"
@@ -18872,6 +18884,9 @@ msgstr "正在登录..."
 
 msgid "Signing in…"
 msgstr "正在登录…"
+
+msgid "Signing out…"
+msgstr "正在退出登录…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "注册正常。欢迎页面已加载，控制台没有错误。"
@@ -20775,6 +20790,9 @@ msgstr "此自动化已归档。请先恢复。"
 msgid "This automation is in another organization"
 msgstr "此自动化位于其他组织"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "此浏览器未登录 Paradev。请登录以继续前往 {connectorName}。"
+
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
@@ -22096,6 +22114,12 @@ msgstr "使用“{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相对于工作区的路径或绝对路径文件夹。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "使用其他账号连接 {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "使用其他账号继续"
+
 msgid "Use another port"
 msgstr "使用其他端口"
 
@@ -23148,6 +23172,9 @@ msgstr "你已离线"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "你当前使用的是<0>{currentPlanLabel}方案</0>。如有任何疑问，或希望就方案获得进一步支持，请<1>联系我们<2/></1>。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "你当前以 {email} 登录。此账号不是该链接所属组织的成员。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "你是某个仍有其他成员的组织的唯一所有者。请先转移所有权或删除该组织。"
 
@@ -23297,6 +23324,9 @@ msgstr "你的账户已停用，并将很快被永久删除。重新激活即可
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "你的账户由你所在的组织管理。请联系管理员来创建新组织。"
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "你的账号不是该链接所属组织的成员。"
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "你的智能体可以用 superset browser 命令打开任意页面并逐步操作。它使用你正在看的窗格，所以每一步你都能看到。"
 
@@ -23392,6 +23422,12 @@ msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续前往 {connectorName}。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的套餐不包含云端环境。"

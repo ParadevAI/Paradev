@@ -6093,6 +6093,9 @@ msgstr "Simge ayarlanamadı"
 msgid "Could not share"
 msgstr "Paylaşılamadı"
 
+msgid "Could not sign out. Please try again."
+msgstr "Oturum kapatılamadı. Lütfen tekrar deneyin."
+
 msgid "Could not start agent"
 msgstr "Ajan başlatılamadı"
 
@@ -18766,6 +18769,9 @@ msgstr "{label} ile oturum aç"
 msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} bağlantısı için oturum açın"
+
 msgid "Sign in to continue"
 msgstr "Devam etmek için oturum açın"
 
@@ -18786,6 +18792,12 @@ msgstr "Bu sayfayı görmek için oturum açın"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} ile giriş yapın, ardından buraya dönün."
+
+msgid "Sign in with another account"
+msgstr "Başka bir hesapla oturum açın"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Başka bir hesapla oturum açın veya kuruluşun bir yöneticisinden sizi davet etmesini isteyin."
 
 msgid "Sign in with email"
 msgstr "E-posta ile oturum aç"
@@ -18872,6 +18884,9 @@ msgstr "Oturum açılıyor..."
 
 msgid "Signing in…"
 msgstr "Oturum açılıyor…"
+
+msgid "Signing out…"
+msgstr "Oturum kapatılıyor…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Kayıt çalışıyor. Hoş geldiniz ekranı yükleniyor ve konsol temiz."
@@ -20775,6 +20790,9 @@ msgstr "Bu otomasyon arşivlendi. Önce geri yükleyin."
 msgid "This automation is in another organization"
 msgstr "Bu otomasyon başka bir kuruluşta"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Bu tarayıcıda Paradev oturumu açık değil. {connectorName} ile devam etmek için oturum açın."
+
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."
 
@@ -22096,6 +22114,12 @@ msgstr "“{0}” kullan"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Çalışma alanına göreli bir yol ya da mutlak bir klasör kullanın."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "{connectorName} bağlantısı için başka bir hesap kullanın"
+
+msgid "Use another account to continue"
+msgstr "Devam etmek için başka bir hesap kullanın"
+
 msgid "Use another port"
 msgstr "Başka bir port kullan"
 
@@ -23148,6 +23172,9 @@ msgstr "Çevrimdışısınız"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "<0>{currentPlanLabel} planındasınız</0>. Sorularınız varsa veya planınızla ilgili destek isterseniz <1>bize ulaşın<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} olarak oturum açtınız. Bu hesap, bu bağlantının ait olduğu kuruluşun üyesi değil."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Başka üyeleri olan bir kuruluşun tek sahibisiniz. Önce sahipliği devredin veya kuruluşu silin."
 
@@ -23297,6 +23324,9 @@ msgstr "Hesabınız devre dışı bırakıldı ve yakında kalıcı olarak silin
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Hesabınız kuruluşunuz tarafından yönetiliyor. Yeni bir kuruluş oluşturmak için yöneticinizle iletişime geçin."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Hesabınız, bu bağlantının ait olduğu kuruluşun üyesi değil."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Ajanınız superset browser komutlarıyla herhangi bir sayfayı açıp içinde ilerleyebilir. İzlediğiniz bölmeyi kullandığı için her adımı görürsünüz."
 
@@ -23392,6 +23422,12 @@ msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlar
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Bu tarayıcıdaki Paradev oturumunuzun süresi doldu. {connectorName} ile devam etmek için yeniden oturum açın."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Bu tarayıcıdaki Paradev oturumunuzun süresi doldu. Devam etmek için yeniden oturum açın."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Planınız bulut ortamlarını içermiyor."

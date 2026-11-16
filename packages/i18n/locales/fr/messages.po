@@ -6093,6 +6093,9 @@ msgstr "Impossible de définir l'icône"
 msgid "Could not share"
 msgstr "Impossible de partager"
 
+msgid "Could not sign out. Please try again."
+msgstr "Impossible de se déconnecter. Veuillez réessayer."
+
 msgid "Could not start agent"
 msgstr "Impossible de démarrer l'agent"
 
@@ -18766,6 +18769,9 @@ msgstr "Se connecter à {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Connectez-vous pour modifier les plugins de votre organisation."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Connectez-vous pour connecter {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Connectez-vous pour continuer"
 
@@ -18786,6 +18792,12 @@ msgstr "Connectez-vous pour voir cette page"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Connectez-vous avec {browserProviderLabel}, puis revenez ici."
+
+msgid "Sign in with another account"
+msgstr "Se connecter avec un autre compte"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Connectez-vous avec un autre compte, ou demandez à un administrateur de l’organisation de vous inviter."
 
 msgid "Sign in with email"
 msgstr "Se connecter par e-mail"
@@ -18872,6 +18884,9 @@ msgstr "Connexion..."
 
 msgid "Signing in…"
 msgstr "Connexion…"
+
+msgid "Signing out…"
+msgstr "Déconnexion…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "L'inscription fonctionne. L'écran d'accueil se charge et la console est propre."
@@ -20775,6 +20790,9 @@ msgstr "Cette automatisation est archivée. Restaurez-la d'abord."
 msgid "This automation is in another organization"
 msgstr "Cette automatisation se trouve dans une autre organisation"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Ce navigateur n’est pas connecté à Paradev. Connectez-vous pour continuer vers {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "Cette action est irréversible."
 
@@ -22096,6 +22114,12 @@ msgstr "Utiliser « {0} »"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Utilisez un chemin relatif à l'espace de travail ou un dossier absolu."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Utilisez un autre compte pour connecter {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Utilisez un autre compte pour continuer"
+
 msgid "Use another port"
 msgstr "Utiliser un autre port"
 
@@ -23148,6 +23172,9 @@ msgstr "Vous êtes hors ligne"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Vous êtes sur le <0>forfait {currentPlanLabel}</0>. Si vous avez des questions ou souhaitez une aide supplémentaire concernant votre forfait, <1>contactez-nous<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Vous êtes connecté en tant que {email}. Ce compte n’est pas membre de l’organisation de ce lien."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Vous êtes le seul propriétaire d'une organisation qui compte d'autres membres. Transférez la propriété ou supprimez l'organisation d'abord."
 
@@ -23297,6 +23324,9 @@ msgstr "Votre compte est désactivé et sera définitivement supprimé prochaine
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Votre compte est géré par votre organisation. Contactez votre administrateur pour créer une nouvelle organisation."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Votre compte n’est pas membre de l’organisation de ce lien."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Votre agent peut ouvrir n'importe quelle page et la parcourir avec les commandes superset browser. Il utilise le volet que vous regardez, donc vous voyez chaque étape."
 
@@ -23392,6 +23422,12 @@ msgstr "Vos propres comptes. Les intégrations de votre organisation permettent 
 
 msgid "Your Paradev download is starting."
 msgstr "Votre téléchargement de Paradev démarre."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer vers {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Votre forfait n'inclut pas d'environnements cloud."

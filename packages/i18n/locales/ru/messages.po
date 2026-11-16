@@ -6093,6 +6093,9 @@ msgstr "Не удалось установить иконку"
 msgid "Could not share"
 msgstr "Не удалось поделиться"
 
+msgid "Could not sign out. Please try again."
+msgstr "Не удалось выйти. Попробуйте ещё раз."
+
 msgid "Could not start agent"
 msgstr "Не удалось запустить агента"
 
@@ -18766,6 +18769,9 @@ msgstr "Войти в {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Войдите, чтобы изменить плагины организации."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Войдите, чтобы подключить {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Войдите, чтобы продолжить"
 
@@ -18786,6 +18792,12 @@ msgstr "Войдите, чтобы открыть эту страницу"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Войдите через {browserProviderLabel} и вернитесь сюда."
+
+msgid "Sign in with another account"
+msgstr "Войти с другой учётной записью"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Войдите с другой учётной записью или попросите администратора организации пригласить вас."
 
 msgid "Sign in with email"
 msgstr "Войти по email"
@@ -18872,6 +18884,9 @@ msgstr "Вход..."
 
 msgid "Signing in…"
 msgstr "Выполняется вход…"
+
+msgid "Signing out…"
+msgstr "Выход…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Регистрация работает. Экран приветствия загружается, в консоли нет ошибок."
@@ -20775,6 +20790,9 @@ msgstr "Эта автоматизация архивирована. Сначал
 msgid "This automation is in another organization"
 msgstr "Эта автоматизация находится в другой организации"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "В этом браузере не выполнен вход в Paradev. Войдите, чтобы перейти к {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "Это нельзя отменить."
 
@@ -22096,6 +22114,12 @@ msgstr "Использовать «{0}»"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Укажите путь относительно рабочей области или абсолютную папку."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Используйте другую учётную запись, чтобы подключить {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Используйте другую учётную запись, чтобы продолжить"
+
 msgid "Use another port"
 msgstr "Использовать другой порт"
 
@@ -23148,6 +23172,9 @@ msgstr "Нет подключения"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "У вас <0>тариф {currentPlanLabel}</0>. Если есть вопросы или нужна помощь с тарифом, <1>напишите нам<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Вы вошли как {email}. Эта учётная запись не входит в организацию, к которой относится эта ссылка."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Вы единственный владелец организации, в которой есть другие участники. Сначала передайте владение или удалите организацию."
 
@@ -23297,6 +23324,9 @@ msgstr "Аккаунт деактивирован и скоро будет бе�
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Вашим аккаунтом управляет ваша организация. Обратитесь к администратору, чтобы создать новую организацию."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Ваша учётная запись не входит в организацию, к которой относится эта ссылка."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Агент может открыть любую страницу и пройтись по ней с помощью команд superset browser. Он использует панель, на которую вы смотрите, поэтому вы видите каждый шаг."
 
@@ -23392,6 +23422,12 @@ msgstr "Ваши собственные учётные записи. Интег�
 
 msgid "Your Paradev download is starting."
 msgstr "Загрузка Paradev начинается."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Ваш сеанс Paradev в этом браузере истёк. Войдите снова, чтобы перейти к {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Ваш сеанс Paradev в этом браузере истёк. Войдите снова, чтобы продолжить."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Ваш тариф не включает облачные окружения."

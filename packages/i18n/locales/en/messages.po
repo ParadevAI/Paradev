@@ -6093,6 +6093,9 @@ msgstr "Could not set icon"
 msgid "Could not share"
 msgstr "Could not share"
 
+msgid "Could not sign out. Please try again."
+msgstr "Could not sign out. Please try again."
+
 msgid "Could not start agent"
 msgstr "Could not start agent"
 
@@ -18766,6 +18769,9 @@ msgstr "Sign in to {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Sign in to change your organization's plugins."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Sign in to connect {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Sign in to continue"
 
@@ -18786,6 +18792,12 @@ msgstr "Sign in to view this page"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Sign in with {browserProviderLabel}, then come back here."
+
+msgid "Sign in with another account"
+msgstr "Sign in with another account"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Sign in with another account, or ask an admin of the organization to invite you."
 
 msgid "Sign in with email"
 msgstr "Sign in with email"
@@ -18872,6 +18884,9 @@ msgstr "Signing in..."
 
 msgid "Signing in…"
 msgstr "Signing in…"
+
+msgid "Signing out…"
+msgstr "Signing out…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Signup works. The welcome screen loads and the console is clean."
@@ -20775,6 +20790,9 @@ msgstr "This automation is archived. Restore it first."
 msgid "This automation is in another organization"
 msgstr "This automation is in another organization"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "This cannot be undone."
 
@@ -22096,6 +22114,12 @@ msgstr "Use “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Use a workspace-relative path or an absolute folder."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Use another account to connect {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Use another account to continue"
+
 msgid "Use another port"
 msgstr "Use another port"
 
@@ -23148,6 +23172,9 @@ msgstr "You are offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "You are signed in as {email}. This account is not a member of the organization this link is for."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 
@@ -23297,6 +23324,9 @@ msgstr "Your account is deactivated and will be permanently deleted soon. Reacti
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Your account is managed by your organization. Contact your admin to create a new organization."
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Your account is not a member of the organization this link is for."
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 
@@ -23392,6 +23422,12 @@ msgstr "Your own accounts. Your organization's integrations let Paradev reach it
 
 msgid "Your Paradev download is starting."
 msgstr "Your Paradev download is starting."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Your Paradev session in this browser has expired. Sign in again to continue."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Your plan does not include cloud environments."

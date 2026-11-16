@@ -6093,6 +6093,9 @@ msgstr "アイコンを設定できませんでした"
 msgid "Could not share"
 msgstr "共有できませんでした"
 
+msgid "Could not sign out. Please try again."
+msgstr "サインアウトできませんでした。もう一度お試しください。"
+
 msgid "Could not start agent"
 msgstr "エージェントを起動できませんでした"
 
@@ -18766,6 +18769,9 @@ msgstr "{label}にサインイン"
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} に接続するにはサインインしてください"
+
 msgid "Sign in to continue"
 msgstr "続行するにはサインインしてください"
 
@@ -18786,6 +18792,12 @@ msgstr "サインインしてこのページを表示"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} でサインインしてから、ここに戻ってください。"
+
+msgid "Sign in with another account"
+msgstr "別のアカウントでサインイン"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "別のアカウントでサインインするか、組織の管理者に招待を依頼してください。"
 
 msgid "Sign in with email"
 msgstr "メールでサインイン"
@@ -18872,6 +18884,9 @@ msgstr "サインイン中..."
 
 msgid "Signing in…"
 msgstr "サインインしています…"
+
+msgid "Signing out…"
+msgstr "サインアウトしています…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "登録は正常に動いています。ウェルカム画面が表示され、コンソールにエラーはありません。"
@@ -20775,6 +20790,9 @@ msgstr "このオートメーションはアーカイブ済みです。先に復
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "このブラウザは Paradev にサインインしていません。サインインして {connectorName} に進んでください。"
+
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
 
@@ -22096,6 +22114,12 @@ msgstr "「{0}」を使用"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "ワークスペースからの相対パスか絶対パスのフォルダを指定します。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "別のアカウントで {connectorName} に接続"
+
+msgid "Use another account to continue"
+msgstr "別のアカウントで続行"
+
 msgid "Use another port"
 msgstr "別のポートを使用"
 
@@ -23148,6 +23172,9 @@ msgstr "オフラインです"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "現在<0>{currentPlanLabel}プラン</0>をご利用中です。プランについてご質問やサポートが必要な場合は、<1>お問い合わせ<2/></1>ください。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} としてサインインしています。このアカウントは、このリンクの組織のメンバーではありません。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "他にメンバーがいる組織の唯一のオーナーです。先にオーナー権限を移譲するか、組織を削除してください。"
 
@@ -23297,6 +23324,9 @@ msgstr "アカウントは無効化されており、まもなく完全に削除
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "アカウントは組織によって管理されています。新しい組織を作成するには管理者に連絡してください。"
 
+msgid "Your account is not a member of the organization this link is for."
+msgstr "あなたのアカウントは、このリンクの組織のメンバーではありません。"
+
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "エージェントは superset browser コマンドで任意のページを開いて操作できます。あなたが見ているペインを使うので、すべての手順が見えます。"
 
@@ -23392,6 +23422,12 @@ msgstr "あなた自身のアカウントです。組織の連携は Paradev が
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "このブラウザの Paradev セッションは期限切れです。もう一度サインインして {connectorName} に進んでください。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "このブラウザの Paradev セッションは期限切れです。続行するにはもう一度サインインしてください。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。"
