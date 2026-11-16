@@ -1,10 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import { CommandGroup, CommandItem } from "@superset/ui/command";
-import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import { Layers } from "lucide-react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { openWorkspaceList } from "../../../../modules/navigation/commands";
+import { KeyCaps } from "../../../KeyCaps";
 import { WorkspaceSwitcherRow } from "../../../WorkspaceList/components/WorkspaceSwitcherRow";
 import { useSwitchToWorkspace } from "../../../WorkspaceList/hooks/useSwitchToWorkspace";
 import type { SwitcherRow } from "../../../WorkspaceList/utils/bucketWorkspaces";
@@ -46,17 +46,7 @@ export function RootWorkspacesSection({
 					{t({ message: "All workspaces" })}
 				</span>
 				{switcher.keys[0] !== "Unassigned" ? (
-					<KbdGroup className="ml-auto">
-						{switcher.keys.map((key, index) => (
-							<Kbd
-								// Chords never repeat a key, but a cap has no identity beyond its position.
-								key={`${index}-${key}`}
-								className="h-[18px] min-w-[18px] text-[11px]"
-							>
-								{key}
-							</Kbd>
-						))}
-					</KbdGroup>
+					<KeyCaps keys={switcher.keys} className="ml-auto" />
 				) : null}
 			</CommandItem>
 		</CommandGroup>

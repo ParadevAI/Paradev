@@ -1,11 +1,8 @@
 import { useHotkey } from "renderer/hotkeys";
 import { useFrameStackStore } from "../../core/frames";
+import { holdsAnyModifier } from "../../core/holdsAnyModifier";
 import { useCheckResourcesHotkey } from "../../hooks/useCheckResourcesHotkey";
 import { openWorkspaceList } from "../../modules/navigation/commands";
-
-function holdsAnyModifier(e: KeyboardEvent): boolean {
-	return e.metaKey || e.ctrlKey || e.altKey;
-}
 
 /**
  * First press opens the switcher. While it is open, each press selects the

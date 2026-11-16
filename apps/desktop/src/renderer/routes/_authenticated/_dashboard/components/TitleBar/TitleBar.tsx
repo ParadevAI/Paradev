@@ -4,7 +4,10 @@ import { ZoomStable } from "renderer/components/ZoomStable";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { useResolvedTheme } from "renderer/stores/theme";
+import {
+	setTitleBarOverlayColor,
+	useResolvedTheme,
+} from "renderer/stores/theme";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { TITLE_BAR_OVERLAY_HEIGHT } from "shared/constants";
 import { toHex } from "shared/themes/utils";
@@ -63,8 +66,12 @@ export function TitleBar() {
 				.catch((error: unknown) => {
 					console.warn("[TitleBar] window controls overlay not updated", error);
 				});
+		setTitleBarOverlayColor((ui) =>
+			shellFrameColor(ui.background, ui.foreground),
+		);
 		setOverlay(shellFrameColor(background, foreground), foreground, ROW_HEIGHT);
 		return () => {
+			setTitleBarOverlayColor(null);
 			setOverlay(background, foreground, TITLE_BAR_OVERLAY_HEIGHT);
 		};
 	}, [background, foreground]);

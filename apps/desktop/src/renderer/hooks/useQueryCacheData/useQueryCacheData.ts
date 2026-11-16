@@ -31,10 +31,7 @@ export function useQueryCacheData<T>(
 	enabled = true,
 ): readonly T[] {
 	const queryClient = useQueryClient();
-	const snapshot = useRef<{ fingerprint: string; data: readonly T[] }>({
-		fingerprint: "[]",
-		data: EMPTY,
-	});
+	const snapshot = useRef<readonly T[]>(EMPTY);
 
 	const subscribe = useCallback(
 		(onChange: () => void) => {
@@ -51,11 +48,14 @@ export function useQueryCacheData<T>(
 
 	return useSyncExternalStore(subscribe, () => {
 		if (!enabled) return EMPTY;
+		// React Query keeps a query's data reference while its content is
+		// unchanged, so comparing references is enough.
 		const data = readQueryCacheData<T>(queryClient, keyPrefix);
-		const fingerprint = JSON.stringify(data);
-		if (fingerprint !== snapshot.current.fingerprint) {
-			snapshot.current = { fingerprint, data };
-		}
-		return snapshot.current.data;
+		const previous = snapshot.current;
+		const unchanged =
+			data.length === previous.length &&
+			data.every((item, index) => item === previous[index]);
+		if (!unchanged) snapshot.current = data;
+		return snapshot.current;
 	});
 }

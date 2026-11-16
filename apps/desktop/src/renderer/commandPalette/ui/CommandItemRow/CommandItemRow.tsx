@@ -1,9 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
 import { CommandItem } from "@superset/ui/command";
-import { Kbd, KbdGroup } from "@superset/ui/kbd";
 import { ChevronRight } from "lucide-react";
 import { useHotkeyDisplay } from "renderer/hotkeys/hooks/useHotkeyDisplay";
 import type { Command } from "../../core/types";
+import { KeyCaps } from "../KeyCaps";
 import { MatchedText } from "../MatchedText";
 
 interface CommandItemRowProps {
@@ -44,17 +44,7 @@ export function CommandItemRow({
 				<MatchedText text={i18n._(command.title)} query={query} />
 			</span>
 			{hasShortcut ? (
-				<KbdGroup className="ml-auto">
-					{display.keys.map((key, index) => (
-						<Kbd
-							// Chords never repeat a key, but a cap has no identity beyond its position.
-							key={`${index}-${key}`}
-							className="h-[18px] min-w-[18px] text-[11px]"
-						>
-							{key}
-						</Kbd>
-					))}
-				</KbdGroup>
+				<KeyCaps keys={display.keys} className="ml-auto" />
 			) : opensFrame ? (
 				<ChevronRight className="ml-auto size-3.5 shrink-0 text-muted-foreground" />
 			) : null}

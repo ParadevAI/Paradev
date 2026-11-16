@@ -157,6 +157,19 @@ function syncThemeToLocalStorage(theme: Theme): void {
 	}
 }
 
+type OverlayColor = (ui: Theme["ui"]) => string;
+const pageBackground: OverlayColor = (ui) => ui.background;
+let titleBarOverlayColor = pageBackground;
+
+/**
+ * The window-controls overlay sits over whatever row is at the top of the
+ * window. A row in another colour than the page sets its colour here while
+ * it is mounted, so every theme change paints the overlay to match it.
+ */
+export function setTitleBarOverlayColor(color: OverlayColor | null): void {
+	titleBarOverlayColor = color ?? pageBackground;
+}
+
 /**
  * Apply a theme to the UI and terminal
  */
@@ -175,7 +188,7 @@ function applyTheme(
 	// as hex.
 	electronTrpcClient.window.setTitleBarOverlay
 		.mutate({
-			color: toHex(theme.ui.background),
+			color: toHex(titleBarOverlayColor(theme.ui)),
 			symbolColor: toHex(theme.ui.foreground),
 		})
 		.catch(() => {});

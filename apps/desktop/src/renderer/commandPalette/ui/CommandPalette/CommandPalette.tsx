@@ -17,6 +17,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { resolveHotkeyFromEvent } from "renderer/hotkeys";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
 import { useCommandContext } from "../../core/ContextProvider";
@@ -126,6 +127,8 @@ export function CommandPalette() {
 			const modifier = event.metaKey || event.ctrlKey;
 			if (isSwitcher && modifier && !event.shiftKey && !event.altKey) {
 				if (event.key === "Backspace") {
+					// With text typed, the chord edits the text.
+					if (query) return;
 					const selection = useFrameStackStore.getState().switcherSelection;
 					if (!selection) return;
 					event.preventDefault();
@@ -137,13 +140,16 @@ export function CommandPalette() {
 					});
 					return;
 				}
-				if (event.key.toLowerCase() === "n") {
-					event.preventDefault();
-					event.stopPropagation();
-					handleOpenChange(false);
-					openNewWorkspace();
-					return;
-				}
+			}
+			if (
+				isSwitcher &&
+				resolveHotkeyFromEvent(event.nativeEvent) === "NEW_WORKSPACE"
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				handleOpenChange(false);
+				openNewWorkspace();
+				return;
 			}
 			if (event.key !== "Enter") return;
 			if (!(event.target instanceof HTMLElement)) return;
@@ -152,7 +158,7 @@ export function CommandPalette() {
 			event.preventDefault();
 			button.click();
 		},
-		[isSwitcher, handleOpenChange, openNewWorkspace],
+		[isSwitcher, query, handleOpenChange, openNewWorkspace],
 	);
 
 	useEffect(() => {
@@ -168,6 +174,15 @@ export function CommandPalette() {
 		setQuery("");
 		setSwitcherValue(undefined);
 	}, [root]);
+
+	// A frame can also be opened from outside (⌘P over an open palette).
+	const frameId = currentFrame?.command.id;
+	const previousFrameId = useRef(frameId);
+	useEffect(() => {
+		if (previousFrameId.current === frameId) return;
+		previousFrameId.current = frameId;
+		setQuery("");
+	}, [frameId]);
 
 	const frameTitle = currentFrame ? i18n._(currentFrame.command.title) : null;
 	const placeholder = currentFrame?.command.framePlaceholder

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { useFrameStackStore } from "../../../../../../core/frames";
+import { holdsAnyModifier } from "../../../../../../core/holdsAnyModifier";
 import type { SwitcherRow } from "../../../../utils/bucketWorkspaces";
 
 export interface SwitcherCycle {
@@ -9,10 +10,6 @@ export interface SwitcherCycle {
 }
 
 type Row = SwitcherRow<AccessibleV2Workspace>;
-
-function holdsAnyModifier(e: KeyboardEvent): boolean {
-	return e.metaKey || e.ctrlKey || e.altKey;
-}
 
 export function useSwitcherCycle(
 	cycle: SwitcherCycle | undefined,
