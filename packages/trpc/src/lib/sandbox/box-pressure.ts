@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import type { BoxPressure } from "@superset/shared/box-pressure";
-import { and, eq, ne } from "drizzle-orm";
+import { ARCHIVED_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
+import { and, eq, notInArray } from "drizzle-orm";
 import { publishBoxPressure } from "../realtime";
 import { sandboxHostSecretFor } from "./access";
 
@@ -31,7 +32,9 @@ export async function reportSandboxBoxPressure(args: {
 		.where(
 			and(
 				eq(cloudWorkspaces.id, args.workspaceId),
-				ne(cloudWorkspaces.status, "deleted"),
+				notInArray(cloudWorkspaces.status, [
+					...ARCHIVED_CLOUD_WORKSPACE_STATUSES,
+				]),
 			),
 		);
 	if (!row) return "unknown";

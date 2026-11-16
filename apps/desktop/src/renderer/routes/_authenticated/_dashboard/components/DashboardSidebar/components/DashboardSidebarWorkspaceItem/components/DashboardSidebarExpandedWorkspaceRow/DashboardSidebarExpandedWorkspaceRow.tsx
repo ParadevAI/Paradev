@@ -374,6 +374,9 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 											hostType={hostType}
 											hostIsOnline={hostIsOnline}
 											pressure={boxPressure?.level ?? null}
+											cloudState={
+												workspace.sandboxStatus === "asleep" ? "asleep" : "on"
+											}
 										/>
 									)}
 								</span>

@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
@@ -45,7 +46,7 @@ export function CloudWorkspaceRow({
 	const { t } = useLingui();
 	const router = useRouter();
 	const enlargedText = useEnlargedText();
-	const archived = row.status === "deleted";
+	const archived = isArchivedCloudWorkspaceStatus(row.status);
 	const readAt = useUnreadWorkspacesStore((state) => state.cloudReadAt[row.id]);
 	const manuallyUnread = useUnreadWorkspacesStore(
 		(state) => row.id in state.manualUnread,

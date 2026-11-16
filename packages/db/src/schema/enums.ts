@@ -60,15 +60,19 @@ export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
 /**
- * No sleep/wake states: the provider wakes a sandbox on the first inbound
- * connection, so "asleep" is invisible to callers and could only ever be
- * reported stale. `ready` means addressable, awake or not.
+ * `asleep`: the box session ended, and the box answers nothing until `access`
+ * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
+ * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
+ * of `awake` and `archived`: rows may still hold them, nothing writes them.
  */
 export const cloudWorkspaceStatusValues = [
 	"provisioning",
 	"ready",
 	"failed",
 	"deleted",
+	"awake",
+	"asleep",
+	"archived",
 ] as const;
 export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
 export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;

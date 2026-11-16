@@ -4,6 +4,7 @@ import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import { useQueryClient } from "@tanstack/react-query";
@@ -571,10 +572,14 @@ export function HomeScreen() {
 	const cloudRepos = useCloudRepos();
 	const cloudPullRequests = useCloudPullRequests({
 		active: listItems.some(
-			(item) => item.kind === "cloudRow" && item.row.status !== "deleted",
+			(item) =>
+				item.kind === "cloudRow" &&
+				!isArchivedCloudWorkspaceStatus(item.row.status),
 		),
 		archived: listItems.some(
-			(item) => item.kind === "cloudRow" && item.row.status === "deleted",
+			(item) =>
+				item.kind === "cloudRow" &&
+				isArchivedCloudWorkspaceStatus(item.row.status),
 		),
 	});
 	const repoPrefixesByProject = useMemo(

@@ -13,13 +13,15 @@ import * as access from "./access";
 import * as activity from "./activity";
 import * as jobs from "./jobs";
 import * as meter from "./meter";
+import * as sandboxExpiry from "./sandbox-expiry";
+import * as sandboxSleep from "./sandbox-sleep";
 import * as wake from "./wake";
 
 const WORKSPACE_ID = "0b8f4c1e-2a3d-4e5f-8a9b-1c2d3e4f5a6b";
 const ROW = {
 	id: WORKSPACE_ID,
 	organizationId: "org-1",
-	status: "ready",
+	status: "awake",
 	providerSandboxId: "box-1",
 	machineSize: "large",
 };
@@ -85,7 +87,20 @@ stub(plan, {
 				: null;
 	},
 });
-stub(meter, { assertMayBoot: async () => {} });
+stub(meter, {
+	assertMayBoot: async () => {},
+	queueSettleWorkspace: async () => {},
+});
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: async (
+		id: string,
+		stopped: { sessionId: string | null },
+	) => {
+		recordedAsleep.push([id, stopped]);
+	},
+});
+stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
 const FORWARD = {
 	port: 5173,
 	localPort: 5174,
@@ -101,7 +116,10 @@ stub(sandbox, {
 		hostTarget: "https://box-1.example",
 		running,
 		vcpus: boxVcpus,
+		expiresAt: running ? new Date(Date.now() + 60_000) : null,
+		sessionId: "session_1",
 	}),
+	stopAndSnapshot: async () => ({ sessionId: "session_1" }),
 	environmentRepositoryRows: async () => [
 		{ id: "repo-1", defaultBranch: "main" },
 	],
@@ -142,6 +160,7 @@ beforeEach(() => {
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
+	recordedAsleep = [];
 	inserted = [];
 	queuedJobs = [];
 	environmentSize = null;
@@ -231,6 +250,18 @@ describe("cloudWorkspace.setMachineSize", () => {
 				machineSize: "2xlarge",
 			}),
 		).rejects.toThrow('Machine size "2xlarge" is not available');
+	});
+});
+
+describe("cloudWorkspace.sleep", () => {
+	test("records asleep only for the session it stopped", async () => {
+		running = true;
+		expect(await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID })).toEqual({
+			stopped: true,
+		});
+		expect(recordedAsleep).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1" }],
+		]);
 	});
 });
 

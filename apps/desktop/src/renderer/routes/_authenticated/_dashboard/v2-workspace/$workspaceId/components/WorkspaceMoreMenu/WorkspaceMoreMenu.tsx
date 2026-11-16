@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -70,8 +71,11 @@ export function WorkspaceMoreMenu({
 	};
 	const environment = useWorkspaceEnvironment(workspace.id);
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
+	const cloudStatus = cloudWorkspaces?.find(
+		(row) => row.id === workspace.id,
+	)?.status;
 	const isWorkspaceReady =
-		cloudWorkspaces?.find((row) => row.id === workspace.id)?.status === "ready";
+		cloudStatus !== undefined && isLiveCloudWorkspaceStatus(cloudStatus);
 	const { data: session } = authClient.useSession();
 	const isAdmin = useIsOrganizationAdmin() === true;
 	const canSaveCheckpoint =

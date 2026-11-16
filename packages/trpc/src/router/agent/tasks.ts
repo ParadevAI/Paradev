@@ -11,6 +11,7 @@ import {
 	type SelectAgentSession,
 	tasks,
 } from "@superset/db/schema";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { startCloudWorkspace } from "../cloud-workspace/start";
@@ -315,7 +316,9 @@ async function withUsableBox(sessionId: string): Promise<SelectAgentSession> {
 	if (!row) throw new Error("task session is gone");
 	if (
 		row.session.cloudWorkspaceId &&
-		(row.boxStatus === "failed" || row.boxStatus === "deleted")
+		row.boxStatus !== null &&
+		(row.boxStatus === "failed" ||
+			isArchivedCloudWorkspaceStatus(row.boxStatus))
 	) {
 		const [cleared] = await db
 			.update(agentSessions)
@@ -436,7 +439,11 @@ async function relaunchedOnNewBox(
 		.from(cloudWorkspaces)
 		.where(eq(cloudWorkspaces.id, session.cloudWorkspaceId))
 		.limit(1);
-	if (box?.status !== "failed" && box?.status !== "deleted") return false;
+	if (
+		!box ||
+		(box.status !== "failed" && !isArchivedCloudWorkspaceStatus(box.status))
+	)
+		return false;
 	const [starts] = await db
 		.select({ n: count() })
 		.from(agentTurns)

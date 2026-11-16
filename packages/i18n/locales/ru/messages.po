@@ -4939,6 +4939,9 @@ msgstr "Использование облака"
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
+msgid "Cloud workspace: asleep"
+msgstr "Облачная рабочая область: в спящем режиме"
+
 msgid "Cloud workspace: connecting"
 msgstr "Облачная рабочая область: подключение"
 

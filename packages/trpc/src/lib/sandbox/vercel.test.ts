@@ -58,6 +58,8 @@ const sandboxes = [
 		createdAt: NOW - 7 * DAY,
 		updatedAt: NOW - 7 * DAY,
 		statusUpdatedAt: NOW - 3 * HOUR,
+		expiresAt: NOW + HOUR,
+		currentSessionId: "session_resumed",
 		tags: { kind: "workspace" },
 	},
 ];
@@ -114,8 +116,12 @@ describe("findSandboxSession", () => {
 describe("listActiveWorkspaceSandboxes", () => {
 	test("finds older resumed workspaces when tag-filtered lists use creation order", async () => {
 		expect(await listActiveWorkspaceSandboxes(NOW - 4 * HOUR)).toEqual([
-			"recently-stopped",
-			"resumed-workspace",
+			{ name: "recently-stopped", expiresAt: null, sessionId: null },
+			{
+				name: "resumed-workspace",
+				expiresAt: new Date(NOW + HOUR),
+				sessionId: "session_resumed",
+			},
 		]);
 		expect(listOptions).toMatchObject({
 			sortBy: "statusUpdatedAt",

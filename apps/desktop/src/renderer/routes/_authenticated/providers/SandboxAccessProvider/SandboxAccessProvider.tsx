@@ -1,4 +1,5 @@
 import { isCloudUsageRefusal } from "@superset/shared/billing";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	type QueryClient,
 	type UseQueryResult,
@@ -115,13 +116,13 @@ export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	});
 	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;
 
-	// Only a `ready` row has a sandbox to address: `access` refuses anything
+	// Only an `awake` or `asleep` row has a sandbox to address: `access` refuses anything
 	// else, and a provisioning workspace asking for a ticket every few seconds
 	// would be a retry loop against a guaranteed rejection.
 	const workspaces = useMemo(
 		() =>
-			(cloudWorkspaces ?? []).filter(
-				(workspace) => workspace.status === "ready",
+			(cloudWorkspaces ?? []).filter((workspace) =>
+				isLiveCloudWorkspaceStatus(workspace.status),
 			),
 		[cloudWorkspaces],
 	);

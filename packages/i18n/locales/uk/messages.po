@@ -4933,6 +4933,9 @@ msgstr "Використання хмари"
 msgid "Cloud workspace"
 msgstr "Хмарний робочий простір"
 
+msgid "Cloud workspace: asleep"
+msgstr "Хмарний робочий простір: у сплячому режимі"
+
 msgid "Cloud workspace: connecting"
 msgstr "Хмарний робочий простір: підключення"
 

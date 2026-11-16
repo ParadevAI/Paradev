@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { FolderGit2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
@@ -93,7 +94,9 @@ export function WorkspaceRow({
 				// failed one only needs disposing of. Deleting a local workspace
 				// retires the record and leaves the checkout alone, so every row on
 				// a host is deletable.
-				canRename={cloudStatus === undefined || cloudStatus === "ready"}
+				canRename={
+					cloudStatus === undefined || isLiveCloudWorkspaceStatus(cloudStatus)
+				}
 				canDelete={cloudStatus === undefined || cloudStatus !== "provisioning"}
 				isCloud={cloudStatus !== undefined}
 				isUnread={isUnread}

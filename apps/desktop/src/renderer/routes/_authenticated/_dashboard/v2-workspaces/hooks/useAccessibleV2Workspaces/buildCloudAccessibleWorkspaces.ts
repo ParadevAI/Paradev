@@ -1,3 +1,5 @@
+import type { CloudWorkspaceStatus } from "@superset/db/schema";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import type {
 	PullRequestCheck,
 	PullRequestChecksStatus,
@@ -15,7 +17,7 @@ export interface CloudAccessibleWorkspaceInput {
 	id: string;
 	name: string;
 	branch: string;
-	status: "provisioning" | "ready" | "failed" | "deleted";
+	status: CloudWorkspaceStatus;
 	agentStatus: "review" | "working" | "failed" | "permission" | null;
 	agentStatusAt: Date | null;
 	createdBy: { userId: string; name: string; image: string | null } | null;
@@ -158,7 +160,7 @@ export function buildCloudAccessibleWorkspaces({
 		if (!project) return [];
 		const pullRequest = pullRequestsById.get(workspace.id)?.[0];
 		const pr = pullRequest ? toPrSummary(pullRequest) : null;
-		const isArchived = workspace.status === "deleted";
+		const isArchived = isArchivedCloudWorkspaceStatus(workspace.status);
 		const reportedAt = workspace.agentStatusAt?.getTime() ?? null;
 		return [
 			{

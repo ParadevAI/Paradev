@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { ARCHIVED_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
+import { and, eq, notInArray, sql } from "drizzle-orm";
 import { nudge } from "../realtime";
 import { sandboxHostSecretFor } from "./access";
 
@@ -34,7 +35,9 @@ export async function reportSandboxAgentStatus(args: {
 		.where(
 			and(
 				eq(cloudWorkspaces.id, args.workspaceId),
-				ne(cloudWorkspaces.status, "deleted"),
+				notInArray(cloudWorkspaces.status, [
+					...ARCHIVED_CLOUD_WORKSPACE_STATUSES,
+				]),
 			),
 		)
 		.returning({

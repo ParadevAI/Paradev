@@ -8,6 +8,7 @@ import {
 	githubRepositories,
 } from "@superset/db/schema";
 import { MACHINE_SIZES } from "@superset/shared/billing";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -229,7 +230,7 @@ async function loadPromotable(
 	cloudWorkspaceId: string,
 ) {
 	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
-	if (workspace.status !== "ready") {
+	if (!isLiveCloudWorkspaceStatus(workspace.status)) {
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "Only a ready workspace can become an environment",
