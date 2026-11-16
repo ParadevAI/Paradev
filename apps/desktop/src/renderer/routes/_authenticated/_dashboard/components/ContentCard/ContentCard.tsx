@@ -1,5 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import { type ReactNode, useState } from "react";
+import { RoundedClip } from "../RoundedClip";
 import { BareContentCardContext } from "./context";
 
 /** Holds the open screen beside the sidebar. A screen that draws its own cards on the frame turns the card off with useBareContentCard. */
@@ -20,17 +21,12 @@ export function ContentCard({
 			)}
 		>
 			<BareContentCardContext.Provider value={setIsBare}>
-				{/* Clip with one radius on all corners: Chromium gives each composited child its own card-size mask when the radii differ. */}
-				<div
-					className={cn(
-						"relative flex min-h-0 min-w-0 flex-1 overflow-hidden",
-						isBare
-							? cn("rounded-[10px]", joinsSidebar && "rounded-l-none")
-							: "rounded-[9px]",
-					)}
+				<RoundedClip
+					squareLeft={joinsSidebar}
+					radiusClassName={isBare ? "rounded-[10px]" : "rounded-[9px]"}
 				>
 					{children}
-				</div>
+				</RoundedClip>
 			</BareContentCardContext.Provider>
 		</div>
 	);
