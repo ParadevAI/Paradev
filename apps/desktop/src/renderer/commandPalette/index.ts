@@ -11,3 +11,4 @@ export type {
 	CommandSection,
 	SectionId,
 } from "./core/types";
+export { openQuickOpen } from "./modules/workspace/commands";

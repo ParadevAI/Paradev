@@ -6,7 +6,9 @@ import {
 	CommandItem,
 	CommandList,
 	CommandSeparator,
+	useCommandState,
 } from "@superset/ui/command";
+import { useEffect, useState } from "react";
 import { ThemeSwatch } from "renderer/components/ThemeSwatch";
 import {
 	SYSTEM_THEME_ID,
@@ -25,6 +27,20 @@ import {
 import { useFrameStackStore } from "../../core/frames";
 import { useCommandPaletteQuery } from "../CommandPalette/CommandPalette";
 
+const SYSTEM_ITEM_VALUE = `system ${SYSTEM_THEME_ID}`;
+const NAVIGATION_KEYS = new Set([
+	"ArrowUp",
+	"ArrowDown",
+	"Home",
+	"End",
+	"PageUp",
+	"PageDown",
+]);
+
+function themeItemValue(heading: string, theme: Theme): string {
+	return `${heading} ${theme.name} ${theme.id}`;
+}
+
 function matchesQuery(haystack: string, query: string): boolean {
 	if (!query) return true;
 	return haystack.toLowerCase().includes(query.toLowerCase().trim());
@@ -39,6 +55,22 @@ export function ThemeFrame() {
 	const systemDarkThemeId = useSystemDarkThemeId();
 	const setOpen = useFrameStackStore((s) => s.setOpen);
 	const query = useCommandPaletteQuery();
+	const previewTheme = useThemeStore((state) => state.previewTheme);
+	const endThemePreview = useThemeStore((state) => state.endThemePreview);
+	const highlightedValue = useCommandState((state) => state.value);
+	// cmdk highlights the first row on open; previewing it would swap the
+	// theme before the user has pointed at anything.
+	const [hasNavigated, setHasNavigated] = useState(false);
+
+	useEffect(() => {
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (NAVIGATION_KEYS.has(event.key)) setHasNavigated(true);
+		};
+		window.addEventListener("keydown", onKeyDown, true);
+		return () => window.removeEventListener("keydown", onKeyDown, true);
+	}, []);
+
+	useEffect(() => endThemePreview, [endThemePreview]);
 
 	const allThemes = [...builtInThemes, ...customThemes];
 	const lightThemes = allThemes.filter((t) => t.type === "light");
@@ -103,8 +135,29 @@ export function ThemeFrame() {
 		visibleDark.length > 0 ||
 		visibleCustom.length > 0;
 
+	const themeIdByItemValue = new Map<string, string>([
+		[SYSTEM_ITEM_VALUE, SYSTEM_THEME_ID],
+	]);
+	for (const [heading, themes] of [
+		[lightHeading, visibleLight],
+		[darkHeading, visibleDark],
+		[customHeading, visibleCustom],
+	] as const) {
+		for (const theme of themes) {
+			themeIdByItemValue.set(themeItemValue(heading, theme), theme.id);
+		}
+	}
+	const previewThemeId =
+		hasNavigated || query
+			? themeIdByItemValue.get(highlightedValue)
+			: undefined;
+
+	useEffect(() => {
+		if (previewThemeId) previewTheme(previewThemeId);
+	}, [previewThemeId, previewTheme]);
+
 	return (
-		<CommandList>
+		<CommandList onPointerMove={() => setHasNavigated(true)}>
 			<CommandEmpty>
 				<Trans>No themes found.</Trans>
 			</CommandEmpty>
@@ -112,7 +165,7 @@ export function ThemeFrame() {
 			{showSystem && (
 				<CommandGroup>
 					<CommandItem
-						value={`system ${SYSTEM_THEME_ID}`}
+						value={SYSTEM_ITEM_VALUE}
 						onSelect={() => pickTheme(SYSTEM_THEME_ID)}
 					>
 						<div className="flex shrink-0 -space-x-1">
@@ -177,7 +230,7 @@ function ThemeGroup({ heading, themes, activeId, onSelect }: ThemeGroupProps) {
 			{themes.map((theme) => (
 				<CommandItem
 					key={`${heading}:${theme.id}`}
-					value={`${heading} ${theme.name} ${theme.id}`}
+					value={themeItemValue(heading, theme)}
 					onSelect={() => onSelect(theme.id)}
 				>
 					<ThemeSwatch theme={theme} />
