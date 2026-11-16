@@ -1185,6 +1185,9 @@ msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó có thể 
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó đã bị dừng."
 
+msgid "{name} is working"
+msgstr "{name} đang làm việc"
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -20148,6 +20151,9 @@ msgstr "Đang nghĩ về hướng tiếp cận"
 msgid "Thinking..."
 msgstr "Đang suy nghĩ..."
 
+msgid "Thinking…"
+msgstr "Đang suy nghĩ…"
+
 msgid "Thirty"
 msgstr "Ba mươi"
 
@@ -21832,6 +21838,9 @@ msgstr "Đang chờ tác vụ nền"
 
 msgid "Waking up workspace"
 msgstr "Đang đánh thức workspace"
+
+msgid "Waking up…"
+msgstr "Đang thức dậy…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Muốn có sớm hơn? <0>Hãy nói với chúng tôi trên Discord</0>. Phần lớn những gì ở đây bắt đầu từ yêu cầu của người dùng."

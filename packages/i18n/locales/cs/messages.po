@@ -1185,6 +1185,9 @@ msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven.
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
 
+msgid "{name} is working"
+msgstr "{name} pracuje"
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -20148,6 +20151,9 @@ msgstr "Přemýšlím o postupu"
 msgid "Thinking..."
 msgstr "Přemýšlím..."
 
+msgid "Thinking…"
+msgstr "Přemýšlí…"
+
 msgid "Thirty"
 msgstr "Třicet"
 
@@ -21832,6 +21838,9 @@ msgstr "Čeká se na práci na pozadí"
 
 msgid "Waking up workspace"
 msgstr "Probouzení pracovního prostoru"
+
+msgid "Waking up…"
+msgstr "Probouzí se…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Chcete něco dřív? <0>Napište nám na Discordu</0>. Spousta z toho, co je tady, začala jako přání uživatele."

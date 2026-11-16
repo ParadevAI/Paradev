@@ -1185,6 +1185,9 @@ msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die mogelijk g
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} is ongewijzigd. Als een agent aan het werk was, is die gestopt."
 
+msgid "{name} is working"
+msgstr "{name} is aan het werk"
+
 msgid "{name} plugin"
 msgstr "Plug-in {name}"
 
@@ -20148,6 +20151,9 @@ msgstr "Nadenken over de aanpak"
 msgid "Thinking..."
 msgstr "Denken..."
 
+msgid "Thinking…"
+msgstr "Denkt na…"
+
 msgid "Thirty"
 msgstr "Dertig"
 
@@ -21832,6 +21838,9 @@ msgstr "Wacht op achtergrondwerk"
 
 msgid "Waking up workspace"
 msgstr "Werkruimte wordt gewekt"
+
+msgid "Waking up…"
+msgstr "Wordt wakker…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Wil je iets eerder zien? <0>Laat het weten in Discord</0>. Veel van wat hier staat begon als gebruikersverzoek."

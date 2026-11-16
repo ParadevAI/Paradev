@@ -9,7 +9,9 @@ import {
 	createTypingReporter,
 	createTypingWatch,
 	createWorkspaceActions,
+	EMPTY_LIVE,
 	type LoadStatus,
+	liveTurnsReducer,
 	type SyncApi,
 	type SyncSignal,
 	type SyncStatus,
@@ -67,7 +69,9 @@ export function useChatsStore(organizationId: string) {
 		[],
 	);
 	const listeners = useRef(new Set<(signal: SyncSignal) => void>());
+	const [turns, applyToTurns] = useReducer(liveTurnsReducer, EMPTY_LIVE);
 	const signal = useCallback((event: SyncSignal) => {
+		applyToTurns(event);
 		for (const listener of listeners.current) listener(event);
 	}, []);
 	const subscribe = useCallback((listener: (signal: SyncSignal) => void) => {
@@ -180,6 +184,7 @@ export function useChatsStore(organizationId: string) {
 		dispatch,
 		actions,
 		live,
+		turns,
 		retry,
 	};
 }

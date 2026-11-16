@@ -1185,6 +1185,9 @@ msgstr "{name} 未變更。如果代理程式正在工作，它可能已被停�
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} 未變更。如果代理程式正在工作，它已被停止。"
 
+msgid "{name} is working"
+msgstr "{name} 正在工作"
+
 msgid "{name} plugin"
 msgstr "{name} 外掛程式"
 
@@ -20148,6 +20151,9 @@ msgstr "正在思考實現方式"
 msgid "Thinking..."
 msgstr "正在思考..."
 
+msgid "Thinking…"
+msgstr "思考中…"
+
 msgid "Thirty"
 msgstr "三十天"
 
@@ -21832,6 +21838,9 @@ msgstr "正在等待背景工作"
 
 msgid "Waking up workspace"
 msgstr "正在喚醒工作區"
+
+msgid "Waking up…"
+msgstr "正在喚醒…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "想讓某件事早點做？<0>在Discord上告訴我們</0>。這裡的很多條目最初都來自使用者的請求。"

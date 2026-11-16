@@ -1,5 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+	chatDevs,
 	directDev,
 	lastEditableMessage,
 	type Message,
@@ -8,6 +9,7 @@ import {
 	renderMentions,
 	typingLabel,
 } from "@superset/chats-core";
+import { chatTurns } from "@superset/chats-sync";
 import { toast } from "@superset/ui/sonner";
 import {
 	useCallback,
@@ -177,6 +179,12 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 		: "";
 	const typing = typingLabel(state, chatId, typists);
 	const candidates = mentionCandidates(state, chat);
+	const devs = chatDevs(state, chat);
+	const working = chatTurns(chats.turns, chatId, devs).map((turn) => ({
+		devId: turn.devId,
+		name: state.devs[turn.devId]?.name ?? "",
+		phase: turn.phase,
+	}));
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -206,6 +214,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					highlightedId={highlightedId}
 					actions={actions}
 					onLoadOlder={loadOlder}
+					working={working}
 					intro={
 						<div className="flex flex-col items-center gap-2 px-8 pt-12 pb-4 text-center">
 							<ChatFace chat={chat} size={60} />

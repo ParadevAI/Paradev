@@ -1185,6 +1185,9 @@ msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu mungki
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu telah dihentikan."
 
+msgid "{name} is working"
+msgstr "{name} sedang bekerja"
+
 msgid "{name} plugin"
 msgstr "Plugin {name}"
 
@@ -20148,6 +20151,9 @@ msgstr "Memikirkan pendekatannya"
 msgid "Thinking..."
 msgstr "Berpikir..."
 
+msgid "Thinking…"
+msgstr "Berpikir…"
+
 msgid "Thirty"
 msgstr "Tiga puluh"
 
@@ -21832,6 +21838,9 @@ msgstr "Menunggu pekerjaan latar belakang"
 
 msgid "Waking up workspace"
 msgstr "Membangunkan workspace"
+
+msgid "Waking up…"
+msgstr "Sedang bangun…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Ingin sesuatu lebih cepat? <0>Beri tahu kami di Discord</0>. Banyak yang ada di sini bermula dari permintaan pengguna."

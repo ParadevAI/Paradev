@@ -1185,6 +1185,9 @@ msgstr "{name} без изменений. Если агент работал, о
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} без изменений. Если агент работал, он был остановлен."
 
+msgid "{name} is working"
+msgstr "{name} работает"
+
 msgid "{name} plugin"
 msgstr "Плагин {name}"
 
@@ -20148,6 +20151,9 @@ msgstr "Обдумываем подход"
 msgid "Thinking..."
 msgstr "Думает..."
 
+msgid "Thinking…"
+msgstr "Думает…"
+
 msgid "Thirty"
 msgstr "Тридцать"
 
@@ -21832,6 +21838,9 @@ msgstr "Ожидание фоновых задач"
 
 msgid "Waking up workspace"
 msgstr "Пробуждение рабочей области"
+
+msgid "Waking up…"
+msgstr "Просыпается…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Хотите что-то быстрее? <0>Скажите нам в Discord</0>. Многое из этого началось с пожелания пользователя."

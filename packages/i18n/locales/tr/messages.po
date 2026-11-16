@@ -1185,6 +1185,9 @@ msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durdurulmuş olabilir."
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durduruldu."
 
+msgid "{name} is working"
+msgstr "{name} çalışıyor"
+
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
 
@@ -20148,6 +20151,9 @@ msgstr "Yaklaşım üzerine düşünülüyor"
 msgid "Thinking..."
 msgstr "Düşünülüyor..."
 
+msgid "Thinking…"
+msgstr "Düşünüyor…"
+
 msgid "Thirty"
 msgstr "Otuz"
 
@@ -21832,6 +21838,9 @@ msgstr "Arka plan işi bekleniyor"
 
 msgid "Waking up workspace"
 msgstr "Çalışma alanı uyandırılıyor"
+
+msgid "Waking up…"
+msgstr "Uyanıyor…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "Bir şeyi daha erken mi istiyorsunuz? <0>Discord'da bize söyleyin</0>. Buradakilerin çoğu bir kullanıcı isteği olarak başladı."

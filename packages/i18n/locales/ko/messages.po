@@ -1185,6 +1185,9 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었습니다."
 
+msgid "{name} is working"
+msgstr "{name} 작업 중"
+
 msgid "{name} plugin"
 msgstr "{name} 플러그인"
 
@@ -20148,6 +20151,9 @@ msgstr "접근 방식을 생각하는 중"
 msgid "Thinking..."
 msgstr "생각하는 중..."
 
+msgid "Thinking…"
+msgstr "생각하는 중…"
+
 msgid "Thirty"
 msgstr "서른 날"
 
@@ -21832,6 +21838,9 @@ msgstr "백그라운드 작업을 기다리는 중"
 
 msgid "Waking up workspace"
 msgstr "워크스페이스 깨우는 중"
+
+msgid "Waking up…"
+msgstr "깨어나는 중…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "더 빨리 필요한 기능이 있나요? <0>Discord에서 알려 주세요</0>. 여기 있는 항목 상당수가 사용자 요청에서 시작했습니다."

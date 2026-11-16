@@ -14,6 +14,7 @@ import {
 import { LuLoader } from "react-icons/lu";
 import { type MessageActions, MessageItem } from "../MessageItem";
 import { ThreadTime } from "../ThreadTime";
+import { WorkingRow } from "./components/WorkingRow";
 
 const NEAR_BOTTOM_PX = 120;
 
@@ -27,6 +28,8 @@ interface ChatThreadProps {
 	onLoadOlder: () => void;
 	/** Shown above the oldest message once the whole history is loaded. */
 	intro: ReactNode;
+	/** Devs at work in this chat, shown after the newest message. */
+	working: { devId: string; name: string; phase: "waking" | "running" }[];
 }
 
 /**
@@ -43,6 +46,7 @@ export function ChatThread({
 	actions,
 	onLoadOlder,
 	intro,
+	working,
 }: ChatThreadProps) {
 	const messages = useMemo(() => messagesOf(state, chatId), [state, chatId]);
 	const items = useMemo(() => toThreadItems(messages), [messages]);
@@ -72,7 +76,7 @@ export function ChatThread({
 		anchor.current = firstId
 			? { firstId, height: scroller.scrollHeight }
 			: null;
-	}, [firstId, lastId]);
+	}, [firstId, lastId, working.length]);
 
 	useEffect(() => {
 		const sentinel = sentinelRef.current;
@@ -134,6 +138,15 @@ export function ChatThread({
 						/>
 					);
 				})}
+				{working.map((turn) => (
+					<WorkingRow
+						key={turn.devId}
+						devId={turn.devId}
+						name={turn.name}
+						isGroup={isGroup}
+						phase={turn.phase}
+					/>
+				))}
 			</div>
 		</div>
 	);

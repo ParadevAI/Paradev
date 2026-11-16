@@ -1185,6 +1185,9 @@ msgstr "{name} 未改变。如果智能体正在工作，它可能已被停止�
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} 未改变。如果智能体正在工作，它已被停止。"
 
+msgid "{name} is working"
+msgstr "{name} 正在工作"
+
 msgid "{name} plugin"
 msgstr "{name} 插件"
 
@@ -20148,6 +20151,9 @@ msgstr "正在思考实现方式"
 msgid "Thinking..."
 msgstr "正在思考..."
 
+msgid "Thinking…"
+msgstr "思考中…"
+
 msgid "Thirty"
 msgstr "三十天"
 
@@ -21832,6 +21838,9 @@ msgstr "正在等待后台任务"
 
 msgid "Waking up workspace"
 msgstr "正在唤醒工作区"
+
+msgid "Waking up…"
+msgstr "正在唤醒…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "想让某件事早点做？<0>在Discord上告诉我们</0>。这里的很多条目最初都来自用户的请求。"

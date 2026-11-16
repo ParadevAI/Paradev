@@ -1185,6 +1185,9 @@ msgstr "{name} は変更されていません。エージェントが作業中�
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止されました。"
 
+msgid "{name} is working"
+msgstr "{name} が作業中"
+
 msgid "{name} plugin"
 msgstr "{name} プラグイン"
 
@@ -20148,6 +20151,9 @@ msgstr "進め方を検討中"
 msgid "Thinking..."
 msgstr "思考中..."
 
+msgid "Thinking…"
+msgstr "考え中…"
+
 msgid "Thirty"
 msgstr "30日"
 
@@ -21832,6 +21838,9 @@ msgstr "バックグラウンド処理を待っています"
 
 msgid "Waking up workspace"
 msgstr "ワークスペースを起動中"
+
+msgid "Waking up…"
+msgstr "起動中…"
 
 msgid "Want something sooner? <0>Tell us in Discord</0>. Much of what's here started as a user request."
 msgstr "もっと早く欲しいものがありますか?<0>Discordで教えてください</0>。ここにあるものの多くは、ユーザーの要望から始まりました。"
