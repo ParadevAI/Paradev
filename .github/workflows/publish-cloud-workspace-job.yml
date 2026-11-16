@@ -4,11 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: Which one-off job under /api/cloud-workspaces/jobs/ to publish to QStash.
+        description: Which job under /api/cloud-workspaces/jobs/ to publish to QStash once, outside its schedule.
         type: choice
         options:
-          - backfill-status
-        default: backfill-status
+          - reconcile-usage
+          - renew-chatgpt-sign-ins
+        default: reconcile-usage
 
 jobs:
   publish:
