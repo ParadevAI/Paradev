@@ -104,6 +104,8 @@ const input = {
 };
 const SEVEN_DAYS = 7 * 24 * 60 * 60;
 
+const BOX = { providerSandboxId: "ws-box", sandboxSessionId: "session_1" };
+
 describe("queueReap", () => {
 	beforeEach(() => {
 		sandboxCalls = [];
@@ -113,7 +115,7 @@ describe("queueReap", () => {
 	});
 
 	test("queues the delete after seven days and the stop after a minute", async () => {
-		await queueReap(input, "ws-box");
+		await queueReap(input, BOX);
 		expect(queued).toEqual([
 			{
 				path: "/api/cloud-workspaces/reap",
@@ -131,7 +133,7 @@ describe("queueReap", () => {
 
 	test("a stop that could not be queued stops the box now, keeps the disk and records the stop", async () => {
 		failingStage = "stop";
-		await queueReap(input, "ws-box");
+		await queueReap(input, BOX);
 		expect(sandboxCalls).toEqual(["stop:ws-box"]);
 		expect(recordedAsleep).toEqual([
 			[input.cloudWorkspaceId, { sessionId: "session_1" }],
@@ -143,7 +145,7 @@ describe("queueReap", () => {
 
 	test("a delete that could not be queued throws so the caller deletes the box", async () => {
 		failingStage = "delete";
-		await expect(queueReap(input, "ws-box")).rejects.toThrow("qstash down");
+		await expect(queueReap(input, BOX)).rejects.toThrow("qstash down");
 		expect(queued).toEqual([]);
 	});
 });

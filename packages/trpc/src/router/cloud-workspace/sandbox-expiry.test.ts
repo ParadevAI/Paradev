@@ -20,6 +20,9 @@ const dialect = new PgDialect();
 
 let storedExpiry: Date | null;
 let storedStatus: string;
+let storedSession: string | null;
+let describedSessionId: string | null | undefined;
+let onDescribe: () => void;
 let liveExpiry: Date | null;
 let calls: string[];
 let watches: { delaySeconds?: number; deduplicationId?: string }[];
@@ -35,6 +38,7 @@ stub(db.query.cloudWorkspaces, {
 		organizationId: "org_1",
 		providerSandboxId: "ws-box",
 		sandboxExpiresAt: storedExpiry,
+		sandboxSessionId: storedSession,
 	}),
 });
 stub(db, {
@@ -50,7 +54,17 @@ stub(db, {
 				return Object.assign(Promise.resolve(), {
 					returning: async () => {
 						if (writeError) throw writeError;
+						const guard = rendered.sql.match(/"sandbox_session_id" = \$(\d+)/);
+						const guarded = guard
+							? rendered.params[Number(guard[1]) - 1]
+							: null;
+						if (guard && storedSession !== null && guarded !== storedSession) {
+							return [];
+						}
 						storedStatus = (values.status as string) ?? storedStatus;
+						if (typeof values.sandboxSessionId === "string") {
+							storedSession = values.sandboxSessionId;
+						}
 						if (values.sandboxExpiresAt instanceof Date) {
 							storedExpiry = values.sandboxExpiresAt;
 						}
@@ -69,11 +83,17 @@ stub(db, {
 stub(sandbox, {
 	describeSandbox: async () => {
 		calls.push("describe");
+		onDescribe();
 		return {
 			hostTarget: "https://box",
 			running: !!liveExpiry,
 			expiresAt: liveExpiry,
-			sessionId: liveExpiry ? "session_2" : "session_1",
+			sessionId:
+				describedSessionId !== undefined
+					? describedSessionId
+					: liveExpiry
+						? "session_2"
+						: "session_1",
 		};
 	},
 });
@@ -95,6 +115,9 @@ beforeEach(() => {
 	writes = [];
 	liveExpiry = null;
 	storedStatus = "awake";
+	storedSession = "session_1";
+	describedSessionId = undefined;
+	onDescribe = () => {};
 	writeError = null;
 });
 
@@ -164,6 +187,25 @@ describe("a stale record never marks a running box asleep", () => {
 		expect(writes[0]?.params).toEqual(
 			expect.arrayContaining(["awake", "ready"]),
 		);
+	});
+
+	test("a wake between the watch's read and its write keeps the row awake when Vercel gives no session id", async () => {
+		storedExpiry = new Date(NOW - 5_000);
+		describedSessionId = null;
+		onDescribe = () => {
+			storedSession = "session_2";
+			storedStatus = "awake";
+		};
+		await watchSandboxExpiry({ cloudWorkspaceId: "ws_1" });
+		expect(storedStatus).toBe("awake");
+		expect(storedSession).toBe("session_2");
+	});
+
+	test("the reconcile skips a stopped listing that carries no session id", async () => {
+		await syncSandboxExpiries([
+			{ name: "ws-box", expiresAt: null, sessionId: null },
+		]);
+		expect(writes).toEqual([]);
 	});
 
 	test("the reconcile writes asleep only while the row still records the listed session", async () => {

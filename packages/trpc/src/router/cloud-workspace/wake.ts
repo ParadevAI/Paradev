@@ -147,7 +147,9 @@ export async function restartCloudWorkspace(
 	const { running } = await describeSandbox(row.providerSandboxId);
 	if (running) {
 		const stopped = await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id, stopped);
+		await recordSandboxAsleep(row.id, {
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+		});
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);

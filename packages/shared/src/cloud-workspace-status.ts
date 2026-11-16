@@ -4,6 +4,8 @@
  * legacy floor. Nothing writes them.
  * TODO(SUPER-3018): drop both spellings once the follow-up runs
  * `UPDATE ready -> awake, deleted -> archived` and every live client is past the floor.
+ * Classify `ready` rows from a full `Sandbox.list`: the reconcile lists only boxes
+ * that changed in its lookback, so a box stopped long ago stays `ready` until opened.
  */
 export const AWAKE_CLOUD_WORKSPACE_STATUSES = ["awake", "ready"] as const;
 export const ARCHIVED_CLOUD_WORKSPACE_STATUSES = [

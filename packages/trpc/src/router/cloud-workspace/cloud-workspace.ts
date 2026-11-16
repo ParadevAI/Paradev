@@ -153,7 +153,9 @@ async function addressSandbox(
 			if (expiresAt) {
 				await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			} else {
-				await recordSandboxAsleep(row.id, { sessionId });
+				await recordSandboxAsleep(row.id, {
+					sessionId: sessionId ?? row.sandboxSessionId,
+				});
 			}
 			return {
 				hostTarget: described.hostTarget,
@@ -750,7 +752,9 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id, stopped);
+				await recordSandboxAsleep(row.id, {
+					sessionId: stopped.sessionId ?? row.sandboxSessionId,
+				});
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -882,7 +886,7 @@ export const cloudWorkspaceRouter = {
 				if (row.provider === "vercel") {
 					await queueReap(
 						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
-						row.providerSandboxId,
+						row,
 					).catch(async (error) => {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,

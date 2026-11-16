@@ -470,7 +470,9 @@ export async function settleBoot(
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
 		const stopped = await stopSandbox(workspace.providerSandboxId);
-		await recordSandboxAsleep(boot.cloudWorkspaceId, stopped);
+		await recordSandboxAsleep(boot.cloudWorkspaceId, {
+			sessionId: stopped.sessionId ?? boot.vercelSessionId,
+		});
 		await setUsageStopAt(boot, null);
 		return "stopped";
 	} catch (error) {
@@ -553,6 +555,7 @@ export async function settleOrganizationNow(
 	const rows = await db
 		.select({
 			id: cloudWorkspaceBoots.id,
+			vercelSessionId: cloudWorkspaceBoots.vercelSessionId,
 			cloudWorkspaceId: cloudWorkspaces.id,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 		})
@@ -565,10 +568,14 @@ export async function settleOrganizationNow(
 			and(eq(cloudWorkspaceBoots.organizationId, organizationId), OPEN_BOOT),
 		);
 	await Promise.all(
-		rows.map(({ id, cloudWorkspaceId, providerSandboxId }) =>
+		rows.map(({ id, vercelSessionId, cloudWorkspaceId, providerSandboxId }) =>
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
-						.then((stopped) => recordSandboxAsleep(cloudWorkspaceId, stopped))
+						.then((stopped) =>
+							recordSandboxAsleep(cloudWorkspaceId, {
+								sessionId: stopped.sessionId ?? vercelSessionId,
+							}),
+						)
 						.catch((error) =>
 							Sentry.captureException(error, { extra: { bootId: id } }),
 						)
@@ -660,7 +667,9 @@ async function adoptRunningBoxes(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
 			const stopped = await stopSandbox(workspace.providerSandboxId);
-			await recordSandboxAsleep(workspace.id, stopped);
+			await recordSandboxAsleep(workspace.id, {
+				sessionId: stopped.sessionId ?? session.id,
+			});
 		}
 	}
 	return adopted;

@@ -98,7 +98,9 @@ export async function reapArchivedCloudWorkspace(
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
-	await recordSandboxAsleep(row.id, stopped);
+	await recordSandboxAsleep(row.id, {
+		sessionId: stopped.sessionId ?? row.sandboxSessionId,
+	});
 	await queueSettleWorkspace(row.id);
 	return "stopped";
 }
@@ -137,7 +139,7 @@ function queueReapStage(
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
-	providerSandboxId: string,
+	box: { providerSandboxId: string; sandboxSessionId: string | null },
 ): Promise<void> {
 	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
@@ -148,7 +150,9 @@ export async function queueReap(
 			`[cloud-workspace] could not queue the stop for ${input.cloudWorkspaceId}`,
 			error,
 		);
-		const stopped = await stopSandbox(providerSandboxId);
-		await recordSandboxAsleep(input.cloudWorkspaceId, stopped);
+		const stopped = await stopSandbox(box.providerSandboxId);
+		await recordSandboxAsleep(input.cloudWorkspaceId, {
+			sessionId: stopped.sessionId ?? box.sandboxSessionId,
+		});
 	});
 }

@@ -121,7 +121,11 @@ export async function watchSandboxExpiry({
 }: WatchSandboxExpiryInput): Promise<"rewatched" | "asleep" | "skipped"> {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
-		columns: { providerSandboxId: true, sandboxExpiresAt: true },
+		columns: {
+			providerSandboxId: true,
+			sandboxExpiresAt: true,
+			sandboxSessionId: true,
+		},
 	});
 	if (!row?.sandboxExpiresAt) return "skipped";
 	if (row.sandboxExpiresAt.getTime() > Date.now()) {
@@ -140,7 +144,7 @@ export async function watchSandboxExpiry({
 		return "rewatched";
 	}
 	await recordSandboxAsleep(cloudWorkspaceId, {
-		sessionId: live?.sessionId ?? null,
+		sessionId: live?.sessionId ?? row.sandboxSessionId,
 	});
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
@@ -176,7 +180,7 @@ export async function syncSandboxExpiries(
 		if (expiresAt && expiresAt.getTime() > now) {
 			await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			await queueWatch(row.id, expiresAt);
-		} else {
+		} else if (sessionId) {
 			await recordSandboxAsleep(row.id, { sessionId });
 		}
 	}
