@@ -305,8 +305,13 @@ try {
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
 		{ check: false },
 	);
-	exec(`: > ${SANDBOX_PATHS.bootLog}`);
+	exec(
+		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.hostRoot}/previous-runtime && touch ${SANDBOX_PATHS.hostRoot}/previous-runtime/host-service.js`,
+	);
 	const second = boot(2);
+	const runtimes = exec(
+		`for i in $(seq 1 100); do [ ! -e ${SANDBOX_PATHS.hostRoot}/previous-runtime ] && break; sleep 0.1; done; find ${SANDBOX_PATHS.hostRoot} -mindepth 1 -maxdepth 1 -type d`,
+	).trim();
 	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect("second boot: run dir cleared", /run\.cleared/.test(log2));
 	expect(
@@ -328,6 +333,12 @@ try {
 		"second boot: host-service ready",
 		/host\.ready/.test(log2),
 		`${second} ms to ready`,
+	);
+	expect(
+		"second boot: only the current runtime is left once host-service answers",
+		runtimes.split("\n").length === 1 &&
+			runtimes === exec(`readlink -f ${SANDBOX_PATHS.hostRoot}/current`).trim(),
+		runtimes.replaceAll("\n", " "),
 	);
 	expect(
 		"second boot: checkout marker respected",
