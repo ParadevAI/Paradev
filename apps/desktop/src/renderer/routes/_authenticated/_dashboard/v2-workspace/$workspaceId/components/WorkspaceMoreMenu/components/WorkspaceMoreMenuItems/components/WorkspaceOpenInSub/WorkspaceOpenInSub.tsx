@@ -3,6 +3,7 @@ import { cn } from "@superset/ui/utils";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
 import type { MenuParts } from "renderer/lib/menuParts";
 import { WorkspaceOpenInApps } from "./components/WorkspaceOpenInApps";
+import { WorkspaceOpenInDefaultItem } from "./components/WorkspaceOpenInDefaultItem";
 
 interface WorkspaceOpenInSubProps {
 	parts: MenuParts;
@@ -16,16 +17,19 @@ export function WorkspaceOpenInSub({
 	const { Sub, SubTrigger, SubContent } = parts;
 
 	return (
-		<Sub>
-			<SubTrigger>
-				<LuSquareArrowOutUpRight
-					className={cn("size-4", parts.iconClassName)}
-				/>
-				<Trans>Open in</Trans>
-			</SubTrigger>
-			<SubContent className="min-w-48">
-				<WorkspaceOpenInApps parts={parts} workspaceId={workspaceId} />
-			</SubContent>
-		</Sub>
+		<>
+			<WorkspaceOpenInDefaultItem parts={parts} workspaceId={workspaceId} />
+			<Sub>
+				<SubTrigger>
+					<LuSquareArrowOutUpRight
+						className={cn("size-4", parts.iconClassName)}
+					/>
+					<Trans>Open in</Trans>
+				</SubTrigger>
+				<SubContent className="min-w-48">
+					<WorkspaceOpenInApps parts={parts} workspaceId={workspaceId} />
+				</SubContent>
+			</Sub>
+		</>
 	);
 }
