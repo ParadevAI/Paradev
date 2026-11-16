@@ -23,6 +23,7 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { WorkspaceSwitcherButton } from "./components/WorkspaceSwitcherButton";
 import { shellFrameColor } from "./utils/shellFrameColor";
 
 /** macOS draws the window buttons in the first 80 physical pixels, whatever the page zoom. */
@@ -103,6 +104,7 @@ export function TitleBar() {
 				<ZoomStable enabled={isMac} className="flex items-center gap-0.5">
 					<NavigationControls />
 					<SidebarToggle />
+					{isListPanelCollapsed && <WorkspaceSwitcherButton />}
 					{isListPanelCollapsed && <NewWorkspaceButton />}
 					<PortsDropdown align="start" />
 					<OfflineBadge />
