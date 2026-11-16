@@ -58,6 +58,7 @@ import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { presignedGetUrl } from "../../lib/r2";
 import { personProcedure } from "../../trpc";
 import { publishChats } from "./publish";
+import { chatsTurnRuntime, triggerTurns } from "./turns";
 import {
 	agentView,
 	messageView,
@@ -371,6 +372,18 @@ async function releaseFiles(where: SQL | undefined) {
 	return () => reapOrphanFiles(fileIds);
 }
 
+/** Wakes the Devs that should answer a person's message. A failure here never fails the send. */
+async function answer(message: typeof chatsMessages.$inferSelect) {
+	const runtime = chatsTurnRuntime();
+	if (!runtime) return [];
+	try {
+		return (await triggerTurns(runtime, message)).ambiguousMentions;
+	} catch (error) {
+		console.error("[chats] no Dev was woken for", message.id, error);
+		return [];
+	}
+}
+
 async function memberMessage(userId: string, messageId: string) {
 	const [message] = await db
 		.select()
@@ -555,7 +568,10 @@ export const chatsRouter = {
 				type: "message.created",
 				...payload,
 			});
-			return payload;
+			const ambiguousMentions = await answer(message);
+			return ambiguousMentions.length > 0
+				? { ...payload, ambiguousMentions }
+				: payload;
 		}),
 
 	/**
@@ -636,7 +652,10 @@ export const chatsRouter = {
 				message: payload.message,
 				task: null,
 			});
-			return payload;
+			const ambiguousMentions = await answer(message);
+			return ambiguousMentions.length > 0
+				? { ...payload, ambiguousMentions }
+				: payload;
 		}),
 
 	/** A short-lived link to a file shared in a chat the person is in. A mutation, because the link is a credential. */
