@@ -14,7 +14,8 @@ import {
 	handleSubscribe,
 	handleUnsubscribe,
 } from "../handlers/index.ts";
-import { adoptFromFd } from "../Pty/index.ts";
+import { adoptFromFd, drainPendingKills } from "../Pty/index.ts";
+import { readProcessTableAsync } from "../process-tree.ts";
 import {
 	type ClientMessage,
 	encodeFrame,
@@ -52,6 +53,8 @@ export interface ServerOptions {
 	 * they can drive sessions deterministically without a real shell.
 	 */
 	spawnPty?: HandlerCtx["spawnPty"];
+	/** Override for tests to control async process-table reads on close. */
+	readProcessTable?: HandlerCtx["readProcessTable"];
 }
 
 const DEFAULT_OUTBOUND_BUFFER_CAP_BYTES = 8 * 1024 * 1024;
@@ -87,7 +90,10 @@ export class Server {
 	private readonly server: net.Server;
 	private readonly store: SessionStore;
 	private readonly conns = new Set<ConnState>();
+	private readonly pendingCloses = new Set<Promise<void>>();
 	private readonly opts: ServerOptions;
+	private closing = false;
+	private socketIdentity: { dev: number; ino: number } | null = null;
 	/**
 	 * macOS trustd reachability, surfaced in the hello-ack. Mutable so the
 	 * probe can run AFTER the socket binds / handoff-ack is sent rather than
@@ -126,6 +132,14 @@ export class Server {
 		});
 		// Owner-only access. The socket file IS the auth boundary.
 		fs.chmodSync(this.opts.socketPath, 0o600);
+		// Record (dev, ino) so close() only unlinks the socket inode we bound,
+		// never one rebound by a handoff successor (e.g. after the 1s fallback).
+		try {
+			const stat = fs.lstatSync(this.opts.socketPath);
+			this.socketIdentity = { dev: stat.dev, ino: stat.ino };
+		} catch {
+			this.socketIdentity = null;
+		}
 	}
 
 	/**
@@ -358,15 +372,44 @@ export class Server {
 		await new Promise((r) => setImmediate(r));
 		// killSessions=false: the master fds are now refcounted in the
 		// successor's process; killing them here would close shells the
-		// user just successfully preserved.
+		// user just successfully preserved. close() unbinds and unlinks our
+		// owned socket immediately before draining pendingCloses so a successor
+		// hitting its 1s disconnect fallback never loses its newly bound socket.
 		await this.close({ killSessions: false });
+		// A close completed just before handoff may still have an async
+		// SIGKILL escalation chain running; wait for all tracked escalations
+		// to settle so SIGHUP-trapping descendants aren't orphaned on exit.
+		await drainPendingKills();
 		setTimeout(() => process.exit(0), 50).unref();
+	}
+
+	private unlinkOwnedSocket(): void {
+		const identity = this.socketIdentity;
+		this.socketIdentity = null;
+		if (!identity) return;
+		try {
+			const stat = fs.lstatSync(this.opts.socketPath);
+			if (stat.dev === identity.dev && stat.ino === identity.ino) {
+				fs.unlinkSync(this.opts.socketPath);
+			}
+		} catch {
+			// ignore (already unlinked or replaced)
+		}
 	}
 
 	async close(opts: { killSessions?: boolean } = {}): Promise<void> {
 		const killSessions = opts.killSessions ?? true;
+		this.closing = true;
+		// Stop accepting new connections and unlink our owned socket inode before
+		// awaiting any process-table reads or pendingCloses, so neither reconnects
+		// nor a successor's post-fallback bind race with cleanup.
+		const serverClosed = this.server.listening
+			? new Promise<void>((resolve) => this.server.close(() => resolve()))
+			: Promise.resolve();
 		for (const c of this.conns) c.socket.destroy();
 		this.conns.clear();
+		await serverClosed;
+		this.unlinkOwnedSocket();
 		if (killSessions) {
 			// Kill all owned PTYs so the daemon process can actually exit (open
 			// master fds keep the event loop alive). This is what the v1
@@ -376,9 +419,14 @@ export class Server {
 			// Phase 2 handoff exit sets killSessions=false: the master fds are
 			// being inherited by a successor process, so we must NOT close
 			// them here.
-			for (const session of this.store.all()) {
+			const sessions = [...this.store.all()];
+			const table =
+				sessions.length > 0
+					? await (this.opts.readProcessTable ?? readProcessTableAsync)()
+					: undefined;
+			for (const session of sessions) {
 				try {
-					session.pty.kill("SIGKILL");
+					session.pty.kill("SIGKILL", table);
 				} catch {
 					// already dead, ignore
 				}
@@ -389,15 +437,16 @@ export class Server {
 				}
 			}
 		}
-		await new Promise<void>((resolve) => this.server.close(() => resolve()));
-		try {
-			fs.unlinkSync(this.opts.socketPath);
-		} catch {
-			// ignore
+		if (this.pendingCloses.size > 0) {
+			await Promise.allSettled([...this.pendingCloses]);
 		}
 	}
 
 	private onConnection(socket: net.Socket): void {
+		if (this.closing) {
+			socket.destroy();
+			return;
+		}
 		const outboundBufferCap =
 			this.opts.outboundBufferCap ?? DEFAULT_OUTBOUND_BUFFER_CAP_BYTES;
 		const conn: ConnState = {
@@ -445,6 +494,23 @@ export class Server {
 		msg: ClientMessage,
 		payload: Uint8Array | null,
 	): void {
+		if (this.closing) {
+			const id =
+				msg &&
+				typeof msg === "object" &&
+				"id" in msg &&
+				typeof msg.id === "string"
+					? msg.id
+					: undefined;
+			conn.send({
+				type: "error",
+				...(id !== undefined ? { id } : {}),
+				message: "daemon is shutting down",
+				code: "ECLOSING",
+			});
+			conn.socket.destroy();
+			return;
+		}
 		// Handshake must come first.
 		if (conn.negotiated === null) {
 			if (msg.type !== "hello") {
@@ -508,7 +574,22 @@ export class Server {
 				return;
 			}
 			case "close": {
-				conn.send(handleClose(ctx, msg));
+				const pending: Promise<void> = handleClose(ctx, msg)
+					.then((reply) => {
+						conn.send(reply);
+					})
+					.catch((err) => {
+						conn.send({
+							type: "error",
+							id: msg.id,
+							message: (err as Error).message,
+							code: "EKILL",
+						});
+					})
+					.finally(() => {
+						this.pendingCloses.delete(pending);
+					});
+				this.pendingCloses.add(pending);
 				return;
 			}
 			case "list": {
@@ -558,6 +639,7 @@ export class Server {
 			store: this.store,
 			wireSession: (session) => this.wireSession(session),
 			spawnPty: this.opts.spawnPty,
+			readProcessTable: this.opts.readProcessTable,
 		};
 	}
 
@@ -571,6 +653,7 @@ export class Server {
 			DEFAULT_OUTBOUND_PAUSE_THRESHOLD_BYTES;
 		let reclaimScheduled = false;
 		const deliver = (chunk: Buffer) => {
+			if (this.store.get(session.id) !== session) return;
 			this.store.appendOutput(session, chunk);
 			const out: ServerMessage = { type: "output", id: session.id };
 			let congested = false;

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { Pty, SpawnOptions } from "../Pty/index.ts";
+import type { ProcessInfo } from "../process-tree.ts";
 import type { ServerMessage } from "../protocol/index.ts";
 import { SessionStore } from "../SessionStore/index.ts";
 import type { Conn, HandlerCtx } from "./handlers.ts";
@@ -19,6 +20,7 @@ interface FakePtyState {
 	rows: number;
 	written: Buffer[];
 	killed: boolean;
+	killTables: Array<ProcessInfo[] | null | undefined>;
 	disposed: boolean;
 }
 
@@ -33,8 +35,9 @@ function makeFakePty(state: FakePtyState, meta: SpawnOptions["meta"]): Pty {
 			state.cols = c;
 			state.rows = r;
 		},
-		kill: () => {
+		kill: (_signal, table) => {
 			state.killed = true;
+			state.killTables.push(table);
 		},
 		onData: () => {},
 		onExit: () => {},
@@ -84,6 +87,7 @@ function makeCtx(): HandlerCtx & {
 				rows: opts.meta.rows,
 				written: [],
 				killed: false,
+				killTables: [],
 				disposed: false,
 			};
 			states.push(state);
@@ -209,14 +213,15 @@ describe("handlers", () => {
 		expect(states[0]?.rows).toBe(30);
 	});
 
-	test("close kills and disposes the pty before replying closed", () => {
+	test("close kills and disposes the pty before replying closed", async () => {
 		const ctx = makeCtx();
+		ctx.readProcessTable = async () => [];
 		handleOpen(ctx, {
 			type: "open",
 			id: "s0",
 			meta: { shell: "/bin/sh", argv: [], cols: 80, rows: 24 },
 		});
-		const reply = handleClose(ctx, { type: "close", id: "s0" });
+		const reply = await handleClose(ctx, { type: "close", id: "s0" });
 		expect(reply.type).toBe("closed");
 		expect(states[0]?.killed).toBe(true);
 		expect(states[0]?.disposed).toBe(true);
@@ -293,5 +298,45 @@ describe("handlers", () => {
 		conn.subscriptions.add("s0");
 		handleUnsubscribe(conn, { type: "unsubscribe", id: "s0" });
 		expect(conn.subscriptions.has("s0")).toBe(false);
+	});
+
+	test("close passes async process table to kill without blocking other handlers", async () => {
+		let resolveTable!: (table: ProcessInfo[] | null) => void;
+		const tablePromise = new Promise<ProcessInfo[] | null>((resolve) => {
+			resolveTable = resolve;
+		});
+		const ctx = makeCtx();
+		ctx.readProcessTable = () => tablePromise;
+
+		handleOpen(ctx, {
+			type: "open",
+			id: "s0",
+			meta: { shell: "/bin/sh", argv: [], cols: 80, rows: 24 },
+		});
+		handleOpen(ctx, {
+			type: "open",
+			id: "s1",
+			meta: { shell: "/bin/sh", argv: [], cols: 80, rows: 24 },
+		});
+
+		const closePromise = handleClose(ctx, { type: "close", id: "s0" });
+		// Session is marked exited immediately and other sessions stay responsive
+		// while the async process-table read is still pending.
+		expect(ctx.store.get("s0")?.exited).toBe(true);
+		expect(
+			handleInput(ctx, { type: "input", id: "s1" }, Buffer.from("hi")),
+		).toBeUndefined();
+		expect(states[1]?.written.map((b) => b.toString())).toEqual(["hi"]);
+		expect(states[0]?.killed).toBe(false);
+
+		const snapshot: ProcessInfo[] = [
+			{ pid: 1000, ppid: 1, pgid: 1000, tty: "ttys001" },
+		];
+		resolveTable(snapshot);
+		const reply = await closePromise;
+		expect(reply.type).toBe("closed");
+		expect(states[0]?.killed).toBe(true);
+		expect(states[0]?.killTables).toEqual([snapshot]);
+		expect(states[0]?.disposed).toBe(true);
 	});
 });
