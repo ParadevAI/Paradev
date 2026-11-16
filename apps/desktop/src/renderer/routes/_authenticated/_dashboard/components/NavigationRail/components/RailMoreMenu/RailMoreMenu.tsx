@@ -12,6 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { PiChatsCircle } from "react-icons/pi";
@@ -39,6 +40,7 @@ export function RailMoreMenu() {
 						<button
 							type="button"
 							aria-label={t({ message: "More" })}
+							aria-current={navigation.isChannelsOpen ? "page" : undefined}
 							className={railButtonClass(navigation.isChannelsOpen)}
 						>
 							<Ellipsis
@@ -58,7 +60,11 @@ export function RailMoreMenu() {
 				onCloseAutoFocus={(event) => event.preventDefault()}
 			>
 				{isChannelsEnabled && (
-					<DropdownMenuItem onSelect={navigation.openChannels}>
+					<DropdownMenuItem
+						onSelect={navigation.openChannels}
+						aria-current={navigation.isChannelsOpen ? "page" : undefined}
+						className={cn(navigation.isChannelsOpen && "bg-fill-selected")}
+					>
 						<PiChatsCircle className="size-4" />
 						<Trans>Chat</Trans>
 					</DropdownMenuItem>
