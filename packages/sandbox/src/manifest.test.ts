@@ -5,6 +5,8 @@ import { join } from "node:path";
 import {
 	type Assets,
 	deriveStepVersions,
+	discardingSteps,
+	loadSteps,
 	renderAssetsTsv,
 	renderStepsTsv,
 	renderToolsTsv,
@@ -184,5 +186,67 @@ describe("deriveStepVersions", () => {
 		expect(renderAssetsTsv(fixture().assets)).toMatch(
 			/^0644\ta{64}\t\.tar\.gz\t/,
 		);
+	});
+});
+
+describe("renderAssetsTsv", () => {
+	const step = (name: string, assets: string[], discards?: string[]) => ({
+		name,
+		assets,
+		after: [],
+		inputs: [],
+		salt: "",
+		discards,
+	});
+	const assets: Assets = {
+		...fixture().assets,
+		tool: {
+			sha256: "c".repeat(64),
+			suffix: "",
+			dest: "/usr/local/share/superset/media/tool-1",
+			mode: "0755",
+		},
+	};
+	const columns = (tsv: string) =>
+		tsv
+			.split("\n")
+			.filter(Boolean)
+			.map((line) => line.split("\t"));
+
+	test("names the step that discards a row in a fifth column, empty for a row that stays", () => {
+		const rows = columns(
+			renderAssetsTsv(assets, [step("install", ["thing", "tool"], ["thing"])]),
+		);
+		expect(rows.map((r) => [r[1]?.[0], r[4]])).toEqual([
+			["a", "install"],
+			["c", ""],
+		]);
+		expect(rows.map((r) => r.length)).toEqual([5, 5]);
+		expect(Buffer.from(rows[1]?.[3] ?? "", "base64").toString()).toBe(
+			"/usr/local/share/superset/media/tool-1",
+		);
+	});
+
+	test("refuses a discard that is not the step's asset, or one two steps claim", () => {
+		expect(() => discardingSteps([step("one", ["tool"], ["thing"])])).toThrow(
+			/not one of its assets/,
+		);
+		expect(() =>
+			discardingSteps([
+				step("one", ["thing"], ["thing"]),
+				step("two", ["thing"], ["thing"]),
+			]),
+		).toThrow(/both discard thing/);
+	});
+
+	test("the bundle keeps the binaries it runs in place and discards the archives", () => {
+		const owners = discardingSteps(
+			loadSteps(join(import.meta.dir, "..", "bundle", "steps.json")),
+		);
+		expect(owners.has("claude")).toBe(false);
+		expect(owners.has("cli")).toBe(false);
+		expect(owners.get("codex")).toBe("install-agent-clis");
+		expect(owners.get("chrome")).toBe("install-chrome");
+		expect(owners.get("host-service")).toBe("install-host");
 	});
 });

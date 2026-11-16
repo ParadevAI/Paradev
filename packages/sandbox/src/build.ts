@@ -77,14 +77,18 @@ export function buildBundle(): BuiltBundle {
 
 	const assets = loadAssets(join(BUNDLE_SRC, "assets.json"));
 	const tools = walkRootfs(join(staging, "rootfs"));
+	const declaredSteps = loadSteps(join(BUNDLE_SRC, "steps.json"));
 	const steps = deriveStepVersions({
-		steps: loadSteps(join(BUNDLE_SRC, "steps.json")),
+		steps: declaredSteps,
 		assets,
 		tools,
 		stepsDir: join(staging, "steps"),
 	});
 	writeFileSync(join(staging, "tools.tsv"), renderToolsTsv(tools));
-	writeFileSync(join(staging, "assets.tsv"), renderAssetsTsv(assets));
+	writeFileSync(
+		join(staging, "assets.tsv"),
+		renderAssetsTsv(assets, declaredSteps),
+	);
 	writeFileSync(join(staging, "steps.tsv"), renderStepsTsv(steps));
 
 	// A reproducible tarball, written here rather than by the system tar so the

@@ -20,7 +20,8 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 } from "@superset/shared/sandbox/contract";
-import { PACKAGE_ROOT } from "./build";
+import { BUNDLE_SRC, PACKAGE_ROOT } from "./build";
+import { discardingSteps, loadAssets, loadSteps } from "./manifest";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";
 const NAME = `superset-boot-twice-${Date.now().toString(36)}`;
@@ -74,6 +75,11 @@ function bootAsUser(): string {
 	);
 	return `${new TextDecoder().decode(proc.stdout)}${new TextDecoder().decode(proc.stderr)}exit=${proc.exitCode}`;
 }
+
+const assets = loadAssets(join(BUNDLE_SRC, "assets.json"));
+const discarded = [
+	...discardingSteps(loadSteps(join(BUNDLE_SRC, "steps.json"))).keys(),
+].map((key) => assets[key]?.dest ?? key);
 
 const failures: string[] = [];
 function expect(label: string, ok: boolean, detail = ""): void {
@@ -276,6 +282,14 @@ try {
 			),
 		),
 	);
+	const leftover = exec(
+		`for f in ${discarded.join(" ")}; do [ -e "$f" ] && echo "$f"; [ -f "$f.hash" ] || echo "no sidecar $f"; done; true`,
+	).trim();
+	expect(
+		"first boot: every consumed archive is gone, its sidecar kept",
+		leftover === "",
+		leftover.replace(/\n/g, ", "),
+	);
 	expect(
 		"status prints every step current",
 		!/pending|never run|failed/.test(
@@ -301,6 +315,15 @@ try {
 	);
 	expect("second boot: nothing fetched", !/fetched \//.test(log2));
 	expect("second boot: every step skipped", !/step \S+ running/.test(log2));
+	const binaries = exec(
+		"claude --version && superset --version && echo binaries-ok",
+		{ user: "ubuntu", check: false },
+	);
+	expect(
+		"second boot: claude and superset still run from the media dir",
+		/binaries-ok/.test(binaries),
+		binaries.trim().replace(/\n/g, " | "),
+	);
 	expect(
 		"second boot: host-service ready",
 		/host\.ready/.test(log2),

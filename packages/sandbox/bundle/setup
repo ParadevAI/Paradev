@@ -5,8 +5,10 @@
 # are compared by hash sidecar, steps by version marker.
 #
 #   setup apply-rootfs               copy every tools.tsv row whose <dest>.hash differs
-#   setup sync-assets                fetch every assets.tsv row whose <dest>.hash differs
-#   setup run-steps                  run every steps.tsv row whose marker differs, fail-open
+#   setup sync-assets                fetch every assets.tsv row whose <dest>.hash differs,
+#                                    except an archive its step already consumed
+#   setup run-steps                  run every steps.tsv row whose marker differs, fail-open;
+#                                    a step re-fetches the archives it consumes, then discards them
 #   setup run-step <name>            one step, no sentinel (build time, or by hand)
 #   setup status                     one line per step: name, version, marker, last outcome
 set -uo pipefail
@@ -47,42 +49,43 @@ apply_rootfs() {
 
 # A staged archive the manifest no longer names is an earlier build's; it
 # would otherwise sit beside the current one forever, and a step that
-# globs the directory could pick it.
+# globs the directory could pick it. A sidecar alone is a discarded archive.
 prune_media() {
-	local file hash
-	for file in "${SUPERSET_MEDIA_DIR}"/*; do
-		[ -f "$file" ] || continue
-		case "$file" in *.hash) continue ;; esac
-		[ -f "${file}.hash" ] || continue
-		hash="$(tr -d '\n\r' < "${file}.hash")"
+	local sidecar hash
+	for sidecar in "${SUPERSET_MEDIA_DIR}"/*.hash; do
+		[ -f "$sidecar" ] || continue
+		hash="$(tr -d '\n\r' < "$sidecar")"
 		if ! grep -qF "$hash" "${BUNDLE_DIR}/assets.tsv"; then
-			rm -f "$file" "${file}.hash"
-			log "pruned ${file}"
+			rm -f "${sidecar%.hash}" "$sidecar"
+			log "pruned ${sidecar%.hash}"
 		fi
 	done
 }
 
 # --- files fetched by hash from the bucket -------------------------------
-sync_assets() {
-	local tmp changed
+# Rows on stdin. With keep_discarded=1, a discarded archive (sidecar
+# matches, file gone) stays gone: its step already consumed it.
+fetch_rows() {
+	local keep_discarded="$1" tmp changed
 	tmp="$(mktemp -d)"
 	changed="${tmp}/changed"
 	mkdir -p "$changed"
-	export SUPERSET_ASSET_BASE_URL SUPERSET_ASSET_TMP="$tmp" SUPERSET_ASSET_CHANGED="$changed"
-	local started
-	started="$(now_ms)"
-	prune_media
-	if ! xargs -r -a "${BUNDLE_DIR}/assets.tsv" -d '\n' -P 16 -n 1 bash -c '
+	export SUPERSET_ASSET_BASE_URL SUPERSET_ASSET_TMP="$tmp" SUPERSET_ASSET_CHANGED="$changed" SUPERSET_ASSET_KEEP_DISCARDED="$keep_discarded"
+	if ! xargs -r -d '\n' -P 16 -n 1 bash -c '
 set -euo pipefail
 line="$1"; tab=$'"'"'\t'"'"'
 mode="${line%%$tab*}"; rest="${line#*$tab}"
 hash="${rest%%$tab*}"; rest="${rest#*$tab}"
-suffix="${rest%%$tab*}"; dest_b64="${rest#*$tab}"
+suffix="${rest%%$tab*}"; rest="${rest#*$tab}"
+dest_b64="${rest%%$tab*}"; discarded_by=""
+[ "$dest_b64" = "$rest" ] || discarded_by="${rest#*$tab}"
 dest="$(printf "%s" "$dest_b64" | base64 --decode)"
 current=""
 if [ -f "$dest" ]; then
   if [ -f "${dest}.hash" ]; then current="$(tr -d "\n\r" < "${dest}.hash")"
   else current="$(sha256sum "$dest" | cut -d" " -f1)"; printf "%s" "$current" > "${dest}.hash"; fi
+elif [ -n "$discarded_by" ] && [ "$SUPERSET_ASSET_KEEP_DISCARDED" = 1 ] && [ -f "${dest}.hash" ]; then
+  current="$(tr -d "\n\r" < "${dest}.hash")"
 fi
 [ "$current" = "$hash" ] && exit 0
 url="${SUPERSET_ASSET_BASE_URL}/${hash}${suffix}"
@@ -108,7 +111,27 @@ echo "fetched ${dest}"
 	[ -e "${changed}/icons" ] && gtk-update-icon-cache -f -q /usr/share/icons/hicolor 2>/dev/null
 	[ -e "${changed}/fonts" ] && fc-cache -f >/dev/null 2>&1
 	rm -rf "$tmp"
+}
+
+sync_assets() {
+	local started
+	started="$(now_ms)"
+	prune_media
+	fetch_rows 1 < "${BUNDLE_DIR}/assets.tsv" || return 1
 	log "sync-assets done in $(( $(now_ms) - started ))ms"
+}
+
+discarded_rows() { awk -F'\t' -v n="$1" '$5 == n' "${BUNDLE_DIR}/assets.tsv"; }
+
+# The sidecars stay: they are how sync-assets knows the archive was consumed.
+discard_archives() {
+	local dest_b64 dest
+	for dest_b64 in $(discarded_rows "$1" | cut -f4); do
+		dest="$(b64d "$dest_b64")"
+		[ -f "$dest" ] || continue
+		rm -f "$dest"
+		log "discarded ${dest}"
+	done
 }
 
 # --- versioned steps -----------------------------------------------------
@@ -121,14 +144,16 @@ run_step() {
 	marker="${STEPS_DIR}/${name}.version"
 	if [ "$(read_trimmed "$marker")" = "$version" ]; then
 		log "step ${name} at ${version:0:12}, skipping"
+		discard_archives "$name"
 		return 0
 	fi
 	local started
 	started="$(now_ms)"
 	log "step ${name} running (${version:0:12})"
-	if SUPERSET_BUNDLE_DIR="$BUNDLE_DIR" bash "${BUNDLE_DIR}/steps/${name}.sh"; then
+	if discarded_rows "$name" | fetch_rows 0 && SUPERSET_BUNDLE_DIR="$BUNDLE_DIR" bash "${BUNDLE_DIR}/steps/${name}.sh"; then
 		mkdir -p "$STEPS_DIR"
 		printf '%s\n' "$version" > "$marker"
+		discard_archives "$name"
 		log "step ${name} done in $(( $(now_ms) - started ))ms"
 		return 0
 	fi
