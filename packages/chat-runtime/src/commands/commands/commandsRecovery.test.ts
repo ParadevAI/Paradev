@@ -624,7 +624,11 @@ describe("replacing a chat keeps its mode", () => {
 		});
 		const create = (
 			harnessId: string,
-			extra: { modeId?: string; replacesSessionId?: string } = {},
+			extra: {
+				modeId?: string;
+				replacesSessionId?: string;
+				harnessSessionId?: string;
+			} = {},
 		) =>
 			runtime.commands.createSession({
 				commandId: randomUUID(),
@@ -635,7 +639,7 @@ describe("replacing a chat keeps its mode", () => {
 				...(extra.replacesSessionId
 					? {
 							resume: {
-								harnessSessionId: "agent-1",
+								harnessSessionId: extra.harnessSessionId ?? "agent-1",
 								replacesSessionId: extra.replacesSessionId,
 							},
 						}
@@ -656,6 +660,7 @@ describe("replacing a chat keeps its mode", () => {
 		create(FAKE_HARNESS, {
 			replacesSessionId: source.sessionId,
 			modeId: "default",
+			harnessSessionId: "agent-2",
 		});
 		create(HARNESS, { replacesSessionId: source.sessionId });
 

@@ -1,0 +1,1 @@
+export { duplicateChatPanes } from "./duplicateChatPanes";
