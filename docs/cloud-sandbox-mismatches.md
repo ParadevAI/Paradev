@@ -874,9 +874,11 @@ cannot.** No better-sqlite3 prebuild exists for Electron 44 on linux-x64, so
 44's V8 headers fail on gcc 12 and on clang 14 (`std::source_location`), so
 `bun install` exited 1 and `bun run dev` in `apps/desktop` died on "Could not
 locate the bindings file". Postinstall uses `clang-16` when `CC` is unset. The
-image does not carry it, since only this repo needs it: the internal
-environment's setup hook (`satya-setup.sh`) installs it, and any other
-environment that builds the desktop has to install it too.
+image ships bookworm's `clang-16` in place of its default clang 14 (one LLVM,
+not two), and `clang`/`clang++` point at it through update-alternatives, so
+every environment builds the desktop without an extra install. A box made
+before this image keeps clang 14: an Aptfile change only rewrites the copy
+under `/usr/local/share/superset/` at boot and installs no package.
 
 **Local dev cannot exercise a sandbox, and the failure mode if you force it is
 silent.** `setup.local.sh` copies `.env.local.example` to `.env`, which sets
