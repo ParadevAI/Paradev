@@ -1373,6 +1373,13 @@
       "when": 1794806184119,
       "tag": "0195_cloud_workspace_status_archived",
       "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1794855931835,
+      "tag": "0196_chats_schema",
+      "breakpoints": true
     }
   ]
 }
