@@ -1,5 +1,6 @@
 import { auth } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
+import { env } from "@/env";
 
 export type OrgMember = {
 	organizationId: string;
@@ -9,8 +10,8 @@ export type OrgMember = {
 
 /**
  * The connect-route preamble: who is asking, for which organization, and
- * whether they belong to it. Returns the error response to send when a check
- * fails.
+ * whether they belong to it. Returns the response to send when a check fails:
+ * a sign-in redirect that comes back here, or an error.
  *
  * It deliberately hands back no state token: a state is only ever minted by
  * `beginOAuthFlow`, which binds it to the asking browser in the same step.
@@ -20,7 +21,9 @@ export async function requireOrgMember(
 ): Promise<OrgMember | Response> {
 	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session?.user) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
+		const signIn = new URL("/sign-in", env.NEXT_PUBLIC_WEB_URL);
+		signIn.searchParams.set("redirect", request.url);
+		return Response.redirect(signIn.toString(), 302);
 	}
 
 	const organizationId = new URL(request.url).searchParams.get(
