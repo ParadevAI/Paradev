@@ -6,6 +6,6 @@
 		"verbatimModuleSyntax": true,
 		"allowImportingTsExtensions": true
 	},
-	"include": ["src", "build.ts"],
+	"include": ["src", "cli", "build.ts"],
 	"exclude": ["node_modules", "dist"]
 }
