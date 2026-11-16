@@ -4165,6 +4165,9 @@ msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-ure
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat ({unreadChats} ongelezen)"
+
 msgid "Chat closed"
 msgstr "Chat gesloten"
 

@@ -4165,6 +4165,9 @@ msgstr "Satın alınan GB-saatler azaldığında kayıtlı kartınızdan daha fa
 msgid "Chat"
 msgstr "Sohbet"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Sohbet ({unreadChats} okunmamış)"
+
 msgid "Chat closed"
 msgstr "Sohbet kapatıldı"
 

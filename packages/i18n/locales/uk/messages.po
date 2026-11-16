@@ -4159,6 +4159,9 @@ msgstr "Списувати кошти зі збереженої картки з�
 msgid "Chat"
 msgstr "Чат"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Чат (непрочитаних: {unreadChats})"
+
 msgid "Chat closed"
 msgstr "Чат закрито"
 

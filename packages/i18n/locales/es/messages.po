@@ -4165,6 +4165,9 @@ msgstr "Cobra a tu tarjeta guardada más GB-horas cuando se agotan las GB-horas 
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat ({unreadChats} sin leer)"
+
 msgid "Chat closed"
 msgstr "Chat cerrado"
 

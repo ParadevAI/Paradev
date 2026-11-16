@@ -6,6 +6,7 @@ import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
+import { useUnreadChatCount } from "renderer/routes/_authenticated/_dashboard/chats/hooks/useUnreadChatCount";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
@@ -29,6 +30,7 @@ export function NavigationRail() {
 		(useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS) ?? false) ||
 		env.NODE_ENV === "development";
 	const { myFailedCount } = useFailedAutomations();
+	const unreadChats = useUnreadChatCount();
 
 	return (
 		<nav
@@ -44,11 +46,23 @@ export function NavigationRail() {
 			/>
 			{isChannelsEnabled && (
 				<RailButton
-					label={t({ message: "Chat" })}
+					label={
+						unreadChats > 0
+							? t({ message: `Chat (${unreadChats} unread)` })
+							: t({ message: "Chat" })
+					}
 					icon={PiChatsCircle}
 					isIconFilled
 					isActive={navigation.isChannelsOpen}
 					onClick={navigation.openChannels}
+					badge={
+						unreadChats > 0 ? (
+							<span
+								aria-hidden="true"
+								className="absolute top-2 right-2 size-1.5 rounded-full bg-highlight"
+							/>
+						) : undefined
+					}
 				/>
 			)}
 			<RailButton

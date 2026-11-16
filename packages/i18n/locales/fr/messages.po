@@ -4165,6 +4165,9 @@ msgstr "Débite votre carte enregistrée pour plus de Go-heures quand les Go-heu
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat ({unreadChats} non lus)"
+
 msgid "Chat closed"
 msgstr "Chat fermé"
 

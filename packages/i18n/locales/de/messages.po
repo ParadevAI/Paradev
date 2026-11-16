@@ -4165,6 +4165,9 @@ msgstr "Belastet Ihre gespeicherte Karte für weitere GB-Stunden, wenn gekaufte 
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat ({unreadChats} ungelesen)"
+
 msgid "Chat closed"
 msgstr "Chat geschlossen"
 

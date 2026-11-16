@@ -4165,6 +4165,9 @@ msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ 
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Trò chuyện ({unreadChats} chưa đọc)"
+
 msgid "Chat closed"
 msgstr "Đã đóng cuộc trò chuyện"
 

@@ -4165,6 +4165,9 @@ msgstr "Cobra no cartão salvo mais GB-horas quando as GB-horas compradas estão
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat ({unreadChats} não lidos)"
+
 msgid "Chat closed"
 msgstr "Chat fechado"
 

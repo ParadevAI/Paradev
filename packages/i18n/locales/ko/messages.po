@@ -4165,6 +4165,9 @@ msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 
 msgid "Chat"
 msgstr "채팅"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "채팅(읽지 않음 {unreadChats}개)"
+
 msgid "Chat closed"
 msgstr "채팅을 닫았습니다"
 

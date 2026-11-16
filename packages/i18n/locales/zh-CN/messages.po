@@ -4165,6 +4165,9 @@ msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 G
 msgid "Chat"
 msgstr "聊天"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "聊天（{unreadChats} 条未读）"
+
 msgid "Chat closed"
 msgstr "聊天已关闭"
 

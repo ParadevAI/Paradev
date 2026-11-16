@@ -4165,6 +4165,9 @@ msgstr "Списывает с сохранённой карты оплату з�
 msgid "Chat"
 msgstr "Чат"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Чат (непрочитанных: {unreadChats})"
+
 msgid "Chat closed"
 msgstr "Чат закрыт"
 

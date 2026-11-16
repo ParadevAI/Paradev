@@ -4165,6 +4165,9 @@ msgstr "Strhne z uložené karty další GB-hodiny, když koupené GB-hodiny doc
 msgid "Chat"
 msgstr "Chat"
 
+msgid "Chat ({unreadChats} unread)"
+msgstr "Chat (nepřečtené: {unreadChats})"
+
 msgid "Chat closed"
 msgstr "Chat zavřen"
 
