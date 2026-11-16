@@ -6,7 +6,7 @@
  *   bun run assets themes            prebuilt GTK, icon and cursor theme tarballs
  *   bun run assets wallpapers        eight photos, cropped to the display
  *   bun run assets host-service      the runtime tarball from this checkout
- *   bun run assets claude [version]  Claude Code's native binary (default: stable)
+ *   bun run assets claude [version]  Claude Code's native binary (default: latest)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
  *   bun run assets all
  *
@@ -443,9 +443,9 @@ async function fetchText(url: string): Promise<string> {
 	return new TextDecoder().decode(await fetchBytes(url)).trim();
 }
 
-/** Claude Code's native linux-x64 binary; defaults to the `stable` channel. */
+/** Claude Code's native linux-x64 binary; defaults to the `latest` channel, the one a local install follows. */
 async function claude(version?: string): Promise<void> {
-	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/stable`));
+	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/latest`));
 	const manifest = JSON.parse(
 		await fetchText(`${CLAUDE_RELEASES}/${pinned}/manifest.json`),
 	) as { platforms: Record<string, { checksum: string }> };
