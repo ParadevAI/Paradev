@@ -31,7 +31,7 @@ one TLC worker, so a failure always prints the shortest trace. A pass takes abou
 
 ## Coverage record
 
-Synced with commit `e65df2d36`. Paths are under `packages/trpc/src/`.
+Synced with commit `623b52bf4`. Paths are under `packages/trpc/src/`.
 
 | Action | Code |
 | --- | --- |
@@ -72,6 +72,15 @@ configs, and set the sync commit to the commit that holds the change.
     with the session recorded on the row, which a wake writes only at `WakeRecord`. The gap allows
     a short `asleep` while a wake is in flight, which `NeverAsleepWhileRunning` permits, and
     `WakeRecord` then flips the row back because its session is new.
+  - The model always knows the stopped session. In the code, Vercel can give none (`sessionIdOf`
+    returns null when `currentSession()` throws), and `stillStoppedSession(null)` turns the guard
+    off. So no caller may pass null while the row records a session. Each one falls back to the
+    session it read before its provider call: the row's `sandboxSessionId`, or the boot's
+    `vercelSessionId` in `meter.ts`. The reconcile skips a listing that has no session. Null is
+    left only when the row has never recorded a session, or when the box is gone and nothing
+    can wake it. Otherwise a wake between the read and the write records session 2, the null
+    write lands `asleep` over it, and the new-session rule then refuses every awake report for
+    session 2.
   - The model treats `WatchFire`'s provider read and its write as one step. The code reads, then
     writes; the same session guard covers the gap.
   - `WatchFire`'s "still running" branch only moves the expiry in the model. The code calls
