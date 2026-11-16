@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { CommandGroup, CommandItem } from "@superset/ui/command";
-import { WorkspacesIcon } from "renderer/components/WorkspacesIcon";
+import { Layers } from "lucide-react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
 import { openWorkspaceList } from "../../../../modules/navigation/commands";
@@ -40,7 +40,7 @@ export function RootWorkspacesSection({
 				className="gap-2.5 text-[13px]"
 			>
 				<span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
-					<WorkspacesIcon className="size-4" />
+					<Layers className="size-4" />
 				</span>
 				<span className="min-w-0 flex-1 truncate">
 					{t({ message: "All workspaces" })}

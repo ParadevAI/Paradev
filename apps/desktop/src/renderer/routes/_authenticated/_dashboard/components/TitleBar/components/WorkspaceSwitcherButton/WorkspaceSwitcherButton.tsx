@@ -6,8 +6,8 @@ import {
 	toggleWorkspaceList,
 	useFrameStackStore,
 } from "renderer/commandPalette";
-import { WorkspacesIcon } from "renderer/components/WorkspacesIcon";
 import { HotkeyLabel } from "renderer/hotkeys";
+import { WorkspacesIcon } from "./components/WorkspacesIcon";
 import {
 	useWaitingWorkspaceBucket,
 	type WaitingWorkspaceBucket,

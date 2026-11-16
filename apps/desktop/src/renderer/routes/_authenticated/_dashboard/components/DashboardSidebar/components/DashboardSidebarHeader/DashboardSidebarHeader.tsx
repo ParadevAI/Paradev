@@ -14,12 +14,12 @@ import {
 	LuClock,
 	LuFileText,
 	LuGauge,
+	LuLayers,
 	LuPlus,
 	LuPuzzle,
 	LuSearch,
 } from "react-icons/lu";
 import { VscFolderOpened, VscNewFolder } from "react-icons/vsc";
-import { WorkspacesIcon } from "renderer/components/WorkspacesIcon";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { env } from "renderer/env.renderer";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
@@ -156,7 +156,7 @@ export function DashboardSidebarHeader({
 										: "text-muted-foreground hover:bg-fill-hover",
 								)}
 							>
-								<WorkspacesIcon className="size-3.5" />
+								<LuLayers className="size-3.5" strokeWidth={1.5} />
 							</button>
 						</TooltipTrigger>
 						<TooltipContent side="right">
@@ -420,7 +420,10 @@ export function DashboardSidebarHeader({
 						: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
 				)}
 			>
-				<WorkspacesIcon className="size-4 shrink-0 text-muted-foreground" />
+				<LuLayers
+					className="size-4 shrink-0 text-muted-foreground"
+					strokeWidth={1.5}
+				/>
 				<span className="flex-1 text-left">
 					<Trans>Workspaces</Trans>
 				</span>

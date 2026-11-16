@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
+import { Layers } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { PiClockClockwise } from "react-icons/pi";
 import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
-import { WorkspacesIcon } from "renderer/components/WorkspacesIcon";
 import { env } from "renderer/env.renderer";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
@@ -43,8 +43,7 @@ export function NavigationRail() {
 			/>
 			<RailButton
 				label={t({ message: "Workspaces" })}
-				icon={WorkspacesIcon}
-				isIconFilled
+				icon={Layers}
 				isActive={navigation.isWorkspacesOpen}
 				onClick={navigation.openWorkspaces}
 			/>

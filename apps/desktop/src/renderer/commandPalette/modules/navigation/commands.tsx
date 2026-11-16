@@ -1,7 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { BookOpenIcon, HistoryIcon, SettingsIcon } from "lucide-react";
-import { WorkspacesIcon } from "renderer/components/WorkspacesIcon";
+import { BookOpenIcon, HistoryIcon, Layers, SettingsIcon } from "lucide-react";
 import { type SwitcherOpenedVia, useFrameStackStore } from "../../core/frames";
 import type { Command, CommandProvider } from "../../core/types";
 import { RecentlyViewedFrame } from "../../ui/RecentlyViewed/RecentlyViewedFrame";
@@ -53,7 +52,7 @@ export const navigationProvider: CommandProvider = {
 					message: "Workspaces",
 				}),
 				section: "navigation",
-				icon: WorkspacesIcon,
+				icon: Layers,
 				hotkeyId: "OPEN_WORKSPACE_LIST",
 				keywords: ["workspace", "project", "repo", "repository", "switch"],
 				run: () => openWorkspaceList({ via: "command" }),
