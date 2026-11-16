@@ -124,6 +124,10 @@
 			"types": "./src/router/cloud-workspace/meter.ts",
 			"default": "./src/router/cloud-workspace/meter.ts"
 		},
+		"./cloud-workspace-sandbox-expiry": {
+			"types": "./src/router/cloud-workspace/sandbox-expiry.ts",
+			"default": "./src/router/cloud-workspace/sandbox-expiry.ts"
+		},
 		"./cloud-workspace-reap": {
 			"types": "./src/router/cloud-workspace/reap.ts",
 			"default": "./src/router/cloud-workspace/reap.ts"

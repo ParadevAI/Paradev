@@ -536,6 +536,10 @@
 			"types": "./src/plugins/manifest-schema.ts",
 			"default": "./src/plugins/manifest-schema.ts"
 		},
+		"./cloud-workspace-status": {
+			"types": "./src/cloud-workspace-status.ts",
+			"default": "./src/cloud-workspace-status.ts"
+		},
 		"./cloud-workspace-groups": {
 			"types": "./src/cloud-workspace-groups.ts",
 			"default": "./src/cloud-workspace-groups.ts"

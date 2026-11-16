@@ -1,5 +1,6 @@
 import { agentStatusFromEvent } from "@superset/shared/agent-status";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import type { QueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { getCloudEnvironmentsQueryKey } from "@/hooks/useCloudEnvironments";
@@ -202,7 +203,7 @@ export function createVoiceData({
 
 	const hostUrlFor = async (workspace: VoiceWorkspace): Promise<string> => {
 		if (workspace.kind === "cloud") {
-			if (workspace.status !== "ready") {
+			if (!isLiveCloudWorkspaceStatus(workspace.status)) {
 				throw new VoiceDataError(
 					"unreachable",
 					`${workspace.name} is ${workspace.status}; its sandbox is not up.`,

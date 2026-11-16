@@ -21,6 +21,7 @@ import {
 } from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
+import { recordSandboxAwake } from "./sandbox-expiry";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -159,6 +160,7 @@ async function provision(
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
+		if (sandbox.expiresAt) await recordSandboxAwake(row.id, sandbox.expiresAt);
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
 				Sentry.captureException(error, { extra: { bootId } }),
@@ -220,7 +222,7 @@ async function provision(
 		});
 		await transitionCloudWorkspace({
 			id: row.id,
-			from: ["provisioning", "ready"],
+			from: ["provisioning", "ready", "asleep"],
 			to: "failed",
 			set: keepForDiagnosis ? { providerSandboxId } : {},
 		});

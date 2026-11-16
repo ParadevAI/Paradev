@@ -543,6 +543,22 @@ either: gate a new host feature on the version the box reports
 (`health.check`), the same way as a remote host. The chat attachment parts
 floor (`ATTACHMENT_PARTS_MIN_HOST_VERSION`) works like this.
 
+**A machine someone owns is visibly on or off; a box falls asleep without
+telling anyone.** A session ends at its idle timeout, and Vercel sends no
+webhook for that or for a crash. The client cannot ask either: one
+provider read per row per client costs a `Sandbox.get` and a ticket mint, and
+an org-wide `Sandbox.list` pages 50 boxes at a time in creation order.
+**What we did:** every path that starts, extends or stops a box records when
+its session ends (`cloud_workspaces.sandbox_expires_at`) and moves the row
+between `ready` and `asleep`; our own stops write `asleep` at once. A QStash
+watch runs just after each expiry, confirms the stop with one provider read,
+writes `asleep` and nudges clients; an extension only moves the expiry, which
+the watch follows. A stop we did not cause (about 0.5% of sessions end
+`failed`), or a lost watch, is corrected by the 30-minute reconcile. Opening
+an `asleep` workspace wakes it like a `ready` one
+(`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`,
+`sandbox-expiry.ts`.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination

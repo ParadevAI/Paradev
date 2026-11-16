@@ -196,6 +196,7 @@ export async function provisionSandbox(args: {
 	providerSandboxId: string;
 	sandboxUrl: string;
 	hostTarget: string;
+	expiresAt: Date | null;
 }> {
 	const kind = args.kind ?? "workspace";
 	const config = {
@@ -250,6 +251,7 @@ export async function provisionSandbox(args: {
 		providerSandboxId: args.name,
 		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
 		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
+		expiresAt: sandbox.expiresAt ?? null,
 	};
 }
 
@@ -357,6 +359,8 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	hostTarget: string;
 	running: boolean;
 	vcpus: number | undefined;
+	/** When the running session ends unless extended; null when stopped. */
+	expiresAt: Date | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -370,6 +374,7 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 			running,
 			// `sandbox.vcpus` is the configured size, which a running session does not pick up.
 			vcpus: running ? sandbox.currentSession().vcpus : sandbox.vcpus,
+			expiresAt: running ? (sandbox.expiresAt ?? null) : null,
 		};
 	} catch (error) {
 		if (isUnavailable(error))
@@ -386,14 +391,15 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
  */
 export async function topUpSandboxSession(
 	providerSandboxId: string,
-): Promise<void> {
+): Promise<{ expiresAt: Date } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
-	if (sandbox?.status !== "running" || !sandbox.expiresAt) return;
+	if (sandbox?.status !== "running" || !sandbox.expiresAt) return null;
 	const extension =
 		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
 	if (extension > MIN_TOP_UP_MS) {
 		await sandbox.currentSession().extendTimeout(extension);
 	}
+	return sandbox.expiresAt ? { expiresAt: sandbox.expiresAt } : null;
 }
 
 /** Whether host-service is already serving, so a wake can skip the boot. */
@@ -429,6 +435,7 @@ export async function wakeSandbox(args: {
 	/** The boot command ran: the session was stopped, or host-service in it had stopped answering. */
 	rebooted: boolean;
 	answer: HostAnswer;
+	expiresAt: Date | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -498,7 +505,13 @@ export async function wakeSandbox(args: {
 					claim: args.claim,
 				}),
 		);
-		return { hostTarget, booted: !wasRunning, rebooted: !serving, answer };
+		return {
+			hostTarget,
+			booted: !wasRunning,
+			rebooted: !serving,
+			answer,
+			expiresAt: sandbox.expiresAt ?? null,
+		};
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);
@@ -714,10 +727,16 @@ const UNSETTLED_SANDBOX_STATUSES = new Set([
 	"snapshotting",
 ]);
 
+export interface ActiveWorkspaceSandbox {
+	name: string;
+	/** When the running session ends unless extended; null when it is not running. */
+	expiresAt: Date | null;
+}
+
 export async function listActiveWorkspaceSandboxes(
 	since: number,
-): Promise<string[]> {
-	const names: string[] = [];
+): Promise<ActiveWorkspaceSandbox[]> {
+	const found: ActiveWorkspaceSandbox[] = [];
 	const oldestRunning = Date.now() - SESSION_MAX_MS;
 	// Vercel's tag filter uses creation-order pagination instead of statusUpdatedAt.
 	for await (const sandbox of await Sandbox.list({
@@ -729,10 +748,16 @@ export async function listActiveWorkspaceSandboxes(
 		if (updatedAt < oldestRunning) break;
 		if (sandbox.tags?.kind !== "workspace") continue;
 		if (UNSETTLED_SANDBOX_STATUSES.has(sandbox.status) || updatedAt >= since) {
-			names.push(sandbox.name);
+			found.push({
+				name: sandbox.name,
+				expiresAt:
+					sandbox.status === "running" && sandbox.expiresAt
+						? new Date(sandbox.expiresAt)
+						: null,
+			});
 		}
 	}
-	return names;
+	return found;
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */

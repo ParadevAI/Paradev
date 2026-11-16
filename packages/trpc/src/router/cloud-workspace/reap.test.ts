@@ -5,6 +5,7 @@ import * as files from "../../lib/files";
 import * as sandbox from "../../lib/sandbox";
 import * as jobs from "./jobs";
 import * as meter from "./meter";
+import * as sandboxSleep from "./sandbox-sleep";
 
 type Row = {
 	id: string;
@@ -27,6 +28,7 @@ let onArchiveHook: () => void = () => {};
 let reapedFiles: string[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
+stub(sandboxSleep, { recordSandboxAsleep: () => Promise.resolve() });
 stub(sandbox, {
 	stopSandbox: (id: string) => {
 		sandboxCalls.push(`stop:${id}`);

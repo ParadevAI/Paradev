@@ -14,6 +14,7 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	normalizeWorkspaceTags,
 	workspaceTagsInputSchema,
@@ -75,6 +76,8 @@ import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -114,7 +117,7 @@ async function loadReadyWorkspace(
 	await assertMember(ctx, row.organizationId);
 	await assertCloudAccess(ctx, row.organizationId);
 	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
-	if (row.status !== "ready") {
+	if (!isLiveCloudWorkspaceStatus(row.status)) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: `Cloud workspace is ${row.status}`,
@@ -141,8 +144,16 @@ async function addressSandbox(
 }> {
 	try {
 		if (mode === "address") {
+			const described = await describeSandbox(row.providerSandboxId);
+			if (described.expiresAt) {
+				await recordSandboxAwake(row.id, described.expiresAt);
+			} else {
+				await recordSandboxAsleep(row.id);
+			}
 			return {
-				...(await describeSandbox(row.providerSandboxId)),
+				hostTarget: described.hostTarget,
+				running: described.running,
+				vcpus: described.vcpus,
 				agentCredentialsChanged: false,
 			};
 		}
@@ -734,6 +745,7 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				await stopAndSnapshot(row.providerSandboxId);
+				await recordSandboxAsleep(row.id);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -847,7 +859,7 @@ export const cloudWorkspaceRouter = {
 			// The box keeps running until the reap stops it, so an undo is instant.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
-				from: ["provisioning", "ready", "failed"],
+				from: ["provisioning", "ready", "asleep", "failed"],
 				to: "deleted",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
@@ -913,7 +925,11 @@ export const cloudWorkspaceRouter = {
 					? {
 							id: row.id,
 							from: ["deleted"],
-							to: "ready",
+							to:
+								row.sandboxExpiresAt &&
+								row.sandboxExpiresAt.getTime() <= Date.now()
+									? "asleep"
+									: "ready",
 							set: { deletedAt: null },
 						}
 					: {

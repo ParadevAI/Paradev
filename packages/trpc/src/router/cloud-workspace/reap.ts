@@ -12,6 +12,7 @@ import {
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -96,6 +97,7 @@ export async function reapArchivedCloudWorkspace(
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	await stopSandbox(row.providerSandboxId);
+	await recordSandboxAsleep(row.id);
 	await queueSettleWorkspace(row.id);
 	return "stopped";
 }

@@ -21,6 +21,8 @@ import {
 	authorizeBoot,
 	queueSettleWorkspace,
 } from "./meter";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 import { transitionCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -72,7 +74,7 @@ async function wake(
 	);
 	let bootId: string | null = null;
 	const wakeStartedAt = Date.now();
-	const { hostTarget, booted, rebooted, answer } = await wakeSandbox({
+	const { hostTarget, booted, rebooted, answer, expiresAt } = await wakeSandbox({
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		beforeResume: async (box) => {
@@ -124,6 +126,7 @@ async function wake(
 			.set(set)
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
+	if (expiresAt) await recordSandboxAwake(row.id, expiresAt);
 	return {
 		hostTarget,
 		booted,
@@ -143,6 +146,7 @@ export async function restartCloudWorkspace(
 	const { running } = await describeSandbox(row.providerSandboxId);
 	if (running) {
 		await stopAndSnapshot(row.providerSandboxId);
+		await recordSandboxAsleep(row.id);
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);
@@ -159,7 +163,7 @@ export async function markSandboxUnavailable(
 ): Promise<void> {
 	await transitionCloudWorkspace({
 		id: row.id,
-		from: ["ready"],
+		from: ["ready", "asleep"],
 		to: "failed",
 		set: { sandboxUrl: null },
 	});

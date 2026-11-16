@@ -15,7 +15,7 @@ export interface CloudAccessibleWorkspaceInput {
 	id: string;
 	name: string;
 	branch: string;
-	status: "provisioning" | "ready" | "failed" | "deleted";
+	status: "provisioning" | "ready" | "asleep" | "failed" | "deleted";
 	agentStatus: "review" | "working" | "failed" | "permission" | null;
 	agentStatusAt: Date | null;
 	createdBy: { userId: string; name: string; image: string | null } | null;

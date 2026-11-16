@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { TRPCClientError } from "@trpc/client";
@@ -202,7 +203,7 @@ export function CloudWorkspaceRecordScreen({
 					copy(workspaceId, t({ message: "Workspace ID copied" }))
 				}
 				onSaveAsEnvironment={
-					workspace.status === "ready" && !workspace.deletedAt
+					isLiveCloudWorkspaceStatus(workspace.status) && !workspace.deletedAt
 						? () => requestSaveAsEnvironment(workspace.id)
 						: undefined
 				}

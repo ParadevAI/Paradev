@@ -21,7 +21,7 @@ export interface CloudSidebarWorkspaceInput {
 	updatedAt: Date;
 	agentStatusAt: Date | null;
 	createdBy: { userId: string; name: string; image: string | null } | null;
-	status?: "provisioning" | "ready" | "failed" | "deleted";
+	status?: "provisioning" | "ready" | "asleep" | "failed" | "deleted";
 }
 
 export interface CloudSidebarPullRequestInput {
@@ -165,7 +165,9 @@ export function buildCloudSidebarWorkspaces({
 			isMine: userId !== null && workspace.createdBy?.userId === userId,
 			creator: workspace.createdBy,
 			sandboxStatus:
-				workspace.status === "provisioning" || workspace.status === "failed"
+				workspace.status === "provisioning" ||
+				workspace.status === "failed" ||
+				workspace.status === "asleep"
 					? workspace.status
 					: null,
 		};
