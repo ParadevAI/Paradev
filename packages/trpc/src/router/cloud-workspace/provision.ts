@@ -3,7 +3,6 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
@@ -146,7 +145,7 @@ async function provision(
 				where: eq(cloudWorkspaces.id, row.id),
 				columns: { status: true },
 			});
-			if (current && isArchivedCloudWorkspaceStatus(current.status)) {
+			if (current?.status === "archived") {
 				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
 					(error) =>
 						console.error(
@@ -228,7 +227,7 @@ async function provision(
 		});
 		await transitionCloudWorkspace({
 			id: row.id,
-			from: ["provisioning", "awake", "ready", "asleep"],
+			from: ["provisioning", "awake", "asleep"],
 			to: "failed",
 			set: keepForDiagnosis ? { providerSandboxId } : {},
 		});

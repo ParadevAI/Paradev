@@ -132,10 +132,6 @@
 			"types": "./src/router/cloud-workspace/reap.ts",
 			"default": "./src/router/cloud-workspace/reap.ts"
 		},
-		"./cloud-workspace-backfill-status": {
-			"types": "./src/router/cloud-workspace/backfill-status.ts",
-			"default": "./src/router/cloud-workspace/backfill-status.ts"
-		},
 		"./automation-dispatch": {
 			"types": "./src/router/automation/dispatch.ts",
 			"default": "./src/router/automation/dispatch.ts"

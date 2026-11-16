@@ -15,10 +15,6 @@ import {
 	isCloudAgentId,
 } from "@superset/shared/cloud-agent-launch";
 import {
-	isArchivedCloudWorkspaceStatus,
-	isLiveCloudWorkspaceStatus,
-} from "@superset/shared/cloud-workspace-status";
-import {
 	normalizeWorkspaceTags,
 	workspaceTagsInputSchema,
 } from "@superset/shared/workspace-tags";
@@ -71,6 +67,7 @@ import {
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { withClientStatus } from "./client-status";
+import { isLiveStatus } from "./live";
 import {
 	assertMayBoot,
 	queueSettleWorkspace,
@@ -121,7 +118,7 @@ async function loadReadyWorkspace(
 	await assertMember(ctx, row.organizationId);
 	await assertCloudAccess(ctx, row.organizationId);
 	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
-	if (!isLiveCloudWorkspaceStatus(row.status)) {
+	if (!isLiveStatus(row.status)) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: `Cloud workspace is ${row.status}`,
@@ -868,7 +865,7 @@ export const cloudWorkspaceRouter = {
 			// The box keeps running until the reap stops it, so an undo is instant.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
-				from: ["provisioning", "awake", "ready", "asleep", "failed"],
+				from: ["provisioning", "awake", "asleep", "failed"],
 				to: "archived",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
@@ -923,7 +920,7 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
 			const resumable =
-				isArchivedCloudWorkspaceStatus(row.status) &&
+				row.status === "archived" &&
 				row.provider === "vercel" &&
 				(await sandboxExists(row.providerSandboxId));
 			// Inside the grace period the box is still there, running for the
@@ -933,7 +930,7 @@ export const cloudWorkspaceRouter = {
 				resumable
 					? {
 							id: row.id,
-							from: ["archived", "deleted"],
+							from: ["archived"],
 							to:
 								row.sandboxExpiresAt &&
 								row.sandboxExpiresAt.getTime() <= Date.now()
@@ -943,7 +940,7 @@ export const cloudWorkspaceRouter = {
 						}
 					: {
 							id: row.id,
-							from: ["archived", "deleted"],
+							from: ["archived"],
 							to: "provisioning",
 							set: {
 								provider: "vercel",

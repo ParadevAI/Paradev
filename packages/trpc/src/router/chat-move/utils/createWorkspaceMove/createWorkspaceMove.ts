@@ -5,7 +5,6 @@ import {
 	v2UsersHosts,
 	v2Workspaces,
 } from "@superset/db/schema";
-import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import type { NewChatMove } from "@superset/shared/move-book";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
@@ -14,6 +13,7 @@ import {
 	type SelectChatMove,
 	type SelectWorkspaceMove,
 } from "../../../../lib/moves";
+import { isLiveStatus } from "../../../cloud-workspace/live";
 import { findMovableChat, lastTurnSeq } from "../findMovableChat";
 
 type Owner = { organizationId: string; userId: string };
@@ -178,7 +178,7 @@ export async function retryChatMove(
 		if (
 			!(
 				destination &&
-				(isLiveCloudWorkspaceStatus(destination.status) ||
+				(isLiveStatus(destination.status) ||
 					destination.status === "provisioning")
 			)
 		) {

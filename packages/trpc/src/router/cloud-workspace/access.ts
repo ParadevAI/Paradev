@@ -1,16 +1,6 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaceShares, cloudWorkspaces } from "@superset/db/schema";
-import { ARCHIVED_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
-import {
-	and,
-	eq,
-	exists,
-	inArray,
-	isNotNull,
-	notInArray,
-	or,
-	sql,
-} from "drizzle-orm";
+import { and, eq, exists, isNotNull, ne, or, sql } from "drizzle-orm";
 import {
 	assertCloudAccess,
 	assertMember,
@@ -73,13 +63,11 @@ export const visibleTo = (userId: string) =>
 export const isListed = (archived: boolean) =>
 	archived
 		? and(
-				inArray(cloudWorkspaces.status, [...ARCHIVED_CLOUD_WORKSPACE_STATUSES]),
+				eq(cloudWorkspaces.status, "archived"),
 				// Rows deleted before archiving existed have no deletedAt and no box.
 				isNotNull(cloudWorkspaces.deletedAt),
 			)
-		: notInArray(cloudWorkspaces.status, [
-				...ARCHIVED_CLOUD_WORKSPACE_STATUSES,
-			]);
+		: ne(cloudWorkspaces.status, "archived");
 
 export const notFound = () =>
 	userError({
