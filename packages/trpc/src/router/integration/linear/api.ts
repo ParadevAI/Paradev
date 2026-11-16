@@ -184,16 +184,13 @@ async function request<T>(
 	return response.data;
 }
 
-export const linearIssueOrderValues = ["createdAt", "updatedAt"] as const;
-export type LinearIssueOrder = (typeof linearIssueOrderValues)[number];
-
 export async function listIssues(
 	client: LinearClient,
 	input: {
 		filter: LinearIssueFilter;
 		cursor?: string;
 		search?: string;
-		orderBy?: LinearIssueOrder;
+		orderBy?: "createdAt";
 	},
 ): Promise<LinearIssuePage> {
 	const variables = {

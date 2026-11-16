@@ -13,7 +13,6 @@ import {
 	getWorkspace,
 	isLinearRateLimitError,
 	issueFilterFor,
-	linearIssueOrderValues,
 	linearStatusFilterValues,
 	listIssues,
 	listProjects,
@@ -74,7 +73,7 @@ export const linearLiveRouter = {
 				assignee: z.string().nullish(),
 				search: z.string().trim().max(200).nullish(),
 				cursor: z.string().nullish(),
-				orderBy: z.enum(linearIssueOrderValues).optional(),
+				orderBy: z.literal("createdAt").optional(),
 			}),
 		)
 		.query(({ ctx, input }) =>
