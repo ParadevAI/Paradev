@@ -17,6 +17,11 @@ checklist is `plans/20260913-sandbox-implementation-checklist.md`.
   `bun run assets <name>` and fetched on the box by sha256 from
   `cdn.superset.sh/sandbox/`. The row's `dest` is where it lands; archives
   are staged under `/usr/local/share/superset/media/` for a step to consume.
+  A step lists the archives it unpacks under `discards` in `steps.json`: the
+  runner deletes them once the step succeeds, keeps the `.hash` sidecar so
+  `sync-assets` does not fetch them again, and fetches them again only when
+  the step has to re-run. A file the box runs in place (`claude`, `superset`)
+  is never discarded.
 - **Something the box has to execute to configure itself** is a step:
   `bundle/steps/<name>.sh`, registered in `bundle/steps.json` with the assets
   it consumes, the rootfs files it reads (`inputs`) and the steps it must
@@ -50,8 +55,8 @@ build that runs before the publish that uploads the asset poisons the edge it us
 hours; the runner's fetch retries with a cache-busting query when the plain URL 404s, and CI
 publishes before it builds. Locally: publish first.
 
-A staged archive under the media directory that the current manifest does not name is an
-earlier build's; `sync-assets` prunes it before fetching, and a step that needs its asset
+A staged archive or lone sidecar under the media directory that the current manifest does not
+name is an earlier build's; `sync-assets` prunes it before fetching, and a step that needs its asset
 picks it by the manifest's hash rather than by listing the directory.
 
 ## Versioning
