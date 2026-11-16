@@ -147,7 +147,7 @@ function SplitView<TData>({
 					!isCards
 						? undefined
 						: flush
-							? "w-px bg-border data-[panel-group-direction=vertical]:h-px data-[resize-handle-state=drag]:bg-foreground/40 data-[resize-handle-state=hover]:bg-foreground/30"
+							? "w-px shrink-0 bg-border data-[panel-group-direction=vertical]:h-px data-[resize-handle-state=drag]:bg-foreground/40 data-[resize-handle-state=hover]:bg-foreground/30"
 							: "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
 				}
 				style={{ zIndex: RESIZE_HANDLE_BASE_Z_INDEX - path.length }}
