@@ -2222,6 +2222,9 @@ msgstr "Add to sidebar"
 msgid "Add to workspace"
 msgstr "Add to workspace"
 
+msgid "Add your Devs"
+msgstr "Add your Devs"
+
 msgid "Add your first project"
 msgstr "Add your first project"
 
@@ -9559,6 +9562,9 @@ msgstr "Green/Red (Deuteranopia)"
 
 msgid "Grepped"
 msgstr "Grepped"
+
+msgid "Group"
+msgstr "Group"
 
 msgid "Group actions"
 msgstr "Group actions"
@@ -20241,6 +20247,9 @@ msgstr "This conversation is too long for the model"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "This deletes the group and its messages for everyone in it. It cannot be undone."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "This deletes the saved scrollback used for reboot/crash recovery."

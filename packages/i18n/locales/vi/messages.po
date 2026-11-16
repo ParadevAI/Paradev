@@ -2222,6 +2222,9 @@ msgstr "Thêm vào thanh bên"
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
 
+msgid "Add your Devs"
+msgstr "Thêm Devs của bạn"
+
 msgid "Add your first project"
 msgstr "Thêm dự án đầu tiên của bạn"
 
@@ -9559,6 +9562,9 @@ msgstr "Xanh lục/Đỏ (Deuteranopia)"
 
 msgid "Grepped"
 msgstr "Đã grep"
+
+msgid "Group"
+msgstr "Nhóm"
 
 msgid "Group actions"
 msgstr "Hành động nhóm"
@@ -20241,6 +20247,9 @@ msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Thao tác này xóa Dev và cuộc trò chuyện của bạn với nó, đồng thời gỡ nó khỏi mọi nhóm. Không thể hoàn tác."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Thao tác này xóa nhóm và tin nhắn của nhóm đối với mọi thành viên. Không thể hoàn tác."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Thao tác này xóa phần scrollback đã lưu dùng để khôi phục sau khi khởi động lại hoặc crash."

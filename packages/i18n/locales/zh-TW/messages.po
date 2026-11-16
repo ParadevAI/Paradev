@@ -2222,6 +2222,9 @@ msgstr "新增到側邊欄"
 msgid "Add to workspace"
 msgstr "新增到工作區"
 
+msgid "Add your Devs"
+msgstr "新增你的 Devs"
+
 msgid "Add your first project"
 msgstr "新增你的第一個專案"
 
@@ -9559,6 +9562,9 @@ msgstr "綠/紅（綠色盲）"
 
 msgid "Grepped"
 msgstr "已搜尋"
+
+msgid "Group"
+msgstr "群組"
 
 msgid "Group actions"
 msgstr "群組操作"
@@ -20241,6 +20247,9 @@ msgstr "此對話對模型來說太長了"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "這會刪除該 Dev 以及你與它的聊天，並將它移出所有群組。此操作無法復原。"
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "這會為所有成員刪除該群組及其訊息。此操作無法復原。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "這將刪除用於重啟/崩潰恢復的已儲存回滾緩衝。"

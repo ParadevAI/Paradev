@@ -2222,6 +2222,9 @@ msgstr "Kenar çubuğuna ekle"
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
 
+msgid "Add your Devs"
+msgstr "Devs'lerinizi ekleyin"
+
 msgid "Add your first project"
 msgstr "İlk projeni ekle"
 
@@ -9559,6 +9562,9 @@ msgstr "Yeşil/Kırmızı (Döteranopi)"
 
 msgid "Grepped"
 msgstr "Grep'lendi"
+
+msgid "Group"
+msgstr "Grup"
 
 msgid "Group actions"
 msgstr "Grup eylemleri"
@@ -20241,6 +20247,9 @@ msgstr "Bu konuşma model için fazla uzun"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Bu işlem Dev'i ve onunla olan sohbetinizi siler ve onu tüm gruplardan çıkarır. Geri alınamaz."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Bu işlem grubu ve mesajlarını içindeki herkes için siler. Geri alınamaz."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Bu işlem, yeniden başlatma/çökme kurtarma için saklanan kaydırma geçmişini siler."

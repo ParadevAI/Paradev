@@ -2216,6 +2216,9 @@ msgstr "Додати на бічну панель"
 msgid "Add to workspace"
 msgstr "Додати до робочого простору"
 
+msgid "Add your Devs"
+msgstr "Додати ваших Devs"
+
 msgid "Add your first project"
 msgstr "Додайте свій перший проєкт"
 
@@ -9553,6 +9556,9 @@ msgstr "Зелений/червоний (дейтеранопія)"
 
 msgid "Grepped"
 msgstr "Виконано grep"
+
+msgid "Group"
+msgstr "Група"
 
 msgid "Group actions"
 msgstr "Дії з групою"
@@ -20235,6 +20241,9 @@ msgstr "Ця розмова задовга для моделі"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Dev і ваш чат із ним буде видалено, і його буде прибрано з усіх груп. Цю дію не можна скасувати."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Групу та її повідомлення буде видалено для всіх учасників. Цю дію не можна скасувати."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Буде видалено збережений буфер прокручування, який використовується для відновлення після перезавантаження чи збою."

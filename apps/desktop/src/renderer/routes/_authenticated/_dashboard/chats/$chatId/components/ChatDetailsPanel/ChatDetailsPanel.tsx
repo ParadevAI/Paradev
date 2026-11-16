@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { Chat, ChatState } from "@superset/chats-core";
+import { type Chat, type ChatState, myDevs } from "@superset/chats-core";
 import { errorMessage } from "@superset/i18n/errors";
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Button } from "@superset/ui/button";
@@ -13,6 +13,7 @@ import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard
 import { ChatFace } from "../../../components/ChatFace";
 import { useChats } from "../../../hooks/useChats";
 import { EditDevDialog } from "./components/EditDevDialog";
+import { GroupSettings } from "./components/GroupSettings";
 
 interface ChatDetailsPanelProps {
 	state: ChatState;
@@ -43,6 +44,10 @@ export function ChatDetailsPanel({
 	const chats = useChats();
 	const navigate = useNavigate();
 	const editing = editingId ? state.devs[editingId] : undefined;
+	const isGroup = chat.kind === "group";
+	const addableDevs = isGroup
+		? myDevs(state).filter((dev) => !chat.devIds.includes(dev.id))
+		: [];
 	const candidates =
 		chat.kind === "group"
 			? organization.people.filter(
@@ -102,6 +107,17 @@ export function ChatDetailsPanel({
 									</div>
 								)}
 							</div>
+							{isGroup && agent.ownerId === state.meId && (
+								<Button
+									size="xs"
+									variant="ghost"
+									onClick={() =>
+										chats?.actions.setDevInGroup(chat.id, agent.id, false)
+									}
+								>
+									<Trans>Remove</Trans>
+								</Button>
+							)}
 							{agent.descriptionText !== undefined && (
 								<button
 									type="button"
@@ -115,6 +131,33 @@ export function ChatDetailsPanel({
 						</div>
 					))}
 				</section>
+				{addableDevs.length > 0 && (
+					<section className="flex flex-col gap-1">
+						<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
+							<Trans>Add your Devs</Trans>
+						</h3>
+						{addableDevs.map((dev) => (
+							<div
+								key={dev.id}
+								className="flex items-center gap-2.5 rounded-lg px-1 py-1"
+							>
+								<FaceAvatar seed={dev.id} size={28} />
+								<span className="min-w-0 flex-1 truncate text-sm">
+									{dev.name}
+								</span>
+								<Button
+									size="xs"
+									variant="outline"
+									onClick={() =>
+										chats?.actions.setDevInGroup(chat.id, dev.id, true)
+									}
+								>
+									<Trans>Add</Trans>
+								</Button>
+							</div>
+						))}
+					</section>
+				)}
 				<section className="flex flex-col gap-1">
 					<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
 						<Trans>People</Trans>
@@ -154,6 +197,18 @@ export function ChatDetailsPanel({
 							</div>
 						))}
 					</section>
+				)}
+				{isGroup && chats && chat.ownerIds.includes(state.meId) && (
+					<GroupSettings
+						key={chat.id}
+						title={chat.title}
+						onRename={(next) => chats.actions.renameGroup(chat.id, next)}
+						onDelete={async () => {
+							const deleted = await chats.actions.deleteGroup(chat.id);
+							if (deleted) void navigate({ to: "/chats" });
+							return deleted;
+						}}
+					/>
 				)}
 			</div>
 			{editing && chats && (

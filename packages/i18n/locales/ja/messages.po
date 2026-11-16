@@ -2222,6 +2222,9 @@ msgstr "サイドバーに追加"
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
 
+msgid "Add your Devs"
+msgstr "自分の Devs を追加"
+
 msgid "Add your first project"
 msgstr "最初のプロジェクトを追加"
 
@@ -9559,6 +9562,9 @@ msgstr "緑/赤（2型2色覚）"
 
 msgid "Grepped"
 msgstr "検索"
+
+msgid "Group"
+msgstr "グループ"
 
 msgid "Group actions"
 msgstr "グループの操作"
@@ -20241,6 +20247,9 @@ msgstr "この会話はモデルには長すぎます"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Dev とそのチャットが削除され、すべてのグループから外されます。この操作は元に戻せません。"
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "グループとそのメッセージがメンバー全員から削除されます。この操作は元に戻せません。"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "再起動やクラッシュからの復旧に使う保存済みスクロールバックを削除します。"

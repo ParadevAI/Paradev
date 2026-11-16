@@ -2222,6 +2222,9 @@ msgstr "사이드바에 추가"
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
 
+msgid "Add your Devs"
+msgstr "내 Devs 추가"
+
 msgid "Add your first project"
 msgstr "첫 프로젝트 추가"
 
@@ -9559,6 +9562,9 @@ msgstr "녹색/적색(제2색맹)"
 
 msgid "Grepped"
 msgstr "Grep 실행함"
+
+msgid "Group"
+msgstr "그룹"
 
 msgid "Group actions"
 msgstr "그룹 작업"
@@ -20241,6 +20247,9 @@ msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Dev와 해당 채팅이 삭제되고 모든 그룹에서 제거됩니다. 이 작업은 되돌릴 수 없습니다."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "그룹과 그 메시지가 모든 구성원에게서 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "재부팅/충돌 복구에 사용하는 저장된 스크롤백을 삭제합니다."

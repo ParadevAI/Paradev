@@ -2222,6 +2222,9 @@ msgstr "Přidat do postranního panelu"
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
 
+msgid "Add your Devs"
+msgstr "Přidat vaše Devs"
+
 msgid "Add your first project"
 msgstr "Přidejte svůj první projekt"
 
@@ -9559,6 +9562,9 @@ msgstr "Zelená/červená (deuteranopie)"
 
 msgid "Grepped"
 msgstr "Prohledáno"
+
+msgid "Group"
+msgstr "Skupina"
 
 msgid "Group actions"
 msgstr "Akce skupiny"
@@ -20241,6 +20247,9 @@ msgstr "Tato konverzace je pro model příliš dlouhá"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Tím smažete Dev i váš chat s ním a odeberete ho ze všech skupin. Tuto akci nelze vrátit zpět."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Tím smažete skupinu i její zprávy pro všechny členy. Tuto akci nelze vrátit zpět."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Tímto se smaže uložený scrollback používaný k obnovení po restartu nebo pádu."

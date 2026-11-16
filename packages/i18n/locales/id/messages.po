@@ -2222,6 +2222,9 @@ msgstr "Tambahkan ke sidebar"
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
 
+msgid "Add your Devs"
+msgstr "Tambahkan Devs Anda"
+
 msgid "Add your first project"
 msgstr "Tambahkan proyek pertama Anda"
 
@@ -9559,6 +9562,9 @@ msgstr "Hijau/Merah (Deuteranopia)"
 
 msgid "Grepped"
 msgstr "Di-grep"
+
+msgid "Group"
+msgstr "Grup"
 
 msgid "Group actions"
 msgstr "Aksi grup"
@@ -20241,6 +20247,9 @@ msgstr "Percakapan ini terlalu panjang untuk model"
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Tindakan ini menghapus Dev dan chat Anda dengannya, serta mengeluarkannya dari semua grup. Tindakan ini tidak dapat dibatalkan."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Tindakan ini menghapus grup dan pesannya untuk semua anggotanya. Tindakan ini tidak dapat dibatalkan."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Ini menghapus scrollback tersimpan yang dipakai untuk pemulihan setelah reboot/crash."

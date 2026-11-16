@@ -2222,6 +2222,9 @@ msgstr "Добавить на боковую панель"
 msgid "Add to workspace"
 msgstr "Добавить в рабочую область"
 
+msgid "Add your Devs"
+msgstr "Добавить ваших Devs"
+
 msgid "Add your first project"
 msgstr "Добавьте первый проект"
 
@@ -9559,6 +9562,9 @@ msgstr "Зелёный/красный (дейтеранопия)"
 
 msgid "Grepped"
 msgstr "Выполнен grep"
+
+msgid "Group"
+msgstr "Группа"
 
 msgid "Group actions"
 msgstr "Действия с группой"
@@ -20241,6 +20247,9 @@ msgstr "Этот разговор слишком длинный для моде�
 
 msgid "This deletes the Dev and your chat with it, and takes it out of every group. It cannot be undone."
 msgstr "Dev и ваш чат с ним будут удалены, и он будет убран из всех групп. Это действие нельзя отменить."
+
+msgid "This deletes the group and its messages for everyone in it. It cannot be undone."
+msgstr "Группа и её сообщения будут удалены для всех участников. Это действие нельзя отменить."
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Это удалит сохранённую прокрутку, используемую для восстановления после перезагрузки или сбоя."

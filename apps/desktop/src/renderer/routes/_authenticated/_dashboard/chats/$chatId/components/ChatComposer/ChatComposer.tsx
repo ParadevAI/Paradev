@@ -11,7 +11,7 @@ import {
 	splitMentions,
 } from "@superset/chats-core";
 import { Avatar } from "@superset/ui/atoms/Avatar";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LuPencil, LuReply, LuX } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
@@ -83,6 +83,10 @@ export function ChatComposer({
 	}, [editingText]);
 
 	const title = t({ message: "People and Devs" });
+	const candidatesKey = candidates
+		.map((candidate) => `${candidate.kind}:${candidate.id}:${candidate.label}`)
+		.join("|");
+	// biome-ignore lint/correctness/useExhaustiveDependencies: the composer loads a provider's list once, so a changed list needs a new provider
 	const mentionProviders = useMemo<ComposerMentionProvider[]>(
 		() => [
 			{
@@ -108,12 +112,13 @@ export function ChatComposer({
 				},
 			},
 		],
-		[title],
+		[title, candidatesKey],
 	);
 
+	// The composer has no way to empty itself, so dropping an edit mounts a new one.
+	const [draftEpoch, setDraftEpoch] = useState(0);
 	const cancel = () => {
-		if (editing)
-			composer.current?.restoreDraft({ segments: [], attachments: [] });
+		if (editing) setDraftEpoch((epoch) => epoch + 1);
 		onCancel();
 	};
 	const strip = editing
@@ -162,6 +167,7 @@ export function ChatComposer({
 				</div>
 			)}
 			<AgentComposer
+				key={draftEpoch}
 				ref={composer}
 				layout="inline"
 				placeholder={placeholder}
