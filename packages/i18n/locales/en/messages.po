@@ -14362,6 +14362,7 @@ msgstr "Open pull request"
 msgid "Open Pull Request"
 msgstr "Open Pull Request"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"

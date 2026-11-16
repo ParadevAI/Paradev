@@ -115,6 +115,9 @@ import { type MenuPage, selectMenuPages } from "./utils/selectMenuPages";
 const MENU_PAGE_LIMIT = 200;
 const CLOCK_TICK_MS = 1000;
 
+const CAPSULE_BUTTON_CLASS =
+	"relative flex h-full items-center gap-1.5 px-2 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+
 interface WorkspaceActivityMenuProps {
 	workspaceId: string;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
@@ -541,6 +544,12 @@ export function WorkspaceActivityMenu({
 		setShipView(null);
 	};
 
+	const shortcut =
+		changes && currentPr && currentPrState
+			? "pullRequest"
+			: changes && triggerChangesStats
+				? "changes"
+				: null;
 	const onTriggerClick = () => {
 		if (fits) {
 			setHidden(workspaceId, !hidden);
@@ -825,45 +834,97 @@ export function WorkspaceActivityMenu({
 			<PopoverAnchor
 				virtualRef={{ current: anchorNode ?? triggerRef.current }}
 			/>
-			<Tooltip disableHoverableContent>
-				<TooltipTrigger asChild>
-					<button
-						ref={triggerRef}
-						type="button"
-						onClick={onTriggerClick}
-						aria-label={
-							changes && currentPr
-								? t({
-										message: `Workspace activity, pull request #${currentPr.number}`,
-									})
-								: t({ message: "Workspace activity" })
-						}
-						aria-expanded={open}
-						aria-controls={open ? panelId : undefined}
-						aria-describedby={hasNew ? newPageStatusId : undefined}
-						className={cn(
-							"no-drag relative flex h-7 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors",
-							"focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-							open
-								? "border-foreground/30 bg-foreground/15 text-foreground hover:bg-foreground/20"
-								: "border-border/60 bg-muted/30 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
-						)}
-					>
-						<ListTree className="size-3.5 shrink-0" />
-						{runningCount > 0 ? (
-							<>
-								<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
-								<span className="tabular-nums">{runningCount}</span>
-							</>
+			<div
+				className={cn(
+					"no-drag flex h-7 shrink-0 items-stretch rounded-md border text-xs font-medium",
+					shortcut
+						? "border-border/60 bg-muted/30"
+						: open
+							? "border-foreground/30"
+							: "border-border/60",
+				)}
+			>
+				<Tooltip disableHoverableContent>
+					<TooltipTrigger asChild>
+						<button
+							ref={triggerRef}
+							type="button"
+							onClick={onTriggerClick}
+							aria-label={
+								changes && currentPr
+									? t({
+											message: `Workspace activity, pull request #${currentPr.number}`,
+										})
+									: t({ message: "Workspace activity" })
+							}
+							aria-expanded={open}
+							aria-controls={open ? panelId : undefined}
+							aria-describedby={hasNew ? newPageStatusId : undefined}
+							className={cn(
+								CAPSULE_BUTTON_CLASS,
+								shortcut ? "rounded-l-[5px]" : "rounded-[5px]",
+								open
+									? "bg-foreground/15 text-foreground hover:bg-foreground/20"
+									: cn(
+											"text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+											!shortcut && "bg-muted/30",
+										),
+							)}
+						>
+							<ListTree className="size-3.5 shrink-0" />
+							{runningCount > 0 ? (
+								<>
+									<span className="size-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
+									<span className="tabular-nums">{runningCount}</span>
+								</>
+							) : (
+								!paneAreaStyle &&
+								workspace.length > 0 && (
+									<span className="tabular-nums">{workspace.length}</span>
+								)
+							)}
+							{hasNew && (
+								<>
+									<span
+										aria-hidden="true"
+										className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
+									/>
+									<span id={newPageStatusId} className="sr-only">
+										<Trans context="badge on a page published since the menu was last opened">
+											New
+										</Trans>
+									</span>
+								</>
+							)}
+						</button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						{open ? (
+							<Trans>Hide workspace activity</Trans>
 						) : (
-							!paneAreaStyle &&
-							workspace.length > 0 && (
-								<span className="tabular-nums">{workspace.length}</span>
-							)
+							<Trans>Show workspace activity</Trans>
 						)}
-						{changes && currentPr && currentPrState ? (
-							<>
-								<span className="h-3.5 w-px shrink-0 bg-border" />
+					</TooltipContent>
+				</Tooltip>
+				{shortcut === "pullRequest" && currentPr && currentPrState ? (
+					<Tooltip disableHoverableContent>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={() =>
+									onOpenPullRequest({
+										repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,
+										number: currentPr.number,
+									})
+								}
+								aria-label={t({
+									message: `Open pull request #${currentPr.number}`,
+								})}
+								className={cn(
+									CAPSULE_BUTTON_CLASS,
+									"rounded-r-[5px] border-l border-border/60 text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+								)}
+							>
 								{pendingLayer ? (
 									<span className="flex size-3.5 shrink-0 items-center justify-center">
 										<AsciiSpinner className="text-base leading-none" />
@@ -890,41 +951,40 @@ export function WorkspaceActivityMenu({
 									showsChecks(currentPrState) && (
 										<PRStatusIndicators checks={currentPrChecks} />
 									)}
-							</>
-						) : (
-							triggerChangesStats && (
-								<>
-									<span className="h-3.5 w-px shrink-0 bg-border" />
-									<GitCompareArrows className="size-3.5 shrink-0" />
-									<span className="flex items-center gap-1">
-										<ChangesStats stats={triggerChangesStats} />
-									</span>
-								</>
-							)
-						)}
-						{hasNew && (
-							<>
-								<span
-									aria-hidden="true"
-									className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-blue-500"
-								/>
-								<span id={newPageStatusId} className="sr-only">
-									<Trans context="badge on a page published since the menu was last opened">
-										New
-									</Trans>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							{t({ message: `Open pull request #${currentPr.number}` })}
+						</TooltipContent>
+					</Tooltip>
+				) : shortcut === "changes" && changes && triggerChangesStats ? (
+					<Tooltip disableHoverableContent>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								onClick={changes.onToggle}
+								aria-label={t({ message: "Changes" })}
+								aria-pressed={changes.isOpen}
+								className={cn(
+									CAPSULE_BUTTON_CLASS,
+									"rounded-r-[5px] border-l border-border/60",
+									changes.isOpen
+										? "bg-foreground/15 text-foreground hover:bg-foreground/20"
+										: "text-muted-foreground/80 hover:bg-muted/60 hover:text-foreground",
+								)}
+							>
+								<GitCompareArrows className="size-3.5 shrink-0" />
+								<span className="flex items-center gap-1">
+									<ChangesStats stats={triggerChangesStats} />
 								</span>
-							</>
-						)}
-					</button>
-				</TooltipTrigger>
-				<TooltipContent side="bottom">
-					{open ? (
-						<Trans>Hide workspace activity</Trans>
-					) : (
-						<Trans>Show workspace activity</Trans>
-					)}
-				</TooltipContent>
-			</Tooltip>
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<Trans>Changes</Trans>
+						</TooltipContent>
+					</Tooltip>
+				) : null}
+			</div>
 			<PopoverContent
 				align="end"
 				sideOffset={0}

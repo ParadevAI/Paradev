@@ -14362,6 +14362,7 @@ msgstr "풀 리퀘스트 열기"
 msgid "Open Pull Request"
 msgstr "풀 리퀘스트 열기"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"

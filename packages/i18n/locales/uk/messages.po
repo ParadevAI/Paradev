@@ -14356,6 +14356,7 @@ msgstr "Відкрити пул-реквест"
 msgid "Open Pull Request"
 msgstr "Відкрити пул-реквест"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
