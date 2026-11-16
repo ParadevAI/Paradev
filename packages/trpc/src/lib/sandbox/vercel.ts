@@ -557,6 +557,7 @@ const INHERITED_IDENTITY = [
 	`${SANDBOX_PATHS.workspace}/.env`,
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
+	"/var/swap",
 ];
 
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
@@ -566,6 +567,49 @@ export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
 		args: ["-rf", ...INHERITED_IDENTITY],
 		sudo: true,
 	});
+}
+
+const ZERO_FILL_PATH = "/superset-zero-fill";
+const ZERO_FILL_SECONDS = 170;
+const ZERO_FILL_CLIENT_TIMEOUT_MS = (ZERO_FILL_SECONDS + 40) * 1000;
+
+const ZERO_FILL_SCRIPT = [
+	"code=0",
+	"avail=$(df --output=avail -B1 / | tail -n 1)",
+	"count=$(( (avail - 1073741824) / 1048576 ))",
+	`if [ "$count" -gt 0 ]; then timeout ${ZERO_FILL_SECONDS} dd if=/dev/zero of=${ZERO_FILL_PATH} bs=1M count="$count" conv=fsync status=none || code=$?; fi`,
+	`rm -f ${ZERO_FILL_PATH}`,
+	"sync",
+	'exit "$code"',
+].join("; ");
+
+/**
+ * A snapshot is a block-level full copy and the disk has no discard, so blocks
+ * a deleted file freed are still in it until something overwrites them.
+ * Failure only costs snapshot size, so it is logged and not thrown.
+ */
+export async function zeroFreeSpace(
+	sandbox: Sandbox,
+	timeoutMs = ZERO_FILL_CLIENT_TIMEOUT_MS,
+): Promise<void> {
+	try {
+		const result = await sandbox.runCommand({
+			cmd: "bash",
+			args: ["-c", ZERO_FILL_SCRIPT],
+			sudo: true,
+			signal: AbortSignal.timeout(timeoutMs),
+		});
+		if (result.exitCode !== 0) {
+			console.warn(
+				`[sandbox] zero-fill exited ${result.exitCode}; the snapshot keeps freed blocks`,
+			);
+		}
+	} catch (error) {
+		console.warn(
+			"[sandbox] zero-fill failed; the snapshot keeps freed blocks",
+			error,
+		);
+	}
 }
 
 /**
@@ -619,6 +663,7 @@ export async function promoteSandboxToEnvironment(args: {
 		tags: sandboxTags("environment", args.claim.identity),
 	});
 	await stripWorkspaceIdentity(golden);
+	await zeroFreeSpace(golden);
 	const created = golden.currentSnapshotId;
 	await golden.stop();
 	await waitForStopSnapshot(args.goldenName, created);

@@ -203,7 +203,10 @@ drops below twice its reap floor, up to 1.5x the box (at least 6 GB, at most
 16 GB), at `vm.swappiness=10`, and drops the newest one after ten quiet
 minutes if RAM can take its pages back; the cgroup permits it
 (`memory.swap.max` is unbounded). A box that never needs swap holds none on
-disk, so no snapshot carries it. Measured on a 2/4 box: the host-service
+disk. A box that did need it carries those blocks in every snapshot after,
+even once memguard drops the file: a snapshot is a full block-level copy and
+the disk has no discard. A golden strips `/var/swap` and zeroes free space
+before its snapshot (`zeroFreeSpace`); a workspace snapshot does not. Measured on a 2/4 box: the host-service
 typecheck the kernel had killed at 3 GB finished in 22 s with 855 MB swapped;
 the `apps/desktop` typecheck, which needs about 8 GB in all, grew swap
 0 → 6 GB and finished in 86 s with host-service's health check never above

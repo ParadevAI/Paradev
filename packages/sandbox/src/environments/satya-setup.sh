@@ -50,6 +50,8 @@ sudo npm install -g vercel wrangler eas-cli agent-device >/dev/null 2>&1 && log 
 # ntn (Notion), stripe: each reads its credential from the environment's
 # variables, NOTION_API_TOKEN and STRIPE_API_KEY.
 sudo npm install -g ntn >/dev/null 2>&1 && log "ntn $(ntn --version 2>/dev/null) installed" || { log "ntn install failed"; exit 1; }
+sudo npm cache clean --force >/dev/null 2>&1
+sudo rm -rf /root/.cache
 curl -fsSL https://packages.stripe.dev/api/security/keypair/stripe-cli-gpg/public | gpg --dearmor | sudo tee /usr/share/keyrings/stripe.gpg >/dev/null
 echo "deb [signed-by=/usr/share/keyrings/stripe.gpg] https://packages.stripe.dev/stripe-cli-debian-local stable main" | sudo tee /etc/apt/sources.list.d/stripe.list >/dev/null
 sudo -E apt-get update -qq
@@ -105,7 +107,7 @@ fi
 if [ -d "$WORKSPACE/.git" ] && [ ! -d "$WORKSPACE/node_modules" ]; then
   log "installing dependencies (several minutes)"
   if (cd "$WORKSPACE" && bun install --frozen-lockfile >/tmp/bun-install.log 2>&1); then
-    rm -rf "$HOME/.cache/electron"
+    rm -rf "$HOME/.cache/electron" "$HOME/.cache/node-gyp" "$HOME/.electron-gyp"
     log "dependencies installed"
   else
     log "bun install failed:"

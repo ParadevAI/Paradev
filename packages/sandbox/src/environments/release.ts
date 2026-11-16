@@ -169,6 +169,7 @@ const {
 	stopAndSnapshot,
 	stripWorkspaceIdentity,
 	wakeSandbox,
+	zeroFreeSpace,
 } = await import("@superset/trpc/lib/sandbox/vercel");
 const { deriveSandboxCredentials } = await import(
 	"@superset/trpc/lib/sandbox/credentials"
@@ -343,8 +344,10 @@ if (failed) fail(`${failed} check(s) failed; ${golden} left for inspection`);
 // A fork must not come up as the golden's workspace; and the stop is the
 // snapshot forks start from.
 await stripWorkspaceIdentity(goldenBox);
+log("golden: zeroing free space so the snapshot carries no freed blocks");
+await zeroFreeSpace(goldenBox);
 await stopAndSnapshot(golden);
-log(`golden: ${golden} stripped, stopped and snapshotted`);
+log(`golden: ${golden} stripped, zeroed, stopped and snapshotted`);
 
 // 4. probe, as a workspace
 const RESERVED_PREFIXES = ["SUPERSET_", "HOST_SERVICE_", "VERCEL_"];

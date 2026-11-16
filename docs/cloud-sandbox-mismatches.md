@@ -563,6 +563,20 @@ one. Opening an `asleep` workspace wakes it like an `awake` one
 (`isLiveCloudWorkspaceStatus`). Code: `sandbox-sleep.ts`, `sandbox-expiry.ts`;
 model: `.agents/skills/verify-sandbox-asleep`.
 
+**Deleting a file does not shrink a snapshot.** On a machine someone owns,
+`rm` frees the space. A Vercel sandbox snapshot is a full block-level copy of
+the disk, not a delta over its parent, and the disk has no discard, so blocks a
+deleted file freed stay in every later snapshot until something overwrites
+them. At stop, processes get SIGTERM and at least 10 s before the snapshot is
+taken. A golden is forked by every workspace of its environment, so its dead
+bytes are paid once per fork. **What we did:** before a golden's snapshot,
+`zeroFreeSpace` (`packages/trpc/src/lib/sandbox/vercel.ts`) writes zeros over
+all but 1 GiB of free space and removes the file, both on promote and in the
+release (measured: 4.06 GB → 0.84 GB). It is bounded at about 3 minutes and
+only warns on failure. The setup hook also cleans npm and node-gyp caches
+while it builds the golden. **Open:** workspace snapshots still carry freed
+blocks.
+
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
 session length. Vercel's server-side tag filter uses creation-order pagination
