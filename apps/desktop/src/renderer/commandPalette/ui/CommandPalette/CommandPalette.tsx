@@ -24,6 +24,7 @@ import { useCommandContext } from "../../core/ContextProvider";
 import { executeCommand } from "../../core/execute";
 import {
 	PALETTE_TOGGLE_ATTRIBUTE,
+	SWITCHER_ROW_LEAVE_MS,
 	useFrameStackStore,
 } from "../../core/frames";
 import type { Command as CommandType } from "../../core/types";
@@ -129,15 +130,27 @@ export function CommandPalette() {
 				if (event.key === "Backspace") {
 					// With text typed, the chord edits the text.
 					if (query) return;
-					const selection = useFrameStackStore.getState().switcherSelection;
-					if (!selection) return;
+					const {
+						switcherSelection: selection,
+						switcherLeavingId,
+						setSwitcherLeavingId,
+					} = useFrameStackStore.getState();
+					if (!selection || switcherLeavingId) return;
 					event.preventDefault();
 					event.stopPropagation();
-					handleOpenChange(false);
-					useDeleteWorkspaceIntent.getState().request({
-						workspaceId: selection.id,
-						workspaceName: selection.name,
-					});
+					const request = () =>
+						useDeleteWorkspaceIntent.getState().request({
+							workspaceId: selection.id,
+							workspaceName: selection.name,
+						});
+					// A cloud workspace is archived with no confirmation, so its
+					// row leaves first. A delete asks in a dialog over the palette.
+					if (selection.hostType !== "cloud") {
+						request();
+						return;
+					}
+					setSwitcherLeavingId(selection.id);
+					window.setTimeout(request, SWITCHER_ROW_LEAVE_MS);
 					return;
 				}
 			}
@@ -220,9 +233,12 @@ export function CommandPalette() {
 				onOpenAutoFocus={focusInput}
 				onInteractOutside={(event) => {
 					// The toggle's own click closes the palette; closing here too would reopen it.
+					// The delete confirmation opens over the palette.
 					if (
 						event.target instanceof Element &&
-						event.target.closest(`[${PALETTE_TOGGLE_ATTRIBUTE}]`)
+						event.target.closest(
+							`[${PALETTE_TOGGLE_ATTRIBUTE}], [data-slot^="alert-dialog"]`,
+						)
 					) {
 						event.preventDefault();
 					}

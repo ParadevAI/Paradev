@@ -5,6 +5,7 @@ import { useFormat } from "@superset/i18n/react";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { useFrameStackStore } from "../../../../core/frames";
 import { useSwitcherGroups } from "../../hooks/useSwitcherGroups";
 import { useSwitchToWorkspace } from "../../hooks/useSwitchToWorkspace";
 import {
@@ -17,6 +18,8 @@ import { type SwitcherCycle, useSwitcherCycle } from "./hooks/useSwitcherCycle";
 
 /** Every row is a full React row and the list is not virtualised: "#" can match thousands. */
 const MAX_ROWS = 150;
+
+const LEAVING_ROW_TIMEOUT_MS = 3000;
 
 const BUCKET_LABELS: Record<SwitcherBucket, MessageDescriptor> = {
 	needsInput: msg({ message: "Needs input" }),
@@ -70,6 +73,21 @@ export function WorkspaceSwitcherList({
 	);
 	const hiddenLabel = formatNumber(hiddenCount);
 
+	const leavingId = useFrameStackStore((s) => s.switcherLeavingId);
+	const setLeavingId = useFrameStackStore((s) => s.setSwitcherLeavingId);
+	const isLeavingRowListed =
+		leavingId !== null && ordered.some((row) => row.workspace.id === leavingId);
+	useEffect(() => {
+		if (leavingId === null) return;
+		if (!isLeavingRowListed) {
+			setLeavingId(null);
+			return;
+		}
+		// An archive that fails puts the row back; show it again.
+		const timer = setTimeout(() => setLeavingId(null), LEAVING_ROW_TIMEOUT_MS);
+		return () => clearTimeout(timer);
+	}, [leavingId, isLeavingRowListed, setLeavingId]);
+
 	const switchTo = useSwitchToWorkspace("switcher");
 	const select = useCallback(
 		(
@@ -108,6 +126,7 @@ export function WorkspaceSwitcherList({
 				key={row.workspace.id}
 				workspace={row.workspace}
 				isCurrent={row.isCurrent}
+				isLeaving={row.workspace.id === leavingId}
 				query={trimmed}
 				onSelect={() => select(row, offset + index, false)}
 			/>

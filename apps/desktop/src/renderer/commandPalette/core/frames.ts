@@ -14,6 +14,8 @@ export type SwitcherOpenedVia = "hotkey" | "pill" | "command";
 
 export const PALETTE_TOGGLE_ATTRIBUTE = "data-command-palette-toggle";
 
+export const SWITCHER_ROW_LEAVE_MS = 160;
+
 export interface SwitcherSelection {
 	id: string;
 	name: string;
@@ -31,6 +33,8 @@ interface FrameStackState {
 	/** Armed once a further hotkey press steps while the modifier is held: releasing it then switches. */
 	switcherHold: boolean;
 	switcherSelection: SwitcherSelection | null;
+	/** The row that is animating out before it is archived. */
+	switcherLeavingId: string | null;
 	setOpen: (open: boolean) => void;
 	openSwitcher: (options: {
 		via: SwitcherOpenedVia;
@@ -39,6 +43,7 @@ interface FrameStackState {
 	stepSwitcher: (holdsModifier: boolean) => void;
 	releaseSwitcherHold: () => void;
 	setSwitcherSelection: (selection: SwitcherSelection | null) => void;
+	setSwitcherLeavingId: (workspaceId: string | null) => void;
 	pushFrame: (command: Command) => void;
 	popFrame: () => void;
 	reset: () => void;
@@ -51,6 +56,7 @@ const CLOSED = {
 	switcherStep: 0,
 	switcherHold: false,
 	switcherSelection: null,
+	switcherLeavingId: null,
 };
 
 export const useFrameStackStore = create<FrameStackState>((set) => ({
@@ -91,6 +97,7 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 				? state
 				: { switcherSelection },
 		),
+	setSwitcherLeavingId: (switcherLeavingId) => set({ switcherLeavingId }),
 	pushFrame: (command) =>
 		set((state) => ({ frames: [...state.frames, { command }] })),
 	popFrame: () => set((state) => ({ frames: state.frames.slice(0, -1) })),
