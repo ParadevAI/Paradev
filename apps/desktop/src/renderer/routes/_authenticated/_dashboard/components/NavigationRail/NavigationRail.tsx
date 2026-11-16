@@ -34,11 +34,7 @@ export function NavigationRail() {
 				.map((destination) => (
 					<PinnableRailButton key={destination.id} destination={destination} />
 				))}
-			<RailMoreMenu
-				destinations={destinations.filter(
-					(destination) => !destination.isPinned,
-				)}
-			/>
+			<RailMoreMenu destinations={destinations} />
 			<div className="mt-auto flex flex-col items-center gap-1.5">
 				<ParadevAnywhereButton variant="rail" />
 				<UpdatesPill isCollapsed />

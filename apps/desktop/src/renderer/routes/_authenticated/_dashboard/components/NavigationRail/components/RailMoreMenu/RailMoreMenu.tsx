@@ -62,34 +62,55 @@ export function RailMoreMenu({ destinations }: RailMoreMenuProps) {
 				onCloseAutoFocus={(event) => event.preventDefault()}
 			>
 				{destinations.map(
-					({ id, label, icon: Icon, isIconFilled, isActive, onClick }) => (
-						<DropdownMenuItem
-							key={id}
-							onSelect={onClick}
-							aria-current={isActive ? "page" : undefined}
-							className={cn("group/item", isActive && "bg-fill-selected")}
-						>
-							<Icon
-								className="size-4"
-								{...(isIconFilled
-									? {}
-									: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
-							/>
-							<span className="flex-1">{label}</span>
-							<button
-								type="button"
-								aria-label={t({ message: "Pin" })}
-								title={t({ message: "Pin" })}
-								onClick={(event) => {
-									event.stopPropagation();
-									setPinned(id, true);
-								}}
-								className="-my-1 -mr-1 ml-3 flex size-6 items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity hover:bg-fill-hover hover:text-foreground focus-visible:opacity-100 group-hover/item:opacity-100 group-focus/item:opacity-100"
+					({
+						id,
+						label,
+						icon: Icon,
+						isIconFilled,
+						isActive,
+						isPinned,
+						onClick,
+					}) => {
+						const pinLabel = isPinned
+							? t({ message: "Unpin" })
+							: t({ message: "Pin" });
+						return (
+							<DropdownMenuItem
+								key={id}
+								onSelect={onClick}
+								aria-current={isActive ? "page" : undefined}
+								className={cn(isActive && "bg-fill-selected")}
 							>
-								<LuPin className="size-3.5" />
-							</button>
-						</DropdownMenuItem>
-					),
+								<Icon
+									className="size-4"
+									{...(isIconFilled
+										? {}
+										: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
+								/>
+								<span className="flex-1">{label}</span>
+								<button
+									type="button"
+									aria-label={pinLabel}
+									aria-pressed={isPinned}
+									title={pinLabel}
+									onClick={(event) => {
+										event.stopPropagation();
+										setPinned(id, !isPinned);
+									}}
+									className="group/pin -my-1 -mr-1 ml-4 flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-fill-hover"
+								>
+									<LuPin
+										className={cn(
+											"size-3.5 transition-colors group-hover/pin:text-foreground",
+											isPinned
+												? "fill-current text-foreground"
+												: "text-muted-foreground/50",
+										)}
+									/>
+								</button>
+							</DropdownMenuItem>
+						);
+					},
 				)}
 				{isUsageInSidebarEnabled && (
 					<DropdownMenuItem onSelect={navigation.openUsage}>
