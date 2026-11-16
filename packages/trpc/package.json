@@ -183,6 +183,8 @@
 		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",
 		"@superset/chat": "workspace:*",
+		"@superset/chats-core": "workspace:*",
+		"@superset/chats-sync": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/email": "workspace:*",
 		"@superset/i18n": "workspace:*",

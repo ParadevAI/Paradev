@@ -1,0 +1,994 @@
+import {
+	DEV_COLORS,
+	groupDevDescription,
+	UNREAD_MAX,
+} from "@superset/chats-core";
+import type {
+	AddedGroupDev,
+	ApiChatRead,
+	ApiGroup,
+	ApiMessage,
+	ApiMessagePage,
+	Bootstrap,
+	CreatedChat,
+	SendResult,
+} from "@superset/chats-sync";
+import { db, dbWs } from "@superset/db/client";
+import {
+	chatsAgentReads,
+	chatsAgents,
+	chatsBriefs,
+	chatsGroupAgents,
+	chatsGroupMembers,
+	chatsGroups,
+	chatsMessages,
+	chatsQuestions,
+	chatsReads,
+	users,
+} from "@superset/db/schema";
+import { findOrgMembership } from "@superset/db/utils";
+import {
+	CHATS_REALTIME_TICKET_SECONDS,
+	chatsGroupChannel,
+	chatsUserChannel,
+	signChatsRealtimeTicket,
+} from "@superset/shared/chats-realtime";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
+import {
+	and,
+	asc,
+	desc,
+	eq,
+	exists,
+	getTableColumns,
+	inArray,
+	isNotNull,
+	lte,
+	or,
+	sql,
+} from "drizzle-orm";
+import { z } from "zod";
+import { env } from "../../env";
+import { personProcedure } from "../../trpc";
+import { publishChats } from "./publish";
+import {
+	agentView,
+	messageView,
+	replyQuotes,
+	toGroupAgent,
+	toMessage,
+	toQuestion,
+	toUser,
+} from "./views";
+
+const RECENT_MESSAGES = 200;
+const TITLE_MAX = 60;
+const TEXT_MAX = 10_000;
+
+const notFound = (message: string) =>
+	new TRPCError({ code: "NOT_FOUND", message });
+const forbidden = (message: string) =>
+	new TRPCError({ code: "FORBIDDEN", message });
+const invalid = (message: string) =>
+	new TRPCError({ code: "BAD_REQUEST", message });
+
+const organizationInput = z.object({ organizationId: z.string().uuid() });
+const groupInput = z.object({ groupId: z.string().uuid() });
+const messageInput = z.object({ messageId: z.string().uuid() });
+const colorInput = z.string().regex(/^#[0-9a-fA-F]{6}$/);
+
+async function assertOrgMember(userId: string, organizationId: string) {
+	const membership = await findOrgMembership({ userId, organizationId });
+	if (!membership) throw notFound("Organization not found");
+}
+
+/** Answers "not found" to a non-member, so a group's existence does not leak. Returns the member's role. */
+async function assertMember(userId: string, groupId: string) {
+	const [row] = await db
+		.select({ role: chatsGroupMembers.role })
+		.from(chatsGroupMembers)
+		.where(
+			and(
+				eq(chatsGroupMembers.groupId, groupId),
+				eq(chatsGroupMembers.userId, userId),
+			),
+		);
+	if (!row) throw notFound("Group not found");
+	return row.role;
+}
+
+async function groupIdsOf(userId: string, organizationId: string) {
+	const rows = await db
+		.select({ groupId: chatsGroupMembers.groupId })
+		.from(chatsGroupMembers)
+		.innerJoin(chatsGroups, eq(chatsGroups.id, chatsGroupMembers.groupId))
+		.where(
+			and(
+				eq(chatsGroupMembers.userId, userId),
+				eq(chatsGroups.organizationId, organizationId),
+			),
+		)
+		.orderBy(asc(chatsGroupMembers.joinedAt));
+	return rows.map((row) => row.groupId);
+}
+
+async function loadGroups(groupIds: string[]): Promise<ApiGroup[]> {
+	if (groupIds.length === 0) return [];
+	const [groupRows, memberRows] = await Promise.all([
+		db.select().from(chatsGroups).where(inArray(chatsGroups.id, groupIds)),
+		db
+			.select({
+				groupId: chatsGroupMembers.groupId,
+				role: chatsGroupMembers.role,
+				id: users.id,
+				email: users.email,
+				name: users.name,
+			})
+			.from(chatsGroupMembers)
+			.innerJoin(users, eq(chatsGroupMembers.userId, users.id))
+			.where(inArray(chatsGroupMembers.groupId, groupIds))
+			.orderBy(asc(chatsGroupMembers.joinedAt)),
+	]);
+	return groupRows.map((group) => ({
+		id: group.id,
+		kind: group.kind,
+		title: group.title,
+		members: memberRows
+			.filter((member) => member.groupId === group.id)
+			.map((member) => ({ ...toUser(member), role: member.role })),
+	}));
+}
+
+async function loadGroup(groupId: string): Promise<ApiGroup> {
+	const [group] = await loadGroups([groupId]);
+	if (!group) throw notFound("Group not found");
+	return group;
+}
+
+/** The agents a person sees: their own, and the ones in their groups. */
+async function visibleAgents(
+	userId: string,
+	organizationId: string,
+	groupIds: string[],
+) {
+	const inMyGroups = groupIds.length
+		? exists(
+				db
+					.select({ one: sql`1` })
+					.from(chatsGroupAgents)
+					.where(
+						and(
+							eq(chatsGroupAgents.agentId, chatsAgents.id),
+							inArray(chatsGroupAgents.groupId, groupIds),
+						),
+					),
+			)
+		: undefined;
+	const mine = eq(chatsAgents.ownerUserId, userId);
+	const rows = await db
+		.select({ agent: chatsAgents, ownerName: users.name })
+		.from(chatsAgents)
+		.leftJoin(users, eq(users.id, chatsAgents.ownerUserId))
+		.where(
+			and(
+				eq(chatsAgents.organizationId, organizationId),
+				inMyGroups ? or(mine, inMyGroups) : mine,
+			),
+		);
+	return rows.map(({ agent, ownerName }) =>
+		agentView(agent, { owner: agent.ownerUserId === userId, ownerName }),
+	);
+}
+
+async function withCards(rows: (typeof chatsMessages.$inferSelect)[]) {
+	const questionIds = rows.flatMap((row) =>
+		row.questionId ? [row.questionId] : [],
+	);
+	const [questions, quotes] = await Promise.all([
+		questionIds.length
+			? db
+					.select()
+					.from(chatsQuestions)
+					.where(inArray(chatsQuestions.id, questionIds))
+			: [],
+		replyQuotes(rows.map((row) => row.replyToId)),
+	]);
+	const questionById = new Map(questions.map((q) => [q.id, q]));
+	return rows.map((row) =>
+		toMessage(
+			row,
+			row.questionId ? questionById.get(row.questionId) : null,
+			quotes.get(row.replyToId ?? ""),
+		),
+	);
+}
+
+/** Each group's newest `limit` messages, oldest first, and which groups have more before them. */
+async function latestMessages(groupIds: string[], limit: number) {
+	if (groupIds.length === 0) {
+		return { messages: [] as ApiMessage[], withOlder: new Set<string>() };
+	}
+	const ranked = db
+		.select({
+			...getTableColumns(chatsMessages),
+			rank: sql<number>`row_number() over (partition by ${chatsMessages.groupId} order by ${chatsMessages.createdAt} desc, ${chatsMessages.id} desc)`.as(
+				"rank",
+			),
+		})
+		.from(chatsMessages)
+		.where(inArray(chatsMessages.groupId, groupIds))
+		.as("ranked");
+	const rows = await db
+		.select()
+		.from(ranked)
+		.where(lte(ranked.rank, limit + 1))
+		.orderBy(asc(ranked.createdAt), asc(ranked.id));
+	const withOlder = new Set(
+		rows.filter((row) => Number(row.rank) > limit).map((row) => row.groupId),
+	);
+	const kept = rows
+		.filter((row) => Number(row.rank) <= limit)
+		.map(({ rank: _rank, ...row }) => row);
+	return { messages: await withCards(kept), withOlder };
+}
+
+async function listMessages(
+	groupId: string,
+	options: { beforeId?: string; limit: number },
+) {
+	const before = options.beforeId
+		? sql`(${chatsMessages.createdAt}, ${chatsMessages.id}) < (select c.created_at, c.id from ${chatsMessages} c where c.id = ${options.beforeId} and c.group_id = ${groupId})`
+		: undefined;
+	const rows = await db
+		.select()
+		.from(chatsMessages)
+		.where(and(eq(chatsMessages.groupId, groupId), before))
+		.orderBy(desc(chatsMessages.createdAt), desc(chatsMessages.id))
+		.limit(options.limit);
+	return withCards(rows.reverse());
+}
+
+type ReadRow = Pick<
+	typeof chatsReads.$inferSelect,
+	"groupId" | "lastReadMessageId" | "lastReadMessageAt" | "lastReadAt"
+>;
+
+const toRead = (
+	row: ReadRow,
+	reader: { userId: string } | { agentId: string },
+): ApiChatRead => ({
+	groupId: row.groupId,
+	userId: "userId" in reader ? reader.userId : null,
+	devId: "agentId" in reader ? reader.agentId : null,
+	messageId: row.lastReadMessageId,
+	messageAt: row.lastReadMessageAt.toISOString(),
+	at: row.lastReadAt.toISOString(),
+});
+
+async function loadReads(groupIds: string[]): Promise<ApiChatRead[]> {
+	if (groupIds.length === 0) return [];
+	const [people, agents] = await Promise.all([
+		db.select().from(chatsReads).where(inArray(chatsReads.groupId, groupIds)),
+		db
+			.select()
+			.from(chatsAgentReads)
+			.where(inArray(chatsAgentReads.groupId, groupIds)),
+	]);
+	return [
+		...people.map((row) => toRead(row, { userId: row.userId })),
+		...agents.map((row) => toRead(row, { agentId: row.agentId })),
+	];
+}
+
+/** Messages by others after the person's read point, per group, capped for the badge. */
+async function unreadCounts(userId: string, groupIds: string[]) {
+	if (groupIds.length === 0) return {};
+	const rows = await db
+		.select({
+			groupId: chatsMessages.groupId,
+			unread: sql<number>`least(count(*), ${UNREAD_MAX})::int`,
+		})
+		.from(chatsMessages)
+		.leftJoin(
+			chatsReads,
+			and(
+				eq(chatsReads.groupId, chatsMessages.groupId),
+				eq(chatsReads.userId, userId),
+			),
+		)
+		.where(
+			and(
+				inArray(chatsMessages.groupId, groupIds),
+				sql`(${chatsReads.lastReadMessageAt} is null or (${chatsMessages.createdAt}, ${chatsMessages.id}) > (${chatsReads.lastReadMessageAt}, ${chatsReads.lastReadMessageId}))`,
+				sql`${chatsMessages.authorId} is distinct from ${userId}`,
+				or(
+					isNotNull(chatsMessages.authorId),
+					isNotNull(chatsMessages.authorAgentId),
+				),
+			),
+		)
+		.groupBy(chatsMessages.groupId);
+	return Object.fromEntries(
+		groupIds.map((id) => [
+			id,
+			Number(rows.find((row) => row.groupId === id)?.unread ?? 0),
+		]),
+	);
+}
+
+async function memberMessage(userId: string, messageId: string) {
+	const [message] = await db
+		.select()
+		.from(chatsMessages)
+		.where(eq(chatsMessages.id, messageId));
+	if (!message) throw notFound("Message not found");
+	const role = await assertMember(userId, message.groupId).catch(() => {
+		throw notFound("Message not found");
+	});
+	return { message, role };
+}
+
+async function newDirectGroup(
+	tx: Parameters<Parameters<typeof dbWs.transaction>[0]>[0],
+	input: {
+		organizationId: string;
+		userId: string;
+		agentId: string;
+		title: string;
+	},
+) {
+	const [group] = await tx
+		.insert(chatsGroups)
+		.values({
+			organizationId: input.organizationId,
+			kind: "direct",
+			title: input.title,
+			createdBy: input.userId,
+		})
+		.returning();
+	if (!group) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+	await tx
+		.insert(chatsGroupMembers)
+		.values({ groupId: group.id, userId: input.userId, role: "owner" });
+	const [link] = await tx
+		.insert(chatsGroupAgents)
+		.values({
+			groupId: group.id,
+			agentId: input.agentId,
+			addedBy: input.userId,
+		})
+		.returning();
+	if (!link) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+	return { groupId: group.id, link };
+}
+
+export const chatsRouter = {
+	/** Everything the chat store starts from: the person's groups in the organization, their latest messages, agents and reads. */
+	bootstrap: personProcedure
+		.input(organizationInput)
+		.query(async ({ ctx, input }): Promise<Bootstrap> => {
+			const user = ctx.session.user;
+			await assertOrgMember(user.id, input.organizationId);
+			const groupIds = await groupIdsOf(user.id, input.organizationId);
+			const [agents, recent] = await Promise.all([
+				visibleAgents(user.id, input.organizationId, groupIds),
+				latestMessages(groupIds, RECENT_MESSAGES),
+			]);
+			const base = {
+				user: toUser(user),
+				needsOnboarding: !agents.some(
+					(agent) => agent.kind === "personal" && agent.ownerUserId === user.id,
+				),
+				devs: agents,
+				voiceNotes: false,
+				taskViews: [],
+				tasks: [],
+				apps: [],
+				triggerBatches: [],
+			};
+			if (groupIds.length === 0) {
+				return {
+					...base,
+					groups: [],
+					groupDevs: [],
+					messages: [],
+					groupsWithOlderMessages: [],
+					reads: [],
+					unread: {},
+					briefs: [],
+				};
+			}
+			const [groups, links, reads, unread, briefs] = await Promise.all([
+				loadGroups(groupIds),
+				db
+					.select()
+					.from(chatsGroupAgents)
+					.where(inArray(chatsGroupAgents.groupId, groupIds)),
+				loadReads(groupIds),
+				unreadCounts(user.id, groupIds),
+				db
+					.select()
+					.from(chatsBriefs)
+					.where(inArray(chatsBriefs.groupId, groupIds)),
+			]);
+			return {
+				...base,
+				groups,
+				groupDevs: links.map(toGroupAgent),
+				messages: recent.messages,
+				groupsWithOlderMessages: groupIds.filter((id) =>
+					recent.withOlder.has(id),
+				),
+				reads,
+				unread,
+				briefs: briefs.map((brief) => ({
+					groupId: brief.groupId,
+					devId: brief.agentId,
+					topics: brief.topics,
+					updatedAt: brief.updatedAt.toISOString(),
+				})),
+			};
+		}),
+
+	/** A short-lived ticket for the realtime channels the person may hear: their own and each of their groups'. */
+	realtimeTicket: personProcedure
+		.input(organizationInput)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertOrgMember(userId, input.organizationId);
+			const groupIds = await groupIdsOf(userId, input.organizationId);
+			const channels = [
+				chatsUserChannel(userId),
+				...groupIds.map(chatsGroupChannel),
+			];
+			const token = await signChatsRealtimeTicket(env.REALTIME_NUDGE_SECRET, {
+				userId,
+				channels,
+				exp: Math.floor(Date.now() / 1000) + CHATS_REALTIME_TICKET_SECONDS,
+			});
+			return { token, channels };
+		}),
+
+	sendMessage: personProcedure
+		.input(
+			groupInput.extend({
+				text: z.string().trim().min(1).max(TEXT_MAX),
+				clientId: z.string().min(1).max(100).optional(),
+				replyToId: z.string().uuid().optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }): Promise<SendResult> => {
+			const userId = ctx.session.user.id;
+			await assertMember(userId, input.groupId);
+			if (input.clientId) {
+				const [sent] = await db
+					.select()
+					.from(chatsMessages)
+					.where(
+						and(
+							eq(chatsMessages.groupId, input.groupId),
+							eq(chatsMessages.clientId, input.clientId),
+						),
+					);
+				if (sent) return { message: await messageView(sent), task: null };
+			}
+			if (input.replyToId) {
+				const [original] = await db
+					.select({ id: chatsMessages.id })
+					.from(chatsMessages)
+					.where(
+						and(
+							eq(chatsMessages.id, input.replyToId),
+							eq(chatsMessages.groupId, input.groupId),
+						),
+					);
+				if (!original) throw invalid("That message is not in this chat");
+			}
+			const [message] = await db
+				.insert(chatsMessages)
+				.values({
+					groupId: input.groupId,
+					authorId: userId,
+					text: input.text,
+					clientId: input.clientId,
+					replyToId: input.replyToId,
+				})
+				.returning();
+			if (!message) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+			const payload = { message: await messageView(message), task: null };
+			publishChats(chatsGroupChannel(input.groupId), {
+				type: "message.created",
+				...payload,
+			});
+			return payload;
+		}),
+
+	/** Up to `limit` messages of the group from before `beforeId`, oldest first. */
+	olderMessages: personProcedure
+		.input(
+			groupInput.extend({
+				beforeId: z.string().uuid().optional(),
+				limit: z.number().int().min(1).max(200).default(50),
+			}),
+		)
+		.query(async ({ ctx, input }): Promise<ApiMessagePage> => {
+			await assertMember(ctx.session.user.id, input.groupId);
+			const messages = await listMessages(input.groupId, input);
+			return { messages, apps: [], tasks: [] };
+		}),
+
+	editMessage: personProcedure
+		.input(
+			messageInput.extend({ text: z.string().trim().min(1).max(TEXT_MAX) }),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const { message } = await memberMessage(userId, input.messageId);
+			if (message.authorId !== userId) {
+				throw forbidden("Only its author can edit this message");
+			}
+			if (message.taskId || message.questionId || message.fileId) {
+				throw invalid("Only a text message can be edited");
+			}
+			if (input.text === message.text) {
+				return { message: await messageView(message) };
+			}
+			const [updated] = await db
+				.update(chatsMessages)
+				.set({ text: input.text, editedAt: new Date() })
+				.where(eq(chatsMessages.id, input.messageId))
+				.returning();
+			if (!updated) throw notFound("Message not found");
+			const view = await messageView(updated);
+			publishChats(chatsGroupChannel(updated.groupId), {
+				type: "message.updated",
+				message: view,
+			});
+			return { message: view };
+		}),
+
+	deleteMessage: personProcedure
+		.input(messageInput)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const { message, role } = await memberMessage(userId, input.messageId);
+			if (message.authorId !== userId && role !== "owner") {
+				throw forbidden(
+					"Only its author or the chat's owner can delete this message",
+				);
+			}
+			await db
+				.delete(chatsMessages)
+				.where(eq(chatsMessages.id, input.messageId));
+			const channel = chatsGroupChannel(message.groupId);
+			publishChats(channel, {
+				type: "message.deleted",
+				groupId: message.groupId,
+				messageId: input.messageId,
+			});
+			if (message.questionId) {
+				const [cancelled] = await db
+					.update(chatsQuestions)
+					.set({ status: "cancelled" })
+					.where(
+						and(
+							eq(chatsQuestions.id, message.questionId),
+							eq(chatsQuestions.status, "open"),
+						),
+					)
+					.returning();
+				if (cancelled) {
+					publishChats(channel, {
+						type: "question.closed",
+						groupId: message.groupId,
+						question: toQuestion(cancelled),
+					});
+				}
+			}
+			return { messageId: input.messageId };
+		}),
+
+	/** The person has read the group up to this message; null when they already had, since a read only moves forward. */
+	markRead: personProcedure
+		.input(groupInput.merge(messageInput))
+		.mutation(async ({ ctx, input }): Promise<{ read: ApiChatRead | null }> => {
+			const userId = ctx.session.user.id;
+			await assertMember(userId, input.groupId);
+			const [message] = await db
+				.select({ id: chatsMessages.id, createdAt: chatsMessages.createdAt })
+				.from(chatsMessages)
+				.where(
+					and(
+						eq(chatsMessages.id, input.messageId),
+						eq(chatsMessages.groupId, input.groupId),
+					),
+				);
+			if (!message) throw notFound("No such message in this chat");
+			const values = {
+				groupId: input.groupId,
+				lastReadMessageId: message.id,
+				lastReadMessageAt: message.createdAt,
+				lastReadAt: sql`now()`,
+			};
+			const [row] = await db
+				.insert(chatsReads)
+				.values({ userId, ...values })
+				.onConflictDoUpdate({
+					target: [chatsReads.userId, chatsReads.groupId],
+					set: values,
+					setWhere: sql`(${chatsReads.lastReadMessageAt}, ${chatsReads.lastReadMessageId}) < (excluded.last_read_message_at, excluded.last_read_message_id)`,
+				})
+				.returning();
+			if (!row) return { read: null };
+			const read = toRead(row, { userId });
+			publishChats(chatsGroupChannel(input.groupId), {
+				type: "chat.read",
+				...read,
+			});
+			return { read };
+		}),
+
+	/** Tells the group's others this person is typing, or stopped. Nothing is stored. */
+	reportTyping: personProcedure
+		.input(groupInput.extend({ typing: z.boolean() }))
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertMember(userId, input.groupId);
+			publishChats(
+				chatsGroupChannel(input.groupId),
+				{
+					type: "typing",
+					groupId: input.groupId,
+					userId,
+					typing: input.typing,
+				},
+				{ ephemeral: true },
+			);
+			return { ok: true };
+		}),
+
+	/** A new group with its own agent, named like the group unless told otherwise. */
+	createGroup: personProcedure
+		.input(
+			organizationInput.extend({
+				title: z.string().trim().min(1).max(TITLE_MAX),
+				devName: z.string().trim().min(1).max(TITLE_MAX).optional(),
+				devColor: colorInput.optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertOrgMember(userId, input.organizationId);
+			const created = await dbWs.transaction(async (tx) => {
+				const [group] = await tx
+					.insert(chatsGroups)
+					.values({
+						organizationId: input.organizationId,
+						kind: "group",
+						title: input.title,
+						createdBy: userId,
+					})
+					.returning();
+				if (!group) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				await tx
+					.insert(chatsGroupMembers)
+					.values({ groupId: group.id, userId, role: "owner" });
+				const [agent] = await tx
+					.insert(chatsAgents)
+					.values({
+						organizationId: input.organizationId,
+						kind: "group",
+						name: input.devName ?? input.title,
+						description: groupDevDescription(input.title),
+						color:
+							input.devColor ??
+							DEV_COLORS[Math.floor(Math.random() * DEV_COLORS.length)] ??
+							"#F2B23E",
+						groupId: group.id,
+					})
+					.returning();
+				if (!agent) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				const [link] = await tx
+					.insert(chatsGroupAgents)
+					.values({ groupId: group.id, agentId: agent.id, addedBy: userId })
+					.returning();
+				if (!link) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				return { groupId: group.id, agent, link };
+			});
+			publishChats(chatsUserChannel(userId), { type: "groups.changed" });
+			return {
+				group: await loadGroup(created.groupId),
+				dev: agentView(created.agent, { owner: false }),
+				groupDev: toGroupAgent(created.link),
+			} satisfies CreatedChat;
+		}),
+
+	renameGroup: personProcedure
+		.input(
+			groupInput.extend({ title: z.string().trim().min(1).max(TITLE_MAX) }),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const role = await assertMember(ctx.session.user.id, input.groupId);
+			if (role !== "owner") {
+				throw forbidden("Only the group's owner can rename it");
+			}
+			const [group] = await db
+				.select()
+				.from(chatsGroups)
+				.where(eq(chatsGroups.id, input.groupId));
+			if (!group) throw notFound("Group not found");
+			if (group.kind !== "group") {
+				throw invalid("A 1:1 is named after its Dev");
+			}
+			await db
+				.update(chatsGroups)
+				.set({ title: input.title })
+				.where(eq(chatsGroups.id, input.groupId));
+			const payload = { id: input.groupId, title: input.title };
+			const channel = chatsGroupChannel(input.groupId);
+			publishChats(channel, { type: "group.updated", group: payload });
+			const [agent] = await db
+				.update(chatsAgents)
+				.set({ description: groupDevDescription(input.title) })
+				.where(
+					and(
+						eq(chatsAgents.groupId, input.groupId),
+						eq(chatsAgents.kind, "group"),
+						eq(chatsAgents.description, groupDevDescription(group.title)),
+					),
+				)
+				.returning();
+			if (agent) {
+				publishChats(channel, {
+					type: "dev.updated",
+					dev: agentView(agent, { owner: false }),
+				});
+			}
+			return payload;
+		}),
+
+	deleteGroup: personProcedure
+		.input(groupInput)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			const role = await assertMember(userId, input.groupId);
+			const [group] = await db
+				.select()
+				.from(chatsGroups)
+				.where(eq(chatsGroups.id, input.groupId));
+			if (!group) throw notFound("Group not found");
+			if (group.kind === "direct") {
+				throw invalid("Delete the Dev to delete its chat");
+			}
+			if (role !== "owner") {
+				throw forbidden("Only the group's owner can delete it");
+			}
+			const members = await db
+				.select({ userId: chatsGroupMembers.userId })
+				.from(chatsGroupMembers)
+				.where(eq(chatsGroupMembers.groupId, input.groupId));
+			await db.delete(chatsGroups).where(eq(chatsGroups.id, input.groupId));
+			for (const member of members) {
+				publishChats(chatsUserChannel(member.userId), {
+					type: "group.deleted",
+					groupId: input.groupId,
+					title: group.title,
+					deletedBy: userId,
+				});
+			}
+			return { groupId: input.groupId };
+		}),
+
+	/** Adds a person from the organization to a group. Any member may; the person hears it and their groups change. */
+	addMember: personProcedure
+		.input(groupInput.extend({ userId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await assertMember(ctx.session.user.id, input.groupId);
+			const [group] = await db
+				.select()
+				.from(chatsGroups)
+				.where(eq(chatsGroups.id, input.groupId));
+			if (!group) throw notFound("Group not found");
+			if (group.kind !== "group") {
+				throw invalid("A 1:1 is you and one Dev");
+			}
+			const membership = await findOrgMembership({
+				userId: input.userId,
+				organizationId: group.organizationId,
+			});
+			if (!membership) throw notFound("Person not found");
+			const [joined] = await db
+				.insert(chatsGroupMembers)
+				.values({ groupId: input.groupId, userId: input.userId })
+				.onConflictDoNothing()
+				.returning();
+			const [person] = await db
+				.select({ id: users.id, email: users.email, name: users.name })
+				.from(users)
+				.where(eq(users.id, input.userId));
+			if (!person) throw notFound("Person not found");
+			const member = { ...toUser(person), role: "member" as const };
+			if (joined) {
+				publishChats(chatsGroupChannel(input.groupId), {
+					type: "member.joined",
+					groupId: input.groupId,
+					member,
+				});
+				publishChats(chatsUserChannel(input.userId), {
+					type: "groups.changed",
+				});
+			}
+			return { member };
+		}),
+
+	/** The one agent each person has in an organization, with its 1:1. */
+	createPersonalDev: personProcedure
+		.input(
+			organizationInput.extend({
+				name: z.string().trim().min(1).max(TITLE_MAX),
+				color: colorInput,
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertOrgMember(userId, input.organizationId);
+			const created = await dbWs.transaction(async (tx) => {
+				const [agent] = await tx
+					.insert(chatsAgents)
+					.values({
+						organizationId: input.organizationId,
+						kind: "personal",
+						name: input.name,
+						color: input.color,
+						ownerUserId: userId,
+					})
+					.onConflictDoNothing()
+					.returning();
+				if (!agent) return null;
+				const direct = await newDirectGroup(tx, {
+					organizationId: input.organizationId,
+					userId,
+					agentId: agent.id,
+					title: agent.name,
+				});
+				return { agent, ...direct };
+			});
+			if (!created) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "You already have a personal Dev here",
+				});
+			}
+			publishChats(chatsUserChannel(userId), { type: "groups.changed" });
+			return {
+				dev: agentView(created.agent, { owner: true }),
+				group: await loadGroup(created.groupId),
+				groupDev: toGroupAgent(created.link),
+			} satisfies CreatedChat;
+		}),
+
+	/** An agent a person made, with its 1:1. */
+	createDev: personProcedure
+		.input(
+			organizationInput.extend({
+				name: z.string().trim().min(1).max(TITLE_MAX),
+				color: colorInput,
+				description: z.string().trim().min(1).max(2_000),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertOrgMember(userId, input.organizationId);
+			const created = await dbWs.transaction(async (tx) => {
+				const [agent] = await tx
+					.insert(chatsAgents)
+					.values({
+						organizationId: input.organizationId,
+						kind: "custom",
+						name: input.name,
+						color: input.color,
+						description: input.description,
+						ownerUserId: userId,
+					})
+					.returning();
+				if (!agent) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				const direct = await newDirectGroup(tx, {
+					organizationId: input.organizationId,
+					userId,
+					agentId: agent.id,
+					title: agent.name,
+				});
+				return { agent, ...direct };
+			});
+			publishChats(chatsUserChannel(userId), { type: "groups.changed" });
+			return {
+				dev: agentView(created.agent, { owner: true }),
+				group: await loadGroup(created.groupId),
+				groupDev: toGroupAgent(created.link),
+			} satisfies CreatedChat;
+		}),
+
+	/** Lets one of the person's own agents into a group they are in. */
+	addDevToGroup: personProcedure
+		.input(groupInput.extend({ devId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }): Promise<AddedGroupDev> => {
+			const user = ctx.session.user;
+			await assertMember(user.id, input.groupId);
+			const [[group], [agent]] = await Promise.all([
+				db
+					.select({ kind: chatsGroups.kind })
+					.from(chatsGroups)
+					.where(eq(chatsGroups.id, input.groupId)),
+				db.select().from(chatsAgents).where(eq(chatsAgents.id, input.devId)),
+			]);
+			if (group?.kind !== "group") {
+				throw invalid("Devs can only be added to groups");
+			}
+			if (!agent) throw notFound("Dev not found");
+			if (agent.ownerUserId !== user.id) {
+				throw forbidden("You can only add or remove your own Devs");
+			}
+			await db
+				.insert(chatsGroupAgents)
+				.values({
+					groupId: input.groupId,
+					agentId: input.devId,
+					addedBy: user.id,
+				})
+				.onConflictDoNothing();
+			const [link] = await db
+				.select()
+				.from(chatsGroupAgents)
+				.where(
+					and(
+						eq(chatsGroupAgents.groupId, input.groupId),
+						eq(chatsGroupAgents.agentId, input.devId),
+					),
+				);
+			if (!link) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+			const payload = {
+				groupDev: toGroupAgent(link),
+				dev: agentView(agent, {
+					owner: false,
+					ownerName: toUser(user).displayName,
+				}),
+			};
+			publishChats(chatsGroupChannel(input.groupId), {
+				type: "group_dev.added",
+				...payload,
+			});
+			return payload;
+		}),
+
+	removeDevFromGroup: personProcedure
+		.input(groupInput.extend({ devId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertMember(userId, input.groupId);
+			const [agent] = await db
+				.select()
+				.from(chatsAgents)
+				.where(eq(chatsAgents.id, input.devId));
+			if (!agent) throw notFound("Dev not found");
+			if (agent.kind === "group" && agent.groupId === input.groupId) {
+				throw invalid("A group's own Dev always stays in it");
+			}
+			if (agent.ownerUserId !== userId) {
+				throw forbidden("You can only add or remove your own Devs");
+			}
+			await db
+				.delete(chatsGroupAgents)
+				.where(
+					and(
+						eq(chatsGroupAgents.groupId, input.groupId),
+						eq(chatsGroupAgents.agentId, input.devId),
+					),
+				);
+			publishChats(chatsGroupChannel(input.groupId), {
+				type: "group_dev.removed",
+				groupId: input.groupId,
+				devId: input.devId,
+			});
+			return { groupId: input.groupId, devId: input.devId };
+		}),
+} satisfies TRPCRouterRecord;
