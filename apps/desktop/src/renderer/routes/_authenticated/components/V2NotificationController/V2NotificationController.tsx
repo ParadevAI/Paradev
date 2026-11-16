@@ -15,6 +15,7 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import type { AgentLifecycleEvent } from "shared/notification-types";
+import { CloudWorkspaceNotifier } from "./components/CloudWorkspaceNotifier";
 import {
 	HostNotificationSubscriber,
 	type HostNotificationWorkspaceState,
@@ -68,23 +69,28 @@ export function V2NotificationController() {
 	const { machineId, activeHostUrl } = useLocalHostService();
 	const relayUrl = useRelayUrl();
 	const visibleWorkspaceIds = useVisibleSidebarWorkspaceIds();
-	const { workspaces: hostWorkspaces } = useHostWorkspaces();
+	const { workspaces: hostWorkspaces, cache: hostWorkspacesCache } =
+		useHostWorkspaces();
 	const isRightAreaOpen = useV2UserPreferences().preferences.rightSidebarOpen;
 	const isPerWorkspaceRightArea = useRightPaneAreaEnabled() === true;
 	const allWorkspaceHosts = useMemo<WorkspaceHostRow[]>(
 		() =>
-			hostWorkspaces.map((workspace) => ({
-				workspaceId: workspace.id,
-				organizationId: workspace.organizationId,
-				hostId: workspace.hostId,
-				type: workspace.type,
-				name: workspace.name,
-				projectName: projects.find(
-					(project) => project.id === workspace.projectId,
-				)?.name,
-				branch: workspace.branch,
-			})),
-		[hostWorkspaces, projects],
+			hostWorkspaces
+				.filter(
+					(workspace) => !hostWorkspacesCache.isSandboxHost(workspace.hostId),
+				)
+				.map((workspace) => ({
+					workspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+					hostId: workspace.hostId,
+					type: workspace.type,
+					name: workspace.name,
+					projectName: projects.find(
+						(project) => project.id === workspace.projectId,
+					)?.name,
+					branch: workspace.branch,
+				})),
+		[hostWorkspaces, hostWorkspacesCache, projects],
 	);
 	const { data: allLocalWorkspaceRows = [] } = useLiveQuery(
 		(q) =>
@@ -188,6 +194,7 @@ export function V2NotificationController() {
 
 	return (
 		<>
+			<CloudWorkspaceNotifier />
 			{hostGroups.map((group) => (
 				<HostNotificationSubscriber
 					key={group.hostUrl}

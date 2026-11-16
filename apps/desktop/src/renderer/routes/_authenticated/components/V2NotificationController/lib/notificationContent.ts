@@ -14,7 +14,7 @@ import stripAnsi from "strip-ansi";
 interface V2NativeNotificationContentOptions {
 	workspaceName: string;
 	projectName?: string;
-	payload: AgentLifecyclePayload;
+	payload: Pick<AgentLifecyclePayload, "eventType" | "agent" | "preview">;
 }
 
 export function getV2NativeNotificationContent({
