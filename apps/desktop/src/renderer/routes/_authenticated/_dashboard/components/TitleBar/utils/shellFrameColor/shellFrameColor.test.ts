@@ -11,5 +11,6 @@ describe("shellFrameColor", () => {
 		);
 		expect(shellFrameColor("#000000", "#ffffff")).toBe("#0b0b0b");
 		expect(shellFrameColor("#123456", "#123456")).toBe("#123456");
+		expect(shellFrameColor("var(--x)", "#ffffff")).toBe("var(--x)");
 	});
 });

@@ -86,7 +86,8 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 	setSwitcherSelection: (switcherSelection) =>
 		set((state) =>
 			state.switcherSelection?.id === switcherSelection?.id &&
-			state.switcherSelection?.index === switcherSelection?.index
+			state.switcherSelection?.index === switcherSelection?.index &&
+			state.switcherSelection?.name === switcherSelection?.name
 				? state
 				: { switcherSelection },
 		),

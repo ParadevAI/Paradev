@@ -397,6 +397,7 @@ export const useThemeStore = create<ThemeState>()(
 						customThemes,
 						activeTheme: resolvedTheme,
 						terminalTheme,
+						previewThemeId: null,
 					});
 
 					return { added, updated, skipped };

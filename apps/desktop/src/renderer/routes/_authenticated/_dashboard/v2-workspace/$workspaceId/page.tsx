@@ -448,11 +448,13 @@ function V2WorkspaceContent() {
 		},
 		[workspaceClient, workspaceId],
 	);
+	const canSearchFiles = workspaceClient !== null;
 	useEffect(() => {
 		registerQuickOpen({
 			workspaceId,
 			recentFiles,
 			openFilePaths,
+			canSearch: canSearchFiles,
 			searchFiles,
 			onSelectFile: handleQuickOpenSelectFile,
 		});
@@ -460,6 +462,7 @@ function V2WorkspaceContent() {
 	}, [
 		registerQuickOpen,
 		unregisterQuickOpen,
+		canSearchFiles,
 		workspaceId,
 		recentFiles,
 		openFilePaths,

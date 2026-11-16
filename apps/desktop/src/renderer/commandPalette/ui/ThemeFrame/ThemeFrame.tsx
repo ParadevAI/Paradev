@@ -28,6 +28,7 @@ import { useFrameStackStore } from "../../core/frames";
 import { useCommandPaletteQuery } from "../CommandPalette/CommandPalette";
 
 const SYSTEM_ITEM_VALUE = `system ${SYSTEM_THEME_ID}`;
+const CTRL_NAVIGATION_KEYS = new Set(["j", "k", "n", "p"]);
 const NAVIGATION_KEYS = new Set([
 	"ArrowUp",
 	"ArrowDown",
@@ -64,7 +65,12 @@ export function ThemeFrame() {
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
-			if (NAVIGATION_KEYS.has(event.key)) setHasNavigated(true);
+			if (
+				NAVIGATION_KEYS.has(event.key) ||
+				(event.ctrlKey && CTRL_NAVIGATION_KEYS.has(event.key))
+			) {
+				setHasNavigated(true);
+			}
 		};
 		window.addEventListener("keydown", onKeyDown, true);
 		return () => window.removeEventListener("keydown", onKeyDown, true);
@@ -154,7 +160,8 @@ export function ThemeFrame() {
 
 	useEffect(() => {
 		if (previewThemeId) previewTheme(previewThemeId);
-	}, [previewThemeId, previewTheme]);
+		else endThemePreview();
+	}, [previewThemeId, previewTheme, endThemePreview]);
 
 	return (
 		<CommandList onPointerMove={() => setHasNavigated(true)}>

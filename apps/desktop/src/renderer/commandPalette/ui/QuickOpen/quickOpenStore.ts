@@ -11,6 +11,8 @@ export interface QuickOpenProvider {
 	workspaceId: string;
 	recentFiles: RecentFile[];
 	openFilePaths: Set<string>;
+	/** False until the workspace page can reach its host. */
+	canSearch: boolean;
 	searchFiles: (query: string) => Promise<QuickOpenFileMatch[]>;
 	onSelectFile: (filePath: string) => void;
 }

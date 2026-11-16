@@ -926,6 +926,7 @@ export function WorkspaceActivityMenu({
 						<TooltipTrigger asChild>
 							<button
 								type="button"
+								disabled={pendingLayer !== null}
 								onClick={() =>
 									onOpenPullRequest({
 										repoFullName: `${currentPr.repoOwner}/${currentPr.repoName}`,

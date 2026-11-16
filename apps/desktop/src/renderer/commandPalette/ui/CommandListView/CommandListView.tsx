@@ -47,7 +47,7 @@ function useRootWorkspaceRows(
 	enabled: boolean,
 	query: string,
 ): RootWorkspaceRows {
-	const { groups, query: parsed } = useSwitcherGroups(query);
+	const { groups, query: parsed } = useSwitcherGroups(query, enabled);
 	return useMemo(() => {
 		const text = parsed.text;
 		const workspacesOnly = parsed.scope === "all";

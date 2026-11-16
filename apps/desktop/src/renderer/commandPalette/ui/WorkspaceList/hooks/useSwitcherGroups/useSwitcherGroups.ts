@@ -19,9 +19,16 @@ export interface SwitcherGroups {
 	query: SwitcherQuery;
 }
 
-export function useSwitcherGroups(rawQuery: string): SwitcherGroups {
+export function useSwitcherGroups(
+	rawQuery: string,
+	enabled = true,
+): SwitcherGroups {
 	const { all: workspaces } = useAccessibleV2Workspaces({
-		liveState: rawQuery.trimStart().startsWith("#") ? "status" : "cached",
+		liveState: !enabled
+			? undefined
+			: rawQuery.trimStart().startsWith("#")
+				? "status"
+				: "cached",
 	});
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
 	const currentId = currentPath.match(/^\/v2-workspace\/([^/]+)/)?.[1] ?? null;

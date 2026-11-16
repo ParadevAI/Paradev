@@ -26,7 +26,7 @@ export function WorkspaceOpenInDefaultItem({
 
 	if (!currentApp) return null;
 	return (
-		<Item disabled={isLoading} onSelect={openInDefaultApp}>
+		<Item disabled={!target || isLoading} onSelect={openInDefaultApp}>
 			<img
 				src={isDark ? currentApp.darkIcon : currentApp.lightIcon}
 				alt=""

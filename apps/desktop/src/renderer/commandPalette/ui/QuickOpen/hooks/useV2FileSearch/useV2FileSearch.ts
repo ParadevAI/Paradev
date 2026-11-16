@@ -7,10 +7,14 @@ import type { QuickOpenProvider } from "../../quickOpenStore";
  * the host itself.
  */
 export function useV2FileSearch(
-	provider: Pick<QuickOpenProvider, "workspaceId" | "searchFiles"> | null,
+	provider: Pick<
+		QuickOpenProvider,
+		"workspaceId" | "searchFiles" | "canSearch"
+	> | null,
 	query: string,
 ) {
 	const trimmedQuery = query.trim();
+	const canSearch = provider?.canSearch === true && trimmedQuery.length > 0;
 
 	const { data, isFetching } = useQuery({
 		queryKey: ["v2-file-search", provider?.workspaceId ?? "", trimmedQuery],
@@ -18,17 +22,19 @@ export function useV2FileSearch(
 			if (!provider) throw new Error("no workspace page to search");
 			return provider.searchFiles(trimmedQuery);
 		},
-		enabled: provider !== null && trimmedQuery.length > 0,
+		enabled: canSearch,
 		placeholderData: (previous) => previous ?? [],
 	});
 
-	const results =
-		data?.map((match) => ({
-			id: match.absolutePath,
-			name: match.name,
-			path: match.absolutePath,
-			relativePath: match.relativePath,
-		})) ?? [];
+	// placeholderData carries the last matches over to a query that will not run.
+	const results = !canSearch
+		? []
+		: (data?.map((match) => ({
+				id: match.absolutePath,
+				name: match.name,
+				path: match.absolutePath,
+				relativePath: match.relativePath,
+			})) ?? []);
 
 	return { results, isFetching };
 }

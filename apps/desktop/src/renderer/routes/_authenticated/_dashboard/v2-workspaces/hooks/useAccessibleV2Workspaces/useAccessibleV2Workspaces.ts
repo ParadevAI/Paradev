@@ -658,12 +658,10 @@ export function useAccessibleV2Workspaces(
 			organizationId: activeOrganizationId,
 			enabled: cloudRows.length > 0,
 		});
-	// Unscoped callers render no PR data, so they skip this query too.
+	// The sidebar holds the same query, so a `cached` caller adds no fetch.
 	const { byWorkspace: cloudPullRequestsById } = useCloudPullRequests({
 		active:
-			whereFilter !== undefined &&
-			includesCloud &&
-			(activeCloudRows?.length ?? 0) > 0,
+			liveState !== null && includesCloud && (activeCloudRows?.length ?? 0) > 0,
 		archived:
 			whereFilter !== undefined &&
 			includesCloud &&
