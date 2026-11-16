@@ -8,6 +8,7 @@
 		"image": "bun run src/image.ts",
 		"pin": "bun run src/pin.ts",
 		"assets": "bun run src/assets/produce.ts",
+		"inventory": "bun run src/inventory.ts",
 		"release": "bun run src/environments/release.ts",
 		"record-bundle": "bun run src/environments/record-bundle.ts",
 		"test": "bun test",
