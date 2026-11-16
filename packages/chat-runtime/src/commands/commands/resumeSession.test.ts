@@ -333,6 +333,24 @@ describe("resuming chats after a restart", () => {
 		).toEqual([resumed.sessionId]);
 		await runtime.dispose();
 	});
+
+	test("a resumed chat lists its agent session before the agent starts", async () => {
+		const { runtime } = runtimeWithStartedAgents();
+		const { sessionId } = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			resume: { harnessSessionId: "agent-1", replacesSessionId: "on-desktop" },
+		});
+
+		expect(
+			runtime.commands
+				.listSessions({ scopeId: "workspace-1" })
+				.find((row) => row.sessionId === sessionId)?.harnessSessionId,
+		).toBe("agent-1");
+		await runtime.dispose();
+	});
 });
 
 describe("the agent config a chat launched with", () => {

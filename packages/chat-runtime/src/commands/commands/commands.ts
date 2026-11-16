@@ -668,6 +668,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
 					agentConfigId,
+					harnessSessionId: parsed.resume?.harnessSessionId,
 				});
 				try {
 					options.live.create({
