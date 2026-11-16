@@ -13254,9 +13254,6 @@ msgstr "\"{0}\" ile eşleşen eklenti yok"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Henüz eklenti yok. Eşitlemek için bir depo ekleyin."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Henüz port yok. Bir terminalde geliştirme sunucusu başlatın, burada görünür."
-
 msgid "No posts yet."
 msgstr "Henüz yazı yok."
 

@@ -13254,9 +13254,6 @@ msgstr "Tidak ada plugin yang cocok dengan \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Belum ada plugin. Tambahkan repositori untuk menyinkronkannya."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Belum ada port. Jalankan server pengembangan di terminal dan port akan muncul di sini."
-
 msgid "No posts yet."
 msgstr "Belum ada tulisan."
 

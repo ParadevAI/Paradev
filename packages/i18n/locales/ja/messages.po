@@ -13254,9 +13254,6 @@ msgstr "「{0}」に一致するプラグインがありません"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "プラグインはまだありません。リポジトリを追加して同期してください。"
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "まだポートはありません。ターミナルで開発サーバーを起動するとここに表示されます。"
-
 msgid "No posts yet."
 msgstr "投稿はまだありません。"
 

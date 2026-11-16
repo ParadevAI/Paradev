@@ -13254,9 +13254,6 @@ msgstr "Aucun plugin ne correspond à \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Aucun plugin pour l'instant. Ajoutez un dépôt pour les synchroniser."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Aucun port pour l’instant. Lancez un serveur de développement dans un terminal et il apparaîtra ici."
-
 msgid "No posts yet."
 msgstr "Aucun article pour l'instant."
 

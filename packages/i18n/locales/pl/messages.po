@@ -13254,9 +13254,6 @@ msgstr "Brak wtyczek pasujących do „{0}”"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Brak wtyczek. Dodaj repozytorium, aby je zsynchronizować."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Brak portów. Uruchom serwer deweloperski w terminalu, a pojawi się tutaj."
-
 msgid "No posts yet."
 msgstr "Brak wpisów."
 

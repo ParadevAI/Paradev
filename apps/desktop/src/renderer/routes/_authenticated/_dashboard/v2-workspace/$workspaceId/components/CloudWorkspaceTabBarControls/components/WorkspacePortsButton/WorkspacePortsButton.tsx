@@ -33,6 +33,8 @@ export function WorkspacePortsButton({
 	);
 	const totalPortCount = ports.length;
 
+	if (ports.length === 0 && stale.length === 0) return null;
+
 	return (
 		<Popover>
 			<Tooltip delayDuration={300}>
@@ -65,26 +67,17 @@ export function WorkspacePortsButton({
 						<Trans>Only you. Teammates forward their own.</Trans>
 					</span>
 				</div>
-				{ports.length === 0 && stale.length === 0 ? (
-					<p className="px-3 py-3 text-xs text-muted-foreground">
-						<Trans>
-							No ports yet. Start a dev server in a terminal and it shows up
-							here.
-						</Trans>
-					</p>
-				) : (
-					<div className="max-h-80 overflow-y-auto p-1">
-						{ports.map((port) => (
-							<WorkspacePortRow
-								key={`${port.terminalId}:${port.port}`}
-								port={port}
-							/>
-						))}
-						{stale.map((forward) => (
-							<WorkspaceStaleForwardRow key={forward.id} forward={forward} />
-						))}
-					</div>
-				)}
+				<div className="max-h-80 overflow-y-auto p-1">
+					{ports.map((port) => (
+						<WorkspacePortRow
+							key={`${port.terminalId}:${port.port}`}
+							port={port}
+						/>
+					))}
+					{stale.map((forward) => (
+						<WorkspaceStaleForwardRow key={forward.id} forward={forward} />
+					))}
+				</div>
 			</PopoverContent>
 		</Popover>
 	);

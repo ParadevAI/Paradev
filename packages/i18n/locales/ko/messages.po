@@ -13254,9 +13254,6 @@ msgstr "\"{0}\"과(와) 일치하는 플러그인이 없습니다"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "아직 플러그인이 없습니다. 리포지토리를 추가해 동기화하세요."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "아직 포트가 없습니다. 터미널에서 개발 서버를 시작하면 여기에 표시됩니다."
-
 msgid "No posts yet."
 msgstr "아직 게시물이 없습니다."
 
