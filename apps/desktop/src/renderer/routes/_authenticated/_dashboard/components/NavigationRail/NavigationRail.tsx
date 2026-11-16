@@ -1,9 +1,13 @@
 import { useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { Layers } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { PiClockClockwise } from "react-icons/pi";
-import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
+import {
+	TbGitPullRequest,
+	TbNote,
+	TbSmartHome,
+	TbStack2,
+} from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { env } from "renderer/env.renderer";
@@ -43,7 +47,7 @@ export function NavigationRail() {
 			/>
 			<RailButton
 				label={t({ message: "Workspaces" })}
-				icon={Layers}
+				icon={TbStack2}
 				isActive={navigation.isWorkspacesOpen}
 				onClick={navigation.openWorkspaces}
 			/>

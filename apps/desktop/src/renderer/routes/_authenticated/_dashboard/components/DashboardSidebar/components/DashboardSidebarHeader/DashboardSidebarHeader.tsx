@@ -14,11 +14,11 @@ import {
 	LuClock,
 	LuFileText,
 	LuGauge,
-	LuLayers,
 	LuPlus,
 	LuPuzzle,
 	LuSearch,
 } from "react-icons/lu";
+import { TbStack2 } from "react-icons/tb";
 import { VscFolderOpened, VscNewFolder } from "react-icons/vsc";
 import { ZoomStable } from "renderer/components/ZoomStable";
 import { env } from "renderer/env.renderer";
@@ -156,7 +156,7 @@ export function DashboardSidebarHeader({
 										: "text-muted-foreground hover:bg-fill-hover",
 								)}
 							>
-								<LuLayers className="size-3.5" strokeWidth={1.5} />
+								<TbStack2 className="size-3.5" strokeWidth={1.5} />
 							</button>
 						</TooltipTrigger>
 						<TooltipContent side="right">
@@ -420,7 +420,7 @@ export function DashboardSidebarHeader({
 						: "text-muted-foreground hover:bg-fill-hover hover:text-foreground",
 				)}
 			>
-				<LuLayers
+				<TbStack2
 					className="size-4 shrink-0 text-muted-foreground"
 					strokeWidth={1.5}
 				/>
