@@ -290,7 +290,6 @@
         "electron-log": "5.4.3",
         "electron-updater": "6.8.3",
         "electron-vite": "6.0.0",
-        "emojibase-data": "17.0.0",
         "execa": "9.6.1",
         "express": "5.2.1",
         "fast-glob": "3.3.3",
