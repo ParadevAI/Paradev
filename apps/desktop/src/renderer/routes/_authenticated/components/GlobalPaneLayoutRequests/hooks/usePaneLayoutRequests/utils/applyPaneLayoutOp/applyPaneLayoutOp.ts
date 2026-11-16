@@ -424,7 +424,18 @@ export function applyPaneLayoutOp(
 		}
 
 		case "close": {
-			const { area, tab } = locatePane(areas, op.paneId);
+			const { area, tab, pane } = locatePane(areas, op.paneId);
+			const shownTerminalId = (pane.data as { terminalId?: unknown } | null)
+				?.terminalId;
+			if (
+				op.expectedTerminalId !== undefined &&
+				shownTerminalId !== op.expectedTerminalId
+			) {
+				throw new PaneLayoutOpError(
+					"CONFLICT",
+					`Pane ${op.paneId} no longer shows terminal ${op.expectedTerminalId}`,
+				);
+			}
 			const next = inArea(area, (store) =>
 				store.closePane({ tabId: tab.id, paneId: op.paneId }),
 			);
