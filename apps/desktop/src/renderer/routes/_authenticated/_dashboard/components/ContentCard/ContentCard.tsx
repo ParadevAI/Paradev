@@ -14,13 +14,23 @@ export function ContentCard({
 	return (
 		<div
 			className={cn(
-				"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-[10px]",
+				"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 rounded-[10px]",
 				joinsSidebar && "rounded-l-none",
 				isBare ? "bg-shell-frame" : "border border-border bg-background",
 			)}
 		>
 			<BareContentCardContext.Provider value={setIsBare}>
-				<div className="relative flex min-h-0 min-w-0 flex-1">{children}</div>
+				{/* Clip with one radius on all corners: Chromium gives each composited child its own card-size mask when the radii differ. */}
+				<div
+					className={cn(
+						"relative flex min-h-0 min-w-0 flex-1 overflow-hidden",
+						isBare
+							? cn("rounded-[10px]", joinsSidebar && "rounded-l-none")
+							: "rounded-[9px]",
+					)}
+				>
+					{children}
+				</div>
 			</BareContentCardContext.Provider>
 		</div>
 	);
