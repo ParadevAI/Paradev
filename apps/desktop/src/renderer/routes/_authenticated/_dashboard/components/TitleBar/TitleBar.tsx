@@ -125,7 +125,7 @@ export function TitleBar() {
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"relative min-w-0 overflow-hidden border-l border-border",
+					"relative min-w-0 overflow-hidden",
 					sideWidth === null && "hidden",
 				)}
 				style={
