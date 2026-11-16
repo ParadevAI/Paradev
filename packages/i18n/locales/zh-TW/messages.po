@@ -18787,6 +18787,12 @@ msgstr "登入以檢視此頁面"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "使用 {browserProviderLabel} 登入後，再回到這裡。"
 
+msgid "Sign in with another account"
+msgstr "使用其他帳號登入"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "請使用其他帳號登入，或請該組織的管理員邀請你。"
+
 msgid "Sign in with email"
 msgstr "使用電子郵件登入"
 
@@ -18872,6 +18878,9 @@ msgstr "正在登入..."
 
 msgid "Signing in…"
 msgstr "正在登入…"
+
+msgid "Signing out…"
+msgstr "正在登出…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "註冊正常。歡迎畫面已載入，主控台沒有錯誤。"
@@ -22096,6 +22105,12 @@ msgstr "使用「{0}」"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相對於工作區的路徑或絕對路徑資料夾。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "使用其他帳號連接 {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "使用其他帳號繼續"
+
 msgid "Use another port"
 msgstr "使用其他埠"
 
@@ -23148,6 +23163,9 @@ msgstr "你已離線"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "你目前使用的是<0>{currentPlanLabel}方案</0>。如有任何疑問，或希望就方案獲得進一步支援，請<1>聯絡我們<2/></1>。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "你目前以 {email} 登入。此帳號不是此連結所屬組織的成員。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "你是某個仍有其他成員的組織的唯一擁有者。請先轉移所有權或刪除該組織。"
 
@@ -23296,6 +23314,9 @@ msgstr "你的帳戶已停用，並將很快被永久刪除。重新啟用即可
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "你的帳戶由你所在的組織管理。請聯絡管理員來建立新組織。"
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "你的帳號不是此連結所屬組織的成員。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "你的代理程式可以用 superset browser 指令開啟任何頁面並逐步操作。它使用你正在看的窗格，所以每一步你都看得到。"

@@ -1,6 +1,6 @@
+import { connectorNameFromRedirect } from "@/app/utils/connectorNameFromRedirect";
 import { env } from "@/env";
 import { SignInForm } from "./components/SignInForm";
-import { connectorNameFromRedirect } from "./utils/connectorNameFromRedirect";
 
 export default async function SignInPage({
 	searchParams,

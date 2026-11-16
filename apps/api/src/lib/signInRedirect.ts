@@ -19,15 +19,20 @@ export function isBrowserNavigation(request: Request): boolean {
 	return (request.headers.get("accept") ?? "").includes("text/html");
 }
 
-/** The session cookie is scoped to one root domain, so sign in on the request's. */
-export function signInUrl(request: Request): URL {
+/** The session cookie is scoped to one root domain, so send the browser to the web app on the request's. */
+function webPageFor(request: Request, path: string): URL {
 	const root = ownRootOf(new URL(request.url).hostname);
 	const web =
 		withOwnDomainTwins([env.NEXT_PUBLIC_WEB_URL]).find(
 			(url) => ownRootOf(new URL(url).hostname) === root,
 		) ?? env.NEXT_PUBLIC_WEB_URL;
-	const signIn = new URL("/sign-in", web);
-	signIn.searchParams.set("redirect", request.url);
+	const page = new URL(path, web);
+	page.searchParams.set("redirect", request.url);
+	return page;
+}
+
+export function signInUrl(request: Request): URL {
+	const signIn = webPageFor(request, "/sign-in");
 	if (getSessionCookie(request))
 		signIn.searchParams.set("reason", "session_expired");
 	return signIn;
@@ -40,5 +45,18 @@ export function unauthenticatedResponse(
 ): Response {
 	return isBrowserNavigation(request)
 		? Response.redirect(signInUrl(request).toString(), 302)
+		: fallback;
+}
+
+/** A person signed in to the wrong account is offered to switch accounts and come back; any other caller gets `fallback`. */
+export function wrongAccountResponse(
+	request: Request,
+	fallback: Response,
+): Response {
+	return isBrowserNavigation(request)
+		? Response.redirect(
+				webPageFor(request, "/auth/switch-account").toString(),
+				302,
+			)
 		: fallback;
 }

@@ -18787,6 +18787,12 @@ msgstr "Log in om deze pagina te bekijken"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Log in met {browserProviderLabel} en kom dan hier terug."
 
+msgid "Sign in with another account"
+msgstr "Aanmelden met een ander account"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Meld je aan met een ander account of vraag een beheerder van de organisatie om je uit te nodigen."
+
 msgid "Sign in with email"
 msgstr "Inloggen met e-mail"
 
@@ -18872,6 +18878,9 @@ msgstr "Inloggen..."
 
 msgid "Signing in…"
 msgstr "Inloggen…"
+
+msgid "Signing out…"
+msgstr "Afmelden…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Aanmelden werkt. Het welkomstscherm laadt en de console is schoon."
@@ -22096,6 +22105,12 @@ msgstr "“{0}” gebruiken"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Gebruik een pad relatief aan de werkruimte of een absolute map."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Gebruik een ander account om {connectorName} te koppelen"
+
+msgid "Use another account to continue"
+msgstr "Gebruik een ander account om door te gaan"
+
 msgid "Use another port"
 msgstr "Een andere poort gebruiken"
 
@@ -23148,6 +23163,9 @@ msgstr "Je bent offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Je zit op het <0>{currentPlanLabel}-plan</0>. Heb je vragen of wil je meer hulp bij je plan, <1>neem dan contact op<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Je bent aangemeld als {email}. Dit account is geen lid van de organisatie van deze link."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Je bent de enige eigenaar van een organisatie met andere leden. Draag het eigendom over of verwijder de organisatie eerst."
 
@@ -23296,6 +23314,9 @@ msgstr "Je account is gedeactiveerd en wordt binnenkort definitief verwijderd. R
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Je account wordt beheerd door je organisatie. Neem contact op met je beheerder om een nieuwe organisatie aan te maken."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Je account is geen lid van de organisatie van deze link."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Je agent kan elke pagina openen en er doorheen werken met superset browser-commando's. Hij gebruikt het paneel dat je bekijkt, dus je ziet elke stap."

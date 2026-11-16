@@ -18787,6 +18787,12 @@ msgstr "Đăng nhập để xem trang này"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Đăng nhập bằng {browserProviderLabel}, rồi quay lại đây."
 
+msgid "Sign in with another account"
+msgstr "Đăng nhập bằng tài khoản khác"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Hãy đăng nhập bằng tài khoản khác, hoặc nhờ quản trị viên của tổ chức mời bạn."
+
 msgid "Sign in with email"
 msgstr "Đăng nhập bằng email"
 
@@ -18872,6 +18878,9 @@ msgstr "Đang đăng nhập..."
 
 msgid "Signing in…"
 msgstr "Đang đăng nhập…"
+
+msgid "Signing out…"
+msgstr "Đang đăng xuất…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Đăng ký hoạt động tốt. Màn hình chào mừng tải xong và console không có lỗi."
@@ -22096,6 +22105,12 @@ msgstr "Dùng “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Dùng đường dẫn tương đối với workspace hoặc một thư mục tuyệt đối."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Dùng tài khoản khác để kết nối {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Dùng tài khoản khác để tiếp tục"
+
 msgid "Use another port"
 msgstr "Dùng port khác"
 
@@ -23148,6 +23163,9 @@ msgstr "Bạn đang ngoại tuyến"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Bạn đang dùng <0>gói {currentPlanLabel}</0>. Nếu có thắc mắc hoặc cần hỗ trợ thêm về gói của mình, hãy <1>liên hệ với chúng tôi<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Bạn đang đăng nhập với {email}. Tài khoản này không phải là thành viên của tổ chức mà liên kết này thuộc về."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Bạn là chủ sở hữu duy nhất của một tổ chức còn thành viên khác. Hãy chuyển quyền sở hữu hoặc xóa tổ chức trước."
 
@@ -23296,6 +23314,9 @@ msgstr "Tài khoản của bạn đã bị vô hiệu hóa và sẽ sớm bị x
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Tài khoản của bạn do tổ chức quản lý. Hãy liên hệ admin để tạo tổ chức mới."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Tài khoản của bạn không phải là thành viên của tổ chức mà liên kết này thuộc về."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent của bạn có thể mở bất kỳ trang nào và thao tác trên đó bằng lệnh superset browser. Nó dùng ngăn bạn đang xem, nên bạn thấy từng bước."

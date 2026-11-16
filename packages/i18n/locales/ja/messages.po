@@ -18787,6 +18787,12 @@ msgstr "サインインしてこのページを表示"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} でサインインしてから、ここに戻ってください。"
 
+msgid "Sign in with another account"
+msgstr "別のアカウントでサインイン"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "別のアカウントでサインインするか、組織の管理者に招待を依頼してください。"
+
 msgid "Sign in with email"
 msgstr "メールでサインイン"
 
@@ -18872,6 +18878,9 @@ msgstr "サインイン中..."
 
 msgid "Signing in…"
 msgstr "サインインしています…"
+
+msgid "Signing out…"
+msgstr "サインアウトしています…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "登録は正常に動いています。ウェルカム画面が表示され、コンソールにエラーはありません。"
@@ -22096,6 +22105,12 @@ msgstr "「{0}」を使用"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "ワークスペースからの相対パスか絶対パスのフォルダを指定します。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "別のアカウントで {connectorName} に接続"
+
+msgid "Use another account to continue"
+msgstr "別のアカウントで続行"
+
 msgid "Use another port"
 msgstr "別のポートを使用"
 
@@ -23148,6 +23163,9 @@ msgstr "オフラインです"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "現在<0>{currentPlanLabel}プラン</0>をご利用中です。プランについてご質問やサポートが必要な場合は、<1>お問い合わせ<2/></1>ください。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} としてサインインしています。このアカウントは、このリンクの組織のメンバーではありません。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "他にメンバーがいる組織の唯一のオーナーです。先にオーナー権限を移譲するか、組織を削除してください。"
 
@@ -23296,6 +23314,9 @@ msgstr "アカウントは無効化されており、まもなく完全に削除
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "アカウントは組織によって管理されています。新しい組織を作成するには管理者に連絡してください。"
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "あなたのアカウントは、このリンクの組織のメンバーではありません。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "エージェントは superset browser コマンドで任意のページを開いて操作できます。あなたが見ているペインを使うので、すべての手順が見えます。"

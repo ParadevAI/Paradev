@@ -18787,6 +18787,12 @@ msgstr "Accedi per vedere questa pagina"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Accedi con {browserProviderLabel}, poi torna qui."
 
+msgid "Sign in with another account"
+msgstr "Accedi con un altro account"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Accedi con un altro account o chiedi a un amministratore dell’organizzazione di invitarti."
+
 msgid "Sign in with email"
 msgstr "Accedi con email"
 
@@ -18872,6 +18878,9 @@ msgstr "Accesso in corso..."
 
 msgid "Signing in…"
 msgstr "Accesso in corso…"
+
+msgid "Signing out…"
+msgstr "Disconnessione…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "La registrazione funziona. La schermata di benvenuto si carica e la console è pulita."
@@ -22096,6 +22105,12 @@ msgstr "Usa “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Usa un percorso relativo al workspace o una cartella assoluta."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Usa un altro account per connettere {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Usa un altro account per continuare"
+
 msgid "Use another port"
 msgstr "Usa un'altra porta"
 
@@ -23148,6 +23163,9 @@ msgstr "Sei offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Sei sul <0>piano {currentPlanLabel}</0>. Se hai domande o vuoi ulteriore supporto sul tuo piano, <1>contattaci<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Hai effettuato l’accesso come {email}. Questo account non è membro dell’organizzazione di questo link."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Sei l'unico proprietario di un'organizzazione che ha altri membri. Trasferisci la proprietà o elimina prima l'organizzazione."
 
@@ -23296,6 +23314,9 @@ msgstr "Il tuo account è disattivato e sarà eliminato definitivamente a breve.
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Il tuo account è gestito dalla tua organizzazione. Contatta l'amministratore per creare una nuova organizzazione."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Il tuo account non è membro dell’organizzazione di questo link."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Il tuo agente può aprire qualsiasi pagina e percorrerla con i comandi superset browser. Usa il riquadro che stai guardando, quindi vedi ogni passaggio."

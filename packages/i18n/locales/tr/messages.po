@@ -18787,6 +18787,12 @@ msgstr "Bu sayfayı görmek için oturum açın"
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} ile giriş yapın, ardından buraya dönün."
 
+msgid "Sign in with another account"
+msgstr "Başka bir hesapla oturum açın"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Başka bir hesapla oturum açın veya kuruluşun bir yöneticisinden sizi davet etmesini isteyin."
+
 msgid "Sign in with email"
 msgstr "E-posta ile oturum aç"
 
@@ -18872,6 +18878,9 @@ msgstr "Oturum açılıyor..."
 
 msgid "Signing in…"
 msgstr "Oturum açılıyor…"
+
+msgid "Signing out…"
+msgstr "Oturum kapatılıyor…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Kayıt çalışıyor. Hoş geldiniz ekranı yükleniyor ve konsol temiz."
@@ -22096,6 +22105,12 @@ msgstr "“{0}” kullan"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Çalışma alanına göreli bir yol ya da mutlak bir klasör kullanın."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "{connectorName} bağlantısı için başka bir hesap kullanın"
+
+msgid "Use another account to continue"
+msgstr "Devam etmek için başka bir hesap kullanın"
+
 msgid "Use another port"
 msgstr "Başka bir port kullan"
 
@@ -23148,6 +23163,9 @@ msgstr "Çevrimdışısınız"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "<0>{currentPlanLabel} planındasınız</0>. Sorularınız varsa veya planınızla ilgili destek isterseniz <1>bize ulaşın<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} olarak oturum açtınız. Bu hesap, bu bağlantının ait olduğu kuruluşun üyesi değil."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Başka üyeleri olan bir kuruluşun tek sahibisiniz. Önce sahipliği devredin veya kuruluşu silin."
 
@@ -23296,6 +23314,9 @@ msgstr "Hesabınız devre dışı bırakıldı ve yakında kalıcı olarak silin
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Hesabınız kuruluşunuz tarafından yönetiliyor. Yeni bir kuruluş oluşturmak için yöneticinizle iletişime geçin."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Hesabınız, bu bağlantının ait olduğu kuruluşun üyesi değil."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Ajanınız superset browser komutlarıyla herhangi bir sayfayı açıp içinde ilerleyebilir. İzlediğiniz bölmeyi kullandığı için her adımı görürsünüz."
