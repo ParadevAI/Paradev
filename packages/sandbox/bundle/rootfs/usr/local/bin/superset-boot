@@ -121,6 +121,16 @@ stamp "steps.start"; "$BUNDLE/setup" run-steps >> "$SUPERSET_BOOT_LOG" 2>&1; sta
 # is logged, not fatal: the desktop and the checkout still come up so the
 # box can be looked at, and the control plane marks the workspace failed.
 HOST="${SUPERSET_HOST_ROOT}/current"
+# install-host keeps the previous runtime; once the current one answers, it is garbage.
+prune_runtimes() {
+	local keep dir
+	keep="$(readlink -f "$HOST")" || return 0
+	for dir in "${SUPERSET_HOST_ROOT}"/*/; do
+		dir="${dir%/}"
+		[ -L "$dir" ] || [ "$dir" = "$keep" ] && continue
+		rm -rf "$dir" && stamp "host.pruned ${dir##*/}"
+	done
+}
 start_host_service() {
 [ -f "${HOST}/host-service.js" ] || { stamp "host.missing no runtime at ${HOST}"; return 0; }
 chown -R "$SUPERSET_USER:$SUPERSET_USER" "$SUPERSET_STATE_DIR" "$SUPERSET_LOG_DIR"
@@ -171,7 +181,7 @@ echo $! > "${SUPERSET_RUN_DIR}/host-service.pid"
 (
 	for _ in $(seq 1 600); do
 		if curl -fs -o /dev/null "http://127.0.0.1:${SUPERSET_HOST_SERVICE_PORT}/trpc/health.check"; then
-			touch "${SUPERSET_RUN_DIR}/host-service.ready"; stamp "host.ready"; exit 0
+			touch "${SUPERSET_RUN_DIR}/host-service.ready"; stamp "host.ready"; prune_runtimes; exit 0
 		fi
 		sleep 0.1
 	done

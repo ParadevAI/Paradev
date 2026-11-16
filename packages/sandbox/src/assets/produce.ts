@@ -349,7 +349,10 @@ function hostService(): void {
 			`npm install ${[...natives, ...acpAdapters.map(pinned)].join(" ")} @parcel/watcher @xterm/headless --no-audit --no-fund >/dev/null`,
 			// The adapters bring their own claude and codex binaries (~650 MB); host-service points them at the box's pinned CLIs instead.
 			"rm -rf node_modules/@anthropic-ai/claude-agent-sdk-linux-* node_modules/@openai/codex-linux-*",
+			"cd /rt/node_modules/node-pty/prebuilds && find . -mindepth 1 -maxdepth 1 ! -name linux-x64 -exec rm -rf {} + && cd /rt",
+			"rm -rf node_modules/node-pty/third_party node_modules/node-pty/src node_modules/better-sqlite3/deps node_modules/better-sqlite3/src node_modules/zod/src",
 			"test -d node_modules/node-pty/prebuilds/linux-x64 || (echo 'node-pty prebuild missing' && exit 1)",
+			'./node -e \'require("better-sqlite3");require("node-pty");new (require("better-sqlite3"))(":memory:").close()\' || (echo "natives do not load after pruning" && exit 1)',
 			...acpAdapters.map(
 				(adapter) =>
 					`test -f node_modules/${adapter}/dist/index.js || (echo '${adapter} missing' && exit 1)`,
