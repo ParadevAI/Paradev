@@ -23,6 +23,7 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { shellFrameColor } from "./utils/shellFrameColor";
 
 /** macOS draws the window buttons in the first 80 physical pixels, whatever the page zoom. */
 const TRAFFIC_LIGHTS_WIDTH = 80;
@@ -49,7 +50,7 @@ export function TitleBar() {
 
 	// The Windows/Linux window controls are painted by the window, so they take
 	// this row's colour and height only while the row is on screen.
-	const { background, foreground, sidebar, sidebarForeground } = theme.ui;
+	const { background, foreground } = theme.ui;
 	useEffect(() => {
 		const setOverlay = (color: string, symbolColor: string, height: number) =>
 			electronTrpcClient.window.setTitleBarOverlay
@@ -61,11 +62,11 @@ export function TitleBar() {
 				.catch((error: unknown) => {
 					console.warn("[TitleBar] window controls overlay not updated", error);
 				});
-		setOverlay(sidebar, sidebarForeground, ROW_HEIGHT);
+		setOverlay(shellFrameColor(background, foreground), foreground, ROW_HEIGHT);
 		return () => {
 			setOverlay(background, foreground, TITLE_BAR_OVERLAY_HEIGHT);
 		};
-	}, [background, foreground, sidebar, sidebarForeground]);
+	}, [background, foreground]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,

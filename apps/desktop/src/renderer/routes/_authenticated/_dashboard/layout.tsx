@@ -1,4 +1,3 @@
-import { cn } from "@superset/ui/utils";
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { CommandPaletteHost } from "renderer/commandPalette";
@@ -35,6 +34,7 @@ import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-stat
 import { ContentBoundary } from "../components/ContentBoundary";
 import { AddRepositoryModals } from "./components/AddRepositoryModals";
 import { ChatTabs } from "./components/ChatTabs";
+import { ContentCard } from "./components/ContentCard";
 import { CrossVersionMismatchState } from "./components/CrossVersionMismatchState";
 import { NavigationRail } from "./components/NavigationRail";
 import { RemotePortForwarder } from "./components/RemotePortForwarder";
@@ -283,7 +283,7 @@ function DashboardLayout() {
 					<>
 						<CommandPaletteHost />
 						<TitleBarSlotsProvider>
-							<div className="flex h-full w-full flex-col overflow-hidden bg-sidebar">
+							<div className="flex h-full w-full flex-col overflow-hidden bg-shell-frame">
 								<TitleBar />
 								<ChatTabs />
 								<div className="flex min-h-0 flex-1">
@@ -292,21 +292,13 @@ function DashboardLayout() {
 										collapsedWidth={0}
 										slides
 										onLayoutFrame={relayoutBrowserPanes}
-										className="border-r-0"
+										className="mb-1.5 h-auto self-stretch rounded-l-[10px] border-y border-l border-r-0 bg-sidebar [--sidebar:var(--shell-sidebar)]"
 									>
 										<DashboardSidebar />
 									</WorkspaceSidebarPanel>
-									<div
-										className={cn(
-											"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-xl",
-											!onV2WorkspaceRoute &&
-												"border border-border bg-background",
-										)}
-									>
-										<div className="relative flex min-h-0 min-w-0 flex-1">
-											{content}
-										</div>
-									</div>
+									<ContentCard joinsSidebar={!isWorkspaceSidebarCollapsed}>
+										{content}
+									</ContentCard>
 								</div>
 							</div>
 						</TitleBarSlotsProvider>
