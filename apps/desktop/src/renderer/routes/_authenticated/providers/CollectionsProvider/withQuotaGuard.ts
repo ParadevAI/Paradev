@@ -38,7 +38,7 @@ interface QuotaGuardHandlers {
  * builds use a numeric code or their own name. Anything else is a genuine
  * defect and is rethrown, so this never masks unrelated storage failures.
  */
-function isQuotaExceeded(error: unknown): boolean {
+export function isQuotaExceeded(error: unknown): boolean {
 	if (!(error instanceof Error)) return false;
 	const legacyCode = (error as DOMException).code;
 	return (

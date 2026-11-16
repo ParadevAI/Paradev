@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, spyOn, test } from "bun:test";
 import {
 	FINISHED_LIMIT,
 	useActivityPanelStore,
@@ -99,4 +99,24 @@ test("collapsing the subagents group is per workspace", () => {
 	expect("ws-a" in useActivityPanelStore.getState().subagentsCollapsed).toBe(
 		false,
 	);
+});
+
+test.each([
+	"QuotaExceededError",
+	"SecurityError",
+])("keeps visibility usable after a %s persistence failure", (name) => {
+	const write = spyOn(localStorage, "setItem").mockImplementation(() => {
+		throw new DOMException("write refused", name);
+	});
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	try {
+		expect(() =>
+			useActivityPanelVisibilityStore.getState().setHidden(true),
+		).not.toThrow();
+		expect(useActivityPanelVisibilityStore.getState().hidden).toBe(true);
+		expect(warn).toHaveBeenCalled();
+	} finally {
+		write.mockRestore();
+		warn.mockRestore();
+	}
 });

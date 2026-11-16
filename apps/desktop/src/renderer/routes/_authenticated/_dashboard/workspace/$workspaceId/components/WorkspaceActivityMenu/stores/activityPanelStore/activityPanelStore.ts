@@ -1,5 +1,7 @@
+import { notifyQuotaExhausted } from "renderer/routes/_authenticated/providers/CollectionsProvider/notifyQuotaExhausted";
+import { isQuotaExceeded } from "renderer/routes/_authenticated/providers/CollectionsProvider/withQuotaGuard";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const FINISHED_LIMIT = 20;
 
@@ -135,6 +137,22 @@ export const useActivityPanelVisibilityStore =
 			{
 				name: "workspace-activity-panel",
 				partialize: ({ hidden }) => ({ hidden }),
+				storage: createJSONStorage(() => ({
+					getItem: (name) => localStorage.getItem(name),
+					removeItem: (name) => localStorage.removeItem(name),
+					setItem: (name, value) => {
+						try {
+							localStorage.setItem(name, value);
+						} catch (error) {
+							if (isQuotaExceeded(error)) notifyQuotaExhausted(name);
+							else
+								console.warn(
+									"[activity-panel] Failed to persist visibility:",
+									error,
+								);
+						}
+					},
+				})),
 			},
 		),
 	);
