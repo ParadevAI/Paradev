@@ -24,7 +24,8 @@ import {
 } from "drizzle-orm";
 import { publishChats } from "../publish";
 import { messageView, toUser } from "../views";
-import type { Box, BoxProvider, RunnerClient } from "./boxes";
+import { type BoxKeys, signBoxCredential } from "./box-tokens";
+import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
 import { type Claim, TURN_MAX_MS, type TurnOutcome } from "./flow";
 import { loadRoster, mentionableDevs, resolveMentions } from "./roster";
 
@@ -53,6 +54,12 @@ export interface TurnDeps {
 	boxes: BoxProvider;
 	runner: RunnerClient;
 	turnRuns: TurnRuns;
+	/** Signs each box's credential and the tokens it accepts. */
+	boxKeys: () => Promise<BoxKeys>;
+	/** Where a box reaches the API's routes for boxes. */
+	boxApiUrl: string;
+	/** No model key: boxes run the scripted model, so the loop still works end to end. */
+	fauxModel: boolean;
 	idleTimeoutMs: number;
 	now?: () => Date;
 }
@@ -229,7 +236,25 @@ async function ensureBox(
 	const running = await deps.boxes.status(agentId);
 	if (running) return running;
 	await setStatus(agentId, groupId, "waking");
-	return deps.boxes.wake(agentId, { boxId: `box_${crypto.randomUUID()}` });
+	const [agent] = await db
+		.select()
+		.from(chatsAgents)
+		.where(eq(chatsAgents.id, agentId));
+	if (!agent) throw new Error("the Dev is gone");
+	const keys = await deps.boxKeys();
+	const boxId = `box_${crypto.randomUUID()}`;
+	return deps.boxes.wake(agentId, {
+		boxId,
+		credential: await signBoxCredential(keys, { agentId, boxId }),
+		env: {
+			DEV_API_URL: deps.boxApiUrl,
+			DEV_BOX_PUBLIC_KEY: keys.publicKeyText,
+			DEV_NAME: agent.name,
+			DEV_KIND: agent.kind,
+			DEV_DESCRIPTION: agent.description,
+			...(deps.fauxModel ? { DEV_FAUX_MODEL: "1" } : {}),
+		},
+	});
 }
 
 /** Step 2: the Dev's box, woken if stopped, and `turn.started`. False when the box did not start. */
@@ -351,6 +376,63 @@ async function markAgentRead(agentId: string, groupId: string) {
 	});
 }
 
+/** How many messages before the turn's own a Dev is given. */
+const RECENT_MESSAGES = 20;
+const LINE_MAX = 600;
+
+/**
+ * The chat around a turn: the latest messages before the turn's own, oldest
+ * first, each `seen` when an earlier turn of this Dev here started after it,
+ * and who is in the chat.
+ */
+async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
+	const [roster, [previous], rows] = await Promise.all([
+		loadRoster(turn.groupId),
+		db
+			.select({ startedAt: chatsTurns.startedAt })
+			.from(chatsTurns)
+			.where(
+				and(
+					eq(chatsTurns.agentId, turn.agentId),
+					eq(chatsTurns.groupId, turn.groupId),
+					ne(chatsTurns.id, turn.id),
+					isNotNull(chatsTurns.startedAt),
+				),
+			)
+			.orderBy(desc(chatsTurns.startedAt))
+			.limit(1),
+		db
+			.select({ message: chatsMessages, author: users, agent: chatsAgents })
+			.from(chatsMessages)
+			.leftJoin(users, eq(users.id, chatsMessages.authorId))
+			.leftJoin(chatsAgents, eq(chatsAgents.id, chatsMessages.authorAgentId))
+			.where(
+				and(
+					eq(chatsMessages.groupId, turn.groupId),
+					turn.messageId ? ne(chatsMessages.id, turn.messageId) : undefined,
+				),
+			)
+			.orderBy(desc(chatsMessages.createdAt))
+			.limit(RECENT_MESSAGES),
+	]);
+	const names = new Map(roster.map((dev) => [dev.id, dev.name]));
+	const seenBefore = previous?.startedAt ?? null;
+	return {
+		roster: roster.map((dev) => `- ${dev.name} (${dev.kind} Dev)`).join("\n"),
+		recent: rows.reverse().map(({ message, author, agent }) => {
+			const who = agent?.name ?? (author ? toUser(author).displayName : "note");
+			const said = renderMentions(
+				message.text,
+				(ref) => names.get(ref.id) ?? "someone",
+			);
+			return {
+				line: `- ${who}: ${said.length > LINE_MAX ? `${said.slice(0, LINE_MAX - 1)}…` : said}`,
+				seen: seenBefore !== null && message.createdAt < seenBefore,
+			};
+		}),
+	};
+}
+
 /** Step 3: hands the turn to the runner. False when there is nothing to run or the box refused it. */
 export async function startTurn(
 	deps: TurnDeps,
@@ -378,6 +460,7 @@ export async function startTurn(
 			sessionId: turn.groupId,
 			text: prompt.text,
 			checkReply: await checksReply(turn),
+			chat: await turnChat(turn),
 		});
 		await markAgentRead(turn.agentId, turn.groupId).catch((error: unknown) =>
 			console.error(`[chats] turn ${turnId}: the read was not stored:`, error),

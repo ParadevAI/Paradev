@@ -1,4 +1,5 @@
 import { env } from "../../../env";
+import { type BoxKeys, generateBoxKeys } from "./box-tokens";
 import { postDevMessage, settleTurn, type TurnDeps } from "./engine";
 import { inlineTurnRuns } from "./inline-runs";
 import { memoryBoxes, scriptedRunner } from "./scripted";
@@ -7,6 +8,13 @@ const IDLE_TIMEOUT_MS = 10 * 60_000;
 const SCRIPTED_THINK_MS = 1_500;
 
 let runtime: TurnDeps | null | undefined;
+let keys: Promise<BoxKeys> | undefined;
+
+/** One key pair for this process, made the first time a box needs it. */
+function processBoxKeys(): Promise<BoxKeys> {
+	keys ??= generateBoxKeys();
+	return keys;
+}
 
 /** Development's runtime: turns run in this process against a scripted model. */
 function scriptedRuntime(): TurnDeps {
@@ -20,6 +28,9 @@ function scriptedRuntime(): TurnDeps {
 			{ thinkMs: SCRIPTED_THINK_MS },
 		),
 		turnRuns: inlineTurnRuns(() => deps),
+		boxKeys: processBoxKeys,
+		boxApiUrl: "",
+		fauxModel: true,
 		idleTimeoutMs: IDLE_TIMEOUT_MS,
 	};
 	return deps;

@@ -27,6 +27,8 @@ const { postDevMessage, settleTurn } = await import("./engine");
 const { inlineTurnRuns } = await import("./inline-runs");
 const { setChatsTurnRuntime } = await import("./runtime");
 const { memoryBoxes } = await import("./scripted");
+const { generateBoxKeys } = await import("./box-tokens");
+const keys = generateBoxKeys();
 
 type TurnDeps = import("./engine").TurnDeps;
 type TurnStart = import("./boxes").TurnStart;
@@ -125,6 +127,9 @@ beforeEach(() => {
 			},
 		},
 		turnRuns: runs,
+		boxKeys: () => keys,
+		boxApiUrl: "http://api.test",
+		fauxModel: true,
 		idleTimeoutMs: 60_000,
 	};
 	setChatsTurnRuntime(deps);

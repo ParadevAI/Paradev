@@ -5,7 +5,7 @@ export function memoryBoxes(): BoxProvider {
 	const running = new Map<string, Box>();
 	return {
 		async wake(agentId, { boxId }) {
-			const box = { id: boxId };
+			const box = { id: boxId, url: "" };
 			running.set(agentId, box);
 			return box;
 		},

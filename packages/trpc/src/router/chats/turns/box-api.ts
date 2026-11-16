@@ -1,0 +1,278 @@
+import { db } from "@superset/db/client";
+import { chatsAgents, chatsModelUsage, chatsTurns } from "@superset/db/schema";
+import { waitUntil } from "@vercel/functions";
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
+import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
+import type { BoxKeys } from "./box-tokens";
+import { postDevMessage, settleTurn, type TurnDeps } from "./engine";
+
+const GATEWAY_URL = "https://ai-gateway.vercel.sh";
+/** Request headers the Anthropic Messages API understands. Credentials are replaced, not forwarded. */
+const FORWARDED_HEADERS = [
+	"content-type",
+	"accept",
+	"anthropic-version",
+	"anthropic-beta",
+];
+const TEXT_MAX = 100_000;
+
+export interface BoxApiDeps {
+	keys: BoxKeys;
+	turns: TurnDeps;
+	/** The AI Gateway key. Without it the model route answers 503. */
+	gatewayKey?: string;
+	fetch?: typeof fetch;
+}
+
+const json = (status: number, body: unknown) =>
+	new Response(JSON.stringify(body), {
+		status,
+		headers: { "content-type": "application/json" },
+	});
+
+const settlement = z.object({
+	stopReason: z.string().max(100),
+	answer: z.string().max(1_000_000).optional(),
+	error: z.string().max(10_000).optional(),
+});
+
+const devText = z.object({
+	text: z
+		.string()
+		.max(TEXT_MAX)
+		.transform((text) => text.replace(/[​-‍⁠﻿]/g, "").trim())
+		.pipe(z.string().min(1, "The message has nothing visible in it")),
+});
+
+type ReportedUsage = Partial<
+	Record<
+		| "input_tokens"
+		| "output_tokens"
+		| "cache_read_input_tokens"
+		| "cache_creation_input_tokens",
+		number
+	>
+>;
+
+function toUsage(reported: ReportedUsage = {}) {
+	const cacheRead = reported.cache_read_input_tokens ?? 0;
+	const cacheWrite = reported.cache_creation_input_tokens ?? 0;
+	return {
+		inputTokens: (reported.input_tokens ?? 0) + cacheRead + cacheWrite,
+		outputTokens: reported.output_tokens ?? 0,
+		cacheReadTokens: cacheRead,
+		cacheWriteTokens: cacheWrite,
+	};
+}
+
+function parsed(text: string): unknown {
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
+
+/** Usage from an Anthropic event stream. Each event's counts are cumulative, so the latest of each number wins. */
+export async function usageFromStream(body: ReadableStream<Uint8Array>) {
+	const latest: Record<string, number> = {};
+	const decoder = new TextDecoder();
+	let buffer = "";
+	for await (const chunk of body) {
+		buffer += decoder.decode(chunk, { stream: true });
+		const lines = buffer.split("\n");
+		buffer = lines.pop() ?? "";
+		for (const line of lines) {
+			if (!line.startsWith("data:")) continue;
+			const event = parsed(line.slice(5)) as {
+				type?: string;
+				message?: { usage?: Record<string, unknown> };
+				usage?: Record<string, unknown>;
+			} | null;
+			const reported =
+				event?.type === "message_start"
+					? event.message?.usage
+					: event?.type === "message_delta"
+						? event.usage
+						: undefined;
+			for (const [key, value] of Object.entries(reported ?? {})) {
+				if (typeof value === "number") latest[key] = value;
+			}
+		}
+	}
+	return toUsage(latest);
+}
+
+/** A personal or custom Dev's owner is charged; a group's Dev charges whoever started the turn. */
+async function recordUsage(
+	claims: BoxClaims,
+	model: string,
+	usage: ReturnType<typeof toUsage>,
+) {
+	const [agent] = await db
+		.select({
+			ownerUserId: chatsAgents.ownerUserId,
+			organizationId: chatsAgents.organizationId,
+		})
+		.from(chatsAgents)
+		.where(eq(chatsAgents.id, claims.agentId));
+	if (!agent) return;
+	await db.insert(chatsModelUsage).values({
+		organizationId: agent.organizationId,
+		userId: agent.ownerUserId ?? claims.userId,
+		agentId: claims.agentId,
+		model,
+		...usage,
+	});
+}
+
+const metered = (work: Promise<unknown>) =>
+	waitUntil(
+		work.catch((error: unknown) =>
+			console.error("[chats] model usage was not recorded:", error),
+		),
+	);
+
+/**
+ * The only way a box reaches a model: authenticated as the Dev's running
+ * turn, forwarded with the server's key, streamed back as it is, and metered.
+ */
+async function model(deps: BoxApiDeps, request: Request, path: string) {
+	let claims: BoxClaims;
+	try {
+		claims = await boxTurn(deps.keys, request.headers);
+	} catch (error) {
+		if (!(error instanceof BoxRequestError)) throw error;
+		return json(error.status, {
+			type: "error",
+			error: {
+				type:
+					error.status === 401 ? "authentication_error" : "permission_error",
+				message: error.message,
+			},
+		});
+	}
+	if (!deps.gatewayKey) {
+		return json(503, {
+			type: "error",
+			error: { type: "api_error", message: "No model key is configured" },
+		});
+	}
+	if (path !== "/v1/messages") {
+		return json(404, {
+			type: "error",
+			error: { type: "not_found_error", message: "Unknown model route" },
+		});
+	}
+	const body = await request.text();
+	const headers = new Headers({ "x-api-key": deps.gatewayKey });
+	for (const name of FORWARDED_HEADERS) {
+		const value = request.headers.get(name);
+		if (value) headers.set(name, value);
+	}
+	const upstream = await (deps.fetch ?? fetch)(
+		`${GATEWAY_URL}${path}${new URL(request.url).search}`,
+		{ method: "POST", headers, body },
+	);
+	const named = (parsed(body) as { model?: string } | null)?.model ?? "unknown";
+	const responseHeaders = new Headers({
+		"content-type": upstream.headers.get("content-type") ?? "application/json",
+	});
+	if (!upstream.ok || !upstream.body) {
+		return new Response(upstream.body, {
+			status: upstream.status,
+			headers: responseHeaders,
+		});
+	}
+	if (responseHeaders.get("content-type")?.includes("text/event-stream")) {
+		const [toClient, toMeter] = upstream.body.tee();
+		metered(
+			usageFromStream(toMeter).then((usage) =>
+				recordUsage(claims, named, usage),
+			),
+		);
+		return new Response(toClient, {
+			status: upstream.status,
+			headers: responseHeaders,
+		});
+	}
+	const text = await upstream.text();
+	const reported = (parsed(text) as { usage?: ReportedUsage } | null)?.usage;
+	metered(recordUsage(claims, named, toUsage(reported)));
+	return new Response(text, {
+		status: upstream.status,
+		headers: responseHeaders,
+	});
+}
+
+async function settled(deps: BoxApiDeps, request: Request, turnId: string) {
+	const { agentId, groupId } = await boxAgent(deps.keys, request.headers);
+	const id = z.string().uuid().safeParse(turnId);
+	const [turn] = id.success
+		? await db
+				.select({ groupId: chatsTurns.groupId })
+				.from(chatsTurns)
+				.where(and(eq(chatsTurns.id, id.data), eq(chatsTurns.agentId, agentId)))
+		: [];
+	if (!id.success || turn?.groupId !== groupId) {
+		throw new BoxRequestError(
+			403,
+			"forbidden",
+			"That isn't this Dev's turn in this chat",
+		);
+	}
+	const result = settlement.parse(await request.json());
+	await settleTurn(deps.turns, { turnId: id.data, agentId }, result);
+	return new Response(null, { status: 204 });
+}
+
+async function message(deps: BoxApiDeps, request: Request, endsTurn: boolean) {
+	const claims = await boxTurn(deps.keys, request.headers);
+	const { text } = devText.parse(await request.json());
+	const posted = await postDevMessage(claims, { text, endsTurn });
+	if (!posted) {
+		throw new BoxRequestError(
+			409,
+			"not_a_reply",
+			"This turn was replaced by a newer message",
+		);
+	}
+	return json(201, { sent: true });
+}
+
+/**
+ * What a box calls the API for. `path` is the part after the mount point:
+ * `/cli/reply` (the Dev's reply, which ends its turn's live view),
+ * `/cli/messages` (an update mid-turn), `/cli/turns/:id/settled` (the
+ * runner's callback) and `/model/*`.
+ */
+export async function handleBoxRequest(
+	deps: BoxApiDeps,
+	request: Request,
+	path: string,
+): Promise<Response> {
+	if (request.method !== "POST") return json(405, { message: "POST only" });
+	try {
+		if (path.startsWith("/model/")) {
+			return await model(deps, request, path.slice("/model".length));
+		}
+		const settle = /^\/cli\/turns\/([^/]+)\/settled$/.exec(path);
+		if (settle?.[1]) return await settled(deps, request, settle[1]);
+		if (path === "/cli/reply") return await message(deps, request, true);
+		if (path === "/cli/messages") return await message(deps, request, false);
+		return json(404, { code: "not_found", message: "Unknown route" });
+	} catch (error) {
+		if (error instanceof BoxRequestError) {
+			return json(error.status, { code: error.code, message: error.message });
+		}
+		if (error instanceof z.ZodError) {
+			return json(400, {
+				code: "invalid",
+				message: error.issues[0]?.message ?? "Invalid request",
+			});
+		}
+		console.error("[chats] box request failed:", error);
+		return json(500, { code: "error", message: "Something went wrong" });
+	}
+}
