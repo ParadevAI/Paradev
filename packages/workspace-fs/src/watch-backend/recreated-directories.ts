@@ -31,26 +31,35 @@ export function rewatchRecreatedDirectories(
 	}
 
 	async function reconcile() {
-		const candidates = [...pending].sort();
+		const queued = [...pending].sort();
 		pending.clear();
-		const stats = await Promise.all(
-			candidates.map((dir) => lstat(dir).catch(() => undefined)),
-		);
+		const queuedExists = await areDirectories(queued);
 		if (disposed) return;
 
-		const rewatched: string[] = [];
-		for (const [index, dir] of candidates.entries()) {
-			if (!stats[index]?.isDirectory()) {
-				directories.delete(dir);
+		const resets: string[] = [];
+		const adds: string[] = [];
+		for (const [index, dir] of queued.entries()) {
+			if (!queuedExists[index]) {
+				if (!pending.has(dir)) directories.delete(dir);
 				continue;
 			}
-			if (directories.has(dir)) {
-				watcher.unwatch(dir);
-			} else if (rewatched.some((parent) => isInside(dir, parent))) {
-				continue;
-			}
+			if (resets.some((parent) => isInside(dir, parent))) continue;
+			if (directories.has(dir)) resets.push(dir);
+			else if (!adds.some((parent) => isInside(dir, parent))) adds.push(dir);
+		}
+
+		// chokidar skips a subdirectory it still tracks when it reads the
+		// recreated parent, so each one is reset with it.
+		const descendants = [...directories].filter((dir) =>
+			resets.some((parent) => isInside(dir, parent)),
+		);
+		const descendantsExist = await areDirectories(descendants);
+		if (disposed) return;
+
+		watcher.unwatch([...resets, ...descendants]);
+		const existing = descendants.filter((_, index) => descendantsExist[index]);
+		for (const dir of [...resets, ...adds, ...existing].sort()) {
 			watcher.add(dir, undefined, true);
-			rewatched.push(dir);
 		}
 	}
 
@@ -70,6 +79,13 @@ export function rewatchRecreatedDirectories(
 		disposed = true;
 		clearTimeout(timer);
 	};
+}
+
+async function areDirectories(paths: string[]): Promise<boolean[]> {
+	const stats = await Promise.all(
+		paths.map((dir) => lstat(dir).catch(() => undefined)),
+	);
+	return stats.map((stat) => stat?.isDirectory() ?? false);
 }
 
 function isInside(child: string, parent: string): boolean {

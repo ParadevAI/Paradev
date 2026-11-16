@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, renameSync, rmSync } from "node:fs";
 import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -42,19 +42,35 @@ async function watchRoot(files: string[]) {
 	return { root, events, errors };
 }
 
-const SHAPES = [
-	{ shape: "a directory", files: ["x/a.ts"], watched: "x" },
-	{ shape: "a nested directory", files: ["x/sub/a.ts"], watched: "x/sub" },
+const CASES = [
+	{ shape: "a directory", files: ["x/a.ts"], watched: "x", moved: false },
+	{
+		shape: "a nested directory",
+		files: ["x/sub/a.ts"],
+		watched: "x/sub",
+		moved: false,
+	},
+	{
+		shape: "a nested directory",
+		files: ["x/sub/a.ts"],
+		watched: "x/sub",
+		moved: true,
+	},
 ];
 
-for (const { shape, files, watched } of SHAPES) {
-	test(`watches ${shape} again after it is removed and recreated`, async () => {
+for (const { shape, files, watched, moved } of CASES) {
+	const how = moved ? "moved out" : "removed";
+	test(`watches ${shape} again after it is ${how} and recreated`, async () => {
 		const { root, events, errors } = await watchRoot(files);
 		const dir = path.join(root, watched);
 		const created = (target: string) => () =>
 			events.some((e) => e.type === "create" && e.path === target);
+		const away = await mkdtemp(path.join(tmpdir(), "moved-"));
+		cleanups.push(() => rm(away, { recursive: true, force: true }));
 
-		rmSync(path.join(root, "x"), { recursive: true, force: true });
+		const x = path.join(root, "x");
+		if (moved) renameSync(x, path.join(away, "x"));
+		else rmSync(x, { recursive: true, force: true });
 		mkdirSync(dir, { recursive: true });
 		await waitFor(created(dir), `recreate ${watched}`);
 
