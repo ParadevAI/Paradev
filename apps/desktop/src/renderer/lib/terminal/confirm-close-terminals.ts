@@ -20,7 +20,10 @@ export async function probeTerminalRunning(
 	try {
 		const { running } = await utils.client.terminal.hasRunningProcess.query(
 			{ terminalId, workspaceId },
-			{ signal: AbortSignal.timeout(RUNNING_PROCESS_PROBE_TIMEOUT_MS) },
+			{
+				signal: AbortSignal.timeout(RUNNING_PROCESS_PROBE_TIMEOUT_MS),
+				context: { skipBatch: true },
+			},
 		);
 		return running;
 	} catch (error) {
