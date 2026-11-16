@@ -584,47 +584,52 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 	};
 
-	/**
-	 * A resumed chat keeps the agent config it ran under, so it reopens on the
-	 * same account even when the caller only names the harness.
-	 */
-	const launchedAgentConfigId = (
+	/** The chat a resume continues: the one it replaces, else the last one on its agent session. */
+	const continuedRow = (
 		input: z.output<typeof createSessionCommandSchema>,
 		replacedRow: ChatSessionRow | null,
-	): string | null => {
-		if (input.agentConfigId !== undefined) return input.agentConfigId;
+	): ChatSessionRow | null => {
 		if (!input.resume) return null;
 		if (
 			replacedRow?.scopeId === input.scopeId &&
 			replacedRow.harness === input.harness &&
 			replacedRow.harnessSessionId === input.resume.harnessSessionId
 		)
-			return replacedRow.agentConfigId ?? null;
+			return replacedRow;
 		return (
 			options.sessions.findByHarnessSession(
 				input.scopeId,
 				input.harness,
 				input.resume.harnessSessionId,
-			)?.agentConfigId ?? null
+			) ?? null
 		);
 	};
 
-	// A chat resumed onto its agent session without naming the chat it replaces
-	// (`sessions resume`, `sessions send`) starts on what that chat last ran
-	// with, so it does not drop to the agent's own default mode.
+	/**
+	 * A resumed chat keeps the agent config it ran under, so it reopens on the
+	 * same account even when the caller only names the harness.
+	 */
+	const launchedAgentConfigId = (
+		input: z.output<typeof createSessionCommandSchema>,
+		continued: ChatSessionRow | null,
+	): string | null =>
+		input.agentConfigId !== undefined
+			? input.agentConfigId
+			: (continued?.agentConfigId ?? null);
+
+	/**
+	 * A resume that names only the agent session (`sessions resume`, `sessions
+	 * send`) starts on the model, effort, mode and fast mode its last chat had.
+	 */
 	const resumedSelections = (
 		input: z.output<typeof createSessionCommandSchema>,
+		continued: ChatSessionRow | null,
 	): ChatSelections | null => {
-		if (!input.resume) return null;
-		const row = options.sessions.findByHarnessSession(
-			input.scopeId,
-			input.harness,
-			input.resume.harnessSessionId,
-		);
-		if (!row) return null;
-		const replay = replaySession(row.sessionId);
+		if (!continued || input.resume?.replacesSessionId) return null;
+		const replay = replaySession(continued.sessionId);
 		if (!replay.ok) return null;
 		const selections = sessionSelections(replay.snapshot.session);
+		// Nothing recorded counts as none, so an interactive chat still takes the remembered mode.
 		return Object.keys(selections).length > 0 ? selections : null;
 	};
 
@@ -659,6 +664,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				}
 				const replaced = parsed.resume?.replacesSessionId;
 				const replacedRow = replaced ? options.sessions.get(replaced) : null;
+				const priorRow = continuedRow(parsed, replacedRow ?? null);
 				const replay =
 					replaced && replacedRow?.scopeId === parsed.scopeId
 						? replaySession(replaced)
@@ -666,7 +672,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				const continued =
 					replay?.ok && replacedRow?.harness === parsed.harness
 						? sessionSelections(replay.snapshot.session)
-						: resumedSelections(parsed);
+						: resumedSelections(parsed, priorRow);
 				const { modeId: rememberedModeId, ...remembered } =
 					options.selections?.get(parsed.harness) ?? {};
 				const selections: ChatSelections = {
@@ -680,7 +686,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (!selections.modeId && parsed.fallbackModeId) {
 					selections.modeId = parsed.fallbackModeId;
 				}
-				const agentConfigId = launchedAgentConfigId(parsed, replacedRow);
+				const agentConfigId = launchedAgentConfigId(parsed, priorRow);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
