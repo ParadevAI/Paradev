@@ -35,6 +35,8 @@ interface FrameStackState {
 	switcherSelection: SwitcherSelection | null;
 	/** The row that is animating out before it is archived. */
 	switcherLeavingId: string | null;
+	/** What the switcher is searching for, without the "#" scope or a creator filter. */
+	switcherSearchText: string;
 	setOpen: (open: boolean) => void;
 	openSwitcher: (options: {
 		via: SwitcherOpenedVia;
@@ -44,6 +46,7 @@ interface FrameStackState {
 	releaseSwitcherHold: () => void;
 	setSwitcherSelection: (selection: SwitcherSelection | null) => void;
 	setSwitcherLeavingId: (workspaceId: string | null) => void;
+	setSwitcherSearchText: (text: string) => void;
 	pushFrame: (command: Command) => void;
 	popFrame: () => void;
 	reset: () => void;
@@ -57,6 +60,7 @@ const CLOSED = {
 	switcherHold: false,
 	switcherSelection: null,
 	switcherLeavingId: null,
+	switcherSearchText: "",
 };
 
 export const useFrameStackStore = create<FrameStackState>((set) => ({
@@ -98,6 +102,7 @@ export const useFrameStackStore = create<FrameStackState>((set) => ({
 				: { switcherSelection },
 		),
 	setSwitcherLeavingId: (switcherLeavingId) => set({ switcherLeavingId }),
+	setSwitcherSearchText: (switcherSearchText) => set({ switcherSearchText }),
 	pushFrame: (command) =>
 		set((state) => ({ frames: [...state.frames, { command }] })),
 	popFrame: () => set((state) => ({ frames: state.frames.slice(0, -1) })),

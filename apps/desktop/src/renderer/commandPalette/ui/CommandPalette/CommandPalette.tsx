@@ -128,13 +128,15 @@ export function CommandPalette() {
 			const modifier = event.metaKey || event.ctrlKey;
 			if (isSwitcher && modifier && !event.shiftKey && !event.altKey) {
 				if (event.key === "Backspace") {
-					// With text typed, the chord edits the text.
-					if (query) return;
 					const {
 						switcherSelection: selection,
 						switcherLeavingId,
+						switcherSearchText,
 						setSwitcherLeavingId,
 					} = useFrameStackStore.getState();
+					// With search text typed, the chord edits the text. "#" and a
+					// creator filter choose the list; they are not search text.
+					if (switcherSearchText) return;
 					if (!selection || switcherLeavingId) return;
 					event.preventDefault();
 					event.stopPropagation();
@@ -171,7 +173,7 @@ export function CommandPalette() {
 			event.preventDefault();
 			button.click();
 		},
-		[isSwitcher, query, handleOpenChange, openNewWorkspace],
+		[isSwitcher, handleOpenChange, openNewWorkspace],
 	);
 
 	useEffect(() => {
@@ -187,6 +189,18 @@ export function CommandPalette() {
 		setQuery("");
 		setSwitcherValue(undefined);
 	}, [root]);
+
+	// The delete confirmation opens over the palette and takes focus; typing
+	// must work again once it closes.
+	const isConfirmingDelete = useDeleteWorkspaceIntent((s) => s.open);
+	const wasConfirmingDelete = useRef(isConfirmingDelete);
+	useEffect(() => {
+		const closed = wasConfirmingDelete.current && !isConfirmingDelete;
+		wasConfirmingDelete.current = isConfirmingDelete;
+		if (!closed || !open) return;
+		const frame = requestAnimationFrame(() => inputRef.current?.focus());
+		return () => cancelAnimationFrame(frame);
+	}, [isConfirmingDelete, open]);
 
 	// A frame can also be opened from outside (⌘P over an open palette).
 	const frameId = currentFrame?.command.id;

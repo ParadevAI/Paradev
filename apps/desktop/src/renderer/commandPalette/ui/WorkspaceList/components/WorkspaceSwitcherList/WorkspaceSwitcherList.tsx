@@ -73,6 +73,12 @@ export function WorkspaceSwitcherList({
 	);
 	const hiddenLabel = formatNumber(hiddenCount);
 
+	const setSearchText = useFrameStackStore((s) => s.setSwitcherSearchText);
+	useEffect(() => {
+		setSearchText(trimmed);
+		return () => setSearchText("");
+	}, [trimmed, setSearchText]);
+
 	const leavingId = useFrameStackStore((s) => s.switcherLeavingId);
 	const setLeavingId = useFrameStackStore((s) => s.setSwitcherLeavingId);
 	const isLeavingRowListed =
