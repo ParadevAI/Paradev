@@ -136,7 +136,8 @@ describe("watchSandboxExpiry", () => {
 		);
 		expect(calls).toEqual([]);
 		expect(watches).toHaveLength(1);
-		expect(watches[0]?.deduplicationId).toBe(`ws_1:${storedExpiry.getTime()}`);
+		expect(watches[0]?.deduplicationId).toBe(`ws_1-${storedExpiry.getTime()}`);
+		expect(watches[0]?.deduplicationId).not.toContain(":");
 	});
 
 	test("a confirmed stop marks the row asleep, tells clients and settles the meter", async () => {
