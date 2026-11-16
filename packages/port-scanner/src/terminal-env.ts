@@ -12,6 +12,8 @@ export const TERMINAL_ID_ENV_KEYS = [
 	"SUPERSET_PANE_ID",
 ] as const;
 
+const AGENT_LAUNCH_ID_ENV_KEYS = ["SUPERSET_AGENT_LAUNCH_ID"] as const;
+
 /** `ps -p` takes a comma list; keep each invocation's argv comfortably short. */
 const PS_PID_BATCH = 200;
 
@@ -65,9 +67,41 @@ export async function readTerminalIdsFromEnv(
 	return values;
 }
 
+/**
+ * Read the agent launch id from each process's environment. Agent wrappers
+ * export it as "<agent pid>-<start time>" before they exec the agent, so the
+ * agent and every process it starts carry the agent's pid.
+ */
+export async function readAgentLaunchIdsFromEnv(
+	pids: number[],
+	signal?: AbortSignal,
+): Promise<Map<number, string | null>> {
+	const platform = os.platform();
+	try {
+		if (platform === "linux")
+			return await readEnvValuesLinuxProcfs(
+				pids,
+				AGENT_LAUNCH_ID_ENV_KEYS,
+				signal,
+			);
+		if (platform === "darwin")
+			return await readTerminalIdsDarwin(
+				pids,
+				signal,
+				AGENT_LAUNCH_ID_ENV_KEYS,
+			);
+	} catch {
+		// Same rule as readTerminalIdsFromEnv: the error can carry environments.
+		signal?.throwIfAborted();
+		throw new Error("Process environment inspection failed");
+	}
+	return new Map<number, string | null>();
+}
+
 async function readTerminalIdsDarwin(
 	pids: number[],
 	signal?: AbortSignal,
+	keys: readonly string[] = TERMINAL_ID_ENV_KEYS,
 ): Promise<Map<number, string | null>> {
 	// -E: append the environment to the command column
 	// -ww: unlimited width so nothing is truncated
@@ -90,7 +124,7 @@ async function readTerminalIdsDarwin(
 			options,
 		);
 		const values = new Map<number, string | null>();
-		for (const [pid, value] of parsePsEnvOutput(output, commands)) {
+		for (const [pid, value] of parsePsEnvOutput(output, commands, keys)) {
 			if (wanted.has(pid)) values.set(pid, value);
 		}
 		return values;
@@ -109,7 +143,7 @@ async function readTerminalIdsDarwin(
 			["-Eww", "-o", "pid=,command=", "-p", batch.join(",")],
 			options,
 		);
-		for (const [pid, value] of parsePsEnvOutput(output, commands)) {
+		for (const [pid, value] of parsePsEnvOutput(output, commands, keys)) {
 			values.set(pid, value);
 		}
 	}
@@ -125,6 +159,7 @@ async function readTerminalIdsDarwin(
 export function parsePsEnvOutput(
 	output: string,
 	commandOutput: string,
+	keys: readonly string[] = TERMINAL_ID_ENV_KEYS,
 ): Map<number, string | null> {
 	const commands = new Map<number, string>();
 	for (const line of commandOutput.split("\n")) {
@@ -144,10 +179,7 @@ export function parsePsEnvOutput(
 			command && rest.startsWith(`${command} `)
 				? rest.slice(command.length + 1)
 				: "";
-		values.set(
-			pid,
-			pickEnvValue(environment.split(/\s+/), TERMINAL_ID_ENV_KEYS),
-		);
+		values.set(pid, pickEnvValue(environment.split(/\s+/), keys));
 	}
 	return values;
 }

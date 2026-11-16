@@ -80,6 +80,10 @@ let envError: Error | null = null;
 let processTable: { pid: number; ppid: number }[] = [];
 /** pid → terminal id the mocked environment reader reports. */
 let terminalIdEnv = new Map<number, string | null>();
+/** pid → agent launch id the mocked environment reader reports. */
+let agentLaunchIdEnv = new Map<number, string>();
+/** When set, trees come from `processTable` instead of root → [root, root+1]. */
+let useProcessTableTrees = false;
 
 mock.module("./scanner", () => ({
 	readProcessTable: async () => {
@@ -91,6 +95,8 @@ mock.module("./scanner", () => ({
 		_table: { pid: number; ppid: number }[],
 		rootPids: number[],
 	) => {
+		if (useProcessTableTrees)
+			return realScanner.buildProcessTrees(_table, rootPids);
 		spy.lastTreeRootPids = rootPids;
 		return new Map(rootPids.map((pid) => [pid, [pid, pid + 1]]));
 	},
@@ -121,6 +127,8 @@ mock.module("./scanner", () => ({
 }));
 
 mock.module("./terminal-env", () => ({
+	readAgentLaunchIdsFromEnv: async (pids: number[]) =>
+		new Map(pids.map((pid) => [pid, agentLaunchIdEnv.get(pid) ?? null])),
 	readTerminalIdsFromEnv: async (pids: number[]) => {
 		spy.envReads++;
 		spy.lastEnvReadPids = pids;
@@ -167,6 +175,8 @@ function resetSpy(): void {
 	spy.getListeningPortsForPids = 0;
 	processTable = [];
 	terminalIdEnv = new Map();
+	agentLaunchIdEnv = new Map();
+	useProcessTableTrees = false;
 	spy.inFlight = 0;
 	spy.maxInFlight = 0;
 	spy.lastSignal = undefined;
@@ -1028,5 +1038,76 @@ describe("PortManager — detached servers (agent background processes)", () => 
 		});
 		expect(result.success).toBe(true);
 		expect(killed).toEqual([5001]);
+	});
+});
+
+describe("PortManager — agent processes", () => {
+	const AGENT_PORT = 58092;
+	const killed: number[] = [];
+
+	/**
+	 * Shell 1000 → launcher 1001 → agent 1002 → dev server 1003. The agent's
+	 * wrapper exported the launch id, so the agent and its children carry it.
+	 */
+	beforeEach(() => {
+		useProcessTableTrees = true;
+		processTable = [
+			{ pid: 1000, ppid: 500 },
+			{ pid: 1001, ppid: 1000 },
+			{ pid: 1002, ppid: 1001 },
+			{ pid: 1003, ppid: 1002 },
+		];
+		listeningPorts = [
+			{ port: 58091, pid: 1001, address: "127.0.0.1", processName: "node" },
+			{
+				port: AGENT_PORT,
+				pid: 1002,
+				address: "127.0.0.1",
+				processName: "codex",
+			},
+			{ port: 3000, pid: 1003, address: "127.0.0.1", processName: "node" },
+		];
+		killed.length = 0;
+		manager = new PortManager({
+			killFn: async ({ pid }) => {
+				killed.push(pid);
+				return { success: true };
+			},
+		});
+		manager.upsertSession("p1", "ws1", 1000);
+	});
+
+	const agentLaunched = () => {
+		agentLaunchIdEnv = new Map([
+			[1002, "1002-1700000000"],
+			[1003, "1002-1700000000"],
+		]);
+	};
+
+	it("lists the server an agent started, not ports of the agent or its ancestors", async () => {
+		agentLaunched();
+		await manager.forceScan();
+
+		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
+		const result = await manager.killPort({
+			terminalId: "p1",
+			workspaceId: "ws1",
+			port: 3000,
+		});
+		expect(result.success).toBe(true);
+		expect(killed).toEqual([1003]);
+	});
+
+	it("refuses a stale close request for an agent's own port", async () => {
+		await manager.forceScan();
+		agentLaunched();
+
+		const result = await manager.killPort({
+			terminalId: "p1",
+			workspaceId: "ws1",
+			port: AGENT_PORT,
+		});
+		expect(result.success).toBe(false);
+		expect(killed).toEqual([]);
 	});
 });

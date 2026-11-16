@@ -10,8 +10,10 @@ import {
 	buildProcessTrees,
 	getListeningPortsForPids,
 	type PortInfo,
+	type ProcessTableEntry,
 	readProcessTable,
 } from "./scanner.ts";
+import { readAgentLaunchIdsFromEnv } from "./terminal-env.ts";
 import type { DetectedPort } from "./types.ts";
 
 /** How often to poll for port changes (in ms) */
@@ -123,6 +125,7 @@ interface ScanState {
 	pidOwnerMap: Map<number, { terminalId: string; workspaceId: string }>;
 	allPids: Set<number>;
 	emptyTreeTerminals: Map<string, SessionEntry>;
+	table: ProcessTableEntry[];
 }
 
 /**
@@ -295,6 +298,7 @@ export class PortManager extends EventEmitter {
 			>(),
 			allPids: new Set<number>(),
 			emptyTreeTerminals: new Map<string, SessionEntry>(),
+			table: [],
 		};
 	}
 
@@ -326,6 +330,7 @@ export class PortManager extends EventEmitter {
 		if (dueSessions.length === 0) return;
 
 		const table = await readProcessTable();
+		scanState.table = table;
 		const trees = buildProcessTrees(
 			table,
 			dueSessions.map((session) => session.pid),
@@ -403,22 +408,53 @@ export class PortManager extends EventEmitter {
 		}
 	}
 
+	/**
+	 * The given pids that are an agent or one of its ancestors: their own tree
+	 * holds the agent a launch id names. A server the agent started is not one.
+	 */
+	private async findAgentPids(
+		table: ProcessTableEntry[],
+		pids: number[],
+		signal: AbortSignal,
+	): Promise<Set<number>> {
+		const agentPids = new Set<number>();
+		if (pids.length === 0) return agentPids;
+		const trees = buildProcessTrees(table, pids);
+		const launchIds = await readAgentLaunchIdsFromEnv(
+			[...new Set([...trees.values()].flat())],
+			signal,
+		);
+		for (const [pid, tree] of trees) {
+			const holdsAgent = tree.some((member) =>
+				tree.includes(Number.parseInt(launchIds.get(member) ?? "", 10)),
+			);
+			if (holdsAgent) agentPids.add(pid);
+		}
+		return agentPids;
+	}
+
 	private async buildPortsByTerminal({
 		allPids,
 		pidOwnerMap,
+		table,
 	}: {
 		allPids: Set<number>;
 		pidOwnerMap: ScanState["pidOwnerMap"];
+		table: ProcessTableEntry[];
 	}): Promise<Map<string, PortInfo[]>> {
 		const portsByTerminal = new Map<string, PortInfo[]>();
 		const allPidList = Array.from(allPids);
 		if (allPidList.length === 0) return portsByTerminal;
 
-		const portInfos = await getListeningPortsForPids(
-			allPidList,
-			this.ensureScanAbort().signal,
+		const signal = this.ensureScanAbort().signal;
+		const portInfos = await getListeningPortsForPids(allPidList, signal);
+		const agentPids = await this.findAgentPids(
+			table,
+			portInfos.map((info) => info.pid),
+			signal,
 		);
 		for (const info of portInfos) {
+			if (agentPids.has(info.pid)) continue;
 			const owner = pidOwnerMap.get(info.pid);
 			if (!owner) continue;
 			const existing = portsByTerminal.get(owner.terminalId);
@@ -483,6 +519,7 @@ export class PortManager extends EventEmitter {
 			const portsByTerminal = await this.buildPortsByTerminal({
 				allPids: scanState.allPids,
 				pidOwnerMap: scanState.pidOwnerMap,
+				table: scanState.table,
 			});
 
 			this.updatePortsFromScan({
@@ -691,6 +728,12 @@ export class PortManager extends EventEmitter {
 				if (owners.get(detectedPort.pid) !== terminalId)
 					return { success: false };
 			}
+			const agentPids = await this.findAgentPids(
+				table,
+				[detectedPort.pid],
+				signal,
+			);
+			if (agentPids.has(detectedPort.pid)) return { success: false };
 			const listeners = await getListeningPortsForPids(
 				[detectedPort.pid],
 				signal,
