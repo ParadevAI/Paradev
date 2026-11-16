@@ -9417,8 +9417,8 @@ msgstr "Tham số fork"
 msgid "Fork conversation"
 msgstr "Tách cuộc trò chuyện"
 
-msgid "Fork into Chat"
-msgstr "Tách sang Trò chuyện"
+msgid "Fork into chat"
+msgstr "Tách sang trò chuyện"
 
 msgid "Fork into CLI"
 msgstr "Tách sang CLI"

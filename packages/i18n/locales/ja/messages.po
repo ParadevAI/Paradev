@@ -9417,7 +9417,7 @@ msgstr "フォーク引数"
 msgid "Fork conversation"
 msgstr "会話を分岐"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "チャットにフォーク"
 
 msgid "Fork into CLI"

@@ -20,7 +20,7 @@ export function ForkMenuItems({
 			{onForkIntoChat && (
 				<DropdownMenuItem onSelect={onForkIntoChat}>
 					<MessageSquare />
-					<Trans>Fork into Chat</Trans>
+					<Trans>Fork into chat</Trans>
 				</DropdownMenuItem>
 			)}
 		</>

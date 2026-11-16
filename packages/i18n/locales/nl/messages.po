@@ -9417,7 +9417,7 @@ msgstr "Fork-argumenten"
 msgid "Fork conversation"
 msgstr "Gesprek afsplitsen"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "Afsplitsen naar chat"
 
 msgid "Fork into CLI"

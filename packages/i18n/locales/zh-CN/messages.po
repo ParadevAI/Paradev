@@ -9417,7 +9417,7 @@ msgstr "分叉参数"
 msgid "Fork conversation"
 msgstr "分叉对话"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "分叉到聊天"
 
 msgid "Fork into CLI"

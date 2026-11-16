@@ -9417,7 +9417,7 @@ msgstr "포크 인자"
 msgid "Fork conversation"
 msgstr "대화 분기"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "채팅으로 포크"
 
 msgid "Fork into CLI"

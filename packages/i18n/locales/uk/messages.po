@@ -9411,7 +9411,7 @@ msgstr "Аргументи форка"
 msgid "Fork conversation"
 msgstr "Форкнути розмову"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "Відгалузити в чат"
 
 msgid "Fork into CLI"

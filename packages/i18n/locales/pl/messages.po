@@ -9417,7 +9417,7 @@ msgstr "Argumenty forka"
 msgid "Fork conversation"
 msgstr "Rozgałęź rozmowę"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "Rozgałęź do czatu"
 
 msgid "Fork into CLI"

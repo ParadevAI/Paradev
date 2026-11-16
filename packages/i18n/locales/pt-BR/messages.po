@@ -9417,7 +9417,7 @@ msgstr "Argumentos de fork"
 msgid "Fork conversation"
 msgstr "Bifurcar conversa"
 
-msgid "Fork into Chat"
+msgid "Fork into chat"
 msgstr "Bifurcar no chat"
 
 msgid "Fork into CLI"

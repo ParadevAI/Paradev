@@ -9417,8 +9417,8 @@ msgstr "Argumen fork"
 msgid "Fork conversation"
 msgstr "Cabangkan percakapan"
 
-msgid "Fork into Chat"
-msgstr "Fork ke Obrolan"
+msgid "Fork into chat"
+msgstr "Fork ke obrolan"
 
 msgid "Fork into CLI"
 msgstr "Fork ke CLI"
