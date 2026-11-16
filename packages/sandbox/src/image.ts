@@ -77,6 +77,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends ${aptList("base")} \\
  && apt-get install -y --no-install-recommends ${aptList("toolchain")} \\
  && apt-get install -y ${aptList("desktop")} \\
+ && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-16 \\
  && rm -rf /var/lib/apt/lists/*
 # Docker, the GitHub CLI and Go from their vendors: Debian's lag by years.
 RUN install -m 0755 -d /etc/apt/keyrings \\
