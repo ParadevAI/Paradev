@@ -22,6 +22,10 @@ export interface PtyDaemonManifest {
 	protocolVersions: number[];
 	startedAt: number;
 	organizationId: string;
+	/** Executable, script, and bundle fingerprint recorded at spawn/handoff. */
+	execPath?: string;
+	scriptPath?: string;
+	bundleId?: string;
 	// ----- Phase 2 (daemon-binary upgrade fd-handoff) -----
 	// All present only during the brief handoff window. Older host-service
 	// builds that don't know these fields ignore them harmlessly.
@@ -120,6 +124,15 @@ export function readPtyDaemonManifest(
 			startedAt: data.startedAt,
 			organizationId: data.organizationId,
 		};
+		if (typeof data.execPath === "string") {
+			out.execPath = data.execPath;
+		}
+		if (typeof data.scriptPath === "string") {
+			out.scriptPath = data.scriptPath;
+		}
+		if (typeof data.bundleId === "string") {
+			out.bundleId = data.bundleId;
+		}
 		if (typeof data.handoffInProgress === "boolean") {
 			out.handoffInProgress = data.handoffInProgress;
 		}

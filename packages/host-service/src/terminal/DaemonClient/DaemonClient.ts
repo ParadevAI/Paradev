@@ -196,11 +196,18 @@ export class DaemonClient {
 	 * Timeout is generous: the daemon has to write a snapshot, spawn a child
 	 * Node process, wait for the successor's adopt+ack, then reply.
 	 */
-	async prepareUpgrade(): Promise<
+	async prepareUpgrade(target?: {
+		execPath?: string;
+		scriptPath?: string;
+	}): Promise<
 		{ ok: true; successorPid: number } | { ok: false; reason: string }
 	> {
 		const reply = await this.requestNonSession(
-			{ type: "prepare-upgrade" },
+			{
+				type: "prepare-upgrade",
+				...(target?.execPath ? { execPath: target.execPath } : {}),
+				...(target?.scriptPath ? { scriptPath: target.scriptPath } : {}),
+			},
 			"upgrade-prepared",
 			PREPARE_UPGRADE_TIMEOUT_MS,
 		);
@@ -385,7 +392,9 @@ export class DaemonClient {
 	}
 
 	private requestNonSession(
-		req: { type: "list" } | { type: "prepare-upgrade" },
+		req:
+			| { type: "list" }
+			| { type: "prepare-upgrade"; execPath?: string; scriptPath?: string },
 		expectType: "list-reply" | "upgrade-prepared",
 		timeoutMs: number,
 	): Promise<ServerMessage> {

@@ -1319,4 +1319,125 @@ describe("manifest-less adoption of a slow daemon (GH #6822)", () => {
 			}
 		}
 	});
+
+	test("update() replaces a same-version daemon whose bundle path changed and was deleted (ShipIt scenario)", async () => {
+		const tmpDir = fs.mkdtempSync(
+			path.join(os.tmpdir(), "supervisor-shipit-e2e-"),
+		);
+		const shipItDir = path.join(tmpDir, "ShipIt.XXXX");
+		const appDir = path.join(tmpDir, "Superset.app");
+		fs.mkdirSync(shipItDir, { recursive: true });
+		fs.mkdirSync(appDir, { recursive: true });
+
+		const ptyDaemonNodeModules = path.resolve(
+			__dirname,
+			"../../../pty-daemon/node_modules",
+		);
+		fs.symlinkSync(
+			ptyDaemonNodeModules,
+			path.join(shipItDir, "node_modules"),
+			"dir",
+		);
+		fs.symlinkSync(
+			ptyDaemonNodeModules,
+			path.join(appDir, "node_modules"),
+			"dir",
+		);
+
+		const oldBundle = path.join(shipItDir, "pty-daemon.js");
+		const newBundle = path.join(appDir, "pty-daemon.js");
+		fs.copyFileSync(DAEMON_BUNDLE, oldBundle);
+		fs.copyFileSync(DAEMON_BUNDLE, newBundle);
+
+		const orgId = "org-shipit-bundle-swap";
+		const socketPath = ptyDaemonSocketPath(orgId);
+		try {
+			fs.unlinkSync(socketPath);
+		} catch {}
+
+		// Launch predecessor from the ShipIt copy WITHOUT version drift.
+		const child = childProcess.spawn(
+			process.execPath,
+			[oldBundle, `--socket=${socketPath}`],
+			{ detached: true, stdio: "ignore" },
+		);
+		child.unref();
+
+		try {
+			const ready = await waitForSocket(socketPath, 5000);
+			assert.equal(ready, true);
+
+			const { DaemonClient } = await import(
+				"../terminal/DaemonClient/index.ts"
+			);
+			const client = new DaemonClient({ socketPath });
+			await client.connect();
+			const opened = await client.open("shipit-survivor", {
+				shell: "/bin/sh",
+				argv: ["-c", "echo alive; sleep 30"],
+				cols: 80,
+				rows: 24,
+			});
+			await client.dispose();
+
+			// Delete the old ShipIt bundle directory while the daemon still runs.
+			fs.rmSync(shipItDir, { recursive: true, force: true });
+
+			fs.mkdirSync(ptyDaemonManifestDir(orgId), {
+				recursive: true,
+				mode: 0o700,
+			});
+			writePtyDaemonManifest({
+				pid: child.pid as number,
+				socketPath,
+				protocolVersions: [CURRENT_PROTOCOL_VERSION],
+				startedAt: Date.now(),
+				organizationId: orgId,
+			});
+
+			const sup = new DaemonSupervisor({
+				scriptPath: newBundle,
+				autoUpdate: false,
+			});
+			supervisorsToCleanup.push({ sup, orgId });
+
+			const adopted = await sup.ensure(orgId);
+			assert.equal(adopted.runningVersion, EXPECTED_DAEMON_VERSION);
+			assert.equal(
+				adopted.updatePending,
+				true,
+				"same-version daemon from deleted ShipIt bundle must flag updatePending",
+			);
+
+			const updateResult = await sup.update(orgId);
+			assert.equal(
+				updateResult.ok,
+				true,
+				`update() failed: ${JSON.stringify(updateResult)}`,
+			);
+
+			const status = sup.getUpdateStatus(orgId);
+			assert.ok(status);
+			assert.equal(
+				status.pending,
+				false,
+				"updatePending must clear once handoff switches to newBundle",
+			);
+
+			// Live PTY survived handoff to the new bundle.
+			const verifyClient = new DaemonClient({ socketPath });
+			await verifyClient.connect();
+			const sessions = await verifyClient.list();
+			const survivor = sessions.find((s) => s.id === "shipit-survivor");
+			assert.ok(survivor, "live session should survive ShipIt bundle swap");
+			assert.equal(survivor.pid, opened.pid);
+			await verifyClient.close("shipit-survivor", "SIGKILL");
+			await verifyClient.dispose();
+		} finally {
+			try {
+				if (child.pid) process.kill(child.pid, "SIGKILL");
+			} catch {}
+			fs.rmSync(tmpDir, { recursive: true, force: true });
+		}
+	});
 });
