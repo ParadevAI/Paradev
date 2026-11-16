@@ -247,11 +247,12 @@ export function CommandPalette() {
 				onOpenAutoFocus={focusInput}
 				onInteractOutside={(event) => {
 					// The toggle's own click closes the palette; closing here too would reopen it.
-					// The delete confirmation opens over the palette.
+					// The delete confirmation and the archive toast sit outside
+					// the palette and are used with it open.
 					if (
 						event.target instanceof Element &&
 						event.target.closest(
-							`[${PALETTE_TOGGLE_ATTRIBUTE}], [data-slot^="alert-dialog"]`,
+							`[${PALETTE_TOGGLE_ATTRIBUTE}], [data-slot^="alert-dialog"], [data-sonner-toaster]`,
 						)
 					) {
 						event.preventDefault();

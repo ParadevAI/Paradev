@@ -3193,6 +3193,9 @@ msgstr "{0} arşivlendi"
 msgid "Archived shown"
 msgstr "Arşivlenenler gösteriliyor"
 
+msgid "Archiving workspace…"
+msgstr "Çalışma alanı arşivleniyor…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Bu dosyayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
 

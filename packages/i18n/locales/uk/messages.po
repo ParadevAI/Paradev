@@ -3187,6 +3187,9 @@ msgstr "Архівовано {0}"
 msgid "Archived shown"
 msgstr "Показано архівовані"
 
+msgid "Archiving workspace…"
+msgstr "Архівація робочого простору…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Ви справді хочете видалити цей файл? Цю дію не можна скасувати."
 

@@ -3193,6 +3193,9 @@ msgstr "Arquivado {0}"
 msgid "Archived shown"
 msgstr "Arquivadas exibidas"
 
+msgid "Archiving workspace…"
+msgstr "Arquivando o espaço de trabalho…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Tem certeza de que quer excluir este arquivo? Não dá para desfazer."
 
