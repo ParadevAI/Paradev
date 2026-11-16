@@ -1140,17 +1140,52 @@ export class PullRequestRuntimeManager {
 			}
 
 			if (failedKeys.has(key)) {
-				const linkedPr = workspace.pullRequestId
-					? this.findPullRequestRowById(workspace.pullRequestId)
+				const current = this.db
+					.select()
+					.from(workspaces)
+					.where(eq(workspaces.id, workspace.id))
+					.get();
+				if (
+					!current ||
+					current.pullRequestId !== workspace.pullRequestId ||
+					this.effectiveUpstreamKey(current, repo) !== key
+				)
+					continue;
+				const linkedPr = current.pullRequestId
+					? this.findPullRequestRowById(current.pullRequestId)
 					: undefined;
 				const knownCheckoutMismatch =
 					!!head &&
 					syntheticPullRequestNumber(head, repo) !== null &&
-					!!workspace.headSha &&
+					!!current.headSha &&
 					!!linkedPr?.headSha &&
 					linkedPr.headSha.toLowerCase() !==
-						workspace.headSha.trim().toLowerCase();
-				if (!knownCheckoutMismatch) continue;
+						current.headSha.trim().toLowerCase();
+				if (knownCheckoutMismatch && current.pullRequestId && current.headSha) {
+					this.db
+						.update(workspaces)
+						.set({ pullRequestId: null })
+						.where(
+							and(
+								eq(workspaces.id, current.id),
+								isNull(workspaces.archivedAt),
+								eq(workspaces.branch, current.branch),
+								eq(workspaces.headSha, current.headSha),
+								eq(workspaces.pullRequestId, current.pullRequestId),
+								current.upstreamOwner === null
+									? isNull(workspaces.upstreamOwner)
+									: eq(workspaces.upstreamOwner, current.upstreamOwner),
+								current.upstreamRepo === null
+									? isNull(workspaces.upstreamRepo)
+									: eq(workspaces.upstreamRepo, current.upstreamRepo),
+								current.upstreamBranch === null
+									? isNull(workspaces.upstreamBranch)
+									: eq(workspaces.upstreamBranch, current.upstreamBranch),
+							),
+						)
+						.run();
+				}
+				continue;
 			}
 
 			if (workspace.pullRequestId) {
