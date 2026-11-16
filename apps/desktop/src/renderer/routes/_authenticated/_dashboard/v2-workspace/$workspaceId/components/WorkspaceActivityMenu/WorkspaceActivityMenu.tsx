@@ -175,6 +175,12 @@ export function WorkspaceActivityMenu({
 		(state) => state.hidden[workspaceId] === true,
 	);
 	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const subagentsCollapsed = useActivityPanelStore(
+		(state) => state.subagentsCollapsed[workspaceId] === true,
+	);
+	const setSubagentsCollapsed = useActivityPanelStore(
+		(state) => state.setSubagentsCollapsed,
+	);
 	const popoverOpen = useActivityPanelStore(
 		(state) => state.floatingOpen[workspaceId] === true,
 	);
@@ -771,7 +777,15 @@ export function WorkspaceActivityMenu({
 						{agentWork.subagents.length + agentWork.finished.length > 0 && (
 							<MenuGroup
 								title={<Trans>Subagents</Trans>}
-								count={agentWork.subagents.length}
+								count={
+									subagentsCollapsed
+										? agentWork.subagents.length + agentWork.finished.length
+										: agentWork.subagents.length
+								}
+								collapsed={subagentsCollapsed}
+								onCollapsedChange={(collapsed) =>
+									setSubagentsCollapsed(workspaceId, collapsed)
+								}
 							>
 								<div>
 									{agentRows(agentWork.subagents)}
