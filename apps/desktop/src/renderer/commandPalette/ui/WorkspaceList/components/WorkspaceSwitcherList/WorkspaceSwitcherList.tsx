@@ -83,6 +83,19 @@ export function WorkspaceSwitcherList({
 	const setLeavingId = useFrameStackStore((s) => s.setSwitcherLeavingId);
 	const isLeavingRowListed =
 		leavingId !== null && ordered.some((row) => row.workspace.id === leavingId);
+	// cmdk selects the first row when the selected one unmounts, so the
+	// selection moves to the neighbour while the row is still leaving.
+	const latestRows = useRef({ ordered, cycle });
+	latestRows.current = { ordered, cycle };
+	useEffect(() => {
+		if (leavingId === null) return;
+		const { ordered: rows, cycle: current } = latestRows.current;
+		if (current?.selectedValue !== leavingId) return;
+		const index = rows.findIndex((row) => row.workspace.id === leavingId);
+		const neighbour = rows[index + 1] ?? rows[index - 1];
+		if (neighbour) current.onSelectedValueChange(neighbour.workspace.id);
+	}, [leavingId]);
+
 	useEffect(() => {
 		if (leavingId === null) return;
 		if (!isLeavingRowListed) {

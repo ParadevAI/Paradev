@@ -29,21 +29,9 @@ export function useSwitcherCycle(
 		(row) => row.workspace.id === selectedValue,
 	);
 
-	// When the selected row leaves the list, the row that took its place is
-	// selected, not the first one.
-	const lastSelectedIndex = useRef(0);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: a new query starts from the top
 	useEffect(() => {
-		lastSelectedIndex.current = 0;
-	}, [query]);
-	useEffect(() => {
-		if (!cycling || ordered.length === 0) return;
-		if (selectedIndex >= 0) {
-			lastSelectedIndex.current = selectedIndex;
-			return;
-		}
-		const index = Math.min(lastSelectedIndex.current, ordered.length - 1);
-		latest.current.cycle?.onSelectedValueChange(ordered[index].workspace.id);
+		if (!cycling || ordered.length === 0 || selectedIndex >= 0) return;
+		latest.current.cycle?.onSelectedValueChange(ordered[0].workspace.id);
 	}, [cycling, ordered, selectedIndex]);
 
 	useEffect(() => {
