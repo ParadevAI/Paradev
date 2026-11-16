@@ -19,7 +19,6 @@ import {
 } from "@superset/db/schema";
 import { retiredTaskColumns } from "@superset/db/task-list-query";
 import { MAX_ATTACHMENTS } from "@superset/shared/attachment-limits";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { LABELS_MAX_PER_WORKSPACE } from "@superset/shared/labels";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
@@ -688,7 +687,7 @@ export const cloudWorkspaceRecordRouter = {
 				});
 			}
 			const row = await loadVisibleWorkspace(ctx, input.id);
-			if (isArchivedCloudWorkspaceStatus(row.status)) {
+			if (row.status === "archived") {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Workspace not found",

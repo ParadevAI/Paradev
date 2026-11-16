@@ -1,5 +1,4 @@
 import type { CloudWorkspaceStatus } from "@superset/db/schema";
-import { currentCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import semver from "semver";
 import type { ApiClientInfo } from "../../trpc";
 
@@ -33,11 +32,10 @@ export function cloudWorkspaceStatusFor(
 	client: ApiClientInfo | null,
 	status: CloudWorkspaceStatus,
 ): CloudWorkspaceStatus {
-	const current = currentCloudWorkspaceStatus(status);
-	if (!client || !readsOnlyLegacyStatus(client)) return current;
-	if (current === "awake" || current === "asleep") return "ready";
-	if (current === "archived") return "deleted";
-	return current;
+	if (!client || !readsOnlyLegacyStatus(client)) return status;
+	if (status === "awake" || status === "asleep") return "ready";
+	if (status === "archived") return "deleted";
+	return status;
 }
 
 export function withClientStatus<Row extends { status: CloudWorkspaceStatus }>(

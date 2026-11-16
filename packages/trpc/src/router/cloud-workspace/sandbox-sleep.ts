@@ -1,18 +1,7 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { AWAKE_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
-import {
-	and,
-	eq,
-	gt,
-	inArray,
-	isNull,
-	notInArray,
-	or,
-	type SQL,
-	sql,
-} from "drizzle-orm";
+import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
@@ -72,7 +61,7 @@ async function markAsleep(
 		.where(
 			and(
 				eq(cloudWorkspaces.id, cloudWorkspaceId),
-				inArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+				eq(cloudWorkspaces.status, "awake"),
 				stillStoppedSession(sessionId),
 			),
 		)
@@ -87,7 +76,7 @@ async function markAsleep(
 		.where(
 			and(
 				eq(cloudWorkspaces.id, cloudWorkspaceId),
-				notInArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+				ne(cloudWorkspaces.status, "awake"),
 				stillStoppedSession(sessionId),
 				or(
 					isNull(cloudWorkspaces.sandboxExpiresAt),

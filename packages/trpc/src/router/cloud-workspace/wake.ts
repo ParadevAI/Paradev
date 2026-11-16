@@ -166,7 +166,7 @@ export async function markSandboxUnavailable(
 ): Promise<void> {
 	await transitionCloudWorkspace({
 		id: row.id,
-		from: ["awake", "ready", "asleep"],
+		from: ["awake", "asleep"],
 		to: "failed",
 		set: { sandboxUrl: null },
 	});

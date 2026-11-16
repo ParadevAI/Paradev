@@ -181,14 +181,6 @@ describe("a stale record never marks a running box asleep", () => {
 		expectAsleepGuardedBy("session_1");
 	});
 
-	test("a row still at the old `ready` is put to sleep like an awake one", async () => {
-		await recordSandboxAsleep("ws_1", { sessionId: "session_1" });
-		expect(writes[0]?.where).toContain('"status" in ($');
-		expect(writes[0]?.params).toEqual(
-			expect.arrayContaining(["awake", "ready"]),
-		);
-	});
-
 	test("a wake between the watch's read and its write keeps the row awake when Vercel gives no session id", async () => {
 		storedExpiry = new Date(NOW - 5_000);
 		describedSessionId = null;
