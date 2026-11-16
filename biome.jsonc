@@ -61,7 +61,11 @@
 	},
 	"overrides": [
 		{
-			"includes": ["packages/chats-core/**", "packages/chats-sync/**"],
+			"includes": [
+				"packages/chats-core/**",
+				"packages/chats-sync/**",
+				"packages/chats-runner/**"
+			],
 			"linter": {
 				"rules": {
 					"style": {
@@ -69,6 +73,20 @@
 					},
 					"complexity": {
 						"noCommaOperator": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": [
+				"packages/chats-runner/**/*.test.ts",
+				"packages/chats-runner/**/*.integration.ts"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noAssignInExpressions": "off",
+						"noTemplateCurlyInString": "off"
 					}
 				}
 			}
