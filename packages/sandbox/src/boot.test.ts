@@ -36,13 +36,19 @@ describe("superset-boot", () => {
 		);
 	});
 
-	test("swap is memguard's, grown on demand up to a cap by box size", () => {
+	test("nothing turns swap on, and an earlier bundle's swapfiles are removed", () => {
 		expect(boot).not.toMatch(/swapon/);
-		expect(memguard).toMatch(/swap_cap_mb=\$\(\( \$\(box_mb\) \* 3 \/ 2 \)\)/);
-		expect(memguard).toMatch(/-lt 6144 \] && swap_cap_mb=6144/);
-		expect(memguard).toMatch(/-gt 16384 \] && swap_cap_mb=16384/);
-		expect(memguard).toMatch(/swapon "\$f"/);
-		expect(memguard).toMatch(/swapoff "\$f"/);
+		expect(memguard).not.toMatch(/swapon|mkswap|fallocate/);
+		expect(memguard).toMatch(
+			/\/var\/swap\/superset-\*.*swapoff "\$f".*rm -f "\$f"/,
+		);
+		expect(boot).toMatch(/rm -f \/swapfile/);
+	});
+
+	test("memguard reaps on available memory alone", () => {
+		expect(memguard).toMatch(
+			/if \[ "\$mem_avail" -lt "\$floor" \]; then\n\s*victim=/,
+		);
 	});
 
 	test("writes the cgroup's memory ceiling and CPU count for login shells", () => {
