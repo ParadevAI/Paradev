@@ -63,7 +63,8 @@ export type CommandStatus = z.infer<typeof commandStatusEnum>;
  * `asleep`: the box session ended, and the box answers nothing until `access`
  * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
  * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
- * of `awake` and `archived`: rows may still hold them, nothing writes them.
+ * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
+ * enum value without rebuilding the type.
  */
 export const cloudWorkspaceStatusValues = [
 	"provisioning",

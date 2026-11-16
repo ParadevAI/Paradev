@@ -9,7 +9,6 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { agentCredentials, cloudWorkspaces } from "@superset/db/schema";
 import { CHATGPT_PROVIDER } from "@superset/shared/agent-credentials";
-import { AWAKE_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
 import { and, eq, gt, inArray, isNull } from "drizzle-orm";
 import { renewChatgptSignIns } from "../../router/agent-credential";
 import { buildSandboxClaim } from "./claim";
@@ -51,7 +50,7 @@ export async function renewChatgptSignInsAndBoxes(args: {
 					cloudWorkspaces.createdByUserId,
 					recent.map((row) => row.userId),
 				),
-				inArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+				eq(cloudWorkspaces.status, "awake"),
 				isNull(cloudWorkspaces.deletedAt),
 			),
 		);

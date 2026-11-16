@@ -1,6 +1,5 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { eq } from "drizzle-orm";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
@@ -35,7 +34,7 @@ function isStillArchived(
 ): row is CloudWorkspaceRow {
 	return (
 		row !== undefined &&
-		isArchivedCloudWorkspaceStatus(row.status) &&
+		row.status === "archived" &&
 		row.deletedAt?.toISOString() === input.archivedAt &&
 		row.provider === "vercel"
 	);

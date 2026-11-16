@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { AWAKE_CLOUD_WORKSPACE_STATUSES } from "@superset/shared/cloud-workspace-status";
 import { and, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
@@ -62,9 +61,7 @@ async function markAwake(
 				or(
 					and(eq(cloudWorkspaces.status, "asleep"), newSession),
 					and(
-						inArray(cloudWorkspaces.status, [
-							...AWAKE_CLOUD_WORKSPACE_STATUSES,
-						]),
+						eq(cloudWorkspaces.status, "awake"),
 						or(
 							newSession,
 							isNull(cloudWorkspaces.sandboxExpiresAt),
@@ -82,7 +79,7 @@ async function markAwake(
 			.where(
 				and(
 					eq(cloudWorkspaces.id, cloudWorkspaceId),
-					inArray(cloudWorkspaces.status, [...AWAKE_CLOUD_WORKSPACE_STATUSES]),
+					eq(cloudWorkspaces.status, "awake"),
 					sessionId === null
 						? undefined
 						: eq(cloudWorkspaces.sandboxSessionId, sessionId),

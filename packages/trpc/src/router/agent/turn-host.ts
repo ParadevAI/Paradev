@@ -1,6 +1,5 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces, members } from "@superset/db/schema";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
@@ -65,7 +64,7 @@ export async function resolveTurnHost(turn: {
 		throw noAccess();
 	}
 
-	if (isArchivedCloudWorkspaceStatus(row.status) || row.status === "failed") {
+	if (row.status === "archived" || row.status === "failed") {
 		throw new TRPCError({ code: "NOT_FOUND", message: "Workspace is gone." });
 	}
 	if (row.status === "provisioning") {

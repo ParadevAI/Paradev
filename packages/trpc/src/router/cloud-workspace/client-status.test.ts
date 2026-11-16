@@ -19,10 +19,9 @@ describe("cloudWorkspaceStatusFor", () => {
 		).toBe("ready");
 	});
 
-	test("current clients and web read the new names, also for rows not yet backfilled", () => {
+	test("current clients and web read the new names", () => {
 		expect(cloudWorkspaceStatusFor(desktop("2.0.10"), "asleep")).toBe("asleep");
-		expect(cloudWorkspaceStatusFor(desktop("2.0.10"), "ready")).toBe("awake");
-		expect(cloudWorkspaceStatusFor(null, "deleted")).toBe("archived");
+		expect(cloudWorkspaceStatusFor(null, "archived")).toBe("archived");
 		expect(
 			cloudWorkspaceStatusFor(
 				{ product: "mobile", version: "1.2.3" },

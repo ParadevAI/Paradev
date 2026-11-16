@@ -63,9 +63,8 @@ configs, and set the sync commit to the commit that holds the change.
   not checked.
 - Health: whether host-service answers after a wake.
 - More than one workspace. Each writer touches only its own row.
-- The legacy output mapper (`client-status.ts`) and the old spellings `ready` and `deleted`. The
-  model has one `awake` and one `archived`; the code reads both spellings of each through the
-  lists in `packages/shared/src/cloud-workspace-status.ts`.
+- The legacy output mapper (`client-status.ts`), which renames statuses on the way out to old
+  clients and writes nothing.
 - Unarchive inside the grace period.
 - Where the model and the code differ, checked on 2026-11-16:
   - The model's `CAS` compares the stopped session with Vercel's current one. The code compares it

@@ -11,7 +11,6 @@ import {
 	type SelectAgentSession,
 	tasks,
 } from "@superset/db/schema";
-import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { startCloudWorkspace } from "../cloud-workspace/start";
@@ -317,8 +316,7 @@ async function withUsableBox(sessionId: string): Promise<SelectAgentSession> {
 	if (
 		row.session.cloudWorkspaceId &&
 		row.boxStatus !== null &&
-		(row.boxStatus === "failed" ||
-			isArchivedCloudWorkspaceStatus(row.boxStatus))
+		(row.boxStatus === "failed" || row.boxStatus === "archived")
 	) {
 		const [cleared] = await db
 			.update(agentSessions)
@@ -439,10 +437,7 @@ async function relaunchedOnNewBox(
 		.from(cloudWorkspaces)
 		.where(eq(cloudWorkspaces.id, session.cloudWorkspaceId))
 		.limit(1);
-	if (
-		!box ||
-		(box.status !== "failed" && !isArchivedCloudWorkspaceStatus(box.status))
-	)
+	if (!box || (box.status !== "failed" && box.status !== "archived"))
 		return false;
 	const [starts] = await db
 		.select({ n: count() })
