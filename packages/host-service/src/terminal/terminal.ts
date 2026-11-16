@@ -820,10 +820,10 @@ export function isLiveTerminalSession(terminalId: string): boolean {
  * idle shell prompt). Drives the "close anyway?" confirm on pane close. Unknown
  * sessions, idle prompts, and sessions owned by another workspace return false.
  */
-export function sessionHasRunningProcess(
+export async function sessionHasRunningProcess(
 	terminalId: string,
 	workspaceId: string,
-): boolean {
+): Promise<boolean> {
 	const session = sessions.get(terminalId);
 	if (!session || session.exited) return false;
 	// Ownership gate: don't let one workspace probe another's terminals.
