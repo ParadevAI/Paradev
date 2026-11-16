@@ -22,7 +22,7 @@ export function camelToKebab(str: string): string {
 	return str.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
 }
 
-const FLAG_LIKE = /^--?[a-zA-Z][\w-]*(?:=|$)/;
+const FLAG_LIKE = /^(?:-[a-zA-Z]|--[^\s-])[^\s=]*(?:=|$)/;
 
 function isOptionValue(token: string | undefined): token is string {
 	return token !== undefined && token !== "--" && !FLAG_LIKE.test(token);

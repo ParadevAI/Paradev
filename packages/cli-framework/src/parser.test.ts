@@ -19,8 +19,13 @@ describe("parseArgv", () => {
 		"- fix the tests\n- update the docs",
 		"--help me fix the build",
 		"---\ntitle: plan\n---",
+		"-1",
 	])("takes a value that starts with a dash: %p", (value) => {
 		expect(parse("--prompt", value)).toEqual({ prompt: value });
+	});
+
+	it("takes an option-shaped value after =", () => {
+		expect(parse("--prompt=--3d")).toEqual({ prompt: "--3d" });
 	});
 
 	it("takes a negative number", () => {
@@ -32,6 +37,8 @@ describe("parseArgv", () => {
 		["--offset=3"],
 		["-x"],
 		["--unknown"],
+		["--3d"],
+		["--foo.bar"],
 		["--2fa"],
 		["--2fa=123456"],
 		["-2"],
