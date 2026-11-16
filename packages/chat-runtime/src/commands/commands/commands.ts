@@ -609,6 +609,25 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		);
 	};
 
+	// A chat resumed onto its agent session without naming the chat it replaces
+	// (`sessions resume`, `sessions send`) starts on what that chat last ran
+	// with, so it does not drop to the agent's own default mode.
+	const resumedSelections = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): ChatSelections | null => {
+		if (!input.resume) return null;
+		const row = options.sessions.findByHarnessSession(
+			input.scopeId,
+			input.harness,
+			input.resume.harnessSessionId,
+		);
+		if (!row) return null;
+		const replay = replaySession(row.sessionId);
+		if (!replay.ok) return null;
+		const selections = sessionSelections(replay.snapshot.session);
+		return Object.keys(selections).length > 0 ? selections : null;
+	};
+
 	return {
 		createSession(input) {
 			const parsed = createSessionCommandSchema.parse(input);
@@ -647,7 +666,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				const continued =
 					replay?.ok && replacedRow?.harness === parsed.harness
 						? sessionSelections(replay.snapshot.session)
-						: null;
+						: resumedSelections(parsed);
 				const { modeId: rememberedModeId, ...remembered } =
 					options.selections?.get(parsed.harness) ?? {};
 				const selections: ChatSelections = {
