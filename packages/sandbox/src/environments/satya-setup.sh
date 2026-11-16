@@ -34,6 +34,8 @@ sudo -E apt-get update -qq
 # The image carries the toolchain; these are the internal team's shell tools.
 apt_install --no-install-recommends zsh fzf silversearcher-ag neovim postgresql-client
 log "shell tooling installed"
+# An image built before clang-16 moved into it lacks the compiler the desktop's native build needs.
+command -v clang++-16 >/dev/null || { apt_install --no-install-recommends clang-16; log "clang-16 installed"; }
 # neonctl: a workspace branches the database for itself on its first start,
 # the same way .paradev/setup.sh does on a laptop.
 sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
