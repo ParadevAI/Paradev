@@ -52,7 +52,12 @@ export default command({
 			.enum("createdAt", "updatedAt", "dueDate", "priority")
 			.desc("Sort field (default: createdAt)"),
 		sortOrder: string().enum("asc", "desc").desc("Sort direction"),
-		limit: number().int().min(1).max(500).default(50).desc("Max results"),
+		limit: number()
+			.int()
+			.min(1)
+			.max(500)
+			.default(50)
+			.desc("Results per page (1-500)"),
 		offset: number().int().min(0).default(0).desc("Skip results"),
 	},
 	display: (data) => {
