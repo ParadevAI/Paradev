@@ -1,6 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import { ChevronRight, Plus } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useId } from "react";
 
 export function MenuGroup({
 	title,
@@ -8,8 +8,8 @@ export function MenuGroup({
 	actions,
 	addLabel,
 	onAdd,
-	collapsed,
-	onCollapsedChange,
+	collapse,
+	pinned,
 	children,
 }: {
 	title: ReactNode;
@@ -17,10 +17,12 @@ export function MenuGroup({
 	actions?: ReactNode;
 	addLabel?: string;
 	onAdd?: () => void;
-	collapsed?: boolean;
-	onCollapsedChange?: (collapsed: boolean) => void;
+	collapse?: { collapsed: boolean; onChange: (collapsed: boolean) => void };
+	pinned?: ReactNode;
 	children: ReactNode;
 }) {
+	const regionId = useId();
+	const collapsed = collapse?.collapsed === true;
 	const label = (
 		<>
 			{title}
@@ -34,14 +36,15 @@ export function MenuGroup({
 	return (
 		<section className="py-1">
 			<div className="sticky top-0 z-10 flex h-7 items-center justify-between bg-popover pl-2 pr-1">
-				{onCollapsedChange ? (
+				{collapse ? (
 					<button
 						type="button"
 						aria-expanded={!collapsed}
-						onClick={() => onCollapsedChange(!collapsed)}
+						aria-controls={regionId}
+						onClick={() => collapse.onChange(!collapsed)}
 						className={cn(
 							labelClassName,
-							"-ml-1 h-6 rounded-sm px-1 outline-none transition-colors hover:text-foreground focus-visible:bg-accent",
+							"-ml-1 h-6 flex-1 rounded-sm px-1 outline-none transition-colors hover:text-foreground focus-visible:bg-accent",
 						)}
 					>
 						{label}
@@ -70,7 +73,8 @@ export function MenuGroup({
 					)}
 				</span>
 			</div>
-			{!collapsed && children}
+			{pinned}
+			<div id={regionId}>{!collapsed && children}</div>
 		</section>
 	);
 }

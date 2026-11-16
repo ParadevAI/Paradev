@@ -777,29 +777,28 @@ export function WorkspaceActivityMenu({
 						{agentWork.subagents.length + agentWork.finished.length > 0 && (
 							<MenuGroup
 								title={<Trans>Subagents</Trans>}
-								count={
-									subagentsCollapsed
-										? agentWork.subagents.length + agentWork.finished.length
-										: agentWork.subagents.length
-								}
-								collapsed={subagentsCollapsed}
-								onCollapsedChange={(collapsed) =>
-									setSubagentsCollapsed(workspaceId, collapsed)
-								}
-							>
-								<div>
-									{agentRows(agentWork.subagents)}
-									{agentWork.finished.map((entry) => (
-										<FinishedSubagentRow
-											key={entry.key}
-											entry={entry}
-											source={sourceOf(entry.terminalId)}
-											onOpen={(target) =>
-												agentActions.open(target, { subagent: true })
+								count={agentWork.subagents.length}
+								collapse={
+									agentWork.finished.length > 0
+										? {
+												collapsed: subagentsCollapsed,
+												onChange: (collapsed) =>
+													setSubagentsCollapsed(workspaceId, collapsed),
 											}
-										/>
-									))}
-								</div>
+										: undefined
+								}
+								pinned={agentRows(agentWork.subagents)}
+							>
+								{agentWork.finished.map((entry) => (
+									<FinishedSubagentRow
+										key={entry.key}
+										entry={entry}
+										source={sourceOf(entry.terminalId)}
+										onOpen={(target) =>
+											agentActions.open(target, { subagent: true })
+										}
+									/>
+								))}
 							</MenuGroup>
 						)}
 						{processes.length + agentWork.shells.length > 0 && (
