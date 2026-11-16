@@ -4,7 +4,10 @@ import { ZoomStable } from "renderer/components/ZoomStable";
 import { useZoomFactor } from "renderer/hooks/useZoomFactor";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { useResolvedTheme } from "renderer/stores/theme";
+import {
+	setTitleBarOverlayColor,
+	useResolvedTheme,
+} from "renderer/stores/theme";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { TITLE_BAR_OVERLAY_HEIGHT } from "shared/constants";
 import { toHex } from "shared/themes/utils";
@@ -23,6 +26,8 @@ import {
 	WindowControlsInset,
 } from "../WindowControlsInset";
 import { NewWorkspaceButton } from "./components/NewWorkspaceButton";
+import { WorkspaceSwitcherButton } from "./components/WorkspaceSwitcherButton";
+import { shellFrameColor } from "./utils/shellFrameColor";
 
 /** macOS draws the window buttons in the first 80 physical pixels, whatever the page zoom. */
 const TRAFFIC_LIGHTS_WIDTH = 80;
@@ -49,7 +54,7 @@ export function TitleBar() {
 
 	// The Windows/Linux window controls are painted by the window, so they take
 	// this row's colour and height only while the row is on screen.
-	const { background, foreground, sidebar, sidebarForeground } = theme.ui;
+	const { background, foreground } = theme.ui;
 	useEffect(() => {
 		const setOverlay = (color: string, symbolColor: string, height: number) =>
 			electronTrpcClient.window.setTitleBarOverlay
@@ -61,11 +66,15 @@ export function TitleBar() {
 				.catch((error: unknown) => {
 					console.warn("[TitleBar] window controls overlay not updated", error);
 				});
-		setOverlay(sidebar, sidebarForeground, ROW_HEIGHT);
+		setTitleBarOverlayColor((ui) =>
+			shellFrameColor(ui.background, ui.foreground),
+		);
+		setOverlay(shellFrameColor(background, foreground), foreground, ROW_HEIGHT);
 		return () => {
+			setTitleBarOverlayColor(null);
 			setOverlay(background, foreground, TITLE_BAR_OVERLAY_HEIGHT);
 		};
-	}, [background, foreground, sidebar, sidebarForeground]);
+	}, [background, foreground]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,
@@ -76,7 +85,7 @@ export function TitleBar() {
 
 	return (
 		<div
-			className="flex h-11 shrink-0 items-stretch"
+			className="flex h-11 shrink-0 items-stretch [--header-tab-selected:var(--shell-tab-selected)]"
 			style={isMac ? { height: `${ROW_HEIGHT / zoomFactor}px` } : undefined}
 		>
 			{isMac ? (
@@ -102,6 +111,7 @@ export function TitleBar() {
 				<ZoomStable enabled={isMac} className="flex items-center gap-0.5">
 					<NavigationControls />
 					<SidebarToggle />
+					{isListPanelCollapsed && <WorkspaceSwitcherButton />}
 					{isListPanelCollapsed && <NewWorkspaceButton />}
 					<PortsDropdown align="start" />
 					<OfflineBadge />
@@ -122,7 +132,7 @@ export function TitleBar() {
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"relative min-w-0 overflow-hidden border-l border-border",
+					"relative min-w-0 overflow-hidden",
 					sideWidth === null && "hidden",
 				)}
 				style={

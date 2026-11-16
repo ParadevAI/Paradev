@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {さらに#件のファイルを表示} other 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {さらに#件のフレームを表示} other {さらに#件のフレームを表示}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "他 {hiddenLabel} 件。入力してリストを絞り込みます。"
+
 msgid "{hostName} is offline"
 msgstr "{hostName}はオフラインです"
 
@@ -3637,9 +3640,6 @@ msgstr "過去30日間の{0}トークンに基づく({1}を集計)。"
 msgid "Before"
 msgstr "変更前"
 
-msgid "Behavior"
-msgstr "全般"
-
 msgid "Behind base"
 msgstr "ベースより遅れています"
 
@@ -5088,6 +5088,9 @@ msgstr "コマンド..."
 
 msgid "Commands"
 msgstr "コマンド"
+
+msgid "Commands only"
+msgstr "コマンドのみ"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "ワークスペースのセットアップ、ティアダウン、実行ボタンで実行されるコマンド。"
@@ -9658,9 +9661,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "ghostトリガー: アイコン + 省略表示のラベル + 上下シェブロン(Primitivesページでデモしているパターン)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Gitとワークツリー"
 
@@ -12850,9 +12850,6 @@ msgstr "アクティブなサービスはありません"
 msgid "No active terminal sessions"
 msgstr "アクティブなターミナルセッションはありません"
 
-msgid "No active workspaces"
-msgstr "アクティブなワークスペースはありません"
-
 msgid "No agent"
 msgstr "エージェントなし"
 
@@ -12955,9 +12952,6 @@ msgstr "色なし"
 
 msgid "No command configured."
 msgstr "コマンドが設定されていません。"
-
-msgid "No commands found."
-msgstr "コマンドが見つかりません。"
 
 msgid "No comment body"
 msgstr "コメント本文はありません"
@@ -14374,6 +14368,7 @@ msgstr "プルリクエストを開く"
 msgid "Open Pull Request"
 msgstr "プルリクエストを開く"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
@@ -15245,9 +15240,6 @@ msgstr "テーマを選ぶか、システムの外観に従います。<0>マー
 
 msgid "Pick a workspace"
 msgstr "ワークスペースを選択"
-
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "エージェントがあなたの入力を待っている、前回確認してから完了した、またはまだ実行中のワークスペースを選択します"
 
 msgid "Pick an environment"
 msgstr "環境を選択"
@@ -16250,6 +16242,9 @@ msgstr "リベースしてマージ"
 
 msgid "Recall what was said in meetings"
 msgstr "会議での発言を振り返る"
+
+msgid "Recent"
+msgstr "最近"
 
 msgid "Recent Activity"
 msgstr "最近のアクティビティ"
@@ -17274,9 +17269,6 @@ msgstr "右ペイン"
 msgid "Right-click here"
 msgstr "ここを右クリック"
 
-msgid "Ringtones"
-msgstr "通知"
-
 msgid "Roadmap"
 msgstr "ロードマップ"
 
@@ -17516,6 +17508,9 @@ msgstr "ワークスペースの削除時に実行します。"
 
 msgid "Runs while you sleep"
 msgstr "寝ている間も動く"
+
+msgid "Same as Switch Workspace"
+msgstr "「ワークスペースを切り替え」と同じ"
 
 msgid "Same session"
 msgstr "同じセッション"
@@ -17892,6 +17887,9 @@ msgstr "トリガーを検索..."
 msgid "Search workspaces"
 msgstr "ワークスペースを検索"
 
+msgid "Search workspaces, commands, files…"
+msgstr "ワークスペース、コマンド、ファイルを検索…"
+
 msgid "Search workspaces..."
 msgstr "ワークスペースを検索..."
 
@@ -17900,6 +17898,9 @@ msgstr "ワークスペースを検索…"
 
 msgid "Search your meeting notes"
 msgstr "会議メモを検索"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "ワークスペースを検索して開くか、新しいワークスペースを作成します"
 
 msgid "Search..."
 msgstr "検索..."
@@ -19828,6 +19829,15 @@ msgstr "ワークスペース8に切り替え"
 
 msgid "Switch to Workspace 9"
 msgstr "ワークスペース9に切り替え"
+
+msgid "Switch to…"
+msgstr "切り替え先…"
+
+msgid "Switch workspace"
+msgstr "ワークスペースを切り替え"
+
+msgid "Switch Workspace"
+msgstr "ワークスペースを切り替え"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
@@ -22887,10 +22897,6 @@ msgstr "ワークスペースの操作"
 
 msgid "Workspace activity"
 msgstr "ワークスペースのアクティビティ"
-
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "ワークスペースのアクティビティ、プルリクエスト #{0}"
 
 msgid "Workspace agents"
 msgstr "ワークスペースのエージェント"

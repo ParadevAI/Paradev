@@ -66,10 +66,10 @@ interface WorkspaceMenuItemsProps {
 		directions: WorkspaceMoveDirection[];
 		workspace: MovableWorkspace;
 	};
+	/** Placed first, above the leading items. */
+	openInItem?: ReactNode;
 	/** Items above the shared ones, with their own separator. */
 	leadingItems?: ReactNode;
-	/** Placed before Copy. */
-	openInItem?: ReactNode;
 	/** Items between the status group and Move to, with their own separator. */
 	groupItems?: ReactNode;
 	/** Items right after Move, with their own separator. */
@@ -102,6 +102,12 @@ export function WorkspaceMenuItems({
 
 	return (
 		<>
+			{openInItem ? (
+				<>
+					{openInItem}
+					<Separator />
+				</>
+			) : null}
 			{leadingItems}
 			<Item onSelect={actions.onTogglePin}>
 				{state.isPinned ? (
@@ -123,7 +129,6 @@ export function WorkspaceMenuItems({
 				</Item>
 			)}
 			<Separator />
-			{openInItem}
 			<Sub>
 				<SubTrigger>
 					<LuCopy className={icon} />

@@ -6,17 +6,25 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import { resolveProjectIconUrl } from "renderer/hooks/host-projects/resolveProjectIconUrl";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
+import {
+	TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+	type TerminalAgentBinding,
+} from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { useHostWorkspacesSource } from "renderer/hooks/host-workspaces/useHostWorkspaces";
 import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useQueryCacheData } from "renderer/hooks/useQueryCacheData";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { authClient } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { hostQueryFn } from "renderer/lib/hostQueryFn";
-import { derivePullRequestQueryTargets } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
+import {
+	DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX,
+	derivePullRequestQueryTargets,
+} from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarData/derivePullRequestQueryTargets";
 import { useCloudPullRequests } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudPullRequests";
 import { useCloudWorkspaceRepositories } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspaceRepositories";
 import {
@@ -90,6 +98,15 @@ interface UseAccessibleV2WorkspacesOptions {
 	 * where filter — the archived fetch rides the scoped host source.
 	 */
 	includeArchived?: boolean;
+	/**
+	 * Where pull requests, agent status and diff totals come from. `full`
+	 * queries each host for all three, and `status` leaves out diff totals.
+	 * `cached` queries no host: it reads what the sidebar already loaded, so
+	 * only sidebar workspaces have any, and it shares the sidebar's cloud
+	 * pull request query. Defaults to `full` with a where filter and to none
+	 * without one.
+	 */
+	liveState?: "full" | "status" | "cached";
 }
 
 function workspaceMatchesSearch(
@@ -368,12 +385,15 @@ export function useAccessibleV2Workspaces(
 	// The authoritative link lives in host.db (`workspace.pullRequestId`), not
 	// any collection. With host-scoped rows this derives a single target
 	// ("Anywhere" derives one per host with visible rows); a client-side
-	// `repositoryId::branch` map mistracks on fork branch collisions. Unscoped
-	// callers (palette, dev seeding) don't render PR data, so skip the queries
-	// entirely rather than fanning them out per host.
+	// `repositoryId::branch` map mistracks on fork branch collisions. A caller
+	// that renders no live state (dev seeding) skips the queries entirely
+	// rather than fanning them out per host.
+	const liveState =
+		options.liveState ?? (whereFilter !== undefined ? "full" : null);
+	const queriesHosts = liveState === "full" || liveState === "status";
 	const pullRequestQueryTargets = useMemo(
 		() =>
-			whereFilter === undefined
+			!queriesHosts
 				? []
 				: derivePullRequestQueryTargets({
 						activeHostUrl,
@@ -382,7 +402,7 @@ export function useAccessibleV2Workspaces(
 						relayUrl,
 						workspaces: rows,
 					}),
-		[whereFilter, activeHostUrl, hostRows, machineId, relayUrl, rows],
+		[queriesHosts, activeHostUrl, hostRows, machineId, relayUrl, rows],
 	);
 
 	const pullRequestQueries = useQueries({
@@ -409,10 +429,16 @@ export function useAccessibleV2Workspaces(
 	// 5-valued state (incl. merge queue), review decision, and checks — the
 	// old cloud Electric join re-derived a worse 4-valued state and could
 	// never match sessions or repo-unmatched projects.
+	const cachedPullRequests = useQueryCacheData<
+		NonNullable<(typeof pullRequestQueries)[number]["data"]>
+	>(DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX, liveState === "cached");
 	const prSummaryEntries = useMemo<[string, V2WorkspacePrSummary][]>(() => {
 		const entries: [string, V2WorkspacePrSummary][] = [];
-		for (const query of pullRequestQueries) {
-			const data = query.data;
+		const results =
+			liveState === "cached"
+				? cachedPullRequests
+				: pullRequestQueries.map((query) => query.data);
+		for (const data of results) {
 			if (!data) continue;
 			for (const row of data.workspaces) {
 				const pr = row.pullRequest;
@@ -437,7 +463,7 @@ export function useAccessibleV2Workspaces(
 			}
 		}
 		return entries;
-	}, [pullRequestQueries]);
+	}, [liveState, cachedPullRequests, pullRequestQueries]);
 	const prByWorkspaceId = useStableByWorkspaceId(prSummaryEntries);
 
 	// Live agent status, one host-wide query per host — never per workspace
@@ -460,23 +486,27 @@ export function useAccessibleV2Workspaces(
 	// Batched totals, one query per host (mirrors the PR/agent queries above).
 	// Slower cadence: totals only feed row chips, not the Changes tab.
 	const diffStatsQueries = useQueries({
-		queries: pullRequestQueryTargets.map((target) => ({
-			queryKey: [
-				"v2-workspaces",
-				"diff-stats",
-				target.organizationId,
-				target.machineId,
-			] as const,
-			refetchInterval: 30_000,
-			enabled: target.hostUrl !== null,
-			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
-				getHostServiceClientByUrl(hostUrl).git.getDiffStatsByWorkspaces.query({
-					// Server caps the batch at 500 (MAX_DIFF_STATS_BATCH); rows
-					// beyond it simply show no stats rather than failing the call.
-					workspaceIds: target.workspaceIds.slice(0, 500),
-				}),
-			),
-		})),
+		queries: (liveState === "full" ? pullRequestQueryTargets : []).map(
+			(target) => ({
+				queryKey: [
+					"v2-workspaces",
+					"diff-stats",
+					target.organizationId,
+					target.machineId,
+				] as const,
+				refetchInterval: 30_000,
+				enabled: target.hostUrl !== null,
+				queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+					getHostServiceClientByUrl(hostUrl).git.getDiffStatsByWorkspaces.query(
+						{
+							// Server caps the batch at 500 (MAX_DIFF_STATS_BATCH); rows
+							// beyond it simply show no stats rather than failing the call.
+							workspaceIds: target.workspaceIds.slice(0, 500),
+						},
+					),
+				),
+			}),
+		),
 	});
 	const diffStatsEntries = useMemo<[string, V2WorkspaceDiffStats][]>(() => {
 		const entries: [string, V2WorkspaceDiffStats][] = [];
@@ -500,6 +530,10 @@ export function useAccessibleV2Workspaces(
 		(state) => state.terminalSeenAt,
 	);
 	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
+	const cachedBindings = useQueryCacheData<TerminalAgentBinding[]>(
+		TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+		liveState === "cached",
+	);
 	const agentActivityEntries = useMemo<
 		[
 			string,
@@ -518,8 +552,12 @@ export function useAccessibleV2Workspaces(
 				terminals: Array<{ terminalId: string; lastEventAt: number }>;
 			}
 		>();
-		for (const query of terminalAgentQueries) {
-			for (const binding of query.data ?? []) {
+		const bindingLists =
+			liveState === "cached"
+				? cachedBindings
+				: terminalAgentQueries.map((query) => query.data ?? []);
+		for (const bindings of bindingLists) {
+			for (const binding of bindings) {
 				const status = deriveTerminalAgentStatus({
 					lastEventType: binding.lastEventType,
 					lastEventAt: binding.lastEventAt,
@@ -540,7 +578,7 @@ export function useAccessibleV2Workspaces(
 			}
 		}
 		return [...byWorkspace.entries()];
-	}, [terminalAgentQueries, terminalSeenAt]);
+	}, [liveState, cachedBindings, terminalAgentQueries, terminalSeenAt]);
 	const agentActivityByWorkspaceId =
 		useStableByWorkspaceId(agentActivityEntries);
 
@@ -625,12 +663,10 @@ export function useAccessibleV2Workspaces(
 			organizationId: activeOrganizationId,
 			enabled: cloudRows.length > 0,
 		});
-	// Unscoped callers render no PR data, so they skip this query too.
+	// The sidebar holds the same query, so a `cached` caller adds no fetch.
 	const { byWorkspace: cloudPullRequestsById } = useCloudPullRequests({
 		active:
-			whereFilter !== undefined &&
-			includesCloud &&
-			(activeCloudRows?.length ?? 0) > 0,
+			liveState !== null && includesCloud && (activeCloudRows?.length ?? 0) > 0,
 		archived:
 			whereFilter !== undefined &&
 			includesCloud &&

@@ -1095,6 +1095,9 @@ msgstr "{hiddenCount, plural, one {Mostra # altro file} other {Mostra altri # fi
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Mostra # altro frame} other {Mostra altri # frame}}"
 
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "Altri {hiddenLabel}. Digita per restringere l'elenco."
+
 msgid "{hostName} is offline"
 msgstr "{hostName} è offline"
 
@@ -3637,9 +3640,6 @@ msgstr "In base a {0} token negli ultimi 30 giorni, contando {1}."
 msgid "Before"
 msgstr "Prima"
 
-msgid "Behavior"
-msgstr "Comportamento"
-
 msgid "Behind base"
 msgstr "Indietro rispetto alla base"
 
@@ -5088,6 +5088,9 @@ msgstr "Comando..."
 
 msgid "Commands"
 msgstr "Comandi"
+
+msgid "Commands only"
+msgstr "Solo comandi"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Comandi eseguiti per il setup del workspace, il teardown e il pulsante Esegui."
@@ -9658,9 +9661,6 @@ msgstr "Ghost"
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Trigger ghost: icona + etichetta troncata + chevron su-giù (pattern mostrato nella pagina Primitives)"
 
-msgid "Git"
-msgstr "Git"
-
 msgid "Git & worktrees"
 msgstr "Git e worktree"
 
@@ -12850,9 +12850,6 @@ msgstr "Nessun servizio attivo"
 msgid "No active terminal sessions"
 msgstr "Nessuna sessione del terminale attiva"
 
-msgid "No active workspaces"
-msgstr "Nessun workspace attivo"
-
 msgid "No agent"
 msgstr "Nessun agente"
 
@@ -12955,9 +12952,6 @@ msgstr "Nessun colore"
 
 msgid "No command configured."
 msgstr "Nessun comando configurato."
-
-msgid "No commands found."
-msgstr "Nessun comando trovato."
 
 msgid "No comment body"
 msgstr "Nessun corpo del commento"
@@ -14374,6 +14368,7 @@ msgstr "Apri la pull request"
 msgid "Open Pull Request"
 msgstr "Apri la pull request"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
@@ -15245,9 +15240,6 @@ msgstr "Scegli un tema o segui l'aspetto del sistema. Sfoglia il <0>marketplace<
 
 msgid "Pick a workspace"
 msgstr "Scegli un workspace"
-
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Scegli un workspace il cui agente attende un tuo input, ha finito dall'ultima volta che l'hai guardato o è ancora in esecuzione"
 
 msgid "Pick an environment"
 msgstr "Scegli un ambiente"
@@ -16250,6 +16242,9 @@ msgstr "Rebase e merge"
 
 msgid "Recall what was said in meetings"
 msgstr "Ritrova ciò che è stato detto nelle riunioni"
+
+msgid "Recent"
+msgstr "Recenti"
 
 msgid "Recent Activity"
 msgstr "Attività recente"
@@ -17274,9 +17269,6 @@ msgstr "riquadro destro"
 msgid "Right-click here"
 msgstr "Clicca qui con il tasto destro"
 
-msgid "Ringtones"
-msgstr "Suonerie"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17516,6 +17508,9 @@ msgstr "Eseguito quando viene eliminato uno spazio di lavoro."
 
 msgid "Runs while you sleep"
 msgstr "Lavora mentre dormi"
+
+msgid "Same as Switch Workspace"
+msgstr "Come “Cambia workspace”"
 
 msgid "Same session"
 msgstr "Stessa sessione"
@@ -17892,6 +17887,9 @@ msgstr "Cerca trigger..."
 msgid "Search workspaces"
 msgstr "Cerca workspace"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Cerca workspace, comandi, file…"
+
 msgid "Search workspaces..."
 msgstr "Cerca nei workspace..."
 
@@ -17900,6 +17898,9 @@ msgstr "Cerca workspace…"
 
 msgid "Search your meeting notes"
 msgstr "Cerca nelle note delle riunioni"
+
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Cerca tra i tuoi workspace e aprine uno, oppure avviane uno nuovo"
 
 msgid "Search..."
 msgstr "Cerca..."
@@ -19828,6 +19829,15 @@ msgstr "Passa al workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Passa al workspace 9"
+
+msgid "Switch to…"
+msgstr "Passa a…"
+
+msgid "Switch workspace"
+msgstr "Cambia workspace"
+
+msgid "Switch Workspace"
+msgstr "Cambia workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
@@ -22887,10 +22897,6 @@ msgstr "Azioni workspace"
 
 msgid "Workspace activity"
 msgstr "Attività del workspace"
-
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "Attività del workspace, pull request #{0}"
 
 msgid "Workspace agents"
 msgstr "Agenti del workspace"
