@@ -140,7 +140,22 @@ try {
 	docker(["exec", "-i", NAME, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
 		stdin: identity,
 	});
-	const boot = (_n: number) => {
+	// host-service answers before the remaining steps finish; a log read for
+	// what the steps did waits for this boot's steps.end.
+	const waitForSteps = () =>
+		exec(
+			`for i in $(seq 1 3000); do awk '/ boot\\.start/ { d = 0 } / steps\\.end/ { d = 1 } END { exit !d }' ${SANDBOX_PATHS.bootLog} && exit 0; sleep 0.2; done; exit 1`,
+			{ check: false },
+		);
+	const sinceBootStart = (log: string, phase: string) => {
+		const boot = log.split(/(?=^\d+ boot\.start)/m).at(-1) ?? "";
+		const at = (p: string) =>
+			Number(
+				new RegExp(`^(\\d+) ${p.replace(".", "\\.")}\\b`, "m").exec(boot)?.[1],
+			);
+		return at(phase) - at("boot.start");
+	};
+	const boot = (n: number) => {
 		const started = Date.now();
 		bootAsUser();
 		// Wait for host-service (up to 60 s) so the second boot sees a clean run dir cleared by the first.
@@ -148,7 +163,13 @@ try {
 			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
 			{ check: false },
 		);
-		return Date.now() - started;
+		const elapsed = Date.now() - started;
+		waitForSteps();
+		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+		console.log(
+			`boot ${n}: boot.start to host.ready ${sinceBootStart(log, "host.ready")} ms, to steps.end ${sinceBootStart(log, "steps.end")} ms`,
+		);
+		return elapsed;
 	};
 
 	const first = boot(1);

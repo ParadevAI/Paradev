@@ -7,9 +7,11 @@
 #   setup apply-rootfs               copy every tools.tsv row whose <dest>.hash differs
 #   setup sync-assets                fetch every assets.tsv row whose <dest>.hash differs,
 #                                    except an archive its step already consumed
-#   setup run-steps                  run every steps.tsv row whose marker differs, fail-open;
+#   setup run-steps [before-host|after-host]
+#                                    run every steps.tsv row whose marker differs, fail-open;
 #                                    a failed step skips only the steps that depend on it;
-#                                    a step re-fetches the archives it consumes, then discards them
+#                                    a step re-fetches the archives it consumes, then discards them;
+#                                    before-host runs only the rows marked `host`, after-host the rest
 #   setup run-step <name>            one step, no sentinel (build time, or by hand)
 #   setup status                     one line per step: name, version, marker, last outcome
 set -uo pipefail
@@ -50,12 +52,15 @@ apply_rootfs() {
 # A staged archive the manifest no longer names is an earlier build's; it
 # would otherwise sit beside the current one forever, and a step that
 # globs the directory could pick it. A sidecar alone is a discarded archive.
+# A file a link on PATH still points at stays until a step moves the link:
+# host-service already serves while the steps run.
 prune_media() {
 	local sidecar hash
 	for sidecar in "${SUPERSET_MEDIA_DIR}"/*.hash; do
 		[ -f "$sidecar" ] || continue
 		hash="$(tr -d '\n\r' < "$sidecar")"
 		if ! grep -qF "$hash" "${BUNDLE_DIR}/assets.tsv"; then
+			[ -n "$(find /usr/local/bin -maxdepth 1 -lname "${sidecar%.hash}" -print -quit)" ] && continue
 			rm -f "${sidecar%.hash}" "$sidecar"
 			log "pruned ${sidecar%.hash}"
 		fi
@@ -96,7 +101,8 @@ curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors -o "$out" "$url" \
   || curl -fsSL --retry 2 --retry-delay 2 --retry-all-errors -o "$out" "${url}?fresh=$(date +%s)"
 got="$(sha256sum "$out" | cut -d" " -f1)"
 if [ "$got" != "$hash" ]; then echo "asset ${dest}: expected ${hash}, got ${got}" >&2; exit 1; fi
-install -D -m "$mode" "$out" "$dest"
+install -D -m "$mode" "$out" "${dest}.partial"
+mv -f "${dest}.partial" "$dest"
 rm -f "$out"
 printf "%s" "$hash" > "${dest}.hash"
 case "$dest" in
@@ -137,6 +143,7 @@ discard_archives() {
 # --- versioned steps -----------------------------------------------------
 step_version() { awk -F'\t' -v n="$1" '$1 == n { print $2 }' "${BUNDLE_DIR}/steps.tsv"; }
 step_upstream() { awk -F'\t' -v n="$1" '$1 == n { print $4 }' "${BUNDLE_DIR}/steps.tsv"; }
+step_before_host() { [ "$(awk -F'\t' -v n="$1" '$1 == n { print $5 }' "${BUNDLE_DIR}/steps.tsv")" = host ]; }
 
 run_step() {
 	local name="$1" version marker
@@ -202,12 +209,22 @@ write_failure() {
 # disable the step until its version changes. A failed or disabled step skips
 # only the steps that list it upstream (steps.tsv's fourth column); every
 # other step still runs. Success clears the step's record. Always exits 0.
+# after-host counts a before-host step that is not current as failed.
 run_steps() {
+	local phase="${1:-}"
 	rm -f "${STEPS_DIR}/failure.env"
 	local -a names=() failed=()
 	local name dep blocker count
 	while IFS=$'\t' read -r name _; do [ -n "$name" ] && names+=("$name"); done < "${BUNDLE_DIR}/steps.tsv"
 	for name in "${names[@]}"; do
+		if step_before_host "$name"; then
+			if [ "$phase" = after-host ]; then
+				[ "$(read_trimmed "${STEPS_DIR}/${name}.version")" = "$(step_version "$name")" ] || failed+=("$name")
+				continue
+			fi
+		elif [ "$phase" = before-host ]; then
+			continue
+		fi
 		blocker=""
 		for dep in $(step_upstream "$name" | tr ',' ' '); do
 			if [[ " ${failed[*]} " == *" ${dep} "* ]]; then blocker="$dep"; break; fi
@@ -225,6 +242,7 @@ run_steps() {
 			failed+=("$name")
 		fi
 	done
+	[ "$phase" = before-host ] || prune_media
 	return 0
 }
 
@@ -246,8 +264,8 @@ status() {
 case "${1:-}" in
 	apply-rootfs) apply_rootfs ;;
 	sync-assets) sync_assets ;;
-	run-steps) run_steps ;;
+	run-steps) run_steps "${2:-}" ;;
 	run-step) run_step "${2:?step name}" ;;
 	status) status ;;
-	*) echo "usage: setup apply-rootfs | sync-assets | run-steps | run-step <name> | status" >&2; exit 64 ;;
+	*) echo "usage: setup apply-rootfs | sync-assets | run-steps [before-host|after-host] | run-step <name> | status" >&2; exit 64 ;;
 esac
