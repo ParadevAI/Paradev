@@ -17,6 +17,7 @@ import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
+import { MessageAuthorDevProvider } from "./providers/MessageAuthorDevProvider";
 import { mentionMarkdown } from "./utils/mentionMarkdown";
 
 const MINE =
@@ -160,9 +161,11 @@ export const MessageItem = memo(function MessageItem({
 						</div>
 					)}
 					{message.text && (
-						<ChatMarkdown components={MARKDOWN_COMPONENTS}>
-							{mentionMarkdown(message.text, nameOf)}
-						</ChatMarkdown>
+						<MessageAuthorDevProvider value={message.authorDevId ?? null}>
+							<ChatMarkdown components={MARKDOWN_COMPONENTS}>
+								{mentionMarkdown(message.text, nameOf)}
+							</ChatMarkdown>
+						</MessageAuthorDevProvider>
 					)}
 				</div>
 				{message.editedAt && (
