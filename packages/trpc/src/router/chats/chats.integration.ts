@@ -29,9 +29,8 @@ mock.module("./publish", () => ({
 }));
 
 const { db, dbWs } = await import("@superset/db/client");
-const { files, members, organizations, users } = await import(
-	"@superset/db/schema"
-);
+const { chatsAgentSeedFiles, files, members, organizations, users } =
+	await import("@superset/db/schema");
 const { chatsGroupChannel } = await import("@superset/shared/chats-realtime");
 const { fileOriginalKey } = await import("@superset/shared/usercontent");
 const { eq, inArray } = await import("drizzle-orm");
@@ -238,4 +237,59 @@ test("a shared file opens for the chat's members only, and goes when its message
 	await member.chats.deleteMessage({ messageId: sent.message.id });
 	expect(objectStore.has(fileOriginalKey(fileId))).toBe(false);
 	expect(await db.select().from(files).where(eq(files.id, fileId))).toEqual([]);
+});
+
+test("a Dev from the directory is one of your own or one added to a group, once each, with its listing's instructions", async () => {
+	const { listings } = await owner.chats.registry();
+	expect(listings.map((listing) => listing.slug)).toContain("researcher");
+	const page = await owner.chats.registryListing({ slug: "researcher" });
+	expect(page.listing.instructions).toContain("# Researcher");
+
+	const mine = await owner.chats.installListing({
+		organizationId: ORG,
+		slug: "researcher",
+		target: { kind: "you" },
+		name: "Scholar",
+	});
+	expect(mine.dev).toMatchObject({
+		kind: "custom",
+		name: "Scholar",
+		listing: { slug: "researcher", version: "1.0.0" },
+	});
+	expect(
+		await db
+			.select({ path: chatsAgentSeedFiles.path })
+			.from(chatsAgentSeedFiles)
+			.where(eq(chatsAgentSeedFiles.agentId, mine.dev.id)),
+	).toEqual([{ path: "AGENTS.md" }]);
+	const again = { organizationId: ORG, slug: "researcher" };
+	expect(
+		await code(
+			owner.chats.installListing({ ...again, target: { kind: "you" } }),
+		),
+	).toBe("CONFLICT");
+	expect(
+		await code(
+			owner.chats.installListing({
+				organizationId: ORG,
+				slug: "planner",
+				target: { kind: "you" },
+			}),
+		),
+	).toBe("BAD_REQUEST");
+
+	const { group } = await sharedGroup();
+	const target = { kind: "group" as const, groupId: group.id };
+	const added = await member.chats.installListing({ ...again, target });
+	expect(added.dev).toMatchObject({ kind: "added", groupId: group.id });
+	expect(await code(owner.chats.installListing({ ...again, target }))).toBe(
+		"CONFLICT",
+	);
+	expect(await code(outsider.chats.installListing({ ...again, target }))).toBe(
+		"NOT_FOUND",
+	);
+	const removal = { groupId: group.id, devId: added.dev.id };
+	await owner.chats.removeDevFromGroup(removal);
+	const after = await owner.chats.bootstrap({ organizationId: ORG });
+	expect(after.devs.some((dev) => dev.id === added.dev.id)).toBe(false);
 });

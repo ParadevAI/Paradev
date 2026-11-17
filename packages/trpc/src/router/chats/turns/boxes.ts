@@ -13,6 +13,8 @@ export interface WakeOptions {
 	/** Added by the box's network proxy to its requests to the API. It never enters the box. */
 	credential: string;
 	env: Record<string, string>;
+	/** Files to write into the Dev's folder before the box starts, by path there. */
+	files?: Record<string, string>;
 }
 
 /** Where Devs run: one box per Dev, woken for a turn and stopped when idle. */

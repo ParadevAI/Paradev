@@ -3,6 +3,7 @@ import { db, dbWs } from "@superset/db/client";
 import {
 	type ChatsTurnTrace,
 	chatsAgentReads,
+	chatsAgentSeedFiles,
 	chatsAgents,
 	chatsGroupAgents,
 	chatsGroupMembers,
@@ -300,7 +301,14 @@ async function ensureBox(
 	if (!agent) throw new Error("the Dev is gone");
 	const keys = await deps.boxKeys();
 	const boxId = `box_${crypto.randomUUID()}`;
-	return deps.boxes.wake(agentId, {
+	const seeds = await db
+		.select({
+			path: chatsAgentSeedFiles.path,
+			content: chatsAgentSeedFiles.content,
+		})
+		.from(chatsAgentSeedFiles)
+		.where(eq(chatsAgentSeedFiles.agentId, agentId));
+	const box = await deps.boxes.wake(agentId, {
 		boxId,
 		credential: await signBoxCredential(keys, { agentId, boxId }),
 		env: {
@@ -310,7 +318,15 @@ async function ensureBox(
 			...(await identityEnv(agent)),
 			...(deps.fauxModel ? { DEV_FAUX_MODEL: "1" } : {}),
 		},
+		files: Object.fromEntries(seeds.map((seed) => [seed.path, seed.content])),
 	});
+	// Written once: from here the files are the Dev's own to change.
+	if (seeds.length > 0) {
+		await db
+			.delete(chatsAgentSeedFiles)
+			.where(eq(chatsAgentSeedFiles.agentId, agentId));
+	}
+	return box;
 }
 
 /** Step 2: the Dev's box, woken if stopped, and `turn.started`. False when the box did not start. */
@@ -641,6 +657,56 @@ export async function askDev(
 	throw new Error(
 		"error" in outcome ? outcome.error : "the question was cancelled",
 	);
+}
+
+/**
+ * The first turn of a Dev someone just got from the directory: it knows its
+ * job already, so it says hello as that. `groupTitle` is set when it was
+ * added to a group.
+ */
+export async function enqueueInstalledTurn(
+	deps: TurnDeps,
+	input: {
+		agentId: string;
+		groupId: string;
+		userId: string;
+		byName: string;
+		devName: string;
+		listingName: string;
+		example: string | undefined;
+		groupTitle: string | null;
+	},
+): Promise<string> {
+	const from = `the Dev directory: ${input.listingName}`;
+	const header = `${
+		input.groupTitle
+			? turnHeader("Added to the group", [
+					["Chat", `the group "${input.groupTitle}"`],
+					["Added by", input.byName],
+					["Installed from", from],
+					["Time", formatTime(nowOf(deps))],
+				])
+			: turnHeader("New Dev", [
+					["Chat", `your 1:1 with ${input.byName}`],
+					["Installed from", from],
+					["Time", formatTime(nowOf(deps))],
+				])
+	}\n${REPLY_HINT}`;
+	const said = input.groupTitle
+		? `${input.byName} just added you to this group from the Dev directory, and this is your first message here. Your instructions are in your AGENTS.md: follow them. Say hello to everyone as ${input.devName} in a line or two: what you'll do for the group, and how to ask you (mention you, like "@${input.devName} ${input.example ?? "help"}"). Warm and short.`
+		: `${input.byName} just got you from the Dev directory, and this is your first message to them. Your instructions are in your AGENTS.md: follow them. Say hello as ${input.devName} in a line or two: what you'll do for them, and one thing to try (like "${input.example ?? "ask me anything"}"). Warm and short, not a list of features.`;
+	const [turn] = await db
+		.insert(chatsTurns)
+		.values({
+			agentId: input.agentId,
+			groupId: input.groupId,
+			userId: input.userId,
+			prompt: `${header}\n\n${said}`,
+		})
+		.returning({ id: chatsTurns.id });
+	if (!turn) throw new Error("The first turn was not stored");
+	await deps.turnRuns.start(turn.id);
+	return turn.id;
 }
 
 /** A box that cannot say counts as idle, so it is not kept forever. */

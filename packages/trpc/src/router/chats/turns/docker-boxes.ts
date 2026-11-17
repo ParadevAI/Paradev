@@ -33,24 +33,44 @@ http.createServer((req, res) => {
   req.pipe(out);
 }).listen(${PROXY_PORT}, "127.0.0.1");`;
 
+/**
+ * Writes files into `/agent` from a throwaway container: the volume is only
+ * reachable from containers. Each file is written beside its place and
+ * renamed into it, so the runner never reads half of one.
+ */
+const WRITE_FILES_SCRIPT = `
+const fs = require("node:fs"), path = require("node:path");
+let input = "";
+process.stdin.on("data", (d) => (input += d)).on("end", () => {
+  for (const [rel, content] of Object.entries(JSON.parse(input))) {
+    const file = path.join("/agent", rel);
+    if (!file.startsWith("/agent/")) throw new Error("path escapes /agent: " + rel);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    const temp = file + ".tmp-" + require("node:crypto").randomUUID();
+    fs.writeFileSync(temp, content);
+    fs.renameSync(temp, file);
+  }
+});`;
+
 /** One docker CLI call. Tests stand in for it. */
 export type DockerCli = (
 	args: string[],
-	opts?: { env?: Record<string, string> },
+	opts?: { env?: Record<string, string>; stdin?: string },
 ) => Promise<{ ok: boolean; stdout: string; stderr: string }>;
 
 const dockerCli: DockerCli = (args, opts = {}) =>
 	new Promise((resolve) => {
 		const child = spawn("docker", args, {
 			env: { ...process.env, ...opts.env },
-			stdio: ["ignore", "pipe", "pipe"],
+			stdio: [opts.stdin === undefined ? "ignore" : "pipe", "pipe", "pipe"],
 		});
+		child.stdin?.end(opts.stdin);
 		let stdout = "";
 		let stderr = "";
-		child.stdout.on("data", (chunk) => {
+		child.stdout?.on("data", (chunk) => {
 			stdout += chunk;
 		});
-		child.stderr.on("data", (chunk) => {
+		child.stderr?.on("data", (chunk) => {
 			stderr += chunk;
 		});
 		child.on("error", (error) =>
@@ -87,8 +107,12 @@ export function dockerBoxes(opts: {
 				() => false,
 			));
 
-	async function must(args: string[], env?: Record<string, string>) {
-		const result = await docker(args, { env });
+	async function must(
+		args: string[],
+		env?: Record<string, string>,
+		stdin?: string,
+	) {
+		const result = await docker(args, { env, stdin });
 		if (!result.ok)
 			throw new Error(`docker ${args[0]} failed: ${result.stderr}`);
 		return result.stdout;
@@ -122,10 +146,28 @@ export function dockerBoxes(opts: {
 		boxApiUrl: `http://127.0.0.1:${PROXY_PORT}`,
 		status,
 		stop,
-		async wake(agentId, { boxId, credential, env }) {
+		async wake(agentId, { boxId, credential, env, files }) {
 			const running = await status(agentId);
 			if (running) return running;
 			await stop(agentId);
+			if (files && Object.keys(files).length > 0) {
+				await must(
+					[
+						"run",
+						"--rm",
+						"-i",
+						"-v",
+						`${volume(agentId)}:/agent`,
+						"--entrypoint",
+						"node",
+						opts.image,
+						"-e",
+						WRITE_FILES_SCRIPT,
+					],
+					undefined,
+					JSON.stringify(files),
+				);
+			}
 			const proxyEnv = {
 				DEV_UPSTREAM: opts.upstreamUrl,
 				DEV_BOX_CREDENTIAL: credential,

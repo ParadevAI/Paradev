@@ -57,7 +57,10 @@ export function agentView(
 			isOwner: reader.owner,
 			ownerName: reader.ownerName ?? null,
 		}),
-		listing: null,
+		listing:
+			agent.listingSlug && agent.listingVersion
+				? { slug: agent.listingSlug, version: agent.listingVersion }
+				: null,
 		...(reader.owner || ownedByGroup(agent)
 			? { descriptionText: agent.description }
 			: {}),

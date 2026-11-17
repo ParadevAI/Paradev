@@ -17,6 +17,7 @@ import type {
 import { db, dbWs } from "@superset/db/client";
 import {
 	chatsAgentReads,
+	chatsAgentSeedFiles,
 	chatsAgents,
 	chatsAppCalls,
 	chatsBriefs,
@@ -60,7 +61,15 @@ import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { presignedGetUrl } from "../../lib/r2";
 import { personProcedure } from "../../trpc";
 import { publishChats } from "./publish";
+import {
+	allListings,
+	findListing,
+	listingCard,
+	listingDetail,
+	listingSeeds,
+} from "./registry/registry";
 import { chatsTurnRuntime, triggerTurns, watchTicket } from "./turns";
+import { enqueueInstalledTurn } from "./turns/engine";
 import { answerQuestion, answerSchema, QuestionError } from "./turns/questions";
 import {
 	agentView,
@@ -75,6 +84,8 @@ import {
 
 const RECENT_MESSAGES = 200;
 const TITLE_MAX = 60;
+/** As many Devs from the directory as a group holds. */
+const MAX_ADDED_PER_GROUP = 5;
 const TEXT_MAX = 10_000;
 const FILE_LINK_SECONDS = 60 * 60;
 
@@ -1342,6 +1353,213 @@ export const chatsRouter = {
 			} satisfies CreatedChat;
 		}),
 
+	/** The directory of ready-made Devs. */
+	registry: personProcedure.query(() => ({
+		listings: allListings().map(listingCard),
+	})),
+
+	/** One listing's page. */
+	registryListing: personProcedure
+		.input(z.object({ slug: z.string().min(1).max(100) }))
+		.query(({ input }) => {
+			const listing = findListing(input.slug);
+			if (!listing) throw notFound("No such Dev in the directory");
+			return { listing: listingDetail(listing) };
+		}),
+
+	/**
+	 * Gets a Dev from the directory: one of the person's own, with its 1:1, or
+	 * one added to a group they are in, owned by the group. A person has at
+	 * most one of each listing, and a group at most five added Devs, one of
+	 * each.
+	 */
+	installListing: personProcedure
+		.input(
+			organizationInput.extend({
+				slug: z.string().min(1).max(100),
+				target: z.union([
+					z.object({ kind: z.literal("you") }),
+					z.object({ kind: z.literal("group"), groupId: z.string().uuid() }),
+				]),
+				name: z.string().trim().min(1).max(TITLE_MAX).optional(),
+				paradevAccess: z.boolean().optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const user = ctx.session.user;
+			await assertOrgMember(user.id, input.organizationId);
+			const listing = findListing(input.slug);
+			if (!listing) throw notFound("No such Dev in the directory");
+			if (!listing.for.includes(input.target.kind)) {
+				throw invalid(
+					input.target.kind === "group"
+						? `${listing.name} can't be added to a group`
+						: `${listing.name} is for groups`,
+				);
+			}
+			const [person] = await db
+				.select()
+				.from(users)
+				.where(eq(users.id, user.id));
+			const byName = toUser(person ?? user).displayName;
+			const name = input.name ?? listing.name;
+			const fields = {
+				organizationId: input.organizationId,
+				name,
+				color: listing.color,
+				description: listing.summary,
+				listingSlug: listing.slug,
+				listingVersion: listing.version,
+			};
+			const seeds = Object.entries(listingSeeds(listing));
+			const runtime = chatsTurnRuntime();
+			const hello = (agentId: string, groupId: string, title: string | null) =>
+				runtime
+					? enqueueInstalledTurn(runtime, {
+							agentId,
+							groupId,
+							userId: user.id,
+							byName,
+							devName: name,
+							listingName: listing.name,
+							example: listing.examples[0],
+							groupTitle: title,
+						}).catch((error: unknown) => {
+							console.error(
+								"[chats] a new Dev's first turn didn't start:",
+								error,
+							);
+							return null;
+						})
+					: null;
+
+			if (input.target.kind === "you") {
+				const created = await dbWs.transaction(async (tx) => {
+					await tx
+						.select({ id: users.id })
+						.from(users)
+						.where(eq(users.id, user.id))
+						.for("update");
+					const [twin] = await tx
+						.select({ id: chatsAgents.id })
+						.from(chatsAgents)
+						.where(
+							and(
+								eq(chatsAgents.organizationId, input.organizationId),
+								eq(chatsAgents.ownerUserId, user.id),
+								eq(chatsAgents.listingSlug, listing.slug),
+							),
+						);
+					if (twin) return null;
+					const [agent] = await tx
+						.insert(chatsAgents)
+						.values({
+							...fields,
+							kind: "custom",
+							ownerUserId: user.id,
+							paradevAccess: input.paradevAccess === true,
+						})
+						.returning();
+					if (!agent) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+					if (seeds.length > 0) {
+						await tx.insert(chatsAgentSeedFiles).values(
+							seeds.map(([path, content]) => ({
+								agentId: agent.id,
+								path,
+								content,
+							})),
+						);
+					}
+					const direct = await newDirectGroup(tx, {
+						organizationId: input.organizationId,
+						userId: user.id,
+						agentId: agent.id,
+						title: agent.name,
+					});
+					return { agent, ...direct };
+				});
+				if (!created) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: `You already have ${listing.name}`,
+					});
+				}
+				publishChats(chatsUserChannel(user.id), { type: "groups.changed" });
+				return {
+					dev: agentView(created.agent, { owner: true }),
+					group: await loadGroup(created.groupId),
+					groupDev: toGroupAgent(created.link),
+					firstTurnId: await hello(created.agent.id, created.groupId, null),
+				};
+			}
+
+			const groupId = input.target.groupId;
+			await assertMember(user.id, groupId);
+			const added = await dbWs.transaction(async (tx) => {
+				const [group] = await tx
+					.select()
+					.from(chatsGroups)
+					.where(eq(chatsGroups.id, groupId))
+					.for("update");
+				if (group?.kind !== "group") {
+					throw invalid("Devs can only be added to groups");
+				}
+				const present = await tx
+					.select({ slug: chatsAgents.listingSlug })
+					.from(chatsAgents)
+					.where(
+						and(
+							eq(chatsAgents.groupId, groupId),
+							eq(chatsAgents.kind, "added"),
+						),
+					);
+				if (present.some((agent) => agent.slug === listing.slug)) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: `${listing.name} is already in this group`,
+					});
+				}
+				if (present.length >= MAX_ADDED_PER_GROUP) {
+					throw new TRPCError({
+						code: "CONFLICT",
+						message: `A group has at most ${MAX_ADDED_PER_GROUP} added Devs`,
+					});
+				}
+				const [agent] = await tx
+					.insert(chatsAgents)
+					.values({ ...fields, kind: "added", groupId })
+					.returning();
+				if (!agent) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				if (seeds.length > 0) {
+					await tx.insert(chatsAgentSeedFiles).values(
+						seeds.map(([path, content]) => ({
+							agentId: agent.id,
+							path,
+							content,
+						})),
+					);
+				}
+				const [link] = await tx
+					.insert(chatsGroupAgents)
+					.values({ groupId, agentId: agent.id, addedBy: user.id })
+					.returning();
+				if (!link) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+				return { agent, link, title: group.title };
+			});
+			const payload = {
+				groupDev: toGroupAgent(added.link),
+				dev: agentView(added.agent, { owner: false }),
+			};
+			publishChats(chatsGroupChannel(groupId), {
+				type: "group_dev.added",
+				...payload,
+			});
+			return {
+				...payload,
+				firstTurnId: await hello(added.agent.id, groupId, added.title),
+			};
+		}),
+
 	updateDev: personProcedure
 		.input(
 			z.object({
@@ -1506,6 +1724,32 @@ export const chatsRouter = {
 			if (!agent) throw notFound("Dev not found");
 			if (agent.kind === "group" && agent.groupId === input.groupId) {
 				throw invalid("A group's own Dev always stays in it");
+			}
+			if (agent.kind === "added" && agent.groupId === input.groupId) {
+				const [[link], role] = await Promise.all([
+					db
+						.select({ addedBy: chatsGroupAgents.addedBy })
+						.from(chatsGroupAgents)
+						.where(
+							and(
+								eq(chatsGroupAgents.groupId, input.groupId),
+								eq(chatsGroupAgents.agentId, input.devId),
+							),
+						),
+					assertMember(userId, input.groupId),
+				]);
+				if (link?.addedBy !== userId && role !== "owner") {
+					throw forbidden(
+						"Only whoever added it or the group's owner can remove it",
+					);
+				}
+				await db.delete(chatsAgents).where(eq(chatsAgents.id, input.devId));
+				publishChats(chatsGroupChannel(input.groupId), {
+					type: "group_dev.removed",
+					groupId: input.groupId,
+					devId: input.devId,
+				});
+				return { groupId: input.groupId, devId: input.devId };
 			}
 			if (agent.ownerUserId !== userId) {
 				throw forbidden("You can only add or remove your own Devs");
