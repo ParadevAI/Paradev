@@ -525,6 +525,27 @@ async function checksReply(turn: TurnRow): Promise<boolean> {
 	return resolveMentions(message.text, mentionable).ids.includes(turn.agentId);
 }
 
+/**
+ * Whether the turn is in a 1:1 between a Dev and its owner. Never a group
+ * turn, and never a group's Dev, which has no owner.
+ */
+async function isOwnerOneToOne(turn: TurnRow): Promise<boolean> {
+	if (turn.parentTurnId) return false;
+	const [row] = await db
+		.select({ kind: chatsGroups.kind })
+		.from(chatsAgents)
+		.innerJoin(
+			chatsGroupMembers,
+			and(
+				eq(chatsGroupMembers.groupId, turn.groupId),
+				eq(chatsGroupMembers.userId, chatsAgents.ownerUserId),
+			),
+		)
+		.innerJoin(chatsGroups, eq(chatsGroups.id, turn.groupId))
+		.where(eq(chatsAgents.id, turn.agentId));
+	return row?.kind === "direct";
+}
+
 /** The Dev has been given the chat up to now: it has seen it. */
 async function markAgentRead(agentId: string, groupId: string) {
 	const [latest] = await db
@@ -689,6 +710,7 @@ export async function startTurn(
 			sessionId: turn.groupId,
 			text: prompt.text,
 			checkReply: await checksReply(turn),
+			ownerOneToOne: await isOwnerOneToOne(turn),
 			chat: await turnChat(turn),
 		});
 		await markAgentRead(turn.agentId, turn.groupId).catch((error: unknown) =>

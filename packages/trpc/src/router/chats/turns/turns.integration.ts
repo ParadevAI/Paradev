@@ -154,6 +154,7 @@ test("a 1:1's Dev answers every message, and the chat hears each step", async ()
 	const turn = await startedTurn(1);
 	expect(turn.text.split("\n").at(-1)).toBe("hello");
 	expect(turn.checkReply).toBe(true);
+	expect(turn.ownerOneToOne).toBe(true);
 	await reply(turn, "hi there");
 	await runs.idle();
 	expect(await thread(group.id)).toEqual(["person: hello", "dev: hi there"]);
@@ -198,6 +199,7 @@ test("in a group only a mention of its own Dev, or a follow-up, wakes it", async
 	});
 	const turn = await startedTurn(1);
 	expect(turn.agentId).toBe(created.dev.id);
+	expect(turn.ownerOneToOne).toBe(false);
 	await reply(turn, "two things");
 	await runs.idle();
 

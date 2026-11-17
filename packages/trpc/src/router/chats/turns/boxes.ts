@@ -30,6 +30,11 @@ export interface TurnStart {
 	text: string;
 	/** Ask the Dev once, when it ends with words but no reply, whether they were meant for the chat. */
 	checkReply: boolean;
+	/**
+	 * The turn is in the owner's 1:1 with their own Dev: the only chat where
+	 * the box loads what the Dev keeps privately about its owner.
+	 */
+	ownerOneToOne: boolean;
 	/** The chat around the turn: its latest messages, oldest first, and who is in it. */
 	chat: {
 		recent: { line: string; seen: boolean }[];
