@@ -10,6 +10,7 @@ export function rewatchRecreatedDirectories(
 	watcher: FSWatcher,
 	directories: Set<string>,
 	settleMs: number,
+	areDirectories = areDirectoriesOnDisk,
 ) {
 	const pending = new Set<string>();
 	let timer: ReturnType<typeof setTimeout> | undefined;
@@ -56,7 +57,10 @@ export function rewatchRecreatedDirectories(
 		const descendantsExist = await areDirectories(descendants);
 		if (disposed) return;
 
-		watcher.unwatch([...resets, ...descendants]);
+		// An unwatched path stays ignored until it is added again, so leave out
+		// one that chokidar dropped meanwhile: nothing would queue it again.
+		const tracked = descendants.filter((dir) => directories.has(dir));
+		watcher.unwatch([...resets, ...tracked]);
 		const existing = descendants.filter((_, index) => descendantsExist[index]);
 		for (const dir of [...resets, ...adds, ...existing].sort()) {
 			watcher.add(dir, undefined, true);
@@ -81,7 +85,7 @@ export function rewatchRecreatedDirectories(
 	};
 }
 
-async function areDirectories(paths: string[]): Promise<boolean[]> {
+async function areDirectoriesOnDisk(paths: string[]): Promise<boolean[]> {
 	const stats = await Promise.all(
 		paths.map((dir) => lstat(dir).catch(() => undefined)),
 	);
