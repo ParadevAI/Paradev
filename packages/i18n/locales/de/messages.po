@@ -2822,9 +2822,6 @@ msgstr "ein anderes Gerät"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantworte Fragen im Terminal unten, zum Beispiel nach einem Passwort."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Beantworte diese Frage am Desktop oder überspringe sie."
-
 msgid "Answered"
 msgstr "Beantwortet"
 

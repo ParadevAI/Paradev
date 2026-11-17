@@ -1,14 +1,11 @@
-import { userMessageText } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	Decision,
 	FormField,
 	UserContent,
-} from "@superset/chat/protocol";
-import {
-	isInvalidNumber,
-	questionPages,
-} from "../../../../utils/questionPages";
+} from "../../protocol";
+import { isInvalidNumber, questionPages } from "../questionPages/questionPages";
+import { userMessageText } from "../transcript/transcript";
 
 const YES = /^(yes|y|true)$/i;
 const NO = /^(no|n|false)$/i;

@@ -2822,9 +2822,6 @@ msgstr "別のデバイス"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "パスワードなど、下のターミナルでの質問に答えてください。"
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "この質問はデスクトップで回答するか、スキップしてください。"
-
 msgid "Answered"
 msgstr "回答済み"
 

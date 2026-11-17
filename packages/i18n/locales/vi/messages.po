@@ -2822,9 +2822,6 @@ msgstr "thiết bị khác"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Trả lời các câu hỏi trong terminal bên dưới, chẳng hạn mật khẩu."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Trả lời câu hỏi này trên máy tính, hoặc bỏ qua."
-
 msgid "Answered"
 msgstr "Đã trả lời"
 
