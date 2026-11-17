@@ -12,6 +12,7 @@ import { SolarCheckCircleIcon } from "../../components/SolarCheckCircleIcon";
 import {
 	isRailDestinationPinned,
 	type RailDestinationId,
+	resolveRailOrder,
 	useRailPinsStore,
 } from "../../stores/railPinsStore";
 
@@ -31,6 +32,7 @@ export function useRailDestinations(): RailDestination[] {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
 	const pinOverrides = useRailPinsStore((state) => state.pinOverrides);
+	const railOrder = resolveRailOrder(useRailPinsStore((state) => state.order));
 	const isChannelsEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	// `?? false`: the hook returns undefined until PostHog flags resolve.
@@ -116,6 +118,7 @@ export function useRailDestinations(): RailDestination[] {
 
 	return destinations
 		.filter(({ isAvailable = true }) => isAvailable)
+		.sort((a, b) => railOrder.indexOf(a.id) - railOrder.indexOf(b.id))
 		.map(({ isAvailable: _isAvailable, ...destination }) => ({
 			...destination,
 			isPinned: isRailDestinationPinned(pinOverrides, destination.id),

@@ -1,3 +1,15 @@
+import {
+	closestCenter,
+	DndContext,
+	PointerSensor,
+	useSensor,
+	useSensors,
+} from "@dnd-kit/core";
+import {
+	arrayMove,
+	SortableContext,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	DropdownMenu,
@@ -11,9 +23,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
-import { cn } from "@superset/ui/utils";
 import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
-import { LuPin } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import {
@@ -22,7 +32,11 @@ import {
 	railButtonClass,
 } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import type { RailDestination } from "../../hooks/useRailDestinations";
-import { useRailPinsStore } from "../../stores/railPinsStore";
+import {
+	type RailDestinationId,
+	useRailPinsStore,
+} from "../../stores/railPinsStore";
+import { SortableDestinationRow } from "./components/SortableDestinationRow";
 
 interface RailMoreMenuProps {
 	destinations: RailDestination[];
@@ -32,6 +46,10 @@ interface RailMoreMenuProps {
 export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 	const { t } = useLingui();
 	const setPinned = useRailPinsStore((state) => state.setPinned);
+	const setVisibleOrder = useRailPinsStore((state) => state.setVisibleOrder);
+	const sensors = useSensors(
+		useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+	);
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 	const offRailBadge = destinations.find(
@@ -64,56 +82,36 @@ export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 				align="start"
 				onCloseAutoFocus={(event) => event.preventDefault()}
 			>
-				{destinations.map(
-					({
-						id,
-						label,
-						icon: Icon,
-						isIconFilled,
-						isActive,
-						isPinned,
-						onClick,
-					}) => {
-						const pinLabel = isPinned
-							? t({ message: "Unpin" })
-							: t({ message: "Pin" });
-						return (
-							<div key={id} className="flex items-center gap-1">
-								<DropdownMenuItem
-									onSelect={onClick}
-									aria-current={isActive ? "page" : undefined}
-									className={cn("flex-1", isActive && "bg-fill-selected")}
-								>
-									<Icon
-										className="size-4"
-										{...(isIconFilled
-											? {}
-											: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
-									/>
-									{label}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									aria-label={pinLabel}
-									title={pinLabel}
-									onSelect={(event) => {
-										event.preventDefault();
-										setPinned(id, !isPinned);
-									}}
-									className="size-7 justify-center p-0"
-								>
-									<LuPin
-										className={cn(
-											"size-3.5",
-											isPinned
-												? "fill-current text-foreground"
-												: "text-muted-foreground/50",
-										)}
-									/>
-								</DropdownMenuItem>
-							</div>
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={({ active, over }) => {
+						if (!over || active.id === over.id) return;
+						const ids = destinations.map(({ id }) => id);
+						setVisibleOrder(
+							arrayMove(
+								ids,
+								ids.indexOf(active.id as RailDestinationId),
+								ids.indexOf(over.id as RailDestinationId),
+							),
 						);
-					},
-				)}
+					}}
+				>
+					<SortableContext
+						items={destinations.map(({ id }) => id)}
+						strategy={verticalListSortingStrategy}
+					>
+						{destinations.map((destination) => (
+							<SortableDestinationRow
+								key={destination.id}
+								destination={destination}
+								onTogglePinned={() =>
+									setPinned(destination.id, !destination.isPinned)
+								}
+							/>
+						))}
+					</SortableContext>
+				</DndContext>
 				{isUsageInSidebarEnabled && (
 					<DropdownMenuItem onSelect={onOpenUsage}>
 						<Gauge className="size-4" />

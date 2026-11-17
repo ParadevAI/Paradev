@@ -35,9 +35,35 @@ export function withRailPin(
 		: { ...rest, [id]: isPinned };
 }
 
+const DEFAULT_RAIL_ORDER = Object.keys(
+	DEFAULT_RAIL_PINS,
+) as RailDestinationId[];
+
+export function resolveRailOrder(
+	savedOrder: readonly RailDestinationId[],
+): RailDestinationId[] {
+	const saved = savedOrder.filter((id) => id in DEFAULT_RAIL_PINS);
+	return [...saved, ...DEFAULT_RAIL_ORDER.filter((id) => !saved.includes(id))];
+}
+
+export function withRailOrder(
+	savedOrder: readonly RailDestinationId[],
+	visibleOrder: readonly RailDestinationId[],
+): RailDestinationId[] {
+	const queue = [...visibleOrder];
+	const next = resolveRailOrder(savedOrder).map((id) =>
+		visibleOrder.includes(id) ? (queue.shift() ?? id) : id,
+	);
+	return next.every((id, index) => id === DEFAULT_RAIL_ORDER[index])
+		? []
+		: next;
+}
+
 interface RailPinsState {
 	pinOverrides: RailPinOverrides;
+	order: RailDestinationId[];
 	setPinned: (id: RailDestinationId, isPinned: boolean) => void;
+	setVisibleOrder: (visibleOrder: RailDestinationId[]) => void;
 }
 
 /** A fixed-size singleton per profile. */
@@ -45,10 +71,13 @@ export const useRailPinsStore = create<RailPinsState>()(
 	persist(
 		(set) => ({
 			pinOverrides: {},
+			order: [],
 			setPinned: (id, isPinned) =>
 				set((state) => ({
 					pinOverrides: withRailPin(state.pinOverrides, id, isPinned),
 				})),
+			setVisibleOrder: (visibleOrder) =>
+				set((state) => ({ order: withRailOrder(state.order, visibleOrder) })),
 		}),
 		{ name: RAIL_PINS_STORAGE_KEY, version: 1 },
 	),

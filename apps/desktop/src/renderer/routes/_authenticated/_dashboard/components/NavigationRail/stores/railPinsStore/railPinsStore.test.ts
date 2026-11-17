@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { isRailDestinationPinned, withRailPin } from "./railPinsStore";
+import {
+	isRailDestinationPinned,
+	resolveRailOrder,
+	withRailOrder,
+	withRailPin,
+} from "./railPinsStore";
 
 describe("isRailDestinationPinned", () => {
 	test("uses the default until the user overrides it", () => {
@@ -19,5 +24,29 @@ describe("withRailPin", () => {
 		const unpinned = withRailPin({}, "tasks", false);
 		expect(unpinned).toEqual({ tasks: false });
 		expect(withRailPin(unpinned, "tasks", true)).toEqual({});
+	});
+});
+
+describe("withRailOrder", () => {
+	test("reorders the visible sections and leaves hidden ones in their slot", () => {
+		const order = withRailOrder(
+			[],
+			["tasks", "workspaces", "pages", "automations", "pullRequests"],
+		);
+		expect(order).toEqual([
+			"tasks",
+			"chat",
+			"workspaces",
+			"plugins",
+			"pages",
+			"automations",
+			"pullRequests",
+		]);
+	});
+
+	test("stores nothing when the order is the default again", () => {
+		const moved = withRailOrder([], ["chat", "workspaces"]);
+		expect(resolveRailOrder(moved).slice(0, 2)).toEqual(["chat", "workspaces"]);
+		expect(withRailOrder(moved, ["workspaces", "chat"])).toEqual([]);
 	});
 });

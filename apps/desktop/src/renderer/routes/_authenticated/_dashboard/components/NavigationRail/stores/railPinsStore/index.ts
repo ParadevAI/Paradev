@@ -4,6 +4,8 @@ export {
 	RAIL_PINS_STORAGE_KEY,
 	type RailDestinationId,
 	type RailPinOverrides,
+	resolveRailOrder,
 	useRailPinsStore,
+	withRailOrder,
 	withRailPin,
 } from "./railPinsStore";
