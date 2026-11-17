@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
@@ -19,6 +21,8 @@ import {
 import { extractCompareToc, getComparisonPages } from "@/lib/compare";
 import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
+	compareSearchDescription,
+	compareSearchTitle,
 	extractComparisonFaqItems,
 	extractRoundupItems,
 	getComparisonPageTypeLabel,
@@ -135,10 +139,26 @@ export async function generateMetadata({
 	}
 
 	const url = localeUrl(lang, `/compare/${slug}`);
+	const productName = BRAND.NAME;
+	const formerName = BRAND.FORMER_NAME;
+	const translatedIntroName =
+		contentLocale === "en"
+			? undefined
+			: getI18nInstance(lang)._(
+					msg({ message: `${productName} (formerly ${formerName})` }),
+				);
 
 	return {
-		title: page.title,
-		description: page.description,
+		title: {
+			absolute: compareSearchTitle(
+				page.title,
+				translatedIntroName ? [translatedIntroName] : undefined,
+			),
+		},
+		description: compareSearchDescription(
+			page.description,
+			translatedIntroName,
+		),
 		...(page.keywords.length > 0 && { keywords: page.keywords }),
 		alternates: localizedAlternates(lang, `/compare/${slug}`),
 		openGraph: {
