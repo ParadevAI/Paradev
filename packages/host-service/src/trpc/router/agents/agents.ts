@@ -28,6 +28,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
@@ -398,7 +399,7 @@ export function validateAgentLaunchOptions(
 export function buildTerminalAgentLaunch(
 	db: HostDb,
 	input: AgentRunInput,
-): { fullCommand: string; label: string } {
+): { fullCommand: string; label: string; config: ResolvedHostAgentConfig } {
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
 		// Worded for end users (automation run errors show this verbatim), but
@@ -473,6 +474,7 @@ export function buildTerminalAgentLaunch(
 	return {
 		fullCommand: `${envOverlayPrefix({ ...agentLaunchEnv(db, config), ...modelEnv })}${command}`,
 		label: config.label,
+		config,
 	};
 }
 
@@ -505,12 +507,38 @@ export function bindResumedSession(
 	});
 }
 
+export function trackTerminalAgentLaunched(
+	ctx: Pick<HostServiceContext, "api" | "db">,
+	config: ResolvedHostAgentConfig,
+	input: Pick<AgentRunInput, "workspaceId" | "resumeSessionId">,
+): void {
+	try {
+		trackAgentLaunched(ctx.api, {
+			presetId: config.presetId,
+			command: config.command,
+			executable: config.command,
+			env: agentLaunchEnv(ctx.db, config),
+			kind: "terminal",
+			resumed: Boolean(input.resumeSessionId),
+			workspaceId: input.workspaceId,
+		});
+	} catch (error) {
+		console.warn("[agent-launch] could not report the terminal launch", error);
+	}
+}
+
 async function runTerminalAgent(
-	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
+	ctx: Pick<
+		HostServiceContext,
+		"api" | "db" | "eventBus" | "terminalAgentStore"
+	>,
 	input: AgentRunInput,
 	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
-	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
+	const { fullCommand, label, config } = buildTerminalAgentLaunch(
+		ctx.db,
+		input,
+	);
 
 	const result = await createTerminalSessionInternal({
 		terminalId,
@@ -526,6 +554,7 @@ async function runTerminalAgent(
 	}
 
 	bindResumedSession(ctx, input, result.terminalId);
+	trackTerminalAgentLaunched(ctx, config, input);
 
 	return {
 		kind: "terminal",

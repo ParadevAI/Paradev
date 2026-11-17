@@ -45,14 +45,27 @@ describe("superset-boot", () => {
 		expect(memguard).toMatch(/swapoff "\$f"/);
 	});
 
-	test("links the drive's agents after the steps, before host-service starts", () => {
-		const steps = boot.indexOf('"$BUNDLE/setup" run-steps');
+	test("starts host-service after only the before-host steps; the rest run detached after it", () => {
+		const hostSteps = boot.indexOf('"$BUNDLE/setup" run-steps before-host');
 		const link = boot.indexOf("\nlink_agents\n");
 		const host = boot.indexOf("\nstart_host_service\n");
-		expect(steps).toBeGreaterThan(0);
-		expect(link).toBeGreaterThan(steps);
+		const assets = boot.indexOf('"$BUNDLE/setup" sync-assets');
+		const rest = boot.indexOf('"$BUNDLE/setup" run-steps after-host');
+		const desktop = boot.indexOf("/usr/local/bin/superset-desktop-init");
+		expect(hostSteps).toBeGreaterThan(0);
+		expect(link).toBeGreaterThan(hostSteps);
 		expect(host).toBeGreaterThan(link);
+		expect(assets).toBeGreaterThan(host);
+		expect(rest).toBeGreaterThan(assets);
+		expect(desktop).toBeGreaterThan(rest);
 		expect(boot).toMatch(/stamp "agents\.unavailable/);
+	});
+
+	test("marks the checkout ready only once the remaining steps are done", () => {
+		const rest = boot.indexOf('"$BUNDLE/setup" run-steps after-host');
+		const ready = boot.indexOf('/checkout.ready" && start_hook');
+		expect(ready).toBeGreaterThan(rest);
+		expect(boot.slice(rest, ready)).toMatch(/wait "\$checkout_pid"/);
 	});
 
 	test("writes the cgroup's memory ceiling and CPU count for login shells", () => {

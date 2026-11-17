@@ -5031,6 +5031,10 @@ msgstr "Porovnat tarify"
 msgid "Compared against the default style"
 msgstr "Porovnáno s výchozím stylem"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Srovnání"
+
 msgid "complete"
 msgstr "dokončeno"
 
@@ -16010,6 +16014,9 @@ msgstr "se znovu připojil(a) ke kanálu {channel}, stejně jako {others}."
 msgid "rejoined {channel}."
 msgstr "se znovu připojil(a) ke kanálu {channel}."
 
+msgid "Related comparisons"
+msgstr "Související srovnání"
+
 msgid "Related Posts"
 msgstr "Související články"
 
@@ -16901,6 +16908,10 @@ msgstr "Otočit"
 
 msgid "Rotate device"
 msgstr "Otočit zařízení"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Přehled"
 
 msgid "Roundups"
 msgstr "Přehledy"
@@ -21102,6 +21113,10 @@ msgstr "udělej z poznatků o onboardingu stránku"
 
 msgid "Turned off because its files changed"
 msgstr "Vypnuto, protože se změnily jeho soubory"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Návod"
 
 msgid "Two Hands"
 msgstr "Obě ruce"

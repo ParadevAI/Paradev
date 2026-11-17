@@ -5031,6 +5031,10 @@ msgstr "方案对比"
 msgid "Compared against the default style"
 msgstr "与默认样式做了对比"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "对比"
+
 msgid "complete"
 msgstr "已结束"
 
@@ -16010,6 +16014,9 @@ msgstr "与 {others} 一起重新加入了 {channel}。"
 msgid "rejoined {channel}."
 msgstr "已重新加入 {channel}。"
 
+msgid "Related comparisons"
+msgstr "相关对比"
+
 msgid "Related Posts"
 msgstr "相关文章"
 
@@ -16901,6 +16908,10 @@ msgstr "旋转"
 
 msgid "Rotate device"
 msgstr "旋转设备"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "汇总"
 
 msgid "Roundups"
 msgstr "综合评测"
@@ -21102,6 +21113,10 @@ msgstr "把新手引导的调研结果做成页面"
 
 msgid "Turned off because its files changed"
 msgstr "已关闭，因为其文件已更改"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "教程"
 
 msgid "Two Hands"
 msgstr "双手齐开"

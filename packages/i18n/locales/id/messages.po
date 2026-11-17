@@ -5031,6 +5031,10 @@ msgstr "Bandingkan paket"
 msgid "Compared against the default style"
 msgstr "Dibandingkan dengan gaya bawaan"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Perbandingan"
+
 msgid "complete"
 msgstr "selesai"
 
@@ -16010,6 +16014,9 @@ msgstr "bergabung kembali dengan {channel}, bersama {others}."
 msgid "rejoined {channel}."
 msgstr "bergabung kembali dengan {channel}."
 
+msgid "Related comparisons"
+msgstr "Perbandingan terkait"
+
 msgid "Related Posts"
 msgstr "Tulisan Terkait"
 
@@ -16901,6 +16908,10 @@ msgstr "Putar"
 
 msgid "Rotate device"
 msgstr "Putar perangkat"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Rangkuman"
 
 msgid "Roundups"
 msgstr "Rangkuman"
@@ -21102,6 +21113,10 @@ msgstr "ubah temuan onboarding menjadi halaman"
 
 msgid "Turned off because its files changed"
 msgstr "Dimatikan karena file-nya berubah"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
 
 msgid "Two Hands"
 msgstr "Dua tangan"

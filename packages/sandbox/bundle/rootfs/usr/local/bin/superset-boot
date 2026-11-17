@@ -7,11 +7,12 @@
 #   clear /run/superset            facts about a boot that is over
 #   read the contract and identity /etc/superset/{contract.sh,sandbox.conf}
 #   install the pinned bundle      only when its hash differs from current
-#   apply-rootfs, sync-assets,     each a hash compare per file, asset, step
-#   run-steps
+#   apply-rootfs, and the steps    each a hash compare per file and step;
+#   marked beforeHost              the only steps host-service waits for
 #   link the drive's agents        only when the control plane mounted one
 #   start host-service as ubuntu   first; everything else is a side effect
-#   start the desktop and the checkout, detached
+#   then, detached: sync-assets and the other steps, then the desktop;
+#   the checkout beside them; checkout.ready and the start hook after both
 #
 # Every phase is stamped to the boot log in milliseconds; host-service serves
 # the log on its health route so a boot is measurable from outside.
@@ -101,8 +102,8 @@ BOOT_HASH_BEFORE="$(self_hash)"
 ensure_bundle || true
 BUNDLE="${SUPERSET_BUNDLE_ROOT}/current"
 
-# --- the three passes. Steps are fail-open; a broken desktop step degrades
-# the desktop, never the workspace.
+# --- the passes host-service needs. Steps are fail-open; a broken desktop
+# step degrades the desktop, never the workspace.
 stamp "rootfs.start"; "$BUNDLE/setup" apply-rootfs >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "rootfs.end"
 # apply-rootfs may have replaced the contract; re-read it.
 . /etc/superset/contract.sh
@@ -115,8 +116,7 @@ if [ -z "${SUPERSET_BOOT_REEXEC:-}" ] && [ "$(self_hash)" != "$BOOT_HASH_BEFORE"
 	stamp "boot.reexec into the installed bundle's script"
 	SUPERSET_BOOT_REEXEC=1 exec "$0" "$@"
 fi
-stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
-stamp "steps.start"; "$BUNDLE/setup" run-steps >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
+stamp "steps.host.start"; "$BUNDLE/setup" run-steps before-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.host.end"
 
 # --- the agent CLIs from the region's agent-tools drive, when the control
 # plane mounted one. Without it the image's agents stay on PATH. Mounts are
@@ -124,9 +124,11 @@ stamp "steps.start"; "$BUNDLE/setup" run-steps >> "$SUPERSET_BOOT_LOG" 2>&1; sta
 link_agents() {
 	local dir="${SUPERSET_AGENTS_DIR:-/opt/agents}" linked=0 name sha bin target
 	local manifest="${dir}/manifest.json"
-	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print | grep -q .; then
+	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print -quit | grep -q .; then
 		SUPERSET_BUNDLE_DIR="$BUNDLE" bash "$BUNDLE/steps/install-agent-clis.sh" >> "$SUPERSET_BOOT_LOG" 2>&1 ||
 			stamp "agents.restore.failed"
+		# What is still dangling has no image copy to restore: opencode, pi.
+		find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -delete
 	fi
 	if ! jq -e 'type == "array"' "$manifest" > /dev/null 2>&1; then
 		stamp "agents.unavailable no manifest at ${dir}"
@@ -143,6 +145,7 @@ link_agents() {
 	done < <(jq -r '.[] | [.name, .sha, .bin] | map(tostring) | @tsv' "$manifest")
 	stamp "agents.linked ${linked} from ${dir}"
 }
+drive_links() { find /usr/local/bin -maxdepth 1 -lname "${SUPERSET_AGENTS_DIR:-/opt/agents}/*" -printf '%f %l\n' | sort; }
 link_agents
 
 # --- host-service, as the sandbox user, first. A runtime that cannot start
@@ -237,12 +240,6 @@ fi
 # The fixed swapfile of an earlier bundle; memguard adds swap on demand now.
 [ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
 
-# --- the desktop and the checkout: side effects of being up.
-as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \
-	"SUPERSET_SANDBOX_WORKSPACE_ID=${SUPERSET_SANDBOX_WORKSPACE_ID}" \
-	/usr/local/bin/superset-desktop-init >> "${SUPERSET_LOG_DIR}/desktop.log" 2>&1 &
-stamp "desktop.start"
-
 # The repository's start hook: the services a workspace needs every boot.
 # host-service runs it, because the environment the hook needs is pushed
 # into host-service after boot and never leaves it; this runner decides
@@ -318,11 +315,31 @@ checkout() {
 	done < <(printf '%s' "$SUPERSET_SANDBOX_REPOSITORIES" | jq -r '.[] | [.url, .branch, .path, (.baseBranch // "")] | @tsv')
 	return "$failed"
 }
+
+# --- the rest of the passes, then the desktop, beside the checkout.
+# checkout.ready waits for the steps too: the first agent launch, the start
+# hook and the golden build wait for it. The lock makes a boot after
+# host-service died in this session wait for this boot's steps.
 (
-	stamp "checkout.start"
-	checkout && touch "${SUPERSET_RUN_DIR}/checkout.ready"
-	stamp "checkout.end"
-	[ -f "${SUPERSET_RUN_DIR}/checkout.ready" ] && start_hook
+	(
+		stamp "checkout.start"
+		checkout; status=$?
+		stamp "checkout.end"
+		exit "$status"
+	) &
+	checkout_pid=$!
+	exec 8> /run/superset-steps.lock
+	flock 8
+	links_before="$(drive_links)"
+	stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
+	stamp "steps.start"; "$BUNDLE/setup" run-steps after-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
+	[ "$(drive_links)" = "$links_before" ] || link_agents
+	exec 8>&-
+	as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \
+		"SUPERSET_SANDBOX_WORKSPACE_ID=${SUPERSET_SANDBOX_WORKSPACE_ID}" \
+		/usr/local/bin/superset-desktop-init >> "${SUPERSET_LOG_DIR}/desktop.log" 2>&1 &
+	stamp "desktop.start"
+	wait "$checkout_pid" && touch "${SUPERSET_RUN_DIR}/checkout.ready" && start_hook
 ) &
 
 stamp "boot.done"

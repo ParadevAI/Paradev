@@ -20,16 +20,6 @@ import {
 import { FOLDED_FILE_COUNT, MAX_UNFOLDED_FILES } from "./constants";
 import { type CardFile, cardFiles } from "./utils/cardFiles";
 
-function statWidthFor(files: readonly CardFile[]): string {
-	const longest = Math.max(
-		0,
-		...files.flatMap((file) =>
-			file.stats ? [file.stats.additions, file.stats.deletions] : [],
-		),
-	);
-	return `${String(longest).length + 2}ch`;
-}
-
 /**
  * What a settled turn changed, under its answer: a one-line count and total,
  * Review for the turn's files in the diff pane, and a row per file. Worktree
@@ -108,7 +98,6 @@ export function TurnChangesCard({
 		}),
 		{ additions: 0, deletions: 0 },
 	);
-	const statWidth = statWidthFor([...files, ...others]);
 	const fileCount = files.length;
 	const folded = fileCount > MAX_UNFOLDED_FILES && !expanded;
 	const shown = folded ? files.slice(0, FOLDED_FILE_COUNT) : files;
@@ -164,7 +153,6 @@ export function TurnChangesCard({
 				}
 				place={file.place}
 				stats={file.stats}
-				statWidth={statWidth}
 			/>
 		);
 	};

@@ -227,15 +227,30 @@ function canonConfig(c: Record<string, unknown>): Record<string, unknown> {
 	}
 	return out;
 }
+function sortKeys(v: unknown): unknown {
+	if (Array.isArray(v)) return v.map(sortKeys);
+	if (v === null || typeof v !== "object") return v;
+	return Object.fromEntries(
+		Object.entries(v)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([k, x]) => [k, sortKeys(x)]),
+	);
+}
 function canonGraph(steps: Step[], connections: Connection[]): string {
-	return JSON.stringify({
-		steps: steps
-			.map((s) => ({ key: s.key, type: s.type, config: canonConfig(s.config) }))
-			.sort((a, b) => a.key.localeCompare(b.key)),
-		connections: [...connections].sort((a, b) =>
-			`${a.from}>${a.to}`.localeCompare(`${b.from}>${b.to}`),
-		),
-	});
+	return JSON.stringify(
+		sortKeys({
+			steps: steps
+				.map((s) => ({
+					key: s.key,
+					type: s.type,
+					config: canonConfig(s.config),
+				}))
+				.sort((a, b) => a.key.localeCompare(b.key)),
+			connections: [...connections].sort((a, b) =>
+				`${a.from}>${a.to}`.localeCompare(`${b.from}>${b.to}`),
+			),
+		}),
+	);
 }
 
 const listed = await resend.automations.list({ limit: 100 });

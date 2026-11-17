@@ -41,6 +41,7 @@ import {
 } from "../../index";
 import {
 	buildTerminalAgentLaunch,
+	trackTerminalAgentLaunched,
 	validateAgentLaunchOptions,
 } from "../agents";
 import {
@@ -1310,7 +1311,7 @@ export const workspacesRouter = router({
 			// command up-front; if it fails (unknown agent, missing attachment) fall
 			// back to the parallel dispatch, which surfaces the error in the agents
 			// result.
-			let chainAgent: { fullCommand: string; label: string } | null = null;
+			let chainAgent: ReturnType<typeof buildTerminalAgentLaunch> | null = null;
 			const soleLaunch = sugarLaunches.length === 1 ? sugarLaunches[0] : null;
 			if (
 				!alreadyExists &&
@@ -1373,6 +1374,9 @@ export const workspacesRouter = router({
 						sessionId: terminal.id,
 						label: chainAgent.label,
 					};
+					trackTerminalAgentLaunched(ctx, chainAgent.config, {
+						workspaceId: workspaceRow.id,
+					});
 				}
 			}
 

@@ -133,10 +133,8 @@ if (import.meta.main) {
 		projectId: process.env.VERCEL_SANDBOX_PROJECT_ID ?? "",
 	};
 	const [snapshots, sandboxes] = await Promise.all([
-		Snapshot.list({ ...credentials, limit: 100 }).then((page) =>
-			page.toArray(),
-		),
-		Sandbox.list({ ...credentials, limit: 100 }).then((page) => page.toArray()),
+		Snapshot.list({ ...credentials, limit: 50 }).then((page) => page.toArray()),
+		Sandbox.list({ ...credentials, limit: 50 }).then((page) => page.toArray()),
 	]);
 	const inventory = summarizeInventory(snapshots, sandboxes);
 	console.log(
