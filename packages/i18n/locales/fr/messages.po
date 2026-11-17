@@ -12431,6 +12431,9 @@ msgstr "Nouvel espace de travail ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nouvel espace de travail dans {name}"
 
+msgid "New workspace page"
+msgstr "Nouvelle page d’espace de travail"
+
 msgid "Newer than this app"
 msgstr "Plus récent que cette application"
 
@@ -21693,6 +21696,9 @@ msgstr "Utilisez l'application de bureau pour lancer des agents de code en paral
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Utilisez le menu de la barre d'état Paradev > Service hôte > Redémarrer, puis réessayez."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Utiliser la page « Nouvel espace de travail » repensée : la zone de saisie au centre, avec les sélecteurs de projet et de branche au-dessus."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Utiliser la disposition de fenêtre repensée : une barre d’icônes, des onglets dans la barre de titre et des panneaux sous forme de cartes."

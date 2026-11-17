@@ -12431,6 +12431,9 @@ msgstr "Nový pracovní prostor ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nový pracovní prostor v {name}"
 
+msgid "New workspace page"
+msgstr "Nová stránka pracovního prostoru"
+
 msgid "Newer than this app"
 msgstr "Novější než tato aplikace"
 
@@ -21693,6 +21696,9 @@ msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Použijte nabídku Paradev na liště > Host Service > Restart a zkuste to znovu."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Použít přepracovanou stránku „Nový pracovní prostor“: pole pro zadání uprostřed, nad ním výběr projektu a větve."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Použít přepracované rozvržení okna: lištu ikon, karty v záhlaví okna a panely jako karty."

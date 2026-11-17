@@ -12431,6 +12431,9 @@ msgstr "Новая рабочая область ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Новая рабочая область в {name}"
 
+msgid "New workspace page"
+msgstr "Новая страница рабочей области"
+
 msgid "Newer than this app"
 msgstr "Новее этого приложения"
 
@@ -21693,6 +21696,9 @@ msgstr "Используйте десктопное приложение, что
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Откройте меню Paradev в трее > Host Service > Restart, затем повторите."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Использовать обновлённую страницу «Новая рабочая область»: поле запроса в центре, над ним выбор проекта и ветки."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Использовать обновлённый макет окна: панель значков, вкладки в заголовке окна и панели в виде карточек."

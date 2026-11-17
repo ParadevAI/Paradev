@@ -12431,6 +12431,9 @@ msgstr "Workspace Baru ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
 
+msgid "New workspace page"
+msgstr "Halaman workspace baru"
+
 msgid "Newer than this app"
 msgstr "Lebih baru dari aplikasi ini"
 
@@ -21693,6 +21696,9 @@ msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Pakai menu tray Paradev > Host Service > Restart, lalu coba lagi."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Gunakan halaman Workspace Baru yang didesain ulang: kotak prompt di tengah, dengan pemilih proyek dan branch di atasnya."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Gunakan tata letak jendela yang didesain ulang: bilah ikon, tab di bilah judul, dan panel sebagai kartu."

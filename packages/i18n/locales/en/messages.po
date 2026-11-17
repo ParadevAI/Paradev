@@ -12431,6 +12431,9 @@ msgstr "New Workspace ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "New workspace in {name}"
 
+msgid "New workspace page"
+msgstr "New workspace page"
+
 msgid "Newer than this app"
 msgstr "Newer than this app"
 
@@ -21693,6 +21696,9 @@ msgstr "Use the desktop app to start running parallel coding agents."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Use the Paradev tray menu > Host Service > Restart, then retry."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."

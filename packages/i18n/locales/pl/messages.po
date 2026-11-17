@@ -12431,6 +12431,9 @@ msgstr "Nowy obszar roboczy ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Nowy obszar roboczy w {name}"
 
+msgid "New workspace page"
+msgstr "Nowa strona obszaru roboczego"
+
 msgid "Newer than this app"
 msgstr "Nowszy niż ta aplikacja"
 
@@ -21693,6 +21696,9 @@ msgstr "Użyj aplikacji desktopowej, aby uruchamiać równoległych agentów kod
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Użyj menu zasobnika Paradev > Usługa hosta > Uruchom ponownie, a następnie ponów."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Używaj przeprojektowanej strony „Nowy obszar roboczy”: pole promptu na środku, a nad nim wybór projektu i gałęzi."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Używaj przeprojektowanego układu okna: paska ikon, kart na pasku tytułu i paneli w formie kart."

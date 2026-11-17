@@ -12431,6 +12431,9 @@ msgstr "Workspace mới ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace mới trong {name}"
 
+msgid "New workspace page"
+msgstr "Trang workspace mới"
+
 msgid "Newer than this app"
 msgstr "Mới hơn ứng dụng này"
 
@@ -21693,6 +21696,9 @@ msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Dùng menu khay Paradev > Host Service > Restart, rồi thử lại."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Dùng trang Workspace mới được thiết kế lại: ô nhập prompt ở giữa, phía trên là bộ chọn dự án và nhánh."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Dùng bố cục cửa sổ được thiết kế lại: thanh biểu tượng, các tab trên thanh tiêu đề và các ngăn dạng thẻ."

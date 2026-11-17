@@ -12425,6 +12425,9 @@ msgstr "Новий робочий простір ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Новий робочий простір у {name}"
 
+msgid "New workspace page"
+msgstr "Нова сторінка робочого простору"
+
 msgid "Newer than this app"
 msgstr "Новіша за цей застосунок"
 
@@ -21687,6 +21690,9 @@ msgstr "Використовуйте десктопний застосунок, 
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Виберіть у меню Paradev у системному треї «Служба хоста» > «Перезапустити», а потім повторіть спробу."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Використовувати оновлену сторінку «Новий робочий простір»: поле запиту посередині, над ним вибір проєкту та гілки."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "Використовувати оновлений макет вікна: панель значків, вкладки в заголовку вікна та панелі у вигляді карток."

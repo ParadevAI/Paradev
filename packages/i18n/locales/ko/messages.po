@@ -12431,6 +12431,9 @@ msgstr "새 워크스페이스 ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "{name}에 새 워크스페이스"
 
+msgid "New workspace page"
+msgstr "새 워크스페이스 페이지"
+
 msgid "Newer than this app"
 msgstr "이 앱보다 최신"
 
@@ -21693,6 +21696,9 @@ msgstr "데스크톱 앱에서 병렬 코딩 에이전트를 실행하세요."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Paradev 트레이 메뉴 > Host Service > Restart를 사용한 뒤 다시 시도하세요."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "새롭게 디자인된 '새 워크스페이스' 페이지를 사용합니다: 가운데에 프롬프트 입력란, 그 위에 프로젝트 및 브랜치 선택기."
 
 msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 msgstr "새롭게 디자인된 창 레이아웃을 사용합니다: 아이콘 레일, 제목 표시줄의 탭, 카드 형태의 패널."
