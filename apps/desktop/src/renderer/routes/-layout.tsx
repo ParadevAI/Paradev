@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { DesktopNoticesGate } from "renderer/components/DesktopNotices";
 import { LanguageAwareI18nProvider } from "renderer/components/LanguageAwareI18nProvider";
 import { PostHogLocaleTagger } from "renderer/components/PostHogLocaleTagger";
+import { PostHogSurfaceTagger } from "renderer/components/PostHogSurfaceTagger";
 import { PostHogUserIdentifier } from "renderer/components/PostHogUserIdentifier";
 import { TelemetrySync } from "renderer/components/TelemetrySync";
 import { ThemedToaster } from "renderer/components/ThemedToaster";
@@ -15,6 +16,7 @@ export function RootLayout({ children }: { children: ReactNode }) {
 		<PostHogProvider>
 			<ElectronTRPCProvider>
 				<PostHogUserIdentifier />
+				<PostHogSurfaceTagger />
 				<TelemetrySync />
 				<LanguageAwareI18nProvider>
 					<PostHogLocaleTagger />

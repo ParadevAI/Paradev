@@ -108,7 +108,7 @@ interface PersistentHashHistory extends RouterHistory {
 	getEntries: () => HistoryEntry[];
 }
 
-// TODO(2026-10-24): drop with the v1 importer (lib/trpc/routers/migration).
+// Drop with the v1 importer (lib/trpc/routers/migration).
 // A profile re-saves its entries rewritten after one boot on this build.
 const RETIRED_V1_ROUTE = /^\/(?:project(?:\/|$|\?)|workspace(?:$|\?))/;
 

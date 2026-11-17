@@ -3,7 +3,6 @@ import { useEffect, useMemo } from "react";
 import { CommandPaletteHost } from "renderer/commandPalette";
 import { useWorkspaceNamingFailedToast } from "renderer/hooks/host-service/useWorkspaceNamingFailedToast";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
-import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useQuickCreateWorkspace } from "renderer/hooks/useQuickCreateWorkspace";
 import { useHotkey } from "renderer/hotkeys";
@@ -47,7 +46,6 @@ const relayoutBrowserPanes = () => browserRuntimeRegistry.relayout();
 function DashboardLayout() {
 	const navigate = useNavigate();
 
-	const openNewWorkspace = useOpenNewWorkspace();
 	const isParadevShell = useParadevShell();
 	const portsDisplayMode = usePortsDisplayMode();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
@@ -124,11 +122,7 @@ function DashboardLayout() {
 		ignoreEventWhen: (e) => e.defaultPrevented,
 	});
 	useHotkey("TOGGLE_WORKSPACE_SIDEBAR", toggleWorkspaceSidebarCollapsed);
-	useHotkey("NEW_WORKSPACE", () =>
-		currentWorkspace?.projectId
-			? openNewWorkspace(currentWorkspace.projectId)
-			: openNewWorkspaceInViewedProject(),
-	);
+	useHotkey("NEW_WORKSPACE", () => openNewWorkspaceInViewedProject());
 	useHotkey("QUICK_CREATE_WORKSPACE", () =>
 		quickCreateWorkspace(currentWorkspace?.projectId ?? null),
 	);

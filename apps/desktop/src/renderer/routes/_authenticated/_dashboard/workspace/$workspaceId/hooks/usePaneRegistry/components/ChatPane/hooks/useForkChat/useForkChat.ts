@@ -66,7 +66,7 @@ export function useForkChat(_workspaceId: string): {
 				if (!outcome.ok) throw new Error(outcome.error);
 				queuePendingChatHandoff(
 					collections,
-					{ id: newWorkspaceId, projectId },
+					{ id: outcome.workspaceId, projectId },
 					{
 						agentId: source.agentId,
 						prompt: buildChatSessionHandoffPrompt({
@@ -76,7 +76,7 @@ export function useForkChat(_workspaceId: string): {
 						}),
 					},
 				);
-				navigateToWorkspace(newWorkspaceId, navigate);
+				navigateToWorkspace(outcome.workspaceId, navigate);
 			} catch (error) {
 				toast.error(t({ message: "Couldn't branch into a new worktree" }), {
 					description: errorMessage(error, t({ message: "Unknown error" })),
