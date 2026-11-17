@@ -366,6 +366,16 @@ export async function createPlatformWindow({
 	ipcHandler?.attachWindow(window);
 	browserManager.registerHostWindow(window.webContents);
 
+	// A pane leaving HTML fullscreen can leave its <webview> as this document's
+	// fullscreen element. Exiting before the macOS animation ends never settles.
+	window.on("leave-full-screen", () => {
+		window.webContents
+			.executeJavaScript(
+				"document.fullscreenElement && document.exitFullscreen().catch(() => {})",
+			)
+			.catch(() => {});
+	});
+
 	// macOS Sequoia+: occluded/minimized windows can lose compositor layers
 	if (PLATFORM.IS_MAC) {
 		window.on("restore", () => {

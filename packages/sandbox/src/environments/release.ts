@@ -169,20 +169,16 @@ async function environmentRegions(): Promise<SandboxRegionId[]> {
 		),
 	];
 }
-for (const region of await environmentRegions()) {
-	try {
-		const { drive, outcome } = await agentTools.publishAgentToolsDrive({
-			host: driveHost,
-			region,
-			bundleSha: bundle.sha256,
-			assets: bundle.assets,
-		});
-		log(`agent-tools: ${drive} ${outcome}`);
-	} catch (error) {
-		console.log(
-			`::warning::agent-tools: ${region} not published; its boxes keep the image's agents: ${String(error).slice(0, 300)}`,
-		);
-	}
+for (const line of agentTools.describeAgentToolsPublish(
+	await agentTools.publishAgentToolsDrives({
+		host: driveHost,
+		regions: await environmentRegions(),
+		bundleSha: bundle.sha256,
+		assets: bundle.assets,
+	}),
+)) {
+	if (line.startsWith("::warning::")) console.log(line);
+	else log(line);
 }
 
 // 2. image

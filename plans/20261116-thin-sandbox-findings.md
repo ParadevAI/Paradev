@@ -33,7 +33,11 @@ waits for.
 | Swap on a drive | Works: `swapon` accepted a swapfile there. Drives are not part of the sandbox snapshot. | |
 | Create with a drive mounted | Under 1 s. | Three creates. |
 | Read-only snapshot mounts | Two sandboxes mounted the same drive's snapshot at once; `ro`; overlayfs with the drive as lower and local disk as upper works. | |
-| Drive fork | Not tested: the connector has no fork call and a workspace has no sandbox token. | |
+| Drive fork | Copy-on-write and near instant: 0.5 s for a 12 GB drive of 213k files, 0.4 s for a second fork, 0.4 s for a fork of a fork. | `src/drive-fork-probe.ts`, run in CI in sfo1, 2026-11-17. |
+| Is a fork independent? | Yes. Writes to a fork did not appear in its parent. The parent could be deleted while forks existed, and a fork stayed fully readable afterwards. | Same run. |
+| No discard on drives either | `fstrim` reports unsupported on a drive, as on the root disk. | |
+| A snapshot mount taken while a writer holds the drive | Unsafe. One box saw a corrupt filesystem, another an empty drive. A drive must be stopped and report detached before anything mounts it. Deleting a running writer left the drive attached for several minutes. | |
+| Stop time grows with what the session wrote to the drive | 44 s after writing 12 GB, 6 s after 1 GB, 12 s for a normal session. | |
 
 Cold reads, from a sandbox created after the writer stopped (repo cloned and
 `bun install`ed on the drive: 5.0 GB, 213k files):
@@ -46,9 +50,35 @@ Cold reads, from a sandbox created after the writer stopped (repo cloned and
 | Read every file in `node_modules`, 8 parallel | 5.1 s at 4 vCPU, 13.6 s at 2 vCPU | 0.7 s |
 | Same after dropping the guest page cache | 2.7 s | |
 
+The same reads from a fresh fork in sfo1: `git status` 1.9 s cold and 0.07 s
+warm; every file in `node_modules` 6.9 s cold and 0.8 s warm.
+
 Caveat: the platform picks the host, so "cold" may have landed on a host that
 already cached the drive. The 8.7 s walk suggests the metadata at least was
 cold. Repeat in a second region before relying on these as worst case.
+
+## The workspace layout, tested end to end
+
+One box from the released image with a drive at `/mnt/superset-drive`
+(iad1, 4 vCPU, 2026-11-17), laid out by hand the way `superset-boot` would:
+
+| Step | Result |
+| --- | --- |
+| Bind-mount `/workspace` and two home subtrees from the drive | 11 ms; 29 ms again after a wake |
+| Clone and `bun install` with the store at `/workspace/.superset/stores/bun` | 22 s, all 212,973 files hardlinked |
+| Hardlink from `/workspace` to another bind mount of the same drive | Fails with `EXDEV`: the store must be inside `/workspace` |
+| `dockerd --data-root` on the drive | Pulled `node:22-slim` in 4 s and ran a container, again after a wake |
+| 6 GB of swapfiles on the drive, a process touching 11 GB on an 8 GB box | Finished: 25 s to write, 14 s to read back |
+| Stop, then wake | 12 s and 1.9 s; repo, dependencies and the Docker image all present |
+| Root-disk snapshot afterwards | 2.11 GB, the same as a bare box from the image |
+
+## The agents drive in production
+
+The first release with it published `agent-tools-<region>-<bundle>` in all 13
+regions with environments (about 25 s each, one after another). The sfo1
+drive, mounted read-only on a fresh box, ran claude, codex and pdev: cold
+launches of 0.9 s, 1.6 s and 0.5 s. The following release pruned the 13 drives
+of the previous bundle.
 
 ## What this decides
 
@@ -61,7 +91,8 @@ cold. Repeat in a second region before relying on these as worst case.
   touched.
 - Swap written to the root disk is permanent weight. The clean homes for it
   are a drive, or nowhere.
-- The repo, dependencies and agent binaries can live on drives without a
-  cold-read problem at this size.
+- The repo, dependencies, Docker's data, swap and agent binaries can live on
+  drives without a cold-read problem at this size, and a workspace's drive can
+  be forked from a golden drive in half a second.
 - Follow-up worth doing: stage consumed install archives in tmpfs at boot, so
   an agent or Chrome update writes the unpacked files only.
