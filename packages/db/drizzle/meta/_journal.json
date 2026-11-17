@@ -1373,6 +1373,62 @@
       "when": 1794806184119,
       "tag": "0195_cloud_workspace_status_archived",
       "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1794855931835,
+      "tag": "0196_chats_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1794866006035,
+      "tag": "0197_chats_message_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1794872286770,
+      "tag": "0198_chats_model_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1794886701258,
+      "tag": "0199_chats_paradev_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1794891699935,
+      "tag": "0200_chats_app_call_workspace",
+      "breakpoints": true
+    },
+    {
+      "idx": 201,
+      "version": "7",
+      "when": 1794893949122,
+      "tag": "0201_chats_listings",
+      "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1794898704021,
+      "tag": "0202_chats_agent_plugins",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1794909574690,
+      "tag": "0203_chats_tasks",
+      "breakpoints": true
     }
   ]
 }

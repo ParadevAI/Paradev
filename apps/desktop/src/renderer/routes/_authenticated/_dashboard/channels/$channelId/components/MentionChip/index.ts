@@ -1,1 +1,0 @@
-export { MentionChip } from "./MentionChip";

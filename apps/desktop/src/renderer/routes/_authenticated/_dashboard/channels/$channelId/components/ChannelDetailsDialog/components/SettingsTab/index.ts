@@ -1,1 +1,0 @@
-export { SettingsTab } from "./SettingsTab";

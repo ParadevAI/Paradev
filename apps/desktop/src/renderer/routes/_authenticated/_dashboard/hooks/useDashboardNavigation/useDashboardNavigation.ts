@@ -1,6 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
-import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
@@ -8,10 +7,6 @@ import {
 	pullRequestsSearchFromFilters,
 	usePullRequestsFilterStore,
 } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsFilterStore";
-import {
-	organizationChatTabs,
-	useChatTabsStore,
-} from "renderer/routes/_authenticated/_dashboard/stores/chatTabsStore";
 import {
 	tasksSearchFromFilters,
 	useTasksFilterStore,
@@ -27,7 +22,6 @@ export function useDashboardNavigation() {
 	const matchRoute = useMatchRoute();
 	const { gateFeature, hasAccess } = usePaywall();
 	const cloudUtils = cloudTrpc.useUtils();
-	const organizationId = useActiveOrganizationId();
 	const isChatSection = useIsChatSection();
 
 	// Automations are Pro, but an org that already has some (a downgrade) can
@@ -58,14 +52,7 @@ export function useDashboardNavigation() {
 		openHome: () => navigate({ to: "/new-workspace" }),
 
 		isChannelsOpen: isChatSection,
-		openChannels: () => {
-			const { tabs: allTabs, activeTabId } = useChatTabsStore.getState();
-			const tabs = organizationChatTabs(allTabs, organizationId);
-			const active = tabs.find((tab) => tab.id === activeTabId) ?? tabs.at(-1);
-			return active
-				? navigate({ href: active.href })
-				: navigate({ to: "/channels/threads" });
-		},
+		openChannels: () => navigate({ to: "/chats" }),
 
 		isWorkspacesOpen: !!matchRoute({ to: "/v2-workspaces" }),
 		openWorkspaces: () => navigate({ to: "/v2-workspaces" }),

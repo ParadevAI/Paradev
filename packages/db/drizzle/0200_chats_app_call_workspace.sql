@@ -1,0 +1,2 @@
+ALTER TABLE "chats"."app_calls" ADD COLUMN "workspace_id" text;--> statement-breakpoint
+CREATE INDEX "app_calls_owner_workspace_idx" ON "chats"."app_calls" USING btree ("owner_user_id","workspace_id") WHERE "chats"."app_calls"."workspace_id" is not null;

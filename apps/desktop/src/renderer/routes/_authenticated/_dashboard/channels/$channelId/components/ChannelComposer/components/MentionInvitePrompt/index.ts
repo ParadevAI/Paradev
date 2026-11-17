@@ -1,1 +1,0 @@
-export { MentionInvitePrompt } from "./MentionInvitePrompt";

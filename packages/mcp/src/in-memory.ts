@@ -18,25 +18,16 @@ export interface InMemoryClientOptions {
 }
 
 /**
- * Build an in-memory MCP client/server pair for server-side agent integrations
- * (the Slack agent, the automations dispatcher, etc.). Auth context is wired
- * directly through the SDK's documented `authInfo` option on each request —
- * no transport monkey-patching.
- *
- * Callers MUST await the returned `cleanup()` to free the in-memory transport.
- * Use it inside a `try/finally` or with `await using` if your runtime supports it.
+ * The context a server-side caller acts with: one person in one of their
+ * organizations, with a short-lived token for host calls.
  */
-export async function createInMemoryMcpClient({
+export async function mcpContextForUser({
 	userId,
 	organizationId,
 	clientLabel,
 	relayUrl,
 	realtimeUrl,
-	onToolCall,
-}: InMemoryClientOptions): Promise<{
-	client: Client;
-	cleanup: () => Promise<void>;
-}> {
+}: Omit<InMemoryClientOptions, "onToolCall">): Promise<McpContext> {
 	const [user] = await db
 		.select({ email: users.email })
 		.from(users)
@@ -66,7 +57,7 @@ export async function createInMemoryMcpClient({
 		ttlSeconds: 300,
 	});
 
-	const mcpContext: McpContext = {
+	return {
 		userId,
 		email: user.email,
 		organizationId,
@@ -78,6 +69,25 @@ export async function createInMemoryMcpClient({
 		relayUrl,
 		realtimeUrl,
 	};
+}
+
+/**
+ * Build an in-memory MCP client/server pair for server-side agent integrations
+ * (the Slack agent, the automations dispatcher, etc.). Auth context is wired
+ * directly through the SDK's documented `authInfo` option on each request —
+ * no transport monkey-patching.
+ *
+ * Callers MUST await the returned `cleanup()` to free the in-memory transport.
+ * Use it inside a `try/finally` or with `await using` if your runtime supports it.
+ */
+export async function createInMemoryMcpClient({
+	onToolCall,
+	...caller
+}: InMemoryClientOptions): Promise<{
+	client: Client;
+	cleanup: () => Promise<void>;
+}> {
+	const mcpContext = await mcpContextForUser(caller);
 
 	const server = createMcpServer({ onToolCall });
 	const [serverTransport, clientTransport] =

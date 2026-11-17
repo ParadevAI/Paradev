@@ -1,1 +1,0 @@
-export { SettingRow } from "./SettingRow";

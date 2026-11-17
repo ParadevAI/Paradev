@@ -1,0 +1,1 @@
+export { workspaceIdFromLink } from "./workspaceLink";

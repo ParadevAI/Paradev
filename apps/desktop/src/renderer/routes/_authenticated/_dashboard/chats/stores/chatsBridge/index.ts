@@ -1,0 +1,1 @@
+export { useChatsBridge } from "./chatsBridge";

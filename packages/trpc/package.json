@@ -12,6 +12,10 @@
 			"types": "./src/i18n-error.ts",
 			"default": "./src/i18n-error.ts"
 		},
+		"./chats-box": {
+			"types": "./src/router/chats/turns/box-route.ts",
+			"default": "./src/router/chats/turns/box-route.ts"
+		},
 		"./billing": {
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
@@ -183,6 +187,8 @@
 		"@superset/agent-harness": "workspace:*",
 		"@superset/auth": "workspace:*",
 		"@superset/chat": "workspace:*",
+		"@superset/chats-core": "workspace:*",
+		"@superset/chats-sync": "workspace:*",
 		"@superset/db": "workspace:*",
 		"@superset/email": "workspace:*",
 		"@superset/i18n": "workspace:*",
@@ -200,6 +206,7 @@
 		"drizzle-orm": "0.45.2",
 		"gaxios": "7.3.1",
 		"google-auth-library": "10.5.0",
+		"jose": "6.2.13",
 		"posthog-node": "5.28.8",
 		"resend": "6.18.0",
 		"semver": "7.7.4",

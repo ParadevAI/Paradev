@@ -1,0 +1,1 @@
+export { MessageDetailsPanel } from "./MessageDetailsPanel";

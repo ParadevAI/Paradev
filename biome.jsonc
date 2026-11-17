@@ -61,6 +61,37 @@
 	},
 	"overrides": [
 		{
+			"includes": [
+				"packages/chats-core/**",
+				"packages/chats-sync/**",
+				"packages/chats-runner/**"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"noNonNullAssertion": "off"
+					},
+					"complexity": {
+						"noCommaOperator": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": [
+				"packages/chats-runner/**/*.test.ts",
+				"packages/chats-runner/**/*.integration.ts"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noAssignInExpressions": "off",
+						"noTemplateCurlyInString": "off"
+					}
+				}
+			}
+		},
+		{
 			"includes": ["packages/cli-framework/**", "packages/cli/**"],
 			"linter": {
 				"rules": {

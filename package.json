@@ -72,6 +72,11 @@
 		"tooling/*"
 	],
 	"overrides": {
+		"@earendil-works/chord": "1.1.0",
+		"@earendil-works/pi-agent-core": "1.1.0",
+		"@earendil-works/pi-codemode": "1.1.0",
+		"@earendil-works/pi-telemetry": "1.1.0",
+		"@earendil-works/pi-tui": "1.1.0",
 		"@modelcontextprotocol/sdk": "1.32.0",
 		"@tiptap/extension-dropcursor": "3.30.5",
 		"@tiptap/extension-floating-menu": "3.30.5",

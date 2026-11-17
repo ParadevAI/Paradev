@@ -1,1 +1,0 @@
-export { ChannelProperty } from "./ChannelProperty";

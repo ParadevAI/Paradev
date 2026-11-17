@@ -1,1 +1,0 @@
-export { useCloseFreeze } from "./useCloseFreeze";

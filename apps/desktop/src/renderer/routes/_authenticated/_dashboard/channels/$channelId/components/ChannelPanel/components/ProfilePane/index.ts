@@ -1,1 +1,0 @@
-export { ProfilePane } from "./ProfilePane";

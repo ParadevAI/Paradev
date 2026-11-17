@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useDevWorkspaceCreator } from "renderer/hooks/useDevWorkspaceCreator";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
@@ -86,6 +87,7 @@ export function DashboardSidebarWorkspaceItem({
 				}
 			: undefined;
 	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
+	const creatorDevId = useDevWorkspaceCreator(id);
 	const {
 		cancelRename,
 		pendingName,
@@ -336,6 +338,7 @@ export function DashboardSidebarWorkspaceItem({
 				renameValue={renameValue}
 				shortcutLabel={shortcutLabel}
 				pinnedContext={pinnedContext}
+				creatorDevId={creatorDevId}
 				workspaceStatus={workspaceStatus}
 				isInSection={isInSection}
 				indentation={indentation}

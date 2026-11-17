@@ -1,0 +1,22 @@
+{
+	"name": "@superset/chats-core",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./plugin-marks/*": "./src/plugin-marks/marks/*"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
+		"test": "bun test"
+	},
+	"devDependencies": {
+		"@superset/typescript": "workspace:*",
+		"bun-types": "1.4.3",
+		"typescript": "7.0.2"
+	}
+}

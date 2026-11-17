@@ -1,1 +1,0 @@
-export { ChatTab } from "./ChatTab";

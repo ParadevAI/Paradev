@@ -1,1 +1,0 @@
-export { threadTabLabel } from "./threadTabLabel";

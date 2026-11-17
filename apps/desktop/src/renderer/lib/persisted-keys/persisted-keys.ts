@@ -9,6 +9,12 @@ interface DeadKey {
  * the writer.
  */
 export const DEAD_KEYS: DeadKey[] = [
+	// The channel side panel's tabs and the emoji picker's skin tone; both removed with the chat redesign
+	{ key: "channel-panels-v1", match: "exact" },
+	{ key: "channels-emoji-skin-tone", match: "exact" },
+	// The channels and Devs title-bar tabs and side panel; replaced by chats
+	{ key: "chat-tabs", match: "exact" },
+	{ key: "channel-panel", match: "exact" },
 	// New workspace composer width; the resize handles were removed
 	{ key: "new-workspace-width", match: "exact" },
 	// Device-local Chat setting; moved to the account (user_settings.experimental_chat)

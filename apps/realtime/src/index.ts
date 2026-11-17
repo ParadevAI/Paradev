@@ -5,6 +5,13 @@ import {
 	USER_EVENTS_PATH,
 	USERS_PUBLISH_PATH,
 } from "@superset/shared/channels";
+import {
+	CHATS_PUBLISH_PATH,
+	CHATS_REALTIME_PATH,
+	chatsTicketFromProtocols,
+	isChatsChannel,
+	verifyChatsRealtimeTicket,
+} from "@superset/shared/chats-realtime";
 import type { MoveBookRequest } from "@superset/shared/move-book";
 import {
 	MAX_PAGE_STORAGE_KEY_LENGTH,
@@ -33,6 +40,7 @@ import { cors } from "hono/cors";
 import { getServerByName } from "partyserver";
 import type { AppendInput } from "./agent-session/AgentSessionLog";
 import { AgentSessionHub } from "./agent-session-hub";
+import { ChatsChannel } from "./chats-channel";
 import { MoveHub } from "./move-hub";
 import { ORG_USER_HEADER, OrgHub } from "./org-hub";
 import { CLAIMS_HEADER, PageHub } from "./page-hub";
@@ -532,6 +540,63 @@ app.post(USERS_PUBLISH_PATH, async (c) => {
 	return c.json({ ok: true });
 });
 
+// ── Chats: one channel per group and per user, resumed by seq ────────
+
+function chatsChannelStub(env: RealtimeEnv, channel: string) {
+	return env.ChatsChannel.get(env.ChatsChannel.idFromName(channel));
+}
+
+app.get(`${CHATS_REALTIME_PATH}/:channel`, async (c) => {
+	if (c.req.header("Upgrade")?.toLowerCase() !== "websocket") {
+		return c.json({ error: "WebSocket upgrade required" }, 426);
+	}
+	const channel = c.req.param("channel");
+	const ticket = chatsTicketFromProtocols(
+		c.req.header("Sec-WebSocket-Protocol") ?? null,
+	);
+	const grant = ticket
+		? await verifyChatsRealtimeTicket(c.env.NUDGE_SECRET, ticket)
+		: null;
+	if (!grant) return c.json({ error: "Unauthorized" }, 401);
+	if (!grant.channels.includes(channel)) {
+		return c.json({ error: "Forbidden" }, 403);
+	}
+	const since = c.req.query("since");
+	const forward = new URL("https://channel/connect");
+	forward.searchParams.set("channel", channel);
+	forward.searchParams.set("exp", String(grant.exp));
+	if (since && /^\d+$/.test(since)) forward.searchParams.set("since", since);
+	return chatsChannelStub(c.env, channel).fetch(
+		new Request(forward.toString(), c.req.raw),
+	);
+});
+
+app.post(CHATS_PUBLISH_PATH, async (c) => {
+	const token = extractToken(c);
+	if (!token || !secretMatches(token, c.env.NUDGE_SECRET)) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
+	const body = (await c.req.json().catch(() => null)) as {
+		channel?: unknown;
+		data?: unknown;
+		ephemeral?: unknown;
+	} | null;
+	if (
+		!body ||
+		typeof body.channel !== "string" ||
+		!isChatsChannel(body.channel) ||
+		body.data === undefined
+	) {
+		return c.json({ error: "expected { channel, data }" }, 400);
+	}
+	const seq = await chatsChannelStub(c.env, body.channel).publish(
+		body.channel,
+		JSON.stringify(body.data),
+		body.ephemeral === true,
+	);
+	return c.json({ seq });
+});
+
 // ── Emit: the API, after a write ────────────────────────────────────
 
 app.post("/v2/box-pressure", async (c) => {
@@ -729,7 +794,12 @@ const InstrumentedMoveHub = Sentry.instrumentDurableObjectWithSentry(
 	sentryOptions,
 	MoveHub,
 );
+const InstrumentedChatsChannel = Sentry.instrumentDurableObjectWithSentry(
+	sentryOptions,
+	ChatsChannel,
+);
 export {
+	InstrumentedChatsChannel as ChatsChannel,
 	InstrumentedOrgHub as OrgHub,
 	InstrumentedPageHub as PageHub,
 	InstrumentedWorkspaceHub as WorkspaceHub,
