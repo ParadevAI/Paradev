@@ -14,8 +14,11 @@
  * a real `bun install`, REAL_SANDBOX_WORK_GB (default 4) GB written under
  * /workspace, persistence sentinels, a stop, a wake, a second stop. The drive
  * box also checks the layout, the stores, swap and Docker on the drive. Then
- * a third box is created on a fork of the drive box's drive, now full. One
- * table compares the three (drive-comparison.ts).
+ * it is stopped uncleanly (host-service killed, writers still going) and must
+ * boot with host.db and the checkout intact, and it is promoted to a
+ * drive-mode golden that a new workspace is created from on a new branch, the
+ * production path. One table compares them (drive-comparison.ts). A wake
+ * that is not served from a warm snapshot cache cannot be forced from here.
  *
  * Every box and drive it made is deleted at the end, pass or fail: the box
  * stopped first, each drive once detached. REAL_SANDBOX_KEEP=1 keeps the
@@ -78,6 +81,7 @@ await publishBundle(bundle, { dry: false });
 const {
 	deleteSandbox,
 	deleteSandboxAndDrive,
+	promoteSandboxToEnvironment,
 	provisionSandbox,
 	stopSandbox,
 	wakeSandbox,
@@ -214,6 +218,7 @@ async function drivePass(): Promise<number> {
 		waitForDriveDetached,
 		workspaceDriveIdentity,
 		workspaceDriveMounts,
+		goldenDriveNameFor,
 		workspaceDriveNameFor,
 	} = await import("@superset/trpc/lib/sandbox/drives");
 
@@ -223,9 +228,11 @@ async function drivePass(): Promise<number> {
 	const goldenDrive = `env-drive-real-check-${suffix}`;
 	const box = `ws-real-drive-${suffix}`;
 	const plainBox = `ws-real-plain-${suffix}`;
-	const contentBox = `ws-real-content-${suffix}`;
+	const goldenName = `env-real-check-${suffix}`;
+	const goldenBoxDrive = goldenDriveNameFor(goldenName);
+	const forkBox = `ws-real-golden-${suffix}`;
 	const boxDrive = workspaceDriveNameFor(box);
-	const contentDrive = workspaceDriveNameFor(contentBox);
+	const forkDrive = workspaceDriveNameFor(forkBox);
 	const mounts = workspaceDriveMounts(boxDrive);
 	const claimWith = (driveName: string | null, laidOut: boolean) => ({
 		...claim,
@@ -251,7 +258,11 @@ async function drivePass(): Promise<number> {
 		...SENTINELS.map((name) => `plain box kept the ${name}`),
 		...SENTINELS.map((name) => `drive box kept the ${name}`),
 		"the drive box's root snapshot is smaller than the plain box's",
-		"a box on a fork of the full drive has /workspace usable",
+		"unclean stop: the box boots again",
+		"unclean stop: host.db passes integrity_check",
+		"unclean stop: the checkout is intact",
+		"a workspace of a drive-mode golden boots on its new branch",
+		"a workspace of a drive-mode golden has the golden's dependencies",
 	];
 	const reported = new Set<string>();
 	let failures = 0;
@@ -343,10 +354,10 @@ async function drivePass(): Promise<number> {
 		throw new Error(`${name} did not snapshot within 10 minutes of its stop`);
 	};
 
-	const measures: Record<"plain" | "drive" | "content", BoxMeasures> = {
+	const measures: Record<"plain" | "drive" | "golden", BoxMeasures> = {
 		plain: {},
 		drive: {},
-		content: {},
+		golden: {},
 	};
 	const token = randomUUID().replaceAll("-", "");
 
@@ -524,31 +535,129 @@ async function drivePass(): Promise<number> {
 	const [, driveOutcome] = await Promise.all([plain, driveBox]);
 
 	if (driveOutcome !== "failed") {
+		// An unclean stop: host-service killed, writers into host.db and /workspace still going.
 		try {
-			await waitForDriveDetached(boxDrive, { drives });
-			const forkStarted = Date.now();
-			await drives.fork(boxDrive, contentDrive);
-			measures.content.forkMs = Date.now() - forkStarted;
-			const contentMounts = workspaceDriveMounts(contentDrive);
-			const contentClaim = claimWith(contentDrive, false);
-			const createStarted = Date.now();
-			await provisionFromImage(contentBox, contentMounts, contentClaim);
 			await wakeSandbox({
-				providerSandboxId: contentBox,
-				claim: contentClaim,
-				mounts: contentMounts,
+				providerSandboxId: box,
+				claim: claimWith(boxDrive, true),
+				mounts,
 			});
-			measures.content.createToReadyMs = Date.now() - createStarted;
-			measures.content.usableMs = await usableSince(
-				runOn(contentBox),
-				createStarted,
+			const writer = Buffer.from(
+				[
+					'const { Database } = require("bun:sqlite");',
+					'process.on("SIGTERM", () => {});',
+					"const db = new Database(process.argv[2]);",
+					'db.exec("pragma journal_mode=wal; create table if not exists superset_probe (i integer, at integer)");',
+					'for (let i = 0; ; i++) db.run("insert into superset_probe values (?, ?)", [i, Date.now()]);',
+				].join("\n"),
+			).toString("base64");
+			await run(
+				`echo ${writer} | base64 -d > /tmp/superset-probe-writer.js && (setsid nohup bun /tmp/superset-probe-writer.js ${SANDBOX_PATHS.driveState}/host.db > /tmp/superset-probe-writer.log 2>&1 &) && (setsid nohup bash -c "trap '' TERM; while true; do head -c 1048576 /dev/urandom >> ${SANDBOX_PATHS.workspace}/.superset-unclean; done" > /dev/null 2>&1 &)`,
+			);
+			await root("sleep 3; pkill -9 -f host-service.js; true");
+			await stopMeasured(box);
+			await wakeSandbox({
+				providerSandboxId: box,
+				claim: claimWith(boxDrive, true),
+				mounts,
+			});
+			check("unclean stop: the box boots again", true);
+			const integrity = await run(
+				`bun -e 'const { Database } = require("bun:sqlite"); console.log(Object.values(new Database(process.argv[1], { readonly: true }).query("pragma integrity_check").get() ?? {})[0])' ${SANDBOX_PATHS.driveState}/host.db`,
 			);
 			check(
-				"a box on a fork of the full drive has /workspace usable",
-				measures.content.usableMs !== undefined,
+				"unclean stop: host.db passes integrity_check",
+				integrity.out === "ok",
+				integrity.detail,
+			);
+			const checkout = await run(
+				`git -C ${SANDBOX_PATHS.workspace} fsck --connectivity-only --no-progress > /dev/null && git -C ${SANDBOX_PATHS.workspace} status --porcelain > /dev/null && echo intact`,
+			);
+			check(
+				"unclean stop: the checkout is intact",
+				checkout.out === "intact",
+				checkout.detail,
 			);
 		} catch (error) {
-			stoppedAt.push(`content box: ${String(error).slice(0, 300)}`);
+			stoppedAt.push(`unclean stop: ${String(error).slice(0, 300)}`);
+		}
+
+		// The production path: promote the drive box to a drive-mode golden, then a workspace of it.
+		try {
+			const golden = await promoteSandboxToEnvironment({
+				sourceSandbox: box,
+				goldenName,
+				claim: claimWith(boxDrive, true),
+				sourceDriveName: boxDrive,
+				drives,
+			});
+			await stopSandbox(box);
+			const forkWorkspaceId = randomUUID();
+			const forkBranch = `superset/real-check-golden-${forkWorkspaceId.slice(0, 8)}`;
+			const forkClaim = {
+				...claim,
+				hostSecret: await sandboxHostSecretFor(forkWorkspaceId),
+				identity: {
+					...identity,
+					SUPERSET_SANDBOX_WORKSPACE_ID: forkWorkspaceId,
+					SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+						{
+							url: "https://github.com/paradevai/paradev.git",
+							branch: forkBranch,
+							baseBranch: "main",
+							path: ".",
+						},
+					]),
+					SUPERSET_SANDBOX_IMAGE_TAG: goldenName,
+					...workspaceDriveIdentity(forkDrive, { laidOut: false }),
+				},
+			};
+			const forkMounts = workspaceDriveMounts(forkDrive);
+			const createStarted = Date.now();
+			await forkWorkspaceDrive({
+				name: forkDrive,
+				region: golden.region,
+				goldenDriveName: golden.goldenDriveName,
+				drives,
+			});
+			measures.golden.forkMs = Date.now() - createStarted;
+			await provisionSandbox({
+				name: forkBox,
+				environment: {
+					sourceKind: "fork",
+					sourceRef: goldenName,
+					region: golden.region,
+				},
+				claim: forkClaim,
+				mounts: forkMounts,
+			});
+			await wakeSandbox({
+				providerSandboxId: forkBox,
+				claim: forkClaim,
+				mounts: forkMounts,
+			});
+			measures.golden.createToReadyMs = Date.now() - createStarted;
+			const forkRun = runOn(forkBox);
+			measures.golden.usableMs = await usableSince(forkRun, createStarted);
+			await waitForCheckout(forkRun);
+			const branch = await forkRun(
+				`git -C ${SANDBOX_PATHS.workspace} rev-parse --abbrev-ref HEAD`,
+			);
+			check(
+				"a workspace of a drive-mode golden boots on its new branch",
+				branch.out === forkBranch,
+				branch.detail,
+			);
+			const deps = await forkRun(
+				`test -d ${SANDBOX_PATHS.workspace}/node_modules && echo present`,
+			);
+			check(
+				"a workspace of a drive-mode golden has the golden's dependencies",
+				deps.out === "present",
+				deps.detail,
+			);
+		} catch (error) {
+			stoppedAt.push(`golden path: ${String(error).slice(0, 300)}`);
 		}
 	}
 	const plainSnapshot = measures.plain.firstStop?.snapshotBytes;
@@ -575,7 +684,7 @@ async function drivePass(): Promise<number> {
 			[
 				{ label: "plain", measures: measures.plain },
 				{ label: "drive", measures: measures.drive },
-				{ label: "fork of the full drive", measures: measures.content },
+				{ label: "workspace of a drive golden", measures: measures.golden },
 			],
 		)}`,
 	);
@@ -584,7 +693,8 @@ async function drivePass(): Promise<number> {
 		? [
 				[plainBox, () => stopSandbox(plainBox)],
 				[box, () => stopSandbox(box)],
-				[contentBox, () => stopSandbox(contentBox)],
+				[forkBox, () => stopSandbox(forkBox)],
+				[goldenName, () => stopSandbox(goldenName)],
 			]
 		: [
 				[
@@ -596,8 +706,12 @@ async function drivePass(): Promise<number> {
 					() => deleteSandboxAndDrive(box, boxDrive, drives),
 				],
 				[
-					`${contentBox} and ${contentDrive}`,
-					() => deleteSandboxAndDrive(contentBox, contentDrive, drives),
+					`${forkBox} and ${forkDrive}`,
+					() => deleteSandboxAndDrive(forkBox, forkDrive, drives),
+				],
+				[
+					`${goldenName} and ${goldenBoxDrive}`,
+					() => deleteSandboxAndDrive(goldenName, goldenBoxDrive, drives),
 				],
 			];
 	for (const [what, cleanup] of cleanups) {
