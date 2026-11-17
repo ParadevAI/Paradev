@@ -1,4 +1,4 @@
-import type { FormField } from "@superset/chat/protocol";
+import type { FormField } from "../../protocol";
 
 export type FormValues = Record<string, string | string[]>;
 

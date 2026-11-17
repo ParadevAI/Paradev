@@ -1,9 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type {
-	ApprovalRequest,
-	FormField,
-	UserContent,
-} from "@superset/chat/protocol";
+import type { ApprovalRequest, FormField, UserContent } from "../../protocol";
 import { composerAnswer } from "./composerAnswer";
 
 const request = (fields: FormField[]): ApprovalRequest => ({
