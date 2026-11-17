@@ -12,13 +12,16 @@ import { Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
-	bootRefusedForMissingDrive,
 	composeMounts,
 	deleteSandboxAndDrive,
+	driveRefusalIn,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	promoteSandboxToEnvironment,
+	SandboxDriveMissingError,
+	SandboxNotReadyError,
 	SESSION_TIMEOUT_MS,
+	settleSandbox,
 	topUpSandboxSession,
 	wakeSandbox,
 } from "./vercel";
@@ -165,10 +168,13 @@ describe("wakeSandbox mounts", () => {
 			},
 		}),
 	});
+	let attachedTo: string | undefined;
 	stub(Drive, {
 		get: async ({ name }: { name: string }) => {
 			events.push(`drive:${name}`);
-			return { name, currentSandboxName: undefined };
+			// The concurrent wake that took the drive has resumed the box.
+			if (attachedTo) status = "running";
+			return { name, currentSandboxName: attachedTo };
 		},
 	});
 	stub(globalThis, {
@@ -188,6 +194,22 @@ describe("wakeSandbox mounts", () => {
 		current = {};
 		events = [];
 		updates = [];
+		attachedTo = undefined;
+	});
+
+	test("a drive a concurrent wake already resumed this box with is not foreign", async () => {
+		status = "stopped";
+		attachedTo = "sbx";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toThrow();
+		expect(events).not.toContain("resume");
+		expect(updates.some((update) => "mounts" in update)).toBe(false);
 	});
 
 	test("a stopped box waits for its drive, then gets its mounts, then resumes", async () => {
@@ -275,14 +297,97 @@ describe("composeMounts", () => {
 	});
 });
 
-describe("bootRefusedForMissingDrive", () => {
+describe("driveRefusalIn", () => {
 	test("reads only the last boot of the log", () => {
 		const refused =
 			"1 boot.start pid=1 bundle=abc\n2 run.cleared\n3 drive.missing drive-1 is not mounted at /mnt/superset-drive\n4 boot.refused x\n";
 		const recovered = `${refused}5 boot.start pid=2 bundle=abc\n6 drive.layout ms=11\n`;
-		expect(bootRefusedForMissingDrive(refused)).toBe(true);
-		expect(bootRefusedForMissingDrive(recovered)).toBe(false);
-		expect(bootRefusedForMissingDrive("")).toBe(false);
+		expect(driveRefusalIn(refused)).toBe(
+			"drive.missing drive-1 is not mounted at /mnt/superset-drive",
+		);
+		expect(driveRefusalIn(recovered)).toBeNull();
+		expect(driveRefusalIn("")).toBeNull();
+		expect(
+			driveRefusalIn(
+				"1 boot.start pid=1\n2 drive.foreign d belongs to workspace w\n",
+			),
+		).toBe("drive.foreign d belongs to workspace w");
+	});
+});
+
+describe("settleSandbox with a drive", () => {
+	let health: unknown = null;
+	let bootLog = "";
+	stub(globalThis, {
+		fetch: async (url: string) => {
+			if (String(url).endsWith("/trpc/health.check") && health !== null) {
+				return new Response(JSON.stringify(health));
+			}
+			if (String(url).endsWith("/trpc/sandbox.setEnvironment")) {
+				return new Response("{}");
+			}
+			throw new Error("not answering");
+		},
+	});
+	const box = {
+		readFileToBuffer: async () => Buffer.from(bootLog),
+	} as never;
+	const claim = {
+		identity: { SUPERSET_SANDBOX_DRIVE: "drive-1" },
+		hostSecret: "secret",
+		managedEnv: {},
+	} as never;
+	const answering = (phases: string[]) => ({
+		result: {
+			data: {
+				json: {
+					sandboxBoot: {
+						stamps: phases.map((phase, at) => ({ phase, at })),
+					},
+				},
+			},
+		},
+	});
+
+	test("a refused boot is a retryable not-ready, found without the full host wait", async () => {
+		health = null;
+		bootLog =
+			"1 boot.start pid=1\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n";
+		const started = Date.now();
+		const error = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			sandbox: box,
+		}).catch((caught: unknown) => caught);
+		expect(error).toBeInstanceOf(SandboxDriveMissingError);
+		expect(error).toBeInstanceOf(SandboxNotReadyError);
+		expect(Date.now() - started).toBeLessThan(1_000);
+	});
+
+	test("a boot that answers without laying the drive out fails the settle", async () => {
+		health = answering(["boot.start", "host.ready"]);
+		bootLog = "";
+		await expect(
+			settleSandbox({
+				providerSandboxId: "sbx",
+				hostTarget: "https://box.invalid",
+				claim,
+				sandbox: box,
+			}),
+		).rejects.toBeInstanceOf(SandboxDriveMissingError);
+	});
+
+	test("a boot that laid the drive out settles", async () => {
+		health = answering(["boot.start", "drive.layout", "host.ready"]);
+		bootLog = "";
+		const answer = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			sandbox: box,
+		});
+		expect(answer.stamps.map((stamp) => stamp.phase)).toContain("drive.layout");
 	});
 });
 
@@ -379,6 +484,7 @@ describe("promoteSandboxToEnvironment", () => {
 		const strip = events.find((event) => event.startsWith("strip")) ?? "";
 		expect(strip).toContain(`${SANDBOX_PATHS.drive}/workspace/.env`);
 		expect(strip).toContain(`${SANDBOX_PATHS.drive}/home/.codex/sessions`);
+		expect(strip).toContain(SANDBOX_PATHS.driveState);
 		expect(events).toEqual([
 			"snapshot source",
 			"find drive-ws-source",

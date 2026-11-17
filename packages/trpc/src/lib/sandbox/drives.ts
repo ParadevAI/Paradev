@@ -211,13 +211,20 @@ export class DriveStillAttachedError extends Error {
  */
 export async function waitForDriveDetached(
 	driveName: string,
-	options: { drives?: DriveHost; timeoutMs?: number; pollMs?: number } = {},
-): Promise<void> {
+	options: {
+		drives?: DriveHost;
+		timeoutMs?: number;
+		pollMs?: number;
+		/** Whether the sandbox holding the drive is the one about to mount it, already running. */
+		heldByCaller?: (attachedTo: string) => Promise<boolean>;
+	} = {},
+): Promise<"detached" | "held"> {
 	const drives = options.drives ?? vercelDrives();
 	const deadline = Date.now() + (options.timeoutMs ?? DRIVE_DETACH_TIMEOUT_MS);
 	for (;;) {
 		const drive = await drives.find(driveName);
-		if (!drive?.attachedTo) return;
+		if (!drive?.attachedTo) return "detached";
+		if (await options.heldByCaller?.(drive.attachedTo)) return "held";
 		if (Date.now() >= deadline) {
 			throw new DriveStillAttachedError(driveName, drive.attachedTo);
 		}

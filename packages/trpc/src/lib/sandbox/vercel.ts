@@ -79,33 +79,6 @@ export class SandboxUnavailableError extends Error {
 	}
 }
 
-/** The box refused to boot because the drive its identity names was not mounted. */
-export class SandboxDriveMissingError extends SandboxUnavailableError {
-	constructor(
-		providerSandboxId: string,
-		readonly driveName: string,
-	) {
-		super(providerSandboxId, new Error(`drive ${driveName} not mounted`));
-		this.name = "SandboxDriveMissingError";
-		this.message = `Sandbox ${providerSandboxId} refused to boot: its drive ${driveName} is not mounted`;
-	}
-}
-
-/** The boot log keeps every boot of the box; only the last one counts. */
-export function bootRefusedForMissingDrive(bootLog: string): boolean {
-	const lastBoot = bootLog.lastIndexOf(" boot.start ");
-	return /^\d+ drive\.missing /m.test(
-		lastBoot < 0 ? bootLog : bootLog.slice(lastBoot),
-	);
-}
-
-async function refusedForMissingDrive(sandbox: Sandbox): Promise<boolean> {
-	const log = await sandbox
-		.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
-		.catch(() => null);
-	return log !== null && bootRefusedForMissingDrive(log.toString("utf8"));
-}
-
 function isUnavailable(error: unknown): boolean {
 	return (
 		error instanceof APIError &&
@@ -367,12 +340,48 @@ export class SandboxNotReadyError extends Error {
 	}
 }
 
+/**
+ * The box did not come up on the drive its identity names: the drive did not
+ * mount, belongs to another workspace, or the boot never laid it out. The
+ * data is intact, so it is a not-ready the next wake retries, never a failure.
+ */
+export class SandboxDriveMissingError extends SandboxNotReadyError {
+	constructor(
+		providerSandboxId: string,
+		readonly driveName: string,
+		readonly reason: string,
+	) {
+		super(providerSandboxId);
+		this.name = "SandboxDriveMissingError";
+		this.message = `Sandbox ${providerSandboxId} did not come up on its drive ${driveName}: ${reason}`;
+	}
+}
+
+const DRIVE_REFUSAL = /^\d+ (drive\.(?:missing|foreign|unlaid)(?: .*)?)$/m;
+
+/** The boot log keeps every boot of the box; only the last one counts. */
+export function driveRefusalIn(bootLog: string): string | null {
+	const lastBoot = bootLog.lastIndexOf(" boot.start ");
+	const current = lastBoot < 0 ? bootLog : bootLog.slice(lastBoot);
+	return DRIVE_REFUSAL.exec(current)?.[1] ?? null;
+}
+
+/** How often a wait for host-service also reads the boot log for a drive refusal. */
+const DRIVE_REFUSAL_POLL_MS = 2_000;
+
 async function waitForHostService(
 	target: string,
 	providerSandboxId: string,
+	refusal?: () => Promise<Error | null>,
 ): Promise<HostAnswer> {
 	const deadline = Date.now() + HOST_READY_TIMEOUT_MS;
+	let nextRefusalCheck = 0;
 	while (Date.now() < deadline) {
+		if (refusal && Date.now() >= nextRefusalCheck) {
+			const refused = await refusal();
+			if (refused) throw refused;
+			nextRefusalCheck = Date.now() + DRIVE_REFUSAL_POLL_MS;
+		}
 		const body: unknown = await fetch(`${target}/trpc/health.check`, {
 			signal: AbortSignal.timeout(HOST_READY_POLL_MS * 6),
 		})
@@ -397,11 +406,47 @@ export async function settleSandbox(args: {
 	providerSandboxId: string;
 	hostTarget: string;
 	claim: SandboxClaim;
+	/** Where to read the boot log from; fetched when absent. */
+	sandbox?: Pick<Sandbox, "readFileToBuffer">;
 }): Promise<HostAnswer> {
+	const driveName = args.claim.identity.SUPERSET_SANDBOX_DRIVE;
+	let box = args.sandbox;
+	const refusal = driveName
+		? async () => {
+				box ??= await Sandbox.get({
+					...credentials(),
+					name: args.providerSandboxId,
+					resume: false,
+				});
+				const log = await box
+					.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
+					.catch(() => null);
+				const refused = log ? driveRefusalIn(log.toString("utf8")) : null;
+				return refused
+					? new SandboxDriveMissingError(
+							args.providerSandboxId,
+							driveName,
+							refused,
+						)
+					: null;
+			}
+		: undefined;
 	const answer = await waitForHostService(
 		args.hostTarget,
 		args.providerSandboxId,
+		refusal,
 	);
+	// A pinned bundle whose boot predates the drive layout serves the root disk's empty /workspace.
+	if (
+		driveName &&
+		!answer.stamps.some((stamp) => stamp.phase === "drive.layout")
+	) {
+		throw new SandboxDriveMissingError(
+			args.providerSandboxId,
+			driveName,
+			"the boot answered without laying the drive out",
+		);
+	}
 	await pushManagedEnv(
 		args.hostTarget,
 		args.claim.hostSecret,
@@ -570,6 +615,7 @@ export async function wakeSandbox(args: {
 					),
 			);
 		}
+		let resumedByAnotherWake = false;
 		if (!wasRunning) {
 			const { [SANDBOX_PATHS.agents]: previousAgents, ...kept } =
 				sandbox.mounts ?? {};
@@ -577,12 +623,25 @@ export async function wakeSandbox(args: {
 			const mounts = composeMounts(kept, args.mounts, agents) ?? {};
 			const drive = readWriteDriveAt(mounts, SANDBOX_PATHS.drive);
 			if (drive) {
-				await Sentry.startSpan(
+				const outcome = await Sentry.startSpan(
 					{ name: "drive detach", op: "sandbox.provider" },
-					() => waitForDriveDetached(drive),
+					() =>
+						waitForDriveDetached(drive, {
+							heldByCaller: async (attachedTo) =>
+								attachedTo === args.providerSandboxId &&
+								(
+									await Sandbox.get({
+										...credentials(),
+										name: args.providerSandboxId,
+										resume: false,
+									})
+								).status === "running",
+						}),
 				);
+				// A concurrent wake resumed this box with its drive meanwhile.
+				resumedByAnotherWake = outcome === "held";
 			}
-			if (agents || previousAgents || args.mounts) {
+			if (!resumedByAnotherWake && (agents || previousAgents || args.mounts)) {
 				const update = Sentry.startSpan(
 					{ name: "mount", op: "sandbox.provider" },
 					() => sandbox.update({ mounts }),
@@ -598,7 +657,8 @@ export async function wakeSandbox(args: {
 					);
 			}
 		}
-		if (!wasRunning && args.beforeResume) {
+		const running = wasRunning || resumedByAnotherWake;
+		if (!running && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
 		}
 		if (wasRunning) {
@@ -611,7 +671,7 @@ export async function wakeSandbox(args: {
 		}
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
-		const serving = wasRunning && (await hostServiceAnswers(hostTarget));
+		const serving = running && (await hostServiceAnswers(hostTarget));
 		await Sentry.startSpan(
 			{ name: "apply claim", op: "sandbox.provider" },
 			() =>
@@ -640,22 +700,18 @@ export async function wakeSandbox(args: {
 					providerSandboxId: args.providerSandboxId,
 					hostTarget,
 					claim: args.claim,
+					sandbox,
 				}),
 		).catch(async (error) => {
-			const driveName = args.claim.identity.SUPERSET_SANDBOX_DRIVE;
-			if (
-				error instanceof SandboxNotReadyError &&
-				driveName &&
-				(await refusedForMissingDrive(sandbox))
-			) {
+			// Stopped, the next wake mounts the drive afresh.
+			if (error instanceof SandboxDriveMissingError) {
 				await sandbox.stop().catch(() => {});
-				throw new SandboxDriveMissingError(args.providerSandboxId, driveName);
 			}
 			throw error;
 		});
 		return {
 			hostTarget,
-			booted: !wasRunning,
+			booted: !running,
 			rebooted: !serving,
 			answer,
 			expiresAt: sandbox.expiresAt ?? null,
@@ -705,7 +761,7 @@ export function inheritedIdentityPaths(withDrive: boolean): string[] {
 	if (!withDrive) return INHERITED_IDENTITY;
 	const paths = [...INHERITED_IDENTITY, ...DRIVE_IDENTITY];
 	const onDrive = paths.flatMap((path) => sandboxDrivePathOf(path) ?? []);
-	return [...paths, ...onDrive];
+	return [...paths, ...onDrive, SANDBOX_PATHS.driveState];
 }
 
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
