@@ -74,7 +74,11 @@ export function AgentUpdateRestartToast() {
 				label: t({ message: "Restart and resume" }),
 				onClick: () => {
 					markOffered();
-					restartSessions();
+					restartSessions(undefined, {
+						onError: () => {
+							for (const terminalId of terminalIds) offered.delete(terminalId);
+						},
+					});
 				},
 			},
 			onDismiss: markOffered,

@@ -5,6 +5,7 @@ import {
 	mkdtempSync,
 	realpathSync,
 	rmSync,
+	statSync,
 	symlinkSync,
 	writeFileSync,
 } from "node:fs";
@@ -41,26 +42,38 @@ describe("findInstalledBinary", () => {
 		symlinkSync(join(versionDir, "claude"), join(brewDir, "claude"));
 
 		const path = [join(root, "missing"), wrapperDir, brewDir].join(delimiter);
-		expect(await findInstalledBinary("claude", path)).toEndWith(
-			join("Caskroom", "2.1.330", "claude"),
-		);
+		const installed = await findInstalledBinary("claude", path);
+		expect(installed?.path).toEndWith(join("Caskroom", "2.1.330", "claude"));
+		const stats = statSync(join(versionDir, "claude"));
+		expect(installed?.fileId).toBe(`${stats.dev}:${stats.ino}`);
 		expect(await findInstalledBinary("codex", path)).toBeNull();
 	});
 });
 
 describe("isOutdatedExecutable", () => {
-	it("flags only an older copy of the same binary", () => {
-		const installed =
-			"/opt/homebrew/Caskroom/claude-code@latest/2.1.330/claude";
+	it("flags another copy of the same install, never another program", () => {
+		const brew = (version: string, fileId: string) => ({
+			path: `/opt/homebrew/Caskroom/claude-code@latest/${version}/claude`,
+			fileId,
+		});
+		const native = (version: string, fileId: string) => ({
+			path: `/home/u/.local/share/claude/versions/${version}`,
+			fileId,
+		});
+		const npm = { path: "/usr/lib/node_modules/.bin/claude", fileId: "1:5" };
+
 		expect(
-			isOutdatedExecutable(
-				"/opt/homebrew/Caskroom/claude-code@latest/2.1.325/claude",
-				installed,
-			),
+			isOutdatedExecutable(brew("2.1.325", "1:1"), brew("2.1.330", "1:2")),
 		).toBe(true);
-		expect(isOutdatedExecutable(installed, installed)).toBe(false);
-		expect(isOutdatedExecutable("/usr/local/bin/node", installed)).toBe(false);
-		expect(isOutdatedExecutable(null, installed)).toBe(false);
+		expect(
+			isOutdatedExecutable(native("2.1.325", "1:3"), native("2.1.330", "1:4")),
+		).toBe(true);
+		expect(isOutdatedExecutable({ ...npm, fileId: "1:6" }, npm)).toBe(true);
+		expect(isOutdatedExecutable(npm, npm)).toBe(false);
+		expect(
+			isOutdatedExecutable({ path: "/usr/local/bin/node", fileId: "1:9" }, npm),
+		).toBe(false);
+		expect(isOutdatedExecutable(null, npm)).toBe(false);
 	});
 });
 
@@ -69,8 +82,10 @@ describe("readRunningExecutable", () => {
 		const pid = parseLaunchPid(`${process.pid}-1794900734`);
 		expect(pid).toBe(process.pid);
 		if (process.platform !== "darwin" && process.platform !== "linux") return;
-		expect(await readRunningExecutable(pid ?? 0)).toBe(
-			realpathSync(process.execPath),
-		);
+		const stats = statSync(process.execPath);
+		expect(await readRunningExecutable(pid ?? 0)).toEqual({
+			path: realpathSync(process.execPath),
+			fileId: `${stats.dev}:${stats.ino}`,
+		});
 	});
 });
