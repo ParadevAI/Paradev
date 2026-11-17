@@ -3688,9 +3688,6 @@ msgstr "{companyName}을 팀에 도입하세요. 엔터프라이즈 플랜과 �
 msgid "Bring a link to something you built recently."
 msgstr "최근에 만든 결과물의 링크를 가져오세요."
 
-msgid "Bring in an agent"
-msgstr "에이전트 불러오기"
-
 msgid "Bring over your projects"
 msgstr "프로젝트 가져오기"
 
@@ -5923,6 +5920,9 @@ msgstr "아이콘을 설정할 수 없습니다"
 msgid "Could not share"
 msgstr "공유할 수 없습니다"
 
+msgid "Could not sign out. Please try again."
+msgstr "로그아웃할 수 없습니다. 다시 시도하세요."
+
 msgid "Could not start agent"
 msgstr "에이전트를 시작하지 못했습니다"
 
@@ -6842,6 +6842,9 @@ msgstr "\"{hostName}\"을(를) 삭제할까요?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\"을(를) 삭제할까요?"
+
+msgid "Delete \"{title}\"?"
+msgstr "“{title}”을(를) 삭제할까요?"
 
 msgid "Delete “{title}”?"
 msgstr "“{title}”을(를) 삭제할까요?"
@@ -9458,8 +9461,8 @@ msgstr "GitHub 요청 한도에 도달했습니다"
 msgid "GitHub refused the merge"
 msgstr "GitHub가 머지를 거부했습니다"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "플러그인 마켓플레이스 파일이 있는 GitHub 리포지토리입니다. Superset이 해당 플러그인을 조직에 동기화합니다."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "플러그인 마켓플레이스 파일이 있는 GitHub 리포지토리입니다. Paradev가 해당 플러그인을 조직에 동기화합니다."
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub 로그인이 필요합니다"
@@ -12885,9 +12888,6 @@ msgstr "\"{0}\"과(와) 일치하는 플러그인이 없습니다"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "아직 플러그인이 없습니다. 리포지토리를 추가해 동기화하세요."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "아직 포트가 없습니다. 터미널에서 개발 서버를 시작하면 여기에 표시됩니다."
-
 msgid "No posts yet."
 msgstr "아직 게시물이 없습니다."
 
@@ -14149,6 +14149,9 @@ msgstr "조직 {id}"
 msgid "Organization {id}"
 msgstr "조직 {id}"
 
+msgid "Organization already exists"
+msgstr "조직이 이미 존재합니다"
+
 msgid "Organization created successfully!"
 msgstr "조직을 만들었습니다!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "페이지"
 
+msgid "Page actions"
+msgstr "페이지 작업"
+
 msgid "Page by you"
 msgstr "내가 만든 페이지"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev는 본인 계정으로 GitHub에서 작업합니다. 풀 리퀘스트를 병합, 댓글 작성, 업데이트하려면 GitHub 계정을 연결하세요."
 
 msgid "Paradev Agent"
 msgstr "Paradev 에이전트"
@@ -14540,6 +14549,9 @@ msgstr "Paradev 페이지 데모"
 
 msgid "Paradev Plugins"
 msgstr "Paradev 플러그인"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev는 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
@@ -14805,8 +14817,8 @@ msgstr "프로젝트 위치를 선택하세요"
 msgid "Pick a reason"
 msgstr "사유를 선택하세요"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "플러그인 마켓플레이스 파일이 있는 리포지토리를 선택하세요. Superset이 지금 그리고 다시 동기화할 때마다 플러그인을 동기화합니다."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "플러그인 마켓플레이스 파일이 있는 리포지토리를 선택하세요. Paradev가 지금 그리고 다시 동기화할 때마다 플러그인을 동기화합니다."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "소리를 고르거나 직접 추가하세요. 사용자 지정 오디오는 .mp3, .wav, .ogg를 지원합니다."
@@ -15469,11 +15481,11 @@ msgstr "풀 리퀘스트"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "위에 있는 풀 리퀘스트는 열린 상태로 유지되고 GitHub가 대상 브랜치를 변경합니다."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시가 더 이상 본인 계정으로 처리되지 않습니다."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev에서의 풀 리퀘스트, 댓글, 푸시가 더 이상 본인 계정으로 처리되지 않습니다."
 
 msgid "Purple"
 msgstr "보라"
@@ -17934,9 +17946,6 @@ msgstr "페이지 공유(공개)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHub 저장소에서 플러그인을 공유하세요. git 태그로 릴리스를 고정합니다."
 
-msgid "Share this page"
-msgstr "이 페이지 공유"
-
 msgid "Share via…"
 msgstr "공유 방법…"
 
@@ -18243,6 +18252,9 @@ msgstr "{label}에 로그인"
 msgid "Sign in to change your organization's plugins."
 msgstr "조직 플러그인을 변경하려면 로그인하세요."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName}을(를) 연결하려면 로그인하세요"
+
 msgid "Sign in to continue"
 msgstr "계속하려면 로그인하세요"
 
@@ -18263,6 +18275,12 @@ msgstr "이 페이지를 보려면 로그인하세요"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel}(으)로 로그인한 후 여기로 돌아오세요."
+
+msgid "Sign in with another account"
+msgstr "다른 계정으로 로그인"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "다른 계정으로 로그인하거나 조직 관리자에게 초대를 요청하세요."
 
 msgid "Sign in with email"
 msgstr "이메일로 로그인"
@@ -18349,6 +18367,9 @@ msgstr "로그인하는 중..."
 
 msgid "Signing in…"
 msgstr "로그인하는 중…"
+
+msgid "Signing out…"
+msgstr "로그아웃하는 중…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "가입이 잘 됩니다. 환영 화면이 열리고 콘솔에 오류가 없습니다."
@@ -19159,9 +19180,6 @@ msgstr "대체됨"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset은 본인 계정으로 GitHub에서 작업합니다. 풀 리퀘스트를 병합, 댓글 작성, 업데이트하려면 GitHub 계정을 연결하세요."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp는 해당 패널 전용 엔드포인트만 출력합니다. Playwright나 browser-use를 여기에 연결하세요."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset은 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
 
 msgid "Supervised"
 msgstr "감독"
@@ -19767,7 +19782,7 @@ msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
-msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
+msgstr "Paradev가 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
@@ -19979,6 +19994,9 @@ msgstr "야간 근무"
 
 msgid "The owner's account no longer exists."
 msgstr "소유자의 계정이 더 이상 존재하지 않습니다."
+
+msgid "The page and every version of it will be deleted."
+msgstr "페이지와 모든 버전이 삭제됩니다."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "페이지와 그 내용이 삭제됩니다. 링크가 있는 사람도 접근할 수 없게 됩니다."
@@ -20223,6 +20241,9 @@ msgstr "이 자동화는 보관되었습니다. 먼저 복원하세요."
 
 msgid "This automation is in another organization"
 msgstr "이 자동화는 다른 조직에 있습니다"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "이 브라우저는 Paradev에 로그인되어 있지 않습니다. 로그인하여 {connectorName}(으)로 계속하세요."
 
 msgid "This cannot be undone."
 msgstr "되돌릴 수 없습니다."
@@ -21374,7 +21395,7 @@ msgid "Update Paradev on that device. In-app updates require a supported standal
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."
 
 msgid "Update Paradev on this host to edit its workspace config."
-msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev을 업데이트하세요."
+msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev를 업데이트하세요."
 
 msgid "Update payment method"
 msgstr "결제 수단 업데이트"
@@ -21511,6 +21532,12 @@ msgstr "“{0}” 사용"
 
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "워크스페이스 기준 상대 경로나 절대 경로 폴더를 사용하세요."
+
+msgid "Use another account to connect {connectorName}"
+msgstr "다른 계정으로 {connectorName} 연결"
+
+msgid "Use another account to continue"
+msgstr "다른 계정으로 계속"
 
 msgid "Use another port"
 msgstr "다른 포트 사용"
@@ -22536,6 +22563,9 @@ msgstr "오프라인 상태입니다"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "현재 <0>{currentPlanLabel} 플랜</0>을 사용 중입니다. 플랜에 대해 궁금한 점이 있거나 도움이 필요하면 <1>문의해 주세요<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email}(으)로 로그인되어 있습니다. 이 계정은 이 링크의 조직 구성원이 아닙니다."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "다른 멤버가 있는 조직의 유일한 소유자입니다. 먼저 소유권을 이전하거나 조직을 삭제하세요."
 
@@ -22579,6 +22609,9 @@ msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "이 작업은 되돌릴 수 없습니다. 터미널 패널에 \"Process exited\"가 표시되며 다시 시작할 수 있습니다."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "유일한 소유자는 조직에서 나갈 수 없습니다"
+
 msgid "You control the access"
 msgstr "접근 권한은 사용자가 관리합니다"
 
@@ -22608,6 +22641,9 @@ msgstr "계정을 연결하려면 조직에 속해 있어야 합니다."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "연동을 사용하려면 조직에 속해 있어야 합니다."
+
+msgid "You should be a member of at least one team"
+msgstr "최소 한 개의 팀에 속해 있어야 합니다"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "계정이 비활성화되었으며 곧 영구적으로 삭제됩니다. 
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "계정이 조직에서 관리됩니다. 새 조직을 만들려면 관리자에게 문의하세요."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "계정이 이 링크의 조직 구성원이 아닙니다."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "에이전트는 superset browser 명령으로 어떤 페이지든 열고 조작할 수 있습니다. 보고 있는 패널을 사용하므로 모든 단계를 볼 수 있습니다."
@@ -22771,6 +22810,12 @@ msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구�
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "이 브라우저의 Paradev 세션이 만료되었습니다. 다시 로그인하여 {connectorName}(으)로 계속하세요."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "이 브라우저의 Paradev 세션이 만료되었습니다. 계속하려면 다시 로그인하세요."
 
 msgid "Your plan does not include cloud environments."
 msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니다."

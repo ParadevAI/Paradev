@@ -3688,9 +3688,6 @@ msgstr "Přineste {companyName} svému týmu. Ozvěte se nám a zjistěte více 
 msgid "Bring a link to something you built recently."
 msgstr "Přineste odkaz na něco, co jste nedávno vytvořili."
 
-msgid "Bring in an agent"
-msgstr "Přizvat agenta"
-
 msgid "Bring over your projects"
 msgstr "Převeďte své projekty"
 
@@ -5923,6 +5920,9 @@ msgstr "Nepodařilo se nastavit ikonu"
 msgid "Could not share"
 msgstr "Nepodařilo se sdílet"
 
+msgid "Could not sign out. Please try again."
+msgstr "Odhlášení se nezdařilo. Zkuste to znovu."
+
 msgid "Could not start agent"
 msgstr "Nepodařilo se spustit agenta"
 
@@ -6842,6 +6842,9 @@ msgstr "Smazat „{hostName}“?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "Smazat „{projectName}“?"
+
+msgid "Delete \"{title}\"?"
+msgstr "Smazat „{title}“?"
 
 msgid "Delete “{title}”?"
 msgstr "Smazat „{title}“?"
@@ -9458,8 +9461,8 @@ msgstr "Dosažen limit požadavků GitHubu"
 msgid "GitHub refused the merge"
 msgstr "GitHub sloučení odmítl"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Repozitáře GitHub se souborem marketplace pluginů. Superset synchronizuje jejich pluginy do vaší organizace."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Repozitáře GitHub se souborem marketplace pluginů. Paradev synchronizuje jejich pluginy do vaší organizace."
 
 msgid "GitHub sign-in needed"
 msgstr "Je vyžadováno přihlášení ke GitHubu"
@@ -12885,9 +12888,6 @@ msgstr "Žádný plugin neodpovídá „{0}“"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Zatím žádné pluginy. Přidejte repozitář a synchronizujte je."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Zatím žádné porty. Spusťte vývojový server v terminálu a objeví se tady."
-
 msgid "No posts yet."
 msgstr "Zatím žádné články."
 
@@ -14149,6 +14149,9 @@ msgstr "organizaci {id}"
 msgid "Organization {id}"
 msgstr "Organizace {id}"
 
+msgid "Organization already exists"
+msgstr "Organizace již existuje"
+
 msgid "Organization created successfully!"
 msgstr "Organizace byla vytvořena!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Stránka"
 
+msgid "Page actions"
+msgstr "Akce stránky"
+
 msgid "Page by you"
 msgstr "Stránka od vás"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev jedná na GitHubu za vás. Připojte svůj účet GitHub, abyste mohli slučovat, komentovat a aktualizovat pull requesty."
 
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
@@ -14540,6 +14549,9 @@ msgstr "Ukázka Paradev Stránky"
 
 msgid "Paradev Plugins"
 msgstr "Pluginy Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev jej čte pomocí připojeného účtu GitHub. Pokud jste účet ještě nepřipojili, připojte jej v <0>Nastavení › Integrace</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev běží lokálně na počítačích vašich vývojářů. Neukládáme váš kód ani konverzace s AI a Paradev prošel auditem SOC 2 Type II u nezávislého auditora. Vyžádejte si zprávu a projděte si dokumentaci k bezpečnosti na {trustHost}."
@@ -14805,8 +14817,8 @@ msgstr "Vyberte umístění projektu"
 msgid "Pick a reason"
 msgstr "Vyberte důvod"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Vyberte repozitář se souborem marketplace pluginů. Superset synchronizuje jeho pluginy nyní a při každé další synchronizaci."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Vyberte repozitář se souborem marketplace pluginů. Paradev synchronizuje jeho pluginy nyní a při každé další synchronizaci."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Vyberte zvuk nebo přidejte vlastní. Vlastní zvuk podporuje .mp3, .wav a .ogg."
@@ -15469,11 +15481,11 @@ msgstr "Pull requesty"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Pull requesty nad ním zůstanou otevřené a GitHub změní jejich cíl."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Pull requesty, komentáře a pushe ze Supersetu se provádějí pod vaším jménem."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Pull requesty, komentáře a pushe z Paradevu se provádějí pod vaším jménem."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Pull requesty, komentáře a pushe ze Supersetu už nebudou prováděny pod vaším jménem."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Pull requesty, komentáře a pushe z Paradevu už nebudou prováděny pod vaším jménem."
 
 msgid "Purple"
 msgstr "Fialová"
@@ -17934,9 +17946,6 @@ msgstr "Sdílet stránku (veřejná)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Sdílejte pluginy z repozitáře GitHub. Zafixujte vydání pomocí git tagů."
 
-msgid "Share this page"
-msgstr "Sdílet tuto stránku"
-
 msgid "Share via…"
 msgstr "Sdílet přes…"
 
@@ -18243,6 +18252,9 @@ msgstr "Přihlásit se do {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Pro změnu pluginů organizace se přihlaste."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Přihlaste se a připojte {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Pro pokračování se přihlaste"
 
@@ -18263,6 +18275,12 @@ msgstr "Přihlaste se, abyste zobrazili tuto stránku"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Přihlaste se přes {browserProviderLabel} a pak se sem vraťte."
+
+msgid "Sign in with another account"
+msgstr "Přihlásit se jiným účtem"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Přihlaste se jiným účtem, nebo požádejte správce organizace o pozvánku."
 
 msgid "Sign in with email"
 msgstr "Přihlásit se e-mailem"
@@ -18349,6 +18367,9 @@ msgstr "Přihlašuji..."
 
 msgid "Signing in…"
 msgstr "Přihlašování…"
+
+msgid "Signing out…"
+msgstr "Odhlašování…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Registrace funguje. Uvítací obrazovka se načte a konzole je čistá."
@@ -19159,9 +19180,6 @@ msgstr "nahrazeno"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset jedná na GitHubu za vás. Připojte svůj účet GitHub, abyste mohli slučovat, komentovat a aktualizovat pull requesty."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp vypíše endpoint jen pro daný panel. Namiřte na něj Playwright nebo browser-use."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset je nyní Paradev. A také jsme získali seedové kolo ve výši
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile přichází na iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset jej čte pomocí připojeného účtu GitHub. Pokud jste účet ještě nepřipojili, připojte jej v <0>Nastavení › Integrace</0>."
 
 msgid "Supervised"
 msgstr "Pod dohledem"
@@ -19980,6 +19995,9 @@ msgstr "Noční směna"
 msgid "The owner's account no longer exists."
 msgstr "Účet vlastníka už neexistuje."
 
+msgid "The page and every version of it will be deleted."
+msgstr "Stránka a všechny její verze budou smazány."
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Stránka i její obsah se odstraní. Kdokoli s odkazem ztratí přístup."
 
@@ -20223,6 +20241,9 @@ msgstr "Tato automatizace je archivovaná. Nejprve ji obnovte."
 
 msgid "This automation is in another organization"
 msgstr "Tato automatizace je v jiné organizaci"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Tento prohlížeč není přihlášen do Paradevu. Přihlaste se a pokračujte do {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Nelze vrátit zpět."
@@ -21512,6 +21533,12 @@ msgstr "Použít „{0}“"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Použijte cestu relativní k pracovnímu prostoru nebo absolutní složku."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Použijte jiný účet k připojení {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Pokračujte s jiným účtem"
+
 msgid "Use another port"
 msgstr "Použít jiný port"
 
@@ -22536,6 +22563,9 @@ msgstr "Jste offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Máte <0>tarif {currentPlanLabel}</0>. Pokud máte dotazy nebo potřebujete s tarifem pomoct, <1>ozvěte se nám<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Jste přihlášeni jako {email}. Tento účet není členem organizace, pro kterou je tento odkaz."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Jste jediný vlastník organizace, která má další členy. Nejprve převeďte vlastnictví nebo organizaci smažte."
 
@@ -22579,6 +22609,9 @@ msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tuto akci nelze vrátit zpět. Panely terminálu zobrazí „Proces skončil“ a půjde je spustit znovu."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Organizaci nemůžete opustit, protože jste jejím jediným vlastníkem"
+
 msgid "You control the access"
 msgstr "Přístup máte pod kontrolou"
 
@@ -22608,6 +22641,9 @@ msgstr "Pro připojení účtů musíte být součástí organizace."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Pro používání integrací musíte být součástí organizace."
+
+msgid "You should be a member of at least one team"
+msgstr "Musíte být členem alespoň jednoho týmu"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "Váš účet je deaktivovaný a brzy bude trvale smazán. Obnovte ho a b
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Váš účet spravuje vaše organizace. O vytvoření nové organizace požádejte svého správce."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Váš účet není členem organizace, pro kterou je tento odkaz."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent může otevřít libovolnou stránku a projít ji pomocí příkazů superset browser. Používá panel, na který se díváte, takže vidíte každý krok."
@@ -22771,6 +22810,12 @@ msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu 
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Vaše relace Paradev v tomto prohlížeči vypršela. Přihlaste se znovu a pokračujte do {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Vaše relace Paradev v tomto prohlížeči vypršela. Pro pokračování se přihlaste znovu."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Váš plán nezahrnuje cloudová prostředí."

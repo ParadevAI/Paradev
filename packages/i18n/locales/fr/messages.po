@@ -3688,9 +3688,6 @@ msgstr "Déployez {companyName} dans votre équipe. Contactez-nous pour en savoi
 msgid "Bring a link to something you built recently."
 msgstr "Apportez le lien d’un projet que vous avez construit récemment."
 
-msgid "Bring in an agent"
-msgstr "Faire intervenir un agent"
-
 msgid "Bring over your projects"
 msgstr "Importez vos projets"
 
@@ -5923,6 +5920,9 @@ msgstr "Impossible de définir l'icône"
 msgid "Could not share"
 msgstr "Impossible de partager"
 
+msgid "Could not sign out. Please try again."
+msgstr "Impossible de se déconnecter. Veuillez réessayer."
+
 msgid "Could not start agent"
 msgstr "Impossible de démarrer l'agent"
 
@@ -6842,6 +6842,9 @@ msgstr "Supprimer « {hostName} » ?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "Supprimer « {projectName} » ?"
+
+msgid "Delete \"{title}\"?"
+msgstr "Supprimer « {title} » ?"
 
 msgid "Delete “{title}”?"
 msgstr "Supprimer « {title} » ?"
@@ -9458,8 +9461,8 @@ msgstr "Limite de requêtes GitHub atteinte"
 msgid "GitHub refused the merge"
 msgstr "GitHub a refusé la fusion"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Dépôts GitHub contenant un fichier de marketplace de plugins. Superset synchronise leurs plugins dans votre organisation."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Dépôts GitHub contenant un fichier de marketplace de plugins. Paradev synchronise leurs plugins dans votre organisation."
 
 msgid "GitHub sign-in needed"
 msgstr "Connexion à GitHub requise"
@@ -12885,9 +12888,6 @@ msgstr "Aucun plugin ne correspond à \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Aucun plugin pour l'instant. Ajoutez un dépôt pour les synchroniser."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Aucun port pour l’instant. Lancez un serveur de développement dans un terminal et il apparaîtra ici."
-
 msgid "No posts yet."
 msgstr "Aucun article pour l'instant."
 
@@ -14149,6 +14149,9 @@ msgstr "organisation {id}"
 msgid "Organization {id}"
 msgstr "Organisation {id}"
 
+msgid "Organization already exists"
+msgstr "L'organisation existe déjà"
+
 msgid "Organization created successfully!"
 msgstr "Organisation créée avec succès !"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Page"
 
+msgid "Page actions"
+msgstr "Actions de la page"
+
 msgid "Page by you"
 msgstr "Page créée par vous"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev agit sur GitHub en votre nom. Connectez votre compte GitHub pour fusionner, commenter et mettre à jour des pull requests."
 
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
@@ -14540,6 +14549,9 @@ msgstr "Démo de Paradev Pages"
 
 msgid "Paradev Plugins"
 msgstr "Plugins Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev le lit avec votre compte GitHub connecté. Si ce n'est pas encore fait, connectez-en un dans <0>Paramètres › Intégrations</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev tourne en local sur les machines de vos développeurs. Nous ne stockons ni votre code ni vos conversations avec l'IA, et Paradev a passé un audit SOC 2 Type II auprès d'un auditeur indépendant. Demandez le rapport et consultez notre documentation sécurité sur {trustHost}."
@@ -14805,8 +14817,8 @@ msgstr "Choisissez un emplacement de projet"
 msgid "Pick a reason"
 msgstr "Choisissez un motif"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Choisissez un dépôt contenant un fichier de marketplace de plugins. Superset synchronise ses plugins maintenant et à chaque nouvelle synchronisation."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Choisissez un dépôt contenant un fichier de marketplace de plugins. Paradev synchronise ses plugins maintenant et à chaque nouvelle synchronisation."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Choisissez un son ou ajoutez le vôtre. Les sons personnalisés acceptent .mp3, .wav et .ogg."
@@ -15469,11 +15481,11 @@ msgstr "Pull requests"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Les pull requests au-dessus resteront ouvertes et GitHub changera leur cible."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Les pull requests, commentaires et pushes depuis Superset sont faits en votre nom."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Les pull requests, commentaires et pushes depuis Paradev sont faits en votre nom."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Les pull requests, commentaires et pushes depuis Superset ne seront plus faits en votre nom."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Les pull requests, commentaires et pushes depuis Paradev ne seront plus faits en votre nom."
 
 msgid "Purple"
 msgstr "Violet"
@@ -17934,9 +17946,6 @@ msgstr "Partager la page (publique)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Partagez des plugins depuis un dépôt GitHub. Épinglez les versions avec des tags git."
 
-msgid "Share this page"
-msgstr "Partager cette page"
-
 msgid "Share via…"
 msgstr "Partager via…"
 
@@ -18243,6 +18252,9 @@ msgstr "Se connecter à {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Connectez-vous pour modifier les plugins de votre organisation."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Connectez-vous pour connecter {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Connectez-vous pour continuer"
 
@@ -18263,6 +18275,12 @@ msgstr "Connectez-vous pour voir cette page"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Connectez-vous avec {browserProviderLabel}, puis revenez ici."
+
+msgid "Sign in with another account"
+msgstr "Se connecter avec un autre compte"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Connectez-vous avec un autre compte, ou demandez à un administrateur de l’organisation de vous inviter."
 
 msgid "Sign in with email"
 msgstr "Se connecter par e-mail"
@@ -18349,6 +18367,9 @@ msgstr "Connexion..."
 
 msgid "Signing in…"
 msgstr "Connexion…"
+
+msgid "Signing out…"
+msgstr "Déconnexion…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "L'inscription fonctionne. L'écran d'accueil se charge et la console est propre."
@@ -19159,9 +19180,6 @@ msgstr "remplacée"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset agit sur GitHub en votre nom. Connectez votre compte GitHub pour fusionner, commenter et mettre à jour des pull requests."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp affiche un point de terminaison pour ce volet uniquement. Pointez Playwright ou browser-use dessus."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset s'appelle désormais Paradev. Au passage, nous avons levé 11,5
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile arrive sur iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset le lit avec votre compte GitHub connecté. Si ce n'est pas encore fait, connectez-en un dans <0>Paramètres › Intégrations</0>."
 
 msgid "Supervised"
 msgstr "Supervisé"
@@ -19980,6 +19995,9 @@ msgstr "L'équipe de nuit"
 msgid "The owner's account no longer exists."
 msgstr "Le compte du propriétaire n'existe plus."
 
+msgid "The page and every version of it will be deleted."
+msgstr "La page et toutes ses versions seront supprimées."
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "La page et son contenu sont supprimés. Toute personne disposant du lien perd l'accès."
 
@@ -20223,6 +20241,9 @@ msgstr "Cette automatisation est archivée. Restaurez-la d'abord."
 
 msgid "This automation is in another organization"
 msgstr "Cette automatisation se trouve dans une autre organisation"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Ce navigateur n’est pas connecté à Paradev. Connectez-vous pour continuer vers {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Cette action est irréversible."
@@ -21512,6 +21533,12 @@ msgstr "Utiliser « {0} »"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Utilisez un chemin relatif à l'espace de travail ou un dossier absolu."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Utilisez un autre compte pour connecter {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Utilisez un autre compte pour continuer"
+
 msgid "Use another port"
 msgstr "Utiliser un autre port"
 
@@ -22536,6 +22563,9 @@ msgstr "Vous êtes hors ligne"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Vous êtes sur le <0>forfait {currentPlanLabel}</0>. Si vous avez des questions ou souhaitez une aide supplémentaire concernant votre forfait, <1>contactez-nous<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Vous êtes connecté en tant que {email}. Ce compte n’est pas membre de l’organisation de ce lien."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Vous êtes le seul propriétaire d'une organisation qui compte d'autres membres. Transférez la propriété ou supprimez l'organisation d'abord."
 
@@ -22579,6 +22609,9 @@ msgstr "Vous pouvez consulter cette page, mais pas la commenter"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Cette action est irréversible. Les volets de terminal afficheront « Processus terminé » et pourront être relancés."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Vous ne pouvez pas quitter l'organisation en tant que seul propriétaire"
+
 msgid "You control the access"
 msgstr "Vous contrôlez l'accès"
 
@@ -22608,6 +22641,9 @@ msgstr "Vous devez faire partie d'une organisation pour connecter des comptes."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Vous devez faire partie d'une organisation pour utiliser les intégrations."
+
+msgid "You should be a member of at least one team"
+msgstr "Vous devez être membre d'au moins une équipe"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "Votre compte est désactivé et sera définitivement supprimé prochaine
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Votre compte est géré par votre organisation. Contactez votre administrateur pour créer une nouvelle organisation."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Votre compte n’est pas membre de l’organisation de ce lien."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Votre agent peut ouvrir n'importe quelle page et la parcourir avec les commandes superset browser. Il utilise le volet que vous regardez, donc vous voyez chaque étape."
@@ -22771,6 +22810,12 @@ msgstr "Vos propres comptes. Les intégrations de votre organisation permettent 
 
 msgid "Your Paradev download is starting."
 msgstr "Votre téléchargement de Paradev démarre."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer vers {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Votre session Paradev dans ce navigateur a expiré. Reconnectez-vous pour continuer."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Votre forfait n'inclut pas d'environnements cloud."

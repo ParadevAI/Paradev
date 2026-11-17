@@ -3688,9 +3688,6 @@ msgstr "把 {companyName} 带给你的团队。联系我们，了解企业版方
 msgid "Bring a link to something you built recently."
 msgstr "请带上你最近做的作品链接。"
 
-msgid "Bring in an agent"
-msgstr "引入智能体"
-
 msgid "Bring over your projects"
 msgstr "迁入项目"
 
@@ -5923,6 +5920,9 @@ msgstr "无法设置图标"
 msgid "Could not share"
 msgstr "无法分享"
 
+msgid "Could not sign out. Please try again."
+msgstr "无法退出登录。请重试。"
+
 msgid "Could not start agent"
 msgstr "无法启动智能体"
 
@@ -6842,6 +6842,9 @@ msgstr "删除“{hostName}”？"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "删除“{projectName}”？"
+
+msgid "Delete \"{title}\"?"
+msgstr "删除“{title}”？"
 
 msgid "Delete “{title}”?"
 msgstr "删除“{title}”？"
@@ -9458,8 +9461,8 @@ msgstr "已达到 GitHub 速率限制"
 msgid "GitHub refused the merge"
 msgstr "GitHub拒绝了此次合并"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "包含插件市场文件的 GitHub 仓库。Superset 会将其中的插件同步到你的组织。"
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "包含插件市场文件的 GitHub 仓库。Paradev 会将其中的插件同步到你的组织。"
 
 msgid "GitHub sign-in needed"
 msgstr "需要登录 GitHub"
@@ -12885,9 +12888,6 @@ msgstr "没有匹配“{0}”的插件"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "暂无插件。添加一个仓库来同步插件。"
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "还没有端口。在终端中启动开发服务器后会显示在这里。"
-
 msgid "No posts yet."
 msgstr "暂无文章。"
 
@@ -14149,6 +14149,9 @@ msgstr "组织{id}"
 msgid "Organization {id}"
 msgstr "组织{id}"
 
+msgid "Organization already exists"
+msgstr "组织已存在"
+
 msgid "Organization created successfully!"
 msgstr "组织创建成功！"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "页面"
 
+msgid "Page actions"
+msgstr "页面操作"
+
 msgid "Page by you"
 msgstr "你创建的页面"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev 以你的身份在 GitHub 上操作。连接你的 GitHub 账户以合并、评论和更新拉取请求。"
 
 msgid "Paradev Agent"
 msgstr "Paradev智能体"
@@ -14540,6 +14549,9 @@ msgstr "Paradev 页面演示"
 
 msgid "Paradev Plugins"
 msgstr "Paradev 插件"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev 使用你已连接的 GitHub 账号读取它。如果还没有连接，请在<0>设置 › 集成</0>中连接。"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev在你的开发者机器上本地运行。我们不存储你的代码或AI对话，并且Paradev已通过独立审计机构的SOC 2 Type II审计。可在{trustHost}索取报告并查阅我们的安全文档。"
@@ -14805,8 +14817,8 @@ msgstr "请选择项目位置"
 msgid "Pick a reason"
 msgstr "选择原因"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "选择一个包含插件市场文件的仓库。Superset 会立即同步其插件，并在你每次重新同步时再次同步。"
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "选择一个包含插件市场文件的仓库。Paradev 会立即同步其插件，并在你每次重新同步时再次同步。"
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "选择一个声音或添加自己的。自定义音频支持.mp3、.wav和.ogg。"
@@ -15469,11 +15481,11 @@ msgstr "拉取请求"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "其上的拉取请求将保持打开，GitHub 会更改它们的目标分支。"
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "来自 Superset 的拉取请求、评论和推送以你的身份进行。"
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "来自 Paradev 的拉取请求、评论和推送以你的身份进行。"
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "来自 Superset 的拉取请求、评论和推送将不再以你的身份进行。"
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "来自 Paradev 的拉取请求、评论和推送将不再以你的身份进行。"
 
 msgid "Purple"
 msgstr "紫色"
@@ -17934,9 +17946,6 @@ msgstr "分享页面（公开）"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "从 GitHub 仓库分享插件，用 git 标签固定版本。"
 
-msgid "Share this page"
-msgstr "分享此页面"
-
 msgid "Share via…"
 msgstr "分享方式…"
 
@@ -18243,6 +18252,9 @@ msgstr "登录 {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "登录后才能更改组织的插件。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "登录以连接 {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "登录以继续"
 
@@ -18263,6 +18275,12 @@ msgstr "登录以查看此页面"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "使用 {browserProviderLabel} 登录后，再回到这里。"
+
+msgid "Sign in with another account"
+msgstr "使用其他账号登录"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "请使用其他账号登录，或请该组织的管理员邀请你。"
 
 msgid "Sign in with email"
 msgstr "使用邮箱登录"
@@ -18349,6 +18367,9 @@ msgstr "正在登录..."
 
 msgid "Signing in…"
 msgstr "正在登录…"
+
+msgid "Signing out…"
+msgstr "正在退出登录…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "注册正常。欢迎页面已加载，控制台没有错误。"
@@ -19159,9 +19180,6 @@ msgstr "已被取代"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset 以你的身份在 GitHub 上操作。连接你的 GitHub 账户以合并、评论和更新拉取请求。"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只会输出该窗格专属的端点。让 Playwright 或 browser-use 连接它即可。"
 
@@ -19170,9 +19188,6 @@ msgstr "Superset 现已更名为 Paradev。另外，我们完成了 1150 万美�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登陆 iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset 使用你已连接的 GitHub 账号读取它。如果还没有连接，请在<0>设置 › 集成</0>中连接。"
 
 msgid "Supervised"
 msgstr "监督"
@@ -19980,6 +19995,9 @@ msgstr "夜班"
 msgid "The owner's account no longer exists."
 msgstr "所有者的账户已不存在。"
 
+msgid "The page and every version of it will be deleted."
+msgstr "该页面及其所有版本都将被删除。"
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "页面及其内容会被移除。持有链接的人将失去访问权限。"
 
@@ -20223,6 +20241,9 @@ msgstr "此自动化已归档。请先恢复。"
 
 msgid "This automation is in another organization"
 msgstr "此自动化位于其他组织"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "此浏览器未登录 Paradev。请登录以继续前往 {connectorName}。"
 
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
@@ -21512,6 +21533,12 @@ msgstr "使用“{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "使用相对于工作区的路径或绝对路径文件夹。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "使用其他账号连接 {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "使用其他账号继续"
+
 msgid "Use another port"
 msgstr "使用其他端口"
 
@@ -22536,6 +22563,9 @@ msgstr "你已离线"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "你当前使用的是<0>{currentPlanLabel}方案</0>。如有任何疑问，或希望就方案获得进一步支持，请<1>联系我们<2/></1>。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "你当前以 {email} 登录。此账号不是该链接所属组织的成员。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "你是某个仍有其他成员的组织的唯一所有者。请先转移所有权或删除该组织。"
 
@@ -22579,6 +22609,9 @@ msgstr "你可以查看此页面，但不能评论"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作无法撤销。终端窗格会显示“进程已退出”，之后可以重新启动。"
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "你是唯一的所有者，无法退出组织"
+
 msgid "You control the access"
 msgstr "访问权限由你掌控"
 
@@ -22608,6 +22641,9 @@ msgstr "您需要加入一个组织才能连接账户。"
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "你需要加入一个组织才能使用集成。"
+
+msgid "You should be a member of at least one team"
+msgstr "你必须至少属于一个团队"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "你的账户已停用，并将很快被永久删除。重新激活即可
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "你的账户由你所在的组织管理。请联系管理员来创建新组织。"
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "你的账号不是该链接所属组织的成员。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "你的智能体可以用 superset browser 命令打开任意页面并逐步操作。它使用你正在看的窗格，所以每一步你都能看到。"
@@ -22771,6 +22810,12 @@ msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续前往 {connectorName}。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "此浏览器中的 Paradev 会话已过期。请重新登录以继续。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "你的套餐不包含云端环境。"

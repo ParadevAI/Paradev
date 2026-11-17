@@ -3688,9 +3688,6 @@ msgstr "Breng {companyName} naar je team. Neem contact op voor meer informatie o
 msgid "Bring a link to something you built recently."
 msgstr "Neem een link mee naar iets wat je onlangs hebt gebouwd."
 
-msgid "Bring in an agent"
-msgstr "Een agent erbij halen"
-
 msgid "Bring over your projects"
 msgstr "Neem je projecten over"
 
@@ -5923,6 +5920,9 @@ msgstr "Kan icoon niet instellen"
 msgid "Could not share"
 msgstr "Delen mislukt"
 
+msgid "Could not sign out. Please try again."
+msgstr "Afmelden is mislukt. Probeer het opnieuw."
+
 msgid "Could not start agent"
 msgstr "Kan agent niet starten"
 
@@ -6842,6 +6842,9 @@ msgstr "\"{hostName}\" verwijderen?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\" verwijderen?"
+
+msgid "Delete \"{title}\"?"
+msgstr "‘{title}’ verwijderen?"
 
 msgid "Delete “{title}”?"
 msgstr "“{title}” verwijderen?"
@@ -9458,8 +9461,8 @@ msgstr "GitHub-limiet bereikt"
 msgid "GitHub refused the merge"
 msgstr "GitHub weigerde de merge"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "GitHub-repository's met een plugin-marketplacebestand. Superset synchroniseert hun plugins naar je organisatie."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "GitHub-repository's met een plugin-marketplacebestand. Paradev synchroniseert hun plugins naar je organisatie."
 
 msgid "GitHub sign-in needed"
 msgstr "Aanmelden bij GitHub vereist"
@@ -12885,9 +12888,6 @@ msgstr "Geen plugins gevonden voor \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Nog geen plugins. Voeg een repository toe om ze te synchroniseren."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Nog geen poorten. Start een devserver in een terminal en de poort verschijnt hier."
-
 msgid "No posts yet."
 msgstr "Nog geen berichten."
 
@@ -14149,6 +14149,9 @@ msgstr "organisatie {id}"
 msgid "Organization {id}"
 msgstr "Organisatie {id}"
 
+msgid "Organization already exists"
+msgstr "Organisatie bestaat al"
+
 msgid "Organization created successfully!"
 msgstr "Organisatie aangemaakt!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Pagina"
 
+msgid "Page actions"
+msgstr "Pagina-acties"
+
 msgid "Page by you"
 msgstr "Pagina van jou"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev handelt op GitHub namens jou. Koppel je GitHub-account om pull requests te mergen, erop te reageren en bij te werken."
 
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
@@ -14540,6 +14549,9 @@ msgstr "Demo van Paradev Pagina's"
 
 msgid "Paradev Plugins"
 msgstr "Paradev Plugins"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev leest het met je gekoppelde GitHub-account. Koppel er een in <0>Instellingen › Integraties</0> als je dat nog niet hebt gedaan."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev draait lokaal op de machines van je ontwikkelaars. We slaan je code of AI-gesprekken niet op, en Paradev heeft een SOC 2 Type II-audit door een onafhankelijke auditor afgerond. Vraag het rapport aan en bekijk onze securitydocumentatie op {trustHost}."
@@ -14805,8 +14817,8 @@ msgstr "Kies een projectlocatie"
 msgid "Pick a reason"
 msgstr "Kies een reden"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Kies een repository met een plugin-marketplacebestand. Superset synchroniseert de plugins nu en telkens als je opnieuw synchroniseert."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Kies een repository met een plugin-marketplacebestand. Paradev synchroniseert de plugins nu en telkens als je opnieuw synchroniseert."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Kies een geluid of voeg je eigen toe. Eigen audio ondersteunt .mp3, .wav en .ogg."
@@ -15469,11 +15481,11 @@ msgstr "Pull requests"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Pull requests erboven blijven open en GitHub past hun doel aan."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Pull requests, reacties en pushes vanuit Superset worden namens jou gedaan."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Pull requests, reacties en pushes vanuit Paradev worden namens jou gedaan."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Pull requests, reacties en pushes vanuit Superset worden niet langer namens jou gedaan."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Pull requests, reacties en pushes vanuit Paradev worden niet langer namens jou gedaan."
 
 msgid "Purple"
 msgstr "Paars"
@@ -17934,9 +17946,6 @@ msgstr "Pagina delen (openbaar)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Deel plugins vanuit een GitHub-repo. Zet releases vast met git-tags."
 
-msgid "Share this page"
-msgstr "Deze pagina delen"
-
 msgid "Share via…"
 msgstr "Delen via…"
 
@@ -18243,6 +18252,9 @@ msgstr "Inloggen bij {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Log in om de plugins van je organisatie te wijzigen."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Meld je aan om {connectorName} te koppelen"
+
 msgid "Sign in to continue"
 msgstr "Log in om verder te gaan"
 
@@ -18263,6 +18275,12 @@ msgstr "Log in om deze pagina te bekijken"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Log in met {browserProviderLabel} en kom dan hier terug."
+
+msgid "Sign in with another account"
+msgstr "Aanmelden met een ander account"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Meld je aan met een ander account of vraag een beheerder van de organisatie om je uit te nodigen."
 
 msgid "Sign in with email"
 msgstr "Inloggen met e-mail"
@@ -18349,6 +18367,9 @@ msgstr "Inloggen..."
 
 msgid "Signing in…"
 msgstr "Inloggen…"
+
+msgid "Signing out…"
+msgstr "Afmelden…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Aanmelden werkt. Het welkomstscherm laadt en de console is schoon."
@@ -19159,9 +19180,6 @@ msgstr "vervangen"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset handelt op GitHub namens jou. Koppel je GitHub-account om pull requests te mergen, erop te reageren en bij te werken."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp toont een endpoint voor alleen dat paneel. Richt Playwright of browser-use erop."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset heet nu Paradev. En we hebben ook een seedronde van $11,5M opge
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile verschijnt op iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset leest het met je gekoppelde GitHub-account. Koppel er een in <0>Instellingen › Integraties</0> als je dat nog niet hebt gedaan."
 
 msgid "Supervised"
 msgstr "Begeleid"
@@ -19980,6 +19995,9 @@ msgstr "De nachtploeg"
 msgid "The owner's account no longer exists."
 msgstr "Het account van de eigenaar bestaat niet meer."
 
+msgid "The page and every version of it will be deleted."
+msgstr "De pagina en alle versies ervan worden verwijderd."
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "De pagina en de inhoud worden verwijderd. Iedereen met de link verliest toegang."
 
@@ -20223,6 +20241,9 @@ msgstr "Deze automatisering is gearchiveerd. Herstel haar eerst."
 
 msgid "This automation is in another organization"
 msgstr "Deze automatisering staat in een andere organisatie"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Deze browser is niet aangemeld bij Paradev. Meld je aan om door te gaan naar {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
@@ -21512,6 +21533,12 @@ msgstr "“{0}” gebruiken"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Gebruik een pad relatief aan de werkruimte of een absolute map."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Gebruik een ander account om {connectorName} te koppelen"
+
+msgid "Use another account to continue"
+msgstr "Gebruik een ander account om door te gaan"
+
 msgid "Use another port"
 msgstr "Een andere poort gebruiken"
 
@@ -22536,6 +22563,9 @@ msgstr "Je bent offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Je zit op het <0>{currentPlanLabel}-plan</0>. Heb je vragen of wil je meer hulp bij je plan, <1>neem dan contact op<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Je bent aangemeld als {email}. Dit account is geen lid van de organisatie van deze link."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Je bent de enige eigenaar van een organisatie met andere leden. Draag het eigendom over of verwijder de organisatie eerst."
 
@@ -22579,6 +22609,9 @@ msgstr "Je kunt deze pagina bekijken, maar er niet op reageren"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Dit kun je niet ongedaan maken. Terminalpanelen tonen \"Process exited\" en zijn opnieuw te starten."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Je kunt de organisatie niet verlaten als enige eigenaar"
+
 msgid "You control the access"
 msgstr "Jij bepaalt de toegang"
 
@@ -22608,6 +22641,9 @@ msgstr "Je moet deel uitmaken van een organisatie om accounts te verbinden."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Je moet deel uitmaken van een organisatie om integraties te gebruiken."
+
+msgid "You should be a member of at least one team"
+msgstr "Je moet lid zijn van ten minste één team"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "Je account is gedeactiveerd en wordt binnenkort definitief verwijderd. R
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Je account wordt beheerd door je organisatie. Neem contact op met je beheerder om een nieuwe organisatie aan te maken."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Je account is geen lid van de organisatie van deze link."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Je agent kan elke pagina openen en er doorheen werken met superset browser-commando's. Hij gebruikt het paneel dat je bekijkt, dus je ziet elke stap."
@@ -22771,6 +22810,12 @@ msgstr "Je eigen accounts. De integraties van je organisatie geven Paradev toega
 
 msgid "Your Paradev download is starting."
 msgstr "Je Paradev-download start."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Je Paradev-sessie in deze browser is verlopen. Meld je opnieuw aan om door te gaan naar {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Je Paradev-sessie in deze browser is verlopen. Meld je opnieuw aan om door te gaan."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Je abonnement bevat geen cloudomgevingen."

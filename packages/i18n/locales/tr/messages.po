@@ -3688,9 +3688,6 @@ msgstr "{companyName}'i ekibinize getirin. Kurumsal planlar ve dağıtım seçen
 msgid "Bring a link to something you built recently."
 msgstr "Yakın zamanda geliştirdiğiniz bir şeyin bağlantısını getirin."
 
-msgid "Bring in an agent"
-msgstr "Bir ajan getir"
-
 msgid "Bring over your projects"
 msgstr "Projelerinizi aktarın"
 
@@ -5923,6 +5920,9 @@ msgstr "Simge ayarlanamadı"
 msgid "Could not share"
 msgstr "Paylaşılamadı"
 
+msgid "Could not sign out. Please try again."
+msgstr "Oturum kapatılamadı. Lütfen tekrar deneyin."
+
 msgid "Could not start agent"
 msgstr "Ajan başlatılamadı"
 
@@ -6842,6 +6842,9 @@ msgstr "\"{hostName}\" silinsin mi?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "\"{projectName}\" silinsin mi?"
+
+msgid "Delete \"{title}\"?"
+msgstr "“{title}” silinsin mi?"
 
 msgid "Delete “{title}”?"
 msgstr "“{title}” silinsin mi?"
@@ -9458,8 +9461,8 @@ msgstr "GitHub istek sınırına ulaşıldı"
 msgid "GitHub refused the merge"
 msgstr "GitHub birleştirmeyi reddetti"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Eklenti pazar yeri dosyası olan GitHub depoları. Superset bunların eklentilerini kuruluşunuza eşitler."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Eklenti pazar yeri dosyası olan GitHub depoları. Paradev bunların eklentilerini kuruluşunuza eşitler."
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub oturumu açmanız gerekiyor"
@@ -12885,9 +12888,6 @@ msgstr "\"{0}\" ile eşleşen eklenti yok"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Henüz eklenti yok. Eşitlemek için bir depo ekleyin."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Henüz port yok. Bir terminalde geliştirme sunucusu başlatın, burada görünür."
-
 msgid "No posts yet."
 msgstr "Henüz yazı yok."
 
@@ -14149,6 +14149,9 @@ msgstr "{id} kuruluşu"
 msgid "Organization {id}"
 msgstr "{id} kuruluşu"
 
+msgid "Organization already exists"
+msgstr "Kuruluş zaten var"
+
 msgid "Organization created successfully!"
 msgstr "Kuruluş oluşturuldu!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Sayfa"
 
+msgid "Page actions"
+msgstr "Sayfa işlemleri"
+
 msgid "Page by you"
 msgstr "Sizin sayfanız"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev, GitHub'da sizin adınıza işlem yapar. Pull request'leri birleştirmek, yorumlamak ve güncellemek için GitHub hesabınızı bağlayın."
 
 msgid "Paradev Agent"
 msgstr "Paradev Ajanı"
@@ -14540,6 +14549,9 @@ msgstr "Paradev Sayfalar demosu"
 
 msgid "Paradev Plugins"
 msgstr "Paradev Eklentileri"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
@@ -14805,8 +14817,8 @@ msgstr "Bir proje konumu seçin"
 msgid "Pick a reason"
 msgstr "Bir neden seçin"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Eklenti pazar yeri dosyası olan bir depo seçin. Superset eklentilerini şimdi ve her yeniden eşitlemenizde eşitler."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Eklenti pazar yeri dosyası olan bir depo seçin. Paradev eklentilerini şimdi ve her yeniden eşitlemenizde eşitler."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Bir ses seçin veya kendinizinkini ekleyin. Özel ses .mp3, .wav ve .ogg destekler."
@@ -15469,11 +15481,11 @@ msgstr "Pull request'ler"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Üstteki pull request'ler açık kalır ve GitHub hedeflerini değiştirir."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset'ten yapılan pull request'ler, yorumlar ve push'lar sizin adınıza yapılır."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev'den yapılan pull request'ler, yorumlar ve push'lar sizin adınıza yapılır."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset'ten yapılan pull request'ler, yorumlar ve push'lar artık sizin adınıza yapılmayacak."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev'den yapılan pull request'ler, yorumlar ve push'lar artık sizin adınıza yapılmayacak."
 
 msgid "Purple"
 msgstr "Mor"
@@ -17934,9 +17946,6 @@ msgstr "Sayfayı paylaş (herkese açık)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Eklentileri bir GitHub deposundan paylaşın. Sürümleri git etiketleriyle sabitleyin."
 
-msgid "Share this page"
-msgstr "Bu sayfayı paylaş"
-
 msgid "Share via…"
 msgstr "Şununla paylaş…"
 
@@ -18243,6 +18252,9 @@ msgstr "{label} ile oturum aç"
 msgid "Sign in to change your organization's plugins."
 msgstr "Kuruluşunuzun eklentilerini değiştirmek için oturum açın."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} bağlantısı için oturum açın"
+
 msgid "Sign in to continue"
 msgstr "Devam etmek için oturum açın"
 
@@ -18263,6 +18275,12 @@ msgstr "Bu sayfayı görmek için oturum açın"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} ile giriş yapın, ardından buraya dönün."
+
+msgid "Sign in with another account"
+msgstr "Başka bir hesapla oturum açın"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Başka bir hesapla oturum açın veya kuruluşun bir yöneticisinden sizi davet etmesini isteyin."
 
 msgid "Sign in with email"
 msgstr "E-posta ile oturum aç"
@@ -18349,6 +18367,9 @@ msgstr "Oturum açılıyor..."
 
 msgid "Signing in…"
 msgstr "Oturum açılıyor…"
+
+msgid "Signing out…"
+msgstr "Oturum kapatılıyor…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Kayıt çalışıyor. Hoş geldiniz ekranı yükleniyor ve konsol temiz."
@@ -19159,9 +19180,6 @@ msgstr "geçersiz kılındı"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset, GitHub'da sizin adınıza işlem yapar. Pull request'leri birleştirmek, yorumlamak ve güncellemek için GitHub hesabınızı bağlayın."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp yalnızca o bölme için bir uç nokta yazdırır. Playwright'ı veya browser-use'u ona yönlendirin."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset artık Paradev. Bir de 11,5 milyon dolarlık tohum yatırımı 
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
 
 msgid "Supervised"
 msgstr "Gözetimli"
@@ -19980,6 +19995,9 @@ msgstr "Gece vardiyası"
 msgid "The owner's account no longer exists."
 msgstr "Sahibin hesabı artık mevcut değil."
 
+msgid "The page and every version of it will be deleted."
+msgstr "Sayfa ve tüm sürümleri silinecek."
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Sayfa ve içeriği kaldırılır. Bağlantıya sahip herkes erişimini kaybeder."
 
@@ -20223,6 +20241,9 @@ msgstr "Bu otomasyon arşivlendi. Önce geri yükleyin."
 
 msgid "This automation is in another organization"
 msgstr "Bu otomasyon başka bir kuruluşta"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Bu tarayıcıda Paradev oturumu açık değil. {connectorName} ile devam etmek için oturum açın."
 
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."
@@ -21512,6 +21533,12 @@ msgstr "“{0}” kullan"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Çalışma alanına göreli bir yol ya da mutlak bir klasör kullanın."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "{connectorName} bağlantısı için başka bir hesap kullanın"
+
+msgid "Use another account to continue"
+msgstr "Devam etmek için başka bir hesap kullanın"
+
 msgid "Use another port"
 msgstr "Başka bir port kullan"
 
@@ -22536,6 +22563,9 @@ msgstr "Çevrimdışısınız"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "<0>{currentPlanLabel} planındasınız</0>. Sorularınız varsa veya planınızla ilgili destek isterseniz <1>bize ulaşın<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} olarak oturum açtınız. Bu hesap, bu bağlantının ait olduğu kuruluşun üyesi değil."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Başka üyeleri olan bir kuruluşun tek sahibisiniz. Önce sahipliği devredin veya kuruluşu silin."
 
@@ -22579,6 +22609,9 @@ msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Bu işlemi geri alamazsınız. Terminal bölmelerinde \"Process exited\" görünür ve yeniden başlatılabilirler."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Tek sahip olarak kuruluştan ayrılamazsınız"
+
 msgid "You control the access"
 msgstr "Erişimi siz kontrol edersiniz"
 
@@ -22608,6 +22641,9 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
+
+msgid "You should be a member of at least one team"
+msgstr "En az bir takımın üyesi olmalısınız"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "Hesabınız devre dışı bırakıldı ve yakında kalıcı olarak silin
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Hesabınız kuruluşunuz tarafından yönetiliyor. Yeni bir kuruluş oluşturmak için yöneticinizle iletişime geçin."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Hesabınız, bu bağlantının ait olduğu kuruluşun üyesi değil."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Ajanınız superset browser komutlarıyla herhangi bir sayfayı açıp içinde ilerleyebilir. İzlediğiniz bölmeyi kullandığı için her adımı görürsünüz."
@@ -22771,6 +22810,12 @@ msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlar
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Bu tarayıcıdaki Paradev oturumunuzun süresi doldu. {connectorName} ile devam etmek için yeniden oturum açın."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Bu tarayıcıdaki Paradev oturumunuzun süresi doldu. Devam etmek için yeniden oturum açın."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Planınız bulut ortamlarını içermiyor."

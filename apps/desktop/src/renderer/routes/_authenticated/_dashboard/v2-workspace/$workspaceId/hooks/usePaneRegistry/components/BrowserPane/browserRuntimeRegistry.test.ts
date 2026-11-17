@@ -188,19 +188,29 @@ describe("browserRuntimeRegistry detached persistence", () => {
 });
 
 describe("browserRuntimeRegistry pointer passthrough", () => {
-	test("mirrors the passthrough state onto visible webviews only", () => {
-		const makeEntry = (visible: boolean) => ({
+	test("mirrors the passthrough state onto shown webviews only", () => {
+		const hiddenSidebar = document.createElement("div");
+		hiddenSidebar.style.visibility = "hidden";
+		const hiddenPlaceholder = hiddenSidebar.appendChild(
+			document.createElement("div"),
+		);
+		const shownPlaceholder = document.createElement("div");
+		document.body.append(hiddenSidebar, shownPlaceholder);
+		const makeEntry = (visible: boolean, placeholder: Element | null) => ({
 			webview: { style: { pointerEvents: "auto" } },
 			overlay: { style: {} },
 			visible,
+			placeholder,
 		});
-		const shown = makeEntry(true);
-		const parked = makeEntry(false);
+		const shown = makeEntry(true, shownPlaceholder);
+		const parked = makeEntry(false, null);
+		const inClosedSidebar = makeEntry(true, hiddenPlaceholder);
 		const registryInternals = browserRuntimeRegistry as unknown as {
 			entries: Map<string, ReturnType<typeof makeEntry>>;
 		};
 		registryInternals.entries.set("passthrough-shown", shown);
 		registryInternals.entries.set("passthrough-parked", parked);
+		registryInternals.entries.set("passthrough-closed", inClosedSidebar);
 
 		const root = document.documentElement as unknown as {
 			toggleAttribute?: unknown;
@@ -216,8 +226,10 @@ describe("browserRuntimeRegistry pointer passthrough", () => {
 			expect(shown.webview.style.pointerEvents).toBe("none");
 			expect(parked.webview.style.pointerEvents).toBe("auto");
 
+			inClosedSidebar.webview.style.pointerEvents = "none";
 			pointerPassthrough.set("test-gesture", false);
 			expect(shown.webview.style.pointerEvents).toBe("auto");
+			expect(inClosedSidebar.webview.style.pointerEvents).toBe("none");
 		} finally {
 			pointerPassthrough.set("test-gesture", false);
 			if (ownToggleAttribute) {
@@ -227,6 +239,9 @@ describe("browserRuntimeRegistry pointer passthrough", () => {
 			}
 			registryInternals.entries.delete("passthrough-shown");
 			registryInternals.entries.delete("passthrough-parked");
+			registryInternals.entries.delete("passthrough-closed");
+			hiddenSidebar.remove();
+			shownPlaceholder.remove();
 		}
 	});
 });
@@ -323,6 +338,35 @@ describe("browserRuntimeRegistry overlay layer", () => {
 			internals.agentActivePaneIds = previous;
 			registryInternals.entries.delete(paneId);
 			placeholder.remove();
+		}
+	});
+
+	test("a browser that mounts inside a hidden sidebar stays hidden", () => {
+		const paneId = "hidden-sidebar-pane";
+		const sidebar = document.createElement("div");
+		sidebar.style.visibility = "hidden";
+		const placeholder = document.createElement("div");
+		sidebar.appendChild(placeholder);
+		document.body.appendChild(sidebar);
+		const entry = { ...makeEntry(), state: {}, workspaceId: "ws" };
+		registryInternals.entries.set(paneId, entry as never);
+		try {
+			browserRuntimeRegistry.attach(
+				paneId,
+				placeholder,
+				"https://example.com",
+				"ws",
+				() => {},
+				() => {},
+			);
+			expect(entry.webview.style.visibility).toBe("hidden");
+			sidebar.style.visibility = "";
+			browserRuntimeRegistry.relayout();
+			expect(entry.webview.style.visibility).toBe("visible");
+		} finally {
+			browserRuntimeRegistry.detach(paneId);
+			registryInternals.entries.delete(paneId);
+			sidebar.remove();
 		}
 	});
 

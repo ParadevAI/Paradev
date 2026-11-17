@@ -3688,9 +3688,6 @@ msgstr "Đưa {companyName} đến với đội của bạn. Liên hệ với ch
 msgid "Bring a link to something you built recently."
 msgstr "Mang theo đường dẫn tới một thứ bạn đã xây dựng gần đây."
 
-msgid "Bring in an agent"
-msgstr "Chọn một agent"
-
 msgid "Bring over your projects"
 msgstr "Nhập các dự án của bạn"
 
@@ -5923,6 +5920,9 @@ msgstr "Không thể đặt biểu tượng"
 msgid "Could not share"
 msgstr "Không thể chia sẻ"
 
+msgid "Could not sign out. Please try again."
+msgstr "Không thể đăng xuất. Vui lòng thử lại."
+
 msgid "Could not start agent"
 msgstr "Không thể khởi động agent"
 
@@ -6842,6 +6842,9 @@ msgstr "Xóa \"{hostName}\"?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "Xóa \"{projectName}\"?"
+
+msgid "Delete \"{title}\"?"
+msgstr "Xóa “{title}”?"
 
 msgid "Delete “{title}”?"
 msgstr "Xóa “{title}”?"
@@ -9458,8 +9461,8 @@ msgstr "Đã đạt giới hạn yêu cầu GitHub"
 msgid "GitHub refused the merge"
 msgstr "GitHub từ chối merge"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Các repository GitHub có tệp marketplace plugin. Superset đồng bộ plugin của chúng vào tổ chức của bạn."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Các repository GitHub có tệp marketplace plugin. Paradev đồng bộ plugin của chúng vào tổ chức của bạn."
 
 msgid "GitHub sign-in needed"
 msgstr "Cần đăng nhập GitHub"
@@ -12885,9 +12888,6 @@ msgstr "Không có plugin nào khớp \"{0}\""
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Chưa có plugin nào. Thêm một repository để đồng bộ."
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Chưa có cổng nào. Hãy chạy máy chủ phát triển trong terminal và cổng sẽ hiện ở đây."
-
 msgid "No posts yet."
 msgstr "Chưa có bài viết nào."
 
@@ -14149,6 +14149,9 @@ msgstr "tổ chức {id}"
 msgid "Organization {id}"
 msgstr "Tổ chức {id}"
 
+msgid "Organization already exists"
+msgstr "Tổ chức đã tồn tại"
+
 msgid "Organization created successfully!"
 msgstr "Đã tạo tổ chức thành công!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Trang"
 
+msgid "Page actions"
+msgstr "Thao tác với trang"
+
 msgid "Page by you"
 msgstr "Trang do bạn tạo"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev thao tác trên GitHub dưới tên của bạn. Kết nối tài khoản GitHub để hợp nhất, bình luận và cập nhật pull request."
 
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
@@ -14540,6 +14549,9 @@ msgstr "Bản demo Paradev Trang"
 
 msgid "Paradev Plugins"
 msgstr "Plugin Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại {trustHost}."
@@ -14805,8 +14817,8 @@ msgstr "Hãy chọn vị trí dự án"
 msgid "Pick a reason"
 msgstr "Chọn lý do"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Chọn một repository có tệp marketplace plugin. Superset đồng bộ plugin của nó ngay bây giờ và mỗi lần bạn đồng bộ lại."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Chọn một repository có tệp marketplace plugin. Paradev đồng bộ plugin của nó ngay bây giờ và mỗi lần bạn đồng bộ lại."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Chọn một âm thanh hoặc thêm âm thanh riêng. Âm thanh riêng hỗ trợ .mp3, .wav và .ogg."
@@ -15469,11 +15481,11 @@ msgstr "Pull request"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Các pull request phía trên sẽ vẫn mở và GitHub sẽ đổi nhánh đích của chúng."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Các pull request, bình luận và push từ Superset được thực hiện dưới tên của bạn."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Các pull request, bình luận và push từ Paradev được thực hiện dưới tên của bạn."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Các pull request, bình luận và push từ Superset sẽ không còn được thực hiện dưới tên của bạn."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Các pull request, bình luận và push từ Paradev sẽ không còn được thực hiện dưới tên của bạn."
 
 msgid "Purple"
 msgstr "Tím"
@@ -17934,9 +17946,6 @@ msgstr "Chia sẻ trang (công khai)"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Chia sẻ plugin từ một repo GitHub. Ghim bản phát hành bằng git tag."
 
-msgid "Share this page"
-msgstr "Chia sẻ trang này"
-
 msgid "Share via…"
 msgstr "Chia sẻ qua…"
 
@@ -18243,6 +18252,9 @@ msgstr "Đăng nhập vào {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Đăng nhập để thay đổi plugin của tổ chức."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Đăng nhập để kết nối {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Đăng nhập để tiếp tục"
 
@@ -18263,6 +18275,12 @@ msgstr "Đăng nhập để xem trang này"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Đăng nhập bằng {browserProviderLabel}, rồi quay lại đây."
+
+msgid "Sign in with another account"
+msgstr "Đăng nhập bằng tài khoản khác"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Hãy đăng nhập bằng tài khoản khác, hoặc nhờ quản trị viên của tổ chức mời bạn."
 
 msgid "Sign in with email"
 msgstr "Đăng nhập bằng email"
@@ -18349,6 +18367,9 @@ msgstr "Đang đăng nhập..."
 
 msgid "Signing in…"
 msgstr "Đang đăng nhập…"
+
+msgid "Signing out…"
+msgstr "Đang đăng xuất…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Đăng ký hoạt động tốt. Màn hình chào mừng tải xong và console không có lỗi."
@@ -19159,9 +19180,6 @@ msgstr "bị thay thế"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset thao tác trên GitHub dưới tên của bạn. Kết nối tài khoản GitHub để hợp nhất, bình luận và cập nhật pull request."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp in ra endpoint chỉ cho ngăn đó. Trỏ Playwright hoặc browser-use vào đó."
 
@@ -19170,9 +19188,6 @@ msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi đư�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
 
 msgid "Supervised"
 msgstr "Có giám sát"
@@ -19980,6 +19995,9 @@ msgstr "Ca đêm"
 msgid "The owner's account no longer exists."
 msgstr "Tài khoản của chủ sở hữu không còn tồn tại."
 
+msgid "The page and every version of it will be deleted."
+msgstr "Trang và mọi phiên bản của trang sẽ bị xóa."
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Trang và nội dung của nó sẽ bị gỡ. Bất kỳ ai có liên kết đều mất quyền truy cập."
 
@@ -20223,6 +20241,9 @@ msgstr "Tự động hóa này đã được lưu trữ. Hãy khôi phục nó t
 
 msgid "This automation is in another organization"
 msgstr "Tự động hóa này nằm trong một tổ chức khác"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Trình duyệt này chưa đăng nhập vào Paradev. Hãy đăng nhập để tiếp tục đến {connectorName}."
 
 msgid "This cannot be undone."
 msgstr "Không thể hoàn tác."
@@ -21512,6 +21533,12 @@ msgstr "Dùng “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Dùng đường dẫn tương đối với workspace hoặc một thư mục tuyệt đối."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Dùng tài khoản khác để kết nối {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Dùng tài khoản khác để tiếp tục"
+
 msgid "Use another port"
 msgstr "Dùng port khác"
 
@@ -22536,6 +22563,9 @@ msgstr "Bạn đang ngoại tuyến"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Bạn đang dùng <0>gói {currentPlanLabel}</0>. Nếu có thắc mắc hoặc cần hỗ trợ thêm về gói của mình, hãy <1>liên hệ với chúng tôi<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Bạn đang đăng nhập với {email}. Tài khoản này không phải là thành viên của tổ chức mà liên kết này thuộc về."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Bạn là chủ sở hữu duy nhất của một tổ chức còn thành viên khác. Hãy chuyển quyền sở hữu hoặc xóa tổ chức trước."
 
@@ -22579,6 +22609,9 @@ msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Không thể hoàn tác thao tác này. Các khung terminal sẽ hiện \"Process exited\" và có thể khởi động lại."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Bạn không thể rời tổ chức khi là chủ sở hữu duy nhất"
+
 msgid "You control the access"
 msgstr "Bạn kiểm soát quyền truy cập"
 
@@ -22608,6 +22641,9 @@ msgstr "Bạn cần thuộc về một tổ chức để kết nối tài khoả
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Bạn cần thuộc một tổ chức để dùng tích hợp."
+
+msgid "You should be a member of at least one team"
+msgstr "Bạn phải là thành viên của ít nhất một nhóm"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "Tài khoản của bạn đã bị vô hiệu hóa và sẽ sớm bị x
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Tài khoản của bạn do tổ chức quản lý. Hãy liên hệ admin để tạo tổ chức mới."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Tài khoản của bạn không phải là thành viên của tổ chức mà liên kết này thuộc về."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agent của bạn có thể mở bất kỳ trang nào và thao tác trên đó bằng lệnh superset browser. Nó dùng ngăn bạn đang xem, nên bạn thấy từng bước."
@@ -22771,6 +22810,12 @@ msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giú
 
 msgid "Your Paradev download is starting."
 msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Phiên Paradev của bạn trong trình duyệt này đã hết hạn. Hãy đăng nhập lại để tiếp tục đến {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Phiên Paradev của bạn trong trình duyệt này đã hết hạn. Hãy đăng nhập lại để tiếp tục."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Gói của bạn không bao gồm môi trường đám mây."

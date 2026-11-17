@@ -3688,9 +3688,6 @@ msgstr "{companyName}をチームに導入しましょう。エンタープラ�
 msgid "Bring a link to something you built recently."
 msgstr "最近作ったもののリンクをお持ちください。"
 
-msgid "Bring in an agent"
-msgstr "エージェントを選択"
-
 msgid "Bring over your projects"
 msgstr "プロジェクトを引き継ぐ"
 
@@ -5923,6 +5920,9 @@ msgstr "アイコンを設定できませんでした"
 msgid "Could not share"
 msgstr "共有できませんでした"
 
+msgid "Could not sign out. Please try again."
+msgstr "サインアウトできませんでした。もう一度お試しください。"
+
 msgid "Could not start agent"
 msgstr "エージェントを起動できませんでした"
 
@@ -6842,6 +6842,9 @@ msgstr "「{hostName}」を削除しますか?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "「{projectName}」を削除しますか?"
+
+msgid "Delete \"{title}\"?"
+msgstr "「{title}」を削除しますか？"
 
 msgid "Delete “{title}”?"
 msgstr "「{title}」を削除しますか?"
@@ -9458,8 +9461,8 @@ msgstr "GitHub のレート制限に達しました"
 msgid "GitHub refused the merge"
 msgstr "GitHubがマージを拒否しました"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "プラグインのマーケットプレイスファイルを含む GitHub リポジトリです。Superset はそのプラグインを組織に同期します。"
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "プラグインのマーケットプレイスファイルを含む GitHub リポジトリです。Paradev はそのプラグインを組織に同期します。"
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub へのサインインが必要です"
@@ -12885,9 +12888,6 @@ msgstr "「{0}」に一致するプラグインがありません"
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "プラグインはまだありません。リポジトリを追加して同期してください。"
 
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "まだポートはありません。ターミナルで開発サーバーを起動するとここに表示されます。"
-
 msgid "No posts yet."
 msgstr "投稿はまだありません。"
 
@@ -14149,6 +14149,9 @@ msgstr "組織 {id}"
 msgid "Organization {id}"
 msgstr "組織 {id}"
 
+msgid "Organization already exists"
+msgstr "組織はすでに存在します"
+
 msgid "Organization created successfully!"
 msgstr "組織を作成しました!"
 
@@ -14307,6 +14310,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "ページ"
 
+msgid "Page actions"
+msgstr "ページの操作"
+
 msgid "Page by you"
 msgstr "自分が作成したページ"
 
@@ -14390,6 +14396,9 @@ msgstr "Paradev"
 
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
+
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev はあなたとして GitHub を操作します。プルリクエストのマージ、コメント、更新を行うには GitHub アカウントを接続してください。"
 
 msgid "Paradev Agent"
 msgstr "Paradevエージェント"
@@ -14540,6 +14549,9 @@ msgstr "Paradev ページのデモ"
 
 msgid "Paradev Plugins"
 msgstr "Paradev プラグイン"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradevは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Paradevは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認は{trustHost}から行えます。"
@@ -14805,8 +14817,8 @@ msgstr "プロジェクトの場所を選択してください"
 msgid "Pick a reason"
 msgstr "理由を選択"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "プラグインのマーケットプレイスファイルを含むリポジトリを選んでください。Superset は今すぐ、そして再同期するたびにプラグインを同期します。"
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "プラグインのマーケットプレイスファイルを含むリポジトリを選んでください。Paradev は今すぐ、そして再同期するたびにプラグインを同期します。"
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "サウンドを選ぶか、独自の音声を追加してください。カスタム音声は.mp3、.wav、.ogg対応です。"
@@ -15469,11 +15481,11 @@ msgstr "プルリクエスト"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "上にあるプルリクエストは開いたままになり、GitHub がマージ先を変更します。"
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset からのプルリクエスト、コメント、プッシュはあなたとして行われます。"
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev からのプルリクエスト、コメント、プッシュはあなたとして行われます。"
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset からのプルリクエスト、コメント、プッシュは、あなたとして行われなくなります。"
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev からのプルリクエスト、コメント、プッシュは、あなたとして行われなくなります。"
 
 msgid "Purple"
 msgstr "紫"
@@ -17934,9 +17946,6 @@ msgstr "ページを共有（公開）"
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "GitHubリポジトリからプラグインを共有。gitタグでリリースを固定できます。"
 
-msgid "Share this page"
-msgstr "このページを共有"
-
 msgid "Share via…"
 msgstr "共有方法を選択…"
 
@@ -18243,6 +18252,9 @@ msgstr "{label}にサインイン"
 msgid "Sign in to change your organization's plugins."
 msgstr "組織のプラグインを変更するにはサインインしてください。"
 
+msgid "Sign in to connect {connectorName}"
+msgstr "{connectorName} に接続するにはサインインしてください"
+
 msgid "Sign in to continue"
 msgstr "続行するにはサインインしてください"
 
@@ -18263,6 +18275,12 @@ msgstr "サインインしてこのページを表示"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "{browserProviderLabel} でサインインしてから、ここに戻ってください。"
+
+msgid "Sign in with another account"
+msgstr "別のアカウントでサインイン"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "別のアカウントでサインインするか、組織の管理者に招待を依頼してください。"
 
 msgid "Sign in with email"
 msgstr "メールでサインイン"
@@ -18349,6 +18367,9 @@ msgstr "サインイン中..."
 
 msgid "Signing in…"
 msgstr "サインインしています…"
+
+msgid "Signing out…"
+msgstr "サインアウトしています…"
 
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "登録は正常に動いています。ウェルカム画面が表示され、コンソールにエラーはありません。"
@@ -19159,9 +19180,6 @@ msgstr "置き換え済み"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset はあなたとして GitHub を操作します。プルリクエストのマージ、コメント、更新を行うには GitHub アカウントを接続してください。"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp は、そのペイン専用のエンドポイントを出力します。Playwrightやbrowser-useをそこに向けてください。"
 
@@ -19170,9 +19188,6 @@ msgstr "Superset は Paradev になりました。あと、1,150万ドルのシ�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile が iPhone で登場"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
 
 msgid "Supervised"
 msgstr "監督付き"
@@ -19980,6 +19995,9 @@ msgstr "夜間シフト"
 msgid "The owner's account no longer exists."
 msgstr "オーナーのアカウントは存在しません。"
 
+msgid "The page and every version of it will be deleted."
+msgstr "このページとすべてのバージョンが削除されます。"
+
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "ページとその内容が削除されます。リンクを知っている人もアクセスできなくなります。"
 
@@ -20223,6 +20241,9 @@ msgstr "このオートメーションはアーカイブ済みです。先に復
 
 msgid "This automation is in another organization"
 msgstr "このオートメーションは別の組織にあります"
+
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "このブラウザは Paradev にサインインしていません。サインインして {connectorName} に進んでください。"
 
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
@@ -21512,6 +21533,12 @@ msgstr "「{0}」を使用"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "ワークスペースからの相対パスか絶対パスのフォルダを指定します。"
 
+msgid "Use another account to connect {connectorName}"
+msgstr "別のアカウントで {connectorName} に接続"
+
+msgid "Use another account to continue"
+msgstr "別のアカウントで続行"
+
 msgid "Use another port"
 msgstr "別のポートを使用"
 
@@ -22536,6 +22563,9 @@ msgstr "オフラインです"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "現在<0>{currentPlanLabel}プラン</0>をご利用中です。プランについてご質問やサポートが必要な場合は、<1>お問い合わせ<2/></1>ください。"
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "{email} としてサインインしています。このアカウントは、このリンクの組織のメンバーではありません。"
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "他にメンバーがいる組織の唯一のオーナーです。先にオーナー権限を移譲するか、組織を削除してください。"
 
@@ -22579,6 +22609,9 @@ msgstr "このページは閲覧できますが、コメントはできません
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "この操作は元に戻せません。ターミナルペインに「Process exited」と表示され、再起動できます。"
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "唯一のオーナーは組織から退出できません"
+
 msgid "You control the access"
 msgstr "アクセス権はあなたが管理します"
 
@@ -22608,6 +22641,9 @@ msgstr "アカウントを接続するには、組織に所属している必要
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "連携を使うには組織に所属している必要があります。"
+
+msgid "You should be a member of at least one team"
+msgstr "少なくとも 1 つのチームに所属している必要があります"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -22675,6 +22711,9 @@ msgstr "アカウントは無効化されており、まもなく完全に削除
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "アカウントは組織によって管理されています。新しい組織を作成するには管理者に連絡してください。"
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "あなたのアカウントは、このリンクの組織のメンバーではありません。"
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "エージェントは superset browser コマンドで任意のページを開いて操作できます。あなたが見ているペインを使うので、すべての手順が見えます。"
@@ -22771,6 +22810,12 @@ msgstr "あなた自身のアカウントです。組織の連携は Paradev が
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "このブラウザの Paradev セッションは期限切れです。もう一度サインインして {connectorName} に進んでください。"
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "このブラウザの Paradev セッションは期限切れです。続行するにはもう一度サインインしてください。"
 
 msgid "Your plan does not include cloud environments."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。"

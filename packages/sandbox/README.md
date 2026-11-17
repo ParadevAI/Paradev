@@ -17,6 +17,11 @@ checklist is `plans/20260913-sandbox-implementation-checklist.md`.
   `bun run assets <name>` and fetched on the box by sha256 from
   `cdn.superset.sh/sandbox/`. The row's `dest` is where it lands; archives
   are staged under `/usr/local/share/superset/media/` for a step to consume.
+  A step lists the archives it unpacks under `discards` in `steps.json`: the
+  runner deletes them once the step succeeds, keeps the `.hash` sidecar so
+  `sync-assets` does not fetch them again, and fetches them again only when
+  the step has to re-run. A file the box runs in place (`claude`, `superset`)
+  is never discarded.
 - **Something the box has to execute to configure itself** is a step:
   `bundle/steps/<name>.sh`, registered in `bundle/steps.json` with the assets
   it consumes, the rootfs files it reads (`inputs`) and the steps it must
@@ -42,6 +47,7 @@ The rule of thumb: if you can answer "where is it on the box", put it there.
 | `bun run image` | Builds the image: OS, apt lists, vendor tools, the `ubuntu` user, then installs the bundle at its sha and runs every pass once, so a fresh box finds every hash sidecar and step marker matching. A push logs Docker into the registry itself with a credential minted from `VERCEL_SANDBOX_TOKEN`, so there is no login to renew. `--local` builds `superset-sandbox:local` for the boot-twice test; `--dry` prints the Dockerfile. |
 | boot (`superset-boot`) | On the box, as root, run by the control plane on every create and wake, after it has written `sandbox.conf`, with the host secret in its env: clears `/run/superset`, installs the pinned bundle if the hash differs, runs the three passes (each a hash compare), starts host-service as `ubuntu` with the secret from the boot env, writes `resources.env`, starts `superset-memguard` (ranks every process for the OOM killer and reaps the largest before the kernel has to), then the desktop and the checkout. Once host-service answers, the environment has been pushed and the checkout is in, the runner asks host-service to run the repo's `start` hook with that environment. |
 | `bun run release` | Rewrites the host-service and CLI assets from this checkout and the claude, codex and Chrome rows to their latest upstream release, publishes the bundle, pushes the image under a candidate tag `release-<bundle sha>` (unless `--skip-image`), builds the internal golden from it with the environment's `setup` hook, probes a fork of it (`src/environments/probe.ts`) including a stop and wake, and only after the probe passes moves `latest` to the candidate and writes the environment rows. Every image environment resolves `superset-hostsvc` to `latest`, so a failed release changes no box. |
+| `bun run agent-tools --bundle <sha>` | Writes that bundle's agent CLIs to `agent-tools-<region>-<sha 12>`, a drive boxes mount read-only at `/opt/agents` when their organization has the `sandbox-agent-tools-drive` flag. A drive is written once and never again; it starts as a fork of the region's newest earlier drive, so only changed agents are fetched, and an agent that fails its download or `--version` check keeps the earlier drive's version or is left out. `bun run release` does this for every region with an environment, six at a time, before it records the bundle, and afterwards deletes the drives no environment names. |
 | `bun run src/real-sandbox.ts` | The Sandbox workflow dispatched with `real-sandbox`: one real sandbox from the registry image on this checkout's bundle, the same probe, a stop and a wake. |
 | Sandbox workflow, `production-release` | `bun run release --production` from `main` on a CI runner: the image, the internal golden and production's environment rows. Runs on a merge that touches the bundle and every night; a failed merge or nightly run opens an issue, or comments on the open one. |
 
@@ -50,9 +56,25 @@ build that runs before the publish that uploads the asset poisons the edge it us
 hours; the runner's fetch retries with a cache-busting query when the plain URL 404s, and CI
 publishes before it builds. Locally: publish first.
 
-A staged archive under the media directory that the current manifest does not name is an
-earlier build's; `sync-assets` prunes it before fetching, and a step that needs its asset
+A staged archive or lone sidecar under the media directory that the current manifest does not
+name is an earlier build's; `sync-assets` prunes it before fetching, and a step that needs its asset
 picks it by the manifest's hash rather than by listing the directory.
+
+## Measuring size
+
+A snapshot is a full block-level copy of the box's disk, so every byte the
+image or a boot writes is paid for in every snapshot.
+
+- `bun run image --local` ends with the image's total size and one row per
+  layer (size, then the layer's command cut to 90 characters), from
+  `docker history`. Compare it before and after an image change.
+- `bun run inventory` lists every stored snapshot in the sandbox project
+  (`VERCEL_SANDBOX_TOKEN`, `VERCEL_SANDBOX_TEAM_ID`,
+  `VERCEL_SANDBOX_PROJECT_ID`) and names it by the sandbox whose current
+  snapshot it is. It prints count, median, p90 and max size for goldens
+  (`env-*`) and workspaces (everything else, including snapshots no sandbox
+  points at), the 20 largest, and the total stored. `--json` prints one row
+  per snapshot. Without real credentials it exits 64.
 
 ## Versioning
 

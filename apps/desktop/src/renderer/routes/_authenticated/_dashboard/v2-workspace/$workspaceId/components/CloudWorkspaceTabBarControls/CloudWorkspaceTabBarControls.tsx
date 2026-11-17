@@ -31,6 +31,7 @@ export function CloudWorkspaceTabBarControls({
 	if (!workspace) return null;
 	return (
 		<div className="flex items-center gap-1">
+			<WorkspacePortsButton workspaceId={workspace.id} />
 			<CloudWorkspaceShareButton
 				workspaceId={workspace.id}
 				owner={workspace.createdBy}
@@ -43,7 +44,6 @@ export function CloudWorkspaceTabBarControls({
 					setVisibility.mutateAsync({ id: workspace.id, visibility })
 				}
 			/>
-			<WorkspacePortsButton workspaceId={workspace.id} />
 			<PresenceStack
 				people={presence}
 				viewerId={session?.user?.id}
