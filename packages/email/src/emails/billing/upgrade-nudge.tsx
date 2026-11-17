@@ -31,8 +31,7 @@ export function UpgradeNudgeEmail({
 				phone. That&apos;s part of Pro, and your team is on the Free plan.
 			</Text>
 			<Text style={paragraph}>
-				You can upgrade on the web, and the app picks up the new plan on its
-				own: <Link href={upgradeUrl}>{upgradeUrl}</Link>
+				You can upgrade on the web <Link href={upgradeUrl}>here</Link>.
 			</Text>
 			<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
 		</PersonalLayout>
