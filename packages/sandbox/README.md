@@ -25,8 +25,9 @@ checklist is `plans/20260913-sandbox-implementation-checklist.md`.
 - **An agent only the agents drive carries** (`opencode`, `pi`) is a row
   with no `dest`. `assets.tsv` leaves it out, so neither the image nor a
   boot fetches it; `bun run build --publish` still mirrors it to the bucket,
-  and `bun run agent-tools` fetches it from there by sha. A step cannot
-  declare such a row.
+  and `bun run agent-tools` fetches it from there by sha. Its pin goes into
+  the bundle's `drive-assets.tsv`, which no box reads, so a bump alone still
+  names a new bundle and so a new drive. A step cannot declare such a row.
 - **Something the box has to execute to configure itself** is a step:
   `bundle/steps/<name>.sh`, registered in `bundle/steps.json` with the assets
   it consumes, the rootfs files it reads (`inputs`) and the steps it must

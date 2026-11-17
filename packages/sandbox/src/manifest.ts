@@ -145,6 +145,14 @@ export function renderAssetsTsv(assets: Assets, steps: Step[] = []): string {
 		.concat(rows.length ? "\n" : "");
 }
 
+/** Puts the drive-only pins in the bundle's hash, so a bump names a new drive. No box reads it. */
+export function renderDriveAssetsTsv(assets: Assets): string {
+	return Object.entries(assets)
+		.filter(([, a]) => !a.dest)
+		.map(([key, a]) => `${key}\t${a.sha256}\n`)
+		.join("");
+}
+
 export interface DerivedStep extends Step {
 	version: string;
 }
