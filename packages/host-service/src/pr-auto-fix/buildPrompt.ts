@@ -13,17 +13,11 @@ function code(value: string): string {
 	return `\`${clean(value)}\``;
 }
 
-/**
- * One line, so it reads as a notice in the agent's transcript. The agent reads
- * the failures itself with `gh`; the prompt names only the PR, the commit and
- * the rules for pushing.
- */
 export function buildAutoFixPrompt(input: {
 	prNumber: number;
 	pullRequestUrl: string;
 	headSha: string;
 	switchBranch: PrAutoFixSwitchBranch | null;
-	/** The checkout's HEAD now, to restore a detached checkout after a switch. */
 	returnHeadSha: string | null;
 }): string {
 	const url = clean(input.pullRequestUrl);

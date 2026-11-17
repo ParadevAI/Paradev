@@ -18,12 +18,7 @@ export type PullRequestAutoFixWatch = NonNullable<
 
 const FALLBACK_REFETCH_MS = 60_000;
 
-/**
- * The Auto-fix CI state of one PR on one host. Pass the workspace when the
- * caller knows it (the PR pane); otherwise the host finds the workspace on
- * the PR from the project. `target` is null while loading and on a host that
- * predates Auto-fix CI.
- */
+/** `target` stays null on a host that predates Auto-fix CI. */
 export function usePullRequestAutoFix({
 	hostUrl,
 	prNumber,

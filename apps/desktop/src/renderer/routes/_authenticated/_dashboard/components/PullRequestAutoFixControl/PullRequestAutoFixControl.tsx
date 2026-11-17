@@ -10,20 +10,12 @@ import { usePullRequestAutoFix } from "renderer/hooks/host-service/usePullReques
 interface PullRequestAutoFixControlProps {
 	hostUrl: string | null;
 	prNumber: number;
-	/** Closed and merged PRs get no control. */
 	isOpen: boolean;
-	/** The workspace on the PR, when the caller knows it. */
 	workspaceId?: string | null;
-	/** Otherwise the host finds the workspace on the PR in this project. */
 	projectId?: string | null;
 	className?: string;
 }
 
-/**
- * The Auto-fix CI switch of one pull request, sized for the detail top bar,
- * with the full status in its tooltip. Shown only for an open PR whose
- * workspace on this host runs an agent, or that is already watched.
- */
 export function PullRequestAutoFixControl({
 	hostUrl,
 	prNumber,

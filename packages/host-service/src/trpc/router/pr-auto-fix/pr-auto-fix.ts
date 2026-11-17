@@ -15,9 +15,7 @@ import {
 
 const targetSchema = z.object({
 	prNumber: z.number().int().positive(),
-	/** The workspace on the PR, when the caller knows it. */
 	workspaceId: z.string().min(1).optional(),
-	/** Without `workspaceId`, the host finds the workspace as `getLinkedWorkspace` does. */
 	projectId: z.string().min(1).optional(),
 });
 
@@ -36,7 +34,6 @@ const NO_WORKSPACE: PrAutoFixTarget = {
 	blocker: "not-linked",
 };
 
-/** A workspace that already watches the PR wins over the most recently active one on it. */
 async function resolveWorkspaceId(
 	ctx: HostServiceContext,
 	input: Target,

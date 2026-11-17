@@ -422,11 +422,7 @@ export const mobileLastDevices = sqliteTable("mobile_last_devices", {
 	pickedAt: integer("picked_at").notNull(),
 });
 
-/**
- * Pull requests whose failing CI this host hands to the agent of the
- * workspace that owns them. One workspace per PR: the unique URL index keeps
- * two agents from fixing the same PR at once.
- */
+/** The unique URL index keeps two agents from fixing one PR at once. */
 export const pullRequestAutoFix = sqliteTable(
 	"pull_request_auto_fix",
 	{

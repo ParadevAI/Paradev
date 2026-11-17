@@ -10,7 +10,6 @@ import {
 
 /** GitHub can report the old head for a moment after a push. */
 export const NO_PUSH_GRACE_MS = 60_000;
-/** How long an idle agent may stay silent after a fix prompt before the send counts as lost. */
 export const UNSTARTED_FIX_MS = 10 * 60_000;
 
 export type PrAutoFixDecision =
@@ -20,7 +19,6 @@ export type PrAutoFixDecision =
 			reason: "pull-request-closed" | "workspace-unavailable";
 	  }
 	| { type: "pause"; reason: PrAutoFixPauseReason }
-	/** Back to `watching` with this attempt count, without a fix. */
 	| { type: "update"; attempts: number }
 	| {
 			type: "fix";
@@ -32,7 +30,6 @@ export type PrAutoFixDecision =
 export interface PrAutoFixDecisionInput {
 	state: PrAutoFixState;
 	workspaceAvailable: boolean;
-	/** While `fixing`, the agent the fix went to; otherwise the one a fix would go to. */
 	agent: PrAutoFixAgent | null;
 	checkout: PrAutoFixCheckout | null;
 	pullRequest: PrAutoFixPullRequest;
@@ -70,7 +67,6 @@ function decideUnpushedFix(
 		: { type: "pause", reason: "no-push" };
 }
 
-/** What one poll of one watched PR should do. Pure: every input is passed in. */
 export function decideAutoFix(
 	input: PrAutoFixDecisionInput,
 ): PrAutoFixDecision {

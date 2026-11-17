@@ -245,7 +245,6 @@ export interface PageWatchChangedMessage {
 	occurredAt: number;
 }
 
-/** An Auto-fix CI watch in the workspace started, moved, paused or stopped. */
 export interface PrAutoFixChangedMessage {
 	type: "pr-auto-fix:changed";
 	workspaceId: string;

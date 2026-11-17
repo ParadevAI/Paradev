@@ -103,7 +103,6 @@ export class PrAutoFixStore {
 		return row ? toState(row) : null;
 	}
 
-	/** Starts watching, or resumes with a fresh attempt count. */
 	watch(input: {
 		workspaceId: string;
 		pullRequestUrl: string;
@@ -174,7 +173,6 @@ function toAutoFixState(state: string | null): PrAutoFixPullRequest["state"] {
 	return coerced === "closed" || coerced === "merged" ? coerced : "open";
 }
 
-/** A live workspace's checkout, or null once it is archived or gone. */
 export function readLiveWorkspace(
 	db: HostDb,
 	workspaceId: string,
@@ -188,7 +186,6 @@ export function readLiveWorkspace(
 	);
 }
 
-/** The PR the workspace is linked to now, as the sidebar shows it. */
 export function readWorkspacePullRequest(
 	db: HostDb,
 	workspaceId: string,

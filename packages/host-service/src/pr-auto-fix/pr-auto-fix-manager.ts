@@ -14,13 +14,10 @@ import {
 } from "./types.ts";
 
 export const TICK_INTERVAL_MS = 15_000;
-/** Checks running, a fix out, or the agent busy. */
 export const ACTIVE_POLL_MS = 30_000;
 export const SETTLED_POLL_MS = 60_000;
-/** Paused, or nothing changed for `IDLE_AFTER_MS`. */
 export const IDLE_POLL_MS = 5 * 60_000;
 export const IDLE_AFTER_MS = 30 * 60_000;
-/** A PR row older than this was not refreshed for the watcher; see `readPullRequestObservation`. */
 export const STALE_PULL_REQUEST_MS = 10 * 60_000;
 export const MAX_WATCHES = 20;
 
@@ -48,7 +45,6 @@ export interface PrAutoFixDescription {
 	watch: PrAutoFixWatch | null;
 	maxAttempts: number;
 	hasAgent: boolean;
-	/** Why it cannot be turned on now; null when it can. */
 	blocker: PrAutoFixBlocker | null;
 }
 
@@ -69,10 +65,8 @@ const BLOCKER_MESSAGES: Record<PrAutoFixBlocker, string> = {
 
 export interface PrAutoFixDeps {
 	store: PrAutoFixStore;
-	/** Null once the workspace is archived or deleted. */
 	getWorkspace(workspaceId: string): { worktreePath: string } | null;
 	getWorkspacePullRequest(workspaceId: string): WorkspacePullRequest | null;
-	/** `fresh` skips the shared GitHub cache; used only to confirm a push after a fix. */
 	readPullRequest(input: {
 		workspaceId: string;
 		pullRequestUrl: string;
@@ -119,12 +113,6 @@ export function toWatch(state: PrAutoFixState): PrAutoFixWatch {
 	};
 }
 
-/**
- * Watches the CI of opted-in pull requests and hands a failure on a new head
- * commit to the agent of the PR's workspace, one fix at a time per
- * workspace. Every choice is `decideAutoFix`'s; this class reads its inputs,
- * applies its answer, and paces the polls. It never merges.
- */
 export class PrAutoFixManager {
 	private readonly slots = new Map<string, Slot>();
 	private readonly pollingWorkspaces = new Set<string>();
@@ -137,7 +125,6 @@ export class PrAutoFixManager {
 		this.now = deps.now ?? Date.now;
 	}
 
-	/** A fix recorded but never confirmed sent may or may not have reached the agent. */
 	start(): void {
 		const states = this.deps.store.list();
 		for (const state of states) {
@@ -168,7 +155,6 @@ export class PrAutoFixManager {
 			.map(toWatch);
 	}
 
-	/** The workspace already watching one of these PR URLs, if any. */
 	ownerOf(pullRequestUrls: string[]): string | null {
 		for (const url of pullRequestUrls) {
 			const state = this.deps.store.findByUrl(url);
@@ -285,7 +271,6 @@ export class PrAutoFixManager {
 		}
 	}
 
-	/** Returns true when it sent a fix. */
 	private async poll(state: PrAutoFixState, slot: Slot): Promise<boolean> {
 		const workspace = this.deps.getWorkspace(state.workspaceId);
 		if (
@@ -467,7 +452,6 @@ export class PrAutoFixManager {
 			this.deps.notifyChanged(fixing.workspaceId);
 	}
 
-	/** While fixing, the agent the fix went to; otherwise the most recently active one. */
 	private resolveAgent(state: PrAutoFixState): PrAutoFixAgentTarget | null {
 		const agents = this.deps.listAgents(state.workspaceId);
 		if (state.status === "fixing") {
