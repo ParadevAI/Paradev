@@ -16,21 +16,23 @@ export function agentCliUpdateKey(
 export const useAgentCliUpdateWatches = create<{
 	watches: Record<string, Watch>;
 	start: (key: string, watch: Watch) => void;
-	patch: (key: string, patch: Partial<Watch>) => void;
-	clear: (key: string) => void;
+	patch: (key: string, id: string, patch: Partial<Watch>) => void;
+	/** Without `id`, clears whatever update is in flight for `key`. */
+	clear: (key: string, id?: string) => void;
 }>()((set) => ({
 	watches: {},
 	start: (key, watch) =>
 		set((state) => ({ watches: { ...state.watches, [key]: watch } })),
-	patch: (key, patch) =>
+	patch: (key, id, patch) =>
 		set((state) => {
 			const watch = state.watches[key];
-			if (!watch) return state;
+			if (watch?.id !== id) return state;
 			return { watches: { ...state.watches, [key]: { ...watch, ...patch } } };
 		}),
-	clear: (key) =>
+	clear: (key, id) =>
 		set((state) => {
-			if (!(key in state.watches)) return state;
+			const watch = state.watches[key];
+			if (!watch || (id !== undefined && watch.id !== id)) return state;
 			const { [key]: _cleared, ...watches } = state.watches;
 			return { watches };
 		}),

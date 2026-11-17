@@ -1,12 +1,15 @@
 import type { AgentCliStatus } from "@superset/shared/agent-cli-status";
 
 export type UpdateWatch = {
+	/** One update attempt; a late reply from an earlier one must not touch it. */
+	id: string;
 	from: string | null;
 	command: string;
 	sessionId: string | null;
 	until: number;
 	/** The terminal running the update command, once it opened. */
 	terminalId?: string;
+	openedAt?: number;
 	/** Whether the update command was seen running in that terminal. */
 	ran?: boolean;
 };

@@ -10,11 +10,13 @@ import {
 	agentCliUpdateKey,
 	useAgentCliUpdateWatches,
 } from "./stores/agentCliUpdateWatches";
+import { hasCommandExited } from "./utils/hasCommandExited";
 import { hasUpdateLanded } from "./utils/hasUpdateLanded";
 
 const STATUS_STALE_MS = 60_000;
 const UPDATE_POLL_MS = 3_000;
 const COMMAND_POLL_MS = 1_000;
+const COMMAND_START_GRACE_MS = 15_000;
 const UPDATE_WATCH_MS = 5 * 60_000;
 
 export const AGENT_CLI_UPDATE_DOCS_URL = `${COMPANY.DOCS_URL}/chat#update-the-agent-cli`;
@@ -79,7 +81,7 @@ export function useAgentCliUpdate({
 	useEffect(() => {
 		if (!watch || updated) return;
 		const timer = setTimeout(
-			() => clearWatch(key),
+			() => clearWatch(key, watch.id),
 			Math.max(watch.until - Date.now(), 0),
 		);
 		return () => clearTimeout(timer);
@@ -89,7 +91,7 @@ export function useAgentCliUpdate({
 	// A command that ran and exited without changing the install failed or did
 	// nothing: give the Update action back instead of waiting out the watch.
 	const terminalId = watch?.terminalId;
-	const { data: commandState } =
+	const { data: commandState, dataUpdatedAt: commandCheckedAt } =
 		workspaceTrpc.terminal.hasRunningProcess.useQuery(
 			{ terminalId: terminalId ?? "", workspaceId },
 			{
@@ -101,20 +103,36 @@ export function useAgentCliUpdate({
 	const checkingExit = useRef(false);
 	useEffect(() => {
 		if (!watch || updated || commandState === undefined) return;
-		if (commandState.running) {
-			if (!watch.ran) patchWatch(key, { ran: true });
+		if (commandState.running && !watch.ran) {
+			patchWatch(key, watch.id, { ran: true });
 			return;
 		}
-		if (!watch.ran || checkingExit.current) return;
+		const exited = hasCommandExited({
+			running: commandState.running,
+			ran: watch.ran === true,
+			openedAt: watch.openedAt,
+			now: commandCheckedAt,
+			startGraceMs: COMMAND_START_GRACE_MS,
+		});
+		if (!exited || checkingExit.current) return;
 		checkingExit.current = true;
 		void refetch()
 			.then(({ data: fresh }) => {
-				if (!hasUpdateLanded(watch, fresh ?? null)) clearWatch(key);
+				if (!hasUpdateLanded(watch, fresh ?? null)) clearWatch(key, watch.id);
 			})
 			.finally(() => {
 				checkingExit.current = false;
 			});
-	}, [watch, updated, commandState, patchWatch, refetch, clearWatch, key]);
+	}, [
+		watch,
+		updated,
+		commandState,
+		commandCheckedAt,
+		patchWatch,
+		refetch,
+		clearWatch,
+		key,
+	]);
 
 	const command = status?.updateCommand ?? null;
 	const canUpdate = command !== null && onRunInTerminal !== undefined;
@@ -127,7 +145,9 @@ export function useAgentCliUpdate({
 	const installed = status?.installed ?? null;
 	const update = useCallback(async () => {
 		if (!command || !onRunInTerminal || !label) return;
+		const id = crypto.randomUUID();
 		startWatch(key, {
+			id,
 			from: installed,
 			command,
 			sessionId,
@@ -137,8 +157,9 @@ export function useAgentCliUpdate({
 			command,
 			t({ message: `Update ${label}` }),
 		);
-		if (opened) patchWatch(key, { terminalId: opened });
-		else clearWatch(key);
+		if (opened)
+			patchWatch(key, id, { terminalId: opened, openedAt: Date.now() });
+		else clearWatch(key, id);
 	}, [
 		command,
 		onRunInTerminal,

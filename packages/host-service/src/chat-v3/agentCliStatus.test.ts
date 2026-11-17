@@ -23,7 +23,7 @@ function fakeCli(binary: string, version: string, marker?: string) {
 	dirs.push(home);
 	const bin = join(home, "bin");
 	mkdirSync(bin);
-	const touch = marker ? `touch "${marker}"\n` : "";
+	const touch = marker ? `: > "${marker}"\n` : "";
 	writeFileSync(
 		join(bin, binary),
 		`#!/bin/sh\n${touch}echo "${binary} ${version}"\n`,

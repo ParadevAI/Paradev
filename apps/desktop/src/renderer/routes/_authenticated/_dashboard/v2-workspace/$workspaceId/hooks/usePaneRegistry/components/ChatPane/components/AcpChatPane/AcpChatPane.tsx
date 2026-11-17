@@ -476,6 +476,9 @@ export function AcpChatPane({
 		(sessionStopped || sessionDead) && harness && !continuedInTerminal,
 	);
 	const recoveries = useRef(0);
+	// Report a mode only when the session's own mode moves: until the host
+	// confirms a picked mode, the session still shows the old one.
+	const reportedModeId = useRef<string | undefined>(undefined);
 	if (stored?.live && !sessionDead) recoveries.current = 0;
 	const recover = useCallback(() => {
 		if (!harness || !sessionId || recoveryInFlight.current) return;
@@ -834,8 +837,11 @@ export function AcpChatPane({
 						? { harnessSessionId: bound }
 						: {}),
 					...(state?.title ? { title: state.title } : {}),
-					...(state?.modeId ? { modeId: state.modeId } : {}),
+					...(state?.modeId && state.modeId !== reportedModeId.current
+						? { modeId: state.modeId }
+						: {}),
 				});
+				reportedModeId.current = state?.modeId;
 			}}
 			pendingPrompts={pendingPrompts}
 			preferredModelLabel={modelLabel}

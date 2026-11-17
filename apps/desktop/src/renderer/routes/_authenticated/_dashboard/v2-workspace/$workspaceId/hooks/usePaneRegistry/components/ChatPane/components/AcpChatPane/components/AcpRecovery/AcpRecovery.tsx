@@ -100,7 +100,7 @@ export function AcpRecovery({
 					className="w-full max-w-sm"
 					description={
 						updating ? (
-							startedHere ? (
+							startedHere && retry ? (
 								<Trans>The chat resumes after the update.</Trans>
 							) : undefined
 						) : (

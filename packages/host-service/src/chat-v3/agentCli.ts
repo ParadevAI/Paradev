@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { accessSync, constants, realpathSync, statSync } from "node:fs";
+import { realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { delimiter, join, relative } from "node:path";
 import { promisify } from "node:util";
@@ -10,6 +10,7 @@ import { UNGATED_VERSION } from "./acpCatalogue";
 import {
 	type AgentCliBinary,
 	agentCliInstallHint,
+	isExecutableFile,
 	resolveAgentCliUpdate,
 } from "./agentCliUpdate";
 
@@ -23,16 +24,6 @@ export type AgentCli = {
 	env: NodeJS.ProcessEnv;
 	version: string;
 };
-
-function isExecutableFile(path: string): boolean {
-	try {
-		if (!statSync(path).isFile()) return false;
-		accessSync(path, constants.X_OK);
-		return true;
-	} catch {
-		return false;
-	}
-}
 
 const WIN32_DIRECT_EXEC_EXTENSIONS = [".exe", ".com"];
 
@@ -164,8 +155,10 @@ export function agentCliUnsupported(options: {
 	minVersion: string;
 	found: string | null;
 	upgrade?: string;
+	install?: string;
 }): string {
 	const upgrade = options.upgrade ? ` Upgrade with: ${options.upgrade}` : "";
+	const install = options.install ? ` Install with: ${options.install}` : "";
 	const wanted =
 		UNGATED_VERSION === options.minVersion
 			? ""
@@ -173,7 +166,7 @@ export function agentCliUnsupported(options: {
 	if (!options.found) {
 		return (
 			`${options.binary} was not found, so this chat cannot start. Install` +
-			` ${options.binary}${wanted} and make sure it is on your PATH.${upgrade}`
+			` ${options.binary}${wanted} and make sure it is on your PATH.${install || upgrade}`
 		);
 	}
 	return `${options.binary} ${options.minVersion} or newer is needed for chat, and ${options.found} is installed.${upgrade}`;
@@ -208,8 +201,13 @@ export async function resolveAgentCli(options: {
 			!probed.found && update?.source === "unknown"
 				? agentCliInstallHint(options.binary)
 				: undefined;
-		const upgrade = update ? (update.command ?? install) : options.upgrade;
-		const message = agentCliUnsupported({ ...options, found, upgrade });
+		const upgrade = update ? (update.command ?? undefined) : options.upgrade;
+		const message = agentCliUnsupported({
+			...options,
+			found,
+			upgrade,
+			install,
+		});
 		throw found && update
 			? new AgentCliOutdatedError(message)
 			: new Error(message);

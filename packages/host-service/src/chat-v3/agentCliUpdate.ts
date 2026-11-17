@@ -1,4 +1,4 @@
-import { accessSync, constants, existsSync } from "node:fs";
+import { accessSync, constants, statSync } from "node:fs";
 import type { AgentCliInstallSource } from "@superset/shared/agent-cli-status";
 
 export type LatestVersionSource =
@@ -48,6 +48,16 @@ export function hasAgentCliUpdates(binary: string): boolean {
 	return Object.hasOwn(AGENT_CLI_PACKAGES, binary);
 }
 
+export function isExecutableFile(path: string): boolean {
+	try {
+		if (!statSync(path).isFile()) return false;
+		accessSync(path, constants.X_OK);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 /** How to install a supported CLI that is not on the machine at all. */
 export function agentCliInstallHint(binary: string): string | undefined {
 	const pkg = hasAgentCliUpdates(binary)
@@ -84,7 +94,7 @@ export function resolveAgentCliUpdate(options: {
 	binary: string;
 	found: AgentCliBinary | null;
 	runMode?: string | undefined;
-	exists?: (path: string) => boolean;
+	executable?: (path: string) => boolean;
 	writable?: (path: string) => boolean;
 }): AgentCliUpdate | null {
 	const pkg = hasAgentCliUpdates(options.binary)
@@ -101,11 +111,11 @@ export function resolveAgentCliUpdate(options: {
 	};
 	const found = options.found;
 	if (!found) return { source: "unknown", command: null, latest: null };
-	const exists = options.exists ?? existsSync;
+	const executable = options.executable ?? isExecutableFile;
 	const writable = options.writable ?? isWritable;
 	const { path, realPath } = found;
 	const tool = (candidate: string) =>
-		exists(candidate) ? shellQuote(candidate) : null;
+		executable(candidate) ? shellQuote(candidate) : null;
 
 	if (pkg.native?.matches(found)) {
 		return {
@@ -149,13 +159,11 @@ export function resolveAgentCliUpdate(options: {
 			latest: npmLatest,
 		};
 	}
-	if (
-		realPath.includes("/pnpm/global/") &&
-		new RegExp(inPackage).test(realPath)
-	) {
+	const pnpmHome = /^(.*\/pnpm)\/global\//.exec(realPath)?.[1];
+	if (pnpmHome && new RegExp(inPackage).test(realPath)) {
 		return {
 			source: "pnpm",
-			command: `pnpm add -g ${pkg.npm}@latest`,
+			command: `PNPM_HOME=${shellQuote(pnpmHome)} pnpm add -g ${pkg.npm}@latest`,
 			latest: npmLatest,
 		};
 	}

@@ -6,6 +6,7 @@ const UPDATE = "npm install -g --prefix /opt/a @openai/codex@latest";
 const OTHER_NPM = "npm install -g --prefix /opt/b @openai/codex@latest";
 
 const WATCH = {
+	id: "attempt-1",
 	from: "0.161.0",
 	command: UPDATE,
 	sessionId: "session-1",

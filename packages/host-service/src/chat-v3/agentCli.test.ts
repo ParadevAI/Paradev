@@ -98,7 +98,9 @@ describe.skipIf(POSIX_ONLY)("resolveAgentCli", () => {
 			env: async () => env,
 		}).catch((caught: unknown) => caught);
 
-		expect(String(error)).toContain("npm i -g @openai/codex@latest");
+		expect(String(error)).toContain(
+			"Install with: npm i -g @openai/codex@latest",
+		);
 	});
 });
 

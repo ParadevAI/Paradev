@@ -5,12 +5,12 @@ function update(
 	binary: string,
 	path: string,
 	realPath: string,
-	options: { writable?: boolean; exists?: boolean } = {},
+	options: { writable?: boolean; executable?: boolean } = {},
 ) {
 	return resolveAgentCliUpdate({
 		binary,
 		found: { path, realPath },
-		exists: () => options.exists ?? true,
+		executable: () => options.executable ?? true,
 		writable: () => options.writable ?? true,
 	});
 }
@@ -85,7 +85,7 @@ describe("resolveAgentCliUpdate", () => {
 	});
 
 	it("offers no command when the install's own brew or bun is missing", () => {
-		const missing = { exists: false };
+		const missing = { executable: false };
 		expect(
 			update(
 				"codex",
@@ -102,6 +102,16 @@ describe("resolveAgentCliUpdate", () => {
 				missing,
 			),
 		).toMatchObject({ source: "bun", command: null });
+	});
+
+	it("updates a pnpm global install in that pnpm's root", () => {
+		expect(
+			update(
+				"codex",
+				"/Users/a/Library/pnpm/codex",
+				"/Users/a/Library/pnpm/global/5/node_modules/@openai/codex/bin/codex.js",
+			)?.command,
+		).toBe("PNPM_HOME=/Users/a/Library/pnpm pnpm add -g @openai/codex@latest");
 	});
 
 	it("updates a bun global install with that bun", () => {
