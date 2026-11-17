@@ -2816,9 +2816,6 @@ msgstr "інший пристрій"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Відповідайте на запитання в терміналі нижче, наприклад введіть пароль."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Дайте відповідь на це запитання на комп'ютері або пропустіть його."
-
 msgid "Answered"
 msgstr "Відповідь надано"
 

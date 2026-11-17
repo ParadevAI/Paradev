@@ -1,3 +1,4 @@
+import { composerAnswer } from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	Decision,
@@ -5,7 +6,6 @@ import type {
 } from "@superset/chat/protocol";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { useCallback } from "react";
-import { composerAnswer } from "../../utils/composerAnswer";
 
 export function useMainSend({
 	approvals,

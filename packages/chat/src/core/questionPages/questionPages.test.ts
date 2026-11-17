@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { FormField } from "@superset/chat/protocol";
+import type { FormField } from "../../protocol";
 import { isInvalidNumber, questionPages } from "./questionPages";
 
 const choice = (id: string): FormField => ({

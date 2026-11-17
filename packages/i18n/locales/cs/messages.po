@@ -2822,9 +2822,6 @@ msgstr "jiné zařízení"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Odpovězte na dotazy v terminálu níže, například heslo."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Odpovězte na tuto otázku na počítači, nebo ji přeskočte."
-
 msgid "Answered"
 msgstr "Zodpovězeno"
 

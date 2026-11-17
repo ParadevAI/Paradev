@@ -2822,9 +2822,6 @@ msgstr "另一臺裝置"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "請在下方終端機中回答問題，例如輸入密碼。"
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "請在桌面版回答此問題，或略過。"
-
 msgid "Answered"
 msgstr "已回答"
 
