@@ -8,6 +8,9 @@ mock.module("../../lib/r2", () => ({
 		const body = objectStore.get(key);
 		return body ? { sizeBytes: body.length, contentType: null } : null;
 	},
+	putObject: async ({ key, body }: { key: string; body: Uint8Array }) => {
+		objectStore.set(key, body);
+	},
 	deleteObjects: async (keys: string[]) => {
 		for (const key of keys) objectStore.delete(key);
 	},
