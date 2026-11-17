@@ -2239,9 +2239,6 @@ msgstr "Favorilere ekle"
 msgid "Add to merge queue"
 msgstr "Birleştirme kuyruğuna ekle"
 
-msgid "Add to new chat"
-msgstr "Yeni sohbete ekle"
-
 msgid "Add to project"
 msgstr "Projeye ekle"
 

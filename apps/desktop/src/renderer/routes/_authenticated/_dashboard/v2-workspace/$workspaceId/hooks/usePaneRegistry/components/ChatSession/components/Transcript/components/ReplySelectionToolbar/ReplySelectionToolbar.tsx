@@ -1,28 +1,38 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
-import { type RefObject, useLayoutEffect, useState } from "react";
+import { type RefObject, useEffect, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import {
 	type Box,
 	selectionToolbarLayout,
 } from "../../utils/selectionToolbarLayout";
 
 const ACTION_CLASSNAME = "rounded-none px-2.5 font-normal";
+const COPIED_MS = 900;
 
 export function ReplySelectionToolbar({
 	ref,
 	anchor,
 	bounds,
+	text,
 	onAddToChat,
-	onAddToNewChat,
+	onCopied,
 }: {
 	ref: RefObject<HTMLDivElement | null>;
 	anchor: Box;
 	bounds: Box;
+	text: string;
 	onAddToChat: () => void;
-	onAddToNewChat?: (() => void) | undefined;
+	onCopied: () => void;
 }) {
 	const { t } = useLingui();
+	const { copied, copyToClipboard } = useCopyToClipboard();
+	useEffect(() => {
+		if (!copied) return;
+		const timer = setTimeout(onCopied, COPIED_MS);
+		return () => clearTimeout(timer);
+	}, [copied, onCopied]);
 	const [position, setPosition] = useState<{
 		left: number;
 		top: number;
@@ -60,16 +70,18 @@ export function ReplySelectionToolbar({
 			>
 				<Trans>Add to chat</Trans>
 			</Button>
-			{onAddToNewChat && (
-				<Button
-					className={ACTION_CLASSNAME}
-					onClick={onAddToNewChat}
-					size="xs"
-					variant="ghost"
-				>
-					<Trans>Add to new chat</Trans>
-				</Button>
-			)}
+			<Button
+				className={ACTION_CLASSNAME}
+				onClick={() => {
+					copyToClipboard(text).catch((error: unknown) => {
+						console.error("[chat] copy failed", error);
+					});
+				}}
+				size="xs"
+				variant="ghost"
+			>
+				{copied ? <Trans>Copied</Trans> : <Trans>Copy</Trans>}
+			</Button>
 		</div>,
 		document.body,
 	);

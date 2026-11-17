@@ -58,6 +58,7 @@ export function useReplySelection({
 	const selectionRef = useRef(selection);
 	selectionRef.current = selection;
 	const toolbarRef = useRef<HTMLDivElement>(null);
+	const dismiss = useCallback(() => setShown(null), []);
 	const isShown = selection !== null;
 
 	const onMouseUp = useCallback(
@@ -143,5 +144,5 @@ export function useReplySelection({
 		[t],
 	);
 
-	return { selection, toolbarRef, onMouseUp, commit };
+	return { selection, toolbarRef, onMouseUp, commit, dismiss };
 }

@@ -2239,9 +2239,6 @@ msgstr "Ajouter aux favoris"
 msgid "Add to merge queue"
 msgstr "Ajouter à la file de fusion"
 
-msgid "Add to new chat"
-msgstr "Ajouter à une nouvelle discussion"
-
 msgid "Add to project"
 msgstr "Ajouter à un projet"
 

@@ -192,7 +192,7 @@ export function SessionView({
 	getOpenFilePaths?: () => ReadonlySet<string>;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
-	onNewChat?: (draft?: ComposerDraft) => void;
+	onNewChat?: () => void;
 }) {
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
@@ -341,14 +341,6 @@ export function SessionView({
 	const quoteInComposer = useCallback(
 		(text: string) => composerRef.current?.addQuote(text),
 		[],
-	);
-	const quoteInNewChat = useMemo(
-		() =>
-			onNewChat
-				? (text: string) =>
-						onNewChat({ segments: [], attachments: [], quotes: [text] })
-				: undefined,
-		[onNewChat],
 	);
 	const openFind = useCallback(() => transcriptRef.current?.openFind(), []);
 	const [revealMessageId, setRevealMessageId] = useState<string | null>(null);
@@ -739,7 +731,6 @@ export function SessionView({
 												onRespond={onRespond}
 												onMessageRevealed={clearRevealMessage}
 												onQuote={quoteInComposer}
-												onQuoteInNewChat={quoteInNewChat}
 												onRetryPrompt={session.retryPrompt}
 												outbox={transcriptOutbox}
 												ref={transcriptRef}

@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
-import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
 import { hostRemembersChatSelections } from "@superset/shared/host-version";
@@ -140,7 +139,7 @@ export function AcpChatPane({
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
-	onNewChat?: (label: string | undefined, draft?: ComposerDraft) => void;
+	onNewChat?: (label: string | undefined) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -346,10 +345,7 @@ export function AcpChatPane({
 		agentLabel ??
 		agentConfigs?.find((config) => config.presetId === agent?.id)?.label;
 	const newChat = useMemo(
-		() =>
-			onNewChat
-				? (draft?: ComposerDraft) => onNewChat(presetLabel, draft)
-				: undefined,
+		() => (onNewChat ? () => onNewChat(presetLabel) : undefined),
 		[onNewChat, presetLabel],
 	);
 

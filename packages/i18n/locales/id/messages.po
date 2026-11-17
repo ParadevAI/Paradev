@@ -2239,9 +2239,6 @@ msgstr "Tambahkan ke favorit"
 msgid "Add to merge queue"
 msgstr "Tambahkan ke antrean merge"
 
-msgid "Add to new chat"
-msgstr "Tambahkan ke chat baru"
-
 msgid "Add to project"
 msgstr "Tambahkan ke proyek"
 
