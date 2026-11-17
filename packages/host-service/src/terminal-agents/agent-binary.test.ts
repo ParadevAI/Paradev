@@ -73,6 +73,12 @@ describe("isOutdatedExecutable", () => {
 		expect(
 			isOutdatedExecutable({ path: "/usr/local/bin/node", fileId: "1:9" }, npm),
 		).toBe(false);
+		expect(
+			isOutdatedExecutable(
+				{ path: "/usr/local/bin/node", fileId: "1:9" },
+				{ path: "/usr/local/bin/claude", fileId: "1:10" },
+			),
+		).toBe(false);
 		expect(isOutdatedExecutable(null, npm)).toBe(false);
 	});
 });

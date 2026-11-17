@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
@@ -18,7 +18,9 @@ const TOAST_ID = "agent-update-restart";
 export function AgentUpdateRestartToast() {
 	const { t } = useLingui();
 	const { activeHostUrl } = useLocalHostService();
-	const offeredTerminalIdsRef = useRef(new Set<string>());
+	const [offeredTerminalIds, setOfferedTerminalIds] = useState<
+		ReadonlySet<string>
+	>(new Set());
 
 	const { data: outdatedSessions, refetch } = useQuery({
 		queryKey: ["terminal-agents-outdated-sessions", activeHostUrl],
@@ -55,11 +57,12 @@ export function AgentUpdateRestartToast() {
 			return;
 		}
 		const terminalIds = idleTerminalIds.split(",");
-		const offered = offeredTerminalIdsRef.current;
-		if (terminalIds.every((terminalId) => offered.has(terminalId))) return;
+		if (terminalIds.every((terminalId) => offeredTerminalIds.has(terminalId))) {
+			return;
+		}
 
 		const markOffered = () => {
-			for (const terminalId of terminalIds) offered.add(terminalId);
+			setOfferedTerminalIds((offered) => new Set([...offered, ...terminalIds]));
 		};
 		toast(t({ message: "Claude Code was updated" }), {
 			id: TOAST_ID,
@@ -76,14 +79,21 @@ export function AgentUpdateRestartToast() {
 					markOffered();
 					restartSessions(undefined, {
 						onError: () => {
-							for (const terminalId of terminalIds) offered.delete(terminalId);
+							setOfferedTerminalIds(
+								(offered) =>
+									new Set(
+										[...offered].filter(
+											(terminalId) => !terminalIds.includes(terminalId),
+										),
+									),
+							);
 						},
 					});
 				},
 			},
 			onDismiss: markOffered,
 		});
-	}, [idleTerminalIds, restartSessions, t]);
+	}, [idleTerminalIds, offeredTerminalIds, restartSessions, t]);
 
 	return null;
 }

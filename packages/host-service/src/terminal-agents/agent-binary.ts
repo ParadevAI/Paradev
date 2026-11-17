@@ -8,6 +8,9 @@ const execFileAsync = promisify(execFile);
 /** Superset's own agent wrapper carries this line; the real binary is a later PATH match. */
 const WRAPPER_MARKER_PREFIX = "# Superset agent-wrapper";
 
+/** The native installer puts each version at `~/.local/share/claude/versions/<version>`. */
+const NATIVE_VERSIONS_DIR = "versions";
+
 export interface ExecutableFile {
 	path: string;
 	/** `<device>:<inode>`: an update that rewrites the same path still changes it. */
@@ -105,9 +108,9 @@ export async function readRunningExecutable(
 
 /**
  * Whether a process runs another copy of the installed binary. Homebrew keeps
- * the file name across versions and the native installer keeps the folder; a
- * process that matches neither is another program (a reused pid, or `node`
- * running an old npm install) and cannot be compared.
+ * the file name across versions and the native installer keeps the
+ * `versions` folder; a process that matches neither is another program (a
+ * reused pid, or `node` running an old npm install) and cannot be compared.
  */
 export function isOutdatedExecutable(
 	running: ExecutableFile | null,
@@ -116,6 +119,7 @@ export function isOutdatedExecutable(
 	if (!running || !installed) return false;
 	const isSameInstall =
 		basename(running.path) === basename(installed.path) ||
-		dirname(running.path) === dirname(installed.path);
+		(dirname(running.path) === dirname(installed.path) &&
+			basename(dirname(installed.path)) === NATIVE_VERSIONS_DIR);
 	return isSameInstall && running.fileId !== installed.fileId;
 }
