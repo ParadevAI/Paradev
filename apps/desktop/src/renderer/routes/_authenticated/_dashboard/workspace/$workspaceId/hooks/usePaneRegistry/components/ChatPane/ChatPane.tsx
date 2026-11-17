@@ -1,3 +1,4 @@
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import type { RendererContext } from "@superset/panes";
 import { useCallback, useMemo, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
@@ -10,8 +11,10 @@ import type {
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openFilePathsIn";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { chatDraftKey } from "../../utils/chatDraftKey";
 import { openChatHistory } from "../../utils/chatHistoryOpen";
 import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
+import { prependToDraft } from "../ChatSession/components/Composer/hooks/useComposerDraft";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
@@ -65,15 +68,17 @@ export function ChatPane({
 	const agentId = data.agent?.id;
 	const store = ctx.store;
 	const onNewChat = useCallback(
-		(label: string | undefined) => {
+		(label: string | undefined, draft?: ComposerDraft) => {
 			if (!agentId) return;
+			const terminalId = crypto.randomUUID();
+			if (draft) prependToDraft(chatDraftKey(terminalId), [draft]);
 			store.getState().addTab({
 				panes: [
 					{
 						kind: "chat-v3",
 						...(label ? { titleOverride: label } : {}),
 						data: {
-							terminalId: crypto.randomUUID(),
+							terminalId,
 							sessionId: null,
 							agent: { id: agentId },
 						} satisfies ChatPaneData,

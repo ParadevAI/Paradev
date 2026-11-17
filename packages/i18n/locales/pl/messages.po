@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# wiersz} few {# wiersze} many {# wierszy} other {# wiersza}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Cytat} few {Cytat · # wiersze} many {Cytat · # wierszy} other {Cytat · # wiersza}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (to urządzenie)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name} nie przyjmuje argumentów"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} nie przyjmuje załączników"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} nie przyjmuje cytatów"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "Prompt, kilka wyzwalaczy i obszar roboczy dla każdego uruchomienia"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request zawsze dostaje własny worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Cytat może mieć najwyżej {limit} znaków"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Przebudowana powierzchnia czatu do prowadzenia agentów: bogatsze wyjście narzędzi, płynniejsze sterowanie, szybsze wszystko."
@@ -2294,6 +2303,9 @@ msgstr "Dodaj tę etykietę"
 msgid "Add to channel"
 msgstr "Dodaj do kanału"
 
+msgid "Add to chat"
+msgstr "Dodaj do czatu"
+
 msgid "Add to Dictionary"
 msgstr "Dodaj do słownika"
 
@@ -2302,6 +2314,9 @@ msgstr "Dodaj do ulubionych"
 
 msgid "Add to merge queue"
 msgstr "Dodaj do kolejki scalania"
+
+msgid "Add to new chat"
+msgstr "Dodaj do nowego czatu"
 
 msgid "Add to project"
 msgstr "Dodaj do projektu"
@@ -16583,6 +16598,9 @@ msgstr "Usuń powiązanie z PR"
 msgid "Remove queued message"
 msgstr "Usuń wiadomość z kolejki"
 
+msgid "Remove quote"
+msgstr "Usuń cytat"
+
 msgid "Remove repository"
 msgstr "Usuń repozytorium"
 
@@ -18179,6 +18197,9 @@ msgstr "Akcje zaznaczonych obszarów roboczych"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Zaznaczenie tekstu w terminalu od razu kopiuje go do schowka, bez końcowych spacji"
+
+msgid "Selection actions"
+msgstr "Akcje zaznaczenia"
 
 msgid "Self-hosted"
 msgstr "Własny hosting"

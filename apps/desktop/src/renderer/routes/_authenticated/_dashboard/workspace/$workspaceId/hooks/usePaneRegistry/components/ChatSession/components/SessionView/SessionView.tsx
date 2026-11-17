@@ -95,6 +95,7 @@ import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useStoredHistory } from "./hooks/useStoredHistory";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
+import { contentDraft } from "./utils/contentDraft";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
@@ -104,10 +105,6 @@ const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
 const NO_APPROVALS: ReturnType<typeof useApprovals> = [];
-
-function contentText(content: UserContent[]): string {
-	return userMessageText({ content });
-}
 
 export function SessionView({
 	presetId,
@@ -204,7 +201,7 @@ export function SessionView({
 	getOpenFilePaths?: () => ReadonlySet<string>;
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
-	onNewChat?: () => void;
+	onNewChat?: (draft?: ComposerDraft) => void;
 }) {
 	const { t } = useLingui();
 	const snapshotWorktree = useChatTurnSnapshotsEnabled();
@@ -235,10 +232,8 @@ export function SessionView({
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>
 			sentDrafts.current.get(entry.clientId) ??
-			handedOverDrafts.current.get(JSON.stringify(entry.content)) ?? {
-				segments: [{ type: "text", text: contentText(entry.content) }],
-				attachments: [],
-			},
+			handedOverDrafts.current.get(JSON.stringify(entry.content)) ??
+			contentDraft(entry.content),
 		[],
 	);
 	useEffect(() => {
@@ -379,6 +374,18 @@ export function SessionView({
 	);
 
 	const focusComposer = useCallback(() => composerRef.current?.focus(), []);
+	const quoteInComposer = useCallback(
+		(text: string) => composerRef.current?.addQuote(text),
+		[],
+	);
+	const quoteInNewChat = useMemo(
+		() =>
+			onNewChat
+				? (text: string) =>
+						onNewChat({ segments: [], attachments: [], quotes: [text] })
+				: undefined,
+		[onNewChat],
+	);
 	const openFind = useCallback(() => transcriptRef.current?.openFind(), []);
 	const [revealMessageId, setRevealMessageId] = useState<string | null>(null);
 	const clearRevealMessage = useCallback(() => setRevealMessageId(null), []);
@@ -526,13 +533,7 @@ export function SessionView({
 	});
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
-			restoreDraft(
-				{
-					segments: [{ type: "text", text: contentText(content) }],
-					attachments: [],
-				},
-				originKey,
-			),
+			restoreDraft(contentDraft(content), originKey),
 		[restoreDraft],
 	);
 	const onStopTask = useCallback(
@@ -829,6 +830,8 @@ export function SessionView({
 												onRequestItemBodies={session.requestItemBodies}
 												onRespond={onRespond}
 												onMessageRevealed={clearRevealMessage}
+												onQuote={quoteInComposer}
+												onQuoteInNewChat={quoteInNewChat}
 												onRetryPrompt={session.retryPrompt}
 												outbox={transcriptOutbox}
 												ref={transcriptRef}

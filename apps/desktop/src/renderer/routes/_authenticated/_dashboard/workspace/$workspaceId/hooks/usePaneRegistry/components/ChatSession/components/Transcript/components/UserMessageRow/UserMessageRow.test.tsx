@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { withQuotedReplies } from "@superset/chat/core";
 import type { UserMessage } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react";
 import { ChatPaneActionsProvider } from "../../../../providers/ChatPaneActionsProvider";
+import { elementsForChips } from "../../../../utils/messageElements";
 import { copySourceText } from "../../utils/copySourceText";
 import { UserMessageRow } from "./UserMessageRow";
 
@@ -145,4 +147,75 @@ test("editing a message sends the new text in place of the old one", () => {
 		"Why does it crash on reset?",
 	);
 	expect(view.queryByRole("textbox")).toBeNull();
+});
+
+const QUOTE =
+	"The cache key must include the source.\nOtherwise two kernels collide.";
+
+function quotedMessage(typed: string): UserMessage {
+	const text = withQuotedReplies([QUOTE], typed);
+	return {
+		...message(text),
+		content: [
+			{
+				type: "text",
+				text,
+				elements: elementsForChips(
+					typed,
+					[{ label: "a.ts", serialized: "src/a.ts" }],
+					text.slice(0, text.length - typed.length),
+				),
+			},
+		],
+	};
+}
+
+test("a quote shows above the bubble, and chips after it still line up", () => {
+	const view = render(
+		<UserMessageRow
+			harness={undefined}
+			item={quotedMessage("why src/a.ts?")}
+		/>,
+	);
+
+	const quote = view.container.querySelector("[data-quoted-reply] p");
+	expect(quote?.textContent).toBe(QUOTE);
+	expect(view.container.textContent).not.toContain("quoted_reply");
+	const chip = view.container.querySelector("[data-source-text]");
+	expect(chip?.getAttribute("data-source-text")).toBe("src/a.ts");
+});
+
+test("Copy message gives the quote as a markdown quote ahead of the text", async () => {
+	const view = renderRow(withQuotedReplies([QUOTE], TYPED));
+	fireEvent.click(view.getByRole("button", { name: "Copy message" }));
+
+	await waitFor(() => expect(writeText).toHaveBeenCalled());
+	expect(writeText.mock.calls[0]?.[0]).toBe(
+		`> The cache key must include the source.\n> Otherwise two kernels collide.\n\n${TYPED}`,
+	);
+});
+
+test("editing a quoted message keeps its quote", () => {
+	const editMessage = mock((_itemId: string, _text: string) => {});
+	const view = render(
+		<ChatPaneActionsProvider
+			editMessage={editMessage}
+			editableMessageIds={new Set(["user-1"])}
+		>
+			<UserMessageRow
+				harness={undefined}
+				item={message(withQuotedReplies([QUOTE], TYPED))}
+			/>
+		</ChatPaneActionsProvider>,
+	);
+	fireEvent.click(view.getByRole("button", { name: "Edit message" }));
+	const box = view.getByRole("textbox");
+	expect((box as HTMLTextAreaElement).value).toBe(TYPED);
+	fireEvent.change(box, { target: { value: "And on reset?" } });
+	fireEvent.keyDown(box, { key: "Enter" });
+
+	expect(editMessage).toHaveBeenCalledWith(
+		"user-1",
+		withQuotedReplies([QUOTE], "And on reset?"),
+	);
 });

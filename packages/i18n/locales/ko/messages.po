@@ -1158,6 +1158,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {#줄}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {인용} other {인용 · #줄}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (이 기기)"
 
@@ -1567,6 +1570,9 @@ msgstr "/{name}은(는) 인수를 받지 않습니다"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name}은(는) 첨부 파일을 받지 않습니다"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name}은(는) 인용을 받지 않습니다"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1909,6 +1915,9 @@ msgstr "프롬프트, 몇 가지 트리거, 그리고 실행마다 워크스페�
 
 msgid "A pull request always gets its own worktree"
 msgstr "풀 리퀘스트는 항상 자체 worktree를 갖습니다"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "인용은 최대 {limit}자까지 가능합니다"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "에이전트를 다루기 위해 새로 만든 채팅 화면입니다. 더 풍부한 도구 출력, 더 매끄러운 조종, 전반적으로 더 빠른 속도."
@@ -2294,6 +2303,9 @@ msgstr "이 라벨 추가"
 msgid "Add to channel"
 msgstr "채널에 추가"
 
+msgid "Add to chat"
+msgstr "채팅에 추가"
+
 msgid "Add to Dictionary"
 msgstr "사전에 추가"
 
@@ -2302,6 +2314,9 @@ msgstr "즐겨찾기에 추가"
 
 msgid "Add to merge queue"
 msgstr "머지 대기열에 추가"
+
+msgid "Add to new chat"
+msgstr "새 채팅에 추가"
 
 msgid "Add to project"
 msgstr "프로젝트에 추가"
@@ -16583,6 +16598,9 @@ msgstr "PR 링크 제거"
 msgid "Remove queued message"
 msgstr "대기 중인 메시지 삭제"
 
+msgid "Remove quote"
+msgstr "인용 제거"
+
 msgid "Remove repository"
 msgstr "리포지토리 제거"
 
@@ -18179,6 +18197,9 @@ msgstr "선택한 워크스페이스 작업"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "터미널에서 텍스트를 선택하면 끝의 공백이 제거된 상태로 즉시 클립보드에 복사됩니다"
+
+msgid "Selection actions"
+msgstr "선택 항목 작업"
 
 msgid "Self-hosted"
 msgstr "셀프 호스팅"

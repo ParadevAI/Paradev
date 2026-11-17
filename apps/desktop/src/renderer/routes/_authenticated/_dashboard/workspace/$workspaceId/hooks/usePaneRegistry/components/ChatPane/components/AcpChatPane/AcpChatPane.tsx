@@ -1,6 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { AGENT_DEFAULT_MODE, type UserContent } from "@superset/chat/protocol";
+import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
 import { getAgentModelSupport } from "@superset/shared/agent-models";
 import { hostRemembersChatSelections } from "@superset/shared/host-version";
@@ -26,6 +27,7 @@ import type { OpenFile } from "../../../../../../types";
 import { isChatSessionReopened } from "../../../../../../utils/closedChatSessions";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { useForkChatSession } from "../../../../hooks/useForkChatSession";
+import { chatDraftKey } from "../../../../utils/chatDraftKey";
 import {
 	forgetSavedChatMode,
 	freshStartMode,
@@ -140,7 +142,7 @@ export function AcpChatPane({
 	/** Opens the pane header's chat history picker, as `/resume` does. */
 	onOpenHistory?: () => void;
 	/** Opens a fresh chat with this pane's agent, titled with its label. */
-	onNewChat?: (label: string | undefined) => void;
+	onNewChat?: (label: string | undefined, draft?: ComposerDraft) => void;
 	onSwitchAgent?: (target: AgentSwitchTarget) => void;
 	onOpenAgentChat?: (target: AgentSwitchTarget) => void;
 	onOpenForkedChat?: (fork: { sessionId: string; terminalId: string }) => void;
@@ -368,7 +370,10 @@ export function AcpChatPane({
 		agentLabel ??
 		agentConfigs?.find((config) => config.presetId === agent?.id)?.label;
 	const newChat = useMemo(
-		() => (onNewChat ? () => onNewChat(presetLabel) : undefined),
+		() =>
+			onNewChat
+				? (draft?: ComposerDraft) => onNewChat(presetLabel, draft)
+				: undefined,
 		[onNewChat, presetLabel],
 	);
 
@@ -676,7 +681,7 @@ export function AcpChatPane({
 		recover();
 	}, [recover]);
 
-	const draftKey = `chat-v3-draft:${draftId ?? terminalId}`;
+	const draftKey = chatDraftKey(draftId ?? terminalId);
 
 	const editMessage = useCallback(
 		async (request: ChatEditRequest) => {

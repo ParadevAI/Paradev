@@ -3,12 +3,15 @@
 import { AttachmentFileCard } from "../../../AttachmentFileCard";
 import { PastedTextCard } from "../../../PastedTextCard";
 import type { PromptInputAttachment } from "../../types";
+import { QuoteCard } from "./components/QuoteCard";
 import { RemoveButton } from "./components/RemoveButton";
 import { RevealButton } from "./components/RevealButton";
 
 export type AttachmentPillsProps = {
 	attachments: PromptInputAttachment[];
+	quotes?: readonly string[];
 	onRemove: (id: string) => void;
+	onRemoveQuote?: (quote: string) => void;
 	onPreviewError?: (id: string) => void;
 	onReveal?: (attachment: PromptInputAttachment) => void;
 	onAttachmentClick?: (
@@ -19,14 +22,23 @@ export type AttachmentPillsProps = {
 
 export function AttachmentPills({
 	attachments,
+	quotes = [],
 	onRemove,
+	onRemoveQuote,
 	onPreviewError,
 	onReveal,
 	onAttachmentClick,
 }: AttachmentPillsProps) {
-	if (attachments.length === 0) return null;
+	if (attachments.length === 0 && quotes.length === 0) return null;
 	return (
 		<div className="flex flex-wrap items-center gap-2 px-3 pt-3">
+			{quotes.map((quote) => (
+				<QuoteCard
+					key={quote}
+					text={quote}
+					onRemove={() => onRemoveQuote?.(quote)}
+				/>
+			))}
 			{attachments.map((attachment) => {
 				if (attachment.pastedText) {
 					return (
