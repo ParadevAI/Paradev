@@ -20,6 +20,7 @@ import {
 	inArray,
 	isNotNull,
 	isNull,
+	lt,
 	ne,
 	sql,
 } from "drizzle-orm";
@@ -59,6 +60,18 @@ export interface TurnDeps {
 	boxKeys: () => Promise<BoxKeys>;
 	/** Where a box reaches the API's routes for boxes. */
 	boxApiUrl: string;
+	/**
+	 * Decides whether one of a group's Devs should answer a message nobody
+	 * addressed, and which. Absent where there is no key for it: the group
+	 * then stays quiet unless a Dev is mentioned.
+	 */
+	speakUp?: (input: {
+		group: string;
+		sender: string;
+		text: string;
+		recent: { author: string; text: string }[];
+		devs: { id: string; name: string; description: string }[];
+	}) => Promise<string | null>;
 	/** No model key: boxes run the scripted model, so the loop still works end to end. */
 	fauxModel: boolean;
 	idleTimeoutMs: number;
@@ -342,6 +355,32 @@ const turnHeader = (
 		...fields.flatMap(([name, value]) => (value ? [`${name}: ${value}`] : [])),
 	].join("\n");
 
+/** Whether this Dev wrote one of the few messages before this one, a moment ago. */
+async function spokeJustBefore(
+	agentId: string,
+	message: typeof chatsMessages.$inferSelect,
+): Promise<boolean> {
+	const before = await db
+		.select({
+			agentId: chatsMessages.authorAgentId,
+			createdAt: chatsMessages.createdAt,
+		})
+		.from(chatsMessages)
+		.where(
+			and(
+				eq(chatsMessages.groupId, message.groupId),
+				lt(chatsMessages.createdAt, message.createdAt),
+			),
+		)
+		.orderBy(desc(chatsMessages.createdAt))
+		.limit(4);
+	return before.some(
+		(row) =>
+			row.agentId === agentId &&
+			message.createdAt.getTime() - row.createdAt.getTime() <= 10 * 60_000,
+	);
+}
+
 /**
  * A new message's turn: where and from whom, whether this Dev was mentioned
  * or why it was picked, when, then the message with mentions as names. Null
@@ -381,8 +420,9 @@ async function messageTurnText(turn: TurnRow) {
 			.map((dev) => dev.name);
 		mentions = [...(me ? ["you"] : []), ...others].join(", ") || null;
 		if (!me) {
-			why =
-				"not mentioned, but it follows your reply here a moment ago. Reply only if it asks something of you; when people are talking to each other, don't reply";
+			why = (await spokeJustBefore(turn.agentId, row.message))
+				? "not mentioned, but it follows your reply here a moment ago. Reply only if it asks something of you; when people are talking to each other, don't reply"
+				: "not mentioned; picked as the Dev best placed to answer";
 		}
 	}
 	const header = turnHeader("New message", [

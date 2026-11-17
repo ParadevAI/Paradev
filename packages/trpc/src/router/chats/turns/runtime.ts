@@ -9,6 +9,7 @@ import { postDevMessage, settleTurn, type TurnDeps } from "./engine";
 import { httpRunner } from "./http-runner";
 import { inlineTurnRuns } from "./inline-runs";
 import { memoryBoxes, scriptedRunner } from "./scripted";
+import { gatewaySpeakUp } from "./speak-up";
 
 const IDLE_TIMEOUT_MS = 10 * 60_000;
 const SCRIPTED_THINK_MS = 1_500;
@@ -97,6 +98,9 @@ function dockerRuntime(): TurnDeps {
 		boxKeys: processBoxKeys,
 		boxApiUrl: boxes.boxApiUrl,
 		fauxModel: !env.VERCEL_AI_GATEWAY_KEY,
+		speakUp: env.VERCEL_AI_GATEWAY_KEY
+			? gatewaySpeakUp(env.VERCEL_AI_GATEWAY_KEY)
+			: undefined,
 		idleTimeoutMs: IDLE_TIMEOUT_MS,
 	};
 	return deps;

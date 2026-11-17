@@ -209,6 +209,31 @@ test("in a group only a mention of its own Dev, or a follow-up, wakes it", async
 	await runs.idle();
 });
 
+test("a group's Dev speaks up unasked when the check picks it, once per cooldown", async () => {
+	const created = await owner.chats.createGroup({
+		organizationId: ORG,
+		title: "Support",
+	});
+	const groupId = created.group.id;
+	const asked: string[] = [];
+	deps.speakUp = async (input) => {
+		asked.push(input.text);
+		return created.dev.id;
+	};
+	await owner.chats.sendMessage({ groupId, text: "how do I reset it" });
+	const turn = await startedTurn(1);
+	expect(turn.agentId).toBe(created.dev.id);
+	expect(turn.text).toContain("picked as the Dev best placed to answer");
+	await settleTurn(deps, turn, { answer: "" });
+	await runs.idle();
+
+	await owner.chats.sendMessage({ groupId, text: "and after that" });
+	await new Promise((resolve) => setTimeout(resolve, 300));
+	await runs.idle();
+	expect(asked).toEqual(["how do I reset it"]);
+	expect(started.length).toBe(1);
+});
+
 test("a newer message replaces the turn for the one before it", async () => {
 	const { group } = await owner.chats.createDev({
 		organizationId: ORG,
