@@ -417,6 +417,79 @@ function drivePass(): void {
 	});
 	writeConf(driveIdentity);
 
+	// A pinned bundle whose boot script predates the drive: it must never run over the laid-out drive.
+	endSession();
+	const installedBoot = "/usr/local/bin/superset-boot";
+	const bundledBoot = `${SANDBOX_PATHS.bundleRoot}/current/rootfs${installedBoot}`;
+	exec(
+		`cp ${bundledBoot} /tmp/superset-boot.keep && sed -i '/^# superset-boot drive-contract:/d' ${bundledBoot} && rm -f ${installedBoot}.hash`,
+		{ on },
+	);
+	const downgraded = bootAsUser(on);
+	const downgradeLog = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive, older boot script: refused before the reexec, nothing checked out",
+		/exit=[1-9]/.test(downgraded) &&
+			/drive\.downgrade /.test(downgradeLog) &&
+			!/boot\.reexec|checkout\.start|host\.exec/.test(downgradeLog) &&
+			workKept(),
+		downgradeLog.match(/drive\.downgrade.*/)?.[0] ?? downgraded.slice(-200),
+	);
+	exec(
+		`cp /tmp/superset-boot.keep ${bundledBoot} && rm -f ${installedBoot}.hash`,
+		{
+			on,
+		},
+	);
+
+	// A fresh fork of a golden drive: promote stripped its state, and a new workspace boots on it.
+	const repo = "https://github.com/paradevai/paradev.git";
+	const currentBranch = () =>
+		exec(`git -C ${ws} rev-parse --abbrev-ref HEAD`, {
+			check: false,
+			user: "ubuntu",
+			on,
+		}).trim();
+	const forkBoot = (branch: string, baseBranch: string) => {
+		endSession();
+		exec(`rm -rf ${state}`, { on });
+		writeConf({
+			...driveIdentity,
+			SUPERSET_SANDBOX_WORKSPACE_ID: randomUUID(),
+			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+				{ url: repo, branch, baseBranch, path: "." },
+			]),
+		});
+		return bootAndCheckout();
+	};
+	const newBranch = forkBoot("superset/boot-twice-fork", "main");
+	expect(
+		"fresh fork, new branch: fetched from its base, on the branch",
+		/checkout\.fetched \. superset\/boot-twice-fork from main/.test(
+			newBranch,
+		) && currentBranch() === "superset/boot-twice-fork",
+		newBranch.match(/checkout\..*/g)?.join(" | "),
+	);
+	const sameBranch = forkBoot("main", "main");
+	expect(
+		"fresh fork, a branch the golden has: reset to its base, not kept",
+		/checkout\.fetched \. main from main/.test(sameBranch) &&
+			currentBranch() === "main" &&
+			head() !== work,
+		sameBranch.match(/checkout\..*/g)?.join(" | "),
+	);
+	const fetchFails = forkBoot(
+		"superset/boot-twice-fork-2",
+		"superset/boot-twice-no-such-branch",
+	);
+	expect(
+		"fresh fork, fetch failed: recloned as main does, no user work yet",
+		/checkout\.cloned \. /.test(fetchFails) &&
+			currentBranch() === "superset/boot-twice-fork-2",
+		fetchFails.match(/checkout\..*/g)?.join(" | "),
+	);
+	writeConf(driveIdentity);
+
 	const refuses = (label: string, phase: string) => {
 		const answer = bootAsUser(on);
 		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });

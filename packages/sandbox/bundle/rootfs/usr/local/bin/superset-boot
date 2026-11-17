@@ -20,6 +20,9 @@
 # the log on its health route so a boot is measurable from outside.
 set -uo pipefail
 . /etc/superset/contract.sh
+# superset-boot drive-contract: 1
+# A boot that has laid a drive out re-executes only into a script with the
+# line above; one without it predates the drive and would clone over it.
 
 # The control plane runs this from the image's workdir, which the checkout
 # below may replace; every child would inherit a deleted cwd.
@@ -53,7 +56,7 @@ if [ -f "${SUPERSET_RUN_DIR}/host-service.pid" ] && kill -0 "$(cat "${SUPERSET_R
 	exit 0
 fi
 
-stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"
+stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12) boot=${SUPERSET_BOOT_ID:-}"
 
 # --- per-boot state: a restored disk carries the previous session's pids
 # and ready flags, which describe processes that no longer exist.
@@ -66,6 +69,8 @@ stamp "run.cleared"
 # snapshot. Bind mounts end with the session, so every boot does this, before
 # anything reads /workspace. A bind mount, not a symlink: paths must not move.
 DRIVE_MODE=""
+# Set at the first layout of a fresh fork, and kept across the reexec: its checkout is no one's work yet.
+[ -n "${SUPERSET_BOOT_REEXEC:-}" ] || unset SUPERSET_DRIVE_FRESH
 user_path() {
 	local dir="$1" part IFS=/
 	for part in $2; do
@@ -126,8 +131,9 @@ layout_drive() {
 		bind_into "${drive}/home/${sub}" "${SUPERSET_USER_HOME}/${sub}"
 	done
 	if [ -z "$owner" ]; then
-		printf '%s\n' "$SUPERSET_SANDBOX_WORKSPACE_ID" > "${sentinel}.tmp" && mv -T "${sentinel}.tmp" "$sentinel" ||
-			refuse "cannot write ${sentinel}"
+		printf '%s\n' "$SUPERSET_SANDBOX_WORKSPACE_ID" > "${sentinel}.tmp" && mv -T "${sentinel}.tmp" "$sentinel" &&
+			sync "$sentinel" "$SUPERSET_DRIVE_STATE_DIR" || refuse "cannot write ${sentinel}"
+		export SUPERSET_DRIVE_FRESH=1
 	fi
 	DRIVE_MODE=1
 	use_drive_state
@@ -190,14 +196,15 @@ stamp "rootfs.start"; "$BUNDLE/setup" apply-rootfs >> "$SUPERSET_BOOT_LOG" 2>&1;
 # takes effect on the boot after the one that installed it — which is how an
 # older image's checkout raced a newer bundle's. Once per boot: the guard
 # stops a bundle whose script never settles from spinning here.
+if [ -n "$DRIVE_MODE" ] && ! grep -q '^# superset-boot drive-contract: [1-9]' "$0"; then
+	stamp "drive.downgrade the installed boot script predates the workspace drive"
+	refuse "the pinned bundle's boot script does not know the workspace drive"
+fi
 if [ -z "${SUPERSET_BOOT_REEXEC:-}" ] && [ "$(self_hash)" != "$BOOT_HASH_BEFORE" ]; then
 	stamp "boot.reexec into the installed bundle's script"
 	SUPERSET_BOOT_REEXEC=1 exec "$0" "$@"
 fi
 stamp "steps.host.start"; "$BUNDLE/setup" run-steps before-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.host.end"
-
-# A reexec lays the drive out with the installed bundle's contract.
-[ -n "$DRIVE_MODE" ] || layout_drive
 
 # In drive mode, Docker's images and layers go on the drive too. apply-rootfs
 # compares only the hash sidecar, so this rewrite stays until the bundle
@@ -364,6 +371,8 @@ start_hook() {
 # path is ".". A marker per path under the state directory says it is done;
 # a golden has the markers stripped so a fork fetches its branch into the
 # checkout it inherited.
+# A drive laid out in an earlier boot holds the user's work: nothing on it is replaced.
+drive_has_work() { [ -n "$DRIVE_MODE" ] && [ -z "${SUPERSET_DRIVE_FRESH:-}" ]; }
 checkout_one() {
 	local url="$1" branch="$2" path="$3" base="$4"
 	[ -n "$base" ] || base="$branch"
@@ -373,21 +382,21 @@ checkout_one() {
 	local baked
 	baked="$(as_user git -C "$ws" remote get-url origin 2>/dev/null || true)"
 	if [ "$baked" = "$url" ] && [ -d "$ws/.git" ]; then
-		# On a drive, a checkout that already has the branch is the user's work.
-		if [ -n "$DRIVE_MODE" ] && as_user git -C "$ws" rev-parse -q --verify "refs/heads/${branch}" > /dev/null; then
+		# On a drive laid out before, a checkout that already has the branch is the user's work.
+		if drive_has_work && as_user git -C "$ws" rev-parse -q --verify "refs/heads/${branch}" > /dev/null; then
 			touch "$marker"; stamp "checkout.kept ${path} ${branch} is already on the drive"; return 0
 		fi
 		if as_user git -C "$ws" fetch -q --depth 1 origin "$base" && as_user git -C "$ws" checkout -q -B "$branch" FETCH_HEAD; then
 			touch "$marker"; stamp "checkout.fetched ${path} ${branch} from ${base}"; return 0
 		fi
-		if [ -n "$DRIVE_MODE" ]; then
+		if drive_has_work; then
 			stamp "checkout.kept ${path} fetch failed; the checkout on the drive is left as it is"; return 1
 		fi
 		# A clone a previous session interrupted leaves a repository that can
 		# fetch nothing; start over rather than fail every boot.
 		stamp "checkout.fetch.failed ${path} ${branch}; recloning"
 	fi
-	if [ -n "$DRIVE_MODE" ] && [ -n "$(find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -print -quit 2>/dev/null)" ]; then
+	if drive_has_work && [ -n "$(find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -print -quit 2>/dev/null)" ]; then
 		stamp "checkout.kept ${path} ${ws} is not empty; nothing on the drive is replaced"; return 1
 	fi
 	# Clone beside the target and move the result in, the worktree first and
@@ -403,7 +412,8 @@ checkout_one() {
 		as_user git -C "$tmp" checkout -q -B "$branch"
 		install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$ws"
 		if [ -n "$DRIVE_MODE" ]; then
-			# Only the package stores can be here; a repository's own .superset/ merges into theirs.
+			# A fresh fork's golden checkout goes; the package stores stay, and a repository's own .superset/ merges into them.
+			find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -exec rm -rf {} +
 			( shopt -s dotglob nullglob; for entry in "$tmp"/*; do
 				[ "${entry##*/}" = ".git" ] && continue
 				if [ -d "${ws}/${entry##*/}" ]; then cp -a "$entry/." "${ws}/${entry##*/}/" && rm -rf "$entry"; else mv "$entry" "$ws"/; fi
