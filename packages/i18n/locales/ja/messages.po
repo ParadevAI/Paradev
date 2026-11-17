@@ -1179,6 +1179,9 @@ msgstr "{name} は組み込みのため置き換えられません"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} は追加されていません"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} はこのターンをまだ処理中です。"
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} は変更されていません。エージェントが作業中だった場合は、停止された可能性があります。"
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: 1ユーザーあたり月額 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 1ユーザーあたり月額 {monthly}、または年払いで {yearly}"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name} のボックスはこのターンで行ったことを報告しませんでした。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {人を1人以上指定するか、{choice}を選択してください。} sender {送信者を1人以上指定するか、{choice}を選択してください。} other {項目を1つ以上指定するか、{choice}を選択してください。}}"
@@ -3150,8 +3156,18 @@ msgstr "エージェントの様子を聞いたり、次にやることを指示
 msgid "Asked <0>{name}</0>"
 msgstr "<0>{name}</0> に質問しました"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "{0} に質問中"
+
 msgid "Asking <0>{name}</0>"
 msgstr "<0>{name}</0> に質問中"
+
+msgid "Asking anyone here"
+msgstr "ここにいる全員に質問中"
+
+msgid "Asking you"
+msgstr "あなたに質問中"
 
 msgid "Asks before edits and commands"
 msgstr "編集とコマンドの前に確認"
@@ -6119,6 +6135,9 @@ msgstr "以前のメッセージを読み込めませんでした。再試行"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "環境を読み込めませんでした。再試行"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "読み込めませんでした。接続を確認してもう一度お試しください。"
 
 msgid "Couldn't load pages"
 msgstr "ページを読み込めませんでした"
@@ -11861,6 +11880,9 @@ msgstr "{title} にメッセージ"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "{title} にメッセージ、または @{groupDevName} で Dev に質問"
 
+msgid "Message details"
+msgstr "メッセージの詳細"
+
 msgid "Message in channel"
 msgstr "チャンネルのメッセージ"
 
@@ -14251,6 +14273,9 @@ msgstr "Git を入手するほかの方法"
 msgid "Other ways to reach us"
 msgstr "その他の連絡方法"
 
+msgid "Other…"
+msgstr "その他…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "1,150万ドルのシードラウンドは Union Square Ventures が主導し、Y Combinator、Paul Graham、そして私たちが尊敬する創業者たちが参加しています。"
 
@@ -14860,6 +14885,9 @@ msgstr "環境を選択"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "アイコンと色を選ぶか、独自の画像をアップロードします。既定ではリンクされたGitHubオーナーのアバターになります。"
+
+msgid "Pick any"
+msgstr "いくつでも選択"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Paradevアプリで選ぶだけ。アカウントに保存されます。"
@@ -17712,6 +17740,12 @@ msgstr "送信"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}への招待を送ります。48時間で失効します。"
 
+msgid "Send answer"
+msgstr "回答を送信"
+
+msgid "Send answers"
+msgstr "回答を送信"
+
 msgid "Send email and debug delivery"
 msgstr "メールを送信し、配信の問題を調査"
 
@@ -19844,6 +19878,9 @@ msgstr "デスクトップアプリは現在macOSとLinuxに対応していま�
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "デスクトップアプリはmacOSで動作し、Linux向けには実験的なAppImageがあります。Windowsはまだ利用できません。デスクトップアプリのほかにCLI、TypeScript SDK、MCPサーバーがあるので、スクリプトやターミナル、他のエージェントからParadevを操作できます。App StoreのiPhone・iPadアプリを使えば、デスクを離れていてもエージェントの状況を確認し、差分をレビューできます。"
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev はそこに投稿できません。"
 
@@ -20098,6 +20135,9 @@ msgstr "リクエストに失敗しました。"
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "その答えは、エージェントがエージェントをレビューし、人間はすべてを読む代わりに抜き取りで確認することです。信頼は差分ごとではなく、統計的に積み上げられます。"
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "残りは省略されました。このターンは保存できる量を超えています。"
 
 msgid "The rubric"
 msgstr "ルーブリック"
@@ -20878,6 +20918,9 @@ msgstr "古すぎてこのアプリと通信できません。そのデバイス
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "古すぎてこのアプリと通信できません。更新するまでこのホストのワークスペースは開けません。"
+
+msgid "Took"
+msgstr "所要時間"
 
 msgid "Tools"
 msgstr "ツール"
@@ -22101,6 +22144,9 @@ msgstr "新しいParadevへようこそ"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0}とは何か、誰が作っていて、誰のためのものか。並列コーディングエージェントのためのワークスペースを作る、元YCのCTO3人が率いるサンフランシスコのチーム。"
 
+msgid "What {name} did"
+msgstr "{name} が行ったこと"
+
 msgid "What are the benefits?"
 msgstr "福利厚生は?"
 
@@ -22771,6 +22817,9 @@ msgstr "エージェントのサブスクリプションとキー"
 
 msgid "Your Agents, Your Accounts"
 msgstr "エージェントもアカウントも、あなたのもの"
+
+msgid "Your answer"
+msgstr "あなたの回答"
 
 msgid "Your changes"
 msgstr "編集中の内容"

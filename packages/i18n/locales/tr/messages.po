@@ -1179,6 +1179,9 @@ msgstr "{name} yerleşiktir ve değiştirilemez"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} eklenmedi"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} bu tur üzerinde hâlâ çalışıyor."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durdurulmuş olabilir."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: kullanıcı başına aylık {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: kullanıcı başına aylık {monthly} veya yıllık faturalandırmayla {yearly}"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name} kutusu bu turda ne yaptığını bildirmedi."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {En az bir kişi belirtin veya {choice} seçeneğini seçin.} sender {En az bir gönderen belirtin veya {choice} seçeneğini seçin.} other {En az bir öğe belirtin veya {choice} seçeneğini seçin.}}"
@@ -3150,8 +3156,18 @@ msgstr "Ajanlarının ne yaptığını sor ya da birine sırada ne yapacağını
 msgid "Asked <0>{name}</0>"
 msgstr "<0>{name}</0> adlı Dev'e soruldu"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "{0} adlı kişiye soruyor"
+
 msgid "Asking <0>{name}</0>"
 msgstr "<0>{name}</0> adlı Dev'e soruluyor"
+
+msgid "Asking anyone here"
+msgstr "Buradaki herkese soruyor"
+
+msgid "Asking you"
+msgstr "Size soruyor"
 
 msgid "Asks before edits and commands"
 msgstr "Düzenleme ve komutlardan önce sorar"
@@ -6119,6 +6135,9 @@ msgstr "Önceki mesajlar yüklenemedi. Yeniden dene"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Ortamlar yüklenemedi. Tekrar dene"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin."
 
 msgid "Couldn't load pages"
 msgstr "Sayfalar yüklenemedi"
@@ -11861,6 +11880,9 @@ msgstr "{title} için mesaj"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "{title} için mesaj veya Dev'ine sormak için @{groupDevName}"
 
+msgid "Message details"
+msgstr "Mesaj ayrıntıları"
+
 msgid "Message in channel"
 msgstr "Kanalda mesaj"
 
@@ -14251,6 +14273,9 @@ msgstr "Git'i edinmenin diğer yolları"
 msgid "Other ways to reach us"
 msgstr "Bize ulaşmanın diğer yolları"
 
+msgid "Other…"
+msgstr "Diğer…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "11,5 milyon dolarlık tohum turumuza Union Square Ventures liderlik ediyor; Y Combinator, Paul Graham ve hayran olduğumuz kurucular da yer alıyor."
 
@@ -14860,6 +14885,9 @@ msgstr "Bir ortam seçin"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Bir simge ve renk seçin ya da özel bir görsel yükleyin. Varsayılan olarak bağlı GitHub sahibinin avatarı kullanılır."
+
+msgid "Pick any"
+msgstr "İstediğiniz kadar seçin"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Paradev uygulamasında birini seçin. Hesabınıza kaydedilir."
@@ -17712,6 +17740,12 @@ msgstr "Gönder"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName} kuruluşuna katılmak için davet gönderin. 48 saat içinde sona erer."
 
+msgid "Send answer"
+msgstr "Yanıtı gönder"
+
+msgid "Send answers"
+msgstr "Yanıtları gönder"
+
 msgid "Send email and debug delivery"
 msgstr "E-posta gönderin ve teslimatta hata ayıklayın"
 
@@ -19844,6 +19878,9 @@ msgstr "Paradev'i Windows ve Linux'a getiriyoruz. E-postanızı bırakın, hazı
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Masaüstü uygulaması macOS'ta çalışır; deneysel bir Linux AppImage vardır, Windows henüz kullanılamıyor. Masaüstü uygulamasının ötesinde bir CLI, bir TypeScript SDK ve bir MCP sunucusu var; böylece Paradev'i betiklerden, terminallerden ve diğer ajanlardan yönetebilirsiniz. App Store'daki iPhone ve iPad uygulamasıyla masanızdan uzaktayken de ajanlarınızı takip edebilir ve diff'lerini inceleyebilirsiniz."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev oraya gönderi yapamaz."
 
@@ -20098,6 +20135,9 @@ msgstr "İstek başarısız oldu."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "Yanıt şu: ajanlar ajanları inceler, insanlar da her şeyi okumak yerine örnekleme yapar. Güven fark fark değil, istatistiksel olarak kazanılır."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "Kalanı çıkarıldı: bu tur saklanandan fazlasını yaptı."
 
 msgid "The rubric"
 msgstr "Değerlendirme ölçeği"
@@ -20878,6 +20918,9 @@ msgstr "Bu uygulamanın iletişim kuramayacağı kadar eski. Yeniden bağlanmak 
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Bu uygulamanın iletişim kuramayacağı kadar eski. Güncellenene kadar bu ana makinedeki çalışma alanları açılmayacak."
+
+msgid "Took"
+msgstr "Süre"
 
 msgid "Tools"
 msgstr "Araçlar"
@@ -22101,6 +22144,9 @@ msgstr "Yeni Paradev'e hoş geldiniz"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0} nedir, kimler geliştiriyor ve kimler için. Paralel kodlama ajanları için çalışma alanını geliştiren, üç eski YC CTO'sunun liderliğindeki bir San Francisco ekibi."
 
+msgid "What {name} did"
+msgstr "{name} ne yaptı"
+
 msgid "What are the benefits?"
 msgstr "Yan haklar neler?"
 
@@ -22771,6 +22817,9 @@ msgstr "Ajan abonelikleriniz ve anahtarlarınız"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Sizin ajanlarınız, sizin hesaplarınız"
+
+msgid "Your answer"
+msgstr "Yanıtınız"
 
 msgid "Your changes"
 msgstr "Değişiklikleriniz"

@@ -1179,6 +1179,9 @@ msgstr "{name} is built in and cannot be replaced"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} is not added"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} is still working on this turn."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} is unchanged. If an agent was working, it may have been stopped."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: {monthly} per user/month"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per user/month, or {yearly} billed yearly"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name}'s box didn't report what it did in this turn."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
@@ -3150,8 +3156,18 @@ msgstr "Ask what your agents are up to, or tell one what to do next."
 msgid "Asked <0>{name}</0>"
 msgstr "Asked <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Asking {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Asking <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Asking anyone here"
+
+msgid "Asking you"
+msgstr "Asking you"
 
 msgid "Asks before edits and commands"
 msgstr "Asks before edits and commands"
@@ -6119,6 +6135,9 @@ msgstr "Couldn't load earlier messages. Retry"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Couldn’t load environments. Try again"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Couldn't load it. Check your connection and try again."
 
 msgid "Couldn't load pages"
 msgstr "Couldn't load pages"
@@ -11861,6 +11880,9 @@ msgstr "Message {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Message {title}, or @{groupDevName} to ask its Dev"
 
+msgid "Message details"
+msgstr "Message details"
+
 msgid "Message in channel"
 msgstr "Message in channel"
 
@@ -14251,6 +14273,9 @@ msgstr "Other ways to get Git"
 msgid "Other ways to reach us"
 msgstr "Other ways to reach us"
 
+msgid "Other…"
+msgstr "Other…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 
@@ -14860,6 +14885,9 @@ msgstr "Pick an environment"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
+
+msgid "Pick any"
+msgstr "Pick any"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Pick one in the Paradev app. It's saved to your account."
@@ -17712,6 +17740,12 @@ msgstr "Send"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Send an invitation to join {organizationName}. Expires in 48 hours."
 
+msgid "Send answer"
+msgstr "Send answer"
+
+msgid "Send answers"
+msgstr "Send answers"
+
 msgid "Send email and debug delivery"
 msgstr "Send email and debug delivery"
 
@@ -19844,6 +19878,9 @@ msgstr "The desktop app runs on macOS and Linux today. Drop your email and we'll
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 
+msgid "The Dev"
+msgstr "The Dev"
+
 msgid "The Dev can't post there."
 msgstr "The Dev can't post there."
 
@@ -20098,6 +20135,9 @@ msgstr "The request failed."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "The rest was left out: this turn did more than is kept."
 
 msgid "The rubric"
 msgstr "The rubric"
@@ -20878,6 +20918,9 @@ msgstr "Too old for this app to talk to. Update the Paradev app on that device t
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
+
+msgid "Took"
+msgstr "Took"
 
 msgid "Tools"
 msgstr "Tools"
@@ -22101,6 +22144,9 @@ msgstr "Welcome to the new Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 
+msgid "What {name} did"
+msgstr "What {name} did"
+
 msgid "What are the benefits?"
 msgstr "What are the benefits?"
 
@@ -22771,6 +22817,9 @@ msgstr "Your agent subscriptions and keys"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Your Agents, Your Accounts"
+
+msgid "Your answer"
+msgstr "Your answer"
 
 msgid "Your changes"
 msgstr "Your changes"

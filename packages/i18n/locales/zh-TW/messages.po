@@ -1179,6 +1179,9 @@ msgstr "{name} 是內建的，無法取代"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未新增"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} 仍在處理這一輪。"
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} 未變更。如果代理程式正在工作，它可能已被停止。"
 
@@ -1211,6 +1214,9 @@ msgstr "{name}：每位使用者每月 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每位使用者每月 {monthly}，或按年計費 {yearly}"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name} 的盒子沒有回報這一輪做了什麼。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {請至少指定一個人員，或選擇{choice}。} sender {請至少指定一個寄件者，或選擇{choice}。} other {請至少指定一個項目，或選擇{choice}。}}"
@@ -3150,8 +3156,18 @@ msgstr "問問代理程式在做什麼，或告訴它下一步該做什麼。"
 msgid "Asked <0>{name}</0>"
 msgstr "已詢問 <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "正在詢問 {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "正在詢問 <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "正在詢問這裡的任何人"
+
+msgid "Asking you"
+msgstr "正在詢問你"
 
 msgid "Asks before edits and commands"
 msgstr "編輯和執行指令前詢問"
@@ -6119,6 +6135,9 @@ msgstr "無法載入較早的訊息。重試"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "無法載入環境。重試"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "無法載入。請檢查網路連線後再試一次。"
 
 msgid "Couldn't load pages"
 msgstr "無法載入頁面"
@@ -11861,6 +11880,9 @@ msgstr "傳訊息給 {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "傳訊息給 {title}，或用 @{groupDevName} 詢問它的 Dev"
 
+msgid "Message details"
+msgstr "訊息詳細資訊"
+
 msgid "Message in channel"
 msgstr "頻道中的訊息"
 
@@ -14251,6 +14273,9 @@ msgstr "取得 Git 的其他方式"
 msgid "Other ways to reach us"
 msgstr "其他聯絡方式"
 
+msgid "Other…"
+msgstr "其他…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "我們 1,150 萬美元的種子輪由 Union Square Ventures 領投，Y Combinator、Paul Graham 以及我們敬佩的創辦人參與投資。"
 
@@ -14860,6 +14885,9 @@ msgstr "選擇環境"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "選擇圖示和顏色，或上傳自訂圖片。預設使用關聯的GitHub擁有者頭像。"
+
+msgid "Pick any"
+msgstr "可複選"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "在 Paradev 應用程式中選一個，它會儲存到你的帳號。"
@@ -17712,6 +17740,12 @@ msgstr "傳送"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "傳送加入{organizationName}的邀請。48小時後過期。"
 
+msgid "Send answer"
+msgstr "傳送回答"
+
+msgid "Send answers"
+msgstr "傳送回答"
+
 msgid "Send email and debug delivery"
 msgstr "傳送郵件並排查投遞問題"
 
@@ -19844,6 +19878,9 @@ msgstr "我們正在把Paradev帶到Windows和Linux。留下電子郵件，一�
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "桌面應用程式支援macOS，另有實驗性的Linux AppImage；Windows暫未提供。除了桌面應用程式，還有CLI、TypeScript SDK和MCP伺服器，你可以從指令碼、終端和其他代理程式來驅動Paradev。App Store上的iPhone和iPad應用程式讓你離開座位時也能查看代理並審閱它們的差異。"
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "該 Dev 無法在那裡發文。"
 
@@ -20098,6 +20135,9 @@ msgstr "請求失敗。"
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "應對辦法是：讓代理程式審查代理程式，人類改為抽樣而不是通讀。信任靠統計建立，而不是逐個差異建立。"
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "其餘內容已省略：這一輪所做的超出了保留的範圍。"
 
 msgid "The rubric"
 msgstr "評分表"
@@ -20878,6 +20918,9 @@ msgstr "版本太舊，此應用程式無法與其通訊。更新該裝置上的
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "版本太舊，此應用程式無法與其通訊。更新之前，此主機上的工作區無法開啟。"
+
+msgid "Took"
+msgstr "用時"
 
 msgid "Tools"
 msgstr "工具"
@@ -22101,6 +22144,9 @@ msgstr "歡迎使用全新的 Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0} 是什麼、由誰打造、為誰而做。一支由三位前 YC CTO 帶領的舊金山團隊，正在打造平行編碼代理的工作區。"
 
+msgid "What {name} did"
+msgstr "{name} 做了什麼"
+
 msgid "What are the benefits?"
 msgstr "有哪些福利？"
 
@@ -22771,6 +22817,9 @@ msgstr "你的代理程式訂閱和金鑰"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的代理程式，你的帳號"
+
+msgid "Your answer"
+msgstr "你的回答"
 
 msgid "Your changes"
 msgstr "你的變更"

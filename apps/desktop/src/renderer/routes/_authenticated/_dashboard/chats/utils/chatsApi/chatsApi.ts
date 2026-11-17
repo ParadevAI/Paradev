@@ -30,6 +30,7 @@ export type ChatsApi = Pick<
 	| "finishFileUpload"
 	| "fileLink"
 	| "watchToken"
+	| "answerQuestion"
 	| "messageDetails"
 >;
 
@@ -102,6 +103,10 @@ export function createChatsApi(
 		fileLink: cachedFileLinks((fileId) =>
 			call(chats.fileLink.mutate({ fileId })),
 		),
+		answerQuestion: (questionId, body) =>
+			call(chats.answerQuestion.mutate({ questionId, ...body })) as ReturnType<
+				ChatsApi["answerQuestion"]
+			>,
 		watchToken: (devId, groupId) =>
 			call(chats.watchToken.mutate({ devId, groupId })),
 		messageDetails: (messageId) =>

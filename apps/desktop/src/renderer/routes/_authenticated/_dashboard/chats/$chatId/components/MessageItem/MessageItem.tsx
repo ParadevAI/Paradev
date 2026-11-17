@@ -5,6 +5,7 @@ import {
 	canDeleteMessage,
 	canEditMessage,
 	type Message,
+	type QuestionPartAnswer,
 	renderMentions,
 	type SharedFile,
 } from "@superset/chats-core";
@@ -17,6 +18,7 @@ import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
+import { QuestionCard } from "./components/QuestionCard";
 import { MessageAuthorDevProvider } from "./providers/MessageAuthorDevProvider";
 import { mentionMarkdown } from "./utils/mentionMarkdown";
 
@@ -35,6 +37,10 @@ export interface MessageActions {
 	retry: (message: Message) => void;
 	discard: (message: Message) => void;
 	jumpTo: (messageId: string) => void;
+	answerQuestion: (questionId: string, answer: string, typed: boolean) => void;
+	answerForm: (questionId: string, answers: QuestionPartAnswer[]) => void;
+	/** Shows what the Dev did to write the message. */
+	details: (message: Message) => void;
 	fileLink: (fileId: string) => Promise<string>;
 	openFile: (file: SharedFile) => void;
 }
@@ -160,7 +166,16 @@ export const MessageItem = memo(function MessageItem({
 							/>
 						</div>
 					)}
-					{message.text && (
+					{message.question && (
+						<QuestionCard
+							state={state}
+							chatId={message.chatId}
+							question={message.question}
+							onAnswer={actions.answerQuestion}
+							onAnswerForm={actions.answerForm}
+						/>
+					)}
+					{message.text && !message.question && (
 						<MessageAuthorDevProvider value={message.authorDevId ?? null}>
 							<ChatMarkdown components={MARKDOWN_COMPONENTS}>
 								{mentionMarkdown(message.text, nameOf)}
@@ -224,6 +239,16 @@ export const MessageItem = memo(function MessageItem({
 								onClick={() => actions.edit(message)}
 							>
 								<LuPencil className="size-3.5" />
+							</button>
+						)}
+						{message.turnId && (
+							<button
+								type="button"
+								aria-label={t({ message: "Message details" })}
+								className={ACTION}
+								onClick={() => actions.details(message)}
+							>
+								<LuInfo className="size-3.5" />
 							</button>
 						)}
 						<button

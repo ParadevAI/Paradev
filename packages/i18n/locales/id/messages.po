@@ -1179,6 +1179,9 @@ msgstr "{name} bawaan dan tidak dapat diganti"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} belum ditambahkan"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} masih mengerjakan giliran ini."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} tidak berubah. Jika ada agen yang sedang bekerja, agen itu mungkin telah dihentikan."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: {monthly} per pengguna/bulan"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per pengguna/bulan, atau {yearly} ditagih tahunan"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "Box {name} tidak melaporkan apa yang dilakukannya pada giliran ini."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Tentukan minimal satu orang, atau pilih {choice}.} sender {Tentukan minimal satu pengirim, atau pilih {choice}.} other {Tentukan minimal satu entri, atau pilih {choice}.}}"
@@ -3150,8 +3156,18 @@ msgstr "Tanyakan apa yang sedang dikerjakan agenmu, atau beri tahu salah satunya
 msgid "Asked <0>{name}</0>"
 msgstr "Bertanya kepada <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Bertanya kepada {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Sedang bertanya kepada <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Bertanya kepada siapa pun di sini"
+
+msgid "Asking you"
+msgstr "Bertanya kepada Anda"
 
 msgid "Asks before edits and commands"
 msgstr "Bertanya sebelum edit dan perintah"
@@ -6119,6 +6135,9 @@ msgstr "Tidak dapat memuat pesan sebelumnya. Coba lagi"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Gagal memuat environment. Coba lagi"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Tidak dapat memuat. Periksa koneksi Anda dan coba lagi."
 
 msgid "Couldn't load pages"
 msgstr "Tidak dapat memuat halaman"
@@ -11861,6 +11880,9 @@ msgstr "Pesan untuk {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Pesan untuk {title}, atau @{groupDevName} untuk bertanya ke Dev-nya"
 
+msgid "Message details"
+msgstr "Detail pesan"
+
 msgid "Message in channel"
 msgstr "Pesan di channel"
 
@@ -14251,6 +14273,9 @@ msgstr "Cara lain mendapatkan Git"
 msgid "Other ways to reach us"
 msgstr "Cara lain menghubungi kami"
 
+msgid "Other…"
+msgstr "Lainnya…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Putaran pendanaan awal kami senilai $11,5 juta dipimpin oleh Union Square Ventures, bersama Y Combinator, Paul Graham, dan para pendiri yang kami kagumi."
 
@@ -14860,6 +14885,9 @@ msgstr "Pilih lingkungan"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pilih ikon dan warna, atau unggah gambar kustom. Bawaannya memakai avatar pemilik GitHub yang ditautkan."
+
+msgid "Pick any"
+msgstr "Pilih berapa pun"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Pilih satu di aplikasi Paradev. Tersimpan di akun Anda."
@@ -17712,6 +17740,12 @@ msgstr "Kirim"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Kirim undangan untuk bergabung ke {organizationName}. Kedaluwarsa dalam 48 jam."
 
+msgid "Send answer"
+msgstr "Kirim jawaban"
+
+msgid "Send answers"
+msgstr "Kirim jawaban"
+
 msgid "Send email and debug delivery"
 msgstr "Kirim email dan debug pengiriman"
 
@@ -19844,6 +19878,9 @@ msgstr "Kami sedang membawa Paradev ke Windows & Linux. Tinggalkan email Anda da
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Aplikasi desktopnya berjalan di macOS, dengan AppImage Linux eksperimental; Windows belum tersedia. Selain aplikasi desktop ada CLI, SDK TypeScript, dan server MCP, jadi Anda bisa mengendalikan Paradev dari skrip, terminal, dan agen lain. Aplikasi iPhone dan iPad di App Store memungkinkan Anda memantau agen dan meninjau diff mereka saat jauh dari meja."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev tidak dapat memposting di sana."
 
@@ -20098,6 +20135,9 @@ msgstr "Permintaan gagal."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "Jawabannya: agen mereview agen, dan manusia mengambil sampel alih-alih membaca semuanya. Kepercayaan dibangun secara statistik, bukan per diff."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "Sisanya dihilangkan: giliran ini melakukan lebih banyak daripada yang disimpan."
 
 msgid "The rubric"
 msgstr "Rubriknya"
@@ -20878,6 +20918,9 @@ msgstr "Terlalu lama untuk berkomunikasi dengan aplikasi ini. Perbarui aplikasi 
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Terlalu lama untuk berkomunikasi dengan aplikasi ini. Workspace di host ini tidak akan terbuka sampai diperbarui."
+
+msgid "Took"
+msgstr "Durasi"
 
 msgid "Tools"
 msgstr "Alat"
@@ -22101,6 +22144,9 @@ msgstr "Selamat datang di Paradev baru"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Apa itu {0}, siapa yang membangunnya, dan untuk siapa. Tim San Francisco yang dipimpin tiga mantan CTO YC, membangun ruang kerja untuk agen coding paralel."
 
+msgid "What {name} did"
+msgstr "Yang dilakukan {name}"
+
 msgid "What are the benefits?"
 msgstr "Apa saja tunjangannya?"
 
@@ -22771,6 +22817,9 @@ msgstr "Langganan dan kunci agen Anda"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agen Anda, Akun Anda"
+
+msgid "Your answer"
+msgstr "Jawaban Anda"
 
 msgid "Your changes"
 msgstr "Perubahan Anda"

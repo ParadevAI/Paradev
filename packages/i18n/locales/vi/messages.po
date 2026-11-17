@@ -1179,6 +1179,9 @@ msgstr "{name} là tích hợp sẵn nên không thể thay thế"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} chưa được thêm"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} vẫn đang xử lý lượt này."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó có thể đã bị dừng."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: {monthly} mỗi người dùng/tháng"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} mỗi người dùng/tháng, hoặc {yearly} khi thanh toán theo năm"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "Box của {name} không báo cáo những gì nó đã làm trong lượt này."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Hãy chỉ định ít nhất một người, hoặc chọn {choice}.} sender {Hãy chỉ định ít nhất một người gửi, hoặc chọn {choice}.} other {Hãy chỉ định ít nhất một mục, hoặc chọn {choice}.}}"
@@ -3150,8 +3156,18 @@ msgstr "Hỏi xem các agent đang làm gì, hoặc bảo một agent làm gì t
 msgid "Asked <0>{name}</0>"
 msgstr "Đã hỏi <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Đang hỏi {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Đang hỏi <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Đang hỏi bất kỳ ai ở đây"
+
+msgid "Asking you"
+msgstr "Đang hỏi bạn"
 
 msgid "Asks before edits and commands"
 msgstr "Hỏi trước khi sửa và chạy lệnh"
@@ -6119,6 +6135,9 @@ msgstr "Không thể tải các tin nhắn trước đó. Thử lại"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Không tải được các môi trường. Thử lại"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Không tải được. Hãy kiểm tra kết nối và thử lại."
 
 msgid "Couldn't load pages"
 msgstr "Không thể tải các trang"
@@ -11861,6 +11880,9 @@ msgstr "Nhắn tin cho {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Nhắn tin cho {title}, hoặc @{groupDevName} để hỏi Dev của nhóm"
 
+msgid "Message details"
+msgstr "Chi tiết tin nhắn"
+
 msgid "Message in channel"
 msgstr "Tin nhắn trong kênh"
 
@@ -14251,6 +14273,9 @@ msgstr "Cách khác để có Git"
 msgid "Other ways to reach us"
 msgstr "Các cách khác để liên hệ"
 
+msgid "Other…"
+msgstr "Khác…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Vòng gọi vốn hạt giống 11,5 triệu USD của chúng tôi do Union Square Ventures dẫn dắt, cùng Y Combinator, Paul Graham và những nhà sáng lập mà chúng tôi ngưỡng mộ."
 
@@ -14860,6 +14885,9 @@ msgstr "Chọn một môi trường"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Chọn biểu tượng và màu, hoặc tải ảnh riêng lên. Mặc định dùng ảnh đại diện của chủ sở hữu GitHub đã liên kết."
+
+msgid "Pick any"
+msgstr "Chọn bao nhiêu tùy ý"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Chọn một plugin trong ứng dụng Paradev. Plugin được lưu vào tài khoản của bạn."
@@ -17712,6 +17740,12 @@ msgstr "Gửi"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Gửi lời mời tham gia {organizationName}. Hết hạn sau 48 giờ."
 
+msgid "Send answer"
+msgstr "Gửi câu trả lời"
+
+msgid "Send answers"
+msgstr "Gửi các câu trả lời"
+
 msgid "Send email and debug delivery"
 msgstr "Gửi email và gỡ lỗi việc gửi thư"
 
@@ -19844,6 +19878,9 @@ msgstr "Chúng tôi đang đưa Paradev lên Windows & Linux. Để lại email 
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Ứng dụng máy tính chạy trên macOS, kèm bản AppImage Linux thử nghiệm; Windows chưa có. Ngoài ứng dụng máy tính còn có CLI, SDK TypeScript và server MCP, nên bạn có thể điều khiển Paradev từ script, terminal và các agent khác. Ứng dụng cho iPhone và iPad trên App Store cho phép bạn theo dõi các agent và xem lại diff của chúng khi không ngồi tại bàn làm việc."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev không thể đăng ở đó."
 
@@ -20098,6 +20135,9 @@ msgstr "Yêu cầu thất bại."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "Cách phản ứng: agent review agent, còn con người lấy mẫu thay vì đọc tất cả. Niềm tin được xây bằng thống kê, không phải theo từng diff."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "Phần còn lại đã bị lược bỏ: lượt này làm nhiều hơn mức được lưu."
 
 msgid "The rubric"
 msgstr "Thang chấm"
@@ -20878,6 +20918,9 @@ msgstr "Quá cũ để ứng dụng này giao tiếp. Hãy cập nhật ứng d�
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Quá cũ để ứng dụng này giao tiếp. Các workspace trên máy chủ này sẽ không mở cho đến khi được cập nhật."
+
+msgid "Took"
+msgstr "Thời lượng"
 
 msgid "Tools"
 msgstr "Tool"
@@ -22101,6 +22144,9 @@ msgstr "Chào mừng đến với Paradev mới"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0} là gì, ai xây dựng nó và dành cho ai. Một đội ngũ tại San Francisco do ba cựu CTO YC dẫn dắt, xây dựng không gian làm việc cho các agent lập trình song song."
 
+msgid "What {name} did"
+msgstr "Những gì {name} đã làm"
+
 msgid "What are the benefits?"
 msgstr "Phúc lợi gồm những gì?"
 
@@ -22771,6 +22817,9 @@ msgstr "Gói đăng ký và khóa agent của bạn"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agent của bạn, tài khoản của bạn"
+
+msgid "Your answer"
+msgstr "Câu trả lời của bạn"
 
 msgid "Your changes"
 msgstr "Các thay đổi của bạn"

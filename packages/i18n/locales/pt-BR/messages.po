@@ -1179,6 +1179,9 @@ msgstr "{name} é integrado e não pode ser substituído"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} não foi adicionado"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} ainda está trabalhando neste turno."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} não foi alterada. Se um agente estava trabalhando, ele pode ter sido interrompido."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: {monthly} por usuário/mês"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuário/mês, ou {yearly} com cobrança anual"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "A box de {name} não informou o que fez neste turno."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifique pelo menos uma pessoa, ou escolha {choice}.} sender {Especifique pelo menos um remetente, ou escolha {choice}.} other {Especifique pelo menos um item, ou escolha {choice}.}}"
@@ -3150,8 +3156,18 @@ msgstr "Pergunte o que seus agentes estão fazendo ou diga a um deles o que faze
 msgid "Asked <0>{name}</0>"
 msgstr "Perguntou a <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Perguntando a {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Perguntando a <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Perguntando a qualquer pessoa aqui"
+
+msgid "Asking you"
+msgstr "Perguntando a você"
 
 msgid "Asks before edits and commands"
 msgstr "Pergunta antes de edições e comandos"
@@ -6119,6 +6135,9 @@ msgstr "Não foi possível carregar as mensagens anteriores. Tentar novamente"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Não foi possível carregar os ambientes. Tentar de novo"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Não foi possível carregar. Verifique sua conexão e tente novamente."
 
 msgid "Couldn't load pages"
 msgstr "Não foi possível carregar as páginas"
@@ -11861,6 +11880,9 @@ msgstr "Mensagem para {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Mensagem para {title}, ou @{groupDevName} para perguntar ao Dev do grupo"
 
+msgid "Message details"
+msgstr "Detalhes da mensagem"
+
 msgid "Message in channel"
 msgstr "Mensagem no canal"
 
@@ -14251,6 +14273,9 @@ msgstr "Outras formas de obter o Git"
 msgid "Other ways to reach us"
 msgstr "Outras formas de falar com a gente"
 
+msgid "Other…"
+msgstr "Outra…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Nossa rodada seed de US$ 11,5 milhões é liderada pela Union Square Ventures, com Y Combinator, Paul Graham e fundadores que admiramos."
 
@@ -14860,6 +14885,9 @@ msgstr "Escolha um ambiente"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Escolha um ícone e uma cor, ou envie uma imagem. Por padrão, usa o avatar do dono do repositório no GitHub."
+
+msgid "Pick any"
+msgstr "Escolha quantas quiser"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Escolha um no app do Paradev. Ele fica salvo na sua conta."
@@ -17712,6 +17740,12 @@ msgstr "Enviar"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Envie um convite para entrar em {organizationName}. Expira em 48 horas."
 
+msgid "Send answer"
+msgstr "Enviar resposta"
+
+msgid "Send answers"
+msgstr "Enviar respostas"
+
 msgid "Send email and debug delivery"
 msgstr "Enviar e-mails e depurar a entrega"
 
@@ -19844,6 +19878,9 @@ msgstr "Estamos trazendo o Paradev para Windows e Linux. Deixe seu e-mail e avis
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "O app de desktop roda no macOS, com um AppImage experimental para Linux; ainda não há versão para Windows. Além do app, há uma CLI, um SDK em TypeScript e um servidor MCP, então dá para controlar o Paradev por scripts, terminais e outros agentes. Um app para iPhone e iPad na App Store permite acompanhar os agentes e revisar os diffs deles longe da sua mesa."
 
+msgid "The Dev"
+msgstr "O Dev"
+
 msgid "The Dev can't post there."
 msgstr "O Dev não pode publicar lá."
 
@@ -20098,6 +20135,9 @@ msgstr "A requisição falhou."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "A resposta: agentes revisam agentes, e as pessoas amostram em vez de ler tudo. A confiança é conquistada estatisticamente, não diff a diff."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "O restante foi omitido: este turno fez mais do que é guardado."
 
 msgid "The rubric"
 msgstr "A régua"
@@ -20878,6 +20918,9 @@ msgstr "Antigo demais para este app se comunicar. Atualize o app Paradev naquele
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Antigo demais para este app se comunicar. Os workspaces neste host não abrirão até ele ser atualizado."
+
+msgid "Took"
+msgstr "Duração"
 
 msgid "Tools"
 msgstr "Ferramentas"
@@ -22101,6 +22144,9 @@ msgstr "Boas-vindas ao novo Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "O que é o {0}, quem o constrói e para quem ele é. Uma equipe de San Francisco liderada por três ex-CTOs da YC construindo a área de trabalho para agentes de código paralelos."
 
+msgid "What {name} did"
+msgstr "O que {name} fez"
+
 msgid "What are the benefits?"
 msgstr "Quais são os benefícios?"
 
@@ -22771,6 +22817,9 @@ msgstr "Suas assinaturas e chaves de agentes"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Seus agentes, suas contas"
+
+msgid "Your answer"
+msgstr "Sua resposta"
 
 msgid "Your changes"
 msgstr "Suas alterações"

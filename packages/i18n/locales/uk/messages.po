@@ -1173,6 +1173,9 @@ msgstr "{name} вбудовано, тому його не можна замін�
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} не додано"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} ще працює над цим ходом."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} без змін. Якщо агент працював, його могло бути зупинено."
 
@@ -1205,6 +1208,9 @@ msgstr "{name}: {monthly} за користувача на місяць"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за користувача на місяць або {yearly} у разі річної оплати"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "Бокс {name} не повідомив, що він зробив за цей хід."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажіть принаймні одну людину або виберіть {choice}.} sender {Укажіть принаймні одного відправника або виберіть {choice}.} other {Укажіть принаймні одне значення або виберіть {choice}.}}"
@@ -3144,8 +3150,18 @@ msgstr "Запитайте, чим зайняті ваші агенти, або 
 msgid "Asked <0>{name}</0>"
 msgstr "Запитав у <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Запитує {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Запитує у <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Запитує будь-кого тут"
+
+msgid "Asking you"
+msgstr "Запитує вас"
 
 msgid "Asks before edits and commands"
 msgstr "Запитує перед змінами й командами"
@@ -6113,6 +6129,9 @@ msgstr "Не вдалося завантажити попередні повід
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Не вдалося завантажити середовища. Повторити"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Не вдалося завантажити. Перевірте з'єднання та спробуйте ще раз."
 
 msgid "Couldn't load pages"
 msgstr "Не вдалося завантажити сторінки"
@@ -11855,6 +11874,9 @@ msgstr "Повідомлення для {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Повідомлення для {title} або @{groupDevName}, щоб запитати її Dev"
 
+msgid "Message details"
+msgstr "Відомості про повідомлення"
+
 msgid "Message in channel"
 msgstr "Повідомлення в каналі"
 
@@ -14245,6 +14267,9 @@ msgstr "Інші способи отримати Git"
 msgid "Other ways to reach us"
 msgstr "Інші способи зв'язатися з нами"
 
+msgid "Other…"
+msgstr "Інше…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Наш seed-раунд на $11,5 млн очолює Union Square Ventures за участі Y Combinator, Пола Грема та засновників, якими ми захоплюємося."
 
@@ -14854,6 +14879,9 @@ msgstr "Виберіть середовище"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Виберіть значок і колір або завантажте власне зображення. За замовчуванням використовується аватар пов'язаного власника GitHub."
+
+msgid "Pick any"
+msgstr "Виберіть будь-які"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Виберіть його в застосунку Paradev. Вибір зберігається у вашому обліковому записі."
@@ -17706,6 +17734,12 @@ msgstr "Надіслати"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Надішліть запрошення приєднатися до {organizationName}. Діє 48 годин."
 
+msgid "Send answer"
+msgstr "Надіслати відповідь"
+
+msgid "Send answers"
+msgstr "Надіслати відповіді"
+
 msgid "Send email and debug delivery"
 msgstr "Надсилання листів і налагодження доставки"
 
@@ -19838,6 +19872,9 @@ msgstr "Десктопний застосунок уже працює на macOS
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Десктопний застосунок працює на macOS, а для Linux є експериментальний AppImage; Windows поки не підтримується. Окрім десктопного застосунку, є CLI, TypeScript SDK і MCP-сервер, тож ви можете керувати Paradev зі скриптів, терміналів та інших агентів. Застосунок для iPhone та iPad в App Store дає змогу стежити за агентами й переглядати їхні diff, коли ви не за робочим столом."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev не може публікувати там повідомлення."
 
@@ -20092,6 +20129,9 @@ msgstr "Запит не вдався."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "Відповідь: агенти роблять рев'ю іншим агентам, а люди перевіряють вибірково, а не читають усе. Довіру здобувають статистично, а не окремо для кожного diff."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "Решту пропущено: за цей хід зроблено більше, ніж зберігається."
 
 msgid "The rubric"
 msgstr "Критерії оцінювання"
@@ -20872,6 +20912,9 @@ msgstr "Версія застаріла, і цей застосунок не м�
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Версія застаріла, і цей застосунок не може з нею зв'язатися. Робочі простори на цьому хості не відкриватимуться, доки його не оновлять."
+
+msgid "Took"
+msgstr "Тривалість"
 
 msgid "Tools"
 msgstr "Інструменти"
@@ -22095,6 +22138,9 @@ msgstr "Ласкаво просимо до нового Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Що таке {0}, хто його створює і для кого він. Команда із Сан-Франциско на чолі з трьома колишніми CTO стартапів YC, яка створює робочий простір для паралельних кодинг-агентів."
 
+msgid "What {name} did"
+msgstr "Що зробив {name}"
+
 msgid "What are the benefits?"
 msgstr "Які переваги?"
 
@@ -22765,6 +22811,9 @@ msgstr "Ваші підписки та ключі для агентів"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Ваші агенти, ваші облікові записи"
+
+msgid "Your answer"
+msgstr "Ваша відповідь"
 
 msgid "Your changes"
 msgstr "Ваші зміни"

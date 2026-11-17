@@ -1179,6 +1179,9 @@ msgstr "{name} je vestavěný a nelze jej nahradit"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} není přidán"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} na tomto tahu stále pracuje."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: {monthly} za uživatele/měsíc"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} za uživatele/měsíc, nebo {yearly} při roční fakturaci"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "Box agenta {name} neoznámil, co v tomto tahu udělal."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Zadejte alespoň jednu osobu, nebo zvolte {choice}.} sender {Zadejte alespoň jednoho odesílatele, nebo zvolte {choice}.} other {Zadejte alespoň jednu položku, nebo zvolte {choice}.}}"
@@ -3150,8 +3156,18 @@ msgstr "Zeptej se, co dělají tvoji agenti, nebo jednomu řekni, co má dělat 
 msgid "Asked <0>{name}</0>"
 msgstr "Dotaz na <0>{name}</0> odeslán"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "Ptá se: {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "Dotazuje se <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "Ptá se kohokoli zde"
+
+msgid "Asking you"
+msgstr "Ptá se vás"
 
 msgid "Asks before edits and commands"
 msgstr "Ptá se před úpravami a příkazy"
@@ -6119,6 +6135,9 @@ msgstr "Starší zprávy se nepodařilo načíst. Zkusit znovu"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "Prostředí se nepodařilo načíst. Zkusit znovu"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "Nepodařilo se načíst. Zkontrolujte připojení a zkuste to znovu."
 
 msgid "Couldn't load pages"
 msgstr "Stránky se nepodařilo načíst"
@@ -11861,6 +11880,9 @@ msgstr "Zpráva pro {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "Zpráva pro {title}, nebo @{groupDevName} pro dotaz na jejího Dev"
 
+msgid "Message details"
+msgstr "Podrobnosti zprávy"
+
 msgid "Message in channel"
 msgstr "Zpráva v kanálu"
 
@@ -14251,6 +14273,9 @@ msgstr "Další způsoby, jak získat Git"
 msgid "Other ways to reach us"
 msgstr "Další způsoby, jak nás zastihnout"
 
+msgid "Other…"
+msgstr "Jiné…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "Naše seedové kolo ve výši 11,5 mil. $ vede Union Square Ventures, spolu s Y Combinator, Paulem Grahamem a zakladateli, kterých si vážíme."
 
@@ -14860,6 +14885,9 @@ msgstr "Vyberte prostředí"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Vyberte ikonu a barvu nebo nahrajte vlastní obrázek. Ve výchozím stavu se použije avatar propojeného vlastníka na GitHubu."
+
+msgid "Pick any"
+msgstr "Vyberte libovolné"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Vyberte si jeden v aplikaci Paradev. Uloží se k vašemu účtu."
@@ -17712,6 +17740,12 @@ msgstr "Odeslat"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "Pošlete pozvánku do {organizationName}. Platnost vyprší za 48 hodin."
 
+msgid "Send answer"
+msgstr "Odeslat odpověď"
+
+msgid "Send answers"
+msgstr "Odeslat odpovědi"
+
 msgid "Send email and debug delivery"
 msgstr "Odesílání e-mailů a ladění doručování"
 
@@ -19844,6 +19878,9 @@ msgstr "Paradev chystáme i pro Windows a Linux. Nechte nám e-mail a dáme vám
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "Desktopová aplikace běží na macOS, k tomu je experimentální AppImage pro Linux; Windows zatím nejsou dostupné. Kromě desktopové aplikace je tu CLI, TypeScript SDK a MCP server, takže Paradev můžete řídit ze skriptů, terminálů i jiných agentů. Aplikace pro iPhone a iPad z App Storu vám umožní kontrolovat agenty a procházet jejich diffy, i když nejste u stolu."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev tam nemůže psát."
 
@@ -20098,6 +20135,9 @@ msgstr "Požadavek selhal."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "Odpověď: agenti revidují agenty a lidé místo čtení všeho jen vzorkují. Důvěra se získává statisticky, ne u jednotlivého diffu."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "Zbytek byl vynechán: tento tah udělal víc, než se uchovává."
 
 msgid "The rubric"
 msgstr "Hodnoticí tabulka"
@@ -20878,6 +20918,9 @@ msgstr "Příliš staré pro komunikaci s touto aplikací. Aktualizujte aplikaci
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "Příliš staré pro komunikaci s touto aplikací. Pracovní prostory na tomto hostiteli se neotevřou, dokud nebude aktualizován."
+
+msgid "Took"
+msgstr "Trvalo"
 
 msgid "Tools"
 msgstr "Nástroje"
@@ -22101,6 +22144,9 @@ msgstr "Vítejte v novém Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "Co je {0}, kdo ho staví a pro koho je. Sanfranciský tým vedený třemi bývalými YC CTO, který staví pracovní prostor pro paralelní kódovací agenty."
 
+msgid "What {name} did"
+msgstr "Co {name} udělal"
+
 msgid "What are the benefits?"
 msgstr "Jaké jsou benefity?"
 
@@ -22771,6 +22817,9 @@ msgstr "Vaše předplatná agentů a klíče"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Vaši agenti, vaše účty"
+
+msgid "Your answer"
+msgstr "Vaše odpověď"
 
 msgid "Your changes"
 msgstr "Vaše změny"

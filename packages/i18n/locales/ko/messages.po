@@ -1179,6 +1179,9 @@ msgstr "{name}은(는) 기본 제공이라 교체할 수 없습니다"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name}이(가) 추가되지 않았습니다"
 
+msgid "{name} is still working on this turn."
+msgstr "{name}이(가) 아직 이 턴을 처리하고 있습니다."
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었을 수 있습니다."
 
@@ -1211,6 +1214,9 @@ msgstr "{name}: 사용자당 월 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name}의 박스가 이 턴에서 한 일을 보고하지 않았습니다."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
@@ -3150,8 +3156,18 @@ msgstr "에이전트가 무엇을 하고 있는지 물어보거나, 다음에 �
 msgid "Asked <0>{name}</0>"
 msgstr "<0>{name}</0>에게 질문함"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "{0}에게 질문 중"
+
 msgid "Asking <0>{name}</0>"
 msgstr "<0>{name}</0>에게 질문하는 중"
+
+msgid "Asking anyone here"
+msgstr "여기 있는 누구에게나 질문 중"
+
+msgid "Asking you"
+msgstr "나에게 질문 중"
 
 msgid "Asks before edits and commands"
 msgstr "편집과 명령 전에 확인"
@@ -6119,6 +6135,9 @@ msgstr "이전 메시지를 불러올 수 없습니다. 다시 시도"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "환경을 불러오지 못했습니다. 다시 시도"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "불러오지 못했습니다. 연결을 확인하고 다시 시도하세요."
 
 msgid "Couldn't load pages"
 msgstr "페이지를 불러올 수 없습니다"
@@ -11861,6 +11880,9 @@ msgstr "{title}에 메시지"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "{title}에 메시지, 또는 @{groupDevName}(으)로 Dev에게 질문"
 
+msgid "Message details"
+msgstr "메시지 세부 정보"
+
 msgid "Message in channel"
 msgstr "채널 내 메시지"
 
@@ -14251,6 +14273,9 @@ msgstr "Git을 설치하는 다른 방법"
 msgid "Other ways to reach us"
 msgstr "다른 문의 방법"
 
+msgid "Other…"
+msgstr "기타…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "1,150만 달러 규모의 시드 라운드는 Union Square Ventures가 주도했으며, Y Combinator, Paul Graham, 그리고 우리가 존경하는 창업자들이 함께했습니다."
 
@@ -14860,6 +14885,9 @@ msgstr "환경 선택"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "아이콘과 색상을 고르거나 직접 만든 이미지를 업로드하세요. 기본값은 연결된 GitHub 소유자의 아바타입니다."
+
+msgid "Pick any"
+msgstr "원하는 만큼 선택"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "Paradev 앱에서 하나를 고르세요. 계정에 저장됩니다."
@@ -17712,6 +17740,12 @@ msgstr "보내기"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "{organizationName}에 참여하도록 초대를 보냅니다. 48시간 후 만료됩니다."
 
+msgid "Send answer"
+msgstr "답변 보내기"
+
+msgid "Send answers"
+msgstr "답변 보내기"
+
 msgid "Send email and debug delivery"
 msgstr "이메일 전송 및 전달 문제 디버그"
 
@@ -19844,6 +19878,9 @@ msgstr "Paradev를 Windows와 Linux로 확장하고 있습니다. 이메일을 �
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "데스크톱 앱은 macOS에서 실행되며 실험적인 Linux AppImage가 있습니다. Windows는 아직 지원하지 않습니다. 데스크톱 앱 외에 CLI, TypeScript SDK, MCP 서버가 있어 스크립트, 터미널, 다른 에이전트에서 Paradev를 조작할 수 있습니다. App Store의 iPhone 및 iPad 앱으로 자리를 비운 동안에도 에이전트를 확인하고 diff를 검토할 수 있습니다."
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "Dev는 그곳에 게시할 수 없습니다."
 
@@ -20098,6 +20135,9 @@ msgstr "요청이 실패했습니다."
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "그 대응은 이렇습니다. 에이전트가 에이전트를 리뷰하고, 사람은 전부 읽는 대신 표본만 확인합니다. 신뢰는 차이 하나하나가 아니라 통계적으로 쌓입니다."
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "나머지는 생략되었습니다. 이 턴은 보관되는 양보다 많은 작업을 했습니다."
 
 msgid "The rubric"
 msgstr "평가 기준표"
@@ -20878,6 +20918,9 @@ msgstr "너무 오래되어 이 앱과 통신할 수 없습니다. 해당 기기
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "너무 오래되어 이 앱과 통신할 수 없습니다. 업데이트할 때까지 이 호스트의 워크스페이스는 열리지 않습니다."
+
+msgid "Took"
+msgstr "소요 시간"
 
 msgid "Tools"
 msgstr "도구"
@@ -22101,6 +22144,9 @@ msgstr "새로운 Paradev에 오신 것을 환영합니다"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0}가 무엇이고, 누가 만들며, 누구를 위한 것인지. 병렬 코딩 에이전트를 위한 워크스페이스를 만드는, 전 YC CTO 3인이 이끄는 샌프란시스코 팀입니다."
 
+msgid "What {name} did"
+msgstr "{name}이(가) 한 일"
+
 msgid "What are the benefits?"
 msgstr "복리후생은 어떤가요?"
 
@@ -22771,6 +22817,9 @@ msgstr "에이전트 구독과 키"
 
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"
+
+msgid "Your answer"
+msgstr "내 답변"
 
 msgid "Your changes"
 msgstr "내 변경 내용"

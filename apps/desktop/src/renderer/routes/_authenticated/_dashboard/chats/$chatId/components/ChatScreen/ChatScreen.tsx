@@ -6,6 +6,7 @@ import {
 	type Message,
 	mentionCandidates,
 	messageCopyText,
+	messagesOf,
 	renderMentions,
 	typingLabel,
 } from "@superset/chats-core";
@@ -30,6 +31,7 @@ import { useChats } from "../../../hooks/useChats";
 import { ChatComposer } from "../ChatComposer";
 import { ChatDetailsPanel } from "../ChatDetailsPanel";
 import { ChatThread } from "../ChatThread";
+import { MessageDetailsPanel } from "../MessageDetailsPanel";
 import type { MessageActions } from "../MessageItem";
 
 const NOW_TICK_MS = 30_000;
@@ -44,6 +46,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const [replyTo, setReplyTo] = useState<Message | null>(null);
 	const [editing, setEditing] = useState<Message | null>(null);
 	const [showsDetails, setShowsDetails] = useState(false);
+	const [detailsOf, setDetailsOf] = useState<string | null>(null);
 	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
 	const state = chats?.state ?? null;
@@ -106,6 +109,14 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			},
 			remove: (message) =>
 				dispatch?.({ type: "delete-message", messageId: message.id }),
+			answerQuestion: (questionId, answer, typed) =>
+				dispatch?.({ type: "answer-question", questionId, answer, typed }),
+			answerForm: (questionId, answers) =>
+				dispatch?.({ type: "answer-form", questionId, answers }),
+			details: (message) => {
+				setShowsDetails(false);
+				setDetailsOf(message.id);
+			},
 			retry: (message) =>
 				message.file
 					? live?.files.retry(message.id)
@@ -190,6 +201,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			? devs.find((dev) => dev.kind === "group")?.name
 			: undefined;
 	const working = chatTurns(chats.turns, chatId, devs);
+	const detailedMessage = detailsOf
+		? messagesOf(state, chatId).find((message) => message.id === detailsOf)
+		: undefined;
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -200,7 +214,10 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						type="button"
 						aria-label={t({ message: "Chat details" })}
 						aria-expanded={showsDetails}
-						onClick={() => setShowsDetails((shown) => !shown)}
+						onClick={() => {
+							setDetailsOf(null);
+							setShowsDetails((shown) => !shown);
+						}}
 						className="flex h-8 min-w-0 shrink items-center gap-2 rounded-lg px-1.5 hover:bg-fill-hover aria-expanded:bg-fill-hover"
 					>
 						<ChatFace chat={chat} size={22} />
@@ -295,6 +312,14 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					/>
 				</div>
 			</div>
+			{detailedMessage && live && (
+				<MessageDetailsPanel
+					state={state}
+					message={detailedMessage}
+					load={live.messageDetails}
+					onClose={() => setDetailsOf(null)}
+				/>
+			)}
 			{showsDetails && (
 				<ChatDetailsPanel
 					state={state}

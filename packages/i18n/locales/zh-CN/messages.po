@@ -1179,6 +1179,9 @@ msgstr "{name} 是内置的，无法替换"
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
 
+msgid "{name} is still working on this turn."
+msgstr "{name} 仍在处理这一轮。"
+
 msgid "{name} is unchanged. If an agent was working, it may have been stopped."
 msgstr "{name} 未改变。如果智能体正在工作，它可能已被停止。"
 
@@ -1211,6 +1214,9 @@ msgstr "{name}：每用户每月 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
+
+msgid "{name}'s box didn't report what it did in this turn."
+msgstr "{name} 的盒子没有报告这一轮做了什么。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
@@ -3150,8 +3156,18 @@ msgstr "问问智能体在做什么，或者告诉它下一步该做什么。"
 msgid "Asked <0>{name}</0>"
 msgstr "已询问 <0>{name}</0>"
 
+#. placeholder {0}: state.members[question.forUserId]?.name ?? "someone"
+msgid "Asking {0}"
+msgstr "正在询问 {0}"
+
 msgid "Asking <0>{name}</0>"
 msgstr "正在询问 <0>{name}</0>"
+
+msgid "Asking anyone here"
+msgstr "正在询问这里的任何人"
+
+msgid "Asking you"
+msgstr "正在询问你"
 
 msgid "Asks before edits and commands"
 msgstr "编辑和运行命令前询问"
@@ -6119,6 +6135,9 @@ msgstr "无法加载更早的消息。重试"
 
 msgid "Couldn’t load environments. Try again"
 msgstr "无法加载环境。重试"
+
+msgid "Couldn't load it. Check your connection and try again."
+msgstr "无法加载。请检查网络连接后重试。"
 
 msgid "Couldn't load pages"
 msgstr "无法加载页面"
@@ -11861,6 +11880,9 @@ msgstr "发消息给 {title}"
 msgid "Message {title}, or @{groupDevName} to ask its Dev"
 msgstr "发消息给 {title}，或用 @{groupDevName} 询问它的 Dev"
 
+msgid "Message details"
+msgstr "消息详情"
+
 msgid "Message in channel"
 msgstr "频道中的消息"
 
@@ -14251,6 +14273,9 @@ msgstr "获取 Git 的其他方式"
 msgid "Other ways to reach us"
 msgstr "其他联系方式"
 
+msgid "Other…"
+msgstr "其他…"
+
 msgid "Our $11.5M seed round is led by Union Square Ventures, with Y Combinator, Paul Graham, and founders we admire."
 msgstr "我们 1150 万美元的种子轮由 Union Square Ventures 领投，Y Combinator、Paul Graham 以及我们敬佩的创始人参投。"
 
@@ -14860,6 +14885,9 @@ msgstr "选择环境"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "选择图标和颜色，或上传自定义图片。默认使用关联的GitHub所有者头像。"
+
+msgid "Pick any"
+msgstr "可多选"
 
 msgid "Pick one in the Paradev app. It's saved to your account."
 msgstr "在 Paradev 应用中选一个，它会保存到你的账号。"
@@ -17712,6 +17740,12 @@ msgstr "发送"
 msgid "Send an invitation to join {organizationName}. Expires in 48 hours."
 msgstr "发送加入{organizationName}的邀请。48小时后过期。"
 
+msgid "Send answer"
+msgstr "发送回答"
+
+msgid "Send answers"
+msgstr "发送回答"
+
 msgid "Send email and debug delivery"
 msgstr "发送邮件并排查投递问题"
 
@@ -19844,6 +19878,9 @@ msgstr "桌面应用目前支持macOS和Linux。留下邮箱，Windows版本一�
 msgid "The desktop app runs on macOS, with an experimental Linux AppImage; Windows is not yet available. Beyond the desktop app there's a CLI, a TypeScript SDK, and an MCP server, so you can drive Paradev from scripts, terminals, and other agents. An app for iPhone and iPad on the App Store lets you check on agents and review their diffs away from your desk."
 msgstr "桌面应用支持macOS，另有实验性的Linux AppImage；Windows暂未提供。除了桌面应用，还有CLI、TypeScript SDK和MCP服务器，你可以从脚本、终端和其他智能体来驱动Paradev。App Store上的iPhone和iPad应用让你离开工位时也能查看智能体并审阅它们的差异。"
 
+msgid "The Dev"
+msgstr "Dev"
+
 msgid "The Dev can't post there."
 msgstr "该 Dev 无法在那里发帖。"
 
@@ -20098,6 +20135,9 @@ msgstr "请求失败。"
 
 msgid "The response: agents review agents, and humans sample instead of reading everything. Trust is earned statistically, not per diff."
 msgstr "应对办法是：让智能体审查智能体，人类改为抽样而不是通读。信任靠统计建立，而不是逐个差异建立。"
+
+msgid "The rest was left out: this turn did more than is kept."
+msgstr "其余内容已省略：这一轮所做的超出了保留的范围。"
 
 msgid "The rubric"
 msgstr "评分表"
@@ -20878,6 +20918,9 @@ msgstr "版本太旧，此应用无法与其通信。更新那台设备上的 Pa
 
 msgid "Too old for this app to talk to. Workspaces on this host will not open until it is updated."
 msgstr "版本太旧，此应用无法与其通信。更新之前，此主机上的工作区无法打开。"
+
+msgid "Took"
+msgstr "用时"
 
 msgid "Tools"
 msgstr "工具"
@@ -22101,6 +22144,9 @@ msgstr "欢迎使用全新的 Paradev"
 msgid "What {0} is, who builds it, and who it's for. A San Francisco team, led by three ex-YC CTOs, building the workspace for parallel coding agents."
 msgstr "{0} 是什么、由谁打造、为谁而建。一支由三位前 YC CTO 带领的旧金山团队，正在打造并行编码智能体的工作区。"
 
+msgid "What {name} did"
+msgstr "{name} 做了什么"
+
 msgid "What are the benefits?"
 msgstr "有哪些福利？"
 
@@ -22771,6 +22817,9 @@ msgstr "你的智能体订阅和密钥"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"
+
+msgid "Your answer"
+msgstr "你的回答"
 
 msgid "Your changes"
 msgstr "你的更改"
