@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# řádek} few {# řádky} many {# řádku} other {# řádků}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Citace} few {Citace · # řádky} many {Citace · # řádku} other {Citace · # řádků}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (toto zařízení)"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} nepřijímá argumenty"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} nepřijímá přílohy"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} nepřijímá citace"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "Prompt, pár spouštěčů a pracovní prostor pro každý běh"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request má vždy vlastní worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Citace může mít nejvýše {limit} znaků"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Přestavěné chatovací rozhraní pro řízení agentů: bohatší výstup nástrojů, plynulejší usměrňování, všechno rychlejší."
@@ -2218,6 +2227,9 @@ msgstr "Přidat tento štítek"
 msgid "Add to channel"
 msgstr "Přidat do kanálu"
 
+msgid "Add to chat"
+msgstr "Přidat do chatu"
+
 msgid "Add to Dictionary"
 msgstr "Přidat do slovníku"
 
@@ -2226,6 +2238,9 @@ msgstr "Přidat do oblíbených"
 
 msgid "Add to merge queue"
 msgstr "Přidat do fronty slučování"
+
+msgid "Add to new chat"
+msgstr "Přidat do nového chatu"
 
 msgid "Add to project"
 msgstr "Přidat do projektu"
@@ -16172,6 +16187,9 @@ msgstr "Odebrat propojení s PR"
 msgid "Remove queued message"
 msgstr "Odebrat zprávu z fronty"
 
+msgid "Remove quote"
+msgstr "Odebrat citaci"
+
 msgid "Remove repository"
 msgstr "Odebrat repozitář"
 
@@ -17745,6 +17763,9 @@ msgstr "Akce pro vybrané pracovní prostory"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Výběr textu v terminálu ho hned zkopíruje do schránky, bez koncových mezer"
+
+msgid "Selection actions"
+msgstr "Akce s výběrem"
 
 msgid "Self-hosted"
 msgstr "Vlastní hosting"

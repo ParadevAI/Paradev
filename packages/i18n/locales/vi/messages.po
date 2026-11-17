@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# dòng}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Trích dẫn} other {Trích dẫn · # dòng}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (thiết bị này)"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} không nhận đối số"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} không nhận tệp đính kèm"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} không nhận trích dẫn"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "Một prompt, vài trigger và một workspace cho mỗi lượt chạy"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request luôn có worktree riêng"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Trích dẫn có thể dài tối đa {limit} ký tự"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Giao diện chat được dựng lại để điều khiển agent: output tool phong phú hơn, lái mượt hơn, mọi thứ nhanh hơn."
@@ -2218,6 +2227,9 @@ msgstr "Thêm nhãn này"
 msgid "Add to channel"
 msgstr "Thêm vào kênh"
 
+msgid "Add to chat"
+msgstr "Thêm vào cuộc trò chuyện"
+
 msgid "Add to Dictionary"
 msgstr "Thêm vào từ điển"
 
@@ -2226,6 +2238,9 @@ msgstr "Thêm vào mục yêu thích"
 
 msgid "Add to merge queue"
 msgstr "Thêm vào hàng đợi merge"
+
+msgid "Add to new chat"
+msgstr "Thêm vào cuộc trò chuyện mới"
 
 msgid "Add to project"
 msgstr "Thêm vào dự án"
@@ -16172,6 +16187,9 @@ msgstr "Gỡ liên kết PR"
 msgid "Remove queued message"
 msgstr "Xóa tin nhắn trong hàng đợi"
 
+msgid "Remove quote"
+msgstr "Xóa trích dẫn"
+
 msgid "Remove repository"
 msgstr "Gỡ repository"
 
@@ -17745,6 +17763,9 @@ msgstr "Hành động cho workspace đã chọn"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Chọn văn bản trong terminal sẽ sao chép ngay vào clipboard, đã cắt khoảng trắng ở cuối"
+
+msgid "Selection actions"
+msgstr "Thao tác với vùng chọn"
 
 msgid "Self-hosted"
 msgstr "Tự lưu trữ"

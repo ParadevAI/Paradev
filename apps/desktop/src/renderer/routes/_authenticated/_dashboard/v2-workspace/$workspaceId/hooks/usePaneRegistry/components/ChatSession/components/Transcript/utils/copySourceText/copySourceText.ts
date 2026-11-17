@@ -42,27 +42,31 @@ function fragmentText(node: Node): string {
 	return text;
 }
 
+/** The range's text with each `data-source-text` run as typed; null when it has none. */
+export function sourceTextOfRange(range: Range): string | null {
+	const ancestor = range.commonAncestorContainer;
+	const element =
+		ancestor instanceof Element ? ancestor : ancestor.parentElement;
+	const within = element?.closest(`[${SOURCE_TEXT}]`);
+	const text = within?.getAttribute(SOURCE_TEXT);
+	if (text != null) return text;
+	const copied = range.cloneContents();
+	const sources = copied.querySelectorAll(`[${SOURCE_TEXT}]`);
+	if (sources.length === 0) return null;
+	for (const part of sources) {
+		part.textContent = part.getAttribute(SOURCE_TEXT);
+	}
+	return fragmentText(copied);
+}
+
 export function copySourceText(event: ClipboardEvent<HTMLElement>) {
 	if (event.defaultPrevented) return;
 	const selection = window.getSelection();
 	if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
 	const range = selection.getRangeAt(0);
-	const ancestor = range.commonAncestorContainer;
-	if (!event.currentTarget.contains(ancestor)) return;
-
-	const element =
-		ancestor instanceof Element ? ancestor : ancestor.parentElement;
-	const within = element?.closest(`[${SOURCE_TEXT}]`);
-	let text = within?.getAttribute(SOURCE_TEXT);
-	if (text == null) {
-		const copied = range.cloneContents();
-		const sources = copied.querySelectorAll(`[${SOURCE_TEXT}]`);
-		if (sources.length === 0) return;
-		for (const part of sources) {
-			part.textContent = part.getAttribute(SOURCE_TEXT);
-		}
-		text = fragmentText(copied);
-	}
+	if (!event.currentTarget.contains(range.commonAncestorContainer)) return;
+	const text = sourceTextOfRange(range);
+	if (text == null) return;
 	event.clipboardData.setData("text/plain", text);
 	event.preventDefault();
 }

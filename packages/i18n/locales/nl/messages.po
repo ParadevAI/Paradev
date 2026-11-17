@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# regel} other {# regels}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Citaat} other {Citaat · # regels}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (dit apparaat)"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} accepteert geen argumenten"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} accepteert geen bijlagen"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} accepteert geen citaten"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "Een prompt, een paar triggers en een werkruimte per run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Een pull request krijgt altijd een eigen worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Een citaat mag maximaal {limit} tekens bevatten"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Een herbouwd chatoppervlak om agents aan te sturen: rijkere tooluitvoer, soepeler bijsturen, alles sneller."
@@ -2218,6 +2227,9 @@ msgstr "Dit label toevoegen"
 msgid "Add to channel"
 msgstr "Aan kanaal toevoegen"
 
+msgid "Add to chat"
+msgstr "Toevoegen aan chat"
+
 msgid "Add to Dictionary"
 msgstr "Toevoegen aan woordenboek"
 
@@ -2226,6 +2238,9 @@ msgstr "Toevoegen aan favorieten"
 
 msgid "Add to merge queue"
 msgstr "Toevoegen aan mergewachtrij"
+
+msgid "Add to new chat"
+msgstr "Toevoegen aan nieuwe chat"
 
 msgid "Add to project"
 msgstr "Aan project toevoegen"
@@ -16172,6 +16187,9 @@ msgstr "PR-koppeling verwijderen"
 msgid "Remove queued message"
 msgstr "Bericht uit wachtrij verwijderen"
 
+msgid "Remove quote"
+msgstr "Citaat verwijderen"
+
 msgid "Remove repository"
 msgstr "Repository verwijderen"
 
@@ -17745,6 +17763,9 @@ msgstr "Acties voor geselecteerde werkruimtes"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Tekst selecteren in een terminal kopieert die meteen naar het klembord, zonder witruimte aan het einde"
+
+msgid "Selection actions"
+msgstr "Acties voor selectie"
 
 msgid "Self-hosted"
 msgstr "Zelf gehost"

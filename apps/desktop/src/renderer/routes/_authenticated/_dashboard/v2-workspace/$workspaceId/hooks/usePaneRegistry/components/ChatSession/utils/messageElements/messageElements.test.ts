@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { elementsForChips, splitByElements } from "./messageElements";
+import { withQuotedReplies } from "@superset/chat/core";
+import {
+	elementsAfter,
+	elementsForChips,
+	splitByElements,
+} from "./messageElements";
 
 describe("messageElements", () => {
 	test("round-trips chips through byte ranges, past non-ASCII text", () => {
@@ -45,5 +50,28 @@ describe("messageElements", () => {
 		]);
 		expect(element?.label).toBe("#42");
 		expect(element?.data).toEqual(data);
+	});
+
+	test("measures chips past the quotes sent ahead of them, and back", () => {
+		const message = "fix src/é.ts";
+		const sent = withQuotedReplies(["the café bug"], message);
+		const before = sent.slice(0, sent.length - message.length);
+		const chip = {
+			label: "é.ts",
+			serialized: "src/é.ts",
+			data: { elementKind: "file_mention" },
+		};
+		const [element] = elementsForChips(message, [chip], before);
+		const bytes = new TextEncoder().encode(sent);
+		const range = element?.byteRange ?? { start: 0, end: 0 };
+		expect(new TextDecoder().decode(bytes.slice(range.start, range.end))).toBe(
+			"src/é.ts",
+		);
+		expect(
+			splitByElements(
+				message,
+				elementsAfter(element ? [element] : [], before),
+			).map((segment) => segment.element?.label ?? segment.text),
+		).toEqual(["fix ", "é.ts"]);
 	});
 });

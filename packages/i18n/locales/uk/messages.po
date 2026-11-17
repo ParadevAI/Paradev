@@ -1103,6 +1103,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# рядок} few {# рядки} many {# рядків} other {# рядка}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Цитата} one {Цитата · # рядок} few {Цитата · # рядки} many {Цитата · # рядків} other {Цитата · # рядка}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (цей пристрій)"
 
@@ -1473,6 +1476,9 @@ msgstr "/{name} не приймає аргументів"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} не приймає вкладень"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} не приймає цитат"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1827,6 +1833,9 @@ msgstr "Промпт, кілька тригерів і робочий прост
 
 msgid "A pull request always gets its own worktree"
 msgstr "Пул-реквест завжди отримує власний worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Цитата може містити не більше {limit} символів"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Перероблений чат для керування агентами: багатший вивід інструментів, плавніше керування, усе швидше."
@@ -2212,6 +2221,9 @@ msgstr "Додати цю мітку"
 msgid "Add to channel"
 msgstr "Додати до каналу"
 
+msgid "Add to chat"
+msgstr "Додати в чат"
+
 msgid "Add to Dictionary"
 msgstr "Додати до словника"
 
@@ -2220,6 +2232,9 @@ msgstr "Додати до вибраного"
 
 msgid "Add to merge queue"
 msgstr "Додати до черги злиття"
+
+msgid "Add to new chat"
+msgstr "Додати в новий чат"
 
 msgid "Add to project"
 msgstr "Додати до проєкту"
@@ -16166,6 +16181,9 @@ msgstr "Прибрати посилання на PR"
 msgid "Remove queued message"
 msgstr "Прибрати повідомлення з черги"
 
+msgid "Remove quote"
+msgstr "Прибрати цитату"
+
 msgid "Remove repository"
 msgstr "Прибрати репозиторій"
 
@@ -17739,6 +17757,9 @@ msgstr "Дії з вибраними робочими просторами"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Виділений у терміналі текст одразу копіюється в буфер обміну, без пробілів у кінці"
+
+msgid "Selection actions"
+msgstr "Дії з виділенням"
 
 msgid "Self-hosted"
 msgstr "Власний хостинг"

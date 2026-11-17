@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, one {# línea} other {# líneas}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, one {Cita} other {Cita · # líneas}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (este dispositivo)"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} no admite argumentos"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} no admite archivos adjuntos"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} no admite citas"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "Un prompt, algunos desencadenantes y un espacio de trabajo por ejecució
 
 msgid "A pull request always gets its own worktree"
 msgstr "Un pull request siempre tiene su propio worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Una cita puede tener hasta {limit} caracteres"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Una superficie de chat rehecha para dirigir agentes: salida de herramientas más rica, mejor control y todo más rápido."
@@ -2218,6 +2227,9 @@ msgstr "Añadir esta etiqueta"
 msgid "Add to channel"
 msgstr "Añadir a un canal"
 
+msgid "Add to chat"
+msgstr "Añadir al chat"
+
 msgid "Add to Dictionary"
 msgstr "Añadir al diccionario"
 
@@ -2226,6 +2238,9 @@ msgstr "Añadir a favoritos"
 
 msgid "Add to merge queue"
 msgstr "Añadir a la cola de fusión"
+
+msgid "Add to new chat"
+msgstr "Añadir a un chat nuevo"
 
 msgid "Add to project"
 msgstr "Añadir a un proyecto"
@@ -16172,6 +16187,9 @@ msgstr "Quitar el enlace de la PR"
 msgid "Remove queued message"
 msgstr "Quitar mensaje de la cola"
 
+msgid "Remove quote"
+msgstr "Quitar cita"
+
 msgid "Remove repository"
 msgstr "Quitar repositorio"
 
@@ -17745,6 +17763,9 @@ msgstr "Acciones de los espacios de trabajo seleccionados"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Seleccionar texto en un terminal lo copia de inmediato al portapapeles, sin los espacios finales"
+
+msgid "Selection actions"
+msgstr "Acciones de la selección"
 
 msgid "Self-hosted"
 msgstr "Autoalojado"
