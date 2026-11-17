@@ -98,9 +98,8 @@ const desired: DesiredAutomation[] = [
 				type: "send_email",
 				config: {
 					template: { id: "23458b3f-39fb-4465-a3f8-431b73d51aa4" },
-					subject: "",
-					from: "Kiet <kiet@hey.superset.sh>",
-					replyTo: "kiet@superset.sh",
+					from: "Kiet <kiet@hey.paradev.com>",
+					replyTo: "kiet@paradev.com",
 				},
 			},
 		],
