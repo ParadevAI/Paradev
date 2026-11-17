@@ -798,6 +798,9 @@ msgstr "{appName} Mobile thuộc gói Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile chạy agent trên những máy tính bạn kết nối."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Lưu trữ # workspace đám mây} other {Lưu trữ # workspace đám mây}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {đã thêm một commit} other {đã thêm # commit
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Đã tạo # workspace} other {Đã tạo # workspace}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Xóa # workspace} other {Xóa # workspace}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {đã sửa # tệp} other {đã sửa # tệp}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {Còn # ngày}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Tài khoản của bạn đã bị vô hiệu hóa và sẽ bị xóa vĩnh viễn sau # ngày. Kích hoạt lại để khôi phục đúng như lúc bạn rời đi.} other {Tài khoản của bạn đã bị vô hiệu hóa và sẽ bị xóa vĩnh viễn sau # ngày. Kích hoạt lại để khôi phục đúng như lúc bạn rời đi.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Xóa # workspace} other {Xóa # workspace}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3081,6 +3084,9 @@ msgstr "Lưu trữ environment"
 
 msgid "Archive failed"
 msgstr "Lưu trữ thất bại"
+
+msgid "Archive selected cloud workspaces"
+msgstr "Lưu trữ các workspace đám mây đã chọn"
 
 msgid "Archive this automation before you delete it."
 msgstr "Hãy lưu trữ tự động hóa này trước khi xóa."

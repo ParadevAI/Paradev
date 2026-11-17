@@ -798,6 +798,9 @@ msgstr "{appName} Mobile, Pro'nun bir parçasıdır"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile, ajanları bağladığınız bilgisayarlarda çalıştırır."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {# bulut çalışma alanını arşivle} other {# bulut çalışma alanını arşivle}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {main dalının # commit gerisinde, rebase gerekiyor} other {main dalının # commit gerisinde, rebase gerekiyor}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {bir commit ekledi} other {# commit ekledi}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {# çalışma alanı oluşturuldu} other {# çalışma alanı oluşturuldu}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {# çalışma alanını sil} other {# çalışma alanını sil}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, one {# gün kaldı} other {# gün kaldı}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Hesabınız devre dışı bırakıldı ve # gün içinde kalıcı olarak silinecek. Bıraktığınız gibi geri yüklemek için yeniden etkinleştirin.} other {Hesabınız devre dışı bırakıldı ve # gün içinde kalıcı olarak silinecek. Bıraktığınız gibi geri yüklemek için yeniden etkinleştirin.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {# çalışma alanını sil} other {# çalışma alanını sil}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3081,6 +3084,9 @@ msgstr "Ortamı arşivle"
 
 msgid "Archive failed"
 msgstr "Arşivlenemedi"
+
+msgid "Archive selected cloud workspaces"
+msgstr "Seçili bulut çalışma alanlarını arşivle"
 
 msgid "Archive this automation before you delete it."
 msgstr "Silmeden önce bu otomasyonu arşivleyin."
