@@ -651,6 +651,10 @@ msgstr "{0}: thiết bị ngoại tuyến"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Hãy thử menu khay Paradev > Dịch vụ host > Khởi động lại."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "Plugin của {0}"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "Thêm người hoặc nhóm theo tên hoặc email"
 
 msgid "Add photos or files"
 msgstr "Thêm ảnh hoặc tệp"
+
+msgid "Add plugins"
+msgstr "Thêm plugin"
 
 msgid "Add project"
 msgstr "Thêm dự án"
@@ -9457,6 +9464,9 @@ msgstr "Lấy khóa"
 msgid "Get more out of Paradev"
 msgstr "Khai thác Paradev nhiều hơn"
 
+msgid "Get more plugins"
+msgstr "Lấy thêm plugin"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Nhận thông báo khi Paradev có trên Windows."
 
@@ -10725,9 +10735,6 @@ msgstr "Để merge, nó phải vào lại hàng đợi và vượt qua các ki�
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Chỉ mất vài phút. Đang dùng Conductor Cloud? Hãy bắt đầu với <0>hướng dẫn cho cloud</0>."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "Nó dùng các tài khoản đã kết nối của bạn, kể cả khi người khác yêu cầu nó trong nhóm."
 
 msgid "It will open once the connection is back."
 msgstr "Trang sẽ mở khi có kết nối trở lại."
@@ -13276,6 +13283,9 @@ msgstr "Không tệp nào của lượt này có thay đổi ở đây"
 msgid "None selected"
 msgstr "Chưa chọn gì"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "Chưa có. Hãy cấp cho nó GitHub, Linear, Gmail hoặc plugin khác để làm việc với tài khoản của bạn."
+
 msgid "None. This is the floor."
 msgstr "Không có. Đây là mức sàn."
 
@@ -15107,6 +15117,10 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "Plugin cho {0}"
 
 msgid "Plugins it can use as you"
 msgstr "Các plugin nó có thể dùng thay bạn"
@@ -19057,6 +19071,9 @@ msgstr "Bắt đầu từ công việc."
 msgid "Start work from anywhere"
 msgstr "Bắt đầu công việc từ bất cứ đâu"
 
+msgid "Start workspaces and coding agents"
+msgstr "Khởi tạo workspace và agent lập trình"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Bắt đầu workspace ngay từ issue Linear hoặc GitHub trong chế độ xem Tác vụ, mỗi workspace đều có sẵn một agent đang làm việc."
 
@@ -22282,6 +22299,12 @@ msgstr "Paradev Enterprise là gì?"
 
 msgid "What is wrong?"
 msgstr "Vấn đề là gì?"
+
+msgid "What it can use as you."
+msgstr "Những gì nó có thể dùng thay bạn."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "Những gì nó có thể dùng thay bạn. Nó dùng tài khoản của bạn, kể cả khi người khác yêu cầu nó trong nhóm."
 
 msgid "What it does"
 msgstr "Nó làm gì"

@@ -651,6 +651,10 @@ msgstr "{0}：デバイスがオフライン"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}。Paradevのトレイメニュー > ホストサービス > 再起動をお試しください。"
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "{0} のプラグイン"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "名前またはメールアドレスでユーザーやチームを追加
 
 msgid "Add photos or files"
 msgstr "写真やファイルを追加"
+
+msgid "Add plugins"
+msgstr "プラグインを追加"
 
 msgid "Add project"
 msgstr "プロジェクトを追加"
@@ -9457,6 +9464,9 @@ msgstr "キーを取得"
 msgid "Get more out of Paradev"
 msgstr "Paradevをもっと活用する"
 
+msgid "Get more plugins"
+msgstr "プラグインをさらに入手"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "ParadevがWindowsで使えるようになったらお知らせします。"
 
@@ -10725,9 +10735,6 @@ msgstr "マージするには、もう一度キューに入れてチェックに
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "数分で完了します。Conductor Cloud をお使いの場合は、まず<0>クラウドガイド</0>をご覧ください。"
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "グループで他の人に頼まれた場合も含め、あなたの接続済みアカウントを使います。"
 
 msgid "It will open once the connection is back."
 msgstr "接続が戻ると開きます。"
@@ -13276,6 +13283,9 @@ msgstr "このターンのファイルにはここで変更がありません"
 msgid "None selected"
 msgstr "未選択"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "まだありません。GitHub、Linear、Gmail などを渡すと、あなたのアカウントで作業できます。"
+
 msgid "None. This is the floor."
 msgstr "なし。ここが出発点です。"
 
@@ -15107,6 +15117,10 @@ msgstr "プラグインマーケットプレイス"
 
 msgid "Plugins"
 msgstr "プラグイン"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "{0} のプラグイン"
 
 msgid "Plugins it can use as you"
 msgstr "あなたとして使えるプラグイン"
@@ -19057,6 +19071,9 @@ msgstr "仕事から始める。"
 msgid "Start work from anywhere"
 msgstr "どこからでも作業を開始"
 
+msgid "Start workspaces and coding agents"
+msgstr "ワークスペースとコーディングエージェントを開始"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "タスクビューでLinearやGitHubのIssueから直接ワークスペースを開始でき、それぞれでエージェントがすでに作業を始めています。"
 
@@ -22282,6 +22299,12 @@ msgstr "Paradev Enterpriseとは何ですか?"
 
 msgid "What is wrong?"
 msgstr "何が問題ですか？"
+
+msgid "What it can use as you."
+msgstr "あなたとして使えるもの。"
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "あなたとして使えるもの。グループで他の人に頼まれた場合も、あなたのアカウントを使います。"
 
 msgid "What it does"
 msgstr "できること"

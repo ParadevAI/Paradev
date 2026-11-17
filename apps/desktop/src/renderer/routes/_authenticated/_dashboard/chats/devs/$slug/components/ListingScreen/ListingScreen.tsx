@@ -11,6 +11,7 @@ import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useCallback, useState } from "react";
 import { LuChevronLeft, LuLoaderCircle } from "react-icons/lu";
+import { DevPluginIcons } from "renderer/routes/_authenticated/_dashboard/chats/components/DevPluginIcons";
 import { listingFace } from "renderer/routes/_authenticated/_dashboard/chats/utils/listingFace";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
@@ -219,7 +220,8 @@ export function ListingScreen({ slug, groupId }: ListingScreenProps) {
 													key={need.app}
 													className="flex flex-col gap-0.5 border-border border-b py-2.5 text-sm"
 												>
-													<span className="font-medium">
+													<span className="flex items-center gap-2 font-medium">
+														<DevPluginIcons plugins={[need.app]} />
 														{need.app === "paradev" ? (
 															<Trans>Your Paradev access</Trans>
 														) : (

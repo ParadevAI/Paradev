@@ -651,6 +651,10 @@ msgstr "{0}，设备离线"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}。请尝试Paradev托盘菜单 > 主机服务 > 重启。"
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "{0} 的插件"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "按名称或邮箱添加人员或团队"
 
 msgid "Add photos or files"
 msgstr "添加照片或文件"
+
+msgid "Add plugins"
+msgstr "添加插件"
 
 msgid "Add project"
 msgstr "添加项目"
@@ -9457,6 +9464,9 @@ msgstr "获取密钥"
 msgid "Get more out of Paradev"
 msgstr "把Paradev用得更好"
 
+msgid "Get more plugins"
+msgstr "获取更多插件"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Paradev支持Windows时通知我。"
 
@@ -10725,9 +10735,6 @@ msgstr "要合并，它必须重新加入队列并通过检查。"
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需几分钟。在用 Conductor Cloud？请先看<0>云端指南</0>。"
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "它会使用你已连接的账户，即使是群组中的其他人提出请求。"
 
 msgid "It will open once the connection is back."
 msgstr "网络恢复后会自动打开。"
@@ -13276,6 +13283,9 @@ msgstr "本轮的文件在此处都没有更改"
 msgid "None selected"
 msgstr "未选择"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "还没有。给它 GitHub、Linear、Gmail 等，让它用你的账户工作。"
+
 msgid "None. This is the floor."
 msgstr "没有。这是起点。"
 
@@ -15107,6 +15117,10 @@ msgstr "插件市场"
 
 msgid "Plugins"
 msgstr "插件"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "{0} 的插件"
 
 msgid "Plugins it can use as you"
 msgstr "它可以以你的身份使用的插件"
@@ -19057,6 +19071,9 @@ msgstr "从工作本身开始。"
 msgid "Start work from anywhere"
 msgstr "随时随地开始工作"
 
+msgid "Start workspaces and coding agents"
+msgstr "启动工作区和编码智能体"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "在任务视图中直接从 Linear 或 GitHub 议题启动工作区，每个工作区都已有智能体在处理。"
 
@@ -22282,6 +22299,12 @@ msgstr "什么是Paradev Enterprise？"
 
 msgid "What is wrong?"
 msgstr "哪里有问题？"
+
+msgid "What it can use as you."
+msgstr "它可以以你的身份使用的内容。"
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "它可以以你的身份使用的内容。它会使用你的账户，即使是群组中的其他人提出请求。"
 
 msgid "What it does"
 msgstr "它做什么"

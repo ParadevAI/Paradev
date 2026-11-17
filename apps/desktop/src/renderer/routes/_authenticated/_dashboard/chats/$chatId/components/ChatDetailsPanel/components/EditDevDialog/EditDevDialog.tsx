@@ -9,21 +9,14 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
-import { Switch } from "@superset/ui/switch";
 import { Textarea } from "@superset/ui/textarea";
 import { useState } from "react";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 interface EditDevDialogProps {
 	dev: Dev;
 	onOpenChange: (open: boolean) => void;
 	/** Resolves to whether it saved. */
-	onSave: (patch: {
-		name: string;
-		description: string;
-		paradevAccess?: boolean;
-		plugins?: string[];
-	}) => Promise<boolean>;
+	onSave: (patch: { name: string; description: string }) => Promise<boolean>;
 	/** Absent when this Dev cannot be deleted. Resolves to whether it is gone. */
 	onDelete?: () => Promise<boolean>;
 }
@@ -37,16 +30,6 @@ export function EditDevDialog({
 	const { t } = useLingui();
 	const [name, setName] = useState(dev.name);
 	const [description, setDescription] = useState(dev.descriptionText ?? "");
-	const [paradevAccess, setParadevAccess] = useState(
-		dev.paradevAccess ?? false,
-	);
-	const [plugins, setPlugins] = useState(dev.plugins ?? []);
-	const installed = cloudTrpc.plugins.list
-		.useQuery(undefined, {
-			enabled: dev.plugins !== undefined,
-			staleTime: 60_000,
-		})
-		.data?.filter((plugin) => plugin.installed && plugin.enabled);
 	const [isBusy, setBusy] = useState(false);
 	const [isConfirmingDelete, setConfirmingDelete] = useState(false);
 	const ready =
@@ -79,8 +62,6 @@ export function EditDevDialog({
 							onSave({
 								name: name.trim(),
 								description: description.trim(),
-								...(dev.paradevAccess !== undefined ? { paradevAccess } : {}),
-								...(dev.plugins !== undefined ? { plugins } : {}),
 							}),
 						);
 					}}
@@ -101,68 +82,6 @@ export function EditDevDialog({
 						})}
 						onChange={(event) => setDescription(event.target.value)}
 					/>
-					{dev.paradevAccess !== undefined && (
-						<div className="flex items-start justify-between gap-4 rounded-lg border border-border p-3">
-							<span className="flex flex-col gap-1">
-								<label
-									htmlFor="dev-paradev-access"
-									className="text-sm font-medium"
-								>
-									<Trans>Let it act in Paradev as you</Trans>
-								</label>
-								<span className="text-xs text-muted-foreground">
-									<Trans>
-										It can start workspaces and coding agents with your access,
-										also when someone else asks it in a group.
-									</Trans>
-								</span>
-							</span>
-							<Switch
-								id="dev-paradev-access"
-								checked={paradevAccess}
-								onCheckedChange={setParadevAccess}
-							/>
-						</div>
-					)}
-					{dev.plugins !== undefined && installed && installed.length > 0 && (
-						<div className="flex flex-col gap-2 rounded-lg border border-border p-3">
-							<span className="flex flex-col gap-1">
-								<span className="font-medium text-sm">
-									<Trans>Plugins it can use as you</Trans>
-								</span>
-								<span className="text-muted-foreground text-xs">
-									<Trans>
-										It uses your connected accounts, also when someone else asks
-										it in a group.
-									</Trans>
-								</span>
-							</span>
-							<div className="flex max-h-44 flex-col overflow-y-auto">
-								{installed.map((plugin) => (
-									<label
-										key={plugin.name}
-										htmlFor={`dev-plugin-${plugin.name}`}
-										className="flex items-center justify-between gap-3 py-1.5 text-sm"
-									>
-										<span className="min-w-0 truncate">
-											{plugin.displayName}
-										</span>
-										<Switch
-											id={`dev-plugin-${plugin.name}`}
-											checked={plugins.includes(plugin.name)}
-											onCheckedChange={(isOn) =>
-												setPlugins((current) =>
-													isOn
-														? [...current, plugin.name]
-														: current.filter((name) => name !== plugin.name),
-												)
-											}
-										/>
-									</label>
-								))}
-							</div>
-						</div>
-					)}
 					<Button type="submit" disabled={!ready || isBusy}>
 						<Trans>Save</Trans>
 					</Button>

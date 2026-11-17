@@ -651,6 +651,10 @@ msgstr "{0}: zařízení offline"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Zkuste nabídku Paradev v liště > Host Service > Restart."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "Pluginy pro {0}"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "Přidejte lidi nebo týmy podle jména nebo e-mailu"
 
 msgid "Add photos or files"
 msgstr "Přidat fotky nebo soubory"
+
+msgid "Add plugins"
+msgstr "Přidat pluginy"
 
 msgid "Add project"
 msgstr "Přidat projekt"
@@ -9457,6 +9464,9 @@ msgstr "Získat klíč"
 msgid "Get more out of Paradev"
 msgstr "Využít Paradev naplno"
 
+msgid "Get more plugins"
+msgstr "Získat další pluginy"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Dáme vám vědět, až bude Paradev dostupný pro Windows."
 
@@ -10725,9 +10735,6 @@ msgstr "Aby se sloučil, musí se znovu zařadit a projít kontrolami."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Zabere to pár minut. Používáte Conductor Cloud? Začněte <0>průvodcem pro cloud</0>."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "Používá vaše připojené účty, i když ho ve skupině požádá někdo jiný."
 
 msgid "It will open once the connection is back."
 msgstr "Otevře se, jakmile se připojení vrátí."
@@ -13276,6 +13283,9 @@ msgstr "Žádný ze souborů tohoto tahu tu nemá změny"
 msgid "None selected"
 msgstr "Nic nevybráno"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "Zatím žádné. Dejte mu GitHub, Linear, Gmail nebo jiné, aby mohl pracovat s vašimi účty."
+
 msgid "None. This is the floor."
 msgstr "Žádná. Tohle je základ."
 
@@ -15107,6 +15117,10 @@ msgstr "Marketplace pluginů"
 
 msgid "Plugins"
 msgstr "Pluginy"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "Pluginy pro {0}"
 
 msgid "Plugins it can use as you"
 msgstr "Pluginy, které může používat vaším jménem"
@@ -19057,6 +19071,9 @@ msgstr "Začněte prací."
 msgid "Start work from anywhere"
 msgstr "Začněte pracovat odkudkoli"
 
+msgid "Start workspaces and coding agents"
+msgstr "Spouštět pracovní prostory a kódovací agenty"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Spouštějte pracovní prostory přímo z issues v Linear nebo GitHub v zobrazení Úkoly, s agentem, který na každém z nich už pracuje."
 
@@ -22282,6 +22299,12 @@ msgstr "Co je Paradev Enterprise?"
 
 msgid "What is wrong?"
 msgstr "Co je špatně?"
+
+msgid "What it can use as you."
+msgstr "Co může používat vaším jménem."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "Co může používat vaším jménem. Používá vaše účty, i když ho ve skupině požádá někdo jiný."
 
 msgid "What it does"
 msgstr "Co dělá"

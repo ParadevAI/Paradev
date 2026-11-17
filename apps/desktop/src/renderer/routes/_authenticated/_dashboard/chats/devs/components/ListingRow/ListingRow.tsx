@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { RegistryCard } from "@superset/chats-core";
 import { Button } from "@superset/ui/button";
+import { DevPluginIcons } from "renderer/routes/_authenticated/_dashboard/chats/components/DevPluginIcons";
 import { listingFace } from "renderer/routes/_authenticated/_dashboard/chats/utils/listingFace";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 
@@ -38,6 +39,7 @@ export function ListingRow({
 					</span>
 				</span>
 			</button>
+			<DevPluginIcons plugins={[...card.needs.apps, ...card.needs.optional]} />
 			{ownedChatId ? (
 				<Button
 					variant="secondary"

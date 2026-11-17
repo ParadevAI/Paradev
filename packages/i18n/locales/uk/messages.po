@@ -645,6 +645,10 @@ msgstr "{0}: пристрій не в мережі"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Спробуйте меню Paradev у системному треї > Host Service > Restart."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "Плагіни {0}"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2161,6 +2165,9 @@ msgstr "Додайте людей або команди за ім'ям чи ел
 
 msgid "Add photos or files"
 msgstr "Додати фото або файли"
+
+msgid "Add plugins"
+msgstr "Додати плагіни"
 
 msgid "Add project"
 msgstr "Додати проєкт"
@@ -9451,6 +9458,9 @@ msgstr "Отримати ключ"
 msgid "Get more out of Paradev"
 msgstr "Використай Paradev на повну"
 
+msgid "Get more plugins"
+msgstr "Отримати більше плагінів"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Отримайте сповіщення, коли Paradev стане доступний для Windows."
 
@@ -10719,9 +10729,6 @@ msgstr "Щоб його злити, він має знову стати в че�
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Це займе кілька хвилин. Користуєтеся Conductor Cloud? Почніть із <0>посібника для хмари</0>."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "Він використовує ваші підключені акаунти, зокрема коли його просить хтось інший у групі."
 
 msgid "It will open once the connection is back."
 msgstr "Відкриється, щойно з'єднання відновиться."
@@ -13270,6 +13277,9 @@ msgstr "Жоден файл цього ходу не має тут змін"
 msgid "None selected"
 msgstr "Нічого не вибрано"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "Поки немає. Дайте йому GitHub, Linear, Gmail або інші, щоб він працював з вашими акаунтами."
+
 msgid "None. This is the floor."
 msgstr "Немає. Це нижня межа."
 
@@ -15101,6 +15111,10 @@ msgstr "Маркетплейс плагінів"
 
 msgid "Plugins"
 msgstr "Плагіни"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "Плагіни для {0}"
 
 msgid "Plugins it can use as you"
 msgstr "Плагіни, якими він може користуватися від вашого імені"
@@ -19051,6 +19065,9 @@ msgstr "Почніть із роботи."
 msgid "Start work from anywhere"
 msgstr "Починайте роботу будь-де"
 
+msgid "Start workspaces and coding agents"
+msgstr "Запуск робочих просторів і агентів для коду"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Запускайте робочі простори просто з issues у Linear або GitHub у розділі «Завдання», і в кожному з них уже працюватиме агент."
 
@@ -22276,6 +22293,12 @@ msgstr "Що таке Paradev Enterprise?"
 
 msgid "What is wrong?"
 msgstr "Що не так?"
+
+msgid "What it can use as you."
+msgstr "Що він може використовувати від вашого імені."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "Що він може використовувати від вашого імені. Він використовує ваші акаунти, зокрема коли його просить хтось інший у групі."
 
 msgid "What it does"
 msgstr "Що він робить"

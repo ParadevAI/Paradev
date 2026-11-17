@@ -651,6 +651,10 @@ msgstr "{0}: 기기 오프라인"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Paradev 트레이 메뉴 > Host Service > Restart를 사용해 보세요."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "{0}의 플러그인"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "이름 또는 이메일로 사람이나 팀 추가"
 
 msgid "Add photos or files"
 msgstr "사진 또는 파일 추가"
+
+msgid "Add plugins"
+msgstr "플러그인 추가"
 
 msgid "Add project"
 msgstr "프로젝트 추가"
@@ -9457,6 +9464,9 @@ msgstr "키 받기"
 msgid "Get more out of Paradev"
 msgstr "Paradev 더 잘 활용하기"
 
+msgid "Get more plugins"
+msgstr "플러그인 더 받기"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Paradev를 Windows에서 쓸 수 있게 되면 알려 드립니다."
 
@@ -10725,9 +10735,6 @@ msgstr "머지하려면 다시 대기열에 넣고 체크를 통과해야 합니
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "몇 분이면 됩니다. Conductor Cloud를 사용 중이라면 <0>클라우드 가이드</0>부터 시작하세요."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "그룹에서 다른 사람이 요청할 때도 연결된 내 계정을 사용합니다."
 
 msgid "It will open once the connection is back."
 msgstr "연결이 복구되면 열립니다."
@@ -13276,6 +13283,9 @@ msgstr "이 턴의 파일 중 여기에서 변경된 파일이 없습니다"
 msgid "None selected"
 msgstr "선택 안 됨"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "아직 없습니다. GitHub, Linear, Gmail 등을 주면 내 계정으로 작업할 수 있습니다."
+
 msgid "None. This is the floor."
 msgstr "없음. 여기가 바닥입니다."
 
@@ -15107,6 +15117,10 @@ msgstr "플러그인 마켓플레이스"
 
 msgid "Plugins"
 msgstr "플러그인"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "{0}용 플러그인"
 
 msgid "Plugins it can use as you"
 msgstr "나를 대신해 사용할 수 있는 플러그인"
@@ -19057,6 +19071,9 @@ msgstr "할 일에서 시작하세요."
 msgid "Start work from anywhere"
 msgstr "어디서든 작업 시작"
 
+msgid "Start workspaces and coding agents"
+msgstr "워크스페이스와 코딩 에이전트 시작"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "작업 보기에서 Linear 또는 GitHub 이슈로 바로 워크스페이스를 시작하면, 각 워크스페이스에서 에이전트가 이미 작업하고 있습니다."
 
@@ -22282,6 +22299,12 @@ msgstr "Paradev Enterprise란 무엇인가요?"
 
 msgid "What is wrong?"
 msgstr "무엇이 문제인가요?"
+
+msgid "What it can use as you."
+msgstr "나를 대신해 사용할 수 있는 것."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "나를 대신해 사용할 수 있는 것. 그룹에서 다른 사람이 요청할 때도 내 계정을 사용합니다."
 
 msgid "What it does"
 msgstr "하는 일"

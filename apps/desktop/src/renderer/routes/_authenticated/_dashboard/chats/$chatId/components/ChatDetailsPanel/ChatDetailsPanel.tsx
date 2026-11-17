@@ -11,6 +11,8 @@ import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
 import { ChatFace } from "../../../components/ChatFace";
+import { DevPluginIcons } from "../../../components/DevPluginIcons";
+import { DevPluginsDialog } from "../../../components/DevPluginsDialog";
 import { useChats } from "../../../hooks/useChats";
 import { EditDevDialog } from "./components/EditDevDialog";
 import { GroupSettings } from "./components/GroupSettings";
@@ -41,9 +43,11 @@ export function ChatDetailsPanel({
 	const organization = useOrganizationPeople();
 	const [addingId, setAddingId] = useState<string | null>(null);
 	const [editingId, setEditingId] = useState<string | null>(null);
+	const [pluginsOfId, setPluginsOfId] = useState<string | null>(null);
 	const chats = useChats();
 	const navigate = useNavigate();
 	const editing = editingId ? state.devs[editingId] : undefined;
+	const pluginsOf = pluginsOfId ? state.devs[pluginsOfId] : undefined;
 	const isGroup = chat.kind === "group";
 	const addableDevs = isGroup
 		? myDevs(state).filter((dev) => !chat.devIds.includes(dev.id))
@@ -179,6 +183,49 @@ export function ChatDetailsPanel({
 						</Button>
 					)}
 				</section>
+				{agents
+					.filter((agent) => agent.plugins !== undefined)
+					.map((agent) => {
+						const used = [
+							...(agent.paradevAccess ? ["paradev"] : []),
+							...(agent.plugins ?? []),
+						];
+						return (
+							<section key={agent.id} className="flex flex-col gap-1">
+								<h3 className="px-1 pb-1 font-medium text-muted-foreground text-xs">
+									{isGroup ? (
+										<Trans>{agent.name}'s plugins</Trans>
+									) : (
+										<Trans>Plugins</Trans>
+									)}
+								</h3>
+								<p className="px-1 pb-1 text-muted-foreground text-xs">
+									{used.length === 0 ? (
+										<Trans>
+											None yet. Give it GitHub, Linear, Gmail or others to work
+											with your accounts.
+										</Trans>
+									) : (
+										<Trans>What it can use as you.</Trans>
+									)}
+								</p>
+								<div className="flex items-center gap-2 px-1">
+									<DevPluginIcons plugins={used} />
+									<Button
+										size="xs"
+										variant="outline"
+										onClick={() => setPluginsOfId(agent.id)}
+									>
+										{used.length === 0 ? (
+											<Trans>Add plugins</Trans>
+										) : (
+											<Trans>Manage</Trans>
+										)}
+									</Button>
+								</div>
+							</section>
+						);
+					})}
 				{addableDevs.length > 0 && (
 					<section className="flex flex-col gap-1">
 						<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
@@ -287,6 +334,16 @@ export function ChatDetailsPanel({
 					/>
 				)}
 			</div>
+			{pluginsOf && chats && (
+				<DevPluginsDialog
+					key={pluginsOf.id}
+					dev={pluginsOf}
+					onOpenChange={(open) => {
+						if (!open) setPluginsOfId(null);
+					}}
+					onSave={(patch) => chats.actions.updateDev(pluginsOf.id, patch)}
+				/>
+			)}
 			{editing && chats && (
 				<EditDevDialog
 					key={editing.id}

@@ -651,6 +651,10 @@ msgstr "{0}: dispositivo offline"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Prova il menu della barra di stato di Paradev > Servizio host > Riavvia."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "Plugin di {0}"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "Aggiungi persone o team per nome o email"
 
 msgid "Add photos or files"
 msgstr "Aggiungi foto o file"
+
+msgid "Add plugins"
+msgstr "Aggiungi plugin"
 
 msgid "Add project"
 msgstr "Aggiungi progetto"
@@ -9457,6 +9464,9 @@ msgstr "Ottieni la chiave"
 msgid "Get more out of Paradev"
 msgstr "Ottieni di più da Paradev"
 
+msgid "Get more plugins"
+msgstr "Ottieni altri plugin"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Ricevi una notifica quando Paradev sarà disponibile su Windows."
 
@@ -10725,9 +10735,6 @@ msgstr "Per essere unita deve rientrare in coda e superare i controlli."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Bastano pochi minuti. Usi Conductor Cloud? Inizia dalla <0>guida al cloud</0>."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "Usa i tuoi account collegati, anche quando glielo chiede qualcun altro in un gruppo."
 
 msgid "It will open once the connection is back."
 msgstr "Si aprirà al ritorno della connessione."
@@ -13276,6 +13283,9 @@ msgstr "Nessun file di questo turno ha modifiche qui"
 msgid "None selected"
 msgstr "Nessuna selezione"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "Ancora nessuno. Dagli GitHub, Linear, Gmail o altri per lavorare con i tuoi account."
+
 msgid "None. This is the floor."
 msgstr "Nessuno. Questo è il punto di partenza."
 
@@ -15107,6 +15117,10 @@ msgstr "Marketplace dei plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "Plugin per {0}"
 
 msgid "Plugins it can use as you"
 msgstr "Plugin che può usare a tuo nome"
@@ -19057,6 +19071,9 @@ msgstr "Parti dal lavoro."
 msgid "Start work from anywhere"
 msgstr "Inizia a lavorare ovunque"
 
+msgid "Start workspaces and coding agents"
+msgstr "Avviare workspace e agenti di programmazione"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Avvia workspace direttamente dalle issue di Linear o GitHub nella vista Task, con un agente già al lavoro su ciascuna."
 
@@ -22282,6 +22299,12 @@ msgstr "Cos'è Paradev Enterprise?"
 
 msgid "What is wrong?"
 msgstr "Qual è il problema?"
+
+msgid "What it can use as you."
+msgstr "Cosa può usare a tuo nome."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "Cosa può usare a tuo nome. Usa i tuoi account, anche quando glielo chiede qualcun altro in un gruppo."
 
 msgid "What it does"
 msgstr "Cosa fa"

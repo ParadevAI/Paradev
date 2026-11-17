@@ -651,6 +651,10 @@ msgstr "{0}: perangkat offline"
 msgid "{0}. Try the Paradev tray menu > Host Service > Restart."
 msgstr "{0}. Coba menu tray Paradev > Host Service > Restart."
 
+#. placeholder {0}: agent.name
+msgid "{0}'s plugins"
+msgstr "Plugin {0}"
+
 #. placeholder {0}: String(met)
 #. placeholder {1}: String(gaps.length)
 msgid "{0}/{1}"
@@ -2167,6 +2171,9 @@ msgstr "Tambah orang atau tim berdasarkan nama atau email"
 
 msgid "Add photos or files"
 msgstr "Tambah foto atau file"
+
+msgid "Add plugins"
+msgstr "Tambahkan plugin"
 
 msgid "Add project"
 msgstr "Tambah proyek"
@@ -9457,6 +9464,9 @@ msgstr "Dapatkan kunci"
 msgid "Get more out of Paradev"
 msgstr "Manfaatkan Paradev lebih jauh"
 
+msgid "Get more plugins"
+msgstr "Dapatkan plugin lain"
+
 msgid "Get notified when Paradev is available on Windows."
 msgstr "Dapatkan pemberitahuan saat Paradev tersedia di Windows."
 
@@ -10725,9 +10735,6 @@ msgstr "Agar bisa di-merge, ia harus masuk lagi dan lolos pemeriksaannya."
 
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Hanya butuh beberapa menit. Memakai Conductor Cloud? Mulai dengan <0>panduan cloud</0>."
-
-msgid "It uses your connected accounts, also when someone else asks it in a group."
-msgstr "Ia memakai akun terhubung Anda, juga saat orang lain memintanya di grup."
 
 msgid "It will open once the connection is back."
 msgstr "Akan terbuka saat koneksi kembali."
@@ -13276,6 +13283,9 @@ msgstr "Tidak ada file giliran ini yang berubah di sini"
 msgid "None selected"
 msgstr "Tidak ada yang dipilih"
 
+msgid "None yet. Give it GitHub, Linear, Gmail or others to work with your accounts."
+msgstr "Belum ada. Beri ia GitHub, Linear, Gmail, atau lainnya agar dapat bekerja dengan akun Anda."
+
 msgid "None. This is the floor."
 msgstr "Tidak ada. Ini adalah lantai dasarnya."
 
@@ -15107,6 +15117,10 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+#. placeholder {0}: dev.name
+msgid "Plugins for {0}"
+msgstr "Plugin untuk {0}"
 
 msgid "Plugins it can use as you"
 msgstr "Plugin yang dapat ia gunakan atas nama Anda"
@@ -19057,6 +19071,9 @@ msgstr "Mulai dari pekerjaannya."
 msgid "Start work from anywhere"
 msgstr "Mulai bekerja dari mana saja"
 
+msgid "Start workspaces and coding agents"
+msgstr "Memulai workspace dan agen coding"
+
 msgid "Start workspaces straight from Linear or GitHub issues in the Tasks view, with an agent already working on each one."
 msgstr "Mulai workspace langsung dari issue Linear atau GitHub di tampilan Tugas, dengan agen yang sudah mengerjakan masing-masing."
 
@@ -22282,6 +22299,12 @@ msgstr "Apa itu Paradev Enterprise?"
 
 msgid "What is wrong?"
 msgstr "Apa masalahnya?"
+
+msgid "What it can use as you."
+msgstr "Yang dapat ia gunakan atas nama Anda."
+
+msgid "What it can use as you. It uses your accounts, also when someone else asks it in a group."
+msgstr "Yang dapat ia gunakan atas nama Anda. Ia memakai akun Anda, juga saat orang lain memintanya di grup."
 
 msgid "What it does"
 msgstr "Yang dilakukannya"

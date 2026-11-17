@@ -20,13 +20,15 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { LuChevronRight } from "react-icons/lu";
+import { LuChevronRight, LuPlug } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useNow } from "renderer/hooks/useNow";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { ChatFace } from "../../../components/ChatFace";
+import { DevPluginIcons } from "../../../components/DevPluginIcons";
+import { DevPluginsDialog } from "../../../components/DevPluginsDialog";
 import { useChats } from "../../../hooks/useChats";
 import {
 	type Preview,
@@ -57,6 +59,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 		string | null
 	>(null);
 	const [previewedPage, setPreviewedPage] = useState<string | null>(null);
+	const [showsPlugins, setShowsPlugins] = useState(false);
 	const preview = useMemo<Preview>(
 		() => ({
 			openWorkspace: (workspaceId) => {
@@ -230,6 +233,11 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			? devs.find((dev) => dev.kind === "group")?.name
 			: undefined;
 	const working = chatTurns(chats.turns, chatId, devs);
+	const direct = chat.kind === "direct" ? directDev(state, chat) : undefined;
+	const ownDev = direct?.plugins !== undefined ? direct : undefined;
+	const ownDevPlugins = ownDev
+		? [...(ownDev.paradevAccess ? ["paradev"] : []), ...(ownDev.plugins ?? [])]
+		: [];
 	const detailedMessage = detailsOf
 		? messagesOf(state, chatId).find((message) => message.id === detailsOf)
 		: undefined;
@@ -257,7 +265,22 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						</span>
 						<LuChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
 					</button>
-					<div className="drag h-full flex-1 basis-0" />
+					<div className="drag flex h-full flex-1 basis-0 items-center justify-end pr-2">
+						{ownDev && (
+							<button
+								type="button"
+								onClick={() => setShowsPlugins(true)}
+								className="no-drag flex h-8 items-center gap-2 rounded-lg px-2 text-muted-foreground text-sm hover:bg-fill-hover hover:text-foreground"
+							>
+								<LuPlug className="size-3.5" />
+								{ownDevPlugins.length === 0 ? (
+									<Trans>Add plugins</Trans>
+								) : (
+									<DevPluginIcons plugins={ownDevPlugins} />
+								)}
+							</button>
+						)}
+					</div>
 				</PageHeader>
 				<WorkspacePreviewProvider value={preview}>
 					<ChatThread
@@ -350,6 +373,13 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					key={previewedWorkspaceId}
 					workspaceId={previewedWorkspaceId}
 					onClose={() => setPreviewedWorkspaceId(null)}
+				/>
+			)}
+			{showsPlugins && ownDev && (
+				<DevPluginsDialog
+					dev={ownDev}
+					onOpenChange={setShowsPlugins}
+					onSave={(patch) => chats.actions.updateDev(ownDev.id, patch)}
 				/>
 			)}
 			{previewedPage && (

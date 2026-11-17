@@ -1,6 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import type { RegistryCard } from "@superset/chats-core";
 import { Button } from "@superset/ui/button";
+import { DevPluginIcons } from "renderer/routes/_authenticated/_dashboard/chats/components/DevPluginIcons";
 import { listingFace } from "renderer/routes/_authenticated/_dashboard/chats/utils/listingFace";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 
@@ -45,6 +46,10 @@ export function FeaturedListing({
 				<p className="mt-2 max-w-[520px] text-[15px] text-muted-foreground leading-[1.45]">
 					{card.summary}
 				</p>
+				<DevPluginIcons
+					plugins={[...card.needs.apps, ...card.needs.optional]}
+					className="mt-3"
+				/>
 				{ownedChatId ? (
 					<Button className="mt-4 px-4" onClick={() => onOpenChat(ownedChatId)}>
 						<Trans>Open</Trans>
