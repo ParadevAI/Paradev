@@ -32,7 +32,7 @@ import {
 export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 
 const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
-const OPENCODE_PLUGIN_VERSION = "v11";
+const OPENCODE_PLUGIN_VERSION = "v12";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
 const OPENCODE_TUI_PLUGIN_SIGNATURE = "// Superset opencode tui plugin";
 export const OPENCODE_TUI_PLUGIN_MARKER = `${OPENCODE_TUI_PLUGIN_SIGNATURE} v2`;
