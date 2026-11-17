@@ -79,6 +79,33 @@ export class SandboxUnavailableError extends Error {
 	}
 }
 
+/** The box refused to boot because the drive its identity names was not mounted. */
+export class SandboxDriveMissingError extends SandboxUnavailableError {
+	constructor(
+		providerSandboxId: string,
+		readonly driveName: string,
+	) {
+		super(providerSandboxId, new Error(`drive ${driveName} not mounted`));
+		this.name = "SandboxDriveMissingError";
+		this.message = `Sandbox ${providerSandboxId} refused to boot: its drive ${driveName} is not mounted`;
+	}
+}
+
+/** The boot log keeps every boot of the box; only the last one counts. */
+export function bootRefusedForMissingDrive(bootLog: string): boolean {
+	const lastBoot = bootLog.lastIndexOf(" boot.start ");
+	return /^\d+ drive\.missing /m.test(
+		lastBoot < 0 ? bootLog : bootLog.slice(lastBoot),
+	);
+}
+
+async function refusedForMissingDrive(sandbox: Sandbox): Promise<boolean> {
+	const log = await sandbox
+		.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
+		.catch(() => null);
+	return log !== null && bootRefusedForMissingDrive(log.toString("utf8"));
+}
+
 function isUnavailable(error: unknown): boolean {
 	return (
 		error instanceof APIError &&
@@ -614,7 +641,18 @@ export async function wakeSandbox(args: {
 					hostTarget,
 					claim: args.claim,
 				}),
-		);
+		).catch(async (error) => {
+			const driveName = args.claim.identity.SUPERSET_SANDBOX_DRIVE;
+			if (
+				error instanceof SandboxNotReadyError &&
+				driveName &&
+				(await refusedForMissingDrive(sandbox))
+			) {
+				await sandbox.stop().catch(() => {});
+				throw new SandboxDriveMissingError(args.providerSandboxId, driveName);
+			}
+			throw error;
+		});
 		return {
 			hostTarget,
 			booted: !wasRunning,

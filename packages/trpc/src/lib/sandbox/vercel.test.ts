@@ -12,6 +12,7 @@ import { Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
+	bootRefusedForMissingDrive,
 	composeMounts,
 	deleteSandboxAndDrive,
 	findSandboxSession,
@@ -271,6 +272,17 @@ describe("composeMounts", () => {
 		const b = { "/a": { drive: "b", mode: "snapshot" as const } };
 		expect(composeMounts(a, undefined, b)).toEqual(b);
 		expect(composeMounts(undefined, {})).toBeUndefined();
+	});
+});
+
+describe("bootRefusedForMissingDrive", () => {
+	test("reads only the last boot of the log", () => {
+		const refused =
+			"1 boot.start pid=1 bundle=abc\n2 run.cleared\n3 drive.missing drive-1 is not mounted at /mnt/superset-drive\n4 boot.refused x\n";
+		const recovered = `${refused}5 boot.start pid=2 bundle=abc\n6 drive.layout ms=11\n`;
+		expect(bootRefusedForMissingDrive(refused)).toBe(true);
+		expect(bootRefusedForMissingDrive(recovered)).toBe(false);
+		expect(bootRefusedForMissingDrive("")).toBe(false);
 	});
 });
 

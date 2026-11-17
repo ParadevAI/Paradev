@@ -1,5 +1,8 @@
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
+import {
+	SANDBOX_PATHS,
+	type SandboxIdentity,
+} from "@superset/shared/sandbox/contract";
 import {
 	APIError,
 	Drive,
@@ -27,6 +30,12 @@ export function workspaceDriveNameToClaim(args: {
 	if (args.existing) return args.existing;
 	if (!args.goldenDriveName) return null;
 	return workspaceDriveNameFor(args.providerSandboxId);
+}
+
+export function workspaceDriveIdentity(
+	driveName: string | null | undefined,
+): Pick<SandboxIdentity, "SUPERSET_SANDBOX_DRIVE"> {
+	return driveName ? { SUPERSET_SANDBOX_DRIVE: driveName } : {};
 }
 
 export function goldenDriveNameFor(goldenName: string): string {

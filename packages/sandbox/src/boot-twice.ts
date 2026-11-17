@@ -24,6 +24,7 @@ import {
 	SANDBOX_DRIVE_STORES,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
+	type SandboxIdentity,
 } from "@superset/shared/sandbox/contract";
 import { BUNDLE_SRC, PACKAGE_ROOT } from "./build";
 import { discardingSteps, loadAssets, loadSteps } from "./manifest";
@@ -109,7 +110,7 @@ function expect(label: string, ok: boolean, detail = ""): void {
 	if (!ok) failures.push(label);
 }
 
-const identity = renderSandboxConf({
+const identityFields: SandboxIdentity = {
 	SUPERSET_SANDBOX_CONTRACT: "1",
 	SUPERSET_BUNDLE_SHA: bundleSha,
 	SUPERSET_API_URL: "https://api.example.invalid",
@@ -138,7 +139,8 @@ const identity = renderSandboxConf({
 			enabled: true,
 		},
 	]),
-});
+};
+const identity = renderSandboxConf(identityFields);
 
 /**
  * Drive mode, with a tmpfs standing in for the Vercel drive at its mount
@@ -166,7 +168,10 @@ function drivePass(): void {
 		"infinity",
 	]);
 	docker(["exec", "-i", on, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
-		stdin: identity,
+		stdin: renderSandboxConf({
+			...identityFields,
+			SUPERSET_SANDBOX_DRIVE: DRIVE_NAME,
+		}),
 	});
 	const bootDrive = () => {
 		bootAsUser(on);
@@ -278,10 +283,12 @@ function drivePass(): void {
 	);
 
 	// A new session: no processes and no bind mounts survive; the drive does.
-	exec(
-		`pkill -u ubuntu -TERM || true; pkill -x superset-memgua || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}; for m in $(findmnt -rn -o TARGET | grep -E '^(${SANDBOX_PATHS.workspace}|${SANDBOX_PATHS.home}/)' | sort -r); do umount "$m"; done; : > ${SANDBOX_PATHS.bootLog}`,
-		{ check: false, on },
-	);
+	const endSession = () =>
+		exec(
+			`pkill -u ubuntu -TERM || true; pkill -x superset-memgua || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}; for m in $(findmnt -rn -o TARGET | grep -E '^(${SANDBOX_PATHS.workspace}|${SANDBOX_PATHS.home}/)' | sort -r); do umount -l "$m"; done; : > ${SANDBOX_PATHS.bootLog}`,
+			{ check: false, on },
+		);
+	endSession();
 	bootDrive();
 	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
 	expect(
@@ -308,6 +315,35 @@ function drivePass(): void {
 		log2.match(/checkout\..*/)?.[0],
 	);
 	console.log(`\nboot log (drive, second boot):\n${log2}`);
+
+	// A session whose drive did not mount, while sandbox.conf still names one.
+	endSession();
+	exec(`umount ${drive}`, { on });
+	const refused = bootAsUser(on);
+	const log3 = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive missing: boot exits non-zero",
+		/exit=[1-9]/.test(refused),
+		refused.slice(-200).replaceAll("\n", " | "),
+	);
+	expect(
+		"drive missing: stamped drive.missing",
+		/drive\.missing /.test(log3),
+		log3.match(/drive\.missing.*/)?.[0],
+	);
+	expect(
+		"drive missing: no host-service, no checkout",
+		!/host\.exec|checkout\.start|steps\.start/.test(log3) &&
+			exec(`ls ${SANDBOX_PATHS.run}`, { check: false, on }).trim() === "",
+		log3,
+	);
+	expect(
+		"drive missing: /workspace is not bound",
+		exec(`mountpoint -q ${SANDBOX_PATHS.workspace} && echo bound`, {
+			check: false,
+			on,
+		}).trim() === "",
+	);
 }
 
 docker(["rm", "-f", NAME, DRIVE_NAME], { check: false });

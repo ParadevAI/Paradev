@@ -30,6 +30,7 @@ import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentToolsDriveFor } from "./agent-tools";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import { workspaceDriveIdentity, workspaceDriveNameToClaim } from "./drives";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -139,6 +140,13 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
+		...workspaceDriveIdentity(
+			workspaceDriveNameToClaim({
+				existing: args.row.driveName,
+				goldenDriveName: environment.goldenDriveName,
+				providerSandboxId: args.row.providerSandboxId,
+			}),
+		),
 		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {

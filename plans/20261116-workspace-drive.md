@@ -111,6 +111,9 @@ Documented by Vercel or the SDK, not measured:
 - [x] (2026-11-17) Milestone 5: a wake waits for the drive to detach (2 minutes, then fails);
   every delete stops the box and waits before it deletes the sandbox and the drive; a golden
   drive is deleted once no live environment names it.
+- [x] (2026-11-17) Rebased on main (#9861, #9862). The boot refuses a missing drive. The
+  `REAL_SANDBOX_DRIVE=1` pass runs whatever the first box's result, names every drive
+  expectation, and deletes what it made unless a drive expectation failed.
 - [ ] Milestone 6: run the Sandbox workflow's `real-sandbox` dispatch with `real_sandbox_drive`;
   then a release with the flag on for the internal organization; compare wake spans and snapshot
   sizes for a week; then other organizations.
@@ -157,7 +160,13 @@ Documented by Vercel or the SDK, not measured:
 - Decision: promote carries a source's drive whatever the flag says. Rationale: a source in drive
   mode has no `/workspace` on its root disk, so a golden without a fork of its drive would be
   empty. The flag still gates the only place that starts drive mode, the release. A human may
-  prefer promote to refuse when the flag is off. Date/Author: 2026-11-17, agent.
+  prefer promote to refuse when the flag is off. Date/Author: 2026-11-17, agent; kept as coded
+  by the coordinator on 2026-11-17.
+- Decision: the identity file names the workspace's drive (`SUPERSET_SANDBOX_DRIVE`), and
+  `superset-boot` refuses with `drive.missing` when it is set and the drive is not a mount point.
+  Rationale: a failed mount must never present the root disk's empty `/workspace` as the user's
+  work. A wake that finds the refusal in the boot log fails the workspace instead of answering
+  "still starting". Date/Author: 2026-11-17, coordinator.
 - Decision: the drive is mounted once, at `/mnt/superset-drive` (`SANDBOX_PATHS.drive`), and
   `superset-boot` bind-mounts subdirectories of it. Rationale: one read-write mount per drive, at
   most 4 mounts per sandbox, and `/workspace` itself may be the primary checkout. Date/Author:
@@ -352,9 +361,11 @@ another region.
 - The drive is still attached on a wake: the wake waits 2 minutes, then fails with a clear error.
 - Mount update fails on a wake: the wake throws.
 - A bind fails at boot: the boot refuses, so nothing starts on the root disk's empty `/workspace`.
-- **Open:** a box whose row has a drive but whose drive is not mounted at boot boots on the root
-  disk's `/workspace`. The identity file does not say the workspace has a drive, so the boot
-  cannot refuse. Follow-up: a `SUPERSET_SANDBOX_DRIVE` identity key and a refusal.
+- The drive is not mounted at boot: the identity file names it (`SUPERSET_SANDBOX_DRIVE`), so
+  `superset-boot` stamps `drive.missing` and exits non-zero before the bundle, host-service and
+  the checkout. A provision then fails on host-service never answering; a wake reads the boot
+  log, stops the box and fails with `SandboxDriveMissingError`, which marks the workspace
+  `failed`. boot-twice covers the refusal.
 - Drive delete fails: logged, retried by the reap.
 
 
@@ -364,7 +375,7 @@ another region.
 - Migrating existing workspaces.
 - Customer environments' checkpoints through `superset environments replace` beyond what promote
   already covers.
-- A drive variable in `Asleep.tla`, and the identity key above.
+- A drive variable in `Asleep.tla`.
 - A sweep of drives named `drive-ws-*` whose sandbox no longer exists.
 
 

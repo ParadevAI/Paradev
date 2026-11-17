@@ -210,6 +210,7 @@ const {
 	goldenDriveNameFor,
 	vercelDrives,
 	waitForDriveDetached,
+	workspaceDriveIdentity,
 	workspaceDriveMounts,
 	workspaceDriveNameFor,
 	workspaceDrivesEnabled,
@@ -228,7 +229,11 @@ const setupScript = readFileSync(
 );
 const setupHook = [setupScript];
 
-function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
+function identityFor(
+	workspaceId: string,
+	sourceRef: string,
+	driveName: string | null,
+): SandboxIdentity {
 	return {
 		SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
 		SUPERSET_BUNDLE_SHA: bundle.sha256,
@@ -240,6 +245,7 @@ function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
 		]),
 		SUPERSET_SANDBOX_IMAGE_TAG: sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
+		...workspaceDriveIdentity(driveName),
 	};
 }
 
@@ -271,7 +277,7 @@ for (;;) {
 				region: REGION,
 			},
 			claim: {
-				identity: identityFor(goldenWorkspaceId, goldenImage),
+				identity: identityFor(goldenWorkspaceId, goldenImage, goldenDrive),
 				hostSecret: goldenSecret,
 				managedEnv: {},
 				networkPolicy: "allow-all",
@@ -295,7 +301,7 @@ for (;;) {
 await wakeSandbox({
 	providerSandboxId: golden,
 	claim: {
-		identity: identityFor(goldenWorkspaceId, goldenImage),
+		identity: identityFor(goldenWorkspaceId, goldenImage, goldenDrive),
 		hostSecret: goldenSecret,
 		managedEnv: {},
 		networkPolicy: "allow-all",
@@ -456,14 +462,14 @@ const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
 	githubToken: null,
 	gitAuthor: { name: "Superset release", email: "noreply@superset.sh" },
 });
+const probeDrive = goldenDrive ? workspaceDriveNameFor(probe) : null;
 const probeClaim = {
-	identity: identityFor(probeWorkspaceId, golden),
+	identity: identityFor(probeWorkspaceId, golden, probeDrive),
 	hostSecret: probeSecret,
 	managedEnv,
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
 };
-const probeDrive = goldenDrive ? workspaceDriveNameFor(probe) : null;
 const probeMounts = workspaceDriveMounts(probeDrive);
 if (probeDrive) {
 	await forkWorkspaceDrive({

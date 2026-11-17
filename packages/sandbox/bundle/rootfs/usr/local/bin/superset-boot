@@ -6,7 +6,8 @@
 #
 #   clear /run/superset            facts about a boot that is over
 #   read the contract and identity /etc/superset/{contract.sh,sandbox.conf}
-#   lay out the workspace drive    only when the control plane mounted one
+#   lay out the workspace drive    only when the control plane mounted one;
+#                                  refuse when sandbox.conf names a drive that is not mounted
 #   install the pinned bundle      only when its hash differs from current
 #   apply-rootfs, and the steps    each a hash compare per file and step;
 #   marked beforeHost              the only steps host-service waits for
@@ -77,7 +78,12 @@ bind_into() {
 }
 layout_drive() {
 	local drive="${SUPERSET_DRIVE_DIR:-}" started sub
-	[ -n "$drive" ] && mountpoint -q "$drive" || return 0
+	if [ -z "$drive" ] || ! mountpoint -q "$drive"; then
+		# Without its drive the box would serve the root disk's empty /workspace as the user's work.
+		[ -z "${SUPERSET_SANDBOX_DRIVE:-}" ] && return 0
+		stamp "drive.missing ${SUPERSET_SANDBOX_DRIVE} is not mounted at ${drive:-the drive path}"
+		refuse "the workspace drive ${SUPERSET_SANDBOX_DRIVE} is not mounted"
+	fi
 	started="$(date +%s%3N)"
 	user_path "$drive" workspace
 	user_path "$drive" home

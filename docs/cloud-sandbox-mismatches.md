@@ -728,9 +728,15 @@ about:
 
 A drive has no discard either: deleting a file on it does not lower its
 billed size, so memguard reuses fixed swapfile names on it.
-**Open:** a box whose row has a drive but whose drive did not mount boots on
-the root disk's empty `/workspace`; the boot cannot tell, because the
-identity file does not say the workspace has a drive.
+A drive that did not mount leaves the root disk's empty `/workspace` in its
+place, which would look like the user's work is gone. So the identity file
+names the drive (`SUPERSET_SANDBOX_DRIVE`), and `superset-boot` refuses to
+continue when it is set and `/mnt/superset-drive` is not a mount point: it
+stamps `drive.missing` and exits non-zero before the bundle, host-service and
+the checkout. host-service never answers, so a provision fails; a wake reads
+the boot log and fails with `SandboxDriveMissingError`, which marks the
+workspace failed. A box on an image whose runner predates the guard gets it
+after the reexec into the bundle's runner, still before host-service.
 
 **The control plane's command runs from the image's workdir, which the
 checkout replaces.** The first boot cloned `/workspace` by deleting and

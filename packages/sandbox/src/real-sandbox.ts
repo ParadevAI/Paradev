@@ -10,10 +10,13 @@
  * Publishes the bundle first so the box can fetch it if the image is older.
  * Leaves the sandbox up for inspection on failure; deletes it on success.
  *
- * With REAL_SANDBOX_DRIVE=1, a second box runs in drive mode: a throwaway
- * golden drive, the box on a fork of it, the layout, the stores, swap and
- * Docker on the drive, then a stop and a wake. Everything it made is
- * deleted, pass or fail: the box stopped first, each drive once detached.
+ * With REAL_SANDBOX_DRIVE=1, a second box runs in drive mode, whatever the
+ * first box's result: a throwaway golden drive, the box on a fork of it, the
+ * layout, the stores, swap and Docker on the drive, then a stop and a wake.
+ * The first box is then always deleted. The drive box and its drive are
+ * deleted too, unless a drive expectation failed: then the box is stopped
+ * and kept with its drive. Every delete stops the box first and waits for
+ * the drive to detach.
  */
 
 import { randomUUID } from "node:crypto";
@@ -55,8 +58,13 @@ const { buildBundle, publishBundle } = await import("./build");
 const bundle = buildBundle();
 await publishBundle(bundle, { dry: false });
 
-const { deleteSandbox, deleteSandboxAndDrive, provisionSandbox, wakeSandbox } =
-	await import("@superset/trpc/lib/sandbox/vercel");
+const {
+	deleteSandbox,
+	deleteSandboxAndDrive,
+	provisionSandbox,
+	stopSandbox,
+	wakeSandbox,
+} = await import("@superset/trpc/lib/sandbox/vercel");
 const { sandboxHostSecretFor } = await import(
 	"@superset/trpc/lib/sandbox/access"
 );
@@ -98,6 +106,7 @@ const claim = {
 async function provisionFromImage(
 	box: string,
 	mounts?: Parameters<typeof provisionSandbox>[0]["mounts"],
+	boxClaim: Parameters<typeof provisionSandbox>[0]["claim"] = claim,
 ): Promise<void> {
 	const deadline = Date.now() + 20 * 60_000;
 	for (;;) {
@@ -109,7 +118,7 @@ async function provisionFromImage(
 					sourceRef: SANDBOX_IMAGE_NAME,
 					region: DEFAULT_SANDBOX_REGION,
 				},
-				claim,
+				claim: boxClaim,
 				mounts,
 			});
 			return;
@@ -127,44 +136,53 @@ async function provisionFromImage(
 log(
 	`provisioning ${name} from ${SANDBOX_IMAGE_NAME} on bundle ${bundle.sha256.slice(0, 12)}`,
 );
-await provisionFromImage(name);
-const woken = await wakeSandbox({ providerSandboxId: name, claim });
-log(
-	`host-service answered at ${woken.hostTarget} (${Date.now() - started} ms since start)`,
-);
-let failed = await probeBox({
-	name,
-	credentials,
-	hostSecret,
-	bundleSha: bundle.sha256,
-	branch: workingBranch,
-	primaryPath: ".",
-	gate: process.env.SANDBOX_GATE_ORIGIN
-		? { workspaceId, userId: randomUUID() }
-		: null,
-	log,
-});
-{
+const withDrivePass = process.env.REAL_SANDBOX_DRIVE === "1";
+let failed = 0;
+try {
+	await provisionFromImage(name);
+	const woken = await wakeSandbox({ providerSandboxId: name, claim });
+	log(
+		`host-service answered at ${woken.hostTarget} (${Date.now() - started} ms since start)`,
+	);
+	failed += await probeBox({
+		name,
+		credentials,
+		hostSecret,
+		bundleSha: bundle.sha256,
+		branch: workingBranch,
+		primaryPath: ".",
+		gate: process.env.SANDBOX_GATE_ORIGIN
+			? { workspaceId, userId: randomUUID() }
+			: null,
+		log,
+	});
 	const box = await Sandbox.get({ ...credentials, name });
 	await box.stop();
 	const wakeStarted = Date.now();
 	await wakeSandbox({ providerSandboxId: name, claim });
 	log(`woken again in ${Date.now() - wakeStarted} ms`);
 	failed += await checkWakeLog({ name, credentials, log });
+} catch (error) {
+	console.error(
+		`check of ${name} stopped early: ${String(error).slice(0, 300)}`,
+	);
+	failed++;
 }
-if (failed) {
+if (failed && !withDrivePass) {
 	console.error(`${failed} check(s) failed; ${name} left for inspection`);
 	process.exit(1);
 }
-await deleteSandbox(name);
-log(`${name} deleted`);
+await stopSandbox(name)
+	.then(() => deleteSandbox(name))
+	.then(() => log(`${name} deleted`))
+	.catch((error) => log(`could not delete ${name}: ${error}`));
 
-if (process.env.REAL_SANDBOX_DRIVE === "1") {
-	const driveFailures = await drivePass();
-	if (driveFailures) {
-		console.error(`${driveFailures} drive check(s) failed`);
-		process.exit(1);
-	}
+const driveFailures = withDrivePass ? await drivePass() : 0;
+if (failed || driveFailures) {
+	console.error(
+		`${failed} check(s) and ${driveFailures} drive check(s) failed`,
+	);
+	process.exit(1);
 }
 log("all checks passed");
 process.exit(0);
@@ -174,6 +192,7 @@ async function drivePass(): Promise<number> {
 		forkWorkspaceDrive,
 		vercelDrives,
 		waitForDriveDetached,
+		workspaceDriveIdentity,
 		workspaceDriveMounts,
 		workspaceDriveNameFor,
 	} = await import("@superset/trpc/lib/sandbox/drives");
@@ -183,9 +202,31 @@ async function drivePass(): Promise<number> {
 	const box = `ws-real-drive-${suffix}`;
 	const boxDrive = workspaceDriveNameFor(box);
 	const mounts = workspaceDriveMounts(boxDrive);
+	const driveClaim = {
+		...claim,
+		identity: { ...identity, ...workspaceDriveIdentity(boxDrive) },
+	};
 	const drive = SANDBOX_PATHS.drive;
+	const expectations = [
+		"sandbox.conf names the drive",
+		"layout stamped",
+		"host-service ready",
+		"/workspace is a bind mount of the drive",
+		"the checkout landed on the drive",
+		"memguard swaps on the drive",
+		"docker info reports the drive data-root",
+		"the checkout is still there after a wake",
+		"the layout was redone on the wake",
+		"/workspace is a mount point again",
+	] as const;
+	const reported = new Set<string>();
 	let failures = 0;
-	const check = (label: string, ok: boolean, detail = "") => {
+	const check = (
+		label: (typeof expectations)[number],
+		ok: boolean,
+		detail = "",
+	) => {
+		reported.add(label);
 		log(
 			`${ok ? "ok  " : "FAIL"} drive: ${label}${detail ? `: ${detail}` : ""}`,
 		);
@@ -206,6 +247,7 @@ async function drivePass(): Promise<number> {
 				`grep -c 'drive\\.layout ms=' ${SANDBOX_PATHS.bootLog} || true`,
 			),
 		);
+	let stoppedAt = "";
 	try {
 		await drives.create(goldenDrive, DEFAULT_SANDBOX_REGION);
 		await forkWorkspaceDrive({
@@ -215,14 +257,20 @@ async function drivePass(): Promise<number> {
 			drives,
 		});
 		log(`drive: ${boxDrive} forked from ${goldenDrive}; provisioning ${box}`);
-		await provisionFromImage(box, mounts);
-		await wakeSandbox({ providerSandboxId: box, claim, mounts });
+		await provisionFromImage(box, mounts, driveClaim);
+		await wakeSandbox({ providerSandboxId: box, claim: driveClaim, mounts });
 
+		check(
+			"sandbox.conf names the drive",
+			(await run(
+				`grep -c "^SUPERSET_SANDBOX_DRIVE='${boxDrive}'$" ${SANDBOX_PATHS.conf}`,
+			)) === "1",
+		);
 		const bootLog = await run(`cat ${SANDBOX_PATHS.bootLog}`);
 		check(
 			"layout stamped",
 			/drive\.layout ms=\d+/.test(bootLog),
-			bootLog.match(/drive\.layout.*/)?.[0],
+			bootLog.match(/drive\.(layout|missing).*/)?.[0],
 		);
 		check("host-service ready", /host\.ready/.test(bootLog));
 		const backing = await run(
@@ -254,9 +302,9 @@ async function drivePass(): Promise<number> {
 		);
 
 		const before = await layouts();
-		await (await Sandbox.get({ ...credentials, name: box })).stop();
+		await stopSandbox(box);
 		const wakeStarted = Date.now();
-		await wakeSandbox({ providerSandboxId: box, claim, mounts });
+		await wakeSandbox({ providerSandboxId: box, claim: driveClaim, mounts });
 		log(`drive: woken again in ${Date.now() - wakeStarted} ms`);
 		check(
 			"the checkout is still there after a wake",
@@ -271,17 +319,35 @@ async function drivePass(): Promise<number> {
 				"yes",
 		);
 	} catch (error) {
-		check("pass ran to the end", false, String(error).slice(0, 300));
+		stoppedAt = String(error).slice(0, 300);
 	} finally {
-		await deleteSandboxAndDrive(box, boxDrive, drives).catch((error) =>
-			log(`drive: could not delete ${box} and ${boxDrive}: ${error}`),
-		);
+		for (const label of expectations) {
+			if (!reported.has(label)) {
+				check(label, false, `not reached${stoppedAt ? `: ${stoppedAt}` : ""}`);
+			}
+		}
+		if (failures) {
+			await stopSandbox(box)
+				.then(() => waitForDriveDetached(boxDrive, { drives }))
+				.then(() =>
+					log(
+						`drive: ${box} stopped and kept with ${boxDrive} for inspection; delete both when done`,
+					),
+				)
+				.catch((error) => log(`drive: could not stop ${box}: ${error}`));
+		} else {
+			await deleteSandboxAndDrive(box, boxDrive, drives)
+				.then(() => log(`drive: ${box} and ${boxDrive} deleted`))
+				.catch((error) =>
+					log(`drive: could not delete ${box} and ${boxDrive}: ${error}`),
+				);
+		}
 		await waitForDriveDetached(goldenDrive, { drives })
 			.then(() => drives.remove(goldenDrive))
+			.then(() => log(`drive: ${goldenDrive} deleted`))
 			.catch((error) =>
 				log(`drive: could not delete ${goldenDrive}: ${error}`),
 			);
-		log(`drive: ${box}, ${boxDrive} and ${goldenDrive} deleted`);
 	}
 	return failures;
 }

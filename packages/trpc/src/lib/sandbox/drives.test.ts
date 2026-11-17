@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { renderSandboxConf } from "@superset/shared/sandbox/contract";
 import {
 	type DriveHost,
 	DriveStillAttachedError,
@@ -6,6 +7,7 @@ import {
 	forkWorkspaceDrive,
 	WORKSPACE_DRIVE_MOUNT_PATH,
 	waitForDriveDetached,
+	workspaceDriveIdentity,
 	workspaceDriveMounts,
 	workspaceDriveNameToClaim,
 } from "./drives";
@@ -46,6 +48,35 @@ describe("workspaceDriveMounts", () => {
 	test("mounts nothing for a workspace without a drive", () => {
 		expect(workspaceDriveMounts(null)).toBeUndefined();
 		expect(workspaceDriveMounts(undefined)).toBeUndefined();
+	});
+});
+
+describe("workspaceDriveIdentity", () => {
+	const identity = {
+		SUPERSET_SANDBOX_CONTRACT: "1",
+		SUPERSET_BUNDLE_SHA: "a".repeat(64),
+		SUPERSET_API_URL: "https://api.example.invalid",
+		SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+		SUPERSET_SANDBOX_ORGANIZATION_ID: "00000000-0000-4000-8000-000000000002",
+		SUPERSET_SANDBOX_REPOSITORIES: "[]",
+		SUPERSET_SANDBOX_IMAGE_TAG: "image",
+		SUPERSET_SANDBOX_PROVIDER: "vercel",
+	} as const;
+
+	test("a workspace with a drive names it in sandbox.conf, so the box can refuse without it", () => {
+		expect(
+			renderSandboxConf({
+				...identity,
+				...workspaceDriveIdentity("drive-ws-1"),
+			}),
+		).toContain("SUPERSET_SANDBOX_DRIVE='drive-ws-1'\n");
+	});
+
+	test("a workspace without a drive writes no drive key", () => {
+		expect(workspaceDriveIdentity(null)).toEqual({});
+		expect(
+			renderSandboxConf({ ...identity, ...workspaceDriveIdentity(undefined) }),
+		).not.toContain("SUPERSET_SANDBOX_DRIVE");
 	});
 });
 

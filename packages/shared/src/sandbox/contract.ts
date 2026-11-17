@@ -153,6 +153,8 @@ export const sandboxIdentitySchema = z.object({
 	/** The environment row's source (image name or golden), for telemetry. */
 	SUPERSET_SANDBOX_IMAGE_TAG: z.string().min(1),
 	SUPERSET_SANDBOX_PROVIDER: z.string().min(1),
+	/** The workspace drive's name; the box refuses to boot when it is not mounted. */
+	SUPERSET_SANDBOX_DRIVE: z.string().min(1).optional(),
 	HOST_SERVICE_SENTRY_DSN: z.string().optional(),
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
