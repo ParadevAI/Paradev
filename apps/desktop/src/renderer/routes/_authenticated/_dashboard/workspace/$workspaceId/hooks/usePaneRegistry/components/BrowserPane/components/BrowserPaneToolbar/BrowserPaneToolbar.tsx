@@ -63,7 +63,7 @@ export function BrowserPaneToolbar({ ctx }: BrowserPaneToolbarProps) {
 		<div className="@container/browser-toolbar flex h-full w-full min-w-0 items-center justify-between">
 			<BrowserToolbar
 				paneId={paneId}
-				currentUrl={state.currentUrl}
+				currentUrl={state.pendingUrl ?? state.currentUrl}
 				faviconUrl={state.faviconUrl}
 				isLoading={state.isLoading}
 				canGoBack={state.canGoBack}
