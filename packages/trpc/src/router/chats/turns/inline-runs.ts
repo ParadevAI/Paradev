@@ -29,7 +29,7 @@ function signal() {
 					wake = null;
 					resolve(false);
 				}, ms);
-				timer.unref?.();
+				(timer as { unref?: () => void }).unref?.();
 				wake = () => {
 					clearTimeout(timer);
 					wake = null;
@@ -91,7 +91,7 @@ export function inlineTurnRuns(getDeps: () => TurnDeps): TurnRuns & {
 					console.error(`[chats] idle stop of ${agentId} failed:`, error),
 				);
 			}, deps.idleTimeoutMs + 1_000);
-			timer.unref?.();
+			(timer as { unref?: () => void }).unref?.();
 		},
 		async settled(turnId) {
 			of(turnId).settled.fire();

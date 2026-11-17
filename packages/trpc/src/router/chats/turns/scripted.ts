@@ -56,7 +56,7 @@ export function scriptedRunner(
 						console.error(`[chats] scripted turn ${turn.turnId}:`, error),
 					);
 			}, options.thinkMs);
-			timer.unref?.();
+			(timer as { unref?: () => void }).unref?.();
 		},
 		async cancel(_box, { sessionId }) {
 			sessions.get(sessionId)?.abort();
