@@ -9724,8 +9724,8 @@ msgstr "Đã đạt giới hạn yêu cầu GitHub"
 msgid "GitHub refused the merge"
 msgstr "GitHub từ chối merge"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Các repository GitHub có tệp marketplace plugin. Superset đồng bộ plugin của chúng vào tổ chức của bạn."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Các repository GitHub có tệp marketplace plugin. Paradev đồng bộ plugin của chúng vào tổ chức của bạn."
 
 msgid "GitHub sign-in needed"
 msgstr "Cần đăng nhập GitHub"
@@ -14814,6 +14814,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev thao tác trên GitHub dưới tên của bạn. Kết nối tài khoản GitHub để hợp nhất, bình luận và cập nhật pull request."
+
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
 
@@ -14963,6 +14966,9 @@ msgstr "Bản demo Paradev Trang"
 
 msgid "Paradev Plugins"
 msgstr "Plugin Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev chạy cục bộ trên máy của lập trình viên. Chúng tôi không lưu code hay hội thoại AI của bạn, và Paradev đã hoàn tất kiểm toán SOC 2 Type II với một đơn vị kiểm toán độc lập. Hãy yêu cầu báo cáo và xem tài liệu bảo mật tại {trustHost}."
@@ -15232,8 +15238,8 @@ msgstr "Hãy chọn vị trí dự án"
 msgid "Pick a reason"
 msgstr "Chọn lý do"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Chọn một repository có tệp marketplace plugin. Superset đồng bộ plugin của nó ngay bây giờ và mỗi lần bạn đồng bộ lại."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Chọn một repository có tệp marketplace plugin. Paradev đồng bộ plugin của nó ngay bây giờ và mỗi lần bạn đồng bộ lại."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Chọn một âm thanh hoặc thêm âm thanh riêng. Âm thanh riêng hỗ trợ .mp3, .wav và .ogg."
@@ -15902,11 +15908,11 @@ msgstr "Pull request"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Các pull request phía trên sẽ vẫn mở và GitHub sẽ đổi nhánh đích của chúng."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Các pull request, bình luận và push từ Superset được thực hiện dưới tên của bạn."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Các pull request, bình luận và push từ Paradev được thực hiện dưới tên của bạn."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Các pull request, bình luận và push từ Superset sẽ không còn được thực hiện dưới tên của bạn."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Các pull request, bình luận và push từ Paradev sẽ không còn được thực hiện dưới tên của bạn."
 
 msgid "Purple"
 msgstr "Tím"
@@ -19707,9 +19713,6 @@ msgstr "bị thay thế"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset thao tác trên GitHub dưới tên của bạn. Kết nối tài khoản GitHub để hợp nhất, bình luận và cập nhật pull request."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp in ra endpoint chỉ cho ngăn đó. Trỏ Playwright hoặc browser-use vào đó."
 
@@ -19718,9 +19721,6 @@ msgstr "Superset giờ đã là Paradev. À, chúng tôi cũng đã gọi đư�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile ra mắt trên iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset đọc kho này bằng tài khoản GitHub bạn đã kết nối. Nếu chưa kết nối, hãy kết nối trong <0>Cài đặt › Tích hợp</0>."
 
 msgid "Supervised"
 msgstr "Có giám sát"

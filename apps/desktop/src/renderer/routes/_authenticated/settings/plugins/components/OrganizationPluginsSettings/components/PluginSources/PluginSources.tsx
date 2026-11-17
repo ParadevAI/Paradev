@@ -96,7 +96,7 @@ export function PluginSources() {
 					</h3>
 					<p className="text-sm text-muted-foreground mt-1">
 						<Trans>
-							GitHub repositories with a plugin marketplace file. Superset syncs
+							GitHub repositories with a plugin marketplace file. Paradev syncs
 							their plugins into your organization.
 						</Trans>
 					</p>

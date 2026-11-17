@@ -9724,8 +9724,8 @@ msgstr "GitHub 요청 한도에 도달했습니다"
 msgid "GitHub refused the merge"
 msgstr "GitHub가 머지를 거부했습니다"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "플러그인 마켓플레이스 파일이 있는 GitHub 리포지토리입니다. Superset이 해당 플러그인을 조직에 동기화합니다."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "플러그인 마켓플레이스 파일이 있는 GitHub 리포지토리입니다. Paradev가 해당 플러그인을 조직에 동기화합니다."
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub 로그인이 필요합니다"
@@ -14814,6 +14814,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev는 본인 계정으로 GitHub에서 작업합니다. 풀 리퀘스트를 병합, 댓글 작성, 업데이트하려면 GitHub 계정을 연결하세요."
+
 msgid "Paradev Agent"
 msgstr "Paradev 에이전트"
 
@@ -14963,6 +14966,9 @@ msgstr "Paradev 페이지 데모"
 
 msgid "Paradev Plugins"
 msgstr "Paradev 플러그인"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev는 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev는 개발자의 로컬 머신에서 실행됩니다. 코드나 AI 대화를 저장하지 않으며, 독립 감사인과 함께 SOC 2 Type II 감사를 완료했습니다. {trustHost}에서 보고서를 요청하고 보안 문서를 확인하세요."
@@ -15232,8 +15238,8 @@ msgstr "프로젝트 위치를 선택하세요"
 msgid "Pick a reason"
 msgstr "사유를 선택하세요"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "플러그인 마켓플레이스 파일이 있는 리포지토리를 선택하세요. Superset이 지금 그리고 다시 동기화할 때마다 플러그인을 동기화합니다."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "플러그인 마켓플레이스 파일이 있는 리포지토리를 선택하세요. Paradev가 지금 그리고 다시 동기화할 때마다 플러그인을 동기화합니다."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "소리를 고르거나 직접 추가하세요. 사용자 지정 오디오는 .mp3, .wav, .ogg를 지원합니다."
@@ -15902,11 +15908,11 @@ msgstr "풀 리퀘스트"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "위에 있는 풀 리퀘스트는 열린 상태로 유지되고 GitHub가 대상 브랜치를 변경합니다."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev에서의 풀 리퀘스트, 댓글, 푸시는 본인 계정으로 처리됩니다."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset에서의 풀 리퀘스트, 댓글, 푸시가 더 이상 본인 계정으로 처리되지 않습니다."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev에서의 풀 리퀘스트, 댓글, 푸시가 더 이상 본인 계정으로 처리되지 않습니다."
 
 msgid "Purple"
 msgstr "보라"
@@ -19707,9 +19713,6 @@ msgstr "대체됨"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset은 본인 계정으로 GitHub에서 작업합니다. 풀 리퀘스트를 병합, 댓글 작성, 업데이트하려면 GitHub 계정을 연결하세요."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp는 해당 패널 전용 엔드포인트만 출력합니다. Playwright나 browser-use를 여기에 연결하세요."
 
@@ -19718,9 +19721,6 @@ msgstr "Superset이 Paradev가 되었습니다. 그리고 1,150만 달러 규모
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile, iPhone 출시"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset은 연결된 GitHub 계정으로 이 저장소를 읽습니다. 아직 연결하지 않았다면 <0>설정 › 연동</0>에서 연결하세요."
 
 msgid "Supervised"
 msgstr "감독"
@@ -20327,7 +20327,7 @@ msgid "The code expired. Start again."
 msgstr "코드가 만료되었습니다. 다시 시작하세요."
 
 msgid "The commands Paradev runs to set up, run and archive this project's workspaces, from the repository's config.toml."
-msgstr "Paradev이 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
+msgstr "Paradev가 이 프로젝트의 워크스페이스를 설정, 실행, 보관할 때 실행하는 명령어(리포지토리의 config.toml)."
 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
@@ -21970,7 +21970,7 @@ msgid "Update Paradev on that device. In-app updates require a supported standal
 msgstr "해당 기기에서 Paradev를 업데이트하세요. 앱 내 업데이트에는 지원되는 독립 실행형 설치와 정식으로 출시된 앱 버전이 필요합니다."
 
 msgid "Update Paradev on this host to edit its workspace config."
-msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev을 업데이트하세요."
+msgstr "워크스페이스 설정을 편집하려면 이 호스트의 Paradev를 업데이트하세요."
 
 msgid "Update payment method"
 msgstr "결제 수단 업데이트"
