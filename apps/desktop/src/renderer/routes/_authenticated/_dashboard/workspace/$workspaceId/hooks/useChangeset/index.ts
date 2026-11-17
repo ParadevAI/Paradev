@@ -1,3 +1,3 @@
 export { getChangesetFileKey } from "./changesetFileKey";
-export type { ChangesetFile, DiffFileSource } from "./types";
+export type { ChangesetFile, DiffFileSource, DiffRef } from "./types";
 export { useChangeset } from "./useChangeset";

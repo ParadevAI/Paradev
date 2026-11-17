@@ -156,9 +156,9 @@ describe("writeWorkspacePaneLayout", () => {
 
 		create(collections, "beta");
 
-		expect(
-			collections.workspaceLocalState.get("beta")?.rightSidebarOpen,
-		).toBe(false);
+		expect(collections.workspaceLocalState.get("beta")?.rightSidebarOpen).toBe(
+			false,
+		);
 	});
 
 	it("keeps the right sidebar state of a workspace that already has a row", () => {
@@ -170,9 +170,9 @@ describe("writeWorkspacePaneLayout", () => {
 		create(collections, "alpha");
 		create(collections, "zeta");
 
-		expect(
-			collections.workspaceLocalState.get("alpha")?.rightSidebarOpen,
-		).toBe(true);
+		expect(collections.workspaceLocalState.get("alpha")?.rightSidebarOpen).toBe(
+			true,
+		);
 		expect(
 			collections.workspaceLocalState.get("zeta")?.rightSidebarOpen,
 		).toBeUndefined();

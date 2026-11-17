@@ -342,8 +342,8 @@ export const Composer = memo(function Composer({
 			// and restarts the open menu's search.
 			return fileMentionMatches(
 				query,
-				collections.workspaceLocalState.get(workspaceId)
-					?.recentlyViewedFiles ?? [],
+				collections.workspaceLocalState.get(workspaceId)?.recentlyViewedFiles ??
+					[],
 				getOpenFilePaths?.() ?? new Set(),
 				matches,
 			).map(

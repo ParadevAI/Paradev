@@ -451,11 +451,10 @@ export function NewWorkspaceScreen({
 			? environmentBranchKey(resolvedEnvironment.id)
 			: null
 		: projectId;
-	const persistedBaseBranchDefault = useWorkspaceCreateDefaultsStore(
-		(state) =>
-			branchDefaultKey
-				? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
-				: null,
+	const persistedBaseBranchDefault = useWorkspaceCreateDefaultsStore((state) =>
+		branchDefaultKey
+			? (state.baseBranchesByProjectId[branchDefaultKey] ?? null)
+			: null,
 	);
 	const setBaseBranchDefault = useWorkspaceCreateDefaultsStore(
 		(state) => state.setBaseBranchDefault,
@@ -606,7 +605,9 @@ export function NewWorkspaceScreen({
 		});
 
 	const selectedPresetId = useMemo(() => {
-		const agent = agentConfigs.find((candidate) => candidate.id === selectedAgent);
+		const agent = agentConfigs.find(
+			(candidate) => candidate.id === selectedAgent,
+		);
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
 	const modelSupport = selectedPresetId

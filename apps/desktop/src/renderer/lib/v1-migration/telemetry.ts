@@ -8,7 +8,7 @@ const KINDS = [
 	"terminals",
 ] as const;
 
-interface V1MigrationSummaryLike
+export interface V1MigrationSummaryLike
 	extends Record<(typeof KINDS)[number], KindSummary> {
 	gateComplete: boolean;
 }

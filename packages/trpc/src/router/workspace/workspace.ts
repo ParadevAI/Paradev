@@ -8,7 +8,8 @@ import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
-import { jwtProcedure, userError } from "../../trpc";
+import { isMember } from "../../lib/cloud-guards";
+import { personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const ACTIVATION_EVENT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -37,7 +38,7 @@ async function exitActivationEmailCampaign(userId: string) {
 }
 
 export const workspaceRouter = {
-	trackCreated: jwtProcedure
+	trackCreated: personProcedure
 		.input(
 			z.object({
 				workspaceId: z.string(),
@@ -49,7 +50,7 @@ export const workspaceRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "Not a member of this organization",
@@ -58,7 +59,7 @@ export const workspaceRouter = {
 			}
 
 			if (input.type !== "main") {
-				await exitActivationEmailCampaign(ctx.userId);
+				await exitActivationEmailCampaign(ctx.principal.userId);
 			}
 
 			return { ok: true };

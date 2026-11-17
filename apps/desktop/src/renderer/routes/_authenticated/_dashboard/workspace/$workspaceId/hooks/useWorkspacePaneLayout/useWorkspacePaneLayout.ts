@@ -5,13 +5,13 @@ import { useEffect, useMemo, useRef } from "react";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import {
-	type PaneLayoutSlot,
-	registerV2PaneLayoutStore,
-} from "renderer/stores/v2-pane-layout-stores";
-import {
 	applyRememberedPaneSelection,
 	rememberPaneSelection,
 } from "renderer/stores/pane-selection";
+import {
+	type PaneLayoutSlot,
+	registerV2PaneLayoutStore,
+} from "renderer/stores/v2-pane-layout-stores";
 import type { PaneViewerData } from "../../types";
 import { getPaneKey } from "../../utils/getPaneKey";
 import { placeInTabs } from "./utils/placeInTabs";

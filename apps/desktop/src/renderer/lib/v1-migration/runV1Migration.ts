@@ -37,7 +37,9 @@ import {
 	type V1WorktreeLike,
 } from "./workspaces";
 
-interface V1MigrationSummary {
+export { computeGateComplete, type KindSummary } from "./summary";
+
+export interface V1MigrationSummary {
 	projects: KindSummary;
 	workspaces: KindSummary;
 	presets: KindSummary;
@@ -47,7 +49,7 @@ interface V1MigrationSummary {
 	gateComplete: boolean;
 }
 
-interface RunV1MigrationDeps {
+export interface RunV1MigrationDeps {
 	groupTarget?: V1GroupTarget;
 	organizationId: string;
 	hostClient: HostServiceClient;

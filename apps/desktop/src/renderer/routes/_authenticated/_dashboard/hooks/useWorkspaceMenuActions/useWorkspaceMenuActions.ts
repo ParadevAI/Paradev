@@ -12,8 +12,8 @@ import { DASHBOARD_SIDEBAR_PULL_REQUEST_QUERY_KEY_PREFIX } from "renderer/routes
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
-import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
 import { useNotificationStore } from "renderer/stores/notifications";
+import { useRemoveFromSidebarIntent } from "renderer/stores/remove-workspace-from-sidebar-intent";
 
 interface UseWorkspaceMenuActionsOptions {
 	workspaceId: string;

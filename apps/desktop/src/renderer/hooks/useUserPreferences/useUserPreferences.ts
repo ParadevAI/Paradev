@@ -56,9 +56,7 @@ export function useUserPreferences(): UserPreferencesApi {
 			key: "fileLinks" | "urlLinks" | "sidebarFileLinks" | "pageLinks",
 			next: LinkTierMap,
 		) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -129,9 +127,7 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setRightSidebarOpen = useCallback(
 		(next: boolean | ((prev: boolean) => boolean)) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			const prev =
 				existing?.rightSidebarOpen ??
 				DEFAULT_V2_USER_PREFERENCES.rightSidebarOpen;
@@ -152,9 +148,7 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setRightSidebarWidth = useCallback(
 		(next: number) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -188,9 +182,7 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setChangesFileListWidth = useCallback(
 		(next: number) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -207,9 +199,7 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setChangesFileListOpen = useCallback(
 		(next: boolean) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -303,9 +293,7 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setSidebarProjectHostFilter = useCallback(
 		(next: SidebarProjectHostFilter) => {
-			const existing = collections.userPreferences.get(
-				V2_USER_PREFERENCES_ID,
-			);
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,

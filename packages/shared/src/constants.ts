@@ -133,6 +133,13 @@ export const ACCOUNT_DELETION_GRACE_DAYS = 30;
 // PostHog
 export const POSTHOG_COOKIE_NAME = "superset";
 
+// Accounts created in these windows never had v1, so they have nothing to
+// import: [V2_ONLY_USER_CUTOFF, V2_NEW_USER_V1_EXPERIMENT_START) and
+// [V2_NEW_USER_V2_DEFAULT_START, ∞).
+export const V2_ONLY_USER_CUTOFF = "2026-05-15T14:00:00.000Z";
+export const V2_NEW_USER_V1_EXPERIMENT_START = "2026-06-08T06:59:00.000Z";
+export const V2_NEW_USER_V2_DEFAULT_START = "2026-07-09T17:00:00.000Z";
+
 export const FEATURE_FLAGS = {
 	WEB_DOMAIN_MOVE: "web-domain-move",
 	WEB_PAGES_DOMAIN_MOVE: "web-pages-domain-move",

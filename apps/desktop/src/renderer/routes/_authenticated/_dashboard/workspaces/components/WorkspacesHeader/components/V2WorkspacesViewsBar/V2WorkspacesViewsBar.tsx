@@ -38,9 +38,7 @@ export function V2WorkspacesViewsBar({
 	cloudEnabled,
 }: V2WorkspacesViewsBarProps) {
 	const { t } = useLingui();
-	const activeViewId = useWorkspacesFilterStore(
-		(state) => state.activeViewId,
-	);
+	const activeViewId = useWorkspacesFilterStore((state) => state.activeViewId);
 	const savedViews = useWorkspacesFilterStore((state) => state.savedViews);
 	const applyView = useWorkspacesFilterStore((state) => state.applyView);
 	const deleteView = useWorkspacesFilterStore((state) => state.deleteView);

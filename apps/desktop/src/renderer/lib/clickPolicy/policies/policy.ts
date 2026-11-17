@@ -41,6 +41,23 @@ function tierForActionIn(
  * Build a memoized policy from a tier map. Centralized so every policy hook
  * (sidebar / terminal / inline) shares identical semantics.
  */
+export function buildPolicy(
+	map: LinkTierMap,
+	surface: Surface,
+	mode: TierMode,
+): ClickPolicy {
+	const resolve = (event: ModifierEvent): ResolvedClick => {
+		const tier = tierFor(event, mode);
+		return { tier, action: map[tier] };
+	};
+	return {
+		resolve,
+		getAction: (event) => resolve(event).action,
+		tierForAction: (action) => tierForActionIn(map, action),
+		hint: buildHint(map, surface, mode),
+		map,
+	};
+}
 
 type MapKey = "fileLinks" | "urlLinks" | "sidebarFileLinks" | "pageLinks";
 

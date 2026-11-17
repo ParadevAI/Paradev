@@ -1,10 +1,25 @@
-export { actionLabel } from "./actionLabel";
+export {
+	actionLabel,
+	actionLabelOrNone,
+	shortActionLabel,
+} from "./actionLabel";
+export { ClickHint } from "./components/ClickHint";
 export { LinkHoverHint } from "./components/LinkHoverHint";
 export { ShadowClickHint } from "./components/ShadowClickHint";
+export { buildHint, unboundHint } from "./hint";
 export { modifierLabel } from "./modifierLabel";
 export {
+	buildChangesSidebarFileHint,
+	type ChangesSidebarFileIntent,
+	resolveChangesSidebarFileIntent,
+	tierForChangesSidebarFileIntent,
+} from "./policies/changesSidebarFilePolicy";
+export {
+	type FolderIntent,
 	type FolderLinkAction,
 	type FolderTierMap,
+	folderIntentFor,
+	folderIntentForMap,
 	folderIntentLabel,
 } from "./policies/folderPolicy";
 export type { ClickPolicy } from "./policies/policy";
@@ -34,7 +49,9 @@ export type {
 	LinkTier,
 	LinkTierMap,
 	ModifierEvent,
+	ResolvedClick,
 	Surface,
+	TierMode,
 } from "./types";
 export { usePierreChangesSidebarRowClickPolicy } from "./usePierreChangesSidebarRowClickPolicy";
 export { usePierreRowClickPolicy } from "./usePierreRowClickPolicy";

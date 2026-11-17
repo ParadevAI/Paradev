@@ -27,7 +27,6 @@ import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
-import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
@@ -61,8 +60,8 @@ import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
-import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
 import { NotificationController } from "./components/NotificationController";
+import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
 import { WindowTitle } from "./components/WindowTitle";
 import { createPierreWorker } from "./lib/pierreWorker";
 import { CollectionsProvider } from "./providers/CollectionsProvider";
@@ -306,9 +305,7 @@ function AuthenticatedLayout() {
 									<V1MigrationStatusCard
 										organizationId={activeOrganizationId}
 									/>
-									<V1TerminalsNotice
-										organizationId={activeOrganizationId}
-									/>
+									<V1TerminalsNotice organizationId={activeOrganizationId} />
 									<V1AutoMigration />
 									<GitInitConfirmDialog />
 									<Paywall />

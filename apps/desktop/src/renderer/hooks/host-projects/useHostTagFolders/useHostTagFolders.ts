@@ -17,7 +17,7 @@ import {
 
 const TAG_FOLDERS_FALLBACK_REFETCH_INTERVAL_MS = 60_000;
 
-interface UseHostTagFoldersResult {
+export interface UseHostTagFoldersResult {
 	tagFolders: HostTagFolderSetting[];
 	hostResults: HostTagFoldersResult[];
 	/** True once discovery settled and no reachable host read is pending. */

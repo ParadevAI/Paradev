@@ -1,4 +1,4 @@
-interface TreeShape {
+export interface TreeShape {
 	/** Every directory path implied by the files, sorted shallow→deep (ancestors first). */
 	dirs: string[];
 	/** Directory path → count of files anywhere beneath it. */

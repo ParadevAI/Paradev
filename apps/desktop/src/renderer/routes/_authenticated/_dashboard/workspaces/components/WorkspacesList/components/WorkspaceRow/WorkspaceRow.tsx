@@ -19,13 +19,13 @@ import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { useNow } from "renderer/hooks/useNow";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceChecksDot";
 import {
 	type WorkspaceActions,
 	WorkspaceContextMenu,
 } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceContextMenu";
-import { WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceProjectIcon";
-import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceChecksDot";
 import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceOwnerAvatar";
+import { WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceProjectIcon";
 import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard/workspaces/utils/hasLiveWorkspaceState";

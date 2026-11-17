@@ -3,7 +3,7 @@ import { fileToBase64 } from "renderer/lib/file-to-base64";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { create } from "zustand";
 
-type UploadState =
+export type UploadState =
 	| { kind: "pending" }
 	| { kind: "ready"; attachmentId: string }
 	| { kind: "error"; message: string };

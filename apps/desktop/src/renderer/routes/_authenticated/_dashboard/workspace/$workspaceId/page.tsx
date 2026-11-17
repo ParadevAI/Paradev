@@ -30,8 +30,8 @@ import {
 	parseSubagentSearch,
 	readSubagentSearch,
 } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { getNotificationSourcesForTab } from "renderer/stores/notifications";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { useStore } from "zustand";
 import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
@@ -40,6 +40,8 @@ import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
 import { CloudWorkspaceTabBarControls } from "./components/CloudWorkspaceTabBarControls";
 import { HostConnectionPill } from "./components/HostConnectionPill";
+import { NotificationStatusIndicator } from "./components/NotificationStatusIndicator";
+import { PresetsBar } from "./components/PresetsBar";
 import { RightPaneArea } from "./components/RightPaneArea";
 import { MIN_RIGHT_PANE_AREA_WIDTH } from "./components/RightPaneArea/constants";
 import {
@@ -47,10 +49,6 @@ import {
 	getRightPaneOptions,
 	type RightPaneKind,
 } from "./components/RightPaneNewTab";
-import { NotificationStatusIndicator } from "./components/NotificationStatusIndicator";
-import { PresetsBar } from "./components/PresetsBar";
-import { WorkspaceOpenInButton } from "./components/WorkspaceOpenInButton";
-import { WorkspaceRunButton } from "./components/WorkspaceRunButton";
 import {
 	ActivityPanelAside,
 	WorkspaceActivityMenu,
@@ -59,6 +57,8 @@ import { WorkspaceAgentEffects } from "./components/WorkspaceAgentEffects";
 import { WorkspaceEmptyState } from "./components/WorkspaceEmptyState";
 import { WorkspaceMissingWorktreeState } from "./components/WorkspaceMissingWorktreeState";
 import { WorkspaceMoveBanner } from "./components/WorkspaceMoveBanner";
+import { WorkspaceOpenInButton } from "./components/WorkspaceOpenInButton";
+import { WorkspaceRunButton } from "./components/WorkspaceRunButton";
 import { WorkspaceSidebar } from "./components/WorkspaceSidebar";
 import {
 	type PaneArea,
@@ -840,9 +840,7 @@ function WorkspaceContent() {
 											    so it lives here rather than in the sidebar's top strip
 											    (#7167). Without an @container ancestor its branch label
 											    stays hidden, which keeps it compact for the tab bar. */}
-														<WorkspaceOpenInButton
-															workspaceId={workspaceId}
-														/>
+														<WorkspaceOpenInButton workspaceId={workspaceId} />
 														<RightSidebarToggle
 															isOpen={sidebarOpen}
 															onToggle={toggleRightSidebar}

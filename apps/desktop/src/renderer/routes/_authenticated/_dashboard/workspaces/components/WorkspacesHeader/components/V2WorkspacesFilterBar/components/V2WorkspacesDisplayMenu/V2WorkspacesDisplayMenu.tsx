@@ -30,9 +30,7 @@ export function V2WorkspacesDisplayMenu() {
 	const setGroupBy = useWorkspacesFilterStore((state) => state.setGroupBy);
 	const orderBy = useWorkspacesFilterStore((state) => state.orderBy);
 	const setOrderBy = useWorkspacesFilterStore((state) => state.setOrderBy);
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	const setShowArchived = useWorkspacesFilterStore(
 		(state) => state.setShowArchived,
 	);

@@ -2,8 +2,8 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useCallback } from "react";
 import {
-	useUserPreferences,
 	type UserPreferencesApi,
+	useUserPreferences,
 } from "renderer/hooks/useUserPreferences";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";

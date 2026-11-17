@@ -30,7 +30,7 @@ export interface BrowserRuntimeState {
 	zoomFactor: number;
 }
 
-interface PersistableBrowserState {
+export interface PersistableBrowserState {
 	url: string;
 	pageTitle: string;
 	faviconUrl: string | null;

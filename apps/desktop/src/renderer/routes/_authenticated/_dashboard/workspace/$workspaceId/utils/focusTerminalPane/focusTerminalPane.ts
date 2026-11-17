@@ -7,7 +7,7 @@ interface TerminalPaneLocation {
 	paneId: string;
 }
 
-type FocusOrAddTerminalPaneResult = "focused" | "added";
+export type FocusOrAddTerminalPaneResult = "focused" | "added";
 
 export function findTerminalPaneLocation(
 	state: WorkspaceState<PaneViewerData>,

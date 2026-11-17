@@ -12,9 +12,7 @@ describe("workspaceIdFromUrl", () => {
 	});
 
 	test("reads the id from the desktop deep link the web page redirects to", () => {
-		expect(workspaceIdFromUrl("superset://workspace/ws-1", WEB)).toBe(
-			"ws-1",
-		);
+		expect(workspaceIdFromUrl("superset://workspace/ws-1", WEB)).toBe("ws-1");
 	});
 
 	test("reads the id from the web origin's twin on the other root domain", () => {

@@ -23,9 +23,7 @@ export function usePullRequestAgentHandoff(
 ) {
 	const { t } = useLingui();
 	const queryClient = useQueryClient();
-	const { data: agentConfigs = [] } = useAgentConfigs(
-		target?.hostUrl ?? null,
-	);
+	const { data: agentConfigs = [] } = useAgentConfigs(target?.hostUrl ?? null);
 	const agent = agentConfigs[0] ?? null;
 	const linkedWorkspaceQueryKey = [
 		"pullRequests",

@@ -22,7 +22,7 @@ export type V1LedgerMap = Map<
 >;
 
 /** The slice of V1MigrationIpc the ledger helpers need. */
-interface V1LedgerSource {
+export interface V1LedgerSource {
 	ledgerList(organizationId: string): Promise<V1LedgerRow[]>;
 	ledgerRecord(
 		organizationId: string,

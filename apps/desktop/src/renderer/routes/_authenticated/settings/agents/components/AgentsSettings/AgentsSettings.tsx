@@ -11,11 +11,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import {
 	V2_AGENT_CONFIGS_QUERY_KEY as QUERY_KEY,
 	useAgentConfigs,
 } from "renderer/hooks/useAgentConfigs";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import {
 	findLinkedAgent,
 	getAgentCommandText,

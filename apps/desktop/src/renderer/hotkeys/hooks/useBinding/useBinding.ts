@@ -22,7 +22,7 @@ export function useBinding(id: HotkeyId): ShortcutBinding | null {
 }
 
 /** Imperative version of {@link useBinding} for non-React contexts. */
-function getBinding(id: HotkeyId): ShortcutBinding | null {
+export function getBinding(id: HotkeyId): ShortcutBinding | null {
 	const state = useHotkeyOverridesStore.getState();
 	if (!id) return null;
 	if (id in state.overrides) return state.overrides[id] ?? null;

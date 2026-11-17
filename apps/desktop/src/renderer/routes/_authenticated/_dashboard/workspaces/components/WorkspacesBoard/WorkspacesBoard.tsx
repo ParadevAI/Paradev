@@ -15,13 +15,8 @@ interface WorkspacesBoardProps {
 	isReady: boolean;
 }
 
-export function WorkspacesBoard({
-	workspaces,
-	isReady,
-}: WorkspacesBoardProps) {
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+export function WorkspacesBoard({ workspaces, isReady }: WorkspacesBoardProps) {
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	const orderBy = useWorkspacesFilterStore((state) => state.orderBy);
 
 	const byColumn = useMemo(() => {

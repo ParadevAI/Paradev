@@ -35,8 +35,7 @@ export function BrowserLinkSettings({
 }: BrowserLinkSettingsProps) {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
-	const { preferences, setUrlLinks, setPortOpenAction } =
-		useUserPreferences();
+	const { preferences, setUrlLinks, setPortOpenAction } = useUserPreferences();
 	const showUrl = isItemVisible(SETTING_ITEM_ID.LINKS_URL, visibleItems);
 	const showPort = isItemVisible(SETTING_ITEM_ID.LINKS_PORT, visibleItems);
 

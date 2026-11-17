@@ -13,7 +13,7 @@ import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { useEffect, useMemo } from "react";
 import { getHostServiceHeaders } from "renderer/lib/host-service-auth";
 
-type ChatWiring = {
+export type ChatWiring = {
 	transport: ChatTransport;
 	streamBaseUrl: string;
 	createSocket: (url: string) => StreamSocket;

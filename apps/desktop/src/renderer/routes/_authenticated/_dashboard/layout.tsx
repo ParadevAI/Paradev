@@ -35,8 +35,6 @@ import { RemotePortForwarder } from "./components/RemotePortForwarder";
 import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMount";
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TitleBar } from "./components/TitleBar";
-import { TopBar } from "./components/TopBar";
-import { useShowsAppTopBar } from "./hooks/useShowsAppTopBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
 import { browserRuntimeRegistry } from "./workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
@@ -62,9 +60,8 @@ function DashboardLayout() {
 		const stopSectionCollapseSync = syncPersistedStoreAcrossWindows(
 			useSidebarSectionsCollapseStore,
 		);
-		const stopAgentStateSync = syncPersistedStoreAcrossWindows(
-			useNotificationStore,
-		);
+		const stopAgentStateSync =
+			syncPersistedStoreAcrossWindows(useNotificationStore);
 		const stopCloudSidebarSync =
 			syncPersistedStoreAcrossWindows(useCloudSidebarStore);
 		const stopAutomationFailuresSync = syncPersistedStoreAcrossWindows(
@@ -90,7 +87,6 @@ function DashboardLayout() {
 	const currentWorkspaceId =
 		workspaceMatch !== false ? workspaceMatch.workspaceId : null;
 	useHistoryNavigationShortcuts();
-	const showsAppTopBar = useShowsAppTopBar();
 
 	const currentWorkspace = useMemo(
 		() =>
@@ -153,7 +149,7 @@ function DashboardLayout() {
 	// The collapsed rail's top strip continues the page's header row, so the
 	// panel must not draw its own full-height border: the sidebar's inner
 	// border, which stops below the strip, is the only divider.
-	const railContinuesHeaderRow = !showsAppTopBar && isWorkspaceSidebarCollapsed;
+	const railContinuesHeaderRow = isWorkspaceSidebarCollapsed;
 
 	const sidebarPanel = (
 		<WorkspaceSidebarPanel
@@ -162,8 +158,6 @@ function DashboardLayout() {
 			<DashboardSidebar isCollapsed={isWorkspaceSidebarCollapsed} />
 		</WorkspaceSidebarPanel>
 	);
-
-	const sidebarOutsideColumn = !showsAppTopBar || !isWorkspaceSidebarCollapsed;
 
 	const content = (
 		<ContentBoundary>
@@ -226,11 +220,9 @@ function DashboardLayout() {
 				) : (
 					<div className="flex h-full w-full overflow-hidden">
 						<CommandPaletteHost />
-						{sidebarOutsideColumn && sidebarPanel}
+						{sidebarPanel}
 						<div className="flex flex-1 flex-col min-w-0 min-h-0">
-							{showsAppTopBar && <TopBar />}
 							<div className="flex flex-1 min-h-0 min-w-0 overflow-hidden">
-								{!sidebarOutsideColumn && sidebarPanel}
 								<div className="relative flex flex-1 min-h-0 min-w-0">
 									{content}
 								</div>

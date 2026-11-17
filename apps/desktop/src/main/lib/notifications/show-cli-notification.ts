@@ -19,13 +19,10 @@ export function showCliNotification(input: DesktopNotification): boolean {
 		window?.show();
 		window?.focus();
 		if (!input.target) return;
-		notificationsEmitter.emit(
-			NOTIFICATION_EVENTS.FOCUS_NOTIFICATION_SOURCE,
-			{
-				workspaceId: input.target.workspaceId,
-				source: { type: "terminal", id: input.target.terminalId },
-			},
-		);
+		notificationsEmitter.emit(NOTIFICATION_EVENTS.FOCUS_NOTIFICATION_SOURCE, {
+			workspaceId: input.target.workspaceId,
+			source: { type: "terminal", id: input.target.terminalId },
+		});
 	});
 	notification.show();
 	if (input.sound) playNotificationSound();

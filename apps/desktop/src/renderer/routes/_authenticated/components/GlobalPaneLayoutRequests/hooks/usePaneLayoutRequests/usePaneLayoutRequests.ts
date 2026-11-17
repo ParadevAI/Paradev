@@ -21,15 +21,15 @@ import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/wo
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
+import {
+	applyRememberedPaneSelection,
+	rememberPaneSelection,
+} from "renderer/stores/pane-selection";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 import {
 	getV2PaneLayoutStore,
 	type PaneLayoutSlot,
 } from "renderer/stores/v2-pane-layout-stores";
-import {
-	applyRememberedPaneSelection,
-	rememberPaneSelection,
-} from "renderer/stores/pane-selection";
 import {
 	applyPaneLayoutOp,
 	type PaneAreas,
@@ -171,8 +171,7 @@ function runPaneLayoutOp(
 		setSidebarView(collections, workspaceId, wasOpen, { open: true });
 	}
 	const open =
-		collections.workspaceLocalState.get(workspaceId)?.rightSidebarOpen ??
-		false;
+		collections.workspaceLocalState.get(workspaceId)?.rightSidebarOpen ?? false;
 	const fullScreen =
 		open &&
 		useRightPaneFullScreen.getState().fullScreen?.workspaceId === workspaceId;

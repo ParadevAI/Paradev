@@ -7,11 +7,11 @@ import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
-import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import {
 	useAgentConfigs,
 	v2AgentConfigsQueryOptions,
 } from "renderer/hooks/useAgentConfigs";
+import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
 import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import type { StoreApi } from "zustand/vanilla";
 import type {

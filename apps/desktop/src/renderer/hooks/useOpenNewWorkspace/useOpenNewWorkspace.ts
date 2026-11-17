@@ -64,10 +64,7 @@ export function useOpenNewWorkspaceForLocalProject() {
 	const { machineId } = useLocalHostService();
 	return useCallback(
 		(projectId: string) =>
-			openNewWorkspaceForLocalProject(
-				{ machineId, navigate },
-				projectId,
-			),
+			openNewWorkspaceForLocalProject({ machineId, navigate }, projectId),
 		[machineId, navigate],
 	);
 }
@@ -92,11 +89,7 @@ export function useOpenNewWorkspaceForHost() {
 
 	return useCallback(
 		(hostId: string, projectId?: string) => {
-			openNewWorkspace(
-				{ machineId: null, navigate },
-				projectId,
-				hostId,
-			);
+			openNewWorkspace({ machineId: null, navigate }, projectId, hostId);
 		},
 		[navigate],
 	);

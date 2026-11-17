@@ -223,10 +223,7 @@ function writeProjectTopLevelOrder(
 }
 
 function ensureSidebarWorkspaceRecord(
-	collections: Pick<
-		AppCollections,
-		"sidebarSections" | "workspaceLocalState"
-	>,
+	collections: Pick<AppCollections, "sidebarSections" | "workspaceLocalState">,
 	workspaces: readonly TagFolderWorkspaceInput[],
 	tagFolderContext: TagFolderContext,
 	workspaceId: string,
@@ -522,13 +519,9 @@ export function useDashboardSidebarState() {
 					tabOrders.set(projectId, index + 1);
 				}
 			});
-			updateRows(
-				collections.sidebarProjects,
-				tabOrders,
-				(draft, tabOrder) => {
-					draft.tabOrder = tabOrder;
-				},
-			);
+			updateRows(collections.sidebarProjects, tabOrders, (draft, tabOrder) => {
+				draft.tabOrder = tabOrder;
+			});
 		},
 		[collections],
 	);

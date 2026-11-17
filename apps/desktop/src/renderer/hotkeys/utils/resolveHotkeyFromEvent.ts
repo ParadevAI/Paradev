@@ -15,6 +15,7 @@ export {
 	canonicalizeChord,
 	eventToChord,
 	isIgnorableKey,
+	MODIFIERS,
 	matchesChord,
 	normalizeToken,
 } from "shared/hotkey-chord";

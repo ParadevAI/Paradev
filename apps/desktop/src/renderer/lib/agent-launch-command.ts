@@ -6,7 +6,7 @@ import {
 import { parse } from "shell-quote";
 import { joinCommandArgsWithEnv, parseLaunchCommandString } from "./argv";
 
-interface AgentLaunchConfig {
+export interface AgentLaunchConfig {
 	id?: string;
 	presetId?: string;
 	command: string;

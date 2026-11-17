@@ -100,7 +100,7 @@ export function getPathDirectory(path: string): string {
 		: normalizedPath.slice(0, index);
 }
 
-function normalizeComparablePath(path: string): string {
+export function normalizeComparablePath(path: string): string {
 	return path
 		.replace(/[\\/]+/g, "/")
 		.replace(/\/$/, "")

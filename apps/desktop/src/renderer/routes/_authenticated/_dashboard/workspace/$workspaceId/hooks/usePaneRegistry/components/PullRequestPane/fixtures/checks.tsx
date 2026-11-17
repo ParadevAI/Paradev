@@ -60,12 +60,9 @@ mock.module(`${root}/pull-requests/hooks/usePullRequestMergeFlow`, () => ({
 mock.module(`${root}/pull-requests/hooks/useStackRestack`, () => ({
 	useStackRestack: () => null,
 }));
-mock.module(
-	`${root}/workspace/$workspaceId/hooks/useOpenStackLayer`,
-	() => ({
-		useOpenStackLayer: () => mock(),
-	}),
-);
+mock.module(`${root}/workspace/$workspaceId/hooks/useOpenStackLayer`, () => ({
+	useOpenStackLayer: () => mock(),
+}));
 mock.module(`${root}/pull-requests/hooks/useRefreshPullRequest`, () => ({
 	useRefreshPullRequest: () => ({ refresh: () => {}, isRefreshing: false }),
 }));

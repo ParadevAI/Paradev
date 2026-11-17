@@ -50,7 +50,7 @@ export function ProjectsSettingsSidebar({
 			})}
 			hideFilterWhenEmpty
 			groups={listGroups}
-			listFooter={isV2CloudEnabled ? <RecentlyDeletedLink /> : null}
+			listFooter={<RecentlyDeletedLink />}
 			filterRow={(row, q) => row.name.toLowerCase().includes(q.toLowerCase())}
 			getRowKey={(row) => row.id}
 			emptyLabel={t({

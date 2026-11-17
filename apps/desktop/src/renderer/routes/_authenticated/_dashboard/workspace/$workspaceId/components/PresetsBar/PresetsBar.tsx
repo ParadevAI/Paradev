@@ -19,9 +19,9 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { useBuiltinPresets } from "renderer/hooks/useBuiltinPresets";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import type { HotkeyId } from "renderer/hotkeys";
 import { posthog } from "renderer/lib/posthog";

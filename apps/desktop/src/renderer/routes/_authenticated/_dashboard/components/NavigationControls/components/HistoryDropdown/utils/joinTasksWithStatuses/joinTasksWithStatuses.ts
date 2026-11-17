@@ -9,7 +9,7 @@ export type RecentTaskFields = Pick<
 >;
 type TaskStatusRow = RouterOutputs["task"]["statuses"]["list"][number];
 
-interface RecentTaskEntry {
+export interface RecentTaskEntry {
 	id: string;
 	slug: string;
 	title: string;

@@ -14,8 +14,8 @@ import {
 	useWorkspacesFilterStore,
 	type V2WorkspacesGroupBy,
 	type V2WorkspacesOrderBy,
-	type WorkspacesViewMode,
 	WHERE_FILTER_ANYWHERE,
+	type WorkspacesViewMode,
 } from "./stores/workspacesFilterStore";
 import { deriveBoardColumn } from "./utils/deriveBoardColumn";
 import {
@@ -43,9 +43,7 @@ export type WorkspacesSearch = {
 	archived?: true;
 };
 
-export const Route = createFileRoute(
-	"/_authenticated/_dashboard/workspaces/",
-)({
+export const Route = createFileRoute("/_authenticated/_dashboard/workspaces/")({
 	component: WorkspacesPage,
 	validateSearch: (search: Record<string, unknown>): WorkspacesSearch => ({
 		q: typeof search.q === "string" && search.q ? search.q : undefined,
@@ -91,15 +89,11 @@ function WorkspacesPage() {
 	const statusFilters = useWorkspacesFilterStore(
 		(state) => state.statusFilters,
 	);
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	const viewMode = useWorkspacesFilterStore((state) => state.viewMode);
 	const groupBy = useWorkspacesFilterStore((state) => state.groupBy);
 	const orderBy = useWorkspacesFilterStore((state) => state.orderBy);
-	const activeViewId = useWorkspacesFilterStore(
-		(state) => state.activeViewId,
-	);
+	const activeViewId = useWorkspacesFilterStore((state) => state.activeViewId);
 
 	// URL → store, once per mount, and only for params the URL actually
 	// carries: a deep link reproduces its view exactly, while a bare

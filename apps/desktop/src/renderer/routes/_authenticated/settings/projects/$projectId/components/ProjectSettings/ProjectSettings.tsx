@@ -12,8 +12,8 @@ import { useLocalHostService } from "renderer/routes/_authenticated/providers/Lo
 import type { HostSelectOption } from "../../../../components/HostSelect";
 import { DeleteProjectSection } from "./components/DeleteProjectSection";
 import { ProjectLocationSection } from "./components/ProjectLocationSection";
-import { V2ProjectSettingsBody } from "./components/V2ProjectSettingsBody";
 import { ScriptsEditor } from "./components/ScriptsEditor";
+import { V2ProjectSettingsBody } from "./components/V2ProjectSettingsBody";
 import { WorkspaceConfigEditor } from "./components/WorkspaceConfigEditor";
 
 interface ProjectSettingsProps {

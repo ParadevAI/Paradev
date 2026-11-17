@@ -30,8 +30,8 @@ import type { StoreApi } from "zustand/vanilla";
 import { useNewTabLists } from "../../hooks/useNewTabLists";
 import { renderBrowserTabIcon } from "../../hooks/usePaneRegistry/components/BrowserPane";
 import type { PaneViewerData } from "../../types";
-import { NEW_TAB_PANE } from "../RightPaneNewTab";
 import { NotificationStatusIndicator } from "../NotificationStatusIndicator";
+import { NEW_TAB_PANE } from "../RightPaneNewTab";
 import { PullRequestCountsPrefetch } from "./components/PullRequestCountsPrefetch";
 import {
 	withNewTabSplitButton,

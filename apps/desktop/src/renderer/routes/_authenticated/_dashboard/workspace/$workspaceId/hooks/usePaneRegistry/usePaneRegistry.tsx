@@ -57,8 +57,8 @@ import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspac
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { getNotificationSourcesForPane } from "renderer/stores/notifications";
 import type { StoreApi } from "zustand/vanilla";
-import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import { NotificationStatusIndicator } from "../../components/NotificationStatusIndicator";
+import { RightPaneNewTab } from "../../components/RightPaneNewTab";
 import {
 	getDocument,
 	useSharedFileDocument,

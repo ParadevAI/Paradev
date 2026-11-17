@@ -18,7 +18,7 @@ export interface V2PresetLike {
 	agentId?: string | null;
 }
 
-interface ResolvedPresetImport {
+export interface ResolvedPresetImport {
 	v2Name: string;
 	linkedAgentId: string | undefined;
 	/** Keep-v2 collision policy: an existing v2 preset by agentId/name wins. */

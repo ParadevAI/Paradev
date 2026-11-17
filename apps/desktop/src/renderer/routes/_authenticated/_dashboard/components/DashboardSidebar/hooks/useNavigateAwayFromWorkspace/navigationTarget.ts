@@ -1,6 +1,6 @@
 import { getActiveIdAfterRemoval } from "@superset/panes";
 
-type WorkspaceRemovalNavigationTarget =
+export type WorkspaceRemovalNavigationTarget =
 	| { kind: "workspace"; workspaceId: string }
 	| { kind: "home" };
 

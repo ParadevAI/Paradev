@@ -10,7 +10,7 @@ interface ChangesPillInput {
 	unstaged: ChangedFileStats[];
 }
 
-interface ChangesPillStats {
+export interface ChangesPillStats {
 	fileCount: number;
 	additions: number;
 	deletions: number;

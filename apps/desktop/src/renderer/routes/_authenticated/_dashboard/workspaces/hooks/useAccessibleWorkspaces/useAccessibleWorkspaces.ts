@@ -57,6 +57,7 @@ import type {
 
 export type {
 	AccessibleV2Workspace,
+	V2WorkspaceSeenMarks,
 	WorkspaceCreatorOption,
 	WorkspaceDiffStats,
 	WorkspaceHostFilterOption,
@@ -66,7 +67,6 @@ export type {
 	WorkspacePrReviewDecision,
 	WorkspacePrState,
 	WorkspacePrSummary,
-	V2WorkspaceSeenMarks,
 } from "./types";
 
 interface UseAccessibleV2WorkspacesResult {
@@ -526,9 +526,7 @@ export function useAccessibleWorkspaces(
 	}, [diffStatsQueries]);
 	const diffStatsByWorkspaceId = useStableByWorkspaceId(diffStatsEntries);
 
-	const terminalSeenAt = useNotificationStore(
-		(state) => state.terminalSeenAt,
-	);
+	const terminalSeenAt = useNotificationStore((state) => state.terminalSeenAt);
 	const manualUnread = useNotificationStore((state) => state.manualUnread);
 	const cachedBindings = useQueryCacheData<TerminalAgentBinding[]>(
 		TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,

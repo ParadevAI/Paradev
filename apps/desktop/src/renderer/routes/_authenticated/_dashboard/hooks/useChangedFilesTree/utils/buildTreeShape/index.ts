@@ -1,1 +1,1 @@
-export { buildTreeShape } from "./buildTreeShape";
+export { buildTreeShape, type TreeShape } from "./buildTreeShape";

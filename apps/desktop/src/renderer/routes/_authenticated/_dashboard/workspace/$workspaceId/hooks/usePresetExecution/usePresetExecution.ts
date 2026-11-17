@@ -6,15 +6,16 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { useLiveQuery } from "@tanstack/react-db";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import {
 	useAgentConfigs,
 	v2AgentConfigsQueryOptions,
 } from "renderer/hooks/useAgentConfigs";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
 import {
 	findLinkedAgent,
 	resolvePresetLaunchCommands,
 } from "renderer/lib/agent-launch-command";
+import { getPresetLaunchPlan } from "renderer/lib/preset-launch/preset-launch";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";

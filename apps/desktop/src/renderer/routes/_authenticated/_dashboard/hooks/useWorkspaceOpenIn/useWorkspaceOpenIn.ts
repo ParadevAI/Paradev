@@ -25,8 +25,9 @@ export function useWorkspaceOpenIn({
 	const { t } = useLingui();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
 
-	const { app: persistedApp, setApp: persistDefaultApp } =
-		useProjectDefaultApp(projectId ?? undefined);
+	const { app: persistedApp, setApp: persistDefaultApp } = useProjectDefaultApp(
+		projectId ?? undefined,
+	);
 	const resolvedApp: ExternalApp = persistedApp ?? "finder";
 
 	const openInApp = electronTrpc.external.openInApp.useMutation({

@@ -37,7 +37,7 @@ export function selectPendingProjects<T extends { id: string }>(
 	});
 }
 
-type ProjectRowActionPlan =
+export type ProjectRowActionPlan =
 	| { kind: "running"; label?: string }
 	| { kind: "imported"; label: string }
 	| { kind: "confirm-relocate"; message: string; disabled: boolean }

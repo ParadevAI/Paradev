@@ -18,9 +18,7 @@ export function useCurrentViewFilters(): V2WorkspacesViewFilters {
 	const statusFilters = useWorkspacesFilterStore(
 		(state) => state.statusFilters,
 	);
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	return useMemo(
 		() => ({
 			whereFilter,

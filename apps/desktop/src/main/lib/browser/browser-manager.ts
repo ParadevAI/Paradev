@@ -36,7 +36,7 @@ interface PaneRegistration {
 	workspaceId: string | null;
 }
 
-interface BrowserPaneInfo {
+export interface BrowserPaneInfo {
 	paneId: string;
 	workspaceId: string | null;
 	url: string;

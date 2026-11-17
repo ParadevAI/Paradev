@@ -112,15 +112,11 @@ export function V2WorkspacesFilterBar({
 	const setStatusFilters = useWorkspacesFilterStore(
 		(state) => state.setStatusFilters,
 	);
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	const setShowArchived = useWorkspacesFilterStore(
 		(state) => state.setShowArchived,
 	);
-	const activeViewId = useWorkspacesFilterStore(
-		(state) => state.activeViewId,
-	);
+	const activeViewId = useWorkspacesFilterStore((state) => state.activeViewId);
 	const savedViews = useWorkspacesFilterStore((state) => state.savedViews);
 	const currentFilters = useCurrentViewFilters();
 	const resetToView = useWorkspacesFilterStore((state) => state.resetToView);

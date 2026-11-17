@@ -93,12 +93,10 @@ export function TagFolderWorkspacesProvider({
 	// A cloud row's project is the one its placement row filed it under.
 	const { data: placements = [], isReady: placementsReady } = useLiveQuery(
 		(q) =>
-			q
-				.from({ rows: collections.workspaceLocalState })
-				.select(({ rows }) => ({
-					workspaceId: rows.workspaceId,
-					projectId: rows.sidebarState.projectId,
-				})),
+			q.from({ rows: collections.workspaceLocalState }).select(({ rows }) => ({
+				workspaceId: rows.workspaceId,
+				projectId: rows.sidebarState.projectId,
+			})),
 		[collections],
 	);
 	const merged = useMemo(() => {

@@ -20,9 +20,7 @@ export function useRestoreExpandedPaneArea({
 	useEffect(() => {
 		if (!isReady) return;
 		const snapshot =
-			collections.workspaceLocalState.get(
-				workspaceId,
-			)?.rightPaneAreaExpansion;
+			collections.workspaceLocalState.get(workspaceId)?.rightPaneAreaExpansion;
 		if (!snapshot) return;
 		restoreExpandedPaneArea({
 			center: centerStore,

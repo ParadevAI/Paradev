@@ -63,7 +63,6 @@ import {
 } from "react-icons/lu";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
-import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useCreateAgentSession } from "renderer/hooks/useCreateAgentSession";
 import { useNow } from "renderer/hooks/useNow";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";

@@ -13,7 +13,7 @@ import {
 import { useSettings } from "renderer/stores/settings";
 import { DiffTreeToggleButton } from "./components/DiffTreeToggleButton";
 
-interface DiffViewToolbarCommentNav {
+export interface DiffViewToolbarCommentNav {
 	/** Index into the ordered thread list, or null before any navigation. */
 	focusedIndex: number | null;
 	total: number;
@@ -21,7 +21,7 @@ interface DiffViewToolbarCommentNav {
 	onNext: () => void;
 }
 
-interface DiffViewToolbarTreeToggle {
+export interface DiffViewToolbarTreeToggle {
 	fileCount: number;
 	isCollapsed: boolean;
 	onToggle: () => void;

@@ -1,4 +1,4 @@
-interface V1TerminalPane {
+export interface V1TerminalPane {
 	paneId: string;
 	v1WorkspaceId: string;
 	cwd: string | null;
@@ -23,7 +23,7 @@ export interface V1PaneAgentSessionSnapshot {
 	endedAt?: number;
 }
 
-interface MigratedPaneResume {
+export interface MigratedPaneResume {
 	agentId: string;
 	agentSessionId: string;
 }
@@ -45,7 +45,7 @@ export function resolveMigratedPaneResume(
 	return { agentId: session.agentId, agentSessionId: session.agentSessionId };
 }
 
-interface TerminalMigrationPlan {
+export interface TerminalMigrationPlan {
 	/** v2WorkspaceId → terminals to queue (fresh v2 terminal ids). */
 	pendingByV2WorkspaceId: Map<string, PendingMigratedTerminal[]>;
 	/** paneId → assigned v2 terminal id, for ledger recording. */

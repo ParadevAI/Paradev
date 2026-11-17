@@ -1,1 +1,4 @@
-export { WorkspaceContextMenu } from "./WorkspaceContextMenu";
+export {
+	type WorkspaceActions,
+	WorkspaceContextMenu,
+} from "./WorkspaceContextMenu";

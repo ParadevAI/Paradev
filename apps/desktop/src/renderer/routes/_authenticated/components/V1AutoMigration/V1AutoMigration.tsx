@@ -41,12 +41,16 @@ import { useV1MigrationStatusStore } from "renderer/stores/v1-migration-status";
 import { appendPendingMigratedTerminals } from "renderer/stores/workspace-creates/appendPendingMigratedTerminals";
 
 /**
- * Headless import of legacy v1 data (local SQLite) into this machine's host
- * service. Runs one pass per boot while there is outstanding work: machines
- * that still hold unmigrated v1 rows, or best-effort kinds
- * (settings/presets/terminals) that were still failing when the gate
- * completed. Completed migrations still run the ledger-guarded group
- * backfill, since older passes omitted groups entirely.
+ * Headless v1→v2 auto-migration (migrate-then-flip). On the v1 surface it
+ * runs one pass per boot once the preconditions hold, records everything in
+ * the ledger, and marks the org complete when the flip gate (projects +
+ * workspaces) is satisfied — the NEXT launch then lands on v2 with data
+ * already in place. On the v2 surface the full pass runs while there is
+ * outstanding work: best-effort kinds (settings/presets/terminals) that
+ * were still failing when the gate completed (D4), or everything on
+ * machines that reached v2 with unmigrated v1 data (see planV2SurfacePass).
+ * Completed v2 migrations still run the ledger-guarded group backfill, since
+ * older passes omitted groups entirely.
  * Cross-instance single-flight via a main-process lock file. A pass that
  * throws, or leaves the gate open only for transient reasons (network,
  * host-service down), re-arms itself on a short backoff within the session;
@@ -126,6 +130,7 @@ export function V1AutoMigration() {
 		startedOrgsRef.current.add(organizationId);
 
 		const hostUrl = activeHostUrl;
+		const trigger = "v2-followup";
 		const isActiveOrg = () => activeOrgRef.current === organizationId;
 		const setStatus: typeof setMigrationStatus = (...args) => {
 			if (isActiveOrg()) setMigrationStatus(...args);
@@ -161,6 +166,7 @@ export function V1AutoMigration() {
 			if (delayMs === null) return false;
 			retryAttemptsRef.current.set(organizationId, attempt);
 			posthog.capture("v1_auto_migration_retry_scheduled", {
+				trigger,
 				attempt,
 				delay_ms: delayMs,
 				reasons: reasons.slice(0, 5),
@@ -240,7 +246,7 @@ export function V1AutoMigration() {
 					});
 				};
 				// Older completed migrations never imported v1 groups. Backfill on
-				// every boot; the ledger preserves later customizations.
+				// v2 boots too; the ledger preserves later v2 customizations.
 				if (groupsOnly) {
 					await migrateV1Groups({
 						groupTarget,
@@ -256,6 +262,7 @@ export function V1AutoMigration() {
 					organizationId,
 					hostClient: getHostServiceClientByUrl(hostUrl),
 					ipc,
+					reconcileWithHost: false,
 					presetTarget: {
 						agents,
 						existing: Array.from(
@@ -300,7 +307,11 @@ export function V1AutoMigration() {
 				let firstCompletion = false;
 				if (summary.gateComplete) {
 					firstCompletion = !isV1MigrationComplete(organizationId);
-					markV1MigrationComplete(organizationId);
+					// Already on v2: no flip happens, so no welcome card or
+					// continuity restore to hand off to the next launch.
+					markV1MigrationComplete(organizationId, {
+						armFlipHandoff: false,
+					});
 					const bestEffortClean =
 						summary.settings.failed +
 							summary.settings.deferred +
@@ -309,6 +320,10 @@ export function V1AutoMigration() {
 							summary.terminals.failed +
 							summary.terminals.deferred ===
 						0;
+					// First completion always arms a catch-up pass: the user keeps
+					// working on v1 for the REST of this session (the pass ran at
+					// boot), so the first v2 boot must re-sync that tail before the
+					// flag can clear.
 					setV1FollowUpPending(organizationId, !bestEffortClean);
 				}
 
@@ -342,6 +357,7 @@ export function V1AutoMigration() {
 				}
 				posthog.capture("v1_auto_migration_completed", {
 					...v1MigrationEventProps(summary),
+					trigger,
 					first_completion: firstCompletion,
 					duration_ms: Date.now() - startedAt,
 					failure_reasons: failureReasons,
@@ -355,6 +371,7 @@ export function V1AutoMigration() {
 				const durationMs = Date.now() - startedAt;
 				hostReset = await resetOutdatedHostOnce([message]);
 				posthog.capture("v1_auto_migration_failed", {
+					trigger,
 					duration_ms: durationMs,
 					error: message,
 					host_reset: hostReset,

@@ -32,12 +32,12 @@ import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/u
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
+import { useNotificationStore } from "renderer/stores/notifications";
 import { useRestoreCloudWorkspaceIntent } from "renderer/stores/restore-cloud-workspace-intent";
 import { useSaveAsEnvironmentIntent } from "renderer/stores/save-as-environment-intent";
-import { useNotificationStore } from "renderer/stores/notifications";
 import { getWorkspaceDisplayName } from "renderer/utils/getWorkspaceDisplayName";
 
-interface WorkspaceActions {
+export interface WorkspaceActions {
 	/** Navigate to the workspace (paywall-gated for remote hosts). */
 	open: () => void;
 	addToSidebar: () => void;

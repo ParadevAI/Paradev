@@ -56,7 +56,10 @@ const RULES: Rule[] = [
 	{
 		name: "in-process git client construction",
 		pattern: /\b(simpleGit|getSimpleGitWithShellPath)\b/,
-		allowedCounts: {},
+		allowedCounts: {
+			// v1 importer: one git call per detached worktree, user-triggered.
+			"lib/trpc/routers/migration/index.ts": 2,
+		},
 		advice:
 			"simple-git is async, but a client constructed here still pays the spawn syscall + stdout drain on the Electron main process — cost scales linearly with call volume (branch polls, sidebar rows). Async isn't enough for git; route it off-process through host-service.",
 	},

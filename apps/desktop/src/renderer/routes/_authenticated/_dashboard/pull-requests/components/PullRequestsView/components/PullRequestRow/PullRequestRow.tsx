@@ -15,7 +15,7 @@ import {
 	PRIcon,
 } from "renderer/screens/main/components/PRIcon";
 
-interface PullRequestRowData {
+export interface PullRequestRowData {
 	projectId: string;
 	prNumber: number;
 	title: string;

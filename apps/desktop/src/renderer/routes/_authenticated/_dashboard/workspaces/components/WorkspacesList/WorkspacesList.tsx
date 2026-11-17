@@ -77,18 +77,14 @@ export function WorkspacesList({ workspaces, isReady }: WorkspacesListProps) {
 		currentWorkspaceMatch !== false ? currentWorkspaceMatch.workspaceId : null;
 
 	const searchQuery = useWorkspacesFilterStore((state) => state.searchQuery);
-	const activeViewId = useWorkspacesFilterStore(
-		(state) => state.activeViewId,
-	);
+	const activeViewId = useWorkspacesFilterStore((state) => state.activeViewId);
 	const savedViews = useWorkspacesFilterStore((state) => state.savedViews);
 	const currentFilters = useCurrentViewFilters();
 	const applyView = useWorkspacesFilterStore((state) => state.applyView);
 	const setSearchQuery = useWorkspacesFilterStore(
 		(state) => state.setSearchQuery,
 	);
-	const showArchived = useWorkspacesFilterStore(
-		(state) => state.showArchived,
-	);
+	const showArchived = useWorkspacesFilterStore((state) => state.showArchived);
 	const groupBy = useWorkspacesFilterStore((state) => state.groupBy);
 	const orderBy = useWorkspacesFilterStore((state) => state.orderBy);
 	// Status sections persist their collapse in the project-meta store under a
