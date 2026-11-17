@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useHotkey } from "renderer/hotkeys";
+import { noteUserSidebarToggle } from "renderer/stores/agent-sidebar-reveal";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
 import { useRightPaneMode } from "./hooks/useRightPaneMode";
 import { useWorkspaceRightSidebarOpen } from "./hooks/useWorkspaceRightSidebarOpen";
@@ -12,7 +13,10 @@ export function useWorkspaceRightPane({
 	isPaneAreaEnabled: boolean;
 }) {
 	const { isOpen, setOpen } = useWorkspaceRightSidebarOpen();
-	const toggle = useCallback(() => setOpen((prev) => !prev), [setOpen]);
+	const toggle = useCallback(() => {
+		noteUserSidebarToggle(workspaceId, !isOpen);
+		setOpen(!isOpen);
+	}, [workspaceId, isOpen, setOpen]);
 	useHotkey("TOGGLE_SIDEBAR", toggle);
 	useEffect(
 		() =>

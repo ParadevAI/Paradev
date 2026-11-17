@@ -326,6 +326,35 @@ describe("browserRuntimeRegistry overlay layer", () => {
 		}
 	});
 
+	test("a browser that mounts inside a hidden sidebar stays hidden", () => {
+		const paneId = "hidden-sidebar-pane";
+		const sidebar = document.createElement("div");
+		sidebar.style.visibility = "hidden";
+		const placeholder = document.createElement("div");
+		sidebar.appendChild(placeholder);
+		document.body.appendChild(sidebar);
+		const entry = { ...makeEntry(), state: {}, workspaceId: "ws" };
+		registryInternals.entries.set(paneId, entry as never);
+		try {
+			browserRuntimeRegistry.attach(
+				paneId,
+				placeholder,
+				"https://example.com",
+				"ws",
+				() => {},
+				() => {},
+			);
+			expect(entry.webview.style.visibility).toBe("hidden");
+			sidebar.style.visibility = "";
+			browserRuntimeRegistry.relayout();
+			expect(entry.webview.style.visibility).toBe("visible");
+		} finally {
+			browserRuntimeRegistry.detach(paneId);
+			registryInternals.entries.delete(paneId);
+			sidebar.remove();
+		}
+	});
+
 	test("reports no overlay for an unknown pane", () => {
 		expect(browserRuntimeRegistry.getOverlayContainer("nope")).toBeNull();
 	});
