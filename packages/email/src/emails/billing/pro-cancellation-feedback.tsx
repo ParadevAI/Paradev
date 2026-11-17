@@ -16,8 +16,7 @@ export function ProCancellationFeedbackEmail() {
 			<Body style={{ margin: 0, backgroundColor: "#FFFFFF" }}>
 				<Text style={paragraph}>Hey there,</Text>
 				<Text style={paragraph}>
-					I&apos;m Kiet, one of the founders of Paradev. I saw you cancelled
-					Pro.
+					I&apos;m Kiet, founder at Paradev. I saw you cancelled Pro.
 				</Text>
 				<Text style={paragraph}>What made you cancel?</Text>
 				<Text style={paragraph}>Thanks for giving Paradev a try.</Text>
