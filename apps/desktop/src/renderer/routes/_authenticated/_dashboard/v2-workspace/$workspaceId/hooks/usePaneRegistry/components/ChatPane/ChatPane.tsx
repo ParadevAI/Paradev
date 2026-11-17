@@ -17,6 +17,7 @@ import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
+import { useRunInTerminal } from "./hooks/useRunInTerminal";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,
@@ -39,6 +40,7 @@ export function ChatPane({
 }) {
 	const data = ctx.pane.data as ChatPaneData;
 	const openPage = useOpenChatPage(ctx.store);
+	const runInTerminal = useRunInTerminal(ctx.actions.split);
 	const { hint, showHint } = useLinkClickHint();
 	const openLink = useOpenChatLink({
 		store: ctx.store,
@@ -242,6 +244,7 @@ export function ChatPane({
 				getOpenFilePaths={getOpenFilePaths}
 				onOpenHistory={onOpenHistory}
 				onNewChat={agentId ? onNewChat : undefined}
+				onRunInTerminal={runInTerminal}
 				sessionId={data.sessionId}
 				terminalId={data.terminalId}
 				workspaceId={workspaceId}

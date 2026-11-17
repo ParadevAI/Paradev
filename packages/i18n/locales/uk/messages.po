@@ -87,6 +87,9 @@ msgstr "(немає виводу)"
 msgid "(you)"
 msgstr "(ви)"
 
+msgid "[command]"
+msgstr "[команда]"
+
 msgid "[prompt]"
 msgstr "[промпт]"
 
@@ -6136,6 +6139,9 @@ msgstr "Не вдалося перевести субагента у фонов�
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
+
+msgid "Couldn't open a terminal"
+msgstr "Не вдалося відкрити термінал"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Не вдалося відкрити в інтерфейсі чату"
@@ -16944,6 +16950,9 @@ msgstr "Запускайте понад 10 кодинг-агентів пара�
 
 msgid "Run 10+ parallel coding agents on your machine."
 msgstr "Запускайте 10+ паралельних кодинг-агентів на своєму комп'ютері."
+
+msgid "Run a command in a new terminal"
+msgstr "Виконати команду в новому терміналі"
 
 msgid "Run again"
 msgstr "Запустити знову"

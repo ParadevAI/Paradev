@@ -13,6 +13,7 @@ import {
 	Search,
 	ServerIcon,
 	Split,
+	SquareTerminal,
 	Undo2,
 	Zap,
 } from "lucide-react";
@@ -34,6 +35,7 @@ export type AppCommandContext = {
 	openFind?: () => void;
 	openStatus?: () => void;
 	createAutomation?: (prompt: string) => void;
+	runInTerminal?: (command: string) => void;
 };
 
 export type AppCommandOutcome = "done" | "bad-args";
@@ -187,6 +189,19 @@ export const APP_COMMANDS: readonly AppCommand[] = [
 		run: (context, args) => {
 			if (!args) return "bad-args";
 			context.createAutomation?.(args);
+			return "done";
+		},
+	},
+	{
+		name: "terminal",
+		aliases: ["sh"],
+		icon: SquareTerminal,
+		description: msg({ message: "Run a command in a new terminal" }),
+		hint: msg({ message: "[command]" }),
+		takesText: true,
+		available: (context) => context.runInTerminal !== undefined,
+		run: (context, args) => {
+			context.runInTerminal?.(args);
 			return "done";
 		},
 	},

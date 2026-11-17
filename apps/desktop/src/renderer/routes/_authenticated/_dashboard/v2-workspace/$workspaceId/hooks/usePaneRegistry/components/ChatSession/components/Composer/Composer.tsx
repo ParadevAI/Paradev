@@ -121,6 +121,8 @@ export type ComposerProps = {
 	onFork?: (target: ChatForkTarget) => void;
 	canForkToWorktree?: boolean;
 	onOpenFind?: () => void;
+	/** Opens a terminal in this workspace running `command`, or a bare shell. */
+	onRunInTerminal?: (command: string) => void;
 	history?: string[];
 	isActive?: boolean;
 	placeholder?: string;
@@ -198,6 +200,7 @@ export const Composer = memo(function Composer({
 	onFork,
 	onNewChat,
 	onOpenFind,
+	onRunInTerminal,
 	onSend,
 	onOpenHistory,
 	placeholder,
@@ -512,6 +515,7 @@ export const Composer = memo(function Composer({
 		...(onOpenFind ? { onOpenFind } : {}),
 		...(status.available ? { openStatus: status.open } : {}),
 		...(mcpPicker.available ? { openMcp } : {}),
+		...(onRunInTerminal ? { onRunInTerminal } : {}),
 		toSubagent: target !== undefined,
 	});
 	const { hiddenAgentNames, runTyped } = appCommands;
