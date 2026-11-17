@@ -31,6 +31,9 @@ import * as pagesPull from "./pages/pull";
 import * as pagesStorage from "./pages/storage";
 import * as pagesVersions from "./pages/versions";
 import * as projectsList from "./projects/list";
+import * as sessionsCreate from "./sessions/create";
+import * as sessionsRead from "./sessions/read";
+import * as sessionsSend from "./sessions/send";
 import * as tasksCreate from "./tasks/create";
 import * as tasksDelete from "./tasks/delete";
 import * as tasksGet from "./tasks/get";
@@ -50,6 +53,9 @@ import * as workspacesUpdate from "./workspaces/update";
 const REGISTRARS = [
 	tasksList,
 	tasksGet,
+	sessionsCreate,
+	sessionsRead,
+	sessionsSend,
 	tasksCreate,
 	tasksUpdate,
 	tasksDelete,
