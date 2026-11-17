@@ -1,5 +1,13 @@
-import { Section, Text } from "@react-email/components";
-import { Button, EmailLayout } from "../../components";
+import { Link, Text } from "@react-email/components";
+import { PersonalLayout } from "../../components";
+
+const paragraph = {
+	margin: "0 0 16px 0",
+	fontFamily: "Arial, Helvetica, sans-serif",
+	fontSize: "14px",
+	lineHeight: "21px",
+	color: "#222222",
+} as const;
 
 interface UpgradeNudgeEmailProps {
 	featureName: string;
@@ -9,37 +17,26 @@ interface UpgradeNudgeEmailProps {
 
 export function UpgradeNudgeEmail({
 	featureName = "Paradev Mobile",
-	upgradeUrl = "https://app.superset.sh/settings/billing",
+	upgradeUrl = "https://app.paradev.com/settings/billing",
 	unsubscribeUrl,
 }: UpgradeNudgeEmailProps) {
 	return (
-		<EmailLayout
-			preview={`${featureName} is part of Paradev Pro.`}
+		<PersonalLayout
+			preview={`I saw you tried ${featureName} on your phone.`}
 			unsubscribeUrl={unsubscribeUrl}
 		>
-			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-				Hi there,
+			<Text style={paragraph}>Hey there,</Text>
+			<Text style={paragraph}>
+				I&apos;m Kiet, one of the founders of Paradev. I saw you tried{" "}
+				{featureName} on your phone. That&apos;s part of Pro, and your team is
+				on the Free plan.
 			</Text>
-
-			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-				You tried to use <strong>{featureName}</strong> on your phone. It's part
-				of Pro, and your organization is on the Free plan.
+			<Text style={paragraph}>
+				You can <Link href={upgradeUrl}>upgrade on the web</Link>, and the app
+				picks up the new plan on its own.
 			</Text>
-
-			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">
-				You can compare plans and upgrade on the web. The mobile app picks up
-				the new plan on its own.
-			</Text>
-
-			<Section className="mb-6">
-				<Button href={upgradeUrl}>See plans</Button>
-			</Section>
-
-			<Text className="text-[13px] leading-5 text-muted m-0">
-				You're receiving this because you tried a Pro feature in the Paradev
-				mobile app. We send this at most once a week.
-			</Text>
-		</EmailLayout>
+			<Text style={{ ...paragraph, margin: 0 }}>Kiet</Text>
+		</PersonalLayout>
 	);
 }
 
