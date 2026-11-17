@@ -13,14 +13,13 @@ import {
 	useNavigate,
 	useRouterState,
 } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HiOutlineWifi } from "react-icons/hi2";
 import { Paywall } from "renderer/components/Paywall";
 import { Redirect } from "renderer/components/Redirect";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useOnlineStatus } from "renderer/hooks/useOnlineStatus";
 import { useSettingsExternalChangeListener } from "renderer/hooks/useSettingsExternalChangeListener";
 import { useSignOut } from "renderer/hooks/useSignOut";
@@ -28,8 +27,6 @@ import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
-import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
-import { InitGitDialog } from "renderer/react-query/projects/InitGitDialog";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
 import { InterruptedChatsDialog } from "renderer/routes/_authenticated/components/InterruptedChatsDialog";
@@ -45,7 +42,6 @@ import {
 	V1MigrationContinuity,
 } from "renderer/routes/_authenticated/components/V1AutoMigration";
 import {
-	V1FlipNotice,
 	V1MigrationStatusCard,
 	V1TerminalsNotice,
 	V2FlipWelcome,
@@ -53,12 +49,7 @@ import {
 import { V1ImportModal } from "renderer/routes/_authenticated/components/V1ImportModal";
 import { useForwardedHotkeys } from "renderer/routes/_authenticated/hooks/useForwardedHotkeys";
 import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotkeys";
-import { WorkspaceInitEffects } from "renderer/screens/main/components/WorkspaceInitEffects";
 import { useSettingsStore } from "renderer/stores/settings-state";
-import { useTabsStore } from "renderer/stores/tabs/store";
-import { useAgentHookListener } from "renderer/stores/tabs/useAgentHookListener";
-import { setPaneWorkspaceRunState } from "renderer/stores/tabs/workspace-run";
-import { useWorkspaceInitStore } from "renderer/stores/workspace-init";
 import { MOCK_ORG_ID, NOTIFICATION_EVENTS } from "shared/constants";
 import { AgentHooks } from "./components/AgentHooks";
 import { DockBadgeController } from "./components/DockBadgeController";
@@ -69,7 +60,6 @@ import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
 import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
-import { TeardownLogsDialog } from "./components/TeardownLogsDialog";
 import { V2NotificationController } from "./components/V2NotificationController";
 import { WindowTitle } from "./components/WindowTitle";
 import { createPierreWorker } from "./lib/pierreWorker";
@@ -124,9 +114,6 @@ function AuthenticatedLayout() {
 		select: (state) => state.matches[state.matches.length - 1]?.pathname ?? "",
 	});
 	const setOriginRoute = useSettingsStore((s) => s.setOriginRoute);
-	const utils = electronTrpc.useUtils();
-	const shownWorkspaceInitWarningsRef = useRef(new Set<string>());
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 
 	const isSignedIn = env.SKIP_ENV_VALIDATION || !!session?.user;
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION
@@ -143,7 +130,6 @@ function AuthenticatedLayout() {
 	const signOut = useSignOut();
 	const [isSigningOut, setIsSigningOut] = useState(false);
 
-	useAgentHookListener();
 	useSettingsExternalChangeListener();
 
 	// Seed the parked-terminal eviction cap from settings (SUPER-1545).
@@ -155,7 +141,6 @@ function AuthenticatedLayout() {
 		}
 	}, [parkedRuntimeCap]);
 
-	// Update workspace-run pane state on terminal exit
 	electronTrpc.notifications.subscribe.useSubscription(undefined, {
 		onData: (event) => {
 			if (
@@ -172,22 +157,6 @@ function AuthenticatedLayout() {
 						focusRequestId: crypto.randomUUID(),
 					},
 				});
-				return;
-			}
-
-			if (
-				event.type !== NOTIFICATION_EVENTS.TERMINAL_EXIT ||
-				!event.data?.paneId
-			) {
-				return;
-			}
-			const pane = useTabsStore.getState().panes[event.data.paneId];
-			if (pane?.workspaceRun?.state === "running") {
-				const nextState =
-					event.data.reason === "killed"
-						? "stopped-by-user"
-						: "stopped-by-exit";
-				setPaneWorkspaceRunState(event.data.paneId, nextState);
 			}
 		},
 	});
@@ -198,31 +167,6 @@ function AuthenticatedLayout() {
 		}
 	}, [location.pathname, setOriginRoute]);
 
-	// Workspace initialization progress subscription
-	const updateInitProgress = useWorkspaceInitStore((s) => s.updateProgress);
-	electronTrpc.workspaces.onInitProgress.useSubscription(undefined, {
-		onData: (progress) => {
-			updateInitProgress(progress);
-			if (
-				progress.warning &&
-				!shownWorkspaceInitWarningsRef.current.has(progress.workspaceId)
-			) {
-				shownWorkspaceInitWarningsRef.current.add(progress.workspaceId);
-				showWorkspaceAutoNameWarningToast({
-					description: progress.warning,
-				});
-			}
-			if (progress.step === "ready" || progress.step === "failed") {
-				// Invalidate both the grouped list AND the specific workspace
-				utils.workspaces.getAllGrouped.invalidate();
-				utils.workspaces.get.invalidate({ id: progress.workspaceId });
-			}
-		},
-		onError: (error) => {
-			console.error("[workspace-init-subscription] Subscription error:", error);
-		},
-	});
-
 	useZoomHotkeys();
 	useForwardedHotkeys();
 
@@ -232,8 +176,6 @@ function AuthenticatedLayout() {
 			if (event.type === "open-settings") {
 				const section = event.data.section || "account";
 				navigate({ to: `/settings/${section}` as "/settings/account" });
-			} else if (event.type === "open-workspace") {
-				navigate({ to: `/workspace/${event.data.workspaceId}` });
 			}
 		},
 	});
@@ -356,25 +298,14 @@ function AuthenticatedLayout() {
 									<InterruptedChatsDialog />
 									<Outlet />
 									<V1ImportModal />
-									{isV2CloudEnabled ? (
-										<>
-											<V1MigrationContinuity />
-											<V2FlipWelcome organizationId={activeOrganizationId} />
-											<V1MigrationStatusCard
-												organizationId={activeOrganizationId}
-											/>
-											<V1TerminalsNotice
-												organizationId={activeOrganizationId}
-											/>
-										</>
-									) : (
-										<V1FlipNotice />
-									)}
+									<V1MigrationContinuity />
+									<V2FlipWelcome organizationId={activeOrganizationId} />
+									<V1MigrationStatusCard
+										organizationId={activeOrganizationId}
+									/>
+									<V1TerminalsNotice organizationId={activeOrganizationId} />
 									<V1AutoMigration />
-									<WorkspaceInitEffects />
-									<InitGitDialog />
 									<GitInitConfirmDialog />
-									<TeardownLogsDialog />
 									<Paywall />
 									<InviteMemberDialog />
 									<ResizeMachineConfirmDialog />

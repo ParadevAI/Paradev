@@ -2,12 +2,12 @@ const STORAGE_KEY = "v2-pane-scroll-state-v1";
 const MAX_ENTRIES = 250;
 const WRITE_DELAY_MS = 200;
 
-export interface PaneScrollPosition {
+interface PaneScrollPosition {
 	scrollTop: number;
 	scrollLeft: number;
 }
 
-export interface PaneScrollState extends PaneScrollPosition {
+interface PaneScrollState extends PaneScrollPosition {
 	updatedAt: number;
 }
 

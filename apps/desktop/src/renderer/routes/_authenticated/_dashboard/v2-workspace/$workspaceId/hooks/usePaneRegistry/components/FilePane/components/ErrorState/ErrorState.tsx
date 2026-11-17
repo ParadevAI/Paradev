@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { Button } from "@superset/ui/button";
 
-export type ErrorReason =
+type ErrorReason =
 	| "not-found"
 	| "too-large"
 	| "is-directory"

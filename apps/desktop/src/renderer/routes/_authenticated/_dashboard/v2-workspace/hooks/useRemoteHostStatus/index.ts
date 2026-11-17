@@ -1,4 +1,1 @@
-export {
-	type RemoteHostStatus,
-	useRemoteHostStatus,
-} from "./useRemoteHostStatus";
+export { useRemoteHostStatus } from "./useRemoteHostStatus";

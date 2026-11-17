@@ -1,6 +1,6 @@
 export const DEFAULT_BROWSER_URL = "about:blank";
 
-export interface DevicePreset {
+interface DevicePreset {
 	id: string;
 	label: string;
 	width: number;

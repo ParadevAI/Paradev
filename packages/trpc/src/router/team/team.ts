@@ -36,10 +36,12 @@ export const teamRouter = {
 			await verifyOrgAdmin(ctx.session.user.id, organizationId);
 			await requireTeamInActiveOrg(input.teamId, organizationId);
 
-			await ctx.auth.api.addTeamMember({
-				body: { teamId: input.teamId, userId: input.userId },
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.addTeamMember({
+					body: { teamId: input.teamId, userId: input.userId },
+					headers: ctx.headers,
+				}),
+			);
 			return { success: true };
 		}),
 

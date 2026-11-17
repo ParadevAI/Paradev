@@ -215,6 +215,7 @@
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@better-auth/api-key": "1.6.22",
 		"@microsoft/microsoft-graph-types": "2.43.1",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",

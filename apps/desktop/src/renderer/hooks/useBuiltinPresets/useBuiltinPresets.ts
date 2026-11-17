@@ -27,7 +27,7 @@ export const BUILTIN_CLI_PRESET: V2TerminalPresetRow = {
 	createdAt: new Date(0),
 };
 
-export interface BuiltinPresetEntry {
+interface BuiltinPresetEntry {
 	preset: V2TerminalPresetRow;
 	isVisible: boolean;
 }

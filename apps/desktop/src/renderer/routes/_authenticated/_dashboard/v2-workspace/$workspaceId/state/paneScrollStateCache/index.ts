@@ -1,7 +1,3 @@
-export type {
-	PaneScrollPosition,
-	PaneScrollState,
-} from "./paneScrollStateCache";
 export {
 	createPaneScrollStateKey,
 	getPaneScrollState,

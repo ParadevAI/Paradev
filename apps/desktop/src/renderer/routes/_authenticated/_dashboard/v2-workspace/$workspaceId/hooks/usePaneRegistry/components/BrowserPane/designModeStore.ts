@@ -8,9 +8,9 @@ import type {
 	DesignModeScreenshot,
 } from "shared/browser-design-mode";
 
-export type DesignModePhase = "idle" | "selecting" | "confirming";
+type DesignModePhase = "idle" | "selecting" | "confirming";
 
-export interface DesignModeState {
+interface DesignModeState {
 	phase: DesignModePhase;
 	/** Set while `phase === "confirming"`. */
 	payload: DesignModePayload | null;

@@ -4,6 +4,7 @@ import { findMcpServerTokens } from "../../../../../../utils/mcpServerChips";
 
 const encoder = new TextEncoder();
 const SKILL_NAME = /(^|\s)([\w-]+:[\w:-]*\w)(?=$|[\s.,!?;)])/g;
+const COMMAND_TOKEN = /(^|\s)([/$][\w:.-]*\w)(?=$|[\s.,!?;)])/g;
 
 function byteOffset(text: string, index: number): number {
 	return encoder.encode(text.slice(0, index)).length;
@@ -24,6 +25,22 @@ export function textElementsFromText(
 					},
 				]
 			: []),
+		...[...text.matchAll(COMMAND_TOKEN)].flatMap((match) => {
+			const token = match[2] ?? "";
+			const start = (match.index ?? 0) + (match[1]?.length ?? 0);
+			if (token.startsWith("/") && start === 0) return [];
+			const name = token.startsWith("$") ? token : token.slice(1);
+			if (!commands?.has(name)) return [];
+			return [
+				{
+					byteRange: {
+						start: byteOffset(text, start),
+						end: byteOffset(text, start + token.length),
+					},
+					elementKind: "slash_command" as const,
+				},
+			];
+		}),
 		...[...text.matchAll(SKILL_NAME)].flatMap((match) => {
 			const name = match[2] ?? "";
 			if (!commands?.has(name)) return [];

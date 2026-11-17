@@ -2,9 +2,11 @@ import { TRPCError } from "@trpc/server";
 import { isAPIError } from "better-auth/api";
 import { userError } from "../../i18n-error";
 
+// A better-auth 401 refuses a caller the API already signed in, so it is not an
+// expired session. Clients read UNAUTHORIZED as "sign in again".
 const TRPC_CODE_BY_STATUS: Record<number, TRPCError["code"]> = {
 	400: "BAD_REQUEST",
-	401: "UNAUTHORIZED",
+	401: "FORBIDDEN",
 	403: "FORBIDDEN",
 	404: "NOT_FOUND",
 	409: "CONFLICT",

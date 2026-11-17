@@ -1,4 +1,1 @@
-export {
-	buildOrderedThreads,
-	type OrderedDiffThread,
-} from "./buildOrderedThreads";
+export { buildOrderedThreads } from "./buildOrderedThreads";

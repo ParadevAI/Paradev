@@ -39,7 +39,7 @@ interface UseFilesTabActionsOptions {
 	workspaceId: string;
 }
 
-export interface FilesTabActions {
+interface FilesTabActions {
 	/** Expand every ancestor directory of `absolutePath` then scroll the row into view. */
 	reveal(absolutePath: string, isDirectory: boolean): Promise<void>;
 	/** Create a file/folder on disk, then open the inline rename on it. */

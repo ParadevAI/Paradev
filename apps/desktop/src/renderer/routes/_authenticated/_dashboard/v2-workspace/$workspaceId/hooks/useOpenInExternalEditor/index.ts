@@ -1,4 +1,1 @@
-export {
-	type OpenInExternalEditorOptions,
-	useOpenInExternalEditor,
-} from "./useOpenInExternalEditor";
+export { useOpenInExternalEditor } from "./useOpenInExternalEditor";

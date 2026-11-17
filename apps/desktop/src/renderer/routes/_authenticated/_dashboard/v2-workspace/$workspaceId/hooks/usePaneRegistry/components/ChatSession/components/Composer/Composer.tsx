@@ -56,7 +56,11 @@ import { useChatWiring } from "../../hooks/useSessionClient";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
-import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import {
+	commandChip,
+	isSigilSkill,
+	LEADING_COMMAND,
+} from "../../utils/commandChip";
 import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
@@ -140,19 +144,22 @@ const HIDDEN_AGENT_COMMANDS = new Set(["rewind"]);
 
 /**
  * The agent's own slash commands, in the shape the composer's menu takes.
- * Selecting one inserts a chip that serializes back to `/name`, so what the
- * agent receives is the command it advertised.
+ * Selecting one inserts a chip that serializes back to `/name`, or `$name` for
+ * an agent whose skills carry that sigil, so the agent receives what it
+ * advertised. Such an agent's other commands only run at the message start.
  */
 function toMenuCommands(
 	commands: AvailableCommand[],
 	groups: { commands: string; mcp: string },
 ): PromptInputCommand[] {
+	const sigilSkills = commands.some((command) => isSigilSkill(command.name));
 	return commands.map((command) => ({
 		id: command.name,
-		title: `/${command.name}`,
+		title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
 		...(command.hint ? { hint: command.hint } : {}),
 		description: command.description ?? "",
 		group: command.category === "mcp" ? groups.mcp : groups.commands,
+		inline: !sigilSkills || isSigilSkill(command.name),
 		onSelect: (ctx) => {
 			ctx.insertChip(commandChip(command.name, command.description));
 		},
