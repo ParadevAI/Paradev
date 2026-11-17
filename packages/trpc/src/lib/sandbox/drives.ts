@@ -47,26 +47,42 @@ export function workspaceDriveIdentity(
 }
 
 /**
- * Only a provision gives a workspace its environment's drive. A wake mounts
- * the row's own drive or none, so a workspace made before its environment
- * entered drive mode boots exactly as it did.
+ * The drive a claim names. Only a provision gives a workspace its
+ * environment's drive, and only while the organization's flag is on; a wake
+ * mounts the row's own drive or none, so a workspace made before its
+ * environment entered drive mode boots exactly as it did. A wake expects the
+ * drive laid out once the row recorded a boot that laid it out.
  */
-export function claimedDriveIdentity(args: {
-	row: { driveName: string | null; providerSandboxId: string };
+export function claimedWorkspaceDrive(args: {
+	row: {
+		driveName: string | null;
+		driveLaidOutAt: Date | null;
+		providerSandboxId: string;
+	};
 	goldenDriveName: string | null | undefined;
 	provisioning: boolean;
-}): ReturnType<typeof workspaceDriveIdentity> {
+	drivesEnabled: boolean;
+}): {
+	driveName: string | null;
+	identity: ReturnType<typeof workspaceDriveIdentity>;
+} {
 	if (!args.provisioning) {
-		return workspaceDriveIdentity(args.row.driveName, { laidOut: true });
+		return {
+			driveName: args.row.driveName,
+			identity: workspaceDriveIdentity(args.row.driveName, {
+				laidOut: args.row.driveLaidOutAt !== null,
+			}),
+		};
 	}
-	return workspaceDriveIdentity(
-		workspaceDriveNameToClaim({
-			existing: args.row.driveName,
-			goldenDriveName: args.goldenDriveName,
-			providerSandboxId: args.row.providerSandboxId,
-		}),
-		{ laidOut: false },
-	);
+	const driveName = workspaceDriveNameToClaim({
+		existing: args.row.driveName,
+		goldenDriveName: args.drivesEnabled ? args.goldenDriveName : null,
+		providerSandboxId: args.row.providerSandboxId,
+	});
+	return {
+		driveName,
+		identity: workspaceDriveIdentity(driveName, { laidOut: false }),
+	};
 }
 
 export function goldenDriveNameFor(goldenName: string): string {
@@ -159,9 +175,9 @@ export async function forkWorkspaceDrive(args: {
 	region: string;
 	goldenDriveName: string | null;
 	drives?: DriveHost;
-}): Promise<void> {
+}): Promise<"existing" | "forked"> {
 	const drives = args.drives ?? vercelDrives();
-	if (await drives.find(args.name)) return;
+	if (await drives.find(args.name)) return "existing";
 	if (!args.goldenDriveName) {
 		throw new Error(
 			`Drive ${args.name} is missing and its environment has no golden drive to fork`,
@@ -177,6 +193,7 @@ export async function forkWorkspaceDrive(args: {
 		);
 	}
 	await drives.fork(args.goldenDriveName, args.name);
+	return "forked";
 }
 
 /**

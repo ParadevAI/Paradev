@@ -30,7 +30,7 @@ import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentToolsDriveFor } from "./agent-tools";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
-import { claimedDriveIdentity } from "./drives";
+import { claimedWorkspaceDrive, workspaceDrivesEnabled } from "./drives";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -90,6 +90,8 @@ export async function buildSandboxClaim(args: {
 	environment: SandboxEnvironment;
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
+	/** The drive the claim names; what a provision must fork and mount. */
+	driveName: string | null;
 }> {
 	const [environment, signIns] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
@@ -132,6 +134,18 @@ export async function buildSandboxClaim(args: {
 			: null;
 	const repositories = toSandboxRepositories(checkouts);
 
+	const provisioning = args.provisioning ?? false;
+	const drive = claimedWorkspaceDrive({
+		row: args.row,
+		goldenDriveName: environment.goldenDriveName,
+		provisioning,
+		// The kill switch: with the flag off, a new workspace gets no drive.
+		drivesEnabled:
+			provisioning &&
+			!args.row.driveName &&
+			Boolean(environment.goldenDriveName) &&
+			(await workspaceDrivesEnabled(args.row.organizationId)),
+	});
 	const identity: SandboxIdentity = {
 		SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
 		SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
@@ -142,11 +156,7 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
-		...claimedDriveIdentity({
-			row: args.row,
-			goldenDriveName: environment.goldenDriveName,
-			provisioning: args.provisioning ?? false,
-		}),
+		...drive.identity,
 		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {
@@ -197,5 +207,6 @@ export async function buildSandboxClaim(args: {
 		},
 		repositories,
 		agentCredentialDigest: agentCredentialDigest(signIns),
+		driveName: drive.driveName,
 	};
 }

@@ -17,6 +17,7 @@ import {
 	wakeSandbox,
 	workspaceDriveMounts,
 } from "../../lib/sandbox";
+import { recordDriveLaidOut } from "./drive-laid-out";
 import {
 	attachBootSession,
 	authorizeBoot,
@@ -130,6 +131,8 @@ async function wake(
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
 	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	// settleSandbox only answers for a drive whose boot laid it out.
+	if (row.driveName && !row.driveLaidOutAt) await recordDriveLaidOut(row.id);
 	return {
 		hostTarget,
 		booted,
