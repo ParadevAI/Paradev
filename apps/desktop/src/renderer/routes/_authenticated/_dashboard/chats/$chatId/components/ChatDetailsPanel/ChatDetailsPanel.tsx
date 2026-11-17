@@ -1,5 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { type Chat, type ChatState, myDevs } from "@superset/chats-core";
+import {
+	type Chat,
+	type ChatState,
+	myDevs,
+	tasksOf,
+} from "@superset/chats-core";
 import { errorMessage } from "@superset/i18n/errors";
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Button } from "@superset/ui/button";
@@ -13,6 +18,7 @@ import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard
 import { ChatFace } from "../../../components/ChatFace";
 import { DevPluginIcons } from "../../../components/DevPluginIcons";
 import { DevPluginsDialog } from "../../../components/DevPluginsDialog";
+import { TaskStatusRing } from "../../../components/TaskStatusRing";
 import { useChats } from "../../../hooks/useChats";
 import { EditDevDialog } from "./components/EditDevDialog";
 import { GroupSettings } from "./components/GroupSettings";
@@ -22,6 +28,7 @@ interface ChatDetailsPanelProps {
 	chat: Chat;
 	title: string;
 	onClose: () => void;
+	onOpenTask: (taskId: string) => void;
 }
 
 /** What a chat is, beside its conversation: its face and name, its Devs and its people. */
@@ -30,6 +37,7 @@ export function ChatDetailsPanel({
 	chat,
 	title,
 	onClose,
+	onOpenTask,
 }: ChatDetailsPanelProps) {
 	const { t } = useLingui();
 	const agents = chat.devIds.flatMap((id) => {
@@ -49,6 +57,7 @@ export function ChatDetailsPanel({
 	const editing = editingId ? state.devs[editingId] : undefined;
 	const pluginsOf = pluginsOfId ? state.devs[pluginsOfId] : undefined;
 	const isGroup = chat.kind === "group";
+	const tasks = tasksOf(state, chat.id);
 	const addableDevs = isGroup
 		? myDevs(state).filter((dev) => !chat.devIds.includes(dev.id))
 		: [];
@@ -113,6 +122,44 @@ export function ChatDetailsPanel({
 						</p>
 					)}
 				</div>
+				<section className="flex flex-col gap-0.5">
+					<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
+						<Trans>Tasks</Trans>
+					</h3>
+					{tasks.length === 0 && (
+						<p className="px-1 text-muted-foreground text-xs">
+							<Trans>
+								Write /task and what needs doing in the chat to add one.
+							</Trans>
+						</p>
+					)}
+					{tasks.map((task) => (
+						<div
+							key={task.id}
+							className="flex items-center gap-2 rounded-lg px-1 py-1 hover:bg-fill-hover"
+						>
+							<TaskStatusRing
+								status={task.status}
+								title={task.title}
+								size={16}
+								onToggle={() =>
+									chats?.dispatch({ type: "toggle-task", taskId: task.id })
+								}
+							/>
+							<button
+								type="button"
+								onClick={() => onOpenTask(task.id)}
+								className={
+									task.status === "done"
+										? "min-w-0 flex-1 truncate text-left text-muted-foreground text-sm line-through decoration-1"
+										: "min-w-0 flex-1 truncate text-left text-sm"
+								}
+							>
+								{task.title}
+							</button>
+						</div>
+					))}
+				</section>
 				<section className="flex flex-col gap-1">
 					<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
 						<Trans>Devs</Trans>

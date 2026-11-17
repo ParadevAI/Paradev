@@ -526,6 +526,10 @@ msgstr "{0}에서 호스트 서비스 {1}을(를) 실행 중입니다 — 이 �
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0}이(가) 이 컴퓨터에는 설정되어 있지만 계정에는 없습니다"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0}이(가) 작업 중입니다"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "{0}개 더 있습니다. 검색어를 좁혀 보세요"
@@ -3140,6 +3144,10 @@ msgstr "마지막으로 보고된 값입니다. 업데이트하려면 호스트�
 msgid "ascending"
 msgstr "오름차순"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "{0}에게 다시 시작 요청"
+
 msgid "Ask a member to add you to this channel"
 msgstr "멤버에게 이 채널에 추가해 달라고 요청하세요"
 
@@ -3203,6 +3211,9 @@ msgstr "위험한 작업만 확인"
 
 msgid "Aspect Ratio"
 msgstr "종횡비"
+
+msgid "Assign"
+msgstr "담당자 지정"
 
 msgid "Assign to…"
 msgstr "담당자 지정…"
@@ -5016,6 +5027,9 @@ msgstr "코멘트를 게시하지 못했습니다"
 msgid "Comment on this page"
 msgstr "이 페이지에 댓글 달기"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "댓글을 달거나 {devName}에게 더 알려 주세요…"
+
 msgid "Comment."
 msgstr "댓글."
 
@@ -5100,6 +5114,9 @@ msgstr "기본 스타일과 비교함"
 
 msgid "complete"
 msgstr "종료"
+
+msgid "Complete {title}"
+msgstr "{title} 완료"
 
 msgid "Completed"
 msgstr "완료"
@@ -7013,6 +7030,9 @@ msgstr "선택한 워크스페이스 삭제"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "세션 \"{workspaceName}\"을(를) 삭제할까요?"
 
+msgid "Delete task"
+msgstr "작업 삭제"
+
 msgid "Delete team"
 msgstr "팀 삭제"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "완료"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "완료"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "완료 — 프리셋 바에서 쓰던 테두리 칩 스타일이 이제 모든 툴팁의 기본값이 되었고, 복사해 붙여 넣은 재정의는 제거했습니다 (총 −90줄)."
 
@@ -7699,6 +7723,9 @@ msgstr "드롭다운 메뉴"
 
 msgid "Dropdown, context, and application menus"
 msgstr "드롭다운, 컨텍스트, 애플리케이션 메뉴"
+
+msgid "Due date"
+msgstr "마감일"
 
 msgid "Due today"
 msgstr "오늘 결제 금액"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "진행 중"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "진행 중"
+
 msgid "In Progress"
 msgstr "진행 중"
 
@@ -11733,6 +11764,9 @@ msgstr "읽지 않음으로 표시"
 msgid "Mark as viewed"
 msgstr "확인함으로 표시"
 
+msgid "Mark in progress"
+msgstr "진행 중으로 표시"
+
 msgid "Mark Ready"
 msgstr "준비됨으로 표시"
 
@@ -12571,6 +12605,9 @@ msgstr "다음 탭"
 msgid "Next Tab (Second Shortcut)"
 msgstr "다음 탭(두 번째 단축키)"
 
+msgid "Next week"
+msgstr "다음 주"
+
 msgid "Next Workspace"
 msgstr "다음 워크스페이스"
 
@@ -12746,6 +12783,9 @@ msgstr "기여자를 찾을 수 없습니다."
 
 msgid "No credit card required."
 msgstr "신용카드가 필요 없습니다."
+
+msgid "No date"
+msgstr "날짜 없음"
 
 msgid "No description"
 msgstr "설명 없음"
@@ -13261,6 +13301,9 @@ msgstr "아니요. {companyName}는 모델 호출을 프록시하지 않습니�
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "아니요. 에이전트는 독립적으로 유지되고, Paradev는 그 주변의 오케스트레이션 계층입니다. 작업마다 자체 Git 워크트리와 브랜치, 지속되는 세션, diff 리뷰, 이벤트나 일정에 따라 실행되는 자동화가 제공되며, 워크플로가 특정 제공업체에 묶이지 않습니다."
+
+msgid "Nobody"
+msgstr "없음"
 
 msgid "Nobody has joined the board yet."
 msgstr "아직 순위표에 참여한 사람이 없습니다."
@@ -16149,6 +16192,9 @@ msgstr "남음"
 msgid "rematch"
 msgstr "재대결"
 
+msgid "Reminder"
+msgstr "알림"
+
 msgid "remote"
 msgstr "원격"
 
@@ -16382,6 +16428,9 @@ msgstr "{0}에 갱신됩니다."
 
 msgid "Reopen"
 msgstr "다시 열기"
+
+msgid "Reopen {title}"
+msgstr "{title} 다시 열기"
 
 msgid "Reopen Closed Tab"
 msgstr "닫은 탭 다시 열기"
@@ -17848,6 +17897,9 @@ msgstr "답변 보내기"
 msgid "Send answers"
 msgstr "답변 보내기"
 
+msgid "Send comment"
+msgstr "댓글 보내기"
+
 msgid "Send email and debug delivery"
 msgstr "이메일 전송 및 전달 문제 디버그"
 
@@ -19001,6 +19053,10 @@ msgstr "한 주에 늘어난 스타"
 msgctxt "project date"
 msgid "Start"
 msgstr "시작일"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "지금 {0} 시작"
 
 msgid "Start a conversation to see messages here"
 msgstr "대화를 시작하면 메시지가 여기에 표시됩니다"
@@ -20886,6 +20942,10 @@ msgstr "새 위치"
 msgid "to {name}"
 msgstr "{name}에게"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "할 일"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "에이전트 대화를 재개하려면 해당 폴더에서 다음을 실행하세요:"
 
@@ -20987,6 +21047,9 @@ msgstr "세션당 토큰, 최근 30일"
 
 msgid "Tokens stay off your machine"
 msgstr "토큰은 내 머신에 남지 않습니다"
+
+msgid "Tomorrow"
+msgstr "내일"
 
 msgid "Too large to expand"
 msgstr "너무 커서 펼칠 수 없음"
@@ -22074,6 +22137,9 @@ msgstr "로그인 대기 중…"
 msgid "Waiting for the subagent's first message…"
 msgstr "서브 에이전트의 첫 메시지를 기다리는 중…"
 
+msgid "Waiting for your answer"
+msgstr "회원님의 답변을 기다리는 중"
+
 msgid "Waiting for your input"
 msgstr "입력을 기다리는 중"
 
@@ -22641,6 +22707,9 @@ msgstr "다시 지정할까요?"
 
 msgid "Wrap lines"
 msgstr "줄 바꿈"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "채팅에 /task 와 할 일을 적으면 추가됩니다."
 
 msgid "Write a comment"
 msgstr "댓글 작성"

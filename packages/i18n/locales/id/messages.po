@@ -526,6 +526,10 @@ msgstr "{0} menjalankan layanan host {1} — aplikasi ini butuh {2} atau lebih b
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} sudah disiapkan di mesin ini, tetapi tidak di akun Anda"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} sedang mengerjakannya"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "{0} lagi. Persempit pencarian Anda"
@@ -3140,6 +3144,10 @@ msgstr "Sesuai laporan terakhir. Host harus online untuk memperbarui."
 msgid "ascending"
 msgstr "menaik"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "Minta {0} memulai ulang"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Minta anggota untuk menambahkan Anda ke kanal ini"
 
@@ -3203,6 +3211,9 @@ msgstr "Hanya bertanya untuk tindakan berisiko"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
+
+msgid "Assign"
+msgstr "Tugaskan"
 
 msgid "Assign to…"
 msgstr "Tugaskan ke…"
@@ -5016,6 +5027,9 @@ msgstr "Komentar tidak terkirim"
 msgid "Comment on this page"
 msgstr "Komentari halaman ini"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Beri komentar, atau beri tahu {devName} lebih lanjut…"
+
 msgid "Comment."
 msgstr "Komentari."
 
@@ -5100,6 +5114,9 @@ msgstr "Dibandingkan dengan gaya bawaan"
 
 msgid "complete"
 msgstr "selesai"
+
+msgid "Complete {title}"
+msgstr "Selesaikan {title}"
 
 msgid "Completed"
 msgstr "Selesai"
@@ -7013,6 +7030,9 @@ msgstr "Hapus workspace yang dipilih"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Hapus sesi \"{workspaceName}\"?"
 
+msgid "Delete task"
+msgstr "Hapus tugas"
+
 msgid "Delete team"
 msgstr "Hapus tim"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Selesai"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Selesai"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Selesai — gaya chip bergaris yang dipakai presets bar kini menjadi bawaan untuk tiap tooltip, dan penimpaan salin-tempelnya sudah dihapus (bersih −90 baris)."
 
@@ -7699,6 +7723,9 @@ msgstr "Menu Dropdown"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Menu dropdown, konteks, dan aplikasi"
+
+msgid "Due date"
+msgstr "Tenggat"
 
 msgid "Due today"
 msgstr "Jatuh tempo hari ini"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Sedang berjalan"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Sedang dikerjakan"
+
 msgid "In Progress"
 msgstr "Sedang berjalan"
 
@@ -11733,6 +11764,9 @@ msgstr "Tandai Belum Dibaca"
 msgid "Mark as viewed"
 msgstr "Tandai sudah dilihat"
 
+msgid "Mark in progress"
+msgstr "Tandai sedang dikerjakan"
+
 msgid "Mark Ready"
 msgstr "Tandai Siap"
 
@@ -12571,6 +12605,9 @@ msgstr "Tab Berikutnya"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Tab Berikutnya (Pintasan Kedua)"
 
+msgid "Next week"
+msgstr "Minggu depan"
+
 msgid "Next Workspace"
 msgstr "Workspace Berikutnya"
 
@@ -12746,6 +12783,9 @@ msgstr "Tidak ada kontributor ditemukan."
 
 msgid "No credit card required."
 msgstr "Tanpa kartu kredit."
+
+msgid "No date"
+msgstr "Tanpa tanggal"
 
 msgid "No description"
 msgstr "Tidak ada deskripsi"
@@ -13261,6 +13301,9 @@ msgstr "Tidak. {companyName} tidak pernah menjadi proxy untuk panggilan model. A
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Tidak. Agen Anda tetap independen; Paradev adalah lapisan orkestrasi di sekitarnya. Setiap tugas mendapat Git worktree dan branch sendiri, sesi yang persisten, peninjauan diff, dan otomatisasi yang berjalan berdasarkan peristiwa atau jadwal, tanpa mengikat alur kerja ke satu penyedia."
+
+msgid "Nobody"
+msgstr "Tidak ada"
 
 msgid "Nobody has joined the board yet."
 msgstr "Belum ada yang bergabung ke papan ini."
@@ -16149,6 +16192,9 @@ msgstr "Tersisa"
 msgid "rematch"
 msgstr "tanding ulang"
 
+msgid "Reminder"
+msgstr "Pengingat"
+
 msgid "remote"
 msgstr "remote"
 
@@ -16382,6 +16428,9 @@ msgstr "Diperpanjang {0}."
 
 msgid "Reopen"
 msgstr "Buka lagi"
+
+msgid "Reopen {title}"
+msgstr "Buka kembali {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "Buka Lagi Tab yang Ditutup"
@@ -17848,6 +17897,9 @@ msgstr "Kirim jawaban"
 msgid "Send answers"
 msgstr "Kirim jawaban"
 
+msgid "Send comment"
+msgstr "Kirim komentar"
+
 msgid "Send email and debug delivery"
 msgstr "Kirim email dan debug pengiriman"
 
@@ -19001,6 +19053,10 @@ msgstr "Star yang didapat per minggu"
 msgctxt "project date"
 msgid "Start"
 msgstr "Mulai"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "Mulai {0} sekarang"
 
 msgid "Start a conversation to see messages here"
 msgstr "Mulai percakapan untuk melihat pesan di sini"
@@ -20886,6 +20942,10 @@ msgstr "Ke"
 msgid "to {name}"
 msgstr "ke {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "Belum dikerjakan"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Untuk melanjutkan percakapan agen, jalankan ini di foldernya:"
 
@@ -20987,6 +21047,9 @@ msgstr "token per sesi, 30 hari terakhir"
 
 msgid "Tokens stay off your machine"
 msgstr "Token tidak tersimpan di mesin Anda"
+
+msgid "Tomorrow"
+msgstr "Besok"
 
 msgid "Too large to expand"
 msgstr "Terlalu besar untuk diperluas"
@@ -22074,6 +22137,9 @@ msgstr "Menunggu proses masuk…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Menunggu pesan pertama dari subagen…"
 
+msgid "Waiting for your answer"
+msgstr "Menunggu jawaban Anda"
+
 msgid "Waiting for your input"
 msgstr "Menunggu masukan Anda"
 
@@ -22641,6 +22707,9 @@ msgstr "Ingin menetapkannya ulang?"
 
 msgid "Wrap lines"
 msgstr "Bungkus baris"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Tulis /task dan apa yang perlu dikerjakan di chat untuk menambahkannya."
 
 msgid "Write a comment"
 msgstr "Tulis komentar"

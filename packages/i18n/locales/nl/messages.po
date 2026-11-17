@@ -526,6 +526,10 @@ msgstr "{0} draait hostservice {1} — deze app heeft {2} of nieuwer nodig. Werk
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} is ingesteld op deze machine, maar niet op je account"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} werkt eraan"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "Nog {0}. Verfijn je zoekopdracht"
@@ -3140,6 +3144,10 @@ msgstr "Zoals laatst gemeld. De host moet online zijn om bij te werken."
 msgid "ascending"
 msgstr "oplopend"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "{0} vragen opnieuw te beginnen"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Vraag een lid om je aan dit kanaal toe te voegen"
 
@@ -3203,6 +3211,9 @@ msgstr "Vraagt alleen bij riskante acties"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
+
+msgid "Assign"
+msgstr "Toewijzen"
 
 msgid "Assign to…"
 msgstr "Toewijzen aan…"
@@ -5016,6 +5027,9 @@ msgstr "Opmerking niet geplaatst"
 msgid "Comment on this page"
 msgstr "Reageren op deze pagina"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Reageer, of vertel {devName} meer…"
+
 msgid "Comment."
 msgstr "Reageer."
 
@@ -5100,6 +5114,9 @@ msgstr "Vergeleken met de standaardstijl"
 
 msgid "complete"
 msgstr "afgerond"
+
+msgid "Complete {title}"
+msgstr "{title} voltooien"
 
 msgid "Completed"
 msgstr "Afgerond"
@@ -7013,6 +7030,9 @@ msgstr "Geselecteerde werkruimtes verwijderen"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Sessie \"{workspaceName}\" verwijderen?"
 
+msgid "Delete task"
+msgstr "Taak verwijderen"
+
 msgid "Delete team"
 msgstr "Team verwijderen"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Klaar"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Klaar"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Klaar — de omkaderde chipstijl van de presetsbalk is nu de standaard voor elke tooltip, en de gekopieerde overrides zijn verwijderd (netto −90 regels)."
 
@@ -7699,6 +7723,9 @@ msgstr "Dropdownmenu"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Dropdown-, context- en applicatiemenu's"
+
+msgid "Due date"
+msgstr "Vervaldatum"
 
 msgid "Due today"
 msgstr "Vandaag te betalen"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Bezig"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Bezig"
+
 msgid "In Progress"
 msgstr "Bezig"
 
@@ -11733,6 +11764,9 @@ msgstr "Markeren als ongelezen"
 msgid "Mark as viewed"
 msgstr "Markeren als bekeken"
 
+msgid "Mark in progress"
+msgstr "Markeren als bezig"
+
 msgid "Mark Ready"
 msgstr "Markeren als klaar"
 
@@ -12571,6 +12605,9 @@ msgstr "Volgend tabblad"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Volgend tabblad (tweede sneltoets)"
 
+msgid "Next week"
+msgstr "Volgende week"
+
 msgid "Next Workspace"
 msgstr "Volgende werkruimte"
 
@@ -12746,6 +12783,9 @@ msgstr "Geen contributors gevonden."
 
 msgid "No credit card required."
 msgstr "Geen creditcard nodig."
+
+msgid "No date"
+msgstr "Geen datum"
 
 msgid "No description"
 msgstr "Geen beschrijving"
@@ -13261,6 +13301,9 @@ msgstr "Nee. {companyName} stuurt modelaanroepen nooit via een proxy. Agents geb
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Nee. Je agents blijven onafhankelijk; Paradev is de orkestratielaag eromheen. Elke taak krijgt een eigen Git-worktree en branch, blijvende sessies, diff-review en automatiseringen die draaien op events of volgens een schema, zonder de workflow aan één provider te binden."
+
+msgid "Nobody"
+msgstr "Niemand"
 
 msgid "Nobody has joined the board yet."
 msgstr "Nog niemand doet mee aan de ranglijst."
@@ -16149,6 +16192,9 @@ msgstr "Resterend"
 msgid "rematch"
 msgstr "revanche"
 
+msgid "Reminder"
+msgstr "Herinnering"
+
 msgid "remote"
 msgstr "remote"
 
@@ -16382,6 +16428,9 @@ msgstr "Verlengt {0}."
 
 msgid "Reopen"
 msgstr "Heropenen"
+
+msgid "Reopen {title}"
+msgstr "{title} heropenen"
 
 msgid "Reopen Closed Tab"
 msgstr "Gesloten tabblad heropenen"
@@ -17848,6 +17897,9 @@ msgstr "Antwoord verzenden"
 msgid "Send answers"
 msgstr "Antwoorden verzenden"
 
+msgid "Send comment"
+msgstr "Reactie versturen"
+
 msgid "Send email and debug delivery"
 msgstr "Verstuur e-mail en debug de bezorging"
 
@@ -19001,6 +19053,10 @@ msgstr "Nieuwe sterren per week"
 msgctxt "project date"
 msgid "Start"
 msgstr "Start"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "{0} nu starten"
 
 msgid "Start a conversation to see messages here"
 msgstr "Begin een gesprek om hier berichten te zien"
@@ -20886,6 +20942,10 @@ msgstr "Naar"
 msgid "to {name}"
 msgstr "aan {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "Te doen"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Voer dit uit in de map om een agentgesprek te hervatten:"
 
@@ -20987,6 +21047,9 @@ msgstr "tokens per sessie, laatste 30 dagen"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokens blijven van je machine af"
+
+msgid "Tomorrow"
+msgstr "Morgen"
 
 msgid "Too large to expand"
 msgstr "Te groot om uit te vouwen"
@@ -22074,6 +22137,9 @@ msgstr "Wachten op login…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Wachten op het eerste bericht van de subagent…"
 
+msgid "Waiting for your answer"
+msgstr "Wacht op je antwoord"
+
 msgid "Waiting for your input"
 msgstr "Wacht op je invoer"
 
@@ -22641,6 +22707,9 @@ msgstr "Wil je hem opnieuw toewijzen?"
 
 msgid "Wrap lines"
 msgstr "Regels afbreken"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Schrijf /task en wat er moet gebeuren in de chat om er een toe te voegen."
 
 msgid "Write a comment"
 msgstr "Schrijf een reactie"

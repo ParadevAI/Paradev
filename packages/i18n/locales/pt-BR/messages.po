@@ -526,6 +526,10 @@ msgstr "{0} está com o serviço de host {1} — este app precisa da {2} ou mais
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} está configurado nesta máquina, mas não na sua conta"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} está trabalhando nisso"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "mais {0}. Refine sua busca"
@@ -3140,6 +3144,10 @@ msgstr "Conforme o último relato. O host precisa estar online para atualizar."
 msgid "ascending"
 msgstr "crescente"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "Pedir para {0} recomeçar"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Peça a um membro para adicionar você a este canal"
 
@@ -3203,6 +3211,9 @@ msgstr "Pergunta só em ações arriscadas"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
+
+msgid "Assign"
+msgstr "Atribuir"
 
 msgid "Assign to…"
 msgstr "Atribuir a…"
@@ -5016,6 +5027,9 @@ msgstr "Comentário não publicado"
 msgid "Comment on this page"
 msgstr "Comentar nesta página"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Comente ou conte mais para {devName}…"
+
 msgid "Comment."
 msgstr "Comente."
 
@@ -5100,6 +5114,9 @@ msgstr "Comparado ao estilo padrão"
 
 msgid "complete"
 msgstr "concluída"
+
+msgid "Complete {title}"
+msgstr "Concluir {title}"
 
 msgid "Completed"
 msgstr "Concluída"
@@ -7013,6 +7030,9 @@ msgstr "Excluir as áreas de trabalho selecionadas"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Excluir a sessão \"{workspaceName}\"?"
 
+msgid "Delete task"
+msgstr "Excluir tarefa"
+
 msgid "Delete team"
 msgstr "Excluir equipe"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Concluído"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Concluída"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Pronto — o estilo de chip com borda usado na barra de presets agora é o padrão de todo tooltip, e as sobrescritas copiadas foram removidas (líquido −90 linhas)."
 
@@ -7699,6 +7723,9 @@ msgstr "Menu suspenso"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Menus suspensos, de contexto e de aplicativo"
+
+msgid "Due date"
+msgstr "Prazo"
 
 msgid "Due today"
 msgstr "A pagar hoje"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Em andamento"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Em andamento"
+
 msgid "In Progress"
 msgstr "Em andamento"
 
@@ -11733,6 +11764,9 @@ msgstr "Marcar como não lida"
 msgid "Mark as viewed"
 msgstr "Marcar como visto"
 
+msgid "Mark in progress"
+msgstr "Marcar como em andamento"
+
 msgid "Mark Ready"
 msgstr "Marcar como pronto"
 
@@ -12571,6 +12605,9 @@ msgstr "Próxima aba"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Próxima aba (segundo atalho)"
 
+msgid "Next week"
+msgstr "Semana que vem"
+
 msgid "Next Workspace"
 msgstr "Próxima área de trabalho"
 
@@ -12746,6 +12783,9 @@ msgstr "Nenhum contribuidor encontrado."
 
 msgid "No credit card required."
 msgstr "Sem cartão de crédito."
+
+msgid "No date"
+msgstr "Sem data"
 
 msgid "No description"
 msgstr "Sem descrição"
@@ -13261,6 +13301,9 @@ msgstr "Não. O {companyName} nunca atua como proxy nas chamadas aos modelos. Os
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Não. Seus agentes continuam independentes; o Paradev é a camada de orquestração em volta deles. Cada tarefa tem seu próprio worktree Git e sua própria branch, sessões persistentes, revisão de diffs e automações que rodam por eventos ou em um agendamento, sem prender o fluxo de trabalho a um único provedor."
+
+msgid "Nobody"
+msgstr "Ninguém"
 
 msgid "Nobody has joined the board yet."
 msgstr "Ninguém entrou no ranking ainda."
@@ -16149,6 +16192,9 @@ msgstr "Restante"
 msgid "rematch"
 msgstr "revanche"
 
+msgid "Reminder"
+msgstr "Lembrete"
+
 msgid "remote"
 msgstr "remota"
 
@@ -16382,6 +16428,9 @@ msgstr "Renova em {0}."
 
 msgid "Reopen"
 msgstr "Reabrir"
+
+msgid "Reopen {title}"
+msgstr "Reabrir {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "Reabrir aba fechada"
@@ -17848,6 +17897,9 @@ msgstr "Enviar resposta"
 msgid "Send answers"
 msgstr "Enviar respostas"
 
+msgid "Send comment"
+msgstr "Enviar comentário"
+
 msgid "Send email and debug delivery"
 msgstr "Enviar e-mails e depurar a entrega"
 
@@ -19001,6 +19053,10 @@ msgstr "Estrelas ganhas por semana"
 msgctxt "project date"
 msgid "Start"
 msgstr "Início"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "Iniciar {0} agora"
 
 msgid "Start a conversation to see messages here"
 msgstr "Comece uma conversa para ver as mensagens aqui"
@@ -20886,6 +20942,10 @@ msgstr "Para"
 msgid "to {name}"
 msgstr "para {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "A fazer"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Para retomar uma conversa com um agente, execute isto na pasta dela:"
 
@@ -20987,6 +21047,9 @@ msgstr "tokens por sessão, últimos 30 dias"
 
 msgid "Tokens stay off your machine"
 msgstr "Os tokens ficam fora da sua máquina"
+
+msgid "Tomorrow"
+msgstr "Amanhã"
 
 msgid "Too large to expand"
 msgstr "Grande demais para expandir"
@@ -22074,6 +22137,9 @@ msgstr "Aguardando o login…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Aguardando a primeira mensagem do subagente…"
 
+msgid "Waiting for your answer"
+msgstr "Aguardando sua resposta"
+
 msgid "Waiting for your input"
 msgstr "Aguardando sua resposta"
 
@@ -22641,6 +22707,9 @@ msgstr "Quer reatribuir?"
 
 msgid "Wrap lines"
 msgstr "Quebrar linhas"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Escreva /task e o que precisa ser feito no chat para adicionar uma."
 
 msgid "Write a comment"
 msgstr "Escrever um comentário"

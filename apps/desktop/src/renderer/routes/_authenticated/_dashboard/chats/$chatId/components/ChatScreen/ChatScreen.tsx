@@ -40,7 +40,16 @@ import { ChatThread } from "../ChatThread";
 import { MessageDetailsPanel } from "../MessageDetailsPanel";
 import type { MessageActions } from "../MessageItem";
 import { PagePanel } from "../PagePanel";
+import { TaskPanel } from "../TaskPanel";
 import { WorkspaceChatPanel } from "../WorkspaceChatPanel";
+
+/** What is open beside the thread; one thing at a time. */
+type Panel =
+	| { kind: "details" }
+	| { kind: "message"; id: string }
+	| { kind: "workspace"; id: string }
+	| { kind: "page"; slug: string }
+	| { kind: "task"; id: string };
 
 const NOW_TICK_MS = 30_000;
 const HIGHLIGHT_MS = 1600;
@@ -53,27 +62,12 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const { copyToClipboard } = useCopyToClipboard();
 	const [replyTo, setReplyTo] = useState<Message | null>(null);
 	const [editing, setEditing] = useState<Message | null>(null);
-	const [showsDetails, setShowsDetails] = useState(false);
-	const [detailsOf, setDetailsOf] = useState<string | null>(null);
-	const [previewedWorkspaceId, setPreviewedWorkspaceId] = useState<
-		string | null
-	>(null);
-	const [previewedPage, setPreviewedPage] = useState<string | null>(null);
+	const [panel, setPanel] = useState<Panel | null>(null);
 	const [showsPlugins, setShowsPlugins] = useState(false);
 	const preview = useMemo<Preview>(
 		() => ({
-			openWorkspace: (workspaceId) => {
-				setShowsDetails(false);
-				setDetailsOf(null);
-				setPreviewedPage(null);
-				setPreviewedWorkspaceId(workspaceId);
-			},
-			openPage: (slug) => {
-				setShowsDetails(false);
-				setDetailsOf(null);
-				setPreviewedWorkspaceId(null);
-				setPreviewedPage(slug);
-			},
+			openWorkspace: (id) => setPanel({ kind: "workspace", id }),
+			openPage: (slug) => setPanel({ kind: "page", slug }),
 		}),
 		[],
 	);
@@ -143,12 +137,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 				dispatch?.({ type: "answer-question", questionId, answer, typed }),
 			answerForm: (questionId, answers) =>
 				dispatch?.({ type: "answer-form", questionId, answers }),
-			details: (message) => {
-				setPreviewedWorkspaceId(null);
-				setPreviewedPage(null);
-				setShowsDetails(false);
-				setDetailsOf(message.id);
-			},
+			details: (message) => setPanel({ kind: "message", id: message.id }),
+			openTask: (id) => setPanel({ kind: "task", id }),
+			toggleTask: (taskId) => dispatch?.({ type: "toggle-task", taskId }),
 			retry: (message) =>
 				message.file
 					? live?.files.retry(message.id)
@@ -238,9 +229,15 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const ownDevPlugins = ownDev
 		? [...(ownDev.paradevAccess ? ["paradev"] : []), ...(ownDev.plugins ?? [])]
 		: [];
-	const detailedMessage = detailsOf
-		? messagesOf(state, chatId).find((message) => message.id === detailsOf)
-		: undefined;
+	const detailedMessage =
+		panel?.kind === "message"
+			? messagesOf(state, chatId).find((message) => message.id === panel.id)
+			: undefined;
+	const openTask =
+		panel?.kind === "task"
+			? state.tasks.find((task) => task.id === panel.id)
+			: undefined;
+	const close = () => setPanel(null);
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -250,13 +247,12 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					<button
 						type="button"
 						aria-label={t({ message: "Chat details" })}
-						aria-expanded={showsDetails}
-						onClick={() => {
-							setPreviewedWorkspaceId(null);
-							setPreviewedPage(null);
-							setDetailsOf(null);
-							setShowsDetails((shown) => !shown);
-						}}
+						aria-expanded={panel?.kind === "details"}
+						onClick={() =>
+							setPanel((shown) =>
+								shown?.kind === "details" ? null : { kind: "details" },
+							)
+						}
 						className="flex h-8 min-w-0 shrink items-center gap-2 rounded-lg px-1.5 hover:bg-fill-hover aria-expanded:bg-fill-hover"
 					>
 						<ChatFace chat={chat} size={22} />
@@ -368,11 +364,11 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					/>
 				</div>
 			</div>
-			{previewedWorkspaceId && (
+			{panel?.kind === "workspace" && (
 				<WorkspaceChatPanel
-					key={previewedWorkspaceId}
-					workspaceId={previewedWorkspaceId}
-					onClose={() => setPreviewedWorkspaceId(null)}
+					key={panel.id}
+					workspaceId={panel.id}
+					onClose={close}
 				/>
 			)}
 			{showsPlugins && ownDev && (
@@ -382,26 +378,36 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					onSave={(patch) => chats.actions.updateDev(ownDev.id, patch)}
 				/>
 			)}
-			{previewedPage && (
-				<PagePanel
-					slug={previewedPage}
-					onClose={() => setPreviewedPage(null)}
-				/>
+			{panel?.kind === "page" && (
+				<PagePanel slug={panel.slug} onClose={close} />
 			)}
 			{detailedMessage && live && (
 				<MessageDetailsPanel
 					state={state}
 					message={detailedMessage}
 					load={live.messageDetails}
-					onClose={() => setDetailsOf(null)}
+					onClose={close}
 				/>
 			)}
-			{showsDetails && (
+			{openTask && live && (
+				<TaskPanel
+					key={openTask.id}
+					state={state}
+					task={openTask}
+					taskActions={chats.taskActions}
+					subscribe={live.subscribe}
+					live={chats.turns}
+					now={now}
+					onClose={close}
+				/>
+			)}
+			{panel?.kind === "details" && (
 				<ChatDetailsPanel
 					state={state}
 					chat={chat}
 					title={title}
-					onClose={() => setShowsDetails(false)}
+					onClose={close}
+					onOpenTask={(id) => setPanel({ kind: "task", id })}
 				/>
 			)}
 		</div>

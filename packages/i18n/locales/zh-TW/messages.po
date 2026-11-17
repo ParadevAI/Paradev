@@ -526,6 +526,10 @@ msgstr "{0}執行的主機服務是{1} — 此應用需要{2}或更新版本。�
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} 已在本機設定，但未在你的帳戶中設定"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} 正在處理"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "還有{0}個。請細化搜尋"
@@ -3140,6 +3144,10 @@ msgstr "上次回報的版本。主機必須在線上才能更新。"
 msgid "ascending"
 msgstr "升序"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "請 {0} 重新開始"
+
 msgid "Ask a member to add you to this channel"
 msgstr "請讓成員將你加入此頻道"
 
@@ -3203,6 +3211,9 @@ msgstr "僅在有風險時詢問"
 
 msgid "Aspect Ratio"
 msgstr "寬高比"
+
+msgid "Assign"
+msgstr "指派"
 
 msgid "Assign to…"
 msgstr "指派給…"
@@ -5016,6 +5027,9 @@ msgstr "評論未發布"
 msgid "Comment on this page"
 msgstr "評論這個頁面"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "留言，或告訴 {devName} 更多…"
+
 msgid "Comment."
 msgstr "留言。"
 
@@ -5100,6 +5114,9 @@ msgstr "與預設樣式做了對比"
 
 msgid "complete"
 msgstr "已結束"
+
+msgid "Complete {title}"
+msgstr "完成 {title}"
 
 msgid "Completed"
 msgstr "完成時間"
@@ -7013,6 +7030,9 @@ msgstr "刪除選中的工作區"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "刪除會話「{workspaceName}」？"
 
+msgid "Delete task"
+msgstr "刪除任務"
+
 msgid "Delete team"
 msgstr "刪除團隊"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "已完成"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "已完成"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "完成——預設欄使用的帶邊框chip樣式現在是所有tooltip的預設樣式，複製貼上出來的樣式覆蓋也都移除了（淨減90行）。"
 
@@ -7699,6 +7723,9 @@ msgstr "下拉選單"
 
 msgid "Dropdown, context, and application menus"
 msgstr "下拉選單、右鍵選單和應用程式選單"
+
+msgid "Due date"
+msgstr "截止日期"
 
 msgid "Due today"
 msgstr "今日應付"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "進行中"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "進行中"
+
 msgid "In Progress"
 msgstr "進行中"
 
@@ -11733,6 +11764,9 @@ msgstr "標為未讀"
 msgid "Mark as viewed"
 msgstr "標記為已檢視"
 
+msgid "Mark in progress"
+msgstr "標記為進行中"
+
 msgid "Mark Ready"
 msgstr "標記為待審查"
 
@@ -12571,6 +12605,9 @@ msgstr "下一個分頁"
 msgid "Next Tab (Second Shortcut)"
 msgstr "下一個分頁（第二快捷鍵）"
 
+msgid "Next week"
+msgstr "下週"
+
 msgid "Next Workspace"
 msgstr "下一個工作區"
 
@@ -12746,6 +12783,9 @@ msgstr "未找到貢獻者。"
 
 msgid "No credit card required."
 msgstr "無需信用卡。"
+
+msgid "No date"
+msgstr "無日期"
 
 msgid "No description"
 msgstr "無描述"
@@ -13261,6 +13301,9 @@ msgstr "不會。{companyName} 從不代理模型呼叫。代理程式使用你�
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "不是。你的代理保持獨立；Paradev 是圍繞它們的編排層。每個任務都有自己的 Git worktree 和分支、持久工作階段、差異審查，以及依事件或排程執行的自動化，而不會把工作流程綁定在單一供應商。"
+
+msgid "Nobody"
+msgstr "無人"
 
 msgid "Nobody has joined the board yet."
 msgstr "還沒有人加入榜單。"
@@ -16149,6 +16192,9 @@ msgstr "剩餘"
 msgid "rematch"
 msgstr "再來一局"
 
+msgid "Reminder"
+msgstr "提醒"
+
 msgid "remote"
 msgstr "遠端"
 
@@ -16382,6 +16428,9 @@ msgstr "將於{0}續訂。"
 
 msgid "Reopen"
 msgstr "重新開啟"
+
+msgid "Reopen {title}"
+msgstr "重新開啟 {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "重新開啟已關閉的分頁"
@@ -17848,6 +17897,9 @@ msgstr "傳送回答"
 msgid "Send answers"
 msgstr "傳送回答"
 
+msgid "Send comment"
+msgstr "傳送留言"
+
 msgid "Send email and debug delivery"
 msgstr "傳送郵件並排查投遞問題"
 
@@ -19001,6 +19053,10 @@ msgstr "每週新增星標"
 msgctxt "project date"
 msgid "Start"
 msgstr "開始日期"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "立即啟動 {0}"
 
 msgid "Start a conversation to see messages here"
 msgstr "開始一段對話，訊息會顯示在這裡"
@@ -20886,6 +20942,10 @@ msgstr "到"
 msgid "to {name}"
 msgstr "傳給 {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "待辦"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "若要恢復與代理的對話，請在其資料夾中執行："
 
@@ -20987,6 +21047,9 @@ msgstr "每次會話的 Token，近 30 天"
 
 msgid "Tokens stay off your machine"
 msgstr "權杖不會留在你的裝置上"
+
+msgid "Tomorrow"
+msgstr "明天"
 
 msgid "Too large to expand"
 msgstr "檔案過大，無法展開"
@@ -22074,6 +22137,9 @@ msgstr "等待登入…"
 msgid "Waiting for the subagent's first message…"
 msgstr "正在等待子代理程式的第一則訊息…"
 
+msgid "Waiting for your answer"
+msgstr "等待你的回答"
+
 msgid "Waiting for your input"
 msgstr "等待你的輸入"
 
@@ -22641,6 +22707,9 @@ msgstr "要重新分配嗎？"
 
 msgid "Wrap lines"
 msgstr "自動換行"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "在聊天中輸入 /task 和要做的事即可新增。"
 
 msgid "Write a comment"
 msgstr "撰寫留言"

@@ -526,6 +526,10 @@ msgstr "Auf {0} läuft Host-Dienst {1} — diese App braucht {2} oder neuer. Akt
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} ist auf diesem Rechner eingerichtet, aber nicht in deinem Konto"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} arbeitet daran"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "{0} weitere. Grenze deine Suche ein"
@@ -3140,6 +3144,10 @@ msgstr "Zuletzt gemeldet. Der Host muss online sein, um aktualisiert zu werden."
 msgid "ascending"
 msgstr "aufsteigend"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "{0} um Neustart bitten"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Bitte ein Mitglied, dich zu diesem Kanal hinzuzufügen"
 
@@ -3203,6 +3211,9 @@ msgstr "Fragt nur bei riskanten Aktionen"
 
 msgid "Aspect Ratio"
 msgstr "Seitenverhältnis"
+
+msgid "Assign"
+msgstr "Zuweisen"
 
 msgid "Assign to…"
 msgstr "Zuweisen an…"
@@ -5016,6 +5027,9 @@ msgstr "Kommentar nicht veröffentlicht"
 msgid "Comment on this page"
 msgstr "Diese Seite kommentieren"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Kommentieren oder {devName} mehr sagen…"
+
 msgid "Comment."
 msgstr "Kommentieren."
 
@@ -5100,6 +5114,9 @@ msgstr "Verglichen mit dem Standardstil"
 
 msgid "complete"
 msgstr "abgeschlossen"
+
+msgid "Complete {title}"
+msgstr "{title} abschließen"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
@@ -7013,6 +7030,9 @@ msgstr "Ausgewählte Arbeitsbereiche löschen"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Sitzung \"{workspaceName}\" löschen?"
 
+msgid "Delete task"
+msgstr "Aufgabe löschen"
+
 msgid "Delete team"
 msgstr "Team löschen"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Fertig"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Erledigt"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Fertig — der umrandete Chip-Stil aus der Presets-Leiste ist jetzt Standard für jeden Tooltip, und die kopierten Überschreibungen sind entfernt (netto −90 Zeilen)."
 
@@ -7699,6 +7723,9 @@ msgstr "Dropdown-Menü"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Dropdown-, Kontext- und Anwendungsmenüs"
+
+msgid "Due date"
+msgstr "Fälligkeitsdatum"
 
 msgid "Due today"
 msgstr "Heute fällig"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "In Arbeit"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "In Arbeit"
+
 msgid "In Progress"
 msgstr "In Arbeit"
 
@@ -11733,6 +11764,9 @@ msgstr "Als ungelesen markieren"
 msgid "Mark as viewed"
 msgstr "Als angesehen markieren"
 
+msgid "Mark in progress"
+msgstr "Als in Arbeit markieren"
+
 msgid "Mark Ready"
 msgstr "Als bereit markieren"
 
@@ -12571,6 +12605,9 @@ msgstr "Nächster Tab"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Nächster Tab (zweites Tastenkürzel)"
 
+msgid "Next week"
+msgstr "Nächste Woche"
+
 msgid "Next Workspace"
 msgstr "Nächster Arbeitsbereich"
 
@@ -12746,6 +12783,9 @@ msgstr "Keine Mitwirkenden gefunden."
 
 msgid "No credit card required."
 msgstr "Ohne Kreditkarte."
+
+msgid "No date"
+msgstr "Kein Datum"
 
 msgid "No description"
 msgstr "Keine Beschreibung"
@@ -13261,6 +13301,9 @@ msgstr "Nein. {companyName} leitet Modellaufrufe niemals über einen Proxy. Die 
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Nein. Deine Agenten bleiben unabhängig; Paradev ist die Orchestrierungsebene um sie herum. Jede Aufgabe bekommt ihren eigenen Git-Worktree und Branch, dauerhafte Sitzungen, Diff-Review und Automationen, die bei Ereignissen oder nach Zeitplan laufen, ohne den Workflow an einen Anbieter zu binden."
+
+msgid "Nobody"
+msgstr "Niemand"
 
 msgid "Nobody has joined the board yet."
 msgstr "Noch ist niemand dem Board beigetreten."
@@ -16149,6 +16192,9 @@ msgstr "Verbleibend"
 msgid "rematch"
 msgstr "Revanche"
 
+msgid "Reminder"
+msgstr "Erinnerung"
+
 msgid "remote"
 msgstr "remote"
 
@@ -16382,6 +16428,9 @@ msgstr "Verlängert sich am {0}."
 
 msgid "Reopen"
 msgstr "Wieder öffnen"
+
+msgid "Reopen {title}"
+msgstr "{title} wieder öffnen"
 
 msgid "Reopen Closed Tab"
 msgstr "Geschlossenen Tab wieder öffnen"
@@ -17848,6 +17897,9 @@ msgstr "Antwort senden"
 msgid "Send answers"
 msgstr "Antworten senden"
 
+msgid "Send comment"
+msgstr "Kommentar senden"
+
 msgid "Send email and debug delivery"
 msgstr "E-Mails senden und Zustellung debuggen"
 
@@ -19001,6 +19053,10 @@ msgstr "Neue Stars pro Woche"
 msgctxt "project date"
 msgid "Start"
 msgstr "Start"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "{0} jetzt starten"
 
 msgid "Start a conversation to see messages here"
 msgstr "Starte eine Unterhaltung, damit hier Nachrichten erscheinen"
@@ -20886,6 +20942,10 @@ msgstr "Nach"
 msgid "to {name}"
 msgstr "an {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "Zu erledigen"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Um eine Agent-Unterhaltung fortzusetzen, führe dies in ihrem Ordner aus:"
 
@@ -20987,6 +21047,9 @@ msgstr "Tokens pro Sitzung, letzte 30 Tage"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokens bleiben nicht auf deiner Maschine"
+
+msgid "Tomorrow"
+msgstr "Morgen"
 
 msgid "Too large to expand"
 msgstr "Zu groß zum Aufklappen"
@@ -22074,6 +22137,9 @@ msgstr "Warte auf die Anmeldung …"
 msgid "Waiting for the subagent's first message…"
 msgstr "Warten auf die erste Nachricht des Subagenten …"
 
+msgid "Waiting for your answer"
+msgstr "Wartet auf deine Antwort"
+
 msgid "Waiting for your input"
 msgstr "Wartet auf deine Eingabe"
 
@@ -22641,6 +22707,9 @@ msgstr "Möchtest du es neu zuweisen?"
 
 msgid "Wrap lines"
 msgstr "Zeilen umbrechen"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Schreibe /task und was zu tun ist in den Chat, um eine hinzuzufügen."
 
 msgid "Write a comment"
 msgstr "Kommentar schreiben"

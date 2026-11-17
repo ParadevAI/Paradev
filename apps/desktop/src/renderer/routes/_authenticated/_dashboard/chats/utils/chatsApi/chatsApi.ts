@@ -1,5 +1,10 @@
 import { fileTypeFor } from "@superset/chats-core";
-import { ApiError, cachedFileLinks, type SyncApi } from "@superset/chats-sync";
+import {
+	ApiError,
+	cachedFileLinks,
+	type SyncApi,
+	type TaskForm,
+} from "@superset/chats-sync";
 import type { AppRouter } from "@superset/trpc";
 import { type createTRPCProxyClient, TRPCClientError } from "@trpc/client";
 
@@ -35,6 +40,12 @@ export type ChatsApi = Pick<
 	| "registryListing"
 	| "installListing"
 	| "messageDetails"
+	| "createTask"
+	| "updateTask"
+	| "deleteTask"
+	| "startTask"
+	| "commentOnTask"
+	| "taskActivity"
 >;
 
 /**
@@ -52,6 +63,22 @@ export function toApiError(error: unknown): unknown {
 		error.message,
 	);
 }
+
+/** A new task as the API takes it. A repeat is refused there until series exist, so one is sent on to be refused. */
+const taskInput = (
+	task: Pick<
+		TaskForm,
+		"title" | "assignee" | "due" | "scheduledAt" | "remind" | "repeat"
+	> & { description?: string },
+) => ({
+	title: task.title,
+	description: task.description,
+	assignee: task.assignee,
+	due: task.due,
+	scheduledAt: task.scheduledAt,
+	remind: task.remind,
+	repeat: task.repeat as null,
+});
 
 const call = <T>(request: Promise<T>): Promise<T> =>
 	request.catch((error: unknown) => {
@@ -138,8 +165,40 @@ export function createChatsApi(
 					text: body.text,
 					clientId: body.clientId,
 					replyToId: body.replyToId,
+					task: body.task && taskInput(body.task),
 				}),
 			),
+		createTask: (groupId, { clientId, ...form }) =>
+			call(
+				chats.createTask.mutate({
+					groupId,
+					clientId,
+					task: taskInput(form),
+				}),
+			),
+		updateTask: (taskId, patch) =>
+			call(
+				chats.updateTask.mutate({
+					taskId,
+					patch: {
+						title: patch.title,
+						description: patch.description,
+						status: patch.status,
+						assignee: patch.assignee,
+						due: patch.due,
+						scheduledAt: patch.scheduledAt,
+						remind: patch.remind,
+						repeat: patch.repeat === null ? null : undefined,
+					},
+				}),
+			),
+		deleteTask: async (taskId) => {
+			await call(chats.deleteTask.mutate({ taskId }));
+		},
+		startTask: (taskId) => call(chats.startTask.mutate({ taskId })),
+		commentOnTask: (taskId, text) =>
+			call(chats.commentOnTask.mutate({ taskId, text })),
+		taskActivity: (taskId) => call(chats.taskActivity.query({ taskId })),
 		olderMessages: (groupId, beforeId, limit) =>
 			call(chats.olderMessages.query({ groupId, beforeId, limit })),
 		deleteMessage: async (messageId) => {

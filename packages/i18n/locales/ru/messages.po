@@ -526,6 +526,10 @@ msgstr "На {0} служба хоста версии {1} — приложени
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} настроен на этом компьютере, но не в вашем аккаунте"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} работает над этим"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "ещё {0}. Уточните запрос"
@@ -3140,6 +3144,10 @@ msgstr "По последним данным. Для обновления хос
 msgid "ascending"
 msgstr "по возрастанию"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "Попросить {0} начать заново"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Попросите участника добавить вас в этот канал"
 
@@ -3203,6 +3211,9 @@ msgstr "Спрашивает только при риске"
 
 msgid "Aspect Ratio"
 msgstr "Соотношение сторон"
+
+msgid "Assign"
+msgstr "Назначить"
 
 msgid "Assign to…"
 msgstr "Назначить…"
@@ -5016,6 +5027,9 @@ msgstr "Комментарий не отправлен"
 msgid "Comment on this page"
 msgstr "Комментировать эту страницу"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Оставьте комментарий или расскажите {devName} подробнее…"
+
 msgid "Comment."
 msgstr "Комментируйте."
 
@@ -5100,6 +5114,9 @@ msgstr "Сравнили со стилем по умолчанию"
 
 msgid "complete"
 msgstr "завершён"
+
+msgid "Complete {title}"
+msgstr "Завершить {title}"
 
 msgid "Completed"
 msgstr "Завершено"
@@ -7013,6 +7030,9 @@ msgstr "Удалить выбранные рабочие области"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Удалить сессию «{workspaceName}»?"
 
+msgid "Delete task"
+msgstr "Удалить задачу"
+
 msgid "Delete team"
 msgstr "Удалить команду"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Готово"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Готово"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Готово — стиль чипа с рамкой, который используется в панели пресетов, теперь по умолчанию для всех подсказок, а скопированные переопределения удалены (итого −90 строк)."
 
@@ -7699,6 +7723,9 @@ msgstr "Выпадающее меню"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Выпадающие, контекстные и прикладные меню"
+
+msgid "Due date"
+msgstr "Срок"
 
 msgid "Due today"
 msgstr "К оплате сегодня"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "В работе"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "В работе"
+
 msgid "In Progress"
 msgstr "В работе"
 
@@ -11733,6 +11764,9 @@ msgstr "Отметить как непрочитанное"
 msgid "Mark as viewed"
 msgstr "Отметить как просмотренный"
 
+msgid "Mark in progress"
+msgstr "Отметить как в работе"
+
 msgid "Mark Ready"
 msgstr "Отметить готовым"
 
@@ -12571,6 +12605,9 @@ msgstr "Следующая вкладка"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Следующая вкладка (второе сочетание)"
 
+msgid "Next week"
+msgstr "На следующей неделе"
+
 msgid "Next Workspace"
 msgstr "Следующая рабочая область"
 
@@ -12746,6 +12783,9 @@ msgstr "Контрибьюторы не найдены."
 
 msgid "No credit card required."
 msgstr "Карта не нужна."
+
+msgid "No date"
+msgstr "Без даты"
 
 msgid "No description"
 msgstr "Без описания"
@@ -13261,6 +13301,9 @@ msgstr "Нет. {companyName} никогда не проксирует вызо�
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Нет. Ваши агенты остаются независимыми; Paradev — это слой оркестрации вокруг них. Каждая задача получает собственный Git worktree и ветку, постоянные сессии, просмотр diff и автоматизации, которые запускаются по событиям или по расписанию, без привязки рабочего процесса к одному провайдеру."
+
+msgid "Nobody"
+msgstr "Никто"
 
 msgid "Nobody has joined the board yet."
 msgstr "В рейтинг пока никто не вступил."
@@ -16149,6 +16192,9 @@ msgstr "Осталось"
 msgid "rematch"
 msgstr "реванш"
 
+msgid "Reminder"
+msgstr "Напоминание"
+
 msgid "remote"
 msgstr "удалённая"
 
@@ -16382,6 +16428,9 @@ msgstr "Продлевается {0}."
 
 msgid "Reopen"
 msgstr "Открыть снова"
+
+msgid "Reopen {title}"
+msgstr "Открыть снова {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "Открыть заново закрытую вкладку"
@@ -17848,6 +17897,9 @@ msgstr "Отправить ответ"
 msgid "Send answers"
 msgstr "Отправить ответы"
 
+msgid "Send comment"
+msgstr "Отправить комментарий"
+
 msgid "Send email and debug delivery"
 msgstr "Отправка писем и отладка доставки"
 
@@ -19001,6 +19053,10 @@ msgstr "Звёзд в неделю"
 msgctxt "project date"
 msgid "Start"
 msgstr "Начало"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "Запустить {0} сейчас"
 
 msgid "Start a conversation to see messages here"
 msgstr "Начните диалог, чтобы сообщения появились здесь"
@@ -20886,6 +20942,10 @@ msgstr "Куда"
 msgid "to {name}"
 msgstr "для {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "К выполнению"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Чтобы возобновить разговор с агентом, выполните это в его папке:"
 
@@ -20987,6 +21047,9 @@ msgstr "токенов за сессию, последние 30 дней"
 
 msgid "Tokens stay off your machine"
 msgstr "Токены не хранятся на вашем компьютере"
+
+msgid "Tomorrow"
+msgstr "Завтра"
 
 msgid "Too large to expand"
 msgstr "Слишком большой, чтобы развернуть"
@@ -22074,6 +22137,9 @@ msgstr "Ожидание входа…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Ожидание первого сообщения субагента…"
 
+msgid "Waiting for your answer"
+msgstr "Ждёт вашего ответа"
+
 msgid "Waiting for your input"
 msgstr "Ждёт вашего ответа"
 
@@ -22641,6 +22707,9 @@ msgstr "Переназначить?"
 
 msgid "Wrap lines"
 msgstr "Переносить строки"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Напишите в чате /task и что нужно сделать, чтобы добавить задачу."
 
 msgid "Write a comment"
 msgstr "Написать комментарий"

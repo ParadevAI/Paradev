@@ -526,6 +526,10 @@ msgstr "{0}のホストサービスは{1}です — このアプリには{2}以�
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} はこのマシンには設定されていますが、アカウントには設定されていません"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} が作業中です"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "他{0}件。検索条件を絞ってください"
@@ -3140,6 +3144,10 @@ msgstr "最後に報告された値です。更新するにはホストがオン
 msgid "ascending"
 msgstr "昇順"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "{0} にやり直しを依頼"
+
 msgid "Ask a member to add you to this channel"
 msgstr "メンバーにこのチャンネルへの追加を依頼してください"
 
@@ -3203,6 +3211,9 @@ msgstr "リスクのある操作のみ確認"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
+
+msgid "Assign"
+msgstr "割り当て"
 
 msgid "Assign to…"
 msgstr "担当者を割り当て…"
@@ -5016,6 +5027,9 @@ msgstr "コメントを投稿できませんでした"
 msgid "Comment on this page"
 msgstr "このページにコメント"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "コメントするか、{devName} に詳しく伝える…"
+
 msgid "Comment."
 msgstr "コメント。"
 
@@ -5100,6 +5114,9 @@ msgstr "デフォルトスタイルと比較"
 
 msgid "complete"
 msgstr "終了"
+
+msgid "Complete {title}"
+msgstr "{title} を完了"
 
 msgid "Completed"
 msgstr "完了"
@@ -7013,6 +7030,9 @@ msgstr "選択したワークスペースを削除"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "セッション「{workspaceName}」を削除しますか?"
 
+msgid "Delete task"
+msgstr "タスクを削除"
+
 msgid "Delete team"
 msgstr "チームを削除"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "完了"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "完了"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "完了 — プリセットバーで使っていた枠線付きチップスタイルをすべてのtooltipのデフォルトにし、コピペされたオーバーライドを削除しました(差し引き−90行)。"
 
@@ -7699,6 +7723,9 @@ msgstr "Dropdown Menu"
 
 msgid "Dropdown, context, and application menus"
 msgstr "ドロップダウン、コンテキスト、アプリケーションメニュー"
+
+msgid "Due date"
+msgstr "期限"
 
 msgid "Due today"
 msgstr "本日のお支払い"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "進行中"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "進行中"
+
 msgid "In Progress"
 msgstr "進行中"
 
@@ -11733,6 +11764,9 @@ msgstr "未読にする"
 msgid "Mark as viewed"
 msgstr "確認済みにする"
 
+msgid "Mark in progress"
+msgstr "進行中にする"
+
 msgid "Mark Ready"
 msgstr "レビュー可能にする"
 
@@ -12571,6 +12605,9 @@ msgstr "次のタブ"
 msgid "Next Tab (Second Shortcut)"
 msgstr "次のタブ (2つ目のショートカット)"
 
+msgid "Next week"
+msgstr "来週"
+
 msgid "Next Workspace"
 msgstr "次のワークスペース"
 
@@ -12746,6 +12783,9 @@ msgstr "コントリビューターが見つかりません。"
 
 msgid "No credit card required."
 msgstr "クレジットカードは不要です。"
+
+msgid "No date"
+msgstr "日付なし"
 
 msgid "No description"
 msgstr "説明なし"
@@ -13261,6 +13301,9 @@ msgstr "いいえ。{companyName}がモデル呼び出しをプロキシする�
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "いいえ。エージェントは独立したままで、Paradevはその周りのオーケストレーション層です。タスクごとに専用のGitワークツリーとブランチ、永続的なセッション、差分レビュー、イベントやスケジュールで動くオートメーションが手に入り、ワークフローが特定のプロバイダーに縛られることもありません。"
+
+msgid "Nobody"
+msgstr "なし"
 
 msgid "Nobody has joined the board yet."
 msgstr "まだ誰も参加していません。"
@@ -16149,6 +16192,9 @@ msgstr "残り"
 msgid "rematch"
 msgstr "再戦"
 
+msgid "Reminder"
+msgstr "リマインダー"
+
 msgid "remote"
 msgstr "リモート"
 
@@ -16382,6 +16428,9 @@ msgstr "{0}に更新されます。"
 
 msgid "Reopen"
 msgstr "再オープン"
+
+msgid "Reopen {title}"
+msgstr "{title} を再開"
 
 msgid "Reopen Closed Tab"
 msgstr "閉じたタブを再度開く"
@@ -17848,6 +17897,9 @@ msgstr "回答を送信"
 msgid "Send answers"
 msgstr "回答を送信"
 
+msgid "Send comment"
+msgstr "コメントを送信"
+
 msgid "Send email and debug delivery"
 msgstr "メールを送信し、配信の問題を調査"
 
@@ -19001,6 +19053,10 @@ msgstr "1週間あたりの獲得スター"
 msgctxt "project date"
 msgid "Start"
 msgstr "開始日"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "{0} を今すぐ開始"
 
 msgid "Start a conversation to see messages here"
 msgstr "会話を始めるとここにメッセージが表示されます"
@@ -20886,6 +20942,10 @@ msgstr "移動先"
 msgid "to {name}"
 msgstr "{name} へ"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "未着手"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "エージェントとの会話を再開するには、そのフォルダで次を実行します:"
 
@@ -20987,6 +21047,9 @@ msgstr "直近30日のセッションあたりトークン"
 
 msgid "Tokens stay off your machine"
 msgstr "トークンはマシンに残らない"
+
+msgid "Tomorrow"
+msgstr "明日"
 
 msgid "Too large to expand"
 msgstr "大きすぎて展開できません"
@@ -22074,6 +22137,9 @@ msgstr "サインインを待機中…"
 msgid "Waiting for the subagent's first message…"
 msgstr "サブエージェントの最初のメッセージを待っています…"
 
+msgid "Waiting for your answer"
+msgstr "あなたの回答待ち"
+
 msgid "Waiting for your input"
 msgstr "入力を待っています"
 
@@ -22641,6 +22707,9 @@ msgstr "割り当て直しますか?"
 
 msgid "Wrap lines"
 msgstr "行を折り返す"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "チャットに /task とやることを書くと追加できます。"
 
 msgid "Write a comment"
 msgstr "コメントを書く"

@@ -526,6 +526,10 @@ msgstr "{0} đang chạy dịch vụ host {1} — ứng dụng này cần {2} tr
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} đã được thiết lập trên máy này, nhưng chưa có trên tài khoản của bạn"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} đang làm việc này"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "còn {0} nữa. Hãy thu hẹp tìm kiếm"
@@ -3140,6 +3144,10 @@ msgstr "Theo báo cáo gần nhất. Máy chủ phải trực tuyến để cậ
 msgid "ascending"
 msgstr "tăng dần"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "Yêu cầu {0} bắt đầu lại"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Hãy nhờ một thành viên thêm bạn vào kênh này"
 
@@ -3203,6 +3211,9 @@ msgstr "Chỉ hỏi với thao tác rủi ro"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
+
+msgid "Assign"
+msgstr "Giao"
 
 msgid "Assign to…"
 msgstr "Giao cho…"
@@ -5016,6 +5027,9 @@ msgstr "Chưa đăng được bình luận"
 msgid "Comment on this page"
 msgstr "Bình luận về trang này"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Bình luận, hoặc nói thêm với {devName}…"
+
 msgid "Comment."
 msgstr "Bình luận."
 
@@ -5100,6 +5114,9 @@ msgstr "So sánh với kiểu mặc định"
 
 msgid "complete"
 msgstr "đã kết thúc"
+
+msgid "Complete {title}"
+msgstr "Hoàn thành {title}"
 
 msgid "Completed"
 msgstr "Hoàn tất"
@@ -7013,6 +7030,9 @@ msgstr "Xóa các workspace đã chọn"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Xóa phiên \"{workspaceName}\"?"
 
+msgid "Delete task"
+msgstr "Xóa nhiệm vụ"
+
 msgid "Delete team"
 msgstr "Xóa nhóm"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Xong"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Xong"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Xong — kiểu chip có viền mà thanh preset dùng giờ là mặc định cho mọi tooltip, và các chỗ ghi đè sao chép lặp đã được gỡ (giảm ròng 90 dòng)."
 
@@ -7699,6 +7723,9 @@ msgstr "Dropdown Menu"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Menu thả xuống, menu ngữ cảnh và menu ứng dụng"
+
+msgid "Due date"
+msgstr "Hạn chót"
 
 msgid "Due today"
 msgstr "Phải trả hôm nay"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Đang thực hiện"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Đang thực hiện"
+
 msgid "In Progress"
 msgstr "Đang thực hiện"
 
@@ -11733,6 +11764,9 @@ msgstr "Đánh dấu chưa đọc"
 msgid "Mark as viewed"
 msgstr "Đánh dấu đã xem"
 
+msgid "Mark in progress"
+msgstr "Đánh dấu đang thực hiện"
+
 msgid "Mark Ready"
 msgstr "Đánh dấu sẵn sàng"
 
@@ -12571,6 +12605,9 @@ msgstr "Tab kế tiếp"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Tab kế tiếp (phím tắt thứ hai)"
 
+msgid "Next week"
+msgstr "Tuần sau"
+
 msgid "Next Workspace"
 msgstr "Workspace kế tiếp"
 
@@ -12746,6 +12783,9 @@ msgstr "Không tìm thấy người đóng góp nào."
 
 msgid "No credit card required."
 msgstr "Không cần thẻ tín dụng."
+
+msgid "No date"
+msgstr "Không có ngày"
 
 msgid "No description"
 msgstr "Không có mô tả"
@@ -13261,6 +13301,9 @@ msgstr "Không. {companyName} không bao giờ làm proxy cho các lệnh gọi 
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Không. Các agent của bạn vẫn độc lập; Paradev là lớp điều phối bao quanh chúng. Mỗi tác vụ có Git worktree và nhánh riêng, phiên làm việc lâu dài, xem xét diff và các tự động hóa chạy theo sự kiện hoặc theo lịch, mà không ràng buộc quy trình vào một nhà cung cấp."
+
+msgid "Nobody"
+msgstr "Không ai"
 
 msgid "Nobody has joined the board yet."
 msgstr "Chưa ai tham gia bảng xếp hạng."
@@ -16149,6 +16192,9 @@ msgstr "Còn lại"
 msgid "rematch"
 msgstr "tái đấu"
 
+msgid "Reminder"
+msgstr "Lời nhắc"
+
 msgid "remote"
 msgstr "remote"
 
@@ -16382,6 +16428,9 @@ msgstr "Gia hạn vào {0}."
 
 msgid "Reopen"
 msgstr "Mở lại"
+
+msgid "Reopen {title}"
+msgstr "Mở lại {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "Mở lại tab vừa đóng"
@@ -17848,6 +17897,9 @@ msgstr "Gửi câu trả lời"
 msgid "Send answers"
 msgstr "Gửi các câu trả lời"
 
+msgid "Send comment"
+msgstr "Gửi bình luận"
+
 msgid "Send email and debug delivery"
 msgstr "Gửi email và gỡ lỗi việc gửi thư"
 
@@ -19001,6 +19053,10 @@ msgstr "Số star tăng mỗi tuần"
 msgctxt "project date"
 msgid "Start"
 msgstr "Bắt đầu"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "Bắt đầu {0} ngay"
 
 msgid "Start a conversation to see messages here"
 msgstr "Bắt đầu một cuộc trò chuyện để thấy tin nhắn ở đây"
@@ -20886,6 +20942,10 @@ msgstr "Đến"
 msgid "to {name}"
 msgstr "tới {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "Cần làm"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Để tiếp tục một cuộc trò chuyện với agent, hãy chạy lệnh này trong thư mục của nó:"
 
@@ -20987,6 +21047,9 @@ msgstr "token mỗi phiên, 30 ngày gần nhất"
 
 msgid "Tokens stay off your machine"
 msgstr "Token không nằm trên máy của bạn"
+
+msgid "Tomorrow"
+msgstr "Ngày mai"
 
 msgid "Too large to expand"
 msgstr "Quá lớn để mở rộng"
@@ -22074,6 +22137,9 @@ msgstr "Đang chờ đăng nhập…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Đang chờ tin nhắn đầu tiên của agent con…"
 
+msgid "Waiting for your answer"
+msgstr "Đang chờ câu trả lời của bạn"
+
 msgid "Waiting for your input"
 msgstr "Đang chờ bạn phản hồi"
 
@@ -22641,6 +22707,9 @@ msgstr "Bạn có muốn gán lại không?"
 
 msgid "Wrap lines"
 msgstr "Ngắt dòng"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Viết /task và việc cần làm vào cuộc trò chuyện để thêm nhiệm vụ."
 
 msgid "Write a comment"
 msgstr "Viết bình luận"

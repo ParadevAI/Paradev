@@ -19,6 +19,7 @@ import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/compone
 import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
 import { QuestionCard } from "./components/QuestionCard";
+import { TaskCard } from "./components/TaskCard";
 import { MessageAuthorDevProvider } from "./providers/MessageAuthorDevProvider";
 import { mentionMarkdown } from "./utils/mentionMarkdown";
 
@@ -41,6 +42,8 @@ export interface MessageActions {
 	answerForm: (questionId: string, answers: QuestionPartAnswer[]) => void;
 	/** Shows what the Dev did to write the message. */
 	details: (message: Message) => void;
+	openTask: (taskId: string) => void;
+	toggleTask: (taskId: string) => void;
 	fileLink: (fileId: string) => Promise<string>;
 	openFile: (file: SharedFile) => void;
 }
@@ -82,7 +85,31 @@ export const MessageItem = memo(function MessageItem({
 		? state.devs[message.authorDevId]
 		: undefined;
 
+	const task = message.taskId
+		? state.tasks.find((candidate) => candidate.id === message.taskId)
+		: undefined;
+	const card = task && (
+		<TaskCard
+			state={state}
+			task={task}
+			onOpen={() => actions.openTask(task.id)}
+			onToggle={() => actions.toggleTask(task.id)}
+		/>
+	);
+
 	if (message.authorId === null && !message.authorDevId) {
+		if (card) {
+			return (
+				<div className="flex justify-center px-4 py-1.5">
+					<div className="rounded-2xl bg-fill-selected px-3.5 py-2">
+						<div className="pb-1 text-muted-foreground text-xs">
+							<Trans>Reminder</Trans>
+						</div>
+						{card}
+					</div>
+				</div>
+			);
+		}
 		return (
 			<div className="flex items-center justify-center gap-1.5 px-8 py-2 text-center text-xs text-muted-foreground">
 				<LuInfo className="size-3 shrink-0" />
@@ -175,7 +202,8 @@ export const MessageItem = memo(function MessageItem({
 							onAnswerForm={actions.answerForm}
 						/>
 					)}
-					{message.text && !message.question && (
+					{card}
+					{message.text && !message.question && !card && (
 						<MessageAuthorDevProvider value={message.authorDevId ?? null}>
 							<ChatMarkdown components={MARKDOWN_COMPONENTS}>
 								{mentionMarkdown(message.text, nameOf)}

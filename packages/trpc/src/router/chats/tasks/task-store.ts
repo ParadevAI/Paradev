@@ -149,18 +149,22 @@ export async function addNotes(
 	entries: { kind: TaskActivityKind; text?: string }[],
 ): Promise<TaskActivity[]> {
 	if (entries.length === 0) return [];
-	const rows = await db
-		.insert(chatsTaskNotes)
-		.values(
-			entries.map((entry) => ({
+	// One insert each: entries made together share a timestamp, and the timeline reads in the order they were made.
+	const rows: NoteRow[] = [];
+	for (const [index, entry] of entries.entries()) {
+		const [row] = await db
+			.insert(chatsTaskNotes)
+			.values({
 				taskId: found.task.id,
 				kind: entry.kind,
 				text: entry.text ?? "",
 				userId: actor?.kind === "user" ? actor.userId : null,
 				agentId: actor?.kind === "dev" ? actor.agentId : null,
-			})),
-		)
-		.returning();
+				createdAt: new Date(Date.now() + index),
+			})
+			.returning();
+		if (row) rows.push(row);
+	}
 	const notes = rows.map(noteView);
 	for (const activity of notes) {
 		publishChats(chatsGroupChannel(found.chat.groupId), {

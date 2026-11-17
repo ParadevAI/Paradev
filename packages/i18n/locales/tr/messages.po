@@ -526,6 +526,10 @@ msgstr "{0} üzerinde host hizmeti {1} çalışıyor — bu uygulama {2} veya da
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} bu makinede kurulu, ancak hesabınızda değil"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} bunun üzerinde çalışıyor"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "{0} tane daha. Aramanızı daraltın"
@@ -3140,6 +3144,10 @@ msgstr "Son bildirildiği gibi. Güncellemek için ana makine çevrimiçi olmal�
 msgid "ascending"
 msgstr "artan"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "{0} için yeniden başlatma iste"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Bir üyeden sizi bu kanala eklemesini isteyin"
 
@@ -3203,6 +3211,9 @@ msgstr "Yalnızca riskli işlemlerde sorar"
 
 msgid "Aspect Ratio"
 msgstr "En boy oranı"
+
+msgid "Assign"
+msgstr "Ata"
 
 msgid "Assign to…"
 msgstr "Şuna ata…"
@@ -5016,6 +5027,9 @@ msgstr "Yorum gönderilmedi"
 msgid "Comment on this page"
 msgstr "Bu sayfaya yorum yap"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Yorum yapın veya {devName} için daha fazlasını anlatın…"
+
 msgid "Comment."
 msgstr "Yorum yapın."
 
@@ -5100,6 +5114,9 @@ msgstr "Varsayılan stille karşılaştırıldı"
 
 msgid "complete"
 msgstr "tamamlandı"
+
+msgid "Complete {title}"
+msgstr "{title} görevini tamamla"
 
 msgid "Completed"
 msgstr "Tamamlandı"
@@ -7013,6 +7030,9 @@ msgstr "Seçili çalışma alanlarını sil"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "\"{workspaceName}\" oturumu silinsin mi?"
 
+msgid "Delete task"
+msgstr "Görevi sil"
+
 msgid "Delete team"
 msgstr "Takımı sil"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Tamamlandı"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Bitti"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Tamam — hazır ayarlar çubuğunun kullandığı çerçeveli çip stili artık her tooltip için varsayılan ve kopyala-yapıştır geçersiz kılmalar kaldırıldı (net −90 satır)."
 
@@ -7699,6 +7723,9 @@ msgstr "Açılır menü"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Açılır, bağlam ve uygulama menüleri"
+
+msgid "Due date"
+msgstr "Son tarih"
 
 msgid "Due today"
 msgstr "Bugün ödenecek"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Devam ediyor"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Devam ediyor"
+
 msgid "In Progress"
 msgstr "Devam ediyor"
 
@@ -11733,6 +11764,9 @@ msgstr "Okunmadı olarak işaretle"
 msgid "Mark as viewed"
 msgstr "Görüldü olarak işaretle"
 
+msgid "Mark in progress"
+msgstr "Devam ediyor olarak işaretle"
+
 msgid "Mark Ready"
 msgstr "Hazır işaretle"
 
@@ -12571,6 +12605,9 @@ msgstr "Sonraki sekme"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Sonraki sekme (ikinci kısayol)"
 
+msgid "Next week"
+msgstr "Gelecek hafta"
+
 msgid "Next Workspace"
 msgstr "Sonraki çalışma alanı"
 
@@ -12746,6 +12783,9 @@ msgstr "Katkıda bulunan bulunamadı."
 
 msgid "No credit card required."
 msgstr "Kredi kartı gerekmez."
+
+msgid "No date"
+msgstr "Tarih yok"
 
 msgid "No description"
 msgstr "Açıklama yok"
@@ -13261,6 +13301,9 @@ msgstr "Hayır. {companyName}, model çağrıları için asla proxy görevi gör
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Hayır. Ajanlarınız bağımsız kalır; Paradev onların etrafındaki orkestrasyon katmanıdır. Her görev kendi Git worktree'sini ve dalını, kalıcı oturumları, diff incelemesini ve olaylarla ya da bir zamanlamayla çalışan otomasyonları alır; iş akışı tek bir sağlayıcıya bağlanmaz."
+
+msgid "Nobody"
+msgstr "Kimse"
 
 msgid "Nobody has joined the board yet."
 msgstr "Tabloya henüz kimse katılmadı."
@@ -16149,6 +16192,9 @@ msgstr "Kalan"
 msgid "rematch"
 msgstr "rövanş"
 
+msgid "Reminder"
+msgstr "Hatırlatma"
+
 msgid "remote"
 msgstr "uzak"
 
@@ -16382,6 +16428,9 @@ msgstr "{0} tarihinde yenilenir."
 
 msgid "Reopen"
 msgstr "Yeniden aç"
+
+msgid "Reopen {title}"
+msgstr "{title} görevini yeniden aç"
 
 msgid "Reopen Closed Tab"
 msgstr "Kapatılan sekmeyi yeniden aç"
@@ -17848,6 +17897,9 @@ msgstr "Yanıtı gönder"
 msgid "Send answers"
 msgstr "Yanıtları gönder"
 
+msgid "Send comment"
+msgstr "Yorumu gönder"
+
 msgid "Send email and debug delivery"
 msgstr "E-posta gönderin ve teslimatta hata ayıklayın"
 
@@ -19001,6 +19053,10 @@ msgstr "Hafta başına kazanılan yıldız"
 msgctxt "project date"
 msgid "Start"
 msgstr "Başlangıç"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "{0} şimdi başlasın"
 
 msgid "Start a conversation to see messages here"
 msgstr "Mesajları burada görmek için bir konuşma başlatın"
@@ -20886,6 +20942,10 @@ msgstr "Hedef"
 msgid "to {name}"
 msgstr "{name} adlı ajana"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "Yapılacak"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Bir ajan konuşmasını sürdürmek için klasöründe şunu çalıştırın:"
 
@@ -20987,6 +21047,9 @@ msgstr "oturum başına token, son 30 gün"
 
 msgid "Tokens stay off your machine"
 msgstr "Belirteçler makinenizde saklanmaz"
+
+msgid "Tomorrow"
+msgstr "Yarın"
 
 msgid "Too large to expand"
 msgstr "Genişletmek için çok büyük"
@@ -22074,6 +22137,9 @@ msgstr "Oturum açma bekleniyor…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Alt ajanın ilk mesajı bekleniyor…"
 
+msgid "Waiting for your answer"
+msgstr "Yanıtınız bekleniyor"
+
 msgid "Waiting for your input"
 msgstr "Girdinizi bekliyor"
 
@@ -22641,6 +22707,9 @@ msgstr "Yeniden atamak ister misiniz?"
 
 msgid "Wrap lines"
 msgstr "Satırları kaydır"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Eklemek için sohbete /task ve yapılacak işi yazın."
 
 msgid "Write a comment"
 msgstr "Yorum yaz"

@@ -526,6 +526,10 @@ msgstr "{0} běží na host service {1} — tato aplikace potřebuje {2} nebo no
 msgid "{0} is set up on this machine, but not on your account"
 msgstr "{0} je nastaven na tomto počítači, ale ne ve vašem účtu"
 
+#. placeholder {0}: dev.name
+msgid "{0} is working on it"
+msgstr "{0} na tom pracuje"
+
 #. placeholder {0}: matches.length - VISIBLE_LIMIT
 msgid "{0} more. Refine your search"
 msgstr "Ještě {0}. Upřesněte hledání"
@@ -3140,6 +3144,10 @@ msgstr "Podle posledního hlášení. Hostitel musí být online, aby se mohl ak
 msgid "ascending"
 msgstr "vzestupně"
 
+#. placeholder {0}: dev.name
+msgid "Ask {0} to restart"
+msgstr "Požádat {0} o restart"
+
 msgid "Ask a member to add you to this channel"
 msgstr "Požádejte člena, aby vás do kanálu přidal"
 
@@ -3203,6 +3211,9 @@ msgstr "Ptá se jen u rizikových akcí"
 
 msgid "Aspect Ratio"
 msgstr "Poměr stran"
+
+msgid "Assign"
+msgstr "Přiřadit"
 
 msgid "Assign to…"
 msgstr "Přiřadit…"
@@ -5016,6 +5027,9 @@ msgstr "Komentář se nepodařilo odeslat"
 msgid "Comment on this page"
 msgstr "Okomentovat tuto stránku"
 
+msgid "Comment, or tell {devName} more…"
+msgstr "Okomentujte, nebo řekněte {devName} více…"
+
 msgid "Comment."
 msgstr "Komentujte."
 
@@ -5100,6 +5114,9 @@ msgstr "Porovnáno s výchozím stylem"
 
 msgid "complete"
 msgstr "dokončeno"
+
+msgid "Complete {title}"
+msgstr "Dokončit {title}"
 
 msgid "Completed"
 msgstr "Dokončeno"
@@ -7013,6 +7030,9 @@ msgstr "Smazat vybrané pracovní prostory"
 msgid "Delete session \"{workspaceName}\"?"
 msgstr "Smazat relaci „{workspaceName}“?"
 
+msgid "Delete task"
+msgstr "Smazat úkol"
+
 msgid "Delete team"
 msgstr "Smazat tým"
 
@@ -7543,6 +7563,10 @@ msgctxt "subagent status"
 msgid "Done"
 msgstr "Hotovo"
 
+msgctxt "task status"
+msgid "Done"
+msgstr "Hotovo"
+
 msgid "Done — the bordered chip style used by the presets bar is now the default for every tooltip, and the copy-pasted overrides are removed (net −90 lines)."
 msgstr "Hotovo — orámovaný styl čipu z lišty přednastavení je teď výchozí pro každý tooltip a zkopírované přepisy jsou pryč (čistě −90 řádků)."
 
@@ -7699,6 +7723,9 @@ msgstr "Rozbalovací nabídka"
 
 msgid "Dropdown, context, and application menus"
 msgstr "Rozbalovací, kontextové a aplikační nabídky"
+
+msgid "Due date"
+msgstr "Termín"
 
 msgid "Due today"
 msgstr "K úhradě dnes"
@@ -10309,6 +10336,10 @@ msgctxt "project state"
 msgid "In progress"
 msgstr "Probíhá"
 
+msgctxt "task status"
+msgid "In progress"
+msgstr "Probíhá"
+
 msgid "In Progress"
 msgstr "Probíhá"
 
@@ -11733,6 +11764,9 @@ msgstr "Označit jako nepřečtené"
 msgid "Mark as viewed"
 msgstr "Označit jako zobrazené"
 
+msgid "Mark in progress"
+msgstr "Označit jako probíhající"
+
 msgid "Mark Ready"
 msgstr "Označit jako připravené"
 
@@ -12571,6 +12605,9 @@ msgstr "Další karta"
 msgid "Next Tab (Second Shortcut)"
 msgstr "Další karta (druhá zkratka)"
 
+msgid "Next week"
+msgstr "Příští týden"
+
 msgid "Next Workspace"
 msgstr "Další pracovní prostor"
 
@@ -12746,6 +12783,9 @@ msgstr "Nenalezeni žádní přispěvatelé."
 
 msgid "No credit card required."
 msgstr "Bez platební karty."
+
+msgid "No date"
+msgstr "Bez data"
 
 msgid "No description"
 msgstr "Bez popisu"
@@ -13261,6 +13301,9 @@ msgstr "Ne. {companyName} nikdy nezprostředkovává volání modelů přes prox
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Ne. Vaši agenti zůstávají nezávislí; Paradev je orchestrační vrstva kolem nich. Každý úkol dostane vlastní Git worktree a větev, trvalé relace, kontrolu diffů a automatizace, které běží při událostech nebo podle plánu, aniž by byl pracovní postup vázán na jednoho poskytovatele."
+
+msgid "Nobody"
+msgstr "Nikdo"
 
 msgid "Nobody has joined the board yet."
 msgstr "Do žebříčku se zatím nikdo nezapojil."
@@ -16149,6 +16192,9 @@ msgstr "Zbývá"
 msgid "rematch"
 msgstr "odveta"
 
+msgid "Reminder"
+msgstr "Připomenutí"
+
 msgid "remote"
 msgstr "vzdálená"
 
@@ -16382,6 +16428,9 @@ msgstr "Obnovuje se {0}."
 
 msgid "Reopen"
 msgstr "Znovu otevřít"
+
+msgid "Reopen {title}"
+msgstr "Znovu otevřít {title}"
 
 msgid "Reopen Closed Tab"
 msgstr "Znovu otevřít zavřenou kartu"
@@ -17848,6 +17897,9 @@ msgstr "Odeslat odpověď"
 msgid "Send answers"
 msgstr "Odeslat odpovědi"
 
+msgid "Send comment"
+msgstr "Odeslat komentář"
+
 msgid "Send email and debug delivery"
 msgstr "Odesílání e-mailů a ladění doručování"
 
@@ -19001,6 +19053,10 @@ msgstr "Získané hvězdy za týden"
 msgctxt "project date"
 msgid "Start"
 msgstr "Začátek"
+
+#. placeholder {0}: dev.name
+msgid "Start {0} now"
+msgstr "Spustit {0} hned"
 
 msgid "Start a conversation to see messages here"
 msgstr "Začněte konverzaci a zprávy se objeví tady"
@@ -20886,6 +20942,10 @@ msgstr "Do"
 msgid "to {name}"
 msgstr "pro {name}"
 
+msgctxt "task status"
+msgid "To do"
+msgstr "K vyřízení"
+
 msgid "To resume an agent conversation, run this in its folder:"
 msgstr "Chcete-li obnovit konverzaci s agentem, spusťte toto v její složce:"
 
@@ -20987,6 +21047,9 @@ msgstr "tokenů na relaci, posledních 30 dní"
 
 msgid "Tokens stay off your machine"
 msgstr "Tokeny zůstávají mimo váš počítač"
+
+msgid "Tomorrow"
+msgstr "Zítra"
 
 msgid "Too large to expand"
 msgstr "Příliš velký na rozbalení"
@@ -22074,6 +22137,9 @@ msgstr "Čeká se na přihlášení…"
 msgid "Waiting for the subagent's first message…"
 msgstr "Čekání na první zprávu subagenta…"
 
+msgid "Waiting for your answer"
+msgstr "Čeká na vaši odpověď"
+
 msgid "Waiting for your input"
 msgstr "Čeká na váš vstup"
 
@@ -22641,6 +22707,9 @@ msgstr "Chcete zkratku přiřadit znovu?"
 
 msgid "Wrap lines"
 msgstr "Zalamovat řádky"
+
+msgid "Write /task and what needs doing in the chat to add one."
+msgstr "Napište do chatu /task a co je potřeba udělat, a úkol se přidá."
 
 msgid "Write a comment"
 msgstr "Napsat komentář"

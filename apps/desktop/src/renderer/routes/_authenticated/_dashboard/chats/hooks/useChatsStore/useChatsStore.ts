@@ -6,6 +6,7 @@ import {
 	createFileSends,
 	createMessageHistory,
 	createReadMarker,
+	createTaskActions,
 	createTurnWatches,
 	createTypingReporter,
 	createTypingWatch,
@@ -221,6 +222,17 @@ export function useChatsStore(organizationId: string) {
 		[api, update, fail],
 	);
 
+	const taskActions = useMemo(
+		() =>
+			createTaskActions({
+				api,
+				getState: () => stateRef.current,
+				update,
+				fail,
+			}),
+		[api, update, fail],
+	);
+
 	const retry = useCallback(
 		() => session.current?.refresh() ?? Promise.resolve(),
 		[],
@@ -233,6 +245,7 @@ export function useChatsStore(organizationId: string) {
 		syncStatus,
 		dispatch,
 		actions,
+		taskActions,
 		live,
 		turns,
 		/** Says which chat is on screen: its Devs' running turns are streamed from their boxes. */
