@@ -512,15 +512,19 @@ export function trackTerminalAgentLaunched(
 	config: ResolvedHostAgentConfig,
 	input: Pick<AgentRunInput, "workspaceId" | "resumeSessionId">,
 ): void {
-	trackAgentLaunched(ctx.api, {
-		presetId: config.presetId,
-		command: config.command,
-		executable: config.command,
-		env: agentLaunchEnv(ctx.db, config),
-		kind: "terminal",
-		resumed: Boolean(input.resumeSessionId),
-		workspaceId: input.workspaceId,
-	});
+	try {
+		trackAgentLaunched(ctx.api, {
+			presetId: config.presetId,
+			command: config.command,
+			executable: config.command,
+			env: agentLaunchEnv(ctx.db, config),
+			kind: "terminal",
+			resumed: Boolean(input.resumeSessionId),
+			workspaceId: input.workspaceId,
+		});
+	} catch (error) {
+		console.warn("[agent-launch] could not report the terminal launch", error);
+	}
 }
 
 async function runTerminalAgent(

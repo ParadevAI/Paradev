@@ -61,18 +61,58 @@ export function withLaunchSource<T>(
 	return source ? launchSourceStorage.run(source, run) : run();
 }
 
-/** The program a command runs, past any leading `NAME=value` assignments. */
-export function commandExecutable(command: string): string {
-	const token =
-		command
-			.trim()
-			.split(/\s+/)
-			.find((part) => part !== "" && !part.includes("=")) ?? "";
-	return token.replace(/^["']|["']$/g, "");
+const SHELL_OPERATOR = /[;&|<>()`$]/;
+const ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
+const DOUBLE_QUOTE_ESCAPES = new Set(["$", "`", '"', "\\"]);
+
+/**
+ * The program a command runs, past any leading `NAME=value` assignments, with
+ * quotes respected. Null when the words before the program cannot be split
+ * for sure: an unclosed quote, or a shell operator outside quotes.
+ */
+export function commandExecutable(command: string): string | null {
+	let word: string | null = null;
+	let quote: '"' | "'" | null = null;
+	const finish = (): string | null => {
+		const done = word;
+		word = null;
+		return done !== null && !ASSIGNMENT.test(done) ? done : null;
+	};
+	for (let index = 0; index < command.length; index++) {
+		const char = command[index] as string;
+		const next = command[index + 1];
+		if (quote === "'") {
+			if (char === "'") quote = null;
+			else word += char;
+		} else if (quote === '"') {
+			if (char === '"') quote = null;
+			else if (char === "\\" && next && DOUBLE_QUOTE_ESCAPES.has(next)) {
+				word += next;
+				index++;
+			} else word += char;
+		} else if (/\s/.test(char)) {
+			const program = finish();
+			if (program !== null) return program;
+		} else if (SHELL_OPERATOR.test(char)) {
+			return null;
+		} else if (char === '"' || char === "'") {
+			word ??= "";
+			quote = char;
+		} else if (char === "\\") {
+			if (next === undefined) return null;
+			word = (word ?? "") + next;
+			index++;
+		} else {
+			word = (word ?? "") + char;
+		}
+	}
+	return quote ? null : finish();
 }
 
 export function commandBaseName(command: string): string | null {
-	const name = (commandExecutable(command).split(/[\\/]/).pop() ?? "")
+	const executable = commandExecutable(command);
+	if (!executable) return null;
+	const name = (executable.split(/[\\/]/).pop() ?? "")
 		.toLowerCase()
 		.replace(/\.(exe|cmd|bat)$/, "");
 	return SAFE_COMMAND_NAME.test(name) ? name : null;

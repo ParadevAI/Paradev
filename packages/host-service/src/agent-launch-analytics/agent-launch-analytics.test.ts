@@ -21,7 +21,7 @@ import {
 const LOCAL = { source: undefined, runMode: "local", commandFound: true };
 
 const SECRET_COMMAND =
-	"OPENAI_API_KEY=sk-secret-1 /opt/private-tools/aider --api-key sk-secret-2";
+	'OPENAI_API_KEY="sk-secret-1 sk-secret-0" /opt/private-tools/aider --api-key sk-secret-2';
 
 describe("agentLaunchProperties", () => {
 	test("a built-in agent reports its id and no command name", () => {
@@ -77,6 +77,27 @@ describe("commandBaseName", () => {
 	test("strips paths, quotes and Windows extensions", () => {
 		expect(commandBaseName('"C:\\Tools\\Aider.exe" --yes')).toBe("aider");
 		expect(commandBaseName("~/bin/goose run")).toBe("goose");
+	});
+
+	test("skips quoted assignments whose values hold spaces", () => {
+		expect(commandBaseName('API_TOKEN="abc def" my-agent --x')).toBe(
+			"my-agent",
+		);
+		expect(commandBaseName("API_TOKEN='abc def' B=1 aider")).toBe("aider");
+		expect(commandBaseName('TOKEN="a \\" b" aider')).toBe("aider");
+	});
+
+	test("fails closed when the words before the program are unclear", () => {
+		expect(commandBaseName('API_TOKEN="abc def my-agent')).toBeNull();
+		expect(commandBaseName("API_TOKEN='abc def my-agent")).toBeNull();
+		expect(commandBaseName("TOKEN=$(cat key) aider")).toBeNull();
+		expect(commandBaseName("TOKEN=abc;aider")).toBeNull();
+		expect(commandBaseName("TOKEN=abc")).toBeNull();
+	});
+
+	test("ignores quotes and operators after the program", () => {
+		expect(commandBaseName("aider --msg 'unclosed")).toBe("aider");
+		expect(commandBaseName("aider | tee log")).toBe("aider");
 	});
 
 	test("drops a name that does not look like a program", () => {
