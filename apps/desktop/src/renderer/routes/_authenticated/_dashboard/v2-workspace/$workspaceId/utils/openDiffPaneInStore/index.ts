@@ -1,0 +1,1 @@
+export { openDiffPaneInStore } from "./openDiffPaneInStore";
