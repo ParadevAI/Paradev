@@ -17,10 +17,10 @@ import {
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
-	sandboxAgentToolsDrive,
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
+	Drive,
 	type NetworkPolicy,
 	Sandbox,
 	type SandboxMounts,
@@ -121,6 +121,8 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
+	/** The bundle's agent-tools drive to mount read-only; absent keeps the image's agents. */
+	agentToolsDrive?: string | null;
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -139,24 +141,39 @@ function sandboxTags(
 	};
 }
 
+const publishedAgentToolsDrives = new Set<string>();
+
 /**
- * The region's agent-tools drive, read-only, when the flag is on. Mounts are
- * per session and a fork does not inherit them, so every create and every
- * wake passes them.
+ * A mount of a drive that does not exist fails the create, and a drive a
+ * writer still holds read-write mounts corrupt. Only a drive that exists and
+ * is detached is mounted; that answer is final for a drive, so it is cached.
  */
-export function agentToolsMounts(
-	region: string,
-	enabled = env.SANDBOX_AGENT_TOOLS_DRIVE === "true",
-): { mounts: SandboxMounts } | Record<string, never> {
-	if (!enabled) return {};
-	return {
-		mounts: {
-			[SANDBOX_PATHS.agents]: {
-				drive: sandboxAgentToolsDrive(region),
-				mode: "snapshot",
-			},
-		},
-	};
+export async function agentToolsMounts(
+	driveName: string | null | undefined,
+	getDrive: (name: string) => Promise<Pick<Drive, "currentSandboxName">> = (
+		name,
+	) => Drive.get({ ...credentials(), name }),
+): Promise<SandboxMounts | undefined> {
+	if (!driveName) return undefined;
+	if (!publishedAgentToolsDrives.has(driveName)) {
+		try {
+			const drive = await getDrive(driveName);
+			if (drive.currentSandboxName) {
+				console.warn(
+					`[sandbox] agent-tools drive ${driveName} is attached to ${drive.currentSandboxName}; not mounting`,
+				);
+				return undefined;
+			}
+		} catch (error) {
+			console.warn(
+				`[sandbox] agent-tools drive ${driveName} unavailable; not mounting`,
+				error,
+			);
+			return undefined;
+		}
+		publishedAgentToolsDrives.add(driveName);
+	}
+	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
 }
 
 function publishedPorts(extra: readonly number[] = []): number[] {
@@ -243,8 +260,8 @@ export async function provisionSandbox(args: {
 			kind === "environment" ? 0 : WORKSPACE_SNAPSHOT_EXPIRATION_MS,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
-		...agentToolsMounts(args.environment.region),
 	};
+	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
 	const sandbox =
 		(await getSandbox(args.name)) ??
 		(await Sentry.startSpan(
@@ -265,11 +282,13 @@ export async function provisionSandbox(args: {
 						// it was taken.
 						Sandbox.fork({
 							...config,
+							...(mounts ? { mounts } : {}),
 							sourceSandbox: args.environment.sourceRef,
 							resources: { vcpus: args.claim.vcpus },
 						})
 					: Sandbox.create({
 							...config,
+							...(mounts ? { mounts } : {}),
 							image: args.environment.sourceRef,
 							region: args.environment.region as SandboxRegion,
 							resources: { vcpus: args.claim.vcpus },
@@ -500,16 +519,20 @@ export async function wakeSandbox(args: {
 					),
 			);
 		}
-		const { mounts } = agentToolsMounts(sandbox.region);
-		if (!wasRunning && mounts) {
-			await sandbox
-				.update({ mounts })
-				.catch((error) =>
-					console.warn(
-						`[sandbox] mount update failed for ${args.providerSandboxId}`,
-						error,
-					),
-				);
+		if (!wasRunning) {
+			const { [SANDBOX_PATHS.agents]: previous, ...others } =
+				sandbox.mounts ?? {};
+			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+			if (agents || previous) {
+				await sandbox
+					.update({ mounts: { ...others, ...agents } })
+					.catch((error) =>
+						console.warn(
+							`[sandbox] mount update failed for ${args.providerSandboxId}`,
+							error,
+						),
+					);
+			}
 		}
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });

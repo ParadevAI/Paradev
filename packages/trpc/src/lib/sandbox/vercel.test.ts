@@ -163,15 +163,56 @@ describe("topUpSandboxSession", () => {
 });
 
 describe("agentToolsMounts", () => {
-	test("mounts nothing while the flag is off", () => {
-		expect(agentToolsMounts("sfo1", false)).toEqual({});
+	const detached = () => Promise.resolve({ currentSandboxName: undefined });
+
+	test("mounts nothing without a drive name", async () => {
+		let asked = 0;
+		const getDrive = () => {
+			asked++;
+			return detached();
+		};
+		expect(await agentToolsMounts(null, getDrive)).toBeUndefined();
+		expect(asked).toBe(0);
 	});
 
-	test("mounts the region's drive read-only at the agents path", () => {
-		expect(agentToolsMounts("iad1", true)).toEqual({
-			mounts: {
-				"/opt/agents": { drive: "agent-tools-iad1", mode: "snapshot" },
+	test("mounts a detached drive read-only, and asks only once", async () => {
+		let asked = 0;
+		const getDrive = () => {
+			asked++;
+			return detached();
+		};
+		const want = {
+			"/opt/agents": {
+				drive: "agent-tools-iad1-0123456789ab",
+				mode: "snapshot",
 			},
-		});
+		};
+		expect(
+			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
+		).toEqual(want);
+		expect(
+			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
+		).toEqual(want);
+		expect(asked).toBe(1);
+	});
+
+	test("skips a missing drive, or one a writer still holds", async () => {
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-aaaaaaaaaaaa", () =>
+				Promise.reject(new Error("404")),
+			),
+		).toBeUndefined();
+		let asked = 0;
+		const attached = () => {
+			asked++;
+			return Promise.resolve({ currentSandboxName: "builder" });
+		};
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
+		).toBeUndefined();
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
+		).toBeUndefined();
+		expect(asked).toBe(2);
 	});
 });

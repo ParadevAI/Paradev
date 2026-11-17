@@ -39,10 +39,19 @@ export const SANDBOX_PATHS = {
 	agents: "/opt/agents",
 } as const;
 
-/** The drive the agent CLIs are published to; a drive only mounts in its own region. */
-export function sandboxAgentToolsDrive(region: string): string {
-	return `agent-tools-${region}`;
+/**
+ * The agent CLIs of one bundle in one region: written once by the release,
+ * then only ever mounted read-only. A drive only mounts in its own region.
+ */
+export function sandboxAgentToolsDrive(
+	region: string,
+	bundleSha: string,
+): string {
+	return `agent-tools-${region}-${bundleSha.slice(0, 12)}`;
 }
+
+export const SANDBOX_AGENT_TOOLS_DRIVE_PATTERN =
+	/^agent-tools-[a-z]+[0-9]+-[0-9a-f]{12}$/;
 
 /** Every port a workspace publishes, and the loopback ones behind them. */
 export const SANDBOX_PORTS = {
