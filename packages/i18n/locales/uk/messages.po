@@ -10720,6 +10720,9 @@ msgstr "Щоб його злити, він має знову стати в че�
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Це займе кілька хвилин. Користуєтеся Conductor Cloud? Почніть із <0>посібника для хмари</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Він використовує ваші підключені акаунти, зокрема коли його просить хтось інший у групі."
+
 msgid "It will open once the connection is back."
 msgstr "Відкриється, щойно з'єднання відновиться."
 
@@ -15092,6 +15095,9 @@ msgstr "Маркетплейс плагінів"
 
 msgid "Plugins"
 msgstr "Плагіни"
+
+msgid "Plugins it can use as you"
+msgstr "Плагіни, якими він може користуватися від вашого імені"
 
 msgid "Plugins, themes, and agents"
 msgstr "Плагіни, теми та агенти"

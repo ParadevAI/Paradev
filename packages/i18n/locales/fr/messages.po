@@ -10726,6 +10726,9 @@ msgstr "Pour être fusionnée, elle doit rejoindre la file à nouveau et réussi
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Cela prend quelques minutes. Sur Conductor Cloud ? Commencez par le <0>guide cloud</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Il utilise vos comptes connectés, y compris quand quelqu'un d'autre le lui demande dans un groupe."
+
 msgid "It will open once the connection is back."
 msgstr "La page s'ouvrira au retour de la connexion."
 
@@ -15098,6 +15101,9 @@ msgstr "Marketplace de plugins"
 
 msgid "Plugins"
 msgstr "Plugins"
+
+msgid "Plugins it can use as you"
+msgstr "Plugins qu'il peut utiliser en votre nom"
 
 msgid "Plugins, themes, and agents"
 msgstr "Plugins, thèmes et agents"

@@ -185,6 +185,7 @@ export function createChatsApi(
 					color: patch.color,
 					description: patch.description,
 					paradevAccess: patch.paradevAccess,
+					plugins: patch.plugins,
 				}),
 			),
 		deleteDev: async (devId) => {

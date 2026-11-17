@@ -10726,6 +10726,9 @@ msgstr "Per essere unita deve rientrare in coda e superare i controlli."
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Bastano pochi minuti. Usi Conductor Cloud? Inizia dalla <0>guida al cloud</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Usa i tuoi account collegati, anche quando glielo chiede qualcun altro in un gruppo."
+
 msgid "It will open once the connection is back."
 msgstr "Si aprirà al ritorno della connessione."
 
@@ -15098,6 +15101,9 @@ msgstr "Marketplace dei plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins it can use as you"
+msgstr "Plugin che può usare a tuo nome"
 
 msgid "Plugins, themes, and agents"
 msgstr "Plugin, temi e agenti"

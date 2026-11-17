@@ -15,7 +15,9 @@ const { asc, eq, inArray } = await import("drizzle-orm");
 const { chatsRouter } = await import("../chats");
 const { createCallerFactory, createTRPCContext, createTRPCRouter } =
 	await import("../../../trpc");
-const { paradevCaller, recordAppCall } = await import("./app-access");
+const { appCaller, paradevCaller, recordAppCall } = await import(
+	"./app-access"
+);
 const { handleBoxRequest } = await import("./box-api");
 const { generateBoxKeys } = await import("./box-tokens");
 const { inlineTurnRuns } = await import("./inline-runs");
@@ -419,6 +421,30 @@ test("a Dev's question is a card a person answers: the waiting turn hears it, an
 	expect(answerTurn.text).toStartWith("## Answer to your question");
 	expect(answerTurn.text).toContain("You asked: Ship it?\nOwner said yes");
 	await fromBox(answerTurn, `/cli/turns/${answerTurn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
+test("a plugin is its own switch on a Dev: off until its owner names it", async () => {
+	const { turn } = await messaged("check my issues");
+	const headers = new Headers({
+		"x-dev-box": boxes.get(turn.agentId)?.credential ?? "",
+		"x-dev-chat": turn.groupId,
+	});
+	const refusal = (plugin: string) =>
+		appCaller(keys, headers, plugin).then(
+			() => null,
+			(error: { code: string }) => error.code,
+		);
+	expect(await refusal("linear")).toBe("not_selected");
+	await owner.chats.updateDev({ devId: turn.agentId, plugins: ["linear"] });
+	expect(await appCaller(keys, headers, "linear")).toMatchObject({
+		app: "linear",
+		ownerUserId: OWNER,
+	});
+	expect(await refusal("github")).toBe("not_selected");
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
 		stopReason: "end_turn",
 	});
 	await runs.idle();

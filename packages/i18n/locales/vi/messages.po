@@ -10726,6 +10726,9 @@ msgstr "Để merge, nó phải vào lại hàng đợi và vượt qua các ki�
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Chỉ mất vài phút. Đang dùng Conductor Cloud? Hãy bắt đầu với <0>hướng dẫn cho cloud</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Nó dùng các tài khoản đã kết nối của bạn, kể cả khi người khác yêu cầu nó trong nhóm."
+
 msgid "It will open once the connection is back."
 msgstr "Trang sẽ mở khi có kết nối trở lại."
 
@@ -15098,6 +15101,9 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins it can use as you"
+msgstr "Các plugin nó có thể dùng thay bạn"
 
 msgid "Plugins, themes, and agents"
 msgstr "Plugin, chủ đề và agent"

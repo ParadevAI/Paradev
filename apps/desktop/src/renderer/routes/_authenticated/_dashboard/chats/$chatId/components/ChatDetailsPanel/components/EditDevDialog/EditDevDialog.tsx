@@ -12,6 +12,7 @@ import { Input } from "@superset/ui/input";
 import { Switch } from "@superset/ui/switch";
 import { Textarea } from "@superset/ui/textarea";
 import { useState } from "react";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
 interface EditDevDialogProps {
 	dev: Dev;
@@ -21,6 +22,7 @@ interface EditDevDialogProps {
 		name: string;
 		description: string;
 		paradevAccess?: boolean;
+		plugins?: string[];
 	}) => Promise<boolean>;
 	/** Absent when this Dev cannot be deleted. Resolves to whether it is gone. */
 	onDelete?: () => Promise<boolean>;
@@ -38,6 +40,13 @@ export function EditDevDialog({
 	const [paradevAccess, setParadevAccess] = useState(
 		dev.paradevAccess ?? false,
 	);
+	const [plugins, setPlugins] = useState(dev.plugins ?? []);
+	const installed = cloudTrpc.plugins.list
+		.useQuery(undefined, {
+			enabled: dev.plugins !== undefined,
+			staleTime: 60_000,
+		})
+		.data?.filter((plugin) => plugin.installed && plugin.enabled);
 	const [isBusy, setBusy] = useState(false);
 	const [isConfirmingDelete, setConfirmingDelete] = useState(false);
 	const ready =
@@ -71,6 +80,7 @@ export function EditDevDialog({
 								name: name.trim(),
 								description: description.trim(),
 								...(dev.paradevAccess !== undefined ? { paradevAccess } : {}),
+								...(dev.plugins !== undefined ? { plugins } : {}),
 							}),
 						);
 					}}
@@ -112,6 +122,45 @@ export function EditDevDialog({
 								checked={paradevAccess}
 								onCheckedChange={setParadevAccess}
 							/>
+						</div>
+					)}
+					{dev.plugins !== undefined && installed && installed.length > 0 && (
+						<div className="flex flex-col gap-2 rounded-lg border border-border p-3">
+							<span className="flex flex-col gap-1">
+								<span className="font-medium text-sm">
+									<Trans>Plugins it can use as you</Trans>
+								</span>
+								<span className="text-muted-foreground text-xs">
+									<Trans>
+										It uses your connected accounts, also when someone else asks
+										it in a group.
+									</Trans>
+								</span>
+							</span>
+							<div className="flex max-h-44 flex-col overflow-y-auto">
+								{installed.map((plugin) => (
+									<label
+										key={plugin.name}
+										htmlFor={`dev-plugin-${plugin.name}`}
+										className="flex items-center justify-between gap-3 py-1.5 text-sm"
+									>
+										<span className="min-w-0 truncate">
+											{plugin.displayName}
+										</span>
+										<Switch
+											id={`dev-plugin-${plugin.name}`}
+											checked={plugins.includes(plugin.name)}
+											onCheckedChange={(isOn) =>
+												setPlugins((current) =>
+													isOn
+														? [...current, plugin.name]
+														: current.filter((name) => name !== plugin.name),
+												)
+											}
+										/>
+									</label>
+								))}
+							</div>
 						</div>
 					)}
 					<Button type="submit" disabled={!ready || isBusy}>

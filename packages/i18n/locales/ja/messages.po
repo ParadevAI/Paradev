@@ -10726,6 +10726,9 @@ msgstr "マージするには、もう一度キューに入れてチェックに
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "数分で完了します。Conductor Cloud をお使いの場合は、まず<0>クラウドガイド</0>をご覧ください。"
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "グループで他の人に頼まれた場合も含め、あなたの接続済みアカウントを使います。"
+
 msgid "It will open once the connection is back."
 msgstr "接続が戻ると開きます。"
 
@@ -15098,6 +15101,9 @@ msgstr "プラグインマーケットプレイス"
 
 msgid "Plugins"
 msgstr "プラグイン"
+
+msgid "Plugins it can use as you"
+msgstr "あなたとして使えるプラグイン"
 
 msgid "Plugins, themes, and agents"
 msgstr "プラグイン、テーマ、エージェント"

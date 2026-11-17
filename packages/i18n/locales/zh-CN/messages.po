@@ -10726,6 +10726,9 @@ msgstr "要合并，它必须重新加入队列并通过检查。"
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需几分钟。在用 Conductor Cloud？请先看<0>云端指南</0>。"
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "它会使用你已连接的账户，即使是群组中的其他人提出请求。"
+
 msgid "It will open once the connection is back."
 msgstr "网络恢复后会自动打开。"
 
@@ -15098,6 +15101,9 @@ msgstr "插件市场"
 
 msgid "Plugins"
 msgstr "插件"
+
+msgid "Plugins it can use as you"
+msgstr "它可以以你的身份使用的插件"
 
 msgid "Plugins, themes, and agents"
 msgstr "插件、主题和智能体"

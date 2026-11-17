@@ -1,5 +1,5 @@
 import { env } from "../../../env";
-import { type AppCaller, paradevCaller, recordAppCall } from "./app-access";
+import { type AppCaller, appCaller, recordAppCall } from "./app-access";
 import { handleBoxRequest } from "./box-api";
 import { BoxRequestError } from "./box-auth";
 import { CHATS_BOX_API_PATH } from "./box-path";
@@ -26,16 +26,17 @@ export type { AppCaller };
 export { recordAppCall };
 
 /**
- * Whose access a box's request to Paradev's tools uses, or the response
- * that refuses it.
+ * Whose access a box's request to an app's tools uses, or the response that
+ * refuses it. `app` is one of the owner's plugins; omitted, Paradev itself.
  */
-export async function chatsBoxParadevCaller(
+export async function chatsBoxAppCaller(
 	request: Request,
+	app?: string,
 ): Promise<AppCaller | Response> {
 	const runtime = chatsTurnRuntime();
 	if (!runtime) return new Response(null, { status: 404 });
 	try {
-		return await paradevCaller(await runtime.boxKeys(), request.headers);
+		return await appCaller(await runtime.boxKeys(), request.headers, app);
 	} catch (error) {
 		if (error instanceof BoxRequestError) {
 			return Response.json(
@@ -46,3 +47,6 @@ export async function chatsBoxParadevCaller(
 		throw error;
 	}
 }
+
+export const chatsBoxParadevCaller = (request: Request) =>
+	chatsBoxAppCaller(request);

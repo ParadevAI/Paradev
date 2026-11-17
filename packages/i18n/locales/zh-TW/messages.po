@@ -10726,6 +10726,9 @@ msgstr "要合併，它必須重新加入佇列並通過檢查。"
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "只需幾分鐘。在用 Conductor Cloud？請先看<0>雲端指南</0>。"
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "它會使用你已連接的帳戶，即使是群組中的其他人提出要求。"
+
 msgid "It will open once the connection is back."
 msgstr "網路恢復後會自動開啟。"
 
@@ -15098,6 +15101,9 @@ msgstr "外掛市場"
 
 msgid "Plugins"
 msgstr "外掛"
+
+msgid "Plugins it can use as you"
+msgstr "它可以以你的身分使用的外掛"
 
 msgid "Plugins, themes, and agents"
 msgstr "外掛、主題和代理程式"

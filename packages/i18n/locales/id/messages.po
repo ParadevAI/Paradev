@@ -10726,6 +10726,9 @@ msgstr "Agar bisa di-merge, ia harus masuk lagi dan lolos pemeriksaannya."
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Hanya butuh beberapa menit. Memakai Conductor Cloud? Mulai dengan <0>panduan cloud</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Ia memakai akun terhubung Anda, juga saat orang lain memintanya di grup."
+
 msgid "It will open once the connection is back."
 msgstr "Akan terbuka saat koneksi kembali."
 
@@ -15098,6 +15101,9 @@ msgstr "Marketplace plugin"
 
 msgid "Plugins"
 msgstr "Plugin"
+
+msgid "Plugins it can use as you"
+msgstr "Plugin yang dapat ia gunakan atas nama Anda"
 
 msgid "Plugins, themes, and agents"
 msgstr "Plugin, tema, dan agen"

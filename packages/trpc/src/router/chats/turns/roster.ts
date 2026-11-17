@@ -13,6 +13,7 @@ export interface RosterDev {
 	kind: (typeof chatsAgents.$inferSelect)["kind"];
 	ownerUserId: string | null;
 	paradevAccess: boolean;
+	plugins: string[];
 }
 
 /** The group's own Dev first, then the ones added to it, then members'. */
@@ -32,6 +33,7 @@ export async function loadRoster(groupId: string): Promise<RosterDev[]> {
 			kind: chatsAgents.kind,
 			ownerUserId: chatsAgents.ownerUserId,
 			paradevAccess: chatsAgents.paradevAccess,
+			plugins: chatsAgents.plugins,
 		})
 		.from(chatsGroupAgents)
 		.innerJoin(chatsAgents, eq(chatsAgents.id, chatsGroupAgents.agentId))

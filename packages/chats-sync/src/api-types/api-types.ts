@@ -63,6 +63,8 @@ export interface ApiDev {
 	descriptionText?: string;
 	/** Whether its owner lets it act in Paradev with the owner's access; only for the owner. */
 	paradevAccess?: boolean;
+	/** The owner's plugins it may use, by name; only for the owner. */
+	plugins?: string[];
 	/** Its chosen look (core's `DEV_LOOK_IDS`), null when dressed by its words; absent from servers before looks. */
 	look?: string | null;
 	/** Its voice (core's `DEV_VOICES`), null for the default; absent from servers before voices. */

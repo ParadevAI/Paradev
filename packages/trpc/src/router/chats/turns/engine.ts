@@ -30,7 +30,7 @@ import {
 import { env } from "../../../env";
 import { publishChats } from "../publish";
 import { messageView, sharedFiles, toQuestion, toUser } from "../views";
-import { mayUseParadev, turnApps } from "./app-access";
+import { devPlugins, mayUseParadev, turnApps } from "./app-access";
 import { type BoxKeys, signBoxCredential } from "./box-tokens";
 import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
 import { textWithFile } from "./dev-files";
@@ -961,7 +961,13 @@ async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
 		roster: roster
 			.map(
 				(dev) =>
-					`- ${dev.name} (${dev.kind} Dev${mayUseParadev(dev) ? ", can act in Paradev for its owner" : ""})`,
+					`- ${dev.name} (${[
+						`${dev.kind} Dev`,
+						...(mayUseParadev(dev) ? ["can act in Paradev for its owner"] : []),
+						...(devPlugins(dev).length
+							? [`has its owner's ${devPlugins(dev).join(", ")}`]
+							: []),
+					].join(", ")})`,
 			)
 			.join("\n"),
 		recent: rows.reverse().map(({ message, author, agent }) => {

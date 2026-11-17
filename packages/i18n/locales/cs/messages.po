@@ -10726,6 +10726,9 @@ msgstr "Aby se sloučil, musí se znovu zařadit a projít kontrolami."
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Zabere to pár minut. Používáte Conductor Cloud? Začněte <0>průvodcem pro cloud</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Používá vaše připojené účty, i když ho ve skupině požádá někdo jiný."
+
 msgid "It will open once the connection is back."
 msgstr "Otevře se, jakmile se připojení vrátí."
 
@@ -15098,6 +15101,9 @@ msgstr "Marketplace pluginů"
 
 msgid "Plugins"
 msgstr "Pluginy"
+
+msgid "Plugins it can use as you"
+msgstr "Pluginy, které může používat vaším jménem"
 
 msgid "Plugins, themes, and agents"
 msgstr "Pluginy, motivy a agenti"

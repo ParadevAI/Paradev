@@ -10726,6 +10726,9 @@ msgstr "머지하려면 다시 대기열에 넣고 체크를 통과해야 합니
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "몇 분이면 됩니다. Conductor Cloud를 사용 중이라면 <0>클라우드 가이드</0>부터 시작하세요."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "그룹에서 다른 사람이 요청할 때도 연결된 내 계정을 사용합니다."
+
 msgid "It will open once the connection is back."
 msgstr "연결이 복구되면 열립니다."
 
@@ -15098,6 +15101,9 @@ msgstr "플러그인 마켓플레이스"
 
 msgid "Plugins"
 msgstr "플러그인"
+
+msgid "Plugins it can use as you"
+msgstr "나를 대신해 사용할 수 있는 플러그인"
 
 msgid "Plugins, themes, and agents"
 msgstr "플러그인, 테마, 에이전트"

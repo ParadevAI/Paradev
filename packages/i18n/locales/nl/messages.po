@@ -10726,6 +10726,9 @@ msgstr "Om te mergen moet hij opnieuw aansluiten en zijn checks doorstaan."
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Het duurt een paar minuten. Gebruik je Conductor Cloud? Begin met de <0>cloudgids</0>."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Hij gebruikt je gekoppelde accounts, ook wanneer iemand anders hem dat in een groep vraagt."
+
 msgid "It will open once the connection is back."
 msgstr "De pagina opent zodra de verbinding terug is."
 
@@ -15098,6 +15101,9 @@ msgstr "Plugin-marketplace"
 
 msgid "Plugins"
 msgstr "Plugins"
+
+msgid "Plugins it can use as you"
+msgstr "Plugins die hij namens jou mag gebruiken"
 
 msgid "Plugins, themes, and agents"
 msgstr "Plugins, thema's en agents"

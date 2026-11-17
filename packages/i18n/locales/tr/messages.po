@@ -10726,6 +10726,9 @@ msgstr "Birleştirilmesi için yeniden katılması ve kontrollerini geçmesi ger
 msgid "It takes a few minutes. On Conductor Cloud? Start with the <0>cloud guide</0>."
 msgstr "Birkaç dakika sürer. Conductor Cloud mu kullanıyorsunuz? <0>Bulut rehberiyle</0> başlayın."
 
+msgid "It uses your connected accounts, also when someone else asks it in a group."
+msgstr "Bir grupta başka biri istediğinde de bağlı hesaplarınızı kullanır."
+
 msgid "It will open once the connection is back."
 msgstr "Bağlantı geri geldiğinde açılacak."
 
@@ -15098,6 +15101,9 @@ msgstr "Eklenti pazar yeri"
 
 msgid "Plugins"
 msgstr "Eklentiler"
+
+msgid "Plugins it can use as you"
+msgstr "Sizin adınıza kullanabileceği eklentiler"
 
 msgid "Plugins, themes, and agents"
 msgstr "Eklentiler, temalar ve ajanlar"

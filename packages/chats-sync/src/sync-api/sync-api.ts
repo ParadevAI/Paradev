@@ -98,6 +98,7 @@ export interface DevPatch {
 	/** A voice from core's `DEV_VOICES`, or null for the server's default. */
 	voice?: string | null;
 	paradevAccess?: boolean;
+	plugins?: string[];
 }
 
 /** A send is repeated with its clientId when it times out, so a dead connection is given up on well before iOS's 60 s. */
