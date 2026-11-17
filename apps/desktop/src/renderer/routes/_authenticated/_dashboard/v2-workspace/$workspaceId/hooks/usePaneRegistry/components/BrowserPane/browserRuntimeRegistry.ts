@@ -17,6 +17,7 @@ const RAISED_OVERLAY_Z = "32";
 
 export interface BrowserRuntimeState {
 	currentUrl: string;
+	pendingUrl: string | null;
 	pageTitle: string;
 	faviconUrl: string | null;
 	isLoading: boolean;
@@ -49,6 +50,7 @@ interface RegistryEntry {
 	 */
 	overlay: HTMLDivElement;
 	state: BrowserRuntimeState;
+	pendingNavigation: Promise<void> | null;
 	onPersist: ((state: PersistableBrowserState) => void) | null;
 	/** Asks the pane to close itself; fired when the guest closes itself. */
 	onClose: (() => void) | null;
@@ -75,6 +77,7 @@ const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
+	pendingUrl: null,
 	pageTitle: "",
 	faviconUrl: null,
 	isLoading: false,
@@ -386,6 +389,7 @@ export class BrowserRuntimeRegistryImpl {
 			webview,
 			overlay,
 			state: { ...EMPTY_STATE, currentUrl: initialUrl },
+			pendingNavigation: null,
 			onPersist: null,
 			onClose: null,
 			workspaceId,
@@ -452,6 +456,7 @@ export class BrowserRuntimeRegistryImpl {
 		const handleDidNavigate = (e: Electron.DidNavigateEvent) => {
 			this.setState(paneId, {
 				currentUrl: e.url ?? "",
+				pendingUrl: null,
 				pageTitle: "",
 				isLoading: false,
 			});
@@ -768,9 +773,23 @@ export class BrowserRuntimeRegistryImpl {
 	navigate(paneId: string, url: string): void {
 		const entry = this.entries.get(paneId);
 		if (!entry) return;
-		entry.webview.loadURL(sanitizeUrl(url)).catch((err) => {
-			console.error("[browserRuntimeRegistry] loadURL failed:", err);
-		});
+		const targetUrl = sanitizeUrl(url);
+		const navigation = entry.webview.loadURL(targetUrl);
+		entry.pendingNavigation = navigation;
+		this.setState(paneId, { pendingUrl: targetUrl });
+		navigation
+			.catch((err) => {
+				console.error("[browserRuntimeRegistry] loadURL failed:", err);
+			})
+			.finally(() => {
+				if (
+					this.entries.get(paneId) !== entry ||
+					entry.pendingNavigation !== navigation
+				)
+					return;
+				entry.pendingNavigation = null;
+				this.setState(paneId, { pendingUrl: null });
+			});
 	}
 
 	goBack(paneId: string): void {
