@@ -32,7 +32,6 @@ export function PullRequestDetailContent({
 	detail,
 	threads,
 	summaryAside,
-	checksControl,
 	commentTarget = null,
 	preview = null,
 }: {
@@ -52,8 +51,6 @@ export function PullRequestDetailContent({
 	/** The workspace pane's review threads for the Summary's activity rail. */
 	threads?: PullRequestActivityThreads;
 	summaryAside?: ReactNode;
-	/** Sits under the Summary's Checks label. */
-	checksControl?: ReactNode;
 	/** Where a conversation comment posts; null hides the composer. */
 	commentTarget?: PullRequestCommentTarget | null;
 	/** Shown in the loading skeleton's header slot until the detail arrives. */
@@ -113,7 +110,6 @@ export function PullRequestDetailContent({
 						commentTarget={commentTarget}
 						threads={threads}
 						aside={summaryAside}
-						checksControl={checksControl}
 					/>
 				</div>
 			) : activeTab === "summary" || !prUrl ? (

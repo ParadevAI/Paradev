@@ -108,6 +108,14 @@ function PullRequestDetailPage() {
 						/>
 					</div>
 					<div className="drag h-full min-w-4 flex-1" />
+					{prNumber !== null ? (
+						<PullRequestAutoFixControl
+							hostUrl={hostUrl}
+							prNumber={prNumber}
+							isOpen={data?.state === "open"}
+							projectId={detail.projectId}
+						/>
+					) : null}
 					{flow.stack ? (
 						<PullRequestStackPopover
 							stack={flow.stack}
@@ -155,16 +163,6 @@ function PullRequestDetailPage() {
 				hostId={hostId}
 				commentTarget={commentTarget}
 				preview={preview}
-				checksControl={
-					prNumber !== null ? (
-						<PullRequestAutoFixControl
-							hostUrl={hostUrl}
-							prNumber={prNumber}
-							isOpen={data?.state === "open"}
-							projectId={detail.projectId}
-						/>
-					) : null
-				}
 			/>
 		</div>
 	);

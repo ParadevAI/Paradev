@@ -154,6 +154,13 @@ export function PullRequestPane({
 					/>
 				</div>
 				<div className="ml-auto flex shrink-0 items-center gap-1.5">
+					<PullRequestAutoFixControl
+						hostUrl={hostUrl}
+						prNumber={data.number}
+						isOpen={detail.data?.state === "open"}
+						workspaceId={isLinkedPR ? workspace.id : null}
+						projectId={handoffProjectId}
+					/>
 					{flow.stack ? (
 						<PullRequestStackPopover
 							stack={flow.stack}
@@ -192,15 +199,6 @@ export function PullRequestPane({
 				hostId={workspace.hostId}
 				commentTarget={commentTarget}
 				threads={activityThreads}
-				checksControl={
-					<PullRequestAutoFixControl
-						hostUrl={hostUrl}
-						prNumber={data.number}
-						isOpen={detail.data?.state === "open"}
-						workspaceId={isLinkedPR ? workspace.id : null}
-						projectId={handoffProjectId}
-					/>
-				}
 				summaryAside={
 					showEvidence ? (
 						<PullRequestEvidence

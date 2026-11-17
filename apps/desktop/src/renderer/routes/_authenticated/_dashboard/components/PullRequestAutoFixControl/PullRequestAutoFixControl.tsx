@@ -3,7 +3,7 @@ import { Button } from "@superset/ui/button";
 import { Switch } from "@superset/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Wrench } from "lucide-react";
 import { useId } from "react";
 import { usePullRequestAutoFix } from "renderer/hooks/host-service/usePullRequestAutoFix";
 
@@ -20,9 +20,9 @@ interface PullRequestAutoFixControlProps {
 }
 
 /**
- * The Auto-fix CI switch of one pull request and its status line. Shown only
- * for an open PR whose workspace on this host runs an agent, or that is
- * already watched.
+ * The Auto-fix CI switch of one pull request, sized for the detail top bar,
+ * with the full status in its tooltip. Shown only for an open PR whose
+ * workspace on this host runs an agent, or that is already watched.
  */
 export function PullRequestAutoFixControl({
 	hostUrl,
@@ -67,34 +67,46 @@ export function PullRequestAutoFixControl({
 	}
 
 	return (
-		<div className={cn("flex min-w-0 items-center gap-2 text-xs", className)}>
-			<div className="flex min-w-0 flex-1 flex-col">
-				<Tooltip>
-					<TooltipTrigger asChild>
-						<label htmlFor={switchId} className="w-fit text-foreground">
-							<Trans>Auto-fix CI</Trans>
-						</label>
-					</TooltipTrigger>
-					<TooltipContent side="bottom" className="max-w-64">
-						<Trans>
-							When checks fail on a new commit, the workspace's agent gets one
-							fix at a time. It pauses after {maxAttempts} fixes without a green
-							run and never merges.
-						</Trans>
-					</TooltipContent>
-				</Tooltip>
-				{status ? (
-					<span
-						className="flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground"
-						title={status}
+		<div
+			className={cn(
+				"flex h-7 shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs",
+				className,
+			)}
+		>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<label
+						htmlFor={switchId}
+						className="flex min-w-0 items-center gap-1.5 text-muted-foreground"
 					>
 						{watch?.status === "fixing" ? (
 							<LoaderCircle className="size-3 shrink-0 animate-spin motion-reduce:animate-none" />
 						) : null}
-						<span className="truncate">{status}</span>
-					</span>
-				) : null}
-			</div>
+						<Wrench className="hidden size-3.5 shrink-0 @max-[36rem]/topbar:block" />
+						<span className="whitespace-nowrap @max-[36rem]/topbar:sr-only">
+							<Trans>Auto-fix CI</Trans>
+						</span>
+						{watch?.status === "fixing" ? (
+							<span className="tabular-nums">
+								{attempts}/{maxAttempts}
+							</span>
+						) : null}
+						{watch?.status === "paused" ? (
+							<span className="whitespace-nowrap text-amber-600 @max-[36rem]/topbar:hidden dark:text-amber-400">
+								<Trans>Paused</Trans>
+							</span>
+						) : null}
+					</label>
+				</TooltipTrigger>
+				<TooltipContent side="bottom" className="max-w-64">
+					{status ? <p className="mb-1 font-medium">{status}</p> : null}
+					<Trans>
+						When checks fail on a new commit, the workspace's agent gets one fix
+						at a time. It pauses after {maxAttempts} fixes without a green run
+						and never merges.
+					</Trans>
+				</TooltipContent>
+			</Tooltip>
 			{watch?.status === "paused" ? (
 				<Button
 					variant="ghost"

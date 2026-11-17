@@ -17,7 +17,6 @@ interface PullRequestSummaryContentProps {
 	/** The workspace pane's review threads, hung on the activity rail. */
 	threads?: PullRequestActivityThreads;
 	aside?: ReactNode;
-	checksControl?: ReactNode;
 }
 
 /** The Summary tab: header, info rail, description, then the Activity section. */
@@ -26,20 +25,13 @@ export function PullRequestSummaryContent({
 	commentTarget = null,
 	threads,
 	aside,
-	checksControl,
 }: PullRequestSummaryContentProps) {
 	return (
 		<PullRequestPageBody
 			header={
 				<PullRequestItemHeader data={data} actionTarget={commentTarget} />
 			}
-			info={(variant) => (
-				<PullRequestInfo
-					data={data}
-					variant={variant}
-					checksControl={checksControl}
-				/>
-			)}
+			info={(variant) => <PullRequestInfo data={data} variant={variant} />}
 			aside={aside}
 		>
 			<PullRequestMarkdown body={data.body} />
