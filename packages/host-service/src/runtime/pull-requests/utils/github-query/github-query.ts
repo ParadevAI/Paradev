@@ -127,6 +127,13 @@ function normalizePullRequest(raw: unknown): GitHubPullRequestNode | null {
 				? raw.updated_at
 				: new Date(0).toISOString(),
 		mergedAt: parseMergedAt(mergedAt),
+		closedAt: parseMergedAt(
+			typeof raw.closed_at === "string" ? raw.closed_at : null,
+		),
+		baseRefName:
+			isRecord(raw.base) && typeof raw.base.ref === "string"
+				? raw.base.ref
+				: null,
 	};
 }
 

@@ -609,6 +609,126 @@ describe("PullRequestRuntimeManager mergedAt attribution", () => {
 	});
 });
 
+describe("PullRequestRuntimeManager merge-queue merges", () => {
+	const CLOSED_AT_ISO = "2026-11-13T07:19:29Z";
+	const LANDED_AT_ISO = "2026-11-13T07:16:57Z";
+
+	function graphiteExecGh(subjects: string[], calls: string[] = []) {
+		return async (args: string[]) => {
+			const path = args.find((arg) => arg.startsWith("repos/"));
+			calls.push(path ?? "");
+			if (path === `repos/${REPO.owner}/${REPO.name}/pulls`) {
+				return [
+					{
+						...makePrNode({
+							number: 309,
+							headRef: "fix/roof",
+							headSha: "abc123",
+							state: "closed",
+						}),
+						closed_at: CLOSED_AT_ISO,
+						base: {
+							ref: "main",
+							repo: { full_name: `${REPO.owner}/${REPO.name}` },
+						},
+					},
+				];
+			}
+			if (path === `repos/${REPO.owner}/${REPO.name}/pulls/309`) {
+				return { merged_at: null, closed_at: CLOSED_AT_ISO, base_ref: "main" };
+			}
+			if (path === `repos/${REPO.owner}/${REPO.name}/commits`) {
+				expect(args).toContain("sha=main");
+				return subjects.map((message) => ({ message, date: LANDED_AT_ISO }));
+			}
+			if (path?.endsWith("/reviews")) return [];
+			if (path?.endsWith("/check-runs")) return { check_runs: [] };
+			if (path?.endsWith("/statuses")) return [];
+			throw new Error(`unexpected gh call: ${args.join(" ")}`);
+		};
+	}
+
+	function seedRoofWorkspace(db: HostDb) {
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "fix/roof",
+			headSha: "abc123",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "fix/roof",
+		});
+	}
+
+	test("counts a closed PR whose squashed commit is on the base branch as merged", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedRoofWorkspace(db);
+		const calls: string[] = [];
+		const manager = createManager(db, {
+			execGh: graphiteExecGh(["Keep small roof faces (#309)"], calls),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const pr = getPrByNumber(db, 309);
+		expect(pr?.state).toBe("merged");
+		expect(pr?.mergedAt).toBe(Date.parse(LANDED_AT_ISO));
+		expect(calls.filter((path) => path.endsWith("/commits"))).toHaveLength(1);
+	});
+
+	test("keeps a closed PR closed when nothing on the base branch names it", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedRoofWorkspace(db);
+		const manager = createManager(db, {
+			execGh: graphiteExecGh(['Revert "Keep small roof faces (#309)" (#320)']),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const pr = getPrByNumber(db, 309);
+		expect(pr?.state).toBe("closed");
+		expect(pr?.mergedAt).toBeNull();
+	});
+
+	test("backfills a stored closed PR linked to an archived workspace", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-309",
+			prNumber: 309,
+			headBranch: "fix/roof",
+			headSha: "abc123",
+			state: "closed",
+		});
+		db.update(pullRequests)
+			.set({ updatedAt: Date.now() })
+			.where(eq(pullRequests.id, "pr-309"))
+			.run();
+		seedRoofWorkspace(db);
+		db.update(workspaces)
+			.set({ archivedAt: Date.now() })
+			.where(eq(workspaces.id, "ws"))
+			.run();
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "pr-309", linkedAt: 1 })
+			.run();
+		const manager = createManager(db, {
+			execGh: graphiteExecGh(["Keep small roof faces (#309)"]),
+		});
+		const backfill = (
+			manager as unknown as { backfillLandedMerges(): Promise<void> }
+		).backfillLandedMerges.bind(manager);
+
+		await backfill();
+
+		const pr = getPrById(db, "pr-309");
+		expect(pr?.state).toBe("merged");
+		expect(pr?.mergedAt).toBe(Date.parse(LANDED_AT_ISO));
+	});
+});
+
 describe("PullRequestRuntimeManager unlink", () => {
 	function seedLinkedWorkspace(db: HostDb) {
 		seedPullRequest(db, {
