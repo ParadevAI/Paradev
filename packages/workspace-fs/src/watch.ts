@@ -234,6 +234,8 @@ interface WatcherState {
 	newDirCheckRunning: boolean;
 	ignoreRefresh: Promise<boolean> | null;
 	queuedIgnoreRefresh: Promise<boolean> | null;
+	/** Bumped when a full ignore listing is applied; older scoped answers are stale. */
+	ignoreListingEpoch: number;
 	filePaths: Map<string, true>;
 	directoryPaths: Set<string>;
 	pendingEvents: NativeWatchEvent[];
@@ -672,6 +674,7 @@ export class FsWatcherManager {
 			newDirCheckRunning: false,
 			ignoreRefresh: null,
 			queuedIgnoreRefresh: null,
+			ignoreListingEpoch: 0,
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
 			pendingEvents: [],
@@ -725,6 +728,7 @@ export class FsWatcherManager {
 			this.computeGitIgnoredRelDirs(realPath, state.controller.signal),
 		]);
 		state.controller.signal.throwIfAborted();
+		state.ignoreListingEpoch += 1;
 		state.prunedRelPrefixes = [...nestedRepoRelDirs, ...gitIgnoredRelDirs];
 		state.nativePrunedRelPrefixes = state.prunedRelPrefixes;
 		this.setFilteredRelPrefixes(state, []);
@@ -964,6 +968,7 @@ export class FsWatcherManager {
 			// State changed while the providers ran.
 			return false;
 		}
+		state.ignoreListingEpoch += 1;
 		const fresh = [...new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs])];
 		const freshSet = new Set(fresh);
 		const native = new Set(state.nativePrunedRelPrefixes);
@@ -1129,6 +1134,7 @@ export class FsWatcherManager {
 		state.newDirsToCheck.clear();
 		if (!listGitIgnoredDirs || dirs.length === 0) return;
 		state.newDirCheckRunning = true;
+		const epoch = state.ignoreListingEpoch;
 		let ignored: string[] = [];
 		try {
 			ignored = await listGitIgnoredDirs(
@@ -1147,6 +1153,11 @@ export class FsWatcherManager {
 			state.newDirCheckRunning = false;
 		}
 		if (state.controller.signal.aborted || !state.subscription) return;
+		if (state.ignoreListingEpoch !== epoch) {
+			for (const dir of dirs) state.newDirsToCheck.add(dir);
+			this.scheduleNewDirIgnoreCheck(state);
+			return;
+		}
 		const added = [
 			...new Set(
 				ignored.filter(

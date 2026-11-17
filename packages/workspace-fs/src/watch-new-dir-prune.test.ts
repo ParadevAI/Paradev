@@ -39,6 +39,8 @@ async function setup() {
 	};
 	const gitIgnored = new Set<string>();
 	const scopedListings: string[][] = [];
+	const fullListingGate = { wait: Promise.resolve() };
+	const scopedListingGate = { wait: Promise.resolve() };
 	const manager = new FsWatcherManager({
 		backend,
 		debounceMs: 1,
@@ -46,9 +48,15 @@ async function setup() {
 		growthReattachMinMs: 30_000,
 		now: () => 1_000_000,
 		listGitIgnoredDirs: async (_root, _signal, under) => {
-			if (!under) return [...gitIgnored];
+			if (!under) {
+				const answer = [...gitIgnored];
+				await fullListingGate.wait;
+				return answer;
+			}
 			scopedListings.push([...under]);
-			return under.filter((dir) => gitIgnored.has(dir));
+			const answer = under.filter((dir) => gitIgnored.has(dir));
+			await scopedListingGate.wait;
+			return answer;
 		},
 		findNestedRepoRoots: async () => ({ roots: [], truncated: false }),
 	});
@@ -80,6 +88,8 @@ async function setup() {
 		received,
 		createDir,
 		subscribeGate,
+		fullListingGate,
+		scopedListingGate,
 	};
 }
 
@@ -88,6 +98,10 @@ describe("new gitignored dir on a per-entry backend", () => {
 		const run = await setup();
 		run.gitIgnored.add("node_modules");
 		const firstRequest = run.live();
+		let openFullListing = () => {};
+		run.fullListingGate.wait = new Promise<void>((resolve) => {
+			openFullListing = resolve;
+		});
 
 		await run.createDir("node_modules");
 		await until(() =>
@@ -104,6 +118,7 @@ describe("new gitignored dir on a per-entry backend", () => {
 				path.join(run.rootPath, "node_modules/a.js"),
 			),
 		).toBe(true);
+		openFullListing();
 		await until(() => run.requests.length === 2);
 		expect(run.live().ignore).toContain("node_modules/**");
 		await until(
@@ -148,5 +163,27 @@ describe("new gitignored dir on a per-entry backend", () => {
 		expect(await growth).toBe(true);
 		expect(await unIgnore).toBe(true);
 		expect(run.live().ignore).not.toContain("gen/**");
+	});
+
+	it("rechecks a new dir whose scoped answer predates a full refresh", async () => {
+		const run = await setup();
+		let openScopedListing = () => {};
+		run.scopedListingGate.wait = new Promise<void>((resolve) => {
+			openScopedListing = resolve;
+		});
+		run.gitIgnored.add("out");
+		await run.createDir("out");
+		await until(() => run.scopedListings.length === 1);
+
+		run.gitIgnored.delete("out");
+		await run.manager.refreshIgnores(run.rootPath);
+		run.scopedListingGate.wait = Promise.resolve();
+		openScopedListing();
+
+		await until(() => run.scopedListings.length === 2);
+		expect(
+			run.manager.isPathPruned(run.rootPath, path.join(run.rootPath, "out/x")),
+		).toBe(false);
+		expect(run.live().isPruned?.(path.join(run.rootPath, "out/x"))).toBe(false);
 	});
 });
