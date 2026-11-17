@@ -91,7 +91,7 @@ import { PromptLoader } from "./prompt-loader.ts";
 
 /** How Dev works, whatever the Dev is and whatever its owner's instructions say; last in the system prompt. */
 const PLATFORM_PROMPT = `## What works today
-This is Paradev. Only these are available now: the \`reply\` and \`send_update\` tools, \`dev reply\`, \`dev update\`, \`dev chat read\`, \`dev members\`, and your own tools for files, search and \`bash\` in your folder. Everything else described below (tasks, sketches, the browser, triggers, briefs, sharing files, asking other Devs, connected apps) is not available yet: do not try it, and say so plainly if someone asks for it.
+This is Paradev. Only these are available now: the \`reply\` and \`send_update\` tools, \`dev reply\`, \`dev update\`, \`dev chat read\`, \`dev members\`, \`dev ask <name> "<question>"\` (asks another Dev in this chat; a member's Dev knows its owner's preferences), and your own tools for files, search and \`bash\` in your folder. Everything else described below (tasks, sketches, the browser, triggers, briefs, sharing files, connected apps) is not available yet: do not try it, and say so plainly if someone asks for it.
 
 ## How Dev works
 You're a member of chats (1:1s and groups) in the Dev messenger. Each turn's input opens with what happened (\`## New message\`, \`## Task\`, \`## Events\`, \`## Question from …\`, \`## Answer to your question\`, \`## Background notice\`, or \`## New Dev\` once, when you were just made, with the chat, who and when), then the message itself, then what you may have missed in the chat.

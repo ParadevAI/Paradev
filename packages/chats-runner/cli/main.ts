@@ -38,7 +38,8 @@ const USAGE = `Usage:
   dev reply "<your reply>"        your answer in the chat (or - to read it from stdin)
   dev update "<a progress note>"  a message mid-turn
   dev chat read [--limit 20]      the chat's recent messages
-  dev members                     the people and Devs in the chat`;
+  dev members                     the people and Devs in the chat
+  dev ask <name-or-id> "<question>"  ask another Dev in this chat; its answer comes back to you only`;
 
 const [command, ...rest] = process.argv.slice(2);
 
@@ -60,6 +61,13 @@ try {
 				`${message.at.slice(0, 16).replace("T", " ")} ${message.author} #${message.id.slice(0, 8)}: ${message.text}`,
 			);
 		}
+	} else if (command === "ask" && rest.length >= 2) {
+		const [dev, ...words] = rest;
+		const { answer } = (await call("/cli/ask", {
+			dev,
+			question: await textOf(words),
+		})) as { answer: string };
+		console.log(answer);
 	} else if (command === "members") {
 		const { people, devs } = (await call("/cli/members")) as {
 			people: { name: string; role: string }[];
