@@ -55,6 +55,7 @@ import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotk
 import { useSettingsStore } from "renderer/stores/settings-state";
 import { MOCK_ORG_ID, NOTIFICATION_EVENTS } from "shared/constants";
 import { AgentHooks } from "./components/AgentHooks";
+import { AgentUpdateRestartToast } from "./components/AgentUpdateRestartToast";
 import { DockBadgeController } from "./components/DockBadgeController";
 import { FileAutoSave } from "./components/FileAutoSave";
 import { FileMenuListener } from "./components/FileMenuListener";
@@ -302,6 +303,7 @@ function AuthenticatedLayout() {
 									<NotificationController />
 									<DockBadgeController />
 									<StarNagObserver />
+									<AgentUpdateRestartToast />
 									<LeaderboardAutoPublish />
 									<OrganizationPluginSync />
 									<RealtimeNudges />

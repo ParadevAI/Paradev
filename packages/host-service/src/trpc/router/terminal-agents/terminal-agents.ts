@@ -2,11 +2,13 @@ import {
 	type AgentDefinitionId,
 	BUILTIN_AGENT_IDS,
 } from "@superset/shared/agent-catalog";
+import { agentRunState } from "@superset/shared/agent-status";
 import { boundTranscriptText } from "@superset/shared/session-handoff";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { HostDb } from "../../../db";
 import type { EventBus } from "../../../events";
+import { getToolEnvironment } from "../../../terminal/clean-shell-env";
 import { reconcileMissingTerminalSessions } from "../../../terminal/reaper/reaper";
 import {
 	createTerminalSessionInternal,
@@ -17,6 +19,12 @@ import type {
 	TerminalAgentId,
 	TerminalAgentStore,
 } from "../../../terminal-agents";
+import {
+	findInstalledBinary,
+	isOutdatedExecutable,
+	parseLaunchPid,
+	readRunningExecutable,
+} from "../../../terminal-agents/agent-binary";
 import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { terminalHarnessSession } from "../../../terminal-agents/harness-session-ref";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
@@ -201,6 +209,12 @@ export async function resumeTerminalAgentSession(
 	}
 }
 
+interface RestartCandidate {
+	binding: TerminalAgentBinding;
+	agentLabel: string;
+	command: string;
+}
+
 /**
  * Live agent sessions a default-account switch cannot reach: their PTY env
  * was frozen at spawn, so they keep the old login until relaunched. A
@@ -216,8 +230,8 @@ export function listAccountRestartCandidates(
 	db: HostDb,
 	store: TerminalAgentStore,
 	provider: "claude" | "codex",
-): Array<{ binding: TerminalAgentBinding; agentLabel: string }> {
-	const out: Array<{ binding: TerminalAgentBinding; agentLabel: string }> = [];
+): RestartCandidate[] {
+	const out: RestartCandidate[] = [];
 	for (const binding of store.list()) {
 		if (!binding.agentSessionId || binding.chatSessionId) continue;
 		const config = resolveHostAgentConfig(
@@ -226,7 +240,7 @@ export function listAccountRestartCandidates(
 		);
 		if (!config || config.presetId !== provider) continue;
 		if (config.resumeArgs.length === 0) continue;
-		out.push({ binding, agentLabel: config.label });
+		out.push({ binding, agentLabel: config.label, command: config.command });
 	}
 	return out;
 }
@@ -302,8 +316,18 @@ export async function restartAccountSessions(
 		deps.terminalAgentStore,
 		provider,
 	);
+	return restartAgentSessions(
+		deps,
+		candidates.map(({ binding }) => binding),
+	);
+}
+
+async function restartAgentSessions(
+	deps: ResumeSessionDeps,
+	bindings: TerminalAgentBinding[],
+): Promise<{ restartedTerminalIds: string[] }> {
 	const restartedTerminalIds: string[] = [];
-	for (const { binding } of candidates) {
+	for (const binding of bindings) {
 		// Ended crash-style ("terminal-exited", never "disposed") so the
 		// binding is a resume candidate for the relaunch below — and, should
 		// either step fail, for any pane that asks later (a failed relaunch
@@ -318,7 +342,7 @@ export async function restartAccountSessions(
 			});
 			if (!result.resumed) continue;
 		} catch (error) {
-			console.warn("[terminal-agents] account-switch restart failed", {
+			console.warn("[terminal-agents] session restart failed", {
 				terminalId: binding.terminalId,
 				error,
 			});
@@ -327,6 +351,61 @@ export async function restartAccountSessions(
 		restartedTerminalIds.push(binding.terminalId);
 	}
 	return { restartedTerminalIds };
+}
+
+/**
+ * Live Claude sessions whose process still runs an older binary than the one
+ * a new launch would run, so an update reaches them only after a restart.
+ * Sessions kept alive by the pty-daemon across app restarts count too.
+ */
+export async function listOutdatedAgentSessions(
+	db: HostDb,
+	store: TerminalAgentStore,
+): Promise<RestartCandidate[]> {
+	const candidates = listAccountRestartCandidates(db, store, "claude");
+	if (candidates.length === 0) return [];
+
+	const { PATH = "" } = await getToolEnvironment();
+	const installedByCommand = new Map<string, Promise<string | null>>();
+	const outdated = await Promise.all(
+		candidates.map(async (candidate) => {
+			const pid = parseLaunchPid(candidate.binding.launchId);
+			if (!pid) return false;
+			const executable = candidate.command.trim().split(/\s+/)[0] ?? "";
+			let installed = installedByCommand.get(executable);
+			if (!installed) {
+				installed = findInstalledBinary(executable, PATH);
+				installedByCommand.set(executable, installed);
+			}
+			return isOutdatedExecutable(
+				await readRunningExecutable(pid),
+				await installed,
+			);
+		}),
+	);
+	return candidates.filter((_, index) => outdated[index]);
+}
+
+/**
+ * Restart the outdated sessions that are not in a turn. A busy session stays
+ * listed and is restarted on a later call.
+ */
+export async function restartOutdatedAgentSessions(
+	deps: ResumeSessionDeps,
+): Promise<{ restartedTerminalIds: string[] }> {
+	const candidates = await listOutdatedAgentSessions(
+		deps.db,
+		deps.terminalAgentStore,
+	);
+	const idleBindings = candidates
+		.map(({ binding }) => binding)
+		.filter(isBetweenTurns);
+	return restartAgentSessions(deps, idleBindings);
+}
+
+function isBetweenTurns(binding: TerminalAgentBinding): boolean {
+	const state = agentRunState(binding.lastEventType);
+	return state === "idle" || state === "starting";
 }
 
 /**
@@ -533,6 +612,23 @@ export const terminalAgentsRouter = router({
 				agentLabel,
 			})),
 		),
+
+	/** See {@link listOutdatedAgentSessions}. */
+	outdatedSessions: protectedProcedure.query(async ({ ctx }) =>
+		(await listOutdatedAgentSessions(ctx.db, ctx.terminalAgentStore)).map(
+			({ binding, agentLabel }) => ({
+				terminalId: binding.terminalId,
+				workspaceId: binding.workspaceId,
+				agentLabel,
+				isIdle: isBetweenTurns(binding),
+			}),
+		),
+	),
+
+	/** See {@link restartOutdatedAgentSessions}. */
+	restartOutdatedSessions: protectedProcedure.mutation(({ ctx }) =>
+		restartOutdatedAgentSessions(resumeSessionDepsFor(ctx)),
+	),
 
 	/** See {@link restartAccountSessions}. */
 	restartAccountSessions: protectedProcedure

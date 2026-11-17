@@ -108,6 +108,10 @@ msgstr "{0, plural, one {# port actif : masquer les détails} other {# ports act
 msgid "{0, plural, one {# active port: show details} other {# active ports: show details}}"
 msgstr "{0, plural, one {# port actif : afficher les détails} other {# ports actifs : afficher les détails}}"
 
+#. placeholder {0}: terminalIds.length
+msgid "{0, plural, one {# agent still runs the old version.} other {# agents still run the old version.}}"
+msgstr "{0, plural, one {# agent utilise encore l'ancienne version.} other {# agents utilisent encore l'ancienne version.}}"
+
 #. placeholder {0}: person.runningAgentCount
 msgid "{0, plural, one {# agent} other {# agents}}"
 msgstr "{0, plural, one {# agent} other {# agents}}"
@@ -4571,6 +4575,9 @@ msgstr "Clarifier ceci"
 
 msgid "Claude Code sessions, with claude --resume"
 msgstr "Sessions Claude Code, avec claude --resume"
+
+msgid "Claude Code was updated"
+msgstr "Claude Code a été mis à jour"
 
 msgid "Claude Code, Codex, and OpenCode are the agents; Paradev is where you run many of them at once. Each task gets its own Git worktree and branch, so ten agents can work on ten branches simultaneously while you monitor, review, and merge from one place."
 msgstr "Claude Code, Codex et OpenCode sont les agents ; Paradev est l'endroit où vous en lancez plusieurs à la fois. Chaque tâche a son propre worktree Git et sa propre branche, donc dix agents peuvent travailler sur dix branches en même temps pendant que vous surveillez, relisez et fusionnez depuis un seul endroit."

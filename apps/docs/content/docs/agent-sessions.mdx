@@ -17,6 +17,12 @@ Works for agents with an id-based resume command (the **Resume Args** field unde
 paradev agents create --workspace ws_… --agent claude --resume-session <sessionId>
 ```
 
+## Restart After a Claude Code Update
+
+A running Claude Code session keeps the version it started with, even after you update Claude Code and reopen Superset. When Superset finds sessions on an older version, a "Claude Code was updated" toast offers **Restart and resume**. Each session restarts on the new version with the same conversation.
+
+Superset offers only sessions that are waiting for you. A session in the middle of a task is offered when the task ends. This works for Claude Code installed with Homebrew or the native installer. Superset cannot detect npm installs, because they run through `node`.
+
 ## Fork and Hand Off Sessions
 
 The fork icon in an agent terminal's header opens two actions. Both open the new session in a split pane or a new tab.
