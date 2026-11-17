@@ -1,7 +1,7 @@
 import { db } from "@superset/db/client";
 import { chatsAgents, chatsModelUsage, chatsTurns } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
 import type { BoxKeys } from "./box-tokens";
@@ -31,7 +31,13 @@ export interface BoxApiDeps {
 	/** The AI Gateway key. Without it the model route answers 503. */
 	gatewayKey?: string;
 	fetch?: typeof fetch;
+	/** The most model tokens one person's Devs spend in a UTC day; `DAILY_TOKEN_LIMIT` unless a test lowers it. */
+	dailyTokenLimit?: number;
+	now?: () => Date;
 }
+
+/** Input and output together. A long working day of one person's Devs stays well under it. */
+export const DAILY_TOKEN_LIMIT = 20_000_000;
 
 const json = (status: number, body: unknown) =>
 	new Response(JSON.stringify(body), {
@@ -113,11 +119,7 @@ export async function usageFromStream(body: ReadableStream<Uint8Array>) {
 }
 
 /** A personal or custom Dev's owner is charged; a group's Dev charges whoever started the turn. */
-async function recordUsage(
-	claims: BoxClaims,
-	model: string,
-	usage: ReturnType<typeof toUsage>,
-) {
+async function payer(claims: BoxClaims) {
 	const [agent] = await db
 		.select({
 			ownerUserId: chatsAgents.ownerUserId,
@@ -125,14 +127,49 @@ async function recordUsage(
 		})
 		.from(chatsAgents)
 		.where(eq(chatsAgents.id, claims.agentId));
-	if (!agent) return;
+	return agent
+		? {
+				organizationId: agent.organizationId,
+				userId: agent.ownerUserId ?? claims.userId,
+			}
+		: null;
+}
+
+async function recordUsage(
+	claims: BoxClaims,
+	model: string,
+	usage: ReturnType<typeof toUsage>,
+) {
+	const charged = await payer(claims);
+	if (!charged) return;
 	await db.insert(chatsModelUsage).values({
-		organizationId: agent.organizationId,
-		userId: agent.ownerUserId ?? claims.userId,
+		...charged,
 		agentId: claims.agentId,
 		model,
 		...usage,
 	});
+}
+
+/** Whether the person charged for this turn has spent the day's tokens. */
+async function overDailyLimit(deps: BoxApiDeps, claims: BoxClaims) {
+	const charged = await payer(claims);
+	if (!charged?.userId) return false;
+	const dayStart = new Date(deps.now?.() ?? new Date());
+	dayStart.setUTCHours(0, 0, 0, 0);
+	const [spent] = await db
+		.select({
+			tokens: sql<string>`coalesce(sum(${chatsModelUsage.inputTokens} + ${chatsModelUsage.outputTokens}), 0)`,
+		})
+		.from(chatsModelUsage)
+		.where(
+			and(
+				eq(chatsModelUsage.userId, charged.userId),
+				gte(chatsModelUsage.createdAt, dayStart),
+			),
+		);
+	return (
+		Number(spent?.tokens ?? 0) >= (deps.dailyTokenLimit ?? DAILY_TOKEN_LIMIT)
+	);
 }
 
 const metered = (work: Promise<unknown>) =>
@@ -171,6 +208,16 @@ async function model(deps: BoxApiDeps, request: Request, path: string) {
 		return json(404, {
 			type: "error",
 			error: { type: "not_found_error", message: "Unknown model route" },
+		});
+	}
+	if (await overDailyLimit(deps, claims)) {
+		return json(402, {
+			type: "error",
+			error: {
+				type: "billing_error",
+				message:
+					"Today's usage limit for Devs is reached. It resets at 00:00 UTC.",
+			},
 		});
 	}
 	const body = await request.text();

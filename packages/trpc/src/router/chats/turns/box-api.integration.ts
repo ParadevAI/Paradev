@@ -47,6 +47,7 @@ const boxes = new Map<string, { box: Box; credential: string }>();
 let runs: ReturnType<typeof inlineTurnRuns>;
 let deps: TurnDeps;
 let upstream: { url: string; key: string | null }[] = [];
+let dailyTokenLimit: number | undefined;
 
 async function startedTurn(count: number): Promise<TurnStart> {
 	for (let tries = 0; tries < 400 && started.length < count; tries++) {
@@ -69,6 +70,7 @@ const fromBox = (
 			keys,
 			turns: deps,
 			gatewayKey: "gateway-key",
+			dailyTokenLimit,
 			fetch: (async (url: string, init: RequestInit) => {
 				upstream.push({
 					url,
@@ -382,4 +384,19 @@ test("a box's model call goes out with the server's key and is metered to the De
 			row.outputTokens,
 		]),
 	).toEqual([[OWNER, "anthropic/claude-sonnet-5.5", 7, 3]]);
+
+	// The owner has now spent 10 tokens today: at a limit of 10, the next call is refused before it goes out.
+	const next = await messaged("think again");
+	dailyTokenLimit = 10;
+	const refused = await fromBox(next.turn, "/model/v1/messages", {
+		model: "anthropic/claude-sonnet-5.5",
+		messages: [],
+	});
+	dailyTokenLimit = undefined;
+	expect(refused.status).toBe(402);
+	expect(upstream).toHaveLength(1);
+	await fromBox(next.turn, `/cli/turns/${next.turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
 });
