@@ -3332,6 +3332,9 @@ msgstr "자동 저장"
 msgid "Auto top-up"
 msgstr "자동 충전"
 
+msgid "Auto-fix CI"
+msgstr "CI 자동 수정"
+
 msgid "Auto-run on new tab"
 msgstr "새 탭에서 자동 실행"
 
@@ -6315,6 +6318,9 @@ msgstr "스테이징을 해제하지 못했습니다"
 msgid "Couldn't unstage file"
 msgstr "파일 스테이징을 해제하지 못했습니다"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "CI 자동 수정을 업데이트하지 못했습니다"
+
 msgid "Couldn't update pull request"
 msgstr "풀 리퀘스트를 업데이트하지 못했습니다"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "새 Sentry 오류를 하나씩 고치고, 놓친 것은 매일 실행으로 처리합니다."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "수정 중 · {maxAttempts}회 중 {attempts}회째"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "{0}까지 일시 중지됨"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev가 종료되어 일시 중지됨"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "일시 중지됨: {maxAttempts}번 수정한 후에도 검사가 실패했습니다"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "일시 중지됨: 수정 요청이 에이전트에 전달되지 않았을 수 있습니다"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "일시 중지됨: 마지막 수정에서 커밋을 푸시하지 않았습니다"
 
 msgid "Pay {total}"
 msgstr "{total} 결제"
@@ -21955,6 +21973,9 @@ msgstr "{0}와 {1}을(를) 기다리는 중…"
 msgid "Waiting for activity data"
 msgstr "활동 데이터 대기 중"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "워크스페이스의 에이전트를 기다리는 중"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "승인을 기다리는 중입니다. 이 대화 상자를 열어 두세요."
 
@@ -22014,6 +22035,9 @@ msgstr "디자인 리뷰가 댓글에서 새 버전으로 이어지는 과정을
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "YouTube에서 Paradev 자동화 영상 보기"
+
+msgid "Watching checks"
+msgstr "검사 지켜보는 중"
 
 msgid "Wayfinding and disclosure"
 msgstr "길 찾기와 정보 펼침"
@@ -22267,6 +22291,9 @@ msgstr "트리거가 실행되면 선택한 Mac이 새 워크스페이스를 열
 
 msgid "When bought GB-hours fall below"
 msgstr "구매한 GB 시간이 다음보다 적어지면"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "새 커밋에서 검사가 실패하면 워크스페이스의 에이전트에게 한 번에 하나씩 수정을 요청합니다. 성공한 실행 없이 {maxAttempts}번 수정하면 일시 중지되며 병합은 하지 않습니다."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "남은 GB 시간이 {topupThreshold}보다 적어지면 {topupPrice}를 충전합니다({topupGbHours} GB 시간)."

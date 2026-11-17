@@ -297,6 +297,15 @@ export class EventBus {
 		this.broadcast({ type: "page-watch:changed", ...message });
 	}
 
+	broadcastPrAutoFixChanged(
+		message: Omit<
+			Extract<ServerMessage, { type: "pr-auto-fix:changed" }>,
+			"type"
+		>,
+	): void {
+		this.broadcast({ type: "pr-auto-fix:changed", ...message });
+	}
+
 	/**
 	 * Fan out workspace lifecycle changes (create/rename/delete) from the
 	 * host-owned workspaces table. Broadcast to all clients — list consumers

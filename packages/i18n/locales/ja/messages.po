@@ -3332,6 +3332,9 @@ msgstr "自動保存"
 msgid "Auto top-up"
 msgstr "自動チャージ"
 
+msgid "Auto-fix CI"
+msgstr "CI の自動修正"
+
 msgid "Auto-run on new tab"
 msgstr "新しいタブで自動実行"
 
@@ -6315,6 +6318,9 @@ msgstr "変更をステージ解除できませんでした"
 msgid "Couldn't unstage file"
 msgstr "ファイルをステージ解除できませんでした"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "CI の自動修正を更新できませんでした"
+
 msgid "Couldn't update pull request"
 msgstr "プルリクエストを更新できませんでした"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Sentryの新しいエラーをそれぞれ修正し、取りこぼしは毎日の実行で対応します。"
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "修正中 · {maxAttempts} 回中 {attempts} 回目"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "{0}まで一時停止中"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev の終了時に一時停止しました"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "一時停止中: {maxAttempts} 回修正してもチェックが失敗しました"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "一時停止中: 修正がエージェントに届いていない可能性があります"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "一時停止中: 前回の修正でコミットがプッシュされませんでした"
 
 msgid "Pay {total}"
 msgstr "{total} を支払う"
@@ -21955,6 +21973,9 @@ msgstr "{0}と{1}を待っています…"
 msgid "Waiting for activity data"
 msgstr "アクティビティデータを待機中"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "ワークスペースのエージェントを待っています"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "承認を待っています。このダイアログは開いたままにしてください。"
 
@@ -22014,6 +22035,9 @@ msgstr "デザインレビューがコメントから新しいバージョンに
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "YouTubeでParadev オートメーションの動画を見る"
+
+msgid "Watching checks"
+msgstr "チェックを監視中"
 
 msgid "Wayfinding and disclosure"
 msgstr "案内と情報の開示"
@@ -22267,6 +22291,9 @@ msgstr "トリガーが発火すると、選んだMacが新しいワークスペ
 
 msgid "When bought GB-hours fall below"
 msgstr "購入した GB 時間がこれを下回ったとき"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "新しいコミットでチェックが失敗すると、ワークスペースのエージェントに修正を 1 件ずつ依頼します。成功する実行がないまま {maxAttempts} 回修正すると一時停止し、マージは行いません。"
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "残りが {topupThreshold} GB 時間を下回ると、{topupPrice} をチャージします ({topupGbHours} GB 時間)。"

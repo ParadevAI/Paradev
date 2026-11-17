@@ -3332,6 +3332,9 @@ msgstr "Simpan Otomatis"
 msgid "Auto top-up"
 msgstr "Isi ulang otomatis"
 
+msgid "Auto-fix CI"
+msgstr "Perbaikan CI otomatis"
+
 msgid "Auto-run on new tab"
 msgstr "Jalankan otomatis di tab baru"
 
@@ -6315,6 +6318,9 @@ msgstr "Tidak bisa meng-unstage perubahan"
 msgid "Couldn't unstage file"
 msgstr "Tidak bisa meng-unstage file"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Tidak bisa memperbarui perbaikan CI otomatis"
+
 msgid "Couldn't update pull request"
 msgstr "Tidak bisa memperbarui pull request"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Memperbaiki setiap error baru di Sentry, dengan run harian untuk yang terlewat."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Memperbaiki · percobaan {attempts} dari {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "Dijeda hingga {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Dijeda saat Paradev ditutup"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Dijeda: check masih gagal setelah {maxAttempts} perbaikan"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Dijeda: perbaikan mungkin tidak sampai ke agen"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Dijeda: perbaikan terakhir tidak mem-push commit"
 
 msgid "Pay {total}"
 msgstr "Bayar {total}"
@@ -21955,6 +21973,9 @@ msgstr "menunggu {0} dan {1}…"
 msgid "Waiting for activity data"
 msgstr "Menunggu data aktivitas"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Menunggu agen di workspace"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Menunggu persetujuan. Biarkan dialog ini tetap terbuka."
 
@@ -22014,6 +22035,9 @@ msgstr "Lihat bagaimana tinjauan desain berubah dari komentar menjadi versi baru
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Tonton video Otomatisasi Paradev di YouTube"
+
+msgid "Watching checks"
+msgstr "Memantau check"
 
 msgid "Wayfinding and disclosure"
 msgstr "Penunjuk arah dan pengungkapan"
@@ -22267,6 +22291,9 @@ msgstr "Saat pemicu aktif, Mac yang Anda pilih membuka workspace baru dan agen m
 
 msgid "When bought GB-hours fall below"
 msgstr "Saat GB-jam yang dibeli turun di bawah"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Saat check gagal di commit baru, agen workspace menerima satu perbaikan setiap kali. Fitur ini dijeda setelah {maxAttempts} perbaikan tanpa run yang berhasil dan tidak pernah melakukan merge."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Saat sisa GB-jam kurang dari {topupThreshold}, tambah {topupPrice} ({topupGbHours} GB-jam)."

@@ -3332,6 +3332,9 @@ msgstr "Otomatik Kaydetme"
 msgid "Auto top-up"
 msgstr "Otomatik yükleme"
 
+msgid "Auto-fix CI"
+msgstr "CI otomatik düzeltme"
+
 msgid "Auto-run on new tab"
 msgstr "Yeni sekmede otomatik çalıştır"
 
@@ -6315,6 +6318,9 @@ msgstr "Değişiklikler hazırlıktan çıkarılamadı"
 msgid "Couldn't unstage file"
 msgstr "Dosya hazırlıktan çıkarılamadı"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "CI otomatik düzeltme güncellenemedi"
+
 msgid "Couldn't update pull request"
 msgstr "Pull request güncellenemedi"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Her yeni Sentry hatasını düzeltir; kaçırdıkları için günlük bir çalıştırma vardır."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Düzeltiliyor · deneme {attempts}/{maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "{0} saatine kadar duraklatıldı"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev kapanınca duraklatıldı"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Duraklatıldı: kontroller {maxAttempts} düzeltmeden sonra da başarısız oldu"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Duraklatıldı: düzeltme ajana ulaşmamış olabilir"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Duraklatıldı: son düzeltme bir commit push etmedi"
 
 msgid "Pay {total}"
 msgstr "{total} öde"
@@ -21955,6 +21973,9 @@ msgstr "{0} ve {1} bekleniyor…"
 msgid "Waiting for activity data"
 msgstr "Etkinlik verileri bekleniyor"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Çalışma alanında bir ajan bekleniyor"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Onay bekleniyor. Bu pencereyi açık tutun."
 
@@ -22014,6 +22035,9 @@ msgstr "Bir tasarım incelemesinin yorumdan yeni sürüme nasıl geçtiğini izl
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "YouTube'da Paradev Otomasyonlar videosunu izleyin"
+
+msgid "Watching checks"
+msgstr "Kontroller izleniyor"
 
 msgid "Wayfinding and disclosure"
 msgstr "Yönlendirme ve açma-kapama"
@@ -22267,6 +22291,9 @@ msgstr "Bir tetikleyici çalıştığında seçtiğiniz Mac yeni bir çalışma 
 
 msgid "When bought GB-hours fall below"
 msgstr "Satın alınan GB-saat şunun altına düştüğünde"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Yeni bir commit'te kontroller başarısız olduğunda çalışma alanının ajanı her seferinde bir düzeltme alır. Başarılı bir çalıştırma olmadan {maxAttempts} düzeltmeden sonra duraklar ve asla merge etmez."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "{topupThreshold} GB-saatten az kaldığında {topupPrice} ekle ({topupGbHours} GB-saat)."

@@ -3332,6 +3332,9 @@ msgstr "Auto Save"
 msgid "Auto top-up"
 msgstr "Auto top-up"
 
+msgid "Auto-fix CI"
+msgstr "Auto-fix CI"
+
 msgid "Auto-run on new tab"
 msgstr "Auto-run on new tab"
 
@@ -6315,6 +6318,9 @@ msgstr "Couldn't unstage changes"
 msgid "Couldn't unstage file"
 msgstr "Couldn't unstage file"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Couldn't update Auto-fix CI"
+
 msgid "Couldn't update pull request"
 msgstr "Couldn't update pull request"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Fixes each new Sentry error, with a daily run for any it missed."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Fixing · attempt {attempts} of {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "Paused until {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Paused when Paradev closed"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Paused: checks still failed after {maxAttempts} fixes"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Paused: the fix may not have reached the agent"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Paused: the last fix did not push a commit"
 
 msgid "Pay {total}"
 msgstr "Pay {total}"
@@ -21955,6 +21973,9 @@ msgstr "waiting for {0} and {1}…"
 msgid "Waiting for activity data"
 msgstr "Waiting for activity data"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Waiting for an agent in the workspace"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Waiting for approval. Keep this dialog open."
 
@@ -22014,6 +22035,9 @@ msgstr "Watch a design review go from comment to new version."
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Watch the Paradev Automations video on YouTube"
+
+msgid "Watching checks"
+msgstr "Watching checks"
 
 msgid "Wayfinding and disclosure"
 msgstr "Wayfinding and disclosure"
@@ -22267,6 +22291,9 @@ msgstr "When a trigger fires, the Mac you picked opens a new workspace and the a
 
 msgid "When bought GB-hours fall below"
 msgstr "When bought GB-hours fall below"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."

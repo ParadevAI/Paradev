@@ -3332,6 +3332,9 @@ msgstr "Automatické ukládání"
 msgid "Auto top-up"
 msgstr "Automatické dobití"
 
+msgid "Auto-fix CI"
+msgstr "Automatická oprava CI"
+
 msgid "Auto-run on new tab"
 msgstr "Automaticky spustit na nové kartě"
 
@@ -6315,6 +6318,9 @@ msgstr "Nepodařilo se zrušit přípravu změn"
 msgid "Couldn't unstage file"
 msgstr "Nepodařilo se zrušit přípravu souboru"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Automatickou opravu CI se nepodařilo aktualizovat"
+
 msgid "Couldn't update pull request"
 msgstr "Pull request se nepodařilo aktualizovat"
 
@@ -8966,6 +8972,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Opraví každou novou chybu ze Sentry a denní běh doplní ty, které zmeškal."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Opravuje se · pokus {attempts} z {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14755,6 +14764,15 @@ msgstr "Pozastaveno do {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Pozastaveno při zavření aplikace Paradev"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Pozastaveno: kontroly selhaly i po {maxAttempts} opravách"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Pozastaveno: oprava se nemusela dostat k agentovi"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Pozastaveno: poslední oprava nepushnula žádný commit"
 
 msgid "Pay {total}"
 msgstr "Zaplatit {total}"
@@ -21955,6 +21973,9 @@ msgstr "čeká se na {0} a {1}…"
 msgid "Waiting for activity data"
 msgstr "Čeká se na data o aktivitě"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Čeká se na agenta v pracovním prostoru"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Čeká se na schválení. Nechte tento dialog otevřený."
 
@@ -22014,6 +22035,9 @@ msgstr "Podívejte se, jak se design review dostane od komentáře k nové verzi
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Podívejte se na video o Automatizacích Paradev na YouTube"
+
+msgid "Watching checks"
+msgstr "Sleduje kontroly"
 
 msgid "Wayfinding and disclosure"
 msgstr "Orientace a postupné odkrývání"
@@ -22267,6 +22291,9 @@ msgstr "Když se spouštěč spustí, Mac, který jste vybrali, otevře nový pr
 
 msgid "When bought GB-hours fall below"
 msgstr "Když koupené GB-hodiny klesnou pod"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Když kontroly selžou na novém commitu, agent pracovního prostoru dostane vždy jednu opravu. Po {maxAttempts} opravách bez úspěšného běhu se pozastaví a nikdy nic nemerguje."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Když zbývá méně než {topupThreshold} GB-hodin, dobít {topupPrice} ({topupGbHours} GB-hodin)."

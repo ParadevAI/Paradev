@@ -541,6 +541,25 @@ export class PullRequestRuntimeManager {
 		);
 	}
 
+	/**
+	 * Re-reads one workspace's PR through the shared GitHub cache, so a caller
+	 * polling it costs at most one GitHub round per cache TTL.
+	 */
+	async refreshWorkspacePullRequest(workspaceId: string): Promise<void> {
+		const workspace = this.db
+			.select({
+				projectId: workspaces.projectId,
+				archivedAt: workspaces.archivedAt,
+			})
+			.from(workspaces)
+			.where(eq(workspaces.id, workspaceId))
+			.get();
+		if (!workspace?.projectId || workspace.archivedAt != null) return;
+		await this.refreshProject(workspace.projectId, {
+			workspaceIds: [workspaceId],
+		});
+	}
+
 	async listLinkedPullRequests(): Promise<
 		{ repository: string; number: number; linkedAt: number }[]
 	> {
