@@ -16010,6 +16010,9 @@ msgstr "ist {channel} wieder beigetreten, ebenso wie {others}."
 msgid "rejoined {channel}."
 msgstr "ist {channel} wieder beigetreten."
 
+msgid "Related comparisons"
+msgstr "Verwandte Vergleiche"
+
 msgid "Related Posts"
 msgstr "Verwandte Beiträge"
 

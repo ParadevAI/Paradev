@@ -16010,6 +16010,9 @@ msgstr "volvió a unirse a {channel}, junto con {others}."
 msgid "rejoined {channel}."
 msgstr "volvió a unirse a {channel}."
 
+msgid "Related comparisons"
+msgstr "Comparativas relacionadas"
+
 msgid "Related Posts"
 msgstr "Publicaciones relacionadas"
 

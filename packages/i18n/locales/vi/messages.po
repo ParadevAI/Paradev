@@ -16010,6 +16010,9 @@ msgstr "đã tham gia lại {channel}, cùng với {others}."
 msgid "rejoined {channel}."
 msgstr "đã tham gia lại {channel}."
 
+msgid "Related comparisons"
+msgstr "So sánh liên quan"
+
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
 

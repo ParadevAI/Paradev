@@ -16004,6 +16004,9 @@ msgstr "знову приєднався(-лася) до {channel}, як і {othe
 msgid "rejoined {channel}."
 msgstr "знову приєднався(-лася) до {channel}."
 
+msgid "Related comparisons"
+msgstr "Схожі порівняння"
+
 msgid "Related Posts"
 msgstr "Схожі публікації"
 

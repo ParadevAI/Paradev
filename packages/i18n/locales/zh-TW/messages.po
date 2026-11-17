@@ -16010,6 +16010,9 @@ msgstr "與 {others} 一起重新加入了 {channel}。"
 msgid "rejoined {channel}."
 msgstr "已重新加入 {channel}。"
 
+msgid "Related comparisons"
+msgstr "相關比較"
+
 msgid "Related Posts"
 msgstr "相關文章"
 

@@ -16010,6 +16010,9 @@ msgstr "bergabung kembali dengan {channel}, bersama {others}."
 msgid "rejoined {channel}."
 msgstr "bergabung kembali dengan {channel}."
 
+msgid "Related comparisons"
+msgstr "Perbandingan terkait"
+
 msgid "Related Posts"
 msgstr "Tulisan Terkait"
 

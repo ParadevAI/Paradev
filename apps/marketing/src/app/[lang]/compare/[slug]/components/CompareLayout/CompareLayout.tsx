@@ -13,6 +13,10 @@ import {
 	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
 import { CompareDownloadCTA } from "./components/CompareDownloadCTA";
+import {
+	type RelatedComparison,
+	RelatedComparisons,
+} from "./components/RelatedComparisons";
 import { TableOfContents } from "./components/TableOfContents";
 
 const productName = BRAND.NAME;
@@ -25,6 +29,7 @@ interface CompareLayoutProps {
 	toc: TocItem[];
 	children: ReactNode;
 	faq: ReactNode;
+	related: RelatedComparison[];
 }
 
 export function CompareLayout({
@@ -32,6 +37,7 @@ export function CompareLayout({
 	toc,
 	children,
 	faq,
+	related,
 }: CompareLayoutProps) {
 	const sections = toc.filter((item) => item.level === 2);
 	const { platform } = usePlatform();
@@ -151,6 +157,8 @@ export function CompareLayout({
 						{faq}
 					</div>
 				)}
+
+				<RelatedComparisons pages={related} />
 			</div>
 		</article>
 	);

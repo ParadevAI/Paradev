@@ -16010,6 +16010,9 @@ msgstr "снова присоединился(-ась) к {channel}, как и {
 msgid "rejoined {channel}."
 msgstr "снова присоединился(-ась) к {channel}."
 
+msgid "Related comparisons"
+msgstr "Похожие сравнения"
+
 msgid "Related Posts"
 msgstr "Похожие посты"
 

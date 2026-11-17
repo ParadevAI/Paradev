@@ -16010,6 +16010,9 @@ msgstr "{others}와(과) 함께 {channel}에 다시 참여했습니다."
 msgid "rejoined {channel}."
 msgstr "{channel}에 다시 참여했습니다."
 
+msgid "Related comparisons"
+msgstr "관련 비교"
+
 msgid "Related Posts"
 msgstr "관련 게시물"
 

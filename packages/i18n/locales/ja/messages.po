@@ -16010,6 +16010,9 @@ msgstr "{others} と一緒に {channel} に再参加しました。"
 msgid "rejoined {channel}."
 msgstr "{channel} に再参加しました。"
 
+msgid "Related comparisons"
+msgstr "関連する比較"
+
 msgid "Related Posts"
 msgstr "関連記事"
 

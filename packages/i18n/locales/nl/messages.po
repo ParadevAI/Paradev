@@ -16010,6 +16010,9 @@ msgstr "is samen met {others} opnieuw lid geworden van {channel}."
 msgid "rejoined {channel}."
 msgstr "is opnieuw lid geworden van {channel}."
 
+msgid "Related comparisons"
+msgstr "Gerelateerde vergelijkingen"
+
 msgid "Related Posts"
 msgstr "Gerelateerde berichten"
 

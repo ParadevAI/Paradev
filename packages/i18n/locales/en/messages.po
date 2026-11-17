@@ -16010,6 +16010,9 @@ msgstr "rejoined {channel}, along with {others}."
 msgid "rejoined {channel}."
 msgstr "rejoined {channel}."
 
+msgid "Related comparisons"
+msgstr "Related comparisons"
+
 msgid "Related Posts"
 msgstr "Related Posts"
 

@@ -16010,6 +16010,9 @@ msgstr "{others} ile birlikte {channel} kanalına yeniden katıldı."
 msgid "rejoined {channel}."
 msgstr "{channel} kanalına yeniden katıldı."
 
+msgid "Related comparisons"
+msgstr "İlgili karşılaştırmalar"
+
 msgid "Related Posts"
 msgstr "İlgili yazılar"
 
