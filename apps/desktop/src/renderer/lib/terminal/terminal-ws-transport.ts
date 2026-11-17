@@ -195,10 +195,11 @@ export interface TerminalTransport {
 	 */
 	_xtermHadContent: boolean;
 	/**
-	 * The xterm may not match the PTY's screen: it came from a snapshot, or its
-	 * rows changed while detached. The next resize asks the host for a repaint.
+	 * "needed": the xterm may not match the PTY's screen (it came from a
+	 * snapshot, or its rows changed while detached), so the next resize asks
+	 * the host for a repaint. "sent": waiting for the host's `size` answer.
 	 */
-	_isScreenStale: boolean;
+	_repaintRequest: "none" | "needed" | "sent";
 	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
 	_livenessTimer: ReturnType<typeof setInterval> | null;
 	/** Internal: Date.now() at the last watchdog tick. */
@@ -469,7 +470,7 @@ export function createTransport(
 		_seqEverSynced: false,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
-		_isScreenStale: false,
+		_repaintRequest: "none",
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
@@ -834,6 +835,9 @@ function attachSocketListeners(
 		}
 
 		if (message.type === "size") {
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "none";
+			}
 			setNarrowedByOtherClient(transport, message.cols < terminal.cols);
 			return;
 		}
@@ -857,6 +861,10 @@ function attachSocketListeners(
 			setConnectionState(transport, "open");
 			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
+			// The last connection ended before the host answered the request.
+			if (transport._repaintRequest === "sent") {
+				transport._repaintRequest = "needed";
+			}
 			sendResize(transport, terminal.cols, terminal.rows);
 			flushPendingInput(transport);
 			return;
@@ -1224,8 +1232,10 @@ export function sendResize(
 	const socket = transport._socket;
 	if (!socket || socket.readyState !== WebSocket.OPEN) return;
 	if (transport.connectionState !== "open") return;
-	const repaint = transport._isScreenStale || undefined;
-	transport._isScreenStale = false;
+	const repaint = transport._repaintRequest === "needed" || undefined;
+	if (repaint) {
+		transport._repaintRequest = "sent";
+	}
 	socket.send(JSON.stringify({ type: "resize", cols, rows, repaint }));
 }
 

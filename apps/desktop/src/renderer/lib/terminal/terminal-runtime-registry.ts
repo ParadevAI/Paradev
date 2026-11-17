@@ -213,13 +213,15 @@ class TerminalRuntimeRegistryImpl {
 					entry.transport.seqAnchor = loadPersistedSeqAnchor(terminalId);
 				}
 			}
-			entry.transport._isScreenStale = entry.runtime.initialContent !== "none";
+			if (entry.runtime.initialContent !== "none") {
+				entry.transport._repaintRequest = "needed";
+			}
 			// Rows only: a workspace switch changes the columns for a moment, and
 			// only a row change drops rows from the screen.
 			let lastRows = entry.runtime.terminal.rows;
 			entry.runtime.terminal.onResize(({ rows }) => {
 				if (rows !== lastRows && entry.transport.connectionState !== "open") {
-					entry.transport._isScreenStale = true;
+					entry.transport._repaintRequest = "needed";
 				}
 				lastRows = rows;
 			});

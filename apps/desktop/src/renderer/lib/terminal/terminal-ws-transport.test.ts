@@ -456,7 +456,7 @@ describe("terminal-ws-transport", () => {
 	test("asks for a repaint on the first resize after the screen went stale", () => {
 		const transport = createTransport();
 		const terminal = createMockTerminal();
-		transport._isScreenStale = true;
+		transport._repaintRequest = "needed";
 
 		connect(transport, terminal, "ws://host/terminal/t1");
 		const socket = FakeRelaySocket.instances[0];
@@ -472,6 +472,36 @@ describe("terminal-ws-transport", () => {
 			{ type: "resize", cols: 101, rows: 27, repaint: true },
 			{ type: "resize", cols: 101, rows: 27 },
 		]);
+	});
+
+	test("asks for the repaint again when the connection ended before the host answered", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._repaintRequest = "needed";
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		const attach = () => {
+			socket.open();
+			socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		};
+
+		attach();
+		socket.drop();
+		attach();
+		socket.message(JSON.stringify({ type: "size", cols: 101, rows: 27 }));
+		socket.drop();
+		attach();
+
+		expect(
+			socket.sent
+				.map(
+					(payload) => JSON.parse(payload) as { type: string; repaint?: true },
+				)
+				.filter((message) => message.type === "resize")
+				.map((message) => message.repaint === true),
+		).toEqual([true, true, false]);
 	});
 
 	test("never gives up: keeps one socket and never self-closes on repeated failures", () => {
