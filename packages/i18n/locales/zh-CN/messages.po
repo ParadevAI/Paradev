@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}：{statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# 行}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {引用} other {引用 · # 行}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName}（此设备）"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} 不接受参数"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} 不接受附件"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} 不接受引用"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "一个提示词、几个触发器，每次运行一个工作区"
 
 msgid "A pull request always gets its own worktree"
 msgstr "拉取请求总是使用自己的 worktree"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "引用最多 {limit} 个字符"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "重建的智能体驱动聊天界面：更丰富的工具输出、更顺手的引导，一切都更快。"
@@ -2217,6 +2226,9 @@ msgstr "添加此标签"
 
 msgid "Add to channel"
 msgstr "添加到频道"
+
+msgid "Add to chat"
+msgstr "添加到聊天"
 
 msgid "Add to Dictionary"
 msgstr "添加到词典"
@@ -16179,6 +16191,9 @@ msgstr "移除PR链接"
 msgid "Remove queued message"
 msgstr "移除排队消息"
 
+msgid "Remove quote"
+msgstr "移除引用"
+
 msgid "Remove repository"
 msgstr "移除仓库"
 
@@ -17756,6 +17771,9 @@ msgstr "选中工作区的操作"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "在终端中选中文本后立即复制到剪贴板，并去除行尾空白"
+
+msgid "Selection actions"
+msgstr "选中内容操作"
 
 msgid "Self-hosted"
 msgstr "自托管"

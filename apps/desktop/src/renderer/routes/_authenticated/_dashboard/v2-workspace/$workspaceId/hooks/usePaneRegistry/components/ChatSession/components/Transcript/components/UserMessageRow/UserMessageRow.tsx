@@ -1,8 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	readBookkeeping,
+	splitQuotedReplies,
 	transcriptItemKey,
 	userMessageText,
+	withQuotedReplies,
 } from "@superset/chat/core";
 import type { AvailableCommand, UserMessage } from "@superset/chat/protocol";
 import { AttachmentFileCard } from "@superset/chat-ui/AttachmentFileCard";
@@ -19,6 +21,7 @@ import {
 	parseAttachmentTags,
 } from "../../../../utils/attachmentTags";
 import {
+	elementsAfter,
 	type MessageSegment,
 	splitByElements,
 } from "../../../../utils/messageElements";
@@ -27,10 +30,18 @@ import { AttachmentImage } from "../AttachmentImage";
 import { MessageTime } from "../MessageTime";
 import { AttachmentPartImage } from "./components/AttachmentPartImage";
 import { PastedTextBlock } from "./components/PastedTextBlock";
+import { QuotedReplyBlock } from "./components/QuotedReplyBlock";
 import { UserMessageEditor } from "./components/UserMessageEditor";
 import { UserMessageText } from "./components/UserMessageText";
 import { useFitsOneLine } from "./hooks/useFitsOneLine";
 import { textElementsFromText } from "./utils/textElementsFromText";
+
+function asMarkdownQuote(text: string): string {
+	return text
+		.split("\n")
+		.map((line) => (line ? `> ${line}` : ">"))
+		.join("\n");
+}
 
 function BookkeepingRow({ label }: { label: string }) {
 	return (
@@ -63,8 +74,11 @@ export function UserMessageRow({
 	const { t } = useLingui();
 	const raw = userMessageText(item);
 	const note = readBookkeeping(harness, raw);
-	const { text, attachments, pastedTexts } = parseAttachmentTags(raw);
-	const elements = item.content.find((part) => part.type === "text")?.elements;
+	const { text, attachments, pastedTexts, quotes } = parseAttachmentTags(raw);
+	const elements = elementsAfter(
+		item.content.find((part) => part.type === "text")?.elements,
+		raw.slice(0, splitQuotedReplies(raw).offset),
+	);
 	const segments: MessageSegment[] = splitByElements(
 		text,
 		elements?.length ? elements : textElementsFromText(text, commands),
@@ -100,8 +114,24 @@ export function UserMessageRow({
 				mediaType: part.mimeType,
 			})),
 	];
-	const copyable = (text.length > 0 || pastedTexts.length > 0) && !pending;
-	const copyText = [text, ...pastedTexts].filter(Boolean).join("\n\n");
+	const copyable =
+		(text.length > 0 || pastedTexts.length > 0 || quotes.length > 0) &&
+		!pending;
+	const copyText = [...quotes.map(asMarkdownQuote), text, ...pastedTexts]
+		.filter(Boolean)
+		.join("\n\n");
+	const quoteBlocks = quotes.length > 0 && (
+		<div
+			className={cn(
+				"ml-auto flex w-full flex-col items-end gap-1.5 transition-opacity",
+				pending && !pending.failed && "opacity-60",
+			)}
+		>
+			{quotes.map((quote) => (
+				<QuotedReplyBlock key={quote} text={quote} />
+			))}
+		</div>
+	);
 	const editable =
 		copyable &&
 		editMessage !== undefined &&
@@ -113,12 +143,13 @@ export function UserMessageRow({
 	if (editing && editable) {
 		return (
 			<Message className="pt-1.5 pb-5 pl-10" from="user">
+				{quoteBlocks}
 				<UserMessageEditor
 					initialText={text}
 					onCancel={() => setEditing(false)}
 					onSubmit={(edited) => {
 						setEditing(false);
-						editMessage(item.id, edited);
+						editMessage(item.id, withQuotedReplies(quotes, edited));
 					}}
 				/>
 			</Message>
@@ -185,6 +216,7 @@ export function UserMessageRow({
 					))}
 				</div>
 			)}
+			{quoteBlocks}
 			{text && (
 				<MessageContent
 					className={cn(

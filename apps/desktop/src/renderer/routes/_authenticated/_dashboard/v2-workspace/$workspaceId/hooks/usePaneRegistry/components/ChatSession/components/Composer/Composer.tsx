@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { withQuotedReplies } from "@superset/chat/core";
 import type {
 	AvailableCommand,
 	SessionConfigOption,
@@ -88,7 +89,7 @@ export type ComposerTarget = {
 
 export type ComposerHandle = Pick<
 	PromptInputHandle,
-	"restoreDraft" | "addFiles" | "focus"
+	"restoreDraft" | "addFiles" | "addQuote" | "focus"
 > & {
 	returnFocus: (recallHistory?: boolean) => void;
 	/** Opens the model picker on this agent's models only. */
@@ -263,6 +264,7 @@ export const Composer = memo(function Composer({
 			restoreDraft: (draft: ComposerDraft) =>
 				promptInputRef.current?.restoreDraft(draft),
 			addFiles: (files: File[]) => promptInputRef.current?.addFiles(files),
+			addQuote: (text: string) => promptInputRef.current?.addQuote(text),
 			focus: focusInput,
 			returnFocus,
 			openModelPicker: () => {
@@ -538,6 +540,7 @@ export const Composer = memo(function Composer({
 			text: string,
 			files: File[],
 			mentions: ComposerChip[],
+			quotes: string[],
 			steer: boolean,
 			draft: ComposerDraft,
 		) => {
@@ -557,7 +560,12 @@ export const Composer = memo(function Composer({
 			}
 			const { tags, parts } = upload;
 			const message = text.trim();
-			const elements = elementsForChips(message, mentions);
+			const quoted = withQuotedReplies(quotes, message);
+			const elements = elementsForChips(
+				message,
+				mentions,
+				quoted.slice(0, quoted.length - message.length),
+			);
 			const mcpContext = mcpContextLine(
 				mentions.flatMap((chip) => mcpPicker.serverNameOf(chip) ?? []),
 			);
@@ -566,7 +574,7 @@ export const Composer = memo(function Composer({
 				env.NEXT_PUBLIC_WEB_URL,
 				otherHostOf,
 			);
-			const body = [message, ...tags].filter(Boolean).join("\n");
+			const body = [quoted, ...tags].filter(Boolean).join("\n");
 			onSend(
 				[
 					...(body || parts.length === 0
@@ -600,9 +608,20 @@ export const Composer = memo(function Composer({
 	);
 
 	const handleSubmit = useCallback(
-		({ text, files, mentions, steer, draft }: PromptInputSubmitPayload) => {
-			if (blocked || (text.trim() === "" && files.length === 0)) return false;
-			const typed = runTyped(text, files.length > 0);
+		({
+			text,
+			files,
+			mentions,
+			quotes,
+			steer,
+			draft,
+		}: PromptInputSubmitPayload) => {
+			if (
+				blocked ||
+				(text.trim() === "" && files.length === 0 && quotes.length === 0)
+			)
+				return false;
+			const typed = runTyped(text, files.length > 0 || quotes.length > 0);
 			if (typed === "ran") return;
 			if (typed === "kept") return false;
 			const name = LEADING_COMMAND.exec(text.trim())?.[1];
@@ -615,7 +634,16 @@ export const Composer = memo(function Composer({
 				toast.error(t({ message: `Unknown command /${name}` }));
 				return false;
 			}
-			return send(text, files, mentions, steer, draft);
+			// The agent runs a command only when the prompt starts with it.
+			if (
+				name &&
+				quotes.length > 0 &&
+				availableCommands.some((command) => command.name === name)
+			) {
+				toast.error(t({ message: `/${name} doesn't take quotes` }));
+				return false;
+			}
+			return send(text, files, mentions, quotes, steer, draft);
 		},
 		[availableCommands, blocked, runTyped, send, t, target],
 	);

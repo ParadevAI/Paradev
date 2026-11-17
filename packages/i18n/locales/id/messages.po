@@ -1109,6 +1109,9 @@ msgstr "{level} {gate}: {statusLabel}"
 msgid "{lines, plural, one {# line} other {# lines}}"
 msgstr "{lines, plural, other {# baris}}"
 
+msgid "{lines, plural, one {Quote} other {Quote · # lines}}"
+msgstr "{lines, plural, =1 {Kutipan} other {Kutipan · # baris}}"
+
 msgid "{localHostName} (this device)"
 msgstr "{localHostName} (perangkat ini)"
 
@@ -1479,6 +1482,9 @@ msgstr "/{name} tidak menerima argumen"
 msgid "/{name} doesn't take attachments"
 msgstr "/{name} tidak menerima lampiran"
 
+msgid "/{name} doesn't take quotes"
+msgstr "/{name} tidak menerima kutipan"
+
 #. placeholder {0}: detail.pullRequest.number
 #. placeholder {1}: detail.pullRequest.title
 #. placeholder {2}: detail.pullRequest.baseBranch
@@ -1833,6 +1839,9 @@ msgstr "Prompt, beberapa pemicu, dan workspace untuk setiap run"
 
 msgid "A pull request always gets its own worktree"
 msgstr "Pull request selalu mendapat worktree sendiri"
+
+msgid "A quote can be up to {limit} characters"
+msgstr "Kutipan bisa berisi hingga {limit} karakter"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Permukaan chat yang dibangun ulang untuk mengendalikan agen: output alat lebih kaya, pengarahan lebih halus, semuanya lebih cepat."
@@ -2217,6 +2226,9 @@ msgstr "Tambahkan label ini"
 
 msgid "Add to channel"
 msgstr "Tambahkan ke saluran"
+
+msgid "Add to chat"
+msgstr "Tambahkan ke chat"
 
 msgid "Add to Dictionary"
 msgstr "Tambahkan ke Kamus"
@@ -16179,6 +16191,9 @@ msgstr "Hapus Tautan PR"
 msgid "Remove queued message"
 msgstr "Hapus pesan dari antrean"
 
+msgid "Remove quote"
+msgstr "Hapus kutipan"
+
 msgid "Remove repository"
 msgstr "Hapus repositori"
 
@@ -17756,6 +17771,9 @@ msgstr "Aksi workspace terpilih"
 
 msgid "Selecting text in a terminal copies it to the clipboard right away, with trailing whitespace trimmed"
 msgstr "Memilih teks di terminal langsung menyalinnya ke clipboard, tanpa spasi di akhir"
+
+msgid "Selection actions"
+msgstr "Tindakan pilihan"
 
 msgid "Self-hosted"
 msgstr "Hosting mandiri"

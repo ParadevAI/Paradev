@@ -25,6 +25,7 @@ import type { OpenFile } from "../../../../../../types";
 import { isChatSessionReopened } from "../../../../../../utils/closedChatSessions";
 import { saveLastChatAgent } from "../../../../../../utils/lastChatAgent";
 import { useForkChatSession } from "../../../../hooks/useForkChatSession";
+import { chatDraftKey } from "../../../../utils/chatDraftKey";
 import {
 	forgetSavedChatMode,
 	freshStartMode,
@@ -648,7 +649,7 @@ export function AcpChatPane({
 		recover();
 	}, [recover]);
 
-	const draftKey = `chat-v3-draft:${draftId ?? terminalId}`;
+	const draftKey = chatDraftKey(draftId ?? terminalId);
 
 	const editMessage = useCallback(
 		async (request: ChatEditRequest) => {

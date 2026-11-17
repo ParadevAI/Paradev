@@ -90,6 +90,7 @@ import { useRestoreUnsentPrompts } from "./hooks/useRestoreUnsentPrompts";
 import { useStoredHistory } from "./hooks/useStoredHistory";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
+import { contentDraft } from "./utils/contentDraft";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
@@ -98,10 +99,6 @@ import { subagentsInTurn } from "./utils/subagentsInTurn";
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
-
-function contentText(content: UserContent[]): string {
-	return userMessageText({ content });
-}
 
 export function SessionView({
 	presetId,
@@ -224,10 +221,7 @@ export function SessionView({
 	const sentDrafts = useRef(new Map<string, ComposerDraft>());
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>
-			sentDrafts.current.get(entry.clientId) ?? {
-				segments: [{ type: "text", text: contentText(entry.content) }],
-				attachments: [],
-			},
+			sentDrafts.current.get(entry.clientId) ?? contentDraft(entry.content),
 		[],
 	);
 	useEffect(() => {
@@ -344,6 +338,10 @@ export function SessionView({
 	);
 
 	const focusComposer = useCallback(() => composerRef.current?.focus(), []);
+	const quoteInComposer = useCallback(
+		(text: string) => composerRef.current?.addQuote(text),
+		[],
+	);
 	const openFind = useCallback(() => transcriptRef.current?.openFind(), []);
 	const [revealMessageId, setRevealMessageId] = useState<string | null>(null);
 	const clearRevealMessage = useCallback(() => setRevealMessageId(null), []);
@@ -496,13 +494,7 @@ export function SessionView({
 	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
-			restoreDraft(
-				{
-					segments: [{ type: "text", text: contentText(content) }],
-					attachments: [],
-				},
-				originKey,
-			),
+			restoreDraft(contentDraft(content), originKey),
 		[restoreDraft],
 	);
 	const onStopTask = useCallback(
@@ -738,6 +730,7 @@ export function SessionView({
 												onRequestItemBodies={session.requestItemBodies}
 												onRespond={onRespond}
 												onMessageRevealed={clearRevealMessage}
+												onQuote={quoteInComposer}
 												onRetryPrompt={session.retryPrompt}
 												outbox={transcriptOutbox}
 												ref={transcriptRef}

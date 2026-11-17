@@ -3,6 +3,7 @@ import {
 	WORKSPACE_ATTACHMENTS_DIR,
 } from "@superset/shared/workspace-attachments";
 import { parsePastedText } from "../pastedText/pastedText";
+import { splitQuotedReplies } from "../quotedReplies/quotedReplies";
 
 export type AttachmentTag = { path: string; type: string; name?: string };
 
@@ -75,8 +76,10 @@ export function parseAttachmentTags(message: string): {
 	text: string;
 	attachments: AttachmentTag[];
 	pastedTexts: string[];
+	quotes: string[];
 } {
-	const { text, pastes } = parsePastedText(message);
+	const quoted = splitQuotedReplies(message);
+	const { text, pastes } = parsePastedText(quoted.text);
 	const attachments: AttachmentTag[] = [];
 	const rest = text.replace(
 		TAG,
@@ -90,5 +93,10 @@ export function parseAttachmentTags(message: string): {
 			return "";
 		},
 	);
-	return { text: rest.trim(), attachments, pastedTexts: pastes };
+	return {
+		text: rest.trim(),
+		attachments,
+		pastedTexts: pastes,
+		quotes: quoted.quotes,
+	};
 }

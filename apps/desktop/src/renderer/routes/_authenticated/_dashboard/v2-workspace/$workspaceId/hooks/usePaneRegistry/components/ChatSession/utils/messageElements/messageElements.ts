@@ -12,11 +12,14 @@ function elementKindOf(chip: ComposerChip): TextElement["elementKind"] {
 	return kind === "file_mention" || kind === "slash_command" ? kind : "other";
 }
 
+/** `before` is what the sent text part carries ahead of `text`. */
 export function elementsForChips(
 	text: string,
 	chips: readonly ComposerChip[],
+	before = "",
 ): TextElement[] {
 	const elements: TextElement[] = [];
+	const lead = encoder.encode(before).length;
 	let cursor = 0;
 	for (const chip of chips) {
 		// A link chip is sent as its URL, so the message shows it as a link.
@@ -24,7 +27,7 @@ export function elementsForChips(
 		const start = text.indexOf(chip.serialized, cursor);
 		if (start === -1) continue;
 		cursor = start + chip.serialized.length;
-		const byteStart = encoder.encode(text.slice(0, start)).length;
+		const byteStart = lead + encoder.encode(text.slice(0, start)).length;
 		elements.push({
 			byteRange: {
 				start: byteStart,
@@ -36,6 +39,28 @@ export function elementsForChips(
 		});
 	}
 	return elements;
+}
+
+/** The elements of a text part, measured from after its first `before`. */
+export function elementsAfter(
+	elements: readonly TextElement[] | undefined,
+	before: string,
+): TextElement[] | undefined {
+	if (!elements || !before) return elements ? [...elements] : undefined;
+	const lead = encoder.encode(before).length;
+	return elements.flatMap((element) =>
+		element.byteRange.start < lead
+			? []
+			: [
+					{
+						...element,
+						byteRange: {
+							start: element.byteRange.start - lead,
+							end: element.byteRange.end - lead,
+						},
+					},
+				],
+	);
 }
 
 export type MessageSegment =
