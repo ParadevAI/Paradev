@@ -13,6 +13,7 @@ export {
 	getProjectFolderTagIndex,
 	laneProjectIdForScope,
 	mintFolderTag,
+	omitStaleMaterializedFolders,
 	parseSidebarFolderKey,
 	resolveWorkspaceSectionId,
 	type TagFolderContext,
