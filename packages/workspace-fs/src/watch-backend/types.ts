@@ -1,6 +1,8 @@
 export interface NativeWatchEvent {
 	type: "create" | "update" | "delete";
 	path: string;
+	/** Set only by a backend that knows it when the event fires. */
+	isDirectory?: boolean;
 }
 
 export interface NativeWatchSubscription {
@@ -14,6 +16,11 @@ export interface NativeWatchRequest {
 	ignore: string[];
 	/** Unique per attach of one watcher; grows on every re-attach. */
 	generation: number;
+	/**
+	 * Paths pruned after attach, asked again for each new entry. A backend
+	 * with `watchesEachEntry` does not watch an entry for which it is true.
+	 */
+	isPruned?(absolutePath: string): boolean;
 	onEvents(events: NativeWatchEvent[]): void;
 	onError(error: unknown): void;
 }
