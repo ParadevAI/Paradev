@@ -5,9 +5,8 @@
  *
  *   1. the host-service runtime asset (this checkout's host-service and
  *      pty-daemon, natives installed for the box), this checkout's CLI, the
- *      latest claude, codex and Chrome, the newest opencode and pi past
- *      their cooldown (a fetch or digest check that fails keeps the
- *      committed pin) and the bundle, published
+ *      latest claude, codex, Chrome, opencode and pi (a fetch or digest
+ *      check that fails keeps the committed pin) and the bundle, published
  *   2. the image in Vercel Container Registry under a candidate tag, unless
  *      --skip-image; `latest`, which every image environment resolves to,
  *      stays on the previous release
