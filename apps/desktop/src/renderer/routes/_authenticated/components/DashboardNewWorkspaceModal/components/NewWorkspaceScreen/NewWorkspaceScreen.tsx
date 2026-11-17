@@ -63,6 +63,7 @@ import {
 	withEnvironmentSetupSkill,
 } from "renderer/routes/_authenticated/utils/environmentSetupPrompt";
 import { resolveCloudChoices } from "renderer/routes/_authenticated/utils/resolveCloudChoices";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 import { useNewWorkspacePromptContext } from "renderer/stores/new-workspace-prompt-context";
 import {
 	environmentBranchKey,
@@ -146,6 +147,7 @@ export function NewWorkspaceScreen({
 }: NewWorkspaceScreenProps) {
 	const { t } = useLingui();
 	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const navigate = useNavigate();
 	const [promptSeed, setPromptSeed] = useState(0);
 	const {
@@ -1183,12 +1185,21 @@ export function NewWorkspaceScreen({
 		</Button>
 	);
 
-	if (isParadevShell) {
+	if (isNewPage) {
 		return (
 			<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
-				<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
-					{headerActions}
-				</div>
+				{isParadevShell ? (
+					<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
+						{headerActions}
+					</div>
+				) : (
+					<PageHeader
+						className="sticky top-0 z-10 w-full bg-background"
+						end={
+							<div className="flex items-center gap-0.5">{headerActions}</div>
+						}
+					/>
+				)}
 				<div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
 					<h1 className="sr-only">
 						<Trans>What should we build next?</Trans>

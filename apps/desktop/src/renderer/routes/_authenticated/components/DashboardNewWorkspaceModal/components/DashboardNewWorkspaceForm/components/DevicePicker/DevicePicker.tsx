@@ -18,7 +18,6 @@ import {
 	HiOutlineComputerDesktop,
 	HiOutlineServer,
 } from "react-icons/hi2";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import {
 	FORM_PICKER_MENU_CLASS,
@@ -26,6 +25,7 @@ import {
 } from "renderer/routes/_authenticated/components/FormPickerTrigger";
 import { OnlineDot } from "renderer/routes/_authenticated/components/OnlineDot";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 import { PickerChevron } from "../PickerChevron";
 import { useWorkspaceHostOptions } from "./hooks/useWorkspaceHostOptions";
 
@@ -73,7 +73,7 @@ export function DevicePicker({
 	const { t } = useLingui();
 	const { machineId } = useLocalHostService();
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
-	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const { currentDeviceName, localHostIsOnline, otherHosts } =
 		useWorkspaceHostOptions();
 	const isLocal = hostId === null || hostId === machineId;
@@ -115,7 +115,7 @@ export function DevicePicker({
 					{getSelectedIcon(
 						hostId,
 						machineId,
-						isParadevShell ? "size-3.5 shrink-0" : "size-4 shrink-0",
+						isNewPage ? "size-3.5 shrink-0" : "size-4 shrink-0",
 					)}
 					<span className="truncate">{selectedLabel}</span>
 					{selectedOnline !== null && <OnlineDot online={selectedOnline} />}
