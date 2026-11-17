@@ -4,6 +4,7 @@
 		"index",
 		"github",
 		"sentry",
+		"datadog",
 		"stripe",
 		"peec",
 		"supabase",

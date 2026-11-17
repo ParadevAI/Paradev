@@ -5,6 +5,7 @@ import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
 import { LuBookOpen, LuDrama, LuPuzzle } from "react-icons/lu";
 import {
+	SiDatadog,
 	SiGooglechrome,
 	SiGoogledocs,
 	SiGooglesheets,
@@ -75,6 +76,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	notion: { icon: SiNotion },
 	peec: { icon: PeecIcon },
 	sentry: { icon: SiSentry },
+	datadog: { icon: SiDatadog, color: "#632CA6" },
 	posthog: { icon: SiPosthog },
 	resend: { icon: ResendIcon },
 	sazabi: { icon: SazabiIcon, color: "#FF0027" },

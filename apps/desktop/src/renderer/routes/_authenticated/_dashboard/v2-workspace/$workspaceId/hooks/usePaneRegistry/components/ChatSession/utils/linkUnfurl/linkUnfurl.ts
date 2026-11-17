@@ -22,6 +22,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)slack\.com$/, "slack"],
 	[/(^|\.)notion\.(so|site)$/, "notion"],
 	[/(^|\.)sentry\.io$/, "sentry"],
+	[/(^|\.)datadoghq\.(com|eu)$/, "datadog"],
 	[/(^|\.)posthog\.com$/, "posthog"],
 	[/(^|\.)vercel\.com$/, "vercel"],
 	[/(^|\.)resend\.com$/, "resend"],

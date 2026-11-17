@@ -1,0 +1,32 @@
+---
+title: Datadog
+description: "Investigate production with Datadog: search logs, metrics, traces and monitors, work an alert, and check a deploy before you call it done"
+---
+
+Investigate production with Datadog: search logs, metrics, traces and monitors, read incidents and dashboards, and check a deploy before you call it done.
+
+## Skills
+
+| Skill | What it does |
+|:------|:-------------|
+| `investigate-production` | Scopes to one service and environment, ranks errors with aggregates, reads the traces behind them, and reports what fails, why, and who it hits before it changes code |
+| `respond-to-an-alert` | Reads what a firing monitor or incident measures, confirms the signal is real, and lines it up with deploys and other changes |
+| `verify-a-deploy` | Compares error rate, latency and new error kinds before and after a deploy, and checks the targeted error stopped, before it calls the task done |
+
+Skills are named `datadog-<skill>`. In Claude Code they appear as `superset:datadog-<skill>`.
+
+## MCP Server
+
+Tools come from Datadog's own MCP server at `https://mcp.datadoghq.com/v1/mcp`. Paradev proxies each call and adds your credentials. Datadog decides which tools the server offers, and the server ships its own skill guides the agent loads before querying; see [Datadog's MCP server docs](https://docs.datadoghq.com/bits_ai/mcp_server/setup/). Read tools need the `mcp_read` permission and write tools (dashboards, notebooks) `mcp_write`. The Datadog Standard Role has both by default, and an organization can turn write tools off for everyone.
+
+The plugin connects to the US1 site (`app.datadoghq.com`). Organizations on other Datadog sites, such as EU1, are not supported yet.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to Datadog in your browser. Paradev registers itself with Datadog when you connect, so there is no app to set up first. |
+
+If Datadog refuses the sign-in because of the redirect URL, a Datadog admin adds Paradev's, `https://api.superset.sh/api/connectors/callback/datadog_mcp`, under **Organization Settings → MCP OAuth Redirect URLs**.
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

@@ -262,6 +262,49 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "42", label: "Harshith" });
 	});
 
+	test("datadog_mcp reads the user and org from /api/v2/current_user", async () => {
+		const calls = respond({
+			data: {
+				type: "users",
+				id: "user-01",
+				attributes: {
+					email: "h@tegon.ai",
+					name: "Harshith",
+					handle: "h@tegon.ai",
+				},
+				relationships: { org: { data: { type: "orgs", id: "org-01" } } },
+			},
+			included: [
+				{
+					type: "roles",
+					id: "role-01",
+					attributes: { name: "Datadog Standard Role" },
+				},
+				{
+					type: "orgs",
+					id: "org-01",
+					attributes: { name: "Tegon", public_id: "pub01" },
+				},
+			],
+		});
+
+		const identity = await probeIdentity(
+			"datadog_mcp",
+			connectorMethod(requireConnector("datadog_mcp")),
+			"dd-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://api.datadoghq.com/api/v2/current_user",
+				method: "GET",
+				auth: "Bearer dd-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "org-01", label: "h@tegon.ai" });
+		expect(identity.user).toEqual({ id: "user-01", label: "h@tegon.ai" });
+	});
+
 	test("stripe reads the account behind the token as text content", async () => {
 		const account = {
 			accounts: [
