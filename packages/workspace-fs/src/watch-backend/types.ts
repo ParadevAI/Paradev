@@ -20,6 +20,8 @@ export interface NativeWatchRequest {
 
 export interface NativeWatchBackend {
 	readonly name: string;
+	/** A dir pruned after attach keeps its per-entry watches until a re-attach. */
+	readonly watchesEachEntry?: boolean;
 	/** Resolves once the watch is live; rejects if it could not be established. */
 	subscribe(request: NativeWatchRequest): Promise<NativeWatchSubscription>;
 }
