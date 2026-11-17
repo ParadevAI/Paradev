@@ -2223,6 +2223,9 @@ msgstr "Thêm nhãn này"
 msgid "Add to {0}"
 msgstr "Thêm vào {0}"
 
+msgid "Add to a group"
+msgstr "Thêm vào nhóm"
+
 msgid "Add to Dictionary"
 msgstr "Thêm vào từ điển"
 
@@ -3753,6 +3756,9 @@ msgstr "Đang chuyển các dự án v1 của bạn"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Duyệt và cài skill, server MCP và cấu hình agent do cộng đồng chia sẻ."
+
+msgid "Browse Devs…"
+msgstr "Duyệt các Dev…"
 
 msgid "Browse for directory"
 msgstr "Duyệt thư mục"
@@ -15915,9 +15921,6 @@ msgstr "Sẵn sàng merge"
 
 msgid "Ready to try Paradev?"
 msgstr "Sẵn sàng thử Paradev?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Các Dev dựng sẵn. Lấy một Dev cho riêng bạn hoặc thêm vào một nhóm."
 
 msgid "Reapply all commits"
 msgstr "Áp dụng lại toàn bộ commit"

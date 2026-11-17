@@ -5,7 +5,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useNow } from "renderer/hooks/useNow";
+import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { useChats } from "../../hooks/useChats";
+import { listingFace } from "../../utils/listingFace";
 import { ChatListRow } from "./components/ChatListRow";
 import { ChatsSection } from "./components/ChatsSection";
 import { DeleteChatDialog } from "./components/DeleteChatDialog";
@@ -83,6 +85,13 @@ export function ChatsSidebar() {
 				label={t({ message: "Devs" })}
 				addLabel={t({ message: "New Dev" })}
 				onAdd={() => setDialog("agent")}
+				more={[
+					{
+						label: t({ message: "Browse Devs…" }),
+						icon: <FaceAvatar face={listingFace("eng-lead")} size={16} />,
+						onSelect: () => void navigate({ to: "/chats/devs" }),
+					},
+				]}
 				empty={t({ message: "No Devs yet" })}
 			>
 				{rows(agents)}

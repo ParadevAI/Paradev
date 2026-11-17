@@ -2223,6 +2223,9 @@ msgstr "Dieses Label hinzufügen"
 msgid "Add to {0}"
 msgstr "Zu {0} hinzufügen"
 
+msgid "Add to a group"
+msgstr "Zu einer Gruppe hinzufügen"
+
 msgid "Add to Dictionary"
 msgstr "Zum Wörterbuch hinzufügen"
 
@@ -3753,6 +3756,9 @@ msgstr "Deine v1-Projekte werden übernommen"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Von der Community geteilte Skills, MCP-Server und Agenten-Konfigurationen durchstöbern und installieren."
+
+msgid "Browse Devs…"
+msgstr "Devs durchsuchen…"
 
 msgid "Browse for directory"
 msgstr "Verzeichnis auswählen"
@@ -15915,9 +15921,6 @@ msgstr "Bereit zum Zusammenführen"
 
 msgid "Ready to try Paradev?"
 msgstr "Bereit, Paradev auszuprobieren?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Fertige Devs. Hol dir einen für dich oder füge einen zu einer Gruppe hinzu."
 
 msgid "Reapply all commits"
 msgstr "Alle Commits erneut anwenden"

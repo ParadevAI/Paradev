@@ -2223,6 +2223,9 @@ msgstr "添加此标签"
 msgid "Add to {0}"
 msgstr "添加到 {0}"
 
+msgid "Add to a group"
+msgstr "添加到群组"
+
 msgid "Add to Dictionary"
 msgstr "添加到词典"
 
@@ -3753,6 +3756,9 @@ msgstr "正在迁移你的 v1 项目"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "浏览并安装社区共享的技能、MCP服务器和智能体配置。"
+
+msgid "Browse Devs…"
+msgstr "浏览 Dev…"
 
 msgid "Browse for directory"
 msgstr "浏览目录"
@@ -15915,9 +15921,6 @@ msgstr "可以合并"
 
 msgid "Ready to try Paradev?"
 msgstr "准备好试试Paradev了吗？"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "现成的 Dev。为自己获取一个，或添加到群组。"
 
 msgid "Reapply all commits"
 msgstr "重新应用所有提交"

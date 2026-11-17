@@ -2223,6 +2223,9 @@ msgstr "Bu etiketi ekle"
 msgid "Add to {0}"
 msgstr "{0} grubuna ekle"
 
+msgid "Add to a group"
+msgstr "Bir gruba ekle"
+
 msgid "Add to Dictionary"
 msgstr "Sözlüğe ekle"
 
@@ -3753,6 +3756,9 @@ msgstr "v1 projeleriniz aktarılıyor"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Toplulukça paylaşılan becerilere, MCP sunucularına ve ajan yapılandırmalarına göz atın ve kurun."
+
+msgid "Browse Devs…"
+msgstr "Dev'lere göz at…"
 
 msgid "Browse for directory"
 msgstr "Dizine gözat"
@@ -15915,9 +15921,6 @@ msgstr "Birleştirmeye hazır"
 
 msgid "Ready to try Paradev?"
 msgstr "Paradev'i denemeye hazır mısınız?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Hazır Dev'ler. Kendiniz için bir tane alın veya bir gruba ekleyin."
 
 msgid "Reapply all commits"
 msgstr "Tüm commit'leri yeniden uygular"

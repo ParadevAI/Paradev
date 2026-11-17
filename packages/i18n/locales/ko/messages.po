@@ -2223,6 +2223,9 @@ msgstr "이 라벨 추가"
 msgid "Add to {0}"
 msgstr "{0}에 추가"
 
+msgid "Add to a group"
+msgstr "그룹에 추가"
+
 msgid "Add to Dictionary"
 msgstr "사전에 추가"
 
@@ -3753,6 +3756,9 @@ msgstr "v1 프로젝트를 옮기는 중"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "커뮤니티가 공유한 스킬, MCP 서버, 에이전트 설정을 둘러보고 설치하세요."
+
+msgid "Browse Devs…"
+msgstr "Dev 둘러보기…"
 
 msgid "Browse for directory"
 msgstr "디렉터리 찾아보기"
@@ -15915,9 +15921,6 @@ msgstr "머지 준비됨"
 
 msgid "Ready to try Paradev?"
 msgstr "Paradev를 사용해 볼 준비가 되셨나요?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "준비된 Dev입니다. 직접 받거나 그룹에 추가하세요."
 
 msgid "Reapply all commits"
 msgstr "모든 커밋 다시 적용"

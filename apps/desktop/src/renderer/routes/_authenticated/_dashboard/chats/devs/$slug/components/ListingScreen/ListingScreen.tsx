@@ -124,23 +124,23 @@ export function ListingScreen({ slug, groupId }: ListingScreenProps) {
 						)}
 					</output>
 				) : (
-					<div className="mx-auto flex w-full max-w-[680px] flex-col gap-8 px-8 pt-4 pb-16">
-						<header className="flex items-center gap-5">
-							<FaceAvatar face={listingFace(listing.slug)} size={88} />
-							<div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
-								<h1 className="font-semibold text-[28px] leading-tight tracking-[-0.02em]">
+					<div className="mx-auto flex w-full max-w-[920px] flex-col gap-12 px-8 pt-6 pb-16">
+						<header className="flex items-center gap-7">
+							<FaceAvatar face={listingFace(listing.slug)} size={120} />
+							<div className="flex min-w-0 flex-1 flex-col items-start">
+								<h1 className="font-semibold text-[40px] leading-none tracking-[-0.035em]">
 									{listing.name}
 								</h1>
-								<p className="text-muted-foreground text-sm">
+								<p className="mt-3 max-w-[560px] text-[15px] text-muted-foreground leading-[1.45]">
 									{listing.summary}
 								</p>
-								<div className="mt-1.5 flex items-center gap-3">
+								<div className="mt-4 flex items-center gap-3">
 									{mine ? (
-										<Button size="sm" onClick={() => openChat(mine)}>
+										<Button className="px-5" onClick={() => openChat(mine)}>
 											<Trans>Open</Trans>
 										</Button>
 									) : (
-										<Button size="sm" onClick={() => setGetting(true)}>
+										<Button className="px-5" onClick={() => setGetting(true)}>
 											<Trans context="get a ready-made Dev">Get</Trans>
 										</Button>
 									)}
@@ -151,91 +151,100 @@ export function ListingScreen({ slug, groupId }: ListingScreenProps) {
 							</div>
 						</header>
 
-						{listing.examples.length > 0 && (
-							<Section title={t({ message: "Try saying" })}>
-								<div className="flex flex-wrap gap-2">
-									{listing.examples.map((example) => (
-										<span
-											key={example}
-											className="rounded-[18px] bg-fill-selected px-3 py-1.5 text-sm"
-										>
-											{example}
-										</span>
-									))}
-								</div>
-							</Section>
-						)}
+						<div className="grid gap-x-12 gap-y-12 lg:grid-cols-[minmax(0,1fr)_280px]">
+							<div className="flex min-w-0 flex-col gap-12">
+								{listing.examples.length > 0 && (
+									<Section title={t({ message: "Try saying" })}>
+										<div className="flex flex-wrap gap-2">
+											{listing.examples.map((example) => (
+												<span
+													key={example}
+													className="rounded-[18px] bg-fill-selected px-3 py-1.5 text-sm"
+												>
+													{example}
+												</span>
+											))}
+										</div>
+									</Section>
+								)}
 
-						{listing.readme.trim() && (
-							<Section title={t({ message: "What it does" })}>
-								<div className="text-sm">
-									<ChatMarkdown>{listing.readme}</ChatMarkdown>
-								</div>
-							</Section>
-						)}
+								{listing.readme.trim() && (
+									<Section title={t({ message: "What it does" })}>
+										<div className="text-sm">
+											<ChatMarkdown>{listing.readme}</ChatMarkdown>
+										</div>
+									</Section>
+								)}
 
-						<Section title={t({ message: "Needs" })}>
-							{needs.length === 0 ? (
-								<p className="text-sm">
-									<Trans>Nothing to connect: it works on its own.</Trans>
-								</p>
-							) : (
-								<ul className="flex flex-col">
-									{needs.map((need) => (
-										<li
-											key={need.app}
-											className="flex flex-col gap-0.5 border-border border-b py-2.5 text-sm"
-										>
-											<span className="font-medium">
-												{need.app === "paradev" ? (
-													<Trans>Your Paradev access</Trans>
+								{listing.instructions.trim() && (
+									<Section title={t({ message: "Its instructions" })}>
+										<div className="rounded-xl bg-fill-selected px-4 py-3 text-sm">
+											<div
+												className={cn(
+													"min-w-0 [&_pre]:overflow-x-auto",
+													!showsAll && "max-h-44 overflow-hidden",
+												)}
+											>
+												<ChatMarkdown>
+													{unwrapSoftBreaks(listing.instructions)}
+												</ChatMarkdown>
+											</div>
+											<Button
+												variant="ghost"
+												size="sm"
+												className="mt-2 -ml-2"
+												aria-expanded={showsAll}
+												onClick={() => setShowsAll((shown) => !shown)}
+											>
+												{showsAll ? (
+													<Trans>Show less</Trans>
 												) : (
-													need.app
+													<Trans>Show all</Trans>
 												)}
-												{need.isOptional && (
-													<span className="ml-1.5 font-normal text-muted-foreground text-xs">
-														<Trans>optional</Trans>
+											</Button>
+										</div>
+									</Section>
+								)}
+							</div>
+							<div className="flex min-w-0 flex-col gap-12">
+								<Section title={t({ message: "Needs" })}>
+									{needs.length === 0 ? (
+										<p className="text-sm">
+											<Trans>Nothing to connect: it works on its own.</Trans>
+										</p>
+									) : (
+										<ul className="flex flex-col">
+											{needs.map((need) => (
+												<li
+													key={need.app}
+													className="flex flex-col gap-0.5 border-border border-b py-2.5 text-sm"
+												>
+													<span className="font-medium">
+														{need.app === "paradev" ? (
+															<Trans>Your Paradev access</Trans>
+														) : (
+															need.app
+														)}
+														{need.isOptional && (
+															<span className="ml-1.5 font-normal text-muted-foreground text-xs">
+																<Trans>optional</Trans>
+															</span>
+														)}
 													</span>
-												)}
-											</span>
-											<span className="text-muted-foreground text-xs">
-												{need.why}
-											</span>
-										</li>
-									))}
-								</ul>
-							)}
-						</Section>
+													<span className="text-muted-foreground text-xs">
+														{need.why}
+													</span>
+												</li>
+											))}
+										</ul>
+									)}
+								</Section>
 
-						{listing.instructions.trim() && (
-							<Section title={t({ message: "Its instructions" })}>
-								<div className="rounded-xl bg-fill-selected px-4 py-3 text-sm">
-									<div
-										className={cn(
-											"min-w-0 [&_pre]:overflow-x-auto",
-											!showsAll && "max-h-44 overflow-hidden",
-										)}
-									>
-										<ChatMarkdown>
-											{unwrapSoftBreaks(listing.instructions)}
-										</ChatMarkdown>
-									</div>
-									<Button
-										variant="ghost"
-										size="sm"
-										className="mt-2 -ml-2"
-										aria-expanded={showsAll}
-										onClick={() => setShowsAll((shown) => !shown)}
-									>
-										{showsAll ? (
-											<Trans>Show less</Trans>
-										) : (
-											<Trans>Show all</Trans>
-										)}
-									</Button>
-								</div>
-							</Section>
-						)}
+								<Section title={t({ message: "Version" })}>
+									<p className="text-sm tabular-nums">{listing.version}</p>
+								</Section>
+							</div>
+						</div>
 					</div>
 				)}
 			</div>

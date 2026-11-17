@@ -2223,6 +2223,9 @@ msgstr "このラベルを追加"
 msgid "Add to {0}"
 msgstr "{0} に追加"
 
+msgid "Add to a group"
+msgstr "グループに追加"
+
 msgid "Add to Dictionary"
 msgstr "辞書に追加"
 
@@ -3753,6 +3756,9 @@ msgstr "v1 のプロジェクトを移行しています"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "コミュニティが共有したスキル、MCPサーバー、エージェント設定を閲覧してインストールできます。"
+
+msgid "Browse Devs…"
+msgstr "Dev を見る…"
 
 msgid "Browse for directory"
 msgstr "ディレクトリを参照"
@@ -15915,9 +15921,6 @@ msgstr "マージ可能"
 
 msgid "Ready to try Paradev?"
 msgstr "Paradevを試してみませんか?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "既製の Dev です。自分用に入手するか、グループに追加できます。"
 
 msgid "Reapply all commits"
 msgstr "すべてのコミットを再適用"

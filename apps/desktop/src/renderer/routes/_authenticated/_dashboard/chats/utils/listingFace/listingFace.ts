@@ -9,8 +9,11 @@ const LISTING_FACES: Record<string, number> = {
 	"eng-lead": 3,
 	reviewer: 7,
 	researcher: 11,
-	"release-notes": 14,
+	"release-notes": 0,
 	planner: 17,
+	standup: 1,
+	decider: 9,
+	mentor: 5,
 };
 
 /** A listing's face: the same in the directory and on every Dev made from it. */

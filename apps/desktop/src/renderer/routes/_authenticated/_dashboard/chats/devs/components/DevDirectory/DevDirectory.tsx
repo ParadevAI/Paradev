@@ -16,6 +16,7 @@ import { LuLoaderCircle, LuSearch } from "react-icons/lu";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { useChats } from "../../../hooks/useChats";
 import { useLoaded } from "../../hooks/useLoaded";
+import { FeaturedListing } from "../FeaturedListing";
 import { GetDevDialog } from "../GetDevDialog";
 import { ListingRow } from "../ListingRow";
 
@@ -87,19 +88,12 @@ export function DevDirectory({ groupId }: DevDirectoryProps) {
 				<div className="drag h-full flex-1" />
 			</PageHeader>
 			<div className="min-h-0 flex-1 overflow-y-auto">
-				<div className="mx-auto flex w-full max-w-[680px] flex-col gap-5 px-8 pt-4 pb-16">
+				<div className="mx-auto w-full max-w-[920px] px-8 pt-6 pb-16">
 					<div className="flex items-end gap-4">
-						<div className="flex min-w-0 flex-1 flex-col gap-1">
-							<h1 className="font-semibold text-[28px] leading-tight tracking-[-0.02em]">
-								<Trans>Devs</Trans>
-							</h1>
-							<p className="text-muted-foreground text-sm">
-								<Trans>
-									Ready-made Devs. Get one for yourself, or add one to a group.
-								</Trans>
-							</p>
-						</div>
-						<div className="relative w-56 shrink-0">
+						<h1 className="min-w-0 flex-1 font-semibold text-[40px] leading-none tracking-[-0.035em]">
+							<Trans>Devs</Trans>
+						</h1>
+						<div className="relative w-60 shrink-0">
 							<LuSearch className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
 							<Input
 								aria-label={t({ message: "Search Devs" })}
@@ -111,7 +105,7 @@ export function DevDirectory({ groupId }: DevDirectoryProps) {
 						</div>
 					</div>
 					{!groupId && (
-						<div role="tablist" className="flex gap-1">
+						<div role="tablist" className="mt-5 flex gap-1">
 							{shelves.map((entry) => (
 								<button
 									key={entry.shelf}
@@ -148,37 +142,48 @@ export function DevDirectory({ groupId }: DevDirectoryProps) {
 							)}
 						</output>
 					) : (
-						<ul className="flex flex-col">
+						<>
 							{featured && (
-								<ListingRow
-									card={featured}
-									isFeatured
-									ownedChatId={ownedOf(featured)}
-									onOpen={openListing}
-									onGet={setGetting}
-									onOpenChat={openChat}
-								/>
+								<div className="mt-10">
+									<FeaturedListing
+										card={featured}
+										ownedChatId={ownedOf(featured)}
+										onOpen={openListing}
+										onGet={setGetting}
+										onOpenChat={openChat}
+									/>
+								</div>
 							)}
-							{shown.map((card) => (
-								<ListingRow
-									key={card.slug}
-									card={card}
-									ownedChatId={ownedOf(card)}
-									onOpen={openListing}
-									onGet={setGetting}
-									onOpenChat={openChat}
-								/>
-							))}
-							{shown.length === 0 && !featured && (
-								<p className="py-10 text-center text-muted-foreground text-sm">
-									{isSearching ? (
-										<Trans>No Dev matches “{query.trim()}”.</Trans>
-									) : (
-										<Trans>No Devs here yet.</Trans>
-									)}
-								</p>
-							)}
-						</ul>
+							<section className="mt-12">
+								<h2 className="mb-2 font-medium text-muted-foreground text-xs">
+									{isSearching
+										? t({ message: "Results" })
+										: shelves.find((entry) => entry.shelf === shelf)?.label}
+								</h2>
+								{shown.length === 0 ? (
+									<p className="py-10 text-center text-muted-foreground text-sm">
+										{isSearching ? (
+											<Trans>No Dev matches “{query.trim()}”.</Trans>
+										) : (
+											<Trans>No Devs here yet.</Trans>
+										)}
+									</p>
+								) : (
+									<ul className="grid grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-x-10">
+										{shown.map((card) => (
+											<ListingRow
+												key={card.slug}
+												card={card}
+												ownedChatId={ownedOf(card)}
+												onOpen={openListing}
+												onGet={setGetting}
+												onOpenChat={openChat}
+											/>
+										))}
+									</ul>
+								)}
+							</section>
+						</>
 					)}
 				</div>
 			</div>

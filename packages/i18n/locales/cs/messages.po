@@ -2223,6 +2223,9 @@ msgstr "Přidat tento štítek"
 msgid "Add to {0}"
 msgstr "Přidat do {0}"
 
+msgid "Add to a group"
+msgstr "Přidat do skupiny"
+
 msgid "Add to Dictionary"
 msgstr "Přidat do slovníku"
 
@@ -3753,6 +3756,9 @@ msgstr "Přenášíme vaše projekty z v1"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Procházejte a instalujte skills, MCP servery a konfigurace agentů sdílené komunitou."
+
+msgid "Browse Devs…"
+msgstr "Procházet Devy…"
 
 msgid "Browse for directory"
 msgstr "Procházet adresáře"
@@ -15915,9 +15921,6 @@ msgstr "Připraveno ke sloučení"
 
 msgid "Ready to try Paradev?"
 msgstr "Chcete Paradev vyzkoušet?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Hotoví Devové. Získejte jednoho pro sebe, nebo ho přidejte do skupiny."
 
 msgid "Reapply all commits"
 msgstr "Znovu aplikuje všechny commity"

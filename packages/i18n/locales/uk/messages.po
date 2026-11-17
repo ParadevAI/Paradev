@@ -2217,6 +2217,9 @@ msgstr "Додати цю мітку"
 msgid "Add to {0}"
 msgstr "Додати до {0}"
 
+msgid "Add to a group"
+msgstr "Додати до групи"
+
 msgid "Add to Dictionary"
 msgstr "Додати до словника"
 
@@ -3747,6 +3750,9 @@ msgstr "Перенесення ваших проєктів з v1"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Переглядайте та встановлюйте навички, MCP-сервери й конфігурації агентів від спільноти."
+
+msgid "Browse Devs…"
+msgstr "Переглянути Dev…"
 
 msgid "Browse for directory"
 msgstr "Вибрати папку"
@@ -15909,9 +15915,6 @@ msgstr "Готово до злиття"
 
 msgid "Ready to try Paradev?"
 msgstr "Готові спробувати Paradev?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Готові Dev. Візьміть одного собі або додайте до групи."
 
 msgid "Reapply all commits"
 msgstr "Повторно застосувати всі коміти"

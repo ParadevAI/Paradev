@@ -2223,6 +2223,9 @@ msgstr "Tambahkan label ini"
 msgid "Add to {0}"
 msgstr "Tambahkan ke {0}"
 
+msgid "Add to a group"
+msgstr "Tambahkan ke grup"
+
 msgid "Add to Dictionary"
 msgstr "Tambahkan ke Kamus"
 
@@ -3753,6 +3756,9 @@ msgstr "Memindahkan proyek v1 Anda"
 
 msgid "Browse and install skills, MCP servers, and agent configs shared by the community."
 msgstr "Jelajahi dan pasang skill, server MCP, dan konfigurasi agen yang dibagikan komunitas."
+
+msgid "Browse Devs…"
+msgstr "Jelajahi Dev…"
 
 msgid "Browse for directory"
 msgstr "Telusuri direktori"
@@ -15915,9 +15921,6 @@ msgstr "Siap Di-merge"
 
 msgid "Ready to try Paradev?"
 msgstr "Siap mencoba Paradev?"
-
-msgid "Ready-made Devs. Get one for yourself, or add one to a group."
-msgstr "Dev siap pakai. Dapatkan satu untuk Anda, atau tambahkan ke grup."
 
 msgid "Reapply all commits"
 msgstr "Terapkan ulang semua commit"
