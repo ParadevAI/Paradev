@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 export type V2NotificationPaneLike = Pick<Pane<unknown>, "kind" | "data">;
-export type V2NotificationTabLike = Pick<Tab<unknown>, "panes">;
+type V2NotificationTabLike = Pick<Tab<unknown>, "panes">;
 
 export type V2NotificationSource = { type: "terminal"; id: string };
 
@@ -21,7 +21,7 @@ export type V2NotificationSourceInput =
  * facts stored here are about the user, not the agents:
  * manual unread marks and per-terminal seen timestamps.
  */
-export interface V2NotificationState {
+interface V2NotificationState {
 	/** Workspaces manually marked unread from the sidebar. */
 	manualUnread: Record<string, true>;
 	/**
@@ -166,7 +166,7 @@ export function getV2NotificationSourceKey(
 	return `${source.type}:${source.id}`;
 }
 
-export function getV2TerminalNotificationSource(
+function getV2TerminalNotificationSource(
 	terminalId: string,
 ): V2NotificationSource {
 	return { type: "terminal", id: terminalId };

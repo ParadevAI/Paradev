@@ -32,7 +32,7 @@ function rangeSide(
 	return "mixed";
 }
 
-export interface DiffCommentSubmitInput {
+interface DiffCommentSubmitInput {
 	comment: string;
 	target: AgentTarget;
 }

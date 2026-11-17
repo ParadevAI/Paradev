@@ -239,7 +239,7 @@ interface PromptTransportToggleProps {
 
 const TRANSPORT_OPTIONS: readonly PromptTransport[] = ["argv", "stdin"];
 
-export function PromptTransportToggle({
+function PromptTransportToggle({
 	value,
 	onChange,
 }: PromptTransportToggleProps) {

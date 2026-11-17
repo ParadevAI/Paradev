@@ -9,7 +9,7 @@ import { usePlaceWorktreesInSidebar } from "./hooks/usePlaceWorktreesInSidebar";
  */
 export function AgentHooks() {
 	const { activeHostUrl, activeOrganizationId } = useLocalHostService();
-	// Seeds the default v2 terminal presets and warms the local host's agent
+	// Seeds the default terminal presets and warms the local host's agent
 	// config cache for Settings.
 	useDefaultV2TerminalPresets(activeHostUrl);
 	useCliTerminalScriptImport(activeOrganizationId);

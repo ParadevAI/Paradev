@@ -23,7 +23,7 @@ export function selectWorkspaceCreationPresetIds(
 /**
  * Queue the project's creation presets on a freshly created workspace's
  * local-state row. Presets are a renderer localStorage collection the host
- * can't read, so they run on the v2 workspace page's first open (see
+ * can't read, so they run on the workspace page's first open (see
  * useRunWorkspaceCreationPresets) rather than inside the host's create.
  * Ensures the row exists first, mirroring appendPendingMigratedTerminals.
  */

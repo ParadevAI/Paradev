@@ -1,1 +1,1 @@
-export { useViewedFiles, type ViewedFilesApi } from "./useViewedFiles";
+export { useViewedFiles } from "./useViewedFiles";

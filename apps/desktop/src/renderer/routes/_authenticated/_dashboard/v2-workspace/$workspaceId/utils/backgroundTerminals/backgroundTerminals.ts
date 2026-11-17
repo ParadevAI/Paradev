@@ -19,7 +19,7 @@ interface WorkspaceTabLike {
 	panes: Record<string, TerminalPaneLike>;
 }
 
-export interface BackgroundTerminalSessionLike {
+interface BackgroundTerminalSessionLike {
 	terminalId: string;
 	createdAt?: number;
 }

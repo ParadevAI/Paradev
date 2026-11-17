@@ -15,7 +15,7 @@ interface RecentFileInput {
 	absolutePath: string;
 }
 
-export interface RecentlyViewedFilesApi {
+interface RecentlyViewedFilesApi {
 	recentFiles: RecentFile[];
 	recordView: (file: RecentFileInput) => void;
 }

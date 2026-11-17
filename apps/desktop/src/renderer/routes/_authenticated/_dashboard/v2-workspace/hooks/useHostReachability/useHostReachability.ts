@@ -18,7 +18,7 @@ import { getHostEventBus } from "renderer/lib/host-event-bus";
  */
 const DEGRADED_GRACE_MS = 2_000;
 
-export interface HostReachability {
+interface HostReachability {
 	/** Down long enough to show a non-blocking notice. */
 	isDegraded: boolean;
 	/** The relay definitively rejected access; report this without a grace period. */

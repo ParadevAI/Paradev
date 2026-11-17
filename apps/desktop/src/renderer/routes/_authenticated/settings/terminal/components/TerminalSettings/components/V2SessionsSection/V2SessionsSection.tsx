@@ -1,9 +1,9 @@
-// V2 Settings → Terminal → Manage daemon section.
+// Settings → Terminal → Manage daemon section.
 //
 // Talks to host-service's `terminal.daemon` namespace — the supervisor
 // that owns pty-daemon's lifecycle lives there, not in desktop main.
 // What's *not* duplicated from v1: kill-all-sessions, clear-history,
-// per-row kill. Restart already achieves the kill-all effect for v2;
+// per-row kill. Restart already achieves the kill-all effect;
 // scrollback is owned per-session by the daemon's ring buffer with no
 // disk persistence; per-row kill belongs in the renderer's pane controls.
 //

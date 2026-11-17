@@ -6,7 +6,7 @@ import { stripTrailingSlash } from "renderer/lib/pierreTree";
 
 export { stripTrailingSlash };
 
-export function toPosix(p: string): string {
+function toPosix(p: string): string {
 	return p.replace(/\\/g, "/");
 }
 

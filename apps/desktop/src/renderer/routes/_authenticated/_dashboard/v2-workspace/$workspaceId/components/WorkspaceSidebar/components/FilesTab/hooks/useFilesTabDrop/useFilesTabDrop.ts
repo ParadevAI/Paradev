@@ -46,7 +46,7 @@ export interface FilesTabDropTarget {
 	rect: DropRowRect | null;
 }
 
-export interface FilesTabDrop {
+interface FilesTabDrop {
 	/** Non-null while an external file drag hovers the tree. */
 	dropTarget: FilesTabDropTarget | null;
 	onDragOver(e: React.DragEvent<HTMLDivElement>): void;
@@ -247,7 +247,7 @@ async function flattenEntries(
 }
 
 /**
- * Drag-and-drop file upload for the v2 Files tab. Dropping OS files/folders onto
+ * Drag-and-drop file upload for the Files tab. Dropping OS files/folders onto
  * a folder row writes them into that folder (onto a file row → its parent, onto
  * empty space → the worktree root), preserving any nested folder structure.
  * Each file's bytes are read in the renderer and written via

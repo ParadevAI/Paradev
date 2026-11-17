@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { FileAutoSaveMode, FileOpenMode } from "@superset/local-db";
+import type { FileAutoSaveMode } from "@superset/local-db";
 import { Label } from "@superset/ui/label";
 import {
 	Select,
@@ -39,33 +39,10 @@ export function FilesSettings({ visibleItems }: FilesSettingsProps) {
 
 	const searchQuery = useSettingsSearchQuery();
 	const utils = electronTrpc.useUtils();
-	const showFileOpenMode = isItemVisible(
-		SETTING_ITEM_ID.BEHAVIOR_FILE_OPEN_MODE,
-		visibleItems,
-	);
 	const showFileAutoSave = isItemVisible(
 		SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE,
 		visibleItems,
 	);
-	const { data: fileOpenMode, isLoading: isFileOpenModeLoading } =
-		electronTrpc.settings.getFileOpenMode.useQuery();
-	const setFileOpenMode = electronTrpc.settings.setFileOpenMode.useMutation({
-		onMutate: async ({ mode }) => {
-			await utils.settings.getFileOpenMode.cancel();
-			const previous = utils.settings.getFileOpenMode.getData();
-			utils.settings.getFileOpenMode.setData(undefined, mode);
-			return { previous };
-		},
-		onError: (_err, _vars, context) => {
-			if (context?.previous !== undefined) {
-				utils.settings.getFileOpenMode.setData(undefined, context.previous);
-			}
-		},
-		onSettled: () => {
-			utils.settings.getFileOpenMode.invalidate();
-		},
-	});
-
 	const { data: fileAutoSave, isLoading: isFileAutoSaveLoading } =
 		electronTrpc.settings.getFileAutoSave.useQuery();
 	const setFileAutoSave = electronTrpc.settings.setFileAutoSave.useMutation({
@@ -179,52 +156,11 @@ export function FilesSettings({ visibleItems }: FilesSettingsProps) {
 						</div>
 					</section>
 				)}
-				{(showFileOpenMode || showSidebar || showFile) && (
+				{(showSidebar || showFile) && (
 					<section className="space-y-6">
 						<h3 className="text-sm font-medium text-muted-foreground">
 							<Trans>Opening files</Trans>
 						</h3>
-						{showFileOpenMode && (
-							<div className="flex items-center justify-between">
-								<div className="space-y-0.5">
-									<Label
-										htmlFor="file-open-mode"
-										className="text-sm font-medium"
-									>
-										<HighlightText
-											text={t({
-												message: "File open mode",
-											})}
-											query={searchQuery}
-										/>
-									</Label>
-									<p className="text-xs text-muted-foreground">
-										<Trans>
-											Choose how files open when no preview pane exists
-										</Trans>
-									</p>
-								</div>
-								<Select
-									value={fileOpenMode ?? "split-pane"}
-									onValueChange={(value) =>
-										setFileOpenMode.mutate({ mode: value as FileOpenMode })
-									}
-									disabled={isFileOpenModeLoading || setFileOpenMode.isPending}
-								>
-									<SelectTrigger id="file-open-mode" className="w-[180px]">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="split-pane">
-											<Trans>Split pane</Trans>
-										</SelectItem>
-										<SelectItem value="new-tab">
-											<Trans>New tab</Trans>
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						)}
 						{showSidebar && (
 							<LinkTierMapper
 								title={t({

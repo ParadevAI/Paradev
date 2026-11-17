@@ -6,7 +6,7 @@
  * URI if decoding/encoding fails.
  */
 /** Icons render small; clamp uploads to this square bound before storing. */
-export const MAX_ICON_DIMENSION = 128;
+const MAX_ICON_DIMENSION = 128;
 
 export async function resizeImageDataUrl(
 	dataUrl: string,

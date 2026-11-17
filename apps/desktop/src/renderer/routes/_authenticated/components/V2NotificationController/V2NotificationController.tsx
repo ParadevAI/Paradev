@@ -1,26 +1,21 @@
 import type { WorkspaceState } from "@superset/panes";
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import { useLiveQuery } from "@tanstack/react-db";
-import { useEffectEvent, useMemo } from "react";
+import { useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
-import { electronTrpc } from "renderer/lib/electron-trpc";
-import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
 import { useVisibleSidebarWorkspaceIds } from "renderer/routes/_authenticated/hooks/useVisibleSidebarWorkspaceIds";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
-import { NOTIFICATION_EVENTS } from "shared/constants";
-import type { AgentLifecycleEvent } from "shared/notification-types";
 import {
 	HostNotificationSubscriber,
 	type HostNotificationWorkspaceState,
 } from "./components/HostNotificationSubscriber";
 import { getNotificationWorkspaceName } from "./lib/getNotificationWorkspaceName";
-import { markV2AgentLifecycleTargetSeen } from "./lib/lifecycleEvents";
 
 interface WorkspaceHostRow {
 	workspaceId: string;
@@ -37,24 +32,8 @@ interface HostNotificationSubscriberGroup {
 	workspaces: HostNotificationWorkspaceState[];
 }
 
-type ElectronNotificationEventName =
-	(typeof NOTIFICATION_EVENTS)[keyof typeof NOTIFICATION_EVENTS];
-
-type ElectronNotificationEvent =
-	| {
-			type: typeof NOTIFICATION_EVENTS.AGENT_LIFECYCLE;
-			data?: AgentLifecycleEvent;
-	  }
-	| {
-			type: Exclude<
-				ElectronNotificationEventName,
-				typeof NOTIFICATION_EVENTS.AGENT_LIFECYCLE
-			>;
-			data?: unknown;
-	  };
-
 /**
- * Mounts one v2 notification listener per host-service URL so backgrounded
+ * Mounts one notification listener per host-service URL so backgrounded
  * workspaces update their sidebar status indicator and play the finish sound.
  * Sibling to `AgentHooks`; rendered at the authenticated layout level.
  *
@@ -138,53 +117,6 @@ export function V2NotificationController() {
 			}),
 		[workspaceHosts, workspaceStatesById, machineId, activeHostUrl, relayUrl],
 	);
-
-	const handleElectronAgentLifecycle = useEffectEvent(
-		(event: ElectronNotificationEvent) => {
-			if (event.type !== NOTIFICATION_EVENTS.AGENT_LIFECYCLE) return;
-			const data = event.data;
-			if (!data?.workspaceId || !data.terminalId) return;
-			const workspace = workspaceStatesById.get(data.workspaceId);
-			if (!workspace) return;
-
-			// Adopted shells keep their launch-time host-service hook URL. When
-			// that URL is stale, the Electron fallback still has terminal context.
-			const eventType =
-				data.eventType === "PendingQuestion"
-					? "PermissionRequest"
-					: data.eventType;
-			markV2AgentLifecycleTargetSeen({
-				workspaceId: data.workspaceId,
-				payload: {
-					eventType,
-					terminalId: data.terminalId,
-					occurredAt: Date.now(),
-				},
-				paneLayout: workspace.paneLayout,
-				rightPaneLayout: workspace.rightPaneLayout,
-			});
-
-			// Statuses derive from host bindings, so the host must hear the
-			// event too; the binding for an adopted agent persists host-side.
-			if (activeHostUrl) {
-				getHostServiceClientByUrl(activeHostUrl)
-					.notifications.hook.mutate({
-						terminalId: data.terminalId,
-						eventType,
-					})
-					.catch((error) => {
-						console.warn(
-							"[notifications] failed to forward lifecycle event to host:",
-							error,
-						);
-					});
-			}
-		},
-	);
-
-	electronTrpc.notifications.subscribe.useSubscription(undefined, {
-		onData: handleElectronAgentLifecycle,
-	});
 
 	return (
 		<>

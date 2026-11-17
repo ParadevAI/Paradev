@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import type { useNavigate } from "@tanstack/react-router";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
-import { useNewWorkspaceModalStore } from "renderer/stores/new-workspace-modal";
 import {
 	openNewSession,
 	openNewWorkspace,
@@ -11,14 +10,12 @@ import {
 const navigate = mock(() => Promise.resolve());
 const MACHINE_ID = "this-machine";
 const v2 = {
-	isV2CloudEnabled: true,
 	machineId: MACHINE_ID,
 	navigate: navigate as unknown as ReturnType<typeof useNavigate>,
 };
 
 function resetStores() {
 	useNewWorkspaceDraftStore.getState().resetDraft();
-	useNewWorkspaceModalStore.getState().closeModal();
 }
 
 beforeEach(() => {
@@ -82,18 +79,6 @@ test("session handoff re-selects the session when the URL already asks for it", 
 	expect(useNewWorkspaceDraftStore.getState()).toMatchObject({
 		isSession: true,
 		selectedProjectId: null,
-	});
-});
-
-test("v1 local project handoff still opens the project modal", () => {
-	openNewWorkspaceForLocalProject(
-		{ ...v2, isV2CloudEnabled: false },
-		"v1-project",
-	);
-	expect(navigate).not.toHaveBeenCalled();
-	expect(useNewWorkspaceModalStore.getState()).toMatchObject({
-		isOpen: true,
-		preSelectedProjectId: "v1-project",
 	});
 });
 

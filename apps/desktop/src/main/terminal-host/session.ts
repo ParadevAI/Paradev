@@ -109,7 +109,7 @@ type SpawnProcess = (
 // Types
 // =============================================================================
 
-export interface SessionOptions {
+interface SessionOptions {
 	sessionId: string;
 	workspaceId: string;
 	paneId: string;
@@ -128,7 +128,7 @@ export interface SessionOptions {
 	killProcessTree?: (pid: number, signal: string) => Promise<void>;
 }
 
-export interface AttachedClient {
+interface AttachedClient {
 	socket: Socket;
 	attachedAt: number;
 	attachToken: symbol;

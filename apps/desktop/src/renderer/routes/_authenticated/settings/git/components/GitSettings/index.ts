@@ -1,1 +1,0 @@
-export { GitSettings } from "./GitSettings";

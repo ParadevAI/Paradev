@@ -1,4 +1,4 @@
-export interface FrontMatterSplit {
+interface FrontMatterSplit {
 	/** Verbatim front-matter block including its closing delimiter line. */
 	frontMatter: string;
 	body: string;

@@ -13,7 +13,7 @@ import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
-export type RemoteHostStatus =
+type RemoteHostStatus =
 	| { status: "skip" }
 	| { status: "loading" }
 	| {

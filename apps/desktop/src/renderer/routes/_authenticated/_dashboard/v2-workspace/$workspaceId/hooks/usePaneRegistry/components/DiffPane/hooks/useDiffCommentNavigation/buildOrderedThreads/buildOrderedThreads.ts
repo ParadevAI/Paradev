@@ -1,7 +1,7 @@
 import type { CodeViewItem, SelectionSide } from "@pierre/diffs";
 import type { DiffAnnotationMetadata } from "../../useDiffAnnotations";
 
-export interface OrderedDiffThread {
+interface OrderedDiffThread {
 	threadId: string;
 	itemId: string;
 	/** Binary placeholders are `file` items — navigated with an item scroll

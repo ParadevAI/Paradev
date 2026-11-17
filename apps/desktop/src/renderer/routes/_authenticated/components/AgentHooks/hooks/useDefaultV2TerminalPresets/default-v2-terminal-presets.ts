@@ -3,7 +3,7 @@ import { getPresetById } from "@superset/shared/host-agent-presets";
 import { getAgentCommandText } from "renderer/lib/agent-launch-command";
 import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 
-export const DEFAULT_V2_TERMINAL_PRESET_IDS = [
+const DEFAULT_V2_TERMINAL_PRESET_IDS = [
 	"claude",
 	"codex",
 	"opencode",
