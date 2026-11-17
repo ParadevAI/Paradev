@@ -97,6 +97,7 @@ export function AcpChatPane({
 	onNewChat,
 	onModeChange,
 	onSessionCreated,
+	keepReplacement,
 	onSwitchAgent,
 	onOpenAgentChat,
 	onOpenForkedChat,
@@ -128,6 +129,8 @@ export function AcpChatPane({
 	onQueuePrompt: (content: UserContent[]) => void;
 	onRestoreQueuedPrompts: (prompts: UserContent[][]) => void;
 	onSessionCreated: (sessionId: string, pendingPrompt?: string) => void;
+	/** Moves the pane onto a replacement left mid-recovery; false when the pane no longer shows `replaced`. */
+	keepReplacement?: (replaced: string, replacement: string) => boolean;
 	onModeChange?: (modeId: string) => void;
 	onSessionInfo: (info: SessionInfo) => void;
 	onOpenFile?: OpenFile;
@@ -167,9 +170,13 @@ export function AcpChatPane({
 		replacement,
 		hold: holdReplacement,
 		release: releaseReplacement,
-	} = useReplacementSession((orphan) => {
+	} = useReplacementSession((leftBehind) => {
+		if (sessionId && keepReplacement?.(sessionId, leftBehind)) {
+			carryReaderPosition(sessionId, leftBehind);
+			return;
+		}
 		void wiring.transport
-			.closeSession({ sessionId: orphan })
+			.closeSession({ sessionId: leftBehind })
 			.catch(() => undefined);
 	});
 
