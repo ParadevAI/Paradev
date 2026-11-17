@@ -18,8 +18,8 @@ import { useFocusVisible } from "renderer/hooks/useFocusVisible";
 import { HotkeyLabel } from "renderer/hotkeys";
 import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
@@ -273,7 +273,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 					)}
 
 					{creatorDevId && (
-						<FaceAvatar seed={creatorDevId} size={16} className="mr-2" />
+						<DevFace devId={creatorDevId} size={16} className="mr-2" />
 					)}
 
 					{pinnedContext && (

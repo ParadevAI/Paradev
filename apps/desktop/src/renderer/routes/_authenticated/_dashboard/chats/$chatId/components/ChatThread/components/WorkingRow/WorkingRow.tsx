@@ -5,7 +5,7 @@ import {
 	type LiveTurns,
 	toolRunning,
 } from "@superset/chats-sync";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { TurnBlocks } from "../../../TurnBlocks";
 import { WorkingLine } from "../../../TurnBlocks/components/WorkingLine";
 
@@ -37,7 +37,7 @@ export function WorkingRow({ state, live, turn, isGroup }: WorkingRowProps) {
 		>
 			{isGroup && (
 				<div className="mr-2 flex w-6 shrink-0 items-end">
-					<FaceAvatar seed={turn.devId} size={24} />
+					<DevFace devId={turn.devId} size={24} />
 				</div>
 			)}
 			<div className="flex max-w-[70%] min-w-0 flex-col items-start">

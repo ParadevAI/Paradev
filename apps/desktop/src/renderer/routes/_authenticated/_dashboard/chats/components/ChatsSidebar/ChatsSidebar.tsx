@@ -125,6 +125,7 @@ export function ChatsSidebar() {
 					chats.actions.createAgent({ ...dev, color: DEFAULT_COLOR })
 				}
 				onCreated={open}
+				onBrowse={() => void navigate({ to: "/chats/devs" })}
 			/>
 		</>
 	);

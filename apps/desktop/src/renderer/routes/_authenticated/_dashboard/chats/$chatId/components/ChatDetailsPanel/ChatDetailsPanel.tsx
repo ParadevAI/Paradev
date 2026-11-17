@@ -8,7 +8,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { LuPencil, LuX } from "react-icons/lu";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
 import { ChatFace } from "../../../components/ChatFace";
 import { useChats } from "../../../hooks/useChats";
@@ -118,7 +118,7 @@ export function ChatDetailsPanel({
 							key={agent.id}
 							className="flex items-center gap-2.5 rounded-lg px-1 py-1"
 						>
-							<FaceAvatar seed={agent.id} size={28} />
+							<DevFace devId={agent.id} size={28} />
 							<div className="min-w-0 flex-1">
 								<div className="truncate text-sm font-medium">{agent.name}</div>
 								{agent.description && (
@@ -138,6 +138,19 @@ export function ChatDetailsPanel({
 									<Trans>Remove</Trans>
 								</Button>
 							)}
+							{isGroup &&
+								agent.kind === "added" &&
+								(chat.devAddedBy?.[agent.id] === state.meId || isOwner) && (
+									<Button
+										size="xs"
+										variant="ghost"
+										onClick={() =>
+											void chats?.actions.removeAddedDev(chat.id, agent.id)
+										}
+									>
+										<Trans>Remove</Trans>
+									</Button>
+								)}
 							{agent.descriptionText !== undefined && (
 								<button
 									type="button"
@@ -150,6 +163,21 @@ export function ChatDetailsPanel({
 							)}
 						</div>
 					))}
+					{isGroup && (
+						<Button
+							size="xs"
+							variant="outline"
+							className="mt-1 self-start"
+							onClick={() =>
+								void navigate({
+									to: "/chats/devs",
+									search: { groupId: chat.id },
+								})
+							}
+						>
+							<Trans>Add a ready-made Dev</Trans>
+						</Button>
+					)}
 				</section>
 				{addableDevs.length > 0 && (
 					<section className="flex flex-col gap-1">
@@ -167,7 +195,7 @@ export function ChatDetailsPanel({
 								key={dev.id}
 								className="flex items-center gap-2.5 rounded-lg px-1 py-1"
 							>
-								<FaceAvatar seed={dev.id} size={28} />
+								<DevFace devId={dev.id} size={28} />
 								<span className="min-w-0 flex-1 truncate text-sm">
 									{dev.name}
 								</span>

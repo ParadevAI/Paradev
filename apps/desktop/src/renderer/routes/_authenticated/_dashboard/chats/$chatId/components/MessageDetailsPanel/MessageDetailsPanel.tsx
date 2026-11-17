@@ -10,7 +10,7 @@ import {
 import { formatDateTime } from "@superset/i18n/format";
 import { type ReactNode, useEffect, useState } from "react";
 import { LuLoaderCircle, LuX } from "react-icons/lu";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { TurnBlocks } from "../TurnBlocks";
 
 interface MessageDetailsPanelProps {
@@ -88,7 +88,7 @@ export function MessageDetailsPanel({
 				<dl className="grid grid-cols-[72px_1fr] items-start gap-x-3 gap-y-2.5 text-[13px]">
 					<Row label={t({ message: "From" })}>
 						<span className="flex items-center gap-1.5">
-							{dev && <FaceAvatar seed={dev.id} size={16} />}
+							{dev && <DevFace devId={dev.id} size={16} />}
 							{dev?.name ?? person}
 						</span>
 					</Row>

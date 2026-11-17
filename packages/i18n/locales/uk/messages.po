@@ -1767,6 +1767,9 @@ msgstr "Хмарний робочий простір не може виклик�
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Видалення {workspaceName} уже триває."
 
+msgid "A Dev of your own, with its 1:1"
+msgstr "Ваш власний Dev з особистим чатом"
+
 msgid "A falsifiable rubric for the self-driving software factory: six levels of autonomy, the measurable gates between them, and a forecast for how far 2026 gets us."
 msgstr "Перевірювана шкала для самокерованої програмної фабрики: шість рівнів автономності, вимірювані пороги між ними й прогноз того, як далеко ми просунемося у 2026 році."
 
@@ -2050,6 +2053,9 @@ msgstr "Додайте проєкт, щоб бачити issues з GitHub."
 msgid "Add a project to see pull requests."
 msgstr "Додайте проєкт, щоб бачити пул-реквести."
 
+msgid "Add a ready-made Dev"
+msgstr "Додати готового Dev"
+
 msgid "Add a short summary…"
 msgstr "Додайте короткий опис…"
 
@@ -2206,6 +2212,10 @@ msgstr "Повернути промпт /automation у ваше повідомл
 
 msgid "Add this label"
 msgstr "Додати цю мітку"
+
+#. placeholder {0}: choice.title
+msgid "Add to {0}"
+msgstr "Додати до {0}"
 
 msgid "Add to Dictionary"
 msgstr "Додати до словника"
@@ -2679,11 +2689,17 @@ msgstr "Уже перенесено в іншу організацію. Пере
 msgid "Already brought over to another organization. Switch to it to see this workspace."
 msgstr "Уже перенесено в іншу організацію. Перейдіть до неї, щоб побачити цей робочий простір."
 
+msgid "Already has {MAX_ADDED} added Devs"
+msgstr "Уже додано {MAX_ADDED} Dev"
+
 msgid "Already have an account? <0>Sign in</0>"
 msgstr "Уже маєте обліковий запис? <0>Увійдіть</0>"
 
 msgid "Already in tasks"
 msgstr "Уже в завданнях"
+
+msgid "Already in this group"
+msgstr "Уже в цій групі"
 
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Також доступний як CommandDialog для палітр ⌘K"
@@ -3740,6 +3756,9 @@ msgstr "Переглядайте плагіни Paradev, спільні теми
 
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Переглядайте файли тем Paradev від спільноти, зокрема GitHub Dark Colorblind, Catppuccin, Ember і One Dark Pro."
+
+msgid "Browse ready-made Devs"
+msgstr "Переглянути готових Dev"
 
 msgid "Browse the plugins every Paradev agent can use, and submit your own."
 msgstr "Переглядайте плагіни, які може використовувати будь-який агент Paradev, і надсилайте власні."
@@ -6142,6 +6161,12 @@ msgstr "Не вдалося завантажити коментарі рев'ю"
 msgid "Couldn't load runs"
 msgstr "Не вдалося завантажити запуски"
 
+msgid "Couldn't load the Devs."
+msgstr "Не вдалося завантажити список Dev."
+
+msgid "Couldn't load this Dev."
+msgstr "Не вдалося завантажити цього Dev."
+
 msgid "Couldn't load this run's payload."
 msgstr "Не вдалося завантажити дані цього запуску."
 
@@ -8076,6 +8101,9 @@ msgstr "Усі бачать нові версії одразу після пуб
 msgid "Everyone stays on v{sharedVersion} until you change this"
 msgstr "Усі залишаються на v{sharedVersion}, доки ви цього не зміните"
 
+msgid "Everyone there can ask it"
+msgstr "Будь-хто там може поставити йому запитання"
+
 msgid "Everyone with access to this organization."
 msgstr "Усі, хто має доступ до цієї організації."
 
@@ -9117,6 +9145,12 @@ msgstr "Щоб пов'язати проєкт, відкрийте засіб і�
 msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
 msgstr "Щоб повідомити про помилку чи запропонувати функцію, найшвидше створити issue на <0>{githubHandle}</0>. Наша спільнота живе в <1>Discord</1>, а новини ми публікуємо в <2>X ({xHandle})</2> і <3>LinkedIn</3>."
 
+msgid "For groups"
+msgstr "Для груп"
+
+msgid "For groups or you"
+msgstr "Для груп або для вас"
+
 msgid "For individuals getting started"
 msgstr "Для тих, хто починає самостійно"
 
@@ -9143,6 +9177,9 @@ msgstr "Для команд, які запускають агентів щодн
 
 msgid "For teams that run more agents in the cloud"
 msgstr "Для команд, які запускають більше агентів у хмарі"
+
+msgid "For you"
+msgstr "Для вас"
 
 msgid "Force merge"
 msgstr "Примусово злити"
@@ -9375,6 +9412,14 @@ msgstr "Генерування..."
 
 msgid "Generating…"
 msgstr "Генерування…"
+
+msgctxt "get a ready-made Dev"
+msgid "Get"
+msgstr "Отримати"
+
+#. placeholder {0}: name.trim() || card.name
+msgid "Get {0}"
+msgstr "Отримати {0}"
 
 msgid "Get {plan}"
 msgstr "Оформити {plan}"
@@ -10689,6 +10734,9 @@ msgstr "Його коментарі та історію буде видален�
 
 msgid "Its connected accounts were disconnected."
 msgstr "Його підключені облікові записи від'єднано."
+
+msgid "Its instructions"
+msgstr "Його інструкції"
 
 msgid "Its own branch and copy of the files"
 msgstr "Власна гілка й власна копія файлів"
@@ -12257,6 +12305,9 @@ msgstr "Потрібна інтеграція на рівні застосунк
 msgid "Need live chat/tool-call state (ToolUIPart, streams) or an app shell"
 msgstr "Потрібен поточний стан чату чи викликів інструментів (ToolUIPart, потоки) або оболонка застосунку"
 
+msgid "Needs"
+msgstr "Потрібно"
+
 msgid "Needs a retry"
 msgstr "Потрібна повторна спроба"
 
@@ -12680,11 +12731,18 @@ msgstr "Опис не надано."
 msgid "No desktop session is running in this sandbox."
 msgstr "У цій пісочниці не запущено жодного десктопного сеансу."
 
+#. placeholder {0}: query.trim()
+msgid "No Dev matches “{0}”."
+msgstr "Немає Dev, що відповідають «{0}»."
+
 msgid "No device is running."
 msgstr "Жоден пристрій не запущено."
 
 msgid "No devices yet"
 msgstr "Пристроїв ще немає"
+
+msgid "No Devs here yet."
+msgstr "Тут поки немає Dev."
 
 msgid "No Devs yet"
 msgstr "Devs ще немає"
@@ -13329,6 +13387,9 @@ msgstr "Нічого не потребує повторної спроби"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "За останні 30 днів ще нічого не опубліковано. Ваше місце з'явиться, щойно синхронізується використання з цього комп'ютера; публікація від імені <0>{handle}</0>."
+
+msgid "Nothing to connect: it works on its own."
+msgstr "Підключати нічого: він працює сам."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Поки що нічого відкривати. Спершу надішліть повідомлення."
@@ -14145,6 +14206,9 @@ msgstr "Відмовитися"
 
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Комбінації з клавішею Option можуть заважати введенню спеціальних символів"
+
+msgid "optional"
+msgstr "необов'язково"
 
 msgid "Optional"
 msgstr "Необов'язково"
@@ -15843,6 +15907,9 @@ msgstr "Готово до злиття"
 msgid "Ready to try Paradev?"
 msgstr "Готові спробувати Paradev?"
 
+msgid "Ready-made Devs. Get one for yourself, or add one to a group."
+msgstr "Готові Dev. Візьміть одного собі або додайте до групи."
+
 msgid "Reapply all commits"
 msgstr "Повторно застосувати всі коміти"
 
@@ -17320,6 +17387,9 @@ msgstr "Пошук розробників"
 msgid "Search developers by handle or name"
 msgstr "Пошук розробників за нікнеймом або ім'ям"
 
+msgid "Search Devs"
+msgstr "Пошук Dev"
+
 msgid "Search docs..."
 msgstr "Пошук у документації..."
 
@@ -18088,6 +18158,9 @@ msgstr "Показувати мікрофон у полі введення ча�
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Показувати кнопку «Використання» на бічній панелі головного екрана під «Пул-реквестами»"
+
+msgid "Show all"
+msgstr "Показати все"
 
 msgid "Show all {count}"
 msgstr "Показати всі ({count})"
@@ -21066,6 +21139,9 @@ msgstr "Спробувати"
 msgid "Try now"
 msgstr "Спробувати зараз"
 
+msgid "Try saying"
+msgstr "Спробуйте сказати"
+
 msgid "Tufte"
 msgstr "Tufte"
 
@@ -22180,6 +22256,9 @@ msgstr "Що таке Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Що не так?"
 
+msgid "What it does"
+msgstr "Що він робить"
+
 msgid "What it does, and how you want it to work"
 msgstr "Що він робить і як має працювати"
 
@@ -22260,6 +22339,9 @@ msgstr "Яке ваше місце в рейтингу?"
 
 msgid "Where does my code run?"
 msgstr "Де виконується мій код?"
+
+msgid "Where it goes"
+msgstr "Куди додати"
 
 msgid "Where serious teams are"
 msgstr "Де зараз серйозні команди"
@@ -22627,6 +22709,9 @@ msgstr "Ви"
 msgid "YOU"
 msgstr "ВИ"
 
+msgid "You already have it"
+msgstr "Він у вас уже є"
+
 msgid "You appear to be offline"
 msgstr "Схоже, ви офлайн"
 
@@ -22892,6 +22977,9 @@ msgstr "Ваша організація досягла ліміту середо
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."
+
+msgid "Your Paradev access"
+msgstr "Ваш доступ до Paradev"
 
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."

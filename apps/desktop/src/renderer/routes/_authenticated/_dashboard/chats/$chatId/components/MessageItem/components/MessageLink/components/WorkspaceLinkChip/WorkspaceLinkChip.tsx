@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { LuFolderGit2 } from "react-icons/lu";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useMessageAuthorDevId } from "../../../../providers/MessageAuthorDevProvider";
@@ -42,7 +42,7 @@ export function WorkspaceLinkChip({
 			className="my-0.5 inline-flex max-w-full items-center gap-2 rounded-lg bg-background/50 py-1 pr-2.5 pl-1.5 align-middle text-sm text-foreground no-underline transition-colors hover:bg-background/80"
 		>
 			{devId ? (
-				<FaceAvatar seed={devId} size={20} />
+				<DevFace devId={devId} size={20} />
 			) : (
 				<span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-foreground/10">
 					<LuFolderGit2 className="size-3" aria-hidden="true" />

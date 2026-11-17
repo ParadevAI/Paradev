@@ -20,6 +20,8 @@ interface NewDevDialogProps {
 		description: string;
 	}) => Promise<string | null>;
 	onCreated: (chatId: string) => void;
+	/** Opens the directory of ready-made Devs. */
+	onBrowse: () => void;
 }
 
 export function NewDevDialog({
@@ -27,6 +29,7 @@ export function NewDevDialog({
 	onOpenChange,
 	onCreate,
 	onCreated,
+	onBrowse,
 }: NewDevDialogProps) {
 	const { t } = useLingui();
 	const [name, setName] = useState("");
@@ -83,6 +86,17 @@ export function NewDevDialog({
 					/>
 					<Button type="submit" disabled={!ready || isCreating}>
 						<Trans>Create a Dev</Trans>
+					</Button>
+					<Button
+						type="button"
+						variant="ghost"
+						className="text-muted-foreground"
+						onClick={() => {
+							onOpenChange(false);
+							onBrowse();
+						}}
+					>
+						<Trans>Browse ready-made Devs</Trans>
 					</Button>
 				</form>
 			</DialogContent>

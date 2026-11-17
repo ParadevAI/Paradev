@@ -144,6 +144,8 @@ export function useChatsStore(organizationId: string) {
 			files: createFileSends({ api, update, now: increasingNow() }),
 			fileLink: api.fileLink,
 			messageDetails: api.messageDetails,
+			registry: api.registry,
+			registryListing: api.registryListing,
 			typing: {
 				watch: createTypingWatch({ subscribe }),
 				reporter: createTypingReporter({ send: api.reportTyping }),

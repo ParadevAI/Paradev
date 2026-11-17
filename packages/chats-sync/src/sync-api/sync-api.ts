@@ -421,10 +421,16 @@ export function createSyncApi(baseUrl: string, token: string) {
 			target: InstallTarget,
 			timezone: string,
 			name?: string,
+			paradevAccess?: boolean,
 		) =>
 			call<InstalledListing>(`/registry/${encodeURIComponent(slug)}/install`, {
 				method: "POST",
-				body: { target, timezone, ...(name ? { name } : {}) },
+				body: {
+					target,
+					timezone,
+					...(name ? { name } : {}),
+					...(paradevAccess ? { paradevAccess } : {}),
+				},
 			}),
 		createInvite: (groupId: string) =>
 			call<{ id: string; inviteUrl: string; expiresAt: string }>(

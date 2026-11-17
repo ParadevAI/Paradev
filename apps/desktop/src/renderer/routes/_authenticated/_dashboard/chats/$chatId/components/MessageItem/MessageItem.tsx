@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
 import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
 import { QuestionCard } from "./components/QuestionCard";
@@ -114,7 +114,7 @@ export const MessageItem = memo(function MessageItem({
 				<div className="mr-2 flex w-6 shrink-0 items-end">
 					{last &&
 						(agent ? (
-							<FaceAvatar seed={agent.id} size={24} />
+							<DevFace devId={agent.id} size={24} />
 						) : (
 							<Avatar size="sm" fullName={author} image={null} />
 						))}

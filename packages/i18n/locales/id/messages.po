@@ -1773,6 +1773,9 @@ msgstr "Workspace cloud tidak bisa memanggil {path}. Lakukan dari klien tempat k
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Penghapusan untuk {workspaceName} sedang berlangsung."
 
+msgid "A Dev of your own, with its 1:1"
+msgstr "Dev milik Anda sendiri, dengan obrolan 1:1"
+
 msgid "A falsifiable rubric for the self-driving software factory: six levels of autonomy, the measurable gates between them, and a forecast for how far 2026 gets us."
 msgstr "Rubrik yang dapat difalsifikasi untuk pabrik perangkat lunak swakemudi: enam tingkat otonomi, gerbang terukur di antaranya, dan prakiraan sejauh mana 2026 membawa kita."
 
@@ -2056,6 +2059,9 @@ msgstr "Tambahkan proyek untuk melihat issue GitHub."
 msgid "Add a project to see pull requests."
 msgstr "Tambahkan proyek untuk melihat pull request."
 
+msgid "Add a ready-made Dev"
+msgstr "Tambahkan Dev siap pakai"
+
 msgid "Add a short summary…"
 msgstr "Tambahkan ringkasan singkat…"
 
@@ -2212,6 +2218,10 @@ msgstr "Tambahkan lagi prompt /automation ke pesan Anda?"
 
 msgid "Add this label"
 msgstr "Tambahkan label ini"
+
+#. placeholder {0}: choice.title
+msgid "Add to {0}"
+msgstr "Tambahkan ke {0}"
 
 msgid "Add to Dictionary"
 msgstr "Tambahkan ke Kamus"
@@ -2685,11 +2695,17 @@ msgstr "Sudah dipindahkan ke organisasi lain. Beralih ke organisasi itu untuk me
 msgid "Already brought over to another organization. Switch to it to see this workspace."
 msgstr "Sudah dipindahkan ke organisasi lain. Beralih ke organisasi itu untuk melihat workspace ini."
 
+msgid "Already has {MAX_ADDED} added Devs"
+msgstr "Sudah memiliki {MAX_ADDED} Dev tambahan"
+
 msgid "Already have an account? <0>Sign in</0>"
 msgstr "Sudah punya akun? <0>Masuk</0>"
 
 msgid "Already in tasks"
 msgstr "Sudah ada di tugas"
+
+msgid "Already in this group"
+msgstr "Sudah ada di grup ini"
 
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Tersedia juga sebagai CommandDialog untuk palet ⌘K"
@@ -3746,6 +3762,9 @@ msgstr "Jelajahi plugin Paradev, tema bersama, dan konfigurasi agen mendatang."
 
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Jelajahi berkas tema Paradev yang dibagikan komunitas, termasuk GitHub Dark Colorblind, Catppuccin, Ember, dan One Dark Pro."
+
+msgid "Browse ready-made Devs"
+msgstr "Jelajahi Dev siap pakai"
 
 msgid "Browse the plugins every Paradev agent can use, and submit your own."
 msgstr "Jelajahi plugin yang bisa digunakan setiap agen Paradev, dan kirimkan plugin Anda sendiri."
@@ -6148,6 +6167,12 @@ msgstr "Tidak bisa memuat komentar review"
 msgid "Couldn't load runs"
 msgstr "Tidak dapat memuat run"
 
+msgid "Couldn't load the Devs."
+msgstr "Tidak dapat memuat Dev."
+
+msgid "Couldn't load this Dev."
+msgstr "Tidak dapat memuat Dev ini."
+
 msgid "Couldn't load this run's payload."
 msgstr "Tidak dapat memuat payload run ini."
 
@@ -8082,6 +8107,9 @@ msgstr "Semua orang melihat versi baru begitu dipublikasikan"
 msgid "Everyone stays on v{sharedVersion} until you change this"
 msgstr "Semua orang tetap di v{sharedVersion} sampai Anda mengubahnya"
 
+msgid "Everyone there can ask it"
+msgstr "Semua orang di sana bisa bertanya kepadanya"
+
 msgid "Everyone with access to this organization."
 msgstr "Semua orang yang punya akses ke organisasi ini."
 
@@ -9123,6 +9151,12 @@ msgstr "Untuk proyek, buka importer untuk menautkannya."
 msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
 msgstr "Untuk laporan bug dan permintaan fitur, jalur tercepat adalah issue GitHub di <0>{githubHandle}</0>. Komunitas kami ada di <1>Discord</1>, dan kami memposting pembaruan di <2>X ({xHandle})</2> dan <3>LinkedIn</3>."
 
+msgid "For groups"
+msgstr "Untuk grup"
+
+msgid "For groups or you"
+msgstr "Untuk grup atau Anda"
+
 msgid "For individuals getting started"
 msgstr "Untuk perorangan yang baru memulai"
 
@@ -9149,6 +9183,9 @@ msgstr "Untuk tim yang menjalankan agen setiap hari"
 
 msgid "For teams that run more agents in the cloud"
 msgstr "Untuk tim yang menjalankan lebih banyak agen di cloud"
+
+msgid "For you"
+msgstr "Untuk Anda"
 
 msgid "Force merge"
 msgstr "Paksa merge"
@@ -9381,6 +9418,14 @@ msgstr "Membuat..."
 
 msgid "Generating…"
 msgstr "Membuat…"
+
+msgctxt "get a ready-made Dev"
+msgid "Get"
+msgstr "Dapatkan"
+
+#. placeholder {0}: name.trim() || card.name
+msgid "Get {0}"
+msgstr "Dapatkan {0}"
 
 msgid "Get {plan}"
 msgstr "Dapatkan {plan}"
@@ -10695,6 +10740,9 @@ msgstr "Komentar dan riwayatnya ikut terhapus."
 
 msgid "Its connected accounts were disconnected."
 msgstr "Akun yang terhubung telah diputuskan."
+
+msgid "Its instructions"
+msgstr "Instruksinya"
 
 msgid "Its own branch and copy of the files"
 msgstr "Branch dan salinan file tersendiri"
@@ -12263,6 +12311,9 @@ msgstr "Butuh perangkaian di level aplikasi (state form, data grafik, app shell)
 msgid "Need live chat/tool-call state (ToolUIPart, streams) or an app shell"
 msgstr "Butuh status chat/tool-call langsung (ToolUIPart, stream) atau app shell"
 
+msgid "Needs"
+msgstr "Membutuhkan"
+
 msgid "Needs a retry"
 msgstr "Perlu dicoba ulang"
 
@@ -12686,11 +12737,18 @@ msgstr "Tidak ada deskripsi."
 msgid "No desktop session is running in this sandbox."
 msgstr "Tidak ada sesi desktop yang berjalan di sandbox ini."
 
+#. placeholder {0}: query.trim()
+msgid "No Dev matches “{0}”."
+msgstr "Tidak ada Dev yang cocok dengan “{0}”."
+
 msgid "No device is running."
 msgstr "Tidak ada perangkat yang berjalan."
 
 msgid "No devices yet"
 msgstr "Belum ada perangkat"
+
+msgid "No Devs here yet."
+msgstr "Belum ada Dev di sini."
 
 msgid "No Devs yet"
 msgstr "Belum ada Dev"
@@ -13335,6 +13393,9 @@ msgstr "Tidak ada yang perlu dicoba ulang"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda muncul setelah penggunaan dari mesin ini tersinkron, dipublikasikan sebagai <0>{handle}</0>."
+
+msgid "Nothing to connect: it works on its own."
+msgstr "Tidak ada yang perlu dihubungkan: ia bekerja sendiri."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Belum ada yang bisa dibuka. Kirim pesan dulu."
@@ -14151,6 +14212,9 @@ msgstr "Tolak"
 
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Pintasan Option bisa menghalangi pengetikan karakter khusus"
+
+msgid "optional"
+msgstr "opsional"
 
 msgid "Optional"
 msgstr "Opsional"
@@ -15849,6 +15913,9 @@ msgstr "Siap Di-merge"
 msgid "Ready to try Paradev?"
 msgstr "Siap mencoba Paradev?"
 
+msgid "Ready-made Devs. Get one for yourself, or add one to a group."
+msgstr "Dev siap pakai. Dapatkan satu untuk Anda, atau tambahkan ke grup."
+
 msgid "Reapply all commits"
 msgstr "Terapkan ulang semua commit"
 
@@ -17326,6 +17393,9 @@ msgstr "Cari pengembang"
 msgid "Search developers by handle or name"
 msgstr "Cari pengembang berdasarkan handle atau nama"
 
+msgid "Search Devs"
+msgstr "Cari Dev"
+
 msgid "Search docs..."
 msgstr "Cari dokumentasi..."
 
@@ -18094,6 +18164,9 @@ msgstr "Tampilkan mikrofon di kolom chat. Ucapan ditranskripsi oleh ChatGPT jika
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Tampilkan tombol Penggunaan di sidebar beranda, di bawah Pull request"
+
+msgid "Show all"
+msgstr "Tampilkan semua"
 
 msgid "Show all {count}"
 msgstr "Tampilkan semua {count}"
@@ -21072,6 +21145,9 @@ msgstr "Coba"
 msgid "Try now"
 msgstr "Coba sekarang"
 
+msgid "Try saying"
+msgstr "Coba katakan"
+
 msgid "Tufte"
 msgstr "Tufte"
 
@@ -22186,6 +22262,9 @@ msgstr "Apa itu Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Apa masalahnya?"
 
+msgid "What it does"
+msgstr "Yang dilakukannya"
+
 msgid "What it does, and how you want it to work"
 msgstr "Apa yang dilakukannya dan bagaimana Anda ingin ia bekerja"
 
@@ -22266,6 +22345,9 @@ msgstr "Di peringkat berapa Anda?"
 
 msgid "Where does my code run?"
 msgstr "Di mana kode saya berjalan?"
+
+msgid "Where it goes"
+msgstr "Ke mana ia ditempatkan"
 
 msgid "Where serious teams are"
 msgstr "Tempat tim serius berada"
@@ -22633,6 +22715,9 @@ msgstr "Anda"
 msgid "YOU"
 msgstr "ANDA"
 
+msgid "You already have it"
+msgstr "Anda sudah memilikinya"
+
 msgid "You appear to be offline"
 msgstr "Anda tampaknya sedang offline"
 
@@ -22898,6 +22983,9 @@ msgstr "Organisasi Anda telah mencapai batas lingkungan."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
+
+msgid "Your Paradev access"
+msgstr "Akses Paradev Anda"
 
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."

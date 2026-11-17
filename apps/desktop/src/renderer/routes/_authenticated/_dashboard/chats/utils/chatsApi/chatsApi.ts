@@ -31,6 +31,9 @@ export type ChatsApi = Pick<
 	| "fileLink"
 	| "watchToken"
 	| "answerQuestion"
+	| "registry"
+	| "registryListing"
+	| "installListing"
 	| "messageDetails"
 >;
 
@@ -107,6 +110,18 @@ export function createChatsApi(
 			call(chats.answerQuestion.mutate({ questionId, ...body })) as ReturnType<
 				ChatsApi["answerQuestion"]
 			>,
+		registry: () => call(chats.registry.query()),
+		registryListing: (slug) => call(chats.registryListing.query({ slug })),
+		installListing: (slug, target, _timezone, name, paradevAccess) =>
+			call(
+				chats.installListing.mutate({
+					organizationId,
+					slug,
+					target,
+					name,
+					paradevAccess,
+				}),
+			) as ReturnType<ChatsApi["installListing"]>,
 		watchToken: (devId, groupId) =>
 			call(chats.watchToken.mutate({ devId, groupId })),
 		messageDetails: (messageId) =>

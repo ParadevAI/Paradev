@@ -1773,6 +1773,9 @@ msgstr "Workspace w chmurze nie może wywołać {path}. Zrób to z klienta, do k
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Usuwanie {workspaceName} jest już w toku."
 
+msgid "A Dev of your own, with its 1:1"
+msgstr "Twój własny Dev z rozmową 1:1"
+
 msgid "A falsifiable rubric for the self-driving software factory: six levels of autonomy, the measurable gates between them, and a forecast for how far 2026 gets us."
 msgstr "Falsyfikowalna skala dla samosterownej fabryki oprogramowania: sześć poziomów autonomii, mierzalne bramki między nimi i prognoza, jak daleko zaprowadzi nas rok 2026."
 
@@ -2056,6 +2059,9 @@ msgstr "Dodaj projekt, aby zobaczyć zgłoszenia GitHub."
 msgid "Add a project to see pull requests."
 msgstr "Dodaj projekt, aby zobaczyć pull requesty."
 
+msgid "Add a ready-made Dev"
+msgstr "Dodaj gotowego Deva"
+
 msgid "Add a short summary…"
 msgstr "Dodaj krótkie podsumowanie…"
 
@@ -2212,6 +2218,10 @@ msgstr "Dodać prompt /automation z powrotem do Twojej wiadomości?"
 
 msgid "Add this label"
 msgstr "Dodaj tę etykietę"
+
+#. placeholder {0}: choice.title
+msgid "Add to {0}"
+msgstr "Dodaj do {0}"
 
 msgid "Add to Dictionary"
 msgstr "Dodaj do słownika"
@@ -2685,11 +2695,17 @@ msgstr "Już przeniesiono do innej organizacji. Przełącz się na nią, aby zob
 msgid "Already brought over to another organization. Switch to it to see this workspace."
 msgstr "Już przeniesiono do innej organizacji. Przełącz się na nią, aby zobaczyć ten obszar roboczy."
 
+msgid "Already has {MAX_ADDED} added Devs"
+msgstr "Ma już {MAX_ADDED} dodanych Devów"
+
 msgid "Already have an account? <0>Sign in</0>"
 msgstr "Masz już konto? <0>Zaloguj się</0>"
 
 msgid "Already in tasks"
 msgstr "Już jest w zadaniach"
+
+msgid "Already in this group"
+msgstr "Już w tej grupie"
 
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "Dostępne też jako CommandDialog dla palet ⌘K"
@@ -3746,6 +3762,9 @@ msgstr "Przeglądaj wtyczki Paradev, udostępnione motywy i przyszłe konfigurac
 
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "Przeglądaj pliki motywów Paradev udostępnione przez społeczność, w tym GitHub Dark Colorblind, Catppuccin, Ember i One Dark Pro."
+
+msgid "Browse ready-made Devs"
+msgstr "Przeglądaj gotowe Devy"
 
 msgid "Browse the plugins every Paradev agent can use, and submit your own."
 msgstr "Przeglądaj wtyczki, z których może korzystać każdy agent Paradev, i zgłoś własną."
@@ -6148,6 +6167,12 @@ msgstr "Nie udało się wczytać komentarzy przeglądu"
 msgid "Couldn't load runs"
 msgstr "Nie udało się wczytać uruchomień"
 
+msgid "Couldn't load the Devs."
+msgstr "Nie udało się wczytać Devów."
+
+msgid "Couldn't load this Dev."
+msgstr "Nie udało się wczytać tego Deva."
+
 msgid "Couldn't load this run's payload."
 msgstr "Nie udało się wczytać ładunku tego uruchomienia."
 
@@ -8082,6 +8107,9 @@ msgstr "Wszyscy widzą nowe wersje w miarę ich publikowania"
 msgid "Everyone stays on v{sharedVersion} until you change this"
 msgstr "Wszyscy zostają na v{sharedVersion}, dopóki tego nie zmienisz"
 
+msgid "Everyone there can ask it"
+msgstr "Każdy tam może go zapytać"
+
 msgid "Everyone with access to this organization."
 msgstr "Wszyscy z dostępem do tej organizacji."
 
@@ -9123,6 +9151,12 @@ msgstr "W przypadku projektu otwórz importer, aby go połączyć."
 msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
 msgstr "W przypadku zgłoszeń błędów i propozycji funkcji najszybszą drogą jest issue na GitHub pod adresem <0>{githubHandle}</0>. Nasza społeczność mieszka na <1>Discordzie</1>, a aktualności publikujemy na <2>X ({xHandle})</2> i <3>LinkedIn</3>."
 
+msgid "For groups"
+msgstr "Dla grup"
+
+msgid "For groups or you"
+msgstr "Dla grup lub dla Ciebie"
+
 msgid "For individuals getting started"
 msgstr "Dla osób, które zaczynają"
 
@@ -9149,6 +9183,9 @@ msgstr "Dla zespołów, które codziennie uruchamiają agenty"
 
 msgid "For teams that run more agents in the cloud"
 msgstr "Dla zespołów, które uruchamiają więcej agentów w chmurze"
+
+msgid "For you"
+msgstr "Dla Ciebie"
 
 msgid "Force merge"
 msgstr "Wymuś scalenie"
@@ -9381,6 +9418,14 @@ msgstr "Generowanie..."
 
 msgid "Generating…"
 msgstr "Generowanie…"
+
+msgctxt "get a ready-made Dev"
+msgid "Get"
+msgstr "Pobierz"
+
+#. placeholder {0}: name.trim() || card.name
+msgid "Get {0}"
+msgstr "Pobierz {0}"
 
 msgid "Get {plan}"
 msgstr "Wybierz {plan}"
@@ -10695,6 +10740,9 @@ msgstr "Komentarze i historia też zostaną usunięte."
 
 msgid "Its connected accounts were disconnected."
 msgstr "Połączone konta zostały odłączone."
+
+msgid "Its instructions"
+msgstr "Jego instrukcje"
 
 msgid "Its own branch and copy of the files"
 msgstr "Własna gałąź i własna kopia plików"
@@ -12263,6 +12311,9 @@ msgstr "Wymaga podpięcia na poziomie aplikacji (stan formularza, dane wykresu, 
 msgid "Need live chat/tool-call state (ToolUIPart, streams) or an app shell"
 msgstr "Wymaga stanu czatu/wywołania narzędzia na żywo (ToolUIPart, strumienie) albo powłoki aplikacji"
 
+msgid "Needs"
+msgstr "Wymaga"
+
 msgid "Needs a retry"
 msgstr "Wymaga ponowienia"
 
@@ -12686,11 +12737,18 @@ msgstr "Brak opisu."
 msgid "No desktop session is running in this sandbox."
 msgstr "W tej piaskownicy nie działa żadna sesja pulpitu."
 
+#. placeholder {0}: query.trim()
+msgid "No Dev matches “{0}”."
+msgstr "Żaden Dev nie pasuje do „{0}”."
+
 msgid "No device is running."
 msgstr "Żadne urządzenie nie jest uruchomione."
 
 msgid "No devices yet"
 msgstr "Brak urządzeń"
+
+msgid "No Devs here yet."
+msgstr "Nie ma tu jeszcze Devów."
 
 msgid "No Devs yet"
 msgstr "Nie ma jeszcze Devów"
@@ -13335,6 +13393,9 @@ msgstr "Nic nie wymaga ponowienia"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "Nic jeszcze nie opublikowano w ciągu ostatnich 30 dni. Twoja pozycja pojawi się, gdy zsynchronizuje się użycie z tej maszyny — publikacja jako <0>{handle}</0>."
+
+msgid "Nothing to connect: it works on its own."
+msgstr "Nic do połączenia: działa samodzielnie."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nie ma jeszcze czego otworzyć. Najpierw wyślij wiadomość."
@@ -14151,6 +14212,9 @@ msgstr "Rezygnuję"
 
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Skróty z Option mogą uniemożliwić wpisywanie znaków specjalnych"
+
+msgid "optional"
+msgstr "opcjonalne"
 
 msgid "Optional"
 msgstr "Opcjonalne"
@@ -15849,6 +15913,9 @@ msgstr "Gotowy do scalenia"
 msgid "Ready to try Paradev?"
 msgstr "Gotowy, aby wypróbować Paradev?"
 
+msgid "Ready-made Devs. Get one for yourself, or add one to a group."
+msgstr "Gotowe Devy. Weź jednego dla siebie albo dodaj do grupy."
+
 msgid "Reapply all commits"
 msgstr "Nałóż ponownie wszystkie commity"
 
@@ -17326,6 +17393,9 @@ msgstr "Szukaj programistów"
 msgid "Search developers by handle or name"
 msgstr "Szukaj programistów po nazwie lub identyfikatorze"
 
+msgid "Search Devs"
+msgstr "Szukaj Devów"
+
 msgid "Search docs..."
 msgstr "Szukaj w dokumentacji..."
 
@@ -18094,6 +18164,9 @@ msgstr "Pokaż mikrofon w polu czatu. Mowę transkrybuje ChatGPT, gdy Codex jest
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "Pokazuj przycisk Zużycie na pasku bocznym strony głównej, pod pull requestami"
+
+msgid "Show all"
+msgstr "Pokaż wszystko"
 
 msgid "Show all {count}"
 msgstr "Pokaż wszystkie ({count})"
@@ -21072,6 +21145,9 @@ msgstr "Wypróbuj"
 msgid "Try now"
 msgstr "Wypróbuj"
 
+msgid "Try saying"
+msgstr "Spróbuj powiedzieć"
+
 msgid "Tufte"
 msgstr "Tufte"
 
@@ -22186,6 +22262,9 @@ msgstr "Czym jest Paradev Enterprise?"
 msgid "What is wrong?"
 msgstr "Co jest nie tak?"
 
+msgid "What it does"
+msgstr "Co robi"
+
 msgid "What it does, and how you want it to work"
 msgstr "Co robi i jak ma pracować"
 
@@ -22266,6 +22345,9 @@ msgstr "Jaka jest twoja pozycja?"
 
 msgid "Where does my code run?"
 msgstr "Gdzie działa mój kod?"
+
+msgid "Where it goes"
+msgstr "Gdzie trafi"
 
 msgid "Where serious teams are"
 msgstr "Tu są poważne zespoły"
@@ -22633,6 +22715,9 @@ msgstr "Ty"
 msgid "YOU"
 msgstr "TY"
 
+msgid "You already have it"
+msgstr "Już go masz"
+
 msgid "You appear to be offline"
 msgstr "Wygląda na to, że jesteś offline"
 
@@ -22898,6 +22983,9 @@ msgstr "Twoja organizacja osiągnęła limit środowisk."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Twoje własne konta. Integracje twojej organizacji dają Paradevowi dostęp do jej narzędzi; po połączeniu twoich kont praca, którą Paradev wykonuje dla ciebie, pojawia się pod twoim nazwiskiem."
+
+msgid "Your Paradev access"
+msgstr "Twój dostęp do Paradev"
 
 msgid "Your Paradev download is starting."
 msgstr "Pobieranie Paradev właśnie się rozpoczyna."

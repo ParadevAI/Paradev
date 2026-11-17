@@ -1773,6 +1773,9 @@ msgstr "클라우드 워크스페이스에서는 {path}를 호출할 수 없습�
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}에 대한 삭제가 이미 진행 중입니다."
 
+msgid "A Dev of your own, with its 1:1"
+msgstr "나만의 Dev와 1:1 채팅"
+
 msgid "A falsifiable rubric for the self-driving software factory: six levels of autonomy, the measurable gates between them, and a forecast for how far 2026 gets us."
 msgstr "자율 주행 소프트웨어 공장을 위한 반증 가능한 기준: 여섯 단계의 자율성, 각 단계 사이의 측정 가능한 관문, 그리고 2026년에 어디까지 갈지에 대한 전망."
 
@@ -2056,6 +2059,9 @@ msgstr "GitHub 이슈를 보려면 프로젝트를 추가하세요."
 msgid "Add a project to see pull requests."
 msgstr "풀 리퀘스트를 보려면 프로젝트를 추가하세요."
 
+msgid "Add a ready-made Dev"
+msgstr "준비된 Dev 추가"
+
 msgid "Add a short summary…"
 msgstr "짧은 요약 추가…"
 
@@ -2212,6 +2218,10 @@ msgstr "/automation 프롬프트를 메시지에 다시 추가할까요?"
 
 msgid "Add this label"
 msgstr "이 라벨 추가"
+
+#. placeholder {0}: choice.title
+msgid "Add to {0}"
+msgstr "{0}에 추가"
 
 msgid "Add to Dictionary"
 msgstr "사전에 추가"
@@ -2685,11 +2695,17 @@ msgstr "이미 다른 조직으로 옮겨졌습니다. 이 프로젝트를 보�
 msgid "Already brought over to another organization. Switch to it to see this workspace."
 msgstr "이미 다른 조직으로 옮겨졌습니다. 이 워크스페이스를 보려면 해당 조직으로 전환하세요."
 
+msgid "Already has {MAX_ADDED} added Devs"
+msgstr "추가된 Dev가 이미 {MAX_ADDED}개 있습니다"
+
 msgid "Already have an account? <0>Sign in</0>"
 msgstr "이미 계정이 있으신가요? <0>로그인</0>"
 
 msgid "Already in tasks"
 msgstr "이미 작업에 있습니다"
+
+msgid "Already in this group"
+msgstr "이미 이 그룹에 있음"
 
 msgid "Also available as CommandDialog for ⌘K palettes"
 msgstr "⌘K 팔레트용 CommandDialog로도 제공됩니다"
@@ -3746,6 +3762,9 @@ msgstr "Paradev 플러그인, 공유 테마, 향후 제공될 에이전트 설�
 
 msgid "Browse Paradev theme files shared by the community, including GitHub Dark Colorblind, Catppuccin, Ember, and One Dark Pro."
 msgstr "GitHub Dark Colorblind, Catppuccin, Ember, One Dark Pro 등 커뮤니티가 공유한 Paradev 테마 파일을 둘러보세요."
+
+msgid "Browse ready-made Devs"
+msgstr "준비된 Dev 둘러보기"
 
 msgid "Browse the plugins every Paradev agent can use, and submit your own."
 msgstr "모든 Paradev 에이전트가 사용할 수 있는 플러그인을 둘러보고 직접 만든 플러그인을 제출하세요."
@@ -6148,6 +6167,12 @@ msgstr "리뷰 코멘트를 불러오지 못했습니다"
 msgid "Couldn't load runs"
 msgstr "실행 기록을 불러오지 못했습니다"
 
+msgid "Couldn't load the Devs."
+msgstr "Dev를 불러오지 못했습니다."
+
+msgid "Couldn't load this Dev."
+msgstr "이 Dev를 불러오지 못했습니다."
+
 msgid "Couldn't load this run's payload."
 msgstr "이 실행의 페이로드를 불러오지 못했습니다."
 
@@ -8082,6 +8107,9 @@ msgstr "새 버전이 게시되는 대로 모두가 볼 수 있습니다"
 msgid "Everyone stays on v{sharedVersion} until you change this"
 msgstr "변경하기 전까지 모두 v{sharedVersion}을(를) 봅니다"
 
+msgid "Everyone there can ask it"
+msgstr "그곳의 누구나 물어볼 수 있습니다"
+
 msgid "Everyone with access to this organization."
 msgstr "이 조직에 접근할 수 있는 모든 사람입니다."
 
@@ -9123,6 +9151,12 @@ msgstr "프로젝트는 가져오기 도구를 열어 연결하세요."
 msgid "For bug reports and feature requests, the fastest path is a GitHub issue at <0>{githubHandle}</0>. Our community lives on <1>Discord</1>, and we post updates on <2>X ({xHandle})</2> and <3>LinkedIn</3>."
 msgstr "버그 신고와 기능 요청은 <0>{githubHandle}</0>에 GitHub 이슈를 남기는 것이 가장 빠릅니다. 커뮤니티는 <1>Discord</1>에 있고, 소식은 <2>X ({xHandle})</2>와 <3>LinkedIn</3>에 올립니다."
 
+msgid "For groups"
+msgstr "그룹용"
+
+msgid "For groups or you"
+msgstr "그룹 또는 개인용"
+
 msgid "For individuals getting started"
 msgstr "처음 시작하는 개인용"
 
@@ -9149,6 +9183,9 @@ msgstr "매일 에이전트를 실행하는 팀을 위한 플랜"
 
 msgid "For teams that run more agents in the cloud"
 msgstr "클라우드에서 더 많은 에이전트를 실행하는 팀을 위한 플랜"
+
+msgid "For you"
+msgstr "개인용"
 
 msgid "Force merge"
 msgstr "강제 머지"
@@ -9381,6 +9418,14 @@ msgstr "생성 중..."
 
 msgid "Generating…"
 msgstr "생성 중…"
+
+msgctxt "get a ready-made Dev"
+msgid "Get"
+msgstr "받기"
+
+#. placeholder {0}: name.trim() || card.name
+msgid "Get {0}"
+msgstr "{0} 받기"
 
 msgid "Get {plan}"
 msgstr "{plan} 시작하기"
@@ -10695,6 +10740,9 @@ msgstr "댓글과 기록도 함께 삭제됩니다."
 
 msgid "Its connected accounts were disconnected."
 msgstr "연결된 계정의 연결이 해제되었습니다."
+
+msgid "Its instructions"
+msgstr "이 Dev의 지침"
 
 msgid "Its own branch and copy of the files"
 msgstr "독립된 브랜치와 파일 사본"
@@ -12263,6 +12311,9 @@ msgstr "앱 수준 연결이 필요합니다(폼 상태, 차트 데이터, 앱 �
 msgid "Need live chat/tool-call state (ToolUIPart, streams) or an app shell"
 msgstr "실시간 채팅/툴 호출 상태(ToolUIPart, 스트림)나 앱 셸이 필요합니다"
 
+msgid "Needs"
+msgstr "필요 항목"
+
 msgid "Needs a retry"
 msgstr "재시도 필요"
 
@@ -12686,11 +12737,18 @@ msgstr "설명이 없습니다."
 msgid "No desktop session is running in this sandbox."
 msgstr "이 샌드박스에서 실행 중인 데스크톱 세션이 없습니다."
 
+#. placeholder {0}: query.trim()
+msgid "No Dev matches “{0}”."
+msgstr "“{0}”와(과) 일치하는 Dev가 없습니다."
+
 msgid "No device is running."
 msgstr "실행 중인 기기가 없습니다."
 
 msgid "No devices yet"
 msgstr "아직 기기가 없습니다"
+
+msgid "No Devs here yet."
+msgstr "아직 여기에 Dev가 없습니다."
 
 msgid "No Devs yet"
 msgstr "아직 Dev가 없습니다"
@@ -13335,6 +13393,9 @@ msgstr "재시도가 필요한 항목이 없습니다"
 
 msgid "Nothing published in the last 30 days yet. Your rank appears once usage from this machine syncs, publishing as <0>{handle}</0>."
 msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기기의 사용량이 동기화되면 <0>{handle}</0>(으)로 게시되며 순위가 표시됩니다."
+
+msgid "Nothing to connect: it works on its own."
+msgstr "연결할 것이 없습니다. 단독으로 작동합니다."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "아직 열 내용이 없습니다. 먼저 메시지를 보내세요."
@@ -14151,6 +14212,9 @@ msgstr "수집 거부"
 
 msgid "Option shortcuts may prevent typing special characters"
 msgstr "Option 단축키는 특수 문자 입력을 방해할 수 있습니다"
+
+msgid "optional"
+msgstr "선택 사항"
 
 msgid "Optional"
 msgstr "선택 사항"
@@ -15849,6 +15913,9 @@ msgstr "머지 준비됨"
 msgid "Ready to try Paradev?"
 msgstr "Paradev를 사용해 볼 준비가 되셨나요?"
 
+msgid "Ready-made Devs. Get one for yourself, or add one to a group."
+msgstr "준비된 Dev입니다. 직접 받거나 그룹에 추가하세요."
+
 msgid "Reapply all commits"
 msgstr "모든 커밋 다시 적용"
 
@@ -17326,6 +17393,9 @@ msgstr "개발자 검색"
 msgid "Search developers by handle or name"
 msgstr "핸들 또는 이름으로 개발자 검색"
 
+msgid "Search Devs"
+msgstr "Dev 검색"
+
 msgid "Search docs..."
 msgstr "문서 검색..."
 
@@ -18094,6 +18164,9 @@ msgstr "채팅 입력창에 마이크를 표시합니다. Codex가 ChatGPT에 �
 
 msgid "Show a Usage button in the home sidebar, under Pull requests"
 msgstr "홈 사이드바의 풀 리퀘스트 아래에 사용량 버튼을 표시합니다"
+
+msgid "Show all"
+msgstr "모두 보기"
 
 msgid "Show all {count}"
 msgstr "{count}개 모두 보기"
@@ -21072,6 +21145,9 @@ msgstr "사용해 보기"
 msgid "Try now"
 msgstr "사용해 보기"
 
+msgid "Try saying"
+msgstr "이렇게 말해 보세요"
+
 msgid "Tufte"
 msgstr "Tufte"
 
@@ -22186,6 +22262,9 @@ msgstr "Paradev Enterprise란 무엇인가요?"
 msgid "What is wrong?"
 msgstr "무엇이 문제인가요?"
 
+msgid "What it does"
+msgstr "하는 일"
+
 msgid "What it does, and how you want it to work"
 msgstr "무엇을 하고 어떻게 일하길 원하는지"
 
@@ -22266,6 +22345,9 @@ msgstr "내 순위는 몇 위일까요?"
 
 msgid "Where does my code run?"
 msgstr "제 코드는 어디에서 실행되나요?"
+
+msgid "Where it goes"
+msgstr "추가할 위치"
 
 msgid "Where serious teams are"
 msgstr "진지한 팀들이 있는 곳"
@@ -22633,6 +22715,9 @@ msgstr "나"
 msgid "YOU"
 msgstr "나"
 
+msgid "You already have it"
+msgstr "이미 가지고 있습니다"
+
 msgid "You appear to be offline"
 msgstr "오프라인 상태로 보입니다"
 
@@ -22898,6 +22983,9 @@ msgstr "조직이 환경 한도에 도달했습니다."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
+
+msgid "Your Paradev access"
+msgstr "내 Paradev 액세스 권한"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."

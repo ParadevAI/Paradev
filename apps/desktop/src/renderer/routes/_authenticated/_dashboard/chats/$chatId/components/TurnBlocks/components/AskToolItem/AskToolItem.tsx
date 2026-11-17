@@ -7,7 +7,7 @@ import {
 	type ToolBlock,
 	toolRunning,
 } from "@superset/chats-sync";
-import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { TurnBlocks } from "../../TurnBlocks";
 import { ToolStatusIcon } from "../ToolStatusIcon";
 import { WorkingLine } from "../WorkingLine";
@@ -41,7 +41,7 @@ export function AskToolItem({
 	return (
 		<div className="my-1 flex flex-col gap-1">
 			<div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-				{asked && <FaceAvatar seed={asked.id} size={16} />}
+				{asked && <DevFace devId={asked.id} size={16} />}
 				<span>
 					{running ? (
 						<Trans>

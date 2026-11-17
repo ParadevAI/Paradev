@@ -1,5 +1,6 @@
 import type { Chat } from "@superset/chats-core";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { DevFace } from "../DevFace";
 
 /** A chat's face: its Dev's in a 1:1, the group's own otherwise. */
 export function ChatFace({
@@ -11,6 +12,10 @@ export function ChatFace({
 	size: number;
 	className?: string;
 }) {
-	const seed = chat.kind === "direct" ? (chat.devIds[0] ?? chat.id) : chat.id;
-	return <FaceAvatar seed={seed} size={size} className={className} />;
+	const devId = chat.kind === "direct" ? chat.devIds[0] : undefined;
+	return devId ? (
+		<DevFace devId={devId} size={size} className={className} />
+	) : (
+		<FaceAvatar seed={chat.id} size={size} className={className} />
+	);
 }
