@@ -1115,6 +1115,32 @@ describe("PortManager — agent processes", () => {
 		expect(killed).toEqual([]);
 	});
 
+	it("protects an agent that its wrapper runs as a child, and still closes that agent's server", async () => {
+		// The wrapper 1001 did not exec, so its own environment has no launch id.
+		terminalIdEnv = new Map([[1001, "p1"]]);
+		await manager.forceScan();
+		agentLaunchIdEnv = new Map([
+			[1002, "1001-1700000000"],
+			[1003, "1001-1700000000"],
+		]);
+
+		const refused = await manager.killPort({
+			terminalId: "p1",
+			workspaceId: "ws1",
+			port: AGENT_PORT,
+		});
+		expect(refused.success).toBe(false);
+		await manager.forceScan();
+		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
+		const closed = await manager.killPort({
+			terminalId: "p1",
+			workspaceId: "ws1",
+			port: 3000,
+		});
+		expect(closed.success).toBe(true);
+		expect(killed).toEqual([1003]);
+	});
+
 	it("keeps a port closable when its pid was reused after the agent launch", async () => {
 		agentLaunched();
 		processStartTimes = new Map([[1002, 1700009999]]);

@@ -16,6 +16,7 @@ import {
 import {
 	readAgentLaunchIdsFromEnv,
 	readProcessStartTimes,
+	readTerminalIdsFromEnv,
 } from "./terminal-env.ts";
 import type { DetectedPort } from "./types.ts";
 
@@ -419,7 +420,12 @@ export class PortManager extends EventEmitter {
 
 	/**
 	 * The given pids that are an agent or one of its ancestors: their own tree
-	 * holds the agent a launch id names. A server the agent started is not one.
+	 * holds an agent process. A server the agent started is not one.
+	 *
+	 * A launch id is "<launch pid>-<epoch seconds>". A wrapper that execs the
+	 * agent makes the launch pid the agent. The Codex wrapper stays alive and
+	 * runs the agent as its child, so there the agent is the child of the
+	 * launch pid that carries the id.
 	 */
 	private async findAgentPids(
 		table: ProcessTableEntry[],
@@ -433,27 +439,64 @@ export class PortManager extends EventEmitter {
 			[...new Set([...trees.values()].flat())],
 			signal,
 		);
-		const launches = new Map<number, [agentPid: number, launchedAt: number]>();
+		const launches = new Map<number, [launchPid: number, launchedAt: number]>();
 		for (const [member, launchId] of launchIds) {
-			const [agentPid, launchedAt] = (launchId ?? "").split("-").map(Number);
-			if (agentPid) launches.set(member, [agentPid, launchedAt ?? Number.NaN]);
+			const [launchPid, launchedAt] = (launchId ?? "").split("-").map(Number);
+			if (launchPid)
+				launches.set(member, [launchPid, launchedAt ?? Number.NaN]);
 		}
 		const startTimes = await readProcessStartTimes(
-			[...new Set([...launches.values()].map(([agentPid]) => agentPid))],
+			[...new Set([...launches.values()].map(([launchPid]) => launchPid))],
+			signal,
+		);
+		const parents = new Map(table.map(({ pid, ppid }) => [pid, ppid]));
+		const wrapperPids = await this.findLiveWrapperPids(
+			[...launches]
+				.filter(([member, [launchPid]]) => parents.get(member) === launchPid)
+				.map(([, [launchPid]]) => launchPid),
 			signal,
 		);
 		for (const [pid, tree] of trees) {
 			const holdsAgent = tree.some((member) => {
-				const [agentPid, launchedAt] = launches.get(member) ?? [];
-				if (agentPid === undefined || !tree.includes(agentPid)) return false;
+				const [launchPid, launchedAt] = launches.get(member) ?? [];
+				if (launchPid === undefined) return false;
 				// A reused pid started after the launch. An unreadable time is
 				// NaN, which compares false and keeps the pid-only match.
-				const startedAt = startTimes.get(agentPid) ?? Number.NaN;
-				return !(startedAt > Number(launchedAt) + AGENT_START_SLACK_S);
+				const startedAt = startTimes.get(launchPid) ?? Number.NaN;
+				if (startedAt > Number(launchedAt) + AGENT_START_SLACK_S) return false;
+				return (
+					tree.includes(launchPid) ||
+					(parents.get(member) === launchPid && wrapperPids.has(launchPid))
+				);
 			});
 			if (holdsAgent) agentPids.add(pid);
 		}
 		return agentPids;
+	}
+
+	/**
+	 * The given launch pids that are a wrapper still running, not an agent. A
+	 * process's readable environment is the one it started with: an agent that
+	 * the wrapper exec'd has the launch id there, and a live wrapper does not.
+	 * The terminal id shows that the environment could be read at all.
+	 */
+	private async findLiveWrapperPids(
+		launchPids: number[],
+		signal: AbortSignal,
+	): Promise<Set<number>> {
+		const wrapperPids = new Set<number>();
+		if (launchPids.length === 0) return wrapperPids;
+		const pids = [...new Set(launchPids)];
+		const launchIds = await readAgentLaunchIdsFromEnv(pids, signal);
+		const terminalIds = await readTerminalIdsFromEnv(pids, signal);
+		for (const launchPid of pids) {
+			if (
+				terminalIds.get(launchPid) != null &&
+				!launchIds.get(launchPid)?.startsWith(`${launchPid}-`)
+			)
+				wrapperPids.add(launchPid);
+		}
+		return wrapperPids;
 	}
 
 	private async buildPortsByTerminal({
