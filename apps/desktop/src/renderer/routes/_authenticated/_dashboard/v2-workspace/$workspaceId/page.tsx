@@ -245,6 +245,7 @@ function V2WorkspaceContent() {
 	const {
 		isOpen: sidebarOpen,
 		setOpen: setRightSidebarOpen,
+		closeEmpty: closeEmptyRightSidebar,
 		toggle: toggleRightSidebar,
 		mode: rightPaneMode,
 		toggleFullScreen: toggleRightPaneAreaFullScreen,
@@ -264,10 +265,6 @@ function V2WorkspaceContent() {
 	});
 	const openRightSidebar = useCallback(
 		() => setRightSidebarOpen(true),
-		[setRightSidebarOpen],
-	);
-	const closeRightSidebar = useCallback(
-		() => setRightSidebarOpen(false),
 		[setRightSidebarOpen],
 	);
 	const rightTarget = useMemo<PaneTarget>(
@@ -294,7 +291,7 @@ function V2WorkspaceContent() {
 	useCloseRightPaneAreaWhenEmpty({
 		store: rightStore,
 		enabled: isRightPaneAreaEnabled && isRightLayoutReady,
-		close: closeRightSidebar,
+		close: closeEmptyRightSidebar,
 	});
 	useOpenNewTabWhenRightPaneOpensEmpty({
 		store: rightStore,

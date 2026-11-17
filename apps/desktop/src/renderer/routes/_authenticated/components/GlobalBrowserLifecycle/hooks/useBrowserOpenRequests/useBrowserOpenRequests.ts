@@ -6,7 +6,7 @@ import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboar
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
-import { openBackgroundBrowser } from "./utils/openBackgroundBrowser";
+import { openAgentBrowser } from "../../utils/agentBrowserReveal";
 
 interface BrowserOpenRequest {
 	workspaceId: string;
@@ -17,7 +17,7 @@ interface BrowserOpenRequest {
 	show: boolean;
 }
 
-/** Opens agent browsers without navigation unless the caller explicitly asks to show them. */
+/** Opens agent browsers without navigating to their workspace unless the caller asks to show them. */
 export function useBrowserOpenRequests() {
 	const navigate = useNavigate();
 	const collections = useCollections();
@@ -40,7 +40,7 @@ export function useBrowserOpenRequests() {
 									[],
 								);
 							}
-							const paneId = openBackgroundBrowser({
+							const paneId = openAgentBrowser({
 								collections,
 								workspaceId: request.workspaceId,
 								url: request.url,
