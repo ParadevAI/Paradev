@@ -38,6 +38,7 @@ export const MARKETING_CAMPAIGN_PARAMS = [
 
 const AUTH_HOST =
 	/^(accounts\.google\.[a-z.]+|accounts\.youtube\.com|(www\.)?github\.com|appleid\.apple\.com)$/;
+const EXCLUDED_PATH = /\/(api\/auth|accept-invitation)(\/|$)/;
 const MAX_TOUCH_BYTES = 1400;
 
 type MarketingTouch = {
@@ -126,8 +127,7 @@ export function marketingTouchFromPage(
 	now = new Date(),
 ): MarketingTouch | null {
 	const url = httpUrl(urlValue);
-	if (!url || /\/(api\/auth|accept-invitation)(\/|$)/.test(url.pathname))
-		return null;
+	if (!url || EXCLUDED_PATH.test(url.pathname)) return null;
 	const params: MarketingTouch["params"] = {};
 	for (const key of MARKETING_CAMPAIGN_PARAMS) {
 		const value = url.searchParams.get(key);
@@ -201,9 +201,10 @@ export function enrichMarketingAttribution<T extends AttributionEvent>(
 			referrer,
 		);
 		const url = httpUrl(event.properties.$current_url);
-		const hasCampaign = MARKETING_CAMPAIGN_PARAMS.some((key) =>
-			url?.searchParams.has(key),
-		);
+		const hasCampaign =
+			url &&
+			!EXCLUDED_PATH.test(url.pathname) &&
+			MARKETING_CAMPAIGN_PARAMS.some((key) => url.searchParams.has(key));
 		if ((hasCampaign && !arrival) || (arrival && !fitsSharedCookie(arrival))) {
 			client.unregister(MARKETING_TOUCH_PROPERTY);
 			touch = null;

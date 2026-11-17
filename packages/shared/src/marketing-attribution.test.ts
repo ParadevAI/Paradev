@@ -130,6 +130,35 @@ describe("marketing attribution", () => {
 		expect(sdk.properties).toEqual(before);
 	});
 
+	test("tagged excluded pages preserve the retained campaign for the login person update", () => {
+		const sdk = client();
+		enrichMarketingAttribution(
+			page("https://paradev.com/?utm_campaign=A&gclid=click-A"),
+			sdk,
+		);
+		const retained = structuredClone(sdk.properties);
+		for (const path of ["accept-invitation/id", "api/auth/callback/google"]) {
+			const app = client();
+			app.register(structuredClone(retained));
+			enrichMarketingAttribution(
+				page(
+					`https://app.paradev.com/${path}?token=secret&utm_source=email`,
+					"https://external.example/",
+				),
+				app,
+			);
+			expect(app.properties).toEqual(retained);
+			applyMarketingPersonProperties(app);
+			expect(app.events[0]?.properties.$set).toMatchObject({
+				utm_campaign: "A",
+				gclid: "click-A",
+				utm_source: null,
+				marketing_landing_url: "https://paradev.com/",
+			});
+			expect(JSON.stringify(app.events)).not.toContain("secret");
+		}
+	});
+
 	test("captures an external organic referral without carrying old paid identifiers", () => {
 		const sdk = client();
 		enrichMarketingAttribution(page("https://paradev.com/?gclid=old"), sdk);
@@ -230,19 +259,23 @@ describe("marketing attribution", () => {
 		).toBe("https://paradev.com/new-landing");
 	});
 
-	test("an invalid second campaign clears the previous retained touch instead of miscrediting it", () => {
-		const sdk = client();
-		enrichMarketingAttribution(
-			page("https://paradev.com/?utm_campaign=A&gclid=click"),
-			sdk,
-		);
-		enrichMarketingAttribution(
-			page(`https://paradev.com/?utm_campaign=B&gclid=${"x".repeat(257)}`),
-			sdk,
-		);
-		expect(sdk.get_property(MARKETING_TOUCH_PROPERTY)).toBeUndefined();
-		applyMarketingPersonProperties(sdk);
-		expect(sdk.events).toEqual([]);
+	test("invalid or over-budget second campaigns clear the previous retained touch instead of miscrediting it", () => {
+		for (const value of ["x".repeat(257), "\u0001invalid", "界".repeat(200)]) {
+			const sdk = client();
+			enrichMarketingAttribution(
+				page("https://paradev.com/?utm_campaign=A&gclid=click"),
+				sdk,
+			);
+			enrichMarketingAttribution(
+				page(
+					`https://paradev.com/?utm_campaign=B&gclid=${encodeURIComponent(value)}`,
+				),
+				sdk,
+			);
+			expect(sdk.get_property(MARKETING_TOUCH_PROPERTY)).toBeUndefined();
+			applyMarketingPersonProperties(sdk);
+			expect(sdk.events).toEqual([]);
+		}
 	});
 
 	test("decline prevents retention and person updates", () => {
