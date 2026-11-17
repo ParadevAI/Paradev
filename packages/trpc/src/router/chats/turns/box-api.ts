@@ -55,6 +55,13 @@ const settlement = z.object({
 	stopReason: z.string().max(100),
 	answer: z.string().max(1_000_000).optional(),
 	error: z.string().max(10_000).optional(),
+	trace: z
+		.object({
+			model: z.string().max(200).nullable(),
+			updates: z.array(z.record(z.string(), z.unknown())).max(5_000),
+			truncated: z.boolean().optional(),
+		})
+		.optional(),
 });
 
 const devText = z.object({

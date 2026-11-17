@@ -1,6 +1,7 @@
 import { describeDev, renderMentions } from "@superset/chats-core";
 import { db, dbWs } from "@superset/db/client";
 import {
+	type ChatsTurnTrace,
 	chatsAgentReads,
 	chatsAgents,
 	chatsGroupAgents,
@@ -937,17 +938,26 @@ export async function postDevMessage(
 	return true;
 }
 
+/** As large as a stored trace gets; a larger one keeps its model and says the rest was dropped. */
+const TRACE_BYTES_MAX = 256_000;
+
+const boundedTrace = (trace: ChatsTurnTrace): ChatsTurnTrace =>
+	JSON.stringify(trace).length > TRACE_BYTES_MAX
+		? { model: trace.model, updates: [], truncated: true }
+		: trace;
+
 /** The runner's report that a turn settled. Records the answer or the error once, then wakes the turn's run. */
 export async function settleTurn(
 	deps: TurnDeps,
 	claims: { turnId: string; agentId: string },
-	result: { answer?: string; error?: string },
+	result: { answer?: string; error?: string; trace?: ChatsTurnTrace },
 ): Promise<void> {
 	await db
 		.update(chatsTurns)
 		.set({
 			settledAt: nowOf(deps),
 			answer: result.answer ?? null,
+			...(result.trace ? { trace: boundedTrace(result.trace) } : {}),
 			...(result.error ? { error: shortReason(result.error) } : {}),
 		})
 		.where(

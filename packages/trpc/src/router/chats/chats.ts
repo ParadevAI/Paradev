@@ -26,6 +26,7 @@ import {
 	chatsMessages,
 	chatsQuestions,
 	chatsReads,
+	chatsTurns,
 	files,
 	users,
 } from "@superset/db/schema";
@@ -59,7 +60,7 @@ import { detachAll, reapOrphanFiles } from "../../lib/files";
 import { presignedGetUrl } from "../../lib/r2";
 import { personProcedure } from "../../trpc";
 import { publishChats } from "./publish";
-import { chatsTurnRuntime, triggerTurns } from "./turns";
+import { chatsTurnRuntime, triggerTurns, watchTicket } from "./turns";
 import {
 	agentView,
 	messageView,
@@ -82,6 +83,20 @@ const forbidden = (message: string) =>
 	new TRPCError({ code: "FORBIDDEN", message });
 const invalid = (message: string) =>
 	new TRPCError({ code: "BAD_REQUEST", message });
+
+const toTurnDetails = (turn: typeof chatsTurns.$inferSelect) => ({
+	id: turn.id,
+	devId: turn.agentId,
+	groupId: turn.groupId,
+	parentTurnId: turn.parentTurnId,
+	status: turn.status,
+	error: turn.error,
+	createdAt: turn.createdAt.toISOString(),
+	startedAt: turn.startedAt?.toISOString() ?? null,
+	settledAt: turn.settledAt?.toISOString() ?? null,
+	endedAt: turn.endedAt?.toISOString() ?? null,
+	trace: turn.trace,
+});
 
 const organizationInput = z.object({ organizationId: z.string().uuid() });
 const groupInput = z.object({ groupId: z.string().uuid() });
@@ -686,6 +701,59 @@ export const chatsRouter = {
 			return ambiguousMentions.length > 0
 				? { ...payload, ambiguousMentions }
 				: payload;
+		}),
+
+	/** Where a Dev's box streams its work in a chat the person is in, with a short-lived read-only token. */
+	watchToken: personProcedure
+		.input(groupInput.extend({ devId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await assertMember(ctx.session.user.id, input.groupId);
+			const runtime = chatsTurnRuntime();
+			const ticket = runtime
+				? await watchTicket(runtime, input.devId, input.groupId)
+				: null;
+			if (!ticket) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "That Dev isn't working right now",
+				});
+			}
+			return ticket;
+		}),
+
+	/** A message with the turn that wrote it and the turns that turn asked other Devs for. */
+	messageDetails: personProcedure
+		.input(messageInput)
+		.query(async ({ ctx, input }) => {
+			const [message] = await db
+				.select()
+				.from(chatsMessages)
+				.where(eq(chatsMessages.id, input.messageId));
+			if (!message) throw notFound("Message not found");
+			await assertMember(ctx.session.user.id, message.groupId);
+			const [turn] = message.turnId
+				? await db
+						.select()
+						.from(chatsTurns)
+						.where(eq(chatsTurns.id, message.turnId))
+				: [];
+			const asks = turn
+				? await db
+						.select()
+						.from(chatsTurns)
+						.where(
+							and(
+								eq(chatsTurns.parentTurnId, turn.id),
+								eq(chatsTurns.groupId, message.groupId),
+							),
+						)
+						.orderBy(asc(chatsTurns.createdAt))
+				: [];
+			return {
+				message: await messageView(message),
+				turn: turn ? toTurnDetails(turn) : null,
+				asks: asks.map(toTurnDetails),
+			};
 		}),
 
 	/** A short-lived link to a file shared in a chat the person is in. A mutation, because the link is a credential. */
