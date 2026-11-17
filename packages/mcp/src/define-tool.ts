@@ -46,6 +46,8 @@ export interface McpToolCallEvent {
 	durationMs: number;
 	success: boolean;
 	errorMessage?: string;
+	/** What the tool returned, when it succeeded. */
+	result?: unknown;
 }
 
 export type McpToolCallEmitter = (event: McpToolCallEvent) => void;
@@ -147,6 +149,7 @@ export function defineTool<Input extends ToolInput, Output extends ZodRawShape>(
 					clientLabel: ctx.clientLabel,
 					durationMs: Date.now() - startedAt,
 					success: true,
+					result,
 				});
 				return successResult(result);
 			} catch (e) {

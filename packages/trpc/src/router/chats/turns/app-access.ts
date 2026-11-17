@@ -111,9 +111,20 @@ export async function paradevCaller(
 	};
 }
 
+/** A host answers `{ workspace: { id } }`; the cloud answers the workspace's own row. */
+export function createdWorkspaceId(result: unknown): string | null {
+	if (!result || typeof result !== "object") return null;
+	const { workspace, id } = result as {
+		workspace?: { id?: unknown };
+		id?: unknown;
+	};
+	const found = workspace?.id ?? id;
+	return typeof found === "string" ? found : null;
+}
+
 export async function recordAppCall(
 	caller: AppCaller,
-	call: { tool: string; ok: boolean },
+	call: { tool: string; ok: boolean; result?: unknown },
 ): Promise<void> {
 	await db.insert(chatsAppCalls).values({
 		organizationId: caller.organizationId,
@@ -124,5 +135,9 @@ export async function recordAppCall(
 		app: PARADEV_APP,
 		tool: call.tool,
 		ok: call.ok,
+		workspaceId:
+			call.ok && call.tool === "workspaces_create"
+				? createdWorkspaceId(call.result)
+				: null,
 	});
 }

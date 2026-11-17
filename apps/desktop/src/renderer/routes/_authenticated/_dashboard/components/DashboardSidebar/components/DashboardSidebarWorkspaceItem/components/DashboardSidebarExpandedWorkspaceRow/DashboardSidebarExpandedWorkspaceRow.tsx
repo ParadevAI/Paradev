@@ -19,6 +19,7 @@ import { HotkeyLabel } from "renderer/hotkeys";
 import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
+import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
@@ -54,6 +55,8 @@ interface DashboardSidebarExpandedWorkspaceRowProps
 	/** Present when rendered in the Pinned section: shows the project avatar. */
 	/** projectName is null for pinned project-less "session" workspaces. */
 	pinnedContext?: { projectName: string | null; projectIconUrl: string | null };
+	/** The Dev that created the workspace, shown by its face. */
+	creatorDevId?: string | null;
 	onClick?: MouseEventHandler<HTMLDivElement>;
 	onKeyboardActivate?: KeyboardEventHandler<HTMLDivElement>;
 	onWorkspaceChipsClick?: MouseEventHandler<HTMLDivElement>;
@@ -82,6 +85,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 			isBulkSelectable = false,
 			isSelected = false,
 			pinnedContext,
+			creatorDevId,
 			onClick,
 			onKeyboardActivate,
 			onWorkspaceChipsClick,
@@ -266,6 +270,10 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 						<span className="mr-2 flex size-4 shrink-0 items-center justify-center">
 							{leadIndicator}
 						</span>
+					)}
+
+					{creatorDevId && (
+						<FaceAvatar seed={creatorDevId} size={16} className="mr-2" />
 					)}
 
 					{pinnedContext && (

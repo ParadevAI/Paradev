@@ -286,13 +286,20 @@ test("a Dev acts in Paradev as its owner only once the owner switched that on; a
 		organizationId: ORG,
 		groupId,
 	});
-	await recordAppCall(caller, { tool: "workspaces_create", ok: true });
+	await recordAppCall(caller, {
+		tool: "workspaces_create",
+		ok: true,
+		result: { workspace: { id: "ws-1" } },
+	});
 	expect(
 		await db
 			.select({ tool: chatsAppCalls.tool, asker: chatsAppCalls.askedByUserId })
 			.from(chatsAppCalls)
 			.where(eq(chatsAppCalls.agentId, turn.agentId)),
 	).toEqual([{ tool: "workspaces_create", asker: OWNER }]);
+	expect(await owner.chats.devWorkspaces({ organizationId: ORG })).toEqual([
+		{ workspaceId: "ws-1", devId: turn.agentId },
+	]);
 	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
 		stopReason: "end_turn",
 	});

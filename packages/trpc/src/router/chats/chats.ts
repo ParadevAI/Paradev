@@ -18,6 +18,7 @@ import { db, dbWs } from "@superset/db/client";
 import {
 	chatsAgentReads,
 	chatsAgents,
+	chatsAppCalls,
 	chatsBriefs,
 	chatsGroupAgents,
 	chatsGroupMembers,
@@ -496,6 +497,35 @@ export const chatsRouter = {
 					updatedAt: brief.updatedAt.toISOString(),
 				})),
 			};
+		}),
+
+	/** The workspaces the person's Devs created with the person's access, and which Dev made each. */
+	devWorkspaces: personProcedure
+		.input(organizationInput)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+			await assertOrgMember(userId, input.organizationId);
+			const rows = await db
+				.select({
+					workspaceId: chatsAppCalls.workspaceId,
+					devId: chatsAppCalls.agentId,
+				})
+				.from(chatsAppCalls)
+				.where(
+					and(
+						eq(chatsAppCalls.organizationId, input.organizationId),
+						eq(chatsAppCalls.ownerUserId, userId),
+						isNotNull(chatsAppCalls.workspaceId),
+						isNotNull(chatsAppCalls.agentId),
+					),
+				)
+				.orderBy(desc(chatsAppCalls.createdAt))
+				.limit(500);
+			return rows.flatMap((row) =>
+				row.workspaceId && row.devId
+					? [{ workspaceId: row.workspaceId, devId: row.devId }]
+					: [],
+			);
 		}),
 
 	/** A short-lived ticket for the realtime channels the person may hear: their own and each of their groups'. */

@@ -1,9 +1,6 @@
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { createMcpServer, mcpContextForUser } from "@superset/mcp";
-import {
-	chatsBoxParadevCaller,
-	recordAppCall,
-} from "@superset/trpc/chats-box";
+import { chatsBoxParadevCaller, recordAppCall } from "@superset/trpc/chats-box";
 import { env } from "@/env";
 
 /** Paradev's own tools for a Dev's box, run as the Dev's owner. */
@@ -22,6 +19,7 @@ async function handle(request: Request): Promise<Response> {
 			void recordAppCall(caller, {
 				tool: event.toolName,
 				ok: event.success,
+				result: event.result,
 			}).catch((error: unknown) =>
 				console.error("[chats] a Dev's Paradev call was not recorded:", error),
 			);
