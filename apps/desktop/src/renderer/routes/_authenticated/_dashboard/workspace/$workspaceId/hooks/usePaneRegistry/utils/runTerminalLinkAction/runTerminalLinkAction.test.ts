@@ -4,13 +4,16 @@ import {
 	type WorkspaceState,
 	type WorkspaceStore,
 } from "@superset/panes";
+import { env } from "renderer/env.renderer";
 import { type LinkTierMap, tierFor } from "renderer/lib/clickPolicy";
+import { PROTOCOL_SCHEME } from "shared/constants";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../types";
 import {
 	runChatPullRequestLink,
 	runUrlLinkAction,
 	terminalUrlLinkAction,
+	terminalWorkspaceLinkTarget,
 } from "./runTerminalLinkAction";
 
 const PR_URL = "https://github.com/superset-sh/superset/pull/8412";
@@ -220,5 +223,58 @@ describe("terminalUrlLinkAction", () => {
 		expect(terminalUrlLinkAction(ctrl, PR_URL, defaultMap)).toBe("pane");
 		expect(terminalUrlLinkAction(click, FILES_URL, unbound)).toBeNull();
 		expect(terminalUrlLinkAction(click, FILES_URL, external)).toBe("external");
+	});
+});
+
+describe("workspace links", () => {
+	const WORKSPACE_ID = "eb417a4d-96f9-4f29-89ad-5cefe15e869a";
+	const DEEP_LINK = `${PROTOCOL_SCHEME}://v2-workspace/${WORKSPACE_ID}`;
+	const WEB_LINK = new URL(
+		`/workspaces/${WORKSPACE_ID}`,
+		env.NEXT_PUBLIC_WEB_URL,
+	).toString();
+	const click = { metaKey: false, ctrlKey: false, shiftKey: false };
+	const shift = { ...click, shiftKey: true };
+	const meta = { ...click, metaKey: true };
+	const ctrl = { ...click, ctrlKey: true };
+	const metaShift = { ...meta, shiftKey: true };
+	const unbound = () => null;
+
+	it.each([
+		["a plain click", click],
+		["shift-click", shift],
+		["cmd-click", meta],
+		["ctrl-click", ctrl],
+		["cmd-shift-click", metaShift],
+	])("switches to the workspace of a deep link on %s", (_name, event) => {
+		expect(terminalWorkspaceLinkTarget(event, DEEP_LINK)).toBe(WORKSPACE_ID);
+	});
+
+	it("switches to the workspace of a web link on a plain click", () => {
+		expect(terminalWorkspaceLinkTarget(click, WEB_LINK)).toBe(WORKSPACE_ID);
+	});
+
+	it.each([
+		["shift-click", shift],
+		["cmd-click", meta],
+		["ctrl-click", ctrl],
+		["cmd-shift-click", metaShift],
+	])("leaves a web link to the URL actions on %s", (_name, event) => {
+		expect(terminalWorkspaceLinkTarget(event, WEB_LINK)).toBeNull();
+	});
+
+	it("leaves other URLs to the URL actions", () => {
+		expect(
+			terminalWorkspaceLinkTarget(click, "https://example.com/workspaces/x"),
+		).toBeNull();
+	});
+
+	it("opens a web link in the system browser on shift-click", () => {
+		expect(terminalUrlLinkAction(shift, WEB_LINK, unbound)).toBe("external");
+	});
+
+	it("leaves cmd-clicks on a web link to the URL link settings", () => {
+		expect(terminalUrlLinkAction(meta, WEB_LINK, unbound)).toBeNull();
+		expect(terminalUrlLinkAction(metaShift, WEB_LINK, unbound)).toBeNull();
 	});
 });

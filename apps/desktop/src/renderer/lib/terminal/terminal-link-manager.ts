@@ -36,6 +36,11 @@ export interface TerminalLinkHandlers {
 	onFileLinkClick?: (event: MouseEvent, link: DetectedLink) => void;
 	/** Called when a URL link is activated. */
 	onUrlClick?: (event: MouseEvent, url: string) => void;
+	/**
+	 * Schemes besides http(s) that OSC 8 hyperlinks may activate, e.g.
+	 * `superset:`. They get no hover info. Any other scheme stays inert.
+	 */
+	extraOscLinkProtocols?: readonly string[];
 	/** Called when the mouse enters a detected link (file path or URL). */
 	onLinkHover?: (event: MouseEvent, info: LinkHoverInfo) => void;
 	/** Called when the mouse leaves a previously hovered link. */
@@ -158,13 +163,30 @@ export class TerminalLinkManager {
 			// xterm always registers its own OSC 8 hyperlink provider first. Without
 			// this, OSC 8 links use xterm's default confirm() + window.open() path,
 			// which is blocked in Electron and also bypasses our link preferences.
+			const extraProtocols = handlers.extraOscLinkProtocols ?? [];
+			const hasProtocol = (uri: string, protocols: readonly string[]) => {
+				try {
+					return protocols.includes(new URL(uri).protocol);
+				} catch {
+					return false;
+				}
+			};
+			const webProtocols = ["http:", "https:"];
+			const activeProtocols = [...webProtocols, ...extraProtocols];
+			// xterm drops non-http(s) OSC 8 links unless this is true, and then
+			// hands every scheme to activate/hover, so those filter them again.
+			// Hover stays web-only: it feeds the URL hint and "Open in" menu.
 			this._oscLinkHandler = {
-				allowNonHttpProtocols: false,
+				allowNonHttpProtocols: extraProtocols.length > 0,
 				activate: (event, uri) => {
-					onUrlClick(event, uri);
+					if (hasProtocol(uri, activeProtocols)) onUrlClick(event, uri);
 				},
 				hover: onLinkHover
-					? (event, uri) => onLinkHover(event, { kind: "url", url: uri })
+					? (event, uri) => {
+							if (hasProtocol(uri, webProtocols)) {
+								onLinkHover(event, { kind: "url", url: uri });
+							}
+						}
 					: undefined,
 				leave: onLinkLeave ? () => onLinkLeave() : undefined,
 			};

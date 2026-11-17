@@ -5,4 +5,5 @@ export {
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
 	terminalUrlLinkAction,
+	terminalWorkspaceLinkTarget,
 } from "./runTerminalLinkAction";

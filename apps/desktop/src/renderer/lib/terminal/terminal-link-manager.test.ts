@@ -1,4 +1,4 @@
-import { describe, expect, it, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { ILinkProvider, Terminal as XTerm } from "@xterm/xterm";
 import { TerminalLinkManager } from "./terminal-link-manager";
 
@@ -67,6 +67,75 @@ describe("TerminalLinkManager", () => {
 			url: "https://example.com",
 		});
 		expect(onLinkLeave).toHaveBeenCalled();
+	});
+
+	describe("with an extra OSC 8 protocol", () => {
+		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
+		const event = {} as MouseEvent;
+		let terminal: XTerm;
+		let onUrlClick: ReturnType<typeof mock>;
+		let onLinkHover: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal().terminal;
+			onUrlClick = mock();
+			onLinkHover = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat: async () => null,
+				onUrlClick,
+				onLinkHover,
+				extraOscLinkProtocols: ["superset:"],
+			});
+		});
+
+		it("lets xterm create non-http OSC 8 links", () => {
+			expect(terminal.options.linkHandler?.allowNonHttpProtocols).toBe(true);
+		});
+
+		it.each([
+			"superset://v2-workspace/abc",
+			"https://example.com",
+			"http://example.com",
+		])("activates %s", (uri) => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+
+			expect(onUrlClick).toHaveBeenCalledWith(event, uri);
+		});
+
+		it.each([
+			"https://example.com",
+			"http://example.com",
+		])("reports hover on %s", (uri) => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+
+			expect(onLinkHover).toHaveBeenCalledWith(event, {
+				kind: "url",
+				url: uri,
+			});
+		});
+
+		it("reports no hover on an app link", () => {
+			terminal.options.linkHandler?.hover?.(
+				event,
+				"superset://v2-workspace/abc",
+				range,
+			);
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			"file:///etc/passwd",
+			"javascript:alert(1)",
+			"superset-dev://v2-workspace/abc",
+			"not a url",
+		])("ignores %s", (uri) => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
 	});
 
 	it("clears only the OSC link handler it installed", () => {

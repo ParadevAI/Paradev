@@ -13,6 +13,7 @@ import {
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
 import { parseSupersetPageUrl } from "renderer/lib/parseSupersetPageUrl";
+import { parseWorkspaceLinkUrl } from "renderer/lib/parseWorkspaceLinkUrl";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { RightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
@@ -23,6 +24,7 @@ import { openPagePaneInStore } from "renderer/routes/_authenticated/_dashboard/w
 import { openPullRequestPaneInStore } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openPullRequestPaneInStore";
 import { openUrlInRightPane } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openUrlInRightPane";
 import { openUrlInWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openUrlInWorkspace";
+import { PROTOCOL_SCHEME } from "shared/constants";
 import type { StoreApi } from "zustand/vanilla";
 
 /**
@@ -44,19 +46,52 @@ export interface TerminalLinkActionDeps {
 	rightPane?: RightPaneLinkTarget | null;
 }
 
+function parseWorkspaceLink(url: string): string | null {
+	return parseWorkspaceLinkUrl(url, {
+		protocolScheme: PROTOCOL_SCHEME,
+		webUrl: env.NEXT_PUBLIC_WEB_URL,
+	});
+}
+
+function isAppDeepLink(url: string): boolean {
+	return url.startsWith(`${PROTOCOL_SCHEME}:`);
+}
+
+/**
+ * The workspace a terminal click should switch to, or null to treat the link
+ * as a URL. The app's deep link opens on every click; the web form only on a
+ * plain click, so its modifier clicks keep their URL shortcuts.
+ */
+export function terminalWorkspaceLinkTarget(
+	event: ModifierEvent,
+	url: string,
+): string | null {
+	const workspaceId = parseWorkspaceLink(url);
+	if (!workspaceId) return null;
+	if (isAppDeepLink(url)) return workspaceId;
+	const hasModifier = event.metaKey || event.ctrlKey || event.shiftKey;
+	return hasModifier ? null : workspaceId;
+}
+
 /**
  * A bare pull request URL keeps its shortcuts (shift-click → system browser,
  * unbound plain click → PR pane); a plain click the user bound in URL links
- * follows that binding, as it does for every other URL.
+ * follows that binding, as it does for every other URL. A web workspace link
+ * keeps the same shift-click.
  */
 export function terminalUrlLinkAction(
 	event: ModifierEvent,
 	url: string,
 	getUrlAction: (event: ModifierEvent, url: string) => LinkAction | null,
 ): LinkAction | null {
+	const withoutMeta = !event.metaKey && !event.ctrlKey;
 	const isBarePullRequest =
-		!event.metaKey && !event.ctrlKey && pullRequestRefFromBareUrl(url) !== null;
-	if (isBarePullRequest && event.shiftKey) return "external";
+		withoutMeta && pullRequestRefFromBareUrl(url) !== null;
+	const isWebWorkspaceLink =
+		withoutMeta && !isAppDeepLink(url) && parseWorkspaceLink(url) !== null;
+	if ((isBarePullRequest || isWebWorkspaceLink) && event.shiftKey) {
+		return "external";
+	}
 	const chosen = getUrlAction(event, url);
 	if (chosen !== null) return chosen;
 	return isBarePullRequest ? "pane" : null;
