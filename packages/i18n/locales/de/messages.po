@@ -5031,6 +5031,10 @@ msgstr "Tarife vergleichen"
 msgid "Compared against the default style"
 msgstr "Verglichen mit dem Standardstil"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Vergleich"
+
 msgid "complete"
 msgstr "abgeschlossen"
 
@@ -16010,6 +16014,9 @@ msgstr "ist {channel} wieder beigetreten, ebenso wie {others}."
 msgid "rejoined {channel}."
 msgstr "ist {channel} wieder beigetreten."
 
+msgid "Related comparisons"
+msgstr "Verwandte Vergleiche"
+
 msgid "Related Posts"
 msgstr "Verwandte Beiträge"
 
@@ -16901,6 +16908,10 @@ msgstr "Drehen"
 
 msgid "Rotate device"
 msgstr "Gerät drehen"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Übersicht"
 
 msgid "Roundups"
 msgstr "Übersichten"
@@ -21102,6 +21113,10 @@ msgstr "mach aus den Onboarding-Ergebnissen eine Seite"
 
 msgid "Turned off because its files changed"
 msgstr "Deaktiviert, weil sich ihre Dateien geändert haben"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
 
 msgid "Two Hands"
 msgstr "Beidhändig"

@@ -5031,6 +5031,10 @@ msgstr "So sánh gói"
 msgid "Compared against the default style"
 msgstr "So sánh với kiểu mặc định"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "So sánh"
+
 msgid "complete"
 msgstr "đã kết thúc"
 
@@ -16010,6 +16014,9 @@ msgstr "đã tham gia lại {channel}, cùng với {others}."
 msgid "rejoined {channel}."
 msgstr "đã tham gia lại {channel}."
 
+msgid "Related comparisons"
+msgstr "So sánh liên quan"
+
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
 
@@ -16901,6 +16908,10 @@ msgstr "Xoay"
 
 msgid "Rotate device"
 msgstr "Xoay thiết bị"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Tổng hợp"
 
 msgid "Roundups"
 msgstr "Tổng hợp"
@@ -21102,6 +21113,10 @@ msgstr "biến kết quả nghiên cứu onboarding thành một trang"
 
 msgid "Turned off because its files changed"
 msgstr "Đã tắt vì các tệp của tiện ích đã thay đổi"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Hướng dẫn"
 
 msgid "Two Hands"
 msgstr "Hai tay"

@@ -5031,6 +5031,10 @@ msgstr "Сравнить тарифы"
 msgid "Compared against the default style"
 msgstr "Сравнили со стилем по умолчанию"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Сравнение"
+
 msgid "complete"
 msgstr "завершён"
 
@@ -16010,6 +16014,9 @@ msgstr "снова присоединился(-ась) к {channel}, как и {
 msgid "rejoined {channel}."
 msgstr "снова присоединился(-ась) к {channel}."
 
+msgid "Related comparisons"
+msgstr "Похожие сравнения"
+
 msgid "Related Posts"
 msgstr "Похожие посты"
 
@@ -16901,6 +16908,10 @@ msgstr "Повернуть"
 
 msgid "Rotate device"
 msgstr "Повернуть устройство"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Обзор"
 
 msgid "Roundups"
 msgstr "Обзоры"
@@ -21102,6 +21113,10 @@ msgstr "сделай страницу из выводов по онбордин�
 
 msgid "Turned off because its files changed"
 msgstr "Отключено, так как его файлы изменились"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Руководство"
 
 msgid "Two Hands"
 msgstr "Две руки"
