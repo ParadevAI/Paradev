@@ -1,0 +1,1 @@
+export { usePruneStaleSidebarSections } from "./usePruneStaleSidebarSections";
