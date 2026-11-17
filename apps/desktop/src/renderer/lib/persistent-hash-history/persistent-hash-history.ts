@@ -9,9 +9,14 @@ const MAX_ENTRIES = 100;
 
 type LocationState = HistoryLocation["state"];
 
+// Entries saved without this marker come from builds where `/workspace` was
+// the v1 route and v2 lived under `/v2-workspace`.
+const ROUTE_SCHEME = 2;
+
 interface PersistedState {
 	entries: string[];
 	index: number;
+	routes?: number;
 }
 
 interface HistoryEntry {
@@ -34,7 +39,10 @@ function loadPersistedState(): PersistedState {
 					Math.max(parsed.index, 0),
 					parsed.entries.length - 1,
 				);
-				const entries = parsed.entries.map(restoreEntry);
+				const entries =
+					parsed.routes === ROUTE_SCHEME
+						? parsed.entries
+						: parsed.entries.map(restoreLegacyEntry);
 				return { entries, index };
 			}
 		}
@@ -54,7 +62,11 @@ function persistState(entries: string[], index: number) {
 				: index;
 		localStorage.setItem(
 			STORAGE_KEY,
-			JSON.stringify({ entries: capped, index: cappedIndex }),
+			JSON.stringify({
+				entries: capped,
+				index: cappedIndex,
+				routes: ROUTE_SCHEME,
+			}),
 		);
 	} catch {}
 }
@@ -108,13 +120,11 @@ interface PersistentHashHistory extends RouterHistory {
 	getEntries: () => HistoryEntry[];
 }
 
-// Drop with the v1 importer (lib/trpc/routers/migration).
-// A profile re-saves its entries rewritten after one boot on this build.
-const RETIRED_V1_ROUTE = /^\/(?:project(?:\/|$|\?)|workspace(?:$|\?))/;
+const RETIRED_V1_ROUTE = /^\/(?:project|workspaces?)(?:\/|$|\?)/;
 
-function restoreEntry(entry: string): string {
+function restoreLegacyEntry(entry: string): string {
 	if (RETIRED_V1_ROUTE.test(entry)) return "/";
-	return entry.replace(/^\/v2-workspace(s)?\b/, "/workspace$1");
+	return entry.replace(/^\/v2-workspace(s)?(?=\/|$|\?)/, "/workspace$1");
 }
 
 export function createPersistentHashHistory(): PersistentHashHistory {
