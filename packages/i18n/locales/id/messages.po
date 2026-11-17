@@ -18247,6 +18247,13 @@ msgstr "Mengirim…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Mengirim {0} karakter konteks terminal (sekitar {1} token) ke {2}."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "Mengarahkan Anda kembali ke <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "Mengarahkan Anda kembali ke <0>aplikasi di komputer ini</0>"
+
 msgid "Sensitive"
 msgstr "Sensitif"
 

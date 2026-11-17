@@ -18247,6 +18247,13 @@ msgstr "Đang gửi…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Gửi {0} ký tự ngữ cảnh terminal (khoảng {1} token) tới {2}."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "Đưa bạn trở lại <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "Đưa bạn trở lại <0>một ứng dụng trên máy tính này</0>"
+
 msgid "Sensitive"
 msgstr "Nhạy cảm"
 
