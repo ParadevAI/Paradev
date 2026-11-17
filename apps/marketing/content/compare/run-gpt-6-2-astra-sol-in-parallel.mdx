@@ -1,0 +1,146 @@
+---
+title: "How to Run GPT-6.2 Astra and Sol in Parallel with Codex"
+description: "GPT-6.2 Astra and GPT-6.2 Sol shipped in Codex on November 17, 2026. How to pick each model in the Codex CLI, run several sessions at once in separate Git worktrees, and do the same in Paradev."
+date: 2026-11-17
+type: "tutorial"
+competitors:
+  - codex
+  - git-worktrees
+keywords:
+  - gpt-6.2 astra
+  - gpt-6.2 sol
+  - gpt-6.2 codex
+  - run gpt-6.2 in parallel
+  - codex gpt-6.2-astra
+  - codex gpt-6.2-sol
+  - parallel codex sessions
+---
+
+To run GPT-6.2 Astra or GPT-6.2 Sol in parallel, start one Codex session per task, each in its own Git worktree and branch, and launch each with `codex -m gpt-6.2-astra` or `codex -m gpt-6.2-sol`. In Paradev, set the model in `~/.codex/config.toml`, then create one workspace per task with Codex as the agent and **Default model** selected, or start Codex with `--command` from `superset ws create`. Review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+
+## What shipped
+
+On November 17, 2026, OpenAI released [GPT-6.2 Astra and GPT-6.2 Sol](https://openai.com/index/introducing-gpt-6-2-astra-sol/) in ChatGPT Work and Codex, and in the [OpenAI API](https://developers.openai.com/changelog). The [Codex changelog](https://learn.chatgpt.com/docs/changelog) says: "Choose Astra for your hardest projects, such as implementing and testing a change across an existing codebase," and "Choose Sol for everyday coding, writing, and multistep workflows."
+
+| | GPT-6.2 Astra | GPT-6.2 Sol |
+|---|---|---|
+| **Released** | November 17, 2026 | November 17, 2026 |
+| **Best for** | Hard, multi-file changes | Everyday coding and multistep work |
+| **Codex command** | `codex -m gpt-6.2-astra` | `codex -m gpt-6.2-sol` |
+| **Default context in Codex** | 272,000 tokens | 500,000 tokens |
+| **API price per million tokens** | [$8 input, $40 output](https://developers.openai.com/api/docs/models/gpt-6.2-astra) | [$2 input, $10 output](https://developers.openai.com/api/docs/models/gpt-6.2-sol) |
+| **Ultrafast mode** | Pro $500 | Pro $200 and Pro $500 |
+
+Both models have a context window of 1,050,000 tokens in the API. In Codex you can raise the default context to 1 million tokens with the `model_context_window` setting, per the [Codex models page](https://learn.chatgpt.com/codex/models). OpenAI also says Sol completes more tasks on the same paid plan than GPT-6.1 Sol. These figures come from OpenAI and are not independently checked.
+
+The [Codex models page](https://learn.chatgpt.com/codex/models) does not name one default model. If you set no model, Codex uses "a recommended model," so set the model yourself when it matters which one runs.
+
+## Astra or Sol for parallel work
+
+The split maps well onto how parallel work is usually shaped. Most of the tasks you fan out are bounded: tests, small fixes, docs, a migration with a clear spec. Sol costs a quarter of Astra's API price, so it fits those. Keep Astra for the one or two tasks that need the most reasoning, such as a change that spans the codebase. If you are not sure, run the same task on both and compare the diffs.
+
+## Pick a model in the Codex CLI
+
+Update Codex to the latest release, then choose the model when you start a session:
+
+```bash
+codex --version
+codex -m gpt-6.2-sol
+```
+
+Inside a running session, `/model` switches models. To make one model the default for every new session, set it in `~/.codex/config.toml`:
+
+```toml
+model = "gpt-6.2-sol"
+```
+
+## Run several GPT-6.2 sessions at once
+
+Give each task its own worktree and branch, so two sessions never edit the same working files:
+
+```bash
+git worktree add -b ai/astra-refactor ../repo-astra-refactor
+git worktree add -b ai/sol-tests ../repo-sol-tests
+```
+
+Open a terminal in each directory, install dependencies, and start Codex there with the model that fits the task:
+
+```bash
+cd ../repo-astra-refactor && codex -m gpt-6.2-astra
+cd ../repo-sol-tests && codex -m gpt-6.2-sol
+```
+
+Use narrow prompts with a clear stop condition:
+
+```text
+Task A (Astra): Move the billing logic out of the request handlers into
+one module. Keep behavior the same. Run the full test suite and report
+the result. Do not commit.
+
+Task B (Sol): Add regression tests for the input parser. Change only test
+files. Run the focused test command and report the result. Do not commit.
+```
+
+Check each session with `git branch --show-current` before it starts editing.
+
+### What worktrees do not separate
+
+Worktrees share repository history and run as your user. They do not give each task its own ports, database, credentials, or API quota. Two sessions can still change the same external service, and their branches can still conflict when you merge. Rerun your checks on the combined branch.
+
+## Run GPT-6.2 in Paradev
+
+Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Codex runs on your own ChatGPT plan or API key. Paradev is open source under the MIT License.
+
+Paradev's model picker does not list GPT-6.2 yet. Until it does, let Codex choose the model from its own config:
+
+1. Add `model = "gpt-6.2-sol"` (or `gpt-6.2-astra`) to `~/.codex/config.toml`.
+2. Create a new workspace for each task.
+3. Choose **Codex** as the agent and **Default model** in the model menu, so Codex reads the model from its config.
+4. Write the task prompt and start it. Repeat for the next task.
+5. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+
+From the `superset` CLI, start a batch of workspaces and group them with a tag. With the model set in `config.toml`, leave out `--model`:
+
+```bash
+superset ws create --local --project PROJECT_ID --name sol-tests \
+  --branch ai/sol-tests --tag gpt-6-2 \
+  --agent codex --prompt "Add regression tests for the input parser"
+
+superset ws list --local --tag gpt-6-2
+```
+
+To run a different model in one workspace, start Codex with `--command` instead of `--agent`:
+
+```bash
+superset ws create --local --project PROJECT_ID --name astra-refactor \
+  --branch ai/astra-refactor --tag gpt-6-2 \
+  --command 'codex -m gpt-6.2-astra "Move the billing logic out of the request handlers into one module"'
+```
+
+Tagged workspaces collect in a sidebar folder with the tag's name. To compare Astra and Sol on the same task, create two workspaces with the same prompt and different `-m` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud).
+
+## Frequently Asked Questions
+
+### Should I use GPT-6.2 Astra or GPT-6.2 Sol?
+
+OpenAI recommends Astra for the hardest projects, such as a change across an existing codebase, and Sol for everyday coding and multistep work. Sol costs a quarter of Astra's API price, so it suits most parallel tasks.
+
+### Is GPT-6.2 the default model in Codex?
+
+OpenAI's Codex models page does not name a single default. It says Codex uses a recommended model when you set none. Set `model` in `~/.codex/config.toml` or pass `-m` to be sure which model runs.
+
+### Can I use GPT-6.2 with an API key instead of a ChatGPT plan?
+
+Yes. The API model ids are `gpt-6.2-astra` and `gpt-6.2-sol`. Astra costs $8 per million input tokens and $40 per million output tokens; Sol costs $2 and $10.
+
+### Can I pick GPT-6.2 in Paradev's model picker?
+
+Not yet. Set the model in `~/.codex/config.toml` and choose **Default model**, or start Codex with `--command 'codex -m gpt-6.2-astra'` from `superset ws create`.
+
+### Do parallel GPT-6.2 sessions share files?
+
+Not if each runs in its own Git worktree. They still share ports, databases, credentials, and your model quota, and their branches can conflict when merged.
+
+### Where can I read more about running Codex in parallel?
+
+See [How to run GPT-6.1 Terra in parallel](/compare/run-gpt-6-1-terra-in-parallel), the [best IDE for Codex](/compare/best-ide-for-codex), [Paradev vs Codex](/compare/superset-vs-codex), and [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).
