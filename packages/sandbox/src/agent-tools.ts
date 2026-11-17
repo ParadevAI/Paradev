@@ -269,6 +269,7 @@ export function vercelDriveHost(credentials: VercelCredentials): DriveHost {
 			for await (const drive of await Drive.list({
 				...credentials,
 				namePrefix: prefix,
+				sortBy: "name",
 			})) {
 				names.push(drive.name);
 			}
