@@ -101,6 +101,15 @@ const NESTED_REPO_SCAN_CONCURRENCY = 4;
  */
 const WORKTREE_CONTAINER_NAMES = new Set([".worktrees", ".conductor"]);
 
+function toPosixRelative(from: string, to: string): string {
+	const relative = path.relative(from, to);
+	return path.sep === "/" ? relative : relative.split(path.sep).join("/");
+}
+
+function isUnderOrAt(relative: string, dirs: readonly string[]): boolean {
+	return dirs.some((dir) => relative === dir || relative.startsWith(`${dir}/`));
+}
+
 export function isRelPathUnderPrunedDirs(
 	relative: string,
 	prunedRelPrefixes: readonly string[],
@@ -189,6 +198,10 @@ interface WatcherState {
 	 * targeted watch if you need it".
 	 */
 	prunedRelPrefixes: string[];
+	/** The part of `prunedRelPrefixes` the native subscription was given. */
+	nativePrunedRelPrefixes: string[];
+	/** The rest: pruned here, by dropping their events, until a re-attach. */
+	filteredRelPrefixes: string[];
 	filePaths: Map<string, true>;
 	directoryPaths: Set<string>;
 	pendingEvents: NativeWatchEvent[];
@@ -613,6 +626,8 @@ export class FsWatcherManager {
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			prunedRelPrefixes: [],
+			nativePrunedRelPrefixes: [],
+			filteredRelPrefixes: [],
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
 			pendingEvents: [],
@@ -667,6 +682,8 @@ export class FsWatcherManager {
 		]);
 		state.controller.signal.throwIfAborted();
 		state.prunedRelPrefixes = [...nestedRepoRelDirs, ...gitIgnoredRelDirs];
+		state.nativePrunedRelPrefixes = state.prunedRelPrefixes;
+		state.filteredRelPrefixes = [];
 		// Root-relative escaped globs: parcel matches ignores relative to the
 		// watch root (its defaults are all `**/…`), so an absolute path never
 		// matches. Bare paths aren't safe either — parcel's `is-glob` check
@@ -725,7 +742,20 @@ export class FsWatcherManager {
 		}
 
 		this.normalizeEvents(visibleEvents, state);
-		for (const event of visibleEvents) state.pendingEvents.push(event);
+		const keptEvents =
+			state.filteredRelPrefixes.length === 0
+				? visibleEvents
+				: visibleEvents.filter(
+						(event) =>
+							!isUnderOrAt(
+								toPosixRelative(state.absolutePath, event.path),
+								state.filteredRelPrefixes,
+							),
+					);
+		if (keptEvents.length === 0) {
+			return;
+		}
+		for (const event of keptEvents) state.pendingEvents.push(event);
 		if (state.flushTimer) {
 			return;
 		}
@@ -858,29 +888,40 @@ export class FsWatcherManager {
 			this.computeNestedRepoRelDirs(state.realPath, state.controller.signal),
 			this.computeGitIgnoredRelDirs(state.realPath, state.controller.signal),
 		]);
-		const fresh = new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs]);
-		const shrunk = state.prunedRelPrefixes.some((dir) => !fresh.has(dir));
-		if (!shrunk) {
-			const pruned = new Set(state.prunedRelPrefixes);
-			const grew =
-				this.backend.watchesEachEntry === true &&
-				[...fresh].some((dir) => !pruned.has(dir));
-			if (!grew) {
-				return false;
-			}
-			const waitMs =
-				state.lastGrowthReattachAt + this.growthReattachMinMs - this.now();
-			if (waitMs > 0) {
-				this.scheduleGrowthReattach(state, waitMs);
-				return false;
-			}
-		}
 		if (
 			state.controller.signal.aborted ||
 			!state.subscription ||
 			state.recoveryTimer
 		) {
 			// State changed while the providers ran.
+			return false;
+		}
+		const fresh = [...new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs])];
+		const freshSet = new Set(fresh);
+		const native = new Set(state.nativePrunedRelPrefixes);
+		const nativeShrunk = state.nativePrunedRelPrefixes.some(
+			(dir) => !freshSet.has(dir),
+		);
+		const added = fresh.filter((dir) => !native.has(dir));
+		let reattach = nativeShrunk;
+		if (!nativeShrunk && added.length > 0 && this.backend.watchesEachEntry) {
+			const waitMs =
+				state.lastGrowthReattachAt + this.growthReattachMinMs - this.now();
+			if (waitMs > 0) {
+				this.scheduleGrowthReattach(state, waitMs);
+			} else {
+				reattach = true;
+			}
+		}
+		if (!reattach) {
+			const changed =
+				fresh.length !== state.prunedRelPrefixes.length ||
+				state.prunedRelPrefixes.some((dir) => !freshSet.has(dir));
+			if (changed) {
+				state.prunedRelPrefixes = fresh;
+				state.filteredRelPrefixes = added;
+				this.emitRootOverflow(state);
+			}
 			return false;
 		}
 		// Detach the old stream BEFORE attaching the new one. Keeping both
@@ -924,6 +965,11 @@ export class FsWatcherManager {
 		}
 		// Events during the swap gap may have been missed.
 		invalidateSearchIndexesForRoot(state.absolutePath);
+		this.emitRootOverflow(state);
+		return true;
+	}
+
+	private emitRootOverflow(state: WatcherState): void {
 		this.emitDirect(state, {
 			events: [
 				{
@@ -933,7 +979,6 @@ export class FsWatcherManager {
 				},
 			],
 		});
-		return true;
 	}
 
 	private scheduleGrowthReattach(state: WatcherState, delayMs: number): void {
@@ -968,7 +1013,7 @@ export class FsWatcherManager {
 		if (!state || !state.subscription) {
 			return true;
 		}
-		const relative = path.relative(
+		const relative = toPosixRelative(
 			state.absolutePath,
 			normalizeAbsolutePath(absolutePath),
 		);
