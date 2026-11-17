@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, test } from "bun:test";
 import { apiKey } from "@better-auth/api-key";
 import { db } from "@superset/db/client";
 import { TRPCError } from "@trpc/server";
@@ -154,8 +154,12 @@ const cases: Array<{
 ];
 
 describe("better-auth user errors through the routers", () => {
+	let s: Setup;
+	beforeAll(async () => {
+		s = await setup();
+	});
+
 	test.each(cases)("$name", async ({ call, code, message }) => {
-		const s = await setup();
 		const error = await call(s).then(
 			() => null,
 			(e: unknown) => e,
