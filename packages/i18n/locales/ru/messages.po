@@ -18247,6 +18247,13 @@ msgstr "Отправка…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Отправит {0} символов контекста терминала (примерно {1} токенов) агенту {2}."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "Вернёт вас на <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "Вернёт вас в <0>приложение на этом компьютере</0>"
+
 msgid "Sensitive"
 msgstr "Конфиденциально"
 
