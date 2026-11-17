@@ -936,6 +936,8 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"google",
 			"kiro",
 			"aws",
+			"wally",
+			"runanywhere",
 		],
 	},
 	{
@@ -1013,6 +1015,8 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"google",
 			"kiro",
 			"aws",
+			"wally",
+			"runanywhere",
 		],
 	},
 	{
