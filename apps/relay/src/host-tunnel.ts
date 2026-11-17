@@ -16,6 +16,11 @@ import {
 	type HttpExchangeResult,
 	HttpExchanges,
 } from "./http-exchange";
+import {
+	type HostConnectRecord,
+	RECONNECT_STORM_WINDOW_MS,
+	recordHostConnect,
+} from "./reconnect-storm";
 import type { RelayEnv } from "./types";
 
 const HOST_TAG = "host";
@@ -38,7 +43,13 @@ const LIVENESS_SWEEP_MS = 45_000;
 const HOST_STALE_MS = 90_000;
 
 type ConnState =
-	| { kind: "host"; hostId: string; retired?: true }
+	| {
+			kind: "host";
+			hostId: string;
+			colo?: string | null;
+			connectedAt?: number;
+			retired?: true;
+	  }
 	| { kind: "client"; ticket: string; peer?: string }
 	| { kind: "dial"; ticket: string; peer?: string };
 
@@ -205,9 +216,16 @@ export class HostTunnel extends Server<RelayEnv> {
 
 		if (conn.tags.includes(HOST_TAG)) {
 			const hostId = url.searchParams.get("hostId") ?? this.name;
+			const colo = url.searchParams.get("colo");
+			const connectedAt = Date.now();
 			// State first: a replaced socket's close is delivered mid-await, and
 			// teardown must be able to tell this connection is the live host.
-			conn.setState({ kind: "host", hostId } satisfies ConnState);
+			conn.setState({
+				kind: "host",
+				hostId,
+				colo,
+				connectedAt,
+			} satisfies ConnState);
 			// Last-write-wins: the new socket evicts any old one.
 			for (const other of this.getConnections(HOST_TAG)) {
 				if (other.id !== conn.id)
@@ -215,7 +233,14 @@ export class HostTunnel extends Server<RelayEnv> {
 			}
 			await this.ctx.storage.put("lastHostSeenAt", Date.now());
 			await this.ctx.storage.setAlarm(Date.now() + LIVENESS_SWEEP_MS);
-			console.log(`[relay] host connected: ${hostId}`);
+			console.log({
+				message: "[relay] host connected",
+				hostId,
+				colo,
+				country: url.searchParams.get("country"),
+				asn: url.searchParams.get("asn"),
+			});
+			await this.trackReconnects(hostId, { at: connectedAt, colo });
 			return;
 		}
 
@@ -337,15 +362,18 @@ export class HostTunnel extends Server<RelayEnv> {
 		this.earlyFrames.set(conn.id, buffer);
 	}
 
-	async onClose(conn: Connection): Promise<void> {
-		await this.handleGone(conn);
+	async onClose(conn: Connection, code?: number): Promise<void> {
+		await this.handleGone(conn, code ?? null);
 	}
 
 	async onError(conn: Connection): Promise<void> {
-		await this.handleGone(conn);
+		await this.handleGone(conn, null);
 	}
 
-	private async handleGone(conn: Connection): Promise<void> {
+	private async handleGone(
+		conn: Connection,
+		code: number | null,
+	): Promise<void> {
 		const state = conn.state as ConnState | undefined;
 		if (!state) return;
 
@@ -364,7 +392,16 @@ export class HostTunnel extends Server<RelayEnv> {
 			this.httpExchanges.abortAll();
 			// A replaced socket's close lands after the new one registered.
 			if (!this.hostConn()) {
-				console.log(`[relay] host disconnected: ${state.hostId}`);
+				console.log({
+					message: "[relay] host disconnected",
+					hostId: state.hostId,
+					colo: state.colo ?? null,
+					code,
+					connectedMs:
+						state.connectedAt === undefined
+							? null
+							: Date.now() - state.connectedAt,
+				});
 			}
 			return;
 		}
@@ -412,6 +449,25 @@ export class HostTunnel extends Server<RelayEnv> {
 	}
 
 	// ── Internals ─────────────────────────────────────────────────────
+
+	private async trackReconnects(
+		hostId: string,
+		connect: HostConnectRecord,
+	): Promise<void> {
+		const { history, storm } = recordHostConnect(
+			(await this.ctx.storage.get<HostConnectRecord[]>("recentConnects")) ?? [],
+			connect,
+		);
+		await this.ctx.storage.put("recentConnects", history);
+		if (!storm) return;
+		console.warn({
+			message: "[relay] host reconnect storm",
+			hostId,
+			connects: history.length,
+			windowMs: RECONNECT_STORM_WINDOW_MS,
+			colos: [...new Set(history.map((entry) => entry.colo))],
+		});
+	}
 
 	// The host gave up dialing this ticket: answer the waiting client now
 	// instead of at the deadline.
