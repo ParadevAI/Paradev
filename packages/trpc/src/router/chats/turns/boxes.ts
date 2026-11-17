@@ -1,3 +1,5 @@
+import type { TurnApp } from "./app-access";
+
 /** A Dev's running sandbox. */
 export interface Box {
 	id: string;
@@ -40,6 +42,8 @@ export interface TurnStart {
 	 * owner's notes, under a rule to share only what was asked.
 	 */
 	devAsk: boolean;
+	/** The apps the Dev may use this turn, each served by the API with its owner's access. */
+	apps: TurnApp[];
 	/** The chat around the turn: its latest messages, oldest first, and who is in it. */
 	chat: {
 		recent: { line: string; seen: boolean }[];

@@ -3,12 +3,19 @@ import { afterAll, beforeAll, beforeEach, expect, mock, test } from "bun:test";
 mock.module("../publish", () => ({ publishChats: () => {} }));
 
 const { db, dbWs } = await import("@superset/db/client");
-const { chatsMessages, chatsModelUsage, members, organizations, users } =
-	await import("@superset/db/schema");
+const {
+	chatsAppCalls,
+	chatsMessages,
+	chatsModelUsage,
+	members,
+	organizations,
+	users,
+} = await import("@superset/db/schema");
 const { asc, eq, inArray } = await import("drizzle-orm");
 const { chatsRouter } = await import("../chats");
 const { createCallerFactory, createTRPCContext, createTRPCRouter } =
 	await import("../../../trpc");
+const { paradevCaller, recordAppCall } = await import("./app-access");
 const { handleBoxRequest } = await import("./box-api");
 const { generateBoxKeys } = await import("./box-tokens");
 const { inlineTurnRuns } = await import("./inline-runs");
@@ -247,6 +254,71 @@ test("one Dev asks another in its chat and hears the answer; the asked Dev posts
 		(await fromBox(turn, "/cli/ask", { dev: "nobody", question: "x" })).status,
 	).toBe(404);
 	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
+test("a Dev acts in Paradev as its owner only once the owner switched that on; a group's Dev never does", async () => {
+	const boxHeaders = (turn: TurnStart) =>
+		new Headers({
+			"x-dev-box": boxes.get(turn.agentId)?.credential ?? "",
+			"x-dev-chat": turn.groupId,
+		});
+	const refusal = (turn: TurnStart) =>
+		paradevCaller(keys, boxHeaders(turn)).then(
+			() => null,
+			(error: { code: string }) => error.code,
+		);
+	const { groupId, turn } = await messaged("start a workspace");
+	expect(turn.apps).toEqual([]);
+	expect(await refusal(turn)).toBe("not_selected");
+
+	await owner.chats.updateDev({ devId: turn.agentId, paradevAccess: true });
+	const caller = await paradevCaller(keys, boxHeaders(turn));
+	expect(caller).toMatchObject({
+		agentId: turn.agentId,
+		ownerUserId: OWNER,
+		askedByUserId: OWNER,
+		organizationId: ORG,
+		groupId,
+	});
+	await recordAppCall(caller, { tool: "workspaces_create", ok: true });
+	expect(
+		await db
+			.select({ tool: chatsAppCalls.tool, asker: chatsAppCalls.askedByUserId })
+			.from(chatsAppCalls)
+			.where(eq(chatsAppCalls.agentId, turn.agentId)),
+	).toEqual([{ tool: "workspaces_create", asker: OWNER }]);
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+
+	const before = started.length;
+	await owner.chats.sendMessage({ groupId, text: "again" });
+	const next = await startedTurn(before + 1);
+	expect(next.apps.map((app) => app.path)).toEqual(["apps/paradev/mcp"]);
+	await fromBox(next, `/cli/turns/${next.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+
+	const created = await owner.chats.createGroup({
+		organizationId: ORG,
+		title: "No access",
+	});
+	const groupTurns = started.length;
+	await owner.chats.sendMessage({
+		groupId: created.group.id,
+		text: `<@dev:${created.dev.id}> start a workspace`,
+	});
+	const groupTurn = await startedTurn(groupTurns + 1);
+	expect(await refusal(groupTurn)).toBe("no_apps");
+	await expect(
+		owner.chats.updateDev({ devId: created.dev.id, paradevAccess: true }),
+	).rejects.toThrow();
+	await fromBox(groupTurn, `/cli/turns/${groupTurn.turnId}/settled`, {
 		stopReason: "end_turn",
 	});
 	await runs.idle();

@@ -26,6 +26,7 @@ import {
 } from "drizzle-orm";
 import { publishChats } from "../publish";
 import { messageView, toUser } from "../views";
+import { mayUseParadev, turnApps } from "./app-access";
 import { type BoxKeys, signBoxCredential } from "./box-tokens";
 import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
 import { type Claim, TURN_MAX_MS, type TurnOutcome } from "./flow";
@@ -770,7 +771,12 @@ async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
 	const names = new Map(roster.map((dev) => [dev.id, dev.name]));
 	const seenBefore = previous?.startedAt ?? null;
 	return {
-		roster: roster.map((dev) => `- ${dev.name} (${dev.kind} Dev)`).join("\n"),
+		roster: roster
+			.map(
+				(dev) =>
+					`- ${dev.name} (${dev.kind} Dev${mayUseParadev(dev) ? ", can act in Paradev for its owner" : ""})`,
+			)
+			.join("\n"),
 		recent: rows.reverse().map(({ message, author, agent }) => {
 			const who = agent?.name ?? (author ? toUser(author).displayName : "note");
 			const said = renderMentions(
@@ -783,6 +789,16 @@ async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
 			};
 		}),
 	};
+}
+
+async function appsFor(agentId: string) {
+	const [row] = await db
+		.select({ agent: chatsAgents, owner: users })
+		.from(chatsAgents)
+		.leftJoin(users, eq(users.id, chatsAgents.ownerUserId))
+		.where(eq(chatsAgents.id, agentId));
+	if (!row) return [];
+	return turnApps(row.agent, row.owner ? toUser(row.owner).displayName : null);
 }
 
 /** Step 3: hands the turn to the runner. False when there is nothing to run or the box refused it. */
@@ -814,6 +830,7 @@ export async function startTurn(
 			checkReply: turn.parentTurnId ? false : await checksReply(turn),
 			ownerOneToOne: await isOwnerOneToOne(turn),
 			devAsk: await isDevAsk(turn),
+			apps: await appsFor(turn.agentId),
 			chat: await turnChat(turn),
 		});
 		await markAgentRead(turn.agentId, turn.groupId).catch((error: unknown) =>

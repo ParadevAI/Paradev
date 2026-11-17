@@ -61,6 +61,9 @@ export function agentView(
 		...(reader.owner || ownedByGroup(agent)
 			? { descriptionText: agent.description }
 			: {}),
+		...(reader.owner && agent.ownerUserId
+			? { paradevAccess: agent.paradevAccess }
+			: {}),
 	};
 }
 

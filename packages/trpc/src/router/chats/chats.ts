@@ -1210,12 +1210,19 @@ export const chatsRouter = {
 				name: z.string().trim().min(1).max(TITLE_MAX).optional(),
 				color: colorInput.optional(),
 				description: z.string().trim().max(2_000).optional(),
+				paradevAccess: z.boolean().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const user = ctx.session.user;
 			const { devId, ...patch } = input;
 			const existing = await editableAgent(user.id, devId);
+			if (
+				patch.paradevAccess !== undefined &&
+				existing.ownerUserId !== user.id
+			) {
+				throw invalid("Only a Dev's owner can let it act in Paradev");
+			}
 			if (patch.description === "" && existing.kind !== "personal") {
 				throw invalid("A description is required");
 			}
