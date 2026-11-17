@@ -49,6 +49,8 @@ export interface Dev {
 	 * whole description otherwise. Only shown to those who may edit it.
 	 */
 	descriptionText?: string;
+	/** Whether its owner lets it act in Paradev with the owner's access; only shown to the owner. */
+	paradevAccess?: boolean;
 	/** Its chosen look (core's `DEV_LOOK_IDS`: a character's id, or "plain"); null or absent: dressed by its words. */
 	look?: string | null;
 	/** The voice it speaks in (core's `DEV_VOICES` id); null or absent: the server's default voice. */

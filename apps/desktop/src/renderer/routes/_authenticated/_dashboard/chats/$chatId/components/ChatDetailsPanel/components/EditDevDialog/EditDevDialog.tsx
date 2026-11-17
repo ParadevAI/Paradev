@@ -9,6 +9,7 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
+import { Switch } from "@superset/ui/switch";
 import { Textarea } from "@superset/ui/textarea";
 import { useState } from "react";
 
@@ -16,7 +17,11 @@ interface EditDevDialogProps {
 	dev: Dev;
 	onOpenChange: (open: boolean) => void;
 	/** Resolves to whether it saved. */
-	onSave: (patch: { name: string; description: string }) => Promise<boolean>;
+	onSave: (patch: {
+		name: string;
+		description: string;
+		paradevAccess?: boolean;
+	}) => Promise<boolean>;
 	/** Absent when this Dev cannot be deleted. Resolves to whether it is gone. */
 	onDelete?: () => Promise<boolean>;
 }
@@ -30,6 +35,9 @@ export function EditDevDialog({
 	const { t } = useLingui();
 	const [name, setName] = useState(dev.name);
 	const [description, setDescription] = useState(dev.descriptionText ?? "");
+	const [paradevAccess, setParadevAccess] = useState(
+		dev.paradevAccess ?? false,
+	);
 	const [isBusy, setBusy] = useState(false);
 	const [isConfirmingDelete, setConfirmingDelete] = useState(false);
 	const ready =
@@ -59,7 +67,11 @@ export function EditDevDialog({
 						event.preventDefault();
 						if (!ready) return;
 						void run(() =>
-							onSave({ name: name.trim(), description: description.trim() }),
+							onSave({
+								name: name.trim(),
+								description: description.trim(),
+								...(dev.paradevAccess !== undefined ? { paradevAccess } : {}),
+							}),
 						);
 					}}
 				>
@@ -79,6 +91,29 @@ export function EditDevDialog({
 						})}
 						onChange={(event) => setDescription(event.target.value)}
 					/>
+					{dev.paradevAccess !== undefined && (
+						<div className="flex items-start justify-between gap-4 rounded-lg border border-border p-3">
+							<span className="flex flex-col gap-1">
+								<label
+									htmlFor="dev-paradev-access"
+									className="text-sm font-medium"
+								>
+									<Trans>Let it act in Paradev as you</Trans>
+								</label>
+								<span className="text-xs text-muted-foreground">
+									<Trans>
+										It can start workspaces and coding agents with your access,
+										also when someone else asks it in a group.
+									</Trans>
+								</span>
+							</span>
+							<Switch
+								id="dev-paradev-access"
+								checked={paradevAccess}
+								onCheckedChange={setParadevAccess}
+							/>
+						</div>
+					)}
 					<Button type="submit" disabled={!ready || isBusy}>
 						<Trans>Save</Trans>
 					</Button>

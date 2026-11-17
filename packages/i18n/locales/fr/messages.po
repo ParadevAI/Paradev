@@ -10603,6 +10603,9 @@ msgstr "L'URL de l'issue doit correspondre à {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "Il peut lancer des espaces de travail et des agents de code avec votre accès, y compris quand quelqu'un d'autre le lui demande dans un groupe."
+
 msgid "It can:"
 msgstr "Elle peut :"
 
@@ -11058,6 +11061,9 @@ msgstr "il y a moins d'une minute"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "Autoriser un agent à utiliser vos connexions {browserName} ?"
+
+msgid "Let it act in Paradev as you"
+msgstr "L'autoriser à agir dans Paradev en votre nom"
 
 msgid "Let the agent drive."
 msgstr "Laissez l'agent piloter."

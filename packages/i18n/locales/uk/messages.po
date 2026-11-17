@@ -10597,6 +10597,9 @@ msgstr "URL issue має відповідати {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "Він може запускати робочі простори та агентів для коду з вашим доступом, зокрема коли його просить хтось інший у групі."
+
 msgid "It can:"
 msgstr "Розширення зможе:"
 
@@ -11052,6 +11055,9 @@ msgstr "менш ніж хвилину тому"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "Дозволити агенту використовувати сеанси сайтів, у які ви ввійшли через {browserName}?"
+
+msgid "Let it act in Paradev as you"
+msgstr "Дозволити йому діяти в Paradev від вашого імені"
 
 msgid "Let the agent drive."
 msgstr "Віддайте кермо агенту."

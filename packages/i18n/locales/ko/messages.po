@@ -10603,6 +10603,9 @@ msgstr "이슈 URL이 {repoMismatch}과(와) 일치해야 합니다."
 msgid "Issue…"
 msgstr "이슈…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "그룹에서 다른 사람이 요청할 때도 내 액세스 권한으로 워크스페이스와 코딩 에이전트를 시작할 수 있습니다."
+
 msgid "It can:"
 msgstr "가능한 작업:"
 
@@ -11058,6 +11061,9 @@ msgstr "1분 이내"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "에이전트가 {browserName} 로그인을 사용하도록 허용할까요?"
+
+msgid "Let it act in Paradev as you"
+msgstr "Paradev에서 나를 대신해 작업하도록 허용"
 
 msgid "Let the agent drive."
 msgstr "에이전트가 조작하게 하세요."

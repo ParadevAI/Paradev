@@ -10603,6 +10603,9 @@ msgstr "议题URL必须匹配{repoMismatch}。"
 msgid "Issue…"
 msgstr "议题…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "它可以使用你的访问权限启动工作区和编码智能体，即使是群组中的其他人提出请求。"
+
 msgid "It can:"
 msgstr "它可以："
 
@@ -11058,6 +11061,9 @@ msgstr "不到一分钟前"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "允许智能体使用你的 {browserName} 登录信息吗？"
+
+msgid "Let it act in Paradev as you"
+msgstr "允许它以你的身份在 Paradev 中操作"
 
 msgid "Let the agent drive."
 msgstr "让智能体来操作。"

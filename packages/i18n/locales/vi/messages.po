@@ -10603,6 +10603,9 @@ msgstr "URL của issue phải khớp với {repoMismatch}."
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "Nó có thể khởi tạo workspace và agent lập trình bằng quyền truy cập của bạn, kể cả khi người khác yêu cầu nó trong nhóm."
+
 msgid "It can:"
 msgstr "Tiện ích có thể:"
 
@@ -11058,6 +11061,9 @@ msgstr "chưa đầy một phút trước"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "Cho phép agent dùng thông tin đăng nhập {browserName} của bạn?"
+
+msgid "Let it act in Paradev as you"
+msgstr "Cho phép nó hành động trong Paradev thay bạn"
 
 msgid "Let the agent drive."
 msgstr "Để agent điều khiển."

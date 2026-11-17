@@ -46,6 +46,7 @@ export const toDev = (m: ApiDev): Dev => ({
 	...(m.descriptionText !== undefined
 		? { descriptionText: m.descriptionText }
 		: {}),
+	...(m.paradevAccess !== undefined ? { paradevAccess: m.paradevAccess } : {}),
 });
 
 export function toChat(g: ApiGroup, links: ApiGroupDev[]): Chat {

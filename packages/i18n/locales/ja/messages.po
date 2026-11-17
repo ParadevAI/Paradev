@@ -10603,6 +10603,9 @@ msgstr "IssueのURLは{repoMismatch}と一致する必要があります。"
 msgid "Issue…"
 msgstr "Issue…"
 
+msgid "It can start workspaces and coding agents with your access, also when someone else asks it in a group."
+msgstr "グループで他の人に頼まれた場合も含め、あなたのアクセス権でワークスペースやコーディングエージェントを開始できます。"
+
 msgid "It can:"
 msgstr "次の操作を行えます:"
 
@@ -11058,6 +11061,9 @@ msgstr "1分未満前"
 
 msgid "Let an agent use your {browserName} logins?"
 msgstr "エージェントに {browserName} のログインを使わせますか？"
+
+msgid "Let it act in Paradev as you"
+msgstr "Paradev であなたとして操作することを許可"
 
 msgid "Let the agent drive."
 msgstr "エージェントに操作させる。"

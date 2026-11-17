@@ -17,6 +17,8 @@ export interface TurnPlugin {
 	name: string;
 	displayName: string;
 	description: string;
+	/** Where the API serves its tools, under the API's address for boxes. */
+	path?: string;
 	/** The accounts its tools act as (`me@x.com`; with several, `me@x.com (ca_1)`, the id saying which to pass). */
 	accounts?: string[];
 }
@@ -170,6 +172,14 @@ export function createSessionMcp(opts: {
 			// An unreadable file keeps the servers it last had; the server rewrites it whole on its next change.
 			if (errors.length) return;
 			const wanted = new Map(servers.map((s) => [s.name, s.config]));
+			for (const app of next) {
+				if (!app.path) continue;
+				wanted.set(app.name, {
+					url: `${api}${app.path.replace(/^\/+/, "")}`,
+					exposure: "deferred",
+					description: app.description,
+				} as McpServerEntry["config"]);
+			}
 			const changed = [...registered.keys()].filter(
 				(name) => registered.get(name) !== JSON.stringify(wanted.get(name)),
 			);
