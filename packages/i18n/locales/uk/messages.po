@@ -5025,6 +5025,10 @@ msgstr "Порівняти тарифи"
 msgid "Compared against the default style"
 msgstr "Порівняно зі стилем за замовчуванням"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Порівняння"
+
 msgid "complete"
 msgstr "завершено"
 
@@ -16899,6 +16903,10 @@ msgstr "Повернути"
 msgid "Rotate device"
 msgstr "Повернути пристрій"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Огляд"
+
 msgid "Roundups"
 msgstr "Огляди"
 
@@ -21099,6 +21107,10 @@ msgstr "перетвори висновки з онбордингу на сто�
 
 msgid "Turned off because its files changed"
 msgstr "Вимкнено, бо його файли змінилися"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Посібник"
 
 msgid "Two Hands"
 msgstr "Дві руки"

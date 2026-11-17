@@ -5031,6 +5031,10 @@ msgstr "Plannen vergelijken"
 msgid "Compared against the default style"
 msgstr "Vergeleken met de standaardstijl"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Vergelijking"
+
 msgid "complete"
 msgstr "afgerond"
 
@@ -16905,6 +16909,10 @@ msgstr "Draaien"
 msgid "Rotate device"
 msgstr "Apparaat draaien"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Overzicht"
+
 msgid "Roundups"
 msgstr "Overzichten"
 
@@ -21105,6 +21113,10 @@ msgstr "maak van de onboarding-bevindingen een pagina"
 
 msgid "Turned off because its files changed"
 msgstr "Uitgeschakeld omdat de bestanden zijn gewijzigd"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
 
 msgid "Two Hands"
 msgstr "Twee handen"

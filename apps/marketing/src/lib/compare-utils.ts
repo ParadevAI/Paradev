@@ -3,6 +3,8 @@
  * These can be safely imported in both server and client components.
  */
 
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { BRAND } from "@superset/shared/brand";
 import { formatContentDate } from "./content-utils";
 
@@ -30,6 +32,15 @@ export interface ComparisonFaqItem {
 export function formatCompareDate(date: string): string {
 	return formatContentDate(date, "short");
 }
+
+export const COMPARISON_PAGE_TYPE_LABELS: Record<
+	ComparisonPageType,
+	MessageDescriptor
+> = {
+	"1v1": msg({ message: "Comparison", context: "compare page type" }),
+	roundup: msg({ message: "Roundup", context: "compare page type" }),
+	tutorial: msg({ message: "Tutorial", context: "compare page type" }),
+};
 
 export function getComparisonPageTypeLabel(type: ComparisonPageType): string {
 	switch (type) {

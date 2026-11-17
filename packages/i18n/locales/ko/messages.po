@@ -5031,6 +5031,10 @@ msgstr "플랜 비교"
 msgid "Compared against the default style"
 msgstr "기본 스타일과 비교함"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "비교"
+
 msgid "complete"
 msgstr "종료"
 
@@ -16905,6 +16909,10 @@ msgstr "회전"
 msgid "Rotate device"
 msgstr "기기 회전"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "모음"
+
 msgid "Roundups"
 msgstr "모아 보기"
 
@@ -21105,6 +21113,10 @@ msgstr "온보딩 조사 결과를 페이지로 만들어 줘"
 
 msgid "Turned off because its files changed"
 msgstr "파일이 변경되어 꺼졌습니다"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "튜토리얼"
 
 msgid "Two Hands"
 msgstr "양손"

@@ -5031,6 +5031,10 @@ msgstr "Compare plans"
 msgid "Compared against the default style"
 msgstr "Compared against the default style"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Comparison"
+
 msgid "complete"
 msgstr "complete"
 
@@ -16905,6 +16909,10 @@ msgstr "Rotate"
 msgid "Rotate device"
 msgstr "Rotate device"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Roundup"
+
 msgid "Roundups"
 msgstr "Roundups"
 
@@ -21105,6 +21113,10 @@ msgstr "turn the onboarding findings into a page"
 
 msgid "Turned off because its files changed"
 msgstr "Turned off because its files changed"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
 
 msgid "Two Hands"
 msgstr "Two Hands"

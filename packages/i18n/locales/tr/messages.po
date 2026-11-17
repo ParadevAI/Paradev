@@ -5031,6 +5031,10 @@ msgstr "Planları karşılaştır"
 msgid "Compared against the default style"
 msgstr "Varsayılan stille karşılaştırıldı"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Karşılaştırma"
+
 msgid "complete"
 msgstr "tamamlandı"
 
@@ -16905,6 +16909,10 @@ msgstr "Döndür"
 msgid "Rotate device"
 msgstr "Cihazı döndür"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Derleme"
+
 msgid "Roundups"
 msgstr "Derlemeler"
 
@@ -21105,6 +21113,10 @@ msgstr "onboarding bulgularını bir sayfaya dönüştür"
 
 msgid "Turned off because its files changed"
 msgstr "Dosyaları değiştiği için kapatıldı"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Eğitim"
 
 msgid "Two Hands"
 msgstr "İki el"

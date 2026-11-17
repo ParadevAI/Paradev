@@ -1,8 +1,9 @@
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import Link from "next/link";
 import {
+	COMPARISON_PAGE_TYPE_LABELS,
 	type ComparisonPageType,
-	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
 
 export interface RelatedComparison {
@@ -17,6 +18,8 @@ interface RelatedComparisonsProps {
 }
 
 export function RelatedComparisons({ pages }: RelatedComparisonsProps) {
+	const { i18n } = useLingui();
+
 	if (pages.length === 0) return null;
 
 	return (
@@ -38,7 +41,7 @@ export function RelatedComparisons({ pages }: RelatedComparisonsProps) {
 								{page.title}
 							</span>
 							<span className="shrink-0 text-xs font-mono text-muted-foreground uppercase tracking-wider">
-								{getComparisonPageTypeLabel(page.type)}
+								{i18n._(COMPARISON_PAGE_TYPE_LABELS[page.type])}
 							</span>
 						</Link>
 					</li>

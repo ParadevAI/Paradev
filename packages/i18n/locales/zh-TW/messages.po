@@ -5031,6 +5031,10 @@ msgstr "方案對比"
 msgid "Compared against the default style"
 msgstr "與預設樣式做了對比"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "比較"
+
 msgid "complete"
 msgstr "已結束"
 
@@ -16905,6 +16909,10 @@ msgstr "旋轉"
 msgid "Rotate device"
 msgstr "旋轉裝置"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "彙整"
+
 msgid "Roundups"
 msgstr "綜合評測"
 
@@ -21105,6 +21113,10 @@ msgstr "把新手引導的調查結果做成頁面"
 
 msgid "Turned off because its files changed"
 msgstr "已關閉，因為其檔案已變更"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "教學"
 
 msgid "Two Hands"
 msgstr "雙手齊開"

@@ -1,5 +1,6 @@
 "use client";
 
+import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
 import { BRAND } from "@superset/shared/brand";
 import type { MouseEvent, ReactNode } from "react";
@@ -8,9 +9,9 @@ import { usePlatform } from "@/app/[lang]/hooks/useOS";
 import { track } from "@/lib/analytics";
 import type { TocItem } from "@/lib/blog-utils";
 import {
+	COMPARISON_PAGE_TYPE_LABELS,
 	type ComparisonPage,
 	formatCompareDate,
-	getComparisonPageTypeLabel,
 } from "@/lib/compare-utils";
 import { CompareDownloadCTA } from "./components/CompareDownloadCTA";
 import {
@@ -42,7 +43,8 @@ export function CompareLayout({
 	const sections = toc.filter((item) => item.level === 2);
 	const { platform } = usePlatform();
 	const formattedDate = formatCompareDate(page.lastUpdated ?? page.date);
-	const pageTypeLabel = getComparisonPageTypeLabel(page.type);
+	const { i18n } = useLingui();
+	const pageTypeLabel = i18n._(COMPARISON_PAGE_TYPE_LABELS[page.type]);
 
 	const trackInlineDownloadClick = (event: MouseEvent<HTMLDivElement>) => {
 		const link = (event.target as HTMLElement).closest("a");

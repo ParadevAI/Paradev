@@ -5031,6 +5031,10 @@ msgstr "Porovnat tarify"
 msgid "Compared against the default style"
 msgstr "Porovnáno s výchozím stylem"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Srovnání"
+
 msgid "complete"
 msgstr "dokončeno"
 
@@ -16905,6 +16909,10 @@ msgstr "Otočit"
 msgid "Rotate device"
 msgstr "Otočit zařízení"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Přehled"
+
 msgid "Roundups"
 msgstr "Přehledy"
 
@@ -21105,6 +21113,10 @@ msgstr "udělej z poznatků o onboardingu stránku"
 
 msgid "Turned off because its files changed"
 msgstr "Vypnuto, protože se změnily jeho soubory"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Návod"
 
 msgid "Two Hands"
 msgstr "Obě ruce"

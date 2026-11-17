@@ -5031,6 +5031,10 @@ msgstr "プランを比較"
 msgid "Compared against the default style"
 msgstr "デフォルトスタイルと比較"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "比較"
+
 msgid "complete"
 msgstr "終了"
 
@@ -16905,6 +16909,10 @@ msgstr "回転"
 msgid "Rotate device"
 msgstr "デバイスを回転"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "まとめ"
+
 msgid "Roundups"
 msgstr "まとめ"
 
@@ -21105,6 +21113,10 @@ msgstr "オンボーディングの調査結果をページにして"
 
 msgid "Turned off because its files changed"
 msgstr "ファイルが変更されたためオフになっています"
+
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "チュートリアル"
 
 msgid "Two Hands"
 msgstr "両手"
