@@ -194,6 +194,11 @@ export interface TerminalTransport {
 	 * request the ring tail (`seq=new`) — it would double-paint.
 	 */
 	_xtermHadContent: boolean;
+	/**
+	 * The xterm may not match the PTY's screen: it came from a snapshot, or its
+	 * rows changed while detached. The next resize asks the host for a repaint.
+	 */
+	_isScreenStale: boolean;
 	/** Internal: wall-clock-gap watchdog for laptop sleep/wake detection. */
 	_livenessTimer: ReturnType<typeof setInterval> | null;
 	/** Internal: Date.now() at the last watchdog tick. */
@@ -464,6 +469,7 @@ export function createTransport(
 		_seqEverSynced: false,
 		_bytesSinceAttach: false,
 		_xtermHadContent: false,
+		_isScreenStale: false,
 		_livenessTimer: null,
 		_lastLivenessTick: 0,
 		_resumeListener: null,
@@ -1218,7 +1224,9 @@ export function sendResize(
 	const socket = transport._socket;
 	if (!socket || socket.readyState !== WebSocket.OPEN) return;
 	if (transport.connectionState !== "open") return;
-	socket.send(JSON.stringify({ type: "resize", cols, rows }));
+	const repaint = transport._isScreenStale || undefined;
+	transport._isScreenStale = false;
+	socket.send(JSON.stringify({ type: "resize", cols, rows, repaint }));
 }
 
 export function sendDispose(transport: TerminalTransport) {

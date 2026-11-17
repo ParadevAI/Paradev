@@ -17,6 +17,7 @@ import {
 	park,
 	reconnect,
 	sendColors,
+	sendResize,
 } from "./terminal-ws-transport";
 
 // The transport builds on createRelaySocket (partysocket) — reconnection,
@@ -449,6 +450,27 @@ describe("terminal-ws-transport", () => {
 			{ type: "resize", cols: 101, rows: 27 },
 			{ type: "input", data: "a" },
 			{ type: "input", data: "b" },
+		]);
+	});
+
+	test("asks for a repaint on the first resize after the screen went stale", () => {
+		const transport = createTransport();
+		const terminal = createMockTerminal();
+		transport._isScreenStale = true;
+
+		connect(transport, terminal, "ws://host/terminal/t1");
+		const socket = FakeRelaySocket.instances[0];
+		if (!socket) throw new Error("expected relay socket instance");
+		socket.open();
+		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
+		sendResize(transport, 101, 27);
+
+		expect(
+			socket.sent.map((payload) => JSON.parse(payload) as unknown),
+		).toEqual([
+			{ type: "visible", visible: true },
+			{ type: "resize", cols: 101, rows: 27, repaint: true },
+			{ type: "resize", cols: 101, rows: 27 },
 		]);
 	});
 
