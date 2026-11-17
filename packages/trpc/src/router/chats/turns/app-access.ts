@@ -44,14 +44,14 @@ export const mayUseParadev = (
 export function turnApps(
 	agent: Pick<AgentRow, "kind" | "ownerUserId" | "paradevAccess">,
 	ownerName: string | null,
+	webUrl: string,
 ): TurnApp[] {
 	if (!mayUseParadev(agent)) return [];
 	return [
 		{
 			name: PARADEV_APP,
 			displayName: "Paradev",
-			description:
-				"your owner's Paradev: list projects and hosts, create workspaces, start coding agents and chat sessions in them, read their terminals, and manage tasks and automations. Everything you do there is done as your owner.",
+			description: `your owner's Paradev: list projects and hosts, create workspaces, start coding agents and chat sessions in them, read their terminals, and manage tasks and automations. Everything you do there is done as your owner. Link a workspace in a reply as [its name](${webUrl.replace(/\/+$/, "")}/workspaces/<workspace id>).`,
 			path: `apps/${PARADEV_APP}/mcp`,
 			accounts: ownerName ? [ownerName] : [],
 		},

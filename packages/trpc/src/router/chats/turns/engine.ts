@@ -24,6 +24,7 @@ import {
 	ne,
 	sql,
 } from "drizzle-orm";
+import { env } from "../../../env";
 import { publishChats } from "../publish";
 import { messageView, sharedFiles, toUser } from "../views";
 import { mayUseParadev, turnApps } from "./app-access";
@@ -834,7 +835,11 @@ async function appsFor(agentId: string) {
 		.leftJoin(users, eq(users.id, chatsAgents.ownerUserId))
 		.where(eq(chatsAgents.id, agentId));
 	if (!row) return [];
-	return turnApps(row.agent, row.owner ? toUser(row.owner).displayName : null);
+	return turnApps(
+		row.agent,
+		row.owner ? toUser(row.owner).displayName : null,
+		env.NEXT_PUBLIC_WEB_URL,
+	);
 }
 
 /** Step 3: hands the turn to the runner. False when there is nothing to run or the box refused it. */
