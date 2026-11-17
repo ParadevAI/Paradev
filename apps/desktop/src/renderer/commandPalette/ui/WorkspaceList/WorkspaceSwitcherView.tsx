@@ -1,4 +1,5 @@
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
+import { useFrameStackStore } from "../../core/frames";
 import { V1WorkspaceList } from "./components/V1WorkspaceList";
 import { WorkspaceSwitcherFooter } from "./components/WorkspaceSwitcherFooter";
 import {
@@ -16,11 +17,12 @@ export function WorkspaceSwitcherView({
 	cycle,
 }: WorkspaceSwitcherViewProps) {
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const selection = useFrameStackStore((s) => s.switcherSelection);
 	if (!isV2CloudEnabled) return <V1WorkspaceList query={query.trim()} />;
 	return (
 		<>
 			<WorkspaceSwitcherList query={query} cycle={cycle} />
-			<WorkspaceSwitcherFooter />
+			<WorkspaceSwitcherFooter selection={selection} />
 		</>
 	);
 }

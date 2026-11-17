@@ -3193,6 +3193,9 @@ msgstr "Diarsipkan {0}"
 msgid "Archived shown"
 msgstr "Arsip ditampilkan"
 
+msgid "Archiving workspace…"
+msgstr "Mengarsipkan ruang kerja…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Yakin ingin menghapus file ini? Tindakan ini tidak bisa dibatalkan."
 

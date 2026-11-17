@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { createElement } from "react";
+import { createElement, type MouseEvent, useRef } from "react";
 import { LuArchive } from "react-icons/lu";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useArchivingCloudWorkspaceIds } from "renderer/hooks/useArchivingCloudWorkspaceIds";
@@ -13,10 +13,14 @@ import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dash
 import { moveCloudWorkspaceRow } from "renderer/routes/_authenticated/_dashboard/utils/moveCloudWorkspaceRow";
 import { useUndoStack } from "renderer/stores/undo-stack";
 
-interface ArchivedWorkspace {
-	id: string;
-	toastId: string | number;
+interface PendingArchive {
+	target: WorkspaceRemovalNavigationTarget | null;
+	/** Undo was pressed before the server answered; it runs once the archive lands. */
+	undoRequested: boolean;
 }
+
+const toastIdOf = (id: string) => `archive-workspace:${id}`;
+const ARCHIVED_TOAST_MS = 4000;
 
 export function useArchiveCloudWorkspace() {
 	const { t } = useLingui();
@@ -27,42 +31,10 @@ export function useArchiveCloudWorkspace() {
 	const { navigateAwayFromWorkspace } = useNavigateAwayFromWorkspace();
 	const unarchive = useUnarchiveCloudWorkspace();
 	const archiving = useArchivingCloudWorkspaceIds();
-	const { mutateAsync } = cloudTrpc.cloudWorkspace.delete.useMutation({
-		onMutate: async ({ id }) =>
-			organizationId
-				? {
-						rollback: await moveCloudWorkspaceRow({
-							utils,
-							organizationId,
-							id,
-							to: "archived",
-						}),
-					}
-				: undefined,
-		onError: (error, _variables, context) => {
-			context?.rollback();
-			toast.error(errorMessage(error));
-		},
-		// Awaited so the row stays hidden until a list without it lands.
-		onSettled: (_data, _error, { id }) =>
-			Promise.all([
-				utils.cloudWorkspace.list.invalidate(),
-				utils.cloudWorkspace.get.invalidate({ id }),
-				utils.cloudWorkspace.activity.invalidate({ id }),
-			]),
-	});
+	const pending = useRef(new Map<string, PendingArchive>());
 
-	const undoEntryId = (id: string) => `archive-workspace:${id}`;
 	const clearUndoable = (id: string) =>
-		useUndoStack.getState().remove(undoEntryId(id));
-
-	const undo = ({ id, toastId }: ArchivedWorkspace) => {
-		clearUndoable(id);
-		toast.dismiss(toastId);
-		unarchive(id, {
-			onSuccess: () => toast.success(t({ message: "Workspace restored" })),
-		});
-	};
+		useUndoStack.getState().remove(toastIdOf(id));
 
 	const returnIfStillAt = (
 		id: string,
@@ -82,46 +54,131 @@ export function useArchiveCloudWorkspace() {
 		});
 	};
 
+	const showRestoring = (id: string) =>
+		toast.loading(t({ message: "Restoring…" }), {
+			id: toastIdOf(id),
+			duration: Number.POSITIVE_INFINITY,
+			action: undefined,
+			cancel: undefined,
+		});
+
+	const restore = (id: string) => {
+		clearUndoable(id);
+		showRestoring(id);
+		unarchive(id, {
+			onSuccess: () =>
+				toast.success(t({ message: "Workspace restored" }), {
+					id: toastIdOf(id),
+					duration: ARCHIVED_TOAST_MS,
+				}),
+			onError: () => toast.dismiss(toastIdOf(id)),
+		});
+	};
+
+	// Unarchive only succeeds once the row is archived, so an undo pressed
+	// while the archive is in flight waits for the server.
+	const undo = (id: string) => {
+		const entry = pending.current.get(id);
+		if (!entry) {
+			restore(id);
+			return;
+		}
+		entry.undoRequested = true;
+		clearUndoable(id);
+		showRestoring(id);
+	};
+
+	const toastClassNames = {
+		cancelButton:
+			"bg-secondary! text-secondary-foreground! hover:bg-secondary/80!",
+		actionButton: "ms-1.5!",
+	};
+	const undoAction = (id: string) => ({
+		label: t({ message: "Undo" }),
+		onClick: (event: MouseEvent<HTMLButtonElement>) => {
+			// Sonner closes a toast whose action was clicked; this one stays
+			// to show the restore.
+			event.preventDefault();
+			undo(id);
+		},
+	});
+
+	const { mutateAsync } = cloudTrpc.cloudWorkspace.delete.useMutation({
+		onMutate: async ({ id }) =>
+			organizationId
+				? {
+						rollback: await moveCloudWorkspaceRow({
+							utils,
+							organizationId,
+							id,
+							to: "archived",
+						}),
+					}
+				: undefined,
+		// Here, not after the call resolves: that waits for the list refetch below.
+		onSuccess: ({ deleted }, { id }) => {
+			const entry = pending.current.get(id);
+			pending.current.delete(id);
+			if (!deleted) {
+				clearUndoable(id);
+				toast.dismiss(toastIdOf(id));
+				returnIfStillAt(id, entry?.target ?? null);
+				return;
+			}
+			if (entry?.undoRequested) {
+				restore(id);
+				return;
+			}
+			toast(t({ message: "Workspace archived" }), {
+				id: toastIdOf(id),
+				duration: ARCHIVED_TOAST_MS,
+				icon: createElement(LuArchive, { className: "size-4" }),
+				classNames: toastClassNames,
+				cancel: {
+					label: t({ message: "View" }),
+					onClick: () => {
+						clearUndoable(id);
+						void navigate({
+							to: "/v2-workspace/$workspaceId",
+							params: { workspaceId: id },
+						});
+					},
+				},
+				action: undoAction(id),
+				onDismiss: () => clearUndoable(id),
+				onAutoClose: () => clearUndoable(id),
+			});
+		},
+		onError: (error, { id }, context) => {
+			const entry = pending.current.get(id);
+			pending.current.delete(id);
+			context?.rollback();
+			clearUndoable(id);
+			toast.error(errorMessage(error), { id: toastIdOf(id) });
+			returnIfStillAt(id, entry?.target ?? null);
+		},
+		// Awaited so the row stays hidden until a list without it lands.
+		onSettled: (_data, _error, { id }) =>
+			Promise.all([
+				utils.cloudWorkspace.list.invalidate(),
+				utils.cloudWorkspace.get.invalidate({ id }),
+				utils.cloudWorkspace.activity.invalidate({ id }),
+			]),
+	});
+
 	return (id: string) => {
-		if (archiving.includes(id)) return;
-		const target = navigateAwayFromWorkspace(id);
-		// Unarchive only succeeds once the row is archived, so the undo waits
-		// for the server.
-		mutateAsync({ id })
-			.then(({ deleted }) => {
-				if (!deleted) {
-					returnIfStillAt(id, target);
-					return;
-				}
-				const toastId = toast(t({ message: "Workspace archived" }), {
-					icon: createElement(LuArchive, { className: "size-4" }),
-					classNames: {
-						cancelButton:
-							"bg-secondary! text-secondary-foreground! hover:bg-secondary/80!",
-						actionButton: "ms-1.5!",
-					},
-					cancel: {
-						label: t({ message: "View" }),
-						onClick: () => {
-							clearUndoable(id);
-							void navigate({
-								to: "/v2-workspace/$workspaceId",
-								params: { workspaceId: id },
-							});
-						},
-					},
-					action: {
-						label: t({ message: "Undo" }),
-						onClick: () => undo({ id, toastId }),
-					},
-					onDismiss: () => clearUndoable(id),
-					onAutoClose: () => clearUndoable(id),
-				});
-				useUndoStack.getState().push({
-					id: undoEntryId(id),
-					undo: () => undo({ id, toastId }),
-				});
-			})
-			.catch(() => returnIfStillAt(id, target));
+		if (archiving.includes(id) || pending.current.has(id)) return;
+		pending.current.set(id, {
+			target: navigateAwayFromWorkspace(id),
+			undoRequested: false,
+		});
+		toast.loading(t({ message: "Archiving workspace…" }), {
+			id: toastIdOf(id),
+			duration: Number.POSITIVE_INFINITY,
+			classNames: toastClassNames,
+			action: undoAction(id),
+		});
+		useUndoStack.getState().push({ id: toastIdOf(id), undo: () => undo(id) });
+		mutateAsync({ id }).catch(() => {});
 	};
 }

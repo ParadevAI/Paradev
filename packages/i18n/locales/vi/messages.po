@@ -3193,6 +3193,9 @@ msgstr "Đã lưu trữ {0}"
 msgid "Archived shown"
 msgstr "Đang hiện mục đã lưu trữ"
 
+msgid "Archiving workspace…"
+msgstr "Đang lưu trữ không gian làm việc…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Bạn chắc chắn muốn xóa tệp này? Không thể hoàn tác."
 

@@ -3193,6 +3193,9 @@ msgstr "Archivováno {0}"
 msgid "Archived shown"
 msgstr "Archivované zobrazeny"
 
+msgid "Archiving workspace…"
+msgstr "Archivace pracovního prostoru…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Opravdu chcete tento soubor smazat? Tuto akci nelze vrátit zpět."
 

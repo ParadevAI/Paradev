@@ -3193,6 +3193,9 @@ msgstr "В архиве {0}"
 msgid "Archived shown"
 msgstr "Архивные показаны"
 
+msgid "Archiving workspace…"
+msgstr "Архивация рабочего пространства…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "Точно удалить этот файл? Действие нельзя отменить."
 

@@ -37,6 +37,8 @@ export function useUnarchiveCloudWorkspace() {
 		id: string,
 		options?: {
 			onSuccess?: () => void;
+			/** The restore did not happen; the error toast is already shown. */
+			onError?: () => void;
 			/** Go to the workspace as it comes back; false keeps the caller's screen. */
 			open?: boolean;
 		},
@@ -48,8 +50,9 @@ export function useUnarchiveCloudWorkspace() {
 		mutateAsync({ id })
 			.then(({ unarchived }) => {
 				if (unarchived) options?.onSuccess?.();
+				else options?.onError?.();
 			})
-			.catch(() => {});
+			.catch(() => options?.onError?.());
 		if (options?.open === false) return;
 		void navigate({
 			to: "/v2-workspace/$workspaceId",

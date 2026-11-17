@@ -3193,6 +3193,9 @@ msgstr "已封存 {0}"
 msgid "Archived shown"
 msgstr "已顯示歸檔"
 
+msgid "Archiving workspace…"
+msgstr "正在封存工作區…"
+
 msgid "Are you sure you want to delete this file? This action cannot be undone."
 msgstr "確定要刪除此檔案嗎？此操作無法復原。"
 
