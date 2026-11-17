@@ -2,9 +2,9 @@
  * The runner's own behaviour, exercised against a synthetic bundle in the
  * locally built image (`bun run image --local`): apply-rootfs installs then
  * skips, sync-assets verifies and refuses a bad hash, run-steps skips on a
- * matching marker, and the fail-open wrapper records the sentinel, skips
- * downstream, disables after three failures, clears on success and always
- * exits 0.
+ * matching marker, and the fail-open wrapper records each failure per step,
+ * skips only the steps that depend on it, runs every other step, disables
+ * after three failures, clears on success and always exits 0.
  *
  *   bun run src/runner-check.ts
  */
@@ -42,7 +42,8 @@ function docker(args: string[], check = true): string {
 const sh = (cmd: string) => docker(["exec", NAME, "bash", "-lc", cmd], false);
 
 // A bundle on disk: one rootfs file, three assets (one whose hash lies, one
-// an archive the first step discards), three steps.
+// an archive the first step discards), five steps: `after` and `later`
+// depend on `flaky`, `other` does not.
 const dir = mkdtempSync(join(tmpdir(), "superset-runner-check-"));
 const bundle = join(dir, "bundle");
 mkdirSync(join(bundle, "rootfs/etc/superset"), { recursive: true });
@@ -93,13 +94,14 @@ writeFileSync(
 	join(bundle, "steps/flaky.sh"),
 	"#!/bin/bash\necho flaky ran >> /opt/check/steps.log\n[ -f /opt/check/flaky-ok ] || exit 1\n",
 );
-writeFileSync(
-	join(bundle, "steps/after.sh"),
-	"#!/bin/bash\necho after ran >> /opt/check/steps.log\n",
-);
+for (const step of ["after", "other", "later"])
+	writeFileSync(
+		join(bundle, `steps/${step}.sh`),
+		`#!/bin/bash\necho ${step} ran >> /opt/check/steps.log\n`,
+	);
 writeFileSync(
 	join(bundle, "steps.tsv"),
-	"first\tv-first\nflaky\tv-flaky\nafter\tv-after\n",
+	"first\tv-first\t\t\nflaky\tv-flaky\t\t\nafter\tv-after\t\tflaky\nother\tv-other\t\t\nlater\tv-later\t\tflaky,after\n",
 );
 
 docker(["rm", "-f", NAME], false);
@@ -184,16 +186,34 @@ try {
 	);
 
 	// run-steps: fail-open.
+	sh(
+		`mkdir -p ${steps} && printf 'sentinelVersion=1\\nconsecutiveFailures=3\\nfailedStepName=other\\n' > ${steps}/failure.env`,
+	);
 	const run1 = sh("/bundle/setup run-steps; echo exit=$?");
 	expect("run-steps exits 0 with a failing step", /exit=0/.test(run1));
 	expect(
-		"the failing step is recorded in the sentinel",
-		/consecutiveFailures=1/.test(sh(`cat ${steps}/failure.env`)),
+		"the failing step is recorded in its own failure file",
+		/consecutiveFailures=1/.test(sh(`cat ${steps}/flaky.failure`)),
 	);
 	expect(
-		"the step after the failure is skipped",
-		/after ran/.test(sh("cat /opt/check/steps.log")) === false &&
-			/downstream of failed flaky/.test(run1),
+		"the old single sentinel is removed",
+		sh(`ls ${steps}/failure.env 2>&1 | grep -c 'No such'`).trim() === "1",
+	);
+	expect(
+		"the steps that depend on the failure, directly or not, are skipped and name it",
+		!/(after|later) ran/.test(sh("cat /opt/check/steps.log")) &&
+			/step after skipped: downstream of failed flaky/.test(run1) &&
+			/step later skipped: downstream of failed flaky/.test(run1),
+		run1
+			.trim()
+			.split("\n")
+			.filter((l) => /skipped/.test(l))
+			.join(" | "),
+	);
+	expect(
+		"a step after the failure that does not depend on it runs and is marked",
+		/other ran/.test(sh("cat /opt/check/steps.log")) &&
+			sh(`cat ${steps}/other.version`).trim() === "v-other",
 	);
 	expect(
 		"the step before it ran and is marked",
@@ -225,18 +245,35 @@ try {
 	sh("/bundle/setup run-steps >/dev/null");
 	expect(
 		"three failures disable the step",
-		/consecutiveFailures=3/.test(sh(`cat ${steps}/failure.env`)),
+		/consecutiveFailures=3/.test(sh(`cat ${steps}/flaky.failure`)),
 	);
 	const run4 = sh("/bundle/setup run-steps");
 	expect(
 		"a disabled step is not retried and downstream stays skipped",
-		/flaky skipped: flaky disabled after 3 failures/.test(run4) &&
-			/after skipped/.test(run4),
+		/step flaky skipped: disabled after 3 failures/.test(run4) &&
+			/step after skipped: downstream of failed flaky/.test(run4),
 		run4
 			.trim()
 			.split("\n")
 			.filter((l) => /skipped/.test(l))
 			.join(" | "),
+	);
+	expect(
+		"a disabled step that then succeeds by hand is no longer disabled",
+		(() => {
+			sh(
+				`cp -a ${steps} /opt/check/steps-before && touch /opt/check/flaky-ok && /bundle/setup run-step flaky`,
+			);
+			const out = sh("/bundle/setup run-steps");
+			const ok =
+				/step flaky at v-flaky, skipping/.test(out) &&
+				/step after running/.test(out) &&
+				sh(`ls ${steps}/flaky.failure 2>&1 | grep -c 'No such'`).trim() === "1";
+			sh(
+				`rm -rf ${steps} /opt/check/flaky-ok && mv /opt/check/steps-before ${steps}`,
+			);
+			return ok;
+		})(),
 	);
 	expect(
 		"status shows the failure",
@@ -252,7 +289,7 @@ try {
 			const out = sh("/bundle/setup run-steps");
 			return (
 				/first ran/.test(sh("cat /opt/check/steps.log")) &&
-				/flaky skipped: flaky disabled/.test(out)
+				/flaky skipped: disabled/.test(out)
 			);
 		})(),
 	);
@@ -267,9 +304,10 @@ try {
 	);
 	const run5 = sh("/bundle/setup run-steps");
 	expect(
-		"a new version retries the step; success clears the sentinel and runs downstream",
-		!/failure\.env/.test(sh(`ls ${steps}`)) &&
-			/after ran/.test(sh("cat /opt/check/steps.log")),
+		"a new version retries the step; success clears its failure file and runs downstream",
+		!/\.failure/.test(sh(`ls ${steps}`)) &&
+			/after ran/.test(sh("cat /opt/check/steps.log")) &&
+			/later ran/.test(sh("cat /opt/check/steps.log")),
 		run5.trim().split("\n").pop(),
 	);
 	expect(
