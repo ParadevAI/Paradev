@@ -250,8 +250,37 @@ describe("upstreamSteps", () => {
 			.filter(Boolean)
 			.map((l) => l.split("\t"));
 		expect(rows).toEqual([
-			["a", "v0", "", ""],
-			["b", "v1", "", "a"],
+			["a", "v0", "", "", ""],
+			["b", "v1", "", "a", ""],
+		]);
+	});
+
+	test("marks a before-host step in the fifth column", () => {
+		const rows = renderStepsTsv([
+			{ ...step("a"), beforeHost: true, version: "v0", upstream: [] },
+		]).split("\t");
+		expect(rows[4]).toBe("host\n");
+	});
+
+	test("refuses a before-host step that runs after one that is not", () => {
+		expect(() =>
+			upstreamSteps([step("a"), { ...step("b", ["a"]), beforeHost: true }]),
+		).toThrow(/runs before host-service, after a/);
+	});
+
+	test("refuses a before-host step with an asset it does not discard", () => {
+		expect(() =>
+			upstreamSteps([{ ...step("a"), assets: ["x"], beforeHost: true }]),
+		).toThrow(/does not discard x/);
+	});
+
+	test("in the bundle, only install-host runs before host-service", () => {
+		const steps = loadSteps(
+			join(import.meta.dir, "..", "bundle", "steps.json"),
+		);
+		upstreamSteps(steps);
+		expect(steps.filter((s) => s.beforeHost).map((s) => s.name)).toEqual([
+			"install-host",
 		]);
 	});
 

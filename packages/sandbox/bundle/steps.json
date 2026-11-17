@@ -35,7 +35,8 @@
 	{
 		"name": "install-host",
 		"assets": ["host-service"],
-		"discards": ["host-service"]
+		"discards": ["host-service"],
+		"beforeHost": true
 	},
 	{ "name": "install-cli", "assets": ["cli"] },
 	{

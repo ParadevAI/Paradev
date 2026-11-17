@@ -53,6 +53,12 @@ const stepSchema = z.object({
 	salt: z.string().default(""),
 	/** Of `assets`, the archives the step unpacks: deleted once it succeeds, fetched again before it re-runs. */
 	discards: z.array(z.string()).optional(),
+	/**
+	 * Runs before host-service starts; every other step runs after it. Its
+	 * `after` steps must be the same kind, and it must discard every asset it
+	 * declares: the runner fetches only those before host-service.
+	 */
+	beforeHost: z.boolean().optional(),
 });
 export type Step = z.infer<typeof stepSchema>;
 export const stepsSchema = z.array(stepSchema);
@@ -162,14 +168,28 @@ export interface DerivedStep extends Step {
 /** Each step's `after`, closed transitively, in manifest order. */
 export function upstreamSteps(steps: Step[]): Map<string, string[]> {
 	const order = new Map(steps.map((s, i) => [s.name, i]));
+	const beforeHost = new Set(
+		steps.filter((s) => s.beforeHost).map((s) => s.name),
+	);
 	const closure = new Map<string, string[]>();
 	for (const step of steps) {
+		if (step.beforeHost) {
+			const fetched = step.assets.filter((a) => !step.discards?.includes(a));
+			if (fetched.length)
+				throw new Error(
+					`step ${step.name} runs before host-service but does not discard ${fetched.join(", ")}`,
+				);
+		}
 		const found = new Set<string>();
 		for (const dep of step.after) {
 			const upstream = closure.get(dep);
 			if (!upstream)
 				throw new Error(
 					`step ${step.name} runs after ${dep}, which is not an earlier step`,
+				);
+			if (step.beforeHost && !beforeHost.has(dep))
+				throw new Error(
+					`step ${step.name} runs before host-service, after ${dep}, which does not`,
 				);
 			found.add(dep);
 			for (const name of upstream) found.add(name);
@@ -235,11 +255,20 @@ export function deriveStepVersions(args: {
 	return derived;
 }
 
-/** Columns: name, version, assets, upstream steps. The runner skips a step whose upstream failed. */
+/**
+ * Columns: name, version, assets, upstream steps, `host` for a step that runs
+ * before host-service. The runner skips a step whose upstream failed.
+ */
 export function renderStepsTsv(steps: DerivedStep[]): string {
 	return steps
 		.map((s) =>
-			[s.name, s.version, s.assets.join(","), s.upstream.join(",")].join("\t"),
+			[
+				s.name,
+				s.version,
+				s.assets.join(","),
+				s.upstream.join(","),
+				s.beforeHost ? "host" : "",
+			].join("\t"),
 		)
 		.join("\n")
 		.concat(steps.length ? "\n" : "");
