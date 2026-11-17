@@ -25,6 +25,8 @@ interface AgentCommentComposerProps {
 	contextLabel: string;
 	placeholder?: string;
 	submitLabel?: string;
+	comment: string;
+	onCommentChange: (comment: string) => void;
 	onCancel: () => void;
 	onSubmit: (input: {
 		comment: string;
@@ -38,6 +40,8 @@ export function AgentCommentComposer({
 	contextLabel,
 	placeholder,
 	submitLabel,
+	comment,
+	onCommentChange,
 	onCancel,
 	onSubmit,
 }: AgentCommentComposerProps) {
@@ -70,14 +74,13 @@ export function AgentCommentComposer({
 		preferredTerminalId,
 	});
 
-	const [comment, setComment] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {
 		const el = textareaRef.current;
 		if (!el) return;
-		el.focus();
+		el.focus({ preventScroll: true });
 		const len = el.value.length;
 		el.setSelectionRange(len, len);
 	}, []);
@@ -134,7 +137,7 @@ export function AgentCommentComposer({
 				<textarea
 					ref={textareaRef}
 					value={comment}
-					onChange={(e) => setComment(e.target.value)}
+					onChange={(e) => onCommentChange(e.target.value)}
 					placeholder={resolvedPlaceholder}
 					rows={3}
 					className={cn(

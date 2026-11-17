@@ -68,6 +68,8 @@ interface UseDiffCommentComposerResult {
 		string,
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	> | null;
+	comment: string;
+	setComment: (comment: string) => void;
 	onLineSelectionEnd: OnLineSelectionEnd;
 	onGutterUtilityClick: () => void;
 	clear: () => void;
@@ -92,12 +94,14 @@ export function useDiffCommentComposer({
 }: UseDiffCommentComposerArgs): UseDiffCommentComposerResult {
 	const { t } = useLingui();
 	const [composer, setComposer] = useState<ComposerState | null>(null);
+	const [comment, setComment] = useState("");
 	const composerRef = useRef(composer);
 	composerRef.current = composer;
 	const { send: sendToTerminalAgent } = useSendToTerminalAgent();
 
 	const clear = useCallback(() => {
 		setComposer(null);
+		setComment("");
 		codeViewRef.current?.clearSelectedLines();
 	}, [codeViewRef]);
 
@@ -114,6 +118,7 @@ export function useDiffCommentComposer({
 	const onLineSelectionEnd = useCallback<OnLineSelectionEnd>(
 		(range, context) => {
 			if (context.type !== "diff") return;
+			setComment("");
 			if (!range) {
 				setComposer(null);
 				return;
@@ -216,6 +221,8 @@ export function useDiffCommentComposer({
 
 	return {
 		composerAnnotationsByItemId,
+		comment,
+		setComment,
 		onLineSelectionEnd,
 		onGutterUtilityClick,
 		clear,

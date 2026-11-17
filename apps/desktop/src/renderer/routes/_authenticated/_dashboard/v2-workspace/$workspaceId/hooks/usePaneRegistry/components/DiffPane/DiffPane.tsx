@@ -313,6 +313,8 @@ export function DiffPane({
 
 	const {
 		composerAnnotationsByItemId,
+		comment: composerComment,
+		setComment: setComposerComment,
 		onLineSelectionEnd,
 		onGutterUtilityClick,
 		clear: clearComposer,
@@ -902,6 +904,8 @@ export function DiffPane({
 						placeholder={t({
 							message: "Ask the AI about these lines…",
 						})}
+						comment={composerComment}
+						onCommentChange={setComposerComment}
 						onCancel={clearComposer}
 						onSubmit={submitComposer}
 					/>
@@ -945,6 +949,8 @@ export function DiffPane({
 			data.focusSide,
 			data.focusTick,
 			clearComposer,
+			composerComment,
+			setComposerComment,
 			submitComposer,
 			getFile,
 			requestDiff,
