@@ -1185,6 +1185,9 @@ msgstr "{name} non è cambiato. Se un agente stava lavorando, potrebbe essere st
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} non è cambiato. Se un agente stava lavorando, è stato interrotto."
 
+msgid "{name} is waking up…"
+msgstr "{name} si sta svegliando…"
+
 msgid "{name} is working"
 msgstr "{name} sta lavorando"
 
@@ -2784,6 +2787,9 @@ msgstr "Assemblatore Anonimo"
 msgid "Another AI assistant"
 msgstr "Un altro assistente IA"
 
+msgid "another Dev"
+msgstr "un altro Dev"
+
 msgid "another device"
 msgstr "un altro dispositivo"
 
@@ -2792,6 +2798,10 @@ msgstr "Rispondi alle domande nel terminale qui sotto, ad esempio una password."
 
 msgid "Answer this question on desktop, or skip it."
 msgstr "Rispondi a questa domanda dal desktop o saltala."
+
+#. placeholder {0}: tool.output
+msgid "Answer: {0}"
+msgstr "Risposta: {0}"
 
 msgid "Answered"
 msgstr "Risposto"
@@ -3136,6 +3146,12 @@ msgstr "Chiedi modifiche, @menziona file, esegui /comandi"
 
 msgid "Ask what your agents are up to, or tell one what to do next."
 msgstr "Chiedi cosa stanno facendo i tuoi agenti o di' a uno cosa fare dopo."
+
+msgid "Asked <0>{name}</0>"
+msgstr "Chiesto a <0>{name}</0>"
+
+msgid "Asking <0>{name}</0>"
+msgstr "Chiede a <0>{name}</0>"
 
 msgid "Asks before edits and commands"
 msgstr "Chiede prima di modifiche e comandi"
@@ -10303,6 +10319,10 @@ msgstr "Codice inline"
 msgid "Input"
 msgstr "Input"
 
+msgctxt "what a tool was called with"
+msgid "Input"
+msgstr "Input"
+
 msgid "Input Group"
 msgstr "Input Group"
 
@@ -16628,6 +16648,10 @@ msgstr "Ripristino…"
 msgid "Result"
 msgstr "Risultato"
 
+msgctxt "what a tool returned"
+msgid "Result"
+msgstr "Risultato"
+
 msgid "Results"
 msgstr "Risultati"
 
@@ -17000,6 +17024,9 @@ msgstr "Esecuzione in corso"
 
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "I processi del terminale in esecuzione continuano, ma l'output più vecchio potrebbe non essere più disponibile dopo il riavvio dell'app."
+
+msgid "Running…"
+msgstr "In esecuzione…"
 
 msgid "Runs a local command on your machine"
 msgstr "Esegue un comando locale sulla tua macchina"
@@ -19076,6 +19103,9 @@ msgstr "Fermato dal limite di utilizzo"
 
 msgid "Stopped moving {name}"
 msgstr "Spostamento di {name} interrotto"
+
+msgid "Stopped."
+msgstr "Interrotto."
 
 msgid "Stopping the agent in {what}"
 msgstr "Arresto dell’agente in {what}"
@@ -21856,6 +21886,12 @@ msgstr "In attesa della CPU per il {0}% dell'ultimo minuto"
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
 msgstr "in attesa di {0} e {1}…"
+
+msgid "Waiting for {name}…"
+msgstr "In attesa di {name}…"
+
+msgid "Waiting for a free slot…"
+msgstr "In attesa di uno slot libero…"
 
 msgid "Waiting for activity data"
 msgstr "In attesa dei dati di attività"

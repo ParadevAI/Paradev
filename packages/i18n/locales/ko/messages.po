@@ -1185,6 +1185,9 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중이었다면 중지되었습니다."
 
+msgid "{name} is waking up…"
+msgstr "{name} 깨우는 중…"
+
 msgid "{name} is working"
 msgstr "{name} 작업 중"
 
@@ -2784,6 +2787,9 @@ msgstr "익명의 조립공"
 msgid "Another AI assistant"
 msgstr "다른 AI 어시스턴트"
 
+msgid "another Dev"
+msgstr "다른 Dev"
+
 msgid "another device"
 msgstr "다른 기기"
 
@@ -2792,6 +2798,10 @@ msgstr "아래 터미널에서 비밀번호 등 질문에 답하세요."
 
 msgid "Answer this question on desktop, or skip it."
 msgstr "이 질문은 데스크톱에서 답하거나 건너뛰세요."
+
+#. placeholder {0}: tool.output
+msgid "Answer: {0}"
+msgstr "답변: {0}"
 
 msgid "Answered"
 msgstr "응답함"
@@ -3136,6 +3146,12 @@ msgstr "변경을 요청하고, @로 파일을 멘션하고, /명령을 실행�
 
 msgid "Ask what your agents are up to, or tell one what to do next."
 msgstr "에이전트가 무엇을 하고 있는지 물어보거나, 다음에 할 일을 지시하세요."
+
+msgid "Asked <0>{name}</0>"
+msgstr "<0>{name}</0>에게 질문함"
+
+msgid "Asking <0>{name}</0>"
+msgstr "<0>{name}</0>에게 질문하는 중"
 
 msgid "Asks before edits and commands"
 msgstr "편집과 명령 전에 확인"
@@ -10303,6 +10319,10 @@ msgstr "인라인 코드"
 msgid "Input"
 msgstr "입력"
 
+msgctxt "what a tool was called with"
+msgid "Input"
+msgstr "입력"
+
 msgid "Input Group"
 msgstr "입력 그룹"
 
@@ -16628,6 +16648,10 @@ msgstr "복원 중…"
 msgid "Result"
 msgstr "결과"
 
+msgctxt "what a tool returned"
+msgid "Result"
+msgstr "결과"
+
 msgid "Results"
 msgstr "결과"
 
@@ -17000,6 +17024,9 @@ msgstr "지금 실행 중"
 
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "실행 중인 터미널 프로세스는 계속되지만, 앱을 다시 시작한 뒤에는 이전 출력을 볼 수 없을 수 있습니다."
+
+msgid "Running…"
+msgstr "실행 중…"
 
 msgid "Runs a local command on your machine"
 msgstr "내 컴퓨터에서 로컬 명령을 실행합니다"
@@ -19076,6 +19103,9 @@ msgstr "사용량 한도로 중단됨"
 
 msgid "Stopped moving {name}"
 msgstr "{name} 옮기기를 중지했습니다"
+
+msgid "Stopped."
+msgstr "중지됨."
 
 msgid "Stopping the agent in {what}"
 msgstr "{what}의 에이전트 중지 중"
@@ -21856,6 +21886,12 @@ msgstr "지난 1분 중 {0}% 동안 CPU 대기"
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
 msgstr "{0}와 {1}을(를) 기다리는 중…"
+
+msgid "Waiting for {name}…"
+msgstr "{name} 기다리는 중…"
+
+msgid "Waiting for a free slot…"
+msgstr "빈 자리를 기다리는 중…"
 
 msgid "Waiting for activity data"
 msgstr "활동 데이터 대기 중"

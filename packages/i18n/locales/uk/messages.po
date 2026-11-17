@@ -1179,6 +1179,9 @@ msgstr "{name} без змін. Якщо агент працював, його �
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} без змін. Якщо агент працював, його зупинено."
 
+msgid "{name} is waking up…"
+msgstr "{name} прокидається…"
+
 msgid "{name} is working"
 msgstr "{name} працює"
 
@@ -2778,6 +2781,9 @@ msgstr "Анонімний асемблер"
 msgid "Another AI assistant"
 msgstr "Інший ШІ-асистент"
 
+msgid "another Dev"
+msgstr "інший Dev"
+
 msgid "another device"
 msgstr "інший пристрій"
 
@@ -2786,6 +2792,10 @@ msgstr "Відповідайте на запитання в терміналі �
 
 msgid "Answer this question on desktop, or skip it."
 msgstr "Дайте відповідь на це запитання на комп'ютері або пропустіть його."
+
+#. placeholder {0}: tool.output
+msgid "Answer: {0}"
+msgstr "Відповідь: {0}"
 
 msgid "Answered"
 msgstr "Відповідь надано"
@@ -3130,6 +3140,12 @@ msgstr "Попросіть внести зміни, @згадайте файли
 
 msgid "Ask what your agents are up to, or tell one what to do next."
 msgstr "Запитайте, чим зайняті ваші агенти, або скажіть одному з них, що робити далі."
+
+msgid "Asked <0>{name}</0>"
+msgstr "Запитав у <0>{name}</0>"
+
+msgid "Asking <0>{name}</0>"
+msgstr "Запитує у <0>{name}</0>"
 
 msgid "Asks before edits and commands"
 msgstr "Запитує перед змінами й командами"
@@ -10297,6 +10313,10 @@ msgstr "Вбудований код"
 msgid "Input"
 msgstr "Поле введення"
 
+msgctxt "what a tool was called with"
+msgid "Input"
+msgstr "Ввід"
+
 msgid "Input Group"
 msgstr "Група полів введення"
 
@@ -16622,6 +16642,10 @@ msgstr "Відновлення…"
 msgid "Result"
 msgstr "Результат"
 
+msgctxt "what a tool returned"
+msgid "Result"
+msgstr "Результат"
+
 msgid "Results"
 msgstr "Результати"
 
@@ -16994,6 +17018,9 @@ msgstr "Виконується зараз"
 
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "Запущені процеси термінала продовжать роботу, але старіший вивід може стати недоступним після перезапуску застосунку."
+
+msgid "Running…"
+msgstr "Виконується…"
 
 msgid "Runs a local command on your machine"
 msgstr "Виконує локальну команду на вашому комп'ютері"
@@ -19070,6 +19097,9 @@ msgstr "Зупинено через ліміт використання"
 
 msgid "Stopped moving {name}"
 msgstr "Перенесення {name} зупинено"
+
+msgid "Stopped."
+msgstr "Зупинено."
 
 msgid "Stopping the agent in {what}"
 msgstr "Зупинка агента в {what}"
@@ -21850,6 +21880,12 @@ msgstr "Очікування CPU {0}% останньої хвилини"
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
 msgstr "чекаємо на {0} і {1}…"
+
+msgid "Waiting for {name}…"
+msgstr "Очікування {name}…"
+
+msgid "Waiting for a free slot…"
+msgstr "Очікування вільного місця…"
 
 msgid "Waiting for activity data"
 msgstr "Очікування даних про активність"

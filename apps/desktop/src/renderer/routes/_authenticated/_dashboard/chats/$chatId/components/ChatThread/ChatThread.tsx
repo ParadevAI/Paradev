@@ -3,6 +3,7 @@ import {
 	messagesOf,
 	toThreadItems,
 } from "@superset/chats-core";
+import type { LiveTurn, LiveTurns } from "@superset/chats-sync";
 import { olderMessagesOf } from "@superset/chats-sync";
 import {
 	type ReactNode,
@@ -29,7 +30,9 @@ interface ChatThreadProps {
 	/** Shown above the oldest message once the whole history is loaded. */
 	intro: ReactNode;
 	/** Devs at work in this chat, shown after the newest message. */
-	working: { devId: string; name: string; phase: "waking" | "running" }[];
+	working: LiveTurn[];
+	/** Every Dev's turn in flight, for the turns nested in the ones shown. */
+	live: LiveTurns;
 }
 
 /**
@@ -47,6 +50,7 @@ export function ChatThread({
 	onLoadOlder,
 	intro,
 	working,
+	live,
 }: ChatThreadProps) {
 	const messages = useMemo(() => messagesOf(state, chatId), [state, chatId]);
 	const items = useMemo(() => toThreadItems(messages), [messages]);
@@ -57,6 +61,15 @@ export function ChatThread({
 	const anchor = useRef<{ firstId: string; height: number } | null>(null);
 	const firstId = messages[0]?.id;
 	const lastId = messages.at(-1)?.id;
+	const streamed = working.reduce(
+		(size, turn) =>
+			size +
+			turn.stream.blocks.reduce(
+				(sum, block) => sum + 1 + ("text" in block ? block.text.length : 0),
+				0,
+			),
+		0,
+	);
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: runs when the ends of the list change
 	useLayoutEffect(() => {
@@ -76,7 +89,7 @@ export function ChatThread({
 		anchor.current = firstId
 			? { firstId, height: scroller.scrollHeight }
 			: null;
-	}, [firstId, lastId, working.length]);
+	}, [firstId, lastId, working.length, streamed]);
 
 	useEffect(() => {
 		const sentinel = sentinelRef.current;
@@ -141,10 +154,10 @@ export function ChatThread({
 				{working.map((turn) => (
 					<WorkingRow
 						key={turn.devId}
-						devId={turn.devId}
-						name={turn.name}
+						state={state}
+						live={live}
+						turn={turn}
 						isGroup={isGroup}
-						phase={turn.phase}
 					/>
 				))}
 			</div>

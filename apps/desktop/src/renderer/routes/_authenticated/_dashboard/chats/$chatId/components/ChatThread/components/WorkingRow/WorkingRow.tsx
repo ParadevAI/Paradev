@@ -1,17 +1,35 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
+import type { ChatState } from "@superset/chats-core";
+import {
+	type LiveTurn,
+	type LiveTurns,
+	toolRunning,
+} from "@superset/chats-sync";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
+import { TurnBlocks } from "../../../TurnBlocks";
+import { WorkingLine } from "../../../TurnBlocks/components/WorkingLine";
 
 interface WorkingRowProps {
-	devId: string;
-	name: string;
+	state: ChatState;
+	live: LiveTurns;
+	turn: LiveTurn;
 	/** A group: the Dev's name and face go with its bubble. */
 	isGroup: boolean;
-	phase: "waking" | "running";
 }
 
-/** A Dev at work, at the end of the thread while its turn runs. Its reply arrives as a normal message. */
-export function WorkingRow({ devId, name, isGroup, phase }: WorkingRowProps) {
+/**
+ * A Dev at work, at the end of the thread while its turn runs: "Waking up…"
+ * while its box starts, then what it thinks and does as it happens. Its
+ * reply arrives as a normal message.
+ */
+export function WorkingRow({ state, live, turn, isGroup }: WorkingRowProps) {
 	const { t } = useLingui();
+	const name = state.devs[turn.devId]?.name ?? "";
+	const blocks = turn.stream.blocks;
+	const last = blocks.at(-1);
+	const quiet =
+		turn.phase === "running" &&
+		(!last || (last.kind === "tool" && !toolRunning(last)));
 	return (
 		<output
 			aria-label={t({ message: `${name} is working` })}
@@ -19,7 +37,7 @@ export function WorkingRow({ devId, name, isGroup, phase }: WorkingRowProps) {
 		>
 			{isGroup && (
 				<div className="mr-2 flex w-6 shrink-0 items-end">
-					<FaceAvatar seed={devId} size={24} />
+					<FaceAvatar seed={turn.devId} size={24} />
 				</div>
 			)}
 			<div className="flex max-w-[70%] min-w-0 flex-col items-start">
@@ -28,11 +46,22 @@ export function WorkingRow({ devId, name, isGroup, phase }: WorkingRowProps) {
 						{name}
 					</span>
 				)}
-				<div className="animate-pulse rounded-[20px] rounded-bl-md bg-fill-selected px-3.5 py-2 text-sm leading-relaxed text-muted-foreground">
-					{phase === "waking" ? (
-						<Trans>Waking up…</Trans>
+				<div className="flex min-w-0 max-w-full flex-col gap-0.5 rounded-[20px] rounded-bl-md bg-fill-selected px-3.5 py-2 text-sm leading-relaxed">
+					{turn.phase === "waking" ? (
+						<WorkingLine label={t({ message: "Waking up…" })} />
 					) : (
-						<Trans>Thinking…</Trans>
+						<>
+							<TurnBlocks state={state} live={live} turn={turn} />
+							{quiet && (
+								<WorkingLine
+									label={
+										blocks.length
+											? t({ message: "Working…" })
+											: t({ message: "Thinking…" })
+									}
+								/>
+							)}
+						</>
 					)}
 				</div>
 			</div>

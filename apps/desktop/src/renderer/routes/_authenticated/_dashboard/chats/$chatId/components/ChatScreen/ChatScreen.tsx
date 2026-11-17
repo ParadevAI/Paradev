@@ -50,6 +50,11 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const live = chats?.live;
 	const dispatch = chats?.dispatch;
 	const chat = state?.chats.find((candidate) => candidate.id === chatId);
+	const watchChat = chats?.watchChat;
+	useEffect(() => {
+		watchChat?.(chatId);
+		return () => watchChat?.(null);
+	}, [watchChat, chatId]);
 
 	useEffect(() => {
 		if (!live) return;
@@ -184,11 +189,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 		chat.kind === "group"
 			? devs.find((dev) => dev.kind === "group")?.name
 			: undefined;
-	const working = chatTurns(chats.turns, chatId, devs).map((turn) => ({
-		devId: turn.devId,
-		name: state.devs[turn.devId]?.name ?? "",
-		phase: turn.phase,
-	}));
+	const working = chatTurns(chats.turns, chatId, devs);
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -219,6 +220,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					actions={actions}
 					onLoadOlder={loadOlder}
 					working={working}
+					live={chats.turns}
 					intro={
 						<div className="flex flex-col items-center gap-2 px-8 pt-12 pb-4 text-center">
 							<ChatFace chat={chat} size={60} />

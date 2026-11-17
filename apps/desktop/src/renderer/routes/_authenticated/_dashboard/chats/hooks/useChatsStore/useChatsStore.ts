@@ -6,10 +6,13 @@ import {
 	createFileSends,
 	createMessageHistory,
 	createReadMarker,
+	createTurnWatches,
 	createTypingReporter,
 	createTypingWatch,
 	createWorkspaceActions,
 	EMPTY_LIVE,
+	type LiveAction,
+	type LiveTurns,
 	type LoadStatus,
 	liveTurnsReducer,
 	type SyncApi,
@@ -30,7 +33,11 @@ import {
 } from "react";
 import { env } from "renderer/env.renderer";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
+import { createActionBatcher, nextFrame } from "../../utils/actionBatch";
 import { createChatsApi } from "../../utils/chatsApi";
+
+const applyAll = (state: LiveTurns, actions: LiveAction[]) =>
+	actions.reduce(liveTurnsReducer, state);
 
 const REALTIME_URL = `${env.REALTIME_URL.replace(/^http/, "ws")}${CHATS_REALTIME_PATH}`;
 
@@ -78,11 +85,42 @@ export function useChatsStore(organizationId: string) {
 		[],
 	);
 	const listeners = useRef(new Set<(signal: SyncSignal) => void>());
-	const [turns, applyToTurns] = useReducer(liveTurnsReducer, EMPTY_LIVE);
-	const signal = useCallback((event: SyncSignal) => {
-		applyToTurns(event);
-		for (const listener of listeners.current) listener(event);
-	}, []);
+	const [turns, applyToTurns] = useReducer(applyAll, EMPTY_LIVE);
+	const [batcher] = useState(() =>
+		createActionBatcher<LiveAction>({
+			deliver: applyToTurns,
+			deferred: (action) => action.type === "update",
+			schedule: nextFrame,
+		}),
+	);
+	const apiRef = useRef(api);
+	apiRef.current = api;
+	const [watches] = useState(() =>
+		createTurnWatches({
+			ticket: (devId, groupId) => apiRef.current.watchToken(devId, groupId),
+			onUpdate: (turnId, update) =>
+				batcher.push({ type: "update", turnId, update }),
+		}),
+	);
+	const [viewedChatId, watchChat] = useState<string | null>(null);
+	useEffect(
+		() => watches.update(turns.active, viewedChatId),
+		[watches, turns.active, viewedChatId],
+	);
+	useEffect(
+		() => () => {
+			watches.stop();
+			batcher.stop();
+		},
+		[watches, batcher],
+	);
+	const signal = useCallback(
+		(event: SyncSignal) => {
+			batcher.push(event);
+			for (const listener of listeners.current) listener(event);
+		},
+		[batcher],
+	);
 	const subscribe = useCallback((listener: (signal: SyncSignal) => void) => {
 		listeners.current.add(listener);
 		return () => {
@@ -194,6 +232,8 @@ export function useChatsStore(organizationId: string) {
 		actions,
 		live,
 		turns,
+		/** Says which chat is on screen: its Devs' running turns are streamed from their boxes. */
+		watchChat,
 		retry,
 	};
 }

@@ -1185,6 +1185,9 @@ msgstr "{name} zůstává beze změny. Pokud pracoval agent, mohl být zastaven.
 msgid "{name} is unchanged. If an agent was working, it was stopped."
 msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
 
+msgid "{name} is waking up…"
+msgstr "{name} se probouzí…"
+
 msgid "{name} is working"
 msgstr "{name} pracuje"
 
@@ -2784,6 +2787,9 @@ msgstr "Anonymní montér"
 msgid "Another AI assistant"
 msgstr "Jiný AI asistent"
 
+msgid "another Dev"
+msgstr "jiný Dev"
+
 msgid "another device"
 msgstr "jiné zařízení"
 
@@ -2792,6 +2798,10 @@ msgstr "Odpovězte na dotazy v terminálu níže, například heslo."
 
 msgid "Answer this question on desktop, or skip it."
 msgstr "Odpovězte na tuto otázku na počítači, nebo ji přeskočte."
+
+#. placeholder {0}: tool.output
+msgid "Answer: {0}"
+msgstr "Odpověď: {0}"
 
 msgid "Answered"
 msgstr "Zodpovězeno"
@@ -3136,6 +3146,12 @@ msgstr "Požádejte o změny, zmiňte soubory přes @, spouštějte /commands"
 
 msgid "Ask what your agents are up to, or tell one what to do next."
 msgstr "Zeptej se, co dělají tvoji agenti, nebo jednomu řekni, co má dělat dál."
+
+msgid "Asked <0>{name}</0>"
+msgstr "Dotaz na <0>{name}</0> odeslán"
+
+msgid "Asking <0>{name}</0>"
+msgstr "Dotazuje se <0>{name}</0>"
 
 msgid "Asks before edits and commands"
 msgstr "Ptá se před úpravami a příkazy"
@@ -10303,6 +10319,10 @@ msgstr "Kód v textu"
 msgid "Input"
 msgstr "Vstup"
 
+msgctxt "what a tool was called with"
+msgid "Input"
+msgstr "Vstup"
+
 msgid "Input Group"
 msgstr "Skupina vstupů"
 
@@ -16628,6 +16648,10 @@ msgstr "Obnovuji…"
 msgid "Result"
 msgstr "Výsledek"
 
+msgctxt "what a tool returned"
+msgid "Result"
+msgstr "Výsledek"
+
 msgid "Results"
 msgstr "Výsledky"
 
@@ -17000,6 +17024,9 @@ msgstr "Spouštím"
 
 msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
 msgstr "Běžící procesy v terminálu poběží dál, ale starší výstup po restartu aplikace už nemusí být k dispozici."
+
+msgid "Running…"
+msgstr "Běží…"
 
 msgid "Runs a local command on your machine"
 msgstr "Spouští lokální příkaz na vašem počítači"
@@ -19076,6 +19103,9 @@ msgstr "Zastaveno limitem využití"
 
 msgid "Stopped moving {name}"
 msgstr "Přesun {name} byl zastaven"
+
+msgid "Stopped."
+msgstr "Zastaveno."
 
 msgid "Stopping the agent in {what}"
 msgstr "Zastavuje se agent v {what}"
@@ -21856,6 +21886,12 @@ msgstr "Čekání na CPU {0} % poslední minuty"
 #. placeholder {1}: names.b
 msgid "waiting for {0} and {1}…"
 msgstr "čeká se na {0} a {1}…"
+
+msgid "Waiting for {name}…"
+msgstr "Čeká se na {name}…"
+
+msgid "Waiting for a free slot…"
+msgstr "Čeká se na volné místo…"
 
 msgid "Waiting for activity data"
 msgstr "Čeká se na data o aktivitě"

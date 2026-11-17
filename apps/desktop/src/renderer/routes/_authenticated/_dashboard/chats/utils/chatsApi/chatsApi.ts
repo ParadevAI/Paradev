@@ -29,6 +29,8 @@ export type ChatsApi = Pick<
 	| "putFilePart"
 	| "finishFileUpload"
 	| "fileLink"
+	| "watchToken"
+	| "messageDetails"
 >;
 
 /**
@@ -100,6 +102,12 @@ export function createChatsApi(
 		fileLink: cachedFileLinks((fileId) =>
 			call(chats.fileLink.mutate({ fileId })),
 		),
+		watchToken: (devId, groupId) =>
+			call(chats.watchToken.mutate({ devId, groupId })),
+		messageDetails: (messageId) =>
+			call(chats.messageDetails.query({ messageId })) as ReturnType<
+				ChatsApi["messageDetails"]
+			>,
 		bootstrap: () => call(chats.bootstrap.query({ organizationId })),
 		realtimeToken: () => call(chats.realtimeTicket.query({ organizationId })),
 		sendMessage: (groupId, body) =>
