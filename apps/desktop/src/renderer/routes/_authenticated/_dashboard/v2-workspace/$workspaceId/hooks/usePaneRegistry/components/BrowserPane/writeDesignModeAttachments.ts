@@ -10,16 +10,14 @@ import type { DesignModePayload } from "shared/browser-design-mode";
 import { formatDesignModeContextMarkdown } from "./designModePrompt";
 
 /** Imperative host-service client (`workspaceTrpc.useUtils().client`). */
-export type WorkspaceTrpcClient = ReturnType<
-	typeof workspaceTrpc.useUtils
->["client"];
+type WorkspaceTrpcClient = ReturnType<typeof workspaceTrpc.useUtils>["client"];
 
 function joinAbsolutePath(parentAbsolutePath: string, name: string): string {
 	const separator = parentAbsolutePath.includes("\\") ? "\\" : "/";
 	return `${parentAbsolutePath.replace(/[\\/]+$/, "")}${separator}${name}`;
 }
 
-export interface DesignModeAttachmentPaths {
+interface DesignModeAttachmentPaths {
 	/** Repo-relative path of the context markdown file. */
 	contextPath: string;
 	/** Repo-relative path of the element screenshot PNG, when captured. */
@@ -32,8 +30,8 @@ export interface DesignModeAttachmentPaths {
  * the workspace attachments dir (the same drop zone agent launches use) so the
  * one-line terminal prompt can reference them by repo-relative path.
  *
- * Goes through the host-service filesystem router — v2 workspace ids live in
- * host.db, which the electron-side filesystem/workspaces routers don't know.
+ * Goes through the host-service filesystem router, which owns the workspace
+ * records in host.db.
  */
 export async function writeDesignModeAttachments({
 	client,

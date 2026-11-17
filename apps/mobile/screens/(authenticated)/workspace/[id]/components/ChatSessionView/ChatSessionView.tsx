@@ -1,14 +1,16 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	approvalAsker,
+	composerAnswer,
 	deriveQueuedPrompts,
 	displayText,
 	launchConfigSelections,
 	runningTurnId,
 } from "@superset/chat/core";
-import type { Decision } from "@superset/chat/protocol";
+import type { Decision, UserContent } from "@superset/chat/protocol";
 import {
 	ItemBodiesProvider,
+	useApprovals,
 	useChatSession,
 	useTimeline,
 } from "@superset/chat/react";
@@ -340,21 +342,43 @@ export const ChatSessionView = forwardRef<
 		[sessionId],
 	);
 
+	const approvals = useApprovals(chat.snapshot);
 	useImperativeHandle(
 		ref,
 		() => ({
 			send: async (text: string, attachments: ChatAttachment[] = []) => {
 				if (!text.trim() && attachments.length === 0) return;
-				chat.sendPrompt([
+				const content: UserContent[] = [
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
 						...attachment,
 						type: "attachment" as const,
 					})),
-				]);
+				];
+				const pending = loaded
+					? approvals.filter((approval) => !approval.parentItemId)
+					: [];
+				const [question] = pending;
+				const answer =
+					pending.length === 1 && question
+						? composerAnswer(question, content)
+						: null;
+				if (question && answer) {
+					await chat.respondToApproval(question.id, answer);
+					return;
+				}
+				for (const approval of pending) {
+					void chat
+						.respondToApproval(approval.id, { type: "cancel" })
+						.catch(() => {});
+				}
+				chat.sendPrompt(
+					content,
+					pending.length > 0 && turnId ? { expectedTurnId: turnId } : undefined,
+				);
 			},
 		}),
-		[chat],
+		[chat, approvals, loaded, turnId],
 	);
 
 	const router = useRouter();

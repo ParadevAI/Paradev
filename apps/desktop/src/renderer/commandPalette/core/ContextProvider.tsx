@@ -9,7 +9,6 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -27,7 +26,6 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 	const matchRoute = useMatchRoute();
 	const navigate = useNavigate();
 	const collections = useCollections();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const settingsSectionVisibility = useSettingsSectionVisibility();
 	const openNewWorkspace = useOpenNewWorkspace();
 	const {
@@ -97,7 +95,6 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			hostServiceStatus,
 			localMachineId: machineId ?? null,
 			notificationSoundsMuted,
-			isV2CloudEnabled,
 			settingsSectionVisibility,
 			navigate: navigateTo,
 			openNewWorkspace,
@@ -112,7 +109,6 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			hostServiceStatus,
 			machineId,
 			notificationSoundsMuted,
-			isV2CloudEnabled,
 			settingsSectionVisibility,
 			navigateTo,
 			openNewWorkspace,

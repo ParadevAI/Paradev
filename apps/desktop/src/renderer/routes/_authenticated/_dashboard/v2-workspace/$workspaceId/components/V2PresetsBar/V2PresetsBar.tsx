@@ -39,7 +39,7 @@ interface V2PresetsBarProps {
 	onToggleShowPresetsBar: (enabled: boolean) => void;
 }
 
-// Co-located to keep v2 self-contained. Mirrors the v1 array in
+// Co-located. Mirrors the array in
 // renderer/hotkeys/registry.ts; order matches the registry OPEN_PRESET_{n}
 // definitions so PRESET_HOTKEY_IDS[i] targets the i-th visible preset.
 const PRESET_HOTKEY_IDS: HotkeyId[] = [
@@ -55,7 +55,7 @@ const PRESET_HOTKEY_IDS: HotkeyId[] = [
 ];
 
 function isPresetVisibleInBar(pinnedToBar: boolean | undefined): boolean {
-	// The persisted field is legacy "pinned" wording; the v2 UI treats it as
+	// The persisted field is legacy "pinned" wording; the UI treats it as
 	// show/hide visibility. Undefined defaults to visible for compatibility.
 	return pinnedToBar !== false;
 }

@@ -14,7 +14,6 @@ export const PROJECT_FILTER_SESSIONS = "__sessions__";
 
 /** One of the WHERE_FILTER_* sentinels, or a device's machine id. */
 export type V2WorkspacesWhereFilter = string;
-export type V2WorkspacesProjectFilter = string;
 
 export type V2WorkspacesViewMode = "list" | "board";
 export type V2WorkspacesGroupBy =

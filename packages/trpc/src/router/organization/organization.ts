@@ -560,15 +560,16 @@ export const organizationRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
-			const member = await ctx.auth.api.addMember({
-				body: {
-					organizationId: input.organizationId,
-					userId: input.userId,
-					role: "member",
-				},
-				headers: ctx.headers,
-			});
-			return member;
+			return withAuthUserErrors(
+				ctx.auth.api.addMember({
+					body: {
+						organizationId: input.organizationId,
+						userId: input.userId,
+						role: "member",
+					},
+					headers: ctx.headers,
+				}),
+			);
 		}),
 
 	removeMember: personProcedure
@@ -636,13 +637,15 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.removeMember({
-				body: {
-					organizationId: input.organizationId,
-					memberIdOrEmail: targetMember.id, // Use member ID, not user ID
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.removeMember({
+					body: {
+						organizationId: input.organizationId,
+						memberIdOrEmail: targetMember.id, // Use member ID, not user ID
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const cleanup = await cleanupRemovedMember({
 				userId: input.userId,
@@ -814,14 +817,16 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.updateMemberRole({
-				body: {
-					organizationId: input.organizationId,
-					memberId: input.memberId,
-					role: [input.role],
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.updateMemberRole({
+					body: {
+						organizationId: input.organizationId,
+						memberId: input.memberId,
+						role: [input.role],
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const updatedMember = await db.query.members.findFirst({
 				where: eq(members.id, input.memberId),

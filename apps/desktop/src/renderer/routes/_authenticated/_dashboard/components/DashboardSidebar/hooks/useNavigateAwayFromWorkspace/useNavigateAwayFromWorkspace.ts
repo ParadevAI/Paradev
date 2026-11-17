@@ -102,7 +102,7 @@ export function useNavigateAwayFromWorkspace() {
 				}).catch(reportRemovalNavigationError);
 				return target;
 			}
-			// Straight to the v2 empty state — "/" detours through the v1
+			// Straight to the empty state — "/" detours through the v1
 			// workspace index, which can restore stale pre-migration state
 			// (SUPER-1814).
 			void navigate({ to: "/new-workspace", replace: true }).catch(

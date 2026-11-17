@@ -3,17 +3,15 @@
  * automation in sync-automations.ts sends. Run this before that sync.
  *
  * Usage (dry-run by default, pass --apply to create or update and publish):
- *   RESEND_API_KEY=... NEXT_PUBLIC_MARKETING_URL=https://superset.sh \
+ *   RESEND_API_KEY=... NEXT_PUBLIC_MARKETING_URL=https://paradev.com \
  *     bun scripts/publish-upgrade-nudge-template.ts [--apply]
  *
  * Resend fills {{{RESEND_UNSUBSCRIBE_URL}}} and adds List-Unsubscribe headers
  * only for automation and broadcast sends, never for emails.send().
  */
 import { render } from "@react-email/components";
-import { COMPANY } from "@superset/shared/constants";
 import { Resend } from "resend";
 import { UpgradeNudgeEmail } from "../src/emails/billing/upgrade-nudge";
-import { NOREPLY_FROM } from "../src/lib/sender";
 
 const ALIAS = "billing-upgrade-nudge";
 const apply = process.argv.includes("--apply");
@@ -28,12 +26,16 @@ const html = await render(
 const template = {
 	name: "Billing: upgrade nudge",
 	alias: ALIAS,
-	from: NOREPLY_FROM,
-	replyTo: COMPANY.MAIL_TO.replace(/^mailto:/, ""),
-	subject: "{{{featureName}}} is part of Paradev Pro",
+	from: "Kiet <kiet@hey.paradev.com>",
+	replyTo: "kiet@paradev.com",
+	subject: "Upgrade to Pro to access mobile",
 	html,
 	variables: [
-		{ key: "featureName", type: "string" as const, fallbackValue: "Pro" },
+		{
+			key: "featureName",
+			type: "string" as const,
+			fallbackValue: "a Pro feature",
+		},
 		{ key: "upgradeUrl", type: "string" as const },
 	],
 };

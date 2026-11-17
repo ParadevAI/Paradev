@@ -4,6 +4,7 @@ import {
 	type UpgradeNudgeDeps,
 	type UpgradeNudgeMessage,
 	upgradeNudgeFeatureName,
+	upgradeNudgeUrl,
 } from "./upgrade-nudge";
 
 function fakeDeps({
@@ -60,7 +61,11 @@ describe("recordUpgradeIntent", () => {
 		expect(await recordUpgradeIntent(input, deps)).toBe("sent");
 		expect(captured).toEqual(["sent"]);
 		expect(sent).toEqual([
-			{ to: "ada@example.com", featureName: "Paradev Mobile" },
+			{
+				to: "ada@example.com",
+				featureName: "Paradev Mobile",
+				organizationId: "org-1",
+			},
 		]);
 	});
 
@@ -96,15 +101,22 @@ describe("recordUpgradeIntent", () => {
 	});
 
 	test("names unknown features without passing client text through", () => {
-		expect(upgradeNudgeFeatureName("invite-members")).toBe(
-			"Inviting teammates",
-		);
+		expect(upgradeNudgeFeatureName("invite-members")).toBe("team invites");
 		expect(upgradeNudgeFeatureName("cloud-workspaces")).toBe(
-			"Cloud workspaces",
+			"cloud workspaces",
 		);
-		expect(upgradeNudgeFeatureName("voice_mode")).toBe("Voice mode");
+		expect(upgradeNudgeFeatureName("voice_mode")).toBe("voice mode");
 		expect(upgradeNudgeFeatureName("<a href=x>win</a>")).toBe("a Pro feature");
 		expect(upgradeNudgeFeatureName("__proto__")).toBe("a Pro feature");
-		expect(upgradeNudgeFeatureName("constructor")).toBe("Constructor");
+		expect(upgradeNudgeFeatureName("constructor")).toBe("constructor");
+	});
+
+	test("links to the billing page of the organization that hit the paywall", () => {
+		expect(upgradeNudgeUrl("https://app.paradev.com", "org-1")).toBe(
+			"https://app.paradev.com/settings/billing?organization=org-1",
+		);
+		expect(upgradeNudgeUrl("https://app.paradev.com", null)).toBe(
+			"https://app.paradev.com/settings/billing",
+		);
 	});
 });

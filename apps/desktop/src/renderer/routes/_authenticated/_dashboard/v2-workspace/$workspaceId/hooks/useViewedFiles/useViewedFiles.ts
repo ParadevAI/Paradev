@@ -3,7 +3,7 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useCallback, useMemo } from "react";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 
-export interface ViewedFilesApi {
+interface ViewedFilesApi {
 	viewedSet: Set<string>;
 	setViewed: (path: string, next: boolean) => void;
 }

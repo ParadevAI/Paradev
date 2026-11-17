@@ -29,7 +29,7 @@ import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/Host
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import type { ActivePaneStatus, PaneStatus } from "shared/tabs-types";
 
-export interface SidebarWorkspaceStatusEntry {
+interface SidebarWorkspaceStatusEntry {
 	/** Highest-priority attention status across the workspace's terminals. */
 	status: ActivePaneStatus | null;
 	/** Manual unread mark, or any terminal in review/failed. */

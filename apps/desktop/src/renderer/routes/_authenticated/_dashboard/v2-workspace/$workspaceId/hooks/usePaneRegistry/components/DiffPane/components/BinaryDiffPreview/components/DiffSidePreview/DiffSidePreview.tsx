@@ -15,7 +15,7 @@ import type { FileView } from "../../../../../FilePane/registry";
 import { createGetDiffInput } from "../../../../utils/createGetDiffInput";
 import { createSnapshotDocument } from "../../utils/createSnapshotDocument";
 
-export type DiffSide = "old" | "new";
+type DiffSide = "old" | "new";
 
 interface DiffSidePreviewProps {
 	file: ChangesetFile;

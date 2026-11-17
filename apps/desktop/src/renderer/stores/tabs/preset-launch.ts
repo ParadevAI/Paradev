@@ -2,10 +2,10 @@ import type { ExecutionMode } from "@superset/local-db/schema/zod";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { quote } from "shell-quote";
 
-export type PresetOpenTarget = "new-tab" | "active-tab";
-export type PresetMode = ExecutionMode;
+type PresetOpenTarget = "new-tab" | "active-tab";
+type PresetMode = ExecutionMode;
 
-export type PresetLaunchPlan =
+type PresetLaunchPlan =
 	| "active-terminal"
 	| "new-tab-single"
 	| "new-tab-multi-pane"

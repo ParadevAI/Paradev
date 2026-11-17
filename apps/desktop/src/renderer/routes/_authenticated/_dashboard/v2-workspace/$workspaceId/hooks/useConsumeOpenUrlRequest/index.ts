@@ -1,4 +1,1 @@
-export {
-	getOpenUrlRequestConsumeKey,
-	useConsumeOpenUrlRequest,
-} from "./useConsumeOpenUrlRequest";
+export { useConsumeOpenUrlRequest } from "./useConsumeOpenUrlRequest";

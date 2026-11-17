@@ -52,7 +52,7 @@ module.exports = {
 		categories: ["DEVELOPER_TOOLS", "PRODUCTIVITY"],
 		info: {
 			"en-US": {
-				title: "Paradev: 100+ Coding Agents",
+				title: "Paradev (formerly Superset)",
 				subtitle: "Manage AI agents on the go",
 				promoText:
 					"Your agents keep working when you leave your desk. Start a task, follow it live, and review the diff from your phone.",

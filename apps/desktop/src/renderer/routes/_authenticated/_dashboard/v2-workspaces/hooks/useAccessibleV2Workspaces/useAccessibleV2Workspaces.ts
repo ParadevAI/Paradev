@@ -69,7 +69,7 @@ export type {
 	V2WorkspaceSeenMarks,
 } from "./types";
 
-export interface UseAccessibleV2WorkspacesResult {
+interface UseAccessibleV2WorkspacesResult {
 	all: AccessibleV2Workspace[];
 	/** Row-source settlement — gates empty states only, never rendered rows. */
 	isReady: boolean;

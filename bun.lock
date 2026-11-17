@@ -585,7 +585,7 @@
         "react": "19.3.0",
         "react-dom": "19.3.0",
         "react-native": "0.88.1",
-        "react-native-enriched-markdown": "0.6.0",
+        "react-native-enriched-markdown": "1.2.0",
         "react-native-gesture-handler": "3.3.0",
         "react-native-get-random-values": "1.11.0",
         "react-native-reanimated": "4.7.1",
@@ -1300,6 +1300,7 @@
         "zod": "4.6.6",
       },
       "devDependencies": {
+        "@better-auth/api-key": "1.6.22",
         "@microsoft/microsoft-graph-types": "2.43.1",
         "@superset/typescript": "workspace:*",
         "@types/node": "24.12.0",
@@ -1456,6 +1457,7 @@
     "sharp",
     "electron",
     "better-sqlite3",
+    "react-native-enriched-markdown",
     "bufferutil",
     "workerd",
   ],
@@ -1463,7 +1465,6 @@
     "@pierre/diffs@1.6.2": "patches/@pierre%2Fdiffs@1.6.2.patch",
     "react-native-screens@4.30.1": "patches/react-native-screens@4.30.1.patch",
     "expo-observe@58.0.16": "patches/expo-observe@58.0.16.patch",
-    "react-native-enriched-markdown@0.6.0": "patches/react-native-enriched-markdown@0.6.0.patch",
     "node-pty@1.2.0-beta.14": "patches/node-pty@1.2.0-beta.14.patch",
     "@xterm/xterm@6.1.0-beta.315": "patches/@xterm%2Fxterm@6.1.0-beta.315.patch",
     "@xterm/addon-serialize@0.15.0-beta.310": "patches/@xterm%2Faddon-serialize@0.15.0-beta.310.patch",
@@ -6013,7 +6014,7 @@
 
     "react-native-drawer-layout": ["react-native-drawer-layout@4.2.12", "", { "dependencies": { "color": "^4.2.3", "use-latest-callback": "^0.2.4" }, "peerDependencies": { "react": ">= 18.2.0", "react-native": "*", "react-native-gesture-handler": ">= 2.0.0", "react-native-reanimated": ">= 2.0.0" } }, "sha512-qYmntEctkMSodN7pnC2llV21nswImLFPHJeT3PJXSJqZdU4jzDATR8iVi66sXkrtoOLJ2+EvXxgd7sMMpV4ViA=="],
 
-    "react-native-enriched-markdown": ["react-native-enriched-markdown@0.6.0", "", { "peerDependencies": { "@expo/config-plugins": ">=50.0.0", "katex": ">=0.16.0", "react": "*", "react-native": "*" }, "optionalPeers": ["@expo/config-plugins", "katex"] }, "sha512-/ZkKZv9jGPAuc/oXevkf3MpVfcrG3pjHoVMyKzpJhGsmIXxeTRr2dlsIqo66k+Pa4JrChBg+HB6ImQ44Fg3wJw=="],
+    "react-native-enriched-markdown": ["react-native-enriched-markdown@1.2.0", "", { "peerDependencies": { "katex": ">=0.16.0", "react": "*", "react-native": "*" }, "optionalPeers": ["katex"] }, "sha512-zu2+Slk7tkEu+9qiGoK644cWWV+dVgkFAUwQtjopyGmPFHr00iA9/drrZuEo93TCoXsWILK1AK/H60QNG8XtQQ=="],
 
     "react-native-gesture-handler": ["react-native-gesture-handler@3.3.0", "", { "dependencies": { "@types/react-test-renderer": "^19.1.0", "invariant": "^2.2.4" }, "peerDependencies": { "react": "*", "react-native": "*" } }, "sha512-ZCTlJ09nE3GPbm7J74lvwpxmx1TQ/7MDlHZNLARVYTN82k21mJUJ7BmI9eWjEi8eevHiAudI5O1Cpnt0rJfoJA=="],
 

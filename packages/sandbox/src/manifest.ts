@@ -155,6 +155,31 @@ export function renderDriveAssetsTsv(assets: Assets): string {
 
 export interface DerivedStep extends Step {
 	version: string;
+	/** Every step this one is `after`, directly or through another, in execution order. */
+	upstream: string[];
+}
+
+/** Each step's `after`, closed transitively, in manifest order. */
+export function upstreamSteps(steps: Step[]): Map<string, string[]> {
+	const order = new Map(steps.map((s, i) => [s.name, i]));
+	const closure = new Map<string, string[]>();
+	for (const step of steps) {
+		const found = new Set<string>();
+		for (const dep of step.after) {
+			const upstream = closure.get(dep);
+			if (!upstream)
+				throw new Error(
+					`step ${step.name} runs after ${dep}, which is not an earlier step`,
+				);
+			found.add(dep);
+			for (const name of upstream) found.add(name);
+		}
+		closure.set(
+			step.name,
+			[...found].sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0)),
+		);
+	}
+	return closure;
 }
 
 /**
@@ -170,6 +195,7 @@ export function deriveStepVersions(args: {
 	stepsDir: string;
 }): DerivedStep[] {
 	const toolsByDest = new Map(args.tools.map((t) => [t.dest, t.sha256]));
+	const upstream = upstreamSteps(args.steps);
 	const versions = new Map<string, string>();
 	const derived: DerivedStep[] = [];
 	for (const step of args.steps) {
@@ -204,14 +230,17 @@ export function deriveStepVersions(args: {
 		if (step.salt) parts.push(`salt:${step.salt}`);
 		const version = sha256(parts.join("\n"));
 		versions.set(step.name, version);
-		derived.push({ ...step, version });
+		derived.push({ ...step, version, upstream: upstream.get(step.name) ?? [] });
 	}
 	return derived;
 }
 
+/** Columns: name, version, assets, upstream steps. The runner skips a step whose upstream failed. */
 export function renderStepsTsv(steps: DerivedStep[]): string {
 	return steps
-		.map((s) => [s.name, s.version, s.assets.join(",")].join("\t"))
+		.map((s) =>
+			[s.name, s.version, s.assets.join(","), s.upstream.join(",")].join("\t"),
+		)
 		.join("\n")
 		.concat(steps.length ? "\n" : "");
 }

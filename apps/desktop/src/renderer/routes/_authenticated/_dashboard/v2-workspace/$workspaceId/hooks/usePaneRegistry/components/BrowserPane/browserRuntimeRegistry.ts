@@ -99,7 +99,7 @@ function withoutHash(url: string): string | null {
 /** Page-zoom bounds and step for a browser pane (1 = 100%). */
 export const BROWSER_ZOOM = Object.freeze({ min: 0.25, max: 5, step: 0.1 });
 
-export type BrowserZoomDirection = "in" | "out" | "reset";
+type BrowserZoomDirection = "in" | "out" | "reset";
 
 type BrowserIpcClient = Pick<
 	typeof electronTrpcClient,

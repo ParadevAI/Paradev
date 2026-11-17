@@ -11,7 +11,7 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 16;
 const DEFAULT_TRANSFORM: Transform = { scale: 1, x: 0, y: 0 };
 
-export interface Transform {
+interface Transform {
 	scale: number;
 	x: number;
 	y: number;

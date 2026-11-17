@@ -131,7 +131,7 @@ interface NewWorkspaceScreenProps {
 }
 
 /**
- * The v2 workspace-creation surface: heading, sample prompts, and a minimal
+ * The workspace-creation surface: heading, sample prompts, and a minimal
  * composer, filling the window rather than a dialog.
  */
 function launchPresetIdOf(agent: AgentSelectAgent): string {

@@ -294,7 +294,7 @@ export function buildDashboardSidebarSessions({
 	return { children, workspaces };
 }
 
-export interface BuildDashboardSidebarProjectsParams {
+interface BuildDashboardSidebarProjectsParams {
 	sidebarProjects: SidebarProjectInput[];
 	sidebarSections: SidebarSectionInput[];
 	visibleSidebarWorkspaces: SidebarWorkspaceInput[];

@@ -11,6 +11,7 @@ import {
 	renderStepsTsv,
 	renderToolsTsv,
 	sha256,
+	upstreamSteps,
 	walkRootfs,
 } from "./manifest";
 
@@ -202,6 +203,66 @@ describe("deriveStepVersions", () => {
 		expect(renderAssetsTsv(fixture().assets)).toMatch(
 			/^0644\ta{64}\t\.tar\.gz\t/,
 		);
+	});
+});
+
+describe("upstreamSteps", () => {
+	const step = (name: string, after: string[] = []) => ({
+		name,
+		assets: [],
+		after,
+		inputs: [],
+		salt: "",
+	});
+
+	test("closes `after` transitively, in manifest order, and leaves unrelated steps out", () => {
+		const closure = upstreamSteps([
+			step("a"),
+			step("b", ["a"]),
+			step("c"),
+			step("d", ["c", "b"]),
+		]);
+		expect(Object.fromEntries(closure)).toEqual({
+			a: [],
+			b: ["a"],
+			c: [],
+			d: ["a", "b", "c"],
+		});
+	});
+
+	test("refuses a forward reference", () => {
+		expect(() => upstreamSteps([step("a", ["b"]), step("b")])).toThrow(
+			/not an earlier step/,
+		);
+	});
+
+	test("renders the closure as the fourth steps.tsv column", () => {
+		const steps = [step("a"), step("b", ["a"])];
+		const closure = upstreamSteps(steps);
+		const rows = renderStepsTsv(
+			steps.map((s, i) => ({
+				...s,
+				version: `v${i}`,
+				upstream: closure.get(s.name) ?? [],
+			})),
+		)
+			.split("\n")
+			.filter(Boolean)
+			.map((l) => l.split("\t"));
+		expect(rows).toEqual([
+			["a", "v0", "", ""],
+			["b", "v1", "", "a"],
+		]);
+	});
+
+	test("in the bundle, a Chrome failure skips only configure-chrome", () => {
+		const closure = upstreamSteps(
+			loadSteps(join(import.meta.dir, "..", "bundle", "steps.json")),
+		);
+		const downstream = [...closure]
+			.filter(([, upstream]) => upstream.includes("install-chrome"))
+			.map(([name]) => name);
+		expect(downstream).toEqual(["configure-chrome"]);
 	});
 });
 
