@@ -574,6 +574,8 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
  * moved), the credential rules are re-applied (a token may have aged), and
  * the managed environment is pushed again (a fresh session holds none).
  */
+export type WakePhase = "detach" | "mount" | "resume" | "boot";
+
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
@@ -581,6 +583,8 @@ export async function wakeSandbox(args: {
 	mounts?: SandboxMounts;
 	/** Runs once the box is known to be stopped, before anything resumes it. */
 	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+	/** How long each part of the wake took, for a check that measures it. */
+	onPhase?: (phase: WakePhase, ms: number) => void;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -591,6 +595,14 @@ export async function wakeSandbox(args: {
 	expiresAt: Date | null;
 	sessionId: string | null;
 }> {
+	const timed = async <T>(phase: WakePhase, run: () => Promise<T>) => {
+		const started = Date.now();
+		try {
+			return await run();
+		} finally {
+			args.onPhase?.(phase, Date.now() - started);
+		}
+	};
 	try {
 		const sandbox = await Sandbox.get({
 			...credentials(),
@@ -626,17 +638,19 @@ export async function wakeSandbox(args: {
 				const outcome = await Sentry.startSpan(
 					{ name: "drive detach", op: "sandbox.provider" },
 					() =>
-						waitForDriveDetached(drive, {
-							heldByCaller: async (attachedTo) =>
-								attachedTo === args.providerSandboxId &&
-								(
-									await Sandbox.get({
-										...credentials(),
-										name: args.providerSandboxId,
-										resume: false,
-									})
-								).status === "running",
-						}),
+						timed("detach", () =>
+							waitForDriveDetached(drive, {
+								heldByCaller: async (attachedTo) =>
+									attachedTo === args.providerSandboxId &&
+									(
+										await Sandbox.get({
+											...credentials(),
+											name: args.providerSandboxId,
+											resume: false,
+										})
+									).status === "running",
+							}),
+						),
 				);
 				// A concurrent wake resumed this box with its drive meanwhile.
 				resumedByAnotherWake = outcome === "held";
@@ -644,7 +658,7 @@ export async function wakeSandbox(args: {
 			if (!resumedByAnotherWake && (agents || previousAgents || args.mounts)) {
 				const update = Sentry.startSpan(
 					{ name: "mount", op: "sandbox.provider" },
-					() => sandbox.update({ mounts }),
+					() => timed("mount", () => sandbox.update({ mounts })),
 				);
 				// Without its drive the workspace would boot on an empty /workspace.
 				if (args.mounts) await update;
@@ -672,6 +686,7 @@ export async function wakeSandbox(args: {
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
 		const serving = running && (await hostServiceAnswers(hostTarget));
+		const resumeStarted = Date.now();
 		await Sentry.startSpan(
 			{ name: "apply claim", op: "sandbox.provider" },
 			() =>
@@ -693,15 +708,18 @@ export async function wakeSandbox(args: {
 				runBoot(sandbox, args.claim.hostSecret),
 			);
 		}
+		args.onPhase?.("resume", Date.now() - resumeStarted);
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
 			() =>
-				settleSandbox({
-					providerSandboxId: args.providerSandboxId,
-					hostTarget,
-					claim: args.claim,
-					sandbox,
-				}),
+				timed("boot", () =>
+					settleSandbox({
+						providerSandboxId: args.providerSandboxId,
+						hostTarget,
+						claim: args.claim,
+						sandbox,
+					}),
+				),
 		).catch(async (error) => {
 			// Stopped, the next wake mounts the drive afresh.
 			if (error instanceof SandboxDriveMissingError) {

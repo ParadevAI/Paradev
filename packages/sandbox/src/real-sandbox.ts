@@ -9,9 +9,13 @@
  *
  * Publishes the bundle first so the box can fetch it if the image is older.
  *
- * With REAL_SANDBOX_DRIVE=1, a second box runs in drive mode, whatever the
- * first box's result: a throwaway golden drive, the box on a fork of it, the
- * layout, the stores, swap and Docker on the drive, then a stop and a wake.
+ * With REAL_SANDBOX_DRIVE=1, whatever the first box's result, the same work
+ * runs on a box in drive mode and on a plain box, side by side: the checkout,
+ * a real `bun install`, REAL_SANDBOX_WORK_GB (default 4) GB written under
+ * /workspace, persistence sentinels, a stop, a wake, a second stop. The drive
+ * box also checks the layout, the stores, swap and Docker on the drive. Then
+ * a third box is created on a fork of the drive box's drive, now full. One
+ * table compares the three (drive-comparison.ts).
  *
  * Every box and drive it made is deleted at the end, pass or fail: the box
  * stopped first, each drive once detached. REAL_SANDBOX_KEEP=1 keeps the
@@ -25,10 +29,23 @@ import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	SANDBOX_PATHS,
+	SANDBOX_USER,
 	type SandboxIdentity,
 } from "@superset/shared/sandbox/contract";
 import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
-import { Sandbox } from "@vercel/sandbox";
+import { Sandbox, Snapshot } from "@vercel/sandbox";
+import {
+	type BoxMeasures,
+	type BoxRun,
+	doWork,
+	readSentinels,
+	renderComparison,
+	SENTINELS,
+	type StopMeasure,
+	usableSince,
+	waitForCheckout,
+	writeSentinels,
+} from "./drive-comparison";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
 
@@ -199,19 +216,24 @@ async function drivePass(): Promise<number> {
 		workspaceDriveMounts,
 		workspaceDriveNameFor,
 	} = await import("@superset/trpc/lib/sandbox/drives");
+
 	const drives = vercelDrives();
+	const workGb = Number(process.env.REAL_SANDBOX_WORK_GB) || 4;
 	const suffix = Date.now().toString(36);
 	const goldenDrive = `env-drive-real-check-${suffix}`;
 	const box = `ws-real-drive-${suffix}`;
+	const plainBox = `ws-real-plain-${suffix}`;
+	const contentBox = `ws-real-content-${suffix}`;
 	const boxDrive = workspaceDriveNameFor(box);
+	const contentDrive = workspaceDriveNameFor(contentBox);
 	const mounts = workspaceDriveMounts(boxDrive);
-	const driveClaim = {
+	const claimWith = (driveName: string | null, laidOut: boolean) => ({
 		...claim,
 		identity: {
 			...identity,
-			...workspaceDriveIdentity(boxDrive, { laidOut: false }),
+			...workspaceDriveIdentity(driveName, { laidOut }),
 		},
-	};
+	});
 	const drive = SANDBOX_PATHS.drive;
 	const expectations = [
 		"sandbox.conf names the drive",
@@ -224,14 +246,16 @@ async function drivePass(): Promise<number> {
 		"the checkout is still there after a wake",
 		"the layout was redone on the wake",
 		"/workspace is a mount point again",
-	] as const;
+		"bun install on the plain box",
+		"bun install on the drive box",
+		...SENTINELS.map((name) => `plain box kept the ${name}`),
+		...SENTINELS.map((name) => `drive box kept the ${name}`),
+		"the drive box's root snapshot is smaller than the plain box's",
+		"a box on a fork of the full drive has /workspace usable",
+	];
 	const reported = new Set<string>();
 	let failures = 0;
-	const check = (
-		label: (typeof expectations)[number],
-		ok: boolean,
-		detail = "",
-	) => {
+	const check = (label: string, ok: boolean, detail = "") => {
 		reported.add(label);
 		log(
 			`${ok ? "ok  " : "FAIL"} drive: ${label}${detail ? `: ${detail.replaceAll("\n", " | ")}` : ""}`,
@@ -239,38 +263,48 @@ async function drivePass(): Promise<number> {
 		if (!ok) failures++;
 	};
 	// Only stdout is compared: sudo on the box warns on stderr that it cannot resolve the hostname.
-	const run = async (command: string) => {
-		const sandbox = await Sandbox.get({ ...credentials, name: box });
-		const result = await sandbox.runCommand({
-			cmd: "bash",
-			args: ["-lc", command],
-			sudo: true,
-		});
-		const out = (await result.stdout()).trim();
-		const err = (await result.stderr()).trim();
-		return {
-			out,
-			detail: [out, err && `stderr: ${err}`, `exit=${result.exitCode}`]
-				.filter(Boolean)
-				.join("\n"),
+	const runOn =
+		(name: string): BoxRun =>
+		async (command, options = {}) => {
+			const sandbox = await Sandbox.get({ ...credentials, name });
+			const script = Buffer.from(command).toString("base64");
+			const result = await sandbox.runCommand({
+				cmd: "bash",
+				args: options.root
+					? ["-lc", command]
+					: [
+							"-c",
+							`echo ${script} | base64 -d | runuser -u ${SANDBOX_USER} -- bash -l`,
+						],
+				sudo: true,
+			});
+			const out = (await result.stdout()).trim();
+			const err = (await result.stderr()).trim();
+			return {
+				out,
+				detail: [out, err && `stderr: ${err}`, `exit=${result.exitCode}`]
+					.filter(Boolean)
+					.join("\n"),
+			};
 		};
-	};
+	const run = runOn(box);
+	const root = (command: string) => run(command, { root: true });
 	const layouts = async () =>
 		Number(
 			(
-				await run(
+				await root(
 					`grep -c 'drive\\.layout ms=' ${SANDBOX_PATHS.bootLog} || true`,
 				)
 			).out,
 		);
 	const diagnose = async (when: string) => {
-		const report = await run(
+		const report = await root(
 			[
 				`echo '--- findmnt ${drive} and /workspace'`,
 				`findmnt -no SOURCE,MAJ:MIN,FSROOT,OPTIONS ${drive} ${SANDBOX_PATHS.workspace}`,
-				`echo '--- ls ${drive} ${drive}/workspace'`,
-				`ls -la ${drive} ${drive}/workspace 2>&1 | head -40`,
-				`echo '--- ${SANDBOX_PATHS.conf} drive key'`,
+				`echo '--- ls ${drive} ${drive}/workspace ${drive}/state'`,
+				`ls -la ${drive} ${drive}/workspace ${drive}/state 2>&1 | head -60`,
+				`echo '--- ${SANDBOX_PATHS.conf} drive keys'`,
 				`grep SUPERSET_SANDBOX_DRIVE ${SANDBOX_PATHS.conf}`,
 				`echo '--- run dir'`,
 				`ls ${SANDBOX_PATHS.run}`,
@@ -284,8 +318,113 @@ async function drivePass(): Promise<number> {
 		).catch((error) => ({ detail: `diagnosis failed: ${error}` }));
 		log(`drive: diagnosis ${when}:\n${report.detail}`);
 	};
-	let stoppedAt = "";
-	try {
+
+	const stopMeasured = async (name: string): Promise<StopMeasure> => {
+		const before = (await Sandbox.get({ ...credentials, name, resume: false }))
+			.currentSnapshotId;
+		const stopStarted = Date.now();
+		await stopSandbox(name);
+		while (Date.now() - stopStarted < 10 * 60_000) {
+			const now = await Sandbox.get({ ...credentials, name, resume: false });
+			if (
+				now.status === "stopped" &&
+				now.currentSnapshotId &&
+				now.currentSnapshotId !== before
+			) {
+				const ms = Date.now() - stopStarted;
+				const snapshot = await Snapshot.get({
+					...credentials,
+					snapshotId: now.currentSnapshotId,
+				});
+				return { ms, snapshotBytes: snapshot.sizeBytes };
+			}
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+		throw new Error(`${name} did not snapshot within 10 minutes of its stop`);
+	};
+
+	const measures: Record<"plain" | "drive" | "content", BoxMeasures> = {
+		plain: {},
+		drive: {},
+		content: {},
+	};
+	const token = randomUUID().replaceAll("-", "");
+
+	/** Create, work, stop, wake, read the sentinels back, stop again. */
+	const measureBox = async (args: {
+		name: string;
+		label: "plain" | "drive";
+		provisionClaim: typeof claim;
+		wakeClaim: typeof claim;
+		mounts?: typeof mounts;
+		afterFirstBoot?: () => Promise<void>;
+		beforeStop?: () => Promise<void>;
+		afterWake?: () => Promise<void>;
+	}) => {
+		const m = measures[args.label];
+		const boxRun = runOn(args.name);
+		const createStarted = Date.now();
+		await provisionFromImage(args.name, args.mounts, args.provisionClaim);
+		await wakeSandbox({
+			providerSandboxId: args.name,
+			claim: args.provisionClaim,
+			mounts: args.mounts,
+		});
+		m.createToReadyMs = Date.now() - createStarted;
+		if (!(await waitForCheckout(boxRun))) {
+			throw new Error(`${args.name}: the checkout never became ready`);
+		}
+		await args.afterFirstBoot?.();
+		const work = await doWork(boxRun, workGb);
+		m.installMs = work.installMs;
+		m.writeMs = work.writeMs;
+		check(
+			`bun install on the ${args.label} box`,
+			work.installed === "installed",
+			work.installed,
+		);
+		const values = await writeSentinels(boxRun, token);
+		await args.beforeStop?.();
+		m.firstStop = await stopMeasured(args.name);
+		log(`drive: ${args.label} box stopped once`);
+		const phases: Partial<Record<string, number>> = {};
+		const wakeStarted = Date.now();
+		await wakeSandbox({
+			providerSandboxId: args.name,
+			claim: args.wakeClaim,
+			mounts: args.mounts,
+			onPhase: (phase, ms) => {
+				phases[phase] = (phases[phase] ?? 0) + ms;
+			},
+		});
+		m.wake = {
+			detachMs: phases.detach,
+			mountMs: phases.mount,
+			resumeMs: phases.resume,
+			bootMs: phases.boot,
+			totalMs: Date.now() - wakeStarted,
+		};
+		m.usableMs = await usableSince(boxRun, wakeStarted);
+		m.sentinels = await readSentinels(boxRun, values);
+		for (const name of SENTINELS) {
+			check(`${args.label} box kept the ${name}`, m.sentinels[name] === true);
+		}
+		await args.afterWake?.();
+		m.secondStop = await stopMeasured(args.name);
+		log(`drive: ${args.label} box stopped twice`);
+	};
+
+	const stoppedAt: string[] = [];
+	const plain = measureBox({
+		name: plainBox,
+		label: "plain",
+		provisionClaim: claim,
+		wakeClaim: claim,
+	}).catch((error) => {
+		stoppedAt.push(`plain box: ${String(error).slice(0, 300)}`);
+	});
+	const driveBox = (async () => {
+		const forkStarted = Date.now();
 		await drives.create(goldenDrive, DEFAULT_SANDBOX_REGION);
 		await forkWorkspaceDrive({
 			name: boxDrive,
@@ -293,117 +432,192 @@ async function drivePass(): Promise<number> {
 			goldenDriveName: goldenDrive,
 			drives,
 		});
+		measures.drive.forkMs = Date.now() - forkStarted;
 		log(`drive: ${boxDrive} forked from ${goldenDrive}; provisioning ${box}`);
-		await provisionFromImage(box, mounts, driveClaim);
-		await wakeSandbox({ providerSandboxId: box, claim: driveClaim, mounts });
+		let before = 0;
+		await measureBox({
+			name: box,
+			label: "drive",
+			provisionClaim: claimWith(boxDrive, false),
+			wakeClaim: claimWith(boxDrive, true),
+			mounts,
+			afterFirstBoot: async () => {
+				const conf = await root(
+					`grep -c "^SUPERSET_SANDBOX_DRIVE='${boxDrive}'$" ${SANDBOX_PATHS.conf}`,
+				);
+				check("sandbox.conf names the drive", conf.out === "1", conf.detail);
+				const bootLog = (await root(`cat ${SANDBOX_PATHS.bootLog}`)).out;
+				check(
+					"layout stamped",
+					/drive\.layout ms=\d+/.test(bootLog),
+					bootLog.match(/drive\.(layout|missing|foreign|unlaid).*/)?.[0],
+				);
+				check("host-service ready", /host\.ready/.test(bootLog));
+				// A bind mount of a subdirectory: the drive's device, at fsroot /workspace.
+				const backing = await root(
+					`findmnt -rno MAJ:MIN ${drive}; findmnt -rno MAJ:MIN,FSROOT ${SANDBOX_PATHS.workspace}`,
+				);
+				const [device, workspaceMount] = backing.out.split("\n");
+				check(
+					"/workspace is a bind mount of the drive",
+					Boolean(device) && workspaceMount === `${device} /workspace`,
+					backing.detail,
+				);
+				const checkout = await root(
+					`test -d ${drive}/workspace/.git && echo on-drive`,
+				);
+				check(
+					"the checkout landed on the drive",
+					checkout.out === "on-drive",
+					checkout.detail,
+				);
+				const swap = await root(
+					`grep -o 'swap_dir=[^ ]*' ${SANDBOX_PATHS.logs}/memguard.log`,
+				);
+				check(
+					"memguard swaps on the drive",
+					swap.out.includes(`swap_dir=${drive}/swap`),
+					swap.detail,
+				);
+				const dockerRoot = await root(
+					`(dockerd > /tmp/dockerd.log 2>&1 &); for i in $(seq 1 60); do docker info --format '{{.DockerRootDir}}' 2>/dev/null && exit 0; sleep 1; done; tail -5 /tmp/dockerd.log`,
+				);
+				check(
+					"docker info reports the drive data-root",
+					dockerRoot.out === `${drive}/docker`,
+					dockerRoot.detail,
+				);
+				if (failures) await diagnose("after the first boot");
+			},
+			beforeStop: async () => {
+				before = await layouts();
+			},
+			afterWake: async () => {
+				const kept = await run(
+					`git -C ${SANDBOX_PATHS.workspace} rev-parse --is-inside-work-tree`,
+				);
+				check(
+					"the checkout is still there after a wake",
+					kept.out === "true",
+					kept.detail,
+				);
+				const after = await layouts();
+				check(
+					"the layout was redone on the wake",
+					after > before,
+					`${before} layout stamps before the wake, ${after} after`,
+				);
+				const mounted = await root(
+					`mountpoint ${SANDBOX_PATHS.workspace} && echo yes`,
+				);
+				check(
+					"/workspace is a mount point again",
+					mounted.out.endsWith("yes"),
+					mounted.detail,
+				);
+			},
+		});
+	})().catch((error) => {
+		stoppedAt.push(`drive box: ${String(error).slice(0, 300)}`);
+		return "failed" as const;
+	});
+	const [, driveOutcome] = await Promise.all([plain, driveBox]);
 
-		const conf = await run(
-			`grep -c "^SUPERSET_SANDBOX_DRIVE='${boxDrive}'$" ${SANDBOX_PATHS.conf}`,
-		);
-		check("sandbox.conf names the drive", conf.out === "1", conf.detail);
-		const bootLog = (await run(`cat ${SANDBOX_PATHS.bootLog}`)).out;
+	if (driveOutcome !== "failed") {
+		try {
+			await waitForDriveDetached(boxDrive, { drives });
+			const forkStarted = Date.now();
+			await drives.fork(boxDrive, contentDrive);
+			measures.content.forkMs = Date.now() - forkStarted;
+			const contentMounts = workspaceDriveMounts(contentDrive);
+			const contentClaim = claimWith(contentDrive, false);
+			const createStarted = Date.now();
+			await provisionFromImage(contentBox, contentMounts, contentClaim);
+			await wakeSandbox({
+				providerSandboxId: contentBox,
+				claim: contentClaim,
+				mounts: contentMounts,
+			});
+			measures.content.createToReadyMs = Date.now() - createStarted;
+			measures.content.usableMs = await usableSince(
+				runOn(contentBox),
+				createStarted,
+			);
+			check(
+				"a box on a fork of the full drive has /workspace usable",
+				measures.content.usableMs !== undefined,
+			);
+		} catch (error) {
+			stoppedAt.push(`content box: ${String(error).slice(0, 300)}`);
+		}
+	}
+	const plainSnapshot = measures.plain.firstStop?.snapshotBytes;
+	const driveSnapshot = measures.drive.firstStop?.snapshotBytes;
+	if (plainSnapshot !== undefined && driveSnapshot !== undefined) {
 		check(
-			"layout stamped",
-			/drive\.layout ms=\d+/.test(bootLog),
-			bootLog.match(/drive\.(layout|missing).*/)?.[0],
+			"the drive box's root snapshot is smaller than the plain box's",
+			driveSnapshot < plainSnapshot,
+			`${(driveSnapshot / 1024 ** 3).toFixed(2)} GB against ${(plainSnapshot / 1024 ** 3).toFixed(2)} GB`,
 		);
-		check("host-service ready", /host\.ready/.test(bootLog));
-		// A bind mount of a subdirectory: the drive's device, at fsroot /workspace.
-		const backing = await run(
-			`findmnt -rno MAJ:MIN ${drive}; findmnt -rno MAJ:MIN,FSROOT ${SANDBOX_PATHS.workspace}`,
-		);
-		const [device, workspaceMount] = backing.out.split("\n");
-		check(
-			"/workspace is a bind mount of the drive",
-			Boolean(device) && workspaceMount === `${device} /workspace`,
-			backing.detail,
-		);
-		const checkout = await run(
-			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && break; sleep 1; done; test -d ${drive}/workspace/.git && echo on-drive`,
-		);
-		check(
-			"the checkout landed on the drive",
-			checkout.out === "on-drive",
-			checkout.detail,
-		);
-		const swap = await run(
-			`grep -o 'swap_dir=[^ ]*' ${SANDBOX_PATHS.logs}/memguard.log`,
-		);
-		check(
-			"memguard swaps on the drive",
-			swap.out.includes(`swap_dir=${drive}/swap`),
-			swap.detail,
-		);
-		const dockerRoot = await run(
-			`(dockerd > /tmp/dockerd.log 2>&1 &); for i in $(seq 1 60); do docker info --format '{{.DockerRootDir}}' 2>/dev/null && exit 0; sleep 1; done; tail -5 /tmp/dockerd.log`,
-		);
-		check(
-			"docker info reports the drive data-root",
-			dockerRoot.out === `${drive}/docker`,
-			dockerRoot.detail,
-		);
-		if (failures) await diagnose("after the first boot");
+	}
+	for (const label of expectations) {
+		if (!reported.has(label)) {
+			check(
+				label,
+				false,
+				`not reached${stoppedAt.length ? `: ${stoppedAt.join("; ")}` : ""}`,
+			);
+		}
+	}
+	if (failures) await diagnose("at the end");
+	log(
+		`drive: comparison, ${workGb} GB written under /workspace\n${renderComparison(
+			[
+				{ label: "plain", measures: measures.plain },
+				{ label: "drive", measures: measures.drive },
+				{ label: "fork of the full drive", measures: measures.content },
+			],
+		)}`,
+	);
 
-		const before = await layouts();
-		await stopSandbox(box);
-		const wakeStarted = Date.now();
-		await wakeSandbox({ providerSandboxId: box, claim: driveClaim, mounts });
-		log(`drive: woken again in ${Date.now() - wakeStarted} ms`);
-		const kept = await run(
-			`git -C ${SANDBOX_PATHS.workspace} rev-parse --is-inside-work-tree`,
-		);
-		check(
-			"the checkout is still there after a wake",
-			kept.out === "true",
-			kept.detail,
-		);
-		const after = await layouts();
-		check(
-			"the layout was redone on the wake",
-			after > before,
-			`${before} layout stamps before the wake, ${after} after`,
-		);
-		const mounted = await run(
-			`mountpoint ${SANDBOX_PATHS.workspace} && echo yes`,
-		);
-		check(
-			"/workspace is a mount point again",
-			mounted.out.endsWith("yes"),
-			mounted.detail,
-		);
-	} catch (error) {
-		stoppedAt = String(error).slice(0, 300);
-	} finally {
-		for (const label of expectations) {
-			if (!reported.has(label)) {
-				check(label, false, `not reached${stoppedAt ? `: ${stoppedAt}` : ""}`);
-			}
-		}
-		if (failures) await diagnose("at the end");
-		if (keep) {
-			await stopSandbox(box)
-				.then(() => waitForDriveDetached(boxDrive, { drives }))
-				.then(() =>
-					log(
-						`drive: ${box} stopped and kept with ${boxDrive} (REAL_SANDBOX_KEEP=1); delete both when done`,
-					),
-				)
-				.catch((error) => log(`drive: could not stop ${box}: ${error}`));
-		} else {
-			await deleteSandboxAndDrive(box, boxDrive, drives)
-				.then(() => log(`drive: ${box} and ${boxDrive} deleted`))
-				.catch((error) => {
-					failures++;
-					log(`FAIL drive: could not delete ${box} and ${boxDrive}: ${error}`);
-				});
-		}
-		await waitForDriveDetached(goldenDrive, { drives })
-			.then(() => drives.remove(goldenDrive))
-			.then(() => log(`drive: ${goldenDrive} deleted`))
+	const cleanups: Array<[string, () => Promise<unknown>]> = keep
+		? [
+				[plainBox, () => stopSandbox(plainBox)],
+				[box, () => stopSandbox(box)],
+				[contentBox, () => stopSandbox(contentBox)],
+			]
+		: [
+				[
+					plainBox,
+					() => stopSandbox(plainBox).then(() => deleteSandbox(plainBox)),
+				],
+				[
+					`${box} and ${boxDrive}`,
+					() => deleteSandboxAndDrive(box, boxDrive, drives),
+				],
+				[
+					`${contentBox} and ${contentDrive}`,
+					() => deleteSandboxAndDrive(contentBox, contentDrive, drives),
+				],
+			];
+	for (const [what, cleanup] of cleanups) {
+		await cleanup()
+			.then(() =>
+				log(
+					`drive: ${what} ${keep ? "stopped and kept (REAL_SANDBOX_KEEP=1)" : "deleted"}`,
+				),
+			)
 			.catch((error) => {
 				failures++;
-				log(`FAIL drive: could not delete ${goldenDrive}: ${error}`);
+				log(`FAIL drive: could not clean up ${what}: ${error}`);
 			});
 	}
+	await waitForDriveDetached(goldenDrive, { drives })
+		.then(() => drives.remove(goldenDrive))
+		.then(() => log(`drive: ${goldenDrive} deleted`))
+		.catch((error) => {
+			failures++;
+			log(`FAIL drive: could not delete ${goldenDrive}: ${error}`);
+		});
 	return failures;
 }
