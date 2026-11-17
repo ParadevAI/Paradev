@@ -40,7 +40,7 @@ The update command depends on how the CLI was installed, and Paradev reads that 
 | Homebrew | `brew upgrade --cask claude-code` (or `claude-code@latest`, `codex`) |
 | npm | `npm install -g --prefix <prefix> <package>@latest`, into the prefix that holds the CLI, with `sudo` when you can't write to that prefix |
 | bun | `bun add -g <package>@latest` |
-| pnpm | `pnpm add -g <package>@latest` |
+| pnpm | `PNPM_HOME=<pnpm home> pnpm add -g <package>@latest`, with `PNPM_HOME` set to the pnpm home that holds the CLI |
 
 Paradev never runs one package manager over another's install. If it cannot tell how the CLI was installed, it shows **How to update**, which links here; update the CLI with the tool you installed it with.
 
