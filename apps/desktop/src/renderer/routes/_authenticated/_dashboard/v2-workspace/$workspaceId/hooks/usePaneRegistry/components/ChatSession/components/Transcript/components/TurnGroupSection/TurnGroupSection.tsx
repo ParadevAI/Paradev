@@ -1,8 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { OutboxEntry, SessionSnapshot } from "@superset/chat/core";
-import { approvalAsker, displayText } from "@superset/chat/core";
 import type {
-	ApprovalRequest,
 	AvailableCommand,
 	Decision,
 	Item,
@@ -14,6 +12,7 @@ import type { ReactNode } from "react";
 import type { PageLink } from "../../../../../../utils/pageLinks";
 import type { ChatForkTarget } from "../../../../types";
 import { PageLinkCard } from "../../../PageLinkCard";
+import { rowSnapshotView } from "../../utils/rowSnapshotView";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 import { AttachmentRail, type RailImage } from "../AttachmentRail";
 import { ReplyFooter } from "../ReplyFooter";
@@ -59,15 +58,6 @@ function imageRail(tools: readonly ToolCall[]): ReactNode {
 	) : null;
 }
 
-function approvalTarget(
-	snapshot: SessionSnapshot,
-	item: Item,
-): Item | undefined {
-	if (item.kind !== "approval_request") return undefined;
-	const targetId = (item as ApprovalRequest).targetItemId;
-	return targetId ? snapshot.items.get(targetId)?.item : undefined;
-}
-
 export type TurnGroupSectionProps = {
 	row: TranscriptRow;
 	lastReply: boolean;
@@ -104,7 +94,10 @@ export function TurnGroupSection({
 	snapshot,
 }: TurnGroupSectionProps) {
 	const { t } = useLingui();
-	const harness = snapshot.session?.harness;
+	const { harness, texts, asker, approvalTarget } = rowSnapshotView(
+		row,
+		snapshot,
+	);
 	switch (row.kind) {
 		case "working":
 			return (
@@ -119,12 +112,11 @@ export function TurnGroupSection({
 				/>
 			);
 		case "item": {
-			const asker = approvalAsker(snapshot.items, row.item);
 			return (
 				<>
 					<ItemRow
 						afterTarget={row.afterTarget}
-						approvalTarget={approvalTarget(snapshot, row.item)}
+						approvalTarget={approvalTarget}
 						asker={
 							asker ? asker.title || t({ message: "Subagent" }) : undefined
 						}
@@ -137,7 +129,7 @@ export function TurnGroupSection({
 						onFork={onFork}
 						onRespond={onRespond}
 						pagesShownEarlier={row.pagesShownEarlier}
-						text={displayText(snapshot, row.item.id)}
+						text={texts[0] ?? ""}
 					/>
 					{row.item.kind === "tool_call" && imageRail([row.item as ToolCall])}
 					{pageCards(row.pages)}
@@ -170,9 +162,7 @@ export function TurnGroupSection({
 						onToggle={onToggleEntry}
 						rowKey={row.key}
 						steps={row.steps}
-						stepTexts={row.steps.map((step) =>
-							step.kind === "reasoning" ? displayText(snapshot, step.id) : "",
-						)}
+						stepTexts={texts}
 					/>
 					{imageRail(row.items)}
 					{pageCards(row.pages)}
@@ -204,7 +194,7 @@ export function TurnGroupSection({
 					className="hover:opacity-100"
 					item={row.item}
 					onFork={onFork}
-					text={displayText(snapshot, row.item.id)}
+					text={texts[0] ?? ""}
 				/>
 			);
 	}
