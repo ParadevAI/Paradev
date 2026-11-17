@@ -118,9 +118,12 @@ describe("devs", () => {
 		]);
 	});
 
-	test("people can mention only a group's own Dev in a group, and a 1:1's Dev", () => {
+	test("in a group a person can mention its own Dev and their own, not another member's; and a 1:1's Dev", () => {
 		const s = state();
-		expect(mentionableDevs(s, s.chats[0]!).map((m) => m.id)).toEqual(["goa"]);
+		expect(mentionableDevs(s, s.chats[0]!).map((m) => m.id)).toEqual([
+			"goa",
+			"mine",
+		]);
 		expect(mentionableDevs(s, s.chats[1]!).map((m) => m.id)).toEqual(["coach"]);
 	});
 
@@ -145,6 +148,7 @@ describe("devs", () => {
 		expect(mentionableDevs(s, s.chats[0]!).map((m) => m.id)).toEqual([
 			"goa",
 			"trip",
+			"mine",
 		]);
 		expect(devOwnerLabel(s, s.devs.trip)).toBe("Added here");
 		expect(ownedByGroup(s.devs.trip)).toBe(true);

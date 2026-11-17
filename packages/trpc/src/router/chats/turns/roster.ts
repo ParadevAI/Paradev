@@ -44,9 +44,19 @@ export async function loadRoster(groupId: string): Promise<RosterDev[]> {
 	);
 }
 
-/** The Devs people can wake in a group: its own and the ones added to it. A member's Dev is asked by the group's. */
-export const mentionableDevs = (roster: RosterDev[]) =>
-	roster.filter(ownedByGroup);
+/**
+ * The Devs a person can wake in a group: its own, the ones added to it, and
+ * the person's own. Another member's Dev acts with its owner's access, so
+ * only its owner wakes it; everyone else asks through the group's Dev.
+ */
+export const mentionableDevs = (
+	roster: RosterDev[],
+	senderId: string | null = null,
+) =>
+	roster.filter(
+		(dev) =>
+			ownedByGroup(dev) || (senderId !== null && dev.ownerUserId === senderId),
+	);
 
 export interface Mentions {
 	/** Devs to wake: every token for a Dev in the list, and a plain `@Name` only one of them has. */

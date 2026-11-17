@@ -20032,9 +20032,6 @@ msgstr "Fondy a andělští investoři, kteří podporují náš tým."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Budoucí domov pro znovupoužitelné konfigurace agentů, prompty a průvodce nastavením pro Paradev."
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "Dev skupiny může požádat o pomoc Dev, který přidáte. Lidé zde mu psát nemohou."
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Hostitel se vrátil s verzí {0}, ne {targetVersion}."
@@ -22757,6 +22754,9 @@ msgstr "Nemáš pořadí, dokud nebude dní s aktivitou: {0}. Bodování začne,
 
 msgid "You are viewing version {version}, read-only"
 msgstr "Prohlížíte si verzi {version}, jen pro čtení"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "Deva, kterého přidáte, můžete označit pomocí @. Ostatní se k němu dostanou přes Deva skupiny."
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Můžete přiložit nejvýše {MAX_ATTACHMENTS} souborů"

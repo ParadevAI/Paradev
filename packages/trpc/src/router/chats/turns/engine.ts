@@ -483,7 +483,7 @@ async function messageTurnText(turn: TurnRow) {
 	if (row.chat.kind !== "direct") {
 		const mentioned = resolveMentions(
 			row.message.text,
-			mentionableDevs(roster),
+			mentionableDevs(roster, row.message.authorId),
 		).ids;
 		const me = mentioned.includes(turn.agentId);
 		const others = roster
@@ -541,11 +541,14 @@ async function checksReply(turn: TurnRow): Promise<boolean> {
 		.where(eq(chatsGroups.id, turn.groupId));
 	if (group?.kind === "direct" || !turn.messageId) return true;
 	const [message] = await db
-		.select({ text: chatsMessages.text })
+		.select({ text: chatsMessages.text, authorId: chatsMessages.authorId })
 		.from(chatsMessages)
 		.where(eq(chatsMessages.id, turn.messageId));
 	if (!message) return false;
-	const mentionable = mentionableDevs(await loadRoster(turn.groupId));
+	const mentionable = mentionableDevs(
+		await loadRoster(turn.groupId),
+		message.authorId,
+	);
 	return resolveMentions(message.text, mentionable).ids.includes(turn.agentId);
 }
 

@@ -20032,9 +20032,6 @@ msgstr "私たちのチームを支援するファンドとエンジェル投資
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "再利用可能なParadevエージェント設定、プロンプト、セットアップガイドの今後の公開場所。"
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "グループの Dev は、追加した Dev に手伝いを頼めます。ここのメンバーがその Dev に直接メッセージを送ることはできません。"
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "ホストは{targetVersion}ではなく{0}で復帰しました。"
@@ -22757,6 +22754,9 @@ msgstr "{0}日分の使用実績がそろうまではランク外です。全体
 
 msgid "You are viewing version {version}, read-only"
 msgstr "バージョン {version} を閲覧中です（読み取り専用）"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "追加した Dev は @ で呼び出せます。ほかのメンバーはグループの Dev を通じて依頼します。"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "添付できるファイルは最大{MAX_ATTACHMENTS}件です"

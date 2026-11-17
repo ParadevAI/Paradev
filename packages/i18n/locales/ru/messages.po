@@ -20032,9 +20032,6 @@ msgstr "Фонды и бизнес-ангелы, которые поддержи
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Будущий дом для переиспользуемых конфигураций агентов, промптов и руководств по настройке Paradev."
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "Dev группы может попросить о помощи добавленный вами Dev. Участники не могут писать ему напрямую."
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Хост вернулся с версией {0}, а не {targetVersion}."
@@ -22757,6 +22754,9 @@ msgstr "Вы вне рейтинга, пока не наберётся дней 
 
 msgid "You are viewing version {version}, read-only"
 msgstr "Вы просматриваете версию {version}, только для чтения"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "Добавленного вами Dev можно упомянуть через @. Остальные обращаются к нему через Dev группы."
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Можно прикрепить не более {MAX_ATTACHMENTS} файлов"

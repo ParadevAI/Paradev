@@ -171,7 +171,7 @@ test("a 1:1's Dev answers every message, and the chat hears each step", async ()
 	]);
 });
 
-test("in a group only a mention of its own Dev, or a follow-up, wakes it", async () => {
+test("in a group a mention of its own Dev, a follow-up, or a member's mention of their own Dev wakes one", async () => {
 	const created = await owner.chats.createGroup({
 		organizationId: ORG,
 		title: "Launch",
@@ -209,6 +209,17 @@ test("in a group only a mention of its own Dev, or a follow-up, wakes it", async
 	expect(followUp.agentId).toBe(created.dev.id);
 	expect(followUp.checkReply).toBe(false);
 	await reply(followUp, "these");
+	await runs.idle();
+
+	// A member wakes their own Dev by mentioning it; nobody else can.
+	await member.chats.sendMessage({
+		groupId,
+		text: `${mentionToken({ kind: "dev", id: mine.dev.id })} can you help`,
+	});
+	const own = await startedTurn(3);
+	expect(own.agentId).toBe(mine.dev.id);
+	expect(own.ownerOneToOne).toBe(false);
+	await reply(own, "yes");
 	await runs.idle();
 });
 

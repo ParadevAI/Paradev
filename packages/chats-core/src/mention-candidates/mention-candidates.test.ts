@@ -52,7 +52,7 @@ function fixture() {
 }
 
 describe("mention candidates", () => {
-	test("in a group, only the group's own Dev (with what it's for) then other members; members' Devs aren't offered", () => {
+	test("in a group, the group's own Dev and the viewer's own (with what each is for), then other members; other members' Devs aren't offered", () => {
 		const { state, chat } = fixture();
 		expect(
 			mentionCandidates(state, chat).map((c) => [
@@ -63,6 +63,7 @@ describe("mention candidates", () => {
 			]),
 		).toEqual([
 			["dev", "Goa trip", "This group's", "About Goa trip"],
+			["dev", "Juniper", "Yours", "About Juniper"],
 			["user", "Priya", "Person", undefined],
 		]);
 	});
@@ -72,6 +73,7 @@ describe("mention candidates", () => {
 		state.members.u2 = { id: "u2", name: "Goa trip" };
 		expect(mentionCandidates(state, chat).map((c) => c.label)).toEqual([
 			"Goa trip (group's)",
+			"Juniper",
 			"Goa trip (person)",
 		]);
 	});

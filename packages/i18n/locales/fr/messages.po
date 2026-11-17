@@ -20032,9 +20032,6 @@ msgstr "Les fonds et business angels qui soutiennent notre équipe."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Le futur point de rassemblement des configs d'agents, prompts et guides d'installation réutilisables pour Paradev."
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "Le Dev du groupe peut demander de l'aide à un Dev que vous ajoutez. Les personnes ici ne peuvent pas lui écrire."
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "L'hôte est revenu en {0}, pas en {targetVersion}."
@@ -22757,6 +22754,9 @@ msgstr "Vous n'êtes pas classé tant que {0} jours n'ont pas d'activité. Le sc
 
 msgid "You are viewing version {version}, read-only"
 msgstr "Vous consultez la version {version}, en lecture seule"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "Vous pouvez mentionner avec @ un Dev que vous ajoutez. Les autres personnes passent par le Dev du groupe."
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Vous pouvez joindre jusqu'à {MAX_ATTACHMENTS} fichiers"

@@ -20032,9 +20032,6 @@ msgstr "저희 팀을 후원하는 펀드와 엔젤 투자자입니다."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "재사용 가능한 Paradev 에이전트 설정, 프롬프트, 셋업 가이드가 모일 공간입니다."
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "그룹의 Dev가 추가한 Dev에게 도움을 요청할 수 있습니다. 이곳의 사람들은 해당 Dev에게 메시지를 보낼 수 없습니다."
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "호스트가 {targetVersion}이(가) 아닌 {0}(으)로 돌아왔습니다."
@@ -22757,6 +22754,9 @@ msgstr "{0}일치 사용 기록이 쌓이기 전까지는 순위가 없습니다
 
 msgid "You are viewing version {version}, read-only"
 msgstr "버전 {version}을 읽기 전용으로 보고 있습니다"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "추가한 Dev는 @로 멘션할 수 있습니다. 다른 사람들은 그룹의 Dev를 통해 요청합니다."
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "파일은 최대 {MAX_ATTACHMENTS}개까지 첨부할 수 있습니다"

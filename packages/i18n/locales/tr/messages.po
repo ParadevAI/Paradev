@@ -20032,9 +20032,6 @@ msgstr "Ekibimizi destekleyen fonlar ve melek yatırımcılar."
 msgid "The future home for reusable Paradev agent configs, prompts, and setup guides."
 msgstr "Yeniden kullanılabilir Paradev ajan yapılandırmaları, istemleri ve kurulum kılavuzları için gelecekteki adres."
 
-msgid "The group's Dev can ask a Dev you add for help. People here cannot message it."
-msgstr "Grubun Dev'i, eklediğiniz bir Dev'den yardım isteyebilir. Buradaki kişiler ona mesaj gönderemez."
-
 #. placeholder {0}: info.version
 msgid "The host came back on {0}, not {targetVersion}."
 msgstr "Ana makine {targetVersion} yerine {0} ile geri döndü."
@@ -22757,6 +22754,9 @@ msgstr "{0} gün kullanım birikene kadar sıralama dışısın. Tablo bütün r
 
 msgid "You are viewing version {version}, read-only"
 msgstr "Sürüm {version} görüntüleniyor, salt okunur"
+
+msgid "You can @ a Dev you add. Other people here reach it through the group's Dev."
+msgstr "Eklediğiniz bir Dev'i @ ile anabilirsiniz. Diğer kişiler ona grubun Dev'i üzerinden ulaşır."
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "En fazla {MAX_ATTACHMENTS} dosya ekleyebilirsiniz"
