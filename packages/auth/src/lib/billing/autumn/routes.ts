@@ -5,6 +5,7 @@ import {
 	GB_HOUR_PURCHASE,
 	gbHourPack,
 	gbHourPurchase,
+	seatLimitFrom,
 } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import type { BetterAuthPlugin } from "better-auth";
@@ -47,6 +48,7 @@ import {
 	OWNER_EXPAND,
 	ROUTE_ROLES,
 } from "./routes-policy";
+import { planSeatRefusal } from "./seat-limit";
 import { yearlyChangeStart } from "./seat-policy";
 import { seatPurchase } from "./seats";
 
@@ -99,6 +101,24 @@ async function refuseEnterprise(planId: string): Promise<void> {
 			message: `Enterprise subscriptions are managed by admins. Contact ${COMPANY.SUPPORT_EMAIL}.`,
 		});
 	}
+}
+
+/** Refuses a plan whose member cap the organization is already over. */
+async function refuseOversizedPlan(
+	organizationId: string,
+	planId: string,
+	seats: number,
+): Promise<void> {
+	const [customer, plans] = await Promise.all([
+		ensureAutumnCustomer(organizationId),
+		catalogAutumnPlans(),
+	]);
+	const refusal = planSeatRefusal(
+		seatLimitFrom(customer.metadata) ??
+			seatLimitFrom(plans.find((plan) => plan.id === planId)?.metadata),
+		seats,
+	);
+	if (refusal) throw new APIError("BAD_REQUEST", { message: refusal });
 }
 
 async function subscribedPlanId(
@@ -244,11 +264,11 @@ export const autumnBillingRoutes = {
 								: "This organization's plan changed. Reload billing and try again.",
 					});
 				}
-				await ensureAutumnCustomer(caller.organizationId);
 				const seats = Math.max(
 					1,
 					await countBillableSeats(caller.organizationId),
 				);
+				await refuseOversizedPlan(caller.organizationId, planId, seats);
 				const purchase = await seatPurchase(planId, seats);
 				const startsAt = await yearlyRenewalStart(
 					caller.organizationId,
@@ -359,10 +379,14 @@ export const autumnBillingRoutes = {
 			async (ctx) => {
 				const caller = await billingCaller(ctx, "previewAttach");
 				await refuseEnterprise(ctx.body.planId);
-				await ensureAutumnCustomer(caller.organizationId);
 				const seats = Math.max(
 					1,
 					await countBillableSeats(caller.organizationId),
+				);
+				await refuseOversizedPlan(
+					caller.organizationId,
+					ctx.body.planId,
+					seats,
 				);
 				const { quantities } = await seatPurchase(ctx.body.planId, seats);
 				const params = {
