@@ -52,6 +52,7 @@ import {
 	type SandboxRegionId,
 } from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
+import { useProductionDatabase } from "./production-database";
 
 // The provisioning code imports the API env schema; an operator running this
 // should not need every API secret to exist locally.
@@ -98,31 +99,10 @@ if (!credentials.token || !credentials.teamId || !credentials.projectId) {
 if (!process.env.SANDBOX_GATE_SECRET)
 	fail("SANDBOX_GATE_SECRET is required (the host secret derives from it)");
 if (PRODUCTION) {
-	const key = process.env.NEON_API_KEY;
-	const project = process.env.NEON_PROJECT_ID;
-	if (!key || !project)
-		fail("--production needs NEON_API_KEY and NEON_PROJECT_ID");
-	const headers = { authorization: `Bearer ${key}` };
-	const branchesResponse = await fetch(
-		`https://console.neon.tech/api/v2/projects/${project}/branches`,
-		{ headers },
+	const branch = await useProductionDatabase().catch((error: unknown) =>
+		fail(String(error instanceof Error ? error.message : error)),
 	);
-	if (!branchesResponse.ok) fail(`Neon branches: ${branchesResponse.status}`);
-	const branches = (await branchesResponse.json()) as {
-		branches: Array<{ id: string; name: string; default?: boolean }>;
-	};
-	const main = branches.branches.find((b) => b.default);
-	if (!main) fail("no default branch in the Neon project");
-	const uriResponse = await fetch(
-		`https://console.neon.tech/api/v2/projects/${project}/connection_uri?branch_id=${main.id}&database_name=neondb&role_name=neondb_owner&pooled=false`,
-		{ headers },
-	);
-	if (!uriResponse.ok) fail(`Neon connection_uri: ${uriResponse.status}`);
-	const uri = (await uriResponse.json()) as { uri?: string };
-	if (!uri.uri) fail("could not resolve the production connection string");
-	process.env.DATABASE_URL = uri.uri;
-	process.env.DATABASE_URL_UNPOOLED = uri.uri;
-	log(`database: Neon branch ${main.name} (${main.id})`);
+	log(`database: Neon branch ${branch}`);
 } else if (!process.env.DATABASE_URL) {
 	fail("DATABASE_URL is required (or pass --production)");
 }
