@@ -179,6 +179,20 @@ export const subagentStatusSchema = z.enum([
 ]);
 export type SubagentStatus = z.infer<typeof subagentStatusSchema>;
 
+/**
+ * Work a tool call left running after it returned, such as a background
+ * shell. It outlives the session's live task list, so a finished run still
+ * reads as finished after the chat reloads.
+ */
+export const backgroundRunSchema = z.looseObject({
+	taskId: z.string().min(1),
+	status: z.enum(["running", "completed", "failed", "stopped"]),
+	startedAtMs: z.number(),
+	completedAtMs: z.number().optional(),
+	exitCode: z.number().int().optional(),
+});
+export type BackgroundRun = z.infer<typeof backgroundRunSchema>;
+
 export const toolCallSchema = z.looseObject({
 	...itemBaseFields,
 	kind: z.literal("tool_call"),
@@ -199,6 +213,7 @@ export const toolCallSchema = z.looseObject({
 	canSteer: z.boolean().optional(),
 	canStop: z.boolean().optional(),
 	canBackground: z.boolean().optional(),
+	background: backgroundRunSchema.optional().catch(undefined),
 	attachments: z.array(itemAttachmentSchema).optional(),
 	bodyOmitted: z.boolean().optional(),
 	mcpServer: z

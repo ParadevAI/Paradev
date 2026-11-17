@@ -171,6 +171,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#件失敗} other {#件失敗}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#件のファイルを変更} other {#件のファイルを変更}}"
 
@@ -271,6 +272,7 @@ msgstr "{0, plural, one {#件のセッションが実行中} other {#件のセ�
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#件スキップ} other {#件スキップ}}"
 
+#. placeholder {0}: card.rows.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {サブエージェント # 件}}"
@@ -1041,6 +1043,9 @@ msgstr "このワークスペースの {entryPath} は、別の組織のペー�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#件失敗} other {#件失敗}}"
 
+msgid "{failed} failed"
+msgstr "{failed} 件失敗"
+
 msgid "{failing} of {total} check failing"
 msgstr "{total}件中{failing}件のチェックが失敗"
 
@@ -1052,6 +1057,9 @@ msgstr "{fileCount, plural, one {このワークスペースで変更された�
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
+
+msgid "{finished} finished"
+msgstr "{finished} 件完了"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}でフォーカス"
@@ -1191,9 +1199,6 @@ msgstr "{name} にはメッセージを送れません"
 msgid "{name} failed"
 msgstr "{name} が失敗しました"
 
-msgid "{name} finished"
-msgstr "{name} が完了しました"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} は組み込みのため削除できません"
@@ -1214,9 +1219,6 @@ msgstr "{name} は変更されていません。エージェントが作業中�
 
 msgid "{name} plugin"
 msgstr "{name} プラグイン"
-
-msgid "{name} started working"
-msgstr "{name} が作業を開始しました"
 
 msgid "{name} stopped"
 msgstr "{name} が停止しました"
@@ -1372,6 +1374,9 @@ msgstr "残り {remaining} トークン"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
 
+msgid "{running} running"
+msgstr "{running} 件実行中"
+
 msgid "{seconds}s"
 msgstr "{seconds}秒"
 
@@ -1397,6 +1402,9 @@ msgstr "スター{starCount}件、まだ増えています"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {#件のオートメーションを開始しました} other {#件のオートメーションを開始しました}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} 件停止"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 件のサブエージェントが実行中}}"
@@ -1490,6 +1498,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}件待機中"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, other {# 件のサブエージェントを待機中}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} の上限: {percent} 使用済み"
@@ -8461,6 +8472,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "失敗"
 
+msgid "failed · exit {exitCode}"
+msgstr "失敗 · 終了コード {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失敗した実行 <0>· 7日</0>"
 
@@ -9179,6 +9193,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "レビューを完了"
+
+msgid "finished"
+msgstr "完了"
 
 msgid "Finished"
 msgstr "完了"
@@ -12170,6 +12187,9 @@ msgstr "マージ中…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message"
+msgstr "メッセージ"
+
 msgid "Message {name}"
 msgstr "{name} にメッセージを送信"
 
@@ -12413,6 +12433,9 @@ msgstr "クラウドの作業を移行"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "メインのタブと右サイドバーの間でフォーカスを移動し、サイドバーが閉じている場合は開きます"
 
+msgid "Move the running subagent to the background"
+msgstr "実行中のサブエージェントをバックグラウンドに移動"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "このワークスペースを {computerName} に移動しますか？"
 
@@ -12426,6 +12449,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "数分で {companyName} に移行できます。"
 
 msgid "Move to background"
+msgstr "バックグラウンドに移動"
+
+msgid "Move to Background"
 msgstr "バックグラウンドに移動"
 
 msgid "Move to cloud"
@@ -19562,6 +19588,9 @@ msgstr "{label} を停止"
 msgid "Stop {name}"
 msgstr "{name} を停止"
 
+msgid "Stop all"
+msgstr "すべて停止"
+
 msgid "Stop dictation"
 msgstr "音声入力を停止"
 
@@ -19630,9 +19659,6 @@ msgstr "サブエージェント"
 
 msgid "Subagents"
 msgstr "サブエージェント"
-
-msgid "Subagents · {count}"
-msgstr "サブエージェント · {count}"
 
 msgid "Subject contains..."
 msgstr "件名に含む..."
@@ -20247,6 +20273,13 @@ msgstr "そのプラグインソースは存在しません"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "その実行はスキップされ、再試行されません。あとで「今すぐ実行」で開始できます。"
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "サブエージェント「{name}」が失敗しました。同じタスクでもう一度実行してください:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "2026年の賭け"

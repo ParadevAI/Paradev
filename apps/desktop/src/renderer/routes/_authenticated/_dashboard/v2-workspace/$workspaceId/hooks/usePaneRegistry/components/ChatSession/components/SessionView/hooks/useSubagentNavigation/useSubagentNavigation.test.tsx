@@ -121,7 +121,15 @@ function ChatWithHeader({
 	);
 }
 
-test("clicking a line opens the subagent with a header breadcrumb", () => {
+function openRun(view: ReturnType<typeof render>, itemId: string) {
+	const open = view.container.querySelector(
+		`[data-subagent-run="${itemId}"] button`,
+	);
+	if (!open) throw new Error(`no run row for ${itemId}`);
+	fireEvent.click(open);
+}
+
+test("clicking a run row opens the subagent with a header breadcrumb", () => {
 	const view = render(
 		<ChatWithHeader
 			chatKey="chat-open"
@@ -131,9 +139,7 @@ test("clicking a line opens the subagent with a header breadcrumb", () => {
 	expect(view.queryByRole("navigation", { name: "Breadcrumb" })).toBeNull();
 	expect(view.queryByText("task")).toBeNull();
 
-	fireEvent.click(
-		view.getByRole("button", { name: "Readme and wait started working" }),
-	);
+	openRun(view, "subagent:c1");
 
 	expect(view.getByTestId("focused").textContent).toBe("subagent:c1");
 	const breadcrumb = view.getByRole("navigation", { name: "Breadcrumb" });
@@ -216,9 +222,7 @@ function ChatWithApproval() {
 
 test("answering an approval keeps the subagent open", () => {
 	const view = render(<ChatWithApproval />);
-	fireEvent.click(
-		view.getByRole("button", { name: "Readme and wait started working" }),
-	);
+	openRun(view, "subagent:c1");
 	fireEvent.click(view.getByRole("button", { name: "Allow" }));
 
 	expect(view.queryByRole("button", { name: "Allow" })).toBeNull();

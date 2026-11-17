@@ -171,6 +171,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# nieudana} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# zmieniony plik} few {# zmienione pliki} many {# zmienionych plików} other {# zmienionego pliku}}"
 
@@ -271,6 +272,7 @@ msgstr "{0, plural, one {# sesja działa} few {# sesje działają} many {# sesji
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# pominięty} few {# pominięte} many {# pominiętych} other {# pominiętego}}"
 
+#. placeholder {0}: card.rows.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# subagent} few {# subagenty} many {# subagentów} other {# subagenta}}"
@@ -1041,6 +1043,9 @@ msgstr "{entryPath} w tym workspace jest już opublikowany jako strona w innej o
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# nieudany} few {# nieudane} many {# nieudanych} other {# nieudanego}}"
 
+msgid "{failed} failed"
+msgstr "nieudane: {failed}"
+
 msgid "{failing} of {total} check failing"
 msgstr "{failing} z {total} kontroli nie przechodzi"
 
@@ -1052,6 +1057,9 @@ msgstr "{fileCount, plural, one {W tym obszarze roboczym zmieniono # plik} few {
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Edytowano # plik} few {Edytowano # pliki} many {Edytowano # plików} other {Edytowano # pliku}}"
+
+msgid "{finished} finished"
+msgstr "zakończone: {finished}"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} aby aktywować"
@@ -1191,9 +1199,6 @@ msgstr "Nie można wysłać wiadomości do {name}"
 msgid "{name} failed"
 msgstr "{name} — błąd"
 
-msgid "{name} finished"
-msgstr "{name} skończył"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} jest wbudowany i nie można go usunąć"
@@ -1214,9 +1219,6 @@ msgstr "{name} pozostaje bez zmian. Jeśli agent pracował, został zatrzymany."
 
 msgid "{name} plugin"
 msgstr "Wtyczka {name}"
-
-msgid "{name} started working"
-msgstr "{name} zaczął pracę"
 
 msgid "{name} stopped"
 msgstr "{name} zatrzymany"
@@ -1372,6 +1374,9 @@ msgstr "Pozostałe tokeny: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Cofnięto zmiany w # pliku.} few {Cofnięto zmiany w # plikach.} many {Cofnięto zmiany w # plikach.} other {Cofnięto zmiany w # pliku.}}"
 
+msgid "{running} running"
+msgstr "działają: {running}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1397,6 +1402,9 @@ msgstr "{starCount} gwiazdek i rośnie"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Uruchomiono # automatyzację} few {Uruchomiono # automatyzacje} many {Uruchomiono # automatyzacji} other {Uruchomiono # automatyzacji}}"
+
+msgid "{stopped} stopped"
+msgstr "zatrzymane: {stopped}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent działa} few {# subagenty działają} many {# subagentów działa} other {# subagenta działa}}"
@@ -1490,6 +1498,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} oczekuje"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, one {czeka na # subagenta} few {czeka na # subagentów} many {czeka na # subagentów} other {czeka na # subagenta}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limit {windowLabel}: wykorzystano {percent}"
@@ -8461,6 +8472,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Niepowodzenie"
 
+msgid "failed · exit {exitCode}"
+msgstr "niepowodzenie · kod wyjścia {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Nieudane uruchomienia <0>· 7 dni</0>"
 
@@ -9179,6 +9193,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Zakończ przegląd"
+
+msgid "finished"
+msgstr "zakończono"
 
 msgid "Finished"
 msgstr "Zakończono"
@@ -12170,6 +12187,9 @@ msgstr "Scalanie…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message"
+msgstr "Wiadomość"
+
 msgid "Message {name}"
 msgstr "Napisz do {name}"
 
@@ -12413,6 +12433,9 @@ msgstr "Przenieś pracę z chmury"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Przenieś fokus między głównymi kartami a prawym paskiem bocznym i otwórz pasek, jeśli jest zamknięty"
 
+msgid "Move the running subagent to the background"
+msgstr "Przenieś działającego subagenta w tło"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Przenieść ten obszar roboczy na {computerName}?"
 
@@ -12426,6 +12449,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "Przejdź na {companyName} w kilka minut."
 
 msgid "Move to background"
+msgstr "Przenieś w tło"
+
+msgid "Move to Background"
 msgstr "Przenieś w tło"
 
 msgid "Move to cloud"
@@ -19562,6 +19588,9 @@ msgstr "Zatrzymaj {label}"
 msgid "Stop {name}"
 msgstr "Zatrzymaj {name}"
 
+msgid "Stop all"
+msgstr "Zatrzymaj wszystkie"
+
 msgid "Stop dictation"
 msgstr "Zatrzymaj dyktowanie"
 
@@ -19630,9 +19659,6 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagenci"
-
-msgid "Subagents · {count}"
-msgstr "Subagenci · {count}"
 
 msgid "Subject contains..."
 msgstr "Temat zawiera..."
@@ -20247,6 +20273,13 @@ msgstr "To źródło wtyczek nie istnieje"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "To uruchomienie przepada i nie jest ponawiane. Użyj Uruchom teraz, aby uruchomić je później."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "Subagent „{name}” zakończył się niepowodzeniem. Uruchom go ponownie z tym samym zadaniem:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "Zakład na 2026"

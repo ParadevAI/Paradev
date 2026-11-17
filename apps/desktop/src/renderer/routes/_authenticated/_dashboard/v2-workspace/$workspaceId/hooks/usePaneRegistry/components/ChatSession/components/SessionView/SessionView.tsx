@@ -35,8 +35,13 @@ import type { TerminalAgentBinding } from "renderer/hooks/host-service/useTermin
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { usePluginMentionOptions } from "renderer/hooks/usePluginMentionOptions";
 import { useStableList } from "renderer/hooks/useStableList";
+import { useHotkey } from "renderer/hotkeys";
 import { useChatTurnSnapshotsEnabled } from "renderer/stores/chat-turn-snapshots";
 import type { OpenFile } from "../../../../../../types";
+import {
+	foregroundSubagent,
+	runningAgents,
+} from "../../../../../../utils/collectAgentWork";
 import {
 	ChatPaneActionsProvider,
 	type OpenDiff,
@@ -93,7 +98,6 @@ import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
-import { subagentsInTurn } from "./utils/subagentsInTurn";
 
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
@@ -289,10 +293,6 @@ export function SessionView({
 	);
 	const liveRefreshKey = useMemo(
 		() => settledToolCalls(runningGroup),
-		[runningGroup],
-	);
-	const runningTurnSubagents = useMemo(
-		() => subagentsInTurn(runningGroup),
 		[runningGroup],
 	);
 	const turnChanges = useMemo<TurnChangesSource>(
@@ -529,6 +529,38 @@ export function SessionView({
 	openDraftKey.current = subagent.draftKey;
 
 	const onBackgroundSubagent = useMoveToBackground(client);
+	const backgroundTasks = sessionState?.backgroundTasks;
+	const backgroundTasksRef = useRef(backgroundTasks);
+	backgroundTasksRef.current = backgroundTasks;
+	useHotkey(
+		"MOVE_TO_BACKGROUND",
+		(event) => {
+			const taskId = foregroundSubagent(backgroundTasksRef.current);
+			if (!taskId) return;
+			event.preventDefault();
+			onBackgroundSubagent(taskId);
+		},
+		{ enabled: Boolean(isActive), preventDefault: false },
+	);
+	const liveTasks = useMemo(
+		() => new Map((backgroundTasks ?? []).map((task) => [task.id, task])),
+		[backgroundTasks],
+	);
+	const retrySubagent = useMemo(
+		() =>
+			held === undefined && loaded
+				? (name: string, task: string) =>
+						void sendPrompt([
+							{
+								type: "text",
+								text: t({
+									message: `The "${name}" subagent failed. Run it again with the same task:\n\n${task}`,
+								}),
+							},
+						])
+				: undefined,
+		[held, loaded, sendPrompt, t],
+	);
 	const plugins = usePluginMentionOptions();
 	const childrenByParent = useChildrenByParent(shownSnapshot);
 	const nestedItems = useMemo(
@@ -539,6 +571,9 @@ export function SessionView({
 			respondToApproval: onRespond,
 			openSubagent,
 			moveToBackground: onBackgroundSubagent,
+			liveTasks,
+			stopTask: onStopTask,
+			retrySubagent,
 		}),
 		[
 			shownSnapshot,
@@ -547,6 +582,9 @@ export function SessionView({
 			onRespond,
 			openSubagent,
 			onBackgroundSubagent,
+			liveTasks,
+			onStopTask,
+			retrySubagent,
 		],
 	);
 	const awaitingBackground = sessionState?.awaitingBackground === true;
@@ -557,6 +595,11 @@ export function SessionView({
 				: null,
 		[loaded, runningTurnId, awaitingBackground, cancelTurn, held],
 	);
+	const onStopAllAgents = useCallback(() => {
+		const { stoppable, count } = runningAgents(backgroundTasks);
+		for (const taskId of stoppable) void onStopTask(taskId);
+		if (count > stoppable.length) onCancelTurn?.();
+	}, [backgroundTasks, onStopTask, onCancelTurn]);
 	const sentOutbox = useMemo(
 		() => splitOutbox(session.outbox, runningTurnId !== null),
 		[session.outbox, runningTurnId],
@@ -761,13 +804,11 @@ export function SessionView({
 				</MessageScroller.Provider>
 				{!focusedSubagentId && (
 					<ComposerChips
-						backgroundTasks={sessionState?.backgroundTasks}
-						hiddenSubagents={
-							awaitingBackground ? undefined : runningTurnSubagents
-						}
+						backgroundTasks={backgroundTasks}
 						liveRefreshKey={liveRefreshKey}
 						onMoveToBackground={onBackgroundSubagent}
 						onOpenSubagent={openSubagent}
+						onStopAll={onStopAllAgents}
 						onStopTask={onStopTask}
 						runningTurnId={runningTurnId}
 						sessionId={client.sessionId}

@@ -171,6 +171,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# selhává} few {# selhávají} many {# selhává} other {# selhává}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# změněný soubor} few {# změněné soubory} many {# změněného souboru} other {# změněných souborů}}"
 
@@ -271,6 +272,7 @@ msgstr "{0, plural, one {běží # relace} few {běží # relace} many {běží 
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# přeskočeno} few {# přeskočeno} many {# přeskočeno} other {# přeskočeno}}"
 
+#. placeholder {0}: card.rows.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# subagent} few {# subagenti} many {# subagenta} other {# subagentů}}"
@@ -1041,6 +1043,9 @@ msgstr "{entryPath} v tomto workspace je už publikovaný jako stránka v jiné 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# selhalo} few {# selhalo} many {# selhalo} other {# selhalo}}"
 
+msgid "{failed} failed"
+msgstr "selhalo: {failed}"
+
 msgid "{failing} of {total} check failing"
 msgstr "Selhává {failing} z {total} kontroly"
 
@@ -1052,6 +1057,9 @@ msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Upraven # soubor} few {Upraveny # soubory} many {Upraveno # souboru} other {Upraveno # souborů}}"
+
+msgid "{finished} finished"
+msgstr "dokončeno: {finished}"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pro zaměření"
@@ -1191,9 +1199,6 @@ msgstr "{name} nemůže přijímat zprávy"
 msgid "{name} failed"
 msgstr "{name} selhal"
 
-msgid "{name} finished"
-msgstr "{name} skončil"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} je vestavěný a nelze jej odebrat"
@@ -1214,9 +1219,6 @@ msgstr "{name} zůstává beze změny. Pokud pracoval agent, byl zastaven."
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
-
-msgid "{name} started working"
-msgstr "{name} začal pracovat"
 
 msgid "{name} stopped"
 msgstr "{name} byl zastaven"
@@ -1372,6 +1374,9 @@ msgstr "Zbývající tokeny: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
 
+msgid "{running} running"
+msgstr "běží: {running}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1397,6 +1402,9 @@ msgstr "{starCount} hvězd a přibývá"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
+
+msgid "{stopped} stopped"
+msgstr "zastaveno: {stopped}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# subagent běží} few {# subagenti běží} many {# subagenta běží} other {# subagentů běží}}"
@@ -1490,6 +1498,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "Čeká: {waiting}"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, one {čeká na # subagenta} few {čeká na # subagenty} many {čeká na # subagenta} other {čeká na # subagentů}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limit {windowLabel}: využito {percent}"
@@ -8461,6 +8472,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Selhalo"
 
+msgid "failed · exit {exitCode}"
+msgstr "selhalo · návratový kód {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Neúspěšná spuštění <0>· 7 d</0>"
 
@@ -9179,6 +9193,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Dokončit revizi"
+
+msgid "finished"
+msgstr "dokončeno"
 
 msgid "Finished"
 msgstr "Dokončeno"
@@ -12170,6 +12187,9 @@ msgstr "Slučování…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message"
+msgstr "Zpráva"
+
 msgid "Message {name}"
 msgstr "Napsat {name}"
 
@@ -12413,6 +12433,9 @@ msgstr "Přesuňte práci z cloudu"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Přesunout fokus mezi hlavními kartami a pravým postranním panelem a otevřít panel, pokud je zavřený"
 
+msgid "Move the running subagent to the background"
+msgstr "Přesunout běžícího subagenta na pozadí"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Přesunout tento pracovní prostor na {computerName}?"
 
@@ -12426,6 +12449,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "Přejděte na {companyName} během pár minut."
 
 msgid "Move to background"
+msgstr "Přesunout na pozadí"
+
+msgid "Move to Background"
 msgstr "Přesunout na pozadí"
 
 msgid "Move to cloud"
@@ -19562,6 +19588,9 @@ msgstr "Zastavit {label}"
 msgid "Stop {name}"
 msgstr "Zastavit {name}"
 
+msgid "Stop all"
+msgstr "Zastavit vše"
+
 msgid "Stop dictation"
 msgstr "Zastavit diktování"
 
@@ -19630,9 +19659,6 @@ msgstr "Subagent"
 
 msgid "Subagents"
 msgstr "Subagenti"
-
-msgid "Subagents · {count}"
-msgstr "Subagenti · {count}"
 
 msgid "Subject contains..."
 msgstr "Předmět obsahuje..."
@@ -20247,6 +20273,13 @@ msgstr "Tento zdroj pluginů neexistuje"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "Tento běh se vynechá a neopakuje se. Později ho spustíte tlačítkem Spustit teď."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "Subagent „{name}“ selhal. Spusť ho znovu se stejným úkolem:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "Sázka na rok 2026"

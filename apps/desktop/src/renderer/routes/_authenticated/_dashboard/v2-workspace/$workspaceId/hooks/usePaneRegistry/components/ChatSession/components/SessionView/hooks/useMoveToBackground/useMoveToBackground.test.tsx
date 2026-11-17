@@ -10,7 +10,7 @@ import {
 	render,
 	renderHook,
 } from "@testing-library/react";
-import { SubagentEventLine } from "../../../Transcript/components/SubagentEventLine";
+import { SubagentRunCard } from "../../../Transcript/components/SubagentRunCard";
 import { NestedItemsProvider } from "../../../Transcript/providers/NestedItemsProvider";
 import { useMoveToBackground } from "./useMoveToBackground";
 
@@ -55,9 +55,21 @@ function EventLine({
 				respondToApproval: () => {},
 				openSubagent: () => {},
 				moveToBackground,
+				liveTasks: new Map([
+					[
+						item.id,
+						{
+							id: item.id,
+							kind: "subagent",
+							name: item.title,
+							canStop: false,
+							startedAtMs: 1,
+						},
+					],
+				]),
 			}}
 		>
-			<SubagentEventLine item={item} />
+			<SubagentRunCard launches={[item]} />
 		</NestedItemsProvider>
 	);
 }

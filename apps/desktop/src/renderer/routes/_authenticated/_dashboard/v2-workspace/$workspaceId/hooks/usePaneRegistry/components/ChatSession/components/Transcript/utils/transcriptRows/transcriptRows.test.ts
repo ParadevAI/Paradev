@@ -513,7 +513,7 @@ describe("transcriptRows", () => {
 	});
 });
 
-test("a subagent's task call leaves its tool run", () => {
+test("a subagent's task call leaves its tool run for a card of its own", () => {
 	const tool = (id: string): ToolCall => ({
 		id,
 		kind: "tool_call",
@@ -541,7 +541,7 @@ test("a subagent's task call leaves its tool run", () => {
 		new Set(),
 		find,
 		new Set(),
-		(each) => each.id === "task-1",
+		(each) => (each.id === "task-1" ? [each] : null),
 	);
 	expect(
 		rows.map((row) =>
@@ -549,9 +549,11 @@ test("a subagent's task call leaves its tool run", () => {
 				? row.items.map((each) => each.id)
 				: row.kind === "item"
 					? row.item.id
-					: row.kind,
+					: row.kind === "subagent_run"
+						? row.launches.map((each) => each.id)
+						: row.kind,
 		),
-	).toEqual([["r1", "r2"], "task-1", "r3"]);
+	).toEqual([["r1", "r2"], ["task-1"], "r3"]);
 });
 
 test("a failed turn says its failure once, on the turn's own row, keeping the stderr an older host put only in the notice", () => {
@@ -735,5 +737,66 @@ test("a stop replayed from Claude Code history is a stopped row where it happene
 		kind: "turn_status",
 		status: "interrupted",
 		userStop: "tool_use",
+	});
+});
+
+describe("subagent runs", () => {
+	const launch = (id: string): ToolCall => ({
+		...publish(id, 4),
+		title: id,
+		toolName: "subagent",
+		subagent: true,
+	});
+	const shell: ToolCall = {
+		...publish("shell", 5),
+		rawInput: { command: "sleep 40", run_in_background: true },
+	};
+	const reply: Item = {
+		id: "reply",
+		kind: "agent_message",
+		text: "started",
+		startedAtMs: 6,
+	};
+	const rowsOf = (entries: TurnGroup["entries"]) =>
+		transcriptRows(
+			[{ turnId: "turn-1", turn: null, entries }],
+			[],
+			new Set(),
+			find,
+			new Set(),
+			(tool) => (tool.subagent === true ? [tool] : null),
+			(tool) => tool.id === "shell",
+		);
+
+	test("one step's launches stack as one card, and its background shell keeps a row of its own", () => {
+		const rows = rowsOf([
+			{
+				kind: "tool_run",
+				items: [launch("a"), launch("b"), shell, launch("c"), publish("p", 7)],
+			},
+		]);
+		expect(rows.map((row) => row.kind)).toEqual([
+			"subagent_run",
+			"item",
+			"item",
+		]);
+		const [card, shellRow] = rows;
+		expect(
+			card?.kind === "subagent_run" && card.launches.map((call) => call.id),
+		).toEqual(["a", "b", "c"]);
+		expect(shellRow?.kind === "item" && shellRow.item.id).toBe("shell");
+	});
+
+	test("a launch after the agent spoke opens a new card, as a resumed child does", () => {
+		const rows = rowsOf([
+			{ kind: "tool_run", items: [launch("a")] },
+			{ kind: "item", item: reply },
+			{ kind: "item", item: launch("a:generation:2") },
+		]);
+		expect(rows.map((row) => row.kind)).toEqual([
+			"subagent_run",
+			"item",
+			"subagent_run",
+		]);
 	});
 });

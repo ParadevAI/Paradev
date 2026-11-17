@@ -2,14 +2,17 @@ import type { AvailableCommand, Decision, Item } from "@superset/chat/protocol";
 import { isKnownItem } from "@superset/chat/protocol";
 import { memo } from "react";
 import type { ChatForkTarget } from "../../../../../../types";
+import { isBackgroundShell } from "../../../../utils/backgroundShell";
 import { rowKindForItem } from "../../../../utils/rowKind";
-import { isNestedTool, subagentLines } from "../../../../utils/subagentLines";
+import { subagentLaunches } from "../../../../utils/subagentRuns";
 import { AgentMessageRow } from "../../../AgentMessageRow";
 import { ApprovalRow } from "../../../ApprovalRow";
+import { BackgroundShellRow } from "../../../BackgroundShellRow";
 import { NestedToolCallRow } from "../../../NestedToolCallRow";
 import { NoticeRow } from "../../../NoticeRow";
 import { PlanRow } from "../../../PlanRow";
 import { ReasoningRow } from "../../../ReasoningRow";
+import { SubagentRunCard } from "../../../SubagentRunCard";
 import { ToolCallRow } from "../../../ToolCallRow";
 import { UnknownItemRow } from "../../../UnknownItemRow";
 import { type PendingPrompt, UserMessageRow } from "../../../UserMessageRow";
@@ -74,19 +77,21 @@ export const ItemRow = memo(function ItemRow({
 			);
 		case "reasoning":
 			return <ReasoningRow item={item} text={text} />;
-		case "tool_call":
-			if (subagentLines(item, childItems)) {
-				return <NestedToolCallRow item={item} />;
-			}
+		case "tool_call": {
+			const launches = subagentLaunches(item, childItems);
+			if (launches) return <SubagentRunCard launches={launches} />;
 			return (
 				<RailStep>
-					{isNestedTool(item, childItems) ? (
+					{isBackgroundShell(item) ? (
+						<BackgroundShellRow item={item} />
+					) : (childItems?.length ?? 0) > 0 ? (
 						<NestedToolCallRow item={item} />
 					) : (
 						<ToolCallRow item={item} />
 					)}
 				</RailStep>
 			);
+		}
 		case "plan":
 			return <PlanRow item={item} />;
 		case "approval_request":

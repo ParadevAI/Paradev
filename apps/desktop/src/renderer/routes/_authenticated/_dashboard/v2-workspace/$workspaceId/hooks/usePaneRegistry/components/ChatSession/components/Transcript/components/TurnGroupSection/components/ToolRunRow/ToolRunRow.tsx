@@ -12,8 +12,8 @@ import {
 import { cn } from "@superset/ui/utils";
 import { ChevronRight } from "lucide-react";
 import { memo } from "react";
+import { isBackgroundShell } from "../../../../utils/backgroundShell";
 import { stepSummary } from "../../../../utils/stepSummary";
-import { isNestedTool } from "../../../../utils/subagentLines";
 import { toolKindIcon } from "../../../../utils/toolKindIcon";
 import { NestedToolCallRow } from "../../../NestedToolCallRow";
 import { ReasoningRow } from "../../../ReasoningRow";
@@ -85,10 +85,9 @@ export const ToolRunRow = memo(function ToolRunRow({
 					item={step as ReasoningItem}
 					text={stepTexts[steps.indexOf(step)] ?? ""}
 				/>
-			) : isNestedTool(
-					step as ToolCall,
-					childLists?.[items.indexOf(step as ToolCall)],
-				) ? (
+			) : (childLists?.[items.indexOf(step as ToolCall)]?.length ?? 0) > 0 ||
+				(step as ToolCall).subagent === true ||
+				isBackgroundShell(step as ToolCall) ? (
 				<NestedToolCallRow item={step as ToolCall} />
 			) : (
 				<ToolCallRow item={step as ToolCall} />

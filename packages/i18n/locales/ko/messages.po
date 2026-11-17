@@ -171,6 +171,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#개 실패} other {#개 실패}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {파일 #개 변경됨} other {파일 #개 변경됨}}"
 
@@ -271,6 +272,7 @@ msgstr "{0, plural, one {세션 #개 실행 중} other {세션 #개 실행 중}}
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#개 건너뜀} other {#개 건너뜀}}"
 
+#. placeholder {0}: card.rows.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {서브 에이전트 #개}}"
@@ -1041,6 +1043,9 @@ msgstr "이 워크스페이스의 {entryPath}는 다른 조직에서 이미 페�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#개 실패} other {#개 실패}}"
 
+msgid "{failed} failed"
+msgstr "{failed}개 실패"
+
 msgid "{failing} of {total} check failing"
 msgstr "검사 {total}개 중 {failing}개 실패"
 
@@ -1052,6 +1057,9 @@ msgstr "{fileCount, plural, one {이 워크스페이스에서 변경된 파일 #
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {파일 #개 편집} other {파일 #개 편집}}"
+
+msgid "{finished} finished"
+msgstr "{finished}개 완료"
 
 msgid "{focusShortcutText} to focus"
 msgstr "포커스하려면 {focusShortcutText}"
@@ -1191,9 +1199,6 @@ msgstr "{name}에게 메시지를 보낼 수 없습니다"
 msgid "{name} failed"
 msgstr "{name} 실패"
 
-msgid "{name} finished"
-msgstr "{name} 완료"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name}은(는) 기본 제공이라 제거할 수 없습니다"
@@ -1214,9 +1219,6 @@ msgstr "{name}은(는) 변경되지 않았습니다. 에이전트가 작업 중�
 
 msgid "{name} plugin"
 msgstr "{name} 플러그인"
-
-msgid "{name} started working"
-msgstr "{name} 작업 시작"
 
 msgid "{name} stopped"
 msgstr "{name} 중지됨"
@@ -1372,6 +1374,9 @@ msgstr "{remaining} 토큰 남음"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
 
+msgid "{running} running"
+msgstr "{running}개 실행 중"
+
 msgid "{seconds}s"
 msgstr "{seconds}초"
 
@@ -1397,6 +1402,9 @@ msgstr "스타 {starCount}개, 계속 늘어나는 중"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {자동화 #개를 시작했습니다} other {자동화 #개를 시작했습니다}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped}개 중지됨"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {서브 에이전트 #개 실행 중}}"
@@ -1490,6 +1498,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}명 대기 중"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, other {서브 에이전트 #개 대기 중}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} 한도: {percent} 사용됨"
@@ -8461,6 +8472,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "실패"
 
+msgid "failed · exit {exitCode}"
+msgstr "실패 · 종료 코드 {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "실패한 실행 <0>· 7일</0>"
 
@@ -9179,6 +9193,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "리뷰 마치기"
+
+msgid "finished"
+msgstr "완료"
 
 msgid "Finished"
 msgstr "완료"
@@ -12170,6 +12187,9 @@ msgstr "머지 중…"
 msgid "Mesh Gradient"
 msgstr "메시 그라데이션"
 
+msgid "Message"
+msgstr "메시지"
+
 msgid "Message {name}"
 msgstr "{name}에게 메시지 보내기"
 
@@ -12413,6 +12433,9 @@ msgstr "클라우드 작업 옮기기"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "메인 탭과 오른쪽 사이드바 사이에서 포커스를 옮기고, 사이드바가 닫혀 있으면 엽니다"
 
+msgid "Move the running subagent to the background"
+msgstr "실행 중인 서브 에이전트를 백그라운드로 이동"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "이 워크스페이스를 {computerName}(으)로 옮길까요?"
 
@@ -12426,6 +12449,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "몇 분 만에 {companyName}(으)로 옮기세요."
 
 msgid "Move to background"
+msgstr "백그라운드로 이동"
+
+msgid "Move to Background"
 msgstr "백그라운드로 이동"
 
 msgid "Move to cloud"
@@ -19562,6 +19588,9 @@ msgstr "{label} 중지"
 msgid "Stop {name}"
 msgstr "{name} 중지"
 
+msgid "Stop all"
+msgstr "모두 중지"
+
 msgid "Stop dictation"
 msgstr "받아쓰기 중지"
 
@@ -19630,9 +19659,6 @@ msgstr "서브 에이전트"
 
 msgid "Subagents"
 msgstr "서브 에이전트"
-
-msgid "Subagents · {count}"
-msgstr "서브 에이전트 · {count}"
 
 msgid "Subject contains..."
 msgstr "제목에 포함..."
@@ -20247,6 +20273,13 @@ msgstr "해당 플러그인 소스가 없습니다"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "해당 실행은 건너뛰며 재시도하지 않습니다. 나중에 지금 실행으로 시작하세요."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "\"{name}\" 서브 에이전트가 실패했습니다. 같은 작업으로 다시 실행해 주세요:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "2026년의 베팅"

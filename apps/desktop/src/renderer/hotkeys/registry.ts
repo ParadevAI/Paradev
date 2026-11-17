@@ -944,6 +944,18 @@ export const HOTKEYS_REGISTRY = {
 		label: msg({ message: "Add Attachment" }),
 		category: "Chat",
 	},
+	MOVE_TO_BACKGROUND: {
+		key: {
+			mac: L("ctrl+b"),
+			windows: L("ctrl+alt+b"),
+			linux: L("ctrl+alt+b"),
+		},
+		label: msg({ message: "Move to Background" }),
+		category: "Chat",
+		description: msg({
+			message: "Move the running subagent to the background",
+		}),
+	},
 
 	// Window
 	ZOOM_IN: {

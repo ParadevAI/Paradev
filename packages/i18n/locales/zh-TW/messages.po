@@ -171,6 +171,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#項失敗} other {#項失敗}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#個檔案已更改} other {#個檔案已更改}}"
 
@@ -271,6 +272,7 @@ msgstr "{0, plural, one {#個會話執行中} other {#個會話執行中}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#項已跳過} other {#項已跳過}}"
 
+#. placeholder {0}: card.rows.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {# 個子代理程式}}"
@@ -1041,6 +1043,9 @@ msgstr "此工作區中的 {entryPath} 已在其他組織中發佈為頁面。�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#項失敗} other {#項失敗}}"
 
+msgid "{failed} failed"
+msgstr "{failed} 個失敗"
+
 msgid "{failing} of {total} check failing"
 msgstr "{total}項檢查中有{failing}項失敗"
 
@@ -1052,6 +1057,9 @@ msgstr "{fileCount, plural, one {此工作區中有 # 個檔案更改} other {�
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
+
+msgid "{finished} finished"
+msgstr "{finished} 個已完成"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
@@ -1191,9 +1199,6 @@ msgstr "無法傳送訊息給 {name}"
 msgid "{name} failed"
 msgstr "{name} 失敗"
 
-msgid "{name} finished"
-msgstr "{name} 已完成"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} 是內建的，無法移除"
@@ -1214,9 +1219,6 @@ msgstr "{name} 未變更。如果代理程式正在工作，它已被停止。"
 
 msgid "{name} plugin"
 msgstr "{name} 外掛程式"
-
-msgid "{name} started working"
-msgstr "{name} 開始工作"
 
 msgid "{name} stopped"
 msgstr "{name} 已停止"
@@ -1372,6 +1374,9 @@ msgstr "剩餘 {remaining} 個 token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
 
+msgid "{running} running"
+msgstr "{running} 個執行中"
+
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
 
@@ -1397,6 +1402,9 @@ msgstr "{starCount}個星標，還在成長"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已啟動 # 個自動化} other {已啟動 # 個自動化}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} 個已停止"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 個子代理程式執行中}}"
@@ -1490,6 +1498,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, other {正在等待 # 個子代理程式}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} 額度：已使用 {percent}"
@@ -8461,6 +8472,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "失敗"
 
+msgid "failed · exit {exitCode}"
+msgstr "失敗 · 結束代碼 {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失敗執行 <0>· 7天</0>"
 
@@ -9179,6 +9193,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "完成審查"
+
+msgid "finished"
+msgstr "已完成"
 
 msgid "Finished"
 msgstr "已完成"
@@ -12170,6 +12187,9 @@ msgstr "正在合併…"
 msgid "Mesh Gradient"
 msgstr "網格漸變"
 
+msgid "Message"
+msgstr "傳訊息"
+
 msgid "Message {name}"
 msgstr "傳訊息給 {name}"
 
@@ -12413,6 +12433,9 @@ msgstr "遷移雲端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主要分頁與右側邊欄之間移動焦點，若側邊欄已關閉則將其開啟"
 
+msgid "Move the running subagent to the background"
+msgstr "將執行中的子代理程式移到背景"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "要將此工作區移至 {computerName} 嗎？"
 
@@ -12426,6 +12449,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "幾分鐘即可遷移到 {companyName}。"
 
 msgid "Move to background"
+msgstr "移到背景"
+
+msgid "Move to Background"
 msgstr "移到背景"
 
 msgid "Move to cloud"
@@ -19562,6 +19588,9 @@ msgstr "停止 {label}"
 msgid "Stop {name}"
 msgstr "停止 {name}"
 
+msgid "Stop all"
+msgstr "全部停止"
+
 msgid "Stop dictation"
 msgstr "停止語音輸入"
 
@@ -19630,9 +19659,6 @@ msgstr "子代理程式"
 
 msgid "Subagents"
 msgstr "子代理程式"
-
-msgid "Subagents · {count}"
-msgstr "子代理程式 · {count}"
 
 msgid "Subject contains..."
 msgstr "主題包含..."
@@ -20247,6 +20273,13 @@ msgstr "該外掛來源不存在"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "這次執行會被錯過，且不會重試。之後可用「立即執行」啟動它。"
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "子代理程式「{name}」失敗了。請用相同的任務再執行一次：\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "2026年的賭注"

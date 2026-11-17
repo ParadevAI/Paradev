@@ -3,4 +3,7 @@ export {
 	type AgentWork,
 	collectAgentWork,
 	collectSessionWork,
+	foregroundSubagent,
+	type RunningAgents,
+	runningAgents,
 } from "./collectAgentWork";

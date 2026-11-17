@@ -14,7 +14,7 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import { pageLinkFinder } from "../../../../../../utils/pageLinks";
 import { NestedItemsProvider } from "../../providers/NestedItemsProvider";
 import { replyFooters } from "../../utils/replyFooters";
-import { subagentLines } from "../../utils/subagentLines";
+import { subagentLaunches } from "../../utils/subagentRuns";
 import { transcriptRows } from "../../utils/transcriptRows";
 import { TurnGroupSection } from "./TurnGroupSection";
 
@@ -83,7 +83,7 @@ function renderTranscript(
 			new Set(),
 			pageLinkFinder("https://app.superset.sh"),
 			new Set(),
-			(each) => subagentLines(each, childrenByParent.get(each.id)) !== null,
+			(each) => subagentLaunches(each, childrenByParent.get(each.id)),
 		),
 	);
 	const view = render(
@@ -115,7 +115,7 @@ function renderTranscript(
 	return { rows, view };
 }
 
-test("a subagent line stays visible in a turn whose tools collapse", () => {
+test("a subagent's run card stays visible in a turn whose tools collapse", () => {
 	const { rows, view } = renderTranscript(
 		snapshotOf([
 			tool("a", 1),
@@ -127,9 +127,11 @@ test("a subagent line stays visible in a turn whose tools collapse", () => {
 		]),
 	);
 
+	const run = view.container.querySelector('[data-subagent-run="subagent:c1"]');
+	expect(run?.textContent).toContain("Readme and wait");
 	expect(
-		view.getByRole("button", { name: "Readme and wait finished" }),
-	).toBeTruthy();
+		run?.querySelector("[data-run-status]")?.getAttribute("data-run-status"),
+	).toBe("finished");
 	expect(view.container.textContent).not.toContain("read a.ts");
 	expect(view.container.textContent).not.toContain("read c.ts");
 	expect(rows.filter((row) => row.kind === "tool_run")).toHaveLength(2);
