@@ -13327,6 +13327,9 @@ msgstr "Не входить у ваш тариф"
 msgid "Not installed"
 msgstr "Не встановлено"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Не встановлено. Спочатку додайте його в розділі «Плагіни»."
+
 msgid "Not loaded"
 msgstr "Не завантажено"
 

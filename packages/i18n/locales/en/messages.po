@@ -13333,6 +13333,9 @@ msgstr "Not included in your plan"
 msgid "Not installed"
 msgstr "Not installed"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Not installed. Add it in Plugins first."
+
 msgid "Not loaded"
 msgstr "Not loaded"
 

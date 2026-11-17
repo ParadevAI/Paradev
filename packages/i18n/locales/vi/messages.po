@@ -13333,6 +13333,9 @@ msgstr "Không có trong gói của bạn"
 msgid "Not installed"
 msgstr "Chưa cài đặt"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Chưa cài đặt. Hãy thêm nó trong Plugin trước."
+
 msgid "Not loaded"
 msgstr "Chưa tải"
 

@@ -14,6 +14,7 @@ import { Switch } from "@superset/ui/switch";
 import { cn } from "@superset/ui/utils";
 import { useState } from "react";
 import { LuUser } from "react-icons/lu";
+import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { listingFace } from "renderer/routes/_authenticated/_dashboard/chats/utils/listingFace";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { ChatFace } from "../../../components/ChatFace";
@@ -37,6 +38,7 @@ interface GetDevDialogProps {
 		target: InstallTarget,
 		name: string,
 		paradevAccess: boolean,
+		plugins: string[],
 	) => Promise<string | null>;
 	onGot: (chatId: string) => void;
 }
@@ -61,6 +63,16 @@ export function GetDevDialog({
 	const [paradevAccess, setParadevAccess] = useState(
 		card.needs.apps.includes(PARADEV),
 	);
+	const uses = [
+		...card.needs.apps.map((app) => ({ app, isNeeded: true })),
+		...card.needs.optional.map((app) => ({ app, isNeeded: false })),
+	].filter((need) => need.app !== PARADEV);
+	const installed = cloudTrpc.plugins.list
+		.useQuery(undefined, { enabled: uses.length > 0, staleTime: 60_000 })
+		.data?.filter((plugin) => plugin.installed && plugin.enabled);
+	const [plugins, setPlugins] = useState(() =>
+		uses.filter((need) => need.isNeeded).map((need) => need.app),
+	);
 	const [isBusy, setBusy] = useState(false);
 	const choice = choices.find((candidate) => candidate.key === picked);
 	const detailOf = (candidate: GetChoice) =>
@@ -80,6 +92,11 @@ export function GetDevDialog({
 			choice.target,
 			name.trim(),
 			choice.target.kind === "you" && paradevAccess,
+			choice.target.kind === "you"
+				? plugins.filter((plugin) =>
+						installed?.some((entry) => entry.name === plugin),
+					)
+				: [],
 		);
 		setBusy(false);
 		if (!chatId) return;
@@ -170,6 +187,48 @@ export function GetDevDialog({
 								checked={paradevAccess}
 								onCheckedChange={setParadevAccess}
 							/>
+						</div>
+					)}
+					{uses.length > 0 && choice?.target.kind === "you" && (
+						<div className="flex flex-col gap-1 rounded-lg border border-border p-3">
+							<span className="pb-1 font-medium text-sm">
+								<Trans>Plugins it can use as you</Trans>
+							</span>
+							{uses.map((need) => {
+								const plugin = installed?.find(
+									(entry) => entry.name === need.app,
+								);
+								return (
+									<label
+										key={need.app}
+										htmlFor={`get-dev-plugin-${need.app}`}
+										className="flex items-center justify-between gap-3 py-1 text-sm"
+									>
+										<span className="flex min-w-0 flex-col">
+											<span className="truncate">
+												{plugin?.displayName ?? need.app}
+											</span>
+											{!plugin && installed && (
+												<span className="text-muted-foreground text-xs">
+													<Trans>Not installed. Add it in Plugins first.</Trans>
+												</span>
+											)}
+										</span>
+										<Switch
+											id={`get-dev-plugin-${need.app}`}
+											disabled={!plugin}
+											checked={!!plugin && plugins.includes(need.app)}
+											onCheckedChange={(isOn) =>
+												setPlugins((current) =>
+													isOn
+														? [...current, need.app]
+														: current.filter((name) => name !== need.app),
+												)
+											}
+										/>
+									</label>
+								);
+							})}
 						</div>
 					)}
 					<Button type="submit" disabled={!choice || isBusy || !name.trim()}>

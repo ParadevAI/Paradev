@@ -186,7 +186,12 @@ export function createWorkspaceActions({
 		async installListing(
 			slug: string,
 			target: InstallTarget,
-			opts: { name?: string; timezone?: string; paradevAccess?: boolean } = {},
+			opts: {
+				name?: string;
+				timezone?: string;
+				paradevAccess?: boolean;
+				plugins?: string[];
+			} = {},
 		) {
 			try {
 				const name = opts.name?.trim() || undefined;
@@ -196,6 +201,7 @@ export function createWorkspaceActions({
 					opts.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
 					name,
 					opts.paradevAccess,
+					opts.plugins,
 				);
 				if ("group" in installed) {
 					update((s) => applyGroup(s, installed.group, installed));

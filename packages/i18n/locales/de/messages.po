@@ -13333,6 +13333,9 @@ msgstr "In Ihrem Tarif nicht enthalten"
 msgid "Not installed"
 msgstr "Nicht installiert"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Nicht installiert. Füge es zuerst unter Plugins hinzu."
+
 msgid "Not loaded"
 msgstr "Nicht geladen"
 

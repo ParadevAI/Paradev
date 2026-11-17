@@ -223,7 +223,9 @@ export function ListingScreen({ slug, groupId }: ListingScreenProps) {
 														{need.app === "paradev" ? (
 															<Trans>Your Paradev access</Trans>
 														) : (
-															need.app
+															<span className="capitalize">
+																{need.app.replace(/[-_]/g, " ")}
+															</span>
 														)}
 														{need.isOptional && (
 															<span className="ml-1.5 font-normal text-muted-foreground text-xs">
@@ -254,10 +256,11 @@ export function ListingScreen({ slug, groupId }: ListingScreenProps) {
 					card={cardOf(listing)}
 					fromGroupId={groupId}
 					onOpenChange={(open) => !open && setGetting(false)}
-					onGet={(target, name, paradevAccess) =>
+					onGet={(target, name, paradevAccess, plugins) =>
 						chats.actions.installListing(listing.slug, target, {
 							name,
 							paradevAccess,
+							plugins,
 						})
 					}
 					onGot={openChat}

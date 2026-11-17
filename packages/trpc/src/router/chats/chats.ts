@@ -1383,6 +1383,8 @@ export const chatsRouter = {
 				]),
 				name: z.string().trim().min(1).max(TITLE_MAX).optional(),
 				paradevAccess: z.boolean().optional(),
+				/** The plugins, of the ones its listing uses, the new Dev may use as its owner. */
+				plugins: z.array(z.string().min(1).max(100)).max(50).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -1458,6 +1460,11 @@ export const chatsRouter = {
 							kind: "custom",
 							ownerUserId: user.id,
 							paradevAccess: input.paradevAccess === true,
+							plugins: (input.plugins ?? []).filter((plugin) =>
+								[...listing.needs.apps, ...listing.needs.optional].some(
+									(need) => need.app === plugin,
+								),
+							),
 						})
 						.returning();
 					if (!agent) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });

@@ -61,7 +61,12 @@ async function handle(
 		) {
 			return refused("ambiguous", error.message, 409);
 		}
-		throw error;
+		console.error(`[chats] a Dev's ${plugin} plugin did not open:`, error);
+		return refused(
+			"plugin_unavailable",
+			"This plugin couldn't be opened with its owner's connection; the owner may need to reconnect it in Plugins",
+			502,
+		);
 	}
 
 	const context = await mcpContextForUser({

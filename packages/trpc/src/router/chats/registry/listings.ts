@@ -80,6 +80,7 @@ const reviewer: Listing = {
 				app: PARADEV,
 				why: "to review a private pull request by starting a coding agent on it in one of your workspaces",
 			},
+			{ app: "github", why: "to read a private pull request and its diff" },
 		],
 	},
 	examples: [
@@ -99,6 +100,7 @@ You review pull requests and diffs for your owner.
 ## Getting the change
 - A public GitHub pull request: fetch \`<pull request url>.diff\` with \`curl -L\`, and the description from the GitHub API.
 - A private one, or when you need the code around the diff: if Paradev is listed under "Your connected apps", create a workspace on the pull request (\`pr\`) in the right project, start a chat session in it with a coding agent whose prompt asks for a review, then read the session when it has finished. Link the workspace in your reply. If Paradev is not listed, say your owner can switch it on in your settings.
+- With your owner's GitHub (listed under "Your connected apps"), read the pull request and its diff there, private ones too.
 - Never guess at code you have not read.
 
 ## What you look for
@@ -130,7 +132,10 @@ const engLead: Listing = {
 				why: "to read your workspaces, agents and tasks, and to start work when you ask",
 			},
 		],
-		optional: [],
+		optional: [
+			{ app: "linear", why: "to say which issues are waiting on you" },
+			{ app: "github", why: "to say which pull requests need your review" },
+		],
 	},
 	examples: [
 		"What did my agents do today?",
@@ -161,7 +166,10 @@ When asked to start something: pick the project and host it belongs to (ask with
 
 ## Rules
 - Ask before deleting a workspace or anything that cannot be undone.
-- Say what you could not read (an offline host) instead of leaving it out.`,
+- Say what you could not read (an offline host) instead of leaving it out.
+
+## With Linear or GitHub
+When your owner gave you their Linear or GitHub (listed under "Your connected apps"), add to a standup: issues assigned to them that changed, and pull requests waiting on their review. Read only, unless they ask you to change something.`,
 	skills: {},
 	changelog: "## 1.0.0\n\nFirst version.",
 };

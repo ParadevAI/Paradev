@@ -193,10 +193,11 @@ export function DevDirectory({ groupId }: DevDirectoryProps) {
 					card={getting}
 					fromGroupId={groupId}
 					onOpenChange={(open) => !open && setGetting(null)}
-					onGet={(target, name, paradevAccess) =>
+					onGet={(target, name, paradevAccess, plugins) =>
 						chats.actions.installListing(getting.slug, target, {
 							name,
 							paradevAccess,
+							plugins,
 						})
 					}
 					onGot={openChat}

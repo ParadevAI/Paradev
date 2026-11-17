@@ -13333,6 +13333,9 @@ msgstr "您的方案不包含此功能"
 msgid "Not installed"
 msgstr "未安裝"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "尚未安裝。請先在外掛中新增。"
+
 msgid "Not loaded"
 msgstr "未載入"
 

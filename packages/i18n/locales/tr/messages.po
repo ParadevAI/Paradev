@@ -13333,6 +13333,9 @@ msgstr "Planınıza dahil değil"
 msgid "Not installed"
 msgstr "Yüklü değil"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Yüklü değil. Önce Eklentiler'den ekleyin."
+
 msgid "Not loaded"
 msgstr "Yüklenmedi"
 

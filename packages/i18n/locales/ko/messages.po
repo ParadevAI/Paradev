@@ -13333,6 +13333,9 @@ msgstr "현재 플랜에 포함되어 있지 않음"
 msgid "Not installed"
 msgstr "설치되지 않음"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "설치되지 않았습니다. 먼저 플러그인에서 추가하세요."
+
 msgid "Not loaded"
 msgstr "로드 안 됨"
 

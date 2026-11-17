@@ -13333,6 +13333,9 @@ msgstr "Tidak termasuk dalam paket Anda"
 msgid "Not installed"
 msgstr "Belum terpasang"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Belum terpasang. Tambahkan dulu di Plugin."
+
 msgid "Not loaded"
 msgstr "Belum dimuat"
 

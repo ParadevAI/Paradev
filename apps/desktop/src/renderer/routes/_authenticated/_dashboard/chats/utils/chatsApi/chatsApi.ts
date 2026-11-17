@@ -112,7 +112,7 @@ export function createChatsApi(
 			>,
 		registry: () => call(chats.registry.query()),
 		registryListing: (slug) => call(chats.registryListing.query({ slug })),
-		installListing: (slug, target, _timezone, name, paradevAccess) =>
+		installListing: (slug, target, _timezone, name, paradevAccess, plugins) =>
 			call(
 				chats.installListing.mutate({
 					organizationId,
@@ -120,6 +120,7 @@ export function createChatsApi(
 					target,
 					name,
 					paradevAccess,
+					plugins,
 				}),
 			) as ReturnType<ChatsApi["installListing"]>,
 		watchToken: (devId, groupId) =>

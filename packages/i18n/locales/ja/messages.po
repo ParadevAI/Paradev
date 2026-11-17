@@ -13333,6 +13333,9 @@ msgstr "ご利用のプランに含まれていません"
 msgid "Not installed"
 msgstr "未インストール"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "未インストールです。先にプラグインで追加してください。"
+
 msgid "Not loaded"
 msgstr "未読み込み"
 

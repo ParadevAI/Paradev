@@ -13333,6 +13333,9 @@ msgstr "Není součástí vašeho tarifu"
 msgid "Not installed"
 msgstr "Nenainstalováno"
 
+msgid "Not installed. Add it in Plugins first."
+msgstr "Není nainstalováno. Nejprve ho přidejte v Pluginech."
+
 msgid "Not loaded"
 msgstr "Nenačteno"
 

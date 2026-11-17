@@ -423,6 +423,7 @@ export function createSyncApi(baseUrl: string, token: string) {
 			timezone: string,
 			name?: string,
 			paradevAccess?: boolean,
+			plugins?: string[],
 		) =>
 			call<InstalledListing>(`/registry/${encodeURIComponent(slug)}/install`, {
 				method: "POST",
@@ -431,6 +432,7 @@ export function createSyncApi(baseUrl: string, token: string) {
 					timezone,
 					...(name ? { name } : {}),
 					...(paradevAccess ? { paradevAccess } : {}),
+					...(plugins?.length ? { plugins } : {}),
 				},
 			}),
 		createInvite: (groupId: string) =>
