@@ -221,6 +221,12 @@ export const FEATURE_FLAGS = {
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
 	/**
+	 * Mounts the bundle's agent-tools drive on an organization's boxes, so the
+	 * agent CLIs come from it instead of the image. Evaluated per organization
+	 * on every create and wake. Unloaded or offline means no drive.
+	 */
+	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
+	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:
 	 * shows the Move items, and gates
 	 * `workspaceMove.begin` server-side. Moving to the cloud also needs

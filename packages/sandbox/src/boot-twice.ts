@@ -347,6 +347,51 @@ try {
 	);
 	console.log(`\nboot log (second boot):\n${log2}`);
 
+	// The agent-tools drive, stubbed as a directory at its mount path: the
+	// listed agent is linked from it, and a session without it falls back to
+	// the image's agents rather than to links that point nowhere.
+	const stop = () =>
+		exec(
+			`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
+			{ check: false },
+		);
+	const stubSha = "f".repeat(64);
+	stop();
+	exec(
+		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.agents}/claude/${stubSha} && printf '#!/bin/sh\\necho drive-claude\\n' > ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && chmod 755 ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && printf '%s' '${JSON.stringify([{ name: "claude", sha: stubSha, bin: "claude" }])}' > ${SANDBOX_PATHS.agents}/manifest.json`,
+	);
+	boot(3);
+	const logDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+	expect(
+		"drive: listed agent linked",
+		/agents\.linked 1/.test(logDrive) &&
+			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })),
+		logDrive.match(/agents\..*/)?.[0],
+	);
+	stop();
+	exec(`: > ${SANDBOX_PATHS.bootLog}; rm -rf ${SANDBOX_PATHS.agents}`);
+	const noDriveExit = bootAsUser();
+	exec(
+		`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
+		{ check: false },
+	);
+	const logNoDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+	expect(
+		"no drive: boot exits 0 and host-service ready",
+		/exit=0/.test(noDriveExit) && /host\.ready/.test(logNoDrive),
+	);
+	expect(
+		"no drive: stamped unavailable",
+		/agents\.unavailable/.test(logNoDrive),
+	);
+	expect(
+		"no drive: image claude back on PATH",
+		exec("readlink -f /usr/local/bin/claude", { check: false }).startsWith(
+			SANDBOX_PATHS.media,
+		),
+		exec("readlink -f /usr/local/bin/claude", { check: false }).trim(),
+	);
+
 	// Third boot, with host-service deliberately broken: the box must stay
 	// alive, the desktop must still come up, and the log must say so.
 	exec(

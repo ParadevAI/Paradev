@@ -921,6 +921,26 @@ and provider. Keep the workspace id on both sides: a provisioning failure is
 recorded against the API and a runtime failure against the sandbox, and that id
 is the only thing that joins the two halves of one broken workspace.
 
+**A drive mount lasts one session and a fork does not inherit it — open.**
+For organizations with the `sandbox-agent-tools-drive` PostHog flag, the agent
+CLIs come from the bundle's `agent-tools-<region>-<bundle sha 12>` drive,
+mounted read-only at `/opt/agents`. A machine someone owns keeps a mount; a
+sandbox gets one only from `Sandbox.create`, `Sandbox.fork` or
+`sandbox.update({ mounts })` before the session starts, so `provisionSandbox`
+and `wakeSandbox` both pass it. A drive lives in one region and mounts only in
+that region. A session without the mount leaves links in `/usr/local/bin`
+that point nowhere; `superset-boot` re-runs `install-agent-clis` to put the
+image's agents back.
+
+**A read-only snapshot mount taken while a writer holds the drive is corrupt.**
+Measured 2026-11-17: a box that mounted the snapshot while the builder still
+had the drive read-write got `ro,norecovery`, `ls` answered "Bad message" and
+codex segfaulted. On a disk someone owns, a second reader of a live
+filesystem is just slow. Here a drive is never written after it is
+published: one drive per bundle, written by a builder that is stopped before
+any environment row names the bundle, and the control plane mounts only a
+drive that exists and is detached.
+
 ## Running this repo's own dev stack inside a sandbox
 
 Reproducing an app bug end to end from a cloud workspace means bringing up

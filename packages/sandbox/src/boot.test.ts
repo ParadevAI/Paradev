@@ -45,6 +45,16 @@ describe("superset-boot", () => {
 		expect(memguard).toMatch(/swapoff "\$f"/);
 	});
 
+	test("links the drive's agents after the steps, before host-service starts", () => {
+		const steps = boot.indexOf('"$BUNDLE/setup" run-steps');
+		const link = boot.indexOf("\nlink_agents\n");
+		const host = boot.indexOf("\nstart_host_service\n");
+		expect(steps).toBeGreaterThan(0);
+		expect(link).toBeGreaterThan(steps);
+		expect(host).toBeGreaterThan(link);
+		expect(boot).toMatch(/stamp "agents\.unavailable/);
+	});
+
 	test("writes the cgroup's memory ceiling and CPU count for login shells", () => {
 		expect(boot).toMatch(/SUPERSET_SANDBOX_MEMORY_MB/);
 		expect(boot).toMatch(/SUPERSET_SANDBOX_VCPUS/);
