@@ -39,6 +39,12 @@ export const SANDBOX_PATHS = {
 	agents: "/opt/agents",
 	/** The workspace's own drive, read-write, when its environment is in drive mode. */
 	drive: "/mnt/superset-drive",
+	/**
+	 * In drive mode, what describes the drive's contents lives on the drive, so
+	 * a root disk that rolls back cannot disagree with it: `host.db`, the
+	 * checkout markers and `workspace-id`, the drive's owner.
+	 */
+	driveState: "/mnt/superset-drive/state",
 } as const;
 
 /**
@@ -284,6 +290,7 @@ export function renderContractShell(): string {
 		SUPERSET_BACKGROUNDS_DIR: SANDBOX_PATHS.backgrounds,
 		SUPERSET_AGENTS_DIR: SANDBOX_PATHS.agents,
 		SUPERSET_DRIVE_DIR: SANDBOX_PATHS.drive,
+		SUPERSET_DRIVE_STATE_DIR: SANDBOX_PATHS.driveState,
 		SUPERSET_DRIVE_HOME_SUBTREES: SANDBOX_DRIVE_HOME_SUBTREES.join(" "),
 		SUPERSET_BUN_STORE: SANDBOX_DRIVE_STORES.bun,
 		SUPERSET_PNPM_STORE: SANDBOX_DRIVE_STORES.pnpm,

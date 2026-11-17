@@ -167,12 +167,15 @@ function drivePass(): void {
 		"sleep",
 		"infinity",
 	]);
-	docker(["exec", "-i", on, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
-		stdin: renderSandboxConf({
-			...identityFields,
-			SUPERSET_SANDBOX_DRIVE: DRIVE_NAME,
-		}),
-	});
+	const driveIdentity: SandboxIdentity = {
+		...identityFields,
+		SUPERSET_SANDBOX_DRIVE: DRIVE_NAME,
+	};
+	const writeConf = (fields: SandboxIdentity) =>
+		docker(["exec", "-i", on, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
+			stdin: renderSandboxConf(fields),
+		});
+	writeConf(driveIdentity);
 	const bootDrive = () => {
 		bootAsUser(on);
 		exec(
@@ -315,6 +318,134 @@ function drivePass(): void {
 		log2.match(/checkout\..*/)?.[0],
 	);
 	console.log(`\nboot log (drive, second boot):\n${log2}`);
+
+	const state = SANDBOX_PATHS.driveState;
+	expect(
+		"drive: the drive names its workspace",
+		exec(`cat ${state}/workspace-id`, { check: false, on }).trim() ===
+			identityFields.SUPERSET_SANDBOX_WORKSPACE_ID,
+	);
+	expect(
+		"drive: host.db and the checkout markers are on the drive, not the root disk",
+		exec(
+			`test -f ${state}/host.db && test -f ${state}/checkouts/@root && ! test -e ${SANDBOX_PATHS.checkouts}/@root && echo ok`,
+			{ check: false, on },
+		).trim() === "ok",
+		exec(`ls ${state} ${state}/checkouts ${SANDBOX_PATHS.state}`, {
+			check: false,
+			on,
+		}),
+	);
+
+	// The user's work: a local commit and an uncommitted file.
+	const ws = SANDBOX_PATHS.workspace;
+	exec(
+		`git -C ${ws} -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m user-work && echo user > ${ws}/user-file.txt`,
+		{ user: "ubuntu", on },
+	);
+	const head = () =>
+		exec(`git -C ${ws} rev-parse HEAD`, {
+			check: false,
+			user: "ubuntu",
+			on,
+		}).trim();
+	const work = head();
+	const bootAndCheckout = () => {
+		bootDrive();
+		return exec(
+			`for i in $(seq 1 1200); do grep -q 'checkout.end' ${SANDBOX_PATHS.bootLog} && break; sleep 0.1; done; cat ${SANDBOX_PATHS.bootLog}`,
+			{ check: false, on },
+		);
+	};
+	const workKept = () =>
+		head() === work &&
+		exec(`cat ${ws}/user-file.txt`, { check: false, on }).trim() === "user";
+
+	// The root disk rolled back to before the checkout; the drive did not.
+	endSession();
+	exec(
+		`rm -rf ${SANDBOX_PATHS.checkouts} ${SANDBOX_PATHS.hostDb} ${SANDBOX_PATHS.hostDb}-wal ${SANDBOX_PATHS.hostDb}-shm`,
+		{ on },
+	);
+	const rolledBack = bootAndCheckout();
+	expect(
+		"drive, root rolled back: checkout skipped, the work kept",
+		/checkout\.skipped \. /.test(rolledBack) && workKept(),
+		rolledBack.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// Even with its marker gone, a checkout that has the branch is the user's.
+	endSession();
+	exec(`rm -rf ${state}/checkouts`, { on });
+	const markerLost = bootAndCheckout();
+	expect(
+		"drive, marker lost: the branch is kept, not reset",
+		/checkout\.kept \. main is already on the drive/.test(markerLost) &&
+			workKept(),
+		markerLost.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// A fetch that fails must never turn into a reclone over the drive.
+	endSession();
+	exec(`rm -rf ${state}/checkouts`, { on });
+	exec(`git -C ${drive}/workspace branch -q -m main user-main`, {
+		user: "ubuntu",
+		on,
+	});
+	writeConf({
+		...driveIdentity,
+		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+			{
+				url: "https://github.com/paradevai/paradev.git",
+				branch: "superset/boot-twice-no-such-branch",
+				baseBranch: "superset/boot-twice-no-such-branch",
+				path: ".",
+			},
+		]),
+	});
+	const fetchFailed = bootAndCheckout();
+	expect(
+		"drive, fetch failed: nothing on the drive is replaced",
+		/checkout\.kept \. fetch failed/.test(fetchFailed) &&
+			!/checkout\.cloned/.test(fetchFailed) &&
+			workKept(),
+		fetchFailed.match(/checkout\..*/g)?.join(" | "),
+	);
+	exec(`git -C ${drive}/workspace branch -q -m user-main main`, {
+		user: "ubuntu",
+		on,
+	});
+	writeConf(driveIdentity);
+
+	const refuses = (label: string, phase: string) => {
+		const answer = bootAsUser(on);
+		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+		expect(
+			`${label}: refused before host-service, stamped ${phase}`,
+			/exit=[1-9]/.test(answer) &&
+				new RegExp(`${phase.replace(".", "\\.")} `).test(log) &&
+				!/host\.exec|checkout\.start/.test(log) &&
+				exec(`mountpoint -q ${ws} && echo bound`, {
+					check: false,
+					on,
+				}).trim() === "",
+			log.match(/drive\..*/)?.[0] ?? answer.slice(-200),
+		);
+	};
+
+	// Another workspace's drive.
+	endSession();
+	writeConf({ ...driveIdentity, SUPERSET_SANDBOX_WORKSPACE_ID: randomUUID() });
+	refuses("drive foreign", "drive.foreign");
+	writeConf(driveIdentity);
+
+	// A drive that mounts empty though the workspace was laid out before.
+	endSession();
+	exec(`umount ${drive} && mount -t tmpfs -o exec,mode=0755 tmpfs ${drive}`, {
+		on,
+	});
+	writeConf({ ...driveIdentity, SUPERSET_SANDBOX_DRIVE_LAID_OUT: "1" });
+	refuses("drive empty", "drive.unlaid");
 
 	// A session whose drive did not mount, while sandbox.conf still names one.
 	endSession();

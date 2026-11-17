@@ -76,31 +76,61 @@ user_path() {
 bind_into() {
 	mountpoint -q "$2" || mount --bind "$1" "$2" || refuse "cannot bind ${1} onto ${2}"
 }
+# In drive mode, what describes the drive's contents lives on the drive.
+use_drive_state() {
+	SUPERSET_HOST_DB="${SUPERSET_DRIVE_STATE_DIR}/host.db"
+	SUPERSET_CHECKOUTS_DIR="${SUPERSET_DRIVE_STATE_DIR}/checkouts"
+}
+# A subtree the drive lacks is seeded from what the image left there, under a
+# temporary name, so a boot that dies halfway never leaves a partial copy.
+seed_home_subtree() {
+	local sub="$1" target="${drive}/home/$1" tmp="${drive}/home/$1.seeding"
+	[ "$sub" = "${sub%/*}" ] || user_path "${drive}/home" "${sub%/*}"
+	rm -rf "$tmp"
+	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$tmp"
+	if [ -d "${SUPERSET_USER_HOME}/${sub}" ]; then
+		cp -a "${SUPERSET_USER_HOME}/${sub}/." "${tmp}/" || refuse "cannot seed ${target}"
+	fi
+	mv -T "$tmp" "$target" || refuse "cannot seed ${target}"
+}
 layout_drive() {
-	local drive="${SUPERSET_DRIVE_DIR:-}" started sub
+	local drive="${SUPERSET_DRIVE_DIR:-}" started sub owner sentinel
 	if [ -z "$drive" ] || ! mountpoint -q "$drive"; then
 		# Without its drive the box would serve the root disk's empty /workspace as the user's work.
 		[ -z "${SUPERSET_SANDBOX_DRIVE:-}" ] && return 0
 		stamp "drive.missing ${SUPERSET_SANDBOX_DRIVE} is not mounted at ${drive:-the drive path}"
 		refuse "the workspace drive ${SUPERSET_SANDBOX_DRIVE} is not mounted"
 	fi
+	: "${SUPERSET_DRIVE_STATE_DIR:=${drive}/state}"
+	sentinel="${SUPERSET_DRIVE_STATE_DIR}/workspace-id"
+	owner="$(cat "$sentinel" 2>/dev/null || true)"
+	if [ -n "$owner" ] && [ "$owner" != "$SUPERSET_SANDBOX_WORKSPACE_ID" ]; then
+		stamp "drive.foreign ${SUPERSET_SANDBOX_DRIVE:-} belongs to workspace ${owner}"
+		refuse "the drive at ${drive} belongs to workspace ${owner}"
+	fi
+	if [ -z "$owner" ] && [ -n "${SUPERSET_SANDBOX_DRIVE_LAID_OUT:-}" ]; then
+		stamp "drive.unlaid ${SUPERSET_SANDBOX_DRIVE:-} carries no workspace id though it was laid out before"
+		refuse "the drive at ${drive} is not this workspace's laid-out drive"
+	fi
 	started="$(date +%s%3N)"
 	user_path "$drive" workspace
 	user_path "$drive" home
+	user_path "$drive" state
 	install -d -m 0700 "${drive}/swap"
 	install -d -m 0710 "${drive}/docker"
 	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$SUPERSET_WORKSPACE_DIR"
 	bind_into "${drive}/workspace" "$SUPERSET_WORKSPACE_DIR"
 	for sub in ${SUPERSET_DRIVE_HOME_SUBTREES:-}; do
-		if [ ! -d "${drive}/home/${sub}" ]; then
-			user_path "${drive}/home" "$sub"
-			# What the image left there stays visible under the mount.
-			[ -d "${SUPERSET_USER_HOME}/${sub}" ] && cp -a "${SUPERSET_USER_HOME}/${sub}/." "${drive}/home/${sub}/"
-		fi
+		[ -d "${drive}/home/${sub}" ] || seed_home_subtree "$sub"
 		user_path "$SUPERSET_USER_HOME" "$sub"
 		bind_into "${drive}/home/${sub}" "${SUPERSET_USER_HOME}/${sub}"
 	done
+	if [ -z "$owner" ]; then
+		printf '%s\n' "$SUPERSET_SANDBOX_WORKSPACE_ID" > "${sentinel}.tmp" && mv -T "${sentinel}.tmp" "$sentinel" ||
+			refuse "cannot write ${sentinel}"
+	fi
 	DRIVE_MODE=1
+	use_drive_state
 	printf 'export BUN_INSTALL_CACHE_DIR=%s npm_config_store_dir=%s\n' "$SUPERSET_BUN_STORE" "$SUPERSET_PNPM_STORE" > "${SUPERSET_RUN_DIR}/drive.env"
 	stamp "drive.layout ms=$(( $(date +%s%3N) - started ))"
 }
@@ -154,6 +184,7 @@ BUNDLE="${SUPERSET_BUNDLE_ROOT}/current"
 stamp "rootfs.start"; "$BUNDLE/setup" apply-rootfs >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "rootfs.end"
 # apply-rootfs may have replaced the contract; re-read it.
 . /etc/superset/contract.sh
+[ -z "$DRIVE_MODE" ] || use_drive_state
 # It may also have replaced this script. The shell is running the copy the
 # image baked, so without this a bundle's change to the boot script only
 # takes effect on the boot after the one that installed it — which is how an
@@ -342,12 +373,22 @@ checkout_one() {
 	local baked
 	baked="$(as_user git -C "$ws" remote get-url origin 2>/dev/null || true)"
 	if [ "$baked" = "$url" ] && [ -d "$ws/.git" ]; then
+		# On a drive, a checkout that already has the branch is the user's work.
+		if [ -n "$DRIVE_MODE" ] && as_user git -C "$ws" rev-parse -q --verify "refs/heads/${branch}" > /dev/null; then
+			touch "$marker"; stamp "checkout.kept ${path} ${branch} is already on the drive"; return 0
+		fi
 		if as_user git -C "$ws" fetch -q --depth 1 origin "$base" && as_user git -C "$ws" checkout -q -B "$branch" FETCH_HEAD; then
 			touch "$marker"; stamp "checkout.fetched ${path} ${branch} from ${base}"; return 0
+		fi
+		if [ -n "$DRIVE_MODE" ]; then
+			stamp "checkout.kept ${path} fetch failed; the checkout on the drive is left as it is"; return 1
 		fi
 		# A clone a previous session interrupted leaves a repository that can
 		# fetch nothing; start over rather than fail every boot.
 		stamp "checkout.fetch.failed ${path} ${branch}; recloning"
+	fi
+	if [ -n "$DRIVE_MODE" ] && [ -n "$(find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -print -quit 2>/dev/null)" ]; then
+		stamp "checkout.kept ${path} ${ws} is not empty; nothing on the drive is replaced"; return 1
 	fi
 	# Clone beside the target and move the result in, the worktree first and
 	# .git last, so the directory becomes a repository in one rename: host-service
@@ -361,12 +402,16 @@ checkout_one() {
 		|| { find "$tmp" -mindepth 1 -delete; as_user git clone -q --depth 1 "$url" "$tmp"; }; then
 		as_user git -C "$tmp" checkout -q -B "$branch"
 		install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$ws"
-		find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -exec rm -rf {} +
-		# The package stores in .superset/ outlive a reclone; a repository's own .superset/ merges into it.
-		( shopt -s dotglob nullglob; for entry in "$tmp"/*; do
-			[ "${entry##*/}" = ".git" ] && continue
-			if [ -d "${ws}/${entry##*/}" ]; then cp -a "$entry/." "${ws}/${entry##*/}/" && rm -rf "$entry"; else mv "$entry" "$ws"/; fi
-		done )
+		if [ -n "$DRIVE_MODE" ]; then
+			# Only the package stores can be here; a repository's own .superset/ merges into theirs.
+			( shopt -s dotglob nullglob; for entry in "$tmp"/*; do
+				[ "${entry##*/}" = ".git" ] && continue
+				if [ -d "${ws}/${entry##*/}" ]; then cp -a "$entry/." "${ws}/${entry##*/}/" && rm -rf "$entry"; else mv "$entry" "$ws"/; fi
+			done )
+		else
+			find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' -exec rm -rf {} +
+			( shopt -s dotglob nullglob; for entry in "$tmp"/*; do [ "${entry##*/}" = ".git" ] || mv "$entry" "$ws"/; done )
+		fi
 		mv "$tmp/.git" "$ws/.git"; rmdir "$tmp"
 		touch "$marker"; stamp "checkout.cloned ${path} ${url}"; return 0
 	fi
