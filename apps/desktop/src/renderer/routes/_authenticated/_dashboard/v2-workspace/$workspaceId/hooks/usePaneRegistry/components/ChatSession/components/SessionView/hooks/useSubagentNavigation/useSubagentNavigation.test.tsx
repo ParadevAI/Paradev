@@ -19,6 +19,7 @@ import {
 import { SubagentBreadcrumb } from "../../../../../ChatPaneTitle/components/SubagentBreadcrumb";
 import { SubagentView } from "../../../SubagentView";
 import { NestedToolCallRow } from "../../../Transcript/components/NestedToolCallRow";
+import { expandRunCards } from "../../../Transcript/components/SubagentRunCard/utils/expandRunCards";
 import { NestedItemsProvider } from "../../../Transcript/providers/NestedItemsProvider";
 import { useSubagentNavigation } from "./useSubagentNavigation";
 
@@ -122,6 +123,7 @@ function ChatWithHeader({
 }
 
 function openRun(view: ReturnType<typeof render>, itemId: string) {
+	expandRunCards(view.container);
 	const open = view.container.querySelector(
 		`[data-subagent-run="${itemId}"] button`,
 	);

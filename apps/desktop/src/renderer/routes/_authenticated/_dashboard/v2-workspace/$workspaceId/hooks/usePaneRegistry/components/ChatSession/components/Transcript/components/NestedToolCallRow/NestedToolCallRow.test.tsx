@@ -6,6 +6,7 @@ import {
 import type { Item, ToolCall } from "@superset/chat/protocol";
 import { cleanup, render } from "@testing-library/react";
 import { NestedItemsProvider } from "../../providers/NestedItemsProvider";
+import { expandRunCards } from "../SubagentRunCard/utils/expandRunCards";
 import { NestedToolCallRow } from "./NestedToolCallRow";
 
 afterEach(cleanup);
@@ -63,7 +64,7 @@ function renderRow(
 		cursor: null,
 		pendingReset: null,
 	};
-	return render(
+	const view = render(
 		<NestedItemsProvider
 			value={{
 				snapshot,
@@ -82,6 +83,8 @@ function renderRow(
 			<NestedToolCallRow item={item} />
 		</NestedItemsProvider>,
 	);
+	expandRunCards(view.container);
+	return view;
 }
 
 function statusOf(view: ReturnType<typeof render>, id: string) {

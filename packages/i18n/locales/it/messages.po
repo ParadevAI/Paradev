@@ -272,7 +272,7 @@ msgstr "{0, plural, one {# sessione in esecuzione} other {# sessioni in esecuzio
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# saltato} other {# saltati}}"
 
-#. placeholder {0}: card.rows.length
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# sottoagente} other {# sottoagenti}}"
@@ -314,6 +314,10 @@ msgstr "{0, plural, one {I commenti vanno a questo agente} other {I commenti van
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {Impossibile eliminare # workspace} other {Impossibile eliminare # workspace}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, one {Sottoagente creato} other {# sottoagenti creati}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length

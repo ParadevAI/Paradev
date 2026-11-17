@@ -272,7 +272,7 @@ msgstr "{0, plural, one {세션 #개 실행 중} other {세션 #개 실행 중}}
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#개 건너뜀} other {#개 건너뜀}}"
 
-#. placeholder {0}: card.rows.length
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {서브 에이전트 #개}}"
@@ -314,6 +314,10 @@ msgstr "{0, plural, one {댓글은 이 에이전트에게 전달됩니다} other
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {워크스페이스 #개를 삭제하지 못했습니다} other {워크스페이스 #개를 삭제하지 못했습니다}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, other {서브 에이전트 #개 생성}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length

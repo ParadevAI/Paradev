@@ -99,7 +99,9 @@ function renderTranscript(
 			{rows.map((row) => (
 				<TurnGroupSection
 					childrenByParent={childrenByParent}
-					isEntryCollapsed={(_key, collapsed) => collapsed}
+					isEntryCollapsed={(key, collapsed) =>
+						key.startsWith("subagent_run:") ? false : collapsed
+					}
 					key={row.key}
 					lastReply={inlineReplyKeys.has(row.key)}
 					onDiscardPrompt={() => {}}

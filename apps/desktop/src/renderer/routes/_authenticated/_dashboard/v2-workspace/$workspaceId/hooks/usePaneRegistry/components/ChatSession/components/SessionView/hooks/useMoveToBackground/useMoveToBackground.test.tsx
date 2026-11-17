@@ -11,6 +11,7 @@ import {
 	renderHook,
 } from "@testing-library/react";
 import { SubagentRunCard } from "../../../Transcript/components/SubagentRunCard";
+import { expandRunCards } from "../../../Transcript/components/SubagentRunCard/utils/expandRunCards";
 import { NestedItemsProvider } from "../../../Transcript/providers/NestedItemsProvider";
 import { useMoveToBackground } from "./useMoveToBackground";
 
@@ -81,6 +82,7 @@ test("move to background calls backgroundSubagent", async () => {
 	const view = render(
 		<EventLine backgroundSubagent={backgroundSubagent} item={readme} />,
 	);
+	expandRunCards(view.container);
 	await act(async () => {
 		fireEvent.click(
 			view.getByRole("button", {
@@ -100,6 +102,7 @@ test("only a running subagent that allows it offers the move", () => {
 			item={{ ...readme, status: "completed", subagentStatus: "idle" }}
 		/>,
 	);
+	expandRunCards(finished.container);
 	expect(finished.queryByRole("button", { name })).toBeNull();
 	cleanup();
 	const fixed = render(
@@ -108,6 +111,7 @@ test("only a running subagent that allows it offers the move", () => {
 			item={{ ...readme, canBackground: false }}
 		/>,
 	);
+	expandRunCards(fixed.container);
 	expect(fixed.queryByRole("button", { name })).toBeNull();
 });
 

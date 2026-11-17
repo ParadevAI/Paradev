@@ -272,7 +272,7 @@ msgstr "{0, plural, one {#個會話執行中} other {#個會話執行中}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#項已跳過} other {#項已跳過}}"
 
-#. placeholder {0}: card.rows.length
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {# 個子代理程式}}"
@@ -314,6 +314,10 @@ msgstr "{0, plural, one {評論將傳送給此代理程式} other {評論將傳�
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {無法刪除#個工作區} other {無法刪除#個工作區}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, other {建立了 # 個子代理程式}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length

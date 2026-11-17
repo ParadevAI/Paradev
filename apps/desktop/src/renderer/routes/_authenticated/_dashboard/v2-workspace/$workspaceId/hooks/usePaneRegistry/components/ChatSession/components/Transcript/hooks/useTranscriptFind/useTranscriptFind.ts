@@ -192,8 +192,7 @@ export function useTranscriptFind({
 			) {
 				onToggleEntry(row.key, false);
 			}
-			if (row?.kind === "subagent_run" && row.launches.length > 1)
-				onToggleEntry(row.key, false);
+			if (row?.kind === "subagent_run") onToggleEntry(row.key, false);
 			revealRef.current = row
 				? { match, messageId: rowMessageId(row), frames: REVEAL_FRAMES }
 				: null;

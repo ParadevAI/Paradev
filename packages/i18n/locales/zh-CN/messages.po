@@ -272,7 +272,7 @@ msgstr "{0, plural, one {#个会话运行中} other {#个会话运行中}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#项已跳过} other {#项已跳过}}"
 
-#. placeholder {0}: card.rows.length
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {# 个子智能体}}"
@@ -314,6 +314,10 @@ msgstr "{0, plural, one {评论将发送给此智能体} other {评论将发送�
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {无法删除#个工作区} other {无法删除#个工作区}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, other {创建了 # 个子智能体}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length

@@ -272,7 +272,7 @@ msgstr "{0, plural, one {běží # relace} few {běží # relace} many {běží 
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# přeskočeno} few {# přeskočeno} many {# přeskočeno} other {# přeskočeno}}"
 
-#. placeholder {0}: card.rows.length
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# subagent} few {# subagenti} many {# subagenta} other {# subagentů}}"
@@ -314,6 +314,10 @@ msgstr "{0, plural, one {Komentáře jdou tomuto agentovi} few {Komentáře jdou
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {Nepodařilo se smazat # pracovní prostor} few {Nepodařilo se smazat # pracovní prostory} many {Nepodařilo se smazat # pracovního prostoru} other {Nepodařilo se smazat # pracovních prostorů}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, one {Vytvořen subagent} few {Vytvořeni # subagenti} many {Vytvořeno # subagenta} other {Vytvořeno # subagentů}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length

@@ -13,6 +13,7 @@ import type {
 } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import type { ComponentProps } from "react";
+import { expandRunCards } from "../Transcript/components/SubagentRunCard/utils/expandRunCards";
 import { NestedItemsProvider } from "../Transcript/providers/NestedItemsProvider";
 import { TranscriptPluginsProvider } from "../Transcript/providers/TranscriptPluginsProvider";
 import { SubagentView } from "./SubagentView";
@@ -139,6 +140,7 @@ test("shows the subagent's messages and tools", () => {
 test("a nested subagent is a run row that drills deeper", () => {
 	const onOpenSubagent = mock((_itemId: string) => {});
 	const view = renderView("subagent:c1", { onOpenSubagent });
+	expandRunCards(view.container);
 	const open = view.container.querySelector(
 		'[data-subagent-run="subagent:c2"] button',
 	);
