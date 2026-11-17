@@ -1,5 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { bootBeganSince, bootSegments, bootStampsFrom } from "./boot-trace";
+import {
+	BOOT_STALE_MS,
+	bootBeganSince,
+	bootProgressFrom,
+	bootSegments,
+	bootStampsFrom,
+	describeBootProgress,
+} from "./boot-trace";
 
 const stamps = [
 	{ phase: "boot.start", at: 1_789_000_000_000 },
@@ -73,5 +80,60 @@ describe("bootSegments", () => {
 			answeredAt: 1_789_000_001_150,
 		});
 		expect(last?.end).toBe(1_789_000_001_200);
+	});
+});
+
+describe("bootProgressFrom", () => {
+	const T = 1_789_000_000_000;
+	const earlierBoot = [
+		`${T - 3_600_000} boot.start pid=10 bundle=aaaaaaaaaaaa`,
+		`${T - 3_599_000} host.exec 1.2.3`,
+		`${T - 3_598_000} host.ready`,
+	];
+
+	test("a boot still in its passes is booting, even after an earlier boot that finished", () => {
+		const log = [
+			...earlierBoot,
+			`${T} boot.start pid=42 bundle=aaaaaaaaaaaa`,
+			`${T + 10} run.cleared`,
+			`${T + 20} bundle.fetching bbbbbbbbbbbb`,
+			"fetched /usr/local/bin/something",
+			`${T + 19_000} setup step install-chrome running (cccccccccccc)`,
+			"",
+		].join("\n");
+		const progress = bootProgressFrom(log, T + 61_000);
+		expect(progress.state).toBe("booting");
+		expect(progress.startedAt).toBe(T);
+		expect(progress.last?.phase).toBe("setup");
+		expect(describeBootProgress(progress, T + 61_000)).toBe(
+			'boot booting at "setup step install-chrome running (cccccccccccc)", started 61s ago',
+		);
+	});
+
+	test("host-service started and gave up, or the boot refused: waiting cannot help", () => {
+		for (const end of [
+			"host.timeout after 60s",
+			"boot.refused no conf",
+			"host.missing no runtime",
+			"host.ready",
+		]) {
+			const log = [`${T} boot.start pid=1`, `${T + 5} ${end}`].join("\n");
+			expect(bootProgressFrom(log, T + 61_000).state).toBe("ended");
+		}
+	});
+
+	test("a boot that never finished long ago is stale, not booting", () => {
+		const log = [`${T} boot.start pid=1`, `${T + 5} steps.start`].join("\n");
+		expect(bootProgressFrom(log, T + BOOT_STALE_MS + 60_000).state).toBe(
+			"stale",
+		);
+	});
+
+	test("no boot.start in the log, or none in the tail read, is none", () => {
+		expect(bootProgressFrom("", T).state).toBe("none");
+		expect(
+			bootProgressFrom(`${T} steps.start\n${T + 1} steps.end`, T).state,
+		).toBe("none");
+		expect(describeBootProgress(null, T)).toBe("boot log unreadable");
 	});
 });
