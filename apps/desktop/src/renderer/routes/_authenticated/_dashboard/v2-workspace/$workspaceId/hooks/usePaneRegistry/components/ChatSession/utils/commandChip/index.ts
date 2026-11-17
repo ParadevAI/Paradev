@@ -1,1 +1,6 @@
-export { commandChip, commandLabel, LEADING_COMMAND } from "./commandChip";
+export {
+	commandChip,
+	commandLabel,
+	isSigilSkill,
+	LEADING_COMMAND,
+} from "./commandChip";

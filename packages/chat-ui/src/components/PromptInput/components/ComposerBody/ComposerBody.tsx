@@ -36,6 +36,7 @@ import {
 	CUT_COMMAND,
 	DROP_COMMAND,
 	FORMAT_TEXT_COMMAND,
+	HISTORY_PUSH_TAG,
 	INDENT_CONTENT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
 	KEY_ARROW_RIGHT_COMMAND,
@@ -45,6 +46,7 @@ import {
 	KEY_ENTER_COMMAND,
 	KEY_ESCAPE_COMMAND,
 	KEY_TAB_COMMAND,
+	type LexicalEditor,
 	type LexicalNode,
 	OUTDENT_CONTENT_COMMAND,
 	PASTE_COMMAND,
@@ -108,6 +110,11 @@ import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { registerInlineCodeExit } from "../../utils/inlineCodeExit";
 import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
+import {
+	$commandTokenStart,
+	$textAfterCaret,
+	matchCommandToken,
+} from "../../utils/matchCommandToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
 import { registerTrailingParagraph } from "../../utils/trailingParagraph";
@@ -157,17 +164,6 @@ const FOOTER_BUTTONS: Record<
 const INLINE_CONTEXT_BUTTON_CLASS =
 	"size-7 rounded-full bg-secondary hover:bg-secondary/80 disabled:hover:bg-secondary";
 
-// Slash commands only trigger while the "/token" is the entire message.
-function matchCommandToken(text: string) {
-	const match = /^\/([^/\r\n]*)$/.exec(text);
-	if (!match) return null;
-	return {
-		leadOffset: 0,
-		matchingString: match[1] ?? "",
-		replaceableString: match[0],
-	};
-}
-
 export type ComposerBodyProps = Required<
 	Pick<PromptInputProps, "placeholder" | "status" | "layout">
 > &
@@ -207,6 +203,11 @@ function $insertChipAtSelection(chip: ComposerChip) {
 	if (!$isRangeSelection(selection)) return;
 	const chipNode = MentionChipNode.fromChip(chip);
 	selection.insertNodes([chipNode, $createTextNode(" ")]);
+}
+
+/** A chip is its own undo step, even when it lands right after typing. */
+function insertChip(editor: LexicalEditor, chip: ComposerChip) {
+	editor.update(() => $insertChipAtSelection(chip), { tag: HISTORY_PUSH_TAG });
 }
 
 function $collectChips(): ComposerChip[] {
@@ -302,7 +303,7 @@ export function ComposerBody({
 				focusAtEnd();
 			},
 			insertChip(chip: ComposerChip) {
-				editor.update(() => $insertChipAtSelection(chip));
+				insertChip(editor, chip);
 			},
 			openFileDialog() {
 				fileInputRef.current?.click();
@@ -329,6 +330,10 @@ export function ComposerBody({
 	const [mentionQuery, setMentionQuery] = useState<string | null>(null);
 	const [commandQuery, setCommandQuery] = useState<string | null>(null);
 	const [commandDismissed, setCommandDismissed] = useState(false);
+	const [commandToken, setCommandToken] = useState<{
+		leading: boolean;
+		sigil: "/" | "$";
+	}>({ leading: true, sigil: "/" });
 	const [panel, setPanel] = useState<ComposerPanelContent | null>(null);
 	const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
 	const [browseOpen, setBrowseOpen] = useState(false);
@@ -449,9 +454,7 @@ export function ComposerBody({
 	}, [editor]);
 
 	const actionContext: ComposerActionContext = {
-		insertChip: (chip) => {
-			editor.update(() => $insertChipAtSelection(chip));
-		},
+		insertChip: (chip) => insertChip(editor, chip),
 		attachFiles: () => fileInputRef.current?.click(),
 		openPanel: setPanel,
 		query: mentionQuery ?? "",
@@ -538,8 +541,20 @@ export function ComposerBody({
 	);
 
 	const rankedCommands = useMemo(
-		() => rankCommands(commands ?? [], commandQuery ?? ""),
-		[commands, commandQuery],
+		() =>
+			rankCommands(
+				commandToken.leading
+					? (commands ?? [])
+					: (commands ?? []).filter(
+							(command) =>
+								command.inline &&
+								(commandToken.sigil === "/" ||
+									command.title.startsWith(commandToken.sigil)),
+						),
+				commandQuery ?? "",
+				{ prefixOnly: !commandToken.leading },
+			),
+		[commands, commandQuery, commandToken],
 	);
 	const commandOptions = useMemo(
 		() => rankedCommands.map((command) => new CommandTypeaheadOption(command)),
@@ -804,7 +819,7 @@ export function ComposerBody({
 					trimmed && !asText ? chipForPasteRef.current?.(trimmed) : null;
 				if (chip) {
 					event.preventDefault();
-					editor.update(() => $insertChipAtSelection(chip));
+					insertChip(editor, chip);
 					return true;
 				}
 				const text = normalizePastedText(raw);
@@ -1158,7 +1173,20 @@ export function ComposerBody({
 					else void option.command.onSelect(actionContextRef.current);
 				}}
 				options={commandOptions}
-				triggerFn={(text) => ($isInCode() ? null : matchCommandToken(text))}
+				triggerFn={(text) => {
+					const match = $isInCode()
+						? null
+						: matchCommandToken(text, $commandTokenStart(), $textAfterCaret());
+					if (match) {
+						const { leading, sigil } = match;
+						setCommandToken((current) =>
+							current.leading === leading && current.sigil === sigil
+								? current
+								: { leading, sigil },
+						);
+					}
+					return match;
+				}}
 				commandPriority={COMMAND_PRIORITY_HIGH}
 				menuRenderFn={(
 					anchorElementRef,

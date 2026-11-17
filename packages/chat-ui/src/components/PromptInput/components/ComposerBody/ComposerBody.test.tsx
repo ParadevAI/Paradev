@@ -101,3 +101,52 @@ test.each(
 	expect(result.formatted(format)).toBe(true);
 	expect(result.reachedDocument).toBe(false);
 });
+
+test("one undo takes back a chip inserted right after typing", async () => {
+	const { UNDO_COMMAND } = await import("lexical");
+	const { createRef } = await import("react");
+	const ref = createRef<import("../../types").PromptInputHandle>();
+	const view = render(
+		<PromptInput
+			ref={ref}
+			commands={[]}
+			draft={{ segments: [{ type: "text", text: "use " }], attachments: [] }}
+			mentionProviders={[]}
+		/>,
+	);
+	const editable = view.container.querySelector(
+		"[contenteditable]",
+	) as HTMLElement;
+	const editor = getNearestEditorFromDOMNode(editable);
+	if (!editor) throw new Error("composer has no Lexical editor");
+	await act(async () => {
+		editor.update(() => $getRoot().selectEnd());
+	});
+	for (const char of "/find") {
+		await act(async () => {
+			editor.update(() => {
+				const selection = $getSelection();
+				if ($isRangeSelection(selection)) selection.insertText(char);
+			});
+		});
+	}
+	await act(async () => {
+		editor.update(() => {
+			const selection = $getSelection();
+			if (!$isRangeSelection(selection)) return;
+			const node = selection.anchor.getNode();
+			node.setTextContent("use ");
+			node.selectEnd();
+		});
+		ref.current?.insertChip({
+			label: "Find skills",
+			serialized: "$find-skills",
+		});
+	});
+	await act(async () => {
+		editor.dispatchCommand(UNDO_COMMAND, undefined);
+	});
+	expect(editor.getEditorState().read(() => $getRoot().getTextContent())).toBe(
+		"use /find",
+	);
+});
