@@ -11,6 +11,11 @@
  * stopped and the drive is detached. The release publishes before any
  * environment row points at the bundle, so no box mounts a drive mid-write.
  *
+ * A new drive starts as a fork of the region's newest earlier one, so the
+ * builder fetches only the agents whose sha changed. Each agent fails alone:
+ * it keeps the earlier drive's version, or is left out and boxes use the
+ * image's copy.
+ *
  *   bun run agent-tools --bundle <sha> [--region sfo1 ...]
  *
  * Needs VERCEL_SANDBOX_TOKEN, VERCEL_SANDBOX_TEAM_ID, VERCEL_SANDBOX_PROJECT_ID.
@@ -32,11 +37,21 @@ import { z } from "zod";
 import { type Assets, assetObjectKey, loadAssets, SHA256 } from "./manifest";
 
 /** Each agent's asset row, and its executable relative to the unpacked dir. */
-export const AGENT_TOOLS = [
+export const AGENT_TOOLS: readonly AgentTool[] = [
 	{ name: "claude", bin: "claude" },
 	{ name: "codex", bin: "bin/codex" },
 	{ name: "pdev", bin: "pdev/pdev" },
-] as const;
+];
+
+export interface AgentTool {
+	name: string;
+	bin: string;
+	/** Arguments the builder runs the agent with before it names it; the default is `--version`. */
+	check?: readonly string[];
+}
+
+const DEFAULT_CHECK = ["--version"];
+const CHECK_TIMEOUT_SECONDS = 30;
 
 export const AGENT_TOOLS_MANIFEST = "manifest.json";
 
@@ -51,9 +66,12 @@ const agentToolSchema = z.object({
 export const agentToolsManifestSchema = z.array(agentToolSchema);
 export type AgentToolsManifest = z.infer<typeof agentToolsManifestSchema>;
 
-export function agentToolsManifest(assets: Assets): AgentToolsManifest {
+export function agentToolsManifest(
+	assets: Assets,
+	tools: readonly AgentTool[] = AGENT_TOOLS,
+): AgentToolsManifest {
 	return agentToolsManifestSchema.parse(
-		AGENT_TOOLS.map(({ name, bin }) => {
+		tools.map(({ name, bin }) => {
 			const asset = assets[name];
 			if (!asset) throw new Error(`assets.json has no ${name} row`);
 			return { name, sha: asset.sha256, bin };
@@ -75,69 +93,198 @@ export function parseAgentToolsManifest(
 
 const quote = (value: string) => `'${value.replaceAll("'", "'\\''")}'`;
 
-/** The script the builder runs as root against the empty drive mounted read-write at `root`. */
+export type AgentOutcome = "written" | "reused" | "kept-previous" | "dropped";
+
+export interface AgentResult {
+	name: string;
+	outcome: AgentOutcome;
+	/** The sha the new manifest names; absent when the agent was dropped. */
+	sha?: string;
+}
+
+const RESULT_LINE =
+	/^agent-tools-result ([a-z0-9-]+) (written|reused|kept-previous|dropped) ?([0-9a-f]{64})?$/gm;
+
+export function parseBuilderResults(stdout: string): AgentResult[] {
+	return [...stdout.matchAll(RESULT_LINE)].map(([, name, outcome, sha]) => ({
+		name: name as string,
+		outcome: outcome as AgentOutcome,
+		...(sha ? { sha } : {}),
+	}));
+}
+
+/**
+ * The script the builder runs as root against the drive mounted read-write
+ * at `root`: empty, or a fork of an earlier drive whose manifest is `previous`.
+ */
 export function renderBuilderScript(args: {
 	root: string;
 	baseUrl: string;
 	assets: Assets;
 	manifest: AgentToolsManifest;
+	previous?: AgentToolsManifest;
+	tools?: readonly AgentTool[];
+	checkTimeoutSeconds?: number;
 }): string {
-	const fetches = args.manifest.map(({ name, sha, bin }) => {
+	const tools = args.tools ?? AGENT_TOOLS;
+	const agents = args.manifest.map(({ name, sha, bin }) => {
 		const asset = args.assets[name];
 		if (!asset || asset.sha256 !== sha) {
 			throw new Error(`no asset row for ${name} at ${sha}`);
 		}
 		const archive = asset.suffix === ".tar.gz" ? "tar" : "file";
-		return `publish ${[name, sha, bin, assetObjectKey(asset), archive].map(quote).join(" ")}`;
+		const previous = args.previous?.find((entry) => entry.name === name);
+		const check =
+			tools.find((tool) => tool.name === name)?.check ?? DEFAULT_CHECK;
+		return `agent ${[
+			name,
+			sha,
+			bin,
+			assetObjectKey(asset),
+			archive,
+			previous?.sha ?? "",
+			previous?.bin ?? "",
+			...check,
+		]
+			.map(quote)
+			.join(" ")}`;
 	});
 	return `set -euo pipefail
+shopt -s nullglob
 root=${quote(args.root)}
 base=${quote(args.baseUrl)}
+declare -A keep_sha=()
+entries=()
 
-publish() {
+rm -f "\${root}/${AGENT_TOOLS_MANIFEST}" "\${root}/.${AGENT_TOOLS_MANIFEST}.partial"
+sync
+
+fetch() {
 	local name="$1" sha="$2" bin="$3" key="$4" kind="$5"
-	local target="\${root}/\${name}/\${sha}"
-	local tmp
-	tmp="$(mktemp)"
-	curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors -o "$tmp" "\${base}/\${key}" ||
-		curl -fsSL --retry 2 --retry-delay 2 --retry-all-errors -o "$tmp" "\${base}/\${key}?fresh=$(date +%s)"
-	local got
+	local target="\${root}/\${name}/\${sha}" tmp got
+	tmp="$(mktemp)" || return 1
+	if ! { curl -fsSL --retry 5 --retry-delay 2 --retry-all-errors -o "$tmp" "\${base}/\${key}" ||
+		curl -fsSL --retry 2 --retry-delay 2 --retry-all-errors -o "$tmp" "\${base}/\${key}?fresh=$(date +%s)"; }; then
+		echo "\${name}: download failed" >&2; rm -f "$tmp"; return 1
+	fi
 	got="$(sha256sum "$tmp" | cut -d' ' -f1)"
 	if [ "$got" != "$sha" ]; then echo "\${name}: expected \${sha}, got \${got}" >&2; rm -f "$tmp"; return 1; fi
-	rm -rf "\${target}.partial"
-	mkdir -p "\${target}.partial"
+	rm -rf "\${target}.partial" && mkdir -p "\${target}.partial" || { rm -f "$tmp"; return 1; }
 	if [ "$kind" = tar ]; then
-		tar -xzf "$tmp" -C "\${target}.partial"
+		tar -xzf "$tmp" -C "\${target}.partial" || { echo "\${name}: unpack failed" >&2; rm -f "$tmp"; rm -rf "\${target}.partial"; return 1; }
 	else
-		install -D -m 0755 "$tmp" "\${target}.partial/\${bin}"
+		install -D -m 0755 "$tmp" "\${target}.partial/\${bin}" || { rm -f "$tmp"; rm -rf "\${target}.partial"; return 1; }
 	fi
 	rm -f "$tmp"
-	[ -x "\${target}.partial/\${bin}" ] || { echo "\${name}: no executable at \${bin}" >&2; return 1; }
-	rm -rf "$target"
-	mv -T "\${target}.partial" "$target"
-	echo "\${name} \${sha:0:12} written"
+	[ -x "\${target}.partial/\${bin}" ] || { echo "\${name}: no executable at \${bin}" >&2; rm -rf "\${target}.partial"; return 1; }
+	rm -rf "$target" && mv -T "\${target}.partial" "$target"
 }
 
-${fetches.join("\n")}
-printf '%s\\n' ${quote(JSON.stringify(args.manifest, null, "\t"))} > "\${root}/.${AGENT_TOOLS_MANIFEST}.partial"
+smoke() {
+	local dir="$1" bin="$2" home
+	shift 2
+	home="$(mktemp -d)" || return 1
+	if (cd "$home" && HOME="$home" timeout -k 5 ${args.checkTimeoutSeconds ?? CHECK_TIMEOUT_SECONDS} "\${dir}/\${bin}" "$@" > "\${home}/.out" 2>&1 < /dev/null); then
+		rm -rf "$home"; return 0
+	fi
+	echo "\${dir}/\${bin} $*: check failed: $(tail -c 300 "\${home}/.out")" >&2
+	rm -rf "$home"; return 1
+}
+
+keep() {
+	keep_sha[$1]="$2"
+	entries+=("$(printf '{"name":"%s","sha":"%s","bin":"%s"}' "$1" "$2" "$3")")
+}
+
+agent() {
+	local name="$1" sha="$2" bin="$3" key="$4" kind="$5" prev_sha="$6" prev_bin="$7" outcome=failed
+	shift 7
+	if [ -x "\${root}/\${name}/\${sha}/\${bin}" ]; then outcome=reused
+	elif fetch "$name" "$sha" "$bin" "$key" "$kind"; then outcome=written
+	fi
+	if [ "$outcome" != failed ] && smoke "\${root}/\${name}/\${sha}" "$bin" "$@"; then
+		keep "$name" "$sha" "$bin"
+	elif [ -n "$prev_sha" ] && [ "$prev_sha" != "$sha" ] && [ -x "\${root}/\${name}/\${prev_sha}/\${prev_bin}" ] &&
+		smoke "\${root}/\${name}/\${prev_sha}" "$prev_bin" "$@"; then
+		outcome=kept-previous sha="$prev_sha"
+		keep "$name" "$prev_sha" "$prev_bin"
+	else
+		outcome=dropped sha=
+	fi
+	echo "agent-tools-result \${name} \${outcome} \${sha}"
+}
+
+${agents.join("\n")}
+
+for dir in "\${root}"/*/; do
+	dir="\${dir%/}" name="\${dir##*/}"
+	[[ "$name" =~ ^[a-z0-9-]+$ ]] || continue
+	if [ -z "\${keep_sha[$name]:-}" ]; then rm -rf "$dir"; continue; fi
+	for entry in "\${dir}"/* "\${dir}"/.[!.]*; do
+		[ "\${entry##*/}" = "\${keep_sha[$name]}" ] || rm -rf "$entry"
+	done
+done
+
+[ "\${#entries[@]}" -gt 0 ] || { echo "no agent could be published" >&2; exit 1; }
+printf '[%s]\\n' "$(IFS=,; echo "\${entries[*]}")" > "\${root}/.${AGENT_TOOLS_MANIFEST}.partial"
 sync
 mv -T "\${root}/.${AGENT_TOOLS_MANIFEST}.partial" "\${root}/${AGENT_TOOLS_MANIFEST}"
 sync
 `;
 }
 
+export interface DriveEntry {
+	name: string;
+	createdAt: number;
+	attachedTo?: string;
+}
+
 /** What the publish needs from the provider; `vercelDriveHost` is the real one. */
 export interface DriveHost {
 	/** Null when no drive has the name. */
 	find(name: string): Promise<{ attachedTo?: string } | null>;
-	list(prefix: string): Promise<string[]>;
+	list(prefix: string): Promise<DriveEntry[]>;
 	create(name: string, region: SandboxRegionId): Promise<void>;
+	/** Copy-on-write. The parent must have been written, stopped and detached. */
+	fork(parent: string, name: string): Promise<void>;
 	/** Throws while the drive is attached to a sandbox. */
 	remove(name: string): Promise<void>;
 	/** Through a read-only snapshot mount; null when the drive has no manifest. */
 	readManifest(name: string, region: SandboxRegionId): Promise<string | null>;
-	/** Resolves only once the builder has stopped and the drive is detached. */
-	write(name: string, region: SandboxRegionId, script: string): Promise<void>;
+	/**
+	 * Renders the script from the manifest the mounted drive holds, runs it,
+	 * and returns its stdout. Resolves only once the builder has stopped and
+	 * the drive is detached.
+	 */
+	write(
+		name: string,
+		region: SandboxRegionId,
+		script: (manifest: string | null) => string,
+	): Promise<string>;
+}
+
+export interface AgentToolsPublish {
+	drive: string;
+	outcome: "exists" | "published";
+	forkedFrom?: string;
+	agents: AgentResult[];
+}
+
+/** The region's newest other agent-tools drive that no sandbox holds read-write. */
+export function previousAgentToolsDrive(
+	drives: readonly DriveEntry[],
+	region: SandboxRegionId,
+	drive: string,
+): string | undefined {
+	return drives
+		.filter(
+			(entry) =>
+				entry.name !== drive &&
+				entry.name.startsWith(`agent-tools-${region}-`) &&
+				SANDBOX_AGENT_TOOLS_DRIVE_PATTERN.test(entry.name) &&
+				!entry.attachedTo,
+		)
+		.sort((a, b) => b.createdAt - a.createdAt)[0]?.name;
 }
 
 /**
@@ -151,9 +298,12 @@ export async function publishAgentToolsDrive(args: {
 	bundleSha: string;
 	assets: Assets;
 	baseUrl?: string;
-}): Promise<{ drive: string; outcome: "exists" | "published" }> {
+	tools?: readonly AgentTool[];
+	warn?: (line: string) => void;
+}): Promise<AgentToolsPublish> {
+	const warn = args.warn ?? ((line) => console.log(`::warning::${line}`));
 	const drive = sandboxAgentToolsDrive(args.region, args.bundleSha);
-	const manifest = agentToolsManifest(args.assets);
+	const manifest = agentToolsManifest(args.assets, args.tools);
 	const existing = await args.host.find(drive);
 	if (existing?.attachedTo) {
 		throw new Error(
@@ -164,21 +314,109 @@ export async function publishAgentToolsDrive(args: {
 		const found = parseAgentToolsManifest(
 			await args.host.readManifest(drive, args.region),
 		);
-		if (found.length > 0) return { drive, outcome: "exists" };
+		if (found.length > 0) return { drive, outcome: "exists", agents: [] };
 		await args.host.remove(drive);
 	}
-	await args.host.create(drive, args.region);
-	await args.host.write(
-		drive,
-		args.region,
+	let forkedFrom: string | undefined;
+	let parent: string | undefined;
+	try {
+		parent = previousAgentToolsDrive(
+			await args.host.list(`agent-tools-${args.region}-`),
+			args.region,
+			drive,
+		);
+		if (parent) {
+			await args.host.fork(parent, drive);
+			forkedFrom = parent;
+		}
+	} catch (error) {
+		warn(
+			`agent-tools: ${drive} not forked from ${parent ?? "an earlier drive"}; writing every agent: ${String(error).slice(0, 300)}`,
+		);
+		if (await args.host.find(drive)) await args.host.remove(drive);
+	}
+	if (!forkedFrom) await args.host.create(drive, args.region);
+	const stdout = await args.host.write(drive, args.region, (current) =>
 		renderBuilderScript({
 			root: SANDBOX_PATHS.agents,
 			baseUrl: args.baseUrl ?? SANDBOX_ASSET_BASE_URL,
 			assets: args.assets,
 			manifest,
+			previous: forkedFrom ? parseAgentToolsManifest(current) : [],
+			tools: args.tools,
 		}),
 	);
-	return { drive, outcome: "published" };
+	return {
+		drive,
+		outcome: "published",
+		...(forkedFrom ? { forkedFrom } : {}),
+		agents: parseBuilderResults(stdout),
+	};
+}
+
+export type RegionPublish =
+	| { region: SandboxRegionId; result: AgentToolsPublish }
+	| { region: SandboxRegionId; error: unknown };
+
+/** Publishes `concurrency` regions at a time; a region that fails does not stop the others. */
+export async function publishAgentToolsDrives(
+	args: Omit<Parameters<typeof publishAgentToolsDrive>[0], "region"> & {
+		regions: readonly SandboxRegionId[];
+		concurrency?: number;
+	},
+): Promise<RegionPublish[]> {
+	const { regions, concurrency = 6, ...rest } = args;
+	const results: RegionPublish[] = [];
+	let next = 0;
+	const worker = async () => {
+		while (next < regions.length) {
+			const index = next++;
+			const region = regions[index] as SandboxRegionId;
+			try {
+				results[index] = {
+					region,
+					result: await publishAgentToolsDrive({ ...rest, region }),
+				};
+			} catch (error) {
+				results[index] = { region, error };
+			}
+		}
+	};
+	await Promise.all(
+		Array.from({ length: Math.min(concurrency, regions.length) }, worker),
+	);
+	return results;
+}
+
+/** One line per region and per agent that did not get the bundle's version; warnings start `::warning::`. */
+export function describeAgentToolsPublish(
+	results: readonly RegionPublish[],
+): string[] {
+	return results.flatMap((entry) => {
+		if ("error" in entry) {
+			return [
+				`::warning::agent-tools: ${entry.region} not published; its boxes keep the image's agents: ${String(entry.error).slice(0, 300)}`,
+			];
+		}
+		const { drive, outcome, forkedFrom, agents } = entry.result;
+		const summary = agents
+			.map((agent) => `${agent.name} ${agent.outcome}`)
+			.join(", ");
+		return [
+			`agent-tools: ${drive} ${outcome}${forkedFrom ? ` from ${forkedFrom}` : ""}${summary ? `: ${summary}` : ""}`,
+			...agents.flatMap((agent) =>
+				agent.outcome === "kept-previous"
+					? [
+							`::warning::agent-tools: ${drive}: ${agent.name} kept ${agent.sha?.slice(0, 12)} from the earlier drive; the bundle's version failed`,
+						]
+					: agent.outcome === "dropped"
+						? [
+								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}`,
+							]
+						: [],
+			),
+		];
+	});
 }
 
 /** Agent-tools drives no environment row's bundle and region name any more. */
@@ -200,7 +438,7 @@ export async function pruneAgentToolsDrives(args: {
 	const deleted: string[] = [];
 	const kept: string[] = [];
 	for (const name of agentToolsDrivesToPrune(
-		await args.host.list("agent-tools-"),
+		(await args.host.list("agent-tools-")).map((drive) => drive.name),
 		args.referenced,
 	)) {
 		try {
@@ -265,19 +503,28 @@ export function vercelDriveHost(credentials: VercelCredentials): DriveHost {
 		},
 		async list(prefix) {
 			const { Drive } = await sdk();
-			const names: string[] = [];
+			const drives: DriveEntry[] = [];
 			for await (const drive of await Drive.list({
 				...credentials,
 				namePrefix: prefix,
 				sortBy: "name",
 			})) {
-				names.push(drive.name);
+				drives.push({
+					name: drive.name,
+					createdAt: drive.createdAt.getTime(),
+					attachedTo: drive.currentSandboxName,
+				});
 			}
-			return names;
+			return drives;
 		},
 		async create(name, region) {
 			const { Drive } = await sdk();
 			await Drive.getOrCreate({ ...credentials, name, region });
+		},
+		async fork(parent, name) {
+			const drive = await getDrive(parent);
+			if (!drive) throw new Error(`${parent} does not exist`);
+			await drive.fork({ name });
 		},
 		async remove(name) {
 			await (await getDrive(name))?.delete();
@@ -320,15 +567,18 @@ export function vercelDriveHost(credentials: VercelCredentials): DriveHost {
 				mounts: { [SANDBOX_PATHS.agents]: drive },
 			});
 			let failure: Error | null = null;
+			let stdout = "";
 			try {
+				const current = await builder.readFileToBuffer({
+					path: `${SANDBOX_PATHS.agents}/${AGENT_TOOLS_MANIFEST}`,
+				});
 				const result = await builder.runCommand({
 					cmd: "bash",
-					args: ["-c", script],
+					args: ["-c", script(current?.toString("utf8") ?? null)],
 					sudo: true,
 				});
-				console.log(
-					`${name}: ${await result.stdout()}${await result.stderr()}`,
-				);
+				stdout = await result.stdout();
+				console.log(`${name}: ${stdout}${await result.stderr()}`);
 				if (result.exitCode !== 0) {
 					failure = new Error(`${name}: builder exited ${result.exitCode}`);
 				}
@@ -336,6 +586,7 @@ export function vercelDriveHost(credentials: VercelCredentials): DriveHost {
 				await stopAndDelete(builder, name);
 			}
 			if (failure) throw failure;
+			return stdout;
 		},
 	};
 }
@@ -373,16 +624,14 @@ if (import.meta.main) {
 	const assets = loadAssets(
 		join(import.meta.dir, "..", "bundle", "assets.json"),
 	);
-	const host = vercelDriveHost(credentials);
-	for (const region of regions.length
-		? (regions as SandboxRegionId[])
-		: [DEFAULT_SANDBOX_REGION]) {
-		const { drive, outcome } = await publishAgentToolsDrive({
-			host,
-			region,
-			bundleSha,
-			assets,
-		});
-		console.log(`${drive}: ${outcome}`);
-	}
+	const results = await publishAgentToolsDrives({
+		host: vercelDriveHost(credentials),
+		regions: regions.length
+			? (regions as SandboxRegionId[])
+			: [DEFAULT_SANDBOX_REGION],
+		bundleSha,
+		assets,
+	});
+	for (const line of describeAgentToolsPublish(results)) console.log(line);
+	if (results.some((entry) => "error" in entry)) process.exit(1);
 }
