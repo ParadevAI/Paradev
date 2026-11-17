@@ -42,6 +42,14 @@ describe("compareSearchTitle", () => {
 		).toBe("How to Run Codex Agents in Parallel Today | Paradev (ex-Superset)");
 	});
 
+	test("uses a translated former name when given one", () => {
+		expect(
+			compareSearchTitle("Paradev vs Conductor", [
+				"Paradev (anciennement Superset)",
+			]),
+		).toBe("Paradev vs Conductor | Paradev (anciennement Superset)");
+	});
+
 	test("keeps only the current brand when the title is long", () => {
 		const title = "Claude Code vs Cursor CLI: Which Terminal Agent Wins";
 		expect(compareSearchTitle(title)).toBe(`${title} | Paradev`);

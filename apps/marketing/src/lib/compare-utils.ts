@@ -213,22 +213,27 @@ export function extractRoundupItems(content: string): string[] {
 // Google cuts result titles at about 60 characters.
 const SEARCH_TITLE_MAX_LENGTH = 65;
 
-export function compareSearchTitle(title: string): string {
-	const suffixes = [
+export function compareSearchTitle(
+	title: string,
+	introNames: readonly string[] = [
 		BRAND.INTRO_NAME,
 		`${BRAND.NAME} (ex-${BRAND.FORMER_NAME})`,
-	];
-	for (const suffix of suffixes) {
-		const candidate = `${title} | ${suffix}`;
+	],
+): string {
+	for (const introName of introNames) {
+		const candidate = `${title} | ${introName}`;
 		if (candidate.length <= SEARCH_TITLE_MAX_LENGTH) return candidate;
 	}
 	return `${title} | ${BRAND.NAME}`;
 }
 
-export function compareSearchDescription(description: string): string {
+export function compareSearchDescription(
+	description: string,
+	introName: string = BRAND.INTRO_NAME,
+): string {
 	if (BRAND.NAME === BRAND.FORMER_NAME) return description;
 	return description.replace(
 		new RegExp(`\\b${BRAND.NAME}\\b(?!'s| \\(formerly)`),
-		BRAND.INTRO_NAME,
+		introName,
 	);
 }
