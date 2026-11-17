@@ -4,7 +4,7 @@ import { ALL_VIEWS } from "../../allViews";
 import { pickDefaultView, resolveViews } from "../../resolveViews";
 import type { FileMeta, FileView } from "../../types";
 
-export interface ActivePaneView {
+interface ActivePaneView {
 	views: FileView[];
 	activeView: FileView | null;
 }

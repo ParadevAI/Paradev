@@ -6,7 +6,7 @@ import { getSidebarWorkspaceIsHidden } from "renderer/routes/_authenticated/prov
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 
 /**
- * The set of workspace ids that actually appear in the user's v2 dashboard
+ * The set of workspace ids that actually appear in the user's dashboard
  * sidebar. This is the per-user, per-org "my workspaces" view: explicitly
  * placed (and not hidden) workspaces, gated on the projects the user has in
  * their sidebar.

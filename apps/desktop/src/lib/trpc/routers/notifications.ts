@@ -5,35 +5,16 @@ import type {
 } from "electron";
 import { app, Notification } from "electron";
 import { setBadgeCount } from "main/lib/dock-icon";
-import {
-	type AgentLifecycleEvent,
-	type NotificationIds,
-	notificationsEmitter,
-} from "main/lib/notifications/server";
+import { notificationsEmitter } from "main/lib/notifications/server";
 import { NOTIFICATION_EVENTS } from "shared/constants";
 import type { V2NotificationSourceFocusTarget } from "shared/notification-types";
 import { z } from "zod";
 import { publicProcedure, router } from "..";
 
-type TerminalExitNotification = NotificationIds & {
-	exitCode: number;
-	signal?: number;
-	reason?: "killed" | "exited" | "error";
-};
-
 type NotificationEvent =
-	| {
-			type: typeof NOTIFICATION_EVENTS.AGENT_LIFECYCLE;
-			data?: AgentLifecycleEvent;
-	  }
-	| { type: typeof NOTIFICATION_EVENTS.FOCUS_TAB; data?: NotificationIds }
 	| {
 			type: typeof NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE;
 			data?: V2NotificationSourceFocusTarget;
-	  }
-	| {
-			type: typeof NOTIFICATION_EVENTS.TERMINAL_EXIT;
-			data?: TerminalExitNotification;
 	  }
 	| {
 			type: typeof NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE;
@@ -198,25 +179,13 @@ export const createNotificationsRouter = (
 
 		subscribe: publicProcedure.subscription(() => {
 			return observable<NotificationEvent>((emit) => {
-				const onLifecycle = (data: AgentLifecycleEvent) => {
-					emit.next({ type: NOTIFICATION_EVENTS.AGENT_LIFECYCLE, data });
-				};
-
-				const onFocusTab = (data: NotificationIds) => {
-					emit.next({ type: NOTIFICATION_EVENTS.FOCUS_TAB, data });
-				};
-
-				const onFocusV2NotificationSource = (
+				const onFocusNotificationSource = (
 					data: V2NotificationSourceFocusTarget,
 				) => {
 					emit.next({
 						type: NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE,
 						data,
 					});
-				};
-
-				const onTerminalExit = (data: TerminalExitNotification) => {
-					emit.next({ type: NOTIFICATION_EVENTS.TERMINAL_EXIT, data });
 				};
 
 				const onSettingsExternalChange = (data: { themeState?: unknown }) => {
@@ -227,17 +196,8 @@ export const createNotificationsRouter = (
 				};
 
 				notificationsEmitter.on(
-					NOTIFICATION_EVENTS.AGENT_LIFECYCLE,
-					onLifecycle,
-				);
-				notificationsEmitter.on(NOTIFICATION_EVENTS.FOCUS_TAB, onFocusTab);
-				notificationsEmitter.on(
 					NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE,
-					onFocusV2NotificationSource,
-				);
-				notificationsEmitter.on(
-					NOTIFICATION_EVENTS.TERMINAL_EXIT,
-					onTerminalExit,
+					onFocusNotificationSource,
 				);
 				notificationsEmitter.on(
 					NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,
@@ -257,17 +217,8 @@ export const createNotificationsRouter = (
 
 				return () => {
 					notificationsEmitter.off(
-						NOTIFICATION_EVENTS.AGENT_LIFECYCLE,
-						onLifecycle,
-					);
-					notificationsEmitter.off(NOTIFICATION_EVENTS.FOCUS_TAB, onFocusTab);
-					notificationsEmitter.off(
 						NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE,
-						onFocusV2NotificationSource,
-					);
-					notificationsEmitter.off(
-						NOTIFICATION_EVENTS.TERMINAL_EXIT,
-						onTerminalExit,
+						onFocusNotificationSource,
 					);
 					notificationsEmitter.off(
 						NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,

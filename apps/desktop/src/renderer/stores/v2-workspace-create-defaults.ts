@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
-export type V2WorkspaceCreateBaseBranchSource = "local" | "remote-tracking";
+type V2WorkspaceCreateBaseBranchSource = "local" | "remote-tracking";
 
-export interface V2WorkspaceCreateBaseBranchDefault {
+interface V2WorkspaceCreateBaseBranchDefault {
 	branchName: string;
 	source: V2WorkspaceCreateBaseBranchSource;
 }

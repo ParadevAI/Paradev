@@ -91,7 +91,7 @@ function fence(language: string, content: string): string[] {
 }
 
 /** Where the captured page is running, so the agent can drive and verify it. */
-export interface DesignModeLivePane {
+interface DesignModeLivePane {
 	workspaceId: string;
 	paneId: string;
 }

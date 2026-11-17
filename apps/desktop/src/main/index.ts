@@ -32,7 +32,7 @@ import {
 	loadToken,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
-import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
+import { applyShellEnvToProcess } from "lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
 	APP_PARTITION,

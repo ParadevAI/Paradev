@@ -44,7 +44,7 @@ function getTerminalTitleOverrides(
 	return overrides;
 }
 
-export interface UseResourceSnapshotResult {
+interface UseResourceSnapshotResult {
 	snapshot: ResourceMetricsSnapshot | null;
 	refetch: () => void;
 	isFetching: boolean;
@@ -54,15 +54,12 @@ export interface UseResourceSnapshotResult {
 
 /**
  * Polls the resource-metrics snapshot (2s interval) while mounted and
- * normalizes it, enriching v2 rows with project/workspace names and terminal
+ * normalizes it, enriching rows with project/workspace names and terminal
  * title overrides. Only mount this while a resource view is visible — the
  * polling stops when the consumer unmounts.
  */
-export function useResourceSnapshot(
-	surface: "v1" | "v2",
-): UseResourceSnapshotResult {
+export function useResourceSnapshot(): UseResourceSnapshotResult {
 	const collections = useCollections();
-	const isV2 = surface === "v2";
 	const organizationId = useActiveOrganizationId() ?? undefined;
 
 	const { data: rawSidebarProjects = [] } = useLiveQuery(
@@ -130,7 +127,6 @@ export function useResourceSnapshot(
 	} = electronTrpc.resourceMetrics.getSnapshot.useQuery(
 		{
 			mode: "interactive",
-			surface,
 			organizationId,
 		},
 		{
@@ -141,12 +137,12 @@ export function useResourceSnapshot(
 
 	useEffect(() => {
 		if (!isFetching) return;
-		logStressEvent("resource-monitor.fetch", { surface });
-	}, [isFetching, surface]);
+		logStressEvent("resource-monitor.fetch");
+	}, [isFetching]);
 
 	const normalizedSnapshot = useMemo(() => {
 		const normalized = normalizeResourceMetricsSnapshot(snapshot);
-		if (!normalized || !isV2) return normalized;
+		if (!normalized) return normalized;
 
 		const projectById = new Map(
 			rawV2Projects.map((project) => [project.id, project]),
@@ -176,7 +172,7 @@ export function useResourceSnapshot(
 				};
 			}),
 		};
-	}, [snapshot, isV2, rawV2Projects, rawV2Workspaces, terminalTitleOverrides]);
+	}, [snapshot, rawV2Projects, rawV2Workspaces, terminalTitleOverrides]);
 
 	return {
 		snapshot: normalizedSnapshot,

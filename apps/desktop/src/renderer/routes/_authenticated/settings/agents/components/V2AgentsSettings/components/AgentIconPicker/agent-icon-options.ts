@@ -3,7 +3,7 @@
  * `PRESET_ICONS`. `presetId` for user agents is always `"custom"`, so the icon
  * is stored separately as `iconId` and rendered via `getPresetIcon(iconId)`.
  */
-export interface AgentIconOption {
+interface AgentIconOption {
 	id: string;
 	label: string;
 }

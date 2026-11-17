@@ -70,9 +70,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft.ts",
 		["chat-v3-draft:*"],
 	],
-	["src/renderer/stores/changes/store.ts", ["changes-store"]],
 	["src/renderer/stores/prompt-history.ts", ["prompt-history"]],
-	["src/renderer/stores/tabs/store.ts", ["tabs-storage"]],
 	[
 		"src/renderer/stores/theme/store.ts",
 		["theme-storage", "theme-terminal", "theme-id", "theme-type"],
@@ -84,7 +82,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["markdown-preferences"],
 	],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
-	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
 	[
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
@@ -223,10 +220,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		],
 	],
 	["src/renderer/routes/_authenticated/layout.tsx", ["lastViewedWorkspaceId"]],
-	[
-		"src/renderer/routes/_authenticated/_dashboard/utils/workspace-navigation.ts",
-		["lastViewedWorkspaceId"],
-	],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/PreviousRunsList/PreviousRunsList.tsx",
 		["lastViewedWorkspaceId"],

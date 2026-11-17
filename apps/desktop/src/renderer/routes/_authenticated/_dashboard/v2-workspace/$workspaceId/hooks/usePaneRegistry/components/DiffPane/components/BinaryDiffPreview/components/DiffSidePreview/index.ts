@@ -1,1 +1,1 @@
-export { type DiffSide, DiffSidePreview } from "./DiffSidePreview";
+export { DiffSidePreview } from "./DiffSidePreview";

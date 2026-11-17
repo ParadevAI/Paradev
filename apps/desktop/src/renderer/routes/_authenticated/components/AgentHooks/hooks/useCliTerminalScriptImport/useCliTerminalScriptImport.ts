@@ -8,10 +8,10 @@ import { applyCliTerminalScriptEdit } from "./applyCliTerminalScriptEdit";
 /**
  * One-shot sync of terminal scripts changed by `superset scripts add|edit|
  * delete`. The CLI can only write the legacy local.db store, so it leaves
- * rows flagged for this organization: new scripts are copied into the v2
- * collection, edited ones update their v2 row in place, and delete
- * tombstones remove the v2 row. The flags are then cleared so a script
- * deleted in v2 is never re-imported. A script whose write fails is NOT
+ * rows flagged for this organization: new scripts are copied into the
+ * collection, edited ones update their row in place, and delete
+ * tombstones remove the row. The flags are then cleared so a script
+ * deleted in the app is never re-imported. A script whose write fails is NOT
  * acknowledged: its marker survives, and the next refetch of the pending
  * query (focus, /settings-changed nudge) retries it.
  */

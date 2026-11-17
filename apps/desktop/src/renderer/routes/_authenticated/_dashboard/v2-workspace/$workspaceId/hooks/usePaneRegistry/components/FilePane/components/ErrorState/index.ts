@@ -1,1 +1,1 @@
-export { type ErrorReason, ErrorState } from "./ErrorState";
+export { ErrorState } from "./ErrorState";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export interface LinkClickHint {
+interface LinkClickHint {
 	clientX: number;
 	clientY: number;
 }

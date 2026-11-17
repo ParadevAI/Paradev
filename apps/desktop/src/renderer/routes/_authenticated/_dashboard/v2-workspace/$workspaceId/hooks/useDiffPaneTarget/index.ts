@@ -1,1 +1,1 @@
-export { type DiffPaneTarget, useDiffPaneTarget } from "./useDiffPaneTarget";
+export { useDiffPaneTarget } from "./useDiffPaneTarget";

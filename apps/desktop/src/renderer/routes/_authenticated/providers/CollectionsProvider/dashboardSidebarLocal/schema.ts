@@ -247,7 +247,7 @@ export const workspaceLocalStateSchema = z.object({
 		.default([]),
 	// Terminal presets tagged "auto-run on workspace creation" that matched
 	// this workspace's project when the create resolved. Presets live in
-	// renderer localStorage, so the host can't run them; the v2 workspace
+	// renderer localStorage, so the host can't run them; the workspace
 	// page drains this queue once on first open (see
 	// useRunWorkspaceCreationPresets) and clears it before running.
 	pendingCreationPresetIds: z.array(z.string()).default([]),
@@ -352,7 +352,6 @@ export type DashboardSidebarProjectRow = z.infer<
 	typeof dashboardSidebarProjectSchema
 >;
 export type WorkspaceLocalStateRow = z.infer<typeof workspaceLocalStateSchema>;
-export type WorkspaceRunState = z.infer<typeof workspaceRunStateSchema>;
 export type WorkspaceRunTerminalState = z.infer<
 	typeof workspaceRunTerminalStateSchema
 >;
@@ -362,7 +361,7 @@ export type DashboardSidebarSectionRow = z.infer<
 export type V2TerminalPresetRow = z.infer<typeof v2TerminalPresetSchema>;
 
 /**
- * Singleton row of v2 user-scoped preferences.
+ * Singleton row of user-scoped preferences.
  *
  * fileLinks / urlLinks / sidebarFileLinks map click tiers
  * (plain, ⇧, ⌘, ⌘⇧) to an action:
@@ -623,7 +622,7 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 }
 
 /**
- * Heal a stored v2 user-preferences row against current defaults. Used by the
+ * Heal a stored user-preferences row against current defaults. Used by the
  * localStorage collection's read-time parser so rows persisted before a field
  * was added (top-level or nested in a LinkTierMap) don't surface as undefined
  * to consumers. Per-tier defaults vary by map, so we deep-merge each tier map

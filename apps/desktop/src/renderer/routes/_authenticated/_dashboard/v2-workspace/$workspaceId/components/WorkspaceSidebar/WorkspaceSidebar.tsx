@@ -33,7 +33,7 @@ function isSidebarTabId(tab: string): tab is SidebarTabId {
 	return (WORKSPACE_SIDEBAR_TABS as readonly string[]).includes(tab);
 }
 
-export interface PendingReveal {
+interface PendingReveal {
 	path: string;
 	isDirectory: boolean;
 }

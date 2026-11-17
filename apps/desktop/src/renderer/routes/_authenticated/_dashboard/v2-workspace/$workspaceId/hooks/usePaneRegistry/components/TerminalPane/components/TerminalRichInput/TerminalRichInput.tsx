@@ -58,7 +58,7 @@ interface TerminalRichInputProps {
 const draftsByTerminalId = new Map<string, string>();
 
 /**
- * Warp-style rich input overlay for a v2 terminal pane. Reuses the chat
+ * Warp-style rich input overlay for a terminal pane. Reuses the chat
  * composer stack (PromptInput + TiptapPromptEditor) so the overlay looks and
  * behaves like the workspace chat input — multiline editing, @file mentions —
  * but submits into the running agent's PTY instead of a chat session, through

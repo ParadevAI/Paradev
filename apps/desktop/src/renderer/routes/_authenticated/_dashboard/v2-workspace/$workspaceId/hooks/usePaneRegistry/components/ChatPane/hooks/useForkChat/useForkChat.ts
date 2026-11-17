@@ -4,9 +4,9 @@ import { buildChatSessionHandoffPrompt } from "@superset/shared/session-handoff"
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
-import { useCreateWorkspace } from "renderer/react-query/workspaces";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 import { queuePendingChatHandoff } from "renderer/stores/workspace-creates/queuePendingChatHandoff";
 import { useWorkspace } from "../../../../../../../providers/WorkspaceProvider";
 
@@ -27,7 +27,7 @@ export type ChatForkSource = {
  * between agents, built from the chat's own journal rather than scraped pty
  * bytes.
  */
-export function useForkChat(workspaceId: string): {
+export function useForkChat(_workspaceId: string): {
 	forkToWorktree: (source: ChatForkSource) => Promise<void>;
 	canForkToWorktree: boolean;
 } {
@@ -37,7 +37,7 @@ export function useForkChat(workspaceId: string): {
 	const navigate = useNavigate();
 	// Navigation waits for the handoff to be queued: the target page drains the
 	// queue when its layout hydrates, and arriving first would find nothing.
-	const createWorkspace = useCreateWorkspace({ skipNavigation: true });
+	const { submit } = useWorkspaceCreates();
 	const projectId = workspace.projectId;
 
 	const forkToWorktree = useCallback(
@@ -49,17 +49,24 @@ export function useForkChat(workspaceId: string): {
 				return;
 			}
 			try {
-				const created = await createWorkspace.mutateAsync({
-					projectId,
-					name: t`${workspace.name} branch`,
-					// Branches from this workspace, so the conversation's committed
-					// work is already there. Uncommitted work is not, which is what
-					// the handoff prompt tells the agent to check for.
-					sourceWorkspaceId: workspaceId,
+				const newWorkspaceId = crypto.randomUUID();
+				const { completed } = submit({
+					hostId: workspace.hostId,
+					snapshot: {
+						id: newWorkspaceId,
+						projectId,
+						name: t`${workspace.name} branch`,
+						// Branches from this workspace, so the conversation's committed
+						// work is already there. Uncommitted work is not, which is what
+						// the handoff prompt tells the agent to check for.
+						baseBranch: workspace.branch,
+					},
 				});
+				const outcome = await completed;
+				if (!outcome.ok) throw new Error(outcome.error);
 				queuePendingChatHandoff(
 					collections,
-					{ id: created.workspace.id, projectId },
+					{ id: outcome.workspaceId, projectId },
 					{
 						agentId: source.agentId,
 						prompt: buildChatSessionHandoffPrompt({
@@ -69,7 +76,7 @@ export function useForkChat(workspaceId: string): {
 						}),
 					},
 				);
-				navigateToWorkspace(created.workspace.id, navigate);
+				navigateToV2Workspace(outcome.workspaceId, navigate);
 			} catch (error) {
 				toast.error(t({ message: "Couldn't branch into a new worktree" }), {
 					description: errorMessage(error, t({ message: "Unknown error" })),
@@ -77,11 +84,12 @@ export function useForkChat(workspaceId: string): {
 			}
 		},
 		[
-			createWorkspace,
+			submit,
 			collections,
 			navigate,
 			projectId,
-			workspaceId,
+			workspace.hostId,
+			workspace.branch,
 			workspace.name,
 			t,
 		],

@@ -8,7 +8,7 @@ import {
 	useTagFolderContext,
 } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
 
-export interface ProjectTagFolderSection {
+interface ProjectTagFolderSection {
 	id: string;
 	name: string;
 	color: string | null;

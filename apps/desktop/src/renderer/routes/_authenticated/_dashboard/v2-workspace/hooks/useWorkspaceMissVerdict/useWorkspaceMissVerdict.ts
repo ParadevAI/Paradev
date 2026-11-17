@@ -29,7 +29,7 @@ export interface MissVerdictInput {
 	mirrorSettled: boolean;
 }
 
-export type MissVerdictAction = "none" | "immediate-miss" | "open-window";
+type MissVerdictAction = "none" | "immediate-miss" | "open-window";
 
 /** Pure decision: what a verdict pass should do for the current input. */
 export function planVerdictAction(input: MissVerdictInput): MissVerdictAction {

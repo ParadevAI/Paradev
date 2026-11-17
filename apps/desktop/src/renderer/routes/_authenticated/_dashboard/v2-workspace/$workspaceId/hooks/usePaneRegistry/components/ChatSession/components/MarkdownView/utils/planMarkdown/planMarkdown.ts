@@ -1,11 +1,11 @@
 import { fenceState, splitForStreaming } from "@superset/chat/core";
 
-export type MarkdownBlockPlan = {
+type MarkdownBlockPlan = {
 	key: string;
 	block: string;
 };
 
-export type MarkdownPlan = {
+type MarkdownPlan = {
 	stable: MarkdownBlockPlan[];
 	tail: string | null;
 	tailFenceOpen: boolean;

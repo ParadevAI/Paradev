@@ -16,7 +16,7 @@ export type PRFlowState =
 	| { kind: "busy"; pr: PullRequest | null }
 	| { kind: "error"; pr: PullRequest | null; message: string };
 
-export interface GetPRFlowStateInput {
+interface GetPRFlowStateInput {
 	pr: PullRequest | null;
 	sync: BranchSyncStatus | null;
 	isLoading: boolean;
@@ -61,7 +61,7 @@ export function getPRFlowState(input: GetPRFlowStateInput): PRFlowState {
 // Kept in this file because all three fork on the same `kind` discriminant.
 // ---------------------------------------------------------------------------
 
-export type ActionButtonVariant =
+type ActionButtonVariant =
 	| { kind: "hidden" }
 	| { kind: "disabled-tooltip"; reasonKind: UnavailableReason }
 	| { kind: "create-pr-dropdown" }
@@ -87,7 +87,7 @@ export function selectActionButton(state: PRFlowState): ActionButtonVariant {
 	}
 }
 
-export type PRLinkVariant =
+type PRLinkVariant =
 	| { kind: "none" }
 	| {
 			kind: "pr-link";

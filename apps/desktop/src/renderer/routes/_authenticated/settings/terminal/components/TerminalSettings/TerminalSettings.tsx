@@ -1,6 +1,5 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import {
 	isItemVisible,
 	SETTING_ITEM_ID,
@@ -9,10 +8,7 @@ import {
 import { BackgroundTerminalsSetting } from "./components/BackgroundTerminalsSetting";
 import { CloseConfirmSetting } from "./components/CloseConfirmSetting";
 import { CopyOnSelectSetting } from "./components/CopyOnSelectSetting";
-import { LinkBehaviorSetting } from "./components/LinkBehaviorSetting";
 import { PresetsSection } from "./components/PresetsSection";
-import { SessionsSection } from "./components/SessionsSection";
-import { V2PresetsSection } from "./components/V2PresetsSection";
 import { V2SessionsSection } from "./components/V2SessionsSection";
 
 interface TerminalSettingsProps {
@@ -51,17 +47,12 @@ export function TerminalSettings({
 	pendingCreateProjectId,
 	onPendingCreateProjectIdChange,
 }: TerminalSettingsProps) {
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const showPresets = isItemVisible(
 		SETTING_ITEM_ID.TERMINAL_PRESETS,
 		visibleItems,
 	);
 	const showQuickAdd = isItemVisible(
 		SETTING_ITEM_ID.TERMINAL_QUICK_ADD,
-		visibleItems,
-	);
-	const showLinkBehavior = isItemVisible(
-		SETTING_ITEM_ID.TERMINAL_LINK_BEHAVIOR,
 		visibleItems,
 	);
 	const showSessions = isItemVisible(
@@ -95,40 +86,23 @@ export function TerminalSettings({
 			</div>
 
 			<SectionList>
-				{(showPresets || showQuickAdd) &&
-					(isV2CloudEnabled ? (
-						<V2PresetsSection
-							key="presets"
-							showPresets={showPresets}
-							showQuickAdd={showQuickAdd}
-							editingPresetId={editingPresetId}
-							onEditingPresetIdChange={onEditingPresetIdChange}
-							pendingCreateProjectId={pendingCreateProjectId}
-							onPendingCreateProjectIdChange={onPendingCreateProjectIdChange}
-						/>
-					) : (
-						<PresetsSection
-							key="presets"
-							showPresets={showPresets}
-							showQuickAdd={showQuickAdd}
-							editingPresetId={editingPresetId}
-							onEditingPresetIdChange={onEditingPresetIdChange}
-							pendingCreateProjectId={pendingCreateProjectId}
-							onPendingCreateProjectIdChange={onPendingCreateProjectIdChange}
-						/>
-					))}
-				{showLinkBehavior && <LinkBehaviorSetting key="link-behavior" />}
+				{(showPresets || showQuickAdd) && (
+					<PresetsSection
+						key="presets"
+						showPresets={showPresets}
+						showQuickAdd={showQuickAdd}
+						editingPresetId={editingPresetId}
+						onEditingPresetIdChange={onEditingPresetIdChange}
+						pendingCreateProjectId={pendingCreateProjectId}
+						onPendingCreateProjectIdChange={onPendingCreateProjectIdChange}
+					/>
+				)}
 				{showBackgroundLimit && (
 					<BackgroundTerminalsSetting key="background-limit" />
 				)}
 				{showCopyOnSelect && <CopyOnSelectSetting key="copy-on-select" />}
 				{showCloseConfirm && <CloseConfirmSetting key="close-confirm" />}
-				{showSessions &&
-					(isV2CloudEnabled ? (
-						<V2SessionsSection key="sessions" />
-					) : (
-						<SessionsSection key="sessions" />
-					))}
+				{showSessions && <V2SessionsSection key="sessions" />}
 			</SectionList>
 		</div>
 	);
