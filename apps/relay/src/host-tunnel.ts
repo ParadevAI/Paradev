@@ -16,11 +16,6 @@ import {
 	type HttpExchangeResult,
 	HttpExchanges,
 } from "./http-exchange";
-import {
-	type HostConnectRecord,
-	RECONNECT_STORM_WINDOW_MS,
-	recordHostConnect,
-} from "./reconnect-storm";
 import type { RelayEnv } from "./types";
 
 const HOST_TAG = "host";
@@ -239,8 +234,8 @@ export class HostTunnel extends Server<RelayEnv> {
 				colo,
 				country: url.searchParams.get("country"),
 				asn: url.searchParams.get("asn"),
+				generation: url.searchParams.get("generation"),
 			});
-			await this.trackReconnects(hostId, { at: connectedAt, colo });
 			return;
 		}
 
@@ -449,25 +444,6 @@ export class HostTunnel extends Server<RelayEnv> {
 	}
 
 	// ── Internals ─────────────────────────────────────────────────────
-
-	private async trackReconnects(
-		hostId: string,
-		connect: HostConnectRecord,
-	): Promise<void> {
-		const { history, storm } = recordHostConnect(
-			(await this.ctx.storage.get<HostConnectRecord[]>("recentConnects")) ?? [],
-			connect,
-		);
-		await this.ctx.storage.put("recentConnects", history);
-		if (!storm) return;
-		console.warn({
-			message: "[relay] host reconnect storm",
-			hostId,
-			connects: history.length,
-			windowMs: RECONNECT_STORM_WINDOW_MS,
-			colos: [...new Set(history.map((entry) => entry.colo))],
-		});
-	}
 
 	// The host gave up dialing this ticket: answer the waiting client now
 	// instead of at the deadline.
