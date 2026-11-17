@@ -1,5 +1,5 @@
 // No-ops kept for host-services shipped with desktop 1.20 and earlier, which
-// still call these. TODO(2026-10-24): drop once #7786 gates those builds.
+// still call these. Drop them once MINIMUM_DESKTOP_VERSION excludes those builds.
 import { v2WorkspaceTypeValues } from "@superset/db/enums";
 import type { SelectV2Workspace } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
