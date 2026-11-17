@@ -1008,6 +1008,114 @@ export const chatsRouter = {
 			return { member };
 		}),
 
+	/**
+	 * Takes a person out of a group: the owner removes anyone, and anyone but
+	 * the owner leaves. Their own agents leave the group with them.
+	 */
+	removeMember: personProcedure
+		.input(groupInput.extend({ userId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const actor = ctx.session.user;
+			const role = await assertMember(actor.id, input.groupId);
+			const leaving = input.userId === actor.id;
+			const [group] = await db
+				.select({ kind: chatsGroups.kind })
+				.from(chatsGroups)
+				.where(eq(chatsGroups.id, input.groupId));
+			if (group?.kind !== "group") {
+				throw invalid("A 1:1 is you and one Dev");
+			}
+			if (leaving && role === "owner") {
+				throw invalid("The owner cannot leave a group. Delete it instead.");
+			}
+			if (!leaving && role !== "owner") {
+				throw forbidden("Only the group's owner can remove people");
+			}
+			const [person] = await db
+				.select({ id: users.id, email: users.email, name: users.name })
+				.from(chatsGroupMembers)
+				.innerJoin(users, eq(users.id, chatsGroupMembers.userId))
+				.where(
+					and(
+						eq(chatsGroupMembers.groupId, input.groupId),
+						eq(chatsGroupMembers.userId, input.userId),
+					),
+				);
+			if (!person) throw notFound("They aren't in this group");
+			const theirDevs = await db
+				.select({ id: chatsAgents.id })
+				.from(chatsGroupAgents)
+				.innerJoin(chatsAgents, eq(chatsAgents.id, chatsGroupAgents.agentId))
+				.where(
+					and(
+						eq(chatsGroupAgents.groupId, input.groupId),
+						eq(chatsAgents.ownerUserId, input.userId),
+					),
+				);
+			const note = await dbWs.transaction(async (tx) => {
+				await tx
+					.delete(chatsGroupMembers)
+					.where(
+						and(
+							eq(chatsGroupMembers.groupId, input.groupId),
+							eq(chatsGroupMembers.userId, input.userId),
+						),
+					);
+				await tx
+					.delete(chatsReads)
+					.where(
+						and(
+							eq(chatsReads.groupId, input.groupId),
+							eq(chatsReads.userId, input.userId),
+						),
+					);
+				if (theirDevs.length > 0) {
+					await tx.delete(chatsGroupAgents).where(
+						and(
+							eq(chatsGroupAgents.groupId, input.groupId),
+							inArray(
+								chatsGroupAgents.agentId,
+								theirDevs.map((dev) => dev.id),
+							),
+						),
+					);
+				}
+				const name = toUser(person).displayName;
+				const [row] = await tx
+					.insert(chatsMessages)
+					.values({
+						groupId: input.groupId,
+						text: leaving
+							? `${name} left the group`
+							: `${toUser(actor).displayName} removed ${name}`,
+					})
+					.returning();
+				return row;
+			});
+			const channel = chatsGroupChannel(input.groupId);
+			for (const dev of theirDevs) {
+				publishChats(channel, {
+					type: "group_dev.removed",
+					groupId: input.groupId,
+					devId: dev.id,
+				});
+			}
+			if (note) {
+				publishChats(channel, {
+					type: "message.created",
+					message: await messageView(note),
+					task: null,
+				});
+			}
+			publishChats(channel, {
+				type: "member.left",
+				groupId: input.groupId,
+				userId: input.userId,
+			});
+			publishChats(chatsUserChannel(input.userId), { type: "groups.changed" });
+			return { groupId: input.groupId, userId: input.userId };
+		}),
+
 	/** The one agent each person has in an organization, with its 1:1. */
 	createPersonalDev: personProcedure
 		.input(

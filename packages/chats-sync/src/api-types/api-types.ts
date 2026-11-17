@@ -568,6 +568,8 @@ export type RealtimeEvent =
 	/** On each member's own channel: the group, and everything in it, is gone. */
 	| { type: "group.deleted"; groupId: string; title: string; deletedBy: string }
 	| { type: "member.joined"; groupId: string; member: ApiMember }
+	/** A person left a group or was removed from it. */
+	| { type: "member.left"; groupId: string; userId: string }
 	| { type: "dev.updated"; dev: ApiDev }
 	| { type: "dev.deleted"; devId: string }
 	| ({ type: "group_dev.added" } & AddedGroupDev)

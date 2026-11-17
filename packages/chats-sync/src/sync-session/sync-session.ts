@@ -116,7 +116,8 @@ export function startSync(deps: Deps) {
 		onEvent: (event) => {
 			if (event.type === "groups.changed") return groupsChanged();
 			// The event drops the group; a new token, which no longer lists its channel, closes that.
-			if (event.type === "group.deleted") realtime.refresh();
+			if (event.type === "group.deleted" || event.type === "member.left")
+				realtime.refresh();
 			deps.onEvent(event);
 			inFlight?.push(event);
 			deps.signal({ type: "event", event, at: Date.now() });

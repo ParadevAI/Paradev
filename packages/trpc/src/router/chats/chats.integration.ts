@@ -146,6 +146,36 @@ test("only a group's owner renames or deletes it", async () => {
 	expect(await code(owner.chats.deleteGroup({ groupId: group.id }))).toBe("OK");
 });
 
+test("the owner removes people and others leave; their Devs go with them", async () => {
+	const { group } = await sharedGroup();
+	const mine = await member.chats.createDev({
+		organizationId: ORG,
+		name: "Helper",
+		color: COLOR,
+		description: "Helps",
+	});
+	await member.chats.addDevToGroup({ groupId: group.id, devId: mine.dev.id });
+	const target = { groupId: group.id, userId: MEMBER };
+	expect(
+		await code(member.chats.removeMember({ groupId: group.id, userId: OWNER })),
+	).toBe("FORBIDDEN");
+	expect(
+		await code(owner.chats.removeMember({ groupId: group.id, userId: OWNER })),
+	).toBe("BAD_REQUEST");
+	expect(await code(member.chats.removeMember(target))).toBe("OK");
+	const after = await owner.chats.bootstrap({ organizationId: ORG });
+	const left = after.groups.find((entry) => entry.id === group.id);
+	expect(left?.members.map((person) => person.id)).toEqual([OWNER]);
+	expect(
+		after.groupDevs.some(
+			(link) => link.groupId === group.id && link.devId === mine.dev.id,
+		),
+	).toBe(false);
+	expect(
+		await code(member.chats.sendMessage({ groupId: group.id, text: "hi" })),
+	).toBe("NOT_FOUND");
+});
+
 test("a Dev is changed by its owner; a member who shares a group with it is refused, anyone else hears not found", async () => {
 	const { group } = await sharedGroup();
 	const made = await owner.chats.createDev({

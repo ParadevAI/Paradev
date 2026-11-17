@@ -99,6 +99,13 @@ export function applyEvent(state: ChatState, event: RealtimeEvent): ChatState {
 			return upsertDev(state, event.dev);
 		case "dev.deleted":
 			return removeDev(state, event.devId);
+		case "member.left":
+			if (event.userId === state.meId) return removeGroup(state, event.groupId);
+			return updateChat(state, event.groupId, (c) => ({
+				...c,
+				memberIds: c.memberIds.filter((id) => id !== event.userId),
+				ownerIds: c.ownerIds.filter((id) => id !== event.userId),
+			}));
 		case "group_dev.added":
 			return applyAddedGroupDev(state, event);
 		case "group_dev.removed":
