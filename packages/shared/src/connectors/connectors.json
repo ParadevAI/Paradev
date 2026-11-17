@@ -206,6 +206,39 @@
 				}
 			]
 		},
+		"launchdarkly_mcp": {
+			"displayName": "LaunchDarkly",
+			"icon": "launchdarkly",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.launchdarkly.com/mcp",
+					"scopes": ["reader", "writer", "observability", "offline_access"],
+					"identity": {
+						"mcp": "https://mcp.launchdarkly.com/mcp",
+						"tool": "get-member-self",
+						"arguments": {},
+						"account": {
+							"id": "$.id",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.id",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"notion": {
 			"displayName": "Notion",
 			"icon": "notion",

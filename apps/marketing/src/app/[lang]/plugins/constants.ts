@@ -126,6 +126,13 @@ export const CATALOG: {
 				displayName: "Inngest",
 				description: msg({ message: "Debug failed runs and rerun functions" }),
 			},
+			{
+				name: "launchdarkly",
+				displayName: "LaunchDarkly",
+				description: msg({
+					message: "Check, change, and clean up feature flags",
+				}),
+			},
 		],
 	},
 	{

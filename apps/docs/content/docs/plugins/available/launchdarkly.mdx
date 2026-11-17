@@ -1,0 +1,32 @@
+---
+title: LaunchDarkly
+description: "Check, change and clean up feature flags with LaunchDarkly: see what each environment serves, change targeting safely, and retire flags nothing uses"
+---
+
+Check, change and clean up feature flags: see what each environment serves and to whom, change targeting through your approval settings, and retire flags nothing evaluates anymore.
+
+## Skills
+
+| Skill | What it does |
+|:------|:-------------|
+| `check-a-flag` | Reads what each environment serves and to whom, and where the flag is still evaluated, before it reasons about flagged code |
+| `change-targeting` | Confirms the environment, reads the current rules, follows approval settings, prefers a gradual or guarded rollout, and checks the change took effect |
+| `clean-up-flags` | Finds stale flags, checks removal readiness, removes the flag from the code first, and archives it in LaunchDarkly only after that code ships |
+
+Skills are named `launchdarkly-<skill>`. In Claude Code they appear as `superset:launchdarkly-<skill>`.
+
+## MCP Server
+
+Tools come from LaunchDarkly's hosted MCP server at `https://mcp.launchdarkly.com/mcp`. Paradev proxies each call and adds your credentials. The server offers every toolset (flags, approvals, experiments, AgentControl, observability, releases), and what the agent can change is limited by your LaunchDarkly role. See [LaunchDarkly's MCP server docs](https://launchdarkly.com/docs/home/getting-started/mcp-hosted).
+
+The hosted server is not available for LaunchDarkly's EU or federal instances.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to LaunchDarkly in your browser. Paradev registers itself with LaunchDarkly when you connect, so there is no app to set up first. |
+
+The hosted server accepts only OAuth: it rejects personal and service API access tokens. LaunchDarkly asks you to authorize again every 90 days.
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them.

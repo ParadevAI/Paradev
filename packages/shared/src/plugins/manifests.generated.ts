@@ -1105,6 +1105,57 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"launchdarkly": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "launchdarkly",
+		"version": "1.0.0",
+		"description": "Ship and clean up feature flags with LaunchDarkly: check where a flag is on and still evaluated, change targeting through approvals, and remove flags nothing uses anymore.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"launchdarkly",
+			"feature-flags",
+			"flags",
+			"experiments",
+			"releases",
+			"rollouts"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "LaunchDarkly",
+					"category": "Developer tools",
+					"icon": "launchdarkly"
+				},
+				"connector": {
+					"slug": "launchdarkly_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.launchdarkly.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "change-targeting",
+				"description": "Change who gets a LaunchDarkly flag without surprising anyone — confirm the environment, read the current targeting, respect approval settings, prefer a gradual or guarded rollout in production, and verify the change took effect. Use when the user asks to turn a flag on or off, roll a feature out to a percentage, a customer or a segment, add someone to a flag, or roll a feature back."
+			},
+			{
+				"name": "check-a-flag",
+				"description": "Answer \"is this flag on, for whom, and is it still used\" from LaunchDarkly before changing or reasoning about flagged code — find the flag, read what each environment serves and to whom, and check where it is still evaluated. Use when the user asks whether a feature is on, why a customer sees or does not see something, what a flag does, or before editing code that sits behind a flag."
+			},
+			{
+				"name": "clean-up-flags",
+				"description": "Remove feature flags nothing needs anymore, in the safe order — find stale candidates, prove each is unused or fully launched everywhere, delete the flag from the code first, and archive it in LaunchDarkly only after that code is deployed. Use when the user asks to clean up, remove or retire feature flags, reduce flag debt, or remove one specific flag."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;
