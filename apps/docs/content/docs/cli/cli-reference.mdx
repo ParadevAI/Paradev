@@ -2406,6 +2406,8 @@ Linear, Paradev tasks are not listed or resolved, and the reverse. Pass
 >
 List one page of tasks in the active organization. To retrieve the next page,
 keep the same filters and increase `--offset` by `--limit`.
+Each offset applies to the current task list. Changes between requests can
+cause missing or repeated tasks.
 
 ```bash
 superset tasks list --assignee-me
