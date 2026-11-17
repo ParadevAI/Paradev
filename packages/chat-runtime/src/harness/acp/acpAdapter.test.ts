@@ -6078,6 +6078,27 @@ describe("AcpAdapter config options", () => {
 		]);
 		await adapter.dispose();
 	});
+
+	it.each([
+		["finishes", (agent: FakeAcpAgent) => agent.releasePrompts("end_turn")],
+		["fails", (agent: FakeAcpAgent) => agent.failHeldPrompts(-32603, "boom")],
+	])("does not carry the saved picks past a turn that %s", async (_, end) => {
+		const { adapter, agent, configured } = await approvePlan(
+			{ type: "option", optionId: "exit-plan-clear-auto" },
+			{ model: "sonnet", effort: "low" },
+		);
+		end(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "next" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "config_option_update",
+			configOptions: [MODEL_OPTION, EFFORT_OPTION],
+		});
+		await flush();
+		expect(configured()).toEqual([]);
+		await adapter.dispose();
+	});
 });
 
 describe("AcpAdapter attachments", () => {
