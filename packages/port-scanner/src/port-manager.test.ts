@@ -82,6 +82,8 @@ let processTable: { pid: number; ppid: number }[] = [];
 let terminalIdEnv = new Map<number, string | null>();
 /** pid → agent launch id the mocked environment reader reports. */
 let agentLaunchIdEnv = new Map<number, string>();
+/** pid → start time in epoch seconds; empty means the time can't be read. */
+let processStartTimes = new Map<number, number>();
 /** When set, trees come from `processTable` instead of root → [root, root+1]. */
 let useProcessTableTrees = false;
 
@@ -129,6 +131,7 @@ mock.module("./scanner", () => ({
 mock.module("./terminal-env", () => ({
 	readAgentLaunchIdsFromEnv: async (pids: number[]) =>
 		new Map(pids.map((pid) => [pid, agentLaunchIdEnv.get(pid) ?? null])),
+	readProcessStartTimes: async () => processStartTimes,
 	readTerminalIdsFromEnv: async (pids: number[]) => {
 		spy.envReads++;
 		spy.lastEnvReadPids = pids;
@@ -176,6 +179,7 @@ function resetSpy(): void {
 	processTable = [];
 	terminalIdEnv = new Map();
 	agentLaunchIdEnv = new Map();
+	processStartTimes = new Map();
 	useProcessTableTrees = false;
 	spy.inFlight = 0;
 	spy.maxInFlight = 0;
@@ -1109,5 +1113,20 @@ describe("PortManager — agent processes", () => {
 		});
 		expect(result.success).toBe(false);
 		expect(killed).toEqual([]);
+	});
+
+	it("keeps a port closable when its pid was reused after the agent launch", async () => {
+		agentLaunched();
+		processStartTimes = new Map([[1002, 1700009999]]);
+		await manager.forceScan();
+
+		expect(manager.getAllPorts().map(({ port }) => port)).toContain(AGENT_PORT);
+		const result = await manager.killPort({
+			terminalId: "p1",
+			workspaceId: "ws1",
+			port: AGENT_PORT,
+		});
+		expect(result.success).toBe(true);
+		expect(killed).toEqual([1002]);
 	});
 });

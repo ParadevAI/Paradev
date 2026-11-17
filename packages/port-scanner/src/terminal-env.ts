@@ -1,6 +1,10 @@
 import os from "node:os";
 import { EXEC_TIMEOUT_MS, runTolerant } from "./exec.ts";
-import { pickEnvValue, readEnvValuesLinuxProcfs } from "./procfs.ts";
+import {
+	pickEnvValue,
+	readEnvValuesLinuxProcfs,
+	readStartTimesLinuxProcfs,
+} from "./procfs.ts";
 
 /**
  * Environment keys that carry the owning terminal's id, in priority order.
@@ -96,6 +100,43 @@ export async function readAgentLaunchIdsFromEnv(
 		throw new Error("Process environment inspection failed");
 	}
 	return new Map<number, string | null>();
+}
+
+/**
+ * Read each process's start time in epoch seconds, the clock that `date +%s`
+ * gives the agent launch id. A pid whose start time can't be read is null or
+ * absent, and a failed read gives an empty map.
+ */
+export async function readProcessStartTimes(
+	pids: number[],
+	signal?: AbortSignal,
+): Promise<Map<number, number | null>> {
+	const values = new Map<number, number | null>();
+	if (pids.length === 0) return values;
+	const platform = os.platform();
+	try {
+		if (platform === "linux")
+			return await readStartTimesLinuxProcfs(pids, signal);
+		if (platform === "darwin") {
+			const output = await runTolerant(
+				"ps",
+				["-o", "pid=,lstart=", "-p", pids.join(",")],
+				{ maxBuffer: 1024 * 1024, timeout: EXEC_TIMEOUT_MS, signal },
+			);
+			for (const line of output.split("\n")) {
+				const match = line.match(/^\s*(\d+)\s+(.+)$/);
+				if (!match?.[1] || !match[2]) continue;
+				const startTime = Date.parse(match[2]) / 1000;
+				values.set(
+					Number(match[1]),
+					Number.isFinite(startTime) ? startTime : null,
+				);
+			}
+		}
+	} catch {
+		signal?.throwIfAborted();
+	}
+	return values;
 }
 
 async function readTerminalIdsDarwin(

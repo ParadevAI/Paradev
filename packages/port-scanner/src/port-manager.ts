@@ -13,7 +13,10 @@ import {
 	type ProcessTableEntry,
 	readProcessTable,
 } from "./scanner.ts";
-import { readAgentLaunchIdsFromEnv } from "./terminal-env.ts";
+import {
+	readAgentLaunchIdsFromEnv,
+	readProcessStartTimes,
+} from "./terminal-env.ts";
 import type { DetectedPort } from "./types.ts";
 
 /** How often to poll for port changes (in ms) */
@@ -34,6 +37,12 @@ const HINT_SCAN_DELAY_MS = 500;
 
 /** Ports to ignore (common privileged/system ports that are usually not dev servers) */
 const IGNORED_PORTS = new Set([22, 80, 443]);
+
+/**
+ * A wrapper reads the launch id's time shortly after its process starts, so
+ * the agent's start time is never later than it. Allow for clock rounding.
+ */
+const AGENT_START_SLACK_S = 2;
 
 const PORT_HINT_PATTERNS = [
 	/listening\s+on\s+(?:port\s+)?(\d+)/i,
@@ -424,10 +433,24 @@ export class PortManager extends EventEmitter {
 			[...new Set([...trees.values()].flat())],
 			signal,
 		);
+		const launches = new Map<number, [agentPid: number, launchedAt: number]>();
+		for (const [member, launchId] of launchIds) {
+			const [agentPid, launchedAt] = (launchId ?? "").split("-").map(Number);
+			if (agentPid) launches.set(member, [agentPid, launchedAt ?? Number.NaN]);
+		}
+		const startTimes = await readProcessStartTimes(
+			[...new Set([...launches.values()].map(([agentPid]) => agentPid))],
+			signal,
+		);
 		for (const [pid, tree] of trees) {
-			const holdsAgent = tree.some((member) =>
-				tree.includes(Number.parseInt(launchIds.get(member) ?? "", 10)),
-			);
+			const holdsAgent = tree.some((member) => {
+				const [agentPid, launchedAt] = launches.get(member) ?? [];
+				if (agentPid === undefined || !tree.includes(agentPid)) return false;
+				// A reused pid started after the launch. An unreadable time is
+				// NaN, which compares false and keeps the pid-only match.
+				const startedAt = startTimes.get(agentPid) ?? Number.NaN;
+				return !(startedAt > Number(launchedAt) + AGENT_START_SLACK_S);
+			});
 			if (holdsAgent) agentPids.add(pid);
 		}
 		return agentPids;
