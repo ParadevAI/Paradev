@@ -29,6 +29,11 @@ import {
 } from "drizzle-orm";
 import { env } from "../../../env";
 import { publishChats } from "../publish";
+import {
+	markTaskStarted,
+	markTaskTurnEnded,
+	taskTurnText,
+} from "../tasks/task-turn";
 import { messageView, sharedFiles, toQuestion, toUser } from "../views";
 import { devPlugins, mayUseParadev, turnApps } from "./app-access";
 import { type BoxKeys, signBoxCredential } from "./box-tokens";
@@ -36,6 +41,7 @@ import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
 import { textWithFile } from "./dev-files";
 import { type Claim, TURN_MAX_MS, type TurnOutcome } from "./flow";
 import { loadRoster, mentionableDevs, resolveMentions } from "./roster";
+import { formatTime, turnHeader } from "./turn-header";
 
 /** A request to run a Dev in a group because of a message. */
 export interface TurnRequest {
@@ -181,6 +187,47 @@ export async function enqueueTurn(
 		),
 	);
 	await deps.turnRuns.start(turnId);
+}
+
+/**
+ * A task for a Dev: queues a turn in the task's chat, unless one for the
+ * task is already queued or running. A task's turn neither cancels a
+ * message's turn nor is cancelled by one.
+ */
+export async function enqueueTaskTurn(
+	deps: TurnDeps,
+	request: {
+		agentId: string;
+		groupId: string;
+		taskId: string;
+		userId: string | null;
+	},
+): Promise<void> {
+	const turnId = await dbWs.transaction(async (tx) => {
+		await tx
+			.select({ id: chatsAgents.id })
+			.from(chatsAgents)
+			.where(eq(chatsAgents.id, request.agentId))
+			.for("update");
+		const [open] = await tx
+			.select({ id: chatsTurns.id })
+			.from(chatsTurns)
+			.where(
+				and(
+					eq(chatsTurns.taskId, request.taskId),
+					inArray(chatsTurns.status, ["queued", "running"]),
+				),
+			)
+			.limit(1);
+		if (open) return null;
+		const [turn] = await tx
+			.insert(chatsTurns)
+			.values(request)
+			.returning({ id: chatsTurns.id });
+		if (!turn) throw new Error("The turn was not stored");
+		return turn.id;
+	});
+	if (turnId) await deps.turnRuns.start(turnId);
 }
 
 /**
@@ -365,19 +412,6 @@ export async function wakeForTurn(
  */
 const REPLY_HINT =
 	"To answer in the chat, call `reply` with your message (or run `dev reply \"<message>\"`). Keep it short: a sentence or two, about 60 words unless they asked for detail. If nothing here needs you, don't reply. Your final text isn't shown.";
-
-const formatTime = (at: Date) =>
-	`${at.toISOString().slice(0, 16).replace("T", " ")} UTC`;
-
-/** What happened, as a title, then one `Field: value` line each, empty ones left out. */
-const turnHeader = (
-	title: string,
-	fields: [string, string | null | undefined][],
-) =>
-	[
-		`## ${title}`,
-		...fields.flatMap(([name, value]) => (value ? [`${name}: ${value}`] : [])),
-	].join("\n");
 
 /** How many cut-off messages a turn takes up again. Older ones have likely moved on. */
 const INTERRUPTED_MAX = 5;
@@ -1007,9 +1041,11 @@ export async function startTurn(
 	if (!turn || turn.superseded) return false;
 	const prompt = turn.messageId
 		? await messageTurnText(turn)
-		: turn.prompt
-			? { text: turn.prompt, userId: turn.userId }
-			: null;
+		: turn.taskId
+			? await taskTurnText(turn.taskId, nowOf(deps))
+			: turn.prompt
+				? { text: turn.prompt, userId: turn.userId }
+				: null;
 	if (!prompt) return false;
 	try {
 		const box = await deps.boxes.status(turn.agentId);
@@ -1024,7 +1060,8 @@ export async function startTurn(
 			groupId: turn.groupId,
 			sessionId: turn.groupId,
 			text: prompt.text,
-			checkReply: turn.parentTurnId ? false : await checksReply(turn),
+			checkReply:
+				turn.parentTurnId || turn.taskId ? false : await checksReply(turn),
 			ownerOneToOne: await isOwnerOneToOne(turn),
 			devAsk: await isDevAsk(turn),
 			apps: await appsFor(turn.agentId),
@@ -1033,6 +1070,7 @@ export async function startTurn(
 		await markAgentRead(turn.agentId, turn.groupId).catch((error: unknown) =>
 			console.error(`[chats] turn ${turnId}: the read was not stored:`, error),
 		);
+		if (turn.taskId) await markTaskStarted(turn.taskId, turn.agentId);
 		return true;
 	} catch (error) {
 		console.error(`[chats] turn ${turnId} did not start:`, error);
@@ -1052,7 +1090,7 @@ export async function startTurn(
 export async function postDevMessage(
 	claims: { turnId: string; agentId: string },
 	input: { text: string; endsTurn: boolean },
-): Promise<boolean> {
+): Promise<boolean | "task"> {
 	const turn = await findTurn(claims.turnId);
 	if (
 		!turn ||
@@ -1063,6 +1101,7 @@ export async function postDevMessage(
 	) {
 		return false;
 	}
+	if (turn.taskId && input.endsTurn) return "task";
 	const [repeat] = await db
 		.select({ id: chatsMessages.id })
 		.from(chatsMessages)
@@ -1188,6 +1227,17 @@ export async function finishTurn(
 			.set({ status: "ended", endedAt: now, error })
 			.where(and(eq(chatsTurns.id, turnId), ne(chatsTurns.status, "ended")))
 			.returning({ id: chatsTurns.id });
+		if (ended.length > 0 && turn.taskId) {
+			await markTaskTurnEnded(
+				{ id: turn.id, taskId: turn.taskId, agentId: turn.agentId },
+				{ error, superseded: turn.superseded, answer: turn.answer },
+			).catch((failure: unknown) =>
+				console.error(
+					`[chats] turn ${turnId}: its task was not updated:`,
+					failure,
+				),
+			);
+		}
 		if (ended.length > 0 && error && !turn.parentTurnId) {
 			await postNote(turn, error);
 		}

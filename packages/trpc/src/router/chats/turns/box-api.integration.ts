@@ -264,17 +264,18 @@ test("one Dev asks another in its chat and hears the answer; the asked Dev posts
 	await runs.idle();
 });
 
-test("a Dev acts in Paradev as its owner only once the owner switched that on; a group's Dev never does", async () => {
-	const boxHeaders = (turn: TurnStart) =>
-		new Headers({
-			"x-dev-box": boxes.get(turn.agentId)?.credential ?? "",
-			"x-dev-chat": turn.groupId,
-		});
-	const refusal = (turn: TurnStart) =>
-		paradevCaller(keys, boxHeaders(turn)).then(
-			() => null,
-			(error: { code: string }) => error.code,
-		);
+const boxHeaders = (turn: TurnStart) =>
+	new Headers({
+		"x-dev-box": boxes.get(turn.agentId)?.credential ?? "",
+		"x-dev-chat": turn.groupId,
+	});
+const refusal = (turn: TurnStart) =>
+	paradevCaller(keys, boxHeaders(turn)).then(
+		() => null,
+		(error: { code: string }) => error.code,
+	);
+
+test("a Dev acts in Paradev as its owner only once the owner switched that on", async () => {
 	const { groupId, turn } = await messaged("start a workspace");
 	expect(turn.apps).toEqual([]);
 	expect(await refusal(turn)).toBe("not_selected");
@@ -315,7 +316,9 @@ test("a Dev acts in Paradev as its owner only once the owner switched that on; a
 		stopReason: "end_turn",
 	});
 	await runs.idle();
+});
 
+test("a group's Dev never acts in Paradev", async () => {
 	const created = await owner.chats.createGroup({
 		organizationId: ORG,
 		title: "No access",
@@ -492,6 +495,55 @@ test("a box's model call goes out with the server's key and is metered to the De
 	expect(refused.status).toBe(402);
 	expect(upstream).toHaveLength(1);
 	await fromBox(next.turn, `/cli/turns/${next.turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
+test("a Dev adds a follow-up for a person from its box and finds it in the chat's tasks", async () => {
+	const { groupId, turn } = await messaged("remind me to call the venue");
+	const added = await fromBox(turn, "/cli/tasks", {
+		title: "Call the venue",
+		assignee: "Owner",
+		due: "2030-01-15 09:00",
+		remind: true,
+	});
+	expect(added.status).toBe(201);
+	const { task } = (await added.json()) as { task: { id: string } };
+	const listed = await handleBoxRequest(
+		{ keys, turns: deps },
+		new Request("http://api.test/cli/tasks?status=open", {
+			headers: boxHeaders(turn),
+		}),
+		"/cli/tasks",
+	);
+	expect(await listed.json()).toEqual({
+		tasks: [
+			{
+				id: task.id,
+				title: "Call the venue",
+				description: "",
+				status: "todo",
+				due: null,
+				scheduledAt: "2030-01-15T09:00:00.000Z",
+				remind: true,
+				assignee: "Owner",
+			},
+		],
+		total: 1,
+		nextOffset: null,
+	});
+	const refused = await fromBox(turn, "/cli/tasks", {
+		title: "Standup",
+		repeat: "every weekday at 9",
+	});
+	expect(refused.status).toBe(400);
+	const boot = await owner.chats.bootstrap({ organizationId: ORG });
+	expect(
+		boot.messages.find((message) => message.taskId === task.id),
+	).toMatchObject({ groupId, authorDevId: turn.agentId, turnId: turn.turnId });
+	await owner.chats.deleteTask({ taskId: task.id });
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
 		stopReason: "end_turn",
 	});
 	await runs.idle();

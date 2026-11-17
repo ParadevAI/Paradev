@@ -1422,6 +1422,13 @@
       "when": 1794898704021,
       "tag": "0202_chats_agent_plugins",
       "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1794909574690,
+      "tag": "0203_chats_tasks",
+      "breakpoints": true
     }
   ]
 }

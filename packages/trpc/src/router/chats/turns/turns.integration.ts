@@ -171,26 +171,14 @@ test("a 1:1's Dev answers every message, and the chat hears each step", async ()
 	]);
 });
 
-test("in a group a mention of its own Dev, a follow-up, or a member's mention of their own Dev wakes one", async () => {
+test("in a group a mention of its own Dev, or a follow-up to its reply, wakes it", async () => {
 	const created = await owner.chats.createGroup({
 		organizationId: ORG,
 		title: "Launch",
 	});
 	const groupId = created.group.id;
 	await owner.chats.addMember({ groupId, userId: MEMBER });
-	const mine = await member.chats.createDev({
-		organizationId: ORG,
-		name: "Helper",
-		color: COLOR,
-		description: "Helps",
-	});
-	await member.chats.addDevToGroup({ groupId, devId: mine.dev.id });
-
 	await owner.chats.sendMessage({ groupId, text: "morning all" });
-	await owner.chats.sendMessage({
-		groupId,
-		text: `${mentionToken({ kind: "dev", id: mine.dev.id })} can you help`,
-	});
 	await runs.idle();
 	expect(started).toEqual([]);
 
@@ -210,13 +198,35 @@ test("in a group a mention of its own Dev, a follow-up, or a member's mention of
 	expect(followUp.checkReply).toBe(false);
 	await reply(followUp, "these");
 	await runs.idle();
+});
 
-	// A member wakes their own Dev by mentioning it; nobody else can.
+test("a member wakes their own Dev in a group by mentioning it; nobody else can", async () => {
+	const created = await owner.chats.createGroup({
+		organizationId: ORG,
+		title: "Launch",
+	});
+	const groupId = created.group.id;
+	await owner.chats.addMember({ groupId, userId: MEMBER });
+	const mine = await member.chats.createDev({
+		organizationId: ORG,
+		name: "Helper",
+		color: COLOR,
+		description: "Helps",
+	});
+	await member.chats.addDevToGroup({ groupId, devId: mine.dev.id });
+
+	await owner.chats.sendMessage({
+		groupId,
+		text: `${mentionToken({ kind: "dev", id: mine.dev.id })} can you help`,
+	});
+	await runs.idle();
+	expect(started).toEqual([]);
+
 	await member.chats.sendMessage({
 		groupId,
 		text: `${mentionToken({ kind: "dev", id: mine.dev.id })} can you help`,
 	});
-	const own = await startedTurn(3);
+	const own = await startedTurn(1);
 	expect(own.agentId).toBe(mine.dev.id);
 	expect(own.ownerOneToOne).toBe(false);
 	await reply(own, "yes");

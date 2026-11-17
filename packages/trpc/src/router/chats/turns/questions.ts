@@ -207,7 +207,11 @@ export async function askQuestion(
 	const isForm = input.kind === "form";
 	const { question, message } = await dbWs.transaction(async (tx) => {
 		const [turn] = await tx
-			.select({ status: chatsTurns.status, parent: chatsTurns.parentTurnId })
+			.select({
+				status: chatsTurns.status,
+				parent: chatsTurns.parentTurnId,
+				taskId: chatsTurns.taskId,
+			})
 			.from(chatsTurns)
 			.where(eq(chatsTurns.id, claims.turnId));
 		if (turn?.status !== "running" || turn.parent) {
@@ -223,6 +227,7 @@ export async function askQuestion(
 				groupId: claims.groupId,
 				agentId: claims.agentId,
 				turnId: claims.turnId,
+				taskId: turn.taskId,
 				kind: input.kind,
 				title: input.title,
 				body: isForm ? "" : input.body,

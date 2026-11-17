@@ -68,7 +68,28 @@ import {
 	listingDetail,
 	listingSeeds,
 } from "./registry/registry";
-import { chatsTurnRuntime, triggerTurns, watchTicket } from "./turns";
+import {
+	chatTaskDetail,
+	commentOnChatTask,
+	createChatTask,
+	deleteChatTask,
+	startChatTask,
+	TaskError,
+	taskInputSchema,
+	taskPatchSchema,
+	updateChatTask,
+} from "./tasks/chat-tasks";
+import {
+	chatTasksByIds,
+	chatTasksOfGroups,
+	taskView,
+} from "./tasks/task-store";
+import {
+	chatsTurnRuntime,
+	rearmChatTasks,
+	triggerTurns,
+	watchTicket,
+} from "./turns";
 import { enqueueInstalledTurn } from "./turns/engine";
 import { answerQuestion, answerSchema, QuestionError } from "./turns/questions";
 import {
@@ -95,6 +116,49 @@ const forbidden = (message: string) =>
 	new TRPCError({ code: "FORBIDDEN", message });
 const invalid = (message: string) =>
 	new TRPCError({ code: "BAD_REQUEST", message });
+
+/** How long a done task stays in what a chat loads at start. */
+const DONE_TASK_DAYS = 30;
+
+/** A task error as the app's API answers it. */
+async function tasked<T>(work: Promise<T>): Promise<T> {
+	try {
+		return await work;
+	} catch (error) {
+		if (!(error instanceof TaskError)) throw error;
+		throw new TRPCError({
+			code:
+				error.status === 403
+					? "FORBIDDEN"
+					: error.status === 404
+						? "NOT_FOUND"
+						: error.status === 409
+							? "CONFLICT"
+							: "BAD_REQUEST",
+			message: error.message,
+		});
+	}
+}
+
+/** The tasks the messages carry as cards. */
+async function cardTasks(messages: ApiMessage[]) {
+	const ids = [...new Set(messages.flatMap((message) => message.taskId ?? []))];
+	return (await chatTasksByIds(ids)).map(taskView);
+}
+
+/** The chats' open tasks, those done lately, and any a loaded message carries. */
+async function startTasks(groupIds: string[], messages: ApiMessage[]) {
+	const since = Date.now() - DONE_TASK_DAYS * 24 * 60 * 60_000;
+	const carried = new Set(messages.flatMap((message) => message.taskId ?? []));
+	return (await chatTasksOfGroups(groupIds))
+		.filter(
+			(found) =>
+				found.status !== "done" ||
+				carried.has(found.task.id) ||
+				(found.task.completedAt?.getTime() ?? Date.now()) > since,
+		)
+		.map(taskView);
+}
 
 const toTurnDetails = (turn: typeof chatsTurns.$inferSelect) => ({
 	id: turn.id,
@@ -465,6 +529,7 @@ export const chatsRouter = {
 		.query(async ({ ctx, input }): Promise<Bootstrap> => {
 			const user = ctx.session.user;
 			await assertOrgMember(user.id, input.organizationId);
+			rearmChatTasks();
 			const groupIds = await groupIdsOf(user.id, input.organizationId);
 			const [agents, recent] = await Promise.all([
 				visibleAgents(user.id, input.organizationId, groupIds),
@@ -494,7 +559,7 @@ export const chatsRouter = {
 					briefs: [],
 				};
 			}
-			const [groups, links, reads, unread, briefs] = await Promise.all([
+			const [groups, links, reads, unread, briefs, tasks] = await Promise.all([
 				loadGroups(groupIds),
 				db
 					.select()
@@ -506,9 +571,11 @@ export const chatsRouter = {
 					.select()
 					.from(chatsBriefs)
 					.where(inArray(chatsBriefs.groupId, groupIds)),
+				startTasks(groupIds, recent.messages),
 			]);
 			return {
 				...base,
+				tasks,
 				groups,
 				groupDevs: links.map(toGroupAgent),
 				messages: recent.messages,
@@ -580,11 +647,24 @@ export const chatsRouter = {
 				text: z.string().trim().min(1).max(TEXT_MAX),
 				clientId: z.string().min(1).max(100).optional(),
 				replyToId: z.string().uuid().optional(),
+				/** A `/task` message: the task it makes, carried as its card. */
+				task: taskInputSchema.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }): Promise<SendResult> => {
 			const userId = ctx.session.user.id;
 			await assertMember(userId, input.groupId);
+			if (input.task) {
+				return tasked(
+					createChatTask(
+						chatsTurnRuntime(),
+						{ kind: "user", userId },
+						input.groupId,
+						input.task,
+						{ messageText: input.text, clientId: input.clientId },
+					),
+				);
+			}
 			if (input.clientId) {
 				const [sent] = await db
 					.select()
@@ -733,6 +813,95 @@ export const chatsRouter = {
 			return ticket;
 		}),
 
+	/** A task in a chat, from the task form. Its card is the message it returns. */
+	createTask: personProcedure
+		.input(
+			groupInput.extend({
+				task: taskInputSchema,
+				clientId: z.string().min(1).max(100).optional(),
+			}),
+		)
+		.mutation(
+			({ ctx, input }): Promise<SendResult> =>
+				tasked(
+					createChatTask(
+						chatsTurnRuntime(),
+						{ kind: "user", userId: ctx.session.user.id },
+						input.groupId,
+						input.task,
+						{ clientId: input.clientId },
+					),
+				),
+		),
+
+	updateTask: personProcedure
+		.input(z.object({ taskId: z.string().uuid(), patch: taskPatchSchema }))
+		.mutation(({ ctx, input }) =>
+			tasked(
+				updateChatTask(
+					chatsTurnRuntime(),
+					{ kind: "user", userId: ctx.session.user.id },
+					input.taskId,
+					input.patch,
+				),
+			),
+		),
+
+	/** Starts a task: its Dev gets to work, or a person's task moves to in progress. */
+	startTask: personProcedure
+		.input(z.object({ taskId: z.string().uuid() }))
+		.mutation(({ ctx, input }) =>
+			tasked(
+				startChatTask(
+					chatsTurnRuntime(),
+					{ kind: "user", userId: ctx.session.user.id },
+					input.taskId,
+				),
+			),
+		),
+
+	commentOnTask: personProcedure
+		.input(
+			z.object({
+				taskId: z.string().uuid(),
+				text: z.string().trim().min(1).max(TEXT_MAX),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => ({
+			activity: await tasked(
+				commentOnChatTask(
+					chatsTurnRuntime(),
+					{ kind: "user", userId: ctx.session.user.id },
+					input.taskId,
+					input.text,
+				),
+			),
+		})),
+
+	/** A task's timeline, oldest first. */
+	taskActivity: personProcedure
+		.input(z.object({ taskId: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			const { activity } = await tasked(
+				chatTaskDetail(
+					{ kind: "user", userId: ctx.session.user.id },
+					input.taskId,
+				),
+			);
+			return { activity };
+		}),
+
+	deleteTask: personProcedure
+		.input(z.object({ taskId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await tasked(
+				deleteChatTask(
+					{ kind: "user", userId: ctx.session.user.id },
+					input.taskId,
+				),
+			);
+		}),
+
 	/** A person's answer to a Dev's question in a chat they are in. The first answer wins. */
 	answerQuestion: personProcedure
 		.input(
@@ -847,7 +1016,7 @@ export const chatsRouter = {
 		.query(async ({ ctx, input }): Promise<ApiMessagePage> => {
 			await assertMember(ctx.session.user.id, input.groupId);
 			const messages = await listMessages(input.groupId, input);
-			return { messages, apps: [], tasks: [] };
+			return { messages, apps: [], tasks: await cardTasks(messages) };
 		}),
 
 	editMessage: personProcedure

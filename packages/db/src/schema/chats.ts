@@ -521,3 +521,119 @@ export const chatsAgentSeedFiles = chatsSchema.table(
 	},
 	(t) => [primaryKey({ columns: [t.agentId, t.path] })],
 );
+
+/** A repeating chat task: each occurrence is a task of its own, made when its time comes. */
+export const chatsTaskSeries = chatsSchema.table(
+	"task_series",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		groupId: uuid("group_id")
+			.notNull()
+			.references(() => chatsGroups.id, { onDelete: "cascade" }),
+		title: text("title").notNull(),
+		description: text("description").notNull().default(""),
+		assigneeUserId: uuid("assignee_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		assigneeAgentId: uuid("assignee_agent_id").references(
+			() => chatsAgents.id,
+			{ onDelete: "cascade" },
+		),
+		rrule: text("rrule").notNull(),
+		timezone: text("timezone").notNull(),
+		dtstart: timestamp("dtstart", { withTimezone: true }).notNull(),
+		/** Raised by every change to the schedule, so a run armed for an older one does nothing. */
+		version: integer("version").notNull().default(0),
+		/** Null once the rule has run out. */
+		nextAt: timestamp("next_at", { withTimezone: true }),
+		createdBy: uuid("created_by").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		createdByAgentId: uuid("created_by_agent_id").references(
+			() => chatsAgents.id,
+			{ onDelete: "set null" },
+		),
+		createdAt: createdAt(),
+	},
+	(t) => [index("task_series_group_idx").on(t.groupId)],
+);
+
+/**
+ * What a task has only because it lives in a chat: the chat, an agent as
+ * assignee, a time to run or remind at, and its series. The task itself is a
+ * row of `tasks`, so it shows wherever tasks do.
+ */
+export const chatsTasks = chatsSchema.table(
+	"tasks",
+	{
+		taskId: uuid("task_id")
+			.primaryKey()
+			.references(() => tasks.id, { onDelete: "cascade" }),
+		groupId: uuid("group_id")
+			.notNull()
+			.references(() => chatsGroups.id, { onDelete: "cascade" }),
+		/** Set in place of the task's own assignee, never with it. */
+		assigneeAgentId: uuid("assignee_agent_id").references(
+			() => chatsAgents.id,
+			{ onDelete: "set null" },
+		),
+		createdByAgentId: uuid("created_by_agent_id").references(
+			() => chatsAgents.id,
+			{ onDelete: "set null" },
+		),
+		scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+		remind: boolean("remind").notNull().default(false),
+		/** Raised by every change to when or who, so a run armed for an older one does nothing. */
+		scheduleVersion: integer("schedule_version").notNull().default(0),
+		seriesId: uuid("series_id").references(() => chatsTaskSeries.id, {
+			onDelete: "set null",
+		}),
+		occurrenceAt: timestamp("occurrence_at", { withTimezone: true }),
+		createdAt: createdAt(),
+	},
+	(t) => [
+		index("tasks_group_idx").on(t.groupId),
+		index("tasks_assignee_agent_idx")
+			.on(t.assigneeAgentId)
+			.where(sql`${t.assigneeAgentId} is not null`),
+		uniqueIndex("tasks_series_occurrence_idx")
+			.on(t.seriesId, t.occurrenceAt)
+			.where(sql`${t.seriesId} is not null`),
+	],
+);
+
+export const chatsTaskNoteKind = chatsSchema.enum("task_note_kind", [
+	"created",
+	"assigned",
+	"scheduled",
+	"started",
+	"progress",
+	"comment",
+	"status",
+	"done",
+	"reopened",
+	"reminded",
+	"edited",
+	"failed",
+]);
+
+/** A chat task's timeline: comments, an agent's progress notes, and what happened to it. Neither actor set: the system did it. */
+export const chatsTaskNotes = chatsSchema.table(
+	"task_notes",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		taskId: uuid("task_id")
+			.notNull()
+			.references(() => tasks.id, { onDelete: "cascade" }),
+		kind: chatsTaskNoteKind("kind").notNull(),
+		text: text("text").notNull().default(""),
+		userId: uuid("user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		agentId: uuid("agent_id").references(() => chatsAgents.id, {
+			onDelete: "set null",
+		}),
+		createdAt: createdAt(),
+	},
+	(t) => [index("task_notes_task_created_idx").on(t.taskId, t.createdAt)],
+);

@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { env } from "../../../env";
+import { rearmTasks } from "../tasks/chat-tasks";
 import { CHATS_BOX_API_PATH } from "./box-path";
 import { type BoxKeys, generateBoxKeys, loadBoxKeys } from "./box-tokens";
 import { dockerBoxes } from "./docker-boxes";
@@ -19,7 +20,11 @@ const SCRIPTED_THINK_MS = 1_500;
  * edit, and the runs in flight and the boxes' keys must outlive that.
  */
 const held = globalThis as typeof globalThis & {
-	__chatsTurns?: { runtime?: TurnDeps | null; keys?: Promise<BoxKeys> };
+	__chatsTurns?: {
+		runtime?: TurnDeps | null;
+		keys?: Promise<BoxKeys>;
+		rearmed?: boolean;
+	};
 };
 held.__chatsTurns ??= {};
 const state = held.__chatsTurns;
@@ -121,6 +126,16 @@ export function chatsTurnRuntime(): TurnDeps | null {
 					: scriptedRuntime();
 	}
 	return state.runtime;
+}
+
+/** Tasks with a time still to come get their runs again, once per process. */
+export function rearmChatTasks() {
+	const runtime = chatsTurnRuntime();
+	if (!runtime || state.rearmed) return;
+	state.rearmed = true;
+	rearmTasks(runtime).catch((error: unknown) =>
+		console.error("[chats] tasks were not re-armed:", error),
+	);
 }
 
 /** Replaces the runtime, for tests. */

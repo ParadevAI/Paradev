@@ -3,6 +3,24 @@ import { chatsAgents, chatsModelUsage, chatsTurns } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
+import {
+	chatTaskDetail,
+	commentOnChatTask,
+	createChatTask,
+	deleteChatTask,
+	devActor,
+	startChatTask,
+	TaskError,
+	updateChatTask,
+} from "../tasks/chat-tasks";
+import {
+	cliFields,
+	cliTaskInput,
+	cliTaskPatch,
+	cliTaskQuery,
+	cliTasks,
+	listCliTasks,
+} from "../tasks/cli-tasks";
 import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
 import type { BoxKeys } from "./box-tokens";
 import {
@@ -309,6 +327,13 @@ async function message(deps: BoxApiDeps, request: Request, endsTurn: boolean) {
 	const claims = await boxTurn(deps.keys, request.headers);
 	const { text } = devText.parse(await request.json());
 	const posted = await postDevMessage(claims, { text, endsTurn });
+	if (posted === "task") {
+		throw new BoxRequestError(
+			409,
+			"task_turn",
+			"This is a task turn: your final message is your note on the task. To tell the chat something, use send_update.",
+		);
+	}
 	if (!posted) {
 		throw new BoxRequestError(
 			409,
@@ -388,6 +413,57 @@ async function shareFile(deps: BoxApiDeps, request: Request) {
 	return json(201, shared);
 }
 
+const taskComment = z.object({ text: z.string().trim().min(1).max(10_000) });
+
+/** `dev task`: a Dev's work on the tasks of its turn's chat. */
+async function tasks(deps: BoxApiDeps, request: Request, path: string) {
+	const claims = await boxTurn(deps.keys, request.headers, {
+		background: true,
+	});
+	const actor = await devActor(claims);
+	const now = new Date();
+	if (path === "/cli/tasks") {
+		const input = cliTaskInput.parse(await request.json());
+		const { task } = await createChatTask(
+			deps.turns,
+			actor,
+			claims.groupId,
+			cliFields(input, now),
+		);
+		const [view] = task ? await cliTasks([task]) : [];
+		return json(201, { task: view });
+	}
+	const action =
+		/^\/cli\/tasks\/([0-9a-f-]{36})\/(update|done|reopen|start|comments|delete)$/.exec(
+			path,
+		);
+	const taskId = action?.[1];
+	if (!taskId)
+		return json(404, { code: "not_found", message: "Unknown route" });
+	if (action[2] === "comments") {
+		const { text } = taskComment.parse(await request.json());
+		await commentOnChatTask(deps.turns, actor, taskId, text);
+		return json(201, { logged: true });
+	}
+	if (action[2] === "delete") {
+		await deleteChatTask(actor, taskId);
+		return new Response(null, { status: 204 });
+	}
+	const task =
+		action[2] === "start"
+			? await startChatTask(deps.turns, actor, taskId)
+			: await updateChatTask(
+					deps.turns,
+					actor,
+					taskId,
+					action[2] === "update"
+						? cliFields(cliTaskPatch.parse(await request.json()), now)
+						: { status: action[2] === "done" ? "done" : "todo" },
+				);
+	const [view] = await cliTasks([task]);
+	return json(200, { task: view });
+}
+
 const noteText = z.object({ text: z.string().trim().min(1).max(2_000) });
 
 const waitSeconds = z.coerce
@@ -420,6 +496,21 @@ async function read(deps: BoxApiDeps, request: Request, path: string) {
 	}
 	if (path === "/cli/files") {
 		return json(200, { files: await chatFiles(claims.groupId) });
+	}
+	if (path === "/cli/tasks") {
+		const query = cliTaskQuery.parse(
+			Object.fromEntries(new URL(request.url).searchParams),
+		);
+		return json(200, await listCliTasks(claims.groupId, claims.agentId, query));
+	}
+	const shown = /^\/cli\/tasks\/([0-9a-f-]{36})$/.exec(path);
+	if (shown?.[1]) {
+		const { task, activity } = await chatTaskDetail(
+			await devActor(claims),
+			shown[1],
+		);
+		const [view] = await cliTasks([task]);
+		return json(200, { task: view, activity });
 	}
 	const content = /^\/cli\/files\/([0-9a-f-]{36})\/content$/.exec(path);
 	if (content?.[1]) {
@@ -486,6 +577,9 @@ export async function handleBoxRequest(
 			await cancelQuestion(claims, settling[1]);
 			return new Response(null, { status: 204 });
 		}
+		if (path === "/cli/tasks" || path.startsWith("/cli/tasks/")) {
+			return await tasks(deps, request, path);
+		}
 		if (path === "/cli/reply") return await message(deps, request, true);
 		if (path === "/cli/messages") return await message(deps, request, false);
 		return json(404, { code: "not_found", message: "Unknown route" });
@@ -493,7 +587,11 @@ export async function handleBoxRequest(
 		if (error instanceof AskError) {
 			return json(error.status, { code: "ask", message: error.message });
 		}
-		if (error instanceof BoxRequestError || error instanceof QuestionError) {
+		if (
+			error instanceof BoxRequestError ||
+			error instanceof QuestionError ||
+			error instanceof TaskError
+		) {
 			return json(error.status, { code: error.code, message: error.message });
 		}
 		if (error instanceof z.ZodError) {

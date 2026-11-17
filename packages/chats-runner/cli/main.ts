@@ -37,6 +37,121 @@ const flag = (args: string[], name: string) => {
 	return at >= 0 ? args[at + 1] : undefined;
 };
 
+interface CliTask {
+	id: string;
+	title: string;
+	description: string;
+	status: "todo" | "in_progress" | "done";
+	due: string | null;
+	scheduledAt: string | null;
+	remind: boolean;
+	assignee: string | null;
+}
+
+const TASK_MARK = { todo: "[ ]", in_progress: "[~]", done: "[x]" };
+
+function formatTask(task: CliTask): string {
+	const details = [
+		...(task.due ? [`due ${task.due}`] : []),
+		...(task.scheduledAt
+			? [
+					`${task.remind ? "remind" : "at"} ${task.scheduledAt.slice(0, 16).replace("T", " ")} UTC`,
+				]
+			: []),
+		...(task.assignee ? [`@${task.assignee}`] : []),
+	];
+	return `${task.id}  ${TASK_MARK[task.status]} ${task.title}${details.length ? ` (${details.join(", ")})` : ""}`;
+}
+
+/** The flags of `dev task add` and `dev task update`, as the API takes them. */
+function taskFields(args: string[]) {
+	const text = (name: string) => flag(args, name);
+	return {
+		...(text("--title") ? { title: text("--title") } : {}),
+		...(text("--description") !== undefined
+			? { description: text("--description") }
+			: {}),
+		...(text("--status") ? { status: text("--status") } : {}),
+		...(text("--assignee") ? { assignee: text("--assignee") } : {}),
+		...(text("--due") ? { due: text("--due") } : {}),
+		...(text("--repeat") ? { repeat: text("--repeat") } : {}),
+		...(args.includes("--remind") ? { remind: true } : {}),
+	};
+}
+
+/** The words before the first flag. */
+const leading = (args: string[]) => {
+	const end = args.findIndex((arg) => arg.startsWith("--"));
+	return (end < 0 ? args : args.slice(0, end)).join(" ").trim();
+};
+
+async function taskCommand([action, ...args]: string[]) {
+	const id = args[0];
+	if (action === "add") {
+		const title = leading(args);
+		if (!title) throw new Error(USAGE);
+		const { task } = (await call("/cli/tasks", {
+			...taskFields(args),
+			title,
+		})) as { task: CliTask };
+		console.log(`Added ${formatTask(task)}`);
+	} else if (action === "list") {
+		const query = new URLSearchParams();
+		for (const name of ["assignee", "status", "search", "limit", "offset"]) {
+			const value = flag(args, `--${name}`);
+			if (value) query.set(name, value);
+		}
+		const { tasks, total, nextOffset } = (await call(
+			`/cli/tasks?${query}`,
+		)) as { tasks: CliTask[]; total: number; nextOffset: number | null };
+		for (const task of tasks) console.log(formatTask(task));
+		if (tasks.length === 0) console.log("No tasks.");
+		if (nextOffset !== null) {
+			console.log(
+				`${nextOffset - tasks.length + 1}–${nextOffset} of ${total}. More: add --offset ${nextOffset}`,
+			);
+		}
+	} else if (action === "show" && id) {
+		const { task, activity } = (await call(`/cli/tasks/${id}`)) as {
+			task: CliTask;
+			activity: { kind: string; text: string; at: string }[];
+		};
+		console.log(formatTask(task));
+		if (task.description) console.log(`\n${task.description}`);
+		if (activity.length) console.log("\nActivity:");
+		for (const entry of activity) {
+			console.log(
+				`[${entry.at.slice(0, 16).replace("T", " ")}] ${entry.kind}${entry.text ? `: ${entry.text}` : ""}`,
+			);
+		}
+	} else if (action === "update" && id) {
+		const { task } = (await call(
+			`/cli/tasks/${id}/update`,
+			taskFields(args.slice(1)),
+		)) as { task: CliTask };
+		console.log(`Updated ${formatTask(task)}`);
+	} else if (
+		(action === "start" || action === "done" || action === "reopen") &&
+		id
+	) {
+		const { task } = (await call(`/cli/tasks/${id}/${action}`, {})) as {
+			task: CliTask;
+		};
+		const said = { start: "Started", done: "Done", reopen: "Reopened" };
+		console.log(`${said[action]} ${formatTask(task)}`);
+	} else if (action === "comment" && id) {
+		const text = await textOf(args.slice(1));
+		if (!text) throw new Error(USAGE);
+		await call(`/cli/tasks/${id}/comments`, { text });
+		console.log("Logged.");
+	} else if (action === "delete" && id) {
+		await call(`/cli/tasks/${id}/delete`, {});
+		console.log("Deleted.");
+	} else {
+		throw new Error(USAGE);
+	}
+}
+
 const FILE_TYPES: Record<string, string> = {
 	".pdf": "application/pdf",
 	".png": "image/png",
@@ -78,7 +193,14 @@ const USAGE = `Usage:
   dev ask <name-or-id> "<question>"  ask another Dev in this chat; its answer comes back to you only
   dev file share <path> [--message "<text>"]  post a file from your folder in the chat (up to 25 MB)
   dev file list                   the files shared in the chat, with their ids
-  dev file get <id>               save one of them to your folder and print its path`;
+  dev file get <id>               save one of them to your folder and print its path
+  dev task add "<title>" [--description "<markdown>"] [--assignee <name|me>] [--due "<when>"] [--remind]
+  dev task list [--assignee me|<name>|none] [--status todo|in_progress|done|open] [--search "<words>"] [--limit 25] [--offset 0]
+  dev task show <id>              a task with its description and activity
+  dev task update <id> [--title] [--description] [--status todo|in_progress|done] [--assignee <name|me|none>] [--due "<when>"|none] [--remind]
+  dev task start|done|reopen <id>
+  dev task comment <id> "<note>"  a note on the task
+  dev task delete <id>`;
 
 const [command, ...rest] = process.argv.slice(2);
 
@@ -147,6 +269,8 @@ try {
 		const saved = join(FILES_DIR, name);
 		writeFileSync(saved, new Uint8Array(await response.arrayBuffer()));
 		console.log(saved);
+	} else if (command === "task") {
+		await taskCommand(rest);
 	} else if (command === "members") {
 		const { people, devs } = (await call("/cli/members")) as {
 			people: { name: string; role: string }[];
