@@ -1,8 +1,7 @@
 #!/bin/bash
 {{MARKER}}
-# CLI agent lifecycle hook — POSTs an AgentIdentity payload to the v2
-# host-service endpoint, with a v1 Electron hook fallback while both
-# terminal stacks are supported.
+# CLI agent lifecycle hook — POSTs an AgentIdentity payload to the
+# host-service endpoint.
 
 # Codex passes JSON as argv; Claude/Mastra/Droid/Kimi/Grok pipe via stdin.
 if [ -n "$1" ]; then
@@ -192,7 +191,7 @@ dispatch_to_host() {
   return 0
 }
 
-# Subagent events go to the host-service roster only: no v1 fallback, no
+# Subagent events go to the host-service roster only: no
 # session id (a Codex child's session_id is its own thread, never the
 # terminal's resumable session), and the raw event name so the host can tell
 # a start from a stop.
@@ -261,10 +260,6 @@ esac
 
 if [ -n "$SUPERSET_TERMINAL_ID" ]; then
   dispatch_to_host "{\"json\":{\"terminalId\":\"$(json_escape "$SUPERSET_TERMINAL_ID")\",\"eventType\":\"$(json_escape "$EVENT_TYPE")\",\"agent\":{\"agentId\":\"$(json_escape "$AGENT_ID")\",\"sessionId\":\"$(json_escape "$SESSION_ID")\"}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"
-  [ "$HOOK_ACCEPTED" = "1" ] && exit 0
-  # Delivered somewhere (2xx) but no host owned the terminal: keep the
-  # pre-existing "any 2xx wins" behavior and skip the v1 fallback.
-  [ "$HOOK_DELIVERED_2XX" = "1" ] && exit 0
 fi
 
 exit 0

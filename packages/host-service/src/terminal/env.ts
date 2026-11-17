@@ -299,11 +299,9 @@ export function buildV2TerminalEnv(
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
-	// v2 — agent posts to host-service so the renderer can play the sound
-	// client-side. No auth token: the endpoint is unauthenticated by design
-	// (chimes plus an idempotent linked-task In Progress nudge). The
-	// notify-hook script falls back to the electron endpoint when this URL
-	// isn't set.
+	// Agent hooks post here; without it the notify-hook script finds the
+	// host-service through the host manifests. No auth token: the endpoint is
+	// unauthenticated by design (chimes plus an idempotent linked-task nudge).
 	if (hostAgentHookUrl) {
 		env.SUPERSET_HOST_AGENT_HOOK_URL = hostAgentHookUrl;
 	}
