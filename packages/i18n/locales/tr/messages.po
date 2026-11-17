@@ -3335,9 +3335,6 @@ msgstr "Otomatik yükleme"
 msgid "Auto-fix CI"
 msgstr "CI otomatik düzeltme"
 
-msgid "Auto-run command"
-msgstr "Komutu otomatik çalıştır"
-
 msgid "Auto-run on new tab"
 msgstr "Yeni sekmede otomatik çalıştır"
 

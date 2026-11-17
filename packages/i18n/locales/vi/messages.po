@@ -3335,9 +3335,6 @@ msgstr "Tự động nạp thêm"
 msgid "Auto-fix CI"
 msgstr "Tự động sửa CI"
 
-msgid "Auto-run command"
-msgstr "Tự động chạy lệnh"
-
 msgid "Auto-run on new tab"
 msgstr "Tự chạy khi mở tab mới"
 

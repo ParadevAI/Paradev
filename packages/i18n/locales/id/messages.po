@@ -3335,9 +3335,6 @@ msgstr "Isi ulang otomatis"
 msgid "Auto-fix CI"
 msgstr "Perbaikan CI otomatis"
 
-msgid "Auto-run command"
-msgstr "Jalankan perintah otomatis"
-
 msgid "Auto-run on new tab"
 msgstr "Jalankan otomatis di tab baru"
 

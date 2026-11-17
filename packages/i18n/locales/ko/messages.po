@@ -3335,9 +3335,6 @@ msgstr "자동 충전"
 msgid "Auto-fix CI"
 msgstr "CI 자동 수정"
 
-msgid "Auto-run command"
-msgstr "명령 자동 실행"
-
 msgid "Auto-run on new tab"
 msgstr "새 탭에서 자동 실행"
 

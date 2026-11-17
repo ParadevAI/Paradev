@@ -3335,9 +3335,6 @@ msgstr "Automatické dobití"
 msgid "Auto-fix CI"
 msgstr "Automatická oprava CI"
 
-msgid "Auto-run command"
-msgstr "Automaticky spustit příkaz"
-
 msgid "Auto-run on new tab"
 msgstr "Automaticky spustit na nové kartě"
 

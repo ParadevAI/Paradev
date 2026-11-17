@@ -3335,9 +3335,6 @@ msgstr "Auto top-up"
 msgid "Auto-fix CI"
 msgstr "Auto-fix CI"
 
-msgid "Auto-run command"
-msgstr "Auto-run command"
-
 msgid "Auto-run on new tab"
 msgstr "Auto-run on new tab"
 

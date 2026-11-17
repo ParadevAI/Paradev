@@ -3335,9 +3335,6 @@ msgstr "自動加值"
 msgid "Auto-fix CI"
 msgstr "自動修正 CI"
 
-msgid "Auto-run command"
-msgstr "自動執行命令"
-
 msgid "Auto-run on new tab"
 msgstr "新建分頁時自動執行"
 

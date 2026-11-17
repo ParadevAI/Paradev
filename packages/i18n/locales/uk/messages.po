@@ -3329,9 +3329,6 @@ msgstr "Автопоповнення"
 msgid "Auto-fix CI"
 msgstr "Автовиправлення CI"
 
-msgid "Auto-run command"
-msgstr "Команда автозапуску"
-
 msgid "Auto-run on new tab"
 msgstr "Автозапуск у новій вкладці"
 

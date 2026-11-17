@@ -3335,9 +3335,6 @@ msgstr "Recharge automatique"
 msgid "Auto-fix CI"
 msgstr "Correction auto de la CI"
 
-msgid "Auto-run command"
-msgstr "Commande à exécution automatique"
-
 msgid "Auto-run on new tab"
 msgstr "Exécution auto. à l'ouverture d'un onglet"
 

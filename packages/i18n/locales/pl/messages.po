@@ -3335,9 +3335,6 @@ msgstr "Automatyczne doładowanie"
 msgid "Auto-fix CI"
 msgstr "Automatyczne naprawianie CI"
 
-msgid "Auto-run command"
-msgstr "Automatyczne polecenie"
-
 msgid "Auto-run on new tab"
 msgstr "Uruchamiaj automatycznie w nowej karcie"
 

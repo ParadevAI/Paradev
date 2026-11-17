@@ -3335,9 +3335,6 @@ msgstr "Automatisch nachkaufen"
 msgid "Auto-fix CI"
 msgstr "Automatische CI-Behebung"
 
-msgid "Auto-run command"
-msgstr "Befehl automatisch ausführen"
-
 msgid "Auto-run on new tab"
 msgstr "Automatisch bei neuem Tab starten"
 

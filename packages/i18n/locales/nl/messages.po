@@ -3335,9 +3335,6 @@ msgstr "Automatisch bijkopen"
 msgid "Auto-fix CI"
 msgstr "CI automatisch herstellen"
 
-msgid "Auto-run command"
-msgstr "Commando automatisch uitvoeren"
-
 msgid "Auto-run on new tab"
 msgstr "Automatisch uitvoeren bij nieuw tabblad"
 

@@ -3335,9 +3335,6 @@ msgstr "自动充值"
 msgid "Auto-fix CI"
 msgstr "自动修复 CI"
 
-msgid "Auto-run command"
-msgstr "自动运行命令"
-
 msgid "Auto-run on new tab"
 msgstr "新建标签页时自动运行"
 

@@ -3335,9 +3335,6 @@ msgstr "自動チャージ"
 msgid "Auto-fix CI"
 msgstr "CI の自動修正"
 
-msgid "Auto-run command"
-msgstr "コマンドを自動実行"
-
 msgid "Auto-run on new tab"
 msgstr "新しいタブで自動実行"
 
