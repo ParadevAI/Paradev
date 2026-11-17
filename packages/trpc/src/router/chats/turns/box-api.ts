@@ -17,6 +17,7 @@ import {
 	chatForDev,
 	enqueueNoticeTurn,
 	postDevMessage,
+	postDevNote,
 	settleTurn,
 	type TurnDeps,
 } from "./engine";
@@ -387,6 +388,8 @@ async function shareFile(deps: BoxApiDeps, request: Request) {
 	return json(201, shared);
 }
 
+const noteText = z.object({ text: z.string().trim().min(1).max(2_000) });
+
 const waitSeconds = z.coerce
 	.number()
 	.int()
@@ -462,6 +465,12 @@ export async function handleBoxRequest(
 		if (path === "/cli/ask") return await ask(deps, request);
 		if (path === "/cli/notifications") return await notice(deps, request);
 		if (path === "/cli/files") return await shareFile(deps, request);
+		if (path === "/cli/notify") {
+			const claims = await boxTurn(deps.keys, request.headers);
+			const { text } = noteText.parse(await request.json());
+			await postDevNote(claims, `says: ${text}`);
+			return new Response(null, { status: 204 });
+		}
 		if (path === "/cli/questions") {
 			const claims = await boxTurn(deps.keys, request.headers);
 			const asked = askSchema.parse(await request.json());

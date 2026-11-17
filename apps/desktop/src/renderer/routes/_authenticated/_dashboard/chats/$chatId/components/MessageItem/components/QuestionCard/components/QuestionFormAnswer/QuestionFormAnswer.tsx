@@ -72,12 +72,12 @@ export function QuestionFormAnswer({
 							return (
 								<Button
 									key={option.label}
-									variant="outline"
+									variant="ghost"
 									role={part.multiSelect ? "checkbox" : "radio"}
 									aria-checked={isOn}
 									className={cn(
-										"h-auto items-start justify-start gap-2 whitespace-normal py-2 text-left",
-										isOn && "border-highlight bg-highlight/10",
+										"h-auto items-start justify-start gap-2 whitespace-normal rounded-lg bg-background/50 py-2 text-left hover:bg-background/80",
+										isOn && "bg-highlight/15 hover:bg-highlight/20",
 									)}
 									onClick={() =>
 										change(index, togglePick(part, answer, option.label))

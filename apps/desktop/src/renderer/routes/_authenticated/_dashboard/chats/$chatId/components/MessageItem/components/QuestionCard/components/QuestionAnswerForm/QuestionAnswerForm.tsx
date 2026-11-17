@@ -51,9 +51,9 @@ export function QuestionAnswerForm({
 			{question.options.map((option) => (
 				<Button
 					key={option.label}
-					variant="outline"
+					variant="ghost"
 					disabled={isReadOnly}
-					className="h-auto flex-col items-start gap-0.5 whitespace-normal py-2 text-left"
+					className="h-auto flex-col items-start gap-0.5 whitespace-normal rounded-lg bg-background/50 py-2 text-left hover:bg-background/80"
 					onClick={() => onAnswer(option.label, false)}
 				>
 					<span className="font-medium text-sm">{option.label}</span>

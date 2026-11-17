@@ -1132,7 +1132,14 @@ export async function finishTurn(
 }
 
 /** A line with no author, which clients show as a centred note. */
-async function postNote(turn: TurnRow, error: string) {
+const postNote = (turn: TurnRow, error: string) =>
+	postDevNote(turn, `couldn't reply: ${error}`);
+
+/** A line about a Dev, shown as a note in its chat: no author, centred. */
+export async function postDevNote(
+	turn: { agentId: string; groupId: string },
+	said: string,
+) {
 	const [agent] = await db
 		.select({ name: chatsAgents.name })
 		.from(chatsAgents)
@@ -1141,7 +1148,7 @@ async function postNote(turn: TurnRow, error: string) {
 		.insert(chatsMessages)
 		.values({
 			groupId: turn.groupId,
-			text: `${agent?.name ?? "The Dev"} couldn't reply: ${error}`,
+			text: `${agent?.name ?? "The Dev"} ${said}`,
 		})
 		.returning();
 	if (!note) return;
