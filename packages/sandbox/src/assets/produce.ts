@@ -8,6 +8,8 @@
  *   bun run assets host-service      the runtime tarball from this checkout
  *   bun run assets claude [version]  Claude Code's native binary (default: latest)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
+ *   bun run assets opencode [version]  OpenCode's linux-x64 release, drive only
+ *   bun run assets pi [version]      Pi's linux-x64 release, drive only
  *   bun run assets all
  *
  * Each producer writes its files to .cache/assets/<sha256><suffix>, then
@@ -60,7 +62,9 @@ function rewriteRows(rows: Record<string, Asset>): void {
 	);
 	writeFileSync(ASSETS_JSON, `${JSON.stringify(sorted, null, "\t")}\n`);
 	for (const [name, row] of Object.entries(rows))
-		console.log(`${name}: ${assetObjectKey(row)} -> ${row.dest}`);
+		console.log(
+			`${name}: ${assetObjectKey(row)} -> ${row.dest ?? "agent-tools drive only"}`,
+		);
 }
 
 async function fetchBytes(url: string): Promise<Uint8Array> {
@@ -538,6 +542,63 @@ async function pdev(version?: string): Promise<void> {
 	});
 }
 
+/**
+ * An agent that boxes get only from the agent-tools drive: the row has no
+ * `dest`, so neither the image nor a boot fetches it.
+ */
+async function driveOnlyAgent(args: {
+	name: string;
+	repo: string;
+	asset: string;
+	version?: string;
+}): Promise<void> {
+	const tag = args.version ? `tags/v${args.version}` : "latest";
+	const release = JSON.parse(
+		await fetchText(
+			`https://api.github.com/repos/${args.repo}/releases/${tag}`,
+		),
+	) as {
+		tag_name: string;
+		assets: { name: string; digest: string; browser_download_url: string }[];
+	};
+	const pinned = release.tag_name.replace(/^v/, "");
+	const asset = release.assets.find((a) => a.name === args.asset);
+	if (!asset) throw new Error(`${args.name} ${pinned}: no ${args.asset}`);
+	const { sha256: hash } = cache(
+		await fetchBytes(asset.browser_download_url),
+		".tar.gz",
+	);
+	if (`sha256:${hash}` !== asset.digest)
+		throw new Error(
+			`${args.name} ${pinned}: sha256 ${hash}, release ${asset.digest}`,
+		);
+	rewriteRows({
+		[args.name]: {
+			sha256: hash,
+			suffix: ".tar.gz",
+			mode: "0644",
+			source: asset.browser_download_url,
+			version: pinned,
+		},
+	});
+}
+
+const opencode = (version?: string) =>
+	driveOnlyAgent({
+		name: "opencode",
+		repo: "anomalyco/opencode",
+		asset: "opencode-linux-x64.tar.gz",
+		version,
+	});
+
+const pi = (version?: string) =>
+	driveOnlyAgent({
+		name: "pi",
+		repo: "earendil-works/pi",
+		asset: "pi-linux-x64.tar.gz",
+		version,
+	});
+
 export const producers: Record<
 	string,
 	(version?: string) => Promise<void> | void
@@ -552,6 +613,8 @@ export const producers: Record<
 	claude,
 	codex,
 	pdev,
+	opencode,
+	pi,
 };
 
 if (import.meta.main) {

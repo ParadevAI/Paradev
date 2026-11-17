@@ -41,6 +41,8 @@ export const AGENT_TOOLS: readonly AgentTool[] = [
 	{ name: "claude", bin: "claude" },
 	{ name: "codex", bin: "bin/codex" },
 	{ name: "pdev", bin: "pdev/pdev" },
+	{ name: "opencode", bin: "opencode" },
+	{ name: "pi", bin: "pi/pi" },
 ];
 
 export interface AgentTool {
@@ -411,7 +413,7 @@ export function describeAgentToolsPublish(
 						]
 					: agent.outcome === "dropped"
 						? [
-								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}`,
+								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}, if the image has one`,
 							]
 						: [],
 			),

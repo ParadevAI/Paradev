@@ -140,6 +140,22 @@ describe("deriveStepVersions", () => {
 		expect(build({ salt: "x" })[1]?.version).not.toBe(build({})[1]?.version);
 	});
 
+	test("refuses a step that consumes a drive-only row", () => {
+		const f = fixture();
+		expect(() =>
+			deriveStepVersions({
+				steps: [
+					{ name: "one", assets: ["agent"], after: [], inputs: [], salt: "" },
+				],
+				assets: {
+					agent: { sha256: "d".repeat(64), suffix: ".tar.gz", mode: "0644" },
+				},
+				tools: walkRootfs(f.rootfs),
+				stepsDir: f.steps,
+			}),
+		).toThrow(/drive-only/);
+	});
+
 	test("refuses unknown assets, missing inputs and forward references", () => {
 		const f = fixture();
 		const tools = walkRootfs(f.rootfs);
@@ -225,6 +241,14 @@ describe("renderAssetsTsv", () => {
 		expect(Buffer.from(rows[1]?.[3] ?? "", "base64").toString()).toBe(
 			"/usr/local/share/superset/media/tool-1",
 		);
+	});
+
+	test("a drive-only row has no line, so no box fetches it", () => {
+		const tsv = renderAssetsTsv({
+			...assets,
+			agent: { sha256: "d".repeat(64), suffix: ".tar.gz", mode: "0644" },
+		});
+		expect(tsv).toBe(renderAssetsTsv(assets));
 	});
 
 	test("refuses a discard that is not the step's asset, or one two steps claim", () => {
