@@ -6,6 +6,12 @@ import { z } from "zod";
 import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
 import type { BoxKeys } from "./box-tokens";
 import {
+	chatFileContent,
+	chatFiles,
+	DEV_FILE_MAX_BYTES,
+	shareDevFile,
+} from "./dev-files";
+import {
 	AskError,
 	askDev,
 	chatForDev,
@@ -321,6 +327,50 @@ async function notice(deps: BoxApiDeps, request: Request) {
 	return new Response(null, { status: 202 });
 }
 
+const fileShare = z.object({
+	name: z
+		.string()
+		.trim()
+		.min(1)
+		.max(200)
+		.transform((name) => name.split(/[\\/]/).at(-1) ?? name),
+	type: z.string().trim().min(1).max(200).default("application/octet-stream"),
+	message: z.string().trim().max(TEXT_MAX).default(""),
+});
+
+/** `dev file share`: the file's bytes as the body, its name, type and caption in the query. */
+async function shareFile(deps: BoxApiDeps, request: Request) {
+	const claims = await boxTurn(deps.keys, request.headers);
+	const query = new URL(request.url).searchParams;
+	const input = fileShare.parse({
+		name: query.get("name") ?? "",
+		type: query.get("type") ?? undefined,
+		message: query.get("message") ?? undefined,
+	});
+	const bytes = new Uint8Array(await request.arrayBuffer());
+	if (bytes.byteLength === 0 || bytes.byteLength > DEV_FILE_MAX_BYTES) {
+		throw new BoxRequestError(
+			413,
+			"too_large",
+			"A shared file is between 1 byte and 25 MB",
+		);
+	}
+	const shared = await shareDevFile(claims, {
+		name: input.name,
+		contentType: input.type,
+		bytes,
+		text: input.message,
+	});
+	if (!shared) {
+		throw new BoxRequestError(
+			409,
+			"not_a_reply",
+			"This turn can't post in the chat",
+		);
+	}
+	return json(201, shared);
+}
+
 const readLimit = z.coerce.number().int().min(1).max(200).default(20);
 
 /** What a Dev reads of its turn's chat: `/cli/messages?limit=` and `/cli/members`. */
@@ -334,6 +384,24 @@ async function read(deps: BoxApiDeps, request: Request, path: string) {
 		);
 		const { messages } = await chatForDev(claims.groupId, limit);
 		return json(200, { messages });
+	}
+	if (path === "/cli/files") {
+		return json(200, { files: await chatFiles(claims.groupId) });
+	}
+	const content = /^\/cli\/files\/([0-9a-f-]{36})\/content$/.exec(path);
+	if (content?.[1]) {
+		const found = await chatFileContent(claims.groupId, content[1]);
+		if (!found)
+			return json(404, {
+				code: "not_found",
+				message: "No such file in this chat",
+			});
+		return new Response(found.body, {
+			headers: {
+				"content-type": found.file.contentType,
+				"x-dev-file-name": encodeURIComponent(found.file.name),
+			},
+		});
 	}
 	if (path === "/cli/members") {
 		const { people, devs } = await chatForDev(claims.groupId, 1);
@@ -363,6 +431,7 @@ export async function handleBoxRequest(
 		if (settle?.[1]) return await settled(deps, request, settle[1]);
 		if (path === "/cli/ask") return await ask(deps, request);
 		if (path === "/cli/notifications") return await notice(deps, request);
+		if (path === "/cli/files") return await shareFile(deps, request);
 		if (path === "/cli/reply") return await message(deps, request, true);
 		if (path === "/cli/messages") return await message(deps, request, false);
 		return json(404, { code: "not_found", message: "Unknown route" });

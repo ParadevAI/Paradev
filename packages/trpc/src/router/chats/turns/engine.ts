@@ -25,10 +25,11 @@ import {
 	sql,
 } from "drizzle-orm";
 import { publishChats } from "../publish";
-import { messageView, toUser } from "../views";
+import { messageView, sharedFiles, toUser } from "../views";
 import { mayUseParadev, turnApps } from "./app-access";
 import { type BoxKeys, signBoxCredential } from "./box-tokens";
 import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
+import { textWithFile } from "./dev-files";
 import { type Claim, TURN_MAX_MS, type TurnOutcome } from "./flow";
 import { loadRoster, mentionableDevs, resolveMentions } from "./roster";
 
@@ -489,9 +490,9 @@ async function messageTurnText(turn: TurnRow) {
 		["Why you", why],
 		["Time", formatTime(row.message.createdAt)],
 	]);
-	const body = renderMentions(
-		row.message.text,
-		(ref) => names.get(ref.id) ?? "someone",
+	const body = textWithFile(
+		renderMentions(row.message.text, (ref) => names.get(ref.id) ?? "someone"),
+		(await sharedFiles([row.message])).get(row.message.fileId ?? ""),
 	);
 	const cut = await interrupted(turn.agentId, row.message);
 	const unanswered = cut.length
@@ -743,6 +744,7 @@ export async function chatForDev(groupId: string, limit: number) {
 		...roster.map((dev) => [dev.id, dev.name] as const),
 		...people.map(({ user }) => [user.id, toUser(user).displayName] as const),
 	]);
+	const shared = await sharedFiles(rows.map(({ message }) => message));
 	return {
 		people: people.map(({ user, role }) => ({
 			id: user.id,
@@ -753,9 +755,9 @@ export async function chatForDev(groupId: string, limit: number) {
 		messages: rows.reverse().map(({ message, author, agent }) => ({
 			id: message.id,
 			author: agent?.name ?? (author ? toUser(author).displayName : "note"),
-			text: renderMentions(
-				message.text,
-				(ref) => names.get(ref.id) ?? "someone",
+			text: textWithFile(
+				renderMentions(message.text, (ref) => names.get(ref.id) ?? "someone"),
+				shared.get(message.fileId ?? ""),
 			),
 			at: message.createdAt.toISOString(),
 		})),
@@ -803,6 +805,7 @@ async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
 	]);
 	const names = new Map(roster.map((dev) => [dev.id, dev.name]));
 	const seenBefore = previous?.startedAt ?? null;
+	const recentFiles = await sharedFiles(rows.map(({ message }) => message));
 	return {
 		roster: roster
 			.map(
@@ -812,9 +815,9 @@ async function turnChat(turn: TurnRow): Promise<TurnStart["chat"]> {
 			.join("\n"),
 		recent: rows.reverse().map(({ message, author, agent }) => {
 			const who = agent?.name ?? (author ? toUser(author).displayName : "note");
-			const said = renderMentions(
-				message.text,
-				(ref) => names.get(ref.id) ?? "someone",
+			const said = textWithFile(
+				renderMentions(message.text, (ref) => names.get(ref.id) ?? "someone"),
+				recentFiles.get(message.fileId ?? ""),
 			);
 			return {
 				line: `- ${who}: ${said.length > LINE_MAX ? `${said.slice(0, LINE_MAX - 1)}…` : said}`,
