@@ -8,8 +8,8 @@
  *   bun run assets host-service      the runtime tarball from this checkout
  *   bun run assets claude [version]  Claude Code's native binary (default: latest)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
- *   bun run assets opencode [version]  OpenCode's linux-x64 release, drive only
- *   bun run assets pi [version]      Pi's linux-x64 release, drive only
+ *   bun run assets opencode [version]  OpenCode's linux-x64 release, drive only (default: newest past the cooldown)
+ *   bun run assets pi [version]      Pi's linux-x64 release, drive only (default: newest past the cooldown)
  *   bun run assets all
  *
  * Each producer writes its files to .cache/assets/<sha256><suffix>, then
@@ -542,9 +542,59 @@ async function pdev(version?: string): Promise<void> {
 	});
 }
 
+/** How old an upstream release must be before the release moves a drive-only agent to it. */
+export const AGENT_RELEASE_COOLDOWN_MS = 3 * 24 * 60 * 60 * 1000;
+
+export interface GithubRelease {
+	tag_name: string;
+	published_at: string | null;
+	draft: boolean;
+	prerelease: boolean;
+	assets: {
+		name: string;
+		digest?: string | null;
+		browser_download_url: string;
+		updated_at: string;
+	}[];
+}
+
+/**
+ * The highest stable `vX.Y.Z` release whose asset has been unchanged for the
+ * cooldown. An asset replaced on an old release counts from its replacement.
+ */
+export function pickCooledRelease(
+	releases: readonly GithubRelease[],
+	assetName: string,
+	now: number,
+	cooldownMs = AGENT_RELEASE_COOLDOWN_MS,
+): { version: string; asset: GithubRelease["assets"][number] } | undefined {
+	return releases
+		.flatMap((release) => {
+			const asset = release.assets.find((a) => a.name === assetName);
+			if (
+				release.draft ||
+				release.prerelease ||
+				!release.published_at ||
+				!asset ||
+				!/^v\d+\.\d+\.\d+$/.test(release.tag_name)
+			)
+				return [];
+			const changed = Math.max(
+				Date.parse(release.published_at),
+				Date.parse(asset.updated_at),
+			);
+			return changed <= now - cooldownMs
+				? [{ version: release.tag_name.slice(1), asset }]
+				: [];
+		})
+		.sort((a, b) => Bun.semver.order(b.version, a.version))[0];
+}
+
 /**
  * An agent that boxes get only from the agent-tools drive: the row has no
- * `dest`, so neither the image nor a boot fetches it.
+ * `dest`, so neither the image nor a boot fetches it. Without a version it
+ * takes the newest release past the cooldown; a version given by hand skips
+ * the cooldown. Either way the bytes must match GitHub's digest for the asset.
  */
 async function driveOnlyAgent(args: {
 	name: string;
@@ -552,33 +602,42 @@ async function driveOnlyAgent(args: {
 	asset: string;
 	version?: string;
 }): Promise<void> {
-	const tag = args.version ? `tags/v${args.version}` : "latest";
-	const release = JSON.parse(
-		await fetchText(
-			`https://api.github.com/repos/${args.repo}/releases/${tag}`,
-		),
-	) as {
-		tag_name: string;
-		assets: { name: string; digest: string; browser_download_url: string }[];
-	};
-	const pinned = release.tag_name.replace(/^v/, "");
-	const asset = release.assets.find((a) => a.name === args.asset);
-	if (!asset) throw new Error(`${args.name} ${pinned}: no ${args.asset}`);
-	const { sha256: hash } = cache(
-		await fetchBytes(asset.browser_download_url),
-		".tar.gz",
-	);
+	const api = `https://api.github.com/repos/${args.repo}/releases`;
+	const picked = args.version
+		? {
+				version: args.version,
+				asset: (
+					JSON.parse(
+						await fetchText(`${api}/tags/v${args.version}`),
+					) as GithubRelease
+				).assets.find((a) => a.name === args.asset),
+			}
+		: pickCooledRelease(
+				JSON.parse(await fetchText(`${api}?per_page=100`)) as GithubRelease[],
+				args.asset,
+				Date.now(),
+			);
+	if (!picked?.asset)
+		throw new Error(
+			`${args.name}: no ${args.asset} ${args.version ? `in v${args.version}` : "in a stable release past the cooldown"}`,
+		);
+	const { version, asset } = picked;
+	if (!asset.digest?.startsWith("sha256:"))
+		throw new Error(`${args.name} ${version}: GitHub publishes no digest`);
+	const bytes = await fetchBytes(asset.browser_download_url);
+	const hash = sha256(bytes);
 	if (`sha256:${hash}` !== asset.digest)
 		throw new Error(
-			`${args.name} ${pinned}: sha256 ${hash}, release ${asset.digest}`,
+			`${args.name} ${version}: sha256 ${hash}, release ${asset.digest}`,
 		);
+	cache(bytes, ".tar.gz");
 	rewriteRows({
 		[args.name]: {
 			sha256: hash,
 			suffix: ".tar.gz",
 			mode: "0644",
 			source: asset.browser_download_url,
-			version: pinned,
+			version,
 		},
 	});
 }

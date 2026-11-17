@@ -167,11 +167,11 @@
 		"node": 24
 	},
 	"opencode": {
-		"sha256": "588310a336fa3b9df36b3f0225b26f679d453efaad0cf3d66c3651ef3ec1647a",
+		"sha256": "fc0f81522aceeabac47693d88389efa2bc517ce74c2c38fd6967819fcc6e4d3b",
 		"suffix": ".tar.gz",
 		"mode": "0644",
-		"source": "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-linux-x64.tar.gz",
-		"version": "1.19.5"
+		"source": "https://github.com/anomalyco/opencode/releases/download/v2.3.0/opencode-linux-x64.tar.gz",
+		"version": "2.3.0"
 	},
 	"pdev": {
 		"sha256": "5a51852a4de0a40e20c0137b873f83e1b26255b4c5d01b6b0a2f608e152d8535",
