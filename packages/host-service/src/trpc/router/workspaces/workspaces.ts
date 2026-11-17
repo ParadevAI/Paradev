@@ -508,7 +508,7 @@ async function registerLocalWorkspace(args: {
 		});
 	}
 
-	void ctx.api.workspace.trackCreated
+	void ctx.api.v2Workspace.trackCreated
 		.mutate({
 			workspaceId: localRow.id,
 			organizationId: ctx.organizationId,
@@ -788,7 +788,7 @@ export const workspacesRouter = router({
 				worktreePath = repoPath;
 				workspaceRow = toCloudShape(row, ctx.organizationId);
 				if (!alreadyExists)
-					void ctx.api.workspace.trackCreated
+					void ctx.api.v2Workspace.trackCreated
 						.mutate({
 							workspaceId: row.id,
 							organizationId: ctx.organizationId,

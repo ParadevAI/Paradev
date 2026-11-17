@@ -108,8 +108,9 @@ export const appRouter = createTRPCRouter({
 	},
 	project: projectRouter,
 	workspace: workspaceRouter,
-	// Every host-service released before this rename calls these names. Keep them
-	// until MINIMUM_DESKTOP_VERSION is past the first release that uses the new ones.
+	// Every released host-service calls these names, and so does this one until
+	// the API with the new names is live. Keep them until MINIMUM_DESKTOP_VERSION
+	// is past the first release that calls the new ones.
 	v2Project: projectRouter,
 	v2Workspace: { ...workspaceRouter, ...legacyWorkspaceRouter },
 });
