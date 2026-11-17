@@ -612,7 +612,10 @@ export const auth = betterAuth({
 							),
 						);
 					if ((otherMemberships?.value ?? 0) === 0) {
-						throw new Error("You should be a member of at least one team");
+						throw new APIError("BAD_REQUEST", {
+							message: "You should be a member of at least one team",
+							code: "MUST_BELONG_TO_A_TEAM",
+						});
 					}
 				},
 

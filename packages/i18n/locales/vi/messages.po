@@ -14566,6 +14566,9 @@ msgstr "tổ chức {id}"
 msgid "Organization {id}"
 msgstr "Tổ chức {id}"
 
+msgid "Organization already exists"
+msgstr "Tổ chức đã tồn tại"
+
 msgid "Organization created successfully!"
 msgstr "Đã tạo tổ chức thành công!"
 
@@ -23212,6 +23215,9 @@ msgstr "Bạn có thể xem trang này nhưng không thể bình luận"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Không thể hoàn tác thao tác này. Các khung terminal sẽ hiện \"Process exited\" và có thể khởi động lại."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Bạn không thể rời tổ chức khi là chủ sở hữu duy nhất"
+
 msgid "You control the access"
 msgstr "Bạn kiểm soát quyền truy cập"
 
@@ -23247,6 +23253,9 @@ msgstr "Bạn cần thuộc về một tổ chức để kết nối tài khoả
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Bạn cần thuộc một tổ chức để dùng tích hợp."
+
+msgid "You should be a member of at least one team"
+msgstr "Bạn phải là thành viên của ít nhất một nhóm"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

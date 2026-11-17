@@ -14566,6 +14566,9 @@ msgstr "Organisation {id}"
 msgid "Organization {id}"
 msgstr "Organisation {id}"
 
+msgid "Organization already exists"
+msgstr "Organisation existiert bereits"
+
 msgid "Organization created successfully!"
 msgstr "Organisation erfolgreich erstellt!"
 
@@ -23212,6 +23215,9 @@ msgstr "Du kannst diese Seite ansehen, aber nicht kommentieren"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Das lässt sich nicht rückgängig machen. Terminal-Bereiche zeigen dann \"Process exited\" und können neu gestartet werden."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Du kannst die Organisation als einziger Eigentümer nicht verlassen"
+
 msgid "You control the access"
 msgstr "Sie behalten die Kontrolle"
 
@@ -23247,6 +23253,9 @@ msgstr "Sie müssen Teil einer Organisation sein, um Konten zu verbinden."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Du musst Teil einer Organisation sein, um Integrationen zu nutzen."
+
+msgid "You should be a member of at least one team"
+msgstr "Du musst Mitglied in mindestens einem Team sein"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

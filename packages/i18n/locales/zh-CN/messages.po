@@ -14566,6 +14566,9 @@ msgstr "组织{id}"
 msgid "Organization {id}"
 msgstr "组织{id}"
 
+msgid "Organization already exists"
+msgstr "组织已存在"
+
 msgid "Organization created successfully!"
 msgstr "组织创建成功！"
 
@@ -23212,6 +23215,9 @@ msgstr "你可以查看此页面，但不能评论"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "此操作无法撤销。终端窗格会显示“进程已退出”，之后可以重新启动。"
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "你是唯一的所有者，无法退出组织"
+
 msgid "You control the access"
 msgstr "访问权限由你掌控"
 
@@ -23247,6 +23253,9 @@ msgstr "您需要加入一个组织才能连接账户。"
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "你需要加入一个组织才能使用集成。"
+
+msgid "You should be a member of at least one team"
+msgstr "你必须至少属于一个团队"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

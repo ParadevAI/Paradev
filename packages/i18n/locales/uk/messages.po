@@ -14560,6 +14560,9 @@ msgstr "організація {id}"
 msgid "Organization {id}"
 msgstr "Організація {id}"
 
+msgid "Organization already exists"
+msgstr "Організація вже існує"
+
 msgid "Organization created successfully!"
 msgstr "Організацію успішно створено!"
 
@@ -23206,6 +23209,9 @@ msgstr "Ви можете переглядати цю сторінку, але �
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Цю дію неможливо скасувати. Панелі терміналів показуватимуть «Process exited», і їх можна буде перезапустити."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Ви не можете вийти з організації, бо ви її єдиний власник"
+
 msgid "You control the access"
 msgstr "Ви керуєте доступом"
 
@@ -23241,6 +23247,9 @@ msgstr "Щоб підключати облікові записи, потріб�
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Щоб використовувати інтеграції, потрібно бути учасником організації."
+
+msgid "You should be a member of at least one team"
+msgstr "Ви маєте бути учасником принаймні однієї команди"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

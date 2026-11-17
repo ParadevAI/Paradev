@@ -14566,6 +14566,9 @@ msgstr "organizacji {id}"
 msgid "Organization {id}"
 msgstr "Organizacja {id}"
 
+msgid "Organization already exists"
+msgstr "Organizacja już istnieje"
+
 msgid "Organization created successfully!"
 msgstr "Organizacja została utworzona!"
 
@@ -23212,6 +23215,9 @@ msgstr "Możesz wyświetlać tę stronę, ale nie możesz jej komentować"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tej operacji nie można cofnąć. Panele terminala pokażą „Proces zakończony” i będzie można je uruchomić ponownie."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Nie możesz opuścić organizacji, ponieważ jesteś jej jedynym właścicielem"
+
 msgid "You control the access"
 msgstr "Ty kontrolujesz dostęp"
 
@@ -23247,6 +23253,9 @@ msgstr "Aby łączyć konta, musisz należeć do organizacji."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Aby korzystać z integracji, trzeba należeć do organizacji."
+
+msgid "You should be a member of at least one team"
+msgstr "Musisz być członkiem co najmniej jednego zespołu"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

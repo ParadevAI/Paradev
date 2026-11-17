@@ -14566,6 +14566,9 @@ msgstr "organizaci {id}"
 msgid "Organization {id}"
 msgstr "Organizace {id}"
 
+msgid "Organization already exists"
+msgstr "Organizace již existuje"
+
 msgid "Organization created successfully!"
 msgstr "Organizace byla vytvořena!"
 
@@ -23212,6 +23215,9 @@ msgstr "Tuto stránku můžete zobrazit, ale ne komentovat"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tuto akci nelze vrátit zpět. Panely terminálu zobrazí „Proces skončil“ a půjde je spustit znovu."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Organizaci nemůžete opustit, protože jste jejím jediným vlastníkem"
+
 msgid "You control the access"
 msgstr "Přístup máte pod kontrolou"
 
@@ -23247,6 +23253,9 @@ msgstr "Pro připojení účtů musíte být součástí organizace."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Pro používání integrací musíte být součástí organizace."
+
+msgid "You should be a member of at least one team"
+msgstr "Musíte být členem alespoň jednoho týmu"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
