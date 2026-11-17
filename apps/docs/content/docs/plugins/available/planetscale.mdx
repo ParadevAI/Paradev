@@ -1,0 +1,18 @@
+---
+title: PlanetScale
+description: Inspect PlanetScale organizations, databases, and branches, read schemas, run SQL, and review query insights
+---
+
+Inspect PlanetScale organizations, databases, and branches, read schemas, run SQL, and review query insights.
+
+## MCP Server
+
+Tools come from PlanetScale's own MCP server at `https://mcp.pscale.dev/mcp/planetscale`. Paradev proxies each call and adds your credentials. PlanetScale decides which tools the server offers, so see [PlanetScale's MCP docs](https://planetscale.com/docs/connect/mcp) for the current list.
+
+## Authentication
+
+| Method | Details |
+|:-------|:--------|
+| OAuth 2.0 | You sign in to PlanetScale in your browser and choose what the agent can reach in each organization or database: no access, read-only, or full access. Paradev registers itself with PlanetScale when you connect, so there is no app to set up first. |
+
+Connect from the plugin's page in **Plugins**. Paradev keeps the credentials. The agent and your machine never see them. An organization admin decides whether MCP clients can run read-only or read and write queries; that setting applies to new connections.

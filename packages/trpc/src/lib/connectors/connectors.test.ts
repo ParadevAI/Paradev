@@ -508,6 +508,26 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org_01", label: "Tegon" });
 	});
 
+	test("planetscale_mcp asks PlanetScale's userinfo endpoint after OAuth", async () => {
+		const calls = respond({ sub: "usr_01", email: "h@tegon.ai" });
+
+		const identity = await probeIdentity(
+			"planetscale_mcp",
+			connectorMethod(requireConnector("planetscale_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://auth.planetscale.com/oauth/userinfo",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+		expect(identity.user).toEqual({ id: "usr_01", label: "h@tegon.ai" });
+	});
+
 	test("firecrawl_mcp takes the team and user from the token response", async () => {
 		const identity = await probeIdentity(
 			"firecrawl_mcp",
