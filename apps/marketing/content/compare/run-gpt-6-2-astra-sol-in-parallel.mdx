@@ -31,7 +31,7 @@ On November 17, 2026, OpenAI released [GPT-6.2 Astra and GPT-6.2 Sol](https://op
 | **API price per million tokens** | [$8 input, $40 output](https://developers.openai.com/api/docs/models/gpt-6.2-astra) | [$2 input, $10 output](https://developers.openai.com/api/docs/models/gpt-6.2-sol) |
 | **Ultrafast mode** | Pro $500 | Pro $200 and Pro $500 |
 
-Both models have a context window of 1,050,000 tokens in the API. In Codex you can raise the default context to 1 million tokens with the `model_context_window` setting, per the [Codex models page](https://learn.chatgpt.com/codex/models). OpenAI also says Sol completes more tasks on the same paid plan than GPT-6.1 Sol. These figures come from OpenAI and are not independently checked.
+Both models have a context window of 1,050,000 tokens in the API. In Codex you can raise the default context to 1 million tokens with the `model_context_window` setting, per the [Codex models page](https://learn.chatgpt.com/codex/models). Requests over 272,000 input tokens cost more in the API: for Astra, OpenAI doubles the input rate and charges 1.5 times the output rate. OpenAI also says Sol completes more tasks on the same paid plan than GPT-6.1 Sol. These figures come from OpenAI and are not independently checked.
 
 The [Codex models page](https://learn.chatgpt.com/codex/models) does not name one default model. If you set no model, Codex uses "a recommended model," so set the model yourself when it matters which one runs.
 
