@@ -28,7 +28,7 @@ const template = {
 	alias: ALIAS,
 	from: "Kiet <kiet@hey.paradev.com>",
 	replyTo: "kiet@paradev.com",
-	subject: "Upgrade to Pro to access {{{featureName}}}?",
+	subject: "Upgrade to Pro to access mobile?",
 	html,
 	variables: [
 		{

@@ -27,9 +27,8 @@ export function UpgradeNudgeEmail({
 		>
 			<Text style={paragraph}>Hey there,</Text>
 			<Text style={paragraph}>
-				I&apos;m Kiet, one of the founders of Paradev. I saw you tried{" "}
-				{featureName} on your phone. That&apos;s part of Pro, and your team is
-				on the Free plan.
+				I&apos;m Kiet, founder at Paradev. I saw you tried {featureName} on your
+				phone. That&apos;s part of Pro, and your team is on the Free plan.
 			</Text>
 			<Text style={paragraph}>
 				You can <Link href={upgradeUrl}>upgrade on the web</Link>, and the app
