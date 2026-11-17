@@ -114,6 +114,8 @@ export const chatsAgents = chatsSchema.table(
 		listingVersion: text("listing_version"),
 		/** Whether its owner lets it act in Paradev with the owner's access. */
 		paradevAccess: boolean("paradev_access").notNull().default(false),
+		/** The owner's plugins it may use, by plugin name. */
+		plugins: jsonb("plugins").$type<string[]>().notNull().default([]),
 		/** The sandbox serving its turns; a new id at every wake. */
 		boxId: text("box_id"),
 		lastActiveAt: timestamp("last_active_at", { withTimezone: true }),

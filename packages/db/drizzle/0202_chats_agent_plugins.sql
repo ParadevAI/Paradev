@@ -1,0 +1,1 @@
+ALTER TABLE "chats"."agents" ADD COLUMN "plugins" jsonb DEFAULT '[]'::jsonb NOT NULL;
