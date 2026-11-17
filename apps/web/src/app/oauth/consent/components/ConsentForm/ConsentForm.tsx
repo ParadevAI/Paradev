@@ -175,7 +175,7 @@ export function ConsentForm({
 						) : (
 							<Trans>
 								Sends you back to{" "}
-								<span className="font-mono font-medium text-foreground">
+								<span className="break-all font-mono font-medium text-foreground">
 									{redirect.host}
 								</span>
 							</Trans>
