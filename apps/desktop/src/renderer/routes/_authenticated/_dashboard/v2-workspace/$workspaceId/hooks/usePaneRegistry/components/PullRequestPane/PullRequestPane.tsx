@@ -7,6 +7,7 @@ import {
 	type PullRequestRef,
 	pullRequestRefFromUrl,
 } from "renderer/lib/github/pullRequestRef";
+import { PullRequestAutoFixControl } from "renderer/routes/_authenticated/_dashboard/components/PullRequestAutoFixControl";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
 import type { PullRequestActivityThreads } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActivity";
 import { PullRequestDetailContent } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailContent";
@@ -191,6 +192,15 @@ export function PullRequestPane({
 				hostId={workspace.hostId}
 				commentTarget={commentTarget}
 				threads={activityThreads}
+				checksControl={
+					<PullRequestAutoFixControl
+						hostUrl={hostUrl}
+						prNumber={data.number}
+						isOpen={detail.data?.state === "open"}
+						workspaceId={isLinkedPR ? workspace.id : null}
+						projectId={handoffProjectId}
+					/>
+				}
 				summaryAside={
 					showEvidence ? (
 						<PullRequestEvidence

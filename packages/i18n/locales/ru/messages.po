@@ -3332,6 +3332,12 @@ msgstr "Автосохранение"
 msgid "Auto top-up"
 msgstr "Автопополнение"
 
+msgid "Auto-fix CI"
+msgstr "Автоисправление CI"
+
+msgid "Auto-run command"
+msgstr "Команда автозапуска"
+
 msgid "Auto-run on new tab"
 msgstr "Автозапуск в новой вкладке"
 
@@ -6311,6 +6317,9 @@ msgstr "Не удалось снять индексацию"
 msgid "Couldn't unstage file"
 msgstr "Не удалось снять индексацию с файла"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Не удалось обновить автоисправление CI"
+
 msgid "Couldn't update pull request"
 msgstr "Не удалось обновить пул-реквест"
 
@@ -8962,6 +8971,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Исправляет каждую новую ошибку из Sentry, а ежедневный запуск подхватывает пропущенные."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Исправление · попытка {attempts} из {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14751,6 +14763,15 @@ msgstr "Приостановлено до {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Приостановлено при закрытии Paradev"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Приостановлено: проверки не прошли и после {maxAttempts} исправлений"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Приостановлено: исправление могло не дойти до агента"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Приостановлено: последнее исправление не запушило коммит"
 
 msgid "Pay {total}"
 msgstr "Оплатить {total}"
@@ -21940,6 +21961,9 @@ msgstr "ожидание {0} и {1}…"
 msgid "Waiting for activity data"
 msgstr "Ожидание данных об активности"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Ожидание агента в рабочей области"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Ожидание подтверждения. Не закрывайте это окно."
 
@@ -21999,6 +22023,9 @@ msgstr "Посмотрите, как дизайн-ревью проходит п
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Посмотрите видео про Paradev Автоматизации на YouTube"
+
+msgid "Watching checks"
+msgstr "Отслеживание проверок"
 
 msgid "Wayfinding and disclosure"
 msgstr "Навигация и раскрытие"
@@ -22252,6 +22279,9 @@ msgstr "Когда срабатывает триггер, выбранный Mac
 
 msgid "When bought GB-hours fall below"
 msgstr "Когда купленных ГБ-часов меньше"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Когда проверки падают на новом коммите, агент рабочей области получает по одному исправлению за раз. После {maxAttempts} исправлений без успешного прогона оно приостанавливается и никогда не делает merge."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Когда остаётся меньше {topupThreshold} ГБ-часов, пополнить на {topupPrice} ({topupGbHours} ГБ-часов)."

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
+import { PullRequestAutoFixControl } from "renderer/routes/_authenticated/_dashboard/components/PullRequestAutoFixControl";
 import { useOpenPullRequestInApp } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenPullRequestInApp";
 import { useProjectHost } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectHost";
 import { PullRequestActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestActions";
@@ -154,6 +155,16 @@ function PullRequestDetailPage() {
 				hostId={hostId}
 				commentTarget={commentTarget}
 				preview={preview}
+				checksControl={
+					prNumber !== null ? (
+						<PullRequestAutoFixControl
+							hostUrl={hostUrl}
+							prNumber={prNumber}
+							isOpen={data?.state === "open"}
+							projectId={detail.projectId}
+						/>
+					) : null
+				}
 			/>
 		</div>
 	);

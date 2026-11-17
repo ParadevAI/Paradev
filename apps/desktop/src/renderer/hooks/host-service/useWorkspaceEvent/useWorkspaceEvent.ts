@@ -5,6 +5,7 @@ import type {
 	GitChangedPayload,
 	PageWatchChangedPayload,
 	PortChangedPayload,
+	PrAutoFixChangedPayload,
 	TerminalLifecyclePayload,
 } from "@superset/workspace-client";
 import type { FsWatchEvent } from "@superset/workspace-fs/client";
@@ -59,6 +60,12 @@ export function useWorkspaceEvent(
 	enabled?: boolean,
 ): void;
 export function useWorkspaceEvent(
+	type: "pr-auto-fix:changed",
+	workspaceId: string,
+	callback: (payload: PrAutoFixChangedPayload) => void,
+	enabled?: boolean,
+): void;
+export function useWorkspaceEvent(
 	type: "chat:sessions-changed",
 	workspaceId: string,
 	callback: (payload: ChatSessionsChangedPayload) => void,
@@ -73,6 +80,7 @@ export function useWorkspaceEvent(
 		| "terminal:lifecycle"
 		| "port:changed"
 		| "page-watch:changed"
+		| "pr-auto-fix:changed"
 		| "chat:sessions-changed",
 	workspaceId: string,
 	callback:
@@ -83,6 +91,7 @@ export function useWorkspaceEvent(
 		| ((payload: TerminalLifecyclePayload) => void)
 		| ((payload: PortChangedPayload) => void)
 		| ((payload: PageWatchChangedPayload) => void)
+		| ((payload: PrAutoFixChangedPayload) => void)
 		| ((payload: ChatSessionsChangedPayload) => void),
 	enabled = true,
 ): void {
@@ -149,6 +158,15 @@ export function useWorkspaceEvent(
 				workspaceId,
 				(_wid, payload) => {
 					(handler as (payload: PageWatchChangedPayload) => void)(payload);
+				},
+			);
+			cleanups.push(removeListener);
+		} else if (type === "pr-auto-fix:changed") {
+			const removeListener = bus.on(
+				"pr-auto-fix:changed",
+				workspaceId,
+				(_wid, payload) => {
+					(handler as (payload: PrAutoFixChangedPayload) => void)(payload);
 				},
 			);
 			cleanups.push(removeListener);

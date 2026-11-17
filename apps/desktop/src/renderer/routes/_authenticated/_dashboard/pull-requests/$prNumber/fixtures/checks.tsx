@@ -58,6 +58,9 @@ mock.module(`${root}/pull-requests/hooks/usePullRequestDetail`, () => ({
 mock.module(`${root}/pull-requests/hooks/usePullRequestListPreview`, () => ({
 	usePullRequestListPreview: () => null,
 }));
+mock.module(`${root}/components/PullRequestAutoFixControl`, () => ({
+	PullRequestAutoFixControl: () => null,
+}));
 mock.module(`${root}/components/PageHeader`, () => ({
 	PageHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));

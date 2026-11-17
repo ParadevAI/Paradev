@@ -3332,6 +3332,12 @@ msgstr "Guardado automático"
 msgid "Auto top-up"
 msgstr "Recarga automática"
 
+msgid "Auto-fix CI"
+msgstr "Corrección automática de CI"
+
+msgid "Auto-run command"
+msgstr "Ejecutar el comando automáticamente"
+
 msgid "Auto-run on new tab"
 msgstr "Ejecutar al abrir una pestaña"
 
@@ -6311,6 +6317,9 @@ msgstr "No se pudieron quitar los cambios de preparados"
 msgid "Couldn't unstage file"
 msgstr "No se pudo quitar el archivo de preparados"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "No se pudo actualizar la corrección automática de CI"
+
 msgid "Couldn't update pull request"
 msgstr "No se pudo actualizar la pull request"
 
@@ -8962,6 +8971,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Corrige cada error nuevo de Sentry, con una ejecución diaria para los que se perdieron."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Corrigiendo · intento {attempts} de {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14751,6 +14763,15 @@ msgstr "En pausa hasta las {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "En pausa al cerrarse Paradev"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "En pausa: las comprobaciones siguieron fallando tras {maxAttempts} correcciones"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "En pausa: puede que la corrección no haya llegado al agente"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "En pausa: la última corrección no hizo push de ningún commit"
 
 msgid "Pay {total}"
 msgstr "Pagar {total}"
@@ -21940,6 +21961,9 @@ msgstr "esperando a {0} y {1}…"
 msgid "Waiting for activity data"
 msgstr "Esperando datos de actividad"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Esperando a un agente en el espacio de trabajo"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Esperando la aprobación. Mantén este cuadro de diálogo abierto."
 
@@ -21999,6 +22023,9 @@ msgstr "Mira cómo una revisión de diseño pasa de un comentario a una nueva ve
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Mira el vídeo de Paradev Automations en YouTube"
+
+msgid "Watching checks"
+msgstr "Vigilando las comprobaciones"
 
 msgid "Wayfinding and disclosure"
 msgstr "Orientación y despliegue de contenido"
@@ -22252,6 +22279,9 @@ msgstr "Cuando salta un desencadenante, el Mac que elegiste abre un espacio de t
 
 msgid "When bought GB-hours fall below"
 msgstr "Cuando las GB-horas compradas bajen de"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Cuando las comprobaciones fallan en un commit nuevo, el agente del espacio de trabajo recibe una corrección cada vez. Se pausa tras {maxAttempts} correcciones sin una ejecución correcta y nunca hace merge."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Cuando queden menos de {topupThreshold} GB-horas, añadir {topupPrice} ({topupGbHours} GB-horas)."

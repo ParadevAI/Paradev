@@ -3332,6 +3332,12 @@ msgstr "自動儲存"
 msgid "Auto top-up"
 msgstr "自動加值"
 
+msgid "Auto-fix CI"
+msgstr "自動修正 CI"
+
+msgid "Auto-run command"
+msgstr "自動執行命令"
+
 msgid "Auto-run on new tab"
 msgstr "新建分頁時自動執行"
 
@@ -6311,6 +6317,9 @@ msgstr "無法取消暫存更改"
 msgid "Couldn't unstage file"
 msgstr "無法取消暫存檔案"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "無法更新自動修正 CI"
+
 msgid "Couldn't update pull request"
 msgstr "無法更新拉取請求"
 
@@ -8962,6 +8971,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "修正每個新的 Sentry 錯誤，漏掉的由每天的執行補上。"
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "正在修正 · 第 {attempts}/{maxAttempts} 次嘗試"
 
 msgid "FK"
 msgstr "FK"
@@ -14751,6 +14763,15 @@ msgstr "已暫停至 {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Paradev 關閉時已暫停"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "已暫停：修正 {maxAttempts} 次後檢查仍然失敗"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "已暫停：修正請求可能未送達代理程式"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "已暫停：上次修正沒有推送提交"
 
 msgid "Pay {total}"
 msgstr "支付 {total}"
@@ -21940,6 +21961,9 @@ msgstr "正在等待 {0} 和 {1}…"
 msgid "Waiting for activity data"
 msgstr "正在等待活動資料"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "正在等待工作區中的代理程式"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "正在等待核准。請保持此對話方塊開啟。"
 
@@ -21999,6 +22023,9 @@ msgstr "看一次設計審查如何從留言變成新版本。"
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "在 YouTube 上觀看 Paradev 自動化影片"
+
+msgid "Watching checks"
+msgstr "正在關注檢查"
 
 msgid "Wayfinding and disclosure"
 msgstr "導航定位與內容展開"
@@ -22252,6 +22279,9 @@ msgstr "觸發器觸發時，你選的 Mac 會開啟一個新工作區，代理�
 
 msgid "When bought GB-hours fall below"
 msgstr "當購買的 GB 小時低於"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "當新提交上的檢查失敗時，工作區的代理程式每次收到一個修正請求。連續修正 {maxAttempts} 次仍未成功執行後會暫停，且從不合併。"
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "剩餘不足 {topupThreshold} GB 小時時，加值 {topupPrice}（{topupGbHours} GB 小時）。"

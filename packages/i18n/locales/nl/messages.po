@@ -3332,6 +3332,12 @@ msgstr "Automatisch opslaan"
 msgid "Auto top-up"
 msgstr "Automatisch bijkopen"
 
+msgid "Auto-fix CI"
+msgstr "CI automatisch herstellen"
+
+msgid "Auto-run command"
+msgstr "Commando automatisch uitvoeren"
+
 msgid "Auto-run on new tab"
 msgstr "Automatisch uitvoeren bij nieuw tabblad"
 
@@ -6311,6 +6317,9 @@ msgstr "Kan wijzigingen niet unstagen"
 msgid "Couldn't unstage file"
 msgstr "Kan bestand niet unstagen"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Kan CI automatisch herstellen niet bijwerken"
+
 msgid "Couldn't update pull request"
 msgstr "Kan pull request niet bijwerken"
 
@@ -8962,6 +8971,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Lost elke nieuwe Sentry-fout op, met een dagelijkse run voor gemiste fouten."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Bezig met herstellen · poging {attempts} van {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14751,6 +14763,15 @@ msgstr "Gepauzeerd tot {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Gepauzeerd toen Paradev werd gesloten"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Gepauzeerd: checks faalden nog na {maxAttempts} herstelpogingen"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Gepauzeerd: de herstelopdracht heeft de agent mogelijk niet bereikt"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Gepauzeerd: de laatste herstelpoging heeft geen commit gepusht"
 
 msgid "Pay {total}"
 msgstr "{total} betalen"
@@ -21940,6 +21961,9 @@ msgstr "wachten op {0} en {1}…"
 msgid "Waiting for activity data"
 msgstr "Wachten op activiteitsgegevens"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Wacht op een agent in de werkruimte"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Wachten op goedkeuring. Houd dit venster open."
 
@@ -21999,6 +22023,9 @@ msgstr "Bekijk hoe een designreview van opmerking naar nieuwe versie gaat."
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Bekijk de Paradev Automations-video op YouTube"
+
+msgid "Watching checks"
+msgstr "Checks in de gaten houden"
 
 msgid "Wayfinding and disclosure"
 msgstr "Wegwijs worden en informatie ontvouwen"
@@ -22252,6 +22279,9 @@ msgstr "Als een trigger afgaat, opent de gekozen Mac een nieuwe werkruimte en be
 
 msgid "When bought GB-hours fall below"
 msgstr "Wanneer gekochte GB-uren dalen onder"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Als checks falen op een nieuwe commit, krijgt de agent van de werkruimte één herstelopdracht tegelijk. Na {maxAttempts} herstelpogingen zonder geslaagde run pauzeert het, en het merget nooit."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Wanneer er minder dan {topupThreshold} GB-uren over zijn, {topupPrice} bijkopen ({topupGbHours} GB-uren)."

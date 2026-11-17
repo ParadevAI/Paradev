@@ -245,6 +245,13 @@ export interface PageWatchChangedMessage {
 	occurredAt: number;
 }
 
+/** An Auto-fix CI watch in the workspace started, moved, paused or stopped. */
+export interface PrAutoFixChangedMessage {
+	type: "pr-auto-fix:changed";
+	workspaceId: string;
+	occurredAt: number;
+}
+
 /** A chat session in the workspace was created, changed, stopped or removed; refetch `listSessions`. */
 export interface ChatSessionsChangedMessage {
 	type: "chat:sessions-changed";
@@ -265,6 +272,7 @@ export type ServerMessage =
 	| ProjectChangedMessage
 	| TagFoldersChangedMessage
 	| PageWatchChangedMessage
+	| PrAutoFixChangedMessage
 	| ChatSessionsChangedMessage
 	| EventBusErrorMessage;
 

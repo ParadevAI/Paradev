@@ -16,6 +16,8 @@ import {
 	LuX,
 } from "react-icons/lu";
 import { VscChevronRight } from "react-icons/vsc";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+import { PullRequestAutoFixControl } from "renderer/routes/_authenticated/_dashboard/components/PullRequestAutoFixControl";
 import { CHECK_STATUS_ICONS } from "renderer/routes/_authenticated/_dashboard/utils/checkStatusIcons";
 import type { NormalizedCheck, NormalizedPR } from "../../types";
 
@@ -31,6 +33,8 @@ interface ChecksSectionProps {
 	checks: NormalizedCheck[];
 	checksStatus: NormalizedPR["checksStatus"];
 	prUrl: string;
+	prNumber: number;
+	isOpen: boolean;
 }
 
 export function ChecksSection({
@@ -38,8 +42,11 @@ export function ChecksSection({
 	checks,
 	checksStatus,
 	prUrl,
+	prNumber,
+	isOpen,
 }: ChecksSectionProps) {
 	const { t } = useLingui();
+	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const [open, setOpen] = useState(true);
 
 	// Mirrors computeChecksRollup: a cancelled check is a relevant failure, not
@@ -103,6 +110,13 @@ export function ChecksSection({
 					</span>
 				</div>
 			</CollapsibleTrigger>
+			<PullRequestAutoFixControl
+				hostUrl={hostUrl}
+				prNumber={prNumber}
+				isOpen={isOpen}
+				workspaceId={workspaceId}
+				className="px-2 pb-1.5"
+			/>
 			<CollapsibleContent className="min-w-0 overflow-hidden px-0.5 pb-1">
 				{relevantChecks.length === 0 ? (
 					<div className="px-1.5 py-1 text-xs text-muted-foreground">

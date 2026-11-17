@@ -80,6 +80,8 @@ export const ReviewTabContent = memo(function ReviewTabContent({
 				checks={pr.checks}
 				checksStatus={pr.checksStatus}
 				prUrl={pr.url}
+				prNumber={pr.number}
+				isOpen={pr.state !== "closed" && pr.state !== "merged"}
 			/>
 
 			<div className="my-1 border-b border-border/70" />

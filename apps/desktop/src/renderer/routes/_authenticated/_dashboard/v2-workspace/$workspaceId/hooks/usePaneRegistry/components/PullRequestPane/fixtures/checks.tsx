@@ -88,6 +88,9 @@ mock.module(
 mock.module(`${pane}/utils/buildReviewThreadEntries`, () => ({
 	buildReviewThreadEntries: () => [],
 }));
+mock.module(`${root}/components/PullRequestAutoFixControl`, () => ({
+	PullRequestAutoFixControl: () => null,
+}));
 mock.module(`${root}/components/WorkItemDetailState`, () => ({
 	WorkItemDetailState: ({ message }: { message: string }) => (
 		<div data-testid="summary-state">{message}</div>

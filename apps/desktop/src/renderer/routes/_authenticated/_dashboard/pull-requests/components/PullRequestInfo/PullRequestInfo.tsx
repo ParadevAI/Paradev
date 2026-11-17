@@ -321,9 +321,11 @@ function CheckRows({ checks }: { checks: PullRequestCheck[] }) {
 function ChecksSection({
 	variant,
 	checks,
+	control,
 }: {
 	variant: PullRequestInfoVariant;
 	checks: PullRequestCheck[];
+	control?: ReactNode;
 }) {
 	const { t } = useLingui();
 	const [open, setOpen] = useState(false);
@@ -331,6 +333,11 @@ function ChecksSection({
 	if (variant === "column") {
 		return (
 			<InfoSection variant="column" label={t({ message: "Checks" })}>
+				{control ? (
+					<div className="border-b border-border/60 pb-2 empty:hidden">
+						{control}
+					</div>
+				) : null}
 				{checks.length === 0 ? (
 					<span className="text-muted-foreground">
 						<Trans>No checks</Trans>
@@ -391,6 +398,7 @@ function ChecksSection({
 					</CollapsibleContent>
 				</Collapsible>
 			)}
+			{control ? <div className="w-full empty:hidden">{control}</div> : null}
 		</InfoSection>
 	);
 }
@@ -398,6 +406,8 @@ function ChecksSection({
 interface PullRequestInfoProps {
 	data: PullRequestDetail;
 	variant: PullRequestInfoVariant;
+	/** Sits under the Checks label (the Auto-fix CI switch). */
+	checksControl?: ReactNode;
 }
 
 /**
@@ -405,7 +415,11 @@ interface PullRequestInfoProps {
  * right-hand column of titled sections (wide panes) and compact label/value
  * rows under the header (narrow panes).
  */
-export function PullRequestInfo({ data, variant }: PullRequestInfoProps) {
+export function PullRequestInfo({
+	data,
+	variant,
+	checksControl,
+}: PullRequestInfoProps) {
 	return (
 		<div
 			className={cn(
@@ -418,7 +432,11 @@ export function PullRequestInfo({ data, variant }: PullRequestInfoProps) {
 				<CommentsSection variant={variant} count={data.comments.length} />
 			) : null}
 			<ReviewsSection variant={variant} data={data} />
-			<ChecksSection variant={variant} checks={data.checks} />
+			<ChecksSection
+				variant={variant}
+				checks={data.checks}
+				control={checksControl}
+			/>
 		</div>
 	);
 }

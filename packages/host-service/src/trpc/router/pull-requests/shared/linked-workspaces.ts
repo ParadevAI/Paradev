@@ -1,6 +1,8 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { HostDb } from "../../../../db";
 import { pullRequests, workspaces } from "../../../../db/schema";
+import type { HostServiceContext } from "../../../../types";
+import { resolveGithubRepo } from "../../workspace-creation/shared/project-helpers";
 
 export interface RepoIdentity {
 	owner: string;
@@ -9,6 +11,7 @@ export interface RepoIdentity {
 
 export interface LinkedPullRequestRow {
 	id: string;
+	url: string;
 	state: string;
 	isDraft: boolean;
 	mergedAt: number | null;
@@ -30,6 +33,7 @@ export function findPullRequestRows(
 	return db
 		.select({
 			id: pullRequests.id,
+			url: pullRequests.url,
 			state: pullRequests.state,
 			isDraft: pullRequests.isDraft,
 			mergedAt: pullRequests.mergedAt,
@@ -60,6 +64,7 @@ export function findPullRequestRowsByProject(
 	return db
 		.select({
 			id: pullRequests.id,
+			url: pullRequests.url,
 			state: pullRequests.state,
 			isDraft: pullRequests.isDraft,
 			mergedAt: pullRequests.mergedAt,
@@ -72,6 +77,25 @@ export function findPullRequestRowsByProject(
 			),
 		)
 		.all();
+}
+
+/**
+ * The host's rows for a project's PR, by repository. When the project's
+ * repository cannot be resolved (checkout gone, remote unreachable) the rows
+ * the project wrote itself still answer, so an existing link is never
+ * mistaken for "none".
+ */
+export async function findProjectPullRequestRows(
+	ctx: HostServiceContext,
+	projectId: string,
+	prNumber: number,
+): Promise<LinkedPullRequestRow[]> {
+	try {
+		const repo = await resolveGithubRepo(ctx, projectId);
+		return findPullRequestRows(ctx.db, repo, prNumber);
+	} catch {
+		return findPullRequestRowsByProject(ctx.db, projectId, prNumber);
+	}
 }
 
 /**

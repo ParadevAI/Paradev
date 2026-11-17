@@ -3332,6 +3332,12 @@ msgstr "Salvataggio automatico"
 msgid "Auto top-up"
 msgstr "Ricarica automatica"
 
+msgid "Auto-fix CI"
+msgstr "Correzione automatica della CI"
+
+msgid "Auto-run command"
+msgstr "Comando da eseguire automaticamente"
+
 msgid "Auto-run on new tab"
 msgstr "Avvio automatico in una nuova scheda"
 
@@ -6311,6 +6317,9 @@ msgstr "Impossibile togliere le modifiche dallo stage"
 msgid "Couldn't unstage file"
 msgstr "Impossibile togliere il file dallo stage"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Impossibile aggiornare la correzione automatica della CI"
+
 msgid "Couldn't update pull request"
 msgstr "Impossibile aggiornare la pull request"
 
@@ -8962,6 +8971,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Corregge ogni nuovo errore di Sentry, con un'esecuzione giornaliera per quelli persi."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Correzione in corso · tentativo {attempts} di {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14751,6 +14763,15 @@ msgstr "In pausa fino alle {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "In pausa alla chiusura di Paradev"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "In pausa: i controlli falliscono ancora dopo {maxAttempts} correzioni"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "In pausa: la correzione potrebbe non aver raggiunto l'agente"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "In pausa: l'ultima correzione non ha fatto push di alcun commit"
 
 msgid "Pay {total}"
 msgstr "Paga {total}"
@@ -21940,6 +21961,9 @@ msgstr "in attesa di {0} e {1}…"
 msgid "Waiting for activity data"
 msgstr "In attesa dei dati di attività"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "In attesa di un agente nel workspace"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "In attesa di approvazione. Tieni aperta questa finestra."
 
@@ -21999,6 +22023,9 @@ msgstr "Guarda una revisione del design passare da un commento a una nuova versi
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Guarda il video su Paradev Automazioni su YouTube"
+
+msgid "Watching checks"
+msgstr "Monitoraggio dei controlli"
 
 msgid "Wayfinding and disclosure"
 msgstr "Orientamento e disclosure"
@@ -22252,6 +22279,9 @@ msgstr "Quando scatta un trigger, il Mac scelto apre un nuovo workspace e l'agen
 
 msgid "When bought GB-hours fall below"
 msgstr "Quando le GB-ore acquistate scendono sotto"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Quando i controlli falliscono su un nuovo commit, l'agente del workspace riceve una correzione alla volta. Si mette in pausa dopo {maxAttempts} correzioni senza un'esecuzione riuscita e non fa mai merge."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Quando restano meno di {topupThreshold} GB-ore, aggiungi {topupPrice} ({topupGbHours} GB-ore)."

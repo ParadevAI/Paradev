@@ -3326,6 +3326,12 @@ msgstr "Автозбереження"
 msgid "Auto top-up"
 msgstr "Автопоповнення"
 
+msgid "Auto-fix CI"
+msgstr "Автовиправлення CI"
+
+msgid "Auto-run command"
+msgstr "Команда автозапуску"
+
 msgid "Auto-run on new tab"
 msgstr "Автозапуск у новій вкладці"
 
@@ -6305,6 +6311,9 @@ msgstr "Не вдалося зняти зміни з індексу"
 msgid "Couldn't unstage file"
 msgstr "Не вдалося зняти файл з індексу"
 
+msgid "Couldn't update Auto-fix CI"
+msgstr "Не вдалося оновити автовиправлення CI"
+
 msgid "Couldn't update pull request"
 msgstr "Не вдалося оновити пул-реквест"
 
@@ -8956,6 +8965,9 @@ msgstr "fix-auth-redirect"
 
 msgid "Fixes each new Sentry error, with a daily run for any it missed."
 msgstr "Виправляє кожну нову помилку із Sentry, а щоденний запуск підхоплює пропущені."
+
+msgid "Fixing · attempt {attempts} of {maxAttempts}"
+msgstr "Виправлення · спроба {attempts} з {maxAttempts}"
 
 msgid "FK"
 msgstr "FK"
@@ -14745,6 +14757,15 @@ msgstr "Призупинено до {0}"
 
 msgid "Paused when Paradev closed"
 msgstr "Призупинено під час закриття Paradev"
+
+msgid "Paused: checks still failed after {maxAttempts} fixes"
+msgstr "Призупинено: перевірки й далі падають після {maxAttempts} виправлень"
+
+msgid "Paused: the fix may not have reached the agent"
+msgstr "Призупинено: виправлення могло не дійти до агента"
+
+msgid "Paused: the last fix did not push a commit"
+msgstr "Призупинено: останнє виправлення не запушило коміт"
 
 msgid "Pay {total}"
 msgstr "Сплатити {total}"
@@ -21934,6 +21955,9 @@ msgstr "чекаємо на {0} і {1}…"
 msgid "Waiting for activity data"
 msgstr "Очікування даних про активність"
 
+msgid "Waiting for an agent in the workspace"
+msgstr "Очікування агента в робочому просторі"
+
 msgid "Waiting for approval. Keep this dialog open."
 msgstr "Очікування схвалення. Не закривайте це вікно."
 
@@ -21993,6 +22017,9 @@ msgstr "Подивіться, як дизайн-рев'ю проходить ш�
 
 msgid "Watch the Paradev Automations video on YouTube"
 msgstr "Дивитися відео про автоматизації Paradev на YouTube"
+
+msgid "Watching checks"
+msgstr "Стежимо за перевірками"
 
 msgid "Wayfinding and disclosure"
 msgstr "Навігація та розкриття"
@@ -22246,6 +22273,9 @@ msgstr "Коли спрацьовує тригер, вибраний вами Ma
 
 msgid "When bought GB-hours fall below"
 msgstr "Коли куплених ГБ-годин залишається менше ніж"
+
+msgid "When checks fail on a new commit, the workspace's agent gets one fix at a time. It pauses after {maxAttempts} fixes without a green run and never merges."
+msgstr "Коли перевірки падають на новому коміті, агент робочого простору отримує одне виправлення за раз. Після {maxAttempts} виправлень без успішного прогону воно призупиняється й ніколи не робить мердж."
 
 msgid "When fewer than {topupThreshold} GB-hours remain, add {topupPrice} ({topupGbHours} GB-hours)."
 msgstr "Коли залишається менше ніж {topupThreshold} ГБ-годин, додавати {topupPrice} ({topupGbHours} ГБ-годин)."

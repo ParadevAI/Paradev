@@ -12,6 +12,7 @@ export {
 	type HostConnectionStatus,
 	type PageWatchChangedPayload,
 	type PortChangedPayload,
+	type PrAutoFixChangedPayload,
 	type ProjectChangedPayload,
 	type ProjectSnapshotPayload,
 	peekEventBusConnectionStatus,

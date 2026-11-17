@@ -421,3 +421,33 @@ export const mobileLastDevices = sqliteTable("mobile_last_devices", {
 	deviceKey: text("device_key").notNull(),
 	pickedAt: integer("picked_at").notNull(),
 });
+
+/**
+ * Pull requests whose failing CI this host hands to the agent of the
+ * workspace that owns them. One workspace per PR: the unique URL index keeps
+ * two agents from fixing the same PR at once.
+ */
+export const pullRequestAutoFix = sqliteTable(
+	"pull_request_auto_fix",
+	{
+		workspaceId: text("workspace_id")
+			.notNull()
+			.references(() => workspaces.id, { onDelete: "cascade" }),
+		pullRequestUrl: text("pull_request_url").notNull(),
+		prNumber: integer("pr_number").notNull(),
+		status: text().$type<"watching" | "fixing" | "paused">().notNull(),
+		pauseReason: text("pause_reason").$type<
+			"attempt-limit" | "no-push" | "dispatch-interrupted"
+		>(),
+		attempts: integer().notNull().default(0),
+		lastHandledHeadSha: text("last_handled_head_sha"),
+		agentTerminalId: text("agent_terminal_id"),
+		fixSentAt: integer("fix_sent_at"),
+		createdAt: integer("created_at").notNull(),
+		updatedAt: integer("updated_at").notNull(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.workspaceId, table.pullRequestUrl] }),
+		uniqueIndex("pull_request_auto_fix_url_unique").on(table.pullRequestUrl),
+	],
+);

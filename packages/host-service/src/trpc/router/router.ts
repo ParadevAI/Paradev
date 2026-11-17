@@ -17,6 +17,7 @@ import { notificationsRouter } from "./notifications";
 import { pageWatchRouter } from "./page-watch";
 import { panesRouter } from "./panes";
 import { portsRouter } from "./ports";
+import { prAutoFixRouter } from "./pr-auto-fix";
 import { projectRouter } from "./project";
 import { pullRequestsRouter } from "./pull-requests";
 import { sandboxRouter } from "./sandbox";
@@ -54,6 +55,7 @@ export const appRouter = router({
 	project: projectRouter,
 	tagFolders: tagFoldersRouter,
 	pageWatch: pageWatchRouter,
+	prAutoFix: prAutoFixRouter,
 	panes: panesRouter,
 	ports: portsRouter,
 	sandbox: sandboxRouter,

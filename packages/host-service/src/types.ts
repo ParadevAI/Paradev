@@ -7,6 +7,7 @@ import type { ClosedMidTurnChat } from "./chat-v3/closedMidTurn";
 import type { HostDb } from "./db";
 import type { EventBus } from "./events";
 import type { PageWatchManager } from "./page-watch/index.ts";
+import type { PrAutoFixManager } from "./pr-auto-fix/index.ts";
 import type { ApiAuthProvider } from "./providers/auth/types";
 import type { AgentJobRunner } from "./runtime/agent-jobs";
 import type { WorkspaceFilesystemManager } from "./runtime/filesystem";
@@ -21,6 +22,7 @@ export interface HostServiceRuntime {
 	filesystem: WorkspaceFilesystemManager;
 	pullRequests: PullRequestRuntimeManager;
 	pageWatch: PageWatchManager;
+	prAutoFix: PrAutoFixManager;
 	chat?: () => ChatRuntime;
 	chatSync?: ChatSync;
 	closeChats?: (scopeId: string) => Promise<void>;

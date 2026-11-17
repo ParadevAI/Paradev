@@ -30,6 +30,15 @@ import { agentIsBusy, PageWatchManager } from "./page-watch/index.ts";
 import { registerForwardMuxRoute } from "./ports/forward-mux-route";
 import { portManager } from "./ports/port-manager";
 import {
+	isAgentBusyForAutoFix,
+	PrAutoFixManager,
+	PrAutoFixStore,
+	readLiveWorkspace,
+	readPullRequestObservation,
+	readWorkspacePullRequest,
+	STALE_PULL_REQUEST_MS,
+} from "./pr-auto-fix/index.ts";
+import {
 	PROJECT_PURGE_INTERVAL_MS,
 	purgeExpiredProjects,
 } from "./projects/project-deletion";
@@ -312,6 +321,84 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	});
 	pageWatch.subscribeToTerminalEvents(eventBus);
 
+	const prAutoFix = new PrAutoFixManager({
+		store: new PrAutoFixStore(db),
+		getWorkspace: (workspaceId) => readLiveWorkspace(db, workspaceId),
+		getWorkspacePullRequest: (workspaceId) =>
+			readWorkspacePullRequest(db, workspaceId),
+		readPullRequest: async ({ workspaceId, pullRequestUrl, fresh }) => {
+			if (fresh) {
+				await pullRequestRuntime.refreshPullRequestsByWorkspaces([workspaceId]);
+			} else {
+				await pullRequestRuntime.refreshWorkspacePullRequest(workspaceId);
+			}
+			return readPullRequestObservation(db, pullRequestUrl, {
+				now: Date.now(),
+				staleAfterMs: STALE_PULL_REQUEST_MS,
+			});
+		},
+		readCheckout: async (worktreePath) => {
+			try {
+				const repo = await git(worktreePath);
+				const status = await repo.status();
+				const headSha = (await repo.revparse(["HEAD"])).trim();
+				return {
+					branch: status.detached ? null : status.current,
+					clean: status.isClean(),
+					headSha: headSha || null,
+				};
+			} catch {
+				return null;
+			}
+		},
+		listAgents: (workspaceId) =>
+			terminalAgentStore
+				.listByWorkspace(workspaceId)
+				.filter((binding) => binding.endedAt === undefined)
+				.map((binding) => ({
+					terminalId: binding.terminalId,
+					binding,
+					lastEventAt: binding.lastEventAt,
+					busy: isAgentBusyForAutoFix(binding),
+					planMode:
+						binding.chatSessionId !== undefined &&
+						chatV3.existingRuntime()?.live.get(binding.chatSessionId)?.state
+							.modeId === "plan",
+				})),
+		sendToAgent: async ({
+			workspaceId,
+			terminalId,
+			expectedAgent,
+			acquireDelivery,
+			text,
+			signal,
+		}) => {
+			const result = await sendToAgent({
+				terminalId,
+				workspaceId,
+				text,
+				submit: true,
+				expectedAgent,
+				acquireDelivery,
+				signal,
+				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
+				db,
+				eventBus,
+			});
+			if ("error" in result) {
+				if (result.inputStaged) return { inputStaged: true } as const;
+				throw new Error(result.error);
+			}
+		},
+		notifyChanged: (workspaceId) =>
+			eventBus.broadcastPrAutoFixChanged({
+				workspaceId,
+				occurredAt: Date.now(),
+			}),
+	});
+	prAutoFix.start();
+
 	const agentJobs = new AgentJobRunner({
 		rootDir: join(resolveAppHomeDir(), "agent-jobs"),
 		onActivity: (workspaceId) => terminalAgentStore.noteActivity(workspaceId),
@@ -326,6 +413,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		filesystem,
 		pullRequests: pullRequestRuntime,
 		pageWatch,
+		prAutoFix,
 		chat: () => chatV3.runtime(),
 		chatSync,
 		closeChats: (scopeId: string) => chatV3.closeScope(scopeId),
@@ -607,6 +695,11 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			pageWatch.stop();
 		} catch (err) {
 			console.warn("[host-service] pageWatch.stop failed:", err);
+		}
+		try {
+			prAutoFix.stop();
+		} catch (err) {
+			console.warn("[host-service] prAutoFix.stop failed:", err);
 		}
 		try {
 			await disposeLocalMobileDevices();

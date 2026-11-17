@@ -26,6 +26,7 @@ type EventType =
 	| "project:changed"
 	| "tag-folders:changed"
 	| "page-watch:changed"
+	| "pr-auto-fix:changed"
 	| "chat:sessions-changed";
 
 interface FsEventsPayload {
@@ -118,6 +119,10 @@ export interface PageWatchChangedPayload {
 	occurredAt: number;
 }
 
+export interface PrAutoFixChangedPayload {
+	occurredAt: number;
+}
+
 export interface ChatSessionsChangedPayload {
 	occurredAt: number;
 }
@@ -172,12 +177,17 @@ type EventListener<T extends EventType> = T extends "fs:events"
 														workspaceId: string,
 														payload: PageWatchChangedPayload,
 													) => void
-												: T extends "chat:sessions-changed"
+												: T extends "pr-auto-fix:changed"
 													? (
 															workspaceId: string,
-															payload: ChatSessionsChangedPayload,
+															payload: PrAutoFixChangedPayload,
 														) => void
-													: never;
+													: T extends "chat:sessions-changed"
+														? (
+																workspaceId: string,
+																payload: ChatSessionsChangedPayload,
+															) => void
+														: never;
 
 interface ListenerEntry {
 	type: EventType;
@@ -318,6 +328,7 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 			message.type === "workspace:create-settled" ||
 			message.type === "workspace:naming-failed" ||
 			message.type === "page-watch:changed" ||
+			message.type === "pr-auto-fix:changed" ||
 			message.type === "chat:sessions-changed"
 				? message.workspaceId
 				: message.type === "project:changed"
@@ -366,6 +377,11 @@ function handleMessage(state: ConnectionState, data: unknown): void {
 			);
 		} else if (message.type === "page-watch:changed") {
 			(entry.callback as EventListener<"page-watch:changed">)(
+				message.workspaceId,
+				{ occurredAt: message.occurredAt },
+			);
+		} else if (message.type === "pr-auto-fix:changed") {
+			(entry.callback as EventListener<"pr-auto-fix:changed">)(
 				message.workspaceId,
 				{ occurredAt: message.occurredAt },
 			);
