@@ -14,6 +14,7 @@ export type ChatSessionInit = {
 	harness: string;
 	agentConfigId?: string | null;
 	harnessSessionId?: string | null;
+	terminalId?: string | null;
 	status?: SessionStatus;
 	title?: string | null;
 };
@@ -38,6 +39,7 @@ export function openEpoch(db: ChatDb, init: ChatSessionInit): OpenedEpoch {
 			harness: init.harness,
 			agentConfigId: init.agentConfigId ?? null,
 			harnessSessionId: init.harnessSessionId ?? null,
+			terminalId: init.terminalId ?? null,
 			epoch,
 			status: init.status ?? "starting",
 			title: init.title ?? null,

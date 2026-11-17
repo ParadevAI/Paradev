@@ -144,6 +144,7 @@ export function createAgentSessionClient(
 					harness: HARNESS,
 					agentConfigId: null,
 					harnessSessionId: null,
+					terminalId: null,
 					epoch: head.cursor?.epoch ?? "",
 					status: head.session?.status ?? "idle",
 					title: options.title ?? null,

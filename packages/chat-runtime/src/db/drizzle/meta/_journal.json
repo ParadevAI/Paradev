@@ -43,6 +43,13 @@
       "when": 1794194559956,
       "tag": "0005_chat_sync_state",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794894383959,
+      "tag": "0006_session_terminal_id",
+      "breakpoints": true
     }
   ]
 }

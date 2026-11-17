@@ -30,6 +30,7 @@ export const chatSessionsLocal = sqliteTable(
 		scopeId: text("scope_id").notNull(),
 		harness: text().notNull(),
 		harnessSessionId: text("harness_session_id"),
+		terminalId: text("terminal_id"),
 		/** The host agent config the chat launched with; its env picks the account. */
 		agentConfigId: text("agent_config_id"),
 		epoch: text().notNull(),

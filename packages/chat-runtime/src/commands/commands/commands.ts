@@ -287,10 +287,7 @@ type ResumedChat = {
 
 export type GetQueueResult = QueueState & { live: boolean };
 
-export type ChatSessionListEntry = ChatSessionRow & {
-	live: boolean;
-	terminalId: string | null;
-};
+export type ChatSessionListEntry = ChatSessionRow & { live: boolean };
 
 export type ChatCommands = {
 	createSession(input: CreateSessionCommandInput): CreateSessionResult;
@@ -579,7 +576,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				return {
 					...row,
 					live: live !== null,
-					terminalId: live?.terminalId ?? null,
+					terminalId: live?.terminalId ?? row.terminalId,
 				};
 			});
 	};
@@ -608,6 +605,15 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			)?.agentConfigId ?? null
 		);
 	};
+
+	/** A chat resumed in place of another takes over the tab that showed it. */
+	const inheritedTerminalId = (
+		input: z.output<typeof createSessionCommandSchema>,
+		replacedRow: ChatSessionRow | null,
+	): string | null =>
+		replacedRow?.scopeId === input.scopeId && !replacedRow.closedByUser
+			? replacedRow.terminalId
+			: null;
 
 	return {
 		createSession(input) {
@@ -662,6 +668,8 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					selections.modeId = parsed.fallbackModeId;
 				}
 				const agentConfigId = launchedAgentConfigId(parsed, replacedRow);
+				const terminalId =
+					parsed.terminalId ?? inheritedTerminalId(parsed, replacedRow);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
@@ -669,6 +677,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					harness: parsed.harness,
 					agentConfigId,
 					harnessSessionId: parsed.resume?.harnessSessionId,
+					terminalId,
 				});
 				try {
 					options.live.create({
@@ -679,7 +688,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						cwd: parsed.cwd,
 						...selections,
 						resume: parsed.resume,
-						terminalId: parsed.terminalId,
+						...(terminalId ? { terminalId } : {}),
 					});
 				} catch (error) {
 					options.journal.discard(sessionId);
@@ -788,7 +797,7 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				...selections,
 				// The history is already in the journal: replaying it again would show it twice.
 				resume: { harnessSessionId: input.harnessSessionId, quiet: true },
-				terminalId: input.terminalId,
+				terminalId: input.terminalId ?? session.terminalId ?? undefined,
 			});
 			return { sessionId: input.sessionId, epoch: opened.epoch };
 		},

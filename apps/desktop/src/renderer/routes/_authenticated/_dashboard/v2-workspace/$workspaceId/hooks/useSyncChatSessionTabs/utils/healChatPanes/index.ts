@@ -1,1 +1,0 @@
-export { healChatPanes } from "./healChatPanes";

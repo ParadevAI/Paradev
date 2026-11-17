@@ -9,6 +9,7 @@ const session: NonNullable<SessionResult["session"]> = {
 	harness: "claude-acp",
 	agentConfigId: null,
 	harnessSessionId: "native-1",
+	terminalId: null,
 	epoch: "epoch-1",
 	status: "idle",
 	title: "Automation run",

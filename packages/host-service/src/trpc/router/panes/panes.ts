@@ -77,7 +77,8 @@ function chatTabTarget(
 	}
 	return {
 		sessionId,
-		terminalId: chat.live.get(sessionId)?.terminalId ?? sessionId,
+		terminalId:
+			chat.live.get(sessionId)?.terminalId ?? session.terminalId ?? sessionId,
 		agentId,
 	};
 }

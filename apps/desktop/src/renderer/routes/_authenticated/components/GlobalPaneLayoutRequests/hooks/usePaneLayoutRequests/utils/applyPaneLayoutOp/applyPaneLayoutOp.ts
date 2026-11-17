@@ -199,14 +199,20 @@ function newTabPane(op: NewTabOp): Omit<CreatePaneInput<PaneViewerData>, "id"> {
 	);
 }
 
-function findChatPane(areas: PaneAreas, sessionId: string): Located | null {
+function findChatPane(
+	areas: PaneAreas,
+	chat: { sessionId: string; terminalId: string },
+): Located | null {
 	for (const area of ["main", "sidebar"] as const) {
 		for (const tab of areas[area].tabs) {
-			const pane = Object.values(tab.panes).find(
-				(candidate) =>
-					candidate.kind === "chat-v3" &&
-					(candidate.data as ChatPaneData).sessionId === sessionId,
-			);
+			const pane = Object.values(tab.panes).find((candidate) => {
+				if (candidate.kind !== "chat-v3") return false;
+				const data = candidate.data as ChatPaneData;
+				return (
+					data.sessionId === chat.sessionId ||
+					data.terminalId === chat.terminalId
+				);
+			});
 			if (pane) return { area, tab, pane };
 		}
 	}
@@ -486,7 +492,7 @@ export function applyPaneLayoutOp(
 
 		case "newTab": {
 			const pane = newTabPane(op);
-			const open = op.chat ? findChatPane(areas, op.chat.sessionId) : null;
+			const open = op.chat ? findChatPane(areas, op.chat) : null;
 			if (open) {
 				const next = op.focus
 					? inArea(open.area, (store) =>

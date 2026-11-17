@@ -13,7 +13,6 @@ import { useChatWiring } from "../usePaneRegistry/components/ChatSession/hooks/u
 import { CHAT_ADOPT_POLL_MS, CHAT_ADOPT_SESSIONS_LIMIT } from "./constants";
 import { chatPanesClosedElsewhere } from "./utils/chatPanesClosedElsewhere";
 import { chatSessionsToAdopt } from "./utils/chatSessionsToAdopt";
-import { healChatPanes } from "./utils/healChatPanes";
 import { storedChatsAsListed } from "./utils/storedChatsAsListed";
 import { storedPanesTheHostClosed } from "./utils/storedPanesTheHostClosed";
 
@@ -122,7 +121,6 @@ export function useSyncChatSessionTabs({
 			}
 		}
 		storedSessionIds.current.clear();
-		healChatPanes({ paneStores: [store, ...linkedStores], sessions });
 		const { version, tabs, activeTabId } = store.getState();
 		const toAdopt = chatSessionsToAdopt({
 			sessions,

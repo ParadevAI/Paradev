@@ -353,6 +353,50 @@ describe("resuming chats after a restart", () => {
 	});
 });
 
+describe("the terminal a resumed chat is shown on", () => {
+	async function resumedFromAnotherDevice({ userClosed = false } = {}) {
+		const { runtime } = runtimeWithStartedAgents();
+		const original = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			terminalId: "desktop-terminal",
+		});
+		await waitFor(
+			() => runtime.live.get(original.sessionId)?.state.status === "idle",
+		);
+		await runtime.commands.closeSession({
+			sessionId: original.sessionId,
+			userClosed,
+		});
+		const resumed = runtime.commands.createSession({
+			commandId: randomUUID(),
+			scopeId: "workspace-1",
+			harness: FAKE_HARNESS,
+			cwd: "/tmp/workspace",
+			resume: {
+				harnessSessionId: "agent-1",
+				replacesSessionId: original.sessionId,
+			},
+		});
+		await runtime.live.dispose(resumed.sessionId);
+		const listed = runtime.commands
+			.listSessions({ scopeId: "workspace-1" })
+			.find((row) => row.sessionId === resumed.sessionId);
+		await runtime.dispose();
+		return listed?.terminalId;
+	}
+
+	test("keeps the replaced chat's terminal after its agent stops", async () => {
+		expect(await resumedFromAnotherDevice()).toBe("desktop-terminal");
+	});
+
+	test("does not take the terminal of a chat a person closed", async () => {
+		expect(await resumedFromAnotherDevice({ userClosed: true })).toBeNull();
+	});
+});
+
 describe("the agent config a chat launched with", () => {
 	test("is stored and handed to every relaunch of that agent session", async () => {
 		const { runtime, started } = runtimeWithStartedAgents();
