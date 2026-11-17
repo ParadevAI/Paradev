@@ -639,6 +639,39 @@ export async function askDev(
 	);
 }
 
+/** A box that cannot say counts as idle, so it is not kept forever. */
+const boxBusy = (deps: TurnDeps, box: Box) =>
+	deps.runner.busy(box).catch((error: unknown) => {
+		console.error(
+			`[chats] box ${box.id} did not say whether it is busy:`,
+			error,
+		);
+		return false;
+	});
+
+/**
+ * Work a Dev left running in a chat ended while no turn ran there: the
+ * runner's notices, as a turn that may reply.
+ */
+export async function enqueueNoticeTurn(
+	deps: TurnDeps,
+	claims: { agentId: string; groupId: string; userId: string | null },
+	notices: string,
+): Promise<void> {
+	const header = `${turnHeader("Background notice", [["Time", formatTime(nowOf(deps))]])}\n${REPLY_HINT}`;
+	const [turn] = await db
+		.insert(chatsTurns)
+		.values({
+			agentId: claims.agentId,
+			groupId: claims.groupId,
+			userId: claims.userId,
+			prompt: `${header}\n\nWork you ran in the background ended (a system notice, not a message from anyone in the chat). Tell the chat what came of it if they're waiting on it; if it failed, say so and what you'll do.\n\n${notices}`,
+		})
+		.returning({ id: chatsTurns.id });
+	if (!turn) throw new Error("The notice was not stored");
+	await deps.turnRuns.start(turn.id);
+}
+
 /** Why a question to another Dev was refused, with the status the box hears. */
 export class AskError extends Error {
 	constructor(
@@ -1048,6 +1081,9 @@ export async function stopIfIdle(
 			)
 			.limit(1);
 		if (running) return false;
+		// Its notice brings a turn, whose end schedules the idle stop again.
+		const box = await deps.boxes.status(agentId);
+		if (box && (await boxBusy(deps, box))) return false;
 		await deps.boxes.stop(agentId);
 		await tx
 			.update(chatsAgents)

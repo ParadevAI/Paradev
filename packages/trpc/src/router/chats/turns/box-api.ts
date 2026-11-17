@@ -9,6 +9,7 @@ import {
 	AskError,
 	askDev,
 	chatForDev,
+	enqueueNoticeTurn,
 	postDevMessage,
 	settleTurn,
 	type TurnDeps,
@@ -148,7 +149,7 @@ const metered = (work: Promise<unknown>) =>
 async function model(deps: BoxApiDeps, request: Request, path: string) {
 	let claims: BoxClaims;
 	try {
-		claims = await boxTurn(deps.keys, request.headers);
+		claims = await boxTurn(deps.keys, request.headers, { background: true });
 	} catch (error) {
 		if (!(error instanceof BoxRequestError)) throw error;
 		return json(error.status, {
@@ -261,11 +262,25 @@ async function ask(deps: BoxApiDeps, request: Request) {
 	return json(200, { answer });
 }
 
+const notices = z.object({ text: z.string().trim().min(1).max(40_000) });
+
+/** The runner's notices of background work that ended while no turn ran in the chat. */
+async function notice(deps: BoxApiDeps, request: Request) {
+	const claims = await boxTurn(deps.keys, request.headers, {
+		background: true,
+	});
+	const { text } = notices.parse(await request.json());
+	await enqueueNoticeTurn(deps.turns, claims, text);
+	return new Response(null, { status: 202 });
+}
+
 const readLimit = z.coerce.number().int().min(1).max(200).default(20);
 
 /** What a Dev reads of its turn's chat: `/cli/messages?limit=` and `/cli/members`. */
 async function read(deps: BoxApiDeps, request: Request, path: string) {
-	const claims = await boxTurn(deps.keys, request.headers);
+	const claims = await boxTurn(deps.keys, request.headers, {
+		background: true,
+	});
 	if (path === "/cli/messages") {
 		const limit = readLimit.parse(
 			new URL(request.url).searchParams.get("limit") ?? undefined,
@@ -300,6 +315,7 @@ export async function handleBoxRequest(
 		const settle = /^\/cli\/turns\/([^/]+)\/settled$/.exec(path);
 		if (settle?.[1]) return await settled(deps, request, settle[1]);
 		if (path === "/cli/ask") return await ask(deps, request);
+		if (path === "/cli/notifications") return await notice(deps, request);
 		if (path === "/cli/reply") return await message(deps, request, true);
 		if (path === "/cli/messages") return await message(deps, request, false);
 		return json(404, { code: "not_found", message: "Unknown route" });

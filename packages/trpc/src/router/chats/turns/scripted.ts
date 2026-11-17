@@ -58,6 +58,9 @@ export function scriptedRunner(
 			}, options.thinkMs);
 			(timer as { unref?: () => void }).unref?.();
 		},
+		async busy() {
+			return false;
+		},
 		async cancel(_box, { sessionId }) {
 			sessions.get(sessionId)?.abort();
 			sessions.delete(sessionId);

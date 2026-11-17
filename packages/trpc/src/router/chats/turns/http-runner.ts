@@ -39,10 +39,20 @@ export function httpRunner(keys: () => Promise<BoxKeys>): RunnerClient {
 					plugins: turn.apps,
 					ownerOneToOne: turn.ownerOneToOne,
 					devAsk: turn.devAsk,
+					...(turn.devAsk ? {} : { canBackground: true }),
 					...(turn.checkReply ? { checkReply: true } : {}),
 					chat: turn.chat,
 				},
 			});
+		},
+		async busy(box) {
+			const response = await fetch(`${box.url}/status`, {
+				headers: { authorization: `Bearer ${await token(box, "status")}` },
+				signal: AbortSignal.timeout(5_000),
+			});
+			if (!response.ok) return false;
+			const said = (await response.json()) as { busy?: boolean };
+			return said.busy === true;
 		},
 		async cancel(box, { sessionId }) {
 			await post(box, "/turns/cancel", await token(box, sessionId), {

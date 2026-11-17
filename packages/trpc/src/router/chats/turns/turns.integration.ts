@@ -125,6 +125,7 @@ beforeEach(() => {
 			cancel: async (_box, { sessionId }) => {
 				cancelled.push(sessionId);
 			},
+			busy: async () => false,
 		},
 		turnRuns: runs,
 		boxKeys: () => keys,

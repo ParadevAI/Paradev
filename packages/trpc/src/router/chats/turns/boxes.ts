@@ -55,4 +55,6 @@ export interface TurnStart {
 export interface RunnerClient {
 	start(box: Box, turn: TurnStart): Promise<void>;
 	cancel(box: Box, opts: { sessionId: string }): Promise<void>;
+	/** Whether the box has work running that outlives its turns. */
+	busy(box: Box): Promise<boolean>;
 }

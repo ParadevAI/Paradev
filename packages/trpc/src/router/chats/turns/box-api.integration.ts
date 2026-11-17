@@ -142,6 +142,7 @@ beforeEach(() => {
 				started.push(turn);
 			},
 			cancel: async () => {},
+			busy: async () => false,
 		},
 		turnRuns: runs,
 		boxKeys: async () => keys,
@@ -319,6 +320,33 @@ test("a Dev acts in Paradev as its owner only once the owner switched that on; a
 		owner.chats.updateDev({ devId: created.dev.id, paradevAccess: true }),
 	).rejects.toThrow();
 	await fromBox(groupTurn, `/cli/turns/${groupTurn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
+test("work a Dev left running reports after its turn: the notice is a new turn that may reply", async () => {
+	const { groupId, turn } = await messaged("build it");
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+	expect(
+		(await fromBox(turn, "/cli/ask", { dev: "x", question: "y" })).status,
+	).toBe(403);
+	const before = started.length;
+	expect(
+		(await fromBox(turn, "/cli/notifications", { text: "the build passed" }))
+			.status,
+	).toBe(202);
+	const noticed = await startedTurn(before + 1);
+	expect(noticed.groupId).toBe(groupId);
+	expect(noticed.text).toStartWith("## Background notice");
+	expect(noticed.text).toContain("the build passed");
+	expect(
+		(await fromBox(noticed, "/cli/reply", { text: "Build passed." })).status,
+	).toBe(201);
+	await fromBox(noticed, `/cli/turns/${noticed.turnId}/settled`, {
 		stopReason: "end_turn",
 	});
 	await runs.idle();

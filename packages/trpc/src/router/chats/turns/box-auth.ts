@@ -1,6 +1,6 @@
 import { db } from "@superset/db/client";
 import { chatsAgents, chatsTurns } from "@superset/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import { z } from "zod";
 import { type BoxKeys, verifyBoxCredential } from "./box-tokens";
 
@@ -25,7 +25,15 @@ export interface BoxClaims {
 	groupId: string;
 	userId: string | null;
 	turnId: string;
+	/**
+	 * No turn runs in the chat: the request is from work the Dev left running
+	 * there, acting as its latest turn. Only reads, the model and notices take it.
+	 */
+	background?: boolean;
 }
+
+/** Work a Dev left running outlives its turn by at most this. */
+export const BACKGROUND_MS = 2 * 60 * 60_000;
 
 const chatId = z.string().uuid();
 
@@ -64,10 +72,14 @@ export async function boxAgent(
 	return { agentId: box.agentId, groupId: chat.data };
 }
 
-/** `boxAgent`, during the Dev's running turn in that chat. */
+/**
+ * `boxAgent`, during the Dev's running turn in that chat. With `background`,
+ * also after a turn there in the last two hours, acting as that turn.
+ */
 export async function boxTurn(
 	keys: BoxKeys,
 	headers: Headers,
+	opts: { background?: boolean; now?: Date } = {},
 ): Promise<BoxClaims> {
 	const { agentId, groupId } = await boxAgent(keys, headers);
 	const [turn] = await db
@@ -82,6 +94,30 @@ export async function boxTurn(
 		)
 		.orderBy(desc(chatsTurns.startedAt))
 		.limit(1);
+	if (!turn && opts.background) {
+		const since = new Date((opts.now ?? new Date()).getTime() - BACKGROUND_MS);
+		const [last] = await db
+			.select({ id: chatsTurns.id, userId: chatsTurns.userId })
+			.from(chatsTurns)
+			.where(
+				and(
+					eq(chatsTurns.agentId, agentId),
+					eq(chatsTurns.groupId, groupId),
+					gt(chatsTurns.startedAt, since),
+				),
+			)
+			.orderBy(desc(chatsTurns.startedAt))
+			.limit(1);
+		if (last) {
+			return {
+				agentId,
+				groupId,
+				userId: last.userId,
+				turnId: last.id,
+				background: true,
+			};
+		}
+	}
 	if (!turn) {
 		throw new BoxRequestError(
 			403,
