@@ -61,6 +61,7 @@ import { presignedGetUrl } from "../../lib/r2";
 import { personProcedure } from "../../trpc";
 import { publishChats } from "./publish";
 import { chatsTurnRuntime, triggerTurns, watchTicket } from "./turns";
+import { answerQuestion, answerSchema, QuestionError } from "./turns/questions";
 import {
 	agentView,
 	messageView,
@@ -719,6 +720,46 @@ export const chatsRouter = {
 				});
 			}
 			return ticket;
+		}),
+
+	/** A person's answer to a Dev's question in a chat they are in. The first answer wins. */
+	answerQuestion: personProcedure
+		.input(
+			z.intersection(z.object({ questionId: z.string().uuid() }), answerSchema),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const user = ctx.session.user;
+			const [question] = await db
+				.select()
+				.from(chatsQuestions)
+				.where(eq(chatsQuestions.id, input.questionId));
+			if (!question) throw notFound("Question not found");
+			await assertMember(user.id, question.groupId);
+			const [person] = await db
+				.select()
+				.from(users)
+				.where(eq(users.id, user.id));
+			try {
+				return {
+					question: await answerQuestion(
+						chatsTurnRuntime(),
+						{ id: user.id, name: toUser(person ?? user).displayName },
+						question,
+						input,
+					),
+				};
+			} catch (error) {
+				if (!(error instanceof QuestionError)) throw error;
+				throw new TRPCError({
+					code:
+						error.status === 403
+							? "FORBIDDEN"
+							: error.status === 409
+								? "CONFLICT"
+								: "BAD_REQUEST",
+					message: error.message,
+				});
+			}
 		}),
 
 	/** A message with the turn that wrote it and the turns that turn asked other Devs for. */

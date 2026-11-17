@@ -20,6 +20,15 @@ import {
 	settleTurn,
 	type TurnDeps,
 } from "./engine";
+import {
+	askQuestion,
+	askSchema,
+	cancelQuestion,
+	MAX_WAIT_S,
+	QuestionError,
+	releaseQuestion,
+	waitForAnswer,
+} from "./questions";
 
 const GATEWAY_URL = "https://ai-gateway.vercel.sh";
 /** Request headers the Anthropic Messages API understands. Credentials are replaced, not forwarded. */
@@ -378,6 +387,13 @@ async function shareFile(deps: BoxApiDeps, request: Request) {
 	return json(201, shared);
 }
 
+const waitSeconds = z.coerce
+	.number()
+	.int()
+	.min(0)
+	.max(MAX_WAIT_S)
+	.default(MAX_WAIT_S);
+
 const readLimit = z.coerce.number().int().min(1).max(200).default(20);
 
 /** What a Dev reads of its turn's chat: `/cli/messages?limit=` and `/cli/members`. */
@@ -391,6 +407,13 @@ async function read(deps: BoxApiDeps, request: Request, path: string) {
 		);
 		const { messages } = await chatForDev(claims.groupId, limit);
 		return json(200, { messages });
+	}
+	const answer = /^\/cli\/questions\/([0-9a-f-]{36})\/answer$/.exec(path);
+	if (answer?.[1]) {
+		const wait = waitSeconds.parse(
+			new URL(request.url).searchParams.get("wait") ?? undefined,
+		);
+		return json(200, await waitForAnswer(claims, answer[1], wait));
 	}
 	if (path === "/cli/files") {
 		return json(200, { files: await chatFiles(claims.groupId) });
@@ -439,6 +462,21 @@ export async function handleBoxRequest(
 		if (path === "/cli/ask") return await ask(deps, request);
 		if (path === "/cli/notifications") return await notice(deps, request);
 		if (path === "/cli/files") return await shareFile(deps, request);
+		if (path === "/cli/questions") {
+			const claims = await boxTurn(deps.keys, request.headers);
+			const asked = askSchema.parse(await request.json());
+			return json(201, { question: await askQuestion(claims, asked) });
+		}
+		const settling =
+			/^\/cli\/questions\/([0-9a-f-]{36})\/(release|cancel)$/.exec(path);
+		if (settling?.[1]) {
+			const claims = await boxTurn(deps.keys, request.headers);
+			if (settling[2] === "release") {
+				return json(200, await releaseQuestion(claims, settling[1]));
+			}
+			await cancelQuestion(claims, settling[1]);
+			return new Response(null, { status: 204 });
+		}
 		if (path === "/cli/reply") return await message(deps, request, true);
 		if (path === "/cli/messages") return await message(deps, request, false);
 		return json(404, { code: "not_found", message: "Unknown route" });
@@ -446,7 +484,7 @@ export async function handleBoxRequest(
 		if (error instanceof AskError) {
 			return json(error.status, { code: "ask", message: error.message });
 		}
-		if (error instanceof BoxRequestError) {
+		if (error instanceof BoxRequestError || error instanceof QuestionError) {
 			return json(error.status, { code: error.code, message: error.message });
 		}
 		if (error instanceof z.ZodError) {

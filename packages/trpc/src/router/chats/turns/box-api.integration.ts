@@ -361,6 +361,69 @@ test("work a Dev left running reports after its turn: the notice is a new turn t
 	await runs.idle();
 });
 
+test("a Dev's question is a card a person answers: the waiting turn hears it, and a late answer starts a turn", async () => {
+	const fromBoxGet = (turn: TurnStart, path: string) =>
+		handleBoxRequest(
+			{ keys, turns: deps, gatewayKey: "gateway-key" },
+			new Request(`http://api.test${path}`, {
+				headers: {
+					"x-dev-box": boxes.get(turn.agentId)?.credential ?? "",
+					"x-dev-chat": turn.groupId,
+				},
+			}),
+			path.split("?")[0] ?? path,
+		);
+	const { groupId, turn } = await messaged("which one?");
+	const asked = await fromBox(turn, "/cli/questions", {
+		kind: "select",
+		title: "Tea or coffee?",
+		options: [{ label: "Tea" }, { label: "Coffee" }],
+	});
+	expect(asked.status).toBe(201);
+	const { question } = (await asked.json()) as { question: { id: string } };
+	expect(
+		await (
+			await fromBoxGet(turn, `/cli/questions/${question.id}/answer?wait=0`)
+		).json(),
+	).toMatchObject({ status: "open" });
+	await expect(
+		owner.chats.answerQuestion({ questionId: question.id, answer: "Water" }),
+	).rejects.toThrow("That isn't one of the options");
+	await owner.chats.answerQuestion({ questionId: question.id, answer: "Tea" });
+	expect(
+		await (
+			await fromBoxGet(turn, `/cli/questions/${question.id}/answer?wait=0`)
+		).json(),
+	).toMatchObject({ status: "answered", answer: "Tea" });
+	await expect(
+		owner.chats.answerQuestion({ questionId: question.id, answer: "Coffee" }),
+	).rejects.toThrow("already answered");
+
+	const second = await fromBox(turn, "/cli/questions", {
+		kind: "confirm",
+		title: "Ship it?",
+	});
+	const later = ((await second.json()) as { question: { id: string } }).question
+		.id;
+	expect(
+		await (await fromBox(turn, `/cli/questions/${later}/release`, {})).json(),
+	).toMatchObject({ status: "open" });
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+	const before = started.length;
+	await owner.chats.answerQuestion({ questionId: later, answer: "yes" });
+	const answerTurn = await startedTurn(before + 1);
+	expect(answerTurn.groupId).toBe(groupId);
+	expect(answerTurn.text).toStartWith("## Answer to your question");
+	expect(answerTurn.text).toContain("You asked: Ship it?\nOwner said yes");
+	await fromBox(answerTurn, `/cli/turns/${answerTurn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
 test("a box's model call goes out with the server's key and is metered to the Dev's owner", async () => {
 	const { turn } = await messaged("think");
 	const response = await fromBox(turn, "/model/v1/messages", {

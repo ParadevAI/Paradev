@@ -8,6 +8,7 @@ import {
 	chatsGroupMembers,
 	chatsGroups,
 	chatsMessages,
+	chatsQuestions,
 	chatsTurns,
 	users,
 } from "@superset/db/schema";
@@ -27,7 +28,7 @@ import {
 } from "drizzle-orm";
 import { env } from "../../../env";
 import { publishChats } from "../publish";
-import { messageView, sharedFiles, toUser } from "../views";
+import { messageView, sharedFiles, toQuestion, toUser } from "../views";
 import { mayUseParadev, turnApps } from "./app-access";
 import { type BoxKeys, signBoxCredential } from "./box-tokens";
 import type { Box, BoxProvider, RunnerClient, TurnStart } from "./boxes";
@@ -675,6 +676,85 @@ export async function enqueueNoticeTurn(
 	await deps.turnRuns.start(turn.id);
 }
 
+type QuestionRow = typeof chatsQuestions.$inferSelect;
+
+/** A form's answers for the Dev, each under its question. */
+const formAnswered = (question: QuestionRow) =>
+	question.parts
+		.map((part, index) => {
+			const answer = question.answers?.[index] ?? { picked: [], typed: null };
+			const lines = [
+				...(answer.picked.length
+					? [`  Chose: ${answer.picked.join(", ")}`]
+					: []),
+				...(answer.typed ? [`  Wrote: ${answer.typed}`] : []),
+			];
+			return [
+				`${index + 1}. ${part.title}`,
+				...(lines.length ? lines : ["  (no answer)"]),
+			].join("\n");
+		})
+		.join("\n");
+
+/**
+ * The answer to a question the Dev stopped waiting on: its turn ended, so
+ * the answer comes as a turn of its own in the chat that asked it.
+ */
+export async function enqueueAnswerTurn(
+	deps: TurnDeps,
+	question: QuestionRow,
+	by: { id: string; name: string },
+): Promise<void> {
+	if (!question.agentId) return;
+	const header = `${turnHeader("Answer to your question", [
+		["From", by.name],
+		["Time", formatTime(question.answeredAt ?? question.createdAt)],
+	])}\n${REPLY_HINT}`;
+	const said =
+		question.kind === "form"
+			? `${by.name} answered your questions:\n${formAnswered(question)}`
+			: `You asked: ${question.title}\n${
+					question.kind === "confirm"
+						? `${by.name} said ${question.answer}`
+						: question.kind === "input" || question.typed
+							? `${by.name} wrote: ${question.answer}`
+							: `${by.name} chose: ${question.answer}`
+				}`;
+	const [turn] = await db
+		.insert(chatsTurns)
+		.values({
+			agentId: question.agentId,
+			groupId: question.groupId,
+			userId: by.id,
+			prompt: `${header}\n\n${said}`,
+		})
+		.returning({ id: chatsTurns.id });
+	if (!turn) throw new Error("The answer was not stored");
+	await deps.turnRuns.start(turn.id);
+}
+
+/** A turn ended while waiting on a question: nobody will act on its answer. */
+async function closeTurnQuestions(turnId: string) {
+	const closed = await db
+		.update(chatsQuestions)
+		.set({ status: "cancelled" })
+		.where(
+			and(
+				eq(chatsQuestions.turnId, turnId),
+				eq(chatsQuestions.status, "open"),
+				eq(chatsQuestions.turnWaiting, true),
+			),
+		)
+		.returning();
+	for (const question of closed) {
+		publishChats(chatsGroupChannel(question.groupId), {
+			type: "question.closed",
+			groupId: question.groupId,
+			question: toQuestion(question),
+		});
+	}
+}
+
 /** Why a question to another Dev was refused, with the status the box hears. */
 export class AskError extends Error {
 	constructor(
@@ -1027,6 +1107,7 @@ export async function finishTurn(
 			...turnEvent(turn),
 			...(error ? { error } : {}),
 		});
+		await closeTurnQuestions(turnId);
 		const ended = await db
 			.update(chatsTurns)
 			.set({ status: "ended", endedAt: now, error })
