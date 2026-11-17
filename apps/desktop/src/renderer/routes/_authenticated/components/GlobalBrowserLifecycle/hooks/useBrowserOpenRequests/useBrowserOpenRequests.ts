@@ -4,9 +4,9 @@ import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { openAgentBrowser } from "renderer/routes/_authenticated/utils/agentBrowserReveal";
 import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
 import { writeWorkspacePaneLayout } from "renderer/stores/workspace-creates/writeWorkspacePaneLayout";
+import { openAgentBrowser } from "../../utils/agentBrowserReveal";
 
 interface BrowserOpenRequest {
 	workspaceId: string;

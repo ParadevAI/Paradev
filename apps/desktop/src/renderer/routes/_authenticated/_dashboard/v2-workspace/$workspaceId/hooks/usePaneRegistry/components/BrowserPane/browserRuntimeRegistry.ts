@@ -226,7 +226,7 @@ export class BrowserRuntimeRegistryImpl {
 
 	private applyPointerPassthrough(passthrough: boolean) {
 		for (const entry of this.entries.values()) {
-			if (!entry.visible) continue;
+			if (!this.isShown(entry)) continue;
 			entry.webview.style.pointerEvents = passthrough ? "none" : "auto";
 		}
 	}
@@ -243,12 +243,16 @@ export class BrowserRuntimeRegistryImpl {
 	// A pane can be mounted inside a closed sidebar, where its placeholder is
 	// hidden but the hoisted webview would still paint.
 	private applyPresentedStyle(paneId: string, entry: RegistryEntry): void {
-		const shown =
+		if (this.isShown(entry)) this.applyShownStyle(entry);
+		else this.applyParkedStyle(paneId, entry);
+	}
+
+	private isShown(entry: RegistryEntry): boolean {
+		return (
 			entry.visible &&
 			entry.placeholder !== null &&
-			getComputedStyle(entry.placeholder).visibility !== "hidden";
-		if (shown) this.applyShownStyle(entry);
-		else this.applyParkedStyle(paneId, entry);
+			getComputedStyle(entry.placeholder).visibility !== "hidden"
+		);
 	}
 
 	private updateLayout(entry: RegistryEntry) {
@@ -647,7 +651,6 @@ export class BrowserRuntimeRegistryImpl {
 		entry.resizeObserver = observer;
 
 		this.applyPresentedStyle(paneId, entry);
-		this.applyPointerPassthrough(pointerPassthrough.active);
 	}
 
 	detach(paneId: string): void {

@@ -1,6 +1,9 @@
 import { useCallback, useEffect } from "react";
 import { useHotkey } from "renderer/hotkeys";
-import { noteUserSidebarToggle } from "renderer/stores/agent-sidebar-reveal";
+import {
+	forgetAgentSidebar,
+	noteUserSidebarChange,
+} from "renderer/stores/agent-sidebar-reveal";
 import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
 import { useRightPaneMode } from "./hooks/useRightPaneMode";
 import { useWorkspaceRightSidebarOpen } from "./hooks/useWorkspaceRightSidebarOpen";
@@ -12,11 +15,21 @@ export function useWorkspaceRightPane({
 	workspaceId: string;
 	isPaneAreaEnabled: boolean;
 }) {
-	const { isOpen, setOpen } = useWorkspaceRightSidebarOpen();
-	const toggle = useCallback(() => {
-		noteUserSidebarToggle(workspaceId, !isOpen);
-		setOpen(!isOpen);
-	}, [workspaceId, isOpen, setOpen]);
+	const { isOpen, setOpen: writeOpen } = useWorkspaceRightSidebarOpen();
+	const setOpen = useCallback<typeof writeOpen>(
+		(next) =>
+			writeOpen((prev) => {
+				const open = typeof next === "function" ? next(prev) : next;
+				if (open !== prev) noteUserSidebarChange(workspaceId, open);
+				return open;
+			}),
+		[workspaceId, writeOpen],
+	);
+	const closeEmpty = useCallback(() => {
+		forgetAgentSidebar(workspaceId);
+		writeOpen(false);
+	}, [workspaceId, writeOpen]);
+	const toggle = useCallback(() => setOpen((prev) => !prev), [setOpen]);
 	useHotkey("TOGGLE_SIDEBAR", toggle);
 	useEffect(
 		() =>
@@ -36,5 +49,5 @@ export function useWorkspaceRightPane({
 		enabled: isPaneAreaEnabled,
 	});
 
-	return { isOpen, setOpen, toggle, mode, toggleFullScreen };
+	return { isOpen, setOpen, closeEmpty, toggle, mode, toggleFullScreen };
 }

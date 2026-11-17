@@ -2,15 +2,15 @@ import type { AppCollections } from "renderer/routes/_authenticated/providers/Co
 import { runPaneLayoutOp } from "renderer/routes/_authenticated/utils/runPaneLayoutOp";
 import {
 	canAgentRevealSidebar,
-	markAgentRevealedSidebar,
+	markAgentBrowsingSidebar,
 } from "renderer/stores/agent-sidebar-reveal";
 
 type Collections = Pick<AppCollections, "v2WorkspaceLocalState">;
 
-function mayRevealSidebar(collections: Collections, workspaceId: string) {
-	const row = collections.v2WorkspaceLocalState.get(workspaceId);
+function isSidebarOpen(collections: Collections, workspaceId: string) {
 	return (
-		row != null && !row.rightSidebarOpen && canAgentRevealSidebar(workspaceId)
+		collections.v2WorkspaceLocalState.get(workspaceId)?.rightSidebarOpen ??
+		false
 	);
 }
 
@@ -24,7 +24,9 @@ export function openAgentBrowser({
 	workspaceId: string;
 	url: string;
 }): string {
-	const reveal = mayRevealSidebar(collections, workspaceId);
+	const reveal =
+		!isSidebarOpen(collections, workspaceId) &&
+		canAgentRevealSidebar(workspaceId);
 	const { paneId } = runPaneLayoutOp(collections, workspaceId, {
 		type: "open",
 		tool: "browser",
@@ -32,12 +34,12 @@ export function openAgentBrowser({
 		background: !reveal,
 	});
 	if (!paneId) throw new Error("Browser open did not create a pane");
-	if (reveal) markAgentRevealedSidebar(workspaceId);
+	markAgentBrowsingSidebar(workspaceId);
 	return paneId;
 }
 
 /** Opens a closed sidebar on the browser tab an agent is using. */
-export function revealAgentBrowserPane({
+export function showAgentBrowserPane({
 	collections,
 	workspaceId,
 	paneId,
@@ -46,7 +48,7 @@ export function revealAgentBrowserPane({
 	workspaceId: string;
 	paneId: string;
 }): void {
-	if (!mayRevealSidebar(collections, workspaceId)) return;
+	if (!canAgentRevealSidebar(workspaceId)) return;
 	const { layout } = runPaneLayoutOp(collections, workspaceId, {
 		type: "list",
 	});
@@ -54,6 +56,8 @@ export function revealAgentBrowserPane({
 		tab.panes.some((pane) => pane.id === paneId),
 	);
 	if (!inSidebar) return;
-	runPaneLayoutOp(collections, workspaceId, { type: "focus", paneId });
-	markAgentRevealedSidebar(workspaceId);
+	if (!isSidebarOpen(collections, workspaceId)) {
+		runPaneLayoutOp(collections, workspaceId, { type: "focus", paneId });
+	}
+	markAgentBrowsingSidebar(workspaceId);
 }

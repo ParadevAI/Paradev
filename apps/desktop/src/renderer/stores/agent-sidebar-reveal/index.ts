@@ -1,6 +1,7 @@
 export {
 	canAgentRevealSidebar,
-	clearAgentSidebarRevealsForTest,
-	markAgentRevealedSidebar,
-	noteUserSidebarToggle,
+	clearAgentSidebarStatesForTest,
+	forgetAgentSidebar,
+	markAgentBrowsingSidebar,
+	noteUserSidebarChange,
 } from "./store";

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { revealAgentBrowserPane } from "renderer/routes/_authenticated/utils/agentBrowserReveal";
+import { showAgentBrowserPane } from "../../utils/agentBrowserReveal";
 
 export function useAgentBrowserReveal() {
 	const collections = useCollections();
@@ -14,7 +14,7 @@ export function useAgentBrowserReveal() {
 				onData: ({ paneId }: { paneId: string }) => {
 					const workspaceId = browserRuntimeRegistry.getWorkspaceId(paneId);
 					if (!workspaceId) return;
-					revealAgentBrowserPane({ collections, workspaceId, paneId });
+					showAgentBrowserPane({ collections, workspaceId, paneId });
 				},
 			},
 		);
