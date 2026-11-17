@@ -12362,6 +12362,9 @@ msgstr "새 그룹…"
 msgid "New issue"
 msgstr "새 이슈"
 
+msgid "New layout"
+msgstr "새 레이아웃"
+
 msgid "New messages"
 msgstr "새 메시지"
 
@@ -16046,6 +16049,9 @@ msgstr "디스크에서 다시 불러오기"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "워크스페이스 목록을 새로 고치려면 Paradev를 다시 불러오세요."
+
+msgid "Reload to apply"
+msgstr "다시 로드하여 적용"
 
 msgid "Reload window"
 msgstr "창 다시 로드"
@@ -21687,6 +21693,9 @@ msgstr "데스크톱 앱에서 병렬 코딩 에이전트를 실행하세요."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Paradev 트레이 메뉴 > Host Service > Restart를 사용한 뒤 다시 시도하세요."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "새롭게 디자인된 창 레이아웃을 사용합니다: 아이콘 레일, 제목 표시줄의 탭, 카드 형태의 패널."
 
 msgid "Use this account"
 msgstr "이 계정 사용"

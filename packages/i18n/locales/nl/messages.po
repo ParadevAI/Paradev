@@ -12362,6 +12362,9 @@ msgstr "Nieuwe groep…"
 msgid "New issue"
 msgstr "Nieuwe issue"
 
+msgid "New layout"
+msgstr "Nieuwe indeling"
+
 msgid "New messages"
 msgstr "Nieuwe berichten"
 
@@ -16046,6 +16049,9 @@ msgstr "Opnieuw laden vanaf schijf"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Herlaad Paradev om de lijst met werkruimtes te verversen."
+
+msgid "Reload to apply"
+msgstr "Opnieuw laden om toe te passen"
 
 msgid "Reload window"
 msgstr "Venster herladen"
@@ -21687,6 +21693,9 @@ msgstr "Gebruik de desktop-app om parallelle coding agents te draaien."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Gebruik het Paradev-menu in de menubalk > Hostservice > Opnieuw starten en probeer het opnieuw."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Gebruik de vernieuwde vensterindeling: een pictogrambalk, tabbladen in de titelbalk en panelen als kaarten."
 
 msgid "Use this account"
 msgstr "Dit account gebruiken"

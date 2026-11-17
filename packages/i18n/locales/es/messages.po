@@ -12362,6 +12362,9 @@ msgstr "Nuevo grupo…"
 msgid "New issue"
 msgstr "Nuevo issue"
 
+msgid "New layout"
+msgstr "Nuevo diseño"
+
 msgid "New messages"
 msgstr "Mensajes nuevos"
 
@@ -16046,6 +16049,9 @@ msgstr "Recargar desde el disco"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Recarga Paradev para actualizar la lista de espacios de trabajo."
+
+msgid "Reload to apply"
+msgstr "Recargar para aplicar"
 
 msgid "Reload window"
 msgstr "Recargar la ventana"
@@ -21687,6 +21693,9 @@ msgstr "Usa la app de escritorio para empezar a ejecutar agentes de programació
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Usa el menú de la bandeja de Paradev > Servicio de host > Reiniciar y vuelve a intentarlo."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Usa el diseño de ventana renovado: una barra de iconos, pestañas en la barra de título y paneles como tarjetas."
 
 msgid "Use this account"
 msgstr "Usar esta cuenta"

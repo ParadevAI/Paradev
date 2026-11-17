@@ -12362,6 +12362,9 @@ msgstr "新建分组…"
 msgid "New issue"
 msgstr "新建议题"
 
+msgid "New layout"
+msgstr "新布局"
+
 msgid "New messages"
 msgstr "新消息"
 
@@ -16046,6 +16049,9 @@ msgstr "从磁盘重新加载"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "重新加载Paradev以刷新工作区列表。"
+
+msgid "Reload to apply"
+msgstr "重新加载以应用"
 
 msgid "Reload window"
 msgstr "重新加载窗口"
@@ -21687,6 +21693,9 @@ msgstr "使用桌面应用开始并行运行编码智能体。"
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "请使用Paradev托盘菜单 > 主机服务 > 重启，然后重试。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "使用重新设计的窗口布局：图标栏、标题栏中的标签页，以及卡片式窗格。"
 
 msgid "Use this account"
 msgstr "使用此账户"

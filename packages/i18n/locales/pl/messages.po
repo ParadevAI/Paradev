@@ -12362,6 +12362,9 @@ msgstr "Nowa grupa…"
 msgid "New issue"
 msgstr "Nowe zgłoszenie"
 
+msgid "New layout"
+msgstr "Nowy układ"
+
 msgid "New messages"
 msgstr "Nowe wiadomości"
 
@@ -16046,6 +16049,9 @@ msgstr "Wczytaj ponownie z dysku"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Przeładuj Paradev, aby odświeżyć listę obszarów roboczych."
+
+msgid "Reload to apply"
+msgstr "Załaduj ponownie, aby zastosować"
 
 msgid "Reload window"
 msgstr "Przeładuj okno"
@@ -21687,6 +21693,9 @@ msgstr "Użyj aplikacji desktopowej, aby uruchamiać równoległych agentów kod
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Użyj menu zasobnika Paradev > Usługa hosta > Uruchom ponownie, a następnie ponów."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Używaj przeprojektowanego układu okna: paska ikon, kart na pasku tytułu i paneli w formie kart."
 
 msgid "Use this account"
 msgstr "Użyj tego konta"

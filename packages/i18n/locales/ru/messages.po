@@ -12362,6 +12362,9 @@ msgstr "Новая группа…"
 msgid "New issue"
 msgstr "Новая задача"
 
+msgid "New layout"
+msgstr "Новый макет"
+
 msgid "New messages"
 msgstr "Новые сообщения"
 
@@ -16046,6 +16049,9 @@ msgstr "Загрузить с диска"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Перезагрузите Paradev, чтобы обновить список рабочих областей."
+
+msgid "Reload to apply"
+msgstr "Перезагрузить для применения"
 
 msgid "Reload window"
 msgstr "Перезагрузить окно"
@@ -21687,6 +21693,9 @@ msgstr "Используйте десктопное приложение, что
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Откройте меню Paradev в трее > Host Service > Restart, затем повторите."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Использовать обновлённый макет окна: панель значков, вкладки в заголовке окна и панели в виде карточек."
 
 msgid "Use this account"
 msgstr "Использовать этот аккаунт"

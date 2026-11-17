@@ -12362,6 +12362,9 @@ msgstr "新しいグループ…"
 msgid "New issue"
 msgstr "新規issue"
 
+msgid "New layout"
+msgstr "新しいレイアウト"
+
 msgid "New messages"
 msgstr "新着メッセージ"
 
@@ -16046,6 +16049,9 @@ msgstr "ディスクから再読み込み"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Paradevを再読み込みしてワークスペース一覧を更新してください。"
+
+msgid "Reload to apply"
+msgstr "再読み込みして適用"
 
 msgid "Reload window"
 msgstr "ウィンドウを再読み込み"
@@ -21687,6 +21693,9 @@ msgstr "デスクトップアプリで並列コーディングエージェント
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してから、再試行してください。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "刷新されたウィンドウレイアウトを使用します：アイコンレール、タイトルバーのタブ、カード形式のペイン。"
 
 msgid "Use this account"
 msgstr "このアカウントを使用"

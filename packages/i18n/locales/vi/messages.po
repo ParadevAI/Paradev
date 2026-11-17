@@ -12362,6 +12362,9 @@ msgstr "Nhóm mới…"
 msgid "New issue"
 msgstr "Issue mới"
 
+msgid "New layout"
+msgstr "Bố cục mới"
+
 msgid "New messages"
 msgstr "Tin nhắn mới"
 
@@ -16046,6 +16049,9 @@ msgstr "Tải lại từ đĩa"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Tải lại Paradev để làm mới danh sách workspace."
+
+msgid "Reload to apply"
+msgstr "Tải lại để áp dụng"
 
 msgid "Reload window"
 msgstr "Tải lại cửa sổ"
@@ -21687,6 +21693,9 @@ msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Dùng menu khay Paradev > Host Service > Restart, rồi thử lại."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Dùng bố cục cửa sổ được thiết kế lại: thanh biểu tượng, các tab trên thanh tiêu đề và các ngăn dạng thẻ."
 
 msgid "Use this account"
 msgstr "Dùng tài khoản này"

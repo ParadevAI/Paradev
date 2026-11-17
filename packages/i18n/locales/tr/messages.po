@@ -12362,6 +12362,9 @@ msgstr "Yeni grup…"
 msgid "New issue"
 msgstr "Yeni issue"
 
+msgid "New layout"
+msgstr "Yeni düzen"
+
 msgid "New messages"
 msgstr "Yeni mesajlar"
 
@@ -16046,6 +16049,9 @@ msgstr "Diskten yeniden yükle"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Çalışma alanı listesini yenilemek için Paradev'i yeniden yükleyin."
+
+msgid "Reload to apply"
+msgstr "Uygulamak için yeniden yükle"
 
 msgid "Reload window"
 msgstr "Pencereyi yeniden yükle"
@@ -21687,6 +21693,9 @@ msgstr "Paralel kodlama ajanları çalıştırmaya başlamak için masaüstü uy
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Paradev tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın, sonra yeniden deneyin."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Yeniden tasarlanan pencere düzenini kullanın: simge çubuğu, başlık çubuğunda sekmeler ve kart şeklinde bölmeler."
 
 msgid "Use this account"
 msgstr "Bu hesabı kullan"

@@ -79,6 +79,7 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
 	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
+	EXPERIMENTAL_NEW_LAYOUT: "experimental-new-layout",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
@@ -1346,6 +1347,27 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"reuse",
 			"sequential",
 			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_LAYOUT,
+		section: "experimental",
+		title: "New layout",
+		description:
+			"Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards",
+		keywords: [
+			"experimental",
+			"layout",
+			"shell",
+			"redesign",
+			"design",
+			"sidebar",
+			"rail",
+			"tabs",
+			"title bar",
+			"cards",
+			"toggle",
+			"switch",
 		],
 	},
 	{

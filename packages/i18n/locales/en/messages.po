@@ -12362,6 +12362,9 @@ msgstr "New group…"
 msgid "New issue"
 msgstr "New issue"
 
+msgid "New layout"
+msgstr "New layout"
+
 msgid "New messages"
 msgstr "New messages"
 
@@ -16046,6 +16049,9 @@ msgstr "Reload from disk"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Reload Paradev to refresh the workspace list."
+
+msgid "Reload to apply"
+msgstr "Reload to apply"
 
 msgid "Reload window"
 msgstr "Reload window"
@@ -21687,6 +21693,9 @@ msgstr "Use the desktop app to start running parallel coding agents."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Use the Paradev tray menu > Host Service > Restart, then retry."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 
 msgid "Use this account"
 msgstr "Use this account"

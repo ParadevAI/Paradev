@@ -12362,6 +12362,9 @@ msgstr "Nová skupina…"
 msgid "New issue"
 msgstr "Nová issue"
 
+msgid "New layout"
+msgstr "Nové rozvržení"
+
 msgid "New messages"
 msgstr "Nové zprávy"
 
@@ -16046,6 +16049,9 @@ msgstr "Znovu načíst z disku"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Načtěte Paradev znovu, aby se seznam pracovních prostorů obnovil."
+
+msgid "Reload to apply"
+msgstr "Znovu načíst pro použití"
 
 msgid "Reload window"
 msgstr "Načíst okno znovu"
@@ -21687,6 +21693,9 @@ msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Použijte nabídku Paradev na liště > Host Service > Restart a zkuste to znovu."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Použít přepracované rozvržení okna: lištu ikon, karty v záhlaví okna a panely jako karty."
 
 msgid "Use this account"
 msgstr "Použít tento účet"
