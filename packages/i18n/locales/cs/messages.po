@@ -22469,6 +22469,9 @@ msgstr "Pracovní prostor vytvořen"
 msgid "Workspace details"
 msgstr "Podrobnosti pracovního prostoru"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Disky pracovních prostorů jsou pro tuto organizaci vypnuté, takže pracovní prostor, jehož soubory jsou na disku, se nemůže stát prostředím."
+
 msgid "Workspace ID copied"
 msgstr "ID pracovního prostoru zkopírováno"
 

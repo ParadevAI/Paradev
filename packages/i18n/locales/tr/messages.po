@@ -22469,6 +22469,9 @@ msgstr "Çalışma alanı oluşturuldu"
 msgid "Workspace details"
 msgstr "Çalışma alanı ayrıntıları"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Bu kuruluş için çalışma alanı sürücüleri kapalı; bu yüzden dosyaları bir sürücüde olan bir çalışma alanı ortama dönüştürülemez."
+
 msgid "Workspace ID copied"
 msgstr "Çalışma alanı kimliği kopyalandı"
 

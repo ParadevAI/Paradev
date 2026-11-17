@@ -22469,6 +22469,9 @@ msgstr "Werkruimte aangemaakt"
 msgid "Workspace details"
 msgstr "Werkruimtedetails"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Werkruimteschijven zijn uitgeschakeld voor deze organisatie, dus een werkruimte waarvan de bestanden op een schijf staan, kan geen omgeving worden."
+
 msgid "Workspace ID copied"
 msgstr "Werkruimte-ID gekopieerd"
 

@@ -476,6 +476,13 @@ export const serverErrorMessages: Record<
 					"This environment's repositories are fixed; promote a workspace again to change them",
 			}),
 		),
+	"serverError.environment.drivesOff": () =>
+		i18n._(
+			msg({
+				message:
+					"Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment.",
+			}),
+		),
 	"serverError.environment.couldNotRecord": () =>
 		i18n._(
 			msg({

@@ -29,6 +29,7 @@ import {
 	promoteSandboxToEnvironment,
 	RepositoryError,
 	sortRepositories,
+	workspaceDrivesEnabled,
 	workspaceRepositories,
 } from "../../lib/sandbox";
 import { personProcedure, userError } from "../../trpc";
@@ -252,6 +253,14 @@ async function loadPromotable(
 	return { workspace, source, checkouts };
 }
 
+/** Only the control plane reads the golden drive; released clients never saw it. */
+function publicEnvironment<Row extends { goldenDriveName?: string | null }>(
+	row: Row,
+): Omit<Row, "goldenDriveName"> {
+	const { goldenDriveName: _goldenDriveName, ...rest } = row;
+	return rest;
+}
+
 /** A golden nothing will point at, and its drive: deleted through the retried job. */
 async function abandonGolden(
 	goldenName: string,
@@ -300,7 +309,7 @@ export const environmentRouter = {
 				projectIdsByEnvironment(ids),
 			]);
 			return rows.map((row) => ({
-				...row,
+				...publicEnvironment(row),
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
 			}));
@@ -316,7 +325,7 @@ export const environmentRouter = {
 				projectIdsByEnvironment([row.id]),
 			]);
 			return {
-				...row,
+				...publicEnvironment(row),
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
 			};
@@ -390,7 +399,10 @@ export const environmentRouter = {
 				await db.delete(environments).where(eq(environments.id, row.id));
 				throw error;
 			}
-			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
+			return {
+				...publicEnvironment(row),
+				primaryRepositoryId: input.primaryRepositoryId,
+			};
 		}),
 
 	linkProject: personProcedure
@@ -516,6 +528,18 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
+			// The kill switch: with drives off, no promote spreads drive mode to a new golden.
+			if (
+				workspace.driveName &&
+				!(await workspaceDrivesEnabled(workspace.organizationId))
+			) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment.",
+					i18nKey: "serverError.environment.drivesOff",
+				});
+			}
 			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
@@ -637,7 +661,7 @@ export const environmentRouter = {
 						),
 					);
 			}
-			return row;
+			return publicEnvironment(row);
 		}),
 
 	update: personProcedure
@@ -710,14 +734,14 @@ export const environmentRouter = {
 					: {}),
 			};
 			if (Object.keys(patch).length === 0) {
-				return loadEnvironment(input.id, ctx);
+				return publicEnvironment(await loadEnvironment(input.id, ctx));
 			}
 			const [row] = await db
 				.update(environments)
 				.set(patch)
 				.where(eq(environments.id, input.id))
 				.returning();
-			return row;
+			return row && publicEnvironment(row);
 		}),
 
 	archive: personProcedure

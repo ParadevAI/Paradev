@@ -58,14 +58,18 @@ stub(access, {
 		driveName: "drive-ws-box",
 	}),
 });
+let drivesOn = true;
+let promoted = 0;
 let abandoned: Array<{ providerSandboxId: string; driveName?: string | null }> =
 	[];
 stub(sandbox, {
 	workspaceRepositories: async () => [],
 	buildSandboxClaim: async () => ({ claim: {} }),
 	promoteSandboxToEnvironment: async () => {
+		promoted++;
 		throw new Error("snapshot failed after the fork");
 	},
+	workspaceDrivesEnabled: async () => drivesOn,
 });
 stub(teardown, {
 	deleteSandboxAndDriveLater: async (args: {
@@ -112,6 +116,8 @@ beforeEach(() => {
 	isAdmin = false;
 	written = [];
 	abandoned = [];
+	drivesOn = true;
+	promoted = 0;
 });
 
 describe("environment.update machineSize", () => {
@@ -126,6 +132,17 @@ describe("environment.update machineSize", () => {
 		isAdmin = true;
 		await caller.environment.update({ id: ENVIRONMENT_ID, machineSize: null });
 		expect(written).toEqual([{ machineSize: null }]);
+	});
+
+	test("the output never carries the golden drive, which released clients never saw", async () => {
+		isAdmin = true;
+		environment.goldenDriveName = "env-drive-env-g";
+		const updated = await caller.environment.update({
+			id: ENVIRONMENT_ID,
+			machineSize: null,
+		});
+		expect(updated).not.toHaveProperty("goldenDriveName");
+		expect(updated).toMatchObject({ id: ENVIRONMENT_ID });
 	});
 
 	test("refuses a size the plan does not offer", async () => {
@@ -163,5 +180,20 @@ describe("environment.promote that fails", () => {
 		expect(golden?.providerSandboxId).toMatch(/^env-/);
 		expect(golden?.driveName).toBe(`env-drive-${golden?.providerSandboxId}`);
 		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote with drives off", () => {
+	test("a workspace whose files are on a drive does not spread drive mode to a new golden", async () => {
+		environment.createdByUserId = "user-1";
+		drivesOn = false;
+		await expect(
+			caller.environment.promote({
+				cloudWorkspaceId: WORKSPACE_ID,
+				environmentId: ENVIRONMENT_ID,
+			}),
+		).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+		expect(promoted).toBe(0);
+		expect(abandoned).toEqual([]);
 	});
 });
