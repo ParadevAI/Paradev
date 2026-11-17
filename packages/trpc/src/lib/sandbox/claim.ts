@@ -185,6 +185,7 @@ export async function buildSandboxClaim(args: {
 			sourceKind: environment.sourceKind,
 			sourceRef: environment.sourceRef,
 			region: environment.region,
+			goldenDriveName: environment.goldenDriveName,
 		},
 		repositories,
 		agentCredentialDigest: agentCredentialDigest(signIns),

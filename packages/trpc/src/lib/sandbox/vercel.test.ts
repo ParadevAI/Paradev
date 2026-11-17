@@ -7,12 +7,16 @@ import {
 	setSystemTime,
 	test,
 } from "bun:test";
-import { Sandbox } from "@vercel/sandbox";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
+import { Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
+	composeMounts,
+	deleteSandboxAndDrive,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
+	promoteSandboxToEnvironment,
 	SESSION_TIMEOUT_MS,
 	topUpSandboxSession,
 	wakeSandbox,
@@ -137,15 +141,21 @@ describe("listActiveWorkspaceSandboxes", () => {
 describe("wakeSandbox mounts", () => {
 	const RESUMED = new Error("resumed");
 	let status: "running" | "stopped";
+	let current: Record<string, unknown>;
+	let events: string[];
 	let updates: Array<Record<string, unknown>>;
 	stub(Sandbox, {
 		get: async () => ({
 			get status() {
 				return status;
 			},
+			get mounts() {
+				return current;
+			},
 			vcpus: 4,
 			domain: () => "https://box.invalid",
 			update: async (params: Record<string, unknown>) => {
+				events.push("update");
 				updates.push(params);
 			},
 			extendTimeout: async () => {},
@@ -154,22 +164,32 @@ describe("wakeSandbox mounts", () => {
 			},
 		}),
 	});
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			events.push(`drive:${name}`);
+			return { name, currentSandboxName: undefined };
+		},
+	});
 	stub(globalThis, {
 		fetch: async () => {
 			throw new Error("no network in tests");
 		},
 	});
-	const mounts = { "/mnt/drive": { drive: "drive-1", mode: "read-write" } };
+	const drive = { drive: "drive-1", mode: "read-write" };
+	const mounts = { [SANDBOX_PATHS.drive]: drive };
 	const claim = { vcpus: 4, files: [], networkPolicy: {} } as never;
 	const stopAtResume = async () => {
+		events.push("resume");
 		throw RESUMED;
 	};
 
 	beforeEach(() => {
+		current = {};
+		events = [];
 		updates = [];
 	});
 
-	test("a stopped box gets its mounts before it resumes", async () => {
+	test("a stopped box waits for its drive, then gets its mounts, then resumes", async () => {
 		status = "stopped";
 		await expect(
 			wakeSandbox({
@@ -179,7 +199,48 @@ describe("wakeSandbox mounts", () => {
 				beforeResume: stopAtResume,
 			}),
 		).rejects.toBe(RESUMED);
+		expect(events).toEqual(["drive:drive-1", "update", "resume"]);
 		expect(updates).toEqual([{ mounts }]);
+	});
+
+	test("the drive and the agent-tools drive share one mounts object", async () => {
+		status = "stopped";
+		const agents = "agent-tools-iad1-feedfacecafe";
+		current = {
+			[SANDBOX_PATHS.agents]: { drive: "agent-tools-old", mode: "snapshot" },
+		};
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: { ...(claim as object), agentToolsDrive: agents } as never,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates).toEqual([
+			{
+				mounts: {
+					[SANDBOX_PATHS.drive]: drive,
+					[SANDBOX_PATHS.agents]: { drive: agents, mode: "snapshot" },
+				},
+			},
+		]);
+	});
+
+	test("an agent-tools update keeps the drive the box already has", async () => {
+		status = "stopped";
+		current = { [SANDBOX_PATHS.drive]: drive };
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: {
+					...(claim as object),
+					agentToolsDrive: "agent-tools-iad1-feedfacecafe",
+				} as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates[0]?.mounts).toMatchObject({ [SANDBOX_PATHS.drive]: drive });
 	});
 
 	test("a box without a drive gets no mount update", async () => {
@@ -200,6 +261,177 @@ describe("wakeSandbox mounts", () => {
 			wakeSandbox({ providerSandboxId: "sbx", claim, mounts: mounts as never }),
 		).rejects.toThrow();
 		expect(updates).toEqual([{ networkPolicy: {} }]);
+		expect(events).not.toContain("drive:drive-1");
+	});
+});
+
+describe("composeMounts", () => {
+	test("merges parts, a later part winning a shared path, and drops empty", () => {
+		const a = { "/a": { drive: "a", mode: "read-write" as const } };
+		const b = { "/a": { drive: "b", mode: "snapshot" as const } };
+		expect(composeMounts(a, undefined, b)).toEqual(b);
+		expect(composeMounts(undefined, {})).toBeUndefined();
+	});
+});
+
+describe("promoteSandboxToEnvironment", () => {
+	let events: string[];
+	let created: Record<string, unknown> | null;
+	let goldenStatus: string;
+	let goldenSnapshot: string;
+	const source = {
+		status: "running",
+		region: "iad1",
+		vcpus: 4,
+		mounts: {},
+		snapshot: async () => {
+			events.push("snapshot source");
+			return { snapshotId: "snap-1" };
+		},
+		update: async (params: Record<string, unknown>) => {
+			events.push(`update source ${JSON.stringify(params.mounts)}`);
+		},
+		writeFiles: async () => {},
+		runCommand: async () => {
+			events.push("boot source");
+		},
+	};
+	const golden = {
+		get status() {
+			return goldenStatus;
+		},
+		get currentSnapshotId() {
+			return goldenSnapshot;
+		},
+		runCommand: async (command: { args: string[] }) => {
+			events.push(`strip ${command.args.join(" ")}`);
+		},
+		stop: async () => {
+			goldenStatus = "stopped";
+			goldenSnapshot = "snap-golden";
+		},
+	};
+	stub(Sandbox, {
+		get: async ({ name }: { name: string }) =>
+			name === "ws-source" ? source : golden,
+		create: async (params: Record<string, unknown>) => {
+			created = params;
+			return golden;
+		},
+	});
+	const drives = {
+		find: async (name: string) => {
+			events.push(`find ${name}`);
+			return { region: "iad1" };
+		},
+		create: async () => {},
+		fork: async (from: string, to: string) => {
+			events.push(`fork ${from} ${to}`);
+		},
+		remove: async () => {},
+	};
+	const claim = {
+		identity: {
+			SUPERSET_SANDBOX_CONTRACT: "1",
+			SUPERSET_BUNDLE_SHA: "0".repeat(64),
+			SUPERSET_API_URL: "https://api.invalid",
+			SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+			SUPERSET_SANDBOX_ORGANIZATION_ID: "00000000-0000-4000-8000-000000000002",
+			SUPERSET_SANDBOX_REPOSITORIES: "[]",
+			SUPERSET_SANDBOX_IMAGE_TAG: "env-g",
+			SUPERSET_SANDBOX_PROVIDER: "vercel",
+		},
+		hostSecret: "s",
+		files: [],
+	} as never;
+
+	beforeEach(() => {
+		events = [];
+		created = null;
+		goldenStatus = "running";
+		goldenSnapshot = "snap-0";
+	});
+
+	test("forks the source's drive once it is released and strips identity on the drive", async () => {
+		const result = await promoteSandboxToEnvironment({
+			sourceSandbox: "ws-source",
+			goldenName: "env-g",
+			claim,
+			sourceDriveName: "drive-ws-source",
+			drives,
+		});
+		expect(result.goldenDriveName).toBe("env-drive-env-g");
+		expect(created?.mounts).toEqual({
+			[SANDBOX_PATHS.drive]: { drive: "env-drive-env-g", mode: "read-write" },
+		});
+		const strip = events.find((event) => event.startsWith("strip")) ?? "";
+		expect(strip).toContain(`${SANDBOX_PATHS.drive}/workspace/.env`);
+		expect(strip).toContain(`${SANDBOX_PATHS.drive}/home/.codex/sessions`);
+		expect(events).toEqual([
+			"snapshot source",
+			"find drive-ws-source",
+			"fork drive-ws-source env-drive-env-g",
+			strip,
+			"find env-drive-env-g",
+			`update source ${JSON.stringify({ [SANDBOX_PATHS.drive]: { drive: "drive-ws-source", mode: "read-write" } })}`,
+			"boot source",
+		]);
+	});
+
+	test("a source without a drive leaves the environment out of drive mode", async () => {
+		const result = await promoteSandboxToEnvironment({
+			sourceSandbox: "ws-source",
+			goldenName: "env-g",
+			claim,
+			drives,
+		});
+		expect(result.goldenDriveName).toBeNull();
+		expect(created).not.toHaveProperty("mounts");
+		expect(events.some((event) => event.startsWith("fork"))).toBe(false);
+		expect(events.join("\n")).not.toContain(SANDBOX_PATHS.drive);
+	});
+});
+
+describe("deleteSandboxAndDrive", () => {
+	let events: string[];
+	let status: string;
+	stub(Sandbox, {
+		get: async () => ({
+			get status() {
+				return status;
+			},
+			currentSession: () => ({ sessionId: "s" }),
+			stop: async () => {
+				events.push("stop");
+				status = "stopped";
+			},
+			delete: async () => {
+				events.push("delete sandbox");
+			},
+		}),
+	});
+	const drives = {
+		find: async () => {
+			events.push("find");
+			return { region: "iad1" };
+		},
+		create: async () => {},
+		fork: async () => {},
+		remove: async (name: string) => {
+			events.push(`delete ${name}`);
+		},
+	};
+
+	test("stops the box and waits for the drive before deleting either", async () => {
+		events = [];
+		status = "running";
+		await deleteSandboxAndDrive("ws-1", "drive-ws-1", drives);
+		expect(events).toEqual([
+			"stop",
+			"find",
+			"delete sandbox",
+			"delete drive-ws-1",
+		]);
 	});
 });
 

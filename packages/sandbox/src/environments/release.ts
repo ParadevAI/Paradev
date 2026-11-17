@@ -199,11 +199,21 @@ if (SKIP_IMAGE) {
 // email clients, whose secrets this job does not have.
 const {
 	deleteSandbox,
+	deleteSandboxAndDrive,
 	provisionSandbox,
 	stopAndSnapshot,
 	stripWorkspaceIdentity,
 	wakeSandbox,
 } = await import("@superset/trpc/lib/sandbox/vercel");
+const {
+	forkWorkspaceDrive,
+	goldenDriveNameFor,
+	vercelDrives,
+	waitForDriveDetached,
+	workspaceDriveMounts,
+	workspaceDriveNameFor,
+	workspaceDrivesEnabled,
+} = await import("@superset/trpc/lib/sandbox/drives");
 const { deriveSandboxCredentials } = await import(
 	"@superset/trpc/lib/sandbox/credentials"
 );
@@ -236,6 +246,16 @@ function identityFor(workspaceId: string, sourceRef: string): SandboxIdentity {
 const golden = `env-internal-${Date.now().toString(36)}`;
 const goldenWorkspaceId = randomUUID();
 const goldenSecret = await sandboxHostSecretFor(goldenWorkspaceId);
+// In drive mode the golden boots with its drive from the first boot, so the
+// checkout and the installs never touch its root disk.
+const drives = vercelDrives();
+const goldenDrive = (await workspaceDrivesEnabled(ORGANIZATION_ID as string))
+	? goldenDriveNameFor(golden)
+	: null;
+if (goldenDrive) {
+	await drives.create(goldenDrive, REGION);
+	log(`golden: drive mode; ${goldenDrive} created in ${REGION}`);
+}
 log(`golden: provisioning ${golden} from ${goldenImage}`);
 // A freshly pushed image sits in `Preparing` while the registry optimises it
 // for sandboxes, and create answers 409 until then.
@@ -257,6 +277,7 @@ for (;;) {
 				networkPolicy: "allow-all",
 				vcpus: GOLDEN_BOX_VCPUS,
 			},
+			mounts: workspaceDriveMounts(goldenDrive),
 		});
 		break;
 	} catch (error) {
@@ -376,8 +397,9 @@ if (failed) fail(`${failed} check(s) failed; ${golden} left for inspection`);
 
 // A fork must not come up as the golden's workspace; and the stop is the
 // snapshot forks start from.
-await stripWorkspaceIdentity(goldenBox);
+await stripWorkspaceIdentity(goldenBox, { withDrive: goldenDrive !== null });
 await stopAndSnapshot(golden);
+if (goldenDrive) await waitForDriveDetached(goldenDrive, { drives });
 log(`golden: ${golden} stripped, stopped and snapshotted`);
 
 // 4. probe, as a workspace
@@ -441,13 +463,28 @@ const probeClaim = {
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
 };
+const probeDrive = goldenDrive ? workspaceDriveNameFor(probe) : null;
+const probeMounts = workspaceDriveMounts(probeDrive);
+if (probeDrive) {
+	await forkWorkspaceDrive({
+		name: probeDrive,
+		region: REGION,
+		goldenDriveName: goldenDrive,
+		drives,
+	});
+}
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({
 	name: probe,
 	environment: { sourceKind: "fork", sourceRef: golden, region: REGION },
 	claim: probeClaim,
+	mounts: probeMounts,
 });
-await wakeSandbox({ providerSandboxId: probe, claim: probeClaim });
+await wakeSandbox({
+	providerSandboxId: probe,
+	claim: probeClaim,
+	mounts: probeMounts,
+});
 let probeFailed = await probeBox({
 	name: probe,
 	credentials,
@@ -492,14 +529,18 @@ if (ENV_FILE) {
 {
 	const box = await Sandbox.get({ ...credentials, name: probe });
 	await box.stop();
-	await wakeSandbox({ providerSandboxId: probe, claim: probeClaim });
+	await wakeSandbox({
+		providerSandboxId: probe,
+		claim: probeClaim,
+		mounts: probeMounts,
+	});
 	probeFailed += await checkWakeLog({ name: probe, credentials, log });
 }
 if (probeFailed)
 	fail(
 		`${probeFailed} probe check(s) failed; ${golden} and ${probe} left for inspection`,
 	);
-await deleteSandbox(probe);
+await deleteSandboxAndDrive(probe, probeDrive, drives);
 log(`probe: ${probe} deleted`);
 
 if (!SKIP_IMAGE) {
@@ -552,6 +593,7 @@ const fromGolden = {
 	sourceKind: "fork" as const,
 	sourceRef: golden,
 	region: REGION,
+	goldenDriveName: goldenDrive,
 	bundleSha: bundle.sha256,
 	primaryRepositoryId: monorepo.id,
 	archivedAt: null,
@@ -628,6 +670,12 @@ if (
 	} else {
 		await deleteSandbox(previous.sourceRef);
 		log(`previous golden ${previous.sourceRef} deleted`);
+		const { deleteGoldenDriveIfUnreferenced } = await import(
+			"@superset/trpc/lib/sandbox/golden-drives"
+		);
+		await deleteGoldenDriveIfUnreferenced(previous.goldenDriveName, drives);
+		if (previous.goldenDriveName)
+			log(`previous golden drive ${previous.goldenDriveName} deleted`);
 	}
 }
 log("release done");

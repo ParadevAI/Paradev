@@ -22,13 +22,15 @@ export {
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
+	DriveStillAttachedError,
 	deleteWorkspaceDrive,
-	ensureWorkspaceDrive,
+	forkWorkspaceDrive,
 	WORKSPACE_DRIVE_MOUNT_PATH,
 	workspaceDriveMounts,
-	workspaceDriveNameFor,
+	workspaceDriveNameToClaim,
 	workspaceDrivesEnabled,
 } from "./drives";
+export { deleteGoldenDriveIfUnreferenced } from "./golden-drives";
 export {
 	listRemoteBranches,
 	type RemoteBranch,
@@ -59,6 +61,7 @@ export {
 	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
+	deleteSandboxAndDrive,
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,

@@ -9,6 +9,8 @@ export DISPLAY="${DISPLAY:-${SUPERSET_DISPLAY:-:1}}"
 [ -r "${SUPERSET_RUN_DIR:-/run/superset}/desktop.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/desktop.env"
 # The box's memory ceiling and CPUs, written by superset-boot from the cgroup.
 [ -r "${SUPERSET_RUN_DIR:-/run/superset}/resources.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/resources.env"
+# The package stores on the workspace drive, written by superset-boot in drive mode.
+[ -r "${SUPERSET_RUN_DIR:-/run/superset}/drive.env" ] && . "${SUPERSET_RUN_DIR:-/run/superset}/drive.env"
 case ":$PATH:" in *":/usr/local/go/bin:"*) ;; *) export PATH="$PATH:/usr/local/go/bin" ;; esac
 # The agent CLIs are pinned by the bundle (install-agent-clis) or run from the
 # read-only agents drive; a self-update would drift from the pin and only

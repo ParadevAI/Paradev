@@ -35,6 +35,7 @@ import {
 } from "./credentials";
 import {
 	type DriveHost,
+	deleteWorkspaceDrive,
 	goldenDriveNameFor,
 	vercelDrives,
 	waitForDriveDetached,
@@ -107,6 +108,8 @@ export interface SandboxEnvironment {
 	sourceKind: "image" | "fork";
 	sourceRef: string;
 	region: string;
+	/** Set when the environment is in drive mode; see `drives.ts`. */
+	goldenDriveName?: string | null;
 }
 
 /** Everything the box needs to become one workspace; nothing of it is a create-time env. */
@@ -938,4 +941,21 @@ export async function deleteSandbox(providerSandboxId: string): Promise<void> {
 	if (!sandbox) return;
 	// Snapshots outlive a sandbox by default and keep billing storage.
 	await sandbox.delete({ deleteOrphanSnapshots: true });
+}
+
+/**
+ * A sandbox deleted while it holds its drive read-write leaves the drive
+ * attached for minutes, so the box is stopped and the drive released first.
+ * Throws while the drive is still attached; the caller retries.
+ */
+export async function deleteSandboxAndDrive(
+	providerSandboxId: string,
+	driveName: string | null | undefined,
+	drives: DriveHost = vercelDrives(),
+): Promise<void> {
+	if (!driveName) return deleteSandbox(providerSandboxId);
+	await stopSandbox(providerSandboxId);
+	await waitForDriveDetached(driveName, { drives });
+	await deleteSandbox(providerSandboxId);
+	await deleteWorkspaceDrive(driveName, drives);
 }

@@ -21,7 +21,9 @@ import {
 } from "../../lib/cloud-guards";
 import {
 	buildSandboxClaim,
+	deleteGoldenDriveIfUnreferenced,
 	deleteSandbox,
+	deleteWorkspaceDrive,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
@@ -503,6 +505,7 @@ export const environmentRouter = {
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
 				claim,
+				sourceDriveName: workspace.driveName,
 			});
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
@@ -510,6 +513,7 @@ export const environmentRouter = {
 				sourceKind: "fork" as const,
 				sourceRef: goldenName,
 				region: golden.region,
+				goldenDriveName: golden.goldenDriveName,
 				bundleSha: await currentBundleSha(),
 				primaryRepositoryId,
 			};
@@ -598,21 +602,25 @@ export const environmentRouter = {
 					return saved;
 				})
 				.catch(async (error: unknown) => {
-					await deleteSandbox(goldenName).catch((cleanup: unknown) =>
-						console.error(
-							`[environment/promote] could not delete unused golden ${goldenName}`,
-							cleanup,
-						),
-					);
+					await deleteSandbox(goldenName)
+						.then(() => deleteWorkspaceDrive(golden.goldenDriveName))
+						.catch((cleanup: unknown) =>
+							console.error(
+								`[environment/promote] could not delete unused golden ${goldenName}`,
+								cleanup,
+							),
+						);
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
-				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
-					console.error(
-						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
-						error,
-					),
-				);
+				await deleteSandbox(target.sourceRef)
+					.then(() => deleteGoldenDriveIfUnreferenced(target.goldenDriveName))
+					.catch((error: unknown) =>
+						console.error(
+							`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
+							error,
+						),
+					);
 			}
 			return row;
 		}),
@@ -709,11 +717,13 @@ export const environmentRouter = {
 				.returning({
 					sourceKind: environments.sourceKind,
 					sourceRef: environments.sourceRef,
+					goldenDriveName: environments.goldenDriveName,
 				});
 			// A golden is one environment's alone, and an archived environment
 			// never forks from it again; without this it bills storage forever.
 			if (archived?.sourceKind === "fork") {
 				await deleteSandbox(archived.sourceRef);
+				await deleteGoldenDriveIfUnreferenced(archived.goldenDriveName);
 			}
 			return { archived: true };
 		}),

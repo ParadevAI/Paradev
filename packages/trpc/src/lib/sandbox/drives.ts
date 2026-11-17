@@ -15,6 +15,20 @@ export function workspaceDriveNameFor(providerSandboxId: string): string {
 	return `drive-${providerSandboxId}`;
 }
 
+/**
+ * Fork or nothing: a workspace has a drive exactly when its environment is
+ * in drive mode, because the golden's root disk was built without /workspace.
+ */
+export function workspaceDriveNameToClaim(args: {
+	existing: string | null;
+	goldenDriveName: string | null | undefined;
+	providerSandboxId: string;
+}): string | null {
+	if (args.existing) return args.existing;
+	if (!args.goldenDriveName) return null;
+	return workspaceDriveNameFor(args.providerSandboxId);
+}
+
 export function goldenDriveNameFor(goldenName: string): string {
 	return `env-drive-${goldenName}`;
 }
@@ -103,11 +117,16 @@ export function vercelDrives(): DriveHost {
 export async function forkWorkspaceDrive(args: {
 	name: string;
 	region: string;
-	goldenDriveName: string;
+	goldenDriveName: string | null;
 	drives?: DriveHost;
 }): Promise<void> {
 	const drives = args.drives ?? vercelDrives();
 	if (await drives.find(args.name)) return;
+	if (!args.goldenDriveName) {
+		throw new Error(
+			`Drive ${args.name} is missing and its environment has no golden drive to fork`,
+		);
+	}
 	const golden = await drives.find(args.goldenDriveName);
 	if (!golden) {
 		throw new Error(`Golden drive ${args.goldenDriveName} does not exist`);
@@ -158,14 +177,10 @@ export async function waitForDriveDetached(
 	const deadline = Date.now() + (options.timeoutMs ?? DRIVE_DETACH_TIMEOUT_MS);
 	for (;;) {
 		const drive = await drives.find(driveName);
-		if (!drive) throw new Error(`Drive ${driveName} does not exist`);
-		if (!drive.attachedTo) return;
+		if (!drive?.attachedTo) return;
 		if (Date.now() >= deadline) {
 			throw new DriveStillAttachedError(driveName, drive.attachedTo);
 		}
-		await new Promise((resolve) =>
-			setTimeout(resolve, options.pollMs ?? 2000),
-		);
+		await new Promise((resolve) => setTimeout(resolve, options.pollMs ?? 2000));
 	}
 }
-

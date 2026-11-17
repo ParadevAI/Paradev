@@ -3,8 +3,7 @@ import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
-	deleteSandbox,
-	deleteWorkspaceDrive,
+	deleteSandboxAndDrive,
 	describeSandbox,
 	rerunBoxStartHook,
 	runBoxArchiveHook,
@@ -92,8 +91,7 @@ export async function reapArchivedCloudWorkspace(
 		await settleWorkspaceNow(row.id).catch((error) =>
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
-		await deleteSandbox(row.providerSandboxId);
-		await deleteWorkspaceDrive(row.driveName);
+		await deleteSandboxAndDrive(row.providerSandboxId, row.driveName);
 		await reapWorkspaceFiles(row.id);
 		return "reaped";
 	}

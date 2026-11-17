@@ -9,6 +9,9 @@
  *
  *   bun run src/boot-twice.ts            expects superset-sandbox:local
  *   SANDBOX_IMAGE=... bun run src/boot-twice.ts
+ *   BOOT_TWICE_CA_FILE=/etc/ssl/certs/ca-certificates.crt bun run src/boot-twice.ts
+ *       in a cloud workspace, whose egress firewall re-signs TLS: without
+ *       its CA the checkout cannot reach GitHub
  *
  * Exits non-zero on any failed expectation, with the boot log printed.
  */
@@ -17,6 +20,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
 	renderSandboxConf,
+	SANDBOX_DRIVE_HOME_SUBTREES,
+	SANDBOX_DRIVE_STORES,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 } from "@superset/shared/sandbox/contract";
@@ -25,6 +30,13 @@ import { discardingSteps, loadAssets, loadSteps } from "./manifest";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";
 const NAME = `superset-boot-twice-${Date.now().toString(36)}`;
+const DRIVE_NAME = `${NAME}-drive`;
+const CA_MOUNT = process.env.BOOT_TWICE_CA_FILE
+	? [
+			"-v",
+			`${process.env.BOOT_TWICE_CA_FILE}:/etc/ssl/certs/ca-certificates.crt:ro`,
+		]
+	: [];
 const bundleSha = readFileSync(
 	join(PACKAGE_ROOT, "dist", "bundle.sha256"),
 	"utf8",
@@ -47,9 +59,19 @@ function docker(
 	}
 	return out;
 }
-const exec = (cmd: string, opts: { user?: string; check?: boolean } = {}) =>
+const exec = (
+	cmd: string,
+	opts: { user?: string; check?: boolean; on?: string } = {},
+) =>
 	docker(
-		["exec", ...(opts.user ? ["-u", opts.user] : []), NAME, "bash", "-lc", cmd],
+		[
+			"exec",
+			...(opts.user ? ["-u", opts.user] : []),
+			opts.on ?? NAME,
+			"bash",
+			"-lc",
+			cmd,
+		],
 		{ check: opts.check },
 	);
 
@@ -57,7 +79,7 @@ const exec = (cmd: string, opts: { user?: string; check?: boolean } = {}) =>
  * The way the control plane starts boot: as the image user, through sudo
  * with the secret preserved from the command's env, never on the argv.
  */
-function bootAsUser(): string {
+function bootAsUser(on = NAME): string {
 	const proc = Bun.spawnSync(
 		[
 			"docker",
@@ -66,7 +88,7 @@ function bootAsUser(): string {
 			"ubuntu",
 			"-e",
 			"HOST_SERVICE_SECRET=boot-twice-secret",
-			NAME,
+			on,
 			"sudo",
 			"--preserve-env=HOST_SERVICE_SECRET",
 			"/usr/local/bin/superset-boot",
@@ -118,7 +140,177 @@ const identity = renderSandboxConf({
 	]),
 });
 
-docker(["rm", "-f", NAME], { check: false });
+/**
+ * Drive mode, with a tmpfs standing in for the Vercel drive at its mount
+ * path: the layout, the store variables, memguard's swap dir and Docker's
+ * data-root, then a second boot after the session's bind mounts are gone.
+ */
+function drivePass(): void {
+	const drive = SANDBOX_PATHS.drive;
+	const on = DRIVE_NAME;
+	docker([
+		"run",
+		"-d",
+		"--name",
+		on,
+		"--platform",
+		"linux/amd64",
+		"--privileged",
+		"--user",
+		"root",
+		...CA_MOUNT,
+		"--tmpfs",
+		`${drive}:exec,mode=0755`,
+		IMAGE,
+		"sleep",
+		"infinity",
+	]);
+	docker(["exec", "-i", on, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
+		stdin: identity,
+	});
+	const bootDrive = () => {
+		bootAsUser(on);
+		exec(
+			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
+			{ check: false, on },
+		);
+	};
+	const homeMounts = SANDBOX_DRIVE_HOME_SUBTREES.map(
+		(sub) => `${SANDBOX_PATHS.home}/${sub}`,
+	);
+	const allMounted = () =>
+		exec(
+			[SANDBOX_PATHS.workspace, ...homeMounts]
+				.map((path) => `mountpoint -q ${path} || echo "not mounted ${path}"`)
+				.join("; "),
+			{ check: false, on },
+		).trim();
+
+	bootDrive();
+	const log = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive: layout stamped with its milliseconds",
+		/drive\.layout ms=\d+/.test(log),
+		log.match(/drive\.layout.*/)?.[0],
+	);
+	expect(
+		"drive: /workspace and every home subtree are bind mounts",
+		allMounted() === "",
+		allMounted(),
+	);
+	expect(
+		"drive: /workspace is backed by the drive",
+		/\/workspace/.test(
+			exec(`findmnt -no FSROOT ${SANDBOX_PATHS.workspace}`, {
+				check: false,
+				on,
+			}),
+		),
+		exec(`findmnt -no SOURCE,FSROOT ${SANDBOX_PATHS.workspace}`, {
+			check: false,
+			on,
+		}).trim(),
+	);
+	expect(
+		"drive: its directories belong to the sandbox user",
+		exec(
+			`stat -c %U ${drive}/workspace ${drive}/home ${drive}/home/.local ${SANDBOX_PATHS.home}/.local ${SANDBOX_PATHS.home}/.cargo`,
+			{ check: false, on },
+		).trim() === Array(5).fill("ubuntu").join("\n"),
+	);
+	const hostEnv = exec(
+		`tr '\\0' '\\n' < /proc/$(cat ${SANDBOX_PATHS.run}/host-service.pid)/environ`,
+		{ check: false, on },
+	);
+	expect(
+		"drive: host-service gets the stores inside /workspace",
+		hostEnv.includes(`BUN_INSTALL_CACHE_DIR=${SANDBOX_DRIVE_STORES.bun}`) &&
+			hostEnv.includes(`npm_config_store_dir=${SANDBOX_DRIVE_STORES.pnpm}`),
+	);
+	expect(
+		"drive: a login shell gets them too",
+		exec("echo $BUN_INSTALL_CACHE_DIR", {
+			user: "ubuntu",
+			check: false,
+			on,
+		}).trim() === SANDBOX_DRIVE_STORES.bun,
+	);
+	expect(
+		"drive: memguard swaps on the drive",
+		/swap_dir=\/mnt\/superset-drive\/swap/.test(
+			exec(
+				`for i in $(seq 1 50); do grep -q swap_dir= ${SANDBOX_PATHS.logs}/memguard.log && break; sleep 0.1; done; cat ${SANDBOX_PATHS.logs}/memguard.log`,
+				{ check: false, on },
+			),
+		),
+	);
+	expect(
+		"drive: Docker's data-root is on the drive, storage driver kept",
+		/"data-root":"\/mnt\/superset-drive\/docker"/.test(
+			exec("jq -c . /etc/docker/daemon.json", { check: false, on }),
+		) &&
+			/fuse-overlayfs/.test(
+				exec("cat /etc/docker/daemon.json", { check: false, on }),
+			),
+		exec("cat /etc/docker/daemon.json", { check: false, on }).trim(),
+	);
+	const checkedOut = /ready/.test(
+		exec(
+			`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+			{ check: false, on },
+		),
+	);
+	expect("drive: checkout done", checkedOut);
+	expect(
+		"drive: the checkout landed on the drive",
+		/ok/.test(
+			exec(`test -d ${drive}/workspace/.git && echo ok`, { check: false, on }),
+		),
+	);
+	expect(
+		"drive: git ignores the stores of a root checkout",
+		/\/\.superset\/stores\//.test(
+			exec(`cat ${SANDBOX_PATHS.workspace}/.git/info/exclude`, {
+				check: false,
+				on,
+			}),
+		),
+	);
+
+	// A new session: no processes and no bind mounts survive; the drive does.
+	exec(
+		`pkill -u ubuntu -TERM || true; pkill -x superset-memgua || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}; for m in $(findmnt -rn -o TARGET | grep -E '^(${SANDBOX_PATHS.workspace}|${SANDBOX_PATHS.home}/)' | sort -r); do umount "$m"; done; : > ${SANDBOX_PATHS.bootLog}`,
+		{ check: false, on },
+	);
+	bootDrive();
+	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive, second boot: layout redone",
+		/drive\.layout ms=\d+/.test(log2),
+	);
+	expect(
+		"drive, second boot: every bind mount back",
+		allMounted() === "",
+		allMounted(),
+	);
+	expect(
+		"drive, second boot: nothing installed",
+		/apply-rootfs installed=0/.test(log2),
+	);
+	expect(
+		"drive, second boot: the checkout is still there",
+		/checkout\.(skipped|fetched)/.test(
+			exec(
+				`for i in $(seq 1 600); do grep -qE 'checkout.(skipped|fetched|cloned|clone)' ${SANDBOX_PATHS.bootLog} && break; sleep 0.1; done; cat ${SANDBOX_PATHS.bootLog}`,
+				{ check: false, on },
+			),
+		) || !checkedOut,
+		log2.match(/checkout\..*/)?.[0],
+	);
+	console.log(`\nboot log (drive, second boot):\n${log2}`);
+}
+
+docker(["rm", "-f", NAME, DRIVE_NAME], { check: false });
 // Privileged for the /dev/shm remount and the X socket dir, like the VM. No
 // network policy here; the checkout needs the internet.
 docker([
@@ -131,6 +323,7 @@ docker([
 	"--privileged",
 	"--user",
 	"root",
+	...CA_MOUNT,
 	IMAGE,
 	"sleep",
 	"infinity",
@@ -460,8 +653,10 @@ try {
 			exec(`ls ${SANDBOX_PATHS.run}`, { check: false }),
 		),
 	);
+
+	drivePass();
 } finally {
-	docker(["rm", "-f", NAME], { check: false });
+	docker(["rm", "-f", NAME, DRIVE_NAME], { check: false });
 }
 if (failures.length) {
 	console.error(

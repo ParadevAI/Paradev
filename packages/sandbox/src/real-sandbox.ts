@@ -5,9 +5,15 @@
  * built here from a throwaway identity.
  *
  *   bun run src/real-sandbox.ts            (VERCEL_SANDBOX_*, SANDBOX_GATE_SECRET, CDN_R2_*)
+ *   REAL_SANDBOX_DRIVE=1 bun run src/real-sandbox.ts
  *
  * Publishes the bundle first so the box can fetch it if the image is older.
  * Leaves the sandbox up for inspection on failure; deletes it on success.
+ *
+ * With REAL_SANDBOX_DRIVE=1, a second box runs in drive mode: a throwaway
+ * golden drive, the box on a fork of it, the layout, the stores, swap and
+ * Docker on the drive, then a stop and a wake. Everything it made is
+ * deleted, pass or fail: the box stopped first, each drive once detached.
  */
 
 import { randomUUID } from "node:crypto";
@@ -15,6 +21,7 @@ import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
+	SANDBOX_PATHS,
 	type SandboxIdentity,
 } from "@superset/shared/sandbox/contract";
 import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
@@ -48,9 +55,8 @@ const { buildBundle, publishBundle } = await import("./build");
 const bundle = buildBundle();
 await publishBundle(bundle, { dry: false });
 
-const { deleteSandbox, provisionSandbox, wakeSandbox } = await import(
-	"@superset/trpc/lib/sandbox/vercel"
-);
+const { deleteSandbox, deleteSandboxAndDrive, provisionSandbox, wakeSandbox } =
+	await import("@superset/trpc/lib/sandbox/vercel");
 const { sandboxHostSecretFor } = await import(
 	"@superset/trpc/lib/sandbox/access"
 );
@@ -87,33 +93,41 @@ const claim = {
 	vcpus: GOLDEN_BOX_VCPUS,
 };
 
+// A freshly pushed image sits in `Preparing` while the registry optimises
+// it, and create answers 409 until then.
+async function provisionFromImage(
+	box: string,
+	mounts?: Parameters<typeof provisionSandbox>[0]["mounts"],
+): Promise<void> {
+	const deadline = Date.now() + 20 * 60_000;
+	for (;;) {
+		try {
+			await provisionSandbox({
+				name: box,
+				environment: {
+					sourceKind: "image",
+					sourceRef: SANDBOX_IMAGE_NAME,
+					region: DEFAULT_SANDBOX_REGION,
+				},
+				claim,
+				mounts,
+			});
+			return;
+		} catch (error) {
+			const notReady =
+				String(error).includes("409") ||
+				String(error).includes("image_not_ready");
+			if (!notReady || Date.now() > deadline) throw error;
+			log("image still preparing in the registry, waiting");
+			await new Promise((resolve) => setTimeout(resolve, 15_000));
+		}
+	}
+}
+
 log(
 	`provisioning ${name} from ${SANDBOX_IMAGE_NAME} on bundle ${bundle.sha256.slice(0, 12)}`,
 );
-// A freshly pushed image sits in `Preparing` while the registry optimises
-// it, and create answers 409 until then.
-const deadline = Date.now() + 20 * 60_000;
-for (;;) {
-	try {
-		await provisionSandbox({
-			name,
-			environment: {
-				sourceKind: "image",
-				sourceRef: SANDBOX_IMAGE_NAME,
-				region: DEFAULT_SANDBOX_REGION,
-			},
-			claim,
-		});
-		break;
-	} catch (error) {
-		const notReady =
-			String(error).includes("409") ||
-			String(error).includes("image_not_ready");
-		if (!notReady || Date.now() > deadline) throw error;
-		log("image still preparing in the registry, waiting");
-		await new Promise((resolve) => setTimeout(resolve, 15_000));
-	}
-}
+await provisionFromImage(name);
 const woken = await wakeSandbox({ providerSandboxId: name, claim });
 log(
 	`host-service answered at ${woken.hostTarget} (${Date.now() - started} ms since start)`,
@@ -143,5 +157,131 @@ if (failed) {
 	process.exit(1);
 }
 await deleteSandbox(name);
-log(`${name} deleted; all checks passed`);
+log(`${name} deleted`);
+
+if (process.env.REAL_SANDBOX_DRIVE === "1") {
+	const driveFailures = await drivePass();
+	if (driveFailures) {
+		console.error(`${driveFailures} drive check(s) failed`);
+		process.exit(1);
+	}
+}
+log("all checks passed");
 process.exit(0);
+
+async function drivePass(): Promise<number> {
+	const {
+		forkWorkspaceDrive,
+		vercelDrives,
+		waitForDriveDetached,
+		workspaceDriveMounts,
+		workspaceDriveNameFor,
+	} = await import("@superset/trpc/lib/sandbox/drives");
+	const drives = vercelDrives();
+	const suffix = Date.now().toString(36);
+	const goldenDrive = `env-drive-real-check-${suffix}`;
+	const box = `ws-real-drive-${suffix}`;
+	const boxDrive = workspaceDriveNameFor(box);
+	const mounts = workspaceDriveMounts(boxDrive);
+	const drive = SANDBOX_PATHS.drive;
+	let failures = 0;
+	const check = (label: string, ok: boolean, detail = "") => {
+		log(
+			`${ok ? "ok  " : "FAIL"} drive: ${label}${detail ? `: ${detail}` : ""}`,
+		);
+		if (!ok) failures++;
+	};
+	const run = async (command: string) => {
+		const sandbox = await Sandbox.get({ ...credentials, name: box });
+		const result = await sandbox.runCommand({
+			cmd: "bash",
+			args: ["-lc", command],
+			sudo: true,
+		});
+		return `${await result.stdout()}${await result.stderr()}`.trim();
+	};
+	const layouts = async () =>
+		Number(
+			await run(
+				`grep -c 'drive\\.layout ms=' ${SANDBOX_PATHS.bootLog} || true`,
+			),
+		);
+	try {
+		await drives.create(goldenDrive, DEFAULT_SANDBOX_REGION);
+		await forkWorkspaceDrive({
+			name: boxDrive,
+			region: DEFAULT_SANDBOX_REGION,
+			goldenDriveName: goldenDrive,
+			drives,
+		});
+		log(`drive: ${boxDrive} forked from ${goldenDrive}; provisioning ${box}`);
+		await provisionFromImage(box, mounts);
+		await wakeSandbox({ providerSandboxId: box, claim, mounts });
+
+		const bootLog = await run(`cat ${SANDBOX_PATHS.bootLog}`);
+		check(
+			"layout stamped",
+			/drive\.layout ms=\d+/.test(bootLog),
+			bootLog.match(/drive\.layout.*/)?.[0],
+		);
+		check("host-service ready", /host\.ready/.test(bootLog));
+		const backing = await run(
+			`mountpoint -q ${SANDBOX_PATHS.workspace} && findmnt -no SOURCE ${drive} && findmnt -no SOURCE,FSROOT ${SANDBOX_PATHS.workspace}`,
+		);
+		const [device, workspaceMount] = backing.split("\n");
+		check(
+			"/workspace is a bind mount of the drive",
+			Boolean(device) && workspaceMount === `${device} /workspace`,
+			backing.replaceAll("\n", " | "),
+		);
+		const checkout = await run(
+			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && break; sleep 1; done; test -d ${drive}/workspace/.git && echo on-drive`,
+		);
+		check("the checkout landed on the drive", checkout.endsWith("on-drive"));
+		check(
+			"memguard swaps on the drive",
+			(
+				await run(`grep -o 'swap_dir=[^ ]*' ${SANDBOX_PATHS.logs}/memguard.log`)
+			).includes(`swap_dir=${drive}/swap`),
+		);
+		const dockerRoot = await run(
+			`(dockerd > /tmp/dockerd.log 2>&1 &); for i in $(seq 1 60); do docker info --format '{{.DockerRootDir}}' 2>/dev/null && exit 0; sleep 1; done; tail -5 /tmp/dockerd.log`,
+		);
+		check(
+			"docker info reports the drive data-root",
+			dockerRoot === `${drive}/docker`,
+			dockerRoot,
+		);
+
+		const before = await layouts();
+		await (await Sandbox.get({ ...credentials, name: box })).stop();
+		const wakeStarted = Date.now();
+		await wakeSandbox({ providerSandboxId: box, claim, mounts });
+		log(`drive: woken again in ${Date.now() - wakeStarted} ms`);
+		check(
+			"the checkout is still there after a wake",
+			(await run(
+				`git -C ${SANDBOX_PATHS.workspace} rev-parse --is-inside-work-tree`,
+			)) === "true",
+		);
+		check("the layout was redone on the wake", (await layouts()) > before);
+		check(
+			"/workspace is a mount point again",
+			(await run(`mountpoint -q ${SANDBOX_PATHS.workspace} && echo yes`)) ===
+				"yes",
+		);
+	} catch (error) {
+		check("pass ran to the end", false, String(error).slice(0, 300));
+	} finally {
+		await deleteSandboxAndDrive(box, boxDrive, drives).catch((error) =>
+			log(`drive: could not delete ${box} and ${boxDrive}: ${error}`),
+		);
+		await waitForDriveDetached(goldenDrive, { drives })
+			.then(() => drives.remove(goldenDrive))
+			.catch((error) =>
+				log(`drive: could not delete ${goldenDrive}: ${error}`),
+			);
+		log(`drive: ${box}, ${boxDrive} and ${goldenDrive} deleted`);
+	}
+	return failures;
+}

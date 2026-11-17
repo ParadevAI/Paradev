@@ -1,16 +1,15 @@
 import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, environments } from "@superset/db/schema";
+import { cloudWorkspaces } from "@superset/db/schema";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
 	buildSandboxClaim,
-	deleteSandbox,
-	deleteWorkspaceDrive,
-	ensureWorkspaceDrive,
+	deleteSandboxAndDrive,
+	forkWorkspaceDrive,
 	provisionSandbox,
 	recordBootSpans,
 	type SandboxEnvironment,
@@ -18,8 +17,7 @@ import {
 	settleSandbox,
 	stopSandbox,
 	workspaceDriveMounts,
-	workspaceDriveNameFor,
-	workspaceDrivesEnabled,
+	workspaceDriveNameToClaim,
 } from "../../lib/sandbox";
 import {
 	failChatMovesTo,
@@ -63,46 +61,23 @@ type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
  * The name is on the row before the drive exists, so a delete that races
  * this provision still finds it.
  */
-async function claimWorkspaceDriveName(
+async function claimWorkspaceDrive(
 	row: CloudWorkspaceRow,
-	drivesEnabled: Promise<boolean>,
-): Promise<string | null> {
-	if (row.driveName) return row.driveName;
-	if (!(await drivesEnabled)) return null;
-	const driveName = workspaceDriveNameFor(row.providerSandboxId);
-	await db
-		.update(cloudWorkspaces)
-		.set({ driveName })
-		.where(eq(cloudWorkspaces.id, row.id));
-	return driveName;
-}
-
-async function provisionWorkspaceDrive(args: {
-	row: CloudWorkspaceRow;
-	driveName: string;
-	environment: SandboxEnvironment;
-}): Promise<void> {
-	const { row, driveName, environment } = args;
-	const golden = await db.query.environments.findFirst({
-		where: eq(environments.id, row.environmentId),
-		columns: { goldenDriveName: true },
-	});
-	await ensureWorkspaceDrive({
-		name: driveName,
-		region: environment.region,
-		goldenDriveName: golden?.goldenDriveName ?? null,
-	});
-}
-
-async function deleteDriveOf(
-	cloudWorkspaceId: string,
-	driveName: string | null,
+	driveName: string,
+	environment: SandboxEnvironment,
 ): Promise<void> {
-	await deleteWorkspaceDrive(driveName).catch((error) =>
-		console.error(
-			`[cloud-workspace] leaked drive ${driveName} of ${cloudWorkspaceId}`,
-			error,
-		),
+	if (!row.driveName) {
+		await db
+			.update(cloudWorkspaces)
+			.set({ driveName })
+			.where(eq(cloudWorkspaces.id, row.id));
+	}
+	await Sentry.startSpan({ name: "drive", op: "sandbox" }, () =>
+		forkWorkspaceDrive({
+			name: driveName,
+			region: environment.region,
+			goldenDriveName: environment.goldenDriveName ?? null,
+		}),
 	);
 }
 
@@ -167,9 +142,6 @@ async function provision(
 				);
 	let bootId: string | null = null;
 	let driveName = row.driveName;
-	const drivesEnabled = driveName
-		? Promise.resolve(true)
-		: workspaceDrivesEnabled(row.createdByUserId);
 	try {
 		const { claim, environment, agentCredentialDigest } =
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
@@ -181,13 +153,12 @@ async function provision(
 			createdByUserId: row.createdByUserId,
 			...boxFor(claim.vcpus),
 		}));
-		const claimedDrive = await claimWorkspaceDriveName(row, drivesEnabled);
-		driveName = claimedDrive;
-		if (claimedDrive) {
-			await Sentry.startSpan({ name: "drive", op: "sandbox" }, () =>
-				provisionWorkspaceDrive({ row, driveName: claimedDrive, environment }),
-			);
-		}
+		driveName = workspaceDriveNameToClaim({
+			existing: row.driveName,
+			goldenDriveName: environment.goldenDriveName,
+			providerSandboxId: row.providerSandboxId,
+		});
+		if (driveName) await claimWorkspaceDrive(row, driveName, environment);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() =>
@@ -225,8 +196,7 @@ async function provision(
 							error,
 						),
 				);
-				await deleteSandbox(providerSandboxId);
-				await deleteDriveOf(row.id, driveName);
+				await deleteSandboxAndDrive(providerSandboxId, driveName);
 				if (bootId) await releaseBoot(bootId);
 			}
 			await naming.catch(() => {});
@@ -290,19 +260,15 @@ async function provision(
 		// from the sidebar still removes it. Any other failure must not leak
 		// a box, since billing started at provision.
 		const keepForDiagnosis = error instanceof SandboxNotReadyError;
-		const tornDown = await (keepForDiagnosis ? stopSandbox : deleteSandbox)(
-			providerSandboxId,
-		).then(
-			() => true,
-			(teardownError) => {
-				console.error(
-					`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}`,
-					teardownError,
-				);
-				return false;
-			},
-		);
-		if (tornDown && !keepForDiagnosis) await deleteDriveOf(row.id, driveName);
+		await (keepForDiagnosis
+			? stopSandbox(providerSandboxId)
+			: deleteSandboxAndDrive(providerSandboxId, driveName)
+		).catch((teardownError) => {
+			console.error(
+				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}${driveName ? ` or its drive ${driveName}` : ""}`,
+				teardownError,
+			);
+		});
 		await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning", "awake", "asleep"],

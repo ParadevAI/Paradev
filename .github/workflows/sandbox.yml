@@ -26,6 +26,10 @@ on:
           - drive-fork-probe
           - inventory
         default: real-sandbox
+      real_sandbox_drive:
+        description: "real-sandbox only: also run the drive-mode pass (a throwaway golden drive, a box on a fork of it, a stop and a wake)"
+        type: boolean
+        default: false
 
 jobs:
   boot-twice:
@@ -120,7 +124,7 @@ jobs:
     name: Real sandbox
     if: github.event_name == 'workflow_dispatch' && inputs.run == 'real-sandbox'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -147,6 +151,7 @@ jobs:
           CDN_R2_ENDPOINT: ${{ secrets.CDN_R2_ENDPOINT }}
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
+          REAL_SANDBOX_DRIVE: ${{ inputs.real_sandbox_drive && '1' || '' }}
         run: bun run src/real-sandbox.ts
 
   drive-fork-probe:

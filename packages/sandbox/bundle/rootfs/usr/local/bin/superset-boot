@@ -6,6 +6,7 @@
 #
 #   clear /run/superset            facts about a boot that is over
 #   read the contract and identity /etc/superset/{contract.sh,sandbox.conf}
+#   lay out the workspace drive    only when the control plane mounted one
 #   install the pinned bundle      only when its hash differs from current
 #   apply-rootfs, and the steps    each a hash compare per file and step;
 #   marked beforeHost              the only steps host-service waits for
@@ -58,6 +59,46 @@ stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-ha
 rm -rf "$SUPERSET_RUN_DIR"
 install -d -m 0755 -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$SUPERSET_RUN_DIR"
 stamp "run.cleared"
+
+# --- the workspace drive, when the environment is in drive mode: /workspace
+# and the large home state live on it, so they never enter the box's
+# snapshot. Bind mounts end with the session, so every boot does this, before
+# anything reads /workspace. A bind mount, not a symlink: paths must not move.
+DRIVE_MODE=""
+user_path() {
+	local dir="$1" part IFS=/
+	for part in $2; do
+		dir="${dir}/${part}"
+		[ -d "$dir" ] || install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$dir"
+	done
+}
+bind_into() {
+	mountpoint -q "$2" || mount --bind "$1" "$2" || refuse "cannot bind ${1} onto ${2}"
+}
+layout_drive() {
+	local drive="${SUPERSET_DRIVE_DIR:-}" started sub
+	[ -n "$drive" ] && mountpoint -q "$drive" || return 0
+	started="$(date +%s%3N)"
+	user_path "$drive" workspace
+	user_path "$drive" home
+	install -d -m 0700 "${drive}/swap"
+	install -d -m 0710 "${drive}/docker"
+	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$SUPERSET_WORKSPACE_DIR"
+	bind_into "${drive}/workspace" "$SUPERSET_WORKSPACE_DIR"
+	for sub in ${SUPERSET_DRIVE_HOME_SUBTREES:-}; do
+		if [ ! -d "${drive}/home/${sub}" ]; then
+			user_path "${drive}/home" "$sub"
+			# What the image left there stays visible under the mount.
+			[ -d "${SUPERSET_USER_HOME}/${sub}" ] && cp -a "${SUPERSET_USER_HOME}/${sub}/." "${drive}/home/${sub}/"
+		fi
+		user_path "$SUPERSET_USER_HOME" "$sub"
+		bind_into "${drive}/home/${sub}" "${SUPERSET_USER_HOME}/${sub}"
+	done
+	DRIVE_MODE=1
+	printf 'export BUN_INSTALL_CACHE_DIR=%s npm_config_store_dir=%s\n' "$SUPERSET_BUN_STORE" "$SUPERSET_PNPM_STORE" > "${SUPERSET_RUN_DIR}/drive.env"
+	stamp "drive.layout ms=$(( $(date +%s%3N) - started ))"
+}
+layout_drive
 
 # --- the bundle the environment pins. A box with no pin would silently keep
 # whatever its image or golden baked, for as long as it lives.
@@ -117,6 +158,22 @@ if [ -z "${SUPERSET_BOOT_REEXEC:-}" ] && [ "$(self_hash)" != "$BOOT_HASH_BEFORE"
 	SUPERSET_BOOT_REEXEC=1 exec "$0" "$@"
 fi
 stamp "steps.host.start"; "$BUNDLE/setup" run-steps before-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.host.end"
+
+# A reexec lays the drive out with the installed bundle's contract.
+[ -n "$DRIVE_MODE" ] || layout_drive
+
+# In drive mode, Docker's images and layers go on the drive too. apply-rootfs
+# compares only the hash sidecar, so this rewrite stays until the bundle
+# ships a new daemon.json, and then it is merged again right here.
+configure_docker() {
+	[ -n "$DRIVE_MODE" ] || return 0
+	local want
+	want="$(jq -c --arg root "${SUPERSET_DRIVE_DIR}/docker" '. + {"data-root": $root}' "${BUNDLE}/rootfs/etc/docker/daemon.json")" ||
+		{ stamp "docker.config.failed"; return 0; }
+	[ "$(jq -c . /etc/docker/daemon.json 2>/dev/null)" = "$want" ] || printf '%s\n' "$want" > /etc/docker/daemon.json
+	stamp "docker.data-root ${SUPERSET_DRIVE_DIR}/docker"
+}
+configure_docker
 
 # --- the agent CLIs from the region's agent-tools drive, when the control
 # plane mounted one. Without it the image's agents stay on PATH. Mounts are
@@ -195,6 +252,7 @@ host_env=(
 	"SUPERSET_RUN_DIR=${SUPERSET_RUN_DIR}" "SUPERSET_SANDBOX_BOOT_LOG=${SUPERSET_BOOT_LOG}"
 	"HOST_SERVICE_SECRET=${HOST_SERVICE_SECRET}"
 )
+[ -n "$DRIVE_MODE" ] && host_env+=("BUN_INSTALL_CACHE_DIR=${SUPERSET_BUN_STORE}" "npm_config_store_dir=${SUPERSET_PNPM_STORE}")
 for key in HOST_SERVICE_SENTRY_DSN HOST_SERVICE_SENTRY_ENVIRONMENT SUPERSET_SANDBOX_CREATOR_USER_ID \
 	SUPERSET_SANDBOX_PLUGINS \
 	SUPERSET_SANDBOX_AGENT SUPERSET_SANDBOX_AGENT_PROMPT SUPERSET_SANDBOX_AGENT_MODEL SUPERSET_SANDBOX_AGENT_EFFORT SUPERSET_SANDBOX_AGENT_MODE SUPERSET_SANDBOX_AGENT_ATTACHMENTS SUPERSET_SANDBOX_AGENT_SURFACE SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID SUPERSET_SANDBOX_AGENT_TERMINAL_ID \
@@ -297,8 +355,12 @@ checkout_one() {
 		|| { find "$tmp" -mindepth 1 -delete; as_user git clone -q --depth 1 "$url" "$tmp"; }; then
 		as_user git -C "$tmp" checkout -q -B "$branch"
 		install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "$ws"
-		find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' -exec rm -rf {} +
-		( shopt -s dotglob nullglob; for entry in "$tmp"/*; do [ "${entry##*/}" = ".git" ] || mv "$entry" "$ws"/; done )
+		find "$ws" -mindepth 1 -maxdepth 1 ! -name '.clone.*' ! -name '.superset' -exec rm -rf {} +
+		# The package stores in .superset/ outlive a reclone; a repository's own .superset/ merges into it.
+		( shopt -s dotglob nullglob; for entry in "$tmp"/*; do
+			[ "${entry##*/}" = ".git" ] && continue
+			if [ -d "${ws}/${entry##*/}" ]; then cp -a "$entry/." "${ws}/${entry##*/}/" && rm -rf "$entry"; else mv "$entry" "$ws"/; fi
+		done )
 		mv "$tmp/.git" "$ws/.git"; rmdir "$tmp"
 		touch "$marker"; stamp "checkout.cloned ${path} ${url}"; return 0
 	fi
@@ -313,7 +375,17 @@ checkout() {
 		[ -n "$path" ] || continue
 		checkout_one "$url" "$branch" "$path" "$base" || failed=1
 	done < <(printf '%s' "$SUPERSET_SANDBOX_REPOSITORIES" | jq -r '.[] | [.url, .branch, .path, (.baseBranch // "")] | @tsv')
+	exclude_stores
 	return "$failed"
+}
+# The package stores sit inside a root checkout in drive mode; git must not
+# see them. Only stores/: a repository may track a .superset/ of its own.
+exclude_stores() {
+	local exclude="${SUPERSET_WORKSPACE_DIR}/.git/info/exclude"
+	[ -n "$DRIVE_MODE" ] && [ -d "${SUPERSET_WORKSPACE_DIR}/.git" ] || return 0
+	grep -qxF '/.superset/stores/' "$exclude" 2>/dev/null && return 0
+	as_user mkdir -p "${exclude%/*}"
+	printf '/.superset/stores/\n' | as_user tee -a "$exclude" > /dev/null
 }
 
 # --- the rest of the passes, then the desktop, beside the checkout.

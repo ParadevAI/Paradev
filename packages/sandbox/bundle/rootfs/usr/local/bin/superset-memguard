@@ -15,7 +15,9 @@
 #   swap   below twice the floor, add a 2 GB swapfile, up to 1.5x the box
 #          (at least 6 GB, at most 16 GB); after ten quiet minutes, drop the
 #          newest one if RAM can take its pages back. Nothing is on disk until
-#          a box needs it, and swap never exists without this script.
+#          a box needs it, and swap never exists without this script. On the
+#          workspace drive when there is one, so swap never enters a snapshot;
+#          the drive has no discard either, so the files keep fixed names.
 #   reap   below the floor with swap at its cap, kill the largest process in the least protected
 #          class. Without swap the kernel drops code pages before it kills
 #          anything, and host-service's event loop stalls for minutes while
@@ -30,7 +32,10 @@ FLOOR_PERCENT="${SUPERSET_MEMGUARD_FLOOR_PERCENT:-8}"
 INTERVAL_S=1
 COOLDOWN_S=3
 MIN_VICTIM_KB=32768
-SWAP_DIR=/var/swap
+ROOT_SWAP_DIR=/var/swap
+DRIVE_SWAP_DIR="${SUPERSET_DRIVE_DIR:-/mnt/superset-drive}/swap"
+SWAP_DIR="$ROOT_SWAP_DIR"
+mountpoint -q "${SUPERSET_DRIVE_DIR:-/mnt/superset-drive}" && SWAP_DIR="$DRIVE_SWAP_DIR"
 SWAP_STEP_MB=2048
 SWAP_IDLE_S="${SUPERSET_MEMGUARD_SWAP_IDLE_S:-600}"
 
@@ -39,7 +44,7 @@ flock -n 9 || exit 0
 
 log() { printf '%s memguard %s\n' "$(date +%s%3N)" "$*"; }
 uid="$(id -u "$SUPERSET_USER")"
-log "start floor=${FLOOR_PERCENT}% user=${SUPERSET_USER}(${uid})"
+log "start floor=${FLOOR_PERCENT}% user=${SUPERSET_USER}(${uid}) swap_dir=${SWAP_DIR}"
 
 # Fills ADJ[pid], RSS_KB[pid] and CLASS[pid] for the sandbox user's processes
 # and writes the adj the class calls for when it differs. No forks: ~70
@@ -117,7 +122,7 @@ swap_cap_mb=$(( $(box_mb) * 3 / 2 ))
 
 swap_files=()
 mkdir -p "$SWAP_DIR"
-for f in "$SWAP_DIR"/superset-*; do [ -e "$f" ] && { swapoff "$f" 2>/dev/null; rm -f "$f"; }; done
+for f in "$ROOT_SWAP_DIR"/superset-* "$DRIVE_SWAP_DIR"/superset-*; do [ -e "$f" ] && { swapoff "$f" 2>/dev/null; rm -f "$f"; }; done
 
 grow_swap() {
 	local f="${SWAP_DIR}/superset-${#swap_files[@]}"

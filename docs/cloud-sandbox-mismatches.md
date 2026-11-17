@@ -698,6 +698,40 @@ socket, all describing processes that no longer exist. The boot runner
 deletes and recreates it first thing; anything that reads a flag there must
 tolerate a stale one for the milliseconds before that.
 
+**A workspace drive is not a disk the box owns.** In drive mode
+(`environments.golden_drive_name` set), `/workspace` and large home subtrees
+live on a Vercel drive at `/mnt/superset-drive`, so they never enter the
+box's snapshot. Three things a machine someone owns never makes you think
+about:
+
+- *Bind mounts end with the session.* Vercel attaches the drive on every
+  session (the control plane passes `mounts` on every create and wake), but
+  the `mount --bind` of `/workspace` and each home subtree is gone after a
+  stop. `superset-boot` lays them out again on every boot, before
+  host-service and the checkout read `/workspace` (`drive.layout` in the
+  boot log). Anything that runs before that sees the root disk's empty
+  `/workspace`.
+- *Hardlinks must stay inside `/workspace`.* Each bind mount is its own
+  `vfsmount`, and `link(2)` across two of them fails with `EXDEV` even on the
+  same filesystem. bun and pnpm then copy every package instead of linking
+  it. So their stores are inside the `/workspace` mount
+  (`BUN_INSTALL_CACHE_DIR=/workspace/.superset/stores/bun`,
+  `npm_config_store_dir=/workspace/.superset/stores/pnpm`, in host-service's
+  env and the login profile), not under `~/.bun` or `~/.cache`.
+- *A drive needs detach before the next mount.* After a stop the drive stays
+  attached while the session flushes what it wrote (6 s after 1 GB, 44 s
+  after 12 GB), and a mount taken meanwhile reads a corrupt or empty
+  filesystem. `wakeSandbox` waits for `Drive.get(...).currentSandboxName` to
+  clear, at most 2 minutes, and fails the wake rather than mount. A sandbox
+  deleted while it still holds its drive leaves the drive attached for
+  minutes, so every delete stops the box first (`deleteSandboxAndDrive`).
+
+A drive has no discard either: deleting a file on it does not lower its
+billed size, so memguard reuses fixed swapfile names on it.
+**Open:** a box whose row has a drive but whose drive did not mount boots on
+the root disk's empty `/workspace`; the boot cannot tell, because the
+identity file does not say the workspace has a drive.
+
 **The control plane's command runs from the image's workdir, which the
 checkout replaces.** The first boot cloned `/workspace` by deleting and
 recreating it, and every child of the boot command — host-service, git,
