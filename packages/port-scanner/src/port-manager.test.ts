@@ -1141,9 +1141,9 @@ describe("PortManager — agent processes", () => {
 		expect(killed).toEqual([1003]);
 	});
 
-	it("protects an agent whose start time is a few seconds off, but not a pid reused long after the launch", async () => {
+	it("protects an agent that started 20 s before its launch id's time, but not a pid reused long after the launch", async () => {
 		agentLaunched();
-		processStartTimes = new Map([[1002, 1700000004]]);
+		processStartTimes = new Map([[1002, 1699999980]]);
 		await manager.forceScan();
 		expect(manager.getAllPorts().map(({ port }) => port)).toEqual([3000]);
 

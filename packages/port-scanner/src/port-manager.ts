@@ -40,10 +40,16 @@ const HINT_SCAN_DELAY_MS = 500;
 const IGNORED_PORTS = new Set([22, 80, 443]);
 
 /**
- * A launch id's time and a process start time are two wall-clock readings.
- * A small clock adjustment can move them apart; a reused pid is far apart.
+ * A wrapper reads the launch id's time after its process starts, and a slow
+ * wrapper reads it late, so the start time may be this much earlier.
  */
-const AGENT_START_TOLERANCE_S = 5;
+const AGENT_START_EARLY_S = 30;
+
+/**
+ * A reused pid starts after the launch, so this side stays strict. It only
+ * allows for a small clock adjustment.
+ */
+const AGENT_START_LATE_S = 5;
 
 const PORT_HINT_PATTERNS = [
 	/listening\s+on\s+(?:port\s+)?(\d+)/i,
@@ -463,8 +469,9 @@ export class PortManager extends EventEmitter {
 				// A reused pid started long after the launch. An unreadable time
 				// is NaN, which compares false and keeps the pid-only match.
 				const startedAt = startTimes.get(launchPid) ?? Number.NaN;
-				const skew = Math.abs(startedAt - Number(launchedAt));
-				if (skew > AGENT_START_TOLERANCE_S) return false;
+				const late = startedAt - Number(launchedAt);
+				if (late > AGENT_START_LATE_S || late < -AGENT_START_EARLY_S)
+					return false;
 				return (
 					tree.includes(launchPid) ||
 					(parents.get(member) === launchPid && wrapperPids.has(launchPid))
