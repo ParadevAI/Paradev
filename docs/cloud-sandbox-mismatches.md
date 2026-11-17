@@ -730,13 +730,20 @@ A drive has no discard either: deleting a file on it does not lower its
 billed size, so memguard reuses fixed swapfile names on it.
 A drive that did not mount leaves the root disk's empty `/workspace` in its
 place, which would look like the user's work is gone. So the identity file
-names the drive (`SUPERSET_SANDBOX_DRIVE`), and `superset-boot` refuses to
-continue when it is set and `/mnt/superset-drive` is not a mount point: it
-stamps `drive.missing` and exits non-zero before the bundle, host-service and
-the checkout. host-service never answers, so a provision fails; a wake reads
-the boot log and fails with `SandboxDriveMissingError`, which marks the
-workspace failed. A box on an image whose runner predates the guard gets it
-after the reexec into the bundle's runner, still before host-service.
+names the drive (`SUPERSET_SANDBOX_DRIVE`), the drive names its owner
+(`/mnt/superset-drive/state/workspace-id`), and `superset-boot` refuses to
+continue (`drive.missing`, `drive.foreign`, `drive.unlaid`) before the bundle,
+host-service and the checkout. The control plane spots the refusal in the
+boot log within about 2 s and answers "still starting"; the next wake mounts
+the drive afresh. Nothing marks the workspace failed, because its data is
+intact. A boot that answers without `drive.layout` is refused the same way.
+A box on an image whose runner predates the guard gets it after the reexec
+into the bundle's runner, still before host-service.
+
+*The root disk and the drive can disagree.* A stop whose snapshot does not
+land rolls the root back and not the drive. So in drive mode the checkout
+markers and `host.db` live on the drive, and the checkout never replaces a
+non-empty checkout there.
 
 **The control plane's command runs from the image's workdir, which the
 checkout replaces.** The first boot cloned `/workspace` by deleting and

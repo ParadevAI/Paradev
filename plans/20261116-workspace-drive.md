@@ -197,6 +197,17 @@ Documented by Vercel or the SDK, not measured:
   `/etc/docker/daemon.json` after `apply-rootfs`, merged from the bundle's own file. Rationale:
   `apply-rootfs` compares only the hash sidecar, so the rewrite stays until a bundle changes
   `daemon.json`, and then the next boot merges again. Date/Author: 2026-11-17, agent.
+- Decision: in drive mode `host.db` moves to the drive with the checkout markers
+  (`/mnt/superset-drive/state`). Rationale: its workspace and project rows name the worktrees on
+  the drive, and `agent-launched` beside it says whether the agent already ran in them. On the
+  root disk, a rollback that the drive does not share would make host-service forget a worktree or
+  launch the agent twice. Terminal sessions in it describe processes, which no snapshot keeps
+  anyway. Date/Author: 2026-11-17, agent, at the coordinator's request.
+- Decision: the drive names its owner (`state/workspace-id`), and a wake's claim says the drive
+  was laid out before (`SUPERSET_SANDBOX_DRIVE_LAID_OUT`); only a provision's claim does not.
+  Rationale: this needs no new column, and a wake is always of a workspace whose provision laid
+  the drive out. A provision that failed before the first layout leaves a workspace whose wakes
+  refuse with `drive.unlaid`; it never had work to lose. Date/Author: 2026-11-17, agent.
 - Decision: do not migrate existing workspaces. See Migration. Date/Author: 2026-11-16, agent;
   confirmed out of scope 2026-11-17.
 - Decision (rejected): wake by forking the golden. A wake would fork the environment's golden
@@ -366,16 +377,51 @@ another region.
 ## Failure modes
 
 - Fork fails at provision: the provision fails as any other create failure does; the row goes to
-  `failed`, and the sandbox and the drive are deleted.
+  `failed`, and the sandbox and the drive go to the teardown job.
 - The drive is still attached on a wake: the wake waits 2 minutes, then fails with a clear error.
+  A drive held by this very sandbox, running again, means a concurrent wake resumed it; the wake
+  goes on as for a running box.
 - Mount update fails on a wake: the wake throws.
-- A bind fails at boot: the boot refuses, so nothing starts on the root disk's empty `/workspace`.
-- The drive is not mounted at boot: the identity file names it (`SUPERSET_SANDBOX_DRIVE`), so
-  `superset-boot` stamps `drive.missing` and exits non-zero before the bundle, host-service and
-  the checkout. A provision then fails on host-service never answering; a wake reads the boot
-  log, stops the box and fails with `SandboxDriveMissingError`, which marks the workspace
-  `failed`. boot-twice covers the refusal.
-- Drive delete fails: logged, retried by the reap.
+- A bind or a home seed fails at boot: the boot refuses, so nothing starts on the root disk's empty
+  `/workspace`.
+- The drive does not mount, belongs to another workspace, or mounts without an owner though the
+  wake says it was laid out: `superset-boot` stamps `drive.missing`, `drive.foreign` or
+  `drive.unlaid` and exits non-zero before the bundle, host-service and the checkout. The control
+  plane reads the boot log every 2 s while it waits for host-service and throws
+  `SandboxDriveMissingError`, a `SandboxNotReadyError`: the wake stops the box and answers "still
+  starting", and the next wake mounts the drive afresh. Nothing marks the workspace `failed`: the
+  data is intact.
+- host-service answers without a `drive.layout` stamp for a workspace with a drive (a pinned
+  bundle older than the layout): the same retryable error, so its empty `/workspace` is never
+  shown as ready.
+- The root disk rolls back (a stop snapshot that did not land) and the drive does not: the
+  checkout markers and `host.db` are on the drive, so they still describe it. A checkout that
+  already has the workspace's branch is kept; a failed fetch keeps the checkout; a clone goes only
+  into an empty `/workspace`.
+- Drive delete fails: the teardown job retries every 30 s, 20 times, then logs and gives up.
+
+
+## Invariants
+
+The owner's two requirements: nothing a user does is ever lost, and an empty `/workspace` is
+never shown as their work.
+
+| Invariant | Enforced in | Test |
+| --- | --- | --- |
+| A wake never gives a workspace a drive its row does not name; only a provision consults the environment. | `claimedDriveIdentity` (`drives.ts`) via `buildSandboxClaim({ provisioning })` (`claim.ts`); `wake()` mounts `workspaceDriveMounts(row.driveName)` (`wake.ts`) | `claim.test.ts` "an existing workspace gets no drive on a wake when its environment enters drive mode"; `wake.test.ts` "a workspace without a drive is woken with no mounts" |
+| A box whose identity names a drive starts nothing that reads `/workspace` unless that drive is mounted. | `layout_drive` in `superset-boot` (`drive.missing`) | boot-twice "drive missing: …" (4 checks) |
+| The mounted drive is this workspace's. | `layout_drive` (`drive.foreign`, `drive.unlaid`, owner written at first layout); `SUPERSET_SANDBOX_DRIVE_LAID_OUT` on every wake claim | boot-twice "drive foreign", "drive empty", "the drive names its workspace"; `claim.test.ts` "a wake of a workspace with a drive expects it laid out" |
+| The control plane never treats a box with a drive as ready unless its boot laid the drive out. | `settleSandbox` (`vercel.ts`) requires `drive.layout` | `vercel.test.ts` "a boot that answers without laying the drive out fails the settle" |
+| A drive refusal is retryable, is found within about 2 s, and never fails the workspace. | `SandboxDriveMissingError extends SandboxNotReadyError`; `waitForHostService` polls `driveRefusalIn`; `wakeSandbox` stops the box | `vercel.test.ts` "a refused boot is a retryable not-ready, found without the full host wait"; `driveRefusalIn` test |
+| In drive mode, what describes the drive's contents is on the drive: checkout markers, `host.db` and its WAL, `agent-launched`, the owner. | `use_drive_state` in `superset-boot`; `SANDBOX_PATHS.driveState` | boot-twice "host.db and the checkout markers are on the drive, not the root disk", "drive, root rolled back" |
+| The checkout never deletes or overwrites a non-empty checkout on a drive. | `checkout_one` drive-mode branches | boot-twice "drive, marker lost: the branch is kept", "drive, fetch failed: nothing on the drive is replaced" |
+| Flag-off boxes run main's checkout code exactly. | `checkout_one` `else` branch | boot-twice first and second boot of the plain box; the diff against main |
+| A home subtree is never seeded partially. | `seed_home_subtree` (copy to `<sub>.seeding`, then `mv -T`) | boot-twice layout checks only; a failed copy is not simulated |
+| One read-write session per drive, and a concurrent wake of the same box does not wait. | `waitForDriveDetached` with `heldByCaller` in `wakeSandbox` | `vercel.test.ts` "a stopped box waits for its drive…", "a drive a concurrent wake already resumed this box with is not foreign"; `drives.test.ts` wait tests |
+| A box is stopped and its drive detached before either is deleted, and no request waits for a detach. | `teardownSandbox`, `deleteSandboxAndDriveLater` (`teardown.ts`), route `/api/cloud-workspaces/teardown` | `teardown.test.ts` (4 tests) |
+| A failed promote leaks neither the golden nor its drive. | `abandonGolden` (`environment.ts`) | `environment.test.ts` "hands the golden and its forked drive to the retried teardown" |
+| A golden carries no workspace identity, on the root disk or the drive. | `inheritedIdentityPaths` (includes `SANDBOX_PATHS.driveState`) | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive" |
+| The drive mount and the agent-tools mount survive each other's updates. | `composeMounts`, `wakeSandbox` | `vercel.test.ts` "the drive and the agent-tools drive share one mounts object", "an agent-tools update keeps the drive the box already has" |
 
 
 ## Follow-ups (out of scope)
@@ -385,6 +431,9 @@ another region.
 - Customer environments' checkpoints through `superset environments replace` beyond what promote
   already covers.
 - A drive variable in `Asleep.tla`.
+- Environment builds (#9282): `activateGolden` must move `source_ref` and `golden_drive_name`
+  together, in one row update, the way promote and the release do. A golden and a drive from two
+  different builds would give every new workspace a checkout that does not match its root disk.
 - A sweep of drives named `drive-ws-*` whose sandbox no longer exists.
 
 
