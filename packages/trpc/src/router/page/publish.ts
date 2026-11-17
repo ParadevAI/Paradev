@@ -21,7 +21,7 @@ import { and, desc, eq, inArray, lte } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { SNIFF_BYTES, sniffContentType } from "../../lib/files";
 import { copyObject, deleteObjects, getObject, headObject } from "../../lib/r2";
-import { assertPageWritable } from "./access";
+import { assertPageEditable } from "./access";
 import { pageUrl } from "./page-url";
 import {
 	isEntryPathConflict,
@@ -533,7 +533,7 @@ async function resolveTargetPage({
 				i18nKey: "serverError.page.pageNotFound",
 			});
 		}
-		assertPageWritable(page, userId);
+		await assertPageEditable(page, userId);
 		return page;
 	}
 
@@ -551,7 +551,7 @@ async function resolveTargetPage({
 				),
 			)
 			.limit(1);
-		if (row?.page) assertPageWritable(row.page, userId);
+		if (row?.page) await assertPageEditable(row.page, userId);
 		return row?.page ?? null;
 	}
 

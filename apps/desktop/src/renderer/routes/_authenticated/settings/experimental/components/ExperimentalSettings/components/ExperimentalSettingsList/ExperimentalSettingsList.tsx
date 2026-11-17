@@ -18,8 +18,8 @@ import {
 	SETTING_ITEM_ID,
 	type SettingItemId,
 } from "../../../../../utils/settings-search";
-import { AcpChatSetting } from "../AcpChatSetting";
 import { ChatTurnSnapshotsSetting } from "../ChatTurnSnapshotsSetting";
+import { RestartOnboardingSetting } from "../RestartOnboardingSetting";
 import { WaitForSetupBeforeAgentSetting } from "../WaitForSetupBeforeAgentSetting";
 
 interface ExperimentalSettingsListProps {
@@ -45,16 +45,16 @@ export function ExperimentalSettingsList({
 		SETTING_ITEM_ID.EXPERIMENTAL_WORKSPACE_AGENTS,
 		visibleItems,
 	);
-	const showAcpChat = isItemVisible(
-		SETTING_ITEM_ID.EXPERIMENTAL_ACP_CHAT,
-		visibleItems,
-	);
 	const showChatTurnSnapshots = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_CHAT_TURN_SNAPSHOTS,
 		visibleItems,
 	);
 	const showWaitForSetupBeforeAgent = isItemVisible(
 		SETTING_ITEM_ID.EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT,
+		visibleItems,
+	);
+	const showRestartOnboarding = isItemVisible(
+		SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
 		visibleItems,
 	);
 	const openV1ImportModal = useOpenV1ImportModal();
@@ -172,9 +172,9 @@ export function ExperimentalSettingsList({
 						/>
 					</div>
 				)}
-				{showAcpChat && <AcpChatSetting />}
 				{showChatTurnSnapshots && <ChatTurnSnapshotsSetting />}
 				{showWaitForSetupBeforeAgent && <WaitForSetupBeforeAgentSetting />}
+				{showRestartOnboarding && <RestartOnboardingSetting />}
 			</div>
 		</div>
 	);

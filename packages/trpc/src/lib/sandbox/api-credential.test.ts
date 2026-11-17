@@ -10,4 +10,24 @@ describe("SANDBOX_ALLOWED_PROCEDURES", () => {
 		);
 		expect(unknown).toEqual([]);
 	});
+
+	test("never lets a box open a host to itself", () => {
+		expect(SANDBOX_ALLOWED_PROCEDURES.has("host.setCloudWorkspaceAccess")).toBe(
+			false,
+		);
+		expect(SANDBOX_ALLOWED_PROCEDURES.has("host.ensure")).toBe(false);
+	});
+
+	test("lets a box update automation settings and prompts", () => {
+		for (const path of [
+			"automation.get",
+			"automation.getPrompt",
+			"automation.setEnabled",
+			"automation.setGroup",
+			"automation.setPrompt",
+			"automation.update",
+		]) {
+			expect(SANDBOX_ALLOWED_PROCEDURES.has(path)).toBe(true);
+		}
+	});
 });

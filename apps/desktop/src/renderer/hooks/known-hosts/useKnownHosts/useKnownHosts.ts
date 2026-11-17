@@ -1,6 +1,9 @@
 import { buildHostRoutingKey } from "@superset/shared/host-routing";
 import type { RouterOutputs } from "@superset/trpc";
-import type { HostConnectionStatus } from "@superset/workspace-client";
+import {
+	type HostConnectionStatus,
+	peekEventBusConnectionStatus,
+} from "@superset/workspace-client";
 import { useEffect, useMemo, useState } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
@@ -81,9 +84,7 @@ function useRelayPresence(
 			),
 		[rows, relayUrl],
 	);
-	const [presence, setPresence] = useState<Map<string, HostConnectionStatus>>(
-		() => new Map(),
-	);
+	const [presence, setPresence] = useState(() => peekPresence(hostUrls));
 	useEffect(() => {
 		const read = () =>
 			new Map(
@@ -108,5 +109,16 @@ function useRelayPresence(
 			for (const cleanup of cleanups) cleanup();
 		};
 	}, [hostUrls]);
+	return presence;
+}
+
+function peekPresence(
+	hostUrls: ReadonlyArray<readonly [string, string]>,
+): Map<string, HostConnectionStatus> {
+	const presence = new Map<string, HostConnectionStatus>();
+	for (const [machineId, hostUrl] of hostUrls) {
+		const status = peekEventBusConnectionStatus(hostUrl);
+		if (status) presence.set(machineId, status);
+	}
 	return presence;
 }

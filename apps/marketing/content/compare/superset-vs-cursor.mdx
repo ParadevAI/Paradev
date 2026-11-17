@@ -1,8 +1,8 @@
 ---
 title: "Paradev vs Cursor (2026): Run Claude Code and Codex in Parallel, or Cursor's Own Agent"
-description: "Compare Paradev and Cursor for parallel AI coding. A desktop workspace that runs Claude Code, Codex, and any CLI agent in Git worktrees vs Cursor's editor, Agents Window, cloud agents, CLI, and Grok-centered plans after joining SpaceX."
+description: "Compare Paradev and Cursor for parallel AI coding. A desktop workspace that runs Claude Code, Codex, and any CLI agent in Git worktrees vs Cursor's editor, Agents Window, multiplayer Projects, cloud agents, and Grok-centered plans after joining SpaceX."
 date: 2026-02-02
-lastUpdated: 2026-10-29
+lastUpdated: 2026-11-10
 type: "1v1"
 competitors:
   - cursor
@@ -14,6 +14,9 @@ keywords:
   - cursor agents window
   - cursor background agents
   - cursor remote control
+  - cursor projects
+  - cursor projects multiplayer
+  - multiplayer coding agents
   - parallel coding agents
 ---
 
@@ -32,8 +35,9 @@ Choose Paradev (formerly Superset) if you want to run Claude Code, Codex, and ot
 | **Category** | Desktop workspace for CLI coding agents | AI editor and agent platform |
 | **Agents** | Any CLI agent: Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and more | Cursor's own agent, with models from several vendors on paid plans |
 | **Parallel work** | Many agents, from different vendors, each in its own worktree and branch | Agents Window with worktrees for local agents; cloud agents on their own VMs |
-| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, or a cloud workspace | Your machine, remote SSH, Cursor's cloud VMs, or self-hosted machines |
+| **Where agents run** | Your machine, any macOS or Linux machine you add as a host, your own Linux server (Bring Your Own Cloud), or a cloud workspace | Your machine, remote SSH, Cursor's cloud VMs, or self-hosted machines |
 | **Mobile** | iPhone and iPad app: terminals and diff review on your hosts and cloud workspaces (Pro) | iOS app for cloud agents, and remote control of local agents since October 6, 2026; web app at cursor.com/agents |
+| **Teams and multiplayer** | Cloud workspaces shared with your organization or named people, with full access to terminals and agents | Multiplayer Projects, in beta since November 10, 2026: a shared task board and context store, and each member's coordinator agent can message a teammate's |
 | **Editor** | Works beside any editor | Cursor's own editor at the center |
 | **Model costs** | Your own subscriptions and keys, never proxied | Plus: Grok models only. Premium and up: third-party models billed at API list price |
 | **Platforms** | macOS; experimental Linux AppImage; Windows unavailable | macOS, Windows, Linux, web, iOS |
@@ -49,11 +53,11 @@ Choose Paradev (formerly Superset) if you want to run Claude Code, Codex, and ot
 
 ### Paradev
 
-Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent in its own Git worktree and branch with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with CI checks and line comments you can send to agents, a file editor, an in-app browser with Design Mode, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, cloud workspaces run without your own computer connected, and scheduled automations, a CLI, and a TypeScript SDK cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for CLI coding agents. It launches Claude Code, Codex, Cursor Agent, Antigravity, Copilot, Amp, OpenCode, Droid, Muse Code, and any other CLI agent in its own Git worktree and branch with persistent terminal sessions, on your own subscriptions and keys, and never proxies model calls. Around that core it adds a Changes pane that commits, pushes, and opens PRs, a pull request view with CI checks and line comments you can send to agents, a file editor, an in-app browser with Design Mode, a [chat interface](https://docs.paradev.com/chat) for Claude Code, Codex, OpenCode, and Pi, and an MCP server so agents and tools can create workspaces and launch agents. Remote Access adds a macOS or Linux machine as a host, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) runs the host on a Linux server in your own cloud account, cloud workspaces run without your own computer connected, and scheduled automations, a CLI, and a TypeScript SDK cover unattended work. The [iPhone and iPad app](/mobile) lets you check on sessions and review diffs away from your desk. Worktrees separate each agent's files; they do not sandbox processes or prevent merge conflicts. Open source under the MIT License.
 
 ### Cursor
 
-Cursor describes itself as "your coding agent for building ambitious software." The Agents Window is a workspace for agents across repositories and environments: local, cloud, and remote SSH, with worktrees that give local agents their own Git checkouts. Cloud agents, formerly called Background Agents, run on isolated VMs, can be started from the editor, Slack, GitHub, Linear, or an API, and need the Premium plan or higher. The CLI, `agent`, runs Cursor's agent in a terminal and can hand a task to a cloud agent. Recent releases added remote control of local agents from the iOS app (October 6), cloud agent canvases (October 16), and an Agent SDK (October 20). Cursor joined SpaceX on August 14, 2026, and its plans now include Grok models, with third-party models from Premium up.
+Cursor describes itself as "your coding agent for building ambitious software." The Agents Window is a workspace for agents across repositories and environments: local, cloud, and remote SSH, with worktrees that give local agents their own Git checkouts. Cloud agents, formerly called Background Agents, run on isolated VMs, can be started from the editor, Slack, GitHub, Linear, or an API, and need the Premium plan or higher. The CLI, `agent`, runs Cursor's agent in a terminal and can hand a task to a cloud agent. Recent releases added remote control of local agents from the iOS app (October 6), cloud agent canvases (October 16), and an Agent SDK (October 20). Projects, launched on September 10, 2026, put a coordinator agent in front of the work: it writes no code itself and directs the agents that do. On November 10, 2026, Cursor [rebuilt Projects for multiplayer](https://cursor.com/blog/projects-multiplayer). Cursor joined SpaceX on August 14, 2026, and its plans now include Grok models, with third-party models from Premium up.
 
 ## Key Differences
 
@@ -67,11 +71,21 @@ Paradev never proxies model calls: each agent runs on your own subscription or k
 
 ### Remote Agents and Mobile
 
-Both let you check on agents running on your own machine from a phone. Cursor's iOS app shows cloud agents and, since October 6, 2026, agents running on your computer, which must stay on. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access and to cloud workspaces, with terminals and diff review for any agent running there.
+Both let you check on agents running on your own machine from a phone. Cursor's iOS app shows cloud agents and, since October 6, 2026, agents running on your computer, which must stay on. Paradev's iPhone and iPad app connects to any macOS or Linux host you add through Remote Access, to Bring Your Own Cloud servers, and to cloud workspaces, with terminals and diff review for any agent running there.
 
 ### Cloud Infrastructure
 
-Cursor offers managed cloud agents on isolated VMs, plus self-hosted machines for running tools on your own hardware. Paradev has cloud workspaces on the Team and Ultra plans (Beta), and runs agents on machines you own through Remote Access on Pro.
+Cursor offers managed cloud agents on isolated VMs, plus self-hosted machines for running tools on your own hardware. Paradev has [cloud workspaces](/cloud) on the Team and Ultra plans, and runs agents on machines you own through Remote Access on Pro. With [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), the Paradev host runs on a Linux server in your own cloud account, with no inbound ports.
+
+### Multiplayer Projects vs Shared Cloud Workspaces
+
+Both products now have an answer for teams, and they share different things.
+
+In a Cursor Project, teammates join and each member keeps their own coordinator agent and workers, which run and bill as that member. What the Project shares is a task board, which shows who is doing what and the pull request behind each task, and a context store that every member's agents read and write, holding specs, diagrams, and decisions. A coordinator can message a teammate's coordinator; the reply arrives in a side chat that answers but cannot be instructed, and the other agent's message is treated as untrusted input. Cursor's [documentation](https://cursor.com/docs/agent/projects) puts Projects on Cloud Agents, so they need a plan that includes Cloud Agents: Premium or above, Teams, Enterprise, or a legacy paid Cursor plan. Sharing a Project also needs a team account and Cursor 3.26.13 or later. Checked on November 10, 2026.
+
+Paradev shares the workspace itself. A [cloud workspace](/cloud) is visible to anyone in your organization or only to the people you invite, and full access lets a teammate open its terminals and prompt the agents that are already running, with the scrollback in front of them. From a shell, `superset workspaces share add ws_a --user ann@example.com` or `--team` does the same. [Automations](https://docs.paradev.com/automations) start agents on a schedule or on a GitHub, Slack, or Linear event, and each run becomes a live workspace a teammate can open and continue, and [Pages](https://docs.paradev.com/pages) give the team a place to comment on what an agent produced.
+
+The practical difference is who has to be in the room. A Cursor Project is made of Cursor members with Cursor coordinators on their own seats; its documentation describes Cursor's own agents throughout and does not describe another vendor's agent joining one. A Paradev workspace holds whichever CLI agent you started in it, and the teammate who opens it talks to that agent. See [multiplayer coding agents](/multiplayer-coding-agents) for the trade-offs between the two approaches.
 
 ### Editor-Centered vs Editor-Independent
 
@@ -125,6 +139,14 @@ Yes. The Agents Window runs agents locally, in the cloud, or over SSH, with work
 ### Can Cursor run Claude Code and Codex side by side?
 
 Cursor's docs describe running Cursor's agent, with Claude and GPT models available from Premium at API list price. They do not describe running the Claude Code or Codex CLIs. Paradev runs both side by side, each in its own worktree.
+
+### What is multiplayer in Cursor Projects?
+
+Teammates join a Project and share two things: the task board, and a context store that every member's agents read and write. Each member still has their own coordinator agent and workers, billed to that member, and one coordinator can message another, which replies in a side chat you can read but not instruct. It launched in beta on November 10, 2026, and Cursor's docs say sharing needs a team account and Cursor 3.26.13 or later.
+
+### Can Claude Code or Codex join a Cursor Project?
+
+Cursor's documentation describes every member of a Project as having their own Cursor coordinator and workers, and does not describe another vendor's agent joining one. Where Cursor does read third-party configuration, such as subagent definitions in `.claude/agents` or Claude Code hooks, that configuration runs on Cursor's own agent. In Paradev, the workspace holds whichever CLI agent you started, and a teammate who opens a shared cloud workspace talks to that agent.
 
 ### What happened to Cursor background agents?
 

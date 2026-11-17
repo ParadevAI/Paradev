@@ -9,6 +9,7 @@ import {
 import {
 	carriedReaderPosition,
 	forgetCarriedReaderPosition,
+	keepReaderPosition,
 	type ReaderPosition,
 	trackReaderPosition,
 } from "../../../../utils/carriedReaderPosition";
@@ -56,6 +57,15 @@ export function useCarriedReaderPosition({
 		return trackReaderPosition(sessionId, () =>
 			awayFromEndRef.current ? readPosition(viewport, rowsRef.current) : null,
 		);
+	}, [sessionId, viewport, awayFromEndRef]);
+	// A layout cleanup runs before React detaches the DOM, so the rows can still be measured.
+	useLayoutEffect(() => {
+		if (!viewport) return;
+		return () =>
+			keepReaderPosition(
+				sessionId,
+				awayFromEndRef.current ? readPosition(viewport, rowsRef.current) : null,
+			);
 	}, [sessionId, viewport, awayFromEndRef]);
 
 	const [carried, setCarried] = useState(() =>

@@ -9,6 +9,7 @@ import {
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import {
 	attachCloudChatSession,
+	attachCloudTerminal,
 	pendingCloudChatPane,
 	releasePendingCloudChat,
 	seedPendingCloudChat,
@@ -19,6 +20,7 @@ const launch: CloudAgentLaunchDescriptor = {
 	agent: "claude",
 	surface: "chat",
 	promptHash: "initial-prompt-hash",
+	terminalId: "promised-terminal",
 };
 
 function collections() {
@@ -57,19 +59,19 @@ test("a confirmed cloud chat has a waiting pane before any host session exists",
 	expect(pending?.kind).toBe(PENDING_CLOUD_CHAT_PANE_KIND);
 	expect(pending?.data).toMatchObject({
 		agentId: "claude",
-		promptHash: launch.promptHash,
+		terminalId: "promised-terminal",
 	});
 	expect(pending?.data).not.toHaveProperty("sessionId");
 	expect(pending?.data).not.toHaveProperty("pendingPrompt");
 });
 
-test("older APIs and terminal launches do not seed a waiting chat", () => {
+test("older APIs, unpromised ids and terminal launches do not seed a waiting chat", () => {
 	const state = collections();
 	for (const [id, descriptor] of [
 		["old-api", undefined],
 		["no-agent", null],
 		["terminal", { ...launch, surface: "terminal" }],
-		["empty-prompt", { ...launch, promptHash: null }],
+		["no-terminal-id", { ...launch, terminalId: null }],
 	] as const) {
 		seedPendingCloudChat({
 			collections: state.collections,
@@ -196,4 +198,21 @@ test("the typed prompt goes to the chat that got it, not to a fresh one", () => 
 	expect(released.tabs[0]?.panes[pending.id]?.data).not.toHaveProperty(
 		"launchPrompt",
 	);
+});
+
+test("a launch that fell back to a terminal turns the waiting pane into that terminal", () => {
+	const state = collections();
+	seedPendingCloudChat({
+		collections: state.collections,
+		workspaceId: "terminal-fallback",
+		launch,
+	});
+	const layout = state.rows.get("terminal-fallback")?.paneLayout;
+	const pending = layout && pendingCloudChatPane(layout);
+	if (!layout || !pending) throw new Error("missing pending pane");
+	const next = attachCloudTerminal(layout, pending.id, "promised-terminal");
+	const pane = next.tabs[0]?.panes[pending.id];
+	expect(pane?.kind).toBe("terminal");
+	expect(pane?.data).toEqual({ terminalId: "promised-terminal" });
+	expect(pendingCloudChatPane(next)).toBeNull();
 });

@@ -8,7 +8,7 @@ import {
 	V2_USER_PREFERENCES_ID,
 } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal/schema";
 
-export interface PageFavoritesApi {
+interface PageFavoritesApi {
 	favoritePageIds: string[];
 	favoritePageIdSet: ReadonlySet<string>;
 	isFavorite: (pageId: string) => boolean;

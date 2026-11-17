@@ -40,6 +40,9 @@ let cachedMacosSystemCertAvailable: boolean | null = null;
  * variables. Node ignores the system store without them, so an agent in a
  * terminal that lost them fails every model call with a certificate error.
  */
+/** `client_ip client_port server_ip server_port`, as sshd sets it. */
+const SANDBOX_SSH_CONNECTION = "127.0.0.1 0 127.0.0.1 0";
+
 const SANDBOX_FIREWALL_CA_KEYS = [
 	"NODE_EXTRA_CA_CERTS",
 	"NODE_USE_SYSTEM_CA",
@@ -191,8 +194,6 @@ interface BuildV2TerminalEnvParams {
 	workspacePath: string;
 	rootPath: string;
 	supersetEnv: "development" | "production";
-	agentHookPort: string;
-	agentHookVersion: string;
 	/**
 	 * tRPC URL for the host-service notifications.hook mutation.
 	 * Endpoint is unauthenticated by design — it broadcasts chimes and
@@ -231,8 +232,6 @@ export function buildHostLaunchEnv(params: {
 		rootPath: params.rootPath,
 		supersetEnv:
 			process.env.NODE_ENV === "development" ? "development" : "production",
-		agentHookPort: process.env.SUPERSET_AGENT_HOOK_PORT || "",
-		agentHookVersion: process.env.SUPERSET_AGENT_HOOK_VERSION || "",
 		hostAgentHookUrl: params.hostAgentHookUrl,
 	});
 }
@@ -256,8 +255,6 @@ export function buildV2TerminalEnv(
 		workspacePath,
 		rootPath,
 		supersetEnv,
-		agentHookPort,
-		agentHookVersion,
 		hostAgentHookUrl,
 	} = params;
 
@@ -302,13 +299,9 @@ export function buildV2TerminalEnv(
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
-	env.SUPERSET_AGENT_HOOK_PORT = agentHookPort;
-	env.SUPERSET_AGENT_HOOK_VERSION = agentHookVersion;
-	// v2 — agent posts to host-service so the renderer can play the sound
-	// client-side. No auth token: the endpoint is unauthenticated by design
-	// (chimes plus an idempotent linked-task In Progress nudge). The
-	// notify-hook script falls back to the electron endpoint when this URL
-	// isn't set.
+	// v2 hooks post here; without it the notify-hook script finds the
+	// host-service through the host manifests. No auth token: the endpoint is
+	// unauthenticated by design (chimes plus an idempotent linked-task nudge).
 	if (hostAgentHookUrl) {
 		env.SUPERSET_HOST_AGENT_HOOK_URL = hostAgentHookUrl;
 	}
@@ -329,6 +322,9 @@ export function buildV2TerminalEnv(
 		// Claude refuses `--dangerously-skip-permissions` unless told it is
 		// inside a sandbox, which is exactly what this is.
 		env.IS_SANDBOX = "1";
+		// The box's X display is real but nobody sees it. TUIs (Codex, Claude
+		// Code) send a copy to the user's terminal over OSC 52 only under SSH.
+		env.SSH_CONNECTION ??= SANDBOX_SSH_CONNECTION;
 	}
 
 	// Electron child processes can't access macOS Keychain for TLS cert verification,

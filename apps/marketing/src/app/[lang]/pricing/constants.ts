@@ -7,12 +7,9 @@ export interface PricingFeature {
 	id: string;
 	label: MessageDescriptor;
 	needs?: "gbHours";
-	beta?: boolean;
 	detail?: MessageDescriptor;
 	info?: { body: MessageDescriptor; faqId: string };
 }
-
-export const BETA = msg({ message: "Beta" });
 
 export interface PricingTier {
 	id: string;
@@ -181,7 +178,6 @@ const CLOUD_WORKSPACES_FEATURE: PricingFeature = {
 	id: "cloudWorkspaces",
 	label: CLOUD_WORKSPACES,
 	needs: "gbHours",
-	beta: true,
 	detail: msg({ message: "{hours} hours per seat each month" }),
 	info: {
 		body: msg({
@@ -286,7 +282,6 @@ export interface ComparisonRow {
 export interface ComparisonSection {
 	id: string;
 	title: MessageDescriptor;
-	badge?: MessageDescriptor;
 	rows: ComparisonRow[];
 }
 
@@ -329,7 +324,6 @@ export const COMPARISON_SECTIONS: ComparisonSection[] = [
 	{
 		id: "cloud",
 		title: CLOUD_WORKSPACES,
-		badge: BETA,
 		rows: [
 			{
 				id: "cloudGbHours",

@@ -323,7 +323,7 @@ export function useOptimisticActions() {
 				const hostUrl = hostWorkspacesCache.resolveHostUrl(workspace.hostId);
 				if (!hostUrl) {
 					throw new Error(
-						"The workspace's host is offline — try again when it reconnects.",
+						"The workspace's host is offline. Try again when it reconnects.",
 					);
 				}
 				hostWorkspacesCache.upsertWorkspace({

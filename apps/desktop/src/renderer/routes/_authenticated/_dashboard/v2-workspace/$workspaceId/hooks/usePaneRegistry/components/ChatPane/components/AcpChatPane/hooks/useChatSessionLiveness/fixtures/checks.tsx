@@ -1,6 +1,5 @@
 import { afterAll, afterEach, expect, jest, mock, test } from "bun:test";
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
-import { Trans } from "@lingui/react/macro";
 import type { ChatTransport } from "@superset/chat/client";
 import type { HostConnectionStatus } from "@superset/workspace-client";
 import type { QueryClient as QueryClientType } from "@tanstack/react-query";
@@ -77,9 +76,8 @@ if (!registered) {
 const { act, cleanup, render, waitFor } = await import(
 	"@testing-library/react"
 );
-const { useChatSessionLiveness } = await import("../useChatSessionLiveness");
-const { ConnectionNotice } = await import(
-	"../../../../../../ChatSession/components/ConnectionNotice"
+const { useChatSessionChecksFailing, useChatSessionLiveness } = await import(
+	"../useChatSessionLiveness"
 );
 const transport = {
 	getSession: async () => {
@@ -89,6 +87,7 @@ const transport = {
 	},
 };
 let current: ReturnType<typeof useChatSessionLiveness>;
+let hostChecksFailing = false;
 const renderedChecks: boolean[] = [];
 function Probe() {
 	current = useChatSessionLiveness({
@@ -96,12 +95,9 @@ function Probe() {
 		sessionId: "chat",
 		transport,
 	});
+	hostChecksFailing = useChatSessionChecksFailing(hostUrl).failing;
 	renderedChecks.push(current.checking);
-	return current.checking ? (
-		<ConnectionNotice>
-			<Trans>Resuming the conversation…</Trans>
-		</ConnectionNotice>
-	) : null;
+	return current.checking ? <div data-testid="held" /> : null;
 }
 function tree(client: QueryClientType) {
 	return (
@@ -135,13 +131,14 @@ afterEach(() => {
 	}
 	hosts.clear();
 	renderedChecks.length = 0;
+	hostChecksFailing = false;
 	hostUrl = "https://sandbox-a";
 });
 afterAll(async () => {
 	if (!registered) await GlobalRegistrator.unregister();
 });
 
-test("a waking box shows the resume notice immediately without a tab switch", async () => {
+test("a waking box holds the chat immediately without a tab switch", async () => {
 	const host = makeHost();
 	host.emit("connecting");
 	const pending = deferredSession();
@@ -158,12 +155,13 @@ test("a waking box shows the resume notice immediately without a tab switch", as
 	);
 	const view = render(tree(queryClient));
 	expect(renderedChecks[0]).toBe(true);
-	expect(view.getByText("Resuming the conversation…")).toBeTruthy();
+	expect(view.getByTestId("held")).toBeTruthy();
 	expect(current.checking).toBe(true);
+	expect(hostChecksFailing).toBe(false);
 	expect(current.stored).toBeUndefined();
 	expect(reads).toBe(0);
 	await act(async () => host.emit("open"));
-	expect(view.getByText("Resuming the conversation…")).toBeTruthy();
+	expect(view.getByTestId("held")).toBeTruthy();
 	expect(reads).toBe(1);
 	await act(async () => pending.resolve(stopped));
 	await waitFor(() => expect(current.stored?.live).toBe(false));
@@ -278,6 +276,7 @@ test("a failed liveness check recovers without another connection event", async 
 		await act(async () => jest.advanceTimersByTime(0));
 		expect(attempts).toBe(3);
 		expect(current.checking).toBe(true);
+		expect(hostChecksFailing).toBe(true);
 		expect(current.stored).toBeUndefined();
 		expect(
 			queryClient.getQueryState([
@@ -291,6 +290,7 @@ test("a failed liveness check recovers without another connection event", async 
 		await act(async () => jest.advanceTimersByTime(2_000));
 		await act(async () => jest.advanceTimersByTime(0));
 		expect(current.checking).toBe(false);
+		expect(hostChecksFailing).toBe(false);
 		expect(current.stored?.live).toBe(true);
 	} finally {
 		cleanup();

@@ -1,4 +1,1 @@
-export {
-	type ActivePaneView,
-	resolveActivePaneView,
-} from "./resolveActivePaneView";
+export { resolveActivePaneView } from "./resolveActivePaneView";

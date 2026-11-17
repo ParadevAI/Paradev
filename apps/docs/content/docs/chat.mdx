@@ -1,32 +1,28 @@
 ---
-title: Chat UI
+title: Chat interface
 description: Run a coding agent as a chat instead of a terminal, and which agents support it
 ---
 
-<Callout type="info">
-The Chat UI is coming soon. It is not yet available to everyone, so you might not see it in the app yet.
-</Callout>
+The chat interface shows an agent session as a chat instead of a terminal. The agent's messages, tool calls, and file edits appear as a transcript, and you approve or decline actions with a click.
 
-The Chat UI shows an agent session as a chat instead of a terminal. You see the agent's messages, tool calls, and file edits as a readable transcript, and you approve or decline actions with a click instead of a keypress.
-
-It is not a separate agent. Paradev runs the agent CLI you already installed, over the [Agent Client Protocol](https://agentclientprotocol.com), so a chat uses the same login, settings, and MCP servers as that CLI in a terminal. A session can move between the chat and the terminal without starting over.
+The agent is the CLI you already installed, which Paradev runs over the [Agent Client Protocol](https://agentclientprotocol.com), so a chat uses the same login, settings, and MCP servers as the CLI in a terminal. A session can move between chat and terminal without starting over.
 
 ## Open a Chat
 
 - **New workspace:** pick a supported agent when you create a workspace, and its session opens as a chat.
 - **Existing agent terminal:** use the **CLI** / **Chat** toggle in the agent pane's header. Switching resumes the same session, so the agent keeps its context. Switch back to **CLI** at any time.
 
-The toggle appears for a running session of a supported agent.
+The toggle appears for running sessions of supported agents.
 
 ## Supported Agents
 
-| Agent | Chat UI | Minimum CLI version |
+| Agent | Chat interface | Minimum CLI version |
 |:------|:-------:|:--------------------|
 | Claude Code | ✅ | 2.1.226 |
 | Codex | ✅ | 0.160.0 |
 | OpenCode | ✅ | 1.15.5 |
 | Pi | ✅ | Any |
-| Other agents | — | — |
+| Other agents | No | None |
 
 If your CLI is older than the minimum, the chat does not start and Paradev tells you which version it needs. Agents without chat support still run in a Paradev terminal.
 

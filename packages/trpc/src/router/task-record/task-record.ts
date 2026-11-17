@@ -21,7 +21,7 @@ import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { anchorAttachments } from "../../lib/attachments";
-import { assertMember } from "../../lib/cloud-guards";
+import { assertMember, type MemberContext } from "../../lib/cloud-guards";
 import {
 	referencedFileIds,
 	toReadableDocument,
@@ -32,7 +32,7 @@ import {
 	ensureLabels,
 	removeTaskLabels,
 } from "../../lib/labels";
-import { jwtProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { visibleTo } from "../cloud-workspace/access";
 import { labelActivity, recordTaskActivity } from "../task/activity";
 
@@ -59,7 +59,7 @@ const notFound = () =>
 		i18nKey: "serverError.task.notFound",
 	});
 
-async function loadTask(ctx: { organizationIds: string[] }, taskId: string) {
+async function loadTask(ctx: MemberContext, taskId: string) {
 	const task = await db.query.tasks.findFirst({
 		where: and(eq(tasks.id, taskId), isNull(tasks.deletedAt)),
 		columns: {
@@ -70,20 +70,17 @@ async function loadTask(ctx: { organizationIds: string[] }, taskId: string) {
 		},
 	});
 	if (!task) throw notFound();
-	assertMember(ctx.organizationIds, task.organizationId);
+	await assertMember(ctx, task.organizationId);
 	return task;
 }
 
-async function loadOwnComment(
-	ctx: { organizationIds: string[]; userId: string },
-	commentId: string,
-) {
+async function loadOwnComment(ctx: MemberContext, commentId: string) {
 	const comment = await db.query.taskComments.findFirst({
 		where: eq(taskComments.id, commentId),
 	});
 	if (!comment) throw notFound();
 	await loadTask(ctx, comment.taskId);
-	if (comment.authorUserId !== ctx.userId) {
+	if (comment.authorUserId !== ctx.principal.userId) {
 		throw userError({
 			code: "FORBIDDEN",
 			message: "Only the author can change a comment",
@@ -108,7 +105,7 @@ async function loadTaskLabels(taskId: string) {
 
 export const taskRecordRouter = {
 	/** Everything that happened to a task, oldest first, for the client to lay out. */
-	timeline: jwtProcedure
+	timeline: personProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
@@ -200,14 +197,14 @@ export const taskRecordRouter = {
 					fromChannelMember,
 					and(
 						eq(fromChannelMember.channelId, taskActivity.fromChannelId),
-						eq(fromChannelMember.actorId, ctx.userId),
+						eq(fromChannelMember.actorId, ctx.principal.userId),
 					),
 				)
 				.leftJoin(
 					toChannelMember,
 					and(
 						eq(toChannelMember.channelId, taskActivity.toChannelId),
-						eq(toChannelMember.actorId, ctx.userId),
+						eq(toChannelMember.actorId, ctx.principal.userId),
 					),
 				)
 				.where(eq(taskActivity.taskId, task.id))
@@ -259,7 +256,7 @@ export const taskRecordRouter = {
 							eq(cloudWorkspaceActivity.linkedTaskId, task.id),
 							eq(cloudWorkspaceActivity.unlinkedTaskId, task.id),
 						),
-						visibleTo(ctx.userId),
+						visibleTo(ctx.principal.userId),
 					),
 				)
 				.orderBy(asc(cloudWorkspaceActivity.createdAt));
@@ -361,7 +358,7 @@ export const taskRecordRouter = {
 		}),
 
 	/** The project a task belongs to, if any. */
-	project: jwtProcedure
+	project: personProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
@@ -381,7 +378,7 @@ export const taskRecordRouter = {
 			return rows.at(0) ?? null;
 		}),
 
-	labels: jwtProcedure
+	labels: personProcedure
 		.input(z.object({ taskId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
@@ -389,7 +386,7 @@ export const taskRecordRouter = {
 		}),
 
 	/** Adds a label by name, creating it in the organization when it is new. */
-	addLabel: jwtProcedure
+	addLabel: personProcedure
 		.input(z.object({ taskId: z.string().uuid(), name: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
@@ -407,13 +404,13 @@ export const taskRecordRouter = {
 			await recordTaskActivity(
 				db,
 				task.id,
-				{ kind: "user", userId: ctx.userId },
+				{ kind: "user", userId: ctx.principal.userId },
 				labelActivity({ added, removed: [] }),
 			);
 			return { labelId: label.id };
 		}),
 
-	removeLabel: jwtProcedure
+	removeLabel: personProcedure
 		.input(z.object({ taskId: z.string().uuid(), labelId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const task = await loadTask(ctx, input.taskId);
@@ -421,13 +418,13 @@ export const taskRecordRouter = {
 			await recordTaskActivity(
 				db,
 				task.id,
-				{ kind: "user", userId: ctx.userId },
+				{ kind: "user", userId: ctx.principal.userId },
 				labelActivity({ added: [], removed }),
 			);
 			return { removed: removed.length > 0 };
 		}),
 
-	addComment: jwtProcedure
+	addComment: personProcedure
 		.input(
 			z.object({
 				taskId: z.string().uuid(),
@@ -454,7 +451,7 @@ export const taskRecordRouter = {
 					parentCommentId: parent
 						? (parent.parentCommentId ?? parent.id)
 						: null,
-					authorUserId: ctx.userId,
+					authorUserId: ctx.principal.userId,
 					body: toStoredDocument(input.body, { kind: "tasks", id: task.id }),
 				})
 				.returning();
@@ -476,7 +473,7 @@ export const taskRecordRouter = {
 			return { id: comment.id, at: comment.createdAt };
 		}),
 
-	editComment: jwtProcedure
+	editComment: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -507,7 +504,7 @@ export const taskRecordRouter = {
 			return { editedAt };
 		}),
 
-	deleteComment: jwtProcedure
+	deleteComment: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const comment = await loadOwnComment(ctx, input.id);

@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { ChangesScopeControl } from "../../../../../../components/ChangesScopeControl";
-import { DiffStatText } from "../../../../../../components/DiffStatText";
 import type { DiffPaneFilter } from "../../../../../../types";
 import { useChangesScope } from "../../../../../useChangesScope";
 

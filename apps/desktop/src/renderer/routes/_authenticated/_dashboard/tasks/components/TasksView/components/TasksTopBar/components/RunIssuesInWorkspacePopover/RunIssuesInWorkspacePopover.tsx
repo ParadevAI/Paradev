@@ -1,6 +1,7 @@
 import { plural } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { Button } from "@superset/ui/button";
 import {
 	Command,
@@ -76,7 +77,7 @@ export function RunIssuesInWorkspacePopover({
 	);
 
 	const [hostId, setHostId] = useState<string | null>(
-		lastHostId ?? machineId ?? null,
+		(lastHostId === CLOUD_HOST_ID ? null : lastHostId) ?? machineId ?? null,
 	);
 
 	const launchHostUrl = useHostUrl(hostId);
@@ -312,6 +313,7 @@ export function RunIssuesInWorkspacePopover({
 							setLastHostId(next);
 						}}
 						className="w-full max-w-none"
+						offersCloud={false}
 					/>
 
 					<Popover open={projectPickerOpen} onOpenChange={setProjectPickerOpen}>

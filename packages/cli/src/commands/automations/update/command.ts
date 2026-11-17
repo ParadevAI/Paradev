@@ -47,7 +47,7 @@ export default command({
 				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Only for a cloud automation",
 			),
 		continueSession: boolean().desc(
-			"Continue the agent session the previous run left (--continue-session) or start a new one each run (--no-continue-session). Requires a pinned workspace",
+			"Continue the agent session the previous run left (--continue-session) or start a new one each run (--no-continue-session). With no pinned workspace, the next run's workspace is kept for the runs after it",
 		),
 		session: boolean().desc(
 			"Switch to session mode: no project, each run creates a project-less session workspace",
@@ -90,12 +90,6 @@ export default command({
 
 		// Ahead of every mutation: `setEnabled` runs before the update, and a
 		// combination the server will refuse must not flip `enabled` first.
-		if (options.session && options.continueSession) {
-			throw new CLIError(
-				"--continue-session requires a pinned workspace",
-				"Session mode has none; drop --session or pass --no-continue-session",
-			);
-		}
 		if (options.rrule && (options.triggers || options.triggersFile)) {
 			throw new CLIError(
 				"Pass a schedule either as --rrule or inside the trigger set, not both",

@@ -4,7 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { Button } from "@superset/ui/button";
 
-export type ErrorReason =
+type ErrorReason =
 	| "not-found"
 	| "too-large"
 	| "is-directory"
@@ -29,7 +29,7 @@ const MESSAGES: Record<ErrorReason, MessageDescriptor> = {
 		message: "This path is a directory",
 	}),
 	"binary-unsupported": msg({
-		message: "Binary file — cannot display",
+		message: "Binary file. Cannot display",
 	}),
 	"load-failed": msg({
 		message: "Failed to load file",

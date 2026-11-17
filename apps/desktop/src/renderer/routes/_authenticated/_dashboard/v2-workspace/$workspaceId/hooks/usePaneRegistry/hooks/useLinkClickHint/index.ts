@@ -1,1 +1,1 @@
-export { type LinkClickHint, useLinkClickHint } from "./useLinkClickHint";
+export { useLinkClickHint } from "./useLinkClickHint";

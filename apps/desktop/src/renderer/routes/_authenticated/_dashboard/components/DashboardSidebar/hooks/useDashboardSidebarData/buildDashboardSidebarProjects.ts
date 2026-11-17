@@ -125,6 +125,7 @@ function decorateSidebarWorkspace(
 		isPinned: workspace.pinnedAt != null,
 		pendingTransaction: workspace.pendingTransaction,
 		isMine: null,
+		creator: null,
 		sandboxStatus: null,
 	};
 }
@@ -293,7 +294,7 @@ export function buildDashboardSidebarSessions({
 	return { children, workspaces };
 }
 
-export interface BuildDashboardSidebarProjectsParams {
+interface BuildDashboardSidebarProjectsParams {
 	sidebarProjects: SidebarProjectInput[];
 	sidebarSections: SidebarSectionInput[];
 	visibleSidebarWorkspaces: SidebarWorkspaceInput[];

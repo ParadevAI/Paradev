@@ -15,13 +15,13 @@ import {
 	listLiveTerminalSessions,
 	parseThemeType,
 	renameTerminalSession,
-	sendAgentMessage,
 	sessionHasRunningProcess,
 	snapshotSession,
 	transcriptSession,
 	writeFramedInputToSession,
 	writeInputToSession,
 } from "../../../terminal/terminal";
+import { sendToAgent } from "../../../terminal-agents/send-to-agent";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { toTerminalSessionError } from "./errors";
@@ -193,12 +193,15 @@ export const terminalRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const message = { ...input, db: ctx.db, eventBus: ctx.eventBus };
-			const binding = ctx.terminalAgentStore.get(input.terminalId);
+			const binding = ctx.terminalAgentStore.getChatOrTerminalAgent(
+				input.terminalId,
+			);
 			const result =
 				binding && binding.endedAt === undefined
-					? await sendAgentMessage({
+					? await sendToAgent({
 							...message,
 							terminalAgentStore: ctx.terminalAgentStore,
+							chatRuntime: () => ctx.runtime.chat?.(),
 						})
 					: await writeFramedInputToSession(message);
 			if ("error" in result) {

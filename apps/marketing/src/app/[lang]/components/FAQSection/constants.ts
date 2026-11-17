@@ -1,5 +1,6 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { COMPANY } from "@superset/shared/constants";
 
 export interface FAQItem {
 	/** Stable key for React lists and anchor ids, never the translated text. */
@@ -73,7 +74,7 @@ export const FAQ_ITEMS: FAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Paradev has a free tier. The source code is available on GitHub under Elastic License 2.0 (ELv2), so you can inspect and self-host it subject to the license terms.",
+				"Paradev has a free tier. The source code is on GitHub under the MIT License, so you can inspect, modify, and self-host it.",
 		}),
 	},
 	{
@@ -93,8 +94,12 @@ export const FAQ_ITEMS: FAQItem[] = [
 		}),
 		answer: msg({
 			message:
-				"Paradev is source-available: the code is public on GitHub under Elastic License 2.0 (ELv2), which lets you inspect and self-host it subject to the license terms, but is not OSI-approved open source. Paradev is unrelated to Apache Superset, the business-intelligence tool.",
+				"Yes. Paradev is open source under the MIT License. The code is public on GitHub, and anyone can file issues, open pull requests, or fork it. Paradev is unrelated to Apache Superset, the business-intelligence tool.",
 		}),
+		link: {
+			href: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
+			label: msg({ message: "Read the MIT License" }),
+		},
 	},
 	{
 		id: "platforms",

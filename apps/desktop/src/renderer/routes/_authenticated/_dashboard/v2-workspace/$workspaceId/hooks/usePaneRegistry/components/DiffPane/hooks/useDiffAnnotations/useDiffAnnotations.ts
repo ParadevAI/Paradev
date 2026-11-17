@@ -8,7 +8,7 @@ import { useLinkedPullRequest } from "../../../../../useLinkedPullRequest";
 
 export type DeferredDiffReason = "deferred" | "loading" | "error";
 
-export interface DiffThreadComment {
+interface DiffThreadComment {
 	id: string;
 	authorLogin: string;
 	avatarUrl?: string;

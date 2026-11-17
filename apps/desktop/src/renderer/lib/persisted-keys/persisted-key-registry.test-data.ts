@@ -70,9 +70,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatSession/components/Composer/hooks/useComposerDraft/useComposerDraft.ts",
 		["chat-v3-draft:*"],
 	],
-	["src/renderer/stores/changes/store.ts", ["changes-store"]],
 	["src/renderer/stores/prompt-history.ts", ["prompt-history"]],
-	["src/renderer/stores/tabs/store.ts", ["tabs-storage"]],
 	[
 		"src/renderer/stores/theme/store.ts",
 		["theme-storage", "theme-terminal", "theme-id", "theme-type"],
@@ -84,8 +82,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["markdown-preferences"],
 	],
 	["src/renderer/stores/ports/store.ts", ["ports-store"]],
-	["src/renderer/stores/sidebar-state.ts", ["sidebar-store"]],
-	["src/renderer/stores/new-workspace-width.ts", ["new-workspace-width"]],
 	[
 		"src/renderer/stores/workspace-sidebar-state.ts",
 		["workspace-sidebar-store"],
@@ -93,6 +89,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore/cloudSidebarStore.ts",
 		["cloud-sidebar"],
+	],
+	[
+		"src/renderer/routes/_authenticated/_dashboard/stores/chatTabsStore/chatTabsStore.ts",
+		["chat-tabs"],
 	],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/stores/listDisplayStore/listDisplayStore.ts",
@@ -121,6 +121,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	],
 	["src/renderer/stores/v2-notifications/store.ts", ["v2-notifications-v1"]],
 	["src/renderer/stores/hiring-banner/store.ts", ["hiring-banner-v1"]],
+	[
+		"src/renderer/stores/payment-failed-card-dismissal/store.ts",
+		["payment-failed-card-dismissal-v1"],
+	],
 	["src/renderer/stores/star-nag/store.ts", ["star-nag-v1"]],
 	[
 		"src/renderer/stores/release-notes-card/store.ts",
@@ -188,7 +192,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["chatFavoriteModels"],
 	],
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/ChatPane/utils/savedChatMode/savedChatMode.ts",
+		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/utils/savedChatMode/savedChatMode.ts",
 		["chatModeByAgent"],
 	],
 	[
@@ -217,10 +221,6 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		],
 	],
 	["src/renderer/routes/_authenticated/layout.tsx", ["lastViewedWorkspaceId"]],
-	[
-		"src/renderer/routes/_authenticated/_dashboard/utils/workspace-navigation.ts",
-		["lastViewedWorkspaceId"],
-	],
 	[
 		"src/renderer/routes/_authenticated/_dashboard/automations/$automationId/components/PreviousRunsList/PreviousRunsList.tsx",
 		["lastViewedWorkspaceId"],

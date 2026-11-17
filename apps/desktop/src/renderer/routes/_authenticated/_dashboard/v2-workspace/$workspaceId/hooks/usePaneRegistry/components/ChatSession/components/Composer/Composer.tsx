@@ -33,9 +33,10 @@ import {
 	useState,
 } from "react";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
+import { PluginIcon } from "renderer/components/PluginIcon";
 import { env } from "renderer/env.renderer";
-import { useHotkey } from "renderer/hotkeys";
-import { FileIcon, getFileIcon } from "renderer/lib/fileIcons";
+import { formatHotkeyDisplay, PLATFORM, useHotkey } from "renderer/hotkeys";
+import { FileIcon } from "renderer/lib/fileIcons";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import {
 	type AgentSwitcher,
@@ -47,19 +48,28 @@ import {
 } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useFooterTier } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useFooterTier";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import type { RunInTerminal } from "../../../../hooks/useAgentCliUpdate";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
+import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
 import type { ChatForkTarget } from "../../types";
 import { chatContextLine, chatReferenceChip } from "../../utils/chatReference";
-import { commandChip, LEADING_COMMAND } from "../../utils/commandChip";
+import {
+	commandChip,
+	isSigilSkill,
+	LEADING_COMMAND,
+} from "../../utils/commandChip";
+import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
 import { AgentCliUpdateNotice } from "./components/AgentCliUpdateNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
+import { EnvironmentSetupNotice } from "./components/EnvironmentSetupNotice";
+import { FILE_SEARCH_LIMIT } from "./constants";
 import { useAppCommands } from "./hooks/useAppCommands";
 import {
 	prependToDraft,
@@ -123,6 +133,9 @@ export type ComposerProps = {
 	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
 	sessionUsage?: SessionUsage | null;
 	turnRunning?: boolean;
+	/** A prompt is on its way: Stop shows, disabled until there is a turn to stop. */
+	promptPending?: boolean;
+	awaitingBackground?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
 	onRunInTerminal?: RunInTerminal;
@@ -137,19 +150,22 @@ const HIDDEN_AGENT_COMMANDS = new Set(["rewind"]);
 
 /**
  * The agent's own slash commands, in the shape the composer's menu takes.
- * Selecting one inserts a chip that serializes back to `/name`, so what the
- * agent receives is the command it advertised.
+ * Selecting one inserts a chip that serializes back to `/name`, or `$name` for
+ * an agent whose skills carry that sigil, so the agent receives what it
+ * advertised. Such an agent's other commands only run at the message start.
  */
 function toMenuCommands(
 	commands: AvailableCommand[],
 	groups: { commands: string; mcp: string },
 ): PromptInputCommand[] {
+	const sigilSkills = commands.some((command) => isSigilSkill(command.name));
 	return commands.map((command) => ({
 		id: command.name,
-		title: `/${command.name}`,
+		title: isSigilSkill(command.name) ? command.name : `/${command.name}`,
 		...(command.hint ? { hint: command.hint } : {}),
 		description: command.description ?? "",
 		group: command.category === "mcp" ? groups.mcp : groups.commands,
+		inline: !sigilSkills || isSigilSkill(command.name),
 		onSelect: (ctx) => {
 			ctx.insertChip(commandChip(command.name, command.description));
 		},
@@ -157,6 +173,11 @@ function toMenuCommands(
 }
 
 const FOCUS_HANDOFF_MS = 1000;
+
+const SEND_NOW_KEYS = formatHotkeyDisplay(
+	PLATFORM === "mac" ? "meta+enter" : "ctrl+enter",
+	PLATFORM,
+).text;
 let focusHandoff: { draftKey: string; at: number } | null = null;
 
 export const Composer = memo(function Composer({
@@ -192,6 +213,8 @@ export const Composer = memo(function Composer({
 	sessionUsage,
 	target,
 	turnRunning = false,
+	promptPending = false,
+	awaitingBackground = false,
 	terminalId,
 	usageLimited = false,
 	workspaceId,
@@ -317,33 +340,39 @@ export const Composer = memo(function Composer({
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [isActive]);
+	const collections = useCollections();
+	const { getOpenFilePaths } = useChatPaneActions();
 	const searchFiles = useCallback(
 		async (query: string) => {
-			if (!query) return [];
-			const { matches } = await trpcUtils.filesystem.searchFiles.fetch({
-				workspaceId,
+			const { matches } = query.trim()
+				? await trpcUtils.filesystem.searchFiles
+						.fetch({
+							workspaceId,
+							query,
+							includeHidden: false,
+							limit: FILE_SEARCH_LIMIT,
+						})
+						.catch(() => ({ matches: [] }))
+				: { matches: [] };
+			// Read at call time: a subscription re-renders on every pane change
+			// and restarts the open menu's search.
+			return fileMentionMatches(
 				query,
-				includeHidden: false,
-				limit: 20,
-			});
-			return matches.map(
-				(match): ComposerMentionEntry => ({
-					id: match.absolutePath,
-					label: match.name,
-					description: match.relativePath,
-					icon: <FileIcon className="size-4" fileName={match.name} />,
-					// The agent reads the path itself, so a mention is the path.
-					select: (ctx) =>
-						ctx.insertChip({
-							label: match.name,
-							serialized: match.relativePath,
-							iconUrl: getFileIcon(match.name, false).src,
-							data: { elementKind: "file_mention" },
-						}),
+				collections.v2WorkspaceLocalState.get(workspaceId)
+					?.recentlyViewedFiles ?? [],
+				getOpenFilePaths?.() ?? new Set(),
+				matches,
+			).map(
+				(file): ComposerMentionEntry => ({
+					id: file.absolutePath,
+					label: file.name,
+					description: file.relativePath,
+					icon: <FileIcon className="size-4" fileName={file.name} />,
+					select: (ctx) => ctx.insertChip(fileMentionChip(file.relativePath)),
 				}),
 			);
 		},
-		[trpcUtils, workspaceId],
+		[trpcUtils, workspaceId, collections, getOpenFilePaths],
 	);
 
 	const { transport } = useChatWiring();
@@ -380,6 +409,7 @@ export const Composer = memo(function Composer({
 						id: session.sessionId,
 						label: title,
 						description: formatRelativeTime(new Date(session.updatedAt)),
+						icon: <PluginIcon className="size-4" pluginName="superset" />,
 						select: (ctx) =>
 							ctx.insertChip(
 								chatReferenceChip(
@@ -599,6 +629,17 @@ export const Composer = memo(function Composer({
 		[availableCommands, blocked, runTyped, send, t, target],
 	);
 
+	const insertSetupPrompt = useCallback((prompt: string) => {
+		const input = promptInputRef.current;
+		if (!input) return;
+		input.restoreDraft({
+			segments: [
+				{ type: "text", text: input.isEmpty() ? prompt : `\n\n${prompt}` },
+			],
+			attachments: [],
+		});
+	}, []);
+
 	return (
 		<div
 			ref={rootRef}
@@ -626,6 +667,13 @@ export const Composer = memo(function Composer({
 				turnRunning={turnRunning}
 				workspaceId={workspaceId}
 			/>
+			{!target && (
+				<EnvironmentSetupNotice
+					className={CHAT_COLUMN_CLASSNAME}
+					workspaceId={workspaceId}
+					onSetUp={insertSetupPrompt}
+				/>
+			)}
 			<AgentComposer
 				className={CHAT_COLUMN_CLASSNAME}
 				commands={commands}
@@ -642,10 +690,20 @@ export const Composer = memo(function Composer({
 				placeholder={
 					target
 						? (target.disabledReason ?? t({ message: `Message ${name}…` }))
-						: (placeholder ??
-							t({ message: "Ask the agent, @mention files, run /commands" }))
+						: awaitingBackground
+							? t({ message: `Queue a message · ${SEND_NOW_KEYS} to send now` })
+							: (placeholder ??
+								t({
+									message: "Ask the agent, @mention files, run /commands",
+								}))
 				}
-				status={stop ? "streaming" : "ready"}
+				status={
+					stop || promptPending
+						? "streaming"
+						: awaitingBackground && !target
+							? "background"
+							: "ready"
+				}
 				stopOnEscape={!escapeGoesBack}
 				toolbar={
 					target ? (

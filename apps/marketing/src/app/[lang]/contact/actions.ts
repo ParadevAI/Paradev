@@ -111,8 +111,6 @@ export async function submitContactInquiry(
 		const { error } = await resend.emails.send({
 			from: NOREPLY_FROM,
 			to: COMPANY.SUPPORT_EMAIL,
-			// CC the submitter so they keep a copy and stay on the reply thread.
-			cc: sanitizedEmail,
 			replyTo: sanitizedEmail,
 			subject: `Contact message from ${sanitizedName}: ${sanitizedTopic}`,
 			react: ContactInquiryEmail({

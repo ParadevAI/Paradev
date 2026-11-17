@@ -1,11 +1,8 @@
 export {
-	closedCloudChatPromptHashes,
+	ignoreChatTerminal,
 	isChatSessionClosed,
-	isChatTerminalClosed,
+	isChatSessionReopened,
+	isChatTerminalIgnored,
 	markChatSessionClosed,
-	markChatTerminalClosed,
-	markCloudChatLaunchClosed,
 	reopenChatSession,
-	reopenChatTerminal,
-	reopenCloudChatLaunch,
 } from "./closedChatSessions";

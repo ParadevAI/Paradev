@@ -44,7 +44,7 @@ export function usePullRequestActions({
 				toast.warning(
 					t({
 						message:
-							"Merged, but couldn't refresh PR state — try again in a moment",
+							"Merged, but couldn't refresh PR state. Try again in a moment",
 					}),
 				);
 			} finally {
@@ -88,7 +88,7 @@ export function usePullRequestActions({
 				toast.warning(
 					t({
 						message:
-							"Marked ready, but couldn't refresh PR state — try again in a moment",
+							"Marked ready, but couldn't refresh PR state. Try again in a moment",
 					}),
 				);
 			} finally {

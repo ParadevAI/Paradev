@@ -451,6 +451,14 @@ export function seatPricePerMonth(family: PlanFamily, yearly: boolean): number {
 	return plan.interval === "year" ? plan.seatPrice / 12 : plan.seatPrice;
 }
 
+const FAMILIES_WITHOUT_ADVERTISED_CLOUD: readonly string[] = ["pro"];
+
+/** Pro seats still carry a GB-minute grant in Autumn, but only Team and up are sold with cloud. */
+export function advertisedGbMinutesPerSeat(family: PlanFamily): number | null {
+	if (FAMILIES_WITHOUT_ADVERTISED_CLOUD.includes(family.family)) return null;
+	return family.gbMinutesPerSeat;
+}
+
 export function familyForPlan(
 	catalog: PlanFamily[],
 	autumnPlanId: string | null | undefined,

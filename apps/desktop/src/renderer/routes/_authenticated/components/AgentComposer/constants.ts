@@ -1,5 +1,5 @@
 export const PILL_TRIGGER_CLASS =
-	"flex h-7 min-w-0 shrink cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[12px] text-foreground/80 outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-foreground/[0.07] data-[state=open]:text-foreground";
+	"flex h-7 min-w-0 shrink cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[12px] text-foreground/80 outline-none transition-colors hover:bg-foreground/[0.07] hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring data-[state=open]:bg-foreground/[0.07] data-[state=open]:text-foreground shell-next:rounded-md shell-next:hover:bg-fill-hover shell-next:data-[state=open]:bg-fill-hover";
 
 export const PILL_CHEVRON_CLASS =
 	"size-3 shrink-0 opacity-60 transition-transform group-data-[state=open]:rotate-180";

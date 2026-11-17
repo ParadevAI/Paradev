@@ -1,1 +1,5 @@
-export { type ChatSessionTarget, focusChatSession } from "./focusChatSession";
+export {
+	addChatTab,
+	type ChatSessionTarget,
+	focusChatSession,
+} from "./focusChatSession";

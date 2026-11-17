@@ -4,19 +4,17 @@ description: Set up cloud workspaces, environments, and machine sizes
 pro: true
 ---
 
-<Callout type="info" title="Early access">
-Cloud workspaces are in early access. They are not yet available to every account, so you might not see the **Cloud** option in the app yet.
-</Callout>
-
 ## Overview
 
-A cloud workspace runs in a sandbox in the cloud instead of on your computer. Agents keep working when your laptop is closed, and you can open the workspace from desktop, iPhone, or iPad.
+A cloud workspace runs in a cloud sandbox instead of on your computer. Agents keep working when your laptop is closed, and you can open the workspace from desktop, iPhone, or iPad.
 
-Every cloud workspace starts from an **environment**: the repositories to clone, the variables to set, and the region to run in. You set up an environment once per repository, then start as many workspaces from it as you need.
+Every cloud workspace starts from an **environment**: the repositories to clone, the variables to set, and the region. Set up an environment once, then start as many workspaces from it as you need.
+
+To run agents on a server in your own cloud account instead, see [Bring Your Own Cloud](/bring-your-own-cloud).
 
 ## Requirements
 
-- **A paid plan.** Cloud workspaces need a paid Paradev plan. Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
+- **Team or Ultra.** Cloud workspaces come with the Team and Ultra plans (see [pricing](https://paradev.com/pricing)). Usage counts against your organization's cloud usage limit (see [Usage and billing](#usage-and-billing)).
 - **GitHub.** Connect GitHub in **Integrations** and give the Paradev GitHub App access to each repository you want to use. A cloud workspace clones its repositories through the app.
 - **Agent sign-in.** Sign in to your agents under **Settings → Agents**. Cloud workspaces use that sign-in; see [Credentials](#credentials).
 
@@ -65,9 +63,9 @@ Each cloud workspace runs on a machine size you pick when you create it. Every s
 
 | Size | Name in CLI | vCPU | Memory | Available on |
 | --- | --- | --- | --- | --- |
-| Small | `small` | 2 | 4 GB | All paid plans |
-| Medium | `medium` | 4 | 8 GB | All paid plans (default) |
-| Large | `large` | 8 | 16 GB | All paid plans |
+| Small | `small` | 2 | 4 GB | Team and Ultra |
+| Medium | `medium` | 4 | 8 GB | Team and Ultra (default) |
+| Large | `large` | 8 | 16 GB | Team and Ultra |
 | X-Large | `xlarge` | 16 | 32 GB | On request |
 | 2X-Large | `2xlarge` | 32 | 64 GB | On request |
 
@@ -101,7 +99,7 @@ superset workspaces create --machine-size large \
   --agent claude --prompt "Fix the login redirect"
 ```
 
-If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--branch` sets the base branch (default: the repository's default branch), and Paradev creates a new working branch from it.
+If your account has cloud workspaces, `workspaces create` makes a cloud workspace by default; pass `--local` to create one on this machine instead. `--base-branch` sets the branch to start from (default: the repository's default branch), and Paradev creates a new working branch from it. `--branch` applies only to workspaces on a host.
 
 If more than one environment has repositories, also pass `--environment <id>`. Run the command without it to see each environment's ID and name.
 
@@ -113,7 +111,7 @@ Cloud usage is metered in **GB-hours**: the machine's memory multiplied by the t
 
 **Settings → Billing** shows the GB-hours used this period, when it resets, and any usage over the plan. Paradev checks the limit each time a workspace starts or wakes, and while it runs. A running workspace that reaches the limit stops about 10 minutes later.
 
-- Without a paid plan: "Cloud workspaces need a paid plan."
+- Without Team or Ultra: "Cloud workspaces need the Team or Ultra plan." Upgrade in **Settings → Billing**.
 - At the limit: "Your organization has reached its cloud usage limit." Raise the limit or upgrade in **Settings → Billing**.
 
 Each plan limits how many environments an organization can hold. When you reach the limit, archive one or upgrade in **Settings → Billing**.
@@ -134,7 +132,7 @@ The checkout lives at `/workspace`. An environment with more than one repository
 
 ## Troubleshooting
 
-- **No Cloud option**, or "Cloud sandboxes are not enabled" from the CLI: your account does not have early access yet.
+- **No Cloud option**, or "Cloud sandboxes are not enabled" from the CLI: cloud workspaces come with the Team and Ultra plans. Upgrade in **Settings → Billing**.
 - **The project is missing from the Cloud picker**: link the project to a GitHub repository, and make sure the Paradev GitHub App can access it.
 - **The environment editor says a repository "isn't shared with the Paradev GitHub App yet"**: click **Configure GitHub App** and add the repository.
 - **"Your GitHub account cannot reach…"**: your connected GitHub account has no access to a repository in the environment. Ask for access, or pick another environment.

@@ -10,6 +10,7 @@ import {
 } from "shared/absolute-paths";
 import { useStore } from "zustand";
 import type { FilePaneData, OpenFile, PaneTarget } from "../../types";
+import { openFilePathsIn } from "../../utils/openFilePathsIn";
 import { setWorkspaceSidebarTab } from "../../utils/setWorkspaceSidebarTab";
 import {
 	type RecentFile,
@@ -82,13 +83,7 @@ export function useWorkspaceFileNavigation({
 	}, [activeFilePanePath]);
 
 	const openFilePathsKey = useStore(viewer.store, (state) =>
-		state.tabs
-			.flatMap((tab) =>
-				Object.values(tab.panes)
-					.filter((pane) => pane.kind === "file")
-					.map((pane) => (pane.data as FilePaneData).filePath),
-			)
-			.join("\u0000"),
+		openFilePathsIn(state).join("\u0000"),
 	);
 	const openFilePaths = useMemo(
 		() => new Set(openFilePathsKey ? openFilePathsKey.split("\u0000") : []),

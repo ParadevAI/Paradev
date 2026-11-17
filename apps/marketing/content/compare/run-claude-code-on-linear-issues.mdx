@@ -2,7 +2,7 @@
 title: "How to Run Claude Code in Parallel on Linear Issues for a Small Team (2026)"
 description: "Turn a batch of Linear issues into parallel Claude Code or Codex runs, one branch and workspace per issue, and keep each issue's status and review owner clear. Paradev, Linear's own agents, and Cyrus compared."
 date: 2026-10-30
-lastUpdated: 2026-10-30
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - linear
@@ -21,7 +21,7 @@ keywords:
   - track coding agent work in linear
 ---
 
-To run Claude Code in parallel on Linear issues, give each issue its own Git branch and its own agent session, start them together, and let the issue keep the status and the owner. In [Paradev](https://paradev.com), open **Tasks**, switch the source to **Linear**, and click **Add to workspace** on an issue. Paradev opens a new workspace on Linear's branch name with the issue linked to the prompt, starts Claude Code (or Codex, or another CLI agent) on it, and moves the issue to In Progress. To start a whole batch at once, loop over the issues with the `superset` CLI. Each teammate runs this on their own machine or a shared host, with their own Claude or OpenAI subscription.
+To run Claude Code in parallel on Linear issues, give each issue its own Git branch and its own agent session, start them together, and let the issue keep the status and the owner. In [Paradev](https://paradev.com), open **Tasks**, switch the source to **Linear**, and click **Add to workspace** on an issue. Paradev opens a new workspace on Linear's branch name with the issue linked to the prompt, starts Claude Code (or Codex, or another CLI agent) on it, and moves the issue to In Progress. To start a whole batch at once, loop over the issues with the `superset` CLI. Each teammate runs this on their own machine, a shared host, or a Linux server in your own cloud account ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), with their own Claude or OpenAI subscription.
 
 The main alternatives are Linear's own agent integrations (assign an issue to Codex or Cursor, which run in the vendor's cloud) and open-source bridges such as Cyrus, which runs Claude Code or another agent on issues assigned to it. The choice comes down to where the agent should run and who reviews the result.
 
@@ -100,7 +100,7 @@ To give the agent itself tools to read and update Linear, such as posting a summ
 
 | Option | Where the agent runs | Agents | Good fit |
 | --- | --- | --- | --- |
-| Paradev Tasks and automations | Your machines or a shared host | Claude Code, Codex, and other CLI agents | Teams that want agents on their own machines and subscriptions, with diffs reviewed before the PR |
+| Paradev Tasks and automations | Your machines, a shared host, or your own cloud server | Claude Code, Codex, and other CLI agents | Teams that want agents on their own machines and subscriptions, with diffs reviewed before the PR |
 | [Codex in Linear](https://learn.chatgpt.com/docs/third-party/linear) | Codex cloud | Codex | Assign or mention @Codex on an issue, and it posts progress back |
 | [Cursor in Linear](https://cursor.com/docs/integrations/linear) | Cursor Cloud Agents | Cursor's agent | Teams already on Cursor; assign an issue to Cursor or mention @Cursor |
 | [Linear coding sessions](https://linear.app/docs/coding-sessions) | A secure cloud environment, per Linear's docs | Linear Agent, writing code with Claude Code or Codex | Teams that want everything to stay inside Linear; needs AI credits and a workspace admin to turn it on |

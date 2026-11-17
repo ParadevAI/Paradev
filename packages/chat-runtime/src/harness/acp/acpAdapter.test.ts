@@ -1,5 +1,6 @@
-import { describe, expect, it, jest } from "bun:test";
+import { describe, expect, it, jest, spyOn } from "bun:test";
 import { spawn } from "node:child_process";
+import type { ChatSelections } from "@superset/chat/core";
 import type { Item } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
 import type { AdapterEvent, ResolveAttachment } from "../types";
@@ -45,6 +46,8 @@ class FakeAcpAgent {
 	newSessionConfigOptions: Array<Record<string, unknown>> | null = null;
 	/** v1's session/new `modes` block; v2 agents report the mode as a config option. */
 	newSessionModes: Record<string, unknown> | null = null;
+	/** Refuse session/new with this message. */
+	newSessionError: string | null = null;
 	/** Reported while a session loads, as an agent restoring its saved options does. */
 	loadConfigOptions: Array<Record<string, unknown>> | null = null;
 	/** Hold mode and option answers until `releaseSelections`. */
@@ -340,6 +343,12 @@ class FakeAcpAgent {
 							: {}),
 					},
 				});
+			} else if (frame.method === "session/new" && this.newSessionError) {
+				this.deliver({
+					jsonrpc: "2.0",
+					id: frame.id,
+					error: { code: -32000, message: this.newSessionError },
+				});
 			} else if (frame.method === "session/new") {
 				this.respond(frame.id as number, {
 					sessionId: "sess-1",
@@ -462,6 +471,8 @@ class FakeAcpAgent {
 					return;
 				}
 				this.respond(frame.id as number, { messageId });
+			} else if (frame.method === "_session/async_task/stop") {
+				this.respond(frame.id as number, { stopped: true });
 			} else if (frame.method === "_sh.superset/subagent/background") {
 				if (this.refuseBackground) {
 					this.deliver({
@@ -540,7 +551,7 @@ async function flush(times = 8): Promise<void> {
 function startAdapter(
 	agent: FakeAcpAgent,
 	resume?: string,
-	selections: { modelId?: string; modeId?: string } = {},
+	selections: ChatSelections = {},
 	adapterOptions: Pick<
 		AcpAdapterOptions,
 		| "defaultModeId"
@@ -549,6 +560,7 @@ function startAdapter(
 		| "shellPollMs"
 		| "backgroundDetailIntervalMs"
 		| "startupTimeoutMs"
+		| "startOptionsGraceMs"
 		| "launch"
 	> = {},
 ): { adapter: AcpAdapter; events: AdapterEvent[] } {
@@ -2454,6 +2466,44 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("shows the reason claude-agent-acp sends in the AIR permission meta", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.requestPermissionWith(
+			{
+				toolCall: { toolCallId: "tc-1", title: "rm -rf build" },
+				options: [
+					{ optionId: "allow-once", name: "Yes", kind: "allow_once" },
+					{ optionId: "reject", name: "No", kind: "reject_once" },
+				],
+				_meta: {
+					jetbrains: {
+						air: {
+							version: 1,
+							permission: {
+								version: 1,
+								title: "rm -rf build",
+								description: "Reason: Deletes files",
+							},
+						},
+					},
+				},
+			},
+			9306,
+		);
+		await flush();
+
+		expect(
+			itemsOf(events).find((item) => item.kind === "approval_request"),
+		).toMatchObject({ reason: "Deletes files", status: "pending" });
+
+		await adapter.dispose();
+	});
+
 	it("a v2 permission is auto-approved in an auto-approving mode", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(
@@ -3397,6 +3447,182 @@ describe("AcpAdapter on protocol v2", () => {
 				: [],
 		);
 		expect(lists).toEqual([["bun run dev"], []]);
+
+		await adapter.dispose();
+	});
+
+	it("reopens the latest turn for a turn the agent starts on its own", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "task-1",
+			name: "sleep 30",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "task-1",
+			state: "completed",
+		});
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+			showInTranscript: false,
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "agent_message_chunk",
+			content: { type: "text", text: "The subagent finished." },
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "autonomous-turn-1",
+			state: "completed",
+		});
+		await flush();
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(new Set(turns.map((turn) => turn.id)).size).toBe(1);
+		expect(turns.map((turn) => turn.status)).toEqual([
+			"running",
+			"completed",
+			"running",
+			"completed",
+		]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-2",
+			name: "Claude is working",
+			description: "A scheduled wakeup fired.",
+			taskType: "turn",
+		});
+		await flush();
+		const wakeup = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(wakeup.at(-1)?.id).not.toBe(turns[0]?.id);
+		const reply = events.find(
+			(e) =>
+				e.kind === "item" &&
+				e.item.kind === "agent_message" &&
+				textOf(e.item) === "The subagent finished.",
+		);
+		expect(reply?.kind === "item" ? reply.turnId : null).toBe(
+			turns[0]?.id ?? "",
+		);
+		expect(
+			events.some(
+				(e) =>
+					e.kind === "session" &&
+					(e.session.backgroundTasks ?? []).some(
+						(task) => task.id === "autonomous-turn-1",
+					),
+			),
+		).toBe(false);
+
+		await adapter.dispose();
+	});
+
+	for (const [ending, end] of [
+		["stopped", (agent: FakeAcpAgent) => agent.releasePrompts("cancelled")],
+		["failed", (agent: FakeAcpAgent) => agent.failHeldPrompts(-32603, "boom")],
+	] as const) {
+		it(`leaves a ${ending} turn as it ended when the agent starts a turn on its own`, async () => {
+			const agent = new FakeAcpAgent();
+			agent.protocolVersion = 1;
+			agent.holdPrompts = true;
+			const { adapter, events } = startAdapter(agent);
+			await flush();
+			adapter.prompt([{ type: "text", text: "start a background subagent" }]);
+			await flush();
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "task-1",
+				name: "sleep 30",
+			});
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_state_update",
+				asyncTaskId: "task-1",
+				state: "completed",
+			});
+			end(agent);
+			await flush();
+
+			agent.notify("sess-1", {
+				sessionUpdate: "async_task_spawned",
+				asyncTaskId: "autonomous-turn-1",
+				name: "Claude is working",
+				taskType: "turn",
+			});
+			await flush();
+
+			const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+			const first = turns.filter((turn) => turn.id === "id-1");
+			expect(first.at(-1)?.status).toBe(
+				ending === "stopped" ? "interrupted" : "failed",
+			);
+			expect(turns.at(-1)?.id).not.toBe("id-1");
+			expect(turns.at(-1)?.status).toBe("running");
+
+			await adapter.dispose();
+		});
+	}
+
+	it("gives a turn the agent starts without background work a turn of its own", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "hello" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			description: "A scheduled wakeup fired.",
+			taskType: "turn",
+		});
+		await flush();
+
+		const turns = events.flatMap((e) => (e.kind === "turn" ? [e.turn] : []));
+		expect(turns.map((turn) => `${turn.id}:${turn.status}`)).toEqual([
+			"id-1:running",
+			"id-1:completed",
+			`${turns[2]?.id}:running`,
+		]);
+		expect(turns[2]?.id).not.toBe("id-1");
+
+		await adapter.dispose();
+	});
+
+	it("stops a turn the agent started on its own through its async task", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+		});
+		await flush();
+		adapter.cancelTurn();
+		await flush();
+
+		const methods = agent.sent.map((f) => f.method);
+		expect(methods).toContain("_session/async_task/stop");
+		expect(methods).not.toContain("session/cancel");
 
 		await adapter.dispose();
 	});
@@ -5778,6 +6004,145 @@ describe("AcpAdapter config options", () => {
 		await adapter.dispose();
 	});
 
+	it("applies the start effort only once the agent has taken the start model", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
+		agent.holdSelections = true;
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			effortId: "low",
+		});
+		const configured = () =>
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params);
+		await flush();
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+		]);
+
+		agent.holdSelections = false;
+		agent.releaseSelections();
+		await flush();
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "effort", value: "low" },
+		]);
+
+		await adapter.dispose();
+	});
+
+	it("turns fast mode on once the agent has taken the start model", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [
+			MODEL_OPTION,
+			{
+				id: "fast",
+				name: "Fast mode",
+				type: "select",
+				currentValue: "off",
+				options: [
+					{ value: "off", name: "Off" },
+					{ value: "on", name: "On" },
+				],
+			},
+		];
+		agent.holdSelections = true;
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			fast: "on",
+		});
+		const configured = () =>
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => f.params);
+		await flush();
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+		]);
+
+		agent.holdSelections = false;
+		agent.releaseSelections();
+		await flush(20);
+		expect(configured()).toEqual([
+			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
+			{ sessionId: "sess-1", configId: "fast", value: "on" },
+		]);
+		expect(await adapter.startSelections()).toEqual({
+			modelId: "sonnet",
+			fast: "on",
+		});
+
+		await adapter.dispose();
+	});
+
+	it("skips the start effort when the agent refuses the start model, and reports what it took", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
+		agent.rejectSelections = true;
+		const { adapter } = startAdapter(agent, undefined, {
+			modelId: "sonnet",
+			effortId: "low",
+		});
+		await flush(20);
+
+		expect(
+			agent.sent
+				.filter((f) => f.method === "session/set_config_option")
+				.map((f) => (f.params as { configId: string }).configId),
+		).toEqual(["model"]);
+		expect(await adapter.startSelections()).toEqual({});
+
+		await adapter.dispose();
+	});
+
+	it("applies start selections from options the agent lists after session/new", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{ modelId: "sonnet" },
+			{ startOptionsGraceMs: 50 },
+		);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "config_option_update",
+			configOptions: [MODEL_OPTION],
+		});
+		await flush();
+
+		expect(
+			agent.sent.find((f) => f.method === "session/set_config_option")?.params,
+		).toEqual({ sessionId: "sess-1", configId: "model", value: "sonnet" });
+		expect(await adapter.startSelections()).toEqual({ modelId: "sonnet" });
+
+		await adapter.dispose();
+	});
+
+	it("warns when the agent lists no options in time to take the start effort", async () => {
+		const warn = spyOn(console, "warn").mockImplementation(() => {});
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{ effortId: "high" },
+			{ startOptionsGraceMs: 1 },
+		);
+
+		expect(await adapter.startSelections()).toEqual({});
+		expect(warn).toHaveBeenCalledWith(
+			'[acp] the agent did not take reasoning effort "high"; it runs at its default',
+		);
+
+		warn.mockRestore();
+		await adapter.dispose();
+	});
+
 	it("leaves the model alone when the start model is not offered", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
@@ -6367,6 +6732,35 @@ describe("AcpAdapter when the agent fails", () => {
 			detail: "POST /v1/messages 401",
 			loginCommand: "claude auth login",
 		});
+
+		await adapter.dispose();
+	});
+
+	it("keeps a chat that cannot open signed out, and fails each prompt with the agent's own login", async () => {
+		const agent = new FakeAcpAgent();
+		agent.newSessionError = "Authentication required";
+		const { adapter, events } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{
+				launch: async () => ({ command: "fake", loginCommand: "codex login" }),
+			},
+		);
+		adapter.prompt([{ type: "text", text: "hi" }]);
+		await flush();
+		adapter.prompt([{ type: "text", text: "again" }]);
+		await flush();
+
+		const failed = events.flatMap((e) =>
+			e.kind === "turn" && e.turn.status === "failed" ? [e.turn] : [],
+		);
+		expect(failed).toHaveLength(2);
+		expect(failed[1]?.error).toMatchObject({
+			kind: "auth",
+			loginCommand: "codex login",
+		});
+		expect(sessionsOf(events).some((s) => s.status === "dead")).toBe(false);
 
 		await adapter.dispose();
 	});

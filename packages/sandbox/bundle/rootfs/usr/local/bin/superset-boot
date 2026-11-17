@@ -9,6 +9,7 @@
 #   install the pinned bundle      only when its hash differs from current
 #   apply-rootfs, sync-assets,     each a hash compare per file, asset, step
 #   run-steps
+#   link the drive's agents        only when the control plane mounted one
 #   start host-service as ubuntu   first; everything else is a side effect
 #   start the desktop and the checkout, detached
 #
@@ -117,10 +118,47 @@ fi
 stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
 stamp "steps.start"; "$BUNDLE/setup" run-steps >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
 
+# --- the agent CLIs from the region's agent-tools drive, when the control
+# plane mounted one. Without it the image's agents stay on PATH. Mounts are
+# per session, so a link into a mount this session lacks points nowhere.
+link_agents() {
+	local dir="${SUPERSET_AGENTS_DIR:-/opt/agents}" linked=0 name sha bin target
+	local manifest="${dir}/manifest.json"
+	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print | grep -q .; then
+		SUPERSET_BUNDLE_DIR="$BUNDLE" bash "$BUNDLE/steps/install-agent-clis.sh" >> "$SUPERSET_BOOT_LOG" 2>&1 ||
+			stamp "agents.restore.failed"
+	fi
+	if ! jq -e 'type == "array"' "$manifest" > /dev/null 2>&1; then
+		stamp "agents.unavailable no manifest at ${dir}"
+		return 0
+	fi
+	while IFS=$'\t' read -r name sha bin; do
+		if ! [[ "$name" =~ ^[a-z0-9-]+$ && "$sha" =~ ^[0-9a-f]{64}$ && "$bin" =~ ^[A-Za-z0-9._/-]+$ && "$bin" != *..* ]]; then
+			stamp "agents.skipped invalid entry ${name:0:32}"; continue
+		fi
+		target="${dir}/${name}/${sha}/${bin}"
+		[ -x "$target" ] || { stamp "agents.missing ${name} ${sha:0:12}"; continue; }
+		ln -sfn "$target" "/usr/local/bin/${name}.tmp" && mv -T "/usr/local/bin/${name}.tmp" "/usr/local/bin/${name}" &&
+			linked=$((linked + 1))
+	done < <(jq -r '.[] | [.name, .sha, .bin] | map(tostring) | @tsv' "$manifest")
+	stamp "agents.linked ${linked} from ${dir}"
+}
+link_agents
+
 # --- host-service, as the sandbox user, first. A runtime that cannot start
 # is logged, not fatal: the desktop and the checkout still come up so the
 # box can be looked at, and the control plane marks the workspace failed.
 HOST="${SUPERSET_HOST_ROOT}/current"
+# install-host keeps the previous runtime; once the current one answers, it is garbage.
+prune_runtimes() {
+	local keep dir
+	keep="$(readlink -f "$HOST")" || return 0
+	for dir in "${SUPERSET_HOST_ROOT}"/*/; do
+		dir="${dir%/}"
+		[ -L "$dir" ] || [ "$dir" = "$keep" ] && continue
+		rm -rf "$dir" && stamp "host.pruned ${dir##*/}"
+	done
+}
 start_host_service() {
 [ -f "${HOST}/host-service.js" ] || { stamp "host.missing no runtime at ${HOST}"; return 0; }
 chown -R "$SUPERSET_USER:$SUPERSET_USER" "$SUPERSET_STATE_DIR" "$SUPERSET_LOG_DIR"
@@ -156,20 +194,22 @@ host_env=(
 )
 for key in HOST_SERVICE_SENTRY_DSN HOST_SERVICE_SENTRY_ENVIRONMENT SUPERSET_SANDBOX_CREATOR_USER_ID \
 	SUPERSET_SANDBOX_PLUGINS \
-	SUPERSET_SANDBOX_AGENT SUPERSET_SANDBOX_AGENT_PROMPT SUPERSET_SANDBOX_AGENT_MODEL SUPERSET_SANDBOX_AGENT_EFFORT SUPERSET_SANDBOX_AGENT_MODE SUPERSET_SANDBOX_AGENT_ATTACHMENTS SUPERSET_SANDBOX_AGENT_SURFACE SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID \
+	SUPERSET_SANDBOX_AGENT SUPERSET_SANDBOX_AGENT_PROMPT SUPERSET_SANDBOX_AGENT_MODEL SUPERSET_SANDBOX_AGENT_EFFORT SUPERSET_SANDBOX_AGENT_MODE SUPERSET_SANDBOX_AGENT_ATTACHMENTS SUPERSET_SANDBOX_AGENT_SURFACE SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID SUPERSET_SANDBOX_AGENT_TERMINAL_ID \
 	NODE_EXTRA_CA_CERTS NODE_USE_SYSTEM_CA SSL_CERT_FILE CURL_CA_BUNDLE REQUESTS_CA_BUNDLE AWS_CA_BUNDLE GIT_SSL_CAINFO NPM_CONFIG_CAFILE PIP_CERT CARGO_HTTP_CAINFO; do
 	[ -n "${!key:-}" ] && host_env+=("${key}=${!key}")
 done
-stamp "host.exec $(cat "${SUPERSET_HOST_ROOT}/current.version" 2>/dev/null)"
+host_node="${HOST}/node"
+[ -x "$host_node" ] || host_node=node
+stamp "host.exec $(cat "${SUPERSET_HOST_ROOT}/current.version" 2>/dev/null) node=${host_node}"
 # setpriv execs in place, so the pid recorded is node's own and the process
 # that answers kill -0 is the one that serves.
 (cd "$SUPERSET_USER_HOME" && exec setpriv --reuid="$SUPERSET_USER" --regid="$SUPERSET_USER" --init-groups \
-	env -i "${host_env[@]}" node "${HOST}/host-service.js") >> "${SUPERSET_LOG_DIR}/host-service.log" 2>&1 9>&- &
+	env -i "${host_env[@]}" "$host_node" "${HOST}/host-service.js") >> "${SUPERSET_LOG_DIR}/host-service.log" 2>&1 9>&- &
 echo $! > "${SUPERSET_RUN_DIR}/host-service.pid"
 (
 	for _ in $(seq 1 600); do
 		if curl -fs -o /dev/null "http://127.0.0.1:${SUPERSET_HOST_SERVICE_PORT}/trpc/health.check"; then
-			touch "${SUPERSET_RUN_DIR}/host-service.ready"; stamp "host.ready"; exit 0
+			touch "${SUPERSET_RUN_DIR}/host-service.ready"; stamp "host.ready"; prune_runtimes; exit 0
 		fi
 		sleep 0.1
 	done

@@ -1,4 +1,5 @@
 import {
+	advertisedGbMinutesPerSeat,
 	DEFAULT_MACHINE_SIZE,
 	familyForPlan,
 	machineSpec,
@@ -14,9 +15,10 @@ export interface EmailPlan {
 }
 
 export function cloudHoursPerSeat(family: PlanFamily): number | null {
-	if (!family.gbMinutesPerSeat) return null;
+	const gbMinutes = advertisedGbMinutesPerSeat(family);
+	if (!gbMinutes) return null;
 	return Math.round(
-		family.gbMinutesPerSeat / 60 / machineSpec(DEFAULT_MACHINE_SIZE).memoryGb,
+		gbMinutes / 60 / machineSpec(DEFAULT_MACHINE_SIZE).memoryGb,
 	);
 }
 

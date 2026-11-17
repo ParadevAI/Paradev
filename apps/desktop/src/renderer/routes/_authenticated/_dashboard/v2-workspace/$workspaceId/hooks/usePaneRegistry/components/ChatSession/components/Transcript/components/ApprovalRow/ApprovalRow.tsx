@@ -11,7 +11,10 @@ import { Badge } from "@superset/ui/badge";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
 import { ShieldQuestion, SquareTerminal } from "lucide-react";
+import { isUnrestrictedMode } from "renderer/routes/_authenticated/utils/isUnrestrictedMode";
+import { useSessionMode } from "../../providers/SessionModeProvider";
 import { ToolContentList } from "../ToolContentList";
+import { ApprovalReason } from "./components/ApprovalReason";
 import { AskerLabel } from "./components/AskerLabel";
 import { OptionButtons } from "./components/OptionButtons";
 import { QuestionForm } from "./components/QuestionForm";
@@ -63,6 +66,7 @@ export function ApprovalRow({
 	target?: Item | undefined;
 }) {
 	const pending = item.status === "pending";
+	const unrestricted = isUnrestrictedMode(useSessionMode());
 	const options = item.options ?? [];
 	const command =
 		target?.kind === "tool_call" && (target as ToolCall).toolKind === "execute";
@@ -130,6 +134,9 @@ export function ApprovalRow({
 				) : (
 					<p className="text-muted-foreground text-sm">{item.title}</p>
 				))}
+			{pending && (item.reason || unrestricted) && (
+				<ApprovalReason reason={item.reason} unrestricted={unrestricted} />
+			)}
 			{pending && item.detail && (
 				<ToolContentList itemId={item.id} items={item.detail} />
 			)}

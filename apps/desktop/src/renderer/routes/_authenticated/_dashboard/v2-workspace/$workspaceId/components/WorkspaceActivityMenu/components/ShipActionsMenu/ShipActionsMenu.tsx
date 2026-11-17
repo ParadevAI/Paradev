@@ -3,7 +3,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
@@ -11,18 +10,25 @@ import { Ellipsis } from "lucide-react";
 import { useRef, useState } from "react";
 import {
 	VscGitCommit,
-	VscGitMerge,
 	VscGitPullRequest,
 	VscGitPullRequestCreate,
 	VscRepoPush,
 } from "react-icons/vsc";
-import type { PullRequestMergeMethod } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import type { PullRequestMergeFlow } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/usePullRequestMergeFlow";
+import type {
+	PullRequestMergeMethod,
+	PullRequestTarget,
+} from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
+import { PullRequestMergeMenuSection } from "../../../PullRequestMergeMenuSection";
 
 export type ShipView = "commit" | "pr";
 
 export interface PullRequestMenuActions {
+	target: PullRequestTarget | null;
+	flow: PullRequestMergeFlow;
 	canMarkReady: boolean;
 	canMerge: boolean;
+	isQueued: boolean;
 	isMarkingReady: boolean;
 	isMerging: boolean;
 	onMarkReady: () => void;
@@ -70,7 +76,7 @@ export function ShipActionsMenu({
 	const hasShipActions = canCommit || canPush || canCreatePr;
 	const hasPullRequestActions =
 		pullRequest !== undefined &&
-		(pullRequest.canMarkReady || pullRequest.canMerge);
+		(pullRequest.canMarkReady || pullRequest.canMerge || pullRequest.isQueued);
 	if (!hasShipActions && !hasPullRequestActions) return null;
 
 	return (
@@ -163,33 +169,15 @@ export function ShipActionsMenu({
 								<Trans>Ready for review</Trans>
 							</DropdownMenuItem>
 						)}
-						{pullRequest.canMerge && (
-							<>
-								<DropdownMenuLabel className="font-normal text-muted-foreground">
-									<Trans>Merge</Trans>
-								</DropdownMenuLabel>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("squash")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Squash and merge</Trans>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("merge")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Create merge commit</Trans>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									disabled={pullRequest.isMerging}
-									onClick={() => pullRequest.onMerge("rebase")}
-								>
-									<VscGitMerge className="size-4" />
-									<Trans>Rebase and merge</Trans>
-								</DropdownMenuItem>
-							</>
+						{(pullRequest.canMerge || pullRequest.isQueued) && (
+							<PullRequestMergeMenuSection
+								target={pullRequest.target}
+								flow={pullRequest.flow}
+								isQueued={pullRequest.isQueued}
+								isMergingAlone={pullRequest.isMerging}
+								onMergeAlone={pullRequest.onMerge}
+								iconClassName="size-4"
+							/>
 						)}
 					</>
 				)}

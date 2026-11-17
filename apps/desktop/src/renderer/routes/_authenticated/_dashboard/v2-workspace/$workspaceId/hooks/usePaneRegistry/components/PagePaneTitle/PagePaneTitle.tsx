@@ -14,13 +14,26 @@ interface PagePaneTitleProps {
 	data: PagePaneData;
 	paneId: string;
 	onClose: () => void;
+	onOpenPage: (page: PagePaneData) => void;
 }
 
-export function PagePaneTitle({ data, paneId, onClose }: PagePaneTitleProps) {
+export function PagePaneTitle({
+	data,
+	paneId,
+	onClose,
+	onOpenPage,
+}: PagePaneTitleProps) {
 	const { setShareOpen, previewVersion, setPreviewVersion } =
 		usePagePaneUi(paneId);
-	const { page, versions, currentUserId, onRename, onRefresh, onDelete } =
-		usePageHeaderData({ ...data, version: previewVersion });
+	const {
+		page,
+		versions,
+		currentUserId,
+		onRename,
+		onRefresh,
+		onDelete,
+		onDuplicate,
+	} = usePageHeaderData({ ...data, version: previewVersion });
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 	const [renameOpen, setRenameOpen] = useState(false);
@@ -40,7 +53,9 @@ export function PagePaneTitle({ data, paneId, onClose }: PagePaneTitleProps) {
 				page={page}
 				versions={versions}
 				editable={
-					currentUserId !== undefined && currentUserId === page.createdByUserId
+					page.canEdit ??
+					(currentUserId !== undefined &&
+						currentUserId === page.createdByUserId)
 				}
 				isOwner={
 					currentUserId !== undefined && currentUserId === page.createdByUserId
@@ -54,6 +69,12 @@ export function PagePaneTitle({ data, paneId, onClose }: PagePaneTitleProps) {
 				onDelete={() => {
 					setMenuOpen(false);
 					setDeleteOpen(true);
+				}}
+				onDuplicate={async (title) => {
+					const copy = await onDuplicate(title);
+					if (copy) {
+						onOpenPage({ slug: copy.slug, pageId: copy.id, title });
+					}
 				}}
 				compact
 				onRename={() => {

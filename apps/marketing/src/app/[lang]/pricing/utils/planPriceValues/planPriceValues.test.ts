@@ -73,7 +73,16 @@ describe("planPriceValues", () => {
 			hasYearlyDiscount: false,
 			environments: "10",
 		});
-		expect(values.byFamily.pro).toMatchObject({ environments: null });
+		expect(values.byFamily.pro).toMatchObject({
+			gbHours: null,
+			hours: null,
+			overageRate: null,
+			environments: null,
+		});
+		expect(values.allowanceItems).toHaveLength(2);
+		expect(values.allowanceItems.some((item) => item.startsWith("Pro:"))).toBe(
+			false,
+		);
 		expect(values.maxDiscount).toBe("20%");
 		expect(values.fromPrice).toBe("$16");
 	});
@@ -99,7 +108,7 @@ describe("planPriceValues", () => {
 					: candidate,
 			);
 		const catalog = planCatalogFromAutumn([
-			...plan("pro", 20, "month", pro),
+			...withPack(plan("pro", 20, "month", pro, 19200)),
 			...withPack(plan("team", 60, "month", team, 72000)),
 			...withPack(plan("ultra", 200, "month", ultra, 240000)),
 		]);

@@ -1,7 +1,8 @@
-import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { authClient } from "renderer/lib/auth-client";
 import {
 	EMPTY_CLOUD_SIDEBAR,
@@ -101,7 +102,7 @@ export function useNavigateAwayFromWorkspace() {
 				}).catch(reportRemovalNavigationError);
 				return target;
 			}
-			// Straight to the v2 empty state — "/" detours through the v1
+			// Straight to the empty state — "/" detours through the v1
 			// workspace index, which can restore stale pre-migration state
 			// (SUPER-1814).
 			void navigate({ to: "/new-workspace", replace: true }).catch(

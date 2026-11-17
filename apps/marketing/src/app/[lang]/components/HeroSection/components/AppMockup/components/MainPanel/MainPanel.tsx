@@ -5,9 +5,11 @@ import { m } from "framer-motion";
 import Image from "next/image";
 import { LuGitPullRequest } from "react-icons/lu";
 import { AUTOMATIONS } from "../../constants";
-import type { ActiveDemo } from "../../types";
+import type { ActiveDemo, PagePhase } from "../../types";
 import { AsciiSpinner } from "../AsciiSpinner";
 import { ClaudeMascot } from "./components/ClaudeMascot";
+import { DitherClouds } from "./components/DitherClouds";
+import { NewCloudWorkspaceDialog } from "./components/NewCloudWorkspaceDialog";
 
 function TokenChip({ children }: { children: React.ReactNode }) {
 	return (
@@ -19,21 +21,24 @@ function TokenChip({ children }: { children: React.ReactNode }) {
 
 interface MainPanelProps {
 	activeDemo: ActiveDemo;
+	pagePhase: PagePhase;
 }
 
-export function MainPanel({ activeDemo }: MainPanelProps) {
+export function MainPanel({ activeDemo, pagePhase }: MainPanelProps) {
 	const { t } = useLingui();
 	const isAutomate = activeDemo === "Automate Tasks";
-	const isRemote = activeDemo === "Remote Access";
-	const isDefault = !isAutomate && !isRemote;
+	const isCloud = activeDemo === "Cloud Workspaces";
+	const isPages = activeDemo === "Publish Pages";
+	const isDefault = !isAutomate && !isCloud && !isPages;
 
 	return (
 		<div className="flex min-w-0 flex-1 flex-col bg-background">
 			<div className="relative flex-1 overflow-hidden p-5 font-mono text-[11px] leading-relaxed">
 				<m.div
 					className="flex h-full flex-col"
-					initial={{ opacity: 1 }}
+					initial={false}
 					animate={{ opacity: isDefault ? 1 : 0 }}
+					aria-hidden={!isDefault}
 					transition={{ duration: 0.2 }}
 				>
 					<div>
@@ -137,10 +142,11 @@ export function MainPanel({ activeDemo }: MainPanelProps) {
 				{/* Automate Tasks: scheduled agents running on their own */}
 				<m.div
 					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
-					initial={{ opacity: 0 }}
+					initial={false}
 					animate={{ opacity: isAutomate ? 1 : 0 }}
 					transition={{ duration: 0.3, ease: "easeOut" }}
 					style={{ pointerEvents: isAutomate ? "auto" : "none" }}
+					aria-hidden={!isAutomate}
 				>
 					<div className="mb-5 text-foreground">
 						<span className="text-muted-foreground/55">❯</span>{" "}
@@ -184,25 +190,62 @@ export function MainPanel({ activeDemo }: MainPanelProps) {
 					</div>
 				</m.div>
 
-				{/* Remote Access: same workspace model, on a box that isn't yours */}
 				<m.div
 					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: isRemote ? 1 : 0 }}
+					initial={false}
+					animate={{ opacity: isCloud ? 1 : 0 }}
 					transition={{ duration: 0.3, ease: "easeOut" }}
-					style={{ pointerEvents: isRemote ? "auto" : "none" }}
+					style={{ pointerEvents: isCloud ? "auto" : "none" }}
+					aria-hidden={!isCloud}
+				>
+					<DitherClouds
+						visible={isCloud}
+						className="pointer-events-none absolute inset-0 h-full w-full"
+					/>
+					<div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-16">
+						<m.div
+							initial={false}
+							animate={{ y: isCloud ? 0 : 10, scale: isCloud ? 1 : 0.98 }}
+							transition={{ duration: 0.25, ease: "easeOut" }}
+						>
+							<NewCloudWorkspaceDialog active={isCloud} />
+						</m.div>
+					</div>
+				</m.div>
+
+				<m.div
+					className="absolute inset-0 p-5 font-mono text-[11px] leading-relaxed"
+					initial={false}
+					animate={{ opacity: isPages ? 1 : 0 }}
+					transition={{ duration: 0.3, ease: "easeOut" }}
+					style={{ pointerEvents: isPages ? "auto" : "none" }}
+					aria-hidden={!isPages}
 				>
 					<div className="mb-3 text-foreground">
 						<span className="text-muted-foreground/55">❯</span>{" "}
-						<TokenChip>
-							<span className="text-brand-light">superset connect gpu-box</span>
-						</TokenChip>
+						<Trans>turn the onboarding findings into a page</Trans>
 					</div>
 					<div className="space-y-1.5 text-muted-foreground">
 						<div>
-							<span className="text-emerald-400/85">✓</span> connected · us-east
-							· 64 cores · 128 GB
+							<span className="text-muted-foreground/55">●</span>{" "}
+							<TokenChip>
+								<span className="text-brand-light">
+									superset pages publish onboarding.html
+								</span>
+							</TokenChip>
 						</div>
+						<div>
+							<span className="text-emerald-400/85">✓</span>{" "}
+							<Trans>Published version 1.</Trans>
+						</div>
+						<m.div
+							initial={false}
+							animate={{ opacity: pagePhase === "revised" ? 1 : 0 }}
+							transition={{ duration: 0.25 }}
+						>
+							<span className="text-emerald-400/85">✓</span>{" "}
+							<Trans>Rewrote it and published version 2.</Trans>
+						</m.div>
 					</div>
 				</m.div>
 			</div>

@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import {
-	useActivityPanelStore,
-	useFinishedSubagents,
-} from "../../stores/activityPanelStore";
-import {
 	type AgentBinding,
 	type AgentWork,
 	collectAgentWork,
-} from "../../utils/collectAgentWork";
+} from "../../../../utils/collectAgentWork";
+import {
+	useActivityPanelStore,
+	useFinishedSubagents,
+} from "../../stores/activityPanelStore";
 
 const sameSession = (
 	binding: AgentBinding | undefined,

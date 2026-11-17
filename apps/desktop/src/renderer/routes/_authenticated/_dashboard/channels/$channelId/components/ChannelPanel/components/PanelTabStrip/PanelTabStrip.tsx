@@ -1,4 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
+import {
+	HEADER_ICON_BUTTON_CLASS,
+	HEADER_ICON_STROKE_WIDTH,
+} from "@superset/ui/lib/header-controls";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import {
@@ -15,6 +19,7 @@ import {
 	useState,
 } from "react";
 import { LuPlus } from "react-icons/lu";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useElementWidth } from "../../../../hooks/useElementWidth";
 import { PanelTab } from "./components/PanelTab";
 import { TabPreviewCard } from "./components/TabPreviewCard";
@@ -71,6 +76,7 @@ export function PanelTabStrip({
 	const available = areaWidth === null ? null : areaWidth - RESERVED_WIDTH;
 	const layout = tabStripLayout(available, tabs.length);
 	const closing = useCloseFreeze();
+	const isParadevShell = useParadevShell();
 	const tabWidth = closing.frozen ?? layout.tabWidth;
 
 	// Width changes animate when tabs open or close, never while resizing.
@@ -131,7 +137,11 @@ export function PanelTabStrip({
 	return (
 		// biome-ignore lint/a11y/noStaticElementInteractions: leaving the strip ends the close-width freeze
 		<div
-			className="flex h-12 shrink-0 items-stretch bg-muted/45 shadow-[inset_0_-1px_0_var(--border)] dark:bg-muted/35"
+			className={
+				isParadevShell
+					? "flex h-12 shrink-0 items-stretch shadow-[inset_0_-1px_0_var(--border)]"
+					: "flex h-12 shrink-0 items-stretch bg-muted/45 shadow-[inset_0_-1px_0_var(--border)] dark:bg-muted/35"
+			}
 			onMouseLeave={() => closing.release()}
 		>
 			{leading}
@@ -226,9 +236,21 @@ export function PanelTabStrip({
 							type="button"
 							aria-label={t({ message: "New tab" })}
 							onClick={onNewTab}
-							className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-fill-hover hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
+							className={
+								isParadevShell
+									? cn(
+											HEADER_ICON_BUTTON_CLASS,
+											"outline-none focus-visible:ring-1 focus-visible:ring-ring",
+										)
+									: "flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-fill-hover hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
+							}
 						>
-							<LuPlus className="size-4" />
+							<LuPlus
+								className="size-4"
+								strokeWidth={
+									isParadevShell ? HEADER_ICON_STROKE_WIDTH : undefined
+								}
+							/>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="bottom">

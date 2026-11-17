@@ -14,6 +14,7 @@ export type PluginDetailSearch = {
 	connect?: boolean;
 	connected?: string;
 	error?: string;
+	owner?: string;
 };
 
 export const Route = createFileRoute(
@@ -25,13 +26,14 @@ export const Route = createFileRoute(
 		connected:
 			typeof search.connected === "string" ? search.connected : undefined,
 		error: typeof search.error === "string" ? search.error : undefined,
+		owner: typeof search.owner === "string" ? search.owner : undefined,
 	}),
 });
 
 function useConnectOutcome(plugin: string, onConnected: () => void) {
 	const { t } = useLingui();
 	const navigate = Route.useNavigate();
-	const { connected, error } = Route.useSearch();
+	const { connected, error, owner } = Route.useSearch();
 	const onConnectedRef = useRef(onConnected);
 	onConnectedRef.current = onConnected;
 
@@ -54,18 +56,28 @@ function useConnectOutcome(plugin: string, onConnected: () => void) {
 					message: `That ${plugin} sign-in link expired. Try connecting again.`,
 				}),
 			);
-		} else if (error === "client_unconfigured") {
+		} else if (error === "not_configured") {
 			toast.error(
 				t({
 					message: `${plugin} has no OAuth client configured on this deployment yet.`,
 				}),
+			);
+		} else if (error === "account_already_linked") {
+			toast.error(
+				owner
+					? t({
+							message: `This ${plugin} account is already connected to another Paradev organization by ${owner}. Ask them to disconnect it there first.`,
+						})
+					: t({
+							message: `This ${plugin} account is already connected by another Paradev organization.`,
+						}),
 			);
 		} else {
 			toast.error(t({ message: `Could not connect ${plugin}. Try again.` }));
 		}
 
 		void navigate({ search: {}, replace: true });
-	}, [connected, error, navigate, plugin, t]);
+	}, [connected, error, owner, navigate, plugin, t]);
 }
 
 function PluginDetailPage() {

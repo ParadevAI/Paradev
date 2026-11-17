@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
-import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -15,6 +14,7 @@ import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hook
 import { useIsOrganizationOwner } from "renderer/routes/_authenticated/hooks/useIsOrganizationOwner";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { HostOfflineRunDialog } from "../components/HostOfflineRunDialog";
+import { useArchiveAutomations } from "../hooks/useArchiveAutomations";
 import { useSetAutomationGroup } from "../hooks/useSetAutomationGroup";
 import { listAutomationGroups } from "../utils/groupAutomations";
 import { dispatchErrorCode, runErrorHelp } from "../utils/runErrorHelp";
@@ -116,7 +116,7 @@ function AutomationDetailPage() {
 
 	const utils = cloudTrpc.useUtils();
 	// Running and resuming are Pro (the server refuses them too); pausing,
-	// editing, and deleting stay open to a downgraded org.
+	// editing, and archiving stay open to a downgraded org.
 	const { gateFeature } = usePaywall();
 
 	const setEnabledMutation = useMutation({
@@ -166,14 +166,12 @@ function AutomationDetailPage() {
 		},
 	});
 
-	const deleteMutation = useMutation({
-		mutationFn: () =>
-			apiTrpcClient.automation.delete.mutate({ id: automationId }),
-		onSuccess: () => {
-			void utils.automation.list.invalidate();
-			navigate({ to: "/automations" });
-		},
-	});
+	const {
+		archiveAsync,
+		restore,
+		confirmDelete,
+		isPending: archivePending,
+	} = useArchiveAutomations();
 
 	if (!automation) {
 		if (automationQuery.isPending || promptQuery.isPending) return null;
@@ -221,6 +219,7 @@ function AutomationDetailPage() {
 	// session (still loading) stays editable — the server is the enforcement.
 	const readOnly =
 		currentUserId !== undefined && automation.ownerUserId !== currentUserId;
+	const archived = automation.archivedAt !== null;
 
 	return (
 		<div className="flex h-full w-full flex-1 overflow-hidden">
@@ -233,57 +232,29 @@ function AutomationDetailPage() {
 						setGroup({ ids: [automation.id], name: automation.name, group })
 					}
 					onCopyLink={() => copyShareLink(`automations/${automation.id}`)}
-					onDelete={() => {
-						alert({
-							title: t({
-								message: "Delete automation?",
-							}),
-							description: t({
-								message: `"${automation.name}" will stop firing and its run history will be removed. This can't be undone.`,
-							}),
-							actions: [
-								{
-									label: t({
-										message: "Cancel",
-									}),
-									variant: "outline",
-									onClick: () => {},
-								},
-								{
-									label: t({
-										message: "Delete",
-									}),
-									variant: "destructive",
-									onClick: () => {
-										toast.promise(deleteMutation.mutateAsync(), {
-											loading: t({
-												message: "Deleting automation...",
-											}),
-											success: t({
-												message: `"${automation.name}" deleted`,
-											}),
-											error: (err) =>
-												err instanceof Error
-													? err.message
-													: t({
-															message: "Failed to delete automation",
-														}),
-										});
-									},
-								},
-							],
-						});
-					}}
+					onArchive={() =>
+						void archiveAsync([automation]).then(
+							() => navigate({ to: "/automations" }),
+							() => {},
+						)
+					}
+					onRestore={() => restore([automation])}
+					onDelete={() =>
+						confirmDelete([automation], {
+							onDeleted: () => navigate({ to: "/automations" }),
+						})
+					}
 					onRunNow={() =>
 						gateFeature(GATED_FEATURES.AUTOMATIONS, () =>
 							runNowMutation.mutate(),
 						)
 					}
 					onOpenHistory={() => setHistoryOpen(true)}
-					deleteDisabled={deleteMutation.isPending}
+					archiveDisabled={archivePending}
 					runNowDisabled={runNowMutation.isPending}
 					readOnly={readOnly}
-					canDelete={!readOnly || isOrgOwner}
+					archived={archived}
+					canArchive={!readOnly || isOrgOwner}
 				/>
 
 				<AutomationBody
@@ -305,6 +276,18 @@ function AutomationDetailPage() {
 					}}
 					toggleDisabled={setEnabledMutation.isPending}
 					readOnly={readOnly}
+					onRestore={
+						!readOnly || isOrgOwner ? () => restore([automation]) : undefined
+					}
+					onDelete={
+						!readOnly || isOrgOwner
+							? () =>
+									confirmDelete([automation], {
+										onDeleted: () => navigate({ to: "/automations" }),
+									})
+							: undefined
+					}
+					restoreDisabled={archivePending}
 				/>
 			</div>
 
@@ -321,7 +304,7 @@ function AutomationDetailPage() {
 				currentPrompt={automation.prompt}
 				// Versions are owner-gated server-side too; the header action is
 				// hidden, but the ?history=true search param could still open it.
-				open={!readOnly && historyOpen}
+				open={!readOnly && !archived && historyOpen}
 				onOpenChange={setHistoryOpen}
 			/>
 		</div>

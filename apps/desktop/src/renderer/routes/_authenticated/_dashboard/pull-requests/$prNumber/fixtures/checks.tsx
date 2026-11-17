@@ -23,6 +23,24 @@ mock.module("@tanstack/react-router", () => ({
 		options,
 		useParams: () => ({ prNumber: "12" }),
 	}),
+	useNavigate: () => mock(),
+}));
+mock.module(`${root}/hooks/useOpenPullRequestInApp`, () => ({
+	useOpenPullRequestInApp: () => mock(),
+}));
+mock.module(`${root}/pull-requests/hooks/usePullRequestMergeFlow`, () => ({
+	usePullRequestMergeFlow: () => ({
+		stack: null,
+		stackQuery: {
+			stack: null,
+			isLoading: false,
+			isIncomplete: false,
+			refetch: mock(),
+		},
+	}),
+}));
+mock.module(`${root}/pull-requests/hooks/useStackRestack`, () => ({
+	useStackRestack: () => null,
 }));
 mock.module(`${root}/pull-requests/layout`, () => ({
 	Route: { useSearch: () => search },
@@ -36,6 +54,9 @@ mock.module("renderer/hooks/host-service/useHostTargetUrl", () => ({
 const read = mock(() => detail);
 mock.module(`${root}/pull-requests/hooks/usePullRequestDetail`, () => ({
 	usePullRequestDetail: read,
+}));
+mock.module(`${root}/pull-requests/hooks/usePullRequestListPreview`, () => ({
+	usePullRequestListPreview: () => null,
 }));
 mock.module(`${root}/components/PageHeader`, () => ({
 	PageHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,

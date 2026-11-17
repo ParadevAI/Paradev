@@ -2,6 +2,7 @@ import { plural } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { Button } from "@superset/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { toast } from "@superset/ui/sonner";
 import { ChevronDownIcon } from "lucide-react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { HiCheck, HiMiniPlay } from "react-icons/hi2";
 import { LuBox } from "react-icons/lu";
@@ -95,6 +97,7 @@ export function RunInWorkspacePopoverV2({
 	);
 
 	const isCloud = hostId === CLOUD_HOST_ID;
+	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	const organizationId = useActiveOrganizationId();
 	const utils = cloudTrpc.useUtils();
 	const environmentsQuery = cloudTrpc.environment.list.useQuery(
@@ -178,6 +181,11 @@ export function RunInWorkspacePopoverV2({
 
 	const submitBlocker = useMemo<string | null>(() => {
 		if (isCloud) {
+			if (cloudEnabled === false)
+				return t({
+					message:
+						"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
+				});
 			if (!selectedEnvironment)
 				return environmentsQuery.isFetched
 					? t({
@@ -233,6 +241,7 @@ export function RunInWorkspacePopoverV2({
 		return null;
 	}, [
 		isCloud,
+		cloudEnabled,
 		selectedEnvironment,
 		environmentsQuery.isFetched,
 		selectedProjectId,
@@ -579,6 +588,11 @@ export function RunInWorkspacePopoverV2({
 							other="Run # Workspaces"
 						/>
 					</Button>
+					{submitBlocker && (
+						<p className="px-1 pt-1.5 text-xs text-muted-foreground">
+							{submitBlocker}
+						</p>
+					)}
 				</div>
 			</PopoverContent>
 		</Popover>

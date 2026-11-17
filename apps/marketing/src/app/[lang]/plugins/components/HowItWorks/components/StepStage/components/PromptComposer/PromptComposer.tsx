@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { ArrowUp } from "lucide-react";
-import { PluginIcon } from "../../../../../PluginIcon";
+import { PluginIcon } from "@/app/[lang]/components/PluginIcon";
 
 export function PromptComposer() {
 	return (

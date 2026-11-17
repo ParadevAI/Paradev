@@ -1,13 +1,13 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import type { FormField } from "@superset/chat/protocol";
-import { cn } from "@superset/ui/utils";
-import { Check, PencilLine } from "lucide-react";
 import {
 	answerText,
 	type FormValues,
 	isInvalidNumber,
 	type QuestionPage as Page,
-} from "../../../../../../../../utils/questionPages";
+} from "@superset/chat/core";
+import type { FormField } from "@superset/chat/protocol";
+import { cn } from "@superset/ui/utils";
+import { Check, PencilLine } from "lucide-react";
 
 type Choice = NonNullable<FormField["options"]>[number];
 

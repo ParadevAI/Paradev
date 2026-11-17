@@ -7,6 +7,7 @@ import { authClient } from "renderer/lib/auth-client";
 import { CloudWorkspaceShareButton } from "renderer/routes/_authenticated/_dashboard/components/CloudWorkspaceShareButton";
 import { useCloudWorkspacePresence } from "renderer/routes/_authenticated/_dashboard/hooks/useCloudWorkspacePresence";
 import { useSetCloudWorkspaceVisibility } from "renderer/routes/_authenticated/_dashboard/hooks/useSetCloudWorkspaceVisibility";
+import { WorkspacePortsButton } from "./components/WorkspacePortsButton";
 
 const NOW_TICK_MS = 30_000;
 
@@ -30,6 +31,7 @@ export function CloudWorkspaceTabBarControls({
 	if (!workspace) return null;
 	return (
 		<div className="flex items-center gap-1">
+			<WorkspacePortsButton workspaceId={workspace.id} />
 			<CloudWorkspaceShareButton
 				workspaceId={workspace.id}
 				owner={workspace.createdBy}

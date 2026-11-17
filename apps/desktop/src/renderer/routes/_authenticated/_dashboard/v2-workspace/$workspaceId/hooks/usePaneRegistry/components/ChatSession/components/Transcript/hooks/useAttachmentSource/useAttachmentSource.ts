@@ -1,4 +1,3 @@
-import { workspaceTrpc } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import type { AttachmentPart } from "../../../../../../utils/sendAttachmentsToWorkspace";
@@ -15,14 +14,24 @@ const resolveCloudUrl = createCloudUrlResolver((fileIds) =>
 
 const HOUR_MS = 60 * 60 * 1000;
 
-/** A data URL for an attachment part's thumbnail, or null for a name badge. */
-export function useAttachmentSource(part: AttachmentPart): {
+export type HostAttachmentRead = (
+	attachmentId: string,
+) => Promise<{ mediaType: string; data: string }>;
+
+/**
+ * A data URL for an attachment part's thumbnail, or null for a name badge.
+ * Without `hostRead`, only parts stored in the cloud can show.
+ */
+export function useAttachmentSource(
+	part: AttachmentPart,
+	hostRead: HostAttachmentRead | null,
+): {
 	src: string | null;
 	isLoading: boolean;
 } {
-	const host = workspaceTrpc.useUtils().client;
 	const showable =
-		isThumbnailable(part) && Boolean(part.fileId || part.attachmentId);
+		isThumbnailable(part) &&
+		Boolean(part.fileId || (hostRead && part.attachmentId));
 	const query = useQuery({
 		queryKey: attachmentSourceKey(part),
 		enabled: showable,
@@ -36,8 +45,10 @@ export function useAttachmentSource(part: AttachmentPart): {
 					const response = await fetch(url);
 					return response.ok ? response.blob() : null;
 				},
-				hostRead: (attachmentId) =>
-					host.attachments.read.query({ attachmentId }),
+				hostRead: (attachmentId) => {
+					if (!hostRead) throw new Error("No workspace host to read from");
+					return hostRead(attachmentId);
+				},
 			}),
 	});
 	return {

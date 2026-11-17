@@ -1,4 +1,11 @@
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import {
+	answerText,
+	type FormValues,
+	isInvalidNumber,
+	isPageAnswered,
+	questionPages,
+} from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	Decision,
@@ -20,13 +27,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import {
-	answerText,
-	type FormValues,
-	isInvalidNumber,
-	isPageAnswered,
-	questionPages,
-} from "../../../../../../utils/questionPages";
 import { QuestionPage } from "./components/QuestionPage";
 
 function focusIfLost(element: HTMLElement | null) {

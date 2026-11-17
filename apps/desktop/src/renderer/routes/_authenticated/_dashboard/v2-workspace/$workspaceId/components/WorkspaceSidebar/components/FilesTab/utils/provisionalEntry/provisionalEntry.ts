@@ -30,7 +30,7 @@ export type ProvisionalEvent =
 	| { type: "removed"; path: string; rootPath: string; versionToken: number }
 	| { type: "workspace-changed" };
 
-export type ProvisionalAction =
+type ProvisionalAction =
 	| { type: "none" }
 	/** Remove the entry from disk — only ever our own, still-provisional entry. */
 	| { type: "cleanup"; entry: ProvisionalEntry };

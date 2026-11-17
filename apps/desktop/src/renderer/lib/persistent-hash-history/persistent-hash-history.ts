@@ -34,7 +34,8 @@ function loadPersistedState(): PersistedState {
 					Math.max(parsed.index, 0),
 					parsed.entries.length - 1,
 				);
-				return { entries: parsed.entries, index };
+				const entries = parsed.entries.map(restoreEntry);
+				return { entries, index };
 			}
 		}
 	} catch {}
@@ -105,6 +106,13 @@ function parseHref(href: string, state: LocationState): HistoryLocation {
 
 export interface PersistentHashHistory extends RouterHistory {
 	getEntries: () => HistoryEntry[];
+}
+
+// The v1 routes are gone; a profile re-saves its entries after one boot.
+const RETIRED_V1_ROUTE = /^\/(?:project|workspaces?)(?:\/|$|\?)/;
+
+function restoreEntry(entry: string): string {
+	return RETIRED_V1_ROUTE.test(entry) ? "/" : entry;
 }
 
 export function createPersistentHashHistory(): PersistentHashHistory {

@@ -7,6 +7,6 @@ export {
 	createCallerFactory,
 	createTRPCContext,
 	createTRPCRouter,
-	protectedProcedure,
+	personProcedure,
 	publicProcedure,
 } from "./trpc";

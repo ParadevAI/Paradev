@@ -4,7 +4,7 @@ import { useStore } from "zustand";
 import type { StoreApi } from "zustand/vanilla";
 import type { DiffPaneData, PaneViewerData } from "../../types";
 
-export interface DiffPaneTarget {
+interface DiffPaneTarget {
 	/** Worktree-relative path of the file the diff pane last navigated to. */
 	path: string;
 	changeKey?: string;

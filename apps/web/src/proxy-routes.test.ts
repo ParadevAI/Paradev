@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+	agentsRewriteUrl,
+	isAgentsRoute,
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
@@ -13,6 +15,7 @@ describe("isPublicRoute", () => {
 		"/sign-in/callback",
 		"/sign-up",
 		"/auth/desktop",
+		"/auth/integration-connect",
 		"/auth/desktop/success",
 		"/api/auth/desktop",
 		"/api/auth/desktop/callback",
@@ -40,6 +43,7 @@ describe("isPublicRoute", () => {
 		"/sign-internal/settings",
 		"/sign-upgrade",
 		"/auth/desktopish",
+		"/auth/integration-connect-other",
 		"/api/auth/desktopish",
 		"/accept-invitation-list",
 		"/cli/auth/codegen",
@@ -118,5 +122,35 @@ describe("safeRedirectUrl", () => {
 	test("rejects auth pages so a signed-in redirect cannot loop", () => {
 		expect(safeRedirectUrl("/sign-in?redirect=/x", origin)).toBeNull();
 		expect(safeRedirectUrl("/sign-up", origin)).toBeNull();
+	});
+});
+
+describe("isAgentsRoute", () => {
+	test.each([
+		"/agents",
+		"/agents/",
+		"/agents/workspace/abc",
+	])("matches %s", (pathname: string) => {
+		expect(isAgentsRoute(pathname)).toBe(true);
+	});
+
+	test.each([
+		"/agentsy",
+		"/",
+		"/workspaces/abc",
+	])("does not match %s", (pathname: string) => {
+		expect(isAgentsRoute(pathname)).toBe(false);
+	});
+});
+
+describe("agentsRewriteUrl", () => {
+	test("keeps the path and query on the agents deployment", () => {
+		const url = agentsRewriteUrl(
+			new URL("https://app.superset.sh/agents/workspace/abc?tab=chat"),
+			"https://superset-agents.vercel.app",
+		);
+		expect(url.href).toBe(
+			"https://superset-agents.vercel.app/agents/workspace/abc?tab=chat",
+		);
 	});
 });

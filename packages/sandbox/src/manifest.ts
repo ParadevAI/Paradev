@@ -48,6 +48,8 @@ const stepSchema = z.object({
 	inputs: z.array(z.string().startsWith("/")).default([]),
 	/** Bump to force a re-run with no other change. */
 	salt: z.string().default(""),
+	/** Of `assets`, the archives the step unpacks: deleted once it succeeds, fetched again before it re-runs. */
+	discards: z.array(z.string()).optional(),
 });
 export type Step = z.infer<typeof stepSchema>;
 export const stepsSchema = z.array(stepSchema);
@@ -103,9 +105,33 @@ export function renderToolsTsv(rows: ToolRow[]): string {
 		.concat(rows.length ? "\n" : "");
 }
 
-export function renderAssetsTsv(assets: Assets): string {
-	return Object.values(assets)
-		.map((a) => [a.mode, a.sha256, a.suffix, b64(a.dest)].join("\t"))
+/** Asset key to the one step that discards it. */
+export function discardingSteps(steps: Step[]): Map<string, string> {
+	const owners = new Map<string, string>();
+	for (const step of steps) {
+		for (const key of step.discards ?? []) {
+			if (!step.assets.includes(key))
+				throw new Error(
+					`step ${step.name} discards ${key}, which is not one of its assets`,
+				);
+			const owner = owners.get(key);
+			if (owner)
+				throw new Error(`steps ${owner} and ${step.name} both discard ${key}`);
+			owners.set(key, step.name);
+		}
+	}
+	return owners;
+}
+
+/** The fifth column names the step that discards the row, empty for a row that stays. */
+export function renderAssetsTsv(assets: Assets, steps: Step[] = []): string {
+	const owners = discardingSteps(steps);
+	return Object.entries(assets)
+		.map(([key, a]) =>
+			[a.mode, a.sha256, a.suffix, b64(a.dest), owners.get(key) ?? ""].join(
+				"\t",
+			),
+		)
 		.join("\n")
 		.concat(Object.keys(assets).length ? "\n" : "");
 }

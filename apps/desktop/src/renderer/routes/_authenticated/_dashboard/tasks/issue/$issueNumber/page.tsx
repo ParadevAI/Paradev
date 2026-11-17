@@ -101,10 +101,9 @@ function IssueDetailPage() {
 		resetDraft();
 		selectProject(projectId);
 		updateDraft({
-			hostId,
 			promptDraft: linkedContextSeed([linkedIssueChip(linkedIssue, isDark)]),
 		});
-		openNewWorkspace(projectId);
+		openNewWorkspace(projectId, hostId);
 	};
 
 	const isClosed = data?.state.toLowerCase() === "closed";

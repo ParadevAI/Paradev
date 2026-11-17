@@ -103,9 +103,7 @@ Behavior to rely on:
   `--keep-terminal` to keep a long-running process alive in the background and
   reattach it later with `--terminal`.
 - `move` closes a tab it leaves empty. `move --to` and `swap` work across the
-  two areas; `--new-tab` keeps the pane in its own area. Only terminals and
-  chats can go into the main area: Changes, files, browsers and Pages stay in
-  the sidebar, and a move that would put one there is refused.
+  two areas for every kind of pane; `--new-tab` keeps the pane in its own area.
 - `open` reuses a sidebar tab that already shows the same thing (a browser always gets
   a new tab) and returns its `paneId`. Pass `--background` to add the tab
   without showing the sidebar or changing its active tab, for example to
@@ -148,8 +146,8 @@ superset panes open changes --workspace $WS --json >/dev/null
 W=$(superset panes open browser --workspace $WS --url http://localhost:3000 --json | jq -r .paneId)
 ```
 
-To drive that browser pane (screenshot, click, read the console), use
-superset:browser.
+To screenshot, click or read the console in that pane, use superset:browser
+with its `paneId`.
 
 A grid of N panes in a new tab: open the tab, split the first pane right for
 each column, split each column down for each row, then `equalize --tab`.

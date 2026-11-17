@@ -1,30 +1,33 @@
 import { useLingui } from "@lingui/react/macro";
 import type { RendererContext } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { LinkHoverHint } from "renderer/lib/clickPolicy";
 import type { OpenReviewDiff } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useReviewCommentNavigation";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
 	ChatPaneData,
 	OpenFile,
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import { openFilePathsIn } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openFilePathsIn";
 import type { TerminalLauncher } from "../../../useV2TerminalLauncher";
 import type { RunInTerminal } from "../../hooks/useAgentCliUpdate";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { openChatHistory } from "../../utils/chatHistoryOpen";
+import { forkedChatPaneData } from "../../utils/forkedChatPaneData";
 import type { OpenDiff } from "../ChatSession/providers/ChatPaneActionsProvider";
 import { AcpChatPane } from "./components/AcpChatPane";
 import { AgentChatPane } from "./components/AgentChatPane";
 import { useOpenChatLink } from "./hooks/useOpenChatLink";
 import { useOpenChatPage } from "./hooks/useOpenChatPage";
-import { openChatHistory } from "./utils/chatHistoryOpen";
 import {
 	pendingChatPrompts,
 	prependChatPrompts,
 } from "./utils/pendingChatPrompts";
 import { restartedChatPaneData } from "./utils/restartedChatPaneData";
-import { saveChatMode } from "./utils/savedChatMode";
+import { sessionInfoPaneData } from "./utils/sessionInfoPaneData";
 
 export function ChatPane({
 	ctx,
@@ -52,6 +55,12 @@ export function ChatPane({
 		onRevealPath,
 		showHint,
 	});
+	const rightPane = useRightPaneLinkTarget();
+	const fileViewerStore = rightPane?.store ?? ctx.store;
+	const getOpenFilePaths = useCallback(
+		() => new Set(openFilePathsIn(fileViewerStore.getState())),
+		[fileViewerStore],
+	);
 	const latest = useRef(data);
 	latest.current = data;
 	const paneId = ctx.pane.id;
@@ -101,7 +110,12 @@ export function ChatPane({
 		},
 		[agentId, store],
 	);
-	const pendingPrompts = pendingChatPrompts(data);
+	const { pendingPrompt, pendingAttachments, queuedPrompts } = data;
+	const pendingPrompts = useMemo(
+		() =>
+			pendingChatPrompts({ pendingPrompt, pendingAttachments, queuedPrompts }),
+		[pendingPrompt, pendingAttachments, queuedPrompts],
+	);
 
 	const clearPendingPrompts = () => {
 		const {
@@ -113,6 +127,12 @@ export function ChatPane({
 		latest.current = rest;
 		ctx.actions.updateData(rest);
 	};
+
+	const clearLaunchPrompt = useCallback(() => {
+		const { launchPrompt: _delivered, ...rest } = latest.current;
+		latest.current = rest;
+		ctx.actions.updateData(rest);
+	}, [ctx.actions]);
 
 	if (data.agentSession) {
 		return (
@@ -127,6 +147,7 @@ export function ChatPane({
 					onOpenFile={onOpenFile}
 					onOpenPage={openPage}
 					onOpenLink={openLink}
+					getOpenFilePaths={getOpenFilePaths}
 					onOpenHistory={onOpenHistory}
 				/>
 				<LinkHoverHint
@@ -143,9 +164,16 @@ export function ChatPane({
 			<AcpChatPane
 				key={`${data.draftId ?? data.terminalId}:${data.agent?.id}`}
 				agent={data.agent}
+				awaitingMove={data.awaitingMove}
+				onMoveArrived={() => {
+					const { awaitingMove: _arrived, ...rest } = latest.current;
+					latest.current = rest;
+					ctx.actions.updateData(rest);
+				}}
 				draftId={data.draftId}
 				isActive={ctx.isActive}
 				onPendingPromptsSent={clearPendingPrompts}
+				onLaunchPromptDelivered={clearLaunchPrompt}
 				onQueuePrompt={(content) => {
 					latest.current = {
 						...latest.current,
@@ -160,31 +188,20 @@ export function ChatPane({
 				pendingPrompts={pendingPrompts}
 				launchPrompt={data.launchPrompt}
 				modelId={data.chatModelId}
-				modelLabel={data.chatModelLabel}
+				effortId={data.chatEffortId}
 				modeId={data.chatModeId}
-				onSessionInfo={({ harnessSessionId, title, modeId }) => {
-					const rebound = harnessSessionId !== undefined && data.agent;
-					const retitled = title !== undefined && title !== data.chatTitle;
-					// A resume keeps the mode the chat was in, not the saved default.
-					const remoded = modeId !== undefined && modeId !== data.chatModeId;
-					if (!rebound && !retitled && !remoded) return;
-					ctx.actions.updateData({
-						...data,
-						...(rebound
-							? { agent: { ...rebound, sessionId: harnessSessionId } }
-							: {}),
-						...(retitled ? { chatTitle: title } : {}),
-						...(remoded ? { chatModeId: modeId } : {}),
-					});
+				onSessionInfo={(info) => {
+					const next = sessionInfoPaneData(latest.current, info);
+					if (!next) return;
+					latest.current = next;
+					ctx.actions.updateData(next);
 				}}
 				onSwitchAgent={({ presetId, label, model, modeId, handoffPrompt }) => {
 					ctx.actions.setTitle(label);
 					ctx.actions.updateData(
 						restartedChatPaneData(data, {
 							agent: { id: presetId },
-							...(model
-								? { chatModelId: model.id, chatModelLabel: model.label }
-								: {}),
+							...(model ? { chatModelId: model.id } : {}),
 							...(modeId ? { chatModeId: modeId } : {}),
 							...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 						}),
@@ -200,9 +217,7 @@ export function ChatPane({
 									terminalId: crypto.randomUUID(),
 									sessionId: null,
 									agent: { id: presetId },
-									...(model
-										? { chatModelId: model.id, chatModelLabel: model.label }
-										: {}),
+									...(model ? { chatModelId: model.id } : {}),
 									...(modeId ? { chatModeId: modeId } : {}),
 									...(handoffPrompt ? { pendingPrompt: handoffPrompt } : {}),
 								} satisfies ChatPaneData,
@@ -210,43 +225,36 @@ export function ChatPane({
 						],
 					})
 				}
-				onOpenForkedChat={({ sessionId, terminalId }) => {
-					const { agent, chatModelId, chatModelLabel, chatModeId, chatTitle } =
-						latest.current;
+				onOpenForkedChat={(fork) => {
 					ctx.store.getState().addTab({
 						panes: [
 							{
 								kind: "chat-v3",
-								data: {
-									terminalId,
-									sessionId,
-									...(agent ? { agent: { id: agent.id } } : {}),
-									...(chatModelId ? { chatModelId } : {}),
-									...(chatModelLabel ? { chatModelLabel } : {}),
-									...(chatModeId ? { chatModeId } : {}),
-									...(chatTitle ? { chatTitle } : {}),
-								} satisfies ChatPaneData,
+								...(ctx.pane.titleOverride
+									? { titleOverride: ctx.pane.titleOverride }
+									: {}),
+								data: forkedChatPaneData(latest.current, fork),
 							},
 						],
 					});
 				}}
 				onRunInTerminal={runInTerminal}
 				onRewound={(prompt) => {
-					const { agent, chatModelId, chatModelLabel, chatModeId } =
+					const { agent, chatModelId, chatEffortId, chatModeId } =
 						latest.current;
 					ctx.actions.updateData(
 						restartedChatPaneData(latest.current, {
 							...(agent ? { agent: { id: agent.id } } : {}),
 							...(chatModelId ? { chatModelId } : {}),
-							...(chatModelLabel ? { chatModelLabel } : {}),
+							...(chatEffortId ? { chatEffortId } : {}),
 							...(chatModeId ? { chatModeId } : {}),
 							pendingPrompt: prompt,
 						}),
 					);
 				}}
 				onModeChange={(chatModeId) => {
-					if (data.agent) saveChatMode(data.agent.id, chatModeId);
-					ctx.actions.updateData({ ...data, chatModeId });
+					latest.current = { ...latest.current, chatModeId };
+					ctx.actions.updateData(latest.current);
 				}}
 				onSessionCreated={(sessionId, pendingPrompt) =>
 					ctx.actions.updateData({
@@ -259,6 +267,7 @@ export function ChatPane({
 				onOpenFile={onOpenFile}
 				onOpenPage={openPage}
 				onOpenLink={openLink}
+				getOpenFilePaths={getOpenFilePaths}
 				onOpenHistory={onOpenHistory}
 				onNewChat={agentId ? onNewChat : undefined}
 				sessionId={data.sessionId}

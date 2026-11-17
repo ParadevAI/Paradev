@@ -377,6 +377,7 @@ export async function pageShareRoleFor(
 		.select({ role: pageShares.role })
 		.from(pageShares)
 		.where(and(eq(pageShares.pageId, pageId), grantsTo(pageShares, userId)));
+	if (rows.some((row) => row.role === "edit")) return "edit";
 	if (rows.some((row) => row.role === "comment")) return "comment";
 	return rows.length ? "view" : null;
 }

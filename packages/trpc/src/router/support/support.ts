@@ -19,7 +19,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
-import { createTRPCRouter, protectedProcedure, userError } from "../../trpc";
+import { createTRPCRouter, personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const SUPPORT_EMAIL = COMPANY.MAIL_TO.replace(/^mailto:/, "");
@@ -130,7 +130,7 @@ function sanitizeEmailBodyLine(value: string): string {
 }
 
 export const supportRouter = createTRPCRouter({
-	sendMigrationReport: protectedProcedure
+	sendMigrationReport: personProcedure
 		.input(
 			z.object({
 				report: z.string().min(1).max(20_000),
@@ -172,7 +172,7 @@ export const supportRouter = createTRPCRouter({
 			}
 		}),
 
-	submitFeedback: protectedProcedure
+	submitFeedback: personProcedure
 		.input(
 			z
 				.object({
@@ -326,7 +326,7 @@ export const supportRouter = createTRPCRouter({
 			});
 		}),
 
-	submitPrompt: protectedProcedure
+	submitPrompt: personProcedure
 		.input(
 			z.object({
 				promptText: z.string().min(1).max(10_000),

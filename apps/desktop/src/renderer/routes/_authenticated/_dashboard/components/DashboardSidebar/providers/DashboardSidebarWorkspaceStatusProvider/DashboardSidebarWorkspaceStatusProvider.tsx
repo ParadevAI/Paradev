@@ -23,15 +23,13 @@ import {
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
+import { deriveWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/utils/deriveWorkspaceStatus";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useV2NotificationStore } from "renderer/stores/v2-notifications";
-import {
-	type ActivePaneStatus,
-	getHighestPriorityStatus,
-	type PaneStatus,
-} from "shared/tabs-types";
+import type { ActivePaneStatus, PaneStatus } from "shared/tabs-types";
 
-export interface SidebarWorkspaceStatusEntry {
+interface SidebarWorkspaceStatusEntry {
 	/** Highest-priority attention status across the workspace's terminals. */
 	status: ActivePaneStatus | null;
 	/** Manual unread mark, or any terminal in review/failed. */
@@ -247,14 +245,13 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		queries: targets.map((target) => ({
 			queryKey: getTerminalAgentBindingsQueryKey(target.workspaceId),
 			enabled: target.hostUrl !== null,
-			queryFn: () => {
-				if (!target.hostUrl) return [] as TerminalAgentBinding[];
-				return getHostServiceClientByUrl(
-					target.hostUrl,
-				).terminalAgents.listByWorkspace.query({
-					workspaceId: target.workspaceId,
-				});
-			},
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).terminalAgents.listByWorkspace.query(
+					{
+						workspaceId: target.workspaceId,
+					},
+				),
+			),
 			// Lifecycle events invalidate for instant updates; the finite
 			// staleTime lets focus/remount refetches self-heal any staleness
 			// from events missed while the WS was down (host restart, sleep).
@@ -360,35 +357,17 @@ export function DashboardSidebarWorkspaceStatusProvider({
 					}),
 				);
 			}
-			const hasManualUnread = Boolean(manualUnread[target.workspaceId]);
-			let hasAttentionTerminal = false;
-			for (const status of statuses.values()) {
-				if (status === "review" || status === "failed") {
-					hasAttentionTerminal = true;
-					break;
-				}
-			}
 			const report =
 				target.hostUrl === null
 					? reportedByWorkspaceId.get(target.workspaceId)
 					: undefined;
-			const reported =
-				report?.status === "review" &&
-				report.at !== null &&
-				(workspaceSeenAt[target.workspaceId] ?? 0) >= report.at
-					? null
-					: (report?.status ?? null);
 			const candidate: SidebarWorkspaceStatusEntry = {
-				status: getHighestPriorityStatus([
-					hasManualUnread ? "review" : undefined,
-					reported ?? undefined,
-					...statuses.values(),
-				]),
-				isUnread:
-					hasManualUnread ||
-					hasAttentionTerminal ||
-					reported === "review" ||
-					reported === "failed",
+				...deriveWorkspaceStatus({
+					terminalStatuses: statuses.values(),
+					hasManualUnread: Boolean(manualUnread[target.workspaceId]),
+					report,
+					seenAt: workspaceSeenAt[target.workspaceId],
+				}),
 				bindings,
 				statuses,
 				diffStats:

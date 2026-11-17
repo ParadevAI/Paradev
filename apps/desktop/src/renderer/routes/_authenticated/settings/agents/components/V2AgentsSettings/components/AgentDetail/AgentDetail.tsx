@@ -340,8 +340,8 @@ export function AgentDetail({
 											<Trans>
 												Registers lifecycle hooks in this agent's global config
 												so Paradev can show status and send notifications.
-												Turning this off removes Paradev's entries everywhere —
-												status and notifications stop for this agent, including
+												Turning this off removes Paradev's entries everywhere.
+												Status and notifications stop for this agent, including
 												inside Paradev.
 											</Trans>
 										</TooltipContent>

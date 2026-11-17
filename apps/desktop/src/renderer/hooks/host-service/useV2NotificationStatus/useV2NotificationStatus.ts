@@ -1,5 +1,5 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useQueryCacheData } from "renderer/hooks/useQueryCacheData";
 import {
 	getV2NotificationSourceKey,
 	getV2NotificationSourcesForPane,
@@ -11,7 +11,10 @@ import {
 	type ActivePaneStatus,
 	getHighestPriorityStatus,
 } from "shared/tabs-types";
-import type { TerminalAgentBinding } from "../useTerminalAgentBindings";
+import {
+	TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+	type TerminalAgentBinding,
+} from "../useTerminalAgentBindings";
 import {
 	deriveTerminalAgentStatus,
 	useTerminalAgentStatuses,
@@ -66,49 +69,40 @@ export function useV2PaneNotificationStatus(
  * with no observed bindings query contribute only their manual unread mark.
  */
 export function useV2AttentionWorkspaceCount(): number {
-	const queryClient = useQueryClient();
+	const bindingLists = useQueryCacheData<TerminalAgentBinding[]>(
+		TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX,
+	);
 	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
 	const terminalSeenAt = useV2NotificationStore(
 		(state) => state.terminalSeenAt,
 	);
-	const [cacheVersion, setCacheVersion] = useState(0);
+	return useMemo(
+		() => countAttentionWorkspaces(bindingLists, manualUnread, terminalSeenAt),
+		[bindingLists, manualUnread, terminalSeenAt],
+	);
+}
 
-	useEffect(() => {
-		return queryClient.getQueryCache().subscribe((event) => {
-			// `added` fires synchronously inside the render that first builds a
-			// query — setState there is a render-phase update. Data-bearing
-			// events (`updated`/`removed`) are the only ones that move the count.
-			if (event.type !== "updated" && event.type !== "removed") {
-				return;
-			}
-			if (event.query.queryKey[0] === "terminal-agent-bindings") {
-				setCacheVersion((version) => version + 1);
-			}
-		});
-	}, [queryClient]);
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies: cacheVersion re-reads the query cache
-	return useMemo(() => {
-		const workspaceIds = new Set(Object.keys(manualUnread));
-		const entries = queryClient.getQueriesData<TerminalAgentBinding[]>({
-			queryKey: ["terminal-agent-bindings"],
-		});
-		for (const [, bindings] of entries) {
-			for (const binding of bindings ?? []) {
-				const status = deriveTerminalAgentStatus({
-					lastEventType: binding.lastEventType,
-					lastEventAt: binding.lastEventAt,
-					lastSeenAt: terminalSeenAt[binding.terminalId],
-				});
-				if (
-					status === "permission" ||
-					status === "review" ||
-					status === "failed"
-				) {
-					workspaceIds.add(binding.workspaceId);
-				}
+function countAttentionWorkspaces(
+	bindingLists: readonly TerminalAgentBinding[][],
+	manualUnread: Record<string, true>,
+	terminalSeenAt: Record<string, number>,
+): number {
+	const workspaceIds = new Set(Object.keys(manualUnread));
+	for (const bindings of bindingLists) {
+		for (const binding of bindings) {
+			const status = deriveTerminalAgentStatus({
+				lastEventType: binding.lastEventType,
+				lastEventAt: binding.lastEventAt,
+				lastSeenAt: terminalSeenAt[binding.terminalId],
+			});
+			if (
+				status === "permission" ||
+				status === "review" ||
+				status === "failed"
+			) {
+				workspaceIds.add(binding.workspaceId);
 			}
 		}
-		return workspaceIds.size;
-	}, [cacheVersion, manualUnread, terminalSeenAt, queryClient]);
+	}
+	return workspaceIds.size;
 }

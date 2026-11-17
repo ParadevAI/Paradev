@@ -150,7 +150,7 @@ export function assertWithinLimits(
 		throw new AttachmentLimitError(
 			i18n._(
 				msg({
-					message: `${count} files attached — a message carries at most ${max}`,
+					message: `${count} files attached. A message carries at most ${max}`,
 				}),
 			),
 		);
@@ -164,12 +164,12 @@ export function assertWithinLimits(
 			cap === MAX_INLINE_ATTACHMENT_BYTES
 				? i18n._(
 						msg({
-							message: `"${name}" is ${size} — files over ${limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead.`,
+							message: `"${name}" is ${size}. Files over ${limit} can't be attached to this workspace. If the file is on the workspace's machine, mention its path instead.`,
 						}),
 					)
 				: i18n._(
 						msg({
-							message: `"${name}" is ${size} — files over ${limit} can't be attached`,
+							message: `"${name}" is ${size}. Files over ${limit} can't be attached`,
 						}),
 					),
 		);

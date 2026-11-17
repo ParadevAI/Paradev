@@ -81,7 +81,7 @@ const hardenLocalCollection = <T>(
 		},
 	);
 
-export interface OrgCollections {
+interface OrgCollections {
 	v2SidebarProjects: Collection<
 		DashboardSidebarProjectRow,
 		string,
@@ -219,7 +219,7 @@ function createOrgCollections(organizationId: string): OrgCollections {
 					schema: v2UserPreferencesSchema,
 					// Cast widens the inferred literal "preferences" key to string so
 					// the collection slots into the shared OrgCollections.{...<TKey=string>}
-					// shape alongside the other v2 collections. Explicit `item` type so
+					// shape alongside the other collections. Explicit `item` type so
 					// `withReadHeal`'s passthrough generic keeps schema/getKey linkage.
 					getKey: (item: V2UserPreferencesRow) => item.id as string,
 				},

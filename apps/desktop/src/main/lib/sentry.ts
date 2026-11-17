@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/electron/main";
 import { IPCMode } from "@sentry/electron/main";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
 import { session } from "electron";
+import { APP_PARTITION } from "shared/constants";
 import { env } from "../env.main";
 
 let sentryInitialized = false;
@@ -28,7 +29,7 @@ export function initSentry(): void {
 			ipcMode: IPCMode.Classic,
 			getSessions: () => [
 				session.defaultSession,
-				session.fromPartition("persist:superset"),
+				session.fromPartition(APP_PARTITION),
 			],
 		});
 

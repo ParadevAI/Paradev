@@ -1,3 +1,4 @@
+import type { CloudWorkspaceStatus } from "@superset/db/schema";
 import { sortByLastAgentMessage } from "@superset/shared/cloud-workspace-groups";
 import type {
 	PullRequestCheck,
@@ -20,8 +21,8 @@ export interface CloudSidebarWorkspaceInput {
 	createdAt: Date;
 	updatedAt: Date;
 	agentStatusAt: Date | null;
-	createdBy: { userId: string } | null;
-	status?: "provisioning" | "ready" | "failed" | "deleted";
+	createdBy: { userId: string; name: string; image: string | null } | null;
+	status?: CloudWorkspaceStatus;
 }
 
 export interface CloudSidebarPullRequestInput {
@@ -163,8 +164,11 @@ export function buildCloudSidebarWorkspaces({
 			isPinned: false,
 			pendingTransaction: null,
 			isMine: userId !== null && workspace.createdBy?.userId === userId,
+			creator: workspace.createdBy,
 			sandboxStatus:
-				workspace.status === "provisioning" || workspace.status === "failed"
+				workspace.status === "provisioning" ||
+				workspace.status === "failed" ||
+				workspace.status === "asleep"
 					? workspace.status
 					: null,
 		};

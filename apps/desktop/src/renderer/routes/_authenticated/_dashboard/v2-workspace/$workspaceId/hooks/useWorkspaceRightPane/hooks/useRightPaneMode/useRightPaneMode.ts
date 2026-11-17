@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
+import type { SidebarSlideMode } from "renderer/routes/_authenticated/_dashboard/components/SidebarSlide";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
-import type { SidebarSlideMode } from "../../../../components/SidebarSlide";
 
 export function useRightPaneMode({
 	workspaceId,

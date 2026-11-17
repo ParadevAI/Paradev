@@ -3,5 +3,4 @@ export {
 	type FileListLayout,
 	fileListLayout,
 	MIN_DIFF_WIDTH,
-	toggledFileListOpen,
 } from "./fileListLayout";

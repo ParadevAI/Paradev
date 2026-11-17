@@ -24,18 +24,18 @@ import {
 	useV2WorktreeLocationSettings,
 	V2WorktreeLocationPicker,
 } from "../../../components/V2WorktreeLocationPicker";
-import { useDefaultWorktreePath } from "../../../components/WorktreeLocationPicker";
+import { useDefaultWorktreePath } from "../../../components/V2WorktreeLocationPicker/useDefaultWorktreePath";
 
-interface V2GitSettingsProps {
+interface GitSettingsProps {
 	hostId: string | null;
 }
 
 /**
- * v2 Git settings — host-wide branch-prefix default for whichever device the
+ * Git settings — host-wide branch-prefix default for whichever device the
  * picker has selected. Per-host setting; the dropdown only appears when the
  * user has 2+ devices in this org.
  */
-export function V2GitSettings({ hostId }: V2GitSettingsProps) {
+export function V2GitSettings({ hostId }: GitSettingsProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
 	const hostService = useLocalHostService();

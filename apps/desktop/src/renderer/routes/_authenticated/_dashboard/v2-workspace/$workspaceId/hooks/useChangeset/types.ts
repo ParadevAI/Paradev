@@ -1,4 +1,4 @@
-import type { FileStatus } from "../../components/StatusIndicator";
+import type { FileStatus } from "renderer/routes/_authenticated/_dashboard/components/StatusIndicator";
 
 export type DiffRef =
 	| { kind: "against-base"; baseBranch: string | null }

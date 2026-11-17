@@ -22,12 +22,14 @@ export function AgentTerminalPane({
 	ctx,
 	onOpenFile,
 	onRevealPath,
+	onNewShell,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string) => void;
+	onNewShell: () => Promise<void>;
 }) {
 	const data = ctx.pane.data as ChatOnTerminalPaneData;
 	const isSavedChat = data.agentSurface === "acp";
@@ -71,6 +73,7 @@ export function AgentTerminalPane({
 			ctx={ctx}
 			onOpenFile={onOpenFile}
 			onRevealPath={onRevealPath}
+			onNewShell={onNewShell}
 			workspaceId={workspaceId}
 		/>
 	);

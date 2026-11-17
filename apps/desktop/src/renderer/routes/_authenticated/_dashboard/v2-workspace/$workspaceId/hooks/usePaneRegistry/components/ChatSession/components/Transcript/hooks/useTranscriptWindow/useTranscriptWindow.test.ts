@@ -25,7 +25,7 @@ function rows(count: number, prefix = "row"): TranscriptRow[] {
 	}));
 }
 
-const observeRow = () => () => {};
+const observeRow = () => {};
 
 type WindowProps = {
 	rows: TranscriptRow[];
@@ -145,7 +145,7 @@ test("records the measured height of a mounted row for the session", () => {
 		const sessionId = crypto.randomUUID();
 		const { result } = renderWindow({ rows: rows(100) }, sessionId);
 		const row = document.createElement("div");
-		act(() => result.current.rowRef("row-70")(row));
+		act(() => result.current.registerRow("row-70", row));
 		act(() => {
 			observers.resizes
 				.at(-1)
@@ -283,4 +283,17 @@ test("holds reveals while a jump scrolls, then resumes when the scroll ends", ()
 	} finally {
 		observers.restore();
 	}
+});
+
+test("registers rows through one function that survives an element swap", () => {
+	const { result, rerender } = renderWindow({ rows: rows(3) });
+	const registerRow = result.current.registerRow;
+	act(() => {
+		registerRow("row-1", document.createElement("div"));
+		registerRow("row-1", null);
+		registerRow("row-1", document.createElement("div"));
+	});
+
+	rerender({ rows: rows(3) });
+	expect(result.current.registerRow).toBe(registerRow);
 });

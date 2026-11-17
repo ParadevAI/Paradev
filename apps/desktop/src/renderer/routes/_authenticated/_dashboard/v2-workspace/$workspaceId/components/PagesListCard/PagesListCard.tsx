@@ -3,6 +3,7 @@ import { useFormat } from "@superset/i18n/react";
 import { cn } from "@superset/ui/utils";
 import { Lock } from "lucide-react";
 import type { MouseEvent } from "react";
+import { useNow } from "renderer/hooks/useNow";
 import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
 
 export interface PagesListItem {
@@ -22,6 +23,7 @@ interface PagesListCardProps {
 }
 
 export function PagesListCard({ page, isActive, onOpen }: PagesListCardProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const { formatCompactRelativeTime } = useFormat();
 	const publishedAtMs = new Date(page.publishedAt ?? page.updatedAt).getTime();
@@ -48,7 +50,7 @@ export function PagesListCard({ page, isActive, onOpen }: PagesListCardProps) {
 					/>
 				)}
 				<span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">
-					{formatCompactRelativeTime(publishedAtMs)}
+					{formatCompactRelativeTime(publishedAtMs, now)}
 				</span>
 			</div>
 		</button>

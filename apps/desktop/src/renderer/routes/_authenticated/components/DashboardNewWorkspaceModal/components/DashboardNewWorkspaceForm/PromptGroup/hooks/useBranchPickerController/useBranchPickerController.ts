@@ -18,7 +18,7 @@ import type {
 
 type PickerProps = React.ComponentProps<typeof CompareBaseBranchPicker>;
 
-export interface UseBranchPickerControllerArgs {
+interface UseBranchPickerControllerArgs {
 	projectId: string | null;
 	hostId: string | null;
 	remoteHostPresence: RemoteHostPresence | null;

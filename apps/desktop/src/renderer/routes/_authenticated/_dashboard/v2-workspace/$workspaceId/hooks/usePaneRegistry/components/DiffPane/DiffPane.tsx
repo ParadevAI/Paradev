@@ -20,7 +20,11 @@ import {
 	EditProvider,
 } from "@pierre/diffs/react";
 import { errorMessage } from "@superset/i18n/errors";
-import { type RendererContext, useIsTabVisible } from "@superset/panes";
+import {
+	type RendererContext,
+	useIsTabVisible,
+	type WorkspaceStore,
+} from "@superset/panes";
 import { alert } from "@superset/ui/atoms/Alert";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
@@ -28,6 +32,8 @@ import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useSidebarFilePolicy } from "renderer/lib/clickPolicy";
 import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
 import {
 	createPaneScrollStateKey,
@@ -38,8 +44,14 @@ import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFil
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { MarkdownSearch } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/components/MarkdownSearch";
 import { toAbsoluteWorkspacePath } from "shared/absolute-paths";
+import { useStore } from "zustand";
+import type { StoreApi } from "zustand/vanilla";
 import { useRightPaneLinkTarget } from "../../../../providers/RightPaneLinkTargetProvider";
-import type { DiffPaneData, PaneViewerData } from "../../../../types";
+import type {
+	ChatPaneData,
+	DiffPaneData,
+	PaneViewerData,
+} from "../../../../types";
 import { changesPillStats } from "../../../../utils/changesPillStats";
 import {
 	type ChangesetFile,
@@ -77,7 +89,7 @@ import {
 	isDiffContentStale,
 	isDiffContentTooLarge,
 } from "./utils/diffLoadingGuards";
-import { fileListLayout, toggledFileListOpen } from "./utils/fileListLayout";
+import { fileListLayout } from "./utils/fileListLayout";
 import { getCharacterOffsetAtPoint } from "./utils/getCharacterOffsetAtPoint";
 import {
 	diffPaneActionsSlotId,
@@ -97,6 +109,7 @@ interface CreateNewAgentSessionInput {
 
 interface DiffPaneProps {
 	context: RendererContext<PaneViewerData>;
+	mainStore: StoreApi<WorkspaceStore<PaneViewerData>>;
 	workspaceId: string;
 	onOpenFile: (path: string, openInNewTab?: boolean) => void;
 	onCreateNewAgentSession?: (
@@ -123,10 +136,17 @@ const createDiffEditor: EditorFactory<DiffAnnotationMetadata, undefined> = (
 
 export function DiffPane({
 	context,
+	mainStore,
 	workspaceId,
 	onOpenFile,
 	onCreateNewAgentSession,
 }: DiffPaneProps) {
+	const activeChatTerminalId = useStore(mainStore, (state) => {
+		const pane = state.getActivePane()?.pane;
+		return pane?.kind === "chat-v3"
+			? (pane.data as ChatPaneData).terminalId
+			: undefined;
+	});
 	const { t } = useLingui();
 	const data = context.pane.data as DiffPaneData;
 	const codeViewRef =
@@ -136,11 +156,11 @@ export function DiffPane({
 	const showFileList = useRightPaneLinkTarget() !== null;
 	const [rowElement, setRowElement] = useState<HTMLDivElement | null>(null);
 	const containerWidth = useElementWidth(rowElement);
-	const [fileListOpen, setFileListOpen] = useState<boolean | null>(null);
+	const { preferences, setChangesFileListOpen } = useV2UserPreferences();
+	const fileListOpen = preferences.changesFileListOpen;
 	const listLayout = showFileList
 		? fileListLayout({ containerWidth, open: fileListOpen })
 		: "hidden";
-	const closeOverlayFileList = useCallback(() => setFileListOpen(null), []);
 
 	const sidebarRef = useSidebarDiffRef(workspaceId);
 	const filter = data.filter;
@@ -730,6 +750,7 @@ export function DiffPane({
 		[getFile],
 	);
 
+	const sidebarFilePolicy = useSidebarFilePolicy();
 	const renderHeaderMetadata = useCallback(
 		(item: CodeViewItem<DiffAnnotationMetadata>) => {
 			const file = getFile(item.id);
@@ -755,10 +776,12 @@ export function DiffPane({
 					onCancelEditing={
 						isEditing ? () => requestExitEditing(item.id) : undefined
 					}
+					policy={sidebarFilePolicy}
 				/>
 			);
 		},
 		[
+			sidebarFilePolicy,
 			getFile,
 			workspaceId,
 			setCollapsed,
@@ -866,6 +889,7 @@ export function DiffPane({
 				return (
 					<AgentCommentComposer
 						workspaceId={workspaceId}
+						preferredTerminalId={activeChatTerminalId}
 						contextLabel={
 							m.startLine === m.endLine
 								? t({
@@ -915,6 +939,7 @@ export function DiffPane({
 		},
 		[
 			workspaceId,
+			activeChatTerminalId,
 			targetItemId,
 			data.focusLine,
 			data.focusSide,
@@ -960,13 +985,7 @@ export function DiffPane({
 								? {
 										fileCount: totals.fileCount,
 										isCollapsed: listLayout === "hidden",
-										onToggle: () =>
-											setFileListOpen(
-												toggledFileListOpen({
-													containerWidth,
-													open: fileListOpen,
-												}),
-											),
+										onToggle: () => setChangesFileListOpen(!fileListOpen),
 									}
 								: undefined
 						}
@@ -1038,7 +1057,6 @@ export function DiffPane({
 					context={context}
 					layout={listLayout}
 					containerWidth={containerWidth}
-					onClose={closeOverlayFileList}
 					workspaceId={workspaceId}
 					onOpenFile={onOpenFile}
 				/>

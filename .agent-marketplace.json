@@ -238,6 +238,16 @@
 			"version": "1.0.0"
 		},
 		{
+			"name": "ahrefs",
+			"description": "Research SEO with Ahrefs: backlinks, organic keywords, rankings, site audits, and brand visibility in AI search.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/ahrefs",
+			"version": "1.0.0"
+		},
+		{
 			"name": "wispr",
 			"description": "Recall your meetings with Wispr Flow: search notes, transcripts, scratchpad notes, and calendar events.",
 			"author": {

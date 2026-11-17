@@ -16,10 +16,15 @@ const STATUS_BY_CODE: Record<PaneLayoutErrorCode, number> = {
 	PRECONDITION_FAILED: 412,
 };
 
+/** Ops main sends itself are not in the shared schema, so the CLI cannot send them. */
+export type RendererPaneLayoutOp =
+	| PaneLayoutOp
+	| { type: "wakeBrowser"; paneId: string };
+
 export interface PaneLayoutRendererRequest {
 	requestId: string;
 	workspaceId: string;
-	op: PaneLayoutOp;
+	op: RendererPaneLayoutOp;
 	targetWebContentsId: number;
 }
 
@@ -88,7 +93,10 @@ class PaneLayoutRequests extends EventEmitter {
 		return this.subscribers.keys().next().value ?? null;
 	}
 
-	request(workspaceId: string, op: PaneLayoutOp): Promise<PaneLayoutOpResult> {
+	request(
+		workspaceId: string,
+		op: RendererPaneLayoutOp,
+	): Promise<PaneLayoutOpResult> {
 		const targetWebContentsId = this.pickTarget(workspaceId);
 		if (targetWebContentsId === null) {
 			return Promise.reject(

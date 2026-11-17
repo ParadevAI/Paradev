@@ -273,4 +273,20 @@ describe("RelayForwardTransport over a mux session", () => {
 		expect(echoed.toString()).toBe("back");
 		stream2.destroy();
 	});
+
+	test("closeAll evicts sessions at once, so the next open dials fresh", async () => {
+		const host = miniHost();
+		const transport = transportFor();
+		const first = await transport.openStream(target(host.hostUrl));
+		first.on("error", () => {});
+		expect(host.connectionCount()).toBe(1);
+
+		transport.closeAll();
+		const second = await transport.openStream(target(host.hostUrl));
+		expect(host.connectionCount()).toBe(2);
+		second.write(Buffer.from("fresh"));
+		const echoed = await new Promise<Buffer>((r) => second.once("data", r));
+		expect(echoed.toString()).toBe("fresh");
+		second.destroy();
+	});
 });

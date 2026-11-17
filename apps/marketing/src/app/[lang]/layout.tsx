@@ -9,6 +9,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ExternalTracking } from "@/components/ExternalTracking";
 import {
 	OrganizationJsonLd,
 	SoftwareApplicationJsonLd,
@@ -16,10 +17,6 @@ import {
 } from "@/components/JsonLd";
 import { getChangelogEntries } from "@/lib/changelog";
 import { REDDIT_PIXEL_ID } from "@/lib/constants";
-import {
-	APPLY_HEADLINE_VARIANT_SCRIPT,
-	HEADLINE_VARIANT_STYLE,
-} from "@/lib/hero-headline";
 
 import { CTAButtons } from "./components/CTAButtons";
 import { Footer } from "./components/Footer";
@@ -50,7 +47,7 @@ const inter = Inter({
 
 const siteDescription = msg({
 	message:
-		"Bring Claude Code, Codex, OpenCode, or any coding agent into one workspace. Run tasks in parallel on separate branches, and review everything in one place.",
+		"The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place.",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -70,6 +67,7 @@ export async function generateMetadata(): Promise<Metadata> {
 			"AI coding",
 			"git worktrees",
 			"code automation",
+			"open source",
 			"Claude Code",
 			"Cursor",
 			"Codex",
@@ -147,14 +145,6 @@ export default async function RootLayout({
 			suppressHydrationWarning
 		>
 			<head>
-				<script
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static script built from constants
-					dangerouslySetInnerHTML={{ __html: APPLY_HEADLINE_VARIANT_SCRIPT }}
-				/>
-				<style
-					// biome-ignore lint/security/noDangerouslySetInnerHtml: static rules built from constants
-					dangerouslySetInnerHTML={{ __html: HEADLINE_VARIANT_STYLE }}
-				/>
 				<OrganizationJsonLd />
 				<SoftwareApplicationJsonLd
 					dateModified={getChangelogEntries()[0]?.date}
@@ -198,6 +188,9 @@ export default async function RootLayout({
 					</Suspense>
 					<CookieConsent />
 				</Providers>
+				<Suspense fallback={null}>
+					<ExternalTracking />
+				</Suspense>
 			</body>
 		</html>
 	);

@@ -1,6 +1,7 @@
 import { startTurn, steerTurn } from "@superset/agent-harness/session";
 import { db, dbWs } from "@superset/db/client";
 import {
+	actors,
 	agentSessions,
 	agents,
 	agentTurns,
@@ -10,11 +11,27 @@ import {
 	channelThreadFollows,
 	type SelectAgent,
 	type SelectAgentRoutine,
+	taskProjects,
+	taskProjectTasks,
+	tasks,
 	users,
 } from "@superset/db/schema";
 import { waitUntil } from "@vercel/functions";
-import { and, arrayOverlaps, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import {
+	and,
+	arrayOverlaps,
+	asc,
+	desc,
+	eq,
+	inArray,
+	isNull,
+	lt,
+	ne,
+	or,
+	sql,
+} from "drizzle-orm";
 import { agentTemporal } from "../../lib/agent-runtime";
+import { isUniqueViolation } from "../channel/members";
 import { agentNotFound } from "./access";
 import { announceAgentChanged } from "./agents-changed";
 import { channelRoutinesFor, markRun, routineText } from "./routines";
@@ -24,13 +41,14 @@ type TurnReason = (typeof agentTurns.$inferInsert)["reason"];
 export type TurnOutcome =
 	| { turnId: string; outcome: "started" }
 	| { turnId: string; outcome: "joined"; steerSeq: number }
+	| { turnId: string; outcome: "queued" }
 	| { turnId: string; outcome: "duplicate"; running: boolean };
 
 interface Prompt {
 	agent: { id: string; organizationId: string };
 	sessionId: string;
-	/** Null for events no person sent, such as a task's report. */
-	actingUserId: string | null;
+	/** The person this work is for; a task's report carries who asked for the task. */
+	actingUserId: string;
 	promptId: string;
 	text: string;
 	reason: TurnReason;
@@ -40,9 +58,11 @@ interface Prompt {
 
 /**
  * Records a prompt as a turn and hands it to the session's workflow: it
- * starts a turn, or joins the running one as a steer. A prompt id already
- * seen records nothing new. A prompt the workflow never got is undone, so
- * the same prompt id can be sent again.
+ * starts a turn, joins the running one as a steer when it is for the same
+ * person, or queues behind it. A turn works for one person, so a Dev's
+ * access in it is that person's. A prompt id already seen records nothing
+ * new. A prompt the workflow never got is undone, so the same prompt id can
+ * be sent again.
  */
 export async function submitPrompt(prompt: Prompt): Promise<TurnOutcome> {
 	const turn = await recordTurn(prompt);
@@ -59,6 +79,18 @@ export async function submitPrompt(prompt: Prompt): Promise<TurnOutcome> {
 /** Retries when the running turn settles between the insert and the join. */
 async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 	const { agent, sessionId, promptId } = prompt;
+	const row = (status: "running" | "queued") => ({
+		organizationId: agent.organizationId,
+		agentId: agent.id,
+		sessionId,
+		status,
+		reason: prompt.reason,
+		actingUserId: prompt.actingUserId,
+		promptId,
+		prompt: prompt.text,
+		triggerMessageId: prompt.triggerMessageId ?? null,
+		routineId: prompt.routineId ?? null,
+	});
 	for (let attempt = 0; attempt < 3; attempt++) {
 		const [duplicate] = await db
 			.select({ id: agentTurns.id, status: agentTurns.status })
@@ -82,16 +114,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 		}
 		const [started] = await db
 			.insert(agentTurns)
-			.values({
-				organizationId: agent.organizationId,
-				agentId: agent.id,
-				sessionId,
-				reason: prompt.reason,
-				actingUserId: prompt.actingUserId,
-				promptId,
-				triggerMessageId: prompt.triggerMessageId ?? null,
-				routineId: prompt.routineId ?? null,
-			})
+			.values(row("running"))
 			.onConflictDoNothing()
 			.returning({ id: agentTurns.id });
 		if (started) return { turnId: started.id, outcome: "started" };
@@ -104,7 +127,9 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 				and(
 					eq(agentTurns.sessionId, sessionId),
 					eq(agentTurns.status, "running"),
+					eq(agentTurns.actingUserId, prompt.actingUserId),
 					sql`not (${promptId} = any(${agentTurns.steerPromptIds}))`,
+					ne(agentTurns.promptId, promptId),
 				),
 			)
 			.returning({
@@ -114,6 +139,23 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
 		if (joined) {
 			return { turnId: joined.id, outcome: "joined", steerSeq: joined.steers };
 		}
+		const [running] = await db
+			.select({ id: agentTurns.id })
+			.from(agentTurns)
+			.where(
+				and(
+					eq(agentTurns.sessionId, sessionId),
+					eq(agentTurns.status, "running"),
+				),
+			)
+			.limit(1);
+		if (!running) continue;
+		const [queued] = await db
+			.insert(agentTurns)
+			.values(row("queued"))
+			.onConflictDoNothing()
+			.returning({ id: agentTurns.id });
+		if (queued) return { turnId: queued.id, outcome: "queued" };
 	}
 	throw agentNotFound();
 }
@@ -123,6 +165,7 @@ async function recordTurn(prompt: Prompt): Promise<TurnOutcome> {
  * may not have landed; the workflow drops prompt ids it has seen.
  */
 async function deliver(sessionId: string, turn: TurnOutcome, prompt: Prompt) {
+	if (turn.outcome === "queued") return;
 	if (turn.outcome === "duplicate" && !turn.running) return;
 	const temporal = await agentTemporal();
 	const { promptId, text, actingUserId } = prompt;
@@ -131,7 +174,7 @@ async function deliver(sessionId: string, turn: TurnOutcome, prompt: Prompt) {
 			turnId: turn.turnId,
 			promptId,
 			text,
-			...(actingUserId ? { actingUserId } : {}),
+			actingUserId,
 		});
 		return;
 	}
@@ -158,6 +201,51 @@ async function forgetUndelivered(turn: TurnOutcome, promptId: string) {
 			})
 			.where(eq(agentTurns.id, turn.turnId));
 	}
+}
+
+/**
+ * Starts the session's oldest queued turn once no turn runs. One that can't
+ * reach the workflow goes back in the queue for the reconciler.
+ */
+export async function startNextQueued(sessionId: string): Promise<boolean> {
+	const [next] = await db
+		.select({ id: agentTurns.id })
+		.from(agentTurns)
+		.where(
+			and(eq(agentTurns.sessionId, sessionId), eq(agentTurns.status, "queued")),
+		)
+		.orderBy(asc(agentTurns.startedAt))
+		.limit(1);
+	if (!next) return false;
+	const [turn] = await db
+		.update(agentTurns)
+		.set({ status: "running", startedAt: new Date() })
+		.where(and(eq(agentTurns.id, next.id), eq(agentTurns.status, "queued")))
+		.returning()
+		.catch((error: unknown) => {
+			if (isUniqueViolation(error)) return [];
+			throw error;
+		});
+	if (!turn?.promptId || !turn.actingUserId) return false;
+	try {
+		await startTurn(await agentTemporal(), sessionId, {
+			turnId: turn.id,
+			promptId: turn.promptId,
+			text: turn.prompt ?? "",
+			actingUserId: turn.actingUserId,
+		});
+	} catch (error) {
+		await db
+			.update(agentTurns)
+			.set({ status: "queued" })
+			.where(and(eq(agentTurns.id, turn.id), eq(agentTurns.status, "running")));
+		throw error;
+	}
+	announceAgentChanged({
+		id: turn.agentId,
+		organizationId: turn.organizationId,
+	});
+	return true;
 }
 
 export const REPLY_TARGET =
@@ -187,14 +275,31 @@ export function eventText(event: {
 	replyTo: string | null;
 	body: string;
 	now?: Date;
+	about?: string | null;
+	project?: string | null;
+	threadStart?: { from: string; body: string } | null;
+	recent?: { from: string; body: string }[];
 }) {
 	const attrs = [
 		`from="${attr(event.from)}"`,
 		`where="${attr(event.where)}"`,
+		...(event.about ? [`about="${attr(event.about)}"`] : []),
+		...(event.project ? [`project="${attr(event.project)}"`] : []),
 		...(event.replyTo ? [`reply_to="${attr(event.replyTo)}"`] : []),
 		`time="${(event.now ?? new Date()).toISOString()}"`,
 	];
-	return `<message ${attrs.join(" ")}>\n${escapeMessageTags(event.body)}\n</message>`;
+	const start = event.threadStart
+		? `<thread_start from="${attr(event.threadStart.from)}">\n${escapeMessageTags(event.threadStart.body)}\n</thread_start>\n`
+		: "";
+	const recent = event.recent?.length
+		? `<recent>\n${event.recent
+				.map(
+					(earlier) =>
+						`<said from="${attr(earlier.from)}">\n${escapeMessageTags(earlier.body)}\n</said>`,
+				)
+				.join("\n")}\n</recent>\n`
+		: "";
+	return `<message ${attrs.join(" ")}>\n${start}${recent}${escapeMessageTags(event.body)}\n</message>`;
 }
 
 function attr(value: string) {
@@ -205,7 +310,10 @@ function attr(value: string) {
 }
 
 function escapeMessageTags(body: string) {
-	return body.replace(/<(?=\s*\/?\s*message\b)/gi, "&lt;");
+	return body.replace(
+		/<(?=\s*\/?\s*(message|thread_start|recent|said)\b)/gi,
+		"&lt;",
+	);
 }
 
 /** The one session every message to a Dev reaches; made on first use. */
@@ -306,7 +414,6 @@ export async function startTurnsForMessage(
 			watchers,
 			devs: members.map((row) => row.agent),
 			channel,
-			roomName: room?.name,
 			authorName: author?.name,
 			message,
 			userId,
@@ -341,11 +448,11 @@ export async function startTurnsForMessage(
 			return;
 		}
 	}
+	if (work.size === 0) return;
 	await deliverToMains({
 		work: [...work.values()],
-		text: messageEvent({
+		text: await messageEvent({
 			channel,
-			roomName: room?.name,
 			authorName: author?.name,
 			message,
 		}),
@@ -399,9 +506,8 @@ async function routeUnmentioned({
 		}));
 	await deliverToMains({
 		work,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: { id: channel.id, kind: "channel" },
-			roomName: channel.name,
 			authorName,
 			message,
 		}),
@@ -410,17 +516,27 @@ async function routeUnmentioned({
 	});
 }
 
-function messageEvent({
+const THREAD_START_CHARS = 2_000;
+
+async function messageEvent({
 	channel,
-	roomName,
 	authorName,
 	message,
 }: {
 	channel: { id: string; kind: "channel" | "dm" };
-	roomName: string | undefined;
 	authorName: string | undefined;
 	message: { id: string; body: string; threadRootId: string | null };
 }) {
+	const [room] = await db
+		.select({
+			name: channels.name,
+			description: channels.description,
+			taskProjectId: channels.taskProjectId,
+			linearProjectId: channels.linearProjectId,
+		})
+		.from(channels)
+		.where(eq(channels.id, channel.id))
+		.limit(1);
 	const threadRootId =
 		channel.kind === "dm"
 			? message.threadRootId
@@ -430,10 +546,109 @@ function messageEvent({
 		where:
 			channel.kind === "dm"
 				? "your DM"
-				: `#${roomName ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
+				: `#${room?.name ?? "channel"}${message.threadRootId ? ", in a thread" : ""}`,
+		about: channel.kind === "dm" ? null : room?.description,
+		project: channel.kind === "dm" || !room ? null : await projectLine(room),
 		replyTo: replyTarget(channel.id, threadRootId),
 		body: message.body,
+		threadStart: message.threadRootId
+			? await threadStartOf(message.threadRootId)
+			: null,
+		recent:
+			channel.kind === "dm" ? [] : await recentBefore(channel.id, message),
 	});
+}
+
+const RECENT_MESSAGES = 8;
+const RECENT_CHARS = 1_000;
+
+/** The channel's or thread's last messages before this one, oldest first. */
+async function recentBefore(
+	channelId: string,
+	message: { id: string; threadRootId: string | null },
+): Promise<{ from: string; body: string }[]> {
+	const seq = db
+		.select({ seq: channelMessages.seq })
+		.from(channelMessages)
+		.where(eq(channelMessages.id, message.id));
+	const rows = await db
+		.select({
+			body: channelMessages.body,
+			userName: users.name,
+			devName: agents.name,
+		})
+		.from(channelMessages)
+		.leftJoin(actors, eq(actors.id, channelMessages.authorId))
+		.leftJoin(users, eq(users.id, actors.userId))
+		.leftJoin(agents, eq(agents.id, actors.agentId))
+		.where(
+			and(
+				eq(channelMessages.channelId, channelId),
+				message.threadRootId
+					? eq(channelMessages.threadRootId, message.threadRootId)
+					: isNull(channelMessages.threadRootId),
+				isNull(channelMessages.deletedAt),
+				isNull(channelMessages.subtype),
+				lt(channelMessages.seq, seq),
+			),
+		)
+		.orderBy(desc(channelMessages.seq))
+		.limit(RECENT_MESSAGES);
+	return rows.reverse().map((row) => ({
+		from: row.devName ?? row.userName ?? "someone",
+		body: row.body.slice(0, RECENT_CHARS),
+	}));
+}
+
+/** What the channel's Tasks tab shows, so "here" has a meaning without a tool call. */
+async function projectLine(room: {
+	taskProjectId: string | null;
+	linearProjectId: string | null;
+}): Promise<string | null> {
+	if (room.linearProjectId)
+		return "a Linear project; read it with channel_tasks";
+	if (!room.taskProjectId) return null;
+	const [project] = await db
+		.select({
+			name: taskProjects.name,
+			tasks: sql<number>`count(${tasks.id})::int`,
+		})
+		.from(taskProjects)
+		.leftJoin(taskProjectTasks, eq(taskProjectTasks.projectId, taskProjects.id))
+		.leftJoin(
+			tasks,
+			and(eq(tasks.id, taskProjectTasks.taskId), isNull(tasks.deletedAt)),
+		)
+		.where(eq(taskProjects.id, room.taskProjectId))
+		.groupBy(taskProjects.name);
+	return project ? `${project.name}, ${project.tasks} tasks` : null;
+}
+
+async function threadStartOf(
+	threadRootId: string,
+): Promise<{ from: string; body: string } | null> {
+	const [root] = await db
+		.select({
+			body: channelMessages.body,
+			userName: users.name,
+			devName: agents.name,
+		})
+		.from(channelMessages)
+		.leftJoin(actors, eq(actors.id, channelMessages.authorId))
+		.leftJoin(users, eq(users.id, actors.userId))
+		.leftJoin(agents, eq(agents.id, actors.agentId))
+		.where(
+			and(
+				eq(channelMessages.id, threadRootId),
+				isNull(channelMessages.deletedAt),
+			),
+		)
+		.limit(1);
+	if (!root) return null;
+	return {
+		from: root.devName ?? root.userName ?? "someone",
+		body: root.body.slice(0, THREAD_START_CHARS),
+	};
 }
 
 /**
@@ -444,7 +659,6 @@ async function deliverToWatchers({
 	watchers,
 	devs,
 	channel,
-	roomName,
 	authorName,
 	message,
 	userId,
@@ -452,12 +666,11 @@ async function deliverToWatchers({
 	watchers: Map<string, SelectAgentRoutine[]>;
 	devs: SelectAgent[];
 	channel: { id: string; kind: "channel" | "dm" };
-	roomName: string | undefined;
 	authorName: string | undefined;
 	message: { id: string; body: string; threadRootId: string | null };
 	userId: string;
 }) {
-	const event = messageEvent({ channel, roomName, authorName, message });
+	const event = await messageEvent({ channel, authorName, message });
 	const replyTo = replyTarget(channel.id, message.threadRootId ?? message.id);
 	const now = new Date();
 	const results = await Promise.allSettled(
@@ -542,7 +755,11 @@ export async function redeliverMessage({
 	reason: TurnReason;
 }): Promise<boolean> {
 	const [row] = await db
-		.select({ message: channelMessages, channel: channels, author: users.name })
+		.select({
+			message: channelMessages,
+			channel: channels,
+			author: { id: users.id, name: users.name, deletedAt: users.deletedAt },
+		})
 		.from(channelMessages)
 		.innerJoin(channels, eq(channels.id, channelMessages.channelId))
 		.leftJoin(users, eq(users.id, channelMessages.authorId))
@@ -550,16 +767,16 @@ export async function redeliverMessage({
 			and(eq(channelMessages.id, messageId), isNull(channelMessages.deletedAt)),
 		)
 		.limit(1);
-	if (!row) return false;
+	const authorId = row?.author && !row.author.deletedAt ? row.author.id : null;
+	if (!row || !authorId) return false;
 	await submitPrompt({
 		agent,
 		sessionId: await ensureMainSession(agent),
-		actingUserId: row.author ? row.message.authorId : null,
+		actingUserId: authorId,
 		promptId,
-		text: messageEvent({
+		text: await messageEvent({
 			channel: row.channel,
-			roomName: row.channel.name,
-			authorName: row.author ?? undefined,
+			authorName: row.author?.name ?? undefined,
 			message: row.message,
 		}),
 		reason,

@@ -12,6 +12,16 @@ GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, GPT-6 Luna, and GPT-5.6 Sol, Terra, and
 Luna. Added GPT-6.1 Terra and removed the retired GPT-5.5. Every model takes
 `max`; all but the two Luna models take `ultra`.
 
+## Fable 5.2: November 9, 2026
+
+Added `claude-fable-5-2` to the Claude picker and Paradev chat, and priced
+Fable 5.2 and Mythos 5.2 at $8/$40 with $0.20 cache reads
+([Anthropic models overview](https://platform.claude.com/docs/en/models/overview)).
+OMP lists `anthropic/claude-fable-5-2` in pi-catalog 18.18.5, so OMP offers it.
+Copilot, Cursor, and OpenCode do not offer it yet: Copilot has not announced
+it, Cursor has not published its model id, and models.dev (which OpenCode
+reads) does not list it. Add it to those pickers once their catalogs do.
+
 ## Verification: September 26, 2026
 
 | Agent | Result | Evidence |

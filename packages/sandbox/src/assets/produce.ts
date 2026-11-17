@@ -6,7 +6,7 @@
  *   bun run assets themes            prebuilt GTK, icon and cursor theme tarballs
  *   bun run assets wallpapers        eight photos, cropped to the display
  *   bun run assets host-service      the runtime tarball from this checkout
- *   bun run assets claude [version]  Claude Code's native binary (default: stable)
+ *   bun run assets claude [version]  Claude Code's native binary (default: latest)
  *   bun run assets codex [version]   Codex's standalone package (default: latest)
  *   bun run assets all
  *
@@ -25,7 +25,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import { ASSET_CACHE, BUNDLE_SRC, PACKAGE_ROOT } from "../build";
 import {
 	type Asset,
@@ -343,11 +343,16 @@ function hostService(): void {
 			"mkdir -p /rt && cd /rt && cp -R /out/stage/dist/. /rt/ && cp -R /out/stage/drizzle /rt/drizzle && cp -R /out/stage/agent-templates /rt/agent-templates && cp /out/stage/RUNTIME /rt/RUNTIME",
 			// host-service resolves the daemon side by side with itself, the way the desktop ships it.
 			"cp /out/stage/pty-daemon/pty-daemon.js /rt/pty-daemon.js",
+			// The natives below build against this node, so the runtime carries it: an environment's setup may replace the box's node.
+			"cp /usr/local/bin/node /rt/node",
 			"cd /rt && npm init -y >/dev/null && npm pkg set type=module >/dev/null",
 			`npm install ${[...natives, ...acpAdapters.map(pinned)].join(" ")} @parcel/watcher @xterm/headless --no-audit --no-fund >/dev/null`,
 			// The adapters bring their own claude and codex binaries (~650 MB); host-service points them at the box's pinned CLIs instead.
 			"rm -rf node_modules/@anthropic-ai/claude-agent-sdk-linux-* node_modules/@openai/codex-linux-*",
+			"cd /rt/node_modules/node-pty/prebuilds && find . -mindepth 1 -maxdepth 1 ! -name linux-x64 -exec rm -rf {} + && cd /rt",
+			"rm -rf node_modules/node-pty/third_party node_modules/node-pty/src node_modules/better-sqlite3/deps node_modules/better-sqlite3/src node_modules/zod/src",
 			"test -d node_modules/node-pty/prebuilds/linux-x64 || (echo 'node-pty prebuild missing' && exit 1)",
+			'./node -e \'require("better-sqlite3");require("node-pty");new (require("better-sqlite3"))(":memory:").close()\' || (echo "natives do not load after pruning" && exit 1)',
 			...acpAdapters.map(
 				(adapter) =>
 					`test -f node_modules/${adapter}/dist/index.js || (echo '${adapter} missing' && exit 1)`,
@@ -441,9 +446,9 @@ async function fetchText(url: string): Promise<string> {
 	return new TextDecoder().decode(await fetchBytes(url)).trim();
 }
 
-/** Claude Code's native linux-x64 binary; defaults to the `stable` channel. */
+/** Claude Code's native linux-x64 binary; defaults to the `latest` channel, the one a local install follows. */
 async function claude(version?: string): Promise<void> {
-	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/stable`));
+	const pinned = version ?? (await fetchText(`${CLAUDE_RELEASES}/latest`));
 	const manifest = JSON.parse(
 		await fetchText(`${CLAUDE_RELEASES}/${pinned}/manifest.json`),
 	) as { platforms: Record<string, { checksum: string }> };

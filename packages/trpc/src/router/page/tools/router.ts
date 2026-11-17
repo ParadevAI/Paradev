@@ -8,7 +8,7 @@ import { Redis } from "@upstash/redis";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../../env";
-import { protectedProcedure, userError } from "../../../trpc";
+import { personProcedure, userError } from "../../../trpc";
 import {
 	type PluginManifest,
 	pluginNeedsConnection,
@@ -100,7 +100,7 @@ async function withinRateLimit(key: string): Promise<boolean> {
 }
 
 export const pageToolRouter = {
-	callTool: protectedProcedure
+	callTool: personProcedure
 		.input(
 			z.object({
 				pageId: z.string().uuid(),
@@ -166,7 +166,7 @@ export const pageToolRouter = {
 			);
 		}),
 
-	grantTool: protectedProcedure
+	grantTool: personProcedure
 		.input(
 			z.object({
 				pageId: z.string().uuid(),
@@ -207,7 +207,7 @@ export const pageToolRouter = {
 			return { ok: true as const };
 		}),
 
-	revokeTool: protectedProcedure
+	revokeTool: personProcedure
 		.input(z.object({ pageId: z.string().uuid(), plugin: name }))
 		.mutation(async ({ ctx, input }) => {
 			await db
@@ -222,7 +222,7 @@ export const pageToolRouter = {
 			return { ok: true as const };
 		}),
 
-	toolGrants: protectedProcedure
+	toolGrants: personProcedure
 		.input(z.object({ pageId: z.string().uuid() }))
 		.query(async ({ ctx, input }) =>
 			db

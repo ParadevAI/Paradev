@@ -59,8 +59,10 @@ export const createAutomationSchema = z
 		tags: workspaceTagsInputSchema.optional(),
 		group: automationGroupInputSchema.optional(),
 		// Deliver each run's prompt into the session the previous run left
-		// behind instead of starting another beside it. Requires v2WorkspaceId.
+		// behind instead of starting another beside it.
 		continueAgentSession: z.boolean().optional(),
+		// With no pinned workspace, the first run's workspace becomes the pin.
+		reuseWorkspace: z.boolean().optional(),
 		// Size of the cloud box each run starts; null = medium.
 		machineSize: z.enum(MACHINE_SIZES).nullish(),
 		// Optional because an automation may be entirely event-driven. Required
@@ -96,6 +98,7 @@ export const updateAutomationSchema = z.object({
 	// Undefined keeps the existing group; null ungroups.
 	group: automationGroupInputSchema.optional(),
 	continueAgentSession: z.boolean().optional(),
+	reuseWorkspace: z.boolean().optional(),
 	// Undefined keeps the existing size; null resets it to medium.
 	machineSize: z.enum(MACHINE_SIZES).nullish(),
 	rrule: rruleBody.optional(),

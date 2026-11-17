@@ -31,7 +31,7 @@ function invoke(options: { local?: boolean }) {
 								id: CLOUD_WORKSPACE_ID,
 								name: "cloud-one",
 								branch: "main",
-								status: "ready",
+								status: "awake",
 							},
 						],
 					},
@@ -59,7 +59,7 @@ describe("workspaces list", () => {
 		const [row] = await invoke({});
 		expect(row).toMatchObject({
 			id: CLOUD_WORKSPACE_ID,
-			status: "ready",
+			status: "awake",
 			...workspaceLinks(CLOUD_WORKSPACE_ID),
 		});
 	});

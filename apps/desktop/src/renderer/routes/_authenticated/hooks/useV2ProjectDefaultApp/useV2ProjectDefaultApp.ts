@@ -6,14 +6,13 @@ import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/u
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 
 /**
- * Single source of truth for the v2 per-project "open in" app choice —
+ * Single source of truth for the per-project "open in" app choice —
  * the value the user picked via the CMD+O menu in `V2OpenInMenuButton`.
  *
- * v2 stores this client-side in `v2SidebarProjects.defaultOpenInApp`
- * (tanstack-db) because v2 projects are not in the v1 localDb tables
- * that the server-side `resolveDefaultEditor` consults. Anywhere v2 code
- * needs to read or write this preference should go through this hook so
- * CMD+O and file-open flows stay in sync.
+ * Stored client-side in `v2SidebarProjects.defaultOpenInApp` (tanstack-db);
+ * the server-side `resolveDefaultEditor` only knows the global default.
+ * Anywhere that needs to read or write this preference should go through
+ * this hook so CMD+O and file-open flows stay in sync.
  */
 export function useV2ProjectDefaultApp(projectId: string | undefined) {
 	const collections = useCollections();

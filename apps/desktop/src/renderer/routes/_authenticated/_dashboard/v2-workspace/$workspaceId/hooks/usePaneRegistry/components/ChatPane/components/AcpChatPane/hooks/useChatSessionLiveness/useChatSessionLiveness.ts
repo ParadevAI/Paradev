@@ -1,14 +1,49 @@
 import type { ChatTransport } from "@superset/chat/client";
-import { type QueryClient, useQuery } from "@tanstack/react-query";
+import {
+	type Query,
+	type QueryClient,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
+
+const LIVENESS_KEY = "acp-chat-session";
 
 function livenessKey(
 	sessionId: string | null,
 	hostUrl: string,
 	connection: unknown,
 ) {
-	return ["acp-chat-session", sessionId, hostUrl, connection];
+	return [LIVENESS_KEY, sessionId, hostUrl, connection];
+}
+
+function isOpenCheckOn(hostUrl: string) {
+	return (query: Query) =>
+		query.queryKey[0] === LIVENESS_KEY &&
+		query.queryKey[2] === hostUrl &&
+		query.getObserversCount() > 0;
+}
+
+export function useChatSessionChecksFailing(hostUrl: string): {
+	failing: boolean;
+	retry: () => void;
+} {
+	const queryClient = useQueryClient();
+	const cache = queryClient.getQueryCache();
+	const failing = useSyncExternalStore(
+		useCallback((onChange) => cache.subscribe(onChange), [cache]),
+		() =>
+			cache
+				.findAll({ predicate: isOpenCheckOn(hostUrl) })
+				.some((query) => query.state.status === "error"),
+	);
+	const retry = useCallback(
+		() =>
+			void queryClient.refetchQueries({ predicate: isOpenCheckOn(hostUrl) }),
+		[queryClient, hostUrl],
+	);
+	return { failing, retry };
 }
 
 export function markChatSessionLive(

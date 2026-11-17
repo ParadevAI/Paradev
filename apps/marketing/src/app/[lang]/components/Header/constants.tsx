@@ -37,6 +37,11 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 				description: <Trans>Agents on your phone</Trans>,
 			},
 			{
+				href: "/cloud",
+				label: <Trans>Cloud</Trans>,
+				description: <Trans>Agents that run while you're away</Trans>,
+			},
+			{
 				href: "/mcp-install",
 				label: "MCP",
 				description: <Trans>Connect any agent</Trans>,
@@ -70,18 +75,7 @@ export const PRODUCT_SECTIONS: NavSection[] = [
 			{
 				href: "/marketplace",
 				label: <Trans>Marketplace</Trans>,
-				description: <Trans>Themes and agents</Trans>,
-			},
-		],
-	},
-	{
-		id: "coming-soon",
-		title: <Trans>Coming soon</Trans>,
-		links: [
-			{
-				href: "/cloud",
-				label: <Trans>Cloud</Trans>,
-				description: <Trans>Join as a design partner</Trans>,
+				description: <Trans>Plugins, themes, and agents</Trans>,
 			},
 		],
 	},

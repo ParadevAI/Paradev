@@ -1,5 +1,7 @@
+import type { Session } from "@superset/auth/server";
 import { db, dbWs } from "@superset/db/client";
 import {
+	agents,
 	attachments,
 	type ChannelBroadcast,
 	type ChannelNotify,
@@ -10,25 +12,26 @@ import {
 	channelThreadFollows,
 	organizations,
 	members as orgMembers,
-	type SelectChannel,
 	type SelectChannelMessage,
 } from "@superset/db/schema";
 import {
 	type ChannelNotifyReason,
 	notificationTextOf,
 } from "@superset/shared/channels";
-import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, lt, sql } from "drizzle-orm";
+import type { z } from "zod";
 import { userError } from "../../i18n-error";
 import { anchorAttachments } from "../../lib/attachments";
-import { protectedProcedure } from "../../trpc";
+import { actorOf, type Principal } from "../../principal";
+import { actorProcedure, personProcedure } from "../../trpc";
 import { jevChannelRouter } from "../agent/channel-routing";
 import { startTurnsForMessage } from "../agent/turns";
 import {
 	assertCanPost,
 	type ChannelAccess,
 	canRemoveMessage,
-	loadChannelAccess,
+	loadChannelAccessFor,
 } from "./access";
 import { type EnrichedMessage, enrichMessage, enrichMessages } from "./enrich";
 import {
@@ -69,14 +72,14 @@ function assertBody(body: string, hasFiles = false): string {
 	return trimmed;
 }
 
-async function loadMessage(userId: string, messageId: string) {
+async function loadMessage(principal: Principal, messageId: string) {
 	const [message] = await db
 		.select()
 		.from(channelMessages)
 		.where(eq(channelMessages.id, messageId))
 		.limit(1);
 	if (!message) throw messageNotFound();
-	const access = await loadChannelAccess(userId, message.channelId).catch(
+	const access = await loadChannelAccessFor(principal, message.channelId).catch(
 		() => {
 			throw messageNotFound();
 		},
@@ -430,68 +433,105 @@ async function appendMessage(input: {
 	});
 }
 
-/** A Dev's post: stored like anyone's, announced to the room's members. */
-export async function postAgentMessage(input: {
-	channel: SelectChannel;
-	agentId: string;
-	agentName: string;
-	body: string;
-	threadRootId: string | null;
-	/** A retried post with the same key returns the first message. */
-	idempotencyKey?: string;
-}): Promise<EnrichedMessage> {
-	const body = assertBody(input.body);
-	const key = input.idempotencyKey;
+async function callerName(principal: Principal, session: Session | null) {
+	if (session) return session.user.name;
+	const [agent] = await db
+		.select({ name: agents.name })
+		.from(agents)
+		.where(eq(agents.id, actorOf(principal)))
+		.limit(1);
+	return agent?.name ?? "";
+}
+
+/**
+ * Posts as the caller. A retried send with the same clientId returns the
+ * first message. Only a person's message starts Devs' work, so Devs never
+ * wake each other.
+ */
+export async function sendChannelMessage(
+	caller: { principal: Principal; session: Session | null },
+	input: z.input<typeof sendMessageSchema>,
+): Promise<EnrichedMessage> {
+	const { principal } = caller;
+	const authorId = actorOf(principal);
+	const fileIds = input.fileIds ?? [];
+	if (principal.kind === "dev" && (fileIds.length > 0 || input.broadcast)) {
+		throw new TRPCError({
+			code: "BAD_REQUEST",
+			message: "A Dev can't attach files or notify the whole channel.",
+		});
+	}
+	const body = assertBody(input.body, fileIds.length > 0);
+	const access = await loadChannelAccessFor(principal, input.channelId);
+	assertCanPost(access);
+
 	const earlier = () =>
-		key ? findByClientId(input.agentId, input.channel.id, key) : null;
+		findByClientId(authorId, access.channel.id, input.clientId);
 	const existing = await earlier();
 	if (existing) return enrichMessage(existing);
+
+	const members = await recipients(access.channel.id);
+	const mentionedIds = (
+		await validMentions(access, members, input.mentionedIds ?? [])
+	).filter((id) => id !== authorId);
+
 	let result: AppendedMessage;
 	try {
 		result = await appendMessage({
-			channelId: input.channel.id,
-			threadRootId: input.threadRootId,
-			authorId: input.agentId,
+			channelId: access.channel.id,
+			threadRootId: input.threadRootId ?? null,
+			authorId,
 			body,
-			mentionedIds: [],
-			clientId: key ?? null,
+			mentionedIds,
+			broadcast: input.broadcast ?? null,
+			clientId: input.clientId,
 		});
 	} catch (error) {
 		const raced = isUniqueViolation(error) ? await earlier() : null;
 		if (raced) return enrichMessage(raced);
 		throw error;
 	}
+
+	await anchorAttachments({
+		parentKind: "channel_message",
+		parentId: result.message.id,
+		organizationId: access.channel.organizationId,
+		fileIds,
+	});
 	if (result.root) await followOnReply(result.root, result.message);
 	const message = await enrichMessage(result.message);
 	const root = result.root ? await enrichMessage(result.root) : null;
-	const access: ChannelAccess = {
-		channel: input.channel,
-		membership: null,
-		orgRole: "member",
-	};
 	await announce(
 		access,
-		await recipients(input.channel.id),
+		members,
 		message,
 		root,
-		input.agentName,
+		await callerName(principal, caller.session),
 	);
+	if (principal.kind === "person") {
+		await startTurnsForMessage(
+			access.channel,
+			result.message,
+			principal.userId,
+			jevChannelRouter,
+		);
+	}
 	return message;
 }
 
 export const channelMessageRouter = {
-	list: protectedProcedure
+	list: actorProcedure
 		.input(listMessagesSchema)
 		.query(async ({ ctx, input }) => {
-			await loadChannelAccess(ctx.session.user.id, input.channelId);
+			await loadChannelAccessFor(ctx.principal, input.channelId);
 			return listTopLevelMessages(input);
 		}),
 
-	thread: protectedProcedure
+	thread: actorProcedure
 		.input(listThreadSchema)
 		.query(async ({ ctx, input }) => {
 			const { message: root } = await loadMessage(
-				ctx.session.user.id,
+				ctx.principal,
 				input.messageId,
 			);
 			if (root.threadRootId) throw messageNotFound();
@@ -510,7 +550,7 @@ export const channelMessageRouter = {
 					.where(
 						and(
 							eq(channelThreadFollows.rootId, root.id),
-							eq(channelThreadFollows.actorId, ctx.session.user.id),
+							eq(channelThreadFollows.actorId, actorOf(ctx.principal)),
 						),
 					)
 					.limit(1),
@@ -522,74 +562,19 @@ export const channelMessageRouter = {
 			};
 		}),
 
-	send: protectedProcedure
+	send: actorProcedure
 		.input(sendMessageSchema)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
-			const body = assertBody(input.body, input.fileIds.length > 0);
-			const access = await loadChannelAccess(userId, input.channelId);
-			assertCanPost(access);
+		.mutation(({ ctx, input }) => sendChannelMessage(ctx, input)),
 
-			const existing = await findByClientId(
-				userId,
-				access.channel.id,
-				input.clientId,
-			);
-			if (existing) return enrichMessage(existing);
-
-			const members = await recipients(access.channel.id);
-			const mentionedIds = (
-				await validMentions(access, members, input.mentionedIds)
-			).filter((id) => id !== userId);
-
-			let result: AppendedMessage;
-			try {
-				result = await appendMessage({
-					channelId: access.channel.id,
-					threadRootId: input.threadRootId ?? null,
-					authorId: userId,
-					body,
-					mentionedIds,
-					broadcast: input.broadcast ?? null,
-					clientId: input.clientId,
-				});
-			} catch (error) {
-				if (isUniqueViolation(error)) {
-					const raced = await findByClientId(
-						userId,
-						access.channel.id,
-						input.clientId,
-					);
-					if (raced) return enrichMessage(raced);
-				}
-				throw error;
-			}
-
-			await anchorAttachments({
-				parentKind: "channel_message",
-				parentId: result.message.id,
-				organizationId: access.channel.organizationId,
-				fileIds: input.fileIds,
-			});
-			if (result.root) await followOnReply(result.root, result.message);
-			const message = await enrichMessage(result.message);
-			const root = result.root ? await enrichMessage(result.root) : null;
-			await announce(access, members, message, root, ctx.session.user.name);
-			await startTurnsForMessage(
-				access.channel,
-				result.message,
-				userId,
-				jevChannelRouter,
-			);
-			return message;
-		}),
-
-	edit: protectedProcedure
+	edit: personProcedure
 		.input(editMessageSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
 			const body = assertBody(input.body);
-			const { message, access } = await loadMessage(userId, input.messageId);
+			const { message, access } = await loadMessage(
+				ctx.principal,
+				input.messageId,
+			);
 			if (message.authorId !== userId || message.deletedAt || message.subtype) {
 				throw userError({
 					code: "FORBIDDEN",
@@ -626,11 +611,14 @@ export const channelMessageRouter = {
 			return edited;
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(messageIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const { message, access } = await loadMessage(userId, input.messageId);
+			const { message, access } = await loadMessage(
+				ctx.principal,
+				input.messageId,
+			);
 			if (!canRemoveMessage(access, message.authorId, userId)) {
 				throw userError({
 					code: "FORBIDDEN",
@@ -692,45 +680,46 @@ export const channelMessageRouter = {
 			return deleted;
 		}),
 
-	react: protectedProcedure
-		.input(reactSchema)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id;
-			const { message, access } = await loadMessage(userId, input.messageId);
-			if (message.deletedAt) throw messageNotFound();
-			assertCanPost(access);
-			if (input.reacted) {
-				await db
-					.insert(channelMessageReactions)
-					.values({
-						messageId: message.id,
-						actorId: userId,
-						emoji: input.emoji,
-					})
-					.onConflictDoNothing();
-			} else {
-				await db
-					.delete(channelMessageReactions)
-					.where(
-						and(
-							eq(channelMessageReactions.messageId, message.id),
-							eq(channelMessageReactions.actorId, userId),
-							eq(channelMessageReactions.emoji, input.emoji),
-						),
-					);
-			}
-			const reacted = await enrichMessage(message);
-			const members = await recipients(access.channel.id);
-			publishToUsers(
-				members.map((m) => m.userId),
-				{
-					type: "channel.message",
-					channelId: access.channel.id,
-					message: toWire(reacted),
-				},
-			);
-			return reacted;
-		}),
+	react: personProcedure.input(reactSchema).mutation(async ({ ctx, input }) => {
+		const userId = ctx.session.user.id;
+		const { message, access } = await loadMessage(
+			ctx.principal,
+			input.messageId,
+		);
+		if (message.deletedAt) throw messageNotFound();
+		assertCanPost(access);
+		if (input.reacted) {
+			await db
+				.insert(channelMessageReactions)
+				.values({
+					messageId: message.id,
+					actorId: userId,
+					emoji: input.emoji,
+				})
+				.onConflictDoNothing();
+		} else {
+			await db
+				.delete(channelMessageReactions)
+				.where(
+					and(
+						eq(channelMessageReactions.messageId, message.id),
+						eq(channelMessageReactions.actorId, userId),
+						eq(channelMessageReactions.emoji, input.emoji),
+					),
+				);
+		}
+		const reacted = await enrichMessage(message);
+		const members = await recipients(access.channel.id);
+		publishToUsers(
+			members.map((m) => m.userId),
+			{
+				type: "channel.message",
+				channelId: access.channel.id,
+				message: toWire(reacted),
+			},
+		);
+		return reacted;
+	}),
 } satisfies TRPCRouterRecord;
 
 async function findByClientId(

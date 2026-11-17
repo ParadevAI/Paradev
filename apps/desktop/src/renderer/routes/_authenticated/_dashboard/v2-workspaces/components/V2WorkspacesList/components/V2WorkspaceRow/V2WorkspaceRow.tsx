@@ -16,6 +16,7 @@ import {
 } from "react-icons/lu";
 import { WorkspaceNameMarquee } from "renderer/components/WorkspaceNameMarquee";
 import { useFocusVisible } from "renderer/hooks/useFocusVisible";
+import { useNow } from "renderer/hooks/useNow";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import {
@@ -92,6 +93,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	workspace,
 	isCurrentRoute,
 }: V2WorkspaceRowProps) {
+	const now = useNow(60_000);
 	const { formatDateTime, formatAge } = useFormat();
 
 	const { t } = useLingui();
@@ -125,7 +127,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 
 	// The visible age tracks activity (matches the sort); creation and
 	// last-agent-event details live in the tooltip.
-	const timeLabel = formatAge(workspaceActivityAt(workspace));
+	const timeLabel = formatAge(workspaceActivityAt(workspace), now);
 	const showsLiveState = hasLiveWorkspaceState(workspace);
 	const createdAtLabel = formatDateTime(workspace.createdAt, undefined);
 	const timeTitle = [
@@ -165,7 +167,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 	const whereLabel = isCloud
 		? t({ message: "Cloud workspace" })
 		: isDeviceOffline
-			? t({ message: `${workspace.hostName} — device offline` })
+			? t({ message: `${workspace.hostName}: device offline` })
 			: workspace.hostName;
 
 	const renderHoverActions = (actions: V2WorkspaceActions) =>
@@ -174,7 +176,7 @@ export const V2WorkspaceRow = memo(function V2WorkspaceRow({
 				<RowHoverAction
 					label={
 						actions.isRestoreBlocked
-							? t({ message: `${workspace.hostName} — device offline` })
+							? t({ message: `${workspace.hostName}: device offline` })
 							: t({ message: "Restore workspace" })
 					}
 					onClick={actions.restore}

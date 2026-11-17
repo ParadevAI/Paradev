@@ -4,10 +4,13 @@ import type {
 	ChatSessionResult,
 	CreateChatSessionInput,
 } from "./session-service";
+import { sessionsClientId } from "./utils/sessionsClientId";
 
 type ChatTarget = {
 	harness: string;
 	label: string;
+	/** `null`: the default account, with no config inherited from another chat. */
+	agentConfigId?: string | null;
 	attachments: ChatLaunchAttachment[];
 };
 
@@ -16,6 +19,7 @@ export function createChatSession(
 	target: ChatTarget,
 	input: CreateChatSessionInput,
 	cwd: string,
+	terminalId: string = crypto.randomUUID(),
 ): ChatSessionResult {
 	const commandId = input.commandId ?? crypto.randomUUID();
 	const created = chat.commands.createSession({
@@ -23,8 +27,12 @@ export function createChatSession(
 		scopeId: input.workspaceId,
 		cwd,
 		harness: target.harness,
-		terminalId: crypto.randomUUID(),
+		...(target.agentConfigId !== undefined
+			? { agentConfigId: target.agentConfigId }
+			: {}),
+		terminalId,
 		...(input.model ? { modelId: input.model } : {}),
+		...(input.effort ? { effortId: input.effort } : {}),
 		...(input.mode ? { modeId: input.mode } : {}),
 		...(input.resumeSessionId
 			? { resume: { harnessSessionId: input.resumeSessionId } }
@@ -43,7 +51,7 @@ export function createChatSession(
 		chat.commands.prompt({
 			commandId,
 			sessionId: created.sessionId,
-			clientId: "superset-sessions",
+			clientId: sessionsClientId(commandId),
 			content,
 		});
 	return {

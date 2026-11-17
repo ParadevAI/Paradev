@@ -17,7 +17,7 @@ function workspace(
 		id: "ws-1",
 		name: "Fix login",
 		branch: "fix-login",
-		status: "ready",
+		status: "awake",
 		agentStatus: null,
 		agentStatusAt: null,
 		createdBy: { userId: ME, name: "Me", image: null },
@@ -144,7 +144,7 @@ describe("buildCloudAccessibleWorkspaces", () => {
 
 		const deletedAt = new Date("2026-10-21T00:00:00Z");
 		const [archived] = build({
-			cloudWorkspaces: [workspace({ status: "deleted", deletedAt })],
+			cloudWorkspaces: [workspace({ status: "archived", deletedAt })],
 			pullRequestsById: new Map([
 				["ws-1", [pullRequest({ state: "merged", mergedAt: deletedAt })]],
 			]),

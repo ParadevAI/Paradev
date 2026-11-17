@@ -31,9 +31,10 @@ export function PageShareSheet() {
 
 	const owner = access.data?.owner;
 	const canManage =
-		page.data !== undefined &&
-		share.currentUserId !== undefined &&
-		page.data.createdByUserId === share.currentUserId;
+		access.data?.canEdit ??
+		(page.data !== undefined &&
+			share.currentUserId !== undefined &&
+			page.data.createdByUserId === share.currentUserId);
 
 	return (
 		<ShareAccessSheet

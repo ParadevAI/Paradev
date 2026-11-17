@@ -43,23 +43,50 @@ export function getComparisonPageTypeLabel(type: ComparisonPageType): string {
 
 const FAQ_HEADING = /^##\s+(Frequently Asked Questions|FAQ)\s*$/i;
 
+function faqHeadingIndex(lines: string[]): number {
+	for (let index = 0; index < lines.length; index++) {
+		const line = lines[index]?.trim() ?? "";
+		if (FAQ_HEADING.test(line)) return index;
+		// Translated bodies retain the original FAQ anchor immediately before its translated heading.
+		if (!/^<span id="(frequently-asked-questions|faq)" \/>$/.test(line))
+			continue;
+		let next = index + 1;
+		while (next < lines.length && !lines[next]?.trim()) next++;
+		if (/^##\s+/.test(lines[next] ?? "")) return next;
+	}
+	return -1;
+}
+
 export function splitComparisonFaq(content: string): {
 	body: string;
 	faq: string | null;
 } {
 	const lines = content.split("\n");
-	const faqStart = lines.findIndex((line) => FAQ_HEADING.test(line.trim()));
+	const faqStart = faqHeadingIndex(lines);
 	if (faqStart === -1) {
 		return { body: content, faq: null };
 	}
+	let fragmentStart = faqStart;
+	while (fragmentStart > 0 && !lines[fragmentStart - 1]?.trim())
+		fragmentStart--;
+	if (
+		/^<span id="(frequently-asked-questions|faq)" \/>$/.test(
+			lines[fragmentStart - 1]?.trim() ?? "",
+		)
+	) {
+		fragmentStart--;
+	} else {
+		fragmentStart = faqStart;
+	}
 	return {
-		body: lines.slice(0, faqStart).join("\n"),
-		faq: lines.slice(faqStart).join("\n"),
+		body: lines.slice(0, fragmentStart).join("\n"),
+		faq: lines.slice(fragmentStart).join("\n"),
 	};
 }
 
 function stripMarkdownFormatting(value: string): string {
 	return value
+		.replace(/<span id="[^"]*" \/>/g, "")
 		.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
 		.replace(/`([^`]+)`/g, "$1")
 		.replace(/[*_~>#]/g, "")
@@ -72,6 +99,7 @@ export function extractComparisonFaqItems(
 ): ComparisonFaqItem[] {
 	const lines = content.split("\n");
 	const items: ComparisonFaqItem[] = [];
+	const faqStart = faqHeadingIndex(lines);
 
 	let inFaqSection = false;
 	let currentQuestion: string | undefined;
@@ -99,10 +127,10 @@ export function extractComparisonFaqItems(
 		currentAnswerLines = [];
 	};
 
-	for (const line of lines) {
+	for (const [lineIndex, line] of lines.entries()) {
 		const trimmedLine = line.trim();
 
-		if (FAQ_HEADING.test(trimmedLine)) {
+		if (lineIndex === faqStart) {
 			inFaqSection = true;
 			continue;
 		}

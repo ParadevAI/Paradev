@@ -1,14 +1,16 @@
+import { useLingui } from "@lingui/react/macro";
 import { fileThumbnail } from "@superset/composer";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { FileText } from "lucide-react-native";
-import { View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import {
 	type AttachmentSource,
 	useAttachmentFile,
 } from "../../hooks/useAttachmentFile";
+import { openAttachmentFile } from "./utils/openAttachmentFile";
 
 const GLYPH_SIZE = 36;
 
@@ -23,6 +25,7 @@ export function AttachmentFileCard({
 	name: string;
 	mediaType: string;
 }) {
+	const { t } = useLingui();
 	const { data: uri } = useAttachmentFile({
 		hostUrl,
 		source,
@@ -36,9 +39,20 @@ export function AttachmentFileCard({
 		queryFn: () => (uri ? fileThumbnail(uri, GLYPH_SIZE) : null),
 	});
 
+	const open = () => {
+		if (!uri) return;
+		openAttachmentFile({ uri, name, mediaType }).catch(() =>
+			Alert.alert(t({ message: "Could not open this file" }), name),
+		);
+	};
+
 	return (
-		<View
-			className="h-20 w-[159px] justify-between rounded-[9px] bg-white/5 p-[7px]"
+		<Pressable
+			accessibilityLabel={name}
+			accessibilityRole="button"
+			className="h-20 w-[159px] justify-between rounded-[9px] bg-white/5 p-[7px] active:opacity-70"
+			disabled={!uri}
+			onPress={open}
 			style={{ borderCurve: "continuous" }}
 		>
 			<View
@@ -62,6 +76,6 @@ export function AttachmentFileCard({
 			>
 				{name}
 			</Text>
-		</View>
+		</Pressable>
 	);
 }

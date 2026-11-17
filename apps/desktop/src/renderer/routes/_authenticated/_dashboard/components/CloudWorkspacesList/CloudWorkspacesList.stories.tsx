@@ -19,7 +19,7 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				workspace: {
 					id: "cloud-presence",
 					name: "Cloud presence",
-					status: "ready",
+					status: "awake",
 					agentStatus: "working",
 					agentStatusAt: new Date("2026-09-25T11:58:00Z"),
 					createdAt: new Date("2026-09-25T09:00:00Z"),
@@ -58,7 +58,7 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				workspace: {
 					id: "region-picker",
 					name: "Environment region picker",
-					status: "ready",
+					status: "awake",
 					agentStatus: "review",
 					agentStatusAt: new Date("2026-09-25T11:30:00Z"),
 					createdAt: new Date("2026-09-25T07:00:00Z"),
@@ -95,7 +95,7 @@ const GROUPS: CloudWorkspaceGroup[] = [
 				workspace: {
 					id: "member-authz",
 					name: "P1-D github member authz",
-					status: "ready",
+					status: "awake",
 					agentStatus: "permission",
 					agentStatusAt: new Date("2026-09-25T11:56:00Z"),
 					createdAt: new Date("2026-09-24T12:00:00Z"),
@@ -199,7 +199,7 @@ export const WithArchived: Story = {
 				ALL_ITEMS[0],
 				...ALL_ITEMS.slice(1, 3).map((item) => ({
 					...item,
-					workspace: { ...item.workspace, status: "deleted" as const },
+					workspace: { ...item.workspace, status: "archived" as const },
 				})),
 				...ALL_ITEMS.slice(3),
 			],

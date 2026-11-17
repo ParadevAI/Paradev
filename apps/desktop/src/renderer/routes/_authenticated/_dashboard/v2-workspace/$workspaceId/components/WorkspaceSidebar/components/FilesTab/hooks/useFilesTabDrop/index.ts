@@ -1,5 +1,1 @@
-export {
-	type FilesTabDrop,
-	type FilesTabDropTarget,
-	useFilesTabDrop,
-} from "./useFilesTabDrop";
+export { type FilesTabDropTarget, useFilesTabDrop } from "./useFilesTabDrop";

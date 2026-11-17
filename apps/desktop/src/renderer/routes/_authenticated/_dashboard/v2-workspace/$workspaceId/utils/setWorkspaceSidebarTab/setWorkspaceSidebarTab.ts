@@ -26,7 +26,7 @@ export function getWorkspaceSidebarTab(
 
 /**
  * Switch a workspace's right-sidebar tab. The sidebar reads its active tab
- * from per-workspace local state (not the global v2 preferences row), so
+ * from per-workspace local state (not the global preferences row), so
  * every flow that surfaces a tab's content — a file reveal, opening Changes,
  * the tab strip itself — writes here. An auto-included local `main`
  * workspace has no local row, and creating one would place it explicitly in

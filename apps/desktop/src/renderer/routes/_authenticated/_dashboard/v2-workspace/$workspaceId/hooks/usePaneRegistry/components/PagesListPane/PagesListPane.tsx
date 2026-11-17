@@ -238,6 +238,7 @@ export function PagesListPane({
 							actions.updateData({ kind: "pages-list", page })
 						}
 						onFocus={actions.focus}
+						isActive={context.isActive}
 					/>
 				</div>
 			)}

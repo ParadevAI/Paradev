@@ -72,7 +72,6 @@ export function OrganizationJsonLd() {
 			"https://github.com/superset-sh",
 			SOCIAL.X_FORMER.url,
 			"https://www.linkedin.com/company/superset-sh",
-			"https://www.youtube.com/@superset-sh",
 		],
 	};
 

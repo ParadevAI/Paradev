@@ -11,8 +11,8 @@ import type {
 } from "@superset/chat/protocol";
 import { isImageAttachment } from "@superset/chat/protocol";
 import type { ReactNode } from "react";
+import type { PageLink } from "../../../../../../utils/pageLinks";
 import type { ChatForkTarget } from "../../../../types";
-import type { PageLink } from "../../../../utils/pageLinks";
 import { PageLinkCard } from "../../../PageLinkCard";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 import { AttachmentRail, type RailImage } from "../AttachmentRail";
@@ -109,8 +109,12 @@ export function TurnGroupSection({
 		case "working":
 			return (
 				<WorkingFor
+					background={
+						row.running && snapshot.session?.awaitingBackground === true
+					}
 					completedAtMs={row.completedAtMs}
 					startedAtMs={row.startedAtMs}
+					stopped={row.stopped}
 					waiting={row.waiting}
 				/>
 			);
@@ -181,6 +185,7 @@ export function TurnGroupSection({
 					latest={row.latest}
 					status={row.status}
 					turnId={row.turnId}
+					userStop={row.userStop}
 				/>
 			);
 		case "changed_files":

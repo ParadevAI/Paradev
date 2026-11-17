@@ -5,6 +5,7 @@
  * anything the API does not already know. The token itself never leaves the
  * API: the answer is a firewall policy update, not a value.
  */
+
 import { timingSafeEqual } from "node:crypto";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
@@ -34,7 +35,7 @@ export async function refreshSandboxCredentials(args: {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, args.workspaceId),
 	});
-	if (!row?.providerSandboxId || row.status !== "ready") return "not-ready";
+	if (!row?.providerSandboxId || row.status !== "awake") return "not-ready";
 	const { claim } = await buildSandboxClaim({ row });
 	return applySandboxPolicy({
 		providerSandboxId: row.providerSandboxId,

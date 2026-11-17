@@ -4,6 +4,7 @@ const MAX_AGE_MS = 24 * 60 * 60 * 1000;
 interface PendingChatStop {
 	workspaceId: string;
 	sessionId: string;
+	terminalId?: string;
 	closedAt: number;
 }
 
@@ -40,13 +41,27 @@ export function readPendingChatStops(workspaceId: string): string[] {
 		.map((entry) => entry.sessionId);
 }
 
+export function readPendingChatStopTerminalIds(workspaceId: string): string[] {
+	return read().flatMap((entry) =>
+		entry.workspaceId === workspaceId && entry.terminalId
+			? [entry.terminalId]
+			: [],
+	);
+}
+
 export function addPendingChatStop(
 	workspaceId: string,
 	sessionId: string,
+	terminalId?: string,
 ): void {
 	write([
 		...read().filter((entry) => entry.sessionId !== sessionId),
-		{ workspaceId, sessionId, closedAt: Date.now() },
+		{
+			workspaceId,
+			sessionId,
+			...(terminalId ? { terminalId } : {}),
+			closedAt: Date.now(),
+		},
 	]);
 }
 

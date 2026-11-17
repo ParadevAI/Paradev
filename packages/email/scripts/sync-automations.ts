@@ -98,9 +98,8 @@ const desired: DesiredAutomation[] = [
 				type: "send_email",
 				config: {
 					template: { id: "23458b3f-39fb-4465-a3f8-431b73d51aa4" },
-					subject: "",
-					from: "Kiet <kiet@hey.superset.sh>",
-					replyTo: "kiet@superset.sh",
+					from: "Kiet <kiet@hey.paradev.com>",
+					replyTo: "kiet@paradev.com",
 				},
 			},
 		],
@@ -111,6 +110,29 @@ const desired: DesiredAutomation[] = [
 				type: "default",
 			},
 		],
+	},
+	{
+		// Mobile paywall hits. The API claims a 7-day KV key per user before it
+		// emits, so each trigger is already deduplicated.
+		name: "upgrade-nudge",
+		steps: [
+			{
+				key: "start",
+				type: "trigger",
+				config: { eventName: "billing.upgrade_nudge_due" },
+			},
+			{
+				key: "send_upgrade_nudge",
+				type: "send_email",
+				config: {
+					template: template("billing-upgrade-nudge", {
+						featureName: { var: "event.featureName" },
+						upgradeUrl: { var: "event.upgradeUrl" },
+					}),
+				},
+			},
+		],
+		connections: [{ from: "start", to: "send_upgrade_nudge", type: "default" }],
 	},
 	{
 		// Signup drip. Listens for first-open from minute zero; a user with no

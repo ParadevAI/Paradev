@@ -3,6 +3,8 @@ import {
 	carriedReaderPosition,
 	carryReaderPosition,
 	forgetCarriedReaderPosition,
+	keepReaderPosition,
+	MAX_CARRIED_POSITIONS,
 	trackReaderPosition,
 } from "./carriedReaderPosition";
 
@@ -27,4 +29,17 @@ test("carries nothing when the reader was at the end", () => {
 	carryReaderPosition("at-end", "next");
 	untrack();
 	expect(carriedReaderPosition("next")).toBeNull();
+});
+
+test("keeps the newest positions up to the cap and drops the oldest", () => {
+	for (let n = 0; n <= MAX_CARRIED_POSITIONS; n++)
+		keepReaderPosition(`kept-${n}`, position);
+	expect(carriedReaderPosition("kept-0")).toBeNull();
+	expect(carriedReaderPosition(`kept-${MAX_CARRIED_POSITIONS}`)).toEqual(
+		position,
+	);
+	keepReaderPosition(`kept-${MAX_CARRIED_POSITIONS}`, null);
+	expect(carriedReaderPosition(`kept-${MAX_CARRIED_POSITIONS}`)).toBeNull();
+	for (let n = 1; n < MAX_CARRIED_POSITIONS; n++)
+		forgetCarriedReaderPosition(`kept-${n}`);
 });

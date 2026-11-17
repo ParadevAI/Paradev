@@ -5,7 +5,7 @@ import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
-export function v2WorktreeLocationQueryKey(hostUrl: string | null) {
+function v2WorktreeLocationQueryKey(hostUrl: string | null) {
 	return ["host-settings", "worktree-location", hostUrl] as const;
 }
 

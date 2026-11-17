@@ -30,6 +30,23 @@ describe("backgroundTerminals", () => {
 		expect(parseAttachedTerminalIdsKey(firstKey)).toEqual(["term-a", "term-b"]);
 	});
 
+	test("counts the terminal a pending cloud chat was promised as attached", () => {
+		expect(
+			parseAttachedTerminalIdsKey(
+				getAttachedTerminalIdsKey([
+					{
+						panes: {
+							a: {
+								kind: "pending-cloud-chat",
+								data: { draftId: "d", terminalId: "promised" },
+							},
+						},
+					},
+				]),
+			),
+		).toEqual(["promised"]);
+	});
+
 	test("filters attached sessions and sorts background sessions newest first", () => {
 		expect(
 			getBackgroundTerminalSessions(

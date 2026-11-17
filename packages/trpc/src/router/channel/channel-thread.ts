@@ -8,7 +8,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray, isNull, lte, max, or, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { loadChannelAccess } from "./access";
 import { enrichMessages } from "./enrich";
 import {
@@ -65,7 +65,7 @@ const followTarget = [
 
 export const channelThreadRouter = {
 	/** Followed threads, unread first, each with its root and newest replies. */
-	list: protectedProcedure
+	list: personProcedure
 		.input(listChannelsSchema)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -154,7 +154,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Moves a followed thread's read point forward; without `seq`, to the newest reply. */
-	markRead: protectedProcedure
+	markRead: personProcedure
 		.input(markThreadReadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -187,7 +187,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Makes a reply the first unread one, and follows the thread. */
-	markUnread: protectedProcedure
+	markUnread: personProcedure
 		.input(messageIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -235,7 +235,7 @@ export const channelThreadRouter = {
 		}),
 
 	/** Following marks the thread read, so only replies after it are new. */
-	follow: protectedProcedure
+	follow: personProcedure
 		.input(followThreadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;

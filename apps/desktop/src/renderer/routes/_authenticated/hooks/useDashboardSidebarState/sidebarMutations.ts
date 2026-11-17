@@ -1,4 +1,5 @@
 import type { WorkspaceState } from "@superset/panes";
+import type { Collection, WritableDeep } from "@tanstack/db";
 import type { PaneLifecycleRow } from "renderer/routes/_authenticated/components/utils/paneLifecycleRows";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { getPrependTabOrder } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
@@ -18,6 +19,30 @@ export function createEmptyPaneLayout(): WorkspaceState<unknown> {
 }
 
 type CleanupPaneRuntimes = (rows: PaneLifecycleRow[]) => void;
+
+/**
+ * Writes many rows as one transaction. A localStorage collection re-serializes
+ * the whole store and notifies every live query on each `update`, so a loop of
+ * single-row updates costs one full save and one React commit per row.
+ */
+export function updateRows<TInput extends object, TValue>(
+	// biome-ignore lint/suspicious/noExplicitAny: only the input row type matters here
+	collection: Collection<any, string, any, any, TInput>,
+	valuesByKey: ReadonlyMap<string, TValue>,
+	apply: (draft: WritableDeep<TInput>, value: TValue) => void,
+): void {
+	if (valuesByKey.size === 0) return;
+	const entries = Array.from(valuesByKey);
+	collection.update(
+		entries.map(([key]) => key),
+		(drafts) => {
+			drafts.forEach((draft, index) => {
+				const entry = entries[index];
+				if (entry) apply(draft, entry[1]);
+			});
+		},
+	);
+}
 
 /**
  * Hides a single workspace while keeping its project in the sidebar, by leaving

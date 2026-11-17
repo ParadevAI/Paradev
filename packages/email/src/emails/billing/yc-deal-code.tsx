@@ -12,14 +12,14 @@ export function YcDealCodeEmail({
 	code = "YCXXXXXXXX",
 }: YcDealCodeEmailProps) {
 	return (
-		<EmailLayout preview="Your code for 6 months of Paradev Pro free">
+		<EmailLayout preview="Your code for 3 months of Paradev Team free">
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
 				Hi {firstName ?? "there"},
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-				Thanks for redeeming our deal on Bookface. Here is your code for 6
-				months of Paradev Pro free:
+				Thanks for redeeming our deal on Bookface. Here is your code for 3
+				months of Paradev Team free:
 			</Text>
 
 			<Section className="bg-surface border border-solid border-border rounded-md px-4 py-3 mb-4 text-center">
@@ -29,8 +29,8 @@ export function YcDealCodeEmail({
 			</Section>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-4">
-				In the app, go to Settings, then Billing, pick the monthly Pro plan, and
-				enter the code at checkout. It covers your whole team.
+				In the app, go to Settings, then Billing, pick the monthly Team plan,
+				and enter the code at checkout. It covers every seat on your team.
 			</Text>
 
 			<Text className="text-[15px] leading-6 text-foreground m-0 mb-6">

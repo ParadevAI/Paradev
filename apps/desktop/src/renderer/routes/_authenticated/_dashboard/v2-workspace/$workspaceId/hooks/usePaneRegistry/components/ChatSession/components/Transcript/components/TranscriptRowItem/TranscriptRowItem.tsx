@@ -1,5 +1,5 @@
 import { MessageScroller } from "@superset/chat-ui/MessageScroller";
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import {
 	TurnGroupSection,
 	type TurnGroupSectionProps,
@@ -9,7 +9,7 @@ type TranscriptRowItemProps = TurnGroupSectionProps & {
 	className: string;
 	messageId: string;
 	rendered: boolean;
-	rowRef: (element: HTMLElement | null) => void;
+	registerRow: (rowKey: string, element: HTMLElement | null) => void;
 };
 
 function sameEmptyRow(
@@ -22,7 +22,7 @@ function sameEmptyRow(
 		previous.row.key === next.row.key &&
 		previous.className === next.className &&
 		previous.messageId === next.messageId &&
-		previous.rowRef === next.rowRef
+		previous.registerRow === next.registerRow
 	);
 }
 
@@ -42,9 +42,14 @@ export const TranscriptRowItem = memo(function TranscriptRowItem({
 	className,
 	messageId,
 	rendered,
-	rowRef,
+	registerRow,
 	...section
 }: TranscriptRowItemProps) {
+	const rowKey = section.row.key;
+	const rowRef = useCallback(
+		(element: HTMLElement | null) => registerRow(rowKey, element),
+		[registerRow, rowKey],
+	);
 	return (
 		<MessageScroller.Item
 			className={className}

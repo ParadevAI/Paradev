@@ -1,0 +1,85 @@
+---
+title: "ParadevとConductorの比較：ローカルエージェント、クラウドワークスペース、レビュー"
+description: "並列コーディングエージェント、ローカルおよびクラウドのワークスペース、レビュー、チームでの共同作業、モバイルアクセスについてParadevとConductorを比較します。"
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset vs conductor
+  - conductor alternative
+  - ai agent orchestration
+  - coding agent management
+  - conductor vs superset
+  - conductor shutting down
+  - migrate from conductor
+---
+
+移行する場合は、選択肢を説明した[ConductorからParadevへの移行](/conductor)、ローカルアプリ向けの[Conductorからの移行](https://docs.paradev.com/migrate-from-conductor)、またはクラウドワークスペース向けの[Conductor Cloudからの移行](https://docs.paradev.com/migrate-from-conductor-cloud)をご覧ください。
+
+ParadevとConductorはどちらも、並列で実行するコーディングタスクを個別のワークスペースに整理します。Conductorは、クラウドワークスペース、チームで共有する会話、APIとMCPサーバー、スケジュール実行のRoutine、クラウドアクセスと実験的なローカルMacワークスペースのリモート操作に対応したiOSアプリを提供します。ParadevのiPhoneおよびiPadアプリは、クラウドワークスペースと自分が所有するホストに接続するため、エージェントがどこで実行されていても、ワークスペースのターミナルを使い、差分をレビューできます。
+
+## 概要
+
+| 要件 | Paradev | Conductor |
+|---|---|---|
+| エージェント | Claude Code、Codex、OpenCode、Gemini CLI、Cursor Agent、Copilot、Amp、追加した任意のカスタムCLIエージェント | Claude Code、Codex、Cursor、OpenCode |
+| 実行場所 | ローカルワークスペース、接続済みホスト、自分のLinuxサーバー（[Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)）、[クラウドワークスペース](https://docs.paradev.com/cloud-workspaces) | ローカルMacワークスペース、クラウドサンドボックス |
+| レビュー | 変更ペインからコミット、プッシュ、PRの作成が可能。PRペインにはチェック、レビューのスレッド、マージが表示される | 差分、チェック、プルリクエスト、マージ、アーカイブ |
+| チームアクセス | 追加したホストへのメンバーごとのアクセス権、および組織アクセス | 共有クラウドワークスペースと会話 |
+| ブラウザー | デザインモード付きのアプリ内ブラウザーペイン。要素を選択してエージェントに渡せる | ブラウザープレビュー |
+| 自動化 | 選択したホストで実行するProのスケジュール実行エージェント。実行履歴と失敗時の再試行に対応 | スケジュールまたはGitHubアクションで起動し、クラウドで実行するRoutine |
+| プログラムによる制御 | CLI、TypeScript SDK、MCPサーバー | APIとConductor MCP |
+| スマートフォン | App StoreのiPhoneおよびiPadアプリ。iOSまたはiPadOS 26以降、Proが必要。クラウドワークスペースと自分のホストで利用可能 | iOSアプリ。クラウドワークスペース、および[ローカルMacワークスペースの実験的なリモート操作](https://www.conductor.build/docs/reference/remote-control)に対応。リモート操作にはMacを起動したまま、スリープさせず、オンラインにしておく必要がある。 |
+| 料金 | 無料。Proは{{price:pro}}/ユーザー/月、または年払いで{{price:pro:yearly}}。Teamは{{price:team}}、または年払いで{{price:team:yearly}}。Ultraは{{price:ultra}}。Enterpriseは個別見積もり。有料プランはクラウドを利用可能。利用枠と従量課金の追加利用分については[料金](/pricing)を参照。 | [現在のプランとアカウントアクセス](https://www.conductor.build/docs/cloud/faq)はConductorの情報を参照 |
+
+Conductorの[紹介ページ](https://www.conductor.build/docs)では、4つのエージェントハーネスとレビューの流れが紹介されています。[Cloudのドキュメント](https://www.conductor.build/docs/cloud)では、共有環境と分離されたサンドボックスについて説明されています。現在のドキュメントには、[iPhoneからローカルMacワークスペースを実験的にリモート操作する機能](https://www.conductor.build/docs/reference/remote-control)についても記載されています。
+
+## Paradevの利用要件
+
+ParadevはCLIコーディングエージェントを個別のワークスペースで実行し、ターミナルと差分レビューを1つのアプリで扱います。デスクトップ版はmacOSと、実験的なLinux AppImageに対応しています。Windowsにはまだ対応していません。ParadevはMITライセンスのオープンソースです。Conductorのチャットが便利だったユーザーは、Claude Code、Codex、OpenCode、Piに対応した[チャットインターフェース](https://docs.paradev.com/chat)を利用できます。
+
+多くのセッションを同時に扱う場合、ワークスペースページではすべてのホストにわたるワークスペースが状態別（対応が必要、作業中、レビュー待ち、アイドル、マージ済み）に整理されます。中断したエージェントのセッションは同じペインで再開でき、Claude CodeまたはCodexが起動したサブエージェントは親エージェントの下に表示されます。
+
+[iPhoneおよびiPadでParadev](/mobile)を使うには、iOS 26またはiPadOS 26以降とProが必要です。クラウドワークスペースは、自分のコンピューターを接続したままにしなくても利用できます。自分のマシン上のワークスペースを使う場合は、そのホストをオンラインにしておく必要があります。リモートアクセスと自動化にも有料プランが必要です。[料金](/pricing)と[リモートアクセスの設定](https://docs.paradev.com/remote-access)をご覧ください。
+
+## 自分のリポジトリで試す
+
+この記事はParadevが公開しています。リンク先のConductorのドキュメントは機能の説明を裏付けるものです。以下の試用方法は評価手段であり、測定済みの性能ランキングではありません。
+
+アプリを比較するには、同じリポジトリのコミット、エージェント、モデルを使い、それぞれのアプリで互いに独立したタスクを2つ実行してください。アプリとエージェントのバージョン、日付、セットアップの違いを記録します。[並列タスクのガイド](/blog/parallel-coding-agents-guide)には、範囲を絞ったプロンプトが掲載されています。
+
+| 試用の手順 | 記録する内容 |
+|---|---|
+| 独立したタスクを2つ作成する | ワークスペースのパスとブランチ名、テスト実行前に必要なセットアップ手順 |
+| 各エージェントに小さな変更を完了させる | プロンプト、モデル、変更ファイル、チェック結果 |
+| 1つ修正を依頼する | 正しいセッションを見つけて再開できるか |
+| 両方の変更をレビューして取り込む | レビュー手順、競合、統合後のテスト結果 |
+| 必要ならリモートアクセスを試す | ホストの利用可否、必要なプラン、切断時の動作 |
+
+セットアップとレビューにかかった時間は、エージェントの実行時間と分けて測定してください。速度について結論を出す前に試行を繰り返してください。エージェントの出力にはばらつきがあり、実行が速くても差分の質が低い場合があります。Gitワークツリーによって作業ファイルは分離されますが、競合しない統合や、エージェント権限のサンドボックス化が保証されるわけではありません。
+
+![Paradevで変更をレビューしている画面。](/images/readme/diff-viewer.png)
+
+## Conductorユーザーが今できること
+
+移行を選ぶ場合は、ブランチを保存し、残しておきたい記録をエクスポートしてください。
+
+自分のiPhoneからエージェントに返信し、タスクを自分のコンピューター、ホスト、またはクラウドワークスペースで実行している間に変更をレビューしたい場合、あらゆるCLIエージェントに対応するParadevをお選びください。[スマートフォンのチュートリアル](/blog/claude-code-codex-iphone)でセットアップを確認できます。作業を移す場合は、[ローカルアプリのガイド](https://docs.paradev.com/migrate-from-conductor)または[Conductor Cloudのガイド](https://docs.paradev.com/migrate-from-conductor-cloud)に沿って進めてください。
+
+コンピューティングとエージェントプロバイダーの費用を含めて、現在の[Paradevプラン](/pricing)を比較してください。エージェントプロバイダーの利用料金は別途請求されます。
+
+## よくある質問
+
+### Conductorはローカル作業専用ですか？
+
+いいえ。Conductorのドキュメントでは、ローカルMacワークスペースと[クラウドサンドボックス](https://www.conductor.build/docs/cloud)について説明されており、共有クラウドワークスペースにも対応しています。iOSアプリでは[ローカルMacワークスペースの実験的なリモート操作](https://www.conductor.build/docs/reference/remote-control)も利用できます。
+
+### ConductorでOpenCodeを実行できますか？
+
+はい。紹介ページには、Claude Code、Codex、CursorとともにOpenCodeが記載されています。
+
+### Paradevを使うにはエディターを切り替える必要がありますか？
+
+いいえ。Paradevがターミナルとワークスペースを管理している間も、エディターでワークスペースのディレクトリを開けます。重複する編集を行う場合は、編集の担当者を1つに決めてください。

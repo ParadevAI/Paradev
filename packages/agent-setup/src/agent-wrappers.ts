@@ -25,6 +25,7 @@ export {
 	createCodexHooksJson,
 	createCodexWrapper,
 	createOpenCodePlugin,
+	createOpenCodeTuiPlugin,
 	createOpenCodeWrapper,
 	getClaudeGlobalSettingsJsonContent,
 	getClaudeGlobalSettingsJsonPath,
@@ -34,10 +35,14 @@ export {
 	getOpenCodeGlobalPluginPath,
 	getOpenCodePluginContent,
 	getOpenCodePluginPath,
+	getOpenCodeTuiPluginContent,
+	getOpenCodeTuiPluginPath,
 	OPENCODE_PLUGIN_FILE,
 	OPENCODE_PLUGIN_MARKER,
+	OPENCODE_TUI_PLUGIN_MARKER,
 	removeClaudeManagedHooks,
 	removeCodexManagedHooks,
+	removeOpenCodeTuiPlugin,
 } from "./agent-wrappers-claude-codex-opencode";
 export {
 	buildWrapperScript,

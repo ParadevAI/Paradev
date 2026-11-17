@@ -34,9 +34,9 @@ afterEach(() => {
 	});
 });
 
-function renderPanel() {
+function renderPanel(collapsedWidth?: number) {
 	const result = render(
-		<WorkspaceSidebarPanel>
+		<WorkspaceSidebarPanel collapsedWidth={collapsedWidth}>
 			<div data-testid="sidebar">sidebar</div>
 		</WorkspaceSidebarPanel>,
 	);
@@ -113,5 +113,11 @@ describe("WorkspaceSidebarPanel", () => {
 		useWorkspaceSidebarStore.getState().setWidth(0);
 		await resizeWindow(400);
 		expect(renderPanel()()).toBe("52px");
+	});
+
+	test("beside a separate rail, collapsing hides the panel entirely", async () => {
+		useWorkspaceSidebarStore.getState().setWidth(0);
+		expect(renderPanel(0)()).toBe("0px");
+		expect(useWorkspaceSidebarStore.getState().isCollapsed()).toBe(true);
 	});
 });

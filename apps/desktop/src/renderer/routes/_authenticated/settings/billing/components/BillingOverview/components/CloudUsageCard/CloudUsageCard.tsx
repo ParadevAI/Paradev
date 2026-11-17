@@ -1,6 +1,5 @@
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import { Badge } from "@superset/ui/badge";
 import { Progress } from "@superset/ui/progress";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { GbHourPurchase } from "./components/GbHourPurchase";
@@ -52,12 +51,6 @@ export function CloudUsageCard({
 		<div>
 			<h3 className="text-sm font-medium mb-2 flex items-center gap-2">
 				<Trans>Cloud usage</Trans>
-				<Badge
-					variant="secondary"
-					className="px-1.5 py-0 text-[10px] font-medium"
-				>
-					<Trans>Beta</Trans>
-				</Badge>
 			</h3>
 			<div className="space-y-2 py-3">
 				<div className="flex items-baseline justify-between gap-4 text-sm">

@@ -14,7 +14,7 @@ import { join } from "node:path";
 import {
 	renderContractShell,
 	SANDBOX_PATHS,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { PACKAGE_ROOT } from "./build";
 import { sha256 } from "./manifest";
 
@@ -41,7 +41,8 @@ function docker(args: string[], check = true): string {
 }
 const sh = (cmd: string) => docker(["exec", NAME, "bash", "-lc", cmd], false);
 
-// A bundle on disk: one rootfs file, two assets (one whose hash lies), three steps.
+// A bundle on disk: one rootfs file, three assets (one whose hash lies, one
+// an archive the first step discards), three steps.
 const dir = mkdtempSync(join(tmpdir(), "superset-runner-check-"));
 const bundle = join(dir, "bundle");
 mkdirSync(join(bundle, "rootfs/etc/superset"), { recursive: true });
@@ -76,13 +77,17 @@ writeFileSync(
 	join(dir, "assets", `${liarSha}.txt`),
 	"what is actually served\n",
 );
+const archive = "an archive the first step unpacks\n";
+const archiveSha = sha256(archive);
+const archiveDest = `${SANDBOX_PATHS.media}/archive.txt`;
+writeFileSync(join(dir, "assets", `${archiveSha}.txt`), archive);
 writeFileSync(
 	join(bundle, "assets.tsv"),
-	`0644\t${goodSha}\t.txt\t${b64("/opt/check/good.txt")}\n0644\t${liarSha}\t.txt\t${b64("/opt/check/liar.txt")}\n`,
+	`0644\t${goodSha}\t.txt\t${b64("/opt/check/good.txt")}\n0644\t${liarSha}\t.txt\t${b64("/opt/check/liar.txt")}\n0644\t${archiveSha}\t.txt\t${b64(archiveDest)}\tfirst\n`,
 );
 writeFileSync(
 	join(bundle, "steps/first.sh"),
-	"#!/bin/bash\necho first ran >> /opt/check/steps.log\n",
+	`#!/bin/bash\ncat ${archiveDest} >> /opt/check/steps.log || exit 1\necho first ran >> /opt/check/steps.log\n`,
 );
 writeFileSync(
 	join(bundle, "steps/flaky.sh"),
@@ -160,15 +165,15 @@ try {
 	// stays. Sidecars are what make a file "staged": a bare file is left alone.
 	const media = SANDBOX_PATHS.media;
 	sh(
-		`printf stale > ${media}/stale.bin && printf ${sha256("stale")} > ${media}/stale.bin.hash && printf keep > ${media}/keep.bin && printf ${goodSha} > ${media}/keep.bin.hash && printf loose > ${media}/loose.bin`,
+		`printf stale > ${media}/stale.bin && printf ${sha256("stale")} > ${media}/stale.bin.hash && printf ${sha256("gone")} > ${media}/gone.bin.hash && printf keep > ${media}/keep.bin && printf ${goodSha} > ${media}/keep.bin.hash && printf loose > ${media}/loose.bin`,
 	);
 	const sync3 = sh("/bundle/setup sync-assets 2>&1 | grep pruned || true");
 	expect(
-		"sync-assets prunes a staged archive the manifest no longer lists",
+		"sync-assets prunes a staged archive and a lone sidecar the manifest no longer lists",
 		/stale\.bin/.test(sync3) &&
 			sh(
-				`ls ${media}/stale.bin ${media}/stale.bin.hash 2>&1 | grep -c 'No such'`,
-			).trim() === "2",
+				`ls ${media}/stale.bin ${media}/stale.bin.hash ${media}/gone.bin.hash 2>&1 | grep -c 'No such'`,
+			).trim() === "3",
 		sync3.trim(),
 	);
 	expect(
@@ -194,6 +199,23 @@ try {
 		"the step before it ran and is marked",
 		/first ran/.test(sh("cat /opt/check/steps.log")) &&
 			sh(`cat ${steps}/first.version`).trim() === "v-first",
+	);
+	expect(
+		"a step that succeeds discards its archive and keeps the sidecar",
+		/discarded .*archive\.txt/.test(run1) &&
+			sh(`ls ${media}/archive.txt 2>&1 | grep -c 'No such'`).trim() === "1" &&
+			sh(`cat ${media}/archive.txt.hash`).trim() === archiveSha,
+	);
+	const sync4 = sh("/bundle/setup sync-assets 2>&1");
+	expect(
+		"sync-assets neither fetches nor prunes a discarded archive",
+		!/archive\.txt/.test(sync4) &&
+			sh(`cat ${media}/archive.txt.hash`).trim() === archiveSha,
+		sync4
+			.trim()
+			.split("\n")
+			.filter((l) => /archive/.test(l))
+			.join(" | "),
 	);
 	const run2 = sh("/bundle/setup run-steps");
 	expect(
@@ -233,6 +255,11 @@ try {
 				/flaky skipped: flaky disabled/.test(out)
 			);
 		})(),
+	);
+	expect(
+		"a step that re-runs fetches its discarded archive first, then discards it again",
+		sh("cat /opt/check/steps.log").includes(archive) &&
+			sh(`ls ${media}/archive.txt 2>&1 | grep -c 'No such'`).trim() === "1",
 	);
 	// A new version clears the sentinel; success clears it for good.
 	sh(

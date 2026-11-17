@@ -4,7 +4,7 @@ import { fileOriginalKey } from "@superset/shared/usercontent";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { headObject, presignedGetUrl, presignedPutUrl } from "../../lib/r2";
 import type { SandboxCaller } from "../../lib/sandbox/api-credential";
-import { protectedProcedure, userError } from "../../trpc";
+import { personProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { resolvableFiles, TRANSFER_ONLY } from "./resolvable";
 import {
@@ -33,7 +33,7 @@ export const attachmentRouter = {
 	 * caller claimed — `resolve` is where that is checked, since the PUT
 	 * happens without the API seeing it.
 	 */
-	createUpload: protectedProcedure
+	createUpload: personProcedure
 		.input(createAttachmentUploadSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
@@ -86,7 +86,7 @@ export const attachmentRouter = {
 	 * A mutation despite reading nothing but rows: the URLs it mints are
 	 * short-lived credentials, and a query's response is cacheable.
 	 */
-	resolve: protectedProcedure
+	resolve: personProcedure
 		.input(resolveAttachmentsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const byId = await loadResolvable(ctx, input.fileIds);
@@ -122,7 +122,7 @@ export const attachmentRouter = {
 	 * asked for, and one the caller may not see is reported the same as one
 	 * that does not exist.
 	 */
-	resolveEach: protectedProcedure
+	resolveEach: personProcedure
 		.input(resolveAttachmentsSchema)
 		.mutation(async ({ ctx, input }) => {
 			const byId = await loadResolvable(ctx, input.fileIds);

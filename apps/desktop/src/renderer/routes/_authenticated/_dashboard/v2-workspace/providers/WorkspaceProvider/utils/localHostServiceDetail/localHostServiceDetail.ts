@@ -17,7 +17,7 @@ export const LOCAL_HOST_SERVICE_DETAIL: Record<
 	}),
 	stopped: msg({
 		message:
-			"The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files — nothing on disk is lost.",
+			"The local host service isn't running, so nothing on this device can serve the workspace. Restarting it reattaches your terminals and files. Nothing on disk is lost.",
 	}),
 	// The process is up but its port hasn't reached us yet: getProcessStatus
 	// polls every second, the connection every five. Never advise a restart

@@ -24,6 +24,7 @@ import { reconcileDevs } from "./reconcile";
 import { fireDueRoutines } from "./routines";
 import { afterTaskTurn } from "./tasks";
 import { resolveTurnHost } from "./turn-host";
+import { startNextQueued } from "./turns";
 
 const turnIdSchema = z.object({ turnId: z.string().uuid() });
 const turnNotRunning = () =>
@@ -123,9 +124,12 @@ export const agentWorkerRouter = {
 				),
 			)
 			.limit(1);
-		if (!turn) throw turnNotRunning();
+		if (!turn?.actingUserId) throw turnNotRunning();
 		return {
-			token: await signTurnToken(env.AGENT_TURN_SIGNING_SECRET, turn),
+			token: await signTurnToken(env.AGENT_TURN_SIGNING_SECRET, {
+				...turn,
+				actingUserId: turn.actingUserId,
+			}),
 			expiresInSeconds: TURN_TOKEN_TTL_SECONDS,
 		};
 	}),
@@ -166,10 +170,12 @@ export const agentWorkerRouter = {
 					),
 				)
 				.limit(1);
-			if (!turn) throw turnNotRunning();
+			const actingUserId = turn?.actingUserId;
+			if (!turn || !actingUserId) throw turnNotRunning();
 			const access = turn.cloudWorkspaceId
 				? await resolveTurnHost({
 						...turn,
+						actingUserId,
 						cloudWorkspaceId: turn.cloudWorkspaceId,
 					})
 				: null;
@@ -178,7 +184,7 @@ export const agentWorkerRouter = {
 				sessionId: turn.sessionId,
 				agentId: turn.agentId,
 				organizationId: turn.organizationId,
-				actingUserId: turn.actingUserId,
+				actingUserId,
 			};
 			return {
 				sessionStore: await sessionStoreFor(turn.sessionId),
@@ -284,6 +290,9 @@ export const agentWorkerRouter = {
 			});
 			// A retried settle runs this again; the parent hears each turn once.
 			await afterTaskTurn(turnId);
+			await startNextQueued(settled.sessionId).catch((error) =>
+				console.error("[agent-worker] next queued turn didn't start", error),
+			);
 			return {
 				settled: true,
 				sessionStore: await sessionStoreFor(settled.sessionId),

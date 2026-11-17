@@ -31,6 +31,7 @@ import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -53,7 +54,7 @@ import {
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
-	terminalPullRequestLinkAction,
+	terminalUrlLinkAction,
 } from "../../utils/runTerminalLinkAction";
 import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
 import { LinkActionMenu } from "./components/LinkActionMenu";
@@ -61,11 +62,13 @@ import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
 import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
+import { TerminalSessionEndedFooter } from "./components/TerminalSessionEndedFooter";
 import { terminalContextMenuLinkStore } from "./contextMenuLinkStore";
 import { useCopyOnSelect } from "./hooks/useCopyOnSelect";
 import { useLinkActionMenu } from "./hooks/useLinkActionMenu";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalInterruptClear } from "./hooks/useTerminalInterruptClear";
+import { useTerminalSessionEnd } from "./hooks/useTerminalSessionEnd";
 import {
 	terminalRichInputOpenStore,
 	useTerminalRichInputOpen,
@@ -77,6 +80,7 @@ interface TerminalPaneProps {
 	workspaceId: string;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
+	onNewShell: () => Promise<void>;
 }
 
 export function TerminalPane({
@@ -84,6 +88,7 @@ export function TerminalPane({
 	workspaceId,
 	onOpenFile,
 	onRevealPath,
+	onNewShell,
 }: TerminalPaneProps) {
 	const { t } = useLingui();
 	const filePolicy = useTerminalFilePolicy();
@@ -195,6 +200,25 @@ export function TerminalPane({
 		[terminalId, terminalInstanceId],
 	);
 	const connectionState = useSyncExternalStore(subscribe, getSnapshot);
+	const sessionEnd = useTerminalSessionEnd(terminalId, terminalInstanceId);
+	const closePaneRef = useRef(ctx.actions.close);
+	closePaneRef.current = ctx.actions.close;
+	useEffect(() => {
+		if (sessionEnd.endedCleanly) closePaneRef.current();
+	}, [sessionEnd.endedCleanly]);
+	useEffect(() => {
+		if (sessionEnd.ended && !sessionEnd.endedCleanly) {
+			terminalRuntimeRegistry.persistEndedSession(
+				terminalId,
+				terminalInstanceId,
+			);
+		}
+	}, [
+		sessionEnd.ended,
+		sessionEnd.endedCleanly,
+		terminalId,
+		terminalInstanceId,
+	]);
 
 	// DOM-first lifecycle (VSCode/Tabby pattern):
 	//   1. mount() attaches xterm to the container synchronously — terminal
@@ -359,9 +383,7 @@ export function TerminalPane({
 					);
 				},
 				onUrlClick: (event, url) => {
-					const action =
-						terminalPullRequestLinkAction(event, url) ??
-						getUrlAction(event, url);
+					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
 							event.preventDefault();
@@ -506,8 +528,9 @@ export function TerminalPane({
 		{ enabled: ctx.isActive },
 	);
 
+	const findEnabled = usePaneHotkeyEnabled(ctx.isActive);
 	useHotkey("FIND_IN_TERMINAL", () => setIsSearchOpen((prev) => !prev), {
-		enabled: ctx.isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 	});
 
@@ -652,6 +675,15 @@ export function TerminalPane({
 				isOpen={isRichInputOpen}
 				onClose={closeRichInput}
 			/>
+			{sessionEnd.ended && !sessionEnd.endedCleanly && (
+				<TerminalSessionEndedFooter
+					key={terminalId}
+					terminalId={terminalId}
+					terminalInstanceId={terminalInstanceId}
+					onNewShell={onNewShell}
+					onClose={ctx.actions.close}
+				/>
+			)}
 			<div
 				className={cn(
 					"pointer-events-none absolute inset-0 bg-primary/10 transition-opacity duration-100",
@@ -705,9 +737,7 @@ function resolveHoverLabel(
 		shiftKey: hovered.shift,
 	};
 	if (hovered.info.kind === "url") {
-		const action =
-			terminalPullRequestLinkAction(event, hovered.info.url) ??
-			getUrlAction(event, hovered.info.url);
+		const action = terminalUrlLinkAction(event, hovered.info.url, getUrlAction);
 		return action ? actionLabel(action, "url") : null;
 	}
 	if (hovered.info.isDirectory) {

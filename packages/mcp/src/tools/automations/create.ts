@@ -96,7 +96,7 @@ export function register(server: McpServer): void {
 				.boolean()
 				.optional()
 				.describe(
-					"Deliver each run's prompt into the agent session the previous run left behind instead of starting another beside it. Requires a pinned v2WorkspaceId or cloudWorkspaceId — that is where the session lives. Use for an automation that should build up one conversation (triaging items one by one) rather than starting clean each time.",
+					"Deliver each run's prompt into the agent session the previous run left behind instead of starting another beside it. With no pinned v2WorkspaceId or cloudWorkspaceId, the first run's workspace is kept and reused, since that is where the session lives. Use for an automation that should build up one conversation (triaging items one by one) rather than starting clean each time.",
 				),
 			tags: workspaceTagsInputSchema
 				.optional()

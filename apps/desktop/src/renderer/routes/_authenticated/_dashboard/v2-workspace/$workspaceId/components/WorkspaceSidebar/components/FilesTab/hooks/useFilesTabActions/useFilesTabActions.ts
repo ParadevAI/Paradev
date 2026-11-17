@@ -39,7 +39,7 @@ interface UseFilesTabActionsOptions {
 	workspaceId: string;
 }
 
-export interface FilesTabActions {
+interface FilesTabActions {
 	/** Expand every ancestor directory of `absolutePath` then scroll the row into view. */
 	reveal(absolutePath: string, isDirectory: boolean): Promise<void>;
 	/** Create a file/folder on disk, then open the inline rename on it. */
@@ -196,11 +196,11 @@ export function useFilesTabActions({
 					toast.info(
 						entry.mode === "folder"
 							? t({
-									message: "Kept the new folder — it is no longer empty",
+									message: "Kept the new folder because it is no longer empty",
 								})
 							: t({
 									message:
-										"Kept the new file — it changed after it was created",
+										"Kept the new file because it changed after it was created",
 								}),
 					);
 				})

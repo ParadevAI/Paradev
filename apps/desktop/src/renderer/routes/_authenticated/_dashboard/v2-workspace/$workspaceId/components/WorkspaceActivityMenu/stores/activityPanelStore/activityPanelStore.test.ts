@@ -56,3 +56,27 @@ test("hiding the docked card is per workspace", () => {
 	setHidden("ws-a", false);
 	expect("ws-a" in useActivityPanelStore.getState().hidden).toBe(false);
 });
+
+test("the floating popover stays open per workspace and closing removes the key", () => {
+	const { setFloatingOpen } = useActivityPanelStore.getState();
+	setFloatingOpen("ws-a", true);
+	expect(useActivityPanelStore.getState().floatingOpen["ws-a"]).toBe(true);
+	expect(useActivityPanelStore.getState().floatingOpen["ws-b"]).toBeUndefined();
+	setFloatingOpen("ws-a", false);
+	expect("ws-a" in useActivityPanelStore.getState().floatingOpen).toBe(false);
+});
+
+test("collapsing the subagents group is per workspace", () => {
+	const { setSubagentsCollapsed } = useActivityPanelStore.getState();
+	setSubagentsCollapsed("ws-a", true);
+	expect(useActivityPanelStore.getState().subagentsCollapsed["ws-a"]).toBe(
+		true,
+	);
+	expect(
+		useActivityPanelStore.getState().subagentsCollapsed["ws-b"],
+	).toBeUndefined();
+	setSubagentsCollapsed("ws-a", false);
+	expect("ws-a" in useActivityPanelStore.getState().subagentsCollapsed).toBe(
+		false,
+	);
+});

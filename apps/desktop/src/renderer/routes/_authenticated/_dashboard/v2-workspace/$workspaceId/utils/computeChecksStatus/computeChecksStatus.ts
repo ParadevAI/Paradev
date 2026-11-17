@@ -7,7 +7,7 @@ type PullRequest = NonNullable<
 type CheckRun = PullRequest["checks"][number];
 
 /** Effective per-check status after collapsing GitHub's status × conclusion grid. */
-export type EffectiveCheckStatus =
+type EffectiveCheckStatus =
 	| "success"
 	| "failure"
 	| "pending"

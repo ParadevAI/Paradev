@@ -1,5 +1,9 @@
 import { agentStatusFromEvent } from "@superset/shared/agent-status";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
 import type { QueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { getCloudEnvironmentsQueryKey } from "@/hooks/useCloudEnvironments";
@@ -202,7 +206,7 @@ export function createVoiceData({
 
 	const hostUrlFor = async (workspace: VoiceWorkspace): Promise<string> => {
 		if (workspace.kind === "cloud") {
-			if (workspace.status !== "ready") {
+			if (!isLiveCloudWorkspaceStatus(workspace.status)) {
 				throw new VoiceDataError(
 					"unreachable",
 					`${workspace.name} is ${workspace.status}; its sandbox is not up.`,
@@ -263,7 +267,7 @@ export function createVoiceData({
 				),
 			]);
 			const fromCloud: VoiceWorkspace[] = cloud
-				.filter((row) => row.status !== "deleted")
+				.filter((row) => !isArchivedCloudWorkspaceStatus(row.status))
 				.map((row) => ({
 					id: row.id,
 					name: row.name,
@@ -323,7 +327,7 @@ export function createVoiceData({
 								hostName: host.name,
 								branch: row.branch,
 								project: row.projectName,
-								status: "ready",
+								status: "awake",
 								attention: attention?.status ?? null,
 								attentionAt: attention?.at ?? null,
 								lastActivityAt: toMs(row.lastActivityAt) ?? toMs(row.updatedAt),
@@ -400,13 +404,29 @@ export function createVoiceData({
 		},
 
 		async findPage(query) {
-			const result = await withTimeout(
-				apiClient.page.listPaginated.query({ limit: PAGE_SEARCH_LIMIT }),
-				HOST_TIMEOUT_MS,
-				"Pages",
-			);
-			const pages = result.items.map(toVoicePage);
 			const q = query.trim().toLowerCase();
+			// The newest batch alone misses an older page, so search the rest too.
+			// A failed search still leaves the newest batch and the slug lookup.
+			const [newest, searched] = await Promise.all([
+				withTimeout(
+					apiClient.page.listPaginated.query({ limit: PAGE_SEARCH_LIMIT }),
+					HOST_TIMEOUT_MS,
+					"Pages",
+				),
+				q
+					? withTimeout(
+							apiClient.page.listPaginated.query({
+								limit: PAGE_SEARCH_LIMIT,
+								search: q.slice(0, 200),
+							}),
+							HOST_TIMEOUT_MS,
+							"Pages",
+						).catch(() => null)
+					: null,
+			]);
+			const pages = [...newest.items, ...(searched?.items ?? [])].map(
+				toVoicePage,
+			);
 			const listed =
 				pages.find((page) => page.id === query || page.slug === query) ??
 				pages.find((page) => page.title.toLowerCase() === q) ??
@@ -550,7 +570,7 @@ export function createVoiceData({
 					branch: result.workspace.branch,
 					project:
 						machine.projects.find((row) => row.id === projectId)?.name ?? null,
-					status: "ready",
+					status: "awake",
 					attention: null,
 					attentionAt: null,
 					lastActivityAt: Date.now(),

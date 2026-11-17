@@ -1,10 +1,8 @@
 import { EventEmitter } from "node:events";
-import { msg } from "@lingui/core/macro";
-import { i18n } from "@superset/i18n";
+import { totalmem } from "node:os";
 import { PROTOCOL_SCHEMES } from "@superset/shared/constants";
-import { clipboard, Menu, webContents } from "electron";
+import { app, BrowserWindow, Menu, webContents } from "electron";
 import { writeClipboardImage } from "main/lib/clipboard-image";
-import { safeOpenExternal } from "main/lib/safe-url";
 import type {
 	DesignModeRect,
 	DesignModeScreenshot,
@@ -12,6 +10,8 @@ import type {
 } from "shared/browser-design-mode";
 import { PROTOCOL_SCHEME } from "shared/constants";
 import { chordFromInput, type ForwardedKey } from "shared/hotkey-chord";
+import { cookieRefusal, redactCookies } from "./cdp-cookie-guard";
+import { createExtensionWorldFilter } from "./cdp-extension-worlds";
 import {
 	forwardSessionFor,
 	handleTargetCommand,
@@ -21,6 +21,7 @@ import {
 import { DesignModeController } from "./design-mode-controller";
 import { captureDesignModeScreenshot } from "./design-mode-screenshot";
 import { buildDesignModeScript } from "./design-mode-script";
+import { buildGuestContextMenu } from "./guest-context-menu";
 import { markBrowserPanePopup, shouldOpenAsPopup } from "./popup-window";
 
 interface ConsoleEntry {
@@ -43,6 +44,30 @@ export interface BrowserPaneInfo {
 	isLoading: boolean;
 }
 
+export interface PaneUnloadInfo {
+	totalMemoryKb: number;
+	panes: Record<
+		string,
+		{ memoryKb: number; audible: boolean; unsavedInput: boolean }
+	>;
+}
+
+const FORM_EDITS_WORLD_ID = 1999;
+const UNLOAD_CHECK_TIMEOUT_MS = 500;
+// Comparing values with their defaults flags untouched selects, range and
+// color inputs, so record real edits instead. Runs in an isolated world: the
+// page cannot see or change the flag. A submit clears it.
+const TRACK_FORM_EDITS_SCRIPT = `if (!globalThis.__formEdits) {
+	const state = (globalThis.__formEdits = { dirty: false });
+	const edited = (event) => {
+		if (event.isTrusted && event.target?.closest?.("input, textarea, select, [contenteditable]")) state.dirty = true;
+	};
+	document.addEventListener("input", edited, true);
+	document.addEventListener("change", edited, true);
+	document.addEventListener("submit", () => { state.dirty = false; }, true);
+}`;
+const HAS_UNSAVED_INPUT_SCRIPT = "globalThis.__formEdits?.dirty === true";
+
 export interface BrowserOpenRequest {
 	workspaceId: string;
 	projectId: string | null;
@@ -52,7 +77,7 @@ export interface BrowserOpenRequest {
 	requestId: string;
 }
 
-export interface CdpSession {
+interface CdpSession {
 	send: (rawMessage: string) => void;
 	detach: () => void;
 }
@@ -101,21 +126,25 @@ const DEEP_LINK_SCHEMES = new Set([
 ]);
 
 /**
- * Resolves the next `mousedown` in the guest's current document. Installs a
- * single capture-phase listener the first time (idempotent across repeated
- * injections into the same document) and queues a resolver per call so a
- * fresh `executeJavaScript` await always gets the *next* press, not a stale
- * one. Never calls `stopPropagation`/`preventDefault` — purely observes.
+ * Resolves `true` on the next `mousedown` in the guest's current document, or
+ * `false` on `pagehide`. Installs its listeners the first time (idempotent
+ * across repeated injections into the same document) and queues a resolver per
+ * call so a fresh `executeJavaScript` await always gets the *next* press, not a
+ * stale one. Never calls `stopPropagation`/`preventDefault` — purely observes.
+ * The `pagehide` settle is required: a pending `executeJavaScript` keeps its
+ * document alive after navigation, so each guest reload would leak one.
  */
 const NEXT_MOUSEDOWN_SCRIPT = `(() => {
 	if (!window.__supersetMousedownHook) {
 		window.__supersetMousedownHook = { resolvers: [] };
-		document.addEventListener("mousedown", () => {
+		const settle = (pressed) => {
 			const hook = window.__supersetMousedownHook;
 			const resolvers = hook.resolvers;
 			hook.resolvers = [];
-			for (const resolve of resolvers) resolve();
-		}, true);
+			for (const resolve of resolvers) resolve(pressed);
+		};
+		document.addEventListener("mousedown", () => settle(true), true);
+		window.addEventListener("pagehide", () => settle(false));
 	}
 	return new Promise((resolve) => {
 		window.__supersetMousedownHook.resolvers.push(resolve);
@@ -130,12 +159,12 @@ function protocolOf(url: string): string | null {
 	}
 }
 
-function isAllowedGuestUrl(url: string): boolean {
+export function isAllowedGuestUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && ALLOWED_GUEST_SCHEMES.has(protocol);
 }
 
-export function isDeepLinkUrl(url: string): boolean {
+function isDeepLinkUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && DEEP_LINK_SCHEMES.has(protocol);
 }
@@ -243,16 +272,24 @@ function withTimeout<T>(
 	});
 }
 
+type ExtensionMenuItems = (
+	contents: Electron.WebContents,
+	params: Electron.ContextMenuParams,
+) => Electron.MenuItem[];
+
 class BrowserManager extends EventEmitter {
 	private panes = new Map<string, PaneRegistration>();
 	private consoleLogs = new Map<string, ConsoleEntry[]>();
 	private consoleListeners = new Map<string, () => void>();
 	private contextMenuListeners = new Map<string, () => void>();
+	private extensionMenuItems: ExtensionMenuItems = () => [];
 	private beforeInputListeners = new Map<string, () => void>();
 	private navigationListeners = new Map<string, () => void>();
 	private popupListeners = new Map<string, () => void>();
 	private focusListeners = new Map<string, () => void>();
+	private formEditListeners = new Map<string, () => void>();
 	private cdpDetachers = new Map<string, () => void>();
+	private requestedPanes = new Set<string>();
 	// Ref-count of in-flight agent work per pane (a live CDP session, a
 	// screenshot capture). While present the guest renderer stays
 	// un-throttled — see acquireAgentWake. The entry object's identity ties
@@ -279,6 +316,7 @@ class BrowserManager extends EventEmitter {
 				this.navigationListeners,
 				this.popupListeners,
 				this.focusListeners,
+				this.formEditListeners,
 			]) {
 				const cleanup = map.get(paneId);
 				if (cleanup) {
@@ -305,6 +343,7 @@ class BrowserManager extends EventEmitter {
 			this.setupBeforeInput(paneId, wc);
 			this.setupNavigationGuard(paneId, wc);
 			this.setupFocusForward(paneId, wc);
+			this.setupFormEditTracking(paneId, wc);
 		}
 		this.emit("pane-registered", {
 			paneId,
@@ -313,6 +352,7 @@ class BrowserManager extends EventEmitter {
 	}
 
 	unregister(paneId: string): void {
+		this.requestedPanes.delete(paneId);
 		for (const map of [
 			this.consoleListeners,
 			this.contextMenuListeners,
@@ -320,6 +360,7 @@ class BrowserManager extends EventEmitter {
 			this.navigationListeners,
 			this.popupListeners,
 			this.focusListeners,
+			this.formEditListeners,
 		]) {
 			const cleanup = map.get(paneId);
 			if (cleanup) {
@@ -334,6 +375,7 @@ class BrowserManager extends EventEmitter {
 		// Tell subscribers when a live wake dies with the pane, so the renderer
 		// doesn't keep a stale pane id in its exemption set.
 		if (this.agentWakes.delete(paneId)) this.emitAgentActive();
+		this.emit("pane-unregistered", { paneId });
 	}
 
 	/**
@@ -450,11 +492,62 @@ class BrowserManager extends EventEmitter {
 
 	/**
 	 * Ask the renderer to open a URL in a workspace's browser pane. Consumed by
-	 * the `browser.onOpenRequest` subscription; the resulting pane announces
-	 * itself back through a `pane-registered` event.
+	 * the `browser.onOpenRequest` subscription; the renderer names the pane it
+	 * made through `resolveOpenRequest`.
 	 */
 	requestOpen(request: BrowserOpenRequest): void {
 		this.emit("open-request", request);
+	}
+
+	resolveOpenRequest(requestId: string, paneId: string): void {
+		this.requestedPanes.add(paneId);
+		this.emit(`open-resolved:${requestId}`, paneId);
+	}
+
+	/** Made for a `requestOpen`, so it is not the pane an extension's new tab is waiting for. */
+	isRequestedPane(paneId: string): boolean {
+		return this.requestedPanes.has(paneId);
+	}
+
+	markUse(paneId: string): void {
+		this.emit("agent-use", { paneId });
+	}
+
+	whenRegistered(
+		paneId: string,
+		workspaceId: string,
+		timeoutMs: number,
+	): { ready: Promise<Electron.WebContents | null>; cancel: () => void } {
+		let cancel = () => {};
+		const ready = new Promise<Electron.WebContents | null>((resolve) => {
+			const check = () => {
+				const wc = this.getWebContents(paneId, workspaceId);
+				if (!wc) return;
+				cancel();
+				resolve(wc);
+			};
+			const timer = setTimeout(() => {
+				cancel();
+				resolve(null);
+			}, timeoutMs);
+			cancel = () => {
+				clearTimeout(timer);
+				this.off("pane-registered", check);
+			};
+			this.on("pane-registered", check);
+			check();
+		});
+		return { ready, cancel };
+	}
+
+	/** Open `url` in a new pane beside `paneId`, as a `target="_blank"` link in it does. */
+	openInNewPane(paneId: string, url: string): void {
+		this.emit(`new-window:${paneId}`, url);
+	}
+
+	/** Close the pane, as Cmd+W in it does. */
+	requestClose(paneId: string): void {
+		this.emit(`close-pane:${paneId}`);
 	}
 
 	/**
@@ -497,6 +590,7 @@ class BrowserManager extends EventEmitter {
 			}
 		};
 
+		const extensionWorlds = createExtensionWorldFilter();
 		let closed = false;
 		const handleMessage = (
 			_event: Electron.Event,
@@ -504,11 +598,12 @@ class BrowserManager extends EventEmitter {
 			params: unknown,
 			sessionId?: string,
 		) => {
+			if (!extensionWorlds.shows(method, params)) return;
 			const outSessionId = tagEventSession(sessionId, flatSessionId);
 			onMessage(
 				JSON.stringify({
 					method,
-					params,
+					params: redactCookies(method, params),
 					...(outSessionId ? { sessionId: outSessionId } : {}),
 				}),
 			);
@@ -586,6 +681,19 @@ class BrowserManager extends EventEmitter {
 						JSON.stringify({
 							id,
 							error: { code: -32600, message: "Missing method" },
+							...(sessionId ? { sessionId } : {}),
+						}),
+					);
+					return;
+				}
+				const refusal =
+					cookieRefusal(method, params) ??
+					extensionWorlds.refusal(method, params);
+				if (refusal) {
+					onMessage(
+						JSON.stringify({
+							id,
+							error: { code: -32000, message: refusal },
 							...(sessionId ? { sessionId } : {}),
 						}),
 					);
@@ -753,6 +861,43 @@ class BrowserManager extends EventEmitter {
 			},
 			detach,
 		};
+	}
+
+	async getUnloadInfo(paneIds: string[]): Promise<PaneUnloadInfo> {
+		const memoryByPid = new Map(
+			app
+				.getAppMetrics()
+				.map((metric) => [metric.pid, metric.memory.workingSetSize]),
+		);
+		const panesByPid = new Map<number, number>();
+		for (const paneId of this.panes.keys()) {
+			const pid = this.getWebContents(paneId)?.getOSProcessId();
+			if (pid) panesByPid.set(pid, (panesByPid.get(pid) ?? 0) + 1);
+		}
+		const panes: PaneUnloadInfo["panes"] = {};
+		await Promise.all(
+			paneIds.map(async (paneId) => {
+				const wc = this.getWebContents(paneId);
+				if (!wc) return;
+				const pid = wc.getOSProcessId();
+				panes[paneId] = {
+					// A process can serve several panes; split its memory between them.
+					memoryKb: (memoryByPid.get(pid) ?? 0) / (panesByPid.get(pid) ?? 1),
+					audible: wc.isCurrentlyAudible(),
+					unsavedInput: await withTimeout(
+						wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
+							{ code: HAS_UNSAVED_INPUT_SCRIPT },
+						]),
+						UNLOAD_CHECK_TIMEOUT_MS,
+						"unsaved input check timed out",
+					).then(
+						(result) => result === true,
+						() => false,
+					),
+				};
+			}),
+		);
+		return { totalMemoryKb: Math.round(totalmem() / 1024), panes };
 	}
 
 	/**
@@ -1035,7 +1180,7 @@ class BrowserManager extends EventEmitter {
 				overrideBrowserWindowOptions: popupWindowOptions(),
 			};
 		}
-		this.emit(`new-window:${paneId}`, details.url);
+		this.openInNewPane(paneId, details.url);
 		return { action: "deny" };
 	}
 
@@ -1043,6 +1188,12 @@ class BrowserManager extends EventEmitter {
 	 * A popup loads arbitrary web content in the pane's session, so it gets the
 	 * pane's scheme guard, and the same window-open policy so the nested consent
 	 * window Google opens mid-flow stays a popup too.
+	 *
+	 * `popup-created` is what makes the window a tab for extensions. Chrome
+	 * counts a popup as a tab of its own window; while the extension host knew
+	 * only about panes, a password manager asking `chrome.tabs.query({active:
+	 * true, currentWindow: true})` for the field it was filling got the pane
+	 * behind the popup instead.
 	 */
 	private configurePopupWindow(
 		paneId: string,
@@ -1050,6 +1201,9 @@ class BrowserManager extends EventEmitter {
 	): void {
 		const wc = window.webContents;
 		markBrowserPanePopup(wc);
+		wc.on("context-menu", (_event, params) => {
+			this.popupContextMenu(wc, params);
+		});
 		const detachGuard = attachNavigationGuard(wc, (url) =>
 			this.emit("deep-link", url),
 		);
@@ -1060,6 +1214,30 @@ class BrowserManager extends EventEmitter {
 			this.configurePopupWindow(paneId, child);
 		});
 		window.on("closed", detachGuard);
+		// Last, and guarded: a listener that throws must not leave the popup
+		// without its scheme guard and window-open policy.
+		try {
+			this.emit("popup-created", { window });
+		} catch (error) {
+			console.error("[browser-manager] A popup listener failed:", error);
+		}
+	}
+
+	/** Items extensions add with `chrome.contextMenus`, for the pane's right-click menu. */
+	setExtensionMenuItems(items: ExtensionMenuItems): void {
+		this.extensionMenuItems = items;
+	}
+
+	// An extension's broken menu must not take the page's own menu with it.
+	private safeExtensionMenuItems(
+		...args: Parameters<ExtensionMenuItems>
+	): Electron.MenuItem[] {
+		try {
+			return this.extensionMenuItems(...args);
+		} catch (error) {
+			console.error("[browser-manager] Extension menu items failed:", error);
+			return [];
+		}
 	}
 
 	private setupContextMenu(paneId: string, wc: Electron.WebContents): void {
@@ -1067,145 +1245,12 @@ class BrowserManager extends EventEmitter {
 			_event: Electron.Event,
 			params: Electron.ContextMenuParams,
 		) => {
-			const { linkURL, pageURL, selectionText, editFlags } = params;
-
-			const menuItems: Electron.MenuItemConstructorOptions[] = [];
-
-			if (linkURL) {
-				menuItems.push(
-					{
-						label: i18n._(
-							msg({
-								message: "Open Link in Default Browser",
-							}),
-						),
-						click: () => {
-							void safeOpenExternal(linkURL);
-						},
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Open Link as New Split",
-							}),
-						),
-						click: () =>
-							this.emit(`context-menu-action:${paneId}`, {
-								action: "open-in-split" as const,
-								url: linkURL,
-							}),
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Copy Link Address",
-							}),
-						),
-						click: () => void clipboard.writeText(linkURL),
-					},
-					{ type: "separator" },
-				);
-			}
-
-			if (selectionText) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Copy",
-						}),
-					),
-					enabled: editFlags.canCopy,
-					click: () => wc.copy(),
-				});
-			}
-
-			if (editFlags.canPaste) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Paste",
-						}),
-					),
-					click: () => wc.paste(),
-				});
-			}
-
-			if (editFlags.canSelectAll) {
-				menuItems.push({
-					label: i18n._(
-						msg({
-							message: "Select All",
-						}),
-					),
-					click: () => wc.selectAll(),
-				});
-			}
-
-			if (selectionText || editFlags.canPaste || editFlags.canSelectAll) {
-				menuItems.push({ type: "separator" });
-			}
-
-			menuItems.push(
-				{
-					label: i18n._(
-						msg({
-							message: "Back",
-						}),
-					),
-					enabled: wc.canGoBack(),
-					click: () => wc.goBack(),
-				},
-				{
-					label: i18n._(
-						msg({
-							message: "Forward",
-						}),
-					),
-					enabled: wc.canGoForward(),
-					click: () => wc.goForward(),
-				},
-				{
-					label: i18n._(
-						msg({
-							message: "Reload",
-						}),
-					),
-					click: () => wc.reload(),
-				},
+			this.popupContextMenu(wc, params, (url) =>
+				this.emit(`context-menu-action:${paneId}`, {
+					action: "open-in-split" as const,
+					url,
+				}),
 			);
-
-			if (!linkURL) {
-				menuItems.push(
-					{ type: "separator" },
-					{
-						label: i18n._(
-							msg({
-								message: "Open Page in Default Browser",
-							}),
-						),
-						click: () => {
-							if (pageURL && pageURL !== "about:blank") {
-								void safeOpenExternal(pageURL);
-							}
-						},
-						enabled: !!pageURL && pageURL !== "about:blank",
-					},
-					{
-						label: i18n._(
-							msg({
-								message: "Copy Page URL",
-							}),
-						),
-						click: () => {
-							if (pageURL) void clipboard.writeText(pageURL);
-						},
-						enabled: !!pageURL && pageURL !== "about:blank",
-					},
-				);
-			}
-
-			const menu = Menu.buildFromTemplate(menuItems);
-			menu.popup();
 		};
 
 		wc.on("context-menu", handler);
@@ -1216,6 +1261,25 @@ class BrowserManager extends EventEmitter {
 				// webContents may be destroyed
 			}
 		});
+	}
+
+	private popupContextMenu(
+		wc: Electron.WebContents,
+		params: Electron.ContextMenuParams,
+		openInSplit?: (url: string) => void,
+	): void {
+		const menu = Menu.buildFromTemplate(
+			buildGuestContextMenu({
+				wc,
+				params,
+				extensionItems: this.safeExtensionMenuItems(wc, params),
+				openInSplit,
+			}),
+		);
+		// Without a window the menu goes to whichever one has focus, which is
+		// the window behind a popup that has not been clicked into yet.
+		const window = BrowserWindow.fromWebContents(wc.hostWebContents ?? wc);
+		menu.popup(window ? { window } : undefined);
 	}
 
 	/** The keystroke as a forwardable chord, or null when it is not one. */
@@ -1246,7 +1310,7 @@ class BrowserManager extends EventEmitter {
 				const key = input.key.toLowerCase();
 				if (key === "w") {
 					event.preventDefault();
-					this.emit(`close-pane:${paneId}`);
+					this.requestClose(paneId);
 					return;
 				}
 				if (key === "r") {
@@ -1291,26 +1355,25 @@ class BrowserManager extends EventEmitter {
 	 */
 	private setupFocusForward(paneId: string, wc: Electron.WebContents): void {
 		let cancelled = false;
-		// Bumped on every main-frame document. A navigation does not reject
-		// the executeJavaScript that was awaiting a mousedown in the old
-		// document — that promise simply never settles — so a loop tied to the
-		// old generation can never notice on its own. dom-ready starts a fresh
-		// loop for the new document; the stale one exits at its next check and
-		// a late resolution from it is dropped rather than emitted.
+		// Bumped on every main-frame document. dom-ready starts a fresh loop
+		// for the new document; the stale one exits at its next check and a
+		// late resolution from it is dropped rather than emitted.
 		let generation = 0;
 		const loop = async (gen: number): Promise<void> => {
 			while (!cancelled && gen === generation) {
 				if (wc.isDestroyed()) return;
+				let pressed: unknown;
 				try {
-					await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
+					pressed = await wc.executeJavaScript(NEXT_MOUSEDOWN_SCRIPT);
 				} catch {
 					// Script failed to run (mid-navigation, crashed renderer):
 					// retry, but not in a hot spin.
 					await new Promise((resolve) => setTimeout(resolve, 100));
 					continue;
 				}
-				if (cancelled || gen !== generation) return;
+				if (pressed === false || cancelled || gen !== generation) return;
 				this.emit(`pane-focus:${paneId}`);
+				this.emit("pane-focused", { paneId });
 			}
 		};
 		const rearm = (): void => {
@@ -1328,6 +1391,32 @@ class BrowserManager extends EventEmitter {
 			}
 		});
 		void loop(generation);
+	}
+
+	private setupFormEditTracking(
+		paneId: string,
+		wc: Electron.WebContents,
+	): void {
+		const install = (): void => {
+			Promise.resolve()
+				.then(() =>
+					wc.executeJavaScriptInIsolatedWorld(FORM_EDITS_WORLD_ID, [
+						{ code: TRACK_FORM_EDITS_SCRIPT },
+					]),
+				)
+				.catch(() => {
+					// Mid-navigation or a crashed page; the next dom-ready installs again.
+				});
+		};
+		wc.on("dom-ready", install);
+		this.formEditListeners.set(paneId, () => {
+			try {
+				wc.off("dom-ready", install);
+			} catch {
+				// webContents may be destroyed
+			}
+		});
+		install();
 	}
 
 	private setupConsoleCapture(paneId: string, wc: Electron.WebContents): void {

@@ -1,4 +1,1 @@
-export {
-	type HostReachability,
-	useHostReachability,
-} from "./useHostReachability";
+export { useHostReachability } from "./useHostReachability";

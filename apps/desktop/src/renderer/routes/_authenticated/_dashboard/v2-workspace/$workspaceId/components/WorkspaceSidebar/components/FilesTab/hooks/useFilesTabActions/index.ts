@@ -1,1 +1,1 @@
-export { type FilesTabActions, useFilesTabActions } from "./useFilesTabActions";
+export { useFilesTabActions } from "./useFilesTabActions";

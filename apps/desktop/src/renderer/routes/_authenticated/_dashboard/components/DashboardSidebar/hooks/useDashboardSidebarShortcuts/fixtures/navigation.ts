@@ -19,6 +19,7 @@ mock.module("renderer/hotkeys", () => ({
 }));
 mock.module("@tanstack/react-router", () => ({
 	useNavigate: () => navigate,
+	useRouterState: () => "",
 	useMatchRoute: () => () =>
 		currentWorkspaceId ? { workspaceId: currentWorkspaceId } : false,
 }));
@@ -70,6 +71,7 @@ function workspace(
 		taskId: null,
 		pendingTransaction: null,
 		isMine: null,
+		creator: null,
 		sandboxStatus: null,
 	};
 }

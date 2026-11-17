@@ -11,7 +11,8 @@ import { userError } from "@superset/trpc/i18n-error";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { projects, workspaces } from "../../../db/schema";
+import { workspaces } from "../../../db/schema";
+import { getProjectIncludingDeleted } from "../../../projects/local-project-store";
 import { createGitEnvResolver } from "../../../runtime/git";
 import { getGitAuthorName } from "../../../runtime/git/identity";
 import { resolveRef } from "../../../runtime/git/refs";
@@ -1538,9 +1539,7 @@ export const workspacesRouter = router({
 			// AI rename also renames the git branch against the project repo;
 			// session workspaces (null projectId) have neither.
 			const project = local.projectId
-				? ctx.db.query.projects
-						.findFirst({ where: eq(projects.id, local.projectId) })
-						.sync()
+				? getProjectIncludingDeleted(ctx.db, local.projectId)
 				: undefined;
 			if (!project) {
 				throw new TRPCError({

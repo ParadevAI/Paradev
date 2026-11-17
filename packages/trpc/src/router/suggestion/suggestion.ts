@@ -1,5 +1,4 @@
 import { db } from "@superset/db/client";
-import type { IntegrationProvider } from "@superset/db/enums";
 import {
 	suggestions,
 	taskLabels,
@@ -7,13 +6,12 @@ import {
 	taskStatuses,
 	tasks,
 } from "@superset/db/schema";
-import { retiredTaskColumns } from "@superset/db/task-list-query";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { nudge } from "../../lib/realtime";
-import { jwtProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { addLabel, linkTask, setProject } from "../cloud-workspace/record";
 
@@ -40,8 +38,6 @@ type CloudWorkspaceSuggestionView = {
 			task: {
 				id: string;
 				slug: string;
-				externalProvider: IntegrationProvider | null;
-				externalKey: string | null;
 				title: string;
 				status: {
 					type: string;
@@ -129,7 +125,7 @@ async function loadPending(id: string) {
  * accepts or dismisses. A dismissed proposal is kept, so it is never made again.
  */
 export const suggestionRouter = {
-	listForCloudWorkspace: jwtProcedure
+	listForCloudWorkspace: personProcedure
 		.input(z.object({ cloudWorkspaceId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.cloudWorkspaceId);
@@ -154,8 +150,6 @@ export const suggestionRouter = {
 							.select({
 								id: tasks.id,
 								slug: tasks.slug,
-								externalProvider: retiredTaskColumns.externalProvider,
-								externalKey: retiredTaskColumns.externalKey,
 								title: tasks.title,
 								statusType: taskStatuses.type,
 								statusColor: taskStatuses.color,
@@ -199,8 +193,6 @@ export const suggestionRouter = {
 							task: {
 								id: task.id,
 								slug: task.slug,
-								externalProvider: task.externalProvider,
-								externalKey: task.externalKey,
 								title: task.title,
 								status:
 									task.statusType && task.statusColor
@@ -231,7 +223,7 @@ export const suggestionRouter = {
 		}),
 
 	/** Proposes a change to a cloud workspace; proposing one that was dismissed does nothing. */
-	createForCloudWorkspace: jwtProcedure
+	createForCloudWorkspace: personProcedure
 		.input(
 			z.object({
 				cloudWorkspaceId: z.string().uuid(),
@@ -253,7 +245,7 @@ export const suggestionRouter = {
 					source: input.source,
 					reason: input.reason,
 					proposedByKind: "user",
-					proposedByUserId: ctx.userId,
+					proposedByUserId: ctx.principal.userId,
 				})
 				.onConflictDoNothing()
 				.returning({ id: suggestions.id });
@@ -261,7 +253,7 @@ export const suggestionRouter = {
 			return { id: created?.id ?? null };
 		}),
 
-	accept: jwtProcedure
+	accept: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const suggestion = await loadPending(input.id);
@@ -273,7 +265,7 @@ export const suggestionRouter = {
 				.update(suggestions)
 				.set({
 					status: "accepted",
-					decidedByUserId: ctx.userId,
+					decidedByUserId: ctx.principal.userId,
 					decidedAt: new Date(),
 				})
 				.where(
@@ -284,7 +276,7 @@ export const suggestionRouter = {
 				)
 				.returning({ id: suggestions.id });
 			if (!claimed) return { accepted: false };
-			const actor = { kind: "user" as const, userId: ctx.userId };
+			const actor = { kind: "user" as const, userId: ctx.principal.userId };
 			switch (suggestion.objectType) {
 				case "task":
 					await linkTask({
@@ -298,7 +290,7 @@ export const suggestionRouter = {
 					await setProject({
 						row,
 						projectId: suggestion.objectId,
-						userId: ctx.userId,
+						userId: ctx.principal.userId,
 						suggestionId: suggestion.id,
 					});
 					break;
@@ -306,7 +298,7 @@ export const suggestionRouter = {
 					await addLabel({
 						row,
 						labelId: suggestion.objectId,
-						userId: ctx.userId,
+						userId: ctx.principal.userId,
 						suggestionId: suggestion.id,
 					});
 					break;
@@ -315,7 +307,7 @@ export const suggestionRouter = {
 			return { accepted: true };
 		}),
 
-	dismiss: jwtProcedure
+	dismiss: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const suggestion = await loadPending(input.id);
@@ -324,7 +316,7 @@ export const suggestionRouter = {
 				.update(suggestions)
 				.set({
 					status: "dismissed",
-					decidedByUserId: ctx.userId,
+					decidedByUserId: ctx.principal.userId,
 					decidedAt: new Date(),
 				})
 				.where(

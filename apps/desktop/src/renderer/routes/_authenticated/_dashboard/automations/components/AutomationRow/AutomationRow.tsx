@@ -51,7 +51,7 @@ interface AutomationRowProps {
 	/** Shared ticking clock so relative times stay fresh without per-row timers. */
 	now: Date;
 	isOwner: boolean;
-	canDelete: boolean;
+	canArchive: boolean;
 	/** True while a run/retry dispatch for this automation is in flight. */
 	isRetrying: boolean;
 	/** Every group in the organization, for "Move to group". */
@@ -77,6 +77,8 @@ interface AutomationRowProps {
 	onRunNow: (automation: AutomationListItem) => void;
 	onToggleEnabled: (automation: AutomationListItem) => void;
 	onMoveToGroup: (automation: AutomationListItem, group: string | null) => void;
+	onArchive: (automation: AutomationListItem) => void;
+	onRestore: (automation: AutomationListItem) => void;
 	onDelete: (automation: AutomationListItem) => void;
 }
 
@@ -106,7 +108,7 @@ export function AutomationRow({
 	lastRun,
 	now,
 	isOwner,
-	canDelete,
+	canArchive,
 	isRetrying,
 	groups,
 	indented,
@@ -115,6 +117,8 @@ export function AutomationRow({
 	onRunNow,
 	onToggleEnabled,
 	onMoveToGroup,
+	onArchive,
+	onRestore,
 	onDelete,
 }: AutomationRowProps) {
 	const { formatDateTime } = useFormat();
@@ -159,7 +163,8 @@ export function AutomationRow({
 		<AutomationActionsMenuItems
 			kind={kind}
 			isOwner={isOwner}
-			canDelete={canDelete}
+			canArchive={canArchive}
+			archived={automation.archivedAt !== null}
 			enabled={automation.enabled}
 			groups={groups}
 			currentGroup={automation.group}
@@ -169,6 +174,8 @@ export function AutomationRow({
 			onToggleEnabled={() => onToggleEnabled(automation)}
 			onHistory={openHistory}
 			onMoveToGroup={(group) => onMoveToGroup(automation, group)}
+			onArchive={() => onArchive(automation)}
+			onRestore={() => onRestore(automation)}
 			onDelete={() => onDelete(automation)}
 		/>
 	);
@@ -392,7 +399,7 @@ export function AutomationRow({
 
 					<TableCell className="pr-4">
 						<span className="flex items-center justify-end gap-0.5">
-							{isOwner && (
+							{isOwner && automation.archivedAt === null && (
 								<Tooltip>
 									<TooltipTrigger asChild>
 										<Button

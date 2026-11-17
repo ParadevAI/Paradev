@@ -11,7 +11,7 @@ import { cn } from "@superset/ui/utils";
 import { VscChevronDown } from "react-icons/vsc";
 import { OpenInExternalDropdownItems } from "renderer/components/OpenInExternalDropdown";
 import { HotkeyLabel } from "renderer/hotkeys";
-import { useWorkspaceOpenIn } from "../../hooks/useWorkspaceOpenIn";
+import { useWorkspaceOpenIn } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceOpenIn";
 
 interface V2OpenInMenuButtonProps {
 	path: string;

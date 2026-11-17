@@ -1,6 +1,6 @@
 {
 	"name": "@superset/sdk",
-	"version": "0.0.1-alpha.12",
+	"version": "0.0.1-alpha.13",
 	"description": "TypeScript SDK for the Paradev API",
 	"homepage": "https://paradev.com",
 	"repository": {
@@ -21,7 +21,7 @@
 	],
 	"private": true,
 	"type": "module",
-	"license": "Apache-2.0",
+	"license": "MIT",
 	"exports": {
 		".": {
 			"types": "./src/index.ts",

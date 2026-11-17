@@ -9,7 +9,8 @@ import { eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
-import { jwtProcedure, protectedProcedure, userError } from "../../trpc";
+import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
+import { personProcedure, userError } from "../../trpc";
 
 const resend = new Resend(env.RESEND_API_KEY);
 const ACTIVATION_EVENT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -38,7 +39,7 @@ async function exitActivationEmailCampaign(userId: string) {
 }
 
 export const v2WorkspaceRouter = {
-	list: jwtProcedure
+	list: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -63,7 +64,7 @@ export const v2WorkspaceRouter = {
 			> => [],
 		),
 
-	create: jwtProcedure
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -91,7 +92,7 @@ export const v2WorkspaceRouter = {
 					name: input.name,
 					branch: input.branch,
 					type: input.type,
-					createdByUserId: ctx.userId,
+					createdByUserId: ctx.principal.userId,
 					taskId: input.taskId ?? null,
 					createdAt: now,
 					updatedAt: now,
@@ -103,7 +104,7 @@ export const v2WorkspaceRouter = {
 	// Exits the Resend activation campaign, and captures nothing: the host-service
 	// already emits `workspace_created` for the same workspace, so a capture here
 	// double-counts it.
-	trackCreated: jwtProcedure
+	trackCreated: personProcedure
 		.input(
 			z.object({
 				workspaceId: z.string(),
@@ -115,7 +116,7 @@ export const v2WorkspaceRouter = {
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			if (!ctx.organizationIds.includes(input.organizationId)) {
+			if (!(await isMember(ctx, input.organizationId))) {
 				throw userError({
 					code: "FORBIDDEN",
 					message: "Not a member of this organization",
@@ -124,13 +125,13 @@ export const v2WorkspaceRouter = {
 			}
 
 			if (input.type !== "main") {
-				await exitActivationEmailCampaign(ctx.userId);
+				await exitActivationEmailCampaign(ctx.principal.userId);
 			}
 
 			return { ok: true };
 		}),
 
-	setTask: protectedProcedure
+	setTask: personProcedure
 		.input(
 			z.object({
 				workspaceId: z.string().uuid(),
@@ -139,7 +140,7 @@ export const v2WorkspaceRouter = {
 		)
 		.mutation(async () => ({ success: true as const, txid: null })),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -157,7 +158,7 @@ export const v2WorkspaceRouter = {
 				const now = new Date();
 				return {
 					id: input.id,
-					organizationId: ctx.activeOrganizationId ?? "",
+					organizationId: organizationOrFirst(ctx) ?? "",
 					projectId: "",
 					hostId: input.hostId ?? "",
 					name: input.name ?? "",
@@ -172,7 +173,7 @@ export const v2WorkspaceRouter = {
 			},
 		),
 
-	getFromHost: jwtProcedure
+	getFromHost: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -181,7 +182,7 @@ export const v2WorkspaceRouter = {
 		)
 		.query(async (): Promise<SelectV2Workspace | null> => null),
 
-	updateNameFromHost: jwtProcedure
+	updateNameFromHost: personProcedure
 		.input(
 			z
 				.object({
@@ -201,11 +202,11 @@ export const v2WorkspaceRouter = {
 			txid: null,
 		})),
 
-	delete: jwtProcedure
+	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async () => ({ success: true, alreadyGone: true as const })),
 
-	deleteMainForHost: jwtProcedure
+	deleteMainForHost: personProcedure
 		.input(z.object({ id: z.string().uuid(), projectId: z.string().uuid() }))
 		.mutation(async () => ({ success: true, alreadyGone: true as const })),
 } satisfies TRPCRouterRecord;

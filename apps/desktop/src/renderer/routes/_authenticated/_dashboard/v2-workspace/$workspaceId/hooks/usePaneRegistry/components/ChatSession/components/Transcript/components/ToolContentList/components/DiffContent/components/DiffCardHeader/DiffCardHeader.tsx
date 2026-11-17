@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { cn } from "@superset/ui/utils";
-import { DiffStatText } from "../../../../../../../../../../../../components/DiffStatText";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { useChatPaneActions } from "../../../../../../../../providers/ChatPaneActionsProvider";
 import { CopyButton } from "../../../../../../../CopyButton";
 import type { DiffStats } from "../../../../../../utils/diffStats";

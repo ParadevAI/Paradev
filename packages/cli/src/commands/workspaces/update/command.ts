@@ -1,8 +1,13 @@
 import { boolean, CLIError, positional, string } from "@superset/cli-framework";
+import { MACHINE_SIZES } from "@superset/shared/billing";
 import { resolveWorkspaceHost } from "../../../lib/cloud-workspaces";
 import { command } from "../../../lib/command";
 import { resolveHostTarget } from "../../../lib/host-target";
-import { updateCloudWorkspace } from "./updateCloudWorkspace";
+import {
+	type CloudWorkspaceResize,
+	describeResize,
+	updateCloudWorkspace,
+} from "./updateCloudWorkspace";
 
 export default command({
 	description:
@@ -39,6 +44,11 @@ export default command({
 		removeLabel: string()
 			.variadic()
 			.desc("Remove a label from a cloud workspace by name. Repeatable"),
+		machineSize: string()
+			.enum(...MACHINE_SIZES)
+			.desc(
+				"Resize a cloud workspace: `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB), `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where your plan includes them. A running box restarts at the new size: every terminal and agent on it ends, files survive",
+			),
 	},
 	run: async ({ ctx, args, options }) => {
 		const id = args.id as string;
@@ -74,6 +84,7 @@ export default command({
 				: undefined;
 
 		const cloudOnly = {
+			"--machine-size": options.machineSize,
 			"--visibility": options.visibility,
 			"--add-label": options.addLabel?.length ? options.addLabel : undefined,
 			"--remove-label": options.removeLabel?.length
@@ -88,7 +99,7 @@ export default command({
 		) {
 			throw new CLIError(
 				"No fields to update",
-				"Pass --name, --task-id, --clear-task, --tag, --clear-tags, --visibility, --add-label, or --remove-label",
+				"Pass --name, --task-id, --clear-task, --tag, --clear-tags, --machine-size, --visibility, --add-label, or --remove-label",
 			);
 		}
 
@@ -105,8 +116,15 @@ export default command({
 				visibility: options.visibility ?? undefined,
 				addLabels: options.addLabel ?? undefined,
 				removeLabels: options.removeLabel ?? undefined,
+				machineSize: options.machineSize ?? undefined,
 			});
-			return { data, message: `Updated cloud workspace ${id}` };
+			const resize = data.resize as CloudWorkspaceResize | undefined;
+			return {
+				data,
+				message: resize
+					? describeResize(id, resize)
+					: `Updated cloud workspace ${id}`,
+			};
 		}
 		for (const [flag, value] of Object.entries(cloudOnly)) {
 			if (value !== undefined) {

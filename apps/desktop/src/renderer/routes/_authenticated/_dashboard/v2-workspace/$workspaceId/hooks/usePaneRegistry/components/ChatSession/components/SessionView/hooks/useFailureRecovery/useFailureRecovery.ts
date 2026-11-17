@@ -1,13 +1,20 @@
 import { CONTINUE_PROMPT } from "@superset/chat/core";
 import type { SessionConfigOption, UserContent } from "@superset/chat/protocol";
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { TurnFailureActions } from "../../../../providers/TurnFailureActionsProvider";
+import type {
+	AgentSignIn,
+	TurnFailureActions,
+} from "../../../../providers/TurnFailureActionsProvider";
 
 const CONTINUE: UserContent[] = [{ type: "text", text: CONTINUE_PROMPT }];
 
 export function useFailureRecovery({
 	blocked,
 	configOptions,
+	manualSignIn,
+	openAgentSettings,
+	agentSignIn,
+	lastPrompt,
 	onRestartAndContinue,
 	onStartNewChat,
 	openModelPicker,
@@ -16,6 +23,11 @@ export function useFailureRecovery({
 }: {
 	blocked: boolean;
 	configOptions: SessionConfigOption[] | undefined;
+	manualSignIn?: boolean;
+	openAgentSettings?: () => void;
+	agentSignIn?: AgentSignIn;
+	/** Resent after a restart for a sign-in: the agent never ran it. */
+	lastPrompt?: string;
 	onRestartAndContinue?: ((prompt: string) => Promise<boolean>) | undefined;
 	onStartNewChat?: (() => Promise<boolean>) | undefined;
 	openModelPicker: () => void;
@@ -82,9 +94,14 @@ export function useFailureRecovery({
 					}
 				: {}),
 			...(onRestartAndContinue
-				? { restartAndContinue: () => onRestartAndContinue(CONTINUE_PROMPT) }
+				? {
+						restartAndContinue: () =>
+							onRestartAndContinue(lastPrompt ?? CONTINUE_PROMPT),
+					}
 				: {}),
 			...(onStartNewChat ? { startNewChat: onStartNewChat } : {}),
+			...(manualSignIn ? { manualSignIn, openAgentSettings } : {}),
+			...(agentSignIn ? { agentSignIn } : {}),
 			dismissed,
 			setDismissed,
 		}),
@@ -94,7 +111,11 @@ export function useFailureRecovery({
 			canChangeModel,
 			openModelPicker,
 			onRestartAndContinue,
+			lastPrompt,
 			onStartNewChat,
+			manualSignIn,
+			openAgentSettings,
+			agentSignIn,
 			dismissed,
 			setDismissed,
 		],

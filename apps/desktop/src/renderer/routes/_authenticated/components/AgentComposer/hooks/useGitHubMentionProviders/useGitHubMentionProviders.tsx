@@ -142,6 +142,7 @@ export function useGitHubMentionProviders(
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
 								includeClosed: query !== "",
+								deferChecks: true,
 							});
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)

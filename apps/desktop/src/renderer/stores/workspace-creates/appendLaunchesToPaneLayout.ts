@@ -1,5 +1,10 @@
-import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
+import {
+	type CreatePaneInput,
+	createWorkspaceStore,
+	type WorkspaceState,
+} from "@superset/panes";
 import type {
+	ChatPaneData,
 	PaneViewerData,
 	TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
@@ -17,6 +22,7 @@ type AgentLaunchResult =
 			sessionId: string;
 			label: string;
 			chatSessionId?: string;
+			chatAgentId?: string;
 	  }
 	| { ok: false; error: string };
 
@@ -29,6 +35,18 @@ interface AppendArgs {
 interface PaneLaunch {
 	sessionId: string;
 	label?: string;
+	pane: CreatePaneInput<PaneViewerData>;
+}
+
+function terminalLaunch(terminalId: string, label?: string): PaneLaunch {
+	return {
+		sessionId: terminalId,
+		label,
+		pane: {
+			kind: "terminal",
+			data: { terminalId } satisfies TerminalPaneData,
+		},
+	};
 }
 
 export function appendLaunchesToPaneLayout({
@@ -36,24 +54,52 @@ export function appendLaunchesToPaneLayout({
 	terminals,
 	agents,
 }: AppendArgs): WorkspaceState<PaneViewerData> {
-	const terminalLaunches: PaneLaunch[] = terminals.map((entry) => ({
-		sessionId: entry.terminalId,
-		label: entry.label,
-	}));
-	const agentLaunches: PaneLaunch[] = agents
-		.filter(
-			(entry): entry is Extract<typeof entry, { ok: true }> =>
-				entry.ok && !entry.chatSessionId,
-		)
-		.map((entry) => ({
-			sessionId: entry.sessionId,
-			label: entry.label,
-		}));
+	const terminalLabels = new Map(
+		terminals.map((entry) => [entry.terminalId, entry.label]),
+	);
 	// A wait-for-setup chained agent reuses the setup terminal, so its result
-	// carries the same session id as the setup terminal descriptor — dedupe to
-	// one tab (first entry wins, keeping the setup terminal's label).
-	const seen = new Set<string>();
-	const launches = [...terminalLaunches, ...agentLaunches].filter((launch) => {
+	// carries the same session id — it gets one tab with the setup label.
+	const agentLaunches = agents.flatMap((entry): PaneLaunch[] => {
+		if (!entry.ok) return [];
+		if (!entry.chatSessionId) {
+			return [
+				terminalLaunch(
+					entry.sessionId,
+					terminalLabels.has(entry.sessionId)
+						? terminalLabels.get(entry.sessionId)
+						: entry.label,
+				),
+			];
+		}
+		if (!entry.chatAgentId) return [];
+		return [
+			{
+				sessionId: entry.sessionId,
+				pane: {
+					kind: "chat-v3",
+					data: {
+						terminalId: entry.sessionId,
+						sessionId: entry.chatSessionId,
+						agent: { id: entry.chatAgentId },
+					} satisfies ChatPaneData,
+				},
+			},
+		];
+	});
+	const seen = new Set(
+		(existing?.tabs ?? []).flatMap((tab) =>
+			Object.values(tab.panes).flatMap((pane) => {
+				const data = pane.data as Partial<ChatPaneData>;
+				return [data.terminalId, data.sessionId].filter(
+					(id): id is string => typeof id === "string",
+				);
+			}),
+		),
+	);
+	const launches = [
+		...agentLaunches,
+		...terminals.map((entry) => terminalLaunch(entry.terminalId, entry.label)),
+	].filter((launch) => {
 		if (seen.has(launch.sessionId)) return false;
 		seen.add(launch.sessionId);
 		return true;
@@ -67,17 +113,16 @@ export function appendLaunchesToPaneLayout({
 		initialState: existing ?? EMPTY_STATE,
 	});
 
-	for (const launch of launches) {
+	let firstTabId: string | null = null;
+	for (const [index, launch] of launches.entries()) {
 		store.getState().addTab({
-			titleOverride: launch.label,
-			panes: [
-				{
-					kind: "terminal",
-					data: { terminalId: launch.sessionId } satisfies TerminalPaneData,
-				},
-			],
+			...(launch.label ? { titleOverride: launch.label } : {}),
+			focus: index === 0,
+			panes: [launch.pane],
 		});
+		if (index === 0) firstTabId = store.getState().activeTabId;
 	}
+	if (firstTabId) store.getState().setActiveTab(firstTabId);
 
 	const next = store.getState();
 	return {

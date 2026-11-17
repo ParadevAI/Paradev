@@ -1,4 +1,4 @@
-import { useWorkspaceOpenInTarget } from "../../hooks/useWorkspaceOpenInTarget";
+import { useWorkspaceOpenInTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceOpenInTarget";
 import { V2OpenInMenuButton } from "../V2OpenInMenuButton";
 
 interface V2WorkspaceOpenInButtonProps {
@@ -16,6 +16,7 @@ export function V2WorkspaceOpenInButton({
 			branch={target.branch}
 			path={target.worktreePath}
 			projectId={target.projectId}
+			hotkeys={false}
 		/>
 	);
 }
