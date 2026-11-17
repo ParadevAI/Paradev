@@ -109,6 +109,9 @@ export const chatsAgents = chatsSchema.table(
 			onDelete: "cascade",
 		}),
 		status: chatsAgentStatus("status").notNull().default("stopped"),
+		/** The directory listing it was made from, and that listing's version then. */
+		listingSlug: text("listing_slug"),
+		listingVersion: text("listing_version"),
 		/** Whether its owner lets it act in Paradev with the owner's access. */
 		paradevAccess: boolean("paradev_access").notNull().default(false),
 		/** The sandbox serving its turns; a new id at every wake. */
@@ -498,4 +501,21 @@ export const chatsAppCalls = chatsSchema.table(
 		index("app_calls_owner_created_idx").on(t.ownerUserId, t.createdAt),
 		index("app_calls_agent_created_idx").on(t.agentId, t.createdAt),
 	],
+);
+
+/**
+ * Files a new agent starts with, from its listing: written into its folder
+ * at its first wake, then deleted here, so they are the agent's own after.
+ */
+export const chatsAgentSeedFiles = chatsSchema.table(
+	"agent_seed_files",
+	{
+		agentId: uuid("agent_id")
+			.notNull()
+			.references(() => chatsAgents.id, { onDelete: "cascade" }),
+		path: text("path").notNull(),
+		content: text("content").notNull(),
+		createdAt: createdAt(),
+	},
+	(t) => [primaryKey({ columns: [t.agentId, t.path] })],
 );
