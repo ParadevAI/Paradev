@@ -4,6 +4,7 @@
 		"index",
 		"github",
 		"sentry",
+		"clickhouse",
 		"stripe",
 		"peec",
 		"supabase",

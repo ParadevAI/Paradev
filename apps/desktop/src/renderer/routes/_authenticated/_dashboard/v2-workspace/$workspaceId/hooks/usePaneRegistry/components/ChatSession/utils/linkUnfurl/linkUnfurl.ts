@@ -28,6 +28,7 @@ const SERVICE_HOSTS: [RegExp, string][] = [
 	[/(^|\.)figma\.com$/, "figma"],
 	[/(^|\.)stripe\.com$/, "stripe"],
 	[/(^|\.)neon\.(tech|com)$/, "neon"],
+	[/(^|\.)clickhouse\.(cloud|com)$/, "clickhouse"],
 	[/(^|\.)ynab\.com$/, "ynab"],
 	[/(^|\.)granola\.(ai|so)$/, "granola"],
 	[/(^|\.)superhuman\.com$/, "superhuman"],

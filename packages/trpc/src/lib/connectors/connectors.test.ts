@@ -350,6 +350,67 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org-cold-bar", label: "Tegon" });
 	});
 
+	test("clickhouse_mcp reads the first organization the user can see", async () => {
+		const organizations = {
+			result: [
+				{
+					id: "7c1e2a4b-0d3f-4b6a-9e21-3f5d8c9a1b20",
+					name: "Tegon",
+					createdAt: "2025-06-19T16:05:59Z",
+					privateEndpoints: [],
+				},
+			],
+		};
+		const calls: { method?: string; name?: string; auth: string | null }[] = [];
+		globalThis.fetch = (async (_url: string, init: RequestInit) => {
+			const body = init.body
+				? (JSON.parse(String(init.body)) as {
+						id?: number;
+						method?: string;
+						params?: { name?: string };
+					})
+				: {};
+			calls.push({
+				method: body.method,
+				name: body.params?.name,
+				auth: new Headers(init.headers).get("Authorization"),
+			});
+			if (init.method === "DELETE") return new Response(null, { status: 204 });
+			if (body.id === undefined) return new Response(null, { status: 202 });
+			const result =
+				body.method === "tools/call"
+					? { structuredContent: organizations }
+					: { protocolVersion: "2025-06-18" };
+			return new Response(
+				JSON.stringify({ jsonrpc: "2.0", id: body.id, result }),
+				{
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				},
+			);
+		}) as unknown as typeof fetch;
+
+		const identity = await probeIdentity(
+			"clickhouse_mcp",
+			connectorMethod(requireConnector("clickhouse_mcp")),
+			"ch-test",
+		);
+
+		expect(calls[2]).toEqual({
+			method: "tools/call",
+			name: "get_organizations",
+			auth: "Bearer ch-test",
+		});
+		expect(identity.account).toEqual({
+			id: "7c1e2a4b-0d3f-4b6a-9e21-3f5d8c9a1b20",
+			label: "Tegon",
+		});
+		expect(identity.user).toEqual({
+			id: "7c1e2a4b-0d3f-4b6a-9e21-3f5d8c9a1b20",
+			label: "Tegon",
+		});
+	});
+
 	test("peec_mcp reads the first project from a columnar result", async () => {
 		const projects = {
 			columns: ["id", "name", "status"],

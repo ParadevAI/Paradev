@@ -137,6 +137,13 @@ export const CATALOG: {
 				description: msg({ message: "Inspect branches and run SQL" }),
 			},
 			{
+				name: "clickhouse",
+				displayName: "ClickHouse Cloud",
+				description: msg({
+					message: "Explore tables and run read-only queries",
+				}),
+			},
+			{
 				name: "supabase",
 				displayName: "Supabase",
 				description: msg({ message: "Inspect tables and apply migrations" }),
