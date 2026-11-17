@@ -18247,6 +18247,13 @@ msgstr "보내는 중…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "터미널 컨텍스트 {0}자(약 {1} 토큰)를 {2}에 보냅니다."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "<0>{0}</0>(으)로 돌아갑니다"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "<0>이 컴퓨터의 앱</0>으로 돌아갑니다"
+
 msgid "Sensitive"
 msgstr "민감"
 

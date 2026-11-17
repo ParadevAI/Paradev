@@ -18241,6 +18241,13 @@ msgstr "Надсилання…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Надсилає агенту {2} контекст термінала: символів — {0}, токенів — приблизно {1}."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "Поверне вас на <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "Поверне вас до <0>застосунку на цьому комп'ютері</0>"
+
 msgid "Sensitive"
 msgstr "Конфіденційно"
 

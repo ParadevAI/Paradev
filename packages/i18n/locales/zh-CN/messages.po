@@ -18247,6 +18247,13 @@ msgstr "正在发送…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "将向 {2} 发送 {0} 个字符的终端上下文（约 {1} 个 token）。"
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "将返回到 <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "将返回到<0>此电脑上的应用</0>"
+
 msgid "Sensitive"
 msgstr "敏感"
 
