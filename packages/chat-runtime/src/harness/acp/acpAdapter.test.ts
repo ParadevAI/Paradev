@@ -1,7 +1,7 @@
 import { describe, expect, it, jest, spyOn } from "bun:test";
 import { spawn } from "node:child_process";
 import type { ChatSelections } from "@superset/chat/core";
-import type { Item } from "@superset/chat/protocol";
+import type { Item, ToolCall } from "@superset/chat/protocol";
 import { AGENT_DEFAULT_MODE, wrapHiddenText } from "@superset/chat/protocol";
 import type { AdapterEvent, ResolveAttachment } from "../types";
 import {
@@ -589,6 +589,19 @@ function itemsOf(events: AdapterEvent[]) {
 		.filter((e) => e.kind === "item")
 		.map((e) => (e.kind === "item" ? e.item : null))
 		.filter((item) => item !== null);
+}
+
+function backgroundRunsOf(events: AdapterEvent[], idSuffix: string) {
+	return events.flatMap((event) =>
+		event.kind === "item" && event.item.id.endsWith(idSuffix)
+			? [
+					{
+						turnId: event.turnId,
+						background: (event.item as ToolCall).background,
+					},
+				]
+			: [],
+	);
 }
 
 function sessionsOf(events: AdapterEvent[]) {
@@ -3447,6 +3460,125 @@ describe("AcpAdapter on protocol v2", () => {
 				: [],
 		);
 		expect(lists).toEqual([["bun run dev"], []]);
+
+		await adapter.dispose();
+	});
+
+	it("records a background task's run on the call that started it, in that call's turn", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "bash-1",
+			title: "npm test",
+			kind: "execute",
+			status: "completed",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "task-1",
+			name: "npm test",
+			canStop: true,
+			toolCallId: "bash-1",
+		});
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "task-1",
+			state: "failed",
+			summary: 'Background command "npm test" failed with exit code 1',
+		});
+		await flush();
+
+		const runs = backgroundRunsOf(events, "bash-1");
+		const [first] = runs;
+		expect(runs.every((run) => run.turnId === first?.turnId)).toBe(true);
+		expect(runs.map((run) => run.background?.status)).toEqual([
+			undefined,
+			"running",
+			"failed",
+		]);
+		expect(runs.at(-1)?.background).toMatchObject({
+			taskId: "task-1",
+			exitCode: 1,
+		});
+
+		await adapter.dispose();
+	});
+
+	it("lets a later end of a background task add what an earlier one left out", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "bash-1",
+			title: "sleep 5; exit 3",
+			kind: "execute",
+			status: "completed",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "task-1",
+			name: "sleep 5; exit 3",
+			toolCallId: "bash-1",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "task-1",
+			state: "stopped",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "task-1",
+			state: "failed",
+			summary: "failed with exit code 3",
+		});
+		await flush();
+		agent.exit(1);
+		await flush();
+
+		expect(backgroundRunsOf(events, "bash-1").at(-1)?.background).toMatchObject(
+			{ status: "failed", exitCode: 3 },
+		);
+
+		await adapter.dispose();
+	});
+
+	it("settles a running background launch as stopped when the agent exits", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "run" }]);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "tool_call",
+			toolCallId: "bash-1",
+			title: "sleep 60",
+			kind: "execute",
+			status: "completed",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "task-1",
+			name: "sleep 60",
+			toolCallId: "bash-1",
+		});
+		await flush();
+		agent.exit(1);
+		await flush();
+
+		expect(backgroundRunsOf(events, "bash-1").at(-1)?.background?.status).toBe(
+			"stopped",
+		);
 
 		await adapter.dispose();
 	});

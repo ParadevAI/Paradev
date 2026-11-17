@@ -161,6 +161,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {#项失败} other {#项失败}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {#个文件已更改} other {#个文件已更改}}"
 
@@ -261,6 +262,7 @@ msgstr "{0, plural, one {#个会话运行中} other {#个会话运行中}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {#项已跳过} other {#项已跳过}}"
 
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {# 个子智能体}}"
@@ -302,6 +304,10 @@ msgstr "{0, plural, one {评论将发送给此智能体} other {评论将发送�
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {无法删除#个工作区} other {无法删除#个工作区}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, other {创建了 # 个子智能体}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -1007,6 +1013,9 @@ msgstr "该工作区中的 {entryPath} 已在另一个组织中发布为页面�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#项失败} other {#项失败}}"
 
+msgid "{failed} failed"
+msgstr "{failed} 个失败"
+
 msgid "{failing} of {total} check failing"
 msgstr "{total}项检查中有{failing}项失败"
 
@@ -1018,6 +1027,9 @@ msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {�
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
+
+msgid "{finished} finished"
+msgstr "{finished} 个已完成"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
@@ -1157,9 +1169,6 @@ msgstr "无法向 {name} 发送消息"
 msgid "{name} failed"
 msgstr "{name} 失败"
 
-msgid "{name} finished"
-msgstr "{name} 已完成"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} 是内置的，无法移除"
@@ -1180,9 +1189,6 @@ msgstr "{name} 未改变。如果智能体正在工作，它已被停止。"
 
 msgid "{name} plugin"
 msgstr "{name} 插件"
-
-msgid "{name} started working"
-msgstr "{name} 开始工作"
 
 msgid "{name} stopped"
 msgstr "{name} 已停止"
@@ -1335,6 +1341,9 @@ msgstr "剩余 {remaining} 个 token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
 
+msgid "{running} running"
+msgstr "{running} 个运行中"
+
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
 
@@ -1360,6 +1369,9 @@ msgstr "{starCount}个星标，还在增长"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} 个已停止"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# 个子智能体运行中}}"
@@ -1447,6 +1459,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, other {正在等待 # 个子智能体}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} 限额：已使用 {percent}"
@@ -8254,6 +8269,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "失败"
 
+msgid "failed · exit {exitCode}"
+msgstr "失败 · 退出码 {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失败运行 <0>· 7天</0>"
 
@@ -8921,6 +8939,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "完成审查"
+
+msgid "finished"
+msgstr "已完成"
 
 msgid "Finished"
 msgstr "已完成"
@@ -11852,6 +11873,9 @@ msgstr "正在合并…"
 msgid "Mesh Gradient"
 msgstr "网格渐变"
 
+msgid "Message"
+msgstr "发消息"
+
 msgid "Message {name}"
 msgstr "给 {name} 发消息"
 
@@ -12095,6 +12119,9 @@ msgstr "迁移云端工作"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "在主标签页和右侧边栏之间移动焦点，如果侧边栏已关闭则将其打开"
 
+msgid "Move the running subagent to the background"
+msgstr "将正在运行的子智能体移到后台"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "将此工作区移至 {computerName}？"
 
@@ -12108,6 +12135,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "几分钟即可迁移到 {companyName}。"
 
 msgid "Move to background"
+msgstr "移到后台"
+
+msgid "Move to Background"
 msgstr "移到后台"
 
 msgid "Move to cloud"
@@ -19126,6 +19156,9 @@ msgstr "停止 {label}"
 msgid "Stop {name}"
 msgstr "停止 {name}"
 
+msgid "Stop all"
+msgstr "全部停止"
+
 msgid "Stop dictation"
 msgstr "停止语音输入"
 
@@ -19194,9 +19227,6 @@ msgstr "子智能体"
 
 msgid "Subagents"
 msgstr "子智能体"
-
-msgid "Subagents · {count}"
-msgstr "子智能体 · {count}"
 
 msgid "Subject contains..."
 msgstr "主题包含..."
@@ -19787,6 +19817,13 @@ msgstr "该插件来源不存在"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "这次运行会被错过，且不会重试。之后可用“立即运行”启动它。"
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "子智能体“{name}”失败了。请用相同的任务再运行一次：\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "2026年的赌注"

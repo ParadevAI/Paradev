@@ -50,10 +50,11 @@ import { useTranscriptWindow } from "./hooks/useTranscriptWindow";
 import { ChatImageGalleryProvider } from "./providers/ChatImageGalleryProvider";
 import { useNestedItems } from "./providers/NestedItemsProvider";
 import { useTranscriptPlugins } from "./providers/TranscriptPluginsProvider";
+import { isBackgroundShell } from "./utils/backgroundShell";
 import { copySourceText } from "./utils/copySourceText";
 import { galleryImages } from "./utils/galleryImages";
 import { replyFooters } from "./utils/replyFooters";
-import { subagentLines } from "./utils/subagentLines";
+import { subagentLaunches } from "./utils/subagentRuns";
 import {
 	rowMessageId,
 	type TranscriptRow,
@@ -101,7 +102,12 @@ export type TranscriptHandle = { openFind: () => void };
 
 function isWork(row: TranscriptRow | undefined): boolean {
 	if (!row) return false;
-	if (row.kind === "working" || row.kind === "tool_run") return true;
+	if (
+		row.kind === "working" ||
+		row.kind === "tool_run" ||
+		row.kind === "subagent_run"
+	)
+		return true;
 	return (
 		row.kind === "item" &&
 		(row.item.kind === "tool_call" || row.item.kind === "reasoning")
@@ -236,7 +242,8 @@ export function Transcript({
 					pendingApprovalTargets,
 					findPageLinks,
 					commandsInApprovals,
-					(tool) => subagentLines(tool, childrenByParent.get(tool.id)) !== null,
+					(tool) => subagentLaunches(tool, childrenByParent.get(tool.id)),
+					isBackgroundShell,
 				),
 			),
 		[

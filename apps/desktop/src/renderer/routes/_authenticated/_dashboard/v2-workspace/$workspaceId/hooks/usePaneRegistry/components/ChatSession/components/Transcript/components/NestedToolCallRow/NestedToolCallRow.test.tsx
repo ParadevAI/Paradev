@@ -6,6 +6,7 @@ import {
 import type { Item, ToolCall } from "@superset/chat/protocol";
 import { cleanup, render } from "@testing-library/react";
 import { NestedItemsProvider } from "../../providers/NestedItemsProvider";
+import { expandRunCards } from "../SubagentRunCard/utils/expandRunCards";
 import { NestedToolCallRow } from "./NestedToolCallRow";
 
 afterEach(cleanup);
@@ -48,7 +49,11 @@ const grandchild: ToolCall = {
 	subagent: true,
 };
 
-function renderRow(items: readonly Item[], item: ToolCall = task) {
+function renderRow(
+	items: readonly Item[],
+	item: ToolCall = task,
+	liveTaskIds: readonly string[] = [],
+) {
 	const snapshot: SessionSnapshot = {
 		session: { status: "running", harness: "acp", backgroundTasks: [] },
 		turns: new Map(),
@@ -59,7 +64,7 @@ function renderRow(items: readonly Item[], item: ToolCall = task) {
 		cursor: null,
 		pendingReset: null,
 	};
-	return render(
+	const view = render(
 		<NestedItemsProvider
 			value={{
 				snapshot,
@@ -67,30 +72,49 @@ function renderRow(items: readonly Item[], item: ToolCall = task) {
 				requestItemBodies: () => {},
 				respondToApproval: () => {},
 				openSubagent: () => {},
+				liveTasks: new Map(
+					liveTaskIds.map((id) => [
+						id,
+						{ id, kind: "subagent", name: id, canStop: false, startedAtMs: 1 },
+					]),
+				),
 			}}
 		>
 			<NestedToolCallRow item={item} />
 		</NestedItemsProvider>,
 	);
+	expandRunCards(view.container);
+	return view;
 }
 
-test("a subagent shows as started and finished lines", () => {
-	const running = renderRow([task, readme, grandchild]);
-	expect(running.container.textContent).toBe("Readme and wait started working");
+function statusOf(view: ReturnType<typeof render>, id: string) {
+	return view.container
+		.querySelector(`[data-subagent-run="${id}"] [data-run-status]`)
+		?.getAttribute("data-run-status");
+}
+
+test("a launcher's subagents show as run rows, a nested one under its parent", () => {
+	const running = renderRow([task, readme, grandchild], task, [
+		readme.id,
+		grandchild.id,
+	]);
+	expect(running.container.textContent).toContain("Readme and wait");
+	expect(statusOf(running, readme.id)).toBe("waiting");
+	expect(statusOf(running, grandchild.id)).toBe("running");
 	cleanup();
 
 	const finished = renderRow([
 		{ ...task, status: "completed" },
 		{ ...readme, status: "completed", subagentStatus: "idle" },
 	]);
-	expect(finished.container.textContent).toBe("Readme and wait finished");
+	expect(statusOf(finished, readme.id)).toBe("finished");
 	cleanup();
 
 	const stopped = renderRow([
 		task,
 		{ ...readme, status: "canceled", subagentStatus: "stopped" },
 	]);
-	expect(stopped.container.textContent).toBe("Readme and wait stopped");
+	expect(statusOf(stopped, readme.id)).toBe("stopped");
 	cleanup();
 
 	const {
@@ -102,5 +126,5 @@ test("a subagent shows as started and finished lines", () => {
 		...claudeTask,
 		status: "failed",
 	});
-	expect(failed.container.textContent).toBe("Readme and wait failed");
+	expect(statusOf(failed, readme.id)).toBe("failed");
 });

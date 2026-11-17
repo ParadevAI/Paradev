@@ -53,6 +53,13 @@ export type TranscriptRow =
 	  }
 	| { kind: "outbox"; key: string; groupStart: boolean; entry: OutboxEntry }
 	| {
+			kind: "subagent_run";
+			key: string;
+			groupStart: boolean;
+			/** The subagent runs one step started, stacked as rows of one card. */
+			launches: ToolCall[];
+	  }
+	| {
 			kind: "tool_run";
 			key: string;
 			groupStart: boolean;
@@ -147,6 +154,7 @@ export function transcriptRows(
 	pendingApprovalTargets: ReadonlySet<string>,
 	findPageLinks: PageLinkFinder,
 	hiddenToolIds: ReadonlySet<string> = new Set(),
+	launchesOf: (tool: ToolCall) => readonly ToolCall[] | null = () => null,
 	standaloneTool: (tool: ToolCall) => boolean = () => false,
 ): TranscriptRow[] {
 	const rows: TranscriptRow[] = [];
@@ -209,6 +217,22 @@ export function transcriptRows(
 				...(afterTarget ? { afterTarget } : {}),
 			});
 			if (item.kind === "agent_message") lastReplyAt = rows.length - 1;
+		};
+		const pushLaunches = (launches: readonly ToolCall[]) => {
+			endRun();
+			const above = groupStart ? undefined : rows.at(-1);
+			if (above?.kind === "subagent_run") {
+				above.launches.push(...launches);
+				return above;
+			}
+			const card: Extract<TranscriptRow, { kind: "subagent_run" }> = {
+				kind: "subagent_run",
+				key: `subagent_run:${launches[0]?.id}`,
+				groupStart,
+				launches: [...launches],
+			};
+			push(card);
+			return card;
 		};
 		const addTools = (
 			items: ToolCall[],
@@ -276,19 +300,30 @@ export function transcriptRows(
 			if (!tools) continue;
 			const visible = tools.filter((tool) => !hiddenToolIds.has(tool.id));
 			if (visible.length === 0) continue;
-			if (!visible.some(standaloneTool)) {
+			const launches = visible.map(launchesOf);
+			if (
+				!launches.some(Boolean) &&
+				!visible.some((tool) => standaloneTool(tool))
+			) {
 				addTools(visible, tools, index);
 				continue;
 			}
 			let chunk: ToolCall[] = [];
-			for (const tool of visible) {
-				if (!standaloneTool(tool)) {
+			let card: Extract<TranscriptRow, { kind: "subagent_run" }> | null = null;
+			for (const [at, tool] of visible.entries()) {
+				const toolLaunches = launches[at];
+				if (toolLaunches && card) {
+					card.launches.push(...toolLaunches);
+					continue;
+				}
+				if (!toolLaunches && !standaloneTool(tool)) {
 					chunk.push(tool);
 					continue;
 				}
 				addTools(chunk, chunk, index);
 				chunk = [];
-				pushItem(tool);
+				if (toolLaunches) card = pushLaunches(toolLaunches);
+				else pushItem(tool);
 			}
 			addTools(chunk, chunk, index);
 		}
@@ -361,5 +396,6 @@ export function transcriptRows(
 export function rowMessageId(row: TranscriptRow): string {
 	if (row.kind === "item") return row.item.id;
 	if (row.kind === "tool_run") return row.items[0]?.id ?? row.key;
+	if (row.kind === "subagent_run") return row.launches[0]?.id ?? row.key;
 	return row.key;
 }

@@ -161,6 +161,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# en échec} other {# en échec}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# fichier modifié} other {# fichiers modifiés}}"
 
@@ -261,6 +262,7 @@ msgstr "{0, plural, one {# session en cours} other {# sessions en cours}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# ignoré} other {# ignorés}}"
 
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# sous-agent} other {# sous-agents}}"
@@ -302,6 +304,10 @@ msgstr "{0, plural, one {Les commentaires sont envoyés à cet agent} other {Les
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {Impossible de supprimer # espace de travail} other {Impossible de supprimer # espaces de travail}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, one {Sous-agent créé} other {# sous-agents créés}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -1007,6 +1013,9 @@ msgstr "{entryPath} de cet espace de travail est déjà publié comme page dans 
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# en échec} other {# en échec}}"
 
+msgid "{failed} failed"
+msgstr "{failed} en échec"
+
 msgid "{failing} of {total} check failing"
 msgstr "{failing} vérification sur {total} en échec"
 
@@ -1018,6 +1027,9 @@ msgstr "{fileCount, plural, one {# fichier modifié dans cet espace de travail} 
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# fichier modifié} other {# fichiers modifiés}}"
+
+msgid "{finished} finished"
+msgstr "{finished} terminé(s)"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pour activer"
@@ -1157,9 +1169,6 @@ msgstr "Impossible d'envoyer un message à {name}"
 msgid "{name} failed"
 msgstr "{name} a échoué"
 
-msgid "{name} finished"
-msgstr "{name} a terminé"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} est intégré et ne peut pas être supprimé"
@@ -1180,9 +1189,6 @@ msgstr "{name} n'a pas changé. Si un agent travaillait, il a été arrêté."
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
-
-msgid "{name} started working"
-msgstr "{name} a commencé à travailler"
 
 msgid "{name} stopped"
 msgstr "{name} s'est arrêté"
@@ -1335,6 +1341,9 @@ msgstr "{remaining} tokens restants"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Modifications annulées sur # fichier.} other {Modifications annulées sur # fichiers.}}"
 
+msgid "{running} running"
+msgstr "{running} en cours"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1360,6 +1369,9 @@ msgstr "{starCount} étoiles, et ça continue"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automatisation lancée} other {# automatisations lancées}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} arrêté(s)"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# sous-agent en cours} other {# sous-agents en cours}}"
@@ -1447,6 +1459,9 @@ msgstr "{vcpuCount} vCPU · {memory} Go"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} en attente"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, one {attend # sous-agent} other {attend # sous-agents}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Limite {windowLabel} : {percent} utilisés"
@@ -8254,6 +8269,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Échec"
 
+msgid "failed · exit {exitCode}"
+msgstr "échec · code de sortie {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Exécutions échouées <0>· 7 j</0>"
 
@@ -8921,6 +8939,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Terminer la revue"
+
+msgid "finished"
+msgstr "terminé"
 
 msgid "Finished"
 msgstr "Terminé"
@@ -11852,6 +11873,9 @@ msgstr "Fusion en cours…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message"
+msgstr "Message"
+
 msgid "Message {name}"
 msgstr "Écrire à {name}"
 
@@ -12095,6 +12119,9 @@ msgstr "Transférer le travail cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Déplacer le focus entre les onglets principaux et la barre latérale droite, et ouvrir la barre latérale si elle est fermée"
 
+msgid "Move the running subagent to the background"
+msgstr "Passer le sous-agent en cours en arrière-plan"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Déplacer cet espace de travail vers {computerName} ?"
 
@@ -12108,6 +12135,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "Passez à {companyName} en quelques minutes."
 
 msgid "Move to background"
+msgstr "Passer en arrière-plan"
+
+msgid "Move to Background"
 msgstr "Passer en arrière-plan"
 
 msgid "Move to cloud"
@@ -19126,6 +19156,9 @@ msgstr "Arrêter {label}"
 msgid "Stop {name}"
 msgstr "Arrêter {name}"
 
+msgid "Stop all"
+msgstr "Tout arrêter"
+
 msgid "Stop dictation"
 msgstr "Arrêter la dictée"
 
@@ -19194,9 +19227,6 @@ msgstr "Sous-agent"
 
 msgid "Subagents"
 msgstr "Sous-agents"
-
-msgid "Subagents · {count}"
-msgstr "Sous-agents · {count}"
 
 msgid "Subject contains..."
 msgstr "L'objet contient..."
@@ -19787,6 +19817,13 @@ msgstr "Cette source de plugins n'existe pas"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "Cette exécution est manquée et n'est pas relancée. Utilisez Exécuter maintenant pour la lancer plus tard."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "Le sous-agent « {name} » a échoué. Relance-le avec la même tâche :\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "Le pari 2026"

@@ -17,6 +17,7 @@ import { PageLinkCard } from "../../../PageLinkCard";
 import type { TranscriptRow } from "../../utils/transcriptRows";
 import { AttachmentRail, type RailImage } from "../AttachmentRail";
 import { ReplyFooter } from "../ReplyFooter";
+import { SubagentRunCard } from "../SubagentRunCard";
 import { ItemRow } from "./components/ItemRow";
 import { ToolRunRow } from "./components/ToolRunRow";
 import { TurnChangesCard } from "./components/TurnChangesCard";
@@ -177,6 +178,16 @@ export function TurnGroupSection({
 					{imageRail(row.items)}
 					{pageCards(row.pages)}
 				</>
+			);
+		case "subagent_run":
+			return (
+				<SubagentRunCard
+					collapsed={(defaultCollapsed) =>
+						isEntryCollapsed(row.key, defaultCollapsed)
+					}
+					launches={row.launches}
+					onToggle={(collapsed) => onToggleEntry(row.key, collapsed)}
+				/>
 			);
 		case "turn_status":
 			return (

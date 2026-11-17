@@ -1,6 +1,11 @@
 import { expect, test } from "bun:test";
 import type { BackgroundTask } from "@superset/chat/protocol";
-import { collectAgentWork, collectSessionWork } from "./collectAgentWork";
+import {
+	collectAgentWork,
+	collectSessionWork,
+	foregroundSubagent,
+	runningAgents,
+} from "./collectAgentWork";
 
 const task = (
 	id: string,
@@ -117,4 +122,38 @@ test("a background process stays listed whatever subagent status it carries", ()
 		{ terminalId: "chat", sessionId: "s" },
 	);
 	expect(work.map((item) => item.taskId)).toEqual(["idle-shell"]);
+});
+
+test("the chat's running agent count takes in nested subagents and leaves out shells and idle ones", () => {
+	expect(
+		runningAgents([
+			task("lead"),
+			task("helper", { parentId: "lead", canStop: false }),
+			task("idle", { subagentStatus: "idle" }),
+			task("bun dev", { kind: "process" }),
+		]),
+	).toEqual({ count: 2, stoppable: ["lead"] });
+	expect(runningAgents(undefined)).toEqual({ count: 0, stoppable: [] });
+});
+
+test("the background key moves the latest top-level subagent that can still leave the foreground", () => {
+	expect(
+		foregroundSubagent([
+			task("old", { canBackground: true, startedAtMs: 1 }),
+			task("new", { canBackground: true, startedAtMs: 5 }),
+			task("fixed", { startedAtMs: 9 }),
+			task("nested", { canBackground: true, startedAtMs: 9, parentId: "new" }),
+			task("done", {
+				canBackground: true,
+				startedAtMs: 9,
+				subagentStatus: "idle",
+			}),
+		]),
+	).toBe("new");
+	expect(foregroundSubagent([task("fixed")])).toBeNull();
+	expect(
+		foregroundSubagent([
+			task("nested", { canBackground: true, parentId: "x" }),
+		]),
+	).toBe("nested");
 });

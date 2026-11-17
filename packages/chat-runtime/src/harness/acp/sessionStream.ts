@@ -1,4 +1,5 @@
 import type {
+	BackgroundRun,
 	Item,
 	ItemAttachment,
 	ToolCall,
@@ -76,6 +77,7 @@ export class SessionStream {
 		}
 	>();
 	private readonly toolCalls = new Map<string, ToolCall>();
+	private readonly toolTurns = new Map<string, string>();
 	private readonly planItems = new Map<string, number>();
 
 	constructor(private readonly options: SessionStreamOptions) {}
@@ -90,6 +92,17 @@ export class SessionStream {
 
 	allToolCalls(): IterableIterator<ToolCall> {
 		return this.toolCalls.values();
+	}
+
+	setBackground(toolCallId: string, background: BackgroundRun): boolean {
+		const id = this.toolItemId(toolCallId);
+		const prior = this.toolCalls.get(id);
+		const turnId = this.toolTurns.get(id);
+		if (!prior || turnId === undefined) return false;
+		const item = { ...prior, background };
+		this.toolCalls.set(id, item);
+		this.emit(item, turnId);
+		return true;
 	}
 
 	openKind(): TextKind | null {
@@ -383,8 +396,10 @@ export class SessionStream {
 			...(rawInput !== undefined ? { rawInput } : {}),
 			...(rawOutput !== undefined ? { rawOutput } : {}),
 			...(mcpServer ? { mcpServer } : {}),
+			...(prior?.background ? { background: prior.background } : {}),
 		};
 		this.toolCalls.set(id, item);
+		this.toolTurns.set(id, turnId);
 		this.emit(item, turnId);
 		return item;
 	}
@@ -418,8 +433,10 @@ export class SessionStream {
 			...(prior?.rawInput !== undefined ? { rawInput: prior.rawInput } : {}),
 			...(prior?.rawOutput !== undefined ? { rawOutput: prior.rawOutput } : {}),
 			...(prior?.mcpServer ? { mcpServer: prior.mcpServer } : {}),
+			...(prior?.background ? { background: prior.background } : {}),
 		};
 		this.toolCalls.set(id, item);
+		this.toolTurns.set(id, turnId);
 		this.emit(item, turnId);
 	}
 

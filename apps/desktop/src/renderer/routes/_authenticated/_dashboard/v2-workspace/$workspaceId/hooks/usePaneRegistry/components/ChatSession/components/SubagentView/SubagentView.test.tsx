@@ -13,6 +13,7 @@ import type {
 } from "@superset/chat/protocol";
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import type { ComponentProps } from "react";
+import { expandRunCards } from "../Transcript/components/SubagentRunCard/utils/expandRunCards";
 import { NestedItemsProvider } from "../Transcript/providers/NestedItemsProvider";
 import { TranscriptPluginsProvider } from "../Transcript/providers/TranscriptPluginsProvider";
 import { SubagentView } from "./SubagentView";
@@ -136,10 +137,15 @@ test("shows the subagent's messages and tools", () => {
 	expect(text).not.toContain("Check the docs");
 });
 
-test("a nested subagent is an event line that drills deeper", () => {
+test("a nested subagent is a run row that drills deeper", () => {
 	const onOpenSubagent = mock((_itemId: string) => {});
 	const view = renderView("subagent:c1", { onOpenSubagent });
-	fireEvent.click(view.getByRole("button", { name: "Nested started working" }));
+	expandRunCards(view.container);
+	const open = view.container.querySelector(
+		'[data-subagent-run="subagent:c2"] button',
+	);
+	if (!open) throw new Error("no run row for the nested subagent");
+	fireEvent.click(open);
 	expect(onOpenSubagent).toHaveBeenCalledWith("subagent:c2");
 });
 

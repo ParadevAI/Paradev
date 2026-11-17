@@ -161,6 +161,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# thất bại} other {# thất bại}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# tệp thay đổi} other {# tệp thay đổi}}"
 
@@ -261,6 +262,7 @@ msgstr "{0, plural, one {# phiên đang chạy} other {# phiên đang chạy}}"
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# bỏ qua} other {# bỏ qua}}"
 
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, other {# agent con}}"
@@ -302,6 +304,10 @@ msgstr "{0, plural, one {Bình luận sẽ được gửi tới agent này} othe
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {Không thể xóa # workspace} other {Không thể xóa # workspace}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, other {Đã tạo # agent con}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -1007,6 +1013,9 @@ msgstr "{entryPath} trong workspace này đã được xuất bản thành một
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# thất bại} other {# thất bại}}"
 
+msgid "{failed} failed"
+msgstr "{failed} thất bại"
+
 msgid "{failing} of {total} check failing"
 msgstr "{failing}/{total} check đang thất bại"
 
@@ -1018,6 +1027,9 @@ msgstr "{fileCount, plural, one {# tệp đã thay đổi trong workspace này} 
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Đã sửa # tệp} other {Đã sửa # tệp}}"
+
+msgid "{finished} finished"
+msgstr "{finished} đã xong"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} để focus"
@@ -1157,9 +1169,6 @@ msgstr "Không thể nhắn tin cho {name}"
 msgid "{name} failed"
 msgstr "{name} đã thất bại"
 
-msgid "{name} finished"
-msgstr "{name} đã xong"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} là tích hợp sẵn nên không thể gỡ"
@@ -1180,9 +1189,6 @@ msgstr "{name} không thay đổi. Nếu agent đang làm việc, nó đã bị 
 
 msgid "{name} plugin"
 msgstr "Plugin {name}"
-
-msgid "{name} started working"
-msgstr "{name} đã bắt đầu làm việc"
 
 msgid "{name} stopped"
 msgstr "{name} đã dừng"
@@ -1335,6 +1341,9 @@ msgstr "Còn {remaining} token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
 
+msgid "{running} running"
+msgstr "{running} đang chạy"
+
 msgid "{seconds}s"
 msgstr "{seconds} giây"
 
@@ -1360,6 +1369,9 @@ msgstr "{starCount} star và còn tăng"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Đã khởi chạy # tự động hóa} other {Đã khởi chạy # tự động hóa}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} đã dừng"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# agent con đang chạy}}"
@@ -1447,6 +1459,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, other {đang chờ # agent con}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Giới hạn {windowLabel}: đã dùng {percent}"
@@ -8254,6 +8269,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Thất bại"
 
+msgid "failed · exit {exitCode}"
+msgstr "thất bại · mã thoát {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Lần chạy thất bại <0>· 7 ngày</0>"
 
@@ -8921,6 +8939,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Hoàn tất review"
+
+msgid "finished"
+msgstr "đã xong"
 
 msgid "Finished"
 msgstr "Đã xong"
@@ -11852,6 +11873,9 @@ msgstr "Đang merge…"
 msgid "Mesh Gradient"
 msgstr "Mesh Gradient"
 
+msgid "Message"
+msgstr "Nhắn tin"
+
 msgid "Message {name}"
 msgstr "Nhắn tin cho {name}"
 
@@ -12095,6 +12119,9 @@ msgstr "Chuyển công việc trên cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Di chuyển tiêu điểm giữa các tab chính và thanh bên phải, và mở thanh bên nếu đang đóng"
 
+msgid "Move the running subagent to the background"
+msgstr "Chuyển agent con đang chạy sang chạy nền"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Chuyển không gian làm việc này sang {computerName}?"
 
@@ -12108,6 +12135,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "Chuyển sang {companyName} chỉ trong vài phút."
 
 msgid "Move to background"
+msgstr "Chuyển sang chạy nền"
+
+msgid "Move to Background"
 msgstr "Chuyển sang chạy nền"
 
 msgid "Move to cloud"
@@ -19126,6 +19156,9 @@ msgstr "Dừng {label}"
 msgid "Stop {name}"
 msgstr "Dừng {name}"
 
+msgid "Stop all"
+msgstr "Dừng tất cả"
+
 msgid "Stop dictation"
 msgstr "Dừng đọc chính tả"
 
@@ -19194,9 +19227,6 @@ msgstr "Agent con"
 
 msgid "Subagents"
 msgstr "Agent con"
-
-msgid "Subagents · {count}"
-msgstr "Agent con · {count}"
 
 msgid "Subject contains..."
 msgstr "Tiêu đề chứa..."
@@ -19787,6 +19817,13 @@ msgstr "Nguồn plugin đó không tồn tại"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "Lượt chạy đó bị bỏ lỡ và không được thử lại. Dùng Chạy ngay để chạy nó sau."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "Agent con \"{name}\" đã thất bại. Hãy chạy lại với cùng nhiệm vụ:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "Canh bạc 2026"

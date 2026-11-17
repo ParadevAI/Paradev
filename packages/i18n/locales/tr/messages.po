@@ -161,6 +161,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# başarısız} other {# başarısız}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {# dosya değişti} other {# dosya değişti}}"
 
@@ -261,6 +262,7 @@ msgstr "{0, plural, one {# oturum çalışıyor} other {# oturum çalışıyor}}
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# atlandı} other {# atlandı}}"
 
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# alt ajan} other {# alt ajan}}"
@@ -302,6 +304,10 @@ msgstr "{0, plural, one {Yorumlar bu ajana gider} other {Yorumlar bu ajanlara gi
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {# çalışma alanı silinemedi} other {# çalışma alanı silinemedi}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, one {Alt ajan oluşturuldu} other {# alt ajan oluşturuldu}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -1007,6 +1013,9 @@ msgstr "Bu çalışma alanındaki {entryPath} başka bir organizasyonda zaten sa
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# başarısız} other {# başarısız}}"
 
+msgid "{failed} failed"
+msgstr "{failed} başarısız"
+
 msgid "{failing} of {total} check failing"
 msgstr "{total} kontrolden {failing} tanesi başarısız"
 
@@ -1018,6 +1027,9 @@ msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} othe
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
+
+msgid "{finished} finished"
+msgstr "{finished} tamamlandı"
 
 msgid "{focusShortcutText} to focus"
 msgstr "Odaklanmak için {focusShortcutText}"
@@ -1157,9 +1169,6 @@ msgstr "{name} mesaj alamıyor"
 msgid "{name} failed"
 msgstr "{name} başarısız oldu"
 
-msgid "{name} finished"
-msgstr "{name} bitti"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} yerleşiktir ve kaldırılamaz"
@@ -1180,9 +1189,6 @@ msgstr "{name} değişmedi. Bir ajan çalışıyorduysa durduruldu."
 
 msgid "{name} plugin"
 msgstr "{name} eklentisi"
-
-msgid "{name} started working"
-msgstr "{name} çalışmaya başladı"
 
 msgid "{name} stopped"
 msgstr "{name} durduruldu"
@@ -1335,6 +1341,9 @@ msgstr "{remaining} token kaldı"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
 
+msgid "{running} running"
+msgstr "{running} çalışıyor"
+
 msgid "{seconds}s"
 msgstr "{seconds} sn"
 
@@ -1360,6 +1369,9 @@ msgstr "{starCount} yıldız ve artıyor"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
+
+msgid "{stopped} stopped"
+msgstr "{stopped} durduruldu"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {# alt ajan çalışıyor} other {# alt ajan çalışıyor}}"
@@ -1447,6 +1459,9 @@ msgstr "{vcpuCount} vCPU · {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, one {# alt ajanı bekliyor} other {# alt ajanı bekliyor}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "{windowLabel} sınırı: {percent} kullanıldı"
@@ -8254,6 +8269,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Başarısız"
 
+msgid "failed · exit {exitCode}"
+msgstr "başarısız · çıkış kodu {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Başarısız çalıştırmalar <0>· 7g</0>"
 
@@ -8921,6 +8939,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "İncelemeyi bitir"
+
+msgid "finished"
+msgstr "tamamlandı"
 
 msgid "Finished"
 msgstr "Tamamlandı"
@@ -11852,6 +11873,9 @@ msgstr "Birleştiriliyor…"
 msgid "Mesh Gradient"
 msgstr "Mesh gradyanı"
 
+msgid "Message"
+msgstr "Mesaj"
+
 msgid "Message {name}"
 msgstr "{name} adlı kişiye mesaj gönder"
 
@@ -12095,6 +12119,9 @@ msgstr "Bulut işinizi taşıyın"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Odağı ana sekmeler ile sağ kenar çubuğu arasında taşı ve kapalıysa kenar çubuğunu aç"
 
+msgid "Move the running subagent to the background"
+msgstr "Çalışan alt ajanı arka plana taşı"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Bu çalışma alanı {computerName} bilgisayarına taşınsın mı?"
 
@@ -12109,6 +12136,9 @@ msgstr "Dakikalar içinde {companyName}'e geçin."
 
 msgid "Move to background"
 msgstr "Arka plana taşı"
+
+msgid "Move to Background"
+msgstr "Arka Plana Taşı"
 
 msgid "Move to cloud"
 msgstr "Buluta taşı"
@@ -19126,6 +19156,9 @@ msgstr "{label} öğesini durdur"
 msgid "Stop {name}"
 msgstr "{name} öğesini durdur"
 
+msgid "Stop all"
+msgstr "Tümünü durdur"
+
 msgid "Stop dictation"
 msgstr "Sesle yazmayı durdur"
 
@@ -19194,9 +19227,6 @@ msgstr "Alt ajan"
 
 msgid "Subagents"
 msgstr "Alt ajanlar"
-
-msgid "Subagents · {count}"
-msgstr "Alt ajanlar · {count}"
 
 msgid "Subject contains..."
 msgstr "Konu şunu içerir..."
@@ -19787,6 +19817,13 @@ msgstr "Bu eklenti kaynağı yok"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "O çalıştırma kaçırılır ve yeniden denenmez. Daha sonra başlatmak için Şimdi çalıştır'ı kullanın."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "\"{name}\" alt ajanı başarısız oldu. Aynı görevle yeniden çalıştır:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "2026 bahsi"

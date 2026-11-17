@@ -13,6 +13,8 @@ function rowItems(row: TranscriptRow): readonly Item[] {
 			return [row.item];
 		case "changed_files":
 			return row.calls;
+		case "subagent_run":
+			return row.launches;
 		default:
 			return [];
 	}

@@ -7,6 +7,7 @@ import {
 import type {
 	ApprovalRequest,
 	AvailableCommand,
+	BackgroundRun,
 	Decision,
 	DiscoverSessionsResult,
 	FormField,
@@ -267,6 +268,13 @@ type SubagentRun = {
 	steers: Set<{ echoes: Set<string>; shared: boolean }>;
 };
 
+type BackgroundLaunch = {
+	stream: SessionStream;
+	toolCallId?: string;
+	startedAtMs: number;
+	end?: BackgroundRun;
+};
+
 type SubagentControls = {
 	canStop: boolean;
 	canSteer: boolean;
@@ -486,6 +494,8 @@ export class AcpAdapter implements HarnessAdapter {
 	private customAnswer: string | null = null;
 	private heldTurnId: string | null = null;
 	private readonly shellPids = new Map<string, number>();
+	private readonly stoppingShells = new Set<string>();
+	private readonly backgroundLaunches = new Map<string, BackgroundLaunch>();
 	private shellPoll: ReturnType<typeof setInterval> | null = null;
 	/** Claude aborts a running compaction when a steer arrives, so steers wait for these. */
 	private readonly compactions = new Set<string>();
@@ -791,7 +801,10 @@ export class AcpAdapter implements HarnessAdapter {
 
 	async stopBackgroundTask(taskId: string): Promise<boolean> {
 		const shellPid = this.shellPids.get(taskId);
-		if (shellPid !== undefined) return stopProcessGroup(shellPid);
+		if (shellPid !== undefined) {
+			this.stoppingShells.add(taskId);
+			return stopProcessGroup(shellPid);
+		}
 		if (!this.client || !this.sessionId) return false;
 		const subagentSessionId = this.subagentSessionOf(taskId);
 		const run = subagentSessionId && this.subagents.get(subagentSessionId);
@@ -1517,7 +1530,7 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
 		if (!item || this.replaying) return;
-		this.trackBackgroundShell(item);
+		this.trackBackgroundShell(item, update.toolCallId);
 		this.trackCompaction(raw, item);
 	}
 
@@ -1543,17 +1556,22 @@ export class AcpAdapter implements HarnessAdapter {
 		this.settleCompactions = null;
 	}
 
-	private trackBackgroundShell(item: ToolCall): void {
+	private trackBackgroundShell(item: ToolCall, toolCallId: string): void {
 		const details = piShellDetailsSchema.safeParse(
 			(item.rawOutput as { details?: unknown } | undefined)?.details,
 		);
 		if (!details.success) return;
-		const { shellId, status, pid } = details.data;
+		const { shellId, status, pid, exitCode } = details.data;
 		if (status !== "running") {
-			this.endBackgroundShell(shellId);
+			this.endBackgroundShell(
+				shellId,
+				shellEndStatus(status, exitCode),
+				exitCode,
+			);
 			return;
 		}
 		if (this.backgroundTasks.has(shellId)) return;
+		this.trackBackgroundLaunch(shellId, this.main, toolCallId);
 		const input = piShellInputSchema.safeParse(item.rawInput);
 		this.backgroundTasks.start({
 			id: shellId,
@@ -1568,12 +1586,71 @@ export class AcpAdapter implements HarnessAdapter {
 		this.shellPids.set(shellId, pid);
 		this.shellPoll ??= setInterval(() => {
 			for (const [id, shellPid] of this.shellPids) {
-				if (!processAlive(shellPid)) this.endBackgroundShell(id);
+				if (!processAlive(shellPid)) this.endBackgroundShell(id, "completed");
 			}
 		}, this.options.shellPollMs ?? SHELL_POLL_MS);
 	}
 
-	private endBackgroundShell(shellId: string): void {
+	private trackBackgroundLaunch(
+		taskId: string,
+		stream: SessionStream,
+		toolCallId: string | null | undefined,
+	): void {
+		let launch = this.backgroundLaunches.get(taskId);
+		if (!launch) {
+			launch = { stream, startedAtMs: this.now() };
+			this.backgroundLaunches.set(taskId, launch);
+		}
+		if (!toolCallId || launch.toolCallId) return;
+		launch.toolCallId = toolCallId;
+		stream.setBackground(
+			toolCallId,
+			launch.end ?? {
+				taskId,
+				status: "running",
+				startedAtMs: launch.startedAtMs,
+			},
+		);
+	}
+
+	private settleBackgroundLaunch(
+		taskId: string,
+		status: BackgroundEnd,
+		exitCode?: number,
+	): void {
+		const launch = this.backgroundLaunches.get(taskId);
+		if (!launch) return;
+		const prior = launch.end;
+		if (
+			prior &&
+			(status === "stopped" ||
+				(prior.status === status &&
+					(exitCode === undefined || prior.exitCode === exitCode)))
+		)
+			return;
+		const code = exitCode ?? prior?.exitCode;
+		launch.end = {
+			taskId,
+			status,
+			startedAtMs: launch.startedAtMs,
+			completedAtMs: prior?.completedAtMs ?? this.now(),
+			...(code !== undefined ? { exitCode: code } : {}),
+		};
+		if (launch.toolCallId)
+			launch.stream.setBackground(launch.toolCallId, launch.end);
+	}
+
+	private endBackgroundShell(
+		shellId: string,
+		status: BackgroundEnd,
+		exitCode?: number,
+	): void {
+		const stopped = this.stoppingShells.delete(shellId);
+		this.settleBackgroundLaunch(
+			shellId,
+			stopped ? "stopped" : status,
+			stopped ? undefined : exitCode,
+		);
 		this.shellPids.delete(shellId);
 		this.backgroundTasks.end(shellId);
 		if (this.shellPids.size === 0 && this.shellPoll) {
@@ -1790,8 +1867,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	private endSubagentTasks(sessionId: string): void {
-		for (const taskId of this.subagentTasks.get(sessionId) ?? [])
+		for (const taskId of this.subagentTasks.get(sessionId) ?? []) {
+			this.settleBackgroundLaunch(taskId, "stopped");
 			this.backgroundTasks.end(taskId);
+		}
 		this.subagentTasks.delete(sessionId);
 	}
 
@@ -1980,7 +2059,8 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskSpawned(sessionId: string, raw: unknown): void {
 		const parsed = airAsyncTaskSpawnedSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { asyncTaskId, name, description, canStop, taskType } = parsed.data;
+		const { asyncTaskId, name, description, canStop, taskType, toolCallId } =
+			parsed.data;
 		if (taskType === AIR_AUTONOMOUS_TURN_TASK_TYPE) {
 			if (sessionId === this.sessionId) this.startAutonomousTurn(asyncTaskId);
 			return;
@@ -1999,23 +2079,40 @@ export class AcpAdapter implements HarnessAdapter {
 			startedAtMs: this.now(),
 			...(owner ? { parentId: owner.item.id } : {}),
 		});
+		this.trackBackgroundLaunch(
+			asyncTaskId,
+			owner?.stream ?? this.main,
+			toolCallId,
+		);
 	}
 
 	private handleAsyncTaskProgress(raw: unknown): void {
 		const parsed = airAsyncTaskProgressSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { asyncTaskId, summary } = parsed.data;
+		const { asyncTaskId, summary, toolCallId } = parsed.data;
 		if (summary) this.backgroundTasks.update(asyncTaskId, { detail: summary });
+		const launch = this.backgroundLaunches.get(asyncTaskId);
+		if (launch)
+			this.trackBackgroundLaunch(asyncTaskId, launch.stream, toolCallId);
 	}
 
 	private handleAsyncTaskState(raw: unknown): void {
 		const parsed = airAsyncTaskStateSchema.safeParse(raw);
 		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
-		const { asyncTaskId, state } = parsed.data;
+		const { asyncTaskId, state, summary, toolCallId } = parsed.data;
 		if (this.autonomousTurns.has(asyncTaskId)) {
 			this.endAutonomousTurn(asyncTaskId, state);
 			return;
 		}
+		const launch = this.backgroundLaunches.get(asyncTaskId);
+		if (launch)
+			this.trackBackgroundLaunch(asyncTaskId, launch.stream, toolCallId);
+		const exitCode = exitCodeOf(summary);
+		this.settleBackgroundLaunch(
+			asyncTaskId,
+			asyncTaskEndStatus(state, exitCode),
+			exitCode,
+		);
 		this.backgroundTasks.end(asyncTaskId);
 	}
 
@@ -2551,6 +2648,8 @@ export class AcpAdapter implements HarnessAdapter {
 		for (const sessionId of [...this.subagents.keys()]) {
 			this.finishSubagent(sessionId, "failed");
 		}
+		for (const taskId of [...this.backgroundLaunches.keys()])
+			this.settleBackgroundLaunch(taskId, "stopped");
 		this.backgroundTasks.clear();
 		const message = `acp agent exited (code ${code ?? "null"})`;
 		if (this.stderrTail) console.warn(`[acp] ${message}\n${this.stderrTail}`);
@@ -2900,7 +2999,32 @@ const piShellDetailsSchema = z.looseObject({
 	shellId: z.string().min(1),
 	status: z.string(),
 	pid: z.number().int().positive().optional(),
+	exitCode: z.number().int().optional().catch(undefined),
 });
+
+type BackgroundEnd = Exclude<BackgroundRun["status"], "running">;
+
+function exitCodeOf(summary: string | null | undefined): number | undefined {
+	const match = summary?.match(/exit code (-?\d+)/i);
+	return match ? Number(match[1]) : undefined;
+}
+
+function asyncTaskEndStatus(
+	state: string,
+	exitCode: number | undefined,
+): BackgroundEnd {
+	if (state === "failed" || (exitCode !== undefined && exitCode !== 0))
+		return "failed";
+	return state === "completed" ? "completed" : "stopped";
+}
+
+function shellEndStatus(
+	status: string,
+	exitCode: number | undefined,
+): BackgroundEnd {
+	if (/kill|stop|cancel/i.test(status)) return "stopped";
+	return exitCode !== undefined && exitCode !== 0 ? "failed" : "completed";
+}
 
 const piShellInputSchema = z.looseObject({
 	command: z.string().optional(),

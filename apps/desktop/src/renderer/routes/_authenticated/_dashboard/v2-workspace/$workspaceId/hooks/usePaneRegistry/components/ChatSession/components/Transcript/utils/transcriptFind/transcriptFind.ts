@@ -86,6 +86,16 @@ export function findSegments(
 			}
 			continue;
 		}
+		if (row.kind === "subagent_run") {
+			for (const launch of row.launches)
+				if (launch.title)
+					segments.push({
+						rowKey: row.key,
+						itemId: launch.id,
+						text: launch.title,
+					});
+			continue;
+		}
 		if (row.kind === "outbox") {
 			const text = parseAttachmentTags(userMessageText(row.entry)).text;
 			if (text) {

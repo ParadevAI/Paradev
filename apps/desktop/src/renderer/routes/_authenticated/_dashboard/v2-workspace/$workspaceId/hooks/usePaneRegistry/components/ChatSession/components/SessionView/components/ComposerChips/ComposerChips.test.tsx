@@ -30,14 +30,14 @@ const subagent = (id: string): BackgroundTask => ({
 const chips = (
 	backgroundTasks: BackgroundTask[],
 	onStopTask: (taskId: string) => Promise<void> = async () => {},
-	hiddenSubagents?: ReadonlySet<string>,
+	onStopAll?: () => void,
 ) => (
 	<ComposerChips
 		backgroundTasks={backgroundTasks}
-		hiddenSubagents={hiddenSubagents}
 		liveRefreshKey={0}
 		onMoveToBackground={() => {}}
 		onOpenSubagent={() => {}}
+		onStopAll={onStopAll}
 		onStopTask={onStopTask}
 		runningTurnId={null}
 		sessionId="session"
@@ -88,29 +88,38 @@ test("a second click on stop while the first is pending sends no request", () =>
 	expect(stops).toEqual(["dev"]);
 });
 
-test("a foreground subagent leaves its chip to the turn, background shells keep theirs", () => {
+test("the subagent chip counts every running subagent of the chat, nested ones included", () => {
 	render(
-		chips(
-			[subagent("review"), shell("dev")],
-			async () => {},
-			new Set(["review"]),
-		),
+		chips([
+			subagent("review"),
+			{ ...subagent("helper"), parentId: "review" },
+			subagent("lint"),
+			shell("dev"),
+		]),
 	);
-	expect(screen.queryByRole("button", { name: /Subagents/ })).toBeNull();
+	expect(
+		screen.queryByRole("button", { name: /3 subagents running/ }),
+	).not.toBeNull();
 	expect(screen.queryByRole("button", { name: /Background/ })).not.toBeNull();
 });
 
-test("an earlier background subagent keeps its chip while a foreground one runs", () => {
+test("Stop all in the subagent list stops them and closes the list", () => {
+	const stops: string[] = [];
 	render(
 		chips(
 			[subagent("review"), subagent("lint")],
 			async () => {},
-			new Set(["review"]),
+			() => stops.push("all"),
 		),
 	);
 	act(() => {
-		fireEvent.click(screen.getByRole("button", { name: /Subagent/ }));
+		fireEvent.click(
+			screen.getByRole("button", { name: /2 subagents running/ }),
+		);
 	});
-	expect(screen.queryByText("lint")).not.toBeNull();
-	expect(screen.queryByText("review")).toBeNull();
+	act(() => {
+		fireEvent.click(screen.getByRole("button", { name: "Stop all" }));
+	});
+	expect(stops).toEqual(["all"]);
+	expect(screen.queryByRole("button", { name: "Stop all" })).toBeNull();
 });

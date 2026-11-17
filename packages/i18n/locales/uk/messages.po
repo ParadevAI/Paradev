@@ -155,6 +155,7 @@ msgid "{0, plural, one {# failing} other {# failing}}"
 msgstr "{0, plural, one {# з помилкою} few {# з помилкою} many {# з помилкою} other {# з помилкою}}"
 
 #. placeholder {0}: detail.pullRequest.changedFiles
+#. placeholder {0}: row.files.length
 msgid "{0, plural, one {# file changed} other {# files changed}}"
 msgstr "{0, plural, one {Змінено # файл} few {Змінено # файли} many {Змінено # файлів} other {Змінено # файлу}}"
 
@@ -255,6 +256,7 @@ msgstr "{0, plural, one {Працює # сеанс} few {Працюють # се
 msgid "{0, plural, one {# skipped} other {# skipped}}"
 msgstr "{0, plural, one {# пропущено} few {# пропущено} many {# пропущено} other {# пропущено}}"
 
+#. placeholder {0}: row.nested.length
 #. placeholder {0}: subagents.length
 msgid "{0, plural, one {# subagent} other {# subagents}}"
 msgstr "{0, plural, one {# субагент} few {# субагенти} many {# субагентів} other {# субагента}}"
@@ -296,6 +298,10 @@ msgstr "{0, plural, =1 {Коментарі надходять цьому аге�
 #. placeholder {0}: nextFailures.length
 msgid "{0, plural, one {Couldn’t delete # workspace} other {Couldn’t delete # workspaces}}"
 msgstr "{0, plural, one {Не вдалося видалити # робочий простір} few {Не вдалося видалити # робочі простори} many {Не вдалося видалити # робочих просторів} other {Не вдалося видалити # робочого простору}}"
+
+#. placeholder {0}: card.rows.length
+msgid "{0, plural, one {Created subagent} other {Created # subagents}}"
+msgstr "{0, plural, one {Створено # субагента} few {Створено # субагенти} many {Створено # субагентів} other {Створено # субагента}}"
 
 #. placeholder {0}: issues.length
 #. placeholder {0}: tasks.length
@@ -1001,6 +1007,9 @@ msgstr "{entryPath} у цьому робочому просторі вже оп�
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# не пройдено} few {# не пройдено} many {# не пройдено} other {# не пройдено}}"
 
+msgid "{failed} failed"
+msgstr "з помилкою: {failed}"
+
 msgid "{failing} of {total} check failing"
 msgstr "Не пройдено {failing} з {total} перевірки"
 
@@ -1012,6 +1021,9 @@ msgstr "{fileCount, plural, one {У цьому робочому просторі
 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Змінено # файл} few {Змінено # файли} many {Змінено # файлів} other {Змінено # файлу}}"
+
+msgid "{finished} finished"
+msgstr "завершено: {finished}"
 
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}, щоб сфокусувати"
@@ -1151,9 +1163,6 @@ msgstr "{name} не може отримувати повідомлення"
 msgid "{name} failed"
 msgstr "{name}: помилка"
 
-msgid "{name} finished"
-msgstr "{name}: роботу завершено"
-
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} вбудовано, тому його не можна видалити"
@@ -1174,9 +1183,6 @@ msgstr "{name} без змін. Якщо агент працював, його �
 
 msgid "{name} plugin"
 msgstr "Плагін {name}"
-
-msgid "{name} started working"
-msgstr "{name}: роботу розпочато"
 
 msgid "{name} stopped"
 msgstr "{name}: зупинено"
@@ -1329,6 +1335,9 @@ msgstr "Залишилося токенів: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
 
+msgid "{running} running"
+msgstr "працюють: {running}"
+
 msgid "{seconds}s"
 msgstr "{seconds} с"
 
@@ -1354,6 +1363,9 @@ msgstr "{starCount} зірок, і це не межа"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
+
+msgid "{stopped} stopped"
+msgstr "зупинено: {stopped}"
 
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, one {Працює # субагент} few {Працюють # субагенти} many {Працює # субагентів} other {Працює # субагента}}"
@@ -1441,6 +1453,9 @@ msgstr "{vcpuCount} vCPU · {memory} ГБ"
 
 msgid "{waiting} Waiting"
 msgstr "Очікують: {waiting}"
+
+msgid "{waitingOn, plural, one {waiting on # subagent} other {waiting on # subagents}}"
+msgstr "{waitingOn, plural, one {чекає на # субагента} few {чекає на # субагентів} many {чекає на # субагентів} other {чекає на # субагента}}"
 
 msgid "{windowLabel} limit {percent} used"
 msgstr "Ліміт «{windowLabel}»: використано {percent}"
@@ -8248,6 +8263,9 @@ msgctxt "agent status"
 msgid "Failed"
 msgstr "Помилка"
 
+msgid "failed · exit {exitCode}"
+msgstr "помилка · код виходу {exitCode}"
+
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Невдалі запуски <0>· 7 дн.</0>"
 
@@ -8915,6 +8933,9 @@ msgstr "Finder"
 
 msgid "Finish review"
 msgstr "Завершити рев'ю"
+
+msgid "finished"
+msgstr "завершено"
 
 msgid "Finished"
 msgstr "Завершено"
@@ -11846,6 +11867,9 @@ msgstr "Злиття…"
 msgid "Mesh Gradient"
 msgstr "Сітчастий градієнт"
 
+msgid "Message"
+msgstr "Написати"
+
 msgid "Message {name}"
 msgstr "Повідомлення для {name}"
 
@@ -12089,6 +12113,9 @@ msgstr "Перенесіть роботу з хмари"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Переміщувати фокус між основними вкладками та правою бічною панеллю і відкривати панель, якщо вона закрита"
 
+msgid "Move the running subagent to the background"
+msgstr "Перевести запущений субагент у фоновий режим"
+
 msgid "Move this workspace to {computerName}?"
 msgstr "Перемістити цей робочий простір на {computerName}?"
 
@@ -12102,6 +12129,9 @@ msgid "Move to {companyName} in minutes."
 msgstr "Перейдіть на {companyName} за кілька хвилин."
 
 msgid "Move to background"
+msgstr "Перевести у фоновий режим"
+
+msgid "Move to Background"
 msgstr "Перевести у фоновий режим"
 
 msgid "Move to cloud"
@@ -19120,6 +19150,9 @@ msgstr "Зупинити {label}"
 msgid "Stop {name}"
 msgstr "Зупинити {name}"
 
+msgid "Stop all"
+msgstr "Зупинити все"
+
 msgid "Stop dictation"
 msgstr "Зупинити диктування"
 
@@ -19188,9 +19221,6 @@ msgstr "Субагент"
 
 msgid "Subagents"
 msgstr "Субагенти"
-
-msgid "Subagents · {count}"
-msgstr "Субагенти · {count}"
 
 msgid "Subject contains..."
 msgstr "Тема містить..."
@@ -19781,6 +19811,13 @@ msgstr "Такого джерела плагінів не існує"
 
 msgid "That run is missed and isn't retried. Use Run now to start it later."
 msgstr "Цей запуск пропущено, і його не буде повторено. Щоб запустити його пізніше, скористайтеся кнопкою «Запустити зараз»."
+
+msgid "The \"{name}\" subagent failed. Run it again with the same task:\n"
+"\n"
+"{task}"
+msgstr "Субагент «{name}» завершився з помилкою. Запусти його знову з тим самим завданням:\n"
+"\n"
+"{task}"
 
 msgid "The 2026 bet"
 msgstr "Ставка на 2026 рік"

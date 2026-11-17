@@ -71,6 +71,44 @@ export function collectSessionWork(
 		}));
 }
 
+export type RunningAgents = {
+	/** Every running subagent of the chat, its subagents' own included. */
+	count: number;
+	stoppable: readonly string[];
+};
+
+export function runningAgents(
+	backgroundTasks: readonly BackgroundTask[] | undefined,
+): RunningAgents {
+	const running = (backgroundTasks ?? []).filter(
+		(task) => task.kind === "subagent" && isRunning(task),
+	);
+	return {
+		count: running.length,
+		stoppable: running.filter((task) => task.canStop).map((task) => task.id),
+	};
+}
+
+/** The subagent the background key moves: the latest one the chat itself started, else the latest nested one. */
+export function foregroundSubagent(
+	backgroundTasks: readonly BackgroundTask[] | undefined,
+): string | null {
+	let latest: BackgroundTask | null = null;
+	const rank = (task: BackgroundTask) => [
+		task.parentId ? 0 : 1,
+		task.startedAtMs,
+	];
+	for (const task of backgroundTasks ?? []) {
+		if (task.kind !== "subagent" || !isRunning(task) || !task.canBackground)
+			continue;
+		const [level, at] = rank(task);
+		const [bestLevel, bestAt] = latest ? rank(latest) : [-1, 0];
+		if (level > bestLevel || (level === bestLevel && at > bestAt))
+			latest = task;
+	}
+	return latest?.id ?? null;
+}
+
 function terminalWork(binding: AgentBinding): AgentWork[] {
 	return (binding.subagents ?? []).map((subagent) => ({
 		key: `${binding.terminalId}:${subagent.id}`,
