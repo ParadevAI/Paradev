@@ -20,6 +20,7 @@ import type {
 	TerminalAgentStore,
 } from "../../../terminal-agents";
 import {
+	type ExecutableFile,
 	findInstalledBinary,
 	isOutdatedExecutable,
 	parseLaunchPid,
@@ -325,9 +326,11 @@ export async function restartAccountSessions(
 async function restartAgentSessions(
 	deps: ResumeSessionDeps,
 	bindings: TerminalAgentBinding[],
+	canRestartNow: (binding: TerminalAgentBinding) => boolean = () => true,
 ): Promise<{ restartedTerminalIds: string[] }> {
 	const restartedTerminalIds: string[] = [];
 	for (const binding of bindings) {
+		if (!canRestartNow(binding)) continue;
 		// Ended crash-style ("terminal-exited", never "disposed") so the
 		// binding is a resume candidate for the relaunch below — and, should
 		// either step fail, for any pane that asks later (a failed relaunch
@@ -366,7 +369,7 @@ export async function listOutdatedAgentSessions(
 	if (candidates.length === 0) return [];
 
 	const { PATH = "" } = await getToolEnvironment();
-	const installedByCommand = new Map<string, Promise<string | null>>();
+	const installedByCommand = new Map<string, Promise<ExecutableFile | null>>();
 	const outdated = await Promise.all(
 		candidates.map(async (candidate) => {
 			const pid = parseLaunchPid(candidate.binding.launchId);
@@ -400,7 +403,15 @@ export async function restartOutdatedAgentSessions(
 	const idleBindings = candidates
 		.map(({ binding }) => binding)
 		.filter(isBetweenTurns);
-	return restartAgentSessions(deps, idleBindings);
+	// A session can start a turn while the ones before it restart.
+	return restartAgentSessions(deps, idleBindings, (binding) => {
+		const current = deps.terminalAgentStore.get(binding.terminalId);
+		return (
+			!!current &&
+			current.launchId === binding.launchId &&
+			isBetweenTurns(current)
+		);
+	});
 }
 
 function isBetweenTurns(binding: TerminalAgentBinding): boolean {
