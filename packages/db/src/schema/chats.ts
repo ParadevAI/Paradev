@@ -487,9 +487,14 @@ export const chatsAppCalls = chatsSchema.table(
 		app: text("app").notNull(),
 		tool: text("tool").notNull(),
 		ok: boolean("ok").notNull(),
+		/** The workspace the call created, for showing which Dev made it. */
+		workspaceId: text("workspace_id"),
 		createdAt: createdAt(),
 	},
 	(t) => [
+		index("app_calls_owner_workspace_idx")
+			.on(t.ownerUserId, t.workspaceId)
+			.where(sql`${t.workspaceId} is not null`),
 		index("app_calls_owner_created_idx").on(t.ownerUserId, t.createdAt),
 		index("app_calls_agent_created_idx").on(t.agentId, t.createdAt),
 	],

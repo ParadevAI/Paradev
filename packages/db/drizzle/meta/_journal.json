@@ -1401,6 +1401,13 @@
       "when": 1794886701258,
       "tag": "0199_chats_paradev_access",
       "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1794891699935,
+      "tag": "0200_chats_app_call_workspace",
+      "breakpoints": true
     }
   ]
 }
