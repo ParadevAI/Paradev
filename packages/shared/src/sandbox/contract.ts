@@ -155,6 +155,8 @@ export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_PROVIDER: z.string().min(1),
 	/** The workspace drive's name; the box refuses to boot when it is not mounted. */
 	SUPERSET_SANDBOX_DRIVE: z.string().min(1).optional(),
+	/** Set after the provision: the drive must already carry this workspace's id. */
+	SUPERSET_SANDBOX_DRIVE_LAID_OUT: z.literal("1").optional(),
 	HOST_SERVICE_SENTRY_DSN: z.string().optional(),
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */

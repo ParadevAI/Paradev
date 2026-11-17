@@ -34,8 +34,39 @@ export function workspaceDriveNameToClaim(args: {
 
 export function workspaceDriveIdentity(
 	driveName: string | null | undefined,
-): Pick<SandboxIdentity, "SUPERSET_SANDBOX_DRIVE"> {
-	return driveName ? { SUPERSET_SANDBOX_DRIVE: driveName } : {};
+	{ laidOut }: { laidOut: boolean },
+): Pick<
+	SandboxIdentity,
+	"SUPERSET_SANDBOX_DRIVE" | "SUPERSET_SANDBOX_DRIVE_LAID_OUT"
+> {
+	if (!driveName) return {};
+	return {
+		SUPERSET_SANDBOX_DRIVE: driveName,
+		...(laidOut ? { SUPERSET_SANDBOX_DRIVE_LAID_OUT: "1" as const } : {}),
+	};
+}
+
+/**
+ * Only a provision gives a workspace its environment's drive. A wake mounts
+ * the row's own drive or none, so a workspace made before its environment
+ * entered drive mode boots exactly as it did.
+ */
+export function claimedDriveIdentity(args: {
+	row: { driveName: string | null; providerSandboxId: string };
+	goldenDriveName: string | null | undefined;
+	provisioning: boolean;
+}): ReturnType<typeof workspaceDriveIdentity> {
+	if (!args.provisioning) {
+		return workspaceDriveIdentity(args.row.driveName, { laidOut: true });
+	}
+	return workspaceDriveIdentity(
+		workspaceDriveNameToClaim({
+			existing: args.row.driveName,
+			goldenDriveName: args.goldenDriveName,
+			providerSandboxId: args.row.providerSandboxId,
+		}),
+		{ laidOut: false },
+	);
 }
 
 export function goldenDriveNameFor(goldenName: string): string {

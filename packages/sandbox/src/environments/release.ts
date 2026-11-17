@@ -245,7 +245,7 @@ function identityFor(
 		]),
 		SUPERSET_SANDBOX_IMAGE_TAG: sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
-		...workspaceDriveIdentity(driveName),
+		...workspaceDriveIdentity(driveName, { laidOut: false }),
 	};
 }
 

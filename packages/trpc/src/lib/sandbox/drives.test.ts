@@ -67,15 +67,20 @@ describe("workspaceDriveIdentity", () => {
 		expect(
 			renderSandboxConf({
 				...identity,
-				...workspaceDriveIdentity("drive-ws-1"),
+				...workspaceDriveIdentity("drive-ws-1", { laidOut: true }),
 			}),
-		).toContain("SUPERSET_SANDBOX_DRIVE='drive-ws-1'\n");
+		).toContain(
+			"SUPERSET_SANDBOX_DRIVE='drive-ws-1'\nSUPERSET_SANDBOX_DRIVE_LAID_OUT='1'\n",
+		);
 	});
 
 	test("a workspace without a drive writes no drive key", () => {
-		expect(workspaceDriveIdentity(null)).toEqual({});
+		expect(workspaceDriveIdentity(null, { laidOut: true })).toEqual({});
 		expect(
-			renderSandboxConf({ ...identity, ...workspaceDriveIdentity(undefined) }),
+			renderSandboxConf({
+				...identity,
+				...workspaceDriveIdentity(undefined, { laidOut: false }),
+			}),
 		).not.toContain("SUPERSET_SANDBOX_DRIVE");
 	});
 });

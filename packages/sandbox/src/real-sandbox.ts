@@ -207,7 +207,10 @@ async function drivePass(): Promise<number> {
 	const mounts = workspaceDriveMounts(boxDrive);
 	const driveClaim = {
 		...claim,
-		identity: { ...identity, ...workspaceDriveIdentity(boxDrive) },
+		identity: {
+			...identity,
+			...workspaceDriveIdentity(boxDrive, { laidOut: false }),
+		},
 	};
 	const drive = SANDBOX_PATHS.drive;
 	const expectations = [

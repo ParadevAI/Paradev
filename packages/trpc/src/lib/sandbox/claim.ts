@@ -30,7 +30,7 @@ import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentToolsDriveFor } from "./agent-tools";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
-import { workspaceDriveIdentity, workspaceDriveNameToClaim } from "./drives";
+import { claimedDriveIdentity } from "./drives";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -83,6 +83,8 @@ export async function buildSandboxClaim(args: {
 	 * are fixed once the box exists), and it costs a GitHub request.
 	 */
 	withRepoHooks?: boolean;
+	/** A create, the only claim that may give the workspace its environment's drive. */
+	provisioning?: boolean;
 }): Promise<{
 	claim: SandboxClaim;
 	environment: SandboxEnvironment;
@@ -140,13 +142,11 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
-		...workspaceDriveIdentity(
-			workspaceDriveNameToClaim({
-				existing: args.row.driveName,
-				goldenDriveName: environment.goldenDriveName,
-				providerSandboxId: args.row.providerSandboxId,
-			}),
-		),
+		...claimedDriveIdentity({
+			row: args.row,
+			goldenDriveName: environment.goldenDriveName,
+			provisioning: args.provisioning ?? false,
+		}),
 		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {

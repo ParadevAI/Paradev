@@ -145,7 +145,12 @@ async function provision(
 	try {
 		const { claim, environment, agentCredentialDigest } =
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
-				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
+				buildSandboxClaim({
+					row,
+					launch: input.launch,
+					withRepoHooks: true,
+					provisioning: true,
+				}),
 			);
 		({ bootId } = await authorizeBoot({
 			organizationId: row.organizationId,
