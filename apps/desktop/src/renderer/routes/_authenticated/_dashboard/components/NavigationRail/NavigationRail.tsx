@@ -15,7 +15,7 @@ export const NAVIGATION_RAIL_WIDTH = 52;
 export function NavigationRail() {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
-	const destinations = useRailDestinations();
+	const destinations = useRailDestinations(navigation);
 
 	return (
 		<nav
@@ -36,6 +36,10 @@ export function NavigationRail() {
 				))}
 			<RailMoreMenu
 				destinations={destinations}
+				isActive={
+					navigation.isChannelsOpen &&
+					!destinations.some((destination) => destination.id === "chat")
+				}
 				onOpenUsage={navigation.openUsage}
 			/>
 			<div className="mt-auto flex flex-col items-center gap-1.5">

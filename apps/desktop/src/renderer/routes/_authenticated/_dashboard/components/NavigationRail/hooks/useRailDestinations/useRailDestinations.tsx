@@ -1,12 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType } from "react";
 import { PiChatsCircle, PiClockClockwise } from "react-icons/pi";
 import { TbGitPullRequest, TbNote, TbStack2 } from "react-icons/tb";
 import { VscExtensions } from "react-icons/vsc";
 import { env } from "renderer/env.renderer";
-import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
+import type { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { SolarCheckCircleIcon } from "../../components/SolarCheckCircleIcon";
 import {
@@ -19,18 +19,18 @@ import {
 export interface RailDestination {
 	id: RailDestinationId;
 	label: string;
-	railLabel?: string;
+	alertLabel?: string;
 	icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 	isIconFilled?: boolean;
 	isActive: boolean;
 	isPinned: boolean;
 	onClick: () => void;
-	badge?: ReactNode;
 }
 
-export function useRailDestinations(): RailDestination[] {
+export function useRailDestinations(
+	navigation: ReturnType<typeof useDashboardNavigation>,
+): RailDestination[] {
 	const { t } = useLingui();
-	const navigation = useDashboardNavigation();
 	const pinOverrides = useRailPinsStore((state) => state.pinOverrides);
 	const railOrder = resolveRailOrder(useRailPinsStore((state) => state.order));
 	const isChannelsEnabled =
@@ -81,7 +81,7 @@ export function useRailDestinations(): RailDestination[] {
 		{
 			id: "automations",
 			label: t({ message: "Automations" }),
-			railLabel:
+			alertLabel:
 				myFailedCount > 0
 					? t({ message: `Automations (${myFailedCount} failing)` })
 					: undefined,
@@ -92,13 +92,6 @@ export function useRailDestinations(): RailDestination[] {
 				myFailedCount > 0
 					? navigation.openFailedAutomations
 					: navigation.openAutomations,
-			badge:
-				myFailedCount > 0 ? (
-					<span
-						aria-hidden="true"
-						className="absolute top-2 right-2 size-1.5 rounded-full bg-red-500"
-					/>
-				) : undefined,
 		},
 		{
 			id: "tasks",

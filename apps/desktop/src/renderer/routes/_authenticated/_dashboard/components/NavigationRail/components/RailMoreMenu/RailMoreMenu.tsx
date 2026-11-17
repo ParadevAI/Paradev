@@ -24,6 +24,7 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { Ellipsis, FolderPlus, Gauge } from "lucide-react";
+import { useId, useState } from "react";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AddProjectMenuItems } from "renderer/routes/_authenticated/_dashboard/components/AddProjectMenuItems";
 import {
@@ -36,14 +37,20 @@ import {
 	type RailDestinationId,
 	useRailPinsStore,
 } from "../../stores/railPinsStore";
+import { RailAlertDot } from "../RailAlertDot";
 import { SortableDestinationRow } from "./components/SortableDestinationRow";
 
 interface RailMoreMenuProps {
 	destinations: RailDestination[];
+	isActive: boolean;
 	onOpenUsage: () => void;
 }
 
-export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
+export function RailMoreMenu({
+	destinations,
+	isActive,
+	onOpenUsage,
+}: RailMoreMenuProps) {
 	const { t } = useLingui();
 	const setPinned = useRailPinsStore((state) => state.setPinned);
 	const setVisibleOrder = useRailPinsStore((state) => state.setVisibleOrder);
@@ -52,9 +59,12 @@ export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 	);
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
-	const offRailBadge = destinations.find(
-		(destination) => !destination.isPinned && !destination.isActive,
-	)?.badge;
+	const [isSorting, setIsSorting] = useState(false);
+	const alertDescriptionId = useId();
+	const offRailAlertLabel = destinations.find(
+		(destination) =>
+			!destination.isPinned && !destination.isActive && destination.alertLabel,
+	)?.alertLabel;
 	return (
 		<DropdownMenu>
 			<Tooltip delayDuration={300}>
@@ -63,13 +73,24 @@ export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 						<button
 							type="button"
 							aria-label={t({ message: "More" })}
-							className={railButtonClass(false)}
+							aria-describedby={
+								offRailAlertLabel ? alertDescriptionId : undefined
+							}
+							aria-current={isActive ? "page" : undefined}
+							className={railButtonClass(isActive)}
 						>
 							<Ellipsis
 								className={RAIL_ICON_CLASS}
 								strokeWidth={RAIL_ICON_STROKE_WIDTH}
 							/>
-							{offRailBadge}
+							{offRailAlertLabel && (
+								<>
+									<RailAlertDot className="absolute top-2 right-2" />
+									<span id={alertDescriptionId} className="sr-only">
+										{offRailAlertLabel}
+									</span>
+								</>
+							)}
 						</button>
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
@@ -81,11 +102,17 @@ export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 				side="right"
 				align="start"
 				onCloseAutoFocus={(event) => event.preventDefault()}
+				onEscapeKeyDown={(event) => {
+					if (isSorting) event.preventDefault();
+				}}
 			>
 				<DndContext
 					sensors={sensors}
 					collisionDetection={closestCenter}
+					onDragStart={() => setIsSorting(true)}
+					onDragCancel={() => setIsSorting(false)}
 					onDragEnd={({ active, over }) => {
+						setIsSorting(false);
 						if (!over || active.id === over.id) return;
 						const ids = destinations.map(({ id }) => id);
 						setVisibleOrder(
@@ -105,6 +132,7 @@ export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 							<SortableDestinationRow
 								key={destination.id}
 								destination={destination}
+								isSorting={isSorting}
 								onTogglePinned={() =>
 									setPinned(destination.id, !destination.isPinned)
 								}

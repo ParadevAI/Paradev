@@ -6,20 +6,29 @@ import { cn } from "@superset/ui/utils";
 import { LuGripVertical, LuPin } from "react-icons/lu";
 import { RAIL_ICON_STROKE_WIDTH } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import type { RailDestination } from "../../../../hooks/useRailDestinations";
+import { RailAlertDot } from "../../../RailAlertDot";
 
 interface SortableDestinationRowProps {
 	destination: RailDestination;
+	isSorting: boolean;
 	onTogglePinned: () => void;
 }
 
 export function SortableDestinationRow({
 	destination,
+	isSorting,
 	onTogglePinned,
 }: SortableDestinationRowProps) {
 	const { t } = useLingui();
 	const { icon: Icon, isIconFilled, isActive, isPinned } = destination;
-	const { setNodeRef, listeners, isDragging, transform, transition } =
-		useSortable({ id: destination.id });
+	const {
+		setNodeRef,
+		setActivatorNodeRef,
+		listeners,
+		isDragging,
+		transform,
+		transition,
+	} = useSortable({ id: destination.id });
 	const pinLabel = isPinned ? t({ message: "Unpin" }) : t({ message: "Pin" });
 
 	return (
@@ -27,7 +36,8 @@ export function SortableDestinationRow({
 			ref={setNodeRef}
 			className={cn(
 				"group/row relative flex items-center gap-1",
-				isDragging && "z-10 cursor-grabbing opacity-70",
+				isSorting && "pointer-events-none",
+				isDragging && "z-10 opacity-70",
 			)}
 			style={{
 				transform: CSS.Translate.toString(
@@ -35,10 +45,10 @@ export function SortableDestinationRow({
 				),
 				transition,
 			}}
-			{...listeners}
 		>
 			<DropdownMenuItem
 				onSelect={destination.onClick}
+				aria-label={destination.alertLabel}
 				aria-current={isActive ? "page" : undefined}
 				className={cn("flex-1", isActive && "bg-fill-selected")}
 			>
@@ -47,6 +57,7 @@ export function SortableDestinationRow({
 					{...(isIconFilled ? {} : { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
 				/>
 				{destination.label}
+				{destination.alertLabel && <RailAlertDot />}
 			</DropdownMenuItem>
 			<DropdownMenuItem
 				aria-label={pinLabel}
@@ -66,10 +77,14 @@ export function SortableDestinationRow({
 					)}
 				/>
 			</DropdownMenuItem>
-			<LuGripVertical
+			<span
+				ref={setActivatorNodeRef}
 				aria-hidden="true"
-				className="size-3.5 shrink-0 cursor-grab text-muted-foreground/40 group-hover/row:text-muted-foreground"
-			/>
+				className="flex h-7 w-5 shrink-0 cursor-grab touch-none items-center justify-center text-muted-foreground/40 group-hover/row:text-muted-foreground"
+				{...listeners}
+			>
+				<LuGripVertical className="size-3.5" />
+			</span>
 		</div>
 	);
 }

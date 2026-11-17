@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	isRailDestinationPinned,
 	resolveRailOrder,
+	sanitizeRailPins,
 	withRailOrder,
 	withRailPin,
 } from "./railPinsStore";
@@ -48,5 +49,25 @@ describe("withRailOrder", () => {
 		const moved = withRailOrder([], ["chat", "workspaces"]);
 		expect(resolveRailOrder(moved).slice(0, 2)).toEqual(["chat", "workspaces"]);
 		expect(withRailOrder(moved, ["workspaces", "chat"])).toEqual([]);
+	});
+});
+
+describe("sanitizeRailPins", () => {
+	test("falls back to the defaults when the saved value has the wrong shape", () => {
+		expect(sanitizeRailPins(null)).toEqual({ pinOverrides: {}, order: [] });
+		expect(sanitizeRailPins({ pinOverrides: null, order: "tasks" })).toEqual({
+			pinOverrides: {},
+			order: [],
+		});
+	});
+
+	test("drops unknown sections, wrong value types and repeated ids", () => {
+		const { pinOverrides, order } = sanitizeRailPins({
+			pinOverrides: { tasks: false, chat: "yes", removed: true },
+			order: ["tasks", "removed", "tasks", 3, "workspaces"],
+		});
+		expect(pinOverrides).toEqual({ tasks: false });
+		expect(order.slice(0, 2)).toEqual(["tasks", "workspaces"]);
+		expect(new Set(order).size).toBe(order.length);
 	});
 });

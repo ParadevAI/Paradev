@@ -42,7 +42,9 @@ const DEFAULT_RAIL_ORDER = Object.keys(
 export function resolveRailOrder(
 	savedOrder: readonly RailDestinationId[],
 ): RailDestinationId[] {
-	const saved = savedOrder.filter((id) => id in DEFAULT_RAIL_PINS);
+	const saved = [...new Set(savedOrder)].filter(
+		(id) => id in DEFAULT_RAIL_PINS,
+	);
 	return [...saved, ...DEFAULT_RAIL_ORDER.filter((id) => !saved.includes(id))];
 }
 
@@ -57,6 +59,32 @@ export function withRailOrder(
 	return next.every((id, index) => id === DEFAULT_RAIL_ORDER[index])
 		? []
 		: next;
+}
+
+export function sanitizeRailPins(persisted: unknown): {
+	pinOverrides: RailPinOverrides;
+	order: RailDestinationId[];
+} {
+	const { pinOverrides, order } = (persisted ?? {}) as Record<string, unknown>;
+	const overrides =
+		pinOverrides && typeof pinOverrides === "object" ? pinOverrides : {};
+	return {
+		pinOverrides: Object.fromEntries(
+			Object.entries(overrides).filter(
+				([id, isPinned]) =>
+					id in DEFAULT_RAIL_PINS && typeof isPinned === "boolean",
+			),
+		),
+		order: Array.isArray(order)
+			? withRailOrder(
+					order.filter(
+						(id): id is RailDestinationId =>
+							typeof id === "string" && id in DEFAULT_RAIL_PINS,
+					),
+					[],
+				)
+			: [],
+	};
 }
 
 interface RailPinsState {
@@ -79,6 +107,13 @@ export const useRailPinsStore = create<RailPinsState>()(
 			setVisibleOrder: (visibleOrder) =>
 				set((state) => ({ order: withRailOrder(state.order, visibleOrder) })),
 		}),
-		{ name: RAIL_PINS_STORAGE_KEY, version: 1 },
+		{
+			name: RAIL_PINS_STORAGE_KEY,
+			version: 1,
+			merge: (persisted, current) => ({
+				...current,
+				...sanitizeRailPins(persisted),
+			}),
+		},
 	),
 );

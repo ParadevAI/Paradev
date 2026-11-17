@@ -9,6 +9,7 @@ import { LuPin, LuPinOff } from "react-icons/lu";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import type { RailDestination } from "../../hooks/useRailDestinations";
 import { useRailPinsStore } from "../../stores/railPinsStore";
+import { RailAlertDot } from "../RailAlertDot";
 
 interface PinnableRailButtonProps {
 	destination: RailDestination;
@@ -22,12 +23,16 @@ export function PinnableRailButton({ destination }: PinnableRailButtonProps) {
 			<ContextMenuTrigger asChild>
 				<div>
 					<RailButton
-						label={destination.railLabel ?? destination.label}
+						label={destination.alertLabel ?? destination.label}
 						icon={destination.icon}
 						isIconFilled={destination.isIconFilled}
 						isActive={destination.isActive}
 						onClick={destination.onClick}
-						badge={destination.badge}
+						badge={
+							destination.alertLabel ? (
+								<RailAlertDot className="absolute top-2 right-2" />
+							) : undefined
+						}
 					/>
 				</div>
 			</ContextMenuTrigger>
