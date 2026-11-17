@@ -24,6 +24,33 @@ export function resolvePendingCreationPresets(
 	});
 }
 
+export interface CreationPresetRun {
+	preset: V2TerminalPresetRow;
+	options: { target: "new-tab" } | undefined;
+}
+
+/**
+ * Split-pane presets run first, while the agent tab seeded by the create is
+ * still the active tab; each new-tab preset activates the tab it opens.
+ * Sequential presets always get a new tab: aimed at the active tab, they would
+ * type into the agent's PTY.
+ */
+export function planCreationPresetRuns(
+	presets: readonly V2TerminalPresetRow[],
+): CreationPresetRun[] {
+	const runs = presets.map((preset) => ({
+		preset,
+		options:
+			preset.executionMode === "split-pane"
+				? undefined
+				: { target: "new-tab" as const },
+	}));
+	return [
+		...runs.filter((run) => run.options === undefined),
+		...runs.filter((run) => run.options !== undefined),
+	];
+}
+
 /**
  * Run the terminal presets tagged "auto-run on workspace creation" that were
  * queued on this workspace's local-state row when its create resolved (see
@@ -75,14 +102,12 @@ export function useRunWorkspaceCreationPresets({
 			resolvePresetCommands,
 		);
 		void (async () => {
-			// Always a fresh tab: the create seeds the agent tab as active, and a
-			// sequential script targeting the active terminal would be typed
-			// into the agent's PTY as a prompt. Serial so tabs land in
-			// presets-bar order. executePreset toasts its own failures; the
-			// guard keeps an unexpected throw from skipping later scripts.
-			for (const preset of presets) {
+			// Serial so tabs land in presets-bar order. executePreset toasts its
+			// own failures; the guard keeps an unexpected throw from skipping
+			// later scripts.
+			for (const { preset, options } of planCreationPresetRuns(presets)) {
 				try {
-					await executePreset(preset, { target: "new-tab" });
+					await executePreset(preset, options);
 				} catch (err) {
 					console.error("[useRunWorkspaceCreationPresets] preset failed", {
 						workspaceId,
