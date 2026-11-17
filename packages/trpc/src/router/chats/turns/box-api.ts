@@ -6,6 +6,8 @@ import { z } from "zod";
 import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
 import type { BoxKeys } from "./box-tokens";
 import {
+	AskError,
+	askDev,
 	chatForDev,
 	postDevMessage,
 	settleTurn,
@@ -246,6 +248,19 @@ async function message(deps: BoxApiDeps, request: Request, endsTurn: boolean) {
 	return json(201, { sent: true });
 }
 
+const question = z.object({
+	dev: z.string().trim().min(1).max(200),
+	question: z.string().trim().min(1).max(10_000),
+});
+
+/** `dev ask`: one Dev's question to another in the turn's chat, answered to the asker only. */
+async function ask(deps: BoxApiDeps, request: Request) {
+	const claims = await boxTurn(deps.keys, request.headers);
+	const body = question.parse(await request.json());
+	const answer = await askDev(deps.turns, claims, body.dev, body.question);
+	return json(200, { answer });
+}
+
 const readLimit = z.coerce.number().int().min(1).max(200).default(20);
 
 /** What a Dev reads of its turn's chat: `/cli/messages?limit=` and `/cli/members`. */
@@ -284,10 +299,14 @@ export async function handleBoxRequest(
 		}
 		const settle = /^\/cli\/turns\/([^/]+)\/settled$/.exec(path);
 		if (settle?.[1]) return await settled(deps, request, settle[1]);
+		if (path === "/cli/ask") return await ask(deps, request);
 		if (path === "/cli/reply") return await message(deps, request, true);
 		if (path === "/cli/messages") return await message(deps, request, false);
 		return json(404, { code: "not_found", message: "Unknown route" });
 	} catch (error) {
+		if (error instanceof AskError) {
+			return json(error.status, { code: "ask", message: error.message });
+		}
 		if (error instanceof BoxRequestError) {
 			return json(error.status, { code: error.code, message: error.message });
 		}

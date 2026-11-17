@@ -35,6 +35,11 @@ export interface TurnStart {
 	 * the box loads what the Dev keeps privately about its owner.
 	 */
 	ownerOneToOne: boolean;
+	/**
+	 * Another Dev asks this owner's Dev something: the box answers from the
+	 * owner's notes, under a rule to share only what was asked.
+	 */
+	devAsk: boolean;
 	/** The chat around the turn: its latest messages, oldest first, and who is in it. */
 	chat: {
 		recent: { line: string; seen: boolean }[];

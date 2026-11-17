@@ -78,6 +78,8 @@ export interface TurnDeps {
 	now?: () => Date;
 }
 
+/** How long one Dev's question to another waits for a busy Dev before giving up. */
+const ASK_WAIT_MS = 120_000;
 /** A queued message turn waits as long as a turn may take, so a long turn in another group delays it and does not drop it. */
 const TURN_WAIT_MS = TURN_MAX_MS;
 /** A running turn older than this no longer blocks its Dev: its run was lost, and a stuck row must not lock the Dev forever. */
@@ -223,7 +225,8 @@ export async function claimTurn(
 			)
 			.limit(1);
 		if (busy) {
-			if (now.getTime() - turn.createdAt.getTime() < TURN_WAIT_MS) {
+			const wait = turn.parentTurnId ? ASK_WAIT_MS : TURN_WAIT_MS;
+			if (now.getTime() - turn.createdAt.getTime() < wait) {
 				return { kind: "wait" };
 			}
 			const error = "it was busy for too long";
@@ -546,6 +549,105 @@ async function isOwnerOneToOne(turn: TurnRow): Promise<boolean> {
 	return row?.kind === "direct";
 }
 
+/** Whether another Dev asks this one something in a chat its owner is in. */
+async function isDevAsk(turn: TurnRow): Promise<boolean> {
+	if (!turn.parentTurnId) return false;
+	const [row] = await db
+		.select({ id: chatsAgents.id })
+		.from(chatsAgents)
+		.innerJoin(
+			chatsGroupMembers,
+			and(
+				eq(chatsGroupMembers.groupId, turn.groupId),
+				eq(chatsGroupMembers.userId, chatsAgents.ownerUserId),
+			),
+		)
+		.where(eq(chatsAgents.id, turn.agentId));
+	return row !== undefined;
+}
+
+/**
+ * One Dev's question to another that is in the same chat. The asked Dev runs
+ * a turn of its own and its final text comes back to the asker only: it does
+ * not post in the chat.
+ */
+export async function askDev(
+	deps: TurnDeps,
+	asker: {
+		turnId: string;
+		agentId: string;
+		groupId: string;
+		userId: string | null;
+	},
+	target: string,
+	question: string,
+): Promise<string> {
+	const roster = await loadRoster(asker.groupId);
+	const others = roster.filter((dev) => dev.id !== asker.agentId);
+	const wanted = target.trim().toLowerCase();
+	const named = others.filter(
+		(dev) => dev.id === wanted || dev.name.toLowerCase() === wanted,
+	);
+	const [asked] = named;
+	if (!asked) throw new AskError(404, "That Dev isn't in this chat");
+	if (named.length > 1) {
+		throw new AskError(
+			409,
+			`Several Devs here are called "${target}". Ask one by its id: ${named.map((dev) => dev.id).join(", ")}`,
+		);
+	}
+	const [[group], people] = await Promise.all([
+		db
+			.select({ kind: chatsGroups.kind, title: chatsGroups.title })
+			.from(chatsGroups)
+			.where(eq(chatsGroups.id, asker.groupId)),
+		db
+			.select({ user: users })
+			.from(chatsGroupMembers)
+			.innerJoin(users, eq(users.id, chatsGroupMembers.userId))
+			.where(eq(chatsGroupMembers.groupId, asker.groupId)),
+	]);
+	const from = roster.find((dev) => dev.id === asker.agentId)?.name ?? "A Dev";
+	const header = turnHeader(`Question from ${from}, a Dev in this chat`, [
+		[
+			"Chat",
+			group?.kind === "direct"
+				? `your 1:1 with ${people.map(({ user }) => toUser(user).displayName).join(", ")}`
+				: `the group "${group?.title ?? ""}"`,
+		],
+		["Time", formatTime(nowOf(deps))],
+	]);
+	const [turn] = await db
+		.insert(chatsTurns)
+		.values({
+			agentId: asked.id,
+			groupId: asker.groupId,
+			prompt: `${header}\n\n${question}\n\nAnswer in plain text as your final message, as briefly as you can; it is passed back to them, not posted in the chat. Don't post in the chat either (no reply, no updates).`,
+			userId: asker.userId,
+			parentTurnId: asker.turnId,
+		})
+		.returning({ id: chatsTurns.id });
+	if (!turn) throw new Error("The question was not stored");
+	const run = await deps.turnRuns.start(turn.id);
+	const outcome = await run.outcome();
+	if ("answer" in outcome) return outcome.answer;
+	if ("busy" in outcome)
+		throw new AskError(409, "That Dev is busy; try again in a bit");
+	throw new Error(
+		"error" in outcome ? outcome.error : "the question was cancelled",
+	);
+}
+
+/** Why a question to another Dev was refused, with the status the box hears. */
+export class AskError extends Error {
+	constructor(
+		readonly status: number,
+		message: string,
+	) {
+		super(message);
+	}
+}
+
 /** The Dev has been given the chat up to now: it has seen it. */
 async function markAgentRead(agentId: string, groupId: string) {
 	const [latest] = await db
@@ -709,8 +811,9 @@ export async function startTurn(
 			groupId: turn.groupId,
 			sessionId: turn.groupId,
 			text: prompt.text,
-			checkReply: await checksReply(turn),
+			checkReply: turn.parentTurnId ? false : await checksReply(turn),
 			ownerOneToOne: await isOwnerOneToOne(turn),
+			devAsk: await isDevAsk(turn),
 			chat: await turnChat(turn),
 		});
 		await markAgentRead(turn.agentId, turn.groupId).catch((error: unknown) =>
@@ -741,7 +844,8 @@ export async function postDevMessage(
 		!turn ||
 		turn.agentId !== claims.agentId ||
 		turn.status !== "running" ||
-		turn.superseded
+		turn.superseded ||
+		turn.parentTurnId
 	) {
 		return false;
 	}

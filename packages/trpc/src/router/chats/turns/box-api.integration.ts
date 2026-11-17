@@ -204,6 +204,50 @@ test("only the current box of the turn's Dev is let in", async () => {
 	await runs.idle();
 });
 
+test("one Dev asks another in its chat and hears the answer; the asked Dev posts nothing", async () => {
+	const created = await owner.chats.createGroup({
+		organizationId: ORG,
+		title: "Asking",
+	});
+	const groupId = created.group.id;
+	const mine = await owner.chats.createDev({
+		organizationId: ORG,
+		name: "Helper",
+		color: "#F2B23E",
+		description: "Knows things",
+	});
+	await owner.chats.addDevToGroup({ groupId, devId: mine.dev.id });
+	const before = started.length;
+	await owner.chats.sendMessage({
+		groupId,
+		text: `<@dev:${created.dev.id}> ask Helper`,
+	});
+	const turn = await startedTurn(before + 1);
+	const asking = fromBox(turn, "/cli/ask", {
+		dev: "helper",
+		question: "what do you know",
+	});
+	const asked = await startedTurn(before + 2);
+	expect(asked.agentId).toBe(mine.dev.id);
+	expect(asked.devAsk).toBe(true);
+	expect(asked.text).toContain("Question from Asking, a Dev in this chat");
+	expect((await fromBox(asked, "/cli/reply", { text: "hi all" })).status).toBe(
+		409,
+	);
+	await fromBox(asked, `/cli/turns/${asked.turnId}/settled`, {
+		stopReason: "end_turn",
+		answer: "plenty",
+	});
+	expect(await (await asking).json()).toEqual({ answer: "plenty" });
+	expect(
+		(await fromBox(turn, "/cli/ask", { dev: "nobody", question: "x" })).status,
+	).toBe(404);
+	await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
+		stopReason: "end_turn",
+	});
+	await runs.idle();
+});
+
 test("a box's model call goes out with the server's key and is metered to the Dev's owner", async () => {
 	const { turn } = await messaged("think");
 	const response = await fromBox(turn, "/model/v1/messages", {
