@@ -2822,9 +2822,6 @@ msgstr "perangkat lain"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Jawab pertanyaan di terminal di bawah, misalnya kata sandi."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Jawab pertanyaan ini di desktop, atau lewati."
-
 msgid "Answered"
 msgstr "Dijawab"
 

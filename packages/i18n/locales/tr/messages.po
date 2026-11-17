@@ -2822,9 +2822,6 @@ msgstr "başka bir cihaz"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Aşağıdaki terminalde parola gibi soruları yanıtla."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Bu soruyu masaüstünde yanıtlayın veya atlayın."
-
 msgid "Answered"
 msgstr "Yanıtlandı"
 

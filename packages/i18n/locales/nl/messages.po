@@ -2822,9 +2822,6 @@ msgstr "een ander apparaat"
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Beantwoord vragen in de terminal hieronder, zoals een wachtwoord."
 
-msgid "Answer this question on desktop, or skip it."
-msgstr "Beantwoord deze vraag op desktop, of sla hem over."
-
 msgid "Answered"
 msgstr "Beantwoord"
 
