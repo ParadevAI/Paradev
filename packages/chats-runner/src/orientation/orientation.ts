@@ -84,20 +84,18 @@ export function orientationPrompt(
 		return `## You and your folder
 You belong to the group, not to any one person, and ${agentDir} is the group's. The group also has its own Dev, which answers when nobody means you: speak when you're asked (mentioned, or a message is for what you do), and leave the rest to it.
 - AGENTS.md: your instructions, from your registry listing (under "Your instructions"); don't edit it.
-- skills/: what you know how to do in depth, from your listing, and Dev's sketches skill.
+- skills/: what you know how to do in depth, from your listing.
 - rules/<chat id>.md: what the group wants from you (see Memory); keep it as they tell you, since you have no owner to take instructions from. This chat's is under "This chat's rules".
-- apps/: the source of the sketches you made for the group.
 - sessions/: your conversation history; don't edit it.
-You have no owner, so no you.md and no connected apps. For anything about a member, or that needs an app, ask their Dev (\`dev members\` shows who's whose).`;
+You have no owner, so no you.md. For anything about a member, ask their Dev (\`dev members\` shows who's whose).`;
 	}
 	if (identity.kind === "group") {
 		return `## You and your folder
 You belong to the group, not to any one person, and ${agentDir} is the group's.${described}
 - AGENTS.md: instructions the group's members gave you earlier, if any (under "Your instructions"); don't edit it.
 - rules/<chat id>.md: what the group has taught you (see Memory); this chat's is under "This chat's rules".
-- apps/: the source of the sketches you made for the group.
 - sessions/: your conversation history; don't edit it.
-You have no owner, so no you.md and no connected apps. For anything about a member (preferences, how they like things done, availability), ask their Dev (\`dev members\` shows who's whose).`;
+You have no owner, so no you.md. For anything about a member (preferences, how they like things done, availability), ask their Dev (\`dev members\` shows who's whose).`;
 	}
 	return `## You and your folder
 You belong to ${identity.ownerName} and are in several chats: their 1:1 with you and groups they brought you into.${described}
@@ -105,6 +103,5 @@ ${agentDir} is yours, shared by all those chats:
 - AGENTS.md: what ${identity.ownerName} wants you to do and how, which you keep from their 1:1 with you (see "Your owner's instructions").
 - rules/<chat id>.md: one per chat (see Memory); this chat's is under "This chat's rules".
 - memory/you.md: ${identity.ownerName}'s preferences, loaded only in their 1:1 with you and when another Dev asks you something.
-- apps/: the source of sketches you made, in any chat. skills/: Dev's sketches skill.
 - sessions/: your conversation history per chat; don't edit it.`;
 }

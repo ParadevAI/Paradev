@@ -93,9 +93,7 @@ describe("the Dev's orientation", () => {
 			"People see you described as: The Dev of Goa trip",
 		);
 		expect(text).toContain("rules/<chat id>.md: what the group has taught you");
-		expect(text).toContain(
-			"You have no owner, so no you.md and no connected apps.",
-		);
+		expect(text).toContain("You have no owner, so no you.md.");
 		expect(text).toContain(
 			"For anything about a member (preferences, how they like things done, availability), ask their Dev (`dev members` shows who's whose).",
 		);
@@ -127,9 +125,7 @@ describe("the Dev's orientation", () => {
 			"AGENTS.md: your instructions, from your registry listing",
 		);
 		expect(text).toContain("rules/<chat id>.md: what the group wants from you");
-		expect(text).toContain(
-			"You have no owner, so no you.md and no connected apps.",
-		);
+		expect(text).toContain("You have no owner, so no you.md.");
 		expect(text).not.toContain("described as");
 	});
 
@@ -145,8 +141,7 @@ describe("the Dev's orientation", () => {
 			expect(text).toContain(
 				"memory/you.md: alice's preferences, loaded only in their 1:1 with you and when another Dev asks you something.",
 			);
-			expect(text).toContain("apps/");
-			expect(text).toContain("skills/");
+			expect(text).not.toContain("apps/");
 		}
 		expect(
 			orientationPrompt(

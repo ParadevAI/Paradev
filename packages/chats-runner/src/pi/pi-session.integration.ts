@@ -90,50 +90,16 @@ describe("a chat's session", () => {
 		expect(await hub.get(CHAT)).toBe(first);
 		expect(opens).toBe(1);
 
-		// Connected apps are the owner's accounts: Composio's, run through its meta tools, and Dev's own (YNAB, Superset).
+		// The prompt describes only what a Dev can do in Paradev today.
 		const systemPrompt = (first as unknown as { opened: { pi: AgentSession } })
 			.opened.pi.systemPrompt;
-		expect(systemPrompt).toContain(
-			"Your connected apps are your owner's accounts",
-		);
-		expect(systemPrompt).toContain("`COMPOSIO_MULTI_EXECUTE_TOOL`");
-		expect(systemPrompt).toContain("`await dev.plugins.tools(app)`");
-		expect(systemPrompt).toContain("Superset's `workspaces_create`");
-		expect(systemPrompt).not.toContain("dev plugin");
-		// Devs are told when to sketch, to look at what they drew, and to save only what people come back to.
-		expect(systemPrompt).toContain(
-			"Sketch when people need to see something to understand it",
-		);
-		expect(systemPrompt).toContain("A sketch is never how you ask something");
-		expect(systemPrompt).toContain("Show, don't tabulate");
 		expect(systemPrompt).toContain("Write like a text, not a report");
 		expect(systemPrompt).toContain("never a wall of text");
-		expect(systemPrompt).toContain(
-			"put each further point on its own short bullet",
-		);
 		expect(systemPrompt).toContain("Your box reaches the internet");
-		expect(systemPrompt).toContain("A sketch shows; a saved sketch remembers.");
-		expect(systemPrompt).toContain(
-			"Deleting a saved sketch deletes its data too: confirm with the `question` tool first.",
-		);
-		expect(systemPrompt).toContain(
-			"Try a flow before you post it: `dev sketch preview <file|folder>`",
-		);
-		expect(systemPrompt).toContain("Read the screenshot with your read tool");
-		expect(systemPrompt).toContain(
-			"`await dev.agent.ask(question)` → your answer: it asks you, the Dev that made the sketch",
-		);
-		expect(systemPrompt).not.toContain("dev app ");
-		expect(systemPrompt).toContain("## Following up");
-		expect(systemPrompt).toContain(
-			"A new version of a saved sketch doesn't post again",
-		);
-		expect(systemPrompt).toContain(
-			"give yourself a task with a time: `dev task add",
-		);
-		expect(systemPrompt).toContain(
-			"add a trigger on your owner's account for that event",
-		);
+		expect(systemPrompt).toContain("## Asking another Dev");
+		expect(systemPrompt).toContain("Not available yet: tasks and reminders");
+		for (const gone of ["dev task", "dev trigger", "dev sketch", "Composio"])
+			expect(systemPrompt).not.toContain(gone);
 
 		// The chat's first turn gets who's here; the second runs in the same session, which has that already.
 		const [one = "", two = ""] = a.inputs();
