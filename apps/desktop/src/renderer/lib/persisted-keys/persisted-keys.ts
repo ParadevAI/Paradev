@@ -58,9 +58,6 @@ export const DEAD_KEYS: DeadKey[] = [
 	{ key: "sidebar-store", match: "exact" },
 	// v1/v2 surface switch removed; v2 is the only surface
 	{ key: "v2-local-override-v2", match: "exact" },
-	// One-shot v1→v2 flip handoffs; no flip remains
-	{ key: "v1-migration-continuity-pending-", match: "prefix" },
-	{ key: "v1-migration-welcome-pending-", match: "prefix" },
 	// Opening a page no longer routes to the last-visited workspace
 	{ key: "last-active-v2-workspace", match: "exact" },
 	// v1/v2 surface toggle; v2 is always on

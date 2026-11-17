@@ -15,7 +15,7 @@ function singleSegment(pathname: string, prefix: string): string | null {
 
 /**
  * Reads the workspace id from a shared web link (`<web>/workspaces/<id>`), or
- * from the desktop deep link (`superset://workspace/<id>`) that the web page
+ * from the desktop deep link (`superset://v2-workspace/<id>`) that the web page
  * redirects to when iOS opens the link in Safari.
  */
 export function workspaceIdFromUrl(url: string, webUrl: string): string | null {

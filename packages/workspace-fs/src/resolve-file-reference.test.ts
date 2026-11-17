@@ -21,7 +21,7 @@ const FILES = [
 	"apps/desktop/package.json",
 	"apps/desktop/src/renderer/commandPalette/CommandPaletteHost.tsx",
 	"apps/desktop/src/renderer/routes/_dashboard/layout.tsx",
-	"apps/desktop/src/renderer/routes/workspace/layout.tsx",
+	"apps/desktop/src/renderer/routes/v2-workspace/layout.tsx",
 	"apps/desktop/src/renderer/stores/archive/index.ts",
 	"apps/desktop/src/renderer/utils/selectIds/index.ts",
 	"packages/host-service/src/index.ts",
