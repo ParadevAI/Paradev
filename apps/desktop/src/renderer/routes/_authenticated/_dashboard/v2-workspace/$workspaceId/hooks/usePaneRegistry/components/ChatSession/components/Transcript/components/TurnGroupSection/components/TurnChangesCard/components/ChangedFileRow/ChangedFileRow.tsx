@@ -8,8 +8,8 @@ import {
 } from "@superset/ui/context-menu";
 import { cn } from "@superset/ui/utils";
 import { ArrowUpRight, FileText } from "lucide-react";
-import type { CSSProperties } from "react";
 import { FileIcon } from "renderer/lib/fileIcons";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
 import { PathActionsMenuItems } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/PathActionsMenuItems";
 import type { FilePlace } from "../../../../../../../../utils/filePlace";
 import type { DiffStats } from "../../../../../../utils/diffStats";
@@ -18,9 +18,8 @@ import { TruncateStart } from "../../../../../TruncateStart";
 
 /**
  * One file of a turn's changes: the name stays whole while its folder gives
- * way, the stats line up with the rows around it, the row opens the file's
- * diff (or the file, when there is no diff to show) and the arrow opens the
- * file itself.
+ * way, the row opens the file's diff (or the file, when there is no diff to
+ * show) and the arrow opens the file itself.
  */
 export function ChangedFileRow({
 	kind,
@@ -28,19 +27,15 @@ export function ChangedFileRow({
 	onReview,
 	place,
 	stats,
-	statWidth,
 }: {
 	kind: FileChangeKind;
 	place: FilePlace;
 	stats: DiffStats | null;
-	/** Wide enough for the card's longest count, so every row's columns align. */
-	statWidth: string;
 	onReview: (() => void) | undefined;
 	onOpen: (() => void) | undefined;
 }) {
 	const { t } = useLingui();
 	const shownPath = place.relativePath ?? place.absolutePath;
-	const columnStyle = { width: statWidth } as CSSProperties;
 	const open = kind === "deleted" ? undefined : onOpen;
 	const onRowClick = onReview ?? open;
 	return (
@@ -78,15 +73,13 @@ export function ChangedFileRow({
 							</span>
 						)}
 						<span
-							className="ml-auto flex shrink-0 font-mono text-xs tabular-nums"
+							className="ml-auto shrink-0 whitespace-nowrap font-mono text-xs tabular-nums"
 							data-find-skip
 						>
-							<span className="text-right text-green-400" style={columnStyle}>
-								{stats && stats.additions > 0 && `+${stats.additions}`}
-							</span>
-							<span className="text-right text-red-400" style={columnStyle}>
-								{stats && stats.deletions > 0 && `−${stats.deletions}`}
-							</span>
+							<DiffStatText
+								additions={stats?.additions ?? null}
+								deletions={stats?.deletions ?? null}
+							/>
 						</span>
 					</button>
 					<button
