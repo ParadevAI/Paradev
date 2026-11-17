@@ -14566,6 +14566,9 @@ msgstr "조직 {id}"
 msgid "Organization {id}"
 msgstr "조직 {id}"
 
+msgid "Organization already exists"
+msgstr "조직이 이미 존재합니다"
+
 msgid "Organization created successfully!"
 msgstr "조직을 만들었습니다!"
 
@@ -23212,6 +23215,9 @@ msgstr "이 페이지를 볼 수는 있지만 댓글을 달 수는 없습니다"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "이 작업은 되돌릴 수 없습니다. 터미널 패널에 \"Process exited\"가 표시되며 다시 시작할 수 있습니다."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "유일한 소유자는 조직에서 나갈 수 없습니다"
+
 msgid "You control the access"
 msgstr "접근 권한은 사용자가 관리합니다"
 
@@ -23247,6 +23253,9 @@ msgstr "계정을 연결하려면 조직에 속해 있어야 합니다."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "연동을 사용하려면 조직에 속해 있어야 합니다."
+
+msgid "You should be a member of at least one team"
+msgstr "최소 한 개의 팀에 속해 있어야 합니다"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

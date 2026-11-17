@@ -30,7 +30,10 @@ async function setup() {
 				teams: { enabled: true },
 				organizationHooks: {
 					beforeRemoveTeamMember: async () => {
-						throw new APIError("BAD_REQUEST", { message: ONE_TEAM_MESSAGE });
+						throw new APIError("BAD_REQUEST", {
+							message: ONE_TEAM_MESSAGE,
+							code: "MUST_BELONG_TO_A_TEAM",
+						});
 					},
 				},
 			}),
@@ -71,6 +74,9 @@ describe("withAuthUserErrors", () => {
 		expect(error.code).toBe("BAD_REQUEST");
 		expect(getHTTPStatusCodeFromError(error)).toBe(400);
 		expect(error.message).toBe("Organization already exists");
+		expect(error.cause).toMatchObject({
+			i18nKey: "serverError.organization.alreadyExists",
+		});
 	});
 
 	test("the only owner leaving is a 400 with better-auth's message", async () => {
@@ -85,6 +91,9 @@ describe("withAuthUserErrors", () => {
 		expect(error.message).toBe(
 			"You cannot leave the organization as the only owner",
 		);
+		expect(error.cause).toMatchObject({
+			i18nKey: "serverError.organization.onlyOwnerCannotLeave",
+		});
 	});
 
 	test("an APIError from a team hook is a 400 with the hook's message", async () => {
@@ -105,6 +114,9 @@ describe("withAuthUserErrors", () => {
 		);
 		expect(error.code).toBe("BAD_REQUEST");
 		expect(error.message).toBe(ONE_TEAM_MESSAGE);
+		expect(error.cause).toMatchObject({
+			i18nKey: "serverError.team.mustBelongToATeam",
+		});
 	});
 
 	test("server failures pass through unchanged", async () => {

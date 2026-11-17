@@ -14566,6 +14566,9 @@ msgstr "{id} kuruluşu"
 msgid "Organization {id}"
 msgstr "{id} kuruluşu"
 
+msgid "Organization already exists"
+msgstr "Kuruluş zaten var"
+
 msgid "Organization created successfully!"
 msgstr "Kuruluş oluşturuldu!"
 
@@ -23212,6 +23215,9 @@ msgstr "Bu sayfayı görüntüleyebilirsiniz ancak yorum yapamazsınız"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Bu işlemi geri alamazsınız. Terminal bölmelerinde \"Process exited\" görünür ve yeniden başlatılabilirler."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Tek sahip olarak kuruluştan ayrılamazsınız"
+
 msgid "You control the access"
 msgstr "Erişimi siz kontrol edersiniz"
 
@@ -23247,6 +23253,9 @@ msgstr "Hesap bağlamak için bir organizasyona üye olmanız gerekir."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Entegrasyonları kullanmak için bir kuruluşun parçası olmanız gerekir."
+
+msgid "You should be a member of at least one team"
+msgstr "En az bir takımın üyesi olmalısınız"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

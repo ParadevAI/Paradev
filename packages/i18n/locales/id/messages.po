@@ -14566,6 +14566,9 @@ msgstr "organisasi {id}"
 msgid "Organization {id}"
 msgstr "Organisasi {id}"
 
+msgid "Organization already exists"
+msgstr "Organisasi sudah ada"
+
 msgid "Organization created successfully!"
 msgstr "Organisasi berhasil dibuat!"
 
@@ -23212,6 +23215,9 @@ msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Tindakan ini tidak bisa dibatalkan. Panel terminal akan menampilkan \"Process exited\" dan bisa dijalankan ulang."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Anda tidak dapat keluar dari organisasi sebagai satu-satunya pemilik"
+
 msgid "You control the access"
 msgstr "Anda mengendalikan akses"
 
@@ -23247,6 +23253,9 @@ msgstr "Anda harus menjadi bagian dari organisasi untuk menghubungkan akun."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Anda harus menjadi bagian dari sebuah organisasi untuk memakai integrasi."
+
+msgid "You should be a member of at least one team"
+msgstr "Anda harus menjadi anggota setidaknya satu tim"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

@@ -14566,6 +14566,9 @@ msgstr "организация {id}"
 msgid "Organization {id}"
 msgstr "Организация {id}"
 
+msgid "Organization already exists"
+msgstr "Организация уже существует"
+
 msgid "Organization created successfully!"
 msgstr "Организация успешно создана!"
 
@@ -23212,6 +23215,9 @@ msgstr "Вы можете просматривать эту страницу, н
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Это действие нельзя отменить. В панелях терминала появится «Process exited», их можно перезапустить."
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "Вы не можете покинуть организацию, так как вы её единственный владелец"
+
 msgid "You control the access"
 msgstr "Вы контролируете доступ"
 
@@ -23247,6 +23253,9 @@ msgstr "Чтобы подключать учётные записи, нужно 
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Чтобы пользоваться интеграциями, нужно состоять в организации."
+
+msgid "You should be a member of at least one team"
+msgstr "Вы должны состоять хотя бы в одной команде"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60

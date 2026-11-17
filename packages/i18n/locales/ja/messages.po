@@ -14566,6 +14566,9 @@ msgstr "組織 {id}"
 msgid "Organization {id}"
 msgstr "組織 {id}"
 
+msgid "Organization already exists"
+msgstr "組織はすでに存在します"
+
 msgid "Organization created successfully!"
 msgstr "組織を作成しました!"
 
@@ -23212,6 +23215,9 @@ msgstr "このページは閲覧できますが、コメントはできません
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "この操作は元に戻せません。ターミナルペインに「Process exited」と表示され、再起動できます。"
 
+msgid "You cannot leave the organization as the only owner"
+msgstr "唯一のオーナーは組織から退出できません"
+
 msgid "You control the access"
 msgstr "アクセス権はあなたが管理します"
 
@@ -23247,6 +23253,9 @@ msgstr "アカウントを接続するには、組織に所属している必要
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "連携を使うには組織に所属している必要があります。"
+
+msgid "You should be a member of at least one team"
+msgstr "少なくとも 1 つのチームに所属している必要があります"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
