@@ -10,6 +10,7 @@
  * ticket-checking gate in front of every port (`access.ts`).
  */
 
+import { randomUUID } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import {
 	renderSandboxConf,
@@ -237,13 +238,16 @@ async function writeSignInFiles(
  * argv. The runner refuses to stack a second host-service on a live one, so
  * a wake that races a wake is harmless.
  */
-async function runBoot(sandbox: Sandbox, hostSecret: string): Promise<void> {
+async function runBoot(sandbox: Sandbox, hostSecret: string): Promise<string> {
+	// Stamped on boot.start, so a wait reads only this boot's lines of the log.
+	const bootId = randomUUID();
 	await sandbox.runCommand({
 		cmd: "sudo",
-		args: ["--preserve-env=HOST_SERVICE_SECRET", BOOT_COMMAND],
+		args: ["--preserve-env=HOST_SERVICE_SECRET,SUPERSET_BOOT_ID", BOOT_COMMAND],
 		detached: true,
-		env: { HOST_SERVICE_SECRET: hostSecret },
+		env: { HOST_SERVICE_SECRET: hostSecret, SUPERSET_BOOT_ID: bootId },
 	});
+	return bootId;
 }
 
 /**
@@ -265,6 +269,8 @@ export async function provisionSandbox(args: {
 	hostTarget: string;
 	expiresAt: Date | null;
 	sessionId: string | null;
+	/** Ties a wait for host-service to this boot's lines of the boot log. */
+	bootId: string;
 }> {
 	const kind = args.kind ?? "workspace";
 	const config = {
@@ -316,10 +322,11 @@ export async function provisionSandbox(args: {
 							resources: { vcpus: args.claim.vcpus },
 						}),
 		));
+	let bootId = "";
 	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
 		await writeIdentity(sandbox, args.claim.identity);
 		await writeSignInFiles(sandbox, args.claim.files);
-		await runBoot(sandbox, args.claim.hostSecret);
+		bootId = await runBoot(sandbox, args.claim.hostSecret);
 	});
 	return {
 		providerSandboxId: args.name,
@@ -327,6 +334,7 @@ export async function provisionSandbox(args: {
 		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
 		expiresAt: sandbox.expiresAt ?? null,
 		sessionId: sessionIdOf(sandbox),
+		bootId,
 	};
 }
 
@@ -357,13 +365,90 @@ export class SandboxDriveMissingError extends SandboxNotReadyError {
 	}
 }
 
-const DRIVE_REFUSAL = /^\d+ (drive\.(?:missing|foreign|unlaid)(?: .*)?)$/m;
+/**
+ * The drive refused for good: the same refusal that no remount can change, in
+ * several boots in a row. The workspace is marked failed with this message;
+ * its drive and box are kept.
+ */
+export class SandboxDriveRefusedError extends SandboxUnavailableError {
+	constructor(
+		providerSandboxId: string,
+		readonly driveName: string,
+		readonly reason: string,
+		readonly boots: number,
+	) {
+		super(providerSandboxId, new Error(reason));
+		this.name = "SandboxDriveRefusedError";
+		this.message = `Sandbox ${providerSandboxId} refused its drive ${driveName} in ${boots} boots in a row: ${reason}`;
+	}
+}
 
-/** The boot log keeps every boot of the box; only the last one counts. */
-export function driveRefusalIn(bootLog: string): string | null {
-	const lastBoot = bootLog.lastIndexOf(" boot.start ");
-	const current = lastBoot < 0 ? bootLog : bootLog.slice(lastBoot);
-	return DRIVE_REFUSAL.exec(current)?.[1] ?? null;
+/** Boots in a row that a refusal no remount can change ends the retries. */
+export const DRIVE_REFUSAL_LIMIT = 3;
+
+const STAMP = /^(\d+) ([a-z][a-z0-9-]*(?:\.[a-z0-9-]+)+)(?: (.*))?$/;
+
+interface DriveBoot {
+	id: string | null;
+	refusal: string | null;
+	laidOut: boolean;
+	hostStarted: boolean;
+}
+
+/**
+ * The boot log is append-only across sessions. One entry per boot; a
+ * reexec's second `boot.start` carries the same boot id and joins its boot.
+ */
+export function driveBootsIn(bootLog: string): DriveBoot[] {
+	const boots: DriveBoot[] = [];
+	for (const line of bootLog.split("\n")) {
+		const match = STAMP.exec(line.trim());
+		if (!match) continue;
+		const [, , phase, detail = ""] = match;
+		if (phase === "boot.start") {
+			const id = /(?:^| )boot=(\S+)/.exec(detail)?.[1] ?? null;
+			const last = boots.at(-1);
+			if (!(last && id && last.id === id)) {
+				boots.push({ id, refusal: null, laidOut: false, hostStarted: false });
+			}
+			continue;
+		}
+		const boot = boots.at(-1);
+		if (!boot) continue;
+		if (/^drive\.(missing|foreign|unlaid|downgrade)$/.test(phase ?? "")) {
+			boot.refusal ??= `${phase} ${detail}`.trim();
+		} else if (phase === "drive.layout") {
+			boot.laidOut = true;
+		} else if (phase === "host.exec") {
+			boot.hostStarted = true;
+		}
+	}
+	return boots;
+}
+
+/** This boot's refusal, if it refused; another boot's line never counts. */
+export function driveRefusalIn(bootLog: string, bootId: string): string | null {
+	const boot = driveBootsIn(bootLog)
+		.reverse()
+		.find((entry) => entry.id === bootId);
+	return boot?.refusal ?? null;
+}
+
+/**
+ * How many of the last boots in a row failed in a way a remount cannot fix:
+ * a drive of another workspace, a drive with no owner, a boot script that
+ * predates the drive, or a boot that started host-service without a layout.
+ */
+export function persistentDriveRefusals(bootLog: string): number {
+	let count = 0;
+	for (const boot of driveBootsIn(bootLog).reverse()) {
+		const persistent = boot.refusal
+			? !boot.refusal.startsWith("drive.missing")
+			: boot.hostStarted && !boot.laidOut;
+		if (!persistent) break;
+		count++;
+	}
+	return count;
 }
 
 /** How often a wait for host-service also reads the boot log for a drive refusal. */
@@ -406,31 +491,52 @@ export async function settleSandbox(args: {
 	providerSandboxId: string;
 	hostTarget: string;
 	claim: SandboxClaim;
+	/** The boot this settle waits for; without one, no refusal is read from the log. */
+	bootId?: string;
 	/** Where to read the boot log from; fetched when absent. */
 	sandbox?: Pick<Sandbox, "readFileToBuffer">;
 }): Promise<HostAnswer> {
 	const driveName = args.claim.identity.SUPERSET_SANDBOX_DRIVE;
 	let box = args.sandbox;
-	const refusal = driveName
-		? async () => {
-				box ??= await Sandbox.get({
-					...credentials(),
-					name: args.providerSandboxId,
-					resume: false,
-				});
-				const log = await box
-					.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
-					.catch(() => null);
-				const refused = log ? driveRefusalIn(log.toString("utf8")) : null;
-				return refused
-					? new SandboxDriveMissingError(
-							args.providerSandboxId,
-							driveName,
-							refused,
-						)
-					: null;
-			}
-		: undefined;
+	const bootLog = async () => {
+		box ??= await Sandbox.get({
+			...credentials(),
+			name: args.providerSandboxId,
+			resume: false,
+		});
+		const log = await box
+			.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
+			.catch(() => null);
+		return log?.toString("utf8") ?? "";
+	};
+	const driveFailure = (driveName: string, reason: string, log: string) => {
+		const boots = persistentDriveRefusals(log);
+		if (boots < DRIVE_REFUSAL_LIMIT) {
+			console.warn(`[sandbox] ${args.providerSandboxId}: ${reason}`);
+			return new SandboxDriveMissingError(
+				args.providerSandboxId,
+				driveName,
+				reason,
+			);
+		}
+		const refused = new SandboxDriveRefusedError(
+			args.providerSandboxId,
+			driveName,
+			reason,
+			boots,
+		);
+		Sentry.captureException(refused);
+		return refused;
+	};
+	const bootId = args.bootId;
+	const refusal =
+		driveName && bootId
+			? async () => {
+					const log = await bootLog();
+					const refused = driveRefusalIn(log, bootId);
+					return refused ? driveFailure(driveName, refused, log) : null;
+				}
+			: undefined;
 	const answer = await waitForHostService(
 		args.hostTarget,
 		args.providerSandboxId,
@@ -441,10 +547,10 @@ export async function settleSandbox(args: {
 		driveName &&
 		!answer.stamps.some((stamp) => stamp.phase === "drive.layout")
 	) {
-		throw new SandboxDriveMissingError(
-			args.providerSandboxId,
+		throw driveFailure(
 			driveName,
 			"the boot answered without laying the drive out",
+			await bootLog(),
 		);
 	}
 	await pushManagedEnv(
@@ -703,11 +809,11 @@ export async function wakeSandbox(args: {
 					writeSignInFiles(sandbox, args.claim.files),
 				]),
 		);
-		if (!serving) {
-			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
-				runBoot(sandbox, args.claim.hostSecret),
-			);
-		}
+		const bootId = serving
+			? undefined
+			: await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
+					runBoot(sandbox, args.claim.hostSecret),
+				);
 		args.onPhase?.("resume", Date.now() - resumeStarted);
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
@@ -717,12 +823,16 @@ export async function wakeSandbox(args: {
 						providerSandboxId: args.providerSandboxId,
 						hostTarget,
 						claim: args.claim,
+						bootId,
 						sandbox,
 					}),
 				),
 		).catch(async (error) => {
-			// Stopped, the next wake mounts the drive afresh.
-			if (error instanceof SandboxDriveMissingError) {
+			// Stopped: the next wake mounts the drive afresh, and a refused box bills nothing.
+			if (
+				error instanceof SandboxDriveMissingError ||
+				error instanceof SandboxDriveRefusedError
+			) {
 				await sandbox.stop().catch(() => {});
 			}
 			throw error;
@@ -784,14 +894,28 @@ export function inheritedIdentityPaths(withDrive: boolean): string[] {
 
 /** Removes what a box wrote for the workspace it was, so a fork starts clean. */
 export async function stripWorkspaceIdentity(
-	sandbox: Sandbox,
+	sandbox: Pick<Sandbox, "runCommand">,
 	options: { withDrive?: boolean } = {},
 ): Promise<void> {
-	await sandbox.runCommand({
-		cmd: "rm",
-		args: ["-rf", ...inheritedIdentityPaths(options.withDrive ?? false)],
+	const withDrive = options.withDrive ?? false;
+	// Unmounted, the rm would miss the drive, and every fork would refuse it as another workspace's.
+	const result = await sandbox.runCommand({
+		cmd: "bash",
+		args: [
+			"-c",
+			`${withDrive ? `mountpoint -q ${SANDBOX_PATHS.drive} || exit 3; ` : ""}rm -rf -- "$@"`,
+			"strip",
+			...inheritedIdentityPaths(withDrive),
+		],
 		sudo: true,
 	});
+	if (result.exitCode !== 0) {
+		throw new Error(
+			result.exitCode === 3
+				? `${SANDBOX_PATHS.drive} is not mounted; the golden's drive keeps the source's identity`
+				: `stripping the workspace identity exited ${result.exitCode}`,
+		);
+	}
 }
 
 /**

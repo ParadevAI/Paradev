@@ -13,13 +13,18 @@ import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
 	composeMounts,
+	DRIVE_REFUSAL_LIMIT,
 	deleteSandboxAndDrive,
+	driveBootsIn,
 	driveRefusalIn,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
+	persistentDriveRefusals,
 	promoteSandboxToEnvironment,
 	SandboxDriveMissingError,
+	SandboxDriveRefusedError,
 	SandboxNotReadyError,
+	SandboxUnavailableError,
 	SESSION_TIMEOUT_MS,
 	settleSandbox,
 	topUpSandboxSession,
@@ -297,21 +302,55 @@ describe("composeMounts", () => {
 	});
 });
 
-describe("driveRefusalIn", () => {
-	test("reads only the last boot of the log", () => {
-		const refused =
-			"1 boot.start pid=1 bundle=abc\n2 run.cleared\n3 drive.missing drive-1 is not mounted at /mnt/superset-drive\n4 boot.refused x\n";
-		const recovered = `${refused}5 boot.start pid=2 bundle=abc\n6 drive.layout ms=11\n`;
-		expect(driveRefusalIn(refused)).toBe(
+describe("drive refusals in the boot log", () => {
+	const boot = (at: number, id: string, ...lines: string[]) =>
+		[`${at} boot.start pid=1 bundle=abc boot=${id}`, ...lines].join("\n");
+
+	test("only this boot's lines count, so a previous boot's refusal never stops a healthy box", () => {
+		const log = [
+			boot(
+				1,
+				"old",
+				"2 drive.missing drive-1 is not mounted at /mnt/superset-drive",
+			),
+			boot(3, "new", "4 run.cleared"),
+		].join("\n");
+		expect(driveRefusalIn(log, "old")).toBe(
 			"drive.missing drive-1 is not mounted at /mnt/superset-drive",
 		);
-		expect(driveRefusalIn(recovered)).toBeNull();
-		expect(driveRefusalIn("")).toBeNull();
+		expect(driveRefusalIn(log, "new")).toBeNull();
+		expect(driveRefusalIn(log, "not-started-yet")).toBeNull();
+	});
+
+	test("a reexec's second boot.start joins its boot", () => {
+		const log = boot(
+			1,
+			"b",
+			"2 boot.reexec into the installed bundle's script",
+			"3 boot.start pid=2 bundle=abc boot=b",
+			"4 drive.foreign drive-1 belongs to workspace w",
+		);
+		expect(driveBootsIn(log)).toHaveLength(1);
+		expect(driveRefusalIn(log, "b")).toBe(
+			"drive.foreign drive-1 belongs to workspace w",
+		);
+	});
+
+	test("counts the persistent refusals in a row; a missing drive or a laid-out boot ends the run", () => {
+		const foreign = (at: number, id: string) =>
+			boot(at, id, `${at + 1} drive.foreign d belongs to workspace w`);
+		const log = [
+			boot(1, "a", "2 drive.layout ms=3", "3 host.exec 1.0"),
+			foreign(10, "b"),
+			boot(20, "c", "21 host.exec 1.0"),
+			foreign(30, "d"),
+		].join("\n");
+		expect(persistentDriveRefusals(log)).toBe(3);
 		expect(
-			driveRefusalIn(
-				"1 boot.start pid=1\n2 drive.foreign d belongs to workspace w\n",
+			persistentDriveRefusals(
+				`${log}\n${boot(40, "e", "41 drive.missing d is not mounted")}`,
 			),
-		).toBe("drive.foreign d belongs to workspace w");
+		).toBe(0);
 	});
 });
 
@@ -352,17 +391,37 @@ describe("settleSandbox with a drive", () => {
 	test("a refused boot is a retryable not-ready, found without the full host wait", async () => {
 		health = null;
 		bootLog =
-			"1 boot.start pid=1\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n";
+			"1 boot.start pid=1 boot=this\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n";
 		const started = Date.now();
 		const error = await settleSandbox({
 			providerSandboxId: "sbx",
 			hostTarget: "https://box.invalid",
 			claim,
+			bootId: "this",
 			sandbox: box,
 		}).catch((caught: unknown) => caught);
 		expect(error).toBeInstanceOf(SandboxDriveMissingError);
 		expect(error).toBeInstanceOf(SandboxNotReadyError);
 		expect(Date.now() - started).toBeLessThan(1_000);
+	});
+
+	test("a refusal no remount can change ends the retries after several boots in a row", async () => {
+		health = null;
+		bootLog = Array.from(
+			{ length: DRIVE_REFUSAL_LIMIT },
+			(_, i) =>
+				`${i * 10} boot.start pid=1 boot=b${i}\n${i * 10 + 1} drive.unlaid drive-1 carries no workspace id`,
+		).join("\n");
+		const error = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			bootId: `b${DRIVE_REFUSAL_LIMIT - 1}`,
+			sandbox: box,
+		}).catch((caught: unknown) => caught);
+		expect(error).toBeInstanceOf(SandboxDriveRefusedError);
+		expect(error).toBeInstanceOf(SandboxUnavailableError);
+		expect(String(error)).toContain(`in ${DRIVE_REFUSAL_LIMIT} boots in a row`);
 	});
 
 	test("a boot that answers without laying the drive out fails the settle", async () => {
@@ -396,6 +455,7 @@ describe("promoteSandboxToEnvironment", () => {
 	let created: Record<string, unknown> | null;
 	let goldenStatus: string;
 	let goldenSnapshot: string;
+	let stripExit: number;
 	const source = {
 		status: "running",
 		region: "iad1",
@@ -422,6 +482,7 @@ describe("promoteSandboxToEnvironment", () => {
 		},
 		runCommand: async (command: { args: string[] }) => {
 			events.push(`strip ${command.args.join(" ")}`);
+			return { exitCode: stripExit };
 		},
 		stop: async () => {
 			goldenStatus = "stopped";
@@ -467,6 +528,23 @@ describe("promoteSandboxToEnvironment", () => {
 		created = null;
 		goldenStatus = "running";
 		goldenSnapshot = "snap-0";
+		stripExit = 0;
+	});
+
+	test("a golden whose drive did not mount is not stripped and fails the promote", async () => {
+		stripExit = 3;
+		await expect(
+			promoteSandboxToEnvironment({
+				sourceSandbox: "ws-source",
+				goldenName: "env-g",
+				claim,
+				sourceDriveName: "drive-ws-source",
+				drives,
+			}),
+		).rejects.toThrow(`${SANDBOX_PATHS.drive} is not mounted`);
+		const strip = events.find((event) => event.startsWith("strip")) ?? "";
+		expect(strip).toContain(`mountpoint -q ${SANDBOX_PATHS.drive} || exit 3;`);
+		expect(events).not.toContain("boot source");
 	});
 
 	test("forks the source's drive once it is released and strips identity on the drive", async () => {

@@ -73,6 +73,8 @@ export {
 	provisionSandbox,
 	pushManagedEnv,
 	type SandboxClaim,
+	SandboxDriveMissingError,
+	SandboxDriveRefusedError,
 	type SandboxEnvironment,
 	SandboxNotReadyError,
 	SandboxUnavailableError,
