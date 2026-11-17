@@ -21,7 +21,7 @@ import {
 	publishAgentToolsDrives,
 	renderBuilderScript,
 } from "./agent-tools";
-import { type Assets, sha256 } from "./manifest";
+import { type Assets, loadAssets, sha256 } from "./manifest";
 
 const sha = (c: string) => c.repeat(64);
 const BUNDLE = "0123456789abcdef".repeat(4);
@@ -35,6 +35,8 @@ const agentAssets: Assets = {
 	codex: row(sha("b"), ".tar.gz"),
 	pdev: row(sha("c"), ".tar.gz"),
 	chrome: row(sha("d"), ".deb"),
+	opencode: { sha256: sha("e"), suffix: ".tar.gz", mode: "0644" },
+	pi: { sha256: sha("f"), suffix: ".tar.gz", mode: "0644" },
 };
 
 describe("agent-tools manifest", () => {
@@ -44,8 +46,27 @@ describe("agent-tools manifest", () => {
 			{ name: "claude", sha: sha("a"), bin: "claude" },
 			{ name: "codex", sha: sha("b"), bin: "bin/codex" },
 			{ name: "pdev", sha: sha("c"), bin: "pdev/pdev" },
+			{ name: "opencode", sha: sha("e"), bin: "opencode" },
+			{ name: "pi", sha: sha("f"), bin: "pi/pi" },
 		]);
 		expect(parseAgentToolsManifest(JSON.stringify(manifest))).toEqual(manifest);
+	});
+
+	test("the committed bundle has a row for every agent, and opencode and pi only on the drive", () => {
+		const assets = loadAssets(
+			join(import.meta.dir, "..", "bundle", "assets.json"),
+		);
+		expect(agentToolsManifest(assets).map((entry) => entry.name)).toEqual([
+			"claude",
+			"codex",
+			"pdev",
+			"opencode",
+			"pi",
+		]);
+		for (const name of ["opencode", "pi"]) {
+			expect(assets[name]?.dest).toBeUndefined();
+			expect(assets[name]?.source).toStartWith("https://github.com/");
+		}
 	});
 
 	test("a missing or bad manifest reads as empty", () => {
@@ -142,11 +163,9 @@ describe("publishAgentToolsDrive", () => {
 		expect(result.drive).toBe(drive);
 		expect(result.outcome).toBe("published");
 		expect(result.forkedFrom).toBeUndefined();
-		expect(result.agents.map((agent) => agent.outcome)).toEqual([
-			"written",
-			"written",
-			"written",
-		]);
+		expect(result.agents.map((agent) => agent.outcome)).toEqual(
+			Array(5).fill("written"),
+		);
 		expect(calls).toEqual([`create ${drive}`, `write ${drive}`]);
 		expect(agentLine(scripts[drive], "claude")).toEndWith("'' '' '--version'");
 	});
