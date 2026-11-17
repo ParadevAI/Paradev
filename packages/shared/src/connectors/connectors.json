@@ -1226,11 +1226,11 @@
 							"Authorization": "Bearer ${config.access_token}"
 						},
 						"account": {
-							"id": "$.sub",
+							"id": "$.email",
 							"label": "$.email"
 						},
 						"user": {
-							"id": "$.sub",
+							"id": "$.email",
 							"label": "$.email"
 						}
 					},
