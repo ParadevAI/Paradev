@@ -18,8 +18,11 @@ const assetSchema = z.object({
 	 * Empty for an executable, which has none.
 	 */
 	suffix: z.string().regex(/^(\.[a-z0-9.]+)?$/),
-	/** Absolute path on the box. Archives are staged under the media dir. */
-	dest: z.string().startsWith("/"),
+	/**
+	 * Absolute path on the box. Archives are staged under the media dir.
+	 * Absent for a drive-only row: no box fetches it, only the agent-tools drive.
+	 */
+	dest: z.string().startsWith("/").optional(),
 	mode: z
 		.string()
 		.regex(/^0[0-7]{3}$/)
@@ -129,17 +132,31 @@ export function discardingSteps(steps: Step[]): Map<string, string> {
 	return owners;
 }
 
-/** The fifth column names the step that discards the row, empty for a row that stays. */
+/**
+ * The fifth column names the step that discards the row, empty for a row that
+ * stays. A drive-only row has no line: no box fetches it.
+ */
 export function renderAssetsTsv(assets: Assets, steps: Step[] = []): string {
 	const owners = discardingSteps(steps);
-	return Object.entries(assets)
-		.map(([key, a]) =>
-			[a.mode, a.sha256, a.suffix, b64(a.dest), owners.get(key) ?? ""].join(
+	const rows = Object.entries(assets).flatMap(([key, a]) =>
+		a.dest ? [{ key, ...a, dest: a.dest }] : [],
+	);
+	return rows
+		.map((a) =>
+			[a.mode, a.sha256, a.suffix, b64(a.dest), owners.get(a.key) ?? ""].join(
 				"\t",
 			),
 		)
 		.join("\n")
-		.concat(Object.keys(assets).length ? "\n" : "");
+		.concat(rows.length ? "\n" : "");
+}
+
+/** Puts the drive-only pins in the bundle's hash, so a bump names a new drive. No box reads it. */
+export function renderDriveAssetsTsv(assets: Assets): string {
+	return Object.entries(assets)
+		.filter(([, a]) => !a.dest)
+		.map(([key, a]) => `${key}\t${a.sha256}\n`)
+		.join("");
 }
 
 export interface DerivedStep extends Step {
@@ -208,6 +225,10 @@ export function deriveStepVersions(args: {
 			const asset = args.assets[key];
 			if (!asset)
 				throw new Error(`step ${step.name} declares unknown asset ${key}`);
+			if (!asset.dest)
+				throw new Error(
+					`step ${step.name} declares ${key}, which is drive-only and never on the box`,
+				);
 			parts.push(`asset:${key}:${asset.sha256}`);
 		}
 		for (const input of step.inputs) {

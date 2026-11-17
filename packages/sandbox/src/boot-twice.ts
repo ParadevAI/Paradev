@@ -379,14 +379,20 @@ try {
 	const stubSha = "f".repeat(64);
 	stop();
 	exec(
-		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.agents}/claude/${stubSha} && printf '#!/bin/sh\\necho drive-claude\\n' > ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && chmod 755 ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && printf '%s' '${JSON.stringify([{ name: "claude", sha: stubSha, bin: "claude" }])}' > ${SANDBOX_PATHS.agents}/manifest.json`,
+		`: > ${SANDBOX_PATHS.bootLog}; for name in claude pi; do mkdir -p ${SANDBOX_PATHS.agents}/$name/${stubSha} && printf '#!/bin/sh\\necho drive-%s\\n' $name > ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name && chmod 755 ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name; done && printf '%s' '${JSON.stringify(
+			[
+				{ name: "claude", sha: stubSha, bin: "claude" },
+				{ name: "pi", sha: stubSha, bin: "pi" },
+			],
+		)}' > ${SANDBOX_PATHS.agents}/manifest.json`,
 	);
 	boot(3);
 	const logDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect(
-		"drive: listed agent linked",
-		/agents\.linked 1/.test(logDrive) &&
-			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })),
+		"drive: listed agents linked",
+		/agents\.linked 2/.test(logDrive) &&
+			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })) &&
+			/drive-pi/.test(exec("pi", { check: false, user: "ubuntu" })),
 		logDrive.match(/agents\..*/)?.[0],
 	);
 	stop();
@@ -411,6 +417,12 @@ try {
 			SANDBOX_PATHS.media,
 		),
 		exec("readlink -f /usr/local/bin/claude", { check: false }).trim(),
+	);
+	expect(
+		"no drive: a drive-only agent's link is gone",
+		exec("test -L /usr/local/bin/pi && echo dangling", {
+			check: false,
+		}).trim() === "",
 	);
 
 	// Third boot, with host-service deliberately broken: the box must stay

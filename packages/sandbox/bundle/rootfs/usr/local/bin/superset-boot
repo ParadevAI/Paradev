@@ -124,9 +124,11 @@ stamp "steps.host.start"; "$BUNDLE/setup" run-steps before-host >> "$SUPERSET_BO
 link_agents() {
 	local dir="${SUPERSET_AGENTS_DIR:-/opt/agents}" linked=0 name sha bin target
 	local manifest="${dir}/manifest.json"
-	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print | grep -q .; then
+	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print -quit | grep -q .; then
 		SUPERSET_BUNDLE_DIR="$BUNDLE" bash "$BUNDLE/steps/install-agent-clis.sh" >> "$SUPERSET_BOOT_LOG" 2>&1 ||
 			stamp "agents.restore.failed"
+		# What is still dangling has no image copy to restore: opencode, pi.
+		find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -delete
 	fi
 	if ! jq -e 'type == "array"' "$manifest" > /dev/null 2>&1; then
 		stamp "agents.unavailable no manifest at ${dir}"

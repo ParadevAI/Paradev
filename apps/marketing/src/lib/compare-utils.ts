@@ -3,6 +3,7 @@
  * These can be safely imported in both server and client components.
  */
 
+import { BRAND } from "@superset/shared/brand";
 import { formatContentDate } from "./content-utils";
 
 export type ComparisonPageType = "1v1" | "roundup" | "tutorial";
@@ -207,4 +208,32 @@ export function extractRoundupItems(content: string): string[] {
 	}
 
 	return items;
+}
+
+// Google cuts result titles at about 60 characters.
+const SEARCH_TITLE_MAX_LENGTH = 65;
+
+export function compareSearchTitle(
+	title: string,
+	introNames: readonly string[] = [
+		BRAND.INTRO_NAME,
+		`${BRAND.NAME} (ex-${BRAND.FORMER_NAME})`,
+	],
+): string {
+	for (const introName of introNames) {
+		const candidate = `${title} | ${introName}`;
+		if (candidate.length <= SEARCH_TITLE_MAX_LENGTH) return candidate;
+	}
+	return `${title} | ${BRAND.NAME}`;
+}
+
+export function compareSearchDescription(
+	description: string,
+	introName: string = BRAND.INTRO_NAME,
+): string {
+	if (BRAND.NAME === BRAND.FORMER_NAME) return description;
+	return description.replace(
+		new RegExp(`\\b${BRAND.NAME}\\b(?!'s| \\(formerly)`),
+		introName,
+	);
 }

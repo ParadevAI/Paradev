@@ -34,7 +34,7 @@ interface DashboardSidebarPinnedSectionProps {
  * accepts workspaces dragged in from project lists or Sessions (drop = pin);
  * while any workspace drag is active an empty section renders a drop zone so
  * the first pin can land. The header toggles a persisted section collapse that
- * hides the rows, exactly like the Projects header. The collapsed rail renders
+ * hides the rows, independent of the Projects header. The collapsed rail renders
  * no section chrome anywhere, so collapsed mode is a plain icon stack with a
  * trailing divider. Pinned pages follow the workspaces; they are not sortable.
  */

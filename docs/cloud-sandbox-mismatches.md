@@ -930,7 +930,16 @@ sandbox gets one only from `Sandbox.create`, `Sandbox.fork` or
 and `wakeSandbox` both pass it. A drive lives in one region and mounts only in
 that region. A session without the mount leaves links in `/usr/local/bin`
 that point nowhere; `superset-boot` re-runs `install-agent-clis` to put the
-image's agents back.
+image's agents back. OpenCode and Pi exist only on the drive, so for them it
+deletes the link instead.
+
+**An agent on the drive cannot update itself.** On a machine someone owns,
+OpenCode and Pi update in place, beside their binary. On a box they run from
+a read-only mount and are pinned by the bundle. `/etc/profile.d/superset.sh`
+turns off their update checks (`OPENCODE_DISABLE_AUTOUPDATE`,
+`PI_SKIP_VERSION_CHECK`), the same way `DISABLE_AUTOUPDATER` does for
+Claude. They keep their state under `~/.local/share/opencode`,
+`~/.config/opencode` and `~/.pi/agent`, as they do on a laptop.
 
 **A read-only snapshot mount taken while a writer holds the drive is corrupt.**
 Measured 2026-11-17: a box that mounted the snapshot while the builder still

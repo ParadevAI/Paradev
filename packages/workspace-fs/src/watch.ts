@@ -57,6 +57,7 @@ const MAX_BUFFERED_EVENTS = 30_000;
 const OVERFLOW_RESCAN_INITIAL_MS = 5_000;
 const OVERFLOW_RESCAN_MAX_MS = 60_000;
 const OVERFLOW_BACKOFF_RESET_MS = 120_000;
+const IGNORE_GROWTH_REATTACH_MIN_MS = 30_000;
 
 // Recovery liveness probe: a freshly attached FSEvents stream can be deaf for
 // a sub-second window after subscribe() resolves (observed on a busy Electron
@@ -99,6 +100,15 @@ const NESTED_REPO_SCAN_CONCURRENCY = 4;
  * on a file type nobody opens.
  */
 const WORKTREE_CONTAINER_NAMES = new Set([".worktrees", ".conductor"]);
+
+function toPosixRelative(from: string, to: string): string {
+	const relative = path.relative(from, to);
+	return path.sep === "/" ? relative : relative.split(path.sep).join("/");
+}
+
+function isUnderOrAt(relative: string, dirs: readonly string[]): boolean {
+	return dirs.some((dir) => relative === dir || relative.startsWith(`${dir}/`));
+}
 
 export function isRelPathUnderPrunedDirs(
 	relative: string,
@@ -168,6 +178,8 @@ interface WatcherState {
 	/** Bounded post-overflow probe for a root deletion whose event was dropped. */
 	overflowRootCheckTimer: ReturnType<typeof setInterval> | null;
 	overflowRootChecksLeft: number;
+	lastGrowthReattachAt: number;
+	growthReattachTimer: ReturnType<typeof setTimeout> | null;
 	/** Pending coalesced overflow rescan; trails the last overflow of a storm. */
 	overflowRescanTimer: ReturnType<typeof setTimeout> | null;
 	/** Hard fire-by time for the pending batch — rearms clamp to this so
@@ -186,6 +198,10 @@ interface WatcherState {
 	 * targeted watch if you need it".
 	 */
 	prunedRelPrefixes: string[];
+	/** The part of `prunedRelPrefixes` the native subscription was given. */
+	nativePrunedRelPrefixes: string[];
+	/** The rest: pruned here, by dropping their events, until a re-attach. */
+	filteredRelPrefixes: string[];
 	filePaths: Map<string, true>;
 	directoryPaths: Set<string>;
 	pendingEvents: NativeWatchEvent[];
@@ -270,6 +286,8 @@ export interface FsWatcherManagerOptions {
 	overflowRescanInitialMs?: number;
 	overflowRescanMaxMs?: number;
 	overflowBackoffResetMs?: number;
+	growthReattachMinMs?: number;
+	now?: () => number;
 }
 
 export class FsWatcherManager {
@@ -292,6 +310,8 @@ export class FsWatcherManager {
 	private readonly overflowRescanInitialMs: number;
 	private readonly overflowRescanMaxMs: number;
 	private readonly overflowBackoffResetMs: number;
+	private readonly growthReattachMinMs: number;
+	private readonly now: () => number;
 	private readonly watchers = new Map<string, WatcherState>();
 	/**
 	 * One-shot dedup so a single ENOSPC report doesn't spam logs across every
@@ -334,6 +354,9 @@ export class FsWatcherManager {
 			options.overflowRescanMaxMs ?? OVERFLOW_RESCAN_MAX_MS;
 		this.overflowBackoffResetMs =
 			options.overflowBackoffResetMs ?? OVERFLOW_BACKOFF_RESET_MS;
+		this.growthReattachMinMs =
+			options.growthReattachMinMs ?? IGNORE_GROWTH_REATTACH_MIN_MS;
+		this.now = options.now ?? Date.now;
 	}
 
 	async subscribe(
@@ -424,6 +447,10 @@ export class FsWatcherManager {
 		}
 		this.clearOverflowRootCheck(state);
 		this.clearOverflowRescan(state);
+		if (state.growthReattachTimer) {
+			clearTimeout(state.growthReattachTimer);
+			state.growthReattachTimer = null;
+		}
 		state.generation += 1;
 		state.throttler.dispose();
 		const subscription = state.subscription;
@@ -590,6 +617,8 @@ export class FsWatcherManager {
 			probeSeen: false,
 			overflowRootCheckTimer: null,
 			overflowRootChecksLeft: 0,
+			lastGrowthReattachAt: Number.NEGATIVE_INFINITY,
+			growthReattachTimer: null,
 			overflowRescanTimer: null,
 			overflowRescanDeadline: 0,
 			overflowRescanDelayMs: this.overflowRescanInitialMs,
@@ -597,6 +626,8 @@ export class FsWatcherManager {
 			lastOverflowAt: 0,
 			listeners: new Set<WatchListener>(),
 			prunedRelPrefixes: [],
+			nativePrunedRelPrefixes: [],
+			filteredRelPrefixes: [],
 			filePaths: new Map<string, true>(),
 			directoryPaths: new Set<string>(),
 			pendingEvents: [],
@@ -651,6 +682,8 @@ export class FsWatcherManager {
 		]);
 		state.controller.signal.throwIfAborted();
 		state.prunedRelPrefixes = [...nestedRepoRelDirs, ...gitIgnoredRelDirs];
+		state.nativePrunedRelPrefixes = state.prunedRelPrefixes;
+		state.filteredRelPrefixes = [];
 		// Root-relative escaped globs: parcel matches ignores relative to the
 		// watch root (its defaults are all `**/…`), so an absolute path never
 		// matches. Bare paths aren't safe either — parcel's `is-glob` check
@@ -709,7 +742,20 @@ export class FsWatcherManager {
 		}
 
 		this.normalizeEvents(visibleEvents, state);
-		for (const event of visibleEvents) state.pendingEvents.push(event);
+		const keptEvents =
+			state.filteredRelPrefixes.length === 0
+				? visibleEvents
+				: visibleEvents.filter(
+						(event) =>
+							!isUnderOrAt(
+								toPosixRelative(state.absolutePath, event.path),
+								state.filteredRelPrefixes,
+							),
+					);
+		if (keptEvents.length === 0) {
+			return;
+		}
+		for (const event of keptEvents) state.pendingEvents.push(event);
 		if (state.flushTimer) {
 			return;
 		}
@@ -819,8 +865,10 @@ export class FsWatcherManager {
 	 * swap the native subscription to it. Needed when a directory is
 	 * UN-ignored: the attach-time prune otherwise keeps suppressing its events
 	 * until process restart (VS Code re-subscribes on watcherExclude changes
-	 * for the same reason). Growth of the set never requires this — new
-	 * ignored dirs are filtered downstream.
+	 * for the same reason). Growth of the set needs it only on a backend that
+	 * holds a watch per entry: there a `node_modules` created after attach
+	 * costs memory per file until the next attach. Growth swaps are
+	 * rate-limited, with one trailing retry so the last growth is not lost.
 	 *
 	 * The old stream stays attached until the new one is live, but its events
 	 * are dropped by the generation guard once attach begins, so a short gap
@@ -828,8 +876,7 @@ export class FsWatcherManager {
 	 * they derive from events; the search index is invalidated here.
 	 *
 	 * Returns true when the subscription was actually swapped. No-swap cases:
-	 * the fresh ignore set still contains every currently-pruned dir (growth
-	 * is handled downstream without re-attach), or the root is absent,
+	 * nothing shrank and no growth swap is due, or the root is absent,
 	 * suspended, or recovering (the next attach re-runs the providers anyway).
 	 */
 	async refreshIgnores(rootAbsolutePath: string): Promise<boolean> {
@@ -841,17 +888,40 @@ export class FsWatcherManager {
 			this.computeNestedRepoRelDirs(state.realPath, state.controller.signal),
 			this.computeGitIgnoredRelDirs(state.realPath, state.controller.signal),
 		]);
-		const fresh = new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs]);
-		const shrunk = state.prunedRelPrefixes.some((dir) => !fresh.has(dir));
-		if (!shrunk) {
-			return false;
-		}
 		if (
 			state.controller.signal.aborted ||
 			!state.subscription ||
 			state.recoveryTimer
 		) {
 			// State changed while the providers ran.
+			return false;
+		}
+		const fresh = [...new Set([...nestedRepoRelDirs, ...gitIgnoredRelDirs])];
+		const freshSet = new Set(fresh);
+		const native = new Set(state.nativePrunedRelPrefixes);
+		const nativeShrunk = state.nativePrunedRelPrefixes.some(
+			(dir) => !freshSet.has(dir),
+		);
+		const added = fresh.filter((dir) => !native.has(dir));
+		let reattach = nativeShrunk;
+		if (!nativeShrunk && added.length > 0 && this.backend.watchesEachEntry) {
+			const waitMs =
+				state.lastGrowthReattachAt + this.growthReattachMinMs - this.now();
+			if (waitMs > 0) {
+				this.scheduleGrowthReattach(state, waitMs);
+			} else {
+				reattach = true;
+			}
+		}
+		if (!reattach) {
+			const changed =
+				fresh.length !== state.prunedRelPrefixes.length ||
+				state.prunedRelPrefixes.some((dir) => !freshSet.has(dir));
+			if (changed) {
+				state.prunedRelPrefixes = fresh;
+				state.filteredRelPrefixes = added;
+				this.emitRootOverflow(state);
+			}
 			return false;
 		}
 		// Detach the old stream BEFORE attaching the new one. Keeping both
@@ -863,6 +933,7 @@ export class FsWatcherManager {
 		const oldSubscription = state.subscription;
 		state.subscription = null;
 		state.generation += 1;
+		state.lastGrowthReattachAt = this.now();
 		await unsubscribeQuietly(oldSubscription);
 		// Disposal or root-deletion recovery may have raced the detach.
 		if (
@@ -894,7 +965,39 @@ export class FsWatcherManager {
 		}
 		// Events during the swap gap may have been missed.
 		invalidateSearchIndexesForRoot(state.absolutePath);
+		this.emitRootOverflow(state);
 		return true;
+	}
+
+	private emitRootOverflow(state: WatcherState): void {
+		this.emitDirect(state, {
+			events: [
+				{
+					kind: "overflow",
+					absolutePath: state.absolutePath,
+					isDirectory: true,
+				},
+			],
+		});
+	}
+
+	private scheduleGrowthReattach(state: WatcherState, delayMs: number): void {
+		if (state.growthReattachTimer) {
+			return;
+		}
+		const timer = setTimeout(() => {
+			state.growthReattachTimer = null;
+			if (this.watchers.get(state.absolutePath) !== state) return;
+			void this.refreshIgnores(state.absolutePath).catch((error) => {
+				if (state.controller.signal.aborted) return;
+				console.error("[workspace-fs/watch] ignore growth re-attach failed", {
+					absolutePath: state.absolutePath,
+					error: toErrorMessage(error),
+				});
+			});
+		}, delayMs);
+		timer.unref?.();
+		state.growthReattachTimer = timer;
 	}
 
 	/**
@@ -910,7 +1013,7 @@ export class FsWatcherManager {
 		if (!state || !state.subscription) {
 			return true;
 		}
-		const relative = path.relative(
+		const relative = toPosixRelative(
 			state.absolutePath,
 			normalizeAbsolutePath(absolutePath),
 		);
