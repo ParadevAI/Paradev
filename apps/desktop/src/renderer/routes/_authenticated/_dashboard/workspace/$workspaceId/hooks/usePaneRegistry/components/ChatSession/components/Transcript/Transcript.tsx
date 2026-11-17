@@ -98,7 +98,6 @@ export type TranscriptProps = {
 	onCloseFind?: (() => void) | undefined;
 	/** Puts text picked from a reply in this chat's composer. */
 	onQuote?: ((text: string) => void) | undefined;
-	onQuoteInNewChat?: ((text: string) => void) | undefined;
 	ref?: Ref<TranscriptHandle>;
 };
 
@@ -149,7 +148,6 @@ export function Transcript({
 	onRetryPrompt,
 	onMessageRevealed,
 	onQuote,
-	onQuoteInNewChat,
 	outbox,
 	ref,
 	revealMessageId = null,
@@ -489,11 +487,9 @@ export function Transcript({
 						anchor={replySelection.selection.anchor}
 						bounds={replySelection.selection.bounds}
 						onAddToChat={() => replySelection.commit(onQuote)}
-						onAddToNewChat={
-							onQuoteInNewChat &&
-							(() => replySelection.commit(onQuoteInNewChat))
-						}
+						onCopied={replySelection.dismiss}
 						ref={replySelection.toolbarRef}
+						text={replySelection.selection.text}
 					/>
 				)}
 			</ChatImageGalleryProvider>

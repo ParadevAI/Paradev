@@ -2315,9 +2315,6 @@ msgstr "お気に入りに追加"
 msgid "Add to merge queue"
 msgstr "マージキューに追加"
 
-msgid "Add to new chat"
-msgstr "新しいチャットに追加"
-
 msgid "Add to project"
 msgstr "プロジェクトに追加"
 

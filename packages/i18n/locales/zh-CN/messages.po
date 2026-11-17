@@ -2315,9 +2315,6 @@ msgstr "添加到收藏"
 msgid "Add to merge queue"
 msgstr "加入合并队列"
 
-msgid "Add to new chat"
-msgstr "添加到新聊天"
-
 msgid "Add to project"
 msgstr "添加到项目"
 

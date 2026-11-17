@@ -2315,9 +2315,6 @@ msgstr "Přidat do oblíbených"
 msgid "Add to merge queue"
 msgstr "Přidat do fronty slučování"
 
-msgid "Add to new chat"
-msgstr "Přidat do nového chatu"
-
 msgid "Add to project"
 msgstr "Přidat do projektu"
 

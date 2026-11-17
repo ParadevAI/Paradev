@@ -2315,9 +2315,6 @@ msgstr "Add to favorites"
 msgid "Add to merge queue"
 msgstr "Add to merge queue"
 
-msgid "Add to new chat"
-msgstr "Add to new chat"
-
 msgid "Add to project"
 msgstr "Add to project"
 

@@ -2309,9 +2309,6 @@ msgstr "Додати до вибраного"
 msgid "Add to merge queue"
 msgstr "Додати до черги злиття"
 
-msgid "Add to new chat"
-msgstr "Додати в новий чат"
-
 msgid "Add to project"
 msgstr "Додати до проєкту"
 
