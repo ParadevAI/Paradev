@@ -31,6 +31,7 @@ export function useSidebarDiffRef(workspaceId: string): DiffRef {
 				? filter.toHash
 				: null;
 	const fromHash = filter.kind === "range" ? filter.fromHash : null;
+	const includeFrom = filter.kind === "range" ? filter.includeFrom : false;
 
 	return useMemo<DiffRef>(() => {
 		switch (filterKind) {
@@ -43,9 +44,10 @@ export function useSidebarDiffRef(workspaceId: string): DiffRef {
 					kind: "commit",
 					commitHash: commitHash ?? "",
 					fromHash: fromHash ?? undefined,
+					includeFrom,
 				};
 			default:
 				return { kind: "against-base", baseBranch };
 		}
-	}, [filterKind, commitHash, fromHash, baseBranch]);
+	}, [filterKind, commitHash, fromHash, includeFrom, baseBranch]);
 }
