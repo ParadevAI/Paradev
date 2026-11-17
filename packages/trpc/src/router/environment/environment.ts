@@ -23,7 +23,7 @@ import {
 	buildSandboxClaim,
 	deleteGoldenDriveIfUnreferenced,
 	deleteSandbox,
-	deleteWorkspaceDrive,
+	goldenDriveNameFor,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
@@ -35,6 +35,7 @@ import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { isLiveStatus } from "../cloud-workspace/live";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { deleteSandboxAndDriveLater } from "../cloud-workspace/teardown";
 import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
@@ -251,6 +252,21 @@ async function loadPromotable(
 	return { workspace, source, checkouts };
 }
 
+/** A golden nothing will point at, and its drive: deleted through the retried job. */
+async function abandonGolden(
+	goldenName: string,
+	goldenDriveName: string | null,
+): Promise<void> {
+	await deleteSandboxAndDriveLater({
+		providerSandboxId: goldenName,
+		driveName: goldenDriveName,
+	}).catch((cleanup: unknown) =>
+		console.error(
+			`[environment/promote] could not delete unused golden ${goldenName}`,
+			cleanup,
+		),
+	);
+}
 export const environmentRouter = {
 	secrets: secretsRouter,
 
@@ -506,6 +522,12 @@ export const environmentRouter = {
 				goldenName,
 				claim,
 				sourceDriveName: workspace.driveName,
+			}).catch(async (error: unknown) => {
+				await abandonGolden(
+					goldenName,
+					workspace.driveName ? goldenDriveNameFor(goldenName) : null,
+				);
+				throw error;
 			});
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
@@ -602,14 +624,7 @@ export const environmentRouter = {
 					return saved;
 				})
 				.catch(async (error: unknown) => {
-					await deleteSandbox(goldenName)
-						.then(() => deleteWorkspaceDrive(golden.goldenDriveName))
-						.catch((cleanup: unknown) =>
-							console.error(
-								`[environment/promote] could not delete unused golden ${goldenName}`,
-								cleanup,
-							),
-						);
+					await abandonGolden(goldenName, golden.goldenDriveName);
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {

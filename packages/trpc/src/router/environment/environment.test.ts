@@ -6,6 +6,7 @@ import * as guards from "../../lib/cloud-guards";
 import * as sandbox from "../../lib/sandbox";
 import { userError } from "../../trpc";
 import * as access from "../cloud-workspace/access";
+import * as teardown from "../cloud-workspace/teardown";
 import * as integration from "../integration/utils";
 
 const ENVIRONMENT_ID = "6f7a8b9c-0d1e-4f2a-8b3c-4d5e6f7a8b9c";
@@ -53,9 +54,27 @@ stub(access, {
 		status: "awake",
 		baseBranch: "main",
 		branch: "main",
+		providerSandboxId: "ws-box",
+		driveName: "drive-ws-box",
 	}),
 });
-stub(sandbox, { workspaceRepositories: async () => [] });
+let abandoned: Array<{ providerSandboxId: string; driveName?: string | null }> =
+	[];
+stub(sandbox, {
+	workspaceRepositories: async () => [],
+	buildSandboxClaim: async () => ({ claim: {} }),
+	promoteSandboxToEnvironment: async () => {
+		throw new Error("snapshot failed after the fork");
+	},
+});
+stub(teardown, {
+	deleteSandboxAndDriveLater: async (args: {
+		providerSandboxId: string;
+		driveName?: string | null;
+	}) => {
+		abandoned.push(args);
+	},
+});
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
 		name === "large" || name == null
@@ -92,6 +111,7 @@ beforeEach(() => {
 	};
 	isAdmin = false;
 	written = [];
+	abandoned = [];
 });
 
 describe("environment.update machineSize", () => {
@@ -125,6 +145,23 @@ describe("environment.promote onto an environment", () => {
 				environmentId: ENVIRONMENT_ID,
 			}),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
+		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote that fails", () => {
+	test("hands the golden and its forked drive to the retried teardown", async () => {
+		environment.createdByUserId = "user-1";
+		await expect(
+			caller.environment.promote({
+				cloudWorkspaceId: WORKSPACE_ID,
+				environmentId: ENVIRONMENT_ID,
+			}),
+		).rejects.toThrow("snapshot failed after the fork");
+		expect(abandoned).toHaveLength(1);
+		const [golden] = abandoned;
+		expect(golden?.providerSandboxId).toMatch(/^env-/);
+		expect(golden?.driveName).toBe(`env-drive-${golden?.providerSandboxId}`);
 		expect(written).toEqual([]);
 	});
 });

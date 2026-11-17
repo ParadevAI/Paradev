@@ -8,7 +8,6 @@ import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
 	buildSandboxClaim,
-	deleteSandboxAndDrive,
 	forkWorkspaceDrive,
 	provisionSandbox,
 	recordBootSpans,
@@ -26,6 +25,7 @@ import {
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { deleteSandboxAndDriveLater } from "./teardown";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -201,7 +201,7 @@ async function provision(
 							error,
 						),
 				);
-				await deleteSandboxAndDrive(providerSandboxId, driveName);
+				await deleteSandboxAndDriveLater({ providerSandboxId, driveName });
 				if (bootId) await releaseBoot(bootId);
 			}
 			await naming.catch(() => {});
@@ -267,7 +267,7 @@ async function provision(
 		const keepForDiagnosis = error instanceof SandboxNotReadyError;
 		await (keepForDiagnosis
 			? stopSandbox(providerSandboxId)
-			: deleteSandboxAndDrive(providerSandboxId, driveName)
+			: deleteSandboxAndDriveLater({ providerSandboxId, driveName })
 		).catch((teardownError) => {
 			console.error(
 				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}${driveName ? ` or its drive ${driveName}` : ""}`,
