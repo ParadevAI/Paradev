@@ -44,7 +44,6 @@ import {
 import { sweepDevAppProfiles } from "./dev-app-profile-sweep";
 import { getAppDisplayName } from "./lib/app-display-name";
 import { initAppState } from "./lib/app-state";
-import { keepAppWindowsOnAppDocument } from "./lib/app-window-navigation";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
 import {
 	isInstallingUpdate,
@@ -615,7 +614,6 @@ if (!gotTheLock) {
 		}
 		downloadManager.start();
 		allowRendererToReachDeviceHub(APP_PARTITION);
-		keepAppWindowsOnAppDocument(APP_PARTITION);
 
 		const hostServiceCoordinator = getHostServiceCoordinator();
 		hostServiceCoordinator.setConfigProvider(async () => {
