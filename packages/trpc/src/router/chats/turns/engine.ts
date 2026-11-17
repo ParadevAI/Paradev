@@ -1,4 +1,4 @@
-import { renderMentions } from "@superset/chats-core";
+import { describeDev, renderMentions } from "@superset/chats-core";
 import { db, dbWs } from "@superset/db/client";
 import {
 	chatsAgentReads,
@@ -228,6 +228,41 @@ export async function claimTurn(
 	});
 }
 
+/**
+ * Who the Dev is, for the box's prompt: its kind, the group it serves or the
+ * person it belongs to, and its description as others read it. Read at wake,
+ * so a rename shows in the next box.
+ */
+async function identityEnv(agent: AgentRow): Promise<Record<string, string>> {
+	if (agent.kind === "group" || agent.kind === "added") {
+		const [group] = agent.groupId
+			? await db
+					.select({ title: chatsGroups.title })
+					.from(chatsGroups)
+					.where(eq(chatsGroups.id, agent.groupId))
+			: [];
+		if (!group) return {};
+		return {
+			DEV_KIND: agent.kind,
+			DEV_GROUP_NAME: group.title,
+			DEV_DESCRIPTION: agent.description,
+		};
+	}
+	const [owner] = agent.ownerUserId
+		? await db.select().from(users).where(eq(users.id, agent.ownerUserId))
+		: [];
+	if (!owner) return {};
+	const ownerName = toUser(owner).displayName;
+	return {
+		DEV_KIND: agent.kind,
+		DEV_OWNER_NAME: ownerName,
+		DEV_DESCRIPTION: describeDev(agent, agent.description, {
+			isOwner: false,
+			ownerName,
+		}),
+	};
+}
+
 /** The Dev's box, woken with a new id when it is stopped. */
 async function ensureBox(
 	deps: TurnDeps,
@@ -251,8 +286,7 @@ async function ensureBox(
 			DEV_API_URL: deps.boxApiUrl,
 			DEV_BOX_PUBLIC_KEY: keys.publicKeyText,
 			DEV_NAME: agent.name,
-			DEV_KIND: agent.kind,
-			DEV_DESCRIPTION: agent.description,
+			...(await identityEnv(agent)),
 			...(deps.fauxModel ? { DEV_FAUX_MODEL: "1" } : {}),
 		},
 	});
