@@ -1785,8 +1785,8 @@ msgstr "친구 또는 동료"
 msgid "A gateway is signed in with an API key."
 msgstr "게이트웨이는 API 키로 로그인합니다."
 
-msgid "A group comes with a Dev of its own."
-msgstr "그룹에는 전용 Dev가 함께 생깁니다."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "그룹에는 전용 Dev가 함께 생깁니다. 그룹 구성원은 @로 질문합니다."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "한밤중에 아이디어가 떠올라 잠에서 깨면 앱을 여는 버릇이 있습니다. 아침이면 검토할 준비가 되어 있죠."
@@ -11829,6 +11829,9 @@ msgstr "{name}에게 메시지…"
 msgid "Message {title}"
 msgstr "{title}에 메시지"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "{title}에 메시지, 또는 @{groupDevName}(으)로 Dev에게 질문"
+
 msgid "Message in channel"
 msgstr "채널 내 메시지"
 
@@ -12157,6 +12160,9 @@ msgstr "이름에 포함..."
 
 msgid "Name Not Resolved"
 msgstr "이름을 확인할 수 없음"
+
+msgid "Name of its Dev (optional)"
+msgstr "Dev 이름(선택 사항)"
 
 msgid "Name updated!"
 msgstr "이름이 업데이트되었습니다!"

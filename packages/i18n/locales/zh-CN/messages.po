@@ -1785,8 +1785,8 @@ msgstr "朋友或同事"
 msgid "A gateway is signed in with an API key."
 msgstr "网关使用 API 密钥登录。"
 
-msgid "A group comes with a Dev of its own."
-msgstr "每个群组都有自己的 Dev。"
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "每个群组都有自己的 Dev。群组成员用 @ 向它提问。"
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "我有个忍不住的习惯：半夜醒来有了想法，就打开应用。到早上就可以审查了。"
@@ -11829,6 +11829,9 @@ msgstr "发消息给 {name}…"
 msgid "Message {title}"
 msgstr "发消息给 {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "发消息给 {title}，或用 @{groupDevName} 询问它的 Dev"
+
 msgid "Message in channel"
 msgstr "频道中的消息"
 
@@ -12157,6 +12160,9 @@ msgstr "名称包含..."
 
 msgid "Name Not Resolved"
 msgstr "域名无法解析"
+
+msgid "Name of its Dev (optional)"
+msgstr "它的 Dev 的名称（可选）"
 
 msgid "Name updated!"
 msgstr "姓名已更新！"

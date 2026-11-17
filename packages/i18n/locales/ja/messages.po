@@ -1785,8 +1785,8 @@ msgstr "友人・同僚"
 msgid "A gateway is signed in with an API key."
 msgstr "ゲートウェイは API キーでサインインします。"
 
-msgid "A group comes with a Dev of its own."
-msgstr "グループには専用のDevが付きます。"
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "グループには専用の Dev が付きます。グループのメンバーは @ で質問します。"
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "夜中にアイデアが浮かんで目が覚めると、ついアプリを開いてしまいます。朝にはレビューできる状態になっています。"
@@ -11829,6 +11829,9 @@ msgstr "{name} へのメッセージ…"
 msgid "Message {title}"
 msgstr "{title} にメッセージ"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "{title} にメッセージ、または @{groupDevName} で Dev に質問"
+
 msgid "Message in channel"
 msgstr "チャンネルのメッセージ"
 
@@ -12157,6 +12160,9 @@ msgstr "名前に含む..."
 
 msgid "Name Not Resolved"
 msgstr "名前を解決できません"
+
+msgid "Name of its Dev (optional)"
+msgstr "Dev の名前（任意）"
 
 msgid "Name updated!"
 msgstr "名前を更新しました!"

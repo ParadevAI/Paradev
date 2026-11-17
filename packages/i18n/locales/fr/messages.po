@@ -1785,8 +1785,8 @@ msgstr "Un ami ou un collègue"
 msgid "A gateway is signed in with an API key."
 msgstr "Une passerelle est connectée avec une clé API."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Un groupe vient avec son propre Dev."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Un groupe vient avec son propre Dev. Les membres du groupe l'interrogent avec un @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "J’ai une mauvaise habitude : me réveiller avec une idée en pleine nuit et ouvrir l’application. Au matin, tout est prêt à être relu."
@@ -11829,6 +11829,9 @@ msgstr "Message à {name}…"
 msgid "Message {title}"
 msgstr "Message à {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Message à {title}, ou @{groupDevName} pour interroger son Dev"
+
 msgid "Message in channel"
 msgstr "Message dans un canal"
 
@@ -12157,6 +12160,9 @@ msgstr "Le nom contient..."
 
 msgid "Name Not Resolved"
 msgstr "Nom non résolu"
+
+msgid "Name of its Dev (optional)"
+msgstr "Nom de son Dev (facultatif)"
 
 msgid "Name updated!"
 msgstr "Nom mis à jour !"

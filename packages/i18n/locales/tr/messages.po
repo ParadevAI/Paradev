@@ -1785,8 +1785,8 @@ msgstr "Bir arkadaş veya iş arkadaşı"
 msgid "A gateway is signed in with an API key."
 msgstr "Ağ geçidi API anahtarıyla oturum açmış durumda."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Bir grup kendi Dev'iyle gelir."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Bir grup kendi Dev'iyle gelir. Gruptaki kişiler ona @ ile sorar."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Gece yarısı bir fikirle uyanıp uygulamayı açmak gibi suçlu hissettiren bir alışkanlığım var. Sabaha incelemeye hazır oluyor."
@@ -11829,6 +11829,9 @@ msgstr "Mesaj gönder: {name}…"
 msgid "Message {title}"
 msgstr "{title} için mesaj"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "{title} için mesaj veya Dev'ine sormak için @{groupDevName}"
+
 msgid "Message in channel"
 msgstr "Kanalda mesaj"
 
@@ -12157,6 +12160,9 @@ msgstr "Ad şunu içerir..."
 
 msgid "Name Not Resolved"
 msgstr "Ad çözümlenemedi"
+
+msgid "Name of its Dev (optional)"
+msgstr "Dev'inin adı (isteğe bağlı)"
 
 msgid "Name updated!"
 msgstr "Ad güncellendi!"

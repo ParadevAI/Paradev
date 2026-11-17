@@ -1785,8 +1785,8 @@ msgstr "Znajomy lub współpracownik"
 msgid "A gateway is signed in with an API key."
 msgstr "Brama loguje się za pomocą klucza API."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Grupa ma własnego Deva."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Grupa ma własnego Dev. Osoby w grupie pytają go, używając @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Mam taki grzeszny nawyk: budzę się w środku nocy z pomysłem i otwieram aplikację. Rano wszystko jest gotowe do przeglądu."
@@ -11829,6 +11829,9 @@ msgstr "Wiadomość do {name}…"
 msgid "Message {title}"
 msgstr "Wiadomość do {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Wiadomość do {title} lub @{groupDevName}, aby zapytać jej Dev"
+
 msgid "Message in channel"
 msgstr "Wiadomość na kanale"
 
@@ -12157,6 +12160,9 @@ msgstr "Nazwa zawiera..."
 
 msgid "Name Not Resolved"
 msgstr "Nie rozwiązano nazwy"
+
+msgid "Name of its Dev (optional)"
+msgstr "Nazwa jej Dev (opcjonalnie)"
 
 msgid "Name updated!"
 msgstr "Nazwa zaktualizowana!"

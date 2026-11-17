@@ -1785,8 +1785,8 @@ msgstr "Друг или коллега"
 msgid "A gateway is signed in with an API key."
 msgstr "Шлюз авторизован с помощью ключа API."
 
-msgid "A group comes with a Dev of its own."
-msgstr "У группы есть собственный Dev."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "У группы есть собственный Dev. Участники обращаются к нему через @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "У меня есть грешок: проснуться посреди ночи с идеей и открыть приложение. К утру всё готово к проверке."
@@ -11829,6 +11829,9 @@ msgstr "Сообщение для {name}…"
 msgid "Message {title}"
 msgstr "Сообщение для {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Сообщение для {title} или @{groupDevName}, чтобы спросить её Dev"
+
 msgid "Message in channel"
 msgstr "Сообщение в канале"
 
@@ -12157,6 +12160,9 @@ msgstr "Название содержит..."
 
 msgid "Name Not Resolved"
 msgstr "Имя не разрешено"
+
+msgid "Name of its Dev (optional)"
+msgstr "Имя её Dev (необязательно)"
 
 msgid "Name updated!"
 msgstr "Имя обновлено!"

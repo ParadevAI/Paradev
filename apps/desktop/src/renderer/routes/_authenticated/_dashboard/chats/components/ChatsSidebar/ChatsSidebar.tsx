@@ -113,12 +113,8 @@ export function ChatsSidebar() {
 			<NewGroupDialog
 				open={dialog === "group"}
 				onOpenChange={(next) => setDialog(next ? "group" : null)}
-				onCreate={(title) =>
-					chats.actions.createGroup({
-						title,
-						devName: title,
-						devColor: DEFAULT_COLOR,
-					})
+				onCreate={(group) =>
+					chats.actions.createGroup({ ...group, devColor: DEFAULT_COLOR })
 				}
 				onCreated={open}
 			/>

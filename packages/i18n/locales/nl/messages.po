@@ -1785,8 +1785,8 @@ msgstr "Een vriend of collega"
 msgid "A gateway is signed in with an API key."
 msgstr "Een gateway meldt zich aan met een API-sleutel."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Een groep heeft een eigen Dev."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Een groep heeft een eigen Dev. Personen in de groep vragen hem iets met een @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Ik heb de slechte gewoonte om midden in de nacht wakker te worden met een idee en de app te openen. Tegen de ochtend is het klaar voor review."
@@ -11829,6 +11829,9 @@ msgstr "Bericht aan {name}…"
 msgid "Message {title}"
 msgstr "Bericht aan {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Bericht aan {title}, of @{groupDevName} om de Dev iets te vragen"
+
 msgid "Message in channel"
 msgstr "Bericht in kanaal"
 
@@ -12157,6 +12160,9 @@ msgstr "Naam bevat..."
 
 msgid "Name Not Resolved"
 msgstr "Naam niet omgezet"
+
+msgid "Name of its Dev (optional)"
+msgstr "Naam van de Dev (optioneel)"
 
 msgid "Name updated!"
 msgstr "Naam bijgewerkt!"

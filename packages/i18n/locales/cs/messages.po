@@ -1785,8 +1785,8 @@ msgstr "Přítel nebo kolega"
 msgid "A gateway is signed in with an API key."
 msgstr "Brána se přihlašuje pomocí API klíče."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Skupina má vlastního Deva."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Skupina má vlastního Dev. Lidé ve skupině se ho ptají pomocí @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Mám takový zlozvyk: probudím se uprostřed noci s nápadem a otevřu aplikaci. Ráno je vše připraveno ke kontrole."
@@ -11829,6 +11829,9 @@ msgstr "Zpráva pro {name}…"
 msgid "Message {title}"
 msgstr "Zpráva pro {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Zpráva pro {title}, nebo @{groupDevName} pro dotaz na jejího Dev"
+
 msgid "Message in channel"
 msgstr "Zpráva v kanálu"
 
@@ -12157,6 +12160,9 @@ msgstr "Jméno obsahuje..."
 
 msgid "Name Not Resolved"
 msgstr "Název se nepodařilo přeložit"
+
+msgid "Name of its Dev (optional)"
+msgstr "Jméno jejího Dev (volitelné)"
 
 msgid "Name updated!"
 msgstr "Jméno aktualizováno!"

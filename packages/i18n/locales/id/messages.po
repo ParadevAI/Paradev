@@ -1785,8 +1785,8 @@ msgstr "Teman atau rekan kerja"
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway masuk menggunakan kunci API."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Sebuah grup memiliki Dev-nya sendiri."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Sebuah grup memiliki Dev sendiri. Orang di grup bertanya kepadanya dengan @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Kebiasaan buruk saya adalah terbangun dengan sebuah ide di tengah malam lalu membuka aplikasi. Paginya sudah siap ditinjau."
@@ -11829,6 +11829,9 @@ msgstr "Pesan untuk {name}…"
 msgid "Message {title}"
 msgstr "Pesan untuk {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Pesan untuk {title}, atau @{groupDevName} untuk bertanya ke Dev-nya"
+
 msgid "Message in channel"
 msgstr "Pesan di channel"
 
@@ -12157,6 +12160,9 @@ msgstr "Nama mengandung..."
 
 msgid "Name Not Resolved"
 msgstr "Nama Tidak Ditemukan"
+
+msgid "Name of its Dev (optional)"
+msgstr "Nama Dev-nya (opsional)"
 
 msgid "Name updated!"
 msgstr "Nama diperbarui!"

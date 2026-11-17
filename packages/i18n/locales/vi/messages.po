@@ -1785,8 +1785,8 @@ msgstr "Bạn bè hoặc đồng nghiệp"
 msgid "A gateway is signed in with an API key."
 msgstr "Gateway đăng nhập bằng khóa API."
 
-msgid "A group comes with a Dev of its own."
-msgstr "Mỗi nhóm có một Dev riêng."
+msgid "A group comes with a Dev of its own. People in the group ask it with an @."
+msgstr "Mỗi nhóm có một Dev riêng. Mọi người trong nhóm hỏi nó bằng @."
 
 msgid "A guilty habit I have is waking up with an idea in the middle of the night and opening the app. By morning it's ready for review."
 msgstr "Tôi có thói quen khó bỏ là tỉnh giấc giữa đêm với một ý tưởng rồi mở ứng dụng. Đến sáng là đã sẵn sàng để xem xét."
@@ -11829,6 +11829,9 @@ msgstr "Nhắn cho {name}…"
 msgid "Message {title}"
 msgstr "Nhắn tin cho {title}"
 
+msgid "Message {title}, or @{groupDevName} to ask its Dev"
+msgstr "Nhắn tin cho {title}, hoặc @{groupDevName} để hỏi Dev của nhóm"
+
 msgid "Message in channel"
 msgstr "Tin nhắn trong kênh"
 
@@ -12157,6 +12160,9 @@ msgstr "Tên chứa..."
 
 msgid "Name Not Resolved"
 msgstr "Không phân giải được tên"
+
+msgid "Name of its Dev (optional)"
+msgstr "Tên Dev của nhóm (không bắt buộc)"
 
 msgid "Name updated!"
 msgstr "Đã cập nhật tên!"

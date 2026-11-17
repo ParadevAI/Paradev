@@ -14,7 +14,10 @@ interface NewGroupDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	/** Resolves to the new chat's id, or null when it was not made. */
-	onCreate: (title: string) => Promise<string | null>;
+	onCreate: (group: {
+		title: string;
+		devName: string;
+	}) => Promise<string | null>;
 	onCreated: (chatId: string) => void;
 }
 
@@ -26,15 +29,20 @@ export function NewGroupDialog({
 }: NewGroupDialogProps) {
 	const { t } = useLingui();
 	const [title, setTitle] = useState("");
+	const [devName, setDevName] = useState("");
 	const [isCreating, setCreating] = useState(false);
 	const name = title.trim();
 	const create = async () => {
 		if (!name || isCreating) return;
 		setCreating(true);
-		const chatId = await onCreate(name);
+		const chatId = await onCreate({
+			title: name,
+			devName: devName.trim() || name,
+		});
 		setCreating(false);
 		if (!chatId) return;
 		setTitle("");
+		setDevName("");
 		onOpenChange(false);
 		onCreated(chatId);
 	};
@@ -46,7 +54,10 @@ export function NewGroupDialog({
 						<Trans>New group</Trans>
 					</DialogTitle>
 					<DialogDescription>
-						<Trans>A group comes with a Dev of its own.</Trans>
+						<Trans>
+							A group comes with a Dev of its own. People in the group ask it
+							with an @.
+						</Trans>
 					</DialogDescription>
 				</DialogHeader>
 				<form
@@ -62,6 +73,12 @@ export function NewGroupDialog({
 						maxLength={60}
 						placeholder={t({ message: "Group name" })}
 						onChange={(event) => setTitle(event.target.value)}
+					/>
+					<Input
+						value={devName}
+						maxLength={60}
+						placeholder={t({ message: "Name of its Dev (optional)" })}
+						onChange={(event) => setDevName(event.target.value)}
 					/>
 					<Button type="submit" disabled={!name || isCreating}>
 						<Trans>Create group</Trans>

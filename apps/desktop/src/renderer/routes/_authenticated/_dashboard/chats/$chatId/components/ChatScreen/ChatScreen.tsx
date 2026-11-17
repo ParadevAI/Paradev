@@ -180,6 +180,10 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const typing = typingLabel(state, chatId, typists);
 	const candidates = mentionCandidates(state, chat);
 	const devs = chatDevs(state, chat);
+	const groupDevName =
+		chat.kind === "group"
+			? devs.find((dev) => dev.kind === "group")?.name
+			: undefined;
 	const working = chatTurns(chats.turns, chatId, devs).map((turn) => ({
 		devId: turn.devId,
 		name: state.devs[turn.devId]?.name ?? "",
@@ -239,7 +243,13 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						</div>
 					)}
 					<ChatComposer
-						placeholder={t({ message: `Message ${title}` })}
+						placeholder={
+							groupDevName
+								? t({
+										message: `Message ${title}, or @${groupDevName} to ask its Dev`,
+									})
+								: t({ message: `Message ${title}` })
+						}
 						candidates={candidates}
 						replyingTo={
 							replyTo
