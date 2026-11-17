@@ -4,6 +4,7 @@ import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { CLIError } from "@superset/cli-framework";
 import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc";
 import { getHostId } from "@superset/shared/host-info";
+import { SUPERSET_LAUNCH_SOURCE_HEADER } from "@superset/shared/host-routing";
 import {
 	createSandboxAccess,
 	type SandboxGrant,
@@ -140,6 +141,7 @@ function targetFor(workspaceId: string, ticket: Ticket): ResolvedHostTarget {
 					headers: {
 						Authorization: `Bearer ${ticket.token}`,
 						"x-superset-client-machine-id": getHostId(),
+						[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 					},
 				}),
 			],
