@@ -259,6 +259,23 @@ try {
 			.join(" | "),
 	);
 	expect(
+		"a disabled step that then succeeds by hand is no longer disabled",
+		(() => {
+			sh(
+				`cp -a ${steps} /opt/check/steps-before && touch /opt/check/flaky-ok && /bundle/setup run-step flaky`,
+			);
+			const out = sh("/bundle/setup run-steps");
+			const ok =
+				/step flaky at v-flaky, skipping/.test(out) &&
+				/step after running/.test(out) &&
+				sh(`ls ${steps}/flaky.failure 2>&1 | grep -c 'No such'`).trim() === "1";
+			sh(
+				`rm -rf ${steps} /opt/check/flaky-ok && mv /opt/check/steps-before ${steps}`,
+			);
+			return ok;
+		})(),
+	);
+	expect(
 		"status shows the failure",
 		/flaky\s+v-flaky\s+failed x3/.test(sh("/bundle/setup status")),
 		sh("/bundle/setup status | grep flaky").trim(),
