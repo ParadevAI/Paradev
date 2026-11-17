@@ -72,6 +72,7 @@ export {
 	promoteSandboxToEnvironment,
 	provisionSandbox,
 	pushManagedEnv,
+	type ResumeLock,
 	type SandboxClaim,
 	SandboxDriveMissingError,
 	SandboxDriveRefusedError,

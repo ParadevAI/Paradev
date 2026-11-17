@@ -21,6 +21,8 @@ import {
 	listActiveWorkspaceSandboxes,
 	persistentDriveRefusals,
 	promoteSandboxToEnvironment,
+	provisionSandbox,
+	type ResumeLock,
 	SandboxDriveMissingError,
 	SandboxDriveRefusedError,
 	SandboxNotReadyError,
@@ -293,6 +295,162 @@ describe("wakeSandbox mounts", () => {
 	});
 });
 
+describe("resume under one lock", () => {
+	let status: "running" | "stopped";
+	let attachedTo: string | undefined;
+	let events: string[];
+	let gate: Promise<void>;
+	let bootLog: string;
+	let refuse: boolean;
+	const box = () => ({
+		get status() {
+			return status;
+		},
+		mounts: {},
+		vcpus: 4,
+		domain: () => "https://box.invalid",
+		expiresAt: undefined,
+		update: async (params: Record<string, unknown>) => {
+			if (params.mounts) {
+				events.push("mount");
+				await gate;
+			}
+		},
+		writeFiles: async () => {
+			events.push("write");
+		},
+		runCommand: async (command: { env?: Record<string, string> }) => {
+			events.push("boot");
+			status = "running";
+			const id = command.env?.SUPERSET_BOOT_ID ?? "";
+			if (refuse) {
+				bootLog = `1 boot.start pid=1 boot=${id}\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n`;
+			}
+		},
+		readFileToBuffer: async () => Buffer.from(bootLog),
+		stop: async () => {
+			events.push("stop");
+			status = "stopped";
+		},
+		currentSession: () => {
+			throw new Error("no session");
+		},
+	});
+	stub(Sandbox, { get: async () => box() });
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			events.push(`drive:${attachedTo ?? "detached"}`);
+			const holder = attachedTo;
+			// The session that stopped finishes saving and lets go.
+			attachedTo = undefined;
+			return { name, currentSandboxName: holder };
+		},
+	});
+	stub(globalThis, {
+		fetch: async () => {
+			throw new Error("not answering");
+		},
+	});
+	const mounts = {
+		[SANDBOX_PATHS.drive]: { drive: "drive-1", mode: "read-write" },
+	} as never;
+	const claim = {
+		identity: {
+			SUPERSET_SANDBOX_CONTRACT: "1",
+			SUPERSET_BUNDLE_SHA: "0".repeat(64),
+			SUPERSET_API_URL: "https://api.invalid",
+			SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+			SUPERSET_SANDBOX_ORGANIZATION_ID: "00000000-0000-4000-8000-000000000002",
+			SUPERSET_SANDBOX_REPOSITORIES: "[]",
+			SUPERSET_SANDBOX_IMAGE_TAG: "env-g",
+			SUPERSET_SANDBOX_PROVIDER: "vercel",
+			SUPERSET_SANDBOX_DRIVE: "drive-1",
+		},
+		hostSecret: "s",
+		files: [],
+		vcpus: 4,
+		networkPolicy: {},
+	} as never;
+	let holder: string | null;
+	const lock =
+		(who: string): ResumeLock =>
+		async (step) => {
+			if (holder) throw new SandboxNotReadyError("sbx");
+			holder = who;
+			events.push(`lock:${who}`);
+			try {
+				return await step();
+			} finally {
+				holder = null;
+			}
+		};
+
+	beforeEach(() => {
+		status = "stopped";
+		attachedTo = undefined;
+		events = [];
+		gate = Promise.resolve();
+		bootLog = "";
+		refuse = false;
+		holder = null;
+	});
+
+	test("a redelivered provision whose box stopped waits for the drive before anything resumes it", async () => {
+		attachedTo = "sbx";
+		await provisionSandbox({
+			name: "sbx",
+			environment: { sourceKind: "fork", sourceRef: "env-g", region: "iad1" },
+			claim,
+			mounts,
+			exclusive: lock("provision"),
+		});
+		expect(events).toEqual([
+			"lock:provision",
+			"drive:sbx",
+			"drive:detached",
+			"mount",
+			"write",
+			"boot",
+		]);
+	});
+
+	test("a second wake while the first resumes does not resume the box; it answers still starting", async () => {
+		let open = () => {};
+		gate = new Promise((resolve) => {
+			open = resolve;
+		});
+		const first = wakeSandbox({
+			providerSandboxId: "sbx",
+			claim,
+			mounts,
+			exclusive: lock("first"),
+		}).catch((error: unknown) => error);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		const second = await wakeSandbox({
+			providerSandboxId: "sbx",
+			claim,
+			mounts,
+			exclusive: lock("second"),
+		}).catch((error: unknown) => error);
+		expect(second).toBeInstanceOf(SandboxNotReadyError);
+		expect(events).toEqual(["lock:first", "drive:detached", "mount"]);
+		refuse = true;
+		open();
+		const outcome = await first;
+		expect(outcome).toBeInstanceOf(SandboxDriveMissingError);
+		// The refused box is stopped under the lock, so no wake can resume it in between.
+		expect(events).toEqual([
+			"lock:first",
+			"drive:detached",
+			"mount",
+			"write",
+			"boot",
+			"lock:first",
+			"stop",
+		]);
+	});
+});
+
 describe("composeMounts", () => {
 	test("merges parts, a later part winning a shared path, and drops empty", () => {
 		const a = { "/a": { drive: "a", mode: "read-write" as const } };
@@ -369,6 +527,7 @@ describe("settleSandbox with a drive", () => {
 		},
 	});
 	const box = {
+		status: "running",
 		readFileToBuffer: async () => Buffer.from(bootLog),
 	} as never;
 	const claim = {
@@ -398,7 +557,7 @@ describe("settleSandbox with a drive", () => {
 			hostTarget: "https://box.invalid",
 			claim,
 			bootId: "this",
-			sandbox: box,
+			getBox: async () => box,
 		}).catch((caught: unknown) => caught);
 		expect(error).toBeInstanceOf(SandboxDriveMissingError);
 		expect(error).toBeInstanceOf(SandboxNotReadyError);
@@ -417,7 +576,7 @@ describe("settleSandbox with a drive", () => {
 			hostTarget: "https://box.invalid",
 			claim,
 			bootId: `b${DRIVE_REFUSAL_LIMIT - 1}`,
-			sandbox: box,
+			getBox: async () => box,
 		}).catch((caught: unknown) => caught);
 		expect(error).toBeInstanceOf(SandboxDriveRefusedError);
 		expect(error).toBeInstanceOf(SandboxUnavailableError);
@@ -432,7 +591,7 @@ describe("settleSandbox with a drive", () => {
 				providerSandboxId: "sbx",
 				hostTarget: "https://box.invalid",
 				claim,
-				sandbox: box,
+				getBox: async () => box,
 			}),
 		).rejects.toBeInstanceOf(SandboxDriveMissingError);
 	});
@@ -444,7 +603,7 @@ describe("settleSandbox with a drive", () => {
 			providerSandboxId: "sbx",
 			hostTarget: "https://box.invalid",
 			claim,
-			sandbox: box,
+			getBox: async () => box,
 		});
 		expect(answer.stamps.map((stamp) => stamp.phase)).toContain("drive.layout");
 	});

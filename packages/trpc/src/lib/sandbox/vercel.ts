@@ -263,6 +263,7 @@ export async function provisionSandbox(args: {
 	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
 	mounts?: SandboxMounts;
+	exclusive?: ResumeLock;
 }): Promise<{
 	providerSandboxId: string;
 	sandboxUrl: string;
@@ -290,52 +291,69 @@ export async function provisionSandbox(args: {
 		args.mounts,
 		await agentToolsMounts(args.claim.agentToolsDrive),
 	);
-	const sandbox =
-		(await getSandbox(args.name)) ??
-		(await Sentry.startSpan(
-			{
-				name:
-					args.environment.sourceKind === "fork" ? "fork" : "create from image",
-				op: "sandbox.provider",
-				attributes: {
-					"sandbox.name": args.name,
-					"sandbox.source": args.environment.sourceRef,
-					"sandbox.region": args.environment.region,
-					"sandbox.vcpus": args.claim.vcpus,
+	return (args.exclusive ?? unlocked)(async () => {
+		const existing = await getSandbox(args.name);
+		// A redelivered provision whose box has stopped: its drive may still be flushing, and anything below resumes the box.
+		if (existing && existing.status !== "running") {
+			const drive = mounts
+				? readWriteDriveAt(mounts, SANDBOX_PATHS.drive)
+				: null;
+			const outcome = drive
+				? await waitForDriveDetached(drive, {
+						heldByCaller: heldByThisRunningBox(args.name),
+					})
+				: "detached";
+			if (outcome === "detached" && mounts) await existing.update({ mounts });
+		}
+		const sandbox =
+			existing ??
+			(await Sentry.startSpan(
+				{
+					name:
+						args.environment.sourceKind === "fork"
+							? "fork"
+							: "create from image",
+					op: "sandbox.provider",
+					attributes: {
+						"sandbox.name": args.name,
+						"sandbox.source": args.environment.sourceRef,
+						"sandbox.region": args.environment.region,
+						"sandbox.vcpus": args.claim.vcpus,
+					},
 				},
-			},
-			() =>
-				args.environment.sourceKind === "fork"
-					? // A fork copies the golden's region; a snapshot only exists where
-						// it was taken.
-						Sandbox.fork({
-							...config,
-							...(mounts ? { mounts } : {}),
-							sourceSandbox: args.environment.sourceRef,
-							resources: { vcpus: args.claim.vcpus },
-						})
-					: Sandbox.create({
-							...config,
-							...(mounts ? { mounts } : {}),
-							image: args.environment.sourceRef,
-							region: args.environment.region as SandboxRegion,
-							resources: { vcpus: args.claim.vcpus },
-						}),
-		));
-	let bootId = "";
-	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
-		await writeIdentity(sandbox, args.claim.identity);
-		await writeSignInFiles(sandbox, args.claim.files);
-		bootId = await runBoot(sandbox, args.claim.hostSecret);
+				() =>
+					args.environment.sourceKind === "fork"
+						? // A fork copies the golden's region; a snapshot only exists where
+							// it was taken.
+							Sandbox.fork({
+								...config,
+								...(mounts ? { mounts } : {}),
+								sourceSandbox: args.environment.sourceRef,
+								resources: { vcpus: args.claim.vcpus },
+							})
+						: Sandbox.create({
+								...config,
+								...(mounts ? { mounts } : {}),
+								image: args.environment.sourceRef,
+								region: args.environment.region as SandboxRegion,
+								resources: { vcpus: args.claim.vcpus },
+							}),
+			));
+		let bootId = "";
+		await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
+			await writeIdentity(sandbox, args.claim.identity);
+			await writeSignInFiles(sandbox, args.claim.files);
+			bootId = await runBoot(sandbox, args.claim.hostSecret);
+		});
+		return {
+			providerSandboxId: args.name,
+			sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
+			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
+			expiresAt: sandbox.expiresAt ?? null,
+			sessionId: sessionIdOf(sandbox),
+			bootId,
+		};
 	});
-	return {
-		providerSandboxId: args.name,
-		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
-		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
-		expiresAt: sandbox.expiresAt ?? null,
-		sessionId: sessionIdOf(sandbox),
-		bootId,
-	};
 }
 
 const HOST_READY_TIMEOUT_MS = 60_000;
@@ -493,17 +511,22 @@ export async function settleSandbox(args: {
 	claim: SandboxClaim;
 	/** The boot this settle waits for; without one, no refusal is read from the log. */
 	bootId?: string;
-	/** Where to read the boot log from; fetched when absent. */
-	sandbox?: Pick<Sandbox, "readFileToBuffer">;
+	/** Fetches the box fresh for each read of the boot log. */
+	getBox?: () => Promise<Pick<Sandbox, "readFileToBuffer" | "status">>;
 }): Promise<HostAnswer> {
 	const driveName = args.claim.identity.SUPERSET_SANDBOX_DRIVE;
-	let box = args.sandbox;
+	const getBox =
+		args.getBox ??
+		(() =>
+			Sandbox.get({
+				...credentials(),
+				name: args.providerSandboxId,
+				resume: false,
+			}));
 	const bootLog = async () => {
-		box ??= await Sandbox.get({
-			...credentials(),
-			name: args.providerSandboxId,
-			resume: false,
-		});
+		// A read from a box another caller stopped could resume it with the drive still held.
+		const box = await getBox();
+		if (box.status !== "running") return "";
 		const log = await box
 			.readFileToBuffer({ path: SANDBOX_PATHS.bootLog })
 			.catch(() => null);
@@ -680,6 +703,28 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
  * moved), the credential rules are re-applied (a token may have aged), and
  * the managed environment is pushed again (a fresh session holds none).
  */
+/**
+ * Runs `step` alone among everything that may resume this sandbox, and throws
+ * SandboxNotReadyError when another caller holds it. A stopped box's drive
+ * check and the call that resumes it are one step under it, so no two
+ * sessions ever hold the drive.
+ */
+export type ResumeLock = <T>(step: () => Promise<T>) => Promise<T>;
+const unlocked: ResumeLock = (step) => step();
+
+/** A drive attached to this very sandbox, running again, is held by the session another caller resumed. */
+function heldByThisRunningBox(providerSandboxId: string) {
+	return async (attachedTo: string) =>
+		attachedTo === providerSandboxId &&
+		(
+			await Sandbox.get({
+				...credentials(),
+				name: providerSandboxId,
+				resume: false,
+			})
+		).status === "running";
+}
+
 export type WakePhase = "detach" | "mount" | "resume" | "boot";
 
 export async function wakeSandbox(args: {
@@ -691,6 +736,7 @@ export async function wakeSandbox(args: {
 	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
 	/** How long each part of the wake took, for a check that measures it. */
 	onPhase?: (phase: WakePhase, ms: number) => void;
+	exclusive?: ResumeLock;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -709,112 +755,115 @@ export async function wakeSandbox(args: {
 			args.onPhase?.(phase, Date.now() - started);
 		}
 	};
+	const exclusive = args.exclusive ?? unlocked;
 	try {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name: args.providerSandboxId,
-			resume: false,
-		});
-		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
-		const wasRunning = sandbox.status === "running";
-		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
-		if (!wasRunning && vcpus !== args.claim.vcpus) {
-			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
-				sandbox
-					.update({ resources: { vcpus: args.claim.vcpus } })
-					.then(() => {
-						vcpus = args.claim.vcpus;
-					})
-					.catch((error) =>
-						console.warn(
-							`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
-							error,
-						),
-					),
-			);
-		}
-		let resumedByAnotherWake = false;
-		if (!wasRunning) {
-			const { [SANDBOX_PATHS.agents]: previousAgents, ...kept } =
-				sandbox.mounts ?? {};
-			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
-			const mounts = composeMounts(kept, args.mounts, agents) ?? {};
-			const drive = readWriteDriveAt(mounts, SANDBOX_PATHS.drive);
-			if (drive) {
-				const outcome = await Sentry.startSpan(
-					{ name: "drive detach", op: "sandbox.provider" },
-					() =>
-						timed("detach", () =>
-							waitForDriveDetached(drive, {
-								heldByCaller: async (attachedTo) =>
-									attachedTo === args.providerSandboxId &&
-									(
-										await Sandbox.get({
-											...credentials(),
-											name: args.providerSandboxId,
-											resume: false,
-										})
-									).status === "running",
-							}),
-						),
-				);
-				// A concurrent wake resumed this box with its drive meanwhile.
-				resumedByAnotherWake = outcome === "held";
-			}
-			if (!resumedByAnotherWake && (agents || previousAgents || args.mounts)) {
-				const update = Sentry.startSpan(
-					{ name: "mount", op: "sandbox.provider" },
-					() => timed("mount", () => sandbox.update({ mounts })),
-				);
-				// Without its drive the workspace would boot on an empty /workspace.
-				if (args.mounts) await update;
-				else
-					await update.catch((error) =>
-						console.warn(
-							`[sandbox] mount update failed for ${args.providerSandboxId}`,
-							error,
-						),
-					);
-			}
-		}
-		const running = wasRunning || resumedByAnotherWake;
-		if (!running && args.beforeResume) {
-			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
-		}
-		if (wasRunning) {
-			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
-			if (remaining < EXTEND_BELOW_MS) {
-				// Past the plan's per-session cap the extension is refused; the
-				// session then ends and the next open resumes it.
-				await sandbox.extendTimeout(SESSION_TIMEOUT_MS).catch(() => {});
-			}
-		}
-		// A box that is already serving needs neither a fresh identity file nor
-		// another boot. The policy still goes out: a credential may have aged.
-		const serving = running && (await hostServiceAnswers(hostTarget));
-		const resumeStarted = Date.now();
-		await Sentry.startSpan(
-			{ name: "apply claim", op: "sandbox.provider" },
-			() =>
-				Promise.all([
+		const resumed = await exclusive(async () => {
+			const sandbox = await Sandbox.get({
+				...credentials(),
+				name: args.providerSandboxId,
+				resume: false,
+			});
+			const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
+			const wasRunning = sandbox.status === "running";
+			let vcpus = sandbox.vcpus ?? args.claim.vcpus;
+			if (!wasRunning && vcpus !== args.claim.vcpus) {
+				await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
 					sandbox
-						.update({ networkPolicy: args.claim.networkPolicy })
+						.update({ resources: { vcpus: args.claim.vcpus } })
+						.then(() => {
+							vcpus = args.claim.vcpus;
+						})
 						.catch((error) =>
 							console.warn(
-								`[sandbox] policy update failed for ${args.providerSandboxId}`,
+								`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
 								error,
 							),
 						),
-					serving ? null : writeIdentity(sandbox, args.claim.identity),
-					writeSignInFiles(sandbox, args.claim.files),
-				]),
-		);
-		const bootId = serving
-			? undefined
-			: await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
-					runBoot(sandbox, args.claim.hostSecret),
 				);
-		args.onPhase?.("resume", Date.now() - resumeStarted);
+			}
+			let resumedByAnotherWake = false;
+			if (!wasRunning) {
+				const { [SANDBOX_PATHS.agents]: previousAgents, ...kept } =
+					sandbox.mounts ?? {};
+				const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+				const mounts = composeMounts(kept, args.mounts, agents) ?? {};
+				const drive = readWriteDriveAt(mounts, SANDBOX_PATHS.drive);
+				if (drive) {
+					const outcome = await Sentry.startSpan(
+						{ name: "drive detach", op: "sandbox.provider" },
+						() =>
+							timed("detach", () =>
+								waitForDriveDetached(drive, {
+									heldByCaller: heldByThisRunningBox(args.providerSandboxId),
+								}),
+							),
+					);
+					// A concurrent wake resumed this box with its drive meanwhile.
+					resumedByAnotherWake = outcome === "held";
+				}
+				if (
+					!resumedByAnotherWake &&
+					(agents || previousAgents || args.mounts)
+				) {
+					const update = Sentry.startSpan(
+						{ name: "mount", op: "sandbox.provider" },
+						() => timed("mount", () => sandbox.update({ mounts })),
+					);
+					// Without its drive the workspace would boot on an empty /workspace.
+					if (args.mounts) await update;
+					else
+						await update.catch((error) =>
+							console.warn(
+								`[sandbox] mount update failed for ${args.providerSandboxId}`,
+								error,
+							),
+						);
+				}
+			}
+			const running = wasRunning || resumedByAnotherWake;
+			if (!running && args.beforeResume) {
+				await args.beforeResume({
+					memoryMb: vcpus * MEMORY_MB_PER_VCPU,
+					vcpus,
+				});
+			}
+			if (wasRunning) {
+				const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
+				if (remaining < EXTEND_BELOW_MS) {
+					// Past the plan's per-session cap the extension is refused; the
+					// session then ends and the next open resumes it.
+					await sandbox.extendTimeout(SESSION_TIMEOUT_MS).catch(() => {});
+				}
+			}
+			// A box that is already serving needs neither a fresh identity file nor
+			// another boot. The policy still goes out: a credential may have aged.
+			const serving = running && (await hostServiceAnswers(hostTarget));
+			const resumeStarted = Date.now();
+			await Sentry.startSpan(
+				{ name: "apply claim", op: "sandbox.provider" },
+				() =>
+					Promise.all([
+						sandbox
+							.update({ networkPolicy: args.claim.networkPolicy })
+							.catch((error) =>
+								console.warn(
+									`[sandbox] policy update failed for ${args.providerSandboxId}`,
+									error,
+								),
+							),
+						serving ? null : writeIdentity(sandbox, args.claim.identity),
+						writeSignInFiles(sandbox, args.claim.files),
+					]),
+			);
+			const bootId = serving
+				? undefined
+				: await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
+						runBoot(sandbox, args.claim.hostSecret),
+					);
+			args.onPhase?.("resume", Date.now() - resumeStarted);
+			return { sandbox, hostTarget, running, serving, bootId };
+		});
+		const { sandbox, hostTarget, running, serving, bootId } = resumed;
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
 			() =>
@@ -824,7 +873,6 @@ export async function wakeSandbox(args: {
 						hostTarget,
 						claim: args.claim,
 						bootId,
-						sandbox,
 					}),
 				),
 		).catch(async (error) => {
@@ -833,7 +881,8 @@ export async function wakeSandbox(args: {
 				error instanceof SandboxDriveMissingError ||
 				error instanceof SandboxDriveRefusedError
 			) {
-				await sandbox.stop().catch(() => {});
+				// Under the lock, so no caller resumes the box between its check and this stop.
+				await exclusive(() => sandbox.stop()).catch(() => {});
 			}
 			throw error;
 		});
