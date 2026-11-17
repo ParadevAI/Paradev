@@ -96,6 +96,7 @@
 		"esbuild",
 		"koffi",
 		"node-pty",
+		"react-native-enriched-markdown",
 		"sharp",
 		"utf-8-validate",
 		"workerd"

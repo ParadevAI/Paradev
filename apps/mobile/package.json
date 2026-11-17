@@ -171,6 +171,6 @@
 	"private": true,
 	"enriched-markdown": {
 		"enableCodeHighlight": false,
-		"enableMath": false
+		"enableMath": true
 	}
 }

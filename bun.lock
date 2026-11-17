@@ -1456,6 +1456,7 @@
     "sharp",
     "electron",
     "better-sqlite3",
+    "react-native-enriched-markdown",
     "bufferutil",
     "workerd",
   ],
