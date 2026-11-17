@@ -12362,6 +12362,9 @@ msgstr "新增群組…"
 msgid "New issue"
 msgstr "新建議題"
 
+msgid "New layout"
+msgstr "新版面配置"
+
 msgid "New messages"
 msgstr "新訊息"
 
@@ -12427,6 +12430,9 @@ msgstr "新建工作區（{shortcutText}）"
 
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作區"
+
+msgid "New workspace page"
+msgstr "新版新建工作區頁面"
 
 msgid "Newer than this app"
 msgstr "比此應用程式新"
@@ -16046,6 +16052,9 @@ msgstr "從磁碟重新載入"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "重新載入Paradev以重新整理工作區列表。"
+
+msgid "Reload to apply"
+msgstr "重新載入以套用"
 
 msgid "Reload window"
 msgstr "重新載入視窗"
@@ -21687,6 +21696,12 @@ msgstr "使用桌面應用程式開始並行執行編碼代理程式。"
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "請使用Paradev托盤選單 > 主機服務 > 重啟，然後重試。"
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "使用重新設計的「新建工作區」頁面：提示輸入框位於中間，上方是專案與分支選擇器。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "使用重新設計的視窗版面配置：圖示欄、標題列中的分頁，以及卡片式窗格。"
 
 msgid "Use this account"
 msgstr "使用此帳戶"
