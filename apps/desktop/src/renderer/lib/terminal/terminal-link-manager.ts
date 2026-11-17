@@ -52,6 +52,23 @@ export interface TerminalLinkHandlers {
 	stat?: StatCallback;
 }
 
+function fileLink(
+	uri: string,
+	resolved: { path: string; isDirectory: boolean },
+): DetectedLink {
+	return {
+		text: uri,
+		startIndex: 0,
+		endIndex: 0,
+		resolvedPath: resolved.path,
+		isDirectory: resolved.isDirectory,
+		row: undefined,
+		col: undefined,
+		rowEnd: undefined,
+		colEnd: undefined,
+	};
+}
+
 interface LinkProviderDisposable {
 	dispose(): void;
 }
@@ -172,23 +189,50 @@ export class TerminalLinkManager {
 				}
 			};
 			const webProtocols = ["http:", "https:"];
+			const fileProtocols = ["file:"];
 			const activeProtocols = [...webProtocols, ...extraProtocols];
+			const resolver = this._resolver;
+			const onFileLinkClick = handlers.onFileLinkClick;
+			let hoveredUri: string | null = null;
 			// xterm drops non-http(s) OSC 8 links unless this is true, and then
 			// hands every scheme to activate/hover, so those filter them again.
-			// Hover stays web-only: it feeds the URL hint and "Open in" menu.
+			// Its OSC provider also runs before ours, so a kept file: link must
+			// do what the path detector under it did. Hover stays off for the
+			// extra schemes: it feeds the URL hint and the "Open in" menu.
 			this._oscLinkHandler = {
 				allowNonHttpProtocols: extraProtocols.length > 0,
 				activate: (event, uri) => {
+					if (hasProtocol(uri, fileProtocols)) {
+						if (!onFileLinkClick) return;
+						void resolver.resolveLink(uri).then((resolved) => {
+							if (resolved) onFileLinkClick(event, fileLink(uri, resolved));
+						});
+						return;
+					}
 					if (hasProtocol(uri, activeProtocols)) onUrlClick(event, uri);
 				},
 				hover: onLinkHover
 					? (event, uri) => {
+							hoveredUri = uri;
 							if (hasProtocol(uri, webProtocols)) {
 								onLinkHover(event, { kind: "url", url: uri });
+								return;
 							}
+							if (!hasProtocol(uri, fileProtocols)) return;
+							void resolver.resolveLink(uri).then((resolved) => {
+								if (!resolved || hoveredUri !== uri) return;
+								onLinkHover(event, {
+									kind: "file",
+									isDirectory: resolved.isDirectory,
+									resolvedPath: resolved.path,
+								});
+							});
 						}
 					: undefined,
-				leave: onLinkLeave ? () => onLinkLeave() : undefined,
+				leave: () => {
+					hoveredUri = null;
+					onLinkLeave?.();
+				},
 			};
 			this._terminal.options.linkHandler = this._oscLinkHandler;
 		}

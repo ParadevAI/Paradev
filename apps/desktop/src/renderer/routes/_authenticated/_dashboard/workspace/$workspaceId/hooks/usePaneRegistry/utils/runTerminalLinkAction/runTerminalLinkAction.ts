@@ -53,8 +53,12 @@ function parseWorkspaceLink(url: string): string | null {
 	});
 }
 
-function isAppDeepLink(url: string): boolean {
-	return url.startsWith(`${PROTOCOL_SCHEME}:`);
+export function isAppDeepLink(url: string): boolean {
+	try {
+		return new URL(url).protocol === `${PROTOCOL_SCHEME}:`;
+	} catch {
+		return false;
+	}
 }
 
 /**

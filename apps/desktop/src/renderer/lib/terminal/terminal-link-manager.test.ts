@@ -138,6 +138,79 @@ describe("TerminalLinkManager", () => {
 		});
 	});
 
+	describe("with a file: OSC 8 link", () => {
+		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
+		const event = {} as MouseEvent;
+		const uri = "file://host/Users/me/repo/src/index.ts";
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		let terminal: XTerm;
+		let stat: ReturnType<typeof mock>;
+		let onUrlClick: ReturnType<typeof mock>;
+		let onFileLinkClick: ReturnType<typeof mock>;
+		let onLinkHover: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal().terminal;
+			stat = mock(async () => ({
+				isDirectory: false,
+				resolvedPath: "/Users/me/repo/src/index.ts",
+			}));
+			onUrlClick = mock();
+			onFileLinkClick = mock();
+			onLinkHover = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat,
+				onUrlClick,
+				onFileLinkClick,
+				onLinkHover,
+				extraOscLinkProtocols: ["superset:"],
+			});
+		});
+
+		it("opens it through the file link handler", async () => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/Users/me/repo/src/index.ts");
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({
+					resolvedPath: "/Users/me/repo/src/index.ts",
+					isDirectory: false,
+				}),
+			);
+		});
+
+		it("reports it as a file on hover", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			await flush();
+
+			expect(onLinkHover).toHaveBeenCalledWith(event, {
+				kind: "file",
+				isDirectory: false,
+				resolvedPath: "/Users/me/repo/src/index.ts",
+			});
+		});
+
+		it("reports no hover once the pointer has left", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			terminal.options.linkHandler?.leave?.(event, uri, range);
+			await flush();
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it("does nothing when the path does not exist", async () => {
+			stat.mockImplementation(async () => null);
+			terminal.options.linkHandler?.activate(event, uri, range);
+			await flush();
+
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+			expect(onUrlClick).not.toHaveBeenCalled();
+		});
+	});
+
 	it("clears only the OSC link handler it installed", () => {
 		const { terminal, disposedProviders } = createMockTerminal();
 		const manager = new TerminalLinkManager(terminal);

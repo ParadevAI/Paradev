@@ -10,6 +10,7 @@ import { PROTOCOL_SCHEME } from "shared/constants";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../types";
 import {
+	isAppDeepLink,
 	runChatPullRequestLink,
 	runUrlLinkAction,
 	terminalUrlLinkAction,
@@ -261,6 +262,26 @@ describe("workspace links", () => {
 		["cmd-shift-click", metaShift],
 	])("leaves a web link to the URL actions on %s", (_name, event) => {
 		expect(terminalWorkspaceLinkTarget(event, WEB_LINK)).toBeNull();
+	});
+
+	it("reads the app scheme case-insensitively", () => {
+		const upperDeepLink = DEEP_LINK.replace(
+			PROTOCOL_SCHEME,
+			PROTOCOL_SCHEME.toUpperCase(),
+		);
+		expect(terminalWorkspaceLinkTarget(shift, upperDeepLink)).toBe(
+			WORKSPACE_ID,
+		);
+		expect(terminalUrlLinkAction(shift, upperDeepLink, unbound)).toBeNull();
+	});
+
+	it.each([
+		[DEEP_LINK, true],
+		[`${PROTOCOL_SCHEME}://tasks/abc`, true],
+		[WEB_LINK, false],
+		["not a url", false],
+	])("isAppDeepLink(%s) is %p", (url, expected) => {
+		expect(isAppDeepLink(url)).toBe(expected);
 	});
 
 	it("leaves other URLs to the URL actions", () => {

@@ -53,6 +53,7 @@ import { PROTOCOL_SCHEME } from "shared/constants";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { useSendAttachments } from "../../hooks/useSendAttachments";
 import {
+	isAppDeepLink,
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
@@ -395,6 +396,7 @@ export function TerminalPane({
 						void navigateToWorkspace(linkedWorkspaceId, navigate);
 						return;
 					}
+					if (isAppDeepLink(url)) return;
 					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
