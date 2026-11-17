@@ -77,7 +77,7 @@ async function release(sandbox: Sandbox, drive: string): Promise<void> {
 	throw new Error(`${drive} still attached after ${sandbox.name} stopped`);
 }
 
-const READ_ALL = `cd ${MOUNT}/repo && ms(){ date +%s%3N; }; s=$(ms); git status --short | wc -l; echo "git status $(( $(ms)-s )) ms"; s=$(ms); find node_modules -type f -print0 | xargs -0 -P 8 -n 500 cat > /dev/null; echo "read all of node_modules $(( $(ms)-s )) ms"`;
+const READ_ALL = `export HOME=/root; cd ${MOUNT}/repo && ms(){ date +%s%3N; }; s=$(ms); git status --short | wc -l; echo "git status $(( $(ms)-s )) ms"; s=$(ms); find node_modules -type f -print0 | xargs -0 -P 8 -n 500 cat > /dev/null; echo "read all of node_modules $(( $(ms)-s )) ms"`;
 
 try {
 	const baseName = `spike-fork-base-${run}`;
@@ -93,7 +93,7 @@ try {
 	log(
 		await sh(
 			writer,
-			`chmod 777 ${MOUNT} && cd ${MOUNT} && git config --global --add safe.directory '*' && git clone -q --depth 1 ${REPO} repo && cd repo && npm i -g bun@$(cat .bun-version) >/dev/null 2>&1 && BUN_INSTALL_CACHE_DIR=${MOUNT}/store bun install --frozen-lockfile --ignore-scripts >/dev/null 2>&1; du -sh ${MOUNT} | cut -f1; find node_modules -type f | wc -l; echo base > ${MOUNT}/marker; sync`,
+			`chmod 777 ${MOUNT} && cd ${MOUNT} && export HOME=/root && git config --global --add safe.directory '*' && git clone -q --depth 1 ${REPO} repo && cd repo && npm i -g bun@$(cat .bun-version) >/dev/null 2>&1; BUN_INSTALL_CACHE_DIR=${MOUNT}/store bun install --ignore-scripts 2>&1 | tail -2; head -c 6G /dev/urandom > ${MOUNT}/big.bin; echo base > ${MOUNT}/marker; sync; du -sh ${MOUNT} | cut -f1; find node_modules -type f | wc -l`,
 		),
 	);
 	await timed("writer stop and drive release", () => release(writer, baseName));
