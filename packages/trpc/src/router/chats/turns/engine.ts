@@ -355,6 +355,53 @@ const turnHeader = (
 		...fields.flatMap(([name, value]) => (value ? [`${name}: ${value}`] : [])),
 	].join("\n");
 
+/** How many cut-off messages a turn takes up again. Older ones have likely moved on. */
+const INTERRUPTED_MAX = 5;
+
+/**
+ * Messages this Dev's turns in the chat were answering when a newer message
+ * replaced them, since its last reply there. A replaced turn posts nothing,
+ * so without this the restarted turn answers only the newest message.
+ */
+async function interrupted(
+	agentId: string,
+	message: typeof chatsMessages.$inferSelect,
+) {
+	const [lastReply] = await db
+		.select({ createdAt: chatsMessages.createdAt })
+		.from(chatsMessages)
+		.where(
+			and(
+				eq(chatsMessages.groupId, message.groupId),
+				eq(chatsMessages.authorAgentId, agentId),
+			),
+		)
+		.orderBy(desc(chatsMessages.createdAt))
+		.limit(1);
+	const rows = await db
+		.select({ text: chatsMessages.text, sender: users })
+		.from(chatsTurns)
+		.innerJoin(chatsMessages, eq(chatsMessages.id, chatsTurns.messageId))
+		.leftJoin(users, eq(users.id, chatsMessages.authorId))
+		.where(
+			and(
+				eq(chatsTurns.agentId, agentId),
+				eq(chatsTurns.groupId, message.groupId),
+				eq(chatsTurns.superseded, true),
+				isNull(chatsTurns.taskId),
+				ne(chatsMessages.id, message.id),
+				lastReply
+					? gt(chatsMessages.createdAt, lastReply.createdAt)
+					: undefined,
+			),
+		)
+		.orderBy(asc(chatsMessages.createdAt));
+	return rows.slice(-INTERRUPTED_MAX).map((row) => ({
+		from: row.sender ? toUser(row.sender).displayName : "someone",
+		text: row.text,
+	}));
+}
+
 /** Whether this Dev wrote one of the few messages before this one, a moment ago. */
 async function spokeJustBefore(
 	agentId: string,
@@ -442,9 +489,18 @@ async function messageTurnText(turn: TurnRow) {
 		row.message.text,
 		(ref) => names.get(ref.id) ?? "someone",
 	);
+	const cut = await interrupted(turn.agentId, row.message);
+	const unanswered = cut.length
+		? `\n\nYour turns for these earlier messages were cut off by newer ones before you replied. Answer them too, in the same reply:\n${cut
+				.map(
+					(entry) =>
+						`- ${entry.from}: ${renderMentions(entry.text, (ref) => names.get(ref.id) ?? "someone")}`,
+				)
+				.join("\n")}`
+		: "";
 	return {
 		userId: row.message.authorId,
-		text: `${header}\n${REPLY_HINT}\n\n${body}`,
+		text: `${header}\n${REPLY_HINT}\n\n${body}${unanswered}`,
 	};
 }
 

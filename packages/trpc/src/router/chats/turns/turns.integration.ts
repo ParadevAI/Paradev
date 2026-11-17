@@ -246,6 +246,8 @@ test("a newer message replaces the turn for the one before it", async () => {
 	await owner.chats.sendMessage({ groupId: group.id, text: "second" });
 	const second = await startedTurn(2);
 	expect(cancelled).toEqual([group.id]);
+	expect(second.text).toContain("were cut off by newer ones");
+	expect(second.text).toContain("- Person 0: first");
 	expect(await postDevMessage(first, { text: "late", endsTurn: true })).toBe(
 		false,
 	);
