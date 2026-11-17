@@ -1105,6 +1105,48 @@ export const FIRST_PARTY_MANIFESTS = {
 		},
 		"skills": []
 	} as const,
+	"docusign": {
+		"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
+		"name": "docusign",
+		"version": "1.0.0",
+		"description": "Send documents for signature with Docusign: create envelopes, add signers and fields, and track their status.",
+		"author": {
+			"name": "Paradev",
+			"url": "https://paradev.com"
+		},
+		"homepage": "https://docs.paradev.com",
+		"repository": "https://github.com/paradevai/paradev",
+		"license": "MIT",
+		"keywords": [
+			"docusign",
+			"esignature",
+			"contracts",
+			"envelopes",
+			"legal"
+		],
+		"extensions": {
+			"superset": {
+				"interface": {
+					"displayName": "Docusign",
+					"category": "Productivity",
+					"icon": "docusign"
+				},
+				"connector": {
+					"slug": "docusign_mcp"
+				},
+				"mcp": {
+					"type": "streamable-http",
+					"url": "https://mcp.docusign.com/mcp"
+				}
+			}
+		},
+		"skills": [
+			{
+				"name": "send-for-signature",
+				"description": "Prepare a Docusign envelope for a document (a board consent, offer letter, option agreement, NDA, contract) with the right signers and signature and date fields, and leave it as a draft for the user to review before it goes out. Use when the user says \"send this for signature\", \"set up the Docusign\", \"get the board to sign\", \"DocuSign this to X\", or asks where an envelope stands."
+			}
+		]
+	} as const,
 } as const;
 
 export type FirstPartyPluginName = keyof typeof FIRST_PARTY_MANIFESTS;

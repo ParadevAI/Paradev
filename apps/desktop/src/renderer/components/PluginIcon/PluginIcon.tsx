@@ -3,7 +3,7 @@ import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
-import { LuBookOpen, LuDrama, LuPuzzle } from "react-icons/lu";
+import { LuBookOpen, LuDrama, LuPuzzle, LuSignature } from "react-icons/lu";
 import {
 	SiGooglechrome,
 	SiGoogledocs,
@@ -87,6 +87,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	"google-sheets": { icon: SiGooglesheets, color: "#0F9D58" },
 	vercel: { icon: SiVercel },
 	wispr: { icon: WisprIcon },
+	docusign: { icon: LuSignature, color: "#4C00FF" },
 };
 
 /**
