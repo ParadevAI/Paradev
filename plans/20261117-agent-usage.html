@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Which agents people use in Paradev</title>
+<style>
+  :root { --sp-measure: 70ch; }
+  main { max-width: 1020px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  .lede { color: var(--sp-muted); max-width: var(--sp-measure); }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.6rem; color: var(--sp-muted); font-size: 0.88rem; margin: 0.6rem 0 2rem; }
+  .meta b { color: var(--sp-text); font-weight: 600; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin: 1.5rem 0 0.5rem; }
+  .tile { border: 1px solid var(--sp-border); border-radius: var(--sp-radius); padding: 0.9rem 1rem; }
+  .tile .n { font-size: 2rem; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
+  .tile .l { color: var(--sp-muted); font-size: 0.86rem; margin-top: 0.2rem; }
+  h2 { margin-top: 3rem; margin-bottom: 0.2rem; }
+  h2 + p { color: var(--sp-muted); margin-top: 0.2rem; max-width: var(--sp-measure); }
+  .bars { margin-top: 1.2rem; display: grid; grid-template-columns: 9.5rem 1fr 13rem; gap: 0.45rem 0.9rem; align-items: center; font-size: 0.92rem; }
+  .bars .track { display: grid; gap: 2px; }
+  .bars .fill { height: 10px; background: var(--sp-chart-1); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bars .fill.w7 { background: var(--sp-chart-2); }
+  .bars .fill.zero { background: none; min-width: 0; }
+  .bars .v { color: var(--sp-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bars .v b { color: var(--sp-text); font-weight: 600; }
+  .tablewrap { overflow-x: auto; margin-top: 1rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th { text-align: left; color: var(--sp-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
+  th, td { padding: 0.45rem 0.9rem 0.45rem 0; border-bottom: 1px solid var(--sp-border); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td .sub { color: var(--sp-muted); font-size: 0.82rem; }
+  .trend { margin-top: 1.4rem; display: flex; align-items: flex-end; gap: 10px; height: 230px; padding-bottom: 1.6rem; position: relative; border-bottom: 1px solid var(--sp-border); }
+  .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; cursor: default; }
+  .col .seg { width: 100%; }
+  .col .seg + .seg { margin-top: 2px; }
+  .col .seg:first-child { border-radius: 4px 4px 0 0; }
+  .s-other { background: var(--sp-chart-3); } .s-codex { background: var(--sp-chart-2); } .s-claude { background: var(--sp-chart-1); }
+  .col .x { position: absolute; bottom: -1.5rem; left: 0; right: 0; text-align: center; font-size: 0.72rem; color: var(--sp-muted); white-space: nowrap; }
+  .col .top { text-align: center; font-size: 0.74rem; color: var(--sp-muted); margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.4rem; margin: 2.2rem 0 0; padding: 0; list-style: none; font-size: 0.88rem; }
+  .legend li { display: flex; align-items: center; gap: 0.45rem; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .tip { position: fixed; pointer-events: none; background: var(--sp-text); color: var(--sp-bg); padding: 0.4rem 0.6rem; border-radius: 6px; font-size: 0.82rem; display: none; z-index: 10; white-space: pre; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.4rem 3rem; }
+  .cols li { margin-bottom: 0.5rem; }
+  footer { margin-top: 3.5rem; color: var(--sp-muted); font-size: 0.86rem; max-width: var(--sp-measure); }
+</style>
+</head>
+<body class="auto">
+<main>
+<h1>Which agents people use in Paradev</h1>
+<p class="lede">Agent usage across the product from PostHog, by people and by activity. Two agents account for almost all of it. Nothing else has reached twenty users in a month.</p>
+<div class="meta"><span>Windows <b>30 days: 18 Oct to 16 Nov 2026</b></span><span><b>7 days: 10 to 16 Nov 2026</b></span><span>Source <b>PostHog, Production project</b></span><span>Pulled <b>17 Nov 2026</b></span></div>
+
+<div class="tiles">
+  <div class="tile"><div class="n">666</div><div class="l">people who started an agent in 30 days</div></div>
+  <div class="tile"><div class="n">292</div><div class="l">in the last 7 days</div></div>
+  <div class="tile"><div class="n">96%</div><div class="l">used Claude (92% in the last 7 days)</div></div>
+  <div class="tile"><div class="n">17%</div><div class="l">used Codex (16% in the last 7 days)</div></div>
+  <div class="tile"><div class="n">80%</div><div class="l">used exactly one agent in 30 days</div></div>
+</div>
+
+<h2>People per agent</h2>
+<p>Distinct people who started the agent at least once, by any route: a chat session, a workspace created with an agent, or a terminal launch. Each agent has two bars: the last 30 days and the last 7. A person who used two agents is counted under both.</p>
+<ul class="legend" style="margin-top:1rem"><li><span class="sw" style="background:var(--sp-chart-1)"></span>Last 30 days, of 666 people</li><li><span class="sw" style="background:var(--sp-chart-2)"></span>Last 7 days, of 292 people</li></ul>
+<div class="bars" id="bars" role="img" aria-label="Bar chart of distinct people per agent over 30 and 7 days"></div>
+
+<h2>Activity per agent</h2>
+<p>Split by how the agent was started. Columns without a period are the 30-day window. Chat sessions and workspace creation are well instrumented. Terminal launches are not, so treat that column as a floor.</p>
+<div class="tablewrap"><table>
+<thead><tr><th>Agent</th><th class="n">People, 30 days</th><th class="n">People, 7 days</th><th class="n">Chat sessions, 30 days</th><th class="n">Chat sessions, 7 days</th><th class="n">Workspaces created with it</th><th class="n">Chat messages</th><th class="n">Terminal launches</th><th class="n">Cloud sessions</th></tr></thead>
+<tbody id="rows"></tbody>
+</table></div>
+
+<h2>Weekly chat sessions since tracking began</h2>
+<p>The session event was first recorded on 24 August 2026, so this is the whole history: 7,812 sessions from 732 people. Hover a bar for the numbers.</p>
+<div class="trend" id="trend" role="img" aria-label="Stacked weekly chat sessions by agent"></div>
+<ul class="legend">
+  <li><span class="sw s-claude"></span>Claude</li><li><span class="sw s-codex"></span>Codex</li><li><span class="sw s-other"></span>Every other agent</li>
+</ul>
+<div class="tip" id="tip"></div>
+
+<h2>What it says</h2>
+<div class="cols"><ul>
+<li><b>Claude is the product for most people.</b> 640 of 666 used it, and it has about 80% of chat sessions in every week since tracking began.</li>
+<li><b>Codex is a real second,</b> at 110 people. It doubled in the week of 8 November, from about 100 sessions to 214.</li>
+<li><b>Most people use one agent.</b> 535 used one, 118 used two, 12 used three or more. Nearly everyone who uses Codex also uses Claude.</li>
+<li><b>OpenCode is the widest of the rest,</b> with 17 people, mostly through the terminal.</li>
+</ul><ul>
+<li><b>Custom agents are the heaviest small group:</b> 17 people, about 210 sessions. Their definitions live on the user's machine, so we cannot see what they run.</li>
+<li><b>Oh My Pi and Pi</b> have five people each over 30 days and use it a lot: 62 and 35 sessions. In the last 7 days Pi had one person and Oh My Pi none.</li>
+<li><b>Everything else is one to three people in a month, and mostly nobody in a given week.</b> Gemini, Grok, Antigravity, Cursor Agent and Mistral Vibe had no users in the last 7 days.</li>
+<li><b>The weekly picture is narrower than the monthly one.</b> Only four agents had more than one user in the last 7 days: Claude 269, Codex 48, custom agents 10, OpenCode 8.</li>
+<li><b>Cloud is small but moving.</b> 163 cloud sessions in the window, 129 of them in the week of 8 November. Cloud boxes only offer Claude and Codex, so cloud cannot show demand for anything else.</li>
+</ul></div>
+
+<h2>How far to trust it</h2>
+<ul>
+<li><b>Terminal use is under-counted.</b> Terminal launches total 1,702 in the window against roughly 74,000 terminal prompts submitted. Agents that people mostly run in a terminal, such as OpenCode and Copilot, are probably more used than this shows.</li>
+<li><b>Most workspace creations carry no agent.</b> <code>workspace_created</code> fired 547,000 times in 30 days and records no agent; only the 2,859 <code>workspace_create_requested</code> events do. What creates the rest has not been traced.</li>
+<li><b>Internal accounts are mostly still in.</b> Excluding <code>superset.sh</code> and <code>paradev.com</code> emails removed only three people, which suggests most team accounts are not identified by those addresses. The cloud numbers in particular include our own use.</li>
+<li><b>Chat sessions are new.</b> The step up in the week of 20 September looks like a release, not organic growth, so week-on-week change before that says little.</li>
+</ul>
+
+<footer><p>Events used: <code>new_session_started</code> (chat sessions, with agent and local or cloud), <code>workspace_create_requested</code> (workspaces created with an agent), <code>chat_message_sent</code>, and <code>agent_session_launch</code> (terminal launches). "People" is distinct PostHog persons. Percentages of people are out of 666 for 30 days and 292 for 7 days, and sum to more than 100 because some people use several agents. The weekly chart includes internal accounts; the tables exclude the three that matched.</p></footer>
+</main>
+<script>
+(function () {
+  // agent, people 30d, chat sessions, workspaces, messages, terminal, cloud sessions, people 7d, chat sessions 7d
+  var A = [
+    ["Claude", 640, 3536, 2155, 2219, 1569, 132, 269, 897],
+    ["Codex", 110, 543, 392, 401, 29, 31, 48, 228],
+    ["OpenCode", 17, 11, 12, 12, 76, 0, 8, 7],
+    ["Custom agents", 17, 209, 148, 151, 0, 0, 10, 26],
+    ["Oh My Pi", 5, 62, 45, 45, 0, 0, 0, 0],
+    ["Pi", 5, 35, 34, 34, 0, 0, 1, 2],
+    ["Gemini", 3, 3, 3, 3, 1, 0, 0, 0],
+    ["Hermes", 2, 15, 12, 12, 0, 0, 1, 13],
+    ["Antigravity", 2, 10, 3, 4, 0, 0, 0, 0],
+    ["Grok", 2, 7, 6, 6, 0, 0, 0, 0],
+    ["Muse", 2, 6, 3, 4, 0, 0, 1, 5],
+    ["Cursor Agent", 2, 2, 1, 1, 2, 0, 0, 0],
+    ["Copilot", 1, 0, 0, 0, 25, 0, 1, 0],
+    ["Mistral Vibe", 1, 1, 1, 1, 0, 0, 0, 0],
+    ["Hatz Pi", 1, 1, 1, 1, 0, 0, 1, 1],
+    ["fx", 1, 0, 1, 1, 0, 0, 1, 0]
+  ];
+  var TOTAL = 666, fmt = function (n) { return n.toLocaleString("en-US"); };
+  var bars = document.getElementById("bars"), max = A[0][1];
+  A.forEach(function (r) {
+    var l = document.createElement("div"); l.textContent = r[0];
+    var t = document.createElement("div"); t.className = "track";
+    var f = document.createElement("div"); f.className = "fill"; f.style.width = (100 * r[1] / max) + "%"; t.appendChild(f);
+    var g = document.createElement("div"); g.className = "fill w7" + (r[7] ? "" : " zero"); g.style.width = (100 * r[7] / max) + "%"; t.appendChild(g);
+    var v = document.createElement("div"); v.className = "v";
+    var pc = function (n, d) { var p = 100 * n / d; return n ? (p >= 1 ? p.toFixed(0) : p.toFixed(1)) + "%" : "0"; };
+    var b = document.createElement("b"); b.textContent = fmt(r[1]); v.appendChild(b);
+    v.appendChild(document.createTextNode(" (" + pc(r[1], TOTAL) + ")  ·  7d "));
+    var b7 = document.createElement("b"); b7.textContent = fmt(r[7]); v.appendChild(b7);
+    v.appendChild(document.createTextNode(r[7] ? " (" + pc(r[7], 292) + ")" : ""));
+    bars.appendChild(l); bars.appendChild(t); bars.appendChild(v);
+  });
+  var rows = document.getElementById("rows");
+  A.forEach(function (r) {
+    var tr = document.createElement("tr");
+    [r[0], r[1], r[7], r[2], r[8], r[3], r[4], r[5], r[6]].forEach(function (c, i) { var td = document.createElement("td"); if (i) td.className = "n"; td.textContent = i ? (c ? fmt(c) : "–") : c; tr.appendChild(td); });
+    rows.appendChild(tr);
+  });
+  // week, claude, codex, other, cloud, people
+  var W = [["23 Aug",29,0,13,13,6],["30 Aug",69,17,0,0,13],["6 Sep",89,5,0,0,20],["13 Sep",94,13,2,5,26],["20 Sep",446,54,6,14,180],["27 Sep",549,134,92,11,168],["4 Oct",699,76,56,7,198],["11 Oct",695,82,78,33,189],["18 Oct",730,90,85,21,199],["25 Oct",772,78,108,17,227],["1 Nov",886,105,93,29,220],["8 Nov",989,214,69,129,260]];
+  var trend = document.getElementById("trend"), tip = document.getElementById("tip");
+  var wmax = Math.max.apply(null, W.map(function (w) { return w[1] + w[2] + w[3]; }));
+  W.forEach(function (w) {
+    var total = w[1] + w[2] + w[3], col = document.createElement("div"); col.className = "col";
+    col.setAttribute("data-t", "Week of " + w[0] + "\n" + fmt(total) + " sessions, " + w[5] + " people\nClaude " + fmt(w[1]) + "\nCodex " + w[2] + "\nOther " + w[3] + "\nOf which cloud " + w[4]);
+    var top = document.createElement("div"); top.className = "top"; top.textContent = fmt(total); col.appendChild(top);
+    [["s-other", w[3]], ["s-codex", w[2]], ["s-claude", w[1]]].forEach(function (s) {
+      if (!s[1]) return; var d = document.createElement("div"); d.className = "seg " + s[0]; d.style.height = (185 * s[1] / wmax) + "px"; col.appendChild(d);
+    });
+    var x = document.createElement("div"); x.className = "x"; x.textContent = w[0]; col.appendChild(x);
+    trend.appendChild(col);
+  });
+  trend.addEventListener("mousemove", function (e) {
+    var c = e.target.closest(".col"); if (!c) { tip.style.display = "none"; return; }
+    tip.textContent = c.getAttribute("data-t"); tip.style.display = "block";
+    tip.style.left = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8) + "px"; tip.style.top = (e.clientY + 14) + "px";
+  });
+  trend.addEventListener("mouseleave", function () { tip.style.display = "none"; });
+})();
+</script>
+</body>
+</html>
