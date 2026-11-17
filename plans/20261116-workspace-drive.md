@@ -121,6 +121,15 @@ Documented by Vercel or the SDK, not measured:
 
 ## Surprises & Discoveries
 
+- Observation: the first real-Vercel drive run (run 44151145824, 2026-11-17) failed 7 of 10 drive
+  expectations. All 7 were bugs in the check, not the product. `sudo` on the box writes `unable to
+  resolve host <hostname>` to stderr, and the check compared stdout and stderr together. Also,
+  findmnt reports a bind mount of a subdirectory as `/dev/vdc[/workspace]`, so its SOURCE never
+  equals the drive's. The log showed the product doing the right thing: `drive.layout ms=50`,
+  `/workspace` from `/dev/vdc[/workspace]`, memguard swap on the drive, and docker's root at
+  `/mnt/superset-drive/docker`. The check now compares stdout only, and compares MAJ:MIN plus
+  FSROOT for the bind.
+
 - Observation: hardlinks do not work across two mount points, even on the same filesystem.
   `link(2)` returns `EXDEV` when the two paths are on different `vfsmount`s, and a bind mount is a
   separate `vfsmount`. Measured on 2026-11-17. So the bun and pnpm stores live inside the
@@ -391,7 +400,10 @@ From the repository root:
     .agents/skills/verify-sandbox-asleep/run.sh
 
 Against real Vercel: dispatch the Sandbox workflow with `run: real-sandbox` and
-`real_sandbox_drive: true`. It must print `ok` for every `drive:` line and delete what it made.
+`real_sandbox_drive: true`. It must print `ok` for every `drive:` line, exit 0, and delete what it
+made. `real_sandbox_keep: true` keeps the stopped boxes and the box drive for inspection. On a
+failed drive expectation it prints a `drive: diagnosis` block (mounts, drive contents, the conf's
+drive key, the run dir, `daemon.json`, the checkout log and the boot log).
 
 
 ## Idempotence and Recovery

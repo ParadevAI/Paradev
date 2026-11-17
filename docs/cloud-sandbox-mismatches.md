@@ -1093,3 +1093,12 @@ doesn't re-spend a session on it; the next thing to try is attaching to the
 `win.setSize()` directly rather than simulating it from outside, or watching
 `app.on("child-process-gone")` / `render-process-gone` across a CDP-reload
 loop to catch the actual GPU-process death this is presumably downstream of.
+
+**`sudo` cannot resolve the box's hostname.** A machine someone owns has its
+hostname in `/etc/hosts`; a Vercel box does not, so every `sudo` (including
+`runCommand({ sudo: true })`) writes `sudo: unable to resolve host <name>:
+Name or service not known` to stderr. The command still runs. A check that
+reads `stdout + stderr` then sees an extra line and fails a comparison that
+was correct; the first real drive check failed 7 expectations that way.
+**What we did:** the real-sandbox drive pass compares stdout only and shows
+stderr as detail. **Open:** the hostname is still missing from `/etc/hosts`.

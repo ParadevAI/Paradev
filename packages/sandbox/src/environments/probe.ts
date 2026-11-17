@@ -167,12 +167,40 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		/up/,
 		90,
 	);
+	await until(
+		"websockify listening",
+		`ss -ltn | grep -q ':${SANDBOX_PORTS.desktop} ' && echo listening`,
+		/listening/,
+		60,
+	);
 	const rfb = await rfbHandshake(host, args.hostSecret);
 	check(
 		"desktop stream answers RFB through host-service",
 		rfb.startsWith("RFB "),
 		JSON.stringify(rfb),
 	);
+	if (!rfb.startsWith("RFB ")) {
+		const plainGet = await status(
+			`${host}/desktop/websockify?token=${encodeURIComponent(args.hostSecret)}`,
+		);
+		const onBox = await run(
+			[
+				`echo '--- listening'`,
+				`ss -ltn | grep -E ':(${SANDBOX_PORTS.desktop}|${SANDBOX_PORTS.vnc}) '`,
+				`echo '--- processes'`,
+				`pgrep -a -f 'websockify|Xvnc'`,
+				`echo '--- loopback handshake'`,
+				`curl -s --max-time 5 -o /dev/null -w '%{http_code}' -H 'Connection: Upgrade' -H 'Upgrade: websocket' -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' http://127.0.0.1:${SANDBOX_PORTS.desktop}/`,
+				`echo; echo '--- desktop.log'`,
+				`tail -20 ${SANDBOX_PATHS.logs}/desktop.log`,
+				`echo '--- host-service.log, desktop lines'`,
+				`grep -i -E 'desktop|websockify' ${SANDBOX_PATHS.logs}/host-service.log | tail -20`,
+			].join("; "),
+		);
+		log(
+			`RFB diagnosis: GET through host-service answered ${plainGet}\n${onBox}`,
+		);
+	}
 	if (args.expectAnthropicRule) {
 		const models = (key: string) =>
 			run(

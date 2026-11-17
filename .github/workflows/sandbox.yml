@@ -30,6 +30,10 @@ on:
         description: "real-sandbox only: also run the drive-mode pass (a throwaway golden drive, a box on a fork of it, a stop and a wake)"
         type: boolean
         default: false
+      real_sandbox_keep:
+        description: "real-sandbox only: keep the boxes (stopped) and the box drive for inspection instead of deleting them"
+        type: boolean
+        default: false
 
 jobs:
   boot-twice:
@@ -152,6 +156,7 @@ jobs:
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
           REAL_SANDBOX_DRIVE: ${{ inputs.real_sandbox_drive && '1' || '' }}
+          REAL_SANDBOX_KEEP: ${{ inputs.real_sandbox_keep && '1' || '' }}
         run: bun run src/real-sandbox.ts
 
   drive-fork-probe:
