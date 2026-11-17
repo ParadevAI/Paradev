@@ -14,3 +14,6 @@
 "Could not start dictation" = "Das Diktat konnte nicht gestartet werden";
 "Uploading" = "Wird hochgeladen";
 "Upload failed" = "Hochladen fehlgeschlagen";
+"Stop" = "Stoppen";
+"Dictation stopped. What was heard so far is in your message." = "Das Diktat wurde beendet. Das bisher Gehörte steht in deiner Nachricht.";
+"Transcription took too long. The last few words may be missing." = "Die Transkription hat zu lange gedauert. Die letzten Wörter fehlen möglicherweise.";

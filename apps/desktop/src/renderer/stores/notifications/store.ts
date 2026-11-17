@@ -191,7 +191,8 @@ export function getNotificationSourcesForTab(
 function getTerminalIdForPane(
 	pane: NotificationPaneLike | null | undefined,
 ): string | null {
-	if (!pane || pane.kind !== "terminal") return null;
+	if (!pane || (pane.kind !== "terminal" && pane.kind !== "chat-v3"))
+		return null;
 	if (!pane.data || typeof pane.data !== "object") return null;
 	const terminalId = (pane.data as { terminalId?: unknown }).terminalId;
 	return typeof terminalId === "string" && terminalId ? terminalId : null;

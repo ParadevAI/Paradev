@@ -7,7 +7,11 @@ import {
 } from "@superset/panes";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, PullRequestPaneData } from "../../types";
-import { openPullRequestPaneInStore } from "./openPullRequestPaneInStore";
+import { getPaneKey } from "../getPaneKey";
+import {
+	findVisiblePullRequestNumber,
+	openPullRequestPaneInStore,
+} from "./openPullRequestPaneInStore";
 
 const REPO = "superset-sh/superset";
 
@@ -75,6 +79,7 @@ function paneData(store: StoreApi<WorkspaceStore<PaneViewerData>>) {
 describe("openPullRequestPaneInStore", () => {
 	it("splits the active pane when no pull-request pane exists", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState(),
 		});
 
@@ -91,6 +96,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("focuses an existing pane for the same PR without touching its data", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",
@@ -110,6 +116,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("retargets the existing pane when the PR number changes", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",
@@ -126,6 +133,7 @@ describe("openPullRequestPaneInStore", () => {
 
 	it("retargets when the same number belongs to another repository", () => {
 		const store = createWorkspaceStore<PaneViewerData>({
+			getPaneKey,
 			initialState: workspaceState({
 				tabId: "tab-2",
 				paneId: "pr-pane",
@@ -143,5 +151,27 @@ describe("openPullRequestPaneInStore", () => {
 			repoFullName: "superset-sh/docs",
 			number: 42,
 		});
+	});
+});
+
+describe("findVisiblePullRequestNumber", () => {
+	it("reads the pull-request pane of the active tab only", () => {
+		const existing = {
+			tabId: "tab-2",
+			paneId: "pane-2",
+			data: { repoFullName: REPO, number: 8437 },
+		};
+		const background = workspaceState(existing);
+		expect(
+			findVisiblePullRequestNumber(
+				background as WorkspaceStore<PaneViewerData>,
+			),
+		).toBeNull();
+		expect(
+			findVisiblePullRequestNumber({
+				...background,
+				activeTabId: "tab-2",
+			} as WorkspaceStore<PaneViewerData>),
+		).toBe(8437);
 	});
 });

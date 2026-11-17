@@ -274,6 +274,16 @@ describe("host-side leaked-input-mode reclaim", () => {
 	});
 });
 
+describe("snapshot maxLines", () => {
+	test("counts from the last row with content, not the screen bottom", () => {
+		const t = createModeTracker(80, 56);
+		for (let i = 1; i <= 10; i += 1) t.feed(enc.encode(`line-${i}\r\n`));
+
+		expect(t.snapshot(3).text).toBe("line-8\nline-9\nline-10");
+		t.dispose();
+	});
+});
+
 describe("snapshot behind an alt screen", () => {
 	// Why the handoff reads the retained PTY stream instead of this snapshot:
 	// the alternate screen keeps no scrollback, so whatever a TUI has already

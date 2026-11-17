@@ -1,1 +1,1 @@
-export { STAR_NAG_INITIAL_THRESHOLD, useStarNagStore } from "./store";
+export { useStarNagStore } from "./store";

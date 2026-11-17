@@ -1,30 +1,41 @@
-import { CLIError } from "@superset/cli-framework";
+import { boolean, CLIError, string } from "@superset/cli-framework";
 import { command } from "../../lib/command";
-import {
-	isProcessAlive,
-	readManifest,
-	removeManifest,
-} from "../../lib/host/manifest";
+import { readManifest, removeManifestIfOwnedBy } from "../../lib/host/manifest";
+import { stopTerminalDaemon } from "../../lib/host/terminal-daemon";
+import { terminateProcess } from "../../lib/host/terminate";
+import { resolveOrganizationFromContext } from "../../lib/resolve-org";
+
+const ORGANIZATION_ID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default command({
 	sandbox: false,
 	description: "Stop the host service daemon",
-	run: async ({ ctx }) => {
-		const organization = await ctx.api.user.myOrganization.query();
+	options: {
+		terminals: boolean().desc(
+			"Also stop the terminal daemon, ending every terminal and agent",
+		),
+		org: string().desc(
+			"Organization the host runs under (id, slug, or name); defaults to active. An id needs no network, so it works with a revoked key",
+		),
+	},
+	run: async ({ ctx, options }) => {
+		const organization = options.org
+			? ORGANIZATION_ID.test(options.org)
+				? { id: options.org, name: options.org }
+				: await resolveOrganizationFromContext(
+						ctx.api,
+						ctx.config.organizationId,
+						options.org,
+					)
+			: await ctx.api.user.myOrganization.query();
 		if (!organization)
 			throw new CLIError("No active organization", "Run: superset auth login");
 
 		const manifest = readManifest(organization.id);
-		if (!manifest) {
-			return {
-				data: { running: false },
-				message: `No host service running for ${organization.name}`,
-			};
-		}
-
-		if (isProcessAlive(manifest.pid)) {
+		if (manifest) {
 			try {
-				process.kill(manifest.pid, "SIGTERM");
+				await terminateProcess(manifest.pid);
 			} catch (error) {
 				throw new CLIError(
 					`Failed to stop host service (pid ${manifest.pid}): ${
@@ -32,25 +43,42 @@ export default command({
 					}`,
 				);
 			}
+			removeManifestIfOwnedBy(organization.id, manifest.pid);
+		}
 
-			const deadline = Date.now() + 10_000;
-			while (Date.now() < deadline) {
-				if (!isProcessAlive(manifest.pid)) break;
-				await new Promise((r) => setTimeout(r, 100));
-			}
-
-			if (isProcessAlive(manifest.pid)) {
-				try {
-					process.kill(manifest.pid, "SIGKILL");
-				} catch {}
+		let terminalDaemonPids: number[] = [];
+		if (options.terminals) {
+			try {
+				terminalDaemonPids = await stopTerminalDaemon(organization.id);
+			} catch (error) {
+				throw new CLIError(
+					`Failed to stop the terminal daemon: ${
+						error instanceof Error ? error.message : "unknown error"
+					}`,
+				);
 			}
 		}
 
-		removeManifest(organization.id);
+		if (!manifest && terminalDaemonPids.length === 0) {
+			return {
+				data: { running: false },
+				message: `No host service running for ${organization.name}`,
+			};
+		}
 
+		const stopped = [
+			manifest ? "host service" : null,
+			terminalDaemonPids.length > 0 ? "terminal daemon" : null,
+		]
+			.filter(Boolean)
+			.join(" and ");
 		return {
-			data: { pid: manifest.pid, organizationId: organization.id },
-			message: `Stopped host service for ${organization.name}`,
+			data: {
+				pid: manifest?.pid ?? null,
+				terminalDaemonPids,
+				organizationId: organization.id,
+			},
+			message: `Stopped ${stopped} for ${organization.name}`,
 		};
 	},
 });

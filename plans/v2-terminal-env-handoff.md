@@ -2,6 +2,10 @@
 
 Last refined: 2026-04-05
 
+> **Update (2026-10-13, PR #8456):** the public env sets no `TERM_PROGRAM` or
+> `TERM_PROGRAM_VERSION`; see `TERMINAL_IDENTITY_ENV_KEYS` in
+> `@superset/shared/constants`.
+
 ## Goal
 
 Define and implement a v2 terminal env contract that:
@@ -160,8 +164,6 @@ Inject this stable terminal surface by default:
 
 ```sh
 TERM=xterm-256color
-TERM_PROGRAM=Superset
-TERM_PROGRAM_VERSION=<app version>
 COLORTERM=truecolor
 LANG=<utf8 locale>
 PWD=<cwd>

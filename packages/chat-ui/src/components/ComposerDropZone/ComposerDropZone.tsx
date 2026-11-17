@@ -5,13 +5,16 @@ import { i18n } from "@superset/i18n";
 import { cn } from "@superset/ui/utils";
 import {
 	createContext,
+	type KeyboardEventHandler,
 	type ReactNode,
+	type Ref,
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
+import { isDropHandled, markDropHandled } from "../../utils/handledDrops";
 
 type DropZoneContextValue = {
 	register(sink: (files: FileList) => void): () => void;
@@ -29,13 +32,10 @@ export type ComposerDropZoneProps = {
 	children: ReactNode;
 	label?: string;
 	className?: string;
+	ref?: Ref<HTMLDivElement>;
+	onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
 };
 
-/**
- * Layout-level file drop target: mount around the whole content area (like the
- * new-workspace screen) and any composer rendered inside registers itself as
- * the drop sink automatically.
- */
 export function ComposerDropZone({
 	children,
 	label = i18n._(
@@ -44,34 +44,26 @@ export function ComposerDropZone({
 		}),
 	),
 	className,
+	ref,
+	onKeyDown,
 }: ComposerDropZoneProps) {
 	const sinkRef = useRef<((files: FileList) => void) | null>(null);
-	// dragover + timeout reset instead of an enter/leave counter, so
-	// Esc-cancelled drags and drops outside the window can't wedge the overlay.
 	const [isDraggingFiles, setIsDraggingFiles] = useState(false);
+	const dragEndTimerRef = useRef<number | null>(null);
 
-	useEffect(() => {
-		let timer: number | null = null;
-		const onDragOver = (event: DragEvent) => {
-			if (!Array.from(event.dataTransfer?.types ?? []).includes("Files"))
-				return;
-			setIsDraggingFiles(true);
-			if (timer !== null) window.clearTimeout(timer);
-			timer = window.setTimeout(() => setIsDraggingFiles(false), 200);
-		};
-		const onDrop = () => {
-			if (timer !== null) window.clearTimeout(timer);
-			timer = null;
-			setIsDraggingFiles(false);
-		};
-		document.addEventListener("dragover", onDragOver);
-		document.addEventListener("drop", onDrop);
-		return () => {
-			document.removeEventListener("dragover", onDragOver);
-			document.removeEventListener("drop", onDrop);
-			if (timer !== null) window.clearTimeout(timer);
-		};
-	}, []);
+	const clearDragEndTimer = () => {
+		if (dragEndTimerRef.current !== null)
+			window.clearTimeout(dragEndTimerRef.current);
+		dragEndTimerRef.current = null;
+	};
+
+	useEffect(
+		() => () => {
+			if (dragEndTimerRef.current !== null)
+				window.clearTimeout(dragEndTimerRef.current);
+		},
+		[],
+	);
 
 	const contextValue = useMemo<DropZoneContextValue>(
 		() => ({
@@ -90,17 +82,27 @@ export function ComposerDropZone({
 			{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-and-drop target; keyboard users attach via the composer's file picker */}
 			<div
 				className={cn("relative", className)}
+				onKeyDown={onKeyDown}
+				ref={ref}
 				onDragOver={(event) => {
-					if (event.dataTransfer.types.includes("Files"))
-						event.preventDefault();
+					if (!event.dataTransfer.types.includes("Files")) return;
+					event.preventDefault();
+					setIsDraggingFiles(true);
+					clearDragEndTimer();
+					dragEndTimerRef.current = window.setTimeout(
+						() => setIsDraggingFiles(false),
+						200,
+					);
 				}}
 				onDrop={(event) => {
-					// The composer's editor may have consumed this already;
-					// preventDefault marks it and the event still bubbles here.
-					if (event.defaultPrevented) return;
-					if (event.dataTransfer.files.length === 0) return;
+					clearDragEndTimer();
+					setIsDraggingFiles(false);
+					if (isDropHandled(event.nativeEvent)) return;
+					const sink = sinkRef.current;
+					if (!sink || event.dataTransfer.files.length === 0) return;
 					event.preventDefault();
-					sinkRef.current?.(event.dataTransfer.files);
+					markDropHandled(event.nativeEvent);
+					sink(event.dataTransfer.files);
 				}}
 			>
 				{children}

@@ -1,9 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
 import * as Updates from "expo-updates";
 import { useEffect, useRef } from "react";
-import { Alert, AppState } from "react-native";
+import { AppState } from "react-native";
 
 const FOREGROUND_CHECK_MIN_INTERVAL_MS = 15 * 60 * 1000;
+const APPLY_AFTER_BACKGROUND_MS = 5 * 60 * 1000;
 
 async function downloadIfAvailable() {
 	const check = await Updates.checkForUpdateAsync();
@@ -12,19 +12,35 @@ async function downloadIfAvailable() {
 
 /**
  * expo-updates only checks on cold launch, and phones rarely cold-launch, so
- * this checks on foreground too and offers a restart once an update has
- * downloaded. A declined restart still applies on the next launch.
+ * this also checks on foreground. A downloaded update applies on the next cold
+ * launch, or on return from a long enough stay in the background.
  */
 export function useOtaUpdates() {
-	const { t } = useLingui();
-	const { isUpdatePending, downloadedUpdate } = Updates.useUpdates();
+	const { isUpdatePending } = Updates.useUpdates();
+	const isUpdatePendingRef = useRef(isUpdatePending);
+	isUpdatePendingRef.current = isUpdatePending;
 	const lastCheckedAt = useRef(Date.now());
-	const promptedFor = useRef<string | null>(null);
+	const backgroundedAt = useRef<number | null>(null);
 
 	useEffect(() => {
 		if (!Updates.isEnabled || __DEV__) return;
 		const subscription = AppState.addEventListener("change", (status) => {
+			if (status === "background") {
+				backgroundedAt.current = Date.now();
+				return;
+			}
 			if (status !== "active") return;
+
+			const awayFor =
+				backgroundedAt.current === null
+					? 0
+					: Date.now() - backgroundedAt.current;
+			backgroundedAt.current = null;
+			if (isUpdatePendingRef.current && awayFor >= APPLY_AFTER_BACKGROUND_MS) {
+				void Updates.reloadAsync().catch(() => {});
+				return;
+			}
+
 			if (
 				Date.now() - lastCheckedAt.current <
 				FOREGROUND_CHECK_MIN_INTERVAL_MS
@@ -36,25 +52,4 @@ export function useOtaUpdates() {
 		});
 		return () => subscription.remove();
 	}, []);
-
-	useEffect(() => {
-		if (!isUpdatePending || !downloadedUpdate) return;
-		const key =
-			downloadedUpdate.type === Updates.UpdateInfoType.NEW
-				? downloadedUpdate.updateId
-				: "rollback";
-		if (promptedFor.current === key) return;
-		promptedFor.current = key;
-		Alert.alert(
-			t({ message: "Update ready" }),
-			t({ message: "Restart to use the latest version of Superset." }),
-			[
-				{ text: t({ message: "Later" }), style: "cancel" },
-				{
-					text: t({ message: "Restart" }),
-					onPress: () => void Updates.reloadAsync().catch(() => {}),
-				},
-			],
-		);
-	}, [isUpdatePending, downloadedUpdate, t]);
 }

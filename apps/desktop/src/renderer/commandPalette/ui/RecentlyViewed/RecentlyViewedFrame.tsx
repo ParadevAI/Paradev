@@ -16,10 +16,7 @@ import {
 	type RecentlyViewedEntry,
 	useRecentlyViewed,
 } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls/components/HistoryDropdown/hooks/useRecentlyViewed";
-import {
-	joinTasksWithStatuses,
-	TASK_LOOKUP_LIMIT,
-} from "renderer/routes/_authenticated/_dashboard/components/NavigationControls/components/HistoryDropdown/utils/joinTasksWithStatuses";
+import { useRecentTasks } from "renderer/routes/_authenticated/_dashboard/components/NavigationControls/components/HistoryDropdown/hooks/useRecentTasks";
 import {
 	StatusIcon,
 	type StatusType,
@@ -70,15 +67,7 @@ export function RecentlyViewedFrame() {
 		[automations],
 	);
 
-	const { data: taskPage } = cloudTrpc.task.listPage.useQuery({
-		limit: TASK_LOOKUP_LIMIT,
-	});
-	const { data: taskStatuses = [] } =
-		cloudTrpc.task.statuses.list.useQuery(undefined);
-	const taskData = useMemo(
-		() => joinTasksWithStatuses(taskPage?.items ?? [], taskStatuses),
-		[taskPage, taskStatuses],
-	);
+	const taskData = useRecentTasks(recentEntries);
 
 	const filteredEntries = recentEntries.filter((entry) => {
 		if (entry.type === "workspace") {
@@ -265,7 +254,7 @@ function TaskRow({
 			onSelect={onSelect}
 			className={cn("gap-2.5", isCurrent && "bg-accent/50")}
 		>
-			<span className="text-muted-foreground text-xs shrink-0 w-24 text-left line-clamp-1">
+			<span className="font-mono text-muted-foreground text-xs shrink-0 w-24 text-left line-clamp-1">
 				{task?.slug ??
 					i18n._(
 						msg({

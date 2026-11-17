@@ -7,6 +7,8 @@ import type { SupportedLocale } from "@superset/i18n/locales";
 import { isSupportedLocale } from "@superset/i18n/locales";
 import {
 	EXTERNAL_APPS,
+	FILE_AUTO_SAVE_MODES,
+	FILE_OPEN_MODES,
 	NON_EDITOR_APPS,
 	settings,
 	type TerminalPreset,
@@ -29,6 +31,9 @@ import { localDb } from "main/lib/local-db";
 import {
 	DEFAULT_CONFIRM_ON_QUIT,
 	DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY,
+	DEFAULT_FILE_AUTO_SAVE,
+	DEFAULT_FILE_OPEN_MODE,
+	DEFAULT_OPEN_LINKS_IN_APP,
 	DEFAULT_SHOW_RESOURCE_MONITOR,
 	DEFAULT_SHOW_USAGE_IN_SIDEBAR,
 	DEFAULT_TERMINAL_COPY_ON_SELECT,
@@ -330,6 +335,47 @@ export const createSettingsRouter = () => {
 				return { restartedOrgCount };
 			}),
 
+		getFileOpenMode: publicProcedure.query(() => {
+			const row = getSettings();
+			return row.fileOpenMode ?? DEFAULT_FILE_OPEN_MODE;
+		}),
+
+		setFileOpenMode: publicProcedure
+			.input(z.object({ mode: z.enum(FILE_OPEN_MODES) }))
+			.mutation(({ input }) => {
+				localDb
+					.insert(settings)
+					.values({ id: 1, fileOpenMode: input.mode })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { fileOpenMode: input.mode },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getFileAutoSave: publicProcedure.query(() => {
+			const row = getSettings();
+			return row.fileAutoSave ?? DEFAULT_FILE_AUTO_SAVE;
+		}),
+
+		setFileAutoSave: publicProcedure
+			.input(z.object({ mode: z.enum(FILE_AUTO_SAVE_MODES) }))
+			.mutation(({ input }) => {
+				const { id } = getSettings();
+				localDb
+					.insert(settings)
+					.values({ id, fileAutoSave: input.mode })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { fileAutoSave: input.mode },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
 		getWaitForSetupBeforeAgent: publicProcedure.query(() => {
 			const row = getSettings();
 			return row.waitForSetupBeforeAgent ?? DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT;
@@ -543,6 +589,26 @@ export const createSettingsRouter = () => {
 					.onConflictDoUpdate({
 						target: settings.id,
 						set: { showUsageInSidebar: input.enabled },
+					})
+					.run();
+
+				return { success: true };
+			}),
+
+		getOpenLinksInApp: publicProcedure.query(() => {
+			const row = getSettings();
+			return row.openLinksInApp ?? DEFAULT_OPEN_LINKS_IN_APP;
+		}),
+
+		setOpenLinksInApp: publicProcedure
+			.input(z.object({ enabled: z.boolean() }))
+			.mutation(({ input }) => {
+				localDb
+					.insert(settings)
+					.values({ id: 1, openLinksInApp: input.enabled })
+					.onConflictDoUpdate({
+						target: settings.id,
+						set: { openLinksInApp: input.enabled },
 					})
 					.run();
 

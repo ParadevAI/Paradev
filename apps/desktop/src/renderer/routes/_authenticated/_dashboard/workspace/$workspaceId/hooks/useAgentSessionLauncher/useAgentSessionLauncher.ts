@@ -1,22 +1,48 @@
 import { useLingui } from "@lingui/react/macro";
+import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import type { WorkspaceStore } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
-import { workspaceTrpc } from "@superset/workspace-client";
+import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
+import {
+	useAgentConfigs,
+	v2AgentConfigsQueryOptions,
+} from "renderer/hooks/useAgentConfigs";
+import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import type { StoreApi } from "zustand/vanilla";
-import type { PaneViewerData, TerminalPaneData } from "../../types";
+import type {
+	ChatPaneData,
+	PaneViewerData,
+	TerminalPaneData,
+} from "../../types";
 import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
+import { readLastChatAgent } from "../../utils/lastChatAgent";
 
 export interface CreateNewAgentSessionInput {
 	configId: string;
 	placement: "split-pane" | "new-tab";
 	prompt: string;
 	forkSessionId?: string;
+	attachments?: Array<{ attachmentId: string; name: string; mimeType: string }>;
+	modelId?: string;
+	modeId?: string;
 }
 
 export type CreateNewAgentSession = (
 	input: CreateNewAgentSessionInput,
+) => Promise<{ terminalId: string } | null>;
+
+type OpenNewChat = () => Promise<{ terminalId: string } | null>;
+
+export type OpenAgentChat = (
+	input: Omit<CreateNewAgentSessionInput, "forkSessionId" | "prompt"> & {
+		prompt?: string;
+		presetId?: string;
+	},
 ) => Promise<{ terminalId: string } | null>;
 
 interface UseAgentSessionLauncherOptions {
@@ -29,21 +55,104 @@ export function useAgentSessionLauncher({
 	store,
 }: UseAgentSessionLauncherOptions): {
 	createNewAgentSession: CreateNewAgentSession;
+	openAgentChat: OpenAgentChat;
+	openNewChat: OpenNewChat;
 	focusAgentTerminal: (terminalId: string) => void;
 } {
 	const { t } = useLingui();
-	const runAgent = workspaceTrpc.agents.run.useMutation();
+	const { mutateAsync: runAgent } = workspaceTrpc.agents.run.useMutation();
+	const appearance = useTerminalAppearance();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
+	const { hostUrl } = useWorkspaceClient();
+	const { data: agentConfigs } = useAgentConfigs(hostUrl);
+	const queryClient = useQueryClient();
+
+	const openChatPane = useCallback<OpenAgentChat>(
+		async (input) => {
+			const configs = await queryClient
+				.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
+				.catch(() => agentConfigs ?? []);
+			const config =
+				configs.find((entry) => entry.id === input.configId) ??
+				configs.find((entry) => entry.presetId === input.presetId);
+			const presetId = config?.presetId;
+			if (!presetId || !acpHarnessForPreset(presetId)) return null;
+			const state = store.getState();
+			const terminalId = crypto.randomUUID();
+			const label = config?.label;
+			const pane = {
+				kind: "chat-v3" as const,
+				...(label ? { titleOverride: label } : {}),
+				data: {
+					terminalId,
+					sessionId: null,
+					agent: { id: presetId },
+					...(input.prompt ? { pendingPrompt: input.prompt } : {}),
+					...(input.attachments?.length
+						? { pendingAttachments: input.attachments }
+						: {}),
+					...(input.modelId ? { chatModelId: input.modelId } : {}),
+					...(input.modeId ? { chatModeId: input.modeId } : {}),
+				} satisfies ChatPaneData,
+			};
+			if (input.placement === "split-pane" && state.activeTabId) {
+				state.addPane({ tabId: state.activeTabId, pane });
+			} else {
+				state.addTab({ panes: [pane] });
+			}
+			return { terminalId };
+		},
+		[queryClient, hostUrl, agentConfigs, store],
+	);
+
+	const openAgentChat = useCallback<OpenAgentChat>(
+		async (input) =>
+			(await resolveAcpChatEnabled()) ? openChatPane(input) : null,
+		[resolveAcpChatEnabled, openChatPane],
+	);
+
+	const openNewChat = useCallback<OpenNewChat>(async () => {
+		const configs = await queryClient
+			.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
+			.catch(() => agentConfigs ?? []);
+		const chatPresetIds = configs
+			.map((config) => config.presetId)
+			.filter((presetId) => acpHarnessForPreset(presetId));
+		const presetId = [readLastChatAgent(), "claude", ...chatPresetIds].find(
+			(candidate) => candidate && chatPresetIds.includes(candidate),
+		);
+		if (!presetId) {
+			toast.error(t({ message: "No installed agent can be opened as a chat" }));
+			return null;
+		}
+		return openChatPane({ configId: "", presetId, placement: "new-tab" });
+	}, [queryClient, hostUrl, agentConfigs, openChatPane, t]);
 
 	const createNewAgentSession = useCallback<CreateNewAgentSession>(
 		async (input) => {
+			if (!input.forkSessionId) {
+				const chat = await openAgentChat(input);
+				if (chat) return chat;
+			}
+
 			try {
 				// Host pipeline bakes the prompt into the initialCommand using the
 				// agent's argv/stdin transport — no follow-up writeInput needed,
 				// no bind-wait race vs. the launching shell.
-				const result = await runAgent.mutateAsync({
+				const result = await runAgent({
 					workspaceId,
+					colors: terminalQueryColors(appearance.theme),
 					agent: input.configId,
 					prompt: input.prompt,
+					...(input.attachments?.length
+						? {
+								attachmentIds: input.attachments.map(
+									(attachment) => attachment.attachmentId,
+								),
+							}
+						: {}),
+					...(input.modelId ? { model: input.modelId } : {}),
+					...(input.modeId ? { mode: input.modeId } : {}),
 					...(input.forkSessionId
 						? { forkSessionId: input.forkSessionId }
 						: {}),
@@ -85,7 +194,7 @@ export function useAgentSessionLauncher({
 				return null;
 			}
 		},
-		[runAgent, store, workspaceId, t],
+		[runAgent, store, workspaceId, t, appearance.theme, openAgentChat],
 	);
 
 	const focusAgentTerminal = useCallback(
@@ -95,5 +204,10 @@ export function useAgentSessionLauncher({
 		[store],
 	);
 
-	return { createNewAgentSession, focusAgentTerminal };
+	return {
+		createNewAgentSession,
+		openAgentChat,
+		openNewChat,
+		focusAgentTerminal,
+	};
 }

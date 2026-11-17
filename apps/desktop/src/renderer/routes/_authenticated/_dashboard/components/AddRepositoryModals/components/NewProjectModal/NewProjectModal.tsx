@@ -12,7 +12,7 @@ import {
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuFolderOpen, LuLoaderCircle } from "react-icons/lu";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -59,10 +59,11 @@ export function NewProjectModal({
 		null,
 	);
 	const [working, setWorking] = useState(false);
+	const cloneAbortRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		if (parentDir || !homeDir) return;
-		setParentDir(`${homeDir}/.superset/projects`);
+		setParentDir(`${homeDir}/.paradev/projects`);
 	}, [homeDir, parentDir]);
 
 	useEffect(() => {
@@ -79,8 +80,10 @@ export function NewProjectModal({
 	};
 
 	const handleOpenChange = (next: boolean) => {
-		if (!next && working) return;
-		if (!next) reset();
+		if (!next) {
+			cloneAbortRef.current?.abort();
+			reset();
+		}
 		onOpenChange(next);
 	};
 
@@ -120,6 +123,8 @@ export function NewProjectModal({
 			return;
 		}
 
+		const abort = new AbortController();
+		cloneAbortRef.current = abort;
 		setWorking(true);
 		try {
 			if (!activeHostUrl) {
@@ -138,15 +143,19 @@ export function NewProjectModal({
 				return;
 			}
 			const client = getHostServiceClientByUrl(activeHostUrl);
-			const result = await client.project.create.mutate({
-				name: trimmedName,
-				mode: { kind: "clone", parentDir: trimmedParent, url: trimmedUrl },
-			});
+			const result = await client.project.create.mutate(
+				{
+					name: trimmedName,
+					mode: { kind: "clone", parentDir: trimmedParent, url: trimmedUrl },
+				},
+				{ signal: abort.signal },
+			);
 			finalizeSetup(activeHostUrl, result);
 			onSuccess?.({ projectId: result.projectId });
 			reset();
 			onOpenChange(false);
 		} catch (err) {
+			if (abort.signal.aborted) return;
 			const raw = rawErrorMessage(err);
 			// Drizzle / pg errors arrive as "Failed query: insert into ..."
 			// which is useless to a user. Hide that envelope in favor of a
@@ -272,7 +281,6 @@ export function NewProjectModal({
 						type="button"
 						variant="ghost"
 						onClick={() => handleOpenChange(false)}
-						disabled={working}
 					>
 						<Trans>Cancel</Trans>
 					</Button>

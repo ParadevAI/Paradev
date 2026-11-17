@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import { basename } from "node:path";
@@ -12,8 +13,8 @@ import {
 	getLocalWorkspace,
 	insertLocalWorkspace,
 	toCloudShape,
-	updateLocalWorkspace,
 } from "../../../../workspaces/local-workspace-store";
+import { setWorkspaceNamingState } from "../../../../workspaces/workspace-naming-state";
 import { protectedProcedure } from "../../../index";
 import { validateAgentLaunchOptions } from "../../agents";
 import { initEmptyRepo } from "../../project/utils/resolve-repo";
@@ -26,22 +27,18 @@ import {
 	defaultSessionsRoot,
 	safeResolveSessionPath,
 } from "../shared/session-paths";
-import {
-	generateWorkspaceNamesFromPrompt,
-	sanitizeBranchCandidate,
-} from "../utils/ai-workspace-names";
+import { sanitizeBranchCandidate } from "../utils/ai-workspace-names";
 import { deduplicateBranchName } from "../utils/sanitize-branch";
+import { scheduleWorkspaceNaming } from "../utils/workspace-naming-job";
 
 const createSessionInputSchema = z.object({
 	// Optimistic-UI idempotency key; becomes the row id.
 	id: z.string().uuid().optional(),
-	// Display name; also seeds the folder name. Omitted with an agent
-	// prompt → friendly-random folder plus an LLM title applied before
-	// agents start (the folder keeps its creation-time name).
 	name: z.string().min(1).optional(),
 	agents: z.array(agentLaunchSchema).optional(),
 	command: z.string().min(1).optional(),
 	namingPrompt: z.string().min(1).optional(),
+	namingAgent: z.string().min(1).optional(),
 	// Sessions render in a flat lane (no per-project folders), but the tags
 	// are stored so listings and future consumers see them — automation
 	// dispatch sends its tag set for sessions and worktrees alike.
@@ -65,10 +62,13 @@ function claimedSessionNames(ctx: HostServiceContext): string[] {
 
 /**
  * Create a project-less "session" workspace: a standalone git repo in a
- * managed folder under `~/.superset/sessions`. No project row, no worktree,
+ * managed folder under `~/.paradev/sessions`. No project row, no worktree,
  * no branch semantics beyond the repo's own `main` — but a real workspace
  * row, so terminals, chat, agents, and git status all work unchanged.
  */
+/** Until a name is typed or generated; the folder stays unique on its own. */
+const NEW_SESSION_NAME = "New session";
+
 export const createSession = protectedProcedure
 	.input(createSessionInputSchema)
 	.mutation(async ({ ctx, input }) => {
@@ -96,21 +96,12 @@ export const createSession = protectedProcedure
 		const composerPrompt =
 			input.agents?.[0]?.prompt?.trim() || input.namingPrompt?.trim() || "";
 		const wantAi = input.name === undefined && !!composerPrompt;
-		const namingAgent = input.agents?.[0]?.agent;
-		const aiNamesPromise = wantAi
-			? generateWorkspaceNamesFromPrompt(
-					composerPrompt,
-					namingAgent ? { db: ctx.db, agent: namingAgent } : undefined,
-				).catch((err) => {
-					console.warn("[workspaces.createSession] AI naming failed", err);
-					return null;
-				})
-			: null;
+		const namingAgent = input.agents?.[0]?.agent ?? input.namingAgent;
 
 		const typedName = input.name?.trim();
 		const folderCandidate =
 			(typedName ? sanitizeBranchCandidate(typedName) : "") ||
-			generateFriendlyBranchName();
+			`${generateFriendlyBranchName()}-${(input.id ?? randomUUID()).slice(0, 8)}`;
 
 		mkdirSync(defaultSessionsRoot(), { recursive: true });
 
@@ -148,7 +139,7 @@ export const createSession = protectedProcedure
 				projectId: null,
 				worktreePath: repoPath,
 				branch: "main",
-				name: typedName || folderName,
+				name: typedName || NEW_SESSION_NAME,
 				type: "session",
 				createdByUserId: ctx.userId ?? null,
 				tags: input.tags,
@@ -180,9 +171,14 @@ export const createSession = protectedProcedure
 			throw err;
 		}
 
-		const aiNames = aiNamesPromise ? await aiNamesPromise : null;
-		if (aiNames?.title) {
-			row = updateLocalWorkspace(ctx, row.id, { name: aiNames.title }) ?? row;
+		if (wantAi) {
+			setWorkspaceNamingState(ctx.db, row.id, {
+				prompt: composerPrompt,
+				attempts: 0,
+				branch: null,
+				agent: namingAgent ?? null,
+			});
+			scheduleWorkspaceNaming(ctx, row.id);
 		}
 
 		const terminalsResult: Array<{ terminalId: string; label: string }> = [];
@@ -209,7 +205,10 @@ export const createSession = protectedProcedure
 		}
 
 		return {
-			workspace: toCloudShape(row, ctx.organizationId),
+			workspace: toCloudShape(
+				getLocalWorkspace(ctx.db, row.id) ?? row,
+				ctx.organizationId,
+			),
 			terminals: terminalsResult,
 			agents: agentsResult,
 		};

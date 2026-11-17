@@ -33,7 +33,7 @@ interface HostTarget {
  * A host's in-memory list is the watch truth, so a host that answers is
  * reporting live state — there is nothing to age out and no heartbeat to
  * read. The cost is that a watcher on a host we cannot reach is not in here;
- * the page's org-wide watch flag still says one exists, and the menu says so.
+ * the page's org-wide watch flag alone cannot confirm the host is unreachable.
  */
 export function usePageWatchersForPage({
 	pageId,
@@ -80,16 +80,17 @@ export function usePageWatchersForPage({
 		})),
 	});
 
-	useWorkspaceEvent(
-		"page-watch:changed",
-		workspaceId,
-		useCallback(() => {
-			void queryClient.invalidateQueries({
-				queryKey: ["page-watchers-by-host"],
-			});
-			if (pageId) void cloudUtils.page.get.invalidate({ id: pageId });
-		}, [queryClient, cloudUtils, pageId]),
-	);
+	const refresh = useCallback(() => {
+		void queryClient.invalidateQueries({
+			queryKey: ["page-watchers-by-host"],
+		});
+		if (pageId) void cloudUtils.page.get.invalidate({ id: pageId });
+	}, [queryClient, cloudUtils, pageId]);
+
+	useWorkspaceEvent("page-watch:changed", workspaceId, refresh);
+	useWorkspaceEvent("terminal:lifecycle", workspaceId, refresh);
+	useWorkspaceEvent("agent:bindings-changed", workspaceId, refresh);
+	useWorkspaceEvent("agent:lifecycle", workspaceId, refresh);
 
 	const names = useMemo(
 		() =>

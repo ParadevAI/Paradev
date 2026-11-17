@@ -7,7 +7,18 @@ export {
 	resolveSandboxCaller,
 	SANDBOX_ALLOWED_PROCEDURES,
 	type SandboxCaller,
+	sandboxCredentialWorkspaceId,
 } from "./api-credential";
+export { bootBeganSince, recordBootSpans } from "./boot-trace";
+export {
+	type BoxHookOutcome,
+	rerunBoxStartHook,
+	runBoxArchiveHook,
+} from "./box-hooks";
+export {
+	type ReportSandboxBoxPressureOutcome,
+	reportSandboxBoxPressure,
+} from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
@@ -19,6 +30,7 @@ export {
 	type RefreshSandboxCredentialsOutcome,
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
+export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
@@ -36,9 +48,14 @@ export {
 	workspaceRepositories,
 } from "./repositories";
 export {
+	type ActiveWorkspaceSandbox,
+	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
+	findSandboxSession,
 	HOST_SERVICE_PORT,
+	listActiveWorkspaceSandboxes,
+	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
 	provisionSandbox,
 	pushManagedEnv,
@@ -46,10 +63,13 @@ export {
 	type SandboxEnvironment,
 	SandboxNotReadyError,
 	SandboxUnavailableError,
+	sandboxExists,
+	sessionEndedAt,
 	settleSandbox,
 	stopAndSnapshot,
 	stopSandbox,
 	stripWorkspaceIdentity,
+	topUpSandboxSession,
 	waitForStopSnapshot,
 	wakeSandbox,
 } from "./vercel";

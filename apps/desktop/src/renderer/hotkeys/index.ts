@@ -1,6 +1,10 @@
 export { HotkeyLabel } from "./components/HotkeyLabel";
 export { HotkeyTooltip } from "./components/HotkeyTooltip";
 export {
+	getBinding,
+	getDispatchChord,
+	useBinding,
+	useDispatchChord,
 	useFormatBinding,
 	useHotkey,
 	useHotkeyDisplay,

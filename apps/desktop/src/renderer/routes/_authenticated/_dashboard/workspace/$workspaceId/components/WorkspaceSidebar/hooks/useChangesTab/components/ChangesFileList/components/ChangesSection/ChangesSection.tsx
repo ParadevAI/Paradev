@@ -12,12 +12,12 @@ import { workspaceTrpc } from "@superset/workspace-client";
 import { ChevronRight, Minus, Plus } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { LuUndo2 } from "react-icons/lu";
-import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/DiscardConfirmDialog";
+import { DiffStatText } from "renderer/routes/_authenticated/_dashboard/components/DiffStatText";
+import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
 import {
 	type ChangesSectionKey,
 	useChangesSectionsStore,
 } from "renderer/stores/changes-sections";
-import { DiffStatText } from "../DiffStatText";
 
 type SectionKind = "unstaged" | "staged";
 

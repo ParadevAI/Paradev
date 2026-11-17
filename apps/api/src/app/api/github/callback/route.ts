@@ -1,12 +1,13 @@
 import { db } from "@superset/db/client";
 import { githubInstallations } from "@superset/db/schema";
+import { organizationSyncsNow } from "@superset/trpc/sync-policy";
 import { Client } from "@upstash/qstash";
 import { and, eq, ne } from "drizzle-orm";
-
 import { env } from "@/env";
 import { exitOAuthFlow, STATE_COOKIES } from "@/lib/integrations/oauthFlow";
 import { resolveCallback } from "@/lib/integrations/resolveCallback";
 import { githubApp } from "../octokit";
+import { saveInstallation } from "./utils/saveInstallation";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
@@ -30,7 +31,10 @@ export async function GET(request: Request) {
 		cookie: STATE_COOKIES.github,
 	});
 	if (callback instanceof Response) return callback;
-	const { organizationId, userId, params, exit } = callback;
+	const { organizationId, userId, role, params, exit } = callback;
+	if (role !== "owner" && role !== "admin") {
+		return exit(`${settingsUrl}?error=admin_required`);
+	}
 	const installationId = params.installation_id;
 
 	try {
@@ -78,61 +82,52 @@ export async function GET(request: Request) {
 			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
-		// Save the installation to our database
-		const [savedInstallation] = await db
-			.insert(githubInstallations)
-			.values({
-				organizationId,
-				connectedByUserId: userId,
-				installationId: String(installation.id),
-				accountLogin,
-				accountType,
-				permissions: installation.permissions as Record<string, string>,
-			})
-			.onConflictDoUpdate({
-				target: [githubInstallations.organizationId],
-				set: {
-					connectedByUserId: userId,
-					installationId: String(installation.id),
-					accountLogin,
-					accountType,
-					permissions: installation.permissions as Record<string, string>,
-					suspended: false,
-					suspendedAt: null, // Clear suspension if reinstalling
-					updatedAt: new Date(),
-				},
-			})
-			.returning();
+		const savedInstallation = await saveInstallation({
+			organizationId,
+			userId,
+			installationId: String(installation.id),
+			accountLogin,
+			accountType,
+			permissions: installation.permissions as Record<string, string>,
+		});
 
 		if (!savedInstallation) {
-			return exit(`${settingsUrl}?error=save_failed`);
+			return exit(`${settingsUrl}?error=already_connected`);
 		}
 
 		// Queue initial sync job. In development the queue cannot reach
 		// localhost, so the job endpoint is called directly, as triggerSync does.
+		// A free organization gets no backfill and no webhook sync after it
+		// either; the subscription hook queues this job when it upgrades.
 		const syncUrl = `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`;
 		const syncBody = {
 			installationDbId: savedInstallation.id,
 			organizationId,
 		};
-		try {
-			if (env.NODE_ENV === "development") {
-				fetch(syncUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(syncBody),
-				}).catch((error) => {
-					console.error("[github/callback] Dev sync failed:", error);
-				});
-			} else {
-				await qstash.publishJSON({ url: syncUrl, body: syncBody, retries: 3 });
+		if (await organizationSyncsNow(organizationId)) {
+			try {
+				if (env.NODE_ENV === "development") {
+					fetch(syncUrl, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(syncBody),
+					}).catch((error) => {
+						console.error("[github/callback] Dev sync failed:", error);
+					});
+				} else {
+					await qstash.publishJSON({
+						url: syncUrl,
+						body: syncBody,
+						retries: 3,
+					});
+				}
+			} catch (error) {
+				console.error(
+					"[github/callback] Failed to queue initial sync job:",
+					error,
+				);
+				return exit(`${settingsUrl}?warning=sync_queue_failed`);
 			}
-		} catch (error) {
-			console.error(
-				"[github/callback] Failed to queue initial sync job:",
-				error,
-			);
-			return exit(`${settingsUrl}?warning=sync_queue_failed`);
 		}
 
 		return exit(`${settingsUrl}?success=github_installed`);

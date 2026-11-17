@@ -1,24 +1,20 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
-import { useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Cloud } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { CloudWorkspaceRow } from "renderer/hooks/useCloudWorkspaces";
-import { apiTrpcClient } from "renderer/lib/api-trpc-client";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
-
-/**
- * A warm sandbox is up in a second or two; the first ones after an image
- * rebuild pull the image and take tens of seconds. Past this, it is more
- * likely stuck than slow.
- */
-const STUCK_AFTER_SECONDS = 45;
+import { provisioningSince } from "renderer/routes/_authenticated/_dashboard/utils/provisioningSince";
+import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
+import {
+	CLOUD_START_STUCK_AFTER_SECONDS,
+	formatElapsed,
+	useElapsedSeconds,
+} from "../../hooks/useElapsedSeconds";
 
 interface CloudWorkspaceProvisioningStateProps {
 	workspaceId: string;
 	name: string;
 	status: CloudWorkspaceRow["status"];
-	createdAt: Date;
 }
 
 /**
@@ -30,10 +26,10 @@ export function CloudWorkspaceProvisioningState({
 	workspaceId,
 	name,
 	status,
-	createdAt,
 }: CloudWorkspaceProvisioningStateProps) {
 	const { t } = useLingui();
-	const elapsed = useElapsedSeconds(createdAt.getTime());
+	const [since] = useState(() => provisioningSince(workspaceId));
+	const elapsed = useElapsedSeconds(since);
 
 	if (status === "failed") {
 		return <CloudWorkspaceFailedState workspaceId={workspaceId} name={name} />;
@@ -67,13 +63,13 @@ export function CloudWorkspaceProvisioningState({
 					{formatElapsed(elapsed)}
 				</span>
 
-				{elapsed >= STUCK_AFTER_SECONDS && (
+				{elapsed >= CLOUD_START_STUCK_AFTER_SECONDS && (
 					<div className="flex w-full flex-col gap-2 border-t border-border/60 pt-4 animate-in fade-in slide-in-from-bottom-1 duration-500">
 						<p className="select-text cursor-text text-[12px] leading-relaxed text-muted-foreground">
 							<Trans>
 								This is taking longer than usual. The sandbox may still be
-								pulling its image — it keeps going whether this window is open
-								or not.
+								pulling its image. It keeps going whether this window is open or
+								not.
 							</Trans>
 						</p>
 					</div>
@@ -96,21 +92,6 @@ function CloudWorkspaceFailedState({
 	name: string;
 }) {
 	const { t } = useLingui();
-	const navigate = useNavigate();
-	const utils = cloudTrpc.useUtils();
-	const [isDeleting, setIsDeleting] = useState(false);
-
-	const handleDelete = async () => {
-		setIsDeleting(true);
-		try {
-			await apiTrpcClient.cloudWorkspace.delete.mutate({ id: workspaceId });
-			await utils.cloudWorkspace.list.invalidate();
-			await navigate({ to: "/workspaces" });
-		} catch (error) {
-			console.error("[cloud-workspace] failed to delete", error);
-			setIsDeleting(false);
-		}
-	};
 
 	return (
 		<div className="flex h-full w-full items-center justify-center p-6">
@@ -141,7 +122,7 @@ function CloudWorkspaceFailedState({
 					<p className="select-text cursor-text text-[12px] leading-relaxed text-destructive/90">
 						<Trans>
 							Provisioning failed and the sandbox was torn down. Nothing is
-							running, and this workspace can't be opened — create a new one to
+							running, and this workspace can't be opened. Create a new one to
 							try again.
 						</Trans>
 					</p>
@@ -150,33 +131,16 @@ function CloudWorkspaceFailedState({
 				<Button
 					size="sm"
 					variant="outline"
-					disabled={isDeleting}
-					onClick={() => void handleDelete()}
+					onClick={() =>
+						useDeleteWorkspaceIntent.getState().request({
+							workspaceId,
+							workspaceName: name || t({ message: "Untitled workspace" }),
+						})
+					}
 				>
-					{isDeleting
-						? t({
-								message: "Removing…",
-							})
-						: t({
-								message: "Remove workspace",
-							})}
+					<Trans>Remove workspace</Trans>
 				</Button>
 			</div>
 		</div>
 	);
-}
-
-function formatElapsed(seconds: number): string {
-	const total = Math.max(0, Math.floor(seconds));
-	const minutes = Math.floor(total / 60);
-	return `${minutes}:${(total % 60).toString().padStart(2, "0")}`;
-}
-
-function useElapsedSeconds(since: number): number {
-	const [now, setNow] = useState(Date.now);
-	useEffect(() => {
-		const id = window.setInterval(() => setNow(Date.now()), 250);
-		return () => window.clearInterval(id);
-	}, []);
-	return (now - since) / 1000;
 }

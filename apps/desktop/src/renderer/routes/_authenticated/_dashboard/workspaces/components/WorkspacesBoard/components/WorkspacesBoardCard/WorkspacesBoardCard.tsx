@@ -1,17 +1,20 @@
 import { plural } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
 import { CgLaptop } from "react-icons/cg";
 import { LuGitBranch, LuMonitor } from "react-icons/lu";
+import { useNow } from "renderer/hooks/useNow";
 import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceChecksDot";
 import { WorkspaceContextMenu } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceContextMenu";
+import { WorkspaceOwnerAvatar } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceOwnerAvatar";
 import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceStateGlyph";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/workspaces/utils/sortWorkspaces";
+import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
-import { getRelativeTime } from "renderer/screens/main/components/WorkspacesListView/utils";
 import { WorkspaceProjectIcon } from "../../../WorkspaceProjectIcon";
 
 interface WorkspacesBoardCardProps {
@@ -23,15 +26,14 @@ interface WorkspacesBoardCardProps {
 export const WorkspacesBoardCard = memo(function WorkspacesBoardCard({
 	workspace,
 }: WorkspacesBoardCardProps) {
-	// Archived tombstones have no worktree or terminals left — no navigation
-	// and no context-menu actions apply.
-	if (workspace.archivedAt != null) {
-		return <BoardCardBody workspace={workspace} />;
-	}
+	const isArchived = workspace.archivedAt != null;
 	return (
 		<WorkspaceContextMenu workspace={workspace}>
 			{(actions) => (
-				<BoardCardBody workspace={workspace} onOpen={actions.open} />
+				<BoardCardBody
+					workspace={workspace}
+					onOpen={isArchived ? undefined : actions.open}
+				/>
 			)}
 		</WorkspaceContextMenu>
 	);
@@ -56,7 +58,9 @@ function BoardCardBody({
 	// ContextMenuTrigger asChild merges its handlers/ref in here; they must
 	// reach the real <button> or right-click never opens the menu.
 } & React.ComponentPropsWithRef<"button">) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
+	const { formatCompactRelativeTime } = useFormat();
 	const isArchived = workspace.archivedAt != null;
 	const isDone = isArchived || workspace.pr?.state === "merged";
 	const isLocalWorkspace = workspace.type === "local";
@@ -68,9 +72,9 @@ function BoardCardBody({
 	const hasDiff =
 		workspace.diffStats != null &&
 		(workspace.diffStats.additions > 0 || workspace.diffStats.deletions > 0);
-	const timeLabel = getRelativeTime(
+	const timeLabel = formatCompactRelativeTime(
 		workspace.archivedAt ?? workspaceActivityAt(workspace),
-		{ format: "compact" },
+		now,
 	);
 
 	return (
@@ -78,7 +82,9 @@ function BoardCardBody({
 			{...triggerProps}
 			type="button"
 			onClick={onOpen}
-			disabled={isArchived}
+			// Not `disabled`: React drops mouse events on disabled buttons, so
+			// right-click would never open the Restore menu.
+			aria-disabled={isArchived}
 			className={cn(
 				"w-full rounded-lg border border-border/50 bg-card px-3.5 py-3 text-left shadow-xs transition-colors",
 				isArchived
@@ -118,14 +124,23 @@ function BoardCardBody({
 						</TooltipContent>
 					</Tooltip>
 				) : null}
-				{workspace.hostType !== "local-device" ? (
+				{workspace.hostType === "cloud" ? (
+					<span
+						className="flex min-w-0 shrink items-center gap-1"
+						title={t({ message: "Cloud workspace" })}
+					>
+						<CloudGlyph className="size-3 shrink-0" />
+						<span className="truncate">{workspace.hostName}</span>
+					</span>
+				) : workspace.hostType === "remote-device" ? (
 					<span className="flex min-w-0 shrink items-center gap-1">
 						<LuMonitor className="size-3 shrink-0" />
 						<span className="truncate">{workspace.hostName}</span>
 					</span>
 				) : null}
-				<span className="ml-auto whitespace-nowrap tabular-nums">
-					{timeLabel}
+				<span className="ml-auto flex shrink-0 items-center gap-1.5">
+					<WorkspaceOwnerAvatar workspace={workspace} />
+					<span className="whitespace-nowrap tabular-nums">{timeLabel}</span>
 				</span>
 			</div>
 

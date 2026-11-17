@@ -5,9 +5,9 @@ set -euo pipefail
 
 SATYA_TEST_ORG=b2c3d4e5-f6a7-4890-9bcd-ef1234567891
 SUPERSET_ORG=a1b2c3d4-e5f6-7890-abcd-ef1234567890
-DEV_DATA_LOCAL_DB="$(pwd)/superset-dev-data/local.db"
-SATYA_TEST_HOST_DB="$(pwd)/superset-dev-data/host/$SATYA_TEST_ORG/host.db"
-SUPERSET_HOST_DB="$(pwd)/superset-dev-data/host/$SUPERSET_ORG/host.db"
+DEV_DATA_LOCAL_DB="$(pwd)/paradev-dev-data/local.db"
+SATYA_TEST_HOST_DB="$(pwd)/paradev-dev-data/host/$SATYA_TEST_ORG/host.db"
+SUPERSET_HOST_DB="$(pwd)/paradev-dev-data/host/$SUPERSET_ORG/host.db"
 
 NEW_NO_REMOTE_ID=22222222-bbbb-4bbb-8bbb-000000000001
 NEW_GHOST_ID=22222222-bbbb-4bbb-8bbb-000000000002

@@ -1,6 +1,9 @@
 # Mobile App Release Process
 
-iOS only. Builds and submissions go through EAS; the App Store listing and the
+iOS ships; Android has not shipped yet. Its build and submit lanes are in
+[Android](#android), and what it still needs is in
+[`plans/20261029-android-launch-checklist.md`](./plans/20261029-android-launch-checklist.md).
+Builds and submissions go through EAS; the App Store listing and the
 App Review notes live in [`store.config.js`](./store.config.js) and are pushed
 with `eas metadata:push`. This file is the runbook for shipping a build and for
 getting unstuck when App Review rejects or stalls it.
@@ -69,10 +72,21 @@ rejections in this category are one of these.
       (the headings in that file map to the guidelines reviewers check:
       payments, Sign in with Apple, account deletion, on-device code execution,
       permissions).
-- [ ] No in-app button, link, or copy points at a web page where a plan can be
-      bought (guideline 3.1.1 outside the US storefront; we ship one build
-      worldwide). Mentioning that plans are managed on the web is fine;
-      linking to it is not.
+- [ ] On iOS, no button, link, or copy points at a web page where a plan can
+      be bought, or says how to upgrade (guideline 3.1.1). Our Nov 6, 2026 reply
+      to App Review promised this for every storefront, so the US link-out that
+      3.1.1(a) allows stays off until a release says otherwise in its notes. On
+      Android (Google Play Payments: we sell nothing in-app), a
+      paid organization gets a "Manage Plan" link and a Free one gets plain,
+      non-tappable "Upgrade to Pro at <host>" text. Billing URLs live only in
+      `lib/web-links.ts` and `lib/upgrade/checkout`, read only by `useUpgrade`,
+      which decides through `billingAccess`; `no-purchase-links.test.ts`
+      enforces it.
+      Reviewers sign in with Sign in with Apple as a new free account every
+      time, so they always see the paywall.
+- [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, or
+      a screen recording on a physical device in `APP_REVIEW_VOICE_VIDEO_URL`
+      and in the review attachment (2.5.4).
 - [ ] Sign in with Apple is present on the sign-in screen whenever any other
       third-party sign-in is (4.8).
 - [ ] Account deletion works from Settings without leaving the app (5.1.1 v).
@@ -97,16 +111,24 @@ Channels: `preview` for internal builds, `production` for the store build.
 
 | Change | Lane |
 |---|---|
-| JS merged to main | `deploy.yml` publishes to `preview` |
+| JS merged to main, under the `deploy.yml` trigger paths | `deploy.yml` publishes to `preview` and `production` |
 | Native merged to main | `deploy.yml` builds and uploads to App Store Connect; App Review stays manual |
 | JS on a pull request | `pr-preview.yml` publishes to a branch named after the git branch and comments a QR code, when a development build matches the fingerprint |
 | Native on a pull request | Add the `mobile-build` label; `build-pr.yml` builds a development client |
 
 ### Production
 
-Never automatic. Dispatch `update-production.yml`, approve it in the run, and it
-publishes to everyone on the production channel. No staged rollout: a small
-team with few users learns more from a fast rollback than a slow ramp.
+Every merge to main that touches the app or a package it imports (the
+`deploy.yml` trigger paths) publishes to everyone on the production channel,
+TestFlight and App Store alike — one binary, one channel. A new workspace
+dependency of the app goes in those paths, or its fixes never publish. Installed builds have to track
+main: the API and host-service move with every merge, and a build left on old
+JS meets them without the client half of each change. The runtime version
+keeps an update off any binary whose native layer it does not match.
+
+No staged rollout: a small team with few users learns more from a fast rollback
+than a slow ramp. `update-production.yml` (manual, with approval) republishes
+outside a merge.
 
 ```bash
 # Back out. Republishes the previous update to everyone, including users who
@@ -120,7 +142,7 @@ The private key lives in 1Password and nowhere in this repository. EAS holds a
 copy it will never show you, so 1Password is the only backup.
 
 Publish only from EAS, never `eas update` from a laptop: the workflows hold the
-signing key and the Sentry token, and production goes through an approval. A
+signing key and the Sentry token. A
 build accepts an update only when the update's runtime version equals the
 fingerprint computed when the binary was built, and an outdated eas-cli
 computes a different one — `cli.version` in `eas.json` sets the floor. The
@@ -145,6 +167,71 @@ carries `MINIMUM_MOBILE_VERSION`; a build below it shows a full-screen
 "Update Required" with an App Store button and nothing else. Raise it only
 once the replacement build is live in the store, or that build is bricked.
 The check fails open: no answer from the server, no gate.
+
+## Android
+
+Same EAS project, same `production` build and submit profiles. Android has not
+shipped; the launch checklist tracks what is missing.
+
+### Versioning
+
+- `version` in `app.config.ts` is the Android `versionName` too. Bump it with
+  iOS; Play does not care about the number, only users see it.
+- `versionCode` is the Android build number, and it works like iOS's: EAS keeps
+  it server-side (`appVersionSource: "remote"`) and the `production` profile
+  raises it on every build (`autoIncrement: true`). Never set it by hand or in
+  `app.config.ts`; EAS writes it into the build. Read it with
+  `eas build:version:get -p android --profile production`.
+- Play rejects an upload whose `versionCode` is not higher than every code it
+  has seen on any track, and a code is spent even if the build is never
+  uploaded. A `--local` production build raises the remote counter too, so
+  gaps are normal. If a build was ever uploaded with a code EAS does not know
+  (a hand-built `.aab`), move EAS past it with `eas build:version:set -p android`.
+- The fingerprint ignores versions (`fingerprint.config.js`), so a version bump
+  does not need a new binary on Android either.
+
+### Shipping a build
+
+```bash
+cd apps/mobile
+
+# 1. Build an .aab signed with the upload key in EAS credentials.
+eas build --platform android --profile production
+
+# 2. Upload to the Play internal track as a draft. Needs the Google service
+#    account key in EAS credentials. Google refuses API uploads until the
+#    first .aab has been uploaded by hand in Play Console.
+eas submit --platform android --profile production --latest
+```
+
+`.eas/workflows/deploy-android.yml` runs the same two steps, skipping the build
+when one already matches the fingerprint. It is manual (`workflow_dispatch`)
+until the first hand upload is done and Android takes OTA updates; then its
+jobs move into `deploy.yml`. Promote from internal to production in Play
+Console.
+
+### Checking a release build without publishing
+
+```bash
+cd apps/mobile
+eas build -p android --profile production --local --output /tmp/superset.aab
+bundletool build-apks --bundle=/tmp/superset.aab --output=/tmp/superset.apks \
+  --mode=universal   # signs with the debug key; fine for an emulator
+unzip -p /tmp/superset.apks universal.apk > /tmp/superset.apk
+adb install -r /tmp/superset.apk
+```
+
+`--local` needs JDK 17 and the Android SDK, and pulls the `production` EAS
+environment and the upload keystore. It submits nothing, but it spends a
+`versionCode`. The installed app talks to production. Check
+`adb shell pm get-app-links com.paradev.mobile` for the App Links hosts.
+
+- R8 runs in full mode in release builds only. A keep rule it ignores shows up
+  at run time, not at build time: look for `NoSuchMethodException` or
+  `ClassNotFoundException` in `adb logcat` after you open each screen. Add
+  rules with `extraProguardRules` in the `expo-build-properties` entry.
+- bundletool signs the APK with the debug key, so Google sign-in falls back to
+  the browser and the App Links do not verify against `assetlinks.json`.
 
 ## When the build is rejected
 
@@ -180,14 +267,14 @@ for Claude Code / Codex" apps in the category; it says nothing about the
 build's quality and it is not resolved by resubmitting the same metadata.
 
 1. Reply in the submission's message thread before resubmitting, and make the
-   reply about *identity*, not features: Superset is our own product, the
+   reply about *identity*, not features: Paradev is our own product, the
    mobile app is its official client, the source is public in this repository
    (`apps/mobile`), the bundle id is our domain, and the app only works with
-   Superset accounts and hosts. Link the GitHub repository, the desktop app
+   Paradev accounts and hosts. Link the GitHub repository, the desktop app
    download, and a screen recording that shows the desktop app and the phone
    app driving the same session.
 2. Make the product page say the same thing. Title keeps the brand; the
-   subtitle and the first sentence of the description should name Superset as
+   subtitle and the first sentence of the description should name Paradev as
    the product the app pairs with, not a generic "run AI agents from
    anywhere". Generic metadata is what the reviewer matched on.
 3. Ask for a call in the same thread. 4.3(a) is a judgment call, and the
@@ -217,6 +304,6 @@ build's quality and it is not resolved by resubmitting the same metadata.
   recording.
 - Bumping the major version or going months between submissions right before
   a launch.
-- Any copy that reads as "build and run apps on your phone". Superset Mobile
+- Any copy that reads as "build and run apps on your phone". Paradev Mobile
   operates agents that run elsewhere; the wording in `store.config.js` and in
   the app should always say so.

@@ -1,3 +1,4 @@
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { env } from "@/env";
 import { createSignedState } from "@/lib/oauth-state";
 
@@ -29,14 +30,18 @@ export const STATE_COOKIES = {
 		name: "microsoft_teams_identity_oauth_state",
 		path: "/api/integrations/microsoft-teams/identity",
 	},
-	connectors: { name: "connector_oauth_state", path: "/api/connectors" },
 } as const satisfies Record<string, StateCookie>;
+
+/** One cookie per connector, so two sign-ins open at once do not overwrite each other's state. */
+export function connectorStateCookie(slug: string): StateCookie {
+	return { name: `connector_oauth_state_${slug}`, path: "/api/connectors" };
+}
 
 /** Matches the signed state's own TTL; both are one-shot. */
 const MAX_AGE_SECONDS = 600;
 
 function attributes(cookie: StateCookie): string {
-	const secure = env.NEXT_PUBLIC_API_URL.startsWith("https") ? " Secure;" : "";
+	const secure = getBrowserApiUrl(env).startsWith("https") ? " Secure;" : "";
 	return `HttpOnly;${secure} SameSite=Lax; Path=${cookie.path}`;
 }
 

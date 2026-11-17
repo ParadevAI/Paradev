@@ -19,8 +19,9 @@ import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
-} from "@superset/shared/sandbox-contract";
-import { PACKAGE_ROOT } from "./build";
+} from "@superset/shared/sandbox/contract";
+import { BUNDLE_SRC, PACKAGE_ROOT } from "./build";
+import { discardingSteps, loadAssets, loadSteps } from "./manifest";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";
 const NAME = `superset-boot-twice-${Date.now().toString(36)}`;
@@ -75,6 +76,11 @@ function bootAsUser(): string {
 	return `${new TextDecoder().decode(proc.stdout)}${new TextDecoder().decode(proc.stderr)}exit=${proc.exitCode}`;
 }
 
+const assets = loadAssets(join(BUNDLE_SRC, "assets.json"));
+const discarded = [
+	...discardingSteps(loadSteps(join(BUNDLE_SRC, "steps.json"))).keys(),
+].map((key) => assets[key]?.dest ?? key);
+
 const failures: string[] = [];
 function expect(label: string, ok: boolean, detail = ""): void {
 	console.log(`${ok ? "ok  " : "FAIL"} ${label}${detail ? `: ${detail}` : ""}`);
@@ -89,13 +95,27 @@ const identity = renderSandboxConf({
 	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
-			url: "https://github.com/superset-sh/superset.git",
+			url: "https://github.com/paradevai/paradev.git",
 			branch: "main",
 			path: ".",
 		},
 	]),
 	SUPERSET_SANDBOX_IMAGE_TAG: IMAGE,
 	SUPERSET_SANDBOX_PROVIDER: "docker",
+	SUPERSET_SANDBOX_PLUGINS: JSON.stringify([
+		{
+			marketplace: "superset",
+			name: "linear",
+			version: "0.0.0",
+			enabled: true,
+		},
+		{
+			marketplace: "acme",
+			name: "not-shipped",
+			version: "1.0.0",
+			enabled: true,
+		},
+	]),
 });
 
 docker(["rm", "-f", NAME], { check: false });
@@ -212,11 +232,38 @@ try {
 			),
 		),
 	);
+	// host-service is an asset pinned in bundle/assets.json, so the box runs a
+	// published build rather than this checkout: what it does with the plugin
+	// list belongs to the release probe and the unit tests. Handing the list
+	// over is the bundle's own job, so that is what this checks.
+	const hostEnv = exec(
+		`tr '\\0' '\\n' < /proc/$(cat ${SANDBOX_PATHS.run}/host-service.pid)/environ`,
+		{ check: false, user: "ubuntu" },
+	);
+	expect(
+		"plugins: the runner hands host-service the plugin list",
+		/SUPERSET_SANDBOX_PLUGINS=.*not-shipped/.test(hostEnv),
+		hostEnv
+			.split("\n")
+			.find((line) => line.startsWith("SUPERSET_SANDBOX_PLUGINS=")) ?? "unset",
+	);
+
 	// The control plane's push, so the runner's hook sequencing runs: this
 	// checkout declares no start hook, which the log must say.
 	exec(
 		`curl -fs -X POST -H 'Authorization: Bearer boot-twice-secret' -H 'Content-Type: application/json' -d '{"json":{"variables":{"FOO":"bar"}}}' http://127.0.0.1:${SANDBOX_PORTS.hostService}/trpc/sandbox.setEnvironment`,
 		{ check: false },
+	);
+	// The clone outlives host-service's readiness; a wake that interrupts it
+	// is its own case (the runner reclones), not this test's.
+	expect(
+		"first boot: checkout done",
+		/ready/.test(
+			exec(
+				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+				{ check: false },
+			),
+		),
 	);
 	expect(
 		"start hook: the runner asked host-service once the push landed",
@@ -235,6 +282,14 @@ try {
 			),
 		),
 	);
+	const leftover = exec(
+		`for f in ${discarded.join(" ")}; do [ -e "$f" ] && echo "$f"; [ -f "$f.hash" ] || echo "no sidecar $f"; done; true`,
+	).trim();
+	expect(
+		"first boot: every consumed archive is gone, its sidecar kept",
+		leftover === "",
+		leftover.replace(/\n/g, ", "),
+	);
 	expect(
 		"status prints every step current",
 		!/pending|never run|failed/.test(
@@ -245,24 +300,18 @@ try {
 		).trim(),
 	);
 
-	// The clone outlives host-service's readiness; a wake that interrupts it
-	// is its own case (the runner reclones), not this test's.
-	expect(
-		"first boot: checkout done",
-		/ready/.test(
-			exec(
-				`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
-				{ check: false },
-			),
-		),
-	);
 	// Second boot: stop everything the way a wake would (no processes survive), then boot again.
 	exec(
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,
 		{ check: false },
 	);
-	exec(`: > ${SANDBOX_PATHS.bootLog}`);
+	exec(
+		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.hostRoot}/previous-runtime && touch ${SANDBOX_PATHS.hostRoot}/previous-runtime/host-service.js`,
+	);
 	const second = boot(2);
+	const runtimes = exec(
+		`for i in $(seq 1 100); do [ ! -e ${SANDBOX_PATHS.hostRoot}/previous-runtime ] && break; sleep 0.1; done; find ${SANDBOX_PATHS.hostRoot} -mindepth 1 -maxdepth 1 -type d`,
+	).trim();
 	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect("second boot: run dir cleared", /run\.cleared/.test(log2));
 	expect(
@@ -271,10 +320,25 @@ try {
 	);
 	expect("second boot: nothing fetched", !/fetched \//.test(log2));
 	expect("second boot: every step skipped", !/step \S+ running/.test(log2));
+	const binaries = exec(
+		"claude --version && superset --version && echo binaries-ok",
+		{ user: "ubuntu", check: false },
+	);
+	expect(
+		"second boot: claude and superset still run from the media dir",
+		/binaries-ok/.test(binaries),
+		binaries.trim().replace(/\n/g, " | "),
+	);
 	expect(
 		"second boot: host-service ready",
 		/host\.ready/.test(log2),
 		`${second} ms to ready`,
+	);
+	expect(
+		"second boot: only the current runtime is left once host-service answers",
+		runtimes.split("\n").length === 1 &&
+			runtimes === exec(`readlink -f ${SANDBOX_PATHS.hostRoot}/current`).trim(),
+		runtimes.replaceAll("\n", " "),
 	);
 	expect(
 		"second boot: checkout marker respected",

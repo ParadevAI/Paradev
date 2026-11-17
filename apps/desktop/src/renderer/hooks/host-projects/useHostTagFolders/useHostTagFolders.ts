@@ -5,6 +5,7 @@ import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { MOCK_ORG_ID } from "shared/constants";
 import { deriveHostProjectsQueryTargets } from "../useHostProjects/useHostProjects.utils";
@@ -76,14 +77,13 @@ export function useHostTagFolders(): UseHostTagFoldersResult {
 			networkMode: "always" as const,
 			refetchIntervalInBackground: true,
 			retry: 1,
-			queryFn: async (): Promise<HostTagFolderSetting[]> => {
-				if (!target.hostUrl) return [];
-				const client = getHostServiceClientByUrl(target.hostUrl);
+			queryFn: hostQueryFn(target.hostUrl, async (hostUrl) => {
+				const client = getHostServiceClientByUrl(hostUrl);
 				// Let failures remain failures. In particular, an old host with no
 				// tagFolders router must not look like a successful empty response:
 				// the migration uses per-host readiness before attempting writes.
 				return (await client.tagFolders.list.query()) as HostTagFolderSetting[];
-			},
+			}),
 		})),
 	});
 

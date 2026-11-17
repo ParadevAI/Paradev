@@ -3,46 +3,84 @@ import { useCallback } from "react";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useNewWorkspaceDraftStore } from "renderer/stores/new-workspace-draft";
 
+interface NewWorkspaceHandoff {
+	machineId: string | null | undefined;
+	navigate: ReturnType<typeof useNavigate>;
+}
+
+export function openNewWorkspace(
+	{ navigate }: NewWorkspaceHandoff,
+	projectId?: string | null,
+	requestedHostId?: string,
+	repository?: string | null,
+) {
+	if (projectId) {
+		useNewWorkspaceDraftStore.getState().selectProject(projectId, repository);
+	}
+	void navigate({
+		to: "/new-workspace",
+		search:
+			projectId || requestedHostId
+				? { projectId: projectId ?? undefined, host: requestedHostId }
+				: undefined,
+	});
+}
+
+export function openNewSession({ navigate }: NewWorkspaceHandoff) {
+	useNewWorkspaceDraftStore.getState().selectSession();
+	void navigate({ to: "/new-workspace", search: { session: true } });
+}
+
 /** Opens the `/new-workspace` create surface. */
 export function useOpenNewWorkspace() {
 	const navigate = useNavigate();
+	const { machineId } = useLocalHostService();
 
 	return useCallback(
-		(projectId?: string | null, hostId?: string) => {
-			if (hostId) {
-				useNewWorkspaceDraftStore.getState().updateDraft({ hostId });
-			}
-			if (projectId) {
-				useNewWorkspaceDraftStore.getState().selectProject(projectId);
-			}
-			void navigate({
-				to: "/new-workspace",
-				search:
-					projectId || hostId
-						? { projectId: projectId ?? undefined, host: hostId }
-						: undefined,
-			});
-		},
-		[navigate],
+		(
+			projectId?: string | null,
+			requestedHostId?: string,
+			repository?: string | null,
+		) =>
+			openNewWorkspace(
+				{ machineId, navigate },
+				projectId,
+				requestedHostId,
+				repository,
+			),
+		[machineId, navigate],
 	);
 }
 
+export function openNewWorkspaceForLocalProject(
+	handoff: NewWorkspaceHandoff,
+	projectId: string,
+) {
+	openNewWorkspace(handoff, projectId, handoff.machineId ?? undefined);
+}
+
 export function useOpenNewWorkspaceForLocalProject() {
+	const navigate = useNavigate();
 	const { machineId } = useLocalHostService();
-	const openNewWorkspace = useOpenNewWorkspace();
 	return useCallback(
-		(projectId: string) => openNewWorkspace(projectId, machineId),
-		[machineId, openNewWorkspace],
+		(projectId: string) =>
+			openNewWorkspaceForLocalProject(
+				{ machineId, navigate },
+				projectId,
+			),
+		[machineId, navigate],
 	);
 }
 
 /** Same, with "No project" (session) preselected. */
 export function useOpenNewSession() {
 	const navigate = useNavigate();
+	const { machineId } = useLocalHostService();
 
-	return useCallback(() => {
-		void navigate({ to: "/new-workspace", search: { session: true } });
-	}, [navigate]);
+	return useCallback(
+		() => openNewSession({ machineId, navigate }),
+		[machineId, navigate],
+	);
 }
 
 /**
@@ -53,8 +91,12 @@ export function useOpenNewWorkspaceForHost() {
 	const navigate = useNavigate();
 
 	return useCallback(
-		(hostId: string) => {
-			void navigate({ to: "/new-workspace", search: { host: hostId } });
+		(hostId: string, projectId?: string) => {
+			openNewWorkspace(
+				{ machineId: null, navigate },
+				projectId,
+				hostId,
+			);
 		},
 		[navigate],
 	);

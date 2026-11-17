@@ -321,7 +321,7 @@ describe("createManagedSkills", () => {
 });
 
 describe("createManagedSkills with plugin sources", () => {
-	it("grafts a marketplace plugin into the one Superset plugin dir", async () => {
+	it("grafts a marketplace plugin into the one Paradev plugin dir", async () => {
 		const github = seedMarketplacePlugin("github", ["issue-triage"]);
 		await run(undefined, [github]);
 
@@ -338,6 +338,17 @@ describe("createManagedSkills with plugin sources", () => {
 		);
 		expect(shared).toContain("name: github-issue-triage");
 		expect(shared).toContain(MANAGED_SKILL_MARKER);
+	});
+
+	it("an overlapping older run does not reap what a newer one wrote", async () => {
+		const github = seedMarketplacePlugin("github", ["issue-triage"]);
+		const older = run(undefined, []);
+		const newer = run(undefined, [github]);
+		await Promise.all([older, newer]);
+
+		expect(existsSync(path.join(agentsSkills, "github-issue-triage"))).toBe(
+			true,
+		);
 	});
 
 	it("keeps non-skill payload out of the Claude plugin dir", async () => {

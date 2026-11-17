@@ -11,6 +11,7 @@ import { buildSubmitPrompt } from "./buildSubmitPrompt";
 import {
 	fetchGitHubIssueBody,
 	fetchInternalTaskBody,
+	fetchLinearIssueBody,
 	fetchPrBody,
 } from "./fetchers";
 import { useNewWorkspacePromptContextStore } from "./store";
@@ -52,9 +53,9 @@ export function useNewWorkspacePromptContext(args: {
 		const store = useNewWorkspacePromptContextStore.getState();
 
 		if (linkedPR) {
-			const prNumber = linkedPR.prNumber;
+			const { prNumber, url } = linkedPR;
 			store.register(`pr:${prNumber}`, () =>
-				fetchPrBody({ prNumber, projectId, hostUrl }),
+				fetchPrBody({ prNumber, url, organizationId: activeOrganizationId }),
 			);
 		}
 
@@ -69,9 +70,15 @@ export function useNewWorkspacePromptContext(args: {
 				store.register(`task:${taskId}`, () =>
 					fetchInternalTaskBody({ taskId }),
 				);
+			} else if (issue.source === "linear" && activeOrganizationId) {
+				const identifier = issue.slug;
+				const organizationId = activeOrganizationId;
+				store.register(`linear-issue:${identifier}`, () =>
+					fetchLinearIssueBody({ organizationId, identifier }),
+				);
 			}
 		}
-	}, [projectId, hostUrl, linkedPR, linkedIssues]);
+	}, [projectId, hostUrl, linkedPR, linkedIssues, activeOrganizationId]);
 
 	return useMemo<NewWorkspacePromptContextApi>(
 		() => ({

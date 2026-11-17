@@ -4,17 +4,18 @@ import { useEffect } from "react";
 import { logStressEvent } from "renderer/lib/performance/stress-instrumentation";
 import { getTerminalBackgroundMarkerIdsKey } from "renderer/lib/terminal/terminal-background-intents";
 import type { StoreApi } from "zustand/vanilla";
+import type { PaneViewerData } from "../../types";
+import { adoptTerminalPanes } from "../../utils/adoptTerminalPanes";
 import {
 	getAttachedTerminalIdsKey,
 	getBackgroundTerminalSessions,
 	parseAttachedTerminalIdsKey,
-} from "../../components/BackgroundTerminalsButton/BackgroundTerminalsButton.utils";
-import type { PaneViewerData } from "../../types";
+} from "../../utils/backgroundTerminals";
 import { isTerminalReplacementCancelled } from "../../utils/cancelledTerminalReplacements";
-import { focusOrAddTerminalPane } from "../../utils/focusTerminalPane";
 
 interface UseAutoAdoptBackgroundSessionsArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	linkedStores: readonly StoreApi<WorkspaceStore<PaneViewerData>>[];
 	workspaceId: string;
 	isLayoutReady: boolean;
 }
@@ -37,6 +38,7 @@ interface UseAutoAdoptBackgroundSessionsArgs {
  */
 export function useAutoAdoptBackgroundSessions({
 	store,
+	linkedStores,
 	workspaceId,
 	isLayoutReady,
 }: UseAutoAdoptBackgroundSessionsArgs): void {
@@ -60,7 +62,12 @@ export function useAutoAdoptBackgroundSessions({
 		);
 		const toAdopt = getBackgroundTerminalSessions(
 			sessions,
-			parseAttachedTerminalIdsKey(getAttachedTerminalIdsKey(state.tabs)),
+			parseAttachedTerminalIdsKey(
+				getAttachedTerminalIdsKey([
+					...state.tabs,
+					...linkedStores.flatMap((linked) => linked.getState().tabs),
+				]),
+			),
 		).filter(
 			(session) =>
 				!marked.has(session.terminalId) &&
@@ -68,18 +75,20 @@ export function useAutoAdoptBackgroundSessions({
 		);
 		if (toAdopt.length === 0) return;
 
-		// Oldest→newest so tabs read chronologically; restore the active tab so
-		// adoption never steals focus.
-		const restoreActiveTabId = state.tabs.length > 0 ? state.activeTabId : null;
-		for (const session of toAdopt.reverse()) {
-			focusOrAddTerminalPane(store, session.terminalId);
-		}
-		if (restoreActiveTabId) {
-			store.getState().setActiveTab(restoreActiveTabId);
-		}
+		adoptTerminalPanes(
+			store,
+			toAdopt.reverse().map((session) => session.terminalId),
+		);
 		logStressEvent("background-terminals.auto-adopt", {
 			count: toAdopt.length,
 			workspaceId,
 		});
-	}, [isLayoutReady, isFetchingSessions, sessions, store, workspaceId]);
+	}, [
+		isLayoutReady,
+		isFetchingSessions,
+		sessions,
+		store,
+		linkedStores,
+		workspaceId,
+	]);
 }

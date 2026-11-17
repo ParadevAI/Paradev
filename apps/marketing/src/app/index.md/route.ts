@@ -1,13 +1,12 @@
+import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
-import {
-	FAQ_ITEMS,
-	faqSourceText,
-} from "@/app/[lang]/components/FAQSection/constants";
+import { FAQ_ITEMS } from "@/app/[lang]/components/FAQSection/constants";
 import {
 	buildCompanyFactsSection,
 	buildDeveloperResourcesSection,
 	buildFrontmatter,
 	buildWhenToUseSection,
+	englishText,
 	MARKDOWN_HEADERS,
 	PRODUCT_SUMMARY,
 } from "@/lib/llms";
@@ -26,11 +25,11 @@ export async function GET() {
 
 	const lines: string[] = [
 		...buildFrontmatter({
-			title: `${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+			title: `${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 			description: PRODUCT_SUMMARY,
 			canonical: `${baseUrl}/`,
 		}),
-		`# ${COMPANY.NAME}: Run 100+ parallel coding agents on your machine`,
+		`# ${BRAND.INTRO_NAME}: Run 100+ parallel coding agents on your machine`,
 		"",
 		PRODUCT_SUMMARY,
 		"",
@@ -38,12 +37,12 @@ export async function GET() {
 		"",
 		"## Features",
 		"",
-		"- **Parallel agents**: run many coding agents side by side, each in an isolated Git worktree on its own branch.",
+		"- **Parallel agents**: run many coding agents side by side, each in its own Git worktree and branch.",
 		"- **Any CLI agent**: Claude Code, OpenAI Codex, OpenCode, and anything else that runs in a terminal.",
 		"- **Diff review**: review every change from one dashboard before merging.",
 		"- **Persistent terminals**: sessions survive app restarts.",
-		"- **Automations** (Pro): schedule recurring agent runs with a prompt.",
-		"- **MCP server**: drive Superset from other AI agents over the Model Context Protocol.",
+		"- **Automations** (Pro): run an agent with a prompt on a schedule or when an event happens.",
+		`- **MCP server**: drive ${BRAND.NAME} from other AI agents over the Model Context Protocol.`,
 		"",
 		"## Get started",
 		"",
@@ -62,14 +61,14 @@ export async function GET() {
 		"## FAQ",
 		"",
 		...FAQ_ITEMS.flatMap((item) => [
-			`### ${faqSourceText(item.question)}`,
+			`### ${englishText(item.question)}`,
 			"",
-			faqSourceText(item.answer),
+			englishText(item.answer),
 			"",
 		]),
 		`## Contact`,
 		"",
-		`- Support: support${COMPANY.EMAIL_DOMAIN}`,
+		`- Support: ${COMPANY.SUPPORT_EMAIL}`,
 		`- Team: ${COMPANY.TEAM_EMAIL}`,
 		`- [Discord](${COMPANY.DISCORD_URL})`,
 		`- [X](${COMPANY.X_URL})`,

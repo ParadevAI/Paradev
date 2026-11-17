@@ -3,7 +3,7 @@
 	"name": "Catppuccin Frappé",
 	"type": "dark",
 	"author": "Catppuccin",
-	"description": "Catppuccin Frappé theme for Superset",
+	"description": "Catppuccin Frappé theme for Paradev",
 	"ui": {
 		"background": "#303446",
 		"foreground": "#c6d0f5",

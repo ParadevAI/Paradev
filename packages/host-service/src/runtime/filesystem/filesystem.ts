@@ -5,9 +5,13 @@ import {
 } from "@superset/workspace-fs/host";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db/index.ts";
-import { projects, workspaces } from "../../db/schema.ts";
-import { listGitIgnoredDirs } from "../git/index.ts";
+import { workspaces } from "../../db/schema.ts";
+import { getLocalProject } from "../../projects/local-project-store.ts";
 import { WatchAttachGuard } from "./watch-attach-guard.ts";
+import {
+	scanGitIgnoredDirectories,
+	scanNestedRepositories,
+} from "./watcher-scans.ts";
 
 export interface WorkspaceFilesystemManagerOptions {
 	db: HostDb;
@@ -30,8 +34,9 @@ export class ProjectNotFoundError extends Error {
 export class WorkspaceFilesystemManager {
 	private readonly db: HostDb;
 	private readonly watcherManager = new FsWatcherManager({
-		listGitIgnoredDirs,
 		useDefaultIgnores: false,
+		listGitIgnoredDirs: scanGitIgnoredDirectories,
+		findNestedRepoRoots: scanNestedRepositories,
 	});
 	private readonly watchAttachGuard = new WatchAttachGuard(this.watcherManager);
 	private readonly serviceCache = new Map<string, FsHostService>();
@@ -53,9 +58,7 @@ export class WorkspaceFilesystemManager {
 	}
 
 	resolveProjectRoot(projectId: string): string {
-		const project = this.db.query.projects
-			.findFirst({ where: eq(projects.id, projectId) })
-			.sync();
+		const project = getLocalProject(this.db, projectId);
 
 		if (!project) {
 			throw new ProjectNotFoundError(`Project not found: ${projectId}`);

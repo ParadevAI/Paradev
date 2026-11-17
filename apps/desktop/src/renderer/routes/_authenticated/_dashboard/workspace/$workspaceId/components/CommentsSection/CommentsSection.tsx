@@ -1,6 +1,7 @@
 import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { Button } from "@superset/ui/button";
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -9,18 +10,24 @@ import {
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { CheckCheck, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuCheck, LuCopy } from "react-icons/lu";
 import { VscChevronRight } from "react-icons/vsc";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { useReviewThreadActions } from "renderer/routes/_authenticated/_dashboard/pull-requests/hooks/useReviewThreadActions";
+import type { PullRequestTarget } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestClient";
 import type { CommentPaneData, DiffFocusSide } from "../../types";
 import { CommentRow } from "./components/CommentRow";
 import type { NormalizedComment } from "./types";
 
+export type CommentsUnavailable = "needs-github" | "failed" | null;
+
 interface CommentsSectionProps {
-	workspaceId: string;
+	pullRequest: PullRequestTarget | null;
+	/** Why the threads could not be read; null when they were. */
+	unavailable?: CommentsUnavailable;
 	comments: NormalizedComment[];
 	isLoading: boolean;
 	onOpenComment?: (comment: CommentPaneData) => void;
@@ -33,7 +40,8 @@ interface CommentsSectionProps {
 }
 
 export function CommentsSection({
-	workspaceId,
+	pullRequest,
+	unavailable = null,
 	comments,
 	isLoading,
 	onOpenComment,
@@ -47,9 +55,7 @@ export function CommentsSection({
 	const [isResolvingAll, setIsResolvingAll] = useState(false);
 	const copiedResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isMountedRef = useRef(true);
-	const utils = workspaceTrpc.useUtils();
-	const setReviewThreadResolution =
-		workspaceTrpc.git.setReviewThreadResolution.useMutation();
+	const threadActions = useReviewThreadActions(pullRequest);
 
 	const copyToClipboard = useCallback(
 		(text: string) => electronTrpcClient.external.copyText.mutate(text),
@@ -142,19 +148,7 @@ export function CommentsSection({
 
 		setIsResolvingAll(true);
 		try {
-			const results = await Promise.allSettled(
-				resolvableThreadIds.map((threadId) =>
-					setReviewThreadResolution.mutateAsync({
-						workspaceId,
-						threadId,
-						resolved: true,
-					}),
-				),
-			);
-
-			if (results.some((result) => result.status === "fulfilled")) {
-				await utils.git.getPullRequestThreads.invalidate({ workspaceId });
-			}
+			const results = await threadActions.resolveAll(resolvableThreadIds);
 
 			const failedCount = results.filter(
 				(result) => result.status === "rejected",
@@ -173,13 +167,7 @@ export function CommentsSection({
 		} finally {
 			if (isMountedRef.current) setIsResolvingAll(false);
 		}
-	}, [
-		resolvableThreadIds,
-		setReviewThreadResolution,
-		utils.git.getPullRequestThreads,
-		workspaceId,
-		t,
-	]);
+	}, [resolvableThreadIds, threadActions, t]);
 
 	const conversationCommentsCountLabel = isLoading
 		? "..."
@@ -195,6 +183,32 @@ export function CommentsSection({
 		copiedActionKey === "comments:review"
 			? t({ message: "Copied" })
 			: t({ message: "Copy all" });
+
+	if (unavailable) {
+		return (
+			<div className="flex flex-col items-center gap-2 px-4 py-6 text-center text-sm text-muted-foreground">
+				<span>
+					{unavailable === "needs-github"
+						? t({
+								message: "Connect GitHub to see review comments as yourself.",
+							})
+						: t({ message: "Couldn't load review comments" })}
+				</span>
+				{unavailable === "needs-github" ? (
+					<Button
+						size="sm"
+						onClick={() =>
+							void cloudTrpcClient.githubUser.connect
+								.mutate()
+								.then(({ url }) => window.open(url, "_blank"))
+						}
+					>
+						{t({ message: "Connect GitHub" })}
+					</Button>
+				) : null}
+			</div>
+		);
+	}
 
 	return (
 		<>

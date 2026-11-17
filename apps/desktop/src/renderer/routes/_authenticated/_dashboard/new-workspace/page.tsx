@@ -1,8 +1,6 @@
-import { PromptInputProvider } from "@superset/ui/ai-elements/prompt-input";
 import { createFileRoute } from "@tanstack/react-router";
 import { NewWorkspaceScreen } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/NewWorkspaceScreen";
 import { DashboardNewWorkspaceDraftProvider } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/DashboardNewWorkspaceDraftContext";
-import { newWorkspaceAttachmentsStore } from "renderer/stores/new-workspace-attachments";
 
 export const Route = createFileRoute(
 	"/_authenticated/_dashboard/new-workspace/",
@@ -26,19 +24,12 @@ function NewWorkspacePage() {
 	const { projectId, session, host } = Route.useSearch();
 	return (
 		<DashboardNewWorkspaceDraftProvider onClose={() => {}}>
-			<PromptInputProvider attachmentsStore={newWorkspaceAttachmentsStore}>
-				<NewWorkspaceScreen
-					isOpen
-					preSelectedProjectId={projectId ?? null}
-					preSelectedSession={session === true}
-					preSelectedHostId={host ?? null}
-				/>
-				{/* Window-drag surface replacing the hidden TopBar's drag region.
-				    Stops short of the top-right corner so the screen's naming
-				    instructions + prompt history buttons underneath stay
-				    clickable. */}
-				<div className="drag absolute left-0 right-20 top-0 z-50 h-12" />
-			</PromptInputProvider>
+			<NewWorkspaceScreen
+				isOpen
+				preSelectedProjectId={projectId ?? null}
+				preSelectedSession={session === true}
+				preSelectedHostId={host ?? null}
+			/>
 		</DashboardNewWorkspaceDraftProvider>
 	);
 }

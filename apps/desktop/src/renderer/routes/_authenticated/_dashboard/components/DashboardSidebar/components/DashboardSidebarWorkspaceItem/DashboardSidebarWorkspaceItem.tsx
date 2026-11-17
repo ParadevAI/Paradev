@@ -1,6 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { errorMessage } from "@superset/i18n/errors";
-import { toast } from "@superset/ui/sonner";
 import {
 	type KeyboardEvent,
 	type MouseEvent,
@@ -10,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOptimisticActions";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
 import {
@@ -30,6 +28,7 @@ import {
 	useWorkspaceRowContextMenu,
 } from "./components/DashboardSidebarWorkspaceBulkContextMenu";
 import { DashboardSidebarWorkspaceContextMenu } from "./components/DashboardSidebarWorkspaceContextMenu/DashboardSidebarWorkspaceContextMenu";
+import { ManageEnvironmentItem } from "./components/ManageEnvironmentItem";
 import { useDashboardSidebarWorkspaceItemActions } from "./hooks/useDashboardSidebarWorkspaceItemActions";
 
 interface DashboardSidebarWorkspaceItemProps {
@@ -61,29 +60,6 @@ export function DashboardSidebarWorkspaceItem({
 	pinnedContext,
 }: DashboardSidebarWorkspaceItemProps) {
 	const { t } = useLingui();
-	// TODO(SUPER-2116): belongs in the create-environment flow; this offers
-	// itself on workspaces that are not "ready" and cannot be promoted.
-	const promoteToEnvironment = cloudTrpc.environment.promote.useMutation();
-
-	const handlePromoteToEnvironment = useCallback(() => {
-		toast.promise(
-			promoteToEnvironment.mutateAsync({
-				cloudWorkspaceId: workspace.id,
-				name: workspace.name,
-			}),
-			{
-				loading: t({
-					message: "Saving as an environment...",
-				}),
-				success: (created) =>
-					t({
-						message: `Saved "${created?.name}" as an environment`,
-					}),
-				error: (error) => errorMessage(error),
-			},
-		);
-	}, [promoteToEnvironment, workspace.id, workspace.name, t]);
-
 	const {
 		id,
 		projectId,
@@ -94,9 +70,22 @@ export function DashboardSidebarWorkspaceItem({
 		branch,
 		pendingTransaction,
 		pullRequest,
+		isMine,
 	} = workspace;
 	const isSessionWorkspace = workspace.type === "session";
-	const { status: workspaceStatus, diffStats } = useSidebarWorkspaceStatus(id);
+	const isCloudWorkspace = hostType === "cloud";
+	const environmentItem = isCloudWorkspace ? (
+		<ManageEnvironmentItem workspaceId={id} />
+	) : undefined;
+	const moveDirections = useWorkspaceMoveDirections(workspace.hostId);
+	const move =
+		moveDirections.length > 0
+			? {
+					directions: moveDirections,
+					workspace: { id, hostId: workspace.hostId, projectId, name },
+				}
+			: undefined;
+	const { status: workspaceStatus } = useSidebarWorkspaceStatus(id);
 	const {
 		cancelRename,
 		pendingName,
@@ -107,7 +96,6 @@ export function DashboardSidebarWorkspaceItem({
 		handleCopyWorkspaceId,
 		handleCreateSection,
 		handleMoveToSection,
-		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleRemovePullRequest,
 		handleTogglePin,
@@ -124,12 +112,15 @@ export function DashboardSidebarWorkspaceItem({
 		workspaceId: id,
 		projectId,
 		isSessionWorkspace,
+		isCloudWorkspace,
 		workspaceName: name,
 		branch,
-		pullRequestUrl: pullRequest?.url ?? null,
-		isCloudWorkspace: hostType === "cloud",
 		isPinned: workspace.isPinned,
 	});
+	// A cloud workspace you created is in the sidebar by definition; only an
+	// opted-in teammate's can be taken back out.
+	const removeFromSidebarIfAllowed =
+		isCloudWorkspace && isMine ? undefined : handleRemoveFromSidebar;
 
 	// Renders the submitted name until the store reports it, so the row never
 	// falls back to the pre-rename value for a frame.
@@ -156,8 +147,11 @@ export function DashboardSidebarWorkspaceItem({
 	const rowRef = useRef<HTMLDivElement>(null);
 	const hoverEligible = !isPending;
 	const hoverPayload = useMemo(
-		() => ({ workspace, onEditBranchClick: setRenameBranchTarget }),
-		[workspace],
+		() => ({
+			workspace,
+			onEditBranchClick: isCloudWorkspace ? undefined : setRenameBranchTarget,
+		}),
+		[workspace, isCloudWorkspace],
 	);
 
 	const handleMouseEnter = useCallback(
@@ -284,28 +278,27 @@ export function DashboardSidebarWorkspaceItem({
 						<DashboardSidebarWorkspaceContextMenu
 							workspaceId={id}
 							projectId={projectId}
+							move={move}
 							isSessionWorkspace={isSessionWorkspace}
 							isInSection={isInSection}
 							isUnread={isUnread}
 							hasStatus={!!workspaceStatus}
 							hasPullRequest={!!pullRequest}
 							isLocalWorkspace={hostType === "local-device"}
-							onPromoteToEnvironment={
-								hostType === "cloud" ? handlePromoteToEnvironment : undefined
-							}
+							isCloudWorkspace={isCloudWorkspace}
 							isPinned={workspace.isPinned}
 							onTogglePin={handleTogglePin}
 							onCreateSection={handleCreateSection}
 							showDeleteHotkey={isActive}
 							onMoveToSection={handleMoveToSection}
-							onOpenInFinder={handleOpenInFinder}
 							onCopyPath={handleCopyPath}
 							onCopyBranchName={handleCopyBranchName}
 							onCopyWorkspaceId={handleCopyWorkspaceId}
-							onRemoveFromSidebar={handleRemoveFromSidebar}
+							onRemoveFromSidebar={removeFromSidebarIfAllowed}
 							onRemovePullRequest={handleRemovePullRequest}
 							onRename={startRename}
 							onDelete={requestDelete}
+							environmentItem={environmentItem}
 							onToggleUnread={handleToggleUnread}
 							onClearStatus={handleClearStatus}
 						>
@@ -343,7 +336,6 @@ export function DashboardSidebarWorkspaceItem({
 				renameValue={renameValue}
 				shortcutLabel={shortcutLabel}
 				pinnedContext={pinnedContext}
-				diffStats={isPending ? null : diffStats}
 				workspaceStatus={workspaceStatus}
 				isInSection={isInSection}
 				indentation={indentation}
@@ -377,6 +369,7 @@ export function DashboardSidebarWorkspaceItem({
 					<DashboardSidebarWorkspaceContextMenu
 						workspaceId={id}
 						projectId={projectId}
+						move={move}
 						isSessionWorkspace={isSessionWorkspace}
 						isInSection={isInSection}
 						isUnread={isUnread}
@@ -385,20 +378,18 @@ export function DashboardSidebarWorkspaceItem({
 						onCreateSection={handleCreateSection}
 						onMoveToSection={handleMoveToSection}
 						isLocalWorkspace={hostType === "local-device"}
-						onPromoteToEnvironment={
-							hostType === "cloud" ? handlePromoteToEnvironment : undefined
-						}
+						isCloudWorkspace={isCloudWorkspace}
 						isPinned={workspace.isPinned}
 						onTogglePin={handleTogglePin}
-						onOpenInFinder={handleOpenInFinder}
 						showDeleteHotkey={isActive}
 						onCopyPath={handleCopyPath}
 						onCopyBranchName={handleCopyBranchName}
 						onCopyWorkspaceId={handleCopyWorkspaceId}
-						onRemoveFromSidebar={handleRemoveFromSidebar}
+						onRemoveFromSidebar={removeFromSidebarIfAllowed}
 						onRemovePullRequest={handleRemovePullRequest}
 						onRename={startRename}
 						onDelete={requestDelete}
+						environmentItem={environmentItem}
 						onToggleUnread={handleToggleUnread}
 						onClearStatus={handleClearStatus}
 					>

@@ -42,7 +42,7 @@ function tierForActionIn(
  * (sidebar / terminal / inline) shares identical semantics.
  */
 
-type MapKey = "fileLinks" | "urlLinks" | "sidebarFileLinks";
+type MapKey = "fileLinks" | "urlLinks" | "sidebarFileLinks" | "pageLinks";
 
 export function usePolicy(
 	key: MapKey,
@@ -70,5 +70,8 @@ export function usePolicy(
 		() => buildHint(map, surface, mode),
 		[map, surface, mode],
 	);
-	return { resolve, getAction, tierForAction, hint, map };
+	return useMemo(
+		() => ({ resolve, getAction, tierForAction, hint, map }),
+		[resolve, getAction, tierForAction, hint, map],
+	);
 }

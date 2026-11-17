@@ -4,7 +4,7 @@ import {
 	createRelaySocket,
 	type RelaySocket,
 } from "@superset/workspace-client/relay-socket";
-import type { Terminal as XTerm } from "@xterm/xterm";
+import type { ITheme, Terminal as XTerm } from "@xterm/xterm";
 import { ensureFreshJwt } from "renderer/lib/auth-client";
 import { posthog } from "renderer/lib/posthog";
 import {
@@ -18,6 +18,7 @@ import {
 	resetAttachRetryState,
 	shouldSurfaceDiagnosis,
 } from "./attach-retry-diagnosis";
+import { terminalQueryColors } from "./terminal-query-colors";
 import {
 	classifyTerminalFailure,
 	type TerminalFailureClassification,
@@ -47,6 +48,9 @@ type TerminalServerMessage =
 	| { type: "error"; message: string; code?: string }
 	| { type: "exit"; exitCode: number; signal: number }
 	| { type: "title"; title: string | null }
+	// The PTY's size: the smallest box across the clients showing it. Sent
+	// after each of our resizes and whenever it changes.
+	| { type: "size"; cols: number; rows: number }
 	// Stream-position anchor from a seq-aware host. Arrives after any
 	// host-synthesized bytes (mode preamble/notice) and before catch-up/live
 	// PTY bytes; sets our counter and arms per-frame counting so the next
@@ -87,23 +91,32 @@ export interface TerminalTransport {
 	 * True once the server has said the PTY is gone for good (live `exit`
 	 * message or a `session-gone` attach error). Distinct from `_terminated`,
 	 * which also covers access denials and unknown errors where the PTY may
-	 * still be alive. Persistence paths must clear — never write — the
-	 * persisted scrollback of a session-ended terminal. Reset on `attached`
-	 * (the session was re-created under the same id).
+	 * still be alive. Reset on `attached` (the session was re-created under the
+	 * same id).
 	 */
 	sessionEnded: boolean;
+	/** Set by a live `exit`; null when the session ended without one (`session-gone`). */
+	exitStatus: { exitCode: number; signal: number } | null;
+	/**
+	 * True while the PTY is narrower than this pane because a smaller client
+	 * (another device, or a narrower split) is showing the same terminal.
+	 */
+	narrowedByOtherClient: boolean;
+	narrowedListeners: Set<() => void>;
 
-	/** Internal: invoked once each time the session-ended signal arrives, so
-	 * the owner can drop persisted scrollback immediately. */
-	_onSessionEnded: (() => void) | null;
 	/** Internal: the shared reconnecting relay socket (partysocket). Created
 	 * once on first connect; it re-signs the URL and runs the relay preflight
 	 * before every (re)dial and retries indefinitely. */
 	_socket: RelaySocket | null;
+	_createSocket: typeof createRelaySocket;
 	/** The xterm instance the socket feeds. */
 	_terminal: XTerm | null;
 	/** Internal: disposes the terminal.onData → socket.send wiring. */
 	_onDataDisposable: { dispose(): void } | null;
+	/** Internal: keystrokes typed while the pane was still attaching. */
+	_pendingInput: { data: string; queuedAt: number } | null;
+	_now: () => number;
+	_pendingColorReset: boolean;
 	/** Internal: title-change debounce timer; see TITLE_COALESCE_MS. */
 	_titleNotifyTimer: ReturnType<typeof setTimeout> | null;
 	/**
@@ -203,6 +216,9 @@ export interface TerminalTransport {
 	 * on every attach: a reconnecting socket starts out assumed visible.
 	 */
 	_visible: boolean;
+	/** Hidden with its relay socket still open. If that socket drops, it parks
+	 * instead of redialing, so hidden panes stay out of reconnect storms. */
+	_backgrounded: boolean;
 }
 
 const MAX_LOG_ENTRIES = 200;
@@ -280,10 +296,64 @@ function maybeSurfaceDiagnosis(
 	});
 }
 
-function markSessionEnded(transport: TerminalTransport) {
-	if (transport.sessionEnded) return;
+function setNarrowedByOtherClient(
+	transport: TerminalTransport,
+	narrowed: boolean,
+) {
+	if (transport.narrowedByOtherClient === narrowed) return;
+	transport.narrowedByOtherClient = narrowed;
+	for (const listener of transport.narrowedListeners) {
+		listener();
+	}
+}
+
+// A re-attach to an exited session replays its `exit`; the line is already there.
+function lastNonEmptyLine(terminal: XTerm): string | null {
+	const buffer = terminal.buffer?.active;
+	if (!buffer) return null;
+	for (let row = buffer.length - 1; row >= 0; row--) {
+		let text = buffer.getLine(row)?.translateToString(true);
+		if (!text) continue;
+		for (let start = row; start > 0 && buffer.getLine(start)?.isWrapped; ) {
+			start--;
+			text = `${buffer.getLine(start)?.translateToString(false) ?? ""}${text}`;
+		}
+		return text;
+	}
+	return null;
+}
+
+function markSessionEnded(
+	transport: TerminalTransport,
+	exitStatus: TerminalTransport["exitStatus"] = null,
+) {
+	transport.exitStatus ??= exitStatus;
 	transport.sessionEnded = true;
-	transport._onSessionEnded?.();
+}
+
+// Input typed before an attach completes is sent once it attaches. Input older
+// than this is dropped instead, so a long outage never replays stale commands.
+const PENDING_INPUT_MAX_AGE_MS = 5_000;
+const PENDING_INPUT_MAX_CHARS = 8_192;
+
+function queuePendingInput(transport: TerminalTransport, data: string) {
+	if (transport.connectionState !== "connecting") return;
+	const pending = transport._pendingInput;
+	if (!pending) {
+		transport._pendingInput = { data, queuedAt: transport._now() };
+		return;
+	}
+	if (pending.data.length + data.length > PENDING_INPUT_MAX_CHARS) return;
+	pending.data += data;
+}
+
+function flushPendingInput(transport: TerminalTransport) {
+	const pending = transport._pendingInput;
+	transport._pendingInput = null;
+	const socket = transport._socket;
+	if (!pending || !socket || socket.readyState !== WebSocket.OPEN) return;
+	if (transport._now() - pending.queuedAt > PENDING_INPUT_MAX_AGE_MS) return;
+	socket.send(JSON.stringify({ type: "input", data: pending.data }));
 }
 
 function setConnectionState(
@@ -357,7 +427,7 @@ export function clearLogs(transport: TerminalTransport) {
 }
 
 export function createTransport(
-	options: { onSessionEnded?: () => void } = {},
+	options: { createSocket?: typeof createRelaySocket; now?: () => number } = {},
 ): TerminalTransport {
 	return {
 		connectionState: "disconnected",
@@ -369,10 +439,16 @@ export function createTransport(
 		logListeners: new Set(),
 		lastDiagnosis: null,
 		sessionEnded: false,
-		_onSessionEnded: options.onSessionEnded ?? null,
+		exitStatus: null,
+		narrowedByOtherClient: false,
+		narrowedListeners: new Set(),
 		_socket: null,
+		_createSocket: options.createSocket ?? createRelaySocket,
 		_terminal: null,
 		_onDataDisposable: null,
+		_pendingInput: null,
+		_now: options.now ?? Date.now,
+		_pendingColorReset: false,
 		_titleNotifyTimer: null,
 		_writeCoalescer: null,
 		_diagnosisLogged: false,
@@ -393,6 +469,7 @@ export function createTransport(
 		_resumeListener: null,
 		_disposeFocusListeners: null,
 		_visible: true,
+		_backgrounded: false,
 	};
 }
 
@@ -413,6 +490,10 @@ function forceReconnect(transport: TerminalTransport) {
 	if (transport._terminated) return;
 	const socket = transport._socket;
 	if (!socket) return;
+	if (transport._backgrounded) {
+		park(transport);
+		return;
+	}
 	transport._diagnosisLogged = false;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
@@ -548,6 +629,7 @@ export function connect(
 	wsUrl: string,
 ) {
 	const base = stripToken(wsUrl);
+	transport._backgrounded = false;
 
 	// Idempotent: a live socket already pointed at this endpoint just needs the
 	// latest token-bearing URL refreshed (the socket re-signs per dial anyway) —
@@ -609,7 +691,7 @@ export function connect(
 		return;
 	}
 
-	const socket = createRelaySocket({
+	const socket = transport._createSocket({
 		// buildUrl/getToken read transport state live, so a URL swap or token
 		// rotation is picked up on the next dial without recreating the socket.
 		buildUrl: () => {
@@ -672,6 +754,31 @@ export function connect(
 	attachSocketListeners(transport, terminal, socket);
 }
 
+export function sendColors(
+	transport: TerminalTransport,
+	theme: ITheme | undefined,
+	resetOverrides = false,
+): void {
+	if (!theme) return;
+	transport._pendingColorReset ||= resetOverrides;
+	const socket = transport._socket;
+	if (
+		transport.connectionState !== "open" ||
+		!socket ||
+		socket.readyState !== WebSocket.OPEN
+	)
+		return;
+	const colors = terminalQueryColors(theme);
+	socket.send(
+		JSON.stringify({
+			type: "colors",
+			colors,
+			resetOverrides: transport._pendingColorReset === true,
+		}),
+	);
+	transport._pendingColorReset = false;
+}
+
 function attachSocketListeners(
 	transport: TerminalTransport,
 	terminal: XTerm,
@@ -720,6 +827,11 @@ function attachSocketListeners(
 			return;
 		}
 
+		if (message.type === "size") {
+			setNarrowedByOtherClient(transport, message.cols < terminal.cols);
+			return;
+		}
+
 		if (message.type === "attached") {
 			transport.lastDiagnosis = null;
 			transport._diagnosisLogged = false;
@@ -730,14 +842,17 @@ function attachSocketListeners(
 			// A successful attach means the session exists again (re-created or
 			// respawned under the same id) — its scrollback is worth keeping.
 			transport.sessionEnded = false;
+			transport.exitStatus = null;
 			// Counting stays disarmed until this attach's `synced` arrives —
 			// bytes before it are host-synthesized (preamble/notice) or from a
 			// pre-seq host, and neither advances the stream position.
 			transport._seqCounting = false;
 			transport._bytesSinceAttach = false;
 			setConnectionState(transport, "open");
+			sendColors(transport, terminal.options?.theme);
 			sendVisibleState(transport);
 			sendResize(transport, terminal.cols, terminal.rows);
+			flushPendingInput(transport);
 			return;
 		}
 
@@ -811,15 +926,19 @@ function attachSocketListeners(
 		if (message.type === "exit") {
 			transport._writeCoalescer?.flushSync();
 			transport._terminated = true;
-			markSessionEnded(transport);
+			markSessionEnded(transport, {
+				exitCode: message.exitCode,
+				signal: message.signal,
+			});
 			transport.lastDiagnosis = {
 				category: "unknown",
 				message: `The terminal session ended (exit code ${message.exitCode}).`,
 			};
 			socket.close();
-			terminal.writeln(
-				`\r\n[terminal] exited with code ${message.exitCode} (signal ${message.signal})`,
-			);
+			const exitLine = `[terminal] exited with code ${message.exitCode} (signal ${message.signal})`;
+			if (lastNonEmptyLine(terminal) !== exitLine) {
+				terminal.writeln(`\r\n${exitLine}`);
+			}
 		}
 	});
 
@@ -831,6 +950,10 @@ function attachSocketListeners(
 		// Render whatever arrived before the close instead of holding it for a
 		// frame that may never come (e.g. hidden window).
 		transport._writeCoalescer?.flushSync();
+		if (transport._backgrounded) {
+			park(transport);
+			return;
+		}
 		// A connection that delivered bytes but never a `synced` was a pre-seq
 		// host (downgrade skew): those bytes advanced the xterm without
 		// advancing the anchor, so the anchor is poisoned — drop it rather
@@ -845,6 +968,7 @@ function attachSocketListeners(
 		// it set would make a later park() misread the ended connection's
 		// counted bytes as uncounted and drop a valid anchor.
 		transport._bytesSinceAttach = false;
+		setNarrowedByOtherClient(transport, false);
 		setConnectionState(transport, "closed");
 		// Per-connection outcome flags; consumed once per close.
 		const connAttached = transport._connAttached;
@@ -917,9 +1041,14 @@ function attachSocketListeners(
 
 	transport._onDataDisposable?.dispose();
 	transport._onDataDisposable = terminal.onData((data) => {
-		if (transport.connectionState !== "open") return;
-		if (socket.readyState !== WebSocket.OPEN) return;
-		socket.send(JSON.stringify({ type: "input", data }));
+		if (
+			transport.connectionState === "open" &&
+			socket.readyState === WebSocket.OPEN
+		) {
+			socket.send(JSON.stringify({ type: "input", data }));
+			return;
+		}
+		queuePendingInput(transport, data);
 	});
 }
 
@@ -940,6 +1069,7 @@ function attachSocketListeners(
  * bytes (or reanchors past the 2 MB ring), so parking loses nothing.
  */
 export function park(transport: TerminalTransport) {
+	transport._backgrounded = false;
 	// A pre-seq host (bytes delivered, `synced` never seen) cannot replay a
 	// parked gap: it ignores `?seq=` and `replay=0` suppresses its legacy
 	// FIFO replay, so closing this socket would silently drop everything
@@ -975,11 +1105,25 @@ export function park(transport: TerminalTransport) {
 
 	transport._onDataDisposable?.dispose();
 	transport._onDataDisposable = null;
+	transport._pendingInput = null;
 	transport._writeCoalescer?.dispose();
 	transport._writeCoalescer = null;
 	if (transport.connectionState !== "disconnected") {
 		setConnectionState(transport, "disconnected");
 	}
+}
+
+/** Like park(), but an open relay socket stays open for the next connect(). */
+export function background(transport: TerminalTransport) {
+	if (
+		transport._terminated ||
+		transport.connectionState !== "open" ||
+		!isRelayHostUrl(transport.currentUrl)
+	) {
+		park(transport);
+		return;
+	}
+	transport._backgrounded = true;
 }
 
 /**
@@ -1008,6 +1152,7 @@ export function disconnect(transport: TerminalTransport) {
 	}
 	transport._onDataDisposable?.dispose();
 	transport._onDataDisposable = null;
+	transport._pendingInput = null;
 	transport._writeCoalescer?.dispose();
 	transport._writeCoalescer = null;
 	transport.currentUrl = null;
@@ -1092,6 +1237,7 @@ export function disposeTransport(transport: TerminalTransport) {
 	}
 	transport._onDataDisposable?.dispose();
 	transport._onDataDisposable = null;
+	transport._pendingInput = null;
 	transport._writeCoalescer?.dispose();
 	transport._writeCoalescer = null;
 	transport.currentUrl = null;
@@ -1099,7 +1245,7 @@ export function disposeTransport(transport: TerminalTransport) {
 	transport._diagnosisLogged = false;
 	transport._terminated = false;
 	transport.sessionEnded = false;
-	transport._onSessionEnded = null;
+	transport.exitStatus = null;
 	transport.lastDiagnosis = null;
 	resetAttachRetryState(transport._attachRetry);
 	setTerminalTitle(transport, undefined);
@@ -1111,4 +1257,6 @@ export function disposeTransport(transport: TerminalTransport) {
 	transport.titleListeners.clear();
 	transport.logs = [];
 	transport.logListeners.clear();
+	transport.narrowedByOtherClient = false;
+	transport.narrowedListeners.clear();
 }

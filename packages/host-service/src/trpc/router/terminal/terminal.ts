@@ -1,4 +1,5 @@
-import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/terminal-session-handoff";
+import { TERMINAL_HANDOFF_MAX_CHARS } from "@superset/shared/session-handoff";
+import { terminalColorsSchema } from "@superset/shared/terminal-colors";
 import { normalizeTerminalTitle } from "@superset/shared/terminal-title-scanner";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -14,13 +15,13 @@ import {
 	listLiveTerminalSessions,
 	parseThemeType,
 	renameTerminalSession,
-	sendAgentMessage,
 	sessionHasRunningProcess,
 	snapshotSession,
 	transcriptSession,
 	writeFramedInputToSession,
 	writeInputToSession,
 } from "../../../terminal/terminal";
+import { sendToAgent } from "../../../terminal-agents/send-to-agent";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { toTerminalSessionError } from "./errors";
@@ -38,6 +39,7 @@ export const createSessionInputSchema = z.object({
 		.transform((value) => (value ? value : undefined)),
 	cwd: z.string().optional(),
 	themeType: z.string().optional(),
+	colors: terminalColorsSchema.optional(),
 	cols: z.number().int().positive().optional(),
 	rows: z.number().int().positive().optional(),
 });
@@ -54,6 +56,7 @@ async function createTerminalSessionFromInput({
 		terminalId,
 		workspaceId: input.workspaceId,
 		themeType: parseThemeType(input.themeType),
+		colors: input.colors,
 		db: ctx.db,
 		eventBus: ctx.eventBus,
 		initialCommand: input.initialCommand,
@@ -190,12 +193,15 @@ export const terminalRouter = router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			const message = { ...input, db: ctx.db, eventBus: ctx.eventBus };
-			const binding = ctx.terminalAgentStore.get(input.terminalId);
+			const binding = ctx.terminalAgentStore.getChatOrTerminalAgent(
+				input.terminalId,
+			);
 			const result =
 				binding && binding.endedAt === undefined
-					? await sendAgentMessage({
+					? await sendToAgent({
 							...message,
 							terminalAgentStore: ctx.terminalAgentStore,
+							chatRuntime: () => ctx.runtime.chat?.(),
 						})
 					: await writeFramedInputToSession(message);
 			if ("error" in result) {

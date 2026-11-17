@@ -31,13 +31,6 @@ export function AddRepositoryModals() {
 					if (!open) close();
 				}}
 				onSuccess={handleProjectCreated}
-				onError={(message) =>
-					toast.error(
-						t({
-							message: `Create failed: ${message}`,
-						}),
-					)
-				}
 			/>
 			<NewProjectModal
 				open={active.kind === "new-project"}
@@ -59,13 +52,6 @@ export function AddRepositoryModals() {
 					if (!open) close();
 				}}
 				onCreated={handleProjectCreated}
-				onError={(message) =>
-					toast.error(
-						t({
-							message: `Create failed: ${message}`,
-						}),
-					)
-				}
 			/>
 		</>
 	);

@@ -1,23 +1,13 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
+import { LinearWebhookClient } from "@linear/sdk/webhooks";
+import * as webhookDelivery from "@/lib/ingest/recordWebhookDelivery";
+import { stub } from "../../../../../../test/stub";
+import * as processDelivery from "./processDelivery";
+import * as queue from "./queue";
 
-mock.module("@/env", () => ({
-	env: { LINEAR_WEBHOOK_SECRET: "test-secret" },
-}));
-
-mock.module("@linear/sdk/webhooks", () => ({
-	LINEAR_WEBHOOK_SIGNATURE_HEADER: "linear-signature",
-	LinearWebhookClient: class {
-		parseData(body: Buffer) {
-			return JSON.parse(body.toString());
-		}
-	},
-}));
-
-// Verified as a Hookdeck delivery, which is the path that skips Linear's own
-// signature. What this file is about is what happens after verification.
-mock.module("@/lib/webhooks/hookdeck", () => ({
-	verifyHookdeckDelivery: () => "verified",
-}));
+stub(LinearWebhookClient.prototype, {
+	parseData: (body: Buffer) => JSON.parse(body.toString()),
+});
 
 let recorded: {
 	id: string;
@@ -27,27 +17,27 @@ let recorded: {
 } | null = null;
 let recordCalls = 0;
 let recordThrows: Error | null = null;
-mock.module("@/lib/ingest/recordWebhookDelivery", () => ({
+stub(webhookDelivery, {
 	recordWebhookDelivery: mock(async () => {
 		recordCalls += 1;
 		if (recordThrows) throw recordThrows;
 		return recorded;
 	}),
-}));
+});
 
 let subscribed = true;
-mock.module("./processDelivery", () => ({
+stub(processDelivery, {
 	hasActiveSubscriber: mock(async () => subscribed),
-}));
+});
 
 let enqueued: unknown[] = [];
 let enqueueThrows: Error | null = null;
-mock.module("./queue", () => ({
+stub(queue, {
 	enqueueLinearDelivery: mock(async (work: unknown) => {
 		if (enqueueThrows) throw enqueueThrows;
 		enqueued.push(work);
 	}),
-}));
+});
 
 const { POST } = await import("./route");
 
@@ -64,7 +54,7 @@ const RECEIVED_AT = new Date("2026-09-07T10:00:00.123Z");
 function request(headers: Record<string, string> = {}): Request {
 	return new Request("http://localhost/api/integrations/linear/webhook", {
 		method: "POST",
-		headers: { "x-hookdeck-signature": "sig", ...headers },
+		headers: { "linear-signature": "sig", ...headers },
 		body: JSON.stringify(PAYLOAD),
 	});
 }
@@ -160,7 +150,7 @@ describe("linear webhook acceptance", () => {
 		const response = await POST(
 			new Request("http://localhost/api/integrations/linear/webhook", {
 				method: "POST",
-				headers: { "x-hookdeck-signature": "sig" },
+				headers: { "linear-signature": "sig" },
 				body: "{not json",
 			}),
 		);

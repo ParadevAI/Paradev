@@ -1,15 +1,18 @@
 import type { RendererContext } from "@superset/panes";
+import { cn } from "@superset/ui/utils";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useCallback, useEffect } from "react";
 import { FileSaveConflictDialog } from "renderer/components/FileSaveConflictDialog";
 import { MarkdownResourceProvider } from "renderer/components/MarkdownRenderer/providers/MarkdownResourceProvider";
 import type { LinkAction } from "renderer/lib/clickPolicy";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { getPathDirectory } from "shared/absolute-paths";
 import { useStore } from "zustand";
 import {
 	decodeBase64,
 	useSharedFileDocument,
 } from "../../../../state/fileDocumentStore";
+import { fileAutoSave } from "../../../../state/fileDocumentStore/fileAutoSave";
 import type { FilePaneData, PaneViewerData } from "../../../../types";
 import { runUrlLinkAction } from "../../utils/runTerminalLinkAction";
 import { ErrorState } from "./components/ErrorState";
@@ -22,9 +25,15 @@ import { resolveActivePaneView } from "./registry";
 interface FilePaneProps {
 	context: RendererContext<PaneViewerData>;
 	workspaceId: string;
+	/** Right pane file view: room for the breadcrumb, and a click inside pins the preview. */
+	inRightPane?: boolean;
 }
 
-export function FilePane({ context, workspaceId }: FilePaneProps) {
+export function FilePane({
+	context,
+	workspaceId,
+	inRightPane = false,
+}: FilePaneProps) {
 	const data = context.pane.data as FilePaneData;
 	const { filePath } = data;
 	const isActiveTab = useStore(
@@ -36,6 +45,14 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 		workspaceId,
 		absolutePath: filePath,
 	});
+
+	const documentId = document.id;
+	useEffect(
+		() => () => {
+			if (context.isActive) fileAutoSave.onFocusChange(documentId);
+		},
+		[context.isActive, documentId],
+	);
 
 	// Images a markdown file points at load through the workspace
 	// filesystem, so they work for cloud sandboxes and never put a raw path
@@ -97,11 +114,12 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 		[context.actions, data],
 	);
 
+	const rightPane = useRightPaneLinkTarget();
 	const handleOpenUrl = useCallback(
 		(url: string, action: LinkAction) => {
-			runUrlLinkAction({ store: context.store }, url, action);
+			runUrlLinkAction({ store: context.store, rightPane }, url, action);
 		},
-		[context.store],
+		[context.store, rightPane],
 	);
 
 	const handlePositionRevealed = useCallback(() => {
@@ -148,7 +166,17 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 	const ViewRenderer = activeView.Renderer;
 
 	return (
-		<div className="flex h-full w-full flex-col">
+		<div
+			className="flex h-full w-full flex-col"
+			onPointerDownCapture={() => {
+				if (inRightPane && !context.pane.pinned) context.actions.pin();
+			}}
+			onBlurCapture={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+					fileAutoSave.onFocusChange(documentId);
+				}
+			}}
+		>
 			<FileSaveConflictDialog
 				open={document.conflict !== null && context.isActive && isActiveTab}
 				filePath={filePath}
@@ -182,7 +210,13 @@ export function FilePane({ context, workspaceId }: FilePaneProps) {
 					onDismiss={() => document.clearSaveError()}
 				/>
 			)}
-			<div className="min-h-0 min-w-0 flex-1">
+			<div
+				className={cn(
+					"relative min-h-0 min-w-0 flex-1",
+					inRightPane &&
+						(activeView.id === "code" ? "[&_.cm-scroller]:pt-10" : "pt-10"),
+				)}
+			>
 				<MarkdownResourceProvider
 					documentDirectory={getPathDirectory(document.absolutePath)}
 					rootPath={workspaceQuery.data?.worktreePath ?? undefined}

@@ -4,11 +4,13 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import { useVisibleSidebarWorkspaceIds } from "renderer/routes/_authenticated/hooks/useVisibleSidebarWorkspaceIds";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import {
 	HostNotificationSubscriber,
 	type HostNotificationWorkspaceState,
@@ -46,6 +48,8 @@ export function NotificationController() {
 	const relayUrl = useRelayUrl();
 	const visibleWorkspaceIds = useVisibleSidebarWorkspaceIds();
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
+	const isRightAreaOpen = useUserPreferences().preferences.rightSidebarOpen;
+	const isPerWorkspaceRightArea = useRightPaneAreaEnabled() === true;
 	const allWorkspaceHosts = useMemo<WorkspaceHostRow[]>(
 		() =>
 			hostWorkspaces.map((workspace) => ({
@@ -68,6 +72,8 @@ export function NotificationController() {
 				.select(({ workspaceLocalState }) => ({
 					workspaceId: workspaceLocalState.workspaceId,
 					paneLayout: workspaceLocalState.paneLayout,
+					rightPaneLayout: workspaceLocalState.rightPaneLayout,
+					rightSidebarOpen: workspaceLocalState.rightSidebarOpen,
 				})),
 		[collections],
 	);
@@ -90,8 +96,15 @@ export function NotificationController() {
 			getNotificationWorkspaceStatesById({
 				workspaceHosts,
 				localWorkspaceRows,
+				isRightAreaOpen,
+				isPerWorkspaceRightArea,
 			}),
-		[workspaceHosts, localWorkspaceRows],
+		[
+			workspaceHosts,
+			localWorkspaceRows,
+			isRightAreaOpen,
+			isPerWorkspaceRightArea,
+		],
 	);
 	const hostGroups = useMemo(
 		() =>
@@ -121,18 +134,36 @@ export function NotificationController() {
 function getNotificationWorkspaceStatesById({
 	workspaceHosts,
 	localWorkspaceRows,
+	isRightAreaOpen,
+	isPerWorkspaceRightArea,
 }: {
 	workspaceHosts: WorkspaceHostRow[];
 	localWorkspaceRows: Array<{
 		workspaceId: string;
 		paneLayout: unknown;
+		rightPaneLayout?: unknown;
+		rightSidebarOpen?: boolean;
 	}>;
+	isRightAreaOpen: boolean;
+	isPerWorkspaceRightArea: boolean;
 }): Map<string, HostNotificationWorkspaceState> {
 	const paneLayoutsByWorkspaceId = new Map(
 		localWorkspaceRows.map((row) => [
 			row.workspaceId,
 			row.paneLayout as WorkspaceState<PaneViewerData>,
 		]),
+	);
+	const rightPaneLayoutsByWorkspaceId = new Map(
+		localWorkspaceRows
+			.filter((row) =>
+				isPerWorkspaceRightArea
+					? (row.rightSidebarOpen ?? false)
+					: isRightAreaOpen,
+			)
+			.map((row) => [
+				row.workspaceId,
+				row.rightPaneLayout as WorkspaceState<PaneViewerData> | undefined,
+			]),
 	);
 
 	const statesById = new Map<string, HostNotificationWorkspaceState>(
@@ -142,6 +173,8 @@ function getNotificationWorkspaceStatesById({
 				workspaceId: row.workspaceId,
 				workspaceName: "Workspace",
 				paneLayout: paneLayoutsByWorkspaceId.get(row.workspaceId) ?? null,
+				rightPaneLayout:
+					rightPaneLayoutsByWorkspaceId.get(row.workspaceId) ?? null,
 			},
 		]),
 	);
@@ -152,6 +185,8 @@ function getNotificationWorkspaceStatesById({
 			workspaceName: getNotificationWorkspaceName(workspace),
 			projectName: workspace.projectName,
 			paneLayout: paneLayoutsByWorkspaceId.get(workspace.workspaceId) ?? null,
+			rightPaneLayout:
+				rightPaneLayoutsByWorkspaceId.get(workspace.workspaceId) ?? null,
 		});
 	}
 

@@ -9,6 +9,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
+import { cn } from "@superset/ui/utils";
 import { useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Settings } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -18,6 +19,7 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { useBuiltinPresets } from "renderer/hooks/useBuiltinPresets";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
@@ -79,6 +81,7 @@ export function PresetsBar({
 }: PresetsBarProps) {
 	const navigate = useNavigate();
 	const isDark = useIsDarkTheme();
+	const isParadevShell = useParadevShell();
 	const collections = useCollections();
 	const { activeHostUrl } = useLocalHostService();
 	const { data: agents } = useAgentConfigs(activeHostUrl);
@@ -230,7 +233,10 @@ export function PresetsBar({
 
 	return (
 		<div
-			className="flex h-10 min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto overflow-y-hidden bg-background px-2"
+			className={cn(
+				"flex h-10 min-w-0 shrink-0 items-center gap-1.5 overflow-x-auto overflow-y-hidden px-2",
+				!isParadevShell && "bg-background",
+			)}
 			style={{ scrollbarWidth: "none" }}
 		>
 			<DropdownMenu>

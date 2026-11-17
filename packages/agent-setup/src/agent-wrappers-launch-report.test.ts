@@ -91,7 +91,7 @@ function readNotifyLog(scenario: Scenario): string {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe("wrapper launch report", () => {
-	it("emits SessionStart at launch and skips help/version/fast-exit/non-Superset runs", async () => {
+	it("emits SessionStart at launch and skips help/version/fast-exit/non-Paradev runs", async () => {
 		// The report is liveness-gated behind a real 2s delay, so run every
 		// scenario concurrently to keep the suite fast.
 		const longRun = `sleep ${(REPORT_DELAY_MS + 1200) / 1000}`;

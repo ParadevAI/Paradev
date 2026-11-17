@@ -1,7 +1,6 @@
 export {
 	CLOUD_UPLOAD_TARGET,
-	useFileIdsForHost,
-	useUploadStateFor,
+	type UploadState,
 } from "./store";
 export {
 	type UseUploadAttachmentsApi,

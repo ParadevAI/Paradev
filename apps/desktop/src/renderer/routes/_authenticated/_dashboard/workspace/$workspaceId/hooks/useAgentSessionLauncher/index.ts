@@ -1,2 +1,6 @@
-export type { CreateNewAgentSession } from "./useAgentSessionLauncher";
+export type {
+	CreateNewAgentSession,
+	CreateNewAgentSessionInput,
+	OpenAgentChat,
+} from "./useAgentSessionLauncher";
 export { useAgentSessionLauncher } from "./useAgentSessionLauncher";

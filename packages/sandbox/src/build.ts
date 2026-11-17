@@ -3,7 +3,7 @@
  *
  *   dist/bundle/<sha256>/
  *     setup, steps/, rootfs/          copied
- *     rootfs/etc/superset/contract.sh rendered from @superset/shared/sandbox-contract
+ *     rootfs/etc/superset/contract.sh rendered from @superset/shared/sandbox/contract
  *     tools.tsv, assets.tsv, steps.tsv derived
  *   dist/bundle.tar.gz                the same tree, named by its sha in the bucket
  *
@@ -26,7 +26,7 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { renderContractShell } from "@superset/shared/sandbox-contract";
+import { renderContractShell } from "@superset/shared/sandbox/contract";
 import { bucketFromEnv, contentTypeFor } from "./bucket";
 import {
 	type Assets,
@@ -77,14 +77,18 @@ export function buildBundle(): BuiltBundle {
 
 	const assets = loadAssets(join(BUNDLE_SRC, "assets.json"));
 	const tools = walkRootfs(join(staging, "rootfs"));
+	const declaredSteps = loadSteps(join(BUNDLE_SRC, "steps.json"));
 	const steps = deriveStepVersions({
-		steps: loadSteps(join(BUNDLE_SRC, "steps.json")),
+		steps: declaredSteps,
 		assets,
 		tools,
 		stepsDir: join(staging, "steps"),
 	});
 	writeFileSync(join(staging, "tools.tsv"), renderToolsTsv(tools));
-	writeFileSync(join(staging, "assets.tsv"), renderAssetsTsv(assets));
+	writeFileSync(
+		join(staging, "assets.tsv"),
+		renderAssetsTsv(assets, declaredSteps),
+	);
 	writeFileSync(join(staging, "steps.tsv"), renderStepsTsv(steps));
 
 	// A reproducible tarball, written here rather than by the system tar so the
@@ -140,14 +144,22 @@ export async function publishBundle(
 
 	for (const { key, name } of missing) {
 		const cached = join(ASSET_CACHE, key);
-		if (!existsSync(cached)) {
+		const source = built.assets[name]?.source;
+		let bytes: Uint8Array;
+		if (existsSync(cached)) {
+			bytes = readFileSync(cached);
+		} else if (source) {
+			const response = await fetch(source);
+			if (!response.ok)
+				throw new Error(`asset ${name}: ${source} returned ${response.status}`);
+			bytes = new Uint8Array(await response.arrayBuffer());
+		} else {
 			throw new Error(
 				`asset ${name} (${key}) is not in the bucket and not in ${ASSET_CACHE}; run \`bun run assets ${name}\` to produce it`,
 			);
 		}
-		const bytes = readFileSync(cached);
 		if (sha256(bytes) !== built.assets[name]?.sha256) {
-			throw new Error(`cached ${key} does not hash to its manifest row`);
+			throw new Error(`${key} does not hash to its manifest row`);
 		}
 		await bucket.put(key, bytes, contentTypeFor(built.assets[name].suffix));
 		console.log(`uploaded ${name} -> ${bucket.url(key)}`);

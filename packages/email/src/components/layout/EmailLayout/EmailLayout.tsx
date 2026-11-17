@@ -11,7 +11,7 @@ import {
 	Text,
 } from "@react-email/components";
 import { Tailwind } from "@react-email/tailwind";
-import { COMPANY } from "@superset/shared/constants";
+import { CANONICAL_URLS, COMPANY } from "@superset/shared/constants";
 import type { ReactNode } from "react";
 import { env } from "../../../lib/env";
 
@@ -89,7 +89,7 @@ export function EmailLayout({
 							padding: "40px 24px 48px",
 						}}
 					>
-						<Img src={`${assets}/logo-full.png`} alt="Superset" width="116" />
+						<Img src={`${assets}/logo-full.png`} alt="Paradev" width="116" />
 
 						<Section style={{ paddingTop: "32px" }}>{children}</Section>
 
@@ -104,7 +104,7 @@ export function EmailLayout({
 							<Link href={COMPANY.APP_STORE_URL}>
 								<Img
 									src={`${assets}/badge-appstore.png`}
-									alt="Download Superset on the App Store"
+									alt="Download Paradev on the App Store"
 									width="108"
 									height="32"
 									style={{ display: "inline-block" }}
@@ -113,15 +113,15 @@ export function EmailLayout({
 						</Section>
 						<Text style={footerText}>
 							<Link
-								href="https://superset.sh"
+								href={CANONICAL_URLS.MARKETING}
 								style={{
 									color: emailTheme.colors.faint,
 									textDecoration: "none",
 								}}
 							>
-								Superset
+								{COMPANY.LEGAL_NAME}
 							</Link>
-							, Inc., San Francisco, CA
+							, San Francisco, CA
 						</Text>
 						{recipientEmail || unsubscribeUrl ? (
 							<Text style={footerText}>

@@ -6,7 +6,7 @@ import { env } from "@/env";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 import { runPayloadSchema } from "../../runPayloadSchema";
 
-export const maxDuration = 60;
+export const maxDuration = 120;
 export const dynamic = "force-dynamic";
 
 export async function POST(
@@ -36,6 +36,9 @@ export async function POST(
 
 	if (!automation) {
 		return Response.json({ ok: true, skipped: "deleted" });
+	}
+	if (automation.archivedAt) {
+		return Response.json({ ok: true, skipped: "archived" });
 	}
 	if (!automation.enabled) {
 		return Response.json({ ok: true, skipped: "disabled" });

@@ -1,84 +1,78 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useDeferredValue, useEffect, useRef } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef } from "react";
 import { WorkspacesBoard } from "./components/WorkspacesBoard";
 import { WorkspacesHeader } from "./components/WorkspacesHeader";
+import {
+	VIEWS_PANEL_ID,
+	viewTabId,
+} from "./components/WorkspacesHeader/components/V2WorkspacesViewsBar";
 import { WorkspacesList } from "./components/WorkspacesList";
 import { useAccessibleWorkspaces } from "./hooks/useAccessibleWorkspaces";
 import {
-	DEVICE_FILTER_THIS_DEVICE,
+	BUILT_IN_VIEW_ALL,
+	BUILT_IN_VIEW_CLOUD,
 	useWorkspacesFilterStore,
-	V2_WORKSPACES_AGENT_STATUS_FILTERS,
-	V2_WORKSPACES_ARCHIVED_WINDOWS,
-	V2_WORKSPACES_PIN_FILTERS,
-	V2_WORKSPACES_PR_STATE_FILTERS,
-	type WorkspacesAgentStatusFilter,
-	type WorkspacesArchivedWindow,
-	type WorkspacesPinFilter,
-	type WorkspacesPrStateFilter,
+	type V2WorkspacesGroupBy,
+	type V2WorkspacesOrderBy,
 	type WorkspacesViewMode,
+	WHERE_FILTER_ANYWHERE,
 } from "./stores/workspacesFilterStore";
+import { deriveBoardColumn } from "./utils/deriveBoardColumn";
+import {
+	hydrateFiltersFromSearch,
+	parseGroupBy,
+	parseOrderBy,
+} from "./utils/parseWorkspacesSearch";
 
 export type WorkspacesSearch = {
 	q?: string;
-	device?: string;
+	/** A WHERE_FILTER_* sentinel or a machine id; omitted = anywhere. */
+	where?: string;
 	/** Comma-joined project ids; may include the `__sessions__` sentinel. */
 	projects?: string;
-	/** Comma-joined PR states. */
-	pr?: string;
-	/** Comma-joined agent statuses. */
-	agent?: string;
 	/** Comma-joined creator user ids. */
 	creators?: string;
-	/** Sidebar pin visibility; omitted = "all". */
-	pin?: WorkspacesPinFilter;
+	/** Comma-joined status buckets (board column keys). */
+	status?: string;
 	view?: WorkspacesViewMode;
-	archived?: WorkspacesArchivedWindow;
+	group?: V2WorkspacesGroupBy;
+	order?: V2WorkspacesOrderBy;
+	/** A built-in view id or a saved view's id; omitted = All. */
+	tab?: string;
+	/** Archived tombstones shown; omitted = hidden. */
+	archived?: true;
 };
 
-function parseList<T extends string>(
-	raw: unknown,
-	allowed?: readonly T[],
-): T[] {
-	if (typeof raw !== "string" || !raw) return [];
-	const entries = raw.split(",").filter(Boolean);
-	return (
-		allowed ? entries.filter((entry) => allowed.includes(entry as T)) : entries
-	) as T[];
-}
-
-export const Route = createFileRoute("/_authenticated/_dashboard/workspaces/")({
+export const Route = createFileRoute(
+	"/_authenticated/_dashboard/workspaces/",
+)({
 	component: WorkspacesPage,
 	validateSearch: (search: Record<string, unknown>): WorkspacesSearch => ({
 		q: typeof search.q === "string" && search.q ? search.q : undefined,
-		device:
-			typeof search.device === "string" && search.device
-				? search.device
+		where:
+			typeof search.where === "string" && search.where
+				? search.where
 				: undefined,
 		projects:
 			typeof search.projects === "string" && search.projects
 				? search.projects
 				: undefined,
-		pr: typeof search.pr === "string" && search.pr ? search.pr : undefined,
-		agent:
-			typeof search.agent === "string" && search.agent
-				? search.agent
-				: undefined,
 		creators:
 			typeof search.creators === "string" && search.creators
 				? search.creators
 				: undefined,
-		pin: V2_WORKSPACES_PIN_FILTERS.includes(search.pin as WorkspacesPinFilter)
-			? (search.pin as WorkspacesPinFilter)
-			: undefined,
+		status:
+			typeof search.status === "string" && search.status
+				? search.status
+				: undefined,
 		view:
 			search.view === "board" || search.view === "list"
 				? search.view
 				: undefined,
-		archived: V2_WORKSPACES_ARCHIVED_WINDOWS.includes(
-			search.archived as WorkspacesArchivedWindow,
-		)
-			? (search.archived as WorkspacesArchivedWindow)
-			: undefined,
+		group: parseGroupBy(search.group),
+		order: parseOrderBy(search.order),
+		tab: typeof search.tab === "string" && search.tab ? search.tab : undefined,
+		archived: search.archived === true ? true : undefined,
 	}),
 });
 
@@ -87,23 +81,24 @@ function WorkspacesPage() {
 	const navigate = useNavigate({ from: Route.fullPath });
 
 	const searchQuery = useWorkspacesFilterStore((state) => state.searchQuery);
-	const deviceFilter = useWorkspacesFilterStore((state) => state.deviceFilter);
+	const whereFilter = useWorkspacesFilterStore((state) => state.whereFilter);
 	const projectFilters = useWorkspacesFilterStore(
 		(state) => state.projectFilters,
-	);
-	const prStateFilters = useWorkspacesFilterStore(
-		(state) => state.prStateFilters,
-	);
-	const agentStatusFilters = useWorkspacesFilterStore(
-		(state) => state.agentStatusFilters,
 	);
 	const creatorFilters = useWorkspacesFilterStore(
 		(state) => state.creatorFilters,
 	);
-	const pinFilter = useWorkspacesFilterStore((state) => state.pinFilter);
+	const statusFilters = useWorkspacesFilterStore(
+		(state) => state.statusFilters,
+	);
+	const showArchived = useWorkspacesFilterStore(
+		(state) => state.showArchived,
+	);
 	const viewMode = useWorkspacesFilterStore((state) => state.viewMode);
-	const archivedWindow = useWorkspacesFilterStore(
-		(state) => state.archivedWindow,
+	const groupBy = useWorkspacesFilterStore((state) => state.groupBy);
+	const orderBy = useWorkspacesFilterStore((state) => state.orderBy);
+	const activeViewId = useWorkspacesFilterStore(
+		(state) => state.activeViewId,
 	);
 
 	// URL → store, once per mount, and only for params the URL actually
@@ -118,30 +113,13 @@ function WorkspacesPage() {
 		hydratedRef.current = true;
 		useWorkspacesFilterStore.setState({
 			searchQuery: search.q ?? "",
-			...(search.device !== undefined && { deviceFilter: search.device }),
-			...(search.projects !== undefined && {
-				projectFilters: parseList(search.projects),
-			}),
-			...(search.pr !== undefined && {
-				prStateFilters: parseList<WorkspacesPrStateFilter>(
-					search.pr,
-					V2_WORKSPACES_PR_STATE_FILTERS,
-				),
-			}),
-			...(search.agent !== undefined && {
-				agentStatusFilters: parseList<WorkspacesAgentStatusFilter>(
-					search.agent,
-					V2_WORKSPACES_AGENT_STATUS_FILTERS,
-				),
-			}),
-			...(search.creators !== undefined && {
-				creatorFilters: parseList(search.creators),
-			}),
-			...(search.pin !== undefined && { pinFilter: search.pin }),
+			...hydrateFiltersFromSearch(
+				search,
+				useWorkspacesFilterStore.getState().savedViews,
+			),
 			...(search.view !== undefined && { viewMode: search.view }),
-			...(search.archived !== undefined && {
-				archivedWindow: search.archived,
-			}),
+			...(search.group !== undefined && { groupBy: search.group }),
+			...(search.order !== undefined && { orderBy: search.order }),
 		});
 	}
 
@@ -154,23 +132,20 @@ function WorkspacesPage() {
 			const syncUrl = navigate({
 				search: {
 					q: searchQuery || undefined,
-					device:
-						deviceFilter !== DEVICE_FILTER_THIS_DEVICE
-							? deviceFilter
-							: undefined,
+					where:
+						whereFilter !== WHERE_FILTER_ANYWHERE ? whereFilter : undefined,
 					projects: projectFilters.length
 						? projectFilters.join(",")
-						: undefined,
-					pr: prStateFilters.length ? prStateFilters.join(",") : undefined,
-					agent: agentStatusFilters.length
-						? agentStatusFilters.join(",")
 						: undefined,
 					creators: creatorFilters.length
 						? creatorFilters.join(",")
 						: undefined,
-					pin: pinFilter !== "all" ? pinFilter : undefined,
-					view: viewMode !== "board" ? viewMode : undefined,
-					archived: archivedWindow !== "none" ? archivedWindow : undefined,
+					status: statusFilters.length ? statusFilters.join(",") : undefined,
+					tab: activeViewId !== BUILT_IN_VIEW_ALL ? activeViewId : undefined,
+					view: viewMode !== "list" ? viewMode : undefined,
+					group: groupBy !== "none" ? groupBy : undefined,
+					order: orderBy !== "activity" ? orderBy : undefined,
+					archived: showArchived ? true : undefined,
 				},
 				replace: true,
 			});
@@ -182,14 +157,15 @@ function WorkspacesPage() {
 	}, [
 		navigate,
 		searchQuery,
-		deviceFilter,
+		whereFilter,
 		projectFilters,
-		prStateFilters,
-		agentStatusFilters,
 		creatorFilters,
-		pinFilter,
+		statusFilters,
+		activeViewId,
 		viewMode,
-		archivedWindow,
+		groupBy,
+		orderBy,
+		showArchived,
 	]);
 
 	// Deferred so per-keystroke filtering leaves the input's critical path:
@@ -205,18 +181,38 @@ function WorkspacesPage() {
 		creatorOptions,
 		hostsById,
 		projectsById,
+		cloudEnabled,
 	} = useAccessibleWorkspaces({
 		searchQuery: deferredSearchQuery,
-		deviceFilter,
+		whereFilter,
 		projectFilters,
-		prStateFilters,
-		agentStatusFilters,
 		creatorFilters,
-		pinFilter,
-		// Tombstones ride along so both views' Merged/Deleted groups work;
-		// each view scopes them by the shared archived window.
-		includeArchived: true,
+		includeArchived: showArchived,
 	});
+
+	// No cloud in this org: the Cloud tab is hidden, so land on All but keep
+	// whatever filters the link carried (the host source already reads an
+	// unavailable cloud place as Anywhere).
+	const setActiveViewId = useWorkspacesFilterStore(
+		(state) => state.setActiveViewId,
+	);
+	useEffect(() => {
+		if (activeViewId === BUILT_IN_VIEW_CLOUD && isReady && !cloudEnabled) {
+			setActiveViewId(BUILT_IN_VIEW_ALL);
+		}
+	}, [activeViewId, isReady, cloudEnabled, setActiveViewId]);
+
+	// Status buckets are derived per row, so they filter here rather than in
+	// the hook, which only knows about sources and identities.
+	const byStatus = useMemo(
+		() =>
+			statusFilters.length === 0
+				? all
+				: all.filter((workspace) =>
+						statusFilters.includes(deriveBoardColumn(workspace)),
+					),
+		[all, statusFilters],
+	);
 
 	// Re-rendering hundreds of rows takes hundreds of ms; deferring keeps
 	// filter menus and checkboxes painting instantly while the list catches
@@ -224,7 +220,7 @@ function WorkspacesPage() {
 	// deferred values flip in the same background render, whereas a sync
 	// isReady=true against still-empty deferred rows would flash the empty
 	// state while the first rows are being rendered.
-	const deferredWorkspaces = useDeferredValue(all);
+	const deferredWorkspaces = useDeferredValue(byStatus);
 	const deferredIsReady = useDeferredValue(isReady);
 
 	return (
@@ -235,18 +231,26 @@ function WorkspacesPage() {
 				creatorOptions={creatorOptions}
 				hostsById={hostsById}
 				projectsById={projectsById}
+				cloudEnabled={cloudEnabled}
 			/>
-			{viewMode === "board" ? (
-				<WorkspacesBoard
-					workspaces={deferredWorkspaces}
-					isReady={deferredIsReady}
-				/>
-			) : (
-				<WorkspacesList
-					workspaces={deferredWorkspaces}
-					isReady={deferredIsReady}
-				/>
-			)}
+			<div
+				role="tabpanel"
+				id={VIEWS_PANEL_ID}
+				aria-labelledby={viewTabId(activeViewId)}
+				className="flex min-h-0 flex-1 flex-col"
+			>
+				{viewMode === "board" ? (
+					<WorkspacesBoard
+						workspaces={deferredWorkspaces}
+						isReady={deferredIsReady}
+					/>
+				) : (
+					<WorkspacesList
+						workspaces={deferredWorkspaces}
+						isReady={deferredIsReady}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }

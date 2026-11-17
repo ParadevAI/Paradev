@@ -58,6 +58,7 @@ export function CodeView({
 			key={document.id}
 			value={document.content.value}
 			language={detectLanguage(filePath)}
+			filePath={filePath}
 			onChange={(next) => document.setContent(next)}
 			onSave={() => void document.save()}
 			editorRef={editorRef}

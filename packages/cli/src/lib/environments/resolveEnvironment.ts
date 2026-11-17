@@ -1,4 +1,5 @@
 import { CLIError } from "@superset/cli-framework";
+import { describeEnvironments } from "@superset/shared/cloud-environments";
 import type { ApiClient } from "../api-client";
 
 export interface ResolvedEnvironment {
@@ -7,8 +8,8 @@ export interface ResolvedEnvironment {
 }
 
 /**
- * The environment a command acts on, by id or name. Nothing requested is
- * only unambiguous when the organization has one environment.
+ * The environment a command acts on, by id. Nothing requested is only
+ * unambiguous when the organization has one environment.
  */
 export async function resolveEnvironment(
 	api: ApiClient,
@@ -19,7 +20,7 @@ export async function resolveEnvironment(
 	if (environments.length === 0) {
 		throw new CLIError(
 			"No environments in this organization",
-			"Create one in Settings → Environments",
+			"Create one with: superset environments create",
 		);
 	}
 	const [only] = environments;
@@ -27,19 +28,16 @@ export async function resolveEnvironment(
 		if (only && environments.length === 1) return only;
 		throw new CLIError(
 			"Several environments in this organization",
-			`Pass --environment with one of: ${environments.map((environment) => environment.name).join(", ")}`,
+			`Pass --environment with one of: ${describeEnvironments(environments)}`,
 		);
 	}
-	const wanted = requested.trim().toLowerCase();
 	const selected = environments.find(
-		(environment) =>
-			environment.id.toLowerCase() === wanted ||
-			environment.name.toLowerCase() === wanted,
+		(environment) => environment.id === requested.trim(),
 	);
 	if (!selected) {
 		throw new CLIError(
-			`No environment "${requested}" in this organization`,
-			`Environments: ${environments.map((environment) => environment.name).join(", ")}`,
+			`No environment ${requested} in this organization`,
+			`Environments: ${describeEnvironments(environments)}`,
 		);
 	}
 	return selected;

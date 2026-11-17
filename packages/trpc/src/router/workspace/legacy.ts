@@ -4,10 +4,11 @@ import { v2WorkspaceTypeValues } from "@superset/db/enums";
 import type { SelectV2Workspace } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
-import { jwtProcedure, protectedProcedure } from "../../trpc";
+import { organizationOrFirst } from "../../lib/cloud-guards";
+import { personProcedure } from "../../trpc";
 
 export const legacyWorkspaceRouter = {
-	list: jwtProcedure
+	list: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -31,7 +32,8 @@ export const legacyWorkspaceRouter = {
 				}>
 			> => [],
 		),
-	create: jwtProcedure
+
+	create: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -59,7 +61,7 @@ export const legacyWorkspaceRouter = {
 					name: input.name,
 					branch: input.branch,
 					type: input.type,
-					createdByUserId: ctx.userId,
+					createdByUserId: ctx.principal.userId,
 					taskId: input.taskId ?? null,
 					createdAt: now,
 					updatedAt: now,
@@ -68,7 +70,7 @@ export const legacyWorkspaceRouter = {
 			},
 		),
 
-	setTask: protectedProcedure
+	setTask: personProcedure
 		.input(
 			z.object({
 				workspaceId: z.string().uuid(),
@@ -76,7 +78,8 @@ export const legacyWorkspaceRouter = {
 			}),
 		)
 		.mutation(async () => ({ success: true as const, txid: null })),
-	update: protectedProcedure
+
+	update: personProcedure
 		.input(
 			z.object({
 				id: z.string().uuid(),
@@ -94,7 +97,7 @@ export const legacyWorkspaceRouter = {
 				const now = new Date();
 				return {
 					id: input.id,
-					organizationId: ctx.activeOrganizationId ?? "",
+					organizationId: organizationOrFirst(ctx) ?? "",
 					projectId: "",
 					hostId: input.hostId ?? "",
 					name: input.name ?? "",
@@ -108,7 +111,8 @@ export const legacyWorkspaceRouter = {
 				};
 			},
 		),
-	getFromHost: jwtProcedure
+
+	getFromHost: personProcedure
 		.input(
 			z.object({
 				organizationId: z.string().uuid(),
@@ -116,7 +120,8 @@ export const legacyWorkspaceRouter = {
 			}),
 		)
 		.query(async (): Promise<SelectV2Workspace | null> => null),
-	updateNameFromHost: jwtProcedure
+
+	updateNameFromHost: personProcedure
 		.input(
 			z
 				.object({
@@ -135,10 +140,12 @@ export const legacyWorkspaceRouter = {
 			branch: input.branch ?? "",
 			txid: null,
 		})),
-	delete: jwtProcedure
+
+	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async () => ({ success: true, alreadyGone: true as const })),
-	deleteMainForHost: jwtProcedure
+
+	deleteMainForHost: personProcedure
 		.input(z.object({ id: z.string().uuid(), projectId: z.string().uuid() }))
 		.mutation(async () => ({ success: true, alreadyGone: true as const })),
 } satisfies TRPCRouterRecord;

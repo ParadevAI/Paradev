@@ -1,3 +1,4 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
@@ -47,6 +48,9 @@ export interface WorkspaceHostResult {
 	cloud: CloudWorkspaceRow | null;
 	/** Cloud only: the API could not address or wake the sandbox. Attempts continue. */
 	sandboxUnreachable: boolean;
+	/** Cloud only: addressed, but not yet woken since it was opened. */
+	sandboxWaking: boolean;
+	sandboxRefusal: string | null;
 	retrySandbox: () => void;
 	/** True while no host has answered yet. */
 	isResolving: boolean;
@@ -73,8 +77,9 @@ export function useWorkspaceHost(
 	);
 	const {
 		target: sandbox,
-		isReady: sandboxReady,
 		isError: sandboxUnreachable,
+		isWaking: sandboxWaking,
+		refusalMessage: sandboxRefusal,
 		retry: retrySandbox,
 	} = useSandboxAccess(cloud);
 
@@ -115,32 +120,32 @@ export function useWorkspaceHost(
 			// the workspace; the sandbox's own row is scratch that a rename
 			// never reaches. Live git state still comes from the sandbox.
 			const workspace = servedRow ? { ...servedRow, name: cloud.name } : null;
+			const host: OrgHost | null = sandbox
+				? {
+						organizationId: cloud.organizationId,
+						machineId: cloud.id,
+						name: "Cloud",
+						version: null,
+						platform: null,
+						installSource: null,
+						allowCloudWorkspaces: false,
+						// A sandbox is reachable or it isn't; there is no offline
+						// device behind it to report on.
+						isOnline: true,
+					}
+				: null;
 			return {
 				workspace,
-				host: workspace
-					? {
-							organizationId: cloud.organizationId,
-							machineId: cloud.id,
-							name: "Cloud",
-							version: null,
-							platform: null,
-							installSource: null,
-							// A sandbox is reachable or it isn't; there is no offline
-							// device behind it to report on.
-							isOnline: true,
-						}
-					: null,
+				host,
 				cloud,
-				sandboxUnreachable:
-					!workspace && (sandboxUnreachable || served?.isError === true),
+				sandboxUnreachable: !host && sandboxUnreachable,
+				sandboxWaking,
+				sandboxRefusal,
 				retrySandbox: () => {
 					retrySandbox();
 					void served?.refetch();
 				},
-				isResolving:
-					!workspace &&
-					cloud.status === "ready" &&
-					(!sandboxReady || served?.isLoading === true),
+				isResolving: !host && isLiveCloudWorkspaceStatus(cloud.status),
 			};
 		}
 		let workspace: HostWorkspaceRow | null = null;
@@ -163,14 +168,17 @@ export function useWorkspaceHost(
 			host,
 			cloud: null,
 			sandboxUnreachable: false,
+			sandboxWaking: false,
+			sandboxRefusal: null,
 			retrySandbox,
 			isResolving,
 		};
 	}, [
 		cloud,
 		sandbox,
-		sandboxReady,
 		sandboxUnreachable,
+		sandboxWaking,
+		sandboxRefusal,
 		retrySandbox,
 		targets,
 		queries,

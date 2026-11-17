@@ -4,6 +4,8 @@ import {
 } from "./agent-setup-targets";
 import {
 	cleanupGlobalOpenCodePlugin,
+	createAgyHooksJson,
+	createAgyWrapper,
 	createAmpPlugin,
 	createAmpWrapper,
 	createClaudeSettingsJson,
@@ -34,10 +36,13 @@ import {
 	createMuseWrapper,
 	createOmpExtension,
 	createOpenCodePlugin,
+	createOpenCodeTuiPlugin,
 	createOpenCodeWrapper,
 	createPiExtension,
+	createUfoWrapper,
 	createVibeHooksToml,
 	createVibeWrapper,
+	removeAgyManagedHooks,
 	removeAmpPlugin,
 	removeClaudeManagedHooks,
 	removeCodexManagedHooks,
@@ -50,6 +55,7 @@ import {
 	removeMastraManagedHooks,
 	removeMuseManagedHooks,
 	removeOmpExtension,
+	removeOpenCodeTuiPlugin,
 	removePiExtension,
 	removeVibeManagedHooks,
 } from "./agent-wrappers";
@@ -73,7 +79,7 @@ interface AgentSetupDefinition {
 	/**
 	 * Removes Superset's footprint from the agent's global config when the
 	 * user disables its hook integration. Wrappers and scripts under
-	 * ~/.superset/ stay — they are Superset-owned and inert outside its
+	 * ~/.paradev/ stay — they are Superset-owned and inert outside its
 	 * terminals. Absent when the agent has no global footprint (Copilot,
 	 * OpenCode).
 	 */
@@ -101,7 +107,12 @@ const AGENT_SETUP_DEFINITIONS: Record<
 		teardown: [removeDroidManagedHooks],
 	},
 	opencode: {
-		setup: [createOpenCodePlugin, createOpenCodeWrapper],
+		setup: [
+			createOpenCodePlugin,
+			createOpenCodeTuiPlugin,
+			createOpenCodeWrapper,
+		],
+		teardown: [removeOpenCodeTuiPlugin],
 	},
 	omp: {
 		setup: [createOmpExtension],
@@ -157,6 +168,13 @@ const AGENT_SETUP_DEFINITIONS: Record<
 			createMuseWrapper,
 		],
 		teardown: [removeMuseManagedHooks],
+	},
+	ufo: {
+		setup: [createUfoWrapper],
+	},
+	agy: {
+		setup: [createAgyHooksJson, createAgyWrapper],
+		teardown: [removeAgyManagedHooks],
 	},
 };
 

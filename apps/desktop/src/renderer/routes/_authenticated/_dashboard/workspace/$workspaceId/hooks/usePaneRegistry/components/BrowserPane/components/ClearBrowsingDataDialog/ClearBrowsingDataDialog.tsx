@@ -87,7 +87,7 @@ export function ClearBrowsingDataDialog({
 			const failedLabels = failed.map((task) => task.label).join(", ");
 			toast.error(
 				t({
-					message: `Cleared ${succeededLabels} — could not clear ${failedLabels}`,
+					message: `Cleared ${succeededLabels}. Could not clear ${failedLabels}`,
 				}),
 			);
 		} else {
@@ -129,7 +129,7 @@ export function ClearBrowsingDataDialog({
 							onCheckedChange={(v) => setClearCookies(v === true)}
 						/>
 						<Label htmlFor="clear-cookies" className="font-normal">
-							<Trans>Cookies and site data — signs you out of most sites</Trans>
+							<Trans>Cookies and site data (signs you out of most sites)</Trans>
 						</Label>
 					</div>
 					<div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import {
 	resetManagedEnvForTests,
 	setManagedEnv,
 	waitForManagedEnv,
+	waitForSandboxManagedEnv,
 } from "./sandbox-managed-env";
 
 afterEach(() => resetManagedEnvForTests());
@@ -29,6 +30,27 @@ describe("the managed environment", () => {
 		setManagedEnv({});
 		expect(getManagedEnv()).toEqual({});
 		expect(hasManagedEnv()).toBe(true);
+	});
+
+	test("sandbox agent launches wait before reading the managed environment", async () => {
+		let released = false;
+		const waiting = waitForSandboxManagedEnv(100, "sandbox").then(() => {
+			released = true;
+			return getManagedEnv();
+		});
+		await Promise.resolve();
+		expect(released).toBe(false);
+		await setManagedEnv({ SUPERSET_TEST_MANAGED_VALUE: "ready" });
+		expect(await waiting).toEqual({ SUPERSET_TEST_MANAGED_VALUE: "ready" });
+	});
+
+	test("local agent launches do not wait for a sandbox environment", async () => {
+		expect(await waitForSandboxManagedEnv(100, "local")).toBe(true);
+		expect(hasManagedEnv()).toBe(false);
+	});
+
+	test("the sandbox launch wait uses the supplied timeout", async () => {
+		expect(await waitForSandboxManagedEnv(0, "sandbox")).toBe(false);
 	});
 
 	test("what callers get is a copy", () => {

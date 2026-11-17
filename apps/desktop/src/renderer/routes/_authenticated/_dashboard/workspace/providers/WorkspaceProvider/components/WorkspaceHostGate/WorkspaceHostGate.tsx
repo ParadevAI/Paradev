@@ -1,16 +1,13 @@
-import { useLingui } from "@lingui/react/macro";
-import { i18n } from "@superset/i18n";
-import { useWorkspaceHostUrl } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import type { HostShapedWorkspace } from "renderer/hooks/host-workspaces/useHostWorkspaces";
-import { useKnownHosts } from "renderer/hooks/known-hosts/useKnownHosts";
-import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useSandboxAccess } from "renderer/routes/_authenticated/providers/SandboxAccessProvider";
-import { useHostReachability } from "../../../../hooks/useHostReachability";
-import { LOCAL_HOST_SERVICE_DETAIL } from "../../utils/localHostServiceDetail";
-import { HostConnectionStrip } from "./components/HostConnectionStrip";
+import { AgentCredentialsChangedBanner } from "./components/AgentCredentialsChangedBanner";
+import { BoxOutOfMemoryBanner } from "./components/BoxOutOfMemoryBanner";
+import { CloudUsageRefusedBanner } from "./components/CloudUsageRefusedBanner";
+import { CloudUsageStoppingBanner } from "./components/CloudUsageStoppingBanner";
 
-/** Keeps loaded panes accessible while reporting the shared host connection. */
+/** Keeps loaded panes accessible while reporting cloud workspace limits. */
 export function WorkspaceHostGate({
 	workspace,
 	children,
@@ -18,66 +15,30 @@ export function WorkspaceHostGate({
 	workspace: HostShapedWorkspace;
 	children: ReactNode;
 }) {
-	const { t } = useLingui();
-	const hostUrl = useWorkspaceHostUrl();
-	const { machineId, hostServiceStatus } = useLocalHostService();
-
-	const isLocalRestartInFlight =
-		workspace.hostId === machineId && hostServiceStatus === "starting";
-	const {
-		isDegraded,
-		isAccessDenied,
-		isReconnecting,
-		hasConnected,
-		detail,
-		retry,
-	} = useHostReachability(hostUrl);
-	const { hosts: hostRows } = useKnownHosts();
-	const { targets: sandboxes } = useSandboxAccess();
-	const isSandbox = sandboxes.some(
-		(sandbox) => sandbox.workspaceId === workspace.hostId,
-	);
-
-	const hostRow =
-		hostRows.find(
-			(host) =>
-				host.organizationId === workspace.organizationId &&
-				host.machineId === workspace.hostId,
-		) ?? null;
-	const hostName = isSandbox
-		? t({ message: "Cloud workspace" })
-		: (hostRow?.name ??
-			(workspace.hostId === machineId
-				? t({ message: "This device" })
-				: t({
-						message: "Unknown host",
-					})));
+	const { agentCredentialsChangedWorkspaceId, usageRefusal } =
+		useSandboxAccess();
+	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
+	const cloudRow = cloudWorkspaces?.find((row) => row.id === workspace.hostId);
+	const isCloudWorkspace = Boolean(cloudRow);
+	const stoppingAtLimit = Boolean(cloudRow?.usageStopAt);
 
 	// The wrapper renders unconditionally — dropping it when the host is
 	// reachable would move `children` in the tree and remount the whole
 	// workspace on every reconnect.
 	return (
-		<div className="relative flex min-h-0 min-w-0 flex-1">
+		<div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
 			<div className="flex min-h-0 min-w-0 flex-1">{children}</div>
-			{isDegraded || isAccessDenied ? (
-				<HostConnectionStrip
-					settingsHostId={isSandbox ? null : workspace.hostId}
-					hostName={hostName}
-					isAccessDenied={isAccessDenied}
-					detail={
-						isLocalRestartInFlight
-							? i18n._(LOCAL_HOST_SERVICE_DETAIL.starting)
-							: isSandbox && !isAccessDenied
-								? t({
-										message:
-											"This cloud workspace is waking up, which can take up to 30 seconds after it has been idle.",
-									})
-								: detail
-					}
-					isReconnecting={isReconnecting}
-					hasConnected={hasConnected}
-					isLocalRestartInFlight={isLocalRestartInFlight}
-					onRetry={retry}
+			{agentCredentialsChangedWorkspaceId === workspace.hostId ? (
+				<AgentCredentialsChangedBanner workspaceId={workspace.hostId} />
+			) : null}
+			{isCloudWorkspace ? (
+				<BoxOutOfMemoryBanner workspaceId={workspace.hostId} />
+			) : null}
+			{stoppingAtLimit ? <CloudUsageStoppingBanner /> : null}
+			{usageRefusal?.workspaceId === workspace.hostId ? (
+				<CloudUsageRefusedBanner
+					workspaceId={workspace.hostId}
+					error={usageRefusal.error}
 				/>
 			) : null}
 		</div>

@@ -6,17 +6,20 @@ import { LuCornerDownLeft, LuLoaderCircle } from "react-icons/lu";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
-import { AgentPickerSelect } from "./components/AgentPickerSelect";
-import { AgentPlacementToggle } from "./components/AgentPlacementToggle";
 import {
+	AgentSessionPicker,
 	type AgentTarget,
-	useDiffCommentTarget,
-} from "./hooks/useDiffCommentTarget";
+	useAgentSessionTarget,
+} from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 
-export type { AgentTarget } from "./hooks/useDiffCommentTarget";
+export type {
+	AgentSessionPlacement,
+	AgentTarget,
+} from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 
 interface AgentCommentComposerProps {
 	workspaceId: string;
+	preferredTerminalId?: string;
 	/** Short description of what the comment is anchored to ("Lines 3–7",
 	 *  a selected element, …), shown in the composer header. */
 	contextLabel: string;
@@ -31,6 +34,7 @@ interface AgentCommentComposerProps {
 
 export function AgentCommentComposer({
 	workspaceId,
+	preferredTerminalId,
 	contextLabel,
 	placeholder,
 	submitLabel,
@@ -60,8 +64,11 @@ export function AgentCommentComposer({
 	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const { data: configs = [] } = useAgentConfigs(hostUrl);
 
-	const { value, placement, resolved, onValueChange, onPlacementChange } =
-		useDiffCommentTarget({ sessions, configs });
+	const { value, resolved, onValueChange } = useAgentSessionTarget({
+		sessions,
+		configs,
+		preferredTerminalId,
+	});
 
 	const [comment, setComment] = useState("");
 	const [submitting, setSubmitting] = useState(false);
@@ -77,7 +84,6 @@ export function AgentCommentComposer({
 
 	const canSubmit =
 		comment.trim().length > 0 && !submitting && resolved != null;
-	const showPlacement = resolved?.kind === "new";
 
 	const handleSubmit = async () => {
 		if (!canSubmit || !resolved) return;
@@ -140,18 +146,13 @@ export function AgentCommentComposer({
 			</div>
 
 			<div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 bg-muted/30 px-2.5 py-1.5">
-				<AgentPickerSelect
+				<AgentSessionPicker
+					workspaceId={workspaceId}
 					value={value}
 					onValueChange={onValueChange}
 					sessions={sessions}
 					configs={configs}
 				/>
-				{showPlacement ? (
-					<AgentPlacementToggle
-						value={placement}
-						onValueChange={onPlacementChange}
-					/>
-				) : null}
 				<div className="ml-auto flex items-center gap-1">
 					<Button
 						type="button"

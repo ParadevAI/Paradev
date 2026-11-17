@@ -1,0 +1,8 @@
+{
+	"ios": {
+		"NSSpeechRecognitionUsageDescription": "Superset використовує розпізнавання мовлення, щоб перетворювати ваш голос на текст.",
+		"NSPhotoLibraryUsageDescription": "Superset потрібен доступ до вашої фотобібліотеки, щоб ви могли прикріплювати зображення до повідомлень у чаті.",
+		"NSCameraUsageDescription": "Superset використовує камеру, щоб ви могли прикріплювати фото до повідомлень у чаті.",
+		"NSMicrophoneUsageDescription": "Superset використовує мікрофон, щоб ви могли диктувати повідомлення в чаті."
+	}
+}

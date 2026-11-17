@@ -3,11 +3,12 @@ import { command } from "../../../../lib/command";
 import { resolveEnvironment } from "../../../../lib/environments";
 
 export default command({
+	sandbox: false,
 	description: "Delete a variable from an environment",
 	args: [positional("name").required().desc("Variable name")],
 	options: {
 		environment: string().desc(
-			"Environment (id or name); required when the organization has several",
+			"Environment ID (see: superset environments list); required when the organization has several",
 		),
 	},
 	run: async ({ ctx, args, options }) => {

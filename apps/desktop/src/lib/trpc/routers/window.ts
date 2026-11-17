@@ -29,7 +29,13 @@ export const createWindowRouter = () => {
 		// Windows and Linux draw the window-controls overlay; its colours follow
 		// the app theme rather than the OS.
 		setTitleBarOverlay: publicProcedure
-			.input(z.object({ color: z.string(), symbolColor: z.string() }))
+			.input(
+				z.object({
+					color: z.string(),
+					symbolColor: z.string(),
+					height: z.number().int().positive().optional(),
+				}),
+			)
 			.mutation(({ ctx, input }) => {
 				const window = ctx.senderWindow;
 				if (!window || process.platform === "darwin") return { success: false };

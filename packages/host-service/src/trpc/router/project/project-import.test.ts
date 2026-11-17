@@ -12,6 +12,7 @@ import * as schema from "../../../db/schema";
 import { projects, workspaces } from "../../../db/schema";
 import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
+import { insertLocalWorkspace } from "../../../workspaces/local-workspace-store";
 import { createCallerFactory } from "../../index";
 import { workspaceCreationRouter } from "../workspace-creation/workspace-creation";
 import { createFromImportLocal } from "./handlers";
@@ -287,5 +288,98 @@ describe("detached-HEAD repos (v1 importer)", () => {
 		expect(created.type).toBe("local");
 		expect(created.branch).toBe(branch);
 		expect(created.worktreePath).toBe(root);
+	});
+});
+
+describe("listProjectWorktrees", () => {
+	it("reports the id of the workspace that tracks each worktree", async () => {
+		const db = createTestDb();
+		const { api } = createRecordingApiStub();
+		const ctx = createTestContext(db, api);
+		const root = await createTempGitRepo();
+		const worktreePath = join(root, "..", `${randomUUID()}-feature`);
+		tempRepoDirs.push(worktreePath);
+		await createUserSimpleGit(root).raw([
+			"worktree",
+			"add",
+			"-b",
+			"feature",
+			worktreePath,
+		]);
+		const { projectId } = await createFromImportLocal(ctx, {
+			name: "Worktrees",
+			repoPath: root,
+		});
+		const caller = createCallerFactory(workspaceCreationRouter)(ctx);
+		const feature = async () =>
+			(await caller.listProjectWorktrees({ projectId })).worktrees.find(
+				(w) => w.branch === "feature",
+			);
+
+		expect(await feature()).toMatchObject({
+			hasWorkspace: false,
+			workspaceId: null,
+		});
+
+		const row = insertLocalWorkspace(ctx, {
+			projectId,
+			worktreePath,
+			branch: "feature",
+			name: "feature",
+		});
+		expect(await feature()).toMatchObject({
+			hasWorkspace: true,
+			workspaceId: row.id,
+		});
+	});
+});
+
+describe("a deleted project on the same repo", () => {
+	async function setUpThenDelete() {
+		const db = createTestDb();
+		const { api } = createRecordingApiStub();
+		const ctx = createTestContext(db, api);
+		const caller = createCallerFactory(projectRouter)(ctx);
+		const root = await createTempGitRepo();
+		const deleted = await createFromImportLocal(ctx, {
+			name: "Deleted",
+			repoPath: root,
+		});
+		await caller.remove({ projectId: deleted.projectId });
+		const projectId = randomUUID();
+		await caller.setup({
+			projectId,
+			origin: { name: "From other machine" },
+			mode: { kind: "import", repoPath: root },
+		});
+		return { db, ctx, caller, root, deletedId: deleted.projectId, projectId };
+	}
+
+	it("does not block setting up the repo as another project", async () => {
+		const { db, deletedId, projectId, root } = await setUpThenDelete();
+
+		const live = db.select().from(projects).where(eq(projects.id, projectId));
+		expect(live.get()?.repoPath).toBe(root);
+		expect(live.get()?.deletedAt).toBeNull();
+		const old = db.select().from(projects).where(eq(projects.id, deletedId));
+		expect(old.get()?.deletedAt).not.toBeNull();
+	});
+
+	it("refuses to restore the deleted project while the repo belongs to another", async () => {
+		const { caller, deletedId } = await setUpThenDelete();
+
+		await expect(caller.restore({ projectId: deletedId })).rejects.toThrow(
+			"Repository is already set up as another project on this device.",
+		);
+	});
+
+	it("re-importing the folder returns the live project, not the deleted one", async () => {
+		const { ctx, root, projectId } = await setUpThenDelete();
+
+		const again = await createFromImportLocal(ctx, {
+			name: "Again",
+			repoPath: root,
+		});
+		expect(again.projectId).toBe(projectId);
 	});
 });

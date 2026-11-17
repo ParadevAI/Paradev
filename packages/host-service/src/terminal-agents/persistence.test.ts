@@ -9,8 +9,12 @@ import * as schema from "../db/schema";
 import { terminalAgentBindings, terminalSessions } from "../db/schema";
 import {
 	claimResumeCandidateBinding,
+	findMoveStoppedBinding,
 	findResumeCandidateBinding,
+	findResumedSuccessorTerminalId,
+	markMoveStoppedBindingResumedInto,
 	markTerminalAgentBindingEnded,
+	recordTerminalAgentTranscriptPath,
 	SqliteTerminalAgentBindingPersistence,
 	seedEndedTerminalAgentBinding,
 	unclaimResumeCandidateBinding,
@@ -545,4 +549,151 @@ it("does not hydrate a live binding with pending disposal intent", () => {
 		.where(eq(terminalSessions.id, "pending"))
 		.run();
 	expect(new SqliteTerminalAgentBindingPersistence(db).load()).toEqual([]);
+});
+
+describe("recordTerminalAgentTranscriptPath", () => {
+	function transcriptPathOf(db: HostDb, terminalId: string) {
+		return db
+			.select({ path: terminalAgentBindings.transcriptPath })
+			.from(terminalAgentBindings)
+			.where(eq(terminalAgentBindings.terminalId, terminalId))
+			.get()?.path;
+	}
+
+	it("stores the path only for the session the binding names", () => {
+		const db = createTestDb();
+		seedSession(db, { id: "t-1", status: "active", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ agentSessionId: "current" })
+			.where(eq(terminalAgentBindings.terminalId, "t-1"))
+			.run();
+
+		recordTerminalAgentTranscriptPath(db, {
+			terminalId: "t-1",
+			agentSessionId: "previous",
+			transcriptPath: "/home/a/.claude/projects/x/previous.jsonl",
+		});
+		expect(transcriptPathOf(db, "t-1")).toBeNull();
+
+		recordTerminalAgentTranscriptPath(db, {
+			terminalId: "t-1",
+			agentSessionId: "current",
+			transcriptPath: "/home/a/.claude/projects/x/current.jsonl",
+		});
+		expect(transcriptPathOf(db, "t-1")).toBe(
+			"/home/a/.claude/projects/x/current.jsonl",
+		);
+	});
+
+	it("clears the path when the terminal moves to another session", () => {
+		const db = createTestDb();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		db.insert(terminalSessions)
+			.values({
+				id: "t-1",
+				status: "active",
+				originWorkspaceId: "ws-1",
+				createdAt: 1,
+			})
+			.run();
+		const event = (agentSessionId: string, occurredAt: number) =>
+			store.recordEvent({
+				terminalId: "t-1",
+				workspaceId: "ws-1",
+				eventType: "Start",
+				agentId: "claude",
+				agentSessionId,
+				occurredAt,
+			});
+		event("s-1", 1);
+		recordTerminalAgentTranscriptPath(db, {
+			terminalId: "t-1",
+			agentSessionId: "s-1",
+			transcriptPath: "/home/a/.claude/projects/x/s-1.jsonl",
+		});
+		event("s-2", 2);
+		expect(transcriptPathOf(db, "t-1")).toBeNull();
+	});
+
+	it("survives the upsert every later hook event performs", () => {
+		const db = createTestDb();
+		const store = new TerminalAgentStore(
+			new SqliteTerminalAgentBindingPersistence(db),
+		);
+		db.insert(terminalSessions)
+			.values({
+				id: "t-1",
+				status: "active",
+				originWorkspaceId: "ws-1",
+				createdAt: 1,
+			})
+			.run();
+		store.recordEvent({
+			terminalId: "t-1",
+			workspaceId: "ws-1",
+			eventType: "Start",
+			agentId: "claude",
+			agentSessionId: "s-1",
+			occurredAt: 1,
+		});
+		recordTerminalAgentTranscriptPath(db, {
+			terminalId: "t-1",
+			agentSessionId: "s-1",
+			transcriptPath: "/home/a/.claude/projects/x/s-1.jsonl",
+		});
+		store.recordEvent({
+			terminalId: "t-1",
+			workspaceId: "ws-1",
+			eventType: "Stop",
+			agentId: "claude",
+			agentSessionId: "s-1",
+			occurredAt: 2,
+		});
+		expect(transcriptPathOf(db, "t-1")).toBe(
+			"/home/a/.claude/projects/x/s-1.jsonl",
+		);
+	});
+});
+
+describe("terminals stopped for a workspace move", () => {
+	const THIRTY_MINUTES = 30 * 60_000;
+
+	function stoppedTerminal(db: HostDb, endedAt: number) {
+		seedSession(db, { id: "term-1", status: "disposed", workspaceId: "ws-1" });
+		db.update(terminalAgentBindings)
+			.set({ agentSessionId: "claude-session-1" })
+			.where(eq(terminalAgentBindings.terminalId, "term-1"))
+			.run();
+		markTerminalAgentBindingEnded(db, "term-1", "disposed", endedAt);
+	}
+
+	it("reads the stop record from the database until it is too old", () => {
+		const db = createTestDb();
+		stoppedTerminal(db, 1_000_000);
+
+		const found = findMoveStoppedBinding(db, "ws-1", "term-1", 1_000_000 - 1);
+		expect(found).toMatchObject({
+			kind: "stopped",
+			binding: { terminalId: "term-1", agentSessionId: "claude-session-1" },
+		});
+		expect(
+			findMoveStoppedBinding(db, "ws-1", "term-1", 1_000_000 + THIRTY_MINUTES),
+		).toBeUndefined();
+		expect(findMoveStoppedBinding(db, "ws-2", "term-1", 0)).toBeUndefined();
+	});
+
+	it("answers a second release with the terminal the first one started", () => {
+		const db = createTestDb();
+		stoppedTerminal(db, 1_000_000);
+
+		markMoveStoppedBindingResumedInto(db, "term-1", "term-2");
+
+		expect(findMoveStoppedBinding(db, "ws-1", "term-1", 0)).toEqual({
+			kind: "resumed",
+			terminalId: "term-2",
+		});
+		expect(findResumedSuccessorTerminalId(db, "ws-1", "term-1")).toBe("term-2");
+	});
 });

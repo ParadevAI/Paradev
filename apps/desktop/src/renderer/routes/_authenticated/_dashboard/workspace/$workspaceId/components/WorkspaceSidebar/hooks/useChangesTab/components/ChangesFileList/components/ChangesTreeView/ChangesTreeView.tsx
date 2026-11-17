@@ -1,38 +1,32 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import type {
-	FileTreeDirectoryHandle,
-	FileTreeRowDecoration,
-	FileTreeRowDecorationContext,
 	ContextMenuItem as PierreContextMenuItem,
 	ContextMenuOpenContext as PierreContextMenuOpenContext,
 } from "@pierre/trees";
 import {
 	FileTree as PierreFileTree,
-	useFileTree as usePierreFileTree,
+	useFileTreeSelector,
 } from "@pierre/trees/react";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { Undo2 } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
 	ShadowClickHint,
 	useChangesSidebarFilePolicy,
 	usePierreChangesSidebarRowClickPolicy,
 } from "renderer/lib/clickPolicy";
-import { useFallthroughIcons } from "renderer/lib/fileIcons";
 import {
-	buildCollisionSafeTreePaths,
 	createPierreTreeStyle,
-	FILE_STATUS_TO_PIERRE,
-	formatDiffStats,
-	PIERRE_TREE_UNSAFE_CSS,
-	type PierreGitStatusEntry,
 	stripTrailingSlash,
 } from "renderer/lib/pierreTree";
-import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/DiscardConfirmDialog";
+import { DiscardConfirmDialog } from "renderer/routes/_authenticated/_dashboard/components/DiscardConfirmDialog";
+import { useChangedFilesTree } from "renderer/routes/_authenticated/_dashboard/hooks/useChangedFilesTree";
+import type { FoldSignal } from "renderer/routes/_authenticated/_dashboard/hooks/useFoldSignal";
 import { PierreRowContextMenu } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/PierreRowContextMenu";
+import { setFileDragData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/WorkspaceSidebar/utils/setFileDragData";
 import {
 	type ChangesetFile,
 	getChangesetFileKey,
@@ -41,8 +35,6 @@ import {
 	toAbsoluteWorkspacePath,
 	toRelativeWorkspacePath,
 } from "shared/absolute-paths";
-import type { FoldSignal } from "../../ChangesFileList";
-import { setFileDragData } from "../../hooks/useFileDrag";
 import { useStagingMutations } from "../../hooks/useStagingMutations";
 import { StageToggleButton } from "../StageToggleButton";
 import { FileRowContextMenuItems } from "./components/FileRowContextMenuItems";
@@ -51,17 +43,11 @@ import {
 	HOVER_ACTIONS_ROW_CSS,
 	ShadowRowHoverActions,
 } from "./components/ShadowRowHoverActions";
-import { useMeasuredTreeHeight } from "./hooks/useMeasuredTreeHeight";
-import { buildTreeShape } from "./utils/buildTreeShape";
 
-const ITEM_HEIGHT = 24;
-// Pierre rows carry `margin-block: 1px`, so each row occupies ITEM_HEIGHT + 2px.
-const ROW_BOX = ITEM_HEIGHT + 2;
 // Small cushion so the last row never clips against the host's `overflow: hidden`.
 const HEIGHT_CUSHION = 8;
 
 const TREE_STYLE = createPierreTreeStyle({
-	rowHeight: ITEM_HEIGHT,
 	levelIndent: 8,
 });
 
@@ -119,107 +105,31 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 	onOpenInEditor,
 }: ChangesTreeViewProps) {
 	const { t } = useLingui();
-	// A changeset can contain a path that is both a file and a directory of
-	// other entries (e.g. same-named file deleted + directory added). Pierre
-	// throws on that shape, so colliding file entries get disambiguated tree
-	// paths; map back through `toRealPath` before treating one as a file path.
-	const { treePaths, toTreePath, toRealPath } = useMemo(
-		() => buildCollisionSafeTreePaths(files.map((f) => f.path)),
-		[files],
-	);
-	const fileByTreePath = useMemo(() => {
-		const map = new Map<string, ChangesetFile>();
-		for (const file of files)
-			map.set(toTreePath.get(file.path) ?? file.path, file);
-		return map;
-	}, [files, toTreePath]);
-
-	const { dirs, dirFileCount } = useMemo(
-		() => buildTreeShape(treePaths),
-		[treePaths],
-	);
-
-	const initialGitStatusEntriesRef = useRef(
-		buildPierreGitStatus(files, toTreePath),
-	);
-
-	// Callbacks routed through a ref so Pierre's stable handler closures
-	// (resolved once at `useFileTree` time) always see the latest props.
-	const handlersRef = useRef({
-		onSelect(_path: string) {},
-		renderRowDecoration(
-			_ctx: FileTreeRowDecorationContext,
-		): FileTreeRowDecoration | null {
-			return null;
+	// Set when the user picks a row, so the echo below skips refocusing it.
+	const lastUserSelectRef = useRef<string | null>(null);
+	const { model, fileByTreePath, toTreePath, toRealPath } = useChangedFilesTree(
+		{
+			files,
+			foldSignal,
+			unsafeCSS: HOVER_ACTIONS_ROW_CSS,
+			onSelectFile: (file) => {
+				lastUserSelectRef.current = file.path;
+				onSelectFile?.(file.path, false, getChangesetFileKey(file));
+			},
 		},
-	});
+	);
 
-	const { model } = usePierreFileTree({
-		paths: treePaths,
-		initialExpansion: "open",
-		search: false,
-		unsafeCSS: PIERRE_TREE_UNSAFE_CSS + HOVER_ACTIONS_ROW_CSS,
-		gitStatus: initialGitStatusEntriesRef.current,
-		icons: { set: "complete", colored: true },
-		itemHeight: ITEM_HEIGHT,
-		overscan: 20,
-		stickyFolders: true,
-		onSelectionChange: (selected) => {
-			const last = selected[selected.length - 1];
-			if (!last || last.endsWith("/")) return;
-			handlersRef.current.onSelect(last);
-		},
-		renderRowDecoration: (ctx) => handlersRef.current.renderRowDecoration(ctx),
-	});
-
-	// Keep Pierre's path set in sync as files churn (stage/unstage, new edits).
-	useEffect(() => {
-		model.resetPaths(treePaths);
-	}, [model, treePaths]);
-
-	useEffect(() => {
-		model.setGitStatus(buildPierreGitStatus(files, toTreePath));
-	}, [model, files, toTreePath]);
-
-	useFallthroughIcons(model);
-
-	// Size the host to Pierre's measured content height (it renders `height:
-	// 100%`, which collapses to 0 inside this section's auto-height container);
-	// fall back to a row-count estimate until that first measurement lands.
-	const contentHeight = useMeasuredTreeHeight(model);
+	// Pierre's host renders `height: 100%`, which collapses to 0 inside this
+	// section's auto-height container, so size it to the visible rows.
 	const treeHeight =
-		contentHeight != null
-			? contentHeight + HEIGHT_CUSHION
-			: (dirs.length + treePaths.length) * ROW_BOX + HEIGHT_CUSHION;
-
-	const setAllDirsExpanded = useCallback(
-		(expanded: boolean) => {
-			for (const dir of dirs) {
-				const handle = model.getItem(`${dir}/`);
-				if (handle?.isDirectory() !== true) continue;
-				const dirHandle = handle as FileTreeDirectoryHandle;
-				if (dirHandle.isExpanded() === expanded) continue;
-				if (expanded) dirHandle.expand();
-				else dirHandle.collapse();
-			}
-		},
-		[model, dirs],
-	);
-
-	// React to expand-all / collapse-all from the toolbar (new signal only).
-	const lastFoldEpochRef = useRef(0);
-	useEffect(() => {
-		if (foldSignal.epoch === 0 || foldSignal.epoch === lastFoldEpochRef.current)
-			return;
-		lastFoldEpochRef.current = foldSignal.epoch;
-		setAllDirsExpanded(foldSignal.action === "expand");
-	}, [foldSignal, setAllDirsExpanded]);
+		useFileTreeSelector(model, (tree) => tree.getVisibleCount()) *
+			model.getItemHeight() +
+		HEIGHT_CUSHION;
 
 	// Echo the diff pane's open file back into the tree's selection — but only
 	// when it belongs to this section. `lastUserSelectRef` guards the loop:
 	// after the user clicks a row, the parent's selectedFilePath comes back to
 	// us and we must not re-focus (which would re-fire onSelectionChange).
-	const lastUserSelectRef = useRef<string | null>(null);
 	const selectedRelPath =
 		selectedFilePath && worktreePath
 			? toRelativeWorkspacePath(worktreePath, selectedFilePath)
@@ -247,31 +157,6 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 		}
 		model.focusPath(selectedTreePath);
 	}, [model, selectedRelPath, selectedChangeKey, fileByTreePath, toTreePath]);
-
-	handlersRef.current.onSelect = (treePath) => {
-		const realPath = toRealPath.get(treePath) ?? treePath;
-		lastUserSelectRef.current = realPath;
-		const file = fileByTreePath.get(treePath);
-		onSelectFile?.(
-			realPath,
-			false,
-			file ? getChangesetFileKey(file) : undefined,
-		);
-	};
-	// Pierre's row decoration accepts text or icon, not arbitrary JSX. The
-	// status indicator is already painted by `setGitStatus` (row tint + icon),
-	// so we contribute the `+N/−N` summary on files (uncolored — a library
-	// limitation) and the file count on directories.
-	handlersRef.current.renderRowDecoration = (ctx) => {
-		if (ctx.item.kind === "directory") {
-			const count = dirFileCount.get(stripTrailingSlash(ctx.item.path));
-			return count ? { text: String(count) } : null;
-		}
-		const file = fileByTreePath.get(ctx.item.path);
-		if (!file) return null;
-		const text = formatDiffStats(file.additions, file.deletions);
-		return text ? { text } : null;
-	};
 
 	const filePolicy = useChangesSidebarFilePolicy();
 	const { onClickCapture, findFileRow } = usePierreChangesSidebarRowClickPolicy(
@@ -516,13 +401,3 @@ export const ChangesTreeView = memo(function ChangesTreeView({
 		</div>
 	);
 });
-
-function buildPierreGitStatus(
-	files: ChangesetFile[],
-	toTreePath: Map<string, string>,
-): PierreGitStatusEntry[] {
-	return files.map((file) => ({
-		path: toTreePath.get(file.path) ?? file.path,
-		status: FILE_STATUS_TO_PIERRE[file.status],
-	}));
-}

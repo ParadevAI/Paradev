@@ -1,6 +1,7 @@
 import { FaSlack } from "react-icons/fa";
 import { ScopeChip } from "../../TriggerSentence/components/ScopeChip";
 import { TextFilterChip } from "../../TriggerSentence/components/TextFilterChip";
+import { AccountSlot } from "../components/AccountSlot";
 import { Sentence } from "../components/Sentence";
 import type { SentenceContext, TriggerProvider } from "../types";
 import { EmojiNameChip } from "./components/EmojiNameChip";
@@ -19,9 +20,11 @@ function renderSlot(
 	config: SlackConfig,
 	slot: Slot,
 	index: number,
-	{ set, mark, options, state, disabled }: SentenceContext,
+	{ set, mark, options, state, disabled, account }: SentenceContext,
 ) {
 	switch (slot) {
+		case "account":
+			return <AccountSlot key={index} before="on" account={account} />;
 		case "channels":
 			return (
 				<ScopeChip
@@ -162,7 +165,7 @@ export const slackProvider: TriggerProvider<SlackConfig> = {
 		if (outside.length === 0) return [];
 		const list = outside.join(", ");
 		return [
-			`This trigger will not run for messages in ${list} until @Superset is invited.`,
+			`This trigger will not run for messages in ${list} until @Paradev is invited.`,
 		];
 	},
 };

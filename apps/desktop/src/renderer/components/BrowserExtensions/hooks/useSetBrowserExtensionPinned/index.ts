@@ -1,0 +1,1 @@
+export { useSetBrowserExtensionPinned } from "./useSetBrowserExtensionPinned";

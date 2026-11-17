@@ -1,1 +1,4 @@
-export { sortDashboardSidebarProjects } from "./sortDashboardSidebarProjects";
+export {
+	sortDashboardSidebarProjectChildren,
+	sortDashboardSidebarProjects,
+} from "./sortDashboardSidebarProjects";

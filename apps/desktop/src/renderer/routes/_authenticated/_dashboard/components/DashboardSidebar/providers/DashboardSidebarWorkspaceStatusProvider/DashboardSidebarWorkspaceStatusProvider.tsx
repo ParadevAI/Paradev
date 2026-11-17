@@ -23,13 +23,11 @@ import {
 import { deriveTerminalAgentStatus } from "renderer/hooks/host-service/useTerminalAgentStatuses";
 import { getHostEventBus } from "renderer/lib/host-event-bus";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
+import { deriveWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/utils/deriveWorkspaceStatus";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useNotificationStore } from "renderer/stores/notifications";
-import {
-	type ActivePaneStatus,
-	getHighestPriorityStatus,
-	type PaneStatus,
-} from "shared/tabs-types";
+import type { ActivePaneStatus, PaneStatus } from "shared/tabs-types";
 
 interface SidebarWorkspaceStatusEntry {
 	/** Highest-priority attention status across the workspace's terminals. */
@@ -63,10 +61,22 @@ const EMPTY_ENTRY: SidebarWorkspaceStatusEntry = {
 class SidebarWorkspaceStatusStore {
 	private entries = new Map<string, SidebarWorkspaceStatusEntry>();
 	private listeners = new Map<string, Set<() => void>>();
+	private allListeners = new Set<() => void>();
 	private pendingChanged: string[] = [];
 
 	get(workspaceId: string): SidebarWorkspaceStatusEntry {
 		return this.entries.get(workspaceId) ?? EMPTY_ENTRY;
+	}
+
+	getAll(): ReadonlyMap<string, SidebarWorkspaceStatusEntry> {
+		return this.entries;
+	}
+
+	subscribeAll(listener: () => void): () => void {
+		this.allListeners.add(listener);
+		return () => {
+			this.allListeners.delete(listener);
+		};
 	}
 
 	subscribe(workspaceId: string, listener: () => void): () => void {
@@ -109,6 +119,7 @@ class SidebarWorkspaceStatusStore {
 			if (!set) continue;
 			for (const listener of [...set]) listener();
 		}
+		for (const listener of [...this.allListeners]) listener();
 	}
 }
 
@@ -234,14 +245,13 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		queries: targets.map((target) => ({
 			queryKey: getTerminalAgentBindingsQueryKey(target.workspaceId),
 			enabled: target.hostUrl !== null,
-			queryFn: () => {
-				if (!target.hostUrl) return [] as TerminalAgentBinding[];
-				return getHostServiceClientByUrl(
-					target.hostUrl,
-				).terminalAgents.listByWorkspace.query({
-					workspaceId: target.workspaceId,
-				});
-			},
+			queryFn: hostQueryFn(target.hostUrl, (hostUrl) =>
+				getHostServiceClientByUrl(hostUrl).terminalAgents.listByWorkspace.query(
+					{
+						workspaceId: target.workspaceId,
+					},
+				),
+			),
 			// Lifecycle events invalidate for instant updates; the finite
 			// staleTime lets focus/remount refetches self-heal any staleness
 			// from events missed while the WS was down (host restart, sleep).
@@ -345,35 +355,17 @@ export function DashboardSidebarWorkspaceStatusProvider({
 					}),
 				);
 			}
-			const hasManualUnread = Boolean(manualUnread[target.workspaceId]);
-			let hasAttentionTerminal = false;
-			for (const status of statuses.values()) {
-				if (status === "review" || status === "failed") {
-					hasAttentionTerminal = true;
-					break;
-				}
-			}
 			const report =
 				target.hostUrl === null
 					? reportedByWorkspaceId.get(target.workspaceId)
 					: undefined;
-			const reported =
-				report?.status === "review" &&
-				report.at !== null &&
-				(workspaceSeenAt[target.workspaceId] ?? 0) >= report.at
-					? null
-					: (report?.status ?? null);
 			const candidate: SidebarWorkspaceStatusEntry = {
-				status: getHighestPriorityStatus([
-					hasManualUnread ? "review" : undefined,
-					reported ?? undefined,
-					...statuses.values(),
-				]),
-				isUnread:
-					hasManualUnread ||
-					hasAttentionTerminal ||
-					reported === "review" ||
-					reported === "failed",
+				...deriveWorkspaceStatus({
+					terminalStatuses: statuses.values(),
+					hasManualUnread: Boolean(manualUnread[target.workspaceId]),
+					report,
+					seenAt: workspaceSeenAt[target.workspaceId],
+				}),
 				bindings,
 				statuses,
 				diffStats:
@@ -437,6 +429,17 @@ export function useSidebarWorkspaceStatus(
 			[store, workspaceId],
 		),
 		useCallback(() => store.get(workspaceId), [store, workspaceId]),
+	);
+}
+
+export function useSidebarWorkspaceStatuses(): ReadonlyMap<
+	string,
+	SidebarWorkspaceStatusEntry
+> {
+	const store = useSidebarWorkspaceStatusStore();
+	return useSyncExternalStore(
+		useCallback((listener) => store.subscribeAll(listener), [store]),
+		useCallback(() => store.getAll(), [store]),
 	);
 }
 

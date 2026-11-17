@@ -266,7 +266,7 @@ export function SparseCheckoutSection({
 					// otherwise fire one toast per attempt. Selectable per the
 					// renderer's body-level user-select: none.
 					<span className="select-text cursor-text text-destructive">
-						<Trans>Couldn't save — retrying…</Trans>
+						<Trans>Couldn't save. Retrying…</Trans>
 					</span>
 				)}
 				{saveStatus === "invalid" && (

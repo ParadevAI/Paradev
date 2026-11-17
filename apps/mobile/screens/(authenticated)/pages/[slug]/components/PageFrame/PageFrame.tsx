@@ -2,11 +2,11 @@ import {
 	FRAME_CHANNEL,
 	type FrameMessage,
 	HOST_CHANNEL,
-	type HostMessageBody,
 } from "@superset/shared/page-comments-runtime";
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import { useOpenLink } from "@/hooks/useOpenLink";
+import type { PageFrameHandle, PageFrameProps } from "./PageFrame.types";
 
 const BRIDGE = `(() => {
 	if (window.__supersetCommentBridge) return;
@@ -19,18 +19,6 @@ const BRIDGE = `(() => {
 })();
 true;`;
 
-export interface PageFrameHandle {
-	send: (message: HostMessageBody) => void;
-	reload: () => void;
-}
-
-interface PageFrameProps {
-	src: string;
-	onMessage: (message: FrameMessage) => void;
-	onLoadEnd: () => void;
-	onError: () => void;
-}
-
 function sameOrigin(url: string, src: string): boolean {
 	try {
 		return new URL(url).origin === new URL(src).origin;
@@ -40,8 +28,8 @@ function sameOrigin(url: string, src: string): boolean {
 }
 
 export const PageFrame = forwardRef<PageFrameHandle, PageFrameProps>(
-	function PageFrame({ src, onMessage, onLoadEnd, onError }, ref) {
-		const webViewRef = useRef<WebView>(null);
+	function PageFrame({ src, insetTop, onMessage, onLoadEnd, onError }, ref) {
+		const webViewRef = useRef<WebView<object>>(null);
 		const openLink = useOpenLink();
 
 		useImperativeHandle(ref, () => ({
@@ -66,7 +54,7 @@ export const PageFrame = forwardRef<PageFrameHandle, PageFrameProps>(
 		};
 
 		return (
-			<WebView
+			<WebView<object>
 				ref={webViewRef}
 				source={{ uri: src }}
 				style={{ flex: 1, backgroundColor: "transparent" }}
@@ -75,6 +63,9 @@ export const PageFrame = forwardRef<PageFrameHandle, PageFrameProps>(
 				onLoadEnd={onLoadEnd}
 				onError={onError}
 				onHttpError={onError}
+				contentInset={{ top: insetTop, left: 0, right: 0, bottom: 0 }}
+				contentInsetAdjustmentBehavior="never"
+				automaticallyAdjustContentInsets={false}
 				onShouldStartLoadWithRequest={(request) => {
 					if (!request.isTopFrame) return true;
 					if (sameOrigin(request.url, src)) return true;

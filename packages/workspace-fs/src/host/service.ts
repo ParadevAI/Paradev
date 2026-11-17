@@ -18,6 +18,10 @@ import {
 	writeFile,
 } from "../fs";
 import { normalizeAbsolutePath } from "../paths";
+import {
+	type FileReferenceMatch,
+	resolveFileReference,
+} from "../resolve-file-reference";
 import type { SearchContentOptions } from "../search";
 import { searchContent, searchFiles } from "../search";
 import type { FsWatchEvent } from "../types";
@@ -48,6 +52,12 @@ export interface FsHostService extends FsService {
 		absolutePath: string;
 		revision: string;
 	}): Promise<FsRemoveFileIfUnchangedResult>;
+
+	/** Host-only: finds the file a shortened or misplaced path refers to. */
+	resolveFileReference(input: {
+		reference: string;
+		preferredRelativePaths?: readonly string[];
+	}): Promise<FileReferenceMatch | null>;
 }
 
 export interface FsHostServiceOptions {
@@ -68,8 +78,12 @@ interface AsyncQueueState<T> {
 }
 
 function createAsyncQueue<T>(
-	subscribe: (push: (value: T) => void) => Promise<() => Promise<void>>,
+	subscribe: (
+		push: (value: T) => void,
+		signal: AbortSignal,
+	) => Promise<() => Promise<void>>,
 ): AsyncIterable<T> {
+	const controller = new AbortController();
 	const state: AsyncQueueState<T> = {
 		queue: [],
 		waiters: [],
@@ -82,6 +96,8 @@ function createAsyncQueue<T>(
 			return;
 		}
 		state.closed = true;
+		state.queue.length = 0;
+		controller.abort();
 		const cleanup = state.cleanup;
 		state.cleanup = null;
 		if (cleanup) {
@@ -107,7 +123,7 @@ function createAsyncQueue<T>(
 		}
 
 		state.queue.push(value);
-	})
+	}, controller.signal)
 		.then((cleanup) => {
 			if (state.closed) {
 				void cleanup().catch((error) => {
@@ -194,7 +210,6 @@ export function createFsHostService(
 
 		async writeFile(input) {
 			return await writeFile({
-				rootPath,
 				absolutePath: input.absolutePath,
 				content: input.content,
 				encoding: input.encoding,
@@ -272,6 +287,10 @@ export function createFsHostService(
 			return { matches };
 		},
 
+		resolveFileReference(input) {
+			return resolveFileReference({ rootPath, ...input });
+		},
+
 		async searchContent(input) {
 			const matches = await searchContent({
 				rootPath,
@@ -303,9 +322,11 @@ export function createFsHostService(
 				);
 			}
 
-			return createAsyncQueue<{ events: FsWatchEvent[] }>(async (push) => {
-				return await watcherManager.subscribe({ absolutePath }, push);
-			});
+			return createAsyncQueue<{ events: FsWatchEvent[] }>(
+				async (push, signal) => {
+					return await watcherManager.subscribe({ absolutePath, signal }, push);
+				},
+			);
 		},
 
 		async close() {

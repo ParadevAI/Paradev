@@ -3,6 +3,7 @@ import type { ExternalApp } from "@superset/local-db";
 import type { ElementType } from "react";
 import type { HotkeyId } from "renderer/hotkeys/registry";
 import type { HostServiceAvailabilityStatus } from "renderer/lib/host-service-unavailable";
+import type { SettingsSectionVisibility } from "renderer/routes/_authenticated/settings/utils/settingsSections";
 
 export type SectionId =
 	| "workspace"
@@ -30,6 +31,7 @@ export interface CommandContext {
 	hostServiceStatus: HostServiceAvailabilityStatus;
 	localMachineId: string | null;
 	notificationSoundsMuted: boolean;
+	settingsSectionVisibility: SettingsSectionVisibility;
 	navigate: (path: string) => void;
 	openNewWorkspace: (projectId?: string | null) => void;
 	focusedView?: "editor" | "terminal" | "git" | "issues" | "files" | "chat";
@@ -47,6 +49,8 @@ export interface Command {
 	run?: (context: CommandContext) => void | Promise<void>;
 	children?: Command[] | ((context: CommandContext) => Command[]);
 	renderFrame?: () => React.ReactNode;
+	/** The input's placeholder while this frame is open; defaults to "Search in {title}…". */
+	framePlaceholder?: MessageDescriptor;
 }
 
 export interface CommandProvider {

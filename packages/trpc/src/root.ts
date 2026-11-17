@@ -1,15 +1,28 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import { adminRouter } from "./router/admin";
+import {
+	agentRouter,
+	agentRoutineRouter,
+	agentWorkerRouter,
+	devToolsRouter,
+} from "./router/agent";
 import { agentCredentialRouter } from "./router/agent-credential";
 import { analyticsRouter } from "./router/analytics";
-import { businessRouter } from "./router/analytics/business";
-import { growthRouter } from "./router/analytics/growth";
 import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
 import { billingRouter } from "./router/billing";
+import {
+	channelMessageRouter,
+	channelNotificationPrefsRouter,
+	channelRouter,
+	channelTaskRouter,
+	channelThreadRouter,
+} from "./router/channel";
 import { chatRouter } from "./router/chat";
+import { chatHistoryRouter } from "./router/chat-history";
+import { chatMoveRouter } from "./router/chat-move";
 import { cloudWorkspaceRouter } from "./router/cloud-workspace";
 import { connectorsRouter } from "./router/connectors";
 import { environmentRouter } from "./router/environment";
@@ -17,31 +30,44 @@ import { githubUserRouter } from "./router/github-user";
 import { hostManagementRouter, hostRouter } from "./router/host";
 import { integrationRouter } from "./router/integration";
 import { leaderboardRouter } from "./router/leaderboard";
+import { mentionRouter } from "./router/mention";
 import { organizationRouter } from "./router/organization";
 import { pageRouter } from "./router/page";
 import { pageCommentRouter } from "./router/page-comment";
 import { pluginsRouter } from "./router/plugins";
 import { projectRouter } from "./router/project";
+import { sandboxRouter } from "./router/sandbox";
+import { suggestionRouter } from "./router/suggestion";
 import { supportRouter } from "./router/support/support";
 import { taskRouter } from "./router/task";
+import { taskLabelRouter } from "./router/task-label";
+import { taskProjectRouter } from "./router/task-project";
+import { taskRecordRouter } from "./router/task-record";
 import { teamRouter } from "./router/team";
 import { userRouter } from "./router/user";
+import { userSettingsRouter } from "./router/user-settings";
+import { voiceRouter } from "./router/voice";
 import { workspaceRouter } from "./router/workspace";
 import { legacyWorkspaceRouter } from "./router/workspace/legacy";
+import { workspaceMoveRouter } from "./router/workspace-move";
 import { createCallerFactory, createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
 	admin: adminRouter,
+	agent: agentRouter,
+	agentRoutine: agentRoutineRouter,
+	agentWorker: agentWorkerRouter,
+	devTools: devToolsRouter,
 	apiKey: apiKeyRouter,
 	analytics: analyticsRouter,
 	attachment: attachmentRouter,
 	automation: automationRouter,
-	business: businessRouter,
 	billing: billingRouter,
 	chat: chatRouter,
+	chatHistory: chatHistoryRouter,
+	chatMove: chatMoveRouter,
 	cloudWorkspace: cloudWorkspaceRouter,
 	environment: environmentRouter,
-	growth: growthRouter,
 	host: { ...hostRouter, ...hostManagementRouter },
 	connectors: connectorsRouter,
 	integration: integrationRouter,
@@ -50,12 +76,26 @@ export const appRouter = createTRPCRouter({
 	page: pageRouter,
 	pageComment: pageCommentRouter,
 	plugins: pluginsRouter,
+	sandbox: sandboxRouter,
+	suggestion: suggestionRouter,
 	support: supportRouter,
 	task: taskRouter,
+	mention: mentionRouter,
+	taskLabel: taskLabelRouter,
+	taskProject: taskProjectRouter,
+	channel: channelRouter,
+	channelMessage: channelMessageRouter,
+	channelNotificationPrefs: channelNotificationPrefsRouter,
+	channelTask: channelTaskRouter,
+	channelThread: channelThreadRouter,
+	taskRecord: taskRecordRouter,
 	team: teamRouter,
 	agentCredential: agentCredentialRouter,
 	githubUser: githubUserRouter,
 	user: userRouter,
+	userSettings: userSettingsRouter,
+	voice: voiceRouter,
+	workspaceMove: workspaceMoveRouter,
 	// TODO(2026-10-11): drop; desktops and phones before 1.29 call these names.
 	v2Host: {
 		list: hostManagementRouter.roster,

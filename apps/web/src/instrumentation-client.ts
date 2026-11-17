@@ -8,6 +8,7 @@ import posthog from "posthog-js";
 
 import { env } from "@/env";
 import { registerBaseProperties } from "@/lib/posthog-client";
+import { sanitizePosthogEvent } from "@/lib/sanitize-posthog-event";
 
 posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	api_host: "/ingest",
@@ -21,9 +22,11 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	person_profiles: "always",
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
+	before_send: sanitizePosthogEvent,
 });
 
 registerBaseProperties();
+posthog.capture("$pageview");
 
 Sentry.init({
 	dsn: env.NEXT_PUBLIC_SENTRY_DSN_WEB,

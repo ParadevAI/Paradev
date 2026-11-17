@@ -4,18 +4,27 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import * as path from "node:path";
 import { defineWorkerTask } from "./define-worker-task.ts";
-import { HostWorkerPool } from "./host-worker-pool.ts";
+import {
+	HostWorkerPool,
+	WorkerPoolUnavailableError,
+} from "./host-worker-pool.ts";
 import {
 	gitStatusSnapshotTask,
 	gitWorktreeRemoveTask,
 	gitWorktreeStateTask,
 } from "./tasks/git.ts";
+import { WORKER_CRASH_ERROR_NAME } from "./WorkerTaskRunner.ts";
 
 const WORKER_ENTRY = path.resolve(import.meta.dirname, "host-worker.ts");
 const CRASH_WORKER = path.resolve(
 	import.meta.dirname,
 	"test-fixtures",
 	"crashing-worker.ts",
+);
+const CRASH_AFTER_RESULT_WORKER = path.resolve(
+	import.meta.dirname,
+	"test-fixtures",
+	"crash-after-result-worker.ts",
 );
 
 const pools: HostWorkerPool[] = [];
@@ -277,6 +286,96 @@ describe("HostWorkerPool", () => {
 		expect(pool.getMode()).toBe("inline");
 		// Circuit open: no worker involved anymore, still correct results.
 		expect(await pool.run(echo, { v: 4 })).toBe(4);
+	});
+
+	test("without inline fallback a crash fails the task, never runs it inline, and pauses the pool", async () => {
+		const pool = makePool({
+			scriptPathResolver: () => CRASH_WORKER,
+			noInlineFallback: { pauseAfterCrashMs: 60_000 },
+		});
+		let inlineRuns = 0;
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => {
+				inlineRuns++;
+				return v;
+			},
+		});
+
+		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
+			name: WORKER_CRASH_ERROR_NAME,
+		});
+		await expect(pool.run(echo, { v: 2 })).rejects.toBeInstanceOf(
+			WorkerPoolUnavailableError,
+		);
+		expect(inlineRuns).toBe(0);
+	});
+
+	test("without inline fallback a worker that crashes while idle still pauses the pool", async () => {
+		let pauses = 0;
+		const pool = makePool({
+			scriptPathResolver: () => CRASH_AFTER_RESULT_WORKER,
+			noInlineFallback: {
+				pauseAfterCrashMs: 60_000,
+				onPause: () => {
+					pauses++;
+				},
+			},
+		});
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => v,
+		});
+		expect(await pool.run(echo, { v: 1 })).toBe(1);
+		// The pool pauses when the worker's exit arrives; wait for that, not a
+		// fixed delay.
+		for (let i = 0; i < 200 && pool.getRunner(); i++) {
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
+		await expect(pool.run(echo, { v: 2 })).rejects.toMatchObject({
+			name: "WorkerPoolUnavailableError",
+			reason: "paused",
+		});
+		expect(pauses).toBe(1);
+	});
+
+	test("a throwing onPause hook does not stop the pool from pausing", async () => {
+		let calls = 0;
+		const pool = makePool({
+			scriptPathResolver: () => CRASH_WORKER,
+			noInlineFallback: {
+				pauseAfterCrashMs: 60_000,
+				onPause: () => {
+					calls++;
+					throw new Error("reporter down");
+				},
+			},
+		});
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => v,
+		});
+		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
+			name: WORKER_CRASH_ERROR_NAME,
+		});
+		expect(calls).toBe(1);
+		await expect(pool.run(echo, { v: 2 })).rejects.toMatchObject({
+			reason: "paused",
+		});
+	});
+
+	test("without inline fallback a missing bundle fails the task", async () => {
+		const pool = makePool({
+			scriptPathResolver: () => null,
+			noInlineFallback: { pauseAfterCrashMs: 60_000 },
+		});
+		const echo = defineWorkerTask<{ v: number }, number>({
+			type: "test/echo",
+			handler: async ({ v }) => v,
+		});
+		await expect(pool.run(echo, { v: 1 })).rejects.toMatchObject({
+			reason: "no-bundle",
+		});
 	});
 
 	test("one crash with coalesced callers counts once toward the budget", async () => {

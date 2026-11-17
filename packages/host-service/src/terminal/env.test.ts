@@ -222,7 +222,7 @@ describe("stripTerminalRuntimeEnv", () => {
 		expect(result.EDITOR).toBe("vim");
 	});
 
-	test("explicit Superset support keys are kept", () => {
+	test("explicit Paradev support keys are kept", () => {
 		const result = stripTerminalRuntimeEnv(secretsEnv);
 		expect(result.SUPERSET_HOME_DIR).toBe("/Users/test/.superset");
 	});
@@ -497,8 +497,6 @@ describe("buildV2TerminalEnv", () => {
 		const env = buildV2TerminalEnv(baseParams);
 		expect(env).toMatchObject({
 			TERM: "xterm-256color",
-			TERM_PROGRAM: "kitty",
-			TERM_PROGRAM_VERSION: "0.42.0",
 			COLORTERM: "truecolor",
 			PWD: "/tmp/workspace",
 			SUPERSET_TERMINAL_ID: "term-1",
@@ -508,9 +506,21 @@ describe("buildV2TerminalEnv", () => {
 			SUPERSET_ROOT_PATH: "/tmp/repo",
 			SUPERSET_ENV: "production",
 		});
-		expect(env.TERM_PROGRAM).toBe("kitty");
 		expect(env.SHELL).toBe("/bin/zsh");
 		expect(env.LANG).toContain("UTF-8");
+	});
+
+	test("claims no terminal identity, even one inherited from the parent", () => {
+		const env = buildV2TerminalEnv({
+			...baseParams,
+			baseEnv: {
+				...baseParams.baseEnv,
+				TERM_PROGRAM: "vscode",
+				TERM_PROGRAM_VERSION: "1.105.0",
+			},
+		});
+		expect(env.TERM_PROGRAM).toBeUndefined();
+		expect(env.TERM_PROGRAM_VERSION).toBeUndefined();
 	});
 
 	test("sets SHELL to the selected launch shell even when base env was stale", () => {
@@ -522,7 +532,7 @@ describe("buildV2TerminalEnv", () => {
 		expect(env.SHELL).toBe("/opt/homebrew/bin/fish");
 	});
 
-	test("allows empty root path and alternate Superset env without breaking the contract", () => {
+	test("allows empty root path and alternate Paradev env without breaking the contract", () => {
 		const env = buildV2TerminalEnv({ ...baseParams, rootPath: "" });
 		expect(env.SUPERSET_ROOT_PATH).toBe("");
 

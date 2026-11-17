@@ -1,4 +1,35 @@
+import { z } from "zod";
+import { MAX_ATTACHMENTS } from "./attachment-limits";
 import { HOST_AGENT_PRESETS } from "./host-agent-presets";
+
+/**
+ * The presets a sandbox can actually run: the CLIs the bundle installs
+ * (`packages/sandbox/bundle/steps.json`, install-agent-clis). Adding one there
+ * is what makes it launchable here.
+ */
+const INSTALLED_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
+
+/**
+ * The installed presets that can run as a chat in the sandbox: claude and codex
+ * through the ACP adapters `packages/sandbox/src/assets/produce.ts` bundles,
+ * pdev through `pdev acp`, its own ACP server.
+ */
+const CHAT_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
+
+export const CLOUD_AGENT_IDS: readonly string[] = HOST_AGENT_PRESETS.filter(
+	(preset) => INSTALLED_IN_SANDBOX.has(preset.presetId),
+).map((preset) => preset.presetId);
+
+/** The prompt reaches host-service as one command-line argument, and the kernel limits its size. */
+export const CLOUD_AGENT_PROMPT_MAX_LENGTH = 20_000;
+
+export function isCloudAgentId(id: string): boolean {
+	return CLOUD_AGENT_IDS.includes(id);
+}
+
+export function supportsCloudAgentChat(agent: string | undefined): boolean {
+	return !!agent && CHAT_IN_SANDBOX.has(agent);
+}
 
 /**
  * What a cloud workspace launches on first boot: a built-in agent and its
@@ -7,33 +38,63 @@ import { HOST_AGENT_PRESETS } from "./host-agent-presets";
  * for a new workspace. Custom agents follow once they live in the cloud
  * (SUPER-2127); until then only the built-in presets are launchable here.
  */
-export interface CloudAgentLaunch {
-	agent: string;
-	prompt: string;
-	model?: string;
-	effort?: string;
-	mode?: string;
+export const cloudAgentLaunchSchema = z.object({
+	agent: z.string().refine(isCloudAgentId, "unknown cloud agent"),
+	prompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH),
+	model: z.string().min(1).optional(),
+	effort: z.string().min(1).optional(),
+	mode: z.string().min(1).optional(),
 	/**
 	 * Cloud uploads the agent is launched with. A sandbox has no host to write
 	 * them to at create time, so the ids travel and the box pulls the bytes
 	 * itself once host-service is up.
 	 */
-	attachmentFileIds?: string[];
+	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
+	surface: z.enum(["terminal", "chat"]).optional(),
+	/**
+	 * Set only by cloud automation dispatch. A manual create must not name a
+	 * run: the box reports this id, and the API trusts it as the correlation.
+	 */
+	automationRunId: z.string().uuid().optional(),
+	/**
+	 * The terminal id the agent launches under, chosen by whoever created the
+	 * workspace so it can open the agent's pane by that exact id.
+	 */
+	terminalId: z.string().uuid().optional(),
+});
+
+export type CloudAgentLaunch = z.infer<typeof cloudAgentLaunchSchema>;
+
+export type CloudAgentLaunchDescriptor = {
+	agent: string;
+	surface: "chat" | "terminal";
+	promptHash: string | null;
+	/** Null when the launch picks its own terminal id. */
+	terminalId: string | null;
+};
+
+export async function hashCloudAgentPrompt(prompt: string): Promise<string> {
+	const digest = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(prompt),
+	);
+	return Array.from(new Uint8Array(digest), (byte) =>
+		byte.toString(16).padStart(2, "0"),
+	).join("");
 }
 
-/**
- * The presets a sandbox can actually run: the CLIs the image installs
- * (`packages/sandbox/src/image.ts`, AGENT_CLI_VERSIONS). Adding one there is what
- * makes it launchable here.
- */
-const INSTALLED_IN_SANDBOX = new Set(["claude", "codex"]);
-
-export const CLOUD_AGENT_IDS: readonly string[] = HOST_AGENT_PRESETS.filter(
-	(preset) => INSTALLED_IN_SANDBOX.has(preset.presetId),
-).map((preset) => preset.presetId);
-
-export function isCloudAgentId(id: string): boolean {
-	return CLOUD_AGENT_IDS.includes(id);
+export async function describeCloudAgentLaunch(
+	launch: CloudAgentLaunch | undefined,
+): Promise<CloudAgentLaunchDescriptor | null> {
+	if (!launch) return null;
+	return {
+		agent: launch.agent,
+		surface: launch.surface === "chat" ? "chat" : "terminal",
+		promptHash: launch.prompt.trim()
+			? await hashCloudAgentPrompt(launch.prompt)
+			: null,
+		terminalId: launch.terminalId ?? null,
+	};
 }
 
 const ENV = {
@@ -43,6 +104,9 @@ const ENV = {
 	effort: "SUPERSET_SANDBOX_AGENT_EFFORT",
 	mode: "SUPERSET_SANDBOX_AGENT_MODE",
 	attachments: "SUPERSET_SANDBOX_AGENT_ATTACHMENTS",
+	surface: "SUPERSET_SANDBOX_AGENT_SURFACE",
+	automationRunId: "SUPERSET_SANDBOX_AGENT_AUTOMATION_RUN_ID",
+	terminalId: "SUPERSET_SANDBOX_AGENT_TERMINAL_ID",
 } as const;
 
 /** Every variable the launch travels in; stripped when a sandbox is promoted. */
@@ -62,6 +126,11 @@ export function cloudAgentLaunchToEnv(
 		...(launch.attachmentFileIds?.length
 			? { [ENV.attachments]: launch.attachmentFileIds.join(",") }
 			: {}),
+		...(launch.surface ? { [ENV.surface]: launch.surface } : {}),
+		...(launch.automationRunId
+			? { [ENV.automationRunId]: launch.automationRunId }
+			: {}),
+		...(launch.terminalId ? { [ENV.terminalId]: launch.terminalId } : {}),
 	};
 }
 
@@ -77,7 +146,16 @@ export function readCloudAgentLaunch(
 		effort: env[ENV.effort] || undefined,
 		mode: env[ENV.mode] || undefined,
 		attachmentFileIds: splitAttachmentIds(env[ENV.attachments]),
+		surface: env[ENV.surface] === "chat" ? "chat" : undefined,
+		automationRunId: readUuid(env[ENV.automationRunId]),
+		terminalId: readUuid(env[ENV.terminalId]),
 	};
+}
+
+function readUuid(value: string | undefined): string | undefined {
+	return value && z.string().uuid().safeParse(value).success
+		? value
+		: undefined;
 }
 
 function splitAttachmentIds(value: string | undefined): string[] | undefined {
@@ -87,17 +165,3 @@ function splitAttachmentIds(value: string | undefined): string[] | undefined {
 		.filter(Boolean);
 	return ids.length > 0 ? ids : undefined;
 }
-
-/**
- * What the agent is asked to do when an environment is created with "Start
- * agent": onboard the checkout so a golden can be promoted from the result.
- * The person watches in the terminal and desktop and can take over.
- */
-export const ENVIRONMENT_ONBOARDING_PROMPT = [
-	"You are setting up this repository so a cloud workspace can start from it.",
-	"Work in the checkout you are in. Read its README, package manifests, lockfiles and any existing `.superset/config.json`.",
-	"Install what a developer needs to run the project (dependencies, toolchains, databases as services), then verify the project builds and its tests or dev server run.",
-	"Write `.superset/config.json` with `setup` (what you just did, as commands that can rerun on a fresh checkout), `start` (the services a workspace needs on every boot) and, if the project serves anything, `ports`.",
-	"If a step needs a secret you do not have, stop and list exactly which variables are required and where they are read; do not invent values.",
-	"When everything runs, summarize what you installed, what the hooks do, and what secrets the environment needs, then stop.",
-].join(" ");

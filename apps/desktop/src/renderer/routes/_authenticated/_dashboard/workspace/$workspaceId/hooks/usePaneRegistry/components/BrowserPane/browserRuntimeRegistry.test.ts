@@ -1,27 +1,58 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
+import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
+import { BrowserRuntimeRegistryImpl } from "./browserRuntimeRegistry";
 
 const register = mock(async (_input: unknown) => ({ success: true }));
 const unregister = mock(async () => ({ success: true }));
 
-mock.module("renderer/lib/trpc-client", () => ({
-	electronTrpcClient: {
-		browser: {
-			register: { mutate: register },
-			unregister: { mutate: unregister },
-			onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
-		},
-		browserHistory: {
-			upsert: { mutate: async () => ({ success: true }) },
+const GB = 1024 * 1024;
+type UnloadInfoPane = {
+	memoryKb: number;
+	audible: boolean;
+	unsavedInput: boolean;
+};
+let paneInfo: Record<string, Partial<UnloadInfoPane>> = {};
+let beforeUnloadInfo = () => {};
+async function unloadInfo({ paneIds }: { paneIds: string[] }) {
+	beforeUnloadInfo();
+	return {
+		totalMemoryKb: 16 * GB,
+		panes: Object.fromEntries(
+			paneIds.map((id) => [
+				id,
+				{ memoryKb: GB, audible: false, unsavedInput: false, ...paneInfo[id] },
+			]),
+		),
+	};
+}
+
+const browserRuntimeRegistry = new BrowserRuntimeRegistryImpl({
+	browser: {
+		register: { mutate: register },
+		unregister: { mutate: unregister },
+		onAgentActivePanes: { subscribe: () => ({ unsubscribe: () => {} }) },
+		onAgentUse: { subscribe: () => ({ unsubscribe: () => {} }) },
+		getUnloadInfo: {
+			query: (input: { paneIds: string[] }) => unloadInfo(input),
 		},
 	},
-}));
+	browserHistory: {
+		upsert: { mutate: async () => ({ success: true }) },
+	},
+} as unknown as ConstructorParameters<typeof BrowserRuntimeRegistryImpl>[0]);
 
-(
-	document.documentElement as unknown as Record<string, unknown>
-).toggleAttribute = mock(() => {});
-
-const { pointerPassthrough } = await import("renderer/lib/pointer-passthrough");
-const { browserRuntimeRegistry } = await import("./browserRuntimeRegistry");
+const hiddenEntry = (lastUsedAt: number) => ({
+	webview: { remove: () => {}, style: { visibility: "hidden" } },
+	overlay: { remove: () => {}, style: { visibility: "hidden" } },
+	state: {},
+	onPersist: null,
+	webContentsId: null,
+	detachHandlers: () => {},
+	placeholder: null,
+	resizeObserver: null,
+	visible: false,
+	lastUsedAt,
+});
 
 describe("browserRuntimeRegistry detached persistence", () => {
 	test("retains its persistence callback for navigation completion after detach", async () => {
@@ -56,48 +87,72 @@ describe("browserRuntimeRegistry detached persistence", () => {
 		}
 	});
 
-	test("hidden-webview eviction spares panes with a live CDP session", async () => {
-		const makeEntry = (lastUsedAt: number) => ({
-			webview: { remove: () => {}, style: { visibility: "hidden" } },
-			overlay: { remove: () => {}, style: { visibility: "hidden" } },
-			state: {},
-			onPersist: null,
-			webContentsId: null,
-			detachHandlers: () => {},
-			placeholder: null,
-			resizeObserver: null,
-			visible: false,
-			lastUsedAt,
-		});
-		const registryInternals = browserRuntimeRegistry as unknown as {
-			entries: Map<string, ReturnType<typeof makeEntry>>;
-			agentActivePaneIds: Set<string>;
-			evictExcessHiddenWebviews: () => void;
-		};
-		// Five hidden panes over the cap of three; the two oldest would go, but
-		// the oldest has an agent attached and must survive.
-		for (let i = 1; i <= 5; i++) {
-			registryInternals.entries.set(`evict-pane-${i}`, makeEntry(i));
-		}
-		registryInternals.agentActivePaneIds = new Set(["evict-pane-1"]);
-
-		try {
-			registryInternals.evictExcessHiddenWebviews();
-
-			const remaining = [...registryInternals.entries.keys()].filter((id) =>
-				id.startsWith("evict-pane-"),
+	const registryInternals = browserRuntimeRegistry as unknown as {
+		entries: Map<string, ReturnType<typeof hiddenEntry>>;
+		agentActivePaneIds: Set<string>;
+		evictExcessHiddenWebviews: () => Promise<void>;
+		touch: (paneId: string) => void;
+	};
+	// Hidden 1 GB pages, oldest first, on a 16 GB machine: the budget is under 1 GB.
+	async function sweep(
+		pages: { id: string }[],
+		setup: () => void = () => {},
+	): Promise<string[]> {
+		const now = Date.now();
+		for (const [i, page] of pages.entries()) {
+			registryInternals.entries.set(
+				page.id,
+				hiddenEntry(now - (pages.length - i)),
 			);
-			expect(remaining).toEqual([
-				"evict-pane-1",
-				"evict-pane-4",
-				"evict-pane-5",
-			]);
-		} finally {
-			registryInternals.agentActivePaneIds = new Set();
-			for (let i = 1; i <= 5; i++) {
-				registryInternals.entries.delete(`evict-pane-${i}`);
-			}
 		}
+		setup();
+		try {
+			await registryInternals.evictExcessHiddenWebviews();
+			return pages
+				.map((page) => page.id)
+				.filter((id) => !registryInternals.entries.has(id));
+		} finally {
+			for (const page of pages) registryInternals.entries.delete(page.id);
+			registryInternals.agentActivePaneIds = new Set();
+			paneInfo = {};
+			beforeUnloadInfo = () => {};
+		}
+	}
+
+	test("over budget, pages an agent drives, that play audio, or hold unsaved input stay loaded", async () => {
+		const unloaded = await sweep(
+			["driven", "audio", "form", "p4", "p5", "p6", "p7", "p8"].map((id) => ({
+				id,
+			})),
+			() => {
+				registryInternals.agentActivePaneIds = new Set(["driven"]);
+				paneInfo = { audio: { audible: true }, form: { unsavedInput: true } };
+			},
+		);
+		expect(unloaded).toEqual(["p4", "p5"]);
+	});
+
+	test("a page an agent uses while the sweep waits on main stays loaded", async () => {
+		const unloaded = await sweep(
+			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),
+			() => {
+				beforeUnloadInfo = () => registryInternals.touch("p1");
+			},
+		);
+		expect(unloaded).toEqual(["p2", "p3"]);
+	});
+
+	test("a page shown while the sweep waits on main stays loaded", async () => {
+		const unloaded = await sweep(
+			["p1", "p2", "p3", "p4", "p5"].map((id) => ({ id })),
+			() => {
+				beforeUnloadInfo = () => {
+					const entry = registryInternals.entries.get("p1");
+					if (entry) entry.visible = true;
+				};
+			},
+		);
+		expect(unloaded).toEqual(["p2"]);
 	});
 
 	test("surfaces BrowserManager unregister failures", async () => {
@@ -147,6 +202,15 @@ describe("browserRuntimeRegistry pointer passthrough", () => {
 		registryInternals.entries.set("passthrough-shown", shown);
 		registryInternals.entries.set("passthrough-parked", parked);
 
+		const root = document.documentElement as unknown as {
+			toggleAttribute?: unknown;
+		};
+		const ownToggleAttribute = Object.getOwnPropertyDescriptor(
+			root,
+			"toggleAttribute",
+		);
+		root.toggleAttribute = () => {};
+
 		try {
 			pointerPassthrough.set("test-gesture", true);
 			expect(shown.webview.style.pointerEvents).toBe("none");
@@ -156,6 +220,11 @@ describe("browserRuntimeRegistry pointer passthrough", () => {
 			expect(shown.webview.style.pointerEvents).toBe("auto");
 		} finally {
 			pointerPassthrough.set("test-gesture", false);
+			if (ownToggleAttribute) {
+				Object.defineProperty(root, "toggleAttribute", ownToggleAttribute);
+			} else {
+				delete root.toggleAttribute;
+			}
 			registryInternals.entries.delete("passthrough-shown");
 			registryInternals.entries.delete("passthrough-parked");
 		}
@@ -208,6 +277,52 @@ describe("browserRuntimeRegistry overlay layer", () => {
 			);
 		} finally {
 			registryInternals.entries.delete(paneId);
+		}
+	});
+
+	test("raises a browser above a panel drawn over the page, and only there", () => {
+		const panel = document.createElement("div");
+		panel.setAttribute("data-browser-layer", "raised");
+		const inPanel = document.createElement("div");
+		const inPage = document.createElement("div");
+		panel.appendChild(inPanel);
+		document.body.append(panel, inPage);
+		try {
+			const raised = { ...makeEntry(), placeholder: inPanel };
+			const plain = { ...makeEntry(), placeholder: inPage };
+			registryInternals.updateLayout(raised as never);
+			registryInternals.updateLayout(plain as never);
+			expect(raised.webview.style.zIndex).toBe("31");
+			expect(raised.overlay.style.zIndex).toBe("32");
+			expect(plain.webview.style.zIndex).toBe("");
+			expect(plain.overlay.style.zIndex).toBe("1");
+		} finally {
+			panel.remove();
+			inPage.remove();
+		}
+	});
+
+	test("a browser shown again after an agent parked it takes clicks", () => {
+		const paneId = "reshown-pane";
+		const placeholder = document.createElement("div");
+		document.body.appendChild(placeholder);
+		const entry = { ...makeEntry(), placeholder };
+		const internals = browserRuntimeRegistry as unknown as {
+			agentActivePaneIds: Set<string>;
+			applyParkedStyle: (id: string, entry: unknown) => void;
+		};
+		const previous = internals.agentActivePaneIds;
+		internals.agentActivePaneIds = new Set([paneId]);
+		registryInternals.entries.set(paneId, entry as never);
+		try {
+			internals.applyParkedStyle(paneId, entry);
+			expect(entry.webview.style.pointerEvents).toBe("none");
+			browserRuntimeRegistry.relayout();
+			expect(entry.webview.style.pointerEvents).toBe("auto");
+		} finally {
+			internals.agentActivePaneIds = previous;
+			registryInternals.entries.delete(paneId);
+			placeholder.remove();
 		}
 	});
 
@@ -413,6 +528,55 @@ describe("browserRuntimeRegistry background open", () => {
 			document.createElement = original;
 			rootSpy.mockRestore();
 			await new Promise((resolve) => setTimeout(resolve, 0));
+		}
+	});
+});
+
+describe("browserRuntimeRegistry open page lookup", () => {
+	test("finds only a visible, loaded pane on the same page", () => {
+		const makeEntry = (
+			currentUrl: string,
+			overrides: { visible?: boolean; isLoading?: boolean } = {},
+		) => ({
+			state: {
+				currentUrl,
+				pageTitle: `Title of ${currentUrl}`,
+				isLoading: overrides.isLoading ?? false,
+				error: null,
+			},
+			webContentsId: 7,
+			visible: overrides.visible ?? true,
+		});
+		const registryInternals = browserRuntimeRegistry as unknown as {
+			entries: Map<string, ReturnType<typeof makeEntry>>;
+		};
+		const panes = {
+			"lookup-hidden": makeEntry("https://example.com/docs", {
+				visible: false,
+			}),
+			"lookup-loading": makeEntry("https://example.com/docs", {
+				isLoading: true,
+			}),
+			"lookup-open": makeEntry("https://example.com/docs#intro"),
+		};
+		for (const [paneId, entry] of Object.entries(panes)) {
+			registryInternals.entries.set(paneId, entry);
+		}
+		try {
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/docs"),
+			).toEqual({
+				paneId: "lookup-open",
+				title: "Title of https://example.com/docs#intro",
+			});
+			expect(
+				browserRuntimeRegistry.findOpenPage("https://example.com/other"),
+			).toBeNull();
+			expect(browserRuntimeRegistry.findOpenPage("not a url")).toBeNull();
+		} finally {
+			for (const paneId of Object.keys(panes)) {
+				registryInternals.entries.delete(paneId);
+			}
 		}
 	});
 });

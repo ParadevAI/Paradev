@@ -10,6 +10,7 @@ import {
 	DropdownMenuTrigger,
 } from "@superset/ui/dropdown-menu";
 import { Popover, PopoverAnchor, PopoverContent } from "@superset/ui/popover";
+import { cn } from "@superset/ui/utils";
 import type { inferRouterOutputs } from "@trpc/server";
 import {
 	Check,
@@ -58,6 +59,7 @@ interface CommitFilterDropdownProps {
 	currentBranchName?: string;
 	canRenameBranch?: boolean;
 	onRenameBranch?: (newName: string) => void;
+	labelClassName?: string;
 }
 
 /**
@@ -78,6 +80,7 @@ export function CommitFilterDropdown({
 	currentBranchName,
 	canRenameBranch = false,
 	onRenameBranch,
+	labelClassName,
 }: CommitFilterDropdownProps) {
 	const [rangeModalOpen, setRangeModalOpen] = useState(false);
 	const [renameOpen, setRenameOpen] = useState(false);
@@ -103,13 +106,18 @@ export function CommitFilterDropdown({
 						<PopoverAnchor asChild>
 							<button
 								type="button"
-								className="flex min-w-0 items-center gap-1 rounded px-1.5 py-0.5 font-medium text-xs hover:bg-accent"
+								title={
+									filter.kind === "all"
+										? i18n._(msg({ message: "Commits" }))
+										: undefined
+								}
+								className="flex min-w-0 items-center gap-1 overflow-hidden rounded px-1.5 py-0.5 font-medium text-xs hover:bg-accent"
 							>
 								{/* At rest the trigger is a category chip — "Commits N" —
 								    like the PR view's; a narrowed scope shows its value. */}
 								{filter.kind === "all" ? (
 									<>
-										<span className="truncate">
+										<span className={cn("truncate", labelClassName)}>
 											<Trans>Commits</Trans>
 										</span>
 										<span className="shrink-0 font-normal text-muted-foreground tabular-nums">

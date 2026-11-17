@@ -1,41 +1,39 @@
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
-import type { WorkspacesSortMode } from "renderer/routes/_authenticated/_dashboard/workspaces/stores/workspacesFilterStore";
+import type { V2WorkspacesOrderBy } from "renderer/routes/_authenticated/_dashboard/workspaces/stores/workspacesFilterStore";
+
+type ActivityInputs = Pick<
+	AccessibleV2Workspace,
+	"lastAgentEventAt" | "createdAt"
+>;
 
 /** Best-known activity timestamp: last agent event, else creation. */
-export function workspaceActivityAt(workspace: AccessibleV2Workspace): number {
+export function workspaceActivityAt(workspace: ActivityInputs): number {
 	return Math.max(
 		workspace.lastAgentEventAt ?? 0,
 		workspace.createdAt.getTime(),
 	);
 }
 
-function workspaceChurn(workspace: AccessibleV2Workspace): number {
-	if (!workspace.diffStats) return -1;
-	return workspace.diffStats.additions + workspace.diffStats.deletions;
+/** Newest activity first. Shared by the list sections and board columns so
+ * both views order rows identically. */
+export function compareWorkspaces(
+	a: ActivityInputs,
+	b: ActivityInputs,
+): number {
+	return workspaceActivityAt(b) - workspaceActivityAt(a);
 }
 
-/** Shared by the list sections and board columns so both views order rows
- * identically. All modes are deterministic: ties fall back to activity. */
-export function compareWorkspaces(
-	a: AccessibleV2Workspace,
-	b: AccessibleV2Workspace,
-	mode: WorkspacesSortMode,
-): number {
-	let cmp = 0;
-	switch (mode) {
-		case "activity":
-			cmp = workspaceActivityAt(b) - workspaceActivityAt(a);
-			break;
+export function compareWorkspacesBy(
+	orderBy: V2WorkspacesOrderBy,
+): (a: AccessibleV2Workspace, b: AccessibleV2Workspace) => number {
+	switch (orderBy) {
 		case "created":
-			cmp = b.createdAt.getTime() - a.createdAt.getTime();
-			break;
-		case "churn":
-			cmp = workspaceChurn(b) - workspaceChurn(a);
-			break;
+			return (a, b) => b.createdAt.getTime() - a.createdAt.getTime();
 		case "name":
-			cmp = a.name.localeCompare(b.name);
-			break;
+			return (a, b) =>
+				a.name.localeCompare(b.name, undefined, { sensitivity: "base" }) ||
+				compareWorkspaces(a, b);
+		default:
+			return compareWorkspaces;
 	}
-	if (cmp !== 0) return cmp;
-	return workspaceActivityAt(b) - workspaceActivityAt(a);
 }

@@ -3,7 +3,7 @@ import type {
 	BrowserWindow,
 	Notification as ElectronNotification,
 } from "electron";
-import { Notification } from "electron";
+import { app, Notification } from "electron";
 import { setBadgeCount } from "main/lib/dock-icon";
 import { notificationsEmitter } from "main/lib/notifications/server";
 import { NOTIFICATION_EVENTS } from "shared/constants";
@@ -19,7 +19,14 @@ type NotificationEvent =
 	| {
 			type: typeof NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE;
 			data?: { themeState?: unknown };
+	  }
+	| { type: typeof NOTIFICATION_EVENTS.OPEN_ROUTE; data?: { path: string } }
+	| {
+			type: typeof NOTIFICATION_EVENTS.NOTIFICATION_REPLY;
+			data?: NotificationReply;
 	  };
+
+type NotificationReply = { target: string; text: string };
 
 const notificationSourceSchema = z.discriminatedUnion("type", [
 	z.object({ type: z.literal("terminal"), id: z.string().min(1) }),
@@ -37,6 +44,14 @@ const showNativeInputSchema = z.object({
 			source: notificationSourceSchema,
 		})
 		.optional(),
+	/** An app route the click opens, e.g. `/channels/<id>`. */
+	clickPath: z.string().startsWith("/").optional(),
+	/** macOS and Windows: removable with `Notification.remove()`. */
+	id: z.string().min(1).optional(),
+	/** Stacks a conversation's notifications; `closeGroup` removes them. */
+	groupId: z.string().min(1).optional(),
+	/** Adds an inline Reply; `replyTarget` comes back with the typed text. */
+	replyTarget: z.string().min(1).optional(),
 });
 type ShowNativeInput = z.infer<typeof showNativeInputSchema>;
 
@@ -95,12 +110,32 @@ export const createNotificationsRouter = (
 							? `${input.subtitle}\n${input.body}`
 							: input.body,
 					silent: input.silent,
+					id: input.id,
+					groupId: input.groupId,
+					hasReply: input.replyTarget !== undefined,
 				});
 				const key = getNativeNotificationKey(input);
 				trackNativeNotification(key, notification);
 
+				const { replyTarget } = input;
+				if (replyTarget) {
+					notification.on("reply", (details) => {
+						const text = details.reply.trim();
+						if (!text) return;
+						notificationsEmitter.emit(NOTIFICATION_EVENTS.NOTIFICATION_REPLY, {
+							target: replyTarget,
+							text,
+						});
+					});
+				}
+
 				notification.on("click", () => {
 					focusWindow(getWindow);
+					if (input.clickPath) {
+						notificationsEmitter.emit(NOTIFICATION_EVENTS.OPEN_ROUTE, {
+							path: input.clickPath,
+						});
+					}
 					if (!input.clickTarget) return;
 					notificationsEmitter.emit(
 						NOTIFICATION_EVENTS.FOCUS_NOTIFICATION_SOURCE,
@@ -112,10 +147,33 @@ export const createNotificationsRouter = (
 				return { success: true as const };
 			}),
 
-		setDockBadge: publicProcedure
-			.input(z.object({ count: z.number().int().min(0) }))
+		closeGroup: publicProcedure
+			.input(z.object({ groupId: z.string().min(1) }))
 			.mutation(({ input }) => {
-				setBadgeCount(input.count);
+				if (process.platform === "darwin" || process.platform === "win32") {
+					Notification.removeGroup(input.groupId);
+				}
+				return { success: true as const };
+			}),
+
+		/** macOS only: once, or until the app is focused. */
+		bounceDock: publicProcedure
+			.input(z.object({ untilFocused: z.boolean() }))
+			.mutation(({ input }) => {
+				app.dock?.bounce(input.untilFocused ? "critical" : "informational");
+				return { success: true as const };
+			}),
+
+		setDockBadge: publicProcedure
+			.input(
+				z.object({
+					count: z.number().int().min(0),
+					/** A dot when the count is 0; macOS only. */
+					dot: z.boolean().optional(),
+				}),
+			)
+			.mutation(({ input }) => {
+				setBadgeCount(input.count, input.dot);
 				return { success: true as const };
 			}),
 
@@ -145,6 +203,17 @@ export const createNotificationsRouter = (
 					NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,
 					onSettingsExternalChange,
 				);
+				const onOpenRoute = (data: { path: string }) => {
+					emit.next({ type: NOTIFICATION_EVENTS.OPEN_ROUTE, data });
+				};
+				notificationsEmitter.on(NOTIFICATION_EVENTS.OPEN_ROUTE, onOpenRoute);
+				const onReply = (data: NotificationReply) => {
+					emit.next({ type: NOTIFICATION_EVENTS.NOTIFICATION_REPLY, data });
+				};
+				notificationsEmitter.on(
+					NOTIFICATION_EVENTS.NOTIFICATION_REPLY,
+					onReply,
+				);
 
 				return () => {
 					notificationsEmitter.off(
@@ -154,6 +223,11 @@ export const createNotificationsRouter = (
 					notificationsEmitter.off(
 						NOTIFICATION_EVENTS.SETTINGS_EXTERNAL_CHANGE,
 						onSettingsExternalChange,
+					);
+					notificationsEmitter.off(NOTIFICATION_EVENTS.OPEN_ROUTE, onOpenRoute);
+					notificationsEmitter.off(
+						NOTIFICATION_EVENTS.NOTIFICATION_REPLY,
+						onReply,
 					);
 				};
 			});

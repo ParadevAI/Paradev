@@ -3,6 +3,7 @@ import {
 	ResizablePanel,
 	ResizablePanelGroup,
 } from "@superset/ui/resizable";
+import { cn } from "@superset/ui/utils";
 import { useEffect, useRef } from "react";
 import type { StoreApi } from "zustand/vanilla";
 import type { WorkspaceStore } from "../../../../../core/store";
@@ -11,9 +12,19 @@ import type {
 	SplitPath,
 	Tab as TabType,
 } from "../../../../../types";
+import { useIsTabVisible } from "../../../../hooks/useIsTabVisible";
+import {
+	usePaneAppearance,
+	usePaneFlush,
+} from "../../../../hooks/usePaneAppearance";
+import {
+	PaneAsideTargetContext,
+	topRightPaneId,
+} from "../../../../hooks/usePaneAside";
 import type {
 	ContextMenuActionConfig,
 	PaneActionConfig,
+	PaneErrorHandler,
 	PaneRegistry,
 	RendererContext,
 } from "../../../../types";
@@ -35,6 +46,7 @@ interface TabProps<TData> {
 	contextMenuActions?:
 		| ContextMenuActionConfig<TData>[]
 		| ((context: RendererContext<TData>) => ContextMenuActionConfig<TData>[]);
+	onPaneError?: PaneErrorHandler;
 	onSplitResizeDragging?: (sourceId: string, isDragging: boolean) => void;
 }
 
@@ -46,6 +58,7 @@ function SplitView<TData>({
 	registry,
 	paneActions,
 	contextMenuActions,
+	onPaneError,
 	onSplitResizeDragging,
 }: {
 	store: StoreApi<WorkspaceStore<TData>>;
@@ -55,9 +68,12 @@ function SplitView<TData>({
 	registry: PaneRegistry<TData>;
 	paneActions?: TabProps<TData>["paneActions"];
 	contextMenuActions?: TabProps<TData>["contextMenuActions"];
+	onPaneError?: TabProps<TData>["onPaneError"];
 	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
 }) {
 	const groupRef = useRef<React.ComponentRef<typeof ResizablePanelGroup>>(null);
+	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
 	const activeHandlePointerRef = useRef<{
 		pointerId: number;
 		downAt: number;
@@ -117,6 +133,7 @@ function SplitView<TData>({
 					registry={registry}
 					paneActions={paneActions}
 					contextMenuActions={contextMenuActions}
+					onPaneError={onPaneError}
 					onSplitResizeDragging={onSplitResizeDragging}
 					parentDirection={node.direction}
 				/>
@@ -125,6 +142,14 @@ function SplitView<TData>({
 				// The active pane draws a 2px border on either side of the 1px
 				// divider. Cover that full visual border with the sash hit area.
 				hitAreaSize="large"
+				// As cards, the gap between two panes is the sash; flush, a hairline is.
+				className={
+					!isCards
+						? undefined
+						: flush
+							? "w-px shrink-0 bg-border data-[panel-group-direction=vertical]:h-px data-[resize-handle-state=drag]:bg-foreground/40 data-[resize-handle-state=hover]:bg-foreground/30"
+							: "w-1.5 rounded-full bg-transparent data-[panel-group-direction=vertical]:h-1.5 data-[resize-handle-state=drag]:bg-fill-selected data-[resize-handle-state=hover]:bg-fill-hover"
+				}
 				style={{ zIndex: RESIZE_HANDLE_BASE_Z_INDEX - path.length }}
 				onPointerDownCapture={(event) => {
 					if (event.button !== 0 || !event.isPrimary) return;
@@ -207,6 +232,7 @@ function SplitView<TData>({
 					registry={registry}
 					paneActions={paneActions}
 					contextMenuActions={contextMenuActions}
+					onPaneError={onPaneError}
 					onSplitResizeDragging={onSplitResizeDragging}
 					parentDirection={node.direction}
 				/>
@@ -223,6 +249,7 @@ function LayoutNodeView<TData>({
 	registry,
 	paneActions,
 	contextMenuActions,
+	onPaneError,
 	onSplitResizeDragging,
 	parentDirection = null,
 }: {
@@ -233,9 +260,11 @@ function LayoutNodeView<TData>({
 	registry: PaneRegistry<TData>;
 	paneActions?: TabProps<TData>["paneActions"];
 	contextMenuActions?: TabProps<TData>["contextMenuActions"];
+	onPaneError?: TabProps<TData>["onPaneError"];
 	onSplitResizeDragging?: TabProps<TData>["onSplitResizeDragging"];
 	parentDirection?: "horizontal" | "vertical" | null;
 }) {
+	const isTabVisible = useIsTabVisible();
 	// A persisted layout can be malformed — a split node with a missing
 	// child, or a corrupt node shape from an older schema. Render nothing
 	// rather than crashing the whole renderer on `node.type` of undefined.
@@ -252,10 +281,11 @@ function LayoutNodeView<TData>({
 				store={store}
 				tab={tab}
 				pane={pane}
-				isActive={tab.activePaneId === pane.id}
+				isActive={isTabVisible && tab.activePaneId === pane.id}
 				registry={registry}
 				paneActions={paneActions}
 				contextMenuActions={contextMenuActions}
+				onPaneError={onPaneError}
 				parentDirection={parentDirection}
 			/>
 		);
@@ -270,6 +300,7 @@ function LayoutNodeView<TData>({
 			registry={registry}
 			paneActions={paneActions}
 			contextMenuActions={contextMenuActions}
+			onPaneError={onPaneError}
 			onSplitResizeDragging={onSplitResizeDragging}
 		/>
 	);
@@ -281,8 +312,11 @@ export function Tab<TData>({
 	registry,
 	paneActions,
 	contextMenuActions,
+	onPaneError,
 	onSplitResizeDragging,
 }: TabProps<TData>) {
+	const isCards = usePaneAppearance() === "cards";
+	const flush = usePaneFlush();
 	if (!tab.layout) {
 		return (
 			<div className="flex min-h-0 min-w-0 flex-1 items-center justify-center text-sm text-muted-foreground">
@@ -294,17 +328,25 @@ export function Tab<TData>({
 	return (
 		// isolate contains the resize handles' z-indexes so they never paint
 		// above body-portalled overlays (dialogs, menus).
-		<div className="isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto">
-			<LayoutNodeView
-				store={store}
-				tab={tab}
-				node={tab.layout}
-				path={[]}
-				registry={registry}
-				paneActions={paneActions}
-				contextMenuActions={contextMenuActions}
-				onSplitResizeDragging={onSplitResizeDragging}
-			/>
-		</div>
+		<PaneAsideTargetContext.Provider value={topRightPaneId(tab.layout)}>
+			<div
+				className={cn(
+					"isolate flex h-full w-full min-h-0 min-w-0 flex-1 overflow-auto",
+					isCards && !flush && "p-1.5",
+				)}
+			>
+				<LayoutNodeView
+					store={store}
+					tab={tab}
+					node={tab.layout}
+					path={[]}
+					registry={registry}
+					paneActions={paneActions}
+					contextMenuActions={contextMenuActions}
+					onPaneError={onPaneError}
+					onSplitResizeDragging={onSplitResizeDragging}
+				/>
+			</div>
+		</PaneAsideTargetContext.Provider>
 	);
 }

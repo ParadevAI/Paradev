@@ -16,6 +16,35 @@ import {
 	resolveNotificationTarget,
 } from "./resolveNotificationTarget";
 
+type PaneLayout = WorkspaceState<PaneViewerData> | null | undefined;
+
+interface LocalPaneLayouts {
+	paneLayout: PaneLayout;
+	rightPaneLayout: PaneLayout;
+}
+
+function getLocalPaneLayouts({
+	workspaceId,
+	paneLayout,
+	rightPaneLayout,
+}: {
+	workspaceId: string;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
+}): LocalPaneLayouts {
+	return {
+		paneLayout: paneLayout
+			? applyRememberedPaneSelection(workspaceId, paneLayout)
+			: paneLayout,
+		rightPaneLayout: rightPaneLayout
+			? applyRememberedPaneSelection(
+					`${workspaceId}:rightPaneLayout`,
+					rightPaneLayout,
+				)
+			: rightPaneLayout,
+	};
+}
+
 /**
  * Marks visible targets as seen (terminal statuses are derived from host
  * agent bindings, so an event landing while the user watches must not turn
@@ -29,6 +58,7 @@ export function handleAgentLifecycleEvent({
 	projectName,
 	payload,
 	paneLayout,
+	rightPaneLayout,
 	volume,
 	muted,
 }: {
@@ -36,19 +66,22 @@ export function handleAgentLifecycleEvent({
 	workspaceName: string;
 	projectName?: string;
 	payload: AgentLifecyclePayload;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
 	volume: number;
 	muted: boolean;
 }): void {
-	const localPaneLayout = paneLayout
-		? applyRememberedPaneSelection(workspaceId, paneLayout)
-		: paneLayout;
+	const layouts = getLocalPaneLayouts({
+		workspaceId,
+		paneLayout,
+		rightPaneLayout,
+	});
 	const target = resolveNotificationTarget({
 		workspaceId,
 		payload,
-		paneLayout: localPaneLayout,
+		...layouts,
 	});
-	markSeenIfTargetVisible({ payload, paneLayout: localPaneLayout, target });
+	markSeenIfTargetVisible({ payload, layouts, target });
 
 	// Only Stop and PermissionRequest deserve sound. Start fires per-prompt
 	// (the working spinner is feedback enough); Attached/Detached fire on
@@ -61,7 +94,7 @@ export function handleAgentLifecycleEvent({
 	) {
 		return;
 	}
-	if (shouldSuppress(target, localPaneLayout)) return;
+	if (shouldSuppress(target, layouts)) return;
 
 	const ringtoneId = useRingtoneStore.getState().selectedRingtoneId;
 	void playRingtone({ ringtoneId, volume, muted });
@@ -83,20 +116,24 @@ export function markAgentLifecycleTargetSeen({
 	workspaceId,
 	payload,
 	paneLayout,
+	rightPaneLayout,
 }: {
 	workspaceId: string;
 	payload: AgentLifecyclePayload;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
 }): void {
-	const localPaneLayout = paneLayout
-		? applyRememberedPaneSelection(workspaceId, paneLayout)
-		: paneLayout;
+	const layouts = getLocalPaneLayouts({
+		workspaceId,
+		paneLayout,
+		rightPaneLayout,
+	});
 	const target = resolveNotificationTarget({
 		workspaceId,
 		payload,
-		paneLayout: localPaneLayout,
+		...layouts,
 	});
-	markSeenIfTargetVisible({ payload, paneLayout: localPaneLayout, target });
+	markSeenIfTargetVisible({ payload, layouts, target });
 }
 
 export function handleTerminalLifecycleEvent({
@@ -110,16 +147,16 @@ export function handleTerminalLifecycleEvent({
 
 function markSeenIfTargetVisible({
 	payload,
-	paneLayout,
+	layouts,
 	target,
 }: {
 	payload: AgentLifecyclePayload;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	layouts: LocalPaneLayouts;
 	target: NotificationTarget;
 }): void {
 	const targetVisible = isNotificationTargetVisible({
 		currentWorkspaceId: getCurrentWorkspaceId(),
-		paneLayout,
+		...layouts,
 		target,
 	});
 	if (!targetVisible) return;
@@ -140,14 +177,14 @@ function getCurrentWorkspaceId(): string | null {
 
 function shouldSuppress(
 	target: NotificationTarget,
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined,
+	layouts: LocalPaneLayouts,
 ): boolean {
 	if (typeof document !== "undefined" && document.hidden) return false;
 	if (typeof window !== "undefined" && !document.hasFocus()) return false;
 
 	return isNotificationTargetVisible({
 		currentWorkspaceId: getCurrentWorkspaceId(),
-		paneLayout,
+		...layouts,
 		target,
 	});
 }

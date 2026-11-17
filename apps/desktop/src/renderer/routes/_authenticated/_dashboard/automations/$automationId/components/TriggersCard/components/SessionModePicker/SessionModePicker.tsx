@@ -10,78 +10,71 @@ import {
 import { ChipButton } from "../../../../../components/TriggerSentence/components/ChipButton";
 
 /**
- * Whether each run starts its own agent session or continues the one the
- * previous run left behind.
- *
- * Only offered with a pinned workspace, which is where that session lives —
- * an automation that branches a workspace per run has nothing to continue,
- * and the API refuses the combination.
+ * Whether each run starts its own agent conversation or picks up the one the
+ * previous run left. Only rendered when runs share a workspace.
  */
 export function SessionModePicker({
 	continueAgentSession,
-	pinnedWorkspaceId,
 	disabled,
 	onChange,
 	className,
 }: {
 	continueAgentSession: boolean;
-	pinnedWorkspaceId: string | null;
 	disabled?: boolean;
 	onChange: (continueAgentSession: boolean) => void;
 	className?: string;
 }) {
-	const pinned = pinnedWorkspaceId !== null;
 	const label = i18n._(
-		continueAgentSession && pinned
-			? msg({
-					message: "continuing the last session",
-				})
-			: msg({
-					message: "in a new session",
-				}),
+		continueAgentSession
+			? msg({ message: "Continue", context: "automation session mode" })
+			: msg({ message: "Start fresh" }),
 	);
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild disabled={disabled || !pinned}>
-				<span
-					title={
-						pinned
-							? undefined
-							: i18n._(
-									msg({
-										message:
-											"Pin a workspace to continue its agent session between runs",
-									}),
-								)
-					}
-				>
+			<DropdownMenuTrigger asChild disabled={disabled}>
+				<span>
 					<ChipButton
 						label={label}
 						empty={!continueAgentSession}
-						disabled={disabled || !pinned}
+						disabled={disabled}
 						className={className}
 					/>
 				</span>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start">
 				<DropdownMenuRadioGroup
-					value={continueAgentSession ? "continue" : "new"}
+					value={continueAgentSession ? "continue" : "fresh"}
 					onValueChange={(value) => onChange(value === "continue")}
 				>
-					<DropdownMenuRadioItem value="new">
-						{i18n._(
-							msg({
-								message: "Start a new agent session each run",
-							}),
-						)}
+					<DropdownMenuRadioItem value="fresh">
+						<span className="flex flex-col">
+							<span>{i18n._(msg({ message: "Start fresh" }))}</span>
+							<span className="text-xs text-muted-foreground">
+								{i18n._(
+									msg({ message: "Each run starts a new agent conversation" }),
+								)}
+							</span>
+						</span>
 					</DropdownMenuRadioItem>
 					<DropdownMenuRadioItem value="continue">
-						{i18n._(
-							msg({
-								message: "Continue the session the last run left",
-							}),
-						)}
+						<span className="flex flex-col">
+							<span>
+								{i18n._(
+									msg({
+										message: "Continue",
+										context: "automation session mode",
+									}),
+								)}
+							</span>
+							<span className="text-xs text-muted-foreground">
+								{i18n._(
+									msg({
+										message: "The agent picks up where the last run left off",
+									}),
+								)}
+							</span>
+						</span>
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>

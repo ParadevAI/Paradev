@@ -1,11 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
-import type { FileTree, FileTreeRenameEvent } from "@pierre/trees";
+import type {
+	FileTree,
+	FileTreeDropResult,
+	FileTreeRenameEvent,
+} from "@pierre/trees";
 import { alert } from "@superset/ui/atoms/Alert";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef } from "react";
 import { canonicalizeTreePath } from "renderer/lib/pierreTree";
-import { FILE_EXPLORER_ROW_HEIGHT } from "../../constants";
+import { FileDeleteContext } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/state/fileDocumentStore/fileDeleteContext";
+import { FileMoveContext } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/state/fileDocumentStore/fileMoveContext";
 import {
 	buildCreationKey,
 	CREATION_BASE_NAME,
@@ -16,9 +21,9 @@ import type {
 	ProvisionalEvent,
 } from "../../utils/provisionalEntry";
 import { reduceProvisional } from "../../utils/provisionalEntry";
-import { scrollTreeToRow } from "../../utils/scrollTreeToRow";
 import {
 	asDirectoryHandle,
+	moveDestinationPath,
 	parentRel,
 	stripTrailingSlash,
 	toAbs,
@@ -41,6 +46,8 @@ interface FilesTabActions {
 	startCreating(mode: "file" | "folder", parentAbs?: string): Promise<void>;
 	/** Commit a Pierre rename event by moving the entry on disk. */
 	handleRename(event: FileTreeRenameEvent): Promise<void>;
+	/** Commit an internal Pierre drag-and-drop move on disk. */
+	handleMove(event: FileTreeDropResult): Promise<void>;
 	/** Surface a name Pierre rejected and stand the creation flow down. */
 	handleRenameError(message: string): void;
 	/** Confirm + delete a file/folder. */
@@ -69,6 +76,8 @@ export function useFilesTabActions({
 	workspaceId,
 }: UseFilesTabActionsOptions): FilesTabActions {
 	const { t } = useLingui();
+	const onFileMove = useContext(FileMoveContext);
+	const onFileDeleted = useContext(FileDeleteContext);
 	const createUniqueEntry =
 		workspaceTrpc.filesystem.createUniqueEntry.useMutation();
 	const removeEmptyDirectory =
@@ -136,13 +145,7 @@ export function useFilesTabActions({
 				}
 				model.getItem(targetKey)?.select();
 				model.focusPath(rel);
-
-				scrollTreeToRow(
-					model,
-					bridge.knownPaths,
-					targetKey,
-					FILE_EXPLORER_ROW_HEIGHT,
-				);
+				model.scrollToPath(targetKey, { offset: "nearest", focus: false });
 			});
 		},
 		[model, rootPath, bridge.fetchDir, bridge.knownPaths],
@@ -193,11 +196,11 @@ export function useFilesTabActions({
 					toast.info(
 						entry.mode === "folder"
 							? t({
-									message: "Kept the new folder — it is no longer empty",
+									message: "Kept the new folder because it is no longer empty",
 								})
 							: t({
 									message:
-										"Kept the new file — it changed after it was created",
+										"Kept the new file because it changed after it was created",
 								}),
 					);
 				})
@@ -420,6 +423,13 @@ export function useFilesTabActions({
 					sourceAbsolutePath: toAbs(rootPath, sourcePath),
 					destinationAbsolutePath: toAbs(rootPath, destinationPath),
 				});
+				if (!bridge.isCurrent(versionToken)) return;
+				onFileMove?.({
+					kind: "rename",
+					oldAbsolutePath: toAbs(rootPath, sourcePath),
+					absolutePath: toAbs(rootPath, destinationPath),
+					isDirectory: isFolder,
+				});
 			} catch (error) {
 				if (!bridge.isCurrent(versionToken)) return;
 				// Revert Pierre's optimistic rename.
@@ -446,7 +456,16 @@ export function useFilesTabActions({
 				);
 			}
 		},
-		[model, rootPath, workspaceId, movePath, bridge, dispatchProvisional, t],
+		[
+			model,
+			rootPath,
+			workspaceId,
+			movePath,
+			onFileMove,
+			bridge,
+			dispatchProvisional,
+			t,
+		],
 	);
 
 	const handleRenameError = useCallback(
@@ -458,6 +477,59 @@ export function useFilesTabActions({
 			dispatchProvisional({ type: "rename-error" });
 		},
 		[dispatchProvisional],
+	);
+
+	const handleMove = useCallback(
+		async (event: FileTreeDropResult): Promise<void> => {
+			if (!rootPath) return;
+			const versionToken = bridge.getVersion();
+
+			for (const sourcePath of event.draggedPaths) {
+				if (!bridge.isCurrent(versionToken)) return;
+				const destinationPath = moveDestinationPath(
+					sourcePath,
+					event.target.directoryPath,
+				);
+				if (sourcePath === destinationPath) continue;
+
+				try {
+					await movePath.mutateAsync({
+						workspaceId,
+						sourceAbsolutePath: toAbs(rootPath, sourcePath),
+						destinationAbsolutePath: toAbs(rootPath, destinationPath),
+					});
+					if (!bridge.isCurrent(versionToken)) return;
+					const isFolder = sourcePath.endsWith("/");
+					onFileMove?.({
+						kind: "rename",
+						oldAbsolutePath: toAbs(rootPath, sourcePath),
+						absolutePath: toAbs(rootPath, destinationPath),
+						isDirectory: isFolder,
+					});
+					bridge.knownPaths.delete(sourcePath);
+					bridge.knownPaths.add(destinationPath);
+					if (isFolder) {
+						bridge.rekeyDescendants(
+							stripTrailingSlash(sourcePath),
+							stripTrailingSlash(destinationPath),
+						);
+					}
+				} catch (error) {
+					if (!bridge.isCurrent(versionToken)) return;
+					void bridge.doRefresh();
+					toast.error(
+						t({
+							message: "Failed",
+						}),
+						{
+							description: error instanceof Error ? error.message : undefined,
+						},
+					);
+					return;
+				}
+			}
+		},
+		[bridge, movePath, onFileMove, rootPath, t, workspaceId],
 	);
 
 	const handleDelete = useCallback(
@@ -483,7 +555,9 @@ export function useFilesTabActions({
 						variant: "destructive",
 						onClick: () => {
 							toast.promise(
-								deletePath.mutateAsync({ workspaceId, absolutePath }),
+								deletePath
+									.mutateAsync({ workspaceId, absolutePath })
+									.then(() => onFileDeleted?.(absolutePath, isDirectory)),
 								{
 									loading: t({
 										message: `Deleting ${name}...`,
@@ -507,7 +581,7 @@ export function useFilesTabActions({
 				],
 			});
 		},
-		[workspaceId, deletePath, t],
+		[workspaceId, deletePath, onFileDeleted, t],
 	);
 
 	const collapseAll = useCallback(() => {
@@ -524,6 +598,7 @@ export function useFilesTabActions({
 		reveal,
 		startCreating,
 		handleRename,
+		handleMove,
 		handleRenameError,
 		handleDelete,
 		collapseAll,

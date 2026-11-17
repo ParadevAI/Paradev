@@ -4,6 +4,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { getTemplatePath } from "./config";
 import { NOTIFY_SCRIPT_MARKER } from "./notify-hook";
+import { APP_HOME_DIR_NAME } from "./paths";
+
+const HOME_DIR_FALLBACK = `\${SUPERSET_HOME_DIR:-$HOME/${APP_HOME_DIR_NAME}}`;
 
 function readNotifyHookTemplate(): string {
 	return readFileSync(getTemplatePath("notify-hook.template.sh"), "utf-8");
@@ -16,15 +19,18 @@ function readNotifyHookTemplate(): string {
 const emptyHome = mkdtempSync(path.join(tmpdir(), "notify-hook-empty-home-"));
 
 function renderNotifyHookScript(): string {
-	return readNotifyHookTemplate().replaceAll(
-		"{{MARKER}}",
-		NOTIFY_SCRIPT_MARKER,
-	);
+	return readNotifyHookTemplate()
+		.replaceAll("{{MARKER}}", NOTIFY_SCRIPT_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
+
+const ambientEnvWithoutSuperset = Object.fromEntries(
+	Object.entries(process.env).filter(([key]) => !key.startsWith("SUPERSET_")),
+);
 
 function hookEnv(envOverrides: Record<string, string>) {
 	return {
-		...process.env,
+		...ambientEnvWithoutSuperset,
 		SUPERSET_AGENT_ID: "grok",
 		SUPERSET_DEBUG_HOOKS: "1",
 		SUPERSET_TERMINAL_ID: "terminal-test",
@@ -73,6 +79,7 @@ async function runNotifyHookAsync(
 function fakeHostService(ignored: boolean) {
 	const requests: Array<{ json: Record<string, unknown> }> = [];
 	const server = Bun.serve({
+		hostname: "127.0.0.1",
 		port: 0,
 		fetch: async (req) => {
 			requests.push((await req.json()) as (typeof requests)[number]);
@@ -105,7 +112,78 @@ function writeHookManifest(home: string, orgId: string, endpoint: string) {
 
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v19");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v22");
+	});
+
+	it("forwards the main session's transcript path with its identity", async () => {
+		const host = fakeHostService(false);
+		try {
+			const result = await runNotifyHookAsync(
+				{
+					hook_event_name: "Stop",
+					session_id: "11111111-2222-4333-8444-555555555555",
+					transcript_path:
+						"/Users/a/.claude/projects/-Users-a-wt/11111111-2222-4333-8444-555555555555.jsonl",
+				},
+				{
+					SUPERSET_AGENT_ID: "claude",
+					SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+				},
+			);
+			expect(result.exitCode).toBe(0);
+			expect(host.requests[0]?.json).toMatchObject({
+				agent: {
+					agentId: "claude",
+					sessionId: "11111111-2222-4333-8444-555555555555",
+				},
+				transcriptPath:
+					"/Users/a/.claude/projects/-Users-a-wt/11111111-2222-4333-8444-555555555555.jsonl",
+			});
+		} finally {
+			host.stop();
+		}
+	});
+
+	it("takes Antigravity's event from its hook config and its session from conversationId", async () => {
+		const host = fakeHostService(false);
+		try {
+			const result = await runNotifyHookAsync(
+				{
+					conversationId: "a38edace-d311-4fea-8de0-1af2ea76b958",
+					lastUserInput: '{"hook_event_name":"Stop","session_id":"pasted"}',
+					modelName: "gemini-3.8-flash-high",
+				},
+				{
+					SUPERSET_AGENT_ID: "agy",
+					SUPERSET_HOOK_HARNESS: "agy",
+					SUPERSET_HOOK_EVENT: "Start",
+					SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook`,
+				},
+			);
+			expect(result.exitCode).toBe(0);
+			expect(host.requests[0]?.json).toMatchObject({
+				eventType: "Start",
+				agent: {
+					agentId: "agy",
+					sessionId: "a38edace-d311-4fea-8de0-1af2ea76b958",
+				},
+			});
+		} finally {
+			host.stop();
+		}
+	});
+
+	it("omits the transcript path when the harness reports none", async () => {
+		const host = fakeHostService(false);
+		try {
+			await runNotifyHookAsync(
+				{ hook_event_name: "Stop", session_id: "grok-session" },
+				{ SUPERSET_HOST_AGENT_HOOK_URL: `${host.url}/trpc/notifications.hook` },
+			);
+			expect(host.requests[0]?.json).not.toHaveProperty("transcriptPath");
+		} finally {
+			host.stop();
+		}
 	});
 
 	it("forwards hooks fired inside a subagent (agent_id present) to the host roster only", async () => {
@@ -243,7 +321,7 @@ describe("getNotifyScriptContent", () => {
 		expect(result.stderr.toString()).toContain("[notify-hook] event=Stop");
 	});
 
-	it("exits silently outside Superset terminals even with a payload session id", () => {
+	it("exits silently outside Paradev terminals even with a payload session id", () => {
 		const result = runNotifyHook(
 			{ hook_event_name: "Stop", session_id: "foreign-session" },
 			{ SUPERSET_TERMINAL_ID: "", SUPERSET_TAB_ID: "" },
@@ -257,10 +335,10 @@ describe("getNotifyScriptContent", () => {
 		const script = readNotifyHookTemplate();
 
 		expect(script).toContain(
-			"HOOK_SESSION_ID=$(json_field session_id sessionId)",
+			"HOOK_SESSION_ID=$(json_field session_id sessionId conversationId)",
 		);
 		expect(script).toContain(
-			'dispatch_to_host "{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$AGENT_ID")\\",\\"sessionId\\":\\"$(json_escape "$SESSION_ID")\\"}$PREVIEW_FIELD$ACCOUNT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"',
+			'dispatch_to_host "{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$AGENT_ID")\\",\\"sessionId\\":\\"$(json_escape "$SESSION_ID")\\"}$PREVIEW_FIELD$ACCOUNT_FIELD$TRANSCRIPT_FIELD$LAUNCH_FIELD$ATTRIBUTION_FIELD}}"',
 		);
 		// One dispatcher serves both the agent and subagent payloads.
 		expect(script.split('dispatch_to_host "').length - 1).toBe(2);
@@ -282,9 +360,9 @@ describe("getNotifyScriptContent", () => {
 	});
 
 	it("resolves the endpoint at call time from org manifests, not only the frozen env URL", () => {
-		const script = readNotifyHookTemplate();
+		const script = renderNotifyHookScript();
 
-		expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+		expect(script).toContain(HOME_DIR_FALLBACK);
 		expect(script).toContain("/host/*/manifest.json; do");
 		expect(script).toContain(
 			'HOOK_CANDIDATE_URLS="$SUPERSET_HOST_AGENT_HOOK_URL"',
@@ -369,7 +447,7 @@ describe("per-agent hook scripts dispatch to host-service", () => {
 	const buildExpectedV2Payload = (agentIdVar: string) =>
 		`PAYLOAD="{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$${agentIdVar}")\\",\\"sessionId\\":\\"$(json_escape "$HOOK_SESSION_ID")\\"}}}"`;
 
-	it("cursor auto-approves permission requests before the outside-Superset bail-out", () => {
+	it("cursor auto-approves permission requests before the outside-Paradev bail-out", () => {
 		const script = readFileSync(
 			getTemplatePath("cursor-hook.template.sh"),
 			"utf-8",
@@ -388,13 +466,16 @@ describe("per-agent hook scripts dispatch to host-service", () => {
 		["gemini-hook.template.sh", "AGENT_ID"],
 	] as const) {
 		it(`${template} posts to host-service`, () => {
-			const script = readFileSync(getTemplatePath(template), "utf-8");
+			const script = readFileSync(
+				getTemplatePath(template),
+				"utf-8",
+			).replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 			expect(script).toContain(
 				'[ -n "$SUPERSET_TERMINAL_ID" ] || [ -n "$SUPERSET_TAB_ID" ] || exit 0',
 			);
 			expect(script).toContain(buildExpectedV2Payload(agentIdVar));
 			expect(script).toContain('curl -sX POST "$HOOK_URL"');
-			expect(script).toContain("SUPERSET_HOME_DIR:-$HOME/.superset");
+			expect(script).toContain(HOME_DIR_FALLBACK);
 			expect(script).toContain("/host/*/manifest.json; do");
 			expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
 		});
@@ -631,10 +712,9 @@ describe("agent identity precedence", () => {
 
 describe("cursor-hook.template.sh identity", () => {
 	function renderCursorHook(): string {
-		return readFileSync(
-			getTemplatePath("cursor-hook.template.sh"),
-			"utf-8",
-		).replaceAll("{{MARKER}}", "# test hook");
+		return readFileSync(getTemplatePath("cursor-hook.template.sh"), "utf-8")
+			.replaceAll("{{MARKER}}", "# test hook")
+			.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 	}
 
 	async function runCursorHook(

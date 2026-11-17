@@ -1,4 +1,9 @@
-import { WorkerPoolContextProvider } from "@pierre/diffs/react";
+import { canUseWASM } from "@pierre/diffs";
+import {
+	type WorkerInitializationRenderOptions,
+	WorkerPoolContextProvider,
+	type WorkerPoolOptions,
+} from "@pierre/diffs/react";
 import { Button } from "@superset/ui/button";
 import { Spinner } from "@superset/ui/spinner";
 import {
@@ -22,13 +27,27 @@ import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { showWorkspaceAutoNameWarningToast } from "renderer/lib/workspaces/showWorkspaceAutoNameWarningToast";
+import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
+import { InterruptedChatsDialog } from "renderer/routes/_authenticated/components/InterruptedChatsDialog";
 import { LeaderboardAutoPublish } from "renderer/routes/_authenticated/components/LeaderboardAutoPublish";
+import { OrganizationPluginSync } from "renderer/routes/_authenticated/components/OrganizationPluginSync";
+import { ParadevShellSync } from "renderer/routes/_authenticated/components/ParadevShellSync";
 import { PendingDeletionScreen } from "renderer/routes/_authenticated/components/PendingDeletionScreen";
+import { PostHogPlanFlags } from "renderer/routes/_authenticated/components/PostHogPlanFlags";
 import { RealtimeNudges } from "renderer/routes/_authenticated/components/RealtimeNudges";
 import { StarNagObserver } from "renderer/routes/_authenticated/components/StarNagObserver";
-import { V1AutoMigration } from "renderer/routes/_authenticated/components/V1AutoMigration";
+import {
+	V1AutoMigration,
+	V1MigrationContinuity,
+} from "renderer/routes/_authenticated/components/V1AutoMigration";
+import {
+	V1MigrationStatusCard,
+	V1TerminalsNotice,
+	V2FlipWelcome,
+} from "renderer/routes/_authenticated/components/V1FlipNotice";
 import { V1ImportModal } from "renderer/routes/_authenticated/components/V1ImportModal";
 import { useForwardedHotkeys } from "renderer/routes/_authenticated/hooks/useForwardedHotkeys";
 import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotkeys";
@@ -36,9 +55,13 @@ import { useSettingsStore } from "renderer/stores/settings-state";
 import { MOCK_ORG_ID, NOTIFICATION_EVENTS } from "shared/constants";
 import { AgentHooks } from "./components/AgentHooks";
 import { DockBadgeController } from "./components/DockBadgeController";
+import { FileAutoSave } from "./components/FileAutoSave";
 import { FileMenuListener } from "./components/FileMenuListener";
 import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
+import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
+import { InviteMemberDialog } from "./components/InviteMemberDialog";
+import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
 import { NotificationController } from "./components/NotificationController";
 import { WindowTitle } from "./components/WindowTitle";
 import { createPierreWorker } from "./lib/pierreWorker";
@@ -46,6 +69,7 @@ import { CollectionsProvider } from "./providers/CollectionsProvider";
 import { HostWorkspacesProvider } from "./providers/HostWorkspacesProvider";
 import { LocalHostServiceProvider } from "./providers/LocalHostServiceProvider";
 import { SandboxAccessProvider } from "./providers/SandboxAccessProvider";
+import { TagFolderWorkspacesProvider } from "./providers/TagFolderWorkspacesProvider";
 
 export const Route = createFileRoute("/_authenticated")({
 	component: AuthenticatedLayout,
@@ -58,6 +82,18 @@ const createOrganizationRedirect = (
 const onboardingRedirect = <Redirect to="/onboarding" replace />;
 
 const SESSION_PENDING_TIMEOUT_MS = 15_000;
+
+const HIGHLIGHT_WITH_WASM = canUseWASM();
+const PIERRE_POOL_OPTIONS: WorkerPoolOptions = HIGHLIGHT_WITH_WASM
+	? {
+			workerFactory: createPierreWorker,
+			poolSize: 2,
+			mainThreadMaxCharacters: 200_000,
+		}
+	: { workerFactory: createPierreWorker, poolSize: 8 };
+const PIERRE_HIGHLIGHTER_OPTIONS: WorkerInitializationRenderOptions = {
+	preferredHighlighter: HIGHLIGHT_WITH_WASM ? "highlights" : "shiki-js",
+};
 
 function AuthenticatedLayout() {
 	const {
@@ -160,7 +196,7 @@ function AuthenticatedLayout() {
 								Still restoring your session
 							</h2>
 							<p className="text-sm text-muted-foreground">
-								Superset can't confirm your sign-in with the server.
+								Paradev can't confirm your sign-in with the server.
 							</p>
 						</div>
 						<div className="flex gap-2">
@@ -236,31 +272,50 @@ function AuthenticatedLayout() {
 		<DndProvider manager={dragDropManager}>
 			<CollectionsProvider>
 				<WindowTitle />
+				<PostHogPlanFlags />
+				<ParadevShellSync />
 				<GlobalBrowserLifecycle />
+				<GlobalPaneLayoutRequests />
+				<FileAutoSave />
 				<LocalHostServiceProvider>
 					{/* Above the workspace fan-out: it needs sandbox addresses to
 					    include them as hosts. */}
 					<SandboxAccessProvider>
 						<HostWorkspacesProvider>
-							<WorkerPoolContextProvider
-								poolOptions={{ workerFactory: createPierreWorker, poolSize: 8 }}
-								highlighterOptions={{ preferredHighlighter: "shiki-wasm" }}
-							>
-								<DiffThemeSync />
-								<AgentHooks />
-								<FileMenuListener />
-								<NotificationController />
-								<DockBadgeController />
-								<StarNagObserver />
-								<LeaderboardAutoPublish />
-								<RealtimeNudges />
-								<DaemonAutoUpdateFailureDialog />
-								<Outlet />
-								<V1ImportModal />
-								<V1AutoMigration />
-								<GitInitConfirmDialog />
-								<Paywall />
-							</WorkerPoolContextProvider>
+							<TagFolderWorkspacesProvider>
+								<WorkerPoolContextProvider
+									poolOptions={PIERRE_POOL_OPTIONS}
+									highlighterOptions={PIERRE_HIGHLIGHTER_OPTIONS}
+								>
+									<DiffThemeSync />
+									<AgentHooks />
+									<FileMenuListener />
+									<NotificationController />
+									<DockBadgeController />
+									<StarNagObserver />
+									<LeaderboardAutoPublish />
+									<OrganizationPluginSync />
+									<RealtimeNudges />
+									<ChannelsRealtime />
+									<DaemonAutoUpdateFailureDialog />
+									<InterruptedChatsDialog />
+									<Outlet />
+									<V1ImportModal />
+									<V1MigrationContinuity />
+									<V2FlipWelcome organizationId={activeOrganizationId} />
+									<V1MigrationStatusCard
+										organizationId={activeOrganizationId}
+									/>
+									<V1TerminalsNotice
+										organizationId={activeOrganizationId}
+									/>
+									<V1AutoMigration />
+									<GitInitConfirmDialog />
+									<Paywall />
+									<InviteMemberDialog />
+									<ResizeMachineConfirmDialog />
+								</WorkerPoolContextProvider>
+							</TagFolderWorkspacesProvider>
 						</HostWorkspacesProvider>
 					</SandboxAccessProvider>
 				</LocalHostServiceProvider>

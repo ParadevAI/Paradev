@@ -1,3 +1,4 @@
+import type { CreatePaneInput } from "@superset/panes";
 import {
 	type FocusDirection,
 	getPaneParentDirection,
@@ -6,33 +7,43 @@ import {
 	type WorkspaceProps,
 	type WorkspaceStore,
 } from "@superset/panes";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useUserPreferences } from "renderer/hooks/useUserPreferences";
+import { useCallback, useMemo, useRef } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
-import { useRightSidebarToggleIntent } from "renderer/stores/right-sidebar-toggle-intent";
 import type { StoreApi } from "zustand";
-import type {
-	BrowserPaneData,
-	DesktopPaneData,
-	PaneViewerData,
-	TerminalPaneData,
+import {
+	createRightPane,
+	type RightPaneKind,
+} from "../../components/RightPaneNewTab";
+import {
+	type BrowserPaneData,
+	type DesktopPaneData,
+	type MobilePaneData,
+	NEW_TAB_PANE_KIND,
+	type PaneTarget,
+	type PaneViewerData,
+	type TerminalPaneData,
 } from "../../types";
+import { cycleActiveTab } from "../../utils/cycleActiveTab";
+import { replaceNewTabPane } from "../../utils/replaceNewTabPane";
 import { useDefaultBrowserUrl } from "../useDefaultBrowserUrl";
 import type { TerminalLauncher } from "../useTerminalLauncher";
 
 export function useWorkspaceHotkeys({
 	store,
+	viewer,
 	matchedPresets,
 	executePreset,
 	addTerminalTab,
 	openChangesPane,
 	paneRegistry,
 	launcher,
-	onBeforeCloseTab,
+	getCloseTarget,
 	isSandbox,
+	isMobilePaneEnabled,
 }: {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	viewer: PaneTarget;
 	matchedPresets: TerminalPresetRow[];
 	executePreset: (preset: TerminalPresetRow) => void | Promise<void>;
 	addTerminalTab: () => Promise<void>;
@@ -40,35 +51,44 @@ export function useWorkspaceHotkeys({
 	paneRegistry: PaneRegistry<PaneViewerData>;
 	launcher: TerminalLauncher;
 	isSandbox: boolean;
-	onBeforeCloseTab?: WorkspaceProps<PaneViewerData>["onBeforeCloseTab"];
+	isMobilePaneEnabled: boolean;
+	getCloseTarget: () => {
+		store: StoreApi<WorkspaceStore<PaneViewerData>>;
+		onBeforeCloseTab?: WorkspaceProps<PaneViewerData>["onBeforeCloseTab"];
+	};
 }) {
-	const { setRightSidebarOpen } = useUserPreferences();
 	const defaultBrowserUrl = useDefaultBrowserUrl();
 	const visiblePresets = useMemo(
 		() => matchedPresets.filter((preset) => preset.pinnedToBar !== false),
 		[matchedPresets],
 	);
 
-	useHotkey("TOGGLE_SIDEBAR", () => {
-		setRightSidebarOpen((prev) => !prev);
-	});
-
-	useEffect(
-		() =>
-			useRightSidebarToggleIntent.subscribe((state, prev) => {
-				if (state.tick !== prev.tick) setRightSidebarOpen((open) => !open);
-			}),
-		[setRightSidebarOpen],
-	);
-
 	// --- Tab creation ---
 
+	const replaceFocusedNewTab = (kind: RightPaneKind): boolean => {
+		const target = getCloseTarget().store;
+		const active = target.getState().getActivePane();
+		if (active?.pane.kind !== NEW_TAB_PANE_KIND) return false;
+		replaceNewTabPane(
+			target,
+			{ tabId: active.tabId, paneId: active.pane.id },
+			createRightPane(kind, {
+				mintTerminalId: launcher.mint,
+				browserUrl: defaultBrowserUrl,
+			}),
+		);
+		return true;
+	};
+
 	useHotkey("NEW_GROUP", async () => {
+		if (replaceFocusedNewTab("terminal")) return;
 		await addTerminalTab();
 	});
 
 	useHotkey("NEW_BROWSER", () => {
-		store.getState().addTab({
+		if (replaceFocusedNewTab("browser")) return;
+		viewer.reveal();
+		viewer.store.getState().addTab({
 			panes: [
 				{
 					kind: "browser",
@@ -81,6 +101,7 @@ export function useWorkspaceHotkeys({
 	});
 
 	useHotkey("OPEN_DIFF_VIEWER", () => {
+		if (replaceFocusedNewTab("diff")) return;
 		openChangesPane();
 	});
 
@@ -91,7 +112,7 @@ export function useWorkspaceHotkeys({
 		if (isClosingPaneRef.current) return;
 		isClosingPaneRef.current = true;
 		try {
-			const state = store.getState();
+			const state = getCloseTarget().store.getState();
 			const active = state.getActivePane();
 			if (!active) return;
 			const definition = paneRegistry[active.pane.kind];
@@ -110,7 +131,8 @@ export function useWorkspaceHotkeys({
 		if (isClosingTabRef.current) return;
 		isClosingTabRef.current = true;
 		try {
-			const state = store.getState();
+			const { store: targetStore, onBeforeCloseTab } = getCloseTarget();
+			const state = targetStore.getState();
 			const tab = state.getActiveTab();
 			if (!tab) return;
 			if (onBeforeCloseTab) {
@@ -123,39 +145,10 @@ export function useWorkspaceHotkeys({
 		}
 	});
 
-	useHotkey("PREV_TAB", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const prevIndex = index <= 0 ? state.tabs.length - 1 : index - 1;
-		state.setActiveTab(state.tabs[prevIndex].id);
-	});
-
-	useHotkey("NEXT_TAB", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const nextIndex =
-			index >= state.tabs.length - 1 || index === -1 ? 0 : index + 1;
-		state.setActiveTab(state.tabs[nextIndex].id);
-	});
-
-	useHotkey("PREV_TAB_ALT", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const prevIndex = index <= 0 ? state.tabs.length - 1 : index - 1;
-		state.setActiveTab(state.tabs[prevIndex].id);
-	});
-
-	useHotkey("NEXT_TAB_ALT", () => {
-		const state = store.getState();
-		if (!state.activeTabId || state.tabs.length === 0) return;
-		const index = state.tabs.findIndex((t) => t.id === state.activeTabId);
-		const nextIndex =
-			index >= state.tabs.length - 1 || index === -1 ? 0 : index + 1;
-		state.setActiveTab(state.tabs[nextIndex].id);
-	});
+	useHotkey("PREV_TAB", () => cycleActiveTab(store, -1));
+	useHotkey("NEXT_TAB", () => cycleActiveTab(store, 1));
+	useHotkey("PREV_TAB_ALT", () => cycleActiveTab(store, -1));
+	useHotkey("NEXT_TAB_ALT", () => cycleActiveTab(store, 1));
 
 	const switchToTab = useCallback(
 		(index: number) => {
@@ -257,9 +250,13 @@ export function useWorkspaceHotkeys({
 		});
 	});
 
-	useHotkey(
-		"SPLIT_WITH_DESKTOP",
-		() => {
+	const splitWithViewerPane = useCallback(
+		(newPane: CreatePaneInput<PaneViewerData>) => {
+			if (viewer.store !== store) {
+				viewer.reveal();
+				viewer.store.getState().openPane({ pane: newPane });
+				return;
+			}
 			const state = store.getState();
 			const active = state.getActivePane();
 			if (!active) return;
@@ -267,31 +264,38 @@ export function useWorkspaceHotkeys({
 				tabId: active.tabId,
 				paneId: active.pane.id,
 				position: "right",
-				newPane: {
-					kind: "desktop",
-					data: { kind: "desktop" } as DesktopPaneData,
-				},
+				newPane,
 			});
 		},
+		[store, viewer],
+	);
+
+	useHotkey(
+		"SPLIT_WITH_DESKTOP",
+		() =>
+			splitWithViewerPane({
+				kind: "desktop",
+				data: { kind: "desktop" } as DesktopPaneData,
+			}),
 		{ enabled: isSandbox },
 	);
 
-	useHotkey("SPLIT_WITH_BROWSER", () => {
-		const state = store.getState();
-		const active = state.getActivePane();
-		if (!active) return;
-		state.splitPane({
-			tabId: active.tabId,
-			paneId: active.pane.id,
-			position: "right",
-			newPane: {
-				kind: "browser",
-				data: {
-					url: defaultBrowserUrl,
-				} as BrowserPaneData,
-			},
-		});
-	});
+	useHotkey(
+		"SPLIT_WITH_MOBILE",
+		() =>
+			splitWithViewerPane({
+				kind: "mobile",
+				data: { kind: "mobile" } as MobilePaneData,
+			}),
+		{ enabled: isMobilePaneEnabled },
+	);
+
+	useHotkey("SPLIT_WITH_BROWSER", () =>
+		splitWithViewerPane({
+			kind: "browser",
+			data: { url: defaultBrowserUrl } as BrowserPaneData,
+		}),
+	);
 
 	useHotkey("EQUALIZE_PANE_SPLITS", () => {
 		const state = store.getState();

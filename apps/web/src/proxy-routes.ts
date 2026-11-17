@@ -2,6 +2,7 @@ const authPageRoutes = ["/sign-in", "/sign-up"] as const;
 
 const otherPublicRoutes = [
 	"/auth/desktop",
+	"/auth/integration-connect",
 	"/api/auth/desktop",
 	"/accept-invitation",
 	"/cli/auth/code",
@@ -9,13 +10,18 @@ const otherPublicRoutes = [
 	// app, so a sign-in wall only strands the recipient of a shared link.
 	"/tasks",
 	"/automations",
+	"/workspaces",
+	"/plugins",
+	"/environments",
 	"/page",
 	"/robots.txt",
+	"/.well-known/apple-app-site-association",
+	"/.well-known/assetlinks.json",
 ] as const;
 
 const publicRoutes = [...authPageRoutes, ...otherPublicRoutes] as const;
 
-/** Routes only visible to signed-in company accounts (COMPANY.EMAIL_DOMAIN). */
+/** Routes only visible to signed-in company accounts (STAFF_EMAIL_DOMAINS). */
 const internalRoutes = ["/design"] as const;
 
 function matchesRouteOrChild(pathname: string, route: string): boolean {
@@ -28,6 +34,30 @@ export function isPublicRoute(pathname: string): boolean {
 
 export function isAuthPageRoute(pathname: string): boolean {
 	return authPageRoutes.some((route) => matchesRouteOrChild(pathname, route));
+}
+
+/** Resolve before checking: URL parsing drops tabs and newlines, so `/\t/host` is another origin. */
+export function safeRedirectUrl(
+	redirect: string | null,
+	origin: string,
+): URL | null {
+	if (!redirect?.startsWith("/")) return null;
+	let url: URL;
+	try {
+		url = new URL(redirect, origin);
+	} catch {
+		return null;
+	}
+	if (url.origin !== origin || isAuthPageRoute(url.pathname)) return null;
+	return url;
+}
+
+export function isAgentsRoute(pathname: string): boolean {
+	return matchesRouteOrChild(pathname, "/agents");
+}
+
+export function agentsRewriteUrl(url: URL, agentsUrl: string): URL {
+	return new URL(`${url.pathname}${url.search}`, agentsUrl);
 }
 
 export function isInternalRoute(pathname: string): boolean {

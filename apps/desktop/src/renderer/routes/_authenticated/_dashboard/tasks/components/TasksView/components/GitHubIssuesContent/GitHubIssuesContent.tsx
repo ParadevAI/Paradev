@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { GoIssueClosed, GoIssueOpened } from "react-icons/go";
 import { HiOutlineArrowTopRightOnSquare } from "react-icons/hi2";
 import { LuMinus, LuPlus, LuRefreshCw } from "react-icons/lu";
+import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
@@ -13,6 +14,11 @@ import { LoadMoreSentinel } from "renderer/routes/_authenticated/_dashboard/comp
 import { serializeProjectFilters } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter/project-filter-utils";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import { useWorkItemsList } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkItemsList";
+import { GitHubAuthorAvatar } from "renderer/routes/_authenticated/_dashboard/tasks/components/GitHubAuthorAvatar";
+import {
+	linkedContextSeed,
+	linkedIssueChip,
+} from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import {
 	type LinkedIssue,
 	useNewWorkspaceDraftStore,
@@ -52,6 +58,7 @@ export function GitHubIssuesContent({
 	onCollapse,
 	onSelectionChange,
 }: GitHubIssuesContentProps) {
+	const isDark = useIsDarkTheme();
 	const { t } = useLingui();
 	const [selectedIssues, setSelectedIssues] = useState<
 		Map<string, SelectedIssue>
@@ -143,7 +150,7 @@ export function GitHubIssuesContent({
 
 	const handleAddToWorkspace = (issue: (typeof issues)[number]) => {
 		const linkedIssue: LinkedIssue = {
-			slug: `gh-${issue.issueNumber}`,
+			slug: `#${issue.issueNumber}`,
 			title: issue.title,
 			source: "github",
 			url: issue.url,
@@ -152,8 +159,10 @@ export function GitHubIssuesContent({
 		};
 		resetDraft();
 		selectProject(issue.projectId);
-		updateDraft({ hostId: issue.hostId, linkedIssues: [linkedIssue] });
-		openNewWorkspace(issue.projectId);
+		updateDraft({
+			promptDraft: linkedContextSeed([linkedIssueChip(linkedIssue, isDark)]),
+		});
+		openNewWorkspace(issue.projectId, issue.hostId ?? undefined);
 	};
 
 	const handleOpenUrl = (url: string) => {
@@ -372,8 +381,14 @@ export function GitHubIssuesContent({
 										{issue.title}
 									</span>
 									{issue.authorLogin && (
-										<span className="hidden shrink-0 text-xs text-muted-foreground @md:inline">
-											{issue.authorLogin}
+										<span
+											className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground"
+											title={issue.authorLogin}
+										>
+											<GitHubAuthorAvatar login={issue.authorLogin} />
+											<span className="hidden @md:inline">
+												{issue.authorLogin}
+											</span>
 										</span>
 									)}
 									<div className="flex items-center gap-1">

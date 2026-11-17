@@ -1,6 +1,6 @@
 # @superset/email
 
-Email templates for Superset, built with [React Email](https://react.email).
+Email templates for Paradev, built with [React Email](https://react.email).
 
 ## Images in Email
 
@@ -9,10 +9,10 @@ Email templates for Superset, built with [React Email](https://react.email).
 ### Image Setup
 1. Generate PNG assets (email clients don't support SVG):
    - Header logo (`logo.png`): 240x240px
-   - Footer logo (`logo-full.png`): 512x83px (pixelated SUPERSET text)
+   - Footer logo (`logo-full.png`): 446x83px (wordmark)
    - Social icons: 48x48px (displayed at 24x24 for retina)
 2. Place in `apps/marketing/public/assets/emails/`
-3. Images load from `https://superset.sh/assets/emails/` in production
+3. Images load from `https://paradev.com/assets/emails/` in production
 
 ### Environment Variables
 
@@ -27,7 +27,7 @@ NEXT_PUBLIC_MARKETING_URL=http://localhost:3002  # Marketing app port
 **For production:**
 Set in your deployment environment:
 ```bash
-NEXT_PUBLIC_MARKETING_URL=https://superset.sh
+NEXT_PUBLIC_MARKETING_URL=https://paradev.com
 ```
 
 **Note:** For actual email sending, the environment variable should be set in your API/backend service.
@@ -126,7 +126,7 @@ const html = render(<WelcomeEmail userName="Satya" />);
 await resend.emails.send({
   from: "noreply@superset.sh",
   to: user.email,
-  subject: "Welcome to Superset!",
+  subject: "Welcome to Paradev!",
   html,
 });
 ```
@@ -159,7 +159,7 @@ Primary and secondary button styles.
 **Example:**
 ```tsx
 <Button href="https://app.superset.sh">Get Started</Button>
-<Button href="https://superset.sh" variant="secondary">
+<Button href="https://paradev.com" variant="secondary">
   Learn More
 </Button>
 ```
@@ -250,3 +250,17 @@ Until that deployment, the enabled Resend automation receives no events from thi
 code. Stop the automation in Resend to disable campaign sending. Never test by
 emitting an event for a customer; local eligibility and deduplication tests live
 beside the job route.
+
+## Mobile upgrade nudge
+
+`billing.recordUpgradeIntent` emits `billing.upgrade_nudge_due` (payload
+`featureName`, `upgradeUrl`) at most once per user per 7 days, through a KV
+claim. It skips organizations on a paid plan and unsubscribed contacts. The
+`upgrade-nudge` automation in `scripts/sync-automations.ts` sends the
+`billing-upgrade-nudge` template. That path gives the email Resend's unsubscribe
+link and `List-Unsubscribe` headers, which a direct `emails.send()` does not get.
+
+To change the email, edit `src/emails/billing/upgrade-nudge.tsx`, then run
+`bun scripts/publish-upgrade-nudge-template.ts --apply` before
+`bun scripts/sync-automations.ts --apply`. The sync fails until the template
+alias exists. Stop the automation in Resend to stop these emails.

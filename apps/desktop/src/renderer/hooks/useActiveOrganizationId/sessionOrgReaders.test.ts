@@ -27,6 +27,8 @@ const ACCOUNT_WIDE_READERS: Record<string, string> = {
 	// for the signed-in user and has no window-scoped meaning.
 	"routes/_authenticated/components/V1AutoMigration/V1AutoMigration.tsx":
 		"v1 migration is per account, not per window",
+	"routes/_authenticated/components/V1AutoMigration/V1MigrationContinuity.tsx":
+		"v1 migration is per account, not per window",
 	"routes/_authenticated/components/V1ImportModal/V1ImportModal.tsx":
 		"v1 import is per account, not per window",
 

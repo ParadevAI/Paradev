@@ -10,6 +10,7 @@ export type GmailConfig = Extract<TriggerConfigInput, { kind: "gmail" }>;
  */
 
 export type GmailSlot =
+	| "account"
 	| "from"
 	| "to"
 	| "subjectFilter"
@@ -19,7 +20,9 @@ export type GmailSlot =
 type SentencePart<Slot extends string> = { text: string } | { slot: Slot };
 
 export const GMAIL_SENTENCE: SentencePart<GmailSlot>[] = [
-	{ text: "Email received from" },
+	{ text: "Email received" },
+	{ slot: "account" },
+	{ text: "from" },
 	{ slot: "from" },
 	{ text: "to" },
 	{ slot: "to" },

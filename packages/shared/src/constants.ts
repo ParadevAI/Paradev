@@ -1,4 +1,17 @@
+import { ROOT_DOMAIN } from "./app-identity";
 import type { TriggerConfigInput } from "./automation-triggers";
+import { BRAND } from "./brand";
+import { OWN_ROOT_DOMAINS } from "./own-domains";
+
+export { ANDROID_APP, CANONICAL_URLS, IOS_APP } from "./app-identity";
+
+// SHA-256 of the certificates that sign the Android app: the EAS upload key and
+// the Play App Signing key. Not in app-identity.ts, so adding one leaves the
+// mobile runtime version alone.
+export const ANDROID_SIGNING_CERT_SHA256: readonly string[] = [
+	"07:4D:2F:5A:8E:53:60:69:9C:D8:BE:92:D6:DC:8C:88:45:2D:C1:EF:B7:F7:DE:D7:38:60:7F:32:96:7E:DD:27",
+	"9F:06:C7:55:C5:46:BD:18:7A:3A:A9:28:63:71:50:1F:E4:5E:DE:F5:57:B2:5C:BE:9F:46:27:BA:C6:8B:43:80",
+];
 
 // Auth
 export const AUTH_PROVIDERS = ["github", "google"] as const;
@@ -14,44 +27,82 @@ export const PROTOCOL_SCHEMES = {
 
 // Company
 // Root domain flips the whole brand at cutover. Default keeps superset.sh so
-// nothing changes until NEXT_PUBLIC_ROOT_DOMAIN is set (e.g. boid.so). All
+// nothing changes until NEXT_PUBLIC_ROOT_DOMAIN is set. All
 // domain-derived URLs below build off this; social handles / GitHub / Discord
 // are external identities and are updated by hand on rebrand.
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || "superset.sh";
+const SUPPORT_EMAIL = `support@${ROOT_DOMAIN}`;
 const MARKETING_URL =
 	process.env.NEXT_PUBLIC_MARKETING_URL || `https://${ROOT_DOMAIN}`;
+const APP_STORE_ID = "6788926383";
+
+export const SOCIAL = {
+	GITHUB: {
+		handle: "github.com/paradevai/paradev",
+		url: "https://github.com/paradevai/paradev",
+	},
+	X: { handle: "@paradevai", url: "https://x.com/paradevai" },
+	X_FORMER: { handle: "@superset_sh", url: "https://x.com/superset_sh" },
+	LINKEDIN: {
+		handle: "linkedin.com/company/paradevai",
+		url: "https://www.linkedin.com/company/paradevai",
+	},
+	YOUTUBE: { handle: "@paradevai", url: "https://www.youtube.com/@paradevai" },
+	DISCORD: {
+		handle: "discord.gg/cZeD9WYcV7",
+		url: "https://discord.gg/cZeD9WYcV7",
+	},
+} as const;
 
 export const COMPANY = {
-	NAME: "Superset",
+	NAME: BRAND.NAME,
+	LEGAL_NAME: "Superset Inc.",
 	DOMAIN: ROOT_DOMAIN,
 	EMAIL_DOMAIN: `@${ROOT_DOMAIN}`,
-	GITHUB_URL: "https://github.com/superset-sh/superset",
+	GITHUB_URL: SOCIAL.GITHUB.url,
 	DOCS_URL: process.env.NEXT_PUBLIC_DOCS_URL || `https://docs.${ROOT_DOMAIN}`,
 	MARKETING_URL,
 	TERMS_URL: `${MARKETING_URL}/terms`,
 	PRIVACY_URL: `${MARKETING_URL}/privacy`,
 	CHANGELOG_URL: `${MARKETING_URL}/changelog`,
-	X_URL: "https://x.com/superset_sh",
-	LINKEDIN_URL: "https://www.linkedin.com/company/superset-sh",
-	YOUTUBE_URL: "https://www.youtube.com/@superset-sh",
-	MAIL_TO: `mailto:support@${ROOT_DOMAIN}`,
+	X_URL: SOCIAL.X.url,
+	LINKEDIN_URL: SOCIAL.LINKEDIN.url,
+	YOUTUBE_URL: SOCIAL.YOUTUBE.url,
+	SUPPORT_EMAIL,
+	MAIL_TO: `mailto:${SUPPORT_EMAIL}`,
 	TEAM_EMAIL: `team@${ROOT_DOMAIN}`,
 	TEAM_MAIL_TO: `mailto:team@${ROOT_DOMAIN}`,
-	REPORT_ISSUE_URL: "https://github.com/superset-sh/superset/issues/new",
-	DISCORD_URL: "https://discord.gg/cZeD9WYcV7",
-	APP_STORE_URL: "https://apps.apple.com/app/id6788926383",
+	SALES_EMAIL: `sales@${ROOT_DOMAIN}`,
+	/** The founders' inbox, used as the press contact. Fixed rather than built from ROOT_DOMAIN. */
+	FOUNDERS_EMAIL: "founders@paradev.com",
+	FOUNDERS_MAIL_TO: "mailto:founders@paradev.com",
+	REPORT_ISSUE_URL: `${SOCIAL.GITHUB.url}/issues/new`,
+	DISCORD_URL: SOCIAL.DISCORD.url,
+	APP_STORE_ID,
+	APP_STORE_URL: `https://apps.apple.com/app/id${APP_STORE_ID}`,
 	STATUS_URL: `https://status.${ROOT_DOMAIN}`,
 	TRUST_URL: `https://trust.${ROOT_DOMAIN}`,
-	JOIN_US_URL: `${MARKETING_URL}/join-us`,
+	JOIN_US_URL: `${MARKETING_URL}/careers`,
 	/** The formal YC listing; product surfaces link here. `JOIN_US_URL` is our own marketing page. */
-	CAREERS_URL: "https://www.ycombinator.com/companies/superset/jobs",
+	CAREERS_URL: "https://www.ycombinator.com/companies/paradev/jobs",
 } as const;
+
+// Staff keep their @superset.sh accounts after the root domain changes.
+export const STAFF_EMAIL_DOMAINS = [
+	...new Set([
+		COMPANY.EMAIL_DOMAIN,
+		...OWN_ROOT_DOMAINS.map((domain) => `@${domain}`),
+	]),
+];
+
+export function isStaffEmail(email: string): boolean {
+	return STAFF_EMAIL_DOMAINS.some((domain) => email.endsWith(domain));
+}
 
 export const OPEN_ROLES = [
 	{
 		title: "Founding Engineer",
 		location: "San Francisco, CA",
-		url: "https://www.ycombinator.com/companies/superset/jobs/Nd9luiP-founding-engineer",
+		url: "https://www.ycombinator.com/companies/paradev/jobs/Nd9luiP-founding-engineer",
 	},
 ] as const;
 
@@ -83,20 +134,32 @@ export const ACCOUNT_DELETION_GRACE_DAYS = 30;
 export const POSTHOG_COOKIE_NAME = "superset";
 
 export const FEATURE_FLAGS = {
+	WEB_DOMAIN_MOVE: "web-domain-move",
+	WEB_PAGES_DOMAIN_MOVE: "web-pages-domain-move",
 	/**
-	 * The public Superset Mobile launch. Off, unloaded, or unreachable all mean
-	 * "not launched": the marketing site hides /mobile from navigation and the
-	 * sitemap and disables indexing. Evaluated per site, not per
-	 * visitor, so keep it a plain on/off flag — a percentage rollout would
-	 * hash the site's single distinct id to one side.
+	 * Shows the `.paradev/config.toml` editor in project settings in place of
+	 * the config.json form. host-service reads a config.toml wherever one
+	 * exists; this gates only where people are led to write one.
 	 */
-	MOBILE_LAUNCH: "mobile-launch",
-	/** Gates access to the experimental mobile-first agents UI on web. */
-	WEB_AGENTS_UI_ACCESS: "web-agents-ui-access",
-	/** Gates access to Cloud features (environment variables, sandboxes). */
-	CLOUD_ACCESS: "cloud-access",
-	/** When enabled, blocks remote agent execution on the desktop (e.g., for enterprise orgs). */
-	DISABLE_REMOTE_AGENT: "disable-remote-agent",
+	WORKSPACE_CONFIG_TOML: "workspace-config-toml",
+	/** In-app channels in the desktop sidebar. */
+	CHANNELS: "channels",
+	/**
+	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
+	 * card, pane cards and the inline home composer. Read once per launch, so
+	 * a change in PostHog applies on the next start.
+	 */
+	PARADEV_SHELL: "paradev-shell",
+	/**
+	 * Kill switch for stacked pull requests on the desktop: the stack read and
+	 * chip, stack merge, merge queue actions, and switching a workspace between
+	 * layers. On for everyone. Unloaded or offline means on, and so does a
+	 * disabled or deleted flag: to turn it off, keep the flag enabled and set
+	 * its rollout to 0%. Plain Merge works either way.
+	 */
+	STACKED_PULL_REQUESTS: "stacked-pull-requests",
+	/** Allowlist for mobile voice mode: shows the entry and authorizes `voice.createSession`. */
+	MOBILE_VOICE_MODE: "mobile-voice-mode",
 	/**
 	 * Shows the "We're Hiring" card in the dashboard sidebar. Targets a static
 	 * PostHog cohort of users who have created 10+ workspaces all-time, which is
@@ -106,8 +169,6 @@ export const FEATURE_FLAGS = {
 	 * it to reach users who cross the threshold later.
 	 */
 	HIRING_BANNER: "hiring-banner",
-	/** Shows the "Star Superset on GitHub" sidebar card once a user crosses the workspace-count threshold. Lets us kill the nag instantly without a release if it reads as annoying. */
-	STAR_NAG_CARD: "star-nag-card",
 	/**
 	 * Which trigger providers the Add Trigger menu offers. Payload is a JSON
 	 * array of provider kinds, e.g. `["github", "slack"]`; Scheduled is always
@@ -123,43 +184,22 @@ export const FEATURE_FLAGS = {
 	 */
 	AUTOMATION_EVENT_TRIGGERS: "automation-event-triggers",
 	/**
-	 * Three-arm experiment flag nested inside the shipped new-workspace screen,
-	 * testing form factor only: `control` keeps the inline sample-prompt rows,
-	 * `cards2` shows two cards above the composer, `cards4` shows four in a 2x2
-	 * grid. Every arm slices a nested prefix of one fixed prompt pool and shares
-	 * the same selection rule, so content is identical and only layout and count
-	 * vary. Evaluated when the screen opens, so exposure matches the population
-	 * that sees it.
-	 *
-	 * Anything other than `cards2`/`cards4` renders control — which is why the
-	 * flag must not go live before a build carrying those arms ships, or older
-	 * builds would be assigned a card arm and shown rows.
-	 *
-	 * Eligibility (new accounts only) is a release condition on the flag, not
-	 * code: a `created_at` person property cutoff, which the renderer sends with
-	 * flag requests at identify time. Existing accounts get `false` back and
-	 * render the rows exactly as they do today, with no exposure recorded.
+	 * Replaces the v2 workspace's right sidebar with a second pane area that
+	 * holds Files, Changes, Review, Browser and Chat panes.
 	 */
-	NEW_WORKSPACE_PROMPT_CARDS: "new-workspace-prompt-cards",
-	/**
-	 * Boolean override that forces the `cards2` arm without evaluating the
-	 * experiment flag — no exposure event, so team and dev accounts can look at
-	 * the cards without entering the analysis. Checked before the experiment
-	 * flag.
-	 */
-	NEW_WORKSPACE_PROMPT_CARDS_OVERRIDE: "new-workspace-prompt-cards-override",
-	/**
-	 * Shows the rebuilt chat pane (ChatV3Pane). UI-only: host-service always
-	 * serves its `/chat-v3/*` routes, so this flag decides who sees the pane,
-	 * not what the host can do — flips take effect live, with no host restart.
-	 */
-	CHAT_V3: "chat-v3",
 	/**
 	 * Who may use cloud sandboxes: shows the option in the create picker, and
 	 * gates the cloud procedures server-side (`assertCloudAccess`). The release
 	 * conditions are the allowlist, so access changes without a deploy.
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
+	/**
+	 * Moving a workspace and its chats to the cloud or to another computer:
+	 * shows the Move items, and gates
+	 * `workspaceMove.begin` server-side. Moving to the cloud also needs
+	 * `cloud-workspaces`.
+	 */
+	WORKSPACE_MOVES: "workspace-moves",
 	/**
 	 * Lets the Slack agent answer replies in a thread it has already replied
 	 * in without an @-mention. Evaluated per Slack team; off, unloaded or
@@ -180,6 +220,20 @@ export const FEATURE_FLAGS = {
 	 * sees it, so a new build ships with it dark and no release widens it.
 	 */
 	MOBILE_LIVE_ACTIVITY: "mobile-live-activity",
+	/**
+	 * Legacy gate for the CLI mode / Chat mode fork menus, replaced by the account's
+	 * Chat experimental setting. Read only by released desktop builds 2.0.2 and 2.0.3;
+	 * remove it once no live build reads it.
+	 */
+	AGENT_SURFACE_FORK: "agent-surface-fork",
+	MOBILE_PANE: "mobile-pane",
+	/**
+	 * Shows the `pdev` agent: in the agent catalog, agent pickers
+	 * and, with the Chat setting on, as a chat harness (`pdev acp`). Off, unloaded or
+	 * offline all hide it. Hosts never seed it, so a user only gets it by
+	 * adding it while the flag is on.
+	 */
+	PDEV_AGENT: "pdev-agent",
 } as const;
 
 /**
@@ -198,6 +252,22 @@ export const LAUNCHED_TRIGGER_KINDS = [
 	"microsoft_teams",
 	"gmail",
 ] as const satisfies readonly TriggerConfigInput["kind"][];
+
+/**
+ * A run that tried and broke. Separate from MISSED_RUN_STATUSES because most
+ * of what used to read as "failed" was a schedule firing at a sleeping
+ * laptop, which is not a failure and is rarely worth retrying hours later.
+ */
+export const FAILED_RUN_STATUSES = ["dispatch_failed"] as const;
+
+/** A run that never started: no host was online when its schedule came due. */
+export const MISSED_RUN_STATUSES = ["skipped_offline"] as const;
+
+/** Everything that did not produce a workspace, failed or missed. */
+export const UNSUCCESSFUL_RUN_STATUSES = [
+	...FAILED_RUN_STATUSES,
+	...MISSED_RUN_STATUSES,
+] as const;
 
 /**
  * What a cloud workspace sandbox holds in place of a real model API key. The
@@ -220,27 +290,20 @@ export const SANDBOX_WORKSPACE_PATH = "/workspace";
 
 export const SANDBOX_IMAGE_NAME = "superset-hostsvc";
 
-/** The one transaction the API traces: the cloud workspace provision job. */
+/** The transactions the API traces: a cloud workspace's start and the provision job it queues, one trace. */
+export const CLOUD_WORKSPACE_START_TRANSACTION = "cloud-workspace.start";
 export const CLOUD_WORKSPACE_PROVISION_TRANSACTION =
 	"cloud-workspace.provision";
+/** Every wake records one; only those that ran the boot command are sent (`CLOUD_WORKSPACE_BOOTED_ATTRIBUTE`). */
+export const CLOUD_WORKSPACE_WAKE_TRANSACTION = "cloud-workspace.wake";
+export const CLOUD_WORKSPACE_BOOTED_ATTRIBUTE = "cloud_workspace.booted";
 
-export const SHARED_ENVIRONMENT_ORGANIZATION_ID =
-	"00000000-0000-0000-0000-000000000000";
-
-export const SHARED_ENVIRONMENT_NAME = "Default";
-
-// Terminal identity presented to shell programs via TERM_PROGRAM. kitty:
-// agent TUIs (claude-code especially) tune wheel-scroll compensation per
-// TERM_PROGRAM, and our terminals install the full-fidelity wheel handler
-// (@superset/shared/terminal-wheel-handler) that produces a native
-// kitty/iTerm-grade report stream. Under kitty-class identities TUIs trust
-// that stream as-is; a vscode identity would make claude-code amplify each
-// report (its compensation for xterm.js's damped stock stream) and
-// over-scroll ~3x. The identity and the wheel handler must ship together —
-// reverting one without the other reintroduces slow or runaway scrolling.
-// Kitty *keyboard protocol* support is advertised separately via the CSI-u
-// capability probe.
-export const TERMINAL_TERM_PROGRAM = "kitty";
-// A plausible kitty version: TUIs may version-gate quirk handling against
-// real kitty releases, so keep this roughly current when touching terminal code.
-export const TERMINAL_TERM_PROGRAM_VERSION = "0.42.0";
+// Terminals set no TERM_PROGRAM, like xterm. Agents take kitty-only paths
+// under "kitty" that xterm.js cannot serve, and under "vscode" Claude Code
+// amplifies the full-fidelity wheel stream ~2x. Without it, agents identify
+// the terminal from its XTVERSION reply ("Superset (xterm.js)", see the
+// desktop terminal-version-reply) and the CSI-u probe.
+export const TERMINAL_IDENTITY_ENV_KEYS = [
+	"TERM_PROGRAM",
+	"TERM_PROGRAM_VERSION",
+] as const;

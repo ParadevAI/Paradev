@@ -8,6 +8,7 @@ import {
 	type FolderTierMap,
 	type LinkAction,
 	type LinkTierMap,
+	type SidebarProjectHostFilter,
 	type SidebarProjectSortMode,
 	type UserPreferencesRow,
 	V2_USER_PREFERENCES_ID,
@@ -20,14 +21,18 @@ export interface UserPreferencesApi {
 	setSidebarFileLinks: (next: LinkTierMap) => void;
 	setFolderLinks: (next: FolderTierMap) => void;
 	setPortOpenAction: (next: LinkAction) => void;
-	setPageOpenAction: (next: LinkAction) => void;
+	setPageLinks: (next: LinkTierMap) => void;
 	setRightSidebarOpen: (next: boolean | ((prev: boolean) => boolean)) => void;
 	setRightSidebarWidth: (next: number) => void;
+	setRightPaneAreaWidth: (next: number) => void;
+	setChangesFileListWidth: (next: number) => void;
+	setChangesFileListOpen: (next: boolean) => void;
 	setDeleteLocalBranch: (next: boolean) => void;
 	setShowPresetsBar: (next: boolean | ((prev: boolean) => boolean)) => void;
 	toggleShowPresetsBar: () => void;
 	setChangesViewMode: (next: ChangesViewMode) => void;
 	setSidebarProjectSortMode: (next: SidebarProjectSortMode) => void;
+	setSidebarProjectHostFilter: (next: SidebarProjectHostFilter) => void;
 	setBuiltinPresetHidden: (presetId: string, hidden: boolean) => void;
 	/** Hide/show a tag folder in one project without touching anyone's tags. */
 	setTagFolderHidden: (projectId: string, tag: string, hidden: boolean) => void;
@@ -47,8 +52,13 @@ export function useUserPreferences(): UserPreferencesApi {
 	const preferences = rows[0] ?? DEFAULT_V2_USER_PREFERENCES;
 
 	const upsertTierMap = useCallback(
-		(key: "fileLinks" | "urlLinks" | "sidebarFileLinks", next: LinkTierMap) => {
-			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
+		(
+			key: "fileLinks" | "urlLinks" | "sidebarFileLinks" | "pageLinks",
+			next: LinkTierMap,
+		) => {
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -112,26 +122,16 @@ export function useUserPreferences(): UserPreferencesApi {
 		[collections],
 	);
 
-	const setPageOpenAction = useCallback(
-		(next: LinkAction) => {
-			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
-			if (!existing) {
-				collections.userPreferences.insert({
-					...DEFAULT_V2_USER_PREFERENCES,
-					pageOpenAction: next,
-				});
-				return;
-			}
-			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
-				draft.pageOpenAction = next;
-			});
-		},
-		[collections],
+	const setPageLinks = useCallback(
+		(next: LinkTierMap) => upsertTierMap("pageLinks", next),
+		[upsertTierMap],
 	);
 
 	const setRightSidebarOpen = useCallback(
 		(next: boolean | ((prev: boolean) => boolean)) => {
-			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
 			const prev =
 				existing?.rightSidebarOpen ??
 				DEFAULT_V2_USER_PREFERENCES.rightSidebarOpen;
@@ -152,7 +152,9 @@ export function useUserPreferences(): UserPreferencesApi {
 
 	const setRightSidebarWidth = useCallback(
 		(next: number) => {
-			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
 			if (!existing) {
 				collections.userPreferences.insert({
 					...DEFAULT_V2_USER_PREFERENCES,
@@ -162,6 +164,61 @@ export function useUserPreferences(): UserPreferencesApi {
 			}
 			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
 				draft.rightSidebarWidth = next;
+			});
+		},
+		[collections],
+	);
+
+	const setRightPaneAreaWidth = useCallback(
+		(next: number) => {
+			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
+			if (!existing) {
+				collections.userPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					rightPaneAreaWidth: next,
+				});
+				return;
+			}
+			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.rightPaneAreaWidth = next;
+			});
+		},
+		[collections],
+	);
+
+	const setChangesFileListWidth = useCallback(
+		(next: number) => {
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
+			if (!existing) {
+				collections.userPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					changesFileListWidth: next,
+				});
+				return;
+			}
+			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.changesFileListWidth = next;
+			});
+		},
+		[collections],
+	);
+
+	const setChangesFileListOpen = useCallback(
+		(next: boolean) => {
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
+			if (!existing) {
+				collections.userPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					changesFileListOpen: next,
+				});
+				return;
+			}
+			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.changesFileListOpen = next;
 			});
 		},
 		[collections],
@@ -244,6 +301,25 @@ export function useUserPreferences(): UserPreferencesApi {
 		[collections],
 	);
 
+	const setSidebarProjectHostFilter = useCallback(
+		(next: SidebarProjectHostFilter) => {
+			const existing = collections.userPreferences.get(
+				V2_USER_PREFERENCES_ID,
+			);
+			if (!existing) {
+				collections.userPreferences.insert({
+					...DEFAULT_V2_USER_PREFERENCES,
+					sidebarProjectHostFilter: next,
+				});
+				return;
+			}
+			collections.userPreferences.update(V2_USER_PREFERENCES_ID, (draft) => {
+				draft.sidebarProjectHostFilter = next;
+			});
+		},
+		[collections],
+	);
+
 	const setBuiltinPresetHidden = useCallback(
 		(presetId: string, hidden: boolean) => {
 			const existing = collections.userPreferences.get(V2_USER_PREFERENCES_ID);
@@ -311,14 +387,18 @@ export function useUserPreferences(): UserPreferencesApi {
 		setSidebarFileLinks,
 		setFolderLinks,
 		setPortOpenAction,
-		setPageOpenAction,
+		setPageLinks,
 		setRightSidebarOpen,
 		setRightSidebarWidth,
+		setRightPaneAreaWidth,
+		setChangesFileListWidth,
+		setChangesFileListOpen,
 		setDeleteLocalBranch,
 		setShowPresetsBar,
 		toggleShowPresetsBar,
 		setChangesViewMode,
 		setSidebarProjectSortMode,
+		setSidebarProjectHostFilter,
 		setBuiltinPresetHidden,
 		setTagFolderHidden,
 	};

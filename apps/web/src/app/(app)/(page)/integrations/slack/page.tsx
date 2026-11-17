@@ -50,16 +50,17 @@ export default async function SlackIntegrationPage() {
 		),
 		workspace_already_linked: {
 			param: "owner",
-			withParam: i18n._(
-				msg({
+			withParam: i18n._({
+				...msg({
 					message:
 						"This Slack workspace is already connected by {owner}. Ask them to disconnect first.",
 				}),
-			),
+				values: { owner: "{owner}" },
+			}),
 			withoutParam: i18n._(
 				msg({
 					message:
-						"This Slack workspace is already connected by another Superset organization.",
+						"This Slack workspace is already connected by another Paradev organization.",
 				}),
 			),
 		},

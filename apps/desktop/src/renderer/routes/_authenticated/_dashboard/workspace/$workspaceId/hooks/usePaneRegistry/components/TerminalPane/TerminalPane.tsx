@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import type { RendererContext } from "@superset/panes";
+import { type RendererContext, usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
+import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import type { OpenFile } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import "@xterm/xterm/css/xterm.css";
 import {
@@ -13,27 +14,27 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { env } from "renderer/env.renderer";
 import { useTerminalAppearance } from "renderer/hooks/useTerminalAppearance";
-import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { useHotkey } from "renderer/hotkeys";
 import {
 	actionLabel,
 	type FolderClickPolicy,
 	folderIntentLabel,
-	type LinkAction,
 	LinkHoverHint,
+	tierFor,
+	type UrlLinkAction,
 	useTerminalFilePolicy,
 	useTerminalFolderPolicy,
-	useTerminalUrlPolicy,
+	useUrlLinkAction,
 } from "renderer/lib/clickPolicy";
-import { parseSupersetPageUrl } from "renderer/lib/parseSupersetPageUrl";
 import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRevealInFinder";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import type {
 	PaneViewerData,
 	TerminalPaneData,
@@ -47,24 +48,31 @@ import { useTheme } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { isWithinWorkspacePath } from "shared/absolute-paths";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
+import { useSendAttachments } from "../../hooks/useSendAttachments";
 import {
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
+	terminalUrlLinkAction,
 } from "../../utils/runTerminalLinkAction";
+import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
+import { LinkActionMenu } from "./components/LinkActionMenu";
 import { TerminalAgentAutoResume } from "./components/TerminalAgentAutoResume";
 import { TerminalCopiedIndicator } from "./components/TerminalCopiedIndicator";
+import { TerminalNarrowedBanner } from "./components/TerminalNarrowedBanner";
 import { TerminalRichInput } from "./components/TerminalRichInput";
+import { TerminalSessionEndedFooter } from "./components/TerminalSessionEndedFooter";
 import { terminalContextMenuLinkStore } from "./contextMenuLinkStore";
 import { useCopyOnSelect } from "./hooks/useCopyOnSelect";
+import { useLinkActionMenu } from "./hooks/useLinkActionMenu";
 import { type HoveredLink, useLinkHoverState } from "./hooks/useLinkHoverState";
 import { useTerminalInterruptClear } from "./hooks/useTerminalInterruptClear";
+import { useTerminalSessionEnd } from "./hooks/useTerminalSessionEnd";
 import {
 	terminalRichInputOpenStore,
 	useTerminalRichInputOpen,
 } from "./richInputOpenStore";
-import { PasteUploadLimitError, uploadPastedFiles } from "./uploadPastedFiles";
 import { shellEscapePaths } from "./utils";
 
 interface TerminalPaneProps {
@@ -72,6 +80,7 @@ interface TerminalPaneProps {
 	workspaceId: string;
 	onOpenFile: OpenFile;
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
+	onNewShell: () => Promise<void>;
 }
 
 export function TerminalPane({
@@ -79,12 +88,12 @@ export function TerminalPane({
 	workspaceId,
 	onOpenFile,
 	onRevealPath,
+	onNewShell,
 }: TerminalPaneProps) {
 	const { t } = useLingui();
 	const filePolicy = useTerminalFilePolicy();
-	const urlPolicy = useTerminalUrlPolicy();
+	const getUrlAction = useUrlLinkAction("4-tier");
 	const folderPolicy = useTerminalFolderPolicy();
-	const { preferences } = useUserPreferences();
 	const {
 		hoveredLink,
 		liveHoveredLinkRef,
@@ -92,6 +101,7 @@ export function TerminalPane({
 		onLeave: onLinkLeave,
 	} = useLinkHoverState();
 	const { hint, showHint } = useLinkClickHint();
+	const { menu: linkMenu, showLinkMenu, closeLinkMenu } = useLinkActionMenu();
 	const openInExternalEditor = useOpenInExternalEditor(workspaceId);
 	const revealInFinder = useRevealInFinder(workspaceId);
 	// The "reveal" intent falls back to Finder for folders outside the
@@ -108,6 +118,7 @@ export function TerminalPane({
 	// Link actions are fired from event handlers (xterm clicks, context-menu
 	// selections) that outlive the render they were registered in, so the deps
 	// are read through a ref.
+	const rightPane = useRightPaneLinkTarget();
 	const linkActionDepsRef = useRef<TerminalLinkActionDeps>({
 		store: ctx.store,
 		onOpenFile,
@@ -115,6 +126,7 @@ export function TerminalPane({
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath,
+		rightPane,
 	});
 	linkActionDepsRef.current = {
 		store: ctx.store,
@@ -123,6 +135,7 @@ export function TerminalPane({
 		openInExternalEditor,
 		revealInFinder,
 		worktreePath,
+		rightPane,
 	};
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	// Open/closed is tracked per terminalId in a shared store so the header
@@ -145,6 +158,10 @@ export function TerminalPane({
 	const themedUrl = new URL(baseWebsocketUrl);
 	themedUrl.searchParams.set("workspaceId", workspaceId);
 	themedUrl.searchParams.set("themeType", themeType);
+	themedUrl.searchParams.set(
+		"colors",
+		JSON.stringify(terminalQueryColors(appearance.theme)),
+	);
 	if (paneData.createOnAttach) {
 		themedUrl.searchParams.set("create", "1");
 	}
@@ -183,6 +200,25 @@ export function TerminalPane({
 		[terminalId, terminalInstanceId],
 	);
 	const connectionState = useSyncExternalStore(subscribe, getSnapshot);
+	const sessionEnd = useTerminalSessionEnd(terminalId, terminalInstanceId);
+	const closePaneRef = useRef(ctx.actions.close);
+	closePaneRef.current = ctx.actions.close;
+	useEffect(() => {
+		if (sessionEnd.endedCleanly) closePaneRef.current();
+	}, [sessionEnd.endedCleanly]);
+	useEffect(() => {
+		if (sessionEnd.ended && !sessionEnd.endedCleanly) {
+			terminalRuntimeRegistry.persistEndedSession(
+				terminalId,
+				terminalInstanceId,
+			);
+		}
+	}, [
+		sessionEnd.ended,
+		sessionEnd.endedCleanly,
+		terminalId,
+		terminalInstanceId,
+	]);
 
 	// DOM-first lifecycle (VSCode/Tabby pattern):
 	//   1. mount() attaches xterm to the container synchronously — terminal
@@ -219,6 +255,13 @@ export function TerminalPane({
 			terminalRuntimeRegistry.detach(terminalId, terminalInstanceId);
 		};
 	}, [terminalId, terminalInstanceId]);
+
+	usePaneFocus(() => {
+		if (isRichInputOpen) return;
+		terminalRuntimeRegistry
+			.getTerminal(terminalId, terminalInstanceId)
+			?.focus();
+	});
 
 	useEffect(() => {
 		if (!ctx.isActive) return;
@@ -340,19 +383,14 @@ export function TerminalPane({
 					);
 				},
 				onUrlClick: (event, url) => {
-					const pageSlug = parseSupersetPageUrl(url, env.NEXT_PUBLIC_WEB_URL);
-					if (pageSlug) {
-						event.preventDefault();
-						runUrlLinkAction(
-							linkActionDepsRef.current,
-							url,
-							preferences.pageOpenAction,
-						);
-						return;
-					}
-					const action = urlPolicy.getAction(event);
+					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
-						showHint(event.clientX, event.clientY);
+						if (tierFor(event, "4-tier") === "plain") {
+							event.preventDefault();
+							showLinkMenu(url, event.clientX, event.clientY);
+						} else {
+							showHint(event.clientX, event.clientY);
+						}
 						return;
 					}
 					event.preventDefault();
@@ -370,10 +408,10 @@ export function TerminalPane({
 		onLinkHover,
 		onLinkLeave,
 		showHint,
+		showLinkMenu,
 		filePolicy,
-		urlPolicy,
+		getUrlAction,
 		folderPolicy,
-		preferences.pageOpenAction,
 	]);
 
 	// Publish what a right-click landed on so the pane context menu (built in
@@ -400,9 +438,9 @@ export function TerminalPane({
 	// The default paste path forwards Ctrl+V and lets the TUI read the OS
 	// clipboard — which only exists on the machine the PTY runs on. When the
 	// workspace lives on another host (relay-reached machine, cloud sandbox),
-	// ship the clipboard bytes there via filesystem.writeFile and paste the
-	// resulting paths instead. Local workspaces keep the Ctrl+V forward, which
-	// lets TUIs attach the image natively.
+	// send the clipboard files to the workspace and paste the resulting paths
+	// instead. Local workspaces keep the Ctrl+V forward, which lets TUIs
+	// attach the image natively.
 	const { machineId } = useLocalHostService();
 	const hostWorkspaces = useHostWorkspaces();
 	const workspaceHostId = hostWorkspaces.workspaces.find(
@@ -416,28 +454,14 @@ export function TerminalPane({
 		Boolean(machineId) &&
 		workspaceHostId !== machineId;
 
-	const writeFileMutation = workspaceTrpc.filesystem.writeFile.useMutation();
-	const createDirectoryMutation =
-		workspaceTrpc.filesystem.createDirectory.useMutation();
-	const writeFileRef = useRef(writeFileMutation.mutateAsync);
-	writeFileRef.current = writeFileMutation.mutateAsync;
-	const createDirectoryRef = useRef(createDirectoryMutation.mutateAsync);
-	createDirectoryRef.current = createDirectoryMutation.mutateAsync;
+	const sendAttachments = useSendAttachments(workspaceId);
 
 	// Fire-and-forget: ship files to the workspace, then paste the paths.
 	const uploadAndPasteFiles = useCallback(
-		(files: File[], worktree: string) => {
+		(files: File[]) => {
 			void (async () => {
 				try {
-					const paths = await uploadPastedFiles({
-						deps: {
-							createDirectory: (input) => createDirectoryRef.current(input),
-							writeFile: (input) => writeFileRef.current(input),
-						},
-						workspaceId,
-						worktreePath: worktree,
-						files,
-					});
+					const paths = await sendAttachments(files);
 					terminalRuntimeRegistry.paste(
 						terminalId,
 						shellEscapePaths(paths),
@@ -446,7 +470,7 @@ export function TerminalPane({
 				} catch (error) {
 					console.error("[v2 Terminal] remote file upload failed", error);
 					toast.error(
-						error instanceof PasteUploadLimitError
+						error instanceof AttachmentLimitError
 							? error.message
 							: files.length === 1
 								? t({
@@ -459,15 +483,15 @@ export function TerminalPane({
 				}
 			})();
 		},
-		[terminalId, terminalInstanceId, workspaceId, t],
+		[terminalId, terminalInstanceId, sendAttachments, t],
 	);
 
 	useEffect(() => {
-		if (!isRemoteHost || !worktreePath) return;
+		if (!isRemoteHost) return;
 
 		terminalRuntimeRegistry.setImagePasteOverride(
 			terminalId,
-			(files) => uploadAndPasteFiles(files, worktreePath),
+			uploadAndPasteFiles,
 			terminalInstanceId,
 		);
 		return () => {
@@ -477,13 +501,7 @@ export function TerminalPane({
 				terminalInstanceId,
 			);
 		};
-	}, [
-		terminalId,
-		terminalInstanceId,
-		worktreePath,
-		isRemoteHost,
-		uploadAndPasteFiles,
-	]);
+	}, [terminalId, terminalInstanceId, isRemoteHost, uploadAndPasteFiles]);
 
 	useTerminalInterruptClear({
 		terminalId,
@@ -510,8 +528,9 @@ export function TerminalPane({
 		{ enabled: ctx.isActive },
 	);
 
+	const findEnabled = usePaneHotkeyEnabled(ctx.isActive);
 	useHotkey("FIND_IN_TERMINAL", () => setIsSearchOpen((prev) => !prev), {
-		enabled: ctx.isActive,
+		enabled: findEnabled,
 		preventDefault: true,
 	});
 
@@ -587,7 +606,7 @@ export function TerminalPane({
 		// remote workspace's PTY runs on. When every dropped entry is a plain
 		// file, ship the bytes instead. Folders keep the path flow (their File
 		// entries carry no content), which at least preserves today's behavior.
-		if (isRemoteHost && worktreePath) {
+		if (isRemoteHost) {
 			const items = Array.from(event.dataTransfer.items);
 			const allPlainFiles =
 				items.length > 0 &&
@@ -602,7 +621,7 @@ export function TerminalPane({
 				terminalRuntimeRegistry
 					.getTerminal(terminalId, terminalInstanceId)
 					?.focus();
-				uploadAndPasteFiles(files, worktreePath);
+				uploadAndPasteFiles(files);
 				return;
 			}
 		}
@@ -624,6 +643,10 @@ export function TerminalPane({
 			onDragLeave={handleDragLeave}
 			onDrop={handleDrop}
 		>
+			<TerminalNarrowedBanner
+				terminalId={terminalId}
+				terminalInstanceId={terminalInstanceId}
+			/>
 			<div className="relative min-h-0 flex-1 overflow-hidden">
 				<TerminalSearch
 					searchAddon={searchAddon}
@@ -652,6 +675,15 @@ export function TerminalPane({
 				isOpen={isRichInputOpen}
 				onClose={closeRichInput}
 			/>
+			{sessionEnd.ended && !sessionEnd.endedCleanly && (
+				<TerminalSessionEndedFooter
+					key={terminalId}
+					terminalId={terminalId}
+					terminalInstanceId={terminalInstanceId}
+					onNewShell={onNewShell}
+					onClose={ctx.actions.close}
+				/>
+			)}
 			<div
 				className={cn(
 					"pointer-events-none absolute inset-0 bg-primary/10 transition-opacity duration-100",
@@ -662,13 +694,25 @@ export function TerminalPane({
 				hoverLabel={resolveHoverLabel(
 					hoveredLink,
 					filePolicy,
-					urlPolicy,
+					getUrlAction,
 					folderPolicy,
 					worktreePath,
-					preferences.pageOpenAction,
 				)}
 				hoverPosition={hoveredLink}
 				clickHint={hint}
+			/>
+			<LinkActionMenu
+				menu={linkMenu}
+				hasRightPane={rightPane !== null}
+				onSelect={(url, action) =>
+					runUrlLinkAction(linkActionDepsRef.current, url, action)
+				}
+				onClose={() => {
+					closeLinkMenu();
+					terminalRuntimeRegistry
+						.getTerminal(terminalId, terminalInstanceId)
+						?.focus();
+				}}
 			/>
 		</div>
 	);
@@ -682,10 +726,9 @@ export function TerminalPane({
 function resolveHoverLabel(
 	hovered: HoveredLink | null,
 	filePolicy: ReturnType<typeof useTerminalFilePolicy>,
-	urlPolicy: ReturnType<typeof useTerminalUrlPolicy>,
+	getUrlAction: UrlLinkAction,
 	folderPolicy: FolderClickPolicy,
 	worktreePath: string | undefined,
-	pageOpenAction: LinkAction,
 ): string | null {
 	if (!hovered) return null;
 	const event = {
@@ -694,11 +737,7 @@ function resolveHoverLabel(
 		shiftKey: hovered.shift,
 	};
 	if (hovered.info.kind === "url") {
-		const pageSlug = parseSupersetPageUrl(
-			hovered.info.url,
-			env.NEXT_PUBLIC_WEB_URL,
-		);
-		const action = pageSlug ? pageOpenAction : urlPolicy.getAction(event);
+		const action = terminalUrlLinkAction(event, hovered.info.url, getUrlAction);
 		return action ? actionLabel(action, "url") : null;
 	}
 	if (hovered.info.isDirectory) {

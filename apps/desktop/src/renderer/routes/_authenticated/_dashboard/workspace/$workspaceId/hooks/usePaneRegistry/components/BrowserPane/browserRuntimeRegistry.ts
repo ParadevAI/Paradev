@@ -1,9 +1,19 @@
 import { attachBrowserViewportZoom } from "renderer/lib/browser-viewport-zoom";
 import { pointerPassthrough } from "renderer/lib/pointer-passthrough";
-import { selectRuntimesToEvict } from "renderer/lib/terminal/terminal-runtime-eviction";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { BROWSER_PARTITION } from "shared/constants";
 import type { BrowserLoadError } from "shared/tabs-types";
 import { sanitizeUrl } from "./sanitizeUrl";
+import { selectWebviewsToUnload } from "./utils/selectWebviewsToUnload";
+import {
+	clippingAncestorRects,
+	visibleClipPath,
+} from "./utils/visibleClipPath";
+
+/** Matches a panel drawn over the page; its browsers sit above it, below dialogs. */
+const RAISED_LAYER_SELECTOR = "[data-browser-layer=raised]";
+const RAISED_WEBVIEW_Z = "31";
+const RAISED_OVERLAY_Z = "32";
 
 export interface BrowserRuntimeState {
 	currentUrl: string;
@@ -49,16 +59,19 @@ interface RegistryEntry {
 	placeholder: HTMLElement | null;
 	resizeObserver: ResizeObserver | null;
 	visible: boolean;
-	/** Monotonic use counter; bumped on attach/detach, drives hidden-LRU eviction. */
+	/** Time of last use in ms, kept strictly increasing so ties never happen. */
 	lastUsedAt: number;
 }
 
-/**
- * Cap on hidden (detached) webviews kept alive. Each one is a full guest
- * Chromium process; past the cap the least-recently-visible are destroyed
- * and rebuilt from the pane's persisted URL on next attach. (SUPER-1545)
- */
-const MAX_HIDDEN_WEBVIEWS = 3;
+// Each hidden webview is a full guest Chromium process. (SUPER-1545)
+const HIDDEN_POOL = {
+	budgetShare: 0.06,
+	minLoaded: 3,
+	maxLoaded: 20,
+	idleMs: Number.POSITIVE_INFINITY,
+};
+const UNLOAD_SWEEP_INTERVAL_MS = 60_000;
+const UNLOAD_INFO_TIMEOUT_MS = 5_000;
 
 const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 	currentUrl: "about:blank",
@@ -73,20 +86,37 @@ const EMPTY_STATE: BrowserRuntimeState = Object.freeze({
 
 const ROOT_CONTAINER_ID = "browser-runtime-root";
 
+function withoutHash(url: string): string | null {
+	try {
+		const parsed = new URL(url);
+		parsed.hash = "";
+		return parsed.href;
+	} catch {
+		return null;
+	}
+}
+
 /** Page-zoom bounds and step for a browser pane (1 = 100%). */
 export const BROWSER_ZOOM = Object.freeze({ min: 0.25, max: 5, step: 0.1 });
 
 type BrowserZoomDirection = "in" | "out" | "reset";
 
-class BrowserRuntimeRegistryImpl {
+type BrowserIpcClient = Pick<
+	typeof electronTrpcClient,
+	"browser" | "browserHistory"
+>;
+
+export class BrowserRuntimeRegistryImpl {
 	private entries = new Map<string, RegistryEntry>();
 	private listenersByPaneId = new Map<string, Set<() => void>>();
 	private foundInPageListenersByPaneId = new Map<
 		string,
 		Set<(result: Electron.FoundInPageResult) => void>
 	>();
-	private useSeq = 0;
+	private lastStamp = 0;
 	private pendingEviction: ReturnType<typeof setTimeout> | null = null;
+	private sweeping = false;
+	private sweepAgain = false;
 	private rootContainer: HTMLDivElement | null = null;
 	private globalListenersInstalled = false;
 	// Panes an agent is driving (live CDP session or in-flight capture, fed
@@ -118,22 +148,20 @@ class BrowserRuntimeRegistryImpl {
 			this.installGlobalListeners();
 			return existing;
 		}
+		// Not positioned, so it forms no stacking context and each webview can
+		// be raised on its own over a panel that slides above the page.
 		const root = document.createElement("div");
 		root.id = ROOT_CONTAINER_ID;
-		root.style.position = "fixed";
-		root.style.top = "0";
-		root.style.left = "0";
 		root.style.width = "0";
 		root.style.height = "0";
 		root.style.pointerEvents = "none";
-		root.style.zIndex = "0";
 		document.body.appendChild(root);
 		this.rootContainer = root;
 		this.installGlobalListeners();
 		return root;
 	}
 
-	constructor() {
+	constructor(private readonly ipc: BrowserIpcClient = electronTrpcClient) {
 		// Webviews are hoisted to <body>, out of reach of the stylesheet rule
 		// that handles iframes, so the passthrough state is mirrored onto them.
 		pointerPassthrough.subscribe((active) =>
@@ -151,17 +179,29 @@ class BrowserRuntimeRegistryImpl {
 			}
 		});
 
-		electronTrpcClient.browser.onAgentActivePanes.subscribe(undefined, {
+		this.ipc.browser.onAgentActivePanes.subscribe(undefined, {
 			onData: ({ paneIds }: { paneIds: string[] }) => {
 				this.agentActivePaneIds = new Set(paneIds);
 				for (const [paneId, entry] of this.entries) {
 					if (!entry.visible) this.applyParkedStyle(paneId, entry);
 				}
-				// A session ending can leave more hidden webviews than the cap
+				// A session ending can leave more hidden webviews than the budget
 				// allows (they were exempt while attached) — sweep again.
 				this.scheduleHiddenEviction();
 			},
 		});
+
+		this.ipc.browser.onAgentUse.subscribe(undefined, {
+			onData: ({ paneId }: { paneId: string }) => this.touch(paneId),
+		});
+
+		// Pages grow and go idle while nothing else triggers a sweep.
+		setInterval(() => this.scheduleHiddenEviction(), UNLOAD_SWEEP_INTERVAL_MS);
+	}
+
+	private stamp(): number {
+		this.lastStamp = Math.max(Date.now(), this.lastStamp + 1);
+		return this.lastStamp;
 	}
 
 	/**
@@ -191,14 +231,47 @@ class BrowserRuntimeRegistryImpl {
 		}
 	}
 
+	private applyShownStyle(entry: RegistryEntry): void {
+		entry.webview.style.visibility = "visible";
+		entry.webview.style.opacity = "";
+		entry.webview.style.pointerEvents = pointerPassthrough.active
+			? "none"
+			: "auto";
+		entry.overlay.style.visibility = "visible";
+	}
+
 	private updateLayout(entry: RegistryEntry) {
 		if (!entry.placeholder) return;
 		const rect = entry.placeholder.getBoundingClientRect();
+		const clipPath =
+			entry.placeholder instanceof Element
+				? visibleClipPath(rect, clippingAncestorRects(entry.placeholder))
+				: "";
+		const raised =
+			entry.placeholder instanceof Element &&
+			entry.placeholder.closest(RAISED_LAYER_SELECTOR) !== null;
+		entry.webview.style.zIndex = raised ? RAISED_WEBVIEW_Z : "";
+		entry.overlay.style.zIndex = raised ? RAISED_OVERLAY_Z : "1";
 		for (const style of [entry.webview.style, entry.overlay.style]) {
 			style.top = `${rect.top}px`;
 			style.left = `${rect.left}px`;
 			style.width = `${rect.width}px`;
 			style.height = `${rect.height}px`;
+			style.clipPath = clipPath;
+		}
+	}
+
+	// The placeholder's ResizeObserver misses moves that do not resize it, so
+	// callers run this on each frame while panes slide.
+	relayout(): void {
+		for (const [paneId, entry] of this.entries) {
+			if (!entry.placeholder || !entry.visible) continue;
+			this.updateLayout(entry);
+			if (getComputedStyle(entry.placeholder).visibility === "hidden") {
+				this.applyParkedStyle(paneId, entry);
+			} else {
+				this.applyShownStyle(entry);
+			}
 		}
 	}
 
@@ -271,7 +344,7 @@ class BrowserRuntimeRegistryImpl {
 	): RegistryEntry {
 		const webview = document.createElement("webview") as Electron.WebviewTag;
 		const detachViewportZoom = attachBrowserViewportZoom(webview);
-		webview.setAttribute("partition", "persist:superset");
+		webview.setAttribute("partition", BROWSER_PARTITION);
 		webview.setAttribute("allowpopups", "");
 		webview.style.position = "fixed";
 		webview.style.top = "0";
@@ -325,7 +398,7 @@ class BrowserRuntimeRegistryImpl {
 			const webContentsId = webview.getWebContentsId();
 			if (entry.webContentsId !== webContentsId) {
 				entry.webContentsId = webContentsId;
-				electronTrpcClient.browser.register
+				this.ipc.browser.register
 					.mutate({ paneId, webContentsId, workspaceId: entry.workspaceId })
 					.catch((err) => {
 						console.error("[browserRuntimeRegistry] register failed:", err);
@@ -356,7 +429,7 @@ class BrowserRuntimeRegistryImpl {
 			this.refreshZoomState(paneId);
 			const { currentUrl, pageTitle, faviconUrl } = entry.state;
 			if (currentUrl && currentUrl !== "about:blank") {
-				electronTrpcClient.browserHistory.upsert
+				this.ipc.browserHistory.upsert
 					.mutate({ url: currentUrl, title: pageTitle, faviconUrl })
 					.catch((err) => {
 						console.error("[browserRuntimeRegistry] upsert history:", err);
@@ -390,7 +463,7 @@ class BrowserRuntimeRegistryImpl {
 			this.setState(paneId, { faviconUrl: favicon });
 			const { currentUrl, pageTitle } = entry.state;
 			if (currentUrl && currentUrl !== "about:blank") {
-				electronTrpcClient.browserHistory.upsert
+				this.ipc.browserHistory.upsert
 					.mutate({ url: currentUrl, title: pageTitle, faviconUrl: favicon })
 					.catch((err) => {
 						console.error("[browserRuntimeRegistry] upsert favicon:", err);
@@ -496,7 +569,7 @@ class BrowserRuntimeRegistryImpl {
 		return entry;
 	}
 
-	/** Create an agent's guest without mounting or focusing its workspace route. */
+	/** Create a guest without mounting or focusing its workspace route. */
 	openBackground(
 		paneId: string,
 		url: string,
@@ -508,7 +581,7 @@ class BrowserRuntimeRegistryImpl {
 		const root = this.ensureRootContainer();
 		const entry = this.createEntry(paneId, url, workspaceId);
 		entry.onPersist = onPersist;
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 		// Give automation a usable viewport before this pane has ever been shown.
 		entry.webview.style.width = "1280px";
 		entry.webview.style.height = "720px";
@@ -540,7 +613,7 @@ class BrowserRuntimeRegistryImpl {
 		if (entry.workspaceId !== workspaceId) {
 			entry.workspaceId = workspaceId;
 			if (entry.webContentsId != null) {
-				electronTrpcClient.browser.register
+				this.ipc.browser.register
 					.mutate({
 						paneId,
 						webContentsId: entry.webContentsId,
@@ -556,19 +629,17 @@ class BrowserRuntimeRegistryImpl {
 		entry.onClose = onClose;
 		entry.placeholder = placeholder;
 		entry.visible = true;
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 
 		entry.resizeObserver?.disconnect();
 		const observer = new ResizeObserver(() => {
 			this.updateLayout(entry);
 		});
+		// Its first notification places the webview, after layout and before paint.
 		observer.observe(placeholder);
 		entry.resizeObserver = observer;
 
-		this.updateLayout(entry);
-		entry.webview.style.visibility = "visible";
-		entry.webview.style.opacity = "";
-		entry.overlay.style.visibility = "visible";
+		this.applyShownStyle(entry);
 		this.applyPointerPassthrough(pointerPassthrough.active);
 	}
 
@@ -583,7 +654,7 @@ class BrowserRuntimeRegistryImpl {
 		entry.resizeObserver = null;
 		entry.visible = false;
 		this.applyParkedStyle(paneId, entry);
-		entry.lastUsedAt = ++this.useSeq;
+		entry.lastUsedAt = this.stamp();
 		this.scheduleHiddenEviction();
 	}
 
@@ -592,26 +663,72 @@ class BrowserRuntimeRegistryImpl {
 		if (this.pendingEviction !== null) return;
 		this.pendingEviction = setTimeout(() => {
 			this.pendingEviction = null;
-			this.evictExcessHiddenWebviews();
+			void this.evictExcessHiddenWebviews();
 		}, 0);
 	}
 
-	private evictExcessHiddenWebviews() {
-		const candidates = Array.from(
-			this.entries.entries(),
-			([paneId, entry]) => ({
-				paneId,
-				runtime: { container: entry.visible ? entry : null },
-				lastUsedAt: entry.lastUsedAt,
-			}),
-		);
-		for (const victim of selectRuntimesToEvict(
-			candidates,
-			MAX_HIDDEN_WEBVIEWS,
-			(candidate) => this.agentActivePaneIds.has(candidate.paneId),
-		)) {
-			this.destroy(victim.paneId);
+	private async evictExcessHiddenWebviews(): Promise<void> {
+		if (this.sweeping) {
+			this.sweepAgain = true;
+			return;
 		}
+		const hidden = [...this.entries].filter(([, entry]) => !entry.visible);
+		if (hidden.length === 0) return;
+		this.sweeping = true;
+		try {
+			const info = await Promise.race([
+				this.ipc.browser.getUnloadInfo.query({
+					paneIds: hidden.map(([paneId]) => paneId),
+				}),
+				new Promise<null>((resolve) =>
+					setTimeout(() => resolve(null), UNLOAD_INFO_TIMEOUT_MS),
+				),
+			]).catch((err) => {
+				console.warn("[browserRuntimeRegistry] unload info failed:", err);
+				return null;
+			});
+			const now = Date.now();
+			const candidates = hidden.map(([paneId, entry]) => {
+				const pane = info?.panes[paneId];
+				return {
+					paneId,
+					lastUsedAt: entry.lastUsedAt,
+					memoryKb: pane?.memoryKb ?? 0,
+					keepLoaded:
+						this.agentActivePaneIds.has(paneId) ||
+						pane?.audible === true ||
+						pane?.unsavedInput === true,
+				};
+			});
+			const unload = selectWebviewsToUnload(candidates, {
+				now,
+				budgetKb: info
+					? info.totalMemoryKb * HIDDEN_POOL.budgetShare
+					: Number.POSITIVE_INFINITY,
+				minLoaded: HIDDEN_POOL.minLoaded,
+				maxLoaded: HIDDEN_POOL.maxLoaded,
+				idleMs: HIDDEN_POOL.idleMs,
+			});
+			for (const paneId of unload) {
+				const entry = this.entries.get(paneId);
+				const seen = candidates.find((c) => c.paneId === paneId);
+				// Shown or used while the info was on its way.
+				if (!entry || entry.visible || entry.lastUsedAt !== seen?.lastUsedAt)
+					continue;
+				this.destroy(paneId);
+			}
+		} finally {
+			this.sweeping = false;
+			if (this.sweepAgain) {
+				this.sweepAgain = false;
+				this.scheduleHiddenEviction();
+			}
+		}
+	}
+
+	private touch(paneId: string): void {
+		const entry = this.entries.get(paneId);
+		if (entry) entry.lastUsedAt = this.stamp();
 	}
 
 	destroy(paneId: string): void {
@@ -626,7 +743,7 @@ class BrowserRuntimeRegistryImpl {
 		this.entries.delete(paneId);
 		this.listenersByPaneId.delete(paneId);
 		this.foundInPageListenersByPaneId.delete(paneId);
-		electronTrpcClient.browser.unregister.mutate({ paneId }).catch((err) => {
+		this.ipc.browser.unregister.mutate({ paneId }).catch((err) => {
 			console.error(
 				`[browserRuntimeRegistry] unregister failed for ${paneId}:`,
 				err,
@@ -652,9 +769,32 @@ class BrowserRuntimeRegistryImpl {
 		if (entry?.webview.canGoForward()) entry.webview.goForward();
 	}
 
+	focus(paneId: string): void {
+		this.entries.get(paneId)?.webview.focus();
+	}
+
 	reload(paneId: string): void {
 		const entry = this.entries.get(paneId);
 		entry?.webview.reload();
+	}
+
+	/** A visible pane that finished loading `url`, for a link preview to reuse. */
+	findOpenPage(url: string): { paneId: string; title: string } | null {
+		const target = withoutHash(url);
+		if (!target) return null;
+		for (const [paneId, entry] of this.entries) {
+			const { currentUrl, isLoading, error, pageTitle } = entry.state;
+			if (
+				entry.visible &&
+				entry.webContentsId !== null &&
+				!isLoading &&
+				!error &&
+				withoutHash(currentUrl) === target
+			) {
+				return { paneId, title: pageTitle };
+			}
+		}
+		return null;
 	}
 
 	getState(paneId: string): BrowserRuntimeState {

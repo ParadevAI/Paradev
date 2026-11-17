@@ -7,6 +7,7 @@ import type { CodeViewHandle } from "@pierre/diffs/react";
 import type { RefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useHotkey } from "renderer/hotkeys";
+import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
 import { getDiffSearchRoots } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/FileViewerPane/utils/diffRendererRoots";
 import type { UseTextSearchReturn } from "renderer/screens/main/components/WorkspaceView/ContentView/TabsContent/TabView/hooks";
 import {
@@ -31,7 +32,10 @@ let nextHighlightInstanceId = 0;
 
 interface UseDiffPaneSearchOptions {
 	containerRef: RefObject<HTMLDivElement | null>;
-	codeViewRef: RefObject<CodeViewHandle<DiffAnnotationMetadata> | null>;
+	codeViewRef: RefObject<CodeViewHandle<
+		DiffAnnotationMetadata,
+		undefined
+	> | null>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	collapsedSet: ReadonlySet<string>;
@@ -89,7 +93,7 @@ function isWithinSingleRow(range: Range): boolean {
 /** Locate the rendered row for a match, if the virtualizer currently has it
  *  mounted. Returns null while the row is scrolled out of the render window. */
 function findMatchRowElement(
-	codeViewHandle: CodeViewHandle<DiffAnnotationMetadata> | null,
+	codeViewHandle: CodeViewHandle<DiffAnnotationMetadata, undefined> | null,
 	match: DiffSearchMatch,
 ): HTMLElement | null {
 	const instance = codeViewHandle?.getInstance();
@@ -412,6 +416,7 @@ export function useDiffPaneSearch({
 		}
 	}, [paneId]);
 
+	const findEnabled = usePaneHotkeyEnabled(isActive);
 	useHotkey(
 		"FIND_IN_CHANGES",
 		() => {
@@ -421,7 +426,7 @@ export function useDiffPaneSearch({
 			}
 			setIsSearchOpen(true);
 		},
-		{ enabled: isActive, preventDefault: true },
+		{ enabled: findEnabled, preventDefault: true },
 	);
 
 	return {

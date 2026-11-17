@@ -1,24 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { useSettingsSearchQuery } from "renderer/stores/settings-state";
-import { getVisibleItemsForSection } from "../utils/settings-search";
-import { LinksSettings } from "./components/LinksSettings";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/settings/links/")({
-	component: LinksSettingsPage,
+	beforeLoad: () => {
+		throw redirect({ to: "/settings/files", replace: true });
+	},
 });
-
-function LinksSettingsPage() {
-	const searchQuery = useSettingsSearchQuery();
-
-	const visibleItems = useMemo(
-		() =>
-			getVisibleItemsForSection({
-				section: "links",
-				searchQuery,
-			}),
-		[searchQuery],
-	);
-
-	return <LinksSettings visibleItems={visibleItems} />;
-}

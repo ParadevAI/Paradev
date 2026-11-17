@@ -12,20 +12,25 @@ export interface NotificationTarget {
 	terminalId: string;
 }
 
+type PaneLayout = WorkspaceState<PaneViewerData> | null | undefined;
+
 export function resolveNotificationTarget({
 	workspaceId,
 	payload,
 	paneLayout,
+	rightPaneLayout,
 }: {
 	workspaceId: string;
 	payload: AgentLifecyclePayload;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
 }): NotificationTarget {
 	return (
 		resolveTerminalTarget({
 			workspaceId,
 			terminalId: payload.terminalId,
 			paneLayout,
+			rightPaneLayout,
 		}) ?? {
 			workspaceId,
 			terminalId: payload.terminalId,
@@ -37,24 +42,26 @@ export function resolveTerminalTarget({
 	workspaceId,
 	terminalId,
 	paneLayout,
+	rightPaneLayout,
 }: {
 	workspaceId: string;
 	terminalId: string;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
 }): NotificationTarget | null {
-	if (!paneLayout?.tabs) return null;
-
-	for (const tab of paneLayout.tabs) {
-		for (const pane of Object.values(tab.panes)) {
-			if (pane.kind !== "terminal") continue;
-			const data = pane.data as Partial<TerminalPaneData>;
-			if (data.terminalId !== terminalId) continue;
-			return {
-				workspaceId,
-				tabId: tab.id,
-				paneId: pane.id,
-				terminalId,
-			};
+	for (const layout of [paneLayout, rightPaneLayout]) {
+		for (const tab of layout?.tabs ?? []) {
+			for (const pane of Object.values(tab.panes)) {
+				if (pane.kind !== "terminal") continue;
+				const data = pane.data as Partial<TerminalPaneData>;
+				if (data.terminalId !== terminalId) continue;
+				return {
+					workspaceId,
+					tabId: tab.id,
+					paneId: pane.id,
+					terminalId,
+				};
+			}
 		}
 	}
 
@@ -64,21 +71,25 @@ export function resolveTerminalTarget({
 export function isNotificationTargetVisible({
 	currentWorkspaceId,
 	paneLayout,
+	rightPaneLayout,
 	target,
 }: {
 	currentWorkspaceId: string | null;
-	paneLayout: WorkspaceState<PaneViewerData> | null | undefined;
+	paneLayout: PaneLayout;
+	rightPaneLayout?: PaneLayout;
 	target: NotificationTarget;
 }): boolean {
 	if (!currentWorkspaceId || currentWorkspaceId !== target.workspaceId) {
 		return false;
 	}
-	if (!target.tabId || !target.paneId || !paneLayout?.tabs) return false;
+	if (!target.tabId || !target.paneId) return false;
 
-	const tab = paneLayout.tabs.find(
-		(candidate) => candidate.id === target.tabId,
-	);
-	return (
-		tab?.activePaneId === target.paneId && paneLayout.activeTabId === tab.id
-	);
+	return [paneLayout, rightPaneLayout].some((layout) => {
+		const tab = layout?.tabs.find((candidate) => candidate.id === target.tabId);
+		return (
+			tab !== undefined &&
+			tab.activePaneId === target.paneId &&
+			layout?.activeTabId === tab.id
+		);
+	});
 }

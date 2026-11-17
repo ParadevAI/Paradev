@@ -1,6 +1,8 @@
-import type { Audience, CommandConfig } from "./command";
+import type { Audience, CommandConfig, CommandResult } from "./command";
 import { CLIError } from "./errors";
 import {
+	type CliDescription,
+	type CommandNode,
 	generateCommandHelp,
 	generateGroupHelp,
 	generateRootHelp,
@@ -8,8 +10,12 @@ import {
 } from "./help";
 import { runInteractiveHelp } from "./interactive-help";
 import type { MiddlewareFn } from "./middleware";
-import type { GenericBuilderInternals, ProcessedBuilderConfig } from "./option";
-import { formatOutput } from "./output";
+import type {
+	BuilderConfig,
+	GenericBuilderInternals,
+	ProcessedBuilderConfig,
+} from "./option";
+import { formatOutput, isRawResult } from "./output";
 import { camelToKebab, isAgentMode, parseArgv } from "./parser";
 import {
 	buildTree,
@@ -18,6 +24,7 @@ import {
 	filterByAudience,
 	routeCommand,
 } from "./router";
+import { wrapText } from "./wrap-text";
 
 export interface CommandTree {
 	commands: CliCommand[];
@@ -35,6 +42,37 @@ export interface RunOptions {
 	sandbox?: boolean;
 }
 
+interface ActiveCli {
+	name: string;
+	version: string;
+	tree: { groups: CliGroup[]; commands: CliCommand[] };
+	globals: Record<string, ProcessedBuilderConfig>;
+}
+
+let activeCli: ActiveCli | undefined;
+
+/**
+ * The running CLI's command tree with every node populated, for commands
+ * that describe the CLI itself (`schema`, `completion`). The root node's
+ * options are the globals. Built from the same audience-filtered tree the
+ * runner routes on, so it never lists a command this run cannot execute.
+ */
+export function introspectCli(): CliDescription {
+	if (!activeCli) {
+		throw new Error("introspectCli() is only available while a command runs");
+	}
+	const { root, commandMap } = buildTree(
+		activeCli.tree.groups,
+		activeCli.tree.commands,
+	);
+	root.options = activeCli.globals;
+	for (const [key, cmd] of commandMap) {
+		const node = getNode(root, key.split("/"));
+		if (node) populateNodeForHelp(node, cmd);
+	}
+	return { name: activeCli.name, version: activeCli.version, root };
+}
+
 export async function run(opts: RunOptions): Promise<void> {
 	const ac = new AbortController();
 	const onSignal = () => ac.abort();
@@ -44,11 +82,18 @@ export async function run(opts: RunOptions): Promise<void> {
 	try {
 		await execute(opts, opts.tree, ac.signal);
 	} catch (error) {
+		if (isBrokenPipe(error)) return;
 		await handleError(error, opts.name, ac.signal);
 	} finally {
+		activeCli = undefined;
 		process.off("SIGINT", onSignal);
 		process.off("SIGTERM", onSignal);
 	}
+}
+
+/** The reader stopped early (`superset schema | head`): nothing to report. */
+function isBrokenPipe(error: unknown): boolean {
+	return (error as { code?: unknown } | null)?.code === "EPIPE";
 }
 
 function formatZodIssues(message: string): string | null {
@@ -104,7 +149,7 @@ export function formatError(
 			const tier = requiredPlan === "enterprise" ? "Enterprise" : "Pro";
 			return {
 				message: error.message,
-				hint: `Needs the ${tier} plan. Upgrade at https://superset.sh/pricing, or in the app under Settings → Billing.`,
+				hint: `Needs the ${tier} plan. Upgrade at https://paradev.com/pricing, or in the app under Settings → Billing.`,
 			};
 		}
 		if (code === "NOT_FOUND") {
@@ -131,7 +176,9 @@ async function handleError(
 	signal?: AbortSignal,
 ): Promise<never> {
 	const { message, hint } = formatError(error, cliName);
-	const text = `Error: ${message}\n${hint ? `Hint: ${hint}\n` : ""}`;
+	const columns = process.stderr.isTTY ? process.stderr.columns : 0;
+	const wrap = (line: string) => (columns ? wrapText(line, columns) : line);
+	const text = `${wrap(`Error: ${message}`)}\n${hint ? `${wrap(`Hint: ${hint}`)}\n` : ""}`;
 	// Same drain rule as stdout (see writeStream): exiting before the pipe
 	// reader catches up would drop the message. Best effort; a failed stderr
 	// write must not mask the exit code.
@@ -198,10 +245,7 @@ function splitArgsForRouting(
 	return { segments, passthrough };
 }
 
-function getNode(
-	root: import("./help").CommandNode,
-	path: string[],
-): import("./help").CommandNode | undefined {
+function getNode(root: CommandNode, path: string[]): CommandNode | undefined {
 	let node = root;
 	for (const segment of path) {
 		const child = node.children.get(segment);
@@ -212,7 +256,7 @@ function getNode(
 }
 
 function populateNodeForHelp(
-	node: import("./help").CommandNode,
+	node: CommandNode,
 	cmd: CommandConfig,
 	optionConfigs?: Record<string, ProcessedBuilderConfig>,
 ): void {
@@ -234,6 +278,19 @@ function populateNodeForHelp(
 	}
 }
 
+function assertEnumValue(
+	argName: string,
+	value: string,
+	config: BuilderConfig,
+): void {
+	if (config.enumVals && !config.enumVals.includes(value)) {
+		throw new CLIError(
+			`<${argName}>: invalid value "${value}"`,
+			`Valid values: ${config.enumVals.join(", ")}`,
+		);
+	}
+}
+
 async function execute(
 	opts: RunOptions,
 	loaded: CommandTree,
@@ -251,6 +308,7 @@ async function execute(
 		opts.sandbox ?? false,
 	);
 	const { root, commandMap } = buildTree(visible.groups, visible.commands);
+	activeCli = { name, version, tree: visible, globals: globalConfigs };
 
 	// EXPERIMENT: bare invocation on a TTY opens the interactive help browser
 	// instead of dumping static help. Agents/CI keep the static output.
@@ -372,12 +430,13 @@ async function execute(
 		for (const posConfig of positionalConfigs) {
 			const argName = posConfig.name ?? `arg${posIdx}`;
 			if (posConfig.isVariadic) {
-				argsResult[argName] = parsed.positionals.slice(posIdx);
+				const values = parsed.positionals.slice(posIdx);
+				for (const value of values) {
+					assertEnumValue(`${argName}...`, value, posConfig);
+				}
+				argsResult[argName] = values;
 				consumedVariadic = true;
-				if (
-					posConfig.isRequired &&
-					(argsResult[argName] as string[]).length === 0
-				) {
+				if (posConfig.isRequired && values.length === 0) {
 					throw new CLIError(`Missing required argument: <${argName}...>`);
 				}
 				break;
@@ -386,6 +445,7 @@ async function execute(
 			if (posConfig.isRequired && value === undefined) {
 				throw new CLIError(`Missing required argument: <${argName}>`);
 			}
+			if (value !== undefined) assertEnumValue(argName, value, posConfig);
 			argsResult[argName] = value;
 			posIdx++;
 		}
@@ -418,12 +478,24 @@ async function execute(
 	// Agent-mode auto-JSON only when --quiet wasn't passed; --quiet beats it.
 	const isJson = jsonFlag ?? (!isQuiet && isAgentMode());
 
-	const result = await cmd.run({
-		options: parsed.options as never,
-		args: argsResult as never,
-		ctx: ctx as never,
-		signal,
-	});
+	let result: CommandResult;
+	try {
+		result = await cmd.run({
+			options: parsed.options as never,
+			args: argsResult as never,
+			ctx: ctx as never,
+			signal,
+		});
+	} catch (error) {
+		if (isJson && error instanceof CLIError && error.data !== undefined) {
+			await writeStream(
+				process.stdout,
+				`${JSON.stringify(error.data, null, 2)}\n`,
+				signal,
+			).catch(() => {});
+		}
+		throw error;
+	}
 
 	if (result !== undefined) {
 		const output = formatOutput(result, cmd.display, {
@@ -432,7 +504,9 @@ async function execute(
 		});
 		// All command output must leave through writeStream; a bare console.log
 		// here reintroduces truncation for any payload past the pipe buffer.
-		if (output) await writeStream(process.stdout, `${output}\n`, signal);
+		if (!output) return;
+		const text = isRawResult(result) ? output : `${output}\n`;
+		await writeStream(process.stdout, text, signal);
 	}
 }
 

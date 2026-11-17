@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+# Keeps the box answering under memory pressure. Started by superset-boot as
+# root beside host-service and resident for the session. Once a second:
+#
+#   rank   every process of the sandbox user gets an oom_score_adj for what it
+#          is, not for who spawned it: the kernel copies the value at fork, so
+#          host-service's protection would otherwise reach every tool an agent
+#          runs and leave the kernel nothing to kill but the box itself.
+#            -900  host-service, pty-daemon: the box and its terminals
+#            -300  a session: an agent (claude, codex, pdev, an ACP adapter), resumable
+#                  from disk with the work in flight lost; the desktop (Xvnc,
+#                  its window manager and stream), gone until the next wake
+#             500  everything else, the platform's default: what an agent or a
+#                  hook ran, and the first thing to go
+#   swap   below twice the floor, add a 2 GB swapfile, up to 1.5x the box
+#          (at least 6 GB, at most 16 GB); after ten quiet minutes, drop the
+#          newest one if RAM can take its pages back. Nothing is on disk until
+#          a box needs it, and swap never exists without this script.
+#   reap   below the floor with swap at its cap, kill the largest process in the least protected
+#          class. Without swap the kernel drops code pages before it kills
+#          anything, and host-service's event loop stalls for minutes while
+#          every process refaults; the kernel's killer is the last resort.
+#
+# One line per action in memguard.log. Fail-open: a box without this script
+# behaves as before.
+set -uo pipefail
+. /etc/superset/contract.sh
+
+FLOOR_PERCENT="${SUPERSET_MEMGUARD_FLOOR_PERCENT:-8}"
+INTERVAL_S=1
+COOLDOWN_S=3
+MIN_VICTIM_KB=32768
+SWAP_DIR=/var/swap
+SWAP_STEP_MB=2048
+SWAP_IDLE_S="${SUPERSET_MEMGUARD_SWAP_IDLE_S:-600}"
+
+exec 9> /run/superset-memguard.lock
+flock -n 9 || exit 0
+
+log() { printf '%s memguard %s\n' "$(date +%s%3N)" "$*"; }
+uid="$(id -u "$SUPERSET_USER")"
+log "start floor=${FLOOR_PERCENT}% user=${SUPERSET_USER}(${uid})"
+
+# Fills ADJ[pid], RSS_KB[pid] and CLASS[pid] for the sandbox user's processes
+# and writes the adj the class calls for when it differs. No forks: ~70
+# processes a second is nothing, but a subshell each would not be.
+declare -A ADJ RSS_KB CLASS
+scan() {
+	ADJ=(); RSS_KB=(); CLASS=()
+	local host_pid="" p pid key val puid rss comm args cmd adj want
+	[ -r "${SUPERSET_RUN_DIR}/host-service.pid" ] && read -r host_pid < "${SUPERSET_RUN_DIR}/host-service.pid"
+	for p in /proc/[0-9]*; do
+		pid="${p#/proc/}"
+		[ "$pid" = 1 ] || [ "$pid" = "$$" ] && continue
+		puid=""; rss=0
+		while read -r key val _; do
+			case "$key" in Uid:) puid="$val" ;; VmRSS:) rss="$val" ;; esac
+		done < "$p/status" 2>/dev/null
+		[ "$puid" = "$uid" ] || continue
+		read -r comm < "$p/comm" 2>/dev/null || continue
+		# The script a node process runs is its second argument; a shell whose
+		# command line merely mentions one must not inherit its rank.
+		mapfile -d '' -t args < "$p/cmdline" 2>/dev/null
+		script="${args[1]:-}"
+		if [ "$pid" = "$host_pid" ] || [[ "$script" == */pty-daemon.js ]]; then
+			want=-900
+		elif [[ "$comm" == claude || "$comm" == codex || "$comm" == pdev || "$script" == */node_modules/@agentclientprotocol/* || "$script" == */node_modules/pi-acp/* ]]; then
+			want=-300
+		elif [[ "$comm" == Xvnc || "$comm" == xfce4-session || "$comm" == xfwm4 || "$comm" == websockify ]]; then
+			want=-300
+		else
+			want=500
+		fi
+		read -r adj < "$p/oom_score_adj" 2>/dev/null || continue
+		# A process that raised itself above the default stays there.
+		if [ "$want" = 500 ] && [ "$adj" -gt 500 ]; then want="$adj"; fi
+		if [ "$adj" != "$want" ]; then
+			if echo "$want" > "$p/oom_score_adj" 2>/dev/null; then
+				log "rank pid=${pid} ${comm} ${adj}->${want}"
+				adj="$want"
+			fi
+		fi
+		ADJ[$pid]="$adj"; RSS_KB[$pid]="$rss"; CLASS[$pid]="$comm"
+	done
+}
+
+# The largest process at or above an adj, if any is worth killing.
+victim_at_or_above() {
+	local threshold="$1" best="" best_rss="$MIN_VICTIM_KB" pid
+	for pid in "${!ADJ[@]}"; do
+		[ "${ADJ[$pid]}" -ge "$threshold" ] || continue
+		[ "${RSS_KB[$pid]}" -gt "$best_rss" ] || continue
+		best="$pid"; best_rss="${RSS_KB[$pid]}"
+	done
+	[ -n "$best" ] && echo "$best"
+}
+
+mem_total=0 mem_avail=0 swap_total=0 swap_free=0
+read_meminfo() {
+	local key val _
+	while read -r key val _; do
+		case "$key" in
+			MemTotal:) mem_total="$val" ;; MemAvailable:) mem_avail="$val" ;;
+			SwapTotal:) swap_total="$val" ;; SwapFree:) swap_free="$val" ;;
+		esac
+	done < /proc/meminfo
+}
+
+box_mb() {
+	local max
+	max="$(cat /sys/fs/cgroup/memory.max 2>/dev/null || true)"
+	case "$max" in ''|max) echo $(( $(awk '/MemTotal/ {print $2}' /proc/meminfo) / 1024 )) ;; *) echo $(( max / 1048576 )) ;; esac
+}
+swap_cap_mb=$(( $(box_mb) * 3 / 2 ))
+[ "$swap_cap_mb" -lt 6144 ] && swap_cap_mb=6144
+[ "$swap_cap_mb" -gt 16384 ] && swap_cap_mb=16384
+
+swap_files=()
+mkdir -p "$SWAP_DIR"
+for f in "$SWAP_DIR"/superset-*; do [ -e "$f" ] && { swapoff "$f" 2>/dev/null; rm -f "$f"; }; done
+
+grow_swap() {
+	local f="${SWAP_DIR}/superset-${#swap_files[@]}"
+	[ $(( (${#swap_files[@]} + 1) * SWAP_STEP_MB )) -le "$swap_cap_mb" ] || return 1
+	if fallocate -l "${SWAP_STEP_MB}M" "$f" && chmod 600 "$f" && mkswap -q "$f" >/dev/null && swapon "$f"; then
+		swap_files+=("$f")
+		sysctl -q -w vm.swappiness=10
+		log "swap.grow ${f} total=$(( ${#swap_files[@]} * SWAP_STEP_MB ))MB cap=${swap_cap_mb}MB available=$(( mem_avail / 1024 ))MB"
+		return 0
+	fi
+	rm -f "$f"; log "swap.grow.failed ${f}"; return 1
+}
+
+shrink_swap() {
+	local n=${#swap_files[@]} f
+	[ "$n" -gt 0 ] || return 0
+	f="${swap_files[$(( n - 1 ))]}"
+	[ $(( swap_total - swap_free + floor * 2 )) -lt "$mem_avail" ] || return 0
+	if swapoff "$f"; then
+		rm -f "$f"; unset 'swap_files[$(( n - 1 ))]'
+		log "swap.shrink ${f} total=$(( ${#swap_files[@]} * SWAP_STEP_MB ))MB"
+	fi
+}
+
+last_pressure=$EPOCHSECONDS
+while true; do
+	scan
+	read_meminfo
+	floor=$(( mem_total * FLOOR_PERCENT / 100 ))
+	if [ "$mem_avail" -lt $(( floor * 2 )) ]; then
+		last_pressure=$EPOCHSECONDS
+		if [ "$swap_free" -lt $(( SWAP_STEP_MB * 1024 )) ] && grow_swap; then
+			sleep "$INTERVAL_S"; continue
+		fi
+	elif [ $(( EPOCHSECONDS - last_pressure )) -ge "$SWAP_IDLE_S" ] && [ ${#swap_files[@]} -gt 0 ]; then
+		shrink_swap
+		last_pressure=$EPOCHSECONDS
+	fi
+	if [ "$mem_avail" -lt "$floor" ] && [ "$swap_free" -lt $(( swap_total / 10 + 1 )) ]; then
+		victim="$(victim_at_or_above 500 || victim_at_or_above 0 || victim_at_or_above -300)"
+		if [ -n "$victim" ]; then
+			log "reap pid=${victim} ${CLASS[$victim]} rss=$(( RSS_KB[$victim] / 1024 ))MB adj=${ADJ[$victim]} available=$(( mem_avail / 1024 ))MB floor=$(( floor / 1024 ))MB"
+			kill -9 "$victim" 2>/dev/null
+			sleep "$COOLDOWN_S"
+			continue
+		fi
+		log "pressure available=$(( mem_avail / 1024 ))MB floor=$(( floor / 1024 ))MB nothing to reap"
+	fi
+	sleep "$INTERVAL_S"
+done

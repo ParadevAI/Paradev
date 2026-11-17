@@ -1,14 +1,13 @@
-import type { WorkspaceStore } from "@superset/panes";
 import { useEffect, useRef } from "react";
-import type { StoreApi } from "zustand/vanilla";
-import type { ConsumeSearch, PaneViewerData } from "../../types";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
+import type { ConsumeSearch, PaneTarget } from "../../types";
 import {
 	openUrlInWorkspace,
 	type WorkspaceUrlOpenTarget,
 } from "../../utils/openUrlInWorkspace";
 
 interface UseConsumeOpenUrlRequestArgs {
-	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	viewer: PaneTarget;
 	url: string | undefined;
 	target: WorkspaceUrlOpenTarget | undefined;
 	requestId: string | undefined;
@@ -16,7 +15,7 @@ interface UseConsumeOpenUrlRequestArgs {
 }
 
 export function useConsumeOpenUrlRequest({
-	store,
+	viewer,
 	url,
 	target,
 	requestId,
@@ -34,9 +33,21 @@ export function useConsumeOpenUrlRequest({
 		});
 		if (consumedRef.current.has(key)) return;
 		consumedRef.current.add(key);
-		openUrlInWorkspace({ store, target: resolvedTarget, url });
+		viewer.reveal();
+		const paneId = openUrlInWorkspace({
+			store: viewer.store,
+			target: resolvedTarget,
+			url,
+		});
+		if (requestId && paneId) {
+			electronTrpcClient.browser.resolveOpenRequest
+				.mutate({ requestId, paneId })
+				.catch((err) => {
+					console.error("[useConsumeOpenUrlRequest] resolve open failed:", err);
+				});
+		}
 		consumeSearch(["openUrl", "openUrlTarget", "openUrlRequestId"]);
-	}, [store, target, url, requestId, consumeSearch]);
+	}, [viewer, target, url, requestId, consumeSearch]);
 }
 
 export function getOpenUrlRequestConsumeKey({

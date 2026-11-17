@@ -1,5 +1,6 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { BRAND } from "@superset/shared/brand";
 import {
 	type DesktopNotice,
 	desktopVersionResponseSchema,
@@ -12,6 +13,11 @@ import { useAppVersionHistoryStore } from "renderer/stores/app-version-history";
 import { useDesktopNoticeDismissalsStore } from "renderer/stores/desktop-notice-dismissals";
 import { useDesktopNoticePreviewStore } from "renderer/stores/desktop-notice-preview";
 import { lt, prerelease } from "semver";
+import {
+	BRAND_RENAME_NOTICE_ID,
+	createBrandRenameNotice,
+	shouldShowBrandRenameNotice,
+} from "./utils/brandRenameNotice";
 
 const REFETCH_INTERVAL_MS = 30 * 60 * 1000;
 
@@ -42,8 +48,14 @@ export function useDesktopNotices(): UseDesktopNoticesResult {
 	const preview = env.NODE_ENV === "development" ? previewNotice : null;
 
 	useEffect(() => {
+		const isFreshInstall =
+			useAppVersionHistoryStore.getState().lastRunVersion === null;
 		recordBoot(window.App.appVersion);
-	}, [recordBoot]);
+		// a fresh install never knew the former name, so it skips the rename notice for good
+		if (isFreshInstall && BRAND.NAME !== BRAND.FORMER_NAME) {
+			storeDismiss(BRAND_RENAME_NOTICE_ID);
+		}
+	}, [recordBoot, storeDismiss]);
 
 	const dismiss = useCallback(
 		(noticeId: string) => {
@@ -74,11 +86,11 @@ export function useDesktopNotices(): UseDesktopNoticesResult {
 	});
 
 	const applicable = useMemo(() => {
-		if (!data) return [];
 		const appVersion = window.App.appVersion;
+		const isDismissed = (id: string) => id in dismissedAt;
 
-		const notices: DesktopNotice[] = [...data.notices];
-		if (lt(appVersion, data.minimumVersion)) {
+		const notices: DesktopNotice[] = [...(data?.notices ?? [])];
+		if (data && lt(appVersion, data.minimumVersion)) {
 			notices.push({
 				id: MINIMUM_VERSION_NOTICE_ID,
 				severity: "blocking",
@@ -96,12 +108,23 @@ export function useDesktopNotices(): UseDesktopNoticesResult {
 			});
 		}
 
+		if (
+			shouldShowBrandRenameNotice({
+				name: BRAND.NAME,
+				formerName: BRAND.FORMER_NAME,
+				previousVersion,
+				isDismissed,
+			})
+		) {
+			notices.push(createBrandRenameNotice());
+		}
+
 		return filterApplicableNotices(notices, {
 			appVersion,
 			platform: window.App.platform,
 			channel: getChannel(appVersion),
 			previousVersion,
-			isDismissed: (id) => id in dismissedAt,
+			isDismissed,
 		});
 	}, [data, dismissedAt, previousVersion]);
 

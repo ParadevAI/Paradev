@@ -1,5 +1,12 @@
 import type { AppRouter } from "@superset/host-service";
-import type { LayoutNode, Tab, WorkspaceState } from "@superset/panes";
+import {
+	findFirstPaneId,
+	type LayoutNode,
+	type Pane,
+	removePaneFromLayout,
+	type Tab,
+	type WorkspaceState,
+} from "@superset/panes";
 import { tagFolderScopeInputSchema } from "@superset/shared/workspace-tags";
 import type { inferRouterInputs } from "@trpc/server";
 import { z } from "zod";
@@ -7,6 +14,23 @@ import { z } from "zod";
 const persistedDateSchema = z
 	.union([z.string(), z.date()])
 	.transform((value) => (typeof value === "string" ? new Date(value) : value));
+
+export const pendingChatHandoffSchema = z.object({
+	agentId: z.string(),
+	prompt: z.string(),
+	attachments: z
+		.array(
+			z.object({
+				attachmentId: z.string(),
+				name: z.string(),
+				mimeType: z.string(),
+			}),
+		)
+		.optional(),
+	modelId: z.string().optional(),
+	modeId: z.string().optional(),
+});
+export type PendingChatHandoff = z.infer<typeof pendingChatHandoffSchema>;
 
 export const dashboardSidebarProjectSchema = z.object({
 	projectId: z.string().uuid(),
@@ -62,6 +86,35 @@ const EMPTY_PANE_LAYOUT: WorkspaceState<unknown> = {
 	activeTabId: null,
 };
 
+// Before #7823 a pull-request pane stored `{ prNumber }` and borrowed its
+// repository from the workspace; that shape cannot be read by repository.
+function isPullRequestPaneWithoutRepository(pane: Pane<unknown>): boolean {
+	return (
+		pane.kind === "pull-request" &&
+		typeof (pane.data as { repoFullName?: unknown } | null)?.repoFullName !==
+			"string"
+	);
+}
+
+function withoutUnreadablePanes(tab: Tab<unknown>): Tab<unknown> | null {
+	const unreadable = Object.values(tab.panes).filter(
+		isPullRequestPaneWithoutRepository,
+	);
+	if (unreadable.length === 0) return tab;
+	let layout: LayoutNode | null = tab.layout;
+	const panes = { ...tab.panes };
+	for (const pane of unreadable) {
+		layout = layout && removePaneFromLayout(layout, pane.id);
+		delete panes[pane.id];
+	}
+	if (!layout) return null;
+	const activePaneId =
+		tab.activePaneId && panes[tab.activePaneId]
+			? tab.activePaneId
+			: findFirstPaneId(layout);
+	return { ...tab, layout, panes, activePaneId };
+}
+
 /**
  * Read-time heal for a persisted pane layout. An unparseable top-level shape
  * (missing `version`/`tabs`, or the legacy `{ panes, focusedPaneId }` layout)
@@ -78,7 +131,9 @@ export function sanitizePaneLayout(raw: unknown): WorkspaceState<unknown> {
 	}
 	const tabs = value.tabs.flatMap((tab): Tab<unknown>[] => {
 		const parsed = tabNodeSchema.safeParse(tab);
-		return parsed.success ? [parsed.data as Tab<unknown>] : [];
+		if (!parsed.success) return [];
+		const healed = withoutUnreadablePanes(parsed.data as Tab<unknown>);
+		return healed ? [healed] : [];
 	});
 	const activeTabId =
 		typeof value.activeTabId === "string" &&
@@ -153,6 +208,16 @@ export const workspaceLocalStateSchema = z.object({
 		suppressedPullRequestUrl: z.string().nullable().default(null),
 	}),
 	paneLayout: paneWorkspaceStateSchema,
+	rightPaneLayout: paneWorkspaceStateSchema.optional(),
+	rightSidebarOpen: z.boolean().optional(),
+	// TODO(2027-01-31): delete with useRestoreExpandedPaneArea / restoreExpandedPaneArea once builds that wrote it are gone.
+	rightPaneAreaExpansion: z
+		.object({
+			movedTabIds: z.array(z.string()),
+			centerActiveTabId: z.string().nullable(),
+			rightActiveTabId: z.string().nullable(),
+		})
+		.optional(),
 	viewedFiles: z.array(z.string()).default([]),
 	recentlyViewedFiles: z
 		.array(
@@ -186,6 +251,12 @@ export const workspaceLocalStateSchema = z.object({
 	// page drains this queue once on first open (see
 	// useRunWorkspaceCreationPresets) and clears it before running.
 	pendingCreationPresetIds: z.array(z.string()).default([]),
+	// A chat branched into this worktree from another one. An agent keys its
+	// sessions to a project directory, so the branch cannot be resumed here:
+	// the new chat is started with the conversation as its first message. The
+	// v2 workspace page drains this once on first open (see
+	// useRunPendingChatHandoff) and clears it before running.
+	pendingChatHandoff: pendingChatHandoffSchema.nullable().default(null),
 });
 
 // Defaults for fields heal can synthesize. Identity fields (workspaceId,
@@ -218,6 +289,7 @@ const WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS = {
 		v1PaneId: string | null;
 	}>,
 	pendingCreationPresetIds: [] as string[],
+	pendingChatHandoff: null as PendingChatHandoff | null,
 };
 
 /**
@@ -297,6 +369,7 @@ export type TerminalPresetRow = z.infer<typeof terminalPresetSchema>;
  *   - "pane"      → open in current tab/pane (file viewer, in-app browser)
  *   - "newTab"    → open in a new tab/pane
  *   - "external"  → open in the external app (editor / system browser)
+ *   - "rightPane" → open URLs in the right pane area (falls back to "pane")
  *
  * Surfaces:
  *   - fileLinks / urlLinks: links embedded in terminal output and markdown.
@@ -310,7 +383,7 @@ export type TerminalPresetRow = z.infer<typeof terminalPresetSchema>;
  *
  * Resolution and labels live in src/renderer/lib/clickPolicy.
  */
-const linkActionSchema = z.enum(["pane", "newTab", "external"]);
+const linkActionSchema = z.enum(["pane", "newTab", "external", "rightPane"]);
 
 export type LinkAction = z.infer<typeof linkActionSchema>;
 
@@ -383,8 +456,6 @@ const DEFAULT_FOLDER_LINKS: FolderTierMap = {
 // in-app tab, "external" = system browser.
 const DEFAULT_PORT_OPEN_ACTION: LinkAction = "external";
 
-const DEFAULT_PAGE_OPEN_ACTION: LinkAction = "pane";
-
 function isSameLinkTierMap(a: LinkTierMap, b: LinkTierMap): boolean {
 	return (
 		a.plain === b.plain &&
@@ -422,6 +493,15 @@ export type SidebarProjectSortMode = z.infer<
 const persistedSidebarProjectSortModeSchema =
 	sidebarProjectSortModeSchema.catch("manual");
 
+const sidebarProjectHostFilterSchema = z.enum(["all", "local", "cloud"]);
+
+export type SidebarProjectHostFilter = z.infer<
+	typeof sidebarProjectHostFilterSchema
+>;
+
+const persistedSidebarProjectHostFilterSchema =
+	sidebarProjectHostFilterSchema.catch("all");
+
 export const userPreferencesSchema = z.object({
 	id: z.literal("preferences"),
 	fileLinks: linkTierMapSchema.default(DEFAULT_LINK_TIER_MAP),
@@ -429,16 +509,22 @@ export const userPreferencesSchema = z.object({
 	sidebarFileLinks: linkTierMapSchema.default(DEFAULT_SIDEBAR_FILE_LINKS),
 	folderLinks: folderTierMapSchema.default(DEFAULT_FOLDER_LINKS),
 	portOpenAction: linkActionSchema.default(DEFAULT_PORT_OPEN_ACTION),
-	pageOpenAction: linkActionSchema.default(DEFAULT_PAGE_OPEN_ACTION),
+	pageLinks: linkTierMapSchema.default(DEFAULT_URL_LINKS),
 	terminalPresetsInitialized: z.boolean().default(false),
 	rightSidebarOpen: z.boolean().default(true),
 	rightSidebarTab: z.enum(["changes", "files"]).default("changes"),
 	rightSidebarWidth: z.number().default(340),
+	rightPaneAreaWidth: z.number().optional(),
+	changesFileListWidth: z.number().optional(),
+	changesFileListOpen: z.boolean().default(true),
 	deleteLocalBranch: z.boolean().default(false),
 	showPresetsBar: z.boolean().default(true),
 	changesViewMode: changesViewModeSchema.default("folders"),
 	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
 	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
+	// Which workspaces the Projects list shows: every row, only the ones on
+	// a device, or only cloud sandboxes.
+	sidebarProjectHostFilter: persistedSidebarProjectHostFilterSchema,
 	// Built-in (synthetic, app-shipped) presets the user hid from the preset
 	// bar. Synthetic presets have no terminalPresets row, so visibility can't
 	// live on the row's pinnedToBar like user presets. Pruned against
@@ -469,15 +555,17 @@ export const DEFAULT_V2_USER_PREFERENCES: UserPreferencesRow = {
 	sidebarFileLinks: DEFAULT_SIDEBAR_FILE_LINKS,
 	folderLinks: DEFAULT_FOLDER_LINKS,
 	portOpenAction: DEFAULT_PORT_OPEN_ACTION,
-	pageOpenAction: DEFAULT_PAGE_OPEN_ACTION,
+	pageLinks: DEFAULT_URL_LINKS,
 	terminalPresetsInitialized: false,
 	rightSidebarOpen: true,
 	rightSidebarTab: "changes",
 	rightSidebarWidth: 340,
+	changesFileListOpen: true,
 	deleteLocalBranch: false,
 	showPresetsBar: true,
 	changesViewMode: "folders",
 	sidebarProjectSortMode: "manual",
+	sidebarProjectHostFilter: "all",
 	hiddenBuiltinPresetIds: [],
 	favoritePageIds: [],
 	hiddenTagFolders: {},
@@ -502,6 +590,10 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		// undefined node. Passed through untouched before, which white-screened
 		// the workspace view on a corrupt layout.
 		paneLayout: sanitizePaneLayout(r.paneLayout),
+		rightPaneLayout:
+			r.rightPaneLayout === undefined
+				? undefined
+				: sanitizePaneLayout(r.rightPaneLayout),
 		viewedFiles:
 			r.viewedFiles ?? WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.viewedFiles,
 		recentlyViewedFiles:
@@ -516,6 +608,9 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
 		pendingCreationPresetIds:
 			r.pendingCreationPresetIds ??
 			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.pendingCreationPresetIds,
+		pendingChatHandoff:
+			r.pendingChatHandoff ??
+			WORKSPACE_LOCAL_STATE_OPTIONAL_DEFAULTS.pendingChatHandoff,
 		sidebarState: {
 			...SIDEBAR_STATE_DEFAULTS,
 			...sidebar,
@@ -563,12 +658,16 @@ export function healUserPreferences(raw: unknown): UserPreferencesRow {
 		sidebarFileLinks: shouldMigrateLegacySidebarFileLinks
 			? DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks
 			: sidebarFileLinks,
+		pageLinks: { ...DEFAULT_V2_USER_PREFERENCES.pageLinks, ...r.pageLinks },
 		folderLinks: {
 			...DEFAULT_V2_USER_PREFERENCES.folderLinks,
 			...r.folderLinks,
 		},
 		sidebarProjectSortMode: persistedSidebarProjectSortModeSchema.parse(
 			r.sidebarProjectSortMode,
+		),
+		sidebarProjectHostFilter: persistedSidebarProjectHostFilterSchema.parse(
+			r.sidebarProjectHostFilter,
 		),
 		// Prune retired/stray built-in ids so the array stays bounded.
 		hiddenBuiltinPresetIds: (Array.isArray(r.hiddenBuiltinPresetIds)

@@ -73,7 +73,8 @@ export function parseSubagentSearch(
 	};
 }
 
-interface WorkspaceSearchParams extends SubagentLinkSearchParams {
+export interface WorkspaceSearchParams extends SubagentLinkSearchParams {
+	sessionId?: string;
 	terminalId?: string;
 	focusRequestId?: string;
 	openUrl?: string;

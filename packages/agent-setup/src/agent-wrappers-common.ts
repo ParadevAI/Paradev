@@ -30,9 +30,16 @@ export const DYNAMIC_NOTIFY_PATH_MARKER = `$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_R
  * `~/.claude/settings.json`, and an agent's tool call can launch a second CLI
  * whose config fires under the terminal's agent — and the notify script uses
  * the disagreement to drop those events instead of relabeling the terminal.
+ *
+ * `eventType` sets `SUPERSET_HOOK_EVENT` for harnesses whose payload does not
+ * name the event (Antigravity); the notify script prefers it over the payload.
  */
-export function getManagedNotifyHookCommand(agentId: string): string {
-	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
+export function getManagedNotifyHookCommand(
+	agentId: string,
+	eventType?: string,
+): string {
+	const eventAssignment = eventType ? ` SUPERSET_HOOK_EVENT=${eventType}` : "";
+	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" ] && SUPERSET_HOOK_HARNESS=${agentId}${eventAssignment} "$SUPERSET_HOME_DIR/${MANAGED_NOTIFY_RELATIVE_PATH}" || true`;
 }
 
 export const MANAGED_ARTIFACT_GUARD_RELATIVE_PATH = `hooks/${ARTIFACT_GUARD_SCRIPT_NAME}`;
@@ -43,11 +50,11 @@ export function getManagedArtifactGuardHookCommand(): string {
 	return `[ -n "$SUPERSET_HOME_DIR" ] && [ -x "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" ] && "$SUPERSET_HOME_DIR/${MANAGED_ARTIFACT_GUARD_RELATIVE_PATH}" || true`;
 }
 
-// Dev setup (.superset/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
-// $PWD/superset-dev-data — without a leading dot — so we must recognize that
+// Dev setup (.paradev/lib/setup/steps.sh) points SUPERSET_HOME_DIR at
+// $PWD/paradev-dev-data — without a leading dot — so we must recognize that
 // variant to reap stale notify.sh paths from deleted worktrees.
 const SUPERSET_MANAGED_HOOK_PATH_PATTERN =
-	/\/(?:\.superset(?:-[^/'"\s\\]+)?|superset-dev-data)\//;
+	/\/(?:\.(?:superset|paradev)(?:-[^/'"\s\\]+)?|(?:paradev|superset)-dev-data)\//;
 
 import { writeFileIfChanged } from "./write-file-if-changed";
 
@@ -118,7 +125,7 @@ function buildRealBinaryResolver(): string {
     [ -z "$dir" ] && continue
     dir="\${dir%/}"
     case "$dir" in
-      "${getBinDir()}"|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
+      "${getBinDir()}"|"$HOME"/.paradev/bin|"$HOME"/.paradev-*/bin|"$HOME"/.superset/bin|"$HOME"/.superset-*/bin) continue ;;
     esac
     if [ -x "$dir/$name" ] && [ ! -d "$dir/$name" ]; then
       printf "%s\\n" "$dir/$name"
@@ -171,7 +178,7 @@ fi
 }
 
 function getMissingBinaryMessage(name: string): string {
-	return `Superset: ${name} not found in PATH. Install it and ensure it is on PATH, then retry.`;
+	return `Paradev: ${name} not found in PATH. Install it and ensure it is on PATH, then retry.`;
 }
 
 export function getWrapperPath(binaryName: string): string {

@@ -5,6 +5,7 @@ import { getInitials } from "@superset/shared/names";
 import { commentAuthor, isOptimisticId } from "@superset/shared/page-comments";
 import { Bot, Check, Loader2, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { type ReactNode, useState } from "react";
+import { useNow } from "../../../../hooks/use-now";
 import { cn } from "../../../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../ui/avatar";
 import { Button } from "../../../ui/button";
@@ -15,6 +16,7 @@ import {
 	useComments,
 } from "../../providers/CommentProvider";
 import { relativeTime } from "../../utils/relativeTime";
+import { CommentImages } from "./components/CommentImages";
 import { Quote } from "./components/Quote";
 
 interface CommentListProps {
@@ -36,6 +38,7 @@ export function CommentList({
 	onDelete,
 	className,
 }: CommentListProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	const { submitting, busyThreadId, canEdit, canDeleteThread } = useComments();
 	// Nothing here can address a row the server has not created yet: its id is
@@ -85,11 +88,14 @@ export function CommentList({
 										{author.name}
 									</span>
 									<span className="truncate text-muted-foreground text-xs">
-										{relativeTime(comment.createdAt)}
+										{relativeTime(comment.createdAt, now)}
 									</span>
 								</div>
 								<div className="ml-auto flex items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/comment:opacity-100">
-									{onEdit && !isOptimisticId(comment.id) && canEdit(comment) ? (
+									{onEdit &&
+									comment.body &&
+									!isOptimisticId(comment.id) &&
+									canEdit(comment) ? (
 										<IconButton
 											label={t({ message: "Edit comment" })}
 											onClick={() => {
@@ -166,9 +172,20 @@ export function CommentList({
 											<Trans>Cancel</Trans>
 										</Button>
 									</div>
+									<CommentImages attachments={comment.attachments} />
 								</div>
 							) : (
-								<p className="whitespace-pre-wrap text-sm">{comment.body}</p>
+								<>
+									{comment.body ? (
+										<p className="whitespace-pre-wrap text-sm">
+											{comment.body}
+										</p>
+									) : null}
+									<CommentImages
+										attachments={comment.attachments}
+										className="mt-0.5"
+									/>
+								</>
 							)}
 						</div>
 					</div>

@@ -1,71 +1,50 @@
 import { db } from "@superset/db/client";
-import { connections } from "@superset/db/schema";
+import { connections, type SelectConnection } from "@superset/db/schema";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
 	decryptOptional,
 	decryptSecret,
-	userConnection,
+	grantSharedWithAnotherConnection,
+	userConnections,
 } from "../../../lib/connectors";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import { stopMailboxWatch } from "./gmail";
-import { findGoogleConnection, googleConfigOf } from "./state";
+import { googleConfigOf, summarizeGoogleConnections } from "./state";
 
 export const googleRouter = {
-	getConnection: protectedProcedure
+	getConnection: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.query(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			// The caller's own connection: Google is per member, so another
+			// The caller's own connections: Google is per member, so another
 			// member's account is not this person's to see or manage.
-			const connection = await userConnection(
-				input.organizationId,
-				"google",
-				ctx.session.user.id,
-				{ includeDisconnected: true },
+			return summarizeGoogleConnections(
+				await userConnections(
+					input.organizationId,
+					"google",
+					ctx.session.user.id,
+					{ includeDisconnected: true },
+				),
 			);
-			if (!connection) return null;
-
-			return {
-				id: connection.id,
-				// The Google account's address; the connection is that person's
-				// mailbox, not the organization's.
-				email: connection.externalAccountId,
-				connectedByUserId: connection.connectedByUserId,
-				connectedAt: connection.createdAt,
-				needsReconnect: connection.disconnectedAt !== null,
-			};
 		}),
 
-	disconnect: protectedProcedure
+	disconnect: personProcedure
 		.input(z.object({ organizationId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const connection = await findGoogleConnection(
+			const owned = await userConnections(
 				input.organizationId,
+				"google",
 				ctx.session.user.id,
 			);
-			if (connection) {
-				// Best effort: Google keeps pushing until the watch is stopped or
-				// expires, and the push route would only reject pushes for a missing
-				// connection. A failure here must not block the disconnect.
-				const config = googleConfigOf(connection.state);
-				await Promise.allSettled([
-					// The grant outlives the row unless it is revoked: without this
-					// the refresh token would be gone from our side and the app would
-					// still hold read access on Google's.
-					revokeGrant(
-						(await decryptOptional(connection.refreshToken)) ??
-							(await decryptSecret(connection.accessToken)),
-					),
-					config.gmail?.watchExpiresAt
-						? stopMailboxWatch(connection.id)
-						: Promise.resolve(),
-				]);
+			const leaving = owned.map((connection) => connection.id);
+			for (const connection of owned) {
+				await releaseGoogleGrant(connection, leaving);
 			}
 
 			const result = await db
@@ -85,6 +64,33 @@ export const googleRouter = {
 			return { success: true };
 		}),
 } satisfies TRPCRouterRecord;
+
+/**
+ * Revokes the grant and stops the mailbox watch, unless another connection
+ * still uses them.
+ */
+export async function releaseGoogleGrant(
+	connection: SelectConnection,
+	alsoLeaving: readonly string[] = [],
+): Promise<void> {
+	if (await grantSharedWithAnotherConnection(connection, alsoLeaving)) return;
+	// Best effort: Google keeps pushing until the watch is stopped or
+	// expires, and the push route would only reject pushes for a missing
+	// connection. A failure here must not block the disconnect.
+	const config = googleConfigOf(connection.state);
+	await Promise.allSettled([
+		// The grant outlives the row unless it is revoked: without this
+		// the refresh token would be gone from our side and the app would
+		// still hold read access on Google's.
+		revokeGrant(
+			(await decryptOptional(connection.refreshToken)) ??
+				(await decryptSecret(connection.accessToken)),
+		),
+		config.gmail?.watchExpiresAt
+			? stopMailboxWatch(connection.id)
+			: Promise.resolve(),
+	]);
+}
 
 async function revokeGrant(token: string): Promise<void> {
 	await fetch(

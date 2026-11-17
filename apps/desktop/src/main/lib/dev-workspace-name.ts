@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
-import { homedir } from "node:os";
 import path from "node:path";
+import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 import { workspaces, worktrees } from "@superset/local-db";
 import BetterSqlite3 from "better-sqlite3";
 import { and, desc, eq, isNull } from "drizzle-orm";
@@ -10,8 +10,8 @@ import { getWorkspaceNameFromHostDbs } from "./host-db-workspace-name";
 import { localDb } from "./local-db";
 
 const IS_DEV = process.env.NODE_ENV === "development";
-const WORKTREE_BASE = path.resolve(homedir(), ".superset/worktrees");
-const PROD_LOCAL_DB_PATH = path.join(homedir(), ".superset", "local.db");
+const WORKTREE_BASE = path.resolve(defaultAppHomeDir(), "worktrees");
+const PROD_LOCAL_DB_PATH = path.join(defaultAppHomeDir(), "local.db");
 
 function getWorktreeSegmentsFromCwd(cwd: string): string[] | undefined {
 	const cwdRelative = path.relative(WORKTREE_BASE, cwd);

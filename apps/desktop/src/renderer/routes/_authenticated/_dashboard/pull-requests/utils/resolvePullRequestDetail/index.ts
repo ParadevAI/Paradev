@@ -1,1 +1,0 @@
-export { resolvePullRequestDetail } from "./resolvePullRequestDetail";

@@ -1,7 +1,8 @@
+import { removePlugin } from "@superset/agent-setup";
 import { positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { withPluginHints } from "../../../lib/plugins/errors";
 import { resolvePluginRef } from "../../../lib/plugins/host";
-import { removePlugin } from "../../../lib/plugins/install";
 
 export default command({
 	sandbox: false,
@@ -36,12 +37,15 @@ export default command({
 				error && typeof error === "object" && "data" in error
 					? (error as { data?: { code?: string } }).data?.code
 					: undefined;
+			if (code === "FORBIDDEN") throw error;
 			if (code !== "NOT_FOUND") {
 				accountError = error instanceof Error ? error.message : String(error);
 			}
 		}
 
-		const removed = await removePlugin(name, marketplace);
+		const removed = await withPluginHints(() =>
+			removePlugin(name, marketplace),
+		);
 
 		const alsoDisconnected = disconnected
 			? ` Disconnected ${disconnected} account${disconnected === 1 ? "" : "s"}.`

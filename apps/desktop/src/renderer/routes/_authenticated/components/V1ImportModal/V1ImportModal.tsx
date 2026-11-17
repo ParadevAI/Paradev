@@ -40,6 +40,7 @@ export function V1ImportModal() {
 
 	return (
 		<Dialog
+			modal
 			open={isOpen}
 			onOpenChange={(open) => {
 				if (!open) close();
@@ -54,14 +55,14 @@ export function V1ImportModal() {
 			>
 				<DialogTitle className="sr-only">
 					{page === "welcome"
-						? "Welcome to Superset v2"
+						? "Welcome to Paradev v2"
 						: page === "intro"
 							? "Let's get you started"
 							: "Import from v1"}
 				</DialogTitle>
 				<DialogDescription className="sr-only">
 					Let's get your workspaces and projects ported over. Terminal sessions
-					won't be carried over, but you can still access v1 at any time.
+					won't be carried over.
 				</DialogDescription>
 
 				<div

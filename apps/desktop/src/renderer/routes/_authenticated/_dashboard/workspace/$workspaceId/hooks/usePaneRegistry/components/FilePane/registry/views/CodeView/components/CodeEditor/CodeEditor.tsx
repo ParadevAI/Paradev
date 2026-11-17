@@ -12,7 +12,7 @@ import {
 	indentOnInput,
 } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, type Extension } from "@codemirror/state";
 import {
 	drawSelection,
 	dropCursor,
@@ -30,7 +30,9 @@ import { type MutableRefObject, useEffect, useRef } from "react";
 import { FONT_SETTINGS_QUERY_KEY } from "renderer/lib/font-settings";
 import { replaceEditorDocument } from "renderer/lib/replaceEditorDocument";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
+import { createZedTheme } from "renderer/screens/main/components/WorkspaceView/utils/code-theme";
 import { useResolvedTheme } from "renderer/stores/theme";
+import type { Theme } from "shared/themes";
 import {
 	type CodeEditorAdapter,
 	createCodeMirrorAdapter,
@@ -39,13 +41,31 @@ import { createCodeMirrorTheme } from "./createCodeMirrorTheme";
 import { contourSelectionLayer } from "./extensions/contourSelectionLayer";
 import { buildFoldChevron } from "./extensions/foldChevron";
 import { buildFoldPlaceholder } from "./extensions/foldPlaceholder";
+import {
+	liveHighlighting,
+	loadLiveHighlighting,
+	resolveLiveHighlighting,
+} from "./extensions/liveHighlighting";
 import { selectionClassTogglePlugin } from "./extensions/selectionClassTogglePlugin";
 import { loadLanguageSupport } from "./loadLanguageSupport";
 import { getCodeSyntaxHighlighting } from "./syntax-highlighting";
 
+/** Undefined while the live lexers are still loading. */
+function highlightingFor(
+	filePath: string | undefined,
+	theme: Theme,
+): Extension | undefined {
+	const live = filePath ? resolveLiveHighlighting(filePath) : null;
+	if (live === undefined) return undefined;
+	return live
+		? liveHighlighting(live, createZedTheme(theme))
+		: getCodeSyntaxHighlighting(theme);
+}
+
 interface CodeEditorProps {
 	value: string;
 	language: string;
+	filePath?: string;
 	readOnly?: boolean;
 	fillHeight?: boolean;
 	className?: string;
@@ -62,6 +82,7 @@ interface CodeEditorProps {
 export function CodeEditor({
 	value,
 	language,
+	filePath,
 	readOnly = false,
 	fillHeight = true,
 	className,
@@ -75,6 +96,11 @@ export function CodeEditor({
 	const viewRef = useRef<EditorView | null>(null);
 	const languageCompartment = useRef(new Compartment()).current;
 	const themeCompartment = useRef(new Compartment()).current;
+	const highlightCompartment = useRef(new Compartment()).current;
+	const appliedHighlightingRef = useRef<{
+		filePath: string | undefined;
+		theme: Theme;
+	} | null>(null);
 	const editableCompartment = useRef(new Compartment()).current;
 	const onChangeRef = useRef(onChange);
 	const onSaveRef = useRef(onSave);
@@ -119,6 +145,11 @@ export function CodeEditor({
 			},
 		]);
 
+		const initialHighlighting = highlightingFor(filePath, activeTheme);
+		if (initialHighlighting) {
+			appliedHighlightingRef.current = { filePath, theme: activeTheme };
+		}
+
 		const state = EditorState.create({
 			doc: value,
 			extensions: [
@@ -153,8 +184,8 @@ export function CodeEditor({
 					...foldKeymap,
 				]),
 				saveKeymap,
+				highlightCompartment.of(initialHighlighting ?? []),
 				themeCompartment.of([
-					getCodeSyntaxHighlighting(activeTheme),
 					createCodeMirrorTheme(
 						activeTheme,
 						{
@@ -238,7 +269,6 @@ export function CodeEditor({
 
 		view.dispatch({
 			effects: themeCompartment.reconfigure([
-				getCodeSyntaxHighlighting(activeTheme),
 				createCodeMirrorTheme(
 					activeTheme,
 					{
@@ -308,6 +338,35 @@ export function CodeEditor({
 			cancelled = true;
 		};
 	}, [language, languageCompartment]);
+
+	useEffect(() => {
+		const applied = appliedHighlightingRef.current;
+		if (
+			applied &&
+			applied.filePath === filePath &&
+			applied.theme === activeTheme
+		)
+			return;
+		let cancelled = false;
+		const apply = (extension: Extension) => {
+			const view = viewRef.current;
+			if (cancelled || !view) return;
+			appliedHighlightingRef.current = { filePath, theme: activeTheme };
+			view.dispatch({ effects: highlightCompartment.reconfigure(extension) });
+		};
+		const ready = highlightingFor(filePath, activeTheme);
+		if (ready) {
+			apply(ready);
+		} else if (filePath) {
+			void loadLiveHighlighting(filePath)
+				.then(() => apply(highlightingFor(filePath, activeTheme) ?? []))
+				.catch(() => apply(getCodeSyntaxHighlighting(activeTheme)));
+		}
+
+		return () => {
+			cancelled = true;
+		};
+	}, [activeTheme, filePath, highlightCompartment]);
 
 	return (
 		<div

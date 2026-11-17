@@ -3,6 +3,7 @@ import {
 	DeleteObjectsCommand,
 	GetObjectCommand,
 	HeadObjectCommand,
+	ListObjectsV2Command,
 	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
@@ -159,6 +160,30 @@ export async function objectExists(
 	return (await headObject(key, { bucket })) !== null;
 }
 
+export async function listObjects(
+	prefix: string,
+	{ bucket = "private" }: { bucket?: Bucket } = {},
+): Promise<{ key: string; lastModified: Date | undefined }[]> {
+	const out: { key: string; lastModified: Date | undefined }[] = [];
+	let token: string | undefined;
+	do {
+		const page = await s3().send(
+			new ListObjectsV2Command({
+				Bucket: bucketName(bucket),
+				Prefix: prefix,
+				ContinuationToken: token,
+			}),
+		);
+		for (const object of page.Contents ?? []) {
+			if (object.Key) {
+				out.push({ key: object.Key, lastModified: object.LastModified });
+			}
+		}
+		token = page.IsTruncated ? page.NextContinuationToken : undefined;
+	} while (token);
+	return out;
+}
+
 /** Deletes are idempotent and batched; a missing key is not an error. */
 export async function deleteObjects(
 	keys: readonly string[],
@@ -189,11 +214,12 @@ export async function deleteObjects(
 export async function presignedGetUrl(
 	key: string,
 	expiresInSeconds = 60 * 60,
+	signingDate?: Date,
 ): Promise<string> {
 	return getSignedUrl(
 		s3(),
 		new GetObjectCommand({ Bucket: bucketName("private"), Key: key }),
-		{ expiresIn: expiresInSeconds },
+		{ expiresIn: expiresInSeconds, signingDate },
 	);
 }
 

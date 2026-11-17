@@ -1,5 +1,16 @@
 import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
-import { and, desc, eq, inArray, isNotNull, isNull, ne, or } from "drizzle-orm";
+import {
+	and,
+	desc,
+	eq,
+	gte,
+	inArray,
+	isNotNull,
+	isNull,
+	ne,
+	or,
+	sql,
+} from "drizzle-orm";
 import type { HostDb } from "../db";
 import { terminalAgentBindings, terminalSessions } from "../db/schema.ts";
 import type {
@@ -187,6 +198,30 @@ export function findResumeCandidateBinding(
 }
 
 /**
+ * Remember the transcript file the harness reported for a session. Written
+ * only while the binding still names that session, so a late hook from a
+ * session the terminal has moved on from cannot attach its file to the next.
+ */
+export function recordTerminalAgentTranscriptPath(
+	db: HostDb,
+	input: { terminalId: string; agentSessionId: string; transcriptPath: string },
+): void {
+	db.update(terminalAgentBindings)
+		.set({ transcriptPath: input.transcriptPath })
+		.where(
+			and(
+				eq(terminalAgentBindings.terminalId, input.terminalId),
+				eq(terminalAgentBindings.agentSessionId, input.agentSessionId),
+				or(
+					isNull(terminalAgentBindings.transcriptPath),
+					ne(terminalAgentBindings.transcriptPath, input.transcriptPath),
+				),
+			),
+		)
+		.run();
+}
+
+/**
  * Record where a consumed candidate's session was relaunched, so a pane
  * that was not mounted for the "resumed" lifecycle event can still find
  * it. Written by the resume path once the launch has a terminal id.
@@ -199,6 +234,62 @@ export function markResumeCandidateResumedInto(
 	db.update(terminalAgentBindings)
 		.set({ resumedIntoTerminalId })
 		.where(eq(terminalAgentBindings.terminalId, terminalId))
+		.run();
+}
+
+/**
+ * The binding of a terminal stopped for a workspace move, read back from the
+ * database so a host restart does not lose it: an ended "disposed" binding
+ * with its session id, or one already resumed into a successor terminal.
+ */
+export function findMoveStoppedBinding(
+	db: HostDb,
+	workspaceId: string,
+	terminalId: string,
+	endedSince: number,
+):
+	| { kind: "stopped"; binding: TerminalAgentBinding }
+	| { kind: "resumed"; terminalId: string }
+	| undefined {
+	const row = db
+		.select({
+			...bindingColumns,
+			resumedInto: terminalAgentBindings.resumedIntoTerminalId,
+		})
+		.from(terminalAgentBindings)
+		.where(
+			and(
+				eq(terminalAgentBindings.terminalId, terminalId),
+				eq(terminalAgentBindings.workspaceId, workspaceId),
+				isNotNull(terminalAgentBindings.agentSessionId),
+				gte(terminalAgentBindings.endedAt, endedSince),
+				inArray(terminalAgentBindings.endReason, ["disposed", "resumed"]),
+			),
+		)
+		.get();
+	if (!row) return undefined;
+	if (row.endReason === "resumed") {
+		return row.resumedInto
+			? { kind: "resumed", terminalId: row.resumedInto }
+			: undefined;
+	}
+	return { kind: "stopped", binding: rowToBinding(row) };
+}
+
+/** Records that a move-stopped terminal now runs as `resumedIntoTerminalId`. */
+export function markMoveStoppedBindingResumedInto(
+	db: HostDb,
+	terminalId: string,
+	resumedIntoTerminalId: string,
+): void {
+	db.update(terminalAgentBindings)
+		.set({ endReason: "resumed", resumedIntoTerminalId })
+		.where(
+			and(
+				eq(terminalAgentBindings.terminalId, terminalId),
+				eq(terminalAgentBindings.endReason, "disposed"),
+			),
+		)
 		.run();
 }
 
@@ -576,6 +667,9 @@ export class SqliteTerminalAgentBindingPersistence
 					lastEventType: binding.lastEventType,
 					endedAt: null,
 					endReason: null,
+					// A reported transcript belongs to the session that reported
+					// it; the next session in this terminal reports its own.
+					transcriptPath: sql`CASE WHEN ${terminalAgentBindings.agentSessionId} IS excluded.agent_session_id THEN ${terminalAgentBindings.transcriptPath} ELSE NULL END`,
 				},
 			})
 			.run();

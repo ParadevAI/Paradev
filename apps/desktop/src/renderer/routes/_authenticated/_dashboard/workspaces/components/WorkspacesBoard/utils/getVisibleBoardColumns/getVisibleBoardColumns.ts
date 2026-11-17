@@ -1,4 +1,3 @@
-import type { WorkspacesArchivedWindow } from "renderer/routes/_authenticated/_dashboard/workspaces/stores/workspacesFilterStore";
 import {
 	BOARD_COLUMN_ORDER,
 	type BoardColumnKey,
@@ -7,12 +6,12 @@ import {
 const ARCHIVED_COLUMNS = new Set<BoardColumnKey>(["merged", "deleted"]);
 
 export function getVisibleBoardColumns(
-	archivedWindow: WorkspacesArchivedWindow,
+	showArchived: boolean,
 	workspaceCount: (column: BoardColumnKey) => number,
 ): BoardColumnKey[] {
 	return BOARD_COLUMN_ORDER.filter(
 		(column) =>
-			archivedWindow !== "none" ||
+			showArchived ||
 			!ARCHIVED_COLUMNS.has(column) ||
 			workspaceCount(column) > 0,
 	);

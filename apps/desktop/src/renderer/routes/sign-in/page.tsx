@@ -13,12 +13,12 @@ import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { Redirect } from "renderer/components/Redirect";
+import { SupersetLogo } from "renderer/components/SupersetLogo";
 import { env } from "renderer/env.renderer";
 import { useDelayElapsed } from "renderer/hooks/useDelayElapsed";
 import { track } from "renderer/lib/analytics";
 import { setAuthToken } from "renderer/lib/auth-client";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { SupersetLogo } from "./components/SupersetLogo";
 import { useSessionRecovery } from "./hooks/useSessionRecovery";
 
 export const Route = createFileRoute("/sign-in/")({
@@ -47,6 +47,9 @@ function SignInPage() {
 	const [isLoadingDev, setIsLoadingDev] = useState(false);
 	const [devError, setDevError] = useState<string | null>(null);
 	const [lastUsedMethod, setLastUsedMethod] = useState(readLastUsedMethod);
+	const [browserProvider, setBrowserProvider] = useState<AuthProvider | null>(
+		null,
+	);
 	const { hasLocalToken, isPending, session } = useSessionRecovery();
 	// A session fetch that never settles must not trap the user on a spinner —
 	// fall through to the sign-in buttons after a while (#5729).
@@ -82,6 +85,7 @@ function SignInPage() {
 	const signIn = (provider: AuthProvider) => {
 		track("auth_started", { provider });
 		rememberLastUsedMethod(provider);
+		setBrowserProvider(provider);
 		signInMutation.mutate({ provider });
 	};
 
@@ -147,104 +151,152 @@ function SignInPage() {
 		}
 	};
 
-	const lastUsedBadge = (
-		<Badge variant="secondary">
-			<Trans>Last used</Trans>
-		</Badge>
-	);
+	const providerButtons = [
+		{
+			provider: "github" as const,
+			icon: <FaGithub />,
+			label: <Trans>Continue with GitHub</Trans>,
+		},
+		{
+			provider: "google" as const,
+			icon: <FcGoogle />,
+			label: <Trans>Continue with Google</Trans>,
+		},
+	];
+
+	const browserOpenFailed =
+		signInMutation.isError || signInMutation.data?.success === false;
+	const isWaitingForBrowser = browserProvider !== null && !browserOpenFailed;
+	const browserProviderLabel =
+		browserProvider === "google" ? "Google" : "GitHub";
 
 	return (
-		<div className="flex flex-col h-full w-full bg-background">
-			<div className="h-12 w-full drag shrink-0" />
+		<div className="flex h-full w-full flex-col bg-background">
+			<div className="drag h-12 w-full shrink-0" />
 
-			<div className="flex flex-1 items-center justify-center">
-				<div className="flex flex-col items-center w-full max-w-md px-8">
-					<div className="mb-8">
-						<SupersetLogo className="h-12 w-auto" />
-					</div>
+			<div className="flex flex-1 items-center justify-center pb-[8vh]">
+				<div className="flex w-full max-w-xs flex-col items-center px-4">
+					<h1 className="mb-3">
+						<SupersetLogo
+							className="h-6 w-auto"
+							gradient={isWaitingForBrowser}
+						/>
+					</h1>
 
-					<div className="text-center mb-8">
-						<h1 className="text-xl font-semibold text-foreground mb-2">
-							<Trans>Welcome to Superset</Trans>
-						</h1>
-						<p className="text-sm text-muted-foreground">
-							{hasLocalToken ? (
-								<Trans>Restoring your session</Trans>
-							) : (
-								<Trans>Sign in to get started</Trans>
-							)}
-						</p>
-					</div>
-
-					<div className="flex flex-col gap-3 w-full max-w-xs">
-						{env.NODE_ENV === "development" && (
-							<Button
-								variant="outline"
-								size="lg"
-								onClick={signInAsDev}
-								className="w-full gap-3"
-								disabled={isLoadingDev}
-							>
-								{isLoadingDev
-									? "Signing in..."
-									: "Sign in as Local Admin (dev)"}
-								{lastUsedMethod === "dev" && lastUsedBadge}
-							</Button>
-						)}
-						{devError && (
-							<p className="text-xs text-destructive text-center select-text cursor-text">
-								{devError}
+					{isWaitingForBrowser ? (
+						<>
+							<p className="text-sm font-medium text-foreground">
+								<Trans>Continue in your browser</Trans>
 							</p>
-						)}
-						<Button
-							variant="outline"
-							size="lg"
-							onClick={() => signIn("github")}
-							className="w-full gap-3"
-							disabled={signInMutation.isPending}
-						>
-							<FaGithub className="size-5" />
-							<Trans>Continue with GitHub</Trans>
-							{lastUsedMethod === "github" && lastUsedBadge}
-						</Button>
+							<p className="mt-1 mb-6 text-balance text-center text-sm text-muted-foreground">
+								<Trans>
+									Sign in with {browserProviderLabel}, then come back here.
+								</Trans>
+							</p>
+							<div className="flex w-full flex-col gap-2">
+								<Button
+									variant="outline"
+									className="w-full"
+									onClick={() => browserProvider && signIn(browserProvider)}
+									disabled={signInMutation.isPending}
+								>
+									<Trans>Open browser again</Trans>
+								</Button>
+								<Button
+									variant="ghost"
+									className="w-full text-muted-foreground"
+									onClick={() => setBrowserProvider(null)}
+								>
+									<Trans>Back</Trans>
+								</Button>
+							</div>
+						</>
+					) : (
+						<>
+							<p className="mb-6 text-sm text-muted-foreground">
+								{hasLocalToken ? (
+									<Trans>Restoring your session</Trans>
+								) : (
+									<Trans>Welcome to Paradev</Trans>
+								)}
+							</p>
 
-						<Button
-							variant="outline"
-							size="lg"
-							onClick={() => signIn("google")}
-							className="w-full gap-3"
-							disabled={signInMutation.isPending}
-						>
-							<FcGoogle className="size-5" />
-							<Trans>Continue with Google</Trans>
-							{lastUsedMethod === "google" && lastUsedBadge}
-						</Button>
-					</div>
+							<div className="flex w-full flex-col gap-3">
+								{providerButtons.map(({ provider, icon, label }) => (
+									<div key={provider} className="relative">
+										<Button
+											variant="outline"
+											onClick={() => signIn(provider)}
+											className="w-full"
+											disabled={signInMutation.isPending}
+										>
+											{icon}
+											{label}
+										</Button>
+										{lastUsedMethod === provider && (
+											<Badge
+												variant="outline"
+												className="pointer-events-none absolute -top-2 -right-2 border-link/40 bg-[color-mix(in_oklab,var(--link)_15%,var(--background))] px-1.5 py-0 text-[10px] text-link"
+											>
+												<Trans>Last used</Trans>
+											</Badge>
+										)}
+									</div>
+								))}
+							</div>
+							{browserOpenFailed && (
+								<p className="mt-3 text-xs text-destructive">
+									<Trans>Couldn't open your browser. Try again.</Trans>
+								</p>
+							)}
 
-					<p className="mt-8 text-xs text-muted-foreground/70 text-center max-w-xs">
-						<Trans>
-							By signing in, you agree to our{" "}
-							<a
-								href={COMPANY.TERMS_URL}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="underline hover:text-muted-foreground transition-colors"
-							>
-								Terms of Service
-							</a>{" "}
-							and{" "}
-							<a
-								href={COMPANY.PRIVACY_URL}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="underline hover:text-muted-foreground transition-colors"
-							>
-								Privacy Policy
-							</a>
-						</Trans>
-					</p>
+							{env.NODE_ENV === "development" && (
+								<div className="mt-6 flex w-full flex-col gap-2 border-t pt-6">
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={signInAsDev}
+										className="w-full text-muted-foreground"
+										disabled={isLoadingDev}
+									>
+										{isLoadingDev
+											? "Signing in..."
+											: "Sign in as Local Admin (dev)"}
+									</Button>
+									{devError && (
+										<p className="cursor-text select-text text-center text-xs text-destructive">
+											{devError}
+										</p>
+									)}
+								</div>
+							)}
+						</>
+					)}
 				</div>
 			</div>
+
+			<p className="mx-auto max-w-md shrink-0 text-balance px-4 pb-6 text-center text-xs text-muted-foreground">
+				<Trans>
+					By signing in, you agree to our{" "}
+					<a
+						href={COMPANY.TERMS_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline underline-offset-2 transition-colors hover:text-foreground"
+					>
+						Terms of Service
+					</a>{" "}
+					and{" "}
+					<a
+						href={COMPANY.PRIVACY_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline underline-offset-2 transition-colors hover:text-foreground"
+					>
+						Privacy Policy
+					</a>
+				</Trans>
+			</p>
 		</div>
 	);
 }

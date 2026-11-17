@@ -22,6 +22,15 @@ describe("parseSupersetPageUrl", () => {
 		).toBe("report-a3f9k2");
 	});
 
+	it("accepts the web origin's twin on the other root domain", () => {
+		expect(
+			parseSupersetPageUrl(
+				"https://app.paradev.com/page/report-a3f9k2",
+				WEB_URL,
+			),
+		).toBe("report-a3f9k2");
+	});
+
 	it("tolerates a trailing slash on the configured web URL", () => {
 		expect(
 			parseSupersetPageUrl(`${WEB_URL}/page/report-a3f9k2`, `${WEB_URL}/`),

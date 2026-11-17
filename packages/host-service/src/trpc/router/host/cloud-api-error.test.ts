@@ -1,7 +1,12 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import { TRPCClientError } from "@trpc/client";
 import { TRPCError } from "@trpc/server";
-import { rethrowCloudUnreachable } from "./cloud-api-error";
+import { createApiClient } from "../../../api";
+import { JwtApiAuthProvider } from "../../../providers/auth/JwtAuthProvider";
+import {
+	rethrowCloudUnreachable,
+	rethrowSessionRejected,
+} from "./cloud-api-error";
 
 function capture(error: unknown): TRPCError | null {
 	try {
@@ -62,6 +67,7 @@ describe("rethrowCloudUnreachable", () => {
 		["ECONNREFUSED", "connect ECONNREFUSED 10.0.0.1:443"],
 		["ECONNRESET", "read ECONNRESET"],
 		["ENOTCONN", "read ENOTCONN"],
+		["EADDRNOTAVAIL", "read EADDRNOTAVAIL"],
 		["ENOTFOUND", "getaddrinfo ENOTFOUND api.example.invalid"],
 		["EAI_AGAIN", "getaddrinfo EAI_AGAIN api.example.invalid"],
 		["EHOSTUNREACH", "connect EHOSTUNREACH 10.0.0.1:443"],
@@ -148,6 +154,57 @@ describe("rethrowCloudUnreachable", () => {
 				code: "PRECONDITION_FAILED",
 				message: "Organization not found or not accessible from JWT",
 			}),
+		);
+		expect(thrown).toBeNull();
+	});
+});
+
+describe("rethrowSessionRejected", () => {
+	const originalFetch = globalThis.fetch;
+	afterEach(() => {
+		globalThis.fetch = originalFetch;
+	});
+
+	async function cloudCallWithMintStatus(status: number): Promise<unknown> {
+		globalThis.fetch = (async () =>
+			new Response("{}", { status })) as unknown as typeof fetch;
+		const api = createApiClient(
+			"https://api.superset.test",
+			new JwtApiAuthProvider({
+				getSessionToken: async () => "session-token",
+				apiUrl: "https://api.superset.test",
+			}),
+			"00000000-0000-0000-0000-000000000001",
+		);
+		return api.organization.getByIdFromJwt
+			.query({ id: "00000000-0000-0000-0000-000000000001" })
+			.catch((error: unknown) => error);
+	}
+
+	function captureRejected(error: unknown): TRPCError | null {
+		try {
+			rethrowSessionRejected(error);
+			return null;
+		} catch (thrown) {
+			return thrown as TRPCError;
+		}
+	}
+
+	test("the cloud refuses to mint a JWT for the session (HOST-SERVICE-2R)", async () => {
+		const thrown = captureRejected(await cloudCallWithMintStatus(401));
+		expect(thrown?.code).toBe("UNAUTHORIZED");
+	});
+
+	test("a mint failure other than 401 still reports", async () => {
+		expect(captureRejected(await cloudCallWithMintStatus(403))).toBeNull();
+		expect(captureRejected(await cloudCallWithMintStatus(500))).toBeNull();
+	});
+
+	test("an UNAUTHORIZED answer from the cloud call itself still reports", () => {
+		const thrown = captureRejected(
+			TRPCClientError.from(
+				new TRPCError({ code: "UNAUTHORIZED", message: "Unauthorized" }),
+			),
 		);
 		expect(thrown).toBeNull();
 	});

@@ -1,0 +1,1 @@
+export { PresenceAvatar } from "./PresenceAvatar";

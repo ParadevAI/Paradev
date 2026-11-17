@@ -1,12 +1,20 @@
 import { useLingui } from "@lingui/react/macro";
+import { acpHarnessForPreset } from "@superset/chat/core";
 import type { CreatePaneInput, Pane, WorkspaceStore } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { workspaceTrpc } from "@superset/workspace-client";
 import { useLiveQuery } from "@tanstack/react-db";
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
-import { resolvePresetLaunchCommands } from "renderer/lib/agent-launch-command";
-import { getPresetLaunchPlan } from "renderer/lib/preset-launch/preset-launch";
+import { useIsAgentPresetEnabled } from "renderer/hooks/useIsAgentPresetEnabled";
+import {
+	useAgentConfigs,
+	v2AgentConfigsQueryOptions,
+} from "renderer/hooks/useAgentConfigs";
+import {
+	findLinkedAgent,
+	resolvePresetLaunchCommands,
+} from "renderer/lib/agent-launch-command";
 import { buildTerminalCommand } from "renderer/lib/terminal/launch-command";
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -18,7 +26,9 @@ import { getPresetsForTriggerField } from "shared/preset-trigger-selection";
 import { quote } from "shell-quote";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData, TerminalPaneData } from "../../types";
+import type { OpenAgentChat } from "../useAgentSessionLauncher";
 import type { TerminalLauncher } from "../useTerminalLauncher";
+import { isLinkedPresetLaunchable } from "./utils/linkedPresetGating";
 
 function makeTerminalPane(
 	terminalId: string,
@@ -80,11 +90,13 @@ function buildFocusedTerminalCommand({
 interface UseV2PresetExecutionArgs {
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	launcher: TerminalLauncher;
+	openAgentChat: OpenAgentChat;
 }
 
 export function usePresetExecution({
 	store,
 	launcher,
+	openAgentChat,
 }: UseV2PresetExecutionArgs) {
 	const { t } = useLingui();
 	const { workspace } = useWorkspace();
@@ -99,7 +111,7 @@ export function usePresetExecution({
 	);
 	const sendToTerminal = workspaceTrpc.terminal.send.useMutation();
 
-	const { data: allPresets = [] } = useLiveQuery(
+	const { data: storedPresets = [] } = useLiveQuery(
 		(query) =>
 			query
 				.from({ terminalPresets: collections.terminalPresets })
@@ -112,6 +124,22 @@ export function usePresetExecution({
 	// already invalidated by mutations in the agents settings page.
 	const { activeHostUrl } = useLocalHostService();
 	const { data: agents = [] } = useAgentConfigs(activeHostUrl);
+	const { data: unfilteredAgents } = useQuery({
+		...v2AgentConfigsQueryOptions(activeHostUrl),
+		enabled: !!activeHostUrl,
+	});
+	const isAgentPresetEnabled = useIsAgentPresetEnabled();
+	const allPresets = useMemo(
+		() =>
+			storedPresets.filter((preset) =>
+				isLinkedPresetLaunchable(
+					preset,
+					unfilteredAgents,
+					isAgentPresetEnabled,
+				),
+			),
+		[storedPresets, unfilteredAgents, isAgentPresetEnabled],
+	);
 
 	const matchedPresets = useMemo(
 		() => filterMatchingPresetsForProject(allPresets, projectId),
@@ -139,6 +167,15 @@ export function usePresetExecution({
 			preset: TerminalPresetRow,
 			options?: { target?: "new-tab" | "active-tab" },
 		) => {
+			if (
+				!isLinkedPresetLaunchable(
+					preset,
+					unfilteredAgents,
+					isAgentPresetEnabled,
+				)
+			) {
+				return;
+			}
 			const state = store.getState();
 			const activeTabId = state.activeTabId;
 			const target = options?.target ?? resolveTarget(preset.executionMode);
@@ -167,6 +204,20 @@ export function usePresetExecution({
 				hasActiveTab: !!activeTabId,
 				hasActiveTerminal: !!activeTerminal,
 			});
+
+			const linkedAgent = findLinkedAgent(agents, preset.agentId);
+			if (
+				linkedAgent &&
+				acpHarnessForPreset(linkedAgent.presetId) &&
+				(plan === "new-tab-single" || plan === "active-tab-single")
+			) {
+				const chat = await openAgentChat({
+					configId: linkedAgent.id,
+					presetId: linkedAgent.presetId,
+					placement: plan === "active-tab-single" ? "split-pane" : "new-tab",
+				});
+				if (chat) return;
+			}
 
 			// Sessions for every pane this plan creates are spun up in parallel
 			// before any of them land in the store, so background tabs (e.g.
@@ -292,6 +343,10 @@ export function usePresetExecution({
 			workspaceId,
 			workspaceQuery.data?.worktreePath,
 			sendToTerminal,
+			agents,
+			unfilteredAgents,
+			isAgentPresetEnabled,
+			openAgentChat,
 		],
 	);
 

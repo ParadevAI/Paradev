@@ -1,5 +1,5 @@
 "use client";
-import { useFormat } from "@superset/i18n/react";
+import { useFormat } from "@superset/i18n/use-format";
 
 import {
 	ChevronDownIcon,

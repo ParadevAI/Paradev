@@ -225,6 +225,11 @@ export class EventBus {
 		}
 	}
 
+	/** For git state changes GitWatcher cannot see, such as a ref fetched into the common dir. */
+	broadcastGitChanged(workspaceId: string): void {
+		this.broadcast({ type: "git:changed", workspaceId });
+	}
+
 	/**
 	 * Fan out an agent lifecycle event (hook completion) to all connected
 	 * clients. The workspace-client filters by `workspaceId` on the receiving
@@ -272,6 +277,15 @@ export class EventBus {
 	onTerminalLifecycle(listener: TerminalLifecycleListener): () => void {
 		this.terminalLifecycleListeners.add(listener);
 		return () => this.terminalLifecycleListeners.delete(listener);
+	}
+
+	broadcastChatSessionsChanged(
+		message: Omit<
+			Extract<ServerMessage, { type: "chat:sessions-changed" }>,
+			"type"
+		>,
+	): void {
+		this.broadcast({ type: "chat:sessions-changed", ...message });
 	}
 
 	broadcastPageWatchChanged(
@@ -331,6 +345,15 @@ export class EventBus {
 		>,
 	): void {
 		this.broadcast({ type: "workspace:create-settled", ...message });
+	}
+
+	broadcastWorkspaceNamingFailed(
+		message: Omit<
+			Extract<ServerMessage, { type: "workspace:naming-failed" }>,
+			"type"
+		>,
+	): void {
+		this.broadcast({ type: "workspace:naming-failed", ...message });
 	}
 
 	/**

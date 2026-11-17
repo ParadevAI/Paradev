@@ -31,7 +31,7 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_USER,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { type BuiltBundle, buildBundle, PACKAGE_ROOT } from "./build";
 import { loginToRegistry } from "./registry";
 
@@ -49,7 +49,6 @@ const GO_VERSION = "1.27.1";
 /** Pinned by `bun run assets go`; verified before the tarball is unpacked. */
 const GO_SHA256 =
 	"63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445";
-const AGENT_CLI_VERSIONS = { claudeCode: "2.1.257", codex: "0.152.0" } as const;
 
 function aptList(name: string): string {
 	return readFileSync(
@@ -78,6 +77,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends ${aptList("base")} \\
  && apt-get install -y --no-install-recommends ${aptList("toolchain")} \\
  && apt-get install -y ${aptList("desktop")} \\
+ && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 100 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-16 \\
  && rm -rf /var/lib/apt/lists/*
 # Docker, the GitHub CLI and Go from their vendors: Debian's lag by years.
 RUN install -m 0755 -d /etc/apt/keyrings \\
@@ -91,8 +91,6 @@ RUN curl -fsSL -o /tmp/go.tgz https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.
  && echo "${GO_SHA256}  /tmp/go.tgz" | sha256sum -c - \\
  && tar -C /usr/local -xzf /tmp/go.tgz && rm /tmp/go.tgz
 RUN npm install -g bun@${BUN_VERSION} --no-audit --no-fund && bun --version
-# The agents the sandbox can run; a sandbox has none of the user's local ones.
-RUN npm install -g @anthropic-ai/claude-code@${AGENT_CLI_VERSIONS.claudeCode} @openai/codex@${AGENT_CLI_VERSIONS.codex} --no-audit --no-fund && claude --version && codex --version
 # The sandbox user: the reference and the platform's own images run as one
 # with passwordless sudo; root is the boot runner only.
 # The base image ships a \`node\` user on uid 1000; ours takes that uid.
@@ -117,6 +115,66 @@ WORKDIR ${SANDBOX_PATHS.workspace}
 `;
 }
 
+type HistoryLayer = { CreatedBy: string; Size: string };
+
+const DOCKER_UNITS: Record<string, number> = {
+	B: 1,
+	kB: 1e3,
+	KB: 1e3,
+	MB: 1e6,
+	GB: 1e9,
+	TB: 1e12,
+};
+
+function parseDockerSize(size: string): number {
+	const match = /^([\d.]+)\s*([kKMGT]?B)?$/.exec(size.trim());
+	if (!match) throw new Error(`unreadable layer size: ${size}`);
+	return Number(match[1]) * (DOCKER_UNITS[match[2] ?? "B"] ?? 1);
+}
+
+function formatBytes(bytes: number): string {
+	if (bytes >= 1e9) return `${(bytes / 1e9).toFixed(2)} GB`;
+	if (bytes >= 1e6) return `${(bytes / 1e6).toFixed(1)} MB`;
+	if (bytes >= 1e3) return `${(bytes / 1e3).toFixed(1)} kB`;
+	return `${bytes} B`;
+}
+
+/** Renders `docker history --format '{{json .}}'` output, one JSON object per line, as a size table. */
+export function formatImageReport(history: string): string {
+	const layers = history
+		.split("\n")
+		.filter((line) => line.trim())
+		.map((line) => JSON.parse(line) as HistoryLayer)
+		.map((layer) => ({
+			bytes: parseDockerSize(layer.Size),
+			command: layer.CreatedBy.replace(/\s+/g, " ").trim(),
+		}));
+	const total = layers.reduce((sum, layer) => sum + layer.bytes, 0);
+	const rows = layers.map(
+		({ bytes, command }) =>
+			`${formatBytes(bytes).padStart(10)}  ${command.length > 90 ? `${command.slice(0, 89)}…` : command}`,
+	);
+	return [`image size: ${formatBytes(total)}`, ...rows].join("\n");
+}
+
+function printImageReport(image: string): void {
+	const history = Bun.spawnSync(
+		[
+			"docker",
+			"history",
+			"--no-trunc",
+			"--human=false",
+			"--format",
+			"{{json .}}",
+			image,
+		],
+		{ stdout: "pipe", stderr: "inherit" },
+	);
+	if (history.exitCode !== 0)
+		throw new Error(`docker history exited ${history.exitCode}`);
+	console.log(formatImageReport(history.stdout.toString()));
+}
+
 function assembleContext(bundle: BuiltBundle): string {
 	const context = mkdtempSync(join(tmpdir(), "superset-sandbox-image-"));
 	cpSync(bundle.dir, join(context, "bundle"), { recursive: true });
@@ -124,14 +182,13 @@ function assembleContext(bundle: BuiltBundle): string {
 	return context;
 }
 
-export const IMAGE_REF = `${SANDBOX_IMAGE_NAME}:${IMAGE_TAG}`;
-
 /** Builds the image from a built bundle; pushes unless `local`. Returns the image reference. */
 export async function buildImage(
 	bundle: BuiltBundle,
-	options: { local: boolean },
+	options: { local: boolean; tag?: string },
 ): Promise<string> {
 	const local = options.local;
+	const imageRef = `${SANDBOX_IMAGE_NAME}:${options.tag ?? IMAGE_TAG}`;
 	const context = assembleContext(bundle);
 	try {
 		const command = local
@@ -153,11 +210,11 @@ export async function buildImage(
 					"--platform",
 					"linux/amd64",
 					"--output",
-					`type=image,name=${await loginToRegistry()}/${IMAGE_REF},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
+					`type=image,name=${await loginToRegistry()}/${imageRef},push=true,oci-mediatypes=true,compression=zstd,compression-level=3,force-compression=true`,
 					context,
 				];
 		console.log(
-			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : IMAGE_REF}`,
+			`building bundle ${bundle.sha256.slice(0, 12)} into ${local ? LOCAL_IMAGE : imageRef}`,
 		);
 		const build = Bun.spawnSync(command, {
 			stdout: "inherit",
@@ -165,11 +222,31 @@ export async function buildImage(
 		});
 		if (build.exitCode !== 0)
 			throw new Error(`image build exited ${build.exitCode}`);
-		console.log(`built: ${local ? LOCAL_IMAGE : IMAGE_REF}`);
-		return local ? LOCAL_IMAGE : IMAGE_REF;
+		console.log(`built: ${local ? LOCAL_IMAGE : imageRef}`);
+		if (local) printImageReport(LOCAL_IMAGE);
+		return local ? LOCAL_IMAGE : imageRef;
 	} finally {
 		rmSync(context, { recursive: true, force: true });
 	}
+}
+
+/** Points `to` at the manifest `from` names, in the registry; nothing is rebuilt or re-pushed. */
+export async function retagImage(from: string, to: string): Promise<void> {
+	const repository = `${await loginToRegistry()}/${SANDBOX_IMAGE_NAME}`;
+	const retag = Bun.spawnSync(
+		[
+			"docker",
+			"buildx",
+			"imagetools",
+			"create",
+			"--tag",
+			`${repository}:${to}`,
+			`${repository}:${from}`,
+		],
+		{ stdout: "inherit", stderr: "inherit" },
+	);
+	if (retag.exitCode !== 0)
+		throw new Error(`retag ${from} -> ${to} exited ${retag.exitCode}`);
 }
 
 if (import.meta.main) {

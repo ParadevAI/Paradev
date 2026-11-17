@@ -1,11 +1,7 @@
 import type { ExternalApp } from "@superset/local-db";
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
-import {
-	useLocation,
-	useMatchRoute,
-	useNavigate,
-} from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import {
 	createContext,
 	type ReactNode,
@@ -13,11 +9,13 @@ import {
 	useContext,
 	useMemo,
 } from "react";
+import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useOpenNewWorkspace } from "renderer/hooks/useOpenNewWorkspace";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useSettingsSectionVisibility } from "renderer/routes/_authenticated/settings/hooks/useSettingsSectionVisibility";
 import { getWorkspaceDisplayName } from "renderer/utils/getWorkspaceDisplayName";
 import type { CommandContext } from "./types";
 
@@ -28,6 +26,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 	const matchRoute = useMatchRoute();
 	const navigate = useNavigate();
 	const collections = useCollections();
+	const settingsSectionVisibility = useSettingsSectionVisibility();
 	const openNewWorkspace = useOpenNewWorkspace();
 	const {
 		activeHostUrl,
@@ -100,6 +99,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			hostServiceStatus,
 			localMachineId: machineId ?? null,
 			notificationSoundsMuted,
+			settingsSectionVisibility,
 			navigate: navigateTo,
 			openNewWorkspace,
 		}),
@@ -113,6 +113,7 @@ export function CommandContextProvider({ children }: { children: ReactNode }) {
 			hostServiceStatus,
 			machineId,
 			notificationSoundsMuted,
+			settingsSectionVisibility,
 			navigateTo,
 			openNewWorkspace,
 		],

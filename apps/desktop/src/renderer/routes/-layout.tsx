@@ -2,6 +2,7 @@ import { Alerter } from "@superset/ui/atoms/Alert";
 import type { ReactNode } from "react";
 import { DesktopNoticesGate } from "renderer/components/DesktopNotices";
 import { LanguageAwareI18nProvider } from "renderer/components/LanguageAwareI18nProvider";
+import { PostHogLocaleTagger } from "renderer/components/PostHogLocaleTagger";
 import { PostHogUserIdentifier } from "renderer/components/PostHogUserIdentifier";
 import { TelemetrySync } from "renderer/components/TelemetrySync";
 import { ThemedToaster } from "renderer/components/ThemedToaster";
@@ -16,6 +17,7 @@ export function RootLayout({ children }: { children: ReactNode }) {
 				<PostHogUserIdentifier />
 				<TelemetrySync />
 				<LanguageAwareI18nProvider>
+					<PostHogLocaleTagger />
 					<AuthProvider>
 						<DesktopNoticesGate>{children}</DesktopNoticesGate>
 						<ThemedToaster />

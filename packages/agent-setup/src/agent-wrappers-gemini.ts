@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import {
 	buildWrapperScript,
@@ -14,7 +13,7 @@ import {
 	type ManagedJsonHooksSpec,
 	removeManagedJsonHooks,
 } from "./managed-json-hooks";
-import { getHooksDir } from "./paths";
+import { APP_HOME_DIR_NAME, getHooksDir, resolveUserHomeDir } from "./paths";
 
 export const GEMINI_HOOK_SCRIPT_NAME = "gemini-hook.sh";
 
@@ -34,7 +33,7 @@ export function getGeminiHookScriptPath(): string {
 }
 
 export function getGeminiSettingsJsonPath(): string {
-	return path.join(os.homedir(), ".gemini", "settings.json");
+	return path.join(resolveUserHomeDir(), ".gemini", "settings.json");
 }
 
 export function getGeminiHookScriptContent(): string {
@@ -42,7 +41,9 @@ export function getGeminiHookScriptContent(): string {
 		getTemplatePath("gemini-hook.template.sh"),
 		"utf-8",
 	);
-	return template.replace("{{MARKER}}", GEMINI_HOOK_MARKER);
+	return template
+		.replace("{{MARKER}}", GEMINI_HOOK_MARKER)
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 // HookEventName values from gemini-cli's packages/core/src/hooks/types.ts.

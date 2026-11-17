@@ -189,7 +189,7 @@ function getRecoveryText(status: HostServiceAvailabilityStatus): string {
 			return i18n._(
 				msg({
 					message:
-						"Use the Superset tray menu > Host Service > Restart, then retry.",
+						"Use the Paradev tray menu > Host Service > Restart, then retry.",
 				}),
 			);
 		case "running":
@@ -201,7 +201,7 @@ function getRecoveryText(status: HostServiceAvailabilityStatus): string {
 		case "unknown":
 			return i18n._(
 				msg({
-					message: "Retry in a few seconds; if it persists, restart Superset.",
+					message: "Retry in a few seconds; if it persists, restart Paradev.",
 				}),
 			);
 	}

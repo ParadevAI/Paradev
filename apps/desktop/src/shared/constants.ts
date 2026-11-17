@@ -8,16 +8,21 @@ export const PLATFORM = {
 };
 
 const workspace = getWorkspaceName();
-export const SUPERSET_DIR_NAME = workspace
-	? `.superset-${workspace}`
-	: ".superset";
 export const PROTOCOL_SCHEME = workspace
 	? `superset-${workspace}`
 	: PROTOCOL_SCHEMES.PROD;
+/** Height of the Windows/Linux window-controls overlay the window opens with. */
+export const TITLE_BAR_OVERLAY_HEIGHT = 40;
+
+// Separate sessions keep browser-pane extensions away from the app's own requests.
+export const APP_PARTITION = "persist:superset";
+export const BROWSER_PARTITION = "persist:browser";
 
 export const NOTIFICATION_EVENTS = {
 	FOCUS_NOTIFICATION_SOURCE: "focus-notification-source",
 	SETTINGS_EXTERNAL_CHANGE: "settings-external-change",
+	OPEN_ROUTE: "open-route",
+	NOTIFICATION_REPLY: "notification-reply",
 } as const;
 
 // Development/testing mock values (used when SKIP_ENV_VALIDATION is set)
@@ -41,8 +46,11 @@ export const MAX_TERMINAL_PARKED_RUNTIME_CAP =
 // Default user preference values
 export const DEFAULT_CONFIRM_ON_QUIT = true;
 export const DEFAULT_TERMINAL_COPY_ON_SELECT = false;
+export const DEFAULT_FILE_OPEN_MODE = "split-pane" as const;
+export const DEFAULT_FILE_AUTO_SAVE = "off" as const;
 export const DEFAULT_WAIT_FOR_SETUP_BEFORE_AGENT = false;
 export const DEFAULT_TELEMETRY_ENABLED = true;
 export const DEFAULT_SHOW_RESOURCE_MONITOR = true;
 export const DEFAULT_SHOW_USAGE_IN_SIDEBAR = false;
+export const DEFAULT_OPEN_LINKS_IN_APP = false;
 export const DEFAULT_EXPOSE_HOST_SERVICE_VIA_RELAY = false;

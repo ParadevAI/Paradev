@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { withSentryConfig } from "@sentry/nextjs";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { config as dotenvConfig } from "dotenv";
 import type { NextConfig } from "next";
 
@@ -16,31 +17,13 @@ const isProduction = process.env.NODE_ENV === "production";
 const apiOrigin = process.env.NEXT_PUBLIC_API_URL
 	? new URL(process.env.NEXT_PUBLIC_API_URL).origin
 	: null;
-// The web app reaches host-services through the relay — a WebSocket for the
-// terminal stream and HTTP for host tRPC. In dev the blanket `ws:`/`wss:`
-// below covers the socket; prod needs the relay origins listed explicitly so
-// `connect-src` blocks neither. The hard-coded prod fallback keeps the header
-// correct even if RELAY_URL isn't plumbed into the build env.
-const relayWsOrigin = process.env.RELAY_URL
-	? new URL(process.env.RELAY_URL).origin.replace(/^http/, "ws")
-	: isProduction
-		? "wss://relay.superset.sh"
-		: null;
-const relayHttpOrigin = process.env.RELAY_URL
-	? new URL(process.env.RELAY_URL).origin
-	: isProduction
-		? "https://relay.superset.sh"
-		: null;
-// Failover relay origin. Env-driven so it flips with the domain at cutover;
-// prod default stays superset.sh until RELAY_BACKUP_URL is set (e.g. boid.so).
-const relayBackupHttpOrigin = process.env.RELAY_BACKUP_URL
-	? new URL(process.env.RELAY_BACKUP_URL).origin
-	: isProduction
-		? "https://relay-backup.superset.sh"
-		: null;
-const relayBackupWsOrigin = relayBackupHttpOrigin
-	? relayBackupHttpOrigin.replace(/^http/, "ws")
-	: null;
+// Each origin as both its http(s) and ws(s) form: an http host source does not
+// admit a WebSocket to the same host. The prod fallbacks keep the header
+// correct when a URL isn't plumbed into the build env.
+const httpAndWsOrigins = (url: string | undefined, prodFallback: string) => {
+	const origin = url ? new URL(url).origin : isProduction ? prodFallback : null;
+	return origin ? [origin, origin.replace(/^http/, "ws")] : [];
+};
 // Published pages are framed from their own origin, one subdomain per page.
 // An unset GitHub Actions var arrives as an empty string, which `??`
 // does not catch — and `new URL("")` throws before Next even loads.
@@ -51,17 +34,28 @@ const usercontentUrl = new URL(
 			: "http://frame.usercontent.localhost:8787"),
 );
 const usercontentFrameSource = `${usercontentUrl.protocol}//*.${usercontentUrl.host}`;
+const serviceConnectSources = withOwnDomainTwins([
+	apiOrigin,
+	...httpAndWsOrigins(process.env.RELAY_URL, "https://relay.superset.sh"),
+	...httpAndWsOrigins(
+		process.env.RELAY_BACKUP_URL,
+		"https://relay-backup.superset.sh",
+	),
+	...httpAndWsOrigins(
+		process.env.NEXT_PUBLIC_REALTIME_URL,
+		"https://realtime.superset.sh",
+	),
+]);
+const attachmentUploadSource = process.env.R2_ENDPOINT
+	? new URL(process.env.R2_ENDPOINT).origin
+	: "https://*.r2.cloudflarestorage.com";
 
 const contentSecurityPolicy = [
 	"default-src 'self'",
 	"base-uri 'self'",
 	[
 		"connect-src 'self'",
-		apiOrigin,
-		relayWsOrigin,
-		relayHttpOrigin,
-		relayBackupWsOrigin,
-		relayBackupHttpOrigin,
+		...serviceConnectSources,
 		"https://*.ingest.sentry.io",
 		"https://*.sentry.io",
 		"https://us.i.posthog.com",
@@ -91,6 +85,42 @@ const contentSecurityPolicy = [
 	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 	"worker-src 'self' blob:",
 ].join("; ");
+
+const agentsContentSecurityPolicy = [
+	"default-src 'self'",
+	"base-uri 'self'",
+	[
+		"connect-src 'self'",
+		...serviceConnectSources,
+		attachmentUploadSource,
+		"https://*.ingest.sentry.io",
+		"https://*.sentry.io",
+		!isProduction && "ws:",
+		!isProduction && "wss:",
+	]
+		.filter(Boolean)
+		.join(" "),
+	"font-src 'self' data:",
+	"form-action 'self'",
+	"frame-ancestors 'none'",
+	`frame-src ${usercontentFrameSource}`,
+	"img-src 'self' data: blob: https:",
+	"media-src 'self' blob:",
+	"object-src 'none'",
+	["script-src 'self' 'unsafe-inline'", !isProduction && "'unsafe-eval'"]
+		.filter(Boolean)
+		.join(" "),
+	"style-src 'self' 'unsafe-inline'",
+	"worker-src 'self' blob:",
+].join("; ");
+
+const agentsHeaders = [
+	{ key: "Content-Security-Policy", value: agentsContentSecurityPolicy },
+	{
+		key: "Permissions-Policy",
+		value: "camera=(), geolocation=(), microphone=(self)",
+	},
+];
 
 const securityHeaders: Array<{ key: string; value: string }> = [
 	...(isProduction
@@ -125,6 +155,7 @@ const securityHeaders: Array<{ key: string; value: string }> = [
 
 const config: NextConfig = {
 	reactCompiler: true,
+	env: { AGENTS_ENABLED: process.env.AGENTS_URL ? "true" : "" },
 	typescript: { ignoreBuildErrors: true },
 
 	// Compiles @lingui/react/macro at build time. Version must stay in
@@ -147,6 +178,12 @@ const config: NextConfig = {
 				source: "/ingest/decide",
 				destination: "https://us.i.posthog.com/decide",
 			},
+			...(process.env.AGENTS_URL
+				? ["/agents", "/agents/:path*"].map((source) => ({
+						source,
+						destination: `${process.env.AGENTS_URL}${source}`,
+					}))
+				: []),
 		];
 	},
 
@@ -156,6 +193,8 @@ const config: NextConfig = {
 				source: "/(.*)",
 				headers: securityHeaders,
 			},
+			{ source: "/agents", headers: agentsHeaders },
+			{ source: "/agents/:path*", headers: agentsHeaders },
 		];
 	},
 

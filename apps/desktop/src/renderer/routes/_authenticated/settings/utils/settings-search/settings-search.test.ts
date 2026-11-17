@@ -103,11 +103,41 @@ describe("settings search - usage in sidebar", () => {
 	});
 });
 
-describe("settings search - mobile rollout", () => {
-	it("excludes mobile matches until the feature flag is enabled", () => {
+describe("settings search - auto save", () => {
+	it('lists Auto Save when searching "onFocusChange"', () => {
+		const ids = getVisibleItemsForSection({
+			section: "files",
+			searchQuery: "onFocusChange",
+		});
+		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
+	});
+
+	it.each([
+		"after delay",
+		"on focus change",
+		"on window change",
+	])('lists Auto Save when searching "%s"', (searchQuery) => {
+		const ids = getVisibleItemsForSection({
+			section: "files",
+			searchQuery,
+		});
+		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
+	});
+});
+
+describe("settings search - mobile", () => {
+	it("finds the mobile section", () => {
+		expect(getVisibleMatchCountBySection("iPhone", false).mobile).toBe(1);
+	});
+});
+
+describe("settings search - plugins visibility", () => {
+	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection("iPhone", false).mobile,
+			getVisibleMatchCountBySection("marketplace", false, false).plugins,
 		).toBeUndefined();
-		expect(getVisibleMatchCountBySection("iPhone", false, true).mobile).toBe(1);
+		expect(
+			getVisibleMatchCountBySection("marketplace", false, true).plugins,
+		).toBeGreaterThan(0);
 	});
 });

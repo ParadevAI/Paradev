@@ -1,15 +1,18 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
-import { LuListFilter } from "react-icons/lu";
+import { LuListFilter, LuRefreshCw } from "react-icons/lu";
+import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { ProjectFilter } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter";
-import { WindowControlsInset } from "renderer/routes/_authenticated/_dashboard/components/WindowControlsInset";
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
 import type { ProjectQueryTarget } from "renderer/routes/_authenticated/_dashboard/hooks/useProjectQueryTargets";
 import { PullRequestDetailToggle } from "renderer/routes/_authenticated/_dashboard/pull-requests/components/PullRequestDetailToggle";
+import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
 import { AuthorFilter } from "./components/AuthorFilter";
+import { ReviewerFilter } from "./components/ReviewerFilter";
 import { ReviewFilter } from "./components/ReviewFilter";
 
 type PullRequestsStateFilter = "open" | "all" | "merged";
@@ -22,10 +25,16 @@ interface PullRequestsTopBarProps {
 	projectTargets: ProjectQueryTarget[];
 	authorFilter: string | null;
 	onAuthorFilterChange: (author: string | null) => void;
+	reviewerFilter: string | null;
+	onReviewerFilterChange: (reviewer: string | null) => void;
 	reviewFilter: PullRequestReviewFilter | null;
 	onReviewFilterChange: (review: PullRequestReviewFilter | null) => void;
 	stateFilter: PullRequestsStateFilter;
 	onStateFilterChange: (state: PullRequestsStateFilter) => void;
+	/** Matches for the current filters, shown on the active state tab; null while unknown. */
+	resultCount: number | null;
+	isRefreshing: boolean;
+	onRefresh?: () => void;
 }
 
 export function PullRequestsTopBar({
@@ -36,12 +45,21 @@ export function PullRequestsTopBar({
 	projectTargets,
 	authorFilter,
 	onAuthorFilterChange,
+	reviewerFilter,
+	onReviewerFilterChange,
 	reviewFilter,
 	onReviewFilterChange,
 	stateFilter,
 	onStateFilterChange,
+	resultCount,
+	isRefreshing,
+	onRefresh,
 }: PullRequestsTopBarProps) {
 	const { t } = useLingui();
+	const { formatNumber } = useFormat();
+	const isDetailCollapsed = usePullRequestsSplitViewStore(
+		(state) => state.isDetailCollapsed,
+	);
 	const stateTabs: ReadonlyArray<{
 		value: PullRequestsStateFilter;
 		label: string;
@@ -69,46 +87,80 @@ export function PullRequestsTopBar({
 	const activeFilterCount = [
 		projectFilters.length > 0,
 		!!authorFilter,
+		!!reviewerFilter,
 		!!reviewFilter,
 	].filter(Boolean).length;
 
 	return (
 		<div
 			data-pull-requests-toolbar
-			className="flex shrink-0 flex-col gap-2 border-b border-border px-3 py-2"
+			className="flex shrink-0 flex-col px-3 pb-2"
 		>
-			<div
-				role="radiogroup"
-				aria-label={t({
-					message: "Filter by state",
-				})}
-				className="flex items-center gap-1"
-			>
-				{stateTabs.map((tab) => (
-					// biome-ignore lint/a11y/useSemanticElements: styled as a pill button, not a native radio input
-					<button
-						key={tab.value}
-						type="button"
-						role="radio"
-						onClick={() => onStateFilterChange(tab.value)}
-						aria-checked={stateFilter === tab.value}
-						className={cn(
-							"rounded-md px-2 py-1 text-xs font-medium transition-colors",
-							stateFilter === tab.value
-								? "bg-accent text-foreground"
-								: "text-muted-foreground hover:text-foreground",
-						)}
+			<PageHeader
+				className="-mx-3"
+				contentClassName="px-3"
+				start={
+					<div
+						role="radiogroup"
+						aria-label={t({
+							message: "Filter by state",
+						})}
+						className="flex items-center gap-1"
 					>
-						{tab.label}
-					</button>
-				))}
-				{/* Window-drag leaf standing in for the hidden TopBar. */}
-				<div className="drag hidden min-w-0 flex-1 self-stretch @4xl:block" />
-				<div className="ml-auto shrink-0">
-					<PullRequestDetailToggle />
-				</div>
-				<WindowControlsInset />
-			</div>
+						{stateTabs.map((tab) => (
+							// biome-ignore lint/a11y/useSemanticElements: styled as a pill button, not a native radio input
+							<button
+								key={tab.value}
+								type="button"
+								role="radio"
+								onClick={() => onStateFilterChange(tab.value)}
+								aria-checked={stateFilter === tab.value}
+								className={cn(
+									"rounded-md px-2 py-1 text-xs font-medium transition-colors",
+									stateFilter === tab.value
+										? "bg-accent text-foreground"
+										: "text-muted-foreground hover:text-foreground",
+								)}
+							>
+								{tab.label}
+								{stateFilter === tab.value && resultCount !== null ? (
+									<span className="ml-1.5 tabular-nums text-muted-foreground">
+										{formatNumber(resultCount)}
+									</span>
+								) : null}
+							</button>
+						))}
+					</div>
+				}
+				end={
+					<div className="flex items-center gap-0.5">
+						{onRefresh ? (
+							<button
+								type="button"
+								onClick={onRefresh}
+								disabled={isRefreshing}
+								title={t({
+									message: "Refresh",
+								})}
+								aria-label={t({
+									message: "Refresh pull requests",
+								})}
+								className="flex size-6 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground disabled:hover:text-muted-foreground"
+							>
+								<LuRefreshCw
+									className={cn(
+										"size-3.5",
+										isRefreshing && "animate-spin motion-reduce:animate-none",
+									)}
+									strokeWidth={1.75}
+								/>
+							</button>
+						) : null}
+						<PullRequestDetailToggle />
+					</div>
+				}
+				reservesWindowControls={isDetailCollapsed}
+			/>
 			<div className="flex items-center gap-1.5">
 				<div className="min-w-0 flex-1">
 					<WorkItemsSearch
@@ -171,6 +223,16 @@ export function PullRequestsTopBar({
 							<AuthorFilter
 								value={authorFilter}
 								onChange={onAuthorFilterChange}
+								projectTargets={projectTargets}
+							/>
+						</div>
+						<div className="flex items-center justify-between gap-2">
+							<span className="text-xs text-muted-foreground">
+								<Trans>Reviewer</Trans>
+							</span>
+							<ReviewerFilter
+								value={reviewerFilter}
+								onChange={onReviewerFilterChange}
 								projectTargets={projectTargets}
 							/>
 						</div>

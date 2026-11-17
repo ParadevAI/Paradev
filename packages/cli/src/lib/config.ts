@@ -9,42 +9,43 @@ import {
 	unlinkSync,
 	writeFileSync,
 } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { resolveWriteTarget } from "@superset/agent-setup/write-file-if-changed";
+import type { StoredOAuth } from "@superset/shared/oauth-refresh";
 import { env } from "./env";
 
+export { AUTH_REFRESH_LEEWAY_MS } from "@superset/shared/oauth-refresh";
+
 export type SupersetConfig = {
-	auth?: {
-		accessToken: string;
-		refreshToken?: string;
-		expiresAt: number;
-	};
+	auth?: StoredOAuth;
 	apiKey?: string;
 	organizationId?: string;
 };
 
-export const SUPERSET_HOME_DIR =
-	process.env.SUPERSET_HOME_DIR ?? join(homedir(), ".superset");
-export const SUPERSET_CONFIG_PATH = join(SUPERSET_HOME_DIR, "config.json");
+export function getSupersetConfigPath(): string {
+	return join(resolveAppHomeDir(), "config.json");
+}
 
 function ensureDir() {
-	if (!existsSync(SUPERSET_HOME_DIR)) {
-		mkdirSync(SUPERSET_HOME_DIR, { recursive: true, mode: 0o700 });
+	const homeDir = resolveAppHomeDir();
+	if (!existsSync(homeDir)) {
+		mkdirSync(homeDir, { recursive: true, mode: 0o700 });
 	}
 	try {
-		const stat = statSync(SUPERSET_HOME_DIR);
-		if ((stat.mode & 0o077) !== 0) chmodSync(SUPERSET_HOME_DIR, 0o700);
+		const stat = statSync(homeDir);
+		if ((stat.mode & 0o077) !== 0) chmodSync(homeDir, 0o700);
 	} catch {}
 }
 
 export function readConfig(): SupersetConfig {
-	if (!existsSync(SUPERSET_CONFIG_PATH)) return {};
+	const configPath = getSupersetConfigPath();
+	if (!existsSync(configPath)) return {};
 	try {
-		const stat = statSync(SUPERSET_CONFIG_PATH);
-		if ((stat.mode & 0o077) !== 0) chmodSync(SUPERSET_CONFIG_PATH, 0o600);
+		const stat = statSync(configPath);
+		if ((stat.mode & 0o077) !== 0) chmodSync(configPath, 0o600);
 	} catch {}
-	return JSON.parse(readFileSync(SUPERSET_CONFIG_PATH, "utf-8"));
+	return JSON.parse(readFileSync(configPath, "utf-8"));
 }
 
 /**
@@ -59,22 +60,30 @@ export function resolveOrganizationId(
 	return process.env.SUPERSET_ORGANIZATION_ID?.trim() || config.organizationId;
 }
 
-export function writeConfig(config: SupersetConfig): void {
+type ConfigWriteFs = Pick<
+	typeof import("node:fs"),
+	"writeFileSync" | "renameSync" | "unlinkSync"
+>;
+
+export function writeConfig(
+	config: SupersetConfig,
+	fs: ConfigWriteFs = { writeFileSync, renameSync, unlinkSync },
+): void {
 	ensureDir();
-	const configPath = resolveWriteTarget(SUPERSET_CONFIG_PATH);
+	const configPath = resolveWriteTarget(getSupersetConfigPath());
 	const tempPath = join(
 		dirname(configPath),
 		`.${randomUUID()}.${process.pid}.config.tmp`,
 	);
-	writeFileSync(tempPath, JSON.stringify(config, null, 2), { mode: 0o600 });
+	fs.writeFileSync(tempPath, JSON.stringify(config, null, 2), { mode: 0o600 });
 	try {
 		chmodSync(tempPath, 0o600);
 	} catch {}
 	try {
-		renameSync(tempPath, configPath);
+		fs.renameSync(tempPath, configPath);
 	} catch (error) {
 		try {
-			unlinkSync(tempPath);
+			fs.unlinkSync(tempPath);
 		} catch {}
 		throw error;
 	}

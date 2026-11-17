@@ -1,2 +1,7 @@
-export type { OpenedSession } from "./journal";
+export type {
+	ChatJournalOptions,
+	ChatSessionChange,
+	ImportedSession,
+	OpenedSession,
+} from "./journal";
 export { ChatJournal } from "./journal";

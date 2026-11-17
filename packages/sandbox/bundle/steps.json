@@ -1,5 +1,5 @@
 [
-	{ "name": "install-chrome", "assets": ["chrome"] },
+	{ "name": "install-chrome", "assets": ["chrome"], "discards": ["chrome"] },
 	{
 		"name": "configure-chrome",
 		"after": ["install-chrome"],
@@ -11,7 +11,8 @@
 	},
 	{
 		"name": "install-themes",
-		"assets": ["whitesur-gtk", "whitesur-icons", "whitesur-cursors"]
+		"assets": ["whitesur-gtk", "whitesur-icons", "whitesur-cursors"],
+		"discards": ["whitesur-gtk", "whitesur-icons", "whitesur-cursors"]
 	},
 	{ "name": "install-locales" },
 	{
@@ -31,6 +32,15 @@
 			"/home/ubuntu/.claude.json"
 		]
 	},
-	{ "name": "install-host", "assets": ["host-service"] },
-	{ "name": "install-cli", "assets": ["cli"] }
+	{
+		"name": "install-host",
+		"assets": ["host-service"],
+		"discards": ["host-service"]
+	},
+	{ "name": "install-cli", "assets": ["cli"] },
+	{
+		"name": "install-agent-clis",
+		"assets": ["claude", "codex", "pdev"],
+		"discards": ["codex", "pdev"]
+	}
 ]

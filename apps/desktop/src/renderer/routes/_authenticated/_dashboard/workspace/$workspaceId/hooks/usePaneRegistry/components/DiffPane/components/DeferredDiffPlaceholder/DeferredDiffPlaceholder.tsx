@@ -1,7 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
-import { LuFileCode, LuLoader } from "react-icons/lu";
+import { LuFileCode, LuFileWarning, LuLoader } from "react-icons/lu";
 import type { DeferredDiffReason } from "../../hooks/useDiffAnnotations";
+import { DiffPlaceholder } from "../DiffPlaceholder";
 
 interface DeferredDiffPlaceholderProps {
 	reason: DeferredDiffReason;
@@ -14,33 +15,36 @@ export function DeferredDiffPlaceholder({
 	reason,
 	onRequest,
 }: DeferredDiffPlaceholderProps) {
-	const isLoading = reason === "loading";
+	if (reason === "loading") {
+		return (
+			<DiffPlaceholder
+				icon={<LuLoader className="animate-spin" />}
+				message={<Trans>Loading diff…</Trans>}
+			/>
+		);
+	}
 
-	return (
-		<div className="flex flex-col items-center justify-center gap-3 bg-muted/30 py-8 text-muted-foreground">
-			{isLoading ? (
-				<LuLoader className="size-6 animate-spin" />
-			) : (
-				<LuFileCode className="size-8" />
-			)}
-			<p className="cursor-text select-text text-sm">
-				{isLoading ? (
-					<Trans>Loading diff…</Trans>
-				) : reason === "error" ? (
-					<Trans>Unable to load diff</Trans>
-				) : (
-					<Trans>Generated file hidden</Trans>
-				)}
-			</p>
-			{reason === "deferred" ? (
-				<Button variant="outline" size="sm" onClick={onRequest}>
-					<Trans>Load diff</Trans>
-				</Button>
-			) : reason === "error" ? (
-				<Button variant="outline" size="sm" onClick={onRequest}>
+	if (reason === "error") {
+		return (
+			<DiffPlaceholder
+				icon={<LuFileWarning />}
+				message={<Trans>Unable to load diff</Trans>}
+			>
+				<Button variant="outline" size="xs" onClick={onRequest}>
 					<Trans>Retry</Trans>
 				</Button>
-			) : null}
-		</div>
+			</DiffPlaceholder>
+		);
+	}
+
+	return (
+		<DiffPlaceholder
+			icon={<LuFileCode />}
+			message={<Trans>Generated file hidden</Trans>}
+		>
+			<Button variant="outline" size="xs" onClick={onRequest}>
+				<Trans>Load diff</Trans>
+			</Button>
+		</DiffPlaceholder>
 	);
 }

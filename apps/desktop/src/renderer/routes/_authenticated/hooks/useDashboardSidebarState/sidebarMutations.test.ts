@@ -3,6 +3,7 @@ import {
 	ensureSidebarProjectRecord,
 	setSidebarProjectHidden,
 	tombstoneSidebarWorkspaceRecord,
+	updateRows,
 } from "./sidebarMutations";
 
 /**
@@ -44,6 +45,11 @@ type LocalStateRow = {
 		pinnedAt: number | null;
 	};
 	paneLayout: { version: number; tabs: unknown[]; activeTabId: string | null };
+	rightPaneLayout?: {
+		version: number;
+		tabs: unknown[];
+		activeTabId: string | null;
+	};
 };
 
 function localStateRow(
@@ -232,14 +238,15 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		expect(cleaned).toEqual([]);
 	});
 
-	it("hides an existing row, clears its section and pin, and runs pane cleanup", () => {
+	it("hides an existing row, clears its section, pin and right pane layout, and runs pane cleanup", () => {
 		const collections = makeCollections();
-		collections.workspaceLocalState.insert(
-			localStateRow("ws-1", "proj-1", {
+		collections.workspaceLocalState.insert({
+			...localStateRow("ws-1", "proj-1", {
 				sectionId: "sec-1",
 				pinnedAt: 1753000000000,
 			}),
-		);
+			rightPaneLayout: { version: 1, tabs: [], activeTabId: null },
+		});
 		const cleaned: string[] = [];
 
 		tombstoneSidebarWorkspaceRecord(
@@ -255,6 +262,42 @@ describe("tombstoneSidebarWorkspaceRecord", () => {
 		expect(row?.sidebarState.isHidden).toBe(true);
 		expect(row?.sidebarState.sectionId).toBeNull();
 		expect(row?.sidebarState.pinnedAt).toBeNull();
+		expect(row?.rightPaneLayout).toBeUndefined();
 		expect(cleaned).toEqual(["ws-1"]);
+	});
+});
+
+describe("updateRows", () => {
+	it("writes every row in one update call, in key order", () => {
+		const rows = new Map([
+			["a", { tabOrder: 0 }],
+			["b", { tabOrder: 0 }],
+		]);
+		const calls: string[][] = [];
+		const collection = {
+			update: (
+				keys: string[],
+				callback: (drafts: Array<{ tabOrder: number }>) => void,
+			) => {
+				calls.push(keys);
+				callback(keys.map((key) => rows.get(key) ?? { tabOrder: -1 }));
+			},
+		};
+
+		updateRows<{ tabOrder: number }, number>(
+			collection as never,
+			new Map([
+				["b", 2],
+				["a", 1],
+			]),
+			(draft, tabOrder) => {
+				draft.tabOrder = tabOrder;
+			},
+		);
+		updateRows(collection as never, new Map(), () => {});
+
+		expect(calls).toEqual([["b", "a"]]);
+		expect(rows.get("a")?.tabOrder).toBe(1);
+		expect(rows.get("b")?.tabOrder).toBe(2);
 	});
 });

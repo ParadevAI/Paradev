@@ -10,10 +10,15 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import type { Configuration } from "electron-builder";
-import baseConfig from "./electron-builder";
+import baseConfig, {
+	displayName as baseDisplayName,
+	toInstallerFileName,
+} from "./electron-builder";
 import pkg from "./package.json";
+import { localizeMacDisplayName } from "./scripts/localize-display-name";
 
 const productName = "Superset Canary";
+const displayName = `${baseDisplayName} Canary`;
 const canaryMacIconPath = join(pkg.resources, "build/icons/icon-canary.icns");
 const canaryLinuxIconPath = join(pkg.resources, "build/icons/icon-canary.png");
 const canaryWinIconPath = join(pkg.resources, "build/icons/icon-canary.ico");
@@ -22,12 +27,19 @@ const config: Configuration = {
 	...baseConfig,
 	appId: "com.superset.desktop.canary",
 	productName,
+	afterPack: localizeMacDisplayName(displayName),
 
 	publish: {
 		provider: "github",
-		owner: "superset-sh",
-		repo: "superset",
+		owner: "paradevai",
+		repo: "paradev",
 		releaseType: "prerelease",
+	},
+
+	dmg: {
+		...baseConfig.dmg,
+		title: displayName,
+		artifactName: `${toInstallerFileName(displayName)}-\${version}-\${arch}.\${ext}`,
 	},
 
 	mac: {
@@ -45,6 +57,10 @@ const config: Configuration = {
 		...baseConfig.linux,
 		...(existsSync(canaryLinuxIconPath) ? { icon: canaryLinuxIconPath } : {}),
 		synopsis: `${pkg.description} (Canary)`,
+		desktop: {
+			...baseConfig.linux?.desktop,
+			entry: { ...baseConfig.linux?.desktop?.entry, Name: displayName },
+		},
 		artifactName: `superset-canary-\${version}-\${arch}.\${ext}`,
 	},
 

@@ -6,6 +6,7 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"packages/panes/src/react/components/Workspace/components/TabBar/components/TabItem",
 	"packages/i18n/src",
 	"apps/web/src/app/account-pending-deletion",
+	"apps/web/src/app/auth/switch-account",
 	// automations is temporarily un-enforced: the trigger-fidelity work
 	// rewrote most of its copy, and converting the new strings is deferred to
 	// a dedicated i18n pass. Re-add once that lands.
@@ -17,6 +18,8 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/tasks",
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/workspaces",
 	"apps/desktop/src/renderer/routes/_authenticated/components/DashboardNewWorkspaceModal",
+	"apps/desktop/src/renderer/routes/_authenticated/components/CreateEnvironmentFlow",
+	"apps/desktop/src/renderer/routes/_authenticated/components/EnvironmentView",
 	// settings — everything except `project/` ($projectId), the v1 counterpart
 	// of v2-project that dies with the v1 sunset.
 	"apps/desktop/src/renderer/routes/_authenticated/settings/account",
@@ -27,6 +30,7 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/settings/billing",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/browser",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/components",
+	"apps/desktop/src/renderer/routes/_authenticated/settings/environments",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/experimental",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/git",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/hooks",
@@ -39,6 +43,7 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/settings/members",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/organization",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/permissions",
+	"apps/desktop/src/renderer/routes/_authenticated/settings/plugins",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/presets",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/projects",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/ringtones",
@@ -66,6 +71,7 @@ export const ENFORCED_DIRS: readonly string[] = [
 	// batch 5: marketing routes that are fully converted. The component
 	// directories stay out — their mockups deliberately render fake CLI output
 	// and brand names, which the scanner cannot tell from real copy.
+	"apps/marketing/src/app/[lang]/careers",
 	"apps/marketing/src/app/[lang]/contact",
 	"apps/marketing/src/app/[lang]/enterprise",
 	"apps/marketing/src/app/[lang]/mcp-install",

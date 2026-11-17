@@ -1,0 +1,1 @@
+export { OrganizationMark } from "./OrganizationMark";

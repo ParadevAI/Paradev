@@ -1,10 +1,10 @@
 ---
-description: "Manage a single Superset automation: edit its prompt in $EDITOR, view recent runs, or trigger a one-off run."
+description: "Manage a single Paradev automation: edit its prompt in $EDITOR, view recent runs, or trigger a one-off run."
 argument-hint: "<id-or-slug> [edit | logs | run] (default: edit)"
 allowed-tools: Bash(superset:*), Bash(mktemp:*), Bash(${EDITOR}:*), Bash(${VISUAL}:*), Bash(vi:*), Bash(vim:*), Bash(nano:*), Bash(jq:*), AskUserQuestion
 ---
 
-You are operating on a single Superset automation.
+You are operating on a single Paradev automation.
 
 ## Parse arguments
 
@@ -13,7 +13,7 @@ Take `$ARGUMENTS` as `<id-or-slug> [action]`.
 - If `<id-or-slug>` is missing, ask the user via `AskUserQuestion`. Optionally call `superset automations list --json | jq -r '.[] | "\(.slug)\t\(.name)"'` and present recent automations as choices.
 - If `[action]` is missing, default to `edit`.
 
-The CLI is required for all actions below; there's no MCP equivalent for the editor round-trip, and the run/logs flows benefit from CLI's argument parsing. If `superset` isn't on PATH, tell the user to install it: `curl -fsSL https://superset.sh/cli/install.sh | sh`.
+The CLI is required for all actions below; there's no MCP equivalent for the editor round-trip, and the run/logs flows benefit from CLI's argument parsing. If `superset` isn't on PATH, tell the user to install it: `curl -fsSL https://paradev.com/cli/install.sh | sh`.
 
 ## Dispatch
 
