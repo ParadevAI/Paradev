@@ -4,8 +4,8 @@ export const UPGRADE_NUDGE_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 
 const FEATURE_NAMES: Record<string, string> = {
 	"mobile-app": `${BRAND.NAME} Mobile`,
-	"invite-members": "Inviting teammates",
-	"cloud-workspaces": "Cloud workspaces",
+	"invite-members": "team invites",
+	"cloud-workspaces": "cloud workspaces",
 };
 
 const SAFE_FEATURE_ID = /^[a-z0-9]+(?:[_.-][a-z0-9]+)*$/i;
@@ -16,8 +16,7 @@ export function upgradeNudgeFeatureName(feature: string): string {
 		: undefined;
 	if (known) return known;
 	if (!SAFE_FEATURE_ID.test(feature)) return "a Pro feature";
-	const words = feature.replace(/[_.-]+/g, " ").toLowerCase();
-	return words.charAt(0).toUpperCase() + words.slice(1);
+	return feature.replace(/[_.-]+/g, " ").toLowerCase();
 }
 
 export interface UpgradeNudgeMessage {
