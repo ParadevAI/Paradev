@@ -19,9 +19,19 @@ export function upgradeNudgeFeatureName(feature: string): string {
 	return feature.replace(/[_.-]+/g, " ").toLowerCase();
 }
 
+export function upgradeNudgeUrl(
+	webUrl: string,
+	organizationId: string | null,
+): string {
+	const url = new URL("/settings/billing", webUrl);
+	if (organizationId) url.searchParams.set("organization", organizationId);
+	return url.toString();
+}
+
 export interface UpgradeNudgeMessage {
 	to: string;
 	featureName: string;
+	organizationId: string | null;
 }
 
 export interface UpgradeNudgeDeps {
@@ -80,6 +90,7 @@ async function nudge(
 		await deps.send({
 			to: user.email,
 			featureName: upgradeNudgeFeatureName(feature),
+			organizationId,
 		});
 		return "sent";
 	} catch (error) {

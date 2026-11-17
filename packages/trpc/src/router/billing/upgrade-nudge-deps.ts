@@ -6,6 +6,7 @@ import { organizationPlan } from "../../lib/billing/plan";
 import {
 	UPGRADE_NUDGE_INTERVAL_SECONDS,
 	type UpgradeNudgeDeps,
+	upgradeNudgeUrl,
 } from "./upgrade-nudge";
 
 export const UPGRADE_NUDGE_EVENT = "billing.upgrade_nudge_due";
@@ -55,7 +56,7 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 		return result === "OK";
 	},
 
-	async send({ to, featureName }) {
+	async send({ to, featureName, organizationId }) {
 		if (env.NODE_ENV !== "production") {
 			console.info(
 				`[billing/upgrade-nudge] not emitting ${UPGRADE_NUDGE_EVENT} outside production`,
@@ -67,7 +68,7 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 			email: to,
 			payload: {
 				featureName,
-				upgradeUrl: `${env.NEXT_PUBLIC_WEB_URL}/settings/billing`,
+				upgradeUrl: upgradeNudgeUrl(env.NEXT_PUBLIC_WEB_URL, organizationId),
 			},
 		});
 		if (error) throw new Error(error.message);
