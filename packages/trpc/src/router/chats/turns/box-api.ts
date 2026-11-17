@@ -5,7 +5,12 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { type BoxClaims, BoxRequestError, boxAgent, boxTurn } from "./box-auth";
 import type { BoxKeys } from "./box-tokens";
-import { postDevMessage, settleTurn, type TurnDeps } from "./engine";
+import {
+	chatForDev,
+	postDevMessage,
+	settleTurn,
+	type TurnDeps,
+} from "./engine";
 
 const GATEWAY_URL = "https://ai-gateway.vercel.sh";
 /** Request headers the Anthropic Messages API understands. Credentials are replaced, not forwarded. */
@@ -241,6 +246,25 @@ async function message(deps: BoxApiDeps, request: Request, endsTurn: boolean) {
 	return json(201, { sent: true });
 }
 
+const readLimit = z.coerce.number().int().min(1).max(200).default(20);
+
+/** What a Dev reads of its turn's chat: `/cli/messages?limit=` and `/cli/members`. */
+async function read(deps: BoxApiDeps, request: Request, path: string) {
+	const claims = await boxTurn(deps.keys, request.headers);
+	if (path === "/cli/messages") {
+		const limit = readLimit.parse(
+			new URL(request.url).searchParams.get("limit") ?? undefined,
+		);
+		const { messages } = await chatForDev(claims.groupId, limit);
+		return json(200, { messages });
+	}
+	if (path === "/cli/members") {
+		const { people, devs } = await chatForDev(claims.groupId, 1);
+		return json(200, { people, devs });
+	}
+	return json(404, { code: "not_found", message: "Unknown route" });
+}
+
 /**
  * What a box calls the API for. `path` is the part after the mount point:
  * `/cli/reply` (the Dev's reply, which ends its turn's live view),
@@ -252,8 +276,9 @@ export async function handleBoxRequest(
 	request: Request,
 	path: string,
 ): Promise<Response> {
-	if (request.method !== "POST") return json(405, { message: "POST only" });
 	try {
+		if (request.method === "GET") return await read(deps, request, path);
+		if (request.method !== "POST") return json(405, { message: "Not allowed" });
 		if (path.startsWith("/model/")) {
 			return await model(deps, request, path.slice("/model".length));
 		}

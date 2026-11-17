@@ -468,6 +468,47 @@ async function markAgentRead(agentId: string, groupId: string) {
 	});
 }
 
+/** A chat's latest messages as a Dev reads them, oldest first, and the people and Devs in it. */
+export async function chatForDev(groupId: string, limit: number) {
+	const [roster, people, rows] = await Promise.all([
+		loadRoster(groupId),
+		db
+			.select({ user: users, role: chatsGroupMembers.role })
+			.from(chatsGroupMembers)
+			.innerJoin(users, eq(users.id, chatsGroupMembers.userId))
+			.where(eq(chatsGroupMembers.groupId, groupId)),
+		db
+			.select({ message: chatsMessages, author: users, agent: chatsAgents })
+			.from(chatsMessages)
+			.leftJoin(users, eq(users.id, chatsMessages.authorId))
+			.leftJoin(chatsAgents, eq(chatsAgents.id, chatsMessages.authorAgentId))
+			.where(eq(chatsMessages.groupId, groupId))
+			.orderBy(desc(chatsMessages.createdAt))
+			.limit(limit),
+	]);
+	const names = new Map<string, string>([
+		...roster.map((dev) => [dev.id, dev.name] as const),
+		...people.map(({ user }) => [user.id, toUser(user).displayName] as const),
+	]);
+	return {
+		people: people.map(({ user, role }) => ({
+			id: user.id,
+			name: toUser(user).displayName,
+			role,
+		})),
+		devs: roster,
+		messages: rows.reverse().map(({ message, author, agent }) => ({
+			id: message.id,
+			author: agent?.name ?? (author ? toUser(author).displayName : "note"),
+			text: renderMentions(
+				message.text,
+				(ref) => names.get(ref.id) ?? "someone",
+			),
+			at: message.createdAt.toISOString(),
+		})),
+	};
+}
+
 /** How many messages before the turn's own a Dev is given. */
 const RECENT_MESSAGES = 20;
 const LINE_MAX = 600;
