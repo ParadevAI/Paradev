@@ -19,6 +19,8 @@ import {
 import { extractCompareToc, getComparisonPages } from "@/lib/compare";
 import { getPricedComparisonPage } from "@/lib/compare-prices";
 import {
+	compareSearchDescription,
+	compareSearchTitle,
 	extractComparisonFaqItems,
 	extractRoundupItems,
 	getComparisonPageTypeLabel,
@@ -137,8 +139,8 @@ export async function generateMetadata({
 	const url = localeUrl(lang, `/compare/${slug}`);
 
 	return {
-		title: page.title,
-		description: page.description,
+		title: { absolute: compareSearchTitle(page.title) },
+		description: compareSearchDescription(page.description),
 		...(page.keywords.length > 0 && { keywords: page.keywords }),
 		alternates: localizedAlternates(lang, `/compare/${slug}`),
 		openGraph: {
