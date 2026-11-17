@@ -563,6 +563,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "docusign",
+		version: "1.0.0",
+		description: "Send documents for signature",
+		interface: { displayName: "Docusign", category: "Productivity" },
+		mcpServers: {
+			docusign: { type: "http", url: "https://mcp.docusign.com/mcp" },
+		},
+	},
+	{
 		name: "superhuman",
 		version: "1.0.0",
 		description: "Search and manage your email",

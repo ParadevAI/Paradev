@@ -256,6 +256,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "docusign",
+			"description": "Send documents for signature with Docusign: create envelopes, add signers and fields, and track their status.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "productivity",
+			"source": "./plugins/docusign",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

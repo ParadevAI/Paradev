@@ -110,6 +110,11 @@ export const env = createEnv({
 		GOOGLE_CONNECTIONS_CLIENT_SECRET: z.string().min(1).optional(),
 		SENTRY_CLIENT_ID: z.string().optional(),
 		SENTRY_CLIENT_SECRET: z.string().optional(),
+		// Optional: the Docusign connector reports "not configured" wherever
+		// these are unset. Docusign has no dynamic client registration, so the
+		// plugin needs an integration key of our own.
+		DOCUSIGN_CLIENT_ID: z.string().min(1).optional(),
+		DOCUSIGN_CLIENT_SECRET: z.string().min(1).optional(),
 		// Optional: the Teams integration is off wherever these are unset, and
 		// every other environment keeps booting.
 		MICROSOFT_CLIENT_ID: z.string().min(1).optional(),

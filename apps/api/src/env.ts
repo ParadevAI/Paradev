@@ -78,6 +78,11 @@ export const env = createEnv({
 		// is not registered yet, in which case the connect flow 400s.
 		SENTRY_CLIENT_ID: z.string().optional(),
 		SENTRY_CLIENT_SECRET: z.string().optional(),
+		// Optional: the Docusign connector reports "not configured" wherever
+		// these are unset. Docusign has no dynamic client registration, so the
+		// plugin needs an integration key of our own.
+		DOCUSIGN_CLIENT_ID: z.string().min(1).optional(),
+		DOCUSIGN_CLIENT_SECRET: z.string().min(1).optional(),
 		// The published app's slug, used to build the install URL.
 		SENTRY_APP_SLUG: z.string().optional(),
 		RELAY_URL: z.string().url().default("https://relay.superset.sh"),
