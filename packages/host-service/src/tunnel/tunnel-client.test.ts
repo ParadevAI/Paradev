@@ -16,6 +16,7 @@ class FakeSocket extends EventTarget {
 	static CONNECTING = 0;
 	readyState = 0;
 	binaryType = "blob";
+	send = mock((_data: string) => {});
 	close = mock(() => {
 		this.readyState = 3;
 		this.dispatchEvent(new Event("close"));
@@ -272,4 +273,53 @@ test("a failure after an opened connection looks the relay up again right away",
 	advance(5_000);
 	await buildControlUrl();
 	expect(resolveRelayUrl).toHaveBeenCalledTimes(2);
+});
+
+async function settle() {
+	for (let i = 0; i < 20; i++) {
+		jest.advanceTimersByTime(0);
+		await Promise.resolve();
+	}
+}
+
+async function openControl() {
+	const client = new TunnelClient({
+		relayUrl: "https://relay.example",
+		hostId: "org:host",
+		getAuthToken: async () => "token",
+		localPort: 1234,
+		hostServiceSecret: "test",
+	});
+	spyOn(console, "warn").mockImplementation(() => {});
+	await client.connect();
+	await settle();
+	FakeSocket.at(0).open();
+	return client;
+}
+
+test("a control socket that stops answering pings reconnects within 25 seconds", async () => {
+	const client = await openControl();
+	advance(15_000);
+	expect(FakeSocket.at(0).send).toHaveBeenCalledWith('{"type":"ping"}');
+	advance(9_900);
+	await settle();
+	expect(FakeSocket.instances).toHaveLength(1);
+	advance(100);
+	await settle();
+	expect(FakeSocket.instances).toHaveLength(2);
+	client.close();
+});
+
+test("a control socket that answers pings stays connected", async () => {
+	const client = await openControl();
+	for (let i = 0; i < 8; i++) {
+		advance(15_000);
+		advance(50);
+		FakeSocket.at(0).dispatchEvent(
+			new MessageEvent("message", { data: '{"type":"pong"}' }),
+		);
+	}
+	await settle();
+	expect(FakeSocket.instances).toHaveLength(1);
+	client.close();
 });

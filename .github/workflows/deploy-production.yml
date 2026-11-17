@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      deploy_relay:
+        description: Also deploy the relay (drops every host's control tunnel)
+        type: boolean
+        default: false
 
 env:
   VERCEL_CLI_VERSION: 50.22.1
@@ -604,8 +609,8 @@ jobs:
               - 'apps/relay/**'
               - 'packages/shared/src/tunnel-protocol.ts'
               - 'packages/shared/src/host-routing.ts'
-              - 'patches/**'
-              - '.github/workflows/deploy-production.yml'
+              - 'packages/shared/src/verify-jwt.ts'
+              - 'packages/shared/src/sandbox/gate.ts'
 
   deploy-relay:
     name: Deploy Relay to Cloudflare
@@ -616,7 +621,7 @@ jobs:
     # Fail open: a broken detector must not leave a stale relay in production.
     if: >-
       !cancelled() && (
-        github.event_name == 'workflow_dispatch'
+        inputs.deploy_relay == true
         || needs.relay-changes.result != 'success'
         || needs.relay-changes.outputs.relay == 'true'
       )

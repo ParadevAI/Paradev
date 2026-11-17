@@ -9,9 +9,8 @@ import {
 import ReconnectingWebSocket from "partysocket/ws";
 
 import { reportTunnelRescue } from "../sentry";
+import { ControlHeartbeat } from "./control-heartbeat";
 
-const PING_INTERVAL_MS = 30_000;
-const INBOUND_SILENCE_TIMEOUT_MS = 75_000;
 const WATCHDOG_INTERVAL_MS = 10_000;
 // How long the control socket may sit outside OPEN before the watchdog kicks
 // partysocket. Generous: covers its 5s max backoff plus 30s connect timeout.
@@ -74,7 +73,7 @@ function toWs(url: string): string {
 export class TunnelClient {
 	private readonly options: TunnelClientOptions;
 	private control: ReconnectingWebSocket | null = null;
-	private pingTimer: ReturnType<typeof setInterval> | null = null;
+	private heartbeat: ControlHeartbeat | null = null;
 	private watchdogTimer: ReturnType<typeof setInterval> | null = null;
 	private lastInboundAt = 0;
 	private connectedAt = 0;
@@ -103,11 +102,26 @@ export class TunnelClient {
 			},
 		);
 		this.control = control;
+		const heartbeat = new ControlHeartbeat({
+			sendPing: () => {
+				if (control.readyState === WebSocket.OPEN) {
+					control.send('{"type":"ping"}');
+				}
+			},
+			onDead: ({ silentForMs, pongTimeoutMs }) => {
+				console.warn(
+					`[host-service:tunnel] no inbound traffic for ${Math.round(silentForMs)}ms (no pong within ${pongTimeoutMs}ms), forcing reconnect`,
+				);
+				control.reconnect();
+			},
+		});
+		this.heartbeat = heartbeat;
 
 		control.addEventListener("open", () => {
 			this.lastInboundAt = Date.now();
 			this.connectedAt = this.lastInboundAt;
 			this.markOpened();
+			heartbeat.start();
 			console.log(
 				`[host-service:tunnel] control connected for ${this.options.hostId}`,
 			);
@@ -119,14 +133,17 @@ export class TunnelClient {
 			try {
 				message = JSON.parse(String(event.data));
 			} catch {
+				heartbeat.onInbound(false);
 				return;
 			}
+			heartbeat.onInbound(message.type === "pong");
 			if (message.type === "stream:dial") {
 				this.handleDial(message);
 			}
 		});
 
 		control.addEventListener("close", (event) => {
+			heartbeat.stop();
 			const now = Date.now();
 			console.warn("[host-service:tunnel] control closed", {
 				timestamp: new Date(now).toISOString(),
@@ -134,7 +151,6 @@ export class TunnelClient {
 				code: event.code,
 				description: describeRelayClose(event.code),
 				reason: event.reason,
-				wasClean: event.wasClean,
 				connectedForMs: this.connectedAt ? now - this.connectedAt : null,
 				inboundSilenceMs: this.lastInboundAt ? now - this.lastInboundAt : null,
 				retrying: !this.closed,
@@ -142,21 +158,9 @@ export class TunnelClient {
 			this.connectedAt = 0;
 		});
 
-		this.pingTimer = setInterval(() => {
-			if (control.readyState !== WebSocket.OPEN) return;
-			control.send('{"type":"ping"}');
-		}, PING_INTERVAL_MS);
-
 		this.watchdogTimer = setInterval(() => {
 			if (control.readyState === WebSocket.OPEN) {
 				this.notOpenSince = null;
-				const silentFor = Date.now() - this.lastInboundAt;
-				if (silentFor > INBOUND_SILENCE_TIMEOUT_MS) {
-					console.warn(
-						`[host-service:tunnel] no inbound traffic for ${silentFor}ms, forcing reconnect`,
-					);
-					control.reconnect();
-				}
 				return;
 			}
 			this.notOpenSince ??= Date.now();
@@ -222,9 +226,9 @@ export class TunnelClient {
 
 	close(): void {
 		this.closed = true;
-		if (this.pingTimer) clearInterval(this.pingTimer);
+		this.heartbeat?.stop();
 		if (this.watchdogTimer) clearInterval(this.watchdogTimer);
-		this.pingTimer = null;
+		this.heartbeat = null;
 		this.watchdogTimer = null;
 		this.control?.close(1000, "Shutting down");
 		this.control = null;

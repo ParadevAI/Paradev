@@ -198,6 +198,9 @@ const ACCESS_DENIED_RETRY_MS = 5 * 60_000;
 // open for every host so its state is presence, which makes this the cadence
 // at which an offline host is re-probed: one cheap relay request per window.
 const HOST_OFFLINE_RETRY_MS = 30_000;
+// Covers the host's own dead-tunnel detection (about 25s worst case) plus its
+// reconnect, so a short tunnel drop is not stretched to a 30s offline window.
+const HOST_RETURN_GRACE_MS = 30_000;
 
 export type HostConnectionState =
 	| "connecting"
@@ -437,6 +440,7 @@ function getOrCreateConnection(
 		getToken: getWsToken,
 		accessDeniedRetryMs: ACCESS_DENIED_RETRY_MS,
 		hostOfflineRetryMs: HOST_OFFLINE_RETRY_MS,
+		hostReturnGraceMs: HOST_RETURN_GRACE_MS,
 		minReconnectionDelay: RECONNECT_BASE_MS,
 		maxReconnectionDelay: RECONNECT_MAX_MS,
 		// Relay upgrades wait for the host's dial-back (DIAL_TIMEOUT_MS);

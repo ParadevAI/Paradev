@@ -23,6 +23,12 @@ export interface RelaySocketOptions {
 	 */
 	hostOfflineRetryMs?: number;
 	/**
+	 * For this long after an open socket drops, a 503 retries on the normal
+	 * backoff instead of waiting `hostOfflineRetryMs`: a host whose tunnel just
+	 * dropped usually registers again within seconds.
+	 */
+	hostReturnGraceMs?: number;
+	/**
 	 * Called with the `_whoowns` probe result before every WS retry (null
 	 * when the URL isn't relay-routed or the relay is unreachable). Lets callers
 	 * surface *why* a stream is down — host offline (503), unauthorized (401),
@@ -95,6 +101,12 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 			: 0;
 
 	let unprobedDialPending = false;
+	let wasOpen = false;
+	let droppedAt: number | null = null;
+	const hostJustDropped = () =>
+		droppedAt !== null &&
+		opts.hostReturnGraceMs != null &&
+		Date.now() - droppedAt < opts.hostReturnGraceMs;
 
 	const provider = async (): Promise<string> => {
 		const retryCount = socket?.retryCount ?? 0;
@@ -123,7 +135,7 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 			throw new Error("relay access denied");
 		}
 		if (probe?.status === 503 && opts.hostOfflineRetryMs != null) {
-			await waitBeforeRetry(opts.hostOfflineRetryMs);
+			if (!hostJustDropped()) await waitBeforeRetry(opts.hostOfflineRetryMs);
 			throw new Error("relay host offline");
 		}
 		return url;
@@ -145,6 +157,13 @@ export function createRelaySocket(opts: RelaySocketOptions): RelaySocket {
 	// promptly and the native retry loop can honor the user's action.
 	socket.addEventListener("open", () => {
 		unprobedDialPending = false;
+		wasOpen = true;
+		droppedAt = null;
+	});
+	socket.addEventListener("close", () => {
+		if (!wasOpen) return;
+		wasOpen = false;
+		droppedAt = Date.now();
 	});
 
 	const reconnect = socket.reconnect.bind(socket);

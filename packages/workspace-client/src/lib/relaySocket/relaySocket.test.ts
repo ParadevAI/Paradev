@@ -148,6 +148,43 @@ describe("createRelaySocket", () => {
 		server.stop(true);
 	});
 
+	it("retries a 503 on the short backoff right after an open socket drops", async () => {
+		let status = 200;
+		const { server, probes, opened, sockets, port } = makeServer(() => status);
+		socket = createRelaySocket({
+			buildUrl: () => `ws://localhost:${port}${HOST_PATH}`,
+			getToken: () => "tok",
+			hostOfflineRetryMs: 60_000,
+			hostReturnGraceMs: 5_000,
+			minReconnectionDelay: 10,
+			maxReconnectionDelay: 20,
+		});
+		await waitFor(() => opened.count === 1);
+
+		status = 503;
+		for (const ws of sockets) ws.close();
+		await waitFor(() => probes.count >= 2);
+		status = 200;
+		await waitFor(() => opened.count === 2);
+		server.stop(true);
+	});
+
+	it("waits hostOfflineRetryMs for a 503 once the grace window has passed", async () => {
+		const { server, probes, port } = makeServer(() => 503);
+		socket = createRelaySocket({
+			buildUrl: () => `ws://localhost:${port}${HOST_PATH}`,
+			getToken: () => "tok",
+			hostOfflineRetryMs: 60_000,
+			hostReturnGraceMs: 5_000,
+			minReconnectionDelay: 10,
+			maxReconnectionDelay: 20,
+		});
+		await waitFor(() => probes.count === 1);
+		await Bun.sleep(200);
+		expect(probes.count).toBe(1);
+		server.stop(true);
+	});
+
 	it("dials local (non-/hosts) URLs without a preflight, converting http to ws", async () => {
 		const { server, tokensSeen, port } = makeServer(() => 503);
 		socket = createRelaySocket({
