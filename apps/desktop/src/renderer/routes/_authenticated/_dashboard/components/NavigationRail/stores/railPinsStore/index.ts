@@ -5,4 +5,5 @@ export {
 	type RailDestinationId,
 	type RailPinOverrides,
 	useRailPinsStore,
+	withRailPin,
 } from "./railPinsStore";

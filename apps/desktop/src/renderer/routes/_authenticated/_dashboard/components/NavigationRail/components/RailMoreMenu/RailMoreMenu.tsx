@@ -21,20 +21,22 @@ import {
 	RAIL_ICON_STROKE_WIDTH,
 	railButtonClass,
 } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
-import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import type { RailDestination } from "../../hooks/useRailDestinations";
 import { useRailPinsStore } from "../../stores/railPinsStore";
 
 interface RailMoreMenuProps {
 	destinations: RailDestination[];
+	onOpenUsage: () => void;
 }
 
-export function RailMoreMenu({ destinations }: RailMoreMenuProps) {
+export function RailMoreMenu({ destinations, onOpenUsage }: RailMoreMenuProps) {
 	const { t } = useLingui();
-	const navigation = useDashboardNavigation();
 	const setPinned = useRailPinsStore((state) => state.setPinned);
 	const { data: isUsageInSidebarEnabled } =
 		electronTrpc.settings.getShowUsageInSidebar.useQuery();
+	const offRailBadge = destinations.find(
+		(destination) => !destination.isPinned && !destination.isActive,
+	)?.badge;
 	return (
 		<DropdownMenu>
 			<Tooltip delayDuration={300}>
@@ -49,6 +51,7 @@ export function RailMoreMenu({ destinations }: RailMoreMenuProps) {
 								className={RAIL_ICON_CLASS}
 								strokeWidth={RAIL_ICON_STROKE_WIDTH}
 							/>
+							{offRailBadge}
 						</button>
 					</DropdownMenuTrigger>
 				</TooltipTrigger>
@@ -75,52 +78,49 @@ export function RailMoreMenu({ destinations }: RailMoreMenuProps) {
 							? t({ message: "Unpin" })
 							: t({ message: "Pin" });
 						return (
-							<DropdownMenuItem
-								key={id}
-								onSelect={onClick}
-								aria-current={isActive ? "page" : undefined}
-								className={cn(isActive && "bg-fill-selected")}
-							>
-								<Icon
-									className="size-4"
-									{...(isIconFilled
-										? {}
-										: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
-								/>
-								<span className="flex-1">{label}</span>
-								<button
-									type="button"
+							<div key={id} className="flex items-center gap-1">
+								<DropdownMenuItem
+									onSelect={onClick}
+									aria-current={isActive ? "page" : undefined}
+									className={cn("flex-1", isActive && "bg-fill-selected")}
+								>
+									<Icon
+										className="size-4"
+										{...(isIconFilled
+											? {}
+											: { strokeWidth: RAIL_ICON_STROKE_WIDTH })}
+									/>
+									{label}
+								</DropdownMenuItem>
+								<DropdownMenuItem
 									aria-label={pinLabel}
-									aria-pressed={isPinned}
 									title={pinLabel}
-									onClick={(event) => {
-										event.stopPropagation();
+									onSelect={(event) => {
+										event.preventDefault();
 										setPinned(id, !isPinned);
 									}}
-									className="group/pin -my-1 -mr-1 ml-4 flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-fill-hover"
+									className="size-7 justify-center p-0"
 								>
 									<LuPin
 										className={cn(
-											"size-3.5 transition-colors group-hover/pin:text-foreground",
+											"size-3.5",
 											isPinned
 												? "fill-current text-foreground"
 												: "text-muted-foreground/50",
 										)}
 									/>
-								</button>
-							</DropdownMenuItem>
+								</DropdownMenuItem>
+							</div>
 						);
 					},
 				)}
 				{isUsageInSidebarEnabled && (
-					<DropdownMenuItem onSelect={navigation.openUsage}>
+					<DropdownMenuItem onSelect={onOpenUsage}>
 						<Gauge className="size-4" />
 						<Trans>Usage</Trans>
 					</DropdownMenuItem>
 				)}
-				{(destinations.length > 0 || isUsageInSidebarEnabled) && (
-					<DropdownMenuSeparator />
-				)}
+				<DropdownMenuSeparator />
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
 						<FolderPlus className="size-4" />

@@ -22,7 +22,7 @@ export function PinnableRailButton({ destination }: PinnableRailButtonProps) {
 			<ContextMenuTrigger asChild>
 				<div>
 					<RailButton
-						label={destination.label}
+						label={destination.railLabel ?? destination.label}
 						icon={destination.icon}
 						isIconFilled={destination.isIconFilled}
 						isActive={destination.isActive}

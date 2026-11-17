@@ -18,6 +18,7 @@ import {
 export interface RailDestination {
 	id: RailDestinationId;
 	label: string;
+	railLabel?: string;
 	icon: ComponentType<{ className?: string; strokeWidth?: number }>;
 	isIconFilled?: boolean;
 	isActive: boolean;
@@ -26,7 +27,6 @@ export interface RailDestination {
 	badge?: ReactNode;
 }
 
-/** Every section this user can open from the rail, in rail order, pinned or not. */
 export function useRailDestinations(): RailDestination[] {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
@@ -78,10 +78,11 @@ export function useRailDestinations(): RailDestination[] {
 		},
 		{
 			id: "automations",
-			label:
+			label: t({ message: "Automations" }),
+			railLabel:
 				myFailedCount > 0
 					? t({ message: `Automations (${myFailedCount} failing)` })
-					: t({ message: "Automations" }),
+					: undefined,
 			icon: PiClockClockwise,
 			isIconFilled: true,
 			isActive: navigation.isAutomationsOpen,

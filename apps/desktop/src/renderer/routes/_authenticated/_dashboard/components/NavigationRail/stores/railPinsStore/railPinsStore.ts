@@ -24,19 +24,30 @@ export function isRailDestinationPinned(
 	return overrides[id] ?? DEFAULT_RAIL_PINS[id];
 }
 
+export function withRailPin(
+	overrides: RailPinOverrides,
+	id: RailDestinationId,
+	isPinned: boolean,
+): RailPinOverrides {
+	const { [id]: _previous, ...rest } = overrides;
+	return isPinned === DEFAULT_RAIL_PINS[id]
+		? rest
+		: { ...rest, [id]: isPinned };
+}
+
 interface RailPinsState {
 	pinOverrides: RailPinOverrides;
 	setPinned: (id: RailDestinationId, isPinned: boolean) => void;
 }
 
-/** Which sections the user pinned to or removed from the rail; a fixed-size singleton per profile. */
+/** A fixed-size singleton per profile. */
 export const useRailPinsStore = create<RailPinsState>()(
 	persist(
 		(set) => ({
 			pinOverrides: {},
 			setPinned: (id, isPinned) =>
 				set((state) => ({
-					pinOverrides: { ...state.pinOverrides, [id]: isPinned },
+					pinOverrides: withRailPin(state.pinOverrides, id, isPinned),
 				})),
 		}),
 		{ name: RAIL_PINS_STORAGE_KEY, version: 1 },
