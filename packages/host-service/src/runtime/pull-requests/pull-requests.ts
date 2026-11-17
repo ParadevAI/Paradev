@@ -83,6 +83,7 @@ const REPO_PULL_REQUEST_CACHE_MAX_TTL_MS = 30 * 60_000;
 // cheap enough to run every tick; spawning git against a missing dir is not.
 const MISSING_WORKTREE_PROBE_INTERVAL_MS = 30_000;
 const PAST_PULL_REQUEST_LOOKUP_BATCH = 8;
+const PAST_PULL_REQUEST_REFRESH_STATES: string[] = ["open", "draft", "queued"];
 // Dedup + link-assignment key. Branch stays case-sensitive: `feature` and
 // `Feature` are distinct branches with distinct PRs, so collapsing them here
 // would mislink. Case drift is tolerated only in the fallback in
@@ -1588,7 +1589,7 @@ export class PullRequestRuntimeManager {
 					eq(pullRequests.repoProvider, repo.provider),
 					eq(pullRequests.repoOwner, repo.owner),
 					eq(pullRequests.repoName, repo.name),
-					inArray(pullRequests.state, ["open", "draft", "queued"]),
+					inArray(pullRequests.state, PAST_PULL_REQUEST_REFRESH_STATES),
 				),
 			)
 			.all()
@@ -1645,7 +1646,14 @@ export class PullRequestRuntimeManager {
 			// A lookup that started earlier can resolve later; never let it
 			// overwrite what a newer one already stored.
 			const latest = this.findPullRequestRowById(rowId);
-			if (!latest || (latest.lastFetchedAt ?? 0) > startedAt) return;
+			if (
+				!latest ||
+				!PAST_PULL_REQUEST_REFRESH_STATES.includes(latest.state) ||
+				(latest.lastFetchedAt ?? 0) > startedAt
+			) {
+				return;
+			}
+			const headChanged = latest.headSha !== node.headRefOid;
 			const now = Date.now();
 			this.upsertPullRequestRow({
 				existing: latest,
@@ -1660,8 +1668,10 @@ export class PullRequestRuntimeManager {
 				headSha: node.headRefOid,
 				mergedAt: node.mergedAt,
 				reviewDecision: coerceReviewDecision(latest.reviewDecision),
-				checksStatus: coerceChecksStatus(latest.checksStatus),
-				checksJson: latest.checksJson,
+				checksStatus: headChanged
+					? "none"
+					: coerceChecksStatus(latest.checksStatus),
+				checksJson: headChanged ? "[]" : latest.checksJson,
 				lastFetchedAt: now,
 				error: null,
 				now,

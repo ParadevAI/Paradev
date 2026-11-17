@@ -2098,6 +2098,52 @@ describe("PullRequestRuntimeManager workspace PR history", () => {
 		expect(getPrById(db, "pr-old")?.state).toBe("open");
 	});
 
+	test("a past PR with a new head commit drops the old head's checks", async () => {
+		const db = createRealDb();
+		seedProject(db);
+		seedPullRequest(db, {
+			id: "pr-old",
+			prNumber: 101,
+			headBranch: "branch-a",
+			headSha: "sha-a1",
+			checksStatus: "success",
+			checksJson: JSON.stringify([
+				{ name: "ci", status: "success", url: null },
+			]),
+		});
+		seedWorkspace(db, {
+			id: "ws",
+			branch: "branch-b",
+			headSha: "sha-branch-b",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+			upstreamBranch: "branch-b",
+		});
+		db.insert(schema.workspacePullRequests)
+			.values({ workspaceId: "ws", pullRequestId: "pr-old", linkedAt: 1 })
+			.run();
+		const serveHistory = historyExecGh(new Map());
+		const manager = createManager(db, {
+			execGh: async (args) =>
+				args.includes(`repos/${REPO.owner}/${REPO.name}/pulls/101`)
+					? makePrNode({
+							number: 101,
+							headRef: "branch-a",
+							headSha: "sha-a2",
+						})
+					: serveHistory(args),
+		});
+
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+
+		const row = getPrById(db, "pr-old");
+		expect([row?.headSha, row?.checksStatus, row?.checksJson]).toEqual([
+			"sha-a2",
+			"none",
+			"[]",
+		]);
+	});
+
 	test("relinking the same PR after flip-flopping branches stays deduped", async () => {
 		const db = createRealDb();
 		seedProject(db);
