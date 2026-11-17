@@ -6078,6 +6078,9 @@ msgstr "エージェントに引き渡せませんでした"
 msgid "Couldn't import"
 msgstr "インポートできませんでした"
 
+msgid "Couldn't leave the group"
+msgstr "グループを退出できませんでした"
+
 msgid "Couldn't load {filename}"
 msgstr "{filename} を読み込めませんでした"
 
@@ -6186,6 +6189,9 @@ msgstr "マージキューから外せませんでした"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "ローカルのサインインを削除できませんでした"
+
+msgid "Couldn't remove them from the group"
+msgstr "グループから削除できませんでした"
 
 msgid "Couldn't restart terminals"
 msgstr "ターミナルを再起動できませんでした"
@@ -10995,6 +11001,9 @@ msgstr "退出して削除"
 
 msgid "Leave comment mode"
 msgstr "コメントモードを終了"
+
+msgid "Leave group"
+msgstr "グループを退出"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "空のままにすると既定の名前に戻ります。"

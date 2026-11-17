@@ -6078,6 +6078,9 @@ msgstr "Impossibile affidare questo a un agente"
 msgid "Couldn't import"
 msgstr "Importazione non riuscita"
 
+msgid "Couldn't leave the group"
+msgstr "Impossibile lasciare il gruppo"
+
 msgid "Couldn't load {filename}"
 msgstr "Impossibile caricare {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "Impossibile rimuovere dalla coda di unione"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Impossibile rimuovere l'accesso locale"
+
+msgid "Couldn't remove them from the group"
+msgstr "Impossibile rimuovere la persona dal gruppo"
 
 msgid "Couldn't restart terminals"
 msgstr "Impossibile riavviare i terminali"
@@ -10995,6 +11001,9 @@ msgstr "Esci ed elimina"
 
 msgid "Leave comment mode"
 msgstr "Esci dalla modalità commento"
+
+msgid "Leave group"
+msgstr "Lascia il gruppo"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Lascia vuoto per tornare al nome predefinito."

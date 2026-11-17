@@ -65,6 +65,26 @@ export function ChatDetailsPanel({
 			)
 			.finally(() => setAddingId(null));
 	};
+	const isOwner = chat.ownerIds.includes(state.meId);
+	const remove = (userId: string) => {
+		setAddingId(userId);
+		apiTrpcClient.chats.removeMember
+			.mutate({ groupId: chat.id, userId })
+			.then(() => {
+				if (userId === state.meId) void navigate({ to: "/chats" });
+			})
+			.catch((error: unknown) =>
+				toast.error(
+					errorMessage(
+						error,
+						userId === state.meId
+							? t({ message: "Couldn't leave the group" })
+							: t({ message: "Couldn't remove them from the group" }),
+					),
+				),
+			)
+			.finally(() => setAddingId(null));
+	};
 	return (
 		<aside className="flex h-full w-80 shrink-0 flex-col border-l border-border">
 			<div className="flex h-12 shrink-0 items-center justify-end px-3">
@@ -174,7 +194,19 @@ export function ChatDetailsPanel({
 							className="flex items-center gap-2.5 rounded-lg px-1 py-1"
 						>
 							<Avatar size="sm" fullName={person.name} image={null} />
-							<span className="truncate text-sm">{person.name}</span>
+							<span className="min-w-0 flex-1 truncate text-sm">
+								{person.name}
+							</span>
+							{isGroup && isOwner && person.id !== state.meId && (
+								<Button
+									size="xs"
+									variant="ghost"
+									disabled={addingId === person.id}
+									onClick={() => remove(person.id)}
+								>
+									<Trans>Remove</Trans>
+								</Button>
+							)}
 						</div>
 					))}
 				</section>
@@ -204,7 +236,17 @@ export function ChatDetailsPanel({
 						))}
 					</section>
 				)}
-				{isGroup && chats && chat.ownerIds.includes(state.meId) && (
+				{isGroup && !isOwner && (
+					<Button
+						variant="ghost"
+						className="justify-start text-destructive hover:text-destructive"
+						disabled={addingId === state.meId}
+						onClick={() => remove(state.meId)}
+					>
+						<Trans>Leave group</Trans>
+					</Button>
+				)}
+				{isGroup && chats && isOwner && (
 					<GroupSettings
 						key={chat.id}
 						title={chat.title}

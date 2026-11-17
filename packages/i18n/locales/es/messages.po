@@ -6078,6 +6078,9 @@ msgstr "No se pudo entregar a un agente"
 msgid "Couldn't import"
 msgstr "No se pudo importar"
 
+msgid "Couldn't leave the group"
+msgstr "No se pudo salir del grupo"
+
 msgid "Couldn't load {filename}"
 msgstr "No se pudo cargar {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "No se pudo quitar de la cola de fusión"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "No se pudo eliminar el inicio de sesión local"
+
+msgid "Couldn't remove them from the group"
+msgstr "No se pudo quitar a la persona del grupo"
 
 msgid "Couldn't restart terminals"
 msgstr "No se pudieron reiniciar las terminales"
@@ -10995,6 +11001,9 @@ msgstr "Salir y eliminar"
 
 msgid "Leave comment mode"
 msgstr "Salir del modo comentario"
+
+msgid "Leave group"
+msgstr "Salir del grupo"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Déjalo vacío para volver al nombre predeterminado."

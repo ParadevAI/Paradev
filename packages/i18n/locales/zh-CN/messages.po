@@ -6078,6 +6078,9 @@ msgstr "无法交给智能体处理"
 msgid "Couldn't import"
 msgstr "无法导入"
 
+msgid "Couldn't leave the group"
+msgstr "无法退出群组"
+
 msgid "Couldn't load {filename}"
 msgstr "无法加载 {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "无法移出合并队列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "无法移除本地登录"
+
+msgid "Couldn't remove them from the group"
+msgstr "无法将其移出群组"
 
 msgid "Couldn't restart terminals"
 msgstr "无法重启终端"
@@ -10995,6 +11001,9 @@ msgstr "退出并删除"
 
 msgid "Leave comment mode"
 msgstr "退出评论模式"
+
+msgid "Leave group"
+msgstr "退出群组"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "留空则恢复为默认名称。"

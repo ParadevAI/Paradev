@@ -6078,6 +6078,9 @@ msgstr "Kon dit niet aan een agent overdragen"
 msgid "Couldn't import"
 msgstr "Importeren mislukt"
 
+msgid "Couldn't leave the group"
+msgstr "Kan de groep niet verlaten"
+
 msgid "Couldn't load {filename}"
 msgstr "Kan {filename} niet laden"
 
@@ -6186,6 +6189,9 @@ msgstr "Verwijderen uit mergewachtrij mislukt"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Kan de lokale login niet verwijderen"
+
+msgid "Couldn't remove them from the group"
+msgstr "Kan de persoon niet uit de groep verwijderen"
 
 msgid "Couldn't restart terminals"
 msgstr "Kan terminals niet herstarten"
@@ -10995,6 +11001,9 @@ msgstr "Verlaten en verwijderen"
 
 msgid "Leave comment mode"
 msgstr "Opmerkingsmodus verlaten"
+
+msgid "Leave group"
+msgstr "Groep verlaten"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Laat leeg om terug te gaan naar de standaardnaam."

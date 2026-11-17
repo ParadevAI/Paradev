@@ -6078,6 +6078,9 @@ msgstr "無法交給代理程式處理"
 msgid "Couldn't import"
 msgstr "無法匯入"
 
+msgid "Couldn't leave the group"
+msgstr "無法退出群組"
+
 msgid "Couldn't load {filename}"
 msgstr "無法載入 {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "無法移出合併佇列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "無法移除本地登入"
+
+msgid "Couldn't remove them from the group"
+msgstr "無法將其移出群組"
 
 msgid "Couldn't restart terminals"
 msgstr "無法重啟終端"
@@ -10995,6 +11001,9 @@ msgstr "退出並刪除"
 
 msgid "Leave comment mode"
 msgstr "退出評論模式"
+
+msgid "Leave group"
+msgstr "退出群組"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "留空則恢復為預設名稱。"

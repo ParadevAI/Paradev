@@ -6072,6 +6072,9 @@ msgstr "Не вдалося передати це агенту"
 msgid "Couldn't import"
 msgstr "Не вдалося імпортувати"
 
+msgid "Couldn't leave the group"
+msgstr "Не вдалося вийти з групи"
+
 msgid "Couldn't load {filename}"
 msgstr "Не вдалося завантажити {filename}"
 
@@ -6180,6 +6183,9 @@ msgstr "Не вдалося прибрати з черги злиття"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не вдалося видалити локальні дані входу"
+
+msgid "Couldn't remove them from the group"
+msgstr "Не вдалося вилучити учасника з групи"
 
 msgid "Couldn't restart terminals"
 msgstr "Не вдалося перезапустити термінали"
@@ -10989,6 +10995,9 @@ msgstr "Вийти й видалити"
 
 msgid "Leave comment mode"
 msgstr "Вийти з режиму коментування"
+
+msgid "Leave group"
+msgstr "Вийти з групи"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Залиште порожнім, щоб повернути типову назву."

@@ -6078,6 +6078,9 @@ msgstr "Tidak dapat menyerahkan ini ke agen"
 msgid "Couldn't import"
 msgstr "Gagal mengimpor"
 
+msgid "Couldn't leave the group"
+msgstr "Tidak dapat keluar dari grup"
+
 msgid "Couldn't load {filename}"
 msgstr "Tidak dapat memuat {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "Gagal mengeluarkan dari antrean merge"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Tidak bisa menghapus sesi masuk lokal"
+
+msgid "Couldn't remove them from the group"
+msgstr "Tidak dapat mengeluarkan mereka dari grup"
 
 msgid "Couldn't restart terminals"
 msgstr "Tidak bisa memulai ulang terminal"
@@ -10995,6 +11001,9 @@ msgstr "Keluar dan hapus"
 
 msgid "Leave comment mode"
 msgstr "Keluar dari mode komentar"
+
+msgid "Leave group"
+msgstr "Keluar dari grup"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Kosongkan untuk kembali ke nama bawaan."

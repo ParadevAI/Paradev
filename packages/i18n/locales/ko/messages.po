@@ -6078,6 +6078,9 @@ msgstr "에이전트에게 넘길 수 없습니다"
 msgid "Couldn't import"
 msgstr "가져오지 못했습니다"
 
+msgid "Couldn't leave the group"
+msgstr "그룹에서 나갈 수 없습니다"
+
 msgid "Couldn't load {filename}"
 msgstr "{filename}을(를) 불러올 수 없습니다"
 
@@ -6186,6 +6189,9 @@ msgstr "머지 대기열에서 빼지 못했습니다"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "로컬 로그인 정보를 제거하지 못했습니다"
+
+msgid "Couldn't remove them from the group"
+msgstr "그룹에서 제거할 수 없습니다"
 
 msgid "Couldn't restart terminals"
 msgstr "터미널을 다시 시작하지 못했습니다"
@@ -10995,6 +11001,9 @@ msgstr "나가고 삭제"
 
 msgid "Leave comment mode"
 msgstr "댓글 모드 나가기"
+
+msgid "Leave group"
+msgstr "그룹 나가기"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "비워 두면 기본 이름으로 돌아갑니다."

@@ -6078,6 +6078,9 @@ msgstr "Не удалось передать агенту"
 msgid "Couldn't import"
 msgstr "Не удалось импортировать"
 
+msgid "Couldn't leave the group"
+msgstr "Не удалось выйти из группы"
+
 msgid "Couldn't load {filename}"
 msgstr "Не удалось загрузить {filename}"
 
@@ -6186,6 +6189,9 @@ msgstr "Не удалось убрать из очереди объединен�
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не удалось удалить локальный вход"
+
+msgid "Couldn't remove them from the group"
+msgstr "Не удалось удалить участника из группы"
 
 msgid "Couldn't restart terminals"
 msgstr "Не удалось перезапустить терминалы"
@@ -10995,6 +11001,9 @@ msgstr "Выйти и удалить"
 
 msgid "Leave comment mode"
 msgstr "Выйти из режима комментариев"
+
+msgid "Leave group"
+msgstr "Выйти из группы"
 
 msgid "Leave it empty to go back to the default name."
 msgstr "Оставьте пустым, чтобы вернуть имя по умолчанию."
