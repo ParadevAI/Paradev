@@ -223,7 +223,7 @@ function wireShutdown(server: Server): void {
 			await server.close();
 			// A requested close may still be mid-escalation; process.exit()
 			// would drop it and leak the SIGHUP-trapping survivors.
-			await drainPendingKills(2000);
+			await drainPendingKills();
 		} catch (err) {
 			process.stderr.write(
 				`[pty-daemon] shutdown error: ${(err as Error).stack ?? err}\n`,

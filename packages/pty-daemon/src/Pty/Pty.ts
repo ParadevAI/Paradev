@@ -44,11 +44,20 @@ function registerPendingKill(chain: Promise<void>): Promise<void> {
 	return tracked;
 }
 
-export async function drainPendingKills(timeoutMs: number): Promise<void> {
+export async function drainPendingKills(timeoutMs?: number): Promise<void> {
 	if (pendingKills.size === 0) return;
+	const waitAll = (async () => {
+		while (pendingKills.size > 0) {
+			await Promise.allSettled([...pendingKills]);
+		}
+	})();
+	if (timeoutMs === undefined) {
+		await waitAll;
+		return;
+	}
 	let timer: NodeJS.Timeout | undefined;
 	await Promise.race([
-		Promise.allSettled([...pendingKills]),
+		waitAll,
 		new Promise<void>((r) => {
 			timer = setTimeout(r, timeoutMs);
 		}),
@@ -99,8 +108,10 @@ class TreeKiller {
 		if (pgid !== null) this.knownPgids.add(pgid);
 	}
 
-	kill(signal: NodeJS.Signals): void {
-		this.volley(signal);
+	kill(signal: NodeJS.Signals, table?: ProcessInfo[] | null): void {
+		if (table !== null) {
+			this.volley(signal, table);
+		}
 		this.signalRoot(signal);
 		if (signal === "SIGKILL" || this.killChain) return;
 		const chain = registerPendingKill(this.runEscalation());
@@ -203,7 +214,7 @@ export interface Pty {
 	readonly meta: SessionMeta;
 	write(data: Buffer): void;
 	resize(cols: number, rows: number): void;
-	kill(signal?: NodeJS.Signals): void;
+	kill(signal?: NodeJS.Signals, table?: ProcessInfo[] | null): void;
 	onData(cb: PtyOnData): void;
 	onExit(cb: PtyOnExit): void;
 	/**
@@ -322,8 +333,8 @@ class NodePtyAdapter implements Pty {
 		this.meta = { ...this.meta, cols, rows };
 	}
 
-	kill(signal?: NodeJS.Signals): void {
-		this.killer.kill(signal ?? "SIGHUP");
+	kill(signal?: NodeJS.Signals, table?: ProcessInfo[] | null): void {
+		this.killer.kill(signal ?? "SIGHUP", table);
 	}
 
 	onData(cb: PtyOnData): void {
@@ -595,8 +606,8 @@ class AdoptedPty implements Pty {
 		}
 	}
 
-	kill(signal?: NodeJS.Signals): void {
-		this.killer.kill(signal ?? "SIGHUP");
+	kill(signal?: NodeJS.Signals, table?: ProcessInfo[] | null): void {
+		this.killer.kill(signal ?? "SIGHUP", table);
 	}
 
 	onData(cb: PtyOnData): void {

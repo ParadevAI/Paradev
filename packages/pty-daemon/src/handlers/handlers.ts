@@ -3,6 +3,7 @@ import {
 	type Pty,
 	type SpawnOptions,
 } from "../Pty/index.ts";
+import { type ProcessInfo, readProcessTableAsync } from "../process-tree.ts";
 import type {
 	CloseMessage,
 	InputMessage,
@@ -36,11 +37,17 @@ export interface Conn {
  */
 export type SessionWirer = (session: Session) => void;
 
+// Strictly below DaemonClient's CLOSE_TIMEOUT_MS (5s) so a wedged `ps` falls
+// back to signalRoot + escalation rather than tripping a client close timeout.
+const CLOSE_PS_TIMEOUT_MS = 3_500;
+
 export interface HandlerCtx {
 	store: SessionStore;
 	wireSession: SessionWirer;
 	/** Pluggable spawn for testability; defaults to real node-pty in production. */
 	spawnPty?: (opts: SpawnOptions) => Pty;
+	/** Pluggable async process-table reader; defaults to readProcessTableAsync. */
+	readProcessTable?: () => Promise<ProcessInfo[] | null>;
 }
 
 export function handleOpen(ctx: HandlerCtx, msg: OpenMessage): ServerMessage {
@@ -130,9 +137,21 @@ export function handleResize(
 	return undefined;
 }
 
-export function handleClose(ctx: HandlerCtx, msg: CloseMessage): ServerMessage {
+export async function handleClose(
+	ctx: HandlerCtx,
+	msg: CloseMessage,
+): Promise<ServerMessage> {
 	const session = ctx.store.get(msg.id);
 	if (!session) return errorFor(msg.id, `unknown session: ${msg.id}`, "ENOENT");
+	// The descriptor is no longer eligible for fd handoff even if process-exit
+	// notification arrives later (or while the async ps read is in flight).
+	session.exited = true;
+	// Read the process table off the event loop before signaling/disposing so
+	// closing multiple heavy workspaces never stalls other sessions or hello
+	// probes (GH #7926).
+	const table = await (
+		ctx.readProcessTable ?? (() => readProcessTableAsync(CLOSE_PS_TIMEOUT_MS))
+	)();
 	let killError: unknown = null;
 	try {
 		// SIGHUP is the right signal for "your terminal is going away" —
@@ -140,7 +159,7 @@ export function handleClose(ctx: HandlerCtx, msg: CloseMessage): ServerMessage {
 		// shells (especially `zsh -l`) trap SIGTERM and stay alive, so
 		// using SIGTERM as the default leaks PTY processes on every
 		// pane close. Callers can still pass an explicit signal.
-		session.pty.kill(msg.signal ?? "SIGHUP");
+		session.pty.kill(msg.signal ?? "SIGHUP", table);
 	} catch (err) {
 		killError = err;
 	}
@@ -153,9 +172,6 @@ export function handleClose(ctx: HandlerCtx, msg: CloseMessage): ServerMessage {
 		// A close request is still acknowledged once signaling succeeded. The
 		// concrete adapters make disposal best-effort and non-throwing.
 	}
-	// The descriptor is no longer eligible for fd handoff even if process-exit
-	// notification arrives later (notably the adopted-PTY liveness poll).
-	session.exited = true;
 	if (killError) return errorFor(msg.id, (killError as Error).message, "EKILL");
 	return { type: "closed", id: msg.id };
 }

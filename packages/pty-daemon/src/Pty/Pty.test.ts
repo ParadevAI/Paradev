@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { spawn } from "./Pty.ts";
+import { drainPendingKills, spawn } from "./Pty.ts";
 
 // node-pty's runtime requires Node (Bun's tty.ReadStream handling is
 // incompatible with the master fd setup). The daemon ships running under
@@ -30,5 +30,10 @@ describe("Pty wrapper (validation only — spawn behavior tested under node)", (
 				meta: { shell: "/bin/sh", argv: [], cols: 80.5, rows: 24 },
 			}),
 		).toThrow(/invalid cols/);
+	});
+
+	test("drainPendingKills resolves cleanly when no kill chains are pending", async () => {
+		await expect(drainPendingKills()).resolves.toBeUndefined();
+		await expect(drainPendingKills(50)).resolves.toBeUndefined();
 	});
 });

@@ -164,12 +164,14 @@ export function readProcessTable(): ProcessInfo[] {
  * (e.g. "no survivors, stop escalating") must treat null as unknown, never
  * as an empty table.
  */
-export function readProcessTableAsync(): Promise<ProcessInfo[] | null> {
+export function readProcessTableAsync(
+	timeoutMs = PS_TIMEOUT_MS,
+): Promise<ProcessInfo[] | null> {
 	return new Promise((resolve) => {
 		execFile(
 			"ps",
 			PS_TABLE_ARGS,
-			{ encoding: "utf8", timeout: PS_TIMEOUT_MS },
+			{ encoding: "utf8", timeout: timeoutMs },
 			(error, stdout) => {
 				resolve(error ? null : parseProcessTable(stdout));
 			},
