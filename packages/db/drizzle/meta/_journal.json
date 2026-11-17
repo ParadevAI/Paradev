@@ -1394,6 +1394,13 @@
       "when": 1794872286770,
       "tag": "0198_chats_model_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1794886701258,
+      "tag": "0199_chats_paradev_access",
+      "breakpoints": true
     }
   ]
 }

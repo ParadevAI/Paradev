@@ -109,6 +109,8 @@ export const chatsAgents = chatsSchema.table(
 			onDelete: "cascade",
 		}),
 		status: chatsAgentStatus("status").notNull().default("stopped"),
+		/** Whether its owner lets it act in Paradev with the owner's access. */
+		paradevAccess: boolean("paradev_access").notNull().default(false),
 		/** The sandbox serving its turns; a new id at every wake. */
 		boxId: text("box_id"),
 		lastActiveAt: timestamp("last_active_at", { withTimezone: true }),
@@ -459,5 +461,36 @@ export const chatsModelUsage = chatsSchema.table(
 			t.createdAt,
 		),
 		index("model_usage_user_created_idx").on(t.userId, t.createdAt),
+	],
+);
+
+/** Each call an agent made with its owner's access, and who asked for the turn. */
+export const chatsAppCalls = chatsSchema.table(
+	"app_calls",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		organizationId: uuid("organization_id")
+			.notNull()
+			.references(() => organizations.id, { onDelete: "cascade" }),
+		agentId: uuid("agent_id").references(() => chatsAgents.id, {
+			onDelete: "set null",
+		}),
+		ownerUserId: uuid("owner_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		askedByUserId: uuid("asked_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
+		groupId: uuid("group_id").references(() => chatsGroups.id, {
+			onDelete: "set null",
+		}),
+		app: text("app").notNull(),
+		tool: text("tool").notNull(),
+		ok: boolean("ok").notNull(),
+		createdAt: createdAt(),
+	},
+	(t) => [
+		index("app_calls_owner_created_idx").on(t.ownerUserId, t.createdAt),
+		index("app_calls_agent_created_idx").on(t.agentId, t.createdAt),
 	],
 );
