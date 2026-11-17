@@ -34,6 +34,15 @@ import { createChatsApi } from "../../utils/chatsApi";
 
 const REALTIME_URL = `${env.REALTIME_URL.replace(/^http/, "ws")}${CHATS_REALTIME_PATH}`;
 
+/** A clock that never repeats a millisecond, so files sent together keep the order they were picked in. */
+function increasingNow(): () => Date {
+	let last = 0;
+	return () => {
+		last = Math.max(Date.now(), last + 1);
+		return new Date(last);
+	};
+}
+
 /** A call the chat API does not serve yet fails as a request would, so the sync layer's own error path shows it. */
 function withUnserved(api: object): SyncApi {
 	return new Proxy(api, {
@@ -94,7 +103,7 @@ export function useChatsStore(organizationId: string) {
 				getState: () => stateRef.current,
 				update,
 			}),
-			files: createFileSends({ api, update }),
+			files: createFileSends({ api, update, now: increasingNow() }),
 			fileLink: api.fileLink,
 			typing: {
 				watch: createTypingWatch({ subscribe }),
