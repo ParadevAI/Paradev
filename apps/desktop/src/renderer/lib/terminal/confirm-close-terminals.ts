@@ -56,20 +56,19 @@ export async function confirmCloseTerminals(
 ): Promise<boolean> {
 	if (useTerminalCloseConfirmStore.getState().suppressed) return true;
 
-	let running = false;
-	for (const terminalId of terminalIds) {
-		// Backgrounded terminals stay alive on close, so nothing is killed.
-		if (hasTerminalBackgroundIntent(terminalId)) continue;
-		try {
-			if (await isRunning(terminalId)) {
-				running = true;
-				break;
+	const runningStates = await Promise.all(
+		terminalIds.map(async (terminalId) => {
+			// Backgrounded terminals stay alive on close, so nothing is killed.
+			if (hasTerminalBackgroundIntent(terminalId)) return false;
+			try {
+				return await isRunning(terminalId);
+			} catch {
+				// If we can't tell, don't block the user from closing.
+				return false;
 			}
-		} catch {
-			// If we can't tell, don't block the user from closing.
-		}
-	}
-	if (!running) return true;
+		}),
+	);
+	if (!runningStates.some(Boolean)) return true;
 
 	return new Promise<boolean>((resolve) => {
 		const shown = alert({

@@ -1,5 +1,9 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
-import { probeTerminalRunning } from "./confirm-close-terminals";
+import { useTerminalCloseConfirmStore } from "renderer/stores/terminal-close-confirm/store";
+import {
+	confirmCloseTerminals,
+	probeTerminalRunning,
+} from "./confirm-close-terminals";
 
 type ProbeUtils = Parameters<typeof probeTerminalRunning>[0];
 
@@ -52,5 +56,34 @@ describe("probeTerminalRunning", () => {
 				await probeTerminalRunning(probeUtils(query), "workspace", "term"),
 			).toBe(running);
 		});
+	}
+});
+
+test("checks a tab's terminals concurrently before allowing its close", async () => {
+	const first = Promise.withResolvers<boolean>();
+	const second = Promise.withResolvers<boolean>();
+	const suppressed = useTerminalCloseConfirmStore.getState().suppressed;
+	const saved = localStorage.getItem("terminal-close-confirm-v1");
+	useTerminalCloseConfirmStore.setState({ suppressed: false });
+	const isRunning = mock((id: string) =>
+		id === "first" ? first.promise : second.promise,
+	);
+	const result = confirmCloseTerminals(["first", "second"], isRunning, {
+		title: "Close terminals",
+		description: "A process is running",
+		confirmLabel: "Close",
+	});
+	try {
+		expect(isRunning.mock.calls.map(([id]) => id)).toEqual(["first", "second"]);
+		first.resolve(false);
+		second.resolve(false);
+		expect(await result).toBe(true);
+	} finally {
+		first.resolve(false);
+		second.resolve(false);
+		await result;
+		useTerminalCloseConfirmStore.setState({ suppressed });
+		if (saved === null) localStorage.removeItem("terminal-close-confirm-v1");
+		else localStorage.setItem("terminal-close-confirm-v1", saved);
 	}
 });
