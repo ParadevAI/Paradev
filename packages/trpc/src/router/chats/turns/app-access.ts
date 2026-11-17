@@ -51,7 +51,7 @@ export function turnApps(
 		{
 			name: PARADEV_APP,
 			displayName: "Paradev",
-			description: `your owner's Paradev: list projects and hosts, create workspaces, start coding agents and chat sessions in them, read their terminals, and manage tasks and automations. Everything you do there is done as your owner. Link a workspace in a reply as [its name](${webUrl.replace(/\/+$/, "")}/workspaces/<workspace id>).`,
+			description: `your owner's Paradev: list projects and hosts, create workspaces, start a chat session with a coding agent in one (\`sessions_create\`, which people can read and reply to from this chat) or a terminal agent (\`agents_create\`), read and message those sessions, and manage tasks and automations. Everything you do there is done as your owner. Link a workspace in a reply as [its name](${webUrl.replace(/\/+$/, "")}/workspaces/<workspace id>).`,
 			path: `apps/${PARADEV_APP}/mcp`,
 			accounts: ownerName ? [ownerName] : [],
 		},
