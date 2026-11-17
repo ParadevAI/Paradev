@@ -215,9 +215,22 @@ Documented by Vercel or the SDK, not measured:
   `drive.unlaid`, `drive.downgrade`, or host-service up without a layout) ends after 3 boots in a
   row, counted from the boot log, with the workspace `failed` and a Sentry report.
   Date/Author: 2026-11-17, agent.
-- Decision: an unarchived workspace reuses its drive when it still exists; the teardown job reads
-  the rows before every destructive call and keeps what a live row names. A drive forked afresh
-  clears `drive_laid_out_at`. Date/Author: 2026-11-17, agent.
+- Decision: an unarchived workspace reuses its box and drive while their names are not retired,
+  that is inside the 7-day grace period. The reap's delete stage retires both names in the same
+  write that commits to deleting them, so an undo after it gets a new box and a fresh drive; the
+  user's deletion had completed. The teardown job still reads the rows before every destructive
+  call and keeps what a live row names. A drive forked afresh clears `drive_laid_out_at`.
+  Rationale: the drive lifecycle model (PR #9914) found a teardown keyed on names deleting a box
+  an undo had just brought back. Date/Author: 2026-11-17, agent.
+- Decision: a provision that lost its row to an archive no longer tears down. Rationale: it cannot
+  tell the archive it lost to from a later one after an undo; that archive's reap can, by its
+  `archivedAt`. The cost is that a box the user never saw lives until that reap's stop and
+  delete stages. Date/Author: 2026-11-17, agent.
+- Decision: a fresh fork is recognised by its drive having no owner at the first layout, not by
+  the golden strip removing local branches (the model's FixFresh). Rationale: promote and the
+  release both strip the drive's state, owner included, so every fork's first boot is fresh and
+  takes main's fetch and `checkout -B` whatever branches the golden has; removing branches would
+  add nothing. Date/Author: 2026-11-17, agent.
 - Decision: the control plane does not refuse to pin a pre-drive bundle to a workspace with a
   drive. Rationale: nothing records which bundle shas know the drive, and both sides already
   refuse: the boot will not reexec into a script without the drive-contract line, and a boot that
@@ -447,6 +460,11 @@ never shown as their work.
 | Flag-off boxes run main's checkout code exactly. | `checkout_one` `else` branches | boot-twice first and second boot of the plain box; the diff against main |
 | A home subtree is never seeded partially. | `seed_home_subtree` (copy to `<sub>.seeding`, then `mv -T`; a failed copy refuses the boot) | boot-twice layout checks only; a failed copy is not simulated |
 | One read-write session per drive, and a concurrent wake of the same box does not wait. | `waitForDriveDetached` with `heldByCaller` in `wakeSandbox` | `vercel.test.ts` "a stopped box waits for its drive…", "a drive a concurrent wake already resumed this box with is not foreign"; `drives.test.ts` wait tests |
+| A stopped box's drive check and the call that resumes it are one step: no other caller resumes or stops the box in between. A refused box is stopped under the same lock. | `ResumeLock` around `wakeSandbox`'s read-to-boot and `provisionSandbox`; `sandboxResumeLock` (`resume-lock.ts`, a transaction-scoped `pg_try_advisory_xact_lock`), passed by `wake.ts` and `provision.ts`; a caller that finds it held answers "still starting" | `vercel.test.ts` "a second wake while the first resumes does not resume the box…" |
+| A redelivered provision whose box has stopped waits for the drive and remounts it before anything resumes the box. | `provisionSandbox` (`existing.status !== "running"`) | `vercel.test.ts` "a redelivered provision whose box stopped waits for the drive before anything resumes it" |
+| The settle never resumes a box another caller stopped. | `settleSandbox` reads the boot log only from a box it just found running | `vercel.test.ts` settle tests |
+| A provision that lost its row to an archive tears nothing down; that archive's reap, keyed on its `archivedAt`, owns the box. A later archive gets its own full grace period. | `provision.ts` (the `!ready` branch); `isStillArchived` and the retiring write in `reap.ts` | `provision.test.ts` "a provision that lost its row to an archive leaves the box to that archive's reap", "a failed create whose row was archived meanwhile tears nothing down" |
+| Committing to delete a box and drive retires their names in the same write, so an undo after it gets a new box and a new drive, never the ones being deleted. | `retireAndTearDown` (`teardown.ts`) from the reap's delete stage and the archive fallback; the provision failure's transition to `failed` | `reap.test.ts` "the delete stage retires the box's names before it deletes them…", "an undo that wins the row before the retire leaves the box and drive alone"; `provision.test.ts` "a failed create retires the box's name in the same write…" |
 | A box is stopped and its drive detached before either is deleted. Deletes never wait in a request, except promote, which must wait for the source's drive before it can fork it. | `teardownSandbox`, `deleteSandboxAndDriveLater` (`teardown.ts`), route `/api/cloud-workspaces/teardown`; promote's two detach waits (up to 2 minutes each) inside the 300 s tRPC route | `teardown.test.ts` "stops the box, waits for its drive, then deletes…" |
 | A teardown never deletes what a live workspace or environment names. | `liveReferences` (`teardown-guard.ts`), read before each destructive call | `teardown.test.ts` "a box a revived workspace runs on is left alone", "an unarchived workspace's new box keeps the drive…" |
 | A failed provision deletes only a drive it forked. | `forkedDrive` in `provision.ts` | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |

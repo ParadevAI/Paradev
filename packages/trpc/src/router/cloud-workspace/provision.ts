@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
@@ -26,6 +25,7 @@ import {
 import { recordDriveLaidOut } from "./drive-laid-out";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
+import { sandboxResumeLock } from "./resume-lock";
 import { recordSandboxAwake } from "./sandbox-expiry";
 import { recordSandboxAsleep } from "./sandbox-sleep";
 import { deleteSandboxAndDriveLater } from "./teardown";
@@ -38,14 +38,9 @@ export function sandboxNameFor(cloudWorkspaceId: string): string {
 	return `ws-${cloudWorkspaceId.replaceAll("-", "").slice(0, 24)}`;
 }
 
-/**
- * A later box for the same row. Vercel refuses a deleted sandbox's name
- * with `image_not_ready` for a few minutes after the delete.
- */
-export function nextSandboxNameFor(cloudWorkspaceId: string): string {
-	const prefix = cloudWorkspaceId.replaceAll("-", "").slice(0, 16);
-	return `ws-${prefix}${randomBytes(4).toString("hex")}`;
-}
+export { nextSandboxNameFor } from "./sandbox-name";
+
+import { nextSandboxNameFor } from "./sandbox-name";
 
 export interface ProvisionCloudWorkspaceInput {
 	cloudWorkspaceId: string;
@@ -188,6 +183,7 @@ async function provision(
 					environment,
 					claim,
 					mounts: workspaceDriveMounts(driveName),
+					exclusive: sandboxResumeLock(providerSandboxId),
 				}),
 		);
 		const ready = await transitionCloudWorkspace({
@@ -201,10 +197,10 @@ async function provision(
 			},
 		});
 		if (!ready) {
-			// Deleted while the box was being made: the delete won the row, so
-			// the box it never knew about goes with it. A duplicate delivery of
-			// this job loses the row to the first one and must leave the box be:
-			// the name is per workspace, so it is the same box.
+			// Deleted while the box was being made. The box is the row's, and the
+			// archive's own reap stops and deletes it after that archive's grace
+			// period: an undo, more work and a later archive must not lose it to
+			// this job. A duplicate delivery loses the row to the first one.
 			const current = await db.query.cloudWorkspaces.findFirst({
 				where: eq(cloudWorkspaces.id, row.id),
 				columns: { status: true },
@@ -217,7 +213,6 @@ async function provision(
 							error,
 						),
 				);
-				await deleteSandboxAndDriveLater({ providerSandboxId, driveName });
 				if (bootId) await releaseBoot(bootId);
 			}
 			await naming.catch(() => {});
@@ -299,24 +294,37 @@ async function provision(
 		const keepForDiagnosis =
 			error instanceof SandboxNotReadyError ||
 			error instanceof SandboxDriveRefusedError;
-		await (keepForDiagnosis
-			? stopSandbox(providerSandboxId)
-			: deleteSandboxAndDriveLater({
-					providerSandboxId,
-					driveName: forkedDrive ? driveName : null,
-				})
-		).catch((teardownError) => {
-			console.error(
-				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}${driveName ? ` or its drive ${driveName}` : ""}`,
-				teardownError,
+		if (keepForDiagnosis) {
+			await stopSandbox(providerSandboxId).catch((stopError) =>
+				console.error(
+					`[cloud-workspace] could not stop sandbox ${providerSandboxId}`,
+					stopError,
+				),
 			);
-		});
-		await transitionCloudWorkspace({
+		}
+		// A box that goes is retired with the transition, so nothing can wake it while it is deleted.
+		const failed = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning", "awake", "asleep"],
 			to: "failed",
-			set: keepForDiagnosis ? { providerSandboxId } : {},
+			set: keepForDiagnosis
+				? { providerSandboxId }
+				: {
+						providerSandboxId: nextSandboxNameFor(row.id),
+						...(forkedDrive ? { driveName: null, driveLaidOutAt: null } : {}),
+					},
 		});
+		if (failed && !keepForDiagnosis) {
+			await deleteSandboxAndDriveLater({
+				providerSandboxId,
+				driveName: forkedDrive ? driveName : null,
+			}).catch((teardownError) =>
+				console.error(
+					`[cloud-workspace] leaked sandbox ${providerSandboxId}${forkedDrive && driveName ? ` or its drive ${driveName}` : ""}`,
+					teardownError,
+				),
+			);
+		}
 		nudge(row.organizationId, "cloud_workspaces");
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
 			(moveError) =>

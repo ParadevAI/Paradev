@@ -27,8 +27,13 @@ let events: string[];
 let settle: () => Promise<unknown>;
 let create: () => Promise<unknown>;
 let fork: "existing" | "forked";
+let wins: (to: string) => boolean;
+let current: { status: string } | undefined;
 
-stub(db.query.cloudWorkspaces, { findFirst: async () => row });
+let reads = 0;
+stub(db.query.cloudWorkspaces, {
+	findFirst: async () => (reads++ === 0 ? row : current),
+});
 stub(db, {
 	update: () => ({
 		set: (values: Record<string, unknown>) => ({
@@ -70,8 +75,14 @@ stub(meter, {
 	releaseBoot: async () => {},
 });
 stub(transition, {
-	transitionCloudWorkspace: async (args: { to: string }) => {
-		events.push(`to ${args.to}`);
+	transitionCloudWorkspace: async (args: {
+		to: string;
+		set?: Record<string, unknown>;
+	}) => {
+		if (!wins(args.to)) return false;
+		events.push(
+			`to ${args.to}${args.set && "providerSandboxId" in args.set ? ` box=${args.set.providerSandboxId === "ws-box" ? "same" : "new"}` : ""}`,
+		);
 		return true;
 	},
 });
@@ -103,6 +114,9 @@ beforeEach(() => {
 	settle = async () => ({ stamps: [], answeredAt: 0 });
 	create = async () => {};
 	fork = "forked";
+	wins = () => true;
+	current = undefined;
+	reads = 0;
 });
 
 describe("provisionCloudWorkspace with a drive", () => {
@@ -130,6 +144,37 @@ describe("provisionCloudWorkspace with a drive", () => {
 		expect(events.some((event) => event.startsWith("teardown"))).toBe(false);
 	});
 
+	test("a provision that lost its row to an archive leaves the box to that archive's reap", async () => {
+		wins = (to) => to !== "awake";
+		current = { status: "archived" };
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: ROW.id })).toBe(
+			"skipped",
+		);
+		expect(events.some((event) => event.startsWith("teardown"))).toBe(false);
+		expect(events).not.toContain("stop");
+	});
+
+	test("a failed create retires the box's name in the same write that fails the row, then tears it down", async () => {
+		create = async () => {
+			throw new Error("create refused");
+		};
+		await provisionCloudWorkspace({ cloudWorkspaceId: ROW.id });
+		expect(events).toEqual([
+			"update driveName",
+			"to failed box=new",
+			"teardown drive=drive-ws-box",
+		]);
+	});
+
+	test("a failed create whose row was archived meanwhile tears nothing down", async () => {
+		create = async () => {
+			throw new Error("create refused");
+		};
+		wins = (to) => to !== "failed";
+		await provisionCloudWorkspace({ cloudWorkspaceId: ROW.id });
+		expect(events.some((event) => event.startsWith("teardown"))).toBe(false);
+	});
+
 	test("a failed create deletes a drive it forked, never one it found", async () => {
 		create = async () => {
 			throw new Error("create refused");
@@ -138,10 +183,11 @@ describe("provisionCloudWorkspace with a drive", () => {
 		expect(events).toContain("teardown drive=drive-ws-box");
 
 		events = [];
+		reads = 0;
 		row = { ...ROW, driveName: "drive-ws-box" };
 		fork = "existing";
 		await provisionCloudWorkspace({ cloudWorkspaceId: ROW.id });
 		expect(events).toContain("teardown drive=null");
-		expect(events).toContain("to failed");
+		expect(events).toContain("to failed box=new");
 	});
 });

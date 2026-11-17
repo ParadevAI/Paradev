@@ -1,4 +1,7 @@
 import * as Sentry from "@sentry/core";
+import { db } from "@superset/db/client";
+import { cloudWorkspaces } from "@superset/db/schema";
+import { and, eq, type SQL } from "drizzle-orm";
 import {
 	DriveStillAttachedError,
 	deleteSandbox,
@@ -7,6 +10,7 @@ import {
 	waitForDriveDetached,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { nextSandboxNameFor } from "./sandbox-name";
 import { liveReferences } from "./teardown-guard";
 
 export interface TeardownSandboxInput {
@@ -114,4 +118,38 @@ export async function deleteSandboxAndDriveLater(args: {
 		driveName: args.driveName,
 		attempt: 0,
 	});
+}
+
+/**
+ * Takes the row's box and drive names out of use in the same write that
+ * commits to deleting them, then queues their teardown. An unarchive after it
+ * finds a name that does not exist and gets a new box and a new drive, never
+ * the ones being deleted. Returns false when the row no longer matches
+ * `condition` or names another box: whatever changed it owns the names now.
+ */
+export async function retireAndTearDown(
+	row: { id: string; providerSandboxId: string; driveName: string | null },
+	condition: SQL | undefined,
+): Promise<boolean> {
+	const [retired] = await db
+		.update(cloudWorkspaces)
+		.set({
+			providerSandboxId: nextSandboxNameFor(row.id),
+			driveName: null,
+			driveLaidOutAt: null,
+		})
+		.where(
+			and(
+				eq(cloudWorkspaces.id, row.id),
+				eq(cloudWorkspaces.providerSandboxId, row.providerSandboxId),
+				condition,
+			),
+		)
+		.returning({ id: cloudWorkspaces.id });
+	if (!retired) return false;
+	await deleteSandboxAndDriveLater({
+		providerSandboxId: row.providerSandboxId,
+		driveName: row.driveName,
+	});
+	return true;
 }
