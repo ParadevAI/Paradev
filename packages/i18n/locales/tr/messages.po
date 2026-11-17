@@ -6235,6 +6235,9 @@ msgstr "Model sağlayıcısına ulaşılamadı"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Bu bulut çalışma alanına ulaşılamadı. Hâlâ uyandırılıyor olabilir. Tekrar deneyin."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Bu çalışma alanının sohbetine ulaşılamadı."
+
 msgid "Couldn't reach workspace"
 msgstr "Çalışma alanına ulaşılamadı"
 
@@ -20782,8 +20785,14 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Bu çalışma alanında henüz sohbet yok. Terminallerini görmek için çalışma alanını açın."
+
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Bu çalışma alanı, uygulamanın ulaşabildiği bir ana makinede değil."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."

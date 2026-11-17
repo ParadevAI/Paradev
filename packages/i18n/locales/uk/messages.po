@@ -6229,6 +6229,9 @@ msgstr "Не вдалося зв'язатися з провайдером мод
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Не вдалося зв'язатися з цим хмарним робочим простором. Можливо, він ще запускається. Спробуйте ще раз."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Не вдалося підключитися до чату цього робочого простору."
+
 msgid "Couldn't reach workspace"
 msgstr "Не вдалося зв'язатися з робочим простором"
 
@@ -20776,8 +20779,14 @@ msgstr "Це зніме з індексу та відкотить усі про�
 msgid "This workspace"
 msgstr "Цей робочий простір"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "У цьому робочому просторі ще немає чату. Відкрийте його, щоб побачити термінали."
+
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Цей робочий простір розташований на хості, недоступному для застосунку."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Можливо, цей робочий простір видалено або ви більше не маєте до нього доступу."

@@ -6235,6 +6235,9 @@ msgstr "Kon de modelprovider niet bereiken"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Kan deze cloudwerkruimte niet bereiken. Mogelijk wordt deze nog gewekt. Probeer het opnieuw."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "De chat van deze workspace is niet bereikbaar."
+
 msgid "Couldn't reach workspace"
 msgstr "Kan werkruimte niet bereiken"
 
@@ -20782,8 +20785,14 @@ msgstr "Hiermee worden alle gestagede wijzigingen ge-unstaged en teruggedraaid. 
 msgid "This workspace"
 msgstr "Deze werkruimte"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Deze workspace heeft nog geen chat. Open de workspace om de terminals te zien."
+
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Deze workspace staat niet op een host die deze app kan bereiken."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Deze werkruimte is mogelijk verwijderd, of je hebt er geen toegang meer toe."

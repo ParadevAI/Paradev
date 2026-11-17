@@ -6235,6 +6235,9 @@ msgstr "Não foi possível conectar ao provedor do modelo"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Não foi possível acessar este workspace na nuvem. Ele pode ainda estar sendo ativado. Tente novamente."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Não foi possível acessar o chat deste workspace."
+
 msgid "Couldn't reach workspace"
 msgstr "Não foi possível acessar a área de trabalho"
 
@@ -20782,8 +20785,14 @@ msgstr "Isso remove do stage e reverte todas as alterações no stage. Arquivos 
 msgid "This workspace"
 msgstr "Esta área de trabalho"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Este workspace ainda não tem chat. Abra o workspace para ver os terminais."
+
 msgid "This workspace has no project to branch from"
 msgstr "Este workspace não tem projeto do qual ramificar"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Este workspace não está em um host que este app consiga acessar."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Esta área de trabalho pode ter sido removida ou você não tem mais acesso a ela."

@@ -6235,6 +6235,9 @@ msgstr "Modellanbieter nicht erreichbar"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Dieser Cloud-Workspace ist nicht erreichbar. Er wird möglicherweise noch aufgeweckt. Versuche es erneut."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Der Chat dieses Workspace ist nicht erreichbar."
+
 msgid "Couldn't reach workspace"
 msgstr "Arbeitsbereich nicht erreichbar"
 
@@ -20782,8 +20785,14 @@ msgstr "Damit werden alle gestageden Änderungen aus dem Index genommen und zur�
 msgid "This workspace"
 msgstr "Dieser Arbeitsbereich"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Dieser Workspace hat noch keinen Chat. Öffne den Workspace, um seine Terminals zu sehen."
+
 msgid "This workspace has no project to branch from"
 msgstr "Dieser Workspace hat kein Projekt, von dem aus verzweigt werden kann"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Dieser Workspace liegt auf keinem Host, den diese App erreichen kann."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Dieser Arbeitsbereich wurde möglicherweise entfernt, oder du hast keinen Zugriff mehr darauf."

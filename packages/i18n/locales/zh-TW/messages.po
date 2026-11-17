@@ -6235,6 +6235,9 @@ msgstr "無法連線到模型供應商"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "無法連線到此雲端工作區。它可能仍在喚醒中。請重試。"
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "無法連線到此工作區的聊天。"
+
 msgid "Couldn't reach workspace"
 msgstr "無法連線到工作區"
 
@@ -20782,8 +20785,14 @@ msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔
 msgid "This workspace"
 msgstr "此工作區"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "此工作區還沒有聊天。開啟工作區可查看其終端機。"
+
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "此工作區不在本應用程式可存取的主機上。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作區可能已被移除，或者你不再擁有它的存取權限。"

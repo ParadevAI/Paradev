@@ -6235,6 +6235,9 @@ msgstr "No se pudo conectar con el proveedor del modelo"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "No se pudo conectar con este espacio de trabajo en la nube. Es posible que todavía se esté reactivando: inténtalo de nuevo."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "No se pudo acceder al chat de este espacio de trabajo."
+
 msgid "Couldn't reach workspace"
 msgstr "No se pudo conectar con el espacio de trabajo"
 
@@ -20782,8 +20785,14 @@ msgstr "Esto quitará de preparados y revertirá todos los cambios preparados. L
 msgid "This workspace"
 msgstr "Este espacio de trabajo"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Este espacio de trabajo aún no tiene chat. Ábrelo para ver sus terminales."
+
 msgid "This workspace has no project to branch from"
 msgstr "Este espacio de trabajo no tiene un proyecto desde el que bifurcar"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Este espacio de trabajo no está en un host al que esta app pueda acceder."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Puede que este espacio de trabajo se haya eliminado o que ya no tengas acceso a él."

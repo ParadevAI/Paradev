@@ -6235,6 +6235,9 @@ msgstr "Không kết nối được với nhà cung cấp mô hình"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Không kết nối được với không gian làm việc đám mây này. Có thể nó vẫn đang được đánh thức. Hãy thử lại."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Không kết nối được với cuộc trò chuyện của workspace này."
+
 msgid "Couldn't reach workspace"
 msgstr "Không kết nối được workspace"
 
@@ -20782,8 +20785,14 @@ msgstr "Thao tác này sẽ bỏ stage và hoàn nguyên toàn bộ thay đổi 
 msgid "This workspace"
 msgstr "Workspace này"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Workspace này chưa có cuộc trò chuyện. Mở workspace để xem các terminal của nó."
+
 msgid "This workspace has no project to branch from"
 msgstr "Workspace này không có dự án để tạo nhánh"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Workspace này không nằm trên máy chủ mà ứng dụng có thể truy cập."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace này có thể đã bị gỡ, hoặc bạn không còn quyền truy cập."

@@ -6235,6 +6235,9 @@ msgstr "Tidak dapat menghubungi penyedia model"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Tidak bisa menjangkau workspace cloud ini. Mungkin masih dibangunkan. Coba lagi."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Tidak dapat menjangkau chat workspace ini."
+
 msgid "Couldn't reach workspace"
 msgstr "Tidak bisa menjangkau workspace"
 
@@ -20782,8 +20785,14 @@ msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. F
 msgid "This workspace"
 msgstr "Workspace ini"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Workspace ini belum memiliki chat. Buka workspace untuk melihat terminalnya."
+
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Workspace ini tidak berada di host yang dapat dijangkau aplikasi ini."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace ini mungkin sudah dihapus, atau Anda sudah tidak punya akses ke sana."

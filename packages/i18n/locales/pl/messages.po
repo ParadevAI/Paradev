@@ -6235,6 +6235,9 @@ msgstr "Nie udało się połączyć z dostawcą modelu"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Nie udało się połączyć z tym obszarem roboczym w chmurze. Może wciąż być wybudzany. Spróbuj ponownie."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Nie udało się połączyć z czatem tego obszaru roboczego."
+
 msgid "Couldn't reach workspace"
 msgstr "Nie udało się połączyć z obszarem roboczym"
 
@@ -20782,8 +20785,14 @@ msgstr "Usunie to z indeksu i cofnie wszystkie zaindeksowane zmiany. Zaindeksowa
 msgid "This workspace"
 msgstr "Ten obszar roboczy"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Ten obszar roboczy nie ma jeszcze czatu. Otwórz go, aby zobaczyć jego terminale."
+
 msgid "This workspace has no project to branch from"
 msgstr "Ten obszar roboczy nie ma projektu, z którego można się rozgałęzić"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Ten obszar roboczy nie znajduje się na hoście dostępnym dla tej aplikacji."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Ten obszar roboczy mógł zostać usunięty albo nie masz już do niego dostępu."

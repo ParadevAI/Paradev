@@ -6235,6 +6235,9 @@ msgstr "Impossible de joindre le fournisseur du modèle"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Impossible de joindre cet espace de travail cloud. Il est peut-être encore en train de se réveiller. Réessayez."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Impossible d'accéder à la discussion de cet espace de travail."
+
 msgid "Couldn't reach workspace"
 msgstr "Impossible de joindre l'espace de travail"
 
@@ -20782,8 +20785,14 @@ msgstr "Cette action désindexera et annulera toutes les modifications indexées
 msgid "This workspace"
 msgstr "Cet espace de travail"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Cet espace de travail n'a pas encore de discussion. Ouvrez-le pour voir ses terminaux."
+
 msgid "This workspace has no project to branch from"
 msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Cet espace de travail n'est pas sur un hôte que cette application peut joindre."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Cet espace de travail a peut-être été supprimé, ou vous n'y avez plus accès."

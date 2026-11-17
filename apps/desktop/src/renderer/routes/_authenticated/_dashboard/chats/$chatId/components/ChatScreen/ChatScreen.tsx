@@ -28,11 +28,13 @@ import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { ChatFace } from "../../../components/ChatFace";
 import { useChats } from "../../../hooks/useChats";
+import { WorkspacePreviewProvider } from "../../providers/WorkspacePreviewProvider";
 import { ChatComposer } from "../ChatComposer";
 import { ChatDetailsPanel } from "../ChatDetailsPanel";
 import { ChatThread } from "../ChatThread";
 import { MessageDetailsPanel } from "../MessageDetailsPanel";
 import type { MessageActions } from "../MessageItem";
+import { WorkspaceChatPanel } from "../WorkspaceChatPanel";
 
 const NOW_TICK_MS = 30_000;
 const HIGHLIGHT_MS = 1600;
@@ -47,6 +49,14 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const [editing, setEditing] = useState<Message | null>(null);
 	const [showsDetails, setShowsDetails] = useState(false);
 	const [detailsOf, setDetailsOf] = useState<string | null>(null);
+	const [previewedWorkspaceId, setPreviewedWorkspaceId] = useState<
+		string | null
+	>(null);
+	const previewWorkspace = useCallback((workspaceId: string) => {
+		setShowsDetails(false);
+		setDetailsOf(null);
+		setPreviewedWorkspaceId(workspaceId);
+	}, []);
 	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
 	const state = chats?.state ?? null;
@@ -114,6 +124,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			answerForm: (questionId, answers) =>
 				dispatch?.({ type: "answer-form", questionId, answers }),
 			details: (message) => {
+				setPreviewedWorkspaceId(null);
 				setShowsDetails(false);
 				setDetailsOf(message.id);
 			},
@@ -215,6 +226,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						aria-label={t({ message: "Chat details" })}
 						aria-expanded={showsDetails}
 						onClick={() => {
+							setPreviewedWorkspaceId(null);
 							setDetailsOf(null);
 							setShowsDetails((shown) => !shown);
 						}}
@@ -228,30 +240,32 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					</button>
 					<div className="drag h-full flex-1 basis-0" />
 				</PageHeader>
-				<ChatThread
-					state={state}
-					chatId={chatId}
-					isGroup={chat.kind === "group"}
-					now={now}
-					highlightedId={highlightedId}
-					actions={actions}
-					onLoadOlder={loadOlder}
-					working={working}
-					live={chats.turns}
-					intro={
-						<div className="flex flex-col items-center gap-2 px-8 pt-12 pb-4 text-center">
-							<ChatFace chat={chat} size={60} />
-							<h2 className="max-w-full truncate text-[22px] leading-tight font-semibold tracking-[-0.02em]">
-								{title}
-							</h2>
-							{agent?.description && (
-								<p className="max-w-md text-sm text-muted-foreground">
-									{agent.description}
-								</p>
-							)}
-						</div>
-					}
-				/>
+				<WorkspacePreviewProvider value={previewWorkspace}>
+					<ChatThread
+						state={state}
+						chatId={chatId}
+						isGroup={chat.kind === "group"}
+						now={now}
+						highlightedId={highlightedId}
+						actions={actions}
+						onLoadOlder={loadOlder}
+						working={working}
+						live={chats.turns}
+						intro={
+							<div className="flex flex-col items-center gap-2 px-8 pt-12 pb-4 text-center">
+								<ChatFace chat={chat} size={60} />
+								<h2 className="max-w-full truncate text-[22px] leading-tight font-semibold tracking-[-0.02em]">
+									{title}
+								</h2>
+								{agent?.description && (
+									<p className="max-w-md text-sm text-muted-foreground">
+										{agent.description}
+									</p>
+								)}
+							</div>
+						}
+					/>
+				</WorkspacePreviewProvider>
 				<div className="relative mx-auto w-full max-w-[720px] shrink-0 px-4 pb-4">
 					{typing && (
 						<div
@@ -312,6 +326,13 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					/>
 				</div>
 			</div>
+			{previewedWorkspaceId && (
+				<WorkspaceChatPanel
+					key={previewedWorkspaceId}
+					workspaceId={previewedWorkspaceId}
+					onClose={() => setPreviewedWorkspaceId(null)}
+				/>
+			)}
 			{detailedMessage && live && (
 				<MessageDetailsPanel
 					state={state}

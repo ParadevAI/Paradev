@@ -6235,6 +6235,9 @@ msgstr "Impossibile raggiungere il fornitore del modello"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Impossibile raggiungere questo workspace cloud. Potrebbe essere ancora in fase di riattivazione: riprova."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Impossibile raggiungere la chat di questo workspace."
+
 msgid "Couldn't reach workspace"
 msgstr "Impossibile raggiungere il workspace"
 
@@ -20782,8 +20785,14 @@ msgstr "Questo toglierà dallo stage e annullerà tutte le modifiche in stage. I
 msgid "This workspace"
 msgstr "Questo workspace"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Questo workspace non ha ancora una chat. Apri il workspace per vedere i suoi terminali."
+
 msgid "This workspace has no project to branch from"
 msgstr "Questo workspace non ha un progetto da cui diramare"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Questo workspace non si trova su un host raggiungibile da questa app."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Questo workspace potrebbe essere stato rimosso oppure non hai più accesso."

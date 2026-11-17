@@ -6235,6 +6235,9 @@ msgstr "Nepodařilo se spojit s poskytovatelem modelu"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Nepodařilo se spojit s tímto cloudovým workspace. Možná se ještě probouzí. Zkuste to znovu."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Chat tohoto pracovního prostoru se nepodařilo načíst."
+
 msgid "Couldn't reach workspace"
 msgstr "Nepodařilo se spojit s pracovním prostorem"
 
@@ -20782,8 +20785,14 @@ msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. P�
 msgid "This workspace"
 msgstr "Tento pracovní prostor"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "Tento pracovní prostor zatím nemá chat. Otevřete ho a uvidíte jeho terminály."
+
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "Tento pracovní prostor není na hostiteli, ke kterému se aplikace dostane."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."

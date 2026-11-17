@@ -6235,6 +6235,9 @@ msgstr "Couldn't reach the model provider"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "Couldn't reach this workspace's chat."
+
 msgid "Couldn't reach workspace"
 msgstr "Couldn't reach workspace"
 
@@ -20782,8 +20785,14 @@ msgstr "This will unstage and revert all staged changes. Staged new files will b
 msgid "This workspace"
 msgstr "This workspace"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "This workspace has no chat yet. Open the workspace to see its terminals."
+
 msgid "This workspace has no project to branch from"
 msgstr "This workspace has no project to branch from"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "This workspace isn't on a host this app can reach."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "This workspace may have been removed, or you no longer have access to it."

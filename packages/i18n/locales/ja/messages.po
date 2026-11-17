@@ -6235,6 +6235,9 @@ msgstr "モデルのプロバイダーに接続できませんでした"
 msgid "Couldn't reach this cloud workspace. It may still be waking up. Try again."
 msgstr "このクラウドワークスペースに接続できませんでした。まだ起動中の可能性があります。もう一度お試しください。"
 
+msgid "Couldn't reach this workspace's chat."
+msgstr "このワークスペースのチャットに接続できませんでした。"
+
 msgid "Couldn't reach workspace"
 msgstr "ワークスペースに接続できませんでした"
 
@@ -20782,8 +20785,14 @@ msgstr "ステージ済みの変更をすべてステージ解除して元に戻
 msgid "This workspace"
 msgstr "このワークスペース"
 
+msgid "This workspace has no chat yet. Open the workspace to see its terminals."
+msgstr "このワークスペースにはまだチャットがありません。ワークスペースを開くとターミナルを確認できます。"
+
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
+
+msgid "This workspace isn't on a host this app can reach."
+msgstr "このワークスペースは、このアプリから接続できるホストにありません。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "このワークスペースは削除されたか、アクセス権がなくなった可能性があります。"
