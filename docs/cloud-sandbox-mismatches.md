@@ -733,10 +733,13 @@ place, which would look like the user's work is gone. So the identity file
 names the drive (`SUPERSET_SANDBOX_DRIVE`), the drive names its owner
 (`/mnt/superset-drive/state/workspace-id`), and `superset-boot` refuses to
 continue (`drive.missing`, `drive.foreign`, `drive.unlaid`) before the bundle,
-host-service and the checkout. The control plane spots the refusal in the
-boot log within about 2 s and answers "still starting"; the next wake mounts
-the drive afresh. Nothing marks the workspace failed, because its data is
-intact. A boot that answers without `drive.layout` is refused the same way.
+host-service and the checkout. The control plane spots the refusal in this
+boot's lines of the boot log within about 2 s and answers "still starting";
+the next wake mounts the drive afresh, and a create records the box asleep.
+A refusal no remount can change (another workspace's drive, a laid-out drive
+that mounts empty, a boot script that predates the drive) ends after 3 boots
+in a row as `failed`, with the box and the drive kept. A boot that answers
+without `drive.layout` is refused the same way.
 A box on an image whose runner predates the guard gets it after the reexec
 into the bundle's runner, still before host-service.
 

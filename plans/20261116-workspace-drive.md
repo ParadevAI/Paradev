@@ -203,11 +203,29 @@ Documented by Vercel or the SDK, not measured:
   root disk, a rollback that the drive does not share would make host-service forget a worktree or
   launch the agent twice. Terminal sessions in it describe processes, which no snapshot keeps
   anyway. Date/Author: 2026-11-17, agent, at the coordinator's request.
-- Decision: the drive names its owner (`state/workspace-id`), and a wake's claim says the drive
-  was laid out before (`SUPERSET_SANDBOX_DRIVE_LAID_OUT`); only a provision's claim does not.
-  Rationale: this needs no new column, and a wake is always of a workspace whose provision laid
-  the drive out. A provision that failed before the first layout leaves a workspace whose wakes
-  refuse with `drive.unlaid`; it never had work to lose. Date/Author: 2026-11-17, agent.
+- Decision: the drive names its owner (`state/workspace-id`, synced), and the row records the
+  first boot that laid the drive out (`cloud_workspaces.drive_laid_out_at`, migration 0197). A
+  wake's claim says the drive was laid out before (`SUPERSET_SANDBOX_DRIVE_LAID_OUT`) only once
+  that column is set. Rationale: the earlier rule (every wake claims it) made a workspace whose
+  first session died before its layout refuse every wake as `drive.unlaid`, and a create that met a
+  transient mount failure could only fail. Replaces the rule of 2026-11-17 morning.
+  Date/Author: 2026-11-17, agent, at the coordinator's request.
+- Decision: a drive refusal is retried, not failed: the box is stopped and the next wake or the
+  user's first open mounts the drive afresh. A refusal no remount can change (`drive.foreign`,
+  `drive.unlaid`, `drive.downgrade`, or host-service up without a layout) ends after 3 boots in a
+  row, counted from the boot log, with the workspace `failed` and a Sentry report.
+  Date/Author: 2026-11-17, agent.
+- Decision: an unarchived workspace reuses its drive when it still exists; the teardown job reads
+  the rows before every destructive call and keeps what a live row names. A drive forked afresh
+  clears `drive_laid_out_at`. Date/Author: 2026-11-17, agent.
+- Decision: the control plane does not refuse to pin a pre-drive bundle to a workspace with a
+  drive. Rationale: nothing records which bundle shas know the drive, and both sides already
+  refuse: the boot will not reexec into a script without the drive-contract line, and a boot that
+  answers without `drive.layout` is never treated as ready. Date/Author: 2026-11-17, agent.
+- Decision: the kill switch is the organization flag, read at provision and promote. It cannot
+  stop forks inside an environment already in drive mode without leaving their workspaces empty,
+  so a provision with the flag off gives the workspace no drive at all, and its box clones and
+  installs onto the root disk. Date/Author: 2026-11-17, agent.
 - Decision: do not migrate existing workspaces. See Migration. Date/Author: 2026-11-16, agent;
   confirmed out of scope 2026-11-17.
 - Decision (rejected): wake by forking the golden. A wake would fork the environment's golden
@@ -389,8 +407,16 @@ another region.
   `drive.unlaid` and exits non-zero before the bundle, host-service and the checkout. The control
   plane reads the boot log every 2 s while it waits for host-service and throws
   `SandboxDriveMissingError`, a `SandboxNotReadyError`: the wake stops the box and answers "still
-  starting", and the next wake mounts the drive afresh. Nothing marks the workspace `failed`: the
-  data is intact.
+  starting", and the next wake mounts the drive afresh; a create records the box asleep instead
+  of failing it. Only this boot's lines count (the boot id on `boot.start`). A refusal no remount
+  can change ends after 3 boots in a row: the workspace goes `failed` with the reason, Sentry gets
+  it, and the box and drive are kept.
+- A pinned bundle whose boot script predates the drive: a drive-mode boot refuses
+  (`drive.downgrade`) before it would reexec into it.
+- An unclean stop (host-service killed, writers still running): the real check's probe requires
+  the box to boot with `host.db` passing `integrity_check` and the checkout passing `git fsck`.
+  A cold wake, one the snapshot cache did not serve, cannot be forced from the check; its wake
+  times are warm.
 - host-service answers without a `drive.layout` stamp for a workspace with a drive (a pinned
   bundle older than the layout): the same retryable error, so its empty `/workspace` is never
   shown as ready.
@@ -408,20 +434,47 @@ never shown as their work.
 
 | Invariant | Enforced in | Test |
 | --- | --- | --- |
-| A wake never gives a workspace a drive its row does not name; only a provision consults the environment. | `claimedDriveIdentity` (`drives.ts`) via `buildSandboxClaim({ provisioning })` (`claim.ts`); `wake()` mounts `workspaceDriveMounts(row.driveName)` (`wake.ts`) | `claim.test.ts` "an existing workspace gets no drive on a wake when its environment enters drive mode"; `wake.test.ts` "a workspace without a drive is woken with no mounts" |
+| A wake never gives a workspace a drive its row does not name; only a provision consults the environment, and only with the organization's flag on. | `claimedWorkspaceDrive` (`drives.ts`) via `buildSandboxClaim({ provisioning })` (`claim.ts`); `wake()` mounts `workspaceDriveMounts(row.driveName)` (`wake.ts`) | `claim.test.ts` "an existing workspace gets no drive on a wake…", "with the organization's flag off a new workspace gets no drive…"; `wake.test.ts` "a workspace without a drive is woken with no mounts" |
 | A box whose identity names a drive starts nothing that reads `/workspace` unless that drive is mounted. | `layout_drive` in `superset-boot` (`drive.missing`) | boot-twice "drive missing: …" (4 checks) |
-| The mounted drive is this workspace's. | `layout_drive` (`drive.foreign`, `drive.unlaid`, owner written at first layout); `SUPERSET_SANDBOX_DRIVE_LAID_OUT` on every wake claim | boot-twice "drive foreign", "drive empty", "the drive names its workspace"; `claim.test.ts` "a wake of a workspace with a drive expects it laid out" |
+| The mounted drive is this workspace's. | `layout_drive` (`drive.foreign`; `drive.unlaid` when `SUPERSET_SANDBOX_DRIVE_LAID_OUT` is set); the owner is written and synced at the first layout; a wake's claim sets the key only once `cloud_workspaces.drive_laid_out_at` is set | boot-twice "drive foreign", "drive empty", "the drive names its workspace"; `claim.test.ts` "a wake expects the drive laid out only once the row recorded a boot that laid it out" |
+| A laid-out drive is recorded durably. | `recordDriveLaidOut` (`drive-laid-out.ts`) after a settle that saw `drive.layout`, in `provision.ts` and `wake.ts`; a fresh fork at provision clears it | `provision.test.ts` "records the drive laid out once the boot answered" |
+| A drive-mode boot never runs a boot script that predates the drive. | the `drive-contract` line and the `drive.downgrade` refusal before the reexec in `superset-boot` | boot-twice "drive, older boot script: refused before the reexec, nothing checked out" |
 | The control plane never treats a box with a drive as ready unless its boot laid the drive out. | `settleSandbox` (`vercel.ts`) requires `drive.layout` | `vercel.test.ts` "a boot that answers without laying the drive out fails the settle" |
-| A drive refusal is retryable, is found within about 2 s, and never fails the workspace. | `SandboxDriveMissingError extends SandboxNotReadyError`; `waitForHostService` polls `driveRefusalIn`; `wakeSandbox` stops the box | `vercel.test.ts` "a refused boot is a retryable not-ready, found without the full host wait"; `driveRefusalIn` test |
-| In drive mode, what describes the drive's contents is on the drive: checkout markers, `host.db` and its WAL, `agent-launched`, the owner. | `use_drive_state` in `superset-boot`; `SANDBOX_PATHS.driveState` | boot-twice "host.db and the checkout markers are on the drive, not the root disk", "drive, root rolled back" |
-| The checkout never deletes or overwrites a non-empty checkout on a drive. | `checkout_one` drive-mode branches | boot-twice "drive, marker lost: the branch is kept", "drive, fetch failed: nothing on the drive is replaced" |
-| Flag-off boxes run main's checkout code exactly. | `checkout_one` `else` branch | boot-twice first and second boot of the plain box; the diff against main |
-| A home subtree is never seeded partially. | `seed_home_subtree` (copy to `<sub>.seeding`, then `mv -T`) | boot-twice layout checks only; a failed copy is not simulated |
+| A drive refusal is read from this boot only, found within about 2 s, and retried by the next wake or create; one no remount can change ends after 3 boots in a row with a clear `failed` and a Sentry report. | `runBoot` boot id, `driveRefusalIn`, `persistentDriveRefusals`, `SandboxDriveMissingError` (a not-ready), `SandboxDriveRefusedError` (an unavailable), `DRIVE_REFUSAL_LIMIT`; `wakeSandbox` stops the box; `provision.ts` records it asleep | `vercel.test.ts` "only this boot's lines count…", "a reexec's second boot.start joins its boot", "counts the persistent refusals in a row…", "a refused boot is a retryable not-ready…", "a refusal no remount can change ends the retries…"; `provision.test.ts` "a drive refusal at create leaves the workspace asleep…" |
+| In drive mode, what describes the drive's contents is on the drive: checkout markers, `host.db` and its WAL, `agent-launched`, the owner. | `use_drive_state` in `superset-boot`; `SANDBOX_PATHS.driveState` | boot-twice "host.db and the checkout markers are on the drive, not the root disk", "drive, root rolled back"; real check "unclean stop: host.db passes integrity_check" |
+| A drive laid out before is never replaced by the checkout. | `checkout_one` with `drive_has_work` | boot-twice "drive, marker lost: the branch is kept", "drive, fetch failed: nothing on the drive is replaced" |
+| A fresh fork checks out its own branch as main does. | `SUPERSET_DRIVE_FRESH` from `layout_drive`, kept across the reexec | boot-twice "fresh fork, new branch", "fresh fork, a branch the golden has", "fresh fork, fetch failed" |
+| Flag-off boxes run main's checkout code exactly. | `checkout_one` `else` branches | boot-twice first and second boot of the plain box; the diff against main |
+| A home subtree is never seeded partially. | `seed_home_subtree` (copy to `<sub>.seeding`, then `mv -T`; a failed copy refuses the boot) | boot-twice layout checks only; a failed copy is not simulated |
 | One read-write session per drive, and a concurrent wake of the same box does not wait. | `waitForDriveDetached` with `heldByCaller` in `wakeSandbox` | `vercel.test.ts` "a stopped box waits for its drive…", "a drive a concurrent wake already resumed this box with is not foreign"; `drives.test.ts` wait tests |
-| A box is stopped and its drive detached before either is deleted, and no request waits for a detach. | `teardownSandbox`, `deleteSandboxAndDriveLater` (`teardown.ts`), route `/api/cloud-workspaces/teardown` | `teardown.test.ts` (4 tests) |
+| A box is stopped and its drive detached before either is deleted. Deletes never wait in a request, except promote, which must wait for the source's drive before it can fork it. | `teardownSandbox`, `deleteSandboxAndDriveLater` (`teardown.ts`), route `/api/cloud-workspaces/teardown`; promote's two detach waits (up to 2 minutes each) inside the 300 s tRPC route | `teardown.test.ts` "stops the box, waits for its drive, then deletes…" |
+| A teardown never deletes what a live workspace or environment names. | `liveReferences` (`teardown-guard.ts`), read before each destructive call | `teardown.test.ts` "a box a revived workspace runs on is left alone", "an unarchived workspace's new box keeps the drive…" |
+| A failed provision deletes only a drive it forked. | `forkedDrive` in `provision.ts` | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |
+| No teardown failure is silent. | `teardownSandbox` reports to Sentry and requeues any failure; giving up is a Sentry error | `teardown.test.ts` "any other failure is retried, not dropped", "gives up after the last attempt…" |
+| A drive nothing names is found and, on request, deleted. | `drive-sweep.ts` (`orphanDrives`), Sandbox workflow `run: drive-sweep`, dry run unless `drive_sweep_delete` | `drive-sweep.test.ts` |
 | A failed promote leaks neither the golden nor its drive. | `abandonGolden` (`environment.ts`) | `environment.test.ts` "hands the golden and its forked drive to the retried teardown" |
-| A golden carries no workspace identity, on the root disk or the drive. | `inheritedIdentityPaths` (includes `SANDBOX_PATHS.driveState`) | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive" |
+| A golden carries no workspace identity, on the root disk or the drive, and is stripped only with its drive mounted. | `inheritedIdentityPaths` (includes `SANDBOX_PATHS.driveState`); `stripWorkspaceIdentity` checks `mountpoint` and the exit code | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive", "a golden whose drive did not mount is not stripped and fails the promote" |
+| Turning the flag off stops new drives. | `buildSandboxClaim` (provision) and `environment.promote` consult `workspaceDrivesEnabled`; the release writes `golden_drive_name = null` | `claim.test.ts` "with the organization's flag off…"; `environment.test.ts` "a workspace whose files are on a drive does not spread drive mode…" |
+| Released clients see the same outputs as before this branch. | `withClientStatus` drops `driveName`, `driveLaidOutAt`; `publicEnvironment` drops `goldenDriveName` | `client-status.test.ts` "never carries the drive columns…"; `environment.test.ts` "the output never carries the golden drive…" |
 | The drive mount and the agent-tools mount survive each other's updates. | `composeMounts`, `wakeSandbox` | `vercel.test.ts` "the drive and the agent-tools drive share one mounts object", "an agent-tools update keeps the drive the box already has" |
+
+
+## Rollback
+
+1. Turn `cloud-workspace-drives` off for the organization. From then on a new workspace gets no
+   drive, even in an environment in drive mode: its box clones and installs onto the root disk, as
+   before drives existed, and so is slower to create. Promote refuses a workspace whose files are
+   on a drive. The next release builds the golden without a drive and writes
+   `golden_drive_name = null`, which takes the environment out of drive mode.
+2. Existing workspaces with a drive keep it and keep working: their data lives there. Nothing
+   moves it back to the root disk; such a workspace is archived and recreated if it must leave
+   drive mode.
+3. Drives that nothing names any more: dispatch the Sandbox workflow with `run: drive-sweep`,
+   read the list, then run it again with `drive_sweep_delete`.
+4. Code rollback: revert the branch's commits. Rows with `drive_name` keep their column, and no
+   pre-drive boot script may run over a laid-out drive (`drive.downgrade`), so workspaces with a
+   drive refuse to boot instead of showing an empty `/workspace`. Archive them before such a
+   revert.
 
 
 ## Follow-ups (out of scope)
@@ -430,7 +483,11 @@ never shown as their work.
 - Migrating existing workspaces.
 - Customer environments' checkpoints through `superset environments replace` beyond what promote
   already covers.
-- A drive variable in `Asleep.tla`.
+- A drive variable in `Asleep.tla`: not needed. No status write is new: a create that meets a
+  drive refusal stops the box and records it asleep, which is `StopBox` and `StopRecord`; a wake
+  that stops a refused box writes no status, so the row sees it as `Crash`; a persistent refusal
+  marks the workspace failed through `markSandboxUnavailable`, as a gone box does. The model
+  passes unchanged (1,624,931 states) and the broken config still fails.
 - Environment builds (#9282): `activateGolden` must move `source_ref` and `golden_drive_name`
   together, in one row update, the way promote and the release do. A golden and a drive from two
   different builds would give every new workspace a checkout that does not match its root disk.

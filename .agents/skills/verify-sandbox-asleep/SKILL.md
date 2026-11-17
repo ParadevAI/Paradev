@@ -31,19 +31,19 @@ one TLC worker, so a failure always prints the shortest trace. A pass takes abou
 
 ## Coverage record
 
-Synced with commit `623b52bf4`. Paths are under `packages/trpc/src/`.
+Synced with commit `b7e0cc77`. Paths are under `packages/trpc/src/`.
 
 | Action | Code |
 | --- | --- |
 | `ProvisionDone` | `provisionCloudWorkspace` in `router/cloud-workspace/provision.ts`: `provisionSandbox`, the transition to `awake`, then `recordSandboxAwake` |
 | `WakeResume` / `WakeRecord` | `wakeCloudWorkspace` in `router/cloud-workspace/wake.ts`: `wakeSandbox` in `lib/sandbox/vercel.ts`, then `recordSandboxAwake` in `router/cloud-workspace/sandbox-expiry.ts` |
 | `TopUpExtend` / `TopUpRecord` | `sandbox.keepalive` in `router/sandbox/sandbox.ts`: `topUpSandboxSession`, then `recordSandboxAwake` |
-| `StopBox` / `StopRecord` | `stopAndSnapshot` or `stopSandbox`, then `recordSandboxAsleep` in `router/cloud-workspace/sandbox-sleep.ts`, from `cloudWorkspace.sleep` (`cloud-workspace.ts`), `restartCloudWorkspace` (`wake.ts`), and the spend-cap stops in `meter.ts` (`settleBoot`, `settleOrganizationNow`, the refused adopt in `adoptRunningBoxes`) |
+| `StopBox` / `StopRecord` | `stopAndSnapshot` or `stopSandbox`, then `recordSandboxAsleep` in `router/cloud-workspace/sandbox-sleep.ts`, from `cloudWorkspace.sleep` (`cloud-workspace.ts`), `restartCloudWorkspace` (`wake.ts`), a create whose drive refused (`provision.ts`, after its transition to `awake`), and the spend-cap stops in `meter.ts` (`settleBoot`, `settleOrganizationNow`, the refused adopt in `adoptRunningBoxes`) |
 | `WatchFire` | `watchSandboxExpiry` in `sandbox-expiry.ts`, queued by `queueWatch` through `publishCloudWorkspaceJob` (`jobs.ts`), served by `apps/api/src/app/api/cloud-workspaces/sandbox-expiry/route.ts` |
 | `ReconcileList` / `ReconcileApply` | `reconcileCloudWorkspaces` in `sandbox-expiry.ts`: `listActiveWorkspaceSandboxes`, then `syncSandboxExpiries` against each listing's `currentSessionId` |
 | `Archive` | `cloudWorkspace.delete` in `cloud-workspace.ts`: the transition to `archived`, then `queueReap` |
 | `Reap` | the stop stage of `reapArchivedCloudWorkspace` in `reap.ts`, and the `queueReap` fallback that stops at once when the stop cannot be queued. Both call `recordSandboxAsleep`, which on an archived row writes only the expiry and session id |
-| `Tick` / `Crash` | Vercel ends a session at its timeout, or a session fails on its own |
+| `Tick` / `Crash` | Vercel ends a session at its timeout, or a session fails on its own. A wake that stops a box whose drive refused (`wakeSandbox`) writes no status, so the row sees it as a crash |
 | `CAS` | `stillStoppedSession` in `sandbox-sleep.ts` (asleep writes) and the new-session rule in `markAwake` (awake writes) |
 
 When you add, remove or reorder a writer, change its action here and in `Asleep.tla`, run both
