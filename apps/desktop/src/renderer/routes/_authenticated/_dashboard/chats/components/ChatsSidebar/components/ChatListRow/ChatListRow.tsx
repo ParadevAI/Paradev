@@ -1,8 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
 import type { ChatRow } from "@superset/chats-core";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+} from "@superset/ui/context-menu";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
-import { LuMessageCircleQuestion, LuPin } from "react-icons/lu";
+import { LuMessageCircleQuestion, LuPin, LuTrash2 } from "react-icons/lu";
 import { listTime } from "../../../../utils/listTime";
 import { ChatFace } from "../../../ChatFace";
 
@@ -13,6 +19,9 @@ interface ChatListRowProps {
 	/** A Dev is working in this chat. */
 	isWorking: boolean;
 	onOpen: (chatId: string) => void;
+	/** What deleting this chat is called, when the viewer may delete it. */
+	deleteLabel: string | null;
+	onDelete: (chatId: string) => void;
 }
 
 /**
@@ -26,10 +35,12 @@ export const ChatListRow = memo(function ChatListRow({
 	isActive,
 	isWorking,
 	onOpen,
+	deleteLabel,
+	onDelete,
 }: ChatListRowProps) {
 	const { t } = useLingui();
 	const needsYou = row.unread > 0 || !!row.asking;
-	return (
+	const button = (
 		<button
 			type="button"
 			aria-current={isActive ? "page" : undefined}
@@ -90,5 +101,20 @@ export const ChatListRow = memo(function ChatListRow({
 				</span>
 			</span>
 		</button>
+	);
+	if (!deleteLabel) return button;
+	return (
+		<ContextMenu>
+			<ContextMenuTrigger asChild>{button}</ContextMenuTrigger>
+			<ContextMenuContent>
+				<ContextMenuItem
+					variant="destructive"
+					onSelect={() => onDelete(row.chat.id)}
+				>
+					<LuTrash2 />
+					{deleteLabel}
+				</ContextMenuItem>
+			</ContextMenuContent>
+		</ContextMenu>
 	);
 });

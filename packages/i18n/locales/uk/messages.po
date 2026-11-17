@@ -6842,6 +6842,9 @@ msgstr "Видалити {0}?"
 msgid "Delete {name}?"
 msgstr "Видалити {name}?"
 
+msgid "Delete {title}?"
+msgstr "Видалити {title}?"
+
 msgid "Delete account"
 msgstr "Видалити обліковий запис"
 

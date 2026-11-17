@@ -6848,6 +6848,9 @@ msgstr "{0} silinsin mi?"
 msgid "Delete {name}?"
 msgstr "{name} silinsin mi?"
 
+msgid "Delete {title}?"
+msgstr "{title} silinsin mi?"
+
 msgid "Delete account"
 msgstr "Hesabı sil"
 

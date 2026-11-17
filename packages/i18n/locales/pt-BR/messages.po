@@ -6848,6 +6848,9 @@ msgstr "Excluir {0}?"
 msgid "Delete {name}?"
 msgstr "Excluir {name}?"
 
+msgid "Delete {title}?"
+msgstr "Excluir {title}?"
+
 msgid "Delete account"
 msgstr "Excluir conta"
 

@@ -6848,6 +6848,9 @@ msgstr "Xóa {0}?"
 msgid "Delete {name}?"
 msgstr "Xóa {name}?"
 
+msgid "Delete {title}?"
+msgstr "Xóa {title}?"
+
 msgid "Delete account"
 msgstr "Xóa tài khoản"
 

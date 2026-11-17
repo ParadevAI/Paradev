@@ -6848,6 +6848,9 @@ msgstr "Hapus {0}?"
 msgid "Delete {name}?"
 msgstr "Hapus {name}?"
 
+msgid "Delete {title}?"
+msgstr "Hapus {title}?"
+
 msgid "Delete account"
 msgstr "Hapus akun"
 

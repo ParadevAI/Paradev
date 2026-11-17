@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
-import { chatRows } from "@superset/chats-core";
+import { chatRows, directDev } from "@superset/chats-core";
+import { workingGroupIds } from "@superset/chats-sync";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
@@ -7,6 +8,7 @@ import { useNow } from "renderer/hooks/useNow";
 import { useChats } from "../../hooks/useChats";
 import { ChatListRow } from "./components/ChatListRow";
 import { ChatsSection } from "./components/ChatsSection";
+import { DeleteChatDialog } from "./components/DeleteChatDialog";
 import { NewDevDialog } from "./components/NewDevDialog";
 import { NewGroupDialog } from "./components/NewGroupDialog";
 
@@ -21,6 +23,7 @@ export function ChatsSidebar() {
 	const matchRoute = useMatchRoute();
 	const now = useNow(NOW_TICK_MS);
 	const [dialog, setDialog] = useState<"group" | "agent" | null>(null);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
 	const state = chats?.state ?? null;
 	const agents = useMemo(() => (state ? chatRows(state, "devs") : []), [state]);
 	const groups = useMemo(
@@ -36,6 +39,30 @@ export function ChatsSidebar() {
 	);
 	if (!chats || !state) return null;
 
+	const working = workingGroupIds(chats.turns);
+	const deleting = state.chats.find((chat) => chat.id === deletingId) ?? null;
+	const deleteLabelOf = (chat: (typeof state.chats)[number]) => {
+		if (chat.kind === "group") {
+			return chat.ownerIds.includes(state.meId)
+				? t({ message: "Delete group" })
+				: null;
+		}
+		const dev = directDev(state, chat);
+		return dev?.kind === "custom" && dev.ownerId === state.meId
+			? t({ message: "Delete Dev" })
+			: null;
+	};
+	const confirmDelete = async () => {
+		if (!deleting) return;
+		setDeletingId(null);
+		const dev = deleting.kind === "direct" ? directDev(state, deleting) : null;
+		const deleted = dev
+			? await chats.actions.deleteAgent(dev.id)
+			: await chats.actions.deleteGroup(deleting.id);
+		if (deleted && deleting.id === activeChatId)
+			void navigate({ to: "/chats" });
+	};
+
 	const rows = (list: typeof agents) =>
 		list.map((row) => (
 			<ChatListRow
@@ -43,8 +70,10 @@ export function ChatsSidebar() {
 				row={row}
 				now={now}
 				isActive={row.chat.id === activeChatId}
-				isWorking={false}
+				isWorking={working.has(row.chat.id)}
 				onOpen={open}
+				deleteLabel={deleteLabelOf(row.chat)}
+				onDelete={setDeletingId}
 			/>
 		));
 
@@ -66,6 +95,21 @@ export function ChatsSidebar() {
 			>
 				{rows(groups)}
 			</ChatsSection>
+			<DeleteChatDialog
+				chat={
+					deleting
+						? {
+								title:
+									deleting.kind === "direct"
+										? (directDev(state, deleting)?.name ?? deleting.title)
+										: deleting.title,
+								kind: deleting.kind,
+							}
+						: null
+				}
+				onCancel={() => setDeletingId(null)}
+				onConfirm={() => void confirmDelete()}
+			/>
 			<NewGroupDialog
 				open={dialog === "group"}
 				onOpenChange={(next) => setDialog(next ? "group" : null)}

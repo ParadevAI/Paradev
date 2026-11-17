@@ -6848,6 +6848,9 @@ msgstr "Eliminare {0}?"
 msgid "Delete {name}?"
 msgstr "Eliminare {name}?"
 
+msgid "Delete {title}?"
+msgstr "Eliminare {title}?"
+
 msgid "Delete account"
 msgstr "Elimina l'account"
 

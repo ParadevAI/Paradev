@@ -6848,6 +6848,9 @@ msgstr "Smazat {0}?"
 msgid "Delete {name}?"
 msgstr "Smazat {name}?"
 
+msgid "Delete {title}?"
+msgstr "Smazat {title}?"
+
 msgid "Delete account"
 msgstr "Smazat účet"
 

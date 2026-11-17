@@ -6848,6 +6848,9 @@ msgstr "{0}을(를) 삭제할까요?"
 msgid "Delete {name}?"
 msgstr "{name}을(를) 삭제할까요?"
 
+msgid "Delete {title}?"
+msgstr "{title}을(를) 삭제할까요?"
+
 msgid "Delete account"
 msgstr "계정 삭제"
 
