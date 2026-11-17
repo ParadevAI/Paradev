@@ -28,12 +28,16 @@ import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components
 import { StateScreenShell } from "renderer/routes/_authenticated/_dashboard/components/StateScreenShell";
 import { ChatFace } from "../../../components/ChatFace";
 import { useChats } from "../../../hooks/useChats";
-import { WorkspacePreviewProvider } from "../../providers/WorkspacePreviewProvider";
+import {
+	type Preview,
+	WorkspacePreviewProvider,
+} from "../../providers/WorkspacePreviewProvider";
 import { ChatComposer } from "../ChatComposer";
 import { ChatDetailsPanel } from "../ChatDetailsPanel";
 import { ChatThread } from "../ChatThread";
 import { MessageDetailsPanel } from "../MessageDetailsPanel";
 import type { MessageActions } from "../MessageItem";
+import { PagePanel } from "../PagePanel";
 import { WorkspaceChatPanel } from "../WorkspaceChatPanel";
 
 const NOW_TICK_MS = 30_000;
@@ -52,11 +56,24 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const [previewedWorkspaceId, setPreviewedWorkspaceId] = useState<
 		string | null
 	>(null);
-	const previewWorkspace = useCallback((workspaceId: string) => {
-		setShowsDetails(false);
-		setDetailsOf(null);
-		setPreviewedWorkspaceId(workspaceId);
-	}, []);
+	const [previewedPage, setPreviewedPage] = useState<string | null>(null);
+	const preview = useMemo<Preview>(
+		() => ({
+			openWorkspace: (workspaceId) => {
+				setShowsDetails(false);
+				setDetailsOf(null);
+				setPreviewedPage(null);
+				setPreviewedWorkspaceId(workspaceId);
+			},
+			openPage: (slug) => {
+				setShowsDetails(false);
+				setDetailsOf(null);
+				setPreviewedWorkspaceId(null);
+				setPreviewedPage(slug);
+			},
+		}),
+		[],
+	);
 	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
 	const state = chats?.state ?? null;
@@ -125,6 +142,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 				dispatch?.({ type: "answer-form", questionId, answers }),
 			details: (message) => {
 				setPreviewedWorkspaceId(null);
+				setPreviewedPage(null);
 				setShowsDetails(false);
 				setDetailsOf(message.id);
 			},
@@ -227,6 +245,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						aria-expanded={showsDetails}
 						onClick={() => {
 							setPreviewedWorkspaceId(null);
+							setPreviewedPage(null);
 							setDetailsOf(null);
 							setShowsDetails((shown) => !shown);
 						}}
@@ -240,7 +259,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					</button>
 					<div className="drag h-full flex-1 basis-0" />
 				</PageHeader>
-				<WorkspacePreviewProvider value={previewWorkspace}>
+				<WorkspacePreviewProvider value={preview}>
 					<ChatThread
 						state={state}
 						chatId={chatId}
@@ -331,6 +350,12 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					key={previewedWorkspaceId}
 					workspaceId={previewedWorkspaceId}
 					onClose={() => setPreviewedWorkspaceId(null)}
+				/>
+			)}
+			{previewedPage && (
+				<PagePanel
+					slug={previewedPage}
+					onClose={() => setPreviewedPage(null)}
 				/>
 			)}
 			{detailedMessage && live && (

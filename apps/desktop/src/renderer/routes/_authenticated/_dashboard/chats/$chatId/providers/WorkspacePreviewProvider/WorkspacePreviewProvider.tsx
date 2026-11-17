@@ -1,11 +1,14 @@
 import { createContext, useContext } from "react";
 
-const WorkspacePreviewContext = createContext<
-	((workspaceId: string) => void) | null
->(null);
+/** Opens something a message links to beside the thread. */
+export interface Preview {
+	openWorkspace: (workspaceId: string) => void;
+	openPage: (slug: string) => void;
+}
 
-/** Opens a workspace's chat beside the thread, for what the thread renders into. */
-export const WorkspacePreviewProvider = WorkspacePreviewContext.Provider;
+const PreviewContext = createContext<Preview | null>(null);
 
-/** Null where there is no place to preview a workspace: a link then opens it whole. */
-export const useWorkspacePreview = () => useContext(WorkspacePreviewContext);
+export const WorkspacePreviewProvider = PreviewContext.Provider;
+
+/** Null where there is no place to preview: a link then opens its target whole. */
+export const usePreview = () => useContext(PreviewContext);

@@ -14041,6 +14041,9 @@ msgstr "Відкрити на GitHub"
 msgid "Open OpenAI's device sign-in page."
 msgstr "Відкрийте сторінку входу з пристрою OpenAI."
 
+msgid "Open page"
+msgstr "Відкрити сторінку"
+
 msgid "Open Page in Default Browser"
 msgstr "Відкрити сторінку в браузері за замовчуванням"
 

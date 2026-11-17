@@ -1,4 +1,5 @@
 export {
-	useWorkspacePreview,
+	type Preview,
+	usePreview,
 	WorkspacePreviewProvider,
 } from "./WorkspacePreviewProvider";

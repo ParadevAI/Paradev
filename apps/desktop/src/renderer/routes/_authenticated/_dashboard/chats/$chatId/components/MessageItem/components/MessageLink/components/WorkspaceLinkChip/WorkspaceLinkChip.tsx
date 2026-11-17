@@ -4,7 +4,7 @@ import { LuFolderGit2 } from "react-icons/lu";
 import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { useWorkspacePreview } from "../../../../../../providers/WorkspacePreviewProvider";
+import { usePreview } from "../../../../../../providers/WorkspacePreviewProvider";
 import { useMessageAuthorDevId } from "../../../../providers/MessageAuthorDevProvider";
 
 interface WorkspaceLinkChipProps {
@@ -23,7 +23,7 @@ export function WorkspaceLinkChip({
 	children,
 }: WorkspaceLinkChipProps) {
 	const navigate = useNavigate();
-	const preview = useWorkspacePreview();
+	const preview = usePreview();
 	const devId = useMessageAuthorDevId();
 	const { workspaces } = useHostWorkspaces();
 	const workspace = workspaces.find((row) => row.id === workspaceId);
@@ -39,7 +39,7 @@ export function WorkspaceLinkChip({
 			href={href}
 			onClick={(event) => {
 				event.preventDefault();
-				if (preview) preview(workspaceId);
+				if (preview) preview.openWorkspace(workspaceId);
 				else void navigateToV2Workspace(workspaceId, navigate);
 			}}
 			className="my-0.5 inline-flex max-w-full items-center gap-2 rounded-lg bg-background/50 py-1 pr-2.5 pl-1.5 align-middle text-sm text-foreground no-underline transition-colors hover:bg-background/80"

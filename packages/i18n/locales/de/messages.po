@@ -14047,6 +14047,9 @@ msgstr "Auf GitHub öffnen"
 msgid "Open OpenAI's device sign-in page."
 msgstr "Öffne die Geräteanmeldung von OpenAI."
 
+msgid "Open page"
+msgstr "Seite öffnen"
+
 msgid "Open Page in Default Browser"
 msgstr "Seite im Standardbrowser öffnen"
 
