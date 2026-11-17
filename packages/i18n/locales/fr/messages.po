@@ -9724,8 +9724,8 @@ msgstr "Limite de requêtes GitHub atteinte"
 msgid "GitHub refused the merge"
 msgstr "GitHub a refusé la fusion"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Dépôts GitHub contenant un fichier de marketplace de plugins. Superset synchronise leurs plugins dans votre organisation."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Dépôts GitHub contenant un fichier de marketplace de plugins. Paradev synchronise leurs plugins dans votre organisation."
 
 msgid "GitHub sign-in needed"
 msgstr "Connexion à GitHub requise"
@@ -14814,6 +14814,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev agit sur GitHub en votre nom. Connectez votre compte GitHub pour fusionner, commenter et mettre à jour des pull requests."
+
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
 
@@ -14963,6 +14966,9 @@ msgstr "Démo de Paradev Pages"
 
 msgid "Paradev Plugins"
 msgstr "Plugins Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev le lit avec votre compte GitHub connecté. Si ce n'est pas encore fait, connectez-en un dans <0>Paramètres › Intégrations</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev tourne en local sur les machines de vos développeurs. Nous ne stockons ni votre code ni vos conversations avec l'IA, et Paradev a passé un audit SOC 2 Type II auprès d'un auditeur indépendant. Demandez le rapport et consultez notre documentation sécurité sur {trustHost}."
@@ -15232,8 +15238,8 @@ msgstr "Choisissez un emplacement de projet"
 msgid "Pick a reason"
 msgstr "Choisissez un motif"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Choisissez un dépôt contenant un fichier de marketplace de plugins. Superset synchronise ses plugins maintenant et à chaque nouvelle synchronisation."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Choisissez un dépôt contenant un fichier de marketplace de plugins. Paradev synchronise ses plugins maintenant et à chaque nouvelle synchronisation."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Choisissez un son ou ajoutez le vôtre. Les sons personnalisés acceptent .mp3, .wav et .ogg."
@@ -15902,11 +15908,11 @@ msgstr "Pull requests"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Les pull requests au-dessus resteront ouvertes et GitHub changera leur cible."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Les pull requests, commentaires et pushes depuis Superset sont faits en votre nom."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Les pull requests, commentaires et pushes depuis Paradev sont faits en votre nom."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Les pull requests, commentaires et pushes depuis Superset ne seront plus faits en votre nom."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Les pull requests, commentaires et pushes depuis Paradev ne seront plus faits en votre nom."
 
 msgid "Purple"
 msgstr "Violet"
@@ -19707,9 +19713,6 @@ msgstr "remplacée"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset agit sur GitHub en votre nom. Connectez votre compte GitHub pour fusionner, commenter et mettre à jour des pull requests."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp affiche un point de terminaison pour ce volet uniquement. Pointez Playwright ou browser-use dessus."
 
@@ -19718,9 +19721,6 @@ msgstr "Superset s'appelle désormais Paradev. Au passage, nous avons levé 11,5
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile arrive sur iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset le lit avec votre compte GitHub connecté. Si ce n'est pas encore fait, connectez-en un dans <0>Paramètres › Intégrations</0>."
 
 msgid "Supervised"
 msgstr "Supervisé"
