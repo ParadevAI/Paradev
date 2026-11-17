@@ -39,7 +39,6 @@ export function httpRunner(keys: () => Promise<BoxKeys>): RunnerClient {
 					plugins: [],
 					ownerOneToOne: turn.ownerOneToOne,
 					devAsk: turn.devAsk,
-					...(turn.devAsk ? {} : { canBackground: true }),
 					...(turn.checkReply ? { checkReply: true } : {}),
 					chat: turn.chat,
 				},

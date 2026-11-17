@@ -849,6 +849,17 @@ export async function postDevMessage(
 	) {
 		return false;
 	}
+	const [repeat] = await db
+		.select({ id: chatsMessages.id })
+		.from(chatsMessages)
+		.where(
+			and(
+				eq(chatsMessages.turnId, turn.id),
+				eq(chatsMessages.text, input.text),
+			),
+		)
+		.limit(1);
+	if (repeat) return true;
 	const [message] = await db
 		.insert(chatsMessages)
 		.values({

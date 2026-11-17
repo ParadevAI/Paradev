@@ -158,6 +158,10 @@ test("a box replies and settles its Dev's turn, and the turn is given the chat",
 	expect((await fromBox(turn, "/cli/reply", { text: "hi back" })).status).toBe(
 		201,
 	);
+	// The same reply sent again in the turn is posted once.
+	expect((await fromBox(turn, "/cli/reply", { text: "hi back" })).status).toBe(
+		201,
+	);
 	const settled = await fromBox(turn, `/cli/turns/${turn.turnId}/settled`, {
 		stopReason: "end_turn",
 		answer: "",
