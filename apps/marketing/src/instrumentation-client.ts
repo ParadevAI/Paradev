@@ -1,4 +1,5 @@
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
+import { enrichMarketingAttribution } from "@superset/shared/marketing-attribution";
 
 import { env } from "@/env";
 import { declineAnalytics } from "@/lib/analytics/decline";
@@ -32,6 +33,7 @@ async function initPosthog() {
 		persistence: "cookie",
 		persistence_name: POSTHOG_COOKIE_NAME,
 		disable_session_recording: true,
+		before_send: (event) => enrichMarketingAttribution(event, posthog),
 		loaded: (posthog) => {
 			const consent = localStorage.getItem(ANALYTICS_CONSENT_KEY);
 			if (consent === "declined") {

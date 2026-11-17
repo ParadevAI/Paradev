@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { POSTHOG_COOKIE_NAME } from "@superset/shared/constants";
+import { enrichMarketingAttribution } from "@superset/shared/marketing-attribution";
 import {
 	SENTRY_DENY_URLS,
 	SENTRY_IGNORE_ERRORS,
@@ -22,7 +23,8 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	person_profiles: "always",
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
-	before_send: sanitizePosthogEvent,
+	before_send: (event) =>
+		enrichMarketingAttribution(sanitizePosthogEvent(event), posthog),
 });
 
 registerBaseProperties();

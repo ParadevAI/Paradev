@@ -1,6 +1,7 @@
 "use client";
 
 import { authClient } from "@superset/auth/client";
+import { applyMarketingPersonProperties } from "@superset/shared/marketing-attribution";
 import posthog from "posthog-js";
 import { useEffect } from "react";
 import { registerBaseProperties } from "@/lib/posthog-client";
@@ -33,6 +34,7 @@ export function PostHogUserIdentifier() {
 				email: user.email,
 				name: user.name,
 			});
+			applyMarketingPersonProperties(posthog);
 		}
 	}, [session, isPending, error]);
 
