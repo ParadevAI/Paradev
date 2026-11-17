@@ -1373,6 +1373,20 @@
       "when": 1794806184119,
       "tag": "0195_cloud_workspace_status_archived",
       "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1794867838685,
+      "tag": "0196_workspace_drive_names",
+      "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1794954139727,
+      "tag": "0197_cloud_workspace_drive_laid_out",
+      "breakpoints": true
     }
   ]
 }

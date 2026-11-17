@@ -1,0 +1,1 @@
+ALTER TABLE "cloud_workspaces" ADD COLUMN "drive_laid_out_at" timestamp with time zone;
