@@ -95,6 +95,7 @@ import type {
 	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
+	PromptInputCommand,
 	PromptInputLayout,
 	PromptInputProps,
 } from "../../types";
@@ -113,6 +114,7 @@ import { $isInCode } from "../../utils/isInCode";
 import {
 	$commandTokenStart,
 	$textAfterCaret,
+	type CommandTokenMatch,
 	matchCommandToken,
 } from "../../utils/matchCommandToken";
 import { rankCommands } from "../../utils/rankCommands";
@@ -163,6 +165,21 @@ const FOOTER_BUTTONS: Record<
 
 const INLINE_CONTEXT_BUTTON_CLASS =
 	"size-7 rounded-full bg-secondary hover:bg-secondary/80 disabled:hover:bg-secondary";
+
+function rankForToken(
+	commands: PromptInputCommand[],
+	token: Pick<CommandTokenMatch, "leading" | "sigil">,
+	query: string,
+): PromptInputCommand[] {
+	const eligible = token.leading
+		? commands
+		: commands.filter(
+				(command) =>
+					command.inline &&
+					(token.sigil === "/" || command.title.startsWith(token.sigil)),
+			);
+	return rankCommands(eligible, query, { prefixOnly: !token.leading });
+}
 
 export type ComposerBodyProps = Required<
 	Pick<PromptInputProps, "placeholder" | "status" | "layout">
@@ -541,19 +558,7 @@ export function ComposerBody({
 	);
 
 	const rankedCommands = useMemo(
-		() =>
-			rankCommands(
-				commandToken.leading
-					? (commands ?? [])
-					: (commands ?? []).filter(
-							(command) =>
-								command.inline &&
-								(commandToken.sigil === "/" ||
-									command.title.startsWith(commandToken.sigil)),
-						),
-				commandQuery ?? "",
-				{ prefixOnly: !commandToken.leading },
-			),
+		() => rankForToken(commands ?? [], commandToken, commandQuery ?? ""),
 		[commands, commandQuery, commandToken],
 	);
 	const commandOptions = useMemo(
@@ -1177,6 +1182,13 @@ export function ComposerBody({
 					const match = $isInCode()
 						? null
 						: matchCommandToken(text, $commandTokenStart(), $textAfterCaret());
+					if (
+						match &&
+						rankForToken(commands ?? [], match, match.matchingString).length ===
+							0
+					)
+						// Lexical keeps a matched menu's arrow keys even when it shows nothing.
+						return null;
 					if (match) {
 						const { leading, sigil } = match;
 						setCommandToken((current) =>

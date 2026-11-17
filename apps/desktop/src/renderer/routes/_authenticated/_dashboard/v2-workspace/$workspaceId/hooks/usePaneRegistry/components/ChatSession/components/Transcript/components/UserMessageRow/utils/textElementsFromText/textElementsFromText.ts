@@ -4,7 +4,7 @@ import { findMcpServerTokens } from "../../../../../../utils/mcpServerChips";
 
 const encoder = new TextEncoder();
 const SKILL_NAME = /(^|\s)([\w-]+:[\w:-]*\w)(?=$|[\s.,!?;)])/g;
-const COMMAND_TOKEN = /(^|\s)([/$][\w:-]*\w)(?=$|[\s.,!?;)])/g;
+const COMMAND_TOKEN = /(^|\s)([/$][\w:.-]*\w)(?=$|[\s.,!?;)])/g;
 
 function byteOffset(text: string, index: number): number {
 	return encoder.encode(text.slice(0, index)).length;

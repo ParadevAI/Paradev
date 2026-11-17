@@ -86,5 +86,8 @@ export function $textAfterCaret(): string {
 	if (!$isRangeSelection(selection)) return "";
 	const node = selection.anchor.getNode();
 	if (!$isTextNode(node)) return "";
-	return node.getTextContent().slice(selection.anchor.offset);
+	const after = node.getTextContent().slice(selection.anchor.offset);
+	if (after) return after;
+	const next = node.getNextSibling();
+	return $isTextNode(next) ? next.getTextContent() : "";
 }
