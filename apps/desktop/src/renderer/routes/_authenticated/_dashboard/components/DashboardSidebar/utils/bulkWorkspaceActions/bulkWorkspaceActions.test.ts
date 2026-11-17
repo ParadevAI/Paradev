@@ -1,5 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { workspaceIdsForSectionMove } from "./bulkWorkspaceActions";
+import {
+	splitBulkRemovalTargets,
+	workspaceIdsForSectionMove,
+} from "./bulkWorkspaceActions";
 
 describe("workspaceIdsForSectionMove", () => {
 	const sectionByWorkspaceId = new Map([
@@ -25,5 +28,18 @@ describe("workspaceIdsForSectionMove", () => {
 				null,
 			),
 		).toEqual(["one", "two"]);
+	});
+});
+
+describe("splitBulkRemovalTargets", () => {
+	it("archives cloud workspaces and deletes the rest", () => {
+		const local = { id: "local", hostType: "local-device" };
+		const remote = { id: "remote", hostType: "remote-device" };
+		const cloud = { id: "cloud", hostType: "cloud" };
+
+		expect(splitBulkRemovalTargets([local, cloud, remote])).toEqual({
+			deletable: [local, remote],
+			archivable: [cloud],
+		});
 	});
 });

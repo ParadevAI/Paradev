@@ -82,9 +82,9 @@ export function useArchiveCloudWorkspace() {
 		});
 	};
 
-	return (id: string) => {
+	return (id: string, archivedWithIds?: ReadonlySet<string>) => {
 		if (archiving.includes(id)) return;
-		const target = navigateAwayFromWorkspace(id);
+		const target = navigateAwayFromWorkspace(id, archivedWithIds);
 		// Unarchive only succeeds once the row is archived, so the undo waits
 		// for the server.
 		mutateAsync({ id })

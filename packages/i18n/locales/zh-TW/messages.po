@@ -798,6 +798,9 @@ msgstr "{appName} Mobile屬於專業版"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile在你連線的電腦上執行代理程式。"
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {歸檔#個雲端工作區} other {歸檔#個雲端工作區}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落後main #個提交，需要變基} other {落後main #個提交，需要變基}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {新增了#個提交} other {新增了#個提交}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {已建立#個工作區} other {已建立#個工作區}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {刪除#個工作區} other {刪除#個工作區}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {剩餘 # 天}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {你的帳戶已停用，將在#天後被永久刪除。重新啟用即可恢復到你離開時的狀態。} other {你的帳戶已停用，將在#天後被永久刪除。重新啟用即可恢復到你離開時的狀態。}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {刪除#個工作區} other {刪除#個工作區}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3081,6 +3084,9 @@ msgstr "封存環境"
 
 msgid "Archive failed"
 msgstr "封存失敗"
+
+msgid "Archive selected cloud workspaces"
+msgstr "歸檔選中的雲端工作區"
 
 msgid "Archive this automation before you delete it."
 msgstr "請先歸檔此自動化，再刪除它。"
