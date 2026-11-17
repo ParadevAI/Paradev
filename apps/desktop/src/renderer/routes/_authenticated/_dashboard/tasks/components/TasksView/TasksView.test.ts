@@ -125,6 +125,5 @@ describe("Tasks and pull requests navigation", () => {
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");
 		}
-
 	});
 });

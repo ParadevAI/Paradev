@@ -9459,8 +9459,8 @@ msgstr "Batas laju GitHub tercapai"
 msgid "GitHub refused the merge"
 msgstr "GitHub menolak merge-nya"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Repositori GitHub dengan file marketplace plugin. Superset menyinkronkan plugin-pluginnya ke organisasi Anda."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Repositori GitHub dengan file marketplace plugin. Paradev menyinkronkan plugin-pluginnya ke organisasi Anda."
 
 msgid "GitHub sign-in needed"
 msgstr "Perlu masuk ke GitHub"
@@ -14462,6 +14462,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev bertindak di GitHub atas nama Anda. Hubungkan akun GitHub Anda untuk menggabungkan, mengomentari, dan memperbarui pull request."
+
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
 
@@ -14608,6 +14611,9 @@ msgstr "Demo Halaman Paradev"
 
 msgid "Paradev Plugins"
 msgstr "Plugin Paradev"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Paradev telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di {trustHost}."
@@ -14870,8 +14876,8 @@ msgstr "Pilih lokasi proyek"
 msgid "Pick a reason"
 msgstr "Pilih alasan"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Pilih repositori dengan file marketplace plugin. Superset menyinkronkan plugin-pluginnya sekarang dan setiap kali Anda menyinkronkan lagi."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Pilih repositori dengan file marketplace plugin. Paradev menyinkronkan plugin-pluginnya sekarang dan setiap kali Anda menyinkronkan lagi."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Pilih suara atau tambahkan milik Anda sendiri. Audio kustom mendukung .mp3, .wav, dan .ogg."
@@ -15519,11 +15525,11 @@ msgstr "Pull Request"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Pull request di atasnya tetap terbuka dan GitHub akan mengubah targetnya."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Pull request, komentar, dan push dari Superset dibuat atas nama Anda."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Pull request, komentar, dan push dari Paradev dibuat atas nama Anda."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Pull request, komentar, dan push dari Superset tidak lagi dibuat atas nama Anda."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Pull request, komentar, dan push dari Paradev tidak lagi dibuat atas nama Anda."
 
 msgid "Purple"
 msgstr "Ungu"
@@ -19250,9 +19256,6 @@ msgstr "digantikan"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset bertindak di GitHub atas nama Anda. Hubungkan akun GitHub Anda untuk menggabungkan, mengomentari, dan memperbarui pull request."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp mencetak endpoint hanya untuk panel itu. Arahkan Playwright atau browser-use ke sana."
 
@@ -19261,9 +19264,6 @@ msgstr "Superset kini menjadi Paradev. Oh ya, kami juga meraih pendanaan awal se
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile hadir di iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
 
 msgid "Supervised"
 msgstr "Diawasi"

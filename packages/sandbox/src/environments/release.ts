@@ -43,9 +43,14 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_ROOT_CHECKOUT,
 	type SandboxIdentity,
+	sandboxAgentToolsDrive,
 	sandboxCheckoutDir,
 } from "@superset/shared/sandbox/contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
+import {
+	DEFAULT_SANDBOX_REGION,
+	isSandboxRegionId,
+	type SandboxRegionId,
+} from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 // The provisioning code imports the API env schema; an operator running this
@@ -146,6 +151,39 @@ log(
 );
 await publishBundle(bundle, { dry: false });
 log(`bundle: ${bundle.sha256} published`);
+
+// 1b. the bundle's agent-tools drive in every region with an environment,
+// before any row points at the bundle so no box mounts one mid-write. Boxes
+// fail open to the image's agents, so a failed publish only warns.
+const agentTools = await import("../agent-tools");
+const driveHost = agentTools.vercelDriveHost(credentials);
+async function environmentRegions(): Promise<SandboxRegionId[]> {
+	const { db } = await import("@superset/db/client");
+	const rows = await db.query.environments.findMany({
+		columns: { region: true },
+		where: (row, { isNull: unset }) => unset(row.archivedAt),
+	});
+	return [
+		...new Set(
+			[REGION, ...rows.map((row) => row.region)].filter(isSandboxRegionId),
+		),
+	];
+}
+for (const region of await environmentRegions()) {
+	try {
+		const { drive, outcome } = await agentTools.publishAgentToolsDrive({
+			host: driveHost,
+			region,
+			bundleSha: bundle.sha256,
+			assets: bundle.assets,
+		});
+		log(`agent-tools: ${drive} ${outcome}`);
+	} catch (error) {
+		console.log(
+			`::warning::agent-tools: ${region} not published; its boxes keep the image's agents: ${String(error).slice(0, 300)}`,
+		);
+	}
+}
 
 // 2. image
 const candidateTag = `release-${bundle.sha256.slice(0, 12)}`;
@@ -563,6 +601,26 @@ if (!previous)
 	log(
 		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
 	);
+
+try {
+	const live = await db.query.environments.findMany({
+		columns: { region: true, bundleSha: true },
+		where: (row, { isNull: unset }) => unset(row.archivedAt),
+	});
+	const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
+		host: driveHost,
+		referenced: new Set(
+			live.map((row) => sandboxAgentToolsDrive(row.region, row.bundleSha)),
+		),
+	});
+	log(
+		`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
+	);
+} catch (error) {
+	console.log(
+		`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
+	);
+}
 
 if (
 	previous &&

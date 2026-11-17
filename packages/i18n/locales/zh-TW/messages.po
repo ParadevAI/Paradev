@@ -9459,8 +9459,8 @@ msgstr "已達到 GitHub 速率限制"
 msgid "GitHub refused the merge"
 msgstr "GitHub拒絕了此次合併"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "包含外掛市集檔案的 GitHub 儲存庫。Superset 會將其中的外掛同步到你的組織。"
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "包含外掛市集檔案的 GitHub 儲存庫。Paradev 會將其中的外掛同步到你的組織。"
 
 msgid "GitHub sign-in needed"
 msgstr "需要登入 GitHub"
@@ -14462,6 +14462,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev 以你的身分在 GitHub 上操作。連接你的 GitHub 帳戶以合併、留言和更新拉取請求。"
+
 msgid "Paradev Agent"
 msgstr "Paradev代理程式"
 
@@ -14608,6 +14611,9 @@ msgstr "Paradev 頁面示範"
 
 msgid "Paradev Plugins"
 msgstr "Paradev 外掛"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev 會使用你已連結的 GitHub 帳號讀取它。如果尚未連結，請在<0>設定 › 整合</0>中連結。"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev在你的開發者機器上本地執行。我們不儲存你的程式碼或AI對話，並且Paradev已通過獨立審計機構的SOC 2 Type II審計。可在{trustHost}索取報告並查閱我們的安全文件。"
@@ -14870,8 +14876,8 @@ msgstr "請選擇專案位置"
 msgid "Pick a reason"
 msgstr "選擇原因"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "選擇一個包含外掛市集檔案的儲存庫。Superset 會立即同步其外掛，並在你每次重新同步時再次同步。"
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "選擇一個包含外掛市集檔案的儲存庫。Paradev 會立即同步其外掛，並在你每次重新同步時再次同步。"
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "選擇一個聲音或新增自己的。自訂音訊支援.mp3、.wav和.ogg。"
@@ -15519,11 +15525,11 @@ msgstr "拉取請求"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "其上的拉取請求將保持開啟，GitHub 會變更它們的目標分支。"
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "來自 Superset 的拉取請求、留言和推送以你的身分進行。"
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "來自 Paradev 的拉取請求、留言和推送以你的身分進行。"
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "來自 Superset 的拉取請求、留言和推送將不再以你的身分進行。"
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "來自 Paradev 的拉取請求、留言和推送將不再以你的身分進行。"
 
 msgid "Purple"
 msgstr "紫色"
@@ -19250,9 +19256,6 @@ msgstr "已被取代"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset 以你的身分在 GitHub 上操作。連接你的 GitHub 帳戶以合併、留言和更新拉取請求。"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp 只會輸出該窗格專屬的端點。讓 Playwright 或 browser-use 連接它即可。"
 
@@ -19261,9 +19264,6 @@ msgstr "Superset 現已更名為 Paradev。另外，我們完成了 1,150 萬美
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile 登上 iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset 會使用你已連結的 GitHub 帳號讀取它。如果尚未連結，請在<0>設定 › 整合</0>中連結。"
 
 msgid "Supervised"
 msgstr "監督"

@@ -9459,8 +9459,8 @@ msgstr "GitHub のレート制限に達しました"
 msgid "GitHub refused the merge"
 msgstr "GitHubがマージを拒否しました"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "プラグインのマーケットプレイスファイルを含む GitHub リポジトリです。Superset はそのプラグインを組織に同期します。"
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "プラグインのマーケットプレイスファイルを含む GitHub リポジトリです。Paradev はそのプラグインを組織に同期します。"
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub へのサインインが必要です"
@@ -14462,6 +14462,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev はあなたとして GitHub を操作します。プルリクエストのマージ、コメント、更新を行うには GitHub アカウントを接続してください。"
+
 msgid "Paradev Agent"
 msgstr "Paradevエージェント"
 
@@ -14608,6 +14611,9 @@ msgstr "Paradev ページのデモ"
 
 msgid "Paradev Plugins"
 msgstr "Paradev プラグイン"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradevは開発者のマシン上でローカルに動作します。コードやAIとの会話を当社が保存することはありません。また、Paradevは独立監査人によるSOC 2 Type II監査を完了しています。レポートのご請求やセキュリティ関連ドキュメントの確認は{trustHost}から行えます。"
@@ -14870,8 +14876,8 @@ msgstr "プロジェクトの場所を選択してください"
 msgid "Pick a reason"
 msgstr "理由を選択"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "プラグインのマーケットプレイスファイルを含むリポジトリを選んでください。Superset は今すぐ、そして再同期するたびにプラグインを同期します。"
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "プラグインのマーケットプレイスファイルを含むリポジトリを選んでください。Paradev は今すぐ、そして再同期するたびにプラグインを同期します。"
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "サウンドを選ぶか、独自の音声を追加してください。カスタム音声は.mp3、.wav、.ogg対応です。"
@@ -15519,11 +15525,11 @@ msgstr "プルリクエスト"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "上にあるプルリクエストは開いたままになり、GitHub がマージ先を変更します。"
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset からのプルリクエスト、コメント、プッシュはあなたとして行われます。"
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev からのプルリクエスト、コメント、プッシュはあなたとして行われます。"
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset からのプルリクエスト、コメント、プッシュは、あなたとして行われなくなります。"
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev からのプルリクエスト、コメント、プッシュは、あなたとして行われなくなります。"
 
 msgid "Purple"
 msgstr "紫"
@@ -19250,9 +19256,6 @@ msgstr "置き換え済み"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset はあなたとして GitHub を操作します。プルリクエストのマージ、コメント、更新を行うには GitHub アカウントを接続してください。"
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp は、そのペイン専用のエンドポイントを出力します。Playwrightやbrowser-useをそこに向けてください。"
 
@@ -19261,9 +19264,6 @@ msgstr "Superset は Paradev になりました。あと、1,150万ドルのシ�
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile が iPhone で登場"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset は接続済みの GitHub アカウントで読み取ります。まだの場合は<0>設定 › 連携</0>で接続してください。"
 
 msgid "Supervised"
 msgstr "監督付き"

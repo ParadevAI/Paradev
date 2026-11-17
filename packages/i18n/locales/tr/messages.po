@@ -9459,8 +9459,8 @@ msgstr "GitHub istek sınırına ulaşıldı"
 msgid "GitHub refused the merge"
 msgstr "GitHub birleştirmeyi reddetti"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Eklenti pazar yeri dosyası olan GitHub depoları. Superset bunların eklentilerini kuruluşunuza eşitler."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Eklenti pazar yeri dosyası olan GitHub depoları. Paradev bunların eklentilerini kuruluşunuza eşitler."
 
 msgid "GitHub sign-in needed"
 msgstr "GitHub oturumu açmanız gerekiyor"
@@ -14462,6 +14462,9 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev, GitHub'da sizin adınıza işlem yapar. Pull request'leri birleştirmek, yorumlamak ve güncellemek için GitHub hesabınızı bağlayın."
+
 msgid "Paradev Agent"
 msgstr "Paradev Ajanı"
 
@@ -14608,6 +14611,9 @@ msgstr "Paradev Sayfalar demosu"
 
 msgid "Paradev Plugins"
 msgstr "Paradev Eklentileri"
+
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
 
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev, geliştiricilerinizin makinelerinde yerel olarak çalışır. Kodunuzu veya AI konuşmalarınızı saklamayız ve Paradev, bağımsız bir denetçiyle SOC 2 Type II denetimini tamamlamıştır. Raporu talep edin ve güvenlik belgelerimizi {trustHost} adresinde inceleyin."
@@ -14870,8 +14876,8 @@ msgstr "Bir proje konumu seçin"
 msgid "Pick a reason"
 msgstr "Bir neden seçin"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Eklenti pazar yeri dosyası olan bir depo seçin. Superset eklentilerini şimdi ve her yeniden eşitlemenizde eşitler."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Eklenti pazar yeri dosyası olan bir depo seçin. Paradev eklentilerini şimdi ve her yeniden eşitlemenizde eşitler."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Bir ses seçin veya kendinizinkini ekleyin. Özel ses .mp3, .wav ve .ogg destekler."
@@ -15519,11 +15525,11 @@ msgstr "Pull request'ler"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Üstteki pull request'ler açık kalır ve GitHub hedeflerini değiştirir."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Superset'ten yapılan pull request'ler, yorumlar ve push'lar sizin adınıza yapılır."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Paradev'den yapılan pull request'ler, yorumlar ve push'lar sizin adınıza yapılır."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Superset'ten yapılan pull request'ler, yorumlar ve push'lar artık sizin adınıza yapılmayacak."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Paradev'den yapılan pull request'ler, yorumlar ve push'lar artık sizin adınıza yapılmayacak."
 
 msgid "Purple"
 msgstr "Mor"
@@ -19250,9 +19256,6 @@ msgstr "geçersiz kılındı"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset, GitHub'da sizin adınıza işlem yapar. Pull request'leri birleştirmek, yorumlamak ve güncellemek için GitHub hesabınızı bağlayın."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp yalnızca o bölme için bir uç nokta yazdırır. Playwright'ı veya browser-use'u ona yönlendirin."
 
@@ -19261,9 +19264,6 @@ msgstr "Superset artık Paradev. Bir de 11,5 milyon dolarlık tohum yatırımı 
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile iPhone'da yayında"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset bunu bağlı GitHub hesabınızla okur. Henüz bağlamadıysanız <0>Ayarlar › Entegrasyonlar</0> bölümünden bir hesap bağlayın."
 
 msgid "Supervised"
 msgstr "Gözetimli"

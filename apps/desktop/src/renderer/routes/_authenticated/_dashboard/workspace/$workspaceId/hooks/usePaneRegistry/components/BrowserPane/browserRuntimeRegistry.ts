@@ -183,7 +183,7 @@ export class BrowserRuntimeRegistryImpl {
 			onData: ({ paneIds }: { paneIds: string[] }) => {
 				this.agentActivePaneIds = new Set(paneIds);
 				for (const [paneId, entry] of this.entries) {
-					if (!entry.visible) this.applyParkedStyle(paneId, entry);
+					this.applyPresentedStyle(paneId, entry);
 				}
 				// A session ending can leave more hidden webviews than the budget
 				// allows (they were exempt while attached) — sweep again.
@@ -226,7 +226,7 @@ export class BrowserRuntimeRegistryImpl {
 
 	private applyPointerPassthrough(passthrough: boolean) {
 		for (const entry of this.entries.values()) {
-			if (!entry.visible) continue;
+			if (!this.isShown(entry)) continue;
 			entry.webview.style.pointerEvents = passthrough ? "none" : "auto";
 		}
 	}
@@ -238,6 +238,21 @@ export class BrowserRuntimeRegistryImpl {
 			? "none"
 			: "auto";
 		entry.overlay.style.visibility = "visible";
+	}
+
+	// A pane can be mounted inside a closed sidebar, where its placeholder is
+	// hidden but the hoisted webview would still paint.
+	private applyPresentedStyle(paneId: string, entry: RegistryEntry): void {
+		if (this.isShown(entry)) this.applyShownStyle(entry);
+		else this.applyParkedStyle(paneId, entry);
+	}
+
+	private isShown(entry: RegistryEntry): boolean {
+		return (
+			entry.visible &&
+			entry.placeholder !== null &&
+			getComputedStyle(entry.placeholder).visibility !== "hidden"
+		);
 	}
 
 	private updateLayout(entry: RegistryEntry) {
@@ -267,11 +282,7 @@ export class BrowserRuntimeRegistryImpl {
 		for (const [paneId, entry] of this.entries) {
 			if (!entry.placeholder || !entry.visible) continue;
 			this.updateLayout(entry);
-			if (getComputedStyle(entry.placeholder).visibility === "hidden") {
-				this.applyParkedStyle(paneId, entry);
-			} else {
-				this.applyShownStyle(entry);
-			}
+			this.applyPresentedStyle(paneId, entry);
 		}
 	}
 
@@ -639,8 +650,7 @@ export class BrowserRuntimeRegistryImpl {
 		observer.observe(placeholder);
 		entry.resizeObserver = observer;
 
-		this.applyShownStyle(entry);
-		this.applyPointerPassthrough(pointerPassthrough.active);
+		this.applyPresentedStyle(paneId, entry);
 	}
 
 	detach(paneId: string): void {
@@ -724,6 +734,10 @@ export class BrowserRuntimeRegistryImpl {
 				this.scheduleHiddenEviction();
 			}
 		}
+	}
+
+	getWorkspaceId(paneId: string): string | null {
+		return this.entries.get(paneId)?.workspaceId ?? null;
 	}
 
 	private touch(paneId: string): void {
