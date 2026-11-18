@@ -31,7 +31,6 @@ import { eq, sql } from "drizzle-orm";
 
 const BATCH = 500;
 const HALF_MICRO = 0.0000005;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 const { values } = parseArgs({
 	options: {
@@ -150,25 +149,20 @@ type Totals = Record<
 function totalBy(key: (row: InsertCloudUsageEvent) => string): Totals {
 	const totals: Totals = {};
 	for (const row of rows) {
-		const total = (totals[key(row)] ??= {
-			rows: 0,
-			gbMinutes: 0,
-			cpuMinutes: 0,
-		});
+		const total = totals[key(row)] ?? { rows: 0, gbMinutes: 0, cpuMinutes: 0 };
+		totals[key(row)] = total;
 		total.rows += 1;
 		total[row.feature === "box_gb_minutes" ? "gbMinutes" : "cpuMinutes"] +=
 			Number(row.amount);
 	}
 	return totals;
 }
-const day = (at: number | Date) =>
-	new Date(Math.floor(new Date(at).getTime() / DAY_MS) * DAY_MS)
-		.toISOString()
-		.slice(0, 10);
+const day = (at: number | Date) => new Date(at).toISOString().slice(0, 10);
 const untiedBy: Record<string, { events: number; total: number }> = {};
 for (const event of untied) {
 	const key = `${event.customerId} ${day(event.timestamp)} ${event.featureId}`;
-	const total = (untiedBy[key] ??= { events: 0, total: 0 });
+	const total = untiedBy[key] ?? { events: 0, total: 0 };
+	untiedBy[key] = total;
 	total.events += 1;
 	total.total += event.value;
 }
