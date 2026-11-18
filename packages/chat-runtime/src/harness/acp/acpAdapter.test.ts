@@ -1104,6 +1104,7 @@ describe("AcpAdapter", () => {
 		await flush();
 		adapter.prompt([{ type: "text", text: "first" }]);
 		await flush();
+		const before = itemsOf(events).length;
 		agent.notify("sess-1", {
 			sessionUpdate: "notice",
 			severity: "warning",
@@ -1117,12 +1118,17 @@ describe("AcpAdapter", () => {
 		});
 		await flush();
 
-		expect(itemsOf(events).filter((i) => i.kind === "notice")).toMatchObject([
+		expect(itemsOf(events).slice(before)).toMatchObject([
 			{
+				kind: "notice",
 				noticeKind: "info",
 				text: "Fast mode is off: It is not available for this model.",
 			},
-			{ noticeKind: "error", text: "MCP server github failed to start" },
+			{
+				kind: "notice",
+				noticeKind: "error",
+				text: "MCP server github failed to start",
+			},
 		]);
 		await adapter.dispose();
 	});
@@ -2360,6 +2366,40 @@ describe("AcpAdapter on protocol v2", () => {
 		});
 		await flush();
 		expect(steered).toBe(false);
+		await adapter.dispose();
+	});
+
+	it("an agent exit cancels a running compaction and releases a steer held on it", async () => {
+		const agent = new FakeAcpAgent();
+		agent.insertOnPrompt = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		await flush();
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(steered).toBeUndefined();
+
+		agent.exit(1);
+		await flush();
+		expect(steered).toBe(false);
+		expect(
+			itemsOf(events)
+				.filter((i) => i.id === "compaction:c1")
+				.at(-1),
+		).toMatchObject({
+			text: "Conversation history compaction was canceled",
+			completedAtMs: expect.any(Number),
+		});
 		await adapter.dispose();
 	});
 
@@ -3758,6 +3798,41 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("a steer waiting on a compaction is released when an autonomous turn ends", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		const { adapter } = startAdapter(agent);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_spawned",
+			asyncTaskId: "autonomous-turn-1",
+			name: "Claude is working",
+			taskType: "turn",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		await flush();
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(steered).toBeUndefined();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "async_task_state_update",
+			asyncTaskId: "autonomous-turn-1",
+			state: "completed",
+		});
+		await flush();
+		expect(steered).toBe(false);
+		await adapter.dispose();
+	});
+
 	it("stops a turn the agent started on its own through its async task", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
@@ -4202,6 +4277,51 @@ describe("AcpAdapter on protocol v2", () => {
 		agent.notify("sess-1", {
 			sessionUpdate: "agent_message_chunk",
 			content: { type: "text", text: "Answer." },
+		});
+		cycleEnds();
+		await flush();
+		expect(awaiting()).toEqual([true, false, true]);
+
+		await adapter.dispose();
+	});
+
+	it("counts a compaction as the steered cycle's activity", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "spawn a helper" }]);
+		await flush();
+		const awaiting = () =>
+			sessionsOf(events)
+				.filter((session) => session.awaitingBackground !== undefined)
+				.map((session) => session.awaitingBackground);
+		const cycleEnds = () =>
+			agent.notify("sess-1", {
+				sessionUpdate: "usage_update",
+				used: 10,
+				size: 100,
+				cost: { amount: 0.01, currency: "USD" },
+			});
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Helper",
+			task: "Help",
+		});
+		cycleEnds();
+		await flush();
+		await adapter.steer([{ type: "text", text: "and this" }]);
+		cycleEnds();
+		await flush();
+		expect(awaiting()).toEqual([true, false]);
+
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
 		});
 		cycleEnds();
 		await flush();

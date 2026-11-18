@@ -85,7 +85,7 @@ export class SessionStream {
 	private readonly planItems = new Map<string, number>();
 	private readonly compactions = new Map<
 		string,
-		{ notice: Notice; turnId: string; error?: string }
+		{ compactionId: string; notice: Notice; turnId: string; error?: string }
 	>();
 
 	constructor(private readonly options: SessionStreamOptions) {}
@@ -204,6 +204,17 @@ export class SessionStream {
 			parsed.data.status,
 			parsed.data.error,
 			turnId,
+		);
+	}
+
+	cancelCompaction(itemId: string): void {
+		const compaction = this.compactions.get(itemId);
+		if (!compaction || compaction.notice.completedAtMs !== undefined) return;
+		this.setCompaction(
+			compaction.compactionId,
+			"cancelled",
+			undefined,
+			compaction.turnId,
 		);
 	}
 
@@ -571,6 +582,7 @@ export class SessionStream {
 		};
 		const pinnedTurnId = prior?.turnId ?? turnId;
 		this.compactions.set(id, {
+			compactionId,
 			notice,
 			turnId: pinnedTurnId,
 			...(reason ? { error: reason } : {}),

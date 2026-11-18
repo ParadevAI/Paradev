@@ -341,6 +341,9 @@ const MAIN_AGENT_ACTIVITY = new Set([
 	"tool_call_content_chunk",
 	"plan",
 	"plan_update",
+	"notice",
+	"compaction_update",
+	"compaction_summary_chunk",
 ]);
 
 function isApprovalOptionKind(
@@ -1555,6 +1558,8 @@ export class AcpAdapter implements HarnessAdapter {
 
 	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */
 	private endCompactions(): void {
+		if (!this.disposed)
+			for (const itemId of this.compactions) this.main.cancelCompaction(itemId);
 		this.compactions.clear();
 		this.settleCompactions?.();
 		this.settleCompactions = null;
@@ -2078,6 +2083,7 @@ export class AcpAdapter implements HarnessAdapter {
 		this.autonomousTurns.delete(asyncTaskId);
 		const turn = this.currentTurn;
 		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.endCompactions();
 		this.main.flush();
 		this.emitTurn({
 			...turn,
@@ -2569,6 +2575,7 @@ export class AcpAdapter implements HarnessAdapter {
 			this.finishSubagent(sessionId, "failed");
 		}
 		this.backgroundTasks.clear();
+		this.endCompactions();
 		const message = `acp agent exited (code ${code ?? "null"})`;
 		if (this.stderrTail) console.warn(`[acp] ${message}\n${this.stderrTail}`);
 		if (this.currentTurn?.status === "running") {
