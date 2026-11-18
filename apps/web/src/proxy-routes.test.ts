@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+	adminReturnUrl,
 	agentsRewriteUrl,
 	isAgentsRoute,
 	isAuthPageRoute,
@@ -152,5 +153,52 @@ describe("agentsRewriteUrl", () => {
 		expect(url.href).toBe(
 			"https://superset-agents.vercel.app/agents/workspace/abc?tab=chat",
 		);
+	});
+});
+
+describe("adminReturnUrl", () => {
+	const admin = "https://admin.example.com";
+
+	test("keeps a URL on exactly the admin origin, path and query", () => {
+		expect(adminReturnUrl(`${admin}/hiring/1?tab=x`, admin)?.href).toBe(
+			`${admin}/hiring/1?tab=x`,
+		);
+		expect(
+			adminReturnUrl(`${admin}/hiring`, `${admin}/ignored/path`),
+		).not.toBeNull();
+	});
+
+	test.each([
+		null,
+		"",
+		"/hiring",
+		"//admin.example.com/x",
+		"https://evil.example/x",
+		"https://evil.example@admin.example.com/x",
+		"https://admin.example.com@evil.example/x",
+		"https://admin.example.com:8443/x",
+		"http://admin.example.com/x",
+		"https://admin.example.com.evil.example/x",
+		"https://evil-admin.example.com/x",
+		"https://sub.admin.example.com/x",
+		"https://other.example.com/x",
+		"https:\\\\evil.example\\x",
+		"https:/\\evil.example/x",
+		"javascript:alert(1)",
+		"data:text/html,x",
+	])("rejects %s", (redirect) => {
+		expect(adminReturnUrl(redirect, admin)).toBeNull();
+	});
+
+	test("a backslash after the host stays on the admin origin", () => {
+		const url = adminReturnUrl(
+			"https://admin.example.com\\@evil.example/x",
+			admin,
+		);
+		expect(url?.href).toBe(`${admin}/@evil.example/x`);
+	});
+
+	test("matches nothing when no admin URL is configured", () => {
+		expect(adminReturnUrl(`${admin}/x`, undefined)).toBeNull();
 	});
 });

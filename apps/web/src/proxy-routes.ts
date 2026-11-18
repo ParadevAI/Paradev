@@ -52,6 +52,22 @@ export function safeRedirectUrl(
 	return url;
 }
 
+/** An absolute URL on exactly the admin origin: no other host, port, scheme or userinfo. */
+export function adminReturnUrl(
+	redirect: string | null,
+	adminUrl: string | undefined,
+): URL | null {
+	if (!redirect || !adminUrl) return null;
+	let url: URL;
+	try {
+		url = new URL(redirect);
+	} catch {
+		return null;
+	}
+	const sameOrigin = url.origin === new URL(adminUrl).origin;
+	return sameOrigin && !url.username && !url.password ? url : null;
+}
+
 export function isAgentsRoute(pathname: string): boolean {
 	return matchesRouteOrChild(pathname, "/agents");
 }
