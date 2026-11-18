@@ -9,7 +9,7 @@ import {
 	type LucideIcon,
 	User,
 } from "lucide-react";
-import type { FeatureFlags } from "../../../../../../../../providers/FeatureFlagsProvider";
+import type { FeatureFlags } from "@/app/(app)/providers/FeatureFlagsProvider";
 
 export interface NavItem {
 	href: string;

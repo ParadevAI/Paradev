@@ -12,6 +12,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@superset/ui/table";
+import { cn } from "@superset/ui/utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTRPC } from "@/trpc/react";
@@ -79,7 +80,9 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 									row.ref && "status" in row.ref ? row.ref : null;
 								return (
 									<TableRow key={row.key ?? ""}>
-										<TableCell className="max-w-48 whitespace-normal">
+										<TableCell
+											className={cn("whitespace-normal", isAdmin && "max-w-48")}
+										>
 											{workspace ? (
 												<button
 													type="button"

@@ -46,7 +46,7 @@ export function UsageTotals({ total, showGbHours }: UsageTotalsProps) {
 		<dl
 			className={cn(
 				"grid gap-px overflow-hidden rounded-md border bg-border",
-				tiles.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4",
+				showGbHours ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3",
 			)}
 		>
 			{tiles.map((tile) => (

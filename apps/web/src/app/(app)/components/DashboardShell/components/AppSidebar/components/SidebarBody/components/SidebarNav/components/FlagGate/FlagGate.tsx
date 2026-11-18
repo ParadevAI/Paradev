@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import {
 	type FeatureFlags,
 	useFeatureFlag,
-} from "../../../../../../../../../../providers/FeatureFlagsProvider";
+} from "@/app/(app)/providers/FeatureFlagsProvider";
 
 export function FlagGate({
 	flag,

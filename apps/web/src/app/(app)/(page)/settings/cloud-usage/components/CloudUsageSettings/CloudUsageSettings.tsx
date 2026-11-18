@@ -64,22 +64,24 @@ export function CloudUsageSettings({
 						)}
 					</p>
 				</div>
-				<div className="flex w-full items-center gap-2 sm:w-auto">
-					{period && periods.data && (
-						<PeriodPicker
-							periods={periods.data.items}
-							value={period.id}
-							onChange={setPeriodId}
-						/>
-					)}
-					{isOwner && (
-						<Button variant="outline" asChild>
-							<Link href="/settings/billing">
-								<Trans>Billing</Trans>
-							</Link>
-						</Button>
-					)}
-				</div>
+				{(period || isOwner) && (
+					<div className="flex w-full items-center gap-2 sm:w-auto">
+						{period && periods.data && (
+							<PeriodPicker
+								periods={periods.data.items}
+								value={period.id}
+								onChange={setPeriodId}
+							/>
+						)}
+						{isOwner && (
+							<Button variant="outline" asChild>
+								<Link href="/settings/billing">
+									<Trans>Billing</Trans>
+								</Link>
+							</Button>
+						)}
+					</div>
+				)}
 			</div>
 
 			{periods.data && !period && (
