@@ -156,6 +156,20 @@ export function TabBar<TData>({
 	const tabsTrackRef = useRef<HTMLDivElement>(null);
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
 	const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTabId);
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const [tabWidthHold, setTabWidthHold] = useState<{
+		width: number;
+		tabCount: number;
+	} | null>(null);
+	const [previousTabCount, setPreviousTabCount] = useState(tabs.length);
+	if (previousTabCount !== tabs.length) {
+		setPreviousTabCount(tabs.length);
+		if (tabs.length > previousTabCount) setTabWidthHold(null);
+	}
+	const heldTabWidth =
+		tabWidthHold && tabs.length <= tabWidthHold.tabCount
+			? tabWidthHold.width
+			: null;
 	useLayoutEffect(() => {
 		const track = tabsTrackRef.current;
 		const scroller = track?.parentElement;
@@ -164,7 +178,7 @@ export function TabBar<TData>({
 		const reveal = (behavior: ScrollBehavior) => {
 			const next = scrollLeftToRevealTab({
 				index: activeTabIndex,
-				tabWidth: drawnTabWidth(track),
+				tabWidth: heldTabWidth ?? drawnTabWidth(track),
 				scrollLeft: scroller.scrollLeft,
 				viewportWidth: scroller.clientWidth,
 				endInset: TAB_BAR_FADE_WIDTH,
@@ -187,19 +201,10 @@ export function TabBar<TData>({
 			cancelAnimationFrame(frame);
 			observer.disconnect();
 		};
-	}, [activeTabIndex, hasHorizontalOverflow]);
+	}, [activeTabIndex, hasHorizontalOverflow, heldTabWidth]);
 
 	const insertIndexRef = useRef<number | null>(null);
 	const [insertLineLeft, setInsertLineLeft] = useState<number | null>(null);
-	const rootRef = useRef<HTMLDivElement | null>(null);
-	const [tabWidthHold, setTabWidthHold] = useState<{
-		width: number;
-		tabCount: number;
-	} | null>(null);
-	const heldTabWidth =
-		tabWidthHold && tabs.length <= tabWidthHold.tabCount
-			? tabWidthHold.width
-			: null;
 	const closeTabHoldingWidths = (tabId: string) => {
 		const track = tabsTrackRef.current;
 		if (track && rootRef.current?.matches(":hover")) {
