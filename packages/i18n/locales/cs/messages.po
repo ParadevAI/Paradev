@@ -1134,6 +1134,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Využitá kvóta {label}: {summary}. Otevřít nastavení využití"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Noční audit"
 msgid "No"
 msgstr "Ne"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Na tomto hostu nejsou žádná přihlášení {0}. Přihlaste se a využití se objeví tady."
 
@@ -18599,6 +18602,9 @@ msgstr "Zobrazit méně souborů"
 msgid "Show file tree"
 msgstr "Zobrazit strom souborů"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Zobrazit dole v postranním panelu, kolik kvóty každý poskytovatel modelů využil"
+
 msgid "Show in bar"
 msgstr "Zobrazit v liště"
 
@@ -18658,6 +18664,9 @@ msgstr "Zobrazit seznam pull requestů"
 
 msgid "Show pull request preview"
 msgstr "Zobrazit náhled pull requestu"
+
+msgid "Show quota rings on sidebar"
+msgstr "Zobrazit kroužky kvót v postranním panelu"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Zobrazit vyřešené ({resolvedCount})"

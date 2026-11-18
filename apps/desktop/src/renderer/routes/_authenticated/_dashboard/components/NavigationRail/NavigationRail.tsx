@@ -12,6 +12,7 @@ import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { RailMoreMenu } from "./components/RailMoreMenu";
+import { RailUsage } from "./components/RailUsage";
 import { SolarCheckCircleIcon } from "./components/SolarCheckCircleIcon";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
@@ -103,6 +104,7 @@ export function NavigationRail() {
 			/>
 			<RailMoreMenu />
 			<div className="mt-auto flex flex-col items-center gap-1.5">
+				<RailUsage />
 				<ParadevAnywhereButton variant="rail" />
 				<UpdatesPill isCollapsed />
 				<OrganizationDropdown variant="rail" />

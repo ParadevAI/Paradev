@@ -1134,6 +1134,9 @@ msgstr "{label} goes back to not set up. Nothing changes inside your workspaces:
 msgid "{label} is set to manual"
 msgstr "{label} is set to manual"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} quota used: {summary}. Open usage settings"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Nightly audit"
 msgid "No"
 msgstr "No"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "No {0} logins on this host. Sign in and usage appears here."
 
@@ -18599,6 +18602,9 @@ msgstr "Show fewer files"
 msgid "Show file tree"
 msgstr "Show file tree"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Show how much quota each model provider has used, at the bottom of the sidebar"
+
 msgid "Show in bar"
 msgstr "Show in bar"
 
@@ -18658,6 +18664,9 @@ msgstr "Show pull request list"
 
 msgid "Show pull request preview"
 msgstr "Show pull request preview"
+
+msgid "Show quota rings on sidebar"
+msgstr "Show quota rings on sidebar"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Show resolved ({resolvedCount})"

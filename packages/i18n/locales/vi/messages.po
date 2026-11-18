@@ -1134,6 +1134,9 @@ msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có g
 msgid "{label} is set to manual"
 msgstr "{label} đã chuyển sang đăng nhập thủ công"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Hạn mức đã dùng của {label}: {summary}. Mở cài đặt mức dùng"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Kiểm tra ban đêm"
 msgid "No"
 msgstr "Không"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Chưa có lần đăng nhập {0} nào trên host này. Hãy đăng nhập và mức sử dụng sẽ hiện ở đây."
 
@@ -18599,6 +18602,9 @@ msgstr "Hiện ít tệp hơn"
 msgid "Show file tree"
 msgstr "Hiện cây tệp"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Hiện ở cuối thanh bên mỗi nhà cung cấp mô hình đã dùng bao nhiêu hạn mức"
+
 msgid "Show in bar"
 msgstr "Hiện trên thanh"
 
@@ -18658,6 +18664,9 @@ msgstr "Hiện danh sách pull request"
 
 msgid "Show pull request preview"
 msgstr "Hiện xem trước pull request"
+
+msgid "Show quota rings on sidebar"
+msgstr "Hiện vòng hạn mức trên thanh bên"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Hiện các mục đã xử lý ({resolvedCount})"

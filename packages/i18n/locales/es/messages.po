@@ -1134,6 +1134,9 @@ msgstr "{label} vuelve a quedar sin configurar. Nada cambia dentro de tus espaci
 msgid "{label} is set to manual"
 msgstr "{label} usa inicio de sesión manual"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Cuota usada de {label}: {summary}. Abrir ajustes de uso"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Auditoría nocturna"
 msgid "No"
 msgstr "No"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "No hay sesiones de {0} en este host: inicia sesión y el uso aparecerá aquí."
 
@@ -18599,6 +18602,9 @@ msgstr "Mostrar menos archivos"
 msgid "Show file tree"
 msgstr "Mostrar el árbol de archivos"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Mostrar al pie de la barra lateral cuánta cuota ha usado cada proveedor de modelos"
+
 msgid "Show in bar"
 msgstr "Mostrar en la barra"
 
@@ -18658,6 +18664,9 @@ msgstr "Mostrar la lista de pull requests"
 
 msgid "Show pull request preview"
 msgstr "Mostrar la vista previa de la pull request"
+
+msgid "Show quota rings on sidebar"
+msgstr "Mostrar anillos de cuota en la barra lateral"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Mostrar los resueltos ({resolvedCount})"

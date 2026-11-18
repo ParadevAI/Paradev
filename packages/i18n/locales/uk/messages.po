@@ -1128,6 +1128,9 @@ msgstr "{label} знову стане неналаштованим. У робо�
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Використано ліміту {label}: {summary}. Відкрити налаштування використання"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12822,7 +12825,7 @@ msgstr "Нічний аудит"
 msgid "No"
 msgstr "Ні"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "На цьому хості немає входів у {0}. Увійдіть, і тут з'являться дані про використання."
 
@@ -18593,6 +18596,9 @@ msgstr "Показати менше файлів"
 msgid "Show file tree"
 msgstr "Показати дерево файлів"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Показувати внизу бічної панелі, скільки ліміту використав кожен постачальник моделей"
+
 msgid "Show in bar"
 msgstr "Показати на панелі"
 
@@ -18652,6 +18658,9 @@ msgstr "Показати список пул-реквестів"
 
 msgid "Show pull request preview"
 msgstr "Показати попередній перегляд пул-реквесту"
+
+msgid "Show quota rings on sidebar"
+msgstr "Показувати кільця лімітів на бічній панелі"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Показати вирішені ({resolvedCount})"

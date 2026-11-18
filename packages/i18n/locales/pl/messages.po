@@ -1134,6 +1134,9 @@ msgstr "{label} wraca do stanu nieskonfigurowanego. W obszarach roboczych nic si
 msgid "{label} is set to manual"
 msgstr "{label} używa teraz logowania ręcznego"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Wykorzystany limit {label}: {summary}. Otwórz ustawienia użycia"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Nocny audyt"
 msgid "No"
 msgstr "Nie"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Brak logowań {0} na tym hoście. Zaloguj się, a zużycie pojawi się tutaj."
 
@@ -18599,6 +18602,9 @@ msgstr "Pokaż mniej plików"
 msgid "Show file tree"
 msgstr "Pokaż drzewo plików"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Pokaż na dole paska bocznego, ile limitu wykorzystał każdy dostawca modeli"
+
 msgid "Show in bar"
 msgstr "Pokaż na pasku"
 
@@ -18658,6 +18664,9 @@ msgstr "Pokaż listę pull requestów"
 
 msgid "Show pull request preview"
 msgstr "Pokaż podgląd pull requesta"
+
+msgid "Show quota rings on sidebar"
+msgstr "Pokaż pierścienie limitów na pasku bocznym"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Pokaż rozwiązane ({resolvedCount})"

@@ -1134,6 +1134,9 @@ msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam wo
 msgid "{label} is set to manual"
 msgstr "{label} kini memakai login manual"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Kuota {label} terpakai: {summary}. Buka pengaturan penggunaan"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Audit malam"
 msgid "No"
 msgstr "Tidak"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Tidak ada login {0} di host ini. Masuk dan penggunaannya akan muncul di sini."
 
@@ -18599,6 +18602,9 @@ msgstr "Tampilkan lebih sedikit file"
 msgid "Show file tree"
 msgstr "Tampilkan pohon file"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Tampilkan berapa banyak kuota yang telah dipakai setiap penyedia model, di bagian bawah bilah samping"
+
 msgid "Show in bar"
 msgstr "Tampilkan di bilah"
 
@@ -18658,6 +18664,9 @@ msgstr "Tampilkan daftar pull request"
 
 msgid "Show pull request preview"
 msgstr "Tampilkan pratinjau pull request"
+
+msgid "Show quota rings on sidebar"
+msgstr "Tampilkan cincin kuota di bilah samping"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Tampilkan yang terselesaikan ({resolvedCount})"

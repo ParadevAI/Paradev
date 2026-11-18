@@ -47,6 +47,7 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_DICTATION: "behavior-dictation",
 	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
 	USAGE_IN_SIDEBAR: "usage-in-sidebar",
+	USAGE_RAIL_RINGS: "usage-rail-rings",
 	BEHAVIOR_OPEN_LINKS_IN_APP: "behavior-open-links-in-app",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
 
@@ -210,6 +211,7 @@ export const SETTING_ITEM_VARIANT: Record<SettingItemId, SettingVariant> = {
 	[SETTING_ITEM_ID.BEHAVIOR_PARADEV_ANYWHERE]: "v2",
 	// The home sidebar (DashboardSidebar) only renders for v2 users.
 	[SETTING_ITEM_ID.USAGE_IN_SIDEBAR]: "v2",
+	[SETTING_ITEM_ID.USAGE_RAIL_RINGS]: "v2",
 	[SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP]: "v1",
 	[SETTING_ITEM_ID.BEHAVIOR_STAR_GITHUB]: "shared",
 
@@ -1006,6 +1008,25 @@ export const SETTINGS_ITEMS: SettingsItem[] = [
 			"gauge",
 			"pull requests",
 			"usage",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.USAGE_RAIL_RINGS,
+		section: "usage",
+		title: "Show quota rings on sidebar",
+		description:
+			"Show how much quota each model provider has used, at the bottom of the sidebar",
+		keywords: [
+			"sidebar",
+			"rail",
+			"quota",
+			"rate limit",
+			"usage",
+			"ring",
+			"claude",
+			"codex",
+			"hide",
+			"show",
 		],
 	},
 	{

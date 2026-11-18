@@ -1134,6 +1134,9 @@ msgstr "{label}은(는) 설정되지 않은 상태로 돌아갑니다. 워크스
 msgid "{label} is set to manual"
 msgstr "{label}이(가) 수동 로그인으로 설정되었습니다"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} 사용한 할당량: {summary}. 사용량 설정 열기"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "야간 점검"
 msgid "No"
 msgstr "아니요"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "이 호스트에 {0} 로그인이 없습니다. 로그인하면 사용량이 여기에 표시됩니다."
 
@@ -18599,6 +18602,9 @@ msgstr "파일 적게 보기"
 msgid "Show file tree"
 msgstr "파일 트리 표시"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "각 모델 제공자가 사용한 할당량을 사이드바 하단에 표시합니다"
+
 msgid "Show in bar"
 msgstr "바에 표시"
 
@@ -18658,6 +18664,9 @@ msgstr "풀 리퀘스트 목록 표시"
 
 msgid "Show pull request preview"
 msgstr "풀 리퀘스트 미리보기 표시"
+
+msgid "Show quota rings on sidebar"
+msgstr "사이드바에 할당량 링 표시"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "해결된 항목 표시 ({resolvedCount})"

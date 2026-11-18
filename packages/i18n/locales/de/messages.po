@@ -1134,6 +1134,9 @@ msgstr "{label} ist danach wieder nicht eingerichtet. In deinen Arbeitsbereichen
 msgid "{label} is set to manual"
 msgstr "{label} nutzt jetzt die manuelle Anmeldung"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Genutztes Kontingent von {label}: {summary}. Nutzungseinstellungen öffnen"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Nächtliches Audit"
 msgid "No"
 msgstr "Nein"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Keine {0}-Anmeldungen auf diesem Host. Melde dich an, dann erscheint die Nutzung hier."
 
@@ -18599,6 +18602,9 @@ msgstr "Weniger Dateien anzeigen"
 msgid "Show file tree"
 msgstr "Dateibaum anzeigen"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Unten in der Seitenleiste anzeigen, wie viel Kontingent jeder Modellanbieter verbraucht hat"
+
 msgid "Show in bar"
 msgstr "In der Leiste anzeigen"
 
@@ -18658,6 +18664,9 @@ msgstr "Pull-Request-Liste anzeigen"
 
 msgid "Show pull request preview"
 msgstr "Pull-Request-Vorschau anzeigen"
+
+msgid "Show quota rings on sidebar"
+msgstr "Kontingentringe in der Seitenleiste anzeigen"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Aufgelöste anzeigen ({resolvedCount})"

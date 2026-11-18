@@ -1134,6 +1134,9 @@ msgstr "{label} is daarna weer niet ingesteld. In je werkruimtes verandert niets
 msgid "{label} is set to manual"
 msgstr "{label} gebruikt nu handmatig inloggen"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Gebruikt quotum van {label}: {summary}. Gebruiksinstellingen openen"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "Nachtelijke audit"
 msgid "No"
 msgstr "Nee"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Geen {0}-logins op deze host. Log in en het gebruik verschijnt hier."
 
@@ -18599,6 +18602,9 @@ msgstr "Minder bestanden tonen"
 msgid "Show file tree"
 msgstr "Bestandsboom tonen"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Onder in de zijbalk tonen hoeveel quotum elke modelaanbieder heeft gebruikt"
+
 msgid "Show in bar"
 msgstr "Tonen in balk"
 
@@ -18658,6 +18664,9 @@ msgstr "Lijst met pull requests tonen"
 
 msgid "Show pull request preview"
 msgstr "Voorbeeld van pull request tonen"
+
+msgid "Show quota rings on sidebar"
+msgstr "Quotumringen in de zijbalk tonen"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "Opgeloste tonen ({resolvedCount})"

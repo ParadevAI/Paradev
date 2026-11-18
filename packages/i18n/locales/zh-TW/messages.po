@@ -1134,6 +1134,9 @@ msgstr "{label} 將恢復為未設定。工作區內不會有任何變化：你�
 msgid "{label} is set to manual"
 msgstr "{label} 已設為手動登入"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} 已用配額：{summary}。開啟用量設定"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12828,7 +12831,7 @@ msgstr "夜間稽核"
 msgid "No"
 msgstr "否"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "此主機上沒有{0}登入。登入後用量會顯示在這裡。"
 
@@ -18599,6 +18602,9 @@ msgstr "顯示較少檔案"
 msgid "Show file tree"
 msgstr "顯示檔案樹"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "在側邊欄底部顯示每個模型供應商已用的配額"
+
 msgid "Show in bar"
 msgstr "在工具列顯示"
 
@@ -18658,6 +18664,9 @@ msgstr "顯示拉取請求列表"
 
 msgid "Show pull request preview"
 msgstr "顯示拉取請求預覽"
+
+msgid "Show quota rings on sidebar"
+msgstr "在側邊欄顯示配額圓環"
 
 msgid "Show resolved ({resolvedCount})"
 msgstr "顯示已解決 ({resolvedCount})"
