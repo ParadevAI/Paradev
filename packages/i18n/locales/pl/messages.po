@@ -4353,6 +4353,9 @@ msgstr "Kontrole przeszły"
 msgid "Checks Skipped"
 msgstr "Kontrole pominięte"
 
+msgid "Checks unavailable"
+msgstr "Kontrole niedostępne"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Wybierz konto {pluginLabel}"
 

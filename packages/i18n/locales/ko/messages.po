@@ -4353,6 +4353,9 @@ msgstr "검사 통과"
 msgid "Checks Skipped"
 msgstr "검사 건너뜀"
 
+msgid "Checks unavailable"
+msgstr "검사를 사용할 수 없음"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "{pluginLabel} 계정 선택"
 

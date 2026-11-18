@@ -4353,6 +4353,9 @@ msgstr "Controlli superati"
 msgid "Checks Skipped"
 msgstr "Controlli saltati"
 
+msgid "Checks unavailable"
+msgstr "Controlli non disponibili"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Scegli un account {pluginLabel}"
 

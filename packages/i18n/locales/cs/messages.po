@@ -4353,6 +4353,9 @@ msgstr "Kontroly prošly"
 msgid "Checks Skipped"
 msgstr "Kontroly přeskočeny"
 
+msgid "Checks unavailable"
+msgstr "Kontroly nejsou dostupné"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Vyberte účet {pluginLabel}"
 

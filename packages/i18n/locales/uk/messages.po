@@ -4347,6 +4347,9 @@ msgstr "Перевірки пройдено"
 msgid "Checks Skipped"
 msgstr "Перевірки пропущено"
 
+msgid "Checks unavailable"
+msgstr "Перевірки недоступні"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Виберіть обліковий запис {pluginLabel}"
 

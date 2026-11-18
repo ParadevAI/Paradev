@@ -4353,6 +4353,9 @@ msgstr "Checks passed"
 msgid "Checks Skipped"
 msgstr "Checks Skipped"
 
+msgid "Checks unavailable"
+msgstr "Checks unavailable"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Choose a {pluginLabel} account"
 

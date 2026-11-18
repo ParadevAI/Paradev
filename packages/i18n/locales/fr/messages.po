@@ -4353,6 +4353,9 @@ msgstr "Vérifications réussies"
 msgid "Checks Skipped"
 msgstr "Vérifications ignorées"
 
+msgid "Checks unavailable"
+msgstr "Vérifications indisponibles"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Choisir un compte {pluginLabel}"
 
