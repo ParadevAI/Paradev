@@ -3593,9 +3593,6 @@ msgstr "落後main ?個提交，需要變基"
 msgid "Being built right now."
 msgstr "正在構建中。"
 
-msgid "Beyond the included total"
-msgstr "超出包含總額"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "再往後：F5不是近期的主張"
 
@@ -13426,6 +13423,9 @@ msgstr "未連線"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
+
+msgid "Not counted by billing yet"
+msgstr "尚未計入帳單"
 
 msgid "Not demoed here"
 msgstr "此處未做演示"

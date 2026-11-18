@@ -3593,9 +3593,6 @@ msgstr "En retard de ? commits sur main, rebase nécessaire"
 msgid "Being built right now."
 msgstr "En cours de construction en ce moment."
 
-msgid "Beyond the included total"
-msgstr "Au-delà du total inclus"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Au-delà : F5 n'est pas une promesse à court terme"
 
@@ -13426,6 +13423,9 @@ msgstr "Non connecté"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Non connecté · les espaces de travail cloud poussent en tant que GitHub App de votre organisation"
+
+msgid "Not counted by billing yet"
+msgstr "Pas encore comptabilisé par la facturation"
 
 msgid "Not demoed here"
 msgstr "Non démontré ici"

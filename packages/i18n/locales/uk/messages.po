@@ -3587,9 +3587,6 @@ msgstr "Відстає від main на ? комітів, потрібен ре�
 msgid "Being built right now."
 msgstr "Зараз у розробці."
 
-msgid "Beyond the included total"
-msgstr "Понад включений обсяг"
-
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Далі: F5 не обіцяємо найближчим часом"
 
@@ -13420,6 +13417,9 @@ msgstr "Не підключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не підключено · хмарні робочі простори пушать від імені GitHub App вашої організації"
+
+msgid "Not counted by billing yet"
+msgstr "Ще не враховано в рахунку"
 
 msgid "Not demoed here"
 msgstr "Тут не демонструється"

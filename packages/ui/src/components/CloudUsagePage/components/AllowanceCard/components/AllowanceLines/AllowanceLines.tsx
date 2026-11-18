@@ -49,7 +49,7 @@ export function AllowanceLines({
 			case "extra":
 				return <Trans>Extra usage</Trans>;
 			case "beyond":
-				return <Trans>Beyond the included total</Trans>;
+				return <Trans>Not counted by billing yet</Trans>;
 		}
 	};
 	const value = (line: AllowanceLine) => {
