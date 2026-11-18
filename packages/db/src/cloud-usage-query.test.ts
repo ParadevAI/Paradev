@@ -19,13 +19,14 @@ import {
 import {
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
+	getFleetCloudBoot,
 	listCloudBoots,
 	listFleetCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
 	queryFleetCloudUsage,
 } from "./cloud-usage-query";
-import { cloudWorkspaces, taskProjects } from "./schema";
+import { cloudWorkspaceBoots, cloudWorkspaces, taskProjects } from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 
@@ -243,7 +244,7 @@ test("billing periods keep Autumn's reset day through short months", () => {
 describe("fleet scope", () => {
 	const fleet = (
 		options: Partial<Parameters<typeof queryFleetCloudUsage>[2]>,
-		organizationId: string | null = null,
+		organizationId: string | string[] | null = null,
 	) =>
 		queryFleetCloudUsage(db, organizationId, {
 			window: NOVEMBER,
@@ -312,6 +313,81 @@ describe("fleet scope", () => {
 				.set({ projectId: null })
 				.where(eq(cloudWorkspaces.id, CHECKOUT));
 		}
+	});
+
+	test("a list of workspaces and a skip of the name lookup serve one page of a list", async () => {
+		const page = await fleet({
+			groupBy: "workspace",
+			filters: { workspace: [CHECKOUT, BROKEN] },
+			refs: false,
+		});
+		expect(
+			page.items.map((item) => [item.key, item.label, item.ref, item.boots]),
+		).toEqual([
+			[CHECKOUT, null, null, 3],
+			[BROKEN, null, null, 0],
+		]);
+		const bySize = await fleet({ groupBy: "size", refs: false });
+		expect(bySize.items.map((item) => item.label)).toEqual(["medium", "large"]);
+		expect(
+			(await fleet({ filters: { workspace: [CHECKOUT, BROKEN] } })).total
+				.workspaces,
+		).toBe(2);
+	});
+
+	test("a list of organizations, and the project filter", async () => {
+		expect((await fleet({}, [ORG, OTHER_ORG])).total).toEqual(
+			(await fleet({})).total,
+		);
+		expect((await fleet({}, [OTHER_ORG])).total.boots).toBe(1);
+		expect((await fleet({}, [])).total.boots).toBe(0);
+		const [project] = await db
+			.insert(taskProjects)
+			.values({ organizationId: ORG, name: "Checkout revamp" })
+			.returning();
+		if (!project) throw new Error("no project");
+		await db
+			.update(cloudWorkspaces)
+			.set({ projectId: project.id })
+			.where(eq(cloudWorkspaces.id, CHECKOUT));
+		try {
+			const inProject = await fleet({ filters: { project: project.id } });
+			expect(inProject.total).toMatchObject({ boots: 3, workspaces: 1 });
+			const listed = await listFleetCloudBoots(db, null, {
+				window: NOVEMBER,
+				filters: { project: project.id },
+				limit: 25,
+				now: NOW,
+				overagePerGbHour: RATE,
+			});
+			expect(listed.items.map((boot) => boot.id)).toEqual([
+				"boot_6",
+				"boot_2",
+				"boot_1",
+			]);
+		} finally {
+			await db
+				.update(cloudWorkspaces)
+				.set({ projectId: null })
+				.where(eq(cloudWorkspaces.id, CHECKOUT));
+		}
+	});
+
+	test("one boot by id or session id, with its organization", async () => {
+		await db
+			.update(cloudWorkspaceBoots)
+			.set({ vercelSessionId: "sess_5" })
+			.where(eq(cloudWorkspaceBoots.id, "boot_5"));
+		const options = { now: NOW, overagePerGbHour: RATE };
+		const byId = await getFleetCloudBoot(db, "boot_5", options);
+		expect(byId).toMatchObject({
+			id: "boot_5",
+			sessionId: "sess_5",
+			organization: { id: OTHER_ORG },
+			gbHours: 100 / 60,
+		});
+		expect((await getFleetCloudBoot(db, "sess_5", options))?.id).toBe("boot_5");
+		expect(await getFleetCloudBoot(db, "boot_nope", options)).toBeNull();
 	});
 
 	test("a failed workspace counts the same way on every path", async () => {

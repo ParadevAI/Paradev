@@ -55,7 +55,11 @@
 							},
 							"@vercel/sandbox": "Most calls on a raw sandbox handle resume a stopped box. Use the functions in packages/trpc/src/lib/sandbox, where only a wake or a create may resume one.",
 							"@superset/db/cloud-usage-query": {
-								"importNames": ["queryFleetCloudUsage", "listFleetCloudBoots"],
+								"importNames": [
+									"queryFleetCloudUsage",
+									"listFleetCloudBoots",
+									"getFleetCloudBoot"
+								],
 								"message": "These read every organization and are for staff tools only (the admin app). A customer procedure uses queryCloudUsage and listCloudBoots, which take one organization."
 							}
 						}
