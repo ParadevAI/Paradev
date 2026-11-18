@@ -35,8 +35,16 @@ import {
 	computeInsertIndex,
 	scrollLeftToRevealTab,
 	TAB_BAR_FADE_WIDTH,
-	TAB_WIDTH,
+	TAB_MAX_WIDTH,
+	TAB_MIN_WIDTH,
 } from "./utils";
+
+function drawnTabWidth(track: HTMLElement): number {
+	return (
+		track.querySelector("[data-tab-slot]")?.getBoundingClientRect().width ??
+		TAB_MAX_WIDTH
+	);
+}
 
 interface TabBarProps<TData> {
 	/** Classes for the bar row, merged over its defaults. */
@@ -149,15 +157,18 @@ export function TabBar<TData>({
 	const [hasHorizontalOverflow, setHasHorizontalOverflow] = useState(false);
 	const activeTabIndex = tabs.findIndex((tab) => tab.id === activeTabId);
 	useLayoutEffect(() => {
-		const scroller = tabsTrackRef.current?.parentElement;
-		if (!scroller || !hasHorizontalOverflow || activeTabIndex < 0) return;
+		const track = tabsTrackRef.current;
+		const scroller = track?.parentElement;
+		if (!track || !scroller || !hasHorizontalOverflow || activeTabIndex < 0)
+			return;
 		const reveal = (behavior: ScrollBehavior) => {
-			const next = scrollLeftToRevealTab(
-				activeTabIndex,
-				scroller.scrollLeft,
-				scroller.clientWidth,
-				TAB_BAR_FADE_WIDTH,
-			);
+			const next = scrollLeftToRevealTab({
+				index: activeTabIndex,
+				tabWidth: drawnTabWidth(track),
+				scrollLeft: scroller.scrollLeft,
+				viewportWidth: scroller.clientWidth,
+				endInset: TAB_BAR_FADE_WIDTH,
+			});
 			if (next !== null) scroller.scrollTo({ left: next, behavior });
 		};
 		let revealedWidth: number | null = null;
@@ -179,7 +190,16 @@ export function TabBar<TData>({
 	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);
-	const [insertIndex, setInsertIndex] = useState<number | null>(null);
+	const [insertLineLeft, setInsertLineLeft] = useState<number | null>(null);
+	const rootRef = useRef<HTMLDivElement | null>(null);
+	const [heldTabWidth, setHeldTabWidth] = useState<number | null>(null);
+	const closeTabHoldingWidths = (tabId: string) => {
+		const track = tabsTrackRef.current;
+		if (track && rootRef.current?.matches(":hover")) {
+			setHeldTabWidth(drawnTabWidth(track));
+		}
+		onCloseTab(tabId);
+	};
 
 	const [{ isOver }, connectDrop] = useDrop(
 		() => ({
@@ -189,14 +209,16 @@ export function TabBar<TData>({
 				const offset = monitor.getClientOffset();
 				if (!track || !offset) return;
 
+				const tabWidth = drawnTabWidth(track);
 				const idx = computeInsertIndex(
 					offset.x,
 					track.getBoundingClientRect(),
 					tabs.length,
+					tabWidth,
 				);
 				if (idx !== insertIndexRef.current) {
 					insertIndexRef.current = idx;
-					setInsertIndex(idx);
+					setInsertLineLeft(idx * tabWidth);
 				}
 			},
 			drop: (item: TabDragItem | PaneDragItem, monitor) => {
@@ -204,7 +226,7 @@ export function TabBar<TData>({
 				if (idx === null) return;
 
 				insertIndexRef.current = null;
-				setInsertIndex(null);
+				setInsertLineLeft(null);
 
 				const source = item.store as typeof store | undefined;
 				if (source && source !== store) {
@@ -254,11 +276,12 @@ export function TabBar<TData>({
 	// Clear indicator when cursor leaves the tab bar
 	if (!isOver && insertIndexRef.current !== null) {
 		insertIndexRef.current = null;
-		if (insertIndex !== null) setInsertIndex(null);
+		if (insertLineLeft !== null) setInsertLineLeft(null);
 	}
 
 	const setRootRef = useCallback(
 		(node: HTMLDivElement | null) => {
+			rootRef.current = node;
 			connectDrop(node);
 		},
 		[connectDrop],
@@ -272,11 +295,11 @@ export function TabBar<TData>({
 		setHasHorizontalOverflow(state.hasOverflowX);
 	}, []);
 
-	const insertLineLeft = insertIndex !== null ? insertIndex * TAB_WIDTH : null;
-
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: leaving the bar only releases held tab widths
 		<div
 			ref={setRootRef}
+			onMouseLeave={() => setHeldTabWidth(null)}
 			// Only the empty filler right of the tabs is an
 			// Electron window-drag region — marking the whole bar `drag` and carving
 			// children out with `no-drag` loses the carve-outs once they sit inside
@@ -314,12 +337,19 @@ export function TabBar<TData>({
 					{tabs.map((tab, i) => (
 						<div
 							className={
-								isCards
-									? "flex h-full shrink-0 items-center px-0.5"
-									: "h-full shrink-0 pt-1"
+								isCards ? "flex h-full items-center px-0.5" : "h-full pt-1"
 							}
+							data-tab-slot
 							key={tab.id}
-							style={{ width: TAB_WIDTH }}
+							style={
+								heldTabWidth === null
+									? {
+											flex: `0 1 ${TAB_MAX_WIDTH}px`,
+											minWidth: TAB_MIN_WIDTH,
+											contain: "inline-size",
+										}
+									: { flex: `0 0 ${heldTabWidth}px` }
+							}
 						>
 							<TabItem
 								tab={tab}
@@ -329,7 +359,7 @@ export function TabBar<TData>({
 								index={i}
 								isActive={tab.id === activeTabId}
 								onSelect={() => onSelectTab(tab.id)}
-								onClose={() => onCloseTab(tab.id)}
+								onClose={() => closeTabHoldingWidths(tab.id)}
 								onCloseOthers={() => onCloseOtherTabs(tab.id)}
 								onCloseAll={onCloseAllTabs}
 								onRename={
