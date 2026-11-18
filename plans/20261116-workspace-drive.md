@@ -240,8 +240,8 @@ Documented by Vercel or the SDK, not measured:
   the later-boot refetch of an untouched copy covers it, so it retries three times and then keeps
   the golden's checkout. Date/Author: 2026-11-18, coordinator.
 - Decision: a workspace's drive is deleted when its snapshot expires. Rationale: the box can never
-  resume, and the drive would bill storage for good. Retention will be ours: a separate reaper
-  deletes an expired workspace's box, snapshots and drive itself, instead of relying on Vercel's
+  resume, and the drive would bill storage for good. Retention will be ours: the reaper of #9987
+  (every 6 h) deletes an expired workspace's box, snapshots and drive itself, instead of relying on Vercel's
   30-day `snapshotExpiration`. It calls `retireAndTearDown`, the one function that retires a row's
   box and drive names and queues their retried teardown. Until then, and as a fallback after,
   the 410 a wake, an agent turn or an automation dispatch gets on an expired snapshot takes
@@ -540,9 +540,6 @@ never shown as their work.
   unless `drive_sweep_delete` is set, so a drive whose teardown gave up stays until someone runs it
   (the model's NoOrphanForever holds only if it is run). Once it has run dry in production a few
   times and listed nothing it should not, run it on a schedule without the dry run.
-- Our own retention (a separate PR): delete an expired workspace's box, snapshots and drive
-  through `retireAndTearDown`. Until it ships, a drive goes only when someone opens its workspace
-  after Vercel expired the snapshot.
 
 
 ## Follow-ups (out of scope)

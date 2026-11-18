@@ -1011,7 +1011,9 @@ OpenCode and Pi update in place, beside their binary. On a box they run from
 a read-only mount and are pinned by the bundle. `/etc/profile.d/superset.sh`
 turns off their update checks (`OPENCODE_DISABLE_AUTOUPDATE`,
 `PI_SKIP_VERSION_CHECK`), the same way `DISABLE_AUTOUPDATER` does for
-Claude. They keep their state under `~/.local/share/opencode`,
+Claude. `superset-boot` also puts all three in host-service's own env: a chat
+agent gets host-service's env, not a terminal's, whenever host-service's
+login-shell probe fails. They keep their state under `~/.local/share/opencode`,
 `~/.config/opencode` and `~/.pi/agent`, as they do on a laptop.
 
 **A read-only snapshot mount taken while a writer holds the drive is corrupt.**
