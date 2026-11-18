@@ -5,15 +5,13 @@ import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { useDiffCommentComposer } from "./useDiffCommentComposer";
 
-test("blocks a second submit from the same draft while a send is pending and allows retry", async () => {
+function renderComposer(
+	onCreateNewAgentSession?: Parameters<
+		typeof useDiffCommentComposer
+	>[0]["onCreateNewAgentSession"],
+) {
 	const queryClient = new QueryClient();
 	const client = workspaceTrpc.createClient({ links: [] });
-	const failed = Promise.withResolvers<null>();
-	const retry = Promise.withResolvers<{ terminalId: string }>();
-	const onCreateNewAgentSession = mock(
-		(): Promise<{ terminalId: string } | null> => retry.promise,
-	);
-	onCreateNewAgentSession.mockImplementationOnce(() => failed.promise);
 
 	const { result, rerender, unmount } = renderHook(
 		() =>
@@ -39,12 +37,72 @@ test("blocks a second submit from the same draft while a send is pending and all
 			),
 		},
 	);
-	try {
+	const select = (
+		range: Parameters<typeof result.current.onLineSelectionEnd>[0],
+		itemId = "file",
+	) => {
 		const context = {
 			type: "diff",
-			item: { id: "file" },
+			item: { id: itemId },
 		} as Parameters<typeof result.current.onLineSelectionEnd>[1];
-		act(() => result.current.onLineSelectionEnd({ start: 3, end: 3 }, context));
+		act(() => result.current.onLineSelectionEnd(range, context));
+	};
+	return {
+		result,
+		rerender,
+		select,
+		dispose: () => {
+			unmount();
+			queryClient.clear();
+		},
+	};
+}
+
+test("keeps the draft on repeated selection and clears it when the anchor changes", () => {
+	const { result, select, dispose } = renderComposer();
+	const range = {
+		start: 3,
+		end: 4,
+		side: "deletions",
+		endSide: "additions",
+	} as const;
+	try {
+		select(range);
+		act(() => result.current.setComment("Check this condition"));
+		const annotation = result.current.composerAnnotationsByItemId;
+		select({ ...range });
+		expect(result.current.comment).toBe("Check this condition");
+		expect(result.current.composerAnnotationsByItemId).toBe(annotation);
+
+		select({ ...range, endSide: "deletions" });
+		expect(result.current.comment).toBe("");
+
+		act(() => result.current.setComment("Different file"));
+		select({ ...range, endSide: "deletions" }, "other-file");
+		expect(result.current.comment).toBe("");
+
+		act(() => result.current.setComment("Dismiss this draft"));
+		select(null, "other-file");
+		expect(result.current.comment).toBe("");
+		expect(result.current.composerAnnotationsByItemId).toBeNull();
+	} finally {
+		dispose();
+	}
+});
+
+test("blocks a second submit from the same draft while a send is pending and allows retry", async () => {
+	const failed = Promise.withResolvers<null>();
+	const retry = Promise.withResolvers<{ terminalId: string }>();
+	const onCreateNewAgentSession = mock(
+		(): Promise<{ terminalId: string } | null> => retry.promise,
+	);
+	onCreateNewAgentSession.mockImplementationOnce(() => failed.promise);
+
+	const { result, rerender, select, dispose } = renderComposer(
+		onCreateNewAgentSession,
+	);
+	try {
+		select({ start: 3, end: 3 });
 		act(() => result.current.setComment("Check this condition"));
 		const submit = () =>
 			result.current.submit({
@@ -56,6 +114,7 @@ test("blocks a second submit from the same draft while a send is pending and all
 			sending = submit();
 		});
 		rerender();
+		select({ start: 3, end: 3 });
 		act(() => {
 			void submit();
 		});
@@ -78,7 +137,6 @@ test("blocks a second submit from the same draft while a send is pending and all
 		expect(result.current.comment).toBe("");
 		expect(result.current.submitting).toBe(false);
 	} finally {
-		unmount();
-		queryClient.clear();
+		dispose();
 	}
 });

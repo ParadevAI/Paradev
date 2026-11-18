@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import type {
-	CodeViewOptions,
-	DiffLineAnnotation,
-	SelectedLineRange,
+import {
+	areSelectionsEqual,
+	type CodeViewOptions,
+	type DiffLineAnnotation,
+	type SelectedLineRange,
 } from "@pierre/diffs";
 import type { CodeViewHandle } from "@pierre/diffs/react";
 import { toast } from "@superset/ui/sonner";
@@ -100,15 +101,19 @@ export function useDiffCommentComposer({
 	const [pending, setPending] = useState<ReadonlySet<ComposerState>>(
 		() => new Set(),
 	);
-	const composerRef = useRef(composer);
-	composerRef.current = composer;
+	const composerRef = useRef<ComposerState | null>(null);
 	const { send: sendToTerminalAgent } = useSendToTerminalAgent();
 
-	const clear = useCallback(() => {
-		setComposer(null);
+	const replaceComposer = useCallback((next: ComposerState | null) => {
+		composerRef.current = next;
+		setComposer(next);
 		setComment("");
+	}, []);
+
+	const clear = useCallback(() => {
+		replaceComposer(null);
 		codeViewRef.current?.clearSelectedLines();
-	}, [codeViewRef]);
+	}, [codeViewRef, replaceComposer]);
 
 	// Only clear when the in-flight submit's composer is still the one on
 	// screen — protects against a slow send wiping a newer composer the user
@@ -123,14 +128,18 @@ export function useDiffCommentComposer({
 	const onLineSelectionEnd = useCallback<OnLineSelectionEnd>(
 		(range, context) => {
 			if (context.type !== "diff") return;
-			setComment("");
-			if (!range) {
-				setComposer(null);
+			const itemId = context.item.id;
+			const current = composerRef.current;
+			if (
+				range &&
+				current?.itemId === itemId &&
+				areSelectionsEqual(current.range, range)
+			) {
 				return;
 			}
-			setComposer({ itemId: context.item.id, range });
+			replaceComposer(range ? { itemId, range } : null);
 		},
-		[],
+		[replaceComposer],
 	);
 
 	// Pierre gates the gutter "+" button's pointer flow behind a non-null
