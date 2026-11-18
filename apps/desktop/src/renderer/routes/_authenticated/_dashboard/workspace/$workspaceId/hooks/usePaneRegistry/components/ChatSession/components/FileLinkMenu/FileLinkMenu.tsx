@@ -10,11 +10,12 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { toast } from "@superset/ui/sonner";
-import { Clipboard } from "lucide-react";
+import { Clipboard, ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import type { LinkAction } from "renderer/lib/clickPolicy";
 import { useChatPaneActions } from "../../providers/ChatPaneActionsProvider";
+import { bareWebUrl } from "../../utils/bareWebUrl";
 
 const NO_MODIFIERS = {
 	metaKey: false,
@@ -41,6 +42,7 @@ export function FileLinkMenu({
 	if (!openLink) return children;
 	const open = (action: LinkAction) =>
 		openLink(reference, NO_MODIFIERS, action);
+	const webUrl = bareWebUrl(reference);
 	const copy = () => {
 		void copyToClipboard(reference).then(
 			() => toast.success(t({ message: "Path copied" })),
@@ -67,6 +69,14 @@ export function FileLinkMenu({
 						</ContextMenuItem>
 					</ContextMenuSubContent>
 				</ContextMenuSub>
+				{webUrl && (
+					<ContextMenuItem
+						onSelect={() => openLink(webUrl, NO_MODIFIERS, "external")}
+					>
+						<ExternalLink />
+						<Trans>Open in Browser</Trans>
+					</ContextMenuItem>
+				)}
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={copy}>
 					<Clipboard />
