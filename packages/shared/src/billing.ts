@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const PLAN_TIERS = ["free", "pro", "enterprise"] as const;
 export type PlanTier = (typeof PLAN_TIERS)[number];
 
@@ -510,6 +512,7 @@ export const MACHINE_SIZES = Object.keys(MACHINE_SIZE_VCPUS) as [
 	MachineSize,
 	...MachineSize[],
 ];
+export const machineSizeSchema = z.enum(MACHINE_SIZES);
 /** Every organization can run these; the rest need an Autumn feature each. */
 export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"small",
