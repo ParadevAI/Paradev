@@ -7073,11 +7073,11 @@ msgstr "Від'єднано"
 msgid "Details"
 msgstr "Подробиці"
 
-msgid "Details (optional)"
-msgstr "Подробиці (необов’язково)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Подробиці тут недоступні, але посилання все одно відкривається."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Подробиці або @, щоб указати issue чи пул-реквест"
 
 msgid "Detect your physical location"
 msgstr "Визначати ваше місцезнаходження"

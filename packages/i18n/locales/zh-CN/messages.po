@@ -7079,11 +7079,11 @@ msgstr "已分离"
 msgid "Details"
 msgstr "详情"
 
-msgid "Details (optional)"
-msgstr "详情(可选)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "此处无法显示详情，但链接仍可打开。"
+
+msgid "Details, or @ an issue or pull request"
+msgstr "详情,或用 @ 引用 issue 或拉取请求"
 
 msgid "Detect your physical location"
 msgstr "检测您的实际位置"

@@ -7079,11 +7079,11 @@ msgstr "Detached"
 msgid "Details"
 msgstr "Details"
 
-msgid "Details (optional)"
-msgstr "Details (optional)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Details are not available here, but the link still opens."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Details, or @ an issue or pull request"
 
 msgid "Detect your physical location"
 msgstr "Detect your physical location"

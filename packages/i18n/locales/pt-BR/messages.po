@@ -7079,11 +7079,11 @@ msgstr "Desconectada"
 msgid "Details"
 msgstr "Detalhes"
 
-msgid "Details (optional)"
-msgstr "Detalhes (opcional)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Os detalhes não estão disponíveis aqui, mas o link ainda abre."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Detalhes, ou @ para uma issue ou pull request"
 
 msgid "Detect your physical location"
 msgstr "Detectar sua localização física"

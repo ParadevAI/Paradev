@@ -7079,11 +7079,11 @@ msgstr "Đã tách"
 msgid "Details"
 msgstr "Chi tiết"
 
-msgid "Details (optional)"
-msgstr "Chi tiết (không bắt buộc)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Chi tiết, hoặc @ để chọn issue hay pull request"
 
 msgid "Detect your physical location"
 msgstr "Phát hiện vị trí thực của bạn"

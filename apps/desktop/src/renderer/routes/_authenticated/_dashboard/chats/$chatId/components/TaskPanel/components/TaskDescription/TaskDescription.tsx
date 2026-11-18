@@ -2,6 +2,9 @@ import { useLingui } from "@lingui/react/macro";
 import { ChatMarkdown } from "@superset/chat-ui/ChatMarkdown";
 import { Textarea } from "@superset/ui/textarea";
 import { useState } from "react";
+import { AppLinkChip } from "../../../AppLinkChip";
+
+const MARKDOWN_COMPONENTS = { a: AppLinkChip };
 
 interface TaskDescriptionProps {
 	value: string;
@@ -20,7 +23,7 @@ export function TaskDescription({ value, onSave }: TaskDescriptionProps) {
 				className="block w-full cursor-text rounded-md text-left text-sm [&_p]:my-1"
 			>
 				{value ? (
-					<ChatMarkdown>{value}</ChatMarkdown>
+					<ChatMarkdown components={MARKDOWN_COMPONENTS}>{value}</ChatMarkdown>
 				) : (
 					<span className="text-muted-foreground">
 						{t({ message: "Add a description…" })}

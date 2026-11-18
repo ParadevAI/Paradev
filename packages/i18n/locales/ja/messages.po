@@ -7079,11 +7079,11 @@ msgstr "切断中"
 msgid "Details"
 msgstr "詳細"
 
-msgid "Details (optional)"
-msgstr "詳細(任意)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "ここでは詳細を表示できませんが、リンクは開けます。"
+
+msgid "Details, or @ an issue or pull request"
+msgstr "詳細、または @ で Issue やプルリクエストを指定"
 
 msgid "Detect your physical location"
 msgstr "現在地を検出する"

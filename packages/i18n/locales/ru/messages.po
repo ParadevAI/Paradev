@@ -7079,11 +7079,11 @@ msgstr "Отключена"
 msgid "Details"
 msgstr "Детали"
 
-msgid "Details (optional)"
-msgstr "Подробности (необязательно)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Сведения здесь недоступны, но ссылка всё равно открывается."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Подробности или @, чтобы указать issue или пул-реквест"
 
 msgid "Detect your physical location"
 msgstr "Определять ваше местоположение"

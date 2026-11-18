@@ -7079,11 +7079,11 @@ msgstr "Terlepas"
 msgid "Details"
 msgstr "Detail"
 
-msgid "Details (optional)"
-msgstr "Detail (opsional)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Detail tidak tersedia di sini, tetapi tautan tetap bisa dibuka."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Detail, atau @ untuk issue atau pull request"
 
 msgid "Detect your physical location"
 msgstr "Mendeteksi lokasi fisik Anda"

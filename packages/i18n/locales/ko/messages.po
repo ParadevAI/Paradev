@@ -7079,11 +7079,11 @@ msgstr "분리됨"
 msgid "Details"
 msgstr "세부 정보"
 
-msgid "Details (optional)"
-msgstr "세부 정보(선택)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "세부 정보, 또는 @로 이슈나 풀 리퀘스트 지정"
 
 msgid "Detect your physical location"
 msgstr "실제 위치 감지"

@@ -1,5 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
+	draftChips,
+	draftText,
+	type PromptInputHandle,
+} from "@superset/chat-ui/PromptInput";
+import {
 	type Chat,
 	type ChatState,
 	parseMentionTokens,
@@ -18,11 +23,12 @@ import {
 	DialogTitle,
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
-import { Textarea } from "@superset/ui/textarea";
 import { cn } from "@superset/ui/utils";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 import { TaskAssigneeMenu } from "../../../components/TaskAssigneeMenu";
 import { TaskWhenMenu } from "../../../components/TaskWhenMenu";
+import { useChatGitHubProviders } from "../../../hooks/useChatGitHubProviders";
 import { NO_SCHEDULE } from "../../../utils/taskSchedule";
 import { ExistingTaskPicker } from "./components/ExistingTaskPicker";
 
@@ -54,6 +60,18 @@ export function NewTaskDialog({
 	const { t } = useLingui();
 	const [title, setTitle] = useState(initial.title);
 	const [description, setDescription] = useState(initial.description);
+	const titleRef = useRef(title);
+	titleRef.current = title;
+	const githubProviders = useChatGitHubProviders();
+	const details = useRef<PromptInputHandle>(null);
+	const initialDescription = useRef(initial.description);
+	useEffect(() => {
+		if (initialDescription.current)
+			details.current?.restoreDraft({
+				attachments: [],
+				segments: [{ type: "text", text: initialDescription.current }],
+			});
+	}, []);
 	const [assignee, setAssignee] = useState<string | null>(() =>
 		defaultTaskAssignee(state, chat),
 	);
@@ -145,14 +163,22 @@ export function NewTaskDialog({
 						placeholder={t({ message: "What needs doing" })}
 						onChange={(event) => setTitle(event.target.value)}
 					/>
-					<Textarea
-						value={description}
-						rows={3}
-						placeholder={t({ message: "Details (optional)" })}
-						onChange={(event) => setDescription(event.target.value)}
-						onKeyDown={(event) => {
-							if (event.key === "Enter" && (event.metaKey || event.ctrlKey))
-								void create();
+					<AgentComposer
+						ref={details}
+						layout="inline"
+						placeholder={t({
+							message: "Details, or @ an issue or pull request",
+						})}
+						mentionProviders={githubProviders}
+						onDraftChange={(draft) => {
+							setDescription(draftText(draft.segments));
+							const [linked] = draftChips(draft.segments);
+							if (linked?.description && !titleRef.current.trim())
+								setTitle(`${linked.label} ${linked.description}`);
+						}}
+						onSubmit={() => {
+							void create();
+							return false;
 						}}
 					/>
 					<div className="flex flex-wrap items-center gap-1.5">

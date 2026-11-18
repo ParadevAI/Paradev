@@ -7079,11 +7079,11 @@ msgstr "Ayrılmış"
 msgid "Details"
 msgstr "Ayrıntılar"
 
-msgid "Details (optional)"
-msgstr "Ayrıntılar (isteğe bağlı)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açılır."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Ayrıntılar veya bir issue ya da pull request için @"
 
 msgid "Detect your physical location"
 msgstr "Fiziksel konumunuzu algılama"

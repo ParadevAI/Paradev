@@ -7079,11 +7079,11 @@ msgstr "Odpojeno"
 msgid "Details"
 msgstr "Podrobnosti"
 
-msgid "Details (optional)"
-msgstr "Podrobnosti (volitelné)"
-
 msgid "Details are not available here, but the link still opens."
 msgstr "Podrobnosti zde nejsou k dispozici, ale odkaz se přesto otevře."
+
+msgid "Details, or @ an issue or pull request"
+msgstr "Podrobnosti, nebo @ pro issue či pull request"
 
 msgid "Detect your physical location"
 msgstr "Zjišťovat vaši fyzickou polohu"

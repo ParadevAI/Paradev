@@ -1,16 +1,19 @@
 import { chatMarkdownComponents } from "@superset/chat-ui/ChatMarkdown";
-import type { LinkChip } from "@superset/chats-core";
+import { linkChip } from "@superset/chats-core";
 import type { ComponentProps } from "react";
 import { PluginIcon } from "renderer/components/PluginIcon";
 
 const Link = chatMarkdownComponents.a;
 
-interface AppLinkChipProps extends ComponentProps<typeof Link> {
-	chip: LinkChip;
-}
-
-/** A bare link to an app the chats know (a Linear issue, a GitHub pull request) as its mark and a short name. */
-export function AppLinkChip({ chip, ...props }: AppLinkChipProps) {
+/**
+ * A link in chat markdown. A bare address of an app the chats know (a Linear
+ * issue, a GitHub pull request) is a chip with the app's mark and a short
+ * name; any other link is an ordinary one.
+ */
+export function AppLinkChip(props: ComponentProps<typeof Link>) {
+	const chip =
+		props.href && props.children === props.href ? linkChip(props.href) : null;
+	if (!chip) return <Link {...props} />;
 	return (
 		<Link
 			{...props}
