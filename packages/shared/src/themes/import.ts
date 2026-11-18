@@ -180,7 +180,7 @@ function parseThemeEntry(
 	entry: unknown,
 	index: number,
 ): { ok: true; theme: Theme } | { ok: false; issue: string } {
-	const parsedEntry = themeConfigSchema.safeParse(fromT3Skin(entry) ?? entry);
+	const parsedEntry = themeConfigSchema.safeParse(entry);
 	if (!parsedEntry.success) {
 		const issue = parsedEntry.error.issues[0]?.message ?? "Invalid theme shape";
 		return { ok: false, issue: `Theme ${index + 1}: ${issue}` };
@@ -280,11 +280,13 @@ export function parseThemeConfigFile(content: string): ThemeConfigParseResult {
 		return { ok: false, error: "Invalid JSON file" };
 	}
 
-	const entries = Array.isArray(parsedJson)
-		? parsedJson
-		: isThemePack(parsedJson)
-			? parsedJson.themes
-			: [parsedJson];
+	const entries = (
+		Array.isArray(parsedJson)
+			? parsedJson
+			: isThemePack(parsedJson)
+				? parsedJson.themes
+				: [parsedJson]
+	).flatMap((entry) => fromT3Skin(entry) ?? [entry]);
 
 	if (entries.length === 0) {
 		return { ok: false, error: "No themes found in file" };

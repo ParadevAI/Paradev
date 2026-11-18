@@ -35,4 +35,23 @@ describe("T3 Code skins", () => {
 		expect(theme?.terminal?.cursor).toBe("#e32a01");
 		expect(theme?.terminal?.red).toBeDefined();
 	});
+
+	it("imports the skin's other appearance as a second theme", () => {
+		const result = parseThemeConfigFile(
+			JSON.stringify({
+				...t3Skin,
+				variants: { light: { canvas: "#ffffff", accent: "#e32a01" } },
+			}),
+		);
+
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+
+		const [dark, light] = result.themes;
+		expect(dark?.id).toBe("e2b");
+		expect(light?.id).toBe("e2b-light");
+		expect(light?.name).toBe("E2B Light");
+		expect(light?.type).toBe("light");
+		expect(light?.ui.background).toBe("#ffffff");
+	});
 });
