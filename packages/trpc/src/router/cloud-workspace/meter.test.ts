@@ -485,7 +485,7 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 
 	test("a release refunds the same user instead of leaving a negative user-only total", async () => {
 		const bootId = await reserve();
-		await releaseBoot(bootId);
+		await releaseBoot(bootId, "provision_failed");
 		expect(userTotal("box_gb_minutes")).toBe(0);
 		expect(reservations.size).toBe(0);
 	});

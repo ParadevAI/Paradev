@@ -1954,9 +1954,6 @@ msgstr "Název účtu"
 msgid "Account pending deletion"
 msgstr "Účet čeká na smazání"
 
-msgid "Account usage"
-msgstr "Využití účtu"
-
 msgid "Account usage: {percent} used"
 msgstr "Využití účtu: využito {percent}"
 
@@ -16493,9 +16490,6 @@ msgstr "Obnovit umístění"
 
 msgid "Reset terminal"
 msgstr "Obnovit terminál"
-
-msgid "Reset time unavailable"
-msgstr "Čas resetu není k dispozici"
 
 msgid "Reset to default"
 msgstr "Obnovit výchozí"

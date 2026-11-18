@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thin sandbox: PRs for review</title>
+<style>
+  :root { --sp-measure: 78ch; }
+  body { padding: 2.5rem 1.5rem 5rem; }
+  main { max-width: 62rem; margin: 0 auto; }
+  h1 { margin-bottom: .25rem; }
+  .lede { color: var(--sp-muted); margin-top: 0; }
+  h2 { margin-top: 3.25rem; padding-top: 1.25rem; border-top: 1px solid var(--sp-border); }
+  h3 { margin-top: 1.75rem; }
+  .wide { overflow-x: auto; }
+  table { width: 100%; }
+  td, th { vertical-align: top; }
+  pre { overflow-x: auto; padding: .9rem 1rem; border-radius: var(--sp-radius); background: var(--sp-code-bg); font-size: .86rem; line-height: 1.5; }
+  .state { display: inline-block; font-size: .78rem; font-weight: 600; padding: .1rem .5rem; border: 1px solid var(--sp-border); border-radius: 999px; white-space: nowrap; }
+  .ready { border-color: var(--sp-chart-2); }
+  .hold { border-color: var(--sp-chart-4); }
+  .decision { border-left: 3px solid var(--sp-text); padding: .15rem 0 .15rem 1rem; margin: 1rem 0; }
+  .decision p { margin: .3rem 0; }
+  .rec { color: var(--sp-muted); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  nav ol { padding-left: 1.2rem; }
+</style>
+</head>
+<body class="auto">
+<main>
+
+<h1>Thin sandbox: PRs for review</h1>
+<p class="lede">Written 18 November 2026. Four pieces of work, each with what it does, pseudocode, what a customer sees, the evidence, and the decisions that are yours. Swap removal has shipped; the other three are not merged.</p>
+
+<h2 id="summary">Summary</h2>
+<div class="wide">
+<table>
+<thead><tr><th>Work</th><th>PRs</th><th>State</th><th>What it buys</th><th>Your decisions</th></tr></thead>
+<tbody>
+<tr><td><a href="#swap">Remove swap</a></td><td>#9924</td><td><span class="state ready">Shipped 18 November</span></td><td>No swap in snapshots (up to 6 to 16 GB per workspace that hit memory pressure). No long stalls under a fast allocator.</td><td>Decided: ship</td></tr>
+<tr><td><a href="#agents">Agents only from the drive</a></td><td>#9929, then #9911</td><td><span class="state ready">A: ready for review</span> <span class="state hold">B: after A is released</span></td><td>0.79 GB off the image. A PostHog outage can no longer affect agents.</td><td>3</td></tr>
+<tr><td><a href="#builds">Environment builds on Vercel Workflow</a></td><td>#9906, on #9282</td><td><span class="state hold">Waiting on your decisions</span></td><td>Builds can run 30 minutes, not about 3. The build log updates while it runs.</td><td>3</td></tr>
+<tr><td><a href="#drive">Workspace drive</a></td><td>#9915, #9847, model #9914</td><td><span class="state hold">Not ready: model verdict outstanding</span></td><td>Root snapshot 2.76 GB against 7.86 to 8.02 GB for the same work.</td><td>2, later</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>All decisions in one place</h3>
+<ol>
+<li><a href="#swap">Swap</a>: ship no swap with the faster memguard? <strong>Decided: yes, shipped.</strong></li>
+<li><a href="#agents">Agents</a>: when the agents drive cannot be mounted, open the box without agents, or fail the open?</li>
+<li><a href="#agents">Agents</a>: should workspaces of archived environments move to the current bundle?</li>
+<li><a href="#agents">Agents</a>: publish drives in all 19 regions on every release, or only regions that have an environment?</li>
+<li><a href="#builds">Builds</a>: bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0?</li>
+<li><a href="#builds">Builds</a>: is 30 minutes the right build limit?</li>
+<li><a href="#builds">Builds</a>: who rebases #9282, and when?</li>
+<li><a href="#drive">Drive</a> (later): which internal environment gets it first, and what happens to a drive when its workspace expires after 30 days?</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="swap">1. Remove swap <span class="state ready">Shipped 18 November</span></h2>
+<p><strong>PR:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9924">#9924</a>, merged. 5 files, +86 −87. The production release that carries it succeeded, and boxes pick it up on their next wake.</p>
+
+<h3>What it does</h3>
+<p>Cloud boxes stop using swap. Removing swap alone was not safe: host-service stalled for up to 175 seconds. So the memory guard that kills runaway processes now checks four times as often and acts one step ahead.</p>
+
+<h3>Pseudocode</h3>
+<pre>every 0.25 s:                              # was every 1 s
+    read available memory                  # no process spawned
+    drop = how much it fell since the last check
+    if available - drop &lt; 8% of the box:
+        kill the largest ordinary process  # agents only if no ordinary process is left;
+                                           # host-service and terminals never
+        wait until it has really exited    # was a fixed 3 s pause
+        check again at once</pre>
+
+<h3>What a customer sees</h3>
+<ul>
+<li>A job bigger than the box is killed early. With swap it often finished slowly. A parallel build on a 4 GB box loses 3 of its 4 workers. A monorepo typecheck of about 8 GB is killed on the 4 GB size.</li>
+<li>Within about 5 seconds the desktop shows an out-of-memory banner that names the process and offers a resize to the next size. The terminal shows <code>Killed</code>.</li>
+<li>Host-service and terminals are never the ones killed. An agent is killed only when no ordinary process is left to kill. In every measured run the victim was an ordinary process.</li>
+</ul>
+
+<h3>Evidence</h3>
+<p>Measured on a real 2 vCPU / 4 GB Vercel box with its real memory limit, no swap, memguard from this PR:</p>
+<div class="wide">
+<table>
+<thead><tr><th>Case</th><th class="num">Longest host-service gap</th><th>Reaped</th><th class="num">Kernel kills</th><th>Protected processes killed</th></tr></thead>
+<tbody>
+<tr><td>One steady allocator</td><td class="num">256 ms</td><td>1, at 22.5 s</td><td class="num">0</td><td>none</td></tr>
+<tr><td>Parallel build, 4 workers</td><td class="num">256 ms</td><td>3 of 4, first at 5.3 s</td><td class="num">0</td><td>none</td></tr>
+<tr><td>Page cache plus allocator</td><td class="num">256 ms</td><td>1, at 28.8 s</td><td class="num">0</td><td>none</td></tr>
+<tr><td>Fast allocator, three runs</td><td class="num">254 ms each</td><td>1 each, at 0.9 s</td><td class="num">0</td><td>none</td></tr>
+</tbody>
+</table>
+</div>
+<p>The worker's simulated runs at 4 GB and 8 GB gave the same picture, with a longest gap of 314 ms. On main, with swap and the 1-second check, the fast allocator caused stalls of 6 to 94 seconds in 6 of 7 simulated runs.</p>
+<p><strong>Not measured:</strong> snapshot size before and after on real Vercel. Swap stayed empty in every run, so the saving follows, but it has not been weighed.</p>
+
+<h3>Risk and rollback</h3>
+<ul>
+<li>The main risk is the product trade above: oversized jobs die where they used to finish.</li>
+<li>Rollback is a revert. No boot step re-runs. Snapshots that already hold swap keep it either way.</li>
+</ul>
+
+<h3>Decision</h3>
+<div class="decision">
+<p><strong>Ship no swap with this loop?</strong> Decided: yes. Merged and released on 18 November.</p>
+</div>
+<p>Not blocking, worth scheduling: a killed Node process shows in the banner as "MainThread", and on the largest size the banner offers no next step.</p>
+
+<!-- ============================================================ -->
+<h2 id="agents">2. Agents only from the drive <span class="state ready">A: ready for review</span> <span class="state hold">B: after A is released</span></h2>
+<p><strong>PRs:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9929">#9929</a> (release side) and <a href="https://github.com/ParadevAI/Paradev/pull/9911">#9911</a> (box side, stacked on it). Both drafts.</p>
+
+<h3>What it does</h3>
+<p>Claude, Codex and Pdev exist twice today: on every box's disk and on the shared read-only agents drive. This removes the disk copy. It is split in two so nothing depends on deploy timing.</p>
+<ul>
+<li><strong>A, #9929</strong> changes only the release. It changes nothing on any box and can soak alone.</li>
+<li><strong>B, #9911</strong> removes the disk copy and the flag. It merges only after a release with A has succeeded.</li>
+</ul>
+
+<h3>Pseudocode</h3>
+<pre># A: the release
+publish the agents drive in all 19 regions
+fail the release if a region with an environment has no drive,
+    or a drive without claude, codex or pdev
+move every environment row to the new bundle, archived ones too
+keep the drives of the 3 newest bundles          # so a rollback has something to mount
+only the production release prunes drives
+
+# B: create or wake a box
+always try to mount the region's agents drive    # no flag
+retry on a transient error
+still no drive -> open the box anyway, report it to us
+boot:
+    link agents from the drive
+    only after a successful link: remove the copies on the box's disk
+agent launched with no drive:
+    "Agents are unavailable on this box; reopen the workspace"</pre>
+
+<h3>What a customer sees</h3>
+<ul>
+<li>When it works: nothing. Same agents, same paths.</li>
+<li>When the drive cannot be mounted: the box opens with terminals, files and desktop working, and launching an agent gives the message above.</li>
+<li>Workspaces of an archived environment move to the current bundle on their next wake. Three such workspaces exist in production.</li>
+</ul>
+
+<h3>Evidence</h3>
+<ul>
+<li>Real Vercel, on an earlier head of B: a drive was published for the branch's bundle, all three agents ran from it, and they were linked again after a stop and wake.</li>
+<li>Local image: 4.89 GB to 4.10 GB.</li>
+<li>The agents drive has been on for every organization since 17 November, 23:38 UTC. Two customer organizations were seen picking it up, one on create and one on wake.</li>
+</ul>
+<p><strong>Not verified:</strong> the current heads of A and B on real Vercel (A's run is in progress), how long publishing 19 regions takes, and a rollback rehearsal.</p>
+
+<h3>Risk and rollback</h3>
+<ul>
+<li>An independent review of the first version said "do not merge". It found that rollback did not restore agents, that an incomplete drive could ship, and that archived environments' workspaces could never wake. A and B are the response. They have not been re-reviewed.</li>
+<li>A release can now fail on a drive problem. Boxes then keep the previous bundle for one more cycle.</li>
+<li>Rollback of B: revert it. Boxes that already dropped their disk copy get it back, because the install marker is now removed with it. The kept drives cover the previous bundles.</li>
+<li>B conflicts with the workspace drive (#9847) in six files. Whichever lands second rebases.</li>
+</ul>
+
+<h3>Your decisions</h3>
+<div class="decision">
+<p><strong>No drive: open without agents, or fail the open?</strong></p>
+<p class="rec">Recommendation: open without agents, which is what B implements. A box with working terminals and files is better than no box, and it means a drive problem can never mark a workspace failed.</p>
+</div>
+<div class="decision">
+<p><strong>Should workspaces of archived environments move to the current bundle?</strong></p>
+<p class="rec">Recommendation: yes. Otherwise their drive is pruned and they lose agents.</p>
+</div>
+<div class="decision">
+<p><strong>Drives in all 19 regions on every release, or only regions with an environment?</strong></p>
+<p class="rec">Recommendation: all 19, since an environment can be created in any region before the next release. The cost is a longer release and more ways for the nightly to fail. The first release on A will give the real publish time.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="builds">3. Environment builds on Vercel Workflow <span class="state hold">Waiting on your decisions</span></h2>
+<p><strong>PR:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9906">#9906</a>, draft, stacked on your #9282.</p>
+
+<h3>What it does</h3>
+<p>A build is one serverless function today, with a 285-second budget. This makes it a Vercel Workflow run: a series of short steps, each retried on failure, with no compute used while it waits.</p>
+
+<h3>Pseudocode</h3>
+<pre>environmentBuildWorkflow(buildId):
+    deadline = now + 30 min
+    create the build box                   # found by name on retry, never a second box
+    for command in [checkout, install]:
+        start it detached on the box       # runs once per command
+        until it exits:
+            save the last 40 lines to the build row
+            sleep 5 s
+    stop the box, poll until the snapshot exists
+    activate the new golden                # no second swap on retry
+    on any failure: delete the box, mark the build failed with the reason</pre>
+
+<h3>What a customer sees</h3>
+<ul>
+<li>A build can take up to 30 minutes. Today an install over about 3 minutes fails.</li>
+<li>Same build IDs, statuses and table columns. No tRPC output changes.</li>
+<li>The stored log updates every 5 seconds during a build. Nothing in the UI reads it yet.</li>
+</ul>
+
+<h3>Evidence</h3>
+<ul>
+<li>A local run of the API app with Workflow's local runner and a fake build box: a successful build and a cancelled build both ran end to end.</li>
+<li>Tests with no real waiting: slow install, failed install, a step that fails then succeeds on retry, the limit, cleanup.</li>
+<li>Preview deploys of API, Web, Docs and Marketing pass on the newer CLI.</li>
+<li>Cost at Vercel's listed price: about $0.004 for a typical build, $0.04 for a 30-minute one.</li>
+</ul>
+<p><strong>Not verified:</strong> a real build on Vercel's workflow runtime with a real sandbox. A run stays pinned to the deployment that started it; one whose deployment is deleted is failed by the stale check after 40 minutes.</p>
+
+<h3>Your decisions</h3>
+<div class="decision">
+<p><strong>Bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0?</strong></p>
+<p>Workflow hard-codes a setting our pinned CLI rejects. 50.31.0 is the lowest version that accepts it, and it is the same major. It is set for previews in this draft only.</p>
+<p class="rec">Recommendation: yes, as its own small PR, watched on staging first.</p>
+</div>
+<div class="decision">
+<p><strong>Is 30 minutes the right build limit?</strong></p>
+<p class="rec">Recommendation: yes to start. It is one constant.</p>
+</div>
+<div class="decision">
+<p><strong>Who rebases #9282 onto main, and when?</strong></p>
+<p>Its migration number is stale, which is why the preview database step fails. It is your in-progress work, so I have not touched it.</p>
+<p class="rec">Recommendation: I can start a worker on the rebase if you want it off your plate.</p>
+</div>
+<p>Also needed before it runs anywhere: "Enable access to System Environment Variables" on the API's Vercel project. Nobody has checked whether it is on.</p>
+
+<!-- ============================================================ -->
+<h2 id="drive">4. Workspace drive <span class="state hold">Not ready: model verdict outstanding</span></h2>
+<p><strong>PRs:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9915">#9915</a> (two nullable columns, lands first), <a href="https://github.com/ParadevAI/Paradev/pull/9847">#9847</a> (the change), <a href="https://github.com/ParadevAI/Paradev/pull/9914">#9914</a> (the TLA+ model). All drafts.</p>
+
+<h3>What it does</h3>
+<p>A workspace's work moves onto a Vercel Drive mounted beside the box, so the box's own snapshot stays small however much work is done. Everything still persists.</p>
+
+<h3>Pseudocode</h3>
+<pre>create a workspace, drive mode on:
+    fork the environment's golden drive        # about 1 s, copy-on-write
+    mount it; first boot lays it out and records the owner on the drive
+boot:
+    drive expected but not mounted, or not this workspace's -> refuse to boot
+    bind /workspace, home caches, docker data and swap onto the drive
+    fresh fork -> fetch and create the branch; existing work -> never replaced
+wake:
+    under one lock: wait for the drive to be released, mount, resume
+delete:
+    retire the box and drive names in the same write
+    cleanup after the grace period, never of anything a live row names
+undo delete:
+    resumes the same box and drive if they still exist</pre>
+
+<h3>The rules it must keep</h3>
+<p>These are the model's rules. The last column is the model author's result at the previous head. The fix worker reports all ten hold at the current head, but it edited the model to get there, so the author is checking that independently.</p>
+<div class="wide">
+<table>
+<thead><tr><th>Rule</th><th>Harm if broken</th><th>Independently verified</th></tr></thead>
+<tbody>
+<tr><td>Nothing is lost</td><td>Commits or changes disappear</td><td>failed, fix claimed</td></tr>
+<tr><td>Never empty shown as work</td><td>User sees an empty workspace as their project</td><td>holds</td></tr>
+<tr><td>One writer per drive</td><td>Drive reads as corrupt or empty</td><td>failed, fix claimed</td></tr>
+<tr><td>Cleanup never deletes a live workspace</td><td>A workspace in use loses its files</td><td>failed, fix claimed</td></tr>
+<tr><td>Only creating a workspace gives it a drive</td><td>Old workspaces break when drive mode turns on</td><td>holds</td></tr>
+<tr><td>No drive, no change</td><td>The flag being off is not safe</td><td>holds</td></tr>
+<tr><td>Never stuck for ever</td><td>Work is safe but cannot be opened</td><td>failed, fix claimed</td></tr>
+<tr><td>A new workspace starts on fresh code</td><td>Stale code that looks like the user's branch</td><td>failed, fix claimed</td></tr>
+<tr><td>A passing glitch is not a failure</td><td>A workspace that would come up shows as broken</td><td>holds</td></tr>
+<tr><td>No drive left behind for ever</td><td>Storage billed for ever</td><td>holds only if the sweep is run by hand</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Evidence</h3>
+<p>Real Vercel, same work on both boxes (clone, <code>bun install</code>, 4 GB written), four runs:</p>
+<div class="wide">
+<table>
+<thead><tr><th></th><th class="num">Plain box</th><th class="num">Drive box</th></tr></thead>
+<tbody>
+<tr><td>Root snapshot after stop</td><td class="num">7.86 to 8.02 GB</td><td class="num">2.58 to 2.79 GB</td></tr>
+<tr><td>Create to host-service ready</td><td class="num">4.7 to 5.3 s</td><td class="num">3.7 to 6.4 s</td></tr>
+<tr><td><code>bun install</code></td><td class="num">70 to 74 s</td><td class="num">74 to 83 s</td></tr>
+<tr><td>Wake, total</td><td class="num">6.8 to 9.4 s</td><td class="num">5.4 to 6.8 s</td></tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li>Kept across stop and wake on both boxes: an uncommitted file, a local commit, a home file, a root-disk file, a Docker image.</li>
+<li>After an unclean stop: the box boots, <code>host.db</code> passes its integrity check, the checkout is intact.</li>
+<li>A workspace created from a drive-mode golden boots on its own new branch with dependencies present.</li>
+</ul>
+<p><strong>Not measured:</strong> a cold wake, which is where the size should pay off most and which cannot be forced from the SDK. The wake numbers above were probably all warm, so do not read a wake improvement from them. Also unmeasured: whether Vercel restarts a stopped box on certain calls, which decides how severe one lifecycle gap is.</p>
+
+<h3>Why it is not ready</h3>
+<p>The benefit is solid. The lifecycle has had four rounds of fixes, and in three of them a fix introduced a new bug that only the model caught. Two things must both be true on the same commit before I recommend enabling it for even one internal environment:</p>
+<ol>
+<li>The model author confirms every rule holds, having re-derived the model from the code.</li>
+<li>The real-Vercel run passes. It does at the current head.</li>
+</ol>
+<p>Still unbuilt: migrating existing workspaces, scheduling the orphan sweep, and merging with the agents work in section 2.</p>
+
+<h3>Your decisions, when it is ready</h3>
+<div class="decision">
+<p><strong>Which internal environment gets drive mode first?</strong> New workspaces only. There is a kill switch.</p>
+</div>
+<div class="decision">
+<p><strong>What happens to a drive when its workspace's snapshot expires after 30 days?</strong> Today the snapshot expires and the drive does not, so an abandoned workspace keeps billing for a drive nothing can resume.</p>
+</div>
+
+<h2 id="shipped">Already shipped in this effort</h2>
+<div class="wide">
+<table>
+<thead><tr><th>PR</th><th>What</th><th>Measured effect</th></tr></thead>
+<tbody>
+<tr><td>#9905</td><td>Host-service starts before the other boot steps</td><td>A fresh box is ready in about 5 s on real Vercel, was about 30 s</td></tr>
+<tr><td>#9896, #9912, #9916</td><td>Watcher stops watching ignored directories created later</td><td>Real <code>bun install</code>: peak 506 MB, was 1,350 MB; 244 MB six minutes later, was about 1,444 MB</td></tr>
+<tr><td>#9866</td><td>OpenCode and Pi on the agents drive</td><td>Verified on a fresh box</td></tr>
+<tr><td>#9865</td><td>A failed boot step skips only its dependents</td><td>A Chrome failure no longer removes agents</td></tr>
+<tr><td>#9869</td><td><code>agent_launched</code> telemetry</td><td>Reports after the next desktop and box releases</td></tr>
+<tr><td>Flag</td><td>Agents drive on for every organization</td><td>Two customer organizations confirmed</td></tr>
+</tbody>
+</table>
+</div>
+
+</main>
+</body>
+</html>

@@ -1954,9 +1954,6 @@ msgstr "Nombre de la cuenta"
 msgid "Account pending deletion"
 msgstr "Cuenta pendiente de eliminación"
 
-msgid "Account usage"
-msgstr "Uso de la cuenta"
-
 msgid "Account usage: {percent} used"
 msgstr "Uso de la cuenta: {percent} usado"
 
@@ -16493,9 +16490,6 @@ msgstr "Restablecer ubicación"
 
 msgid "Reset terminal"
 msgstr "Restablecer el terminal"
-
-msgid "Reset time unavailable"
-msgstr "Hora de restablecimiento no disponible"
 
 msgid "Reset to default"
 msgstr "Restablecer al predeterminado"

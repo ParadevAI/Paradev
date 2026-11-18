@@ -11,6 +11,7 @@ import { agentCredentials, cloudWorkspaces } from "@superset/db/schema";
 import { CHATGPT_PROVIDER } from "@superset/shared/agent-credentials";
 import { and, eq, gt, inArray, isNull } from "drizzle-orm";
 import { renewChatgptSignIns } from "../../router/agent-credential";
+import { controlTags } from "../control-log";
 import { buildSandboxClaim } from "./claim";
 import { applySandboxPolicy } from "./vercel";
 
@@ -67,7 +68,12 @@ export async function renewChatgptSignInsAndBoxes(args: {
 			});
 			if (outcome === "applied") boxesUpdated++;
 		} catch (error) {
-			Sentry.captureException(error, { extra: { workspaceId: row.id } });
+			Sentry.captureException(error, {
+				tags: controlTags({
+					cloudWorkspaceId: row.id,
+					organizationId: row.organizationId,
+				}),
+			});
 		}
 	}
 	return { checked, boxesUpdated, boxesLeft: boxes.length - done };

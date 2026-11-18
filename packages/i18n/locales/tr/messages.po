@@ -1954,9 +1954,6 @@ msgstr "Hesap adı"
 msgid "Account pending deletion"
 msgstr "Hesap silinmeyi bekliyor"
 
-msgid "Account usage"
-msgstr "Hesap kullanımı"
-
 msgid "Account usage: {percent} used"
 msgstr "Hesap kullanımı: {percent} kullanıldı"
 
@@ -16493,9 +16490,6 @@ msgstr "Konumu sıfırla"
 
 msgid "Reset terminal"
 msgstr "Terminali sıfırla"
-
-msgid "Reset time unavailable"
-msgstr "Sıfırlama zamanı kullanılamıyor"
 
 msgid "Reset to default"
 msgstr "Varsayılana sıfırla"
