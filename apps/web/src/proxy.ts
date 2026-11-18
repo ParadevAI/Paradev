@@ -1,9 +1,13 @@
 import { auth } from "@superset/auth/server";
 import { isStaffEmail } from "@superset/shared/constants";
+import { withDomainMove } from "@superset/shared/domain-move";
+import { getSessionCookie } from "better-auth/cookies";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
+	agentsRewriteUrl,
+	isAgentsRoute,
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
@@ -15,6 +19,25 @@ export default async function proxy(req: NextRequest) {
 		headers: await headers(),
 	});
 
+	return withDomainMove({
+		request: req,
+		enabled:
+			session?.user.deletionRequestedAt || isInternalRoute(req.nextUrl.pathname)
+				? undefined
+				: process.env.DOMAIN_MOVE_ENABLED,
+		surface: "web",
+		lookup: async (...args) => {
+			const { posthogServer } = await import("./lib/posthog-server");
+			return posthogServer.getFeatureFlag(...args);
+		},
+		fallback: () => legacyProxy(req, session),
+	});
+}
+
+async function legacyProxy(
+	req: NextRequest,
+	session: Awaited<ReturnType<typeof auth.api.getSession>>,
+) {
 	const pathname = req.nextUrl.pathname;
 
 	// API routes must never redirect to /sign-in: clients (CLI, host-service,
@@ -50,6 +73,8 @@ export default async function proxy(req: NextRequest) {
 	if (!session && !isPublicRoute(pathname)) {
 		const signInUrl = new URL("/sign-in", req.url);
 		signInUrl.searchParams.set("redirect", pathname + req.nextUrl.search);
+		if (getSessionCookie(req))
+			signInUrl.searchParams.set("reason", "session_expired");
 		return NextResponse.redirect(signInUrl);
 	}
 
@@ -75,6 +100,12 @@ export default async function proxy(req: NextRequest) {
 		!isStaffEmail(session.user.email)
 	) {
 		return NextResponse.redirect(new URL("/", req.url));
+	}
+
+	// next.config's rewrite proxies /agents without the headers() CSP; a rewrite from here keeps it.
+	const agentsUrl = process.env.AGENTS_URL;
+	if (agentsUrl && isAgentsRoute(pathname)) {
+		return NextResponse.rewrite(agentsRewriteUrl(req.nextUrl, agentsUrl));
 	}
 
 	return NextResponse.next();

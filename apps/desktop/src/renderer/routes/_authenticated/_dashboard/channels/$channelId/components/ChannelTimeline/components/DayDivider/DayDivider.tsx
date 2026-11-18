@@ -84,7 +84,7 @@ export function DayDivider({ date, onJump, onJumpToDate }: DayDividerProps) {
 					<Calendar
 						mode="single"
 						defaultMonth={date}
-						disabled={{ after: new Date() }}
+						disabled={(day) => day > new Date()}
 						onSelect={(picked) => {
 							setPicking(false);
 							if (picked) onJumpToDate(picked);

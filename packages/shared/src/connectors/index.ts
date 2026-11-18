@@ -134,7 +134,7 @@ export const CONNECTORS: Record<string, Connector> = parsed.connectors;
 export const CONNECTOR_SLUGS = Object.keys(CONNECTORS) as ConnectorSlug[];
 
 export const getConnector = (slug: string): Connector | undefined =>
-	CONNECTORS[slug];
+	Object.hasOwn(CONNECTORS, slug) ? CONNECTORS[slug] : undefined;
 
 export const connectorRequiredEnv = (slug: string): string[] => [
 	...new Set(getConnector(slug)?.methods.flatMap((m) => m.requires_env) ?? []),

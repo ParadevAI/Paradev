@@ -15,8 +15,13 @@ import {
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
+import {
+	failChatMovesTo,
+	queueChatMovesTo,
+} from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
+import { recordSandboxAwake } from "./sandbox-expiry";
 import { transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -53,16 +58,16 @@ export type ProvisionCloudWorkspaceOutcome =
 
 /**
  * Everything a cloud workspace needs after its row exists: a sandbox with
- * its identity written and boot started, the `ready` status that makes it
+ * its identity written and boot started, the `awake` status that makes it
  * openable, and the managed environment pushed once host-service answers.
  *
  * Runs detached from the create that asked for it, so it owns the row's
- * terminal state: it must leave `ready` or `failed` behind. The name is
+ * terminal state: it must leave `awake` or `failed` behind. The name is
  * generated alongside, off the sandbox's critical path: the box never
  * learns it, the API's row is what carries it.
  *
  * Safe to run twice on the same row: the provider calls are create-if-missing
- * and an already-`ready` row is left alone.
+ * and an already-`awake` row is left alone.
  */
 export async function provisionCloudWorkspace(
 	input: ProvisionCloudWorkspaceInput,
@@ -124,7 +129,7 @@ async function provision(
 		const ready = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
-			to: "ready",
+			to: "awake",
 			set: {
 				providerSandboxId: sandbox.providerSandboxId,
 				sandboxUrl: sandbox.sandboxUrl,
@@ -140,7 +145,14 @@ async function provision(
 				where: eq(cloudWorkspaces.id, row.id),
 				columns: { status: true },
 			});
-			if (current?.status === "deleted") {
+			if (current?.status === "archived") {
+				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+					(error) =>
+						console.error(
+							`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+							error,
+						),
+				);
 				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId);
 			}
@@ -148,6 +160,12 @@ async function provision(
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
+		if (sandbox.expiresAt) {
+			await recordSandboxAwake(row.id, {
+				expiresAt: sandbox.expiresAt,
+				sessionId: sandbox.sessionId,
+			});
+		}
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
 				Sentry.captureException(error, { extra: { bootId } }),
@@ -164,6 +182,12 @@ async function provision(
 					hostTarget: sandbox.hostTarget,
 					claim,
 				}),
+		);
+		await queueChatMovesTo(row.id).catch((error) =>
+			console.error(
+				`[cloud-workspace] could not start the chat moving into ${row.id}`,
+				error,
+			),
 		);
 		try {
 			recordBootSpans(answer);
@@ -203,11 +227,18 @@ async function provision(
 		});
 		await transitionCloudWorkspace({
 			id: row.id,
-			from: ["provisioning", "ready"],
+			from: ["provisioning", "awake", "asleep"],
 			to: "failed",
 			set: keepForDiagnosis ? { providerSandboxId } : {},
 		});
 		nudge(row.organizationId, "cloud_workspaces");
+		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
+			(moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
+		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}

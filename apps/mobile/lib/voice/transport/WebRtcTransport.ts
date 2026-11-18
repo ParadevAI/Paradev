@@ -1,12 +1,5 @@
 import { VoiceAudio } from "@superset/voice";
 import {
-	type MediaStream,
-	type MediaStreamTrack,
-	mediaDevices,
-	RTCPeerConnection,
-	RTCSessionDescription,
-} from "react-native-webrtc";
-import {
 	parseServerEvent,
 	type RealtimeClientEvent,
 	type RealtimeServerEvent,
@@ -16,6 +9,13 @@ import type {
 	RealtimeTransport,
 	TransportState,
 } from "./RealtimeTransport";
+import {
+	type MediaStream,
+	type MediaStreamTrack,
+	mediaDevices,
+	RTCPeerConnection,
+	RTCSessionDescription,
+} from "./webrtc";
 
 const CALLS_URL = "https://api.openai.com/v1/realtime/calls";
 const DATA_CHANNEL = "oai-events";

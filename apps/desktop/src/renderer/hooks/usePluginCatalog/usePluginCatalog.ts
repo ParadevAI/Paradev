@@ -27,11 +27,14 @@ export interface CatalogPlugin extends Omit<PluginCatalogEntry, "auth"> {
 	homepage: string | null;
 	author: string | null;
 	license: string | null;
+	/** Artwork the installed plugin ships in its own tree, as a data URI. */
+	iconUrl: string | null;
 }
 
 function toCatalogPlugin(
 	plugin: CatalogRow,
 	localVersions: ReadonlyMap<string, string> | undefined,
+	iconUrls: ReadonlyMap<string, string> | undefined,
 ): CatalogPlugin {
 	return {
 		name: plugin.name,
@@ -40,6 +43,7 @@ function toCatalogPlugin(
 		interface: {
 			displayName: plugin.displayName,
 			category: plugin.category as PluginCategory,
+			icon: plugin.icon,
 		},
 		mcpServers: plugin.mcpUrl
 			? { [plugin.name]: { type: "http" as const, url: plugin.mcpUrl } }
@@ -57,6 +61,8 @@ function toCatalogPlugin(
 		homepage: plugin.homepage,
 		author: plugin.author,
 		license: plugin.license,
+		iconUrl:
+			iconUrls?.get(localVersionKey(plugin.marketplace, plugin.name)) ?? null,
 	};
 }
 
@@ -90,12 +96,28 @@ export function usePluginCatalog() {
 		[organizationVersions.data],
 	);
 
+	const installedIcons = electronTrpc.plugins.installedIcons.useQuery();
+	const iconUrls = useMemo(
+		() =>
+			installedIcons.data
+				? new Map(
+						installedIcons.data.map((entry) => [
+							localVersionKey(entry.marketplace, entry.name),
+							entry.url,
+						]),
+					)
+				: undefined,
+		[installedIcons.data],
+	);
+
 	const plugins = useMemo(
 		() =>
 			onePerName(
-				(query.data ?? []).map((row) => toCatalogPlugin(row, localVersions)),
+				(query.data ?? []).map((row) =>
+					toCatalogPlugin(row, localVersions, iconUrls),
+				),
 			),
-		[query.data, localVersions],
+		[query.data, localVersions, iconUrls],
 	);
 
 	return {

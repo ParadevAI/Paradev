@@ -32,7 +32,7 @@ import {
 	loadToken,
 	parseAuthDeepLink,
 } from "lib/trpc/routers/auth/utils/auth-functions";
-import { applyShellEnvToProcess } from "lib/trpc/routers/workspaces/utils/shell-env";
+import { applyShellEnvToProcess } from "lib/trpc/routers/utils/shell-env";
 import { env as mainEnv } from "main/env.main";
 import {
 	APP_PARTITION,
@@ -57,7 +57,10 @@ import {
 	initBrowserExtensionHost,
 	userExtensions,
 } from "./lib/browser/extension-host";
-import { movePaneSitesOnce } from "./lib/browser/move-pane-sites";
+import {
+	clearMovedPaneSitesOnce,
+	movePaneSitesOnce,
+} from "./lib/browser/move-pane-sites";
 import { preparePaneSessions } from "./lib/browser/pane-session";
 import {
 	installBundledCliShim,
@@ -191,7 +194,11 @@ async function processDeepLink(url: string): Promise<void> {
 
 	// Non-auth deep links: extract path and navigate in renderer
 	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	const path = `/${url.slice(url.indexOf("://") + 3)}`;
+	// Links minted before the route rename (older CLIs, published pages).
+	const path = `/${url.slice(url.indexOf("://") + 3)}`.replace(
+		/^\/v2-workspace(s)?\b/,
+		"/workspace$1",
+	);
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();
@@ -595,19 +602,16 @@ if (!gotTheLock) {
 		} catch (error) {
 			console.error("[main] Failed to start browser bridge:", error);
 		}
+		const appSession = session.fromPartition(APP_PARTITION);
+		const paneCookiesMarkerPath = path.join(
+			app.getPath("userData"),
+			"pane-cookies-copied",
+		);
 		try {
-			const appSession = session.fromPartition(APP_PARTITION);
 			await movePaneSitesOnce({
 				from: appSession.cookies,
 				to: session.fromPartition(BROWSER_PARTITION).cookies,
-				markerPath: path.join(app.getPath("userData"), "pane-cookies-copied"),
-				readVisitedUrls: () =>
-					localDb
-						.select({ url: browserHistory.url })
-						.from(browserHistory)
-						.all()
-						.map((row) => row.url),
-				clearOldSites: (origins) => appSession.clearData({ origins }),
+				markerPath: paneCookiesMarkerPath,
 			});
 		} catch (error) {
 			console.error("[main] Failed to copy browser pane cookies:", error);
@@ -714,6 +718,19 @@ if (!gotTheLock) {
 		await makeAppSetup(
 			() => createPlatformWindow({ orgId: null }),
 			restoreWindows,
+		);
+		void clearMovedPaneSitesOnce({
+			from: appSession.cookies,
+			markerPath: paneCookiesMarkerPath,
+			readVisitedUrls: () =>
+				localDb
+					.select({ url: browserHistory.url })
+					.from(browserHistory)
+					.all()
+					.map((row) => row.url),
+			clearOldSites: (origins) => appSession.clearData({ origins }),
+		}).catch((error) =>
+			console.error("[main] Failed to clear moved browser pane sites:", error),
 		);
 		setupAutoUpdater();
 		initTray();

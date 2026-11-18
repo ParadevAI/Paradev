@@ -11,16 +11,17 @@ import {
 } from "@superset/ui/context-menu";
 import type { ReactNode } from "react";
 import {
-	LuArrowRightLeft,
+	LuArchive,
 	LuArrowUp,
 	LuFolderPlus,
+	LuFolderSymlink,
 	LuTrash2,
 	LuX,
 } from "react-icons/lu";
 import { useBulkWorkspaceMoveActions } from "../../../../hooks/useBulkWorkspaceMoveActions";
+import { useBulkWorkspaceRemoveActions } from "../../../../hooks/useBulkWorkspaceRemoveActions";
 import { useDashboardSidebarHoverActions } from "../../../../providers/DashboardSidebarHoverProvider";
 import { useDashboardSidebarSelection } from "../../../../providers/DashboardSidebarSelectionProvider";
-import { useBulkDeleteWorkspacesIntent } from "../../../../stores/bulkDeleteWorkspacesIntent";
 import { useWorkspaceBulkMenuScope } from "../WorkspaceBulkMenuScope";
 
 interface DashboardSidebarWorkspaceBulkContextMenuProps {
@@ -46,8 +47,8 @@ export function DashboardSidebarWorkspaceBulkContextMenu({
 		workspacesById: scope?.workspacesById ?? new Map(),
 		sectionIdByWorkspaceId: scope?.sectionIdByWorkspaceId ?? new Map(),
 	});
-	const openDeleteDialog = () =>
-		useBulkDeleteWorkspacesIntent.getState().request(selectedWorkspaces);
+	const { archivableCount, archiveSelection, deletableCount, requestDelete } =
+		useBulkWorkspaceRemoveActions(selectedWorkspaces);
 
 	if (!scope) return children;
 
@@ -59,7 +60,7 @@ export function DashboardSidebarWorkspaceBulkContextMenu({
 			<ContextMenuContent onCloseAutoFocus={(event) => event.preventDefault()}>
 				<ContextMenuSub>
 					<ContextMenuSubTrigger>
-						<LuArrowRightLeft className="size-4 mr-2" />
+						<LuFolderSymlink className="size-4 mr-2" />
 						<Trans>Move {count} to Group</Trans>
 					</ContextMenuSubTrigger>
 					<ContextMenuSubContent>
@@ -100,17 +101,29 @@ export function DashboardSidebarWorkspaceBulkContextMenu({
 					</ContextMenuItem>
 				)}
 				<ContextMenuSeparator />
-				<ContextMenuItem
-					onSelect={openDeleteDialog}
-					className="text-destructive focus:text-destructive"
-				>
-					<LuTrash2 className="size-4 mr-2 text-destructive" />
-					<Plural
-						value={count}
-						one="Delete # Workspace"
-						other="Delete # Workspaces"
-					/>
-				</ContextMenuItem>
+				{deletableCount > 0 && (
+					<ContextMenuItem
+						onSelect={requestDelete}
+						className="text-destructive focus:text-destructive"
+					>
+						<LuTrash2 className="size-4 mr-2 text-destructive" />
+						<Plural
+							value={deletableCount}
+							one="Delete # Workspace"
+							other="Delete # Workspaces"
+						/>
+					</ContextMenuItem>
+				)}
+				{archivableCount > 0 && (
+					<ContextMenuItem onSelect={archiveSelection}>
+						<LuArchive className="size-4 mr-2" />
+						<Plural
+							value={archivableCount}
+							one="Archive # Cloud Workspace"
+							other="Archive # Cloud Workspaces"
+						/>
+					</ContextMenuItem>
+				)}
 				<ContextMenuSeparator />
 				<ContextMenuItem onSelect={clearSelection}>
 					<LuX className="size-4 mr-2" />

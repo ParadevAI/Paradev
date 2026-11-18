@@ -173,14 +173,16 @@ export default async function GoogleIntegrationPage() {
 						isConnected={isConnected}
 						needsReconnect={needsReconnect}
 					/>
-					{connection?.email && (
+					{connection && connection.emails.length > 0 && (
 						<div className="mt-4 text-sm text-muted-foreground">
 							{i18n._(
 								msg({
 									message: "Connected as",
 								}),
 							)}{" "}
-							<span className="font-medium">{connection.email}</span>
+							<span className="font-medium">
+								{connection.emails.join(", ")}
+							</span>
 						</div>
 					)}
 				</CardContent>

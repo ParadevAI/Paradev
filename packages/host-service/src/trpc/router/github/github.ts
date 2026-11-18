@@ -6,6 +6,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { protectedProcedure, router } from "../../index";
+import { githubRequestError } from "../workspace-creation/shared/github-search";
 import { createGithubWorkItemLoader } from "./work-item";
 
 const loadWorkItem = createGithubWorkItemLoader();
@@ -21,7 +22,13 @@ export const githubRouter = router({
 				number: z.number().int().positive(),
 			}),
 		)
-		.query(async ({ ctx, input }) => loadWorkItem(await ctx.github(), input)),
+		.query(async ({ ctx, input }) => {
+			try {
+				return await loadWorkItem(await ctx.github(), input);
+			} catch (error) {
+				throw githubRequestError(error, ctx.credentials);
+			}
+		}),
 
 	getPRStatus: protectedProcedure
 		.input(

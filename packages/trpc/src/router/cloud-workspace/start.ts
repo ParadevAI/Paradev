@@ -29,6 +29,7 @@ import {
 } from "../../lib/sandbox";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { userError } from "../../trpc";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { assertMayBoot } from "./meter";
@@ -143,7 +144,14 @@ async function start(args: StartCloudWorkspaceInput) {
 	const openAsChat =
 		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);
-	const size = await resolveMachineSize(args.organizationId, args.machineSize);
+	const size =
+		(await resolveMachineSize(
+			args.organizationId,
+			args.machineSize ?? environment.machineSize,
+		)) ??
+		(args.machineSize
+			? null
+			: await resolveMachineSize(args.organizationId, undefined));
 	if (!size) throw machineSizeNotAvailable(args.machineSize);
 	const machineSize = size.name;
 	await assertMayBoot(args.organizationId, size.vcpus);
@@ -275,7 +283,7 @@ async function start(args: StartCloudWorkspaceInput) {
 		await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
-			to: "deleted",
+			to: "archived",
 		});
 		throw error;
 	}
@@ -308,6 +316,15 @@ export async function queueProvision(
 			from: ["provisioning"],
 			to: "failed",
 		});
+		await failChatMovesTo(
+			job.cloudWorkspaceId,
+			"The cloud workspace could not start",
+		).catch((moveError) =>
+			console.error(
+				`[cloud-workspace] could not fail the chat moves into ${job.cloudWorkspaceId}`,
+				moveError,
+			),
+		);
 		console.error(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,

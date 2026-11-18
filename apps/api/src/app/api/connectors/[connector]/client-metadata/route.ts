@@ -1,5 +1,6 @@
 import { getConnector } from "@superset/shared/connectors";
 import { CANONICAL_URLS } from "@superset/shared/constants";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { clientMetadataUrl, redirectUriFor } from "@superset/trpc/connectors";
 
 export async function GET(
@@ -16,7 +17,7 @@ export async function GET(
 			client_id: clientMetadataUrl(slug),
 			client_name: "Paradev",
 			client_uri: CANONICAL_URLS.MARKETING,
-			redirect_uris: [redirectUriFor(slug)],
+			redirect_uris: withOwnDomainTwins([redirectUriFor(slug)]),
 			grant_types: ["authorization_code", "refresh_token"],
 			response_types: ["code"],
 			token_endpoint_auth_method: "none",

@@ -24,6 +24,8 @@ function forward(status: PortForward["status"]): PortForward {
 		status,
 		transport: "relay",
 		connections: 0,
+		explicit: false,
+		localPort: null,
 	};
 }
 

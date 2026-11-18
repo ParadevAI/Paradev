@@ -10,7 +10,7 @@ const HELP: Record<AutomationRunErrorCode, MessageDescriptor> = {
 	}),
 	agent_not_found: msg({
 		message:
-			"The agent this automation was set to run no longer exists on its host — the host's agents may have been reset or removed. Re-select an agent in the automation's settings.",
+			"The agent this automation was set to run no longer exists on its host. The host's agents may have been reset or removed. Re-select an agent in the automation's settings.",
 	}),
 	workspace_not_found: msg({
 		message:

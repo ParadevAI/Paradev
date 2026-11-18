@@ -1,14 +1,16 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
 	approvalAsker,
+	composerAnswer,
 	deriveQueuedPrompts,
 	displayText,
 	launchConfigSelections,
 	runningTurnId,
 } from "@superset/chat/core";
-import type { Decision } from "@superset/chat/protocol";
+import type { Decision, UserContent } from "@superset/chat/protocol";
 import {
 	ItemBodiesProvider,
+	useApprovals,
 	useChatSession,
 	useTimeline,
 } from "@superset/chat/react";
@@ -25,9 +27,10 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { ActionSheetIOS, Alert, Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { Conversation } from "@/components/ai-elements/conversation";
 import { Text } from "@/components/ui/text";
+import { showActionSheet } from "@/lib/action-sheet";
 import type { ChatAttachmentPart } from "@/lib/attachments/chatParts";
 import {
 	type ChatHost,
@@ -35,6 +38,7 @@ import {
 	getChatTransport,
 } from "@/lib/chat";
 import { errorCopy } from "@/lib/errors";
+import { useColumnInset } from "@/lib/layout";
 import { usePendingChatLaunchStore } from "@/screens/(authenticated)/stores/pendingChatLaunchStore";
 import type { PullRequestDiffstat } from "../../hooks/usePullRequestDiffstat";
 import { useActiveChatStore } from "../../stores/activeChatStore";
@@ -160,6 +164,7 @@ export const ChatSessionView = forwardRef<
 	);
 	const session = chat.snapshot.session;
 	const queuePaused = session?.queuePaused === true;
+	const queuePausedByShutdown = session?.queuePausedByShutdown === true;
 	const queueControls = session?.queueControls === true;
 	const harness = session?.harness;
 	const turnId = runningTurnId(chat.snapshot.turns);
@@ -219,7 +224,7 @@ export const ChatSessionView = forwardRef<
 
 	const branchFrom = useCallback(
 		(itemId: string) => {
-			ActionSheetIOS.showActionSheetWithOptions(
+			showActionSheet(
 				{
 					options: [
 						t({ message: "Branch from here" }),
@@ -313,6 +318,7 @@ export const ChatSessionView = forwardRef<
 			running: turnId !== null,
 			queued,
 			queuePaused,
+			queuePausedByShutdown,
 			queueControls,
 			selectMode: (modeId) => actionsRef.current.selectMode(modeId),
 			stop: () => actionsRef.current.stop(),
@@ -328,6 +334,7 @@ export const ChatSessionView = forwardRef<
 		turnId,
 		queued,
 		queuePaused,
+		queuePausedByShutdown,
 		queueControls,
 	]);
 	useEffect(
@@ -335,21 +342,43 @@ export const ChatSessionView = forwardRef<
 		[sessionId],
 	);
 
+	const approvals = useApprovals(chat.snapshot);
 	useImperativeHandle(
 		ref,
 		() => ({
 			send: async (text: string, attachments: ChatAttachment[] = []) => {
 				if (!text.trim() && attachments.length === 0) return;
-				chat.sendPrompt([
+				const content: UserContent[] = [
 					...(text.trim() ? [{ type: "text" as const, text }] : []),
 					...attachments.map((attachment) => ({
 						...attachment,
 						type: "attachment" as const,
 					})),
-				]);
+				];
+				const pending = loaded
+					? approvals.filter((approval) => !approval.parentItemId)
+					: [];
+				const [question] = pending;
+				const answer =
+					pending.length === 1 && question
+						? composerAnswer(question, content)
+						: null;
+				if (question && answer) {
+					await chat.respondToApproval(question.id, answer);
+					return;
+				}
+				for (const approval of pending) {
+					void chat
+						.respondToApproval(approval.id, { type: "cancel" })
+						.catch(() => {});
+				}
+				chat.sendPrompt(
+					content,
+					pending.length > 0 && turnId ? { expectedTurnId: turnId } : undefined,
+				);
 			},
 		}),
-		[chat],
+		[chat, approvals, loaded, turnId],
 	);
 
 	const router = useRouter();
@@ -421,6 +450,7 @@ export const ChatSessionView = forwardRef<
 	);
 
 	const tapHandlers = useTapHandlers(onTap);
+	const columnInset = useColumnInset(16);
 
 	const banner =
 		session?.status === "dead"
@@ -442,9 +472,9 @@ export const ChatSessionView = forwardRef<
 			<ItemBodiesProvider requestItemBodies={chat.requestItemBodies}>
 				<View className="flex-1" {...tapHandlers}>
 					<Conversation
-						contentContainerClassName="px-4"
 						contentContainerStyle={{
 							paddingTop: headerHeight + 16 + (banner ? BANNER_SPACE : 0),
+							paddingHorizontal: columnInset,
 						}}
 						data={textRows}
 						keyExtractor={({ row }) => row.key}
@@ -471,7 +501,8 @@ export const ChatSessionView = forwardRef<
 				</View>
 			</ItemBodiesProvider>
 			<View
-				className="absolute inset-x-0 bottom-0 gap-2 px-3 pb-2"
+				className="absolute inset-x-0 bottom-0 gap-2 pb-2"
+				style={{ paddingHorizontal: columnInset - 4 }}
 				onLayout={(event) => setDockHeight(event.nativeEvent.layout.height)}
 				pointerEvents="box-none"
 			>

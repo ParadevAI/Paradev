@@ -12,6 +12,8 @@ import { env } from "../../env";
 import { organizationEnvironmentLimit } from "../../lib/billing/plan";
 import { personProcedure, userError } from "../../trpc";
 import { countEnvironments } from "../environment/limit";
+import { recordUpgradeIntent } from "./upgrade-nudge";
+import { upgradeNudgeDeps } from "./upgrade-nudge-deps";
 
 function subtractMonthsClamped(date: Date, months: number) {
 	const result = new Date(date);
@@ -135,6 +137,20 @@ async function isBillingOwner(userId: string, organizationId: string) {
 }
 
 export const billingRouter = {
+	recordUpgradeIntent: personProcedure
+		.input(z.object({ feature: z.string().trim().min(1).max(64) }))
+		.mutation(async ({ ctx, input }) => {
+			await recordUpgradeIntent(
+				{
+					user: ctx.session.user,
+					organizationId: ctx.activeOrganizationId,
+					feature: input.feature,
+				},
+				upgradeNudgeDeps,
+			);
+			return { ok: true as const };
+		}),
+
 	activePlan: personProcedure.query(async ({ ctx }) => {
 		const activeOrgId = ctx.activeOrganizationId;
 		const billingProvider = billingUsesAutumn

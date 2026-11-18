@@ -2,6 +2,7 @@ import { cn } from "@superset/ui/utils";
 import { type ReactNode, useCallback, useRef } from "react";
 import { useDrag } from "react-dnd";
 import { usePaneAppearance } from "../../../../../../../../hooks/usePaneAppearance";
+import { usePaneAreaFocused } from "../../../../../../../../hooks/usePaneAreaFocused";
 import { DefaultHeaderContent } from "./components/DefaultHeaderContent";
 
 interface PaneHeaderProps {
@@ -34,6 +35,8 @@ export function PaneHeader({
 	onMiddleClick,
 }: PaneHeaderProps) {
 	const isCards = usePaneAppearance() === "cards";
+	const isAreaFocused = usePaneAreaFocused();
+	const looksActive = isActive && isAreaFocused;
 	const [{ isDragging }, connectDrag] = useDrag(
 		() => ({
 			type: PANE_DRAG_TYPE,
@@ -68,7 +71,7 @@ export function PaneHeader({
 				isCards
 					? "flex h-8 shrink-0 cursor-grab items-center transition-opacity duration-150"
 					: "flex h-7 shrink-0 cursor-grab items-center border-b border-border/20 bg-muted/30 transition-opacity duration-150",
-				!isActive &&
+				!looksActive &&
 					!isDragging &&
 					cn(
 						isCards ? "opacity-70" : "opacity-60",
@@ -88,7 +91,7 @@ export function PaneHeader({
 				<DefaultHeaderContent
 					title={title}
 					icon={icon}
-					isActive={isActive}
+					isActive={looksActive}
 					titleContent={titleContent}
 					headerExtras={headerExtras}
 					actionsContent={actionsContent}

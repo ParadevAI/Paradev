@@ -142,6 +142,7 @@ export function createAgentSessionClient(
 					sessionId,
 					scopeId: "",
 					harness: HARNESS,
+					agentConfigId: null,
 					harnessSessionId: null,
 					epoch: head.cursor?.epoch ?? "",
 					status: head.session?.status ?? "idle",

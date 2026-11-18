@@ -51,6 +51,12 @@ export default async function GitHubIntegrationPage() {
 					"This GitHub installation is already connected to another Paradev organization. Disconnect it there, or uninstall the Paradev GitHub App, then try again.",
 			}),
 		),
+		admin_required: i18n._(
+			msg({
+				message:
+					"Only organization owners and admins can connect GitHub accounts. Ask one of them to connect it.",
+			}),
+		),
 		unauthorized: i18n._(
 			msg({
 				message: "You are not authorized to perform this action.",

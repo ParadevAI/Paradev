@@ -15,6 +15,10 @@ export {
 	rerunBoxStartHook,
 	runBoxArchiveHook,
 } from "./box-hooks";
+export {
+	type ReportSandboxBoxPressureOutcome,
+	reportSandboxBoxPressure,
+} from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
@@ -26,6 +30,7 @@ export {
 	type RefreshSandboxCredentialsOutcome,
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
+export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
@@ -43,6 +48,7 @@ export {
 	workspaceRepositories,
 } from "./repositories";
 export {
+	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
