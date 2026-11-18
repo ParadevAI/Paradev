@@ -6,6 +6,7 @@ import {
 	type CloudUsageScope,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
+	gbMinutesUsd,
 	listCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
@@ -24,6 +25,7 @@ import { requireActiveOrgRole } from "../utils/active-org";
 import {
 	bootKeysetSchema,
 	type CloudListFilters,
+	type CloudPeriodUnavailable,
 	type CloudRange,
 	cloudBootsInputSchema,
 	cloudBootsOutputSchema,
@@ -57,6 +59,75 @@ function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
 		: null;
 }
 
+function creditLine(credit: CloudUsage["bought"], rate: number | null) {
+	if (!credit?.grantedGbMinutes) return null;
+	const used = credit.grantedGbMinutes - credit.remainingGbMinutes;
+	return {
+		usedGbHours: used / 60,
+		totalGbHours: credit.grantedGbMinutes / 60,
+		usedUsd: gbMinutesUsd(used, rate),
+		totalUsd: gbMinutesUsd(credit.grantedGbMinutes, rate),
+	};
+}
+
+function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
+	const rate = cloudUsage.overagePerGbHour;
+	const included = cloudUsage.includedGbMinutes;
+	const limit = cloudUsage.overageLimit;
+	const unavailable: CloudPeriodUnavailable[] =
+		cloudUsage.bought === null
+			? (
+					[
+						"seats",
+						"bought",
+						"freeCredits",
+						"extraUsageLimit",
+						"limitReached",
+					] as const
+				).map((field) => ({ field, reason: "not_read" }))
+			: [];
+	if (limit?.type === "usage_percentage") {
+		unavailable.push({
+			field: "extraUsageLimit",
+			reason: "percent_of_allowance",
+		});
+	}
+	if (cloudUsage.bought !== null && cloudUsage.limitReached === null) {
+		unavailable.push({ field: "limitReached", reason: "not_tracked" });
+	}
+	return {
+		allowance: {
+			includedGbHours: included === null ? null : included / 60,
+			usedGbHours: cloudUsage.usedGbMinutes / 60,
+			overageGbHours: cloudUsage.overageGbMinutes / 60,
+			prepaidRemainingGbHours: cloudUsage.prepaidGbMinutes / 60,
+			resetsAt,
+			usedUsd: gbMinutesUsd(cloudUsage.usedGbMinutes, rate),
+			includedUsd: included === null ? null : gbMinutesUsd(included, rate),
+			overageUsd: gbMinutesUsd(cloudUsage.overageGbMinutes, rate),
+			seats: cloudUsage.seats,
+			bought: creditLine(cloudUsage.bought, rate),
+			freeCredits: creditLine(cloudUsage.freeCredits, rate),
+			extraUsageLimit:
+				limit?.type === "absolute"
+					? {
+							gbHours: limit.gbMinutes / 60,
+							usd: gbMinutesUsd(limit.gbMinutes, rate),
+						}
+					: null,
+			limitReached: cloudUsage.limitReached,
+		},
+		unavailable,
+	};
+}
+
+function noAllowance(reason: "closed_period" | "owners_and_admins_only") {
+	return {
+		allowance: null,
+		unavailable: [{ field: "allowance", reason } as const],
+	};
+}
+
 function periodId(start: Date): string {
 	return start.toISOString().slice(0, 10);
 }
@@ -74,7 +145,13 @@ const CURSOR_FILTER_KEYS = Object.keys({
 	endReason: true,
 	groupBy: true,
 	open: true,
+	order: true,
 	range: true,
+	search: true,
+	size: true,
+	sort: true,
+	status: true,
+	user: true,
 	workspace: true,
 } satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
 
@@ -174,10 +251,13 @@ export function cloudRouterWith(deps: CloudDeps) {
 							i18nKey: "serverError.cloud.onlyAdminsSeeUsageByPerson",
 						});
 					}
-					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
+					const sort =
+						input.sort ?? (input.groupBy === "day" ? null : "gbHours");
+					const keysetSort =
+						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(
 						input,
-						usageKeysetSchemas[sort],
+						usageKeysetSchemas[keysetSort],
 					);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await queryCloudUsage(
@@ -185,11 +265,21 @@ export function cloudRouterWith(deps: CloudDeps) {
 						ctx.scope,
 						{
 							window,
-							filters: { workspace: input.workspace },
+							filters: {
+								workspace: input.workspace,
+								user: ctx.isAdmin ? input.user : undefined,
+								size: input.size,
+								status: input.status,
+								search: input.search,
+							},
 							groupBy: input.groupBy,
+							sort:
+								sort === null
+									? undefined
+									: { by: sort, order: input.order ?? "desc" },
 							limit: input.limit,
 							cursor: keyset && {
-								gbMinutes: keyset.sort === "gbMinutes" ? keyset.value : "0",
+								value: keyset.sort === "key" ? "0" : keyset.value,
 								key: keyset.key,
 							},
 							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
@@ -202,9 +292,13 @@ export function cloudRouterWith(deps: CloudDeps) {
 							nextCursor &&
 							writeCursor(
 								input,
-								sort === "key"
-									? { sort, key: nextCursor.key }
-									: { sort, value: nextCursor.gbMinutes, key: nextCursor.key },
+								keysetSort === "key"
+									? { sort: keysetSort, key: nextCursor.key }
+									: {
+											sort: keysetSort,
+											value: nextCursor.value,
+											key: nextCursor.key,
+										},
 							),
 					};
 				}),
@@ -254,8 +348,9 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudPeriodsInputSchema)
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const anchor = anchorOf(ctx.cloudUsage);
-					if (!anchor) return { items: [], nextCursor: null };
+					const { cloudUsage } = ctx;
+					const anchor = anchorOf(cloudUsage);
+					if (!cloudUsage || !anchor) return { items: [], nextCursor: null };
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
 						: -1;
@@ -270,9 +365,8 @@ export function cloudRouterWith(deps: CloudDeps) {
 					).filter((period) => period.to > createdAt);
 					const page = await queryCloudUsageByPeriod(deps.db, ctx.scope, {
 						periods: periods.slice(0, input.limit),
-						overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+						overagePerGbHour: cloudUsage.overagePerGbHour,
 					});
-					const allowance = ctx.isAdmin ? ctx.cloudUsage : null;
 					const last = page.at(-1);
 					return {
 						items: page.map(({ from, to, metrics }, i) => {
@@ -282,20 +376,11 @@ export function cloudRouterWith(deps: CloudDeps) {
 								start: from,
 								end: to,
 								closed: !open,
-								allowance:
-									open && allowance
-										? {
-												includedGbHours:
-													allowance.includedGbMinutes === null
-														? null
-														: allowance.includedGbMinutes / 60,
-												usedGbHours: allowance.usedGbMinutes / 60,
-												overageGbHours: allowance.overageGbMinutes / 60,
-												prepaidRemainingGbHours:
-													allowance.prepaidGbMinutes / 60,
-												resetsAt: to,
-											}
-										: null,
+								...(!open
+									? noAllowance("closed_period")
+									: !ctx.isAdmin
+										? noAllowance("owners_and_admins_only")
+										: allowanceOf(cloudUsage, to)),
 								metrics,
 							};
 						}),

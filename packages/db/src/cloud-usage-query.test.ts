@@ -26,7 +26,12 @@ import {
 	queryCloudUsageByPeriod,
 	queryFleetCloudUsage,
 } from "./cloud-usage-query";
-import { cloudWorkspaceBoots, cloudWorkspaces, taskProjects } from "./schema";
+import {
+	cloudUsageEvents,
+	cloudWorkspaceBoots,
+	cloudWorkspaces,
+	taskProjects,
+} from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 
@@ -72,6 +77,7 @@ describe("queryCloudUsage", () => {
 				gbHours: 34,
 				usageUsd: 2.04,
 			},
+			rowCount: 0,
 			nextCursor: null,
 		});
 	});
@@ -119,8 +125,38 @@ describe("queryCloudUsage", () => {
 					reason: "snapshot_expired",
 					at: new Date("2026-11-16T14:03:00Z"),
 				},
+				lastBoot: null,
 			},
 		]);
+	});
+
+	test("a workspace carries its newest boot's end reason and stop, null while it runs", async () => {
+		const { items } = await usage({ groupBy: "workspace" });
+		expect(
+			items.map((item) => [
+				item.key,
+				item.ref && "lastBoot" in item.ref ? item.ref.lastBoot : undefined,
+			]),
+		).toEqual([
+			[
+				CHECKOUT,
+				{ endReason: "released", stoppedAt: new Date("2026-11-12T08:05Z") },
+			],
+			[
+				BILLING_PAGE,
+				{ endReason: "user", stoppedAt: new Date("2026-12-05T09:00Z") },
+			],
+			[BROKEN, null],
+		]);
+		const { items: own } = await usage(
+			{ groupBy: "workspace", filters: { workspace: BILLING_PAGE } },
+			SAM,
+		);
+		expect(
+			own.map((item) =>
+				item.ref && "lastBoot" in item.ref ? item.ref.lastBoot : undefined,
+			),
+		).toEqual([{ endReason: null, stoppedAt: null }]);
 	});
 
 	test("an event sent at the window's end belongs to the next window", async () => {
@@ -216,6 +252,79 @@ test("paging one row at a time returns every row once, in order", async () => {
 	expect(await pages((cursor) => boots({ limit: 1, cursor }))).toEqual(
 		(await boots({})).items,
 	);
+});
+
+test("a search matches workspace names, any case, and its wildcards are text", async () => {
+	const keys = async (search: string) =>
+		(await usage({ groupBy: "workspace", filters: { search } })).items.map(
+			(item) => item.key,
+		);
+	expect(await keys("CHECK")).toEqual([CHECKOUT]);
+	expect(await keys("-")).toEqual([CHECKOUT, BILLING_PAGE, BROKEN]);
+	expect(await keys("%")).toEqual([]);
+});
+
+test.each([
+	["gbHours", "desc", [CHECKOUT, BILLING_PAGE, BROKEN]],
+	["hours", "asc", [BROKEN, BILLING_PAGE, CHECKOUT]],
+	["boots", "desc", [CHECKOUT, BILLING_PAGE, BROKEN]],
+	["name", "asc", [BILLING_PAGE, BROKEN, CHECKOUT]],
+	["name", "desc", [CHECKOUT, BROKEN, BILLING_PAGE]],
+	["status", "asc", [BROKEN, BILLING_PAGE, CHECKOUT]],
+] as const)("sorted by %s %s, pages of one row give the same rows", async (by, order, expected) => {
+	const sort = { by, order };
+	const all = await usage({ groupBy: "workspace", sort });
+	expect(all.items.map((item) => item.key)).toEqual([...expected]);
+	const paged: typeof all.items = [];
+	let cursor: (typeof all)["nextCursor"] | undefined;
+	do {
+		const page = await usage({ groupBy: "workspace", sort, limit: 1, cursor });
+		paged.push(...page.items);
+		cursor = page.nextCursor;
+	} while (cursor && paged.length < 10);
+	expect(paged).toEqual(all.items);
+});
+
+test("rowCount is every row of the filter, on every page", async () => {
+	const first = await usage({ groupBy: "workspace", limit: 1 });
+	expect(first.rowCount).toBe(3);
+	const second = await usage({
+		groupBy: "workspace",
+		limit: 1,
+		cursor: first.nextCursor ?? undefined,
+	});
+	expect(second.rowCount).toBe(3);
+	expect(
+		(await usage({ groupBy: "workspace", filters: { status: ["failed"] } }))
+			.rowCount,
+	).toBe(1);
+});
+
+test("rowCount counts the row of usage with no workspace, which total.workspaces does not", async () => {
+	const window = {
+		from: new Date("2026-12-10T00:00:00Z"),
+		to: new Date("2026-12-20T00:00:00Z"),
+	};
+	await db.insert(cloudUsageEvents).values({
+		bootId: "boot_7",
+		lockSeq: 9,
+		feature: "box_gb_minutes",
+		organizationId: ORG,
+		cloudWorkspaceId: null,
+		userId: MAYA,
+		windowFrom: new Date("2026-12-15T00:00:00Z"),
+		windowTo: new Date("2026-12-15T01:00:00Z"),
+		amount: "60",
+		sentAt: new Date("2026-12-15T01:00:00Z"),
+	});
+	try {
+		const result = await usage({ window, groupBy: "workspace" });
+		expect(result.items.map((item) => item.key)).toEqual([null]);
+		expect(result.rowCount).toBe(1);
+		expect(result.total.workspaces).toBe(0);
+	} finally {
+		await db.delete(cloudUsageEvents).where(eq(cloudUsageEvents.lockSeq, 9));
+	}
 });
 
 test("billing periods keep Autumn's reset day through short months", () => {

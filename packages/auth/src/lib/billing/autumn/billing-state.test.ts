@@ -268,3 +268,27 @@ test("cloud usage carries the plan's overage price per GB-hour", () => {
 		0.06,
 	);
 });
+
+test.each([
+	[
+		"the paid plan's seat licenses",
+		{
+			licenses: [
+				{ parentPlanId: "pro", granted: 3 },
+				{ parentPlanId: "team", granted: 9 },
+			],
+			balances: {},
+		},
+		3,
+	],
+	["the seats feature", { balances: { seats: { granted: 4 } } }, 4],
+	["no seat count", { balances: {} }, null],
+] as const)("cloud usage counts seats from %s", (_, seats, expected) => {
+	const source = customer({ flags: pro, subscription: {} });
+	Object.assign(source, seats);
+	source.balances = {
+		...source.balances,
+		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
+	} as never;
+	expect(billingFromCustomer(source, NOW).cloudUsage?.seats).toBe(expected);
+});

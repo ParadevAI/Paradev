@@ -12,6 +12,7 @@ import {
 	desc,
 	eq,
 	gte,
+	ilike,
 	inArray,
 	isNotNull,
 	isNull,
@@ -37,6 +38,7 @@ import {
 	taskProjects,
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
+import { escapeLikePattern } from "./utils/like";
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
@@ -68,11 +70,19 @@ const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 			? inArray(column, scope.organizationId)
 			: eq(column, scope.organizationId);
 
+const workspaceOf = (scope: Scope, column: AnyPgColumn) =>
+	and(
+		eq(workspaces.id, column),
+		inOrganization(scope, workspaces.organizationId),
+	);
+
 export interface CloudUsageFilters {
 	user?: string;
 	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
+	/** Part of the workspace name, in any case. */
+	search?: string;
 }
 
 export interface CloudFleetFilters extends CloudUsageFilters {
@@ -84,12 +94,27 @@ export interface CloudUsageWindow {
 	to: Date;
 }
 
+export const cloudUsageSortValues = [
+	"gbHours",
+	"hours",
+	"boots",
+	"name",
+	"status",
+] as const;
+
+/** `name` and `status` are the workspace's, so they need grouping by workspace. */
+export interface CloudUsageSort {
+	by: (typeof cloudUsageSortValues)[number];
+	order: "asc" | "desc";
+}
+
 /**
- * `gbMinutes` is the exact sum as decimal digits with an optional fraction (`1080`, `16.5`); it is
- * cast to numeric in SQL, so the router must check that format. Grouped by day, only `key` is used.
+ * `value` is the last row's sort value: the workspace name for `name`, else decimal digits with an
+ * optional fraction (`1080`, `16.5`) that is cast to numeric in SQL, so the router must check that
+ * format. Grouped by day with no sort, only `key` is used.
  */
 export interface CloudUsageCursor {
-	gbMinutes: string;
+	value: string;
 	key: string;
 }
 
@@ -169,7 +194,10 @@ const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
 
-function usd(gbMinutes: number, overagePerGbHour: number | null) {
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
 	return overagePerGbHour === null
 		? null
 		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
@@ -201,6 +229,11 @@ function scopeConditions(
 	if (filters.status?.length) {
 		conditions.push(inArray(workspaces.status, filters.status));
 	}
+	if (filters.search) {
+		conditions.push(
+			ilike(workspaces.name, `%${escapeLikePattern(filters.search)}%`),
+		);
+	}
 	return conditions;
 }
 
@@ -212,6 +245,21 @@ const sizeOfBoot = sql`case ${boots.vcpus} ${sql.join(
 )} end`;
 
 const sizeOfWorkspace = sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE})`;
+
+const STATUS_ORDER: CloudWorkspaceStatus[] = [
+	"failed",
+	"provisioning",
+	"awake",
+	"asleep",
+	"archived",
+];
+
+const statusRank = sql`case ${workspaces.status} ${sql.join(
+	STATUS_ORDER.map(
+		(status, rank) => sql`when ${status} then ${sql.raw(String(rank))}`,
+	),
+	sql` `,
+)} end`;
 
 const bootSize = (size: MachineSize) =>
 	eq(boots.vcpus, MACHINE_SIZE_VCPUS[size]);
@@ -294,7 +342,7 @@ function usageFacts(
 		})
 		.from(events)
 		.leftJoin(boots, eq(boots.id, events.bootId))
-		.leftJoin(workspaces, eq(workspaces.id, events.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, events.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, events.organizationId),
@@ -318,7 +366,7 @@ function usageFacts(
 			failed: sql<boolean>`${boots.endReason} is not distinct from 'failed'`,
 		})
 		.from(boots)
-		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, boots.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, boots.organizationId),
@@ -383,7 +431,7 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 		failedBoots: row.failedBoots,
 		hours: Number(row.seconds) / 3600,
 		gbHours: gbMinutes / 60,
-		usageUsd: usd(gbMinutes, overagePerGbHour),
+		usageUsd: gbMinutesUsd(gbMinutes, overagePerGbHour),
 	};
 }
 
@@ -406,6 +454,14 @@ interface WorkspaceRef {
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
+	/**
+	 * The newest boot the scope may see, in any window. `stoppedAt` is null while it runs; a stopped
+	 * boot with no end reason is from before end reasons were kept.
+	 */
+	lastBoot: {
+		endReason: CloudWorkspaceBootEndReason | null;
+		stoppedAt: Date | null;
+	} | null;
 }
 
 interface OrganizationRef {
@@ -451,24 +507,44 @@ async function refsFor(
 			.where(inArray(users.id, keys));
 		return new Map(rows.map((row) => [row.id, row]));
 	}
-	const rows = await db
-		.select({
-			id: workspaces.id,
-			name: workspaces.name,
-			status: workspaces.status,
-			machineSize: workspaces.machineSize,
-			failureReason: workspaces.failureReason,
-			failedAt: workspaces.failedAt,
-			owner: { id: users.id, name: users.name, email: users.email },
-		})
-		.from(workspaces)
-		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
-		.where(
-			and(
-				inOrganization(scope, workspaces.organizationId),
-				inArray(workspaces.id, keys),
+	const [rows, lastBoots] = await Promise.all([
+		db
+			.select({
+				id: workspaces.id,
+				name: workspaces.name,
+				status: workspaces.status,
+				machineSize: workspaces.machineSize,
+				failureReason: workspaces.failureReason,
+				failedAt: workspaces.failedAt,
+				owner: { id: users.id, name: users.name, email: users.email },
+			})
+			.from(workspaces)
+			.leftJoin(users, eq(users.id, workspaces.createdByUserId))
+			.where(
+				and(
+					inOrganization(scope, workspaces.organizationId),
+					inArray(workspaces.id, keys),
+				),
 			),
-		);
+		db
+			.selectDistinctOn([boots.cloudWorkspaceId], {
+				workspaceId: boots.cloudWorkspaceId,
+				endReason: boots.endReason,
+				stoppedAt: boots.stoppedAt,
+			})
+			.from(boots)
+			.where(
+				and(
+					inOrganization(scope, boots.organizationId),
+					inArray(boots.cloudWorkspaceId, keys),
+					scope.userId ? eq(boots.createdByUserId, scope.userId) : undefined,
+				),
+			)
+			.orderBy(boots.cloudWorkspaceId, desc(boots.startedAt), desc(boots.id)),
+	]);
+	const lastBootOf = new Map(
+		lastBoots.map(({ workspaceId, ...lastBoot }) => [workspaceId, lastBoot]),
+	);
 	return new Map(
 		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
 			row.id,
@@ -479,6 +555,7 @@ async function refsFor(
 					row.status === "failed" && failureReason && failedAt
 						? { reason: failureReason, at: failedAt }
 						: null,
+				lastBoot: lastBootOf.get(row.id) ?? null,
 			},
 		]),
 	);
@@ -488,6 +565,8 @@ interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
 	window: CloudUsageWindow;
 	filters?: Filters;
 	groupBy?: GroupBy;
+	/** Default: by day newest first, else by GB-hours, most first. */
+	sort?: CloudUsageSort;
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
@@ -531,36 +610,79 @@ async function usageRows(
 		return {
 			items: [],
 			total: toMetrics(await totalRow, overagePerGbHour),
+			rowCount: 0,
 			nextCursor: null,
 		};
 	}
 
+	const sort =
+		options.sort ??
+		(groupBy === "day" ? null : { by: "gbHours", order: "desc" });
+	if (
+		(sort?.by === "name" || sort?.by === "status") &&
+		groupBy !== "workspace"
+	) {
+		throw new Error(`Sorting by ${sort.by} needs grouping by workspace`);
+	}
 	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
 	const metrics = metricColumns(facts);
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
-	const [rows, total] = await Promise.all([
+	const ofWorkspace = (column: AnyPgColumn | SQL) =>
+		sql`(select ${column} from ${workspaces} where ${workspaces.id} = ${facts.key}::uuid)`;
+	const sortValue = !sort
+		? sortKey
+		: {
+				gbHours: metrics.gbMinutes,
+				hours: metrics.seconds,
+				boots: metrics.boots,
+				name: sql`coalesce(${ofWorkspace(workspaces.name)}, '')`,
+				status: sql`coalesce(${ofWorkspace(statusRank)}, ${sql.raw(String(STATUS_ORDER.length))})`,
+			}[sort.by];
+	const cursorValue =
+		cursor &&
+		(sort?.by === "name"
+			? sql`${cursor.value}`
+			: sql`${cursor.value}::numeric`);
+	const [rows, total, rowCount] = await Promise.all([
 		db
 			.with(facts)
-			.select({ key: facts.key, sortKey, ...metrics })
+			.select({
+				key: facts.key,
+				sortKey,
+				sortValue: sql<string>`(${sortValue})::text`,
+				...metrics,
+			})
 			.from(facts)
 			.groupBy(facts.key)
 			.having(
 				!cursor
 					? undefined
-					: groupBy === "day"
+					: !sort
 						? sql`${facts.key} < ${cursor.key}`
 						: or(
-								sql`${metrics.gbMinutes} < ${cursor.gbMinutes}::numeric`,
-								sql`${metrics.gbMinutes} = ${cursor.gbMinutes}::numeric and ${sortKey} > ${cursor.key}`,
+								sort.order === "desc"
+									? sql`${sortValue} < ${cursorValue}`
+									: sql`${sortValue} > ${cursorValue}`,
+								sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
 							),
 			)
 			.orderBy(
-				...(groupBy === "day"
+				...(!sort
 					? [desc(facts.key)]
-					: [desc(metrics.gbMinutes), asc(sortKey)]),
+					: [
+							sort.order === "desc" ? desc(sortValue) : asc(sortValue),
+							asc(sortKey),
+						]),
 			)
 			.limit(limit + 1),
 		totalRow,
+		db
+			.with(facts)
+			.select({
+				rowCount: sql<number>`count(distinct ${sortKey})`.mapWith(Number),
+			})
+			.from(facts)
+			.then(([row]) => row?.rowCount ?? 0),
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
@@ -574,7 +696,7 @@ async function usageRows(
 					page.flatMap((row) => (row.key ? [row.key] : [])),
 				);
 	return {
-		items: page.map(({ key, sortKey: _, ...row }) => {
+		items: page.map(({ key, sortKey: _, sortValue: __, ...row }) => {
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
@@ -584,9 +706,10 @@ async function usageRows(
 			};
 		}),
 		total: toMetrics(total, overagePerGbHour),
+		rowCount,
 		nextCursor:
 			rows.length > limit && last
-				? { gbMinutes: last.gbMinutes, key: last.sortKey }
+				? { value: last.sortValue, key: last.sortKey }
 				: null,
 	};
 }
@@ -754,7 +877,7 @@ function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 			size: sizeOfVcpus.get(row.vcpus) ?? null,
 			memoryGb: memoryMb / 1024,
 			gbHours: Number(gbMinutes) / 60,
-			usageUsd: usd(Number(gbMinutes), overagePerGbHour),
+			usageUsd: gbMinutesUsd(Number(gbMinutes), overagePerGbHour),
 		})),
 		nextCursor:
 			rows.length > limit && last

@@ -60,6 +60,19 @@ function planTierOf(
 	return typeof family === "string" && family ? family : tier;
 }
 
+/** The paid plan's seat licenses, else the seats feature of a plan from before licenses. */
+function seatCount(
+	customer: Pick<AutumnCustomer, "balances" | "licenses">,
+	planId: string | null,
+): number | null {
+	const licenses = (customer.licenses ?? []).filter(
+		(license) => license.parentPlanId === planId,
+	);
+	return licenses.length
+		? licenses.reduce((total, license) => total + license.granted, 0)
+		: (customer.balances[SEATS_FEATURE_ID]?.granted ?? null);
+}
+
 function iso(ms: number | null | undefined): string | null {
 	return ms ? new Date(ms).toISOString() : null;
 }
@@ -67,7 +80,12 @@ function iso(ms: number | null | undefined): string | null {
 export function billingFromCustomer(
 	customer: Pick<
 		AutumnCustomer,
-		"flags" | "subscriptions" | "invoices" | "balances" | "billingControls"
+		| "flags"
+		| "subscriptions"
+		| "invoices"
+		| "balances"
+		| "billingControls"
+		| "licenses"
 	>,
 	now: number,
 	seatInterval: string | null = null,
@@ -141,6 +159,7 @@ export function billingFromCustomer(
 			customer.billingControls,
 			paid?.plan ? gbHourPack(paid.plan) : null,
 			paid?.plan ? overagePerGbHour(paid.plan) : null,
+			seatCount(customer, paidPlanId),
 		),
 		planTier: planTierOf(paid?.plan?.metadata, tier),
 		gatedMachineSizes: gatedMachineSizesFromFlags(customer.flags),
