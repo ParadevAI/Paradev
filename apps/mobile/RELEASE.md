@@ -49,9 +49,8 @@ eas build --platform ios --profile production
 eas submit --platform ios --profile production --latest
 
 # 3. Listing + App Review notes, once App Store Connect has processed the
-#    build. APP_REVIEW_VIDEO_URL is optional but worth it: a two-minute screen
-#    recording of sign-in and the main flows is the single most effective
-#    thing in the notes.
+#    build. Recordings go in the version's App Review attachment, not the
+#    notes: the notes are near the 4,000-character limit.
 eas metadata:push   # from the main checkout; APP_REVIEW_EMAIL / APP_REVIEW_PASSWORD come from the root .env
 
 # 4. In App Store Connect, attach the processed build to the version and
@@ -84,9 +83,12 @@ rejections in this category are one of these.
       enforces it.
       Reviewers sign in with Sign in with Apple as a new free account every
       time, so they always see the paywall.
-- [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, or
-      a screen recording on a physical device in `APP_REVIEW_VOICE_VIDEO_URL`
-      and in the review attachment (2.5.4).
+- [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, and
+      the voice-mode recording on a physical device is in the version's App
+      Review attachment (2.5.4). Attachments do not carry over to a new
+      version, and the review notes say the recording is attached.
+- [ ] The review notes are 4,000 characters or fewer (App Store Connect
+      rejects longer notes; `store.config.test.ts` enforces it).
 - [ ] Sign in with Apple is present on the sign-in screen whenever any other
       third-party sign-in is (4.8).
 - [ ] Account deletion works from Settings without leaving the app (5.1.1 v).
