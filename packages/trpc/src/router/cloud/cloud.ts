@@ -155,6 +155,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						ctx.scope,
 						{
 							window,
+							filters: { workspace: input.workspace },
 							groupBy: input.groupBy,
 							limit: input.limit,
 							cursor: keyset && {

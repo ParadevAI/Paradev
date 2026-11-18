@@ -398,7 +398,7 @@ describe("fleet scope", () => {
 		}
 	});
 
-	test("phases and the trace id on the fleet reads, not on the customer list", async () => {
+	test("phases, the trace id and the origin on the fleet reads, not on the customer list", async () => {
 		const phases = [
 			{ name: "claim", source: "api" as const, at: 1_789_000_000_000, ms: 400 },
 			{
@@ -411,15 +411,16 @@ describe("fleet scope", () => {
 		const setTrace = (trace: {
 			phases: typeof phases | null;
 			traceId: string | null;
+			origin: "wake" | null;
 		}) =>
 			db
 				.update(cloudWorkspaceBoots)
 				.set(trace)
 				.where(eq(cloudWorkspaceBoots.id, "boot_1"));
-		await setTrace({ phases, traceId: "a".repeat(32) });
+		await setTrace({ phases, traceId: "a".repeat(32), origin: "wake" });
 		try {
 			const options = { now: NOW, overagePerGbHour: RATE };
-			const traced = { phases, traceId: "a".repeat(32) };
+			const traced = { phases, traceId: "a".repeat(32), origin: "wake" };
 			expect(await getFleetCloudBoot(db, "boot_1", options)).toMatchObject(
 				traced,
 			);
@@ -437,8 +438,9 @@ describe("fleet scope", () => {
 			expect(customer).toBeDefined();
 			expect(customer).not.toHaveProperty("phases");
 			expect(customer).not.toHaveProperty("traceId");
+			expect(customer).not.toHaveProperty("origin");
 		} finally {
-			await setTrace({ phases: null, traceId: null });
+			await setTrace({ phases: null, traceId: null, origin: null });
 		}
 	});
 
@@ -480,6 +482,7 @@ describe("fleet scope", () => {
 			user: { id: BEN },
 			activeCpuMinutes: null,
 			egressGb: null,
+			origin: null,
 		});
 	});
 

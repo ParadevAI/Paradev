@@ -9,6 +9,7 @@ import {
 	MAYA,
 	NOVEMBER,
 	ORG,
+	OTHER_WS,
 	SAM,
 	seedCloudUsage,
 } from "@superset/db/testing";
@@ -103,6 +104,30 @@ describe("scope", () => {
 		const [open] = (await member.periods.list({})).items;
 		expect(open?.allowance).toBeNull();
 		expect(open?.metrics.gbHours).toBe(16);
+	});
+
+	test("a member's workspace filter finds only their own workspace", async () => {
+		const filtered = (workspace: string) =>
+			caller(SAM).usage.query({ range: NOVEMBER, workspace });
+		expect((await filtered(BILLING_PAGE)).total).toMatchObject({
+			gbHours: 16,
+			boots: 1,
+		});
+		expect((await filtered(CHECKOUT)).total).toMatchObject({
+			gbHours: 0,
+			boots: 0,
+			workspaces: 0,
+		});
+	});
+
+	test("a workspace in another organization returns nothing", async () => {
+		const usage = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "workspace",
+			workspace: OTHER_WS,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
 	});
 
 	test("a signed-in person outside the organization is FORBIDDEN", async () => {
