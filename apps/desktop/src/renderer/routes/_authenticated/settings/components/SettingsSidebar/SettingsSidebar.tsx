@@ -8,6 +8,7 @@ import {
 	HiMagnifyingGlass,
 	HiXMark,
 } from "react-icons/hi2";
+import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AppMenuButton } from "renderer/routes/_authenticated/_dashboard/components/AppMenuButton";
@@ -35,11 +36,13 @@ export function SettingsSidebar() {
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const pluginsVisible = usePluginsSettingsVisible();
+	const cloudUsageEnabled = useCloudUsageEnabled();
 	const normalizedSearchQuery = searchQuery.trim();
 	const matchCounts = normalizedSearchQuery
 		? getVisibleMatchCountBySection(normalizedSearchQuery, {
 				cloudWorkspaces: cloudWorkspacesEnabled,
 				plugins: pluginsVisible,
+				cloudUsage: cloudUsageEnabled,
 			})
 		: null;
 

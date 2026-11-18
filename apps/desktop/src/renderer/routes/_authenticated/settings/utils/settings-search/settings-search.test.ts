@@ -131,6 +131,7 @@ describe("settings search - mobile", () => {
 			getVisibleMatchCountBySection("iPhone", {
 				cloudWorkspaces: false,
 				plugins: false,
+				cloudUsage: false,
 			}).mobile,
 		).toBe(1);
 	});
@@ -142,12 +143,14 @@ describe("settings search - plugins visibility", () => {
 			getVisibleMatchCountBySection("marketplace", {
 				cloudWorkspaces: false,
 				plugins: false,
+				cloudUsage: false,
 			}).plugins,
 		).toBeUndefined();
 		expect(
 			getVisibleMatchCountBySection("marketplace", {
 				cloudWorkspaces: false,
 				plugins: true,
+				cloudUsage: false,
 			}).plugins,
 		).toBeGreaterThan(0);
 	});

@@ -7,6 +7,7 @@ import {
 	HiOutlineBell,
 	HiOutlineBuildingOffice2,
 	HiOutlineChartBar,
+	HiOutlineCloud,
 	HiOutlineCommandLine,
 	HiOutlineComputerDesktop,
 	HiOutlineCpuChip,
@@ -49,6 +50,7 @@ export type SettingsRoute =
 	| "/settings/integrations"
 	| "/settings/plugins"
 	| "/settings/billing"
+	| "/settings/cloud-usage"
 	| "/settings/api-keys"
 	| "/settings/security"
 	| "/settings/permissions"
@@ -288,6 +290,14 @@ export const SETTINGS_SECTION_GROUPS: SettingsSectionGroup[] = [
 				icon: HiOutlineCreditCard,
 			},
 			{
+				id: "/settings/cloud-usage",
+				section: "cloudUsage",
+				label: msg({
+					message: "Cloud usage",
+				}),
+				icon: HiOutlineCloud,
+			},
+			{
 				id: "/settings/api-keys",
 				section: "apikeys",
 				label: msg({
@@ -348,6 +358,7 @@ export interface SettingsSectionVisibility {
 	isMac: boolean;
 	isAdmin: boolean;
 	pluginsEnabled: boolean;
+	cloudUsageEnabled: boolean;
 	allowedSections: ReadonlySet<SettingsSection>;
 }
 
@@ -358,6 +369,7 @@ export function isSettingsSectionVisible(
 	return (
 		(!item.macOnly || visibility.isMac) &&
 		(item.section !== "plugins" || visibility.pluginsEnabled) &&
+		(item.section !== "cloudUsage" || visibility.cloudUsageEnabled) &&
 		(!item.adminOnly || visibility.isAdmin) &&
 		visibility.allowedSections.has(item.section)
 	);

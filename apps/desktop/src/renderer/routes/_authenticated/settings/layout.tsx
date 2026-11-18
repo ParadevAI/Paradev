@@ -9,6 +9,7 @@ import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useMemo } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CheckResourcesHotkeyMount } from "renderer/commandPalette";
+import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
 import {
@@ -51,6 +52,7 @@ const SECTION_ORDER: SettingsSection[] = [
 	"integrations",
 	"plugins",
 	"billing",
+	"cloudUsage",
 	"apikeys",
 	"security",
 	"permissions",
@@ -83,6 +85,7 @@ const SECTION_PATHS: Partial<Record<SettingsSection, string>> = {
 	integrations: "/settings/integrations",
 	plugins: "/settings/plugins",
 	billing: "/settings/billing",
+	cloudUsage: "/settings/cloud-usage",
 	apikeys: "/settings/api-keys",
 	security: "/settings/security",
 	permissions: "/settings/permissions",
@@ -115,6 +118,7 @@ function SettingsLayout() {
 	const cloudWorkspacesEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const pluginsVisible = usePluginsSettingsVisible();
+	const cloudUsageEnabled = useCloudUsageEnabled();
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
 	const originRoute = useSettingsOriginRoute();
@@ -133,6 +137,7 @@ function SettingsLayout() {
 				? getVisibleMatchCountBySection(normalizedSearchQuery, {
 						cloudWorkspaces: cloudWorkspacesEnabled,
 						plugins: pluginsVisible,
+						cloudUsage: cloudUsageEnabled,
 					})
 				: {},
 		[
@@ -140,6 +145,7 @@ function SettingsLayout() {
 			normalizedSearchQuery,
 			cloudWorkspacesEnabled,
 			pluginsVisible,
+			cloudUsageEnabled,
 		],
 	);
 	const totalMatches = Object.values(matchCounts).reduce(

@@ -86,6 +86,8 @@ export const SETTING_ITEM_ID = {
 	BILLING_PLANS: "billing-plans",
 	BILLING_USAGE: "billing-usage",
 
+	CLOUD_USAGE: "cloud-usage",
+
 	PROJECT_NAME: "project-name",
 	PROJECT_PATH: "project-path",
 	PROJECT_SCRIPTS: "project-scripts",
@@ -1456,6 +1458,13 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.CLOUD_USAGE,
+		section: "cloudUsage",
+		title: "Cloud usage",
+		description: "GB-hours used by cloud workspaces",
+		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
+	},
+	{
 		id: SETTING_ITEM_ID.PROJECT_NAME,
 		section: "project",
 		title: "Project Name",
@@ -1967,12 +1976,13 @@ function isItemOffered(
 /** Like `getMatchCountBySection`, but excludes items that are not offered. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	visible: { cloudWorkspaces: boolean; plugins: boolean },
+	visible: { cloudWorkspaces: boolean; plugins: boolean; cloudUsage: boolean },
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
 			isItemOffered(item, visible.cloudWorkspaces) &&
-			(item.section !== "plugins" || visible.plugins),
+			(item.section !== "plugins" || visible.plugins) &&
+			(item.section !== "cloudUsage" || visible.cloudUsage),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
