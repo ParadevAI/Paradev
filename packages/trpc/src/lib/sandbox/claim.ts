@@ -7,7 +7,10 @@
 import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
-import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import {
+	GOLDEN_BOX_VCPUS,
+	LEGACY_MACHINE_SIZE,
+} from "@superset/shared/billing";
 import { BRAND } from "@superset/shared/brand";
 import {
 	type CloudAgentLaunch,
@@ -69,7 +72,7 @@ async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
 	const size =
 		(await resolveMachineSize(
 			row.organizationId,
-			row.machineSize ?? "large",
+			row.machineSize ?? LEGACY_MACHINE_SIZE,
 		)) ?? (await resolveMachineSize(row.organizationId, null));
 	return size?.vcpus ?? GOLDEN_BOX_VCPUS;
 }

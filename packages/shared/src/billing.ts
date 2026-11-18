@@ -510,6 +510,8 @@ export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"large",
 ];
 export const DEFAULT_MACHINE_SIZE: MachineSize = "medium";
+/** The size of a workspace with no stored size: it was made before sizes existed. */
+export const LEGACY_MACHINE_SIZE: MachineSize = "large";
 
 export function isMachineSize(value: unknown): value is MachineSize {
 	return typeof value === "string" && Object.hasOwn(MACHINE_SIZE_VCPUS, value);
