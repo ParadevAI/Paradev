@@ -20,6 +20,7 @@ import {
 	describeSandbox,
 	recordBootSpans,
 	stopAndSnapshot,
+	stopSandbox,
 	wakeSandbox,
 } from "../../lib/sandbox";
 import {
@@ -84,12 +85,14 @@ async function wake(
 		organizationId: row.organizationId,
 	};
 	let bootId: string | null = null;
+	let resumed: { sessionId: string | null; expiresAt: Date | null } | undefined;
 	const wakeStartedAt = Date.now();
 	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
 		await wakeSandbox({
 			providerSandboxId: row.providerSandboxId,
 			claim,
-			beforeResume: async (box) => {
+			beforeResume: async ({ resumedSession, ...box }) => {
+				resumed = resumedSession;
 				({ bootId } = await Sentry.startSpan(
 					{ name: "authorize boot", op: "billing" },
 					() =>
@@ -119,6 +122,27 @@ async function wake(
 					bootId,
 					providerSandboxId: row.providerSandboxId,
 				}).catch(() => {});
+			}
+			// A call here resumed the box, and no boot meters that session.
+			if (resumed && isCloudUsageRefusal(error)) {
+				console.error(
+					`[cloud-workspace] ${row.id} was resumed past its limit; stopping it`,
+				);
+				try {
+					if (resumed.expiresAt) {
+						await recordSandboxAwake(row.id, {
+							expiresAt: resumed.expiresAt,
+							sessionId: resumed.sessionId,
+						});
+					}
+					const stopped = await stopSandbox(row.providerSandboxId);
+					await recordSandboxAsleep(row.id, {
+						sessionId: stopped.sessionId ?? resumed.sessionId,
+					});
+					logControl("meter.cap_stopped", scope, { source: "wake" }, "warn");
+				} catch (stopError) {
+					Sentry.captureException(stopError, { tags: controlTags(scope) });
+				}
 			}
 			throw error;
 		});
@@ -176,13 +200,19 @@ export async function restartCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
-	if (running) {
-		const stopped = await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id, {
-			sessionId: stopped.sessionId ?? row.sandboxSessionId,
-		});
-		await queueSettleWorkspace(row.id);
-	}
+	if (!running) return wakeCloudWorkspace(row);
+	return wakeAfterStop(row, await stopAndSnapshot(row.providerSandboxId));
+}
+
+/** Starts a box again after the caller ended its session, as a metered wake. */
+export async function wakeAfterStop(
+	row: CloudWorkspaceRow,
+	stopped: { sessionId: string | null },
+): Promise<WokenCloudWorkspace> {
+	await recordSandboxAsleep(row.id, {
+		sessionId: stopped.sessionId ?? row.sandboxSessionId,
+	});
+	await queueSettleWorkspace(row.id);
 	return wakeCloudWorkspace(row);
 }
 

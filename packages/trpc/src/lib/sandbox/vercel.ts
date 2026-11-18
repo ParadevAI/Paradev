@@ -126,17 +126,22 @@ export interface SandboxClaim {
 	agentTools?: boolean;
 }
 
+function environmentTags(organizationId: string): Record<string, string> {
+	return { kind: "environment", org: organizationId };
+}
+
 /** Vercel allows 5 tags per sandbox. */
 function sandboxTags(
 	kind: "workspace" | "environment",
 	identity: SandboxIdentity,
 ): Record<string, string> {
-	const tags = { kind, org: identity.SUPERSET_SANDBOX_ORGANIZATION_ID };
+	const org = identity.SUPERSET_SANDBOX_ORGANIZATION_ID;
 	// A golden's identity is the workspace it was built from, not its own.
-	if (kind === "environment") return tags;
+	if (kind === "environment") return environmentTags(org);
 	const user = identity.SUPERSET_SANDBOX_CREATOR_USER_ID;
 	return {
-		...tags,
+		kind,
+		org,
 		workspace: identity.SUPERSET_SANDBOX_WORKSPACE_ID,
 		...(user ? { user } : {}),
 	};
@@ -496,8 +501,16 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
-	/** Runs once the box is known to be stopped, before anything resumes it. */
-	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+	/**
+	 * Runs once the box is known to be stopped, before anything resumes it; or,
+	 * for a box read running that a call here resumed (`resumedSession`), once
+	 * those calls end.
+	 */
+	beforeResume?: (box: {
+		memoryMb: number;
+		vcpus: number;
+		resumedSession?: { sessionId: string | null; expiresAt: Date | null };
+	}) => Promise<void>;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -509,13 +522,21 @@ export async function wakeSandbox(args: {
 	sessionId: string | null;
 }> {
 	try {
+		let wasRunning = false;
+		let resumed = null as { vcpus: number; sessionId: string | null } | null;
 		const sandbox = await Sandbox.get({
 			...credentials(),
 			name: args.providerSandboxId,
 			resume: false,
+			// Any call on a Sandbox object resumes a stopped session and retries.
+			onResume: async (box) => {
+				if (!wasRunning) return;
+				const session = box.currentSession();
+				resumed = { vcpus: session.vcpus, sessionId: session.sessionId };
+			},
 		});
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
-		const wasRunning = sandbox.status === "running";
+		wasRunning = sandbox.status === "running";
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
 			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
@@ -583,6 +604,16 @@ export async function wakeSandbox(args: {
 			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
 				runBoot(sandbox, args.claim.hostSecret),
 			);
+		}
+		if (resumed && args.beforeResume) {
+			await args.beforeResume({
+				memoryMb: resumed.vcpus * MEMORY_MB_PER_VCPU,
+				vcpus: resumed.vcpus,
+				resumedSession: {
+					sessionId: resumed.sessionId,
+					expiresAt: sandbox.expiresAt ?? null,
+				},
+			});
 		}
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
@@ -660,21 +691,26 @@ export async function stopAndSnapshot(
  * A golden is a stopped sandbox whose current snapshot is what forks start
  * from. It is built from a snapshot of the source taken now (a fork alone
  * would start from the source's last stop) and created with an empty env.
- * Taking that snapshot ends the source's session, so a running source is
- * started again before this returns.
+ * Taking that snapshot ends the source's session. The source stays stopped:
+ * the caller starts it again through a wake, which meters the new session.
  */
 export async function promoteSandboxToEnvironment(args: {
 	sourceSandbox: string;
 	goldenName: string;
-	/** What restarts the source: it boots the same way a wake does. */
-	claim: SandboxClaim;
-}): Promise<{ goldenName: string; region: string }> {
+	organizationId: string;
+}): Promise<{
+	goldenName: string;
+	region: string;
+	/** The session the snapshot ended; null when the source was not running. */
+	stopped: { sessionId: string | null } | null;
+}> {
 	const source = await Sandbox.get({
 		...credentials(),
 		name: args.sourceSandbox,
 		resume: false,
 	});
-	const wasRunning = source.status === "running";
+	const stopped =
+		source.status === "running" ? { sessionId: sessionIdOf(source) } : null;
 	const snapshot = await source.snapshot();
 	const golden = await Sandbox.create({
 		...credentials(),
@@ -688,18 +724,13 @@ export async function promoteSandboxToEnvironment(args: {
 		persistent: true,
 		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
-		tags: sandboxTags("environment", args.claim.identity),
+		tags: environmentTags(args.organizationId),
 	});
 	await stripWorkspaceIdentity(golden);
 	const created = golden.currentSnapshotId;
 	await golden.stop();
 	await waitForStopSnapshot(args.goldenName, created);
-	if (wasRunning) {
-		await writeIdentity(source, args.claim.identity);
-		await writeSignInFiles(source, args.claim.files);
-		await runBoot(source, args.claim.hostSecret);
-	}
-	return { goldenName: args.goldenName, region: source.region };
+	return { goldenName: args.goldenName, region: source.region, stopped };
 }
 
 /**
@@ -797,6 +828,29 @@ function toBoxSession(session: RawSession): BoxSession | null {
 		endedAt: sessionEndedAt(session),
 		activeCpuMs: session.activeCpuDurationMs ?? null,
 	};
+}
+
+/**
+ * The box's sessions that are live or ended at or after `since`, newest
+ * first. Null when the sandbox no longer exists.
+ */
+export async function listSandboxSessions(
+	providerSandboxId: string,
+	since: number,
+): Promise<BoxSession[] | null> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (!sandbox) return null;
+	const sessions: BoxSession[] = [];
+	for await (const raw of await sandbox.listSessions({
+		sortOrder: "desc",
+		limit: SESSION_PAGE_SIZE,
+	})) {
+		const session = toBoxSession(raw);
+		if (!session) continue;
+		if (session.endedAt !== null && session.endedAt < since) break;
+		sessions.push(session);
+	}
+	return sessions;
 }
 
 /** Null when the sandbox no longer exists. */

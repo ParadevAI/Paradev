@@ -11,11 +11,7 @@ import {
 	SandboxUnavailableError,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import {
-	queueSettleWorkspace,
-	RECONCILE_LOOKBACK_MS,
-	reconcileCloudWorkspaceUsage,
-} from "./meter";
+import { queueSettleWorkspace, reconcileCloudWorkspaceUsage } from "./meter";
 import {
 	keepUpdatedAt,
 	recordSandboxAsleep,
@@ -23,6 +19,8 @@ import {
 } from "./sandbox-sleep";
 
 const WATCH_AFTER_EXPIRY_MS = 5_000;
+// The meter adopts only boxes this listing returns: keep it at least its ADOPT_LOOKBACK_MS.
+const LISTING_LOOKBACK_MS = 2 * 60 * 60 * 1000;
 
 export interface WatchSandboxExpiryInput {
 	cloudWorkspaceId: string;
@@ -191,7 +189,7 @@ export async function syncSandboxExpiries(
 /** The 30-minute reconcile: sleep state on every stack, then the meter where billing runs. */
 export async function reconcileCloudWorkspaces() {
 	const active = await listActiveWorkspaceSandboxes(
-		Date.now() - RECONCILE_LOOKBACK_MS,
+		Date.now() - LISTING_LOOKBACK_MS,
 	).catch((error) => {
 		Sentry.captureException(error);
 		return null;
