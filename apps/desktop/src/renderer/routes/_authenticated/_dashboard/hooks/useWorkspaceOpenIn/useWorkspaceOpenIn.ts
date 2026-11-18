@@ -5,7 +5,7 @@ import { useCallback, useMemo } from "react";
 import { getAppOption } from "renderer/components/OpenInExternalDropdown";
 import { useHotkey, useHotkeyDisplay } from "renderer/hotkeys";
 import { electronTrpc } from "renderer/lib/electron-trpc";
-import { useV2ProjectDefaultApp } from "renderer/routes/_authenticated/hooks/useV2ProjectDefaultApp";
+import { useProjectDefaultApp } from "renderer/routes/_authenticated/hooks/useProjectDefaultApp";
 import { useThemeStore } from "renderer/stores";
 
 interface UseWorkspaceOpenInOptions {
@@ -25,8 +25,9 @@ export function useWorkspaceOpenIn({
 	const { t } = useLingui();
 	const activeTheme = useThemeStore((state) => state.activeTheme);
 
-	const { app: persistedApp, setApp: persistDefaultApp } =
-		useV2ProjectDefaultApp(projectId ?? undefined);
+	const { app: persistedApp, setApp: persistDefaultApp } = useProjectDefaultApp(
+		projectId ?? undefined,
+	);
 	const resolvedApp: ExternalApp = persistedApp ?? "finder";
 
 	const openInApp = electronTrpc.external.openInApp.useMutation({

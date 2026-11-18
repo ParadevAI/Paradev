@@ -35,7 +35,23 @@ export const SANDBOX_PATHS = {
 	media: "/usr/local/share/superset/media",
 	desktopTemplates: "/usr/local/share/superset/desktop",
 	backgrounds: "/usr/share/backgrounds/superset",
+	/** A read-only snapshot of the region's agent-tools drive, when one is mounted. */
+	agents: "/opt/agents",
 } as const;
+
+/**
+ * The agent CLIs of one bundle in one region: written once by the release,
+ * then only ever mounted read-only. A drive only mounts in its own region.
+ */
+export function sandboxAgentToolsDrive(
+	region: string,
+	bundleSha: string,
+): string {
+	return `agent-tools-${region}-${bundleSha.slice(0, 12)}`;
+}
+
+export const SANDBOX_AGENT_TOOLS_DRIVE_PATTERN =
+	/^agent-tools-[a-z]+[0-9]+-[0-9a-f]{12}$/;
 
 /** Every port a workspace publishes, and the loopback ones behind them. */
 export const SANDBOX_PORTS = {
@@ -220,6 +236,7 @@ export function renderContractShell(): string {
 		SUPERSET_MEDIA_DIR: SANDBOX_PATHS.media,
 		SUPERSET_DESKTOP_TEMPLATES: SANDBOX_PATHS.desktopTemplates,
 		SUPERSET_BACKGROUNDS_DIR: SANDBOX_PATHS.backgrounds,
+		SUPERSET_AGENTS_DIR: SANDBOX_PATHS.agents,
 		SUPERSET_HOST_SERVICE_PORT: SANDBOX_PORTS.hostService,
 		SUPERSET_DESKTOP_PORT: SANDBOX_PORTS.desktop,
 		SUPERSET_VNC_PORT: SANDBOX_PORTS.vnc,

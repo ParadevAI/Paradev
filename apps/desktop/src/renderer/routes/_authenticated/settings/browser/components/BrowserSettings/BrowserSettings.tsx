@@ -2,7 +2,6 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
 import { Label } from "@superset/ui/label";
-import { Switch } from "@superset/ui/switch";
 import { useEffect, useState } from "react";
 import { TbDownload } from "react-icons/tb";
 import { ImportHistoryDialog } from "renderer/components/ImportHistoryDialog";
@@ -26,10 +25,6 @@ export function BrowserSettings({ visibleItems }: BrowserSettingsProps) {
 	const searchQuery = useSettingsSearchQuery();
 	const [isImportOpen, setIsImportOpen] = useState(false);
 
-	const showOpenLinksInApp = isItemVisible(
-		SETTING_ITEM_ID.BEHAVIOR_OPEN_LINKS_IN_APP,
-		visibleItems,
-	);
 	const showHomepage = isItemVisible(
 		SETTING_ITEM_ID.BROWSER_HOMEPAGE,
 		visibleItems,
@@ -48,27 +43,6 @@ export function BrowserSettings({ visibleItems }: BrowserSettingsProps) {
 				utils.settings.getBrowserHomepageUrl.invalidate();
 			},
 		});
-
-	const { data: openLinksInApp, isLoading: isOpenLinksInAppLoading } =
-		electronTrpc.settings.getOpenLinksInApp.useQuery();
-	const setOpenLinksInApp = electronTrpc.settings.setOpenLinksInApp.useMutation(
-		{
-			onMutate: async ({ enabled }) => {
-				await utils.settings.getOpenLinksInApp.cancel();
-				const previous = utils.settings.getOpenLinksInApp.getData();
-				utils.settings.getOpenLinksInApp.setData(undefined, enabled);
-				return { previous };
-			},
-			onError: (_err, _vars, context) => {
-				if (context?.previous !== undefined) {
-					utils.settings.getOpenLinksInApp.setData(undefined, context.previous);
-				}
-			},
-			onSettled: () => {
-				utils.settings.getOpenLinksInApp.invalidate();
-			},
-		},
-	);
 
 	// Local draft so the field stays editable while the query/mutation settle.
 	const [draft, setDraft] = useState("");
@@ -94,38 +68,6 @@ export function BrowserSettings({ visibleItems }: BrowserSettingsProps) {
 			</div>
 
 			<div className="space-y-6">
-				{showOpenLinksInApp && (
-					<div className="flex items-center justify-between">
-						<div className="space-y-0.5">
-							<Label
-								htmlFor="open-links-in-app"
-								className="text-sm font-medium"
-							>
-								<HighlightText
-									text={t({
-										message: "Open links in the in-app browser",
-									})}
-									query={searchQuery}
-								/>
-							</Label>
-							<p className="text-xs text-muted-foreground">
-								<Trans>
-									Open links from chat and terminal in the in-app browser
-									instead of your default browser
-								</Trans>
-							</p>
-						</div>
-						<Switch
-							id="open-links-in-app"
-							checked={openLinksInApp ?? false}
-							onCheckedChange={(enabled) =>
-								setOpenLinksInApp.mutate({ enabled })
-							}
-							disabled={isOpenLinksInAppLoading || setOpenLinksInApp.isPending}
-						/>
-					</div>
-				)}
-
 				{showHomepage && (
 					<div className="flex items-center justify-between gap-4">
 						<div className="space-y-0.5">

@@ -3,10 +3,10 @@ import { useFormat } from "@superset/i18n/react";
 import { CommandItem } from "@superset/ui/command";
 import { cn } from "@superset/ui/utils";
 import { Monitor, MonitorOff } from "lucide-react";
-import { V2WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/V2WorkspaceProjectIcon";
-import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceChecksDot";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
-import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+import { WorkspaceChecksDot } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceChecksDot";
+import { WorkspaceProjectIcon } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceProjectIcon";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
+import { workspaceActivityAt } from "renderer/routes/_authenticated/_dashboard/workspaces/utils/sortWorkspaces";
 import { CloudGlyph } from "renderer/routes/_authenticated/components/CloudGlyph";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
 import { MatchedText } from "../../../MatchedText";
@@ -61,7 +61,7 @@ export function WorkspaceSwitcherRow({
 				</span>
 				{/* Clips rather than overlapping the right cluster when the name takes the room. */}
 				<span className="flex max-w-[55%] min-w-0 flex-[0_1_auto] items-center gap-1.5 overflow-hidden text-[11.5px] text-muted-foreground">
-					<V2WorkspaceProjectIcon
+					<WorkspaceProjectIcon
 						projectName={projectName}
 						iconUrl={workspace.projectIconUrl}
 						size="sm"

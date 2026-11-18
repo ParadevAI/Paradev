@@ -183,16 +183,19 @@ app.get("/v2/control", async (c) => {
 		);
 	}
 
-	const placement = await placeHost(
-		c.env,
-		hostId,
-		c.req.raw.cf as IncomingRequestCfProperties | undefined,
-	);
+	const cf = c.req.raw.cf as IncomingRequestCfProperties | undefined;
+	const placement = await placeHost(c.env, hostId, cf);
 	const stub = await getServerByName(c.env.HostTunnel, placement.name);
-	return stub.fetch(
-		`https://relay/register?hostId=${encodeURIComponent(hostId)}`,
-		{ headers: { Upgrade: "websocket", "x-relay-token": result.token } },
-	);
+	const params = new URLSearchParams({
+		hostId,
+		generation: String(placement.generation),
+	});
+	if (cf?.colo) params.set("colo", cf.colo);
+	if (cf?.country) params.set("country", cf.country);
+	if (cf?.asn) params.set("asn", String(cf.asn));
+	return stub.fetch(`https://relay/register?${params}`, {
+		headers: { Upgrade: "websocket", "x-relay-token": result.token },
+	});
 });
 
 // ── Host dial-back (stream attach) ──────────────────────────────────

@@ -70,6 +70,7 @@ export function PersonalLayout({
 						<Text
 							style={{
 								margin: 0,
+								fontFamily: "Arial, Helvetica, sans-serif",
 								fontSize: "12px",
 								lineHeight: "18px",
 								color: "#8E8E8E",

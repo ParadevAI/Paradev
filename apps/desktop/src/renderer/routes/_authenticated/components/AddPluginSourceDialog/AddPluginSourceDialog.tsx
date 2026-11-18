@@ -88,7 +88,7 @@ export function AddPluginSourceDialog({
 					</DialogTitle>
 					<DialogDescription>
 						<Trans>
-							Pick a repository with a plugin marketplace file. Superset syncs
+							Pick a repository with a plugin marketplace file. Paradev syncs
 							its plugins now and each time you sync again.
 						</Trans>
 					</DialogDescription>
@@ -107,8 +107,8 @@ export function AddPluginSourceDialog({
 						/>
 						<p className="text-xs text-muted-foreground">
 							<Trans>
-								Superset reads it with your connected GitHub account. Connect
-								one in{" "}
+								Paradev reads it with your connected GitHub account. Connect one
+								in{" "}
 								<Link
 									to="/settings/integrations"
 									className="text-primary hover:underline"

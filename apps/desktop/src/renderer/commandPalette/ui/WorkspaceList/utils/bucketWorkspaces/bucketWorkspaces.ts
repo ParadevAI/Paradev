@@ -1,5 +1,5 @@
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
-import { compareWorkspaces } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/sortWorkspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
+import { compareWorkspaces } from "renderer/routes/_authenticated/_dashboard/workspaces/utils/sortWorkspaces";
 import { scoreText } from "../../../../core/rankCommands";
 
 export type SwitcherBucket = "needsInput" | "completed" | "running" | "recent";

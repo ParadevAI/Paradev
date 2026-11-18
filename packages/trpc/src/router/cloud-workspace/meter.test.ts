@@ -12,6 +12,7 @@ import { sessionEndedAt } from "../../lib/sandbox/vercel";
 import * as jobs from "./jobs";
 import {
 	assertMayBoot,
+	attachBootSession,
 	authorizeBoot,
 	gbMinutes,
 	lockIdFor,
@@ -36,6 +37,7 @@ let autumnCalls: { method: string; params: unknown; headers?: unknown }[];
 let stopped: string[];
 let usageStopAt: Date | null;
 let delayedSettles: number[];
+let updateMatches: boolean;
 type UsageEvent = {
 	featureId: string;
 	value: number;
@@ -65,7 +67,7 @@ function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 }
 
 stub(db, {
-	update: () => chain(() => (boot ? [boot] : [])),
+	update: () => chain(() => (boot && updateMatches ? [boot] : [])),
 	insert: () => ({
 		values: async (values: Record<string, unknown>) => {
 			writes.push(values);
@@ -208,8 +210,28 @@ beforeEach(() => {
 	recordedAsleep = [];
 	usageStopAt = null;
 	delayedSettles = [];
+	updateMatches = true;
 	usageEvents = null;
 	reservations = new Map();
+});
+
+describe("attachBootSession", () => {
+	test("a boot another caller already attached to this session stays open", async () => {
+		updateMatches = false;
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls).toEqual([]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(false);
+	});
+
+	test("a boot that lost its session to another boot is released", async () => {
+		updateMatches = false;
+		boot = { ...boot, vercelSessionId: null };
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls.map((call) => call.params)).toMatchObject([
+			{ lockId: "boot_1:0", action: "release" },
+		]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(true);
+	});
 });
 
 describe("settleBoot", () => {

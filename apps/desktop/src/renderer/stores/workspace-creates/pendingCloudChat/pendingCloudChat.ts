@@ -11,7 +11,7 @@ import {
 	PENDING_CLOUD_CHAT_PANE_KIND,
 	type PendingCloudChatPaneData,
 	type TerminalPaneData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
@@ -44,7 +44,7 @@ export function seedPendingCloudChat({
 	modeId?: string | null;
 }): void {
 	if (launch?.surface !== "chat" || !launch.terminalId) return;
-	const existing = collections.v2WorkspaceLocalState.get(workspaceId)
+	const existing = collections.workspaceLocalState.get(workspaceId)
 		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
 	if (existing?.tabs.length) return;
 	writeWorkspacePaneLayout(
@@ -76,7 +76,7 @@ export function seedPendingCloudChat({
 		],
 	});
 	const { version, tabs, activeTabId } = store.getState();
-	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+	collections.workspaceLocalState.update(workspaceId, (draft) => {
 		draft.paneLayout = { version, tabs, activeTabId };
 	});
 }

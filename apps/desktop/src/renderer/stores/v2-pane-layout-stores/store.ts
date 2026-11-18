@@ -1,5 +1,5 @@
 import type { WorkspaceStore } from "@superset/panes";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { StoreApi } from "zustand";
 
 export type PaneLayoutSlot = "paneLayout" | "rightPaneLayout";
