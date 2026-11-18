@@ -3,8 +3,12 @@ import { HEADER_ICON_BUTTON_CLASS } from "@superset/ui/lib/header-controls";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
+import { LuCable } from "react-icons/lu";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import { useExplicitForwards } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
+import {
+	useExplicitForwards,
+	usePortForwardLookup,
+} from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
 import { portForwardId } from "shared/types";
 import { WorkspacePortRow } from "./components/WorkspacePortRow";
@@ -31,7 +35,11 @@ export function WorkspacePortsButton({
 	const stale = useExplicitForwards(workspaceId).filter(
 		(forward) => !detected.has(forward.id),
 	);
-	const totalPortCount = ports.length;
+	const lookupForward = usePortForwardLookup();
+	const forwardedCount =
+		ports.filter((port) => lookupForward(port)?.status.state === "active")
+			.length +
+		stale.filter((forward) => forward.status.state === "active").length;
 
 	if (ports.length === 0 && stale.length === 0) return null;
 
@@ -42,19 +50,19 @@ export function WorkspacePortsButton({
 					<PopoverTrigger asChild>
 						<button
 							type="button"
-							aria-label={t({ message: `Ports: ${totalPortCount} live` })}
+							aria-label={t({ message: "Ports on this computer" })}
 							className={cn(
 								"no-drag data-[state=open]:bg-fill-hover data-[state=open]:text-foreground",
 								HEADER_ICON_BUTTON_CLASS,
 							)}
 						>
-							<PortsCountIcon count={totalPortCount} />
+							<PortsCountIcon count={forwardedCount} icon={LuCable} />
 						</button>
 					</PopoverTrigger>
 				</TooltipTrigger>
 				<TooltipContent side="bottom">
 					<p className="text-xs">
-						<Trans>Ports</Trans>
+						<Trans>Ports on this computer</Trans>
 					</p>
 				</TooltipContent>
 			</Tooltip>
