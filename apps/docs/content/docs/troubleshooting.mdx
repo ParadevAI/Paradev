@@ -11,7 +11,7 @@ Almost always a context mix-up, not data loss. Check, in order:
 2. **Sign-in provider**: GitHub and Google logins are separate accounts even with the same email. Sign out and back in with your original provider.
 3. **v1 fallback**: if the app reverted to the legacy interface, re-enable v2 under **Settings → Experimental**.
 
-Your worktrees are still on disk at `~/.superset/worktrees/` either way; Paradev only deletes them when you delete a workspace.
+Your worktrees are still on disk at `~/.paradev/worktrees/` either way; Paradev only deletes them when you delete a workspace.
 
 If you created your account after using v1, update Paradev and relaunch it. Current versions import pre-account workspaces that older v2 releases could miss.
 
@@ -23,7 +23,7 @@ If the app quits and reopens on the same version, the updater hit a known race (
 
 Paradev terminals differ from Terminal.app in a few specific ways:
 
-- **PATH shims**: Paradev puts wrappers in `~/.superset/bin` (for status and notifications). If an agent misbehaves, run `which -a codex` (or `claude`) to spot duplicate installs on your PATH.
+- **PATH shims**: Paradev puts wrappers in `~/.paradev/bin` (for status and notifications). If an agent misbehaves, run `which -a codex` (or `claude`) to spot duplicate installs on your PATH.
 - **Copied settings**: new worktrees copy files like `.claude/settings.local.json` from your root checkout. If you rotated an API key, old worktrees may still carry the stale one.
 - **Shell**: launch commands assume a POSIX shell. fish or nushell as your login shell breaks agent launches.
 - **After an update**: terminal sessions are held by a background daemon that outlives the app. If terminals stay broken after an update, quit Paradev fully and relaunch; if that doesn't clear it, reboot.
@@ -32,7 +32,7 @@ Paradev terminals differ from Terminal.app in a few specific ways:
 
 Workspaces only copy git-tracked files, so `node_modules`, `.env`, and build artifacts don't come along.
 
-**Fix:** add [project lifecycle setup commands](/setup-teardown-scripts) to `.superset/config.json`:
+**Fix:** add [project lifecycle setup commands](/setup-teardown-scripts) to `.paradev/config.json`:
 
 ```json
 {

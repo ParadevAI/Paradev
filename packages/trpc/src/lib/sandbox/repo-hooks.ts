@@ -1,13 +1,16 @@
 /**
  * The hooks a repository declares for its cloud workspaces, read from
- * `.superset/config.toml` (else the v1 `.superset/config.json`) on the branch
+ * `.paradev/config.toml` (else the v1 `config.json`, else the same files in
+ * the pre-rename `.superset/`) on the branch
  * a workspace is created from. Ports are the one key the control plane must
  * know before the box exists (a sandbox publishes its ports at create); the
  * box reads its own setup and terminals.
  */
 import {
 	fromV1Json,
+	LEGACY_PROJECT_CONFIG_DIR,
 	MAX_PREVIEW_PORTS,
+	PROJECT_CONFIG_DIR,
 	type ProjectConfig,
 	parseProjectConfig,
 	resolveProjectConfig,
@@ -81,8 +84,11 @@ export function repoHooksFromJson(text: string): RepositoryHooks | null {
 export async function readRepoHooks(
 	args: RepoFileArgs,
 ): Promise<RepositoryHooks | null> {
-	const toml = await readRepoFile(args, ".superset/config.toml");
-	if (toml !== null) return repoHooksFromToml(toml);
-	const json = await readRepoFile(args, ".superset/config.json");
-	return json === null ? null : repoHooksFromJson(json);
+	for (const dir of [PROJECT_CONFIG_DIR, LEGACY_PROJECT_CONFIG_DIR]) {
+		const toml = await readRepoFile(args, `${dir}/config.toml`);
+		if (toml !== null) return repoHooksFromToml(toml);
+		const json = await readRepoFile(args, `${dir}/config.json`);
+		if (json !== null) return repoHooksFromJson(json);
+	}
+	return null;
 }

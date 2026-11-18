@@ -1,6 +1,5 @@
 "use client";
 
-import { $isCodeNode } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -66,8 +65,10 @@ import type {
 	ComposerChip,
 	ComposerMentionEntry,
 } from "../../../PromptInput/types";
+import { registerInlineCodeExit } from "../../../PromptInput/utils/inlineCodeExit";
 import { $insertTranscript } from "../../../PromptInput/utils/insertTranscript";
 import { $isInCode } from "../../../PromptInput/utils/isInCode";
+import { registerTrailingParagraph } from "../../../PromptInput/utils/trailingParagraph";
 import { MentionTypeaheadOption } from "../../../PromptInput/utils/typeaheadOptions";
 import { useMessageAttachments } from "../../hooks/useMessageAttachments";
 import type { MessageComposerProps } from "../../types";
@@ -312,19 +313,10 @@ export function MessageComposerBody({
 			KEY_ENTER_COMMAND,
 			(event) => {
 				if (event?.isComposing || event?.keyCode === 229) return false;
-				// Shift+Enter starts a new line, list item or quote line; inside
-				// a code block Enter adds a line, as in Slack.
 				if (event?.shiftKey) {
 					event.preventDefault();
 					editor.dispatchCommand(INSERT_PARAGRAPH_COMMAND, undefined);
 					return true;
-				}
-				const selection = $getSelection();
-				if (
-					$isRangeSelection(selection) &&
-					$isCodeNode(selection.anchor.getNode().getTopLevelElement())
-				) {
-					return false;
 				}
 				event?.preventDefault();
 				submitRef.current();
@@ -409,9 +401,13 @@ export function MessageComposerBody({
 			removeSelectedChips,
 			COMMAND_PRIORITY_LOW,
 		);
+		const unregisterTrailingParagraph = registerTrailingParagraph(editor);
+		const unregisterInlineCodeExit = registerInlineCodeExit(editor);
 		return () => {
 			unregisterText();
 			unregisterEnter();
+			unregisterTrailingParagraph();
+			unregisterInlineCodeExit();
 			unregisterClick();
 			unregisterBackspace();
 			unregisterDelete();

@@ -63,7 +63,7 @@ Production database: Neon plugin `run_sql` with `project_id` `frosty-lab-3241699
 PostHog (`exec`): count `dev_reconciler_fixed` by `fix`, and `dev_turn_retried` by `reason`, over
 the last 7 days.
 
-Sentry: `search_issues` in organization `paradev` for `agent-worker`, `agentWorker`, `devTools`
+Sentry: `search_issues` in organization `superset-sh` for `agent-worker`, `agentWorker`, `devTools`
 and `reconcile`, unresolved, last 7 days.
 
 ### 2. Group by cause
@@ -116,9 +116,9 @@ One rough edge per run. Add any new rough edges you notice to the list.
 ## Finish
 
 - Update the notebook, then write your final message: mode, what you found, what you filed (with
-  links), and anything that blocked you.
-- Last command: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"` when everything
-  worked, or `superset workspaces sleep` when a step failed, so the evidence stays.
+  links), and anything that blocked you. When a step failed, put the command, its output, and the
+  ids involved in the notebook and the final message; the workspace does not outlive the run.
+- Last command, every run: `superset workspaces archive "$SUPERSET_SANDBOX_WORKSPACE_ID"`.
 
 ## Rules
 

@@ -23,7 +23,7 @@ Maestro, recorded with `simctl`. Nothing here opens a window on the user's displ
 
 Start each in its own Paradev terminal
 (`superset terminals create --local --workspace $SUPERSET_WORKSPACE_ID --command "..."`;
-without `--local` the call silently returns nothing). Ports come from `.superset/ports.json`
+without `--local` the call silently returns nothing). Ports come from `.paradev/ports.json`
 and the root `.env`.
 
 | Service | Command | Trap |

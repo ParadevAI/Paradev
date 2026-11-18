@@ -32,7 +32,7 @@ import {
 } from "../../lib/organization-plugins";
 import { deleteObjects, getObject } from "../../lib/r2";
 import { nudge } from "../../lib/realtime";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin } from "../integration/utils";
 import { requireActiveOrgId } from "../utils/active-org";
 import { type PluginManifest, pluginConnector } from "./manifest";
@@ -114,7 +114,7 @@ const policySchema = z.partialRecord(
 );
 
 const sourcesRouter = {
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		const organizationId = await requireAdmin(ctx);
 		const rows = await db
 			.select({
@@ -137,7 +137,7 @@ const sourcesRouter = {
 		}));
 	}),
 
-	add: protectedProcedure
+	add: personProcedure
 		.input(
 			z.object({
 				repo: z
@@ -189,7 +189,7 @@ const sourcesRouter = {
 			return source;
 		}),
 
-	sync: protectedProcedure
+	sync: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAdmin(ctx);
@@ -204,7 +204,7 @@ const sourcesRouter = {
 			return { requested: source.id };
 		}),
 
-	remove: protectedProcedure
+	remove: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAdmin(ctx);
@@ -243,7 +243,7 @@ const sourcesRouter = {
 } satisfies TRPCRouterRecord;
 
 export const organizationPluginsRouter = {
-	list: protectedProcedure.query(async ({ ctx }) => {
+	list: personProcedure.query(async ({ ctx }) => {
 		const organizationId = requireActiveOrgId(ctx);
 		const userId = ctx.session.user.id;
 		const admin = await isAdmin(userId, organizationId);
@@ -280,7 +280,7 @@ export const organizationPluginsRouter = {
 		}));
 	}),
 
-	bundle: protectedProcedure
+	bundle: personProcedure
 		.input(z.object({ name: z.string().min(1) }))
 		.query(async ({ ctx, input }) => {
 			const organizationId = requireActiveOrgId(ctx);
@@ -304,7 +304,7 @@ export const organizationPluginsRouter = {
 			};
 		}),
 
-	setPolicy: protectedProcedure
+	setPolicy: personProcedure
 		.input(z.object({ name: z.string().min(1), policy: policySchema }))
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireAdmin(ctx);

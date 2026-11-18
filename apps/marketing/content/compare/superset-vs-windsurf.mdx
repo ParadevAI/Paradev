@@ -2,7 +2,7 @@
 title: "Paradev vs Windsurf (2026): Parallel Agent Orchestration vs AI IDE"
 description: "Compare Paradev and Windsurf, now Devin Desktop, for AI-assisted development. See how parallel worktree orchestration differs from an AI-powered IDE."
 date: 2026-02-18
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "1v1"
 competitors:
   - windsurf
@@ -27,17 +27,17 @@ Note: as of mid-2026, Windsurf is now Devin Desktop, and the original Cascade ag
 |---|---|---|
 | **Category** | Agent orchestration workspace | AI-powered IDE with an agent command center |
 | **AI approach** | Agent-agnostic -- Claude Code, Codex, OpenCode, Cursor, Gemini, or any CLI agent | Devin Local plus ACP agents (Codex, Claude, OpenCode) |
-| **Parallelism** | Core feature -- multiple agents across isolated worktrees | Manages local and cloud agents from a Kanban command center |
+| **Parallelism** | Core feature -- multiple agents across separate worktrees | Manages local and cloud agents from a Kanban command center |
 | **Isolation** | Git worktrees for local branch-based workspaces | Cloud isolated; local mechanism not clearly documented |
 | **Editor** | Works alongside any editor (VS Code, Cursor, JetBrains, Xcode) | You use the Devin Desktop IDE |
 | **Pricing** | Free tier + Pro {{price:pro}}, Team {{price:team}}, Ultra {{price:ultra}}/seat/mo | Free tier, Pro $20/mo, Max $200/mo |
-| **License** | Source-available (ELv2) | Closed source |
+| **License** | Open source (MIT) | Closed source |
 
 ---
 
 ## What Is Paradev?
 
-Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows inside isolated Git worktrees with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, chat panel, in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Source-available under Elastic License 2.0 (ELv2).
+Paradev is a local-first desktop workspace for AI coding agents. It launches Claude Code, Codex, OpenCode, Cursor Agent, Copilot, Gemini CLI, Mistral Vibe, and other agent workflows in separate Git worktrees and branches, with persistent terminal sessions. Around that core, it adds a built-in diff/file editor, a chat interface for Claude Code, Codex, OpenCode, and Pi, an in-app browser for docs and dev servers, port management, and MCP tooling. You can review inside Paradev or jump into VS Code, Cursor, Windsurf, JetBrains, or Xcode. Open source under the MIT License.
 
 ---
 
@@ -63,11 +63,11 @@ Both can run external CLI agents now. Devin Desktop added ACP support, so ACP-co
 
 ### Reach and Automation
 
-Paradev extends past the local desktop with Remote Access to machines you own and cloud workspaces that run in the cloud, plus CLI and MCP surfaces and scheduled automations. Devin Desktop pairs its local IDE with Cognition's cloud agents. Both cross the local/cloud boundary; they differ in whether the center of gravity is a worktree workspace or an IDE.
+Paradev extends past the local desktop with Remote Access to machines you own, [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud) on a Linux server in your own cloud account, and [cloud workspaces](/cloud) that run in the cloud, plus CLI and MCP surfaces and scheduled automations. Devin Desktop pairs its local IDE with Cognition's cloud agents. Both cross the local/cloud boundary; they differ in whether the center of gravity is a worktree workspace or an IDE.
 
 ### Privacy and Licensing
 
-Paradev runs agents locally in Git worktrees and is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source. If auditability and local-first control matter, that is a real distinction.
+Paradev runs agents locally in Git worktrees and is open source on GitHub under the MIT License. Windsurf/Devin Desktop is closed source. If auditability and local-first control matter, that is a real distinction.
 
 ---
 
@@ -86,7 +86,7 @@ Paradev offers a free tier, Pro at {{price:pro}}/seat/month, and Team ({{price:t
 - Want ACP agents hosted inside one IDE
 
 **Choose Paradev if you:**
-- Run CLI-based agents and want to parallelize across many isolated worktrees
+- Run CLI-based agents and want to parallelize across many separate worktrees
 - Use JetBrains, Xcode, Neovim, or any editor, and want orchestration to stay independent
 - Need local worktrees plus remote hosts you own and cloud workspaces
 - Want agent and model flexibility with no editor lock-in
@@ -103,11 +103,11 @@ Windsurf is now Devin Desktop, following Cognition's acquisition. It shipped as 
 
 ### Does Windsurf (Devin Desktop) support parallel agents?
 
-Devin Desktop manages multiple local and cloud agents from its command center, and its cloud agents run in isolation. It does not clearly document a local worktree-per-agent model. Paradev's worktree isolation is built specifically for parallel agent execution on one repository.
+Devin Desktop manages multiple local and cloud agents from its command center, and its cloud agents run in isolation. It does not clearly document a local worktree-per-agent model. Paradev's worktree-per-task model is built specifically for parallel agent execution on one repository.
 
 ### Is Paradev open source?
 
-Paradev is source-available on GitHub under Elastic License 2.0 (ELv2). Windsurf/Devin Desktop is closed source.
+Yes. Paradev is open source on GitHub under the MIT License. Windsurf/Devin Desktop is closed source.
 
 ### What is the difference between Windsurf and Devin?
 

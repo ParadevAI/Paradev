@@ -17,7 +17,7 @@ const SHIM_HEADER_BYTES = 2048;
 /** `paradev` is an alias of `superset`; both shims exec the same binary. */
 const BUNDLED_CLI_COMMANDS = ["superset", "paradev"] as const;
 
-export type BundledCliInstallStatus = "installed" | "missing" | "skipped";
+type BundledCliInstallStatus = "installed" | "missing" | "skipped";
 
 interface InstallBundledCliShimOptions {
 	binDir?: string;

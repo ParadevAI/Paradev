@@ -20,7 +20,8 @@ export function computeInsertIndex(
 
 /**
  * The scrollLeft that brings tab `index` fully into view, keeping `endInset`
- * clear at the right edge, or null if it is already visible.
+ * clear at the right edge, or null if it is already visible. A tab wider than
+ * the viewport aligns its left edge, so its title stays readable.
  */
 export function scrollLeftToRevealTab(
 	index: number,
@@ -32,7 +33,7 @@ export function scrollLeftToRevealTab(
 	const tabRight = tabLeft + TAB_WIDTH;
 	if (tabLeft < scrollLeft) return tabLeft;
 	if (tabRight > scrollLeft + viewportWidth - endInset) {
-		return tabRight - viewportWidth + endInset;
+		return Math.min(tabLeft, tabRight - viewportWidth + endInset);
 	}
 	return null;
 }

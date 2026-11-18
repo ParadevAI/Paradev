@@ -13,7 +13,7 @@ import {
 	type ManagedTomlBlockSpec,
 	removeManagedTomlBlock,
 } from "./managed-toml-block";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 
 /**
  * Materializes the MCP servers of installed Superset plugins into agent
@@ -24,7 +24,7 @@ import { resolveSupersetHomeDir } from "./paths";
  * fingerprint (unlike hooks, recognized by their notify-script path):
  *
  * - Claude's `mcpServers` is a name→object map inside a user-owned file, so a
- *   sidecar ledger (`~/.superset/plugins/mcp-ledger.json`) records which keys
+ *   sidecar ledger (`~/.paradev/plugins/mcp-ledger.json`) records which keys
  *   we wrote and a hash of each value. Reap removes only keys whose current
  *   value still matches what we wrote; a user-edited entry transfers to the
  *   user. A pre-existing key we never wrote is never touched.
@@ -40,7 +40,7 @@ import { resolveSupersetHomeDir } from "./paths";
 export interface SyncManagedMcpServersOptions {
 	/** Override for tests. */
 	homeDir?: string;
-	/** Override for tests; production resolves ~/.superset. */
+	/** Override for tests; production resolves ~/.paradev. */
 	supersetHomeDir?: string;
 	pdevAgentDir?: string;
 }
@@ -354,7 +354,7 @@ export function readExternallyConfiguredMcpServers(
 	options: SyncManagedMcpServersOptions = {},
 ): ExternalMcpServer[] {
 	const homeDir = options.homeDir ?? os.homedir();
-	const supersetHomeDir = options.supersetHomeDir ?? resolveSupersetHomeDir();
+	const supersetHomeDir = options.supersetHomeDir ?? resolveAppHomeDir();
 	const ledger = readLedger(supersetHomeDir);
 	const bySourceAndName = new Map<string, ExternalMcpServer>();
 
@@ -533,7 +533,7 @@ export function syncManagedMcpServers(
 	options: SyncManagedMcpServersOptions = {},
 ): void {
 	const homeDir = options.homeDir ?? os.homedir();
-	const supersetHomeDir = options.supersetHomeDir ?? resolveSupersetHomeDir();
+	const supersetHomeDir = options.supersetHomeDir ?? resolveAppHomeDir();
 	const scoped = getDesiredMcpServersByAgent(desired, options);
 	const errors: unknown[] = [];
 	const attempt = (sync: () => void) => {

@@ -2,7 +2,7 @@
 title: "How to Review Coding Agent Work as a Team: Branches, Diffs, and Owners (2026)"
 description: "Tools for giving each coding agent task its own branch and human reviewer, comparing two agents' diffs, and sending follow-ups before you merge."
 date: 2026-10-07
-lastUpdated: 2026-10-15
+lastUpdated: 2026-11-05
 type: "roundup"
 competitors:
   - codex
@@ -43,7 +43,7 @@ The rest of this page answers the specific questions teams ask when they set thi
 | Paradev | Git worktree and branch per workspace | Changes pane, PR view with checks and merge | Select PR diff lines, send to a running or new agent | `superset` CLI, MCP server, TypeScript SDK (alpha) |
 | Codex app | Worktrees and cloud environments | Diff review in the app | Chat follow-up in the same thread | Codex CLI |
 | Cursor | Up to 8 agents in local worktrees, plus cloud agents | Agent diff view in the editor | Follow-up prompts in the agent pane | Cursor's own agents |
-| Conductor | Workspace per task, local Mac or cloud | Diffs, checks, PRs, merge | Chat in the workspace | Conductor API |
+| Conductor (closed to new users) | Workspace per task on a local Mac; cloud shuts down November 20, 2026 | Diffs, checks, PRs, merge | Chat in the workspace | Conductor API |
 | GitHub Copilot coding agent | Branch per assigned issue | GitHub pull request | PR review comments | Assign a GitHub issue |
 | Plain `git worktree` + tmux | Manual | Your editor and `git diff` | Type into the agent's pane | Shell scripts |
 
@@ -57,7 +57,7 @@ A practical shortlist:
 - **Cursor** if engineers want to stay in one editor. Cursor 2.0 runs up to eight agents in parallel, each in its own local worktree.
 - **Claude Code** as the agent, with `claude --worktree` for manual isolation, or under a workspace tool when you run more than two or three sessions.
 - **GitHub Copilot coding agent** or **Devin** if you want issue-in, pull-request-out work from an agent you assign rather than drive.
-- **Paradev** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch, terminals, and ports, and it runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
+- **Paradev** if the team uses a mix of CLI agents. Each workspace is a Git worktree with its own branch and terminals, and Paradev shows the ports each workspace's processes open. It runs Claude Code, Codex, OpenCode, Gemini CLI, Copilot, Cursor Agent, Amp, Devin, and other CLI agents side by side. Desktop runs on macOS, with an experimental Linux AppImage. Windows is not yet available.
 
 Run the same 10 to 20 real backlog tasks through each candidate and measure human minutes per merged PR. Worktrees separate working files. They do not sandbox processes, and they do not prevent merge conflicts between branches that touch the same files. For the setup itself, see [Git worktrees for AI coding agents](/compare/git-worktrees-for-ai-agents) and the [parallel coding agents guide](/blog/parallel-coding-agents-guide).
 
@@ -118,7 +118,7 @@ Keep one task, one branch, and one PR, and merge them one at a time with CI betw
 
 - **Plain `git worktree`** works for two or three agents. Name branches after the task.
 - **Vibe Kanban** maps each task card to a worktree and agent.
-- **Conductor** gives each workspace its own diff, checks, and merge.
+- **Conductor** gives each workspace its own diff, checks, and merge. It is joining Meta and is closed to new users. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 - **Graphite** fits when agent branches depend on each other and you want stacked PRs.
 - **Paradev** shows each workspace's PR state, review status, and CI checks on hover in the sidebar. `--tag` groups workspaces into sidebar folders, for example one folder per feature. The Pull requests view filters by several authors at once, and **Merge** offers squash, merge commit, or rebase.
 
@@ -142,7 +142,7 @@ Headless agent modes cover single tasks: `claude -p`, `codex exec`, `aider --mes
 
 Paradev gives you three ways in:
 
-- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates an isolated branch with an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
+- **CLI**: `superset workspaces create --project <id> --name <name> --branch <branch> --local --agent <agent> --prompt "..."` creates a workspace with its own worktree and branch and an agent already working. `superset agents create` starts another agent in an existing workspace, and `superset terminals read` and `superset terminals send` check progress and deliver follow-ups. See the [CLI reference](https://docs.paradev.com/cli/cli-reference).
 - **Another agent**: the `superset:orchestrate` skill, shipped to agents Paradev runs, lets Claude Code or Codex act as a coordinator. It creates one workspace per worker, sends bounded prompts, and checks each worker's completion report. You still review one branch and PR per worker. See [Agent Orchestration](https://docs.paradev.com/orchestration).
 - **MCP and SDK**: the [MCP server](https://docs.paradev.com/mcp-server) exposes tasks, workspaces, agents, and terminals to any MCP client. The TypeScript SDK is in early alpha.
 
@@ -152,7 +152,7 @@ The Linear custom-script setup is another dispatch path: **Work on issue → Cus
 
 - **Pick Codex, Cursor, or Claude Code alone** if one engineer runs two or three agents and is happy with one vendor's agent.
 - **Pick Copilot coding agent or Devin** if you want to assign an issue and get the work back as a PR.
-- **Pick Paradev** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, or a cloud workspace, does not proxy model calls, and has a free tier plus paid seats.
+- **Pick Paradev** if the team mixes CLI agents and wants branches, diffs, PRs, and tasks in one desktop app, plus CLI and MCP dispatch. It runs on your machine, a connected host, your own Linux server with Bring Your Own Cloud, or a cloud workspace. It is open source under the MIT License, does not proxy model calls, and has a free tier plus paid seats.
 - **Add branch protection and `CODEOWNERS` in every case.** That is where the accountable reviewer actually lives.
 
 ## Frequently Asked Questions

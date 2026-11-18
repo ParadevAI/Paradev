@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@superset/ui/popover";
 import { cn } from "@superset/ui/utils";
-import { LuListFilter } from "react-icons/lu";
+import { LuListFilter, LuRefreshCw } from "react-icons/lu";
 import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components/PageHeader";
 import { ProjectFilter } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter";
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
@@ -11,6 +12,7 @@ import { PullRequestDetailToggle } from "renderer/routes/_authenticated/_dashboa
 import { usePullRequestsSplitViewStore } from "renderer/routes/_authenticated/_dashboard/pull-requests/stores/pullRequestsSplitViewStore";
 import type { PullRequestReviewFilter } from "renderer/routes/_authenticated/_dashboard/pull-requests/utils/pullRequestReviewFilter";
 import { AuthorFilter } from "./components/AuthorFilter";
+import { ReviewerFilter } from "./components/ReviewerFilter";
 import { ReviewFilter } from "./components/ReviewFilter";
 
 type PullRequestsStateFilter = "open" | "all" | "merged";
@@ -23,10 +25,16 @@ interface PullRequestsTopBarProps {
 	projectTargets: ProjectQueryTarget[];
 	authorFilter: string | null;
 	onAuthorFilterChange: (author: string | null) => void;
+	reviewerFilter: string | null;
+	onReviewerFilterChange: (reviewer: string | null) => void;
 	reviewFilter: PullRequestReviewFilter | null;
 	onReviewFilterChange: (review: PullRequestReviewFilter | null) => void;
 	stateFilter: PullRequestsStateFilter;
 	onStateFilterChange: (state: PullRequestsStateFilter) => void;
+	/** Matches for the current filters, shown on the active state tab; null while unknown. */
+	resultCount: number | null;
+	isRefreshing: boolean;
+	onRefresh?: () => void;
 }
 
 export function PullRequestsTopBar({
@@ -37,12 +45,18 @@ export function PullRequestsTopBar({
 	projectTargets,
 	authorFilter,
 	onAuthorFilterChange,
+	reviewerFilter,
+	onReviewerFilterChange,
 	reviewFilter,
 	onReviewFilterChange,
 	stateFilter,
 	onStateFilterChange,
+	resultCount,
+	isRefreshing,
+	onRefresh,
 }: PullRequestsTopBarProps) {
 	const { t } = useLingui();
+	const { formatNumber } = useFormat();
 	const isDetailCollapsed = usePullRequestsSplitViewStore(
 		(state) => state.isDetailCollapsed,
 	);
@@ -73,13 +87,14 @@ export function PullRequestsTopBar({
 	const activeFilterCount = [
 		projectFilters.length > 0,
 		!!authorFilter,
+		!!reviewerFilter,
 		!!reviewFilter,
 	].filter(Boolean).length;
 
 	return (
 		<div
 			data-pull-requests-toolbar
-			className="flex shrink-0 flex-col border-b border-border px-3 pb-2"
+			className="flex shrink-0 flex-col px-3 pb-2"
 		>
 			<PageHeader
 				className="-mx-3"
@@ -108,11 +123,42 @@ export function PullRequestsTopBar({
 								)}
 							>
 								{tab.label}
+								{stateFilter === tab.value && resultCount !== null ? (
+									<span className="ml-1.5 tabular-nums text-muted-foreground">
+										{formatNumber(resultCount)}
+									</span>
+								) : null}
 							</button>
 						))}
 					</div>
 				}
-				end={<PullRequestDetailToggle />}
+				end={
+					<div className="flex items-center gap-0.5">
+						{onRefresh ? (
+							<button
+								type="button"
+								onClick={onRefresh}
+								disabled={isRefreshing}
+								title={t({
+									message: "Refresh",
+								})}
+								aria-label={t({
+									message: "Refresh pull requests",
+								})}
+								className="flex size-6 items-center justify-center rounded text-muted-foreground transition-colors hover:text-foreground disabled:hover:text-muted-foreground"
+							>
+								<LuRefreshCw
+									className={cn(
+										"size-3.5",
+										isRefreshing && "animate-spin motion-reduce:animate-none",
+									)}
+									strokeWidth={1.75}
+								/>
+							</button>
+						) : null}
+						<PullRequestDetailToggle />
+					</div>
+				}
 				reservesWindowControls={isDetailCollapsed}
 			/>
 			<div className="flex items-center gap-1.5">
@@ -177,6 +223,16 @@ export function PullRequestsTopBar({
 							<AuthorFilter
 								value={authorFilter}
 								onChange={onAuthorFilterChange}
+								projectTargets={projectTargets}
+							/>
+						</div>
+						<div className="flex items-center justify-between gap-2">
+							<span className="text-xs text-muted-foreground">
+								<Trans>Reviewer</Trans>
+							</span>
+							<ReviewerFilter
+								value={reviewerFilter}
+								onChange={onReviewerFilterChange}
 								projectTargets={projectTargets}
 							/>
 						</div>

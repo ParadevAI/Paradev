@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useWorkspaceConnectionRefresh } from "../useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "../useWorkspaceEvent";
 import { useWorkspaceHostUrl } from "../useWorkspaceHostUrl";
@@ -18,8 +19,12 @@ export type TerminalAgentBinding = TerminalAgentBindings[number];
  * host-service port change cold-started every agent chip. The queryFn
  * resolves the current host URL at fetch time.
  */
+export const TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX = [
+	"terminal-agent-bindings",
+] as const;
+
 export function getTerminalAgentBindingsQueryKey(workspaceId: string) {
-	return ["terminal-agent-bindings", workspaceId] as const;
+	return [...TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX, workspaceId] as const;
 }
 
 /**
@@ -42,12 +47,12 @@ export function useTerminalAgentBindings(
 	const { data } = useQuery({
 		queryKey,
 		enabled,
-		queryFn: ({ signal }) => {
-			if (!hostUrl) return [] as TerminalAgentBindings;
-			return getHostServiceClientByUrl(
-				hostUrl,
-			).terminalAgents.listByWorkspace.query({ workspaceId }, { signal });
-		},
+		queryFn: hostQueryFn(hostUrl, (url, { signal }) =>
+			getHostServiceClientByUrl(url).terminalAgents.listByWorkspace.query(
+				{ workspaceId },
+				{ signal },
+			),
+		),
 		staleTime: 30_000,
 	});
 

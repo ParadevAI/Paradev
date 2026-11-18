@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "sentry",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Debug with production error context: search issues, read stack traces, and manage alerts in Sentry.",
 	"author": {
 		"name": "Paradev",

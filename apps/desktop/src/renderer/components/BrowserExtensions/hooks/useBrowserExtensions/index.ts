@@ -1,0 +1,1 @@
+export { useBrowserExtensions } from "./useBrowserExtensions";

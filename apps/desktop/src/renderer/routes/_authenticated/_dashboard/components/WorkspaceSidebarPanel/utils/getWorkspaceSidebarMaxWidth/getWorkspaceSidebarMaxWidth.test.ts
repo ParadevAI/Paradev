@@ -6,11 +6,11 @@ describe("getWorkspaceSidebarMaxWidth", () => {
 		expect(getWorkspaceSidebarMaxWidth(1728)).toBe(400);
 	});
 
-	test("leaves the window room for the right pane's minimum", () => {
-		expect(getWorkspaceSidebarMaxWidth(560)).toBe(560 - 262);
+	test("leaves the window room for the center and right pane minimums", () => {
+		expect(getWorkspaceSidebarMaxWidth(760)).toBe(760 - 260 - 262);
 	});
 
 	test("never goes below the sidebar's own minimum", () => {
-		expect(getWorkspaceSidebarMaxWidth(400)).toBe(225);
+		expect(getWorkspaceSidebarMaxWidth(640)).toBe(225);
 	});
 });

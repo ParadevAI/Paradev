@@ -24,7 +24,7 @@ superset agents list --local --json
 superset workspaces list --local --json
 ```
 
-When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID"` explicitly to agent and terminal commands. Only `workspaces get` defaults its workspace ID from that environment variable. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. To run workers on a machine that is not a host yet but that the user can SSH into, `superset hosts add <ssh-target>` installs the CLI there, signs it in, and keeps it running as a user service. It changes that machine, so get the user's go-ahead first and pass `--yes` only after they agree. It needs `ssh <ssh-target>` to already work from here, and on the remote: macOS or glibc Linux (x64 or arm64, not Alpine or Windows), `curl`, and on Linux a valid `/etc/machine-id` and systemd user services. Without `gh` signed in there, private repos will not clone on that host. Running it again on the same target repairs a broken setup, and `superset hosts remove <ssh-target>` undoes it. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
+When coordinating from inside the target workspace, pass `--workspace "$SUPERSET_WORKSPACE_ID" --local` explicitly to agent and terminal commands; they never default `--workspace`. Without `--local` or `--host`, `agents create/read/wait`, terminal, and workspace commands target the cloud when the account has cloud workspaces; `agents list` needs one of them. Pass `--host <id>` consistently for a remote host. If the target host is offline, use `hosts wake <id>` and confirm it is online before dispatching. To run workers on a machine that is not a host yet but that the user can SSH into, `superset hosts add <ssh-target>` installs the CLI there, signs it in, and keeps it running as a user service. It changes that machine, so get the user's go-ahead first and pass `--yes` only after they agree. It needs `ssh <ssh-target>` to already work from here, and on the remote: macOS or glibc Linux (x64 or arm64, not Alpine or Windows), `curl`, and on Linux a valid `/etc/machine-id` and systemd user services. Without `gh` signed in there, private repos will not clone on that host. Running it again on the same target repairs a broken setup, and `superset hosts remove <ssh-target>` undoes it. Do not use `--agent superset`: it creates a chat session, and terminal read/send cannot control it.
 
 ## Plan the work
 
@@ -153,7 +153,7 @@ If `superset agents wait` is not available (an older CLI), poll `terminals read`
 
 To see every worker at once (each terminal, its agent and state), read the host in one call with `superset snapshot --host <host-id> --json`. `superset agents explain` says why a worker shows the state it does.
 
-When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. They work only for workspaces on the machine running the desktop app. For anything beyond this (resizing, swapping, moving, closing, or building a full layout), use the `superset:panes` skill.
+When the user wants to watch workers in the desktop app, lay them out with `superset panes`: `panes new-tab --workspace <id> --terminal <terminal-id>` opens a worker in its own tab, and `panes split --workspace <id> --pane <pane-id> --direction right --terminal <terminal-id>` puts two side by side. Get pane IDs from `panes list --workspace <id> --json`. These commands do not move focus; only `panes focus` does. Add `--sidebar` to `new-tab` to watch a worker in the right sidebar beside your own work, and `panes open changes --workspace <id>` to show its diff there. They work only for workspaces on the machine running the desktop app. For anything beyond this (resizing, swapping, moving, closing, or building a full layout), use the `superset:panes` skill.
 
 If the user wants to take over a worker from their own shell, give them the command rather than running it: `superset terminals attach --workspace <id> --terminal <terminal-id>` (add `--ssh <user@machine>` for a worker on another machine). It needs an interactive terminal, and `Ctrl+]` detaches without stopping the worker.
 
@@ -171,6 +171,8 @@ For isolated branches, ask each implementation worker to commit or otherwise pro
 ## Finish and clean up
 
 Summarize each task's outcome, workspace/branch, files changed, checks, blockers, and integration order. Distinguish worker claims from checks the coordinator independently ran.
+
+For cloud workers, `superset workspaces pull-requests --all --json` lists every pull request they opened in one call. `superset workspaces sleep <id>` stops a finished worker's sandbox instead of archiving it; opening it wakes it.
 
 A long run usually finishes while the user is looking elsewhere. Tell them with a desktop notification; run from a Paradev terminal, clicking it brings them back to the coordinator:
 

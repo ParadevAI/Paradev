@@ -185,6 +185,11 @@ const LEGAL_LINKS: FooterLink[] = [
 		href: "/privacy",
 		label: <Trans>Privacy</Trans>,
 	},
+	{
+		href: `${COMPANY.GITHUB_URL}/blob/main/LICENSE.md`,
+		label: <Trans>MIT License</Trans>,
+		external: true,
+	},
 ];
 
 export function Footer({

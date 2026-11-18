@@ -5,6 +5,7 @@ import {
 	isLinearRateLimitError,
 	issueFilterFor,
 	listIssues,
+	listProjects,
 	updateIssue,
 } from "./api";
 
@@ -46,6 +47,12 @@ describe("issueFilterFor", () => {
 			team: { id: { eq: "t1" } },
 			state: { type: { in: ["unstarted", "started"] } },
 			assignee: { isMe: { eq: true } },
+		});
+	});
+
+	test("narrows to one project", () => {
+		expect(issueFilterFor({ status: "all", projectId: "p1" })).toEqual({
+			project: { id: { eq: "p1" } },
 		});
 	});
 
@@ -167,5 +174,29 @@ describe("isLinearRateLimitError", () => {
 			}),
 		).toBe(true);
 		expect(isLinearRateLimitError(new Error("boom"))).toBe(false);
+	});
+});
+
+describe("listProjects", () => {
+	test("pages through every project and sorts them by name", async () => {
+		const pages = [
+			{
+				projects: {
+					nodes: [{ id: "p2", name: "Zeta", icon: null, color: "#000000" }],
+					pageInfo: { hasNextPage: true, endCursor: "c1" },
+				},
+			},
+			{
+				projects: {
+					nodes: [{ id: "p1", name: "Alpha", icon: null, color: "#ffffff" }],
+					pageInfo: { hasNextPage: false, endCursor: null },
+				},
+			},
+		];
+		const rawRequest = mock(async () => ({ data: pages.shift() }));
+		const client = { client: { rawRequest } } as unknown as LinearClient;
+		const projects = await listProjects(client);
+		expect(projects.map((project) => project.id)).toEqual(["p1", "p2"]);
+		expect(rawRequest).toHaveBeenCalledTimes(2);
 	});
 });

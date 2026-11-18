@@ -5,7 +5,7 @@ import { env } from "@/env";
 import { stub } from "../../../../../../test/stub";
 import type { PromoCode } from "./addRewardPromoCode";
 
-const REWARD_ID = "yc-bookface-6mo-pro";
+const REWARD_ID = "yc-bookface-3mo-team";
 
 let rewardCodes: PromoCode[] = [];
 let dropOnWrite: string[] = [];
@@ -13,6 +13,9 @@ let autumnWrites = 0;
 let emailedCodes: string[] = [];
 let existingRow: { status: string } | undefined;
 let insertedRows: Array<Record<string, unknown>> = [];
+let slackAlerts: string[] = [];
+
+const SLACK_URL = "https://hooks.slack.test/billing";
 
 async function fakeFetch(input: string | URL | Request, init?: RequestInit) {
 	const url = String(input instanceof Request ? input.url : input);
@@ -37,6 +40,10 @@ async function fakeFetch(input: string | URL | Request, init?: RequestInit) {
 		rewardCodes = codes.filter((c) => !dropOnWrite.includes(c.code));
 		return Response.json({ coupon: { id: REWARD_ID } });
 	}
+	if (url === SLACK_URL) {
+		slackAlerts.push(String(body.text));
+		return new Response("ok");
+	}
 	if (url.startsWith("https://api.resend.com/emails")) {
 		emailedCodes.push(String(body.html).match(/\bYC[A-Z0-9]{8}\b/)?.[0] ?? "");
 		return Response.json({ id: "email_1" });
@@ -44,7 +51,7 @@ async function fakeFetch(input: string | URL | Request, init?: RequestInit) {
 	throw new Error(`Unexpected fetch ${url}`);
 }
 
-stub(env, { YC_BOOKFACE_DEAL_ID: 13843 });
+stub(env, { YC_BOOKFACE_DEAL_ID: 13843, SLACK_BILLING_WEBHOOK_URL: SLACK_URL });
 stub(globalThis, { fetch: fakeFetch });
 stub(dbWs, {
 	transaction: async (fn: (tx: unknown) => Promise<unknown>) =>
@@ -97,6 +104,7 @@ beforeEach(() => {
 	emailedCodes = [];
 	existingRow = undefined;
 	insertedRows = [];
+	slackAlerts = [];
 });
 
 describe("YC Bookface webhook", () => {
@@ -131,6 +139,22 @@ describe("YC Bookface webhook", () => {
 		expect(response.status).toBe(500);
 		expect(emailedCodes).toEqual([]);
 		expect(insertedRows).toEqual([]);
+	});
+
+	test("a missing Autumn reward fails the delivery and alerts Slack", async () => {
+		const rewardId = env.YC_BOOKFACE_REWARD_ID;
+		Reflect.set(env, "YC_BOOKFACE_REWARD_ID", "renamed-in-dashboard");
+		let response: Response;
+		try {
+			response = await POST(signed(REDEMPTION));
+		} finally {
+			Reflect.set(env, "YC_BOOKFACE_REWARD_ID", rewardId);
+		}
+		expect(response.status).toBe(500);
+		expect(emailedCodes).toEqual([]);
+		expect(insertedRows).toEqual([]);
+		expect(slackAlerts).toHaveLength(1);
+		expect(slackAlerts[0]).toContain("Founder@Example.com");
 	});
 });
 

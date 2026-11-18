@@ -13,7 +13,7 @@ import type { BrowserWindow } from "electron";
  * compile time) and never calls into Electron at runtime, so it can be unit
  * tested with plain stub objects exposing `id` and `isDestroyed()`.
  */
-export interface WindowEntry {
+interface WindowEntry {
 	window: BrowserWindow;
 	orgId: string | null;
 	/**
@@ -29,6 +29,19 @@ const registry = new Map<number, WindowEntry>();
 // getFocusedOrLastWindow() as the fallback target for notifications,
 // deep links, and the legacy single-window getWindow() getter.
 const focusOrder: number[] = [];
+
+const watchers = new Set<(window: BrowserWindow) => void>();
+
+function notify(
+	watcher: (window: BrowserWindow) => void,
+	window: BrowserWindow,
+): void {
+	try {
+		watcher(window);
+	} catch (error) {
+		console.error("[window-registry] A window watcher failed:", error);
+	}
+}
 
 function moveToEnd(windowId: number): void {
 	const existing = focusOrder.indexOf(windowId);
@@ -49,16 +62,18 @@ export function registerWindow({
 }): void {
 	registry.set(window.id, { window, orgId, key });
 	moveToEnd(window.id);
+	for (const watcher of watchers) notify(watcher, window);
+}
+
+/** Calls `watcher` with every open window, then with each window registered later. */
+export function watchWindows(watcher: (window: BrowserWindow) => void): void {
+	for (const window of getAllWindows()) notify(watcher, window);
+	watchers.add(watcher);
 }
 
 /** The persisted identity of a window, or null if it is not registered. */
 export function getKey(windowId: number): string | null {
 	return registry.get(windowId)?.key ?? null;
-}
-
-/** Every registered window's key — the set persisted state may keep. */
-export function getAllKeys(): string[] {
-	return [...registry.values()].map((entry) => entry.key);
 }
 
 export function unregisterWindow(windowId: number): void {
@@ -127,4 +142,5 @@ export function getFocusedOrLastWindow(): BrowserWindow | null {
 export function __resetForTests(): void {
 	registry.clear();
 	focusOrder.length = 0;
+	watchers.clear();
 }

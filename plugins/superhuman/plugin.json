@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "superhuman",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Work your inbox from Superhuman: find and read threads, triage what needs you, draft replies in your voice, and schedule from your calendar.",
 	"author": {
 		"name": "Paradev",

@@ -257,6 +257,8 @@ export const agentTurns = pgTable(
 			.defaultNow(),
 		/** Set by the caller so a resent prompt runs once. */
 		promptId: text("prompt_id"),
+		/** What the turn was asked; a queued turn is started with it. */
+		prompt: text(),
 		/** Prompts that joined the turn while it ran; it settles only after the worker read them all. */
 		steerPromptIds: text("steer_prompt_ids").array().notNull().default([]),
 		settledAt: timestamp("settled_at", { withTimezone: true }),

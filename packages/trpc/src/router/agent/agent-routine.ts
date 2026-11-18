@@ -14,7 +14,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { userError } from "../../i18n-error";
-import { protectedProcedure } from "../../trpc";
+import { personProcedure } from "../../trpc";
 import { loadChannelAccess } from "../channel/access";
 import { loadAgentAccess } from "./access";
 import { ensureDirectMessage } from "./direct-message";
@@ -102,7 +102,7 @@ async function loadOwnRoutine(
 }
 
 export const agentRoutineRouter = {
-	list: protectedProcedure
+	list: personProcedure
 		.input(z.object({ agentId: z.string().uuid() }))
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
@@ -199,7 +199,7 @@ export const agentRoutineRouter = {
 			}));
 		}),
 
-	update: protectedProcedure
+	update: personProcedure
 		.input(
 			routineIdSchema.extend({
 				title: routineFieldsSchema.shape.title.optional(),
@@ -247,7 +247,7 @@ export const agentRoutineRouter = {
 			return { id: routine.id };
 		}),
 
-	delete: protectedProcedure
+	delete: personProcedure
 		.input(routineIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const routine = await loadOwnRoutine(
@@ -259,7 +259,7 @@ export const agentRoutineRouter = {
 			return { id: routine.id };
 		}),
 
-	runNow: protectedProcedure
+	runNow: personProcedure
 		.input(routineIdSchema)
 		.mutation(async ({ ctx, input }) => {
 			const routine = await loadOwnRoutine(

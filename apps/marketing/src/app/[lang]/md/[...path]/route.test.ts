@@ -68,7 +68,7 @@ test("pricing Markdown compares the cloud rows from the catalog", async () => {
 	);
 	const body = await response.text();
 	expect(response.status).toBe(200);
-	expect(body).toContain("### Cloud workspaces (Beta)\n");
+	expect(body).toContain("### Cloud workspaces\n");
 	expect(body).toContain("| | Free | Pro | Team | Ultra | Enterprise |");
 	expect(body).toContain(
 		"| Cloud GB-hours per seat each month | No | No | 1,200 | 4,000 | Custom |\n| Cloud environments | No | No | 5 | 10 | Custom |\n| GB-hours past the pool | No | No | $0.06 per GB-hour | $0.06 per GB-hour | Custom |\n| Extra GB-hours, bought as needed | No | No | $0.06 per GB-hour | $0.06 per GB-hour | Custom |",

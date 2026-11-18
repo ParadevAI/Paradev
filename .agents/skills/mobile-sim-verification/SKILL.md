@@ -46,7 +46,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
 ```
 
 - **API:** `cd apps/api && bun run dev`. A 500 with `password authentication failed` means this
-  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.superset/lib/setup/steps.sh`
+  worktree's Neon branch was deleted by the daily cleanup. Recreate it as `.paradev/lib/setup/steps.sh`
   does and rewrite the three lines under `# Workspace Database` in `.env`.
 - **Relay:** run it in a loop. `wrangler dev` exits with an empty `✘ [ERROR]` when a client aborts a
   request, which every app relaunch does. Durable Object state survives the restart.
@@ -70,7 +70,7 @@ superset terminals create --local --workspace "$SUPERSET_WORKSPACE_ID" --command
   `ios/` is gitignored.
 - Silence the first-run developer menu:
   `xcrun simctl spawn booted defaults write sh.superset.mobile EXDevMenuIsOnboardingFinished -bool YES`.
-- Sign in: `maestro test apps/mobile/.maestro/flows/sign-in.yml`
+- Sign in: tap the dev sign-in button with Maestro (`tapOn: { id: dev-sign-in-button }`, from `DevSignInOptions.tsx`), as `mobile-demo-record` does.
   (`JAVA_HOME=/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home`).
 - The dev account has no plan, so Home shows the paywall. Give its org a temporary one on this
   worktree's Neon branch, and delete the row afterwards. Confirm `DATABASE_URL_UNPOOLED` is the
@@ -115,7 +115,7 @@ commands, and the simulator reaches this box only through local egress.
 - **Input.** `agent-device snapshot -i`, `press`, `fill`, `screenshot`. `press` and `fill` take
   `--settle` and print what changed. The dev-menu sheet covers the first screen: press `Continue`,
   then `Close`.
-- **Request counts.** `/tmp/superset-eas-egress.log` names each local port the simulator reached.
+- **Request counts.** `.tmp/eas-dev/egress.log` in the checkout names each local port the simulator reached.
 - **Cloud screens.** The workspace's Neon branch is a copy of production, and cloud access is a
   PostHog flag on the email, so the dev account sees no cloud workspaces. Prefer a test account
   that has the flag. Use a real account only with its owner's approval: save its `auth.accounts`

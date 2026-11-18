@@ -5,8 +5,8 @@
  *
  *   1. the host-service runtime asset (this checkout's host-service and
  *      pty-daemon, natives installed for the box), this checkout's CLI, the
- *      latest claude, codex and Chrome (a fetch that fails keeps the
- *      committed pin) and the bundle, published
+ *      latest claude, codex, Chrome, opencode and pi (a fetch or digest
+ *      check that fails keeps the committed pin) and the bundle, published
  *   2. the image in Vercel Container Registry under a candidate tag, unless
  *      --skip-image; `latest`, which every image environment resolves to,
  *      stays on the previous release
@@ -43,9 +43,14 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_ROOT_CHECKOUT,
 	type SandboxIdentity,
+	sandboxAgentToolsDrive,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/contract";
+import {
+	DEFAULT_SANDBOX_REGION,
+	isSandboxRegionId,
+	type SandboxRegionId,
+} from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 // The provisioning code imports the API env schema; an operator running this
@@ -55,7 +60,7 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
-const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome"];
+const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome", "opencode", "pi"];
 /** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
 const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
 const INTERNAL_NAME =
@@ -67,7 +72,7 @@ const REPO_URL = "https://github.com/paradevai/paradev.git";
 const REPO_PATH = SANDBOX_ROOT_CHECKOUT;
 const REPO_DIR = sandboxCheckoutDir(SANDBOX_PATHS.workspace, REPO_PATH);
 const REPO_FULL_NAME = "paradevai/paradev";
-/** The monorepo branch the golden is built from; its `.superset/config.json` supplies `start`. */
+/** The monorepo branch the golden is built from; its `.paradev/config.json` supplies `start`. */
 const BRANCH = process.env.SUPERSET_INTERNAL_BRANCH ?? "main";
 const REGION = DEFAULT_SANDBOX_REGION;
 
@@ -146,6 +151,35 @@ log(
 );
 await publishBundle(bundle, { dry: false });
 log(`bundle: ${bundle.sha256} published`);
+
+// 1b. the bundle's agent-tools drive in every region with an environment,
+// before any row points at the bundle so no box mounts one mid-write. Boxes
+// fail open to the image's agents, so a failed publish only warns.
+const agentTools = await import("../agent-tools");
+const driveHost = agentTools.vercelDriveHost(credentials);
+async function environmentRegions(): Promise<SandboxRegionId[]> {
+	const { db } = await import("@superset/db/client");
+	const rows = await db.query.environments.findMany({
+		columns: { region: true },
+		where: (row, { isNull: unset }) => unset(row.archivedAt),
+	});
+	return [
+		...new Set(
+			[REGION, ...rows.map((row) => row.region)].filter(isSandboxRegionId),
+		),
+	];
+}
+for (const line of agentTools.describeAgentToolsPublish(
+	await agentTools.publishAgentToolsDrives({
+		host: driveHost,
+		regions: await environmentRegions(),
+		bundleSha: bundle.sha256,
+		assets: bundle.assets,
+	}),
+)) {
+	if (line.startsWith("::warning::")) console.log(line);
+	else log(line);
+}
 
 // 2. image
 const candidateTag = `release-${bundle.sha256.slice(0, 12)}`;
@@ -317,7 +351,7 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	],
 	[
 		"the repository's cloud setup and dev stack",
-		"test -x /workspace/.superset/setup.cloud.sh && test -x /workspace/.superset/dev-stack.cloud.sh && echo ok",
+		"test -x /workspace/.paradev/setup.cloud.sh && test -x /workspace/.paradev/dev-stack.cloud.sh && echo ok",
 		/ok/,
 	],
 	["neonctl", "neonctl --version", /^\d+\.\d+/m],
@@ -486,7 +520,7 @@ const { releaseRepositoryWhere } = await import(
 const { recordReleasedBundle } = await import("./record-bundle");
 
 // The golden baked the monorepo at its path; a fork asks for the same, and
-// the box acts on the monorepo's own .superset/config.json.
+// the box acts on the monorepo's own .paradev/config.json.
 const monorepo = await db.query.githubRepositories.findFirst({
 	where: releaseRepositoryWhere(ORGANIZATION_ID as string, REPO_FULL_NAME),
 });
@@ -563,6 +597,26 @@ if (!previous)
 	log(
 		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
 	);
+
+try {
+	const live = await db.query.environments.findMany({
+		columns: { region: true, bundleSha: true },
+		where: (row, { isNull: unset }) => unset(row.archivedAt),
+	});
+	const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
+		host: driveHost,
+		referenced: new Set(
+			live.map((row) => sandboxAgentToolsDrive(row.region, row.bundleSha)),
+		),
+	});
+	log(
+		`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
+	);
+} catch (error) {
+	console.log(
+		`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
+	);
+}
 
 if (
 	previous &&

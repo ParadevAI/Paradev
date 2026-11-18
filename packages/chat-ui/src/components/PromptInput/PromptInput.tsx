@@ -42,6 +42,7 @@ export function PromptInput({
 			message: "Do anything",
 		}),
 	),
+	layout = "stacked",
 	mentionProviders,
 	commands,
 	dictation,
@@ -80,6 +81,7 @@ export function PromptInput({
 					<ComposerBody
 						ref={ref}
 						placeholder={placeholder}
+						layout={layout}
 						mentionProviders={mentionProviders}
 						commands={commands}
 						dictation={dictation}

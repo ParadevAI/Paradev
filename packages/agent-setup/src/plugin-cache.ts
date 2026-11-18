@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { resolveSupersetHomeDir } from "./paths";
+import { resolveAppHomeDir } from "./paths";
 
 const SAFE_SEGMENT = /^[a-zA-Z0-9][a-zA-Z0-9._+-]*$/;
 
@@ -23,7 +23,7 @@ export function assertSafePluginSegment(value: string, label: string): string {
 }
 
 export function pluginCacheDir(): string {
-	return path.join(resolveSupersetHomeDir(), "plugins", "cache");
+	return path.join(resolveAppHomeDir(), "plugins", "cache");
 }
 
 /**

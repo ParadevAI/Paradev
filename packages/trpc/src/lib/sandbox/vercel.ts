@@ -10,20 +10,24 @@
  * ticket-checking gate in front of every port (`access.ts`).
  */
 
+import * as Sentry from "@sentry/core";
 import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import {
 	APIError,
+	Drive,
 	type NetworkPolicy,
 	Sandbox,
+	type SandboxMounts,
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
+import { bootStampsFrom, type HostAnswer } from "./boot-trace";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
@@ -81,6 +85,15 @@ function isUnavailable(error: unknown): boolean {
 	);
 }
 
+/** Vercel starts a new session on every resume, so the id tells a stale record from a fresh one. */
+function sessionIdOf(sandbox: Sandbox): string | null {
+	try {
+		return sandbox.currentSession().sessionId;
+	} catch {
+		return null;
+	}
+}
+
 async function getSandbox(name: string): Promise<Sandbox | null> {
 	try {
 		return await Sandbox.get({ ...credentials(), name, resume: false });
@@ -108,6 +121,8 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
+	/** The bundle's agent-tools drive to mount read-only; absent keeps the image's agents. */
+	agentToolsDrive?: string | null;
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -124,6 +139,41 @@ function sandboxTags(
 		workspace: identity.SUPERSET_SANDBOX_WORKSPACE_ID,
 		...(user ? { user } : {}),
 	};
+}
+
+const publishedAgentToolsDrives = new Set<string>();
+
+/**
+ * A mount of a drive that does not exist fails the create, and a drive a
+ * writer still holds read-write mounts corrupt. Only a drive that exists and
+ * is detached is mounted; that answer is final for a drive, so it is cached.
+ */
+export async function agentToolsMounts(
+	driveName: string | null | undefined,
+	getDrive: (name: string) => Promise<Pick<Drive, "currentSandboxName">> = (
+		name,
+	) => Drive.get({ ...credentials(), name }),
+): Promise<SandboxMounts | undefined> {
+	if (!driveName) return undefined;
+	if (!publishedAgentToolsDrives.has(driveName)) {
+		try {
+			const drive = await getDrive(driveName);
+			if (drive.currentSandboxName) {
+				console.warn(
+					`[sandbox] agent-tools drive ${driveName} is attached to ${drive.currentSandboxName}; not mounting`,
+				);
+				return undefined;
+			}
+		} catch (error) {
+			console.warn(
+				`[sandbox] agent-tools drive ${driveName} unavailable; not mounting`,
+				error,
+			);
+			return undefined;
+		}
+		publishedAgentToolsDrives.add(driveName);
+	}
+	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
 }
 
 function publishedPorts(extra: readonly number[] = []): number[] {
@@ -179,11 +229,6 @@ async function runBoot(sandbox: Sandbox, hostSecret: string): Promise<void> {
 }
 
 /**
- * When the provider call that makes the sandbox started and returned, and
- * when boot was fired into it. Job-side clock; the boot runner's own phases
- * are stamped inside the sandbox and read off health.check.
- */
-/**
  * Creates the sandbox, writes its identity and starts boot. Returns once the
  * sandbox's address exists, not once anything listens on it; `settleSandbox`
  * is how a caller waits for that. Idempotent on the name: a re-delivered
@@ -199,6 +244,8 @@ export async function provisionSandbox(args: {
 	providerSandboxId: string;
 	sandboxUrl: string;
 	hostTarget: string;
+	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	const kind = args.kind ?? "workspace";
 	const config = {
@@ -214,29 +261,50 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
+	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
 	const sandbox =
 		(await getSandbox(args.name)) ??
-		(args.environment.sourceKind === "fork"
-			? // A fork copies the golden's region; a snapshot only exists where
-				// it was taken.
-				await Sandbox.fork({
-					...config,
-					sourceSandbox: args.environment.sourceRef,
-					resources: { vcpus: args.claim.vcpus },
-				})
-			: await Sandbox.create({
-					...config,
-					image: args.environment.sourceRef,
-					region: args.environment.region as SandboxRegion,
-					resources: { vcpus: args.claim.vcpus },
-				}));
-	await writeIdentity(sandbox, args.claim.identity);
-	await writeSignInFiles(sandbox, args.claim.files);
-	await runBoot(sandbox, args.claim.hostSecret);
+		(await Sentry.startSpan(
+			{
+				name:
+					args.environment.sourceKind === "fork" ? "fork" : "create from image",
+				op: "sandbox.provider",
+				attributes: {
+					"sandbox.name": args.name,
+					"sandbox.source": args.environment.sourceRef,
+					"sandbox.region": args.environment.region,
+					"sandbox.vcpus": args.claim.vcpus,
+				},
+			},
+			() =>
+				args.environment.sourceKind === "fork"
+					? // A fork copies the golden's region; a snapshot only exists where
+						// it was taken.
+						Sandbox.fork({
+							...config,
+							...(mounts ? { mounts } : {}),
+							sourceSandbox: args.environment.sourceRef,
+							resources: { vcpus: args.claim.vcpus },
+						})
+					: Sandbox.create({
+							...config,
+							...(mounts ? { mounts } : {}),
+							image: args.environment.sourceRef,
+							region: args.environment.region as SandboxRegion,
+							resources: { vcpus: args.claim.vcpus },
+						}),
+		));
+	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
+		await writeIdentity(sandbox, args.claim.identity);
+		await writeSignInFiles(sandbox, args.claim.files);
+		await runBoot(sandbox, args.claim.hostSecret);
+	});
 	return {
 		providerSandboxId: args.name,
 		sandboxUrl: sandbox.domain(HOST_SERVICE_PORT),
 		hostTarget: sandbox.domain(HOST_SERVICE_PORT),
+		expiresAt: sandbox.expiresAt ?? null,
+		sessionId: sessionIdOf(sandbox),
 	};
 }
 
@@ -253,15 +321,19 @@ export class SandboxNotReadyError extends Error {
 async function waitForHostService(
 	target: string,
 	providerSandboxId: string,
-): Promise<void> {
+): Promise<HostAnswer> {
 	const deadline = Date.now() + HOST_READY_TIMEOUT_MS;
 	while (Date.now() < deadline) {
-		const ok = await fetch(`${target}/trpc/health.check`, {
+		const body: unknown = await fetch(`${target}/trpc/health.check`, {
 			signal: AbortSignal.timeout(HOST_READY_POLL_MS * 6),
 		})
-			.then((response) => response.ok)
-			.catch(() => false);
-		if (ok) return;
+			.then((response) =>
+				response.ok ? response.json().catch(() => ({})) : null,
+			)
+			.catch(() => null);
+		if (body !== null) {
+			return { stamps: bootStampsFrom(body), answeredAt: Date.now() };
+		}
 		await new Promise((resolve) => setTimeout(resolve, HOST_READY_POLL_MS));
 	}
 	throw new SandboxNotReadyError(providerSandboxId);
@@ -276,13 +348,17 @@ export async function settleSandbox(args: {
 	providerSandboxId: string;
 	hostTarget: string;
 	claim: SandboxClaim;
-}): Promise<void> {
-	await waitForHostService(args.hostTarget, args.providerSandboxId);
+}): Promise<HostAnswer> {
+	const answer = await waitForHostService(
+		args.hostTarget,
+		args.providerSandboxId,
+	);
 	await pushManagedEnv(
 		args.hostTarget,
 		args.claim.hostSecret,
 		args.claim.managedEnv,
 	);
+	return answer;
 }
 
 /**
@@ -335,6 +411,10 @@ export async function applySandboxPolicy(args: {
 export async function describeSandbox(providerSandboxId: string): Promise<{
 	hostTarget: string;
 	running: boolean;
+	vcpus: number | undefined;
+	/** When the running session ends unless extended; null when stopped. */
+	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -342,9 +422,14 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 			name: providerSandboxId,
 			resume: false,
 		});
+		const running = sandbox.status === "running";
 		return {
 			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
-			running: sandbox.status === "running",
+			running,
+			// `sandbox.vcpus` is the configured size, which a running session does not pick up.
+			vcpus: running ? sandbox.currentSession().vcpus : sandbox.vcpus,
+			expiresAt: running ? (sandbox.expiresAt ?? null) : null,
+			sessionId: sessionIdOf(sandbox),
 		};
 	} catch (error) {
 		if (isUnavailable(error))
@@ -361,14 +446,17 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
  */
 export async function topUpSandboxSession(
 	providerSandboxId: string,
-): Promise<void> {
+): Promise<{ expiresAt: Date; sessionId: string | null } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
-	if (sandbox?.status !== "running" || !sandbox.expiresAt) return;
+	if (sandbox?.status !== "running" || !sandbox.expiresAt) return null;
 	const extension =
 		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
 	if (extension > MIN_TOP_UP_MS) {
 		await sandbox.currentSession().extendTimeout(extension);
 	}
+	return sandbox.expiresAt
+		? { expiresAt: sandbox.expiresAt, sessionId: sessionIdOf(sandbox) }
+		: null;
 }
 
 /** Whether host-service is already serving, so a wake can skip the boot. */
@@ -401,6 +489,11 @@ export async function wakeSandbox(args: {
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
 	booted: boolean;
+	/** The boot command ran: the session was stopped, or host-service in it had stopped answering. */
+	rebooted: boolean;
+	answer: HostAnswer;
+	expiresAt: Date | null;
+	sessionId: string | null;
 }> {
 	try {
 		const sandbox = await Sandbox.get({
@@ -412,17 +505,34 @@ export async function wakeSandbox(args: {
 		const wasRunning = sandbox.status === "running";
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
-			await sandbox
-				.update({ resources: { vcpus: args.claim.vcpus } })
-				.then(() => {
-					vcpus = args.claim.vcpus;
-				})
-				.catch((error) =>
-					console.warn(
-						`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
-						error,
+			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
+				sandbox
+					.update({ resources: { vcpus: args.claim.vcpus } })
+					.then(() => {
+						vcpus = args.claim.vcpus;
+					})
+					.catch((error) =>
+						console.warn(
+							`[sandbox] resize to ${args.claim.vcpus} vCPUs failed for ${args.providerSandboxId}`,
+							error,
+						),
 					),
-				);
+			);
+		}
+		if (!wasRunning) {
+			const { [SANDBOX_PATHS.agents]: previous, ...others } =
+				sandbox.mounts ?? {};
+			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+			if (agents || previous) {
+				await sandbox
+					.update({ mounts: { ...others, ...agents } })
+					.catch((error) =>
+						console.warn(
+							`[sandbox] mount update failed for ${args.providerSandboxId}`,
+							error,
+						),
+					);
+			}
 		}
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
@@ -438,25 +548,44 @@ export async function wakeSandbox(args: {
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
 		const serving = wasRunning && (await hostServiceAnswers(hostTarget));
-		await Promise.all([
-			sandbox
-				.update({ networkPolicy: args.claim.networkPolicy })
-				.catch((error) =>
-					console.warn(
-						`[sandbox] policy update failed for ${args.providerSandboxId}`,
-						error,
-					),
-				),
-			serving ? null : writeIdentity(sandbox, args.claim.identity),
-			writeSignInFiles(sandbox, args.claim.files),
-		]);
-		if (!serving) await runBoot(sandbox, args.claim.hostSecret);
-		await settleSandbox({
-			providerSandboxId: args.providerSandboxId,
+		await Sentry.startSpan(
+			{ name: "apply claim", op: "sandbox.provider" },
+			() =>
+				Promise.all([
+					sandbox
+						.update({ networkPolicy: args.claim.networkPolicy })
+						.catch((error) =>
+							console.warn(
+								`[sandbox] policy update failed for ${args.providerSandboxId}`,
+								error,
+							),
+						),
+					serving ? null : writeIdentity(sandbox, args.claim.identity),
+					writeSignInFiles(sandbox, args.claim.files),
+				]),
+		);
+		if (!serving) {
+			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
+				runBoot(sandbox, args.claim.hostSecret),
+			);
+		}
+		const answer = await Sentry.startSpan(
+			{ name: "settle", op: "sandbox" },
+			() =>
+				settleSandbox({
+					providerSandboxId: args.providerSandboxId,
+					hostTarget,
+					claim: args.claim,
+				}),
+		);
+		return {
 			hostTarget,
-			claim: args.claim,
-		});
-		return { hostTarget, booted: !wasRunning };
+			booted: !wasRunning,
+			rebooted: !serving,
+			answer,
+			expiresAt: sandbox.expiresAt ?? null,
+			sessionId: sessionIdOf(sandbox),
+		};
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);
@@ -478,6 +607,8 @@ const INHERITED_IDENTITY = [
 	SANDBOX_PATHS.checkouts,
 	`${SANDBOX_PATHS.state}/agent-launched`,
 	`${SANDBOX_PATHS.state}/db-branch`,
+	`${SANDBOX_PATHS.home}/.paradev/host`,
+	// Boxes from before the home directory moved.
 	`${SANDBOX_PATHS.home}/.superset/host`,
 	`${SANDBOX_PATHS.home}/.gitconfig`,
 	`${SANDBOX_PATHS.workspace}/.env`,
@@ -498,11 +629,16 @@ export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
  * Stops a sandbox and returns once the snapshot forks would start from is
  * current. What a release does to a golden it has finished building.
  */
-export async function stopAndSnapshot(name: string): Promise<void> {
+/** Returns the session it stopped. */
+export async function stopAndSnapshot(
+	name: string,
+): Promise<{ sessionId: string | null }> {
 	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
 	const before = sandbox.currentSnapshotId;
+	const sessionId = sessionIdOf(sandbox);
 	await sandbox.stop();
 	await waitForStopSnapshot(name, before);
+	return { sessionId };
 }
 
 /**
@@ -584,10 +720,15 @@ export async function sandboxExists(
 	return (await getSandbox(providerSandboxId)) !== null;
 }
 
-export async function stopSandbox(providerSandboxId: string): Promise<void> {
+/** Returns the session that is now stopped: the one it stopped, or the one it found stopped. */
+export async function stopSandbox(
+	providerSandboxId: string,
+): Promise<{ sessionId: string | null }> {
 	const sandbox = await getSandbox(providerSandboxId);
-	if (!sandbox || sandbox.status !== "running") return;
-	await sandbox.stop();
+	if (!sandbox) return { sessionId: null };
+	const sessionId = sessionIdOf(sandbox);
+	if (sandbox.status === "running") await sandbox.stop();
+	return { sessionId };
 }
 
 export interface BoxSession {
@@ -670,10 +811,17 @@ const UNSETTLED_SANDBOX_STATUSES = new Set([
 	"snapshotting",
 ]);
 
+export interface ActiveWorkspaceSandbox {
+	name: string;
+	/** When the running session ends unless extended; null when it is not running. */
+	expiresAt: Date | null;
+	sessionId: string | null;
+}
+
 export async function listActiveWorkspaceSandboxes(
 	since: number,
-): Promise<string[]> {
-	const names: string[] = [];
+): Promise<ActiveWorkspaceSandbox[]> {
+	const found: ActiveWorkspaceSandbox[] = [];
 	const oldestRunning = Date.now() - SESSION_MAX_MS;
 	// Vercel's tag filter uses creation-order pagination instead of statusUpdatedAt.
 	for await (const sandbox of await Sandbox.list({
@@ -685,10 +833,17 @@ export async function listActiveWorkspaceSandboxes(
 		if (updatedAt < oldestRunning) break;
 		if (sandbox.tags?.kind !== "workspace") continue;
 		if (UNSETTLED_SANDBOX_STATUSES.has(sandbox.status) || updatedAt >= since) {
-			names.push(sandbox.name);
+			found.push({
+				name: sandbox.name,
+				expiresAt:
+					sandbox.status === "running" && sandbox.expiresAt
+						? new Date(sandbox.expiresAt)
+						: null,
+				sessionId: sandbox.currentSessionId ?? null,
+			});
 		}
 	}
-	return names;
+	return found;
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */

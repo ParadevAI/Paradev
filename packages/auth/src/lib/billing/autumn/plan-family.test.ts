@@ -18,10 +18,17 @@ function family(key: string, name: string, gbMinutesPerSeat: number | null) {
 }
 
 const catalog = [
-	family("pro", "Pro", null),
+	family("pro", "Pro", 19200),
 	family("team", "Team", 9600),
 	family("ultra", "Ultra", 48000),
 ];
+
+describe("emailPlanFor", () => {
+	test("Pro emails leave out cloud hours that Pro still has", () => {
+		expect(emailPlanFor(catalog, "pro_monthly")?.cloudHoursPerSeat).toBeNull();
+		expect(emailPlanFor(catalog, "team_monthly")?.cloudHoursPerSeat).toBe(20);
+	});
+});
 
 describe("upgradedFrom", () => {
 	const team = emailPlanFor(catalog, "team_monthly");

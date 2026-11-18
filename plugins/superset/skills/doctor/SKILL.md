@@ -32,6 +32,9 @@ Diagnose first, change one thing at a time, verify after each change.
 | `hosts add` stops on an empty or invalid `/etc/machine-id` (cloned VM or container image) | on that machine, `sudo rm -f /etc/machine-id && sudo systemd-machine-id-setup`, then re-run `hosts add`. The user runs this, since it needs sudo on their box |
 | `superset pages publish` in a Paradev terminal fails with "Not a member of organization" | `superset update`; newer CLIs use the desktop app's account inside its terminals |
 | CLI and desktop app version mismatch, or stale CLI | `superset update` |
+| `workspaces`, `agents`, or `terminals` inside a local workspace fails with "No cloud workspace … in this organization" | the account has cloud workspaces, so these default to the cloud; add `--local` (or `--host <id>`) |
+| An agent in a cloud workspace keeps an old sign-in after reconnecting Claude or Codex | `superset workspaces restart <id>`; it ends every terminal and agent there, so ask first |
+| A cloud workspace was archived by mistake | `superset workspaces unarchive <id>`; within 7 days it keeps its disk, after that it starts fresh from its environment |
 | App-side misbehavior (macOS) | read the newest entries in `~/Library/Logs/Superset/main.log` for errors |
 
 Propose the matching fix and get the user's go-ahead before running anything that changes state. Never delete data as a "fix".

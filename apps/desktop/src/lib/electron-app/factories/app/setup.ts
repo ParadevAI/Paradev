@@ -106,9 +106,14 @@ if (env.NODE_ENV === "development" && process.env.RENDERER_REMOTE_DEBUG_PORT) {
 		"remote-debugging-port",
 		process.env.RENDERER_REMOTE_DEBUG_PORT,
 	);
+} else {
+	// A program that relaunches the app with these flags could drive every
+	// browser pane, signed-in password managers included.
+	app.commandLine.removeSwitch("remote-debugging-port");
+	app.commandLine.removeSwitch("remote-debugging-pipe");
 }
 
-// Each xterm pane holds one WebGL context. v2 parking keeps panes alive
+// Each xterm pane holds one WebGL context. parking keeps panes alive
 // across workspace switches, so cumulative contexts can reach the low
 // hundreds — past Chromium's default cap of 16, Blink force-evicts the
 // oldest context and the terminal blanks out. 256 covers the parking load

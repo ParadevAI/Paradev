@@ -16,7 +16,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/stargazers)
 [![GitHub release](https://img.shields.io/github/v/release/paradevai/paradev?style=flat&logo=github)](https://github.com/paradevai/paradev/releases)
-[![License](https://img.shields.io/badge/license-Elastic%20License%202.0-blue?style=flat)](../LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](../LICENSE.md)
 [![Twitter](https://img.shields.io/badge/@paradevai-555?logo=x)](https://x.com/paradevai)
 [![Discord](https://img.shields.io/badge/Discord-555?logo=discord)](https://discord.gg/cZeD9WYcV7)
 
@@ -274,7 +274,7 @@ git clone https://github.com/paradevai/paradev.git
 Draai daarna de development-setup vanuit de terminal van die werkruimte:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -292,13 +292,13 @@ Zie [**DEVELOPMENT.md**](../DEVELOPMENT.md) voor de volledige gids: wat het setu
 
 ## Configuratie
 
-Configureer setup-, teardown- en run-scripts voor werkruimtes in `.superset/config.json`. Zie de [volledige documentatie](https://docs.paradev.com/setup-teardown-scripts).
+Configureer setup-, teardown- en run-scripts voor werkruimtes in `.paradev/config.json`. Zie de [volledige documentatie](https://docs.paradev.com/setup-teardown-scripts).
 
 ```json
 {
-  "setup": ["./.superset/setup.sh"],
-  "teardown": ["./.superset/teardown.sh"],
-  "run": ["./.superset/run.sh"]
+  "setup": ["./.paradev/setup.sh"],
+  "teardown": ["./.paradev/teardown.sh"],
+  "run": ["./.paradev/run.sh"]
 }
 ```
 
@@ -321,7 +321,6 @@ Sneltoetsen zijn aanpasbaar via **Instellingen → Sneltoetsen** (⌘/); zie de 
 
 ## Standaard privé
 
-- **Broncode beschikbaar**: de volledige broncode staat op GitHub onder de Elastic License 2.0 (ELv2).
 - **Expliciete verbindingen**: jij kiest welke agents, providers en integraties je verbindt.
 
 ## Bijdragen
@@ -351,4 +350,4 @@ Word lid van de Paradev-community om hulp te krijgen, feedback te delen en ander
 
 **De desktop-app is voor altijd gratis.** Agents parallel draaien op je eigen machine zal nooit betaling vereisen. Alles waarvoor we geld vragen, wordt een optionele service daarbovenop.
 
-De hele app staat in deze repo onder de [Elastic License 2.0](../LICENSE.md): gebruik hem, fork hem, pas hem aan, self-host hem voor je team. Het enige dat niet mag, is Paradev zelf herverpakken als een service die je aan anderen verkoopt.
+De hele app staat in deze repo onder de [MIT-licentie](../LICENSE.md): gebruik hem, fork hem, pas hem aan, self-host hem en verspreid hem verder.

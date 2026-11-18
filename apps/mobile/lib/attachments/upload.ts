@@ -1,10 +1,16 @@
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
 import { MAX_ATTACHMENT_BYTES } from "@superset/shared/attachment-limits";
-import { File } from "expo-file-system";
 import type { PromptInputAttachmentItem } from "@/components/ai-elements/prompt-input";
 import { apiClient } from "@/lib/trpc/client";
 import { useComposerDraftsStore } from "@/screens/(authenticated)/stores/composerDraftsStore";
+import {
+	type AttachmentFile,
+	attachmentSize,
+	openAttachmentFile,
+	readAttachmentBase64,
+} from "./attachmentFile";
+import type { ChatAttachmentFile } from "./chatParts";
 import { waitForSettledUploads } from "./settle";
 
 const FALLBACK_MEDIA_TYPE = "application/octet-stream";
@@ -18,11 +24,28 @@ const FALLBACK_MEDIA_TYPE = "application/octet-stream";
 const controllers = new Map<string, AbortController>();
 
 /**
+ * Drafts whose workspace is on a machine someone owns. Their bytes go to that
+ * host at send and never to our storage, so nothing uploads at attach time.
+ */
+const hostDrafts = new Set<string>();
+
+export function setDraftAttachmentHome(
+	draftKey: string,
+	home: "cloud" | "host",
+): void {
+	if (home === "host") hostDrafts.add(draftKey);
+	else hostDrafts.delete(draftKey);
+}
+
+/**
  * The name to store an attachment under when the picker gave us none. The
  * uri's last segment is what the user would recognize; a generated name is
  * the last resort, and the host renames anything unusable anyway.
  */
-function nameOf(attachment: PromptInputAttachmentItem, index: number): string {
+export function nameOf(
+	attachment: PromptInputAttachmentItem,
+	index: number,
+): string {
 	if (attachment.name) return attachment.name;
 	const fromUri = decodeURIComponent(
 		attachment.uri.split("?")[0]?.split("/").pop() ?? "",
@@ -35,7 +58,7 @@ function nameOf(attachment: PromptInputAttachmentItem, index: number): string {
  * It reaches here only when the picker reported no size and the file could
  * not be measured until now.
  */
-function assertSendable(file: File): void {
+function assertSendable(file: AttachmentFile): void {
 	// 0 is what `size` reports for a file it cannot read, not an empty one —
 	// either way there is nothing to upload.
 	if (file.size <= 0) {
@@ -72,7 +95,7 @@ async function upload(
 	store.beginUpload(draftKey, attachment.id);
 
 	try {
-		const file = new File(attachment.uri);
+		const file = await openAttachmentFile(attachment.uri);
 		const name = nameOf(attachment, index);
 		assertSendable(file);
 
@@ -85,7 +108,6 @@ async function upload(
 
 		let reported = -1;
 		const result = await file.upload(target.url, {
-			httpMethod: "PUT",
 			headers: target.headers,
 			signal: controller.signal,
 			onProgress: ({ bytesSent, totalBytes }) => {
@@ -139,6 +161,7 @@ export function startAttachmentUploads(
 	draftKey: string,
 	attachments: PromptInputAttachmentItem[],
 ): void {
+	if (hostDrafts.has(draftKey)) return;
 	for (const [index, attachment] of attachments.entries()) {
 		if (controllers.has(attachment.id)) continue;
 		void upload(draftKey, attachment, index);
@@ -168,14 +191,17 @@ export async function awaitAttachmentUploads(
 		useComposerDraftsStore.getState().draftsByKey[draftKey]?.uploads ?? {};
 	// A failure earlier in the draft's life is worth one more try now that the
 	// user has actually asked to send: the usual cause is a connection that
-	// has since come back.
+	// has since come back. One that never started was attached while the
+	// workspace's home was still unknown.
 	const stale = uploadsNow();
 	startAttachmentUploads(
 		draftKey,
 		// Only entries the draft still holds: `beginUpload` refuses to write
 		// state for an attachment that is gone, so starting one would upload
 		// bytes nothing could ever wait on.
-		attachments.filter((item) => stale[item.id]?.error !== undefined),
+		attachments.filter(
+			(item) => !stale[item.id] || stale[item.id]?.error !== undefined,
+		),
 	);
 
 	const uploads = await waitForSettledUploads(
@@ -193,4 +219,16 @@ export async function awaitAttachmentUploads(
 		}
 		return entry.fileId;
 	});
+}
+
+/** The composer's attachments as files a host can be sent, read only when sent. */
+export function toAttachmentFiles(
+	attachments: PromptInputAttachmentItem[],
+): ChatAttachmentFile[] {
+	return attachments.map((attachment, index) => ({
+		name: nameOf(attachment, index),
+		mimeType: attachment.mediaType ?? FALLBACK_MEDIA_TYPE,
+		size: attachmentSize(attachment.uri),
+		readBase64: () => readAttachmentBase64(attachment.uri),
+	}));
 }

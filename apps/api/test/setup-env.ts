@@ -9,6 +9,9 @@ process.env.AUTUMN_SECRET_KEY ??= "am_sk_test_placeholder";
 process.env.AUTUMN_WEBHOOK_SECRET ??= "whsec_cGxhY2Vob2xkZXI=";
 process.env.RESEND_API_KEY ??= "re_placeholder";
 process.env.NEXT_PUBLIC_POSTHOG_KEY ??= "phc_placeholder";
+process.env.GH_APP_ID ??= "1";
+process.env.GH_APP_PRIVATE_KEY ??= "placeholder";
+process.env.GH_WEBHOOK_SECRET ??= "test-secret";
 // @superset/email validates this at import and has no opt-out.
 process.env.NEXT_PUBLIC_MARKETING_URL ??= "https://marketing.test";
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/test";
@@ -24,6 +27,6 @@ Object.assign(process.env, {
 	QSTASH_TOKEN: "qstash-token",
 	SERVER_ANTHROPIC_API_KEY: "test",
 	SLACK_SIGNING_SECRET: "test-secret",
-	YC_BOOKFACE_REWARD_ID: "yc-bookface-6mo-pro",
+	YC_BOOKFACE_REWARD_ID: "yc-bookface-3mo-team",
 	YC_DEALS_WEBHOOK_SECRET: "test-secret",
 });

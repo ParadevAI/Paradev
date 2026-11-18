@@ -60,15 +60,20 @@ export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
 /**
- * No sleep/wake states: the provider wakes a sandbox on the first inbound
- * connection, so "asleep" is invisible to callers and could only ever be
- * reported stale. `ready` means addressable, awake or not.
+ * `asleep`: the box session ended, and the box answers nothing until `access`
+ * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
+ * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
+ * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
+ * enum value without rebuilding the type.
  */
 export const cloudWorkspaceStatusValues = [
 	"provisioning",
 	"ready",
 	"failed",
 	"deleted",
+	"awake",
+	"asleep",
+	"archived",
 ] as const;
 export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
 export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
@@ -252,7 +257,7 @@ export const pageVisibilityValues = ["just_me", "org", "everyone"] as const;
 export const pageVisibilityEnum = z.enum(pageVisibilityValues);
 export type PageVisibility = z.infer<typeof pageVisibilityEnum>;
 
-export const pageShareRoleValues = ["view", "comment"] as const;
+export const pageShareRoleValues = ["view", "comment", "edit"] as const;
 export const pageShareRoleEnum = z.enum(pageShareRoleValues);
 export type PageShareRole = z.infer<typeof pageShareRoleEnum>;
 
@@ -329,6 +334,7 @@ export const agentTurnStatusValues = [
 	"completed",
 	"failed",
 	"interrupted",
+	"queued",
 ] as const;
 export const agentTurnStatusEnum = z.enum(agentTurnStatusValues);
 export type AgentTurnStatus = z.infer<typeof agentTurnStatusEnum>;

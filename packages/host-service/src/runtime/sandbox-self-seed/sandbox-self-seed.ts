@@ -15,10 +15,15 @@ import {
 	type SandboxRepository,
 	sandboxCheckoutDir,
 	sandboxRepositoriesSchema,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
+import {
+	createTerminalSessionInternal,
+	isAgentTerminalAlive,
+	isLiveTerminalSession,
+} from "../../terminal/terminal";
 import {
 	chatLaunchTarget,
 	runAgentInWorkspace,
@@ -46,6 +51,7 @@ import {
 } from "./launchMarker";
 import { buildStartHookEnv } from "./utils/buildStartHookEnv";
 import { seedSandboxAgents } from "./utils/seedSandboxAgents";
+import { terminalFallbackMode } from "./utils/terminalFallbackMode";
 
 /**
  * Makes a sandbox describe its own workspace, instead of being described from
@@ -71,7 +77,7 @@ export interface SandboxIdentity {
 	workspaceRoot: string;
 	/**
 	 * The primary repository's checkout: the one the workspace opens on and
-	 * whose `.superset/config.json` the box acts on.
+	 * whose Paradev config the box acts on.
 	 */
 	worktreePath: string;
 	/** Every checkout on the box, the primary first. */
@@ -171,32 +177,145 @@ function readTail(path: string): string {
 	}
 }
 
+export interface StartHookPlan {
+	setup: string | null;
+	run: PhaseCommand | null;
+}
+
 /**
  * Cloud boot: `[setup]`, then the default terminal, as two separate steps.
  * Exported for tests.
  */
-export function startHookCommands(identity: SandboxIdentity): string[] {
+export function startHookPlan(identity: SandboxIdentity): StartHookPlan {
 	const root = identity.worktreePath;
 	const config = loadProjectConfig({
 		repoPath: root,
 		projectId: identity.workspaceId,
 	});
-	if (!config) return [];
-	if (config.kind === "invalid") return [invalidConfigCommand(config)];
+	if (!config) return { setup: null, run: null };
+	if (config.kind === "invalid")
+		return { setup: invalidConfigCommand(config), run: null };
+	const setup = chainPhases([config.resolved.setup], root);
 	const terminal = getDefaultTerminal(config.resolved);
-	const inDirectory = (step: PhaseCommand) => {
-		const dir = step.cwd ? resolve(root, step.cwd) : root;
-		return dir !== root && existsSync(dir)
-			? `(cd ${shellSingleQuote(dir)} && ${step.command})`
-			: step.command;
+	const setupDir = setup?.cwd ? resolve(root, setup.cwd) : root;
+	return {
+		setup:
+			setup && setupDir !== root && existsSync(setupDir)
+				? `(cd ${shellSingleQuote(setupDir)} && ${setup.command})`
+				: (setup?.command ?? null),
+		run: terminal ? chainPhases([terminal], root) : null,
 	};
-	return [
-		chainPhases([config.resolved.setup], root),
-		terminal ? chainPhases([terminal], root) : null,
-	]
-		.filter((step): step is PhaseCommand => step !== null)
-		.map(inDirectory);
 }
+
+const START_HOOK_RUN_TERMINAL = join(
+	SANDBOX_PATHS.run,
+	"start-hook-run-terminal",
+);
+
+export interface StartHookFiles {
+	marker: string;
+	log: string;
+	runTerminal: string;
+}
+
+const START_HOOK_FILES: StartHookFiles = {
+	marker: START_HOOK_MARKER,
+	log: START_HOOK_LOG,
+	runTerminal: START_HOOK_RUN_TERMINAL,
+};
+
+type StartedRun = { terminalId: string; pid: number | null };
+
+export interface RunTerminalStarter {
+	start(run: PhaseCommand): Promise<StartedRun | { error: string }>;
+	isLive(terminalId: string): Promise<boolean>;
+}
+
+function readRunTerminalId(files: StartHookFiles): string | null {
+	try {
+		return readFileSync(files.runTerminal, "utf8").trim() || null;
+	} catch {
+		return null;
+	}
+}
+
+export function getStartHookRunTerminalId(
+	files: StartHookFiles = START_HOOK_FILES,
+): string | null {
+	const terminalId = readRunTerminalId(files);
+	return terminalId && isLiveTerminalSession(terminalId) ? terminalId : null;
+}
+
+function sessionRunTerminalStarter(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
+	identity: SandboxIdentity,
+): RunTerminalStarter {
+	return {
+		isLive: (terminalId) =>
+			isAgentTerminalAlive({
+				terminalId,
+				workspaceId: identity.workspaceId,
+				db: ctx.db,
+				eventBus: ctx.eventBus,
+			}),
+		start: async (run) => {
+			const terminalId = crypto.randomUUID();
+			const result = await createTerminalSessionInternal({
+				terminalId,
+				workspaceId: identity.workspaceId,
+				db: ctx.db,
+				eventBus: ctx.eventBus,
+				initialCommand: run.command,
+				...(run.cwd && { cwd: run.cwd }),
+			});
+			if ("error" in result) return { error: result.error };
+			return { terminalId, pid: result.pty.pid };
+		},
+	};
+}
+
+let runTerminalInFlight: Promise<StartedRun | { error: string }> | null = null;
+
+function startRunTerminal(
+	starter: RunTerminalStarter,
+	files: StartHookFiles,
+	run: PhaseCommand,
+): Promise<StartedRun | { error: string }> {
+	runTerminalInFlight ??= startRunTerminalOnce(starter, files, run).finally(
+		() => {
+			runTerminalInFlight = null;
+		},
+	);
+	return runTerminalInFlight;
+}
+
+async function startRunTerminalOnce(
+	starter: RunTerminalStarter,
+	files: StartHookFiles,
+	run: PhaseCommand,
+): Promise<StartedRun | { error: string }> {
+	const existing = readRunTerminalId(files);
+	if (existing && (await starter.isLive(existing)))
+		return { terminalId: existing, pid: null };
+	const started = await starter.start(run);
+	if ("error" in started) {
+		console.warn(`[sandbox] run terminal not started: ${started.error}`);
+		return started;
+	}
+	writeFileSync(files.runTerminal, `${started.terminalId}\n`);
+	return started;
+}
+
+function isProcessAlive(pid: number): boolean {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+const SETUP_EXIT_POLL_MS = 2_000;
 
 /**
  * Runs the repository's `start` hook: the services a workspace needs on
@@ -207,27 +326,53 @@ export function startHookCommands(identity: SandboxIdentity): string[] {
  * directory the boot runner clears.
  */
 export async function runSandboxStartHook(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
 	identity: SandboxIdentity,
-	options: { force?: boolean } = {},
+	options: {
+		force?: boolean;
+		files?: StartHookFiles;
+		starter?: RunTerminalStarter;
+	} = {},
 ): Promise<StartHookOutcome> {
+	const files = options.files ?? START_HOOK_FILES;
+	const starter = options.starter ?? sessionRunTerminalStarter(ctx, identity);
 	// `force` re-runs setup after an archive hook raced an undo on this boot.
-	if (!options.force && existsSync(START_HOOK_MARKER))
+	if (!options.force && existsSync(files.marker))
 		return { started: false, reason: "already-started" };
-	const commands = startHookCommands(identity);
-	if (commands.length === 0) return { started: false, reason: "no-hook" };
-	const log = openSync(START_HOOK_LOG, "a");
-	const command = commands.join("; ");
-	// Setup stops at its first failure; the terminal still starts after it.
-	const child = spawn(
-		"bash",
-		["-lc", commands.map((one) => `{ ${one}; }`).join("\n")],
-		{
-			cwd: identity.worktreePath,
-			env: buildStartHookEnv(process.env, getManagedEnv()),
-			stdio: ["ignore", log, log],
-			detached: true,
-		},
-	);
+	const plan = startHookPlan(identity);
+	const startRun = async () =>
+		plan.run ? startRunTerminal(starter, files, plan.run) : null;
+
+	if (!plan.setup) {
+		const started = await startRun();
+		if (!started || !plan.run) return { started: false, reason: "no-hook" };
+		if ("error" in started) {
+			return {
+				started: false,
+				reason: "failed",
+				command: plan.run.command,
+				log: started.error,
+			};
+		}
+		writeFileSync(files.marker, `${started.pid ?? ""}\n`);
+		console.log(
+			`[sandbox] start hook running in terminal ${started.terminalId}: ${plan.run.command}`,
+		);
+		return {
+			started: true,
+			pid: started.pid ?? 0,
+			command: plan.run.command,
+		};
+	}
+
+	const command = plan.setup;
+	const log = openSync(files.log, "a");
+	const child = spawn("bash", ["-lc", command], {
+		cwd: identity.worktreePath,
+		env: buildStartHookEnv(process.env, getManagedEnv()),
+		stdio: ["ignore", log, log],
+		detached: true,
+	});
 	child.unref();
 	const pid = child.pid ?? 0;
 	startHookState = { state: "running", command, pid, since: Date.now() };
@@ -237,8 +382,11 @@ export async function runSandboxStartHook(
 			command,
 			exitCode: code,
 			since: Date.now(),
-			log: readTail(START_HOOK_LOG),
+			log: readTail(files.log),
 		};
+		startRun().catch((error) => {
+			console.error("[sandbox] run terminal not started", error);
+		});
 	});
 
 	// A command that daemonizes (tmux new-session -d) also exits at once, so
@@ -257,14 +405,36 @@ export async function runSandboxStartHook(
 			reason: "failed",
 			command,
 			exitCode: failure,
-			log: readTail(START_HOOK_LOG),
+			log: readTail(files.log),
 		};
 	}
 	// Written only now: a hook that failed to start must be runnable again on
 	// this boot, and the marker is what makes the next call a no-op.
-	writeFileSync(START_HOOK_MARKER, `${pid}\n`);
+	writeFileSync(files.marker, `${pid}\n`);
 	console.log(`[sandbox] start hook running (pid ${pid}): ${command}`);
 	return { started: true, pid, command };
+}
+
+export async function resumeSandboxStartHookRun(
+	ctx: Pick<HostServiceContext, "db" | "eventBus">,
+	identity: SandboxIdentity,
+	options: { files?: StartHookFiles; starter?: RunTerminalStarter } = {},
+): Promise<void> {
+	const files = options.files ?? START_HOOK_FILES;
+	const starter = options.starter ?? sessionRunTerminalStarter(ctx, identity);
+	const recorded = readRunTerminalId(files);
+	if (recorded) {
+		await starter.isLive(recorded);
+		return;
+	}
+	if (!existsSync(files.marker)) return;
+	const plan = startHookPlan(identity);
+	if (!plan.run) return;
+	const setupPid = Number.parseInt(readFileSync(files.marker, "utf8"), 10);
+	while (setupPid > 0 && isProcessAlive(setupPid)) {
+		await new Promise((resolve) => setTimeout(resolve, SETUP_EXIT_POLL_MS));
+	}
+	await startRunTerminal(starter, files, plan.run);
 }
 
 /**
@@ -332,6 +502,9 @@ export async function launchSandboxAgentOnce(
 	if (!identity.launch) return;
 	const { agent, prompt, model, effort, mode, attachmentFileIds, surface } =
 		identity.launch;
+	const launchedAs = identity.launch.terminalId
+		? { terminalId: identity.launch.terminalId }
+		: {};
 	// The agent needs the environment the control plane pushes after boot and
 	// the branch the boot runner is checking out beside us; both are seconds.
 	const [pushed, checkedOut] = await Promise.all([
@@ -378,27 +551,36 @@ export async function launchSandboxAgentOnce(
 		const useChat =
 			chatTarget && ctx.runtime.chat?.()?.live.supports(chatTarget.harness);
 		const report = useChat
-			? await createChatSessionInWorkspace(ctx, {
-					workspaceId: identity.workspaceId,
-					agent,
-					prompt,
-					model,
-					mode,
-					...(attachmentIds?.length ? { attachmentIds } : {}),
-				}).then((session) => ({
+			? await createChatSessionInWorkspace(
+					ctx,
+					{
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						effort,
+						mode,
+						...(attachmentIds?.length ? { attachmentIds } : {}),
+					},
+					launchedAs,
+				).then((session) => ({
 					kind: "chat" as const,
 					sessionId: session.sessionId,
 					terminalId: session.terminalId,
 				}))
-			: await runAgentInWorkspace(ctx, {
-					workspaceId: identity.workspaceId,
-					agent,
-					prompt,
-					model,
-					effort,
-					mode,
-					...(attachmentIds?.length ? { attachmentIds } : {}),
-				}).then((run) => ({
+			: await runAgentInWorkspace(
+					ctx,
+					{
+						workspaceId: identity.workspaceId,
+						agent,
+						prompt,
+						model,
+						effort,
+						mode: chatTarget ? terminalFallbackMode(agent, mode) : mode,
+						...(attachmentIds?.length ? { attachmentIds } : {}),
+					},
+					launchedAs,
+				).then((run) => ({
 					kind: "terminal" as const,
 					terminalId: run.sessionId,
 				}));

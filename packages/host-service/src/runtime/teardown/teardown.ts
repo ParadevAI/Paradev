@@ -33,12 +33,11 @@ interface RunTeardownOptions {
 	db: HostDb;
 	workspaceId: string;
 	worktreePath: string;
-	/** Main repo path — source of truth for `.superset/config.json`. */
+	/** Main repo path — source of truth for the repo's config. */
 	repoPath: string;
 	projectId: string;
 	timeoutMs?: number;
-	/** Override $HOME for tests. Defaults to `os.homedir()`. */
-	homeDir?: string;
+	appHomeDir?: string;
 }
 
 /**
@@ -48,8 +47,8 @@ interface RunTeardownOptions {
  * setup runs.
  *
  * The teardown to run is resolved by {@link resolveTeardownCommand}: the
- * configured `teardown` commands from `.superset/config.json` take precedence,
- * falling back to a `.superset/teardown.sh` script (worktree first, then main
+ * configured `teardown` commands from the repo's config take precedence,
+ * falling back to a `teardown.sh` script in the config dir (worktree first, then main
  * repo). Skipped (as a success) when no source resolves to anything runnable.
  *
  * Silent by design — the PTY session is transient and not surfaced as a
@@ -62,13 +61,13 @@ export async function runTeardown({
 	repoPath,
 	projectId,
 	timeoutMs = TEARDOWN_TIMEOUT_MS,
-	homeDir,
+	appHomeDir,
 }: RunTeardownOptions): Promise<TeardownResult> {
 	const resolved = resolveTeardownCommand({
 		repoPath,
 		projectId,
 		worktreePath,
-		homeDir,
+		appHomeDir,
 	});
 	if (resolved === null) return { status: "skipped" };
 
@@ -168,8 +167,7 @@ export function resolveTeardownCommand(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath: string;
-	/** Override $HOME for tests. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
 	if (config?.kind !== "ok") return null;

@@ -24,7 +24,7 @@ change. Paradev creates that workspace as an isolated git worktree. In the new
 workspace terminal, run:
 
 ```bash
-./.superset/setup.local.sh
+./.paradev/setup.local.sh
 bun run dev
 ```
 
@@ -44,12 +44,12 @@ validation, and `setup.local.sh` runs everything against a local Docker stack.
 3. Brings up Postgres + neon-proxy + Redis (behind an HTTP shim, for the relay) via `docker compose` (project-scoped to this worktree)
 4. Runs `bun install` and `bun run db:migrate`
 5. Seeds a `Local Admin` dev account via `bun run db:seed-dev`
-6. Writes a gitignored `.superset/config.local.json` overlay so subsequent worktrees automatically use this setup
+6. Writes a gitignored `.paradev/config.local.json` overlay so subsequent worktrees automatically use this setup
 
 Re-run the script any time to refresh the workspace. To tear the local DB stack down:
 
 ```bash
-./.superset/teardown.local.sh
+./.paradev/teardown.local.sh
 ```
 
 ### Signing in
@@ -96,10 +96,10 @@ See [`AGENTS.md`](./AGENTS.md) for repo structure, monorepo conventions, and dat
 
 - **Dev desktop exits while the installed app is running**: launch development
   from a Paradev workspace instead of the repository's main checkout, run
-  `./.superset/setup.local.sh` in that worktree, then run `bun run dev` again.
+  `./.paradev/setup.local.sh` in that worktree, then run `bun run dev` again.
 - **Port collision**: `setup.local.sh` allocates a fresh port window per worktree. If you ran the script before this change landed, re-run it to migrate.
-- **DB connection errors after pulling main**: re-run `./.superset/setup.local.sh`; it's idempotent and will apply any new migrations.
-- **Stuck Docker stack**: `./.superset/teardown.local.sh` then re-run setup.
+- **DB connection errors after pulling main**: re-run `./.paradev/setup.local.sh`; it's idempotent and will apply any new migrations.
+- **Stuck Docker stack**: `./.paradev/teardown.local.sh` then re-run setup.
 
 ## Contributing
 

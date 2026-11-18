@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, isAbsolute, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import type { NodeWebSocket } from "@hono/node-ws";
-import { resolveSupersetHomeDir } from "@superset/agent-setup/paths";
+import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import { hasRunningForegroundProcess } from "@superset/pty-daemon/process-tree";
 import {
 	buildFishPromptCommandString,
@@ -37,9 +37,10 @@ import type { Hono } from "hono";
 import { getSupervisor } from "../daemon/index.ts";
 import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
-import { projects, terminalSessions, workspaces } from "../db/schema.ts";
+import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
 import {
 	getPathState,
 	inaccessiblePathMessage,
@@ -894,7 +895,9 @@ export type TerminalSessionErrorKind =
 	 * Retrying will fail the same way; this is the only kind that means "we
 	 * have a bug or a broken install".
 	 */
-	| "TERMINAL_START_FAILED";
+	| "TERMINAL_START_FAILED"
+	/** The target is a chat, which has no input to hold unsent or empty text. */
+	| "CHAT_NEEDS_SUBMITTED_TEXT";
 
 export type TerminalSessionError = {
 	inputStaged?: true;
@@ -3069,9 +3072,7 @@ async function createTerminalSessionUnlocked({
 	// (null projectId) have no main repo; the session dir is the only root.
 	let rootPath = "";
 	const project = workspace.projectId
-		? db.query.projects
-				.findFirst({ where: eq(projects.id, workspace.projectId) })
-				.sync()
+		? getProjectIncludingDeleted(db, workspace.projectId)
 		: undefined;
 	if (project?.repoPath) {
 		rootPath = project.repoPath;
@@ -3100,7 +3101,7 @@ async function createTerminalSessionUnlocked({
 	// Fallback matters for hosts not spawned by the desktop (CLI/systemd):
 	// without it the wrapper paths, hook guard env, and shell bootstrap all
 	// silently disable (#6254).
-	const supersetHomeDir = resolveSupersetHomeDir();
+	const supersetHomeDir = resolveAppHomeDir();
 	const shell = resolveLaunchShell(baseEnv);
 	const shellArgs = getShellLaunchArgs({ shell, supersetHomeDir });
 	const ptyEnv = {

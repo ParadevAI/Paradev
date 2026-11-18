@@ -7,6 +7,8 @@ import type { SandboxIdentity } from "./sandbox-self-seed";
 
 let root: string;
 let previousRunMode: string | undefined;
+let previousHome: string | undefined;
+let previousBashEnv: string | undefined;
 
 function identity(): SandboxIdentity {
 	return {
@@ -31,12 +33,21 @@ beforeEach(() => {
 	root = mkdtempSync(join(tmpdir(), "archive-hook-test-"));
 	previousRunMode = process.env.SUPERSET_HOST_RUN_MODE;
 	process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+	// The hook runs `bash -lc`; an empty HOME and no BASH_ENV keep the
+	// developer's shell startup files out of the run.
+	previousHome = process.env.HOME;
+	process.env.HOME = root;
+	previousBashEnv = process.env.BASH_ENV;
+	delete process.env.BASH_ENV;
 });
 
 afterEach(() => {
 	rmSync(root, { recursive: true, force: true });
 	if (previousRunMode === undefined) delete process.env.SUPERSET_HOST_RUN_MODE;
 	else process.env.SUPERSET_HOST_RUN_MODE = previousRunMode;
+	if (previousHome === undefined) delete process.env.HOME;
+	else process.env.HOME = previousHome;
+	if (previousBashEnv !== undefined) process.env.BASH_ENV = previousBashEnv;
 });
 
 describe("runSandboxArchiveHook", () => {

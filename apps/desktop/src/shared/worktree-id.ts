@@ -14,7 +14,7 @@ export function normalizeWorkspaceName(name?: string): string | undefined {
 
 /**
  * Derive a workspace name from worktree path segments relative to:
- * ~/.superset/worktrees/<project>/...
+ * ~/.paradev/worktrees/<project>/...
  *
  * Examples:
  * - ["superset", "my-branch", "apps", "desktop"] -> "my-branch"

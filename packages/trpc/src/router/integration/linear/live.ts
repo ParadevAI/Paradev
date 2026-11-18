@@ -4,7 +4,7 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 import { env } from "../../../env";
 import { userError } from "../../../i18n-error";
-import { protectedProcedure } from "../../../trpc";
+import { personProcedure } from "../../../trpc";
 import { verifyOrgMembership } from "../utils";
 import {
 	archiveIssue,
@@ -15,6 +15,7 @@ import {
 	issueFilterFor,
 	linearStatusFilterValues,
 	listIssues,
+	listProjects,
 	updateIssue,
 } from "./api";
 import { callLinear } from "./refresh";
@@ -51,16 +52,23 @@ export async function withLinear<T>(
 const organizationInput = z.object({ organizationId: z.uuid() });
 
 export const linearLiveRouter = {
-	workspace: protectedProcedure
+	workspace: personProcedure
 		.input(organizationInput)
 		.query(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, getWorkspace),
 		),
 
-	issues: protectedProcedure
+	projects: personProcedure
+		.input(organizationInput)
+		.query(({ ctx, input }) =>
+			withLinear(ctx.session.user.id, input.organizationId, listProjects),
+		),
+
+	issues: personProcedure
 		.input(
 			organizationInput.extend({
 				teamId: z.string().nullish(),
+				projectId: z.string().nullish(),
 				status: z.enum(linearStatusFilterValues).default("active"),
 				assignee: z.string().nullish(),
 				search: z.string().trim().max(200).nullish(),
@@ -77,7 +85,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	issue: protectedProcedure
+	issue: personProcedure
 		.input(organizationInput.extend({ issueId: z.string().min(1) }))
 		.query(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, (client) =>
@@ -85,7 +93,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	updateIssue: protectedProcedure
+	updateIssue: personProcedure
 		.input(
 			organizationInput.extend({
 				issueId: z.string().min(1),
@@ -105,7 +113,7 @@ export const linearLiveRouter = {
 			);
 		}),
 
-	archiveIssue: protectedProcedure
+	archiveIssue: personProcedure
 		.input(organizationInput.extend({ issueId: z.string().min(1) }))
 		.mutation(({ ctx, input }) =>
 			withLinear(ctx.session.user.id, input.organizationId, (client) =>
@@ -113,7 +121,7 @@ export const linearLiveRouter = {
 			),
 		),
 
-	createIssue: protectedProcedure
+	createIssue: personProcedure
 		.input(
 			organizationInput.extend({
 				teamId: z.string().min(1),

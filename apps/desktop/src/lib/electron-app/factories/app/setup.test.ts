@@ -13,3 +13,18 @@ describe("app setup GPU policy", () => {
 		expect(setupSource).not.toMatch(/appendSwitch\(\s*["']disable-gpu/);
 	});
 });
+
+describe("app setup debug port", () => {
+	test("strips both remote debugging switches outside dev", () => {
+		const elseBlock = /\}\s*else\s*\{([^}]*)\}/g;
+		const outsideDev = [...setupSource.matchAll(elseBlock)]
+			.map((match) => match[1])
+			.find((body) => body?.includes("remote-debugging"));
+		expect(outsideDev).toMatch(
+			/removeSwitch\(\s*["']remote-debugging-port["']/,
+		);
+		expect(outsideDev).toMatch(
+			/removeSwitch\(\s*["']remote-debugging-pipe["']/,
+		);
+	});
+});

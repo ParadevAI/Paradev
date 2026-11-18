@@ -33,7 +33,7 @@ interface StartSetupTerminalResult {
  *
  * Runs `[install]` then `[setup]` from {@link loadProjectConfig}, joined with
  * ` && ` so failures short-circuit. Scripts that need the canonical
- * `.superset/` dir read `$SUPERSET_ROOT_PATH`, injected by the v2 terminal
+ * config dir read `$SUPERSET_ROOT_PATH`, injected by the v2 terminal
  * env builder. Configured `cwd` is honored via the terminal session.
  *
  * No-op when no source resolves to anything runnable.
@@ -113,8 +113,7 @@ export function resolveInitialCommand(args: {
 	repoPath: string;
 	projectId: string;
 	worktreePath?: string;
-	/** Override $HOME for tests. */
-	homeDir?: string;
+	appHomeDir?: string;
 }): { initialCommand: string; cwd?: string } | null {
 	const config = loadProjectConfig(args);
 	if (!config) return null;

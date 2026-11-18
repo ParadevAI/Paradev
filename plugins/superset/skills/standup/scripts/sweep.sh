@@ -4,7 +4,7 @@
 # Usage: sweep.sh [--host <id>] [--max-lines <n>]
 set -u
 
-HOST_ARGS=()
+HOST_ARGS=(--local)
 MAX_LINES=60
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -43,7 +43,7 @@ run_json() {
 }
 
 echo "sweeping workspaces and tasks..." >&2
-WORKSPACES=$(run_json workspaces list "${HOST_ARGS[@]:---local}")
+WORKSPACES=$(run_json workspaces list "${HOST_ARGS[@]}")
 TASKS=$(run_json tasks list)
 
 TERMINALS='[]'

@@ -10,12 +10,14 @@ import { Label } from "@superset/ui/label";
 import { RadioGroup, RadioGroupItem } from "@superset/ui/radio-group";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import { SetupAgentNote } from "../SetupAgentNote";
 
 interface ChoosePrimaryStepProps {
 	repositories: ReadonlyArray<{ id: string; fullName: string }>;
 	isStarting: boolean;
 	onBack: () => void;
 	onGetStarted: (primaryId: string) => void;
+	onSkip: (primaryId: string) => void;
 }
 
 export function ChoosePrimaryStep({
@@ -23,6 +25,7 @@ export function ChoosePrimaryStep({
 	isStarting,
 	onBack,
 	onGetStarted,
+	onSkip,
 }: ChoosePrimaryStepProps) {
 	const [primaryId, setPrimaryId] = useState(repositories[0]?.id ?? "");
 
@@ -34,8 +37,8 @@ export function ChoosePrimaryStep({
 				</DialogTitle>
 				<DialogDescription className="text-sm leading-snug">
 					<Trans>
-						Cloud workspaces open on it, and its .superset/config.json runs
-						setup. The others are checked out beside it.
+						Cloud workspaces open on it, and its Paradev config runs setup. The
+						others are checked out beside it.
 					</Trans>
 				</DialogDescription>
 			</DialogHeader>
@@ -63,6 +66,7 @@ export function ChoosePrimaryStep({
 					))}
 				</RadioGroup>
 			</div>
+			<SetupAgentNote />
 			<DialogFooter className="items-center border-t border-border/70 bg-muted/20 px-5 py-3">
 				<span className="flex-1" />
 				<Button onClick={onBack} size="sm" variant="ghost">
@@ -70,10 +74,18 @@ export function ChoosePrimaryStep({
 				</Button>
 				<Button
 					disabled={!primaryId || isStarting}
+					onClick={() => onSkip(primaryId)}
+					size="sm"
+					variant="outline"
+				>
+					<Trans>Skip & save</Trans>
+				</Button>
+				<Button
+					disabled={!primaryId || isStarting}
 					onClick={() => onGetStarted(primaryId)}
 					size="sm"
 				>
-					{isStarting ? <Trans>Starting…</Trans> : <Trans>Get started</Trans>}
+					{isStarting ? <Trans>Starting…</Trans> : <Trans>Start agent</Trans>}
 				</Button>
 			</DialogFooter>
 		</>

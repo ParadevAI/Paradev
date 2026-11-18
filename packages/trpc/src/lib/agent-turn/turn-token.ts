@@ -9,8 +9,8 @@ export interface TurnTokenClaims {
 	sessionId: string;
 	agentId: string;
 	organizationId: string;
-	/** The person whose message started the turn, recorded by the API. */
-	actingUserId: string | null;
+	/** The person the turn works for. Always set: a Dev never acts for nobody. */
+	actingUserId: string;
 	exp: number;
 }
 
@@ -40,7 +40,7 @@ export async function verifyTurnToken(
 		typeof sessionId !== "string" ||
 		typeof agentId !== "string" ||
 		typeof organizationId !== "string" ||
-		(actingUserId !== null && typeof actingUserId !== "string") ||
+		typeof actingUserId !== "string" ||
 		typeof exp !== "number"
 	) {
 		return null;

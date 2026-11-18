@@ -1,8 +1,13 @@
+import { syncPluginMcpServers } from "@superset/agent-setup";
 import { CLIError, positional, string, table } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
-import { authorizeUrl, chooseAuthMethod } from "../../../lib/plugins/connect";
 import {
-	findInstalled,
+	authorizeUrl,
+	chooseAuthMethod,
+	findConnectTarget,
+} from "../../../lib/plugins/connect";
+import { toCliError } from "../../../lib/plugins/errors";
+import {
 	readInstalledPlugins,
 	resolvePluginRef,
 } from "../../../lib/plugins/host";
@@ -11,7 +16,6 @@ import {
 	missingInputsError,
 	parseInputs,
 } from "../../../lib/plugins/inputs";
-import { syncPluginMcpServers } from "../../../lib/plugins/mcp-servers";
 
 export default command({
 	sandbox: false,
@@ -44,8 +48,21 @@ export default command({
 			args.plugin as string,
 			options.marketplace as string | undefined,
 		);
-		const installed = findInstalled(readInstalledPlugins(), name, marketplace);
-		if (!installed) {
+		const catalog = await ctx.api.plugins.list.query({
+			includeOrganization: true,
+		});
+		let target: ReturnType<typeof findConnectTarget>;
+		try {
+			target = findConnectTarget(
+				catalog,
+				readInstalledPlugins(),
+				name,
+				marketplace,
+			);
+		} catch (error) {
+			throw toCliError(error);
+		}
+		if (!target) {
 			throw new CLIError(
 				marketplace
 					? `"${name}" is not installed from "${marketplace}". Run: superset plugins install ${name} --marketplace ${marketplace}`
@@ -53,15 +70,7 @@ export default command({
 			);
 		}
 
-		const catalog = await ctx.api.plugins.list.query({
-			includeOrganization: true,
-		});
-		const slug =
-			catalog.find(
-				(entry) =>
-					entry.name === name &&
-					(!marketplace || entry.marketplace === marketplace),
-			)?.connector ?? undefined;
+		const slug = target.connector ?? undefined;
 
 		if (!slug) {
 			return {

@@ -1,11 +1,18 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import {
+	CLOUD_WORKSPACE_BOOTED_ATTRIBUTE,
+	CLOUD_WORKSPACE_WAKE_TRANSACTION,
+} from "@superset/shared/constants";
+import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
 import { nudge } from "../../lib/realtime";
 import {
+	bootBeganSince,
 	buildSandboxClaim,
 	describeSandbox,
+	recordBootSpans,
 	stopAndSnapshot,
 	wakeSandbox,
 } from "../../lib/sandbox";
@@ -14,6 +21,8 @@ import {
 	authorizeBoot,
 	queueSettleWorkspace,
 } from "./meter";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 import { transitionCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -27,38 +36,90 @@ export interface WokenCloudWorkspace {
 /** Resumes or extends the sandbox and records its current address. */
 export async function wakeCloudWorkspace(
 	row: CloudWorkspaceRow,
+	options: { adoptSignIns?: boolean } = {},
 ): Promise<WokenCloudWorkspace> {
-	const { claim, agentCredentialDigest } = await buildSandboxClaim({ row });
+	try {
+		return await Sentry.startSpan(
+			{
+				name: CLOUD_WORKSPACE_WAKE_TRANSACTION,
+				op: "function",
+				forceTransaction: true,
+				attributes: { "cloud_workspace.id": row.id },
+			},
+			async (span) => {
+				const { booted, rebooted, ...woken } = await wake(row, options);
+				span.setAttributes({
+					"cloud_workspace.resumed": booted,
+					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
+				});
+				return woken;
+			},
+		);
+	} finally {
+		waitUntil(Sentry.flush(2_000).catch(() => false));
+	}
+}
+
+/**
+ * `adoptSignIns` marks the box's sign-ins current without a boot: the caller
+ * restarts the one agent that needs them, and the others keep theirs.
+ */
+async function wake(
+	row: CloudWorkspaceRow,
+	{ adoptSignIns = false }: { adoptSignIns?: boolean },
+): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
+	const { claim, agentCredentialDigest } = await Sentry.startSpan(
+		{ name: "claim", op: "sandbox" },
+		() => buildSandboxClaim({ row }),
+	);
 	let bootId: string | null = null;
-	const { hostTarget, booted } = await wakeSandbox({
-		providerSandboxId: row.providerSandboxId,
-		claim,
-		beforeResume: async (box) => {
-			({ bootId } = await authorizeBoot({
-				organizationId: row.organizationId,
-				cloudWorkspaceId: row.id,
-				createdByUserId: row.createdByUserId,
-				...box,
-			}));
-		},
-	}).catch(async (error) => {
-		if (bootId) {
-			await attachBootSession({
-				bootId,
-				providerSandboxId: row.providerSandboxId,
-			}).catch(() => {});
-		}
-		throw error;
-	});
+	const wakeStartedAt = Date.now();
+	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
+		await wakeSandbox({
+			providerSandboxId: row.providerSandboxId,
+			claim,
+			beforeResume: async (box) => {
+				({ bootId } = await Sentry.startSpan(
+					{ name: "authorize boot", op: "billing" },
+					() =>
+						authorizeBoot({
+							organizationId: row.organizationId,
+							cloudWorkspaceId: row.id,
+							createdByUserId: row.createdByUserId,
+							...box,
+						}),
+				));
+			},
+		}).catch(async (error) => {
+			if (bootId) {
+				await attachBootSession({
+					bootId,
+					providerSandboxId: row.providerSandboxId,
+				}).catch(() => {});
+			}
+			throw error;
+		});
 	if (bootId) {
 		await attachBootSession({
 			bootId,
 			providerSandboxId: row.providerSandboxId,
 		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
 	}
+	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
+		try {
+			recordBootSpans(answer);
+		} catch (error) {
+			console.error(
+				`[cloud-workspace] could not trace the boot of ${row.id}`,
+				error,
+			);
+		}
+	}
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
-		...(booted ? { bootAgentCredentialDigest: agentCredentialDigest } : {}),
+		...(booted || adoptSignIns
+			? { bootAgentCredentialDigest: agentCredentialDigest }
+			: {}),
 	};
 	if (Object.keys(set).length > 0) {
 		await db
@@ -66,10 +127,14 @@ export async function wakeCloudWorkspace(
 			.set(set)
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
+	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
 	return {
 		hostTarget,
+		booted,
+		rebooted,
 		agentCredentialsChanged:
 			!booted &&
+			!adoptSignIns &&
 			row.bootAgentCredentialDigest !== null &&
 			row.bootAgentCredentialDigest !== agentCredentialDigest,
 	};
@@ -81,14 +146,17 @@ export async function restartCloudWorkspace(
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
 	if (running) {
-		await stopAndSnapshot(row.providerSandboxId);
+		const stopped = await stopAndSnapshot(row.providerSandboxId);
+		await recordSandboxAsleep(row.id, {
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+		});
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);
 }
 
 /**
- * For a sandbox that is gone or can never resume. A `ready` row nothing can
+ * For a sandbox that is gone or can never resume. An `awake` row nothing can
  * open would sit in the sidebar forever; failed is the state the client
  * already renders with a way out.
  */
@@ -98,7 +166,7 @@ export async function markSandboxUnavailable(
 ): Promise<void> {
 	await transitionCloudWorkspace({
 		id: row.id,
-		from: ["ready"],
+		from: ["awake", "asleep"],
 		to: "failed",
 		set: { sandboxUrl: null },
 	});

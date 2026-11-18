@@ -35,7 +35,7 @@ for (const locale of SUPPORTED_LOCALES) {
 		).text();
 		expect(plurals).toContain("<key>other</key>");
 		expect(plurals).toContain("NSStringPluralRuleType");
-		if (["pl", "ru", "cs"].includes(locale)) {
+		if (["pl", "ru", "cs", "uk"].includes(locale)) {
 			expect(plurals).toContain("<key>few</key>");
 			expect(plurals).toContain("<key>many</key>");
 		}

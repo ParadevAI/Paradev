@@ -1,4 +1,5 @@
 import type { AgentSessionHub } from "./agent-session-hub";
+import type { MoveHub } from "./move-hub";
 import type { OrgHub } from "./org-hub";
 import type { PageHub } from "./page-hub";
 import type { UserHub } from "./user-hub";
@@ -17,6 +18,7 @@ export interface RealtimeEnv {
 	WorkspaceHub: DurableObjectNamespace<WorkspaceHub>;
 	UserHub: DurableObjectNamespace<UserHub>;
 	AgentSessionHub: DurableObjectNamespace<AgentSessionHub>;
+	MoveHub: DurableObjectNamespace<MoveHub>;
 	PRIVATE: R2Bucket;
 	GUEST_PRESENCE_BY_IP: RateLimit;
 	GUEST_PRESENCE_BY_PAGE: RateLimit;

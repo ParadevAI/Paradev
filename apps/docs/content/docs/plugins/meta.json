@@ -1,5 +1,5 @@
 {
 	"title": "Plugins",
 	"icon": "Puzzle",
-	"pages": ["overview", "available"]
+	"pages": ["overview", "available", "build-a-plugin", "organization-plugins"]
 }

@@ -1,12 +1,13 @@
-import { boolean, CLIError, table } from "@superset/cli-framework";
-import { createApiClient } from "../../../lib/api-client";
-import { command } from "../../../lib/command";
-import { skillsRoot } from "../../../lib/plugins/host";
-import { syncPlugins } from "../../../lib/plugins/install";
 import {
 	forgetOrganizationPlugins,
 	reconcileOrganizationPlugins,
-} from "../../../lib/plugins/organization";
+	skillsRoot,
+	syncPlugins,
+} from "@superset/agent-setup";
+import { boolean, CLIError, table } from "@superset/cli-framework";
+import { createApiClient } from "../../../lib/api-client";
+import { command } from "../../../lib/command";
+import { withPluginHints } from "../../../lib/plugins/errors";
 import { NOT_LOGGED_IN, resolveAuth } from "../../../lib/resolve-auth";
 
 const removedText = (removed: string[]) =>
@@ -81,7 +82,7 @@ export default command({
 		const organization = options.forgetOrganizations
 			? { text: removedText(forgetOrganizationPlugins()), failed: [] }
 			: await organizationChanges();
-		const result = await syncPlugins();
+		const result = await withPluginHints(() => syncPlugins());
 		const reaped = result.removed
 			? ` Reaped ${result.removed} stale skill folder${result.removed === 1 ? "" : "s"}.`
 			: "";

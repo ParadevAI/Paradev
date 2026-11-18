@@ -1,4 +1,5 @@
 import { cn } from "@superset/ui/utils";
+import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { IconType } from "react-icons";
 import { FaGithub } from "react-icons/fa";
@@ -29,11 +30,15 @@ import neonIconUrl from "renderer/assets/icons/neon-icon.png";
 import slackIconUrl from "renderer/assets/icons/slack-icon.svg";
 import stripeIconUrl from "renderer/assets/icons/stripe-icon.svg";
 import ynabIconUrl from "renderer/assets/icons/ynab-icon.png";
+import { AhrefsIcon } from "./components/AhrefsIcon";
 import { AutumnIcon } from "./components/AutumnIcon";
+import { FirecrawlIcon } from "./components/FirecrawlIcon";
+import { InngestIcon } from "./components/InngestIcon";
 import { PeecIcon } from "./components/PeecIcon";
 import { ResendIcon } from "./components/ResendIcon";
 import { SazabiIcon } from "./components/SazabiIcon";
 import { SuperhumanIcon } from "./components/SuperhumanIcon";
+import { WisprIcon } from "./components/WisprIcon";
 
 /**
  * Per-plugin brand icons. Icons stay per-app rather than in the shared
@@ -61,8 +66,11 @@ const IMAGE_ICONS: Record<string, string> = {
 };
 
 const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
+	ahrefs: { icon: AhrefsIcon, color: "#FF8D00" },
 	autumn: { icon: AutumnIcon },
+	firecrawl: { icon: FirecrawlIcon, color: "#FA5D19" },
 	github: { icon: FaGithub },
+	inngest: { icon: InngestIcon },
 	superhuman: { icon: SuperhumanIcon },
 	notion: { icon: SiNotion },
 	peec: { icon: PeecIcon },
@@ -78,6 +86,7 @@ const PLUGIN_ICONS: Record<string, { icon: IconType; color?: string }> = {
 	"google-docs": { icon: SiGoogledocs, color: "#4285F4" },
 	"google-sheets": { icon: SiGooglesheets, color: "#0F9D58" },
 	vercel: { icon: SiVercel },
+	wispr: { icon: WisprIcon },
 };
 
 /**
@@ -102,11 +111,29 @@ export function getPluginIconUrl(
 
 interface PluginIconProps {
 	pluginName: string;
+	/** The manifest's `interface.icon`: a built-in icon key, used when the name has none. */
+	icon?: string;
+	/** Artwork the plugin ships in its own tree, used when no built-in icon matches. */
+	iconUrl?: string | null;
 	className?: string;
 }
 
-export function PluginIcon({ pluginName, className }: PluginIconProps) {
+function builtInKey(pluginName: string, icon: string | undefined) {
+	const known = (key: string) =>
+		Object.hasOwn(IMAGE_ICONS, key) || Object.hasOwn(PLUGIN_ICONS, key);
+	if (known(pluginName)) return pluginName;
+	if (icon !== undefined && known(icon)) return icon;
+	return undefined;
+}
+
+export function PluginIcon({
+	pluginName,
+	icon,
+	iconUrl,
+	className,
+}: PluginIconProps) {
 	const supersetIcon = usePresetIcon("superset");
+	const [brokenUrl, setBrokenUrl] = useState<string | null>(null);
 	const size = className ?? "size-9";
 
 	if (pluginName === "superset") {
@@ -119,8 +146,11 @@ export function PluginIcon({ pluginName, className }: PluginIconProps) {
 		);
 	}
 
-	const imageIcon = ownEntry(IMAGE_ICONS, pluginName);
-	const entry = ownEntry(PLUGIN_ICONS, pluginName);
+	const key = builtInKey(pluginName, icon);
+	const candidate =
+		key !== undefined ? ownEntry(IMAGE_ICONS, key) : iconUrl || undefined;
+	const imageIcon = candidate !== brokenUrl ? candidate : undefined;
+	const entry = key !== undefined ? ownEntry(PLUGIN_ICONS, key) : undefined;
 	const Icon = entry?.icon ?? LuPuzzle;
 	return (
 		<div
@@ -133,6 +163,7 @@ export function PluginIcon({ pluginName, className }: PluginIconProps) {
 				<img
 					src={imageIcon}
 					alt=""
+					onError={() => setBrokenUrl(imageIcon)}
 					className="size-3/5 object-contain @max-[1.5rem]:size-5/6"
 				/>
 			) : (

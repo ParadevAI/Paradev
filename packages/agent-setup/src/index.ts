@@ -31,7 +31,7 @@ import {
  * process and the standalone (CLI-launched) host-service alike.
  *
  * Callers without their own settings store (headless hosts) omit
- * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.superset mirror files
+ * `disabledAgentIds`/`disabledSkillIds`; the shared ~/.paradev mirror files
  * (agent-hooks.json, disabled-skills.json) and their SUPERSET_DISABLED_*
  * env overrides apply instead, so a machine running both the desktop and CLI
  * hosts converges on one disable set.
@@ -91,6 +91,7 @@ export {
 	writeSharedDisabledSkillIds,
 } from "./disabled-skills";
 export {
+	adoptInstalledPlugins,
 	type EnabledPlugin,
 	findInstalledTree,
 	type InstalledPluginEntry,
@@ -110,7 +111,7 @@ export {
 	createManagedSkills,
 	type PluginSkillSource,
 } from "./managed-skills";
-export { getBinDir, resolveSupersetHomeDir } from "./paths";
+export { getBinDir, resolveAppHomeDir } from "./paths";
 export {
 	assertSafePluginSegment,
 	isSafePluginSegment,
@@ -118,7 +119,64 @@ export {
 	pluginCachePath,
 	writePluginTree,
 } from "./plugin-cache";
+export { serializePluginChange } from "./plugin-changes";
 export { mcpHeadersHelperCommand } from "./plugin-connections";
+export { PluginError, type PluginErrorCode } from "./plugin-error";
+export {
+	type InstalledPluginIcon,
+	readInstalledPluginIcons,
+} from "./plugin-icon";
+export {
+	type AvailablePlugin,
+	availablePlugins,
+	type ChangedPlugin,
+	ensureDefaultMarketplace,
+	findAvailablePlugin,
+	type InstallMarketplaceResult,
+	type InstallPluginOptions,
+	type InstallPluginResult,
+	installMarketplace,
+	installPlugin,
+	ledgerWithPlugin,
+	listAvailable,
+	listSkills,
+	type PluginRecord,
+	parseMarketplaceSource,
+	recordPlugin,
+	refreshMarketplaces,
+	removePlugin,
+	restorePluginTrees,
+	type SkillEntry,
+	type SyncResult,
+	setPluginEnabled,
+	syncPlugins,
+} from "./plugin-install";
+export {
+	assertSafeSegment,
+	MARKETPLACE_FILE,
+	type Marketplace,
+	type MarketplaceEntry,
+	releaseTag,
+} from "./plugin-marketplace";
+export { syncPluginMcpServers } from "./plugin-mcp-servers";
+export {
+	forgetOrganizationPlugins,
+	installOrganizationPlugin,
+	type OrganizationPluginApi,
+	reconcileOrganizationPlugins,
+} from "./plugin-organization";
+export {
+	findInstalled,
+	type KnownMarketplace,
+	type MarketplaceSource,
+	marketplaceManifest,
+	marketplacesDir,
+	pluginsRoot,
+	readInstalledPlugins,
+	readKnownMarketplaces,
+	skillsRoot,
+	writeKnownMarketplaces,
+} from "./plugin-state";
 export {
 	type McpReconcileReport,
 	reconcileMcpServers,

@@ -1,0 +1,1 @@
+export { hasUserMessage } from "./hasUserMessage";

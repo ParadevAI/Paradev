@@ -69,17 +69,17 @@ describe("teardown initial command", () => {
 describe("resolveTeardownCommand", () => {
 	function makeSandbox(): {
 		repoPath: string;
-		homeDir: string;
+		appHomeDir: string;
 		cleanup: () => void;
 	} {
 		const root = mkdtempSync(join(tmpdir(), "host-service-teardown-resolve-"));
 		const repoPath = join(root, "repo");
-		const homeDir = join(root, "home");
+		const appHomeDir = join(root, "home");
 		mkdirSync(join(repoPath, ".superset"), { recursive: true });
-		mkdirSync(homeDir, { recursive: true });
+		mkdirSync(appHomeDir, { recursive: true });
 		return {
 			repoPath,
-			homeDir,
+			appHomeDir,
 			cleanup: () => rmSync(root, { recursive: true, force: true }),
 		};
 	}
@@ -106,7 +106,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath: join(sb.repoPath, ".worktrees", "feature"),
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toEqual({
@@ -131,7 +131,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath: join(sb.repoPath, ".worktrees", "feature"),
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toEqual({
@@ -156,7 +156,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath: join(sb.repoPath, ".worktrees", "feature"),
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toEqual({
@@ -185,7 +185,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath,
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toEqual({
@@ -210,7 +210,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath: join(sb.repoPath, ".worktrees", "feature"),
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toEqual({
@@ -229,7 +229,7 @@ describe("resolveTeardownCommand", () => {
 				repoPath: sb.repoPath,
 				projectId: "proj-1",
 				worktreePath: join(sb.repoPath, ".worktrees", "feature"),
-				homeDir: sb.homeDir,
+				appHomeDir: sb.appHomeDir,
 			});
 
 			expect(resolved).toBeNull();

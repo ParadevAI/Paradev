@@ -178,6 +178,12 @@ export function ChannelsRealtime() {
 					void utils.channelTask.list.invalidate({
 						channelId: event.channelId,
 					});
+					void utils.channelTask.project.invalidate({
+						channelId: event.channelId,
+					});
+					void utils.channelTask.linearProject.invalidate({
+						channelId: event.channelId,
+					});
 					void utils.channelTask.forTask.invalidate();
 					break;
 				case "channels.changed":

@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
-import { auth, type Session } from "@superset/auth/server";
+import { auth, getRequestSession, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
-import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox-gate";
+import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
 import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
@@ -59,6 +59,9 @@ async function sessionFromOAuthBearer(
 
 	const activeOrganizationId =
 		typeof payload.organizationId === "string" ? payload.organizationId : null;
+	const organizationIds = Array.isArray(payload.organizationIds)
+		? payload.organizationIds
+		: undefined;
 
 	const sessionId = typeof payload.sid === "string" ? payload.sid : userId;
 
@@ -68,6 +71,7 @@ async function sessionFromOAuthBearer(
 			id: sessionId,
 			userId,
 			activeOrganizationId,
+			organizationIds,
 			expiresAt: new Date(((payload.exp as number) ?? 0) * 1000),
 			token: token,
 			ipAddress: null,
@@ -121,9 +125,7 @@ export const createContext = async ({
 	req: Request;
 	resHeaders: Headers;
 }) => {
-	let session = await auth.api.getSession({
-		headers: req.headers,
-	});
+	let session = await getRequestSession(req.headers);
 
 	if (!session) {
 		session = await sessionFromOAuthBearer(req.headers);

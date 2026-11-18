@@ -7,28 +7,32 @@ export async function findInstalledRepository(
 	organizationId: string,
 	repoFullName: string,
 ) {
-	const installation = await db.query.githubInstallations.findFirst({
-		where: eq(githubInstallations.organizationId, organizationId),
+	const repo = await db.query.githubRepositories.findFirst({
+		where: and(
+			eq(githubRepositories.organizationId, organizationId),
+			sql`lower(${githubRepositories.fullName}) = ${repoFullName.toLowerCase()}`,
+		),
+		columns: { id: true, fullName: true },
+		with: { installation: true },
 	});
-	if (!installation)
+	if (repo) {
+		const { installation, ...rest } = repo;
+		return { installation, repo: rest };
+	}
+	const anyInstallation = await db.query.githubInstallations.findFirst({
+		where: eq(githubInstallations.organizationId, organizationId),
+		columns: { id: true },
+	});
+	if (!anyInstallation)
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "GitHub installation not found",
 			i18nKey: "serverError.integration.githubInstallationNotFound",
 		});
-	const repo = await db.query.githubRepositories.findFirst({
-		where: and(
-			eq(githubRepositories.installationId, installation.id),
-			sql`lower(${githubRepositories.fullName}) = ${repoFullName.toLowerCase()}`,
-		),
-		columns: { id: true, fullName: true },
+	throw userError({
+		code: "NOT_FOUND",
+		message: `${repoFullName} is not a repository the GitHub App is installed on`,
+		i18nKey: "serverError.integration.repositoryNotInstalled",
+		params: { repoFullName },
 	});
-	if (!repo)
-		throw userError({
-			code: "NOT_FOUND",
-			message: `${repoFullName} is not a repository the GitHub App is installed on`,
-			i18nKey: "serverError.integration.repositoryNotInstalled",
-			params: { repoFullName },
-		});
-	return { installation, repo };
 }

@@ -89,6 +89,8 @@ export type PromptInputCommand = {
 	searchAliases?: string[];
 	// Tab inserts this chip in place of the typed command instead of selecting.
 	completion?: ComposerChip;
+	// Offered mid-sentence too, not only when the command starts the message.
+	inline?: boolean;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -162,12 +164,21 @@ export type PromptInputHandle = {
 	blur(): void;
 };
 
+/**
+ * `stacked` puts the toolbar on a row under the text; `inline` is a single
+ * pill with the attach button and send controls beside the text, and the
+ * toolbar slots are not rendered.
+ */
+export type PromptInputLayout = "stacked" | "inline";
+
 export type PromptInputProps = {
 	ref?: Ref<PromptInputHandle>;
 	placeholder?: string;
+	layout?: PromptInputLayout;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
-	status?: "ready" | "streaming";
+	// "background": a turn runs but offers no Stop; Enter queues, ⌘↩ steers.
+	status?: "ready" | "streaming" | "background";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;

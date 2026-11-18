@@ -32,11 +32,20 @@ fi
 
 # Native addon require() probes. Run from /tmp so Node's module resolution
 # doesn't walk up into a host repo's node_modules and shadow the bundle.
-( cd /tmp && NODE_PATH="$DIST/lib/node_modules" "$DIST/lib/node" -e '
+( cd /tmp && NODE_PATH="$DIST/lib/node_modules" DIST="$DIST" "$DIST/lib/node" -e '
 	for (const m of ["better-sqlite3", "node-pty", "@parcel/watcher"]) {
 		require(m);
 		console.log("[smoke]", m, "OK");
 	}
+	const { dirname, join } = require("node:path");
+	const { existsSync } = require("node:fs");
+	const adapter = require.resolve("@agentclientprotocol/claude-agent-acp/package.json");
+	if (!adapter.startsWith(process.env.DIST + "/")) {
+		throw new Error("Claude ACP adapter resolved outside the distribution: " + adapter);
+	}
+	const entry = join(dirname(adapter), "dist/index.js");
+	if (!existsSync(entry)) throw new Error("Missing Claude ACP adapter entry: " + entry);
+	console.log("[smoke] Claude ACP adapter OK");
 ' )
 
 # node-pty must resolve from the bundled tree (not a leaked host copy), and a

@@ -31,7 +31,7 @@ Prefer `--json` (auto-on in agent environments; parse it rather than
 matching the human sentences) and `superset settings list` to discover keys
 and allowed values instead of guessing. In Paradev terminals `superset` is
 already on PATH. `SUPERSET_HOME_DIR` overrides the target profile
-(`~/.superset` by default); useful for testing against a sandbox copy.
+(`~/.paradev` by default); useful for testing against a sandbox copy.
 
 ## Creating custom themes
 
@@ -107,7 +107,7 @@ app" means the nudge landed. The notes below are the fallback behavior when
 no app acknowledged (app not running, or an older app version):
 
 - **Regular settings** (most of `settings set`): written to
-  `~/.superset/local.db`. A running older app picks them up the next time
+  `local.db` in the target profile (`$SUPERSET_HOME_DIR`, else `~/.paradev`). A running older app picks them up the next time
   its window regains focus; no restart needed.
 - **Git settings** (`branchPrefixMode`, `branchPrefixCustom`,
   `worktreeBaseDir`): host-wide values written through the local host
@@ -133,7 +133,7 @@ Booleans accept `true/false/on/off/1/0/yes/no`.
 | --- | --- |
 | behavior | `confirmOnQuit`, `fileOpenMode` (`split-pane\|new-tab`), `showResourceMonitor`, `showUsageInSidebar`, `openLinksInApp`, `defaultEditor` (vscode, cursor, zed, ...) |
 | git | `branchPrefixMode` (`none\|github\|author\|custom`), `branchPrefixCustom`, `worktreeBaseDir`; host-wide, written through the local host service, so the app (or `superset start`) must be running |
-| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala), `notificationSoundsMuted`, `notificationVolume` (0-100) |
+| notifications | `selectedRingtoneId` (shamisen, arcade, ping, quick, doowap, woman, african, afrobeat, edm, comeback, shabala, tribute), `notificationSoundsMuted`, `notificationVolume` (0-100) |
 | terminal | `terminalLinkBehavior` (`external-editor\|file-viewer`), `terminalParkedRuntimeCap` (2-64), `showPresetsBar`, `useCompactTerminalAddButton`, `autoApplyDefaultPreset`, `waitForSetupBeforeAgent` |
 | terminal appearance | `terminalFontFamily`, `terminalFontSize` (10-24, 0.5 steps), `terminalLineHeight` (1-2.5), `terminalLetterSpacing` (-2-4), `terminalFontWeight` (100-900), `terminalLigatures`, `terminalMinimumContrast` (1\|3\|4.5\|7), `terminalCursorStyle` (`block\|bar\|underline`), `terminalCursorBlink` |
 | editor appearance | `editorFontFamily`, `editorFontSize`, `editorLineHeight`, `editorLetterSpacing`, `editorFontWeight`, `editorLigatures` |

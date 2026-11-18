@@ -1,7 +1,7 @@
 {
 	"$schema": "https://superset.sh/schemas/plugin/1.0.0.json",
 	"name": "github",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Work with issues, pull requests, and CI across your repositories.",
 	"author": {
 		"name": "Paradev",
@@ -23,7 +23,10 @@
 			},
 			"mcp": {
 				"type": "streamable-http",
-				"url": "https://api.githubcopilot.com/mcp/"
+				"url": "https://api.githubcopilot.com/mcp/",
+				"headers": {
+					"X-MCP-Toolsets": "context,repos,issues,pull_requests,users,actions"
+				}
 			}
 		}
 	}

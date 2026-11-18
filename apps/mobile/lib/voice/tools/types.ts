@@ -13,7 +13,7 @@ export interface VoiceWorkspace {
 	branch: string | null;
 	/** `owner/repo` or the host project's name. */
 	project: string | null;
-	/** Cloud lifecycle: provisioning, ready, failed… Hosts are always "ready". */
+	/** Cloud lifecycle: provisioning, awake, asleep, failed… Hosts are always "awake". */
 	status: string;
 	attention: VoiceAttention | null;
 	attentionAt: number | null;

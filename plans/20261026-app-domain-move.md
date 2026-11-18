@@ -67,8 +67,8 @@ proves that a host serves (probed 2026-10-26).
 | `www.paradev.com` | Vercel only | — | 308 to apex | OK |
 | `app.paradev.com` | **was** `app-identity.ts:31` (`CANONICAL_URLS.APP`), desktop defaults `electron.vite.config.ts:84,211`, `env.main.ts:23` | web URL in deploys and build-desktop. **The standalone CLI does not bake `SUPERSET_WEB_URL`** (`cli/src/lib/env.ts:15`) | 307 to /sign-in, sign-in broken | **Fixed:** pinned to app.superset.sh. Otherwise the next CLI would sign in through app.paradev.com with an unregistered `redirect_uri` (`cli/src/lib/auth.ts:290`). Mobile share link now uses `EXPO_PUBLIC_WEB_URL`. |
 | `docs.paradev.com` | `app-identity.ts:32`, `constants.ts:35`, CLI `cli.config.ts:38` | Docs URL in build-desktop and web; not in CLI | 200 | OK |
-| `status.paradev.com` | `constants.ts:51` | — | 307 to status.superset.sh | OK (one extra hop) |
-| `trust.paradev.com` | `constants.ts:52` | — | 307 to trust.superset.sh | OK |
+| `status.paradev.com` | `constants.ts:51` | — | 200, served by incident.io since Nov 1; status.superset.sh 301s to it | OK |
+| `trust.paradev.com` | `constants.ts:52` | — | 200, served by Oneleet since Nov 1; trust.superset.sh 301s to it | OK |
 | `streams.paradev.com` | `env.main.ts:22`, `electron.vite.config.ts:80` | `NEXT_PUBLIC_STREAMS_URL` in build-desktop | No (streams.superset.sh is dead too) | Left as is |
 | `support@`, `team@`, `sales@paradev.com` | `constants.ts:24,33,45` | — | MX is Google Workspace | **Check that each alias exists.** Marketing contact and enterprise forms now mail support@paradev.com (`contact/actions.ts:113`, `enterprise/actions.ts:124`). |
 | `did:web:paradev.com` | `marketing/src/lib/agent-identity.ts:19` | — | did.json 200 | OK |

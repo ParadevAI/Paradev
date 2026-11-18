@@ -8,6 +8,7 @@ import {
 	getManagedNotifyHookCommand,
 	isManagedArtifactGuardCommand,
 	isManagedNotifyCommand,
+	removeOwnedFileIfMarked,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
 import { getArtifactGuardScriptPath } from "./artifact-guard-hook";
@@ -24,6 +25,7 @@ import { getNotifyScriptPath } from "./notify-hook";
 import {
 	getOpenCodeConfigDir,
 	getOpenCodePluginDir,
+	getOpenCodeTuiPluginDir,
 	resolveUserHomeDir,
 } from "./paths";
 
@@ -32,12 +34,18 @@ export const OPENCODE_PLUGIN_FILE = "superset-notify.js";
 const OPENCODE_PLUGIN_SIGNATURE = "// Superset opencode plugin";
 const OPENCODE_PLUGIN_VERSION = "v11";
 export const OPENCODE_PLUGIN_MARKER = `${OPENCODE_PLUGIN_SIGNATURE} ${OPENCODE_PLUGIN_VERSION}`;
+const OPENCODE_TUI_PLUGIN_SIGNATURE = "// Superset opencode tui plugin";
+export const OPENCODE_TUI_PLUGIN_MARKER = `${OPENCODE_TUI_PLUGIN_SIGNATURE} v2`;
 
 /**
  * Returns the environment-scoped OpenCode plugin path under Superset home.
  */
 export function getOpenCodePluginPath(): string {
 	return path.join(getOpenCodePluginDir(), OPENCODE_PLUGIN_FILE);
+}
+
+export function getOpenCodeTuiPluginPath(): string {
+	return path.join(getOpenCodeTuiPluginDir(), "tui.js");
 }
 
 /** @see https://opencode.ai/docs/plugins */
@@ -290,6 +298,16 @@ export function getOpenCodePluginContent(notifyPath: string): string {
 		.replace("{{NOTIFY_PATH}}", notifyPath);
 }
 
+export function getOpenCodeTuiPluginContent(notifyPath: string): string {
+	const template = fs.readFileSync(
+		getTemplatePath("opencode-tui-plugin.template.js"),
+		"utf-8",
+	);
+	return template
+		.replace("{{MARKER}}", OPENCODE_TUI_PLUGIN_MARKER)
+		.replace("{{NOTIFY_PATH}}", () => JSON.stringify(notifyPath));
+}
+
 /**
  * Wrapper for Claude: forwards SUPERSET_* env vars into the agent process
  * tree and follows the Usage-tab account switch at launch time. Hooks live
@@ -349,6 +367,27 @@ export function createOpenCodePlugin(): void {
 	const changed = writeFileIfChanged(pluginPath, content, 0o644);
 	console.log(
 		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode plugin`,
+	);
+}
+
+export function createOpenCodeTuiPlugin(): void {
+	fs.mkdirSync(getOpenCodeTuiPluginDir(), { recursive: true });
+	const content = getOpenCodeTuiPluginContent(getNotifyScriptPath());
+	const changed = writeFileIfChanged(
+		getOpenCodeTuiPluginPath(),
+		content,
+		0o644,
+	);
+	console.log(
+		`[agent-setup] ${changed ? "Updated" : "Verified"} OpenCode TUI plugin`,
+	);
+}
+
+export function removeOpenCodeTuiPlugin(): void {
+	removeOwnedFileIfMarked(
+		getOpenCodeTuiPluginPath(),
+		OPENCODE_TUI_PLUGIN_SIGNATURE,
+		"OpenCode TUI plugin",
 	);
 }
 

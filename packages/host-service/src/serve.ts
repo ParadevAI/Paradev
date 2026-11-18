@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { moveLegacyAppHome } from "@superset/agent-setup/legacy-home-move";
 import { createApp } from "./app";
 import { getSupervisor, startDaemonBootstrap } from "./daemon";
 import { env } from "./env";
@@ -12,9 +13,11 @@ import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { provisionAgentIntegrations } from "./runtime/agent-provisioning";
 import { processStartedAt, recordBootStamp } from "./runtime/boot-stamps";
+import { readSandboxBoxResources } from "./runtime/box-resources";
 import { resolveBrowserBridgeFromEnv } from "./runtime/browser-bridge/env";
 import { applyLoginShellEnvToProcess } from "./runtime/login-shell-env";
 import { startSandboxAgentStatusReporter } from "./runtime/sandbox-agent-status";
+import { startSandboxBoxPressureReporter } from "./runtime/sandbox-box-pressure";
 import { startSandboxCredentialRefresh } from "./runtime/sandbox-credential-refresh";
 import { startSandboxKeepalive } from "./runtime/sandbox-keepalive";
 import { startSandboxPullRequestReporter } from "./runtime/sandbox-pull-requests";
@@ -39,6 +42,13 @@ async function main(): Promise<void> {
 	console.log(
 		`[host-service] starting (org=${env.ORGANIZATION_ID}, port=${env.PORT}, NODE_ENV=${process.env.NODE_ENV ?? "unset"})`,
 	);
+
+	const appHome = moveLegacyAppHome();
+	if (appHome.move === "moved" || appHome.move === "failed") {
+		console.log(
+			`[host-service] app home: ${appHome.homeDir} (${appHome.move})`,
+		);
+	}
 
 	// Resolve the shell-env snapshot in the background — it must not block the
 	// server from listening (the login-shell probe can burn the full 8s
@@ -178,6 +188,12 @@ async function main(): Promise<void> {
 				workspaceId: sandboxWorkspaceId,
 				hostSecret: env.HOST_SERVICE_SECRET,
 				store: terminalAgentStore,
+			});
+			startSandboxBoxPressureReporter({
+				apiUrl: env.SUPERSET_API_URL,
+				workspaceId: sandboxWorkspaceId,
+				hostSecret: env.HOST_SERVICE_SECRET,
+				read: readSandboxBoxResources,
 			});
 			startSandboxKeepalive({
 				keepalive: () => api.sandbox.keepalive.mutate(),

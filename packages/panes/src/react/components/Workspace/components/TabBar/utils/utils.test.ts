@@ -16,4 +16,9 @@ describe("scrollLeftToRevealTab", () => {
 		expect(scrollLeftToRevealTab(2, 0, viewport, 24)).toBe(24);
 		expect(scrollLeftToRevealTab(1, 0, viewport, 24)).toBeNull();
 	});
+
+	test("shows the start of a tab that is wider than the viewport", () => {
+		expect(scrollLeftToRevealTab(3, 0, TAB_WIDTH - 40)).toBe(TAB_WIDTH * 3);
+		expect(scrollLeftToRevealTab(3, 0, TAB_WIDTH - 40, 24)).toBe(TAB_WIDTH * 3);
+	});
 });

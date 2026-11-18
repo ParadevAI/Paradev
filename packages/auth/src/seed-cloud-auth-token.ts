@@ -9,7 +9,7 @@ const HOME_DIR_MODE = 0o700;
 
 /**
  * Mints a real session for the cloud workspace's creator and seeds it into
- * superset-dev-data/, the same way a sign-in through the desktop app would —
+ * paradev-dev-data/, the same way a sign-in through the desktop app would —
  * so the dev build of the desktop app comes up already signed in as the
  * person who made the workspace, instead of the shared `admin@local.test`
  * dev account. Only possible because a workspace's Neon branch is a

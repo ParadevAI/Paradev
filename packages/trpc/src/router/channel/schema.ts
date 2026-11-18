@@ -91,6 +91,16 @@ export const channelTaskSchema = z.object({
 	taskId: z.string().uuid(),
 });
 
+export const channelProjectSchema = z.object({
+	channelId,
+	projectId: z.string().uuid().nullable(),
+});
+
+export const channelLinearProjectSchema = z.object({
+	channelId,
+	linearProjectId: z.string().min(1).max(64).nullable(),
+});
+
 export const setMutedSchema = z.object({
 	channelId,
 	muted: z.boolean(),

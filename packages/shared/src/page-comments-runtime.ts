@@ -1,4 +1,8 @@
 import {
+	PAGE_FIND_RUNTIME_SOURCE,
+	type PageFindResult,
+} from "./page-find-runtime";
+import {
 	PAGE_PINCH_ZOOM_RUNTIME_SOURCE,
 	type PageViewportZoom,
 } from "./page-zoom";
@@ -24,8 +28,15 @@ export interface FrameRect {
 	height: number;
 }
 
+export type { PageFindResult };
+
 export const HOST_CHANNEL = "superset-comments/host";
 export const FRAME_CHANNEL = "superset-comments/frame";
+
+/** Announced in the frame's `ready`; a runtime served before find omits it. */
+export const PAGE_FIND_FEATURE = "find";
+
+export const PAGE_FIND_REFRESH_MS = 200;
 
 export const PENDING_ANCHOR_ID = "superset-pending-anchor";
 
@@ -42,13 +53,19 @@ export type HostMessageBody =
 	| { type: "enable-pinch-zoom" }
 	| { type: "set-mode"; enabled: boolean; locked: boolean }
 	| { type: "track"; anchors: { id: string; anchor: CommentAnchor }[] }
-	| { type: "restore-scroll"; y: number };
+	| { type: "restore-scroll"; y: number }
+	| { type: "set-find-chords"; chords: string[] }
+	| { type: "find"; query: string }
+	| { type: "find-step"; delta: 1 | -1 }
+	| { type: "find-clear" };
 
 export type HostMessage = HostMessageBody & { channel: typeof HOST_CHANNEL };
 
 export type FrameMessage =
 	| ({ channel: typeof FRAME_CHANNEL; type: "link-click" } & PageLinkClick)
-	| { channel: typeof FRAME_CHANNEL; type: "ready" }
+	| { channel: typeof FRAME_CHANNEL; type: "ready"; features?: string[] }
+	| ({ channel: typeof FRAME_CHANNEL; type: "find-result" } & PageFindResult)
+	| { channel: typeof FRAME_CHANNEL; type: "find-shortcut" }
 	| {
 			channel: typeof FRAME_CHANNEL;
 			type: "viewport-zoom";
@@ -71,10 +88,11 @@ export type FrameMessage =
 	  };
 
 /**
- * Runs inside the served page. It is generic — it never reads page content,
- * it only measures and reports DOM elements the host asks about — and it is
- * inert until the host sends `set-mode`. The usercontent origin serves it
- * same-origin at `RUNTIME_SCRIPT_PATH` and injects one script tag per page.
+ * Runs inside the served page. It is generic — it reads page text only to
+ * find what the host asks for, and otherwise only measures and reports DOM
+ * elements the host asks about — and it is inert until the host sends
+ * `set-mode`. The usercontent origin serves it same-origin at
+ * `RUNTIME_SCRIPT_PATH` and injects one script tag per page.
  */
 export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 	const HOST = ${JSON.stringify(HOST_CHANNEL)};
@@ -92,7 +110,11 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 	let restoreDeadline = 0;
 	let lastScrollPost = 0;
 	let settleTimer = 0;
+	let findChords = new Set();
+	let findTimer = 0;
 	const SCROLL_POST_IDLE_MS = 150;
+	const FIND_REFRESH_MS = ${PAGE_FIND_REFRESH_MS};
+	const FEATURES = [${JSON.stringify(PAGE_FIND_FEATURE)}];
 
 	const post = (message) => {
 		parent.postMessage({ channel: FRAME, ...message }, "*");
@@ -214,13 +236,32 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 		post({ type: "hover", rect: null });
 	});
 
-	// Escape pressed while the frame has focus never reaches the host window,
-	// so the frame forwards it out.
+	// Same form as the host's canonical chords: sorted modifiers, then the
+	// physical key.
+	const chordOf = (event) => {
+		if (!event.code || event.isComposing) return null;
+		const altGraph = event.getModifierState?.("AltGraph") === true;
+		const mods = [];
+		if (event.altKey && !altGraph) mods.push("alt");
+		if (event.ctrlKey && !altGraph) mods.push("ctrl");
+		if (event.metaKey) mods.push("meta");
+		if (event.shiftKey) mods.push("shift");
+		return [...mods, event.code.toLowerCase().replace(/key|digit|numpad/, "")].join("+");
+	};
+
+	// Keys pressed while the frame has focus never reach the host window, so
+	// the frame forwards Escape and the host's find shortcut out.
 	document.addEventListener(
 		"keydown",
 		(event) => {
-			if (event.key !== "Escape") return;
-			post({ type: "escape" });
+			if (event.key === "Escape") {
+				post({ type: "escape" });
+				return;
+			}
+			if (findChords.size === 0 || !findChords.has(chordOf(event))) return;
+			event.preventDefault();
+			event.stopPropagation();
+			post({ type: "find-shortcut" });
 		},
 		true,
 	);
@@ -293,6 +334,18 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 		true,
 	);
 
+	const find = (${PAGE_FIND_RUNTIME_SOURCE})((result) => {
+		post({ type: "find-result", ...result });
+	});
+
+	const scheduleFindRefresh = () => {
+		if (findTimer || !find.active()) return;
+		findTimer = setTimeout(() => {
+			findTimer = 0;
+			find.refresh();
+		}, FIND_REFRESH_MS);
+	};
+
 	const pinchZoom = (${PAGE_PINCH_ZOOM_RUNTIME_SOURCE})((viewport) => {
 		post({ type: "viewport-zoom", viewport });
 		lastHoverPath = null;
@@ -329,6 +382,7 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 			}
 		}
 		schedule();
+		scheduleFindRefresh();
 	}).observe(document.documentElement, {
 		subtree: true,
 		childList: true,
@@ -341,7 +395,21 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 		if (!data || data.channel !== HOST) return;
 		if (data.type === "enable-pinch-zoom" && event.source === parent) pinchZoom.enable();
 		if (data.type === "set-link-handling" && event.source === parent) handleLinks = Boolean(data.enabled);
-		if (data.type === "ready") post({ type: "ready" });
+		if (data.type === "ready") post({ type: "ready", features: FEATURES });
+		if (event.source === parent) {
+			if (data.type === "set-find-chords") {
+				findChords = new Set(Array.isArray(data.chords) ? data.chords.filter((chord) => typeof chord === "string") : []);
+			}
+			if (data.type === "find") {
+				restoreY = null;
+				find.search(data.query);
+			}
+			if (data.type === "find-step") {
+				restoreY = null;
+				find.step(Number(data.delta));
+			}
+			if (data.type === "find-clear") find.clear();
+		}
 		if (data.type === "set-mode") {
 			enabled = Boolean(data.enabled);
 			locked = Boolean(data.locked);
@@ -363,5 +431,5 @@ export const PAGE_COMMENTS_RUNTIME_SOURCE = `(() => {
 		}
 	});
 
-	post({ type: "ready" });
+	post({ type: "ready", features: FEATURES });
 })();`;

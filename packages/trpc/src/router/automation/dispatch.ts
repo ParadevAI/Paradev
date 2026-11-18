@@ -15,6 +15,7 @@ import { parseGitHubRemote } from "@superset/shared/github-remote";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 } from "@superset/shared/host-routing";
 import {
 	deduplicateBranchName,
@@ -38,6 +39,7 @@ import {
 	classifyDispatchError,
 	describeError,
 	nonForkPullRequest,
+	pinCreatedWorkspace,
 	previousRunSession,
 	type RunWorkspace,
 	replacePin,
@@ -80,6 +82,7 @@ export type DispatchableAutomation = Pick<
 	| "environmentId"
 	| "tags"
 	| "continueAgentSession"
+	| "reuseWorkspace"
 	| "machineSize"
 >;
 
@@ -248,6 +251,12 @@ export async function dispatchAutomation(
 				pullRequest,
 			});
 			placed({ v2WorkspaceId: created.workspaceId });
+			if (automation.reuseWorkspace) {
+				await pinCreatedWorkspace(automation.id, {
+					v2WorkspaceId: created.workspaceId,
+					targetHostId: host.machineId,
+				});
+			}
 			return created.workspaceId;
 		};
 
@@ -271,6 +280,7 @@ export async function dispatchAutomation(
 				agent: automation.agent,
 				prompt,
 				chat,
+				openTab: true,
 				// Only the pinned workspace holds that session; the stale-pin
 				// recovery below branches a fresh one, which has none.
 				...(previous && targetWorkspaceId === automation.v2WorkspaceId
@@ -584,7 +594,7 @@ async function createWorkspaceOnHost(args: {
 	pullRequest: number | null;
 }): Promise<{ workspaceId: string }> {
 	// Session automation: no project, no branch. The host allocates a managed
-	// folder under ~/.superset/sessions and dedupes the name per run.
+	// folder under ~/.paradev/sessions and dedupes the name per run.
 	if (args.projectId === null) {
 		const result = await relayMutation<
 			{ name: string; tags?: string[] },
@@ -694,7 +704,11 @@ async function createWorkspaceOnHost(args: {
 	return { workspaceId: result.workspace.id };
 }
 
-function relayHostCaller(options: RelayClientOptions): HostCaller {
+function relayHostCaller(relay: RelayClientOptions): HostCaller {
+	const options = {
+		...relay,
+		headers: { [SUPERSET_LAUNCH_SOURCE_HEADER]: "automation" },
+	};
 	return {
 		mutation: <TOutput>(procedure: string, input: object) =>
 			relayMutation<object, TOutput>(options, procedure, input),

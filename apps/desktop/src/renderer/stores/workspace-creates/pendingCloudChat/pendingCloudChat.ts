@@ -10,7 +10,8 @@ import {
 	type PaneViewerData,
 	PENDING_CLOUD_CHAT_PANE_KIND,
 	type PendingCloudChatPaneData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+	type TerminalPaneData,
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
@@ -42,8 +43,8 @@ export function seedPendingCloudChat({
 	modelId?: string | null;
 	modeId?: string | null;
 }): void {
-	if (launch?.surface !== "chat" || !launch.promptHash) return;
-	const existing = collections.v2WorkspaceLocalState.get(workspaceId)
+	if (launch?.surface !== "chat" || !launch.terminalId) return;
+	const existing = collections.workspaceLocalState.get(workspaceId)
 		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
 	if (existing?.tabs.length) return;
 	writeWorkspacePaneLayout(
@@ -66,7 +67,7 @@ export function seedPendingCloudChat({
 				data: {
 					draftId: crypto.randomUUID(),
 					agentId: launch.agent,
-					promptHash: launch.promptHash,
+					terminalId: launch.terminalId,
 					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
@@ -75,7 +76,7 @@ export function seedPendingCloudChat({
 		],
 	});
 	const { version, tabs, activeTabId } = store.getState();
-	collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+	collections.workspaceLocalState.update(workspaceId, (draft) => {
 		draft.paneLayout = { version, tabs, activeTabId };
 	});
 }
@@ -138,6 +139,32 @@ export function attachCloudChatSession(
 		...(data.launchPrompt ? { launchPrompt: data.launchPrompt } : {}),
 		...(session.title ? { chatTitle: session.title } : {}),
 	}));
+}
+
+export function attachCloudTerminal(
+	state: WorkspaceState<PaneViewerData>,
+	paneId: string,
+	terminalId: string,
+): WorkspaceState<PaneViewerData> {
+	return {
+		...state,
+		tabs: state.tabs.map((tab) => {
+			const pane = tab.panes[paneId];
+			if (pane?.kind !== PENDING_CLOUD_CHAT_PANE_KIND) return tab;
+			const { titleOverride: _waitingTitle, ...rest } = pane;
+			return {
+				...tab,
+				panes: {
+					...tab.panes,
+					[paneId]: {
+						...rest,
+						kind: "terminal",
+						data: { terminalId } satisfies TerminalPaneData,
+					},
+				},
+			};
+		}),
+	};
 }
 
 export function releasePendingCloudChat(

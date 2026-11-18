@@ -1,40 +1,11 @@
 import { isSupportedLocale } from "@superset/i18n";
-import { COMPANY } from "@superset/shared/constants";
 import { isProfileHandle } from "@superset/trpc/leaderboard-reserved-handles";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { canonicalPathname } from "@/lib/canonical-pathname";
-import { assignHeadlineVariant } from "@/lib/hero-headline-assignment";
-import { evaluateHeadlineVariant } from "@/lib/hero-headline-flags";
 
-export async function proxy(request: NextRequest) {
-	const response = route(request);
-	if (
-		!isHomepage(request.nextUrl.pathname) ||
-		response?.headers.has("location")
-	) {
-		return response;
-	}
-	const homepage = response ?? NextResponse.next();
-	await assignHeadlineVariant(request, homepage, {
-		isProductionHost: isProductionHost(request),
-		evaluate: evaluateHeadlineVariant,
-	});
-	return homepage;
-}
-
-function isHomepage(pathname: string): boolean {
-	const [, first = "", ...rest] = pathname.split("/");
-	return rest.length === 0 && (first === "" || isSupportedLocale(first));
-}
-
-function isProductionHost(request: NextRequest): boolean {
-	const productionHost = new URL(COMPANY.MARKETING_URL).hostname;
-	const { hostname } = request.nextUrl;
-	return (
-		process.env.NODE_ENV === "production" &&
-		(hostname === productionHost || hostname === `www.${productionHost}`)
-	);
+export function proxy(request: NextRequest) {
+	return route(request);
 }
 
 /**

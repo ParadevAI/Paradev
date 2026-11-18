@@ -11,7 +11,7 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { mintSandboxGateAccess } from "@superset/trpc/lib/sandbox/access";
 import { Sandbox } from "@vercel/sandbox";
 
@@ -32,6 +32,9 @@ export interface ProbeArgs {
 	gate?: { workspaceId: string; userId: string } | null;
 	log: (line: string) => void;
 }
+
+/** host-service answers before the boot's remaining steps finish; their end is `steps.end`. */
+const currentBootHasStepsEnd = `awk '/ boot\\.start/ { done = 0 } / steps\\.end/ { done = 1 } END { print done ? "steps done" : "steps running" }' ${SANDBOX_PATHS.bootLog}`;
 
 export async function probeBox(args: ProbeArgs): Promise<number> {
 	const { log } = args;
@@ -87,6 +90,12 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		})) === 200,
 	);
 
+	await until(
+		"boot: the steps after host-service finished",
+		currentBootHasStepsEnd,
+		/steps done/,
+		300,
+	);
 	const bootLog = await run(`cat ${SANDBOX_PATHS.bootLog}`);
 	check(
 		"boot: host-service ready",
@@ -219,7 +228,7 @@ export async function checkWakeLog(args: {
 	});
 	const result = await sandbox.runCommand("bash", [
 		"-lc",
-		`cat ${SANDBOX_PATHS.bootLog}`,
+		`for i in $(seq 1 150); do ${currentBootHasStepsEnd} | grep -q 'steps done' && break; sleep 2; done; cat ${SANDBOX_PATHS.bootLog}`,
 	]);
 	const text = await result.stdout();
 	const boots = text.split(/(?=^\d+ boot\.start)/m);
