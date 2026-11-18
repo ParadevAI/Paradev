@@ -4,6 +4,8 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { useCallback } from "react";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
+import { dedupeUsageAccounts } from "./utils/dedupeUsageAccounts";
+
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 export type UsageAccount = RouterOutputs["usage"]["quota"][number];
 export type UsageQuotaWindow = UsageAccount["windows"][number];
@@ -24,6 +26,7 @@ export function useHostUsageQuota(hostUrl: string | null) {
 
 	const query = useQuery({
 		queryKey,
+		select: dedupeUsageAccounts,
 		enabled: !!hostUrl,
 		queryFn: () => {
 			if (!hostUrl) return [] as UsageAccount[];
