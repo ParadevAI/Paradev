@@ -37,10 +37,9 @@ export interface WatchSandboxExpiryInput {
 export async function recordSandboxAwake(
 	cloudWorkspaceId: string,
 	session: { expiresAt: Date; sessionId: string | null },
-	organizationId?: string,
 ): Promise<void> {
 	await markAwake(cloudWorkspaceId, session).catch((error) =>
-		reportSleepWriteFailure(cloudWorkspaceId, error, organizationId),
+		reportSleepWriteFailure(cloudWorkspaceId, error),
 	);
 }
 
@@ -91,11 +90,10 @@ async function markAwake(
 		return;
 	}
 	nudge(woke.organizationId, "cloud_workspaces");
-	logControl(
-		"workspace.awake",
-		{ cloudWorkspaceId, organizationId: woke.organizationId },
-		{ "sandbox.session_id": sessionId ?? undefined },
-	);
+	logControl("workspace.awake", {
+		cloudWorkspaceId,
+		organizationId: woke.organizationId,
+	});
 	await queueWatch(cloudWorkspaceId, expiresAt);
 }
 
@@ -126,7 +124,6 @@ export async function watchSandboxExpiry({
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 		columns: {
-			organizationId: true,
 			providerSandboxId: true,
 			sandboxExpiresAt: true,
 			sandboxSessionId: true,
@@ -142,23 +139,15 @@ export async function watchSandboxExpiry({
 		throw error;
 	});
 	if (live?.expiresAt && live.expiresAt.getTime() > Date.now()) {
-		await recordSandboxAwake(
-			cloudWorkspaceId,
-			{
-				expiresAt: live.expiresAt,
-				sessionId: live.sessionId,
-			},
-			row.organizationId,
-		);
+		await recordSandboxAwake(cloudWorkspaceId, {
+			expiresAt: live.expiresAt,
+			sessionId: live.sessionId,
+		});
 		return "rewatched";
 	}
-	await recordSandboxAsleep(
-		cloudWorkspaceId,
-		{
-			sessionId: live?.sessionId ?? row.sandboxSessionId,
-		},
-		row.organizationId,
-	);
+	await recordSandboxAsleep(cloudWorkspaceId, {
+		sessionId: live?.sessionId ?? row.sandboxSessionId,
+	});
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
 }
@@ -176,7 +165,6 @@ export async function syncSandboxExpiries(
 	const rows = await db
 		.select({
 			id: cloudWorkspaces.id,
-			organizationId: cloudWorkspaces.organizationId,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 		})
 		.from(cloudWorkspaces)
@@ -192,14 +180,10 @@ export async function syncSandboxExpiries(
 		if (!listed) continue;
 		const { expiresAt, sessionId } = listed;
 		if (expiresAt && expiresAt.getTime() > now) {
-			await recordSandboxAwake(
-				row.id,
-				{ expiresAt, sessionId },
-				row.organizationId,
-			);
+			await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			await queueWatch(row.id, expiresAt);
 		} else if (sessionId) {
-			await recordSandboxAsleep(row.id, { sessionId }, row.organizationId);
+			await recordSandboxAsleep(row.id, { sessionId });
 		}
 	}
 }

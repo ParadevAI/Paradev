@@ -104,11 +104,7 @@ const input = {
 };
 const SEVEN_DAYS = 7 * 24 * 60 * 60;
 
-const BOX = {
-	organizationId: "org_1",
-	providerSandboxId: "ws-box",
-	sandboxSessionId: "session_1",
-};
+const BOX = { providerSandboxId: "ws-box", sandboxSessionId: "session_1" };
 
 describe("queueReap", () => {
 	beforeEach(() => {

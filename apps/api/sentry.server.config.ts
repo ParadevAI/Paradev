@@ -32,6 +32,5 @@ Sentry.init({
 			? null
 			: event,
 	sendDefaultPii: true,
-	enableLogs: true,
 	debug: false,
 });
