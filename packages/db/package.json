@@ -12,6 +12,14 @@
 			"types": "./src/client.ts",
 			"default": "./src/client.ts"
 		},
+		"./cloud-usage-query": {
+			"types": "./src/cloud-usage-query.ts",
+			"default": "./src/cloud-usage-query.ts"
+		},
+		"./cloud-usage-schemas": {
+			"types": "./src/cloud-usage-schemas.ts",
+			"default": "./src/cloud-usage-schemas.ts"
+		},
 		"./enums": {
 			"types": "./src/schema/enums.ts",
 			"default": "./src/schema/enums.ts"
@@ -54,6 +62,7 @@
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@electric-sql/pglite": "0.5.16",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
 		"bun-types": "1.4.3",
