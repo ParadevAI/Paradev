@@ -7,7 +7,13 @@
  *  resolver caching, and priority ordering.
  *--------------------------------------------------------------------------------------------*/
 
-import type { ILinkHandler, Terminal as XTerm } from "@xterm/xterm";
+import type {
+	IBufferRange,
+	ILink,
+	ILinkHandler,
+	ILinkProvider,
+	Terminal as XTerm,
+} from "@xterm/xterm";
 import type { DetectedLink } from "./links";
 import {
 	LinkDetectorAdapter,
@@ -52,13 +58,27 @@ export interface TerminalLinkHandlers {
 	stat?: StatCallback;
 }
 
-function fileUriPath(uri: string): string | null {
+function normalizedFileUrl(uri: string): string | null {
 	try {
 		const url = new URL(uri);
-		return url.protocol === "file:" ? decodeURIComponent(url.pathname) : null;
+		return url.protocol === "file:" ? url.href : null;
 	} catch {
 		return null;
 	}
+}
+
+function comparePositions(
+	a: IBufferRange["start"],
+	b: IBufferRange["start"],
+): number {
+	return a.y - b.y || a.x - b.x;
+}
+
+function rangesOverlap(a: IBufferRange, b: IBufferRange): boolean {
+	return (
+		comparePositions(a.start, b.end) <= 0 &&
+		comparePositions(b.start, a.end) <= 0
+	);
 }
 
 function fileLink(
@@ -96,6 +116,7 @@ export class TerminalLinkManager {
 	private _handlers: TerminalLinkHandlers | null = null;
 	private _oscLinkHandler: ILinkHandler | null = null;
 	private _hoverRequest = 0;
+	private _textProviders: ILinkProvider[] = [];
 
 	constructor(private readonly _terminal: XTerm) {}
 
@@ -129,6 +150,21 @@ export class TerminalLinkManager {
 		this._handlers = null;
 	}
 
+	private async _textLinkUnder(
+		range: IBufferRange,
+	): Promise<ILink | undefined> {
+		for (const provider of this._textProviders) {
+			const links = await new Promise<ILink[] | undefined>((resolve) =>
+				provider.provideLinks(range.start.y, resolve),
+			);
+			const link = links?.find((candidate) =>
+				rangesOverlap(candidate.range, range),
+			);
+			if (link) return link;
+		}
+		return undefined;
+	}
+
 	private _clearOscLinkHandler(): void {
 		if (this._terminal.options.linkHandler === this._oscLinkHandler) {
 			this._terminal.options.linkHandler = null;
@@ -139,10 +175,12 @@ export class TerminalLinkManager {
 	private _register(): void {
 		const handlers = this._handlers;
 		if (!handlers?.stat) return;
+		this._hoverRequest++;
 
 		// Dispose old providers to prevent duplicates
 		for (const d of this._disposables) d.dispose();
 		this._disposables = [];
+		this._textProviders = [];
 		this._clearOscLinkHandler();
 
 		// Reuse resolver to preserve stat cache across re-registrations.
@@ -172,6 +210,7 @@ export class TerminalLinkManager {
 			onLinkLeave,
 		);
 		this._disposables.push(this._terminal.registerLinkProvider(adapter));
+		this._textProviders.push(adapter);
 
 		// 2. URL link provider (handles terminal-wrapped URLs)
 		if (handlers.onUrlClick) {
@@ -187,6 +226,7 @@ export class TerminalLinkManager {
 				onLinkLeave,
 			);
 			this._disposables.push(this._terminal.registerLinkProvider(urlProvider));
+			this._textProviders.push(urlProvider);
 
 			// xterm always registers its own OSC 8 hyperlink provider first. Without
 			// this, OSC 8 links use xterm's default confirm() + window.open() path,
@@ -203,37 +243,51 @@ export class TerminalLinkManager {
 			const activeProtocols = [...webProtocols, ...extraProtocols];
 			const resolver = this._resolver;
 			const onFileLinkClick = handlers.onFileLinkClick;
-			this._hoverRequest++;
 			// xterm drops non-http(s) OSC 8 links unless this is true, and then
 			// hands every scheme to activate/hover, so those filter them again.
-			// Its OSC provider also runs before ours, so a kept file: link must
-			// do what the path detector under it did. Hover stays off for the
-			// extra schemes: it feeds the URL hint and the "Open in" menu.
+			// Its OSC provider also runs before ours, so an OSC link we do not
+			// open as a URL defers to the text link under it, then to its file:
+			// target. Hover stays off for the extra schemes: it feeds the URL
+			// hint and the "Open in" menu.
 			this._oscLinkHandler = {
 				allowNonHttpProtocols: extraProtocols.length > 0,
-				activate: (event, uri) => {
-					const path = fileUriPath(uri);
-					if (path !== null) {
-						if (!onFileLinkClick) return;
-						void resolver.resolveLink(path).then((resolved) => {
-							if (!resolved || !this._handlers) return;
-							onFileLinkClick(event, fileLink(uri, resolved));
-						});
+				activate: (event, uri, range) => {
+					if (hasProtocol(uri, activeProtocols)) {
+						onUrlClick(event, uri);
 						return;
 					}
-					if (hasProtocol(uri, activeProtocols)) onUrlClick(event, uri);
+					void this._textLinkUnder(range).then(async (textLink) => {
+						if (!this._handlers) return;
+						if (textLink) {
+							textLink.activate(event, textLink.text);
+							return;
+						}
+						const fileUrl = normalizedFileUrl(uri);
+						if (!fileUrl || !onFileLinkClick) return;
+						const resolved = await resolver.resolveLink(fileUrl);
+						if (!resolved || !this._handlers) return;
+						onFileLinkClick(event, fileLink(uri, resolved));
+					});
 				},
 				hover: onLinkHover
-					? (event, uri) => {
+					? (event, uri, range) => {
 							const request = ++this._hoverRequest;
 							if (hasProtocol(uri, webProtocols)) {
 								onLinkHover(event, { kind: "url", url: uri });
 								return;
 							}
-							const path = fileUriPath(uri);
-							if (path === null) return;
-							void resolver.resolveLink(path).then((resolved) => {
-								if (!resolved || request !== this._hoverRequest) return;
+							if (hasProtocol(uri, extraProtocols)) return;
+							const isCurrent = () => request === this._hoverRequest;
+							void this._textLinkUnder(range).then(async (textLink) => {
+								if (!isCurrent()) return;
+								if (textLink) {
+									textLink.hover?.(event, textLink.text);
+									return;
+								}
+								const fileUrl = normalizedFileUrl(uri);
+								if (!fileUrl) return;
+								const resolved = await resolver.resolveLink(fileUrl);
+								if (!resolved || !isCurrent()) return;
 								onLinkHover(event, {
 									kind: "file",
 									isDirectory: resolved.isDirectory,
@@ -285,6 +339,7 @@ export class TerminalLinkManager {
 				onLinkLeave,
 			);
 			this._disposables.push(this._terminal.registerLinkProvider(wordDetector));
+			this._textProviders.push(wordDetector);
 		}
 	}
 }

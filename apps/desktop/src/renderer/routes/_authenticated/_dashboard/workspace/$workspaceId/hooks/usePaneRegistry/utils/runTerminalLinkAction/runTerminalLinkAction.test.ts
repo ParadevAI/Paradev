@@ -234,7 +234,7 @@ describe("workspace links", () => {
 		`/workspaces/${WORKSPACE_ID}`,
 		env.NEXT_PUBLIC_WEB_URL,
 	).toString();
-	const click = { metaKey: false, ctrlKey: false, shiftKey: false };
+	const click = { metaKey: false, ctrlKey: false, shiftKey: false, button: 0 };
 	const shift = { ...click, shiftKey: true };
 	const meta = { ...click, metaKey: true };
 	const ctrl = { ...click, ctrlKey: true };
@@ -249,6 +249,15 @@ describe("workspace links", () => {
 		["cmd-shift-click", metaShift],
 	])("switches to the workspace of a deep link on %s", (_name, event) => {
 		expect(terminalWorkspaceLinkTarget(event, DEEP_LINK)).toBe(WORKSPACE_ID);
+	});
+
+	it.each([
+		["a deep link", DEEP_LINK],
+		["a web link", WEB_LINK],
+	])("ignores a right-click on %s", (_name, url) => {
+		expect(
+			terminalWorkspaceLinkTarget({ ...click, button: 2 }, url),
+		).toBeNull();
 	});
 
 	it("switches to the workspace of a web link on a plain click", () => {

@@ -63,13 +63,15 @@ export function isAppDeepLink(url: string): boolean {
 
 /**
  * The workspace a terminal click should switch to, or null to treat the link
- * as a URL. The app's deep link opens on every click; the web form only on a
- * plain click, so its modifier clicks keep their URL shortcuts.
+ * as a URL. Only the primary button switches: xterm activates links on any
+ * mouseup. The app's deep link opens on every such click; the web form only
+ * on a plain click, so its modifier clicks keep their URL shortcuts.
  */
 export function terminalWorkspaceLinkTarget(
-	event: ModifierEvent,
+	event: ModifierEvent & { button: number },
 	url: string,
 ): string | null {
+	if (event.button !== 0) return null;
 	const workspaceId = parseWorkspaceLink(url);
 	if (!workspaceId) return null;
 	if (isAppDeepLink(url)) return workspaceId;
