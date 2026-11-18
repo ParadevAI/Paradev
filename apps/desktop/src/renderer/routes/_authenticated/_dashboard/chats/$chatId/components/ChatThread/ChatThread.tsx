@@ -113,7 +113,7 @@ export function ChatThread({
 				nearBottom.current =
 					el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX;
 			}}
-			className="min-h-0 flex-1 overflow-y-auto pb-3"
+			className="min-h-0 flex-1 overflow-y-auto pb-7 [mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-28px),transparent)]"
 		>
 			<div className="mx-auto w-full max-w-[720px]">
 				{older.hasMore ? (
