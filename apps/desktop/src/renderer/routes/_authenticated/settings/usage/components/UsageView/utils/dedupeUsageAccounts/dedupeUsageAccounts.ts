@@ -1,4 +1,4 @@
-import type { UsageAccount } from "../../useHostUsageQuota";
+import type { UsageAccount } from "renderer/hooks/host-service/useHostUsageQuota";
 
 export function dedupeUsageAccounts(accounts: UsageAccount[]): UsageAccount[] {
 	const unique = new Map<string, UsageAccount>();
@@ -14,10 +14,9 @@ export function dedupeUsageAccounts(accounts: UsageAccount[]): UsageAccount[] {
 		const previous = unique.get(key);
 		if (
 			!previous ||
-			account.isDefault ||
-			(!previous.isDefault &&
-				account.status === "ok" &&
-				previous.status !== "ok")
+			(account.isDefault === previous.isDefault
+				? account.status === "ok" && previous.status !== "ok"
+				: account.isDefault)
 		) {
 			unique.set(key, account);
 		}

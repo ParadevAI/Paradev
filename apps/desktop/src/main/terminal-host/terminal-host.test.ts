@@ -489,3 +489,63 @@ it("disposes a command canceled after attachment but before publication", async 
 		await session?.dispose();
 	}
 });
+
+it("canceled startup cannot remove the replacement session", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	let ready!: () => void;
+	let started!: () => void;
+	const pending = new Promise<void>((resolve) => {
+		ready = resolve;
+	});
+	const spawning = new Promise<void>((resolve) => {
+		started = resolve;
+	});
+	let count = 0;
+	let disposed = false;
+	let written = false;
+	const host = new TerminalHost({
+		createSession: () => {
+			const first = count++ === 0;
+			return {
+				onExit: () => {},
+				attach: async () => ({}),
+				spawn: () => {
+					if (first) started();
+				},
+				waitForReady: () => (first ? pending : Promise.resolve()),
+				isAlive: true,
+				isAttachable: true,
+				pid: 1,
+				clientCount: 1,
+				dispose: async () => {
+					if (first) disposed = true;
+				},
+				write: () => {
+					if (!first) written = true;
+				},
+			} as unknown as InstanceType<typeof Session>;
+		},
+	});
+	const socket = {} as import("node:net").Socket;
+	const request = {
+		sessionId: "replaced-command",
+		paneId: "pane",
+		tabId: "tab",
+		workspaceId: "workspace",
+		cols: 80,
+		rows: 24,
+		command: "login",
+	};
+	const original = host.createOrAttach(socket, {
+		...request,
+		requestId: "first",
+	});
+	const rejected = original.catch((error: unknown) => error);
+	await spawning;
+	await host.createOrAttach(socket, { ...request, requestId: "second" });
+	ready();
+	expect(await rejected).toBeInstanceOf(Error);
+	host.write({ sessionId: request.sessionId, data: "still attached" });
+	expect(disposed).toBe(true);
+	expect(written).toBe(true);
+});

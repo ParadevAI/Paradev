@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { UsageAccount } from "../../useHostUsageQuota";
+import type { UsageAccount } from "renderer/hooks/host-service/useHostUsageQuota";
 import { dedupeUsageAccounts } from "./dedupeUsageAccounts";
 
 function account(
@@ -51,4 +51,14 @@ test("keep separate organizations, unknown identities, API profiles and signed-o
 		account("codex", { agent: "codex" }),
 	];
 	expect(dedupeUsageAccounts(accounts)).toEqual(accounts);
+});
+
+test("readable quota wins when both duplicates are default", () => {
+	const live = account("live", { isDefault: true });
+	const expired = account("expired", {
+		isDefault: true,
+		status: "token_expired",
+	});
+	expect(dedupeUsageAccounts([live, expired])).toEqual([live]);
+	expect(dedupeUsageAccounts([expired, live])).toEqual([live]);
 });

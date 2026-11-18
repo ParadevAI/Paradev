@@ -203,7 +203,9 @@ export class TerminalHost {
 				(this.sessions.get(sessionId) !== session || session.clientCount === 0)
 			) {
 				void session.dispose();
-				this.sessions.delete(sessionId);
+				if (this.sessions.get(sessionId) === session) {
+					this.sessions.delete(sessionId);
+				}
 			}
 			throw error;
 		} finally {
