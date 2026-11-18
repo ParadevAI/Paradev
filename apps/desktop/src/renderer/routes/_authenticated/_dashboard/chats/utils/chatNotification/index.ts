@@ -1,1 +1,6 @@
-export { chatNotification } from "./chatNotification";
+export {
+	type Attention,
+	chatNotification,
+	chatNotificationGroup,
+	chatOfReplyTarget,
+} from "./chatNotification";
