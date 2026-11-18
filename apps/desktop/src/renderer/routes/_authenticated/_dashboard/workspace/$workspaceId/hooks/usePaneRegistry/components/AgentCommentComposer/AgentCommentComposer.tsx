@@ -1,7 +1,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import { cn } from "@superset/ui/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { LuCornerDownLeft, LuLoaderCircle } from "react-icons/lu";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
@@ -26,6 +26,7 @@ interface AgentCommentComposerProps {
 	placeholder?: string;
 	submitLabel?: string;
 	comment: string;
+	submitting: boolean;
 	onCommentChange: (comment: string) => void;
 	onCancel: () => void;
 	onSubmit: (input: {
@@ -41,6 +42,7 @@ export function AgentCommentComposer({
 	placeholder,
 	submitLabel,
 	comment,
+	submitting,
 	onCommentChange,
 	onCancel,
 	onSubmit,
@@ -74,7 +76,6 @@ export function AgentCommentComposer({
 		preferredTerminalId,
 	});
 
-	const [submitting, setSubmitting] = useState(false);
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 	useEffect(() => {
@@ -90,7 +91,6 @@ export function AgentCommentComposer({
 
 	const handleSubmit = async () => {
 		if (!canSubmit || !resolved) return;
-		setSubmitting(true);
 		try {
 			await onSubmit({ comment: comment.trim(), target: resolved });
 		} catch (error) {
@@ -98,8 +98,6 @@ export function AgentCommentComposer({
 			// DiffPane's submit path). Catch here so a rejection doesn't leak
 			// as an unhandled promise out of the form's synchronous handlers.
 			console.error("[AgentCommentComposer] submit failed", error);
-		} finally {
-			setSubmitting(false);
 		}
 	};
 

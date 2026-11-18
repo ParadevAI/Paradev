@@ -69,6 +69,7 @@ interface UseDiffCommentComposerResult {
 		DiffLineAnnotation<DiffAnnotationMetadata>[]
 	> | null;
 	comment: string;
+	submitting: boolean;
 	setComment: (comment: string) => void;
 	onLineSelectionEnd: OnLineSelectionEnd;
 	onGutterUtilityClick: () => void;
@@ -95,6 +96,10 @@ export function useDiffCommentComposer({
 	const { t } = useLingui();
 	const [composer, setComposer] = useState<ComposerState | null>(null);
 	const [comment, setComment] = useState("");
+	const pendingComposers = useRef(new Set<ComposerState>());
+	const [pending, setPending] = useState<ReadonlySet<ComposerState>>(
+		() => new Set(),
+	);
 	const composerRef = useRef(composer);
 	composerRef.current = composer;
 	const { send: sendToTerminalAgent } = useSendToTerminalAgent();
@@ -161,7 +166,7 @@ export function useDiffCommentComposer({
 	const submit = useCallback(
 		async (input: DiffCommentSubmitInput) => {
 			const submitted = composer;
-			if (!submitted) return;
+			if (!submitted || pendingComposers.current.has(submitted)) return;
 			const file = getFile(submitted.itemId);
 			if (!file) return;
 
@@ -175,37 +180,44 @@ export function useDiffCommentComposer({
 				},
 			});
 
-			if (input.target.kind === "new") {
-				if (!onCreateNewAgentSession) {
-					toast.error(
-						t({
-							message: "Couldn't start a new agent session",
-						}),
-					);
+			pendingComposers.current.add(submitted);
+			setPending(new Set(pendingComposers.current));
+			try {
+				if (input.target.kind === "new") {
+					if (!onCreateNewAgentSession) {
+						toast.error(
+							t({
+								message: "Couldn't start a new agent session",
+							}),
+						);
+						return;
+					}
+					// Host bakes the prompt into the launch command (argv/stdin per
+					// the agent config), so no follow-up send here.
+					const result = await onCreateNewAgentSession({
+						configId: input.target.configId,
+						placement: input.target.placement,
+						prompt: text,
+					});
+					if (result) clearIfStillCurrent(submitted);
 					return;
 				}
-				// Host bakes the prompt into the launch command (argv/stdin per
-				// the agent config), so no follow-up send here.
-				const result = await onCreateNewAgentSession({
-					configId: input.target.configId,
-					placement: input.target.placement,
-					prompt: text,
-				});
-				if (result) clearIfStillCurrent(submitted);
-				return;
-			}
 
-			try {
-				await sendToTerminalAgent({
-					workspaceId,
-					terminalId: input.target.terminalId,
-					text,
-					submit: true,
-				});
-				clearIfStillCurrent(submitted);
-			} catch {
-				// Toast surfaced by the hook; keep composer open so the user
-				// can retry or edit.
+				try {
+					await sendToTerminalAgent({
+						workspaceId,
+						terminalId: input.target.terminalId,
+						text,
+						submit: true,
+					});
+					clearIfStillCurrent(submitted);
+				} catch {
+					// Toast surfaced by the hook; keep composer open so the user
+					// can retry or edit.
+				}
+			} finally {
+				pendingComposers.current.delete(submitted);
+				setPending(new Set(pendingComposers.current));
 			}
 		},
 		[
@@ -222,6 +234,7 @@ export function useDiffCommentComposer({
 	return {
 		composerAnnotationsByItemId,
 		comment,
+		submitting: composer !== null && pending.has(composer),
 		setComment,
 		onLineSelectionEnd,
 		onGutterUtilityClick,
