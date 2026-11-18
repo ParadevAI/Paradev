@@ -210,6 +210,9 @@ export async function githubUserConnectionFor(userId: string): Promise<{
  * A usable token for the person, refreshed when it is near expiry. Refreshing
  * rotates the refresh token, so two wakes refreshing at once would lock one
  * out: the refresh runs under a per-user lock and re-reads the row inside it.
+ * It also revokes the old access token, which every box the person created
+ * carries in its firewall rules, so those boxes get the new one before this
+ * returns.
  * A connection GitHub no longer honours is removed, and the caller falls back
  * to the App's token.
  */
@@ -226,7 +229,9 @@ export async function githubUserTokenFor(
 	if (!row) return null;
 	if (fresh(row))
 		return open(row.encryptedAccessToken, tokenAad(userId, "access"));
-	return withConnectionLock(`github-user:${userId}`, async (tx) => {
+	const lock = `github-user:${userId}`;
+	let refreshed = false;
+	const token = await withConnectionLock(lock, async (tx) => {
 		const [current] = await tx
 			.select()
 			.from(githubUserConnections)
@@ -248,6 +253,7 @@ export async function githubUserTokenFor(
 				.update(githubUserConnections)
 				.set(tokenColumns(userId, tokens))
 				.where(eq(githubUserConnections.userId, userId));
+			refreshed = true;
 			return tokens.access_token;
 		} catch (error) {
 			if (
@@ -269,6 +275,14 @@ export async function githubUserTokenFor(
 			return null;
 		}
 	});
+	if (refreshed) {
+		// Imported here because the box's claim reads this token: a static import is a cycle.
+		const { reapplyRulesOfBoxesCreatedBy } = await import(
+			"../sandbox/refresh-credentials"
+		);
+		await reapplyRulesOfBoxesCreatedBy(userId);
+	}
+	return token;
 }
 
 /** Removes the connection and revokes the grant, so GitHub forgets it too. */

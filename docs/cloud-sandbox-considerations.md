@@ -103,8 +103,24 @@ sandbox to read — including an agent that followed a prompt injection. The
 token is now a firewall header rule like the model keys (`Basic` for
 `github.com`, `Bearer` for `api.github.com` and `uploads.github.com`), the
 clone URL carries nothing, and the box holds only a `GH_TOKEN` placeholder so
-`gh` is willing to call. The rule is re-minted on every wake and every
-`access` keepalive, so a rule's token is never older than one keepalive.
+`gh` is willing to call. The rule is re-minted on every wake, every 30
+minutes by the box's host-service (`startSandboxCredentialRefresh`), and on
+every awake box of a person when their GitHub user token is refreshed, because
+the refresh revokes the old one.
+
+**A box's processes can read its host secret. Open.** host-service and the
+agents run as the same user (`ubuntu`), so anything in the box can read
+`HOST_SERVICE_SECRET` from `/proc/<host-service pid>/environ`. That secret is
+what host-service presents to the API for credential refresh, agent status and
+box pressure, and what the gate presents to host-service. A prompt-injected
+agent holds it. Closing it means running host-service as its own user, or
+moving those reports to the firewall-added workspace credential.
+
+**An agent cannot ask for fresh GitHub rules itself. Open (follow-up).** After a
+401, an agent waits for the next 30-minute refresh or a sleep and wake. A
+box-authenticated `sandbox.refreshCredentials` procedure, reachable as a
+`superset` CLI command, would re-apply the rules of that one box. It gives the
+box nothing new: the token still never enters it.
 
 **A visitor acts on GitHub as the workspace's creator. Accepted (multiplayer).**
 Any member of the organization can open any cloud workspace; that is the

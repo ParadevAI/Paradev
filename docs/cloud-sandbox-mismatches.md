@@ -360,6 +360,28 @@ asked to connect GitHub; the organization's App installation is not a
 fallback, because its rate limit is shared by everything the organization
 runs.
 
+**A person's GitHub token is shared by every box they created, and a refresh
+revokes it for all of them. Fixed (2026-11-18).** On a machine someone owns,
+`gh` and git hold their own token. A box holds none: `GH_TOKEN` is the fixed
+placeholder, git has no credential helper, and the firewall adds the token on
+`github.com`, `api.github.com` and `uploads.github.com`. A creator who connected
+GitHub gets their own 8-hour user token in that rule, the same one in every box
+they made. `githubUserTokenFor` refreshes it 15 minutes before expiry, and
+GitHub then revokes the old access token at once. Before the fix, every other
+box kept the revoked token until its own 30-minute refresh (host-service
+`startSandboxCredentialRefresh`), so agents saw `gh` answer 401 "Bad
+credentials" and `git push` answer "Invalid username or token". An agent
+told not to retry never saw it recover, and a sleep and wake looked like the
+only fix. **What we did:** after a refresh, `githubUserTokenFor` re-applies the
+rules of every awake box of that person (`reapplyRulesOfBoxesCreatedBy`)
+before it returns. A wake whose rule update fails now retries once and reports
+to Sentry, where before it logged and carried on with the old rules. **Trap
+for the next diagnosis:** "`GH_TOKEN` is invalid" is always true in a box, and
+a login shell without it has no token by design; neither says anything about
+GitHub access. Check with `gh api -i /rate_limit` (the
+`Github-Authentication-Token-Expiration` header) or `git ls-remote`. A running
+process never needs a new variable: the next request carries the new rule.
+
 ## Runtime environment
 
 **No login shell, no rc files, and the variables are not in the process env.**

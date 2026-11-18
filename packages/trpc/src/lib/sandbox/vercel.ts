@@ -563,17 +563,18 @@ export async function wakeSandbox(args: {
 		// A box that is already serving needs neither a fresh identity file nor
 		// another boot. The policy still goes out: a credential may have aged.
 		const serving = wasRunning && (await hostServiceAnswers(hostTarget));
+		const applyPolicy = () =>
+			sandbox.update({ networkPolicy: args.claim.networkPolicy });
 		await Sentry.startSpan(
 			{ name: "apply claim", op: "sandbox.provider" },
 			() =>
 				Promise.all([
-					sandbox
-						.update({ networkPolicy: args.claim.networkPolicy })
+					applyPolicy()
+						.catch(applyPolicy)
 						.catch((error) =>
-							console.warn(
-								`[sandbox] policy update failed for ${args.providerSandboxId}`,
-								error,
-							),
+							Sentry.captureException(error, {
+								tags: { "sandbox.provider_id": args.providerSandboxId },
+							}),
 						),
 					serving ? null : writeIdentity(sandbox, args.claim.identity),
 					writeSignInFiles(sandbox, args.claim.files),

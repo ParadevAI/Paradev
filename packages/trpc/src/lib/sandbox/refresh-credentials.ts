@@ -8,6 +8,7 @@
  */
 
 import { timingSafeEqual } from "node:crypto";
+import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, inArray, isNull } from "drizzle-orm";
@@ -46,6 +47,25 @@ export function awakeBoxesCreatedBy(
 				isNull(cloudWorkspaces.deletedAt),
 			),
 		);
+}
+
+/** One box that cannot take the new rules keeps its old ones until its own refresh; the rest still get theirs. */
+export async function reapplyRulesOfBoxesCreatedBy(
+	userId: string,
+): Promise<void> {
+	const boxes = await awakeBoxesCreatedBy([userId]);
+	await Promise.all(
+		boxes.map((row) =>
+			reapplySandboxRules(row).catch((error) => {
+				Sentry.captureException(error, {
+					tags: {
+						"cloud_workspace.id": row.id,
+						"organization.id": row.organizationId,
+					},
+				});
+			}),
+		),
+	);
 }
 
 export async function refreshSandboxCredentials(args: {
