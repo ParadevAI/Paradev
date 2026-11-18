@@ -794,6 +794,8 @@ async function fleetBoots(db: Db, scope: Scope, options: BootReadOptions) {
 			},
 			activeCpuMs: boots.activeCpuMs,
 			egressBytes: boots.egressBytes,
+			phases: boots.phases,
+			traceId: boots.traceId,
 		})
 		.from(boots)
 		.leftJoin(organizations, eq(organizations.id, boots.organizationId))
@@ -817,7 +819,7 @@ export type CloudFleetBootsResult = Awaited<ReturnType<typeof fleetBoots>>;
 
 /**
  * `listCloudBoots` across organizations (`organizationId: null`), for some or for one, with the
- * organization, active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
+ * organization, active CPU, egress, phases and trace id of each boot. Staff only, like `queryFleetCloudUsage`.
  */
 export function listFleetCloudBoots(
 	db: Db,

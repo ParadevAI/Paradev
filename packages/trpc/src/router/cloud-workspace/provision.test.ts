@@ -6,6 +6,7 @@ import { userError } from "../../i18n-error";
 import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as chatMoves from "../chat-move/utils/queueChatMove";
+import * as meter from "./meter";
 import { provisionCloudWorkspace } from "./provision";
 
 const logged: unknown[] = [];
@@ -126,5 +127,74 @@ describe("a provision whose row another write already moved", () => {
 		);
 		expect(logged).toEqual([]);
 		expect(captured).toEqual([]);
+	});
+});
+
+describe("a provision whose host answered", () => {
+	const authorized: { traceId: string; transactionTraceId?: string }[] = [];
+	const sets: Record<string, unknown>[] = [];
+	const at = 1_789_000_000_000;
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({
+			claim: { vcpus: 4 },
+			environment: {},
+			agentCredentialDigest: "digest",
+		}),
+		provisionSandbox: async () => ({
+			providerSandboxId: "ws-box",
+			sandboxUrl: "https://box.test",
+			hostTarget: "https://box.test",
+			expiresAt: null,
+			sessionId: "sess_1",
+		}),
+		settleSandbox: async () => ({
+			stamps: [
+				{ phase: "boot.start", at },
+				{ phase: "host.ready", at: at + 700 },
+			],
+			answeredAt: at + 750,
+		}),
+	});
+	stub(meter, {
+		authorizeBoot: async (args: { traceId: string }) => {
+			const active = Sentry.getActiveSpan();
+			const transaction = active && Sentry.getRootSpan(active);
+			authorized.push({
+				traceId: args.traceId,
+				transactionTraceId: transaction?.spanContext().traceId,
+			});
+			return { bootId: "boot_1" };
+		},
+		attachBootSession: async () => {},
+	});
+	stub(chatMoves, { queueChatMovesTo: async () => {} });
+	stub(db, {
+		update: () => ({
+			set: (values: Record<string, unknown>) => {
+				sets.push(values);
+				return {
+					where: () =>
+						Object.assign(Promise.resolve([]), {
+							returning: async () => [{ id: "ws_1" }],
+						}),
+				};
+			},
+		}),
+	});
+
+	test("authorizes the boot with the provision's trace id and stores the box's phases", async () => {
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"provisioned",
+		);
+		expect(authorized[0]?.transactionTraceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.traceId).toBe(authorized[0]?.transactionTraceId);
+		expect(sets.filter((set) => "phases" in set)).toEqual([
+			{
+				phases: [
+					{ name: "boot.start", source: "box", at, ms: 700 },
+					{ name: "host.ready", source: "box", at: at + 700, ms: 50 },
+				],
+			},
+		]);
 	});
 });

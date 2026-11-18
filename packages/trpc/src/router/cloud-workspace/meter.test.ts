@@ -790,6 +790,7 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 				memoryMb: 16_384,
 				vcpus: 8,
 				origin: "wake",
+				traceId: "trace_1",
 			},
 			{ billingEnabled: true },
 		);
@@ -931,6 +932,7 @@ describe("with BILLING_PROVIDER=stripe", () => {
 				memoryMb: 16_384,
 				vcpus: 8,
 				origin: "create",
+				traceId: "trace_1",
 			}),
 		).toEqual({ bootId: null });
 		expect(await reconcileCloudWorkspaceUsage()).toEqual({

@@ -10,10 +10,10 @@ import { eq } from "drizzle-orm";
 import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	bootPhases,
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
-	recordBootSpans,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
@@ -25,6 +25,7 @@ import {
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordBootTrace } from "./sandbox-sleep";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -132,13 +133,18 @@ async function provision(
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
 				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
 			);
-		({ bootId } = await authorizeBoot({
-			organizationId: row.organizationId,
-			cloudWorkspaceId: row.id,
-			createdByUserId: row.createdByUserId,
-			...boxFor(claim.vcpus),
-			origin: "create",
-		}));
+		({ bootId } = await Sentry.startSpan(
+			{ name: "authorize boot", op: "billing" },
+			() =>
+				authorizeBoot({
+					organizationId: row.organizationId,
+					cloudWorkspaceId: row.id,
+					createdByUserId: row.createdByUserId,
+					...boxFor(claim.vcpus),
+					origin: "create",
+					traceId: span.spanContext().traceId,
+				}),
+		));
 		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
@@ -213,14 +219,11 @@ async function provision(
 				error,
 			),
 		);
-		try {
-			recordBootSpans(answer);
-		} catch (error) {
-			console.error(
-				`[cloud-workspace] could not trace the boot of ${row.id}`,
-				error,
-			);
-		}
+		await recordBootTrace(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
+			span,
+			bootPhases(answer),
+		);
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);

@@ -398,6 +398,50 @@ describe("fleet scope", () => {
 		}
 	});
 
+	test("phases and the trace id on the fleet reads, not on the customer list", async () => {
+		const phases = [
+			{ name: "claim", source: "api" as const, at: 1_789_000_000_000, ms: 400 },
+			{
+				name: "boot.start",
+				source: "box" as const,
+				at: 1_789_000_000_500,
+				ms: 900,
+			},
+		];
+		const setTrace = (trace: {
+			phases: typeof phases | null;
+			traceId: string | null;
+		}) =>
+			db
+				.update(cloudWorkspaceBoots)
+				.set(trace)
+				.where(eq(cloudWorkspaceBoots.id, "boot_1"));
+		await setTrace({ phases, traceId: "a".repeat(32) });
+		try {
+			const options = { now: NOW, overagePerGbHour: RATE };
+			const traced = { phases, traceId: "a".repeat(32) };
+			expect(await getFleetCloudBoot(db, "boot_1", options)).toMatchObject(
+				traced,
+			);
+			const fleetList = await listFleetCloudBoots(db, ORG, {
+				window: NOVEMBER,
+				limit: 25,
+				...options,
+			});
+			expect(
+				fleetList.items.find((boot) => boot.id === "boot_1"),
+			).toMatchObject(traced);
+			const customer = (await boots({})).items.find(
+				(boot) => boot.id === "boot_1",
+			);
+			expect(customer).toBeDefined();
+			expect(customer).not.toHaveProperty("phases");
+			expect(customer).not.toHaveProperty("traceId");
+		} finally {
+			await setTrace({ phases: null, traceId: null });
+		}
+	});
+
 	test("a failed workspace counts the same way on every path", async () => {
 		const failedWorkspaces = (result: { items: { workspaces: number }[] }) =>
 			result.items.reduce((sum, item) => sum + item.workspaces, 0);

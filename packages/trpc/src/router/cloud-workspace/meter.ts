@@ -184,6 +184,7 @@ export async function authorizeBoot(
 		memoryMb: number;
 		vcpus: number;
 		origin: CloudWorkspaceBootOrigin;
+		traceId: string;
 	},
 	{ billingEnabled = billingUsesAutumn }: { billingEnabled?: boolean } = {},
 ): Promise<{ bootId: string | null }> {
@@ -221,6 +222,7 @@ export async function authorizeBoot(
 		lockOpen: result !== null,
 		createdByUserId: args.createdByUserId,
 		origin: args.origin,
+		traceId: args.traceId,
 	});
 	logControl(
 		"boot.authorized",

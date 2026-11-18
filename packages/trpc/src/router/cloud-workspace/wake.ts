@@ -15,9 +15,9 @@ import {
 } from "../../lib/control-log";
 import {
 	bootBeganSince,
+	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
-	recordBootSpans,
 	type SandboxUnavailableError,
 	stopAndSnapshot,
 	stopSandbox,
@@ -29,7 +29,11 @@ import {
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordBoxStopped, recordSandboxAsleep } from "./sandbox-sleep";
+import {
+	recordBootTrace,
+	recordBoxStopped,
+	recordSandboxAsleep,
+} from "./sandbox-sleep";
 import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -115,6 +119,7 @@ async function wake(
 						createdByUserId: row.createdByUserId,
 						...box,
 						origin: "wake",
+						traceId: span.spanContext().traceId,
 					}),
 			));
 			if (bootId) {
@@ -170,16 +175,11 @@ async function wake(
 			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);
 	}
-	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
-		try {
-			recordBootSpans(answer);
-		} catch (error) {
-			console.error(
-				`[cloud-workspace] could not trace the boot of ${row.id}`,
-				error,
-			);
-		}
-	}
+	await recordBootTrace(
+		scope,
+		span,
+		rebooted && bootBeganSince(answer, wakeStartedAt) ? bootPhases(answer) : [],
+	);
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
 		...(booted || adoptSignIns

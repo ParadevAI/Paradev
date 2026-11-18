@@ -1,7 +1,11 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import type { CloudWorkspaceBootEndReason } from "@superset/db/enums";
-import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
+import {
+	type CloudWorkspaceBootPhase,
+	cloudWorkspaceBoots,
+	cloudWorkspaces,
+} from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
 import {
 	type ControlScope,
@@ -9,6 +13,7 @@ import {
 	logControl,
 } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
+import { apiPhases, recordBootSpans } from "../../lib/sandbox";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
 export const keepUpdatedAt = { updatedAt: sql`${cloudWorkspaces.updatedAt}` };
@@ -76,6 +81,48 @@ export async function recordBootEnd(
 		.catch((error) =>
 			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);
+}
+
+const MAX_BOOT_PHASES = 64;
+
+/** A pathological boot log keeps its first phases and its last, the one the host answered after. */
+function boundedPhases(
+	phases: CloudWorkspaceBootPhase[],
+): CloudWorkspaceBootPhase[] {
+	if (phases.length <= MAX_BOOT_PHASES) return phases;
+	return [...phases.slice(0, MAX_BOOT_PHASES - 1), ...phases.slice(-1)];
+}
+
+/**
+ * Once host-service answered: the box's boot as spans under `transaction`, and
+ * on the boot row the transaction's steps, then the box's. A failure here is
+ * reported and the provision or wake goes on.
+ */
+export async function recordBootTrace(
+	scope: ControlScope,
+	transaction: Sentry.Span,
+	boxPhases: CloudWorkspaceBootPhase[],
+): Promise<void> {
+	try {
+		recordBootSpans(boxPhases);
+	} catch (error) {
+		console.error(
+			`[cloud-workspace] could not trace the boot of ${scope.cloudWorkspaceId}`,
+			error,
+		);
+	}
+	const { bootId } = scope;
+	if (!bootId) return;
+	try {
+		await db
+			.update(cloudWorkspaceBoots)
+			.set({
+				phases: boundedPhases([...apiPhases(transaction), ...boxPhases]),
+			})
+			.where(eq(cloudWorkspaceBoots.id, bootId));
+	} catch (error) {
+		Sentry.captureException(error, { tags: controlTags(scope) });
+	}
 }
 
 /**
