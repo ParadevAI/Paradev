@@ -239,7 +239,9 @@ fi
 
 # Sends this box's own logs to Sentry, only when the claim turned it on; see the script.
 if [ "${SUPERSET_SANDBOX_BOX_LOGS:-}" = 1 ] && [ -n "${HOST_SERVICE_SENTRY_DSN:-}" ]; then
-	env -u HOST_SERVICE_SECRET nice -n 10 /usr/local/bin/superset-logship >> "${SUPERSET_LOG_DIR}/logship.log" 2>&1 9>&- &
+	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "${SUPERSET_STATE_DIR}/logship"
+	env -u HOST_SERVICE_SECRET nice -n 10 setpriv --reuid="$SUPERSET_USER" --regid="$SUPERSET_USER" --init-groups \
+		/usr/local/bin/superset-logship >> "${SUPERSET_LOG_DIR}/logship.log" 2>&1 9>&- &
 	stamp "logship.start pid=$!"
 fi
 

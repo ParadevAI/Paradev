@@ -13,7 +13,6 @@ import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
 } from "@superset/shared/cloud-agent-launch";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
@@ -30,8 +29,9 @@ import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
-import { agentToolsDriveFor, organizationFlagEnabled } from "./agent-tools";
+import { agentToolsDriveFor } from "./agent-tools";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import { boxLogsEnabled } from "./feature-flags";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -62,8 +62,6 @@ function agentCredentialDigest(signIns: AgentSignIns): string {
 		.update(`agent-credentials:${JSON.stringify(sorted)}`)
 		.digest("hex");
 }
-
-const BOX_LOGS_FLEET_ORGANIZATION = "sandbox-fleet";
 
 /** Commits by a workspace nobody created, such as an automation's. */
 const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
@@ -98,19 +96,7 @@ export async function buildSandboxClaim(args: {
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
 		env.SENTRY_DSN_SANDBOX
-			? organizationFlagEnabled(
-					posthog,
-					FEATURE_FLAGS.SANDBOX_BOX_LOGS_FLEET,
-					BOX_LOGS_FLEET_ORGANIZATION,
-				).then(
-					(fleet) =>
-						fleet &&
-						organizationFlagEnabled(
-							posthog,
-							FEATURE_FLAGS.SANDBOX_BOX_LOGS,
-							args.row.organizationId,
-						),
-				)
+			? boxLogsEnabled(posthog, args.row.organizationId)
 			: false,
 	]);
 	if (!environment) throw new Error("Environment not found");

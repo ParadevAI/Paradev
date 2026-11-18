@@ -267,7 +267,7 @@ describe("superset-logship", () => {
 			"desktop.log",
 			Array.from({ length: 10 }, (_, n) => line(n)).join(""),
 		);
-		const cap = { SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES: "1000" };
+		const cap = { SUPERSET_LOGSHIP_CAP_BYTES: "1000" };
 		await ship(cap);
 		const kept = items().filter((i) => !isCap(i));
 		const size = (i: Item) => Buffer.byteLength(JSON.stringify(i));

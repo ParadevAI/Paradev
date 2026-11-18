@@ -1,21 +1,7 @@
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { sandboxAgentToolsDrive } from "@superset/shared/sandbox/contract";
 import type { PostHog } from "posthog-node";
-
-/** Fails closed: an unloaded flag or an unreachable PostHog is off. */
-export async function organizationFlagEnabled(
-	flags: Pick<PostHog, "isFeatureEnabled">,
-	flag: string,
-	organizationId: string,
-): Promise<boolean> {
-	const enabled = await flags
-		.isFeatureEnabled(flag, organizationId, {
-			groups: { organization: organizationId },
-			sendFeatureFlagEvents: false,
-		})
-		.catch(() => undefined);
-	return enabled === true;
-}
+import { organizationFlagEnabled } from "./feature-flags";
 
 /** The drive of the bundle the box boots, or null while the organization's flag is off. */
 export async function agentToolsDriveFor(args: {

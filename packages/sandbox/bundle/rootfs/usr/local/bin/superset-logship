@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sends the platform's own box logs to Sentry Logs. Started by superset-boot as
-# root beside memguard, only when sandbox.conf has SUPERSET_SANDBOX_BOX_LOGS=1;
-# it does not need host-service. Each pass, every few seconds:
+# the sandbox user beside memguard, only when sandbox.conf has
+# SUPERSET_SANDBOX_BOX_LOGS=1; it does not need host-service. Each pass, every few seconds:
 #
 #   read    boot, memguard, desktop and host-service logs from the byte offset
 #           saved for each under the state directory. start-hook.log and
@@ -32,7 +32,7 @@ AUTH="X-Sentry-Auth: Sentry sentry_version=7, sentry_key=${BASH_REMATCH[2]}, sen
 
 SOURCES=(boot memguard desktop host-service)
 STATE="${SUPERSET_STATE_DIR}/logship"
-CAP="${SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES:-262144}"
+CAP="${SUPERSET_LOGSHIP_CAP_BYTES:-262144}"
 INTERVAL_S="${SUPERSET_LOGSHIP_INTERVAL_S:-5}"
 MAX_READ=65536
 MAX_RECORDS=100
@@ -192,6 +192,7 @@ send() {
 
 ship_file() {
 	local src="$1" file="${SUPERSET_LOG_DIR}/${src}.log" size off partial=0 full=0 used capped read_to count last payload
+	# The box's user owns the log directory and could link a log to any file it can read.
 	[ -f "$file" ] && [ ! -L "$file" ] || return 0
 	size="$(stat -c %s "$file")"
 	off="$(read_state "${src}.offset" "")"
