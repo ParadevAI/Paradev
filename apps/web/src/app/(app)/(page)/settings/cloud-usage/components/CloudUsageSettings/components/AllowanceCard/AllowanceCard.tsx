@@ -15,8 +15,7 @@ export function AllowanceCard({ allowance }: { allowance: Allowance }) {
 	const formatGbHours = useFormatGbHours();
 	const { includedGbHours, usedGbHours, overageGbHours } = allowance;
 	const used = formatGbHours(usedGbHours);
-	const included =
-		includedGbHours === null ? null : formatGbHours(includedGbHours);
+	const included = includedGbHours ? formatGbHours(includedGbHours) : null;
 	const overage = formatGbHours(overageGbHours);
 	const prepaid = formatGbHours(allowance.prepaidRemainingGbHours);
 	const resetDate = formatDate(allowance.resetsAt);
