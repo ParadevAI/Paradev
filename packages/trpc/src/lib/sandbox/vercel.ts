@@ -126,11 +126,11 @@ export interface SandboxClaim {
 	agentTools?: boolean;
 }
 
-/** Vercel allows 5 tags per sandbox. */
 function environmentTags(organizationId: string): Record<string, string> {
 	return { kind: "environment", org: organizationId };
 }
 
+/** Vercel allows 5 tags per sandbox. */
 function sandboxTags(
 	kind: "workspace" | "environment",
 	identity: SandboxIdentity,

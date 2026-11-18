@@ -32,7 +32,7 @@ const LOCK_TTL_MS = 70 * 60 * 1000;
 const CAP_GRACE_MS = 10 * 60 * 1000;
 const SETTLE_LEASE_MS = 2 * 60 * 1000;
 const UNATTACHED_BOOT_GRACE_MS = 60 * 60 * 1000;
-export const RECONCILE_LOOKBACK_MS = 2 * 60 * 60 * 1000;
+const ADOPT_LOOKBACK_MS = 2 * 60 * 60 * 1000;
 const RECONCILE_CONCURRENCY = 25;
 
 export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
@@ -700,7 +700,7 @@ async function adoptRunningBoxes(
 	const adoptSessions = async (workspace: (typeof unmetered)[number]) => {
 		const sessions = await listSandboxSessions(
 			workspace.providerSandboxId,
-			Date.now() - RECONCILE_LOOKBACK_MS,
+			Date.now() - ADOPT_LOOKBACK_MS,
 		);
 		if (!sessions?.length) return 0;
 		const boots = await db
