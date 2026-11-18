@@ -94,6 +94,10 @@ None blocking. Reviewers should check decision D3 (time budget) in the Decision 
   Date/Author: 2026-10-30, Satya and Claude.
 
 
+- D10. Decision: supersedes D3. A build is a Vercel Workflow run (`environmentBuildWorkflow`), not one QStash job. The box does the long work: a step starts each command detached and returns, and the workflow polls it in short steps with a 5-second durable sleep between, keeping the last 40 lines in `environment_builds.log`. One limit for the whole build, `BUILD_LIMIT_MS` (30 minutes), enforced by the workflow and by `timeout` on the box; `STALE_BUILD_MS` moves past it. Secrets are never step inputs or outputs: each step that needs them derives them again.
+  Rationale: a slow `[install]` failed at the 285-second budget, and drive builds must also wait for a drive to detach on stop. The owner chose Vercel's own compute over Temporal.
+  Date/Author: 2026-11-17, Claude.
+
 ## Outcomes & Retrospective
 
 Built: builds on demand (tRPC, CLI, desktop), a daily build, repository changes through a build, the last five goldens kept with Restore, and the environment, edit, builds and variables screens. Unit-tested throughout; not yet run against a real sandbox.

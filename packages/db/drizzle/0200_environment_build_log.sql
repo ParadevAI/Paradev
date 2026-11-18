@@ -1,0 +1,1 @@
+ALTER TABLE "environment_builds" ADD COLUMN "log" text;

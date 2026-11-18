@@ -33,6 +33,13 @@ import {
 import { env } from "../../env";
 import { bootStampsFrom, type HostAnswer } from "./boot-trace";
 import {
+	BUILD_COMMANDS_DIR,
+	buildCommandDir,
+	detachedCommandScript,
+	parseCommandState,
+	readCommandScript,
+} from "./build-command";
+import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
 	type SandboxFile,
@@ -834,7 +841,7 @@ export type BuildBoxSource =
 /**
  * The box an environment build runs in. Never booted, so neither
  * host-service nor the repository's start hook runs. Its session ends on its
- * own if the job that drives it dies.
+ * own if the workflow that drives it dies.
  */
 export async function createBuildBox(args: {
 	name: string;
@@ -867,57 +874,89 @@ export async function createBuildBox(args: {
 	});
 }
 
-export interface BuildCommandResult {
-	exitCode: number;
-	output: string;
-	timedOut: boolean;
+/** What a build command left on the box; `exitCode` is null while it runs. */
+export interface BuildCommandState {
+	exitCode: number | null;
+	tail: string;
 }
 
-/** Runs a bash script as the box's user; the sandbox kills it at the timeout. */
-export async function runBuildCommand(args: {
+/**
+ * Starts a script detached and returns at once: the box runs it, not the
+ * caller. Starting the same key again does not start a second copy.
+ */
+export async function startBuildCommand(args: {
 	name: string;
+	key: string;
 	script: string;
 	env: Record<string, string>;
 	cwd?: string;
-	timeoutMs: number;
-}): Promise<BuildCommandResult> {
-	const sandbox = await Sandbox.get({
-		...credentials(),
-		name: args.name,
-		resume: false,
-	});
-	const started = Date.now();
-	const command = await sandbox.asUser(SANDBOX_USER).runCommand({
-		cmd: "bash",
-		args: ["-lc", args.script],
-		env: args.env,
-		...(args.cwd ? { cwd: args.cwd } : {}),
-		detached: true,
-		timeoutMs: args.timeoutMs,
-	});
-	const finished = await command.wait();
-	const output = `${await finished.stdout()}${await finished.stderr()}`;
-	return {
-		exitCode: finished.exitCode,
-		output,
-		timedOut: finished.exitCode !== 0 && Date.now() - started >= args.timeoutMs,
-	};
-}
-
-/** Strips workspace identity, stops, and returns once forks start from this state. */
-export async function snapshotBuildBox(args: {
-	name: string;
-	timeoutMs: number;
+	timeoutSeconds: number;
 }): Promise<void> {
 	const sandbox = await Sandbox.get({
 		...credentials(),
 		name: args.name,
 		resume: false,
 	});
+	await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: [
+			"-c",
+			detachedCommandScript({
+				dir: buildCommandDir(args.key),
+				script: args.script,
+				timeoutSeconds: args.timeoutSeconds,
+			}),
+		],
+		env: args.env,
+		...(args.cwd ? { cwd: args.cwd } : {}),
+		detached: true,
+	});
+}
+
+export async function readBuildCommand(args: {
+	name: string;
+	key: string;
+}): Promise<BuildCommandState> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	const read = await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: ["-c", readCommandScript(buildCommandDir(args.key))],
+	});
+	return parseCommandState(await read.stdout());
+}
+
+export async function buildBoxSnapshotId(name: string): Promise<string | null> {
+	const sandbox = await getSandbox(name);
+	return sandbox?.currentSnapshotId ?? null;
+}
+
+/** Strips workspace identity and the build's own files, then stops; a box already stopping is left alone. */
+export async function stopBuildBox(name: string): Promise<void> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	if (sandbox.status !== "running") return;
 	await stripWorkspaceIdentity(sandbox);
-	const before = sandbox.currentSnapshotId;
+	await sandbox.runCommand({
+		cmd: "rm",
+		args: ["-rf", BUILD_COMMANDS_DIR],
+		sudo: true,
+	});
 	await sandbox.stop();
-	await waitForStopSnapshot(args.name, before, args.timeoutMs);
+}
+
+/** True once forks of the box start from the snapshot its stop took. */
+export async function buildBoxSnapshotTaken(
+	name: string,
+	previous: string | null,
+): Promise<boolean> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	const current = sandbox.currentSnapshotId;
+	return (
+		sandbox.status === "stopped" && Boolean(current) && current !== previous
+	);
 }
 
 /**

@@ -5,8 +5,11 @@ import {
 	sandboxRepositoryPath,
 } from "@superset/shared/sandbox/contract";
 
+import { BUILD_LIMIT_MS } from "./limits";
+
 const KEPT_GOLDENS = 5;
-export const STALE_BUILD_MS = 10 * 60 * 1000;
+/** Past the build limit, so only a build whose workflow died is stale. */
+export const STALE_BUILD_MS = BUILD_LIMIT_MS + 10 * 60 * 1000;
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 
 type CheckoutRepository = { id: string; owner: string; name: string };
@@ -44,7 +47,7 @@ export function removedCheckoutPaths(args: {
 		.filter((path) => path !== SANDBOX_ROOT_CHECKOUT);
 }
 
-/** A running build whose job died never finishes on its own. */
+/** A running build whose workflow died never finishes on its own. */
 export function isStale(build: {
 	status: EnvironmentBuildStatus;
 	startedAt: Date;

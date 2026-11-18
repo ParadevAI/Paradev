@@ -78,6 +78,24 @@ export async function recordBuildCommit(
 		.where(eq(environmentBuilds.id, buildId));
 }
 
+/** False when the build is no longer running, so the workflow stops. */
+export async function recordBuildLog(
+	buildId: string,
+	log: string,
+): Promise<boolean> {
+	const rows = await db
+		.update(environmentBuilds)
+		.set({ log })
+		.where(
+			and(
+				eq(environmentBuilds.id, buildId),
+				eq(environmentBuilds.status, "running"),
+			),
+		)
+		.returning({ id: environmentBuilds.id });
+	return rows.length > 0;
+}
+
 export async function failBuild(buildId: string, error: string): Promise<void> {
 	await db
 		.update(environmentBuilds)

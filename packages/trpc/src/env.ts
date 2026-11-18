@@ -69,6 +69,8 @@ export const env = createEnv({
 		VERCEL_SANDBOX_TOKEN: z.string().min(1),
 		VERCEL_SANDBOX_TEAM_ID: z.string().min(1),
 		VERCEL_SANDBOX_PROJECT_ID: z.string().min(1),
+		// "1" runs environment builds on an in-memory box; ignored in production.
+		ENVIRONMENT_BUILD_FAKE_SANDBOX: z.enum(["1"]).optional(),
 		// Shared with the gate Worker: signs the tickets clients present
 		// there and derives the secret each sandbox's host-service is booted with.
 		SANDBOX_GATE_SECRET: z.string().min(32),

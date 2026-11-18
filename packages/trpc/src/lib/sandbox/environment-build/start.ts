@@ -6,7 +6,7 @@ import {
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
 import { and, eq, isNull, lt } from "drizzle-orm";
-import { publishCloudWorkspaceJob } from "../../../router/cloud-workspace/jobs";
+import { start } from "workflow/api";
 import { organizationPlan } from "../../billing/plan";
 import { readRepoHooks } from "../repo-hooks";
 import {
@@ -16,10 +16,9 @@ import {
 	primaryRepository,
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
-import { buildBoxName, rebuildEnvironment } from "./environment-build";
+import { environmentBuildWorkflow } from "./build-workflow";
+import { buildBoxName } from "./environment-build";
 import { checkoutLayoutMoves, STALE_BUILD_MS } from "./policy";
-
-export const BUILD_JOB_PATH = "/api/environments/build";
 
 export type BuildRefusalReason =
 	| "not-found"
@@ -45,7 +44,7 @@ export async function organizationMayBuild(
 	return (await organizationPlan(organizationId)) !== "free";
 }
 
-/** A running build whose job died is failed here, and its box deleted. */
+/** A running build whose workflow died is failed here, and its box deleted. */
 export async function expireStaleBuilds(environmentId: string): Promise<void> {
 	const now = Date.now();
 	const expired = await db
@@ -78,7 +77,7 @@ function isUniqueViolation(error: unknown): boolean {
 }
 
 /**
- * Records a running build and queues the job that runs it. Refuses with a
+ * Records a running build and starts the workflow that runs it. Refuses with a
  * `BuildRefused` the caller can show: the database's one-running-build index
  * is what refuses a second build.
  */
@@ -171,17 +170,15 @@ export async function startEnvironmentBuild(args: {
 
 	const queued = build;
 	try {
-		await publishCloudWorkspaceJob({
-			path: BUILD_JOB_PATH,
-			body: { buildId: queued.id },
-			runLocally: ({ buildId }) => rebuildEnvironment({ buildId }),
+		await start(environmentBuildWorkflow, [queued.id], {
+			attributes: { buildId: queued.id, environmentId: queued.environmentId },
 		});
 	} catch (error) {
 		await db
 			.update(environmentBuilds)
 			.set({
 				status: "failed",
-				error: "The build could not be queued",
+				error: "The build could not be started",
 				finishedAt: new Date(),
 			})
 			.where(eq(environmentBuilds.id, queued.id));

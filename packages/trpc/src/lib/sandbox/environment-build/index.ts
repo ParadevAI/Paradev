@@ -1,5 +1,5 @@
 export { queueDailyBuilds } from "./daily";
-export { pruneGoldens, rebuildEnvironment } from "./environment-build";
+export { pruneGoldens } from "./environment-build";
 export { isStale } from "./policy";
 export {
 	type BuildRefusalReason,

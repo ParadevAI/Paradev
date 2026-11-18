@@ -1003,6 +1003,8 @@ export const environmentBuilds = pgTable(
 		goldenRef: text("golden_ref"),
 		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),
 		error: text(),
+		/** The last lines of the running command's output, updated as the build runs. */
+		log: text(),
 		startedAt: timestamp("started_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
