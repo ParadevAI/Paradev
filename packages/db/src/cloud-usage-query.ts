@@ -58,15 +58,20 @@ export interface CloudUsageScope {
 	userId?: string;
 }
 
-/** Only the fleet entry points pass `null`, which reads every organization. */
-type Scope = { organizationId: string | null; userId?: string };
+/** Only the fleet entry points pass `null` (every organization) or a list. */
+type Scope = { organizationId: string | string[] | null; userId?: string };
 
 const inOrganization = (scope: Scope, column: AnyPgColumn) =>
-	scope.organizationId === null ? undefined : eq(column, scope.organizationId);
+	scope.organizationId === null
+		? undefined
+		: Array.isArray(scope.organizationId)
+			? inArray(column, scope.organizationId)
+			: eq(column, scope.organizationId);
 
 export interface CloudUsageFilters {
 	user?: string;
-	workspace?: string;
+	workspace?: string | string[];
+	project?: string;
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
 }
@@ -180,7 +185,14 @@ function scopeConditions(
 	if (scope.userId) conditions.push(eq(columns.user, scope.userId));
 	if (filters.user) conditions.push(eq(columns.user, filters.user));
 	if (filters.workspace) {
-		conditions.push(eq(columns.workspace, filters.workspace));
+		conditions.push(
+			Array.isArray(filters.workspace)
+				? inArray(columns.workspace, filters.workspace)
+				: eq(columns.workspace, filters.workspace),
+		);
+	}
+	if (filters.project) {
+		conditions.push(eq(workspaces.projectId, filters.project));
 	}
 	if (filters.size) conditions.push(columns.size(filters.size));
 	if (filters.status?.length) {
@@ -406,7 +418,7 @@ interface ProjectRef {
 
 async function refsFor(
 	db: Db,
-	organizationId: string | null,
+	scope: Scope,
 	groupBy: CloudFleetGroupBy,
 	keys: string[],
 ): Promise<Map<string, UserRef | WorkspaceRef | OrganizationRef | ProjectRef>> {
@@ -450,9 +462,7 @@ async function refsFor(
 		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
 		.where(
 			and(
-				organizationId === null
-					? undefined
-					: eq(workspaces.organizationId, organizationId),
+				inOrganization(scope, workspaces.organizationId),
 				inArray(workspaces.id, keys),
 			),
 		);
@@ -489,7 +499,7 @@ interface CloudUsageOptions<GroupBy> {
 async function usageRows(
 	db: Db,
 	scope: Scope,
-	options: CloudUsageOptions<CloudFleetGroupBy>,
+	options: CloudUsageOptions<CloudFleetGroupBy> & { refs?: boolean },
 ) {
 	const {
 		window,
@@ -546,12 +556,15 @@ async function usageRows(
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
-	const refs = await refsFor(
-		db,
-		scope.organizationId,
-		groupBy,
-		page.flatMap((row) => (row.key ? [row.key] : [])),
-	);
+	const refs =
+		options.refs === false
+			? new Map()
+			: await refsFor(
+					db,
+					scope,
+					groupBy,
+					page.flatMap((row) => (row.key ? [row.key] : [])),
+				);
 	return {
 		items: page.map(({ key, sortKey: _, ...row }) => {
 			const ref = (key && refs.get(key)) || null;
@@ -589,14 +602,15 @@ export function queryCloudUsage(
 }
 
 /**
- * `queryCloudUsage` across organizations (`organizationId: null`) or for one, with more groupings.
- * Staff only: biome.jsonc forbids importing it outside this package, and `queryCloudUsage` accepts
- * only a `CloudUsageScope`, whose organization id is a string.
+ * `queryCloudUsage` across organizations (`organizationId: null`), for some or for one, with more
+ * groupings. `refs: false` skips the lookup of names, so a group has no `ref` and, unless its key is
+ * its own label, no `label`. Staff only: biome.jsonc forbids importing it outside this package, and
+ * `queryCloudUsage` accepts only a `CloudUsageScope`, whose organization id is a string.
  */
 export function queryFleetCloudUsage(
 	db: Db,
-	organizationId: string | null,
-	options: CloudUsageOptions<CloudFleetGroupBy>,
+	organizationId: string | string[] | null,
+	options: CloudUsageOptions<CloudFleetGroupBy> & { refs?: boolean },
 ): Promise<CloudFleetUsageResult> {
 	return usageRows(db, { organizationId }, options);
 }
@@ -660,7 +674,13 @@ interface CloudBootsOptions {
 	overagePerGbHour: number | null;
 }
 
-async function bootRows(db: Db, scope: Scope, options: CloudBootsOptions) {
+interface BootReadOptions extends Omit<CloudBootsOptions, "window"> {
+	window?: CloudUsageWindow;
+	/** A boot id or a Vercel session id. */
+	boot?: string;
+}
+
+async function bootRows(db: Db, scope: Scope, options: BootReadOptions) {
 	const {
 		window,
 		filters = {},
@@ -688,8 +708,14 @@ async function bootRows(db: Db, scope: Scope, options: CloudBootsOptions) {
 		.where(
 			and(
 				inOrganization(scope, boots.organizationId),
-				gte(boots.startedAt, window.from),
-				lt(boots.startedAt, window.to),
+				window && gte(boots.startedAt, window.from),
+				window && lt(boots.startedAt, window.to),
+				options.boot
+					? or(
+							eq(boots.id, options.boot),
+							eq(boots.vercelSessionId, options.boot),
+						)
+					: undefined,
 				...scopeConditions(scope, filters, {
 					user: boots.createdByUserId,
 					workspace: boots.cloudWorkspaceId,
@@ -788,16 +814,10 @@ export function listCloudBoots(
 	return bootRows(db, scope, options);
 }
 
-/**
- * `listCloudBoots` across organizations (`organizationId: null`) or for one, with the organization,
- * active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
- */
-export async function listFleetCloudBoots(
+async function withFleetFields(
 	db: Db,
-	organizationId: string | null,
-	options: CloudBootsOptions,
+	result: Awaited<ReturnType<typeof bootRows>>,
 ): Promise<CloudFleetBootsResult> {
-	const result = await bootRows(db, { organizationId }, options);
 	const fields = await fleetBootFields(
 		db,
 		result.items.map((boot) => boot.id),
@@ -809,4 +829,35 @@ export async function listFleetCloudBoots(
 			...(fields.get(boot.id) ?? NO_FLEET_BOOT_FIELDS),
 		})),
 	};
+}
+
+/**
+ * `listCloudBoots` across organizations (`organizationId: null`), for some or for one, with the
+ * organization, active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function listFleetCloudBoots(
+	db: Db,
+	organizationId: string | string[] | null,
+	options: CloudBootsOptions,
+) {
+	return withFleetFields(db, await bootRows(db, { organizationId }, options));
+}
+
+/** One boot by boot id or Vercel session id, in any organization, or null. Staff only. */
+export async function getFleetCloudBoot(
+	db: Db,
+	boot: string,
+	options: { now: Date; overagePerGbHour: number | null },
+) {
+	const {
+		items: [found],
+	} = await withFleetFields(
+		db,
+		await bootRows(
+			db,
+			{ organizationId: null },
+			{ ...options, boot, limit: 1 },
+		),
+	);
+	return found ?? null;
 }
