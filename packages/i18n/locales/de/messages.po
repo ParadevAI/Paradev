@@ -1954,9 +1954,6 @@ msgstr "Kontoname"
 msgid "Account pending deletion"
 msgstr "Konto zur Löschung vorgemerkt"
 
-msgid "Account usage"
-msgstr "Kontonutzung"
-
 msgid "Account usage: {percent} used"
 msgstr "Kontonutzung: {percent} verbraucht"
 
@@ -16493,9 +16490,6 @@ msgstr "Speicherort zurücksetzen"
 
 msgid "Reset terminal"
 msgstr "Terminal zurücksetzen"
-
-msgid "Reset time unavailable"
-msgstr "Zeitpunkt der Zurücksetzung nicht verfügbar"
 
 msgid "Reset to default"
 msgstr "Auf Standard zurücksetzen"

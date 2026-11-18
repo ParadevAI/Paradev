@@ -1954,9 +1954,6 @@ msgstr "Nama akun"
 msgid "Account pending deletion"
 msgstr "Akun menunggu penghapusan"
 
-msgid "Account usage"
-msgstr "Penggunaan akun"
-
 msgid "Account usage: {percent} used"
 msgstr "Penggunaan akun: {percent} terpakai"
 
@@ -16493,9 +16490,6 @@ msgstr "Reset lokasi"
 
 msgid "Reset terminal"
 msgstr "Reset terminal"
-
-msgid "Reset time unavailable"
-msgstr "Waktu reset tidak tersedia"
 
 msgid "Reset to default"
 msgstr "Reset ke bawaan"

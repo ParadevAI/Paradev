@@ -1954,9 +1954,6 @@ msgstr "Account name"
 msgid "Account pending deletion"
 msgstr "Account pending deletion"
 
-msgid "Account usage"
-msgstr "Account usage"
-
 msgid "Account usage: {percent} used"
 msgstr "Account usage: {percent} used"
 
@@ -16493,9 +16490,6 @@ msgstr "Reset location"
 
 msgid "Reset terminal"
 msgstr "Reset terminal"
-
-msgid "Reset time unavailable"
-msgstr "Reset time unavailable"
 
 msgid "Reset to default"
 msgstr "Reset to default"

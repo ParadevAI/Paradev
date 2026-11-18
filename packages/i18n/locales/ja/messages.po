@@ -1954,9 +1954,6 @@ msgstr "アカウント名"
 msgid "Account pending deletion"
 msgstr "アカウントは削除待ちです"
 
-msgid "Account usage"
-msgstr "アカウントの使用状況"
-
 msgid "Account usage: {percent} used"
 msgstr "アカウントの使用状況: {percent} 使用済み"
 
@@ -16493,9 +16490,6 @@ msgstr "場所をリセット"
 
 msgid "Reset terminal"
 msgstr "ターミナルをリセット"
-
-msgid "Reset time unavailable"
-msgstr "リセット時刻を取得できません"
 
 msgid "Reset to default"
 msgstr "デフォルトに戻す"

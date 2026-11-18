@@ -619,10 +619,6 @@ export function TerminalSessionDropdown({
 								</div>
 							)}
 						</div>
-						<AccountUsageMenuSection
-							workspaceId={workspaceId}
-							terminalId={terminalId}
-						/>
 						{binding && (
 							<>
 								<DropdownMenuSeparator />
@@ -640,6 +636,10 @@ export function TerminalSessionDropdown({
 								</DropdownMenuItem>
 							</>
 						)}
+						<AccountUsageMenuSection
+							workspaceId={workspaceId}
+							terminalId={terminalId}
+						/>
 					</DropdownMenuContent>
 				</StopHeaderEvents>
 			</DropdownMenu>

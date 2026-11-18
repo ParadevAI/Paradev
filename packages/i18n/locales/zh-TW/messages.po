@@ -1954,9 +1954,6 @@ msgstr "帳戶名稱"
 msgid "Account pending deletion"
 msgstr "帳戶待刪除"
 
-msgid "Account usage"
-msgstr "帳戶用量"
-
 msgid "Account usage: {percent} used"
 msgstr "帳戶用量：已使用 {percent}"
 
@@ -16493,9 +16490,6 @@ msgstr "重置位置"
 
 msgid "Reset terminal"
 msgstr "重置終端"
-
-msgid "Reset time unavailable"
-msgstr "無法取得重設時間"
 
 msgid "Reset to default"
 msgstr "恢復預設"
