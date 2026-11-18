@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev, sesinizi metne dönüştürmek için konuşma tanımayı kullanır.",
 		"NSPhotoLibraryUsageDescription": "Paradev, sohbet mesajlarına görsel ekleyebilmeniz için fotoğraf arşivinize erişim gerektirir.",
 		"NSCameraUsageDescription": "Paradev, sohbet mesajlarına fotoğraf ekleyebilmeniz için kamerayı kullanır.",
-		"NSMicrophoneUsageDescription": "Paradev, sohbet mesajlarını dikte edebilmeniz için mikrofonu kullanır."
+		"NSMicrophoneUsageDescription": "Paradev, mikrofonu sesli mod ve sohbet mesajlarını dikte etmek için kullanır."
 	}
 }

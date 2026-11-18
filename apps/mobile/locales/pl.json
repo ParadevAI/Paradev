@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev używa rozpoznawania mowy do zamiany głosu na tekst.",
 		"NSPhotoLibraryUsageDescription": "Paradev potrzebuje dostępu do biblioteki zdjęć, aby dołączać obrazy do wiadomości.",
 		"NSCameraUsageDescription": "Paradev używa aparatu, aby dołączać zdjęcia do wiadomości.",
-		"NSMicrophoneUsageDescription": "Paradev używa mikrofonu, aby umożliwić dyktowanie wiadomości."
+		"NSMicrophoneUsageDescription": "Paradev używa mikrofonu w trybie głosowym i do dyktowania wiadomości."
 	}
 }
