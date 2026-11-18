@@ -25,8 +25,8 @@ const RING_SPACING = 4.5;
 
 const RING_STROKE_CLASS: Record<QuotaMeterTone, string> = {
 	normal: "stroke-muted-foreground/60 group-hover:stroke-foreground",
-	warning: "stroke-amber-500/80 group-hover:stroke-amber-500",
-	danger: "stroke-red-500/80 group-hover:stroke-red-500",
+	warning: "stroke-amber-500/45 group-hover:stroke-amber-500",
+	danger: "stroke-red-500/45 group-hover:stroke-red-500",
 };
 
 export function RailUsageRing({
