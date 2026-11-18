@@ -4790,6 +4790,9 @@ msgstr "Sandboxes na nuvem"
 msgid "Cloud usage"
 msgstr "Uso da nuvem"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "O uso da nuvem não está ativado para esta organização."
+
 msgid "Cloud workspace"
 msgstr "Área de trabalho na nuvem"
 
@@ -12587,6 +12590,10 @@ msgstr "Nenhum autor encontrado."
 msgid "No automations match"
 msgstr "Nenhuma automação corresponde"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Nenhum período de cobrança começa em {0}."
+
 msgid "No branches found"
 msgstr "Nenhuma branch encontrada"
 
@@ -13600,6 +13607,9 @@ msgstr "Só proprietários da organização podem alterar estas configurações.
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Somente proprietários da organização ou o proprietário do dispositivo podem excluir este projeto."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Só proprietários e administradores podem ver o uso por pessoa."
 
 msgid "Only owners can change membership."
 msgstr "Só proprietários podem alterar quem tem acesso."
@@ -19760,6 +19770,9 @@ msgstr "Essa conta não está mais conectada — escolha outra."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Essa sessão do agente ainda não tem conversa para abrir: ela foi iniciada, mas nunca recebeu um pedido."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Não foi possível ler esse cursor. Remova-o para começar da primeira página."
+
 msgid "that device"
 msgstr "esse dispositivo"
 
@@ -20500,6 +20513,9 @@ msgstr "Isso muda só o nome exibido, não a branch."
 
 msgid "this organization"
 msgstr "esta organização"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Esta organização não tem períodos de cobrança. Escolha um intervalo de tempo."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Esta organização está no plano gratuito. O {appName} Mobile está disponível para organizações no Pro."

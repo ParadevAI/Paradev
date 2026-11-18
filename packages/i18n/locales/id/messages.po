@@ -4790,6 +4790,9 @@ msgstr "Sandbox cloud"
 msgid "Cloud usage"
 msgstr "Penggunaan cloud"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
+
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
@@ -12587,6 +12590,10 @@ msgstr "Tidak ada penulis ditemukan."
 msgid "No automations match"
 msgstr "Tidak ada otomatisasi yang cocok"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Tidak ada periode penagihan yang dimulai pada {0}."
+
 msgid "No branches found"
 msgstr "Tidak ada branch ditemukan"
 
@@ -13600,6 +13607,9 @@ msgstr "Hanya pemilik organisasi yang bisa mengubah pengaturan ini."
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Hanya pemilik organisasi atau pemilik perangkat yang dapat menghapus proyek ini."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Hanya pemilik dan admin yang dapat melihat penggunaan per orang."
 
 msgid "Only owners can change membership."
 msgstr "Hanya pemilik yang bisa mengubah keanggotaan."
@@ -19760,6 +19770,9 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka. Sudah dimulai tetapi belum pernah diberi perintah."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Kursor itu tidak dapat dibaca. Hapus untuk mulai dari halaman pertama."
+
 msgid "that device"
 msgstr "perangkat itu"
 
@@ -20500,6 +20513,9 @@ msgstr "Ini hanya mengubah nama tampilan, bukan branch-nya."
 
 msgid "this organization"
 msgstr "organisasi ini"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Organisasi ini tidak memiliki periode penagihan. Pilih rentang waktu sebagai gantinya."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Organisasi ini memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."

@@ -4790,6 +4790,9 @@ msgstr "Sandboxes en la nube"
 msgid "Cloud usage"
 msgstr "Uso de la nube"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "El uso de la nube no está activado para esta organización."
+
 msgid "Cloud workspace"
 msgstr "Espacio de trabajo en la nube"
 
@@ -12587,6 +12590,10 @@ msgstr "No se encontraron autores."
 msgid "No automations match"
 msgstr "Ninguna automatización coincide"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Ningún período de facturación empieza el {0}."
+
 msgid "No branches found"
 msgstr "No se encontraron ramas"
 
@@ -13600,6 +13607,9 @@ msgstr "Solo los propietarios de la organización pueden modificar esta configur
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Solo los propietarios de la organización o el propietario del dispositivo pueden eliminar este proyecto."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Solo los propietarios y administradores pueden ver el uso por persona."
 
 msgid "Only owners can change membership."
 msgstr "Solo los propietarios pueden cambiar la pertenencia."
@@ -19760,6 +19770,9 @@ msgstr "Esa cuenta ya no está conectada — elige otra."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Esa sesión del agente aún no tiene conversación que abrir: se inició pero nunca recibió una petición."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "No se pudo leer ese cursor. Quítalo para empezar desde la primera página."
+
 msgid "that device"
 msgstr "ese dispositivo"
 
@@ -20500,6 +20513,9 @@ msgstr "Esto solo cambia el nombre mostrado, no la rama."
 
 msgid "this organization"
 msgstr "esta organización"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Esta organización no tiene períodos de facturación. Elige un intervalo de tiempo."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Esta organización tiene el plan Gratis. {appName} Mobile está disponible para organizaciones con el plan Pro."
