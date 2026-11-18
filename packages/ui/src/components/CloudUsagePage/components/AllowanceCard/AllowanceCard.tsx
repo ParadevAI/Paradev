@@ -1,56 +1,60 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { useFormat } from "@superset/i18n/react";
-import { Progress } from "../../../ui/progress";
-import type { CloudPeriod } from "../../types";
+import type { ReactNode } from "react";
+import { useUsageFormat } from "../../hooks/useUsageFormat";
+import type { CloudMetrics, CloudPeriod } from "../../types";
+import { AllowanceLines } from "./components/AllowanceLines";
 
-type Allowance = NonNullable<CloudPeriod["allowance"]>;
+interface AllowanceCardProps {
+	total: CloudMetrics;
+	/** Null for a past period, or when the organization has no plan data. */
+	allowance: CloudPeriod["allowance"];
+	/** False when the organization has no billing periods and the range is the last 30 days. */
+	isPeriod: boolean;
+	billing: ReactNode;
+}
 
-export function AllowanceCard({ allowance }: { allowance: Allowance }) {
-	const { formatDate, formatGbHours } = useFormat();
-	const { includedGbHours, usedGbHours, overageGbHours } = allowance;
-	const used = formatGbHours(usedGbHours);
-	const included = includedGbHours ? formatGbHours(includedGbHours) : null;
-	const overage = formatGbHours(overageGbHours);
-	const prepaid = formatGbHours(allowance.prepaidRemainingGbHours);
-	const resetDate = formatDate(allowance.resetsAt);
+export function AllowanceCard({
+	total,
+	allowance,
+	isPeriod,
+	billing,
+}: AllowanceCardProps) {
+	const { usage, gbHours } = useUsageFormat();
+	const used = usage(total);
+	const included = allowance?.includedGbHours ?? null;
+	const includedLabel = included === null ? null : gbHours(included);
 
 	return (
-		<section className="space-y-3 rounded-md border p-4">
+		<section className="space-y-3 rounded-lg bg-muted/60 p-4">
 			<div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-				<div className="text-sm font-medium tabular-nums">
-					{included === null ? (
-						<Trans>GB-hours used: {used}</Trans>
-					) : (
-						<Trans>
-							GB-hours used: {used} of {included}
-						</Trans>
-					)}
-				</div>
-				<div className="text-sm text-muted-foreground">
-					<Trans>Resets {resetDate}</Trans>
-				</div>
+				<h3 className="text-base tabular-nums">
+					<span className="font-semibold">
+						<Trans>{used} used</Trans>
+					</span>{" "}
+					<span className="text-muted-foreground">
+						{includedLabel !== null ? (
+							<Trans>of {includedLabel} included</Trans>
+						) : isPeriod ? (
+							<Trans>in this period</Trans>
+						) : (
+							<Trans>in the last 30 days</Trans>
+						)}
+					</span>
+				</h3>
+				{billing}
 			</div>
-			{includedGbHours !== null && includedGbHours > 0 && (
-				<Progress
-					value={Math.min(100, (usedGbHours / includedGbHours) * 100)}
-				/>
-			)}
-			{includedGbHours === 0 && (
-				<p className="text-sm text-muted-foreground">
-					<Trans>Your plan includes no cloud GB-hours.</Trans>
-				</p>
-			)}
-			{allowance.prepaidRemainingGbHours > 0 && (
-				<p className="text-sm text-muted-foreground tabular-nums">
-					<Trans>Bought GB-hours left: {prepaid}</Trans>
-				</p>
-			)}
-			{overageGbHours > 0 && (
-				<p className="text-sm text-warning tabular-nums">
-					<Trans>GB-hours over the plan: {overage}</Trans>
-				</p>
+			{allowance && included !== null ? (
+				<AllowanceLines allowance={allowance} included={included} />
+			) : (
+				isPeriod && (
+					<p className="text-xs text-muted-foreground">
+						<Trans>
+							The breakdown by plan is kept for the current period only.
+						</Trans>
+					</p>
+				)
 			)}
 		</section>
 	);

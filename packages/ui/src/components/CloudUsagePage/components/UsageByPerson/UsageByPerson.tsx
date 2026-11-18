@@ -1,26 +1,25 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { useFormat } from "@superset/i18n/react";
-import type { CloudQuery, CloudUsage } from "../../types";
+import { useUsageFormat } from "../../hooks/useUsageFormat";
+import type { CloudQuery, CloudUsage, CloudUsageLink } from "../../types";
+import { Person } from "../Person";
 import { QueryStatus } from "../QueryStatus";
+import { Section } from "../Section";
 
-export function UsageByPerson({
-	byPerson,
-}: {
+interface UsageByPersonProps {
+	Link: CloudUsageLink;
 	byPerson: CloudQuery<CloudUsage>;
-}) {
-	const { formatGbHours } = useFormat();
-	const max = Math.max(
-		...(byPerson.data?.items.map((item) => item.gbHours) ?? []),
-		0,
-	);
+	period: string | undefined;
+}
+
+export function UsageByPerson({ Link, byPerson, period }: UsageByPersonProps) {
+	const { usage } = useUsageFormat();
+	const items = byPerson.data?.items ?? [];
+	const max = Math.max(...items.map((item) => item.gbHours), 0);
 
 	return (
-		<section className="min-w-0 space-y-3">
-			<h3 className="text-sm font-medium">
-				<Trans>Usage by person</Trans>
-			</h3>
+		<Section title={<Trans>By person</Trans>}>
 			{!byPerson.data ? (
 				<QueryStatus
 					isError={byPerson.isError}
@@ -28,21 +27,35 @@ export function UsageByPerson({
 				/>
 			) : (
 				<ul className="space-y-3">
-					{byPerson.data.items.map((item) => {
-						const gbHours = formatGbHours(item.gbHours);
+					{items.map((item) => {
+						const name = item.ref?.name;
+						const top = (
+							<span className="flex items-center justify-between gap-3">
+								{name ? (
+									<Person name={name} />
+								) : (
+									<span className="text-muted-foreground">
+										<Trans>No person recorded</Trans>
+									</span>
+								)}
+								<span className="shrink-0 tabular-nums">{usage(item)}</span>
+							</span>
+						);
 						return (
-							<li key={item.key ?? ""} className="space-y-1 text-sm">
-								<div className="flex items-baseline justify-between gap-3">
-									<span className="truncate">
-										{item.ref?.name ?? <Trans>No person recorded</Trans>}
-									</span>
-									<span className="shrink-0 text-muted-foreground tabular-nums">
-										<Trans>{gbHours} GB-hours</Trans>
-									</span>
-								</div>
-								<div className="h-1.5 overflow-hidden rounded-full bg-muted">
+							<li key={item.key ?? ""} className="space-y-1.5 text-sm">
+								{item.key ? (
+									<Link
+										to={{ page: "workspaces", period, user: item.key }}
+										className="block rounded-sm hover:underline"
+									>
+										{top}
+									</Link>
+								) : (
+									top
+								)}
+								<div className="h-2 overflow-hidden rounded-full bg-foreground/10">
 									<div
-										className="h-full rounded-full bg-chart-1"
+										className="h-full rounded-full bg-muted-foreground"
 										style={{
 											width: `${max > 0 ? (item.gbHours / max) * 100 : 0}%`,
 										}}
@@ -53,6 +66,6 @@ export function UsageByPerson({
 					})}
 				</ul>
 			)}
-		</section>
+		</Section>
 	);
 }

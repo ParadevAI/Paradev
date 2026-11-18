@@ -1,41 +1,40 @@
 "use client";
 
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { cn } from "../../../../lib/utils";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "../../../ui/chart";
-import type { CloudUsage as Usage } from "../../types";
+import { useUsageFormat } from "../../hooks/useUsageFormat";
+import type { CloudUsage } from "../../types";
+import { Section } from "../Section";
 import { utcDays } from "./utils/utcDays";
 
 interface UsageByDayProps {
-	items: Usage["items"];
-	window: Usage["range"];
+	usage: CloudUsage;
 	title: ReactNode;
-	className?: string;
 }
 
-export function UsageByDay({
-	items,
-	window,
-	title,
-	className,
-}: UsageByDayProps) {
+export function UsageByDay({ usage, title }: UsageByDayProps) {
 	const { t } = useLingui();
-	const { formatDate, formatNumber } = useFormat();
-	const gbHoursByDay = new Map(items.map((item) => [item.key, item.gbHours]));
-	const data = utcDays(window).map((day) => ({
-		day,
-		gbHours: gbHoursByDay.get(day) ?? 0,
-	}));
+	const { formatCurrency, formatDate, formatNumber } = useFormat();
+	const format = useUsageFormat();
+	const inDollars = usage.total.usageUsd !== null;
+	const byDay = new Map(usage.items.map((item) => [item.key, item]));
+	const data = utcDays(usage.range).map((day) => {
+		const item = byDay.get(day);
+		return { day, value: (inDollars ? item?.usageUsd : item?.gbHours) ?? 0 };
+	});
 	const config = {
-		gbHours: { label: t({ message: "GB-hours" }), color: "var(--chart-1)" },
+		value: {
+			label: inDollars ? t({ message: "Usage" }) : t({ message: "GB-hours" }),
+			color: "var(--muted-foreground)",
+		},
 	} satisfies ChartConfig;
 	const formatDay = (day: string) =>
 		formatDate(new Date(`${day}T00:00:00Z`), {
@@ -43,11 +42,14 @@ export function UsageByDay({
 			day: "numeric",
 			timeZone: "UTC",
 		});
+	const formatValue = (value: number) =>
+		inDollars
+			? format.dollars(value)
+			: formatNumber(value, { maximumFractionDigits: 1 });
 
 	return (
-		<section className={cn("min-w-0 space-y-3", className)}>
-			<h3 className="text-sm font-medium">{title}</h3>
-			<ChartContainer config={config} className="aspect-auto h-48 w-full">
+		<Section title={title}>
+			<ChartContainer config={config} className="aspect-auto h-44 w-full">
 				<BarChart data={data} margin={{ left: 0, right: 0, top: 4 }}>
 					<CartesianGrid vertical={false} />
 					<XAxis
@@ -58,10 +60,17 @@ export function UsageByDay({
 						tickFormatter={formatDay}
 					/>
 					<YAxis
-						width={40}
+						width={48}
 						tickLine={false}
 						axisLine={false}
-						tickFormatter={(value: number) => formatNumber(value)}
+						tickFormatter={(value: number) =>
+							inDollars
+								? formatCurrency(value, "USD", {
+										minimumFractionDigits: 0,
+										maximumFractionDigits: 0,
+									})
+								: formatNumber(value)
+						}
 					/>
 					<ChartTooltip
 						content={
@@ -69,18 +78,13 @@ export function UsageByDay({
 								labelFormatter={(_, payload) =>
 									formatDay(payload[0]?.payload.day)
 								}
+								formatter={(value) => formatValue(Number(value))}
 							/>
 						}
 					/>
-					<Bar dataKey="gbHours" fill="var(--color-gbHours)" radius={2} />
+					<Bar dataKey="value" fill="var(--color-value)" radius={2} />
 				</BarChart>
 			</ChartContainer>
-			<p className="text-xs text-muted-foreground">
-				<Trans>
-					Usage is shown on the UTC day it was billed, which can be a little
-					after the workspace ran.
-				</Trans>
-			</p>
-		</section>
+		</Section>
 	);
 }

@@ -2,6 +2,7 @@
 
 import { Trans } from "@lingui/react/macro";
 import { Button } from "../../../ui/button";
+import { Notice } from "../Notice";
 
 interface QueryStatusProps {
 	isError: boolean;
@@ -11,17 +12,19 @@ interface QueryStatusProps {
 export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 	if (!isError) {
 		return (
-			<p className="py-12 text-center text-sm text-muted-foreground">
+			<Notice>
 				<Trans>Loading...</Trans>
-			</p>
+			</Notice>
 		);
 	}
 	return (
-		<div className="flex flex-wrap items-center justify-center gap-3 py-12 text-sm text-muted-foreground">
-			<Trans>Could not load cloud usage.</Trans>
-			<Button size="sm" variant="outline" onClick={onRetry}>
-				<Trans>Retry</Trans>
-			</Button>
-		</div>
+		<Notice>
+			<span className="flex flex-wrap items-center justify-center gap-3">
+				<Trans>Could not load cloud usage.</Trans>
+				<Button size="sm" variant="outline" onClick={onRetry}>
+					<Trans>Retry</Trans>
+				</Button>
+			</span>
+		</Notice>
 	);
 }

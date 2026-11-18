@@ -804,6 +804,9 @@ msgstr "{archivableCount, plural, one {#件のクラウドワークスペース�
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {mainより#コミット遅れています。リベースが必要です} other {mainより#コミット遅れています。リベースが必要です}}"
 
+msgid "{boughtLabel} left"
+msgstr "残り {boughtLabel}"
+
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches}件中{branchPosition}件目"
 
@@ -915,6 +918,12 @@ msgstr "{count, plural, one {#件のページを取得} other {#件のページ�
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {#件のワークツリーをインポート} other {#件のワークツリーをインポート}}"
+
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, other {過去 30 日間に # 件のワークスペースで}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, other {この期間に # 件のワークスペースで}}"
 
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, other {# 件のプルリクエストをマージしますか?}}"
@@ -1087,6 +1096,9 @@ msgstr "{hours}時間{minutes}分"
 
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {#件のワークツリーをワークスペースとしてインポートしました} other {#件のワークツリーをワークスペースとしてインポートしました}}"
+
+msgid "{includedUsedLabel} of {includedLabel}"
+msgstr "{includedUsedLabel} / {includedLabel}"
 
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter}があなたを{role}として招待しました。"
@@ -1364,17 +1376,17 @@ msgstr "{total}件中{shown}件"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "{shownCount}件表示 · {0} · {1}トークン"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}、{memory} GB"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {#件スキップ} other {#件スキップ}}"
 
 msgid "{starCount} stars and counting"
 msgstr "スター{starCount}件、まだ増えています"
 
-msgid "{start} to {end}"
-msgstr "{start}〜{end}"
-
-msgid "{start} to {end} (current)"
-msgstr "{start}〜{end}(現在)"
+msgid "{start} – {end}"
+msgstr "{start}～{end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {#件のオートメーションを開始しました} other {#件のオートメーションを開始しました}}"
@@ -1436,6 +1448,9 @@ msgstr "{size} トークン中 {used}"
 msgid "{used} used"
 msgstr "{used} 使用済み"
 
+msgid "{used} used by you"
+msgstr "あなたの使用量: {used}"
+
 msgid "{user} and {others} joined and left."
 msgstr "{user} と {others} が参加して退出しました。"
 
@@ -1462,9 +1477,6 @@ msgstr "{user} が再参加しました。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vcpus} vCPU, {memory} GB"
-msgstr "{vcpus} vCPU、{memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}件待機中"
@@ -3462,6 +3474,10 @@ msgstr "自分のレビュー待ち"
 msgid "Awaiting review from you or your team"
 msgstr "自分またはチームのレビュー待ち"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "稼働中"
+
 msgid "Away"
 msgstr "離席中"
 
@@ -3589,9 +3605,6 @@ msgstr "請求"
 msgid "Billing details"
 msgstr "請求先情報"
 
-msgid "Billing period"
-msgstr "請求期間"
-
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "課金によりクラウドワークスペースの起動が拒否されました。組織のプランにクラウドワークスペースが含まれていないか、クラウド利用上限に達しています。クラウドワークスペースには Team または Ultra プランが必要です。設定 > 請求でアップグレードするか上限を上げてください。またはデバイスで自動化を実行してください。"
 
@@ -3671,6 +3684,9 @@ msgstr "自動運転車の等級付けを借りて、ソフトウェアの作ら
 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "下部ドロワー。タッチデバイスではスワイプで操作できます。"
+
+msgid "Bought GB-hours"
+msgstr "購入した GB 時間"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "購入済み GB 時間の残り: {prepaid}"
@@ -3895,6 +3911,12 @@ msgstr "許可すると、このアプリケーションはその利用規約と
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "続行をクリックすると、<0>利用規約</0>と<1>プライバシーポリシー</1>に同意したことになります。"
+
+msgid "By day"
+msgstr "日別"
+
+msgid "By person"
+msgstr "人別"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4830,9 +4852,6 @@ msgstr "この組織ではクラウド使用量が有効になっていません
 
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
-
-msgid "Cloud workspace usage for the whole organization."
-msgstr "組織全体のクラウドワークスペースの使用量。"
 
 msgid "Cloud workspace: asleep"
 msgstr "クラウドワークスペース：スリープ中"
@@ -5997,6 +6016,9 @@ msgstr "セッションを開始できませんでした"
 
 msgid "Could not start the chat"
 msgstr "チャットを開始できませんでした"
+
+msgid "Could not start."
+msgstr "起動できませんでした。"
 
 msgid "Could not steer"
 msgstr "軌道修正できませんでした"
@@ -7776,6 +7798,9 @@ msgstr "サーフェスごとに独自のタイポグラフィがあります。
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "ワークスペースごとに専用のクラウドマシンが割り当てられ、ノートパソコンを閉じても動き続けます。デスクトップ、iPhone、iPad から様子を確認できます。"
 
+msgid "Earlier period"
+msgstr "前の期間"
+
 msgid "Early 2024"
 msgstr "2024年前半"
 
@@ -8335,9 +8360,6 @@ msgstr "失敗"
 msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "失敗"
-
-msgid "Failed {failedAt}"
-msgstr "{failedAt} に失敗"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失敗した実行 <0>· 7日</0>"
@@ -9284,6 +9306,10 @@ msgstr "創業エンジニア"
 msgid "Free"
 msgstr "Free"
 
+msgctxt "cloud allowance group"
+msgid "Free"
+msgstr "無料"
+
 msgid "Free for everyone"
 msgstr "誰でも無料"
 
@@ -10110,6 +10136,10 @@ msgstr "識別情報"
 msgid "Idle"
 msgstr "アイドル"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "アイドル"
+
 msgid "Idle · branch pushed"
 msgstr "アイドル · ブランチをプッシュ済み"
 
@@ -10303,6 +10333,9 @@ msgstr "レビュー中"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "{appName}デスクトップアプリで設定 → リモートアクセスを開き、「リレー経由でこのデバイスへのリモートアクセスを許可」をオンにしてください。"
 
+msgid "in the last 30 days"
+msgstr "過去 30 日間"
+
 msgid "In the merge queue"
 msgstr "マージキュー内"
 
@@ -10311,6 +10344,9 @@ msgstr "マージキュー内です。順番が来ると GitHub がマージし�
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Paradevデスクトップアプリで<0>設定 → 外観 → テーマ</0>を開きます。"
+
+msgid "in this period"
+msgstr "この期間"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "公開から 1 年足らずで、180 か国の 14 万 5,000 人以上の開発者が {productName} を使い、185 万以上のエージェントワークスペースが作成されました。"
@@ -10341,6 +10377,9 @@ msgstr "Enterpriseに含まれます"
 
 msgid "Included with Team and Ultra."
 msgstr "Team と Ultra に含まれています。"
+
+msgid "Included with the plan"
+msgstr "プランに含まれる分"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Paradev独自のboxバリアントを含みます"
@@ -10963,6 +11002,9 @@ msgstr "直近3か月"
 msgid "last 30 days"
 msgstr "直近30日"
 
+msgid "Last 30 days"
+msgstr "過去 30 日間"
+
 msgid "Last 4 weeks"
 msgstr "直近4週間"
 
@@ -11036,6 +11078,9 @@ msgstr "レイテンシ"
 
 msgid "Later messages are removed."
 msgstr "以降のメッセージは削除されます。"
+
+msgid "Later period"
+msgstr "次の期間"
 
 msgid "Latest"
 msgstr "最新"
@@ -13292,6 +13337,9 @@ msgstr "このホストにはまだワークスペースがありません"
 msgid "No workspaces yet"
 msgstr "ワークスペースはまだありません"
 
+msgid "No workspaces."
+msgstr "ワークスペースはありません。"
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "いいえ。{companyName}がモデル呼び出しをプロキシすることはありません。エージェントはご自身のサブスクリプションとキーを使います。"
 
@@ -13522,6 +13570,9 @@ msgstr "物"
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
 msgstr "{0}人中"
+
+msgid "of {includedLabel} included"
+msgstr "（{includedLabel} 含む）"
 
 msgid "of {total}"
 msgstr "{total}人中"
@@ -13803,9 +13854,6 @@ msgstr "この接続を使えるのはあなただけです。チームメンバ
 
 msgid "Only you. Teammates forward their own."
 msgstr "あなただけです。チームメイトはそれぞれ自分で転送します。"
-
-msgid "Only your own workspaces. Organization totals are for owners and admins."
-msgstr "自分のワークスペースのみ。組織全体の合計はオーナーと管理者が確認できます。"
 
 msgid "open"
 msgstr "開く"
@@ -14470,6 +14518,9 @@ msgstr "出力は省略されました"
 msgid "Outside these hours, channels do not notify you."
 msgstr "この時間外はチャンネルから通知されません。"
 
+msgid "Over the plan"
+msgstr "プラン超過分"
+
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14566,6 +14617,10 @@ msgstr "ページネーション"
 
 msgid "Pagination"
 msgstr "Pagination"
+
+msgctxt "cloud allowance group"
+msgid "Paid"
+msgstr "有料"
 
 msgid "Paid plans"
 msgstr "有料プラン"
@@ -15576,6 +15631,10 @@ msgstr "プロパティ"
 msgid "Provide either id or slug"
 msgstr "idまたはslugのいずれかを指定してください"
 
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "準備中"
+
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "プロビジョニングに失敗し、サンドボックスは破棄されました。何も実行されておらず、このワークスペースは開けません。新しく作成してやり直してください。"
 
@@ -16334,6 +16393,9 @@ msgstr "ターミナルセッションを削除"
 
 msgid "remove the agent"
 msgstr "エージェントを削除する"
+
+msgid "Remove the person filter"
+msgstr "人のフィルターを解除"
 
 msgid "remove the PR link"
 msgstr "PRリンクを削除する"
@@ -17215,7 +17277,7 @@ msgstr "実行中"
 msgid "Running"
 msgstr "実行中"
 
-msgctxt "cloud workspace status"
+msgctxt "cloud workspace boot"
 msgid "Running"
 msgstr "実行中"
 
@@ -19154,10 +19216,6 @@ msgstr "起動中"
 msgid "Starting"
 msgstr "起動中"
 
-msgctxt "cloud workspace status"
-msgid "Starting"
-msgstr "起動中"
-
 msgid "Starting {agentLabel}"
 msgstr "{agentLabel}を起動中"
 
@@ -19306,22 +19364,20 @@ msgstr "停止"
 msgid "Stopped"
 msgstr "停止しました"
 
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "停止"
+
 #. placeholder {0}: pressure.reap.processName
 #. placeholder {1}: gb(pressure.reap.rssMb)
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "メモリを確保するため {0} ({1} GB) を停止しました"
-
-msgid "Stopped by a person"
-msgstr "ユーザーが停止"
 
 msgid "Stopped by the usage limit"
 msgstr "使用量の上限により停止"
 
 msgid "Stopped moving {name}"
 msgstr "{name} の移動を停止しました"
-
-msgid "Stopped when idle"
-msgstr "アイドル時に停止"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what} のエージェントを停止中"
@@ -20003,6 +20059,9 @@ msgstr "最良のエージェントは変わります。<0/>ワークフロー�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "マシンは {wanted} vCPU ではなく {actual} vCPU で起動しました。もう一度再起動してください。"
 
+msgid "The breakdown by plan is kept for the current period only."
+msgstr "プラン別の内訳は現在の期間のみ保持されます。"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "ボタンが目立つようになりました。ペインで確認済みです。"
 
@@ -20150,9 +20209,6 @@ msgstr "人間がマージ前に全行を読む。"
 
 msgid "The image upload expired — attach it again"
 msgstr "画像のアップロードの有効期限が切れました — もう一度添付してください"
-
-msgid "The included and overage GB-hours are kept for the current period only."
-msgstr "含まれる GB 時間と超過分の GB 時間は、現在の期間のみ保持されます。"
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "職務の中身が変わります。エンジニアは審美眼のあるタイピストであることをやめ、審美眼のあるディスパッチャーになります。作業を分解し、フリートに割り振り、同じモジュールに触れたエージェント同士の衝突を裁く役です。"
@@ -20662,9 +20718,6 @@ msgstr "変更されるのは表示名だけで、ブランチは変わりませ
 msgid "this organization"
 msgstr "この組織"
 
-msgid "This organization has no billing periods, so this page shows the last 30 days."
-msgstr "この組織には請求期間がないため、このページには過去 30 日間が表示されます。"
-
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "この組織には請求期間がありません。代わりに期間を選んでください。"
 
@@ -20875,6 +20928,9 @@ msgstr "このワークスペース"
 
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
+
+msgid "This workspace has no usage in this period."
+msgstr "このワークスペースはこの期間に使用されていません。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "このワークスペースは削除されたか、アクセス権がなくなった可能性があります。"
@@ -21782,17 +21838,11 @@ msgstr "組織内で一意のURLフレンドリーな識別子。"
 msgid "Usage"
 msgstr "使用量"
 
-msgid "Usage by day"
-msgstr "日別の使用量"
-
-msgid "Usage by person"
-msgstr "ユーザー別の使用量"
-
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
-msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
-msgstr "使用量は請求された日 (UTC) に表示されます。ワークスペースが実行された時刻より少し後になることがあります。"
+msgid "Usage limit"
+msgstr "使用量の上限"
 
 msgid "Usage limit reached"
 msgstr "使用量の上限に達しました"
@@ -23119,6 +23169,9 @@ msgstr "組織が環境の上限に達しました。"
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "あなた自身のアカウントです。組織の連携は Paradev がそのツールにアクセスするためのもので、あなたのアカウントを接続すると、Paradev があなたのために行った作業があなたの名前で表示されます。"
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "あなた自身の使用量のみです。組織の合計、割り当て、人別の使用量はオーナーと管理者のみが表示できます。"
+
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"
 
@@ -23133,9 +23186,6 @@ msgstr "ご利用のプランにはクラウド環境が含まれていません
 
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "ご利用のプランにはクラウド環境が含まれていません。作成するには、設定の請求からアップグレードしてください。"
-
-msgid "Your plan includes no cloud GB-hours."
-msgstr "ご利用のプランにはクラウド GB 時間が含まれていません。"
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "{startDate} にプランが {planName} に変わります。本日の請求はありません。"

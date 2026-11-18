@@ -804,6 +804,9 @@ msgstr "{archivableCount, plural, one {Arsipkan # Workspace Cloud} other {Arsipk
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} other {Tertinggal # commit dari main, perlu rebase}}"
 
+msgid "{boughtLabel} left"
+msgstr "Sisa {boughtLabel}"
+
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} dari {totalBranches}"
 
@@ -915,6 +918,12 @@ msgstr "{count, plural, one {mengambil # halaman} other {mengambil # halaman}}"
 
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Impor # worktree} other {Impor # worktree}}"
+
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, other {di # workspace dalam 30 hari terakhir}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, other {di # workspace pada periode ini}}"
 
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, other {Merge # pull request?}}"
@@ -1087,6 +1096,9 @@ msgstr "{hours}j {minutes}m"
 
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Mengimpor # worktree sebagai workspace} other {Mengimpor # worktree sebagai workspace}}"
+
+msgid "{includedUsedLabel} of {includedLabel}"
+msgstr "{includedUsedLabel} dari {includedLabel}"
 
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} mengundang Anda bergabung sebagai {role}."
@@ -1364,17 +1376,17 @@ msgstr "{shown} dari {total}"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "{shownCount} ditampilkan · {0} · {1} token"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}, {memory} GB"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# dilewati} other {# dilewati}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} star dan terus bertambah"
 
-msgid "{start} to {end}"
-msgstr "{start} sampai {end}"
-
-msgid "{start} to {end} (current)"
-msgstr "{start} sampai {end} (saat ini)"
+msgid "{start} – {end}"
+msgstr "{start} – {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimulai}}"
@@ -1436,6 +1448,9 @@ msgstr "{used} dari {size} token"
 msgid "{used} used"
 msgstr "{used} terpakai"
 
+msgid "{used} used by you"
+msgstr "{used} digunakan oleh Anda"
+
 msgid "{user} and {others} joined and left."
 msgstr "{user} dan {others} bergabung lalu keluar."
 
@@ -1462,9 +1477,6 @@ msgstr "{user} bergabung kembali."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vcpus} vCPU, {memory} GB"
-msgstr "{vcpus} vCPU, {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Menunggu"
@@ -3462,6 +3474,10 @@ msgstr "Menunggu review dari Anda"
 msgid "Awaiting review from you or your team"
 msgstr "Menunggu review dari Anda atau tim Anda"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "Aktif"
+
 msgid "Away"
 msgstr "Tidak di tempat"
 
@@ -3589,9 +3605,6 @@ msgstr "Penagihan"
 msgid "Billing details"
 msgstr "Detail penagihan"
 
-msgid "Billing period"
-msgstr "Periode penagihan"
-
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Penagihan menolak memulai workspace cloud: paket organisasi tidak mencakup workspace cloud, atau organisasi mencapai batas pemakaian cloud. Workspace cloud memerlukan paket Team atau Ultra. Upgrade atau naikkan batas di Pengaturan > Penagihan, atau jalankan otomatisasi di perangkat."
 
@@ -3671,6 +3684,9 @@ msgstr "Dipinjam dari cara mobil swakemudi dinilai, diterapkan pada cara perangk
 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Laci bawah, ramah geser di perangkat sentuh."
+
+msgid "Bought GB-hours"
+msgstr "GB-jam yang dibeli"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Sisa GB-jam yang dibeli: {prepaid}"
@@ -3895,6 +3911,12 @@ msgstr "Dengan memberi otorisasi, Anda mengizinkan aplikasi ini mengakses data A
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "Dengan mengklik lanjutkan, Anda menyetujui <0>Ketentuan Layanan</0> dan <1>Kebijakan Privasi</1> kami."
+
+msgid "By day"
+msgstr "Per hari"
+
+msgid "By person"
+msgstr "Per orang"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4830,9 +4852,6 @@ msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
 
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
-
-msgid "Cloud workspace usage for the whole organization."
-msgstr "Penggunaan workspace cloud untuk seluruh organisasi."
 
 msgid "Cloud workspace: asleep"
 msgstr "Workspace cloud: tertidur"
@@ -5997,6 +6016,9 @@ msgstr "Tidak bisa memulai sesi"
 
 msgid "Could not start the chat"
 msgstr "Tidak dapat memulai obrolan"
+
+msgid "Could not start."
+msgstr "Tidak dapat dimulai."
 
 msgid "Could not steer"
 msgstr "Tidak dapat mengarahkan"
@@ -7776,6 +7798,9 @@ msgstr "Tiap permukaan punya tipografinya sendiri. Perubahan langsung terlihat d
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Setiap workspace mendapat mesin cloud sendiri dan tetap bekerja saat laptop Anda tertutup. Pantau dari desktop, iPhone, atau iPad."
 
+msgid "Earlier period"
+msgstr "Periode sebelumnya"
+
 msgid "Early 2024"
 msgstr "Awal 2024"
 
@@ -8335,9 +8360,6 @@ msgstr "Gagal"
 msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "Gagal"
-
-msgid "Failed {failedAt}"
-msgstr "Gagal pada {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Eksekusi gagal <0>· 7h</0>"
@@ -9284,6 +9306,10 @@ msgstr "Engineer Pendiri"
 msgid "Free"
 msgstr "Gratis"
 
+msgctxt "cloud allowance group"
+msgid "Free"
+msgstr "Gratis"
+
 msgid "Free for everyone"
 msgstr "Gratis untuk semua orang"
 
@@ -10110,6 +10136,10 @@ msgstr "Identitas"
 msgid "Idle"
 msgstr "Idle"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "Menganggur"
+
 msgid "Idle · branch pushed"
 msgstr "Idle · branch sudah di-push"
 
@@ -10303,6 +10333,9 @@ msgstr "Dalam review"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "Di aplikasi desktop {appName}, buka Pengaturan → Akses Jarak Jauh dan aktifkan “Izinkan akses jarak jauh ke perangkat ini melalui relay”."
 
+msgid "in the last 30 days"
+msgstr "dalam 30 hari terakhir"
+
 msgid "In the merge queue"
 msgstr "Di antrean merge"
 
@@ -10311,6 +10344,9 @@ msgstr "Di antrean merge. GitHub me-merge-nya saat gilirannya tiba."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "Di aplikasi desktop Paradev, buka <0>Pengaturan → Tampilan → Tema</0>."
+
+msgid "in this period"
+msgstr "pada periode ini"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "Dalam waktu kurang dari setahun, lebih dari 145.000 developer di 180 negara telah menjalankan {productName} dan membuat lebih dari 1,85 juta workspace agen."
@@ -10341,6 +10377,9 @@ msgstr "Termasuk di Enterprise"
 
 msgid "Included with Team and Ultra."
 msgstr "Termasuk dalam Team dan Ultra."
+
+msgid "Included with the plan"
+msgstr "Termasuk dalam paket"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Termasuk varian box khusus Paradev"
@@ -10963,6 +11002,9 @@ msgstr "3 bulan terakhir"
 msgid "last 30 days"
 msgstr "30 hari terakhir"
 
+msgid "Last 30 days"
+msgstr "30 hari terakhir"
+
 msgid "Last 4 weeks"
 msgstr "4 minggu terakhir"
 
@@ -11036,6 +11078,9 @@ msgstr "Latensi"
 
 msgid "Later messages are removed."
 msgstr "Pesan berikutnya akan dihapus."
+
+msgid "Later period"
+msgstr "Periode berikutnya"
 
 msgid "Latest"
 msgstr "Terbaru"
@@ -13292,6 +13337,9 @@ msgstr "Belum ada workspace di host ini"
 msgid "No workspaces yet"
 msgstr "Belum ada workspace"
 
+msgid "No workspaces."
+msgstr "Tidak ada workspace."
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Tidak. {companyName} tidak pernah menjadi proxy untuk panggilan model. Agen menggunakan langganan dan kunci Anda sendiri."
 
@@ -13522,6 +13570,9 @@ msgstr "Objek"
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
 msgstr "dari {0}"
+
+msgid "of {includedLabel} included"
+msgstr "dari {includedLabel} yang termasuk"
 
 msgid "of {total}"
 msgstr "dari {total}"
@@ -13803,9 +13854,6 @@ msgstr "Hanya Anda yang dapat menggunakan koneksi ini. Rekan tim menghubungkan a
 
 msgid "Only you. Teammates forward their own."
 msgstr "Hanya Anda. Rekan tim meneruskan port mereka sendiri."
-
-msgid "Only your own workspaces. Organization totals are for owners and admins."
-msgstr "Hanya workspace Anda sendiri. Total organisasi untuk pemilik dan admin."
 
 msgid "open"
 msgstr "buka"
@@ -14470,6 +14518,9 @@ msgstr "Output dipotong"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Di luar jam ini, kanal tidak memberi Anda notifikasi."
 
+msgid "Over the plan"
+msgstr "Di atas paket"
+
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14566,6 +14617,10 @@ msgstr "paginasi"
 
 msgid "Pagination"
 msgstr "Paginasi"
+
+msgctxt "cloud allowance group"
+msgid "Paid"
+msgstr "Berbayar"
 
 msgid "Paid plans"
 msgstr "Paket berbayar"
@@ -15576,6 +15631,10 @@ msgstr "Properti"
 msgid "Provide either id or slug"
 msgstr "Berikan id atau slug"
 
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "Sedang disiapkan"
+
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Provisioning gagal dan sandbox-nya dibongkar. Tidak ada yang berjalan, dan workspace ini tidak bisa dibuka. Buat yang baru untuk mencoba lagi."
 
@@ -16334,6 +16393,9 @@ msgstr "Hapus sesi terminal"
 
 msgid "remove the agent"
 msgstr "menghapus agen"
+
+msgid "Remove the person filter"
+msgstr "Hapus filter orang"
 
 msgid "remove the PR link"
 msgstr "menghapus tautan PR"
@@ -17215,7 +17277,7 @@ msgstr "berjalan"
 msgid "Running"
 msgstr "Berjalan"
 
-msgctxt "cloud workspace status"
+msgctxt "cloud workspace boot"
 msgid "Running"
 msgstr "Berjalan"
 
@@ -19154,10 +19216,6 @@ msgstr "memulai"
 msgid "Starting"
 msgstr "Memulai"
 
-msgctxt "cloud workspace status"
-msgid "Starting"
-msgstr "Memulai"
-
 msgid "Starting {agentLabel}"
 msgstr "Memulai {agentLabel}"
 
@@ -19306,22 +19364,20 @@ msgstr "berhenti"
 msgid "Stopped"
 msgstr "Dihentikan"
 
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "Dihentikan"
+
 #. placeholder {0}: pressure.reap.processName
 #. placeholder {1}: gb(pressure.reap.rssMb)
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "{0} ({1} GB) dihentikan untuk mengosongkan memori"
-
-msgid "Stopped by a person"
-msgstr "Dihentikan oleh seseorang"
 
 msgid "Stopped by the usage limit"
 msgstr "Dihentikan oleh batas penggunaan"
 
 msgid "Stopped moving {name}"
 msgstr "Pemindahan {name} dihentikan"
-
-msgid "Stopped when idle"
-msgstr "Dihentikan saat tidak aktif"
 
 msgid "Stopping the agent in {what}"
 msgstr "Menghentikan agen di {what}"
@@ -20003,6 +20059,9 @@ msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Mesin aktif kembali dengan {actual} vCPU, bukan {wanted}. Mulai ulang untuk mencoba lagi."
 
+msgid "The breakdown by plan is kept for the current period only."
+msgstr "Rincian per paket hanya disimpan untuk periode saat ini."
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 
@@ -20150,9 +20209,6 @@ msgstr "Manusia membaca tiap baris sebelum di-merge."
 
 msgid "The image upload expired — attach it again"
 msgstr "Unggahan gambar kedaluwarsa — lampirkan lagi"
-
-msgid "The included and overage GB-hours are kept for the current period only."
-msgstr "GB-jam yang termasuk dan kelebihannya hanya disimpan untuk periode saat ini."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Deskripsi pekerjaannya bergeser. Engineer berhenti menjadi juru ketik berselera dan menjadi pengatur lalu lintas berselera: memecah pekerjaan, mengarahkannya ke armada agen, menengahi konflik antara agen yang sama-sama menyentuh modul yang sama."
@@ -20662,9 +20718,6 @@ msgstr "Ini hanya mengubah nama tampilan, bukan branch-nya."
 msgid "this organization"
 msgstr "organisasi ini"
 
-msgid "This organization has no billing periods, so this page shows the last 30 days."
-msgstr "Organisasi ini tidak memiliki periode penagihan, jadi halaman ini menampilkan 30 hari terakhir."
-
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Organisasi ini tidak memiliki periode penagihan. Pilih rentang waktu sebagai gantinya."
 
@@ -20875,6 +20928,9 @@ msgstr "Workspace ini"
 
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
+
+msgid "This workspace has no usage in this period."
+msgstr "Workspace ini tidak memiliki penggunaan pada periode ini."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Workspace ini mungkin sudah dihapus, atau Anda sudah tidak punya akses ke sana."
@@ -21782,17 +21838,11 @@ msgstr "Pengenal ramah URL, unik di dalam organisasi Anda."
 msgid "Usage"
 msgstr "Penggunaan"
 
-msgid "Usage by day"
-msgstr "Penggunaan per hari"
-
-msgid "Usage by person"
-msgstr "Penggunaan per orang"
-
 msgid "Usage is out of date"
 msgstr "Data penggunaan sudah tidak mutakhir"
 
-msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
-msgstr "Penggunaan ditampilkan pada hari UTC saat ditagih, yang bisa sedikit setelah workspace berjalan."
+msgid "Usage limit"
+msgstr "Batas penggunaan"
 
 msgid "Usage limit reached"
 msgstr "Batas penggunaan tercapai"
@@ -23119,6 +23169,9 @@ msgstr "Organisasi Anda telah mencapai batas lingkungan."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Hanya penggunaan Anda sendiri. Total organisasi, jatahnya, dan penggunaan per orang hanya untuk pemilik dan admin."
+
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."
 
@@ -23133,9 +23186,6 @@ msgstr "Paket Anda tidak mencakup lingkungan cloud."
 
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Paket Anda tidak mencakup lingkungan cloud. Tingkatkan paket di Pengaturan, Penagihan untuk membuatnya."
-
-msgid "Your plan includes no cloud GB-hours."
-msgstr "Paket Anda tidak menyertakan GB-jam cloud."
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Paket Anda pindah ke {planName} pada {startDate}. Tidak ada tagihan hari ini."

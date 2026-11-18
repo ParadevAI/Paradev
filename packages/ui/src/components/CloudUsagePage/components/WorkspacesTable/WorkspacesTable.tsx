@@ -2,8 +2,8 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
+import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import { cn } from "../../../../lib/utils";
-import { Button } from "../../../ui/button";
 import {
 	Table,
 	TableBody,
@@ -12,137 +12,140 @@ import {
 	TableHeader,
 	TableRow,
 } from "../../../ui/table";
-import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
-import type { CloudPages, CloudUsage, WorkspaceRef } from "../../types";
-import { QueryStatus } from "../QueryStatus";
-import { SizeLabel } from "../SizeLabel";
+import { useUsageFormat } from "../../hooks/useUsageFormat";
+import type { CloudUsageLink, CloudUsageRow } from "../../types";
+import { workspaceOf } from "../../utils/workspaceOf";
+import { Person } from "../Person";
+import { StatusPill } from "../StatusPill";
 
 interface WorkspacesTableProps {
-	pages: CloudPages<CloudUsage>;
+	Link: CloudUsageLink;
+	rows: CloudUsageRow[];
 	isAdmin: boolean;
-	onSelect: (workspace: WorkspaceRef) => void;
+	inDollars: boolean;
+	period: string | undefined;
 }
 
+const HEAD =
+	"h-9 text-xs font-medium tracking-wide text-muted-foreground uppercase";
+/** Folding, by the page's width: owner, hours and size go first, then GB-hours. */
+const WIDE = "hidden @2xl:table-cell";
+const MEDIUM = "hidden @xl:table-cell";
+const NARROW = "hidden @lg:table-cell";
+
 export function WorkspacesTable({
-	pages,
+	Link,
+	rows,
 	isAdmin,
-	onSelect,
+	inDollars,
+	period,
 }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
-	const { formatNumber, formatGbHours } = useFormat();
-	const rows = pages.data?.pages.flatMap((page) => page.items) ?? [];
+	const { formatNumber } = useFormat();
+	const { dollars, formatGbHours } = useUsageFormat();
 
 	return (
-		<section className="space-y-3">
-			<h3 className="text-sm font-medium">
-				{isAdmin ? <Trans>Workspaces</Trans> : <Trans>Your workspaces</Trans>}
-			</h3>
-			{!pages.data ? (
-				<QueryStatus isError={pages.isError} onRetry={() => pages.refetch()} />
-			) : (
-				<div className="rounded-md border">
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>
-									<Trans>Workspace</Trans>
-								</TableHead>
-								{isAdmin && (
-									<TableHead className="hidden lg:table-cell">
-										<Trans>Owner</Trans>
-									</TableHead>
+		<Table>
+			<TableHeader>
+				<TableRow className="hover:bg-transparent">
+					<TableHead className={HEAD}>
+						<Trans>Workspace</Trans>
+					</TableHead>
+					{isAdmin && (
+						<TableHead className={cn(HEAD, WIDE)}>
+							<Trans>Owner</Trans>
+						</TableHead>
+					)}
+					<TableHead className={HEAD}>
+						<Trans>Status</Trans>
+					</TableHead>
+					<TableHead className={cn(HEAD, MEDIUM)}>
+						<Trans>Size</Trans>
+					</TableHead>
+					<TableHead className={cn(HEAD, WIDE, "text-right")}>
+						<Trans>Hours</Trans>
+					</TableHead>
+					<TableHead className={cn(HEAD, "text-right", inDollars && NARROW)}>
+						<Trans>GB-hours</Trans>
+					</TableHead>
+					{inDollars && (
+						<TableHead className={cn(HEAD, "text-right")}>
+							<Trans>Usage</Trans>
+						</TableHead>
+					)}
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{rows.length === 0 && (
+					<TableRow className="hover:bg-transparent">
+						<TableCell
+							colSpan={7}
+							className="py-8 text-center text-muted-foreground"
+						>
+							<Trans>No workspaces.</Trans>
+						</TableCell>
+					</TableRow>
+				)}
+				{rows.map((row) => {
+					const workspace = workspaceOf(row);
+					const owner = workspace?.owner?.name;
+					const size = workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
+					return (
+						<TableRow key={row.key ?? ""} className="relative">
+							<TableCell className="max-w-64 py-2.5 whitespace-normal">
+								{workspace ? (
+									<Link
+										to={{
+											page: "workspace",
+											workspaceId: workspace.id,
+											period,
+										}}
+										className="font-semibold break-words after:absolute after:inset-0"
+									>
+										{workspace.name}
+									</Link>
+								) : (
+									<span className="text-muted-foreground">
+										<Trans>Deleted workspace</Trans>
+									</span>
 								)}
-								<TableHead>
-									<Trans>Status</Trans>
-								</TableHead>
-								<TableHead className="hidden lg:table-cell">
-									<Trans>Size</Trans>
-								</TableHead>
-								<TableHead className="hidden text-right sm:table-cell">
-									<Trans>Hours</Trans>
-								</TableHead>
-								<TableHead className="text-right">
-									<Trans>GB-hours</Trans>
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{rows.map((row) => {
-								const workspace =
-									row.ref && "status" in row.ref ? row.ref : null;
-								return (
-									<TableRow key={row.key ?? ""}>
-										<TableCell
-											className={cn("whitespace-normal", isAdmin && "max-w-48")}
-										>
-											{workspace ? (
-												<button
-													type="button"
-													className="text-left font-medium break-words hover:underline"
-													onClick={() => onSelect(workspace)}
-												>
-													{workspace.name}
-												</button>
-											) : (
-												<span className="text-muted-foreground">
-													<Trans>Deleted workspace</Trans>
-												</span>
-											)}
-											{isAdmin && workspace?.owner && (
-												<div className="text-xs text-muted-foreground lg:hidden">
-													{workspace.owner.name}
-												</div>
-											)}
-										</TableCell>
-										{isAdmin && (
-											<TableCell className="hidden whitespace-normal lg:table-cell">
-												{workspace?.owner?.name}
-											</TableCell>
-										)}
-										<TableCell className="whitespace-normal">
-											{workspace && (
-												<div
-													className={
-														workspace.status === "failed"
-															? "text-destructive"
-															: undefined
-													}
-												>
-													{i18n._(STATUS_LABELS[workspace.status])}
-												</div>
-											)}
-											{workspace?.failure && (
-												<div className="text-xs text-muted-foreground">
-													{i18n._(FAILURE_REASONS[workspace.failure.reason])}
-												</div>
-											)}
-										</TableCell>
-										<TableCell className="hidden lg:table-cell">
-											{workspace && <SizeLabel size={workspace.size} />}
-										</TableCell>
-										<TableCell className="hidden text-right tabular-nums sm:table-cell">
-											{formatNumber(row.hours, { maximumFractionDigits: 1 })}
-										</TableCell>
-										<TableCell className="text-right tabular-nums">
-											{formatGbHours(row.gbHours)}
-										</TableCell>
-									</TableRow>
-								);
-							})}
-						</TableBody>
-					</Table>
-				</div>
-			)}
-			{pages.hasNextPage && (
-				<Button
-					variant="outline"
-					size="sm"
-					disabled={pages.isFetchingNextPage}
-					onClick={() => pages.fetchNextPage()}
-				>
-					<Trans>Show more</Trans>
-				</Button>
-			)}
-		</section>
+								<div className="flex flex-wrap gap-x-1.5 text-xs text-muted-foreground @2xl:hidden">
+									{isAdmin && owner && <span>{owner}</span>}
+									{isAdmin && owner && size && (
+										<span aria-hidden className="@xl:hidden">
+											·
+										</span>
+									)}
+									{size && <span className="@xl:hidden">{size}</span>}
+								</div>
+							</TableCell>
+							{isAdmin && (
+								<TableCell className={WIDE}>
+									{owner && <Person name={owner} />}
+								</TableCell>
+							)}
+							<TableCell>
+								{/* A "usage limit" note goes beside the pill once the row carries the last boot's end reason. */}
+								{workspace && <StatusPill status={workspace.status} />}
+							</TableCell>
+							<TableCell className={MEDIUM}>{size}</TableCell>
+							<TableCell className={cn(WIDE, "text-right tabular-nums")}>
+								{formatNumber(row.hours, { maximumFractionDigits: 0 })}
+							</TableCell>
+							<TableCell
+								className={cn("text-right tabular-nums", inDollars && NARROW)}
+							>
+								{formatGbHours(row.gbHours)}
+							</TableCell>
+							{inDollars && (
+								<TableCell className="text-right tabular-nums">
+									{row.usageUsd === null ? null : dollars(row.usageUsd)}
+								</TableCell>
+							)}
+						</TableRow>
+					);
+				})}
+			</TableBody>
+		</Table>
 	);
 }
