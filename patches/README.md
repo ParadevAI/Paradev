@@ -551,11 +551,45 @@ guard test checks it.
 **Guard test:** `packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
 It runs the installed provider against an in-memory database.
 
+**Also changes** (`superset-patch: grant-revocation`): JWT access tokens are
+not stored, so `/oauth2/revoke` verified them and did nothing, and the old
+token kept working on `/oauth2/userinfo` and our own APIs for its 7 days. Three
+options are added and set in `packages/auth/src/server.ts`:
+`isJwtAccessTokenLive` (checked in `validateJwtAccessToken`, so userinfo and
+introspection), `onJwtAccessTokenRevoked` and `onRefreshTokenRevoked` (called
+by `/oauth2/revoke`). Userinfo answers an inactive token with 401
+`invalid_token`. The logic is in `packages/auth/src/lib/oauth-grant/`.
+
+**Guard tests:** `packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`
+and `packages/auth/src/lib/oauth-grant/oauth-grant.test.ts`. Both run the
+installed provider against an in-memory database.
+
 **Regenerating after a version bump:** `bun patch @better-auth/oauth-provider`,
-make the same change in `handleRefreshTokenGrant` (keep the
-`superset-patch: refresh-reuse-grace` comment), `bun patch --commit
-'node_modules/@better-auth/oauth-provider'`, then
-`bun test packages/auth/src/oauth-provider-refresh-grace-patch.test.ts`.
+make the same changes (keep the `superset-patch:` comments, and the option
+types in `dist/oauth-*.d.mts`), `bun patch --commit
+'node_modules/@better-auth/oauth-provider'`, then run both guard tests.
+
+## @better-auth/drizzle-adapter (`@better-auth%2Fdrizzle-adapter@<version>.patch`)
+
+**Why:** on Postgres, `incrementOne` ran `UPDATE … WHERE id IN (SELECT id …
+WHERE <guard> LIMIT 1)`. Under READ COMMITTED a second concurrent UPDATE waits
+for the first, then re-checks only `id IN (…)`, not the guard. Two parallel
+refreshes of one token both passed the `revoked IS NULL` guard and created two
+live children; revoking the one the client kept left the other working. In
+production on 2026-11-18, 86 superset-cli rotations had forked this way.
+
+**What it changes** (`dist/index.mjs`, `incrementOne`, non-MySQL path): the
+guard is repeated on the UPDATE itself, so the second caller gets no row and
+the refresh fails with `invalid_grant`, as any lost rotation race already does.
+
+**Guard test:** `packages/auth/src/drizzle-adapter-increment-patch.test.ts`
+checks the patch is registered and applied. The race itself needs two Postgres
+sessions; it was reproduced on a Neon branch when the patch was written.
+
+**Regenerating after a version bump:** `bun patch @better-auth/drizzle-adapter`,
+repeat the change (keep the `superset-patch: atomic-increment-one` comment),
+`bun patch --commit 'node_modules/@better-auth/drizzle-adapter'`, then run the
+guard test.
 
 ## react-native (`react-native@<version>.patch`)
 

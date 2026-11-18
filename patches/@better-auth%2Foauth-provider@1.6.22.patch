@@ -1,8 +1,20 @@
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 4d997fc61d436f35f722986f4fcc6601a1fb2068..8eb2d58434c29183b652d6b1bd30e276c29d9f82 100644
+index 4d997fc61d436f35f722986f4fcc6601a1fb2068..ab3089dc525d3e85f19d55f76f246827aa86801d 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
-@@ -772,7 +772,10 @@ async function handleRefreshTokenGrant(ctx, opts) {
+@@ -228,6 +228,11 @@ async function userInfoEndpoint(ctx, opts) {
+ 		error: "invalid_request"
+ 	});
+ 	const jwt = await validateAccessToken(ctx, opts, token);
++	// superset-patch: grant-revocation. RFC 6750: an inactive token is invalid_token.
++	if (!jwt.active) throw new APIError("UNAUTHORIZED", {
++		error_description: "token is not active",
++		error: "invalid_token"
++	});
+ 	const scopes = jwt.scope?.split(" ");
+ 	if (!scopes?.includes("openid")) throw new APIError("BAD_REQUEST", {
+ 		error_description: "Missing required scope",
+@@ -772,7 +777,10 @@ async function handleRefreshTokenGrant(ctx, opts) {
  		error: "invalid_grant"
  	});
  	if (refreshToken.revoked) {
@@ -14,3 +26,71 @@ index 4d997fc61d436f35f722986f4fcc6601a1fb2068..8eb2d58434c29183b652d6b1bd30e276
  		throw new APIError("BAD_REQUEST", {
  			error_description: "invalid refresh token",
  			error: "invalid_grant"
+@@ -861,6 +869,8 @@ async function validateJwtAccessToken(ctx, opts, token, clientId) {
+ 		});
+ 		if (!session || session.expiresAt < /* @__PURE__ */ new Date()) jwtPayload.sid = void 0;
+ 	}
++	// superset-patch: grant-revocation. JWT access tokens are not stored, so liveness comes from their grant.
++	if (opts.isJwtAccessTokenLive && !await opts.isJwtAccessTokenLive(ctx, jwtPayload)) return { active: false };
+ 	jwtPayload.client_id = jwtPayload.azp;
+ 	jwtPayload.active = true;
+ 	return jwtPayload;
+@@ -2262,11 +2272,12 @@ const deleteOAuthConsent = (opts) => createAuthEndpoint("/oauth2/delete-consent"
+ * Revokes a JWT access token against the configured JWKs.
+ * (does nothing if successful since a JWT is not stored on the server)
+ */
+-async function revokeJwtAccessToken(ctx, opts, token) {
++async function revokeJwtAccessToken(ctx, opts, token, clientId) {
+ 	const jwtPlugin = opts.disableJwtPlugin ? void 0 : getJwtPlugin(ctx.context);
+ 	const jwtPluginOptions = jwtPlugin?.options;
++	let jwtPayload;
+ 	try {
+-		await verifyJwsAccessToken(token, {
++		jwtPayload = await verifyJwsAccessToken(token, {
+ 			jwksFetch: jwtPluginOptions?.jwks?.remoteUrl ? jwtPluginOptions.jwks.remoteUrl : async () => {
+ 				return (await jwtPlugin?.endpoints.getJwks(ctx))?.response;
+ 			},
+@@ -2288,6 +2299,8 @@ async function revokeJwtAccessToken(ctx, opts, token) {
+ 		}
+ 		throw new Error(error);
+ 	}
++	// superset-patch: grant-revocation. RFC 7009 2.1: revoking an access token may revoke its grant.
++	if (opts.onJwtAccessTokenRevoked && jwtPayload.azp === clientId) await opts.onJwtAccessTokenRevoked(ctx, jwtPayload);
+ }
+ /**
+ * Searches for an opaque access token in the database and validates it
+@@ -2375,6 +2388,8 @@ async function revokeRefreshToken(ctx, opts, token, clientId) {
+ 			value: refreshToken.id
+ 		}]
+ 	});
++	// superset-patch: grant-revocation. RFC 7009 2.1: invalidate the rest of the grant.
++	if (opts.onRefreshTokenRevoked) await opts.onRefreshTokenRevoked(ctx, refreshToken);
+ }
+ /**
+ * We don't know the access token format so we try to validate it
+@@ -2382,7 +2397,7 @@ async function revokeRefreshToken(ctx, opts, token, clientId) {
+ */
+ async function revokeAccessToken(ctx, opts, clientId, token) {
+ 	try {
+-		return await revokeJwtAccessToken(ctx, opts, token);
++		return await revokeJwtAccessToken(ctx, opts, token, clientId);
+ 	} catch (err) {
+ 		if (err instanceof APIError$1) {} else if (err instanceof Error) throw err;
+ 		else throw new Error(err);
+diff --git a/dist/oauth-D74mBkw6.d.mts b/dist/oauth-D74mBkw6.d.mts
+index 5531f010da1b43580be514022df818bb1f835323..c684bed30237fe39c134ddab3694b41eb1c4a539 100644
+--- a/dist/oauth-D74mBkw6.d.mts
++++ b/dist/oauth-D74mBkw6.d.mts
+@@ -358,6 +358,12 @@ interface OAuthOptions<Scopes extends readonly Scope[] = InternallySupportedScop
+    * @default 3600 (1 hour) - Industry standard
+    */
+   accessTokenExpiresIn?: number;
++  /** superset-patch: grant-revocation. Return false to make a verified JWT access token inactive. */
++  isJwtAccessTokenLive?: (ctx: GenericEndpointContext, payload: JWTPayload) => Promise<boolean> | boolean;
++  /** superset-patch: grant-revocation. Called after /oauth2/revoke verifies a JWT access token issued to the caller. */
++  onJwtAccessTokenRevoked?: (ctx: GenericEndpointContext, payload: JWTPayload) => Promise<void> | void;
++  /** superset-patch: grant-revocation. Called after /oauth2/revoke revokes a refresh token row. */
++  onRefreshTokenRevoked?: (ctx: GenericEndpointContext, refreshToken: OAuthRefreshToken) => Promise<void> | void;
+   /**
+    * The amount of time in seconds that a client
+    * credentials grant access token is valid for.
