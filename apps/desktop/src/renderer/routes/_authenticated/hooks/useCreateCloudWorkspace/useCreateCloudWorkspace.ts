@@ -24,10 +24,7 @@ export function useCreateCloudWorkspace() {
 			input: CreateCloudWorkspaceInput,
 			launchContext: PendingCloudLaunchContext = {},
 		) => {
-			const { initialLaunch, ...created } = await mutateAsync({
-				...input,
-				...(input.agent ? { agentTerminalId: crypto.randomUUID() } : {}),
-			});
+			const { initialLaunch, ...created } = await mutateAsync(input);
 			seedPendingCloudLaunch({
 				collections,
 				workspaceId: created.id,
