@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { CloudAgentLaunchDescriptor } from "@superset/shared/cloud-agent-launch";
+import type { PendingCloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import {
 	fetchPendingCloudLaunch,
 	type PendingLaunchHostClient,
@@ -8,17 +8,18 @@ import {
 const RENDERER_ROOT = `${import.meta.dir}/../../../../../../../../..`;
 
 function hostAnswering(
-	answer: () => Promise<CloudAgentLaunchDescriptor | null>,
+	answer: () => Promise<PendingCloudAgentLaunch | null>,
 ): PendingLaunchHostClient {
 	return { sandbox: { pendingLaunch: { query: answer } } };
 }
 
 test("passes the box's pending launch through", async () => {
-	const launch: CloudAgentLaunchDescriptor = {
+	const launch: PendingCloudAgentLaunch = {
 		agent: "claude",
 		surface: "terminal",
 		promptHash: null,
 		terminalId: "promised-terminal",
+		prompt: "",
 	};
 	expect(
 		await fetchPendingCloudLaunch(
@@ -50,20 +51,14 @@ test("any other failure stays an error so the query retries", async () => {
 	);
 });
 
-test("only fetchPendingCloudLaunch asks a host for its pending launch, and only the pending-launch store builds the waiting pane", async () => {
+test("only fetchPendingCloudLaunch asks a host for its pending launch", async () => {
 	const askers: string[] = [];
-	const builders: string[] = [];
 	for await (const path of new Bun.Glob("**/*.{ts,tsx}").scan(RENDERER_ROOT)) {
 		if (/\.test\.tsx?$/.test(path)) continue;
 		const source = await Bun.file(`${RENDERER_ROOT}/${path}`).text();
 		if (/sandbox\s*\.\s*pendingLaunch\b/.test(source)) askers.push(path);
-		if (/kind:\s*PENDING_CLOUD_LAUNCH_PANE_KIND\b/.test(source))
-			builders.push(path);
 	}
 	expect(askers).toEqual([
 		"routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useHostPendingCloudLaunch/utils/fetchPendingCloudLaunch/fetchPendingCloudLaunch.ts",
-	]);
-	expect(builders).toEqual([
-		"stores/workspace-creates/pendingCloudLaunch/pendingCloudLaunch.ts",
 	]);
 });

@@ -278,3 +278,18 @@ test("a launch that fell back to a terminal turns the waiting pane into that ter
 	expect(pane?.data).toEqual({ terminalId: "promised-terminal" });
 	expect(pendingCloudLaunchPane(next)).toBeNull();
 });
+
+const RENDERER_ROOT = `${import.meta.dir}/../../..`;
+
+test("only the pending-launch store builds the waiting pane", async () => {
+	const builders: string[] = [];
+	for await (const path of new Bun.Glob("**/*.{ts,tsx}").scan(RENDERER_ROOT)) {
+		if (/\.test\.tsx?$/.test(path)) continue;
+		const source = await Bun.file(`${RENDERER_ROOT}/${path}`).text();
+		if (/kind:\s*PENDING_CLOUD_LAUNCH_PANE_KIND\b/.test(source))
+			builders.push(path);
+	}
+	expect(builders).toEqual([
+		"stores/workspace-creates/pendingCloudLaunch/pendingCloudLaunch.ts",
+	]);
+});

@@ -1,4 +1,4 @@
-import type { CloudAgentLaunchDescriptor } from "@superset/shared/cloud-agent-launch";
+import type { PendingCloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 
 export interface PendingLaunchHostClient {
@@ -6,7 +6,7 @@ export interface PendingLaunchHostClient {
 		pendingLaunch: {
 			query(input: {
 				workspaceId: string;
-			}): Promise<CloudAgentLaunchDescriptor | null>;
+			}): Promise<PendingCloudAgentLaunch | null>;
 		};
 	};
 }
@@ -15,7 +15,7 @@ export interface PendingLaunchHostClient {
 export async function fetchPendingCloudLaunch(
 	client: PendingLaunchHostClient,
 	workspaceId: string,
-): Promise<CloudAgentLaunchDescriptor | null> {
+): Promise<PendingCloudAgentLaunch | null> {
 	try {
 		return await client.sandbox.pendingLaunch.query({ workspaceId });
 	} catch (error) {

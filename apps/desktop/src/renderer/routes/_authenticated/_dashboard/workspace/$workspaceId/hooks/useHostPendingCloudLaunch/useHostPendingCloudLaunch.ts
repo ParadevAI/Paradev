@@ -4,13 +4,11 @@ import { useLayoutEffect, useMemo } from "react";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
-import { withPendingCloudLaunch } from "renderer/stores/workspace-creates/pendingCloudLaunch";
 import type { StoreApi } from "zustand";
 import type { PaneViewerData } from "../../types";
 import { canShowEmptyLayout } from "./utils/canShowEmptyLayout";
 import { fetchPendingCloudLaunch } from "./utils/fetchPendingCloudLaunch";
-
-const seededLaunches = new Set<string>();
+import { seedHostPendingLaunch } from "./utils/seedHostPendingLaunch";
 
 /**
  * Opens the waiting pane for a launch this desktop did not create (CLI,
@@ -50,14 +48,8 @@ export function useHostPendingCloudLaunch({
 
 	// Before paint, so the frame that has the answer never shows the empty view.
 	useLayoutEffect(() => {
-		if (!isLayoutReady || !launch?.terminalId) return;
-		const key = `${workspaceId}:${launch.terminalId}`;
-		if (seededLaunches.has(key)) return;
-		seededLaunches.add(key);
-		store
-			.getState()
-			.replaceState((state) => withPendingCloudLaunch(state, launch) ?? state);
-	}, [isLayoutReady, launch, store, workspaceId]);
+		if (isLayoutReady && launch) seedHostPendingLaunch(store, launch);
+	}, [isLayoutReady, launch, store]);
 
 	return {
 		canShowEmptyLayout: canShowEmptyLayout({
