@@ -509,7 +509,7 @@ describe("probeIdentity", () => {
 	});
 
 	test("planetscale_mcp keys on email, since PlanetScale's sub is pairwise per client", async () => {
-		const calls = respond({ sub: "pairwise_01", email: "h@tegon.ai" });
+		const calls = respond({ sub: "pairwise_01", email: "h@paradev.com" });
 
 		const identity = await probeIdentity(
 			"planetscale_mcp",
@@ -524,8 +524,14 @@ describe("probeIdentity", () => {
 				auth: "Bearer oauth-test",
 			},
 		]);
-		expect(identity.account).toEqual({ id: "h@tegon.ai", label: "h@tegon.ai" });
-		expect(identity.user).toEqual({ id: "h@tegon.ai", label: "h@tegon.ai" });
+		expect(identity.account).toEqual({
+			id: "h@paradev.com",
+			label: "h@paradev.com",
+		});
+		expect(identity.user).toEqual({
+			id: "h@paradev.com",
+			label: "h@paradev.com",
+		});
 	});
 
 	test("firecrawl_mcp takes the team and user from the token response", async () => {
