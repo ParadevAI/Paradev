@@ -148,6 +148,7 @@ const themeConfigSchema = z
 		terminal: terminalColorsSchema.optional(),
 		colors: terminalColorsSchema.optional(),
 		editor: editorThemeSchema.optional(),
+		css: z.string().optional(),
 	})
 	.passthrough();
 
@@ -231,6 +232,7 @@ function parseThemeEntry(
 					...terminalOverrides,
 				}
 			: undefined,
+		css: config.css,
 	};
 	const baseEditorTheme = getEditorTheme(resolvedThemeBase);
 

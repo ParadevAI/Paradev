@@ -301,6 +301,8 @@ export interface Theme {
 	terminal?: TerminalColors;
 	/** Code editor and diff colors (optional, otherwise derived from UI + terminal tokens) */
 	editor?: EditorThemeOverrides;
+	/** Stylesheet injected while the theme is active */
+	css?: string;
 
 	/** Whether this is a built-in theme */
 	isBuiltIn?: boolean;
