@@ -1,5 +1,6 @@
 import { plural } from "@lingui/core/macro";
 import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
@@ -23,6 +24,7 @@ import { LuBox } from "react-icons/lu";
 import { AgentSelect } from "renderer/components/AgentSelect";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
@@ -78,6 +80,7 @@ export function RunInWorkspacePopover({
 	const { machineId, activeHostUrl } = hostService;
 	const { otherHosts } = useWorkspaceHostOptions();
 	const { submit } = useWorkspaceCreates();
+	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 
 	const lastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.lastHostId,
@@ -293,7 +296,7 @@ export function RunInWorkspacePopover({
 		return promise;
 	};
 
-	const handleRun = () => {
+	const handleRun = async () => {
 		if (isCloud) {
 			if (submitBlocker || !selectedEnvironment || !organizationId) {
 				if (submitBlocker) toast.error(submitBlocker);
@@ -331,6 +334,21 @@ export function RunInWorkspacePopover({
 			return;
 		}
 
+		setOpen(false);
+		onComplete();
+
+		const agentChoice = agentConfigs.find(
+			(agent) => agent.id === selectedAgent,
+		);
+		const openAsChat =
+			agentChoice !== undefined &&
+			Boolean(
+				acpHarnessForPreset(
+					agentChoice.launchPresetId ?? agentChoice.presetId ?? null,
+				),
+			) &&
+			(await resolveAcpChatEnabled());
+
 		const handles = tasks.map((task) =>
 			submit({
 				hostId,
@@ -352,6 +370,7 @@ export function RunInWorkspacePopover({
 									{
 										agent: selectedAgent,
 										prompt: synthesizeTaskPrompt(task),
+										...(openAsChat ? { surface: "chat" as const } : {}),
 									},
 								],
 				},
@@ -389,9 +408,6 @@ export function RunInWorkspacePopover({
 				}),
 			error: (err) => errorMessage(err),
 		});
-
-		setOpen(false);
-		onComplete();
 	};
 
 	return (
