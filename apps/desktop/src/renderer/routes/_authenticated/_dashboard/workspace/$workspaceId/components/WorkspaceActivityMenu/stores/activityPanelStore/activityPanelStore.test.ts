@@ -67,7 +67,7 @@ test.each([
 	useActivityPanelVisibilityStore.getState().setHidden(hidden);
 	const saved = localStorage.getItem("workspace-activity-panel");
 	expect(JSON.parse(saved ?? "null")).toEqual({
-		state: { hidden },
+		state: { hidden, changedAt: expect.any(Number) },
 		version: 0,
 	});
 
@@ -133,10 +133,12 @@ test("offers quota reclaim and saves the latest visibility after space is freed"
 	const bufferKey = `${TERMINAL_BUFFER_KEY_PREFIX}activity-quota-test`;
 	localStorage.setItem(bufferKey, "saved scrollback");
 	const setItem = localStorage.setItem.bind(localStorage);
+	let failure: "QuotaExceededError" | "SecurityError" | null =
+		"QuotaExceededError";
 	const write = spyOn(localStorage, "setItem").mockImplementation(
 		(name, value) => {
-			if (name === key && localStorage.getItem(bufferKey) !== null) {
-				throw new DOMException("storage full", "QuotaExceededError");
+			if (name === key && failure) {
+				throw new DOMException("write refused", failure);
 			}
 			setItem(name, value);
 		},
@@ -144,6 +146,17 @@ test("offers quota reclaim and saves the latest visibility after space is freed"
 	const warn = spyOn(console, "warn").mockImplementation(() => {});
 	const notice = spyOn(toast, "warning").mockImplementation(() => "notice");
 	const success = spyOn(toast, "success").mockImplementation(() => "success");
+	function reclaim(
+		action: NonNullable<Parameters<typeof toast.warning>[1]>["action"],
+	) {
+		if (!action || typeof action !== "object" || !("onClick" in action))
+			throw new Error("Missing reclaim action");
+		action.onClick(
+			new MouseEvent("click") as unknown as Parameters<
+				typeof action.onClick
+			>[0],
+		);
+	}
 	try {
 		const { setHidden } = useActivityPanelVisibilityStore.getState();
 		setHidden(true);
@@ -155,19 +168,19 @@ test("offers quota reclaim and saves the latest visibility after space is freed"
 				action: expect.objectContaining({ label: "Free up space" }),
 			}),
 		);
+		failure = "SecurityError";
 		setHidden(false);
 		notifyQuotaExhausted("another-quota-test-key");
-		const action = notice.mock.calls.at(-1)?.[1]?.action;
-		if (!action || typeof action !== "object" || !("onClick" in action))
-			throw new Error("Missing reclaim action");
-		action.onClick(
-			new MouseEvent("click") as unknown as Parameters<
-				typeof action.onClick
-			>[0],
-		);
+		failure = "QuotaExceededError";
+		reclaim(notice.mock.calls.at(-1)?.[1]?.action);
+		expect(write.mock.calls.filter(([k]) => k === key)).toHaveLength(3);
 		expect(localStorage.getItem(bufferKey)).toBeNull();
+		expect(localStorage.getItem(key)).toBeNull();
+		failure = null;
+		reclaim(success.mock.calls.at(-1)?.[1]?.action);
+		expect(write.mock.calls.filter(([k]) => k === key)).toHaveLength(4);
 		expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual({
-			state: { hidden: false },
+			state: { hidden: false, changedAt: expect.any(Number) },
 			version: 0,
 		});
 	} finally {
@@ -177,4 +190,36 @@ test("offers quota reclaim and saves the latest visibility after space is freed"
 		success.mockRestore();
 		localStorage.removeItem(bufferKey);
 	}
+});
+
+test("a pending choice survives old storage events and yields to a newer choice", async () => {
+	const key = "workspace-activity-panel";
+	const store = useActivityPanelVisibilityStore;
+	localStorage.setItem(
+		key,
+		JSON.stringify({ state: { hidden: false }, version: 0 }),
+	);
+	await store.persist.rehydrate();
+	expect(store.getState().hidden).toBe(false);
+	const write = spyOn(localStorage, "setItem").mockImplementation(() => {
+		throw new DOMException("storage full", "QuotaExceededError");
+	});
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const notice = spyOn(toast, "warning").mockImplementation(() => "notice");
+	try {
+		store.getState().setHidden(true);
+		await store.persist.rehydrate();
+		expect(store.getState().hidden).toBe(true);
+	} finally {
+		write.mockRestore();
+		warn.mockRestore();
+		notice.mockRestore();
+	}
+	const changedAt = store.getState().changedAt + 1;
+	localStorage.setItem(
+		key,
+		JSON.stringify({ state: { hidden: false, changedAt }, version: 0 }),
+	);
+	await store.persist.rehydrate();
+	expect(store.getState().hidden).toBe(false);
 });
