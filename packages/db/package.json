@@ -42,6 +42,7 @@
 		"push": "drizzle-kit push",
 		"migrate": "drizzle-kit migrate",
 		"studio": "drizzle-kit studio",
+		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
