@@ -69,7 +69,7 @@ renew_cloud_branch_lease() {
     warn "No Neon branch named $SUPERSET_WORKSPACE_NAME; setting up again"
     return 1
   fi
-  renew_neon_branch_lease "$branch_id"
+  renew_neon_branch_lease "$branch_id" "${NEON_PROJECT_ID:-}"
 }
 
 cloud_setup_main() {

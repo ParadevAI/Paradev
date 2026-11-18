@@ -78,16 +78,77 @@ neon_branch_lease_expiry() {
 # Push a branch's expiry NEON_BRANCH_LEASE_DAYS out. Never call
 # set-expiration without --expires-at: that removes the expiry.
 renew_neon_branch_lease() {
-  local branch_id="$1"
+  local branch_id="$1" project_id="$2"
   local lease_expiry
   lease_expiry="$(neon_branch_lease_expiry)"
   [ -n "$lease_expiry" ] || return 0
   if neonctl branches set-expiration "$branch_id" \
-      --project-id "$NEON_PROJECT_ID" \
+      --project-id "$project_id" \
       --expires-at "$lease_expiry" --output json > /dev/null; then
     echo "  Lease renewed until $lease_expiry"
   else
     warn "Could not renew the Neon branch lease (continuing)"
+  fi
+}
+
+# Sets BRANCH_ID to the project's branch called $2: renews its lease when it
+# exists, else creates it (from branch $3 when given).
+find_or_create_neon_branch() {
+  local project_id="$1" name="$2" parent="${3:-}"
+
+  local branches_output
+  # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
+  if ! branches_output=$(neonctl branches list --project-id "$project_id" --output json); then
+    error "Failed to list Neon branches (check output above)"
+    return 1
+  fi
+
+  # Validate JSON before parsing
+  if ! validate_json "$branches_output" "Neon branches list"; then
+    return 1
+  fi
+
+  # Now safe to parse with jq - use // empty for fallback
+  EXISTING_BRANCH=$(echo "$branches_output" | jq -r --arg n "$name" '.[] | select(.name == $n) | .id // empty' 2>/dev/null)
+
+  local lease_expiry
+  lease_expiry="$(neon_branch_lease_expiry)"
+
+  if [ -n "$EXISTING_BRANCH" ]; then
+    echo "  Using existing Neon branch..."
+    BRANCH_ID="$EXISTING_BRANCH"
+    renew_neon_branch_lease "$BRANCH_ID" "$project_id"
+  else
+    echo "  Creating new Neon branch..."
+    local neon_output
+    local create_args=()
+    [ -n "$lease_expiry" ] && create_args+=(--expires-at "$lease_expiry")
+    [ -n "$parent" ] && create_args+=(--parent "$parent")
+    # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
+    if ! neon_output=$(neonctl branches create \
+        --project-id "$project_id" \
+        --name "$name" \
+        ${create_args[@]+"${create_args[@]}"} \
+        --output json); then
+      error "Failed to create Neon branch (check output above)"
+      return 1
+    fi
+
+    # Validate JSON before parsing
+    if ! validate_json "$neon_output" "Neon branch creation"; then
+      return 1
+    fi
+
+    # Parse with fallback - if .branch.id doesn't exist, try .id
+    BRANCH_ID=$(echo "$neon_output" | jq -r '.branch.id // .id // empty' 2>/dev/null)
+
+    # Verify we got a branch ID
+    if [ -z "$BRANCH_ID" ]; then
+      error "Branch ID not found in neonctl response"
+      echo "Response structure:" >&2
+      echo "$neon_output" | jq '.' >&2 2>/dev/null || echo "$neon_output" >&2
+      return 1
+    fi
   fi
 }
 
@@ -112,60 +173,7 @@ step_setup_neon_branch() {
 
   WORKSPACE_NAME="${SUPERSET_WORKSPACE_NAME:-$(basename "$PWD")}"
 
-  # Check if branch already exists
-  local branches_output
-  # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
-  if ! branches_output=$(neonctl branches list --project-id "$NEON_PROJECT_ID" --output json); then
-    error "Failed to list Neon branches (check output above)"
-    return 1
-  fi
-
-  # Validate JSON before parsing
-  if ! validate_json "$branches_output" "Neon branches list"; then
-    return 1
-  fi
-
-  # Now safe to parse with jq - use // empty for fallback
-  EXISTING_BRANCH=$(echo "$branches_output" | jq -r ".[] | select(.name == \"$WORKSPACE_NAME\") | .id // empty" 2>/dev/null)
-
-  local lease_expiry
-  lease_expiry="$(neon_branch_lease_expiry)"
-
-  if [ -n "$EXISTING_BRANCH" ]; then
-    echo "  Using existing Neon branch..."
-    BRANCH_ID="$EXISTING_BRANCH"
-    renew_neon_branch_lease "$BRANCH_ID"
-  else
-    echo "  Creating new Neon branch..."
-    local neon_output
-    local lease_args=()
-    [ -n "$lease_expiry" ] && lease_args=(--expires-at "$lease_expiry")
-    # NO 2>&1 - keep stdout (JSON) and stderr (errors) separate
-    if ! neon_output=$(neonctl branches create \
-        --project-id "$NEON_PROJECT_ID" \
-        --name "$WORKSPACE_NAME" \
-        ${lease_args[@]+"${lease_args[@]}"} \
-        --output json); then
-      error "Failed to create Neon branch (check output above)"
-      return 1
-    fi
-
-    # Validate JSON before parsing
-    if ! validate_json "$neon_output" "Neon branch creation"; then
-      return 1
-    fi
-
-    # Parse with fallback - if .branch.id doesn't exist, try .id
-    BRANCH_ID=$(echo "$neon_output" | jq -r '.branch.id // .id // empty' 2>/dev/null)
-
-    # Verify we got a branch ID
-    if [ -z "$BRANCH_ID" ]; then
-      error "Branch ID not found in neonctl response"
-      echo "Response structure:" >&2
-      echo "$neon_output" | jq '.' >&2 2>/dev/null || echo "$neon_output" >&2
-      return 1
-    fi
-  fi
+  find_or_create_neon_branch "$NEON_PROJECT_ID" "$WORKSPACE_NAME" || return 1
 
   # Get connection strings
   if ! DIRECT_URL=$(neonctl connection-string "$BRANCH_ID" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner); then
