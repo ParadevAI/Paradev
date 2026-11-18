@@ -120,7 +120,22 @@ describe("queryCloudUsage", () => {
 					reason: "snapshot_expired",
 					at: new Date("2026-11-16T14:03:00Z"),
 				},
+				lastBoot: null,
 			},
+		]);
+	});
+
+	test("a workspace carries its newest boot's end reason, null while it runs", async () => {
+		const { items } = await usage({ groupBy: "workspace" });
+		expect(
+			items.map((item) => [
+				item.key,
+				item.ref && "lastBoot" in item.ref ? item.ref.lastBoot : undefined,
+			]),
+		).toEqual([
+			[CHECKOUT, { endReason: "released" }],
+			[BILLING_PAGE, { endReason: null }],
+			[BROKEN, null],
 		]);
 	});
 

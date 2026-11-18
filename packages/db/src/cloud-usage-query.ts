@@ -448,6 +448,8 @@ interface WorkspaceRef {
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
+	/** The newest boot in any window; its end reason is null while it runs. */
+	lastBoot: { endReason: CloudWorkspaceBootEndReason | null } | null;
 }
 
 interface OrganizationRef {
@@ -493,24 +495,42 @@ async function refsFor(
 			.where(inArray(users.id, keys));
 		return new Map(rows.map((row) => [row.id, row]));
 	}
-	const rows = await db
-		.select({
-			id: workspaces.id,
-			name: workspaces.name,
-			status: workspaces.status,
-			machineSize: workspaces.machineSize,
-			failureReason: workspaces.failureReason,
-			failedAt: workspaces.failedAt,
-			owner: { id: users.id, name: users.name, email: users.email },
-		})
-		.from(workspaces)
-		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
-		.where(
-			and(
-				inOrganization(scope, workspaces.organizationId),
-				inArray(workspaces.id, keys),
+	const [rows, lastBoots] = await Promise.all([
+		db
+			.select({
+				id: workspaces.id,
+				name: workspaces.name,
+				status: workspaces.status,
+				machineSize: workspaces.machineSize,
+				failureReason: workspaces.failureReason,
+				failedAt: workspaces.failedAt,
+				owner: { id: users.id, name: users.name, email: users.email },
+			})
+			.from(workspaces)
+			.leftJoin(users, eq(users.id, workspaces.createdByUserId))
+			.where(
+				and(
+					inOrganization(scope, workspaces.organizationId),
+					inArray(workspaces.id, keys),
+				),
 			),
-		);
+		db
+			.selectDistinctOn([boots.cloudWorkspaceId], {
+				workspaceId: boots.cloudWorkspaceId,
+				endReason: boots.endReason,
+			})
+			.from(boots)
+			.where(
+				and(
+					inOrganization(scope, boots.organizationId),
+					inArray(boots.cloudWorkspaceId, keys),
+				),
+			)
+			.orderBy(boots.cloudWorkspaceId, desc(boots.startedAt), desc(boots.id)),
+	]);
+	const lastBootOf = new Map(
+		lastBoots.map(({ workspaceId, endReason }) => [workspaceId, { endReason }]),
+	);
 	return new Map(
 		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
 			row.id,
@@ -521,6 +541,7 @@ async function refsFor(
 					row.status === "failed" && failureReason && failedAt
 						? { reason: failureReason, at: failedAt }
 						: null,
+				lastBoot: lastBootOf.get(row.id) ?? null,
 			},
 		]),
 	);

@@ -142,6 +142,11 @@ export const cloudUsageOutputSchema = z.object({
 						failure: z
 							.object({ reason: cloudWorkspaceFailureReasonEnum, at: z.date() })
 							.nullable(),
+						lastBoot: z
+							.object({
+								endReason: cloudWorkspaceBootEndReasonEnum.nullable(),
+							})
+							.nullable(),
 					}),
 					userRefSchema,
 				])
