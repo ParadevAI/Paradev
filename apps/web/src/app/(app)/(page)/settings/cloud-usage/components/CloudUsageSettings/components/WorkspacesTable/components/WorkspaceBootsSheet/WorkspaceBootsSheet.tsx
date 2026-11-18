@@ -2,7 +2,6 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import { machineSpec } from "@superset/shared/billing";
 import type { RouterInputs } from "@superset/trpc";
 import { Button } from "@superset/ui/button";
 import {
@@ -25,7 +24,9 @@ import { useTRPC } from "@/trpc/react";
 import { QueryStatus } from "../../../QueryStatus";
 import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
 import type { WorkspaceRef } from "../../types";
+import { SizeLabel } from "../SizeLabel";
 import { END_REASONS } from "./constants";
+import { bootEnd } from "./utils/bootEnd";
 
 interface WorkspaceBootsSheetProps {
 	workspace: WorkspaceRef | null;
@@ -49,9 +50,6 @@ export function WorkspaceBootsSheet({
 		enabled: !!workspace,
 	});
 	const boots = pages.data?.pages.flatMap((page) => page.items) ?? [];
-	const spec = workspace && machineSpec(workspace.size);
-	const vcpus = spec?.vcpus;
-	const memory = spec && formatNumber(spec.memoryGb);
 	const failedAt = workspace?.failure && formatDateTime(workspace.failure.at);
 	const formatMinutes = (minutes: number) =>
 		minutes < 60
@@ -78,9 +76,7 @@ export function WorkspaceBootsSheet({
 							<SheetDescription>
 								{i18n._(STATUS_LABELS[workspace.status])}
 								{" · "}
-								<Trans>
-									{vcpus} vCPU, {memory} GB
-								</Trans>
+								<SizeLabel size={workspace.size} />
 								{workspace.owner && ` · ${workspace.owner.name}`}
 							</SheetDescription>
 						</SheetHeader>
@@ -115,10 +111,10 @@ export function WorkspaceBootsSheet({
 												<TableHead>
 													<Trans>Started</Trans>
 												</TableHead>
-												<TableHead>
+												<TableHead className="hidden sm:table-cell">
 													<Trans>Duration</Trans>
 												</TableHead>
-												<TableHead>
+												<TableHead className="hidden sm:table-cell">
 													<Trans>Ended</Trans>
 												</TableHead>
 												<TableHead className="text-right">
@@ -127,28 +123,30 @@ export function WorkspaceBootsSheet({
 											</TableRow>
 										</TableHeader>
 										<TableBody>
-											{boots.map((boot) => (
-												<TableRow key={boot.id}>
-													<TableCell>
-														{formatDateTime(boot.startedAt)}
-													</TableCell>
-													<TableCell className="tabular-nums">
-														{formatMinutes(boot.minutes)}
-													</TableCell>
-													<TableCell className="whitespace-normal">
-														{boot.stoppedAt === null ? (
-															<Trans>Running</Trans>
-														) : (
-															boot.endReason &&
-															boot.endReason !== "unknown" &&
-															i18n._(END_REASONS[boot.endReason])
-														)}
-													</TableCell>
-													<TableCell className="text-right tabular-nums">
-														{formatGbHours(boot.gbHours)}
-													</TableCell>
-												</TableRow>
-											))}
+											{boots.map((boot) => {
+												const end = bootEnd(boot);
+												const ended = end && i18n._(END_REASONS[end]);
+												const duration = formatMinutes(boot.minutes);
+												return (
+													<TableRow key={boot.id}>
+														<TableCell className="whitespace-normal">
+															{formatDateTime(boot.startedAt)}
+															<div className="text-xs text-muted-foreground sm:hidden">
+																{ended ? `${duration} · ${ended}` : duration}
+															</div>
+														</TableCell>
+														<TableCell className="hidden tabular-nums sm:table-cell">
+															{duration}
+														</TableCell>
+														<TableCell className="hidden whitespace-normal sm:table-cell">
+															{ended}
+														</TableCell>
+														<TableCell className="text-right tabular-nums">
+															{formatGbHours(boot.gbHours)}
+														</TableCell>
+													</TableRow>
+												);
+											})}
 										</TableBody>
 									</Table>
 								</div>

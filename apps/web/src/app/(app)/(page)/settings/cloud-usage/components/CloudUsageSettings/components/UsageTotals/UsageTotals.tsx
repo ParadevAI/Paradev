@@ -3,17 +3,28 @@
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { RouterOutputs } from "@superset/trpc";
+import { cn } from "@superset/ui/utils";
 
 type Metrics = RouterOutputs["cloud"]["usage"]["query"]["total"];
 
-export function UsageTotals({ total }: { total: Metrics }) {
+interface UsageTotalsProps {
+	total: Metrics;
+	/** Off beside the allowance card, so one "used" figure is shown. */
+	showGbHours: boolean;
+}
+
+export function UsageTotals({ total, showGbHours }: UsageTotalsProps) {
 	const { formatNumber, formatGbHours } = useFormat();
 	const tiles = [
-		{
-			key: "gbHours",
-			label: <Trans>GB-hours</Trans>,
-			value: formatGbHours(total.gbHours),
-		},
+		...(showGbHours
+			? [
+					{
+						key: "gbHours",
+						label: <Trans>GB-hours</Trans>,
+						value: formatGbHours(total.gbHours),
+					},
+				]
+			: []),
 		{
 			key: "hours",
 			label: <Trans>Hours</Trans>,
@@ -32,7 +43,12 @@ export function UsageTotals({ total }: { total: Metrics }) {
 	];
 
 	return (
-		<dl className="grid grid-cols-2 gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-4">
+		<dl
+			className={cn(
+				"grid gap-px overflow-hidden rounded-md border bg-border",
+				tiles.length === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4",
+			)}
+		>
 			{tiles.map((tile) => (
 				<div key={tile.key} className="bg-background p-4">
 					<dt className="text-xs text-muted-foreground">{tile.label}</dt>

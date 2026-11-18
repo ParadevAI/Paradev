@@ -1,12 +1,12 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { CloudWorkspaceBootEndReason } from "@superset/db/enums";
+import type { bootEnd } from "./utils/bootEnd";
 
-/** `unknown` means nothing recorded why the boot ended, so it shows nothing. */
 export const END_REASONS: Record<
-	Exclude<CloudWorkspaceBootEndReason, "unknown">,
+	NonNullable<ReturnType<typeof bootEnd>>,
 	MessageDescriptor
 > = {
+	running: msg({ message: "Running" }),
 	idle: msg({ message: "Stopped when idle" }),
 	user: msg({ message: "Stopped by a person" }),
 	usage_limit: msg({ message: "Usage limit reached" }),

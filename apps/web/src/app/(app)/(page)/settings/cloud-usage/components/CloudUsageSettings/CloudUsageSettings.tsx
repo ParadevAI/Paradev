@@ -13,6 +13,8 @@ import { UsageByDay } from "./components/UsageByDay";
 import { UsageByPerson } from "./components/UsageByPerson";
 import { UsageTotals } from "./components/UsageTotals";
 import { WorkspacesTable } from "./components/WorkspacesTable";
+import { hasUsage } from "./utils/hasUsage";
+import { usageRange } from "./utils/usageRange";
 
 interface CloudUsageSettingsProps {
 	isAdmin: boolean;
@@ -29,7 +31,8 @@ export function CloudUsageSettings({
 	const period =
 		periods.data?.items.find((item) => item.id === periodId) ??
 		periods.data?.items[0];
-	const range = period ? { period: period.id } : ("30d" as const);
+	const range = usageRange(period);
+	const allowance = isAdmin ? period?.allowance : null;
 	const byDay = useQuery({
 		...trpc.cloud.usage.query.queryOptions({
 			range,
@@ -38,10 +41,6 @@ export function CloudUsageSettings({
 		}),
 		enabled: periods.isSuccess,
 	});
-
-	const total = byDay.data?.total;
-	const hasUsage =
-		!!total && (total.gbHours > 0 || total.boots > 0 || total.workspaces > 0);
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-8">
@@ -92,9 +91,7 @@ export function CloudUsageSettings({
 				</p>
 			)}
 
-			{isAdmin && period?.allowance && (
-				<AllowanceCard allowance={period.allowance} />
-			)}
+			{allowance && <AllowanceCard allowance={allowance} />}
 
 			{!periods.data || !byDay.data ? (
 				<QueryStatus
@@ -103,7 +100,7 @@ export function CloudUsageSettings({
 						periods.isError ? periods.refetch() : byDay.refetch()
 					}
 				/>
-			) : !hasUsage ? (
+			) : !hasUsage(byDay.data.total) ? (
 				<p className="rounded-md border border-dashed py-12 text-center text-sm text-muted-foreground">
 					{isAdmin ? (
 						<Trans>No cloud usage in this period.</Trans>
@@ -113,7 +110,7 @@ export function CloudUsageSettings({
 				</p>
 			) : (
 				<>
-					<UsageTotals total={byDay.data.total} />
+					<UsageTotals total={byDay.data.total} showGbHours={!allowance} />
 					{isAdmin && period?.closed && (
 						<p className="text-sm text-muted-foreground">
 							<Trans>

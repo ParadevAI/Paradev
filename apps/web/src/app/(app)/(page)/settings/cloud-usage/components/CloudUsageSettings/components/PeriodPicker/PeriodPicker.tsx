@@ -22,6 +22,21 @@ interface PeriodPickerProps {
 export function PeriodPicker({ periods, value, onChange }: PeriodPickerProps) {
 	const { t } = useLingui();
 	const { formatDate } = useFormat();
+	const label = (period: Period, year: boolean) => {
+		const format = (date: Date) =>
+			formatDate(date, {
+				month: "short",
+				day: "numeric",
+				year: year ? "numeric" : undefined,
+				timeZone: "UTC",
+			});
+		const start = format(period.start);
+		const end = format(new Date(period.end.getTime() - 1));
+		return period.closed
+			? t({ message: `${start} to ${end}` })
+			: t({ message: `${start} to ${end} (current)` });
+	};
+	const selected = periods.find((period) => period.id === value);
 
 	return (
 		<Select value={value} onValueChange={onChange}>
@@ -29,20 +44,14 @@ export function PeriodPicker({ periods, value, onChange }: PeriodPickerProps) {
 				className="min-w-0 flex-1 sm:flex-none"
 				aria-label={t({ message: "Billing period" })}
 			>
-				<SelectValue />
+				<SelectValue>{selected && label(selected, false)}</SelectValue>
 			</SelectTrigger>
 			<SelectContent>
-				{periods.map((period) => {
-					const start = formatDate(period.start);
-					const end = formatDate(period.end);
-					return (
-						<SelectItem key={period.id} value={period.id}>
-							{period.closed
-								? t({ message: `${start} to ${end}` })
-								: t({ message: `${start} to ${end} (current)` })}
-						</SelectItem>
-					);
-				})}
+				{periods.map((period) => (
+					<SelectItem key={period.id} value={period.id}>
+						{label(period, true)}
+					</SelectItem>
+				))}
 			</SelectContent>
 		</Select>
 	);

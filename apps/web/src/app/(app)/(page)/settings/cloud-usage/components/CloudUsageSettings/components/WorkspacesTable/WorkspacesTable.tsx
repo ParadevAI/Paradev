@@ -2,7 +2,6 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import { machineSpec } from "@superset/shared/billing";
 import type { RouterInputs } from "@superset/trpc";
 import { Button } from "@superset/ui/button";
 import {
@@ -17,6 +16,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTRPC } from "@/trpc/react";
 import { QueryStatus } from "../QueryStatus";
+import { SizeLabel } from "./components/SizeLabel";
 import { WorkspaceBootsSheet } from "./components/WorkspaceBootsSheet";
 import { FAILURE_REASONS, STATUS_LABELS } from "./constants";
 import type { WorkspaceRef } from "./types";
@@ -77,9 +77,6 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 							{rows.map((row) => {
 								const workspace =
 									row.ref && "status" in row.ref ? row.ref : null;
-								const spec = workspace && machineSpec(workspace.size);
-								const vcpus = spec?.vcpus;
-								const memory = spec && formatNumber(spec.memoryGb);
 								return (
 									<TableRow key={row.key ?? ""}>
 										<TableCell className="max-w-48 whitespace-normal">
@@ -121,11 +118,7 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 											)}
 										</TableCell>
 										<TableCell className="hidden sm:table-cell">
-											{spec && (
-												<Trans>
-													{vcpus} vCPU, {memory} GB
-												</Trans>
-											)}
+											{workspace && <SizeLabel size={workspace.size} />}
 										</TableCell>
 										<TableCell className="hidden text-right tabular-nums sm:table-cell">
 											{formatNumber(row.hours, { maximumFractionDigits: 1 })}
