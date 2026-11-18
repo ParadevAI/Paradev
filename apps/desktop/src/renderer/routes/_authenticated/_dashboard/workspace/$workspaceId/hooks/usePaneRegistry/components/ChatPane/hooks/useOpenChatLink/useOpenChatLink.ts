@@ -25,7 +25,7 @@ import {
 	type TerminalLinkActionDeps,
 } from "../../../../utils/runTerminalLinkAction";
 import type { OpenLink } from "../../../ChatSession/providers/ChatPaneActionsProvider";
-import { type LocatedPath, locatePath } from "./utils/locatePath";
+import { type ChatLinkTarget, locateChatLink } from "./utils/locateChatLink";
 import { parseFileHref } from "./utils/parseFileHref";
 
 const WEB_URL = /^https?:\/\//i;
@@ -56,11 +56,11 @@ export function useOpenChatLink({
 	const statPath = workspaceTrpc.filesystem.statPath.useMutation();
 	const hostClient = workspaceTrpc.useUtils().client;
 	const { recentFiles } = useRecentlyViewedFiles(workspaceId);
-	const locateRef = useRef<(path: string) => Promise<LocatedPath | null>>(
-		async () => null,
-	);
-	locateRef.current = (path) =>
-		locatePath(path, {
+	const locateRef = useRef<
+		(href: string, path: string) => Promise<ChatLinkTarget | null>
+	>(async () => null);
+	locateRef.current = (href, path) =>
+		locateChatLink(href, path, {
 			stat: (target) => statPath.mutateAsync({ workspaceId, path: target }),
 			resolveFile: (reference) =>
 				hostClient.filesystem.resolveFileReference.query({
@@ -92,23 +92,29 @@ export function useOpenChatLink({
 	return useCallback(
 		(href, event, chosen) => {
 			const isPlain = tierFor(event, "2-tier") === "plain";
-			if (WEB_URL.test(href)) {
-				if (runChatPullRequestLink(depsRef.current, href, event, chosen))
-					return true;
+			const openWebUrl = (url: string) => {
+				if (runChatPullRequestLink(depsRef.current, url, event, chosen)) return;
 				const action =
-					chosen ?? getUrlAction(event, href) ?? (isPlain ? "pane" : null);
+					chosen ?? getUrlAction(event, url) ?? (isPlain ? "pane" : null);
 				if (action === null) showHint(event.clientX, event.clientY);
-				else runUrlLinkAction(depsRef.current, href, action);
+				else runUrlLinkAction(depsRef.current, url, action);
+			};
+			if (WEB_URL.test(href)) {
+				openWebUrl(href);
 				return true;
 			}
 
 			const file = parseFileHref(href);
 			if (!file) return false;
-			void locateRef.current(file.path).then(
+			void locateRef.current(href, file.path).then(
 				(stat) => {
 					if (!stat) {
 						const { path } = file;
 						toast.error(t({ message: `Path not found: ${path}` }));
+						return;
+					}
+					if (stat.kind === "web") {
+						openWebUrl(stat.url);
 						return;
 					}
 					if (stat.isDirectory) {
