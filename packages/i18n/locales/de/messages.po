@@ -6185,6 +6185,9 @@ msgstr "Review-Kommentare konnten nicht geladen werden"
 msgid "Couldn't load runs"
 msgstr "Ausführungen konnten nicht geladen werden"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Die Nachrichten dieses Chats konnten nicht geladen werden."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Die Nachrichten dieses Chats konnten nicht geladen werden. Neuer Versuch…"
 

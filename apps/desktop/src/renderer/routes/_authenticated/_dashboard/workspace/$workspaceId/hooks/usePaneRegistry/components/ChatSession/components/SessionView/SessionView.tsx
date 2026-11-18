@@ -75,6 +75,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { HistoryNotice } from "./components/HistoryNotice";
 import { TranscriptLoadState } from "./components/TranscriptLoadState";
 import {
 	type SwitchAccount,
@@ -99,6 +100,7 @@ import { subagentsInTurn } from "./utils/subagentsInTurn";
 const RESUME_FOLLOW_PX = 24;
 const NO_COMMANDS: AvailableCommand[] = [];
 const NO_CONFIG_OPTIONS: SessionConfigOption[] = [];
+const NO_APPROVALS: ReturnType<typeof useApprovals> = [];
 
 function contentText(content: UserContent[]): string {
 	return userMessageText({ content });
@@ -472,7 +474,7 @@ export function SessionView({
 		[sendPrompt],
 	);
 	const onSend = useMainSend({
-		approvals,
+		approvals: session.history === "loaded" ? approvals : NO_APPROVALS,
 		holdPrompt,
 		loaded,
 		onAnswerFailed,
@@ -709,6 +711,12 @@ export function SessionView({
 				{setupEnvironment && (
 					<SetupSessionHeader environmentId={setupEnvironment} />
 				)}
+				{session.history !== "loaded" && (
+					<HistoryNotice
+						failed={session.history === "failed"}
+						onRetry={session.retryHistory}
+					/>
+				)}
 				<MessageScroller.Provider
 					autoScroll
 					defaultScrollPosition="end"
@@ -754,7 +762,6 @@ export function SessionView({
 						{!focusedSubagentId && (
 							<TranscriptLoadState
 								empty={timeline.length === 0 && transcriptOutbox.length === 0}
-								historyUnavailable={session.historyUnavailable}
 								loading={!loaded}
 								unreachable={session.unreachable}
 							/>

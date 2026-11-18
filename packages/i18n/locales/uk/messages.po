@@ -6179,6 +6179,9 @@ msgstr "Не вдалося завантажити коментарі рев'ю"
 msgid "Couldn't load runs"
 msgstr "Не вдалося завантажити запуски"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Не вдалося завантажити повідомлення цього чату."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Не вдалося завантажити повідомлення цього чату. Повторна спроба…"
 

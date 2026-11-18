@@ -6185,6 +6185,9 @@ msgstr "Nepodařilo se načíst komentáře k revizi"
 msgid "Couldn't load runs"
 msgstr "Běhy se nepodařilo načíst"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Zprávy tohoto chatu se nepodařilo načíst."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Zprávy tohoto chatu se nepodařilo načíst. Zkouším znovu…"
 

@@ -6185,6 +6185,9 @@ msgstr "Tidak bisa memuat komentar review"
 msgid "Couldn't load runs"
 msgstr "Tidak dapat memuat run"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Tidak dapat memuat pesan chat ini."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Tidak dapat memuat pesan chat ini. Mencoba lagi…"
 

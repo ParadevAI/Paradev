@@ -6185,6 +6185,9 @@ msgstr "리뷰 코멘트를 불러오지 못했습니다"
 msgid "Couldn't load runs"
 msgstr "실행 기록을 불러오지 못했습니다"
 
+msgid "Couldn't load this chat's messages."
+msgstr "이 채팅의 메시지를 불러오지 못했습니다."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "이 채팅의 메시지를 불러오지 못했습니다. 다시 시도하는 중…"
 

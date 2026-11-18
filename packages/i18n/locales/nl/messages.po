@@ -6185,6 +6185,9 @@ msgstr "Kan reviewopmerkingen niet laden"
 msgid "Couldn't load runs"
 msgstr "Kan runs niet laden"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Kan de berichten van deze chat niet laden."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Kan de berichten van deze chat niet laden. Opnieuw proberen…"
 

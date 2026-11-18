@@ -6185,6 +6185,9 @@ msgstr "İnceleme yorumları yüklenemedi"
 msgid "Couldn't load runs"
 msgstr "Çalıştırmalar yüklenemedi"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Bu sohbetin mesajları yüklenemedi."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Bu sohbetin mesajları yüklenemedi. Yeniden deneniyor…"
 

@@ -6185,6 +6185,9 @@ msgstr "Không thể tải bình luận review"
 msgid "Couldn't load runs"
 msgstr "Không thể tải các lần chạy"
 
+msgid "Couldn't load this chat's messages."
+msgstr "Không thể tải tin nhắn của cuộc trò chuyện này."
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "Không thể tải tin nhắn của cuộc trò chuyện này. Đang thử lại…"
 

@@ -6185,6 +6185,9 @@ msgstr "無法載入審查評論"
 msgid "Couldn't load runs"
 msgstr "無法載入執行紀錄"
 
+msgid "Couldn't load this chat's messages."
+msgstr "無法載入此聊天的訊息。"
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "無法載入此聊天的訊息。正在重試…"
 

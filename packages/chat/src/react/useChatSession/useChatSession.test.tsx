@@ -1037,14 +1037,14 @@ describe("useChatSession", () => {
 		const client = stack.makeClient({ transport: flaky, wait: manual.wait });
 		const view = render(<Probe client={client} wait={manual.wait} />);
 
-		await domWaitFor(() => expect(session().historyUnavailable).toBe(true));
+		await domWaitFor(() => expect(session().history).toBe("retrying"));
 		expect(session().status).toBe("ready");
 		expect(session().snapshot.items.size).toBe(cachedItems);
 
 		readable = true;
 		await domWaitFor(() => {
 			act(() => manual.flush());
-			expect(session().historyUnavailable).toBe(false);
+			expect(session().history).toBe("loaded");
 		});
 		expect(session().snapshot.items.size).toBe(cachedItems);
 		view.unmount();
@@ -1066,13 +1066,91 @@ describe("useChatSession", () => {
 			wait: manual.wait,
 		});
 		const view = render(<Probe client={client} wait={manual.wait} />);
-		await domWaitFor(() => expect(session().historyUnavailable).toBe(true));
+		await domWaitFor(() => expect(session().history).toBe("retrying"));
 		expect(session().snapshot.session?.harness).toBe(FAKE_HARNESS);
 
 		view.unmount();
 		client.close();
 		act(() => manual.flush());
 		expect(manual.pendingCount()).toBe(0);
+		await stack.runtime.dispose();
+	});
+
+	test("loads the history again when a resync after a stream reset fails", async () => {
+		const stack = await startStack();
+		let readable = true;
+		const flaky: ChatTransport = new Proxy(stack.transport, {
+			get: (target, prop, receiver) => {
+				if ((prop === "getOutline" || prop === "getItems") && !readable) {
+					return async () => ({ ok: false, reset: "journal_missing" });
+				}
+				return Reflect.get(target, prop, receiver);
+			},
+		});
+		const manual = createManualWait();
+		const client = stack.makeClient({ transport: flaky, wait: manual.wait });
+		const view = render(<Probe client={client} wait={manual.wait} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		expect(session().history).toBe("loaded");
+
+		readable = false;
+		act(() => {
+			stack.runtime.subscriptions.publish({
+				v: 1,
+				sessionId: stack.sessionId,
+				ts: Date.now(),
+				reset: { reason: "journal_missing" },
+			});
+		});
+		await domWaitFor(() => expect(session().history).toBe("retrying"));
+
+		readable = true;
+		await domWaitFor(() => {
+			act(() => manual.flush());
+			expect(session().history).toBe("loaded");
+		});
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("gives up on an unreadable history after a while and loads it when asked again", async () => {
+		const stack = await startStack();
+		let readable = false;
+		let reads = 0;
+		const flaky: ChatTransport = new Proxy(stack.transport, {
+			get: (target, prop, receiver) => {
+				if (prop !== "getOutline" && prop !== "getItems") {
+					return Reflect.get(target, prop, receiver);
+				}
+				return async (input: never) => {
+					reads += 1;
+					if (!readable) return { ok: false, reset: "journal_missing" };
+					return prop === "getOutline"
+						? target.getOutline(input)
+						: target.getItems(input);
+				};
+			},
+		});
+		const manual = createManualWait();
+		const client = stack.makeClient({ transport: flaky, wait: manual.wait });
+		const view = render(<Probe client={client} wait={manual.wait} />);
+
+		await domWaitFor(() => {
+			act(() => manual.flush());
+			expect(session().history).toBe("failed");
+		});
+		const readsWhenFailed = reads;
+		for (let i = 0; i < 5; i += 1) act(() => manual.flush());
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		expect(reads).toBe(readsWhenFailed);
+
+		readable = true;
+		act(() => session().retryHistory());
+		await domWaitFor(() => expect(session().history).toBe("loaded"));
+		expect(reads).toBeGreaterThan(readsWhenFailed);
+		view.unmount();
+		client.close();
 		await stack.runtime.dispose();
 	});
 });

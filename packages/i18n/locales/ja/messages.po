@@ -6185,6 +6185,9 @@ msgstr "レビューコメントを読み込めませんでした"
 msgid "Couldn't load runs"
 msgstr "実行履歴を読み込めませんでした"
 
+msgid "Couldn't load this chat's messages."
+msgstr "このチャットのメッセージを読み込めませんでした。"
+
 msgid "Couldn't load this chat's messages. Retrying…"
 msgstr "このチャットのメッセージを読み込めませんでした。再試行中…"
 
