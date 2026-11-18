@@ -234,6 +234,7 @@ const themeSchema = z.object({
 	ui: uiColorsSchema,
 	terminal: terminalColorsSchema,
 	editor: editorThemeSchema.optional(),
+	css: z.string().optional(),
 	isBuiltIn: z.boolean().optional(),
 	isCustom: z.boolean().optional(),
 });
