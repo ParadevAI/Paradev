@@ -30,6 +30,7 @@ import {
 	acpToolCallUpdateSchema,
 } from "./wire";
 import { withoutImageData } from "./withoutImageData";
+import { withoutTaskNotifications } from "./withoutTaskNotifications";
 
 export function messageIdOf(raw: unknown): string | null {
 	const messageId = (raw as { messageId?: unknown }).messageId;
@@ -43,6 +44,7 @@ type OpenText = {
 	kind: TextKind;
 	messageId: string | null;
 	text: string;
+	shown: string | null;
 	attachments: ItemAttachment[];
 	turnId: string;
 	startedAtMs: number;
@@ -75,6 +77,7 @@ export class SessionStream {
 		string,
 		{
 			text: string;
+			shown: string | null;
 			attachments: ItemAttachment[];
 			startedAtMs: number;
 			model?: string;
@@ -232,15 +235,16 @@ export class SessionStream {
 		if (!this.open) return;
 		const open = this.open;
 		this.open = null;
+		this.emitText(open, "flushed");
 		if (open.messageId)
 			this.messages.set(open.messageId, {
 				text: open.text,
+				shown: open.shown,
 				attachments: open.attachments,
 				startedAtMs: open.startedAtMs,
 				...(open.model ? { model: open.model } : {}),
 				...(open.from ? { from: open.from } : {}),
 			});
-		this.emit(this.textItem(open, "flushed"), open.turnId);
 	}
 
 	private turnScope(turnId: string): string {
@@ -268,7 +272,7 @@ export class SessionStream {
 			const open = this.openMessage(kind, turnId, messageId);
 			if (model) open.model = model;
 			open.attachments.push(attachment);
-			this.emit(this.textItem(open, "open"), turnId);
+			this.emitText(open, "open");
 			return;
 		}
 		const chunk = content?.type === "text" ? (content.text ?? "") : "";
@@ -276,6 +280,10 @@ export class SessionStream {
 		const open = this.openMessage(kind, turnId, messageId, from);
 		if (kind === "agent_message" && model) open.model = model;
 		open.text += chunk;
+		if (kind === "agent_message") {
+			this.streamAgentText(open);
+			return;
+		}
 		if (kind !== "user_message") {
 			this.options.emitTextDelta(open.itemId, chunk);
 			return;
@@ -305,6 +313,7 @@ export class SessionStream {
 			kind,
 			messageId,
 			text: flushed?.text ?? "",
+			shown: flushed?.shown ?? null,
 			attachments: [...(flushed?.attachments ?? [])],
 			turnId,
 			startedAtMs: flushed?.startedAtMs ?? this.options.nextStartMs(),
@@ -314,9 +323,37 @@ export class SessionStream {
 			...((from ?? flushed?.from) ? { from: from ?? flushed?.from } : {}),
 		};
 		this.open = next;
-		if (kind !== "user_message" || this.options.streamUserMessages)
+		if (kind === "agent_message") {
+			if (next.shown !== null) this.emitText(next, "open");
+		} else if (kind !== "user_message" || this.options.streamUserMessages)
 			this.emit(this.textItem(next, "open"), turnId);
 		return next;
+	}
+
+	private streamAgentText(open: OpenText): void {
+		const visible = withoutTaskNotifications(open.text, false);
+		if (open.shown === null) {
+			if (!visible.trim()) return;
+			open.shown = "";
+			this.emit(this.textItem(open, "open"), open.turnId);
+		}
+		if (!visible.startsWith(open.shown)) {
+			this.emitText(open, "open");
+			return;
+		}
+		if (visible.length > open.shown.length)
+			this.options.emitTextDelta(open.itemId, visible.slice(open.shown.length));
+		open.shown = visible;
+	}
+
+	private emitText(open: OpenText, state: "open" | "flushed"): void {
+		if (open.kind === "agent_message") {
+			const text = withoutTaskNotifications(open.text, state === "flushed");
+			if (open.shown === null && !text.trim() && open.attachments.length === 0)
+				return;
+			open.shown = text;
+		}
+		this.emit(this.textItem(open, state), open.turnId);
 	}
 
 	private handleMessage(
@@ -362,7 +399,7 @@ export class SessionStream {
 				return {
 					...base,
 					kind: "agent_message",
-					text: open.text,
+					text: open.shown ?? "",
 					...(open.messageId ? { agentMessageId: open.messageId } : {}),
 					...(open.attachments.length > 0
 						? { attachments: open.attachments }

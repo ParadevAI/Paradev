@@ -1162,6 +1162,52 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
+	it("hides a task notification the model repeats, and a reply that is only that", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "watch CI" }]);
+		await flush();
+		const notification = [
+			"<system-reminder>",
+			"[SYSTEM NOTIFICATION - NOT USER INPUT]",
+			"This is an automated background-task event, NOT a message from the user.",
+			"",
+			"<task-notification>",
+			"<task-id>bpnxmf1pv</task-id>",
+			"<status>completed</status>",
+			'<summary>Monitor "wait for CI" stream ended</summary>',
+			"</task-notification>",
+			"</system-reminder>",
+		].join("\n");
+		const say = (messageId: string, text: string) => {
+			for (let i = 0; i < text.length; i += 7)
+				agent.notify("sess-1", {
+					sessionUpdate: "agent_message_chunk",
+					messageId,
+					content: { type: "text", text: text.slice(i, i + 7) },
+				});
+		};
+		say("m1", `Checking CI.\n\n${notification}\n\nCI passed.`);
+		say("m2", notification);
+		agent.releasePrompts("end_turn");
+		await flush();
+
+		const replies = itemsOf(events).filter((i) => i.kind === "agent_message");
+		expect(new Set(replies.map((i) => i.id.split(":").at(-1)))).toEqual(
+			new Set(["m1"]),
+		);
+		expect(replies.at(-1)).toMatchObject({
+			text: "Checking CI.\n\nCI passed.",
+		});
+		const streamed = events
+			.flatMap((e) => (e.kind === "delta" ? [e.delta.append] : []))
+			.join("");
+		expect(streamed).toBe("Checking CI.\n\nCI passed.");
+		await adapter.dispose();
+	});
+
 	it("replays a compaction as a notice in its place, not as a user message", async () => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
