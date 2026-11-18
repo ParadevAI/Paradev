@@ -1,10 +1,12 @@
 import type {
 	Item,
 	ItemAttachment,
+	Notice,
 	ToolCall,
 	ToolContent,
 } from "@superset/chat/protocol";
 import {
+	compactionText,
 	mapToolBody,
 	mcpServerOf,
 	messageText,
@@ -14,8 +16,11 @@ import {
 	toolStatus,
 } from "./itemMapping";
 import {
+	type AcpCompactionStatus,
 	type AcpContentBlock,
 	type AcpToolCallContent,
+	acpCompactionSummaryChunkSchema,
+	acpCompactionUpdateSchema,
 	acpContentBlockSchema,
 	acpMessageSchema,
 	acpPlanSchema,
@@ -77,6 +82,10 @@ export class SessionStream {
 	>();
 	private readonly toolCalls = new Map<string, ToolCall>();
 	private readonly planItems = new Map<string, number>();
+	private readonly compactions = new Map<
+		string,
+		{ notice: Notice; turnId: string; error?: string }
+	>();
 
 	constructor(private readonly options: SessionStreamOptions) {}
 
@@ -156,9 +165,43 @@ export class SessionStream {
 			case "plan_update":
 				this.handlePlanUpdate(raw, turnId);
 				return;
+			case "compaction_update":
+			case "compaction_summary_chunk":
+				this.handleCompaction(variant, raw, turnId);
+				return;
 			default:
 				return;
 		}
+	}
+
+	/** Undefined for a summary chunk of a compaction already shown: the notice keeps no summary. */
+	handleCompaction(
+		variant: "compaction_update" | "compaction_summary_chunk",
+		raw: unknown,
+		turnId: string,
+	): Notice | undefined {
+		if (variant === "compaction_summary_chunk") {
+			const chunk = acpCompactionSummaryChunkSchema.safeParse(raw);
+			if (
+				!chunk.success ||
+				this.compactions.has(this.compactionItemId(chunk.data.compactionId))
+			)
+				return;
+			return this.setCompaction(
+				chunk.data.compactionId,
+				"in_progress",
+				undefined,
+				turnId,
+			);
+		}
+		const parsed = acpCompactionUpdateSchema.safeParse(raw);
+		if (!parsed.success) return;
+		return this.setCompaction(
+			parsed.data.compactionId,
+			parsed.data.status,
+			parsed.data.error,
+			turnId,
+		);
 	}
 
 	handleParentMessage(
@@ -471,6 +514,45 @@ export class SessionStream {
 			},
 			turnId,
 		);
+	}
+
+	private compactionItemId(compactionId: string): string {
+		return `${this.options.idPrefix}compaction:${compactionId}`;
+	}
+
+	private setCompaction(
+		compactionId: string,
+		status: AcpCompactionStatus,
+		error: string | null | undefined,
+		turnId: string,
+	): Notice {
+		this.flush();
+		const id = this.compactionItemId(compactionId);
+		const prior = this.compactions.get(id);
+		const reason = error === undefined ? prior?.error : (error ?? undefined);
+		const notice: Notice = {
+			id,
+			kind: "notice",
+			noticeKind: status === "failed" ? "error" : "compaction",
+			...(this.options.parentItemId
+				? { parentItemId: this.options.parentItemId }
+				: {}),
+			startedAtMs: prior?.notice.startedAtMs ?? this.options.nextStartMs(),
+			...(status === "in_progress"
+				? {}
+				: {
+						completedAtMs: prior?.notice.completedAtMs ?? this.options.now(),
+					}),
+			text: compactionText(status, reason),
+		};
+		const pinnedTurnId = prior?.turnId ?? turnId;
+		this.compactions.set(id, {
+			notice,
+			turnId: pinnedTurnId,
+			...(reason ? { error: reason } : {}),
+		});
+		this.emit(notice, pinnedTurnId);
+		return notice;
 	}
 
 	private emit(item: Item, turnId: string): void {

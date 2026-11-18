@@ -228,6 +228,28 @@ export const acpPlanUpdateSchema = z.looseObject({
 	}),
 });
 
+export const acpCompactionStatusSchema = z.enum([
+	"in_progress",
+	"completed",
+	"failed",
+	"cancelled",
+]);
+export type AcpCompactionStatus = z.infer<typeof acpCompactionStatusSchema>;
+
+/**
+ * An upsert keyed by `compactionId`: the first update fixes its place in the
+ * transcript. An omitted `error` keeps the last one, and null clears it.
+ */
+export const acpCompactionUpdateSchema = z.looseObject({
+	compactionId: z.string().min(1),
+	status: acpCompactionStatusSchema,
+	error: z.string().nullable().optional(),
+});
+
+export const acpCompactionSummaryChunkSchema = z.looseObject({
+	compactionId: z.string().min(1),
+});
+
 /**
  * v2 `state_update`: a snapshot of the agent's foreground work, not a mode.
  * `idle` carries the stop reason that ended it.

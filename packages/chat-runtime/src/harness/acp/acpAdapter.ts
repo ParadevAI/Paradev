@@ -115,6 +115,27 @@ const LATEST_PROTOCOL_VERSION = 2;
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
 
+/**
+ * No fs or terminal: the agent falls back to its own Read/Edit/Bash tools,
+ * which run headless in the workspace. The ACP SDK's router serves a v2
+ * request on v1 with a fixed set in place of this one; a v1 request keeps the
+ * plan operations and boolean options which that set grants.
+ */
+function v1ClientCapabilities(protocolVersion: number) {
+	const pinnedToV1 = protocolVersion < 2;
+	return {
+		fs: { readTextFile: false, writeTextFile: false },
+		terminal: false,
+		elicitation: { form: {} },
+		...(pinnedToV1 ? { plan: {} } : {}),
+		session: {
+			compaction: {},
+			...(pinnedToV1 ? { configOptions: { boolean: {} } } : {}),
+		},
+		_meta: AIR_CLIENT_META,
+	};
+}
+
 function unconfirmedSelectionMessage(error: AcpTimeoutError): string {
 	return `${error.message}. The agent can still apply the change, so the selection stays as you set it.`;
 }
@@ -237,6 +258,8 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	defaultModeId?: string;
 	clientApprovalModes?: boolean;
 	forkAtMessage?: boolean;
+	/** The newest protocol version to ask for, for an agent held below ours. */
+	protocolVersion?: number;
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
@@ -1002,10 +1025,12 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 
+		const protocolVersion =
+			this.options.protocolVersion ?? LATEST_PROTOCOL_VERSION;
 		const initialized = await client.request(
 			"initialize",
 			{
-				protocolVersion: LATEST_PROTOCOL_VERSION,
+				protocolVersion,
 				// v2 requires `info` and renamed `clientCapabilities` to
 				// `capabilities`, so both names go out and one request serves either
 				// side of the bump.
@@ -1013,14 +1038,7 @@ export class AcpAdapter implements HarnessAdapter {
 				// v2 moved fs and terminal out of client capabilities entirely.
 				// Without form elicitation, claude-agent-acp drops AskUserQuestion.
 				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
-				// Do not advertise fs/terminal: the agent falls back to its own
-				// Read/Edit/Bash tools, which run headless in the workspace.
-				clientCapabilities: {
-					fs: { readTextFile: false, writeTextFile: false },
-					terminal: false,
-					elicitation: { form: {} },
-					_meta: AIR_CLIENT_META,
-				},
+				clientCapabilities: v1ClientCapabilities(protocolVersion),
 			},
 			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
 		);
@@ -1448,6 +1466,10 @@ export class AcpAdapter implements HarnessAdapter {
 			case "tool_call_update":
 				this.handleToolCall(outer.data.update, turnId);
 				return;
+			case "compaction_update":
+			case "compaction_summary_chunk":
+				this.handleCompaction(variant, outer.data.update, turnId);
+				return;
 			case "available_commands_update":
 				this.handleAvailableCommands(outer.data.update);
 				return;
@@ -1518,13 +1540,23 @@ export class AcpAdapter implements HarnessAdapter {
 		const item = this.main.handleUpdate("tool_call_update", raw, turnId);
 		if (!item || this.replaying) return;
 		this.trackBackgroundShell(item);
-		this.trackCompaction(raw, item);
+		if (this.compactions.has(item.id) || isCompactionCall(raw))
+			this.trackCompaction(item.id, item.status === "running");
 	}
 
-	private trackCompaction(raw: unknown, item: ToolCall): void {
-		if (!this.compactions.has(item.id) && !isCompactionCall(raw)) return;
-		if (item.status !== "running") {
-			this.compactions.delete(item.id);
+	private handleCompaction(
+		variant: "compaction_update" | "compaction_summary_chunk",
+		raw: unknown,
+		turnId: string,
+	): void {
+		const notice = this.main.handleCompaction(variant, raw, turnId);
+		if (!notice || this.replaying) return;
+		this.trackCompaction(notice.id, notice.completedAtMs === undefined);
+	}
+
+	private trackCompaction(itemId: string, running: boolean): void {
+		if (!running) {
+			this.compactions.delete(itemId);
 			if (this.compactions.size === 0) this.endCompactions();
 			return;
 		}
@@ -1533,7 +1565,7 @@ export class AcpAdapter implements HarnessAdapter {
 				this.settleCompactions = resolve;
 			});
 		}
-		this.compactions.add(item.id);
+		this.compactions.add(itemId);
 	}
 
 	/** claude-agent-acp leaves an unfinished compaction `in_progress` at the turn's end. */

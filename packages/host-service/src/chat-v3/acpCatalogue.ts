@@ -18,6 +18,8 @@ export type AcpHarness = {
 	clientApprovalModes?: boolean;
 	/** Forks a session up to a given message (JetBrains AIR fork point), so a rewind keeps the agent's own history. */
 	forkAtMessage?: boolean;
+	/** The newest ACP version to ask for, where the translator is held below it. */
+	protocolVersion?: number;
 	note: string;
 } & AcpTranslator;
 
@@ -33,7 +35,10 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		executableEnv: "CLAUDE_CODE_EXECUTABLE",
 		// The adapter serves ACP v2 since 0.95, where steering is not yet
 		// supported and turns end differently. Chat is built and tested on v1.
+		// Served on v1, a v2 request loses the client's v1 capabilities, and
+		// with them compaction updates, so the client asks for v1 too.
 		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
+		protocolVersion: 1,
 		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,

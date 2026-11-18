@@ -562,6 +562,7 @@ function startAdapter(
 		| "startupTimeoutMs"
 		| "startOptionsGraceMs"
 		| "launch"
+		| "protocolVersion"
 	> = {},
 ): { adapter: AcpAdapter; events: AdapterEvent[] } {
 	let counter = 0;
@@ -1006,6 +1007,152 @@ describe("AcpAdapter", () => {
 		await flush();
 		expect(steered).toBe(true);
 		expect(agent.sent.at(-1)).toMatchObject({ method: "_session/steering" });
+		await adapter.dispose();
+	});
+
+	it("advertises compaction updates", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter } = startAdapter(agent);
+		await flush();
+
+		const initialize = agent.sent.find((f) => f.method === "initialize");
+		expect(initialize?.params).toMatchObject({
+			clientCapabilities: { session: { compaction: {} } },
+		});
+		await adapter.dispose();
+	});
+
+	it("asks a v1-pinned agent for v1 with what the SDK router grants a v2 client", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+
+		const initialize = agent.sent.find((f) => f.method === "initialize");
+		expect(initialize?.params).toMatchObject({
+			protocolVersion: 1,
+			clientCapabilities: {
+				plan: {},
+				session: { compaction: {}, configOptions: { boolean: {} } },
+			},
+		});
+		await adapter.dispose();
+	});
+
+	it("shows a compaction as one notice and holds a steer until it settles", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.steeringOutcome = "injected";
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		await flush();
+		expect(itemsOf(events).at(-1)).toMatchObject({
+			id: "compaction:c1",
+			kind: "notice",
+			noticeKind: "compaction",
+			text: "Compacting conversation history",
+		});
+
+		let steered: boolean | undefined;
+		void adapter.steer([{ type: "text", text: "and this" }]).then((taken) => {
+			steered = taken;
+		});
+		await flush();
+		expect(agent.sent.map((f) => f.method)).not.toContain("_session/steering");
+
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_summary_chunk",
+			compactionId: "c1",
+			content: { type: "text", text: "The user asked for…" },
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "completed",
+		});
+		await flush();
+		expect(steered).toBe(true);
+		const notices = itemsOf(events).filter((i) => i.kind === "notice");
+		expect(new Set(notices.map((i) => i.id))).toEqual(
+			new Set(["compaction:c1"]),
+		);
+		expect(notices.at(-1)).toMatchObject({
+			text: "Conversation history was compacted",
+			startedAtMs: notices[0]?.startedAtMs,
+			completedAtMs: 1,
+		});
+		await adapter.dispose();
+	});
+
+	it("shows a failed compaction as an error with the agent's reason", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "failed",
+			error: "Prompt is too long",
+		});
+		await flush();
+
+		expect(itemsOf(events).at(-1)).toMatchObject({
+			id: "compaction:c1",
+			noticeKind: "error",
+			text: "Could not compact conversation history: Prompt is too long",
+		});
+		await adapter.dispose();
+	});
+
+	it("replays a compaction as a notice in its place, not as a user message", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		agent.replayUpdates = [
+			{
+				sessionUpdate: "user_message_chunk",
+				content: { type: "text", text: "fix the flaky test" },
+			},
+			{
+				sessionUpdate: "agent_message_chunk",
+				content: { type: "text", text: "On it." },
+			},
+			{
+				sessionUpdate: "compaction_update",
+				compactionId: "summary-uuid",
+				status: "completed",
+				summary: [{ type: "text", text: "The user asked to fix a test." }],
+			},
+			{
+				sessionUpdate: "agent_message_chunk",
+				content: { type: "text", text: "Fixed." },
+			},
+		];
+		const { adapter, events } = startAdapter(agent, "sess-1");
+		await flush(40);
+
+		const items = itemsOf(events);
+		expect(items.filter((i) => i.kind === "user_message")).toHaveLength(1);
+		const startOf = (match: (item: Item) => boolean): number =>
+			items.find(match)?.startedAtMs ?? Number.NaN;
+		const compaction = startOf((i) => i.id === "compaction:summary-uuid");
+		expect(startOf((i) => textOf(i) === "On it.")).toBeLessThan(compaction);
+		expect(compaction).toBeLessThan(startOf((i) => textOf(i) === "Fixed."));
 		await adapter.dispose();
 	});
 
