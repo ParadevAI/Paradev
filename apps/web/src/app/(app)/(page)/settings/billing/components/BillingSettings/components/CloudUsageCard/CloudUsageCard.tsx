@@ -5,6 +5,7 @@ import { useFormat } from "@superset/i18n/react";
 import { Progress } from "@superset/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
+import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 import { GbHourPurchase } from "./components/GbHourPurchase";
 
 interface CloudUsageCardProps {
@@ -17,7 +18,8 @@ export function CloudUsageCard({
 	canBuy,
 }: CloudUsageCardProps) {
 	const trpc = useTRPC();
-	const { formatNumber, formatDate } = useFormat();
+	const { formatDate } = useFormat();
+	const formatGbHours = useFormatGbHours();
 	const { data: usage } = useQuery(trpc.billing.cloudUsage.queryOptions());
 
 	if (
@@ -31,11 +33,7 @@ export function CloudUsageCard({
 		return null;
 	}
 
-	const gbHours = (gbMinutes: number) => {
-		const hours = gbMinutes / 60;
-		if (hours > 0 && hours < 0.1) return `<${formatNumber(0.1)}`;
-		return formatNumber(hours, { maximumFractionDigits: 1 });
-	};
+	const gbHours = (gbMinutes: number) => formatGbHours(gbMinutes / 60);
 	const used = gbHours(usage.usedGbMinutes);
 	const included =
 		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
