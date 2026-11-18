@@ -6,16 +6,21 @@ import {
 	setSystemTime,
 	test,
 } from "bun:test";
-import { Drive, Sandbox } from "@vercel/sandbox";
+import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
+	applySandboxPolicy,
+	deleteSandbox,
+	describeSandbox,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
 	type SandboxClaim,
 	SESSION_TIMEOUT_MS,
+	sandboxExists,
+	stopSandbox,
 	topUpSandboxSession,
 	wakeSandbox,
 } from "./vercel";
@@ -153,58 +158,181 @@ describe("listSandboxSessions", () => {
 	});
 });
 
-describe("promoteSandboxToEnvironment", () => {
-	const sourceCalls: string[] = [];
-	const source = {
-		status: "running",
-		region: "iad1",
+/**
+ * A box the way the SDK presents it: the handle keeps the status it was read
+ * with, a session call on a stopped session fails, and a handle call resumes
+ * it first, which `resumes` records.
+ */
+function fakeBox(read: "running" | "stopped") {
+	const box = {
+		live: read,
+		snapshotId: "snap_stop_0",
+		resumes: [] as string[],
+	};
+	const stoppedError = () => new APIError(new Response(null, { status: 410 }));
+	const session = {
+		sessionId: "sess_A",
 		vcpus: 4,
-		currentSession: () => ({ sessionId: "sess_A" }),
+		update: async () => {
+			if (box.live !== "running") throw stoppedError();
+		},
+		extendTimeout: async () => {
+			if (box.live !== "running") throw stoppedError();
+		},
 		snapshot: async () => {
-			sourceCalls.push("snapshot");
-			return { snapshotId: "snap_1" };
-		},
-		writeFiles: async () => {
-			sourceCalls.push("writeFiles");
-		},
-		runCommand: async () => {
-			sourceCalls.push("runCommand");
-		},
-		mkDir: async () => {
-			sourceCalls.push("mkDir");
+			if (box.live !== "running") throw stoppedError();
+			box.live = "stopped";
+			return { snapshotId: "snap_now" };
 		},
 	};
+	const resumingCall = (method: string) => async () => {
+		if (box.live !== "running") {
+			box.resumes.push(method);
+			box.live = "running";
+		}
+		return method === "snapshot" ? session.snapshot() : undefined;
+	};
+	const handle = () => ({
+		name: "ws-box",
+		status: box.live,
+		region: "iad1",
+		vcpus: 4,
+		currentSnapshotId: box.snapshotId,
+		expiresAt: new Date(NOW + HOUR / 2),
+		domain: () => "https://box.test",
+		currentSession: () => session,
+		update: async (params: { networkPolicy?: unknown }) => {
+			if (params.networkPolicy && handleStatus === "running") {
+				await session.update();
+			}
+		},
+		delete: async () => {},
+		listSessions: async () => (async function* () {})(),
+		snapshot: resumingCall("snapshot"),
+		runCommand: resumingCall("runCommand"),
+		writeFiles: resumingCall("writeFiles"),
+		extendTimeout: resumingCall("extendTimeout"),
+	});
+	let handleStatus: string = read;
+	const stopNow = () => {
+		box.live = "stopped";
+		box.snapshotId = "snap_stop_1";
+	};
+	return {
+		box,
+		stopNow,
+		get: async () => {
+			const read = handle();
+			handleStatus = read.status;
+			return read;
+		},
+	};
+}
+
+/** The idle timeout ends the session after the first read, before any call. */
+function stopsAfterRead(fake: ReturnType<typeof fakeBox>) {
+	const read = fake.get;
+	let reads = 0;
+	fake.get = async () => {
+		const handle = await read();
+		if (++reads === 1) fake.stopNow();
+		return handle;
+	};
+	return fake;
+}
+
+describe("a caller that is not a wake leaves a stopped box stopped", () => {
+	let fake = fakeBox("stopped");
+	stub(Sandbox, { get: async () => fake.get() });
+
+	test("reads, stops, deletes, session lists, policy and top-up", async () => {
+		fake = fakeBox("stopped");
+		await describeSandbox("ws-box");
+		await sandboxExists("ws-box");
+		await stopSandbox("ws-box");
+		await listSandboxSessions("ws-box", NOW - HOUR);
+		await findSandboxSession("ws-box", null);
+		expect(
+			await applySandboxPolicy({
+				providerSandboxId: "ws-box",
+				networkPolicy: {},
+			}),
+		).toBe("not-running");
+		expect(await topUpSandboxSession("ws-box")).toBeNull();
+		await deleteSandbox("ws-box");
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+
+	test("policy and top-up find the box stopped since they read it running", async () => {
+		fake = stopsAfterRead(fakeBox("running"));
+		expect(
+			await applySandboxPolicy({
+				providerSandboxId: "ws-box",
+				networkPolicy: {},
+			}),
+		).toBe("not-running");
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+
+		fake = stopsAfterRead(fakeBox("running"));
+		expect(await topUpSandboxSession("ws-box")).toBeNull();
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+});
+
+describe("promoteSandboxToEnvironment", () => {
+	let fake = fakeBox("running");
+	let sourceSnapshot: string | undefined;
+	let createTags: unknown;
 	const golden = {
 		currentSnapshotId: "snap_golden_0",
 		runCommand: async () => {},
 		stop: async () => {},
 	};
-	let createTags: unknown;
 	stub(Sandbox, {
 		get: async ({ name }: { name: string }) =>
 			name === "ws-box"
-				? source
+				? fake.get()
 				: { status: "stopped", currentSnapshotId: "snap_golden_1" },
-		create: async (params: { tags: unknown }) => {
+		create: async (params: {
+			tags: unknown;
+			source: { snapshotId: string };
+		}) => {
 			createTags = params.tags;
+			sourceSnapshot = params.source.snapshotId;
 			return golden;
 		},
 	});
+	const promote = () =>
+		promoteSandboxToEnvironment({
+			sourceSandbox: "ws-box",
+			goldenName: "env-1",
+			organizationId: "org_1",
+		});
 
-	test("ends the source's session for the snapshot and leaves its restart to the caller", async () => {
-		expect(
-			await promoteSandboxToEnvironment({
-				sourceSandbox: "ws-box",
-				goldenName: "env-1",
-				organizationId: "org_1",
-			}),
-		).toEqual({
+	test("snapshots a running source through its session and leaves its restart to the caller", async () => {
+		fake = fakeBox("running");
+		expect(await promote()).toEqual({
 			goldenName: "env-1",
 			region: "iad1",
 			stopped: { sessionId: "sess_A" },
 		});
-		expect(sourceCalls).toEqual(["snapshot"]);
+		expect(sourceSnapshot).toBe("snap_now");
 		expect(createTags).toEqual({ kind: "environment", org: "org_1" });
+		expect(fake.box.resumes).toEqual([]);
+	});
+
+	test("builds from a stopped source's last stop without resuming it", async () => {
+		fake = fakeBox("stopped");
+		expect((await promote()).stopped).toBeNull();
+		expect(sourceSnapshot).toBe("snap_stop_0");
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+
+	test("a source that stops before its snapshot is built from that stop's snapshot", async () => {
+		fake = stopsAfterRead(fakeBox("running"));
+		await promote();
+		expect(sourceSnapshot).toBe("snap_stop_1");
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 });
 

@@ -790,12 +790,17 @@ timeout a moment later is resumed by the next call on that object, and no
 code chose to start it. Measured: 9 sessions in a week started 0.8–1.5 s after
 a timeout stop. `wakeSandbox` passes `onResume` to `Sandbox.get` and runs
 `beforeResume` (which authorizes the boot) for such a session; a refused one is
-stopped at once. A top-up goes through the session, which never resumes.
-Other callers on a box read `running` are covered only by the reconcile, which
-adopts any session that has no boot row within one run: promote's
-`source.snapshot()` (wrapped in `withResume`), and `applySandboxPolicy`, whose
-`update` does not resume in SDK 4.0.0 but would if a later SDK wrapped it.
-`provisionSandbox` on a box it already made is covered by its own boot.
+stopped at once. **What we did:** only `wakeSandbox` and `provisionSandbox`
+get a full handle (`getSandboxToWake` in `vercel.ts`). Every other caller gets
+`getSandbox`, typed to the members that cannot resume (`stop`, `update`,
+`delete`, `listSessions`, `currentSession()` and reads), and acts on a running
+box through the session, whose calls answer 410 or 422 on a stopped one
+instead. Top-up and the credential refresh treat that answer as "not
+running"; promote builds a stopped source's golden from the snapshot its
+stop took (measured: a create from that automatic snapshot has the stopped
+box's files). An HTTP request to a stopped box's port does not resume it
+either: measured, it answers `410 This sandbox was stopped` and no session
+starts, so the archive hook and other host-service calls cannot wake a box.
 
 **`stop()` returns before the stop's snapshot is current.** The sandbox is
 still `stopping` when the call resolves, and a fork taken then boots from
