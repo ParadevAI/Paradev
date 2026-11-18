@@ -366,6 +366,8 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 			headSha: "abc123",
 			beforeLookup: undefined as (() => Promise<void>) | undefined,
 			beforeChecks: undefined as (() => Promise<void>) | undefined,
+			beforeRefs: undefined as (() => Promise<void>) | undefined,
+			overrideBranch: null as string | null,
 			branchHeadSha: null as string | null,
 		};
 		const manager = createManager(db, {
@@ -374,8 +376,9 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 					db,
 					worktreePath.split("/").at(-1) ?? "",
 				);
+				await network.beforeRefs?.();
 				return {
-					branch: workspace?.branch ?? null,
+					branch: network.overrideBranch ?? workspace?.branch ?? null,
 					headSha: workspace?.headSha ?? null,
 					upstream: {
 						owner: workspace?.upstreamOwner ?? REPO.owner,
@@ -650,6 +653,52 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 			manager.refreshPullRequestsByWorkspaces(["ws"]),
 		);
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBe(prId);
+	});
+
+	test("clears a stale synthetic link when another ref already refreshed its PR head", async () => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeTruthy();
+		seedWorkspace(db, {
+			id: "branch",
+			branch: "deleted-feature",
+			upstreamOwner: REPO.owner,
+			upstreamRepo: REPO.name,
+		});
+		network.branchHeadSha = "def456";
+		await manager.refreshPullRequestsByWorkspaces(["branch"]);
+		await projectRefresher(manager)(PROJECT_ID);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests.map((pr) => pr.number)).toEqual([42]);
+	});
+
+	test("a delayed Git ref read does not restore a link removed during the read", async () => {
+		const { db, manager, network } = setup();
+		await manager.refreshPullRequestsByWorkspaces(["ws"]);
+		const prId = getWorkspace(db, "ws")?.pullRequestId;
+		expect(prId).toBeTruthy();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeRefs = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		network.overrideBranch = "renamed";
+		network.offline = true;
+		await withSilencedWarnings(async () => {
+			const refresh = manager.refreshPullRequestsByWorkspaces(["ws"]);
+			try {
+				await entered.promise;
+				manager.unlinkWorkspacePullRequest("ws");
+			} finally {
+				pending.resolve();
+				await refresh;
+			}
+		});
+		expect(getWorkspace(db, "ws")?.branch).toBe("renamed");
+		expect(getWorkspace(db, "ws")?.suppressedPullRequestId).toBe(prId);
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
 	});
 });
 

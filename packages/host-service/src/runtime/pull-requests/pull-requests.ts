@@ -58,6 +58,9 @@ import {
 	type ReviewDecision,
 } from "./utils/pull-request-mappers";
 import {
+	decodeHeadBranch,
+	encodeHeadBranch,
+	pullRequestRefNumber,
 	readWorkspaceRefs,
 	type WorkspaceRefsSnapshot,
 } from "./utils/workspace-refs";
@@ -107,9 +110,7 @@ function syntheticPullRequestNumber(
 	) {
 		return null;
 	}
-	const match = /^refs\/pull\/([1-9]\d*)\/head$/.exec(head.branch);
-	const number = match ? Number(match[1]) : NaN;
-	return Number.isSafeInteger(number) ? number : null;
+	return pullRequestRefNumber(head.branch);
 }
 
 type RepoProvider = "github";
@@ -230,13 +231,17 @@ function deriveCheckoutPullRequestUpstream(
 	pr: CheckoutPullRequestMetadata,
 ): { owner: string; name: string; branch: string } | null {
 	if (!pr.isCrossRepository) {
-		return { owner: repo.owner, name: repo.name, branch: pr.headRefName };
+		return {
+			owner: repo.owner,
+			name: repo.name,
+			branch: encodeHeadBranch(pr.headRefName),
+		};
 	}
 
 	const owner = pr.headRepositoryOwner?.trim();
 	const name = pr.headRepositoryName?.trim();
 	if (!owner || !name) return null;
-	return { owner, name, branch: pr.headRefName };
+	return { owner, name, branch: encodeHeadBranch(pr.headRefName) };
 }
 
 interface ProjectRefreshOptions {
@@ -890,11 +895,10 @@ export class PullRequestRuntimeManager {
 			const upstreamOwner = upstream?.owner ?? null;
 			const upstreamRepo = upstream?.name ?? null;
 			const upstreamBranch = upstream?.branch ?? null;
-			const pullRequestId =
-				upstream ||
-				this.pullRequestHeadMatches(workspace.pullRequestId, headSha)
-					? workspace.pullRequestId
-					: null;
+			const shouldClearLink =
+				workspace.pullRequestId !== null &&
+				!upstream &&
+				!this.pullRequestHeadMatches(workspace.pullRequestId, headSha);
 
 			if (
 				branch === workspace.branch &&
@@ -902,7 +906,7 @@ export class PullRequestRuntimeManager {
 				upstreamOwner === workspace.upstreamOwner &&
 				upstreamRepo === workspace.upstreamRepo &&
 				upstreamBranch === workspace.upstreamBranch &&
-				pullRequestId === workspace.pullRequestId
+				!shouldClearLink
 			) {
 				return null;
 			}
@@ -915,7 +919,11 @@ export class PullRequestRuntimeManager {
 					upstreamOwner,
 					upstreamRepo,
 					upstreamBranch,
-					pullRequestId,
+					...(shouldClearLink
+						? {
+								pullRequestId: sql`CASE WHEN ${workspaces.pullRequestId} = ${workspace.pullRequestId} THEN NULL ELSE ${workspaces.pullRequestId} END`,
+							}
+						: {}),
 					...(branch !== workspace.branch ? { updatedAt: Date.now() } : {}),
 				})
 				// Guard: the workspace can archive during the awaited ref read;
@@ -1106,25 +1114,28 @@ export class PullRequestRuntimeManager {
 				}
 				continue;
 			}
-			if (supersededKeys.has(key)) continue;
-			const rawMatch = keyToPullRequest.get(key);
+			const fetchedMatch = keyToPullRequest.get(key);
 			const head = wantedRefs.get(key);
 			const isSyntheticCheckout =
 				head !== undefined && syntheticPullRequestNumber(head, repo) !== null;
-			const lookupFailed = failedKeys.has(key);
+			const lookupSuperseded =
+				supersededKeys.has(key) ||
+				Boolean(
+					isSyntheticCheckout &&
+						fetchedMatch &&
+						(this.appliedPullRequestSequence.get(fetchedMatch.id) ?? 0) >
+							fetchedMatch.sequence &&
+						!this.pullRequestHeadMatches(fetchedMatch.id, fetchedMatch.headSha),
+				);
+			if (lookupSuperseded && !isSyntheticCheckout) continue;
+			const rawMatch = lookupSuperseded ? undefined : fetchedMatch;
+			const useStoredHead = failedKeys.has(key) || lookupSuperseded;
 			let headSha = workspace.headSha;
 			let linkCondition = and(
 				eq(workspaces.id, workspace.id),
 				isNull(workspaces.archivedAt),
 			);
 			if (isSyntheticCheckout) {
-				if (
-					rawMatch &&
-					(this.appliedPullRequestSequence.get(rawMatch.id) ?? 0) >
-						rawMatch.sequence &&
-					!this.pullRequestHeadMatches(rawMatch.id, rawMatch.headSha)
-				)
-					continue;
 				const sameCheckout = and(
 					linkCondition,
 					eq(workspaces.projectId, projectId),
@@ -1142,7 +1153,7 @@ export class PullRequestRuntimeManager {
 					.get();
 				if (
 					!current ||
-					(!lookupFailed && current.headSha !== workspace.headSha)
+					(!useStoredHead && current.headSha !== workspace.headSha)
 				) {
 					continue;
 				}
@@ -1191,7 +1202,7 @@ export class PullRequestRuntimeManager {
 				continue;
 			}
 
-			if (lookupFailed) {
+			if (useStoredHead) {
 				if (!isSyntheticCheckout || !workspace.pullRequestId || !headSha) {
 					continue;
 				}
@@ -1569,6 +1580,7 @@ export class PullRequestRuntimeManager {
 		const prNumber = syntheticPullRequestNumber(head, repo);
 		if (prNumber !== null)
 			return this.getCachedPullRequestByNumber(repo, prNumber, options);
+		const branchHead = { ...head, branch: decodeHeadBranch(head.branch) };
 		// Branch stays case-sensitive so two case-variant branches can't share
 		// a cache entry and return each other's PR.
 		const cacheKey = [
@@ -1586,8 +1598,9 @@ export class PullRequestRuntimeManager {
 				this.fetchFromGitHub(
 					"PR head lookup",
 					{ owner: repo.owner, name: repo.name, head },
-					() => fetchPullRequestByHeadFromGh(this.execGh, repo, head),
-					async () => fetchPullRequestByHead(await this.github(), repo, head),
+					() => fetchPullRequestByHeadFromGh(this.execGh, repo, branchHead),
+					async () =>
+						fetchPullRequestByHead(await this.github(), repo, branchHead),
 					{ probe: options.bypassCache === true },
 				),
 		);
@@ -1868,7 +1881,7 @@ export class PullRequestRuntimeManager {
 					const nodeKey = upstreamKey(
 						node.headRepositoryOwner?.login ?? null,
 						node.headRepository?.name ?? null,
-						node.headRefName,
+						encodeHeadBranch(node.headRefName),
 					);
 					if (
 						nodeKey === key ||
@@ -1916,7 +1929,7 @@ export class PullRequestRuntimeManager {
 					const nodeKey = upstreamKey(
 						node.headRepositoryOwner?.login ?? null,
 						node.headRepository?.name ?? null,
-						node.headRefName,
+						encodeHeadBranch(node.headRefName),
 					);
 					if (!nodeKey) continue;
 					const lower = nodeKey.toLowerCase();
