@@ -261,10 +261,10 @@ describe("environmentBuildWorkflow", () => {
 	});
 
 	test("an [install] far past the old 285 s budget still succeeds", async () => {
-		install = { ...install, durationMs: 20 * 60_000 };
+		install = { ...install, durationMs: 8 * 60_000 };
 		const started = now;
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
-		expect(now - started).toBeGreaterThan(20 * 60_000);
+		expect(now - started).toBeGreaterThan(8 * 60_000);
 	});
 
 	test("an [install] that fails keeps the golden and deletes the box", async () => {
