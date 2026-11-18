@@ -1,1 +1,5 @@
-export { agentLaunchPreset, useResolveOpenAsChat } from "./useResolveOpenAsChat";
+export {
+	agentLaunchPreset,
+	opensInChat,
+	useResolveOpenAsChat,
+} from "./useResolveOpenAsChat";

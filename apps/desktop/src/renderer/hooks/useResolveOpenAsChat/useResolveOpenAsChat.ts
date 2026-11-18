@@ -13,14 +13,21 @@ export function agentLaunchPreset(agent: AgentPresetSource): string | null {
 	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? null;
 }
 
-/** Whether a new agent opens in chat: its preset has a chat harness and the user opens agents in chat. */
+/** A new agent opens in chat when its preset has a chat harness and the user opens agents in chat. */
+export async function opensInChat(
+	presetId: string | null | undefined,
+	isChatEnabled: () => Promise<boolean>,
+): Promise<boolean> {
+	if (!acpHarnessForPreset(presetId)) return false;
+	return isChatEnabled();
+}
+
 export function useResolveOpenAsChat(): (
 	presetId: string | null | undefined,
 ) => Promise<boolean> {
 	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
 	return useCallback(
-		async (presetId) =>
-			Boolean(acpHarnessForPreset(presetId)) && (await resolveAcpChatEnabled()),
+		(presetId) => opensInChat(presetId, resolveAcpChatEnabled),
 		[resolveAcpChatEnabled],
 	);
 }
