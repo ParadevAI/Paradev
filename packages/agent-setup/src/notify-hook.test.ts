@@ -21,7 +21,6 @@ const emptyHome = mkdtempSync(path.join(tmpdir(), "notify-hook-empty-home-"));
 function renderNotifyHookScript(): string {
 	return readNotifyHookTemplate()
 		.replaceAll("{{MARKER}}", NOTIFY_SCRIPT_MARKER)
-		.replaceAll("{{DEFAULT_PORT}}", "48763")
 		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
@@ -113,7 +112,7 @@ function writeHookManifest(home: string, orgId: string, endpoint: string) {
 
 describe("getNotifyScriptContent", () => {
 	it("bumps the notify hook marker when hook semantics change", () => {
-		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v21");
+		expect(NOTIFY_SCRIPT_MARKER).toBe("# Superset agent notification hook v22");
 	});
 
 	it("forwards the main session's transcript path with its identity", async () => {
@@ -350,8 +349,6 @@ describe("getNotifyScriptContent", () => {
 		expect(script).toContain(
 			"event=$EVENT_TYPE terminalId=$SUPERSET_TERMINAL_ID agentId=$AGENT_ID subagentId=$SUBAGENT_ID sessionId=$SESSION_ID hookSessionId=$HOOK_SESSION_ID resourceId=$RESOURCE_ID paneId=$SUPERSET_PANE_ID tabId=$SUPERSET_TAB_ID workspaceId=$SUPERSET_WORKSPACE_ID",
 		);
-		expect(script).toContain('V1_EVENT_TYPE="$EVENT_TYPE"');
-		expect(script).toContain('V1_EVENT_TYPE="Stop"');
 	});
 
 	it("gives the v2 host-service hook enough time to deliver", () => {
@@ -377,10 +374,6 @@ describe("getNotifyScriptContent", () => {
 		const script = readNotifyHookTemplate();
 
 		expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
-		expect(script).toContain(
-			'[ -z "$SUPERSET_TAB_ID" ] && [ -z "$SESSION_ID" ] && [ -z "$SUPERSET_TERMINAL_ID" ] && exit 0',
-		);
-		expect(script).toContain("/hook/complete");
 		expect(script).toContain("terminalId=$SUPERSET_TERMINAL_ID");
 		expect(script).toContain("SUPERSET_TAB_ID");
 		expect(script).toContain("SUPERSET_PANE_ID");
@@ -450,7 +443,7 @@ describe("getNotifyScriptContent", () => {
 	});
 });
 
-describe("per-agent hook scripts dispatch to v2", () => {
+describe("per-agent hook scripts dispatch to host-service", () => {
 	const buildExpectedV2Payload = (agentIdVar: string) =>
 		`PAYLOAD="{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$${agentIdVar}")\\",\\"sessionId\\":\\"$(json_escape "$HOOK_SESSION_ID")\\"}}}"`;
 
@@ -472,7 +465,7 @@ describe("per-agent hook scripts dispatch to v2", () => {
 		["copilot-hook.template.sh", "AGENT_ID"],
 		["gemini-hook.template.sh", "AGENT_ID"],
 	] as const) {
-		it(`${template} posts v2 first and falls back to v1`, () => {
+		it(`${template} posts to host-service`, () => {
 			const script = readFileSync(
 				getTemplatePath(template),
 				"utf-8",
@@ -485,12 +478,6 @@ describe("per-agent hook scripts dispatch to v2", () => {
 			expect(script).toContain(HOME_DIR_FALLBACK);
 			expect(script).toContain("/host/*/manifest.json; do");
 			expect(script).toContain('if [ -n "$SUPERSET_TERMINAL_ID" ]; then');
-			expect(script).toContain("/hook/complete");
-			expect(script).toContain('V1_EVENT_TYPE="$EVENT_TYPE"');
-			expect(script).toContain("eventType=$V1_EVENT_TYPE");
-			expect(script).toContain("terminalId=$SUPERSET_TERMINAL_ID");
-			expect(script).toContain("SUPERSET_TAB_ID");
-			expect(script).toContain("SUPERSET_PANE_ID");
 		});
 	}
 });
@@ -727,7 +714,6 @@ describe("cursor-hook.template.sh identity", () => {
 	function renderCursorHook(): string {
 		return readFileSync(getTemplatePath("cursor-hook.template.sh"), "utf-8")
 			.replaceAll("{{MARKER}}", "# test hook")
-			.replaceAll("{{DEFAULT_PORT}}", "48763")
 			.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 	}
 

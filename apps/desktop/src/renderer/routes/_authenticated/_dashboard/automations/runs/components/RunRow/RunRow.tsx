@@ -56,7 +56,7 @@ export function RunRow({
 		if (!workspaceId) return;
 		localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 		navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId },
 			search: runWorkspaceSearch(run),
 		});

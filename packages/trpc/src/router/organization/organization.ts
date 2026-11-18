@@ -24,6 +24,7 @@ import { canRemoveMember, type OrganizationRole } from "@superset/shared/auth";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
+import { withAuthUserErrors } from "../../lib/auth-user-error";
 import { isMember, organizationOrFirst } from "../../lib/cloud-guards";
 import { userConnection } from "../../lib/connectors";
 import { generateImagePathname, uploadImage } from "../../lib/upload";
@@ -361,14 +362,16 @@ export const organizationRouter = {
 				}
 			}
 
-			const organization = await auth.api.createOrganization({
-				body: {
-					name: input.name,
-					slug: input.slug,
-					logo: input.logo,
-					userId: ctx.session.user.id,
-				},
-			});
+			const organization = await withAuthUserErrors(
+				auth.api.createOrganization({
+					body: {
+						name: input.name,
+						slug: input.slug,
+						logo: input.logo,
+						userId: ctx.session.user.id,
+					},
+				}),
+			);
 
 			if (!organization) {
 				throw userError({
@@ -557,15 +560,16 @@ export const organizationRouter = {
 		)
 		.mutation(async ({ ctx, input }) => {
 			await verifyOrgAdmin(ctx.session.user.id, input.organizationId);
-			const member = await ctx.auth.api.addMember({
-				body: {
-					organizationId: input.organizationId,
-					userId: input.userId,
-					role: "member",
-				},
-				headers: ctx.headers,
-			});
-			return member;
+			return withAuthUserErrors(
+				ctx.auth.api.addMember({
+					body: {
+						organizationId: input.organizationId,
+						userId: input.userId,
+						role: "member",
+					},
+					headers: ctx.headers,
+				}),
+			);
 		}),
 
 	removeMember: personProcedure
@@ -633,13 +637,15 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.removeMember({
-				body: {
-					organizationId: input.organizationId,
-					memberIdOrEmail: targetMember.id, // Use member ID, not user ID
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.removeMember({
+					body: {
+						organizationId: input.organizationId,
+						memberIdOrEmail: targetMember.id, // Use member ID, not user ID
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const cleanup = await cleanupRemovedMember({
 				userId: input.userId,
@@ -692,10 +698,12 @@ export const organizationRouter = {
 				});
 			}
 
-			const leaveResult = await ctx.auth.api.leaveOrganization({
-				body: { organizationId: input.organizationId },
-				headers: ctx.headers,
-			});
+			const leaveResult = await withAuthUserErrors(
+				ctx.auth.api.leaveOrganization({
+					body: { organizationId: input.organizationId },
+					headers: ctx.headers,
+				}),
+			);
 
 			if (!leaveResult) {
 				throw userError({
@@ -809,14 +817,16 @@ export const organizationRouter = {
 				});
 			}
 
-			await ctx.auth.api.updateMemberRole({
-				body: {
-					organizationId: input.organizationId,
-					memberId: input.memberId,
-					role: [input.role],
-				},
-				headers: ctx.headers,
-			});
+			await withAuthUserErrors(
+				ctx.auth.api.updateMemberRole({
+					body: {
+						organizationId: input.organizationId,
+						memberId: input.memberId,
+						role: [input.role],
+					},
+					headers: ctx.headers,
+				}),
+			);
 
 			const updatedMember = await db.query.members.findFirst({
 				where: eq(members.id, input.memberId),

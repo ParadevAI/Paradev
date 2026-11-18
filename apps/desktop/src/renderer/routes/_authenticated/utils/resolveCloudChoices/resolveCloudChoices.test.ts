@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { CloudCreateChoice } from "renderer/stores/v2-workspace-create-defaults";
+import type { CloudCreateChoice } from "renderer/stores/workspace-create-defaults";
 import { resolveCloudChoices } from "./resolveCloudChoices";
 
 const web = {

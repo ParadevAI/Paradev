@@ -1,5 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import { type ReactNode, useState } from "react";
+import { useTitleBarSlots } from "../../providers/TitleBarSlotsProvider";
 import { RoundedClip } from "../RoundedClip";
 import { BareContentCardContext } from "./context";
 
@@ -12,8 +13,10 @@ export function ContentCard({
 	children: ReactNode;
 }) {
 	const [isBare, setIsBare] = useState(false);
+	const { setContentCard } = useTitleBarSlots();
 	return (
 		<div
+			ref={setContentCard}
 			className={cn(
 				"relative mr-1.5 mb-1.5 flex min-h-0 min-w-0 flex-1 rounded-[10px]",
 				joinsSidebar && "rounded-l-none",

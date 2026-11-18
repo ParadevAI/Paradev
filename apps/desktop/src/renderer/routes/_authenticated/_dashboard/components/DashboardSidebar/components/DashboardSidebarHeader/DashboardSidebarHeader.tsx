@@ -39,7 +39,6 @@ import {
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { useOpenNewWorkspaceInViewedProject } from "renderer/routes/_authenticated/_dashboard/hooks/useOpenNewWorkspaceInViewedProject";
-import { useShowsAppTopBar } from "renderer/routes/_authenticated/_dashboard/hooks/useShowsAppTopBar";
 import { STROKE_WIDTH_THICK } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import { COLLAPSED_WORKSPACE_SIDEBAR_WIDTH } from "renderer/stores/workspace-sidebar-state";
 import { useCommandPaletteToggle } from "../../hooks/useCommandPaletteToggle";
@@ -63,7 +62,6 @@ export function DashboardSidebarHeader({
 	// Default to Mac while loading so we don't briefly cover the traffic lights.
 	const isMac = platform === undefined || platform === "darwin";
 	const zoomFactor = useZoomFactor();
-	const showsAppTopBar = useShowsAppTopBar();
 	// `?? false`: the hook returns undefined until PostHog flags resolve.
 	// Dev builds bypass the flag — the local dev account isn't in the
 	// @superset.sh release condition.
@@ -79,29 +77,27 @@ export function DashboardSidebarHeader({
 			<div className="flex flex-col">
 				{/* The page's header row continues across the rail, and the macOS
 				    window buttons sit in it. */}
-				{!showsAppTopBar && (
-					<div
-						// w +1px: overlaps the container's border-r so the sidebar's
-						// vertical border starts below the row, not inside it.
-						className={cn(
-							"drag h-12 w-[calc(100%+1px)] shrink-0",
-							WINDOW_CHROME_BAND_CLASS,
-						)}
-					>
-						{!isMac && (
-							<div
-								className="flex items-center justify-center"
-								style={{
-									width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
-									marginTop: WINDOW_CONTROLS_ROW_TOP,
-									height: WINDOW_CONTROLS_ROW_HEIGHT,
-								}}
-							>
-								<AppMenuButton />
-							</div>
-						)}
-					</div>
-				)}
+				<div
+					// w +1px: overlaps the container's border-r so the sidebar's
+					// vertical border starts below the row, not inside it.
+					className={cn(
+						"drag h-12 w-[calc(100%+1px)] shrink-0",
+						WINDOW_CHROME_BAND_CLASS,
+					)}
+				>
+					{!isMac && (
+						<div
+							className="flex items-center justify-center"
+							style={{
+								width: COLLAPSED_WORKSPACE_SIDEBAR_WIDTH,
+								marginTop: WINDOW_CONTROLS_ROW_TOP,
+								height: WINDOW_CONTROLS_ROW_HEIGHT,
+							}}
+						>
+							<AppMenuButton />
+						</div>
+					)}
+				</div>
 				{/* Mirrors the expanded header's nav container so the buttons keep
 				    the same padding, order, and vertical rhythm when collapsed. */}
 				<div className="flex flex-col items-center gap-1 px-2 pt-3 pb-2">

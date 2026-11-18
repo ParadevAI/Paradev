@@ -84,4 +84,14 @@ describe("isBrowserNavigation", () => {
 			),
 		).toBe(false);
 	});
+
+	test("a request that carries an API key is an API client, not a browser", () => {
+		expect(
+			isBrowserNavigation(
+				new Request("https://x.test", {
+					headers: { ...navigation, "x-api-key": "sk_live_bad" },
+				}),
+			),
+		).toBe(false);
+	});
 });

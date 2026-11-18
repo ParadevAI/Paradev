@@ -1,3 +1,5 @@
+import { msg } from "@lingui/core/macro";
+import { getI18nInstance } from "@superset/i18n/server";
 import { BRAND } from "@superset/shared/brand";
 import { COMPANY } from "@superset/shared/constants";
 import type { Metadata } from "next";
@@ -8,7 +10,11 @@ import {
 	getMdxComponents,
 	mdxComponents,
 } from "@/app/[lang]/blog/components/mdx-components";
-import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
+import {
+	hasLocalizedContent,
+	localeUrl,
+	localizedAlternates,
+} from "@/app/[lang]/metadata";
 import { initServerI18n } from "@/app/i18n-server";
 import {
 	BreadcrumbJsonLd,
@@ -18,13 +24,17 @@ import {
 } from "@/components/JsonLd";
 import { extractCompareToc, getComparisonPages } from "@/lib/compare";
 import { getPricedComparisonPage } from "@/lib/compare-prices";
+import { getRelatedComparisonPages } from "@/lib/compare-related";
 import {
+	compareSearchDescription,
+	compareSearchTitle,
 	extractComparisonFaqItems,
 	extractRoundupItems,
 	getComparisonPageTypeLabel,
 	splitComparisonFaq,
 } from "@/lib/compare-utils";
 import { slugify } from "@/lib/content-utils";
+import { LEGACY_PAGE_REDIRECTS } from "@/lib/legacy-redirects";
 import { CompareLayout } from "./components/CompareLayout";
 
 const mdxOptions = { mdxOptions: { remarkPlugins: [remarkGfm] } };
@@ -58,6 +68,18 @@ export default async function ComparePageRoute({ params }: PageProps) {
 				}))
 			: [];
 
+	const related = getRelatedComparisonPages(page, getComparisonPages(), {
+		redirectedPaths: new Set(Object.keys(LEGACY_PAGE_REDIRECTS)),
+	}).map((relatedPage) => ({
+		slug: relatedPage.slug,
+		href:
+			lang !== "en" && hasLocalizedContent(relatedPage.url)
+				? `/${lang}${relatedPage.url}`
+				: relatedPage.url,
+		title: relatedPage.title,
+		type: relatedPage.type,
+	}));
+
 	return (
 		<main>
 			{roundupItems.length > 1 && (
@@ -88,6 +110,7 @@ export default async function ComparePageRoute({ params }: PageProps) {
 			<CompareLayout
 				page={page}
 				toc={extractCompareToc(page.content, contentLocale)}
+				related={related}
 				faq={
 					faq && (
 						<MDXRemote
@@ -135,10 +158,26 @@ export async function generateMetadata({
 	}
 
 	const url = localeUrl(lang, `/compare/${slug}`);
+	const productName = BRAND.NAME;
+	const formerName = BRAND.FORMER_NAME;
+	const translatedIntroName =
+		contentLocale === "en"
+			? undefined
+			: getI18nInstance(lang)._(
+					msg({ message: `${productName} (formerly ${formerName})` }),
+				);
 
 	return {
-		title: page.title,
-		description: page.description,
+		title: {
+			absolute: compareSearchTitle(
+				page.title,
+				translatedIntroName ? [translatedIntroName] : undefined,
+			),
+		},
+		description: compareSearchDescription(
+			page.description,
+			translatedIntroName,
+		),
 		...(page.keywords.length > 0 && { keywords: page.keywords }),
 		alternates: localizedAlternates(lang, `/compare/${slug}`),
 		openGraph: {

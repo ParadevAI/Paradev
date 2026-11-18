@@ -83,6 +83,52 @@ afterEach(() => {
 });
 
 describe("createPersistentHashHistory", () => {
+	it("drops v1 routes saved by builds before the route rename", () => {
+		storage.set(
+			"router-history",
+			JSON.stringify({
+				entries: ["/v2-workspace/abc", "/project/p1", "/workspace/v1-id"],
+				index: 2,
+			}),
+		);
+		const history = createPersistentHashHistory();
+		expect(history.location.pathname).toBe("/");
+		history.back();
+		expect(history.location.pathname).toBe("/");
+		history.back();
+		expect(history.location.pathname).toBe("/workspace/abc");
+	});
+
+	it("rewrites entries saved under the old v2-workspace routes", () => {
+		storage.set(
+			"router-history",
+			JSON.stringify({
+				entries: ["/", "/v2-workspace/abc", "/v2-workspaces"],
+				index: 2,
+			}),
+		);
+		const history = createPersistentHashHistory();
+		expect(history.location.pathname).toBe("/workspaces");
+		history.back();
+		expect(history.location.pathname).toBe("/workspace/abc");
+	});
+
+	it("keeps entries saved by this build", () => {
+		storage.set(
+			"router-history",
+			JSON.stringify({
+				entries: ["/", "/workspace/abc", "/workspaces"],
+				index: 1,
+				routes: 2,
+			}),
+		);
+		const history = createPersistentHashHistory();
+		expect(history.location.pathname).toBe("/workspace/abc");
+		history.push("/tasks");
+		const stored = JSON.parse(storage.get("router-history") ?? "{}");
+		expect(stored.routes).toBe(2);
+	});
+
 	describe("push", () => {
 		it("advances index and adds entries", () => {
 			const history = createPersistentHashHistory();
@@ -231,6 +277,7 @@ describe("createPersistentHashHistory", () => {
 				JSON.stringify({
 					entries: ["/", "/tasks", "/workspace/xyz"],
 					index: 1,
+					routes: 2,
 				}),
 			);
 
@@ -337,6 +384,7 @@ describe("createPersistentHashHistory", () => {
 				JSON.stringify({
 					entries: ["/", "/tasks", "/workspace/abc"],
 					index: 2,
+					routes: 2,
 				}),
 			);
 

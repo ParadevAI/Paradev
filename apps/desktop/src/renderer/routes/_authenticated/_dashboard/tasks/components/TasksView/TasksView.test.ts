@@ -95,7 +95,6 @@ describe("Tasks and pull requests navigation", () => {
 		// literal aria-label. Accept either so this keeps asserting the routes
 		// stay separate rather than how their labels are authored.
 		const labelled = (source: string, label: string) =>
-			source.includes(`aria-label="${label}"`) ||
 			source.includes(`message: "${label}"`);
 
 		const navigationSource = readComponent(
@@ -128,14 +127,5 @@ describe("Tasks and pull requests navigation", () => {
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");
 		}
-
-		const v1Source = readComponent(
-			"../../../../../../screens/main/components/WorkspaceSidebar/WorkspaceSidebarHeader/WorkspaceSidebarHeader.tsx",
-		);
-		expect(v1Source).toContain('to: "/tasks"');
-		expect(v1Source).toContain('to: "/pull-requests"');
-		expect(labelled(v1Source, "Tasks")).toBe(true);
-		expect(labelled(v1Source, "Pull requests")).toBe(true);
-		expect(v1Source).not.toContain("Tasks & PRs");
 	});
 });

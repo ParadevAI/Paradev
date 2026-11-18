@@ -57,6 +57,31 @@ describe("matchModelRate", () => {
 		});
 	});
 
+	test("prices GPT-6.2 Astra and Sol, with long-context rates above 272k", () => {
+		expect(matchModelRate("codex", "gpt-6.2-astra")).toMatchObject({
+			inputPerM: 8,
+			outputPerM: 40,
+			cacheReadPerM: 0.4,
+			approximate: false,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-astra", 272_001)).toMatchObject({
+			inputPerM: 16,
+			outputPerM: 60,
+			cacheReadPerM: 0.8,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-sol")).toMatchObject({
+			inputPerM: 2,
+			outputPerM: 10,
+			cacheReadPerM: 0.1,
+			approximate: false,
+		});
+		expect(matchModelRate("codex", "gpt-6.2-sol", 272_001)).toMatchObject({
+			inputPerM: 4,
+			outputPerM: 15,
+			cacheReadPerM: 0.2,
+		});
+	});
+
 	test("prices GPT-6.1 Terra at its own rate, not the cheapest fallback", () => {
 		expect(matchModelRate("codex", "gpt-6.1-terra")).toMatchObject({
 			inputPerM: 1,

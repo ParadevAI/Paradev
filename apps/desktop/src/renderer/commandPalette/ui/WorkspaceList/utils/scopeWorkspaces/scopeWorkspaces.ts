@@ -1,4 +1,4 @@
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { matchesCreator, type SwitcherQuery } from "../parseSwitcherQuery";
 
 type ScopeInputs = Pick<

@@ -85,7 +85,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 	// active state flips, not every row in the sidebar.
 	const isActive = useRouterState({
 		select: (state) => {
-			const path = `/v2-workspace/${workspaceId}`;
+			const path = `/workspace/${workspaceId}`;
 			// While a navigation loads, the page on screen is still the
 			// resolved one; match it, as useMatchRoute does.
 			const { pathname } = state.isLoading
@@ -99,7 +99,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 		if (isRenaming) return;
 		clearWorkspaceAttention();
 		navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId },
 		});
 	};

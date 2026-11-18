@@ -5,7 +5,7 @@ import {
 	type ChatPaneData,
 	type PaneViewerData,
 	PENDING_CLOUD_CHAT_PANE_KIND,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import {
 	attachCloudChatSession,
@@ -26,7 +26,7 @@ const launch: CloudAgentLaunchDescriptor = {
 function collections() {
 	const rows = new Map<string, Row>();
 	const result = {
-		v2WorkspaceLocalState: {
+		workspaceLocalState: {
 			state: rows,
 			get: (id: string) => rows.get(id),
 			insert: (row: Row) => rows.set(row.workspaceId, structuredClone(row)),
@@ -38,7 +38,7 @@ function collections() {
 				rows.set(id, next);
 			},
 		},
-		v2SidebarSections: { state: new Map() },
+		sidebarSections: { state: new Map() },
 	} as unknown as AppCollections;
 	return { collections: result, rows };
 }

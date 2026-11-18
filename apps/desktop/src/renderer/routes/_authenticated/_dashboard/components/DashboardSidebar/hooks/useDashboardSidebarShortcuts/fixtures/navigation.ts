@@ -128,7 +128,7 @@ function press(id: string) {
 function expectTarget(workspaceId: string) {
 	expect(navigate).toHaveBeenLastCalledWith(
 		expect.objectContaining({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId },
 		}),
 	);
@@ -166,7 +166,7 @@ test("navigates when every workspace is pinned and reveals collapsed pins", () =
 	expect(toggleProjectCollapsed).not.toHaveBeenCalled();
 });
 
-test("reveals a collapsed Workspaces section, not just Pinned, for a pinned target", () => {
+test("leaves a collapsed Projects section collapsed for a pinned target", () => {
 	currentWorkspaceId = "project-workspace";
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
@@ -184,7 +184,7 @@ test("reveals a collapsed Workspaces section, not just Pinned, for a pinned targ
 	press("NEXT_WORKSPACE");
 	expectTarget("pinned-project");
 	expect(useSidebarSectionsCollapseStore.getState().collapsed.workspaces).toBe(
-		false,
+		true,
 	);
 });
 
