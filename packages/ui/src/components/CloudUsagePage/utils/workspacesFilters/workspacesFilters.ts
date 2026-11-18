@@ -2,6 +2,7 @@ import { MACHINE_SIZES } from "@superset/shared/billing";
 import type {
 	WorkspaceRef,
 	WorkspacesFilters,
+	WorkspacesRows,
 	WorkspacesSort,
 } from "../../types";
 
@@ -20,6 +21,9 @@ const SORTS = [
 	"name",
 	"status",
 ] as const satisfies readonly WorkspacesSort[];
+export const ROWS_PER_PAGE = [
+	25, 50,
+] as const satisfies readonly WorkspacesRows[];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const oneOf = <T extends string>(values: readonly T[], value: unknown) =>
@@ -37,5 +41,6 @@ export function workspacesFilters(
 		status: oneOf(FILTER_STATUSES, read("status")),
 		q: typeof q === "string" && q.trim() ? q.trim().slice(0, 200) : undefined,
 		sort: oneOf(SORTS, read("sort")),
+		rows: ROWS_PER_PAGE.find((rows) => String(rows) === String(read("rows"))),
 	};
 }

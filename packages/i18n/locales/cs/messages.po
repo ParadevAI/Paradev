@@ -17167,6 +17167,9 @@ msgstr "Akce řádku"
 msgid "Rows changed"
 msgstr "Změněny řádky"
 
+msgid "Rows per page"
+msgstr "Řádků na stránku"
+
 msgid "Rule"
 msgstr "Pravidlo"
 

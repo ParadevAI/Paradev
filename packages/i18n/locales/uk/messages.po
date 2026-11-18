@@ -17161,6 +17161,9 @@ msgstr "Дії з рядком"
 msgid "Rows changed"
 msgstr "Змінені рядки"
 
+msgid "Rows per page"
+msgstr "Рядків на сторінці"
+
 msgid "Rule"
 msgstr "Правило"
 

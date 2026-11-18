@@ -83,7 +83,7 @@ export function FilterChips({
 				</span>
 			))}
 			<Link
-				to={to({ sort: filters.sort })}
+				to={to({ sort: filters.sort, rows: filters.rows })}
 				className="px-1 text-muted-foreground hover:text-foreground"
 			>
 				<Trans>Clear all</Trans>

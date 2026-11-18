@@ -17167,6 +17167,9 @@ msgstr "Satır eylemleri"
 msgid "Rows changed"
 msgstr "Satırlar değişti"
 
+msgid "Rows per page"
+msgstr "Sayfa başına satır"
+
 msgid "Rule"
 msgstr "Kural"
 

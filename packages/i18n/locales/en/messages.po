@@ -17167,6 +17167,9 @@ msgstr "Row actions"
 msgid "Rows changed"
 msgstr "Rows changed"
 
+msgid "Rows per page"
+msgstr "Rows per page"
+
 msgid "Rule"
 msgstr "Rule"
 

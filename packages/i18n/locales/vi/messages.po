@@ -17167,6 +17167,9 @@ msgstr "Hành động hàng"
 msgid "Rows changed"
 msgstr "Hàng thay đổi"
 
+msgid "Rows per page"
+msgstr "Số hàng mỗi trang"
+
 msgid "Rule"
 msgstr "Quy tắc"
 

@@ -21,7 +21,7 @@ export function cloudUsageQueries({
 	workspaceId?: string;
 	filters?: WorkspacesFilters;
 }) {
-	const { user, size, status, q, sort } = filters;
+	const { user, size, status, q, sort, rows } = filters;
 	return {
 		byDay: {
 			input: { range, groupBy: "day", limit: CHART_LIMIT } as const,
@@ -39,7 +39,7 @@ export function cloudUsageQueries({
 			input: {
 				range,
 				groupBy: "workspace",
-				limit: PAGE_SIZE,
+				limit: rows ?? PAGE_SIZE,
 				user: isAdmin ? user : undefined,
 				size,
 				status: status && [status],

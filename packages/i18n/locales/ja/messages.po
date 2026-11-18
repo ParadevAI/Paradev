@@ -17167,6 +17167,9 @@ msgstr "行の操作"
 msgid "Rows changed"
 msgstr "行の変更"
 
+msgid "Rows per page"
+msgstr "1 ページの行数"
+
 msgid "Rule"
 msgstr "ルール"
 

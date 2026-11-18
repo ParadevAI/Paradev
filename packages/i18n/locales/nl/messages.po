@@ -17167,6 +17167,9 @@ msgstr "Rij-acties"
 msgid "Rows changed"
 msgstr "Rijen gewijzigd"
 
+msgid "Rows per page"
+msgstr "Rijen per pagina"
+
 msgid "Rule"
 msgstr "Regel"
 

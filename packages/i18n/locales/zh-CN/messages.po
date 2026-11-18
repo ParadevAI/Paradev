@@ -17167,6 +17167,9 @@ msgstr "行操作"
 msgid "Rows changed"
 msgstr "行有变更"
 
+msgid "Rows per page"
+msgstr "每页行数"
+
 msgid "Rule"
 msgstr "规则"
 

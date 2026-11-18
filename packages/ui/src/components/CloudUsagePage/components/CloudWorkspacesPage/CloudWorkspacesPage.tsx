@@ -123,6 +123,10 @@ export function CloudWorkspacesPage({
 						hasNextPage={workspaces.hasNextPage}
 						isFetchingNextPage={workspaces.isFetchingNextPage}
 						onPage={onPage}
+						rows={filters.rows ?? 25}
+						onRows={(rows) =>
+							navigate(to({ ...filters, rows: rows === 25 ? undefined : rows }))
+						}
 					/>
 				</>
 			)}

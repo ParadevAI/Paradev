@@ -17167,6 +17167,9 @@ msgstr "Действия со строкой"
 msgid "Rows changed"
 msgstr "Строки изменены"
 
+msgid "Rows per page"
+msgstr "Строк на странице"
+
 msgid "Rule"
 msgstr "Правило"
 

@@ -11,6 +11,7 @@ test("keeps valid values and drops what the router would refuse", () => {
 				status: "asleep",
 				q: "  fix ",
 				sort: "name",
+				rows: "50",
 			}),
 		),
 	).toEqual({
@@ -19,6 +20,7 @@ test("keeps valid values and drops what the router would refuse", () => {
 		status: "asleep",
 		q: "fix",
 		sort: "name",
+		rows: 50,
 	});
 	expect(
 		workspacesFilters(
@@ -28,6 +30,7 @@ test("keeps valid values and drops what the router would refuse", () => {
 				status: "ready",
 				q: " ",
 				sort: "boots",
+				rows: "15",
 			}),
 		),
 	).toEqual({
@@ -36,5 +39,6 @@ test("keeps valid values and drops what the router would refuse", () => {
 		status: undefined,
 		q: undefined,
 		sort: undefined,
+		rows: undefined,
 	});
 });

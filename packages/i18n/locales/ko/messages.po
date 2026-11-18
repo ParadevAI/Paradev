@@ -17167,6 +17167,9 @@ msgstr "행 작업"
 msgid "Rows changed"
 msgstr "행 변경됨"
 
+msgid "Rows per page"
+msgstr "페이지당 행 수"
+
 msgid "Rule"
 msgstr "규칙"
 

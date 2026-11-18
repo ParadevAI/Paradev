@@ -17167,6 +17167,9 @@ msgstr "Zeilenaktionen"
 msgid "Rows changed"
 msgstr "Zeilen geändert"
 
+msgid "Rows per page"
+msgstr "Zeilen pro Seite"
+
 msgid "Rule"
 msgstr "Regel"
 

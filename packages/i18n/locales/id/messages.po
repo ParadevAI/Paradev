@@ -17167,6 +17167,9 @@ msgstr "Aksi baris"
 msgid "Rows changed"
 msgstr "Baris berubah"
 
+msgid "Rows per page"
+msgstr "Baris per halaman"
+
 msgid "Rule"
 msgstr "Aturan"
 

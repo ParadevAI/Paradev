@@ -17167,6 +17167,9 @@ msgstr "Azioni della riga"
 msgid "Rows changed"
 msgstr "Righe modificate"
 
+msgid "Rows per page"
+msgstr "Righe per pagina"
+
 msgid "Rule"
 msgstr "Regola"
 

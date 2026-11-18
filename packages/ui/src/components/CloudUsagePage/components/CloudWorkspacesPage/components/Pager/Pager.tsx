@@ -4,6 +4,15 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { LuChevronLeft, LuChevronRight, LuChevronsLeft } from "react-icons/lu";
 import { Button } from "../../../../../ui/button";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../../../../../ui/select";
+import type { WorkspacesRows } from "../../../../types";
+import { ROWS_PER_PAGE } from "../../../../utils/workspacesFilters";
 
 interface PagerProps {
 	/** Rows on each loaded page, in order. */
@@ -13,6 +22,8 @@ interface PagerProps {
 	hasNextPage: boolean;
 	isFetchingNextPage: boolean;
 	onPage: (index: number) => void;
+	rows: WorkspacesRows;
+	onRows: (rows: WorkspacesRows) => void;
 }
 
 /** Pages are cursor pages, so the pager steps one page at a time and cannot jump to the last. */
@@ -23,6 +34,8 @@ export function Pager({
 	hasNextPage,
 	isFetchingNextPage,
 	onPage,
+	rows,
+	onRows,
 }: PagerProps) {
 	"use no memo";
 	const { t } = useLingui();
@@ -30,9 +43,8 @@ export function Pager({
 	const before = pageSizes.slice(0, index).reduce((sum, size) => sum + size, 0);
 	const first = formatNumber(rowCount === 0 ? 0 : before + 1);
 	const last = formatNumber(before + (pageSizes[index] ?? 0));
-	const pageSize = pageSizes[0] || 1;
 	const page = formatNumber(index + 1);
-	const pages = formatNumber(Math.max(1, Math.ceil(rowCount / pageSize)));
+	const pages = formatNumber(Math.max(1, Math.ceil(rowCount / rows)));
 	const canGoOn = index + 1 < pageSizes.length || hasNextPage;
 
 	return (
@@ -44,7 +56,33 @@ export function Pager({
 					other={`${first}–${last} of # rows`}
 				/>
 			</span>
-			<div className="flex items-center gap-3">
+			<div className="flex flex-wrap items-center gap-3">
+				<span className="flex items-center gap-2">
+					<Trans>Rows per page</Trans>
+					<Select
+						value={String(rows)}
+						onValueChange={(value) =>
+							onRows(
+								ROWS_PER_PAGE.find((option) => String(option) === value) ??
+									rows,
+							)
+						}
+					>
+						<SelectTrigger
+							size="sm"
+							aria-label={t({ message: "Rows per page" })}
+						>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{ROWS_PER_PAGE.map((option) => (
+								<SelectItem key={option} value={String(option)}>
+									{formatNumber(option)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</span>
 				<span className="tabular-nums">
 					<Trans>
 						Page {page} of {pages}

@@ -17167,6 +17167,9 @@ msgstr "Akcje wiersza"
 msgid "Rows changed"
 msgstr "Zmieniono wiersze"
 
+msgid "Rows per page"
+msgstr "Wierszy na stronę"
+
 msgid "Rule"
 msgstr "Reguła"
 

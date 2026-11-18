@@ -12,9 +12,10 @@ export function cloudUsageHref(to: CloudUsageTarget): string {
 				: `${BASE}/workspaces/${to.workspaceId}`;
 	const { page: _, ...params } = to;
 	const search = new URLSearchParams(
-		Object.entries(params).filter(
-			(entry): entry is [string, string] =>
-				typeof entry[1] === "string" && entry[0] !== "workspaceId",
+		Object.entries(params).flatMap(([key, value]) =>
+			key !== "workspaceId" && value !== undefined
+				? [[key, String(value)]]
+				: [],
 		),
 	).toString();
 	return search ? `${path}?${search}` : path;

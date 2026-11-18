@@ -1,1 +1,5 @@
-export { FILTER_STATUSES, workspacesFilters } from "./workspacesFilters";
+export {
+	FILTER_STATUSES,
+	ROWS_PER_PAGE,
+	workspacesFilters,
+} from "./workspacesFilters";
