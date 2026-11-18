@@ -254,7 +254,6 @@
 					"client": "dynamic",
 					"authorization_url": "https://mcp.notion.com/mcp",
 					"scopes": [],
-					"token_request_auth_method": "client_secret_basic",
 					"authorization_params": {
 						"owner": "user"
 					},
@@ -1192,6 +1191,7 @@
 					"client": "dynamic",
 					"authorization_url": "https://api.ahrefs.com/mcp/mcp",
 					"scopes": ["apiv3-mcp"],
+					"token_request_auth_method": "client_secret_post",
 					"identity": {
 						"account": {
 							"id": "$.token_type"

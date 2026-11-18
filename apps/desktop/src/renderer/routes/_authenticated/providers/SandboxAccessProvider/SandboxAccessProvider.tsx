@@ -36,7 +36,7 @@ import {
  */
 const OPEN_WORKSPACE_KEEPALIVE_MS = 10 * 60 * 1000;
 
-export interface SandboxTarget {
+interface SandboxTarget {
 	/** The cloud workspace's id, which is also its host address key. */
 	workspaceId: string;
 	organizationId: string;
@@ -45,7 +45,7 @@ export interface SandboxTarget {
 	desktopUrl: string;
 }
 
-export interface SandboxAccessValue {
+interface SandboxAccessValue {
 	targets: SandboxTarget[];
 	/** False until the cloud list is known and every ready workspace in it has been addressed once. */
 	isReady: boolean;
@@ -111,7 +111,7 @@ function combineAccess(results: UseQueryResult<SandboxAccess>[]) {
 export function SandboxAccessProvider({ children }: { children: ReactNode }) {
 	const { workspaces: cloudWorkspaces, organizationId } = useCloudWorkspaces();
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;

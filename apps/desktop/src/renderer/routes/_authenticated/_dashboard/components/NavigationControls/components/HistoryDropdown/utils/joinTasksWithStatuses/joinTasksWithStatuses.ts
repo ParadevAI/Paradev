@@ -5,15 +5,13 @@ export const TASK_LOOKUP_LIMIT = 200;
 type TaskListRow = RouterOutputs["task"]["listPage"]["items"][number];
 export type RecentTaskFields = Pick<
 	TaskListRow["task"],
-	"id" | "slug" | "externalProvider" | "externalKey" | "title" | "statusId"
+	"id" | "slug" | "title" | "statusId"
 >;
 type TaskStatusRow = RouterOutputs["task"]["statuses"]["list"][number];
 
 export interface RecentTaskEntry {
 	id: string;
 	slug: string;
-	externalProvider: string | null;
-	externalKey: string | null;
 	title: string;
 	statusColor: string;
 	statusType: string;
@@ -32,8 +30,6 @@ export function joinTasksWithStatuses(
 			{
 				id: task.id,
 				slug: task.slug,
-				externalProvider: task.externalProvider,
-				externalKey: task.externalKey,
 				title: task.title,
 				statusColor: status.color,
 				statusType: status.type,

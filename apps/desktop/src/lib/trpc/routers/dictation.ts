@@ -10,7 +10,7 @@ import {
 } from "main/lib/native-transcriber";
 import { z } from "zod";
 import { publicProcedure, router } from "..";
-import { getProcessEnvWithShellPath } from "./workspaces/utils/shell-env";
+import { getProcessEnvWithShellPath } from "./utils/shell-env";
 
 export type DesktopTranscriptionResult = NativeTranscription & {
 	engine?: "chatgpt" | "mac";

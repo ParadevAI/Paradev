@@ -3,7 +3,7 @@ import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useUnarchiveCloudWorkspace } from "renderer/routes/_authenticated/_dashboard/hooks/useUnarchiveCloudWorkspace";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useRestoreCloudWorkspaceIntent } from "renderer/stores/restore-cloud-workspace-intent";
 
 /**
@@ -27,7 +27,7 @@ export function RestoreCloudWorkspaceMount() {
 				toast.success(t({ message: `Restored "${workspaceName}"` }), {
 					action: {
 						label: t({ message: "Open" }),
-						onClick: () => navigateToV2Workspace(workspaceId, navigate),
+						onClick: () => navigateToWorkspace(workspaceId, navigate),
 					},
 				}),
 		});

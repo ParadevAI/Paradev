@@ -22,14 +22,20 @@ const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
  * files (e.g. `.env`) are deliberately excluded — files stay watched so an
  * open gitignored file still live-reloads.
  *
+ * `under` limits the listing to those root-relative dirs, matched literally.
+ *
  * Returns [] for non-git roots, timeouts, and every other failure — callers
  * degrade to the static ignore list, never block on this.
  */
-export async function listGitIgnoredDirs(rootPath: string): Promise<string[]> {
+export async function listGitIgnoredDirs(
+	rootPath: string,
+	under?: readonly string[],
+): Promise<string[]> {
 	try {
 		const { stdout } = await execFileAsync(
 			"git",
 			[
+				"--literal-pathspecs",
 				"-C",
 				rootPath,
 				"ls-files",
@@ -38,6 +44,7 @@ export async function listGitIgnoredDirs(rootPath: string): Promise<string[]> {
 				"--exclude-standard",
 				"--directory",
 				"-z",
+				...(under ? ["--", ...under] : []),
 			],
 			{ timeout: TIMEOUT_MS, maxBuffer: MAX_BUFFER_BYTES },
 		);

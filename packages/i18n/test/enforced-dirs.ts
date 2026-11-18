@@ -6,6 +6,7 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"packages/panes/src/react/components/Workspace/components/TabBar/components/TabItem",
 	"packages/i18n/src",
 	"apps/web/src/app/account-pending-deletion",
+	"apps/web/src/app/auth/switch-account",
 	// automations is temporarily un-enforced: the trigger-fidelity work
 	// rewrote most of its copy, and converting the new strings is deferred to
 	// a dedicated i18n pass. Re-add once that lands.
@@ -13,10 +14,9 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/new-workspace",
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/pages",
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/plugins",
-	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/project",
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/pull-requests",
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/tasks",
-	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspaces",
+	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/workspaces",
 	"apps/desktop/src/renderer/routes/_authenticated/components/DashboardNewWorkspaceModal",
 	"apps/desktop/src/renderer/routes/_authenticated/components/CreateEnvironmentFlow",
 	"apps/desktop/src/renderer/routes/_authenticated/components/EnvironmentView",
@@ -48,14 +48,12 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/settings/projects",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/ringtones",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/security",
-	"apps/desktop/src/renderer/routes/_authenticated/settings/team",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/teams",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/terminal",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/usage",
 	"apps/desktop/src/renderer/routes/_authenticated/settings/utils",
-	"apps/desktop/src/renderer/routes/_authenticated/settings/v2-project",
 	// batch 3: v2-workspace, shared renderer components, palette, auth routes
-	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/v2-workspace",
+	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/workspace",
 	"apps/desktop/src/renderer/commandPalette",
 	"apps/desktop/src/renderer/components",
 	"apps/desktop/src/renderer/react-query",

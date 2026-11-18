@@ -59,6 +59,8 @@ describe("SUPERSET_CHAT_MODELS", () => {
 		expect(ids).toContain("anthropic/claude-opus-5");
 		expect(ids).toContain("anthropic/claude-fable-5-2");
 		expect(ids).toContain("anthropic/claude-fable-5-1");
+		expect(ids).toContain("openai/gpt-6.2-astra");
+		expect(ids).toContain("openai/gpt-6.2-sol");
 		expect(ids).toContain("openai/gpt-6.1-sol");
 		expect(ids).toContain("openai/gpt-6-astra");
 		expect(ids).toContain("openai/gpt-6-sol");
@@ -221,6 +223,8 @@ describe("buildAgentModelArgs", () => {
 
 	it("offers every GPT-6 Codex model", () => {
 		for (const model of [
+			"gpt-6.2-sol",
+			"gpt-6.2-astra",
 			"gpt-6.1-sol",
 			"gpt-6-astra",
 			"gpt-6.1-terra",
@@ -409,6 +413,32 @@ describe("buildAgentEffortArgs", () => {
 		expect(
 			buildAgentEffortArgs("cursor-agent", "low", "claude-opus-5-high"),
 		).toEqual([]);
+	});
+
+	it("offers ultra on GPT-6.2 Astra and Sol", () => {
+		for (const model of ["gpt-6.2-astra", "gpt-6.2-sol"]) {
+			expect(buildAgentEffortArgs("codex", "ultra", model)).toEqual([
+				"-c",
+				"model_reasoning_effort=ultra",
+			]);
+		}
+	});
+
+	it("offers fable 5.2 and gpt-6.2 in opencode, and fable 5.2 in copilot", () => {
+		for (const model of [
+			"anthropic/claude-fable-5-2",
+			"openai/gpt-6.2-astra",
+			"openai/gpt-6.2-sol",
+		]) {
+			expect(buildAgentModelArgs("opencode", model)).toEqual([
+				"--model",
+				model,
+			]);
+		}
+		expect(buildAgentModelArgs("copilot", "claude-fable-5.2")).toEqual([
+			"--model",
+			"claude-fable-5.2",
+		]);
 	});
 
 	it("builds every GPT-6.1 Sol reasoning effort", () => {

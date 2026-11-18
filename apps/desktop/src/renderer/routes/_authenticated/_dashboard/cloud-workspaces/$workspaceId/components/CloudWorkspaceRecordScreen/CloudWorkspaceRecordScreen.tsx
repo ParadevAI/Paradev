@@ -233,7 +233,7 @@ export function CloudWorkspaceRecordScreen({
 				onOpenWorkspace={() => {
 					if (organizationId) setInSidebar(organizationId, workspaceId, true);
 					void navigate({
-						to: "/v2-workspace/$workspaceId",
+						to: "/workspace/$workspaceId",
 						params: { workspaceId },
 					});
 				}}
