@@ -155,3 +155,21 @@ describe("settings search - plugins visibility", () => {
 		).toBeGreaterThan(0);
 	});
 });
+
+describe("settings search - cloud usage visibility", () => {
+	it("excludes cloud usage matches unless the flag is on", () => {
+		const offered = { cloudWorkspaces: false, plugins: false };
+		expect(
+			getVisibleMatchCountBySection("gb-hours", {
+				...offered,
+				cloudUsage: false,
+			}).cloudUsage,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection("gb-hours", {
+				...offered,
+				cloudUsage: true,
+			}).cloudUsage,
+		).toBe(1);
+	});
+});

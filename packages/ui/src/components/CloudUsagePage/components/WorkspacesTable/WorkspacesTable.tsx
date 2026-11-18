@@ -95,7 +95,7 @@ export function WorkspacesTable({
 											)}
 										</TableCell>
 										{isAdmin && (
-											<TableCell className="hidden lg:table-cell">
+											<TableCell className="hidden whitespace-normal lg:table-cell">
 												{workspace?.owner?.name}
 											</TableCell>
 										)}

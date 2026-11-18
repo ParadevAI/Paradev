@@ -21,7 +21,7 @@ import type {
 } from "./types";
 import { hasUsage } from "./utils/hasUsage";
 
-export interface CloudUsagePageProps {
+interface CloudUsagePageProps {
 	isAdmin: boolean;
 	/** Beside the period picker, such as a link to billing. */
 	actions?: ReactNode;
