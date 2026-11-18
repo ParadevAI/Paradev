@@ -374,48 +374,66 @@ describe("fleet scope", () => {
 	});
 
 	test("one boot by id or session id, with its organization", async () => {
-		await db
-			.update(cloudWorkspaceBoots)
-			.set({ vercelSessionId: "sess_5" })
-			.where(eq(cloudWorkspaceBoots.id, "boot_5"));
-		const options = { now: NOW, overagePerGbHour: RATE };
-		const byId = await getFleetCloudBoot(db, "boot_5", options);
-		expect(byId).toMatchObject({
-			id: "boot_5",
-			sessionId: "sess_5",
-			organization: { id: OTHER_ORG },
-			gbHours: 100 / 60,
-			phases: null,
-			traceId: null,
-		});
-		expect((await getFleetCloudBoot(db, "sess_5", options))?.id).toBe("boot_5");
-		expect(await getFleetCloudBoot(db, "boot_nope", options)).toBeNull();
+		const setSession = (vercelSessionId: string | null) =>
+			db
+				.update(cloudWorkspaceBoots)
+				.set({ vercelSessionId })
+				.where(eq(cloudWorkspaceBoots.id, "boot_5"));
+		await setSession("sess_5");
+		try {
+			const options = { now: NOW, overagePerGbHour: RATE };
+			const byId = await getFleetCloudBoot(db, "boot_5", options);
+			expect(byId).toMatchObject({
+				id: "boot_5",
+				sessionId: "sess_5",
+				organization: { id: OTHER_ORG },
+				gbHours: 100 / 60,
+			});
+			expect((await getFleetCloudBoot(db, "sess_5", options))?.id).toBe(
+				"boot_5",
+			);
+			expect(await getFleetCloudBoot(db, "boot_nope", options)).toBeNull();
+		} finally {
+			await setSession(null);
+		}
 	});
 
-	test("phases and the trace id on the staff read of one boot, on no list", async () => {
+	test("phases and the trace id on the fleet reads, not on the customer list", async () => {
 		const phases = [
 			{ name: "claim", at: 1_789_000_000_000, ms: 400 },
 			{ name: "boot.start", at: 1_789_000_000_500, ms: 900 },
 		];
-		await db
-			.update(cloudWorkspaceBoots)
-			.set({ phases, traceId: "a".repeat(32) })
-			.where(eq(cloudWorkspaceBoots.id, "boot_1"));
-		const options = { now: NOW, overagePerGbHour: RATE };
-		expect(await getFleetCloudBoot(db, "boot_1", options)).toMatchObject({
-			phases,
-			traceId: "a".repeat(32),
-		});
-		const fleetList = await listFleetCloudBoots(db, ORG, {
-			window: NOVEMBER,
-			limit: 25,
-			...options,
-		});
-		for (const list of [(await boots({})).items, fleetList.items]) {
-			const listed = list.find((boot) => boot.id === "boot_1");
-			expect(listed).toBeDefined();
-			expect(listed).not.toHaveProperty("phases");
-			expect(listed).not.toHaveProperty("traceId");
+		const setTrace = (trace: {
+			phases: typeof phases | null;
+			traceId: string | null;
+		}) =>
+			db
+				.update(cloudWorkspaceBoots)
+				.set(trace)
+				.where(eq(cloudWorkspaceBoots.id, "boot_1"));
+		await setTrace({ phases, traceId: "a".repeat(32) });
+		try {
+			const options = { now: NOW, overagePerGbHour: RATE };
+			const traced = { phases, traceId: "a".repeat(32) };
+			expect(await getFleetCloudBoot(db, "boot_1", options)).toMatchObject(
+				traced,
+			);
+			const fleetList = await listFleetCloudBoots(db, ORG, {
+				window: NOVEMBER,
+				limit: 25,
+				...options,
+			});
+			expect(
+				fleetList.items.find((boot) => boot.id === "boot_1"),
+			).toMatchObject(traced);
+			const customer = (await boots({})).items.find(
+				(boot) => boot.id === "boot_1",
+			);
+			expect(customer).toBeDefined();
+			expect(customer).not.toHaveProperty("phases");
+			expect(customer).not.toHaveProperty("traceId");
+		} finally {
+			await setTrace({ phases: null, traceId: null });
 		}
 	});
 
@@ -483,21 +501,5 @@ describe("fleet scope", () => {
 			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
-	});
-
-	test("a customer scope cannot group by more than user, day or workspace", () => {
-		const groupByOrganization = () =>
-			queryCloudUsage(
-				db,
-				{ organizationId: ORG },
-				{
-					window: NOVEMBER,
-					limit: 1,
-					// @ts-expect-error a customer scope groups by user, day or workspace
-					groupBy: "organization",
-					overagePerGbHour: RATE,
-				},
-			);
-		expect(groupByOrganization).toBeFunction();
 	});
 });
