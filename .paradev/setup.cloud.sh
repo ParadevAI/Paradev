@@ -12,6 +12,8 @@ ROOT_DIR="$(cd "$PARADEV_SCRIPT_DIR/.." && pwd)"
 source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh"
+# shellcheck source=/dev/null
+source "$PARADEV_SCRIPT_DIR/lib/setup/admin.sh"
 cd "$ROOT_DIR" || exit 1
 
 # The environment's variables, as a file, because step_write_env copies one.
@@ -79,13 +81,20 @@ cloud_setup_main() {
   # is archived or abandoned releases its branch without running any hook.
   export NEON_BRANCH_LEASE_DAYS=7
 
-  if already_set_up && renew_cloud_branch_lease; then
-    echo "This workspace already has its database and .env"
-    return 0
-  fi
-
   FAILED_STEPS=()
   SKIPPED_STEPS=()
+
+  # The ParadevAI/admin checkout, when the environment has that repository too.
+  local admin_dir=""
+  admin_dir="$(admin_checkout_dir)" || admin_dir=""
+
+  if already_set_up && renew_cloud_branch_lease; then
+    echo "This workspace already has its database and .env"
+    [ -n "$admin_dir" ] || return 0
+    step_setup_admin_checkout "$admin_dir" || step_failed "Set up admin checkout"
+    print_summary "Cloud setup (admin checkout)"
+    return
+  fi
 
   # The environment's variables land in .env beside the checkout either way —
   # step_write_env copies this file there. What this keeps out of the checkout
@@ -112,6 +121,9 @@ cloud_setup_main() {
     step_failed "Seed personal auth token"
   ( set -a; . "$ROOT_DIR/.env"; set +a; bun run db:seed-cloud-mobile-token ) ||
     step_failed "Seed mobile dev token"
+  if [ -n "$admin_dir" ]; then
+    step_setup_admin_checkout "$admin_dir" || step_failed "Set up admin checkout"
+  fi
 
   print_summary "Cloud setup"
 }

@@ -35,4 +35,14 @@ else
 fi
 tmux new-window -t paradev -n realtime -c "$ROOT_DIR" \
   "bash '$ROOT_DIR/apps/realtime/scripts/dev-local.sh' 2>&1 | tee '$LOG_DIR/realtime-dev.log'"
+# shellcheck source=/dev/null
+. "$ROOT_DIR/.paradev/lib/setup/admin.sh"
+if ADMIN_DIR="$(admin_checkout_dir)"; then
+  if [ -f "$ADMIN_DIR/.env.workspace" ] && [ -d "$ADMIN_DIR/node_modules" ]; then
+    tmux new-window -t paradev -n admin -c "$ADMIN_DIR" \
+      "export NODE_ENV=development; bun run dev 2>&1 | tee '$LOG_DIR/admin-dev.log'"
+  else
+    echo "dev-stack: admin checkout at $ADMIN_DIR is not set up; not starting the admin app"
+  fi
+fi
 echo "dev-stack: started (tmux attach -t paradev)"
