@@ -36,6 +36,8 @@ const pageInputSchema = z.object({
 	cursor: z.string().optional(),
 });
 
+export type PageInput = z.infer<typeof pageInputSchema>;
+
 export const cloudUsageInputSchema = pageInputSchema.extend({
 	groupBy: z.enum(cloudUsageGroupByValues).optional(),
 });

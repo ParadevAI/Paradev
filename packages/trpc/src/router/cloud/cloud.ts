@@ -14,7 +14,7 @@ import { organizations } from "@superset/db/schema";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import { userError } from "../../i18n-error";
 import { posthog } from "../../lib/analytics";
 import { decodeCursor, encodeCursor } from "../../lib/cursor";
@@ -30,6 +30,7 @@ import {
 	cloudPeriodsOutputSchema,
 	cloudUsageInputSchema,
 	cloudUsageOutputSchema,
+	type PageInput,
 	type RangePreset,
 	usageKeysetSchema,
 } from "./schema";
@@ -68,10 +69,22 @@ function cursorNotValid() {
 	});
 }
 
-function readCursor<T>(value: string, schema: z.ZodType<T>): T {
-	const keyset = decodeCursor(value, schema);
-	if (!keyset) throw cursorNotValid();
-	return keyset;
+function filtersOf({ limit, cursor, ...filters }: PageInput): string {
+	return JSON.stringify(filters);
+}
+
+function readCursor<T>(input: PageInput, keyset: z.ZodType<T>): T | undefined {
+	if (input.cursor === undefined) return undefined;
+	const cursor = decodeCursor(
+		input.cursor,
+		z.object({ filters: z.literal(filtersOf(input)), keyset }),
+	);
+	if (!cursor) throw cursorNotValid();
+	return cursor.keyset;
+}
+
+function writeCursor(input: PageInput, keyset: object): string {
+	return encodeCursor({ filters: filtersOf(input), keyset });
 }
 
 function windowFor(range: CloudRange, anchor: CloudBillingAnchor | null) {
@@ -142,10 +155,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
-					const keyset =
-						input.cursor === undefined
-							? undefined
-							: readCursor(input.cursor, usageKeysetSchema);
+					const keyset = readCursor(input, usageKeysetSchema);
 					if (keyset && keyset.sort !== sort) throw cursorNotValid();
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await queryCloudUsage(
@@ -168,7 +178,8 @@ export function cloudRouterWith(deps: CloudDeps) {
 						...result,
 						nextCursor:
 							nextCursor &&
-							encodeCursor(
+							writeCursor(
+								input,
 								sort === "key"
 									? { sort, key: nextCursor.key }
 									: { sort, value: nextCursor.gbMinutes, key: nextCursor.key },
@@ -182,10 +193,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudBootsInputSchema)
 				.output(cloudBootsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const keyset =
-						input.cursor === undefined
-							? undefined
-							: readCursor(input.cursor, bootKeysetSchema);
+					const keyset = readCursor(input, bootKeysetSchema);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await listCloudBoots(
 						deps.db,
@@ -209,7 +217,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						...result,
 						nextCursor:
 							nextCursor &&
-							encodeCursor({
+							writeCursor(input, {
 								sort: "startedAt",
 								value: nextCursor.startedAt.toISOString(),
 								key: nextCursor.id,

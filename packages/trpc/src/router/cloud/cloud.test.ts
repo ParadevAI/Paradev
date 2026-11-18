@@ -172,6 +172,49 @@ test("a cursor that does not decode is BAD_REQUEST", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
+test("a cursor read with other filters, or made before cursors held them, is BAD_REQUEST", async () => {
+	const owner = caller(MAYA);
+	const usageCursor = (
+		await owner.usage.query({ range: NOVEMBER, groupBy: "workspace", limit: 1 })
+	).nextCursor;
+	const bootsCursor = (await owner.boots.list({ range: NOVEMBER, limit: 1 }))
+		.nextCursor;
+	if (!usageCursor || !bootsCursor) throw new Error("No second page to read");
+	const notValid = {
+		code: "BAD_REQUEST",
+		message:
+			"That cursor could not be read. Drop it to start from the first page.",
+	};
+	for (const input of [
+		{ range: NOVEMBER, groupBy: "user" },
+		{ range: "30d", groupBy: "workspace" },
+		{ range: NOVEMBER, groupBy: "workspace", workspace: CHECKOUT },
+	] as const) {
+		await expect(
+			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
+		).rejects.toMatchObject(notValid);
+	}
+	for (const input of [
+		{ range: "30d" },
+		{ range: NOVEMBER, workspace: CHECKOUT },
+		{ range: NOVEMBER, open: true },
+	] as const) {
+		await expect(
+			owner.boots.list({ ...input, limit: 1, cursor: bootsCursor }),
+		).rejects.toMatchObject(notValid);
+	}
+	const unbound = Buffer.from(
+		JSON.stringify({ sort: "gbMinutes", value: "1080", key: CHECKOUT }),
+	).toString("base64url");
+	await expect(
+		owner.usage.query({
+			range: NOVEMBER,
+			groupBy: "workspace",
+			cursor: unbound,
+		}),
+	).rejects.toMatchObject(notValid);
+});
+
 test("paging one row at a time with the opaque cursor returns every row once", async () => {
 	const owner = caller(MAYA);
 	async function pages<Item>(
