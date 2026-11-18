@@ -45,6 +45,9 @@ export const TerminalWebView = forwardRef<
 			bounces={false}
 			scrollEnabled={false}
 			setSupportMultipleWindows={false}
+			// Android would scale page text after xterm measured its cells and
+			// clip the glyphs; the font scale reaches xterm's fontSize instead.
+			textZoom={100}
 			keyboardDisplayRequiresUserAction={false}
 			hideKeyboardAccessoryView
 			webviewDebuggingEnabled={__DEV__}

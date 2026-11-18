@@ -11,6 +11,7 @@ const retained = [
 	"/cli/auth",
 	"/auth/desktop",
 	"/auth/integration-connect",
+	"/auth/switch-account",
 	"/integrations/sentry",
 	"/integrations/notion",
 	"/integrations/microsoft-teams",
@@ -145,6 +146,7 @@ type Move = { location?: string; cookie?: string };
 async function evaluate(
 	request: Request,
 	target: URL,
+	flagKey: string,
 	lookup: FlagLookup,
 	schedule: typeof setTimeout = setTimeout,
 ): Promise<Move> {
@@ -167,7 +169,7 @@ async function evaluate(
 	try {
 		const flag = await Promise.race([
 			Promise.resolve().then(() =>
-				lookup(FEATURE_FLAGS.WEB_DOMAIN_MOVE, id, {
+				lookup(flagKey, id, {
 					sendFeatureFlagEvents: false,
 				}),
 			),
@@ -208,7 +210,15 @@ export async function withDomainMove({
 	if (enabled !== "true") return fallback();
 	const target = domainMoveTarget(request, surface);
 	if (!target) return fallback();
-	const move = await evaluate(request, target, lookup, schedule);
+	const move = await evaluate(
+		request,
+		target,
+		surface === "web"
+			? FEATURE_FLAGS.WEB_PAGES_DOMAIN_MOVE
+			: FEATURE_FLAGS.WEB_DOMAIN_MOVE,
+		lookup,
+		schedule,
+	);
 	const response = move.location
 		? new Response(null, { status: 307, headers: { location: move.location } })
 		: await fallback();

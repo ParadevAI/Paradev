@@ -16,9 +16,8 @@ import * as Haptics from "expo-haptics";
 import { useMemo } from "react";
 import { Alert } from "react-native";
 import { authClient, useSession } from "@/lib/auth/client";
-import { openUrl } from "@/lib/open-url";
 import { apiClient } from "@/lib/trpc/client";
-import { billingSettingsUrl, webHost } from "@/lib/web-links";
+import { recordUpgradeIntent, useUpgrade } from "@/lib/upgrade";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { useOrgMembers } from "@/screens/(authenticated)/hooks/useOrgMembers";
 
@@ -29,6 +28,7 @@ export function useShareDirectory() {
 	const organizationId = session?.session?.activeOrganizationId ?? null;
 	const members = useOrgMembers();
 	const { activeOrganization } = useOrganizations();
+	const { isResolved, canUpgrade, upgradeHost, upgrade } = useUpgrade();
 	const teams = useQuery({
 		queryKey: ["cloud", "organization", "listTeams", organizationId],
 		enabled: organizationId !== null,
@@ -69,20 +69,26 @@ export function useShareDirectory() {
 
 	const organizationName = activeOrganization?.name ?? "";
 
-	const onUpgrade = () =>
+	const onUpgrade = () => {
+		if (isResolved && !canUpgrade) recordUpgradeIntent("invite-members");
 		Alert.alert(
-			t({ message: "Invite people on a paid plan" }),
-			t({
-				message: `Adding people to ${organizationName} needs a paid plan. Your organization's plan is managed by its owner at ${webHost()}.`,
-			}),
+			t({ message: "Not included in your plan" }),
+			[
+				t({
+					message: `Adding people to ${organizationName} needs a paid plan.`,
+				}),
+				upgradeHost ? t({ message: `Upgrade to Pro at ${upgradeHost}` }) : null,
+			]
+				.filter(Boolean)
+				.join("\n\n"),
 			[
 				{ style: "cancel", text: t({ message: "Dismiss" }) },
-				{
-					onPress: () => openUrl(billingSettingsUrl(organizationId)),
-					text: t({ message: `Manage on ${webHost()}` }),
-				},
+				...(canUpgrade
+					? [{ onPress: upgrade, text: t({ message: "Upgrade" }) }]
+					: []),
 			],
 		);
+	};
 
 	/** Invites any new emails, then grants everyone access through `add`. Resolves false after showing the error. */
 	const share = async (

@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import { Button } from "@superset/ui/button";
 import {
@@ -12,6 +13,7 @@ import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import {
 	Building2,
+	Copy,
 	Globe,
 	Link2,
 	Lock,
@@ -20,7 +22,7 @@ import {
 	PinOff,
 	Trash2,
 } from "lucide-react";
-import { type MouseEvent, useId, useState } from "react";
+import { type MouseEvent, useId, useRef, useState } from "react";
 import { useNow } from "renderer/hooks/useNow";
 import { PageThumbnail } from "renderer/routes/_authenticated/_dashboard/components/PageThumbnail";
 import { CommentCount } from "./components/CommentCount";
@@ -52,6 +54,7 @@ interface PageCardProps {
 	onOpen: (page: PageCardItem, event: MouseEvent) => void;
 	onTogglePin: (pageId: string) => void;
 	onDelete: (pageId: string) => Promise<void>;
+	onDuplicate: (pageId: string, title: string) => Promise<void>;
 }
 
 export function PageCard({
@@ -61,6 +64,7 @@ export function PageCard({
 	onOpen,
 	onTogglePin,
 	onDelete,
+	onDuplicate,
 }: PageCardProps) {
 	const now = useNow(60_000);
 	const { formatRelativeTime } = useFormat();
@@ -84,6 +88,25 @@ export function PageCard({
 	const preview = page.commentPreview;
 	const trigger = useCommentPreview({ eligible: preview !== null });
 	const panelDomId = useId();
+
+	const duplicating = useRef(false);
+	const duplicate = async () => {
+		if (duplicating.current) return;
+		duplicating.current = true;
+		const title = page.title;
+		try {
+			await onDuplicate(
+				page.id,
+				t({ message: `${title} (copy)` }).slice(0, 200),
+			);
+		} catch (error) {
+			toast.error(
+				errorMessage(error, t({ message: "Could not duplicate this page" })),
+			);
+		} finally {
+			duplicating.current = false;
+		}
+	};
 
 	const copyLink = async () => {
 		try {
@@ -179,7 +202,7 @@ export function PageCard({
 							message: `Actions for ${page.title}`,
 						})}
 						className={cn(
-							"absolute top-2 right-2 size-7 bg-background/80 backdrop-blur transition-opacity",
+							"absolute top-2 right-2 size-7 bg-background/90 transition-opacity",
 							"opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100",
 						)}
 					>
@@ -198,6 +221,10 @@ export function PageCard({
 					<DropdownMenuItem onSelect={() => void copyLink()}>
 						<Link2 className="size-4" />
 						<Trans>Copy link</Trans>
+					</DropdownMenuItem>
+					<DropdownMenuItem onSelect={() => void duplicate()}>
+						<Copy className="size-4" />
+						<Trans>Duplicate</Trans>
 					</DropdownMenuItem>
 					{isOwner ? (
 						<DropdownMenuItem

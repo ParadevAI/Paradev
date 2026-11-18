@@ -18,6 +18,7 @@ export function WorkspaceRowMenu({
 	onDelete,
 	onCopyId,
 	onShare,
+	move,
 	children,
 }: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
@@ -62,6 +63,37 @@ export function WorkspaceRowMenu({
 					<Link.MenuAction icon="pencil" onPress={onRename}>
 						{t({ message: "Rename" })}
 					</Link.MenuAction>
+				) : null}
+				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
+					<Link.Menu
+						title={t({ message: "Move to" })}
+						icon="arrow.left.arrow.right"
+					>
+						{move.canMoveToCloud ? (
+							<Link.MenuAction icon="cloud" onPress={move.moveToCloud}>
+								{t({ message: "Cloud" })}
+							</Link.MenuAction>
+						) : null}
+						{move.computers.length > 0 ? (
+							<Link.Menu inline>
+								{move.computers.map((computer) => (
+									<Link.MenuAction
+										key={computer.hostId}
+										icon="server.rack"
+										disabled={!computer.online}
+										subtitle={
+											computer.online
+												? t({ message: "Online" })
+												: t({ message: "Offline" })
+										}
+										onPress={() => move.moveToComputer(computer)}
+									>
+										{computer.name}
+									</Link.MenuAction>
+								))}
+							</Link.Menu>
+						) : null}
+					</Link.Menu>
 				) : null}
 				{canDelete && isCloud ? (
 					<Link.MenuAction icon="archivebox" onPress={onDelete}>

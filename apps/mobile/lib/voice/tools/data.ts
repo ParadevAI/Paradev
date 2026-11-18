@@ -1,5 +1,9 @@
 import { agentStatusFromEvent } from "@superset/shared/agent-status";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
+import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
 import type { QueryClient } from "@tanstack/react-query";
 import { TRPCClientError } from "@trpc/client";
 import { getCloudEnvironmentsQueryKey } from "@/hooks/useCloudEnvironments";
@@ -202,7 +206,7 @@ export function createVoiceData({
 
 	const hostUrlFor = async (workspace: VoiceWorkspace): Promise<string> => {
 		if (workspace.kind === "cloud") {
-			if (workspace.status !== "ready") {
+			if (!isLiveCloudWorkspaceStatus(workspace.status)) {
 				throw new VoiceDataError(
 					"unreachable",
 					`${workspace.name} is ${workspace.status}; its sandbox is not up.`,
@@ -263,7 +267,7 @@ export function createVoiceData({
 				),
 			]);
 			const fromCloud: VoiceWorkspace[] = cloud
-				.filter((row) => row.status !== "deleted")
+				.filter((row) => !isArchivedCloudWorkspaceStatus(row.status))
 				.map((row) => ({
 					id: row.id,
 					name: row.name,
@@ -323,7 +327,7 @@ export function createVoiceData({
 								hostName: host.name,
 								branch: row.branch,
 								project: row.projectName,
-								status: "ready",
+								status: "awake",
 								attention: attention?.status ?? null,
 								attentionAt: attention?.at ?? null,
 								lastActivityAt: toMs(row.lastActivityAt) ?? toMs(row.updatedAt),
@@ -566,7 +570,7 @@ export function createVoiceData({
 					branch: result.workspace.branch,
 					project:
 						machine.projects.find((row) => row.id === projectId)?.name ?? null,
-					status: "ready",
+					status: "awake",
 					attention: null,
 					attentionAt: null,
 					lastActivityAt: Date.now(),

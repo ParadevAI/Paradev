@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { keepMoveAlive } from "@superset/shared/move-book";
 import { useCallback } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
@@ -21,7 +22,6 @@ import {
 	mergeHandoffs,
 	skippedTerminalNames,
 } from "../../utils/handOffTerminals";
-import { keepMoveAlive } from "../../utils/keepMoveAlive";
 import { releaseSourceChats } from "../../utils/releaseSourceChats";
 import { releaseSourceTerminals } from "../../utils/releaseSourceTerminals";
 import { runMoveOnComputer } from "../../utils/runMoveOnComputer";
@@ -74,7 +74,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 							relayUrl,
 						})
 					: null;
-				if (!url) throw new Error(t`That computer can't be reached`);
+				if (!url) throw new Error(t`That device can't be reached`);
 				return url;
 			};
 			const destinationUrl = hostUrlOf(destination.hostId);
@@ -91,7 +91,7 @@ export function useMoveWorkspaceToComputer(workspace: MovableWorkspace) {
 				throw new Error(
 					computer
 						? t`Add ${repositoryName} as a project on ${computer} first`
-						: t`Add ${repositoryName} as a project on this computer first`,
+						: t`Add ${repositoryName} as a project on this device first`,
 				);
 			};
 			const sourceProject = projects.find(

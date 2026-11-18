@@ -100,7 +100,7 @@ export default ({ config }: ConfigContext) => ({
 			// went with `GlassComposer`. Without it `SFSpeechRecognizer`'s
 			// authorization request terminates the app.
 			NSSpeechRecognitionUsageDescription:
-				"Superset uses speech recognition to turn your voice into text.",
+				"Paradev uses speech recognition to turn your voice into text.",
 		},
 	},
 	android: {
@@ -169,11 +169,11 @@ export default ({ config }: ConfigContext) => ({
 			"expo-image-picker",
 			{
 				photosPermission:
-					"Superset needs access to your photo library so you can attach images to chat messages.",
+					"Paradev needs access to your photo library so you can attach images to chat messages.",
 				cameraPermission:
-					"Superset uses the camera so you can attach photos to chat messages.",
+					"Paradev uses the camera so you can attach photos to chat messages.",
 				microphonePermission:
-					"Superset uses the microphone so you can dictate chat messages.",
+					"Paradev uses the microphone so you can dictate chat messages.",
 			},
 		],
 		"expo-document-picker",
@@ -183,9 +183,9 @@ export default ({ config }: ConfigContext) => ({
 			"@config-plugins/react-native-webrtc",
 			{
 				cameraPermission:
-					"Superset uses the camera so you can attach photos to chat messages.",
+					"Paradev uses the camera so you can attach photos to chat messages.",
 				microphonePermission:
-					"Superset uses the microphone for voice mode and to dictate chat messages.",
+					"Paradev uses the microphone for voice mode and to dictate chat messages.",
 			},
 		],
 		["expo-notifications", { enableBackgroundRemoteNotifications: false }],

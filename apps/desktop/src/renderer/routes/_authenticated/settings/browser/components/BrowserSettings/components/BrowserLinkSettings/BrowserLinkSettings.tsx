@@ -9,7 +9,7 @@ import {
 } from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import {
 	actionLabel,
 	type LinkAction,
@@ -35,8 +35,7 @@ export function BrowserLinkSettings({
 }: BrowserLinkSettingsProps) {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
-	const { preferences, setUrlLinks, setPortOpenAction } =
-		useV2UserPreferences();
+	const { preferences, setUrlLinks, setPortOpenAction } = useUserPreferences();
 	const showUrl = isItemVisible(SETTING_ITEM_ID.LINKS_URL, visibleItems);
 	const showPort = isItemVisible(SETTING_ITEM_ID.LINKS_PORT, visibleItems);
 

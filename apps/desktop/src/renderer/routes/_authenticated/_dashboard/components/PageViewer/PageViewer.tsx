@@ -33,7 +33,7 @@ import { usePageUpdates } from "./hooks/usePageUpdates";
 
 const scrollPositions = new Map<string, number>();
 
-export interface ResolvedPage {
+interface ResolvedPage {
 	id: string;
 	slug: string;
 	title: string | null;

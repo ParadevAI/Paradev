@@ -61,6 +61,7 @@ describe("domain move policy", () => {
 			"/cli/auth",
 			"/auth/desktop",
 			"/auth/integration-connect",
+			"/auth/switch-account",
 			"/integrations/sentry",
 			"/integrations/notion",
 			"/integrations/microsoft-teams",
@@ -307,13 +308,14 @@ describe("domain move evaluation", () => {
 
 	test("first-time browser gets a stable shared cohort even when excluded by percentage", async () => {
 		const ids: string[] = [];
+		const keys: string[] = [];
 		const lookup = mock(
 			async (
 				key: string,
 				id: string,
 				options: { sendFeatureFlagEvents: false },
 			) => {
-				expect(key).toBe("web-domain-move");
+				keys.push(key);
 				expect(options).toEqual({ sendFeatureFlagEvents: false });
 				ids.push(id);
 				return false;
@@ -336,6 +338,7 @@ describe("domain move evaluation", () => {
 			lookup,
 			fallback: legacy,
 		});
+		expect(keys).toEqual(["web-pages-domain-move", "web-domain-move"]);
 		expect(ids[0]).toBe(ids[1]);
 		expect(ids[0]).toMatch(/^[0-9a-f-]{36}$/);
 		expect(second.headers.get("set-cookie")).toBeNull();

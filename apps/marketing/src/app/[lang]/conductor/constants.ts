@@ -2,15 +2,9 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { COMPANY } from "@superset/shared/constants";
 
-export const CONDUCTOR_ANNOUNCEMENT_URL =
-	"https://www.conductor.build/announcement";
 export const MIGRATE_LOCAL_URL = `${COMPANY.DOCS_URL}/migrate-from-conductor`;
 export const MIGRATE_CLOUD_URL = `${COMPANY.DOCS_URL}/migrate-from-conductor-cloud`;
 export const COMPARE_PATH = "/compare/superset-vs-conductor";
-
-export const ANNOUNCED_DATE = new Date(Date.UTC(2026, 10, 4));
-export const READ_ONLY_DATE = new Date(Date.UTC(2026, 10, 13));
-export const SHUTDOWN_DATE = new Date(Date.UTC(2026, 10, 20));
 
 interface TextLink {
 	label: MessageDescriptor;
@@ -46,47 +40,6 @@ export const HIGHLIGHTS: Highlight[] = [
 		detail: msg({
 			message: "Check on agents and review their work from iPhone or iPad.",
 		}),
-	},
-];
-
-interface TimelineEntry {
-	date: Date | null;
-	dateTime: string;
-	dateLabel?: MessageDescriptor;
-	title: MessageDescriptor;
-	detail: MessageDescriptor;
-	urgent?: boolean;
-}
-
-export const TIMELINE: TimelineEntry[] = [
-	{
-		date: ANNOUNCED_DATE,
-		dateTime: "2026-11-04",
-		title: msg({ message: "Conductor joins Meta" }),
-		detail: msg({ message: "The team announced the news." }),
-	},
-	{
-		date: READ_ONLY_DATE,
-		dateTime: "2026-11-13",
-		title: msg({ message: "Cloud goes read-only" }),
-		detail: msg({ message: "You can read and export, but not run agents." }),
-		urgent: true,
-	},
-	{
-		date: SHUTDOWN_DATE,
-		dateTime: "2026-11-20",
-		title: msg({ message: "Cloud shuts down" }),
-		detail: msg({
-			message: "Cloud data gets deleted. Push your branches first.",
-		}),
-		urgent: true,
-	},
-	{
-		date: null,
-		dateTime: "2027",
-		dateLabel: msg({ message: "Early 2027" }),
-		title: msg({ message: "Mac app winds down" }),
-		detail: msg({ message: "Local work can move at your own pace." }),
 	},
 ];
 
@@ -151,14 +104,6 @@ interface ComparisonRow {
 
 export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
-		id: "status",
-		label: msg({ message: "Status" }),
-		paradev: msg({ message: "Available" }),
-		conductor: msg({
-			message: "Cloud ends {shutdownDate}. Mac app ends early 2027",
-		}),
-	},
-	{
 		id: "worktrees",
 		label: msg({ message: "Worktree per task" }),
 		paradev: msg({ message: "Yes" }),
@@ -176,8 +121,8 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 	{
 		id: "cloud",
 		label: msg({ message: "Cloud workspaces" }),
-		paradev: msg({ message: "Team and Ultra plans" }),
-		conductor: msg({ message: "Shuts down {shutdownDate}" }),
+		paradev: msg({ message: "Paid plans" }),
+		conductor: msg({ message: "Cloud workspaces" }),
 	},
 	{
 		id: "chat",
@@ -189,13 +134,15 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 		id: "automations",
 		label: msg({ message: "Automations" }),
 		paradev: msg({ message: "Local, on a host, or in the cloud" }),
-		conductor: msg({ message: "Routines, ending with Cloud" }),
+		conductor: msg({ message: "Routines" }),
 	},
 	{
 		id: "phone",
 		label: msg({ message: "Phone" }),
 		paradev: msg({ message: "iPhone and iPad" }),
-		conductor: msg({ message: "iOS app, ending {shutdownDate}" }),
+		conductor: msg({
+			message: "iOS app; cloud and experimental local Mac remote control",
+		}),
 	},
 	{
 		id: "platforms",
@@ -210,7 +157,9 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
 			message: "Free for one user. Pro from {proPrice}/user/mo",
 		}),
 		unpricedParadev: msg({ message: "Free for one user. Paid plans per user" }),
-		conductor: msg({ message: "No longer on sale" }),
+		conductor: msg({
+			message: "See Conductor for current plans and account access",
+		}),
 	},
 ];
 
@@ -227,7 +176,9 @@ export const DOES_NOT_TRANSFER: MessageDescriptor[] = [
 		message:
 			"Conductor chat history. Export it in Conductor under Settings → Account",
 	}),
-	msg({ message: "Unpushed Cloud work. Push before {shutdownDate}" }),
+	msg({
+		message: "Unpushed cloud changes. Save and push the work you want to move.",
+	}),
 	msg({ message: "Git-ignored files in Cloud, like .env. Copy them out" }),
 ];
 
@@ -257,12 +208,8 @@ export const FAQ_ITEMS: FaqItem[] = [
 		question: msg({ message: "Do you proxy my model calls?" }),
 		answer: msg({
 			message:
-				"Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests.",
+				"No. {companyName} never proxies model calls. Agents use your own subscriptions and keys.",
 		}),
-		link: {
-			label: msg({ message: "Cloud credentials" }),
-			href: `${COMPANY.DOCS_URL}/cloud-workspaces#credentials`,
-		},
 	},
 	{
 		id: "windows",
@@ -277,11 +224,11 @@ export const FAQ_ITEMS: FaqItem[] = [
 		question: msg({ message: "How much does it cost?" }),
 		answer: msg({
 			message:
-				"Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces.",
+				"Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras.",
 		}),
 		unpricedAnswer: msg({
 			message:
-				"Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces.",
+				"Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras.",
 		}),
 		link: { label: msg({ message: "See pricing" }), href: "/pricing" },
 	},
@@ -296,7 +243,7 @@ export const FAQ_ITEMS: FaqItem[] = [
 		question: msg({ message: "What happens to my Conductor Cloud data?" }),
 		answer: msg({
 			message:
-				"Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then.",
+				"If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}.",
 		}),
 		link: {
 			label: msg({ message: "Conductor Cloud guide" }),

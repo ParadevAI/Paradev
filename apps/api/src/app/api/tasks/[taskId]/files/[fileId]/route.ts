@@ -1,12 +1,17 @@
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import { signedDocumentFileUrl } from "@superset/trpc/lib/document-files";
+import { unauthenticatedResponse } from "@/lib/signInRedirect";
 
 export async function GET(
 	request: Request,
 	{ params }: { params: Promise<{ taskId: string; fileId: string }> },
 ): Promise<Response> {
-	const session = await auth.api.getSession({ headers: request.headers });
-	if (!session?.user) return new Response("Unauthorized", { status: 401 });
+	const session = await getRequestSession(request.headers);
+	if (!session?.user)
+		return unauthenticatedResponse(
+			request,
+			new Response("Unauthorized", { status: 401 }),
+		);
 	const { taskId, fileId } = await params;
 	const url = await signedDocumentFileUrl({
 		userId: session.user.id,

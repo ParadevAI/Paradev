@@ -31,11 +31,13 @@ const { default: proxy } = await import("./proxy");
  * Empties the Authorization header for the unauthenticated cases. */
 async function callProxy(
 	path: string,
-	{ auth }: { auth?: string } = {},
+	{ auth, cookie }: { auth?: string; cookie?: string } = {},
 ): Promise<Response> {
 	if (auth) sessionHeaders.set("authorization", auth);
 	else sessionHeaders.delete("authorization");
-	return proxy(new NextRequest(path));
+	return proxy(
+		new NextRequest(path, { headers: cookie ? { cookie } : undefined }),
+	);
 }
 
 describe("proxy: unauthenticated API requests return JSON 401, never a sign-in redirect", () => {
@@ -67,6 +69,22 @@ describe("proxy: unauthenticated API requests return JSON 401, never a sign-in r
 		// Not an API route: the historical page-redirect behaviour is preserved.
 		expect(res.status).toBe(307);
 		expect(res.headers.get("location")).toContain("/sign-in");
+	});
+
+	it("tells a browser whose session cookie no longer resolves that its session expired", async () => {
+		const signedOut = await callProxy("https://app.superset.sh/dashboard");
+		const stale = await callProxy("https://app.superset.sh/dashboard", {
+			cookie: "__Secure-better-auth.session_token=revoked.signature",
+		});
+
+		expect(
+			new URL(signedOut.headers.get("location") ?? "").searchParams.has(
+				"reason",
+			),
+		).toBe(false);
+		expect(
+			new URL(stale.headers.get("location") ?? "").searchParams.get("reason"),
+		).toBe("session_expired");
 	});
 
 	it("does not treat /apiary or /trpcfoo as API routes (slash-delimited child only)", async () => {

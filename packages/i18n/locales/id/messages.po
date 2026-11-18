@@ -78,12 +78,6 @@ msgstr "\"{name}\" dilanjutkan"
 msgid "\"{name}\" was moved or deleted. Attach it again."
 msgstr "\"{name}\" telah dipindahkan atau dihapus. Lampirkan lagi."
 
-msgid "\"{title}\" has finished its task"
-msgstr "\"{title}\" telah menyelesaikan tugasnya"
-
-msgid "\"{title}\" is waiting for your reply"
-msgstr "\"{title}\" sedang menunggu balasan Anda"
-
 msgid "({aliveCount} running)"
 msgstr "({aliveCount} berjalan)"
 
@@ -157,10 +151,6 @@ msgstr "{0, plural, one {# Commit} other {# Commit}}"
 #. placeholder {0}: summary.updated
 msgid "{0, plural, one {# existing theme updated} other {# existing themes updated}}"
 msgstr "{0, plural, one {# tema yang ada diperbarui} other {# tema yang ada diperbarui}}"
-
-#. placeholder {0}: importableWorktrees.length
-msgid "{0, plural, one {# existing worktree found} other {# existing worktrees found}}"
-msgstr "{0, plural, one {# worktree yang ada ditemukan} other {# worktree yang ada ditemukan}}"
 
 #. placeholder {0}: summary.failed
 msgid "{0, plural, one {# failed} other {# failed}}"
@@ -350,10 +340,6 @@ msgstr "{0, plural, one {Diff dipotong — # baris lagi ada di host} other {Diff
 msgid "{0, plural, one {Failed to close # port} other {Failed to close # ports}}"
 msgstr "{0, plural, one {Gagal menutup # port} other {Gagal menutup # port}}"
 
-#. placeholder {0}: result.imported
-msgid "{0, plural, one {Imported # workspace} other {Imported # workspaces}}"
-msgstr "{0, plural, one {Mengimpor # workspace} other {Mengimpor # workspace}}"
-
 #. placeholder {0}: pendingGroupDelete?.ids.length ?? 0
 msgid "{0, plural, one {Its # automation moves to No group. The automation itself is kept.} other {Its # automations move to No group. The automations themselves are kept.}}"
 msgstr "{0, plural, one {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.} other {# otomatisasinya pindah ke Tanpa grup. Otomatisasinya tetap ada.}}"
@@ -395,10 +381,6 @@ msgstr "{0, plural, one {Jalankan # Workspace} other {Jalankan # Workspace}}"
 #. placeholder {0}: lines.length - MAX_VISIBLE_LINES
 msgid "{0, plural, one {Show # more line} other {Show # more lines}}"
 msgstr "{0, plural, one {Tampilkan # baris lagi} other {Tampilkan # baris lagi}}"
-
-#. placeholder {0}: importableWorktrees.length
-msgid "{0, plural, one {This will import # existing worktree into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Paradev as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
-msgstr "{0, plural, one {Ini akan mengimpor # worktree yang ada ke Paradev sebagai workspace. Tiap worktree di disk akan dilacak dan muncul di sidebar Anda. Tidak ada file yang diubah.} other {Ini akan mengimpor # worktree yang ada ke Paradev sebagai workspace. Tiap worktree di disk akan dilacak dan muncul di sidebar Anda. Tidak ada file yang diubah.}}"
 
 #. placeholder {0}: move.chats.total - move.chats.ready
 msgid "{0, plural, one {This workspace moved. Its # chat stayed here.} other {This workspace moved. Its # chats stayed here.}}"
@@ -520,10 +502,6 @@ msgstr "{0} tidak berjalan."
 msgid "{0} is offline"
 msgstr "{0} sedang offline"
 
-#. placeholder {0}: selectedHost?.name ?? t({ message: "This device", })
-msgid "{0} is offline."
-msgstr "{0} sedang offline."
-
 #. placeholder {0}: activeOrganization.name
 msgid "{0} is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "{0} memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
@@ -596,18 +574,9 @@ msgstr "{0} Berjalan"
 msgid "{0} selected"
 msgstr "{0} dipilih"
 
-#. placeholder {0}: result.killedCount
-msgid "{0} sessions terminated"
-msgstr "{0} sesi dihentikan"
-
 #. placeholder {0}: move.name
 msgid "{0} stays where it was. If an agent was working, it may have been stopped."
 msgstr "{0} tetap di tempat semula. Jika ada agen yang sedang bekerja, agen itu mungkin telah dihentikan."
-
-#. placeholder {0}: result.killedCount
-#. placeholder {1}: result.remainingCount
-msgid "{0} terminated, {1} remaining"
-msgstr "{0} dihentikan, {1} tersisa"
 
 #. placeholder {0}: formatTokens(aboveGap > 0n ? aboveGap : 0n)
 #. placeholder {1}: formatNumber(above.rank)
@@ -829,6 +798,9 @@ msgstr "{appName} Mobile termasuk dalam Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile menjalankan agen di komputer yang Anda hubungkan."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Arsipkan # Workspace Cloud} other {Arsipkan # Workspace Cloud}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} other {Tertinggal # commit dari main, perlu rebase}}"
 
@@ -859,9 +831,6 @@ msgstr "{completed} dari {0} check selesai"
 
 msgid "{completed} of {total} completed"
 msgstr "{completed} dari {total} selesai"
-
-msgid "{computerName} (offline)"
-msgstr "{computerName} (offline)"
 
 msgid "{configTitle} font size"
 msgstr "Ukuran font {configTitle}"
@@ -920,9 +889,6 @@ msgstr "{count, plural, one {menambahkan satu commit} other {menambahkan # commi
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Membuat # workspace} other {Membuat # workspace}}"
 
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Hapus # Workspace} other {Hapus # Workspace}}"
-
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {mengedit # file} other {mengedit # file}}"
 
@@ -955,9 +921,6 @@ msgstr "{count, plural, other {Merge # pull request?}}"
 
 msgid "{count, plural, one {Moved # automation to {group}} other {Moved # automations to {group}}}"
 msgstr "{count, plural, one {# otomatisasi dipindahkan ke {group}} other {# otomatisasi dipindahkan ke {group}}}"
-
-msgid "{count, plural, one {Project opened} other {# projects opened}}"
-msgstr "{count, plural, one {Proyek dibuka} other {# proyek dibuka}}"
 
 msgid "{count, plural, one {ran # command} other {ran # commands}}"
 msgstr "{count, plural, one {menjalankan # perintah} other {menjalankan # perintah}}"
@@ -1028,6 +991,9 @@ msgstr "{daysLeft, plural, other {Sisa # hari}}"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Akun Anda dinonaktifkan dan akan dihapus permanen dalam # hari. Aktifkan kembali untuk memulihkannya persis seperti yang Anda tinggalkan.} other {Akun Anda dinonaktifkan dan akan dihapus permanen dalam # hari. Aktifkan kembali untuk memulihkannya persis seperti yang Anda tinggalkan.}}"
 
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Hapus # Workspace} other {Hapus # Workspace}}"
+
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
@@ -1097,6 +1063,9 @@ msgstr "{hiddenCount, plural, one {Tampilkan # file lagi} other {Tampilkan # fil
 
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {Tampilkan # frame lagi} other {Tampilkan # frame lagi}}"
+
+msgid "{hiddenLabel} more. Type to narrow the list."
+msgstr "{hiddenLabel} lainnya. Ketik untuk mempersempit daftar."
 
 msgid "{hostName} is offline"
 msgstr "{hostName} sedang offline"
@@ -1294,9 +1263,6 @@ msgstr "{plugin} belum memiliki klien OAuth yang dikonfigurasi di deployment ini
 msgid "{plugin} is no longer installed."
 msgstr "{plugin} sudah tidak terpasang."
 
-msgid "{presetLabel} reset to defaults"
-msgstr "{presetLabel} direset ke setelan bawaan"
-
 #. placeholder {0}: Number(previewLineHeight.toFixed(2))
 msgid "{previewSize}px · {0} line height"
 msgstr "{previewSize}px · tinggi baris {0}"
@@ -1401,12 +1367,6 @@ msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimul
 msgid "{subagentCount, plural, one {# subagent running} other {# subagents running}}"
 msgstr "{subagentCount, plural, other {# subagen berjalan}}"
 
-msgid "{successCount, plural, one {Created # workspace, {failCount} failed} other {Created # workspaces, {failCount} failed}}"
-msgstr "{successCount, plural, one {Membuat # workspace, {failCount} gagal} other {Membuat # workspace, {failCount} gagal}}"
-
-msgid "{successCount, plural, one {Created # workspace} other {Created # workspaces}}"
-msgstr "{successCount, plural, one {Membuat # workspace} other {Membuat # workspace}}"
-
 msgid "{tallyText} open"
 msgstr "{tallyText} terbuka"
 
@@ -1418,6 +1378,9 @@ msgstr "{teardownFailureCount, plural, one {Tetap hapus} other {Tetap hapus #}}"
 
 msgid "{threshold, plural, one {# agent PR merged} other {# agent PRs merged}}"
 msgstr "{threshold, plural, other {# PR agen digabungkan}}"
+
+msgid "{title} (copy)"
+msgstr "{title} (salinan)"
 
 msgid "{toolName} interrupted"
 msgstr "{toolName} dihentikan"
@@ -1589,13 +1552,6 @@ msgstr "+{hiddenCount}"
 
 msgid "+{hiddenCount} earlier"
 msgstr "+{hiddenCount} sebelumnya"
-
-msgid "+{remainingCount} more"
-msgstr "+{remainingCount} lagi"
-
-#. placeholder {0}: paths[0]?.split("/").pop()
-msgid "<0>{0}</0> is not a git repository. Would you like to initialize one?"
-msgstr "<0>{0}</0> bukan repositori git. Ingin menginisialisasi satu?"
 
 #. placeholder {0}: remoteHost.name
 msgid "<0>{0}</0> isn't connected to the Paradev relay, so its runs will be skipped. Check its <1>host settings</1>, and make sure relay access is on in Settings > Remote Access on that device."
@@ -1775,9 +1731,6 @@ msgstr "87,4 rb dari 200 rb token dipakai di sesi ini."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Browser dalam aplikasi yang lebih baik: lihat pratinjau perubahan Anda dan klik elemen mana pun untuk mengirimkannya ke agen sebagai konteks."
 
-msgid "A better Paradev is ready"
-msgstr "Paradev yang lebih baik sudah siap"
-
 msgid "A CDP endpoint per pane"
 msgstr "Satu endpoint CDP per panel"
 
@@ -1808,9 +1761,6 @@ msgstr "Instruksi automasi cloud maksimal {max} karakter"
 #. js-lingui-explicit-id
 msgid "serverError.common.cloudWorkspaceCannotCallThis"
 msgstr "Workspace cloud tidak bisa memanggil {path}. Lakukan dari klien tempat kamu masuk."
-
-msgid "A computer"
-msgstr "Komputer"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Penghapusan untuk {workspaceName} sedang berlangsung."
@@ -2016,9 +1966,6 @@ msgstr "Pencapaian"
 msgid "Acme Inc."
 msgstr "Acme Inc."
 
-msgid "Action"
-msgstr "Aksi"
-
 msgid "Actions"
 msgstr "Aksi"
 
@@ -2081,8 +2028,8 @@ msgstr "Tambahkan {localizedName}?"
 msgid "Add {repositoryName} as a project on {computer} first"
 msgstr "Tambahkan {repositoryName} sebagai proyek di {computer} terlebih dahulu"
 
-msgid "Add {repositoryName} as a project on this computer first"
-msgstr "Tambahkan {repositoryName} sebagai proyek di komputer ini terlebih dahulu"
+msgid "Add {repositoryName} as a project on this device first"
+msgstr "Tambahkan {repositoryName} sebagai proyek di perangkat ini terlebih dahulu"
 
 msgid "Add #{prNumber} to the merge queue?"
 msgstr "Tambahkan #{prNumber} ke antrean merge?"
@@ -2151,9 +2098,6 @@ msgid "Add back"
 msgstr "Tambahkan lagi"
 
 msgid "Add command"
-msgstr "Tambah perintah"
-
-msgid "Add commands"
 msgstr "Tambah perintah"
 
 msgid "Add comment"
@@ -2243,12 +2187,6 @@ msgstr "Tambah repositori"
 
 msgid "Add script"
 msgstr "Tambah skrip"
-
-msgid "Add Script"
-msgstr "Tambah Skrip"
-
-msgid "Add setup commands, one per line..."
-msgstr "Tambahkan perintah setup, satu per baris..."
 
 msgid "Add stack to merge queue"
 msgstr "Tambahkan stack ke antrean merge"
@@ -2346,9 +2284,8 @@ msgstr "Ditambahkan ke input agen"
 msgid "Added to merge queue"
 msgstr "Ditambahkan ke antrean merge"
 
-#. placeholder {0}: webHost()
-msgid "Adding people to {organizationName} needs a paid plan. Your organization's plan is managed by its owner at {0}."
-msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
+msgid "Adding people to {organizationName} needs a paid plan."
+msgstr "Menambahkan orang ke {organizationName} memerlukan paket berbayar."
 
 msgid "Adding to queue…"
 msgstr "Menambahkan ke antrean…"
@@ -2383,9 +2320,6 @@ msgstr "Gabungkan ruang kerja v1 ke proyek v2 terkait yang telah diimpor."
 msgid "Advanced"
 msgstr "Lanjutan"
 
-msgid "Advanced options"
-msgstr "Opsi lanjutan"
-
 msgid "After"
 msgstr "Sesudah"
 
@@ -2404,9 +2338,6 @@ msgstr "Agen"
 msgid "Agent commands"
 msgstr "Perintah agen"
 
-msgid "Agent Complete · {workspaceName}"
-msgstr "Agen Selesai · {workspaceName}"
-
 msgid "Agent Configs"
 msgstr "Konfigurasi Agen"
 
@@ -2421,9 +2352,6 @@ msgstr "Independensi Agen"
 
 msgid "Agent is working"
 msgstr "Agen sedang bekerja"
-
-msgid "Agent launch configuration"
-msgstr "Konfigurasi peluncuran agen"
 
 msgid "Agent not found"
 msgstr "Agen tidak ditemukan"
@@ -2684,9 +2612,6 @@ msgstr "Semua review"
 msgid "All runs"
 msgstr "Semua run"
 
-msgid "All sessions killed and daemon restarted. The app will use a fresh daemon."
-msgstr "Semua sesi dimatikan dan daemon dimulai ulang. Aplikasi akan memakai daemon yang baru."
-
 msgid "All sessions preserved across the upgrade."
 msgstr "Semua sesi dipertahankan sepanjang upgrade."
 
@@ -2777,9 +2702,6 @@ msgstr "Hapus juga branch lokal"
 msgid "Also delete local branches"
 msgstr "Hapus juga branch lokal"
 
-msgid "Also delete the local git branch when deleting a worktree workspace"
-msgstr "Hapus juga branch git lokal saat menghapus workspace worktree"
-
 msgid "Also edit the channel and its members"
 msgstr "Juga dapat mengedit saluran dan anggotanya"
 
@@ -2858,9 +2780,6 @@ msgstr "Worktree git terisolasi tempat agen berjalan tanpa menyentuh checkout ut
 msgid "An OpenAI API key."
 msgstr "Kunci API OpenAI."
 
-msgid "An unknown error occurred"
-msgstr "Terjadi kesalahan yang tidak diketahui"
-
 msgid "An update is ready to install."
 msgstr "Pembaruan siap dipasang."
 
@@ -2900,17 +2819,11 @@ msgstr "Perakit Anonim"
 msgid "Another AI assistant"
 msgstr "Asisten AI lain"
 
-msgid "Another computer"
-msgstr "Komputer lain"
-
 msgid "another device"
 msgstr "perangkat lain"
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Jawab pertanyaan di terminal di bawah, misalnya kata sandi."
-
-msgid "Answer this question on desktop, or skip it."
-msgstr "Jawab pertanyaan ini di desktop, atau lewati."
 
 msgid "Answered"
 msgstr "Dijawab"
@@ -3172,6 +3085,9 @@ msgstr "Arsipkan environment"
 msgid "Archive failed"
 msgstr "Pengarsipan gagal"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Arsipkan workspace cloud yang dipilih"
+
 msgid "Archive this automation before you delete it."
 msgstr "Arsipkan otomatisasi ini sebelum menghapusnya."
 
@@ -3422,9 +3338,6 @@ msgstr "Simpan Otomatis"
 msgid "Auto top-up"
 msgstr "Isi ulang otomatis"
 
-msgid "Auto-run command"
-msgstr "Jalankan perintah otomatis"
-
 msgid "Auto-run on new tab"
 msgstr "Jalankan otomatis di tab baru"
 
@@ -3520,9 +3433,6 @@ msgstr "Avi Peltz, Satya Patel, dan Kiet Ho di YC Demo Day"
 msgid "Awaiting {0}"
 msgstr "Menunggu {0}"
 
-msgid "Awaiting Response · {workspaceName}"
-msgstr "Menunggu Balasan · {workspaceName}"
-
 msgid "Awaiting review from you"
 msgstr "Menunggu review dari Anda"
 
@@ -3550,9 +3460,6 @@ msgstr "Kembali ke penagihan"
 
 msgid "Back to Changelog"
 msgstr "Kembali ke Changelog"
-
-msgid "Back to checklist"
-msgstr "Kembali ke checklist"
 
 msgid "Back to current"
 msgstr "Kembali ke versi saat ini"
@@ -3608,20 +3515,8 @@ msgstr "Menanamkan gaya chip ke tooltip.tsx"
 msgid "Bar"
 msgstr "Batang"
 
-msgid "Base branch"
-msgstr "Branch dasar"
-
-msgid "Base Branch"
-msgstr "Cabang Dasar"
-
 msgid "Base directory for new worktree workspaces on this host."
 msgstr "Direktori dasar untuk workspace worktree baru di host ini."
-
-msgid "Base directory for new worktrees"
-msgstr "Direktori dasar untuk worktree baru"
-
-msgid "Base directory for new worktrees on {selectedHostLabel}"
-msgstr "Direktori dasar untuk worktree baru di {selectedHostLabel}"
 
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Direktori dasar untuk worktree baru di {selectedHostName}."
@@ -3643,9 +3538,6 @@ msgstr "Berdasarkan {0} token dalam 30 hari terakhir, menghitung {1}."
 
 msgid "Before"
 msgstr "Sebelum"
-
-msgid "Behavior"
-msgstr "Perilaku"
 
 msgid "Behind base"
 msgstr "Tertinggal dari base"
@@ -3795,9 +3687,6 @@ msgstr "Branch atau tag (opsional)"
 msgid "Branch prefix"
 msgstr "Prefix branch"
 
-msgid "Branch Prefix"
-msgstr "Awalan Cabang"
-
 msgid "Branch renamed to {newName}"
 msgstr "Nama branch diganti menjadi {newName}"
 
@@ -3831,9 +3720,6 @@ msgstr "Bawa {companyName} ke tim Anda. Hubungi kami untuk mempelajari lebih lan
 
 msgid "Bring a link to something you built recently."
 msgstr "Bawa tautan ke sesuatu yang baru-baru ini Anda bangun."
-
-msgid "Bring in an agent"
-msgstr "Libatkan agen"
 
 msgid "Bring over your projects"
 msgstr "Impor proyek Anda"
@@ -3870,9 +3756,6 @@ msgstr "Jelajahi repo ↗"
 
 msgid "Browse workspaces"
 msgstr "Jelajahi workspace"
-
-msgid "Browse..."
-msgstr "Telusuri..."
 
 msgid "Browser"
 msgstr "Browser"
@@ -4345,12 +4228,6 @@ msgstr "Riwayat obrolan"
 msgid "Chat interface"
 msgstr "Antarmuka chat"
 
-msgid "Chat is being reworked"
-msgstr "Chat sedang dirombak"
-
-msgid "Chat Launch"
-msgstr "Peluncuran Chat"
-
 msgid "Chat name"
 msgstr "Nama obrolan"
 
@@ -4392,9 +4269,6 @@ msgstr "Periksa sumber daya"
 
 msgid "Check Resources"
 msgstr "Periksa Sumber Daya"
-
-msgid "Check the rendered prompt and launch output before saving"
-msgstr "Periksa prompt yang dirender dan output peluncuran sebelum menyimpan"
 
 msgid "Check your access under Settings > Security on that device."
 msgstr "Periksa akses Anda di Pengaturan > Keamanan pada perangkat tersebut."
@@ -4521,14 +4395,8 @@ msgstr "Pilih server MCP"
 msgid "Choose app"
 msgstr "Pilih aplikasi"
 
-msgid "Choose how files open when no preview pane exists"
-msgstr "Pilih cara file dibuka saat tidak ada panel pratinjau"
-
 msgid "Choose how the Changes view opens from the top bar"
 msgstr "Pilih cara membuka tampilan perubahan dari bilah atas"
-
-msgid "Choose how to open file paths when Cmd+clicking in the terminal"
-msgstr "Pilih cara membuka path file saat Cmd+klik di terminal"
 
 msgid "Choose MCP servers for this message"
 msgstr "Pilih server MCP untuk pesan ini"
@@ -4645,12 +4513,6 @@ msgstr "Bersihkan Status"
 msgid "Clear Terminal"
 msgstr "Bersihkan Terminal"
 
-msgid "Clear terminal history"
-msgstr "Bersihkan riwayat terminal"
-
-msgid "Clear terminal history?"
-msgstr "Bersihkan riwayat terminal?"
-
 msgid "Clear the filter to rearrange the sidebar"
 msgstr "Hapus filter untuk menyusun ulang sidebar"
 
@@ -4662,9 +4524,6 @@ msgstr "Membersihkan {succeededLabels}. Tidak bisa membersihkan {failedLabels}"
 
 msgid "Cleared Operator inside the Run 01 window"
 msgstr "Mencapai Operator dalam periode Run 01"
-
-msgid "Cleared terminal history"
-msgstr "Riwayat terminal dibersihkan"
 
 msgid "Clearing session name..."
 msgstr "Menghapus nama sesi..."
@@ -4690,9 +4549,6 @@ msgstr "klik"
 msgid "Click <0>Import Theme</0> and select the downloaded file."
 msgstr "Klik <0>Import Theme</0> dan pilih file yang sudah diunduh."
 
-msgid "Click a terminal script to edit its details."
-msgstr "Klik sebuah skrip terminal untuk mengedit detailnya."
-
 msgid "Click an element."
 msgstr "Klik sebuah elemen."
 
@@ -4713,9 +4569,6 @@ msgstr "Klik untuk menyalin ID sesi (lanjutkan dengan `claude --resume <id>`)."
 
 msgid "Click two commits to define the range."
 msgstr "Klik dua commit untuk menentukan rentangnya."
-
-msgid "Clients"
-msgstr "Klien"
 
 msgid "Clone"
 msgstr "Clone"
@@ -4884,9 +4737,6 @@ msgstr "Tutup tab saat ini"
 msgid "Close Window"
 msgstr "Tutup Jendela"
 
-msgid "Close workspace"
-msgstr "Tutup workspace"
-
 msgid "Close Workspace"
 msgstr "Tutup Workspace"
 
@@ -4922,20 +4772,14 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
-msgid "Cloud credentials"
-msgstr "Kredensial cloud"
-
-msgid "Cloud data gets deleted. Push your branches first."
-msgstr "Data cloud akan dihapus. Push branch Anda terlebih dahulu."
-
-msgid "Cloud ends {shutdownDate}. Mac app ends early 2027"
-msgstr "Cloud berakhir {shutdownDate}. Aplikasi Mac berakhir awal 2027"
-
 msgid "Cloud environment setup"
 msgstr "Penyiapan environment cloud"
 
 msgid "Cloud environments"
 msgstr "Environment cloud"
+
+msgid "Cloud environments are not included in your plan."
+msgstr "Lingkungan cloud tidak termasuk dalam paket Anda."
 
 msgid "Cloud environments check out your repositories from GitHub. Connect these first; you only do this once."
 msgstr "Environment cloud mengambil repositori Anda dari GitHub. Hubungkan ini dulu; Anda hanya melakukannya sekali."
@@ -4943,20 +4787,17 @@ msgstr "Environment cloud mengambil repositori Anda dari GitHub. Hubungkan ini d
 msgid "Cloud GB-hours per seat each month"
 msgstr "GB-jam cloud per kursi setiap bulan"
 
-msgid "Cloud goes read-only"
-msgstr "Cloud menjadi hanya-baca"
-
 msgid "Cloud sandboxes"
 msgstr "Sandbox cloud"
-
-msgid "Cloud shuts down"
-msgstr "Cloud ditutup"
 
 msgid "Cloud usage"
 msgstr "Penggunaan cloud"
 
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
+
+msgid "Cloud workspace: asleep"
+msgstr "Workspace cloud: tertidur"
 
 msgid "Cloud workspace: connecting"
 msgstr "Workspace cloud: menghubungkan"
@@ -4976,6 +4817,9 @@ msgstr "Workspace cloud"
 #. js-lingui-explicit-id
 msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
 msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersedia di paket Team dan Ultra: upgrade di Pengaturan, Penagihan."
+
+msgid "Cloud workspaces are not included in your plan."
+msgstr "Ruang kerja cloud tidak termasuk dalam paket Anda."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
@@ -5075,32 +4919,20 @@ msgstr "Perintah"
 msgid "Command \"{title}\" failed: {message}"
 msgstr "Perintah \"{title}\" gagal: {message}"
 
-msgid "Command (No Prompt)"
-msgstr "Perintah (Tanpa Prompt)"
-
-msgid "Command (With Prompt)"
-msgstr "Perintah (Dengan Prompt)"
-
 msgid "Command cannot be empty"
 msgstr "Perintah tidak boleh kosong"
 
-msgid "Command is only available for terminal agents."
-msgstr "Perintah hanya tersedia untuk agen terminal."
-
-msgid "Command is required for terminal agents."
-msgstr "Perintah wajib diisi untuk agen terminal."
-
 msgid "Command Palette"
 msgstr "Command Palette"
-
-msgid "Command to start your dev server, triggered via keyboard shortcut."
-msgstr "Perintah untuk memulai server pengembangan melalui pintasan keyboard."
 
 msgid "Command..."
 msgstr "Perintah..."
 
 msgid "Commands"
 msgstr "Perintah"
+
+msgid "Commands only"
+msgstr "Hanya perintah"
 
 msgid "Commands run for workspace setup, teardown, and the Run button."
 msgstr "Perintah yang dijalankan untuk setup workspace, teardown, dan tombol Run."
@@ -5147,9 +4979,6 @@ msgstr "Commit"
 #. placeholder {0}: error.message
 msgid "Commit failed: {0}"
 msgstr "Commit gagal: {0}"
-
-msgid "Commit message"
-msgstr "Pesan commit"
 
 msgid "Commit message (optional)"
 msgstr "Pesan commit (opsional)"
@@ -5208,6 +5037,10 @@ msgstr "Bandingkan paket"
 msgid "Compared against the default style"
 msgstr "Dibandingkan dengan gaya bawaan"
 
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Perbandingan"
+
 msgid "complete"
 msgstr "selesai"
 
@@ -5227,21 +5060,8 @@ msgstr "Tata letak form yang bisa dikomposisi — berpasangan dengan @superset/u
 msgid "Conductor chat history. Export it in Conductor under Settings → Account"
 msgstr "Riwayat chat Conductor. Ekspor di Conductor melalui Settings → Account"
 
-#. placeholder {0}: BRAND.NAME
-msgid "Conductor Cloud ends {shutdownDate}. Move to {0} in minutes."
-msgstr "Conductor Cloud berakhir {shutdownDate}. Pindah ke {0} dalam hitungan menit."
-
-msgid "Conductor Cloud ends {shutdownDate}. Switch to {companyName}"
-msgstr "Conductor Cloud berakhir {shutdownDate}. Beralih ke {companyName}"
-
 msgid "Conductor Cloud guide"
 msgstr "Panduan Conductor Cloud"
-
-msgid "Conductor Cloud shuts down on {shutdownDateLong}. Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
-msgstr "Conductor Cloud ditutup pada {shutdownDateLong}. Pindahkan worktree dan agen Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
-
-msgid "Conductor deletes it after {shutdownDate}, and {companyName} can't reach it. Push your branches and export your chats before then."
-msgstr "Conductor menghapusnya setelah {shutdownDate}, dan {companyName} tidak dapat mengaksesnya. Push branch dan ekspor chat Anda sebelum tanggal itu."
 
 msgid "Conductor details are from its public docs. See the <0>full comparison</0>."
 msgstr "Detail Conductor diambil dari dokumentasi publiknya. Lihat <0>perbandingan lengkap</0>."
@@ -5249,9 +5069,6 @@ msgstr "Detail Conductor diambil dari dokumentasi publiknya. Lihat <0>perbanding
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor is a trademark of its owner. {0} is not affiliated with or endorsed by Conductor or Meta."
 msgstr "Conductor adalah merek dagang milik pemiliknya. {0} tidak berafiliasi dengan atau didukung oleh Conductor maupun Meta."
-
-msgid "Conductor joins Meta"
-msgstr "Conductor bergabung dengan Meta"
 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
@@ -5278,9 +5095,6 @@ msgstr "Atur perintah, ketersediaan, dan perilaku peluncuran untuk skrip termina
 msgid "Configure general app preferences"
 msgstr "Atur preferensi umum aplikasi"
 
-msgid "Configure git branch and worktree behavior"
-msgstr "Atur perilaku branch git dan worktree"
-
 msgid "Configure GitHub App…"
 msgstr "Konfigurasi GitHub App…"
 
@@ -5292,9 +5106,6 @@ msgstr "Atur perilaku terminal dan skrip terminal pakai ulang"
 
 msgid "Configure the in-app browser"
 msgstr "Atur browser dalam aplikasi"
-
-msgid "Configure which agents appear in launchers and how their launches are built."
-msgstr "Atur agen mana yang muncul di peluncur dan bagaimana peluncurannya disusun."
 
 msgid "Configure workspace run command"
 msgstr "Atur perintah run workspace"
@@ -5315,9 +5126,6 @@ msgstr "Konflik"
 #. placeholder {0}: status.baseBranch
 msgid "Conflicts with {0}"
 msgstr "Konflik dengan {0}"
-
-msgid "Congrats to the Conductor team on joining Meta. Dates are from <0>their announcement</0>."
-msgstr "Selamat kepada tim Conductor yang bergabung dengan Meta. Tanggal diambil dari <0>pengumuman mereka</0>."
 
 msgid "Connect"
 msgstr "Hubungkan"
@@ -5947,6 +5755,9 @@ msgstr "Tidak dapat mengunduh {names}."
 msgid "Could not download the template. Check your internet connection and try again."
 msgstr "Tidak dapat mengunduh template. Periksa koneksi internet Anda, lalu coba lagi."
 
+msgid "Could not duplicate this page"
+msgstr "Tidak dapat menduplikasi halaman ini"
+
 msgid "Could not forget {domain}"
 msgstr "Tidak bisa melupakan {domain}"
 
@@ -6118,6 +5929,9 @@ msgstr "Tidak bisa menyetel ikon"
 
 msgid "Could not share"
 msgstr "Tidak bisa membagikan"
+
+msgid "Could not sign out. Please try again."
+msgstr "Tidak dapat keluar. Coba lagi."
 
 msgid "Could not start agent"
 msgstr "Tidak bisa memulai agen"
@@ -6687,9 +6501,6 @@ msgstr "Buat workspace, jalankan agen, dan baca outputnya dari terminal atau skr
 msgid "Create your account"
 msgstr "Buat akun Anda"
 
-msgid "Create your first workspace"
-msgstr "Buat workspace pertama Anda"
-
 msgid "Create, list, send input to, read the screen of, and close terminal sessions."
 msgstr "Membuat, menampilkan, mengirim input ke, membaca layar dari, dan menutup sesi terminal."
 
@@ -6900,9 +6711,6 @@ msgstr "Sesuaikan"
 msgid "Customize {devName}"
 msgstr "Sesuaikan {devName}"
 
-msgid "Customize commands"
-msgstr "Sesuaikan perintah"
-
 msgid "Customize how Paradev looks on your device"
 msgstr "Sesuaikan tampilan Paradev di perangkat Anda"
 
@@ -6918,10 +6726,6 @@ msgstr "Siklus berakhir"
 
 msgid "Daemon restarted"
 msgstr "Daemon dimulai ulang"
-
-#. placeholder {0}: aliveSessions.length
-msgid "Daemon sessions running: {0}"
-msgstr "Sesi daemon yang berjalan: {0}"
 
 msgid "Daemon unavailable"
 msgstr "Daemon tidak tersedia"
@@ -7013,14 +6817,8 @@ msgstr "Bawaan"
 msgid "default · secondary · outline · ghost · link · destructive"
 msgstr "default · secondary · outline · ghost · link · destructive"
 
-msgid "Default ({defaultWorktreePath})"
-msgstr "Bawaan ({defaultWorktreePath})"
-
 msgid "Default ({fallback})"
 msgstr "Bawaan ({fallback})"
-
-msgid "Default base for new workspaces. Override per-workspace at creation."
-msgstr "Dasar default untuk ruang kerja baru. Dapat diganti per ruang kerja saat dibuat."
 
 msgid "Default branch"
 msgstr "Branch default"
@@ -7068,6 +6866,9 @@ msgstr "Hapus \"{hostName}\"?"
 
 msgid "Delete \"{projectName}\"?"
 msgstr "Hapus \"{projectName}\"?"
+
+msgid "Delete \"{title}\"?"
+msgstr "Hapus “{title}”?"
 
 msgid "Delete “{title}”?"
 msgstr "Hapus “{title}”?"
@@ -7124,9 +6925,6 @@ msgstr "Hapus host"
 
 msgid "Delete image"
 msgstr "Hapus gambar"
-
-msgid "Delete local branch on workspace removal"
-msgstr "Hapus branch lokal saat workspace dihapus"
 
 msgid "Delete message"
 msgstr "Hapus pesan"
@@ -7461,9 +7259,6 @@ msgstr "diff"
 
 msgid "Diff"
 msgstr "Diff"
-
-msgid "Diff change overview"
-msgstr "Ringkasan perubahan diff"
 
 msgid "diff in new tab"
 msgstr "diff di tab baru"
@@ -7854,14 +7649,11 @@ msgstr "Menu dropdown, konteks, dan aplikasi"
 msgid "Due today"
 msgstr "Jatuh tempo hari ini"
 
+msgid "Duplicate"
+msgstr "Duplikat"
+
 msgid "Duration"
 msgstr "Durasi"
-
-msgid "e.g. Add dark mode, Fix checkout bug"
-msgstr "mis. Tambah mode gelap, Perbaiki bug checkout"
-
-msgid "e.g. bun install && bun run dev"
-msgstr "mis. bun install && bun run dev"
 
 msgid "e.g. bun run dev"
 msgstr "mis. bun run dev"
@@ -7871,9 +7663,6 @@ msgstr "mis. Claude Desktop"
 
 msgid "e.g. Dev server"
 msgstr "mis. Dev server"
-
-msgid "e.g. docker compose down"
-msgstr "mis. docker compose down"
 
 msgid "e.g. engineering"
 msgstr "mis. engineering"
@@ -8085,13 +7874,6 @@ msgstr "Proyek kosong"
 
 msgid "Emulator"
 msgstr "Emulator"
-
-#. placeholder {0}: preset.label
-msgid "Enable {0}"
-msgstr "Aktifkan {0}"
-
-msgid "Enable an agent in Settings > Agents first"
-msgstr "Aktifkan dulu sebuah agen di Pengaturan > Agen"
 
 msgid "Enable relay access…"
 msgstr "Aktifkan akses relay…"
@@ -8432,9 +8214,6 @@ msgstr "browser eksternal"
 msgid "External Browser"
 msgstr "Browser Eksternal"
 
-msgid "External editor"
-msgstr "Editor eksternal"
-
 msgid "extra ${used} of ${limit}"
 msgstr "tambahan ${used} dari ${limit}"
 
@@ -8521,9 +8300,6 @@ msgstr "Gagal memeriksa pembaruan. Silakan coba lagi nanti."
 msgid "Failed to clear agent status: {0}"
 msgstr "Gagal membersihkan status agen: {0}"
 
-msgid "Failed to clear terminal history"
-msgstr "Gagal membersihkan riwayat terminal"
-
 #. placeholder {0}: port.port
 msgid "Failed to close port {0}"
 msgstr "Gagal menutup port {0}"
@@ -8584,10 +8360,6 @@ msgstr "Gagal membuat organisasi"
 
 msgid "Failed to create page"
 msgstr "Gagal membuat halaman"
-
-#. placeholder {0}: errorMessage( error, t({ message: "Unknown error", }), )
-msgid "Failed to create section: {0}"
-msgstr "Gagal membuat bagian: {0}"
 
 msgid "Failed to create task"
 msgstr "Gagal membuat tugas"
@@ -8656,15 +8428,6 @@ msgstr "Gagal membuat kunci API"
 msgid "Failed to import theme file"
 msgstr "Gagal mengimpor file tema"
 
-msgid "Failed to import worktrees"
-msgstr "Gagal mengimpor worktree"
-
-msgid "Failed to kill session"
-msgstr "Gagal mematikan sesi"
-
-msgid "Failed to kill sessions"
-msgstr "Gagal mematikan sesi"
-
 msgid "Failed to kill terminal session"
 msgstr "Gagal mematikan sesi terminal"
 
@@ -8695,17 +8458,6 @@ msgstr "Gagal keluar. Silakan coba lagi."
 
 msgid "Failed to move automation"
 msgstr "Gagal memindahkan otomatisasi"
-
-#. placeholder {0}: error.message
-msgid "Failed to move workspace: {0}"
-msgstr "Gagal memindahkan workspace: {0}"
-
-#. placeholder {0}: error.message
-msgid "Failed to move workspaces: {0}"
-msgstr "Gagal memindahkan workspace: {0}"
-
-msgid "Failed to open {name}"
-msgstr "Gagal membuka {name}"
 
 #. placeholder {0}: errorMessage( error, t({ message: "Unknown error", }), )
 msgid "Failed to open file: {0}"
@@ -8787,9 +8539,6 @@ msgstr "Gagal mengganti 1 file"
 msgid "Failed to reset"
 msgstr "Gagal mereset"
 
-msgid "Failed to reset agent settings"
-msgstr "Gagal mereset pengaturan agen"
-
 msgid "Failed to resolve {failedCount} thread"
 msgstr "Gagal menyelesaikan {failedCount} thread"
 
@@ -8846,9 +8595,6 @@ msgstr "Gagal menyimpan instalasi. Silakan coba lagi."
 msgid "Failed to save prompt"
 msgstr "Gagal menyimpan prompt"
 
-msgid "Failed to save setup config"
-msgstr "Gagal menyimpan konfigurasi setup"
-
 msgid "Failed to save team"
 msgstr "Gagal menyimpan tim"
 
@@ -8893,9 +8639,6 @@ msgstr "Gagal mengganti organisasi. Silakan coba lagi."
 
 msgid "Failed to trigger run"
 msgstr "Gagal memicu run"
-
-msgid "Failed to update agent settings"
-msgstr "Gagal memperbarui pengaturan agen"
 
 msgid "Failed to update automation"
 msgstr "Gagal memperbarui otomatisasi"
@@ -8975,9 +8718,6 @@ msgstr "Mode cepat nonaktif"
 msgid "Fast mode on"
 msgstr "Mode cepat aktif"
 
-msgid "Fatal"
-msgstr "Fatal"
-
 msgid "Fault"
 msgstr "Kegagalan"
 
@@ -9047,17 +8787,11 @@ msgstr "File sudah tidak ada"
 msgid "File not found"
 msgstr "File tidak ditemukan"
 
-msgid "File open mode"
-msgstr "Mode buka file"
-
 msgid "File opens when the workspace wakes up"
 msgstr "File terbuka saat workspace bangun"
 
 msgid "File too large. Maximum size is 256 KB."
 msgstr "File terlalu besar. Ukuran maksimum 256 KB."
-
-msgid "File viewer"
-msgstr "Penampil file"
 
 msgid "File was deleted on disk."
 msgstr "File dihapus di disk."
@@ -9076,12 +8810,6 @@ msgstr "File yang berubah"
 
 msgid "Files load when the workspace wakes up"
 msgstr "File dimuat saat workspace bangun"
-
-msgid "files to exclude (glob)"
-msgstr "file yang dikecualikan (glob)"
-
-msgid "files to include (glob)"
-msgstr "file yang disertakan (glob)"
 
 msgid "Fill out the contact form on this page and our team will reach out to learn about your needs and walk you through next steps."
 msgstr "Isi formulir kontak di halaman ini dan tim kami akan menghubungi Anda untuk memahami kebutuhan Anda dan memandu langkah berikutnya."
@@ -9489,23 +9217,20 @@ msgstr "Gratis untuk satu pengguna. Open source dengan lisensi MIT."
 msgid "Free for one user. Paid plans per user"
 msgstr "Gratis untuk satu pengguna. Paket berbayar per pengguna"
 
-msgid "Free for one user. Pro adds automations and the mobile app. Team adds cloud workspaces."
-msgstr "Gratis untuk satu pengguna. Pro menambahkan otomasi dan aplikasi mobile. Team menambahkan workspace cloud."
+msgid "Free for one user. Pro adds automations and the mobile app. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis untuk satu pengguna. Pro menambahkan otomasi dan aplikasi mobile. Paket berbayar dapat mengakses ruang kerja cloud. Lihat harga untuk kuota yang disertakan dan biaya penggunaan tambahan."
 
 msgid "Free for one user. Pro from {proPrice}/user/mo"
 msgstr "Gratis untuk satu pengguna. Pro mulai {proPrice}/pengguna/bln"
 
-msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice} and adds cloud workspaces."
-msgstr "Gratis untuk satu pengguna. Pro seharga {proPrice} per pengguna per bulan dan menambahkan otomasi serta aplikasi mobile. Team seharga {teamPrice} dan menambahkan workspace cloud."
+msgid "Free for one user. Pro is {proPrice} per user per month and adds automations and the mobile app. Team is {teamPrice}. Paid plans can access cloud workspaces. See pricing for included usage and metered extras."
+msgstr "Gratis untuk satu pengguna. Pro seharga {proPrice} per pengguna per bulan dan menambahkan otomasi serta aplikasi mobile. Team seharga {teamPrice}. Paket berbayar dapat mengakses ruang kerja cloud. Lihat harga untuk kuota yang disertakan dan biaya penggunaan tambahan."
 
 msgid "Frequently Used"
 msgstr "Sering Digunakan"
 
 msgid "Frequently<0/>asked questions"
 msgstr "Pertanyaan<0/>yang sering diajukan"
-
-msgid "from"
-msgstr "dari"
 
 msgid "From"
 msgstr "Dari"
@@ -9672,8 +9397,8 @@ msgstr "Dapatkan aplikasi iPhone dan iPad"
 msgid "Gets an invite to join {organizationName}"
 msgstr "Akan menerima undangan untuk bergabung ke {organizationName}"
 
-msgid "Getting the computer ready"
-msgstr "Menyiapkan komputer"
+msgid "Getting the device ready"
+msgstr "Menyiapkan perangkat"
 
 msgid "Getting Work Done"
 msgstr "Menyelesaikan Pekerjaan"
@@ -9683,9 +9408,6 @@ msgstr "Ghost"
 
 msgid "Ghost trigger: icon + truncating label + up-down chevron (pattern demoed on the Primitives page)"
 msgstr "Pemicu ghost: ikon + label terpotong + chevron atas-bawah (pola didemokan di halaman Primitives)"
-
-msgid "Git"
-msgstr "Git"
 
 msgid "Git & worktrees"
 msgstr "Git & worktree"
@@ -9747,8 +9469,8 @@ msgstr "Batas laju GitHub tercapai"
 msgid "GitHub refused the merge"
 msgstr "GitHub menolak merge-nya"
 
-msgid "GitHub repositories with a plugin marketplace file. Superset syncs their plugins into your organization."
-msgstr "Repositori GitHub dengan file marketplace plugin. Superset menyinkronkan plugin-pluginnya ke organisasi Anda."
+msgid "GitHub repositories with a plugin marketplace file. Paradev syncs their plugins into your organization."
+msgstr "Repositori GitHub dengan file marketplace plugin. Paradev menyinkronkan plugin-pluginnya ke organisasi Anda."
 
 msgid "GitHub sign-in needed"
 msgstr "Perlu masuk ke GitHub"
@@ -10015,9 +9737,6 @@ msgstr "Sembunyikan log"
 msgid "Hide panel"
 msgstr "Sembunyikan panel"
 
-msgid "Hide Preview"
-msgstr "Sembunyikan Pratinjau"
-
 msgid "Hide pull request list"
 msgstr "Sembunyikan daftar pull request"
 
@@ -10029,9 +9748,6 @@ msgstr "Sembunyikan yang terselesaikan ({resolvedCount})"
 
 msgid "Hide resolved comments"
 msgstr "Sembunyikan komentar yang terselesaikan"
-
-msgid "Hide sessions"
-msgstr "Sembunyikan sesi"
 
 msgid "Hide text"
 msgstr "Sembunyikan teks"
@@ -10315,6 +10031,9 @@ msgstr "Idle"
 msgid "Idle · branch pushed"
 msgstr "Idle · branch sudah di-push"
 
+msgid "If you choose to move, save your branches and export the data you want to keep. Exports do not import Conductor chats into {companyName}."
+msgstr "Jika memilih pindah, simpan branch dan ekspor data yang ingin disimpan. Ekspor tidak mengimpor percakapan Conductor ke {companyName}."
+
 msgid "If you're enjoying Paradev so far, a GitHub star helps other developers discover it."
 msgstr "Kalau sejauh ini Anda menikmati Paradev, satu star GitHub membantu developer lain menemukannya."
 
@@ -10376,9 +10095,6 @@ msgstr "Impor agen"
 
 msgid "Import all"
 msgstr "Impor semua"
-
-msgid "Import all worktrees"
-msgstr "Impor semua worktree"
 
 msgid "Import cookies and passwords…"
 msgstr "Impor cookie dan kata sandi…"
@@ -10564,15 +10280,6 @@ msgstr "Informasi"
 
 msgid "Initial prompt"
 msgstr "Prompt awal"
-
-msgid "Initialize Git"
-msgstr "Inisialisasi Git"
-
-msgid "Initialize Git Repository?"
-msgstr "Inisialisasi Repositori Git?"
-
-msgid "Initializing..."
-msgstr "Menginisialisasi..."
 
 msgid "Initials fallback via getInitials, sizes xs → xl"
 msgstr "Fallback inisial lewat getInitials, ukuran xs → xl"
@@ -10784,9 +10491,6 @@ msgstr "Undang"
 msgid "Invite ({pickCount})"
 msgstr "Undang ({pickCount})"
 
-msgid "Invite and manage members, assign roles, and control permissions"
-msgstr "Undang dan kelola anggota, tetapkan peran, dan atur izin"
-
 msgid "Invite member"
 msgstr "Undang anggota"
 
@@ -10795,9 +10499,6 @@ msgstr "Undang Anggota"
 
 msgid "Invite pending"
 msgstr "Undangan tertunda"
-
-msgid "Invite people on a paid plan"
-msgstr "Undang orang dengan paket berbayar"
 
 msgid "Invite teammate"
 msgstr "Undang rekan tim"
@@ -10820,8 +10521,8 @@ msgstr "Faktur dan metode pembayaran"
 msgid "iOS app"
 msgstr "Aplikasi iOS"
 
-msgid "iOS app, ending {shutdownDate}"
-msgstr "Aplikasi iOS, berakhir {shutdownDate}"
+msgid "iOS app; cloud and experimental local Mac remote control"
+msgstr "Aplikasi iOS; cloud dan kendali jarak jauh Mac lokal eksperimental"
 
 msgid "iOS Simulator"
 msgstr "Simulator iOS"
@@ -10957,6 +10658,9 @@ msgstr "Plugin-pluginnya muncul setelah sinkronisasi selesai."
 
 msgid "Its replies go with it."
 msgstr "Balasannya ikut terhapus."
+
+msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
+msgstr "Pekerjaannya, termasuk perubahan yang belum di-commit, di-push ke branch baru. Workspace di {computerName} dimulai dari branch itu, dan setiap obrolan Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan obrolan lain tetap di tempatnya."
 
 msgid "Its workspaces and terminals are unavailable until it restarts. Use the Paradev tray menu > Host Service > Restart."
 msgstr "Workspace dan terminalnya tidak tersedia sampai layanan ini dimulai ulang. Pakai menu tray Paradev > Host Service > Restart."
@@ -11103,9 +10807,6 @@ msgstr "Folder baru dipertahankan, sudah tidak kosong"
 msgid "Key"
 msgstr "Kunci"
 
-msgid "Key dates"
-msgstr "Tanggal penting"
-
 msgid "Key name"
 msgstr "Nama kunci"
 
@@ -11121,29 +10822,8 @@ msgstr "Pintasan Keyboard"
 msgid "Kiet Ho, Satya Patel, and Avi Peltz presenting at YC"
 msgstr "Kiet Ho, Satya Patel, dan Avi Peltz presentasi di YC"
 
-msgid "Kill"
-msgstr "Matikan"
-
-msgid "Kill all"
-msgstr "Matikan semua"
-
-msgid "Kill all sessions"
-msgstr "Matikan semua sesi"
-
-msgid "Kill all terminal sessions?"
-msgstr "Matikan semua sesi terminal?"
-
 msgid "Kill Terminal Session"
 msgstr "Matikan Sesi Terminal"
-
-msgid "Kill terminal session?"
-msgstr "Matikan sesi terminal?"
-
-msgid "Killed all terminal sessions"
-msgstr "Semua sesi terminal dimatikan"
-
-msgid "Killed terminal session"
-msgstr "Sesi terminal dimatikan"
 
 msgid "Knock out some TODOs"
 msgstr "Beresin beberapa TODO"
@@ -11160,9 +10840,6 @@ msgstr "Label"
 
 msgid "Label change"
 msgstr "Perubahan label"
-
-msgid "Label is required."
-msgstr "Label wajib diisi."
 
 msgid "Label name..."
 msgstr "Nama label..."
@@ -11185,9 +10862,6 @@ msgstr "Besar"
 msgctxt "machine size"
 msgid "Large"
 msgstr "Besar"
-
-msgid "Large numbers of persistent terminals can increase CPU/memory usage. Consider killing old sessions if you notice slowdowns."
-msgstr "Terminal persisten dalam jumlah besar bisa menaikkan penggunaan CPU/memori. Pertimbangkan mematikan sesi lama kalau Anda merasakan perlambatan."
 
 msgid "Last 3 months"
 msgstr "3 bulan terakhir"
@@ -11213,9 +10887,6 @@ msgstr "Aktivitas agen terakhir {0}"
 
 msgid "Last agent message"
 msgstr "Pesan agen terakhir"
-
-msgid "Last attached"
-msgstr "Terakhir terhubung"
 
 msgid "Last day of each month"
 msgstr "Hari terakhir tiap bulan"
@@ -11313,9 +10984,6 @@ msgstr "Daun"
 
 msgid "Learn"
 msgstr "Belajar"
-
-msgid "Learn how to use scripts"
-msgstr "Pelajari cara memakai skrip"
 
 msgid "Learn more"
 msgstr "Pelajari lebih lanjut"
@@ -11628,9 +11296,6 @@ msgstr "Loader · Braille Spinner"
 msgid "Loading"
 msgstr "Memuat"
 
-msgid "Loading agent settings..."
-msgstr "Memuat pengaturan agen..."
-
 msgid "Loading and in-flight activity indicators"
 msgstr "Indikator pemuatan dan aktivitas yang sedang berjalan"
 
@@ -11737,9 +11402,6 @@ msgstr "Local First"
 msgid "Local Network"
 msgstr "Local Network"
 
-msgid "Local work can move at your own pace."
-msgstr "Pekerjaan lokal bisa dipindahkan sesuai kecepatan Anda."
-
 msgid "Local workspace"
 msgstr "Workspace lokal"
 
@@ -11832,9 +11494,6 @@ msgstr "Rendah"
 msgid "Low severity"
 msgstr "Tingkat keparahan rendah"
 
-msgid "Mac app winds down"
-msgstr "Aplikasi Mac dihentikan"
-
 msgid "Machine resources"
 msgstr "Sumber daya mesin"
 
@@ -11913,15 +11572,11 @@ msgstr "Kelola kunci untuk akses server MCP dan integrasi eksternal seperti Clau
 msgid "Manage members"
 msgstr "Kelola anggota"
 
-#. placeholder {0}: webHost()
-msgid "Manage on {0}"
-msgstr "Kelola di {0}"
+msgid "Manage plan"
+msgstr "Kelola paket"
 
 msgid "Manage Plan"
 msgstr "Kelola Paket"
-
-msgid "Manage plan on the web"
-msgstr "Kelola paket lewat web"
 
 msgid "Manage plugins…"
 msgstr "Kelola plugin…"
@@ -12446,8 +12101,23 @@ msgstr "Pindahkan pekerjaan cloud"
 msgid "Move focus between the main tabs and the right sidebar, and open the sidebar if it is closed"
 msgstr "Pindahkan fokus antara tab utama dan sidebar kanan, lalu buka sidebar jika tertutup"
 
+msgid "Move this workspace to {computerName}?"
+msgstr "Pindahkan workspace ini ke {computerName}?"
+
+msgid "Move this workspace to the cloud?"
+msgstr "Pindahkan workspace ini ke cloud?"
+
+msgid "Move to"
+msgstr "Pindahkan ke"
+
+msgid "Move to {companyName} in minutes."
+msgstr "Pindah ke {companyName} dalam hitungan menit."
+
 msgid "Move to background"
 msgstr "Pindahkan ke latar belakang"
+
+msgid "Move to cloud"
+msgstr "Pindahkan ke cloud"
 
 msgid "Move to group"
 msgstr "Pindahkan ke grup"
@@ -12461,8 +12131,11 @@ msgstr "Pindahkan ke kanan"
 msgid "Move to Tab"
 msgstr "Pindahkan ke Tab"
 
-msgid "Move your agents before {shutdownDate}."
-msgstr "Pindahkan agen Anda sebelum {shutdownDate}."
+msgid "Move your agents."
+msgstr "Pindahkan agen Anda."
+
+msgid "Move your worktrees and agents to {companyName} in a few minutes. Free and open source."
+msgstr "Pindahkan worktree dan agen Anda ke {companyName} dalam beberapa menit. Gratis dan open source."
 
 msgid "Moved \"{name}\" to {group}"
 msgstr "\"{name}\" dipindahkan ke {group}"
@@ -12695,6 +12368,9 @@ msgstr "Grup baru…"
 msgid "New issue"
 msgstr "Issue baru"
 
+msgid "New layout"
+msgstr "Tata letak baru"
+
 msgid "New messages"
 msgstr "Pesan baru"
 
@@ -12761,6 +12437,9 @@ msgstr "Workspace Baru ({shortcutText})"
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
 
+msgid "New workspace page"
+msgstr "Halaman workspace baru"
+
 msgid "Newer than this app"
 msgstr "Lebih baru dari aplikasi ini"
 
@@ -12790,9 +12469,6 @@ msgstr "Tagihan berikutnya: {nextTotal} pada {nextDate}, ditambah pemakaian di l
 
 msgid "Next comment"
 msgstr "Komentar berikutnya"
-
-msgid "Next file"
-msgstr "File berikutnya"
 
 msgid "Next image"
 msgstr "Gambar berikutnya"
@@ -12867,9 +12543,6 @@ msgstr "Tidak ada layanan aktif"
 
 msgid "No active terminal sessions"
 msgstr "Tidak ada sesi terminal aktif"
-
-msgid "No active workspaces"
-msgstr "Tidak ada workspace aktif"
 
 msgid "No agent"
 msgstr "Tanpa agen"
@@ -12956,6 +12629,9 @@ msgstr "Tidak ditemukan Chrome, Brave, Arc, atau browser Chromium lainnya."
 msgid "No Claude or Codex usage found on this machine yet. Join now and you'll appear once you've used an agent."
 msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan Anda akan muncul setelah memakai agen."
 
+msgid "No cloud environment opens {repository}."
+msgstr "Tidak ada lingkungan cloud yang membuka {repository}."
+
 msgid "No cloud workspaces"
 msgstr "Tidak ada workspace cloud"
 
@@ -12967,12 +12643,6 @@ msgstr "Belum ada workspace cloud"
 
 msgid "No color"
 msgstr "Tanpa warna"
-
-msgid "No command configured."
-msgstr "Tidak ada perintah yang dikonfigurasi."
-
-msgid "No commands found."
-msgstr "Tidak ada perintah ditemukan."
 
 msgid "No comment body"
 msgstr "Tidak ada isi komentar"
@@ -13151,9 +12821,6 @@ msgstr "tanpa login"
 msgid "No longer in source"
 msgstr "Tidak lagi ada di sumber"
 
-msgid "No longer on sale"
-msgstr "Tidak lagi dijual"
-
 msgid "No match"
 msgstr "Tidak ada yang cocok"
 
@@ -13238,8 +12905,8 @@ msgstr "Tidak ada organisasi yang dipilih"
 msgid "No other chats here"
 msgstr "Tidak ada obrolan lain di sini"
 
-msgid "No other computer is set up for this account."
-msgstr "Tidak ada komputer lain yang disiapkan untuk akun ini."
+msgid "No other device is set up for this account."
+msgstr "Tidak ada perangkat lain yang disiapkan untuk akun ini."
 
 msgid "No pages match"
 msgstr "Tidak ada halaman yang cocok"
@@ -13271,9 +12938,6 @@ msgstr "Tidak ada plugin yang cocok dengan \"{0}\""
 
 msgid "No plugins yet. Add a repository to sync them."
 msgstr "Belum ada plugin. Tambahkan repositori untuk menyinkronkannya."
-
-msgid "No ports yet. Start a dev server in a terminal and it shows up here."
-msgstr "Belum ada port. Jalankan server pengembangan di terminal dan port akan muncul di sini."
 
 msgid "No posts yet."
 msgstr "Belum ada tulisan."
@@ -13308,9 +12972,6 @@ msgstr "Tidak ada proyek tersedia"
 msgid "No projects available."
 msgstr "Tidak ada proyek tersedia."
 
-msgid "No projects found"
-msgstr "Tidak ada proyek ditemukan"
-
 msgid "No projects found."
 msgstr "Tidak ada proyek ditemukan."
 
@@ -13334,9 +12995,6 @@ msgstr "Tidak ada proyek yang dihapus dalam 30 hari terakhir."
 
 msgid "No projects yet."
 msgstr "Belum ada proyek."
-
-msgid "No prompt-capable command configured."
-msgstr "Tidak ada perintah yang mendukung prompt yang dikonfigurasi."
 
 msgid "No prompts found."
 msgstr "Tidak ada prompt ditemukan."
@@ -13527,8 +13185,8 @@ msgstr "Belum ada workspace di host ini"
 msgid "No workspaces yet"
 msgstr "Belum ada workspace"
 
-msgid "No-Prompt Launch"
-msgstr "Peluncuran Tanpa Prompt"
+msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
+msgstr "Tidak. {companyName} tidak pernah menjadi proxy untuk panggilan model. Agen menggunakan langganan dan kunci Anda sendiri."
 
 msgid "No. Your agents stay independent; Paradev is the orchestration layer around them. Each task gets its own Git worktree and branch, persistent sessions, diff review, and automations that run on events or a schedule, without tying the workflow to one provider."
 msgstr "Tidak. Agen Anda tetap independen; Paradev adalah lapisan orkestrasi di sekitarnya. Setiap tugas mendapat Git worktree dan branch sendiri, sesi yang persisten, peninjauan diff, dan otomatisasi yang berjalan berdasarkan peristiwa atau jadwal, tanpa mengikat alur kerja ke satu penyedia."
@@ -13605,6 +13263,9 @@ msgstr "Tidak di kanal"
 msgid "Not included"
 msgstr "Tidak termasuk"
 
+msgid "Not included in your plan"
+msgstr "Tidak termasuk dalam paket Anda"
+
 msgid "Not installed"
 msgstr "Belum terpasang"
 
@@ -13619,9 +13280,6 @@ msgstr "Tidak ada di papan peringkat. Ikut serta dulu."
 
 msgid "Not on this version"
 msgstr "Tidak ada di versi ini"
-
-msgid "Not on your machine. Agents call their providers directly and bill you there. In cloud workspaces, your keys never enter the sandbox. {companyName} adds your sign-in to outgoing requests."
-msgstr "Tidak di mesin Anda. Agen memanggil penyedianya secara langsung dan menagih Anda di sana. Di workspace cloud, kunci Anda tidak pernah masuk ke sandbox. {companyName} menambahkan info masuk Anda ke permintaan keluar."
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Belum menerima event: Microsoft Graph menolak langganan notifikasi. Periksa persetujuan admin aplikasi dan persetujuan protected API, lalu hubungkan ulang."
@@ -13747,9 +13405,6 @@ msgstr "Kini, kami telah menggalang dana dari investor terbaik di Silicon Valley
 
 msgid "Numbered list"
 msgstr "Daftar bernomor"
-
-msgid "OAuth 2.0"
-msgstr "OAuth 2.0"
 
 msgid "OAuth by default, API keys for CI"
 msgstr "OAuth secara bawaan, kunci API untuk CI"
@@ -14336,12 +13991,6 @@ msgstr "Buka Tautan sebagai Panel Baru"
 msgid "Open Link in Default Browser"
 msgstr "Buka Tautan di Browser Bawaan"
 
-msgid "Open links from chat and terminal in the in-app browser instead of your default browser"
-msgstr "Buka tautan dari chat dan terminal di browser dalam aplikasi, bukan di browser bawaan Anda"
-
-msgid "Open links in the in-app browser"
-msgstr "Buka tautan di browser dalam aplikasi"
-
 #. placeholder {0}: port.port
 msgid "Open localhost:{0} in external browser"
 msgstr "Buka localhost:{0} di browser eksternal"
@@ -14377,9 +14026,6 @@ msgstr "Buka Pratinjau"
 msgid "Open project"
 msgstr "Buka proyek"
 
-msgid "Open Project"
-msgstr "Buka Proyek"
-
 msgid "Open Projects"
 msgstr "Buka Proyek"
 
@@ -14389,6 +14035,7 @@ msgstr "Buka pull request"
 msgid "Open Pull Request"
 msgstr "Buka Pull Request"
 
+#. placeholder {0}: currentPr.number
 #. placeholder {0}: pr.number
 #. placeholder {0}: pullRequest.number
 msgid "Open pull request #{0}"
@@ -14547,9 +14194,6 @@ msgstr "Opsional"
 msgid "Optional context shown in the terminal scripts list."
 msgstr "Konteks opsional yang ditampilkan di daftar skrip terminal."
 
-msgid "Optional flags appended after the prompt payload"
-msgstr "Flag opsional yang ditambahkan setelah muatan prompt"
-
 msgid "Optional. Helps us learn what works."
 msgstr "Opsional. Membantu kami mengetahui apa yang berhasil."
 
@@ -14585,6 +14229,9 @@ msgstr "organisasi {id}"
 
 msgid "Organization {id}"
 msgstr "Organisasi {id}"
+
+msgid "Organization already exists"
+msgstr "Organisasi sudah ada"
 
 msgid "Organization created successfully!"
 msgstr "Organisasi berhasil dibuat!"
@@ -14747,6 +14394,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Halaman"
 
+msgid "Page actions"
+msgstr "Tindakan halaman"
+
 msgid "Page by you"
 msgstr "Halaman oleh Anda"
 
@@ -14755,6 +14405,9 @@ msgstr "Konten halaman tidak tersedia"
 
 msgid "Page deleted"
 msgstr "Halaman dihapus"
+
+msgid "Page duplicated"
+msgstr "Halaman diduplikasi"
 
 msgid "Page has no versions"
 msgstr "Halaman tidak punya versi"
@@ -14798,6 +14451,9 @@ msgstr "paginasi"
 msgid "Pagination"
 msgstr "Paginasi"
 
+msgid "Paid plans"
+msgstr "Paket berbayar"
+
 msgid "Paid plans are priced per user per month and billed for each active seat on your team. {planPrices}."
 msgstr "Paket berbayar dihargai per pengguna per bulan dan ditagih untuk setiap kursi aktif di tim Anda. {planPrices}."
 
@@ -14825,13 +14481,13 @@ msgstr "Paradev"
 msgid "Paradev {version}"
 msgstr "Paradev {version}"
 
+msgid "Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
+msgstr "Paradev bertindak di GitHub atas nama Anda. Hubungkan akun GitHub Anda untuk menggabungkan, mengomentari, dan memperbarui pull request."
+
 msgid "Paradev Agent"
 msgstr "Paradev Agent"
 
 msgid "Paradev app"
-msgstr "Aplikasi Paradev"
-
-msgid "Paradev App"
 msgstr "Aplikasi Paradev"
 
 msgid "Paradev Automations"
@@ -14975,6 +14631,9 @@ msgstr "Demo Halaman Paradev"
 msgid "Paradev Plugins"
 msgstr "Plugin Paradev"
 
+msgid "Paradev reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
+msgstr "Paradev membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
+
 msgid "Paradev runs locally on your developers' machines. We don't store your code or AI conversations, and Paradev has completed a SOC 2 Type II audit with an independent auditor. Request the report and review our security documentation at {trustHost}."
 msgstr "Paradev berjalan lokal di mesin developer Anda. Kami tidak menyimpan kode atau percakapan AI Anda, dan Paradev telah menyelesaikan audit SOC 2 Type II dengan auditor independen. Minta laporannya dan tinjau dokumentasi keamanan kami di {trustHost}."
 
@@ -14986,10 +14645,6 @@ msgstr "Tim Paradev"
 
 msgid "Paradev UI"
 msgstr "Paradev UI"
-
-#. placeholder {0}: formatPercent(trackedMemorySharePercent)
-msgid "Paradev uses {0} of system RAM"
-msgstr "Paradev memakai {0} dari RAM sistem"
 
 msgid "Paradev uses the GitHub CLI to clone repos and open pull requests. You can also do this later."
 msgstr "Paradev menggunakan GitHub CLI untuk mengklon repositori dan membuka pull request. Anda juga bisa melakukannya nanti."
@@ -15161,9 +14816,6 @@ msgstr "per pengguna/bulan"
 msgid "Per-repo agent memory"
 msgstr "Memori agen per repositori"
 
-msgid "Percent of total system RAM used by monitored Paradev resources only (not all apps). A high share means Paradev is a major contributor to system memory pressure; a low share means pressure is likely elsewhere."
-msgstr "Persentase total RAM sistem yang dipakai hanya oleh sumber daya Paradev yang dipantau (bukan semua aplikasi). Porsi tinggi berarti Paradev penyumbang utama tekanan memori sistem; porsi rendah berarti tekanannya kemungkinan dari tempat lain."
-
 msgid "Permanently delete \"{projectName}\"?"
 msgstr "Hapus \"{projectName}\" secara permanen?"
 
@@ -15243,8 +14895,8 @@ msgstr "Pilih lokasi proyek"
 msgid "Pick a reason"
 msgstr "Pilih alasan"
 
-msgid "Pick a repository with a plugin marketplace file. Superset syncs its plugins now and each time you sync again."
-msgstr "Pilih repositori dengan file marketplace plugin. Superset menyinkronkan plugin-pluginnya sekarang dan setiap kali Anda menyinkronkan lagi."
+msgid "Pick a repository with a plugin marketplace file. Paradev syncs its plugins now and each time you sync again."
+msgstr "Pilih repositori dengan file marketplace plugin. Paradev menyinkronkan plugin-pluginnya sekarang dan setiap kali Anda menyinkronkan lagi."
 
 msgid "Pick a sound or add your own. Custom audio supports .mp3, .wav, and .ogg."
 msgstr "Pilih suara atau tambahkan milik Anda sendiri. Audio kustom mendukung .mp3, .wav, dan .ogg."
@@ -15252,11 +14904,8 @@ msgstr "Pilih suara atau tambahkan milik Anda sendiri. Audio kustom mendukung .m
 msgid "Pick a theme or follow your system appearance. Browse the <0>marketplace<1/></0> or <2>docs<3/></2>."
 msgstr "Pilih tema atau ikuti tampilan sistem Anda. Jelajahi <0>marketplace<1/></0> atau <2>dokumentasi<3/></2>."
 
-msgid "Pick a workspace"
-msgstr "Pilih workspace"
-
-msgid "Pick a workspace whose agent is waiting for your input, has finished since you last looked, or is still running"
-msgstr "Pilih workspace yang agennya menunggu input Anda, sudah selesai sejak terakhir Anda melihatnya, atau masih berjalan"
+msgid "Pick an environment"
+msgstr "Pilih lingkungan"
 
 msgid "Pick an icon and a color, or upload a custom image. Defaults to the linked GitHub owner's avatar."
 msgstr "Pilih ikon dan warna, atau unggah gambar kustom. Bawaannya memakai avatar pemilik GitHub yang ditautkan."
@@ -15569,9 +15218,6 @@ msgstr "Branch sebelumnya"
 msgid "Previous comment"
 msgstr "Komentar sebelumnya"
 
-msgid "Previous file"
-msgstr "File sebelumnya"
-
 msgid "Previous image"
 msgstr "Gambar sebelumnya"
 
@@ -15705,9 +15351,6 @@ msgstr "Proyek dibuat."
 msgid "Project folder is not on this machine"
 msgstr "Folder proyek tidak ada di mesin ini"
 
-msgid "Project icon"
-msgstr "Ikon proyek"
-
 msgid "Project imported and selected."
 msgstr "Proyek diimpor dan dipilih."
 
@@ -15783,18 +15426,6 @@ msgstr "Prompt"
 
 msgid "Prompt a coding agent to build what you want to see in Paradev. If we like your prompt, we'll run it and merge the result."
 msgstr "Beri prompt ke agen coding untuk membangun apa yang ingin Anda lihat di Paradev. Kalau kami suka prompt Anda, kami akan menjalankannya dan me-merge hasilnya."
-
-msgid "Prompt command is only available for terminal agents."
-msgstr "Perintah prompt hanya tersedia untuk agen terminal."
-
-msgid "Prompt command is required for terminal agents."
-msgstr "Perintah prompt wajib diisi untuk agen terminal."
-
-msgid "Prompt Command Suffix"
-msgstr "Sufiks Perintah Prompt"
-
-msgid "Prompt command suffix is only available for terminal agents."
-msgstr "Sufiks perintah prompt hanya tersedia untuk agen terminal."
 
 msgid "Prompt history"
 msgstr "Riwayat prompt"
@@ -15913,11 +15544,11 @@ msgstr "Pull Request"
 msgid "Pull requests above it will remain open and GitHub will retarget them."
 msgstr "Pull request di atasnya tetap terbuka dan GitHub akan mengubah targetnya."
 
-msgid "Pull requests, comments and pushes from Superset are made as you."
-msgstr "Pull request, komentar, dan push dari Superset dibuat atas nama Anda."
+msgid "Pull requests, comments and pushes from Paradev are made as you."
+msgstr "Pull request, komentar, dan push dari Paradev dibuat atas nama Anda."
 
-msgid "Pull requests, comments and pushes from Superset will no longer be made as you."
-msgstr "Pull request, komentar, dan push dari Superset tidak lagi dibuat atas nama Anda."
+msgid "Pull requests, comments and pushes from Paradev will no longer be made as you."
+msgstr "Pull request, komentar, dan push dari Paradev tidak lagi dibuat atas nama Anda."
 
 msgid "Purple"
 msgstr "Ungu"
@@ -16054,9 +15685,6 @@ msgstr "Radix memutar pembungkus panah tooltip per sisi,"
 
 msgid "Radix Tooltip docs"
 msgstr "Dokumentasi Radix Tooltip"
-
-msgid "RAM Share"
-msgstr "Porsi RAM"
 
 msgid "Random icon"
 msgstr "Ikon acak"
@@ -16257,6 +15885,9 @@ msgstr "Rebase dan merge"
 msgid "Recall what was said in meetings"
 msgstr "Ingat kembali apa yang dibahas dalam rapat"
 
+msgid "Recent"
+msgstr "Terbaru"
+
 msgid "Recent Activity"
 msgstr "Aktivitas Terbaru"
 
@@ -16277,9 +15908,6 @@ msgstr "Baru dihapus"
 
 msgid "Recently Shipped"
 msgstr "Baru Dirilis"
-
-msgid "Recently viewed"
-msgstr "Baru dilihat"
 
 msgid "Recently Viewed"
 msgstr "Baru Dilihat"
@@ -16398,6 +16026,9 @@ msgstr "bergabung kembali dengan {channel}, bersama {others}."
 msgid "rejoined {channel}."
 msgstr "bergabung kembali dengan {channel}."
 
+msgid "Related comparisons"
+msgstr "Perbandingan terkait"
+
 msgid "Related Posts"
 msgstr "Tulisan Terkait"
 
@@ -16427,6 +16058,9 @@ msgstr "Muat ulang dari disk"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Muat ulang Paradev untuk menyegarkan daftar workspace."
+
+msgid "Reload to apply"
+msgstr "Muat ulang untuk menerapkan"
 
 msgid "Reload window"
 msgstr "Muat ulang jendela"
@@ -16669,9 +16303,6 @@ msgstr "Mengganti nama sesi menjadi {trimmed}..."
 msgid "Rendered output: code, sources, citations, context"
 msgstr "Output yang dirender: kode, sumber, kutipan, konteks"
 
-msgid "Rendered Task Prompt"
-msgstr "Prompt Tugas yang Dirender"
-
 msgid "Renderer"
 msgstr "Renderer"
 
@@ -16872,9 +16503,6 @@ msgstr "Reset ke bawaan"
 msgid "Reset to defaults"
 msgstr "Reset ke setelan bawaan"
 
-msgid "Reset to Defaults"
-msgstr "Reset ke Setelan Bawaan"
-
 msgid "Reset worktree location"
 msgstr "Reset lokasi worktree"
 
@@ -16895,9 +16523,6 @@ msgstr "Reset dalam {countdown} · {absolute}"
 
 msgid "Resets now"
 msgstr "Reset sekarang"
-
-msgid "Resident memory used by Paradev and monitored terminal process trees. If this keeps climbing without dropping, a workspace process may be retaining memory. High values increase swap risk and can cause stutter."
-msgstr "Memori residen yang dipakai Paradev dan pohon proses terminal yang dipantau. Kalau angkanya terus naik tanpa turun, sebuah proses workspace mungkin menahan memori. Nilai tinggi menambah risiko swap dan bisa menyebabkan patah-patah."
 
 msgid "Resizable"
 msgstr "Resizable"
@@ -16939,9 +16564,6 @@ msgstr "Selesaikan thread"
 msgid "Resolved"
 msgstr "Terselesaikan"
 
-msgid "Resource consumption"
-msgstr "Konsumsi sumber daya"
-
 msgid "Resource monitor"
 msgstr "Monitor sumber daya"
 
@@ -16968,9 +16590,6 @@ msgstr "Jalankan ulang dan lanjutkan"
 
 msgid "Restart Browser"
 msgstr "Mulai Ulang Browser"
-
-msgid "Restart daemon"
-msgstr "Mulai ulang daemon"
 
 msgid "Restart host service"
 msgstr "Mulai ulang layanan host"
@@ -17159,9 +16778,6 @@ msgstr "Kembali ke dasbor"
 msgid "Returns"
 msgstr "Mengembalikan"
 
-msgid "Reusable commands that launch in terminals. Project setup, run, and teardown commands are configured as lifecycle scripts."
-msgstr "Perintah pakai ulang yang dijalankan di terminal. Perintah setup, run, dan teardown proyek diatur sebagai skrip lifecycle."
-
 msgid "Reusable instructions your agents pick up automatically"
 msgstr "Instruksi pakai ulang yang otomatis diambil agen Anda"
 
@@ -17280,9 +16896,6 @@ msgstr "panel kanan"
 msgid "Right-click here"
 msgstr "Klik kanan di sini"
 
-msgid "Ringtones"
-msgstr "Nada dering"
-
 msgid "Roadmap"
 msgstr "Roadmap"
 
@@ -17311,6 +16924,10 @@ msgstr "Putar"
 msgid "Rotate device"
 msgstr "Putar perangkat"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Rangkuman"
+
 msgid "Roundups"
 msgstr "Rangkuman"
 
@@ -17328,9 +16945,6 @@ msgstr "Tiket rutin tanpa intervensi di tengah tugas"
 
 msgid "Routines"
 msgstr "Rutinitas"
-
-msgid "Routines, ending with Cloud"
-msgstr "Routines, berakhir bersama Cloud"
 
 msgid "Row actions"
 msgstr "Aksi baris"
@@ -17490,9 +17104,6 @@ msgstr "Menjalankan bun test…"
 msgid "Running now"
 msgstr "Berjalan sekarang"
 
-msgid "Running terminal processes continue, but older output may no longer be available after restarting the app."
-msgstr "Proses terminal yang berjalan tetap lanjut, tapi output lama mungkin tidak tersedia lagi setelah aplikasi dimulai ulang."
-
 msgid "Runs a local command on your machine"
 msgstr "Menjalankan perintah lokal di mesin Anda"
 
@@ -17517,14 +17128,11 @@ msgstr "Eksekusi yang memulai workspace-nya dalam 7 hari terakhir"
 msgid "Runs the tests and reviews each pull request you're asked to review."
 msgstr "Menjalankan tes dan meninjau setiap pull request yang diminta untuk Anda review."
 
-msgid "Runs when a new workspace is created."
-msgstr "Dijalankan saat ruang kerja baru dibuat."
-
-msgid "Runs when a workspace is deleted."
-msgstr "Dijalankan saat ruang kerja dihapus."
-
 msgid "Runs while you sleep"
 msgstr "Berjalan saat Anda tidur"
+
+msgid "Same as Switch Workspace"
+msgstr "Sama seperti “Ganti workspace”"
 
 msgid "Same session"
 msgstr "Sesi yang sama"
@@ -17546,9 +17154,6 @@ msgstr "Sandbox berhenti merespons"
 
 msgid "Save"
 msgstr "Simpan"
-
-msgid "Save & create workspace"
-msgstr "Simpan & buat workspace"
 
 msgid "Save a checkpoint to {name}?"
 msgstr "Simpan checkpoint ke {name}?"
@@ -17901,6 +17506,9 @@ msgstr "Cari pemicu..."
 msgid "Search workspaces"
 msgstr "Cari workspace"
 
+msgid "Search workspaces, commands, files…"
+msgstr "Cari workspace, perintah, file…"
+
 msgid "Search workspaces..."
 msgstr "Cari workspace..."
 
@@ -17910,8 +17518,8 @@ msgstr "Cari workspace…"
 msgid "Search your meeting notes"
 msgstr "Cari catatan rapat Anda"
 
-msgid "Search..."
-msgstr "Cari..."
+msgid "Search your workspaces and open one, or start a new workspace"
+msgstr "Cari workspace Anda dan buka salah satunya, atau mulai workspace baru"
 
 msgctxt "shell intent"
 msgid "Searched"
@@ -17929,7 +17537,6 @@ msgstr "Mencari penggunaan Kbd"
 
 #. placeholder {0}: format(new Date(periodEnd), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(periodEnd)
-#. placeholder {0}: formatLocaleDate(new Date(seatPeriodEnd), { month: "long", day: "numeric", year: "numeric" })
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Kursi yang dihapus di tengah siklus tetap aktif hingga {0}."
 
@@ -17953,6 +17560,9 @@ msgstr "Lihat semua statistik →"
 
 msgid "See Changes"
 msgstr "Lihat Perubahan"
+
+msgid "See Conductor for current plans and account access"
+msgstr "Lihat Conductor untuk paket dan akses akun saat ini"
 
 msgid "See how {companyName}'s GitHub stars have grown over time."
 msgstr "Lihat bagaimana star GitHub {companyName} bertumbuh dari waktu ke waktu."
@@ -18039,9 +17649,6 @@ msgstr "Pilih pull request untuk melihat pratinjaunya di sini."
 msgid "Select a team"
 msgstr "Pilih sebuah tim"
 
-msgid "Select a workspace from the sidebar to get started."
-msgstr "Pilih workspace dari sidebar untuk memulai."
-
 msgid "Select agent"
 msgstr "Pilih agen"
 
@@ -18066,14 +17673,8 @@ msgstr "Pilih sebuah organisasi"
 msgid "Select base branch…"
 msgstr "Pilih branch dasar…"
 
-msgid "Select branch..."
-msgstr "Pilih branch..."
-
 msgid "Select channels"
 msgstr "Pilih channel"
-
-msgid "Select Clone Destination"
-msgstr "Pilih Tujuan Clone"
 
 msgid "Select commit range"
 msgstr "Pilih rentang commit"
@@ -18240,6 +17841,13 @@ msgstr "Mengirim…"
 msgid "Sends {0} characters of terminal context (about {1} tokens) to {2}."
 msgstr "Mengirim {0} karakter konteks terminal (sekitar {1} token) ke {2}."
 
+#. placeholder {0}: redirect.host
+msgid "Sends you back to <0>{0}</0>"
+msgstr "Mengarahkan Anda kembali ke <0>{0}</0>"
+
+msgid "Sends you back to <0>an app on this computer</0>"
+msgstr "Mengarahkan Anda kembali ke <0>aplikasi di komputer ini</0>"
+
 msgid "Sensitive"
 msgstr "Sensitif"
 
@@ -18387,9 +17995,6 @@ msgstr "Mengembalikan plugin terpasang ke Tersedia membuat semua orang tetap mem
 msgid "Setting saved"
 msgstr "Pengaturan disimpan"
 
-msgid "Setting up in the background..."
-msgstr "Menyiapkan di latar belakang..."
-
 msgid "Setting up the new workspace…"
 msgstr "Menyiapkan workspace baru…"
 
@@ -18413,9 +18018,6 @@ msgstr "settings.ts"
 
 msgid "Setup"
 msgstr "Setup"
-
-msgid "Setup script"
-msgstr "Skrip setup"
 
 msgid "Setup scripts, once you convert conductor.json"
 msgstr "Skrip setup, setelah Anda mengonversi conductor.json"
@@ -18455,9 +18057,6 @@ msgstr "Bagikan halaman (publik)"
 
 msgid "Share plugins from a GitHub repo. Pin releases with git tags."
 msgstr "Bagikan plugin dari repo GitHub. Sematkan rilis dengan tag git."
-
-msgid "Share this page"
-msgstr "Bagikan halaman ini"
 
 msgid "Share via…"
 msgstr "Bagikan lewat…"
@@ -18655,9 +18254,6 @@ msgstr "Tampilkan item yang terbuka"
 msgid "Show original"
 msgstr "Tampilkan asli"
 
-msgid "Show Preview"
-msgstr "Tampilkan Pratinjau"
-
 msgid "Show pull request list"
 msgstr "Tampilkan daftar pull request"
 
@@ -18675,9 +18271,6 @@ msgstr "Tampilkan agen yang berjalan di bawah tiap workspace di sidebar, lengkap
 
 msgid "Show Scripts Bar"
 msgstr "Tampilkan Bilah Skrip"
-
-msgid "Show sessions"
-msgstr "Tampilkan sesi"
 
 msgid "Show status and send notifications for this agent."
 msgstr "Tampilkan status dan kirim notifikasi untuk agen ini."
@@ -18721,9 +18314,6 @@ msgstr "Ditampilkan secara publik di samping nama Anda."
 #. placeholder {0}: selected.name
 msgid "Shut down {0}"
 msgstr "Matikan {0}"
-
-msgid "Shuts down {shutdownDate}"
-msgstr "Ditutup {shutdownDate}"
 
 msgid "Side by side"
 msgstr "Berdampingan"
@@ -18771,6 +18361,9 @@ msgstr "Masuk ke {label}"
 msgid "Sign in to change your organization's plugins."
 msgstr "Masuk untuk mengubah plugin organisasi Anda."
 
+msgid "Sign in to connect {connectorName}"
+msgstr "Masuk untuk menghubungkan {connectorName}"
+
 msgid "Sign in to continue"
 msgstr "Masuk untuk melanjutkan"
 
@@ -18791,6 +18384,12 @@ msgstr "Masuk untuk melihat halaman ini"
 
 msgid "Sign in with {browserProviderLabel}, then come back here."
 msgstr "Masuk dengan {browserProviderLabel}, lalu kembali ke sini."
+
+msgid "Sign in with another account"
+msgstr "Masuk dengan akun lain"
+
+msgid "Sign in with another account, or ask an admin of the organization to invite you."
+msgstr "Masuk dengan akun lain, atau minta admin organisasi untuk mengundang Anda."
 
 msgid "Sign in with email"
 msgstr "Masuk dengan email"
@@ -18878,6 +18477,9 @@ msgstr "Sedang masuk..."
 msgid "Signing in…"
 msgstr "Sedang masuk…"
 
+msgid "Signing out…"
+msgstr "Sedang keluar…"
+
 msgid "Signup works. The welcome screen loads and the console is clean."
 msgstr "Pendaftaran berhasil. Layar sambutan termuat dan konsol bersih."
 
@@ -18961,9 +18563,6 @@ msgstr "Lewati & simpan"
 
 msgid "Skip All"
 msgstr "Lewati Semua"
-
-msgid "Skip for now"
-msgstr "Lewati dulu"
 
 msgid "Skipped"
 msgstr "Dilewati"
@@ -19057,9 +18656,6 @@ msgstr "Sebagian model dihitung dengan tarif cadangan"
 #. placeholder {0}: error.message
 msgid "Some repositories could not be loaded: {0}"
 msgstr "Sebagian repositori tidak bisa dimuat: {0}"
-
-msgid "Some sessions could not be killed"
-msgstr "Sebagian sesi tidak bisa dimatikan"
 
 msgid "Some themes were skipped"
 msgstr "Sebagian tema dilewati"
@@ -19508,10 +19104,6 @@ msgstr "Tertinggal"
 msgid "Steer"
 msgstr "Arahkan"
 
-#. placeholder {0}: step === "workspace" ? 1 : 2
-msgid "Step {0} of 2"
-msgstr "Langkah {0} dari 2"
-
 msgid "Step 1 of 2"
 msgstr "Langkah 1 dari 2"
 
@@ -19679,9 +19271,6 @@ msgstr "Saran"
 msgid "suite for agent UIs, and shared app components. Click any import path to copy it."
 msgstr "untuk UI agen, dan komponen aplikasi bersama. Klik path impor mana pun untuk menyalinnya."
 
-msgid "Sum of CPU used by Paradev and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
-msgstr "Jumlah CPU yang dipakai Paradev dan pohon proses terminal yang dipantau. Di atas 100% berarti beberapa inti CPU sedang sibuk. Nilai tinggi yang bertahan lama biasanya membuat UI terasa lambat dan baterai lebih boros."
-
 msgid "Summarize the changes in this workspace"
 msgstr "Rangkum perubahan di workspace ini"
 
@@ -19703,9 +19292,6 @@ msgstr "digantikan"
 msgid "superset"
 msgstr "superset"
 
-msgid "Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests."
-msgstr "Superset bertindak di GitHub atas nama Anda. Hubungkan akun GitHub Anda untuk menggabungkan, mengomentari, dan memperbarui pull request."
-
 msgid "superset browser cdp prints an endpoint for that pane only. Point Playwright or browser-use at it."
 msgstr "superset browser cdp mencetak endpoint hanya untuk panel itu. Arahkan Playwright atau browser-use ke sana."
 
@@ -19714,9 +19300,6 @@ msgstr "Superset kini menjadi Paradev. Oh ya, kami juga meraih pendanaan awal se
 
 msgid "Superset Mobile launches on iPhone"
 msgstr "Superset Mobile hadir di iPhone"
-
-msgid "Superset reads it with your connected GitHub account. Connect one in <0>Settings › Integrations</0> if you have not yet."
-msgstr "Superset membacanya dengan akun GitHub yang terhubung. Jika belum, hubungkan akun di <0>Pengaturan › Integrasi</0>."
 
 msgid "Supervised"
 msgstr "Diawasi"
@@ -19771,6 +19354,9 @@ msgstr "Ganti sesi masuk"
 
 msgid "Switch sign-in…"
 msgstr "Ganti sesi masuk…"
+
+msgid "Switch to {companyName}"
+msgstr "Beralih ke {companyName}"
 
 msgid "Switch to {planName}"
 msgstr "Pindah ke {planName}"
@@ -19834,6 +19420,15 @@ msgstr "Beralih ke Workspace 8"
 
 msgid "Switch to Workspace 9"
 msgstr "Beralih ke Workspace 9"
+
+msgid "Switch to…"
+msgstr "Beralih ke…"
+
+msgid "Switch workspace"
+msgstr "Ganti workspace"
+
+msgid "Switch Workspace"
+msgstr "Ganti workspace"
 
 #. placeholder {0}: format(new Date(switchAt), "MMMM d, yyyy")
 #. placeholder {0}: formatDate(scheduledAt)
@@ -19982,9 +19577,6 @@ msgstr "Tugas terhenti"
 msgid "Task key"
 msgstr "Kunci tugas"
 
-msgid "Task Launch"
-msgstr "Peluncuran Tugas"
-
 msgid "Task layout"
 msgstr "Tata letak tugas"
 
@@ -19993,12 +19585,6 @@ msgstr "Manajemen Tugas"
 
 msgid "Task not found"
 msgstr "Tugas tidak ditemukan"
-
-msgid "Task Prompt Template"
-msgstr "Templat Prompt Tugas"
-
-msgid "Task prompt template is required."
-msgstr "Templat prompt tugas wajib diisi."
 
 msgid "Task synced to Linear"
 msgstr "Tugas disinkronkan ke Linear"
@@ -20033,9 +19619,6 @@ msgstr "Tim"
 msgid "Team activity feed"
 msgstr "Feed aktivitas tim"
 
-msgid "Team and Ultra plans"
-msgstr "Paket Team dan Ultra"
-
 msgid "Team collaboration"
 msgstr "Kolaborasi tim"
 
@@ -20044,9 +19627,6 @@ msgstr "Kolaborasi Tim"
 
 msgid "Team members"
 msgstr "Anggota tim"
-
-msgid "Team Members"
-msgstr "Anggota Tim"
 
 msgid "Team not found in this organization"
 msgstr "Tim tidak ditemukan di organisasi ini"
@@ -20062,9 +19642,6 @@ msgstr "Tim"
 
 msgid "Teardown"
 msgstr "Teardown"
-
-msgid "Teardown commands (optional)"
-msgstr "Perintah teardown (opsional)"
 
 msgid "Teardown exited with code {exitCode}"
 msgstr "Teardown keluar dengan kode {exitCode}"
@@ -20105,9 +19682,6 @@ msgstr "Koneksi terminal: {label}"
 msgid "Terminal daemon"
 msgstr "Daemon terminal"
 
-msgid "Terminal file links"
-msgstr "Tautan file terminal"
-
 msgid "Terminal font size"
 msgstr "Ukuran font terminal"
 
@@ -20122,9 +19696,6 @@ msgstr "Terminal dihapus"
 
 msgid "Terminal scripts"
 msgstr "Skrip terminal"
-
-msgid "Terminal Scripts"
-msgstr "Skrip Terminal"
 
 msgid "Terminal session creation failed."
 msgstr "Pembuatan sesi terminal gagal."
@@ -20195,8 +19766,11 @@ msgstr "Akun itu sudah tidak terhubung — pilih yang lain."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Sesi agen itu belum punya percakapan untuk dibuka. Sudah dimulai tetapi belum pernah diberi perintah."
 
-msgid "That computer can't be reached"
-msgstr "Komputer itu tidak dapat dijangkau"
+msgid "that device"
+msgstr "perangkat itu"
+
+msgid "That device can't be reached"
+msgstr "Perangkat itu tidak dapat dijangkau"
 
 msgid "That endpoint could not be resolved."
 msgstr "Endpoint itu tidak dapat ditemukan."
@@ -20391,9 +19965,6 @@ msgstr "Tim-tim pertama, yang berukuran kecil, merilis kode yang mayoritas ditul
 msgid "The folder that holds the marketplace file, if it is not at the root."
 msgstr "Folder yang berisi file marketplace, jika tidak berada di root."
 
-msgid "The following folders are not git repositories. Would you like to initialize them?"
-msgstr "Folder berikut bukan repositori git. Ingin menginisialisasinya?"
-
 msgid "The forecast"
 msgstr "Prakiraan"
 
@@ -20494,8 +20065,14 @@ msgstr "Waktu pemindahan habis."
 msgid "The move was cancelled."
 msgstr "Pemindahan dibatalkan."
 
+msgid "The moved workspace shows on Home when it is ready."
+msgstr "Workspace yang dipindahkan akan muncul di Beranda saat siap."
+
 msgid "The name of your organization or team"
 msgstr "Nama organisasi atau tim Anda"
+
+msgid "The name shows in the sidebar."
+msgstr "Nama ini ditampilkan di bilah samping."
 
 msgid "The network connection changed"
 msgstr "Koneksi jaringan berubah"
@@ -20506,14 +20083,17 @@ msgstr "Workspace open source untuk Claude Code, Codex, dan agen coding apa pun.
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Workspace open source untuk Claude Code, Codex, OpenCode, dan agen coding apa pun. Jalankan tugas secara paralel di branch terpisah, dan tinjau semuanya di satu tempat."
 
-msgid "The other side of the move runs an older version. Restart a cloud workspace or update the computer's host, then try again."
-msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host komputer, lalu coba lagi."
+msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
+msgstr "Sisi lain pemindahan menjalankan versi lama. Mulai ulang workspace cloud atau perbarui host perangkat, lalu coba lagi."
 
 msgid "The overnight shift"
 msgstr "Shift malam"
 
 msgid "The owner's account no longer exists."
 msgstr "Akun pemiliknya sudah tidak ada."
+
+msgid "The page and every version of it will be deleted."
+msgstr "Halaman dan semua versinya akan dihapus."
 
 msgid "The page and its content are removed. Anyone with the link loses access."
 msgstr "Halaman beserta isinya dihapus. Siapa pun yang punya tautannya kehilangan akses."
@@ -20632,9 +20212,6 @@ msgstr "host tujuan"
 msgid "The team"
 msgstr "Tim"
 
-msgid "The team announced the news."
-msgstr "Tim mengumumkan kabar ini."
-
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "Undangan tim ini sudah kedaluwarsa atau tidak ada. Minta tautan baru dari pemilik tim atau periksa URL-nya sudah benar."
 
@@ -20688,9 +20265,6 @@ msgstr "Tema"
 
 msgid "These are linked by base branch, so each merges into the one below it. A GitHub stack merges them in one step."
 msgstr "Ini terhubung melalui branch dasar, jadi masing-masing di-merge ke yang di bawahnya. Stack GitHub me-merge semuanya dalam satu langkah."
-
-msgid "These commands run automatically when a workspace is created. <0>Read our docs<1/></0>"
-msgstr "Perintah ini berjalan otomatis saat workspace dibuat. <0>Baca dokumentasi kami<1/></0>"
 
 msgid "These folders still have your files, but they did not come over to the new Paradev on their own."
 msgstr "Folder ini masih berisi file Anda, tetapi tidak otomatis dipindahkan ke Paradev yang baru."
@@ -20762,6 +20336,9 @@ msgstr "Otomatisasi ini diarsipkan. Pulihkan terlebih dahulu."
 msgid "This automation is in another organization"
 msgstr "Otomatisasi ini berada di organisasi lain"
 
+msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
+msgstr "Browser ini belum masuk ke Paradev. Masuk untuk melanjutkan ke {connectorName}."
+
 msgid "This cannot be undone."
 msgstr "Ini tidak bisa dibatalkan."
 
@@ -20807,20 +20384,8 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
-msgid "this computer"
-msgstr "komputer ini"
-
-msgid "This computer"
-msgstr "Komputer ini"
-
-msgid "This computer's host is not running"
-msgstr "Host komputer ini tidak berjalan"
-
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
-
-msgid "This deletes the saved scrollback used for reboot/crash recovery."
-msgstr "Ini menghapus scrollback tersimpan yang dipakai untuk pemulihan setelah reboot/crash."
 
 msgid "This deletes the session's folder and everything in it from disk."
 msgstr "Ini menghapus folder sesi beserta seluruh isinya dari disk."
@@ -20836,6 +20401,9 @@ msgstr "perangkat ini ({id})"
 
 msgid "This device isn't connected to the Paradev relay, so automation runs will be skipped."
 msgstr "Perangkat ini tidak terhubung ke relay Paradev, jadi run otomatisasi akan dilewati."
+
+msgid "This device's host is not running"
+msgstr "Host perangkat ini tidak berjalan"
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
@@ -21108,9 +20676,6 @@ msgstr "Ini akan mengubah URL publik organisasi Anda. Pastikan memperbarui bookm
 msgid "This will delete <0>{0}</0> and remove all of its members. This can't be undone."
 msgstr "Ini akan menghapus <0>{0}</0> dan mengeluarkan semua anggotanya. Ini tidak bisa dibatalkan."
 
-msgid "This will kill all running sessions and restart the terminal daemon. The app will restart terminals with a fresh daemon."
-msgstr "Ini akan mematikan semua sesi yang berjalan dan memulai ulang daemon terminal. Aplikasi akan menjalankan ulang terminal dengan daemon yang baru."
-
 msgid "This will merge #{prNumber} into {base} using a merge commit."
 msgstr "Ini akan me-merge #{prNumber} ke {base} menggunakan commit merge."
 
@@ -21138,20 +20703,8 @@ msgstr "Ini akan menghapus koneksi antara organisasi Anda dan Slack. Anda bisa m
 msgid "This will revert all changes to this file. This action cannot be undone."
 msgstr "Ini akan mengembalikan semua perubahan pada file ini. Tindakan ini tidak bisa dibatalkan."
 
-msgid "This will revert all unstaged modifications and delete untracked files. This action cannot be undone."
-msgstr "Ini akan membatalkan semua perubahan yang belum di-stage dan menghapus file yang tidak dilacak. Tindakan ini tidak dapat dibatalkan."
-
 msgid "This will revert all unstaged modifications and delete untracked files. This cannot be undone."
 msgstr "Ini akan mengembalikan semua modifikasi yang belum di-stage dan menghapus file yang belum dilacak. Ini tidak bisa dibatalkan."
-
-msgid "This will terminate all persistent terminal processes (builds, tests, agents, etc.)."
-msgstr "Ini akan menghentikan semua proses terminal persisten (build, tes, agen, dll.)."
-
-msgid "This will terminate the session and its underlying process."
-msgstr "Ini akan menghentikan sesi beserta proses di baliknya."
-
-msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This action cannot be undone."
-msgstr "Ini akan mengeluarkan semua perubahan dari staging dan membatalkannya. File baru yang di-stage akan dihapus. Tindakan ini tidak dapat dibatalkan."
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. File baru yang di-stage akan dihapus. Ini tidak bisa dibatalkan."
@@ -21179,6 +20732,9 @@ msgstr "Host workspace ini sedang offline"
 
 msgid "This workspace's host runs an older host service than this app supports. Update it to reconnect; the workspace and its files are untouched."
 msgstr "Host workspace ini menjalankan layanan host yang lebih lama dari yang didukung aplikasi ini. Perbarui untuk tersambung kembali; workspace dan berkasnya tidak tersentuh."
+
+msgid "This workspace's project is not on GitHub."
+msgstr "Proyek workspace ini tidak ada di GitHub."
 
 msgid "Thorough reasoning effort"
 msgstr "Upaya penalaran menyeluruh"
@@ -21573,6 +21129,10 @@ msgstr "ubah temuan onboarding menjadi halaman"
 msgid "Turned off because its files changed"
 msgstr "Dimatikan karena file-nya berubah"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
+
 msgid "Two Hands"
 msgstr "Dua tangan"
 
@@ -21787,9 +21347,6 @@ msgstr "Proyek Tidak Diketahui"
 msgid "Unknown user"
 msgstr "Pengguna tidak diketahui"
 
-msgid "Unknown variables: {unknownVariables}"
-msgstr "Variabel tidak dikenal: {unknownVariables}"
-
 msgid "Unknown Welder"
 msgstr "Tukang Las Tak Dikenal"
 
@@ -21830,8 +21387,8 @@ msgstr "Publikasi dibatalkan"
 msgid "Unpushed"
 msgstr "Belum di-push"
 
-msgid "Unpushed Cloud work. Push before {shutdownDate}"
-msgstr "Pekerjaan Cloud yang belum di-push. Push sebelum {shutdownDate}"
+msgid "Unpushed cloud changes. Save and push the work you want to move."
+msgstr "Perubahan cloud yang belum di-push. Simpan dan push pekerjaan yang ingin dipindahkan."
 
 msgid "Unranked"
 msgstr "Belum berperingkat"
@@ -21941,6 +21498,9 @@ msgstr "Perbarui di Google Play"
 msgid "Update Paradev from Google Play to continue."
 msgstr "Perbarui Paradev dari Google Play untuk melanjutkan."
 
+msgid "Update Paradev on {sourceName} to move its workspaces from this phone."
+msgstr "Perbarui Paradev di {sourceName} untuk memindahkan workspace-nya dari ponsel ini."
+
 msgid "Update Paradev on that device. In-app updates require a supported standalone install and a released app version."
 msgstr "Perbarui Paradev di perangkat tersebut. Pembaruan dari aplikasi memerlukan instalasi mandiri yang didukung dan versi aplikasi yang telah dirilis."
 
@@ -22007,15 +21567,14 @@ msgstr "Upgrade"
 msgid "Upgrade a dependency and fix what breaks…"
 msgstr "Upgrade satu dependensi dan perbaiki yang rusak…"
 
-#. placeholder {0}: webHost()
-msgid "Upgrade on {0}"
-msgstr "Upgrade di {0}"
-
 msgid "Upgrade to {planName}"
 msgstr "Tingkatkan ke {planName}"
 
 msgid "Upgrade to Pro"
 msgstr "Upgrade ke Pro"
+
+msgid "Upgrade to Pro at {upgradeHost}"
+msgstr "Tingkatkan ke Pro di {upgradeHost}"
 
 msgid "Upgrade to Team"
 msgstr "Upgrade ke Team"
@@ -22084,6 +21643,12 @@ msgstr "Pakai “{0}”"
 msgid "Use a workspace-relative path or an absolute folder."
 msgstr "Pakai path relatif terhadap workspace atau folder absolut."
 
+msgid "Use another account to connect {connectorName}"
+msgstr "Gunakan akun lain untuk menghubungkan {connectorName}"
+
+msgid "Use another account to continue"
+msgstr "Gunakan akun lain untuk melanjutkan"
+
 msgid "Use another port"
 msgstr "Gunakan port lain"
 
@@ -22138,6 +21703,12 @@ msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Pakai menu tray Paradev > Host Service > Restart, lalu coba lagi."
 
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Gunakan halaman Workspace Baru yang didesain ulang: kotak prompt di tengah, dengan pemilih proyek dan branch di atasnya."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Gunakan tata letak jendela yang didesain ulang: bilah ikon, tab di bilah judul, dan panel sebagai kartu."
+
 msgid "Use this account"
 msgstr "Gunakan akun ini"
 
@@ -22146,9 +21717,6 @@ msgstr "Pakai folder ini"
 
 msgid "Use this repo"
 msgstr "Pakai repo ini"
-
-msgid "Use this to fix terminals that are stuck or unresponsive."
-msgstr "Pakai ini untuk memperbaiki terminal yang macet atau tidak merespons."
 
 msgid "Use this when calling the Paradev API."
 msgstr "Pakai ini saat memanggil API Paradev."
@@ -22489,9 +22057,6 @@ msgstr "Kami tidak bisa menagih metode pembayaran organisasi ini. Minta pemilik 
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Kami tidak bisa menagih metode pembayaran Anda. Perbarui untuk mempertahankan paket ini."
 
-msgid "We couldn't detect a package manager or environment config."
-msgstr "Kami tidak menemukan package manager atau konfigurasi environment."
-
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Kami tidak dapat menghubungi {appName} untuk melihat apakah perangkat ini online. Periksa koneksi Anda dan coba lagi."
 
@@ -22542,9 +22107,6 @@ msgstr "Kami merekrut engineer di San Francisco. Mari bangun alat yang digunakan
 
 msgid "We're hiring in San Francisco"
 msgstr "Kami sedang merekrut di San Francisco"
-
-msgid "We're rebuilding this feature. Check back soon."
-msgstr "Kami sedang membangun ulang fitur ini. Cek lagi nanti."
 
 msgid "Web Fetch"
 msgstr "Pengambilan web"
@@ -22892,10 +22454,6 @@ msgstr "Aksi workspace"
 msgid "Workspace activity"
 msgstr "Aktivitas workspace"
 
-#. placeholder {0}: currentPr.number
-msgid "Workspace activity, pull request #{0}"
-msgstr "Aktivitas workspace, pull request #{0}"
-
 msgid "Workspace agents"
 msgstr "Agen workspace"
 
@@ -22919,12 +22477,6 @@ msgstr "Nama workspace"
 
 msgid "Workspace not found"
 msgstr "Workspace tidak ditemukan"
-
-msgid "Workspace opened, but setup command failed."
-msgstr "Workspace terbuka, tapi perintah setup gagal."
-
-msgid "Workspace opened, but terminal failed to start."
-msgstr "Workspace terbuka, tapi terminal gagal dijalankan."
 
 msgid "Workspace path is not available"
 msgstr "Path workspace tidak tersedia"
@@ -22955,9 +22507,6 @@ msgstr "Worktree workspace tidak tersedia"
 
 msgid "Workspaces"
 msgstr "Workspace"
-
-msgid "Workspaces are isolated task environments backed by git worktrees."
-msgstr "Workspace adalah lingkungan tugas terisolasi yang didukung git worktree."
 
 msgid "Workspaces started from this environment will stop receiving it."
 msgstr "Workspace yang dimulai dari environment ini tidak akan menerimanya lagi."
@@ -23140,6 +22689,9 @@ msgstr "Anda sedang offline"
 msgid "You are on the <0>{currentPlanLabel} plan</0>. If you have any questions or would like further support with your plan, <1>contact us<2/></1>."
 msgstr "Anda memakai <0>paket {currentPlanLabel}</0>. Kalau ada pertanyaan atau butuh bantuan lebih lanjut soal paket Anda, <1>hubungi kami<2/></1>."
 
+msgid "You are signed in as {email}. This account is not a member of the organization this link is for."
+msgstr "Anda masuk sebagai {email}. Akun ini bukan anggota organisasi untuk tautan ini."
+
 msgid "You are the only owner of an organization that has other members. Transfer ownership or delete the organization first."
 msgstr "Anda satu-satunya pemilik organisasi yang punya anggota lain. Alihkan kepemilikan atau hapus organisasinya dulu."
 
@@ -23168,9 +22720,6 @@ msgstr "Anda hanya dapat mengedit pesan Anda sendiri"
 msgid "You can only share with people and teams in this organization"
 msgstr "Anda hanya dapat berbagi dengan orang dan tim di organisasi ini"
 
-msgid "You can read and export, but not run agents."
-msgstr "Anda bisa membaca dan mengekspor, tetapi tidak bisa menjalankan agen."
-
 msgid "You can restore it from Settings → Projects for 30 days. The repository folder is never deleted."
 msgstr "Anda dapat memulihkannya dari Pengaturan → Proyek selama 30 hari. Folder repositori tidak pernah dihapus."
 
@@ -23183,12 +22732,8 @@ msgstr "Anda dapat melihat halaman ini tetapi tidak dapat mengubahnya"
 msgid "You can view this page but not comment on it"
 msgstr "Anda dapat melihat halaman ini tetapi tidak dapat berkomentar"
 
-#. placeholder {0}: webHost()
-msgid "You can't change this subscription in the app. Your organization's plan is managed by its owner at {0}."
-msgstr "Anda tidak bisa mengubah langganan ini di aplikasi. Paket organisasi Anda dikelola oleh pemiliknya di {0}."
-
-msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
-msgstr "Tindakan ini tidak bisa dibatalkan. Panel terminal akan menampilkan \"Process exited\" dan bisa dijalankan ulang."
+msgid "You cannot leave the organization as the only owner"
+msgstr "Anda tidak dapat keluar dari organisasi sebagai satu-satunya pemilik"
 
 msgid "You control the access"
 msgstr "Anda mengendalikan akses"
@@ -23225,6 +22770,9 @@ msgstr "Anda harus menjadi bagian dari organisasi untuk menghubungkan akun."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Anda harus menjadi bagian dari sebuah organisasi untuk memakai integrasi."
+
+msgid "You should be a member of at least one team"
+msgstr "Anda harus menjadi anggota setidaknya satu tim"
 
 #. placeholder {0}: Math.floor(seconds / 60)
 #. placeholder {1}: seconds % 60
@@ -23295,6 +22843,9 @@ msgstr "Akun Anda dinonaktifkan dan akan segera dihapus permanen. Aktifkan kemba
 
 msgid "Your account is managed by your organization. Contact your admin to create a new organization."
 msgstr "Akun Anda dikelola oleh organisasi Anda. Hubungi admin Anda untuk membuat organisasi baru."
+
+msgid "Your account is not a member of the organization this link is for."
+msgstr "Akun Anda bukan anggota organisasi untuk tautan ini."
 
 msgid "Your agent can open any page and work through it with superset browser commands. It uses the pane you are watching, so you see every step."
 msgstr "Agen Anda bisa membuka halaman apa pun dan menjelajahinya dengan perintah superset browser. Agen memakai panel yang sedang Anda lihat, jadi Anda melihat setiap langkah."
@@ -23377,14 +22928,26 @@ msgstr "Organisasi Anda memasang {plugin} untuk Anda, jadi plugin ini tidak dapa
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Organisasi Anda memasang plugin ini untuk Anda. Anda dapat menonaktifkannya, tetapi tidak dapat menghapusnya."
 
+msgid "Your organization reached its cloud usage limit."
+msgstr "Organisasi Anda telah mencapai batas penggunaan cloud."
+
 msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
 msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini akan berhenti dalam beberapa menit kecuali batasnya dinaikkan."
+
+msgid "Your organization reached its environment limit."
+msgstr "Organisasi Anda telah mencapai batas lingkungan."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
 
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue to {connectorName}."
+msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan ke {connectorName}."
+
+msgid "Your Paradev session in this browser has expired. Sign in again to continue."
+msgstr "Sesi Paradev Anda di browser ini telah kedaluwarsa. Masuk lagi untuk melanjutkan."
 
 msgid "Your plan does not include cloud environments."
 msgstr "Paket Anda tidak mencakup lingkungan cloud."
@@ -23444,6 +23007,9 @@ msgstr "Proyek dan workspace v1 Anda sedang dipindahkan ke Paradev yang baru. Se
 
 msgid "Your version: {currentVersion}"
 msgstr "Versi Anda: {currentVersion}"
+
+msgid "Your work, including uncommitted changes, is pushed to a new branch on the remote. A cloud workspace starts from that branch in the environment you pick, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay here."
+msgstr "Pekerjaan Anda, termasuk perubahan yang belum di-commit, didorong ke branch baru di remote. Workspace cloud dimulai dari branch tersebut di lingkungan yang Anda pilih, dan setiap chat Claude berlanjut di sana. Agen yang sedang bekerja dihentikan terlebih dahulu. Terminal dan chat lainnya tetap di sini."
 
 msgid "Your workspace admin turns on device code sign-in for Codex."
 msgstr "Admin workspace Anda mengaktifkan masuk dengan kode perangkat untuk Codex."

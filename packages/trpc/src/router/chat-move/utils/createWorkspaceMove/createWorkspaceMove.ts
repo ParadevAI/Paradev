@@ -13,6 +13,7 @@ import {
 	type SelectChatMove,
 	type SelectWorkspaceMove,
 } from "../../../../lib/moves";
+import { isLiveStatus } from "../../../cloud-workspace/live";
 import { findMovableChat, lastTurnSeq } from "../findMovableChat";
 
 type Owner = { organizationId: string; userId: string };
@@ -175,8 +176,11 @@ export async function retryChatMove(
 			columns: { status: true },
 		});
 		if (
-			destination?.status !== "ready" &&
-			destination?.status !== "provisioning"
+			!(
+				destination &&
+				(isLiveStatus(destination.status) ||
+					destination.status === "provisioning")
+			)
 		) {
 			throw new TRPCError({
 				code: "PRECONDITION_FAILED",

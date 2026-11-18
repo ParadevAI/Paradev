@@ -26,7 +26,7 @@
 		"@formatjs/intl-locale": "5.3.10",
 		"@formatjs/intl-pluralrules": "6.3.13",
 		"@formatjs/intl-relativetimeformat": "12.3.15",
-		"@legendapp/list": "3.0.3",
+		"@legendapp/list": "3.7.2",
 		"@lingui/core": "6.12.0",
 		"@lingui/react": "6.12.0",
 		"@posthog/react-native-plugin": "2.4.0",
@@ -121,7 +121,7 @@
 		"react": "19.3.0",
 		"react-dom": "19.3.0",
 		"react-native": "0.88.1",
-		"react-native-enriched-markdown": "0.6.0",
+		"react-native-enriched-markdown": "1.2.0",
 		"react-native-gesture-handler": "3.3.0",
 		"react-native-get-random-values": "1.11.0",
 		"react-native-reanimated": "4.7.1",
@@ -168,5 +168,9 @@
 		"storybook": "10.6.2",
 		"typescript": "7.0.2"
 	},
-	"private": true
+	"private": true,
+	"enriched-markdown": {
+		"enableCodeHighlight": false,
+		"enableMath": true
+	}
 }

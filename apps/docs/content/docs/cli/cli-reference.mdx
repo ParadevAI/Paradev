@@ -1,5 +1,6 @@
 ---
 title: Paradev CLI Reference
+seoTitle: "Paradev CLI Reference (formerly Superset CLI)"
 description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
@@ -2134,6 +2135,21 @@ Page metadata including `id`, `title`, `version`, and `url`, plus `unanchored`,
 >
 Delete a page and every version. Interactive terminals ask for confirmation
 unless `--yes` is passed; non-interactive input does not prompt.
+</Command>
+
+<Command
+	name="superset pages duplicate <page>"
+	args={[
+		{ name: "page", required: true, description: "Page ID or slug." },
+	]}
+	options={[
+		{ flag: "--title <title>", description: 'Title of the copy. Defaults to "<title> (copy)".' },
+	]}
+	output="{ id, slug, url, title, visibility }"
+>
+Copy the version a page currently serves into a new page that only you can
+see. The copy starts at version 1 and does not carry comments, shares, or
+version history.
 </Command>
 
 <Command

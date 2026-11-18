@@ -283,7 +283,7 @@ async function start(args: StartCloudWorkspaceInput) {
 		await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
-			to: "deleted",
+			to: "archived",
 		});
 		throw error;
 	}

@@ -67,8 +67,8 @@ export function useDashboardNavigation() {
 				: navigate({ to: "/channels/threads" });
 		},
 
-		isWorkspacesOpen: !!matchRoute({ to: "/v2-workspaces" }),
-		openWorkspaces: () => navigate({ to: "/v2-workspaces" }),
+		isWorkspacesOpen: !!matchRoute({ to: "/workspaces" }),
+		openWorkspaces: () => navigate({ to: "/workspaces" }),
 
 		isAutomationsOpen: !!matchRoute({ to: "/automations", fuzzy: true }),
 		openAutomations,

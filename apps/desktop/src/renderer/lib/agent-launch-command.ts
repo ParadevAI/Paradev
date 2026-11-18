@@ -14,7 +14,7 @@ export interface AgentLaunchConfig {
 	env?: Record<string, string>;
 }
 
-export interface AgentCommandPatch {
+interface AgentCommandPatch {
 	command: string;
 	args: string[];
 	env: Record<string, string>;

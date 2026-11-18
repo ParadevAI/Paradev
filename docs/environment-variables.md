@@ -142,8 +142,10 @@ The web proxy reads this optional string directly from `process.env` so its
 auth gate does not load the full app environment schema. The API reads its
 declared server environment value.
 Production API builds and runtime now pass the optional production
-`DOMAIN_MOVE_ENABLED` secret. Production web deliberately does not pass it, so
-desktop sign-in can roll out before existing web pages move. No secret is set
+`DOMAIN_MOVE_ENABLED` secret, and production web passes the same secret. Each
+surface has its own PostHog flag, so they roll out separately: desktop sign-in
+reads `web-domain-move` and old-app pages read `web-pages-domain-move`. A
+missing `web-pages-domain-move` flag retains the old pages. No secret is set
 by merging the wiring. Stage and final artifact preparation explicitly pass
 `false`. See
 [the cutover handoff](paradev-staging.md#inert-domain-cutover-preparation) before
@@ -162,3 +164,15 @@ still receives its existing schema-validated `NEXT_PUBLIC_WEB_URL` at build
 and runtime, so no additional app schema or local environment value is needed.
 Do not change the shared `NEXT_PUBLIC_WEB_URL` secret to move marketing: the
 legacy API, web, admin, billing and auth returns still depend on it.
+
+## Desktop destination override
+
+The production-only GitHub environment secrets `DESKTOP_API_URL` and
+`DESKTOP_WEB_URL` override `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WEB_URL` only
+in the desktop build jobs (`build-desktop.yml`, stable and canary). An absent
+or empty override retains the shared secret. They take effect in the next
+desktop build; released builds do not change. To roll back, remove them and
+build again.
+
+Do not change the shared secrets to move desktop: the legacy API uses
+`NEXT_PUBLIC_API_URL` as its token issuer and audience.
