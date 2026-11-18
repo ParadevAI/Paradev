@@ -1106,6 +1106,9 @@ msgstr "{label} sẽ trở lại trạng thái chưa thiết lập. Không có g
 msgid "{label} is set to manual"
 msgstr "{label} đã chuyển sang đăng nhập thủ công"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Hạn mức đã dùng của {label}: {summary}. Mở cài đặt mức dùng"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "Kiểm tra ban đêm"
 msgid "No"
 msgstr "Không"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Chưa có lần đăng nhập {0} nào trên host này. Hãy đăng nhập và mức sử dụng sẽ hiện ở đây."
 
@@ -18191,9 +18194,6 @@ msgstr "Chia sẻ."
 msgid "Shared"
 msgstr "Dùng chung"
 
-msgid "Shared across sessions using this login."
-msgstr "Dùng chung giữa các phiên sử dụng tài khoản đăng nhập này."
-
 msgid "Shared app components"
 msgstr "Component dùng chung của ứng dụng"
 
@@ -18258,9 +18258,6 @@ msgstr "Hiện hộp thoại xác nhận khi thoát ứng dụng"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Hiển thị micrô trong ô soạn chat. Giọng nói được ChatGPT chuyển thành văn bản khi Codex đã đăng nhập vào đó, nếu không thì trên máy Mac của bạn khi có thể, và nếu không nữa thì trên máy chủ của Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Hiện nút Mức sử dụng trong thanh bên trang chủ, bên dưới Pull request"
-
 msgid "Show all {count}"
 msgstr "Hiện tất cả {count}"
 
@@ -18324,6 +18321,9 @@ msgstr "Hiện ít tệp hơn"
 msgid "Show file tree"
 msgstr "Hiện cây tệp"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Hiện ở cuối thanh bên mỗi nhà cung cấp mô hình đã dùng bao nhiêu hạn mức"
+
 msgid "Show in bar"
 msgstr "Hiện trên thanh"
 
@@ -18381,6 +18381,9 @@ msgstr "Hiện danh sách pull request"
 msgid "Show pull request preview"
 msgstr "Hiện xem trước pull request"
 
+msgid "Show quota rings on sidebar"
+msgstr "Hiện vòng hạn mức trên thanh bên"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Hiện các mục đã xử lý ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "Hiển thị payload kích hoạt"
 
 msgid "Show translation"
 msgstr "Xem bản dịch"
-
-msgid "Show usage tab on sidebar"
-msgstr "Hiển thị thẻ mức sử dụng trên thanh bên"
 
 msgid "Show workspace activity"
 msgstr "Hiện hoạt động của workspace"

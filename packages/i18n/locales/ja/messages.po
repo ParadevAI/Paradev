@@ -1106,6 +1106,9 @@ msgstr "{label} は未設定の状態に戻ります。ワークスペース内�
 msgid "{label} is set to manual"
 msgstr "{label} を手動サインインに設定しました"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} の使用済みクォータ: {summary}。使用量の設定を開く"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "夜間監査"
 msgid "No"
 msgstr "いいえ"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "このホストに{0}のログインがありません。サインインすると使用量が表示されます。"
 
@@ -18191,9 +18194,6 @@ msgstr "共有。"
 msgid "Shared"
 msgstr "共有"
 
-msgid "Shared across sessions using this login."
-msgstr "このログインを使用するセッション間で共有されます。"
-
 msgid "Shared app components"
 msgstr "共有アプリコンポーネント"
 
@@ -18258,9 +18258,6 @@ msgstr "アプリ終了時に確認ダイアログを表示"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "チャットの入力欄にマイクを表示します。Codex が ChatGPT にサインインしている場合は ChatGPT が、それ以外は可能であれば Mac 上で、それもできない場合は Paradev のサーバーが音声を文字起こしします。"
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "ホームのサイドバーの「プルリクエスト」の下に「使用量」ボタンを表示"
-
 msgid "Show all {count}"
 msgstr "{count}件すべて表示"
 
@@ -18324,6 +18321,9 @@ msgstr "表示するファイルを減らす"
 msgid "Show file tree"
 msgstr "ファイルツリーを表示"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "各モデルプロバイダーが使用したクォータをサイドバーの下部に表示します"
+
 msgid "Show in bar"
 msgstr "バーに表示"
 
@@ -18381,6 +18381,9 @@ msgstr "プルリクエスト一覧を表示"
 msgid "Show pull request preview"
 msgstr "プルリクエストのプレビューを表示"
 
+msgid "Show quota rings on sidebar"
+msgstr "サイドバーにクォータリングを表示"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "解決済みを表示 ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "トリガーのペイロードを表示"
 
 msgid "Show translation"
 msgstr "翻訳を表示"
-
-msgid "Show usage tab on sidebar"
-msgstr "サイドバーに使用状況タブを表示"
 
 msgid "Show workspace activity"
 msgstr "ワークスペースのアクティビティを表示"

@@ -1106,6 +1106,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Využitá kvóta {label}: {summary}. Otevřít nastavení využití"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "Noční audit"
 msgid "No"
 msgstr "Ne"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Na tomto hostu nejsou žádná přihlášení {0}. Přihlaste se a využití se objeví tady."
 
@@ -18191,9 +18194,6 @@ msgstr "Sdílejte."
 msgid "Shared"
 msgstr "Sdílené"
 
-msgid "Shared across sessions using this login."
-msgstr "Sdíleno mezi relacemi používajícími toto přihlášení."
-
 msgid "Shared app components"
 msgstr "Sdílené komponenty aplikace"
 
@@ -18258,9 +18258,6 @@ msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Zobrazit v editoru chatu mikrofon. Řeč přepisuje ChatGPT, pokud je k němu přihlášen Codex, jinak se přepisuje na vašem Macu, když to jde, a jinak na serverech Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Zobrazovat tlačítko Využití v postranním panelu domovské obrazovky pod pull requesty"
-
 msgid "Show all {count}"
 msgstr "Zobrazit všech {count}"
 
@@ -18324,6 +18321,9 @@ msgstr "Zobrazit méně souborů"
 msgid "Show file tree"
 msgstr "Zobrazit strom souborů"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Zobrazit dole v postranním panelu, kolik kvóty každý poskytovatel modelů využil"
+
 msgid "Show in bar"
 msgstr "Zobrazit v liště"
 
@@ -18381,6 +18381,9 @@ msgstr "Zobrazit seznam pull requestů"
 msgid "Show pull request preview"
 msgstr "Zobrazit náhled pull requestu"
 
+msgid "Show quota rings on sidebar"
+msgstr "Zobrazit kroužky kvót v postranním panelu"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Zobrazit vyřešené ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "Zobrazit spouštěcí data"
 
 msgid "Show translation"
 msgstr "Zobrazit překlad"
-
-msgid "Show usage tab on sidebar"
-msgstr "Zobrazit kartu využití v postranním panelu"
 
 msgid "Show workspace activity"
 msgstr "Zobrazit aktivitu pracovního prostoru"

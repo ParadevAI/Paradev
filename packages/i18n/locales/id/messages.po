@@ -1106,6 +1106,9 @@ msgstr "{label} kembali menjadi belum diatur. Tidak ada yang berubah di dalam wo
 msgid "{label} is set to manual"
 msgstr "{label} kini memakai login manual"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Kuota {label} terpakai: {summary}. Buka pengaturan penggunaan"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "Audit malam"
 msgid "No"
 msgstr "Tidak"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Tidak ada login {0} di host ini. Masuk dan penggunaannya akan muncul di sini."
 
@@ -18191,9 +18194,6 @@ msgstr "Bagikan."
 msgid "Shared"
 msgstr "Dibagikan"
 
-msgid "Shared across sessions using this login."
-msgstr "Dibagikan di semua sesi yang menggunakan login ini."
-
 msgid "Shared app components"
 msgstr "Komponen aplikasi bersama"
 
@@ -18258,9 +18258,6 @@ msgstr "Tampilkan dialog konfirmasi saat keluar dari aplikasi"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Tampilkan mikrofon di kolom chat. Ucapan ditranskripsi oleh ChatGPT jika Codex masuk ke ChatGPT, jika tidak di Mac Anda bila memungkinkan, dan jika tidak oleh server Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Tampilkan tombol Penggunaan di sidebar beranda, di bawah Pull request"
-
 msgid "Show all {count}"
 msgstr "Tampilkan semua {count}"
 
@@ -18324,6 +18321,9 @@ msgstr "Tampilkan lebih sedikit file"
 msgid "Show file tree"
 msgstr "Tampilkan pohon file"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Tampilkan berapa banyak kuota yang telah dipakai setiap penyedia model, di bagian bawah bilah samping"
+
 msgid "Show in bar"
 msgstr "Tampilkan di bilah"
 
@@ -18381,6 +18381,9 @@ msgstr "Tampilkan daftar pull request"
 msgid "Show pull request preview"
 msgstr "Tampilkan pratinjau pull request"
 
+msgid "Show quota rings on sidebar"
+msgstr "Tampilkan cincin kuota di bilah samping"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Tampilkan yang terselesaikan ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "Tampilkan payload pemicu"
 
 msgid "Show translation"
 msgstr "Tampilkan terjemahan"
-
-msgid "Show usage tab on sidebar"
-msgstr "Tampilkan tab penggunaan di bilah samping"
 
 msgid "Show workspace activity"
 msgstr "Tampilkan aktivitas workspace"

@@ -1,0 +1,1 @@
+export { isModelScopedWindow } from "./isModelScopedWindow";

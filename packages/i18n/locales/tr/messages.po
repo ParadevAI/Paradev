@@ -1106,6 +1106,9 @@ msgstr "{label} yeniden ayarlanmamış duruma döner. Çalışma alanlarınızda
 msgid "{label} is set to manual"
 msgstr "{label} artık manuel oturum açma kullanıyor"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} kullanılan kota: {summary}. Kullanım ayarlarını aç"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "Gece denetimi"
 msgid "No"
 msgstr "Hayır"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Bu host'ta {0} oturumu yok. Oturum açın, kullanım burada görünsün."
 
@@ -18191,9 +18194,6 @@ msgstr "Paylaşın."
 msgid "Shared"
 msgstr "Paylaşılan"
 
-msgid "Shared across sessions using this login."
-msgstr "Bu hesabı kullanan oturumlar arasında paylaşılır."
-
 msgid "Shared app components"
 msgstr "Paylaşılan uygulama bileşenleri"
 
@@ -18258,9 +18258,6 @@ msgstr "Uygulamadan çıkarken onay penceresi göster"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Sohbet giriş alanında bir mikrofon göster. Codex ChatGPT'de oturum açmışsa konuşmayı ChatGPT yazıya döker; aksi halde mümkünse Mac'iniz, o da olmazsa Paradev sunucuları döker."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Ana sayfa kenar çubuğunda, pull request'lerin altında bir Kullanım düğmesi göster"
-
 msgid "Show all {count}"
 msgstr "Tümünü göster ({count})"
 
@@ -18324,6 +18321,9 @@ msgstr "Daha az dosya göster"
 msgid "Show file tree"
 msgstr "Dosya ağacını göster"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Her model sağlayıcısının ne kadar kota kullandığını kenar çubuğunun altında göster"
+
 msgid "Show in bar"
 msgstr "Çubukta göster"
 
@@ -18381,6 +18381,9 @@ msgstr "Pull request listesini göster"
 msgid "Show pull request preview"
 msgstr "Pull request önizlemesini göster"
 
+msgid "Show quota rings on sidebar"
+msgstr "Kota halkalarını kenar çubuğunda göster"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Çözülenleri göster ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "Tetikleyen yükü göster"
 
 msgid "Show translation"
 msgstr "Çeviriyi göster"
-
-msgid "Show usage tab on sidebar"
-msgstr "Kenar çubuğunda kullanım sekmesini göster"
 
 msgid "Show workspace activity"
 msgstr "Çalışma alanı etkinliğini göster"

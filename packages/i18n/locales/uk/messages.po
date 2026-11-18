@@ -1100,6 +1100,9 @@ msgstr "{label} знову стане неналаштованим. У робо�
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Використано ліміту {label}: {summary}. Відкрити налаштування використання"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12601,7 +12604,7 @@ msgstr "Нічний аудит"
 msgid "No"
 msgstr "Ні"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "На цьому хості немає входів у {0}. Увійдіть, і тут з'являться дані про використання."
 
@@ -18185,9 +18188,6 @@ msgstr "Поділіться."
 msgid "Shared"
 msgstr "Спільний"
 
-msgid "Shared across sessions using this login."
-msgstr "Спільний ліміт для сеансів із цим обліковим записом."
-
 msgid "Shared app components"
 msgstr "Спільні компоненти застосунку"
 
@@ -18252,9 +18252,6 @@ msgstr "Показувати діалог підтвердження під ча
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Показувати мікрофон у полі введення чату. Мовлення розпізнає ChatGPT, якщо в Codex виконано вхід у ChatGPT; інакше, коли можливо, ваш Mac; в інших випадках — сервери Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Показувати кнопку «Використання» на бічній панелі головного екрана під «Пул-реквестами»"
-
 msgid "Show all {count}"
 msgstr "Показати всі ({count})"
 
@@ -18318,6 +18315,9 @@ msgstr "Показати менше файлів"
 msgid "Show file tree"
 msgstr "Показати дерево файлів"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Показувати внизу бічної панелі, скільки ліміту використав кожен постачальник моделей"
+
 msgid "Show in bar"
 msgstr "Показати на панелі"
 
@@ -18375,6 +18375,9 @@ msgstr "Показати список пул-реквестів"
 msgid "Show pull request preview"
 msgstr "Показати попередній перегляд пул-реквесту"
 
+msgid "Show quota rings on sidebar"
+msgstr "Показувати кільця лімітів на бічній панелі"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Показати вирішені ({resolvedCount})"
 
@@ -18407,9 +18410,6 @@ msgstr "Показати payload тригера"
 
 msgid "Show translation"
 msgstr "Показати переклад"
-
-msgid "Show usage tab on sidebar"
-msgstr "Показувати вкладку використання на бічній панелі"
 
 msgid "Show workspace activity"
 msgstr "Показати активність робочого простору"

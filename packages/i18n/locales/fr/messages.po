@@ -1106,6 +1106,9 @@ msgstr "{label} redevient non configuré. Rien ne change dans vos espaces de tra
 msgid "{label} is set to manual"
 msgstr "{label} est en connexion manuelle"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Quota utilisé de {label} : {summary}. Ouvrir les réglages d’utilisation"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "Audit nocturne"
 msgid "No"
 msgstr "Non"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Aucune connexion {0} sur cet hôte. Connectez-vous et l'utilisation apparaîtra ici."
 
@@ -18191,9 +18194,6 @@ msgstr "Partagez."
 msgid "Shared"
 msgstr "Partagé"
 
-msgid "Shared across sessions using this login."
-msgstr "Partagé entre les sessions utilisant cette connexion."
-
 msgid "Shared app components"
 msgstr "Composants d'application partagés"
 
@@ -18258,9 +18258,6 @@ msgstr "Afficher une boîte de dialogue de confirmation à la fermeture de l'app
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Afficher un micro dans le champ de saisie du chat. La parole est transcrite par ChatGPT lorsque Codex y est connecté, sinon sur votre Mac quand c'est possible, et à défaut par les serveurs de Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Afficher un bouton Utilisation dans la barre latérale d'accueil, sous Pull requests"
-
 msgid "Show all {count}"
 msgstr "Afficher les {count}"
 
@@ -18324,6 +18321,9 @@ msgstr "Afficher moins de fichiers"
 msgid "Show file tree"
 msgstr "Afficher l'arborescence des fichiers"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Afficher en bas de la barre latérale le quota utilisé par chaque fournisseur de modèles"
+
 msgid "Show in bar"
 msgstr "Afficher dans la barre"
 
@@ -18381,6 +18381,9 @@ msgstr "Afficher la liste des pull requests"
 msgid "Show pull request preview"
 msgstr "Afficher l'aperçu de la pull request"
 
+msgid "Show quota rings on sidebar"
+msgstr "Afficher les anneaux de quota dans la barre latérale"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Afficher les commentaires résolus ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "Afficher la charge utile déclenchante"
 
 msgid "Show translation"
 msgstr "Afficher la traduction"
-
-msgid "Show usage tab on sidebar"
-msgstr "Afficher l’onglet d’utilisation dans la barre latérale"
 
 msgid "Show workspace activity"
 msgstr "Afficher l'activité de l'espace de travail"

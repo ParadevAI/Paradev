@@ -1106,6 +1106,9 @@ msgstr "{label} 將恢復為未設定。工作區內不會有任何變化：你�
 msgid "{label} is set to manual"
 msgstr "{label} 已設為手動登入"
 
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "{label} 已用配額：{summary}。開啟用量設定"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -12607,7 +12610,7 @@ msgstr "夜間稽核"
 msgid "No"
 msgstr "否"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "此主機上沒有{0}登入。登入後用量會顯示在這裡。"
 
@@ -18191,9 +18194,6 @@ msgstr "分享。"
 msgid "Shared"
 msgstr "共享"
 
-msgid "Shared across sessions using this login."
-msgstr "使用此登入的所有工作階段共用此額度。"
-
 msgid "Shared app components"
 msgstr "共享應用元件"
 
@@ -18258,9 +18258,6 @@ msgstr "退出應用時顯示確認對話方塊"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "在聊天輸入框中顯示麥克風。如果 Codex 已登入 ChatGPT，語音由 ChatGPT 轉寫；否則在可行時於你的 Mac 上轉寫，再不行則由 Paradev 的伺服器轉寫。"
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "在首頁側邊欄的「拉取請求」下方顯示「用量」按鈕"
-
 msgid "Show all {count}"
 msgstr "顯示全部{count}條"
 
@@ -18324,6 +18321,9 @@ msgstr "顯示較少檔案"
 msgid "Show file tree"
 msgstr "顯示檔案樹"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "在側邊欄底部顯示每個模型供應商已用的配額"
+
 msgid "Show in bar"
 msgstr "在工具列顯示"
 
@@ -18381,6 +18381,9 @@ msgstr "顯示拉取請求列表"
 msgid "Show pull request preview"
 msgstr "顯示拉取請求預覽"
 
+msgid "Show quota rings on sidebar"
+msgstr "在側邊欄顯示配額圓環"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "顯示已解決 ({resolvedCount})"
 
@@ -18413,9 +18416,6 @@ msgstr "顯示觸發酬載"
 
 msgid "Show translation"
 msgstr "顯示譯文"
-
-msgid "Show usage tab on sidebar"
-msgstr "在側邊欄顯示用量分頁"
 
 msgid "Show workspace activity"
 msgstr "顯示工作區動態"
