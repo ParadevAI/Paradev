@@ -1,5 +1,8 @@
 # Setup steps.
 
+# shellcheck source=../admin.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../admin.sh"
+
 step_load_env() {
   echo "📂 Loading environment variables..."
 
