@@ -131,6 +131,14 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 	);
 	for (const preset of HOST_AGENT_PRESETS) {
 		if (!isCloudAgentId(preset.presetId)) continue;
+		const resolved = (
+			await run(`readlink -f "$(command -v ${preset.command})"`)
+		).trim();
+		check(
+			`${preset.presetId} runs from the agents drive`,
+			resolved.startsWith(`${SANDBOX_PATHS.agents}/`),
+			resolved,
+		);
 		const out = await run(
 			`cd /tmp && timeout 15 ${[preset.command, ...preset.args].join(" ")} </dev/null >/tmp/preset.out 2>&1; echo "exit=$?"; head -5 /tmp/preset.out`,
 		);
@@ -244,6 +252,10 @@ export async function checkWakeLog(args: {
 	check("wake: every step skipped", !/step \S+ running/.test(last));
 	check("wake: checkout kept", /checkout\.skipped/.test(last));
 	check("wake: host-service ready", /host\.ready/.test(last));
+	check(
+		"wake: agents linked from the remounted drive",
+		/agents\.linked [1-9]/.test(last) && !/agents\.unavailable/.test(last),
+	);
 	return failed;
 }
 

@@ -13,6 +13,7 @@ import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
 } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
@@ -29,9 +30,8 @@ import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
-import { agentToolsDriveFor } from "./agent-tools";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
-import { boxLogsEnabled } from "./feature-flags";
+import { boxLogsEnabled, organizationFlagEnabled } from "./feature-flags";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -181,12 +181,11 @@ export async function buildSandboxClaim(args: {
 			files,
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
-			agentToolsDrive: await agentToolsDriveFor({
-				flags: posthog,
-				organizationId: args.row.organizationId,
-				region: environment.region,
-				bundleSha: environment.bundleSha,
-			}),
+			agentTools: await organizationFlagEnabled(
+				posthog,
+				FEATURE_FLAGS.SANDBOX_AGENT_TOOLS_DRIVE,
+				args.row.organizationId,
+			),
 		},
 		environment: {
 			sourceKind: environment.sourceKind,

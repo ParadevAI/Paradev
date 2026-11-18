@@ -6,14 +6,16 @@ import {
 	setSystemTime,
 	test,
 } from "bun:test";
-import { Sandbox } from "@vercel/sandbox";
+import { Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
+	type SandboxClaim,
 	SESSION_TIMEOUT_MS,
 	topUpSandboxSession,
+	wakeSandbox,
 } from "./vercel";
 
 type ListOptions = NonNullable<Parameters<typeof Sandbox.list>[0]>;
@@ -214,5 +216,54 @@ describe("agentToolsMounts", () => {
 			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
 		).toBeUndefined();
 		expect(asked).toBe(2);
+	});
+});
+
+describe("wakeSandbox", () => {
+	const asked: string[] = [];
+	const updates: unknown[] = [];
+	stub(Sandbox, {
+		get: async () => ({
+			status: "stopped",
+			region: "iad1",
+			vcpus: 2,
+			mounts: {},
+			domain: () => "https://host.example",
+			update: async (patch: unknown) => {
+				updates.push(patch);
+			},
+		}),
+	});
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			asked.push(name);
+			return { currentSandboxName: undefined };
+		},
+	});
+
+	test("mounts the drive of the box's own region, not its environment's", async () => {
+		const stop = new Error("stop before resume");
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: {
+					vcpus: 2,
+					agentTools: true,
+					identity: { SUPERSET_BUNDLE_SHA: "abcdef012345".repeat(5) },
+				} as unknown as SandboxClaim,
+				beforeResume: () => Promise.reject(stop),
+			}),
+		).rejects.toBe(stop);
+		expect(asked).toEqual(["agent-tools-iad1-abcdef012345"]);
+		expect(updates).toEqual([
+			{
+				mounts: {
+					"/opt/agents": {
+						drive: "agent-tools-iad1-abcdef012345",
+						mode: "snapshot",
+					},
+				},
+			},
+		]);
 	});
 });
