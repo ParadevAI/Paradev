@@ -1188,9 +1188,11 @@ export const cloudWorkspaceBoots = pgTable(
 );
 
 /**
- * One row for each amount billed to Autumn for a boot. Autumn stores a lock as
- * several events (the reservation, then the confirm or release adjustment);
- * a row here is their net amount for one lock.
+ * One row for each amount billed to Autumn for a boot: the net of Autumn's
+ * events for one lock. Autumn records the hold as `reserved_amount` at
+ * `reserved_at`, then a confirm or release as `amount - reserved_amount` at
+ * `sent_at`. When the lock expired instead, Autumn records `-reserved_amount`
+ * at `reservation_expired_at` and the amount arrives as a track at `sent_at`.
  */
 export const cloudUsageEvents = pgTable(
 	"cloud_usage_events",
@@ -1207,6 +1209,12 @@ export const cloudUsageEvents = pgTable(
 		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
 		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
 		amount: numeric().notNull(),
+		/** Null for a track sent without a lock. */
+		reservedAmount: numeric("reserved_amount"),
+		reservedAt: timestamp("reserved_at", { withTimezone: true }),
+		reservationExpiredAt: timestamp("reservation_expired_at", {
+			withTimezone: true,
+		}),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -1222,6 +1230,10 @@ export const cloudUsageEvents = pgTable(
 		index("cloud_usage_events_unsent_idx")
 			.on(table.createdAt)
 			.where(sql`${table.sentAt} is null`),
+		check(
+			"cloud_usage_events_reservation_complete",
+			sql`(${table.reservedAmount} is null) = (${table.reservedAt} is null) and (${table.reservationExpiredAt} is null or ${table.reservedAt} is not null)`,
+		),
 	],
 );
 

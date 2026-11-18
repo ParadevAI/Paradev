@@ -1,0 +1,4 @@
+ALTER TABLE "cloud_usage_events" ADD COLUMN "reserved_amount" numeric;--> statement-breakpoint
+ALTER TABLE "cloud_usage_events" ADD COLUMN "reserved_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "cloud_usage_events" ADD COLUMN "reservation_expired_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "cloud_usage_events" ADD CONSTRAINT "cloud_usage_events_reservation_complete" CHECK (("cloud_usage_events"."reserved_amount" is null) = ("cloud_usage_events"."reserved_at" is null) and ("cloud_usage_events"."reservation_expired_at" is null or "cloud_usage_events"."reserved_at" is not null));
