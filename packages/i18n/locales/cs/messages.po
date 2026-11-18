@@ -10178,6 +10178,9 @@ msgstr "Importovat vše"
 msgid "Import cookies and passwords…"
 msgstr "Importovat cookies a hesla…"
 
+msgid "Import custom theme?"
+msgstr "Importovat vlastní motiv?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Importujte každý projekt v1 do v2. Již importované projekty jsou označeny jako importované."
 
@@ -13686,6 +13689,9 @@ msgstr "Tohoto hosta mohou smazat jen jeho vlastníci nebo vlastníci organizace
 
 msgid "Only images can be attached to a comment"
 msgstr "Ke komentáři lze připojit pouze obrázky"
+
+msgid "Only import themes from sources you trust."
+msgstr "Importujte motivy pouze z důvěryhodných zdrojů."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Tohoto agenta může změnit jen jeho tvůrce nebo správce organizace"
@@ -21594,6 +21600,9 @@ msgstr "Skript bez názvu"
 
 msgid "Untitled workspace"
 msgstr "Pracovní prostor bez názvu"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Nedůvěryhodné motivy mohou ohrozit vaše data."
 
 msgid "Up next"
 msgstr "Další na řadě"

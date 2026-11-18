@@ -10178,6 +10178,9 @@ msgstr "Impor semua"
 msgid "Import cookies and passwords…"
 msgstr "Impor cookie dan kata sandi…"
 
+msgid "Import custom theme?"
+msgstr "Impor tema kustom?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Impor setiap proyek v1 ke v2. Proyek yang sudah diimpor ditandai sebagai telah diimpor."
 
@@ -13686,6 +13689,9 @@ msgstr "Hanya pemilik host atau pemilik organisasi yang bisa menghapus host ini"
 
 msgid "Only images can be attached to a comment"
 msgstr "Hanya gambar yang dapat dilampirkan ke komentar"
+
+msgid "Only import themes from sources you trust."
+msgstr "Hanya impor tema dari sumber tepercaya."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Hanya pembuatnya atau admin organisasi yang dapat mengubah agen ini"
@@ -21594,6 +21600,9 @@ msgstr "Skrip tanpa judul"
 
 msgid "Untitled workspace"
 msgstr "Workspace tanpa judul"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Tema yang tidak tepercaya dapat membahayakan data Anda."
 
 msgid "Up next"
 msgstr "Berikutnya"

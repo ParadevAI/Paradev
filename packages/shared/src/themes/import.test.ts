@@ -127,7 +127,9 @@ describe("parseThemeConfigFile", () => {
 		expect(result.ok).toBe(true);
 		if (!result.ok) return;
 
-		expect(result.themes[0]?.css).toBe(css);
+		expect(result.themes[0]?.css).toBe(
+			"body{background:url(data:image/png;base64,AA==)}",
+		);
 	});
 
 	it("returns an error for invalid JSON", () => {
@@ -158,4 +160,20 @@ describe("parseThemeConfigFile", () => {
 		if (result.ok) return;
 		expect(result.error).toContain("reserved");
 	});
+});
+
+it("filters unsafe CSS during import and rejects oversized stylesheets", () => {
+	const result = parseThemeConfigFile(
+		JSON.stringify({
+			name: "Filtered",
+			css: "body {display:none; background:url(https://example.invalid/track); color:red}",
+		}),
+	);
+	expect(result.ok).toBe(true);
+	if (result.ok)
+		expect(result.themes[0]?.css).toBe("body{display:none;color:red}");
+	const oversized = parseThemeConfigFile(
+		JSON.stringify({ name: "Too large", css: " ".repeat(65537) }),
+	);
+	expect(oversized.ok).toBe(false);
 });

@@ -10178,6 +10178,9 @@ msgstr "全部匯入"
 msgid "Import cookies and passwords…"
 msgstr "匯入cookie和密碼…"
 
+msgid "Import custom theme?"
+msgstr "匯入自訂佈景主題？"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "將每個 v1 專案匯入 v2。已匯入的專案會顯示為已匯入。"
 
@@ -13686,6 +13689,9 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
+
+msgid "Only import themes from sources you trust."
+msgstr "請僅匯入來自可信來源的佈景主題。"
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有建立者或組織管理員可以變更此代理程式"
@@ -21594,6 +21600,9 @@ msgstr "未命名指令碼"
 
 msgid "Untitled workspace"
 msgstr "未命名工作區"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "不可信的佈景主題可能危及你的資料安全。"
 
 msgid "Up next"
 msgstr "即將執行"

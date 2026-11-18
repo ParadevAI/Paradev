@@ -43,7 +43,7 @@ The importer supports:
 - `ui` color overrides
 - `terminal` color overrides
 - `colors` as an alias for `terminal`
-- `css`: a stylesheet applied while the theme is active
+- `css`: an optional stylesheet (up to 65,536 characters) filtered before import and every time the theme is applied
 
 Missing values fall back to Paradev defaults for the selected theme type.
 
@@ -91,3 +91,24 @@ Missing values fall back to Paradev defaults for the selected theme type.
 
 - Theme IDs must be unique and not reserved (`system`, built-in theme IDs like `dark`/`light`).
 - Very large files are rejected in the desktop importer.
+
+## Custom CSS restrictions
+
+Import only themes from sources you trust. Importing can replace the active theme.
+The desktop asks for confirmation before opening the import file picker.
+
+CSS Tree parses custom CSS; Paradev applies a security policy on import and
+again whenever the theme is applied. External, relative, and file URLs, imports,
+SVG images, attribute extraction, executable legacy properties, and unsupported
+functions or at-rules are removed. Embedded base64 PNG, JPEG, and WebP images
+are supported. Malformed, oversized, or overly complex stylesheets fail closed.
+
+Layout, visibility, animations, generated content, nesting, and selectors are
+allowed. Theme custom properties and their references are namespaced so they
+cannot supply unchecked values to the app's own CSS rules. This also means theme
+CSS cannot reference app-owned custom properties. Unsupported CSS may change how
+a third-party theme looks.
+
+CSS Tree handles parsing, not the security policy. Filtering reduces risk; it
+does not certify themes or protect against every browser vulnerability. T3 skins
+use their own color schema and selectors; this is not a complete T3 skin importer.

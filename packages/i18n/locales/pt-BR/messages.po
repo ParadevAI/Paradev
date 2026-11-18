@@ -10178,6 +10178,9 @@ msgstr "Importar todas"
 msgid "Import cookies and passwords…"
 msgstr "Importar cookies e senhas…"
 
+msgid "Import custom theme?"
+msgstr "Importar tema personalizado?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Importe cada projeto v1 para v2. Projetos já importados aparecem como importados."
 
@@ -13686,6 +13689,9 @@ msgstr "Só proprietários do host ou proprietários da organização podem excl
 
 msgid "Only images can be attached to a comment"
 msgstr "Apenas imagens podem ser anexadas a um comentário"
+
+msgid "Only import themes from sources you trust."
+msgstr "Importe apenas temas de fontes confiáveis."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Só quem criou ou um administrador da organização pode alterar este agente"
@@ -21594,6 +21600,9 @@ msgstr "Script sem título"
 
 msgid "Untitled workspace"
 msgstr "Área de trabalho sem título"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Temas não confiáveis podem colocar seus dados em risco."
 
 msgid "Up next"
 msgstr "A seguir"

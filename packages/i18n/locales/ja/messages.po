@@ -10178,6 +10178,9 @@ msgstr "すべてインポート"
 msgid "Import cookies and passwords…"
 msgstr "Cookieとパスワードをインポート…"
 
+msgid "Import custom theme?"
+msgstr "カスタムテーマをインポートしますか？"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "各v1プロジェクトをv2にインポートします。インポート済みのプロジェクトにはインポート済みと表示されます。"
 
@@ -13686,6 +13689,9 @@ msgstr "このホストを削除できるのはホストのオーナーまたは
 
 msgid "Only images can be attached to a comment"
 msgstr "コメントに添付できるのは画像のみです"
+
+msgid "Only import themes from sources you trust."
+msgstr "信頼できる提供元のテーマのみをインポートしてください。"
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "このエージェントを変更できるのは、作成者または組織の管理者のみです"
@@ -21594,6 +21600,9 @@ msgstr "無題のスクリプト"
 
 msgid "Untitled workspace"
 msgstr "無題のワークスペース"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "信頼できないテーマは、データを危険にさらすおそれがあります。"
 
 msgid "Up next"
 msgstr "次の実行"

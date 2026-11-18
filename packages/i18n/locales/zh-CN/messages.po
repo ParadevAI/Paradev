@@ -10178,6 +10178,9 @@ msgstr "全部导入"
 msgid "Import cookies and passwords…"
 msgstr "导入cookie和密码…"
 
+msgid "Import custom theme?"
+msgstr "导入自定义主题？"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "将每个 v1 项目导入 v2。已导入的项目会显示为已导入。"
 
@@ -13686,6 +13689,9 @@ msgstr "只有主机所有者或组织所有者才能删除此主机"
 
 msgid "Only images can be attached to a comment"
 msgstr "评论只能附加图片"
+
+msgid "Only import themes from sources you trust."
+msgstr "请仅导入来自可信来源的主题。"
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有创建者或组织管理员可以更改此智能体"
@@ -21594,6 +21600,9 @@ msgstr "未命名脚本"
 
 msgid "Untitled workspace"
 msgstr "未命名工作区"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "不可信的主题可能危及你的数据安全。"
 
 msgid "Up next"
 msgstr "即将运行"

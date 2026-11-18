@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { builtInThemes, darkTheme, lightTheme } from "./built-in";
 import { getEditorTheme } from "./editor-theme";
+import { MAX_THEME_CSS_LENGTH, sanitizeThemeCss } from "./sanitizeThemeCss";
 import { getDefaultTerminalColors, type Theme } from "./types";
 
 const uiColorsSchema = z
@@ -148,7 +149,7 @@ const themeConfigSchema = z
 		terminal: terminalColorsSchema.optional(),
 		colors: terminalColorsSchema.optional(),
 		editor: editorThemeSchema.optional(),
-		css: z.string().optional(),
+		css: z.string().max(MAX_THEME_CSS_LENGTH).optional(),
 	})
 	.passthrough();
 
@@ -232,7 +233,7 @@ function parseThemeEntry(
 					...terminalOverrides,
 				}
 			: undefined,
-		css: config.css,
+		css: config.css === undefined ? undefined : sanitizeThemeCss(config.css),
 	};
 	const baseEditorTheme = getEditorTheme(resolvedThemeBase);
 

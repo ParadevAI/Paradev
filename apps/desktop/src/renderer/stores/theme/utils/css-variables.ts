@@ -1,3 +1,4 @@
+import { sanitizeThemeCss } from "shared/themes";
 import type { UIColors } from "shared/themes/types";
 
 /**
@@ -83,16 +84,14 @@ export function updateThemeClass(type: "dark" | "light"): void {
 
 const THEME_CSS_ID = "theme-css";
 
-/**
- * Replace the active theme's stylesheet, or remove it when the theme has none
- */
 export function applyThemeCss(css: string | undefined): void {
 	document.getElementById(THEME_CSS_ID)?.remove();
-	if (!css) return;
+	const sanitizedCss = sanitizeThemeCss(css);
+	if (!sanitizedCss) return;
 
 	const style = document.createElement("style");
 	style.id = THEME_CSS_ID;
-	style.textContent = css;
+	style.textContent = sanitizedCss;
 	document.head.append(style);
 }
 
