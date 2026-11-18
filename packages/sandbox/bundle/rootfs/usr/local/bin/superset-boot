@@ -237,7 +237,7 @@ if [ -x /usr/local/bin/superset-memguard ]; then
 	stamp "memguard.start pid=$!"
 fi
 
-# The fixed swapfile of an earlier bundle; memguard adds swap on demand now.
+# The fixed swapfile of an earlier bundle; boxes have no swap now.
 [ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
 
 # The repository's start hook: the services a workspace needs every boot.

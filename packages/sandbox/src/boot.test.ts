@@ -36,13 +36,25 @@ describe("superset-boot", () => {
 		);
 	});
 
-	test("swap is memguard's, grown on demand up to a cap by box size", () => {
+	test("nothing turns swap on, and an earlier bundle's swapfiles are removed", () => {
 		expect(boot).not.toMatch(/swapon/);
-		expect(memguard).toMatch(/swap_cap_mb=\$\(\( \$\(box_mb\) \* 3 \/ 2 \)\)/);
-		expect(memguard).toMatch(/-lt 6144 \] && swap_cap_mb=6144/);
-		expect(memguard).toMatch(/-gt 16384 \] && swap_cap_mb=16384/);
-		expect(memguard).toMatch(/swapon "\$f"/);
-		expect(memguard).toMatch(/swapoff "\$f"/);
+		expect(memguard).not.toMatch(/swapon|mkswap|fallocate/);
+		expect(memguard).toMatch(
+			/\/var\/swap\/superset-\*.*swapoff "\$f".*rm -f "\$f"/,
+		);
+		expect(boot).toMatch(/rm -f \/swapfile/);
+	});
+
+	test("memguard reaps below the floor, or a check before a fast fall reaches it", () => {
+		expect(memguard).toMatch(
+			/if \[ \$\(\( mem_avail - drop \)\) -lt "\$floor" \]; then\n\s*scan\n\s*victim=/,
+		);
+	});
+
+	test("memguard's loop forks nothing between checks, and kills before it logs", () => {
+		expect(memguard).not.toMatch(/^\s*sleep /m);
+		expect(memguard).toMatch(/pause 0\.25\ndone\s*$/);
+		expect(memguard).toMatch(/kill -9 "\$victim" 2>\/dev\/null\n\s*log "reap /);
 	});
 
 	test("starts host-service after only the before-host steps; the rest run detached after it", () => {
