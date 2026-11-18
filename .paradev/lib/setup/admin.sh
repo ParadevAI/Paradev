@@ -6,22 +6,33 @@
 ADMIN_NEON_PROJECT_ID="aged-night-40823751" # superset-admin
 ADMIN_NEON_PARENT_BRANCH="development"
 
-# The admin checkout's directory, from the repositories the platform checked
-# out (SUPERSET_SANDBOX_REPOSITORIES). Fails when there is none.
-admin_checkout_dir() {
-  local repos="${SUPERSET_SANDBOX_REPOSITORIES:-}"
-  local root="${SUPERSET_SANDBOX_WORKSPACE_PATH:-}"
-  [ -n "$repos" ] && [ -n "$root" ] || return 1
-  command -v jq &> /dev/null || return 1
-  local path
-  path="$(jq -r '
-    map(select(.url | test("github\\.com[/:]ParadevAI/admin(\\.git)?/?$"; "i")))
-    | .[0].path // empty' <<< "$repos" 2>/dev/null)" || return 1
-  # "." would make admin the primary repository, whose own config runs instead.
-  [ -n "$path" ] && [ "$path" != "." ] || return 1
-  local dir="$root/$path"
+PARADEV_ADMIN_LIB_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+
+is_admin_checkout() {
+  local dir="$1" origin
   [ -f "$dir/package.json" ] && [ -f "$dir/scripts/db.sh" ] || return 1
-  printf '%s\n' "$dir"
+  origin="$(git -C "$dir" remote get-url origin 2>/dev/null)" || return 1
+  [[ "$origin" =~ github\.com[/:]ParadevAI/admin(\.git)?/?$ ]]
+}
+
+# The admin checkout's directory, or failure when the workspace has none.
+# Several repositories sit side by side under the workspace root
+# (/workspace/Paradev, /workspace/admin); a lone one is the root itself.
+# The start hook does not get SUPERSET_SANDBOX_REPOSITORIES, so look there.
+admin_checkout_dir() {
+  [ -n "${SUPERSET_SANDBOX_WORKSPACE_ID:-}" ] || return 1
+  local parent dir
+  parent="$(dirname "$PARADEV_ADMIN_LIB_ROOT")"
+  [ "$parent" != "/" ] || return 1
+  for dir in "$parent"/*/; do
+    dir="${dir%/}"
+    [ "$dir" != "$PARADEV_ADMIN_LIB_ROOT" ] || continue
+    if is_admin_checkout "$dir"; then
+      printf '%s\n' "$dir"
+      return 0
+    fi
+  done
+  return 1
 }
 
 # One workspace's admin database: a branch of superset-admin's development
@@ -90,15 +101,15 @@ step_setup_admin_checkout() {
   # The workspace's keys and ports, as a worktree of the admin repo links its
   # main checkout's .env. A file someone put there is theirs; leave it.
   if [ ! -e "$dir/.env" ] && [ ! -L "$dir/.env" ]; then
-    ln -s "$ROOT_DIR/.env" "$dir/.env"
+    ln -s "$PARADEV_ADMIN_LIB_ROOT/.env" "$dir/.env"
   fi
 
   # This workspace's product branch, from the .env setup wrote (later lines
   # win, and the workspace's own come after the environment's).
   local product_pooled product_direct
-  product_pooled="$(set -a; . "$ROOT_DIR/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL:-}")"
-  product_direct="$(set -a; . "$ROOT_DIR/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL_UNPOOLED:-}")"
-  if ! grep -q "^NEON_BRANCH_ID=" "$ROOT_DIR/.env" 2>/dev/null || [ -z "$product_pooled" ]; then
+  product_pooled="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL:-}")"
+  product_direct="$(set -a; . "$PARADEV_ADMIN_LIB_ROOT/.env" > /dev/null 2>&1; printf '%s' "${DATABASE_URL_UNPOOLED:-}")"
+  if ! grep -q "^NEON_BRANCH_ID=" "$PARADEV_ADMIN_LIB_ROOT/.env" 2>/dev/null || [ -z "$product_pooled" ]; then
     error "This workspace has no product database branch yet; not pointing the admin app at one"
     return 1
   fi
