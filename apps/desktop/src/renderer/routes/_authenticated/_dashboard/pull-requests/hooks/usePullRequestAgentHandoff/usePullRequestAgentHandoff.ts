@@ -68,7 +68,10 @@ export function usePullRequestAgentHandoff(
 		},
 		staleTime: 30_000,
 	};
-	useQuery({ ...linkedWorkspaceQuery, enabled: target !== null });
+	const { data: linkedWorkspace } = useQuery({
+		...linkedWorkspaceQuery,
+		enabled: target !== null,
+	});
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
 	const resolveOpenAsChat = useResolveOpenAsChat();
 
@@ -78,12 +81,6 @@ export function usePullRequestAgentHandoff(
 				throw new Error(
 					t({ message: "This pull request has no host to act through" }),
 				);
-			}
-			const launchAgent = choice?.configId
-				? agentConfigs.find((a) => a.id === choice.configId)
-				: agent;
-			if (!launchAgent) {
-				throw new Error(t({ message: "No agent is configured on this host" }));
 			}
 			const linkedWorkspaceId =
 				(
@@ -124,6 +121,12 @@ export function usePullRequestAgentHandoff(
 						workspaceId: linkedWorkspaceId,
 						...result,
 					};
+			}
+			const launchAgent = choice?.configId
+				? agentConfigs.find((a) => a.id === choice.configId)
+				: agent;
+			if (!launchAgent) {
+				throw new Error(t({ message: "No agent is configured on this host" }));
 			}
 			if (linkedWorkspaceId) {
 				await getHostServiceClientByUrl(target.hostUrl).agents.run.mutate({
@@ -213,5 +216,8 @@ export function usePullRequestAgentHandoff(
 			}),
 		isPending: mutation.isPending,
 		available: target !== null && agent !== null,
+		canResolveConflicts:
+			target !== null &&
+			(agent !== null || Boolean(linkedWorkspace?.workspaceId)),
 	};
 }

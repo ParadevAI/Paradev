@@ -269,7 +269,7 @@ export function PullRequestActions({
 			</PullRequestMenuItem>
 			{data.state === "open" && data.mergeability === "conflicting" ? (
 				<PullRequestMenuItem
-					disabled={!handoff.available || handoff.isPending}
+					disabled={!handoff.canResolveConflicts || handoff.isPending}
 					onClick={() =>
 						handoff.resolveConflicts(buildResolveConflictsPrompt(data))
 					}
