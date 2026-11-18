@@ -43,6 +43,7 @@ export const users = authSchema.table(
 		// rather than removed, because tasks, integrations and automations belong
 		// to the organization and ON DELETE CASCADE would take them too.
 		deletedAt: timestamp("deleted_at"),
+		tokensValidAfter: timestamp("tokens_valid_after"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
 			.defaultNow()

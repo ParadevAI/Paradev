@@ -1,0 +1,1 @@
+ALTER TABLE "auth"."users" ADD COLUMN "tokens_valid_after" timestamp;

@@ -12,6 +12,7 @@ import {
 import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import { env } from "@/env";
+import { isIssuedBeforeCutoff } from "./isIssuedBeforeCutoff";
 
 const apiUrl = env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
 
@@ -56,6 +57,7 @@ async function sessionFromOAuthBearer(
 		where: eq(authSchema.users.id, userId),
 	});
 	if (!user) return null;
+	if (isIssuedBeforeCutoff(payload.iat, user.tokensValidAfter)) return null;
 
 	const activeOrganizationId =
 		typeof payload.organizationId === "string" ? payload.organizationId : null;
