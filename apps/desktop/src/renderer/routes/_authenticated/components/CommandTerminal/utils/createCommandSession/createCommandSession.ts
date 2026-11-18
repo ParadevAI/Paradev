@@ -72,6 +72,7 @@ export function createCommandSession({
 			resize(size);
 			for (const data of pendingInput.splice(0)) write(data);
 		} catch (error) {
+			kill();
 			fail(error);
 		}
 	};

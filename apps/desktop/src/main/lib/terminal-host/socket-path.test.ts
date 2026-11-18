@@ -6,6 +6,7 @@ import {
 	rmSync,
 	symlinkSync,
 } from "node:fs";
+import { userInfo } from "node:os";
 import { join } from "node:path";
 import { terminalHostSocketPath } from "./socket-path";
 
@@ -32,7 +33,7 @@ test("bounds socket paths even when TMPDIR is too long", () => {
 });
 test("rejects a preexisting symlink or shared socket directory", () => {
 	const root = mkdtempSync("/tmp/socket-security-");
-	const directory = join(root, `paradev-terminal-${process.getuid()}`);
+	const directory = join(root, `paradev-terminal-${userInfo().uid}`);
 	try {
 		symlinkSync(root, directory);
 		expect(() => terminalHostSocketPath(`/${"h".repeat(120)}`, root)).toThrow(

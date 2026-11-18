@@ -159,3 +159,12 @@ test("disconnect and subsequent subscription errors only finish once", async () 
 	expect(t.transport.kill).toHaveBeenCalledTimes(1);
 	t.session.dispose();
 });
+
+test("a rejected create after disposal still cleans up a possibly spawned command", async () => {
+	const t = setup();
+	t.events.onStarted();
+	t.session.dispose();
+	t.rejectCreate(new Error("response lost"));
+	await Promise.resolve();
+	expect(t.transport.kill).toHaveBeenCalledTimes(1);
+});

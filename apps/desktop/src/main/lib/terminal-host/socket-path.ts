@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { lstatSync, mkdirSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { tmpdir, userInfo } from "node:os";
 import { join, resolve } from "node:path";
 
 export function terminalHostSocketPath(
@@ -14,7 +14,7 @@ export function terminalHostSocketPath(
 		.update(resolve(home))
 		.digest("hex")
 		.slice(0, 16);
-	const directoryName = `paradev-terminal-${process.getuid()}`;
+	const directoryName = `paradev-terminal-${userInfo().uid}`;
 	let directory = join(temporaryRoot, directoryName);
 	if (Buffer.byteLength(join(directory, `${id}.sock`)) >= 104) {
 		directory = join("/tmp", directoryName);
@@ -27,7 +27,7 @@ export function terminalHostSocketPath(
 	const info = lstatSync(directory);
 	if (
 		!info.isDirectory() ||
-		info.uid !== process.getuid() ||
+		info.uid !== userInfo().uid ||
 		(info.mode & 0o077) !== 0
 	) {
 		throw new Error(
