@@ -198,6 +198,15 @@ describe("adminReturnUrl", () => {
 		expect(url?.href).toBe(`${admin}/@evil.example/x`);
 	});
 
+	test("matches nothing when the admin URL is malformed", () => {
+		expect(adminReturnUrl(`${admin}/x`, "not a url")).toBeNull();
+	});
+
+	test("matches nothing when the admin URL is not http or https", () => {
+		expect(adminReturnUrl("data:text/html,x", "data:text/html,y")).toBeNull();
+		expect(adminReturnUrl("file:///etc/passwd", "file:///tmp")).toBeNull();
+	});
+
 	test("matches nothing when no admin URL is configured", () => {
 		expect(adminReturnUrl(`${admin}/x`, undefined)).toBeNull();
 	});
