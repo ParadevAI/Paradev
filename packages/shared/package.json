@@ -40,6 +40,10 @@
 			"types": "./src/account-labels.ts",
 			"default": "./src/account-labels.ts"
 		},
+		"./machine-size-names": {
+			"types": "./src/machine-size-names.ts",
+			"default": "./src/machine-size-names.ts"
+		},
 		"./html-preview": {
 			"types": "./src/html-preview.ts",
 			"default": "./src/html-preview.ts"
