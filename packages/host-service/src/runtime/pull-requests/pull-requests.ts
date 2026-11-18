@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import type { Octokit } from "@octokit/rest";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
 import { computeChecksStatus } from "@superset/shared/pull-request-checks";
-import { and, eq, inArray, isNull, notInArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, notInArray, sql } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import {
 	projects,
@@ -1104,11 +1104,46 @@ export class PullRequestRuntimeManager {
 			}
 			const rawMatch = keyToPullRequest.get(key);
 			const head = wantedRefs.get(key);
+			const isSyntheticCheckout =
+				head !== undefined && syntheticPullRequestNumber(head, repo) !== null;
+			const lookupFailed = failedKeys.has(key);
+			let headSha = workspace.headSha;
+			let linkCondition = and(
+				eq(workspaces.id, workspace.id),
+				isNull(workspaces.archivedAt),
+			);
+			if (isSyntheticCheckout) {
+				const sameCheckout = and(
+					linkCondition,
+					eq(workspaces.projectId, projectId),
+					eq(workspaces.branch, workspace.branch),
+					sql`${workspaces.upstreamOwner} IS ${workspace.upstreamOwner}`,
+					sql`${workspaces.upstreamRepo} IS ${workspace.upstreamRepo}`,
+					sql`${workspaces.upstreamBranch} IS ${workspace.upstreamBranch}`,
+					sql`${workspaces.pullRequestId} IS ${workspace.pullRequestId}`,
+					sql`${workspaces.suppressedPullRequestId} IS ${workspace.suppressedPullRequestId}`,
+				);
+				const current = this.db
+					.select({ headSha: workspaces.headSha })
+					.from(workspaces)
+					.where(sameCheckout)
+					.get();
+				if (
+					!current ||
+					(!lookupFailed && current.headSha !== workspace.headSha)
+				) {
+					continue;
+				}
+				headSha = current.headSha;
+				linkCondition = and(
+					sameCheckout,
+					sql`${workspaces.headSha} IS ${headSha}`,
+				);
+			}
 			const checkoutHeadChanged =
 				!!rawMatch &&
-				!!head &&
-				syntheticPullRequestNumber(head, repo) !== null &&
-				!this.pullRequestHeadMatches(rawMatch.id, workspace.headSha);
+				isSyntheticCheckout &&
+				!this.pullRequestHeadMatches(rawMatch.id, headSha);
 			// A head=<default> PR that is merged or closed is a past promotion
 			// (e.g. main -> staging), never the default-branch workspace's work.
 			const isPastPromotion =
@@ -1126,75 +1161,41 @@ export class PullRequestRuntimeManager {
 					? undefined
 					: rawMatch;
 			if (match) {
-				this.db
+				const { changes } = this.db
 					.update(workspaces)
 					.set({ pullRequestId: match.id })
-					.where(
-						and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
-					)
+					.where(linkCondition)
 					.run();
 				// The sweep re-asserts the link every pass, so this also heals
 				// history rows for links that predate the table.
-				this.recordWorkspacePullRequestLink(workspace.id, match.id, Date.now());
+				if (changes > 0) {
+					this.recordWorkspacePullRequestLink(
+						workspace.id,
+						match.id,
+						Date.now(),
+					);
+				}
 				continue;
 			}
 
-			if (failedKeys.has(key)) {
-				const current = this.db
-					.select()
-					.from(workspaces)
-					.where(eq(workspaces.id, workspace.id))
-					.get();
-				if (
-					!current ||
-					current.pullRequestId !== workspace.pullRequestId ||
-					this.effectiveUpstreamKey(current, repo) !== key
-				)
+			if (lookupFailed) {
+				if (!isSyntheticCheckout || !workspace.pullRequestId || !headSha) {
 					continue;
-				const linkedPr = current.pullRequestId
-					? this.findPullRequestRowById(current.pullRequestId)
-					: undefined;
-				const knownCheckoutMismatch =
-					!!head &&
-					syntheticPullRequestNumber(head, repo) !== null &&
-					!!current.headSha &&
-					!!linkedPr?.headSha &&
-					linkedPr.headSha.toLowerCase() !==
-						current.headSha.trim().toLowerCase();
-				if (knownCheckoutMismatch && current.pullRequestId && current.headSha) {
-					this.db
-						.update(workspaces)
-						.set({ pullRequestId: null })
-						.where(
-							and(
-								eq(workspaces.id, current.id),
-								isNull(workspaces.archivedAt),
-								eq(workspaces.branch, current.branch),
-								eq(workspaces.headSha, current.headSha),
-								eq(workspaces.pullRequestId, current.pullRequestId),
-								current.upstreamOwner === null
-									? isNull(workspaces.upstreamOwner)
-									: eq(workspaces.upstreamOwner, current.upstreamOwner),
-								current.upstreamRepo === null
-									? isNull(workspaces.upstreamRepo)
-									: eq(workspaces.upstreamRepo, current.upstreamRepo),
-								current.upstreamBranch === null
-									? isNull(workspaces.upstreamBranch)
-									: eq(workspaces.upstreamBranch, current.upstreamBranch),
-							),
-						)
-						.run();
 				}
-				continue;
+				const linkedPr = this.findPullRequestRowById(workspace.pullRequestId);
+				if (
+					!linkedPr?.headSha ||
+					linkedPr.headSha.toLowerCase() === headSha.trim().toLowerCase()
+				) {
+					continue;
+				}
 			}
 
 			if (workspace.pullRequestId) {
 				this.db
 					.update(workspaces)
 					.set({ pullRequestId: null })
-					.where(
-						and(eq(workspaces.id, workspace.id), isNull(workspaces.archivedAt)),
-					)
+					.where(linkCondition)
 					.run();
 			}
 		}

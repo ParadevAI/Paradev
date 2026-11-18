@@ -511,6 +511,33 @@ describe("PullRequestRuntimeManager synthetic PR refs", () => {
 		expect(getWorkspace(db, "ws")?.headSha).toBe("def456");
 		expect(getWorkspace(db, "ws")?.pullRequestId).toBe("pr-existing");
 	});
+
+	test("a successful old project lookup does not link a checkout that moved to a different HEAD", async () => {
+		const { db, manager, network } = setup();
+		const entered = Promise.withResolvers<void>();
+		const pending = Promise.withResolvers<void>();
+		network.beforeLookup = () => {
+			entered.resolve();
+			return pending.promise;
+		};
+		const fullRefresh = projectRefresher(manager)(PROJECT_ID);
+		try {
+			await entered.promise;
+			network.beforeLookup = undefined;
+			db.update(workspaces)
+				.set({ headSha: "def456" })
+				.where(eq(workspaces.id, "ws"))
+				.run();
+			await manager.refreshPullRequestsByWorkspaces(["ws"]);
+			expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		} finally {
+			pending.resolve();
+			await fullRefresh;
+		}
+		expect(getWorkspace(db, "ws")?.pullRequestId).toBeNull();
+		const [history] = await manager.getPullRequestHistoryByWorkspaces(["ws"]);
+		expect(history?.pullRequests).toEqual([]);
+	});
 });
 
 describe("PullRequestRuntimeManager mergedAt attribution", () => {
