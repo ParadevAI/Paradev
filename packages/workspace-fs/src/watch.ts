@@ -933,13 +933,17 @@ export class FsWatcherManager {
 	async refreshIgnores(rootAbsolutePath: string): Promise<boolean> {
 		const state = this.watchers.get(normalizeAbsolutePath(rootAbsolutePath));
 		if (!state) return false;
+		return this.refreshIgnoresSerialized(state);
+	}
+
+	private refreshIgnoresSerialized(state: WatcherState): Promise<boolean> {
 		const running = state.ignoreRefresh;
 		if (!running) return this.startIgnoreRefresh(state);
 		state.queuedIgnoreRefresh ??= running
 			.catch(() => false)
 			.then(() => {
 				state.queuedIgnoreRefresh = null;
-				return this.startIgnoreRefresh(state);
+				return this.refreshIgnoresSerialized(state);
 			});
 		return state.queuedIgnoreRefresh;
 	}

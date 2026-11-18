@@ -41,6 +41,7 @@ async function setup() {
 	const scopedListings: string[][] = [];
 	const fullListingGate = { wait: Promise.resolve() };
 	const scopedListingGate = { wait: Promise.resolve() };
+	const fullListings = { inFlight: 0, maxInFlight: 0 };
 	const manager = new FsWatcherManager({
 		backend,
 		debounceMs: 1,
@@ -50,7 +51,14 @@ async function setup() {
 		listGitIgnoredDirs: async (_root, _signal, under) => {
 			if (!under) {
 				const answer = [...gitIgnored];
+				fullListings.inFlight += 1;
+				fullListings.maxInFlight = Math.max(
+					fullListings.maxInFlight,
+					fullListings.inFlight,
+				);
 				await fullListingGate.wait;
+				await new Promise((resolve) => setTimeout(resolve, 1));
+				fullListings.inFlight -= 1;
 				return answer;
 			}
 			scopedListings.push([...under]);
@@ -90,6 +98,7 @@ async function setup() {
 		subscribeGate,
 		fullListingGate,
 		scopedListingGate,
+		fullListings,
 	};
 }
 
@@ -163,6 +172,18 @@ describe("new gitignored dir on a per-entry backend", () => {
 		expect(await growth).toBe(true);
 		expect(await unIgnore).toBe(true);
 		expect(run.live().ignore).not.toContain("gen/**");
+	});
+
+	it("runs a queued refresh after a refresh started as the active one settles", async () => {
+		const run = await setup();
+		const first = run.manager.refreshIgnores(run.rootPath);
+		const queued = run.manager.refreshIgnores(run.rootPath);
+		const startedOnSettle = first.then(() =>
+			run.manager.refreshIgnores(run.rootPath),
+		);
+
+		await Promise.all([first, queued, startedOnSettle]);
+		expect(run.fullListings.maxInFlight).toBe(1);
 	});
 
 	it("rechecks a new dir whose scoped answer predates a full refresh", async () => {
