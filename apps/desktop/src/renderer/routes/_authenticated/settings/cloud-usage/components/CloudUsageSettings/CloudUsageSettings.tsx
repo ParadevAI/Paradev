@@ -5,7 +5,7 @@ import {
 	selectedPeriod,
 	usageRange,
 	type WorkspaceRef,
-} from "@superset/ui/cloud-usage";
+} from "@superset/ui/cloud-usage-page";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useOrganizationRole } from "renderer/hooks/useOrganizationRole";

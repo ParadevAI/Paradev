@@ -7,7 +7,7 @@ import {
 	selectedPeriod,
 	usageRange,
 	type WorkspaceRef,
-} from "@superset/ui/cloud-usage";
+} from "@superset/ui/cloud-usage-page";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
