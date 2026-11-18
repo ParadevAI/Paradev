@@ -22751,6 +22751,9 @@ msgstr "Робочий простір створено"
 msgid "Workspace details"
 msgstr "Відомості про робочий простір"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Диски робочих просторів вимкнено для цієї організації, тому робочий простір, файли якого на диску, не може стати середовищем."
+
 msgid "Workspace ID copied"
 msgstr "ID робочого простору скопійовано"
 

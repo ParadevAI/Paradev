@@ -22757,6 +22757,9 @@ msgstr "Рабочая область создана"
 msgid "Workspace details"
 msgstr "Сведения о рабочей области"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Диски рабочих областей отключены для этой организации, поэтому рабочая область, файлы которой лежат на диске, не может стать окружением."
+
 msgid "Workspace ID copied"
 msgstr "ID рабочей области скопирован"
 

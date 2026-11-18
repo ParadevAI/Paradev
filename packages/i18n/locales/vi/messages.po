@@ -22757,6 +22757,9 @@ msgstr "Đã tạo workspace"
 msgid "Workspace details"
 msgstr "Chi tiết workspace"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Ổ đĩa workspace đã bị tắt cho tổ chức này, nên một workspace có tệp nằm trên ổ đĩa không thể trở thành môi trường."
+
 msgid "Workspace ID copied"
 msgstr "Đã sao chép ID workspace"
 

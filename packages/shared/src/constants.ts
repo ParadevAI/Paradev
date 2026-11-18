@@ -207,6 +207,13 @@ export const FEATURE_FLAGS = {
 	/** One answer for every box (asked for the subject `sandbox-fleet`, no group): off stops box logs at each box's next wake. */
 	SANDBOX_BOX_LOGS_FLEET: "sandbox-box-logs-fleet",
 	/**
+	 * Lets a golden build or a promote put an organization's environment in
+	 * drive mode (`environments.golden_drive_name`). Evaluated per organization.
+	 * Workspaces follow their environment, never this flag. Unloaded or
+	 * offline means no drive.
+	 */
+	CLOUD_WORKSPACE_DRIVES: "cloud-workspace-drives",
+	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:
 	 * shows the Move items, and gates
 	 * `workspaceMove.begin` server-side. Moving to the cloud also needs

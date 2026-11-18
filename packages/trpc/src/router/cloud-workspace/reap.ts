@@ -1,10 +1,9 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { logControl } from "../../lib/control-log";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
-	deleteSandbox,
 	describeSandbox,
 	rerunBoxStartHook,
 	runBoxArchiveHook,
@@ -14,6 +13,7 @@ import {
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
 import { recordBootEnd, recordBoxStopped } from "./sandbox-sleep";
+import { retireAndTearDown } from "./teardown";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -96,7 +96,15 @@ export async function reapArchivedCloudWorkspace(
 		await settleWorkspaceNow(row.id).catch((error) =>
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
-		await deleteSandbox(row.providerSandboxId);
+		// The names go with this archive's deletion; an undo after it gets a new box and drive.
+		const retired = await retireAndTearDown(
+			row,
+			and(
+				eq(cloudWorkspaces.status, "archived"),
+				eq(cloudWorkspaces.deletedAt, new Date(input.archivedAt)),
+			),
+		);
+		if (!retired) return "skipped";
 		await reapWorkspaceFiles(row.id);
 		logControl("archive.deleted", {
 			cloudWorkspaceId: row.id,

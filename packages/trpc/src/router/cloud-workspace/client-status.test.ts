@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { cloudWorkspaceStatusFor } from "./client-status";
+import { cloudWorkspaceStatusFor, withClientStatus } from "./client-status";
 
 const desktop = (version: string) => ({ product: "desktop" as const, version });
 
@@ -28,5 +28,17 @@ describe("cloudWorkspaceStatusFor", () => {
 				"asleep",
 			),
 		).toBe("asleep");
+	});
+});
+
+describe("withClientStatus output", () => {
+	test("never carries the drive columns, which released clients never saw", () => {
+		const out = withClientStatus(null, {
+			id: "ws-1",
+			status: "awake" as const,
+			driveName: "drive-ws-1",
+			driveLaidOutAt: new Date(),
+		});
+		expect(out).toEqual({ id: "ws-1", status: "awake" });
 	});
 });

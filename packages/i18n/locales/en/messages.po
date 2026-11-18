@@ -22757,6 +22757,9 @@ msgstr "Workspace created"
 msgid "Workspace details"
 msgstr "Workspace details"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+
 msgid "Workspace ID copied"
 msgstr "Workspace ID copied"
 

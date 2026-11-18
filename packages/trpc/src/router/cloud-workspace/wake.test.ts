@@ -9,6 +9,7 @@ import * as sandbox from "../../lib/sandbox";
 import * as meter from "./meter";
 import * as sandboxExpiry from "./sandbox-expiry";
 import * as sandboxSleep from "./sandbox-sleep";
+import * as teardown from "./teardown";
 import {
 	markSandboxUnavailable,
 	restartCloudWorkspace,
@@ -438,5 +439,85 @@ describe("markSandboxUnavailable", () => {
 			);
 			expect(captured).toEqual([]);
 		});
+	});
+});
+
+describe("a workspace whose snapshot expired", () => {
+	const retired: Array<{
+		providerSandboxId: string;
+		driveName: string | null;
+	}> = [];
+	stub(realtime, { nudge: () => {} });
+	stub(db, rowUpdate(true));
+	stub(Sentry, { captureException: () => "" });
+	stub(teardown, {
+		retireAndTearDown: async (row: {
+			providerSandboxId: string;
+			driveName: string | null;
+		}) => {
+			retired.push({
+				providerSandboxId: row.providerSandboxId,
+				driveName: row.driveName,
+			});
+			return true;
+		},
+	});
+	beforeEach(() => {
+		retired.length = 0;
+	});
+	const row = { ...ROW, driveName: "drive-ws-box" } as Row;
+	const unavailable = (status: number) =>
+		new sandbox.SandboxUnavailableError(
+			"ws-box",
+			new APIError(new Response(null, { status })),
+		);
+
+	test("retires its names and queues the teardown of its box and drive", async () => {
+		await markSandboxUnavailable(row, unavailable(410));
+		expect(retired).toEqual([
+			{ providerSandboxId: "ws-box", driveName: "drive-ws-box" },
+		]);
+	});
+
+	test("a box deleted out from under the row keeps the drive", async () => {
+		await markSandboxUnavailable(row, unavailable(404));
+		expect(retired).toEqual([]);
+	});
+
+	test("a drive refused for good is kept for diagnosis", async () => {
+		await markSandboxUnavailable(
+			row,
+			new sandbox.SandboxDriveRefusedError(
+				"ws-box",
+				"drive-ws-box",
+				"drive.foreign",
+				3,
+			),
+		);
+		expect(retired).toEqual([]);
+	});
+
+	test("a workspace without a drive is left as it was", async () => {
+		await markSandboxUnavailable({ ...row, driveName: null }, unavailable(410));
+		expect(retired).toEqual([]);
+	});
+});
+
+describe("a wake of a workspace without a drive", () => {
+	const wakes: Array<{ mounts?: unknown }> = [];
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({ claim: {}, agentCredentialDigest: "" }),
+		wakeSandbox: async (args: { mounts?: unknown }) => {
+			wakes.push(args);
+			throw new Error("wake not under test");
+		},
+	});
+
+	test("mounts nothing, whatever its environment", async () => {
+		await expect(
+			wakeCloudWorkspace({ ...ROW, driveName: null } as Row),
+		).rejects.toThrow("wake not under test");
+		expect(wakes).toHaveLength(1);
+		expect(wakes[0]?.mounts).toBeUndefined();
 	});
 });

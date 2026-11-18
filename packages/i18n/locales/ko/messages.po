@@ -22757,6 +22757,9 @@ msgstr "워크스페이스를 만들었습니다"
 msgid "Workspace details"
 msgstr "워크스페이스 세부 정보"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "이 조직에서는 워크스페이스 드라이브가 꺼져 있어, 파일이 드라이브에 있는 워크스페이스는 환경이 될 수 없습니다."
+
 msgid "Workspace ID copied"
 msgstr "워크스페이스 ID 복사됨"
 

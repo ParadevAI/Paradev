@@ -7,7 +7,7 @@ import {
 	CLOUD_WORKSPACE_WAKE_TRANSACTION,
 } from "@superset/shared/constants";
 import { waitUntil } from "@vercel/functions";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
 	type ControlScope,
 	controlTags,
@@ -22,18 +22,22 @@ import {
 	stopAndSnapshot,
 	stopSandbox,
 	wakeSandbox,
+	workspaceDriveMounts,
 } from "../../lib/sandbox";
+import { recordDriveLaidOut } from "./drive-laid-out";
 import {
 	attachBootSession,
 	authorizeBoot,
 	queueSettleWorkspace,
 } from "./meter";
+import { sandboxResumeLock } from "./resume-lock";
 import { recordSandboxAwake } from "./sandbox-expiry";
 import {
 	recordBootTrace,
 	recordBoxStopped,
 	recordSandboxAsleep,
 } from "./sandbox-sleep";
+import { retireAndTearDown } from "./teardown";
 import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -108,6 +112,8 @@ async function wake(
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		onlyIfRunning: adoptSignIns,
+		mounts: workspaceDriveMounts(row.driveName),
+		exclusive: sandboxResumeLock(row.driveName ?? row.providerSandboxId),
 		beforeResume: async ({ resumedSession, ...box }) => {
 			resumed = resumedSession;
 			({ bootId } = await Sentry.startSpan(
@@ -193,6 +199,8 @@ async function wake(
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
 	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	// settleSandbox only answers for a drive whose boot laid it out.
+	if (row.driveName && !row.driveLaidOutAt) await recordDriveLaidOut(row.id);
 	if (rebooted) {
 		logControl("wake.completed", scope, {
 			ms: Date.now() - wakeStartedAt,
@@ -253,4 +261,18 @@ export async function markSandboxUnavailable(
 		reason: error.snapshotExpired ? "snapshot_expired" : "sandbox_gone",
 		error,
 	});
+	if (row.driveName && error.snapshotExpired) {
+		await retireAndTearDown(
+			row,
+			and(
+				eq(cloudWorkspaces.status, "failed"),
+				eq(cloudWorkspaces.driveName, row.driveName),
+			),
+		).catch((teardownError) =>
+			console.error(
+				`[cloud-workspace] ${row.id} teardown after snapshot expiry`,
+				teardownError,
+			),
+		);
+	}
 }

@@ -6,6 +6,7 @@ import * as guards from "../../lib/cloud-guards";
 import * as sandbox from "../../lib/sandbox";
 import { userError } from "../../trpc";
 import * as access from "../cloud-workspace/access";
+import * as teardown from "../cloud-workspace/teardown";
 import * as wake from "../cloud-workspace/wake";
 import * as integration from "../integration/utils";
 import * as currentBundle from "./current-bundle";
@@ -56,9 +57,26 @@ stub(access, {
 		status: "awake",
 		baseBranch: "main",
 		branch: "main",
+		providerSandboxId: "ws-box",
+		driveName: "drive-ws-box",
 	}),
 });
-stub(sandbox, { workspaceRepositories: async () => [] });
+let drivesOn = true;
+let promoted = 0;
+let abandoned: Array<{ providerSandboxId: string; driveName?: string | null }> =
+	[];
+stub(sandbox, {
+	workspaceRepositories: async () => [],
+	workspaceDrivesEnabled: async () => drivesOn,
+});
+stub(teardown, {
+	deleteSandboxAndDriveLater: async (args: {
+		providerSandboxId: string;
+		driveName?: string | null;
+	}) => {
+		abandoned.push(args);
+	},
+});
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
 		name === "large" || name == null
@@ -95,6 +113,9 @@ beforeEach(() => {
 	};
 	isAdmin = false;
 	written = [];
+	abandoned = [];
+	drivesOn = true;
+	promoted = 0;
 });
 
 describe("environment.update machineSize", () => {
@@ -109,6 +130,17 @@ describe("environment.update machineSize", () => {
 		isAdmin = true;
 		await caller.environment.update({ id: ENVIRONMENT_ID, machineSize: null });
 		expect(written).toEqual([{ machineSize: null }]);
+	});
+
+	test("the output never carries the golden drive, which released clients never saw", async () => {
+		isAdmin = true;
+		environment.goldenDriveName = "env-drive-env-g";
+		const updated = await caller.environment.update({
+			id: ENVIRONMENT_ID,
+			machineSize: null,
+		});
+		expect(updated).not.toHaveProperty("goldenDriveName");
+		expect(updated).toMatchObject({ id: ENVIRONMENT_ID });
 	});
 
 	test("refuses a size the plan does not offer", async () => {
@@ -185,5 +217,46 @@ describe("environment.promote of a running workspace", () => {
 		});
 		expect(restarted).toEqual([[WORKSPACE_ID, { sessionId: "sess_A" }]]);
 		expect(order).toEqual(["save", "restart"]);
+	});
+});
+
+const failingPromote = {
+	promoteSandboxToEnvironment: async () => {
+		promoted++;
+		throw new Error("snapshot failed after the fork");
+	},
+};
+
+describe("environment.promote that fails", () => {
+	stub(sandbox, failingPromote);
+	test("hands the golden and its forked drive to the retried teardown", async () => {
+		environment.createdByUserId = "user-1";
+		await expect(
+			caller.environment.promote({
+				cloudWorkspaceId: WORKSPACE_ID,
+				environmentId: ENVIRONMENT_ID,
+			}),
+		).rejects.toThrow("snapshot failed after the fork");
+		expect(abandoned).toHaveLength(1);
+		const [golden] = abandoned;
+		expect(golden?.providerSandboxId).toMatch(/^env-/);
+		expect(golden?.driveName).toBe(`env-drive-${golden?.providerSandboxId}`);
+		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote with drives off", () => {
+	stub(sandbox, failingPromote);
+	test("a workspace whose files are on a drive does not spread drive mode to a new golden", async () => {
+		environment.createdByUserId = "user-1";
+		drivesOn = false;
+		await expect(
+			caller.environment.promote({
+				cloudWorkspaceId: WORKSPACE_ID,
+				environmentId: ENVIRONMENT_ID,
+			}),
+		).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+		expect(promoted).toBe(0);
+		expect(abandoned).toEqual([]);
 	});
 });

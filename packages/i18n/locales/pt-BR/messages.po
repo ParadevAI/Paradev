@@ -22757,6 +22757,9 @@ msgstr "Área de trabalho criada"
 msgid "Workspace details"
 msgstr "Detalhes da área de trabalho"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "Os discos de área de trabalho estão desativados para esta organização, então uma área de trabalho cujos arquivos estão em um disco não pode virar um ambiente."
+
 msgid "Workspace ID copied"
 msgstr "ID da área de trabalho copiado"
 

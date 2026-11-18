@@ -16,6 +16,8 @@ type Move = {
 	id: string;
 	from: readonly CloudWorkspaceStatus[];
 	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
+	/** Only while the row still names this box: an unarchive may have given it another. */
+	onBox?: string;
 };
 
 async function moveCloudWorkspace(
@@ -28,6 +30,9 @@ async function moveCloudWorkspace(
 			and(
 				eq(cloudWorkspaces.id, args.id),
 				inArray(cloudWorkspaces.status, [...args.from]),
+				args.onBox === undefined
+					? undefined
+					: eq(cloudWorkspaces.providerSandboxId, args.onBox),
 			),
 		)
 		.returning({ id: cloudWorkspaces.id });
@@ -60,16 +65,18 @@ export async function failCloudWorkspace(args: {
 	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
 	reason: CloudWorkspaceFailureReason;
 	error: unknown;
-}): Promise<void> {
+	onBox?: string;
+}): Promise<boolean> {
 	const { scope } = args;
 	const changed = await moveCloudWorkspace({
 		id: scope.cloudWorkspaceId,
 		from: args.from,
 		to: "failed",
+		onBox: args.onBox,
 		set: { ...args.set, failureReason: args.reason, failedAt: new Date() },
 	});
 	nudge(scope.organizationId, "cloud_workspaces");
-	if (!changed) return;
+	if (!changed) return false;
 	const refused = isCloudUsageRefusal(args.error);
 	logControl(
 		"workspace.failed",
@@ -80,4 +87,5 @@ export async function failCloudWorkspace(args: {
 	if (!refused) {
 		Sentry.captureException(args.error, { tags: controlTags(scope) });
 	}
+	return true;
 }

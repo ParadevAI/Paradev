@@ -24,7 +24,24 @@ on:
           - real-sandbox
           - production-release
           - inventory
+          - drive-sweep
         default: real-sandbox
+      real_sandbox_drive:
+        description: "real-sandbox only: also run the drive-mode pass (a throwaway golden drive, a box on a fork of it, a stop and a wake)"
+        type: boolean
+        default: false
+      real_sandbox_keep:
+        description: "real-sandbox only: keep the boxes (stopped) and the box drive for inspection instead of deleting them"
+        type: boolean
+        default: false
+      drive_sweep_delete:
+        description: "drive-sweep only: delete the orphaned drives it lists (off: a dry run)"
+        type: boolean
+        default: false
+      real_sandbox_work_gb:
+        description: "real-sandbox drive pass only: GB written under /workspace on the drive box and the plain box"
+        type: string
+        default: "4"
 
 jobs:
   boot-twice:
@@ -119,7 +136,7 @@ jobs:
     name: Real sandbox
     if: github.event_name == 'workflow_dispatch' && inputs.run == 'real-sandbox'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -146,6 +163,9 @@ jobs:
           CDN_R2_ENDPOINT: ${{ secrets.CDN_R2_ENDPOINT }}
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
+          REAL_SANDBOX_DRIVE: ${{ inputs.real_sandbox_drive && '1' || '' }}
+          REAL_SANDBOX_KEEP: ${{ inputs.real_sandbox_keep && '1' || '' }}
+          REAL_SANDBOX_WORK_GB: ${{ inputs.real_sandbox_work_gb }}
         run: bun run src/real-sandbox.ts
 
   inventory:
@@ -172,6 +192,34 @@ jobs:
           VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
           VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
         run: bun run inventory
+
+  drive-sweep:
+    name: Drive sweep
+    if: github.event_name == 'workflow_dispatch' && inputs.run == 'drive-sweep'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: List, or delete, drives nothing names
+        working-directory: packages/sandbox
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+          VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
+          VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
+          VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
+          DRIVE_SWEEP_DELETE: ${{ inputs.drive_sweep_delete && '--delete' || '' }}
+        run: bun run drive-sweep --production $DRIVE_SWEEP_DELETE
 
   production-release:
     name: Production release

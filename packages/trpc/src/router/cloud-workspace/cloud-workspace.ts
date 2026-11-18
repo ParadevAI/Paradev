@@ -37,7 +37,6 @@ import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
-	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
 	listRemoteBranches,
@@ -90,6 +89,7 @@ import {
 	queueProvision,
 	startCloudWorkspace,
 } from "./start";
+import { retireAndTearDown } from "./teardown";
 import { transitionCloudWorkspace } from "./transition";
 import {
 	markSandboxUnavailable,
@@ -916,7 +916,13 @@ export const cloudWorkspaceRouter = {
 								meterError,
 							),
 						);
-						await deleteSandbox(row.providerSandboxId);
+						await retireAndTearDown(
+							row,
+							and(
+								eq(cloudWorkspaces.status, "archived"),
+								eq(cloudWorkspaces.deletedAt, archivedAt),
+							),
+						);
 						await reapWorkspaceFiles(row.id);
 					});
 				}
