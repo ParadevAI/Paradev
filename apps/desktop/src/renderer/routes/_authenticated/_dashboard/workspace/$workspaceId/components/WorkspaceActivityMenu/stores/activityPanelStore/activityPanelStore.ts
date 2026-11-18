@@ -127,6 +127,18 @@ interface ActivityPanelVisibilityState {
 	setHidden: (hidden: boolean) => void;
 }
 
+let retryingVisibilityWrite = false;
+
+function retryVisibilityWrite(): void {
+	retryingVisibilityWrite = true;
+	try {
+		const { hidden, setHidden } = useActivityPanelVisibilityStore.getState();
+		setHidden(hidden);
+	} finally {
+		retryingVisibilityWrite = false;
+	}
+}
+
 export const useActivityPanelVisibilityStore =
 	create<ActivityPanelVisibilityState>()(
 		persist(
@@ -144,7 +156,8 @@ export const useActivityPanelVisibilityStore =
 						try {
 							localStorage.setItem(name, value);
 						} catch (error) {
-							if (isQuotaExceeded(error)) notifyQuotaExhausted(name);
+							if (!retryingVisibilityWrite && isQuotaExceeded(error))
+								notifyQuotaExhausted(name, undefined, retryVisibilityWrite);
 							else
 								console.warn(
 									"[activity-panel] Failed to persist visibility:",

@@ -27,6 +27,7 @@ const QUOTA_NOTICE_MODE: QuotaNoticeMode = "offer-reclaim";
 const TOAST_ID = "localstorage-quota-exhausted";
 
 const warnedStorageKeys = new Set<string>();
+const writesToRetry = new Map<string, () => void>();
 
 /**
  * Warns once per storage key. The loop this replaces fired ~40x a second, so an
@@ -53,7 +54,13 @@ export function describeClearedSnapshots(cleared: number): string {
 }
 
 function reclaimFromToast(): void {
-	toast.success(describeClearedSnapshots(clearAllTerminalState()), {
+	const cleared = clearAllTerminalState();
+	if (cleared > 0) {
+		const retries = [...writesToRetry.values()];
+		writesToRetry.clear();
+		for (const retry of retries) retry();
+	}
+	toast.success(describeClearedSnapshots(cleared), {
 		id: TOAST_ID,
 	});
 }
@@ -65,9 +72,12 @@ function reclaimFromToast(): void {
 export function notifyQuotaExhausted(
 	storageKey: string,
 	mode: QuotaNoticeMode = QUOTA_NOTICE_MODE,
+	retryWrite?: () => void,
 ): void {
 	warnOnce(storageKey);
 	if (mode === "silent") return;
+	if (mode === "offer-reclaim" && retryWrite)
+		writesToRetry.set(storageKey, retryWrite);
 
 	toast.warning("Storage is full", {
 		id: TOAST_ID,

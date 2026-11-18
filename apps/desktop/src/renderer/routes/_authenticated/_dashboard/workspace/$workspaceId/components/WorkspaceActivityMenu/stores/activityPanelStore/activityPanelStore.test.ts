@@ -1,4 +1,7 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
+import { toast } from "@superset/ui/sonner";
+import { TERMINAL_BUFFER_KEY_PREFIX } from "renderer/lib/terminal/terminal-buffer-gc";
+import { notifyQuotaExhausted } from "renderer/routes/_authenticated/providers/CollectionsProvider/notifyQuotaExhausted";
 import {
 	FINISHED_LIMIT,
 	useActivityPanelStore,
@@ -101,22 +104,77 @@ test("collapsing the subagents group is per workspace", () => {
 	);
 });
 
-test.each([
-	"QuotaExceededError",
-	"SecurityError",
-])("keeps visibility usable after a %s persistence failure", (name) => {
+test("reports a non-quota persistence failure without offering reclaim", () => {
+	const error = new DOMException("write refused", "SecurityError");
 	const write = spyOn(localStorage, "setItem").mockImplementation(() => {
-		throw new DOMException("write refused", name);
+		throw error;
 	});
 	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const notice = spyOn(toast, "warning").mockImplementation(() => "notice");
 	try {
 		expect(() =>
 			useActivityPanelVisibilityStore.getState().setHidden(true),
 		).not.toThrow();
 		expect(useActivityPanelVisibilityStore.getState().hidden).toBe(true);
-		expect(warn).toHaveBeenCalled();
+		expect(warn).toHaveBeenCalledWith(
+			"[activity-panel] Failed to persist visibility:",
+			error,
+		);
+		expect(notice).not.toHaveBeenCalled();
 	} finally {
 		write.mockRestore();
 		warn.mockRestore();
+		notice.mockRestore();
+	}
+});
+
+test("offers quota reclaim and saves the latest visibility after space is freed", () => {
+	const key = "workspace-activity-panel";
+	const bufferKey = `${TERMINAL_BUFFER_KEY_PREFIX}activity-quota-test`;
+	localStorage.setItem(bufferKey, "saved scrollback");
+	const setItem = localStorage.setItem.bind(localStorage);
+	const write = spyOn(localStorage, "setItem").mockImplementation(
+		(name, value) => {
+			if (name === key && localStorage.getItem(bufferKey) !== null) {
+				throw new DOMException("storage full", "QuotaExceededError");
+			}
+			setItem(name, value);
+		},
+	);
+	const warn = spyOn(console, "warn").mockImplementation(() => {});
+	const notice = spyOn(toast, "warning").mockImplementation(() => "notice");
+	const success = spyOn(toast, "success").mockImplementation(() => "success");
+	try {
+		const { setHidden } = useActivityPanelVisibilityStore.getState();
+		setHidden(true);
+		expect(useActivityPanelVisibilityStore.getState().hidden).toBe(true);
+		expect(localStorage.getItem(key)).toBeNull();
+		expect(notice).toHaveBeenCalledWith(
+			"Storage is full",
+			expect.objectContaining({
+				action: expect.objectContaining({ label: "Free up space" }),
+			}),
+		);
+		setHidden(false);
+		notifyQuotaExhausted("another-quota-test-key");
+		const action = notice.mock.calls.at(-1)?.[1]?.action;
+		if (!action || typeof action !== "object" || !("onClick" in action))
+			throw new Error("Missing reclaim action");
+		action.onClick(
+			new MouseEvent("click") as unknown as Parameters<
+				typeof action.onClick
+			>[0],
+		);
+		expect(localStorage.getItem(bufferKey)).toBeNull();
+		expect(JSON.parse(localStorage.getItem(key) ?? "null")).toEqual({
+			state: { hidden: false },
+			version: 0,
+		});
+	} finally {
+		write.mockRestore();
+		warn.mockRestore();
+		notice.mockRestore();
+		success.mockRestore();
+		localStorage.removeItem(bufferKey);
 	}
 });
