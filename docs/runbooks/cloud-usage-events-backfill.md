@@ -54,7 +54,7 @@ backfill. Running the script again sets the same values; it never adds.
    Write the value in the run log. After a backfill this query returns a backfilled row, not the
    deploy.
 
-2. **Export Autumn's events.** About 80 Autumn calls and 2 minutes for 114k events:
+2. **Export Autumn's events.** About 77 Autumn calls and 2 minutes for 114k events:
 
    ```bash
    bun run packages/trpc/scripts/export-autumn-usage-events.ts --out /tmp/autumn-usage-events.jsonl
