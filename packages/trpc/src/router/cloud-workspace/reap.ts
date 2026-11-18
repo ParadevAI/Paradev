@@ -89,19 +89,7 @@ export async function reapArchivedCloudWorkspace(
 		return "skipped";
 	}
 	if (input.stage === "delete") {
-		await recordBootEnd(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
-			{ sessionId: null, reason: "archived" },
-		);
-		await settleWorkspaceNow(row.id).catch((error) =>
-			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
-		);
-		await deleteSandbox(row.providerSandboxId);
-		await reapWorkspaceFiles(row.id);
-		logControl("archive.deleted", {
-			cloudWorkspaceId: row.id,
-			organizationId: row.organizationId,
-		});
+		await deleteArchivedBox(row);
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
@@ -119,6 +107,44 @@ export async function reapArchivedCloudWorkspace(
 		organizationId: row.organizationId,
 	});
 	return "stopped";
+}
+
+async function deleteArchivedBox(row: CloudWorkspaceRow): Promise<void> {
+	await recordBootEnd(
+		{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		{ sessionId: null, reason: "archived" },
+	);
+	await settleWorkspaceNow(row.id).catch((error) =>
+		console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
+	);
+	await deleteSandbox(row.providerSandboxId);
+	await reapWorkspaceFiles(row.id);
+	logControl("archive.deleted", {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	});
+}
+
+/**
+ * The delete stage for an archived row with no archive date: no reap was
+ * ever queued for it, so it has no `archivedAt` to match. Deletes only while
+ * the row is still archived, undated, and unchanged since `archivedBefore`.
+ */
+export async function reapUndatedArchivedCloudWorkspace(input: {
+	cloudWorkspaceId: string;
+	archivedBefore: Date;
+}): Promise<"reaped" | "skipped"> {
+	const row = await findRow(input.cloudWorkspaceId);
+	if (
+		row?.status !== "archived" ||
+		row.deletedAt !== null ||
+		row.provider !== "vercel" ||
+		row.updatedAt >= input.archivedBefore
+	) {
+		return "skipped";
+	}
+	await deleteArchivedBox(row);
+	return "reaped";
 }
 
 /** Drops the files sent to a workspace whose box is gone for good. */

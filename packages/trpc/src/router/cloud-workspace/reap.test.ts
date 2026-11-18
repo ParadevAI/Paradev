@@ -13,6 +13,7 @@ type Row = {
 	deletedAt: Date | null;
 	provider: string;
 	providerSandboxId: string;
+	updatedAt?: Date;
 };
 type Stage = "stop" | "delete";
 
@@ -100,7 +101,11 @@ stub(meter, {
 	},
 });
 
-const { queueReap, reapArchivedCloudWorkspace } = await import("./reap");
+const {
+	queueReap,
+	reapArchivedCloudWorkspace,
+	reapUndatedArchivedCloudWorkspace,
+} = await import("./reap");
 
 const archivedAt = new Date("2026-10-01T00:00:00.000Z");
 const input = {
@@ -311,5 +316,43 @@ describe("reapArchivedCloudWorkspace", () => {
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
 		).toBe("skipped");
 		expect(sandboxCalls).toEqual([]);
+	});
+});
+
+describe("reapUndatedArchivedCloudWorkspace", () => {
+	test("deletes the box of an archived row with no archive date only while it is still archived and unchanged", async () => {
+		const archivedBefore = new Date("2026-11-10T00:00:00.000Z");
+		const undated = {
+			id: input.cloudWorkspaceId,
+			status: "archived",
+			deletedAt: null,
+			provider: "vercel",
+			providerSandboxId: "ws-undated",
+			updatedAt: new Date("2026-10-01T00:00:00.000Z"),
+		};
+		sandboxCalls = [];
+		row = { ...undated, status: "asleep" };
+		expect(
+			await reapUndatedArchivedCloudWorkspace({
+				cloudWorkspaceId: undated.id,
+				archivedBefore,
+			}),
+		).toBe("skipped");
+		row = { ...undated, updatedAt: new Date("2026-11-12T00:00:00.000Z") };
+		expect(
+			await reapUndatedArchivedCloudWorkspace({
+				cloudWorkspaceId: undated.id,
+				archivedBefore,
+			}),
+		).toBe("skipped");
+		expect(sandboxCalls).toEqual([]);
+		row = undated;
+		expect(
+			await reapUndatedArchivedCloudWorkspace({
+				cloudWorkspaceId: undated.id,
+				archivedBefore,
+			}),
+		).toBe("reaped");
+		expect(sandboxCalls).toEqual(["delete:ws-undated"]);
 	});
 });

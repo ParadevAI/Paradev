@@ -987,29 +987,25 @@ export async function listActiveWorkspaceSandboxes(
 	return found;
 }
 
-export interface TaggedSandbox {
+export interface ListedSandbox {
 	name: string;
+	/** Our `kind` tag; absent on a box made before tags or not made by us. */
+	kind: string | undefined;
 	createdAt: number;
 	statusUpdatedAt: number;
 	status: string;
-	snapshotExpiration: number | undefined;
 }
 
-/** Every box we tagged with this kind, whatever its age. */
-export async function listTaggedSandboxes(
-	kind: "workspace" | "environment",
-): Promise<TaggedSandbox[]> {
-	const found: TaggedSandbox[] = [];
-	for await (const sandbox of await Sandbox.list({
-		...credentials(),
-		tags: { kind },
-	})) {
+/** Every box in the project, whatever its age or tags. */
+export async function listAllSandboxes(): Promise<ListedSandbox[]> {
+	const found: ListedSandbox[] = [];
+	for await (const sandbox of await Sandbox.list(credentials())) {
 		found.push({
 			name: sandbox.name,
+			kind: sandbox.tags?.kind,
 			createdAt: sandbox.createdAt,
 			statusUpdatedAt: sandbox.statusUpdatedAt ?? sandbox.updatedAt,
 			status: sandbox.status,
-			snapshotExpiration: sandbox.snapshotExpiration,
 		});
 	}
 	return found;

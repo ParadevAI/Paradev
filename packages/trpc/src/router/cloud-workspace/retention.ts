@@ -1,14 +1,31 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
-import { and, asc, eq, isNull, lt, or, type SQL, sql } from "drizzle-orm";
+import {
+	and,
+	asc,
+	count,
+	eq,
+	inArray,
+	isNotNull,
+	isNull,
+	lt,
+	or,
+	type SQL,
+	sql,
+} from "drizzle-orm";
 import {
 	describeSandbox,
-	listTaggedSandboxes,
+	type ListedSandbox,
+	listAllSandboxes,
 	SandboxUnavailableError,
-	type TaggedSandbox,
 } from "../../lib/sandbox";
 import { nextSandboxNameFor } from "./provision";
+import {
+	ARCHIVE_GRACE_SECONDS,
+	reapArchivedCloudWorkspace,
+	reapUndatedArchivedCloudWorkspace,
+} from "./reap";
 import { queueTeardown } from "./teardown";
 import { namedSandboxes } from "./teardown-guard";
 import { failCloudWorkspace } from "./transition";
@@ -26,6 +43,10 @@ export const ORPHAN_MIN_AGE_MS = 7 * DAY_MS;
  */
 export const REAP_BATCH = 200;
 export const ORPHAN_BATCH = 200;
+/** A backstop for a lost archive delete, which deletes inline: few a run. */
+export const ARCHIVED_BATCH = 20;
+/** The archive's own delete runs at the grace; a day later it has had its retries. */
+export const ARCHIVED_BACKSTOP_AFTER_MS = ARCHIVE_GRACE_SECONDS * 1000 + DAY_MS;
 /** Stops starting new work here, well inside the route's 300 s; the rest waits for the next run. */
 export const RUN_BUDGET_MS = 200_000;
 /** One delete a second: far under Vercel's 20 deletions a second per team. */
@@ -119,6 +140,66 @@ async function boxIsRunning(providerSandboxId: string): Promise<boolean> {
 	}
 }
 
+function archivedPastGrace(cutoff: Date): SQL {
+	return and(
+		eq(cloudWorkspaces.provider, "vercel"),
+		eq(cloudWorkspaces.status, "archived"),
+		or(
+			and(
+				isNotNull(cloudWorkspaces.deletedAt),
+				lt(cloudWorkspaces.deletedAt, cutoff),
+			),
+			and(
+				isNull(cloudWorkspaces.deletedAt),
+				lt(cloudWorkspaces.updatedAt, cutoff),
+			),
+		),
+	) as SQL;
+}
+
+async function countArchivedPastGrace(cutoff: Date): Promise<number> {
+	const [row] = await db
+		.select({ n: count() })
+		.from(cloudWorkspaces)
+		.where(archivedPastGrace(cutoff));
+	return row?.n ?? 0;
+}
+
+export interface ArchivedWorkspace {
+	id: string;
+	providerSandboxId: string;
+	deletedAt: Date | null;
+}
+
+/** The archived rows past their grace whose box is among `names`. */
+async function findArchivedPastGraceAmong(
+	cutoff: Date,
+	names: string[],
+): Promise<ArchivedWorkspace[]> {
+	const found: ArchivedWorkspace[] = [];
+	for (let i = 0; i < names.length; i += NAME_LOOKUP_CHUNK) {
+		found.push(
+			...(await db
+				.select({
+					id: cloudWorkspaces.id,
+					providerSandboxId: cloudWorkspaces.providerSandboxId,
+					deletedAt: cloudWorkspaces.deletedAt,
+				})
+				.from(cloudWorkspaces)
+				.where(
+					and(
+						archivedPastGrace(cutoff),
+						inArray(
+							cloudWorkspaces.providerSandboxId,
+							names.slice(i, i + NAME_LOOKUP_CHUNK),
+						),
+					),
+				)),
+		);
+	}
+	return found;
+}
+
 async function namedAmong(names: string[]): Promise<Set<string>> {
 	const named = new Set<string>();
 	for (let i = 0; i < names.length; i += NAME_LOOKUP_CHUNK) {
@@ -135,8 +216,12 @@ export interface RetentionDeps {
 	findIdleWorkspaces: typeof findIdleWorkspaces;
 	retireIdleWorkspace: typeof retireIdleWorkspace;
 	boxIsRunning: typeof boxIsRunning;
-	listTaggedSandboxes: typeof listTaggedSandboxes;
+	listAllSandboxes: typeof listAllSandboxes;
 	namedSandboxes: typeof namedAmong;
+	countArchivedPastGrace: typeof countArchivedPastGrace;
+	findArchivedPastGraceAmong: typeof findArchivedPastGraceAmong;
+	reapArchived: typeof reapArchivedCloudWorkspace;
+	reapUndatedArchived: typeof reapUndatedArchivedCloudWorkspace;
 	queueTeardown: (
 		providerSandboxId: string,
 		delaySeconds: number,
@@ -147,8 +232,12 @@ const defaultDeps: RetentionDeps = {
 	findIdleWorkspaces,
 	retireIdleWorkspace,
 	boxIsRunning,
-	listTaggedSandboxes,
+	listAllSandboxes,
 	namedSandboxes: namedAmong,
+	countArchivedPastGrace,
+	findArchivedPastGraceAmong,
+	reapArchived: reapArchivedCloudWorkspace,
+	reapUndatedArchived: reapUndatedArchivedCloudWorkspace,
 	queueTeardown: (providerSandboxId, delaySeconds) =>
 		queueTeardown(
 			{ providerSandboxId, driveName: null, attempt: 0 },
@@ -165,6 +254,16 @@ export interface RetentionRun {
 		deferred: number;
 		failed: number;
 	};
+	archived:
+		| {
+				found: number;
+				alreadyDeleted: number;
+				deleted: number;
+				skipped: number;
+				deferred: number;
+				failed: number;
+		  }
+		| { skipped: "not production" };
 	orphans:
 		| {
 				listed: number;
@@ -180,9 +279,10 @@ export interface RetentionRun {
  * The one place a workspace box is deleted for age. Every 6 hours: a workspace asleep
  * and unused for `RETENTION_IDLE_MS` fails as `snapshot_expired`, exactly as a
  * wake that met Vercel's expiry did, and its box is torn down. Then, in
- * production only, boxes we tagged that no row names are torn down. Every
- * deployment shares the Vercel project, so another database would see
- * production's boxes as orphans.
+ * production only: an archived box still there a day after its grace is
+ * deleted (its own delete was lost), and boxes we tagged that no row names
+ * are torn down. Every deployment shares the Vercel project, and a dev
+ * database copied from production names production's boxes.
  */
 export async function reapCloudWorkspaceRetention({
 	now = Date.now(),
@@ -202,13 +302,22 @@ export async function reapCloudWorkspaceRetention({
 		deps.queueTeardown(name, slot++ * TEARDOWN_SPACING_SECONDS);
 	const retiredNames = new Set<string>();
 	const idle = await reapIdle({ now, deps, queue, retiredNames, outOfTime });
+	const notProduction = { skipped: "not production" } as const;
+	const boxes = production ? await deps.listAllSandboxes() : [];
+	const archived = production
+		? await reapArchived({ now, deps, boxes, outOfTime })
+		: notProduction;
 	const orphans = production
-		? await reapOrphans({ now, deps, queue, retiredNames, outOfTime })
-		: ({ skipped: "not production" } as const);
-	const run = { idle, orphans };
+		? await reapOrphans({ now, deps, boxes, queue, retiredNames, outOfTime })
+		: notProduction;
+	const run = { idle, archived, orphans };
 	console.log("[cloud-workspace] retention run", JSON.stringify(run));
 	Sentry.logger.info("retention.run", flatten(run));
-	if (idle.failed || ("failed" in orphans && orphans.failed)) {
+	if (
+		idle.failed ||
+		("failed" in archived && archived.failed) ||
+		("failed" in orphans && orphans.failed)
+	) {
 		Sentry.captureMessage("cloud workspace retention run had failures", {
 			level: "warning",
 			extra: { ...run },
@@ -268,7 +377,61 @@ async function reapIdle({
 	return counts;
 }
 
-function isOldAndSettled(box: TaggedSandbox, now: number): boolean {
+async function reapArchived({
+	now,
+	deps,
+	boxes,
+	outOfTime,
+}: {
+	now: number;
+	deps: RetentionDeps;
+	boxes: ListedSandbox[];
+	outOfTime: () => boolean;
+}): Promise<Exclude<RetentionRun["archived"], { skipped: string }>> {
+	const cutoff = new Date(now - ARCHIVED_BACKSTOP_AFTER_MS);
+	const found = await deps.countArchivedPastGrace(cutoff);
+	const lingering = await deps.findArchivedPastGraceAmong(
+		cutoff,
+		boxes.map((box) => box.name),
+	);
+	const batch = lingering.slice(0, ARCHIVED_BATCH);
+	const counts = {
+		found,
+		alreadyDeleted: found - lingering.length,
+		deleted: 0,
+		skipped: 0,
+		deferred: lingering.length - batch.length,
+		failed: 0,
+	};
+	for (const [index, row] of batch.entries()) {
+		if (outOfTime()) {
+			counts.deferred += batch.length - index;
+			break;
+		}
+		try {
+			const outcome = row.deletedAt
+				? await deps.reapArchived({
+						cloudWorkspaceId: row.id,
+						archivedAt: row.deletedAt.toISOString(),
+						stage: "delete",
+					})
+				: await deps.reapUndatedArchived({
+						cloudWorkspaceId: row.id,
+						archivedBefore: cutoff,
+					});
+			if (outcome === "reaped") counts.deleted++;
+			else counts.skipped++;
+		} catch (error) {
+			counts.failed++;
+			Sentry.captureException(error, {
+				tags: { "cloud_workspace.id": row.id },
+			});
+		}
+	}
+	return counts;
+}
+
+function isOldAndSettled(box: ListedSandbox, now: number): boolean {
 	return (
 		SETTLED_STATUSES.has(box.status) &&
 		now - box.createdAt > ORPHAN_MIN_AGE_MS &&
@@ -279,21 +442,22 @@ function isOldAndSettled(box: TaggedSandbox, now: number): boolean {
 async function reapOrphans({
 	now,
 	deps,
+	boxes,
 	queue,
 	retiredNames,
 	outOfTime,
 }: {
 	now: number;
 	deps: RetentionDeps;
+	boxes: ListedSandbox[];
 	queue: (name: string) => Promise<void>;
 	retiredNames: Set<string>;
 	outOfTime: () => boolean;
 }): Promise<Exclude<RetentionRun["orphans"], { skipped: string }>> {
-	const boxes = [
-		...(await deps.listTaggedSandboxes("workspace")),
-		...(await deps.listTaggedSandboxes("environment")),
-	];
-	const candidates = boxes
+	const ours = boxes.filter(
+		(box) => box.kind === "workspace" || box.kind === "environment",
+	);
+	const candidates = ours
 		.filter((box) => isOldAndSettled(box, now) && !retiredNames.has(box.name))
 		.map((box) => box.name);
 	const named = await deps.namedSandboxes(candidates);
@@ -316,7 +480,7 @@ async function reapOrphans({
 		}
 	}
 	return {
-		listed: boxes.length,
+		listed: ours.length,
 		orphaned: orphaned.length,
 		queued,
 		deferred: orphaned.length - batch.length + unstarted,
@@ -328,6 +492,12 @@ function flatten(run: RetentionRun): Record<string, number | string> {
 	return {
 		...Object.fromEntries(
 			Object.entries(run.idle).map(([key, value]) => [`idle.${key}`, value]),
+		),
+		...Object.fromEntries(
+			Object.entries(run.archived).map(([key, value]) => [
+				`archived.${key}`,
+				value,
+			]),
 		),
 		...Object.fromEntries(
 			Object.entries(run.orphans).map(([key, value]) => [

@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { stub } from "../../../test/stub";
-import type { TaggedSandbox } from "../../lib/sandbox";
+import type { ListedSandbox } from "../../lib/sandbox";
 import {
+	ARCHIVED_BACKSTOP_AFTER_MS,
 	ORPHAN_BATCH,
 	RETENTION_IDLE_MS,
 	type RetentionDeps,
@@ -20,18 +21,22 @@ const idleRow = (n: number) => ({
 	providerSandboxId: `ws-box${n}`,
 });
 
-const box = (name: string, overrides: Partial<TaggedSandbox> = {}) => ({
+const box = (
+	name: string,
+	overrides: Partial<ListedSandbox> = {},
+): ListedSandbox => ({
 	name,
+	kind: "workspace",
 	createdAt: NOW - 60 * DAY,
 	statusUpdatedAt: NOW - 40 * DAY,
 	status: "stopped",
-	snapshotExpiration: 0,
 	...overrides,
 });
 
 function fakeDeps(overrides: Partial<RetentionDeps> = {}) {
 	const queued: Array<[string, number]> = [];
 	const retired: string[] = [];
+	const reaped: unknown[] = [];
 	const deps: RetentionDeps = {
 		findIdleWorkspaces: async () => [],
 		retireIdleWorkspace: async (row) => {
@@ -39,14 +44,24 @@ function fakeDeps(overrides: Partial<RetentionDeps> = {}) {
 			return true;
 		},
 		boxIsRunning: async () => false,
-		listTaggedSandboxes: async () => [],
+		listAllSandboxes: async () => [],
 		namedSandboxes: async () => new Set(),
+		countArchivedPastGrace: async () => 0,
+		findArchivedPastGraceAmong: async () => [],
+		reapArchived: async (input) => {
+			reaped.push(input);
+			return "reaped";
+		},
+		reapUndatedArchived: async (input) => {
+			reaped.push(input);
+			return "reaped";
+		},
 		queueTeardown: async (name, delaySeconds) => {
 			queued.push([name, delaySeconds]);
 		},
 		...overrides,
 	};
-	return { deps, queued, retired };
+	return { deps, queued, retired, reaped };
 }
 
 describe("reapCloudWorkspaceRetention", () => {
@@ -104,17 +119,16 @@ describe("reapCloudWorkspaceRetention", () => {
 	test("queues only old, settled boxes no row names, and not one it just retired", async () => {
 		const { deps, queued } = fakeDeps({
 			findIdleWorkspaces: async () => [idleRow(1)],
-			listTaggedSandboxes: async (kind) =>
-				kind === "workspace"
-					? [
-							box("ws-box1"),
-							box("ws-orphan"),
-							box("ws-named"),
-							box("ws-young", { createdAt: NOW - DAY }),
-							box("ws-recent", { statusUpdatedAt: NOW - DAY }),
-							box("ws-running", { status: "running" }),
-						]
-					: [box("env-orphan")],
+			listAllSandboxes: async () => [
+				box("ws-box1"),
+				box("ws-orphan"),
+				box("ws-named"),
+				box("ws-young", { createdAt: NOW - DAY }),
+				box("ws-recent", { statusUpdatedAt: NOW - DAY }),
+				box("ws-running", { status: "running" }),
+				box("env-orphan", { kind: "environment" }),
+				box("someone-elses", { kind: undefined }),
+			],
 			namedSandboxes: async () => new Set(["ws-named"]),
 		});
 		const run = await reapCloudWorkspaceRetention({
@@ -136,13 +150,16 @@ describe("reapCloudWorkspaceRetention", () => {
 		});
 	});
 
-	test("outside production it never looks for orphans", async () => {
+	test("outside production it touches no archived box and looks for no orphan", async () => {
 		let listed = false;
-		const { deps } = fakeDeps({
-			listTaggedSandboxes: async () => {
+		const { deps, reaped } = fakeDeps({
+			listAllSandboxes: async () => {
 				listed = true;
 				return [box("ws-orphan")];
 			},
+			findArchivedPastGraceAmong: async () => [
+				{ id: "ws_a", providerSandboxId: "ws-a", deletedAt: new Date(0) },
+			],
 		});
 		const run = await reapCloudWorkspaceRetention({
 			now: NOW,
@@ -150,7 +167,69 @@ describe("reapCloudWorkspaceRetention", () => {
 			deps,
 		});
 		expect(listed).toBe(false);
+		expect(reaped).toEqual([]);
+		expect(run.archived).toEqual({ skipped: "not production" });
 		expect(run.orphans).toEqual({ skipped: "not production" });
+	});
+
+	test("deletes an archived box still there past its grace through the archive's own delete, by the guard that fits the row", async () => {
+		let cutoff: Date | undefined;
+		let askedAbout: string[] = [];
+		const archivedAt = new Date("2026-10-01T00:00:00.000Z");
+		const { deps, reaped } = fakeDeps({
+			listAllSandboxes: async () => [box("ws-dated"), box("ws-undated")],
+			countArchivedPastGrace: async (at) => {
+				cutoff = at;
+				return 40;
+			},
+			findArchivedPastGraceAmong: async (_at, names) => {
+				askedAbout = names;
+				return [
+					{ id: "ws_d", providerSandboxId: "ws-dated", deletedAt: archivedAt },
+					{ id: "ws_u", providerSandboxId: "ws-undated", deletedAt: null },
+				];
+			},
+		});
+		const run = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: true,
+			deps,
+		});
+		expect(cutoff?.getTime()).toBe(NOW - ARCHIVED_BACKSTOP_AFTER_MS);
+		expect(askedAbout).toEqual(["ws-dated", "ws-undated"]);
+		expect(reaped).toEqual([
+			{
+				cloudWorkspaceId: "ws_d",
+				archivedAt: archivedAt.toISOString(),
+				stage: "delete",
+			},
+			{ cloudWorkspaceId: "ws_u", archivedBefore: cutoff },
+		]);
+		expect(run.archived).toEqual({
+			found: 40,
+			alreadyDeleted: 38,
+			deleted: 2,
+			skipped: 0,
+			deferred: 0,
+			failed: 0,
+		});
+	});
+
+	test("an archived row unarchived or changed before its delete is counted as skipped", async () => {
+		const { deps } = fakeDeps({
+			listAllSandboxes: async () => [box("ws-dated")],
+			countArchivedPastGrace: async () => 1,
+			findArchivedPastGraceAmong: async () => [
+				{ id: "ws_d", providerSandboxId: "ws-dated", deletedAt: new Date(0) },
+			],
+			reapArchived: async () => "skipped",
+		});
+		const run = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: true,
+			deps,
+		});
+		expect(run.archived).toMatchObject({ deleted: 0, skipped: 1 });
 	});
 
 	test("queues at most a batch of orphans a run and counts the rest", async () => {
@@ -158,7 +237,7 @@ describe("reapCloudWorkspaceRetention", () => {
 			box(`ws-orphan${i}`),
 		);
 		const { deps, queued } = fakeDeps({
-			listTaggedSandboxes: async (kind) => (kind === "workspace" ? many : []),
+			listAllSandboxes: async () => many,
 		});
 		const run = await reapCloudWorkspaceRetention({
 			now: NOW,

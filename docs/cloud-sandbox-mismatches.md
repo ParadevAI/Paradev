@@ -796,7 +796,14 @@ state as the 410. It gives the row a new box name in that same update. Then it
 queues `teardownSandbox`, which deletes the box only if no row names it. "Unused"
 means no boot started or stopped since then, with `sandbox_expires_at` and
 `created_at` older too, so a wake in flight (its boot row is written before
-Vercel resumes) keeps the box. In production only, the same job tears down
+Vercel resumes) keeps the box. Archive deletes its box at the end of the
+7-day grace through one delayed QStash message, and Vercel's 30-day expiry used
+to clean up after a lost one. That backstop is gone, so in production the job
+also deletes an archived box still listed a day after its grace, through the
+archive's own delete stage (`reapUndatedArchivedCloudWorkspace` for the rows
+archived before `deleted_at` existed). It matches rows against one listing of
+every box, so a box already gone costs no provider call. In production only,
+the same job also tears down
 tagged boxes that no row and no unarchived environment names, once they are
 7 days old: every deployment shares one Vercel project, so a dev or preview
 database would see production's boxes as orphans. Boxes created before this
