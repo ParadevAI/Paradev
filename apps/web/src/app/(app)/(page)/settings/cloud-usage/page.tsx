@@ -16,6 +16,7 @@ export default async function CloudUsagePage() {
 
 	return (
 		<CloudUsageSettings
+			key={organizationId}
 			isAdmin={membership.role === "owner" || membership.role === "admin"}
 			isOwner={membership.role === "owner"}
 		/>

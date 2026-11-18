@@ -1,5 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import type { SettingsSectionVisibility } from "../settingsSections";
 import {
+	getOfferedSections,
 	getVisibleItemsForSection,
 	getVisibleMatchCountBySection,
 	SETTING_ITEM_ID,
@@ -125,19 +127,44 @@ describe("settings search - auto save", () => {
 	});
 });
 
+function visible(
+	overrides: Partial<SettingsSectionVisibility> = {},
+): SettingsSectionVisibility {
+	return {
+		isMac: true,
+		isAdmin: true,
+		pluginsEnabled: false,
+		cloudUsageEnabled: false,
+		allowedSections: getOfferedSections(false),
+		...overrides,
+	};
+}
+
 describe("settings search - mobile", () => {
 	it("finds the mobile section", () => {
-		expect(getVisibleMatchCountBySection("iPhone", false).mobile).toBe(1);
+		expect(getVisibleMatchCountBySection("iPhone", visible()).mobile).toBe(1);
 	});
 });
 
-describe("settings search - plugins visibility", () => {
-	it("excludes plugin matches unless the plugins section is visible", () => {
+describe("settings search - visibility", () => {
+	it("counts matches only in sections the settings nav shows", () => {
 		expect(
-			getVisibleMatchCountBySection("marketplace", false, false).plugins,
+			getVisibleMatchCountBySection("marketplace", visible()).plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("marketplace", false, true).plugins,
+			getVisibleMatchCountBySection(
+				"marketplace",
+				visible({ pluginsEnabled: true }),
+			).plugins,
 		).toBeGreaterThan(0);
+		expect(
+			getVisibleMatchCountBySection("gb-hours", visible()).cloudUsage,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection(
+				"gb-hours",
+				visible({ cloudUsageEnabled: true }),
+			).cloudUsage,
+		).toBe(1);
 	});
 });

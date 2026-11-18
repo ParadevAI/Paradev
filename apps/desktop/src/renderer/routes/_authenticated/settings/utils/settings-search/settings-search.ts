@@ -3,6 +3,11 @@ import {
 	type IntegrationProvider,
 } from "@superset/shared/integrations";
 import type { SettingsSection } from "renderer/stores/settings-state";
+import {
+	isSettingsSectionVisible,
+	SETTINGS_SECTION_GROUPS,
+	type SettingsSectionVisibility,
+} from "../settingsSections";
 
 export const SETTING_ITEM_ID = {
 	MOBILE_APP: "mobile-app",
@@ -85,6 +90,8 @@ export const SETTING_ITEM_ID = {
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
 	BILLING_USAGE: "billing-usage",
+
+	CLOUD_USAGE: "cloud-usage",
 
 	PROJECT_NAME: "project-name",
 	PROJECT_PATH: "project-path",
@@ -1456,6 +1463,13 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.CLOUD_USAGE,
+		section: "cloudUsage",
+		title: "Cloud usage",
+		description: "GB-hours used by cloud workspaces",
+		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
+	},
+	{
 		id: SETTING_ITEM_ID.PROJECT_NAME,
 		section: "project",
 		title: "Project Name",
@@ -1964,17 +1978,24 @@ function isItemOffered(
 	return cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section);
 }
 
-/** Like `getMatchCountBySection`, but excludes items that are not offered. */
+const NAV_ITEMS = new Map(
+	SETTINGS_SECTION_GROUPS.flatMap((group) => group.items).map((item) => [
+		item.section,
+		item,
+	]),
+);
+
+/** Like `getMatchCountBySection`, but only for sections the settings nav shows. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	cloudWorkspaces: boolean,
-	pluginsVisible = false,
+	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query).filter(
-		(item) =>
-			isItemOffered(item, cloudWorkspaces) &&
-			(item.section !== "plugins" || pluginsVisible),
-	);
+	const matches = searchSettings(query).filter((item) => {
+		const navItem = NAV_ITEMS.get(item.section);
+		return navItem
+			? isSettingsSectionVisible(navItem, visibility)
+			: visibility.allowedSections.has(item.section);
+	});
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
 		counts[item.section] = (counts[item.section] || 0) + 1;

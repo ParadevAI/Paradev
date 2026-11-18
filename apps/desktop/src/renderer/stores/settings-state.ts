@@ -20,6 +20,7 @@ export type SettingsSection =
 	| "integrations"
 	| "plugins"
 	| "billing"
+	| "cloudUsage"
 	| "apikeys"
 	| "permissions"
 	| "security"
