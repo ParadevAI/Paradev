@@ -20169,6 +20169,9 @@ msgstr "The link may be wrong, the page may have been deleted, or you may not ha
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "The linked agent is missing or disabled. Showing the snapshot."
 
+msgid "The linked workspace changed"
+msgstr "The linked workspace changed"
+
 msgid "The local change was rolled back."
 msgstr "The local change was rolled back."
 

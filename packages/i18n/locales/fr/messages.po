@@ -20169,6 +20169,9 @@ msgstr "Le lien est peut-être erroné, la page a peut-être été supprimée, o
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "L'agent lié est absent ou désactivé. Affichage de l'instantané."
 
+msgid "The linked workspace changed"
+msgstr "L’espace de travail lié a changé"
+
 msgid "The local change was rolled back."
 msgstr "La modification locale a été annulée."
 

@@ -20169,6 +20169,9 @@ msgstr "링크가 잘못되었거나, 페이지가 삭제되었거나, 접근 �
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "연결된 에이전트가 없거나 비활성화되어 있습니다. 스냅샷을 표시합니다."
 
+msgid "The linked workspace changed"
+msgstr "연결된 작업 공간이 변경되었습니다"
+
 msgid "The local change was rolled back."
 msgstr "로컬 변경 사항이 되돌려졌습니다."
 

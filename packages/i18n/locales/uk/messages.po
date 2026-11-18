@@ -20163,6 +20163,9 @@ msgstr "Можливо, посилання неправильне, сторін�
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Пов'язаний агент відсутній або вимкнений. Показано знімок."
 
+msgid "The linked workspace changed"
+msgstr "Пов’язаний робочий простір змінився"
+
 msgid "The local change was rolled back."
 msgstr "Локальну зміну відкочено."
 
