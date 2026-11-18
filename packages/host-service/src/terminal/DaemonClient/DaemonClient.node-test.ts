@@ -445,7 +445,9 @@ test(
 		});
 		const client = new DaemonClient({ socketPath });
 		const cancelled = Promise.withResolvers<never>();
-		const cancel = () => cancelled.reject(t.signal.reason);
+		const cancel = () =>
+			cancelled.reject(t.signal.reason ?? new Error("Fixture closed"));
+		void cancelled.promise.catch(() => {});
 		t.signal.addEventListener("abort", cancel, { once: true });
 		const wait = <T>(promise: Promise<T>) =>
 			Promise.race([promise, cancelled.promise]);
@@ -453,15 +455,19 @@ test(
 			await wait(
 				new Promise<void>((resolve) => fake.listen(socketPath, resolve)),
 			);
-			await wait(client.connect());
+			await client.connect();
+			t.signal.throwIfAborted();
 			t.mock.timers.enable({ apis: ["setTimeout"] });
-			const timeout = assert.rejects(client.list(), DaemonUnavailableError);
-			const first = await wait(firstRequest.promise);
-			t.mock.timers.runAll();
-			await wait(timeout);
+			const [first] = await wait(
+				Promise.all([
+					firstRequest.promise.then((message) => {
+						t.mock.timers.runAll();
+						return message;
+					}),
+					assert.rejects(client.list(), DaemonUnavailableError),
+				]),
+			);
 
-			const next = client.list();
-			const { message: second, socket } = await wait(secondRequest.promise);
 			const session = {
 				id: "current",
 				pid: 1,
@@ -469,43 +475,50 @@ test(
 				rows: 24,
 				alive: true,
 			};
-			const repliesRead = Promise.withResolvers<void>();
-			client.subscribe(
-				"list-test-marker",
-				{ replay: false },
-				{
-					onOutput: () => repliesRead.resolve(),
-					onExit: () => {},
-				},
-			);
-			socket.write(
-				Buffer.concat([
-					encodeFrame({
-						type: "list-reply",
-						requestId: first.requestId,
-						sessions: [],
-					}),
-					encodeFrame({
-						type: "list-reply",
-						requestId: second.requestId,
-						sessions: [session],
-					}),
-					encodeFrame(
-						{ type: "output", id: "list-test-marker" },
-						Buffer.from("replies read"),
-					),
-				]),
-			);
-			// The marker arrives after both replies, even if neither matched.
 			const [sessions] = await wait(
 				Promise.all([
-					next,
-					repliesRead.promise.then(() => t.mock.timers.runAll()),
+					client.list(),
+					(async () => {
+						const { message: second, socket } = await wait(
+							secondRequest.promise,
+						);
+						const repliesRead = Promise.withResolvers<void>();
+						client.subscribe(
+							"list-test-marker",
+							{ replay: false },
+							{
+								onOutput: () => repliesRead.resolve(),
+								onExit: () => {},
+							},
+						);
+						socket.write(
+							Buffer.concat([
+								encodeFrame({
+									type: "list-reply",
+									requestId: first.requestId,
+									sessions: [],
+								}),
+								encodeFrame({
+									type: "list-reply",
+									requestId: second.requestId,
+									sessions: [session],
+								}),
+								encodeFrame(
+									{ type: "output", id: "list-test-marker" },
+									Buffer.from("replies read"),
+								),
+							]),
+						);
+						// The marker arrives after both replies, even if neither matched.
+						await wait(repliesRead.promise);
+						t.mock.timers.runAll();
+					})(),
 				]),
 			);
 			assert.deepEqual(sessions, [session]);
 		} finally {
 			t.signal.removeEventListener("abort", cancel);
+			cancel();
 			t.mock.timers.reset();
 			await client.dispose();
 			await new Promise<void>((resolve) => fake.close(() => resolve()));
