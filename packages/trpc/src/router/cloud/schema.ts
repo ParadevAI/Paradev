@@ -29,12 +29,15 @@ export type CloudRange = z.infer<typeof rangeSchema>;
 
 const limitSchema = z.number().int().min(1).max(100).default(25);
 
-export const cloudUsageInputSchema = z.object({
+const pageInputSchema = z.object({
 	workspace: z.uuid().optional(),
 	range: rangeSchema,
-	groupBy: z.enum(cloudUsageGroupByValues).optional(),
 	limit: limitSchema,
 	cursor: z.string().optional(),
+});
+
+export const cloudUsageInputSchema = pageInputSchema.extend({
+	groupBy: z.enum(cloudUsageGroupByValues).optional(),
 });
 
 /** Inside the opaque usage cursor. `value` is cast to numeric in SQL, so it must be decimal digits. */
@@ -54,13 +57,9 @@ export const bootKeysetSchema = z.object({
 	key: z.string(),
 });
 
-export const cloudBootsInputSchema = z.object({
-	workspace: z.uuid().optional(),
+export const cloudBootsInputSchema = pageInputSchema.extend({
 	endReason: z.array(cloudWorkspaceBootEndReasonEnum).optional(),
 	open: z.boolean().optional(),
-	range: rangeSchema,
-	limit: limitSchema,
-	cursor: z.string().optional(),
 });
 
 export const cloudPeriodsInputSchema = z.object({
