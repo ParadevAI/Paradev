@@ -1,16 +1,12 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	createFileRoute,
 	Outlet,
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useEffect, useMemo } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CheckResourcesHotkeyMount } from "renderer/commandPalette";
-import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
-import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { useHistoryNavigationShortcuts } from "renderer/routes/_authenticated/_dashboard/hooks/useHistoryNavigationShortcuts";
 import {
 	type SettingsSection,
@@ -23,6 +19,7 @@ import { ContentBoundary } from "../components/ContentBoundary";
 import { SearchResultsBanner } from "./components/SearchResultsBanner";
 import { SettingsSidebar } from "./components/SettingsSidebar";
 import { useScrollReset } from "./hooks/useScrollReset";
+import { useSettingsSectionVisibility } from "./hooks/useSettingsSectionVisibility";
 import { getVisibleMatchCountBySection } from "./utils/settings-search";
 import { FULL_WIDTH_SECTION_PATHS } from "./utils/settingsSections";
 
@@ -115,10 +112,7 @@ const NON_ROUTABLE_ESCAPE_PARENTS = new Set([
 ]);
 
 function SettingsLayout() {
-	const cloudWorkspacesEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
-	const pluginsVisible = usePluginsSettingsVisible();
-	const cloudUsageEnabled = useCloudUsageEnabled();
+	const visibility = useSettingsSectionVisibility();
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
 	const originRoute = useSettingsOriginRoute();
@@ -134,19 +128,9 @@ function SettingsLayout() {
 	const matchCounts = useMemo(
 		() =>
 			isSearchActive
-				? getVisibleMatchCountBySection(normalizedSearchQuery, {
-						cloudWorkspaces: cloudWorkspacesEnabled,
-						plugins: pluginsVisible,
-						cloudUsage: cloudUsageEnabled,
-					})
+				? getVisibleMatchCountBySection(normalizedSearchQuery, visibility)
 				: {},
-		[
-			isSearchActive,
-			normalizedSearchQuery,
-			cloudWorkspacesEnabled,
-			pluginsVisible,
-			cloudUsageEnabled,
-		],
+		[isSearchActive, normalizedSearchQuery, visibility],
 	);
 	const totalMatches = Object.values(matchCounts).reduce(
 		(sum, count) => sum + count,

@@ -3,6 +3,11 @@ import {
 	type IntegrationProvider,
 } from "@superset/shared/integrations";
 import type { SettingsSection } from "renderer/stores/settings-state";
+import {
+	isSettingsSectionVisible,
+	SETTINGS_SECTION_GROUPS,
+	type SettingsSectionVisibility,
+} from "../settingsSections";
 
 export const SETTING_ITEM_ID = {
 	MOBILE_APP: "mobile-app",
@@ -1973,17 +1978,24 @@ function isItemOffered(
 	return cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section);
 }
 
-/** Like `getMatchCountBySection`, but excludes items that are not offered. */
+const NAV_ITEMS = new Map(
+	SETTINGS_SECTION_GROUPS.flatMap((group) => group.items).map((item) => [
+		item.section,
+		item,
+	]),
+);
+
+/** Like `getMatchCountBySection`, but only for sections the settings nav shows. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	visible: { cloudWorkspaces: boolean; plugins: boolean; cloudUsage: boolean },
+	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query).filter(
-		(item) =>
-			isItemOffered(item, visible.cloudWorkspaces) &&
-			(item.section !== "plugins" || visible.plugins) &&
-			(item.section !== "cloudUsage" || visible.cloudUsage),
-	);
+	const matches = searchSettings(query).filter((item) => {
+		const navItem = NAV_ITEMS.get(item.section);
+		return navItem
+			? isSettingsSectionVisible(navItem, visibility)
+			: visibility.allowedSections.has(item.section);
+	});
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
 		counts[item.section] = (counts[item.section] || 0) + 1;
