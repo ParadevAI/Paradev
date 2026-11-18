@@ -63,7 +63,7 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 								<TableHead>
 									<Trans>Status</Trans>
 								</TableHead>
-								<TableHead className="hidden sm:table-cell">
+								<TableHead className="hidden lg:table-cell">
 									<Trans>Size</Trans>
 								</TableHead>
 								<TableHead className="hidden text-right sm:table-cell">
@@ -125,7 +125,7 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 												</div>
 											)}
 										</TableCell>
-										<TableCell className="hidden sm:table-cell">
+										<TableCell className="hidden lg:table-cell">
 											{workspace && <SizeLabel size={workspace.size} />}
 										</TableCell>
 										<TableCell className="hidden text-right tabular-nums sm:table-cell">
