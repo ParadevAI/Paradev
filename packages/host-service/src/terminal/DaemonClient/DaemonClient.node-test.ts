@@ -407,91 +407,111 @@ test("adoption flow: client A opens, drops, client B finds + subscribes-with-rep
 	await b.dispose();
 });
 
-test("a timed-out list reply cannot settle the next list request", async (t) => {
-	const socketPath = path.join(
-		os.tmpdir(),
-		`host-list-reply-${process.pid}.sock`,
-	);
-	const firstRequest = Promise.withResolvers<ListMessage>();
-	const secondRequest = Promise.withResolvers<{
-		message: ListMessage;
-		socket: net.Socket;
-	}>();
-	let count = 0;
-	const fake = net.createServer((socket) => {
-		const decoder = new FrameDecoder();
-		socket.on("data", (chunk) => {
-			decoder.push(chunk);
-			for (const frame of decoder.drain()) {
-				const message = frame.message as ClientMessage;
-				if (message.type === "hello") {
-					socket.write(
-						encodeFrame({
-							type: "hello-ack",
-							protocol: CURRENT_PROTOCOL_VERSION,
-							daemonVersion: "test",
-							supportsListRequestIds: true,
-						}),
-					);
-				} else if (message.type === "list") {
-					if (++count === 1) firstRequest.resolve(message);
-					else secondRequest.resolve({ message, socket });
+test(
+	"a timed-out list reply cannot settle the next list request",
+	{ timeout: 5000 },
+	async (t) => {
+		const socketPath = path.join(
+			os.tmpdir(),
+			`host-list-reply-${process.pid}.sock`,
+		);
+		const firstRequest = Promise.withResolvers<ListMessage>();
+		const secondRequest = Promise.withResolvers<{
+			message: ListMessage;
+			socket: net.Socket;
+		}>();
+		let count = 0;
+		const fake = net.createServer((socket) => {
+			const decoder = new FrameDecoder();
+			socket.on("data", (chunk) => {
+				decoder.push(chunk);
+				for (const frame of decoder.drain()) {
+					const message = frame.message as ClientMessage;
+					if (message.type === "hello") {
+						socket.write(
+							encodeFrame({
+								type: "hello-ack",
+								protocol: CURRENT_PROTOCOL_VERSION,
+								daemonVersion: "test",
+								supportsListRequestIds: true,
+							}),
+						);
+					} else if (message.type === "list") {
+						if (++count === 1) firstRequest.resolve(message);
+						else secondRequest.resolve({ message, socket });
+					}
 				}
-			}
+			});
 		});
-	});
-	await new Promise<void>((resolve) => fake.listen(socketPath, resolve));
-	const client = new DaemonClient({ socketPath });
-	try {
-		await client.connect();
-		t.mock.timers.enable({ apis: ["setTimeout"] });
-		const timeout = assert.rejects(client.list(), DaemonUnavailableError);
-		const first = await firstRequest.promise;
-		t.mock.timers.runAll();
-		await timeout;
+		const client = new DaemonClient({ socketPath });
+		const cancelled = Promise.withResolvers<never>();
+		const cancel = () => cancelled.reject(t.signal.reason);
+		t.signal.addEventListener("abort", cancel, { once: true });
+		const wait = <T>(promise: Promise<T>) =>
+			Promise.race([promise, cancelled.promise]);
+		try {
+			await wait(
+				new Promise<void>((resolve) => fake.listen(socketPath, resolve)),
+			);
+			await wait(client.connect());
+			t.mock.timers.enable({ apis: ["setTimeout"] });
+			const timeout = assert.rejects(client.list(), DaemonUnavailableError);
+			const first = await wait(firstRequest.promise);
+			t.mock.timers.runAll();
+			await wait(timeout);
 
-		const next = client.list();
-		const { message: second, socket } = await secondRequest.promise;
-		const session = { id: "current", pid: 1, cols: 80, rows: 24, alive: true };
-		const repliesRead = Promise.withResolvers<void>();
-		client.subscribe(
-			"list-test-marker",
-			{ replay: false },
-			{
-				onOutput: () => repliesRead.resolve(),
-				onExit: () => {},
-			},
-		);
-		socket.write(
-			Buffer.concat([
-				encodeFrame({
-					type: "list-reply",
-					requestId: first.requestId,
-					sessions: [],
-				}),
-				encodeFrame({
-					type: "list-reply",
-					requestId: second.requestId,
-					sessions: [session],
-				}),
-				encodeFrame(
-					{ type: "output", id: "list-test-marker" },
-					Buffer.from("replies read"),
-				),
-			]),
-		);
-		// The marker arrives after both replies, even if neither matched.
-		const [sessions] = await Promise.all([
-			next,
-			repliesRead.promise.then(() => t.mock.timers.runAll()),
-		]);
-		assert.deepEqual(sessions, [session]);
-	} finally {
-		t.mock.timers.reset();
-		await client.dispose();
-		await new Promise<void>((resolve) => fake.close(() => resolve()));
-	}
-});
+			const next = client.list();
+			const { message: second, socket } = await wait(secondRequest.promise);
+			const session = {
+				id: "current",
+				pid: 1,
+				cols: 80,
+				rows: 24,
+				alive: true,
+			};
+			const repliesRead = Promise.withResolvers<void>();
+			client.subscribe(
+				"list-test-marker",
+				{ replay: false },
+				{
+					onOutput: () => repliesRead.resolve(),
+					onExit: () => {},
+				},
+			);
+			socket.write(
+				Buffer.concat([
+					encodeFrame({
+						type: "list-reply",
+						requestId: first.requestId,
+						sessions: [],
+					}),
+					encodeFrame({
+						type: "list-reply",
+						requestId: second.requestId,
+						sessions: [session],
+					}),
+					encodeFrame(
+						{ type: "output", id: "list-test-marker" },
+						Buffer.from("replies read"),
+					),
+				]),
+			);
+			// The marker arrives after both replies, even if neither matched.
+			const [sessions] = await wait(
+				Promise.all([
+					next,
+					repliesRead.promise.then(() => t.mock.timers.runAll()),
+				]),
+			);
+			assert.deepEqual(sessions, [session]);
+		} finally {
+			t.signal.removeEventListener("abort", cancel);
+			t.mock.timers.reset();
+			await client.dispose();
+			await new Promise<void>((resolve) => fake.close(() => resolve()));
+		}
+	},
+);
 
 test("open rejects with DaemonUnavailableError when the daemon dies mid-request", async () => {
 	// Fake daemon: completes the handshake, then never answers `open` — the
