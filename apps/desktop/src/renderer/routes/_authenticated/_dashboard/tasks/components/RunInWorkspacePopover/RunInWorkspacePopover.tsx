@@ -334,6 +334,9 @@ export function RunInWorkspacePopover({
 			return;
 		}
 
+		setOpen(false);
+		onComplete();
+
 		const agentChoice = agentConfigs.find(
 			(agent) => agent.id === selectedAgent,
 		);
@@ -405,9 +408,6 @@ export function RunInWorkspacePopover({
 				}),
 			error: (err) => errorMessage(err),
 		});
-
-		setOpen(false);
-		onComplete();
 	};
 
 	return (
