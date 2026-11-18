@@ -60,8 +60,8 @@ import { GitInitConfirmDialog } from "./components/GitInitConfirmDialog";
 import { GlobalBrowserLifecycle } from "./components/GlobalBrowserLifecycle";
 import { GlobalPaneLayoutRequests } from "./components/GlobalPaneLayoutRequests";
 import { InviteMemberDialog } from "./components/InviteMemberDialog";
+import { NotificationController } from "./components/NotificationController";
 import { ResizeMachineConfirmDialog } from "./components/ResizeMachineConfirmDialog";
-import { V2NotificationController } from "./components/V2NotificationController";
 import { WindowTitle } from "./components/WindowTitle";
 import { createPierreWorker } from "./lib/pierreWorker";
 import { CollectionsProvider } from "./providers/CollectionsProvider";
@@ -145,13 +145,13 @@ function AuthenticatedLayout() {
 	electronTrpc.notifications.subscribe.useSubscription(undefined, {
 		onData: (event) => {
 			if (
-				event.type === NOTIFICATION_EVENTS.FOCUS_V2_NOTIFICATION_SOURCE &&
+				event.type === NOTIFICATION_EVENTS.FOCUS_NOTIFICATION_SOURCE &&
 				event.data
 			) {
 				localStorage.setItem("lastViewedWorkspaceId", event.data.workspaceId);
 				const source = event.data.source;
 				void navigate({
-					to: "/v2-workspace/$workspaceId",
+					to: "/workspace/$workspaceId",
 					params: { workspaceId: event.data.workspaceId },
 					search: {
 						terminalId: source.id,
@@ -289,7 +289,7 @@ function AuthenticatedLayout() {
 									<DiffThemeSync />
 									<AgentHooks />
 									<FileMenuListener />
-									<V2NotificationController />
+									<NotificationController />
 									<DockBadgeController />
 									<StarNagObserver />
 									<LeaderboardAutoPublish />

@@ -3,11 +3,11 @@
  * Kept in shared/ to avoid cross-boundary imports.
  */
 
-export type V2NotificationSource =
+export type NotificationSource =
 	| { type: "terminal"; id: string }
 	| { type: "chat"; id: string };
 
-export interface V2NotificationSourceFocusTarget {
+export interface NotificationSourceFocusTarget {
 	workspaceId: string;
-	source: V2NotificationSource;
+	source: NotificationSource;
 }

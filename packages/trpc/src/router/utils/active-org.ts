@@ -29,6 +29,24 @@ export function requireActiveOrgId(
 	return organizationId;
 }
 
+export function isOrgAdmin(orgRole: string): boolean {
+	return orgRole === "owner" || orgRole === "admin";
+}
+
+/** The active organization, and whether the caller is one of its owners or admins. */
+export async function requireActiveOrgRole(
+	ctx: ProtectedContext,
+	database?: Parameters<typeof verifyOrgMembership>[2],
+) {
+	const organizationId = requireActiveOrgId(ctx);
+	const { membership } = await verifyOrgMembership(
+		ctx.session.user.id,
+		organizationId,
+		database,
+	);
+	return { organizationId, isAdmin: isOrgAdmin(membership.role) };
+}
+
 export async function requireActiveOrgMembership(
 	ctx: ProtectedContext,
 	message?: string,

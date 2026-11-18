@@ -798,6 +798,9 @@ msgstr "{appName} Mobile属于专业版"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile在你连接的电脑上运行智能体。"
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {归档#个云工作区} other {归档#个云工作区}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落后main #个提交，需要变基} other {落后main #个提交，需要变基}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {添加了#个提交} other {添加了#个提交}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {已创建#个工作区} other {已创建#个工作区}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {删除#个工作区} other {删除#个工作区}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
@@ -991,6 +991,9 @@ msgstr "{daysLeft, plural, other {剩余 # 天}}"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {你的账户已停用，将在#天后被永久删除。重新激活即可恢复到你离开时的状态。} other {你的账户已停用，将在#天后被永久删除。重新激活即可恢复到你离开时的状态。}}"
 
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {删除#个工作区} other {删除#个工作区}}"
+
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
@@ -1039,6 +1042,9 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
+
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} GB 小时"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隐藏} other {#行已隐藏}}"
@@ -1159,6 +1165,9 @@ msgstr "{name} 失败"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} 分组，{count, plural, other {# 个工作区}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1358,6 +1367,12 @@ msgstr "{skipped, plural, one {#项已跳过} other {#项已跳过}}"
 msgid "{starCount} stars and counting"
 msgstr "{starCount}个星标，还在增长"
 
+msgid "{start} to {end}"
+msgstr "{start} 至 {end}"
+
+msgid "{start} to {end} (current)"
+msgstr "{start} 至 {end}(当前)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"
 
@@ -1444,6 +1459,9 @@ msgstr "{user} 已重新加入。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} 个 vCPU,{memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
@@ -1950,9 +1968,6 @@ msgstr "账户名称"
 
 msgid "Account pending deletion"
 msgstr "账户待删除"
-
-msgid "Account usage"
-msgstr "账户用量"
 
 msgid "Account usage: {percent} used"
 msgstr "账户用量：已使用 {percent}"
@@ -3082,12 +3097,19 @@ msgstr "归档环境"
 msgid "Archive failed"
 msgstr "归档失败"
 
+msgid "Archive selected cloud workspaces"
+msgstr "归档选中的云工作区"
+
 msgid "Archive this automation before you delete it."
 msgstr "请先归档此自动化，再删除它。"
 
 msgid "Archive workspace"
 msgstr "归档工作区"
 
+msgid "Archived"
+msgstr "已归档"
+
+msgctxt "cloud workspace status"
 msgid "Archived"
 msgstr "已归档"
 
@@ -3187,6 +3209,10 @@ msgstr "编辑和运行命令前询问"
 
 msgid "Asks only for risky actions"
 msgstr "仅在有风险时询问"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "休眠中"
 
 msgid "Aspect Ratio"
 msgstr "宽高比"
@@ -3560,6 +3586,9 @@ msgstr "账单"
 msgid "Billing details"
 msgstr "账单信息"
 
+msgid "Billing period"
+msgstr "账单周期"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "计费系统拒绝启动云工作区：组织的方案不包含云工作区，或已达到云使用上限。云工作区需要 Team 或 Ultra 方案。请在设置 > 账单中升级或提高上限，或在设备上运行此自动化。"
 
@@ -3624,6 +3653,9 @@ msgstr "启动"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "正在启动 {0}…"
+
+msgid "Boots"
+msgstr "启动"
 
 msgid "Border"
 msgstr "边框"
@@ -4350,6 +4382,9 @@ msgstr "检查通过"
 msgid "Checks Skipped"
 msgstr "检查已跳过"
 
+msgid "Checks unavailable"
+msgstr "检查不可用"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "选择 {pluginLabel} 账户"
 
@@ -4787,8 +4822,14 @@ msgstr "云端沙箱"
 msgid "Cloud usage"
 msgstr "云端用量"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "此组织未启用云端用量。"
+
 msgid "Cloud workspace"
 msgstr "云端工作区"
+
+msgid "Cloud workspace usage for the whole organization."
+msgstr "整个组织的云端工作区用量。"
 
 msgid "Cloud workspace: asleep"
 msgstr "云端工作区，已休眠"
@@ -4820,6 +4861,9 @@ msgstr "云工作区以你的身份提交、推送并创建拉取请求"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "云工作区会忽略此变量。智能体改为在「设置 › 智能体」中登录。"
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "云端工作区需要付费套餐。"
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "云工作区需要 Team 或 Ultra 方案。请在设置的账单中升级后启动。"
@@ -5030,6 +5074,10 @@ msgstr "方案对比"
 
 msgid "Compared against the default style"
 msgstr "与默认样式做了对比"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "对比"
 
 msgid "complete"
 msgstr "已结束"
@@ -5764,6 +5812,9 @@ msgstr "无法列出目录"
 msgid "Could not load agents from {0}"
 msgstr "无法从{0}加载智能体"
 
+msgid "Could not load cloud usage."
+msgstr "无法加载云端用量。"
+
 msgid "Could not load environments"
 msgstr "无法加载环境"
 
@@ -5923,6 +5974,9 @@ msgstr "无法分享"
 msgid "Could not sign out. Please try again."
 msgstr "无法退出登录。请重试。"
 
+msgid "Could not start"
+msgstr "无法启动"
+
 msgid "Could not start agent"
 msgstr "无法启动智能体"
 
@@ -6005,6 +6059,9 @@ msgstr "无法分叉对话"
 msgid "Couldn't cancel the move"
 msgstr "无法取消移动"
 
+msgid "Couldn't change the group color"
+msgstr "无法更改分组颜色"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "无法更改机器规格：{0}"
@@ -6051,8 +6108,14 @@ msgstr "无法创建堆栈"
 msgid "Couldn't create the channel"
 msgstr "无法创建频道"
 
+msgid "Couldn't create the group"
+msgstr "无法创建分组"
+
 msgid "Couldn't create workspace"
 msgstr "无法创建工作区"
+
+msgid "Couldn't delete the group"
+msgstr "无法删除分组"
 
 msgid "Couldn't discard changes"
 msgstr "无法放弃更改"
@@ -6140,6 +6203,9 @@ msgstr "无法移动 {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "无法将子智能体移到后台"
 
+msgid "Couldn't move the workspace"
+msgstr "无法移动工作区"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
 
@@ -6189,6 +6255,9 @@ msgstr "无法移出合并队列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "无法移除本地登录"
+
+msgid "Couldn't rename the group"
+msgstr "无法重命名分组"
 
 msgid "Couldn't restart terminals"
 msgstr "无法重启终端"
@@ -6345,6 +6414,9 @@ msgstr "CPU核心"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "CPU 受限"
+
+msgid "Crashed"
+msgstr "已崩溃"
 
 msgid "Create"
 msgstr "创建"
@@ -6991,6 +7063,10 @@ msgstr "已删除"
 msgid "Deleted"
 msgstr "已删除"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "已删除"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "已删除"
@@ -7037,6 +7113,9 @@ msgstr "已删除的项目可在 30 天内恢复，连同一起删除的工作�
 
 msgid "Deleted user"
 msgstr "已删除的用户"
+
+msgid "Deleted workspace"
+msgstr "已删除的工作区"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "工作区已删除，但侧边栏没能更新完"
@@ -8249,6 +8328,13 @@ msgstr "失败"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "失败"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "失败"
+
+msgid "Failed {failedAt}"
+msgstr "失败于 {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失败运行 <0>· 7天</0>"
@@ -9850,6 +9936,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "每小时"
 
+msgid "Hours"
+msgstr "小时"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "时长由整个团队共享。以标准 {vcpus} vCPU / {memoryGb} GB 工作区计算，更大的机器消耗更快。"
 
@@ -10640,6 +10729,9 @@ msgstr "其评论和历史记录也会一并删除。"
 msgid "Its connected accounts were disconnected."
 msgstr "其已连接的账户已断开。"
 
+msgid "Its machine no longer exists."
+msgstr "其机器已不存在。"
+
 msgid "Its own branch and copy of the files"
 msgstr "独立的分支和文件副本"
 
@@ -10648,6 +10740,12 @@ msgstr "同步完成后，其插件会显示出来。"
 
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
+
+msgid "Its saved state expired."
+msgstr "其保存的状态已过期。"
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "云端工作区启动它后，它的终端会在这里打开。"
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的更改）会推送到一个新分支。{computerName} 上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
@@ -12358,6 +12456,9 @@ msgstr "新建分组…"
 msgid "New issue"
 msgstr "新建议题"
 
+msgid "New layout"
+msgstr "新布局"
+
 msgid "New messages"
 msgstr "新消息"
 
@@ -12423,6 +12524,9 @@ msgstr "新建工作区（{shortcutText}）"
 
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作区"
+
+msgid "New workspace page"
+msgstr "新版新建工作区页面"
 
 msgid "Newer than this app"
 msgstr "比此应用新"
@@ -12574,6 +12678,13 @@ msgstr "未找到作者。"
 msgid "No automations match"
 msgstr "没有匹配的自动化"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "没有从 {0} 开始的结算周期。"
+
+msgid "No boots in this period."
+msgstr "此周期内没有启动。"
+
 msgid "No branches found"
 msgstr "未找到分支"
 
@@ -12615,6 +12726,9 @@ msgstr "这台机器上还没有发现Claude或Codex的用量。现在加入，�
 
 msgid "No cloud environment opens {repository}."
 msgstr "没有云环境打开 {repository}。"
+
+msgid "No cloud usage in this period."
+msgstr "此周期内没有云端用量。"
 
 msgid "No cloud workspaces"
 msgstr "没有云工作区"
@@ -12912,6 +13026,9 @@ msgstr "没有待处理的邀请"
 
 msgid "No people found."
 msgstr "未找到成员。"
+
+msgid "No person recorded"
+msgstr "未记录人员"
 
 msgid "No plugins available yet."
 msgstr "暂无可用插件。"
@@ -13588,6 +13705,9 @@ msgstr "只有组织所有者可以修改这些设置。"
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "只有组织所有者或设备所有者可以删除此项目。"
 
+msgid "Only owners and admins can see usage by person."
+msgstr "只有所有者和管理员可以按人员查看用量。"
+
 msgid "Only owners can change membership."
 msgstr "只有所有者可以更改成员。"
 
@@ -13674,6 +13794,9 @@ msgstr "只有你可以使用此连接。队友会连接自己的 {name} 账号�
 
 msgid "Only you. Teammates forward their own."
 msgstr "仅你自己。队友各自转发。"
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "仅显示你自己的工作区。组织总计仅供所有者和管理员查看。"
 
 msgid "open"
 msgstr "打开"
@@ -15825,6 +15948,10 @@ msgstr "可读可发"
 msgid "Ready"
 msgstr "就绪"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "就绪"
+
 msgid "Ready for review"
 msgstr "待审查"
 
@@ -16010,6 +16137,9 @@ msgstr "与 {others} 一起重新加入了 {channel}。"
 msgid "rejoined {channel}."
 msgstr "已重新加入 {channel}。"
 
+msgid "Related comparisons"
+msgstr "相关对比"
+
 msgid "Related Posts"
 msgstr "相关文章"
 
@@ -16028,6 +16158,9 @@ msgstr "释放控制"
 msgid "Release…"
 msgstr "版本…"
 
+msgid "Released before use"
+msgstr "使用前已释放"
+
 msgid "Reload"
 msgstr "重新加载"
 
@@ -16039,6 +16172,9 @@ msgstr "从磁盘重新加载"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "重新加载Paradev以刷新工作区列表。"
+
+msgid "Reload to apply"
+msgstr "重新加载以应用"
 
 msgid "Reload window"
 msgstr "重新加载窗口"
@@ -16472,9 +16608,6 @@ msgstr "重置位置"
 msgid "Reset terminal"
 msgstr "重置终端"
 
-msgid "Reset time unavailable"
-msgstr "重置时间不可用"
-
 msgid "Reset to default"
 msgstr "恢复默认"
 
@@ -16595,6 +16728,9 @@ msgstr "重启工作区"
 
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "重启工作区以使用新的代理凭据。"
+
+msgid "Restarted"
+msgstr "已重启"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "已重启{restartedOrgCount}个主机服务"
@@ -16902,6 +17038,10 @@ msgstr "旋转"
 msgid "Rotate device"
 msgstr "旋转设备"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "汇总"
+
 msgid "Roundups"
 msgstr "综合评测"
 
@@ -17063,6 +17203,10 @@ msgstr "运行。"
 msgid "running"
 msgstr "运行中"
 
+msgid "Running"
+msgstr "运行中"
+
+msgctxt "cloud workspace status"
 msgid "Running"
 msgstr "运行中"
 
@@ -17579,6 +17723,9 @@ msgstr "查看空缺职位，或先试用 Paradev。"
 
 msgid "See this gate on the scorecard"
 msgstr "在评分表中查看这道关卡"
+
+msgid "See usage"
+msgstr "查看用量"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "查看改动、给出反馈，就绪后合并成果。"
@@ -19001,6 +19148,10 @@ msgstr "启动中"
 msgid "Starting"
 msgstr "启动中"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "启动中"
+
 msgid "Starting {agentLabel}"
 msgstr "正在启动{agentLabel}"
 
@@ -19154,11 +19305,17 @@ msgstr "已停止"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "已停止 {0}（{1} GB）以释放内存"
 
+msgid "Stopped by a person"
+msgstr "由用户停止"
+
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
 msgid "Stopped moving {name}"
 msgstr "已停止移动 {name}"
+
+msgid "Stopped when idle"
+msgstr "空闲时停止"
 
 msgid "Stopping the agent in {what}"
 msgstr "正在停止 {what} 中的代理"
@@ -19740,6 +19897,9 @@ msgstr "该账号已断开连接，请选择其他账号。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "该智能体会话还没有可打开的对话。它已启动但从未收到指令。"
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "无法读取该游标。去掉它即可从第一页开始。"
+
 msgid "that device"
 msgstr "那台设备"
 
@@ -19985,6 +20145,9 @@ msgstr "合并前人类会逐行阅读。"
 msgid "The image upload expired — attach it again"
 msgstr "图片上传已过期 — 请重新附加"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "包含的 GB 小时和超额 GB 小时仅保留当前周期的数据。"
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "岗位描述变了。工程师不再是有品味的打字员，而成了有品味的调度员：拆解工作、分派给智能体集群、在两个改了同一个模块的智能体之间做裁决。"
 
@@ -20056,6 +20219,9 @@ msgstr "开源工作区，容纳Claude Code、Codex和任何编码智能体。"
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "开源工作区，容纳 Claude Code、Codex、OpenCode 和任何编码智能体。在不同分支上并行运行任务，并在一个地方审查所有内容。"
+
+msgid "The organization reached its usage limit."
+msgstr "组织已达到使用上限。"
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "移动的另一端运行的是旧版本。请重启云端工作区或更新设备的主机，然后重试。"
@@ -20201,8 +20367,17 @@ msgstr "此更新还可以："
 msgid "The very beginning"
 msgstr "最开始"
 
+msgid "The workspace could not be created."
+msgstr "无法创建工作区。"
+
+msgid "The workspace could not be queued to start."
+msgstr "无法将工作区加入启动队列。"
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "无法连接到工作区。请检查它是否正在运行，然后重试。"
+
+msgid "The workspace did not become ready."
+msgstr "工作区未能就绪。"
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "工作区尚未就绪。请重试。"
@@ -20480,6 +20655,12 @@ msgstr "这只会更改显示名称，不会更改分支。"
 
 msgid "this organization"
 msgstr "此组织"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "此组织没有账单周期,因此本页显示最近 30 天。"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "此组织没有结算周期。请改为选择一个时间范围。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
@@ -21103,6 +21284,10 @@ msgstr "把新手引导的调研结果做成页面"
 msgid "Turned off because its files changed"
 msgstr "已关闭，因为其文件已更改"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "教程"
+
 msgid "Two Hands"
 msgstr "双手齐开"
 
@@ -21588,8 +21773,17 @@ msgstr "URL友好的标识符，在你的组织内唯一。"
 msgid "Usage"
 msgstr "用量"
 
+msgid "Usage by day"
+msgstr "按天用量"
+
+msgid "Usage by person"
+msgstr "按人员用量"
+
 msgid "Usage is out of date"
 msgstr "用量数据已过时"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "用量显示在计费当天(UTC),可能略晚于工作区实际运行的时间。"
 
 msgid "Usage limit reached"
 msgstr "已达到使用上限"
@@ -21672,6 +21866,12 @@ msgstr "使用桌面应用开始并行运行编码智能体。"
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "请使用Paradev托盘菜单 > 主机服务 > 重启，然后重试。"
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "使用重新设计的“新建工作区”页面：提示输入框位于中间，上方是项目和分支选择器。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "使用重新设计的窗口布局：图标栏、标题栏中的标签页，以及卡片式窗格。"
 
 msgid "Use this account"
 msgstr "使用此账户"
@@ -22720,6 +22920,9 @@ msgstr "你没有此终端的访问权限。"
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
 
+msgid "You have no cloud usage in this period."
+msgstr "你在此周期内没有云端用量。"
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未保存的环境变量。确定要关闭吗？"
 
@@ -22835,6 +23038,9 @@ msgstr "如果不保存，你的更改将会丢失。"
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "你的聊天记录会保留。只有智能体会重启。"
 
+msgid "Your cloud usage"
+msgstr "你的云端用量"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "你的云端工作区将无法再访问此主机。"
 
@@ -22919,6 +23125,9 @@ msgstr "你的套餐不包含云端环境。"
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "你的套餐不包含云端环境。请在设置的账单中升级后再创建。"
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "你的套餐不包含云端 GB 小时。"
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "您的方案将于 {startDate} 切换到 {planName}。今天不扣费。"
 
@@ -22966,6 +23175,9 @@ msgstr "你的等级是为你测得的 {0} 个维度的加权得分，强项可�
 msgid "Your tokens"
 msgstr "你的token数"
 
+msgid "Your usage by day"
+msgstr "你的按天用量"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "你的 v1 项目和工作区正在迁移到新版 Paradev。每一项准备好后就会出现在侧边栏中。"
 
@@ -22980,6 +23192,9 @@ msgstr "Codex 的设备码登录由你的工作区管理员开启。"
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "你的工作区没有变化。几分钟后可以再次移动。"
+
+msgid "Your workspaces"
+msgstr "你的工作区"
 
 msgid "Zap"
 msgstr "闪电"

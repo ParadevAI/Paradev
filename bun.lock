@@ -727,6 +727,7 @@
         "react": "19.3.0",
         "react-dom": "19.3.0",
         "react-icons": "5.6.0",
+        "recharts": "2.15.4",
         "require-in-the-middle": "8.0.1",
         "server-only": "0.0.1",
         "superjson": "2.2.6",
@@ -973,6 +974,7 @@
         "zod": "4.6.6",
       },
       "devDependencies": {
+        "@electric-sql/pglite": "0.5.16",
         "@superset/typescript": "workspace:*",
         "@types/node": "24.12.0",
         "bun-types": "1.4.3",
@@ -1382,6 +1384,7 @@
         "@lingui/babel-plugin-lingui-macro": "6.12.0",
         "@rolldown/plugin-babel": "0.3.0",
         "@storybook/react-vite": "10.6.2",
+        "@superset/trpc": "workspace:*",
         "@superset/typescript": "workspace:*",
         "@tailwindcss/postcss": "4.2.2",
         "@tailwindcss/vite": "4.2.2",
@@ -1477,6 +1480,7 @@
     "trpc-electron@0.1.2": "patches/trpc-electron@0.1.2.patch",
     "metro@0.87.1": "patches/metro@0.87.1.patch",
     "@vercel/sandbox@4.0.0": "patches/@vercel%2Fsandbox@4.0.0.patch",
+    "sonner@2.0.7": "patches/sonner@2.0.7.patch",
     "electron-chrome-web-store@0.13.0": "patches/electron-chrome-web-store@0.13.0.patch",
     "@xterm/addon-ligatures@0.11.0-beta.310": "patches/@xterm%2Faddon-ligatures@0.11.0-beta.310.patch",
   },
@@ -1944,6 +1948,8 @@
     "@dotenvx/primitives": ["@dotenvx/primitives@0.8.0", "", {}, "sha512-VYJy0uhFm9zTJ1TxBaW/pA8bjbOM/OttaNMwZ1RHG4JKyRG7DhSdiqD1ipQoAyoD22olUtxbP78W9xY3Wd11bg=="],
 
     "@drizzle-team/brocli": ["@drizzle-team/brocli@0.10.2", "", {}, "sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w=="],
+
+    "@electric-sql/pglite": ["@electric-sql/pglite@0.5.16", "", {}, "sha512-Nj8KcIsJL748W408U2N8q4+9IlONdpRIU8MJypIAAINMJ5nqKyqpX7Mgg/5XKkXiAib3AoZGR6hnJFlrlLBrcg=="],
 
     "@electron-internal/extract-zip": ["@electron-internal/extract-zip@1.0.5", "", {}, "sha512-+bqFCP98pLI0Tt0XQo1TmlXtwjWchISndDOxCkEcIuUgXWpBnLyRI+2DU+mesvnMMX6L1XDqYNA0lXNDHd/yiA=="],
 

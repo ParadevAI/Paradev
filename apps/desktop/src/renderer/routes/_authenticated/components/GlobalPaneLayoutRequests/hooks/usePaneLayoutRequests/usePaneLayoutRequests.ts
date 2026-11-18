@@ -4,7 +4,7 @@ import {
 } from "@superset/shared/pane-layout-ops";
 import { useEffect } from "react";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { persistBrowserPaneState } from "renderer/routes/_authenticated/utils/persistBrowserPaneState";
@@ -14,7 +14,7 @@ import {
 } from "renderer/routes/_authenticated/utils/runPaneLayoutOp";
 
 function wakeBrowser(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<AppCollections, "workspaceLocalState">,
 	workspaceId: string,
 	paneId: string,
 ): PaneLayoutOpResult {

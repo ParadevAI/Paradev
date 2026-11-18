@@ -15,6 +15,7 @@ export interface CloudUsage {
 	prepaidGbMinutes: number;
 	autoTopup: CloudAutoTopup | null;
 	pack: GbHourPack | null;
+	overagePerGbHour: number | null;
 	resetsAt: string | null;
 }
 
@@ -28,6 +29,7 @@ export function cloudUsageFromBalances(
 	balances: Customer["balances"],
 	billingControls?: Customer["billingControls"],
 	pack: GbHourPack | null = null,
+	overagePerGbHour: number | null = null,
 ): CloudUsage | null {
 	const balance = balances[BOX_GB_MINUTES_FEATURE_ID];
 	if (!balance) return null;
@@ -62,6 +64,7 @@ export function cloudUsageFromBalances(
 				}
 			: null,
 		pack,
+		overagePerGbHour,
 		resetsAt: balance.nextResetAt
 			? new Date(balance.nextResetAt).toISOString()
 			: null,

@@ -8,22 +8,23 @@ import { markTerminalForBackground } from "renderer/lib/terminal/terminal-backgr
 import type {
 	ChatPaneData,
 	PaneViewerData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import {
 	ignoreChatTerminal,
 	markChatSessionClosed,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/closedChatSessions";
-import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/pendingChatStops";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/closedChatSessions";
+import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/pendingChatStops";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { forgetAgentSidebar } from "renderer/stores/agent-sidebar-reveal";
+import {
+	applyRememberedPaneSelection,
+	rememberPaneSelection,
+} from "renderer/stores/pane-selection";
 import { useRightPaneFullScreen } from "renderer/stores/right-pane-full-screen";
 import {
 	getV2PaneLayoutStore,
 	type PaneLayoutSlot,
 } from "renderer/stores/v2-pane-layout-stores";
-import {
-	applyRememberedV2PaneSelection,
-	rememberV2PaneSelection,
-} from "renderer/stores/v2-pane-selection";
 import {
 	applyPaneLayoutOp,
 	type PaneAreas,
@@ -94,14 +95,14 @@ function readArea(
 		const { tabs, activeTabId } = mounted.getState();
 		return { version: 1, tabs, activeTabId };
 	}
-	return applyRememberedV2PaneSelection(
+	return applyRememberedPaneSelection(
 		selectionKey(workspaceId, area),
 		(row?.[SLOTS[area]] as LayoutState | undefined) ?? EMPTY_LAYOUT,
 	);
 }
 
 function setSidebarView(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<AppCollections, "workspaceLocalState">,
 	workspaceId: string,
 	wasOpen: boolean,
 	view: { open: boolean; fullScreen?: boolean },
@@ -115,18 +116,18 @@ function setSidebarView(
 		clearFor(workspaceId);
 	}
 	if (view.open !== wasOpen) {
-		collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+		collections.workspaceLocalState.update(workspaceId, (draft) => {
 			draft.rightSidebarOpen = view.open;
 		});
 	}
 }
 
 export function runPaneLayoutOp(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<AppCollections, "workspaceLocalState">,
 	workspaceId: string,
 	op: PaneLayoutOp,
 ): PaneLayoutOpResult {
-	const row = collections.v2WorkspaceLocalState.get(workspaceId);
+	const row = collections.workspaceLocalState.get(workspaceId);
 	const isMounted = getV2PaneLayoutStore(workspaceId, "paneLayout") != null;
 	if (!row && op.type !== "list" && (!isMounted || op.type === "sidebar")) {
 		throw new PaneLayoutOpError(
@@ -151,10 +152,16 @@ export function runPaneLayoutOp(
 				mounted.getState().replaceState(next);
 				continue;
 			}
-			collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+			const emptiedSidebar =
+				area === "sidebar" &&
+				next.tabs.length === 0 &&
+				previous.sidebar.tabs.length > 0;
+			if (emptiedSidebar) forgetAgentSidebar(workspaceId);
+			collections.workspaceLocalState.update(workspaceId, (draft) => {
 				draft[SLOTS[area]] = next;
+				if (emptiedSidebar) draft.rightSidebarOpen = false;
 			});
-			rememberV2PaneSelection(selectionKey(workspaceId, area), next);
+			rememberPaneSelection(selectionKey(workspaceId, area), next);
 		}
 	}
 
@@ -165,8 +172,7 @@ export function runPaneLayoutOp(
 		setSidebarView(collections, workspaceId, wasOpen, { open: true });
 	}
 	const open =
-		collections.v2WorkspaceLocalState.get(workspaceId)?.rightSidebarOpen ??
-		false;
+		collections.workspaceLocalState.get(workspaceId)?.rightSidebarOpen ?? false;
 	const fullScreen =
 		open &&
 		useRightPaneFullScreen.getState().fullScreen?.workspaceId === workspaceId;

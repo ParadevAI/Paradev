@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -58,6 +58,26 @@ describe("runSandboxArchiveHook", () => {
 		const result = await runSandboxArchiveHook(identity());
 		expect(result.status).toBe("ok");
 		expect(result.status === "ok" && result.outputTail).toBe("cloud\ndone\n");
+	});
+
+	it("logs the outcome without a multi-line command", async () => {
+		writeConfig(
+			'[archive.cloud]\nrun = """\necho ARCHIVE-LINE-ONE\necho ARCHIVE-LINE-TWO\n"""\n',
+		);
+		const printed: unknown[] = [];
+		const spy = spyOn(console, "log").mockImplementation((...args) => {
+			printed.push(...args);
+		});
+		try {
+			expect((await runSandboxArchiveHook(identity())).status).toBe("ok");
+		} finally {
+			spy.mockRestore();
+		}
+		expect(printed).toEqual([
+			expect.stringMatching(
+				/^\[sandbox\] archive hook exited 0 \(command of \d+ chars\)$/,
+			),
+		]);
 	});
 
 	it("is skipped when there is nothing to run", async () => {

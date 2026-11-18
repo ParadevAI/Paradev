@@ -15,8 +15,8 @@ import type {
 	PaneLayoutOp,
 	PaneSplitDirection,
 } from "@superset/shared/pane-layout-ops";
-import { DEFAULT_BROWSER_URL } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/constants";
-import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspacePaneLayout/utils/preserveLocalPaneSelection";
+import { DEFAULT_BROWSER_URL } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/constants";
+import { preserveLocalPaneSelection } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useWorkspacePaneLayout/utils/preserveLocalPaneSelection";
 import type {
 	BrowserPaneData,
 	ChatPaneData,
@@ -24,8 +24,8 @@ import type {
 	FilePaneData,
 	PagesListPaneData,
 	PaneViewerData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
-import { NEW_DIFF_PANE } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/utils/openChangesPaneInStore";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
+import { NEW_DIFF_PANE } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/openChangesPaneInStore";
 
 type LayoutState = WorkspaceState<PaneViewerData>;
 

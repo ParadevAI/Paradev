@@ -16,7 +16,7 @@ keywords:
   - parallel codex sessions
 ---
 
-To run GPT-6.2 Astra or GPT-6.2 Sol in parallel, start one Codex session per task, each in its own Git worktree and branch, and launch each with `codex -m gpt-6.2-astra` or `codex -m gpt-6.2-sol`. In Paradev, set the model in `~/.codex/config.toml`, then create one workspace per task with Codex as the agent and **Default model** selected, or start Codex with `--command` from `superset ws create`. Review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+To run GPT-6.2 Astra or GPT-6.2 Sol in parallel, start one Codex session per task, each in its own Git worktree and branch, and launch each with `codex -m gpt-6.2-astra` or `codex -m gpt-6.2-sol`. In Paradev, create one workspace per task, choose Codex as the agent and GPT-6.2 Astra or GPT-6.2 Sol in the model picker, or pass `--agent codex --model gpt-6.2-sol` to `superset ws create`. Review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
 
 ## What shipped
 
@@ -91,33 +91,32 @@ Worktrees share repository history and run as your user. They do not give each t
 
 Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Codex runs on your own ChatGPT plan or API key. Paradev is open source under the MIT License.
 
-Paradev's model picker does not list GPT-6.2 yet. Until it does, let Codex choose the model from its own config:
+Paradev lists GPT-6.2 Astra and GPT-6.2 Sol in the Codex model picker from version 2.0.10. Codex must be 0.169.0 or later: older Codex releases reject both models with `model_not_found`.
 
-1. Add `model = "gpt-6.2-sol"` (or `gpt-6.2-astra`) to `~/.codex/config.toml`.
-2. Create a new workspace for each task.
-3. Choose **Codex** as the agent and **Default model** in the model menu, so Codex reads the model from its config.
-4. Write the task prompt and start it. Repeat for the next task.
-5. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+From the app:
 
-From the `superset` CLI, start a batch of workspaces and group them with a tag. With the model set in `config.toml`, leave out `--model`:
+1. Create a new workspace for each task.
+2. In the composer, choose **Codex** as the agent and **GPT-6.2 Astra** or **GPT-6.2 Sol** in the model picker.
+3. Write the task prompt and start it. Repeat for the next task.
+4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
 
-```bash
-superset ws create --local --project PROJECT_ID --name sol-tests \
-  --branch ai/sol-tests --tag gpt-6-2 \
-  --agent codex --prompt "Add regression tests for the input parser"
-
-superset ws list --local --tag gpt-6-2
-```
-
-To run a different model in one workspace, start Codex with `--command` instead of `--agent`:
+From the `superset` CLI, start a batch of workspaces and group them with a tag:
 
 ```bash
 superset ws create --local --project PROJECT_ID --name astra-refactor \
   --branch ai/astra-refactor --tag gpt-6-2 \
-  --command 'codex -m gpt-6.2-astra "Move the billing logic out of the request handlers into one module"'
+  --agent codex --model gpt-6.2-astra --prompt "Move the billing logic out of the request handlers into one module"
+
+superset ws create --local --project PROJECT_ID --name sol-tests \
+  --branch ai/sol-tests --tag gpt-6-2 \
+  --agent codex --model gpt-6.2-sol --prompt "Add regression tests for the input parser"
+
+superset ws list --local --tag gpt-6-2
 ```
 
-Tagged workspaces collect in a sidebar folder with the tag's name. To compare Astra and Sol on the same task, create two workspaces with the same prompt and different `-m` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud).
+`--effort` sets reasoning effort for the launch; both models accept every level up to `ultra`. On Paradev 2.0.9 or earlier, the picker does not list GPT-6.2: add `model = "gpt-6.2-sol"` to `~/.codex/config.toml` and choose **Default model**, so Codex reads the model from its config.
+
+Tagged workspaces collect in a sidebar folder with the tag's name. To compare Astra and Sol on the same task, create two workspaces with the same prompt and different `--model` values. The [iPhone and iPad app](/mobile) lets you check on the sessions and review diffs while they keep running on your machine, a host you added, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud).
 
 ## Frequently Asked Questions
 
@@ -135,7 +134,7 @@ Yes. The API model ids are `gpt-6.2-astra` and `gpt-6.2-sol`. Astra costs $8 per
 
 ### Can I pick GPT-6.2 in Paradev's model picker?
 
-Not yet. Set the model in `~/.codex/config.toml` and choose **Default model**, or start Codex with `--command 'codex -m gpt-6.2-astra'` from `superset ws create`.
+Yes, from Paradev 2.0.10 with Codex 0.169.0 or later. Choose **Codex** as the agent, then **GPT-6.2 Astra** or **GPT-6.2 Sol** in the model picker. On older versions, set the model in `~/.codex/config.toml` and choose **Default model**.
 
 ### Do parallel GPT-6.2 sessions share files?
 

@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { Progress } from "@superset/ui/progress";
+import { Link } from "@tanstack/react-router";
+import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { GbHourPurchase } from "./components/GbHourPurchase";
 
@@ -13,8 +15,9 @@ export function CloudUsageCard({
 	organizationId,
 	canBuy,
 }: CloudUsageCardProps) {
-	const { formatNumber, formatDate } = useFormat();
+	const { formatDate, formatGbHours } = useFormat();
 	const { data: usage } = cloudTrpc.billing.cloudUsage.useQuery(undefined);
+	const showUsageLink = useCloudUsageEnabled();
 
 	if (
 		!usage ||
@@ -27,11 +30,7 @@ export function CloudUsageCard({
 		return null;
 	}
 
-	const gbHours = (gbMinutes: number) => {
-		const hours = gbMinutes / 60;
-		if (hours > 0 && hours < 0.1) return `<${formatNumber(0.1)}`;
-		return formatNumber(hours, { maximumFractionDigits: 1 });
-	};
+	const gbHours = (gbMinutes: number) => formatGbHours(gbMinutes / 60);
 	const used = gbHours(usage.usedGbMinutes);
 	const included =
 		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
@@ -63,11 +62,21 @@ export function CloudUsageCard({
 							</Trans>
 						)}
 					</span>
-					{resetDate && (
-						<span className="text-xs text-muted-foreground">
-							<Trans>Resets {resetDate}</Trans>
-						</span>
-					)}
+					<span className="flex items-baseline gap-3 text-xs">
+						{resetDate && (
+							<span className="text-muted-foreground">
+								<Trans>Resets {resetDate}</Trans>
+							</span>
+						)}
+						{showUsageLink && (
+							<Link
+								to="/settings/cloud-usage"
+								className="text-primary hover:underline"
+							>
+								<Trans>See usage</Trans>
+							</Link>
+						)}
+					</span>
 				</div>
 				{usage.includedGbMinutes !== null && usage.includedGbMinutes > 0 && (
 					<Progress value={percentUsed} />

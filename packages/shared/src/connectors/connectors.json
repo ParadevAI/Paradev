@@ -1208,6 +1208,40 @@
 				}
 			]
 		},
+		"planetscale_mcp": {
+			"displayName": "PlanetScale",
+			"icon": "planetscale",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.pscale.dev/mcp/planetscale",
+					"identity": {
+						"url": "https://auth.planetscale.com/oauth/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.email",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.email",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"wispr_mcp": {
 			"displayName": "Wispr Flow",
 			"icon": "wispr",

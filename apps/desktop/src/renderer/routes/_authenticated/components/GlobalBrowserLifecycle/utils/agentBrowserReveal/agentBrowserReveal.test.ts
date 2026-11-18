@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import {
 	clearAgentSidebarStatesForTest,
 	noteUserSidebarChange,
 } from "renderer/stores/agent-sidebar-reveal";
-import { clearRememberedV2PaneSelectionsForTest } from "renderer/stores/v2-pane-selection";
+import { clearRememberedPaneSelectionsForTest } from "renderer/stores/pane-selection";
 import { openAgentBrowser, showAgentBrowserPane } from "./agentBrowserReveal";
 
 type Layout = WorkspaceState<PaneViewerData>;
@@ -37,14 +37,14 @@ function fixture(rightSidebarOpen: boolean) {
 		["empty", { rightSidebarOpen, paneLayout: structuredClone(main) }],
 	]);
 	const collections = {
-		v2WorkspaceLocalState: {
+		workspaceLocalState: {
 			get: (id: string) => rows.get(id),
 			update: (id: string, update: (row: Row) => void) => {
 				const row = rows.get(id);
 				if (row) update(row);
 			},
 		},
-	} as unknown as Pick<AppCollections, "v2WorkspaceLocalState">;
+	} as unknown as Pick<AppCollections, "workspaceLocalState">;
 	const row = (id = "ws") => {
 		const found = rows.get(id);
 		if (!found) throw new Error(`Missing row ${id}`);
@@ -66,7 +66,7 @@ function fixture(rightSidebarOpen: boolean) {
 
 afterEach(() => {
 	clearAgentSidebarStatesForTest();
-	clearRememberedV2PaneSelectionsForTest();
+	clearRememberedPaneSelectionsForTest();
 });
 
 describe("agent browser reveal", () => {

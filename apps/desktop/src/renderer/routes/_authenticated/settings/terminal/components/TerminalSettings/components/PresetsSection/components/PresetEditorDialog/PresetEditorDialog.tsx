@@ -28,7 +28,7 @@ import { Link } from "@tanstack/react-router";
 import { ExternalLink, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { HiExclamationTriangle, HiOutlineFolderOpen } from "react-icons/hi2";
-import { V2_AGENT_CONFIGS_QUERY_KEY } from "renderer/hooks/useV2AgentConfigs";
+import { V2_AGENT_CONFIGS_QUERY_KEY } from "renderer/hooks/useAgentConfigs";
 import {
 	findLinkedAgent,
 	getAgentCommandText,

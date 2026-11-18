@@ -114,3 +114,10 @@ const ACP_HARNESS_BY_PRESET: Record<string, string> = {
 export function acpHarnessForPreset(presetId: string): string | undefined {
 	return ACP_HARNESS_BY_PRESET[presetId];
 }
+
+export function harnessBinary(harness: string): string {
+	return (
+		ACP_HARNESSES[harness]?.binary ??
+		(harness === "claude-code" ? "claude" : harness)
+	);
+}

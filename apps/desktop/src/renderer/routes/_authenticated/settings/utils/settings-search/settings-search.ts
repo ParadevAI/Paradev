@@ -3,6 +3,11 @@ import {
 	type IntegrationProvider,
 } from "@superset/shared/integrations";
 import type { SettingsSection } from "renderer/stores/settings-state";
+import {
+	isSettingsSectionVisible,
+	SETTINGS_SECTION_GROUPS,
+	type SettingsSectionVisibility,
+} from "../settingsSections";
 
 export const SETTING_ITEM_ID = {
 	MOBILE_APP: "mobile-app",
@@ -79,10 +84,14 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
 	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
+	EXPERIMENTAL_NEW_LAYOUT: "experimental-new-layout",
+	EXPERIMENTAL_NEW_WORKSPACE_PAGE: "experimental-new-workspace-page",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
 	BILLING_USAGE: "billing-usage",
+
+	CLOUD_USAGE: "cloud-usage",
 
 	PROJECT_NAME: "project-name",
 	PROJECT_PATH: "project-path",
@@ -1349,6 +1358,46 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		],
 	},
 	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_LAYOUT,
+		section: "experimental",
+		title: "New layout",
+		description:
+			"Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards",
+		keywords: [
+			"experimental",
+			"layout",
+			"shell",
+			"redesign",
+			"design",
+			"sidebar",
+			"rail",
+			"tabs",
+			"title bar",
+			"cards",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_WORKSPACE_PAGE,
+		section: "experimental",
+		title: "New workspace page",
+		description:
+			"Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it",
+		keywords: [
+			"experimental",
+			"new workspace",
+			"home",
+			"composer",
+			"prompt",
+			"redesign",
+			"layout",
+			"pickers",
+			"toggle",
+			"switch",
+		],
+	},
+	{
 		id: SETTING_ITEM_ID.EXPERIMENTAL_RESTART_ONBOARDING,
 		section: "experimental",
 		title: "Restart onboarding",
@@ -1412,6 +1461,13 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"quota",
 			"seats",
 		],
+	},
+	{
+		id: SETTING_ITEM_ID.CLOUD_USAGE,
+		section: "cloudUsage",
+		title: "Cloud usage",
+		description: "GB-hours used by cloud workspaces",
+		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
 	},
 	{
 		id: SETTING_ITEM_ID.PROJECT_NAME,
@@ -1922,17 +1978,24 @@ function isItemOffered(
 	return cloudWorkspaces || !CLOUD_WORKSPACE_SECTIONS.has(item.section);
 }
 
-/** Like `getMatchCountBySection`, but excludes items that are not offered. */
+const NAV_ITEMS = new Map(
+	SETTINGS_SECTION_GROUPS.flatMap((group) => group.items).map((item) => [
+		item.section,
+		item,
+	]),
+);
+
+/** Like `getMatchCountBySection`, but only for sections the settings nav shows. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	cloudWorkspaces: boolean,
-	pluginsVisible = false,
+	visibility: SettingsSectionVisibility,
 ): Partial<Record<SettingsSection, number>> {
-	const matches = searchSettings(query).filter(
-		(item) =>
-			isItemOffered(item, cloudWorkspaces) &&
-			(item.section !== "plugins" || pluginsVisible),
-	);
+	const matches = searchSettings(query).filter((item) => {
+		const navItem = NAV_ITEMS.get(item.section);
+		return navItem
+			? isSettingsSectionVisible(navItem, visibility)
+			: visibility.allowedSections.has(item.section);
+	});
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {
 		counts[item.section] = (counts[item.section] || 0) + 1;

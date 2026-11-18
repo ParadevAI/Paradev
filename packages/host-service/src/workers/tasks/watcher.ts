@@ -21,11 +21,11 @@ export const nestedRepositoriesTask = defineWorkerTask<
 });
 
 export const ignoredDirectoriesTask = defineWorkerTask<
-	{ rootPath: string },
+	{ rootPath: string; under?: readonly string[] },
 	string[]
 >({
 	type: "watcher/ignored-directories",
-	handler: ({ rootPath }) => listGitIgnoredDirs(rootPath),
+	handler: ({ rootPath, under }) => listGitIgnoredDirs(rootPath, under),
 });
 
 export const gitDirectoryTask = defineWorkerTask<

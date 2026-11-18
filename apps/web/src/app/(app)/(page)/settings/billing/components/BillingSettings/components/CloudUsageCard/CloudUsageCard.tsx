@@ -4,20 +4,23 @@ import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { Progress } from "@superset/ui/progress";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useTRPC } from "@/trpc/react";
 import { GbHourPurchase } from "./components/GbHourPurchase";
 
 interface CloudUsageCardProps {
 	organizationId: string | null;
 	canBuy: boolean;
+	showUsageLink: boolean;
 }
 
 export function CloudUsageCard({
 	organizationId,
 	canBuy,
+	showUsageLink,
 }: CloudUsageCardProps) {
 	const trpc = useTRPC();
-	const { formatNumber, formatDate } = useFormat();
+	const { formatDate, formatGbHours } = useFormat();
 	const { data: usage } = useQuery(trpc.billing.cloudUsage.queryOptions());
 
 	if (
@@ -31,11 +34,7 @@ export function CloudUsageCard({
 		return null;
 	}
 
-	const gbHours = (gbMinutes: number) => {
-		const hours = gbMinutes / 60;
-		if (hours > 0 && hours < 0.1) return `<${formatNumber(0.1)}`;
-		return formatNumber(hours, { maximumFractionDigits: 1 });
-	};
+	const gbHours = (gbMinutes: number) => formatGbHours(gbMinutes / 60);
 	const used = gbHours(usage.usedGbMinutes);
 	const included =
 		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
@@ -57,11 +56,21 @@ export function CloudUsageCard({
 				<div className="flex items-center gap-2 text-sm font-medium">
 					<Trans>Cloud usage</Trans>
 				</div>
-				{resetDate && (
-					<div className="text-sm text-muted-foreground">
-						<Trans>Resets {resetDate}</Trans>
-					</div>
-				)}
+				<div className="flex items-baseline gap-3 text-sm">
+					{resetDate && (
+						<span className="text-muted-foreground">
+							<Trans>Resets {resetDate}</Trans>
+						</span>
+					)}
+					{showUsageLink && (
+						<Link
+							href="/settings/cloud-usage"
+							className="text-primary hover:underline"
+						>
+							<Trans>See usage</Trans>
+						</Link>
+					)}
+				</div>
 			</div>
 			<div className="text-sm tabular-nums">
 				{included === null ? (

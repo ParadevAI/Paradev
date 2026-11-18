@@ -1,6 +1,6 @@
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useCliTerminalScriptImport } from "./hooks/useCliTerminalScriptImport";
-import { useDefaultV2TerminalPresets } from "./hooks/useDefaultV2TerminalPresets";
+import { useDefaultTerminalPresets } from "./hooks/useDefaultTerminalPresets";
 import { usePlaceProjectsInSidebar } from "./hooks/usePlaceProjectsInSidebar";
 import { usePlaceWorktreesInSidebar } from "./hooks/usePlaceWorktreesInSidebar";
 
@@ -11,7 +11,7 @@ export function AgentHooks() {
 	const { activeHostUrl, activeOrganizationId } = useLocalHostService();
 	// Seeds the default terminal presets and warms the local host's agent
 	// config cache for Settings.
-	useDefaultV2TerminalPresets(activeHostUrl);
+	useDefaultTerminalPresets(activeHostUrl);
 	useCliTerminalScriptImport(activeOrganizationId);
 	usePlaceProjectsInSidebar();
 	usePlaceWorktreesInSidebar();

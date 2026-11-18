@@ -9,7 +9,12 @@ export {
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "./api-credential";
-export { bootBeganSince, recordBootSpans } from "./boot-trace";
+export {
+	apiPhases,
+	bootBeganSince,
+	bootPhases,
+	recordBootSpans,
+} from "./boot-trace";
 export {
 	type BoxHookOutcome,
 	rerunBoxStartHook,
@@ -55,6 +60,7 @@ export {
 	findSandboxSession,
 	HOST_SERVICE_PORT,
 	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
 	provisionSandbox,

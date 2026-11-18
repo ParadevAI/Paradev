@@ -2972,6 +2972,15 @@ export function getPendingTerminalWorkspaceId(
 	return lifecycleOperations.getWorkspaceId(terminalId);
 }
 
+function announceListed(session: TerminalSession): void {
+	session.eventBus?.broadcastTerminalLifecycle({
+		workspaceId: session.workspaceId,
+		terminalId: session.terminalId,
+		eventType: "listed",
+		occurredAt: Date.now(),
+	});
+}
+
 export function createTerminalSessionInternal(
 	options: CreateTerminalSessionOptions,
 ): Promise<TerminalSession | CreateSessionError> {
@@ -3034,7 +3043,10 @@ async function createTerminalSessionUnlocked({
 		if (mismatchError)
 			return { kind: "SESSION_WRONG_WORKSPACE", error: mismatchError };
 
-		if (listed) existing.listed = true;
+		if (listed && !existing.listed) {
+			existing.listed = true;
+			announceListed(existing);
+		}
 		if (initialCommand) queueInitialCommand(existing, initialCommand);
 		return existing;
 	}
@@ -3345,6 +3357,7 @@ async function createTerminalSessionUnlocked({
 	reclaimSession = session;
 	sessions.set(terminalId, session);
 	portManager.upsertSession(terminalId, workspaceId, pty.pid);
+	if (session.listed) announceListed(session);
 
 	if (session.shellReadyState === "pending") {
 		// Size the wait to observed reality: on machines whose profile never

@@ -1,5 +1,4 @@
 import { Plural, useLingui } from "@lingui/react/macro";
-import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import {
 	type NativeStackNavigationProp,
 	useNavigation,
@@ -30,6 +29,7 @@ import { useWorkspacesFilterStore } from "@/screens/(authenticated)/(home)/home/
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
 import { useSelectedHost } from "@/screens/(authenticated)/(home)/hooks/useSelectedHost";
 import { useWorkspaceScope } from "@/screens/(authenticated)/(home)/hooks/useWorkspaceScope";
+import { workspaceSortTime } from "@/screens/(authenticated)/(home)/utils/workspaceSortTime";
 import { usePinnedWorkspacesStore } from "@/screens/(authenticated)/stores/pinnedWorkspacesStore";
 import { SearchBar, type SearchBarHandle } from "./components/SearchBar";
 
@@ -101,15 +101,12 @@ export function SearchScreen() {
 	);
 
 	const activityTs = useCallback(
-		(workspace: HostWorkspaceItem) => {
-			if (sort !== "updatedAt") return new Date(workspace[sort]).getTime();
-			const workspaceTs = getWorkspaceActivityTime(workspace);
-			const terminalTs = (terminalsByWorkspace.get(workspace.id) ?? []).reduce(
-				(newest, row) => Math.max(newest, row.ts),
-				0,
-			);
-			return Math.max(workspaceTs, terminalTs);
-		},
+		(workspace: HostWorkspaceItem) =>
+			workspaceSortTime(
+				workspace,
+				sort,
+				(terminalsByWorkspace.get(workspace.id) ?? []).map((row) => row.ts),
+			),
 		[sort, terminalsByWorkspace],
 	);
 

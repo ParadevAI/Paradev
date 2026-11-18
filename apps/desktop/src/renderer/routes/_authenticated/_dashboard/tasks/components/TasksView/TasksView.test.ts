@@ -116,11 +116,13 @@ describe("Tasks and pull requests navigation", () => {
 			readComponent(
 				"../../../components/DashboardSidebar/components/DashboardSidebarHeader/DashboardSidebarHeader.tsx",
 			),
-			readComponent("../../../components/NavigationRail/NavigationRail.tsx"),
+			readComponent(
+				"../../../components/NavigationRail/hooks/useRailDestinations/useRailDestinations.tsx",
+			),
 		];
 		for (const source of v2Sources) {
-			expect(source).toContain("onClick={navigation.openTasks}");
-			expect(source).toContain("onClick={navigation.openPullRequests}");
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openTasks\b/);
+			expect(source).toMatch(/onClick(=\{|: )navigation\.openPullRequests\b/);
 			expect(labelled(source, "Tasks")).toBe(true);
 			expect(labelled(source, "Pull requests")).toBe(true);
 			expect(source).not.toContain("Tasks & PRs");

@@ -826,4 +826,33 @@ by hand and fails the build when it does not apply.
 
 **Remove when** claude-agent-acp ships an SDK with the fix, or chat runs Claude
 on v2 (drop `CLAUDE_AGENT_ACP_PROTOCOL` from the catalogue): delete the patch,
-this section, the step in `produce.ts` and the guard test.
+its `patchedDependencies` entry, this section, the step in `produce.ts` and the
+guard test, then run `bun install` to update `bun.lock`.
+
+## sonner (`sonner@<version>.patch`)
+
+**Why:** #9938. Sonner treats a `loading` toast as not dismissable: it hides the
+close button and ignores swipe for that type, even with `closeButton` set on the
+`Toaster`. A loading toast stays until code replaces it, so a slow merge queue
+left "Adding to queue…" toasts on screen with no way to close them. Any loading
+toast must be dismissable by the user.
+
+**What it changes** (`dist/index.js` and `dist/index.mjs`): two lines in
+`Toast`. `disabled` is no longer `true` for loading toasts (it gated swipe and
+the close click), and the close button renders for every type. Loading toasts
+still do not auto-close.
+
+**Guard test:** `apps/desktop/src/sonner-dismissable-loading-patch.test.ts`.
+
+**Regenerating after a version bump** (~2 min):
+
+```bash
+bun patch sonner@<new-version>
+# in node_modules/sonner/dist/index.{js,mjs}: set `const disabled = false;`
+# and drop `&& toastType !== 'loading'` from the close button condition
+bun patch --commit 'node_modules/sonner'
+bun test apps/desktop/src/sonner-dismissable-loading-patch.test.ts
+```
+
+**Removing:** delete the patch, the `patchedDependencies` entry and the guard
+test once sonner lets loading toasts be dismissed.

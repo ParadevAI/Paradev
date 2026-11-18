@@ -798,6 +798,9 @@ msgstr "O {appName} Mobile faz parte do Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "O {appName} Mobile roda agentes nos computadores que você conectar."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Arquivar # workspace na nuvem} other {Arquivar # workspaces na nuvem}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {# commit atrás da main, precisa de rebase} other {# commits atrás da main, precisa de rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {adicionou um commit} other {adicionou # commits}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {# área de trabalho criada} other {# áreas de trabalho criadas}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Excluir # área de trabalho} other {Excluir # áreas de trabalho}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {editou # arquivo} other {editou # arquivos}}"
@@ -991,6 +991,9 @@ msgstr "{daysLeft, plural, one {# dia restante} other {# dias restantes}}"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Sua conta está desativada e será excluída permanentemente em # dia. Reative para restaurá-la exatamente como você deixou.} other {Sua conta está desativada e será excluída permanentemente em # dias. Reative para restaurá-la exatamente como você deixou.}}"
 
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Excluir # área de trabalho} other {Excluir # áreas de trabalho}}"
+
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
@@ -1039,6 +1042,9 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
+
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} GB-horas"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# linha oculta} other {# linhas ocultas}}"
@@ -1159,6 +1165,9 @@ msgstr "{name} falhou"
 
 msgid "{name} finished"
 msgstr "{name} terminou"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Grupo {name}, {count, plural, one {# área de trabalho} other {# áreas de trabalho}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1358,6 +1367,12 @@ msgstr "{skipped, plural, one {# ignorado} other {# ignorados}}"
 msgid "{starCount} stars and counting"
 msgstr "{starCount} estrelas e subindo"
 
+msgid "{start} to {end}"
+msgstr "De {start} a {end}"
+
+msgid "{start} to {end} (current)"
+msgstr "De {start} a {end} (atual)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automação iniciada} other {# automações iniciadas}}"
 
@@ -1444,6 +1459,9 @@ msgstr "{user} voltou a entrar."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} vCPU, {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} aguardando"
@@ -1950,9 +1968,6 @@ msgstr "Nome da conta"
 
 msgid "Account pending deletion"
 msgstr "Conta com exclusão pendente"
-
-msgid "Account usage"
-msgstr "Uso da conta"
 
 msgid "Account usage: {percent} used"
 msgstr "Uso da conta: {percent} usado"
@@ -3082,6 +3097,9 @@ msgstr "Arquivar ambiente"
 msgid "Archive failed"
 msgstr "Falha ao arquivar"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Arquivar os workspaces na nuvem selecionados"
+
 msgid "Archive this automation before you delete it."
 msgstr "Arquive esta automação antes de excluí-la."
 
@@ -3090,6 +3108,10 @@ msgstr "Arquivar área de trabalho"
 
 msgid "Archived"
 msgstr "Arquivadas"
+
+msgctxt "cloud workspace status"
+msgid "Archived"
+msgstr "Arquivado"
 
 #. placeholder {0}: formatCompactRelativeTime(archivedAt, now)
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
@@ -3187,6 +3209,10 @@ msgstr "Pergunta antes de edições e comandos"
 
 msgid "Asks only for risky actions"
 msgstr "Pergunta só em ações arriscadas"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "Em repouso"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
@@ -3560,6 +3586,9 @@ msgstr "Faturamento"
 msgid "Billing details"
 msgstr "Dados de faturamento"
 
+msgid "Billing period"
+msgstr "Período de faturamento"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "A cobrança recusou iniciar um workspace na nuvem: o plano da organização não inclui workspaces na nuvem, ou ela atingiu o limite de uso da nuvem. Workspaces na nuvem precisam do plano Team ou Ultra. Faça upgrade ou aumente o limite em Configurações > Cobrança, ou execute a automação em um dispositivo."
 
@@ -3624,6 +3653,9 @@ msgstr "Iniciar"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "Iniciando {0}…"
+
+msgid "Boots"
+msgstr "Inicializações"
 
 msgid "Border"
 msgstr "Borda"
@@ -4350,6 +4382,9 @@ msgstr "As verificações passaram"
 msgid "Checks Skipped"
 msgstr "Verificações ignoradas"
 
+msgid "Checks unavailable"
+msgstr "Verificações indisponíveis"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Escolha uma conta do {pluginLabel}"
 
@@ -4787,8 +4822,14 @@ msgstr "Sandboxes na nuvem"
 msgid "Cloud usage"
 msgstr "Uso da nuvem"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "O uso da nuvem não está ativado para esta organização."
+
 msgid "Cloud workspace"
 msgstr "Área de trabalho na nuvem"
+
+msgid "Cloud workspace usage for the whole organization."
+msgstr "Uso das áreas de trabalho na nuvem de toda a organização."
 
 msgid "Cloud workspace: asleep"
 msgstr "Área de trabalho na nuvem: em repouso"
@@ -4820,6 +4861,9 @@ msgstr "Áreas de trabalho na nuvem fazem commit, push e abrem pull requests com
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Workspaces na nuvem ignoram esta variável. Em vez disso, os agentes entram em Configurações › Agentes."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "As áreas de trabalho na nuvem exigem um plano pago."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Workspaces na nuvem precisam do plano Team ou Ultra. Faça upgrade em Configurações, Cobrança para iniciar um."
@@ -5030,6 +5074,10 @@ msgstr "Comparar planos"
 
 msgid "Compared against the default style"
 msgstr "Comparado ao estilo padrão"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Comparação"
 
 msgid "complete"
 msgstr "concluída"
@@ -5764,6 +5812,9 @@ msgstr "Não foi possível listar o diretório"
 msgid "Could not load agents from {0}"
 msgstr "Não foi possível carregar os agentes de {0}"
 
+msgid "Could not load cloud usage."
+msgstr "Não foi possível carregar o uso da nuvem."
+
 msgid "Could not load environments"
 msgstr "Não foi possível carregar os ambientes"
 
@@ -5923,6 +5974,9 @@ msgstr "Não foi possível compartilhar"
 msgid "Could not sign out. Please try again."
 msgstr "Não foi possível sair. Tente novamente."
 
+msgid "Could not start"
+msgstr "Não foi possível iniciar"
+
 msgid "Could not start agent"
 msgstr "Não foi possível iniciar o agente"
 
@@ -6005,6 +6059,9 @@ msgstr "Não foi possível ramificar a conversa"
 msgid "Couldn't cancel the move"
 msgstr "Não foi possível cancelar a movimentação"
 
+msgid "Couldn't change the group color"
+msgstr "Não foi possível alterar a cor do grupo"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Não foi possível alterar o tamanho da máquina: {0}"
@@ -6051,8 +6108,14 @@ msgstr "Não foi possível criar a pilha"
 msgid "Couldn't create the channel"
 msgstr "Não foi possível criar o canal"
 
+msgid "Couldn't create the group"
+msgstr "Não foi possível criar o grupo"
+
 msgid "Couldn't create workspace"
 msgstr "Não foi possível criar a área de trabalho"
+
+msgid "Couldn't delete the group"
+msgstr "Não foi possível excluir o grupo"
 
 msgid "Couldn't discard changes"
 msgstr "Não foi possível descartar as alterações"
@@ -6140,6 +6203,9 @@ msgstr "Não foi possível mover {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Não foi possível mover o subagente para segundo plano"
 
+msgid "Couldn't move the workspace"
+msgstr "Não foi possível mover a área de trabalho"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Não foi possível nomear \"{name}\" automaticamente"
 
@@ -6189,6 +6255,9 @@ msgstr "Não foi possível remover da fila de merge"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Não foi possível remover o login local"
+
+msgid "Couldn't rename the group"
+msgstr "Não foi possível renomear o grupo"
 
 msgid "Couldn't restart terminals"
 msgstr "Não foi possível reiniciar os terminais"
@@ -6345,6 +6414,9 @@ msgstr "Núcleos de CPU"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "Limitada pela CPU"
+
+msgid "Crashed"
+msgstr "Travou"
 
 msgid "Create"
 msgstr "Criar"
@@ -6991,6 +7063,10 @@ msgstr "excluído"
 msgid "Deleted"
 msgstr "Excluídas"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "Excluído"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "Excluído"
@@ -7037,6 +7113,9 @@ msgstr "Projetos excluídos podem ser restaurados por 30 dias, junto com os work
 
 msgid "Deleted user"
 msgstr "Usuário excluído"
+
+msgid "Deleted workspace"
+msgstr "Área de trabalho excluída"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "As áreas de trabalho foram excluídas, mas não foi possível terminar de atualizar a barra lateral"
@@ -8249,6 +8328,13 @@ msgstr "Falhou"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "Falhou"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "Falhou"
+
+msgid "Failed {failedAt}"
+msgstr "Falhou em {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Execuções com falha <0>· 7d</0>"
@@ -9850,6 +9936,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "A cada hora"
 
+msgid "Hours"
+msgstr "Horas"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "As horas são compartilhadas com toda a equipe. Elas consideram uma área de trabalho padrão de {vcpus} vCPU / {memoryGb} GB, e máquinas maiores as consomem mais rápido."
 
@@ -10640,6 +10729,9 @@ msgstr "Os comentários e o histórico também serão excluídos."
 msgid "Its connected accounts were disconnected."
 msgstr "As contas conectadas foram desconectadas."
 
+msgid "Its machine no longer exists."
+msgstr "A máquina dela não existe mais."
+
 msgid "Its own branch and copy of the files"
 msgstr "Sua própria branch e sua própria cópia dos arquivos"
 
@@ -10648,6 +10740,12 @@ msgstr "Os plugins dele aparecem quando a sincronização termina."
 
 msgid "Its replies go with it."
 msgstr "As respostas também serão excluídas."
+
+msgid "Its saved state expired."
+msgstr "O estado salvo expirou."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "O terminal dele abre aqui quando a área de trabalho na nuvem o iniciar."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "O trabalho, incluindo alterações não commitadas, é enviado para uma nova branch. Uma área de trabalho em {computerName} começa a partir dessa branch, e cada chat do Claude continua lá. Agentes que estiverem trabalhando param primeiro. Terminais e outros chats ficam onde estão."
@@ -12358,6 +12456,9 @@ msgstr "Novo grupo…"
 msgid "New issue"
 msgstr "Nova issue"
 
+msgid "New layout"
+msgstr "Novo layout"
+
 msgid "New messages"
 msgstr "Novas mensagens"
 
@@ -12423,6 +12524,9 @@ msgstr "Nova área de trabalho ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nova área de trabalho em {name}"
+
+msgid "New workspace page"
+msgstr "Nova página de área de trabalho"
 
 msgid "Newer than this app"
 msgstr "Mais recente que este app"
@@ -12574,6 +12678,13 @@ msgstr "Nenhum autor encontrado."
 msgid "No automations match"
 msgstr "Nenhuma automação corresponde"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Nenhum período de cobrança começa em {0}."
+
+msgid "No boots in this period."
+msgstr "Nenhuma inicialização neste período."
+
 msgid "No branches found"
 msgstr "Nenhuma branch encontrada"
 
@@ -12615,6 +12726,9 @@ msgstr "Nenhum uso do Claude ou do Codex encontrado nesta máquina ainda. Entre 
 
 msgid "No cloud environment opens {repository}."
 msgstr "Nenhum ambiente na nuvem abre {repository}."
+
+msgid "No cloud usage in this period."
+msgstr "Nenhum uso da nuvem neste período."
 
 msgid "No cloud workspaces"
 msgstr "Nenhum workspace na nuvem"
@@ -12912,6 +13026,9 @@ msgstr "Nenhum convite pendente"
 
 msgid "No people found."
 msgstr "Nenhuma pessoa encontrada."
+
+msgid "No person recorded"
+msgstr "Nenhuma pessoa registrada"
 
 msgid "No plugins available yet."
 msgstr "Nenhum plugin disponível ainda."
@@ -13588,6 +13705,9 @@ msgstr "Só proprietários da organização podem alterar estas configurações.
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Somente proprietários da organização ou o proprietário do dispositivo podem excluir este projeto."
 
+msgid "Only owners and admins can see usage by person."
+msgstr "Só proprietários e administradores podem ver o uso por pessoa."
+
 msgid "Only owners can change membership."
 msgstr "Só proprietários podem alterar quem tem acesso."
 
@@ -13674,6 +13794,9 @@ msgstr "Só você pode usar esta conexão. Seus colegas conectam as próprias co
 
 msgid "Only you. Teammates forward their own."
 msgstr "Só você. Cada colega encaminha as próprias."
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "Apenas suas próprias áreas de trabalho. Os totais da organização são para proprietários e administradores."
 
 msgid "open"
 msgstr "abrir"
@@ -15825,6 +15948,10 @@ msgstr "Lê e publica"
 msgid "Ready"
 msgstr "Pronto"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "Pronto"
+
 msgid "Ready for review"
 msgstr "Pronta para revisão"
 
@@ -16010,6 +16137,9 @@ msgstr "voltou a entrar em {channel}, junto com {others}."
 msgid "rejoined {channel}."
 msgstr "voltou a entrar em {channel}."
 
+msgid "Related comparisons"
+msgstr "Comparações relacionadas"
+
 msgid "Related Posts"
 msgstr "Posts relacionados"
 
@@ -16028,6 +16158,9 @@ msgstr "Liberar o controle"
 msgid "Release…"
 msgstr "Lançamento…"
 
+msgid "Released before use"
+msgstr "Liberado antes do uso"
+
 msgid "Reload"
 msgstr "Recarregar"
 
@@ -16039,6 +16172,9 @@ msgstr "Recarregar do disco"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Recarregue o Paradev para atualizar a lista de áreas de trabalho."
+
+msgid "Reload to apply"
+msgstr "Recarregar para aplicar"
 
 msgid "Reload window"
 msgstr "Recarregar a janela"
@@ -16472,9 +16608,6 @@ msgstr "Redefinir local"
 msgid "Reset terminal"
 msgstr "Redefinir terminal"
 
-msgid "Reset time unavailable"
-msgstr "Horário de redefinição indisponível"
-
 msgid "Reset to default"
 msgstr "Restaurar o padrão"
 
@@ -16595,6 +16728,9 @@ msgstr "Reiniciar área de trabalho"
 
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "Reinicie os workspaces para aplicar as novas credenciais do agente."
+
+msgid "Restarted"
+msgstr "Reiniciado"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "{restartedOrgCount} serviços de host reiniciados"
@@ -16902,6 +17038,10 @@ msgstr "Girar"
 msgid "Rotate device"
 msgstr "Girar o dispositivo"
 
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Compilado"
+
 msgid "Roundups"
 msgstr "Panoramas"
 
@@ -17063,6 +17203,10 @@ msgstr "Execute."
 msgid "running"
 msgstr "em execução"
 
+msgid "Running"
+msgstr "Em execução"
+
+msgctxt "cloud workspace status"
 msgid "Running"
 msgstr "Em execução"
 
@@ -17579,6 +17723,9 @@ msgstr "Veja as vagas abertas ou experimente o Paradev primeiro."
 
 msgid "See this gate on the scorecard"
 msgstr "Ver este portão no placar"
+
+msgid "See usage"
+msgstr "Ver uso"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Veja o que mudou, dê feedback e mescle o trabalho quando estiver pronto."
@@ -19001,6 +19148,10 @@ msgstr "iniciando"
 msgid "Starting"
 msgstr "Iniciando"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "Iniciando"
+
 msgid "Starting {agentLabel}"
 msgstr "Iniciando {agentLabel}"
 
@@ -19154,11 +19305,17 @@ msgstr "Parado"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "{0} ({1} GB) parado para liberar memória"
 
+msgid "Stopped by a person"
+msgstr "Parado por uma pessoa"
+
 msgid "Stopped by the usage limit"
 msgstr "Interrompido pelo limite de uso"
 
 msgid "Stopped moving {name}"
 msgstr "Movimentação de {name} interrompida"
+
+msgid "Stopped when idle"
+msgstr "Parado por inatividade"
 
 msgid "Stopping the agent in {what}"
 msgstr "Parando o agente em {what}"
@@ -19740,6 +19897,9 @@ msgstr "Essa conta não está mais conectada — escolha outra."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Essa sessão do agente ainda não tem conversa para abrir: ela foi iniciada, mas nunca recebeu um pedido."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Não foi possível ler esse cursor. Remova-o para começar da primeira página."
+
 msgid "that device"
 msgstr "esse dispositivo"
 
@@ -19985,6 +20145,9 @@ msgstr "A pessoa lê cada linha antes do merge."
 msgid "The image upload expired — attach it again"
 msgstr "O envio da imagem expirou — anexe-a novamente"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "As GB-horas incluídas e as excedentes são mantidas apenas para o período atual."
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "A descrição do cargo muda. Quem desenvolve deixa de ser digitador com bom gosto e vira despachante com bom gosto: decompõe o trabalho, direciona para as frotas e arbitra conflitos entre agentes que mexeram no mesmo módulo."
 
@@ -20056,6 +20219,9 @@ msgstr "A área de trabalho de código aberto para Claude Code, Codex e qualquer
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "O workspace de código aberto para Claude Code, Codex, OpenCode e qualquer agente de código. Execute tarefas em paralelo em branches separadas e revise tudo em um só lugar."
+
+msgid "The organization reached its usage limit."
+msgstr "A organização atingiu o limite de uso."
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "O outro lado da movimentação usa uma versão mais antiga. Reinicie uma área de trabalho na nuvem ou atualize o host do dispositivo e tente novamente."
@@ -20201,8 +20367,17 @@ msgstr "A atualização também pode:"
 msgid "The very beginning"
 msgstr "O início"
 
+msgid "The workspace could not be created."
+msgstr "Não foi possível criar a área de trabalho."
+
+msgid "The workspace could not be queued to start."
+msgstr "Não foi possível colocar a área de trabalho na fila para iniciar."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "Não foi possível acessar a área de trabalho. Verifique se ela está em execução e tente novamente."
+
+msgid "The workspace did not become ready."
+msgstr "A área de trabalho não ficou pronta."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "A área de trabalho ainda não está pronta. Tente de novo."
@@ -20480,6 +20655,12 @@ msgstr "Isso muda só o nome exibido, não a branch."
 
 msgid "this organization"
 msgstr "esta organização"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "Esta organização não tem períodos de faturamento, então esta página mostra os últimos 30 dias."
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Esta organização não tem períodos de cobrança. Escolha um intervalo de tempo."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Esta organização está no plano gratuito. O {appName} Mobile está disponível para organizações no Pro."
@@ -21103,6 +21284,10 @@ msgstr "transforme as descobertas do onboarding em uma página"
 msgid "Turned off because its files changed"
 msgstr "Desativada porque os arquivos dela mudaram"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
+
 msgid "Two Hands"
 msgstr "Duas mãos"
 
@@ -21588,8 +21773,17 @@ msgstr "Identificador amigável para URL, único dentro da sua organização."
 msgid "Usage"
 msgstr "Uso"
 
+msgid "Usage by day"
+msgstr "Uso por dia"
+
+msgid "Usage by person"
+msgstr "Uso por pessoa"
+
 msgid "Usage is out of date"
 msgstr "Os dados de uso estão desatualizados"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "O uso aparece no dia UTC em que foi cobrado, que pode ser um pouco depois de a área de trabalho ser executada."
 
 msgid "Usage limit reached"
 msgstr "Limite de uso atingido"
@@ -21672,6 +21866,12 @@ msgstr "Use o app de desktop para rodar agentes de código em paralelo."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Use o menu da bandeja do Paradev > Serviço do host > Reiniciar e tente de novo."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Use a página “Nova área de trabalho” redesenhada: a caixa de prompt no centro, com os seletores de projeto e branch acima dela."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Use o layout de janela redesenhado: uma barra de ícones, abas na barra de título e painéis como cartões."
 
 msgid "Use this account"
 msgstr "Usar esta conta"
@@ -22720,6 +22920,9 @@ msgstr "Você não tem acesso a este terminal."
 msgid "You don't have permission to remove this member"
 msgstr "Você não tem permissão para remover este membro"
 
+msgid "You have no cloud usage in this period."
+msgstr "Você não tem uso da nuvem neste período."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Você tem variáveis de ambiente não salvas. Tem certeza de que deseja fechar?"
 
@@ -22835,6 +23038,9 @@ msgstr "Suas alterações serão perdidas se você não salvar."
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "Seu histórico de chat é mantido. Só o agente reinicia."
 
+msgid "Your cloud usage"
+msgstr "Seu uso da nuvem"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Suas áreas de trabalho na nuvem não poderão mais acessar este host."
 
@@ -22919,6 +23125,9 @@ msgstr "Seu plano não inclui ambientes na nuvem."
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Seu plano não inclui ambientes na nuvem. Faça upgrade em Configurações, Cobrança para criar um."
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "Seu plano não inclui GB-horas na nuvem."
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Seu plano muda para {planName} em {startDate}. Nada é cobrado hoje."
 
@@ -22966,6 +23175,9 @@ msgstr "Seu nível é uma pontuação ponderada dos {0} eixos medidos para você
 msgid "Your tokens"
 msgstr "Seus tokens"
 
+msgid "Your usage by day"
+msgstr "Seu uso por dia"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "Seus projetos e workspaces da v1 estão sendo levados para o novo Paradev. Eles aparecem na barra lateral à medida que cada um fica pronto."
 
@@ -22980,6 +23192,9 @@ msgstr "O administrador do seu workspace ativa o login com código de dispositiv
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "Sua área de trabalho não mudou. Você pode movê-la de novo em alguns minutos."
+
+msgid "Your workspaces"
+msgstr "Suas áreas de trabalho"
 
 msgid "Zap"
 msgstr "Raio"
