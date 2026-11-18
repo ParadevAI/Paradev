@@ -28,11 +28,11 @@ Please read this policy carefully. If you do not agree with the terms of this Pr
 
 ### 2.3 Desktop Application
 
-Our desktop application runs locally on your machine. When it runs on your own machine, we do not have access to your source code, terminal commands, or file contents unless you explicitly choose to share diagnostic information with us. Section 2.4 describes cloud workspaces, which run on machines we host.
+When you work on your own machine, our desktop application runs locally and we do not have access to your source code, terminal commands, or file contents unless you explicitly choose to share diagnostic information with us. Section 2.4 describes cloud workspaces, which run on machines we host.
 
 ### 2.4 Cloud Workspaces
 
-Cloud workspaces run on machines that we host for you through our hosting provider. To operate them, we collect operational logs from our own services on each machine (the boot steps, the memory guard, the remote desktop session, and our host service) and from our API. We do not collect the output of your setup scripts, your terminal sessions, or your files for monitoring.
+Cloud workspaces run on machines that we host for you through our hosting provider. A cloud workspace's files, including the code you check out there, live on that machine and on a saved copy of its disk, so that the workspace can stop when idle and resume later. We keep only the most recent saved copy for each workspace and set it to expire 30 days after we save it. A stopped workspace whose saved copy has expired cannot resume. To operate cloud workspaces, we collect operational logs from our own services on each machine (the boot steps, the memory guard, the remote desktop session, and our host service) and from our API. We do not collect the output of your setup scripts, your terminal sessions, or your files for monitoring.
 
 ### 2.5 Mobile Application
 
