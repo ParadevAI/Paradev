@@ -45,7 +45,7 @@ only_rule() {  # only_rule CONFIG RULE OUT
   awk -v check="$check" '/^INVARIANTS|^PROPERTIES/ { skip = 1 } /^SYMMETRY/ { skip = 0; print check } !skip' \
     "$1" > "$3"
 }
-head_of() { sed -E 's/(Fix[A-Za-z]+|HasSweep) = TRUE/\1 = FALSE/g' "$1"; }
+head_of() { sed -E 's/(FixOneProvision|HasSweep) = TRUE/\1 = FALSE/g' "$1"; }
 
 case "${1:-}" in
   "")

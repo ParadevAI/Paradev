@@ -29,6 +29,10 @@ CONSTANTS
   FixFreshDurable,   \* "fresh fork" is recorded on the drive until its first checkout
   FixSweepNamed,     \* the sweep keeps every drive a row still names, whatever its status
   FixOneProvision,   \* an unarchive starts no second provision while one may still run for the row
+  FixOneProvByDrive, \* #9847: the lock is keyed on the drive, a create waits for the drive, and
+                     \* provisioning -> awake/failed only on the job's own box; a lost job tears its box down
+                     \* and keeps the drive
+  GuardAnyRow,       \* #9847: liveReferences keeps what any row names, whatever its status
   \* Bounds
   RefusalLimit,  \* DRIVE_REFUSAL_LIMIT
   MaxSessions, MaxMountFails, MaxRedeliveries, MaxArchives, MaxEnvChanges,
@@ -88,6 +92,8 @@ Live == status \in {"provisioning", "awake"}
 LiveBox(b) == Live /\ rowBox = b
 LiveDrive(d) == Live /\ d # 0 /\ rowDrive = d
 ProvIdle == \A j \in ProvJobs : pj[j].pc = "none"
+\* sandboxResumeLock's key: the drive's name when there is one, else the box's.
+LockKey(b, d) == IF FixOneProvByDrive /\ d # 0 THEN 10 + d ELSE b
 
 Init ==
   /\ status = "provisioning" /\ rowBox = 1 /\ rowDrive = 0 /\ rowLaid = FALSE
@@ -283,7 +289,7 @@ OwnTearDown(b, d) ==
 \* (a new box name, and no drive if this job forked it); then the old ones go.
 ProvFailNow(j) ==
   LET J == pj[j]
-      won == status \in {"provisioning", "awake"} IN
+      won == status \in {"provisioning", "awake"} /\ (FixOneProvByDrive => rowBox = J.box) IN
   /\ status' = IF won THEN "failed" ELSE status
   /\ IF won /\ RetireNames
        THEN /\ rowBox' = 0
@@ -324,9 +330,10 @@ ProvCreate(j) ==
       bx == boxes[J.box]
       next == IF J.d # 0 THEN J.d ELSE bx.next IN
   /\ J.pc = "create"
-  /\ ResumeLock => J.box \notin locked
+  /\ ResumeLock => LockKey(J.box, J.d) \notin locked
   /\ IF ~bx.ex
        THEN /\ pj' = [pj EXCEPT ![j].pc = "mark"]
+            /\ (FixOneProvByDrive /\ WaitDetach) => Detached(J.d)
             /\ Start(J.box, [NoBox EXCEPT !.next = J.d], J.d, J.d, FALSE)
             /\ UNCHANGED locked
        ELSE IF ~bx.run
@@ -335,7 +342,7 @@ ProvCreate(j) ==
               /\ Start(J.box, [bx EXCEPT !.next = next], next, J.d, FALSE)
               /\ UNCHANGED locked
          ELSE /\ pj' = [pj EXCEPT ![j].pc = "write"]
-              /\ locked' = IF ResumeLock THEN locked \cup {J.box} ELSE locked
+              /\ locked' = IF ResumeLock THEN locked \cup {LockKey(J.box, J.d)} ELSE locked
               /\ UNCHANGED <<boxes, drives, doubleMount, mfail, sessions>>
   /\ UNCHANGED <<rowVars, wk, reapQ, tdQ, sweepD, envVars, workVars, badDel, failedTransient,
                  redeliveries, envCh, bundleCh, wakes, aborts, sweeps, reprovs>>
@@ -347,7 +354,7 @@ ProvWrite(j) ==
       bx == boxes[J.box] IN
   /\ J.pc = "write"
   /\ pj' = [pj EXCEPT ![j].pc = "mark"]
-  /\ locked' = locked \ {J.box}
+  /\ locked' = locked \ {LockKey(J.box, J.d)}
   /\ IF bx.ex /\ ~bx.run
        THEN /\ (WaitDetach /\ FixRunningResume) => Detached(bx.next)
             /\ Start(J.box, bx, bx.next, J.d, FALSE)
@@ -357,7 +364,7 @@ ProvWrite(j) ==
 
 ProvError(j) ==
   /\ pj[j].pc \in {"fork", "create"}
-  /\ ResumeLock /\ pj[j].pc = "create" => pj[j].box \notin locked
+  /\ ResumeLock /\ pj[j].pc = "create" => LockKey(pj[j].box, pj[j].d) \notin locked
   /\ redeliveries < MaxRedeliveries
   /\ redeliveries' = redeliveries + 1
   /\ ProvFailNow(j)
@@ -369,13 +376,18 @@ ProvError(j) ==
 ProvMark(j) ==
   LET J == pj[j] IN
   /\ J.pc = "mark"
-  /\ IF status = "provisioning"
+  /\ IF status = "provisioning" /\ (FixOneProvByDrive => rowBox = J.box)
        THEN /\ status' = "awake" /\ rowBox' = J.box
             /\ pj' = [pj EXCEPT ![j].pc = "settle"]
             /\ UNCHANGED <<boxes, tdQ, badDel>>
        ELSE /\ pj' = [pj EXCEPT ![j] = IdleJob]
             /\ UNCHANGED <<status, rowBox>>
-            /\ IF status = "archived" /\ ~LostRowLeftToReap
+            /\ IF FixOneProvByDrive /\ rowBox # J.box
+                 THEN IF J.d # 0
+                        THEN /\ tdQ' = tdQ \cup {[TdJob(J.box, J.d, "lost") EXCEPT !.ld = TRUE]}
+                             /\ UNCHANGED <<boxes, badDel>>
+                        ELSE TearDown(J.box, 0, "lost")
+                 ELSE IF status = "archived" /\ ~LostRowLeftToReap
                  THEN TearDown(J.box, J.d, "archived")
                  ELSE UNCHANGED <<boxes, tdQ, badDel>>
   /\ UNCHANGED <<rowDrive, rowLaid, epoch, graceOver, wk, drives, reapQ, sweepD, envVars,
@@ -412,7 +424,7 @@ ProvDie(j) ==
   /\ redeliveries < MaxRedeliveries
   /\ redeliveries' = redeliveries + 1
   /\ pj' \in {[pj EXCEPT ![j] = IdleJob], [pj EXCEPT ![j] = [IdleJob EXCEPT !.pc = "claim"]]}
-  /\ locked' = IF pj[j].pc = "write" THEN locked \ {pj[j].box} ELSE locked
+  /\ locked' = IF pj[j].pc = "write" THEN locked \ {LockKey(pj[j].box, pj[j].d)} ELSE locked
   /\ UNCHANGED <<rowVars, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
                  sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, reprovs>>
 
@@ -426,11 +438,11 @@ WakeStart(w) ==
   LET bx == boxes[rowBox]
       dd == IF rowDrive # 0 THEN rowDrive ELSE bx.next IN
   /\ wk[w].ph = "idle" /\ status = "awake" /\ bx.ex
-  /\ ResumeLock => rowBox \notin locked
+  /\ ResumeLock => LockKey(rowBox, rowDrive) \notin locked
   /\ wakes < MaxWakes
   /\ wakes' = wakes + 1
   /\ bx.run \/ Detached(dd) \/ ~WaitDetach
-  /\ locked' = IF ResumeLock THEN locked \cup {rowBox} ELSE locked
+  /\ locked' = IF ResumeLock THEN locked \cup {LockKey(rowBox, rowDrive)} ELSE locked
   /\ wk' = [wk EXCEPT ![w] = [ph |-> "waited", b |-> rowBox, d |-> rowDrive, cd |-> WakeD,
                                cl |-> WakeL, laid |-> rowLaid, run |-> bx.run]]
   /\ UNCHANGED <<rowVars, pj, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
@@ -446,7 +458,7 @@ WakeResume(w) ==
       bx == boxes[b]
       next == IF d # 0 THEN d ELSE bx.next IN
   /\ W.ph = "waited" /\ bx.ex
-  /\ locked' = locked \ {b}
+  /\ locked' = locked \ {LockKey(b, d)}
   /\ IF ~W.run /\ d # 0 /\ ~drives[d].ex
        THEN /\ wk' = [wk EXCEPT ![w] = IdleWake]
             /\ UNCHANGED <<boxes, drives, rowDrive, doubleMount, mfail, sessions>>
@@ -475,7 +487,7 @@ WakeSettle(w) ==
        THEN /\ boxes' = [boxes EXCEPT ![b].ok = TRUE]
             /\ rowLaid' = (rowLaid \/ (LaidColumn /\ W.d # 0 /\ ~W.laid))
             /\ UNCHANGED status
-       ELSE /\ boxes' = IF Refused(bx, W.cd) /\ (ResumeLock => b \notin locked)
+       ELSE /\ boxes' = IF Refused(bx, W.cd) /\ (ResumeLock => LockKey(b, W.d) \notin locked)
                            THEN StopIn(boxes, b) ELSE boxes
             /\ status' = IF Refused(bx, W.cd) /\ Terminal(bx) /\ status = "awake"
                            THEN "failed" ELSE status
@@ -487,7 +499,7 @@ WakeSettle(w) ==
 WakeDie(w) ==
   /\ wk[w].ph # "idle"
   /\ wk' = [wk EXCEPT ![w] = IdleWake]
-  /\ locked' = IF wk[w].ph = "waited" THEN locked \ {wk[w].b} ELSE locked
+  /\ locked' = IF wk[w].ph = "waited" THEN locked \ {LockKey(wk[w].b, wk[w].d)} ELSE locked
   /\ UNCHANGED <<rowVars, pj, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars,
                  reprovs>>
 
@@ -567,8 +579,8 @@ Unarchive ==
 \* [check rows] [delete drive]. Keyed on names; any failure requeues from the top.
 Done(j) == tdQ' = tdQ \ {j}
 \* liveReferences: a row not archived or failed keeps what it names.
-KeepBox(j) == TeardownChecksRows /\ LiveBox(j.b)
-KeepDrive(j) == TeardownChecksRows /\ LiveDrive(j.d)
+KeepBox(j) == TeardownChecksRows /\ IF GuardAnyRow THEN rowBox = j.b ELSE LiveBox(j.b)
+KeepDrive(j) == TeardownChecksRows /\ IF GuardAnyRow THEN j.d # 0 /\ rowDrive = j.d ELSE LiveDrive(j.d)
 Phase(j, ph) == tdQ' = (tdQ \ {j}) \cup {[j EXCEPT !.ph = ph]}
 TdRun(j) ==
   /\ j \in tdQ
@@ -581,7 +593,7 @@ TdRun(j) ==
           /\ Detached(j.d)
           /\ IF KeepBox(j)
                THEN Done(j)
-               ELSE tdQ' = (tdQ \ {j}) \cup {[j EXCEPT !.ph = "delbox", !.ld = KeepDrive(j)]}
+               ELSE tdQ' = (tdQ \ {j}) \cup {[j EXCEPT !.ph = "delbox", !.ld = j.ld \/ KeepDrive(j)]}
           /\ UNCHANGED <<boxes, drives, badDel, redeliveries>>
        [] j.ph = "delbox" ->
           /\ boxes' = [boxes EXCEPT ![j.b] = NoBox]
