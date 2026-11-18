@@ -783,6 +783,9 @@ msgstr "{actor} 님이 워크스페이스 {workspace}의 연결을 해제했습�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "현재 {actual} · 예상 ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+msgstr "{agentLabel}에서는 서브 에이전트에게 메시지를 보낼 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} 세션은 해당 워크스페이스를 열면 재개됩니다."
 
@@ -1160,8 +1163,14 @@ msgstr "{name}이(가) 요청함"
 msgid "{name} can't be messaged"
 msgstr "{name}에게 메시지를 보낼 수 없습니다"
 
+msgid "{name} can't take messages now. Go back to message the main agent."
+msgstr "{name}은(는) 지금 메시지를 받을 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
 msgid "{name} failed"
 msgstr "{name} 실패"
+
+msgid "{name} failed and can't take messages. Go back to message the main agent."
+msgstr "{name}이(가) 실패하여 메시지를 받을 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
 
 msgid "{name} finished"
 msgstr "{name} 완료"
@@ -1195,6 +1204,9 @@ msgstr "{name} 작업 시작"
 
 msgid "{name} stopped"
 msgstr "{name} 중지됨"
+
+msgid "{name} stopped and can't take messages. Go back to message the main agent."
+msgstr "{name}이(가) 중지되어 메시지를 받을 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
 
 msgid "{name} wants more access"
 msgstr "{name}에서 더 많은 접근 권한을 요청합니다"
@@ -3468,6 +3480,9 @@ msgstr "뒤로"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "뒤로"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle}(으)로 돌아가기"
 
 msgid "Back to About"
 msgstr "소개로 돌아가기"
@@ -11971,6 +11986,9 @@ msgstr "메시지"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "이 단어가 포함된 메시지는 멘션처럼 알림을 보냅니다. 쉼표로 구분하세요."
 
+msgid "Messages you send go to {name}."
+msgstr "보내는 메시지는 {name}에게 전달됩니다."
+
 msgid "Microphone"
 msgstr "마이크"
 
@@ -20454,6 +20472,9 @@ msgstr "이 에이전트는 대화를 분기할 수 없습니다"
 msgid "This agent can't run in a cloud workspace"
 msgstr "이 에이전트는 클라우드 워크스페이스에서 실행할 수 없습니다"
 
+msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
+msgstr "이 에이전트에서는 서브 에이전트에게 메시지를 보낼 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "이 에이전트는 선택한 기기에 더 이상 존재하지 않습니다 (에이전트가 초기화되었을 수 있습니다). 새 에이전트를 선택할 때까지 실행이 실패합니다."
 
@@ -21683,6 +21704,9 @@ msgstr "<0>{key}</0>의 값 업데이트"
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
+msgid "Update this host to message subagents. Go back to message the main agent."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
 msgid "Update this host to move subagents to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 업데이트하세요"
 
@@ -22097,6 +22121,9 @@ msgstr "사용량 보기"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "보는 중"
+
+msgid "Viewing subagent {name}"
+msgstr "서브 에이전트 {name} 보는 중"
 
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"

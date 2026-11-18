@@ -27,6 +27,7 @@ import { MessageScroller } from "@superset/chat-ui/MessageScroller";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -75,6 +76,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { SubagentNotice } from "./components/SubagentNotice";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -482,18 +484,13 @@ export function SessionView({
 	});
 	const {
 		focusedId: focusedSubagentId,
+		parentTitle: subagentParentTitle,
 		openSubagent,
 		goBack,
 	} = useSubagentNavigation({
 		chatKey,
 		items: session.snapshot.items,
 	});
-	const shownSubagentId = useRef(focusedSubagentId);
-	useEffect(() => {
-		if (shownSubagentId.current === focusedSubagentId) return;
-		shownSubagentId.current = focusedSubagentId;
-		focusComposer();
-	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
 			restoreDraft(
@@ -527,6 +524,25 @@ export function SessionView({
 		onUnsent: restoreUnsent,
 	});
 	openDraftKey.current = subagent.draftKey;
+	const subagentBackRef = useRef<HTMLButtonElement>(null);
+	const subagentBlocked = subagent.target?.blockedBy !== undefined;
+	const shownSubagent = useRef({
+		id: focusedSubagentId,
+		blocked: subagentBlocked,
+	});
+	useEffect(() => {
+		const shown = shownSubagent.current;
+		shownSubagent.current = { id: focusedSubagentId, blocked: subagentBlocked };
+		if (shown.id !== focusedSubagentId) {
+			if (subagentBlocked) subagentBackRef.current?.focus();
+			else focusComposer();
+			return;
+		}
+		if (!subagentBlocked || shown.blocked) return;
+		const active = document.activeElement;
+		if (active === document.body || paneRef.current?.contains(active))
+			subagentBackRef.current?.focus();
+	}, [focusedSubagentId, focusComposer, subagentBlocked]);
 
 	const onBackgroundSubagent = useMoveToBackground(client);
 	const plugins = usePluginMentionOptions();
@@ -675,6 +691,27 @@ export function SessionView({
 	const composerQueue = held ? undefined : promptQueue;
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
 
+	const subagentNotice = subagent.target && (
+		<SubagentNotice
+			agentLabel={agentLabel}
+			backRef={subagentBackRef}
+			onBack={goBack}
+			parentTitle={subagentParentTitle}
+			target={subagent.target}
+		/>
+	);
+	const usageLimitNotice = usageLimit && !held && (
+		<UsageLimitNotice
+			agent={usageLimit.agent}
+			hostUrl={usageLimit.hostUrl}
+			limit={usageLimit.limit}
+			modelLabel={usageLimit.modelLabel}
+			onRespond={usageLimit.respond}
+			onSwitchAccount={usageLimit.onSwitchAccount}
+			sessionAccount={usageLimit.sessionAccount}
+		/>
+	);
+
 	// w-full because the pane lays its children out in a row: without it this
 	// sizes to its content and leaves the right of the pane empty.
 	return (
@@ -776,18 +813,20 @@ export function SessionView({
 				)}
 				<WorkDrawer
 					notice={
-						usageLimit &&
-						!held && (
-							<UsageLimitNotice
-								agent={usageLimit.agent}
-								hostUrl={usageLimit.hostUrl}
-								limit={usageLimit.limit}
-								modelLabel={usageLimit.modelLabel}
-								onRespond={usageLimit.respond}
-								onSwitchAccount={usageLimit.onSwitchAccount}
-								sessionAccount={usageLimit.sessionAccount}
-							/>
-						)
+						subagentNotice || usageLimitNotice ? (
+							<>
+								{subagentNotice}
+								{usageLimitNotice && (
+									<div
+										className={cn(
+											subagentNotice && "border-border/60 border-t",
+										)}
+									>
+										{usageLimitNotice}
+									</div>
+								)}
+							</>
+						) : undefined
 					}
 					onExit={returnToComposer}
 					paneRef={paneRef}

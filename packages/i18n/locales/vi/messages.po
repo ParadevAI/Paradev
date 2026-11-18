@@ -783,6 +783,9 @@ msgstr "{actor} đã hủy liên kết không gian làm việc {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} đến hiện tại · dự kiến ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+msgstr "{agentLabel} không cho phép bạn nhắn tin cho các agent con của nó. Quay lại để nhắn tin cho agent chính."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Các phiên {agents} sẽ tiếp tục khi bạn mở workspace của chúng."
 
@@ -1160,8 +1163,14 @@ msgstr "{name} hỏi"
 msgid "{name} can't be messaged"
 msgstr "Không thể nhắn tin cho {name}"
 
+msgid "{name} can't take messages now. Go back to message the main agent."
+msgstr "{name} hiện không thể nhận tin nhắn. Quay lại để nhắn tin cho agent chính."
+
 msgid "{name} failed"
 msgstr "{name} đã thất bại"
+
+msgid "{name} failed and can't take messages. Go back to message the main agent."
+msgstr "{name} đã thất bại và không thể nhận tin nhắn. Quay lại để nhắn tin cho agent chính."
 
 msgid "{name} finished"
 msgstr "{name} đã xong"
@@ -1195,6 +1204,9 @@ msgstr "{name} đã bắt đầu làm việc"
 
 msgid "{name} stopped"
 msgstr "{name} đã dừng"
+
+msgid "{name} stopped and can't take messages. Go back to message the main agent."
+msgstr "{name} đã dừng và không thể nhận tin nhắn. Quay lại để nhắn tin cho agent chính."
 
 msgid "{name} wants more access"
 msgstr "{name} muốn có thêm quyền truy cập"
@@ -3468,6 +3480,9 @@ msgstr "Quay lại"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Quay lại"
+
+msgid "Back to {parentTitle}"
+msgstr "Quay lại {parentTitle}"
 
 msgid "Back to About"
 msgstr "Quay lại Giới thiệu"
@@ -11971,6 +11986,9 @@ msgstr "Tin nhắn"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Tin nhắn chứa các từ này sẽ thông báo cho bạn như khi được nhắc. Phân tách bằng dấu phẩy."
 
+msgid "Messages you send go to {name}."
+msgstr "Tin nhắn bạn gửi sẽ đến {name}."
+
 msgid "Microphone"
 msgstr "Micrô"
 
@@ -20454,6 +20472,9 @@ msgstr "Tác nhân này không thể tạo nhánh hội thoại"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agent này không thể chạy trong workspace cloud"
 
+msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
+msgstr "Agent này không cho phép bạn nhắn tin cho các agent con của nó. Quay lại để nhắn tin cho agent chính."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."
 
@@ -21683,6 +21704,9 @@ msgstr "Cập nhật giá trị cho <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 
+msgid "Update this host to message subagents. Go back to message the main agent."
+msgstr "Cập nhật host này để nhắn tin cho agent con. Quay lại để nhắn tin cho agent chính."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Cập nhật máy chủ này để chuyển agent con sang chạy nền"
 
@@ -22097,6 +22121,9 @@ msgstr "Xem mức sử dụng"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Đang xem"
+
+msgid "Viewing subagent {name}"
+msgstr "Đang xem agent con {name}"
 
 msgid "Violence or harassment"
 msgstr "Bạo lực hoặc quấy rối"

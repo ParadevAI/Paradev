@@ -103,6 +103,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 	expect(stopped.hook.result.current.target?.disabledReason).toBe(
 		"Explore stopped",
 	);
+	expect(stopped.hook.result.current.target?.blockedBy).toBe("stopped");
 	const failed = renderTarget({
 		...explore,
 		status: "failed",
@@ -113,6 +114,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 	expect(failed.hook.result.current.target?.disabledReason).toBe(
 		"Explore failed",
 	);
+	expect(failed.hook.result.current.target?.blockedBy).toBe("failed");
 	const resumable = renderTarget({
 		...explore,
 		status: "failed",
@@ -121,6 +123,7 @@ test("a stopped or failed subagent disables the composer with the reason", () =>
 		canStop: false,
 	});
 	expect(resumable.hook.result.current.target?.disabledReason).toBeUndefined();
+	expect(resumable.hook.result.current.target?.blockedBy).toBeUndefined();
 });
 
 test("a subagent without controls can't be messaged", () => {
@@ -135,7 +138,20 @@ test("a subagent without controls can't be messaged", () => {
 	expect(hook.result.current.target?.disabledReason).toBe(
 		"Explore can't be messaged",
 	);
+	expect(hook.result.current.target?.blockedBy).toBe("agent");
 	expect(hook.result.current.target?.onStop).toBeUndefined();
+});
+
+test("a finished subagent without controls is not blamed on the agent", () => {
+	const {
+		subagentStatus: _status,
+		canSteer: _steer,
+		canStop: _stop,
+		canBackground: _background,
+		...finished
+	} = explore;
+	const { hook } = renderTarget({ ...finished, status: "completed" });
+	expect(hook.result.current.target?.blockedBy).toBe("ended");
 });
 
 test("stop reads the item and stops its task", () => {
@@ -152,13 +168,11 @@ test("a host too old to message subagents gives the text back and says so", asyn
 			draft: textDraft(""),
 		});
 	});
-	expect(onUnsent).toHaveBeenCalledWith(
-		typed,
-		`chat-v3-draft:t1:subagent:${explore.id}`,
-	);
+	expect(onUnsent).toHaveBeenCalledWith(typed, "chat-v3-draft:t1");
 	expect(hook.result.current.target?.disabledReason).toBe(
 		"Update this host to message subagents",
 	);
+	expect(hook.result.current.target?.blockedBy).toBe("host");
 });
 
 test("drafts are kept per target", () => {

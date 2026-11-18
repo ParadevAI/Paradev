@@ -783,6 +783,9 @@ msgstr "{actor} unlinked the workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} so far · ~{projected} projected"
 
+msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+msgstr "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} sessions resume when you open their workspace."
 
@@ -1160,8 +1163,14 @@ msgstr "{name} asks"
 msgid "{name} can't be messaged"
 msgstr "{name} can't be messaged"
 
+msgid "{name} can't take messages now. Go back to message the main agent."
+msgstr "{name} can't take messages now. Go back to message the main agent."
+
 msgid "{name} failed"
 msgstr "{name} failed"
+
+msgid "{name} failed and can't take messages. Go back to message the main agent."
+msgstr "{name} failed and can't take messages. Go back to message the main agent."
 
 msgid "{name} finished"
 msgstr "{name} finished"
@@ -1195,6 +1204,9 @@ msgstr "{name} started working"
 
 msgid "{name} stopped"
 msgstr "{name} stopped"
+
+msgid "{name} stopped and can't take messages. Go back to message the main agent."
+msgstr "{name} stopped and can't take messages. Go back to message the main agent."
 
 msgid "{name} wants more access"
 msgstr "{name} wants more access"
@@ -3468,6 +3480,9 @@ msgstr "Back"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Back"
+
+msgid "Back to {parentTitle}"
+msgstr "Back to {parentTitle}"
 
 msgid "Back to About"
 msgstr "Back to About"
@@ -11971,6 +11986,9 @@ msgstr "Messages"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Messages with these words notify you like a mention. Separate them with commas."
 
+msgid "Messages you send go to {name}."
+msgstr "Messages you send go to {name}."
+
 msgid "Microphone"
 msgstr "Microphone"
 
@@ -20454,6 +20472,9 @@ msgstr "This agent can't branch a conversation"
 msgid "This agent can't run in a cloud workspace"
 msgstr "This agent can't run in a cloud workspace"
 
+msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
+msgstr "This agent doesn't let you message its subagents. Go back to message the main agent."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 
@@ -21683,6 +21704,9 @@ msgstr "Update the value for <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Update this host to message subagents"
 
+msgid "Update this host to message subagents. Go back to message the main agent."
+msgstr "Update this host to message subagents. Go back to message the main agent."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Update this host to move subagents to the background"
 
@@ -22097,6 +22121,9 @@ msgstr "View usage"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Viewing"
+
+msgid "Viewing subagent {name}"
+msgstr "Viewing subagent {name}"
 
 msgid "Violence or harassment"
 msgstr "Violence or harassment"

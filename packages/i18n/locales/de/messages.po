@@ -783,6 +783,9 @@ msgstr "{actor} hat die Verknüpfung mit dem Arbeitsbereich {workspace} aufgehob
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} bisher · ~{projected} erwartet"
 
+msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+msgstr "{agentLabel} lässt dich seinen Subagents keine Nachrichten senden. Geh zurück, um dem Hauptagenten zu schreiben."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-Sitzungen werden fortgesetzt, wenn du ihren Workspace öffnest."
 
@@ -1160,8 +1163,14 @@ msgstr "{name} fragt"
 msgid "{name} can't be messaged"
 msgstr "{name} kann keine Nachrichten empfangen"
 
+msgid "{name} can't take messages now. Go back to message the main agent."
+msgstr "{name} kann gerade keine Nachrichten empfangen. Geh zurück, um dem Hauptagenten zu schreiben."
+
 msgid "{name} failed"
 msgstr "{name} ist fehlgeschlagen"
+
+msgid "{name} failed and can't take messages. Go back to message the main agent."
+msgstr "{name} ist fehlgeschlagen und kann keine Nachrichten empfangen. Geh zurück, um dem Hauptagenten zu schreiben."
 
 msgid "{name} finished"
 msgstr "{name} ist fertig"
@@ -1195,6 +1204,9 @@ msgstr "{name} hat mit der Arbeit begonnen"
 
 msgid "{name} stopped"
 msgstr "{name} wurde gestoppt"
+
+msgid "{name} stopped and can't take messages. Go back to message the main agent."
+msgstr "{name} wurde gestoppt und kann keine Nachrichten empfangen. Geh zurück, um dem Hauptagenten zu schreiben."
 
 msgid "{name} wants more access"
 msgstr "{name} möchte mehr Zugriff"
@@ -3468,6 +3480,9 @@ msgstr "Zurück"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Zurück"
+
+msgid "Back to {parentTitle}"
+msgstr "Zurück zu {parentTitle}"
 
 msgid "Back to About"
 msgstr "Zurück zu Über uns"
@@ -11971,6 +11986,9 @@ msgstr "Nachrichten"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Nachrichten mit diesen Wörtern benachrichtigen dich wie eine Erwähnung. Trenne sie mit Kommas."
 
+msgid "Messages you send go to {name}."
+msgstr "Deine Nachrichten gehen an {name}."
+
 msgid "Microphone"
 msgstr "Mikrofon"
 
@@ -20454,6 +20472,9 @@ msgstr "Dieser Agent kann keine Unterhaltung verzweigen"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Dieser Agent kann nicht in einem Cloud-Arbeitsbereich laufen"
 
+msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
+msgstr "Dieser Agent lässt dich seinen Subagents keine Nachrichten senden. Geh zurück, um dem Hauptagenten zu schreiben."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Diesen Agenten gibt es auf dem gewählten Gerät nicht mehr (seine Agenten wurden möglicherweise zurückgesetzt). Läufe schlagen fehl, bis du einen neuen auswählst."
 
@@ -21683,6 +21704,9 @@ msgstr "Wert für <0>{key}</0> aktualisieren"
 msgid "Update this host to message subagents"
 msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden"
 
+msgid "Update this host to message subagents. Go back to message the main agent."
+msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden. Geh zurück, um dem Hauptagenten zu schreiben."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Aktualisiere diesen Host, um Subagents in den Hintergrund zu verschieben"
 
@@ -22097,6 +22121,9 @@ msgstr "Nutzung ansehen"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Angezeigt"
+
+msgid "Viewing subagent {name}"
+msgstr "Subagent {name} wird angezeigt"
 
 msgid "Violence or harassment"
 msgstr "Gewalt oder Belästigung"

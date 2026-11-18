@@ -783,6 +783,9 @@ msgstr "{actor} heeft de koppeling met workspace {workspace} verwijderd"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} tot nu toe · ~{projected} verwacht"
 
+msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
+msgstr "Met {agentLabel} kun je geen berichten naar subagents sturen. Ga terug om de hoofdagent een bericht te sturen."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-sessies worden hervat wanneer je hun workspace opent."
 
@@ -1160,8 +1163,14 @@ msgstr "{name} vraagt"
 msgid "{name} can't be messaged"
 msgstr "{name} kan geen berichten ontvangen"
 
+msgid "{name} can't take messages now. Go back to message the main agent."
+msgstr "{name} kan nu geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
+
 msgid "{name} failed"
 msgstr "{name} is mislukt"
+
+msgid "{name} failed and can't take messages. Go back to message the main agent."
+msgstr "{name} is mislukt en kan geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
 
 msgid "{name} finished"
 msgstr "{name} is klaar"
@@ -1195,6 +1204,9 @@ msgstr "{name} is begonnen"
 
 msgid "{name} stopped"
 msgstr "{name} is gestopt"
+
+msgid "{name} stopped and can't take messages. Go back to message the main agent."
+msgstr "{name} is gestopt en kan geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
 
 msgid "{name} wants more access"
 msgstr "{name} wil meer toegang"
@@ -3468,6 +3480,9 @@ msgstr "Terug"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Terug"
+
+msgid "Back to {parentTitle}"
+msgstr "Terug naar {parentTitle}"
 
 msgid "Back to About"
 msgstr "Terug naar Over ons"
@@ -11971,6 +11986,9 @@ msgstr "Berichten"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Berichten met deze woorden geven je een melding zoals een vermelding. Scheid ze met komma's."
 
+msgid "Messages you send go to {name}."
+msgstr "Berichten die je stuurt gaan naar {name}."
+
 msgid "Microphone"
 msgstr "Microfoon"
 
@@ -20454,6 +20472,9 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
 
+msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
+msgstr "Met deze agent kun je geen berichten naar subagents sturen. Ga terug om de hoofdagent een bericht te sturen."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
 
@@ -21683,6 +21704,9 @@ msgstr "Werk de waarde van <0>{key}</0> bij"
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
 
+msgid "Update this host to message subagents. Go back to message the main agent."
+msgstr "Werk deze host bij om subagents berichten te sturen. Ga terug om de hoofdagent een bericht te sturen."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"
 
@@ -22097,6 +22121,9 @@ msgstr "Gebruik bekijken"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Bekeken"
+
+msgid "Viewing subagent {name}"
+msgstr "Je bekijkt subagent {name}"
 
 msgid "Violence or harassment"
 msgstr "Geweld of intimidatie"

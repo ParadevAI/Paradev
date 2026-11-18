@@ -10,7 +10,7 @@ import type { Item, UserContent, UserMessage } from "@superset/chat/protocol";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { toast } from "@superset/ui/sonner";
 import { useCallback, useMemo, useRef, useState } from "react";
-import type { ComposerTarget } from "../../../Composer";
+import type { ComposerTarget, SubagentBlock } from "../../../Composer";
 
 type Send = (
 	content: UserContent[],
@@ -77,17 +77,29 @@ export function useSubagentTarget({
 	});
 	const canStop = item?.canStop === true;
 
-	const disabledReason = !item
+	const blockedBy: SubagentBlock | undefined = !item
 		? undefined
 		: hostCannotSteer
-			? hostTooOldReason
+			? "host"
 			: outcome === "stopped"
-				? t({ message: `${name} stopped` })
+				? "stopped"
 				: item.canSteer
 					? undefined
 					: outcome === "failed"
-						? t({ message: `${name} failed` })
-						: unreachableReason;
+						? "failed"
+						: item.status === "running"
+							? "agent"
+							: "ended";
+	const disabledReason =
+		blockedBy === "host"
+			? hostTooOldReason
+			: blockedBy === "stopped"
+				? t({ message: `${name} stopped` })
+				: blockedBy === "failed"
+					? t({ message: `${name} failed` })
+					: blockedBy === "agent" || blockedBy === "ended"
+						? unreachableReason
+						: undefined;
 
 	const stop = useCallback(() => {
 		if (itemId) onStop(itemId);
@@ -98,11 +110,13 @@ export function useSubagentTarget({
 			itemId
 				? {
 						name,
-						...(disabledReason ? { disabledReason } : {}),
+						...(blockedBy && disabledReason
+							? { disabledReason, blockedBy }
+							: {}),
 						...(canStop ? { onStop: stop } : {}),
 					}
 				: undefined,
-		[itemId, name, disabledReason, canStop, stop],
+		[itemId, name, disabledReason, blockedBy, canStop, stop],
 	);
 
 	const steer = useCallback(
@@ -134,7 +148,7 @@ export function useSubagentTarget({
 					return;
 				}
 				drop();
-				onUnsent(content, origin);
+				onUnsent(content, draftKey);
 				if (result === "unsupported") {
 					setHostCannotSteer(true);
 					toast.error(hostTooOldReason);
