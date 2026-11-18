@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { seedPendingCloudLaunch } from "renderer/stores/workspace-creates/pendingCloudLaunch";
+import { withCreatedCloudWorkspace } from "./utils/withCreatedCloudWorkspace";
 
 export type CreateCloudWorkspaceInput = Omit<
 	RouterInputs["cloudWorkspace"]["create"],
@@ -40,9 +41,7 @@ export function useCreateCloudWorkspace() {
 			const listInput = { organizationId: input.organizationId };
 			await utils.cloudWorkspace.list.cancel(listInput);
 			utils.cloudWorkspace.list.setData(listInput, (rows) =>
-				rows
-					? [created, ...rows.filter((row) => row.id !== created.id)]
-					: [created],
+				withCreatedCloudWorkspace(rows, created),
 			);
 			void utils.cloudWorkspace.list.invalidate(listInput);
 			return created;
