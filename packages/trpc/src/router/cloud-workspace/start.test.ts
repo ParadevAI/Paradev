@@ -1,11 +1,27 @@
 import { describe, expect, test } from "bun:test";
 import * as Sentry from "@sentry/core";
+import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as realtime from "../../lib/realtime";
 import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as jobs from "./jobs";
 import { queueProvision } from "./start";
-import * as transition from "./transition";
+
+/** The row update a failure makes; `moved` says whether the row was still in a `from` status. */
+function rowUpdate(moved: boolean, sets: unknown[] = []) {
+	return {
+		update: () => ({
+			set: (values: unknown) => {
+				sets.push(values);
+				return {
+					where: () => ({
+						returning: async () => (moved ? [{ id: "ws_1" }] : []),
+					}),
+				};
+			},
+		}),
+	};
+}
 
 describe("a provision that cannot be queued", () => {
 	const nudged: unknown[] = [];
@@ -14,15 +30,8 @@ describe("a provision that cannot be queued", () => {
 			throw new Error("queue down");
 		},
 	});
-	const failed: unknown[] = [];
-	stub(transition, {
-		transitionCloudWorkspace: async (args: {
-			set: { failureReason?: string };
-		}) => {
-			failed.push(args.set.failureReason);
-			return true;
-		},
-	});
+	const sets: { failureReason?: string }[] = [];
+	stub(db, rowUpdate(true, sets));
 	stub(realtime, { nudge: (...args: unknown[]) => nudged.push(args) });
 	stub(chatMoves, { failChatMovesTo: async () => {} });
 	stub(Sentry, { captureException: () => "" });
@@ -35,10 +44,10 @@ describe("a provision that cannot be queued", () => {
 	});
 
 	test("records the failure as queue_failed", async () => {
-		failed.length = 0;
+		sets.length = 0;
 		await expect(
 			queueProvision({ cloudWorkspaceId: "ws_1" }, "org_1"),
 		).rejects.toThrow();
-		expect(failed).toEqual(["queue_failed"]);
+		expect(sets.map((set) => set.failureReason)).toEqual(["queue_failed"]);
 	});
 });

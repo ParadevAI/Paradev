@@ -35,8 +35,8 @@ stub(sandboxSleep, {
 		recordedAsleep.push([id, stopped]);
 		return Promise.resolve();
 	},
-	recordBootEnd: (id: string, ended: unknown) => {
-		endedBoots.push([id, ended]);
+	recordBootEnd: (scope: { cloudWorkspaceId: string }, ended: unknown) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
 		return Promise.resolve();
 	},
 });
@@ -109,7 +109,11 @@ const input = {
 };
 const SEVEN_DAYS = 7 * 24 * 60 * 60;
 
-const BOX = { providerSandboxId: "ws-box", sandboxSessionId: "session_1" };
+const BOX = {
+	organizationId: "org_1",
+	providerSandboxId: "ws-box",
+	sandboxSessionId: "session_1",
+};
 
 describe("queueReap", () => {
 	beforeEach(() => {

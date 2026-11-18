@@ -29,7 +29,7 @@ import {
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBoxStopped, recordSandboxAsleep } from "./sandbox-sleep";
 import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -225,9 +225,13 @@ export async function wakeAfterStop(
 	row: CloudWorkspaceRow,
 	stopped: { sessionId: string | null },
 ): Promise<WokenCloudWorkspace> {
-	const sessionId = stopped.sessionId ?? row.sandboxSessionId;
-	await recordSandboxAsleep(row.id, { sessionId });
-	await recordBootEnd(row.id, { sessionId, reason: "restarted" });
+	await recordBoxStopped(
+		{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		{
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+			reason: "restarted",
+		},
+	);
 	await queueSettleWorkspace(row.id);
 	return wakeCloudWorkspace(row);
 }

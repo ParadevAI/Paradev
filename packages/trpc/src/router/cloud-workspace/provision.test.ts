@@ -7,7 +7,6 @@ import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as chatMoves from "../chat-move/utils/queueChatMove";
 import { provisionCloudWorkspace } from "./provision";
-import * as transition from "./transition";
 
 const logged: unknown[] = [];
 const captured: unknown[] = [];
@@ -37,8 +36,24 @@ stub(Sentry, {
 	captureException: (...args: unknown[]) => captured.push(args),
 });
 
+/** The row update a failure makes; `moved` says whether the row was still in a `from` status. */
+function rowUpdate(moved: boolean, sets: unknown[] = []) {
+	return {
+		update: () => ({
+			set: (values: unknown) => {
+				sets.push(values);
+				return {
+					where: () => ({
+						returning: async () => (moved ? [{ id: "ws_1" }] : []),
+					}),
+				};
+			},
+		}),
+	};
+}
+
 describe("a provision that Autumn refuses", () => {
-	stub(transition, { transitionCloudWorkspace: async () => true });
+	stub(db, rowUpdate(true));
 
 	test("fails the workspace with a warning and opens no Sentry issue", async () => {
 		logged.length = 0;
@@ -68,15 +83,8 @@ describe("a provision that Autumn refuses", () => {
 });
 
 describe("a failed provision records why", () => {
-	const failed: unknown[] = [];
-	stub(transition, {
-		transitionCloudWorkspace: async (args: {
-			set: { failureReason?: string; failedAt?: Date };
-		}) => {
-			failed.push([args.set.failureReason, args.set.failedAt instanceof Date]);
-			return true;
-		},
-	});
+	const sets: { failureReason?: string; failedAt?: Date }[] = [];
+	stub(db, rowUpdate(true, sets));
 
 	test("from the error: a refusal of either kind, a host that never answered, anything else", async () => {
 		for (claimError of [
@@ -95,7 +103,9 @@ describe("a failed provision records why", () => {
 		]) {
 			await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });
 		}
-		expect(failed).toEqual([
+		expect(
+			sets.map((set) => [set.failureReason, set.failedAt instanceof Date]),
+		).toEqual([
 			["usage_limit", true],
 			["needs_paid_plan", true],
 			["host_not_ready", true],
@@ -105,7 +115,7 @@ describe("a failed provision records why", () => {
 });
 
 describe("a provision whose row another write already moved", () => {
-	stub(transition, { transitionCloudWorkspace: async () => false });
+	stub(db, rowUpdate(false));
 
 	test("writes no workspace.failed and opens no Sentry issue", async () => {
 		logged.length = 0;

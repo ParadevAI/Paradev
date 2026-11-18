@@ -148,8 +148,11 @@ stub(sandboxSleep, {
 	) => {
 		recordedAsleep.push([id, stopped]);
 	},
-	recordBootEnd: async (id: string, ended: unknown) => {
-		endedBoots.push([id, ended]);
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
 	},
 });
 stub(jobs, {
@@ -301,31 +304,31 @@ describe("attachBootSession", () => {
 });
 
 describe("releaseBoot", () => {
-	const logged: unknown[] = [];
-	stub(Sentry.logger, { info: (...args: unknown[]) => logged.push(args) });
+	const logged: [string, unknown][] = [];
+	stub(Sentry.logger, {
+		info: (event: string, attributes: unknown) =>
+			logged.push([event, attributes]),
+	});
 
 	test("a failed start ends as failed, any other release as released, and a reason already written stays", async () => {
 		await releaseBoot("boot_1", "provision_failed");
 		await releaseBoot("boot_1", "never_attached");
-		expect(writes.map(endReasonOf)).toEqual([
-			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
-			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		boot = { ...boot, endReason: "archived" };
+		await releaseBoot("boot_1", "sandbox_lost");
+		expect(writes.map((write) => write.endReason)).toEqual([
+			"failed",
+			"released",
+			"archived",
 		]);
-		expect(logged).toEqual([
-			[
-				"boot.released",
-				expect.objectContaining({
-					"end.reason": "failed",
-					"release.cause": "provision_failed",
-				}),
-			],
-			[
-				"boot.released",
-				expect.objectContaining({
-					"end.reason": "released",
-					"release.cause": "never_attached",
-				}),
-			],
+		expect(
+			logged.map(([, attributes]) => [
+				(attributes as Record<string, unknown>)["end.reason"],
+				(attributes as Record<string, unknown>)["release.cause"],
+			]),
+		).toEqual([
+			["failed", "provision_failed"],
+			["released", "never_attached"],
+			["archived", "sandbox_lost"],
 		]);
 	});
 });

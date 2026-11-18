@@ -14,14 +14,27 @@ stub(db, {
 });
 
 describe("transitionCloudWorkspace", () => {
-	test("a row that leaves failed drops its failure reason and time", async () => {
+	test("an archived row keeps why it failed; a row live again drops it", async () => {
+		written.length = 0;
 		await transitionCloudWorkspace({
 			id: "ws_1",
 			from: ["failed"],
 			to: "archived",
 		});
+		await transitionCloudWorkspace({
+			id: "ws_1",
+			from: ["archived"],
+			to: "asleep",
+			set: { deletedAt: null },
+		});
 		expect(written).toEqual([
-			{ failureReason: null, failedAt: null, status: "archived" },
+			{ status: "archived" },
+			{
+				failureReason: null,
+				failedAt: null,
+				deletedAt: null,
+				status: "asleep",
+			},
 		]);
 	});
 });

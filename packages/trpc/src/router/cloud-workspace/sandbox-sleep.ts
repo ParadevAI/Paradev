@@ -3,7 +3,11 @@ import { db } from "@superset/db/client";
 import type { CloudWorkspaceBootEndReason } from "@superset/db/enums";
 import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
-import { logControl } from "../../lib/control-log";
+import {
+	type ControlScope,
+	controlTags,
+	logControl,
+} from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
@@ -41,11 +45,13 @@ export function stillStoppedSession(sessionId: string | null): SQL | undefined {
 }
 
 /**
- * Why the box stopped, on the open boot of `sessionId` (any open boot when null).
- * The first stop site to write wins; the meter closes the boot later.
+ * Why the box stopped, on the open boot of `sessionId` (any open boot when
+ * null). It also lands on a boot of a concurrent wake that has not attached
+ * yet. The first stop site to write wins; at close the meter keeps it, unless
+ * Vercel marked the session failed or aborted, which is `crashed`.
  */
 export async function recordBootEnd(
-	cloudWorkspaceId: string,
+	scope: ControlScope,
 	{
 		sessionId,
 		reason,
@@ -56,7 +62,7 @@ export async function recordBootEnd(
 		.set({ endReason: reason })
 		.where(
 			and(
-				eq(cloudWorkspaceBoots.cloudWorkspaceId, cloudWorkspaceId),
+				eq(cloudWorkspaceBoots.cloudWorkspaceId, scope.cloudWorkspaceId),
 				isNull(cloudWorkspaceBoots.stoppedAt),
 				isNull(cloudWorkspaceBoots.endReason),
 				sessionId === null
@@ -68,10 +74,23 @@ export async function recordBootEnd(
 			),
 		)
 		.catch((error) =>
-			Sentry.captureException(error, {
-				tags: { "cloud_workspace.id": cloudWorkspaceId },
-			}),
+			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);
+}
+
+/**
+ * After a stop we caused: why it stopped, then the asleep record. The reason
+ * goes first so the reconcile, which labels an expired stop idle, cannot get
+ * there before it.
+ */
+export async function recordBoxStopped(
+	scope: ControlScope,
+	stopped: { sessionId: string | null; reason: CloudWorkspaceBootEndReason },
+): Promise<void> {
+	await recordBootEnd(scope, stopped);
+	await recordSandboxAsleep(scope.cloudWorkspaceId, {
+		sessionId: stopped.sessionId,
+	});
 }
 
 /** `sessionId` is the session the caller saw stopped, read before or at the stop. */

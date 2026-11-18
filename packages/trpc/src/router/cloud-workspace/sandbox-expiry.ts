@@ -14,7 +14,7 @@ import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, reconcileCloudWorkspaceUsage } from "./meter";
 import {
 	keepUpdatedAt,
-	recordBootEnd,
+	recordBoxStopped,
 	recordSandboxAsleep,
 	reportSleepWriteFailure,
 } from "./sandbox-sleep";
@@ -113,6 +113,28 @@ function queueWatch(cloudWorkspaceId: string, expiresAt: Date): Promise<void> {
 }
 
 /**
+ * A stop seen in a provider read, not caused here. Past the recorded expiry it
+ * is the timeout the expiry watch would have labelled idle.
+ */
+export async function recordStopSeen(
+	row: {
+		id: string;
+		organizationId: string;
+		sandboxExpiresAt: Date | null;
+	},
+	{ sessionId }: { sessionId: string | null },
+): Promise<void> {
+	if (row.sandboxExpiresAt && row.sandboxExpiresAt.getTime() <= Date.now()) {
+		await recordBoxStopped(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+			{ sessionId, reason: "idle" },
+		);
+		return;
+	}
+	await recordSandboxAsleep(row.id, { sessionId });
+}
+
+/**
  * Runs just after a box's recorded expiry. An extension since then moved the
  * expiry, so the watch follows it; otherwise one provider read confirms the
  * stop before clients and the meter are told.
@@ -123,6 +145,7 @@ export async function watchSandboxExpiry({
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 		columns: {
+			organizationId: true,
 			providerSandboxId: true,
 			sandboxExpiresAt: true,
 			sandboxSessionId: true,
@@ -145,9 +168,13 @@ export async function watchSandboxExpiry({
 		return "rewatched";
 	}
 	const sessionId = live?.sessionId ?? row.sandboxSessionId;
-	await recordSandboxAsleep(cloudWorkspaceId, { sessionId });
 	if (live) {
-		await recordBootEnd(cloudWorkspaceId, { sessionId, reason: "idle" });
+		await recordBoxStopped(
+			{ cloudWorkspaceId, organizationId: row.organizationId },
+			{ sessionId, reason: "idle" },
+		);
+	} else {
+		await recordSandboxAsleep(cloudWorkspaceId, { sessionId });
 	}
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
@@ -166,7 +193,9 @@ export async function syncSandboxExpiries(
 	const rows = await db
 		.select({
 			id: cloudWorkspaces.id,
+			organizationId: cloudWorkspaces.organizationId,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
+			sandboxExpiresAt: cloudWorkspaces.sandboxExpiresAt,
 		})
 		.from(cloudWorkspaces)
 		.where(
@@ -184,7 +213,7 @@ export async function syncSandboxExpiries(
 			await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			await queueWatch(row.id, expiresAt);
 		} else if (sessionId) {
-			await recordSandboxAsleep(row.id, { sessionId });
+			await recordStopSeen(row, { sessionId });
 		}
 	}
 }

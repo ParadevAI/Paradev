@@ -104,8 +104,11 @@ stub(sandboxSleep, {
 	) => {
 		recordedAsleep.push([id, stopped]);
 	},
-	recordBootEnd: async (id: string, ended: unknown) => {
-		endedBoots.push([id, ended]);
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
 	},
 });
 stub(reap, {
@@ -308,6 +311,22 @@ describe("cloudWorkspace.sleep ends the boot", () => {
 		await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID });
 		expect(endedBoots).toEqual([
 			[WORKSPACE_ID, { sessionId: "session_1", reason: "user" }],
+		]);
+	});
+});
+
+describe("an address read that finds the box stopped", () => {
+	test("labels the boot idle when the recorded expiry has passed", async () => {
+		Object.assign(ROW, { sandboxExpiresAt: new Date(Date.now() - 60_000) });
+		try {
+			expect(await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID })).toEqual({
+				stopped: false,
+			});
+		} finally {
+			Object.assign(ROW, { sandboxExpiresAt: undefined });
+		}
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1", reason: "idle" }],
 		]);
 	});
 });

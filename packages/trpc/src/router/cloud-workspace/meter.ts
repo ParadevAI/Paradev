@@ -30,7 +30,7 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBoxStopped } from "./sandbox-sleep";
 
 const LOCK_WINDOW_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 70 * 60 * 1000;
@@ -272,7 +272,7 @@ export async function releaseBoot(
 			finalizedThrough: now,
 			lockOpen: false,
 			settleLeaseUntil: null,
-			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${endReason})`,
+			endReason,
 		})
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 	if (boot.cloudWorkspaceId) {
@@ -607,10 +607,8 @@ export async function settleBoot(
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
 		const stopped = await stopSandbox(workspace.providerSandboxId);
-		const sessionId = stopped.sessionId ?? boot.vercelSessionId;
-		await recordSandboxAsleep(boot.cloudWorkspaceId, { sessionId });
-		await recordBootEnd(boot.cloudWorkspaceId, {
-			sessionId,
+		await recordBoxStopped(scope, {
+			sessionId: stopped.sessionId ?? boot.vercelSessionId,
 			reason: "usage_limit",
 		});
 		await setUsageStopAt(boot, null);
@@ -712,14 +710,15 @@ export async function settleOrganizationNow(
 		rows.map(({ id, vercelSessionId, cloudWorkspaceId, providerSandboxId }) =>
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
-						.then(async (stopped) => {
-							const sessionId = stopped.sessionId ?? vercelSessionId;
-							await recordSandboxAsleep(cloudWorkspaceId, { sessionId });
-							await recordBootEnd(cloudWorkspaceId, {
-								sessionId,
-								reason: "archived",
-							});
-						})
+						.then((stopped) =>
+							recordBoxStopped(
+								{ cloudWorkspaceId, organizationId },
+								{
+									sessionId: stopped.sessionId ?? vercelSessionId,
+									reason: "archived",
+								},
+							),
+						)
 						.catch((error) =>
 							Sentry.captureException(error, {
 								tags: controlTags({
@@ -856,9 +855,13 @@ async function adoptRunningBoxes(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
 			const stopped = await stopSandbox(workspace.providerSandboxId);
-			const sessionId = stopped.sessionId ?? session.id;
-			await recordSandboxAsleep(workspace.id, { sessionId });
-			await recordBootEnd(workspace.id, { sessionId, reason: "usage_limit" });
+			await recordBoxStopped(
+				{
+					cloudWorkspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+				},
+				{ sessionId: stopped.sessionId ?? session.id, reason: "usage_limit" },
+			);
 			logControl(
 				"meter.cap_stopped",
 				{

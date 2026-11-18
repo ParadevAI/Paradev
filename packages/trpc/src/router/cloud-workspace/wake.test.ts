@@ -9,7 +9,6 @@ import * as sandbox from "../../lib/sandbox";
 import * as meter from "./meter";
 import * as sandboxExpiry from "./sandbox-expiry";
 import * as sandboxSleep from "./sandbox-sleep";
-import * as transition from "./transition";
 import {
 	markSandboxUnavailable,
 	restartCloudWorkspace,
@@ -121,8 +120,11 @@ describe("wakeAfterStop", () => {
 		) => {
 			recordedAsleep.push([id, stopped]);
 		},
-		recordBootEnd: async (id: string, ended: unknown) => {
-			endedBoots.push([id, ended]);
+		recordBootEnd: async (
+			scope: { cloudWorkspaceId: string },
+			ended: unknown,
+		) => {
+			endedBoots.push([scope.cloudWorkspaceId, ended]);
 		},
 	});
 	stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
@@ -216,12 +218,28 @@ describe("a refused wake", () => {
 	});
 });
 
+/** The row update a failure makes; `moved` says whether the row was still in a `from` status. */
+function rowUpdate(moved: boolean, sets: unknown[] = []) {
+	return {
+		update: () => ({
+			set: (values: unknown) => {
+				sets.push(values);
+				return {
+					where: () => ({
+						returning: async () => (moved ? [{ id: "ws_1" }] : []),
+					}),
+				};
+			},
+		}),
+	};
+}
+
 describe("markSandboxUnavailable", () => {
 	stub(realtime, { nudge: () => {} });
 
 	describe("when the row moves to failed", () => {
 		const captured: unknown[] = [];
-		stub(transition, { transitionCloudWorkspace: async () => true });
+		stub(db, rowUpdate(true));
 		stub(Sentry, {
 			captureException: (...args: unknown[]) => captured.push(args),
 		});
@@ -242,12 +260,7 @@ describe("markSandboxUnavailable", () => {
 
 	describe("records why the sandbox is unavailable", () => {
 		const failed: unknown[] = [];
-		stub(transition, {
-			transitionCloudWorkspace: async (args: { set: unknown }) => {
-				failed.push(args.set);
-				return true;
-			},
-		});
+		stub(db, rowUpdate(true, failed));
 		stub(Sentry, { captureException: () => "" });
 
 		test("a 404 is sandbox_gone and a 410 is snapshot_expired", async () => {
@@ -263,11 +276,13 @@ describe("markSandboxUnavailable", () => {
 					sandboxUrl: null,
 					failureReason: "sandbox_gone",
 					failedAt: expect.any(Date),
+					status: "failed",
 				},
 				{
 					sandboxUrl: null,
 					failureReason: "snapshot_expired",
 					failedAt: expect.any(Date),
+					status: "failed",
 				},
 			]);
 		});
@@ -275,7 +290,7 @@ describe("markSandboxUnavailable", () => {
 
 	describe("when the row was already moved", () => {
 		const captured: unknown[] = [];
-		stub(transition, { transitionCloudWorkspace: async () => false });
+		stub(db, rowUpdate(false));
 		stub(Sentry, {
 			captureException: (...args: unknown[]) => captured.push(args),
 		});

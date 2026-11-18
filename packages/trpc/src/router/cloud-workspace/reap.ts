@@ -13,7 +13,7 @@ import {
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
-import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBootEnd, recordBoxStopped } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -89,7 +89,10 @@ export async function reapArchivedCloudWorkspace(
 		return "skipped";
 	}
 	if (input.stage === "delete") {
-		await recordBootEnd(row.id, { sessionId: null, reason: "archived" });
+		await recordBootEnd(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+			{ sessionId: null, reason: "archived" },
+		);
 		await settleWorkspaceNow(row.id).catch((error) =>
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
@@ -103,9 +106,13 @@ export async function reapArchivedCloudWorkspace(
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
-	const sessionId = stopped.sessionId ?? row.sandboxSessionId;
-	await recordSandboxAsleep(row.id, { sessionId });
-	await recordBootEnd(row.id, { sessionId, reason: "archived" });
+	await recordBoxStopped(
+		{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		{
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+			reason: "archived",
+		},
+	);
 	await queueSettleWorkspace(row.id);
 	logControl("archive.stopped", {
 		cloudWorkspaceId: row.id,
@@ -148,7 +155,11 @@ function queueReapStage(
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
-	box: { providerSandboxId: string; sandboxSessionId: string | null },
+	box: {
+		organizationId: string;
+		providerSandboxId: string;
+		sandboxSessionId: string | null;
+	},
 ): Promise<void> {
 	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
@@ -160,11 +171,15 @@ export async function queueReap(
 			error,
 		);
 		const stopped = await stopSandbox(box.providerSandboxId);
-		const sessionId = stopped.sessionId ?? box.sandboxSessionId;
-		await recordSandboxAsleep(input.cloudWorkspaceId, { sessionId });
-		await recordBootEnd(input.cloudWorkspaceId, {
-			sessionId,
-			reason: "archived",
-		});
+		await recordBoxStopped(
+			{
+				cloudWorkspaceId: input.cloudWorkspaceId,
+				organizationId: box.organizationId,
+			},
+			{
+				sessionId: stopped.sessionId ?? box.sandboxSessionId,
+				reason: "archived",
+			},
+		);
 	});
 }
