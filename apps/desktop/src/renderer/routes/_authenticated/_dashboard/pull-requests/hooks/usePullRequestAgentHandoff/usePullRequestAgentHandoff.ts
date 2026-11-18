@@ -1,8 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { resolveAgentLaunchPresetId } from "@superset/shared/agent-models";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
+import { useResolveOpenAsChat } from "renderer/hooks/useResolveOpenAsChat";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 
@@ -47,6 +49,7 @@ export function usePullRequestAgentHandoff(
 	};
 	useQuery({ ...linkedWorkspaceQuery, enabled: target !== null });
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
+	const resolveOpenAsChat = useResolveOpenAsChat();
 
 	const mutation = useMutation({
 		mutationFn: async (prompt: string) => {
@@ -69,13 +72,22 @@ export function usePullRequestAgentHandoff(
 				});
 				return { opened: "existing" as const };
 			}
+			const openAsChat = await resolveOpenAsChat(
+				resolveAgentLaunchPresetId(agent.presetId, agent.command),
+			);
 			const { completed } = submitWorkspaceCreate({
 				hostId: target.hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId: target.projectId,
 					pr: target.prNumber,
-					agents: [{ agent: agent.id, prompt }],
+					agents: [
+						{
+							agent: agent.id,
+							prompt,
+							...(openAsChat ? { surface: "chat" as const } : {}),
+						},
+					],
 				},
 			});
 			const outcome = await completed;

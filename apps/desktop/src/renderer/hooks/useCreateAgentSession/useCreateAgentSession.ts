@@ -1,23 +1,16 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import {
+	agentLaunchPreset,
+	useResolveOpenAsChat,
+} from "renderer/hooks/useResolveOpenAsChat";
 import { AGENT_STORAGE_KEY } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/PromptGroup/types";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
-
-/** The preset an agent choice runs; agent ids are per-user config ids. */
-function presetOf(agent: {
-	launchPresetId?: string | null;
-	presetId?: string | null;
-	iconId?: string | null;
-}): string | null {
-	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? null;
-}
 
 export function useCreateAgentSession() {
 	const { t } = useLingui();
@@ -25,7 +18,7 @@ export function useCreateAgentSession() {
 	const { machineId, activeHostUrl } = useLocalHostService();
 	const { agents } = useAgentChoices(activeHostUrl);
 	const { submit } = useWorkspaceCreates();
-	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
+	const resolveOpenAsChat = useResolveOpenAsChat();
 	const busy = useRef(false);
 	const [isPending, setIsPending] = useState(false);
 
@@ -49,7 +42,8 @@ export function useCreateAgentSession() {
 		const choice =
 			terminalAgents.find(
 				(option) =>
-					options.preset !== undefined && presetOf(option) === options.preset,
+					options.preset !== undefined &&
+					agentLaunchPreset(option) === options.preset,
 			) ??
 			terminalAgents.find((option) => option.id === stored) ??
 			terminalAgents[0];
@@ -65,8 +59,7 @@ export function useCreateAgentSession() {
 		try {
 			const openAsChat =
 				options.preferChat === true &&
-				Boolean(acpHarnessForPreset(presetOf(choice))) &&
-				(await resolveAcpChatEnabled());
+				(await resolveOpenAsChat(agentLaunchPreset(choice)));
 			const { workspaceId, completed } = submit({
 				hostId: machineId,
 				snapshot: {
