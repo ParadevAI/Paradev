@@ -84,7 +84,7 @@ export function CloudUsagePage({
 							total={byDay.data.total}
 							period={period}
 							billing={
-								<MoreLink Link={Link} to={{ page: "billing" }}>
+								<MoreLink Link={Link} to={{ view: "billing" }}>
 									<Trans>Billing</Trans>
 								</MoreLink>
 							}
@@ -129,7 +129,7 @@ export function CloudUsagePage({
 								action={
 									<MoreLink
 										Link={Link}
-										to={{ page: "workspaces", period: param }}
+										to={{ view: "workspaces", period: param }}
 									>
 										<Trans>View all</Trans>
 									</MoreLink>

@@ -31,7 +31,7 @@ export function PeriodStepper({ Link, periods, period }: PeriodStepperProps) {
 			<Button variant="outline" size="icon-sm" asChild>
 				<Link
 					to={{
-						page: "overview",
+						view: "overview",
 						period: index + offset === 0 ? undefined : target.id,
 					}}
 					aria-label={name}

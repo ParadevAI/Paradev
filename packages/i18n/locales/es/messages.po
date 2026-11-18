@@ -3596,6 +3596,9 @@ msgstr "? commits por detrás de main, necesita rebase"
 msgid "Being built right now."
 msgstr "Se está construyendo ahora mismo."
 
+msgid "Beyond the included total"
+msgstr "Por encima del total incluido"
+
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Más allá: F5 no es una afirmación a corto plazo"
 
@@ -20170,8 +20173,8 @@ msgstr "El entorno desde el que esta automatización inicia espacios de trabajo 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "La extensión y sus datos locales se eliminan de este navegador."
 
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
-msgstr "El límite de uso adicional es un porcentaje del plan, así que su importe no se muestra y esta página no puede saber cuándo se alcanza."
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "El límite de uso adicional es un porcentaje del plan, así que su importe no se muestra."
 
 msgid "The factory"
 msgstr "La fábrica"

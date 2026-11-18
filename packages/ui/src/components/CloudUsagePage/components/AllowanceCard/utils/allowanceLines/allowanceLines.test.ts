@@ -16,10 +16,19 @@ const base = {
 	extraUsageLimit: null,
 	limitReached: false,
 };
+const used = (gbHours: number, usd: number | null = gbHours * 0.06) => ({
+	gbHours,
+	usd,
+});
 
 describe("allowanceLines", () => {
 	it("measures against the included total plus the cap, with lines in the design's order", () => {
-		const { lines, cap, hasCap } = allowanceLines(
+		const {
+			lines,
+			cap,
+			hasCap,
+			used: total,
+		} = allowanceLines(
 			{
 				...base,
 				overageGbHours: 1000,
@@ -33,6 +42,7 @@ describe("allowanceLines", () => {
 				extraUsageLimit: { gbHours: 4000, usd: 240 },
 			},
 			4000,
+			used(5500),
 		);
 		expect(lines.map((line) => line.kind)).toEqual([
 			"included",
@@ -41,29 +51,43 @@ describe("allowanceLines", () => {
 		]);
 		expect(hasCap).toBe(true);
 		expect(cap).toEqual({ gbHours: 8500, usd: 510 });
+		expect(total).toEqual({ gbHours: 5500, usd: 330 });
 	});
 
-	it("has no extra line with overage off, and an open extra line with no cap", () => {
-		const off = allowanceLines(
-			{ ...base, extraUsageLimit: { gbHours: 0, usd: 0 } },
+	it("shows usage past every line as its own line, so the headline and the lines agree", () => {
+		const {
+			lines,
+			used: total,
+			scale,
+		} = allowanceLines(
+			{ ...base, extraUsageLimit: { gbHours: 0, usd: 0 }, limitReached: true },
 			4000,
+			used(4500),
 		);
-		expect(off.lines.map((line) => line.kind)).toEqual(["included"]);
-		expect(off.cap).toEqual({ gbHours: 4000, usd: 240 });
+		expect(lines.at(-1)).toMatchObject({
+			kind: "beyond",
+			used: { gbHours: 500 },
+		});
+		expect(total.gbHours).toBe(4500);
+		expect(scale.gbHours).toBe(4500);
+	});
 
-		const open = allowanceLines(
-			{ ...base, overageGbHours: 100, overageUsd: 6 },
+	it("leaves the bar open when no cap is known and the limit is not reached", () => {
+		const { lines, hasCap, scale } = allowanceLines(
+			{ ...base, overageGbHours: 800, overageUsd: 48, limitReached: null },
 			4000,
+			used(4800),
 		);
-		expect(open.lines.at(-1)).toMatchObject({ kind: "extra", total: null });
-		expect(open.hasCap).toBe(false);
-		expect(open.scale).toEqual({ gbHours: 4100, usd: 246 });
+		expect(lines.at(-1)).toMatchObject({ kind: "extra", total: null });
+		expect(hasCap).toBe(false);
+		expect(scale.gbHours).toBe(6000);
 	});
 
 	it("keeps GB-hours and drops dollars when there is no rate", () => {
 		const { cap } = allowanceLines(
 			{ ...base, usedUsd: null, includedUsd: null, overageUsd: null },
 			4000,
+			used(4000, null),
 		);
 		expect(cap).toEqual({ gbHours: 4000, usd: null });
 	});

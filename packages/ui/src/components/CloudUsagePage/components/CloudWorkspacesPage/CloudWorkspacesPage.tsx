@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { useState } from "react";
+import { useEffect } from "react";
 import { usePeriodLabel } from "../../hooks/usePeriodLabel";
 import type {
 	CloudPages,
@@ -14,12 +14,15 @@ import type {
 	WorkspacesTarget,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
+import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
 import { PageHeader } from "../PageHeader";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspacesTable } from "../WorkspacesTable";
 import { FilterChips } from "./components/FilterChips";
 import { Pager } from "./components/Pager";
 import { WorkspacesToolbar } from "./components/WorkspacesToolbar";
+
+const DEFAULT_ROWS = ROWS_PER_PAGE[0];
 
 interface CloudWorkspacesPageProps {
 	Link: CloudUsageLink;
@@ -45,19 +48,22 @@ export function CloudWorkspacesPage({
 }: CloudWorkspacesPageProps) {
 	const periodLabel = usePeriodLabel();
 	const param = periodParam(periods.data?.items, period);
+	/** Any change but the page itself goes back to the first page. */
 	const to = (next: WorkspacesFilters): WorkspacesTarget => ({
-		page: "workspaces",
+		view: "workspaces",
 		period: param,
 		...next,
+		page: undefined,
 	});
 	const pages = workspaces.data?.pages ?? [];
-	const pagingKey = JSON.stringify([param, filters]);
-	const [paging, setPaging] = useState({ key: pagingKey, index: 0 });
-	const index = paging.key === pagingKey ? paging.index : 0;
-	const onPage = async (next: number) => {
-		if (next >= pages.length) await workspaces.fetchNextPage();
-		setPaging({ key: pagingKey, index: next });
-	};
+	const { hasNextPage, isFetchingNextPage, fetchNextPage } = workspaces;
+	const wanted = (filters.page ?? 1) - 1;
+	// Pages are cursor pages: a page from the URL is reached by loading the pages before it.
+	const walking = wanted >= pages.length && hasNextPage;
+	useEffect(() => {
+		if (walking && !isFetchingNextPage) fetchNextPage();
+	}, [walking, isFetchingNextPage, fetchNextPage]);
+	const index = Math.max(0, Math.min(wanted, pages.length - 1));
 	const people = isAdmin
 		? (byPerson.data?.items.flatMap((item) =>
 				item.ref && !("status" in item.ref) ? [item.ref] : [],
@@ -72,9 +78,10 @@ export function CloudWorkspacesPage({
 				crumbs={[
 					{
 						label: <Trans>Cloud usage</Trans>,
-						to: { page: "overview", period: param },
+						to: { view: "overview", period: param },
 					},
 				]}
+				current={<Trans>Workspaces</Trans>}
 				title={
 					isAdmin ? <Trans>Workspaces</Trans> : <Trans>Your workspaces</Trans>
 				}
@@ -95,7 +102,7 @@ export function CloudWorkspacesPage({
 				personName={personName}
 				to={to}
 			/>
-			{!periods.data || !workspaces.data ? (
+			{!periods.data || !workspaces.data || walking ? (
 				<QueryStatus
 					isError={periods.isError || workspaces.isError}
 					onRetry={() =>
@@ -120,12 +127,22 @@ export function CloudWorkspacesPage({
 						pageSizes={pages.map((page) => page.items.length)}
 						index={index}
 						rowCount={pages[0]?.rowCount ?? 0}
-						hasNextPage={workspaces.hasNextPage}
-						isFetchingNextPage={workspaces.isFetchingNextPage}
-						onPage={onPage}
-						rows={filters.rows ?? 25}
+						hasNextPage={hasNextPage}
+						isFetchingNextPage={isFetchingNextPage}
+						onPage={(next) =>
+							navigate({
+								...to(filters),
+								page: next === 0 ? undefined : next + 1,
+							})
+						}
+						rows={filters.rows ?? DEFAULT_ROWS}
 						onRows={(rows) =>
-							navigate(to({ ...filters, rows: rows === 25 ? undefined : rows }))
+							navigate(
+								to({
+									...filters,
+									rows: rows === DEFAULT_ROWS ? undefined : rows,
+								}),
+							)
 						}
 					/>
 				</>

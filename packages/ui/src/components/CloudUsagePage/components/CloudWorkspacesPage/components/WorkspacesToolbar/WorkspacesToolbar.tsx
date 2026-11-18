@@ -4,7 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import { useEffect, useState } from "react";
-import { LuSearch } from "react-icons/lu";
+import { LuSearch, LuX } from "react-icons/lu";
 import { Input } from "../../../../../ui/input";
 import { STATUS_PILLS } from "../../../../constants";
 import type { PersonRef, WorkspacesFilters } from "../../../../types";
@@ -41,16 +41,25 @@ export function WorkspacesToolbar({
 
 	return (
 		<div className="flex flex-wrap items-center gap-2">
-			<div className="relative min-w-48 flex-1">
+			<div className="relative w-full @xl:w-auto @xl:min-w-48 @xl:flex-1">
 				<LuSearch className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
 				<Input
-					type="search"
 					value={text}
 					onChange={(event) => setText(event.target.value)}
 					placeholder={t({ message: "Search" })}
 					aria-label={t({ message: "Search workspaces" })}
-					className="h-8 pl-8"
+					className="h-8 px-8"
 				/>
+				{text && (
+					<button
+						type="button"
+						onClick={() => setText("")}
+						aria-label={t({ message: "Clear search" })}
+						className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+					>
+						<LuX className="size-4" />
+					</button>
+				)}
 			</div>
 			{people && (
 				<>

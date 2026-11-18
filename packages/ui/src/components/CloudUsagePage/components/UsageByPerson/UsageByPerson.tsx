@@ -45,7 +45,7 @@ export function UsageByPerson({ Link, byPerson, period }: UsageByPersonProps) {
 							<li key={item.key ?? ""} className="space-y-1.5 text-sm">
 								{item.key ? (
 									<Link
-										to={{ page: "workspaces", period, user: item.key }}
+										to={{ view: "workspaces", period, user: item.key }}
 										className="block rounded-sm hover:underline"
 									>
 										{top}

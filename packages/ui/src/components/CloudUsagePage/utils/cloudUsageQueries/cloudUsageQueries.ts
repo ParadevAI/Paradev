@@ -1,5 +1,6 @@
 import type { WorkspacesFilters } from "../../types";
 import type { usageRange } from "../usageRange";
+import { ROWS_PER_PAGE } from "../workspacesFilters";
 
 const PAGE_SIZE = 25;
 const CHART_LIMIT = 100;
@@ -39,7 +40,7 @@ export function cloudUsageQueries({
 			input: {
 				range,
 				groupBy: "workspace",
-				limit: rows ?? PAGE_SIZE,
+				limit: rows ?? ROWS_PER_PAGE[0],
 				user: isAdmin ? user : undefined,
 				size,
 				status: status && [status],

@@ -6,7 +6,8 @@ import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { CloudMetrics, CloudPeriod } from "../../types";
 import { AllowanceLines } from "./components/AllowanceLines";
 import { type Amount, allowanceLines } from "./utils/allowanceLines";
-import { type AllowanceNote, allowanceNotes } from "./utils/allowanceNotes";
+
+type Reason = CloudPeriod["unavailable"][number]["reason"];
 
 interface AllowanceCardProps {
 	total: CloudMetrics;
@@ -15,7 +16,8 @@ interface AllowanceCardProps {
 	billing: ReactNode;
 }
 
-const NOTES: Record<AllowanceNote, ReactNode> = {
+/** What the card says, once per reason, about a value the router could not give. A member never sees the card. */
+const NOTES: Record<Exclude<Reason, "owners_and_admins_only">, ReactNode> = {
 	closed_period: (
 		<Trans>The breakdown by plan is kept for the current period only.</Trans>
 	),
@@ -28,7 +30,7 @@ const NOTES: Record<AllowanceNote, ReactNode> = {
 	percent_of_allowance: (
 		<Trans>
 			The extra-usage limit is a percentage of the plan, so its amount is not
-			shown, and this page cannot tell when it is reached.
+			shown.
 		</Trans>
 	),
 	not_tracked: (
@@ -40,13 +42,21 @@ export function AllowanceCard({ total, period, billing }: AllowanceCardProps) {
 	const { usage, dollars, gbHours } = useUsageFormat();
 	const format = (amount: Amount) =>
 		amount.usd === null ? gbHours(amount.gbHours) : dollars(amount.usd);
-	const used = usage(total);
 	const allowance = period?.allowance ?? null;
 	const included = allowance?.includedGbHours ?? null;
 	const summary =
-		allowance && included !== null ? allowanceLines(allowance, included) : null;
+		allowance && included !== null
+			? allowanceLines(allowance, included, {
+					gbHours: total.gbHours,
+					usd: total.usageUsd,
+				})
+			: null;
+	const used = summary ? format(summary.used) : usage(total);
 	const cap = summary && format(summary.cap);
-	const notes = allowanceNotes(period?.unavailable ?? []);
+	const reasons = new Set(period?.unavailable.map((item) => item.reason));
+	const notes = (Object.keys(NOTES) as (keyof typeof NOTES)[]).filter(
+		(reason) => reasons.has(reason),
+	);
 
 	return (
 		<section className="space-y-3 rounded-lg bg-muted/60 p-4">
@@ -77,9 +87,9 @@ export function AllowanceCard({ total, period, billing }: AllowanceCardProps) {
 					format={format}
 				/>
 			)}
-			{notes.map((note) => (
-				<p key={note} className="text-xs text-muted-foreground">
-					{NOTES[note]}
+			{notes.map((reason) => (
+				<p key={reason} className="text-xs text-muted-foreground">
+					{NOTES[reason]}
 				</p>
 			))}
 		</section>

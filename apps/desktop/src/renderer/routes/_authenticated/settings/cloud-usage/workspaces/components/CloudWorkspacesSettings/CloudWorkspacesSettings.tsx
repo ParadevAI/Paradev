@@ -42,7 +42,7 @@ export function CloudWorkspacesSettings({
 	return (
 		<CloudWorkspacesPage
 			Link={CloudUsageLink}
-			navigate={({ page: _, ...search }) =>
+			navigate={({ view: _, ...search }) =>
 				navigate({
 					to: "/settings/cloud-usage/workspaces",
 					search,

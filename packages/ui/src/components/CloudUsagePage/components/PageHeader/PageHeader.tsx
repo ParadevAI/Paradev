@@ -13,6 +13,8 @@ interface PageHeaderProps {
 	/** The pages above this one; the title is the last crumb. */
 	crumbs?: { label: ReactNode; to: CloudUsageTarget }[];
 	title: ReactNode;
+	/** The last crumb, when it is not the title. */
+	current?: ReactNode;
 	/** Beside the title, such as a status pill. */
 	badge?: ReactNode;
 	actions?: ReactNode;
@@ -22,6 +24,7 @@ export function PageHeader({
 	Link,
 	crumbs,
 	title,
+	current = title,
 	badge,
 	actions,
 }: PageHeaderProps) {
@@ -31,7 +34,7 @@ export function PageHeader({
 				<Breadcrumb>
 					<BreadcrumbList>
 						{crumbs.map((crumb) => (
-							<Fragment key={crumb.to.page}>
+							<Fragment key={crumb.to.view}>
 								<BreadcrumbItem>
 									<Link
 										to={crumb.to}
@@ -44,7 +47,7 @@ export function PageHeader({
 							</Fragment>
 						))}
 						<BreadcrumbItem className="min-w-0">
-							<BreadcrumbPage className="truncate">{title}</BreadcrumbPage>
+							<BreadcrumbPage className="truncate">{current}</BreadcrumbPage>
 						</BreadcrumbItem>
 					</BreadcrumbList>
 				</Breadcrumb>

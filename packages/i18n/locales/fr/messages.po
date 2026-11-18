@@ -3596,6 +3596,9 @@ msgstr "En retard de ? commits sur main, rebase nécessaire"
 msgid "Being built right now."
 msgstr "En cours de construction en ce moment."
 
+msgid "Beyond the included total"
+msgstr "Au-delà du total inclus"
+
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Au-delà : F5 n'est pas une promesse à court terme"
 
@@ -20170,8 +20173,8 @@ msgstr "L'environnement à partir duquel cette automatisation démarre des espac
 msgid "The extension and its local data are deleted from this browser."
 msgstr "L’extension et ses données locales sont supprimées de ce navigateur."
 
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
-msgstr "La limite d'utilisation supplémentaire est un pourcentage de l'offre : son montant n'est donc pas affiché, et cette page ne peut pas savoir quand elle est atteinte."
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "La limite d'utilisation supplémentaire est un pourcentage de l'offre, son montant n'est donc pas affiché."
 
 msgid "The factory"
 msgstr "L'usine"

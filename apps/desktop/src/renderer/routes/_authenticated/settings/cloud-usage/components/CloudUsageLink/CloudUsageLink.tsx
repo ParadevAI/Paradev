@@ -2,7 +2,7 @@ import type { CloudUsageLink as LinkType } from "@superset/ui/cloud-usage-page";
 import { Link } from "@tanstack/react-router";
 
 export const CloudUsageLink: LinkType = ({ to, ...props }) => {
-	switch (to.page) {
+	switch (to.view) {
 		case "overview":
 			return (
 				<Link
@@ -12,7 +12,7 @@ export const CloudUsageLink: LinkType = ({ to, ...props }) => {
 				/>
 			);
 		case "workspaces": {
-			const { page: _, ...search } = to;
+			const { view: _, ...search } = to;
 			return (
 				<Link
 					to="/settings/cloud-usage/workspaces"

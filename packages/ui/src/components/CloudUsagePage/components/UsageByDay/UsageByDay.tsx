@@ -15,6 +15,8 @@ import type { CloudUsage } from "../../types";
 import { Section } from "../Section";
 import { utcDays } from "./utils/utcDays";
 
+const TICK_STEP_DAYS = 5;
+
 interface UsageByDayProps {
 	usage: CloudUsage;
 	title: ReactNode;
@@ -30,6 +32,9 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 		const item = byDay.get(day);
 		return { day, value: (inDollars ? item?.usageUsd : item?.gbHours) ?? 0 };
 	});
+	const ticks = data
+		.filter((_, i) => i % TICK_STEP_DAYS === 0)
+		.map((item) => item.day);
 	const config = {
 		value: {
 			label: inDollars ? t({ message: "Usage" }) : t({ message: "GB-hours" }),
@@ -43,9 +48,7 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 			timeZone: "UTC",
 		});
 	const formatValue = (value: number) =>
-		inDollars
-			? format.dollars(value)
-			: formatNumber(value, { maximumFractionDigits: 1 });
+		inDollars ? format.dollars(value) : format.formatGbHours(value);
 
 	return (
 		<Section title={title}>
@@ -56,7 +59,8 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 						dataKey="day"
 						tickLine={false}
 						axisLine={false}
-						minTickGap={24}
+						ticks={ticks}
+						interval={0}
 						tickFormatter={formatDay}
 					/>
 					<YAxis

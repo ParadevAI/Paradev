@@ -21,13 +21,22 @@ const SORTS = [
 	"name",
 	"status",
 ] as const satisfies readonly WorkspacesSort[];
+/** The first is the default, as in the design. */
 export const ROWS_PER_PAGE = [
-	25, 50,
+	15, 50,
 ] as const satisfies readonly WorkspacesRows[];
+const MAX_PAGE = 1000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const oneOf = <T extends string>(values: readonly T[], value: unknown) =>
 	values.find((item) => item === value);
+
+const pageOf = (value: unknown) => {
+	const page = Number(value);
+	return Number.isInteger(page) && page > 1 && page <= MAX_PAGE
+		? page
+		: undefined;
+};
 
 /** The filters in a URL's search params; a value the router would refuse is dropped. */
 export function workspacesFilters(
@@ -42,5 +51,6 @@ export function workspacesFilters(
 		q: typeof q === "string" && q.trim() ? q.trim().slice(0, 200) : undefined,
 		sort: oneOf(SORTS, read("sort")),
 		rows: ROWS_PER_PAGE.find((rows) => String(rows) === String(read("rows"))),
+		page: pageOf(read("page")),
 	};
 }

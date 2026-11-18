@@ -3596,6 +3596,9 @@ msgstr "main dalının ? commit gerisinde, rebase gerekiyor"
 msgid "Being built right now."
 msgstr "Şu anda geliştiriliyor."
 
+msgid "Beyond the included total"
+msgstr "Dahil olan toplamın üzerinde"
+
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Ötesi: F5 yakın vadeli bir iddia değil"
 
@@ -20170,8 +20173,8 @@ msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşiv
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
 
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
-msgstr "Ek kullanım sınırı planın bir yüzdesi olduğundan tutarı gösterilmez ve bu sayfa sınıra ne zaman ulaşıldığını bilemez."
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "Ek kullanım sınırı planın bir yüzdesi olduğundan tutarı gösterilmez."
 
 msgid "The factory"
 msgstr "Fabrika"

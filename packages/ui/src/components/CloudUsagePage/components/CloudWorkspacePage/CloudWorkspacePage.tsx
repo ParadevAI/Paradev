@@ -54,11 +54,11 @@ export function CloudWorkspacePage({
 	const crumbs = [
 		{
 			label: <Trans>Cloud usage</Trans>,
-			to: { page: "overview", period: param } as const,
+			to: { view: "overview", period: param } as const,
 		},
 		{
 			label: <Trans>Workspaces</Trans>,
-			to: { page: "workspaces", period: param } as const,
+			to: { view: "workspaces", period: param } as const,
 		},
 	];
 

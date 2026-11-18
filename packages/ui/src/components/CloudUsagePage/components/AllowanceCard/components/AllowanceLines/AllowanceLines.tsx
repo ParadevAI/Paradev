@@ -17,6 +17,7 @@ const SWATCH: Record<AllowanceLine["kind"], string> = {
 	freeCredits: "bg-foreground/35",
 	bought: "bg-chart-2",
 	extra: "bg-chart-1",
+	beyond: "bg-warning",
 };
 
 export function AllowanceLines({
@@ -48,6 +49,8 @@ export function AllowanceLines({
 				return <Trans>Bought credits</Trans>;
 			case "extra":
 				return <Trans>Extra usage</Trans>;
+			case "beyond":
+				return <Trans>Beyond the included total</Trans>;
 		}
 	};
 	const value = (line: AllowanceLine) => {

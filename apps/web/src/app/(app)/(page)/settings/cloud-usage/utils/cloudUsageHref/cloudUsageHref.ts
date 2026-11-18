@@ -3,14 +3,14 @@ import type { CloudUsageTarget } from "@superset/ui/cloud-usage-page";
 const BASE = "/settings/cloud-usage";
 
 export function cloudUsageHref(to: CloudUsageTarget): string {
-	if (to.page === "billing") return "/settings/billing";
+	if (to.view === "billing") return "/settings/billing";
 	const path =
-		to.page === "overview"
+		to.view === "overview"
 			? BASE
-			: to.page === "workspaces"
+			: to.view === "workspaces"
 				? `${BASE}/workspaces`
 				: `${BASE}/workspaces/${to.workspaceId}`;
-	const { page: _, ...params } = to;
+	const { view: _, ...params } = to;
 	const search = new URLSearchParams(
 		Object.entries(params).flatMap(([key, value]) =>
 			key !== "workspaceId" && value !== undefined

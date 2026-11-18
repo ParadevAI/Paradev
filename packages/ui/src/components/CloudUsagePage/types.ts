@@ -31,7 +31,7 @@ export interface CloudPages<TPage> extends CloudQuery<{ pages: TPage[] }> {
 }
 
 export type WorkspacesSort = "gbHours" | "hours" | "name" | "status";
-export type WorkspacesRows = 25 | 50;
+export type WorkspacesRows = 15 | 50;
 
 /** The Workspaces page's filters and sort, kept in the URL. Absent means any, and GB-hours for the sort. */
 export interface WorkspacesFilters {
@@ -41,18 +41,20 @@ export interface WorkspacesFilters {
 	q?: string;
 	sort?: WorkspacesSort;
 	rows?: WorkspacesRows;
+	/** 1-based; absent for the first page. */
+	page?: number;
 }
 
 /** A place in the cloud usage pages; each app maps it to its own router. `period` is a period id, absent for the newest. */
 export type CloudUsageTarget =
-	| { page: "overview"; period?: string }
-	| ({ page: "workspaces"; period?: string } & WorkspacesFilters)
-	| { page: "workspace"; workspaceId: string; period?: string }
-	| { page: "billing" };
+	| { view: "overview"; period?: string }
+	| ({ view: "workspaces"; period?: string } & WorkspacesFilters)
+	| { view: "workspace"; workspaceId: string; period?: string }
+	| { view: "billing" };
 
 export type WorkspacesTarget = Extract<
 	CloudUsageTarget,
-	{ page: "workspaces" }
+	{ view: "workspaces" }
 >;
 
 export type CloudUsageLink = ComponentType<{

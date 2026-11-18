@@ -36,10 +36,10 @@ interface WorkspacesTableProps {
 
 const HEAD =
 	"h-9 text-xs font-medium tracking-wide text-muted-foreground uppercase";
-/** Folding, by the page's width: owner, hours and size go first, then GB-hours. */
+/** Folding, by the page's content width: owner and hours go first, then size, then GB-hours. */
 const WIDE = "hidden @2xl:table-cell";
 const MEDIUM = "hidden @xl:table-cell";
-const NARROW = "hidden @lg:table-cell";
+const NARROW = "hidden @md:table-cell";
 
 export function WorkspacesTable({
 	Link,
@@ -114,7 +114,7 @@ export function WorkspacesTable({
 								{workspace ? (
 									<Link
 										to={{
-											page: "workspace",
+											view: "workspace",
 											workspaceId: workspace.id,
 											period,
 										}}
@@ -129,12 +129,12 @@ export function WorkspacesTable({
 								)}
 								<div className="flex flex-wrap gap-x-1.5 text-xs text-muted-foreground @2xl:hidden">
 									{isAdmin && owner && <span>{owner}</span>}
-									{isAdmin && owner && size && (
-										<span aria-hidden className="@xl:hidden">
-											·
+									{size && (
+										<span className="whitespace-nowrap @xl:hidden">
+											{isAdmin && owner && <span aria-hidden>· </span>}
+											{size}
 										</span>
 									)}
-									{size && <span className="@xl:hidden">{size}</span>}
 								</div>
 							</TableCell>
 							{isAdmin && (

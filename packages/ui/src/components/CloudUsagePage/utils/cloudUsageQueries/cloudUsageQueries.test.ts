@@ -1,10 +1,12 @@
 import { describe, expect, it } from "bun:test";
 import { cloudUsageQueries } from "./cloudUsageQueries";
 
+const range = { period: "2026-10-27" };
+
 describe("cloudUsageQueries", () => {
 	it("waits for periods, asks by person only for admins, and a workspace's data only for a workspace", () => {
 		const member = cloudUsageQueries({
-			range: "30d",
+			range,
 			periodsLoaded: true,
 			isAdmin: false,
 		});
@@ -14,7 +16,7 @@ describe("cloudUsageQueries", () => {
 		expect(member.boots.enabled).toBe(false);
 
 		const loading = cloudUsageQueries({
-			range: "30d",
+			range,
 			periodsLoaded: false,
 			isAdmin: true,
 			workspaceId: "w1",
@@ -24,13 +26,13 @@ describe("cloudUsageQueries", () => {
 		expect(loading.boots.enabled).toBe(false);
 
 		const loaded = cloudUsageQueries({
-			range: "30d",
+			range,
 			periodsLoaded: true,
 			isAdmin: true,
 			workspaceId: "w1",
 		});
 		expect(loaded.boots).toEqual({
-			input: { workspace: "w1", range: "30d", limit: 25 },
+			input: { workspace: "w1", range, limit: 25 },
 			enabled: true,
 		});
 	});
@@ -44,7 +46,7 @@ describe("cloudUsageQueries", () => {
 			sort: "name",
 		} as const;
 		const admin = cloudUsageQueries({
-			range: "30d",
+			range,
 			periodsLoaded: true,
 			isAdmin: true,
 			filters,
@@ -58,7 +60,7 @@ describe("cloudUsageQueries", () => {
 			order: "asc",
 		});
 		const member = cloudUsageQueries({
-			range: "30d",
+			range,
 			periodsLoaded: true,
 			isAdmin: false,
 			filters,

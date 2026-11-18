@@ -28,7 +28,7 @@ interface BootsTableProps {
 const HEAD =
 	"h-9 text-xs font-medium tracking-wide text-muted-foreground uppercase";
 const MEDIUM = "hidden @xl:table-cell";
-const NARROW = "hidden @lg:table-cell";
+const NARROW = "hidden @md:table-cell";
 
 export function BootsTable({ pages, inDollars }: BootsTableProps) {
 	const { i18n } = useLingui();

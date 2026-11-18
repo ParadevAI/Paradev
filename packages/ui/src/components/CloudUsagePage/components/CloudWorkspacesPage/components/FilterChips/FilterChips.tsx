@@ -84,7 +84,7 @@ export function FilterChips({
 			))}
 			<Link
 				to={to({ sort: filters.sort, rows: filters.rows })}
-				className="px-1 text-muted-foreground hover:text-foreground"
+				className="rounded-md border px-2 py-1 text-muted-foreground hover:text-foreground"
 			>
 				<Trans>Clear all</Trans>
 			</Link>
