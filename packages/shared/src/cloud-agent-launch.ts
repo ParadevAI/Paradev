@@ -77,6 +77,11 @@ export type CloudAgentLaunchDescriptor = {
 	terminalId: string | null;
 };
 
+/** A launch a box has not started yet, with the prompt its waiting pane shows. */
+export type PendingCloudAgentLaunch = CloudAgentLaunchDescriptor & {
+	prompt: string;
+};
+
 export async function hashCloudAgentPrompt(prompt: string): Promise<string> {
 	const digest = await crypto.subtle.digest(
 		"SHA-256",

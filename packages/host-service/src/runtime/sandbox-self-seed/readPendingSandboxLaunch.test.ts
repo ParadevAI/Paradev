@@ -35,6 +35,7 @@ test("describes the launch until the box claims it", async () => {
 		agent: "claude",
 		surface: "terminal",
 		terminalId: TERMINAL_ID,
+		prompt: "fix the login bug",
 	});
 	writeFileSync(join(dir, "agent-launched"), "claude now\n");
 	expect(await readPendingSandboxLaunch(WORKSPACE_ID, env)).toBeNull();

@@ -6,8 +6,8 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
-	type CloudAgentLaunchDescriptor,
 	describeCloudAgentLaunch,
+	type PendingCloudAgentLaunch,
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -509,13 +509,14 @@ function approveClaudeApiKey(): void {
 export async function readPendingSandboxLaunch(
 	workspaceId: string,
 	env: NodeJS.ProcessEnv = process.env,
-): Promise<CloudAgentLaunchDescriptor | null> {
+): Promise<PendingCloudAgentLaunch | null> {
 	if (env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
 	const identity = readSandboxIdentity(env);
 	if (identity?.workspaceId !== workspaceId) return null;
 	if (!identity.launch?.terminalId) return null;
 	if (existsSync(identity.launchMarkerPath)) return null;
-	return describeCloudAgentLaunch(identity.launch);
+	const descriptor = await describeCloudAgentLaunch(identity.launch);
+	return descriptor && { ...descriptor, prompt: identity.launch.prompt };
 }
 
 /**
