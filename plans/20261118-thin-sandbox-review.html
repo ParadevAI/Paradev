@@ -30,14 +30,14 @@
 <main>
 
 <h1>Thin sandbox: PRs for review</h1>
-<p class="lede">Written 18 November 2026. Four pieces of work, each with what it does, pseudocode, what a customer sees, the evidence, and the decisions that are yours. Nothing here is merged.</p>
+<p class="lede">Written 18 November 2026. Four pieces of work, each with what it does, pseudocode, what a customer sees, the evidence, and the decisions that are yours. Swap removal has shipped; the other three are not merged.</p>
 
 <h2 id="summary">Summary</h2>
 <div class="wide">
 <table>
 <thead><tr><th>Work</th><th>PRs</th><th>State</th><th>What it buys</th><th>Your decisions</th></tr></thead>
 <tbody>
-<tr><td><a href="#swap">Remove swap</a></td><td>#9924</td><td><span class="state ready">Ready for review</span></td><td>No swap in snapshots (up to 6 to 16 GB per workspace that hit memory pressure). No long stalls under a fast allocator.</td><td>1</td></tr>
+<tr><td><a href="#swap">Remove swap</a></td><td>#9924</td><td><span class="state ready">Shipped 18 November</span></td><td>No swap in snapshots (up to 6 to 16 GB per workspace that hit memory pressure). No long stalls under a fast allocator.</td><td>Decided: ship</td></tr>
 <tr><td><a href="#agents">Agents only from the drive</a></td><td>#9929, then #9911</td><td><span class="state ready">A: ready for review</span> <span class="state hold">B: after A is released</span></td><td>0.79 GB off the image. A PostHog outage can no longer affect agents.</td><td>3</td></tr>
 <tr><td><a href="#builds">Environment builds on Vercel Workflow</a></td><td>#9906, on #9282</td><td><span class="state hold">Waiting on your decisions</span></td><td>Builds can run 30 minutes, not about 3. The build log updates while it runs.</td><td>3</td></tr>
 <tr><td><a href="#drive">Workspace drive</a></td><td>#9915, #9847, model #9914</td><td><span class="state hold">Not ready: model verdict outstanding</span></td><td>Root snapshot 2.76 GB against 7.86 to 8.02 GB for the same work.</td><td>2, later</td></tr>
@@ -47,7 +47,7 @@
 
 <h3>All decisions in one place</h3>
 <ol>
-<li><a href="#swap">Swap</a>: ship no swap with the faster memguard?</li>
+<li><a href="#swap">Swap</a>: ship no swap with the faster memguard? <strong>Decided: yes, shipped.</strong></li>
 <li><a href="#agents">Agents</a>: when the agents drive cannot be mounted, open the box without agents, or fail the open?</li>
 <li><a href="#agents">Agents</a>: should workspaces of archived environments move to the current bundle?</li>
 <li><a href="#agents">Agents</a>: publish drives in all 19 regions on every release, or only regions that have an environment?</li>
@@ -58,8 +58,8 @@
 </ol>
 
 <!-- ============================================================ -->
-<h2 id="swap">1. Remove swap <span class="state ready">Ready for review</span></h2>
-<p><strong>PR:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9924">#9924</a>, draft. 5 files, +86 −87. All 18 checks pass.</p>
+<h2 id="swap">1. Remove swap <span class="state ready">Shipped 18 November</span></h2>
+<p><strong>PR:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9924">#9924</a>, merged. 5 files, +86 −87. The production release that carries it succeeded, and boxes pick it up on their next wake.</p>
 
 <h3>What it does</h3>
 <p>Cloud boxes stop using swap. Removing swap alone was not safe: host-service stalled for up to 175 seconds. So the memory guard that kills runaway processes now checks four times as often and acts one step ahead.</p>
@@ -69,7 +69,8 @@
     read available memory                  # no process spawned
     drop = how much it fell since the last check
     if available - drop &lt; 8% of the box:
-        kill the largest ordinary process  # never host-service, terminals or agents
+        kill the largest ordinary process  # agents only if no ordinary process is left;
+                                           # host-service and terminals never
         wait until it has really exited    # was a fixed 3 s pause
         check again at once</pre>
 
@@ -77,7 +78,7 @@
 <ul>
 <li>A job bigger than the box is killed early. With swap it often finished slowly. A parallel build on a 4 GB box loses 3 of its 4 workers. A monorepo typecheck of about 8 GB is killed on the 4 GB size.</li>
 <li>Within about 5 seconds the desktop shows an out-of-memory banner that names the process and offers a resize to the next size. The terminal shows <code>Killed</code>.</li>
-<li>Host-service, terminals and agents are never the ones killed.</li>
+<li>Host-service and terminals are never the ones killed. An agent is killed only when no ordinary process is left to kill. In every measured run the victim was an ordinary process.</li>
 </ul>
 
 <h3>Evidence</h3>
@@ -102,10 +103,9 @@
 <li>Rollback is a revert. No boot step re-runs. Snapshots that already hold swap keep it either way.</li>
 </ul>
 
-<h3>Your decision</h3>
+<h3>Decision</h3>
 <div class="decision">
-<p><strong>Ship no swap with this loop?</strong></p>
-<p class="rec">Recommendation: yes. You settled on removing swap after Vercel's advice. The stall that made it unsafe is fixed and proven on a real small box, and main is worse under a fast allocator.</p>
+<p><strong>Ship no swap with this loop?</strong> Decided: yes. Merged and released on 18 November.</p>
 </div>
 <p>Not blocking, worth scheduling: a killed Node process shows in the banner as "MainThread", and on the largest size the banner offers no next step.</p>
 
