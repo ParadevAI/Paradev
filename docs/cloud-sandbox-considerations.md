@@ -228,6 +228,19 @@ host-service's pressure report (`runtime/sandbox-box-pressure`), which
 cannot report a box whose host-service has stalled. Still open: automatic resume of an agent whose own process was
 reaped while its terminal survived.
 
+## Box logs leave the box
+
+`superset-logship` sends `boot.log`, `memguard.log`, `desktop.log` and
+`host-service.log` to the sandbox Sentry project when the claim sets
+`SUPERSET_SANDBOX_BOX_LOGS=1`. That needs both PostHog flags:
+`sandbox-box-logs-fleet` and the organization's `sandbox-box-logs`. The setup
+script and the clone output are never read. **Open:** host-service lines can
+still carry customer text: worktree paths, branch names, repository URLs, and
+git or `gh` errors that print the command. The shipper scrubs token formats;
+host-service no longer prints hook commands. Before the flag is on for a customer organization,
+the policy wording (L1) must be live, and someone must decide which of those
+lines to drop.
+
 ## Untested behaviour
 
 These are unknowns, not known failures — but each could change the design, and
