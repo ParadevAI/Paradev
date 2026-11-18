@@ -929,6 +929,23 @@ export async function readBuildCommand(args: {
 	return parseCommandState(await read.stdout());
 }
 
+// TODO: import ROOT_DISK_AGENTS_COMMAND from @superset/shared/sandbox/contract once #9911 merges.
+export const ROOT_DISK_AGENTS_COMMAND = `ls -d /opt/codex /opt/pdev ${SANDBOX_PATHS.media}/claude-* ${SANDBOX_PATHS.steps}/install-agent-clis.version 2>/dev/null || true`;
+
+/** The agent CLI paths on the box's own disk; empty when the disk is clean. */
+export async function buildBoxRootDiskAgents(name: string): Promise<string> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name,
+		resume: false,
+	});
+	const read = await sandbox.runCommand({
+		cmd: "bash",
+		args: ["-c", ROOT_DISK_AGENTS_COMMAND],
+	});
+	return (await read.stdout()).trim();
+}
+
 export async function buildBoxSnapshotId(name: string): Promise<string | null> {
 	const sandbox = await getSandbox(name);
 	return sandbox?.currentSnapshotId ?? null;

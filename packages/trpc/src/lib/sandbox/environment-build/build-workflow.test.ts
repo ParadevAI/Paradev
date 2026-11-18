@@ -11,7 +11,12 @@ import * as repoHooks from "../repo-hooks";
 import * as repositories from "../repositories";
 import * as vercel from "../vercel";
 import * as steps from "./build-steps";
-import { BUILD_LIMIT_MESSAGE, BUILD_LIMIT_MS } from "./limits";
+import {
+	BUILD_LIMIT_MESSAGE,
+	BUILD_LIMIT_MS,
+	FRESH_REBUILD_WAIT_MS,
+} from "./limits";
+import type { FreshRebuildClaim } from "./policy";
 import * as store from "./store";
 
 const ENVIRONMENT_ID = "00000000-0000-0000-0000-0000000000e1";
@@ -72,6 +77,8 @@ let stoppedAt: number | null;
 let install: { durationMs: number; exitCode: number; output: string };
 let failNext: Partial<Record<string, number>>;
 let swapAllowed: boolean;
+let rootDiskAgents: string;
+let claims: FreshRebuildClaim[];
 
 function failOnce(name: string): void {
 	const left = failNext[name] ?? 0;
@@ -130,6 +137,7 @@ stub(vercel, {
 		const done = now - command.startedAt >= command.durationMs;
 		return { exitCode: done ? command.exitCode : null, tail: command.output };
 	},
+	buildBoxRootDiskAgents: async () => rootDiskAgents,
 	buildBoxSnapshotId: async () => "snap-before",
 	stopBuildBox: async () => {
 		calls.push("stop");
@@ -165,6 +173,13 @@ stub(store, {
 		failOnce("activate");
 		return true;
 	},
+	claimFreshRebuild: async () => {
+		const claim = claims.shift() ?? "wait";
+		calls.push(`claim:${claim}`);
+		if (claim === "claimed") build = { ...build, kind: "fresh" };
+		return claim;
+	},
+	restartBuildClock: async () => {},
 	finishedBuilds: async () => [],
 	markGoldensDeleted: async () => {},
 });
@@ -236,6 +251,8 @@ beforeEach(() => {
 	install = { durationMs: 60_000, exitCode: 0, output: "installed" };
 	failNext = {};
 	swapAllowed = true;
+	rootDiskAgents = "";
+	claims = [];
 });
 
 afterEach(() => {
@@ -323,5 +340,46 @@ describe("environmentBuildWorkflow", () => {
 		build = makeBuild({ status: "succeeded" });
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("skipped");
 		expect(calls).toEqual([]);
+	});
+
+	test("a fork with agent CLIs on its disk is rebuilt from the image", async () => {
+		rootDiskAgents = "/opt/codex\n/opt/pdev";
+		claims = ["claimed"];
+		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+		expect(calls.slice(0, 5)).toEqual([
+			"create",
+			`delete:${BOX}`,
+			"claim:claimed",
+			"create:image",
+			"start:checkout",
+		]);
+		expect(build).toMatchObject({ status: "succeeded", kind: "fresh" });
+	});
+
+	test("a clean fork stays incremental", async () => {
+		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+		expect(calls.some((call) => call.startsWith("claim"))).toBe(false);
+		expect(build.kind).toBe("incremental");
+	});
+
+	test("past the caps the build forks as before and the golden waits for the next run", async () => {
+		rootDiskAgents = "/opt/codex";
+		const started = now;
+		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+		expect(now - started).toBeGreaterThanOrEqual(FRESH_REBUILD_WAIT_MS);
+		expect(calls.filter((call) => call === "create")).toHaveLength(2);
+		expect(calls).not.toContain("create:image");
+		expect(build.kind).toBe("incremental");
+	});
+
+	test("a build refused a fresh slot does not wait", async () => {
+		rootDiskAgents = "/opt/codex";
+		claims = ["refused"];
+		const started = now;
+		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+		expect(calls.filter((call) => call.startsWith("claim"))).toEqual([
+			"claim:refused",
+		]);
+		expect(now - started).toBeLessThan(FRESH_REBUILD_WAIT_MS);
 	});
 });

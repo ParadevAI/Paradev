@@ -3,6 +3,7 @@ import {
 	checkoutLayoutMoves,
 	checkoutScript,
 	dailyBuildsPaused,
+	freshRebuildClaim,
 	goldensToDelete,
 	isStale,
 	removedCheckoutPaths,
@@ -163,5 +164,27 @@ describe("removedCheckoutPaths", () => {
 		expect(removedCheckoutPaths({ current, nextIds: ["web"] })).toEqual([
 			"api",
 		]);
+	});
+});
+
+describe("freshRebuildClaim", () => {
+	test("allows ten at once and forty an hour; only a daily build waits", () => {
+		const daily = { trigger: "daily" as const };
+		expect(
+			freshRebuildClaim({ ...daily, running: 9, startedLastHour: 39 }),
+		).toBe("claimed");
+		expect(
+			freshRebuildClaim({ ...daily, running: 10, startedLastHour: 20 }),
+		).toBe("wait");
+		expect(
+			freshRebuildClaim({ ...daily, running: 0, startedLastHour: 40 }),
+		).toBe("refused");
+		expect(
+			freshRebuildClaim({
+				trigger: "manual",
+				running: 10,
+				startedLastHour: 20,
+			}),
+		).toBe("refused");
 	});
 });

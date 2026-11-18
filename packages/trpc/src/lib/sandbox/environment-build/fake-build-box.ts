@@ -97,6 +97,10 @@ export const fakeBuildBox = {
 		return state;
 	},
 
+	async buildBoxRootDiskAgents(_name: string): Promise<string> {
+		return "";
+	},
+
 	async buildBoxSnapshotId(name: string): Promise<string | null> {
 		return boxes.get(name)?.snapshotId ?? null;
 	},

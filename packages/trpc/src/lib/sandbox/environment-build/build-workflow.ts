@@ -5,29 +5,39 @@ import {
 	type BuildCommandKey,
 	beginBuild,
 	boxSnapshotId,
+	claimFreshBuild,
 	createBox,
 	failBuildAndCleanUp,
 	prepareBuildDrive,
 	pruneOldGoldens,
 	readCommand,
+	restartClock,
 	snapshotTaken,
 	startCommand,
 	stopBox,
 } from "./build-steps";
-import { BUILD_LIMIT_MESSAGE, BUILD_LIMIT_MS, BUILD_POLL_MS } from "./limits";
+import {
+	BUILD_LIMIT_MESSAGE,
+	BUILD_LIMIT_MS,
+	BUILD_POLL_MS,
+	FRESH_REBUILD_POLL_MS,
+	FRESH_REBUILD_WAIT_MS,
+} from "./limits";
 
 export type BuildOutcome = "succeeded" | "failed" | "skipped";
 
 /**
  * Builds an environment's golden from `[install]` and makes it the one new
  * workspaces start from. The box does the long work; each step only starts
- * or checks it. A failure leaves the current golden in place.
+ * or checks it. A failure leaves the current golden in place. A golden that
+ * holds agent CLIs on its disk is rebuilt from the image, within the caps in
+ * `limits.ts`; past them it is forked as before and checked again next time.
  */
 export async function environmentBuildWorkflow(
 	buildId: string,
 ): Promise<BuildOutcome> {
 	"use workflow";
-	const deadline = Date.now() + BUILD_LIMIT_MS;
+	let deadline = Date.now() + BUILD_LIMIT_MS;
 
 	async function waitFor(done: () => Promise<boolean>): Promise<void> {
 		while (!(await done())) {
@@ -55,7 +65,17 @@ export async function environmentBuildWorkflow(
 	try {
 		const sourceRef = await beginBuild(buildId);
 		if (sourceRef === null) return "skipped";
-		await createBox(buildId, sourceRef);
+		if ((await createBox(buildId, sourceRef, true)) === "root-disk-agents") {
+			const waitUntil = Date.now() + FRESH_REBUILD_WAIT_MS;
+			let claim = await claimFreshBuild(buildId);
+			while (claim === "wait" && Date.now() < waitUntil) {
+				await sleep(FRESH_REBUILD_POLL_MS);
+				claim = await claimFreshBuild(buildId);
+			}
+			if (claim !== "claimed") await restartClock(buildId);
+			await createBox(buildId, sourceRef, false);
+			deadline = Date.now() + BUILD_LIMIT_MS;
+		}
 		await prepareBuildDrive(buildId);
 
 		const checkout = await runOnBox("checkout");

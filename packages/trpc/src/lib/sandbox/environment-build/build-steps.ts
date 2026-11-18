@@ -7,6 +7,7 @@ import { env } from "../../../env";
 import {
 	type BuildBoxSource,
 	type BuildCommandState,
+	buildBoxRootDiskAgents,
 	buildBoxSnapshotId,
 	buildBoxSnapshotTaken,
 	createBuildBox,
@@ -25,12 +26,14 @@ import {
 } from "./environment-build";
 import { fakeBuildBox } from "./fake-build-box";
 import { BUILD_LIMIT_MS } from "./limits";
-import { checkoutScript } from "./policy";
+import { checkoutScript, type FreshRebuildClaim } from "./policy";
 import {
+	claimFreshRebuild,
 	failBuild,
 	loadBuild,
 	recordBuildCommit,
 	recordBuildLog,
+	restartBuildClock,
 	succeedBuild,
 } from "./store";
 
@@ -43,6 +46,7 @@ function vercelBuildBox() {
 		createBuildBox,
 		startBuildCommand,
 		readBuildCommand,
+		buildBoxRootDiskAgents,
 		buildBoxSnapshotId,
 		stopBuildBox,
 		buildBoxSnapshotTaken,
@@ -85,21 +89,26 @@ export async function beginBuild(buildId: string): Promise<string | null> {
 	return loaded.environment.sourceRef;
 }
 
-/** Creates the box once: a retry finds the box by its name. */
+/**
+ * Creates the box once: a retry finds the box by its name. A fork whose disk
+ * holds agent CLIs is deleted, so the build can start again from the image.
+ */
 export async function createBox(
 	buildId: string,
 	sourceRef: string,
-): Promise<void> {
+	checkRootDisk: boolean,
+): Promise<"ready" | "root-disk-agents"> {
 	"use step";
 	const { build, environment } = await runningBuild(buildId);
 	const inputs = await prepareBuild(build);
+	const name = buildBoxName(build.id);
 	const source: BuildBoxSource =
 		build.kind === "incremental" && environment.sourceKind === "fork"
 			? { kind: "fork", golden: sourceRef }
 			: { kind: "image", region: environment.region };
 	await within(
 		buildBox().createBuildBox({
-			name: buildBoxName(build.id),
+			name,
 			source,
 			networkPolicy: inputs.networkPolicy,
 			organizationId: build.organizationId,
@@ -108,6 +117,25 @@ export async function createBox(
 		BOX_READY_MS,
 		`The box was not ready within ${BOX_READY_MS / 1000} seconds`,
 	);
+	if (!checkRootDisk || source.kind !== "fork") return "ready";
+	if (!(await buildBox().buildBoxRootDiskAgents(name))) return "ready";
+	await buildBox().deleteSandbox(name);
+	return "root-disk-agents";
+}
+
+/** Makes the build fresh when the caps allow it; see `freshRebuildClaim`. */
+export async function claimFreshBuild(
+	buildId: string,
+): Promise<FreshRebuildClaim> {
+	"use step";
+	const claim = await claimFreshRebuild(buildId);
+	if (claim === null) throw new FatalError(NOT_RUNNING);
+	return claim;
+}
+
+export async function restartClock(buildId: string): Promise<void> {
+	"use step";
+	await restartBuildClock(buildId);
 }
 
 /** Where a build will wait for its drive to detach and lay the drive out before the checkout. */

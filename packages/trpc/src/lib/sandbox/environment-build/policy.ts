@@ -1,11 +1,18 @@
-import type { EnvironmentBuildStatus } from "@superset/db/schema";
+import type {
+	EnvironmentBuildStatus,
+	EnvironmentBuildTrigger,
+} from "@superset/db/schema";
 import {
 	SANDBOX_ROOT_CHECKOUT,
 	sandboxCheckoutDir,
 	sandboxRepositoryPath,
 } from "@superset/shared/sandbox/contract";
 
-import { BUILD_LIMIT_MS } from "./limits";
+import {
+	BUILD_LIMIT_MS,
+	FRESH_REBUILDS_AT_ONCE,
+	FRESH_REBUILDS_PER_HOUR,
+} from "./limits";
 
 const KEPT_GOLDENS = 5;
 /** Past the build limit, so only a build whose workflow died is stale. */
@@ -86,6 +93,19 @@ export function dailyBuildsPaused(
 		recent.length === DAILY_PAUSE_AFTER_FAILURES &&
 		recent.every((build) => build.status === "failed")
 	);
+}
+
+/** `wait` while fresh rebuilds are at the cap but the hour has room; only a daily build waits. */
+export type FreshRebuildClaim = "claimed" | "wait" | "refused";
+
+export function freshRebuildClaim(args: {
+	running: number;
+	startedLastHour: number;
+	trigger: EnvironmentBuildTrigger;
+}): FreshRebuildClaim {
+	if (args.startedLastHour >= FRESH_REBUILDS_PER_HOUR) return "refused";
+	if (args.running < FRESH_REBUILDS_AT_ONCE) return "claimed";
+	return args.trigger === "daily" ? "wait" : "refused";
 }
 
 function quote(value: string): string {
