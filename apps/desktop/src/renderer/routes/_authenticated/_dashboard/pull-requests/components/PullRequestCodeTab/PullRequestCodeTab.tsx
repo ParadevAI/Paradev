@@ -25,8 +25,8 @@ import type { FileStatus } from "renderer/lib/pierreTree";
 import type { AgentTarget } from "renderer/routes/_authenticated/_dashboard/components/AgentSessionPicker";
 import { WorkItemDetailState } from "renderer/routes/_authenticated/_dashboard/components/WorkItemDetailState";
 import { buildContentKey } from "renderer/routes/_authenticated/_dashboard/utils/buildContentKey";
-import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
-import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
+import { useDiffCardCodeViewTheme } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/DiffPane/hooks/useDiffCodeViewTheme";
+import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
 import { DiffFileCollapseButton } from "renderer/screens/main/components/DiffFileCollapseButton";
 import { DiffFileHeaderName } from "renderer/screens/main/components/DiffFileHeaderName";
 import { DiffViewToolbar } from "renderer/screens/main/components/DiffViewToolbar";
@@ -659,7 +659,7 @@ export function PullRequestCodeTab({
 				// non-null onGutterUtilityClick (InteractionManager's
 				// startGutterSelectionFromPointerDown early-returns otherwise)
 				// — the real open logic lives in onLineSelectionEnd, which also
-				// fires on gutter clicks. Mirrors the v2-workspace DiffPane's
+				// fires on gutter clicks. Mirrors the workspace DiffPane's
 				// identical stub for the same reason.
 				onGutterUtilityClick: () => {},
 				onLineSelectionEnd: (

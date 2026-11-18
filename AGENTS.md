@@ -134,7 +134,7 @@ workspace, what's running, what an agent is doing right now, and cleanup when yo
 
 Those agents run in terminals. A user who asks for a new *session* or a *chat* means a chat agent
 session, which is a different namespace: use `superset sessions`, not `agents create` or
-`terminals`. `terminals read` and `send` cannot control a chat session.
+`terminals`. `terminals read` cannot read a chat session; prompt one with `sessions send`.
 
 ```bash
 superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."

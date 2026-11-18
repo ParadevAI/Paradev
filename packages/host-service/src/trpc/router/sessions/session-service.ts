@@ -10,6 +10,7 @@ import { chatContinuationTarget, chatLaunchTarget } from "../agents/agents";
 import { seedDefaultsIfEmpty } from "../settings/agent-configs";
 import { seedAgentFolderTrust } from "../workspace-creation/shared/seed-agent-trust";
 import { createChatSession } from "./create-chat-session";
+import { sessionsClientId } from "./utils/sessionsClientId";
 
 export const createChatSessionSchema = z
 	.object({
@@ -17,6 +18,7 @@ export const createChatSessionSchema = z
 		agent: z.string().min(1),
 		prompt: z.string().default(""),
 		model: z.string().min(1).optional(),
+		effort: z.string().min(1).optional(),
 		mode: z.string().min(1).optional(),
 		resumeSessionId: z.string().min(1).optional(),
 		continueSessionId: z.string().min(1).optional(),
@@ -126,6 +128,7 @@ export async function createChatSessionInWorkspace(
 	if (
 		input.continueSessionId &&
 		!input.model &&
+		!input.effort &&
 		!input.mode &&
 		!input.attachmentIds?.length
 	) {
@@ -152,7 +155,7 @@ export async function createChatSessionInWorkspace(
 				chat.commands.prompt({
 					commandId,
 					sessionId: input.continueSessionId,
-					clientId: "superset-sessions",
+					clientId: sessionsClientId(commandId),
 					content: [{ type: "text", text: input.prompt }],
 				});
 			return {

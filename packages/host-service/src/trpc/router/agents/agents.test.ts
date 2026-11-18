@@ -11,6 +11,7 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import { TerminalAgentStore } from "../../../terminal-agents";
+import type { HostServiceContext } from "../../../types";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
@@ -25,6 +26,7 @@ import {
 	chatContinuationTarget,
 	chatLaunchTarget,
 	continuationTarget,
+	continueAgent,
 	validateAgentEffortSelection,
 	validateAgentForkSelection,
 	validateAgentLaunchOptions,
@@ -1092,6 +1094,30 @@ describe("continuationTarget", () => {
 		});
 	});
 
+	it("continues a terminal agent without opening the chat runtime", async () => {
+		const db = createTestDb();
+		seedClaude(db);
+		let chatOpened = false;
+		const continued = await continueAgent(
+			{
+				db,
+				eventBus: {} as HostServiceContext["eventBus"],
+				terminalAgentStore: boundStore(),
+				runtime: {
+					chat: () => {
+						chatOpened = true;
+						throw new Error("chat runtime opened");
+					},
+				} as unknown as HostServiceContext["runtime"],
+			},
+			run,
+		);
+		expect({ continued, chatOpened }).toEqual({
+			continued: null,
+			chatOpened: false,
+		});
+	});
+
 	it("declines when the caller named no terminal", () => {
 		const db = createTestDb();
 		seedClaude(db);
@@ -1174,19 +1200,20 @@ describe("continuationTarget", () => {
 		const db = createTestDb();
 		seedClaude(db);
 		const launch = { workspaceId, agent: "claude", prompt: "go" };
-
-		expect(
-			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
-		).toEqual({
+		const claudeChat = {
 			harness: "claude-acp",
 			label: "Claude",
 			agentConfigId: "00000000-0000-0000-0000-00000000000a",
 			attachments: [],
-		});
-		expect(chatLaunchTarget(db, launch)).toBeNull();
+		};
+
+		expect(
+			chatLaunchTarget(db, { ...launch, surface: "chat", mode: "plan" }),
+		).toEqual(claudeChat);
 		expect(
 			chatLaunchTarget(db, { ...launch, surface: "chat", effort: "high" }),
-		).toBeNull();
+		).toEqual(claudeChat);
+		expect(chatLaunchTarget(db, launch)).toBeNull();
 	});
 
 	it("chats as a custom agent that runs the claude or codex CLI", () => {

@@ -78,11 +78,12 @@ const runtimeJs = /* js */ `
 	// disarm the same modes.
 	var FRESH_SHELL_INPUT_MODE_RESET = ${JSON.stringify(FRESH_SHELL_INPUT_MODE_RESET)};
 
+	var BASE_FONT_SIZE = 12;
 	var term = new Terminal({
 		allowTransparency: false,
 		cursorBlink: true,
 		fontFamily: "Menlo, monospace",
-		fontSize: 12,
+		fontSize: BASE_FONT_SIZE,
 		scrollback: 5000,
 		// The built-in scrollbar only reveals on hover; the overlay one below
 		// replaces it, and dropping it gives its 14px gutter back to the columns.
@@ -678,6 +679,9 @@ const runtimeJs = /* js */ `
 			switchSession(message.terminalId, message.restore);
 		} else if (message.type === "attach") {
 			beginSession(message.terminalId, message.restore);
+		} else if (message.type === "fontScale") {
+			term.options.fontSize = BASE_FONT_SIZE * message.scale;
+			fit.fit();
 		} else if (message.type === "copySelection") {
 			copySelection();
 		} else if (message.type === "scrollToBottom") {
@@ -694,7 +698,7 @@ const runtimeJs = /* js */ `
 			allowTextareaFocus = true;
 			term.focus();
 			setTimeout(function () {
-				allowTextareaFocus = false;
+				allowTextareaFocus = keyboardInput;
 			}, 250);
 		}
 	}
@@ -710,7 +714,10 @@ const runtimeJs = /* js */ `
 	// keyboard must never come up from inside the page. WKWebView turns
 	// some taps into real clicks, and xterm focuses its hidden textarea on
 	// click — so focus is refused unless RN explicitly asked for it.
-	var allowTextareaFocus = false;
+	// A browser with a real keyboard sets terminalKeyboardInput: there a click
+	// focuses xterm and typing goes straight to the PTY.
+	var keyboardInput = window.terminalKeyboardInput === true;
+	var allowTextareaFocus = keyboardInput;
 	term.textarea.addEventListener("focus", function () {
 		if (!allowTextareaFocus) term.textarea.blur();
 	});

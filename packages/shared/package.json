@@ -4,6 +4,9 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./legacy-integration-connect": "./src/legacy-integration-connect/index.ts",
+		"./domain-move": "./src/domain-move/index.ts",
+		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"
@@ -189,13 +192,13 @@
 			"types": "./src/plugins/index.ts",
 			"default": "./src/plugins/index.ts"
 		},
-		"./sandbox-regions": {
-			"types": "./src/sandbox-regions.ts",
-			"default": "./src/sandbox-regions.ts"
+		"./sandbox/regions": {
+			"types": "./src/sandbox/regions.ts",
+			"default": "./src/sandbox/regions.ts"
 		},
-		"./sandbox-contract": {
-			"types": "./src/sandbox-contract.ts",
-			"default": "./src/sandbox-contract.ts"
+		"./sandbox/contract": {
+			"types": "./src/sandbox/contract.ts",
+			"default": "./src/sandbox/contract.ts"
 		},
 		"./pull-request-diff": {
 			"types": "./src/pull-request-diff/index.ts",
@@ -237,9 +240,21 @@
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
 		},
-		"./sandbox-gate": {
-			"types": "./src/sandbox-gate.ts",
-			"default": "./src/sandbox-gate.ts"
+		"./sandbox/gate": {
+			"types": "./src/sandbox/gate.ts",
+			"default": "./src/sandbox/gate.ts"
+		},
+		"./sandbox/access": {
+			"types": "./src/sandbox/access.ts",
+			"default": "./src/sandbox/access.ts"
+		},
+		"./sandbox/reach": {
+			"types": "./src/sandbox/reach.ts",
+			"default": "./src/sandbox/reach.ts"
+		},
+		"./sandbox/watch": {
+			"types": "./src/sandbox/watch.ts",
+			"default": "./src/sandbox/watch.ts"
 		},
 		"./sentry": {
 			"types": "./src/sentry.ts",
@@ -369,6 +384,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./box-pressure": {
+			"types": "./src/box-pressure.ts",
+			"default": "./src/box-pressure.ts"
+		},
 		"./workspace-launch": {
 			"types": "./src/workspace-launch/index.ts",
 			"default": "./src/workspace-launch/index.ts"
@@ -416,6 +435,10 @@
 		"./claude-command": {
 			"types": "./src/claude-command.ts",
 			"default": "./src/claude-command.ts"
+		},
+		"./origin-list": {
+			"types": "./src/origin-list.ts",
+			"default": "./src/origin-list.ts"
 		},
 		"./vercel-preview-origins": {
 			"types": "./src/vercel-preview-origins.ts",
@@ -512,6 +535,10 @@
 		"./plugins/manifest-schema": {
 			"types": "./src/plugins/manifest-schema.ts",
 			"default": "./src/plugins/manifest-schema.ts"
+		},
+		"./cloud-workspace-status": {
+			"types": "./src/cloud-workspace-status.ts",
+			"default": "./src/cloud-workspace-status.ts"
 		},
 		"./cloud-workspace-groups": {
 			"types": "./src/cloud-workspace-groups.ts",

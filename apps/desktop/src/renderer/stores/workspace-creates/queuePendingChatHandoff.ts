@@ -14,10 +14,10 @@ export function queuePendingChatHandoff(
 	workspace: { id: string; projectId: string | null },
 	handoff: PendingChatHandoff,
 ): void {
-	if (!collections.v2WorkspaceLocalState.get(workspace.id)) {
+	if (!collections.workspaceLocalState.get(workspace.id)) {
 		writeWorkspacePaneLayout(collections, workspace, [], []);
 	}
-	collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
+	collections.workspaceLocalState.update(workspace.id, (draft) => {
 		draft.pendingChatHandoff = handoff;
 	});
 }

@@ -28,13 +28,11 @@ import {
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
-import {
-	createTerminalSessionInternal,
-	sendAgentMessage,
-} from "../../../terminal/terminal";
+import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
 	TerminalAgentStore,
@@ -45,6 +43,7 @@ import {
 	resolveHostAgentConfig,
 } from "../../../terminal-agents/agent-config";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
+import { sendToAgent } from "../../../terminal-agents/send-to-agent";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import {
@@ -400,7 +399,7 @@ export function validateAgentLaunchOptions(
 export function buildTerminalAgentLaunch(
 	db: HostDb,
 	input: AgentRunInput,
-): { fullCommand: string; label: string } {
+): { fullCommand: string; label: string; config: ResolvedHostAgentConfig } {
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
 		// Worded for end users (automation run errors show this verbatim), but
@@ -475,6 +474,7 @@ export function buildTerminalAgentLaunch(
 	return {
 		fullCommand: `${envOverlayPrefix({ ...agentLaunchEnv(db, config), ...modelEnv })}${command}`,
 		label: config.label,
+		config,
 	};
 }
 
@@ -507,12 +507,38 @@ export function bindResumedSession(
 	});
 }
 
+export function trackTerminalAgentLaunched(
+	ctx: Pick<HostServiceContext, "api" | "db">,
+	config: ResolvedHostAgentConfig,
+	input: Pick<AgentRunInput, "workspaceId" | "resumeSessionId">,
+): void {
+	try {
+		trackAgentLaunched(ctx.api, {
+			presetId: config.presetId,
+			command: config.command,
+			executable: config.command,
+			env: agentLaunchEnv(ctx.db, config),
+			kind: "terminal",
+			resumed: Boolean(input.resumeSessionId),
+			workspaceId: input.workspaceId,
+		});
+	} catch (error) {
+		console.warn("[agent-launch] could not report the terminal launch", error);
+	}
+}
+
 async function runTerminalAgent(
-	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
+	ctx: Pick<
+		HostServiceContext,
+		"api" | "db" | "eventBus" | "terminalAgentStore"
+	>,
 	input: AgentRunInput,
 	terminalId: string = crypto.randomUUID(),
 ): Promise<AgentRunResult> {
-	const { fullCommand, label } = buildTerminalAgentLaunch(ctx.db, input);
+	const { fullCommand, label, config } = buildTerminalAgentLaunch(
+		ctx.db,
+		input,
+	);
 
 	const result = await createTerminalSessionInternal({
 		terminalId,
@@ -528,6 +554,7 @@ async function runTerminalAgent(
 	}
 
 	bindResumedSession(ctx, input, result.terminalId);
+	trackTerminalAgentLaunched(ctx, config, input);
 
 	return {
 		kind: "terminal",
@@ -673,7 +700,6 @@ export function chatLaunchTarget(
 } | null {
 	if (
 		input.surface !== "chat" ||
-		input.effort ||
 		input.resumeSessionId ||
 		input.forkSessionId
 	) {
@@ -747,41 +773,6 @@ export function storedChatConfig(
 	return { stored, keeps };
 }
 
-function continueChatAgent(
-	ctx: Pick<HostServiceContext, "db" | "runtime" | "terminalAgentStore">,
-	input: AgentRunInput,
-): AgentRunResult | null {
-	const terminalId = input.continueTerminalId;
-	if (!terminalId || !ctx.terminalAgentStore.getChat(terminalId)) return null;
-	const chat = ctx.runtime.chat?.();
-	if (!chat) return null;
-	const target = chatContinuationTarget(
-		ctx.db,
-		ctx.terminalAgentStore,
-		chat.live,
-		input,
-	);
-	if (!target) return null;
-
-	try {
-		chat.commands.prompt({
-			commandId: crypto.randomUUID(),
-			sessionId: target.chatSessionId,
-			clientId: crypto.randomUUID(),
-			content: [{ type: "text", text: input.prompt }],
-		});
-	} catch {
-		return null;
-	}
-
-	return {
-		kind: "terminal",
-		sessionId: target.terminalId,
-		label: target.label,
-		chatSessionId: target.chatSessionId,
-	};
-}
-
 function launchChatAgent(
 	ctx: Pick<HostServiceContext, "db" | "runtime">,
 	input: AgentRunInput,
@@ -816,18 +807,32 @@ function launchChatAgent(
  * Every rejection falls through to a launch rather than failing: the caller's
  * candidate is a hint, and a stale one must cost nothing.
  */
-async function continueTerminalAgent(
-	ctx: Pick<HostServiceContext, "db" | "eventBus" | "terminalAgentStore">,
+export async function continueAgent(
+	ctx: Pick<
+		HostServiceContext,
+		"db" | "eventBus" | "runtime" | "terminalAgentStore"
+	>,
 	input: AgentRunInput,
 ): Promise<AgentRunResult | null> {
-	const target = continuationTarget(ctx.db, ctx.terminalAgentStore, input);
+	const terminalId = input.continueTerminalId;
+	if (!terminalId) return null;
+	// `runtime.chat()` opens chat.db on first use, so only a chat asks for it.
+	const chat = ctx.terminalAgentStore.hasChat(terminalId)
+		? ctx.runtime.chat?.()
+		: undefined;
+	const chatTarget = chat
+		? chatContinuationTarget(ctx.db, ctx.terminalAgentStore, chat.live, input)
+		: null;
+	const target =
+		chatTarget ?? continuationTarget(ctx.db, ctx.terminalAgentStore, input);
 	if (!target) return null;
 
-	const sent = await sendAgentMessage({
+	const sent = await sendToAgent({
 		terminalId: target.terminalId,
 		workspaceId: input.workspaceId,
 		text: input.prompt,
 		terminalAgentStore: ctx.terminalAgentStore,
+		chatRuntime: () => chat,
 		submit: true,
 		db: ctx.db,
 		eventBus: ctx.eventBus,
@@ -841,6 +846,7 @@ async function continueTerminalAgent(
 		kind: "terminal",
 		sessionId: target.terminalId,
 		label: target.label,
+		...(chatTarget ? { chatSessionId: chatTarget.chatSessionId } : {}),
 	};
 }
 
@@ -871,8 +877,7 @@ export async function runAgentInWorkspace(
 		});
 	}
 	// Ahead of the launch path: continuing costs no pty and no trust seeding.
-	const continued =
-		continueChatAgent(ctx, input) ?? (await continueTerminalAgent(ctx, input));
+	const continued = await continueAgent(ctx, input);
 	if (continued) return continued;
 
 	// Session workspaces are standalone repos the host itself scaffolded, so

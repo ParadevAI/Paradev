@@ -4,6 +4,7 @@ import { ForwardSwipe } from "@superset/forward-swipe";
 import { i18n } from "@superset/i18n";
 import { useFormat } from "@superset/i18n/react";
 import { groupCloudWorkspacesByTime } from "@superset/shared/cloud-workspace-groups";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { getWorkspaceActivityTime } from "@superset/shared/workspace-activity";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,6 +41,8 @@ import { useOrgHosts } from "@/hooks/useOrgHosts";
 import { useReadableInset } from "@/hooks/useReadableInset";
 import { useSession } from "@/lib/auth/client";
 import { errorCopy } from "@/lib/errors";
+import { listSideInset } from "@/lib/layout";
+import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { useVoiceSession } from "@/lib/voice/useVoiceSession";
 import { useVoiceActive } from "@/lib/voice/voiceStore";
 import { useCloudFilters } from "@/screens/(authenticated)/(home)/hooks/useCloudFilters";
@@ -192,6 +195,7 @@ export function HomeScreen() {
 	const columns = grid?.columns ?? 1;
 	const cellWidth = grid?.cellWidth ?? 0;
 	const listInset = grid?.inset ?? readableInset;
+	const sideInset = useMemo(() => listSideInset(listInset), [listInset]);
 	const queryClient = useQueryClient();
 	useAppReviewPrompt();
 	const setTargetKey = useNewSessionPreferencesStore(
@@ -568,10 +572,14 @@ export function HomeScreen() {
 	const cloudRepos = useCloudRepos();
 	const cloudPullRequests = useCloudPullRequests({
 		active: listItems.some(
-			(item) => item.kind === "cloudRow" && item.row.status !== "deleted",
+			(item) =>
+				item.kind === "cloudRow" &&
+				!isArchivedCloudWorkspaceStatus(item.row.status),
 		),
 		archived: listItems.some(
-			(item) => item.kind === "cloudRow" && item.row.status === "deleted",
+			(item) =>
+				item.kind === "cloudRow" &&
+				isArchivedCloudWorkspaceStatus(item.row.status),
 		),
 	});
 	const repoPrefixesByProject = useMemo(
@@ -703,25 +711,28 @@ export function HomeScreen() {
 
 	const renderItem = useCallback(
 		({ item }: { item: HomeListEntry }) => {
-			if (item.kind !== "gridRow") return renderListItem(item, false);
-			return (
-				<View
-					className="flex-row"
-					style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
-				>
-					{item.cells.map((cell) => (
-						<View
-							key={homeListItemKey(cell)}
-							className="border-border rounded-xl border"
-							style={{ width: cellWidth }}
-						>
-							{renderListItem(cell, true)}
-						</View>
-					))}
-				</View>
-			);
+			const row =
+				item.kind !== "gridRow" ? (
+					renderListItem(item, false)
+				) : (
+					<View
+						className="flex-row"
+						style={{ gap: GRID_GAP, paddingBottom: GRID_GAP }}
+					>
+						{item.cells.map((cell) => (
+							<View
+								key={homeListItemKey(cell)}
+								className="border-border rounded-xl border"
+								style={{ width: cellWidth }}
+							>
+								{renderListItem(cell, true)}
+							</View>
+						))}
+					</View>
+				);
+			return sideInset.row ? <View style={sideInset.row}>{row}</View> : row;
 		},
-		[renderListItem, cellWidth],
+		[renderListItem, cellWidth, sideInset.row],
 	);
 
 	// The native splash is still up until hideSplash() below; nothing to draw.
@@ -773,7 +784,7 @@ export function HomeScreen() {
 			    offline — its list isn't shown, so there is nothing to search. */}
 			<Stack.Screen
 				options={{
-					headerTransparent: true,
+					headerTransparent: contentScrollsUnderHeader,
 					headerTitle: notice
 						? () => (
 								<HeaderNotice
@@ -787,10 +798,10 @@ export function HomeScreen() {
 				}}
 			/>
 			{selectedHost && hostOffline && !voiceEnabled ? null : (
-				<Stack.Toolbar placement="right">
+				<HeaderToolbar placement="right">
 					{voiceEnabled ? (
-						<Stack.Toolbar.Button
-							icon="waveform"
+						<HeaderToolbar.Button
+							icon="voice"
 							accessibilityLabel={t({ message: "Start voice mode" })}
 							onPress={() => {
 								void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -805,9 +816,9 @@ export function HomeScreen() {
 							}}
 						/>
 					) : null}
-					<Stack.Toolbar.Button
+					<HeaderToolbar.Button
 						hidden={Boolean(selectedHost && hostOffline)}
-						icon="magnifyingglass"
+						icon="search"
 						accessibilityLabel={t({
 							message: "Search workspaces",
 						})}
@@ -816,7 +827,7 @@ export function HomeScreen() {
 							router.push("/(authenticated)/(home)/search");
 						}}
 					/>
-				</Stack.Toolbar>
+				</HeaderToolbar>
 			)}
 			{selectedHost && hostOffline ? (
 				<View
@@ -852,17 +863,29 @@ export function HomeScreen() {
 					keyboardDismissMode="on-drag"
 					keyboardShouldPersistTaps="handled"
 					contentContainerStyle={{
-						minHeight:
-							windowHeight - insets.top - NAVIGATION_BAR_HEIGHT - insets.bottom,
+						// Fills the screen under a transparent header; an opaque header
+						// already takes its height, so the list would scroll empty.
+						minHeight: contentScrollsUnderHeader
+							? windowHeight -
+								insets.top -
+								NAVIGATION_BAR_HEIGHT -
+								insets.bottom
+							: undefined,
 						paddingBottom: 112,
 						paddingTop: 8,
-						paddingHorizontal: listInset,
+						...sideInset.content,
 					}}
 					data={listEntries}
 					extraData={renderItem}
 					keyExtractor={homeListEntryKey}
 					renderItem={renderItem}
-					ListHeaderComponent={scopeBar}
+					ListHeaderComponent={
+						sideInset.row ? (
+							<View style={sideInset.row}>{scopeBar}</View>
+						) : (
+							scopeBar
+						)
+					}
 					viewabilityConfig={VIEWABILITY_CONFIG}
 					onViewableItemsChanged={onViewableItemsChanged}
 					refreshControl={

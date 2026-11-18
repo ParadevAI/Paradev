@@ -23,7 +23,7 @@ export type Slot =
 	| "messageFilter"
 	| "nameFilter";
 
-export type SentencePart = { text: string } | { slot: Slot };
+type SentencePart = { text: string } | { slot: Slot };
 
 export const TEAMS_SENTENCES: Record<
 	MicrosoftTeamsTriggerEvent,
@@ -72,7 +72,7 @@ function leaf(label: MessageDescriptor, event: MicrosoftTeamsTriggerEvent) {
  * nothing until someone picks — the same safety property as GitHub's
  * repositories.
  */
-export function createTeamsConfig(
+function createTeamsConfig(
 	event: MicrosoftTeamsTriggerEvent,
 ): MicrosoftTeamsConfig {
 	return {

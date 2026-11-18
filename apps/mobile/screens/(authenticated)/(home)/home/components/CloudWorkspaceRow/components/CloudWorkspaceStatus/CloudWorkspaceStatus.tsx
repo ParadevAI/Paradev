@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import * as Haptics from "expo-haptics";
 import { Info, RotateCcw } from "lucide-react-native";
 import { Alert, Pressable, View } from "react-native";
@@ -32,7 +33,7 @@ export function CloudWorkspaceStatus({
 			</View>
 		);
 	}
-	if (row.status === "deleted") {
+	if (isArchivedCloudWorkspaceStatus(row.status)) {
 		return (
 			<Pressable
 				accessibilityRole="button"

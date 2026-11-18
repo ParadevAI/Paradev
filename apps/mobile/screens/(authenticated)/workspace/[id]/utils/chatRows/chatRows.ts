@@ -4,12 +4,13 @@ import {
 	toolRunKey,
 	transcriptItemKey,
 } from "@superset/chat/core";
-import type {
-	Item,
-	Notice,
-	ToolCall,
-	Turn,
-	UserMessage,
+import {
+	type Item,
+	isUsageLimitMessage,
+	type Notice,
+	type ToolCall,
+	type Turn,
+	type UserMessage,
 } from "@superset/chat/protocol";
 
 export type ChatRow =
@@ -18,12 +19,27 @@ export type ChatRow =
 	| {
 			kind: "turn_status";
 			key: string;
-			status: "failed" | "interrupted" | "paused";
+			status: TurnStatus;
 			message: string | undefined;
 	  }
 	| { kind: "outbox"; key: string; entry: OutboxEntry }
 	| { kind: "working"; key: string }
 	| { kind: "activity"; key: string; rows: ChatRow[] };
+
+type TurnStatus = "failed" | "interrupted" | "paused" | "limited";
+
+/** Hosts released before they knew this wording send a usage limit as `unknown`. */
+function stoppedByUsageLimit(turn: Turn): boolean {
+	const kind = turn.error?.kind ?? "unknown";
+	if (kind === "usage_limit") return true;
+	return kind === "unknown" && isUsageLimitMessage(turn.error?.message ?? "");
+}
+
+function endedStatus(turn: Turn, status: "failed" | "interrupted"): TurnStatus {
+	if (turn.error?.kind === "host_stopped") return "paused";
+	if (status === "failed" && stoppedByUsageLimit(turn)) return "limited";
+	return status;
+}
 
 function lastRowIsLive(group: TurnGroup): boolean {
 	const entry = group.entries.at(-1);
@@ -65,6 +81,7 @@ export function chatRows(
 ): ChatRow[] {
 	const rows: ChatRow[] = [];
 	const echoed = new Set<string>();
+	const itemKeys = new Set<string>();
 
 	for (const group of groups) {
 		let failureText: string | undefined;
@@ -79,11 +96,11 @@ export function chatRows(
 					const clientId = (entry.item as UserMessage).clientId;
 					if (clientId) echoed.add(clientId);
 				}
-				rows.push({
-					kind: "item",
-					key: transcriptItemKey(entry.item),
-					item: entry.item,
-				});
+				// Older hosts gave every CLI prompt one client id.
+				const itemKey = transcriptItemKey(entry.item);
+				const key = itemKeys.has(itemKey) ? entry.item.id : itemKey;
+				itemKeys.add(key);
+				rows.push({ kind: "item", key, item: entry.item });
 				return;
 			}
 			if (entry.kind === "user_stop") {
@@ -112,7 +129,7 @@ export function chatRows(
 			rows.push({
 				kind: "turn_status",
 				key: `status:${group.turnId}`,
-				status: turn.error?.kind === "host_stopped" ? "paused" : turn.status,
+				status: endedStatus(turn, turn.status),
 				message: failureText || turn.error?.message,
 			});
 		}

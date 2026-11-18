@@ -186,7 +186,7 @@ export function TasksView({
 		projects: hostProjects,
 		targets: projectTargets,
 	} = useProjectQueryTargets(projectFilters);
-	const v2Projects = useMemo(
+	const projectOptions = useMemo(
 		() =>
 			hostProjects.map((project) => ({
 				id: project.projectKey,
@@ -197,7 +197,7 @@ export function TasksView({
 
 	useEffect(() => {
 		if (!areProjectsReady) return;
-		const availableIds = new Set(v2Projects.map((project) => project.id));
+		const availableIds = new Set(projectOptions.map((project) => project.id));
 		const availableFilters = projectFilters.filter((projectId) =>
 			availableIds.has(projectId),
 		);
@@ -211,7 +211,7 @@ export function TasksView({
 	}, [
 		areProjectsReady,
 		projectFilters,
-		v2Projects,
+		projectOptions,
 		cancelPendingSearchNavigation,
 		navigate,
 		buildSearch,
@@ -409,7 +409,7 @@ export function TasksView({
 						projectFilters={projectFilters}
 						projectTargets={projectTargets}
 						areProjectsReady={areProjectsReady}
-						hasProjects={v2Projects.length > 0}
+						hasProjects={projectOptions.length > 0}
 						searchQuery={searchQuery}
 						includeClosed={includeClosedIssues}
 						onSelectionChange={handleIssueSelectionChange}

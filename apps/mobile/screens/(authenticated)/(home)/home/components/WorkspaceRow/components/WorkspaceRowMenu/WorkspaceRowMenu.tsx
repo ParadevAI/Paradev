@@ -1,9 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
 import { Link } from "expo-router";
-import { type ReactNode, useRef } from "react";
+import { useRef } from "react";
 import type { ViewInstance } from "react-native";
 import { View } from "react-native";
 import { anchorOf } from "@/screens/(authenticated)/components/ToolbarAnchor";
+import type { WorkspaceRowMenuProps } from "./WorkspaceRowMenu.types";
 
 export function WorkspaceRowMenu({
 	pinned,
@@ -17,23 +18,9 @@ export function WorkspaceRowMenu({
 	onDelete,
 	onCopyId,
 	onShare,
+	move,
 	children,
-}: {
-	pinned: boolean;
-	onTogglePin?: () => void;
-	canRename: boolean;
-	canDelete: boolean;
-	/** A cloud workspace is archived, not deleted. */
-	isCloud: boolean;
-	isUnread: boolean;
-	onToggleUnread: () => void;
-	onRename: () => void;
-	onDelete: () => void;
-	onCopyId: () => void;
-	/** Gets the row's tag, so iPad's share popover points at the row. */
-	onShare: (anchor?: number) => void;
-	children: ReactNode;
-}) {
+}: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
 	const rowRef = useRef<ViewInstance>(null);
 	// Tap navigation lives on the row itself; the Link exists solely because
@@ -76,6 +63,37 @@ export function WorkspaceRowMenu({
 					<Link.MenuAction icon="pencil" onPress={onRename}>
 						{t({ message: "Rename" })}
 					</Link.MenuAction>
+				) : null}
+				{move && (move.canMoveToCloud || move.computers.length > 0) ? (
+					<Link.Menu
+						title={t({ message: "Move to" })}
+						icon="arrow.left.arrow.right"
+					>
+						{move.canMoveToCloud ? (
+							<Link.MenuAction icon="cloud" onPress={move.moveToCloud}>
+								{t({ message: "Cloud" })}
+							</Link.MenuAction>
+						) : null}
+						{move.computers.length > 0 ? (
+							<Link.Menu inline>
+								{move.computers.map((computer) => (
+									<Link.MenuAction
+										key={computer.hostId}
+										icon="server.rack"
+										disabled={!computer.online}
+										subtitle={
+											computer.online
+												? t({ message: "Online" })
+												: t({ message: "Offline" })
+										}
+										onPress={() => move.moveToComputer(computer)}
+									>
+										{computer.name}
+									</Link.MenuAction>
+								))}
+							</Link.Menu>
+						) : null}
+					</Link.Menu>
 				) : null}
 				{canDelete && isCloud ? (
 					<Link.MenuAction icon="archivebox" onPress={onDelete}>

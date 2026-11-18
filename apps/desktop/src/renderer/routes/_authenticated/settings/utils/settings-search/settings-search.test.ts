@@ -81,22 +81,12 @@ describe("settings search - hosts", () => {
 });
 
 describe("settings search - usage in sidebar", () => {
-	it('searching "sidebar" in Usage returns the usage-in-sidebar switch for v2 users', () => {
+	it('searching "sidebar" in Usage returns the usage-in-sidebar switch', () => {
 		const ids = getVisibleItemsForSection({
 			section: "usage",
 			searchQuery: "sidebar",
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
-	});
-
-	it("hides the usage-in-sidebar switch from v1 users", () => {
-		const ids = getVisibleItemsForSection({
-			section: "usage",
-			searchQuery: "sidebar",
-			isV2: false,
-		});
-		expect(ids).not.toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
 	});
 
 	it('searching "shortcut" matches the usage-in-sidebar item', () => {
@@ -104,22 +94,20 @@ describe("settings search - usage in sidebar", () => {
 		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
 	});
 
-	it("lists the usage-in-sidebar switch in Usage without a search for v2 users", () => {
+	it("lists the usage-in-sidebar switch in Usage without a search", () => {
 		const ids = getVisibleItemsForSection({
 			section: "usage",
 			searchQuery: "",
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.USAGE_IN_SIDEBAR);
 	});
 });
 
 describe("settings search - auto save", () => {
-	it('lists Auto Save for v2 users when searching "onFocusChange"', () => {
+	it('lists Auto Save when searching "onFocusChange"', () => {
 		const ids = getVisibleItemsForSection({
 			section: "files",
 			searchQuery: "onFocusChange",
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
 	});
@@ -128,39 +116,28 @@ describe("settings search - auto save", () => {
 		"after delay",
 		"on focus change",
 		"on window change",
-	])('lists Auto Save for v2 users when searching "%s"', (searchQuery) => {
+	])('lists Auto Save when searching "%s"', (searchQuery) => {
 		const ids = getVisibleItemsForSection({
 			section: "files",
 			searchQuery,
-			isV2: true,
 		});
 		expect(ids).toContain(SETTING_ITEM_ID.BEHAVIOR_FILE_AUTO_SAVE);
 	});
 });
 
-describe("settings search - mobile rollout", () => {
-	it("excludes mobile matches until the feature flag is enabled", () => {
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false).mobile,
-		).toBeUndefined();
-		expect(
-			getVisibleMatchCountBySection("iPhone", true, false, true).mobile,
-		).toBe(1);
-		expect(
-			getVisibleMatchCountBySection("iPhone", false, false, true).mobile,
-		).toBe(1);
+describe("settings search - mobile", () => {
+	it("finds the mobile section", () => {
+		expect(getVisibleMatchCountBySection("iPhone", false).mobile).toBe(1);
 	});
 });
 
 describe("settings search - plugins visibility", () => {
 	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, false)
-				.plugins,
+			getVisibleMatchCountBySection("marketplace", false, false).plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("marketplace", true, false, false, true)
-				.plugins,
+			getVisibleMatchCountBySection("marketplace", false, true).plugins,
 		).toBeGreaterThan(0);
 	});
 });

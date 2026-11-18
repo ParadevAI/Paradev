@@ -2,9 +2,9 @@
  * The runner's own behaviour, exercised against a synthetic bundle in the
  * locally built image (`bun run image --local`): apply-rootfs installs then
  * skips, sync-assets verifies and refuses a bad hash, run-steps skips on a
- * matching marker, and the fail-open wrapper records the sentinel, skips
- * downstream, disables after three failures, clears on success and always
- * exits 0.
+ * matching marker, and the fail-open wrapper records each failure per step,
+ * skips only the steps that depend on it, runs every other step, disables
+ * after three failures, clears on success and always exits 0.
  *
  *   bun run src/runner-check.ts
  */
@@ -14,7 +14,7 @@ import { join } from "node:path";
 import {
 	renderContractShell,
 	SANDBOX_PATHS,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { PACKAGE_ROOT } from "./build";
 import { sha256 } from "./manifest";
 
@@ -41,7 +41,9 @@ function docker(args: string[], check = true): string {
 }
 const sh = (cmd: string) => docker(["exec", NAME, "bash", "-lc", cmd], false);
 
-// A bundle on disk: one rootfs file, two assets (one whose hash lies), three steps.
+// A bundle on disk: one rootfs file, three assets (one whose hash lies, one
+// an archive the first step discards), five steps: `after` and `later`
+// depend on `flaky`, `other` does not.
 const dir = mkdtempSync(join(tmpdir(), "superset-runner-check-"));
 const bundle = join(dir, "bundle");
 mkdirSync(join(bundle, "rootfs/etc/superset"), { recursive: true });
@@ -76,25 +78,30 @@ writeFileSync(
 	join(dir, "assets", `${liarSha}.txt`),
 	"what is actually served\n",
 );
+const archive = "an archive the first step unpacks\n";
+const archiveSha = sha256(archive);
+const archiveDest = `${SANDBOX_PATHS.media}/archive.txt`;
+writeFileSync(join(dir, "assets", `${archiveSha}.txt`), archive);
 writeFileSync(
 	join(bundle, "assets.tsv"),
-	`0644\t${goodSha}\t.txt\t${b64("/opt/check/good.txt")}\n0644\t${liarSha}\t.txt\t${b64("/opt/check/liar.txt")}\n`,
+	`0644\t${goodSha}\t.txt\t${b64("/opt/check/good.txt")}\n0644\t${liarSha}\t.txt\t${b64("/opt/check/liar.txt")}\n0644\t${archiveSha}\t.txt\t${b64(archiveDest)}\tfirst\n`,
 );
 writeFileSync(
 	join(bundle, "steps/first.sh"),
-	"#!/bin/bash\necho first ran >> /opt/check/steps.log\n",
+	`#!/bin/bash\ncat ${archiveDest} >> /opt/check/steps.log || exit 1\necho first ran >> /opt/check/steps.log\n`,
 );
 writeFileSync(
 	join(bundle, "steps/flaky.sh"),
 	"#!/bin/bash\necho flaky ran >> /opt/check/steps.log\n[ -f /opt/check/flaky-ok ] || exit 1\n",
 );
-writeFileSync(
-	join(bundle, "steps/after.sh"),
-	"#!/bin/bash\necho after ran >> /opt/check/steps.log\n",
-);
+for (const step of ["after", "other", "later"])
+	writeFileSync(
+		join(bundle, `steps/${step}.sh`),
+		`#!/bin/bash\necho ${step} ran >> /opt/check/steps.log\n`,
+	);
 writeFileSync(
 	join(bundle, "steps.tsv"),
-	"first\tv-first\nflaky\tv-flaky\nafter\tv-after\n",
+	"first\tv-first\t\t\nflaky\tv-flaky\t\t\nafter\tv-after\t\tflaky\nother\tv-other\t\t\nlater\tv-later\t\tflaky,after\n",
 );
 
 docker(["rm", "-f", NAME], false);
@@ -160,15 +167,15 @@ try {
 	// stays. Sidecars are what make a file "staged": a bare file is left alone.
 	const media = SANDBOX_PATHS.media;
 	sh(
-		`printf stale > ${media}/stale.bin && printf ${sha256("stale")} > ${media}/stale.bin.hash && printf keep > ${media}/keep.bin && printf ${goodSha} > ${media}/keep.bin.hash && printf loose > ${media}/loose.bin`,
+		`printf stale > ${media}/stale.bin && printf ${sha256("stale")} > ${media}/stale.bin.hash && printf ${sha256("gone")} > ${media}/gone.bin.hash && printf keep > ${media}/keep.bin && printf ${goodSha} > ${media}/keep.bin.hash && printf loose > ${media}/loose.bin`,
 	);
 	const sync3 = sh("/bundle/setup sync-assets 2>&1 | grep pruned || true");
 	expect(
-		"sync-assets prunes a staged archive the manifest no longer lists",
+		"sync-assets prunes a staged archive and a lone sidecar the manifest no longer lists",
 		/stale\.bin/.test(sync3) &&
 			sh(
-				`ls ${media}/stale.bin ${media}/stale.bin.hash 2>&1 | grep -c 'No such'`,
-			).trim() === "2",
+				`ls ${media}/stale.bin ${media}/stale.bin.hash ${media}/gone.bin.hash 2>&1 | grep -c 'No such'`,
+			).trim() === "3",
 		sync3.trim(),
 	);
 	expect(
@@ -179,21 +186,56 @@ try {
 	);
 
 	// run-steps: fail-open.
+	sh(
+		`mkdir -p ${steps} && printf 'sentinelVersion=1\\nconsecutiveFailures=3\\nfailedStepName=other\\n' > ${steps}/failure.env`,
+	);
 	const run1 = sh("/bundle/setup run-steps; echo exit=$?");
 	expect("run-steps exits 0 with a failing step", /exit=0/.test(run1));
 	expect(
-		"the failing step is recorded in the sentinel",
-		/consecutiveFailures=1/.test(sh(`cat ${steps}/failure.env`)),
+		"the failing step is recorded in its own failure file",
+		/consecutiveFailures=1/.test(sh(`cat ${steps}/flaky.failure`)),
 	);
 	expect(
-		"the step after the failure is skipped",
-		/after ran/.test(sh("cat /opt/check/steps.log")) === false &&
-			/downstream of failed flaky/.test(run1),
+		"the old single sentinel is removed",
+		sh(`ls ${steps}/failure.env 2>&1 | grep -c 'No such'`).trim() === "1",
+	);
+	expect(
+		"the steps that depend on the failure, directly or not, are skipped and name it",
+		!/(after|later) ran/.test(sh("cat /opt/check/steps.log")) &&
+			/step after skipped: downstream of failed flaky/.test(run1) &&
+			/step later skipped: downstream of failed flaky/.test(run1),
+		run1
+			.trim()
+			.split("\n")
+			.filter((l) => /skipped/.test(l))
+			.join(" | "),
+	);
+	expect(
+		"a step after the failure that does not depend on it runs and is marked",
+		/other ran/.test(sh("cat /opt/check/steps.log")) &&
+			sh(`cat ${steps}/other.version`).trim() === "v-other",
 	);
 	expect(
 		"the step before it ran and is marked",
 		/first ran/.test(sh("cat /opt/check/steps.log")) &&
 			sh(`cat ${steps}/first.version`).trim() === "v-first",
+	);
+	expect(
+		"a step that succeeds discards its archive and keeps the sidecar",
+		/discarded .*archive\.txt/.test(run1) &&
+			sh(`ls ${media}/archive.txt 2>&1 | grep -c 'No such'`).trim() === "1" &&
+			sh(`cat ${media}/archive.txt.hash`).trim() === archiveSha,
+	);
+	const sync4 = sh("/bundle/setup sync-assets 2>&1");
+	expect(
+		"sync-assets neither fetches nor prunes a discarded archive",
+		!/archive\.txt/.test(sync4) &&
+			sh(`cat ${media}/archive.txt.hash`).trim() === archiveSha,
+		sync4
+			.trim()
+			.split("\n")
+			.filter((l) => /archive/.test(l))
+			.join(" | "),
 	);
 	const run2 = sh("/bundle/setup run-steps");
 	expect(
@@ -203,18 +245,35 @@ try {
 	sh("/bundle/setup run-steps >/dev/null");
 	expect(
 		"three failures disable the step",
-		/consecutiveFailures=3/.test(sh(`cat ${steps}/failure.env`)),
+		/consecutiveFailures=3/.test(sh(`cat ${steps}/flaky.failure`)),
 	);
 	const run4 = sh("/bundle/setup run-steps");
 	expect(
 		"a disabled step is not retried and downstream stays skipped",
-		/flaky skipped: flaky disabled after 3 failures/.test(run4) &&
-			/after skipped/.test(run4),
+		/step flaky skipped: disabled after 3 failures/.test(run4) &&
+			/step after skipped: downstream of failed flaky/.test(run4),
 		run4
 			.trim()
 			.split("\n")
 			.filter((l) => /skipped/.test(l))
 			.join(" | "),
+	);
+	expect(
+		"a disabled step that then succeeds by hand is no longer disabled",
+		(() => {
+			sh(
+				`cp -a ${steps} /opt/check/steps-before && touch /opt/check/flaky-ok && /bundle/setup run-step flaky`,
+			);
+			const out = sh("/bundle/setup run-steps");
+			const ok =
+				/step flaky at v-flaky, skipping/.test(out) &&
+				/step after running/.test(out) &&
+				sh(`ls ${steps}/flaky.failure 2>&1 | grep -c 'No such'`).trim() === "1";
+			sh(
+				`rm -rf ${steps} /opt/check/flaky-ok && mv /opt/check/steps-before ${steps}`,
+			);
+			return ok;
+		})(),
 	);
 	expect(
 		"status shows the failure",
@@ -230,9 +289,14 @@ try {
 			const out = sh("/bundle/setup run-steps");
 			return (
 				/first ran/.test(sh("cat /opt/check/steps.log")) &&
-				/flaky skipped: flaky disabled/.test(out)
+				/flaky skipped: disabled/.test(out)
 			);
 		})(),
+	);
+	expect(
+		"a step that re-runs fetches its discarded archive first, then discards it again",
+		sh("cat /opt/check/steps.log").includes(archive) &&
+			sh(`ls ${media}/archive.txt 2>&1 | grep -c 'No such'`).trim() === "1",
 	);
 	// A new version clears the sentinel; success clears it for good.
 	sh(
@@ -240,14 +304,60 @@ try {
 	);
 	const run5 = sh("/bundle/setup run-steps");
 	expect(
-		"a new version retries the step; success clears the sentinel and runs downstream",
-		!/failure\.env/.test(sh(`ls ${steps}`)) &&
-			/after ran/.test(sh("cat /opt/check/steps.log")),
+		"a new version retries the step; success clears its failure file and runs downstream",
+		!/\.failure/.test(sh(`ls ${steps}`)) &&
+			/after ran/.test(sh("cat /opt/check/steps.log")) &&
+			/later ran/.test(sh("cat /opt/check/steps.log")),
 		run5.trim().split("\n").pop(),
 	);
 	expect(
 		"status shows every step current",
 		!/pending|never run|failed/.test(sh("/bundle/setup status")),
+	);
+
+	// A stale file a link on PATH points at stays until the link moves.
+	sh(
+		`printf old > ${media}/linked.bin && printf ${sha256("old")} > ${media}/linked.bin.hash && ln -sfn ${media}/linked.bin /usr/local/bin/check-linked`,
+	);
+	sh("/bundle/setup sync-assets >/dev/null 2>&1");
+	expect(
+		"sync-assets keeps a stale file a link on PATH points at",
+		sh("cat /usr/local/bin/check-linked") === "old",
+	);
+	sh("rm /usr/local/bin/check-linked");
+	expect(
+		"run-steps prunes it once the link is gone",
+		/pruned .*linked\.bin/.test(sh("/bundle/setup run-steps")),
+	);
+
+	// Phases: flaky becomes a before-host step at a version it has not run.
+	sh(
+		`rm -f /opt/check/steps.log && awk -F'\t' -v OFS='\t' '$1 == "flaky" { $2 = "v-flaky-3"; $5 = "host" } { print }' /bundle/steps.tsv > /tmp/steps.tsv && mv /tmp/steps.tsv /bundle/steps.tsv && sed -i 's/v-after/v-after-2/; s/v-other/v-other-2/' /bundle/steps.tsv`,
+	);
+	const after1 = sh("/bundle/setup run-steps after-host");
+	expect(
+		"after-host does not run a before-host step, and skips what depends on one that is not current",
+		!/flaky ran/.test(sh("cat /opt/check/steps.log")) &&
+			/other ran/.test(sh("cat /opt/check/steps.log")) &&
+			/step after skipped: downstream of failed flaky/.test(after1),
+		after1
+			.trim()
+			.split("\n")
+			.filter((l) => /step/.test(l))
+			.join(" | "),
+	);
+	sh("rm -f /opt/check/steps.log");
+	sh("/bundle/setup run-steps before-host >/dev/null");
+	expect(
+		"before-host runs only the before-host steps",
+		sh("cat /opt/check/steps.log").trim() === "flaky ran",
+		sh("cat /opt/check/steps.log").trim().replaceAll("\n", ", "),
+	);
+	sh("/bundle/setup run-steps after-host >/dev/null");
+	expect(
+		"after-host then runs what depends on it",
+		/after ran/.test(sh("cat /opt/check/steps.log")) &&
+			!/pending|never run|failed/.test(sh("/bundle/setup status")),
 	);
 } finally {
 	docker(["rm", "-f", NAME], false);

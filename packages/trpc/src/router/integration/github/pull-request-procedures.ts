@@ -29,6 +29,27 @@ async function onGithub<T>(
 	}
 }
 
+const warnedRefusals = new Set<string>();
+
+function warnRefusedOnce(repoFullName: string, error: unknown) {
+	const errors = (error as { errors?: { path?: unknown[] }[] }).errors ?? [];
+	const paths = [
+		...new Set(
+			errors.map(
+				(entry) =>
+					entry?.path
+						?.map((key) => (typeof key === "number" ? "*" : key))
+						.join(".") ?? "?",
+			),
+		),
+	].join(", ");
+	if (warnedRefusals.has(paths)) return;
+	warnedRefusals.add(paths);
+	console.warn(
+		`[github.getPullRequestDetail] GitHub refused ${paths} on ${repoFullName}`,
+	);
+}
+
 /**
  * A pull request by its own identity, read and written as the person asking.
  * The work is `@superset/shared/pull-request-github`, which the desktop also
@@ -41,7 +62,10 @@ export const pullRequestProcedures = {
 		.query(async ({ ctx, input }): Promise<PullRequestDetailRead> => {
 			const pr = await asViewer(ctx.session.user.id, input);
 			return onGithub(`Failed to read pull request #${pr.number}`, () =>
-				pr.detail({ activity: input.activity }),
+				pr.detail({
+					activity: input.activity,
+					onRefused: (error) => warnRefusedOnce(input.repoFullName, error),
+				}),
 			);
 		}),
 

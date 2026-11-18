@@ -1,3 +1,4 @@
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useQueries } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
@@ -144,7 +145,7 @@ export function useWorkspaceHost(
 					retrySandbox();
 					void served?.refetch();
 				},
-				isResolving: !host && cloud.status === "ready",
+				isResolving: !host && isLiveCloudWorkspaceStatus(cloud.status),
 			};
 		}
 		let workspace: HostWorkspaceRow | null = null;

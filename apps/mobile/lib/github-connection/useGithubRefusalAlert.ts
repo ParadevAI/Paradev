@@ -18,7 +18,7 @@ export function useGithubRefusalAlert() {
 				t({ message: "Connect GitHub to continue" }),
 				t({
 					message:
-						"Superset acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests.",
+						"Paradev acts on GitHub as you. Connect your GitHub account to merge, comment on and update pull requests.",
 				}),
 				[
 					{ text: t({ message: "Not now" }), style: "cancel" },

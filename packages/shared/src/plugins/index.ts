@@ -545,6 +545,15 @@ export const PLUGIN_CATALOG: readonly PluginCatalogEntry[] = [
 		},
 	},
 	{
+		name: "ahrefs",
+		version: "1.0.0",
+		description: "Research backlinks, keywords, and rankings",
+		interface: { displayName: "Ahrefs", category: "Data & APIs" },
+		mcpServers: {
+			ahrefs: { type: "http", url: "https://api.ahrefs.com/mcp/mcp" },
+		},
+	},
+	{
 		name: "wispr",
 		version: "1.0.0",
 		description: "Search your meeting notes and transcripts",

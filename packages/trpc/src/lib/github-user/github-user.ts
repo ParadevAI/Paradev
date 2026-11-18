@@ -8,6 +8,7 @@
 import { db } from "@superset/db/client";
 import { githubUserConnections } from "@superset/db/schema";
 import { withConnectionLock } from "@superset/db/utils";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
@@ -46,7 +47,7 @@ function clientCredentials(): { clientId: string; clientSecret: string } {
 }
 
 export function githubUserCallbackUrl(): string {
-	return `${env.NEXT_PUBLIC_API_URL}/api/github/user/callback`;
+	return `${getBrowserApiUrl(env)}/api/github/user/callback`;
 }
 
 function tokenAad(userId: string, kind: "access" | "refresh"): string {
