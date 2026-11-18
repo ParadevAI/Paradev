@@ -40,6 +40,21 @@ export const SANDBOX_PATHS = {
 } as const;
 
 /**
+ * Where bundles before the agents drive put the agent CLIs on the box's own
+ * disk. A golden that holds one of these is from before the drive and every
+ * fork of it carries the bytes, so it is rebuilt from the image, not forked.
+ */
+export const SANDBOX_ROOT_DISK_AGENTS = [
+	"/opt/codex",
+	"/opt/pdev",
+	`${SANDBOX_PATHS.media}/claude-*`,
+	`${SANDBOX_PATHS.steps}/install-agent-clis.version`,
+] as const;
+
+/** Prints each root-disk agent path that exists; prints nothing on a clean disk. */
+export const ROOT_DISK_AGENTS_COMMAND = `ls -d ${SANDBOX_ROOT_DISK_AGENTS.join(" ")} 2>/dev/null || true`;
+
+/**
  * The agent CLIs of one bundle in one region: written once by the release,
  * then only ever mounted read-only. A drive only mounts in its own region.
  */

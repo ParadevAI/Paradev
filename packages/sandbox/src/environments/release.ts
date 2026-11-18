@@ -39,6 +39,7 @@ import { join } from "node:path";
 import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
+	ROOT_DISK_AGENTS_COMMAND,
 	SANDBOX_CONTRACT_VERSION,
 	SANDBOX_PATHS,
 	SANDBOX_ROOT_CHECKOUT,
@@ -261,7 +262,6 @@ for (;;) {
 				managedEnv: {},
 				networkPolicy: "allow-all",
 				vcpus: GOLDEN_BOX_VCPUS,
-				agentTools: true,
 			},
 		});
 		break;
@@ -285,7 +285,6 @@ await wakeSandbox({
 		managedEnv: {},
 		networkPolicy: "allow-all",
 		vcpus: GOLDEN_BOX_VCPUS,
-		agentTools: true,
 	},
 });
 log("golden: host-service up; waiting for the checkout");
@@ -370,6 +369,13 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	["agent-device", "agent-device --version", /\d+\.\d+\.\d+/],
 	["stripe", "stripe --version", /\d+\.\d+\.\d+/],
 ];
+if (!SKIP_IMAGE) {
+	checks.push([
+		"no agent CLI on the golden's root disk",
+		`[ -z "$(${ROOT_DISK_AGENTS_COMMAND})" ] && echo clean`,
+		/^clean$/m,
+	]);
+}
 let failed = 0;
 for (const [label, command, expect] of checks) {
 	const { logs } = await run(goldenBox, command);
@@ -447,7 +453,6 @@ const probeClaim = {
 	managedEnv,
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
-	agentTools: true,
 };
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({
@@ -458,6 +463,7 @@ await provisionSandbox({
 await wakeSandbox({ providerSandboxId: probe, claim: probeClaim });
 let probeFailed = await probeBox({
 	name: probe,
+	imageFromThisCheckout: !SKIP_IMAGE,
 	credentials,
 	hostSecret: probeSecret,
 	bundleSha: bundle.sha256,

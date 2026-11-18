@@ -12,6 +12,7 @@ import { nudge } from "../../lib/realtime";
 import {
 	bootPhases,
 	buildSandboxClaim,
+	CLOUD_WORKSPACE_NOT_STARTED,
 	deleteSandbox,
 	provisionSandbox,
 	SandboxNotReadyError,
@@ -263,7 +264,7 @@ async function provision(
 			reason: provisionFailureReason(error),
 			error,
 		});
-		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
+		await failChatMovesTo(row.id, CLOUD_WORKSPACE_NOT_STARTED).catch(
 			(moveError) =>
 				console.error(
 					`[cloud-workspace] could not fail the chat moves into ${row.id}`,

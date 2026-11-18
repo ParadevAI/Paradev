@@ -37,6 +37,7 @@ import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
+	AgentToolsUnavailableError,
 	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
@@ -172,7 +173,10 @@ async function addressSandbox(
 				: await wakeCloudWorkspace(row);
 		return { ...woken, running: true };
 	} catch (error) {
-		if (error instanceof SandboxNotReadyError) {
+		if (
+			error instanceof SandboxNotReadyError ||
+			error instanceof AgentToolsUnavailableError
+		) {
 			throw new TRPCError({
 				code: "TIMEOUT",
 				message: "Cloud workspace is still starting",

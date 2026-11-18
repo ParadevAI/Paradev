@@ -945,16 +945,23 @@ recorded against the API and a runtime failure against the sandbox, and that id
 is the only thing that joins the two halves of one broken workspace.
 
 **A drive mount lasts one session and a fork does not inherit it — open.**
-For organizations with the `sandbox-agent-tools-drive` PostHog flag, the agent
-CLIs come from the bundle's `agent-tools-<region>-<bundle sha 12>` drive,
-mounted read-only at `/opt/agents`. A machine someone owns keeps a mount; a
-sandbox gets one only from `Sandbox.create`, `Sandbox.fork` or
-`sandbox.update({ mounts })` before the session starts, so `provisionSandbox`
-and `wakeSandbox` both pass it. A drive lives in one region and mounts only in
-that region. A session without the mount leaves links in `/usr/local/bin`
-that point nowhere; `superset-boot` re-runs `install-agent-clis` to put the
-image's agents back. OpenCode and Pi exist only on the drive, so for them it
-deletes the link instead.
+The agent CLIs come only from the bundle's `agent-tools-<region>-<bundle sha 12>`
+drive, mounted read-only at `/opt/agents`; a new box's own disk has none, and
+an older golden's disk copies are left alone and never used. A machine someone
+owns keeps a mount; a sandbox gets one only from `Sandbox.create`,
+`Sandbox.fork` or `sandbox.update({ mounts })` before the session starts, so
+`provisionSandbox` and `wakeSandbox` pass it, and a promote's restart is a
+wake. A drive lives in one region and mounts only there, so it is named by
+the box's own region, and the release writes one in every region. A drive
+that cannot be mounted after a few tries on 429 and 5xx fails the create or
+the wake the way any box that will not start does ("The cloud workspace could
+not start"; a wake answers "Cloud workspace is still starting"): a customer
+never sees the drive. The drive, region and bundle go only to Sentry and the
+server log. A promote keeps its golden. A boot that finds no
+manifest at `/opt/agents` is refused before host-service starts. **Open:** a
+running session whose host-service died is booted again without a remount,
+since a mount cannot be added to a live session; if that session has no
+drive, its boots are refused until the box is stopped and opened again.
 
 **An agent on the drive cannot update itself.** On a machine someone owns,
 OpenCode and Pi update in place, beside their binary. On a box they run from

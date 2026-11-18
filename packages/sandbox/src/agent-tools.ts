@@ -13,8 +13,7 @@
  *
  * A new drive starts as a fork of the region's newest earlier one, so the
  * builder fetches only the agents whose sha changed. Each agent fails alone:
- * it keeps the earlier drive's version, or is left out and boxes use the
- * image's copy.
+ * it keeps the earlier drive's version, or is left out and boxes have none.
  *
  *   bun run agent-tools --bundle <sha> [--region sfo1 ...]
  *
@@ -411,7 +410,7 @@ export function describeAgentToolsPublish(
 	return results.flatMap((entry) => {
 		if ("error" in entry) {
 			return [
-				`::warning::agent-tools: ${entry.region} not published; its boxes keep the image's agents: ${String(entry.error).slice(0, 300)}`,
+				`::warning::agent-tools: ${entry.region} not published; its boxes have no agents: ${String(entry.error).slice(0, 300)}`,
 			];
 		}
 		const { drive, outcome, forkedFrom, agents } = entry.result;
@@ -427,7 +426,7 @@ export function describeAgentToolsPublish(
 						]
 					: agent.outcome === "dropped"
 						? [
-								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes keep the image's ${agent.name}, if the image has one`,
+								`::warning::agent-tools: ${drive}: ${agent.name} left out; its boxes have no ${agent.name}`,
 							]
 						: [],
 			),

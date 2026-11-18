@@ -8,6 +8,7 @@ import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
+	ROOT_DISK_AGENTS_COMMAND,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
@@ -28,6 +29,12 @@ export interface ProbeArgs {
 	expectDependencies?: boolean;
 	/** Set when a brokered Anthropic rule is on the box's firewall. */
 	expectAnthropicRule?: boolean;
+	/**
+	 * True when the box's image was built from this checkout, so its root disk
+	 * must hold no agent CLI. An older image still has its own copies; then only
+	 * the bundle is checked, which must install none.
+	 */
+	imageFromThisCheckout?: boolean;
 	/** A gate to mint a ticket at; skipped when the secret is absent. */
 	gate?: { workspaceId: string; userId: string } | null;
 	log: (line: string) => void;
@@ -148,6 +155,28 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 				!/unknown option|unexpected argument|not found in PATH/i.test(out),
 			out.trim().split("\n").slice(0, 2).join(" "),
 		);
+	}
+	const rootDiskAgents = (await run(ROOT_DISK_AGENTS_COMMAND)).trim();
+	if (args.imageFromThisCheckout) {
+		check(
+			"no agent CLI on the box's root disk, so none in its golden",
+			rootDiskAgents === "",
+			rootDiskAgents.replaceAll("\n", " "),
+		);
+	} else {
+		const steps = await run(
+			`cut -f1 ${SANDBOX_PATHS.bundleRoot}/current/steps.tsv`,
+		);
+		check(
+			"the bundle installs no agent CLI on the root disk",
+			/\binstall-host\b/.test(steps) && !/install-agent-clis/.test(steps),
+			steps.trim().replaceAll("\n", " "),
+		);
+		if (rootDiskAgents) {
+			log(
+				`info the image predates this checkout and still holds: ${rootDiskAgents.replaceAll("\n", " ")}`,
+			);
+		}
 	}
 	const cliVersion = await run("superset --version");
 	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { userError } from "../../i18n-error";
+import { AgentToolsUnavailableError } from "../../lib/sandbox/vercel";
 import { classifyDispatchError } from "./run";
 
 describe("classifyDispatchError", () => {
@@ -15,5 +16,13 @@ describe("classifyDispatchError", () => {
 				),
 			).toBe("cloud_usage_limit_reached");
 		}
+	});
+
+	test("a box whose agents drive cannot be mounted is a cloud box that is not ready", () => {
+		expect(
+			classifyDispatchError(
+				new AgentToolsUnavailableError("agent-tools-sfo1-0123456789ab"),
+			),
+		).toBe("cloud_not_ready");
 	});
 });

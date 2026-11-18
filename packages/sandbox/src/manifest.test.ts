@@ -357,9 +357,7 @@ describe("renderAssetsTsv", () => {
 		const owners = discardingSteps(
 			loadSteps(join(import.meta.dir, "..", "bundle", "steps.json")),
 		);
-		expect(owners.has("claude")).toBe(false);
 		expect(owners.has("cli")).toBe(false);
-		expect(owners.get("codex")).toBe("install-agent-clis");
 		expect(owners.get("chrome")).toBe("install-chrome");
 		expect(owners.get("host-service")).toBe("install-host");
 	});

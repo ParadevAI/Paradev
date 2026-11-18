@@ -466,7 +466,6 @@ async function claude(version?: string): Promise<void> {
 		claude: {
 			sha256: hash,
 			suffix: "",
-			dest: `${SANDBOX_PATHS.media}/claude-${pinned}`,
 			mode: "0755",
 			source,
 			version: pinned,
@@ -500,7 +499,6 @@ async function codex(version?: string): Promise<void> {
 		codex: {
 			sha256: hash,
 			suffix: ".tar.gz",
-			dest: `${SANDBOX_PATHS.media}/codex-${pinned}.tar.gz`,
 			mode: "0644",
 			source: asset.browser_download_url,
 			version: pinned,
@@ -534,7 +532,6 @@ async function pdev(version?: string): Promise<void> {
 		pdev: {
 			sha256: hash,
 			suffix: ".tar.gz",
-			dest: `${SANDBOX_PATHS.media}/pdev-${pinned}.tar.gz`,
 			mode: "0644",
 			source: asset.browser_download_url,
 			version: pinned,

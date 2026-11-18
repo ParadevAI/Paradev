@@ -108,7 +108,6 @@ const claim = {
 	managedEnv: { SUPERSET_REAL_CHECK: "1" },
 	networkPolicy: "allow-all" as const,
 	vcpus: GOLDEN_BOX_VCPUS,
-	agentTools: true,
 };
 
 log(
