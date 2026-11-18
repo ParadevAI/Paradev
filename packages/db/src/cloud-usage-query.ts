@@ -70,14 +70,12 @@ const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 
 export interface CloudUsageFilters {
 	user?: string;
-	workspace?: string;
+	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
 }
 
-export interface CloudFleetFilters
-	extends Omit<CloudUsageFilters, "workspace"> {
-	workspace?: string | string[];
+export interface CloudFleetFilters extends CloudUsageFilters {
 	project?: string;
 }
 

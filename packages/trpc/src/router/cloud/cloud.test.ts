@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, mock, test } from "bun:test";
 import type { CloudUsage } from "@superset/auth/billing";
 import {
 	ADA,
@@ -18,7 +18,7 @@ import {
 	createTRPCContext,
 	createTRPCRouter,
 } from "../../trpc";
-import { cloudRouterWith } from "./cloud";
+import { type CloudDeps, cloudRouterWith } from "./cloud";
 
 const CLOUD_USAGE: CloudUsage = {
 	includedGbMinutes: 1200,
@@ -40,14 +40,17 @@ beforeAll(async () => {
 function caller(
 	userId: string,
 	{
-		cloudUsage = CLOUD_USAGE,
 		enabled = true,
-	}: { cloudUsage?: CloudUsage | null; enabled?: boolean } = {},
+		readCloudUsage = async () => CLOUD_USAGE,
+	}: {
+		enabled?: boolean;
+		readCloudUsage?: CloudDeps["cloudUsage"];
+	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
-			cloudUsage: async () => cloudUsage,
+			cloudUsage: readCloudUsage,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
 	});
@@ -143,14 +146,22 @@ describe("scope", () => {
 	});
 });
 
+const encoded = (cursor: object) =>
+	Buffer.from(JSON.stringify(cursor)).toString("base64url");
+
+const decoded = (cursor: string) =>
+	JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+
 test("a cursor that does not decode is BAD_REQUEST", async () => {
 	const owner = caller(MAYA);
-	const encoded = (keyset: object) =>
-		Buffer.from(JSON.stringify(keyset)).toString("base64url");
+	const filters = { groupBy: "workspace", range: NOVEMBER };
 	for (const cursor of [
 		"not-a-cursor",
-		encoded({ sort: "gbMinutes", value: "1 or 1=1", key: "" }),
-		encoded({ sort: "key", key: "2026-11-17" }),
+		encoded({
+			filters,
+			keyset: { sort: "gbMinutes", value: "1 or 1=1", key: "" },
+		}),
+		encoded({ filters, keyset: { sort: "key", key: "2026-11-17" } }),
 	]) {
 		await expect(
 			owner.usage.query({ range: NOVEMBER, groupBy: "workspace", cursor }),
@@ -159,12 +170,72 @@ test("a cursor that does not decode is BAD_REQUEST", async () => {
 	await expect(
 		owner.boots.list({
 			range: NOVEMBER,
-			cursor: encoded({ sort: "startedAt", value: "yesterday", key: "boot_1" }),
+			cursor: encoded({
+				filters: { range: NOVEMBER },
+				keyset: { sort: "startedAt", value: "yesterday", key: "boot_1" },
+			}),
 		}),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 	await expect(
 		owner.periods.list({ cursor: "2026-10-02" }),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
+});
+
+test("a cursor read with other filters, or made before cursors held them, is BAD_REQUEST", async () => {
+	const owner = caller(MAYA);
+	const usageCursor = (
+		await owner.usage.query({ range: NOVEMBER, groupBy: "workspace", limit: 1 })
+	).nextCursor;
+	const bootsCursor = (await owner.boots.list({ range: NOVEMBER, limit: 1 }))
+		.nextCursor;
+	if (!usageCursor || !bootsCursor) throw new Error("No second page to read");
+	const notValid = {
+		code: "BAD_REQUEST",
+		message:
+			"That cursor could not be read. Drop it to start from the first page.",
+	};
+	for (const input of [
+		{ range: NOVEMBER, groupBy: "user" },
+		{ range: "30d", groupBy: "workspace" },
+		{ range: NOVEMBER, groupBy: "workspace", workspace: CHECKOUT },
+	] as const) {
+		await expect(
+			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
+		).rejects.toMatchObject(notValid);
+	}
+	for (const input of [
+		{ range: "30d" },
+		{ range: NOVEMBER, workspace: CHECKOUT },
+		{ range: NOVEMBER, open: true },
+	] as const) {
+		await expect(
+			owner.boots.list({ ...input, limit: 1, cursor: bootsCursor }),
+		).rejects.toMatchObject(notValid);
+	}
+	const unbound = encoded({ sort: "gbMinutes", value: "1080", key: CHECKOUT });
+	await expect(
+		owner.usage.query({
+			range: NOVEMBER,
+			groupBy: "workspace",
+			cursor: unbound,
+		}),
+	).rejects.toMatchObject(notValid);
+});
+
+test("a cursor's filters match in any key order", async () => {
+	const owner = caller(MAYA);
+	const input = { range: NOVEMBER, groupBy: "workspace", limit: 1 } as const;
+	const { nextCursor } = await owner.usage.query(input);
+	if (!nextCursor) throw new Error("No second page to read");
+	const { filters, keyset } = decoded(nextCursor);
+	expect(Object.keys(filters)).toEqual(["groupBy", "range"]);
+	const reordered = encoded({
+		keyset,
+		filters: { range: filters.range, groupBy: filters.groupBy },
+	});
+	expect(await owner.usage.query({ ...input, cursor: reordered })).toEqual(
+		await owner.usage.query({ ...input, cursor: nextCursor }),
+	);
 });
 
 test("paging one row at a time with the opaque cursor returns every row once", async () => {
@@ -201,8 +272,9 @@ test("paging one row at a time with the opaque cursor returns every row once", a
 	).toEqual(boots.map((boot) => boot.id));
 });
 
-test("with the flag off every procedure is FORBIDDEN", async () => {
-	const off = caller(MAYA, { enabled: false });
+test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {
+	const readCloudUsage = mock(async () => CLOUD_USAGE);
+	const off = caller(MAYA, { enabled: false, readCloudUsage });
 	for (const call of [
 		() => off.usage.query({ range: "7d" }),
 		() => off.boots.list({ range: "7d" }),
@@ -210,6 +282,7 @@ test("with the flag off every procedure is FORBIDDEN", async () => {
 	]) {
 		await expect(call()).rejects.toMatchObject({ code: "FORBIDDEN" });
 	}
+	expect(readCloudUsage).not.toHaveBeenCalled();
 });
 
 test("periods run from the open one back to the one the organization was created in", async () => {
@@ -237,7 +310,7 @@ test("periods run from the open one back to the one the organization was created
 });
 
 test("with billing off there are no periods and no prices", async () => {
-	const owner = caller(MAYA, { cloudUsage: null });
+	const owner = caller(MAYA, { readCloudUsage: async () => null });
 	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),

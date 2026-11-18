@@ -14,7 +14,7 @@ import { organizations } from "@superset/db/schema";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
-import type { z } from "zod";
+import { z } from "zod";
 import { userError } from "../../i18n-error";
 import { posthog } from "../../lib/analytics";
 import { decodeCursor, encodeCursor } from "../../lib/cursor";
@@ -23,6 +23,7 @@ import { personProcedure } from "../../trpc";
 import { requireActiveOrgRole } from "../utils/active-org";
 import {
 	bootKeysetSchema,
+	type CloudListFilters,
 	type CloudRange,
 	cloudBootsInputSchema,
 	cloudBootsOutputSchema,
@@ -31,7 +32,8 @@ import {
 	cloudUsageInputSchema,
 	cloudUsageOutputSchema,
 	type RangePreset,
-	usageKeysetSchema,
+	type UsageKeyset,
+	usageKeysetSchemas,
 } from "./schema";
 
 export interface CloudDeps {
@@ -68,10 +70,41 @@ function cursorNotValid() {
 	});
 }
 
-function readCursor<T>(value: string, schema: z.ZodType<T>): T {
-	const keyset = decodeCursor(value, schema);
-	if (!keyset) throw cursorNotValid();
-	return keyset;
+const CURSOR_FILTER_KEYS = Object.keys({
+	endReason: true,
+	groupBy: true,
+	open: true,
+	range: true,
+	workspace: true,
+} satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
+
+function filtersOf(filters: Partial<Record<keyof CloudListFilters, unknown>>) {
+	return Object.fromEntries(
+		CURSOR_FILTER_KEYS.map((key) => [key, filters[key]]),
+	);
+}
+
+function readCursor<T>(
+	input: Partial<CloudListFilters> & { cursor?: string },
+	keyset: z.ZodType<T>,
+): T | undefined {
+	if (input.cursor === undefined) return undefined;
+	const cursor = decodeCursor(
+		input.cursor,
+		z.object({ filters: z.record(z.string(), z.unknown()), keyset }),
+	);
+	if (
+		!cursor ||
+		JSON.stringify(filtersOf(cursor.filters)) !==
+			JSON.stringify(filtersOf(input))
+	) {
+		throw cursorNotValid();
+	}
+	return cursor.keyset;
+}
+
+function writeCursor(input: Partial<CloudListFilters>, keyset: object): string {
+	return encodeCursor({ filters: filtersOf(input), keyset });
 }
 
 function windowFor(range: CloudRange, anchor: CloudBillingAnchor | null) {
@@ -109,14 +142,11 @@ export function cloudRouterWith(deps: CloudDeps) {
 			ctx,
 			deps.db,
 		);
-		const [enabled, cloudUsage] = await Promise.all([
-			organizationFlagEnabled(
-				deps.flags,
-				FEATURE_FLAGS.CLOUD_USAGE,
-				organizationId,
-			),
-			deps.cloudUsage(organizationId),
-		]);
+		const enabled = await organizationFlagEnabled(
+			deps.flags,
+			FEATURE_FLAGS.CLOUD_USAGE,
+			organizationId,
+		);
 		if (!enabled) {
 			throw userError({
 				code: "FORBIDDEN",
@@ -124,6 +154,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
 			});
 		}
+		const cloudUsage = await deps.cloudUsage(organizationId);
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };
@@ -144,11 +175,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
-					const keyset =
-						input.cursor === undefined
-							? undefined
-							: readCursor(input.cursor, usageKeysetSchema);
-					if (keyset && keyset.sort !== sort) throw cursorNotValid();
+					const keyset = readCursor<UsageKeyset>(
+						input,
+						usageKeysetSchemas[sort],
+					);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await queryCloudUsage(
 						deps.db,
@@ -170,7 +200,8 @@ export function cloudRouterWith(deps: CloudDeps) {
 						...result,
 						nextCursor:
 							nextCursor &&
-							encodeCursor(
+							writeCursor(
+								input,
 								sort === "key"
 									? { sort, key: nextCursor.key }
 									: { sort, value: nextCursor.gbMinutes, key: nextCursor.key },
@@ -184,10 +215,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudBootsInputSchema)
 				.output(cloudBootsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const keyset =
-						input.cursor === undefined
-							? undefined
-							: readCursor(input.cursor, bootKeysetSchema);
+					const keyset = readCursor(input, bootKeysetSchema);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await listCloudBoots(
 						deps.db,
@@ -211,7 +239,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						...result,
 						nextCursor:
 							nextCursor &&
-							encodeCursor({
+							writeCursor(input, {
 								sort: "startedAt",
 								value: nextCursor.startedAt.toISOString(),
 								key: nextCursor.id,

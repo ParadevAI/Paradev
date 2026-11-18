@@ -29,23 +29,30 @@ export type CloudRange = z.infer<typeof rangeSchema>;
 
 const limitSchema = z.number().int().min(1).max(100).default(25);
 
-export const cloudUsageInputSchema = z.object({
+const cloudListInputSchema = z.object({
 	workspace: z.uuid().optional(),
 	range: rangeSchema,
-	groupBy: z.enum(cloudUsageGroupByValues).optional(),
 	limit: limitSchema,
 	cursor: z.string().optional(),
 });
 
-/** Inside the opaque usage cursor. `value` is cast to numeric in SQL, so it must be decimal digits. */
-export const usageKeysetSchema = z.discriminatedUnion("sort", [
-	z.object({
+export const cloudUsageInputSchema = cloudListInputSchema.extend({
+	groupBy: z.enum(cloudUsageGroupByValues).optional(),
+});
+
+/** Inside the opaque usage cursor, by sort. `value` is cast to numeric in SQL, so it must be decimal digits. */
+export const usageKeysetSchemas = {
+	gbMinutes: z.object({
 		sort: z.literal("gbMinutes"),
 		value: z.string().regex(/^\d+(\.\d+)?$/),
 		key: z.string(),
 	}),
-	z.object({ sort: z.literal("key"), key: z.string() }),
-]);
+	key: z.object({ sort: z.literal("key"), key: z.string() }),
+};
+
+export type UsageKeyset = z.infer<
+	(typeof usageKeysetSchemas)[keyof typeof usageKeysetSchemas]
+>;
 
 /** Inside the opaque boots cursor. */
 export const bootKeysetSchema = z.object({
@@ -54,14 +61,15 @@ export const bootKeysetSchema = z.object({
 	key: z.string(),
 });
 
-export const cloudBootsInputSchema = z.object({
-	workspace: z.uuid().optional(),
+export const cloudBootsInputSchema = cloudListInputSchema.extend({
 	endReason: z.array(cloudWorkspaceBootEndReasonEnum).optional(),
 	open: z.boolean().optional(),
-	range: rangeSchema,
-	limit: limitSchema,
-	cursor: z.string().optional(),
 });
+
+export type CloudListFilters = Omit<
+	z.infer<typeof cloudUsageInputSchema> & z.infer<typeof cloudBootsInputSchema>,
+	"limit" | "cursor"
+>;
 
 export const cloudPeriodsInputSchema = z.object({
 	limit: z.number().int().min(1).max(24).default(6),
