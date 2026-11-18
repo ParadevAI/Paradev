@@ -7,12 +7,14 @@
 
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { agentCredentials, cloudWorkspaces } from "@superset/db/schema";
+import { agentCredentials } from "@superset/db/schema";
 import { CHATGPT_PROVIDER } from "@superset/shared/agent-credentials";
-import { and, eq, gt, inArray, isNull } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 import { renewChatgptSignIns } from "../../router/agent-credential";
-import { buildSandboxClaim } from "./claim";
-import { applySandboxPolicy } from "./vercel";
+import {
+	awakeBoxesCreatedBy,
+	reapplySandboxRules,
+} from "./refresh-credentials";
 
 /**
  * Boxes of a sign-in saved this recently get its rules again. Read from the
@@ -41,31 +43,14 @@ export async function renewChatgptSignInsAndBoxes(args: {
 			),
 		);
 	if (recent.length === 0) return { checked, boxesUpdated: 0, boxesLeft: 0 };
-	const boxes = await db
-		.select()
-		.from(cloudWorkspaces)
-		.where(
-			and(
-				inArray(
-					cloudWorkspaces.createdByUserId,
-					recent.map((row) => row.userId),
-				),
-				eq(cloudWorkspaces.status, "awake"),
-				isNull(cloudWorkspaces.deletedAt),
-			),
-		);
+	const boxes = await awakeBoxesCreatedBy(recent.map((row) => row.userId));
 	let boxesUpdated = 0;
 	let done = 0;
 	for (const row of boxes) {
 		if (Date.now() > args.updateBoxesUntil) break;
 		done++;
 		try {
-			const { claim } = await buildSandboxClaim({ row });
-			const outcome = await applySandboxPolicy({
-				providerSandboxId: row.providerSandboxId,
-				networkPolicy: claim.networkPolicy,
-			});
-			if (outcome === "applied") boxesUpdated++;
+			if ((await reapplySandboxRules(row)) === "applied") boxesUpdated++;
 		} catch (error) {
 			Sentry.captureException(error, {
 				tags: {
