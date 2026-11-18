@@ -73,7 +73,7 @@ function isNotFound(error: unknown): boolean {
 export class SandboxUnavailableError extends Error {
 	constructor(
 		readonly providerSandboxId: string,
-		cause: unknown,
+		cause?: unknown,
 	) {
 		super(`Sandbox ${providerSandboxId} is unavailable`, { cause });
 	}
@@ -87,7 +87,7 @@ function isUnavailable(error: unknown): boolean {
 }
 
 /** Vercel starts a new session on every resume, so the id tells a stale record from a fresh one. */
-function sessionIdOf(sandbox: Sandbox): string | null {
+function sessionIdOf(sandbox: Pick<Sandbox, "currentSession">): string | null {
 	try {
 		return sandbox.currentSession().sessionId;
 	} catch {
@@ -95,14 +95,60 @@ function sessionIdOf(sandbox: Sandbox): string | null {
 	}
 }
 
-async function getSandbox(name: string): Promise<Sandbox | null> {
+/** The session ended under the call: the SDK's own resume-and-retry case. */
+function isSessionStopped(error: unknown): boolean {
+	if (!(error instanceof APIError)) return false;
+	if (error.response.status === 410) return true;
+	const code = (error.json as { error?: { code?: string } } | undefined)?.error
+		?.code;
+	return (
+		error.response.status === 422 &&
+		(code === "sandbox_stopping" || code === "sandbox_snapshotting")
+	);
+}
+
+/**
+ * Most of a handle's calls resume a stopped session and retry. Only a wake
+ * or a create may do that, so every other caller gets the members that
+ * cannot, and acts on a running session through `currentSession()`, whose
+ * calls fail on a stopped one instead.
+ */
+type NonResumingSandbox = Pick<
+	Sandbox,
+	| "name"
+	| "status"
+	| "region"
+	| "vcpus"
+	| "expiresAt"
+	| "currentSnapshotId"
+	| "domain"
+	| "currentSession"
+	| "update"
+	| "stop"
+	| "delete"
+	| "listSessions"
+>;
+
+/** A handle whose calls resume a stopped session: for a wake or a create only. */
+async function getSandboxToWake(
+	name: string,
+	onResume?: (sandbox: Sandbox) => Promise<void>,
+): Promise<Sandbox | null> {
 	try {
-		return await Sandbox.get({ ...credentials(), name, resume: false });
+		return await Sandbox.get({
+			...credentials(),
+			name,
+			resume: false,
+			onResume,
+		});
 	} catch (error) {
 		if (isNotFound(error)) return null;
 		throw error;
 	}
 }
+
+const getSandbox: (name: string) => Promise<NonResumingSandbox | null> =
+	getSandboxToWake;
 
 export interface SandboxEnvironment {
 	sourceKind: "image" | "fork";
@@ -281,7 +327,7 @@ export async function provisionSandbox(args: {
 		agentToolsDriveName(args.claim, args.environment.region),
 	);
 	const sandbox =
-		(await getSandbox(args.name)) ??
+		(await getSandboxToWake(args.name)) ??
 		(await Sentry.startSpan(
 			{
 				name:
@@ -412,16 +458,14 @@ export async function applySandboxPolicy(args: {
 	providerSandboxId: string;
 	networkPolicy: NetworkPolicy;
 }): Promise<"applied" | "not-running"> {
-	const sandbox = await Sandbox.get({
-		...credentials(),
-		name: args.providerSandboxId,
-		resume: false,
-	}).catch((error: unknown) => {
-		if (isNotFound(error)) return null;
+	const sandbox = await getSandbox(args.providerSandboxId);
+	if (sandbox?.status !== "running") return "not-running";
+	try {
+		await sandbox.update({ networkPolicy: args.networkPolicy });
+	} catch (error) {
+		if (isSessionStopped(error)) return "not-running";
 		throw error;
-	});
-	if (!sandbox || sandbox.status !== "running") return "not-running";
-	await sandbox.update({ networkPolicy: args.networkPolicy });
+	}
 	return "applied";
 }
 
@@ -435,11 +479,8 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	sessionId: string | null;
 }> {
 	try {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name: providerSandboxId,
-			resume: false,
-		});
+		const sandbox = await getSandbox(providerSandboxId);
+		if (!sandbox) throw new SandboxUnavailableError(providerSandboxId);
 		const running = sandbox.status === "running";
 		return {
 			hostTarget: sandbox.domain(HOST_SERVICE_PORT),
@@ -470,7 +511,12 @@ export async function topUpSandboxSession(
 	const extension =
 		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
 	if (extension > MIN_TOP_UP_MS) {
-		await sandbox.currentSession().extendTimeout(extension);
+		try {
+			await sandbox.currentSession().extendTimeout(extension);
+		} catch (error) {
+			if (isSessionStopped(error)) return null;
+			throw error;
+		}
 	}
 	return sandbox.expiresAt
 		? { expiresAt: sandbox.expiresAt, sessionId: sessionIdOf(sandbox) }
@@ -501,6 +547,8 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
+	/** A stopped box is left stopped, and the wake answers null. */
+	onlyIfRunning?: boolean;
 	/**
 	 * Runs once the box is known to be stopped, before anything resumes it; or,
 	 * for a box read running that a call here resumed (`resumedSession`), once
@@ -520,23 +568,22 @@ export async function wakeSandbox(args: {
 	answer: HostAnswer;
 	expiresAt: Date | null;
 	sessionId: string | null;
-}> {
+} | null> {
 	try {
 		let wasRunning = false;
 		let resumed = null as { vcpus: number; sessionId: string | null } | null;
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name: args.providerSandboxId,
-			resume: false,
-			// Any call on a Sandbox object resumes a stopped session and retries.
-			onResume: async (box) => {
+		const sandbox = await getSandboxToWake(
+			args.providerSandboxId,
+			async (box) => {
 				if (!wasRunning) return;
 				const session = box.currentSession();
 				resumed = { vcpus: session.vcpus, sessionId: session.sessionId };
 			},
-		});
+		);
+		if (!sandbox) throw new SandboxUnavailableError(args.providerSandboxId);
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
 		wasRunning = sandbox.status === "running";
+		if (args.onlyIfRunning && !wasRunning) return null;
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
 			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
@@ -679,7 +726,8 @@ export async function stripWorkspaceIdentity(sandbox: Sandbox): Promise<void> {
 export async function stopAndSnapshot(
 	name: string,
 ): Promise<{ sessionId: string | null }> {
-	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	const sandbox = await getSandbox(name);
+	if (!sandbox) throw new SandboxUnavailableError(name);
 	const before = sandbox.currentSnapshotId;
 	const sessionId = sessionIdOf(sandbox);
 	await sandbox.stop();
@@ -704,18 +752,14 @@ export async function promoteSandboxToEnvironment(args: {
 	/** The session the snapshot ended; null when the source was not running. */
 	stopped: { sessionId: string | null } | null;
 }> {
-	const source = await Sandbox.get({
-		...credentials(),
-		name: args.sourceSandbox,
-		resume: false,
-	});
+	const source = await getSandbox(args.sourceSandbox);
+	if (!source) throw new SandboxUnavailableError(args.sourceSandbox);
 	const stopped =
 		source.status === "running" ? { sessionId: sessionIdOf(source) } : null;
-	const snapshot = await source.snapshot();
 	const golden = await Sandbox.create({
 		...credentials(),
 		name: args.goldenName,
-		source: { type: "snapshot", snapshotId: snapshot.snapshotId },
+		source: { type: "snapshot", snapshotId: await snapshotNow(source) },
 		ports: publishedPorts(),
 		timeout: GOLDEN_SESSION_TIMEOUT_MS,
 		region: source.region as SandboxRegion,
@@ -734,22 +778,41 @@ export async function promoteSandboxToEnvironment(args: {
 }
 
 /**
+ * A running box's disk, snapshotted now; a stopped box's disk is the snapshot
+ * its stop took, so it is not resumed to take another.
+ */
+async function snapshotNow(source: NonResumingSandbox): Promise<string> {
+	if (source.status === "running") {
+		try {
+			return (await source.currentSession().snapshot()).snapshotId;
+		} catch (error) {
+			if (!isSessionStopped(error)) throw error;
+		}
+	} else if (source.status === "stopped") {
+		if (source.currentSnapshotId) return source.currentSnapshotId;
+		throw new SandboxUnavailableError(source.name);
+	} else if (source.status !== "stopping" && source.status !== "snapshotting") {
+		throw new SandboxUnavailableError(source.name);
+	}
+	return waitForStopSnapshot(source.name, source.currentSnapshotId);
+}
+
+/**
  * stop() returns while the sandbox is still `stopping`; a fork taken before
  * the stop's snapshot is current boots from whatever was current before.
  */
 export async function waitForStopSnapshot(
 	name: string,
 	previous: string | undefined,
-): Promise<void> {
+): Promise<string> {
 	const deadline = Date.now() + 3 * 60 * 1000;
 	while (Date.now() < deadline) {
-		const sandbox = await Sandbox.get({
-			...credentials(),
-			name,
-			resume: false,
-		});
+		const sandbox = await getSandbox(name);
+		if (!sandbox) throw new SandboxUnavailableError(name);
 		const current = sandbox.currentSnapshotId;
-		if (sandbox.status === "stopped" && current && current !== previous) return;
+		if (sandbox.status === "stopped" && current && current !== previous) {
+			return current;
+		}
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	}
 	throw new Error(`${name} did not snapshot in time`);

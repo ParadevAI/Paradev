@@ -139,6 +139,7 @@ for (;;) {
 	}
 }
 const woken = await wakeSandbox({ providerSandboxId: name, claim });
+if (!woken) throw new Error(`${name} did not wake`);
 log(
 	`host-service answered at ${woken.hostTarget} (${Date.now() - started} ms since start)`,
 );

@@ -664,8 +664,8 @@ export const cloudWorkspaceRouter = {
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
-			await wakeCloudWorkspace(row, { adoptSignIns: true });
-			return { applied: true };
+			const woken = await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: woken !== null };
 		}),
 
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */

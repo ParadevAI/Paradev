@@ -128,6 +128,13 @@ stub(sandbox, {
 	workspaceBranchName: () => "paradev/ws-1",
 });
 stub(wake, {
+	wakeCloudWorkspace: async () => {
+		if (!running) return null;
+		return {
+			hostTarget: "https://box-1.example",
+			agentCredentialsChanged: false,
+		};
+	},
 	restartCloudWorkspace: async (row: { machineSize: string }) => {
 		restartedWith.push(row.machineSize);
 		boxVcpus = 16;
@@ -250,6 +257,19 @@ describe("cloudWorkspace.setMachineSize", () => {
 				machineSize: "2xlarge",
 			}),
 		).rejects.toThrow('Machine size "2xlarge" is not available');
+	});
+});
+
+describe("cloudWorkspace.applySignIns", () => {
+	test("hands sign-ins to a running box, and leaves a stopped one for its next wake", async () => {
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: false });
+
+		running = true;
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: true });
 	});
 });
 
