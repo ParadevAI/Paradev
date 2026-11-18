@@ -19,6 +19,11 @@ import {
 	formatAgentPromptWithFileContext,
 } from "renderer/hooks/host-service/useSendToTerminalAgent";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
+import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import {
+	agentLaunchPreset,
+	useResolveOpenAsChat,
+} from "renderer/hooks/useResolveOpenAsChat";
 import { pullRequestRefFromUrl } from "renderer/lib/github/pullRequestRef";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import type { FileStatus } from "renderer/lib/pierreTree";
@@ -392,6 +397,8 @@ export function PullRequestCodeTab({
 	});
 	const linkedWorkspaceId = linkedWorkspaceData?.workspaceId ?? null;
 	const { submit: submitWorkspaceCreate } = useWorkspaceCreates();
+	const { agents: agentChoices } = useAgentChoices(hostUrl);
+	const resolveOpenAsChat = useResolveOpenAsChat();
 
 	// Mirrors DiffPane's split between "send to an existing terminal" and
 	// "create a new agent session", but the PR tab has no fixed workspace to
@@ -446,13 +453,26 @@ export function PullRequestCodeTab({
 			if (!hostId || !projectId) {
 				throw new Error("No host available to create a workspace");
 			}
+			const target = input.target;
+			const agentChoice = agentChoices.find(
+				(agent) => agent.id === target.configId,
+			);
+			const openAsChat =
+				agentChoice !== undefined &&
+				(await resolveOpenAsChat(agentLaunchPreset(agentChoice)));
 			const { completed } = submitWorkspaceCreate({
 				hostId,
 				snapshot: {
 					id: crypto.randomUUID(),
 					projectId,
 					pr: prNumber,
-					agents: [{ agent: input.target.configId, prompt: text }],
+					agents: [
+						{
+							agent: input.target.configId,
+							prompt: text,
+							...(openAsChat ? { surface: "chat" as const } : {}),
+						},
+					],
 				},
 			});
 			const outcome = await completed;

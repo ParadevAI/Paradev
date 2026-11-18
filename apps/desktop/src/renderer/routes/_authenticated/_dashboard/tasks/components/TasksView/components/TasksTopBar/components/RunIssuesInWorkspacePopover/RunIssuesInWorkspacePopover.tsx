@@ -20,6 +20,10 @@ import { AgentSelect } from "renderer/components/AgentSelect";
 import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProjects";
 import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
+import {
+	agentLaunchPreset,
+	useResolveOpenAsChat,
+} from "renderer/hooks/useResolveOpenAsChat";
 import { useSelectedHostProjectIds } from "renderer/hooks/useSelectedHostProjectIds";
 import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { DevicePicker } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker";
@@ -65,6 +69,7 @@ export function RunIssuesInWorkspacePopover({
 	const { machineId, activeHostUrl } = hostService;
 	const { otherHosts } = useWorkspaceHostOptions();
 	const { submit } = useWorkspaceCreates();
+	const resolveOpenAsChat = useResolveOpenAsChat();
 
 	const lastHostId = useWorkspaceCreateDefaultsStore(
 		(state) => state.lastHostId,
@@ -217,7 +222,7 @@ export function RunIssuesInWorkspacePopover({
 		t,
 	]);
 
-	const handleRun = () => {
+	const handleRun = async () => {
 		if (!selectedProjectId || !hostId) return;
 		if (submitBlocker) {
 			if (hostId === machineId && !activeHostUrl) {
@@ -231,6 +236,15 @@ export function RunIssuesInWorkspacePopover({
 		}
 
 		setLastProjectId(selectedProjectId);
+		setOpen(false);
+		onComplete();
+
+		const agentChoice = agentConfigs.find(
+			(agent) => agent.id === selectedAgent,
+		);
+		const openAsChat =
+			agentChoice !== undefined &&
+			(await resolveOpenAsChat(agentLaunchPreset(agentChoice)));
 
 		const handles = issues.map((issue) =>
 			submit({
@@ -250,6 +264,7 @@ export function RunIssuesInWorkspacePopover({
 									{
 										agent: selectedAgent,
 										prompt: synthesizeIssuePrompt(issue),
+										...(openAsChat ? { surface: "chat" as const } : {}),
 									},
 								],
 				},
@@ -287,9 +302,6 @@ export function RunIssuesInWorkspacePopover({
 				}),
 			error: (err) => errorMessage(err),
 		});
-
-		setOpen(false);
-		onComplete();
 	};
 
 	return (
