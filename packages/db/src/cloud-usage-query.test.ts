@@ -3,7 +3,12 @@ import { PGlite } from "@electric-sql/pglite";
 import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
 import { drizzle } from "drizzle-orm/pglite";
-import { listCloudBoots, queryCloudUsage } from "./cloud-usage-query";
+import {
+	cloudBillingPeriod,
+	cloudBillingPeriodIndex,
+	listCloudBoots,
+	queryCloudUsage,
+} from "./cloud-usage-query";
 import * as schema from "./schema";
 
 const ORG = "a0000000-0000-4000-8000-000000000001";
@@ -277,7 +282,7 @@ describe("queryCloudUsage", () => {
 		expect(await usage({})).toEqual({
 			items: [],
 			total: {
-				workspaces: 2,
+				workspaces: 3,
 				boots: 3,
 				failedBoots: 1,
 				hours: 3.25,
@@ -295,21 +300,23 @@ describe("queryCloudUsage", () => {
 				item.gbHours,
 				item.boots,
 				item.failedBoots,
+				item.workspaces,
 			]);
 		expect(await brief("user")).toEqual([
-			["Maya", 18, 2, 1],
-			["Sam", 16, 1, 0],
+			["Maya", 18, 2, 1, 2],
+			["Sam", 16, 1, 0, 1],
 		]);
 		expect(await brief("day")).toEqual([
-			["2026-11-17", 0, 1, 0],
-			["2026-11-12", 0, 1, 1],
-			["2026-11-10", 18, 1, 0],
-			["2026-11-01", 16, 0, 0],
+			["2026-11-17", 0, 1, 0, 1],
+			["2026-11-16", 0, 0, 0, 1],
+			["2026-11-12", 0, 1, 1, 1],
+			["2026-11-10", 18, 1, 0, 1],
+			["2026-11-01", 16, 0, 0, 1],
 		]);
 		expect(await brief("workspace")).toEqual([
-			["fix-flaky-checkout", 18, 2, 1],
-			["billing-page", 16, 1, 0],
-			["broken-env", 0, 0, 0],
+			["fix-flaky-checkout", 18, 2, 1, 1],
+			["billing-page", 16, 1, 0, 1],
+			["broken-env", 0, 0, 0, 1],
 		]);
 	});
 
@@ -392,5 +399,28 @@ test("paging one row at a time returns every row once, in order", async () => {
 	}
 	expect(await pages((cursor) => boots({ limit: 1, cursor }))).toEqual(
 		(await boots({})).items,
+	);
+});
+
+test("billing periods keep Autumn's reset day through short months", () => {
+	const anchor = {
+		resetsAt: new Date("2026-02-28T05:00:00Z"),
+		previousResetAt: new Date("2026-01-31T05:00:00Z"),
+	};
+	expect(cloudBillingPeriod(anchor, 0)).toEqual({
+		from: anchor.previousResetAt,
+		to: anchor.resetsAt,
+	});
+	expect(cloudBillingPeriod(anchor, 1).from).toEqual(
+		new Date("2025-12-31T05:00:00Z"),
+	);
+	expect(cloudBillingPeriodIndex(anchor, "2025-12-31")).toBe(1);
+	expect(cloudBillingPeriodIndex(anchor, "2026-01-28")).toBeNull();
+	const thirtieth = {
+		resetsAt: new Date("2026-11-30T05:00:00Z"),
+		previousResetAt: new Date("2026-10-30T05:00:00Z"),
+	};
+	expect(cloudBillingPeriod(thirtieth, 1).from).toEqual(
+		new Date("2026-09-30T05:00:00Z"),
 	);
 });

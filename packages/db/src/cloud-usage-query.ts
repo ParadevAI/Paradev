@@ -1,5 +1,6 @@
 import {
 	isMachineSize,
+	LEGACY_MACHINE_SIZE,
 	MACHINE_SIZE_VCPUS,
 	MACHINE_SIZES,
 	type MachineSize,
@@ -68,6 +69,71 @@ export interface CloudBootCursor {
 	id: string;
 }
 
+/**
+ * Autumn resets the GB-minute balance monthly on a fixed day of the month, on the last day of a
+ * shorter month, at the time of day of `resetsAt`. `previousResetAt` is the reset that opened the
+ * period, when the caller knows it: it settles the day when `resetsAt` is a short month's last day.
+ */
+export interface CloudBillingAnchor {
+	resetsAt: Date;
+	previousResetAt: Date | null;
+}
+
+function lastDayOfMonth(year: number, month: number): number {
+	return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+}
+
+function anchorDay({ resetsAt, previousResetAt }: CloudBillingAnchor): number {
+	const day = resetsAt.getUTCDate();
+	const isMonthEnd =
+		day === lastDayOfMonth(resetsAt.getUTCFullYear(), resetsAt.getUTCMonth());
+	return isMonthEnd && previousResetAt
+		? Math.max(day, previousResetAt.getUTCDate())
+		: day;
+}
+
+function resetMonthsBefore(anchor: CloudBillingAnchor, months: number): Date {
+	const reset = new Date(anchor.resetsAt);
+	reset.setUTCDate(1);
+	reset.setUTCMonth(reset.getUTCMonth() - months);
+	reset.setUTCDate(
+		Math.min(
+			anchorDay(anchor),
+			lastDayOfMonth(reset.getUTCFullYear(), reset.getUTCMonth()),
+		),
+	);
+	return reset;
+}
+
+/** Period 0 is the open one, ending at `resetsAt`; period n ends n resets earlier. */
+export function cloudBillingPeriod(
+	anchor: CloudBillingAnchor,
+	index: number,
+): CloudUsageWindow {
+	return {
+		from: resetMonthsBefore(anchor, index + 1),
+		to: resetMonthsBefore(anchor, index),
+	};
+}
+
+/** The index of the period that starts on `startDate` (YYYY-MM-DD, UTC), or null if none does. */
+export function cloudBillingPeriodIndex(
+	anchor: CloudBillingAnchor,
+	startDate: string,
+): number | null {
+	const [year, month] = startDate.split("-").map(Number);
+	if (!year || !month) return null;
+	const index =
+		(anchor.resetsAt.getUTCFullYear() - year) * 12 +
+		anchor.resetsAt.getUTCMonth() -
+		month;
+	return index >= 0 &&
+		cloudBillingPeriod(anchor, index).from.toISOString().slice(0, 10) ===
+			startDate
+		? index
+		: null;
+}
+
 const BILLED_FEATURE = "box_gb_minutes";
 
 const sizeOfVcpus = new Map<number, MachineSize>(
@@ -109,18 +175,27 @@ const utcDay = (column: AnyPgColumn) =>
 	sql`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD')`;
 
 const groupKeys = {
-	user: { event: sql`${events.userId}`, boot: sql`${boots.createdByUserId}` },
-	day: { event: utcDay(events.sentAt), boot: utcDay(boots.startedAt) },
+	user: {
+		event: sql`${events.userId}`,
+		boot: sql`${boots.createdByUserId}`,
+		failed: sql`${workspaces.createdByUserId}`,
+	},
+	day: {
+		event: utcDay(events.sentAt),
+		boot: utcDay(boots.startedAt),
+		failed: utcDay(workspaces.failedAt),
+	},
 	workspace: {
 		event: sql`${events.cloudWorkspaceId}`,
 		boot: sql`${boots.cloudWorkspaceId}`,
+		failed: sql`${workspaces.id}`,
 	},
-} satisfies Record<CloudUsageGroupBy, { event: SQL; boot: SQL }>;
+} satisfies Record<CloudUsageGroupBy, Record<"event" | "boot" | "failed", SQL>>;
 
 /**
  * One row per sent event (placed at sent_at) and one per boot (placed at started_at), in one
- * shape, so a single GROUP BY gives usage and boot counts for any key. Grouped by workspace, each
- * workspace that failed in the window adds a zero row, so one with no boot still has a group.
+ * shape, so a single GROUP BY gives usage and boot counts for any key. Each workspace that failed
+ * in the window adds a row with no usage, so one with no boot still counts and has a group.
  */
 function usageFacts(
 	db: Db,
@@ -131,7 +206,7 @@ function usageFacts(
 ) {
 	const keys = groupBy
 		? groupKeys[groupBy]
-		: { event: sql`null`, boot: sql`null` };
+		: { event: sql`null`, boot: sql`null`, failed: sql`null` };
 	const sent = db
 		.select({
 			key: sql<string | null>`${keys.event}::text`.as("key"),
@@ -185,13 +260,10 @@ function usageFacts(
 				}),
 			),
 		);
-	if (groupBy !== "workspace") {
-		return db.$with("facts").as(sent.unionAll(started));
-	}
 	const failed = db
 		.select({
-			key: sql<string | null>`${workspaces.id}::text`,
-			workspaceId: sql<string | null>`null::uuid`,
+			key: sql<string | null>`${keys.failed}::text`,
+			workspaceId: sql<string | null>`${workspaces.id}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`null::text`,
@@ -209,7 +281,7 @@ function usageFacts(
 					user: workspaces.createdByUserId,
 					workspace: workspaces.id,
 					size: (size) =>
-						sql`coalesce(${workspaces.machineSize}, 'large') = ${size}`,
+						sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE}) = ${size}`,
 				}),
 			),
 		);
@@ -230,13 +302,8 @@ function metricColumns(facts: ReturnType<typeof usageFacts>) {
 	};
 }
 
-type MetricRow = {
-	gbMinutes: string;
-	seconds: string;
-	boots: number;
-	failedBoots: number;
-	workspaces: number;
-};
+type MetricColumns = ReturnType<typeof metricColumns>;
+type MetricRow = { [K in keyof MetricColumns]: MetricColumns[K]["_"]["type"] };
 
 /** An aggregate without GROUP BY always returns one row; this only satisfies the type. */
 const NO_ROWS: MetricRow = {
@@ -261,7 +328,12 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 
 export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
-async function refsFor(db: Db, groupBy: CloudUsageGroupBy, keys: string[]) {
+async function refsFor(
+	db: Db,
+	organizationId: string,
+	groupBy: CloudUsageGroupBy,
+	keys: string[],
+) {
 	if (groupBy === "day" || keys.length === 0) return new Map<string, never>();
 	if (groupBy === "user") {
 		const rows = await db
@@ -282,13 +354,18 @@ async function refsFor(db: Db, groupBy: CloudUsageGroupBy, keys: string[]) {
 		})
 		.from(workspaces)
 		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
-		.where(inArray(workspaces.id, keys));
+		.where(
+			and(
+				eq(workspaces.organizationId, organizationId),
+				inArray(workspaces.id, keys),
+			),
+		);
 	return new Map(
 		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
 			row.id,
 			{
 				...row,
-				size: isMachineSize(machineSize) ? machineSize : ("large" as const),
+				size: isMachineSize(machineSize) ? machineSize : LEGACY_MACHINE_SIZE,
 				failure:
 					row.status === "failed" && failureReason && failedAt
 						? { reason: failureReason, at: failedAt }
@@ -300,7 +377,8 @@ async function refsFor(db: Db, groupBy: CloudUsageGroupBy, keys: string[]) {
 
 /**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
- * in the window: a total, and with `groupBy` one row per user, UTC day or workspace.
+ * in the window: a total, and with `groupBy` one row per user, UTC day or workspace. Pages ordered
+ * by amount are read at each call: an event sent between pages can move a row across the cursor.
  */
 export async function queryCloudUsage(
 	db: Db,
@@ -367,6 +445,7 @@ export async function queryCloudUsage(
 	const last = page.at(-1);
 	const refs = await refsFor(
 		db,
+		scope.organizationId,
 		groupBy,
 		page.flatMap((row) => (row.key ? [row.key] : [])),
 	);
