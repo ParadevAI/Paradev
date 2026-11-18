@@ -5,6 +5,8 @@ import * as billing from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { cloudWorkspaceBoots, users } from "@superset/db/schema";
 import { AutumnError } from "autumn-js";
+import type { SQL } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import { stub } from "../../../test/stub";
 import * as realtime from "../../lib/realtime";
 import type { BoxSession } from "../../lib/sandbox";
@@ -21,6 +23,7 @@ import {
 	refusalFor,
 	releaseBoot,
 	settleBoot,
+	settleOrganizationNow,
 } from "./meter";
 import * as sandboxSleep from "./sandbox-sleep";
 
@@ -31,6 +34,7 @@ let boot: Record<string, unknown> | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
+let duringFinalize: () => void;
 let trackError: Error | null;
 let renewalError: Error | null;
 let writes: Record<string, unknown>[];
@@ -137,12 +141,19 @@ stub(Sentry, {
 	},
 });
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+let endedBoots: unknown[] = [];
 stub(sandboxSleep, {
 	recordSandboxAsleep: async (
 		id: string,
 		stopped: { sessionId: string | null },
 	) => {
 		recordedAsleep.push([id, stopped]);
+	},
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
 	},
 });
 stub(jobs, {
@@ -187,6 +198,7 @@ stub(autumnClient, {
 stub(autumnClient.balances, {
 	finalize: async (params: unknown, options?: { headers?: unknown }) => {
 		autumnCalls.push({ method: "finalize", params, headers: options?.headers });
+		duringFinalize();
 		if (finalizeError) throw finalizeError;
 		const finalize = params as Parameters<
 			typeof autumnClient.balances.finalize
@@ -207,6 +219,16 @@ stub(autumnClient.balances, {
 		return { success: true };
 	},
 });
+
+const dialect = new PgDialect();
+
+/** The end reason a write sets: a value, or the SQL that keeps one already written. */
+function endReasonOf(write: Record<string, unknown> | undefined) {
+	const value = write?.endReason;
+	if (typeof value === "string" || value === undefined) return value;
+	const { sql, params } = dialect.sqlToQuery(value as SQL);
+	return `${sql} ${JSON.stringify(params)}`;
+}
 
 function usageRows() {
 	return writes.filter((write) => "feature" in write);
@@ -239,15 +261,18 @@ beforeEach(() => {
 		endedAt: null,
 		activeCpuMs: null,
 		egressBytes: null,
+		crashed: false,
 	};
 	renewalAllowed = true;
 	finalizeError = null;
+	duringFinalize = () => {};
 	trackError = null;
 	renewalError = null;
 	writes = [];
 	autumnCalls = [];
 	stopped = [];
 	recordedAsleep = [];
+	endedBoots = [];
 	usageStopAt = null;
 	creatorId = "user_1";
 	delayedSettles = [];
@@ -278,6 +303,40 @@ describe("attachBootSession", () => {
 			{ lockId: "boot_1:0", action: "release" },
 		]);
 		expect(writes.some((write) => "stoppedAt" in write)).toBe(true);
+	});
+});
+
+describe("releaseBoot", () => {
+	const logged: [string, unknown][] = [];
+	stub(Sentry.logger, {
+		info: (event: string, attributes: unknown) =>
+			logged.push([event, attributes]),
+	});
+
+	test("a failed start falls back to failed, any other release to released", async () => {
+		await releaseBoot("boot_1", "provision_failed");
+		await releaseBoot("boot_1", "never_attached");
+		expect(writes.map(endReasonOf)).toEqual([
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		]);
+	});
+
+	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
+		duringFinalize = () => {
+			boot = { ...boot, endReason: "archived" };
+		};
+		await releaseBoot("boot_1", "sandbox_lost");
+		expect(endReasonOf(writes.at(-1))).toBe(
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		);
+		expect(logged.at(-1)).toEqual([
+			"boot.released",
+			expect.objectContaining({
+				"end.reason": "archived",
+				"release.cause": "sandbox_lost",
+			}),
+		]);
 	});
 });
 
@@ -370,6 +429,33 @@ describe("settleBoot", () => {
 		expect(writes).toContainEqual(
 			expect.objectContaining({ lockSeq: 1, lockOpen: false }),
 		);
+	});
+
+	test("a closed boot keeps the reason its stop site wrote, or is unknown", async () => {
+		session = { ...(session as BoxSession), endedAt: NOW - MINUTE };
+		await settleBoot("boot_1");
+		expect(endReasonOf(writes.at(-1))).toBe(
+			'coalesce("cloud_workspace_boots"."end_reason", \'unknown\') []',
+		);
+	});
+
+	test("a session Vercel failed or aborted closes as crashed", async () => {
+		session = {
+			...(session as BoxSession),
+			endedAt: NOW - MINUTE,
+			crashed: true,
+		};
+		await settleBoot("boot_1");
+		expect(writes.at(-1)).toMatchObject({ endReason: "crashed" });
+	});
+
+	test("a box stopped at the spend cap ends its boot as usage_limit", async () => {
+		renewalAllowed = false;
+		usageStopAt = new Date(NOW - MINUTE);
+		await settleBoot("boot_1");
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "usage_limit" }],
+		]);
 	});
 
 	test("a box still refused once its grace ends is stopped, recorded asleep for the session it stopped, and the warning cleared", async () => {
@@ -571,6 +657,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		endedAt,
 		activeCpuMs: null,
 		egressBytes: null,
+		crashed: false,
 	});
 	const timedOut: BoxSession = {
 		id: "sess_1",
@@ -580,6 +667,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		endedAt: NOW - 12 * MINUTE - 1_000,
 		activeCpuMs: null,
 		egressBytes: null,
+		crashed: false,
 	};
 	const reconcile = () =>
 		reconcileCloudWorkspaceUsage({ active: [box], billingEnabled: true });
@@ -663,6 +751,21 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		expect(adoptedBoot()).toMatchObject({ lockOpen: false });
 	});
 
+	test("an adopted boot records that the reconcile opened it", async () => {
+		listed = [resumed(null)];
+		await reconcile();
+		expect(adoptedBoot()).toMatchObject({ origin: "adopt" });
+	});
+
+	test("a refused running session ends its adopted boot as usage_limit", async () => {
+		renewalAllowed = false;
+		listed = [resumed(null)];
+		await reconcile();
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "usage_limit" }],
+		]);
+	});
+
 	test("the newest session is left to an open boot that has not attached yet", async () => {
 		boot = { ...boot, vercelSessionId: null };
 		listed = [resumed(null), timedOut];
@@ -686,6 +789,7 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 				createdByUserId: userId,
 				memoryMb: 16_384,
 				vcpus: 8,
+				origin: "wake",
 			},
 			{ billingEnabled: true },
 		);
@@ -765,6 +869,21 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 		await reserve();
 		expect(writes[0]).toMatchObject({ createdByUserId: "user_1" });
 	});
+
+	test("a boot records the call that authorized it", async () => {
+		await reserve();
+		expect(writes[0]).toMatchObject({ origin: "wake" });
+	});
+});
+
+describe("settleOrganizationNow", () => {
+	test("the boxes of a purged account end their boots as archived", async () => {
+		boot = { ...boot, providerSandboxId: "ws-box" };
+		await settleOrganizationNow("org_1");
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "session_1", reason: "archived" }],
+		]);
+	});
 });
 
 describe("meter", () => {
@@ -811,6 +930,7 @@ describe("with BILLING_PROVIDER=stripe", () => {
 				createdByUserId: "user_1",
 				memoryMb: 16_384,
 				vcpus: 8,
+				origin: "create",
 			}),
 		).toEqual({ bootId: null });
 		expect(await reconcileCloudWorkspaceUsage()).toEqual({

@@ -314,10 +314,12 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		await failCloudWorkspace(
-			{ cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
-			{ from: ["provisioning"], site: "queue", error },
-		);
+		await failCloudWorkspace({
+			scope: { cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
+			from: ["provisioning"],
+			reason: "queue_failed",
+			error,
+		});
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",

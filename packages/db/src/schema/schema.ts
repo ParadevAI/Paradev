@@ -35,6 +35,7 @@ import {
 	cloudUsageFeatureValues,
 	cloudWorkspaceActivityEventValues,
 	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceBootOriginValues,
 	cloudWorkspaceFailureReasonValues,
 	cloudWorkspaceStatusValues,
 	cloudWorkspaceVisibilityValues,
@@ -94,6 +95,10 @@ export const cloudWorkspaceVisibility = pgEnum(
 export const cloudWorkspaceBootEndReason = pgEnum(
 	"cloud_workspace_boot_end_reason",
 	cloudWorkspaceBootEndReasonValues,
+);
+export const cloudWorkspaceBootOrigin = pgEnum(
+	"cloud_workspace_boot_origin",
+	cloudWorkspaceBootOriginValues,
 );
 export const cloudWorkspaceFailureReason = pgEnum(
 	"cloud_workspace_failure_reason",
@@ -1160,6 +1165,7 @@ export const cloudWorkspaceBoots = pgTable(
 		finalizedThrough: timestamp("finalized_through", { withTimezone: true }),
 		settleLeaseUntil: timestamp("settle_lease_until", { withTimezone: true }),
 		endReason: cloudWorkspaceBootEndReason("end_reason"),
+		origin: cloudWorkspaceBootOrigin(),
 		activeCpuMs: bigint("active_cpu_ms", { mode: "number" }),
 		egressBytes: bigint("egress_bytes", { mode: "number" }),
 		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),

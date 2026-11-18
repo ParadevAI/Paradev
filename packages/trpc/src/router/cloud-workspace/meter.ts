@@ -8,7 +8,11 @@ import {
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { recordUsageEvent } from "@superset/db/cloud-usage-events";
-import type { CloudUsageFeature } from "@superset/db/enums";
+import type {
+	CloudUsageFeature,
+	CloudWorkspaceBootEndReason,
+	CloudWorkspaceBootOrigin,
+} from "@superset/db/enums";
 import {
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
@@ -27,7 +31,7 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBoxStopped } from "./sandbox-sleep";
 
 const LOCK_WINDOW_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 70 * 60 * 1000;
@@ -179,6 +183,7 @@ export async function authorizeBoot(
 		createdByUserId: string | null;
 		memoryMb: number;
 		vcpus: number;
+		origin: CloudWorkspaceBootOrigin;
 	},
 	{ billingEnabled = billingUsesAutumn }: { billingEnabled?: boolean } = {},
 ): Promise<{ bootId: string | null }> {
@@ -215,6 +220,7 @@ export async function authorizeBoot(
 		startedAt: new Date(),
 		lockOpen: result !== null,
 		createdByUserId: args.createdByUserId,
+		origin: args.origin,
 	});
 	logControl(
 		"boot.authorized",
@@ -228,7 +234,7 @@ export async function authorizeBoot(
 	return { bootId };
 }
 
-type BootReleaseReason =
+type BootReleaseCause =
 	| "provision_failed"
 	| "provision_abandoned"
 	| "session_taken"
@@ -237,7 +243,7 @@ type BootReleaseReason =
 
 export async function releaseBoot(
 	bootId: string,
-	reason: BootReleaseReason,
+	cause: BootReleaseCause,
 ): Promise<void> {
 	const [boot] = await db
 		.select()
@@ -258,16 +264,20 @@ export async function releaseBoot(
 			);
 	}
 	const now = new Date();
-	await db
+	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
 			lockOpen: false,
 			settleLeaseUntil: null,
+			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
-		.where(eq(cloudWorkspaceBoots.id, bootId));
-	if (boot.cloudWorkspaceId) {
+		.where(eq(cloudWorkspaceBoots.id, bootId))
+		.returning({
+			endReason: sql<CloudWorkspaceBootEndReason>`${cloudWorkspaceBoots.endReason}`,
+		});
+	if (boot.cloudWorkspaceId && released) {
 		logControl(
 			"boot.released",
 			{
@@ -275,7 +285,7 @@ export async function releaseBoot(
 				organizationId: boot.organizationId,
 				bootId,
 			},
-			{ reason },
+			{ "end.reason": released.endReason, "release.cause": cause },
 		);
 	}
 }
@@ -548,6 +558,9 @@ export async function settleBoot(
 					settleLeaseUntil: null,
 					activeCpuMs: session.activeCpuMs,
 					egressBytes: session.egressBytes,
+					endReason: session.crashed
+						? "crashed"
+						: sql`coalesce(${cloudWorkspaceBoots.endReason}, 'unknown')`,
 				})
 				.where(eq(cloudWorkspaceBoots.id, bootId));
 			if (workspace?.usageStopAt && !(await otherOpenBoot(boot))) {
@@ -596,8 +609,9 @@ export async function settleBoot(
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
 		const stopped = await stopSandbox(workspace.providerSandboxId);
-		await recordSandboxAsleep(boot.cloudWorkspaceId, {
+		await recordBoxStopped(scope, {
 			sessionId: stopped.sessionId ?? boot.vercelSessionId,
+			reason: "usage_limit",
 		});
 		await setUsageStopAt(boot, null);
 		logControl("meter.cap_stopped", scope, { source: "settle" }, "warn");
@@ -699,9 +713,13 @@ export async function settleOrganizationNow(
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
 						.then((stopped) =>
-							recordSandboxAsleep(cloudWorkspaceId, {
-								sessionId: stopped.sessionId ?? vercelSessionId,
-							}),
+							recordBoxStopped(
+								{ cloudWorkspaceId, organizationId },
+								{
+									sessionId: stopped.sessionId ?? vercelSessionId,
+									reason: "archived",
+								},
+							),
 						)
 						.catch((error) =>
 							Sentry.captureException(error, {
@@ -819,6 +837,7 @@ async function adoptRunningBoxes(
 						startedAt: new Date(session.startedAt),
 						lockOpen,
 						createdByUserId: workspace.createdByUserId,
+						origin: "adopt",
 					})
 					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
 					.returning({ id: cloudWorkspaceBoots.id });
@@ -838,9 +857,13 @@ async function adoptRunningBoxes(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
 			const stopped = await stopSandbox(workspace.providerSandboxId);
-			await recordSandboxAsleep(workspace.id, {
-				sessionId: stopped.sessionId ?? session.id,
-			});
+			await recordBoxStopped(
+				{
+					cloudWorkspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+				},
+				{ sessionId: stopped.sessionId ?? session.id, reason: "usage_limit" },
+			);
 			logControl(
 				"meter.cap_stopped",
 				{

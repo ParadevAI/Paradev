@@ -121,8 +121,33 @@ describe("findSandboxSession", () => {
 				endedAt: NOW,
 				activeCpuMs: null,
 				egressBytes: 2_048,
+				crashed: false,
 			},
 		});
+	});
+});
+
+describe("a session Vercel aborted", () => {
+	stub(Sandbox, {
+		get: async () => ({
+			listSessions: async () =>
+				(async function* () {
+					yield {
+						id: "session_1",
+						memory: 8192,
+						vcpus: 4,
+						status: "aborted",
+						startedAt: NOW - HOUR,
+						abortedAt: NOW,
+						updatedAt: NOW,
+					};
+				})(),
+		}),
+	});
+
+	test("is a crash", async () => {
+		const found = await findSandboxSession("workspace", "session_1");
+		expect(found?.session?.crashed).toBe(true);
 	});
 });
 
