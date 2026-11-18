@@ -4,6 +4,8 @@ import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import {
 	CloudUsagePage,
+	cloudUsageQueries,
+	PERIODS_INPUT,
 	selectedPeriod,
 	usageRange,
 	type WorkspaceRef,
@@ -23,40 +25,35 @@ export function CloudUsageSettings({
 	isOwner,
 }: CloudUsageSettingsProps) {
 	const trpc = useTRPC();
-	const periods = useQuery(trpc.cloud.periods.list.queryOptions({ limit: 24 }));
+	const periods = useQuery(trpc.cloud.periods.list.queryOptions(PERIODS_INPUT));
 	const [periodId, setPeriodId] = useState<string>();
 	const [workspace, setWorkspace] = useState<WorkspaceRef | null>(null);
 	const period = selectedPeriod(periods.data?.items, periodId);
-	const range = usageRange(period);
+	const queries = cloudUsageQueries({
+		range: usageRange(period),
+		periodsLoaded: periods.isSuccess,
+		isAdmin,
+		workspaceId: workspace?.id,
+	});
 	const byDay = useQuery({
-		...trpc.cloud.usage.query.queryOptions({
-			range,
-			groupBy: "day",
-			limit: 100,
-		}),
-		enabled: periods.isSuccess,
+		...trpc.cloud.usage.query.queryOptions(queries.byDay.input),
+		enabled: queries.byDay.enabled,
 	});
 	const byPerson = useQuery({
-		...trpc.cloud.usage.query.queryOptions({
-			range,
-			groupBy: "user",
-			limit: 100,
-		}),
-		enabled: periods.isSuccess && isAdmin,
+		...trpc.cloud.usage.query.queryOptions(queries.byPerson.input),
+		enabled: queries.byPerson.enabled,
 	});
 	const workspaces = useInfiniteQuery({
-		...trpc.cloud.usage.query.infiniteQueryOptions(
-			{ range, groupBy: "workspace", limit: 25 },
-			{ getNextPageParam: (page) => page.nextCursor },
-		),
-		enabled: periods.isSuccess,
+		...trpc.cloud.usage.query.infiniteQueryOptions(queries.workspaces.input, {
+			getNextPageParam: (page) => page.nextCursor,
+		}),
+		enabled: queries.workspaces.enabled,
 	});
 	const boots = useInfiniteQuery({
-		...trpc.cloud.boots.list.infiniteQueryOptions(
-			{ workspace: workspace?.id, range, limit: 25 },
-			{ getNextPageParam: (page) => page.nextCursor },
-		),
-		enabled: !!workspace,
+		...trpc.cloud.boots.list.infiniteQueryOptions(queries.boots.input, {
+			getNextPageParam: (page) => page.nextCursor,
+		}),
+		enabled: queries.boots.enabled,
 	});
 
 	return (

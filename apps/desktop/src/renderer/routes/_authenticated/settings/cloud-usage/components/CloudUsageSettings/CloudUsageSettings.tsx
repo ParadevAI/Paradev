@@ -2,6 +2,8 @@ import { Trans } from "@lingui/react/macro";
 import { Button } from "@superset/ui/button";
 import {
 	CloudUsagePage,
+	cloudUsageQueries,
+	PERIODS_INPUT,
 	selectedPeriod,
 	usageRange,
 	type WorkspaceRef,
@@ -15,29 +17,36 @@ export function CloudUsageSettings() {
 	const navigate = useNavigate();
 	const role = useOrganizationRole();
 	const isAdmin = role === "owner" || role === "admin";
-	const periods = cloudTrpc.cloud.periods.list.useQuery({ limit: 24 });
+	const periods = cloudTrpc.cloud.periods.list.useQuery(PERIODS_INPUT);
 	const [periodId, setPeriodId] = useState<string>();
 	const [workspace, setWorkspace] = useState<WorkspaceRef | null>(null);
 	const period = selectedPeriod(periods.data?.items, periodId);
-	const range = usageRange(period);
-	const byDay = cloudTrpc.cloud.usage.query.useQuery(
-		{ range, groupBy: "day", limit: 100 },
-		{ enabled: periods.isSuccess },
-	);
+	const queries = cloudUsageQueries({
+		range: usageRange(period),
+		periodsLoaded: periods.isSuccess,
+		isAdmin,
+		workspaceId: workspace?.id,
+	});
+	const byDay = cloudTrpc.cloud.usage.query.useQuery(queries.byDay.input, {
+		enabled: queries.byDay.enabled,
+	});
 	const byPerson = cloudTrpc.cloud.usage.query.useQuery(
-		{ range, groupBy: "user", limit: 100 },
-		{ enabled: periods.isSuccess && isAdmin },
+		queries.byPerson.input,
+		{ enabled: queries.byPerson.enabled },
 	);
 	const workspaces = cloudTrpc.cloud.usage.query.useInfiniteQuery(
-		{ range, groupBy: "workspace", limit: 25 },
+		queries.workspaces.input,
 		{
 			getNextPageParam: (page) => page.nextCursor,
-			enabled: periods.isSuccess,
+			enabled: queries.workspaces.enabled,
 		},
 	);
 	const boots = cloudTrpc.cloud.boots.list.useInfiniteQuery(
-		{ workspace: workspace?.id, range, limit: 25 },
-		{ getNextPageParam: (page) => page.nextCursor, enabled: !!workspace },
+		queries.boots.input,
+		{
+			getNextPageParam: (page) => page.nextCursor,
+			enabled: queries.boots.enabled,
+		},
 	);
 	const isDisabled = periods.error?.data?.code === "FORBIDDEN";
 
