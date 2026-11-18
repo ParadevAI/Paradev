@@ -200,16 +200,9 @@ export const FEATURE_FLAGS = {
 	 * on every create and wake. Unloaded or offline means no drive.
 	 */
 	SANDBOX_AGENT_TOOLS_DRIVE: "sandbox-agent-tools-drive",
-	/**
-	 * Sends an organization's box logs (boot, memguard, desktop, host-service)
-	 * to Sentry Logs. Takes effect only with `SANDBOX_BOX_LOGS_FLEET` on too;
-	 * read on every create and wake. Unloaded or offline means off.
-	 */
+	/** Sends an organization's box logs to Sentry; needs `SANDBOX_BOX_LOGS_FLEET` too. */
 	SANDBOX_BOX_LOGS: "sandbox-box-logs",
-	/**
-	 * The fleet switch for box logs: one answer for every box, so turning it off
-	 * stops the shipper on each box at its next wake without a deploy.
-	 */
+	/** One answer for every box: off stops box logs at each box's next wake. */
 	SANDBOX_BOX_LOGS_FLEET: "sandbox-box-logs-fleet",
 	/**
 	 * Moving a workspace and its chats to the cloud or to another computer:

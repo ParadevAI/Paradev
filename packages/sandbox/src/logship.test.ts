@@ -67,7 +67,7 @@ beforeEach(() => {
 	mkdirSync(logs());
 	writeFileSync(
 		join(root, "contract.sh"),
-		`SUPERSET_LOG_DIR='${logs()}'\nSUPERSET_STATE_DIR='${join(root, "state")}'\nSUPERSET_BOOT_LOG='${logs()}/boot.log'\nSUPERSET_BOX_LOGS_DEFAULT_CAP_BYTES='262144'\n`,
+		`SUPERSET_LOG_DIR='${logs()}'\nSUPERSET_STATE_DIR='${join(root, "state")}'\nSUPERSET_BOOT_LOG='${logs()}/boot.log'\n`,
 	);
 	status = 200;
 	headers = {};
@@ -399,7 +399,7 @@ describe("superset-logship", () => {
 		expect(out).toContain(`refused: ${code}`);
 		expect(existsSync(join(state(), "boot.offset"))).toBe(false);
 		const files = readdirSync(state()).sort();
-		expect(files).toEqual(["boot", "lock", "retry", "said"]);
+		expect(files).toEqual(["boot", "lock", "retry"]);
 
 		await ship({ SUPERSET_LOGSHIP_NOW_MS: String(NOW + 30_000) });
 		expect(received).toHaveLength(1);
@@ -425,7 +425,7 @@ describe("superset-logship", () => {
 describe("superset-boot and the shipper", () => {
 	test("starts the shipper only when sandbox.conf turns it on, and removes its state otherwise", () => {
 		expect(boot).toMatch(
-			/if \[ "\$\{SUPERSET_SANDBOX_BOX_LOGS:-\}" = 1 \] && \[ -n "\$\{HOST_SERVICE_SENTRY_DSN:-\}" \][^\n]*\n\tenv -u HOST_SERVICE_SECRET nice -n 10 \/usr\/local\/bin\/superset-logship [^\n]*9>&- &\n[\s\S]*?\nelse\n[^\n]*\n\trm -rf "\$\{SUPERSET_STATE_DIR\}\/logship"\nfi/,
+			/if \[ "\$\{SUPERSET_SANDBOX_BOX_LOGS:-\}" = 1 \] && \[ -n "\$\{HOST_SERVICE_SENTRY_DSN:-\}" \]; then\n\tenv -u HOST_SERVICE_SECRET nice -n 10 \/usr\/local\/bin\/superset-logship [^\n]*9>&- &\n[\s\S]*?\nelse\n[^\n]*\n\trm -rf "\$\{SUPERSET_STATE_DIR\}\/logship"\nfi/,
 		);
 		expect(boot.indexOf("superset-logship >>")).toBeGreaterThan(
 			boot.indexOf("superset-memguard >>"),

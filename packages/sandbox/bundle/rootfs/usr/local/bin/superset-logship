@@ -12,15 +12,13 @@
 #           hook's command with a marker; scrub token formats; collapse a run
 #           of identical lines into one record with a count.
 #   cap     a budget of serialized record bytes per box per clock hour; one record
-#           says it was reached,
-#           and the lines after it are dropped, not held.
+#           says it was reached, and the lines after it are dropped, not held.
 #   send    one envelope per file per pass. The offset moves only on a 2xx, so a
 #           box that sleeps first sends those lines at its next wake. A refusal
 #           waits (Retry-After, else doubling up to an hour) and keeps nothing in
 #           memory: the log files are the only queue.
 #
-# --once runs one pass and exits. Its own notes go to stdout, one line per change
-# of state, never per line of log.
+# --once runs one pass and exits. It prints one line per refusal, never per line of log.
 set -uo pipefail
 . "${SUPERSET_CONTRACT:-/etc/superset/contract.sh}"
 
@@ -34,7 +32,7 @@ AUTH="X-Sentry-Auth: Sentry sentry_version=7, sentry_key=${BASH_REMATCH[2]}, sen
 
 SOURCES=(boot memguard desktop host-service)
 STATE="${SUPERSET_STATE_DIR}/logship"
-CAP="${SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES:-$SUPERSET_BOX_LOGS_DEFAULT_CAP_BYTES}"
+CAP="${SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES:-262144}"
 INTERVAL_S="${SUPERSET_LOGSHIP_INTERVAL_S:-5}"
 MAX_READ=65536
 MAX_RECORDS=100
@@ -168,24 +166,22 @@ def record($r; $t):
 | ([.used, .capped, $read_to, (.items | length), (.prev // "")] | @tsv), ({items: .items} | tojson)
 JQ
 
-say() { local last; last="$(read_state said "")"; [ "$last" = "$1" ] && return; write_state said "$1"; echo "$(now_ms) logship $1"; }
-
 # 0 sent or nothing to send, 1 refused (the pass stops and waits).
 send() {
-	local body="$1" count="$2" code wait fails now
-	code="$(printf '%s\n%s\n%s\n' "{\"dsn\":\"${DSN}\"}" \
+	local body="$1" count="$2" out code wait fails
+	out="$(printf '%s\n%s\n%s\n' "{\"dsn\":\"${DSN}\"}" \
 		"{\"type\":\"log\",\"item_count\":${count},\"content_type\":\"application/vnd.sentry.items.log+json\"}" "$body" |
-		curl -s -o /dev/null -D "${STATE}/headers" -w '%{http_code}' --max-time 15 \
-			-H "$AUTH" -H 'Content-Type: application/x-sentry-envelope' --data-binary @- "$ENVELOPE_URL")" || code=000
-	now="$(now_ms)"
+		curl -s -o /dev/null -D - -w '%{http_code}' --max-time 15 \
+			-H "$AUTH" -H 'Content-Type: application/x-sentry-envelope' --data-binary @- "$ENVELOPE_URL" | tr -d '\r')"
+	code="${out##*$'\n'}"
 	case "$code" in
-		2??) rm -f "${STATE}/retry"; say "sending"; return 0 ;;
+		2??) rm -f "${STATE}/retry"; return 0 ;;
 		# A batch Sentry cannot parse would be refused forever; it is dropped.
-		400 | 413) say "dropped a batch: ${code}"; return 0 ;;
+		400 | 413) echo "$(now_ms) logship dropped a batch: ${code}"; return 0 ;;
 	esac
 	fails="$(read_state retry "0 0" | cut -d' ' -f2)"
 	fails=$((fails + 1))
-	wait="$(tr -d '\r' < "${STATE}/headers" 2>/dev/null | awk -F': *' 'tolower($1) == "retry-after" && $2 ~ /^[0-9]+$/ { print $2; exit }')"
+	wait="$(awk -F': *' 'tolower($1) == "retry-after" && $2 ~ /^[0-9]+$/ { print $2; exit }' <<< "$out")"
 	if [ -z "$wait" ]; then
 		case "$code" in
 			401 | 403) wait=$MAX_WAIT_S ;;
@@ -193,16 +189,9 @@ send() {
 		esac
 	fi
 	[ "$wait" -gt "$MAX_WAIT_S" ] && wait=$MAX_WAIT_S
-	write_state retry "$((now + wait * 1000)) ${fails}"
-	say "refused: ${code}; waiting"
+	write_state retry "$(( $(now_ms) + wait * 1000 )) ${fails}"
+	echo "$(now_ms) logship refused: ${code:-none}; waiting ${wait}s"
 	return 1
-}
-
-# Turning the shipper on sends no history: each file starts at the current boot.
-first_offset() {
-	local file="$1" size="$2"
-	[ -n "$BOOT_MS" ] || { echo "$size"; return; }
-	LC_ALL=C awk -v ms="$BOOT_MS" -v iso="$BOOT_ISO" -v size="$size" "$FIRST" "$file"
 }
 
 ship_file() {
@@ -210,22 +199,25 @@ ship_file() {
 	[ -f "$file" ] || return 0
 	size="$(stat -c %s "$file")"
 	off="$(read_state "${src}.offset" "")"
+	# Turning the shipper on sends no history: each file starts at the current boot.
 	if [ -z "$off" ]; then
-		off="$(first_offset "$file" "$size")"
+		off="$size"
+		[ -n "$BOOT_MS" ] && off="$(LC_ALL=C awk -v ms="$BOOT_MS" -v iso="$BOOT_ISO" -v size="$size" "$FIRST" "$file")"
 	fi
 	[ "$size" -lt "$off" ] && off=0
 	[ "$size" -eq "$off" ] && { write_state "${src}.offset" "$off"; return 0; }
 	tail -c +"$((off + 1))" "$file" | head -c "$MAX_READ" > "${STATE}/chunk"
 	[ -n "$(tail -c 1 "${STATE}/chunk")" ] && partial=1
 	[ "$(stat -c %s "${STATE}/chunk")" -ge "$MAX_READ" ] && full=1
-	LC_ALL=C awk -v src="$src" -v pos="$off" -v partial="$partial" -v full="$full" \
-		-v maxrec="$MAX_RECORDS" -v maxbody="$MAX_BODY" "$SPLIT" "${STATE}/chunk" |
-		LC_ALL=C sed -E "$SCRUB" |
-		jq -R -n -r --arg src "$src" --arg ws "${SUPERSET_SANDBOX_WORKSPACE_ID:-}" \
-			--arg org "${SUPERSET_SANDBOX_ORGANIZATION_ID:-}" --argjson prev "$(read_state "${src}.time" null)" \
-			--arg trace "$TRACE_ID" --argjson now "$NOW" --argjson starts "$BOOT_STARTS" \
-			--argjson cap "$CAP" --argjson used "$USED" --arg capped "$CAPPED" "$BUILD" > "${STATE}/batch"
-	{ IFS=$'\t' read -r used capped read_to count last; read -r payload; } < "${STATE}/batch"
+	{ IFS=$'\t' read -r used capped read_to count last; read -r payload; } < <(
+		LC_ALL=C awk -v src="$src" -v pos="$off" -v partial="$partial" -v full="$full" \
+			-v maxrec="$MAX_RECORDS" -v maxbody="$MAX_BODY" "$SPLIT" "${STATE}/chunk" |
+			LC_ALL=C sed -E "$SCRUB" |
+			jq -R -n -r --arg src "$src" --arg ws "${SUPERSET_SANDBOX_WORKSPACE_ID:-}" \
+				--arg org "${SUPERSET_SANDBOX_ORGANIZATION_ID:-}" --argjson prev "$(read_state "${src}.time" null)" \
+				--arg trace "$TRACE_ID" --argjson now "$NOW" --argjson starts "$BOOT_STARTS" \
+				--argjson cap "$CAP" --argjson used "$USED" --arg capped "$CAPPED" "$BUILD"
+	)
 	[ -n "${read_to:-}" ] || return 0
 	if [ "$count" -gt 0 ]; then
 		send "$payload" "$count" || return 1
@@ -255,7 +247,7 @@ pass() {
 	for src in "${SOURCES[@]}"; do
 		ship_file "$src" || break
 	done
-	rm -f "${STATE}/chunk" "${STATE}/batch" "${STATE}/headers"
+	rm -f "${STATE}/chunk"
 }
 
 read_boots() {
@@ -275,7 +267,6 @@ fi
 write_state boot "${BOOT_MS:-}"
 
 [ "${1:-}" = --once ] && { pass; exit 0; }
-trap 'exit 0' TERM INT
 while true; do
 	pass
 	sleep "$INTERVAL_S"

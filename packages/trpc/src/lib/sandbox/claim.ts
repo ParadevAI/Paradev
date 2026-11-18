@@ -25,11 +25,12 @@ import {
 	resolveAgentSignIns,
 } from "../../router/agent-credential";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
+import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentToolsDriveFor } from "./agent-tools";
-import { boxLogsIdentity } from "./box-logs";
+import { boxLogsEnabled } from "./box-logs";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
@@ -94,9 +95,7 @@ export async function buildSandboxClaim(args: {
 		args.row.createdByUserId
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
-		env.SENTRY_DSN_SANDBOX
-			? boxLogsIdentity(args.row.organizationId)
-			: Promise.resolve({}),
+		env.SENTRY_DSN_SANDBOX && boxLogsEnabled(posthog, args.row.organizationId),
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
@@ -151,7 +150,7 @@ export async function buildSandboxClaim(args: {
 						env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
 				}
 			: {}),
-		...boxLogs,
+		...(boxLogs ? { SUPERSET_SANDBOX_BOX_LOGS: "1" as const } : {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
 	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({

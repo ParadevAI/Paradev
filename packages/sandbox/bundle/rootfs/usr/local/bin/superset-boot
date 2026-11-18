@@ -238,9 +238,8 @@ if [ -x /usr/local/bin/superset-memguard ]; then
 fi
 
 # Sends this box's own logs to Sentry, only when the claim turned it on; see the script.
-if [ "${SUPERSET_SANDBOX_BOX_LOGS:-}" = 1 ] && [ -n "${HOST_SERVICE_SENTRY_DSN:-}" ] && [ -x /usr/local/bin/superset-logship ]; then
+if [ "${SUPERSET_SANDBOX_BOX_LOGS:-}" = 1 ] && [ -n "${HOST_SERVICE_SENTRY_DSN:-}" ]; then
 	env -u HOST_SERVICE_SECRET nice -n 10 /usr/local/bin/superset-logship >> "${SUPERSET_LOG_DIR}/logship.log" 2>&1 9>&- &
-	echo $! > "${SUPERSET_RUN_DIR}/logship.pid"
 	stamp "logship.start pid=$!"
 else
 	# Off for this boot: what it writes must never be sent by a later enable.
@@ -267,11 +266,11 @@ start_hook() {
 	if [ "$i" -ge 1200 ]; then stamp "hook.skipped no environment push within 120s"; return 0; fi
 	t0="$(date +%s%3N)"
 	out="$(curl -fs -X POST -H "$auth" -H 'Content-Type: application/json' -d '{}' "${api}.runStartHook" 2>/dev/null |
-		jq -r '(.result.data.json // .result.data) | [(.started | tostring), (.reason // ""), (.pid // "" | tostring), (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" ||
+		jq -r '.result.data.json | [(.started | tostring), (.reason // ""), (.pid // "" | tostring), (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" ||
 		out=""
 	local started reason pid code
 	IFS='|' read -r started reason pid code <<< "$out"
-	case "${started:-}:${reason:-}" in
+	case "${started}:${reason}" in
 		true:*) stamp "hook.started pid=${pid}" ;;
 		false:no-hook) stamp "hook.none"; return 0 ;;
 		false:failed) stamp "hook.failed exit=${code} ms=$(( $(date +%s%3N) - t0 ))"; return 0 ;;
@@ -287,9 +286,9 @@ start_hook() {
 			stamp "hook.running ms=${waited} no longer polled"; return 0
 		fi
 		state="$(curl -fs -H "$auth" "${api}.status" 2>/dev/null |
-			jq -r '(.result.data.json // .result.data).startHook | [.state, (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" || state=""
+			jq -r '.result.data.json.startHook | [.state, (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" || state=""
 		IFS='|' read -r state code <<< "$state"
-		case "${state:-}" in
+		case "$state" in
 			running)
 				if [ "$waited" -lt $(( ${SUPERSET_HOOK_POLL_FAST_FOR_S:-120} * 1000 )) ]; then
 					sleep "${SUPERSET_HOOK_POLL_S:-2}"
