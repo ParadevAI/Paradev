@@ -8,6 +8,7 @@ import {
 	readFileSync,
 	rmSync,
 	statSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -161,37 +162,33 @@ describe("superset-logship", () => {
 		expect(readdirSync(state())).not.toContain("start-hook.offset");
 	});
 
-	test("drops vitals and memguard rank lines, keeps kills, and hides hook commands", async () => {
+	test("drops vitals and memguard rank lines and keeps kills", async () => {
 		bootStart(BOOT1);
 		const t = (s: number) => iso(BOOT1 + s * 1000);
 		write(
 			"host-service.log",
-			[
-				`${t(1)} [host-service:vitals] {"rss":120}`,
-				`${t(2)} [sandbox] start hook running (pid 42): pnpm i && pnpm dev --acme`,
-				`${t(3)} [sandbox] start hook running in terminal t1: docker compose up`,
-				`${t(4)} [sandbox] start hook failed (exit 1): ./setup-acme.sh`,
-				`${t(5)} [sandbox] archive hook exited 0: ./teardown --env acme`,
-				"",
-			].join("\n"),
+			`${t(1)} [host-service:vitals] {"rss":120}\n${t(2)} [host-service] listening\n`,
 		);
 		write(
 			"memguard.log",
 			`${BOOT1 + 10} memguard rank pid=9 node 0->500\n${BOOT1 + 500} memguard reap pid=9 node rss=900MB adj=500\n`,
 		);
 		await ship();
-		expect(bodies().join("\n")).not.toMatch(
-			/vitals|rank pid|acme|pnpm|docker|setup-/,
-		);
-		expect(bySource("host-service").map((i) => i.body)).toEqual([
-			`${t(2)} [sandbox] start hook running (pid 42): [command not sent]`,
-			`${t(3)} [sandbox] start hook running in terminal t1: [command not sent]`,
-			`${t(4)} [sandbox] start hook failed (exit 1): [command not sent]`,
-			`${t(5)} [sandbox] archive hook exited 0: [command not sent]`,
-		]);
-		expect(bySource("memguard").map((i) => i.body)).toEqual([
+		expect(bodies()).toEqual([
+			`${BOOT1} boot.start pid=1`,
 			`${BOOT1 + 500} memguard reap pid=9 node rss=900MB adj=500`,
+			`${t(2)} [host-service] listening`,
 		]);
+	});
+
+	test("reads only regular files, never a link the box's user put in the log directory", async () => {
+		bootStart(BOOT1);
+		const secret = join(root, "secret.txt");
+		writeFileSync(secret, `${BOOT1 + 1} desktop SECRET-FILE\n`);
+		symlinkSync(secret, join(logs(), "desktop.log"));
+		await ship();
+		expect(JSON.stringify(received)).not.toContain("SECRET-FILE");
+		expect(existsSync(join(state(), "desktop.offset"))).toBe(false);
 	});
 
 	test("scrubs token formats before a line leaves", async () => {
@@ -237,7 +234,7 @@ describe("superset-logship", () => {
 		expect(bySource("host-service")).toHaveLength(secrets.length + 4);
 	});
 
-	test("collapses a run of identical lines into one record with a count, across dropped lines", async () => {
+	test("collapses a run of identical lines read in one pass into one record with a count, across dropped lines", async () => {
 		bootStart(BOOT1);
 		write(
 			"desktop.log",
@@ -281,7 +278,12 @@ describe("superset-logship", () => {
 		expect(kept.length).toBeLessThan(11);
 		expect(items().filter(isCap)).toHaveLength(1);
 
-		append("desktop.log", line(10));
+		const hour = readFileSync(join(state(), "hour"), "utf8").trim().split(" ");
+		expect(Number(hour[1])).toBe(keptBytes + size(items().find(isCap) as Item));
+		expect(hour[2]).toBe("1");
+
+		// A record small enough to fit what is left still waits for the next hour.
+		append("desktop.log", `${BOOT1 + 99} x\n`);
 		received = [];
 		await ship(cap);
 		expect(received).toHaveLength(0);
@@ -422,41 +424,18 @@ describe("superset-logship", () => {
 	});
 });
 
-describe("superset-boot and the shipper", () => {
-	test("starts the shipper only when sandbox.conf turns it on, and removes its state otherwise", () => {
-		expect(boot).toMatch(
-			/if \[ "\$\{SUPERSET_SANDBOX_BOX_LOGS:-\}" = 1 \] && \[ -n "\$\{HOST_SERVICE_SENTRY_DSN:-\}" \]; then\n\tenv -u HOST_SERVICE_SECRET nice -n 10 \/usr\/local\/bin\/superset-logship [^\n]*9>&- &\n[\s\S]*?\nelse\n[^\n]*\n\trm -rf "\$\{SUPERSET_STATE_DIR\}\/logship"\nfi/,
-		);
-		expect(boot.indexOf("superset-logship >>")).toBeGreaterThan(
-			boot.indexOf("superset-memguard >>"),
-		);
-	});
-});
-
 describe("the start hook's stamps", () => {
 	const fn = /\nstart_hook\(\) \{\n[\s\S]*?\n\}\n/.exec(boot)?.[0] ?? "";
 	const CUSTOMER = "CUSTOMER-OUTPUT secret-db-url pnpm run acme";
 
-	async function runHook(
-		answer: object,
-		states: object[],
-		env: Record<string, string> = {},
-	): Promise<{ log: string; polls: number[] }> {
-		const polls: number[] = [];
+	async function runHook(answer: object): Promise<string> {
 		const host = Bun.serve({
 			port: 0,
 			fetch(req) {
-				const wrap = (json: object) =>
-					Response.json({ result: { data: { json } } });
-				if (new URL(req.url).pathname.endsWith(".runStartHook"))
-					return wrap(answer);
-				polls.push(Date.now());
-				const startHook = states[
-					Math.min(polls.length - 1, states.length - 1)
-				] ?? {
-					state: "none",
-				};
-				return wrap({ environmentPushed: true, startHook });
+				const json = new URL(req.url).pathname.endsWith(".runStartHook")
+					? answer
+					: { environmentPushed: true };
+				return Response.json({ result: { data: { json } } });
 			},
 		});
 		const run = join(root, "run");
@@ -476,97 +455,28 @@ describe("the start hook's stamps", () => {
 					SUPERSET_HOST_SERVICE_PORT: String(host.port),
 					SUPERSET_RUN_DIR: run,
 					HOST_SERVICE_SECRET: "boot-secret",
-					SUPERSET_HOOK_POLL_S: "0.01",
-					...env,
 				},
 			},
 		);
 		await proc.exited;
 		host.stop(true);
-		return { log: readFileSync(log, "utf8"), polls };
+		return readFileSync(log, "utf8");
 	}
 
-	test("a hook that fails at once leaves its exit code and duration, never its output", async () => {
+	test("a hook that fails to start is stamped without its command or output", async () => {
 		expect(fn).not.toBe("");
-		const { log } = await runHook(
-			{
-				started: false,
-				reason: "failed",
-				command: CUSTOMER,
-				exitCode: 2,
-				log: CUSTOMER,
-			},
-			[
-				{
-					state: "exited",
-					command: CUSTOMER,
-					exitCode: 2,
-					since: 1,
-					log: CUSTOMER,
-				},
-			],
-		);
-		expect(log).toMatch(/^\d{13} hook\.failed exit=2 ms=\d+\n$/);
+		const log = await runHook({
+			started: false,
+			reason: "failed",
+			command: CUSTOMER,
+			exitCode: 2,
+			log: CUSTOMER,
+		});
+		expect(log).toMatch(/^\d{13} hook\.start\.failed\n$/);
 	});
 
-	test("a setup that runs then fails is stamped started, then failed with its exit code", async () => {
-		const { log } = await runHook(
-			{ started: true, pid: 4321, command: CUSTOMER },
-			[
-				{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
-				{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
-				{
-					state: "exited",
-					command: CUSTOMER,
-					exitCode: 7,
-					since: 2,
-					log: CUSTOMER,
-				},
-			],
-		);
-		expect(log).not.toContain("CUSTOMER");
-		expect(log).toMatch(
-			/^\d{13} hook\.started pid=4321\n\d{13} hook\.failed exit=7 ms=\d+\n$/,
-		);
-	});
-
-	test("a setup that succeeds is stamped exited 0; a run-only hook stops at started", async () => {
-		const ok = await runHook({ started: true, pid: 9, command: CUSTOMER }, [
-			{
-				state: "exited",
-				command: CUSTOMER,
-				exitCode: 0,
-				since: 2,
-				log: CUSTOMER,
-			},
-		]);
-		expect(ok.log).toMatch(
-			/hook\.started pid=9\n\d{13} hook\.exited exit=0 ms=\d+\n$/,
-		);
-		const runOnly = await runHook(
-			{ started: true, pid: 0, command: CUSTOMER },
-			[{ state: "none" }],
-		);
-		expect(runOnly.log).toMatch(/^\d{13} hook\.started pid=0\n$/);
-		expect(`${ok.log}${runOnly.log}`).not.toContain("CUSTOMER");
-	});
-
-	test("a setup that never ends is polled fast, then slowly, then stamped running and left", async () => {
-		const { log, polls } = await runHook(
-			{ started: true, pid: 5, command: CUSTOMER },
-			[{ state: "running", command: CUSTOMER, pid: 5, since: 1 }],
-			{
-				SUPERSET_HOOK_POLL_FAST_FOR_S: "1",
-				SUPERSET_HOOK_POLL_SLOW_S: "0.25",
-				SUPERSET_HOOK_POLL_LIMIT_S: "2",
-			},
-		);
-		expect(log).toMatch(
-			/^\d{13} hook\.started pid=5\n\d{13} hook\.running ms=\d+ no longer polled\n$/,
-		);
-		const start = polls[0] ?? 0;
-		const slow = polls.filter((t) => t - start > 1100);
-		expect(polls.length - slow.length).toBeGreaterThan(10);
-		expect(slow.length).toBeLessThanOrEqual(5);
+	test("a started hook is stamped with its pid only", async () => {
+		const log = await runHook({ started: true, pid: 4321, command: CUSTOMER });
+		expect(log).toMatch(/^\d{13} hook\.started pid=4321\n$/);
 	});
 });

@@ -8,11 +8,11 @@
 #           checkout.log are the customer's output and are never read. Offsets
 #           are trusted only if this script also ran in the previous boot; else
 #           each file starts at its first line of the current boot.
-#   filter  drop host-service vitals and memguard rank lines; replace the start
-#           hook's command with a marker; scrub token formats; collapse a run
-#           of identical lines into one record with a count.
+#   filter  drop host-service vitals and memguard rank lines; scrub token
+#           formats; collapse a run of identical lines read in one pass into one
+#           record with a count. A file that is not a regular file is never read.
 #   cap     a budget of serialized record bytes per box per clock hour; one record
-#           says it was reached, and the lines after it are dropped, not held.
+#           says it was reached, and nothing else is sent that hour.
 #   send    one envelope per file per pass. The offset moves only on a 2xx, so a
 #           box that sleeps first sends those lines at its next wake. A refusal
 #           waits (Retry-After, else doubling up to an hour) and keeps nothing in
@@ -53,7 +53,7 @@ write_state() { printf '%s\n' "$2" > "${STATE}/$1.tmp" && mv -f "${STATE}/$1.tmp
 # line, whose time a following line without one inherits; then `E <offset>` for
 # how far the file is read. A trailing line with no newline yet waits a pass.
 read -r -d '' SPLIT <<'AWK'
-function handle(line, len,   key, plen, i) {
+function handle(line, len,   key, i, n, d) {
 	if (stop) return
 	key = line
 	sub(/^[0-9]+ /, "", key)
@@ -62,11 +62,6 @@ function handle(line, len,   key, plen, i) {
 		(src == "memguard" && index(key, "memguard rank ") == 1)) {
 		if (!have) { printf "D\t%s\n", substr(line, 1, 30); pos += len; return }
 		dropped = dropped substr(line, 1, 30) "\n"; pos += len; return
-	}
-	if (src == "host-service" && (index(key, "[sandbox] start hook ") == 1 || index(key, "[sandbox] archive hook ") == 1) && (i = index(key, ": ")) > 0) {
-		plen = length(line) - length(key)
-		key = substr(key, 1, i + 1) "[command not sent]"
-		line = substr(line, 1, plen) key
 	}
 	if (have && key == prevkey) { count++; dropped = dropped substr(line, 1, 30) "\n"; pos += len; return }
 	if (emitted + have >= maxrec) { flush(); stop = 1; return }
@@ -144,7 +139,7 @@ def record($r; $t):
 [inputs] as $lines
 | ($lines | map(select(startswith("E\t")))[0][2:] | tonumber) as $read_to
 | reduce ($lines[] | select(startswith("R\t") or startswith("D\t"))) as $l
-	({items: [], used: $used, over: false, prev: $prev};
+	({items: [], used: $used, over: ($capped == "1"), prev: $prev};
 	if ($l | startswith("D\t")) then .prev = (stamp($l[2:]) // .prev)
 	else
 		($l | capture("^R\t(?<o>[0-9]+)\t(?<c>[0-9]+)\t(?<b>.*)$")) as $r
@@ -156,13 +151,14 @@ def record($r; $t):
 		  else .items += [$rec] | .used += $n end
 	end)
 | if .over and ($capped == "0") then
-	.items += [{
+	{
 		timestamp: ($now / 1000), trace_id: $trace, level: "info",
-		body: "log shipper: cap of \($cap) bytes this hour reached; lines are dropped until the next hour",
+		body: "log shipper: cap of \($cap) bytes this hour reached; nothing more is sent until the next hour",
 		attributes: common
-	}]
-	| .capped = "1"
-  else .capped = (if .over then "1" else $capped end) end
+	} as $note
+	| .items += [$note] | .used += ($note | tojson | utf8bytelength)
+  else . end
+| .capped = (if .over then "1" else $capped end)
 | ([.used, .capped, $read_to, (.items | length), (.prev // "")] | @tsv), ({items: .items} | tojson)
 JQ
 
@@ -196,7 +192,7 @@ send() {
 
 ship_file() {
 	local src="$1" file="${SUPERSET_LOG_DIR}/${src}.log" size off partial=0 full=0 used capped read_to count last payload
-	[ -f "$file" ] || return 0
+	[ -f "$file" ] && [ ! -L "$file" ] || return 0
 	size="$(stat -c %s "$file")"
 	off="$(read_state "${src}.offset" "")"
 	# Turning the shipper on sends no history: each file starts at the current boot.
@@ -238,6 +234,7 @@ pass() {
 	[ "$h" = "$HOUR" ] || { USED=0; CAPPED=0; }
 	local src size off idle=1
 	for src in "${SOURCES[@]}"; do
+		[ -L "${SUPERSET_LOG_DIR}/${src}.log" ] && continue
 		size="$(stat -c %s "${SUPERSET_LOG_DIR}/${src}.log" 2>/dev/null)" || continue
 		off="$(read_state "${src}.offset" "")"
 		[ "$size" = "$off" ] || { idle=0; break; }

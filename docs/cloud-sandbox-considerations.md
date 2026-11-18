@@ -224,8 +224,8 @@ reaped while its terminal survived.
 `sandbox-box-logs-fleet` and the organization's `sandbox-box-logs`. The setup
 script and the clone output are never read. **Open:** host-service lines can
 still carry customer text: worktree paths, branch names, repository URLs, and
-git or `gh` errors that print the command. The shipper scrubs token formats
-and the hook command only. Before the flag is on for a customer organization,
+git or `gh` errors that print the command. The shipper scrubs token formats;
+host-service no longer prints hook commands. Before the flag is on for a customer organization,
 the policy wording (L1) must be live, and someone must decide which of those
 lines to drop.
 

@@ -115,11 +115,6 @@ export const sandboxIdentitySchema = z.object({
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
 	/** Starts `superset-logship`, which sends the platform's box logs to Sentry. Absent is off. */
 	SUPERSET_SANDBOX_BOX_LOGS: z.literal("1").optional(),
-	/** Bytes of records `superset-logship` sends per clock hour; its own default when absent. */
-	SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES: z
-		.string()
-		.regex(/^[1-9][0-9]*$/)
-		.optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
 	SUPERSET_SANDBOX_AGENT: z.string().optional(),
 	SUPERSET_SANDBOX_AGENT_PROMPT: z.string().optional(),
