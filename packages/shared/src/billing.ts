@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const PLAN_TIERS = ["free", "pro", "enterprise"] as const;
 export type PlanTier = (typeof PLAN_TIERS)[number];
 
@@ -148,12 +150,21 @@ export const CLOUD_USAGE_REFUSAL_KEYS = [
 	"serverError.cloudWorkspace.usageLimitReached",
 ] as const;
 
+/** Clients read the key from `data`; the server's own `TRPCError` still holds it in `cause`. */
+export function cloudUsageRefusalKey(
+	error: unknown,
+): (typeof CLOUD_USAGE_REFUSAL_KEYS)[number] | null {
+	const { data, cause } =
+		(error as {
+			data?: { i18nKey?: unknown } | null;
+			cause?: { i18nKey?: unknown } | null;
+		} | null) ?? {};
+	const i18nKey = data?.i18nKey ?? cause?.i18nKey;
+	return CLOUD_USAGE_REFUSAL_KEYS.find((key) => key === i18nKey) ?? null;
+}
+
 export function isCloudUsageRefusal(error: unknown): boolean {
-	const data = (error as { data?: { i18nKey?: unknown } | null } | null)?.data;
-	return (
-		typeof data?.i18nKey === "string" &&
-		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(data.i18nKey)
-	);
+	return cloudUsageRefusalKey(error) !== null;
 }
 
 export const PLAN_PRICE_CURRENCY = "USD";
@@ -335,7 +346,8 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+/** The plan's monthly price for a GB-hour beyond the allowance, when it sells overage. */
+export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 	const price = plan.items.find(
 		(item) =>
 			item.featureId === "box_gb_minutes" && item.price?.interval === "month",
@@ -503,6 +515,7 @@ export const MACHINE_SIZES = Object.keys(MACHINE_SIZE_VCPUS) as [
 	MachineSize,
 	...MachineSize[],
 ];
+export const machineSizeSchema = z.enum(MACHINE_SIZES);
 /** Every organization can run these; the rest need an Autumn feature each. */
 export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"small",
@@ -510,6 +523,8 @@ export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"large",
 ];
 export const DEFAULT_MACHINE_SIZE: MachineSize = "medium";
+/** The size of a workspace with no stored size: it was made before sizes existed. */
+export const LEGACY_MACHINE_SIZE: MachineSize = "large";
 
 export function isMachineSize(value: unknown): value is MachineSize {
 	return typeof value === "string" && Object.hasOwn(MACHINE_SIZE_VCPUS, value);

@@ -1,9 +1,9 @@
 import type { WorkspaceState } from "@superset/panes";
-import type { PersistableBrowserState } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import type { PersistableBrowserState } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import type {
 	BrowserPaneData,
 	PaneViewerData,
-} from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+} from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import {
 	getV2PaneLayoutStore,
@@ -17,7 +17,7 @@ const SLOTS: PaneLayoutSlot[] = ["paneLayout", "rightPaneLayout"];
  * workspace's mounted layout when it is shown, else into its saved layout.
  */
 export function persistBrowserPaneState(
-	collections: Pick<AppCollections, "v2WorkspaceLocalState">,
+	collections: Pick<AppCollections, "workspaceLocalState">,
 	workspaceId: string,
 	paneId: string,
 ): (state: PersistableBrowserState) => void {
@@ -34,8 +34,8 @@ export function persistBrowserPaneState(
 				return;
 			}
 		}
-		if (!collections.v2WorkspaceLocalState.get(workspaceId)) return;
-		collections.v2WorkspaceLocalState.update(workspaceId, (draft) => {
+		if (!collections.workspaceLocalState.get(workspaceId)) return;
+		collections.workspaceLocalState.update(workspaceId, (draft) => {
 			for (const slot of SLOTS) {
 				const layout = draft[slot] as
 					| WorkspaceState<PaneViewerData>

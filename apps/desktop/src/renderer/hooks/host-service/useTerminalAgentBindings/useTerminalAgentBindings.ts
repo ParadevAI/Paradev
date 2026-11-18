@@ -19,8 +19,12 @@ export type TerminalAgentBinding = TerminalAgentBindings[number];
  * host-service port change cold-started every agent chip. The queryFn
  * resolves the current host URL at fetch time.
  */
+export const TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX = [
+	"terminal-agent-bindings",
+] as const;
+
 export function getTerminalAgentBindingsQueryKey(workspaceId: string) {
-	return ["terminal-agent-bindings", workspaceId] as const;
+	return [...TERMINAL_AGENT_BINDINGS_QUERY_KEY_PREFIX, workspaceId] as const;
 }
 
 /**

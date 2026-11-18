@@ -13,7 +13,7 @@ export type AgentTarget =
 	| { kind: "existing"; terminalId: string; chatSessionId?: string }
 	| { kind: "new"; configId: string; placement: AgentSessionPlacement };
 
-export interface DecodedSelection {
+interface DecodedSelection {
 	kind: "existing" | "new";
 	id: string;
 }
@@ -34,7 +34,7 @@ function writeStorage(key: string, value: string) {
 	window.localStorage.setItem(key, value);
 }
 
-export function decodeSelection(value: string): DecodedSelection | null {
+function decodeSelection(value: string): DecodedSelection | null {
 	if (value.startsWith(EXISTING_PREFIX)) {
 		return { kind: "existing", id: value.slice(EXISTING_PREFIX.length) };
 	}

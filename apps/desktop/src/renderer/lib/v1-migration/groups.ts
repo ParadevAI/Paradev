@@ -1,6 +1,6 @@
+import { mintFolderTag } from "@superset/shared/workspace-tag-folders";
 import { normalizeWorkspaceTags } from "@superset/shared/workspace-tags";
 import type { HostServiceClient } from "renderer/lib/host-service-client";
-import { mintFolderTag } from "renderer/routes/_authenticated/utils/workspaceTagFolders/workspaceTagFolders";
 import type { V1GroupRow, V1MigrationIpc } from "./ipc";
 import {
 	isTerminalStatus,

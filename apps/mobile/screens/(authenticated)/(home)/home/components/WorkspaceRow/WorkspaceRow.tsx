@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { FolderGit2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
@@ -28,7 +29,10 @@ import type {
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
-import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
+import {
+	WorkspaceRowMenu,
+	type WorkspaceRowMenuProps,
+} from "./components/WorkspaceRowMenu";
 import { useWorkspaceMove } from "./hooks/useWorkspaceMove";
 import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
@@ -46,6 +50,7 @@ export function WorkspaceRow({
 	cloudStatus,
 	onCopied,
 	card = false,
+	groups,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -59,6 +64,7 @@ export function WorkspaceRow({
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
+	groups?: WorkspaceRowMenuProps["groups"];
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -93,7 +99,9 @@ export function WorkspaceRow({
 				// failed one only needs disposing of. Deleting a local workspace
 				// retires the record and leaves the checkout alone, so every row on
 				// a host is deletable.
-				canRename={cloudStatus === undefined || cloudStatus === "ready"}
+				canRename={
+					cloudStatus === undefined || isLiveCloudWorkspaceStatus(cloudStatus)
+				}
 				canDelete={cloudStatus === undefined || cloudStatus !== "provisioning"}
 				isCloud={cloudStatus !== undefined}
 				isUnread={isUnread}
@@ -106,6 +114,7 @@ export function WorkspaceRow({
 				onShare={shareWorkspace}
 				link={{ href, onCopied }}
 				move={move}
+				groups={groups}
 			>
 				{/* Default press behavior on purpose: the system context-menu lift
 			    owns the hold animation, and custom press feedback fights it. */}

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useV2AttentionWorkspaceCount } from "renderer/hooks/host-service/useV2NotificationStatus";
+import { useAttentionWorkspaceCount } from "renderer/hooks/host-service/useNotificationStatus";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useChannelBadge } from "./hooks/useChannelBadge";
 
@@ -10,7 +10,7 @@ import { useChannelBadge } from "./hooks/useChannelBadge";
  * lingers on the app icon.
  */
 export function DockBadgeController() {
-	const workspaces = useV2AttentionWorkspaceCount();
+	const workspaces = useAttentionWorkspaceCount();
 	const channels = useChannelBadge();
 	const count = workspaces + channels.mentions;
 

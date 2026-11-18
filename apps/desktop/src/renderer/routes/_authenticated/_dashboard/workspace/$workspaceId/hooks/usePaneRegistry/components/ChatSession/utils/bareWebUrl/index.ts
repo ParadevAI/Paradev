@@ -1,0 +1,1 @@
+export { bareWebUrl } from "./bareWebUrl";

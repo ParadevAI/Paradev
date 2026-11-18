@@ -11,9 +11,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LuCpu, LuGitBranch } from "react-icons/lu";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { electronTrpc } from "renderer/lib/electron-trpc";
 import {
 	type RecentlyViewedEntry,
 	useRecentlyViewed,
@@ -30,24 +28,13 @@ export function RecentlyViewedFrame() {
 	const { i18n } = useLingui();
 	const recentEntries = useRecentlyViewed(20);
 	const currentPath = useLocation({ select: (loc) => loc.pathname });
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const setOpen = useFrameStackStore((s) => s.setOpen);
 	const navigate = useNavigate();
-
-	const { data: groups } = electronTrpc.workspaces.getAllGrouped.useQuery();
-	const workspaceData = (groups ?? []).flatMap((group) =>
-		group.workspaces.map((ws) => ({
-			id: ws.id,
-			projectName: group.project.name,
-			projectColor: group.project.color,
-			branch: ws.branch ?? ws.name,
-		})),
-	);
 
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	// Projects are fully local — identity comes from the host fan-out.
 	const { projects: hostProjects } = useHostProjects();
-	const v2ProjectData = useMemo(
+	const projectData = useMemo(
 		() =>
 			hostProjects.map((project) => ({
 				id: project.projectKey,
@@ -55,9 +42,9 @@ export function RecentlyViewedFrame() {
 			})),
 		[hostProjects],
 	);
-	const v2WorkspaceData = useMemo(() => {
+	const workspaceData = useMemo(() => {
 		const projectNamesById = new Map(
-			(v2ProjectData ?? []).map((p) => [p.id, p.name]),
+			(projectData ?? []).map((p) => [p.id, p.name]),
 		);
 		// Inner join: drop workspaces whose project isn't synced yet (and
 		// project-less session workspaces).
@@ -67,7 +54,7 @@ export function RecentlyViewedFrame() {
 			if (projectName === undefined) return [];
 			return [{ id: workspace.id, projectName, branch: workspace.branch }];
 		});
-	}, [hostWorkspaces, v2ProjectData]);
+	}, [hostWorkspaces, projectData]);
 
 	const { data: automations = [] } =
 		cloudTrpc.automation.list.useQuery(undefined);
@@ -84,15 +71,9 @@ export function RecentlyViewedFrame() {
 
 	const filteredEntries = recentEntries.filter((entry) => {
 		if (entry.type === "workspace") {
-			if (isV2CloudEnabled) return false;
-			return workspaceData.some((w) => w.id === entry.entityId);
-		}
-		if (entry.type === "v2-workspace") {
-			if (!isV2CloudEnabled) return false;
-			return (v2WorkspaceData ?? []).some((w) => w.id === entry.entityId);
+			return (workspaceData ?? []).some((w) => w.id === entry.entityId);
 		}
 		if (entry.type === "automation") {
-			if (!isV2CloudEnabled) return false;
 			return automationData.some((a) => a.id === entry.entityId);
 		}
 		return taskData.some(
@@ -130,34 +111,23 @@ export function RecentlyViewedFrame() {
 							/>
 						);
 					}
-					if (entry.type === "v2-workspace") {
+					if (entry.type === "workspace") {
 						return (
-							<V2WorkspaceRow
+							<WorkspaceRow
 								key={entry.path}
 								entry={entry}
 								isCurrent={isCurrent}
-								v2WorkspaceData={v2WorkspaceData ?? []}
-								onSelect={() => navigateTo(entry.path)}
-							/>
-						);
-					}
-					if (entry.type === "automation") {
-						return (
-							<AutomationRow
-								key={entry.path}
-								entry={entry}
-								isCurrent={isCurrent}
-								automationData={automationData}
+								workspaceData={workspaceData ?? []}
 								onSelect={() => navigateTo(entry.path)}
 							/>
 						);
 					}
 					return (
-						<WorkspaceRow
+						<AutomationRow
 							key={entry.path}
 							entry={entry}
 							isCurrent={isCurrent}
-							workspaceData={workspaceData}
+							automationData={automationData}
 							onSelect={() => navigateTo(entry.path)}
 						/>
 					);
@@ -179,64 +149,10 @@ function WorkspaceRow({
 	workspaceData,
 	onSelect,
 }: RowProps & {
-	workspaceData: {
-		id: string;
-		projectName: string;
-		projectColor: string;
-		branch: string;
-	}[];
+	workspaceData: { id: string; projectName: string; branch: string }[];
 }) {
 	const { i18n } = useLingui();
 	const ws = workspaceData.find((w) => w.id === entry.entityId);
-	return (
-		<CommandItem
-			value={`workspace ${entry.entityId} ${ws?.projectName ?? ""} ${ws?.branch ?? ""}`}
-			onSelect={onSelect}
-			className={cn("gap-2.5", isCurrent && "bg-accent/50")}
-		>
-			<span className="text-muted-foreground text-xs shrink-0 w-24 text-left line-clamp-1">
-				{ws?.projectName ??
-					i18n._(
-						msg({
-							message: "Workspace",
-						}),
-					)}
-			</span>
-			<span className="flex items-center justify-center w-4 shrink-0">
-				{ws ? (
-					<span
-						className="size-2 rounded-full"
-						style={{ background: ws.projectColor }}
-					/>
-				) : null}
-			</span>
-			<span
-				className={cn(
-					"truncate text-xs font-normal flex-1 min-w-0",
-					!ws && "text-muted-foreground",
-				)}
-			>
-				{ws?.branch ??
-					i18n._(
-						msg({
-							message: "Unknown",
-						}),
-					)}
-			</span>
-		</CommandItem>
-	);
-}
-
-function V2WorkspaceRow({
-	entry,
-	isCurrent,
-	v2WorkspaceData,
-	onSelect,
-}: RowProps & {
-	v2WorkspaceData: { id: string; projectName: string; branch: string }[];
-}) {
-	const { i18n } = useLingui();
-	const ws = v2WorkspaceData.find((w) => w.id === entry.entityId);
 	return (
 		<CommandItem
 			value={`v2-workspace ${entry.entityId} ${ws?.projectName ?? ""} ${ws?.branch ?? ""}`}
@@ -322,8 +238,6 @@ function TaskRow({
 	taskData: {
 		id: string;
 		slug: string;
-		externalProvider: string | null;
-		externalKey: string | null;
 		title: string;
 		statusColor: string;
 		statusType: string;

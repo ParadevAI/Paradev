@@ -72,19 +72,19 @@ export function useArchiveCloudWorkspace() {
 		const { pathname } = router.state.location;
 		const stillAtTarget =
 			target.kind === "workspace"
-				? pathname.startsWith(`/v2-workspace/${target.workspaceId}`)
+				? pathname.startsWith(`/workspace/${target.workspaceId}`)
 				: pathname === "/new-workspace";
 		if (!stillAtTarget) return;
 		void navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: id },
 			replace: true,
 		});
 	};
 
-	return (id: string) => {
+	return (id: string, archivedWithIds?: ReadonlySet<string>) => {
 		if (archiving.includes(id)) return;
-		const target = navigateAwayFromWorkspace(id);
+		const target = navigateAwayFromWorkspace(id, archivedWithIds);
 		// Unarchive only succeeds once the row is archived, so the undo waits
 		// for the server.
 		mutateAsync({ id })
@@ -105,7 +105,7 @@ export function useArchiveCloudWorkspace() {
 						onClick: () => {
 							clearUndoable(id);
 							void navigate({
-								to: "/v2-workspace/$workspaceId",
+								to: "/workspace/$workspaceId",
 								params: { workspaceId: id },
 							});
 						},

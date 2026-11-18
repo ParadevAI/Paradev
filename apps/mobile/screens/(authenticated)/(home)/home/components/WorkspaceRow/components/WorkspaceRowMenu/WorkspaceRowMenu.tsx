@@ -19,6 +19,7 @@ export function WorkspaceRowMenu({
 	onCopyId,
 	onShare,
 	move,
+	groups,
 	children,
 }: WorkspaceRowMenuProps) {
 	const { t } = useLingui();
@@ -62,6 +63,35 @@ export function WorkspaceRowMenu({
 				{canRename ? (
 					<Link.MenuAction icon="pencil" onPress={onRename}>
 						{t({ message: "Rename" })}
+					</Link.MenuAction>
+				) : null}
+				{groups ? (
+					<Link.Menu title={t({ message: "Move to group" })} icon="folder">
+						{groups.options.map((group) => (
+							<Link.MenuAction
+								key={group.tag}
+								isOn={group.tag === groups.current}
+								onPress={() => groups.onMove(group.tag)}
+							>
+								{group.name}
+							</Link.MenuAction>
+						))}
+						<Link.Menu inline>
+							<Link.MenuAction
+								icon="folder.badge.plus"
+								onPress={groups.onCreate}
+							>
+								{t({ message: "Create new group" })}
+							</Link.MenuAction>
+						</Link.Menu>
+					</Link.Menu>
+				) : null}
+				{groups?.current ? (
+					<Link.MenuAction
+						icon="folder.badge.minus"
+						onPress={() => groups.onMove(null)}
+					>
+						{t({ message: "Ungroup" })}
 					</Link.MenuAction>
 				) : null}
 				{move && (move.canMoveToCloud || move.computers.length > 0) ? (

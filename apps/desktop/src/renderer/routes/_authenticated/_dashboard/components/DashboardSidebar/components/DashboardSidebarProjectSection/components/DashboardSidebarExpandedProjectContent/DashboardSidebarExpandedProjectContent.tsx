@@ -21,10 +21,8 @@ import { SidebarDropZone } from "../../../SidebarDropZone";
 import { SortableSectionHeader } from "../../../SortableSectionHeader";
 import { SortableWorkspaceItem } from "../../../SortableWorkspaceItem";
 
-// Bulk actions are host-backed; a cloud row stays out of the selection.
 const isBulkSelectable = (workspace: DashboardSidebarWorkspace) =>
-	workspace.pendingTransaction?.type !== "insert" &&
-	workspace.hostType !== "cloud";
+	workspace.pendingTransaction?.type !== "insert";
 
 interface DashboardSidebarExpandedProjectContentProps {
 	/** DnD container: a project id, or SESSIONS_CONTAINER for the Sessions lane. */

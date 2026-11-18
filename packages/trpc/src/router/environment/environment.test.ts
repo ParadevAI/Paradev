@@ -1,12 +1,15 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { db } from "@superset/db/client";
+import { db, dbWs } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as plan from "../../lib/billing/plan";
 import * as guards from "../../lib/cloud-guards";
 import * as sandbox from "../../lib/sandbox";
 import { userError } from "../../trpc";
 import * as access from "../cloud-workspace/access";
+import * as wake from "../cloud-workspace/wake";
 import * as integration from "../integration/utils";
+import * as currentBundle from "./current-bundle";
+import * as limit from "./limit";
 
 const ENVIRONMENT_ID = "6f7a8b9c-0d1e-4f2a-8b3c-4d5e6f7a8b9c";
 const ORGANIZATION_ID = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d";
@@ -50,7 +53,7 @@ stub(access, {
 		id: WORKSPACE_ID,
 		organizationId: ORGANIZATION_ID,
 		environmentId: ENVIRONMENT_ID,
-		status: "ready",
+		status: "awake",
 		baseBranch: "main",
 		branch: "main",
 	}),
@@ -126,5 +129,61 @@ describe("environment.promote onto an environment", () => {
 			}),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote of a running workspace", () => {
+	const restarted: Array<[string, { sessionId: string | null }]> = [];
+	const order: string[] = [];
+	stub(sandbox, {
+		promoteSandboxToEnvironment: async () => ({
+			goldenName: "env-new",
+			region: "iad1",
+			stopped: { sessionId: "sess_A" },
+		}),
+		deleteSandbox: async () => {},
+	});
+	stub(wake, {
+		wakeAfterStop: async (
+			row: { id: string },
+			stopped: { sessionId: string | null },
+		) => {
+			restarted.push([row.id, stopped]);
+			order.push("restart");
+			throw userError({
+				code: "FORBIDDEN",
+				message: "limit reached",
+				i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+			});
+		},
+	});
+	stub(db, {
+		select: () => ({ from: () => ({ where: async () => [] }) }),
+	});
+	stub(limit, { assertEnvironmentCapacity: async () => null });
+	stub(currentBundle, { currentBundleSha: async () => "sha" });
+	stub(dbWs, {
+		transaction: async (run: (tx: unknown) => Promise<unknown>) => {
+			const rows = () => [{ id: ENVIRONMENT_ID }];
+			const tx = {
+				insert: () => ({
+					values: () =>
+						Object.assign(Promise.resolve(), { returning: async () => rows() }),
+				}),
+				delete: () => ({ where: async () => {} }),
+			};
+			const saved = await run(tx);
+			order.push("save");
+			return saved;
+		},
+	});
+
+	test("saves the environment, then starts the box again through the wake path; a refused restart does not fail the promote", async () => {
+		await caller.environment.promote({
+			cloudWorkspaceId: WORKSPACE_ID,
+			name: "Saved",
+		});
+		expect(restarted).toEqual([[WORKSPACE_ID, { sessionId: "sess_A" }]]);
+		expect(order).toEqual(["save", "restart"]);
 	});
 });

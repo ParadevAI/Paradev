@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
 	environmentProjects,
@@ -7,7 +8,7 @@ import {
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
-import { MACHINE_SIZES } from "@superset/shared/billing";
+import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -19,8 +20,8 @@ import {
 	isMember,
 	type MemberContext,
 } from "../../lib/cloud-guards";
+import { controlTags } from "../../lib/control-log";
 import {
-	buildSandboxClaim,
 	deleteSandbox,
 	loadRepositories,
 	primaryRepository,
@@ -31,7 +32,9 @@ import {
 } from "../../lib/sandbox";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { isLiveStatus } from "../cloud-workspace/live";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { wakeAfterStop } from "../cloud-workspace/wake";
 import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
@@ -229,7 +232,7 @@ async function loadPromotable(
 	cloudWorkspaceId: string,
 ) {
 	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
-	if (workspace.status !== "ready") {
+	if (!isLiveStatus(workspace.status)) {
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "Only a ready workspace can become an environment",
@@ -497,12 +500,28 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
-			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
-				claim,
+				organizationId: workspace.organizationId,
 			});
+			const { stopped } = golden;
+			const restart = async () => {
+				if (!stopped) return;
+				await wakeAfterStop(workspace, stopped).catch((error) => {
+					console.error(
+						`[environment/promote] could not restart ${workspace.id} after its snapshot`,
+						error,
+					);
+					if (isCloudUsageRefusal(error)) return;
+					Sentry.captureException(error, {
+						tags: controlTags({
+							cloudWorkspaceId: workspace.id,
+							organizationId: workspace.organizationId,
+						}),
+					});
+				});
+			};
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,
@@ -603,6 +622,7 @@ export const environmentRouter = {
 							cleanup,
 						),
 					);
+					await restart();
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
@@ -613,6 +633,7 @@ export const environmentRouter = {
 					),
 				);
 			}
+			await restart();
 			return row;
 		}),
 

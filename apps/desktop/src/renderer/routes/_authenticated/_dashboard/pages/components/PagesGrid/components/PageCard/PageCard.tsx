@@ -202,7 +202,7 @@ export function PageCard({
 							message: `Actions for ${page.title}`,
 						})}
 						className={cn(
-							"absolute top-2 right-2 size-7 bg-background/80 backdrop-blur transition-opacity",
+							"absolute top-2 right-2 size-7 bg-background/90 transition-opacity",
 							"opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100",
 						)}
 					>

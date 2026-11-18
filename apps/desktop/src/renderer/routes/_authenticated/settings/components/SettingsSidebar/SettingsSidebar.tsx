@@ -8,7 +8,6 @@ import {
 	HiMagnifyingGlass,
 	HiXMark,
 } from "react-icons/hi2";
-import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { usePluginsSettingsVisible } from "renderer/hooks/usePluginsSettingsVisible";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { AppMenuButton } from "renderer/routes/_authenticated/_dashboard/components/AppMenuButton";
@@ -31,7 +30,6 @@ export function SettingsSidebar() {
 	const searchQuery = useSettingsSearchQuery();
 	const setSearchQuery = useSetSettingsSearchQuery();
 	const originRoute = useSettingsOriginRoute();
-	const isV2CloudEnabled = useIsV2CloudEnabled();
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === undefined || platform === "darwin";
 	const cloudWorkspacesEnabled =
@@ -41,7 +39,6 @@ export function SettingsSidebar() {
 	const matchCounts = normalizedSearchQuery
 		? getVisibleMatchCountBySection(
 				normalizedSearchQuery,
-				isV2CloudEnabled,
 				cloudWorkspacesEnabled,
 				pluginsVisible,
 			)

@@ -73,7 +73,7 @@ export class Workspaces extends APIResource {
 
 	/**
 	 * Create a cloud workspace. Provisioning runs in the background, so this
-	 * returns the row in `provisioning`; poll `retrieve(id)` until `ready`
+	 * returns the row in `provisioning`; poll `retrieve(id)` until it leaves `provisioning`
 	 * before creating terminals or agents in it. Pass `agent` and `prompt` to
 	 * launch an agent as soon as the sandbox boots.
 	 *
@@ -199,16 +199,17 @@ function selectEnvironment<
 
 export type CloudWorkspaceStatus =
 	| "provisioning"
-	| "ready"
+	| "awake"
+	| "asleep"
 	| "failed"
-	| "deleted";
+	| "archived";
 
 export interface CloudWorkspace {
 	id: string;
 	organizationId: string;
 	name: string;
 	branch: string;
-	/** Only `ready` workspaces accept terminals and agents. */
+	/** Only `awake` and `asleep` workspaces accept terminals and agents; an asleep one is woken. */
 	status: CloudWorkspaceStatus;
 	environmentId: string;
 	provider: string;
