@@ -32,6 +32,7 @@ describe("cloudUsageFromBalances", () => {
 			prepaidGbMinutes: 0,
 			autoTopup: null,
 			pack: null,
+			overagePerGbHour: null,
 			resetsAt: new Date(RESET).toISOString(),
 		});
 	});
@@ -54,6 +55,7 @@ describe("cloudUsageFromBalances", () => {
 			prepaidGbMinutes: 0,
 			autoTopup: null,
 			pack: null,
+			overagePerGbHour: null,
 			resetsAt: null,
 		});
 	});

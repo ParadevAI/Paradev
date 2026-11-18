@@ -60,15 +60,20 @@ export const commandStatusEnum = z.enum(commandStatusValues);
 export type CommandStatus = z.infer<typeof commandStatusEnum>;
 
 /**
- * No sleep/wake states: the provider wakes a sandbox on the first inbound
- * connection, so "asleep" is invisible to callers and could only ever be
- * reported stale. `ready` means addressable, awake or not.
+ * `asleep`: the box session ended, and the box answers nothing until `access`
+ * with `wake` resumes it. Only `sandbox-sleep.ts` and `sandbox-expiry.ts` move
+ * a row between `awake` and `asleep`. `ready` and `deleted` are the old names
+ * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
+ * enum value without rebuilding the type.
  */
 export const cloudWorkspaceStatusValues = [
 	"provisioning",
 	"ready",
 	"failed",
 	"deleted",
+	"awake",
+	"asleep",
+	"archived",
 ] as const;
 export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
 export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
@@ -80,6 +85,61 @@ export const cloudWorkspaceVisibilityEnum = z.enum(
 );
 export type CloudWorkspaceVisibility = z.infer<
 	typeof cloudWorkspaceVisibilityEnum
+>;
+
+/** The Autumn features a cloud workspace boot is billed on; the values are Autumn feature ids. */
+export const cloudUsageFeatureValues = [
+	"box_gb_minutes",
+	"active_cpu_minutes",
+] as const;
+export const cloudUsageFeatureEnum = z.enum(cloudUsageFeatureValues);
+export type CloudUsageFeature = z.infer<typeof cloudUsageFeatureEnum>;
+
+export const cloudWorkspaceBootEndReasonValues = [
+	"idle",
+	"user",
+	"usage_limit",
+	"archived",
+	"restarted",
+	"failed",
+	"released",
+	"crashed",
+	"unknown",
+] as const;
+export const cloudWorkspaceBootEndReasonEnum = z.enum(
+	cloudWorkspaceBootEndReasonValues,
+);
+export type CloudWorkspaceBootEndReason = z.infer<
+	typeof cloudWorkspaceBootEndReasonEnum
+>;
+
+/** Who inserted a boot row: a create or a wake that authorized it, or the reconcile that found its session unmetered. */
+export const cloudWorkspaceBootOriginValues = [
+	"create",
+	"wake",
+	"adopt",
+] as const;
+export const cloudWorkspaceBootOriginEnum = z.enum(
+	cloudWorkspaceBootOriginValues,
+);
+export type CloudWorkspaceBootOrigin = z.infer<
+	typeof cloudWorkspaceBootOriginEnum
+>;
+
+export const cloudWorkspaceFailureReasonValues = [
+	"usage_limit",
+	"needs_paid_plan",
+	"host_not_ready",
+	"create_failed",
+	"queue_failed",
+	"sandbox_gone",
+	"snapshot_expired",
+] as const;
+export const cloudWorkspaceFailureReasonEnum = z.enum(
+	cloudWorkspaceFailureReasonValues,
+);
+export type CloudWorkspaceFailureReason = z.infer<
+	typeof cloudWorkspaceFailureReasonEnum
 >;
 
 /** Who made a change: a person (bot accounts included) or Superset itself. */

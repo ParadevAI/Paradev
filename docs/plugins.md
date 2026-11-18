@@ -99,7 +99,11 @@ authorization server's metadata, and then gets a client identity one of two ways
   stored; or
 - the server offers a `registration_endpoint`, so we register once per authorization server
   (RFC 7591) and keep the result in `plugin_oauth_clients`, keyed by issuer and redirect URI so
-  every user shares one registration.
+  every user shares one registration. The registration picks a client authentication method from
+  the server's `token_endpoint_auth_methods_supported` (`client_secret_basic` when it lists none).
+  A server that wants another one than it advertises gets `token_request_auth_method` on the
+  method: we register with it, send token requests with it, and register again rather than reuse a
+  stored client registered with another one.
 
 Either way the flow is PKCE with a `resource` indicator, the authorization response's `iss` is
 checked against the discovered issuer before the code is redeemed (RFC 9207), and refresh happens

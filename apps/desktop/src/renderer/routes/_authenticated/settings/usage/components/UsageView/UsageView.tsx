@@ -34,6 +34,7 @@ import type {
 } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
+import { useNow } from "renderer/hooks/useNow";
 import {
 	formatResetIn,
 	formatResetLabel,
@@ -79,6 +80,7 @@ function meterColor(usedPercent: number): string {
 
 /** One line per window: label · bar · % · reset. Density over ceremony. */
 function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
+	const now = useNow(60_000);
 	const percent = Math.min(window.usedPercent, 100);
 	return (
 		<div className="grid grid-cols-[minmax(0,9rem)_1fr_2.5rem_5rem] items-center gap-2">
@@ -96,9 +98,11 @@ function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
 			</span>
 			<span
 				className="text-right text-[11px] text-muted-foreground tabular-nums"
-				title={window.resetsAt ? formatResetLabel(window.resetsAt) : undefined}
+				title={
+					window.resetsAt ? formatResetLabel(window.resetsAt, now) : undefined
+				}
 			>
-				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt)}` : ""}
+				{window.resetsAt ? `↺ ${formatResetIn(window.resetsAt, now)}` : ""}
 			</span>
 		</div>
 	);

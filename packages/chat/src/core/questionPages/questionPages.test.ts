@@ -1,0 +1,75 @@
+import { describe, expect, it } from "bun:test";
+import type { FormField } from "../../protocol";
+import {
+	isInvalidNumber,
+	isPageAnswered,
+	questionPages,
+} from "./questionPages";
+
+const choice = (id: string): FormField => ({
+	id,
+	input: "single",
+	options: [{ value: "a", label: "a" }],
+});
+const text = (id: string): FormField => ({ id, input: "text" });
+
+describe("questionPages", () => {
+	it("pairs each choice with the text field that follows it", () => {
+		const pages = questionPages([
+			choice("q0"),
+			text("q0_custom"),
+			choice("q1"),
+			text("q1_custom"),
+			text("note"),
+		]);
+		expect(pages.map((page) => [page.field.id, page.other?.id])).toEqual([
+			["q0", "q0_custom"],
+			["q1", "q1_custom"],
+			["note", undefined],
+		]);
+	});
+
+	it("accepts a Codex note as the only answer to its required choice", () => {
+		const pages = questionPages([
+			{ ...choice("delivery"), required: true },
+			{ ...text("delivery_note1"), answerFor: "delivery" },
+		]);
+		expect(pages).toHaveLength(1);
+		const [page] = pages;
+		if (!page) throw new Error("Missing question");
+		expect(isPageAnswered(page, { delivery_note1: "Pickup" })).toBe(true);
+		expect(isPageAnswered(page, { delivery_note1: " " })).toBe(false);
+	});
+
+	it("attaches a delayed note to its own question without replacing an earlier note", () => {
+		const pages = questionPages([
+			choice("1"),
+			choice("2"),
+			{ ...text("first_note"), answerFor: "1" },
+			{ ...text("second_note"), answerFor: "2" },
+			{ ...text("duplicate"), answerFor: "1" },
+		]);
+		expect(pages.map(({ field, other }) => [field.id, other?.id])).toEqual([
+			["1", "first_note"],
+			["2", "second_note"],
+			["duplicate", undefined],
+		]);
+	});
+
+	it("keeps a generic text field on its own page", () => {
+		const pages = questionPages([choice("priority"), text("notes")]);
+		expect(pages.map((page) => [page.field.id, page.other?.id])).toEqual([
+			["priority", undefined],
+			["notes", undefined],
+		]);
+	});
+
+	it("flags a decimal in a whole-number field but not an empty one", () => {
+		const integer: FormField = { id: "count", input: "integer" };
+		const number: FormField = { id: "ratio", input: "number" };
+		expect(isInvalidNumber(integer, "3.9")).toBe(true);
+		expect(isInvalidNumber(integer, "4")).toBe(false);
+		expect(isInvalidNumber(integer, "")).toBe(false);
+		expect(isInvalidNumber(number, "3.9")).toBe(false);
+	});
+});

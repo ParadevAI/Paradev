@@ -18,7 +18,7 @@ import { StatStrip } from "@/app/[lang]/components/StatStrip";
 import { TierObjectives } from "@/app/[lang]/components/TierObjectives";
 import { TierTube } from "@/app/[lang]/components/TierTube";
 import { TokenSplitBar } from "@/app/[lang]/components/TokenSplitBar";
-import { localeUrl, localizedAlternates } from "@/app/[lang]/metadata";
+import { localeUrl } from "@/app/[lang]/metadata";
 import {
 	dayCount,
 	formatCount,
@@ -64,12 +64,12 @@ export async function generateMetadata({
 		profile.models.length,
 		lang,
 	)} models.`;
-	const url = localeUrl(lang, `/${profile.handle}`);
+	const url = localeUrl("en", `/${profile.handle}`);
 
 	return {
 		title,
 		description,
-		alternates: localizedAlternates(lang, `/${profile.handle}`),
+		alternates: { canonical: url },
 
 		openGraph: {
 			title,

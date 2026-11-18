@@ -7,6 +7,7 @@ config({ path: path.resolve(process.cwd(), "../../../.env"), quiet: true });
 
 export const env = createEnv({
 	server: {
+		BROWSER_API_URL: z.string().url().optional(),
 		GH_CLIENT_ID: z.string(),
 		GH_CLIENT_SECRET: z.string(),
 		GOOGLE_CLIENT_ID: z.string(),
@@ -27,6 +28,7 @@ export const env = createEnv({
 		AUTUMN_SECRET_KEY: z.string().min(1),
 		QSTASH_TOKEN: z.string().min(1),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
+		MOBILE_WEB_ORIGINS: z.string().optional(),
 	},
 	clientPrefix: "NEXT_PUBLIC_",
 	client: {

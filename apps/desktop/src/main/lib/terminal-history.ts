@@ -50,7 +50,7 @@ export function truncateUtf8ToLastBytes(
 // Types
 // =============================================================================
 
-export interface SessionMetadata {
+interface SessionMetadata {
 	cwd: string;
 	cols: number;
 	rows: number;

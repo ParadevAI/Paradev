@@ -1,6 +1,10 @@
 import { auth } from "@superset/auth/server";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import { buildProtectedResourceMetadata } from "@/lib/oauth-metadata";
+import { env } from "@/env";
+import {
+	buildProtectedResourceMetadata,
+	MCP_RESOURCE_PATH,
+} from "@/lib/oauth-metadata";
 
 interface RouteContext {
 	params: Promise<{
@@ -20,6 +24,7 @@ export async function GET(
 
 	return Response.json(
 		buildProtectedResourceMetadata(request, resourcePath, {
+			resourceUrl: `${env.NEXT_PUBLIC_API_URL}${MCP_RESOURCE_PATH}`,
 			authorizationServerUrl:
 				typeof authServerMetadata.issuer === "string"
 					? authServerMetadata.issuer

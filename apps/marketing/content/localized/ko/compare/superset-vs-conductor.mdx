@@ -1,0 +1,85 @@
+---
+title: "Paradev와 Conductor 비교: 로컬 에이전트, 클라우드 워크스페이스, 검토"
+description: "병렬 코딩 에이전트, 로컬 및 클라우드 워크스페이스, 검토, 팀 협업, 모바일 액세스를 기준으로 Paradev와 Conductor를 비교합니다."
+date: 2026-02-02
+lastUpdated: 2026-11-14
+type: "1v1"
+competitors:
+  - conductor
+keywords:
+  - superset vs conductor
+  - conductor 대안
+  - ai 에이전트 오케스트레이션
+  - 코딩 에이전트 관리
+  - conductor vs superset
+  - conductor 종료
+  - conductor에서 이전
+---
+
+이전을 원한다면 이전 옵션은 [Conductor에서 Paradev로 이동](/conductor)을, 로컬 앱은 [Conductor에서 이전](https://docs.paradev.com/migrate-from-conductor)을, 클라우드 워크스페이스는 [Conductor Cloud에서 이전](https://docs.paradev.com/migrate-from-conductor-cloud)을 참조하세요.
+
+Paradev와 Conductor는 모두 병렬 코딩 작업을 별도의 워크스페이스로 구성합니다. Conductor는 클라우드 워크스페이스, 공유 팀 대화, API 및 MCP 서버, 예약 또는 GitHub 액션으로 실행되는 Routines, 클라우드 액세스 및 로컬 Mac 워크스페이스의 실험적 원격 제어를 제공하는 iOS 앱을 지원합니다. Paradev의 iPhone 및 iPad 앱은 클라우드 워크스페이스와 사용자가 소유한 호스트에 연결되므로 에이전트가 실행되는 곳과 관계없이 워크스페이스 터미널과 diff 검토를 이어갈 수 있습니다.
+
+## 한눈에 보기
+
+| 요구 사항 | Paradev | Conductor |
+|---|---|---|
+| 에이전트 | Claude Code, Codex, OpenCode, Gemini CLI, Cursor Agent, Copilot, Amp 및 추가하는 모든 사용자 지정 CLI 에이전트 | Claude Code, Codex, Cursor, OpenCode |
+| 작업 위치 | 로컬 워크스페이스, 연결된 호스트, 자체 Linux 서버([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), [클라우드 워크스페이스](https://docs.paradev.com/cloud-workspaces) | 로컬 Mac 워크스페이스 및 클라우드 샌드박스 |
+| 검토 | 변경사항 창에서 커밋, 푸시, PR 열기; PR 창에서 검사, 검토 스레드, 병합 확인 | diff, 검사, pull request, 병합 및 보관 |
+| 팀 액세스 | 추가한 호스트에 구성원별로 액세스 권한 부여, 조직 액세스 지원 | 공유 클라우드 워크스페이스 및 대화 |
+| 브라우저 | 디자인 모드가 있는 앱 내 브라우저 창: 요소를 선택해 에이전트에게 전달 | 브라우저 미리보기 |
+| 자동화 | Pro에서 선택한 호스트의 에이전트 실행 예약, 실행 기록 및 실패한 실행 재시도 | 예약 또는 GitHub 액션으로 클라우드에서 실행하는 Routines |
+| 프로그래밍 방식 제어 | CLI, TypeScript SDK, MCP 서버 | API 및 Conductor MCP |
+| 휴대폰 | App Store의 iPhone 및 iPad 앱, iOS 또는 iPadOS 26 이상, Pro; 클라우드 워크스페이스와 자체 호스트에서 작동 | iOS 앱; 클라우드 워크스페이스와 [로컬 Mac 워크스페이스의 실험적 원격 제어](https://www.conductor.build/docs/reference/remote-control). 원격 제어를 사용하려면 Mac을 켜고, 절전 상태가 아니며, 온라인 상태로 유지해야 합니다. |
+| 요금 | 무료; Pro {{price:pro}}/사용자/월 또는 연간 결제 시 {{price:pro:yearly}}; Team {{price:team}} 또는 연간 결제 시 {{price:team:yearly}}; Ultra {{price:ultra}}; Enterprise 맞춤 요금. 유료 플랜은 클라우드를 이용할 수 있습니다. 포함 사용량과 종량제 초과분은 [요금](/pricing)을 참조하세요. | Conductor의 [현재 플랜 및 계정 액세스](https://www.conductor.build/docs/cloud/faq) 참조 |
+
+Conductor의 [소개](https://www.conductor.build/docs)에는 네 가지 에이전트 하네스와 검토 경로가 나와 있습니다. [Cloud 문서](https://www.conductor.build/docs/cloud)에서는 공유 환경과 격리된 샌드박스를 설명합니다. 현재 문서에는 [iPhone에서 로컬 Mac 워크스페이스를 실험적으로 원격 제어하는 기능](https://www.conductor.build/docs/reference/remote-control)도 나와 있습니다.
+
+## Paradev 요구 사항
+
+Paradev는 CLI 코딩 에이전트를 별도 워크스페이스에서 실행하며, 터미널과 diff 검토를 하나의 앱에서 제공합니다. 데스크톱 앱은 macOS와 실험용 Linux AppImage를 지원합니다. Windows는 아직 지원되지 않습니다. Paradev는 MIT 라이선스 오픈 소스입니다. Conductor에서 채팅 기능을 사용했다면 Claude Code, Codex, OpenCode, Pi를 위한 [채팅 인터페이스](https://docs.paradev.com/chat)를 사용할 수 있습니다.
+
+여러 세션을 동시에 다루는 경우 워크스페이스 페이지에서 모든 호스트의 워크스페이스를 상태별(주의 필요, 작업 중, 검토 필요, 유휴, 병합됨)로 묶어 보여줍니다. 중단된 에이전트 세션은 같은 창에서 다시 시작되며, Claude Code나 Codex가 시작한 하위 에이전트는 상위 에이전트 아래에 표시됩니다.
+
+[iPhone 및 iPad에서 Paradev](/mobile)를 사용하려면 iOS 26 또는 iPadOS 26 이상과 Pro가 필요합니다. 클라우드 워크스페이스는 자체 컴퓨터를 연결된 상태로 유지하지 않아도 작동합니다. 자체 컴퓨터에서 실행되는 워크스페이스를 사용하려면 해당 호스트를 온라인 상태로 유지해야 합니다. 원격 액세스와 자동화에도 유료 플랜이 필요합니다. [요금](/pricing) 및 [원격 액세스 설정](https://docs.paradev.com/remote-access)을 참조하세요.
+
+## 저장소에서 사용해 보기
+
+이 비교는 Paradev가 발행했습니다. 링크된 Conductor 문서는 기능 설명의 근거이며, 아래의 시험 방법은 성능 순위 측정이 아닙니다.
+
+앱을 비교하려면 각 앱에서 동일한 저장소 커밋, 에이전트, 모델, 서로 독립적인 작업 프롬프트 두 개를 사용하세요. 앱과 에이전트 버전, 날짜, 설정 차이를 기록하세요. 범위가 정해진 프롬프트는 [병렬 작업 안내서](/blog/parallel-coding-agents-guide)에 있습니다.
+
+| 시험 단계 | 기록할 근거 |
+|---|---|
+| 서로 독립적인 작업 두 개 만들기 | 워크스페이스 경로와 브랜치 이름, 테스트 실행 전에 필요한 설정 단계 |
+| 각 에이전트가 작은 변경을 마칠 때까지 기다리기 | 프롬프트, 모델, 변경된 파일, 검사 출력 |
+| 수정 사항 하나 요청하기 | 올바른 세션을 찾아 다시 시작할 수 있는지 여부 |
+| 두 변경사항 검토 및 통합하기 | 검토 단계, 충돌, 통합 테스트 결과 |
+| 필요한 경우 원격 액세스 시도하기 | 호스트 사용 가능 여부, 필요한 플랜, 연결이 끊겼을 때의 동작 |
+
+설정 및 검토 시간은 에이전트 실행 시간과 별도로 측정하세요. 속도에 대한 결론을 내리기 전에 반복해서 시험하세요. 에이전트 출력은 달라지며, 실행이 빨라도 diff 품질이 더 나쁠 수 있습니다. Git worktree는 작업 파일을 분리하지만, 충돌 없는 통합이나 에이전트 권한의 샌드박싱을 보장하지는 않습니다.
+
+![Paradev에서 변경사항 검토하기.](/images/readme/diff-viewer.png)
+
+## Conductor 사용자가 지금 할 수 있는 일
+
+이전을 선택한다면 유지할 브랜치를 저장하고 필요한 기록을 내보내세요.
+
+어떤 CLI 에이전트든 사용할 수 있고, 작업이 자체 컴퓨터, 호스트, 클라우드 워크스페이스에서 실행되는 동안 iPhone으로 에이전트에게 답하고 변경사항을 검토하고 싶다면 Paradev를 선택하세요. [휴대폰 안내](/blog/claude-code-codex-iphone)로 설정을 확인하세요. 작업을 옮기려면 [로컬 앱 안내서](https://docs.paradev.com/migrate-from-conductor) 또는 [Conductor Cloud 안내서](https://docs.paradev.com/migrate-from-conductor-cloud)를 따르세요.
+
+컴퓨팅 및 에이전트 제공자 비용을 포함해 현재 [Paradev 플랜](/pricing)을 비교해보세요. 에이전트 제공자 사용량은 별도로 청구됩니다.
+
+## 자주 묻는 질문
+
+### Conductor는 로컬 작업만 지원하나요?
+
+아니요. Conductor 문서는 로컬 Mac 워크스페이스와 [클라우드 샌드박스](https://www.conductor.build/docs/cloud)를 설명하며, 공유 클라우드 워크스페이스도 포함됩니다. iOS 앱은 [로컬 Mac 워크스페이스의 실험적 원격 제어](https://www.conductor.build/docs/reference/remote-control)도 제공합니다.
+
+### Conductor에서 OpenCode를 실행할 수 있나요?
+
+예. 소개 문서에는 OpenCode가 Claude Code, Codex, Cursor와 함께 나와 있습니다.
+
+### Paradev를 사용하려면 편집기를 바꿔야 하나요?
+
+아니요. Paradev가 터미널과 워크스페이스를 관리하는 동안 편집기에서 워크스페이스 디렉터리를 열 수 있습니다. 겹치는 편집 작업은 한쪽에서만 담당하도록 하세요.

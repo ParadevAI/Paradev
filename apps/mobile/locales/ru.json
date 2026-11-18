@@ -1,8 +1,8 @@
 {
 	"ios": {
-		"NSSpeechRecognitionUsageDescription": "Superset использует распознавание речи для преобразования голоса в текст.",
-		"NSPhotoLibraryUsageDescription": "Superset нужен доступ к вашей медиатеке, чтобы прикреплять изображения к сообщениям.",
-		"NSCameraUsageDescription": "Superset использует камеру, чтобы прикреплять фотографии к сообщениям.",
-		"NSMicrophoneUsageDescription": "Superset использует микрофон, чтобы вы могли диктовать сообщения."
+		"NSSpeechRecognitionUsageDescription": "Paradev использует распознавание речи для преобразования голоса в текст.",
+		"NSPhotoLibraryUsageDescription": "Paradev нужен доступ к вашей медиатеке, чтобы прикреплять изображения к сообщениям.",
+		"NSCameraUsageDescription": "Paradev использует камеру, чтобы прикреплять фотографии к сообщениям.",
+		"NSMicrophoneUsageDescription": "Paradev использует микрофон, чтобы вы могли диктовать сообщения."
 	}
 }

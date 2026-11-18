@@ -156,6 +156,7 @@ describe("isCloudUsageRefusal", () => {
 			"serverError.cloudWorkspace.usageLimitReached",
 		]) {
 			expect(isCloudUsageRefusal({ data: { i18nKey } })).toBe(true);
+			expect(isCloudUsageRefusal({ cause: { i18nKey } })).toBe(true);
 		}
 		expect(
 			isCloudUsageRefusal({

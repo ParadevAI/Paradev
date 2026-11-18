@@ -73,7 +73,7 @@ export class Workspaces extends APIResource {
 
 	/**
 	 * Create a cloud workspace. Provisioning runs in the background, so this
-	 * returns the row in `provisioning`; poll `retrieve(id)` until `ready`
+	 * returns the row in `provisioning`; poll `retrieve(id)` until it leaves `provisioning`
 	 * before creating terminals or agents in it. Pass `agent` and `prompt` to
 	 * launch an agent as soon as the sandbox boots.
 	 *
@@ -199,16 +199,17 @@ function selectEnvironment<
 
 export type CloudWorkspaceStatus =
 	| "provisioning"
-	| "ready"
+	| "awake"
+	| "asleep"
 	| "failed"
-	| "deleted";
+	| "archived";
 
 export interface CloudWorkspace {
 	id: string;
 	organizationId: string;
 	name: string;
 	branch: string;
-	/** Only `ready` workspaces accept terminals and agents. */
+	/** Only `awake` and `asleep` workspaces accept terminals and agents; an asleep one is woken. */
 	status: CloudWorkspaceStatus;
 	environmentId: string;
 	provider: string;
@@ -244,7 +245,7 @@ export interface WorkspaceCreateParams {
 	model?: string;
 	/** Reasoning effort for the agent. Supported values depend on the agent; omit to use its default. */
 	effort?: string;
-	/** `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB; the default) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where the plan includes them. */
+	/** `small` (2 vCPU, 4 GB), `medium` (4 vCPU, 8 GB) or `large` (8 vCPU, 16 GB); `xlarge` and `2xlarge` where the plan includes them. Omitted = the environment's size, else the organization's default. */
 	machineSize?: "small" | "medium" | "large" | "xlarge" | "2xlarge";
 }
 

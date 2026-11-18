@@ -104,6 +104,8 @@ export const ChatRowView = memo(
 							<Trans>Paused when Paradev closed</Trans>
 						) : row.status === "interrupted" ? (
 							<Trans>Stopped</Trans>
+						) : row.status === "limited" ? (
+							<Trans>Stopped by the usage limit</Trans>
 						) : (
 							(row.message ?? <Trans>The turn failed</Trans>)
 						)}

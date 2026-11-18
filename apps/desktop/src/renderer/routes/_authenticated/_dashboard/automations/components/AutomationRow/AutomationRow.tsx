@@ -153,7 +153,7 @@ export function AutomationRow({
 		if (!lastRun?.workspaceId) return;
 		localStorage.setItem("lastViewedWorkspaceId", lastRun.workspaceId);
 		navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: lastRun.workspaceId },
 			search: runWorkspaceSearch(lastRun),
 		});

@@ -3,12 +3,10 @@ title: Migrate from Conductor
 description: Move your local Conductor workspaces, scripts, and agents to Paradev
 ---
 
-Conductor is [joining Meta](https://www.conductor.build/announcement) and is winding down. This guide moves your work to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
+If you choose to switch from Conductor, this guide moves your local workspaces to Paradev. Your branches, uncommitted changes, and agent subscriptions all come with you.
 
-The local Conductor app keeps working until early 2027, so you can move at your own pace.
-
-<Callout type="warn" title="Using Conductor Cloud?">
-Conductor Cloud goes read-only on November 13, 2026 and begins to delete data on November 20. Follow [Migrate from Conductor Cloud](/migrate-from-conductor-cloud) first.
+<Callout type="info" title="Using Conductor Cloud?">
+Follow [Migrate from Conductor Cloud](/migrate-from-conductor-cloud) to save your work and choose where to continue.
 </Callout>
 
 Both apps use the same model: one Git worktree and one branch per task, with an agent working inside it. Most of the move is pointing Paradev at the same repositories and translating one config file.
@@ -141,7 +139,7 @@ The [first parallel session](/first-workspace) walks through this end to end. Al
 
 ## 6. Remove Conductor
 
-The local Conductor app keeps working until early 2027, but you cannot download it again. When your workspaces are in Paradev:
+If you decide to remove Conductor after moving your workspaces, follow these steps:
 
 1. Quit Conductor and move it to the Trash.
 2. Keep `~/conductor/workspaces/` (or the repository's `.conductor/` folder) while you still have workspaces imported from it. They are ordinary worktrees, and deleting the folder deletes your work.

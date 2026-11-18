@@ -1,4 +1,5 @@
 import type { SelectConnection } from "@superset/db/schema";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import {
 	type ConnectorMethod,
 	getConnector,
@@ -105,7 +106,7 @@ function connectUrl(slug: string, organizationId: string | null): string {
 
 	const params = new URLSearchParams({ method: "oauth2" });
 	if (organizationId) params.set("organizationId", organizationId);
-	return `${env.NEXT_PUBLIC_API_URL}/api/connectors/${slug}/connect?${params}`;
+	return `${getBrowserApiUrl(env)}/api/connectors/${slug}/connect?${params}`;
 }
 
 async function pinnedConnection(

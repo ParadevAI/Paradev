@@ -90,6 +90,18 @@ export function WorkspaceMoveToast({ moveId }: { moveId: string }) {
 						: `${stayedSentence(move.stayed.length, i18n)} ${move.stayed.join(", ")}`}
 				</p>
 			)}
+			{ended && !failure && move.stayedTerminals.length > 0 && (
+				<p className="mt-1 truncate text-xs text-muted-foreground/70">
+					{move.stage === "ready"
+						? move.stayedTerminals.join(", ")
+						: `${stayedTerminalsSentence(move.stayedTerminals.length, i18n)} ${move.stayedTerminals.join(", ")}`}
+				</p>
+			)}
+			{ended && !failure && move.notRestartedTerminals.length > 0 && (
+				<p className="mt-1 truncate text-xs text-muted-foreground/70">
+					{move.notRestartedTerminals.join(", ")}
+				</p>
+			)}
 			{!ended && (
 				<Progress className="mt-3 h-1.5" value={progressPercent(move)} />
 			)}
@@ -166,9 +178,22 @@ function describe(move: WorkspaceMoveProgress, i18n: I18n): string {
 			);
 		}
 		case "ready":
-			return move.stayed.length === 0
-				? i18n._(msg({ message: "Everything moved." }))
-				: stayedSentence(move.stayed.length, i18n);
+			if (move.terminalsPending) {
+				return i18n._(msg({ message: "Moving its terminals…" }));
+			}
+			if (move.stayed.length > 0) {
+				return stayedSentence(move.stayed.length, i18n);
+			}
+			if (move.notRestartedTerminals.length > 0) {
+				return notRestartedTerminalsSentence(
+					move.notRestartedTerminals.length,
+					i18n,
+				);
+			}
+			if (move.stayedTerminals.length > 0) {
+				return stayedTerminalsSentence(move.stayedTerminals.length, i18n);
+			}
+			return i18n._(msg({ message: "Everything moved." }));
 		case "partial":
 			return i18n._(
 				msg({
@@ -207,6 +232,28 @@ function stayedSentence(count: number, i18n: I18n): string {
 			message: plural(count, {
 				one: "# chat stayed in the old workspace.",
 				other: "# chats stayed in the old workspace.",
+			}),
+		}),
+	);
+}
+
+function stayedTerminalsSentence(count: number, i18n: I18n): string {
+	return i18n._(
+		msg({
+			message: plural(count, {
+				one: "# terminal stayed in the old workspace.",
+				other: "# terminals stayed in the old workspace.",
+			}),
+		}),
+	);
+}
+
+function notRestartedTerminalsSentence(count: number, i18n: I18n): string {
+	return i18n._(
+		msg({
+			message: plural(count, {
+				one: "# terminal stopped and could not start again.",
+				other: "# terminals stopped and could not start again.",
 			}),
 		}),
 	);

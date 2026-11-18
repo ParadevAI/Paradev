@@ -2,7 +2,7 @@
 title: "How to Isolate Parallel Coding Agents in One Repository (2026): Worktrees, Ports, and Resuming Work"
 description: "Isolate parallel coding agents with worktrees, clones, containers, or cloud sandboxes, keep ports and previews apart, and resume a task later."
 date: 2026-10-07
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-15
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -102,7 +102,7 @@ The browser pane can also be driven by agents through `superset browser` command
 
 ## How can I return to a coding task later with its agent session, terminal, branch, and preview still organized?
 
-Tie all four to one directory, and use tools that remember the link. The branch lives in the worktree, the conversation in the agent's session store, and the dev server in a process that must outlive your window.
+Tie all four to one directory, and use tools that remember the link, such as tmux for terminals or a Paradev workspace for the whole task. The branch lives in the worktree, the conversation in the agent's session store, and the dev server in a process that must outlive your window.
 
 **With plain tools:**
 

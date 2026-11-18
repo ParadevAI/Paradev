@@ -9,12 +9,21 @@ export {
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "./api-credential";
-export { bootBeganSince, recordBootSpans } from "./boot-trace";
+export {
+	apiPhases,
+	bootBeganSince,
+	bootPhases,
+	recordBootSpans,
+} from "./boot-trace";
 export {
 	type BoxHookOutcome,
 	rerunBoxStartHook,
 	runBoxArchiveHook,
 } from "./box-hooks";
+export {
+	type ReportSandboxBoxPressureOutcome,
+	reportSandboxBoxPressure,
+} from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
 export {
@@ -44,12 +53,14 @@ export {
 	workspaceRepositories,
 } from "./repositories";
 export {
+	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
 	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
 	provisionSandbox,

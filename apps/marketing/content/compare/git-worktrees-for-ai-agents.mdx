@@ -2,7 +2,7 @@
 title: "Git Worktrees for AI Coding Agents: The Parallel Workflow"
 description: "How Git worktrees let you run multiple AI coding agents in parallel in separate working directories. Learn the workflow, the tradeoffs, and the tools that automate it."
 date: 2026-07-13
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-15
 type: "tutorial"
 competitors:
   - git-worktrees
@@ -74,9 +74,9 @@ A Git merge can succeed while the application fails: one branch might rename an 
 
 ## How can I return to a coding task later with its agent session, terminal, branch, and preview still organized?
 
-Keep each task in its own workspace, not in a terminal tab. A worktree keeps the branch and files, but a plain terminal session ends when you close it.
+Keep each task in its own workspace, not in a terminal tab. In Paradev, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. A worktree alone keeps the branch and files, but a plain terminal session ends when you close it.
 
-In Paradev, each worktree workspace keeps its own worktree, branch, terminals, diff, and browser preview. Terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Paradev resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Agent Sessions](https://docs.paradev.com/agent-sessions).
+Paradev terminals run in a background service, so agents keep running when you close or update the app, and the scrollback is there when you return. If an agent's terminal dies unexpectedly and the agent has an ID-based resume command, Paradev resumes the session with it, for example `claude --resume <id>`. Agents without one do not resume automatically. See [Keep Agents Running](https://docs.paradev.com/keep-agents-running) and [Agent Sessions](https://docs.paradev.com/agent-sessions).
 
 ## I run several web-app branches with coding agents. How can I keep their terminals, previews, and ports organized?
 

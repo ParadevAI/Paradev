@@ -38,12 +38,14 @@ interface BillingSettingsProps {
 	 * organization, and the two sessions do not share that choice.
 	 */
 	organizationId?: string;
+	cloudUsageEnabled: boolean;
 	selectedPlan?: string;
 	yearly?: boolean;
 }
 
 export function BillingSettings({
 	organizationId,
+	cloudUsageEnabled,
 	selectedPlan,
 	yearly,
 }: BillingSettingsProps) {
@@ -281,6 +283,7 @@ export function BillingSettings({
 			<CloudUsageCard
 				organizationId={activeOrganizationId ?? null}
 				canBuy={isOwner}
+				showUsageLink={cloudUsageEnabled}
 			/>
 
 			{(plan === "free" || (plan === "pro" && usesAutumn && !cancelAt)) &&

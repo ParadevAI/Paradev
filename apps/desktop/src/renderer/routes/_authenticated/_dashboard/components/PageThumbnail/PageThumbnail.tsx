@@ -1,6 +1,6 @@
 import { cn } from "@superset/ui/utils";
 import { FileText } from "lucide-react";
-import { useReducer, useState } from "react";
+import { useState } from "react";
 import { THUMBNAIL_ASPECT_RATIO } from "./constants";
 
 const RETRY_FAILED_AFTER_MS = 60_000;
@@ -24,10 +24,17 @@ export function PageThumbnail({
 	className,
 }: PageThumbnailProps) {
 	const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-	const [, rerender] = useReducer((count: number) => count + 1, 0);
+	const [failure, setFailure] = useState<{ src: string; at: number } | null>(
+		null,
+	);
 	// Failures are shared across cards so a remount doesn't refetch a known
 	// 404, and expire so a later list refetch retries a fresh capture.
-	const failedAt = src === null ? undefined : failedAtBySrc.get(src);
+	const failedAt =
+		src === null
+			? undefined
+			: failure?.src === src
+				? failure.at
+				: failedAtBySrc.get(src);
 	const showImage =
 		src !== null &&
 		!(failedAt !== undefined && Date.now() - failedAt < RETRY_FAILED_AFTER_MS);
@@ -53,8 +60,9 @@ export function PageThumbnail({
 					decoding="async"
 					onLoad={() => setLoadedSrc(src)}
 					onError={() => {
-						failedAtBySrc.set(src, Date.now());
-						rerender();
+						const at = Date.now();
+						failedAtBySrc.set(src, at);
+						setFailure({ src, at });
 					}}
 					className={cn(
 						"absolute inset-0 h-full w-full object-cover object-top",

@@ -7,30 +7,38 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
+import { recordUsageEvent } from "@superset/db/cloud-usage-events";
+import type {
+	CloudUsageFeature,
+	CloudWorkspaceBootEndReason,
+	CloudWorkspaceBootOrigin,
+} from "@superset/db/enums";
 import {
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
 	users,
 } from "@superset/db/schema";
-import { CLOUD_USAGE_REFUSAL_KEYS } from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
-import { and, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
+import { controlTags, logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	type ActiveWorkspaceSandbox,
 	findSandboxSession,
-	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { recordBoxStopped } from "./sandbox-sleep";
 
 const LOCK_WINDOW_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 70 * 60 * 1000;
 const CAP_GRACE_MS = 10 * 60 * 1000;
 const SETTLE_LEASE_MS = 2 * 60 * 1000;
 const UNATTACHED_BOOT_GRACE_MS = 60 * 60 * 1000;
-const RECONCILE_LOOKBACK_MS = 60 * 60 * 1000;
+const ADOPT_LOOKBACK_MS = 2 * 60 * 60 * 1000;
 const RECONCILE_CONCURRENCY = 25;
 
 export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
@@ -82,6 +90,24 @@ function reservation(memoryMb: number): number {
 	return gbMinutes({ ms: LOCK_WINDOW_MS, memoryMb });
 }
 
+function reserveLock(
+	boot: Pick<Boot, "id" | "lockSeq" | "organizationId" | "cloudWorkspaceId">,
+	memoryMb: number,
+	user: UsageUser | null,
+) {
+	return autumnClient.check({
+		customerId: boot.organizationId,
+		featureId: BOX_GB_MINUTES_FEATURE_ID,
+		requiredBalance: reservation(memoryMb),
+		properties: usageProperties(boot, user),
+		lock: {
+			enabled: true,
+			lockId: lockIdFor(boot.id, boot.lockSeq),
+			expiresAt: Date.now() + LOCK_TTL_MS,
+		},
+	});
+}
+
 function usageProperties(
 	boot: Pick<Boot, "id" | "lockSeq" | "cloudWorkspaceId">,
 	user: UsageUser | null,
@@ -120,7 +146,9 @@ async function checkOrFailOpen<T>(
 		await ensureAutumnCustomer(organizationId);
 		return await check();
 	} catch (error) {
-		Sentry.captureException(error, { extra: { organizationId } });
+		Sentry.captureException(error, {
+			tags: { "organization.id": organizationId },
+		});
 		return null;
 	}
 }
@@ -155,6 +183,8 @@ export async function authorizeBoot(
 		createdByUserId: string | null;
 		memoryMb: number;
 		vcpus: number;
+		origin: CloudWorkspaceBootOrigin;
+		traceId: string;
 	},
 	{ billingEnabled = billingUsesAutumn }: { billingEnabled?: boolean } = {},
 ): Promise<{ bootId: string | null }> {
@@ -162,23 +192,26 @@ export async function authorizeBoot(
 	const bootId = `boot_${randomUUID()}`;
 	const user = await usageUser(args.createdByUserId);
 	const result = await checkOrFailOpen(args.organizationId, () =>
-		autumnClient.check({
-			customerId: args.organizationId,
-			featureId: BOX_GB_MINUTES_FEATURE_ID,
-			requiredBalance: reservation(args.memoryMb),
-			properties: usageProperties(
-				{ id: bootId, lockSeq: 0, cloudWorkspaceId: args.cloudWorkspaceId },
-				user,
-			),
-			lock: {
-				enabled: true,
-				lockId: lockIdFor(bootId, 0),
-				expiresAt: Date.now() + LOCK_TTL_MS,
+		reserveLock(
+			{
+				id: bootId,
+				lockSeq: 0,
+				organizationId: args.organizationId,
+				cloudWorkspaceId: args.cloudWorkspaceId,
 			},
-		}),
+			args.memoryMb,
+			user,
+		),
 	);
+	const scope = {
+		cloudWorkspaceId: args.cloudWorkspaceId,
+		organizationId: args.organizationId,
+	};
 	const refusal = result && refusalFor(result);
-	if (refusal) throw refusalError(refusal);
+	if (refusal) {
+		logControl("boot.refused", scope, { refusal }, "warn");
+		throw refusalError(refusal);
+	}
 	await db.insert(cloudWorkspaceBoots).values({
 		id: bootId,
 		organizationId: args.organizationId,
@@ -187,11 +220,33 @@ export async function authorizeBoot(
 		vcpus: args.vcpus,
 		startedAt: new Date(),
 		lockOpen: result !== null,
+		createdByUserId: args.createdByUserId,
+		origin: args.origin,
+		traceId: args.traceId,
 	});
+	logControl(
+		"boot.authorized",
+		{ ...scope, bootId },
+		{
+			"box.vcpus": args.vcpus,
+			"box.memory_mb": args.memoryMb,
+			"lock.open": result !== null,
+		},
+	);
 	return { bootId };
 }
 
-export async function releaseBoot(bootId: string): Promise<void> {
+type BootReleaseCause =
+	| "provision_failed"
+	| "provision_abandoned"
+	| "session_taken"
+	| "never_attached"
+	| "sandbox_lost";
+
+export async function releaseBoot(
+	bootId: string,
+	cause: BootReleaseCause,
+): Promise<void> {
 	const [boot] = await db
 		.select()
 		.from(cloudWorkspaceBoots)
@@ -211,15 +266,30 @@ export async function releaseBoot(bootId: string): Promise<void> {
 			);
 	}
 	const now = new Date();
-	await db
+	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
 			lockOpen: false,
 			settleLeaseUntil: null,
+			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
-		.where(eq(cloudWorkspaceBoots.id, bootId));
+		.where(eq(cloudWorkspaceBoots.id, bootId))
+		.returning({
+			endReason: sql<CloudWorkspaceBootEndReason>`${cloudWorkspaceBoots.endReason}`,
+		});
+	if (boot.cloudWorkspaceId && released) {
+		logControl(
+			"boot.released",
+			{
+				cloudWorkspaceId: boot.cloudWorkspaceId,
+				organizationId: boot.organizationId,
+				bootId,
+			},
+			{ "end.reason": released.endReason, "release.cause": cause },
+		);
+	}
 }
 
 export async function attachBootSession(args: {
@@ -249,13 +319,69 @@ export async function attachBootSession(args: {
 			if (isUniqueViolation(error)) return [];
 			throw error;
 		});
-	if (attached.length === 0) await releaseBoot(args.bootId);
+	if (attached.length > 0) return;
+	const [current] = await db
+		.select({ vercelSessionId: cloudWorkspaceBoots.vercelSessionId })
+		.from(cloudWorkspaceBoots)
+		.where(eq(cloudWorkspaceBoots.id, args.bootId));
+	if (current?.vercelSessionId === session.id) return;
+	await releaseBoot(args.bootId, "session_taken");
 }
 
-async function recordUsage(
+function bootTags(boot: Boot): Record<string, string> {
+	return {
+		"organization.id": boot.organizationId,
+		"boot.id": boot.id,
+		...(boot.cloudWorkspaceId
+			? { "cloud_workspace.id": boot.cloudWorkspaceId }
+			: {}),
+	};
+}
+
+type UsageWindow = {
+	from: number;
+	to: number;
+	amount: number;
+	user: UsageUser | null;
+};
+
+async function recordSentUsage(
 	boot: Boot,
-	window: { from: number; amount: number; user: UsageUser | null },
+	feature: CloudUsageFeature,
+	window: UsageWindow,
 ): Promise<void> {
+	await recordUsageEvent(db, {
+		bootId: boot.id,
+		lockSeq: boot.lockSeq,
+		feature,
+		organizationId: boot.organizationId,
+		cloudWorkspaceId: boot.cloudWorkspaceId,
+		userId: window.user?.id ?? null,
+		windowFrom: new Date(window.from),
+		windowTo: new Date(window.to),
+		amount: String(window.amount),
+		sentAt: new Date(),
+	}).catch((error) => {
+		Sentry.captureException(error, {
+			tags: bootTags(boot),
+			extra: { feature, lockSeq: boot.lockSeq },
+		});
+	});
+}
+
+/**
+ * Autumn can apply a confirm and still answer 503; the retry then finds no lock.
+ * A lock taken less than its lifetime ago cannot have expired, so that confirm went through.
+ */
+function confirmedEarlier(boot: Boot, error: AutumnError): boolean {
+	const takenAt = boot.finalizedThrough ?? boot.createdAt;
+	return (
+		error.body.includes("Lock not found") &&
+		Date.now() < takenAt.getTime() + LOCK_TTL_MS - LOCK_WINDOW_MS
+	);
+}
+
+async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 	const { amount } = window;
 	const properties = usageProperties(boot, window.user);
 	const lockId = lockIdFor(boot.id, boot.lockSeq);
@@ -266,17 +392,16 @@ async function recordUsage(
 				{ lockId, action: "confirm", overrideValue: amount },
 				{ headers: { "Idempotency-Key": `${lockId}:confirm` } },
 			);
-			return;
+			return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 		} catch (error) {
 			if (!(error instanceof AutumnError)) throw error;
-			if (error.statusCode === 409) return;
+			if (error.statusCode === 409 || confirmedEarlier(boot, error)) {
+				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
+			}
 			if (error.statusCode >= 500) throw error;
 			Sentry.captureException(error, {
-				extra: {
-					bootId: boot.id,
-					lockId,
-					organizationId: boot.organizationId,
-				},
+				tags: bootTags(boot),
+				extra: { lockId },
 			});
 		}
 	}
@@ -294,9 +419,10 @@ async function recordUsage(
 			{ headers: { "Idempotency-Key": `${lockId}:track:${window.from}` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 }
 
 async function claimSettle(bootId: string): Promise<Boot | null> {
@@ -324,26 +450,23 @@ function clearLease(bootId: string) {
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 }
 
-async function recordActiveCpu(
-	boot: Boot,
-	activeCpuMs: number,
-	user: UsageUser | null,
-) {
+async function recordActiveCpu(boot: Boot, window: UsageWindow) {
 	try {
 		await autumnClient.track(
 			{
 				customerId: boot.organizationId,
 				featureId: ACTIVE_CPU_MINUTES_FEATURE_ID,
-				value: activeCpuMs / 60_000,
+				value: window.amount,
 				async: false,
-				properties: usageProperties(boot, user),
+				properties: usageProperties(boot, window.user),
 			},
 			{ headers: { "Idempotency-Key": `${boot.id}:active-cpu` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, ACTIVE_CPU_MINUTES_FEATURE_ID, window);
 }
 
 /**
@@ -382,7 +505,7 @@ export async function settleBoot(
 				await clearLease(bootId);
 				return "skipped";
 			}
-			await releaseBoot(bootId);
+			await releaseBoot(bootId, "never_attached");
 			return "closed";
 		}
 		const found = workspace
@@ -395,7 +518,7 @@ export async function settleBoot(
 			Sentry.captureMessage(
 				`[cloud-workspace/meter] boot ${bootId} lost its sandbox; unsettled minutes released`,
 			);
-			await releaseBoot(bootId);
+			await releaseBoot(bootId, "sandbox_lost");
 			return "closed";
 		}
 		const { session } = found;
@@ -412,6 +535,7 @@ export async function settleBoot(
 		).getTime();
 		await recordUsage(boot, {
 			from,
+			to: end,
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
 			user,
 		});
@@ -422,11 +546,24 @@ export async function settleBoot(
 
 		if (session.endedAt !== null) {
 			if (session.activeCpuMs) {
-				await recordActiveCpu(boot, session.activeCpuMs, user);
+				await recordActiveCpu(boot, {
+					from: session.startedAt,
+					to: end,
+					amount: session.activeCpuMs / 60_000,
+					user,
+				});
 			}
 			await db
 				.update(cloudWorkspaceBoots)
-				.set({ stoppedAt: new Date(end), settleLeaseUntil: null })
+				.set({
+					stoppedAt: new Date(end),
+					settleLeaseUntil: null,
+					activeCpuMs: session.activeCpuMs,
+					egressBytes: session.egressBytes,
+					endReason: session.crashed
+						? "crashed"
+						: sql`coalesce(${cloudWorkspaceBoots.endReason}, 'unknown')`,
+				})
 				.where(eq(cloudWorkspaceBoots.id, bootId));
 			if (workspace?.usageStopAt && !(await otherOpenBoot(boot))) {
 				await setUsageStopAt(boot, null);
@@ -435,17 +572,11 @@ export async function settleBoot(
 		}
 
 		const nextSeq = boot.lockSeq + 1;
-		const renewal = await autumnClient.check({
-			customerId: boot.organizationId,
-			featureId: BOX_GB_MINUTES_FEATURE_ID,
-			requiredBalance: reservation(session.memoryMb),
-			properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
-			lock: {
-				enabled: true,
-				lockId: lockIdFor(bootId, nextSeq),
-				expiresAt: Date.now() + LOCK_TTL_MS,
-			},
-		});
+		const renewal = await reserveLock(
+			{ ...boot, lockSeq: nextSeq },
+			session.memoryMb,
+			user,
+		);
 		await db
 			.update(cloudWorkspaceBoots)
 			.set({
@@ -458,18 +589,34 @@ export async function settleBoot(
 			return renewal.allowed ? "renewed" : "stopped";
 		}
 		const stopAt = workspace.usageStopAt;
+		const scope = {
+			cloudWorkspaceId: boot.cloudWorkspaceId,
+			organizationId: boot.organizationId,
+			bootId,
+		};
 		if (renewal.allowed) {
 			if (stopAt) await setUsageStopAt(boot, null);
 			return "renewed";
 		}
 		if (!stopAt) {
 			await setUsageStopAt(boot, new Date(Date.now() + CAP_GRACE_MS));
+			logControl(
+				"meter.cap_reached",
+				scope,
+				{ stop_in_ms: CAP_GRACE_MS },
+				"warn",
+			);
 			await queueSettle(bootId, CAP_GRACE_MS / 1000);
 			return "warned";
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
-		await stopSandbox(workspace.providerSandboxId);
+		const stopped = await stopSandbox(workspace.providerSandboxId);
+		await recordBoxStopped(scope, {
+			sessionId: stopped.sessionId ?? boot.vercelSessionId,
+			reason: "usage_limit",
+		});
 		await setUsageStopAt(boot, null);
+		logControl("meter.cap_stopped", scope, { source: "settle" }, "warn");
 		return "stopped";
 	} catch (error) {
 		await clearLease(bootId);
@@ -551,6 +698,8 @@ export async function settleOrganizationNow(
 	const rows = await db
 		.select({
 			id: cloudWorkspaceBoots.id,
+			vercelSessionId: cloudWorkspaceBoots.vercelSessionId,
+			cloudWorkspaceId: cloudWorkspaces.id,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 		})
 		.from(cloudWorkspaceBoots)
@@ -562,11 +711,27 @@ export async function settleOrganizationNow(
 			and(eq(cloudWorkspaceBoots.organizationId, organizationId), OPEN_BOOT),
 		);
 	await Promise.all(
-		rows.map(({ id, providerSandboxId }) =>
-			providerSandboxId
-				? stopSandbox(providerSandboxId).catch((error) =>
-						Sentry.captureException(error, { extra: { bootId: id } }),
-					)
+		rows.map(({ id, vercelSessionId, cloudWorkspaceId, providerSandboxId }) =>
+			cloudWorkspaceId && providerSandboxId
+				? stopSandbox(providerSandboxId)
+						.then((stopped) =>
+							recordBoxStopped(
+								{ cloudWorkspaceId, organizationId },
+								{
+									sessionId: stopped.sessionId ?? vercelSessionId,
+									reason: "archived",
+								},
+							),
+						)
+						.catch((error) =>
+							Sentry.captureException(error, {
+								tags: controlTags({
+									cloudWorkspaceId,
+									organizationId,
+									bootId: id,
+								}),
+							}),
+						)
 				: undefined,
 		),
 	);
@@ -590,10 +755,10 @@ export async function settleWorkspaceNow(
 	}
 }
 
-async function adoptRunningBoxes(): Promise<number> {
-	const names = await listActiveWorkspaceSandboxes(
-		Date.now() - RECONCILE_LOOKBACK_MS,
-	);
+async function adoptRunningBoxes(
+	active: ActiveWorkspaceSandbox[],
+): Promise<number> {
+	const names = active.map((box) => box.name);
 	if (names.length === 0) return 0;
 	const unmetered = await db
 		.select({
@@ -608,72 +773,148 @@ async function adoptRunningBoxes(): Promise<number> {
 				eq(cloudWorkspaces.provider, "vercel"),
 				ne(cloudWorkspaces.status, "failed"),
 				inArray(cloudWorkspaces.providerSandboxId, names),
-				sql`not exists (select 1 from ${cloudWorkspaceBoots} boot where boot.cloud_workspace_id = ${cloudWorkspaces.id} and boot.stopped_at is null)`,
 			),
 		);
-	let adopted = 0;
-	for (const workspace of unmetered) {
-		const found = await findSandboxSession(workspace.providerSandboxId, null);
-		const session = found?.session;
-		if (!session || session.endedAt !== null) continue;
-		const claimed = await db
-			.select({ id: cloudWorkspaceBoots.id })
+	const adoptSessions = async (workspace: (typeof unmetered)[number]) => {
+		const sessions = await listSandboxSessions(
+			workspace.providerSandboxId,
+			Date.now() - ADOPT_LOOKBACK_MS,
+		);
+		if (!sessions?.length) return 0;
+		const boots = await db
+			.select({ vercelSessionId: cloudWorkspaceBoots.vercelSessionId })
 			.from(cloudWorkspaceBoots)
-			.where(eq(cloudWorkspaceBoots.vercelSessionId, session.id));
-		if (claimed.length > 0) continue;
-		let bootId: string | null = null;
-		try {
-			({ bootId } = await authorizeBoot({
-				organizationId: workspace.organizationId,
-				cloudWorkspaceId: workspace.id,
-				createdByUserId: workspace.createdByUserId,
-				memoryMb: session.memoryMb,
-				vcpus: session.vcpus,
-			}));
-			if (!bootId) continue;
-			await db
-				.update(cloudWorkspaceBoots)
-				.set({
-					vercelSessionId: session.id,
-					startedAt: new Date(session.startedAt),
-					finalizedThrough: new Date(),
-				})
-				.where(eq(cloudWorkspaceBoots.id, bootId));
-			adopted += 1;
-		} catch (error) {
-			if (bootId) await releaseBoot(bootId).catch(() => {});
-			const refused = (CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(
-				String((error as { cause?: { i18nKey?: unknown } }).cause?.i18nKey),
+			.where(
+				or(
+					inArray(
+						cloudWorkspaceBoots.vercelSessionId,
+						sessions.map((session) => session.id),
+					),
+					and(
+						eq(cloudWorkspaceBoots.cloudWorkspaceId, workspace.id),
+						isNull(cloudWorkspaceBoots.vercelSessionId),
+						isNull(cloudWorkspaceBoots.stoppedAt),
+						gt(
+							cloudWorkspaceBoots.createdAt,
+							new Date(Date.now() - UNATTACHED_BOOT_GRACE_MS),
+						),
+					),
+				),
 			);
-			if (!refused) {
-				Sentry.captureException(error, {
-					extra: { cloudWorkspaceId: workspace.id },
-				});
+		const metered = new Set(boots.map((boot) => boot.vercelSessionId));
+		let adopted = 0;
+		for (const [index, session] of sessions.entries()) {
+			// An open boot with no session yet attaches the newest one itself.
+			if (metered.has(session.id) || (index === 0 && metered.has(null))) {
 				continue;
 			}
+			const bootId = `boot_${randomUUID()}`;
+			const lock =
+				session.endedAt === null
+					? await checkOrFailOpen(workspace.organizationId, async () =>
+							reserveLock(
+								{
+									id: bootId,
+									lockSeq: 0,
+									organizationId: workspace.organizationId,
+									cloudWorkspaceId: workspace.id,
+								},
+								session.memoryMb,
+								await usageUser(workspace.createdByUserId),
+							),
+						)
+					: null;
+			const lockOpen = lock?.allowed === true;
+			let inserted: { id: string }[] = [];
+			try {
+				inserted = await db
+					.insert(cloudWorkspaceBoots)
+					.values({
+						id: bootId,
+						organizationId: workspace.organizationId,
+						cloudWorkspaceId: workspace.id,
+						vercelSessionId: session.id,
+						memoryMb: session.memoryMb,
+						vcpus: session.vcpus,
+						startedAt: new Date(session.startedAt),
+						lockOpen,
+						createdByUserId: workspace.createdByUserId,
+						origin: "adopt",
+					})
+					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
+					.returning({ id: cloudWorkspaceBoots.id });
+			} finally {
+				if (inserted.length === 0 && lockOpen) {
+					await autumnClient.balances.finalize({
+						lockId: lockIdFor(bootId, 0),
+						action: "release",
+					});
+				}
+			}
+			if (inserted.length === 0) continue;
+			adopted += 1;
+			await queueSettle(bootId);
+			if (!lock || lockOpen) continue;
 			console.error(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
-			await stopSandbox(workspace.providerSandboxId);
+			const stopped = await stopSandbox(workspace.providerSandboxId);
+			await recordBoxStopped(
+				{
+					cloudWorkspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+				},
+				{ sessionId: stopped.sessionId ?? session.id, reason: "usage_limit" },
+			);
+			logControl(
+				"meter.cap_stopped",
+				{
+					cloudWorkspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+				},
+				{ source: "reconcile" },
+				"warn",
+			);
+		}
+		return adopted;
+	};
+	let adopted = 0;
+	for (let i = 0; i < unmetered.length; i += RECONCILE_CONCURRENCY) {
+		const batch = unmetered.slice(i, i + RECONCILE_CONCURRENCY);
+		const results = await Promise.allSettled(batch.map(adoptSessions));
+		for (const [index, result] of results.entries()) {
+			if (result.status === "fulfilled") adopted += result.value;
+			else {
+				const workspace = batch[index] as (typeof unmetered)[number];
+				Sentry.captureException(result.reason, {
+					tags: controlTags({
+						cloudWorkspaceId: workspace.id,
+						organizationId: workspace.organizationId,
+					}),
+				});
+			}
 		}
 	}
 	return adopted;
 }
 
 /**
- * Queues a settle for every open boot, and starts metering boxes running
- * without one (boxes already up when metering shipped).
+ * Queues a settle for every open boot, then opens a boot for every recent
+ * session that has none (a box resumed by a call no one authorized).
  */
-export async function reconcileCloudWorkspaceUsage(): Promise<{
+export async function reconcileCloudWorkspaceUsage({
+	active = null,
+	billingEnabled = billingUsesAutumn,
+}: {
+	/** Workspace boxes whose state changed lately; null when the listing failed. */
+	active?: ActiveWorkspaceSandbox[] | null;
+	billingEnabled?: boolean;
+} = {}): Promise<{
 	adopted: number;
 	queued: number;
 	failed: number;
 }> {
-	if (!billingUsesAutumn) return { adopted: 0, queued: 0, failed: 0 };
-	const adopted = await adoptRunningBoxes().catch((error) => {
-		Sentry.captureException(error);
-		return 0;
-	});
+	if (!billingEnabled) return { adopted: 0, queued: 0, failed: 0 };
 	const ids = await openBootIds();
 	let failed = 0;
 	for (let i = 0; i < ids.length; i += RECONCILE_CONCURRENCY) {
@@ -687,5 +928,11 @@ export async function reconcileCloudWorkspaceUsage(): Promise<{
 			}
 		}
 	}
+	const adopted = active
+		? await adoptRunningBoxes(active).catch((error) => {
+				Sentry.captureException(error);
+				return 0;
+			})
+		: 0;
 	return { adopted, queued: ids.length - failed, failed };
 }
