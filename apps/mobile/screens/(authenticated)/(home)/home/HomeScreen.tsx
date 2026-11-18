@@ -126,6 +126,7 @@ interface ProjectGroups {
 	projectId: string | null;
 	folders: TagFolderGroup<HostWorkspaceItem>[];
 	folderTags: string[];
+	/** Every workspace in the scope, hidden ones included, for Delete group. */
 	workspaces: HostWorkspaceItem[];
 }
 
@@ -481,7 +482,11 @@ export function HomeScreen() {
 				projectId,
 				folders: grouped.folders,
 				folderTags: grouped.folderTags,
-				workspaces: groupable,
+				workspaces: workspaces.filter(
+					(workspace) =>
+						workspace.hostId === selectedHost?.machineId &&
+						workspace.projectId === projectId,
+				),
 			};
 			const children = orderProjectChildren(
 				grouped,
@@ -528,6 +533,7 @@ export function HomeScreen() {
 
 		return items;
 	}, [
+		workspaces,
 		liveWorkspaces,
 		cloudScope,
 		showArchived,

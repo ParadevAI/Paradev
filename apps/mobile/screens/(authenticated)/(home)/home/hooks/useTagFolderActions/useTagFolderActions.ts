@@ -168,32 +168,25 @@ export function useTagFolderActions(
 				queryClient.getQueryData<FolderSettingRow[]>(settingsKey) ?? []
 			).flatMap((row) => (row.scope === scope ? [row.tag] : []));
 			const tag = mintFolderTag(name, [...folderTags, ...storedTags]);
-			let settingWritten = false;
 			try {
 				await writeSetting(scope, tag, {
 					displayName: name,
 					color: randomGroupColor(),
 				});
-				settingWritten = true;
 				const current = latest(workspace);
 				await writeTags(
 					current,
-					applyFolderTagChange(current.tags, folderTags, tag),
+					applyFolderTagChange(
+						current.tags,
+						[...folderTags, ...normalizeWorkspaceTags(current.tags)],
+						tag,
+					),
 				);
 			} catch {
-				if (settingWritten && hostUrl) {
-					void getHostServiceClientByUrl(hostUrl)
-						.tagFolders.delete.mutate({ scope, tag })
-						.catch(() => {})
-						.finally(
-							() =>
-								void queryClient.invalidateQueries({ queryKey: settingsKey }),
-						);
-				}
 				Alert.alert(t({ message: "Couldn't create the group" }));
 			}
 		},
-		[writeSetting, writeTags, latest, queryClient, settingsKey, hostUrl, t],
+		[writeSetting, writeTags, latest, queryClient, settingsKey, t],
 	);
 
 	const renameFolder = useCallback(
