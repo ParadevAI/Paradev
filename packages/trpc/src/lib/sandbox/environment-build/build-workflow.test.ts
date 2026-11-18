@@ -104,7 +104,7 @@ stub(Sandbox, {
 	create: async ({ name }: { name: string }) => {
 		boxes.add(name);
 		boxesCreated++;
-		calls.push("create:image");
+		calls.push(`create:image:${name}`);
 	},
 });
 
@@ -146,6 +146,7 @@ stub(vercel, {
 	buildBoxSnapshotTaken: async () =>
 		stoppedAt !== null && now - stoppedAt >= STOP_MS,
 	deleteSandbox: async (name: string) => {
+		if (!boxes.has(name)) return;
 		calls.push(`delete:${name}`);
 		boxes.delete(name);
 	},
@@ -350,10 +351,14 @@ describe("environmentBuildWorkflow", () => {
 			"create",
 			`delete:${BOX}`,
 			"claim:claimed",
-			"create:image",
+			`create:image:${BOX}-fresh`,
 			"start:checkout",
 		]);
-		expect(build).toMatchObject({ status: "succeeded", kind: "fresh" });
+		expect(build).toMatchObject({
+			status: "succeeded",
+			kind: "fresh",
+			goldenRef: `${BOX}-fresh`,
+		});
 	});
 
 	test("a clean fork stays incremental", async () => {
@@ -368,7 +373,7 @@ describe("environmentBuildWorkflow", () => {
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
 		expect(now - started).toBeGreaterThanOrEqual(FRESH_REBUILD_WAIT_MS);
 		expect(calls.filter((call) => call === "create")).toHaveLength(2);
-		expect(calls).not.toContain("create:image");
+		expect(calls.some((call) => call.startsWith("create:image"))).toBe(false);
 		expect(build.kind).toBe("incremental");
 	});
 

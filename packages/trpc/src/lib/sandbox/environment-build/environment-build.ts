@@ -28,6 +28,20 @@ export function buildBoxName(buildId: string): string {
 	return `envb-${buildId.replaceAll("-", "").slice(0, 24)}`;
 }
 
+/** A fresh build has its own box name, so a fork of it still being deleted cannot collide. */
+export function freshBuildBoxName(buildId: string): string {
+	return `${buildBoxName(buildId)}-fresh`;
+}
+
+export function buildBoxNameFor(build: {
+	id: string;
+	kind: SelectEnvironmentBuild["kind"];
+}): string {
+	return build.kind === "fresh"
+		? freshBuildBoxName(build.id)
+		: buildBoxName(build.id);
+}
+
 export interface BuildInputs {
 	install: ResolvedPhase | null;
 	installSource: string;

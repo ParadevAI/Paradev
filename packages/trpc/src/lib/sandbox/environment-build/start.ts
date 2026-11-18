@@ -17,7 +17,7 @@ import {
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
 import { environmentBuildWorkflow } from "./build-workflow";
-import { buildBoxName } from "./environment-build";
+import { buildBoxName, freshBuildBoxName } from "./environment-build";
 import { checkoutLayoutMoves, STALE_BUILD_MS } from "./policy";
 
 export type BuildRefusalReason =
@@ -63,9 +63,14 @@ export async function expireStaleBuilds(environmentId: string): Promise<void> {
 		)
 		.returning({ id: environmentBuilds.id });
 	for (const { id } of expired) {
-		await deleteSandbox(buildBoxName(id)).catch((error: unknown) =>
-			console.error(`[environment-build] could not delete box of ${id}`, error),
-		);
+		for (const name of [buildBoxName(id), freshBuildBoxName(id)]) {
+			await deleteSandbox(name).catch((error: unknown) =>
+				console.error(
+					`[environment-build] could not delete box of ${id}`,
+					error,
+				),
+			);
+		}
 	}
 }
 

@@ -20,6 +20,8 @@ import {
 	BOX_READY_MS,
 	BuildFailure,
 	buildBoxName,
+	buildBoxNameFor,
+	freshBuildBoxName,
 	prepareBuild,
 	pruneGoldens,
 	within,
@@ -72,6 +74,12 @@ async function runningBuild(buildId: string) {
 	return loaded;
 }
 
+async function boxNameOf(buildId: string): Promise<string> {
+	const loaded = await loadBuild(buildId);
+	if (!loaded) throw new FatalError(NOT_RUNNING);
+	return buildBoxNameFor(loaded.build);
+}
+
 /**
  * The golden the build starts from, which is also what its swap is guarded
  * on; null for a build that already finished. Fails one with no `[install]`.
@@ -101,7 +109,7 @@ export async function createBox(
 	"use step";
 	const { build, environment } = await runningBuild(buildId);
 	const inputs = await prepareBuild(build);
-	const name = buildBoxName(build.id);
+	const name = buildBoxNameFor(build);
 	const source: BuildBoxSource =
 		build.kind === "incremental" && environment.sourceKind === "fork"
 			? { kind: "fork", golden: sourceRef }
@@ -162,7 +170,7 @@ export async function startCommand(
 		);
 	}
 	await buildBox().startBuildCommand({
-		name: buildBoxName(build.id),
+		name: buildBoxNameFor(build),
 		key,
 		script:
 			key === "checkout" || !install
@@ -189,7 +197,7 @@ export async function readCommand(
 ): Promise<BuildCommandState> {
 	"use step";
 	const state = await buildBox().readBuildCommand({
-		name: buildBoxName(buildId),
+		name: await boxNameOf(buildId),
 		key,
 	});
 	if (!(await recordBuildLog(buildId, state.tail))) {
@@ -206,13 +214,13 @@ export async function readCommand(
 
 export async function boxSnapshotId(buildId: string): Promise<string | null> {
 	"use step";
-	return buildBox().buildBoxSnapshotId(buildBoxName(buildId));
+	return buildBox().buildBoxSnapshotId(await boxNameOf(buildId));
 }
 
 export async function stopBox(buildId: string): Promise<void> {
 	"use step";
-	await runningBuild(buildId);
-	await buildBox().stopBuildBox(buildBoxName(buildId));
+	const { build } = await runningBuild(buildId);
+	await buildBox().stopBuildBox(buildBoxNameFor(build));
 }
 
 export async function snapshotTaken(
@@ -220,7 +228,7 @@ export async function snapshotTaken(
 	previous: string | null,
 ): Promise<boolean> {
 	"use step";
-	return buildBox().buildBoxSnapshotTaken(buildBoxName(buildId), previous);
+	return buildBox().buildBoxSnapshotTaken(await boxNameOf(buildId), previous);
 }
 
 /**
@@ -233,14 +241,13 @@ export async function activateBuild(
 	previousSourceRef: string,
 ): Promise<boolean> {
 	"use step";
-	const name = buildBoxName(buildId);
 	const loaded = await loadBuild(buildId);
-	if (loaded?.build.status === "succeeded" && loaded.build.goldenRef === name) {
+	if (!loaded) throw new FatalError(NOT_RUNNING);
+	const name = buildBoxNameFor(loaded.build);
+	if (loaded.build.status === "succeeded" && loaded.build.goldenRef === name) {
 		return true;
 	}
-	if (!loaded || loaded.build.status !== "running") {
-		throw new FatalError(NOT_RUNNING);
-	}
+	if (loaded.build.status !== "running") throw new FatalError(NOT_RUNNING);
 	return succeedBuild({
 		build: loaded.build,
 		previousSourceRef,
@@ -254,7 +261,7 @@ export async function pruneOldGoldens(buildId: string): Promise<void> {
 	if (!loaded) return;
 	await pruneGoldens({
 		environmentId: loaded.build.environmentId,
-		activeRef: buildBoxName(buildId),
+		activeRef: buildBoxNameFor(loaded.build),
 	});
 }
 
@@ -265,4 +272,5 @@ export async function failBuildAndCleanUp(
 	"use step";
 	await failBuild(buildId, reason);
 	await buildBox().deleteSandbox(buildBoxName(buildId));
+	await buildBox().deleteSandbox(freshBuildBoxName(buildId));
 }
