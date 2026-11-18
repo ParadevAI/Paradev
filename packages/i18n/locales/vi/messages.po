@@ -4353,6 +4353,9 @@ msgstr "Check đã qua"
 msgid "Checks Skipped"
 msgstr "Check đã bỏ qua"
 
+msgid "Checks unavailable"
+msgstr "Không có thông tin check"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Chọn một tài khoản {pluginLabel}"
 
@@ -4789,6 +4792,9 @@ msgstr "Sandbox trên cloud"
 
 msgid "Cloud usage"
 msgstr "Mức sử dụng đám mây"
+
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Mức sử dụng đám mây chưa được bật cho tổ chức này."
 
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
@@ -12587,6 +12593,10 @@ msgstr "Không tìm thấy tác giả nào."
 msgid "No automations match"
 msgstr "Không có tự động hóa nào khớp"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Không có kỳ thanh toán nào bắt đầu vào {0}."
+
 msgid "No branches found"
 msgstr "Không tìm thấy nhánh nào"
 
@@ -13600,6 +13610,9 @@ msgstr "Chỉ chủ sở hữu tổ chức mới sửa được các cài đặt
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Chỉ chủ sở hữu tổ chức hoặc chủ sở hữu thiết bị mới có thể xóa dự án này."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Chỉ chủ sở hữu và quản trị viên mới xem được mức sử dụng theo người."
 
 msgid "Only owners can change membership."
 msgstr "Chỉ chủ sở hữu mới thay đổi được thành viên."
@@ -19760,6 +19773,9 @@ msgstr "Tài khoản đó không còn được kết nối — hãy chọn tài 
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Phiên tác nhân đó chưa có cuộc trò chuyện nào để mở. Nó đã khởi động nhưng chưa từng nhận yêu cầu."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Không đọc được con trỏ này. Bỏ nó đi để bắt đầu từ trang đầu tiên."
+
 msgid "that device"
 msgstr "thiết bị đó"
 
@@ -20500,6 +20516,9 @@ msgstr "Việc này chỉ đổi tên hiển thị, không đổi nhánh."
 
 msgid "this organization"
 msgstr "tổ chức này"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Tổ chức này không có kỳ thanh toán nào. Hãy chọn một khoảng thời gian."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tổ chức này đang dùng gói Free. {appName} Mobile chỉ dành cho tổ chức dùng gói Pro."

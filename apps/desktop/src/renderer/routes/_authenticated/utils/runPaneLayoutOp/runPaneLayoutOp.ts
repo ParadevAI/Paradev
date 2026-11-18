@@ -15,6 +15,7 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/closedChatSessions";
 import { addPendingChatStop } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/utils/pendingChatStops";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
+import { forgetAgentSidebar } from "renderer/stores/agent-sidebar-reveal";
 import {
 	applyRememberedPaneSelection,
 	rememberPaneSelection,
@@ -151,8 +152,14 @@ export function runPaneLayoutOp(
 				mounted.getState().replaceState(next);
 				continue;
 			}
+			const emptiedSidebar =
+				area === "sidebar" &&
+				next.tabs.length === 0 &&
+				previous.sidebar.tabs.length > 0;
+			if (emptiedSidebar) forgetAgentSidebar(workspaceId);
 			collections.workspaceLocalState.update(workspaceId, (draft) => {
 				draft[SLOTS[area]] = next;
+				if (emptiedSidebar) draft.rightSidebarOpen = false;
 			});
 			rememberPaneSelection(selectionKey(workspaceId, area), next);
 		}

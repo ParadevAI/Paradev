@@ -14,6 +14,7 @@ export const OTHER_ORG = "a0000000-0000-4000-8000-000000000002";
 export const MAYA = "b0000000-0000-4000-8000-000000000001";
 export const SAM = "b0000000-0000-4000-8000-000000000002";
 export const BEN = "b0000000-0000-4000-8000-000000000003";
+export const ADA = "b0000000-0000-4000-8000-000000000004";
 export const CHECKOUT = "c0000000-0000-4000-8000-000000000001";
 export const BILLING_PAGE = "c0000000-0000-4000-8000-000000000002";
 export const BROKEN = "c0000000-0000-4000-8000-000000000003";
@@ -56,7 +57,7 @@ export async function seedCloudUsage() {
 	);
 	const client = new PGlite();
 	await client.exec(ddl.join(";\n"));
-	const db = drizzle({ client, casing: "snake_case" });
+	const db = drizzle({ client, schema, casing: "snake_case" });
 
 	await db.insert(schema.organizations).values([
 		{
@@ -73,12 +74,14 @@ export async function seedCloudUsage() {
 				[MAYA, "Maya"],
 				[SAM, "Sam"],
 				[BEN, "Ben"],
+				[ADA, "Ada"],
 			] as const
 		).map(([id, name]) => ({ id, name, email: `${name}@example.com` })),
 	);
 	await db.insert(schema.members).values([
 		{ organizationId: ORG, userId: MAYA, role: "owner" },
 		{ organizationId: ORG, userId: SAM, role: "member" },
+		{ organizationId: ORG, userId: ADA, role: "admin" },
 		{ organizationId: OTHER_ORG, userId: BEN, role: "owner" },
 	]);
 	const [env, otherEnv] = await db

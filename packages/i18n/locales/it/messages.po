@@ -4353,6 +4353,9 @@ msgstr "Controlli superati"
 msgid "Checks Skipped"
 msgstr "Controlli saltati"
 
+msgid "Checks unavailable"
+msgstr "Controlli non disponibili"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Scegli un account {pluginLabel}"
 
@@ -4789,6 +4792,9 @@ msgstr "Sandbox nel cloud"
 
 msgid "Cloud usage"
 msgstr "Utilizzo del cloud"
+
+msgid "Cloud usage is not enabled for this organization."
+msgstr "L’utilizzo del cloud non è attivo per questa organizzazione."
 
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
@@ -12587,6 +12593,10 @@ msgstr "Nessun autore trovato."
 msgid "No automations match"
 msgstr "Nessuna automazione corrisponde"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Nessun periodo di fatturazione inizia il {0}."
+
 msgid "No branches found"
 msgstr "Nessun branch trovato"
 
@@ -13600,6 +13610,9 @@ msgstr "Solo i proprietari dell'organizzazione possono modificare queste imposta
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Solo i proprietari dell’organizzazione o il proprietario del dispositivo possono eliminare questo progetto."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Solo i proprietari e gli amministratori possono vedere l’utilizzo per persona."
 
 msgid "Only owners can change membership."
 msgstr "Solo i proprietari possono modificare gli accessi."
@@ -19760,6 +19773,9 @@ msgstr "Questo account non è più connesso — scegline un altro."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Quella sessione dell'agente non ha ancora una conversazione da aprire: è stata avviata ma non ha mai ricevuto una richiesta."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Impossibile leggere quel cursore. Rimuovilo per ripartire dalla prima pagina."
+
 msgid "that device"
 msgstr "quel dispositivo"
 
@@ -20500,6 +20516,9 @@ msgstr "Questo cambia solo il nome visualizzato, non il branch."
 
 msgid "this organization"
 msgstr "questa organizzazione"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Questa organizzazione non ha periodi di fatturazione. Scegli invece un intervallo di tempo."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Questa organizzazione è sul piano Free. {appName} Mobile è disponibile per le organizzazioni con piano Pro."

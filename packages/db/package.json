@@ -44,6 +44,10 @@
 			"types": "./src/task-list-query.ts",
 			"default": "./src/task-list-query.ts"
 		},
+		"./testing": {
+			"types": "./test/cloud-usage-fixture.ts",
+			"default": "./test/cloud-usage-fixture.ts"
+		},
 		"./utils": {
 			"types": "./src/utils/index.ts",
 			"default": "./src/utils/index.ts"

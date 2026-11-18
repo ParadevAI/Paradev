@@ -4353,6 +4353,9 @@ msgstr "Checks geslaagd"
 msgid "Checks Skipped"
 msgstr "Checks overgeslagen"
 
+msgid "Checks unavailable"
+msgstr "Checks niet beschikbaar"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Kies een {pluginLabel}-account"
 
@@ -4789,6 +4792,9 @@ msgstr "Cloudsandboxen"
 
 msgid "Cloud usage"
 msgstr "Cloudgebruik"
+
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Cloudgebruik is niet ingeschakeld voor deze organisatie."
 
 msgid "Cloud workspace"
 msgstr "Cloudwerkruimte"
@@ -12587,6 +12593,10 @@ msgstr "Geen auteurs gevonden."
 msgid "No automations match"
 msgstr "Geen overeenkomende automatiseringen"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Er begint geen factuurperiode op {0}."
+
 msgid "No branches found"
 msgstr "Geen branches gevonden"
 
@@ -13600,6 +13610,9 @@ msgstr "Alleen eigenaren van de organisatie kunnen deze instellingen wijzigen."
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Alleen organisatie-eigenaren of de eigenaar van het apparaat kunnen dit project verwijderen."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Alleen eigenaren en beheerders kunnen het gebruik per persoon zien."
 
 msgid "Only owners can change membership."
 msgstr "Alleen eigenaren kunnen het lidmaatschap wijzigen."
@@ -19760,6 +19773,9 @@ msgstr "Dit account is niet meer verbonden — kies een ander."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Die agentsessie heeft nog geen gesprek om te openen. Hij is gestart maar nooit aangestuurd."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Die cursor kan niet worden gelezen. Laat hem weg om bij de eerste pagina te beginnen."
+
 msgid "that device"
 msgstr "dat apparaat"
 
@@ -20500,6 +20516,9 @@ msgstr "Dit verandert alleen de weergavenaam, niet de branch."
 
 msgid "this organization"
 msgstr "deze organisatie"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Deze organisatie heeft geen factuurperiodes. Kies in plaats daarvan een tijdsbereik."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Deze organisatie zit op het Free-plan. {appName} Mobile is beschikbaar voor organisaties met Pro."

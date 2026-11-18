@@ -178,6 +178,8 @@ const bootSize = (size: MachineSize) =>
 const utcDay = (column: AnyPgColumn) =>
 	sql`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD')`;
 
+type FactKeys = Record<"event" | "boot" | "failed", SQL>;
+
 const groupKeys = {
 	user: {
 		event: sql`${events.userId}`,
@@ -194,7 +196,13 @@ const groupKeys = {
 		boot: sql`${boots.cloudWorkspaceId}`,
 		failed: sql`${workspaces.id}`,
 	},
-} satisfies Record<CloudUsageGroupBy, Record<"event" | "boot" | "failed", SQL>>;
+} satisfies Record<CloudUsageGroupBy, FactKeys>;
+
+const NO_KEY: FactKeys = {
+	event: sql`null`,
+	boot: sql`null`,
+	failed: sql`null`,
+};
 
 /**
  * One row per sent event (placed at sent_at) and one per boot (placed at started_at), in one
@@ -206,11 +214,8 @@ function usageFacts(
 	scope: CloudUsageScope,
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
-	groupBy: CloudUsageGroupBy | undefined,
+	keys: FactKeys,
 ) {
-	const keys = groupBy
-		? groupKeys[groupBy]
-		: { event: sql`null`, boot: sql`null`, failed: sql`null` };
 	const sent = db
 		.select({
 			key: sql<string | null>`${keys.event}::text`.as("key"),
@@ -395,7 +400,7 @@ export async function queryCloudUsage(
 		limit,
 		overagePerGbHour,
 	} = options;
-	const totalFacts = usageFacts(db, scope, filters, window, undefined);
+	const totalFacts = usageFacts(db, scope, filters, window, NO_KEY);
 	const totalRow = db
 		.with(totalFacts)
 		.select(metricColumns(totalFacts))
@@ -413,7 +418,7 @@ export async function queryCloudUsage(
 		};
 	}
 
-	const facts = usageFacts(db, scope, filters, window, groupBy);
+	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
 	const metrics = metricColumns(facts);
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
 	const [rows, total] = await Promise.all([
@@ -467,6 +472,54 @@ export async function queryCloudUsage(
 }
 
 export type CloudUsageResult = Awaited<ReturnType<typeof queryCloudUsage>>;
+
+const NO_USAGE: MetricRow = {
+	gbMinutes: "0",
+	seconds: "0",
+	boots: 0,
+	failedBoots: 0,
+	workspaces: 0,
+};
+
+/** The usage total of each period, in one query, in the order given. */
+export async function queryCloudUsageByPeriod(
+	db: Db,
+	scope: CloudUsageScope,
+	options: { periods: CloudUsageWindow[]; overagePerGbHour: number | null },
+): Promise<Array<CloudUsageWindow & { metrics: CloudUsageMetrics }>> {
+	const { periods, overagePerGbHour } = options;
+	if (periods.length === 0) return [];
+	const periodOf = (column: AnyPgColumn) =>
+		sql`case ${sql.join(
+			periods.map(
+				({ from, to }, index) =>
+					sql`when ${column} >= ${from.toISOString()}::timestamptz and ${column} < ${to.toISOString()}::timestamptz then ${String(index)}`,
+			),
+			sql` `,
+		)} end`;
+	const span = {
+		from: new Date(Math.min(...periods.map(({ from }) => from.getTime()))),
+		to: new Date(Math.max(...periods.map(({ to }) => to.getTime()))),
+	};
+	const facts = usageFacts(db, scope, {}, span, {
+		event: periodOf(events.sentAt),
+		boot: periodOf(boots.startedAt),
+		failed: periodOf(workspaces.failedAt),
+	});
+	const rows = await db
+		.with(facts)
+		.select({ key: facts.key, ...metricColumns(facts) })
+		.from(facts)
+		.groupBy(facts.key);
+	const byPeriod = new Map(rows.map(({ key, ...row }) => [key, row]));
+	return periods.map((period, index) => ({
+		...period,
+		metrics: toMetrics(
+			byPeriod.get(String(index)) ?? NO_USAGE,
+			overagePerGbHour,
+		),
+	}));
+}
 
 /** Boot rows that started in the window, newest first, each with the sum of its sent events. */
 export async function listCloudBoots(

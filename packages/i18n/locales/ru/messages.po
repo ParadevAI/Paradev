@@ -4353,6 +4353,9 @@ msgstr "Проверки пройдены"
 msgid "Checks Skipped"
 msgstr "Проверки пропущены"
 
+msgid "Checks unavailable"
+msgstr "Проверки недоступны"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Выберите аккаунт {pluginLabel}"
 
@@ -4789,6 +4792,9 @@ msgstr "Облачные песочницы"
 
 msgid "Cloud usage"
 msgstr "Использование облака"
+
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Использование облака не включено для этой организации."
 
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
@@ -12587,6 +12593,10 @@ msgstr "Авторы не найдены."
 msgid "No automations match"
 msgstr "Нет подходящих автоматизаций"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Ни один расчётный период не начинается {0}."
+
 msgid "No branches found"
 msgstr "Ветки не найдены"
 
@@ -13600,6 +13610,9 @@ msgstr "Изменять эти настройки могут только вл�
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Удалить этот проект могут только владельцы организации или владелец устройства."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Использование по людям видят только владельцы и администраторы."
 
 msgid "Only owners can change membership."
 msgstr "Изменять состав участников могут только владельцы."
@@ -19760,6 +19773,9 @@ msgstr "Этот аккаунт больше не подключён — выб�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У этой сессии агента пока нет разговора, который можно открыть: она была запущена, но ни разу не получила запрос."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Не удалось прочитать этот курсор. Уберите его, чтобы начать с первой страницы."
+
 msgid "that device"
 msgstr "этом устройстве"
 
@@ -20500,6 +20516,9 @@ msgstr "Это меняет только отображаемое имя, а н�
 
 msgid "this organization"
 msgstr "эта организация"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "У этой организации нет расчётных периодов. Выберите временной диапазон."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."

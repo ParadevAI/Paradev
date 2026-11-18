@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const PLAN_TIERS = ["free", "pro", "enterprise"] as const;
 export type PlanTier = (typeof PLAN_TIERS)[number];
 
@@ -341,7 +343,8 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+/** The plan's monthly price for a GB-hour beyond the allowance, when it sells overage. */
+export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 	const price = plan.items.find(
 		(item) =>
 			item.featureId === "box_gb_minutes" && item.price?.interval === "month",
@@ -509,6 +512,7 @@ export const MACHINE_SIZES = Object.keys(MACHINE_SIZE_VCPUS) as [
 	MachineSize,
 	...MachineSize[],
 ];
+export const machineSizeSchema = z.enum(MACHINE_SIZES);
 /** Every organization can run these; the rest need an Autumn feature each. */
 export const OPEN_MACHINE_SIZES: readonly MachineSize[] = [
 	"small",

@@ -194,6 +194,8 @@ export const FEATURE_FLAGS = {
 	 * conditions are the allowlist, so access changes without a deploy.
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
+	/** Per organization: shows Settings, Cloud usage, and gates the `cloud.*` procedures server-side. Unloaded or offline is off. */
+	CLOUD_USAGE: "cloud-usage",
 	/**
 	 * Mounts the bundle's agent-tools drive on an organization's boxes, so the
 	 * agent CLIs come from it instead of the image. Evaluated per organization
