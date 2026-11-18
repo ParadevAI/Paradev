@@ -4,6 +4,7 @@ import { db } from "@superset/db/client";
 import {
 	type AutumnUsageEvent,
 	autumnUsageByLock,
+	LOCK_SETTLED_MS,
 } from "@superset/db/cloud-usage-autumn";
 import {
 	cloudUsageEvents,
@@ -14,19 +15,21 @@ import {
 import { eq, sql } from "drizzle-orm";
 
 /**
- * Fills cloud_usage_events from what Autumn already holds for the boots metered before the meter
- * wrote rows (M5a), and created_by_user_id on boots made before authorizeBoot wrote it.
+ * Fills cloud_usage_events from what Autumn holds, for every settled lock that has no row: the
+ * locks metered before the meter wrote rows (M5a), and any lock whose row write failed since.
+ * Also fills created_by_user_id on boots made before authorizeBoot wrote it.
  *
- * A row is Autumn's net for one lock: the sum of its events per boot, lock sequence and feature.
- * Its sent_at and window_to are the lock's last event; window_from is window_to less the amount
- * at the boot's GB. An event that cannot be tied to a boot is reported, not written.
+ * History gets one row per lock, Autumn's net: the sum of its events per boot, lock sequence and
+ * feature. Autumn's events do not say which is a reservation, an adjustment, a track or a refund,
+ * so the windows of a lock with several sends are not known. The row's sent_at and window_to are
+ * the lock's last event; window_from is window_to less the amount at the boot's GB. A CPU row has
+ * the boot's start and stop. An event that cannot be tied to a boot is reported, not written.
  *
- * Reports what it would do unless `--apply` is passed. Safe to run again: it sets each row and
- * never adds, it skips locks with an event at or after --before (the meter writes those) and
- * locks still open, and it never changes a row sent at or after --before.
+ * A lock is settled when its boot has moved past it or closed, and its last event is
+ * LOCK_SETTLED_MS older than the export. Reports what it would do unless `--apply` is passed.
+ * Safe to run again: it only inserts, and only for a lock with no row.
  *
- * Usage: bun run packages/trpc/scripts/backfill-cloud-usage-events.ts \
- *   --events FILE --before ISO_TIMESTAMP [--apply]
+ * Usage: bun run packages/trpc/scripts/backfill-cloud-usage-events.ts --events FILE [--apply]
  */
 
 const BATCH = 500;
@@ -35,19 +38,11 @@ const HALF_MICRO = 0.0000005;
 const { values } = parseArgs({
 	options: {
 		events: { type: "string" },
-		before: { type: "string" },
 		apply: { type: "boolean", default: false },
 	},
 });
-const before = Date.parse(values.before ?? "");
-if (
-	!values.events ||
-	!Number.isFinite(before) ||
-	!/(Z|[+-]\d{2}:\d{2})$/.test(values.before ?? "")
-) {
-	console.error(
-		"Pass --events FILE and --before ISO_TIMESTAMP with a timezone (when M5a was deployed)",
-	);
+if (!values.events) {
+	console.error("Pass --events FILE (from export-autumn-usage-events.ts)");
 	process.exit(64);
 }
 
@@ -55,6 +50,9 @@ const events: AutumnUsageEvent[] = readFileSync(values.events, "utf8")
 	.split("\n")
 	.filter(Boolean)
 	.map((line) => JSON.parse(line));
+const settledBefore =
+	events.reduce((latest, event) => Math.max(latest, event.timestamp), 0) -
+	LOCK_SETTLED_MS;
 
 const boots = await db
 	.select({
@@ -73,12 +71,31 @@ const boots = await db
 		eq(cloudWorkspaces.id, cloudWorkspaceBoots.cloudWorkspaceId),
 	);
 const bootById = new Map(boots.map((boot) => [boot.id, boot]));
+const lockKey = (lock: { bootId: string; lockSeq: number; feature: string }) =>
+	`${lock.bootId}:${lock.lockSeq}:${lock.feature}`;
+const recorded = new Set(
+	(
+		await db
+			.selectDistinct({
+				bootId: cloudUsageEvents.bootId,
+				lockSeq: cloudUsageEvents.lockSeq,
+				feature: cloudUsageEvents.feature,
+			})
+			.from(cloudUsageEvents)
+	).map(lockKey),
+);
 const { locks, untied } = autumnUsageByLock(
 	events,
 	new Map(boots.map((boot) => [boot.id, boot.lockSeq])),
 );
 
-const skipped = { open: 0, atOrAfterBefore: 0, zero: 0, negative: 0 };
+const skipped = {
+	recorded: 0,
+	open: 0,
+	notSettled: 0,
+	zero: 0,
+	negative: 0,
+};
 const rows: InsertCloudUsageEvent[] = [];
 const anomalies = [];
 for (const lock of locks) {
@@ -88,8 +105,9 @@ for (const lock of locks) {
 		boot.stoppedAt === null ||
 		boot.finalizedThrough === null ||
 		boot.finalizedThrough < boot.stoppedAt;
-	if (open && lock.lockSeq === boot.lockSeq) skipped.open += 1;
-	else if (lock.lastEventAt >= before) skipped.atOrAfterBefore += 1;
+	if (recorded.has(lockKey(lock))) skipped.recorded += 1;
+	else if (open && lock.lockSeq === boot.lockSeq) skipped.open += 1;
+	else if (lock.lastEventAt >= settledBefore) skipped.notSettled += 1;
 	else if (Math.abs(lock.amount) < HALF_MICRO) skipped.zero += 1;
 	else if (lock.amount < 0) skipped.negative += 1;
 	else {
@@ -172,7 +190,7 @@ console.log(
 		{
 			mode: values.apply ? "apply" : "dry run; pass --apply to write",
 			database: new URL(process.env.DATABASE_URL ?? "").host,
-			before: new Date(before).toISOString(),
+			settledBefore: new Date(settledBefore).toISOString(),
 			events: events.length,
 			locks: locks.length,
 			rows: rows.length,
@@ -193,26 +211,7 @@ if (!values.apply) process.exit(0);
 let written = 0;
 for (let index = 0; index < rows.length; index += BATCH) {
 	const batch = rows.slice(index, index + BATCH);
-	await db
-		.insert(cloudUsageEvents)
-		.values(batch)
-		.onConflictDoUpdate({
-			target: [
-				cloudUsageEvents.bootId,
-				cloudUsageEvents.lockSeq,
-				cloudUsageEvents.feature,
-			],
-			set: {
-				organizationId: sql`excluded.organization_id`,
-				cloudWorkspaceId: sql`excluded.cloud_workspace_id`,
-				userId: sql`excluded.user_id`,
-				windowFrom: sql`excluded.window_from`,
-				windowTo: sql`excluded.window_to`,
-				amount: sql`excluded.amount`,
-				sentAt: sql`excluded.sent_at`,
-			},
-			setWhere: sql`${cloudUsageEvents.sentAt} < ${new Date(before)}`,
-		});
+	await db.insert(cloudUsageEvents).values(batch).onConflictDoNothing();
 	written += batch.length;
 }
 let filled = 0;

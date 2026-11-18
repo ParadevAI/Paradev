@@ -27,6 +27,9 @@ export interface AutumnLockUsage {
 	lastEventAt: number;
 }
 
+/** A lock's events in Autumn are final this long after its last one: Autumn refunds a lock when it expires at 70 minutes. */
+export const LOCK_SETTLED_MS = 80 * 60 * 1000;
+
 /** Launch-night GB-minutes Autumn holds under a boot but no lock. */
 export const LEGACY_LOCK_SEQ = -1;
 const LEGACY_CORRECTION = "legacy-lock-attribution";

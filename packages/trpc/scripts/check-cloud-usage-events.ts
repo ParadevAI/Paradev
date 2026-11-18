@@ -4,14 +4,16 @@ import { db } from "@superset/db/client";
 import {
 	type AutumnUsageEvent,
 	autumnUsageByLock,
+	LOCK_SETTLED_MS,
 } from "@superset/db/cloud-usage-autumn";
 import { cloudUsageEvents, cloudWorkspaceBoots } from "@superset/db/schema";
 import { and, isNull, lt } from "drizzle-orm";
 
 /**
- * Check 3 of the cost and health design, once, as a script: for every boot closed before the
- * export, each cloud_usage_events row against Autumn's events summed per boot, lock sequence and
- * feature, both ways; and every row with no sent_at older than one hour. Read-only.
+ * Check 3 of the cost and health design, once, as a script: for every closed boot, our rows
+ * against Autumn's events, each summed per boot, lock sequence and feature, both ways; and every
+ * row with no sent_at older than one hour. A lock is compared once its last event and its rows are
+ * LOCK_SETTLED_MS older than the export, so a refund still to come is not a difference. Read-only.
  *
  * Exits 1 when anything differs.
  *
@@ -19,7 +21,6 @@ import { and, isNull, lt } from "drizzle-orm";
  */
 
 const TOLERANCE = 0.000001;
-const SETTLE_LAG_MS = 10 * 60 * 1000;
 const UNSENT_AFTER_MS = 60 * 60 * 1000;
 const LISTED = 50;
 
@@ -51,8 +52,7 @@ const closed = new Set(
 			(boot) =>
 				boot.stoppedAt !== null &&
 				boot.finalizedThrough !== null &&
-				boot.finalizedThrough >= boot.stoppedAt &&
-				boot.stoppedAt.getTime() < exportedThrough - SETTLE_LAG_MS,
+				boot.finalizedThrough >= boot.stoppedAt,
 		)
 		.map((boot) => boot.id),
 );
@@ -62,25 +62,34 @@ const { locks } = autumnUsageByLock(
 );
 const key = (row: { bootId: string; lockSeq: number; feature: string }) =>
 	`${row.bootId}:${row.lockSeq}:${row.feature}`;
-const autumn = new Map(
-	locks
-		.filter((lock) => closed.has(lock.bootId))
-		.map((lock) => [key(lock), lock.amount]),
-);
-const ours = new Map(
-	(
-		await db
-			.select({
-				bootId: cloudUsageEvents.bootId,
-				lockSeq: cloudUsageEvents.lockSeq,
-				feature: cloudUsageEvents.feature,
-				amount: cloudUsageEvents.amount,
-			})
-			.from(cloudUsageEvents)
-	)
-		.filter((row) => closed.has(row.bootId))
-		.map((row) => [key(row), Number(row.amount)]),
-);
+const settledBefore = exportedThrough - LOCK_SETTLED_MS;
+const unsettled = new Set<string>();
+const autumn = new Map<string, number>();
+for (const lock of locks) {
+	if (!closed.has(lock.bootId)) continue;
+	autumn.set(key(lock), lock.amount);
+	if (lock.lastEventAt >= settledBefore) unsettled.add(key(lock));
+}
+const ours = new Map<string, number>();
+for (const row of await db
+	.select({
+		bootId: cloudUsageEvents.bootId,
+		lockSeq: cloudUsageEvents.lockSeq,
+		feature: cloudUsageEvents.feature,
+		amount: cloudUsageEvents.amount,
+		sentAt: cloudUsageEvents.sentAt,
+	})
+	.from(cloudUsageEvents)) {
+	if (!closed.has(row.bootId)) continue;
+	ours.set(key(row), (ours.get(key(row)) ?? 0) + Number(row.amount));
+	if (!row.sentAt || row.sentAt.getTime() >= settledBefore) {
+		unsettled.add(key(row));
+	}
+}
+for (const lock of unsettled) {
+	autumn.delete(lock);
+	ours.delete(lock);
+}
 
 const onlyOurs: string[] = [];
 const amountDiffers: { lock: string; ours: number; autumn: number }[] = [];
@@ -118,6 +127,7 @@ console.log(
 			database: new URL(process.env.DATABASE_URL ?? "").host,
 			exportedThrough: new Date(exportedThrough).toISOString(),
 			closedBoots: closed.size,
+			unsettledLocks: unsettled.size,
 			locks: { ours: ours.size, autumn: autumn.size },
 			onlyOurs: { count: onlyOurs.length, first: onlyOurs.slice(0, LISTED) },
 			onlyAutumn: {
