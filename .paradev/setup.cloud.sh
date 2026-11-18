@@ -14,8 +14,6 @@ source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh"
 # shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/admin.sh"
-# shellcheck source=/dev/null
-source "$PARADEV_SCRIPT_DIR/lib/setup/admin.sh"
 cd "$ROOT_DIR" || exit 1
 
 # The environment's variables, as a file, because step_write_env copies one.

@@ -6,9 +6,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-error() { echo -e "${RED}✗${NC} $1"; }
+error() { echo -e "${RED}✗${NC} $1" >&2; }
 success() { echo -e "${GREEN}✓${NC} $1"; }
-warn() { echo -e "${YELLOW}!${NC} $1"; }
+warn() { echo -e "${YELLOW}!${NC} $1" >&2; }
 
 # Track step failure
 step_failed() {
