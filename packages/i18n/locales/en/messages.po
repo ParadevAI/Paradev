@@ -2416,9 +2416,6 @@ msgstr "Agent-driven previews"
 msgid "Agents"
 msgstr "Agents"
 
-msgid "Agents are unavailable in {region} right now; try again"
-msgstr "Agents are unavailable in {region} right now; try again"
-
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agents cannot reach {0}'s tools"

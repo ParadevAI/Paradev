@@ -56,6 +56,7 @@ export {
 	type ActiveWorkspaceSandbox,
 	AgentToolsUnavailableError,
 	type BoxSession,
+	CLOUD_WORKSPACE_NOT_STARTED,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,

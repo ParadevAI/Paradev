@@ -2416,9 +2416,6 @@ msgstr "Bản xem trước do agent điều khiển"
 msgid "Agents"
 msgstr "Agent"
 
-msgid "Agents are unavailable in {region} right now; try again"
-msgstr "Hiện không thể dùng agent tại {region}; hãy thử lại"
-
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agent không thể truy cập các công cụ của {0}"

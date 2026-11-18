@@ -173,15 +173,10 @@ async function addressSandbox(
 				: await wakeCloudWorkspace(row);
 		return { ...woken, running: true };
 	} catch (error) {
-		if (error instanceof AgentToolsUnavailableError) {
-			throw userError({
-				code: "SERVICE_UNAVAILABLE",
-				message: error.message,
-				i18nKey: "serverError.cloudWorkspace.agentsUnavailable",
-				params: { region: error.region },
-			});
-		}
-		if (error instanceof SandboxNotReadyError) {
+		if (
+			error instanceof SandboxNotReadyError ||
+			error instanceof AgentToolsUnavailableError
+		) {
 			throw new TRPCError({
 				code: "TIMEOUT",
 				message: "Cloud workspace is still starting",

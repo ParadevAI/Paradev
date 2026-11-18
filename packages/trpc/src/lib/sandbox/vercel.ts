@@ -200,7 +200,14 @@ const publishedAgentToolsDrives = new Set<string>();
 /** A box has no agents without its drive, so a transient refusal gets a few quick tries. */
 export const AGENT_TOOLS_RETRY = { attempts: 3, delayMs: 500 };
 
-/** The open fails: a box without its agents drive has no agent CLIs at all. */
+export const CLOUD_WORKSPACE_NOT_STARTED =
+	"The cloud workspace could not start";
+
+/**
+ * The open fails: a box without its agents drive has no agent CLIs at all.
+ * The message is what a customer sees for any box that will not start; the
+ * drive, region and bundle go only to logs and Sentry.
+ */
 export class AgentToolsUnavailableError extends Error {
 	readonly region: string;
 	readonly bundle: string;
@@ -210,9 +217,7 @@ export class AgentToolsUnavailableError extends Error {
 	) {
 		const [, region = "", bundle = ""] =
 			/^agent-tools-([a-z]+[0-9]+)-([0-9a-f]{12})$/.exec(driveName) ?? [];
-		super(`Agents are unavailable in ${region} right now; try again`, {
-			cause,
-		});
+		super(CLOUD_WORKSPACE_NOT_STARTED, { cause });
 		this.name = "AgentToolsUnavailableError";
 		this.region = region;
 		this.bundle = bundle;

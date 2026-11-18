@@ -128,7 +128,7 @@ link_agents() {
 	find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -delete
 	if ! jq -e 'type == "array"' "$manifest" > /dev/null 2>&1; then
 		stamp "agents.unavailable no manifest at ${dir}"
-		refuse "no agents drive at ${dir}; the control plane mounts it on every create and wake"
+		refuse "no agent CLIs at ${dir}"
 	fi
 	while IFS=$'\t' read -r name sha bin; do
 		if ! [[ "$name" =~ ^[a-z0-9-]+$ && "$sha" =~ ^[0-9a-f]{64}$ && "$bin" =~ ^[A-Za-z0-9._/-]+$ && "$bin" != *..* ]]; then

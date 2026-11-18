@@ -10,9 +10,9 @@ import { eq } from "drizzle-orm";
 import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
-	AgentToolsUnavailableError,
 	bootPhases,
 	buildSandboxClaim,
+	CLOUD_WORKSPACE_NOT_STARTED,
 	deleteSandbox,
 	provisionSandbox,
 	SandboxNotReadyError,
@@ -264,16 +264,12 @@ async function provision(
 			reason: provisionFailureReason(error),
 			error,
 		});
-		await failChatMovesTo(
-			row.id,
-			error instanceof AgentToolsUnavailableError
-				? error.message
-				: "The cloud workspace could not start",
-		).catch((moveError) =>
-			console.error(
-				`[cloud-workspace] could not fail the chat moves into ${row.id}`,
-				moveError,
-			),
+		await failChatMovesTo(row.id, CLOUD_WORKSPACE_NOT_STARTED).catch(
+			(moveError) =>
+				console.error(
+					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+					moveError,
+				),
 		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";

@@ -950,13 +950,14 @@ drive, mounted read-only at `/opt/agents`; a new box's own disk has none, and
 an older golden's disk copies are left alone and never used. A machine someone
 owns keeps a mount; a sandbox gets one only from `Sandbox.create`,
 `Sandbox.fork` or `sandbox.update({ mounts })` before the session starts, so
-`provisionSandbox`, `wakeSandbox` and the restart in
-`promoteSandboxToEnvironment` all pass it. A drive lives in one region and
-mounts only there, so it is named by the box's own region, and the release
-writes one in every region. A drive that cannot be mounted after a few tries
-on 429 and 5xx fails the create or the wake with "Agents are unavailable in
-<region> right now; try again" and a Sentry event with the region and bundle;
-a promote keeps its golden and leaves the source stopped. A boot that finds no
+`provisionSandbox` and `wakeSandbox` pass it, and a promote's restart is a
+wake. A drive lives in one region and mounts only there, so it is named by
+the box's own region, and the release writes one in every region. A drive
+that cannot be mounted after a few tries on 429 and 5xx fails the create or
+the wake the way any box that will not start does ("The cloud workspace could
+not start"; a wake answers "Cloud workspace is still starting"): a customer
+never sees the drive. The drive, region and bundle go only to Sentry and the
+server log. A promote keeps its golden. A boot that finds no
 manifest at `/opt/agents` is refused before host-service starts. **Open:** a
 running session whose host-service died is booted again without a remount,
 since a mount cannot be added to a live session; if that session has no

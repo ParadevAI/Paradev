@@ -2416,9 +2416,6 @@ msgstr "Anteprime guidate dall'agente"
 msgid "Agents"
 msgstr "Agenti"
 
-msgid "Agents are unavailable in {region} right now; try again"
-msgstr "Gli agenti non sono disponibili in {region} al momento; riprova"
-
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Gli agenti non possono raggiungere gli strumenti di {0}"

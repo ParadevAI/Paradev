@@ -4,7 +4,10 @@ import { automationRuns, automations } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import { isI18nErrorCause } from "../../i18n-error";
-import { SandboxNotReadyError } from "../../lib/sandbox";
+import {
+	AgentToolsUnavailableError,
+	SandboxNotReadyError,
+} from "../../lib/sandbox";
 import { RelayDispatchError } from "./relay-client";
 
 /**
@@ -184,7 +187,11 @@ export function classifyDispatchError(
 	err: unknown,
 ): AutomationRunErrorCode | null {
 	if (err instanceof RunFailure) return err.code;
-	if (err instanceof SandboxNotReadyError) return "cloud_not_ready";
+	if (
+		err instanceof SandboxNotReadyError ||
+		err instanceof AgentToolsUnavailableError
+	)
+		return "cloud_not_ready";
 	if (err instanceof TRPCError && isI18nErrorCause(err.cause)) {
 		return CLOUD_ERROR_CODES[err.cause.i18nKey] ?? null;
 	}

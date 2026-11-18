@@ -2416,9 +2416,6 @@ msgstr "Pratinjau yang digerakkan agen"
 msgid "Agents"
 msgstr "Agen"
 
-msgid "Agents are unavailable in {region} right now; try again"
-msgstr "Agen tidak tersedia di {region} saat ini; coba lagi"
-
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Agen tidak dapat menjangkau alat {0}"

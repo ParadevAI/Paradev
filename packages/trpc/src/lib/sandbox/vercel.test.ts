@@ -14,6 +14,7 @@ import {
 	AgentToolsUnavailableError,
 	agentToolsMounts,
 	applySandboxPolicy,
+	CLOUD_WORKSPACE_NOT_STARTED,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
@@ -555,8 +556,6 @@ const claimFor = (bundle: string) =>
 		networkPolicy: "allow-all",
 		identity: IDENTITY(bundle),
 	}) as unknown as SandboxClaim;
-const unavailableIn = (region: string) =>
-	`Agents are unavailable in ${region} right now; try again`;
 
 describe("agentToolsMounts", () => {
 	const detached = () => Promise.resolve({ currentSandboxName: undefined });
@@ -597,15 +596,19 @@ describe("agentToolsMounts", () => {
 		expect(mounts).toBeDefined();
 	});
 
-	test("a drive that stays unavailable, is missing or a writer holds fails with the region, and reports region and bundle", async () => {
+	test("a drive that stays unavailable, is missing or a writer holds fails like any box that will not start; region, bundle and drive go only to Sentry", async () => {
 		reports.length = 0;
 		let asked = 0;
-		await expect(
-			agentToolsMounts("agent-tools-sfo1-aaaaaaaaaaaa", () => {
+		const error = await agentToolsMounts(
+			"agent-tools-sfo1-aaaaaaaaaaaa",
+			() => {
 				asked++;
 				return Promise.reject(failure(503));
-			}),
-		).rejects.toThrow(unavailableIn("sfo1"));
+			},
+		).catch((caught: unknown) => caught);
+		expect(error).toBeInstanceOf(AgentToolsUnavailableError);
+		expect((error as Error).message).toBe(CLOUD_WORKSPACE_NOT_STARTED);
+		expect((error as Error).message).not.toMatch(/drive|agent|sfo1/i);
 		expect(asked).toBe(3);
 		await expect(
 			agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", () =>
@@ -677,7 +680,9 @@ describe("wakeSandbox", () => {
 		drives.set("agent-tools-iad1-c20000000000", () =>
 			Promise.reject(failure(404)),
 		);
-		await expect(wake(BUNDLE("c2"))).rejects.toThrow(unavailableIn("iad1"));
+		await expect(wake(BUNDLE("c2"))).rejects.toThrow(
+			CLOUD_WORKSPACE_NOT_STARTED,
+		);
 		expect(updates).toEqual([]);
 		expect(resumes).toEqual([]);
 	});
@@ -690,7 +695,9 @@ describe("wakeSandbox", () => {
 		expect(updates).toHaveLength(2);
 		updates.length = 0;
 		updateAnswers = [failure(503), failure(503), failure(503)];
-		await expect(wake(BUNDLE("c4"))).rejects.toThrow(unavailableIn("iad1"));
+		await expect(wake(BUNDLE("c4"))).rejects.toThrow(
+			CLOUD_WORKSPACE_NOT_STARTED,
+		);
 		expect(updates).toHaveLength(3);
 		expect(resumes).toEqual([BUNDLE("c3")]);
 	});
@@ -745,7 +752,7 @@ describe("provisionSandbox", () => {
 			Promise.reject(failure(404)),
 		);
 		await expect(provision(BUNDLE("d2"))).rejects.toThrow(
-			unavailableIn("sfo1"),
+			CLOUD_WORKSPACE_NOT_STARTED,
 		);
 		expect(creates).toEqual([]);
 	});

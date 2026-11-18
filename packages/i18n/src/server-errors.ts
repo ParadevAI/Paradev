@@ -419,14 +419,6 @@ export const serverErrorMessages: Record<
 				message: "Only owners and admins can see usage by person.",
 			}),
 		),
-	"serverError.cloudWorkspace.agentsUnavailable": (params) => {
-		const region = String(params?.region ?? "");
-		return i18n._(
-			msg({
-				message: `Agents are unavailable in ${region} right now; try again`,
-			}),
-		);
-	},
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
 		i18n._({
 			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
