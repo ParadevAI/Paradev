@@ -88,7 +88,7 @@ export function allowanceLines(
 	const beyond = minus(periodUsed, sum(billed.map((line) => line.used)));
 	const lines: AllowanceLine[] =
 		beyond.gbHours >= BEYOND_MIN_GB_HOURS
-			? [...billed, { kind: "beyond", paid: true, used: beyond, total: null }]
+			? [...billed, { kind: "beyond", paid: false, used: beyond, total: null }]
 			: billed;
 
 	const totalsOf = (items: AllowanceLine[]) =>

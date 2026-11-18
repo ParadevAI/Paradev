@@ -16,6 +16,8 @@ import { Section } from "../Section";
 import { utcDays } from "./utils/utcDays";
 
 const TICK_STEP_DAYS = 5;
+/** No tick on the last bars, where its label would run past the chart's edge. */
+const LAST_TICK_GAP_DAYS = 2;
 
 interface UsageByDayProps {
 	usage: CloudUsage;
@@ -33,7 +35,10 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 		return { day, value: (inDollars ? item?.usageUsd : item?.gbHours) ?? 0 };
 	});
 	const ticks = data
-		.filter((_, i) => i % TICK_STEP_DAYS === 0)
+		.filter(
+			(_, i) =>
+				i % TICK_STEP_DAYS === 0 && i < data.length - LAST_TICK_GAP_DAYS,
+		)
 		.map((item) => item.day);
 	const config = {
 		value: {

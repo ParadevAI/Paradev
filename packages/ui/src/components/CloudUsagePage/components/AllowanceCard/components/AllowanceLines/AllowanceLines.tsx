@@ -63,8 +63,24 @@ export function AllowanceLines({
 			</Trans>
 		);
 	};
+	const row = (line: AllowanceLine) => (
+		<tr key={line.kind} className="border-b border-border/70">
+			<td className="py-2">
+				<span className="inline-flex items-center gap-2">
+					<span
+						aria-hidden
+						className={cn("size-2.5 shrink-0 rounded-[2px]", SWATCH[line.kind])}
+					/>
+					{label(line)}
+				</span>
+			</td>
+			<td className="py-2 pl-3 text-right tabular-nums">{value(line)}</td>
+		</tr>
+	);
 	const group = (paid: boolean) => {
-		const items = lines.filter((line) => line.paid === paid);
+		const items = lines.filter(
+			(line) => line.paid === paid && line.kind !== "beyond",
+		);
 		if (items.length === 0) return null;
 		return (
 			<>
@@ -80,23 +96,7 @@ export function AllowanceLines({
 						)}
 					</td>
 				</tr>
-				{items.map((line) => (
-					<tr key={line.kind} className="border-b border-border/70">
-						<td className="py-2">
-							<span className="inline-flex items-center gap-2">
-								<span
-									aria-hidden
-									className={cn(
-										"size-2.5 shrink-0 rounded-[2px]",
-										SWATCH[line.kind],
-									)}
-								/>
-								{label(line)}
-							</span>
-						</td>
-						<td className="py-2 pl-3 text-right tabular-nums">{value(line)}</td>
-					</tr>
-				))}
+				{items.map(row)}
 			</>
 		);
 	};
@@ -116,6 +116,7 @@ export function AllowanceLines({
 				<tbody>
 					{group(false)}
 					{group(true)}
+					{lines.filter((line) => line.kind === "beyond").map(row)}
 				</tbody>
 			</table>
 		</>
