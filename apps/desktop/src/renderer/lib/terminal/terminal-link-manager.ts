@@ -154,17 +154,24 @@ export class TerminalLinkManager {
 	private async _textLinkUnder(
 		range: IBufferRange,
 	): Promise<ILink | undefined> {
+		// Providers run in priority order; overlapping detections are one
+		// visible link, separate ones make the OSC span ambiguous.
+		const distinct: ILink[] = [];
 		for (const provider of this._textProviders) {
-			const links = await new Promise<ILink[] | undefined>((resolve) =>
-				provider.provideLinks(range.start.y, resolve),
-			);
-			const overlapping = (links ?? []).filter((candidate) =>
-				rangesOverlap(candidate.range, range),
-			);
-			if (overlapping.length === 1) return overlapping[0];
-			if (overlapping.length > 1) return undefined;
+			for (let y = range.start.y; y <= range.end.y; y++) {
+				const links = await new Promise<ILink[] | undefined>((resolve) =>
+					provider.provideLinks(y, resolve),
+				);
+				for (const link of links ?? []) {
+					if (!rangesOverlap(link.range, range)) continue;
+					const known = distinct.some((seen) =>
+						rangesOverlap(seen.range, link.range),
+					);
+					if (!known) distinct.push(link);
+				}
+			}
 		}
-		return undefined;
+		return distinct.length === 1 ? distinct[0] : undefined;
 	}
 
 	private _clearOscLinkHandler(): void {

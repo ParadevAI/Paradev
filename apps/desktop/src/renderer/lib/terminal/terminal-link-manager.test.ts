@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { ILinkProvider, Terminal as XTerm } from "@xterm/xterm";
+import type { StatCallback } from "./links";
 import { TerminalLinkManager } from "./terminal-link-manager";
 
 const COLS = 80;
@@ -383,6 +384,61 @@ describe("TerminalLinkManager", () => {
 			await flush();
 
 			expect(onFileLinkClick).toHaveBeenCalledTimes(1);
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({ resolvedPath: "/tmp/c.ts" }),
+			);
+		});
+	});
+
+	describe("with an OSC 8 link over several visible rows", () => {
+		const event = {} as MouseEvent;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		let onUrlClick: ReturnType<typeof mock>;
+		let onFileLinkClick: ReturnType<typeof mock>;
+
+		function setUp(lines: string[], stat: StatCallback): XTerm {
+			const { terminal } = createMockTerminal(lines);
+			onUrlClick = mock();
+			onFileLinkClick = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat,
+				onUrlClick,
+				onFileLinkClick,
+				isOscAppLink,
+			});
+			return terminal;
+		}
+
+		it("finds a visible link on a later row of the OSC range", async () => {
+			const terminal = setUp(
+				["see", "https://example.com/page"],
+				async () => null,
+			);
+			terminal.options.linkHandler?.activate(event, "cursor:///x", {
+				start: { x: 1, y: 1 },
+				end: { x: 24, y: 2 },
+			});
+			await flush();
+
+			expect(onUrlClick).toHaveBeenCalledWith(
+				expect.anything(),
+				"https://example.com/page",
+			);
+		});
+
+		it("opens its own target when links from two providers overlap it", async () => {
+			const terminal = setUp(
+				["/tmp/a.ts:12:3 https://example.com"],
+				async (path) => ({ isDirectory: false, resolvedPath: path }),
+			);
+			terminal.options.linkHandler?.activate(event, "file:///tmp/c.ts", {
+				start: { x: 1, y: 1 },
+				end: { x: 34, y: 1 },
+			});
+			await flush();
+
+			expect(onUrlClick).not.toHaveBeenCalled();
 			expect(onFileLinkClick).toHaveBeenCalledWith(
 				event,
 				expect.objectContaining({ resolvedPath: "/tmp/c.ts" }),
