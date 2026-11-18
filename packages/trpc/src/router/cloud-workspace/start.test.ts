@@ -14,7 +14,15 @@ describe("a provision that cannot be queued", () => {
 			throw new Error("queue down");
 		},
 	});
-	stub(transition, { transitionCloudWorkspace: async () => true });
+	const failed: unknown[] = [];
+	stub(transition, {
+		transitionCloudWorkspace: async (args: {
+			set: { failureReason?: string };
+		}) => {
+			failed.push(args.set.failureReason);
+			return true;
+		},
+	});
 	stub(realtime, { nudge: (...args: unknown[]) => nudged.push(args) });
 	stub(chatMoves, { failChatMovesTo: async () => {} });
 	stub(Sentry, { captureException: () => "" });
@@ -24,5 +32,13 @@ describe("a provision that cannot be queued", () => {
 			queueProvision({ cloudWorkspaceId: "ws_1" }, "org_1"),
 		).rejects.toThrow();
 		expect(nudged).toEqual([["org_1", "cloud_workspaces"]]);
+	});
+
+	test("records the failure as queue_failed", async () => {
+		failed.length = 0;
+		await expect(
+			queueProvision({ cloudWorkspaceId: "ws_1" }, "org_1"),
+		).rejects.toThrow();
+		expect(failed).toEqual(["queue_failed"]);
 	});
 });

@@ -79,7 +79,7 @@ import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -750,9 +750,9 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id, {
-					sessionId: stopped.sessionId ?? row.sandboxSessionId,
-				});
+				const sessionId = stopped.sessionId ?? row.sandboxSessionId;
+				await recordSandboxAsleep(row.id, { sessionId });
+				await recordBootEnd(row.id, { sessionId, reason: "user" });
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -895,6 +895,10 @@ export const cloudWorkspaceRouter = {
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
 						);
+						await recordBootEnd(row.id, {
+							sessionId: null,
+							reason: "archived",
+						});
 						await settleWorkspaceNow(row.id).catch((meterError) =>
 							console.error(
 								`[cloud-workspace] ${row.id} final meter failed`,

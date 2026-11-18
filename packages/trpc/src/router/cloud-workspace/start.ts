@@ -323,7 +323,7 @@ export async function queueProvision(
 		await failCloudWorkspace({
 			scope: { cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
 			from: ["provisioning"],
-			site: "queue",
+			reason: "queue_failed",
 			error,
 		});
 		await failChatMovesTo(

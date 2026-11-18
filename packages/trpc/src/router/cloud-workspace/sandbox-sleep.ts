@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces } from "@superset/db/schema";
+import type { CloudWorkspaceBootEndReason } from "@superset/db/enums";
+import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
 import { logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
@@ -37,6 +38,40 @@ export function stillStoppedSession(sessionId: string | null): SQL | undefined {
 		isNull(cloudWorkspaces.sandboxSessionId),
 		eq(cloudWorkspaces.sandboxSessionId, sessionId),
 	);
+}
+
+/**
+ * Why the box stopped, on the open boot of `sessionId` (any open boot when null).
+ * The first stop site to write wins; the meter closes the boot later.
+ */
+export async function recordBootEnd(
+	cloudWorkspaceId: string,
+	{
+		sessionId,
+		reason,
+	}: { sessionId: string | null; reason: CloudWorkspaceBootEndReason },
+): Promise<void> {
+	await db
+		.update(cloudWorkspaceBoots)
+		.set({ endReason: reason })
+		.where(
+			and(
+				eq(cloudWorkspaceBoots.cloudWorkspaceId, cloudWorkspaceId),
+				isNull(cloudWorkspaceBoots.stoppedAt),
+				isNull(cloudWorkspaceBoots.endReason),
+				sessionId === null
+					? undefined
+					: or(
+							isNull(cloudWorkspaceBoots.vercelSessionId),
+							eq(cloudWorkspaceBoots.vercelSessionId, sessionId),
+						),
+			),
+		)
+		.catch((error) =>
+			Sentry.captureException(error, {
+				tags: { "cloud_workspace.id": cloudWorkspaceId },
+			}),
+		);
 }
 
 /** `sessionId` is the session the caller saw stopped, read before or at the stop. */

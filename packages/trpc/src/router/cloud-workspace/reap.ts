@@ -13,7 +13,7 @@ import {
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, settleWorkspaceNow } from "./meter";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
 
 /** How long an archived workspace keeps its box running, so an undo finds it live. */
 export const ARCHIVE_STOP_DELAY_SECONDS = 60;
@@ -89,6 +89,7 @@ export async function reapArchivedCloudWorkspace(
 		return "skipped";
 	}
 	if (input.stage === "delete") {
+		await recordBootEnd(row.id, { sessionId: null, reason: "archived" });
 		await settleWorkspaceNow(row.id).catch((error) =>
 			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
 		);
@@ -102,9 +103,9 @@ export async function reapArchivedCloudWorkspace(
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
-	await recordSandboxAsleep(row.id, {
-		sessionId: stopped.sessionId ?? row.sandboxSessionId,
-	});
+	const sessionId = stopped.sessionId ?? row.sandboxSessionId;
+	await recordSandboxAsleep(row.id, { sessionId });
+	await recordBootEnd(row.id, { sessionId, reason: "archived" });
 	await queueSettleWorkspace(row.id);
 	logControl("archive.stopped", {
 		cloudWorkspaceId: row.id,
@@ -159,8 +160,11 @@ export async function queueReap(
 			error,
 		);
 		const stopped = await stopSandbox(box.providerSandboxId);
-		await recordSandboxAsleep(input.cloudWorkspaceId, {
-			sessionId: stopped.sessionId ?? box.sandboxSessionId,
+		const sessionId = stopped.sessionId ?? box.sandboxSessionId;
+		await recordSandboxAsleep(input.cloudWorkspaceId, { sessionId });
+		await recordBootEnd(input.cloudWorkspaceId, {
+			sessionId,
+			reason: "archived",
 		});
 	});
 }

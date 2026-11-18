@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import { APIError } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import { userError } from "../../i18n-error";
 import * as realtime from "../../lib/realtime";
@@ -42,6 +43,7 @@ describe("restartCloudWorkspace", () => {
 		) => {
 			recordedAsleep.push([id, stopped]);
 		},
+		recordBootEnd: async () => {},
 	});
 
 	test("records asleep only for the session it stopped, before the wake", async () => {
@@ -111,12 +113,16 @@ describe("wakeAfterStop", () => {
 			calls.push(`attach ${bootId}`);
 		},
 	});
+	const endedBoots: unknown[] = [];
 	stub(sandboxSleep, {
 		recordSandboxAsleep: async (
 			id: string,
 			stopped: { sessionId: string | null },
 		) => {
 			recordedAsleep.push([id, stopped]);
+		},
+		recordBootEnd: async (id: string, ended: unknown) => {
+			endedBoots.push([id, ended]);
 		},
 	});
 	stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
@@ -126,6 +132,14 @@ describe("wakeAfterStop", () => {
 		await wakeAfterStop(ROW, { sessionId: "sess_A" });
 		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "sess_A" }]]);
 		expect(calls).toEqual(["settle", "authorize", "attach boot_2"]);
+	});
+
+	test("ends the stopped session's boot as restarted before the wake opens the next", async () => {
+		endedBoots.length = 0;
+		await wakeAfterStop(ROW, { sessionId: "sess_A" });
+		expect(endedBoots).toEqual([
+			["ws_1", { sessionId: "sess_A", reason: "restarted" }],
+		]);
 	});
 });
 
@@ -213,7 +227,7 @@ describe("markSandboxUnavailable", () => {
 		});
 
 		test("captures the error with the ids as tags", async () => {
-			const error = new Error("gone");
+			const error = new sandbox.SandboxUnavailableError("ws-box");
 			await markSandboxUnavailable(ROW, error);
 			expect(captured).toEqual([
 				[
@@ -226,6 +240,39 @@ describe("markSandboxUnavailable", () => {
 		});
 	});
 
+	describe("records why the sandbox is unavailable", () => {
+		const failed: unknown[] = [];
+		stub(transition, {
+			transitionCloudWorkspace: async (args: { set: unknown }) => {
+				failed.push(args.set);
+				return true;
+			},
+		});
+		stub(Sentry, { captureException: () => "" });
+
+		test("a 404 is sandbox_gone and a 410 is snapshot_expired", async () => {
+			const unavailable = (status: number) =>
+				new sandbox.SandboxUnavailableError(
+					"ws-box",
+					new APIError(new Response(null, { status })),
+				);
+			await markSandboxUnavailable(ROW, unavailable(404));
+			await markSandboxUnavailable(ROW, unavailable(410));
+			expect(failed).toEqual([
+				{
+					sandboxUrl: null,
+					failureReason: "sandbox_gone",
+					failedAt: expect.any(Date),
+				},
+				{
+					sandboxUrl: null,
+					failureReason: "snapshot_expired",
+					failedAt: expect.any(Date),
+				},
+			]);
+		});
+	});
+
 	describe("when the row was already moved", () => {
 		const captured: unknown[] = [];
 		stub(transition, { transitionCloudWorkspace: async () => false });
@@ -234,7 +281,10 @@ describe("markSandboxUnavailable", () => {
 		});
 
 		test("does not capture it again", async () => {
-			await markSandboxUnavailable(ROW, new Error("gone"));
+			await markSandboxUnavailable(
+				ROW,
+				new sandbox.SandboxUnavailableError("ws-box"),
+			);
 			expect(captured).toEqual([]);
 		});
 	});

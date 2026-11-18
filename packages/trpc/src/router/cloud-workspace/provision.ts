@@ -1,7 +1,9 @@
 import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { cloudUsageRefusalKey } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
@@ -50,6 +52,18 @@ export interface ProvisionCloudWorkspaceInput {
 	namingPrompt?: string;
 	/** A built-in agent to run once the sandbox is up; see cloud-agent-launch. */
 	launch?: CloudAgentLaunch;
+}
+
+function provisionFailureReason(error: unknown): CloudWorkspaceFailureReason {
+	switch (cloudUsageRefusalKey(error)) {
+		case "serverError.cloudWorkspace.usageLimitReached":
+			return "usage_limit";
+		case "serverError.cloudWorkspace.cloudNeedsPaidPlan":
+			return "needs_paid_plan";
+	}
+	return error instanceof SandboxNotReadyError
+		? "host_not_ready"
+		: "create_failed";
 }
 
 export type ProvisionCloudWorkspaceOutcome =
@@ -123,6 +137,7 @@ async function provision(
 			cloudWorkspaceId: row.id,
 			createdByUserId: row.createdByUserId,
 			...boxFor(claim.vcpus),
+			origin: "create",
 		}));
 		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
@@ -242,7 +257,7 @@ async function provision(
 			},
 			from: ["provisioning", "awake", "asleep"],
 			set: keepForDiagnosis ? { providerSandboxId } : {},
-			site: "provision",
+			reason: provisionFailureReason(error),
 			error,
 		});
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(

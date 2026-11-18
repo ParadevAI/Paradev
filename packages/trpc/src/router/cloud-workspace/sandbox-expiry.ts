@@ -14,6 +14,7 @@ import { publishCloudWorkspaceJob } from "./jobs";
 import { queueSettleWorkspace, reconcileCloudWorkspaceUsage } from "./meter";
 import {
 	keepUpdatedAt,
+	recordBootEnd,
 	recordSandboxAsleep,
 	reportSleepWriteFailure,
 } from "./sandbox-sleep";
@@ -143,9 +144,11 @@ export async function watchSandboxExpiry({
 		});
 		return "rewatched";
 	}
-	await recordSandboxAsleep(cloudWorkspaceId, {
-		sessionId: live?.sessionId ?? row.sandboxSessionId,
-	});
+	const sessionId = live?.sessionId ?? row.sandboxSessionId;
+	await recordSandboxAsleep(cloudWorkspaceId, { sessionId });
+	if (live) {
+		await recordBootEnd(cloudWorkspaceId, { sessionId, reason: "idle" });
+	}
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
 }

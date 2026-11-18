@@ -13,12 +13,12 @@ import {
 	controlTags,
 	logControl,
 } from "../../lib/control-log";
-import { nudge } from "../../lib/realtime";
 import {
 	bootBeganSince,
 	buildSandboxClaim,
 	describeSandbox,
 	recordBootSpans,
+	type SandboxUnavailableError,
 	stopAndSnapshot,
 	stopSandbox,
 	wakeSandbox,
@@ -29,8 +29,8 @@ import {
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
-import { transitionCloudWorkspace } from "./transition";
+import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
+import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
@@ -114,6 +114,7 @@ async function wake(
 						cloudWorkspaceId: row.id,
 						createdByUserId: row.createdByUserId,
 						...box,
+						origin: "wake",
 					}),
 			));
 			if (bootId) {
@@ -224,9 +225,9 @@ export async function wakeAfterStop(
 	row: CloudWorkspaceRow,
 	stopped: { sessionId: string | null },
 ): Promise<WokenCloudWorkspace> {
-	await recordSandboxAsleep(row.id, {
-		sessionId: stopped.sessionId ?? row.sandboxSessionId,
-	});
+	const sessionId = stopped.sessionId ?? row.sandboxSessionId;
+	await recordSandboxAsleep(row.id, { sessionId });
+	await recordBootEnd(row.id, { sessionId, reason: "restarted" });
 	await queueSettleWorkspace(row.id);
 	return wakeCloudWorkspace(row);
 }
@@ -238,25 +239,14 @@ export async function wakeAfterStop(
  */
 export async function markSandboxUnavailable(
 	row: CloudWorkspaceRow,
-	error: unknown,
+	error: SandboxUnavailableError,
 ): Promise<void> {
-	const changed = await transitionCloudWorkspace({
-		id: row.id,
-		from: ["awake", "asleep"],
-		to: "failed",
-		set: { sandboxUrl: null },
-	});
-	nudge(row.organizationId, "cloud_workspaces");
 	console.error(`[cloud-workspace] ${row.id} sandbox unavailable`, error);
-	const scope = {
-		cloudWorkspaceId: row.id,
-		organizationId: row.organizationId,
-	};
-	logControl(
-		"workspace.failed",
-		scope,
-		{ "failure.site": "sandbox_unavailable", "status.changed": changed },
-		"error",
-	);
-	if (changed) Sentry.captureException(error, { tags: controlTags(scope) });
+	await failCloudWorkspace({
+		scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		from: ["awake", "asleep"],
+		set: { sandboxUrl: null },
+		reason: error.snapshotExpired ? "snapshot_expired" : "sandbox_gone",
+		error,
+	});
 }

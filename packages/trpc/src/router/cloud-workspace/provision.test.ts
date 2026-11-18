@@ -25,6 +25,7 @@ stub(sandbox, {
 		throw claimError;
 	},
 	deleteSandbox: async () => {},
+	stopSandbox: async () => ({ sessionId: null }),
 });
 stub(realtime, { nudge: () => {} });
 stub(chatMoves, { failChatMovesTo: async () => {} });
@@ -58,11 +59,48 @@ describe("a provision that Autumn refuses", () => {
 					"log.source": "control",
 					"cloud_workspace.id": "ws_1",
 					"organization.id": "org_1",
-					"failure.site": "provision",
+					"failure.reason": "usage_limit",
 				},
 			],
 		]);
 		expect(captured).toEqual([]);
+	});
+});
+
+describe("a failed provision records why", () => {
+	const failed: unknown[] = [];
+	stub(transition, {
+		transitionCloudWorkspace: async (args: {
+			set: { failureReason?: string; failedAt?: Date };
+		}) => {
+			failed.push([args.set.failureReason, args.set.failedAt instanceof Date]);
+			return true;
+		},
+	});
+
+	test("from the error: a refusal of either kind, a host that never answered, anything else", async () => {
+		for (claimError of [
+			userError({
+				code: "FORBIDDEN",
+				message: "limit reached",
+				i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+			}),
+			userError({
+				code: "FORBIDDEN",
+				message: "needs a paid plan",
+				i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan",
+			}),
+			new sandbox.SandboxNotReadyError("ws-box"),
+			new Error("create failed"),
+		]) {
+			await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });
+		}
+		expect(failed).toEqual([
+			["usage_limit", true],
+			["needs_paid_plan", true],
+			["host_not_ready", true],
+			["create_failed", true],
+		]);
 	});
 });
 

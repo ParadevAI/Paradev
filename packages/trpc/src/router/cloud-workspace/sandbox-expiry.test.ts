@@ -12,7 +12,7 @@ import {
 	syncSandboxExpiries,
 	watchSandboxExpiry,
 } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBootEnd, recordSandboxAsleep } from "./sandbox-sleep";
 
 const NOW = Date.now();
 const MINUTE = 60_000;
@@ -151,6 +151,16 @@ describe("watchSandboxExpiry", () => {
 		expect(watches).toEqual([]);
 	});
 
+	test("a confirmed stop ends the open boot of the stopped session as idle, unless a stop site already said why", async () => {
+		storedExpiry = new Date(NOW - 5_000);
+		await watchSandboxExpiry({ cloudWorkspaceId: "ws_1" });
+		const ended = writes.find((write) => "endReason" in write.set);
+		expect(ended?.set).toEqual({ endReason: "idle" });
+		expect(ended?.where).toContain('"stopped_at" is null');
+		expect(ended?.where).toContain('"end_reason" is null');
+		expect(ended?.params).toContain("session_1");
+	});
+
 	test("a box still running past its recorded expiry goes through recordSandboxAwake", async () => {
 		storedExpiry = new Date(NOW - 5_000);
 		liveExpiry = new Date(NOW + 20 * MINUTE);
@@ -173,6 +183,16 @@ describe("watchSandboxExpiry", () => {
 			}),
 		).resolves.toBeUndefined();
 		expect(watches).toEqual([]);
+	});
+});
+
+describe("recordBootEnd", () => {
+	test("with no stopped session it ends every open boot of the workspace", async () => {
+		await recordBootEnd("ws_1", { sessionId: null, reason: "archived" });
+		expect(writes).toHaveLength(1);
+		expect(writes[0]?.set).toEqual({ endReason: "archived" });
+		expect(writes[0]?.where).not.toContain("vercel_session_id");
+		expect(writes[0]?.params).toEqual(["ws_1"]);
 	});
 });
 
