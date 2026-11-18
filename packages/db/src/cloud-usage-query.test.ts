@@ -1,7 +1,12 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { PGlite } from "@electric-sql/pglite";
-import { pg_trgm } from "@electric-sql/pglite/contrib/pg_trgm";
 import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
+import {
+	getTableConfig,
+	isPgEnum,
+	isPgSchema,
+	type PgTable,
+} from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/pglite";
 import {
 	cloudBillingPeriod,
@@ -32,14 +37,29 @@ const RATE = 0.06;
 let db: ReturnType<typeof drizzle>;
 
 beforeAll(async () => {
-	const client = new PGlite({ extensions: { pg_trgm } });
-	await client.exec("create extension pg_trgm");
-	// chat_items has a generated column over a function that only a hand-written migration creates.
-	const { chatItems: _, ...tables } = schema;
+	const tables = new Set<PgTable>();
+	const withParents = (table: PgTable) => {
+		if (tables.has(table)) return;
+		tables.add(table);
+		for (const key of getTableConfig(table).foreignKeys) {
+			withParents(key.reference().foreignTable);
+		}
+	};
+	withParents(schema.cloudUsageEvents);
+	withParents(schema.users);
+	const types = Object.values(schema).filter(
+		(value) => isPgEnum(value) || isPgSchema(value),
+	);
 	const ddl = await generateMigration(
 		generateDrizzleJson({}),
-		generateDrizzleJson(tables, undefined, undefined, "snake_case"),
+		generateDrizzleJson(
+			Object.fromEntries([...types, ...tables].map((value, i) => [i, value])),
+			undefined,
+			undefined,
+			"snake_case",
+		),
 	);
+	const client = new PGlite();
 	await client.exec(ddl.join(";\n"));
 	db = drizzle({ client, casing: "snake_case" });
 
@@ -129,6 +149,15 @@ beforeAll(async () => {
 					"user",
 				],
 				["boot_4", BILLING_PAGE, SAM, 8, "2026-11-17T08:00Z", null, null],
+				[
+					"boot_6",
+					CHECKOUT,
+					MAYA,
+					4,
+					"2026-11-12T08:00Z",
+					"2026-11-12T08:05Z",
+					"released",
+				],
 				[
 					"boot_5",
 					OTHER_WS,
@@ -283,7 +312,7 @@ describe("queryCloudUsage", () => {
 			items: [],
 			total: {
 				workspaces: 3,
-				boots: 3,
+				boots: 4,
 				failedBoots: 1,
 				hours: 3.25,
 				gbHours: 34,
@@ -303,18 +332,18 @@ describe("queryCloudUsage", () => {
 				item.workspaces,
 			]);
 		expect(await brief("user")).toEqual([
-			["Maya", 18, 2, 1, 2],
+			["Maya", 18, 3, 1, 2],
 			["Sam", 16, 1, 0, 1],
 		]);
 		expect(await brief("day")).toEqual([
 			["2026-11-17", 0, 1, 0, 1],
 			["2026-11-16", 0, 0, 0, 1],
-			["2026-11-12", 0, 1, 1, 1],
+			["2026-11-12", 0, 2, 1, 1],
 			["2026-11-10", 18, 1, 0, 1],
 			["2026-11-01", 16, 0, 0, 1],
 		]);
 		expect(await brief("workspace")).toEqual([
-			["fix-flaky-checkout", 18, 2, 1, 1],
+			["fix-flaky-checkout", 18, 3, 1, 1],
 			["billing-page", 16, 1, 0, 1],
 			["broken-env", 0, 0, 0, 1],
 		]);
@@ -347,16 +376,17 @@ describe("queryCloudUsage", () => {
 });
 
 describe("listCloudBoots", () => {
-	test("lists boots newest first; failed and open boots have only sent usage", async () => {
+	test("lists boots newest first; failed, released and open boots have only sent usage", async () => {
 		const { items } = await boots({});
 		expect(
 			items.map((b) => [b.id, b.endReason, b.gbHours, b.usageUsd, b.minutes]),
 		).toEqual([
 			["boot_4", null, 0, 0, 960],
+			["boot_6", "released", 0, 0, 5],
 			["boot_2", "failed", 0, 0, 1],
 			["boot_1", "idle", 18, 1.08, 135],
 		]);
-		expect(items[2]).toMatchObject({
+		expect(items[3]).toMatchObject({
 			workspace: { id: CHECKOUT, name: "fix-flaky-checkout" },
 			user: { id: MAYA, name: "Maya" },
 			size: "medium",
@@ -372,7 +402,11 @@ test("a member gets only their own rows", async () => {
 	expect(own.items.map((item) => item.key)).toEqual([BILLING_PAGE]);
 	expect(own.total).toMatchObject({ gbHours: 16, boots: 1 });
 	const ownBoots = await boots({}, MAYA);
-	expect(ownBoots.items.map((b) => b.id)).toEqual(["boot_2", "boot_1"]);
+	expect(ownBoots.items.map((b) => b.id)).toEqual([
+		"boot_6",
+		"boot_2",
+		"boot_1",
+	]);
 });
 
 test("paging one row at a time returns every row once, in order", async () => {

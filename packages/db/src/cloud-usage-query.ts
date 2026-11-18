@@ -1,3 +1,4 @@
+// Runs whole queries, unlike task-list-query's condition builders: the admin repo shares them and vendors packages/db but not packages/trpc.
 import {
 	isMachineSize,
 	LEGACY_MACHINE_SIZE,
@@ -58,7 +59,10 @@ export interface CloudUsageWindow {
 	to: Date;
 }
 
-/** `gbMinutes` is the exact numeric sum as text; grouped by day, only `key` is used. */
+/**
+ * `gbMinutes` is the exact sum as decimal digits with an optional fraction (`1080`, `16.5`); it is
+ * cast to numeric in SQL, so the router must check that format. Grouped by day, only `key` is used.
+ */
 export interface CloudUsageCursor {
 	gbMinutes: string;
 	key: string;
@@ -305,15 +309,6 @@ function metricColumns(facts: ReturnType<typeof usageFacts>) {
 type MetricColumns = ReturnType<typeof metricColumns>;
 type MetricRow = { [K in keyof MetricColumns]: MetricColumns[K]["_"]["type"] };
 
-/** An aggregate without GROUP BY always returns one row; this only satisfies the type. */
-const NO_ROWS: MetricRow = {
-	gbMinutes: "0",
-	seconds: "0",
-	boots: 0,
-	failedBoots: 0,
-	workspaces: 0,
-};
-
 function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 	const gbMinutes = Number(row.gbMinutes);
 	return {
@@ -401,15 +396,19 @@ export async function queryCloudUsage(
 		overagePerGbHour,
 	} = options;
 	const totalFacts = usageFacts(db, scope, filters, window, undefined);
-	const totalQuery = db
+	const totalRow = db
 		.with(totalFacts)
 		.select(metricColumns(totalFacts))
-		.from(totalFacts);
+		.from(totalFacts)
+		.then(([row]) => {
+			if (!row)
+				throw new Error("An aggregate without GROUP BY returned no row");
+			return row;
+		});
 	if (!groupBy) {
-		const [total = NO_ROWS] = await totalQuery;
 		return {
 			items: [],
-			total: toMetrics(total, overagePerGbHour),
+			total: toMetrics(await totalRow, overagePerGbHour),
 			nextCursor: null,
 		};
 	}
@@ -417,7 +416,7 @@ export async function queryCloudUsage(
 	const facts = usageFacts(db, scope, filters, window, groupBy);
 	const metrics = metricColumns(facts);
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
-	const [rows, [total = NO_ROWS]] = await Promise.all([
+	const [rows, total] = await Promise.all([
 		db
 			.with(facts)
 			.select({ key: facts.key, sortKey, ...metrics })
@@ -439,7 +438,7 @@ export async function queryCloudUsage(
 					: [desc(metrics.gbMinutes), asc(sortKey)]),
 			)
 			.limit(limit + 1),
-		totalQuery,
+		totalRow,
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
