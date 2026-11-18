@@ -1,6 +1,7 @@
 import {
 	gbHourPack,
 	type MachineSize,
+	overagePerGbHour,
 	PLAN_METADATA,
 	type PlanTier,
 } from "@superset/shared/billing";
@@ -139,6 +140,7 @@ export function billingFromCustomer(
 			customer.balances,
 			customer.billingControls,
 			paid?.plan ? gbHourPack(paid.plan) : null,
+			paid?.plan ? overagePerGbHour(paid.plan) : null,
 		),
 		planTier: planTierOf(paid?.plan?.metadata, tier),
 		gatedMachineSizes: gatedMachineSizesFromFlags(customer.flags),
