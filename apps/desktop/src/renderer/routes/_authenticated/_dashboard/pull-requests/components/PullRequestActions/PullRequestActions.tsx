@@ -78,6 +78,7 @@ import {
 } from "../PullRequestMenu";
 import { PullRequestMergeFlowDialog } from "../PullRequestMergeFlowDialog";
 import { PullRequestSkeleton as Skeleton } from "../PullRequestSkeleton";
+import { ConflictSessionDialog } from "./components/ConflictSessionDialog";
 
 type MergeMethod = PullRequestMergeMethod;
 
@@ -269,7 +270,9 @@ export function PullRequestActions({
 			{data.state === "open" && data.mergeability === "conflicting" ? (
 				<PullRequestMenuItem
 					disabled={!handoff.available || handoff.isPending}
-					onClick={() => handoff.handOff(buildResolveConflictsPrompt(data))}
+					onClick={() =>
+						handoff.resolveConflicts(buildResolveConflictsPrompt(data))
+					}
 				>
 					<GitMerge strokeWidth={1.75} className="text-destructive" />
 					<Trans>Resolve conflicts</Trans>
@@ -640,6 +643,21 @@ export function PullRequestActions({
 				</Button>
 			) : null}
 
+			{handoff.choice && (
+				<ConflictSessionDialog
+					workspaceId={handoff.choice.workspaceId}
+					sessions={handoff.choice.sessions}
+					configs={handoff.configs}
+					onClose={handoff.dismissChoice}
+					onConfirm={(selection) => {
+						if (handoff.choice)
+							handoff.confirmChoice(handoff.choice, {
+								workspaceId: handoff.choice.workspaceId,
+								...selection,
+							});
+					}}
+				/>
+			)}
 			{prNumber !== null ? (
 				<PullRequestMergeFlowDialog flow={flow} prNumber={prNumber} />
 			) : null}
