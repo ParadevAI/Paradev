@@ -5,12 +5,18 @@ export interface Amount {
 	usd: number;
 }
 
+/**
+ * What each line holds. The first four are what billing counted; together they are its total.
+ * - `included`: usage of the seats' monthly amount, of that amount.
+ * - `freeCredits`, `bought`: usage of a granted or bought credit, of the credit.
+ * - `extra`: usage past the included amount and the credits, of the extra-usage cap when there is one.
+ * - `beyond`: usage the period's events hold past what billing counted, such as usage not sent yet.
+ */
 export interface AllowanceLine {
-	/** `beyond` is usage the other lines do not hold: the period's usage events past what billing counted. */
 	kind: "included" | "freeCredits" | "bought" | "extra" | "beyond";
 	paid: boolean;
 	used: Amount;
-	/** Null for extra usage with no known cap, and for `beyond`. */
+	/** Null for extra usage with no cap or an unknown one, and for `beyond`. */
 	total: Amount | null;
 }
 
@@ -33,7 +39,8 @@ const minus = (a: Amount, b: Amount): Amount => ({
  * The card's lines, in the design's order: what the plan includes and free credits, then
  * bought credits, extra usage, and any usage the period's events hold beyond those lines.
  * `used` is the sum of the lines, so the headline and the lines always agree. `cap` is
- * the included total, plus the extra-usage limit when there is one.
+ * the included total, plus the extra-usage limit when there is one. With extra usage off
+ * the included total is the cap, so the bar is not left open.
  */
 export function allowanceLines(
 	allowance: PricedAllowance,
@@ -88,7 +95,9 @@ export function allowanceLines(
 	const hasCap = lines.some((item) => item.kind === "extra" && item.total);
 	const open = lines.filter((item) => !item.total);
 	const filled = sum([...totalsOf(lines), ...open.map((item) => item.used)]);
-	const leaveOpen = open.length > 0 && allowance.limitReached !== true;
+	const capKnown = limit !== null;
+	const leaveOpen =
+		!capKnown && open.length > 0 && allowance.limitReached !== true;
 	return {
 		lines,
 		used: sum(lines.map((line) => line.used)),

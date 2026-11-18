@@ -1,5 +1,4 @@
 import type {
-	CloudBoot,
 	CloudBoots,
 	CloudMetrics,
 	CloudPages,
@@ -9,74 +8,54 @@ import type {
 	CloudUsageRow,
 } from "../../types";
 
-type WithUsd<T> = Omit<T, "usageUsd"> & { usageUsd: number };
+/** Null only when the included total itself is not known. */
+type KeepsNull = "includedUsd";
 
-export type PricedMetrics = WithUsd<CloudMetrics>;
-export type PricedRow = WithUsd<CloudUsageRow>;
-export type PricedUsage = Omit<CloudUsage, "items" | "total"> & {
-	items: PricedRow[];
-	total: PricedMetrics;
-};
-export type PricedBoot = WithUsd<CloudBoot>;
-export type PricedBoots = Omit<CloudBoots, "items"> & { items: PricedBoot[] };
+/** A router output with every dollar field present: `usageUsd`, `usedUsd`, `usd` and the rest. */
+export type Priced<T> = T extends Date
+	? T
+	: T extends readonly (infer Item)[]
+		? Priced<Item>[]
+		: T extends object
+			? {
+					[K in keyof T]: K extends KeepsNull
+						? T[K]
+						: K extends `${string}Usd` | "usd"
+							? Exclude<T[K], null>
+							: Priced<T[K]>;
+				}
+			: T;
 
-type Allowance = NonNullable<CloudPeriod["allowance"]>;
-type Credit = NonNullable<Allowance["bought"]>;
-type PricedCredit = Omit<Credit, "usedUsd" | "totalUsd"> & {
-	usedUsd: number;
-	totalUsd: number;
-};
-export type PricedAllowance = Omit<
-	Allowance,
-	| "usedUsd"
-	| "includedUsd"
-	| "overageUsd"
-	| "bought"
-	| "freeCredits"
-	| "extraUsageLimit"
-> & {
-	usedUsd: number;
-	/** Null only when the included total is not known. */
-	includedUsd: number | null;
-	overageUsd: number;
-	bought: PricedCredit | null;
-	freeCredits: PricedCredit | null;
-	extraUsageLimit: { gbHours: number; usd: number } | null;
-};
+export type PricedUsage = Priced<CloudUsage>;
+export type PricedRow = Priced<CloudUsageRow>;
+export type PricedMetrics = Priced<CloudMetrics>;
+export type PricedBoots = Priced<CloudBoots>;
+export type PricedAllowance = Priced<NonNullable<CloudPeriod["allowance"]>>;
 
-const hasUsd = (item: { usageUsd: number | null }) => item.usageUsd !== null;
-const creditPriced = (credit: Credit | null) =>
-	credit === null || (credit.usedUsd !== null && credit.totalUsd !== null);
+const isDollars = (key: string) => key === "usd" || key.endsWith("Usd");
 
-export function pricedUsage(usage: CloudUsage): PricedUsage | null {
-	return hasUsd(usage.total) && usage.items.every(hasUsd)
-		? (usage as PricedUsage)
-		: null;
-}
-
-export function pricedBoots(boots: CloudBoots): PricedBoots | null {
-	return boots.items.every(hasUsd) ? (boots as PricedBoots) : null;
-}
-
-export function pricedAllowance(allowance: Allowance): PricedAllowance | null {
-	const priced =
-		allowance.usedUsd !== null &&
-		allowance.overageUsd !== null &&
-		(allowance.includedUsd !== null || allowance.includedGbHours === null) &&
-		creditPriced(allowance.bought) &&
-		creditPriced(allowance.freeCredits) &&
-		(allowance.extraUsageLimit === null ||
-			allowance.extraUsageLimit.usd !== null);
-	return priced ? (allowance as PricedAllowance) : null;
+/** `value` itself when every dollar field in it is present, else null. */
+export function priced<T>(value: T): Priced<T> | null {
+	const check = (node: unknown): boolean => {
+		if (Array.isArray(node)) return node.every(check);
+		if (node === null || typeof node !== "object" || node instanceof Date)
+			return true;
+		const record = node as Record<string, unknown>;
+		return Object.entries(record).every(([key, item]) =>
+			key === "includedUsd"
+				? item !== null || record.includedGbHours === null
+				: isDollars(key)
+					? item !== null
+					: check(item),
+		);
+	};
+	return check(value) ? (value as Priced<T>) : null;
 }
 
 /** Usage without prices is a load failure: the pages show usage in dollars only. */
-export function pricedQuery<TData, TPriced>(
-	query: CloudQuery<TData>,
-	price: (data: TData) => TPriced | null,
-): CloudQuery<TPriced> {
+export function pricedQuery<T>(query: CloudQuery<T>): CloudQuery<Priced<T>> {
 	const data =
-		query.data === undefined ? undefined : (price(query.data) ?? undefined);
+		query.data === undefined ? undefined : (priced(query.data) ?? undefined);
 	return {
 		data,
 		isError: query.isError || (query.data !== undefined && data === undefined),
@@ -84,13 +63,10 @@ export function pricedQuery<TData, TPriced>(
 	};
 }
 
-export function pricedPages<TPage, TPriced>(
-	query: CloudPages<TPage>,
-	price: (page: TPage) => TPriced | null,
-): CloudPages<TPriced> {
-	const pages = query.data?.pages.map(price);
+export function pricedPages<T>(query: CloudPages<T>): CloudPages<Priced<T>> {
+	const pages = query.data?.pages.map(priced);
 	const all = pages?.every((page) => page !== null)
-		? (pages as TPriced[])
+		? (pages as Priced<T>[])
 		: undefined;
 	return {
 		...query,

@@ -47,7 +47,7 @@ export function AllowanceCard({
 	allowance,
 	billing,
 }: AllowanceCardProps) {
-	const { dollars } = useUsageFormat();
+	const { dollarsFor } = useUsageFormat();
 	const summary =
 		allowance?.includedGbHours != null && allowance.includedUsd !== null
 			? allowanceLines(
@@ -56,6 +56,19 @@ export function AllowanceCard({
 					{ gbHours: total.gbHours, usd: total.usageUsd },
 				)
 			: null;
+	const dollars = dollarsFor([
+		total.usageUsd,
+		...(summary
+			? [
+					summary.used.usd,
+					summary.cap.usd,
+					...summary.lines.flatMap((line) => [
+						line.used.usd,
+						...(line.total ? [line.total.usd] : []),
+					]),
+				]
+			: []),
+	]);
 	const used = dollars(summary ? summary.used.usd : total.usageUsd);
 	const cap = summary && dollars(summary.cap.usd);
 	const reasons = new Set(period?.unavailable.map((item) => item.reason));

@@ -11510,6 +11510,9 @@ msgstr "Memuat lagi..."
 msgid "Loading more…"
 msgstr "Memuat lagi…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Memuat halaman {loadingPage} dari {targetPage}..."
+
 msgid "Loading project…"
 msgstr "Memuat proyek…"
 
@@ -21557,6 +21560,10 @@ msgstr "Unik"
 msgid "unknown"
 msgstr "tidak diketahui"
 
+msgid "Unknown"
+msgstr "Tidak diketahui"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Tidak diketahui"
 

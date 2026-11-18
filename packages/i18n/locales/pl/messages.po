@@ -11510,6 +11510,9 @@ msgstr "Wczytywanie kolejnych..."
 msgid "Loading more…"
 msgstr "Wczytywanie kolejnych…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Wczytywanie strony {loadingPage} z {targetPage}..."
+
 msgid "Loading project…"
 msgstr "Wczytywanie projektu…"
 
@@ -21559,6 +21562,10 @@ msgstr "nieznana"
 
 msgid "Unknown"
 msgstr "Nieznana"
+
+msgctxt "boot end"
+msgid "Unknown"
+msgstr "Nieznany"
 
 msgctxt "person"
 msgid "Unknown"

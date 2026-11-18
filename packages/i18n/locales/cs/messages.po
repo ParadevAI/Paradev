@@ -11510,6 +11510,9 @@ msgstr "Načítám další..."
 msgid "Loading more…"
 msgstr "Načítám další…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Načítání stránky {loadingPage} z {targetPage}..."
+
 msgid "Loading project…"
 msgstr "Načítám projekt…"
 
@@ -21559,6 +21562,10 @@ msgstr "neznámý"
 
 msgid "Unknown"
 msgstr "Neznámá"
+
+msgctxt "boot end"
+msgid "Unknown"
+msgstr "Neznámé"
 
 msgctxt "person"
 msgid "Unknown"

@@ -49,7 +49,8 @@ export function WorkspacesTable({
 }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
 	const { formatNumber } = useFormat();
-	const { dollars, formatGbHours } = useUsageFormat();
+	const { dollarsFor, formatGbHours } = useUsageFormat();
+	const dollars = dollarsFor(rows.map((row) => row.usageUsd));
 	const head = (by: WorkspacesSort, label: ReactNode, marked = true) =>
 		sort ? (
 			<Link to={sort.to(by)} className="hover:text-foreground">
@@ -106,7 +107,7 @@ export function WorkspacesTable({
 					const size = workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
 					return (
 						<TableRow key={row.key ?? ""} className="relative">
-							<TableCell className="max-w-64 py-2.5 whitespace-normal">
+							<TableCell className="w-full min-w-28 max-w-0 py-2.5 whitespace-normal @xl:min-w-40">
 								{workspace ? (
 									<Link
 										to={{
@@ -116,25 +117,28 @@ export function WorkspacesTable({
 										}}
 										className="font-semibold break-words after:absolute after:inset-0"
 									>
-										{workspace.name}
+										<span title={workspace.name} className="line-clamp-2">
+											{workspace.name}
+										</span>
 									</Link>
 								) : (
 									<span className="text-muted-foreground">
 										<Trans>Deleted workspace</Trans>
 									</span>
 								)}
-								<div className="flex flex-wrap gap-x-1.5 text-xs text-muted-foreground @2xl:hidden">
-									{isAdmin && owner && <span>{owner}</span>}
-									{size && (
-										<span className="whitespace-nowrap @xl:hidden">
-											{isAdmin && owner && <span aria-hidden>· </span>}
-											{size}
+								<div className="flex min-w-0 flex-wrap gap-x-3 text-xs text-muted-foreground @2xl:hidden">
+									{isAdmin && owner && (
+										<span title={owner} className="max-w-full truncate">
+											{owner}
 										</span>
+									)}
+									{size && (
+										<span className="whitespace-nowrap @xl:hidden">{size}</span>
 									)}
 								</div>
 							</TableCell>
 							{isAdmin && (
-								<TableCell className={WIDE}>
+								<TableCell className={cn(WIDE, "max-w-48")}>
 									{owner && <Person name={owner} />}
 								</TableCell>
 							)}

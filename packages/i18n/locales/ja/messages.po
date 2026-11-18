@@ -11510,6 +11510,9 @@ msgstr "さらに読み込み中..."
 msgid "Loading more…"
 msgstr "さらに読み込み中…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "{targetPage} ページ中 {loadingPage} ページ目を読み込んでいます..."
+
 msgid "Loading project…"
 msgstr "プロジェクトを読み込み中…"
 
@@ -21557,6 +21560,10 @@ msgstr "一意"
 msgid "unknown"
 msgstr "不明"
 
+msgid "Unknown"
+msgstr "不明"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "不明"
 

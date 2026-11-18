@@ -11510,6 +11510,9 @@ msgstr "Meer laden..."
 msgid "Loading more…"
 msgstr "Meer laden…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Pagina {loadingPage} van {targetPage} laden..."
+
 msgid "Loading project…"
 msgstr "Project laden…"
 
@@ -21557,6 +21560,10 @@ msgstr "Uniek"
 msgid "unknown"
 msgstr "onbekend"
 
+msgid "Unknown"
+msgstr "Onbekend"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Onbekend"
 

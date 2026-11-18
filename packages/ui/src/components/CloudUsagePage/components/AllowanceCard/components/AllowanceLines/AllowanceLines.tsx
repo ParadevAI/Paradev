@@ -12,12 +12,13 @@ interface AllowanceLinesProps {
 	format: (usd: number) => string;
 }
 
+/** Fixed palette hues for the paid and beyond segments, so each keeps one colour in both themes. */
 const SWATCH: Record<AllowanceLine["kind"], string> = {
 	included: "bg-foreground/70",
 	freeCredits: "bg-foreground/35",
-	bought: "bg-chart-2",
-	extra: "bg-chart-1",
-	beyond: "bg-warning",
+	bought: "bg-teal-500",
+	extra: "bg-orange-500",
+	beyond: "bg-amber-400",
 };
 
 export function AllowanceLines({

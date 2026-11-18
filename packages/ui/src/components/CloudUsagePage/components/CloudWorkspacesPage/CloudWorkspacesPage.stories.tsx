@@ -1,23 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
-	allowanceFixtures,
 	PEOPLE,
 	pagesQuery,
-	periods,
 	query,
 	rowsFixtures,
 	StoryLink,
-	unavailableFixtures,
-	usageFixtures,
 	withSettingsShell,
 	workspacePages,
+	workspacesByPerson,
+	workspacesPeriods,
 } from "../../fixtures";
 import { CloudWorkspacesPage } from "./CloudWorkspacesPage";
-
-const list = periods({
-	allowance: allowanceFixtures.freeCredits,
-	unavailable: unavailableFixtures.none,
-});
 
 const meta = {
 	title: "Cloud usage/Workspaces",
@@ -27,11 +20,11 @@ const meta = {
 		Link: StoryLink,
 		navigate: () => undefined,
 		isAdmin: true,
-		periods: query(list),
-		period: list.items[0],
+		periods: query(workspacesPeriods),
+		period: workspacesPeriods.items[0],
 		workspaces: pagesQuery(workspacePages()),
 		filters: {},
-		byPerson: query(usageFixtures.byPerson),
+		byPerson: query(workspacesByPerson),
 	},
 } satisfies Meta<typeof CloudWorkspacesPage>;
 
@@ -57,9 +50,7 @@ export const Search: Story = {
 		workspaces: pagesQuery(workspacePages(rowsFixtures.sync)),
 	},
 };
-export const Page2: Story = {
-	args: { filters: { page: 2 }, workspaces: pagesQuery(workspacePages()) },
-};
+export const Page2: Story = { args: { filters: { page: 2 } } };
 export const NoMatch: Story = {
 	args: {
 		filters: { q: "nothing" },

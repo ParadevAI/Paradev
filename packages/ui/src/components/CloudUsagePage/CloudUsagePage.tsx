@@ -21,7 +21,7 @@ import type {
 } from "./types";
 import { hasUsage } from "./utils/hasUsage";
 import { periodParam } from "./utils/periodParam";
-import { pricedAllowance, pricedQuery, pricedUsage } from "./utils/priced";
+import { priced, pricedQuery } from "./utils/priced";
 
 interface CloudUsagePageProps {
 	Link: CloudUsageLink;
@@ -44,12 +44,10 @@ export function CloudUsagePage({
 	workspaces: unpricedWorkspaces,
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
-	const byDay = pricedQuery(unpricedByDay, pricedUsage);
-	const byPerson = pricedQuery(unpricedByPerson, pricedUsage);
-	const workspaces = pricedQuery(unpricedWorkspaces, pricedUsage);
-	const allowance = period?.allowance
-		? pricedAllowance(period.allowance)
-		: null;
+	const byDay = pricedQuery(unpricedByDay);
+	const byPerson = pricedQuery(unpricedByPerson);
+	const workspaces = pricedQuery(unpricedWorkspaces);
+	const allowance = period?.allowance ? priced(period.allowance) : null;
 	const unpriced = Boolean(period?.allowance) && allowance === null;
 
 	return (

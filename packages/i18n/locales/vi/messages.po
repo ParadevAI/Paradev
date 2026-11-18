@@ -11510,6 +11510,9 @@ msgstr "Đang tải thêm..."
 msgid "Loading more…"
 msgstr "Đang tải thêm…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Đang tải trang {loadingPage}/{targetPage}..."
+
 msgid "Loading project…"
 msgstr "Đang tải dự án…"
 
@@ -21557,6 +21560,10 @@ msgstr "Duy nhất"
 msgid "unknown"
 msgstr "không rõ"
 
+msgid "Unknown"
+msgstr "Không rõ"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Không rõ"
 

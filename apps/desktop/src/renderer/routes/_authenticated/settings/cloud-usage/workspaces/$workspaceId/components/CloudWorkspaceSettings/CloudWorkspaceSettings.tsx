@@ -36,6 +36,10 @@ export function CloudWorkspaceSettings({
 			enabled: queries.workspace.enabled,
 		},
 	);
+	const allTime = cloudTrpc.cloud.usage.query.useQuery(
+		queries.workspaceAllTime.input,
+		{ enabled: queries.workspaceAllTime.enabled },
+	);
 	const boots = cloudTrpc.cloud.boots.list.useInfiniteQuery(
 		queries.boots.input,
 		{
@@ -50,6 +54,7 @@ export function CloudWorkspaceSettings({
 			periods={periods}
 			period={period}
 			workspace={workspace}
+			allTime={allTime}
 			boots={boots}
 			openWorkspace={
 				canOpen

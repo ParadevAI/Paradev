@@ -11510,6 +11510,9 @@ msgstr "더 불러오는 중..."
 msgid "Loading more…"
 msgstr "더 불러오는 중…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "{targetPage}페이지 중 {loadingPage}페이지를 불러오는 중..."
+
 msgid "Loading project…"
 msgstr "프로젝트 불러오는 중…"
 
@@ -21557,6 +21560,10 @@ msgstr "고유"
 msgid "unknown"
 msgstr "알 수 없음"
 
+msgid "Unknown"
+msgstr "알 수 없음"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "알 수 없음"
 

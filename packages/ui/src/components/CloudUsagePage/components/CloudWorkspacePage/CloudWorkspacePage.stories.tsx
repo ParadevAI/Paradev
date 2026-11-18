@@ -3,74 +3,52 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { LuArrowUpRight } from "react-icons/lu";
 import { Button } from "../../../ui/button";
 import {
-	allowanceFixtures,
-	boots,
+	emptyUsage,
 	pagesQuery,
-	periods,
 	query,
-	rowOf,
 	StoryLink,
-	unavailableFixtures,
-	usageFixtures,
 	withSettingsShell,
-	workspaceRefs,
+	workspaceArgs,
 } from "../../fixtures";
-import type { CloudUsage, WorkspaceRef } from "../../types";
+import type { CloudBoots, CloudUsage } from "../../types";
 import { CloudWorkspacePage } from "./CloudWorkspacePage";
 
-const list = periods({
-	allowance: allowanceFixtures.freeCredits,
-	unavailable: unavailableFixtures.none,
-});
-const one = (ref: WorkspaceRef) =>
-	query({ ...usageFixtures.empty, items: [{ ...rowOf(ref), ref }] });
+const openWorkspace = () => (
+	<Button variant="outline" size="sm">
+		<Trans>Open workspace</Trans>
+		<LuArrowUpRight />
+	</Button>
+);
 
+/** Stories render as on the web, with no "Open workspace", unless named for desktop. */
 const meta = {
 	title: "Cloud usage/Workspace",
 	component: CloudWorkspacePage,
 	decorators: [withSettingsShell],
-	args: {
-		Link: StoryLink,
-		periods: query(list),
-		period: list.items[0],
-		workspace: one(workspaceRefs.asleep),
-		boots: pagesQuery([boots(workspaceRefs.asleep)]),
-		openWorkspace: () => (
-			<Button variant="outline" size="sm">
-				<Trans>Open workspace</Trans>
-				<LuArrowUpRight />
-			</Button>
-		),
-	},
+	args: { Link: StoryLink, ...workspaceArgs("asleep") },
 } satisfies Meta<typeof CloudWorkspacePage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** As on desktop, with "Open workspace"; the web has no workspace page to open. */
-export const Desktop: Story = {};
-export const Web: Story = { args: { openWorkspace: undefined } };
-export const Failed: Story = {
-	args: {
-		workspace: one(workspaceRefs.failed),
-		boots: pagesQuery([boots(workspaceRefs.failed, true)]),
-	},
-};
-export const Running: Story = {
-	args: {
-		workspace: one({ ...workspaceRefs.asleep, status: "awake" }),
-		boots: pagesQuery([boots({ ...workspaceRefs.asleep, status: "awake" })]),
-	},
-};
+export const Desktop: Story = { args: { openWorkspace } };
+export const Web: Story = {};
+export const Failed: Story = { args: workspaceArgs("failed") };
+export const Running: Story = { args: workspaceArgs("awake") };
+/** No usage in the period: the name comes from the workspace's usage over all time. */
 export const NoUsage: Story = {
-	args: { workspace: query(usageFixtures.empty), boots: pagesQuery([]) },
-};
-export const LongNames: Story = {
 	args: {
-		workspace: one(workspaceRefs.long),
-		boots: pagesQuery([boots(workspaceRefs.long)]),
+		workspace: query(emptyUsage),
+		boots: pagesQuery<CloudBoots>([]),
 	},
+};
+export const LongNamesDesktop: Story = {
+	args: { ...workspaceArgs("long"), openWorkspace },
 };
 export const Loading: Story = {
-	args: { workspace: query<CloudUsage>(undefined) },
+	args: {
+		workspace: query<CloudUsage>(undefined),
+		allTime: query<CloudUsage>(undefined),
+		boots: pagesQuery<CloudBoots>(undefined),
+	},
 };

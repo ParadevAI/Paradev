@@ -33,8 +33,9 @@ const NARROW = "hidden @md:table-cell";
 export function BootsTable({ pages }: BootsTableProps) {
 	const { i18n } = useLingui();
 	const { formatDateTime, formatList, formatNumber } = useFormat();
-	const { dollars, formatGbHours } = useUsageFormat();
+	const { dollarsFor, formatGbHours } = useUsageFormat();
 	const boots = pages.data?.pages.flatMap((page) => page.items) ?? [];
+	const dollars = dollarsFor(boots.map((boot) => boot.usageUsd));
 	const unit = (value: number, name: "hour" | "minute" | "second") =>
 		formatNumber(value, { style: "unit", unit: name, unitDisplay: "narrow" });
 	const duration = (minutes: number) => {
@@ -115,7 +116,13 @@ export function BootsTable({ pages }: BootsTableProps) {
 									{boot.size && i18n._(MACHINE_SIZE_NAMES[boot.size])}
 								</TableCell>
 								<TableCell>
-									{pill && <Pill tone={pill.tone}>{i18n._(pill.label)}</Pill>}
+									{pill ? (
+										<Pill tone={pill.tone}>{i18n._(pill.label)}</Pill>
+									) : (
+										<span className="text-muted-foreground">
+											<Trans context="boot end">Unknown</Trans>
+										</span>
+									)}
 								</TableCell>
 								<TableCell className={cn("text-right tabular-nums", NARROW)}>
 									{formatGbHours(boot.gbHours)}

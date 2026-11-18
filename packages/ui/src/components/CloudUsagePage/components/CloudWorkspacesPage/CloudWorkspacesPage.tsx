@@ -14,9 +14,10 @@ import type {
 	WorkspacesTarget,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
-import { pricedPages, pricedUsage } from "../../utils/priced";
+import { pricedPages } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
+import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspacesTable } from "../WorkspacesTable";
@@ -48,7 +49,7 @@ export function CloudWorkspacesPage({
 	filters,
 	byPerson,
 }: CloudWorkspacesPageProps) {
-	const workspaces = pricedPages(unpriced, pricedUsage);
+	const workspaces = pricedPages(unpriced);
 	const periodLabel = usePeriodLabel();
 	const param = periodParam(periods.data?.items, period);
 	/** Any change but the page itself goes back to the first page. */
@@ -60,9 +61,17 @@ export function CloudWorkspacesPage({
 	});
 	const pages = workspaces.data?.pages ?? [];
 	const { hasNextPage, isFetchingNextPage, fetchNextPage } = workspaces;
-	const wanted = (filters.page ?? 1) - 1;
-	// Pages are cursor pages: a page from the URL is reached by loading the pages before it.
+	const rows = filters.rows ?? DEFAULT_ROWS;
+	const rowCount = pages[0]?.rowCount;
+	const pageCount =
+		rowCount === undefined
+			? undefined
+			: Math.max(1, Math.ceil(rowCount / rows));
+	// Pages are cursor pages: a page from the URL is reached by loading the pages before it, up to the last page there is.
+	const wanted = Math.min((filters.page ?? 1) - 1, (pageCount ?? 1) - 1);
 	const walking = !workspaces.isError && wanted >= pages.length && hasNextPage;
+	const loadingPage = pages.length + 1;
+	const targetPage = wanted + 1;
 	useEffect(() => {
 		if (walking && !isFetchingNextPage) fetchNextPage();
 	}, [walking, isFetchingNextPage, fetchNextPage]);
@@ -110,7 +119,13 @@ export function CloudWorkspacesPage({
 				personName={personName}
 				to={to}
 			/>
-			{!periods.data || !workspaces.data || walking ? (
+			{walking ? (
+				<Notice>
+					<Trans>
+						Loading page {loadingPage} of {targetPage}...
+					</Trans>
+				</Notice>
+			) : !periods.data || !workspaces.data ? (
 				<QueryStatus
 					isError={periods.isError || workspaces.isError}
 					onRetry={() =>
@@ -142,7 +157,7 @@ export function CloudWorkspacesPage({
 								page: next === 0 ? undefined : next + 1,
 							})
 						}
-						rows={filters.rows ?? DEFAULT_ROWS}
+						rows={rows}
 						onRows={(rows) =>
 							navigate(
 								to({

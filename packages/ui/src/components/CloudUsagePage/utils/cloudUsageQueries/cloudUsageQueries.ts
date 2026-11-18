@@ -1,10 +1,12 @@
 import type { WorkspacesFilters } from "../../types";
-import type { usageRange } from "../usageRange";
+import { usageRange } from "../usageRange";
 import { ROWS_PER_PAGE } from "../workspacesFilters";
 
 const PAGE_SIZE = 25;
 const CHART_LIMIT = 100;
 const TOP_WORKSPACES = 8;
+/** Before any cloud workspace existed. */
+const ALL_TIME_FROM = "2024-01-01T00:00:00.000Z";
 
 export const PERIODS_INPUT = { limit: 24 } as const;
 
@@ -58,6 +60,15 @@ export function cloudUsageQueries({
 				limit: 1,
 			} as const,
 			enabled: periodsLoaded && workspaceId !== undefined,
+		},
+		workspaceAllTime: {
+			input: {
+				range: { from: ALL_TIME_FROM, to: usageRange(undefined).to },
+				workspace: workspaceId,
+				groupBy: "workspace",
+				limit: 1,
+			} as const,
+			enabled: workspaceId !== undefined,
 		},
 		boots: {
 			input: { workspace: workspaceId, range, limit: PAGE_SIZE },

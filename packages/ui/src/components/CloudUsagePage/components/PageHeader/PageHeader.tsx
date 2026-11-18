@@ -47,7 +47,12 @@ export function PageHeader({
 							</Fragment>
 						))}
 						<BreadcrumbItem className="min-w-0">
-							<BreadcrumbPage className="truncate">{current}</BreadcrumbPage>
+							<BreadcrumbPage
+								title={typeof current === "string" ? current : undefined}
+								className="truncate"
+							>
+								{current}
+							</BreadcrumbPage>
 						</BreadcrumbItem>
 					</BreadcrumbList>
 				</Breadcrumb>

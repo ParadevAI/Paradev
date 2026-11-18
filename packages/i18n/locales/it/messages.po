@@ -11510,6 +11510,9 @@ msgstr "Caricamento di altri..."
 msgid "Loading more…"
 msgstr "Caricamento di altri…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Caricamento della pagina {loadingPage} di {targetPage}..."
+
 msgid "Loading project…"
 msgstr "Caricamento del progetto…"
 
@@ -21557,6 +21560,10 @@ msgstr "Univoco"
 msgid "unknown"
 msgstr "sconosciuto"
 
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Sconosciuto"
 

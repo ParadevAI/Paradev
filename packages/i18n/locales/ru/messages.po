@@ -11510,6 +11510,9 @@ msgstr "Загружаем ещё..."
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Загрузка страницы {loadingPage} из {targetPage}..."
+
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
 
@@ -21557,6 +21560,10 @@ msgstr "Уникальное"
 msgid "unknown"
 msgstr "неизвестно"
 
+msgid "Unknown"
+msgstr "Неизвестно"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Неизвестно"
 

@@ -11510,6 +11510,9 @@ msgstr "Daha fazlası yükleniyor..."
 msgid "Loading more…"
 msgstr "Daha fazlası yükleniyor…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Sayfa {loadingPage}/{targetPage} yükleniyor..."
+
 msgid "Loading project…"
 msgstr "Proje yükleniyor…"
 
@@ -21557,6 +21560,10 @@ msgstr "Benzersiz"
 msgid "unknown"
 msgstr "bilinmiyor"
 
+msgid "Unknown"
+msgstr "Bilinmiyor"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Bilinmiyor"
 

@@ -11510,6 +11510,9 @@ msgstr "正在載入更多..."
 msgid "Loading more…"
 msgstr "正在載入更多…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "正在載入第 {loadingPage} 頁，共 {targetPage} 頁..."
+
 msgid "Loading project…"
 msgstr "正在載入專案…"
 
@@ -21557,6 +21560,10 @@ msgstr "唯一"
 msgid "unknown"
 msgstr "未知"
 
+msgid "Unknown"
+msgstr "未知"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "未知"
 

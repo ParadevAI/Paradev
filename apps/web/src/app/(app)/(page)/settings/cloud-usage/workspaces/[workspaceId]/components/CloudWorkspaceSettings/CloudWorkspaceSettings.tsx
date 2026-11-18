@@ -26,6 +26,10 @@ export function CloudWorkspaceSettings({
 		...trpc.cloud.usage.query.queryOptions(queries.workspace.input),
 		enabled: queries.workspace.enabled,
 	});
+	const allTime = useQuery({
+		...trpc.cloud.usage.query.queryOptions(queries.workspaceAllTime.input),
+		enabled: queries.workspaceAllTime.enabled,
+	});
 	const boots = useInfiniteQuery({
 		...trpc.cloud.boots.list.infiniteQueryOptions(queries.boots.input, {
 			getNextPageParam: (page) => page.nextCursor,
@@ -40,6 +44,7 @@ export function CloudWorkspaceSettings({
 				periods={periods}
 				period={period}
 				workspace={workspace}
+				allTime={allTime}
 				boots={boots}
 			/>
 		</div>

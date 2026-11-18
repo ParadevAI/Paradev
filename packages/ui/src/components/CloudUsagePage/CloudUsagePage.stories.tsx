@@ -1,98 +1,46 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { CloudUsagePage } from "./CloudUsagePage";
 import {
-	allowanceFixtures,
-	periods,
+	noPeriodsArgs,
+	overviewArgs,
 	query,
 	StoryLink,
-	unavailableFixtures,
-	usageFixtures,
 	withSettingsShell,
 } from "./fixtures";
 import type { CloudUsage } from "./types";
-
-const current = (
-	allowance: keyof typeof allowanceFixtures,
-	unavailable: keyof typeof unavailableFixtures = "none",
-) =>
-	periods({
-		allowance: allowanceFixtures[allowance],
-		unavailable: unavailableFixtures[unavailable],
-	});
-
-const base = current("freeCredits");
 
 const meta = {
 	title: "Cloud usage/Overview",
 	component: CloudUsagePage,
 	decorators: [withSettingsShell],
-	args: {
-		Link: StoryLink,
-		isAdmin: true,
-		periods: query(base),
-		period: base.items[0],
-		byDay: query(usageFixtures.byDay),
-		byPerson: query(usageFixtures.byPerson),
-		workspaces: query(usageFixtures.top),
-	},
+	args: { Link: StoryLink, isAdmin: true, ...overviewArgs("northwind") },
 } satisfies Meta<typeof CloudUsagePage>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const withAllowance = (
-	allowance: keyof typeof allowanceFixtures,
-	unavailable?: keyof typeof unavailableFixtures,
-): Story["args"] => {
-	const list = current(allowance, unavailable);
-	return { periods: query(list), period: list.items[0] };
-};
-
+/** Northwind Labs, as in the design: seats, a used-up free credit and extra usage under its cap. */
 export const Owner: Story = {};
-export const Trial: Story = { args: withAllowance("seatsOnly") };
-export const Over: Story = { args: withAllowance("over") };
-export const Prepaid: Story = { args: withAllowance("bought") };
-export const LimitReached: Story = { args: withAllowance("limitReached") };
-export const PercentCap: Story = {
-	args: withAllowance("percentCap", "percentCap"),
-};
-export const NotRead: Story = { args: withAllowance("notRead", "notRead") };
+/** Birchwood Health, as in the design: on a trial, seats only, under its allowance. */
+export const Trial: Story = { args: overviewArgs("trial") };
+/** Acme Robotics, as in the design: a bought pack not drawn yet. */
+export const Prepaid: Story = { args: overviewArgs("prepaid") };
+export const LimitReached: Story = { args: overviewArgs("limitReached") };
+export const PercentCap: Story = { args: overviewArgs("percentCap") };
+export const NotRead: Story = { args: overviewArgs("notRead") };
+export const Unbilled: Story = { args: overviewArgs("unbilled") };
 export const PastPeriod: Story = {
-	args: { period: base.items[1] },
+	args: overviewArgs("northwind", { back: 1 }),
 };
-export const Empty: Story = {
-	args: {
-		period: base.items[5],
-		byDay: query(usageFixtures.empty),
-		byPerson: query(usageFixtures.empty),
-		workspaces: query(usageFixtures.empty),
-	},
-};
-export const NoPeriods: Story = {
-	args: {
-		periods: query({ items: [], nextCursor: null }),
-		period: undefined,
-		byDay: query(usageFixtures.byDay),
-		byPerson: query(usageFixtures.byPerson),
-		workspaces: query(usageFixtures.top),
-	},
-};
+export const Empty: Story = { args: overviewArgs("northwind", { back: 5 }) };
+export const NoPeriods: Story = { args: noPeriodsArgs() };
 export const Loading: Story = { args: { byDay: query<CloudUsage>(undefined) } };
 export const LoadError: Story = {
 	args: { byDay: query<CloudUsage>(undefined, true) },
 };
 export const Member: Story = {
-	args: {
-		isAdmin: false,
-		...withAllowance("freeCredits"),
-		byDay: query(usageFixtures.memberByDay),
-		workspaces: query(usageFixtures.memberTop),
-	},
+	args: { isAdmin: false, ...overviewArgs("northwind", { member: true }) },
 };
 export const LongNames: Story = {
-	args: {
-		byDay: query(usageFixtures.longByDay),
-		byPerson: query(usageFixtures.longByPerson),
-		workspaces: query(usageFixtures.longTop),
-	},
+	args: overviewArgs("northwind", { long: true }),
 };

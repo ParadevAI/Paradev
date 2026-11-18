@@ -17,12 +17,7 @@ import type {
 	CloudUsageLink,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
-import {
-	pricedBoots,
-	pricedPages,
-	pricedQuery,
-	pricedUsage,
-} from "../../utils/priced";
+import { pricedPages, pricedQuery } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
@@ -38,6 +33,8 @@ interface CloudWorkspacePageProps {
 	period: CloudPeriod | undefined;
 	/** The workspace's one usage row in the period. */
 	workspace: CloudQuery<CloudUsage>;
+	/** The workspace's usage over all time, for its name when the period has no row. */
+	allTime: CloudQuery<CloudUsage>;
 	boots: CloudPages<CloudBoots>;
 	/** Where the app can open the workspace. */
 	openWorkspace?: (workspaceId: string) => ReactNode;
@@ -48,11 +45,12 @@ export function CloudWorkspacePage({
 	periods,
 	period,
 	workspace: unpriced,
+	allTime,
 	boots: unpricedBoots,
 	openWorkspace,
 }: CloudWorkspacePageProps) {
-	const query = pricedQuery(unpriced, pricedUsage);
-	const boots = pricedPages(unpricedBoots, pricedBoots);
+	const query = pricedQuery(unpriced);
+	const boots = pricedPages(unpricedBoots);
 	const { i18n } = useLingui();
 	const { formatNumber } = useFormat();
 	const { dollars, formatGbHours } = useUsageFormat();
@@ -71,12 +69,26 @@ export function CloudWorkspacePage({
 	];
 
 	if (!row || !workspace) {
+		const known = allTime.data?.items[0];
+		const ref = known ? workspaceOf(known) : null;
 		return (
 			<div className="@container space-y-6">
 				<PageHeader
 					Link={Link}
 					crumbs={crumbs}
-					title={<Trans>Workspace</Trans>}
+					title={
+						ref ? (
+							ref.name
+						) : allTime.data || allTime.isError ? (
+							<Trans>Workspace</Trans>
+						) : (
+							<span
+								aria-hidden
+								className="inline-block h-7 w-48 animate-pulse rounded-md bg-muted align-middle"
+							/>
+						)
+					}
+					badge={ref && <StatusPill status={ref.status} />}
 				/>
 				{periods.data && query.data ? (
 					<Notice>

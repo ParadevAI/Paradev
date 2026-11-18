@@ -11510,6 +11510,9 @@ msgstr "Mehr wird geladen..."
 msgid "Loading more…"
 msgstr "Mehr wird geladen…"
 
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Seite {loadingPage} von {targetPage} wird geladen..."
+
 msgid "Loading project…"
 msgstr "Projekt wird geladen…"
 
@@ -21557,6 +21560,10 @@ msgstr "Eindeutig"
 msgid "unknown"
 msgstr "unbekannt"
 
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgctxt "boot end"
 msgid "Unknown"
 msgstr "Unbekannt"
 

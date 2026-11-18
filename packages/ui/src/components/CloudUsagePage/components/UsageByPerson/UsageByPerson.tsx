@@ -15,8 +15,9 @@ interface UsageByPersonProps {
 }
 
 export function UsageByPerson({ Link, byPerson, period }: UsageByPersonProps) {
-	const { dollars } = useUsageFormat();
+	const { dollarsFor } = useUsageFormat();
 	const items = byPerson.data?.items ?? [];
+	const dollars = dollarsFor(items.map((item) => item.usageUsd));
 	const max = Math.max(...items.map((item) => item.gbHours), 0);
 
 	return (
