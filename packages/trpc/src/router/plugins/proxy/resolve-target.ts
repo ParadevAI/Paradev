@@ -144,14 +144,6 @@ export function targetKey(target: PluginTarget): string {
 	}
 }
 
-// A dynamic client registers against the tool server itself, so that address is
-// the one place the connector's credential was issued for.
-export function connectorServer(
-	method: ConnectorMethod | undefined,
-): string | null {
-	return method ? connectorServerUrl(method) : null;
-}
-
 function remoteBinding(
 	install: { manifest: PluginManifest; marketplace: string },
 	slug: string | undefined,
@@ -171,7 +163,7 @@ function remoteBinding(
 		: connector?.methods[0];
 
 	if (slug && !trustedManifest(install.marketplace)) {
-		const url = connectorServer(method);
+		const url = method ? connectorServerUrl(method) : null;
 		if (!url) {
 			throw new PluginTargetError(
 				`"${install.manifest.name}" is from ${install.marketplace} and cannot use the ${slug} connector.`,

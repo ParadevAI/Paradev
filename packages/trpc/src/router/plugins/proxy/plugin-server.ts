@@ -85,7 +85,7 @@ function firstPartyServer(
 				target.build.credential(target.secrets),
 			);
 		} catch (error) {
-			if (!credentialRejected(error)) throw error;
+			if (refusalOf(error)?.kind !== "rejected") throw error;
 			await recordRejection(target.connectionId, target.storedAccessToken);
 			return errorResult(
 				`${target.plugin} rejected this account's credential. Ask the user to reconnect it, then retry.`,
@@ -134,11 +134,10 @@ function remoteServer(
 		} catch (error) {
 			// The credential is good and the person is not allowed: reconnecting
 			// cannot help, so say what the server said and leave the connection be.
-			if (credentialForbidden(error))
-				return errorResult(
-					`${target.plugin} refused this account: ${forbiddenReason(error)}`,
-				);
-			if (!credentialRejected(error)) throw error;
+			const refusal = refusalOf(error);
+			if (refusal?.kind === "forbidden")
+				return errorResult(refusedText(target.plugin, refusal.reason));
+			if (refusal?.kind !== "rejected") throw error;
 			await recordRejection(target.connectionId, target.storedAccessToken);
 			return errorResult(
 				`${target.plugin} rejected this account's credential. Ask the user to reconnect it, then retry.`,
@@ -220,22 +219,37 @@ function accountNames(target: {
 	].filter((name): name is string => Boolean(name));
 }
 
-function credentialRejected(error: unknown): boolean {
-	return (error as { code?: unknown } | null)?.code === 401;
-}
+const REASON_LIMIT = 200;
+const NO_REASON = "the server gave no reason.";
 
-function credentialForbidden(error: unknown): boolean {
-	return (error as { code?: unknown } | null)?.code === 403;
-}
-
+/** What the server said about a 403: its own `error.message`, one line, capped. Nothing else of the response is passed on. */
 function forbiddenReason(error: unknown): string {
-	const message = error instanceof Error ? error.message : String(error);
-	const body = message.slice(message.indexOf("{"));
+	const message = error instanceof Error ? error.message : "";
 	try {
-		const parsed = JSON.parse(body) as { error?: { message?: unknown } };
-		if (typeof parsed.error?.message === "string") return parsed.error.message;
-	} catch {}
-	return message;
+		const parsed = JSON.parse(message.slice(message.indexOf("{"))) as {
+			error?: { message?: unknown };
+		};
+		const reason = parsed.error?.message;
+		if (typeof reason !== "string" || !reason.trim()) return NO_REASON;
+		return reason.replace(/\p{Cc}/gu, " ").slice(0, REASON_LIMIT);
+	} catch {
+		return NO_REASON;
+	}
+}
+
+type Refusal = { kind: "rejected" } | { kind: "forbidden"; reason: string };
+
+/** How an upstream answer to a good request refuses the person: 401 says the credential is dead, 403 that the person may not. */
+function refusalOf(error: unknown): Refusal | null {
+	const code = (error as { code?: unknown } | null)?.code;
+	if (code === 401) return { kind: "rejected" };
+	if (code === 403)
+		return { kind: "forbidden", reason: forbiddenReason(error) };
+	return null;
+}
+
+function refusedText(plugin: string, reason: string): string {
+	return `${plugin} refused this account: ${reason}`;
 }
 
 type RecordRejection = (
@@ -252,15 +266,18 @@ async function markRejected(
 }
 
 async function rejectionAware<T>(
-	target: { connectionId: string; storedAccessToken?: string },
+	target: { plugin: string; connectionId: string; storedAccessToken?: string },
 	recordRejection: RecordRejection,
 	run: () => Promise<T>,
 ): Promise<T> {
 	try {
 		return await run();
 	} catch (error) {
-		if (credentialRejected(error))
+		const refusal = refusalOf(error);
+		if (refusal?.kind === "rejected")
 			await recordRejection(target.connectionId, target.storedAccessToken);
+		if (refusal?.kind === "forbidden")
+			throw new Error(refusedText(target.plugin, refusal.reason));
 		throw error;
 	}
 }
@@ -297,7 +314,7 @@ function multiServer(
 			}
 			return "rejected";
 		} catch (error) {
-			if (!credentialRejected(error)) return "unknown";
+			if (refusalOf(error)?.kind !== "rejected") return "unknown";
 			await recordRejection(
 				account.connectionId,
 				resolved && "storedAccessToken" in resolved
@@ -488,7 +505,12 @@ function multiServer(
 							}
 						})();
 		} catch (error) {
-			if (!credentialRejected(error)) throw error;
+			const refusal = refusalOf(error);
+			if (refusal?.kind === "forbidden")
+				return errorResult(
+					`${target.connectorLabel} refused ${label}: ${refusal.reason}`,
+				);
+			if (refusal?.kind !== "rejected") throw error;
 			layouts.delete(layoutKey(target));
 			await recordRejection(resolved.connectionId, resolved.storedAccessToken);
 			const after = await target.resolve(choice.connectionId).catch(() => null);

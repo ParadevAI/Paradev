@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { CONNECTOR_SLUGS, getConnector } from "@superset/shared/connectors";
 import { generateCodeChallenge } from "better-auth/oauth2";
 import type { PluginManifest } from "../../router/plugins/manifest";
-import { connectorServer } from "../../router/plugins/proxy/resolve-target";
 import { organizationPluginProblem } from "../organization-plugins/rules";
 import {
 	assertRespondingIssuer,
 	authorizeUrl,
 	connectorMethod,
+	connectorServerUrl,
 	exchangeCode,
 	IssuerMismatchError,
 	MissingConnectorEnvError,
@@ -1135,9 +1135,25 @@ describe("the admin connector", () => {
 	});
 
 	test("the tool server is the templated address, and unknown while the address is unset", () => {
-		expect(connectorServer(method())).toBe(`${ADMIN}/api/mcp/cloud`);
+		expect(connectorServerUrl(method())).toBe(`${ADMIN}/api/mcp/cloud`);
 		delete process.env.NEXT_PUBLIC_ADMIN_URL;
-		expect(connectorServer(method())).toBeNull();
+		expect(connectorServerUrl(method())).toBeNull();
+	});
+
+	test.each([
+		["empty", ""],
+		["not a URL", "admin.example.test"],
+		["plain http", "http://admin.example.test"],
+	])("an address variable that is %s is no server", (_name, value) => {
+		process.env.NEXT_PUBLIC_ADMIN_URL = value;
+		expect(connectorServerUrl(method())).toBeNull();
+	});
+
+	test("an empty address variable fails discovery by name, not with a relative URL", async () => {
+		process.env.NEXT_PUBLIC_ADMIN_URL = "";
+		await expect(authorize("superset_admin_mcp")).rejects.toThrow(
+			"NEXT_PUBLIC_ADMIN_URL",
+		);
 	});
 
 	test("an organization plugin may name it", () => {

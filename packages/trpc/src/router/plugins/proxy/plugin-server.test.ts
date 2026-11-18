@@ -601,50 +601,121 @@ describe("superset-home review", () => {
 describe("an upstream that answers 403 for a signed-in person", () => {
 	const realFetch = globalThis.fetch;
 	const REFUSAL = "Forbidden: this account is not on the staff list.";
-	const remote: PluginTarget = {
+	const remote = (connectionId = "conn-1"): PluginTarget => ({
 		kind: "remote",
 		plugin: "superset-admin",
 		version: "1.0.0",
 		url: "https://admin.example.test/api/mcp/cloud",
 		headers: { Authorization: "Bearer jwt" },
-		connectionId: "conn-1",
-	};
+		connectionId,
+	});
 
-	function refuse() {
+	function answer(body: string, status = 403) {
 		globalThis.fetch = (async () =>
-			new Response(JSON.stringify({ error: { message: REFUSAL } }), {
-				status: 403,
+			new Response(body, {
+				status,
 				headers: { "content-type": "application/json" },
 			})) as unknown as typeof fetch;
+	}
+	const refuse = (message = REFUSAL) =>
+		answer(JSON.stringify({ error: { message } }));
+
+	async function withServer<T>(
+		target: PluginTarget,
+		rejected: string[],
+		run: (client: Awaited<ReturnType<typeof connect>>["client"]) => Promise<T>,
+	): Promise<T> {
+		const { client, close } = await connect(target, rejected);
+		try {
+			return await run(client);
+		} finally {
+			globalThis.fetch = realFetch;
+			await close();
+		}
 	}
 
 	test("a tool call answers with the server's reason, and the connection is not marked", async () => {
 		refuse();
 		const rejected: string[] = [];
-		const { client, close } = await connect(remote, rejected);
-		try {
+		await withServer(remote(), rejected, async (client) => {
 			const result = await client.callTool({ name: "any", arguments: {} });
 			expect(result.isError).toBe(true);
 			const text = JSON.stringify(result.content);
 			expect(text).toContain(REFUSAL);
 			expect(text).not.toContain("reconnect");
-			expect(rejected).toEqual([]);
-		} finally {
-			globalThis.fetch = realFetch;
-			await close();
-		}
+		});
+		expect(rejected).toEqual([]);
 	});
 
-	test("a tool list fails with the server's reason, and the connection is not marked", async () => {
+	test("a tool list fails with the same words, and the connection is not marked", async () => {
 		refuse();
 		const rejected: string[] = [];
-		const { client, close } = await connect(remote, rejected);
-		try {
-			await expect(client.listTools()).rejects.toThrow(REFUSAL);
-			expect(rejected).toEqual([]);
-		} finally {
-			globalThis.fetch = realFetch;
-			await close();
-		}
+		await withServer(remote(), rejected, async (client) => {
+			await expect(client.listTools()).rejects.toThrow(
+				`superset-admin refused this account: ${REFUSAL}`,
+			);
+		});
+		expect(rejected).toEqual([]);
+	});
+
+	test("a call through an account choice answers the same way, and marks nothing", async () => {
+		refuse();
+		const rejected: string[] = [];
+		await withServer(
+			multiTarget(async (id) => remote(id)),
+			rejected,
+			async (client) => {
+				const result = await client.callTool({
+					name: "any",
+					arguments: { superset_account: "id-work" },
+				});
+				expect(result.isError).toBe(true);
+				expect(JSON.stringify(result.content)).toContain(REFUSAL);
+				expect(JSON.stringify(result.content)).not.toContain("reconnect");
+			},
+		);
+		expect(rejected).toEqual([]);
+	});
+
+	test("a long reason is cut at 200 characters", async () => {
+		refuse("x".repeat(5000));
+		await withServer(remote(), [], async (client) => {
+			const result = await client.callTool({ name: "any", arguments: {} });
+			const text = (result.content as { text: string }[])[0]?.text ?? "";
+			expect(text).toBe(
+				`superset-admin refused this account: ${"x".repeat(200)}`,
+			);
+		});
+	});
+
+	test.each([
+		["a body that is not JSON", "internal stack: db password=hunter2"],
+		[
+			"JSON with no reason",
+			JSON.stringify({ detail: "internal host 10.0.0.1" }),
+		],
+		[
+			"JSON whose reason is not text",
+			JSON.stringify({ error: { message: { a: 1 } } }),
+		],
+	])("%s is never echoed", async (_name, body) => {
+		answer(body);
+		await withServer(remote(), [], async (client) => {
+			const result = await client.callTool({ name: "any", arguments: {} });
+			const text = (result.content as { text: string }[])[0]?.text ?? "";
+			expect(text).toBe(
+				"superset-admin refused this account: the server gave no reason.",
+			);
+		});
+	});
+
+	test("a 401 still marks the connection", async () => {
+		answer("{}", 401);
+		const rejected: string[] = [];
+		await withServer(remote(), rejected, async (client) => {
+			const result = await client.callTool({ name: "any", arguments: {} });
+			expect(JSON.stringify(result.content)).toContain("reconnect");
+		});
+		expect(rejected).toEqual(["conn-1"]);
 	});
 });

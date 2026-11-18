@@ -10,7 +10,7 @@ import {
 	pluginConnector,
 	supersetExtension,
 } from "../../router/plugins/manifest";
-import { connectorServer } from "../../router/plugins/proxy/resolve-target";
+import { connectorServerUrl } from "../connectors";
 import { isInternalHost } from "./internal-host";
 
 export class OrganizationPluginError extends Error {}
@@ -27,7 +27,7 @@ export function organizationPluginProblem(
 	if (slug) {
 		const connector = getConnector(slug);
 		if (!connector) return `"${slug}" is not a connector Superset knows`;
-		if (!connector.methods.some((method) => connectorServer(method))) {
+		if (!connector.methods.some((method) => connectorServerUrl(method))) {
 			return `the ${slug} connector has no tool server of its own, so an organization plugin cannot use it`;
 		}
 		return null;

@@ -85,8 +85,16 @@ export function connectorEnv(
  * Where a dynamic connector's tool server lives. The address may be a
  * `${env.NAME}` template over the method's `requires_env`, so a connector
  * can point at a deployment without naming its host in the registry. Null when
- * the method has no server or a variable it needs is unset.
+ * the method has no server, a variable it needs is unset, or the result is not an absolute https URL.
  */
+function isHttpsUrl(value: string): boolean {
+	try {
+		return new URL(value).protocol === "https:";
+	} catch {
+		return false;
+	}
+}
+
 export function connectorServerUrl(method: ConnectorMethod): string | null {
 	if (
 		method.type !== "oauth2" ||
@@ -98,7 +106,7 @@ export function connectorServerUrl(method: ConnectorMethod): string | null {
 		method.requires_env.map((name) => [name, process.env[name]]),
 	);
 	const url = resolveConnectorTemplate(method.authorization_url, { env });
-	return url.includes("${") ? null : url;
+	return isHttpsUrl(url) ? url : null;
 }
 
 export function clientCredentials(

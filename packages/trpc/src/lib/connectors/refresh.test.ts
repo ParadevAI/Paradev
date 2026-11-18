@@ -661,4 +661,13 @@ describe("what a refresh sends and stores", () => {
 		const expiresAt = (updates[0]?.tokenExpiresAt as Date).getTime();
 		expect(expiresAt - before).toBeGreaterThanOrEqual(604800 * 1000);
 	});
+
+	test("two requests refreshing the admin connection at once make one token request, with the resource", async () => {
+		const row = dynamic("superset_admin_mcp", "admin-client");
+		await Promise.all([ensureFreshConnection(row), ensureFreshConnection(row)]);
+		expect(tokenRequests).toHaveLength(1);
+		expect(tokenRequests[0]?.get("resource")).toBe(
+			"https://mcp.useautumn.com/mcp",
+		);
+	});
 });
