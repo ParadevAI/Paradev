@@ -82,6 +82,9 @@ export const SANDBOX_DISPLAY = {
 	panelHeight: 28,
 } as const;
 
+/** What `superset-logship` sends per box per clock hour when the claim names no cap. */
+export const SANDBOX_BOX_LOGS_DEFAULT_CAP_BYTES = 262_144;
+
 /** Where `sync-assets` fetches by hash: `<base>/<sha256><suffix>`. */
 export const SANDBOX_ASSET_BASE_URL = "https://cdn.superset.sh/sandbox";
 
@@ -113,6 +116,13 @@ export const sandboxIdentitySchema = z.object({
 	SUPERSET_SANDBOX_PROVIDER: z.string().min(1),
 	HOST_SERVICE_SENTRY_DSN: z.string().optional(),
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
+	/** Starts `superset-logship`, which sends the platform's box logs to Sentry. Absent is off. */
+	SUPERSET_SANDBOX_BOX_LOGS: z.literal("1").optional(),
+	/** Overrides `SANDBOX_BOX_LOGS_DEFAULT_CAP_BYTES` for this box. */
+	SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES: z
+		.string()
+		.regex(/^[1-9][0-9]*$/)
+		.optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
 	SUPERSET_SANDBOX_AGENT: z.string().optional(),
 	SUPERSET_SANDBOX_AGENT_PROMPT: z.string().optional(),
@@ -247,5 +257,6 @@ export function renderContractShell(): string {
 		SUPERSET_DISPLAY_DEPTH: SANDBOX_DISPLAY.depth,
 		SUPERSET_DISPLAY_DPI: SANDBOX_DISPLAY.dpi,
 		SUPERSET_ASSET_BASE_URL: SANDBOX_ASSET_BASE_URL,
+		SUPERSET_BOX_LOGS_DEFAULT_CAP_BYTES: SANDBOX_BOX_LOGS_DEFAULT_CAP_BYTES,
 	});
 }

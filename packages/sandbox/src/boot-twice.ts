@@ -321,6 +321,17 @@ try {
 		).trim(),
 	);
 
+	// The stub identity has no SUPERSET_SANDBOX_BOX_LOGS, like every box whose flag is off.
+	const shipper = exec(
+		`grep -c logship ${SANDBOX_PATHS.bootLog}; pgrep -fc '[s]uperset-logship'; ls ${SANDBOX_PATHS.state}/logship 2>/dev/null | wc -l`,
+		{ check: false },
+	);
+	expect(
+		"box logs off: no shipper stamp, process or state",
+		shipper.trim().split(/\s+/).join(" ") === "0 0 0",
+		shipper.trim().split(/\s+/).join(" "),
+	);
+
 	// Second boot: stop everything the way a wake would (no processes survive), then boot again.
 	exec(
 		`pkill -u ubuntu -TERM || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}`,

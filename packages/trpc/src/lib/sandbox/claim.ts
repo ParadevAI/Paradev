@@ -29,6 +29,7 @@ import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { agentToolsDriveFor } from "./agent-tools";
+import { boxLogsIdentity } from "./box-logs";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
@@ -128,6 +129,9 @@ export async function buildSandboxClaim(args: {
 				})
 			: null;
 	const repositories = toSandboxRepositories(checkouts);
+	const boxLogs = env.SENTRY_DSN_SANDBOX
+		? await boxLogsIdentity(args.row.organizationId)
+		: {};
 
 	const identity: SandboxIdentity = {
 		SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
@@ -147,6 +151,7 @@ export async function buildSandboxClaim(args: {
 						env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
 				}
 			: {}),
+		...boxLogs,
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
 	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({

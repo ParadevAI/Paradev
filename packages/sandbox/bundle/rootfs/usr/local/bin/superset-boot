@@ -237,6 +237,13 @@ if [ -x /usr/local/bin/superset-memguard ]; then
 	stamp "memguard.start pid=$!"
 fi
 
+# Sends this box's own logs to Sentry, only when the claim turned it on; see the script.
+if [ "${SUPERSET_SANDBOX_BOX_LOGS:-}" = 1 ] && [ -n "${HOST_SERVICE_SENTRY_DSN:-}" ] && [ -x /usr/local/bin/superset-logship ]; then
+	env -u HOST_SERVICE_SECRET nice -n 10 /usr/local/bin/superset-logship >> "${SUPERSET_LOG_DIR}/logship.log" 2>&1 9>&- &
+	echo $! > "${SUPERSET_RUN_DIR}/logship.pid"
+	stamp "logship.start pid=$!"
+fi
+
 # The fixed swapfile of an earlier bundle; memguard adds swap on demand now.
 [ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
 
@@ -244,24 +251,44 @@ fi
 # host-service runs it, because the environment the hook needs is pushed
 # into host-service after boot and never leaves it; this runner decides
 # when: once host-service answers, the push has landed and the checkout is in.
+# boot.log leaves the box, so it gets the outcome only: no command, no output.
 start_hook() {
 	local api="http://127.0.0.1:${SUPERSET_HOST_SERVICE_PORT}/trpc/sandbox"
 	local auth="Authorization: Bearer ${HOST_SERVICE_SECRET}"
-	local i
+	local i out t0 state
 	for i in $(seq 1 1200); do
 		[ -f "${SUPERSET_RUN_DIR}/host-service.ready" ] &&
 			curl -fs -H "$auth" "${api}.status" 2>/dev/null | grep -q '"environmentPushed":true' && break
 		sleep 0.1
 	done
 	if [ "$i" -ge 1200 ]; then stamp "hook.skipped no environment push within 120s"; return 0; fi
-	local out
-	out="$(curl -fs -X POST -H "$auth" -H 'Content-Type: application/json' -d '{}' "${api}.runStartHook" 2>&1)" ||
-		{ stamp "hook.failed ${out:0:160}"; return 0; }
-	case "$out" in
-		*'"started":true'*) stamp "hook.started ${out}" ;;
-		*'"no-hook"'*) stamp "hook.none" ;;
-		*) stamp "hook.skipped ${out:0:160}" ;;
+	t0="$(date +%s%3N)"
+	out="$(curl -fs -X POST -H "$auth" -H 'Content-Type: application/json' -d '{}' "${api}.runStartHook" 2>/dev/null |
+		jq -r '(.result.data.json // .result.data) | [(.started | tostring), (.reason // ""), (.pid // "" | tostring), (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" ||
+		out=""
+	local started reason pid code
+	IFS='|' read -r started reason pid code <<< "$out"
+	case "${started:-}:${reason:-}" in
+		true:*) stamp "hook.started pid=${pid}" ;;
+		false:no-hook) stamp "hook.none"; return 0 ;;
+		false:failed) stamp "hook.failed exit=${code} ms=$(( $(date +%s%3N) - t0 ))"; return 0 ;;
+		false:*) stamp "hook.skipped ${reason//[^a-z-]/}"; return 0 ;;
+		*) stamp "hook.failed exit=none ms=$(( $(date +%s%3N) - t0 )) no answer from host-service"; return 0 ;;
 	esac
+	# A run-only hook is a terminal that never exits; setup has a state to wait on.
+	while :; do
+		state="$(curl -fs -H "$auth" "${api}.status" 2>/dev/null |
+			jq -r '(.result.data.json // .result.data).startHook | [.state, (.exitCode // "none" | tostring)] | join("|")' 2>/dev/null)" || state=""
+		IFS='|' read -r state code <<< "$state"
+		case "${state:-}" in
+			running) sleep "${SUPERSET_HOOK_POLL_S:-2}" ;;
+			exited)
+				if [ "$code" = 0 ]; then stamp "hook.exited exit=0 ms=$(( $(date +%s%3N) - t0 ))"
+				else stamp "hook.failed exit=${code} ms=$(( $(date +%s%3N) - t0 ))"; fi
+				return 0 ;;
+			*) return 0 ;;
+		esac
+	done
 }
 
 # One checkout per repository in SUPERSET_SANDBOX_REPOSITORIES, each at
