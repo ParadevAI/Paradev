@@ -227,8 +227,14 @@ pass() {
 	HOUR=$((NOW / 3600000))
 	read -r h USED CAPPED < <(read_state hour "0 0 0")
 	[ "$h" = "$HOUR" ] || { USED=0; CAPPED=0; }
+	local src size off idle=1
+	for src in "${SOURCES[@]}"; do
+		size="$(stat -c %s "${SUPERSET_LOG_DIR}/${src}.log" 2>/dev/null)" || continue
+		off="$(read_state "${src}.offset" "")"
+		[ "$size" = "$off" ] || { idle=0; break; }
+	done
+	[ "$idle" = 1 ] && return 0
 	BOOT_STARTS="$(grep -oE '^[0-9]+ boot\.start' "$SUPERSET_BOOT_LOG" 2>/dev/null | cut -d' ' -f1 | jq -sc .)"
-	local src
 	for src in "${SOURCES[@]}"; do
 		ship_file "$src" || break
 	done
