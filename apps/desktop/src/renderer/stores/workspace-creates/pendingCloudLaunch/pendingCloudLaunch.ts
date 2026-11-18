@@ -3,32 +3,48 @@ import {
 	type Pane,
 	type WorkspaceState,
 } from "@superset/panes";
-import type { CloudAgentLaunchDescriptor } from "@superset/shared/cloud-agent-launch";
+import type {
+	CloudAgentLaunchDescriptor,
+	CloudAgentLaunchSurface,
+} from "@superset/shared/cloud-agent-launch";
 import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
 	type ChatPaneData,
 	type PaneViewerData,
-	PENDING_CLOUD_CHAT_PANE_KIND,
-	type PendingCloudChatPaneData,
+	PENDING_CLOUD_LAUNCH_PANE_KIND,
+	type PendingCloudLaunchPaneData,
 	type TerminalPaneData,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import { writeWorkspacePaneLayout } from "../writeWorkspacePaneLayout";
 
-export function pendingCloudChatPane(
+export function pendingCloudLaunchPane(
 	layout: WorkspaceState<PaneViewerData> | undefined,
-): Pane<PendingCloudChatPaneData> | null {
+): Pane<PendingCloudLaunchPaneData> | null {
 	for (const tab of layout?.tabs ?? []) {
 		for (const pane of Object.values(tab.panes)) {
-			if (pane.kind === PENDING_CLOUD_CHAT_PANE_KIND) {
-				return pane as Pane<PendingCloudChatPaneData>;
+			if (pane.kind === PENDING_CLOUD_LAUNCH_PANE_KIND) {
+				return pane as Pane<PendingCloudLaunchPaneData>;
 			}
 		}
 	}
 	return null;
 }
 
-export function seedPendingCloudChat({
+export function cloudLaunchAgentLabel(agentId: string): string {
+	return (
+		HOST_AGENT_PRESETS.find((preset) => preset.presetId === agentId)?.label ??
+		agentId
+	);
+}
+
+export function pendingLaunchSurface(
+	data: PendingCloudLaunchPaneData,
+): CloudAgentLaunchSurface {
+	return data.surface ?? "chat";
+}
+
+export function seedPendingCloudLaunch({
 	collections,
 	workspaceId,
 	launch,
@@ -43,7 +59,7 @@ export function seedPendingCloudChat({
 	modelId?: string | null;
 	modeId?: string | null;
 }): void {
-	if (launch?.surface !== "chat" || !launch.terminalId) return;
+	if (!launch?.terminalId) return;
 	const existing = collections.workspaceLocalState.get(workspaceId)
 		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
 	if (existing?.tabs.length) return;
@@ -53,25 +69,24 @@ export function seedPendingCloudChat({
 		[],
 		[],
 	);
-	const label =
-		HOST_AGENT_PRESETS.find((preset) => preset.presetId === launch.agent)
-			?.label ?? launch.agent;
+	const label = cloudLaunchAgentLabel(launch.agent);
 	const store = createWorkspaceStore<PaneViewerData>({
 		initialState: existing,
 	});
 	store.getState().addTab({
 		panes: [
 			{
-				kind: PENDING_CLOUD_CHAT_PANE_KIND,
+				kind: PENDING_CLOUD_LAUNCH_PANE_KIND,
 				titleOverride: label,
 				data: {
 					draftId: crypto.randomUUID(),
 					agentId: launch.agent,
+					surface: launch.surface,
 					terminalId: launch.terminalId,
 					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
-				} satisfies PendingCloudChatPaneData,
+				} satisfies PendingCloudLaunchPaneData,
 			},
 		],
 	});
@@ -84,13 +99,13 @@ export function seedPendingCloudChat({
 function convertPendingPane(
 	state: WorkspaceState<PaneViewerData>,
 	paneId: string,
-	toData: (data: PendingCloudChatPaneData) => ChatPaneData,
+	toData: (data: PendingCloudLaunchPaneData) => ChatPaneData,
 ): WorkspaceState<PaneViewerData> {
 	return {
 		...state,
 		tabs: state.tabs.map((tab) => {
 			const pane = tab.panes[paneId];
-			if (pane?.kind !== PENDING_CLOUD_CHAT_PANE_KIND) return tab;
+			if (pane?.kind !== PENDING_CLOUD_LAUNCH_PANE_KIND) return tab;
 			const { titleOverride: _waitingTitle, ...rest } = pane;
 			return {
 				...tab,
@@ -99,7 +114,7 @@ function convertPendingPane(
 					[paneId]: {
 						...rest,
 						kind: "chat-v3",
-						data: toData(pane.data as PendingCloudChatPaneData),
+						data: toData(pane.data as PendingCloudLaunchPaneData),
 					},
 				},
 			};
@@ -107,7 +122,7 @@ function convertPendingPane(
 	};
 }
 
-function carriedOver(data: PendingCloudChatPaneData) {
+function carriedOver(data: PendingCloudLaunchPaneData) {
 	return {
 		draftId: data.draftId,
 		...(data.queuedPrompts ? { queuedPrompts: data.queuedPrompts } : {}),
@@ -150,7 +165,7 @@ export function attachCloudTerminal(
 		...state,
 		tabs: state.tabs.map((tab) => {
 			const pane = tab.panes[paneId];
-			if (pane?.kind !== PENDING_CLOUD_CHAT_PANE_KIND) return tab;
+			if (pane?.kind !== PENDING_CLOUD_LAUNCH_PANE_KIND) return tab;
 			const { titleOverride: _waitingTitle, ...rest } = pane;
 			return {
 				...tab,

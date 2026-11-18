@@ -10659,6 +10659,9 @@ msgstr "Os plugins dele aparecem quando a sincronização termina."
 msgid "Its replies go with it."
 msgstr "As respostas também serão excluídas."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "O terminal dele abre aqui quando a área de trabalho na nuvem o iniciar."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "O trabalho, incluindo alterações não commitadas, é enviado para uma nova branch. Uma área de trabalho em {computerName} começa a partir dessa branch, e cada chat do Claude continua lá. Agentes que estiverem trabalhando param primeiro. Terminais e outros chats ficam onde estão."
 

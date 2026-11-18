@@ -10659,6 +10659,9 @@ msgstr "Jego wtyczki pojawią się po zakończeniu synchronizacji."
 msgid "Its replies go with it."
 msgstr "Odpowiedzi też zostaną usunięte."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Jego terminal otworzy się tutaj, gdy obszar roboczy w chmurze go uruchomi."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Jego praca, w tym niezatwierdzone zmiany, zostaje wypchnięta do nowej gałęzi. Obszar roboczy na {computerName} startuje z tej gałęzi, a każdy czat Claude jest tam kontynuowany. Pracujący agenci najpierw się zatrzymują. Terminale i pozostałe czaty zostają tam, gdzie są."
 

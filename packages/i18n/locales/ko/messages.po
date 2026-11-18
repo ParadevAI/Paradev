@@ -10659,6 +10659,9 @@ msgstr "동기화가 끝나면 플러그인이 표시됩니다."
 msgid "Its replies go with it."
 msgstr "답글도 함께 삭제됩니다."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "클라우드 워크스페이스가 시작하면 여기에 터미널이 열립니다."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "커밋하지 않은 변경 사항을 포함한 작업이 새 브랜치로 푸시됩니다. {computerName}의 워크스페이스가 그 브랜치에서 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 멈춥니다. 터미널과 다른 채팅은 그대로 남습니다."
 

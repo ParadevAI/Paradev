@@ -2,20 +2,18 @@ import type { RendererContext } from "@superset/panes";
 import { useMemo } from "react";
 import type {
 	PaneViewerData,
-	PendingCloudChatPaneData,
-} from "../../../../types";
-import { DraftChat } from "../ChatPane/components/AcpChatPane/components/DraftChat";
-import { usePendingCloudChatLaunch } from "./hooks/usePendingCloudChatLaunch";
+	PendingCloudLaunchPaneData,
+} from "../../../../../../types";
+import { DraftChat } from "../../../ChatPane/components/AcpChatPane/components/DraftChat";
 
-export function PendingCloudChatPane({
+export function PendingCloudChat({
 	ctx,
 	workspaceId,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
 }) {
-	const data = ctx.pane.data as PendingCloudChatPaneData;
-	usePendingCloudChatLaunch({ ctx, workspaceId });
+	const data = ctx.pane.data as PendingCloudLaunchPaneData;
 	const launched = useMemo(
 		() =>
 			data.launchPrompt
@@ -34,7 +32,7 @@ export function PendingCloudChatPane({
 					.getState()
 					.tabs.flatMap((tab) => Object.values(tab.panes))
 					.find((pane) => pane.id === ctx.pane.id)?.data as
-					| PendingCloudChatPaneData
+					| PendingCloudLaunchPaneData
 					| undefined;
 				if (!current) return;
 				ctx.actions.updateData({

@@ -10659,6 +10659,9 @@ msgstr "同期が完了するとプラグインが表示されます。"
 msgid "Its replies go with it."
 msgstr "返信も一緒に削除されます。"
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "クラウドワークスペースが起動すると、ここにターミナルが開きます。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "コミットされていない変更を含む作業内容は、新しいブランチにプッシュされます。{computerName} 上のワークスペースがそのブランチから始まり、各 Claude チャットはそこで続きます。作業中のエージェントは先に停止します。ターミナルとその他のチャットはそのまま残ります。"
 

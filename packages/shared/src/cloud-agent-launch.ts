@@ -38,6 +38,10 @@ export function supportsCloudAgentChat(agent: string | undefined): boolean {
  * for a new workspace. Custom agents follow once they live in the cloud
  * (SUPER-2127); until then only the built-in presets are launchable here.
  */
+export const CLOUD_AGENT_LAUNCH_SURFACES = ["terminal", "chat"] as const;
+export type CloudAgentLaunchSurface =
+	(typeof CLOUD_AGENT_LAUNCH_SURFACES)[number];
+
 export const cloudAgentLaunchSchema = z.object({
 	agent: z.string().refine(isCloudAgentId, "unknown cloud agent"),
 	prompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH),
@@ -50,7 +54,7 @@ export const cloudAgentLaunchSchema = z.object({
 	 * itself once host-service is up.
 	 */
 	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
-	surface: z.enum(["terminal", "chat"]).optional(),
+	surface: z.enum(CLOUD_AGENT_LAUNCH_SURFACES).optional(),
 	/**
 	 * Set only by cloud automation dispatch. A manual create must not name a
 	 * run: the box reports this id, and the API trusts it as the correlation.
@@ -67,7 +71,7 @@ export type CloudAgentLaunch = z.infer<typeof cloudAgentLaunchSchema>;
 
 export type CloudAgentLaunchDescriptor = {
 	agent: string;
-	surface: "chat" | "terminal";
+	surface: CloudAgentLaunchSurface;
 	promptHash: string | null;
 	/** Null when the launch picks its own terminal id. */
 	terminalId: string | null;

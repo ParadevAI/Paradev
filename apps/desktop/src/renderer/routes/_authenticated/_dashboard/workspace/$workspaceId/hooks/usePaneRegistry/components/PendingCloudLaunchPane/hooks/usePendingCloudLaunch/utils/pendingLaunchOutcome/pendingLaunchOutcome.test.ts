@@ -10,6 +10,7 @@ const chat = (terminalId: string | null, live = true) => ({
 	live,
 });
 const base = {
+	surface: "chat" as const,
 	terminalId: T,
 	sessions: [],
 	launchedTerminal: false,
@@ -50,5 +51,28 @@ describe("pendingLaunchOutcome", () => {
 		expect(pendingLaunchOutcome({ ...base, terminalId: undefined })).toEqual({
 			kind: "release",
 		});
+	});
+
+	it("a terminal launch becomes its terminal once the box starts it", () => {
+		const terminal = { ...base, surface: "terminal" as const };
+		expect(pendingLaunchOutcome(terminal)).toEqual({
+			kind: "wait",
+			untilMs: 100,
+		});
+		expect(
+			pendingLaunchOutcome({ ...terminal, launchedTerminal: true }),
+		).toEqual({
+			kind: "terminal",
+		});
+	});
+
+	it("a terminal launch that never arrives drops its pane instead of opening a chat", () => {
+		const terminal = { ...base, surface: "terminal" as const };
+		expect(pendingLaunchOutcome({ ...terminal, nowMs: 100 })).toEqual({
+			kind: "drop",
+		});
+		expect(
+			pendingLaunchOutcome({ ...terminal, terminalId: undefined }),
+		).toEqual({ kind: "drop" });
 	});
 });

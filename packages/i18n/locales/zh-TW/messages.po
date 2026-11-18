@@ -10659,6 +10659,9 @@ msgstr "同步完成後，其外掛會顯示出來。"
 msgid "Its replies go with it."
 msgstr "其回覆也會一併刪除。"
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "雲端工作區啟動它後，它的終端機會在這裡開啟。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的變更）會推送到一個新分支。{computerName} 上的工作區會從該分支開始，每個 Claude 聊天都會在那裡繼續。正在工作的代理程式會先停止。終端機和其他聊天保持不變。"
 

@@ -10659,6 +10659,9 @@ msgstr "同步完成后，其插件会显示出来。"
 msgid "Its replies go with it."
 msgstr "其回复也会一并删除。"
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "云端工作区启动它后，它的终端会在这里打开。"
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "它的工作（包括未提交的更改）会推送到一个新分支。{computerName} 上的工作区会从该分支开始，每个 Claude 聊天都会在那里继续。正在工作的智能体会先停止。终端和其他聊天保持不变。"
 

@@ -1,19 +1,23 @@
 import { expect, test } from "bun:test";
 import { createWorkspaceStore, type WorkspaceState } from "@superset/panes";
-import type { CloudAgentLaunchDescriptor } from "@superset/shared/cloud-agent-launch";
+import {
+	CLOUD_AGENT_LAUNCH_SURFACES,
+	type CloudAgentLaunchDescriptor,
+} from "@superset/shared/cloud-agent-launch";
 import {
 	type ChatPaneData,
 	type PaneViewerData,
-	PENDING_CLOUD_CHAT_PANE_KIND,
+	PENDING_CLOUD_LAUNCH_PANE_KIND,
 } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
 import {
 	attachCloudChatSession,
 	attachCloudTerminal,
-	pendingCloudChatPane,
+	pendingCloudLaunchPane,
+	pendingLaunchSurface,
 	releasePendingCloudChat,
-	seedPendingCloudChat,
-} from "./pendingCloudChat";
+	seedPendingCloudLaunch,
+} from "./pendingCloudLaunch";
 
 type Row = { workspaceId: string; paneLayout: WorkspaceState<PaneViewerData> };
 const launch: CloudAgentLaunchDescriptor = {
@@ -46,7 +50,7 @@ function collections() {
 test("a confirmed cloud chat has a waiting pane before any host session exists", () => {
 	const state = collections();
 	const seed = () =>
-		seedPendingCloudChat({
+		seedPendingCloudLaunch({
 			collections: state.collections,
 			workspaceId: "new-cloud",
 			launch,
@@ -54,9 +58,9 @@ test("a confirmed cloud chat has a waiting pane before any host session exists",
 	seed();
 	seed();
 	const layout = state.rows.get("new-cloud")?.paneLayout;
-	const pending = pendingCloudChatPane(layout);
+	const pending = pendingCloudLaunchPane(layout);
 	expect(layout?.tabs).toHaveLength(1);
-	expect(pending?.kind).toBe(PENDING_CLOUD_CHAT_PANE_KIND);
+	expect(pending?.kind).toBe(PENDING_CLOUD_LAUNCH_PANE_KIND);
 	expect(pending?.data).toMatchObject({
 		agentId: "claude",
 		terminalId: "promised-terminal",
@@ -65,15 +69,39 @@ test("a confirmed cloud chat has a waiting pane before any host session exists",
 	expect(pending?.data).not.toHaveProperty("pendingPrompt");
 });
 
-test("older APIs, unpromised ids and terminal launches do not seed a waiting chat", () => {
+test("every launch surface gets a waiting pane that records its surface", () => {
+	for (const surface of CLOUD_AGENT_LAUNCH_SURFACES) {
+		const state = collections();
+		seedPendingCloudLaunch({
+			collections: state.collections,
+			workspaceId: surface,
+			launch: { ...launch, surface },
+		});
+		const pending = pendingCloudLaunchPane(state.rows.get(surface)?.paneLayout);
+		expect(pending?.data).toMatchObject({
+			surface,
+			terminalId: "promised-terminal",
+		});
+		expect(
+			pendingLaunchSurface(pending?.data ?? { draftId: "", agentId: "" }),
+		).toBe(surface);
+	}
+});
+
+test("a waiting pane saved before panes had a surface reads as chat", () => {
+	expect(pendingLaunchSurface({ draftId: "d", agentId: "claude" })).toBe(
+		"chat",
+	);
+});
+
+test("older APIs and unpromised ids do not seed a waiting pane", () => {
 	const state = collections();
 	for (const [id, descriptor] of [
 		["old-api", undefined],
 		["no-agent", null],
-		["terminal", { ...launch, surface: "terminal" }],
 		["no-terminal-id", { ...launch, terminalId: null }],
 	] as const) {
-		seedPendingCloudChat({
+		seedPendingCloudLaunch({
 			collections: state.collections,
 			workspaceId: id,
 			launch: descriptor,
@@ -94,7 +122,7 @@ test("an existing nonempty pane layout is never replaced", () => {
 		workspaceId: "existing-cloud",
 		paneLayout: original,
 	});
-	seedPendingCloudChat({
+	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "existing-cloud",
 		launch,
@@ -104,7 +132,7 @@ test("an existing nonempty pane layout is never replaced", () => {
 
 test("attaching preserves the pane, tab, draft, queued messages and model without replaying the initial prompt", () => {
 	const state = collections();
-	seedPendingCloudChat({
+	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "handoff",
 		launch,
@@ -113,7 +141,7 @@ test("attaching preserves the pane, tab, draft, queued messages and model withou
 	});
 	const layout = state.rows.get("handoff")?.paneLayout;
 	if (!layout) throw new Error("missing seeded layout");
-	const pending = pendingCloudChatPane(layout);
+	const pending = pendingCloudLaunchPane(layout);
 	if (!pending) throw new Error("missing pending pane");
 	pending.data.queuedPrompts = [
 		[{ type: "text", text: "typed while starting" }],
@@ -141,20 +169,20 @@ test("attaching preserves the pane, tab, draft, queued messages and model withou
 		chatModeId: "plan",
 	});
 	expect(data).not.toHaveProperty("pendingPrompt");
-	expect(pendingCloudChatPane(next)).toBeNull();
+	expect(pendingCloudLaunchPane(next)).toBeNull();
 	expect(attachCloudChatSession(next, pending.id, session)).toEqual(next);
 });
 
 test("releasing a waiting chat keeps the pane and what was typed but starts its own session", () => {
 	const state = collections();
-	seedPendingCloudChat({
+	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "release",
 		launch,
 		modelId: "chosen-model",
 	});
 	const layout = state.rows.get("release")?.paneLayout;
-	const pending = layout && pendingCloudChatPane(layout);
+	const pending = layout && pendingCloudLaunchPane(layout);
 	if (!layout || !pending) throw new Error("missing pending pane");
 	pending.data.queuedPrompts = [[{ type: "text", text: "typed" }]];
 	const next = releasePendingCloudChat(layout, pending.id);
@@ -175,14 +203,14 @@ test("releasing a waiting chat keeps the pane and what was typed but starts its 
 
 test("the typed prompt goes to the chat that got it, not to a fresh one", () => {
 	const state = collections();
-	seedPendingCloudChat({
+	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "typed",
 		launch,
 		prompt: "fix the login bug",
 	});
 	const layout = state.rows.get("typed")?.paneLayout;
-	const pending = layout && pendingCloudChatPane(layout);
+	const pending = layout && pendingCloudLaunchPane(layout);
 	if (!layout || !pending) throw new Error("missing pending pane");
 	expect(pending.data.launchPrompt).toBe("fix the login bug");
 	const attached = attachCloudChatSession(layout, pending.id, {
@@ -202,17 +230,17 @@ test("the typed prompt goes to the chat that got it, not to a fresh one", () => 
 
 test("a launch that fell back to a terminal turns the waiting pane into that terminal", () => {
 	const state = collections();
-	seedPendingCloudChat({
+	seedPendingCloudLaunch({
 		collections: state.collections,
 		workspaceId: "terminal-fallback",
 		launch,
 	});
 	const layout = state.rows.get("terminal-fallback")?.paneLayout;
-	const pending = layout && pendingCloudChatPane(layout);
+	const pending = layout && pendingCloudLaunchPane(layout);
 	if (!layout || !pending) throw new Error("missing pending pane");
 	const next = attachCloudTerminal(layout, pending.id, "promised-terminal");
 	const pane = next.tabs[0]?.panes[pending.id];
 	expect(pane?.kind).toBe("terminal");
 	expect(pane?.data).toEqual({ terminalId: "promised-terminal" });
-	expect(pendingCloudChatPane(next)).toBeNull();
+	expect(pendingCloudLaunchPane(next)).toBeNull();
 });

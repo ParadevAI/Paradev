@@ -10659,6 +10659,9 @@ msgstr "Eklentileri eşitleme bitince görünür."
 msgid "Its replies go with it."
 msgstr "Yanıtları da silinir."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Bulut çalışma alanı onu başlattığında terminali burada açılır."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. {computerName} üzerindeki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."
 
