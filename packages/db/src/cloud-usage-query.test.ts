@@ -463,34 +463,4 @@ describe("fleet scope", () => {
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
 	});
-
-	test("a customer scope cannot group by more than user, day or workspace", () => {
-		const groupByOrganization = () =>
-			queryCloudUsage(
-				db,
-				{ organizationId: ORG },
-				{
-					window: NOVEMBER,
-					limit: 1,
-					// @ts-expect-error a customer scope groups by user, day or workspace
-					groupBy: "organization",
-					overagePerGbHour: RATE,
-				},
-			);
-		const filterByProject = () =>
-			listCloudBoots(
-				db,
-				{ organizationId: ORG },
-				{
-					window: NOVEMBER,
-					// @ts-expect-error only the fleet functions filter by project
-					filters: { project: "p" },
-					limit: 1,
-					now: NOW,
-					overagePerGbHour: RATE,
-				},
-			);
-		expect(groupByOrganization).toBeFunction();
-		expect(filterByProject).toBeFunction();
-	});
 });

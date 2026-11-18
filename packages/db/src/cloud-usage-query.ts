@@ -75,7 +75,6 @@ export interface CloudUsageFilters {
 	status?: CloudWorkspaceStatus[];
 }
 
-/** What only the fleet functions filter by. */
 export interface CloudFleetFilters
 	extends Omit<CloudUsageFilters, "workspace"> {
 	workspace?: string | string[];
@@ -736,16 +735,16 @@ function bootConditions(scope: Scope, options: BootReadOptions) {
 }
 
 /** Rows come fetched one past the limit. */
-function bootPage<
-	Row extends {
-		id: string;
-		startedAt: Date;
-		stoppedAt: Date | null;
-		vcpus: number;
-		memoryMb: number;
-		gbMinutes: string;
-	},
->(rows: Row[], options: BootReadOptions) {
+const selectBootRows = (db: Db) =>
+	db
+		.select(bootColumns)
+		.from(boots)
+		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
+		.leftJoin(users, eq(users.id, boots.createdByUserId));
+
+type BootRow = Awaited<ReturnType<typeof selectBootRows>>[number];
+
+function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 	const { limit, now, overagePerGbHour } = options;
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
@@ -775,11 +774,7 @@ export async function listCloudBoots(
 	scope: CloudUsageScope,
 	options: CloudBootsOptions,
 ) {
-	const rows = await db
-		.select(bootColumns)
-		.from(boots)
-		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
-		.leftJoin(users, eq(users.id, boots.createdByUserId))
+	const rows = await selectBootRows(db)
 		.where(bootConditions(scope, options))
 		.orderBy(desc(boots.startedAt), desc(boots.id))
 		.limit(options.limit + 1);
