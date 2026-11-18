@@ -453,6 +453,15 @@ test("a timed-out list reply cannot settle the next list request", async (t) => 
 		const next = client.list();
 		const { message: second, socket } = await secondRequest.promise;
 		const session = { id: "current", pid: 1, cols: 80, rows: 24, alive: true };
+		const repliesRead = Promise.withResolvers<void>();
+		client.subscribe(
+			"list-test-marker",
+			{ replay: false },
+			{
+				onOutput: () => repliesRead.resolve(),
+				onExit: () => {},
+			},
+		);
 		socket.write(
 			Buffer.concat([
 				encodeFrame({
@@ -465,9 +474,18 @@ test("a timed-out list reply cannot settle the next list request", async (t) => 
 					requestId: second.requestId,
 					sessions: [session],
 				}),
+				encodeFrame(
+					{ type: "output", id: "list-test-marker" },
+					Buffer.from("replies read"),
+				),
 			]),
 		);
-		assert.deepEqual(await next, [session]);
+		// The marker arrives after both replies, even if neither matched.
+		const [sessions] = await Promise.all([
+			next,
+			repliesRead.promise.then(() => t.mock.timers.runAll()),
+		]);
+		assert.deepEqual(sessions, [session]);
 	} finally {
 		t.mock.timers.reset();
 		await client.dispose();
