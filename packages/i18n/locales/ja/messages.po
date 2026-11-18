@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {アカウントは無効化されており�
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} は今すぐ開始し、その時刻にリマインドします"
+
+msgid "{devName} starts then"
+msgstr "{devName} はその時刻に開始します"
+
 msgid "{distance} ago"
 msgstr "{distance}前"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {リポジトリを1つ以上指定してく�
 
 msgid "{openCount} open"
 msgstr "{openCount}件通過"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, other {# 件のタスク}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {このワークスペースで他にも変更: #件のファイル} other {このワークスペースで他にも変更: #件のファイル}}"
@@ -2016,6 +2025,9 @@ msgstr "既製の Dev を追加"
 
 msgid "Add a short summary…"
 msgstr "短い概要を追加…"
+
+msgid "Add a task to this chat"
+msgstr "このチャットにタスクを追加"
 
 msgid "Add account"
 msgstr "アカウントを追加"
@@ -6664,6 +6676,9 @@ msgstr "データとAPI"
 msgid "Data display"
 msgstr "データ表示"
 
+msgid "Date"
+msgstr "日付"
+
 msgid "Date created"
 msgstr "作成日"
 
@@ -7054,6 +7069,9 @@ msgstr "切断中"
 
 msgid "Details"
 msgstr "詳細"
+
+msgid "Details (optional)"
+msgstr "詳細(任意)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "ここでは詳細を表示できませんが、リンクは開けます。"
@@ -12459,9 +12477,6 @@ msgstr "コントリビューターが見つかりません。"
 msgid "No credit card required."
 msgstr "クレジットカードは不要です。"
 
-msgid "No date"
-msgstr "日付なし"
-
 msgid "No description"
 msgstr "説明なし"
 
@@ -13131,6 +13146,9 @@ msgstr "直近30日に公開された実績はまだありません。このマ�
 msgid "Nothing to connect: it works on its own."
 msgstr "接続するものはありません。単独で動作します。"
 
+msgid "Nothing to do in this chat yet."
+msgstr "このチャットにはまだやることがありません。"
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "まだ開く内容がありません。先にメッセージを送信してください。"
 
@@ -13389,6 +13407,9 @@ msgstr "招待したユーザーのみ"
 
 msgid "Only people who opted in appear here."
 msgstr "参加を選んだ人だけがここに表示されます。"
+
+msgid "Only remind me then"
+msgstr "その時刻にリマインドのみ"
 
 msgid "Only the author can change a comment"
 msgstr "コメントを変更できるのは作成者だけです"
@@ -19532,6 +19553,9 @@ msgstr "ボタンが目立つようになりました。ペインで確認済み
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "変更はすぐに適用されます。期間の残りについて差額のみをお支払いいただきます。"
 
+msgid "The chat gets a reminder then"
+msgstr "その時刻にチャットへリマインドが届きます"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "チャットはそのまま残ります。このターンの後に誰かが編集したファイルはそのままにし、一覧に表示します。"
 
@@ -20766,6 +20790,9 @@ msgstr "トンネル確立"
 msgid "Turn Fast mode on or off"
 msgstr "高速モードのオン/オフを切り替え"
 
+msgid "Turn into task"
+msgstr "タスクにする"
+
 msgid "Turn it back on in Settings → General."
 msgstr "「設定 → 全般」から再び表示できます。"
 
@@ -21874,6 +21901,9 @@ msgstr "できること"
 msgid "What it does, and how you want it to work"
 msgstr "何をするか、どのように動いてほしいか"
 
+msgid "What needs doing"
+msgstr "やること"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradevはどのプラットフォームで動きますか?"
 
@@ -22194,9 +22224,6 @@ msgstr "割り当て直しますか?"
 
 msgid "Wrap lines"
 msgstr "行を折り返す"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "チャットに /task とやることを書くと追加できます。"
 
 msgid "Write a comment"
 msgstr "コメントを書く"

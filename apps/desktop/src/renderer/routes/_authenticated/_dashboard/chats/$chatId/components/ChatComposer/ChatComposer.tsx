@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import type {
 	ComposerDraft,
 	ComposerMentionProvider,
+	PromptInputCommand,
 	PromptInputHandle,
 } from "@superset/chat-ui/PromptInput";
 import { draftText } from "@superset/chat-ui/PromptInput";
@@ -11,8 +12,8 @@ import {
 	splitMentions,
 } from "@superset/chats-core";
 import { Avatar } from "@superset/ui/atoms/Avatar";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { LuPencil, LuReply, LuX } from "react-icons/lu";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LuPencil, LuReply, LuSquareCheck, LuX } from "react-icons/lu";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
 
@@ -54,6 +55,7 @@ interface ChatComposerProps {
 	onTextChange: (text: string) => void;
 	/** Up in an empty composer: edit the last message you sent. */
 	onEditLast: () => void;
+	onNewTask: () => void;
 }
 
 /** The app's composer, in a chat: @ names its people and Devs, and a strip says what a send answers or changes. */
@@ -66,6 +68,7 @@ export function ChatComposer({
 	onSend,
 	onTextChange,
 	onEditLast,
+	onNewTask,
 }: ChatComposerProps) {
 	const { t } = useLingui();
 	const composer = useRef<PromptInputHandle>(null);
@@ -82,6 +85,28 @@ export function ChatComposer({
 		composer.current?.focus();
 	}, [editingText]);
 
+	const newTaskRef = useRef(onNewTask);
+	newTaskRef.current = onNewTask;
+	// The composer takes focus back after a menu pick, which would close a dialog opened in the same tick.
+	const openNewTask = useCallback(() => {
+		setTimeout(() => newTaskRef.current(), 0);
+	}, []);
+	const newTaskTitle = t({ message: "New task" });
+	const newTaskHint = t({ message: "Add a task to this chat" });
+	const actionsTitle = t({ message: "Actions" });
+	const commands = useMemo<PromptInputCommand[]>(
+		() => [
+			{
+				id: "new-task",
+				title: newTaskTitle,
+				description: newTaskHint,
+				icon: <LuSquareCheck className="size-4" />,
+				searchAliases: ["task", "todo"],
+				onSelect: () => openNewTask(),
+			},
+		],
+		[newTaskTitle, newTaskHint, openNewTask],
+	);
 	const title = t({ message: "People and Devs" });
 	const candidatesKey = candidates
 		.map((candidate) => `${candidate.kind}:${candidate.id}:${candidate.label}`)
@@ -111,8 +136,33 @@ export function ChatComposer({
 						})),
 				},
 			},
+			{
+				id: "chat-actions",
+				title: actionsTitle,
+				priority: MENTION_PRIORITY - 1,
+				source: {
+					kind: "static",
+					load: () => [
+						{
+							id: "new-task",
+							label: newTaskTitle,
+							description: newTaskHint,
+							keywords: ["task", "todo"],
+							icon: <LuSquareCheck className="size-4" />,
+							select: () => openNewTask(),
+						},
+					],
+				},
+			},
 		],
-		[title, candidatesKey],
+		[
+			title,
+			candidatesKey,
+			actionsTitle,
+			newTaskTitle,
+			newTaskHint,
+			openNewTask,
+		],
 	);
 
 	// The composer has no way to empty itself, so dropping an edit mounts a new one.
@@ -172,6 +222,7 @@ export function ChatComposer({
 				layout="inline"
 				placeholder={placeholder}
 				mentionProviders={mentionProviders}
+				commands={commands}
 				autoFocus
 				onDraftChange={(draft) => onTextChange(draftText(draft.segments))}
 				onSubmit={(payload) => {

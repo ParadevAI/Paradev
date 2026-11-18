@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {계정이 비활성화되었으며 #일 후
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName}이(가) 지금 시작하고 그때 알려 줍니다"
+
+msgid "{devName} starts then"
+msgstr "{devName}이(가) 그때 시작합니다"
+
 msgid "{distance} ago"
 msgstr "{distance} 전"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {리포지토리를 하나 이상 지정하세
 
 msgid "{openCount} open"
 msgstr "{openCount}개 열림"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, other {작업 #개}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {이 워크스페이스에서 함께 변경됨: 파일 #개} other {이 워크스페이스에서 함께 변경됨: 파일 #개}}"
@@ -2016,6 +2025,9 @@ msgstr "준비된 Dev 추가"
 
 msgid "Add a short summary…"
 msgstr "짧은 요약 추가…"
+
+msgid "Add a task to this chat"
+msgstr "이 채팅에 작업 추가"
 
 msgid "Add account"
 msgstr "계정 추가"
@@ -6664,6 +6676,9 @@ msgstr "데이터 및 API"
 msgid "Data display"
 msgstr "데이터 표시"
 
+msgid "Date"
+msgstr "날짜"
+
 msgid "Date created"
 msgstr "생성일"
 
@@ -7054,6 +7069,9 @@ msgstr "분리됨"
 
 msgid "Details"
 msgstr "세부 정보"
+
+msgid "Details (optional)"
+msgstr "세부 정보(선택)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "여기서는 세부 정보를 볼 수 없지만 링크는 열립니다."
@@ -12459,9 +12477,6 @@ msgstr "기여자를 찾을 수 없습니다."
 msgid "No credit card required."
 msgstr "신용카드가 필요 없습니다."
 
-msgid "No date"
-msgstr "날짜 없음"
-
 msgid "No description"
 msgstr "설명 없음"
 
@@ -13131,6 +13146,9 @@ msgstr "최근 30일 동안 게시된 사용량이 아직 없습니다. 이 기�
 msgid "Nothing to connect: it works on its own."
 msgstr "연결할 것이 없습니다. 단독으로 작동합니다."
 
+msgid "Nothing to do in this chat yet."
+msgstr "이 채팅에는 아직 할 일이 없습니다."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "아직 열 내용이 없습니다. 먼저 메시지를 보내세요."
 
@@ -13389,6 +13407,9 @@ msgstr "초대된 사람만"
 
 msgid "Only people who opted in appear here."
 msgstr "참여를 선택한 사람만 여기에 표시됩니다."
+
+msgid "Only remind me then"
+msgstr "그때 알림만 받기"
 
 msgid "Only the author can change a comment"
 msgstr "작성자만 댓글을 변경할 수 있습니다"
@@ -19532,6 +19553,9 @@ msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "변경은 바로 적용됩니다. 남은 기간에 대한 차액만 결제합니다."
 
+msgid "The chat gets a reminder then"
+msgstr "그때 채팅에 알림이 옵니다"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "채팅은 그대로 유지됩니다. 이 턴 이후 누군가 편집한 파일은 그대로 두고 목록에 표시합니다."
 
@@ -20766,6 +20790,9 @@ msgstr "터널 연결됨"
 msgid "Turn Fast mode on or off"
 msgstr "빠른 모드 켜기 또는 끄기"
 
+msgid "Turn into task"
+msgstr "작업으로 만들기"
+
 msgid "Turn it back on in Settings → General."
 msgstr "설정 → 일반에서 다시 켤 수 있습니다."
 
@@ -21874,6 +21901,9 @@ msgstr "하는 일"
 msgid "What it does, and how you want it to work"
 msgstr "무엇을 하고 어떻게 일하길 원하는지"
 
+msgid "What needs doing"
+msgstr "해야 할 일"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev는 어떤 플랫폼에서 실행되나요?"
 
@@ -22194,9 +22224,6 @@ msgstr "다시 지정할까요?"
 
 msgid "Wrap lines"
 msgstr "줄 바꿈"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "채팅에 /task 와 할 일을 적으면 추가됩니다."
 
 msgid "Write a comment"
 msgstr "댓글 작성"

@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Váš účet je deaktivovaný a za # den bu
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} začne hned a pak vám to připomene"
+
+msgid "{devName} starts then"
+msgstr "{devName} začne v ten čas"
+
 msgid "{distance} ago"
 msgstr "před {distance}"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Zadejte alespoň jeden repozitář.} channel 
 
 msgid "{openCount} open"
 msgstr "{openCount} otevřených"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# úkol} few {# úkoly} many {# úkolu} other {# úkolů}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {V tomto pracovním prostoru se změnil i # soubor} few {V tomto pracovním prostoru se změnily i # soubory} many {V tomto pracovním prostoru se změnilo i # souboru} other {V tomto pracovním prostoru se změnilo i # souborů}}"
@@ -2016,6 +2025,9 @@ msgstr "Přidat hotového Deva"
 
 msgid "Add a short summary…"
 msgstr "Přidejte krátké shrnutí…"
+
+msgid "Add a task to this chat"
+msgstr "Přidat úkol do tohoto chatu"
 
 msgid "Add account"
 msgstr "Přidat účet"
@@ -6664,6 +6676,9 @@ msgstr "Data a API"
 msgid "Data display"
 msgstr "Zobrazení dat"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Date created"
 msgstr "Datum vytvoření"
 
@@ -7054,6 +7069,9 @@ msgstr "Odpojeno"
 
 msgid "Details"
 msgstr "Podrobnosti"
+
+msgid "Details (optional)"
+msgstr "Podrobnosti (volitelné)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Podrobnosti zde nejsou k dispozici, ale odkaz se přesto otevře."
@@ -12459,9 +12477,6 @@ msgstr "Nenalezeni žádní přispěvatelé."
 msgid "No credit card required."
 msgstr "Bez platební karty."
 
-msgid "No date"
-msgstr "Bez data"
-
 msgid "No description"
 msgstr "Bez popisu"
 
@@ -13131,6 +13146,9 @@ msgstr "Za posledních 30 dní zatím nebylo nic publikováno. Vaše pozice se o
 msgid "Nothing to connect: it works on its own."
 msgstr "Není co připojovat: funguje sám."
 
+msgid "Nothing to do in this chat yet."
+msgstr "V tomto chatu zatím není co dělat."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Zatím není co otevřít. Nejdřív pošlete zprávu."
 
@@ -13389,6 +13407,9 @@ msgstr "Jen pozvaní lidé"
 
 msgid "Only people who opted in appear here."
 msgstr "Objevují se tu jen lidé, kteří se sami přihlásili."
+
+msgid "Only remind me then"
+msgstr "V ten čas mi to jen připomenout"
 
 msgid "Only the author can change a comment"
 msgstr "Komentář může upravit jen jeho autor"
@@ -19532,6 +19553,9 @@ msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Změna platí hned. Platíte jen rozdíl za zbytek období."
 
+msgid "The chat gets a reminder then"
+msgstr "Chat v ten čas dostane připomenutí"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat zůstane, jak je. Soubory, které kdokoli upravil od tohoto tahu, zůstanou beze změny a budou vypsány."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunel navázán"
 msgid "Turn Fast mode on or off"
 msgstr "Zapnout nebo vypnout rychlý režim"
 
+msgid "Turn into task"
+msgstr "Změnit na úkol"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Znovu ho můžete zapnout v Nastavení → Obecné."
 
@@ -21874,6 +21901,9 @@ msgstr "Co dělá"
 msgid "What it does, and how you want it to work"
 msgstr "Co dělá a jak chcete, aby pracoval"
 
+msgid "What needs doing"
+msgstr "Co je potřeba udělat"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Na jakých platformách Paradev běží?"
 
@@ -22194,9 +22224,6 @@ msgstr "Chcete zkratku přiřadit znovu?"
 
 msgid "Wrap lines"
 msgstr "Zalamovat řádky"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Napište do chatu /task a co je potřeba udělat, a úkol se přidá."
 
 msgid "Write a comment"
 msgstr "Napsat komentář"

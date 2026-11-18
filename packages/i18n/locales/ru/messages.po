@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Аккаунт деактивирован �
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} начнёт сейчас и напомнит вам в это время"
+
+msgid "{devName} starts then"
+msgstr "{devName} начнёт в это время"
+
 msgid "{distance} ago"
 msgstr "{distance} назад"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Укажите хотя бы один реп�
 
 msgid "{openCount} open"
 msgstr "{openCount} открыто"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# задача} few {# задачи} many {# задач} other {# задачи}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Также изменён в этой рабочей области: # файл} few {Также изменены в этой рабочей области: # файла} many {Также изменены в этой рабочей области: # файлов} other {Также изменены в этой рабочей области: # файла}}"
@@ -2016,6 +2025,9 @@ msgstr "Добавить готового Dev"
 
 msgid "Add a short summary…"
 msgstr "Добавьте краткое описание…"
+
+msgid "Add a task to this chat"
+msgstr "Добавить задачу в этот чат"
 
 msgid "Add account"
 msgstr "Добавить аккаунт"
@@ -6664,6 +6676,9 @@ msgstr "Данные и API"
 msgid "Data display"
 msgstr "Отображение данных"
 
+msgid "Date"
+msgstr "Дата"
+
 msgid "Date created"
 msgstr "Дате создания"
 
@@ -7054,6 +7069,9 @@ msgstr "Отключена"
 
 msgid "Details"
 msgstr "Детали"
+
+msgid "Details (optional)"
+msgstr "Подробности (необязательно)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Сведения здесь недоступны, но ссылка всё равно открывается."
@@ -12459,9 +12477,6 @@ msgstr "Контрибьюторы не найдены."
 msgid "No credit card required."
 msgstr "Карта не нужна."
 
-msgid "No date"
-msgstr "Без даты"
-
 msgid "No description"
 msgstr "Без описания"
 
@@ -13131,6 +13146,9 @@ msgstr "За последние 30 дней ещё ничего не опубл�
 msgid "Nothing to connect: it works on its own."
 msgstr "Подключать нечего: он работает сам."
 
+msgid "Nothing to do in this chat yet."
+msgstr "В этом чате пока нечего делать."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Пока нечего открывать. Сначала отправьте сообщение."
 
@@ -13389,6 +13407,9 @@ msgstr "Только приглашённые"
 
 msgid "Only people who opted in appear here."
 msgstr "Здесь показаны только те, кто согласился участвовать."
+
+msgid "Only remind me then"
+msgstr "Только напомнить мне в это время"
 
 msgid "Only the author can change a comment"
 msgstr "Изменить комментарий может только автор"
@@ -19532,6 +19553,9 @@ msgstr "Теперь кнопка выделяется. Я проверил эт
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Изменение вступает в силу сразу. Вы платите только разницу за остаток периода."
 
+msgid "The chat gets a reminder then"
+msgstr "Чат получит напоминание в это время"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат остаётся как есть. Файлы, которые кто-либо изменил после этого хода, не трогаются и перечисляются."
 
@@ -20766,6 +20790,9 @@ msgstr "Туннель установлен"
 msgid "Turn Fast mode on or off"
 msgstr "Включить или выключить быстрый режим"
 
+msgid "Turn into task"
+msgstr "Превратить в задачу"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Его можно снова включить в разделе «Настройки → Общие»."
 
@@ -21874,6 +21901,9 @@ msgstr "Что он делает"
 msgid "What it does, and how you want it to work"
 msgstr "Что он делает и как должен работать"
 
+msgid "What needs doing"
+msgstr "Что нужно сделать"
+
 msgid "What platforms does Paradev run on?"
 msgstr "На каких платформах работает Paradev?"
 
@@ -22194,9 +22224,6 @@ msgstr "Переназначить?"
 
 msgid "Wrap lines"
 msgstr "Переносить строки"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Напишите в чате /task и что нужно сделать, чтобы добавить задачу."
 
 msgid "Write a comment"
 msgstr "Написать комментарий"

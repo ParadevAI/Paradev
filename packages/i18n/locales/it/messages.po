@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Il tuo account è disattivato e sarà elimi
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} inizia ora e te lo ricorda a quell’ora"
+
+msgid "{devName} starts then"
+msgstr "{devName} inizia a quell’ora"
+
 msgid "{distance} ago"
 msgstr "{distance} fa"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Specifica almeno un repository.} channel {Spe
 
 msgid "{openCount} open"
 msgstr "{openCount} aperti"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# task} other {# task}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Modificato anche in questo workspace: # file} other {Modificati anche in questo workspace: # file}}"
@@ -2016,6 +2025,9 @@ msgstr "Aggiungi un Dev pronto all'uso"
 
 msgid "Add a short summary…"
 msgstr "Aggiungi un breve riepilogo…"
+
+msgid "Add a task to this chat"
+msgstr "Aggiungi un task a questa chat"
 
 msgid "Add account"
 msgstr "Aggiungi account"
@@ -6664,6 +6676,9 @@ msgstr "Dati e API"
 msgid "Data display"
 msgstr "Visualizzazione dei dati"
 
+msgid "Date"
+msgstr "Data"
+
 msgid "Date created"
 msgstr "Data di creazione"
 
@@ -7054,6 +7069,9 @@ msgstr "Scollegata"
 
 msgid "Details"
 msgstr "Dettagli"
+
+msgid "Details (optional)"
+msgstr "Dettagli (facoltativo)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "I dettagli non sono disponibili qui, ma il link si apre comunque."
@@ -12459,9 +12477,6 @@ msgstr "Nessun contributore trovato."
 msgid "No credit card required."
 msgstr "Nessuna carta di credito richiesta."
 
-msgid "No date"
-msgstr "Nessuna data"
-
 msgid "No description"
 msgstr "Nessuna descrizione"
 
@@ -13131,6 +13146,9 @@ msgstr "Ancora nessuna pubblicazione negli ultimi 30 giorni. La tua posizione co
 msgid "Nothing to connect: it works on its own."
 msgstr "Niente da collegare: funziona da solo."
 
+msgid "Nothing to do in this chat yet."
+msgstr "In questa chat non c’è ancora niente da fare."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Ancora niente da aprire. Invia prima un messaggio."
 
@@ -13389,6 +13407,9 @@ msgstr "Solo le persone invitate"
 
 msgid "Only people who opted in appear here."
 msgstr "Qui compaiono solo le persone che hanno scelto di partecipare."
+
+msgid "Only remind me then"
+msgstr "Ricordamelo soltanto a quell’ora"
 
 msgid "Only the author can change a comment"
 msgstr "Solo l’autore può modificare un commento"
@@ -19532,6 +19553,9 @@ msgstr "Ora il pulsante risalta. L'ho verificato nel tuo riquadro."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Il cambio inizia subito. Paghi solo la differenza per il resto del periodo."
 
+msgid "The chat gets a reminder then"
+msgstr "La chat riceve un promemoria a quell’ora"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "La chat resta com'è. I file modificati dopo questo turno, da chiunque, non vengono toccati e sono elencati."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunnel stabilito"
 msgid "Turn Fast mode on or off"
 msgstr "Attiva o disattiva la modalità veloce"
 
+msgid "Turn into task"
+msgstr "Trasforma in task"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Puoi riattivarlo in Impostazioni → Generali."
 
@@ -21874,6 +21901,9 @@ msgstr "Cosa fa"
 msgid "What it does, and how you want it to work"
 msgstr "Cosa fa e come vuoi che lavori"
 
+msgid "What needs doing"
+msgstr "Cosa c’è da fare"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Su quali piattaforme gira Paradev?"
 
@@ -22194,9 +22224,6 @@ msgstr "Vuoi riassegnarla?"
 
 msgid "Wrap lines"
 msgstr "A capo automatico"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Scrivi /task e cosa c’è da fare nella chat per aggiungerne una."
 
 msgid "Write a comment"
 msgstr "Scrivi un commento"

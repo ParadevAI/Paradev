@@ -972,6 +972,12 @@ msgstr "{daysRemaining, plural, one {Ваш обліковий запис деа
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} почне зараз і нагадає вам у цей час"
+
+msgid "{devName} starts then"
+msgstr "{devName} почне в цей час"
+
 msgid "{distance} ago"
 msgstr "{distance} тому"
 
@@ -1194,6 +1200,9 @@ msgstr "{noun, select, repository {Укажіть принаймні один р
 
 msgid "{openCount} open"
 msgstr "Відкрито: {openCount}"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# завдання} few {# завдання} many {# завдань} other {# завдання}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Також змінено в цьому робочому просторі: # файл} few {Також змінено в цьому робочому просторі: # файли} many {Також змінено в цьому робочому просторі: # файлів} other {Також змінено в цьому робочому просторі: # файлу}}"
@@ -2010,6 +2019,9 @@ msgstr "Додати готового Dev"
 
 msgid "Add a short summary…"
 msgstr "Додайте короткий опис…"
+
+msgid "Add a task to this chat"
+msgstr "Додати завдання до цього чату"
 
 msgid "Add account"
 msgstr "Додати обліковий запис"
@@ -6658,6 +6670,9 @@ msgstr "Дані та API"
 msgid "Data display"
 msgstr "Відображення даних"
 
+msgid "Date"
+msgstr "Дата"
+
 msgid "Date created"
 msgstr "Дата створення"
 
@@ -7048,6 +7063,9 @@ msgstr "Від'єднано"
 
 msgid "Details"
 msgstr "Подробиці"
+
+msgid "Details (optional)"
+msgstr "Подробиці (необов’язково)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Подробиці тут недоступні, але посилання все одно відкривається."
@@ -12453,9 +12471,6 @@ msgstr "Учасників не знайдено."
 msgid "No credit card required."
 msgstr "Кредитна картка не потрібна."
 
-msgid "No date"
-msgstr "Без дати"
-
 msgid "No description"
 msgstr "Немає опису"
 
@@ -13125,6 +13140,9 @@ msgstr "За останні 30 днів ще нічого не опубліко�
 msgid "Nothing to connect: it works on its own."
 msgstr "Підключати нічого: він працює сам."
 
+msgid "Nothing to do in this chat yet."
+msgstr "У цьому чаті поки нічого робити."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Поки що нічого відкривати. Спершу надішліть повідомлення."
 
@@ -13383,6 +13401,9 @@ msgstr "Лише запрошені люди"
 
 msgid "Only people who opted in appear here."
 msgstr "Тут показано лише тих, хто погодився на участь."
+
+msgid "Only remind me then"
+msgstr "Лише нагадати мені в цей час"
 
 msgid "Only the author can change a comment"
 msgstr "Лише автор може змінити коментар"
@@ -19526,6 +19547,9 @@ msgstr "Тепер кнопка помітніша. Я перевірив її �
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Зміна діє вже зараз. За решту цього періоду ви сплачуєте лише різницю."
 
+msgid "The chat gets a reminder then"
+msgstr "Чат отримає нагадування в цей час"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат залишиться без змін. Файли, які будь-хто змінив після цього ходу, не зачіпаються й показуються в списку."
 
@@ -20760,6 +20784,9 @@ msgstr "Тунель встановлено"
 msgid "Turn Fast mode on or off"
 msgstr "Увімкнути або вимкнути швидкий режим"
 
+msgid "Turn into task"
+msgstr "Перетворити на завдання"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Його можна знову ввімкнути в розділі «Налаштування → Загальні»."
 
@@ -21868,6 +21895,9 @@ msgstr "Що він робить"
 msgid "What it does, and how you want it to work"
 msgstr "Що він робить і як має працювати"
 
+msgid "What needs doing"
+msgstr "Що потрібно зробити"
+
 msgid "What platforms does Paradev run on?"
 msgstr "На яких платформах працює Paradev?"
 
@@ -22188,9 +22218,6 @@ msgstr "Бажаєте перепризначити його?"
 
 msgid "Wrap lines"
 msgstr "Переносити рядки"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Напишіть у чаті /task і що треба зробити, щоб додати завдання."
 
 msgid "Write a comment"
 msgstr "Напишіть коментар"

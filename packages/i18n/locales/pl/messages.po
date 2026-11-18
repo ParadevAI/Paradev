@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Konto jest dezaktywowane i zostanie trwale 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} zaczyna teraz i przypomni Ci wtedy"
+
+msgid "{devName} starts then"
+msgstr "{devName} zaczyna wtedy"
+
 msgid "{distance} ago"
 msgstr "{distance} temu"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Podaj co najmniej jedno repozytorium.} channe
 
 msgid "{openCount} open"
 msgstr "{openCount} otwartych"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# zadanie} few {# zadania} many {# zadań} other {# zadania}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Zmieniono też w tym obszarze roboczym: # plik} few {Zmieniono też w tym obszarze roboczym: # pliki} many {Zmieniono też w tym obszarze roboczym: # plików} other {Zmieniono też w tym obszarze roboczym: # pliku}}"
@@ -2016,6 +2025,9 @@ msgstr "Dodaj gotowego Deva"
 
 msgid "Add a short summary…"
 msgstr "Dodaj krótkie podsumowanie…"
+
+msgid "Add a task to this chat"
+msgstr "Dodaj zadanie do tego czatu"
 
 msgid "Add account"
 msgstr "Dodaj konto"
@@ -6664,6 +6676,9 @@ msgstr "Dane i API"
 msgid "Data display"
 msgstr "Prezentacja danych"
 
+msgid "Date"
+msgstr "Data"
+
 msgid "Date created"
 msgstr "Data utworzenia"
 
@@ -7054,6 +7069,9 @@ msgstr "Odłączona"
 
 msgid "Details"
 msgstr "Szczegóły"
+
+msgid "Details (optional)"
+msgstr "Szczegóły (opcjonalnie)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Szczegóły nie są tu dostępne, ale link nadal się otwiera."
@@ -12459,9 +12477,6 @@ msgstr "Nie znaleziono współtwórców."
 msgid "No credit card required."
 msgstr "Bez karty kredytowej."
 
-msgid "No date"
-msgstr "Bez daty"
-
 msgid "No description"
 msgstr "Brak opisu"
 
@@ -13131,6 +13146,9 @@ msgstr "Nic jeszcze nie opublikowano w ciągu ostatnich 30 dni. Twoja pozycja po
 msgid "Nothing to connect: it works on its own."
 msgstr "Nic do połączenia: działa samodzielnie."
 
+msgid "Nothing to do in this chat yet."
+msgstr "W tym czacie nie ma jeszcze nic do zrobienia."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nie ma jeszcze czego otworzyć. Najpierw wyślij wiadomość."
 
@@ -13389,6 +13407,9 @@ msgstr "Tylko zaproszone osoby"
 
 msgid "Only people who opted in appear here."
 msgstr "Pojawiają się tu tylko osoby, które zgłosiły się same."
+
+msgid "Only remind me then"
+msgstr "Tylko przypomnij mi wtedy"
 
 msgid "Only the author can change a comment"
 msgstr "Tylko autor może zmienić komentarz"
@@ -19532,6 +19553,9 @@ msgstr "Przycisk teraz się wyróżnia. Sprawdziłem to w Twoim panelu."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Zmiana działa od razu. Płacisz tylko różnicę za resztę okresu."
 
+msgid "The chat gets a reminder then"
+msgstr "Czat dostanie wtedy przypomnienie"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Czat zostaje bez zmian. Pliki edytowane od tej tury przez kogokolwiek pozostają nietknięte i są wymienione."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunel nawiązany"
 msgid "Turn Fast mode on or off"
 msgstr "Włącz lub wyłącz tryb szybki"
 
+msgid "Turn into task"
+msgstr "Zamień w zadanie"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Możesz go ponownie włączyć w Ustawienia → Ogólne."
 
@@ -21874,6 +21901,9 @@ msgstr "Co robi"
 msgid "What it does, and how you want it to work"
 msgstr "Co robi i jak ma pracować"
 
+msgid "What needs doing"
+msgstr "Co trzeba zrobić"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Na jakich platformach działa Paradev?"
 
@@ -22194,9 +22224,6 @@ msgstr "Czy przypisać ponownie?"
 
 msgid "Wrap lines"
 msgstr "Zawijaj wiersze"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Napisz na czacie /task i co trzeba zrobić, aby dodać zadanie."
 
 msgid "Write a comment"
 msgstr "Napisz komentarz"

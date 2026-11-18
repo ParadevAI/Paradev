@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Tài khoản của bạn đã bị vô hi�
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} bắt đầu ngay và nhắc bạn vào lúc đó"
+
+msgid "{devName} starts then"
+msgstr "{devName} bắt đầu vào lúc đó"
+
 msgid "{distance} ago"
 msgstr "{distance} trước"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Hãy chỉ định ít nhất một repo.} ch
 
 msgid "{openCount} open"
 msgstr "{openCount} còn mở"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, other {# nhiệm vụ}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Cũng thay đổi trong workspace này: # tệp} other {Cũng thay đổi trong workspace này: # tệp}}"
@@ -2016,6 +2025,9 @@ msgstr "Thêm một Dev dựng sẵn"
 
 msgid "Add a short summary…"
 msgstr "Thêm tóm tắt ngắn…"
+
+msgid "Add a task to this chat"
+msgstr "Thêm nhiệm vụ vào cuộc trò chuyện này"
 
 msgid "Add account"
 msgstr "Thêm tài khoản"
@@ -6664,6 +6676,9 @@ msgstr "Dữ liệu & API"
 msgid "Data display"
 msgstr "Hiển thị dữ liệu"
 
+msgid "Date"
+msgstr "Ngày"
+
 msgid "Date created"
 msgstr "Ngày tạo"
 
@@ -7054,6 +7069,9 @@ msgstr "Đã tách"
 
 msgid "Details"
 msgstr "Chi tiết"
+
+msgid "Details (optional)"
+msgstr "Chi tiết (không bắt buộc)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Không có chi tiết ở đây, nhưng liên kết vẫn mở được."
@@ -12459,9 +12477,6 @@ msgstr "Không tìm thấy người đóng góp nào."
 msgid "No credit card required."
 msgstr "Không cần thẻ tín dụng."
 
-msgid "No date"
-msgstr "Không có ngày"
-
 msgid "No description"
 msgstr "Không có mô tả"
 
@@ -13131,6 +13146,9 @@ msgstr "Chưa có gì được công khai trong 30 ngày qua. Thứ hạng của
 msgid "Nothing to connect: it works on its own."
 msgstr "Không cần kết nối gì: nó tự hoạt động."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Cuộc trò chuyện này chưa có việc gì cần làm."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Chưa có gì để mở. Hãy gửi tin nhắn trước."
 
@@ -13389,6 +13407,9 @@ msgstr "Chỉ những người được mời"
 
 msgid "Only people who opted in appear here."
 msgstr "Chỉ những người đã chọn tham gia mới xuất hiện ở đây."
+
+msgid "Only remind me then"
+msgstr "Chỉ nhắc tôi vào lúc đó"
 
 msgid "Only the author can change a comment"
 msgstr "Chỉ tác giả mới có thể sửa bình luận"
@@ -19532,6 +19553,9 @@ msgstr "Nút giờ đã nổi bật. Tôi đã kiểm tra trong ngăn của bạ
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Thay đổi có hiệu lực ngay. Bạn chỉ trả phần chênh lệch cho thời gian còn lại của kỳ này."
 
+msgid "The chat gets a reminder then"
+msgstr "Cuộc trò chuyện nhận lời nhắc vào lúc đó"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat vẫn giữ nguyên. Các tệp đã được bất kỳ ai sửa kể từ lượt này sẽ được giữ nguyên và liệt kê."
 
@@ -20766,6 +20790,9 @@ msgstr "Đã thiết lập tunnel"
 msgid "Turn Fast mode on or off"
 msgstr "Bật hoặc tắt chế độ nhanh"
 
+msgid "Turn into task"
+msgstr "Chuyển thành nhiệm vụ"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Bạn có thể bật lại trong Cài đặt → Chung."
 
@@ -21874,6 +21901,9 @@ msgstr "Nó làm gì"
 msgid "What it does, and how you want it to work"
 msgstr "Nó làm gì và bạn muốn nó làm việc ra sao"
 
+msgid "What needs doing"
+msgstr "Việc cần làm"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev chạy trên những nền tảng nào?"
 
@@ -22194,9 +22224,6 @@ msgstr "Bạn có muốn gán lại không?"
 
 msgid "Wrap lines"
 msgstr "Ngắt dòng"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Viết /task và việc cần làm vào cuộc trò chuyện để thêm nhiệm vụ."
 
 msgid "Write a comment"
 msgstr "Viết bình luận"

@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Hesabınız devre dışı bırakıldı ve #
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} şimdi başlar ve o zaman size hatırlatır"
+
+msgid "{devName} starts then"
+msgstr "{devName} o zaman başlar"
+
 msgid "{distance} ago"
 msgstr "{distance} önce"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {En az bir depo belirtin.} channel {En az bir 
 
 msgid "{openCount} open"
 msgstr "{openCount} açık"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# görev} other {# görev}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Bu çalışma alanında ayrıca değişen: # dosya} other {Bu çalışma alanında ayrıca değişen: # dosya}}"
@@ -2016,6 +2025,9 @@ msgstr "Hazır bir Dev ekle"
 
 msgid "Add a short summary…"
 msgstr "Kısa bir özet ekleyin…"
+
+msgid "Add a task to this chat"
+msgstr "Bu sohbete görev ekle"
 
 msgid "Add account"
 msgstr "Hesap ekle"
@@ -6664,6 +6676,9 @@ msgstr "Veri ve API'ler"
 msgid "Data display"
 msgstr "Veri gösterimi"
 
+msgid "Date"
+msgstr "Tarih"
+
 msgid "Date created"
 msgstr "Oluşturulma tarihi"
 
@@ -7054,6 +7069,9 @@ msgstr "Ayrılmış"
 
 msgid "Details"
 msgstr "Ayrıntılar"
+
+msgid "Details (optional)"
+msgstr "Ayrıntılar (isteğe bağlı)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Ayrıntılar burada görüntülenemiyor, ancak bağlantı yine de açılır."
@@ -12459,9 +12477,6 @@ msgstr "Katkıda bulunan bulunamadı."
 msgid "No credit card required."
 msgstr "Kredi kartı gerekmez."
 
-msgid "No date"
-msgstr "Tarih yok"
-
 msgid "No description"
 msgstr "Açıklama yok"
 
@@ -13131,6 +13146,9 @@ msgstr "Son 30 günde henüz hiçbir şey yayınlanmadı. Bu makinedeki kullanı
 msgid "Nothing to connect: it works on its own."
 msgstr "Bağlanacak bir şey yok: kendi başına çalışır."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Bu sohbette henüz yapılacak bir şey yok."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Henüz açılacak bir şey yok. Önce bir mesaj gönderin."
 
@@ -13389,6 +13407,9 @@ msgstr "Yalnızca davet edilen kişiler"
 
 msgid "Only people who opted in appear here."
 msgstr "Burada yalnızca katılmayı seçenler görünür."
+
+msgid "Only remind me then"
+msgstr "O zaman yalnızca hatırlat"
 
 msgid "Only the author can change a comment"
 msgstr "Yorumu yalnızca yazarı değiştirebilir"
@@ -19532,6 +19553,9 @@ msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Değişiklik hemen başlar. Dönemin kalanı için yalnızca farkı ödersiniz."
 
+msgid "The chat gets a reminder then"
+msgstr "Sohbet o zaman bir hatırlatma alır"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Sohbet olduğu gibi kalır. Bu turdan sonra herhangi biri tarafından düzenlenen dosyalara dokunulmaz ve listelenir."
 
@@ -20766,6 +20790,9 @@ msgstr "Tünel kuruldu"
 msgid "Turn Fast mode on or off"
 msgstr "Hızlı modu aç veya kapat"
 
+msgid "Turn into task"
+msgstr "Göreve dönüştür"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Ayarlar → Genel bölümünden yeniden açabilirsiniz."
 
@@ -21874,6 +21901,9 @@ msgstr "Ne yapar"
 msgid "What it does, and how you want it to work"
 msgstr "Ne yaptığı ve nasıl çalışmasını istediğiniz"
 
+msgid "What needs doing"
+msgstr "Ne yapılması gerekiyor"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev hangi platformlarda çalışıyor?"
 
@@ -22194,9 +22224,6 @@ msgstr "Yeniden atamak ister misiniz?"
 
 msgid "Wrap lines"
 msgstr "Satırları kaydır"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Eklemek için sohbete /task ve yapılacak işi yazın."
 
 msgid "Write a comment"
 msgstr "Yorum yaz"

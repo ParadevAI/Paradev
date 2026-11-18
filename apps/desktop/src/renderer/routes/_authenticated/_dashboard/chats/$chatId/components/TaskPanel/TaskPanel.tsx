@@ -8,6 +8,7 @@ import {
 import {
 	type LiveTurns,
 	type SyncSignal,
+	schedulePatch,
 	type TaskActions,
 	type TaskPatch,
 	workingOnTask,
@@ -29,13 +30,13 @@ import {
 	LuTrash2,
 	LuX,
 } from "react-icons/lu";
+import { TaskAssigneeMenu } from "renderer/routes/_authenticated/_dashboard/chats/components/TaskAssigneeMenu";
+import { TaskStatusMenu } from "renderer/routes/_authenticated/_dashboard/chats/components/TaskStatusMenu";
 import { TaskStatusRing } from "renderer/routes/_authenticated/_dashboard/chats/components/TaskStatusRing";
+import { TaskWhenMenu } from "renderer/routes/_authenticated/_dashboard/chats/components/TaskWhenMenu";
 import { TaskActivityItem } from "./components/TaskActivityItem";
-import { TaskAssigneeMenu } from "./components/TaskAssigneeMenu";
 import { TaskComment } from "./components/TaskComment";
 import { TaskDescription } from "./components/TaskDescription";
-import { TaskStatusMenu } from "./components/TaskStatusMenu";
-import { TaskWhenMenu } from "./components/TaskWhenMenu";
 import { useTaskActivity } from "./hooks/useTaskActivity";
 
 const ACTION =
@@ -88,7 +89,12 @@ export function TaskPanel({
 						status={task.status}
 						onChange={(status) => update({ status })}
 					/>
-					<TaskWhenMenu task={task} now={now} onChange={update} />
+					<TaskWhenMenu
+						value={task}
+						devName={dev?.name ?? null}
+						now={now}
+						onChange={(schedule) => update(schedulePatch(task, schedule))}
+					/>
 					{chat && (
 						<TaskAssigneeMenu
 							assignee={assignee}

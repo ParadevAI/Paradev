@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Votre compte est désactivé et sera défin
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} commence maintenant et vous le rappelle à ce moment-là"
+
+msgid "{devName} starts then"
+msgstr "{devName} commence à ce moment-là"
+
 msgid "{distance} ago"
 msgstr "il y a {distance}"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Indiquez au moins un dépôt.} channel {Indiq
 
 msgid "{openCount} open"
 msgstr "{openCount} ouvertes"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# tâche} other {# tâches}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Aussi modifié dans cet espace de travail : # fichier} other {Aussi modifiés dans cet espace de travail : # fichiers}}"
@@ -2016,6 +2025,9 @@ msgstr "Ajouter un Dev prêt à l'emploi"
 
 msgid "Add a short summary…"
 msgstr "Ajoutez un bref résumé…"
+
+msgid "Add a task to this chat"
+msgstr "Ajouter une tâche à ce chat"
 
 msgid "Add account"
 msgstr "Ajouter un compte"
@@ -6664,6 +6676,9 @@ msgstr "Données et API"
 msgid "Data display"
 msgstr "Affichage des données"
 
+msgid "Date"
+msgstr "Date"
+
 msgid "Date created"
 msgstr "Date de création"
 
@@ -7054,6 +7069,9 @@ msgstr "Détachée"
 
 msgid "Details"
 msgstr "Détails"
+
+msgid "Details (optional)"
+msgstr "Détails (facultatif)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Les détails ne sont pas disponibles ici, mais le lien s'ouvre quand même."
@@ -12459,9 +12477,6 @@ msgstr "Aucun contributeur trouvé."
 msgid "No credit card required."
 msgstr "Aucune carte bancaire requise."
 
-msgid "No date"
-msgstr "Aucune date"
-
 msgid "No description"
 msgstr "Aucune description"
 
@@ -13131,6 +13146,9 @@ msgstr "Rien de publié sur les 30 derniers jours pour l'instant. Votre rang app
 msgid "Nothing to connect: it works on its own."
 msgstr "Rien à connecter : il fonctionne seul."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Rien à faire dans ce chat pour le moment."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Rien à ouvrir pour l’instant. Envoyez d’abord un message."
 
@@ -13389,6 +13407,9 @@ msgstr "Personnes invitées uniquement"
 
 msgid "Only people who opted in appear here."
 msgstr "Seules les personnes qui ont choisi de participer apparaissent ici."
+
+msgid "Only remind me then"
+msgstr "Seulement me le rappeler à ce moment-là"
 
 msgid "Only the author can change a comment"
 msgstr "Seul l’auteur peut modifier un commentaire"
@@ -19532,6 +19553,9 @@ msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Le changement s'applique tout de suite. Vous payez seulement la différence pour le reste de la période."
 
+msgid "The chat gets a reminder then"
+msgstr "Le chat reçoit un rappel à ce moment-là"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui que ce soit, ne sont pas touchés et sont listés."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunnel établi"
 msgid "Turn Fast mode on or off"
 msgstr "Activer ou désactiver le mode rapide"
 
+msgid "Turn into task"
+msgstr "Transformer en tâche"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Vous pouvez le réactiver dans Paramètres → Général."
 
@@ -21874,6 +21901,9 @@ msgstr "Ce qu'il fait"
 msgid "What it does, and how you want it to work"
 msgstr "Ce qu'il fait et comment vous voulez qu'il travaille"
 
+msgid "What needs doing"
+msgstr "Ce qu’il faut faire"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Sur quelles plateformes Paradev fonctionne-t-il ?"
 
@@ -22194,9 +22224,6 @@ msgstr "Souhaitez-vous le réattribuer ?"
 
 msgid "Wrap lines"
 msgstr "Renvoyer à la ligne"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Écrivez /task et ce qu’il faut faire dans le chat pour en ajouter une."
 
 msgid "Write a comment"
 msgstr "Écrire un commentaire"

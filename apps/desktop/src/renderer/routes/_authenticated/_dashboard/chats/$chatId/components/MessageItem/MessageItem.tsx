@@ -14,7 +14,14 @@ import { Avatar } from "@superset/ui/atoms/Avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { memo } from "react";
-import { LuCopy, LuInfo, LuPencil, LuReply, LuTrash2 } from "react-icons/lu";
+import {
+	LuCopy,
+	LuInfo,
+	LuPencil,
+	LuReply,
+	LuSquareCheck,
+	LuTrash2,
+} from "react-icons/lu";
 import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { MessageFile } from "./components/MessageFile";
 import { MessageLink } from "./components/MessageLink";
@@ -42,6 +49,7 @@ export interface MessageActions {
 	answerForm: (questionId: string, answers: QuestionPartAnswer[]) => void;
 	/** Shows what the Dev did to write the message. */
 	details: (message: Message) => void;
+	turnIntoTask: (message: Message) => void;
 	openTask: (taskId: string) => void;
 	toggleTask: (taskId: string) => void;
 	fileLink: (fileId: string) => Promise<string>;
@@ -277,6 +285,17 @@ export const MessageItem = memo(function MessageItem({
 								onClick={() => actions.details(message)}
 							>
 								<LuInfo className="size-3.5" />
+							</button>
+						)}
+						{!message.taskId && !message.question && message.text.trim() && (
+							<button
+								type="button"
+								aria-label={t({ message: "Turn into task" })}
+								title={t({ message: "Turn into task" })}
+								className={ACTION}
+								onClick={() => actions.turnIntoTask(message)}
+							>
+								<LuSquareCheck className="size-3.5" />
 							</button>
 						)}
 						<button

@@ -11,7 +11,7 @@ import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { LuPencil, LuX } from "react-icons/lu";
+import { LuPencil, LuPlus, LuX } from "react-icons/lu";
 import { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { DevFace } from "renderer/routes/_authenticated/_dashboard/chats/components/DevFace";
 import { useOrganizationPeople } from "renderer/routes/_authenticated/_dashboard/hooks/useOrganizationPeople";
@@ -29,6 +29,7 @@ interface ChatDetailsPanelProps {
 	title: string;
 	onClose: () => void;
 	onOpenTask: (taskId: string) => void;
+	onNewTask: () => void;
 }
 
 /** What a chat is, beside its conversation: its face and name, its Devs and its people. */
@@ -38,6 +39,7 @@ export function ChatDetailsPanel({
 	title,
 	onClose,
 	onOpenTask,
+	onNewTask,
 }: ChatDetailsPanelProps) {
 	const { t } = useLingui();
 	const agents = chat.devIds.flatMap((id) => {
@@ -123,14 +125,22 @@ export function ChatDetailsPanel({
 					)}
 				</div>
 				<section className="flex flex-col gap-0.5">
-					<h3 className="px-1 pb-1 text-xs font-medium text-muted-foreground">
-						<Trans>Tasks</Trans>
-					</h3>
+					<div className="flex items-center justify-between px-1 pb-1">
+						<h3 className="text-xs font-medium text-muted-foreground">
+							<Trans>Tasks</Trans>
+						</h3>
+						<button
+							type="button"
+							onClick={onNewTask}
+							className="flex h-6 items-center gap-1 rounded-md px-1.5 text-muted-foreground text-xs hover:bg-fill-hover hover:text-foreground"
+						>
+							<LuPlus className="size-3.5" />
+							<Trans>New task</Trans>
+						</button>
+					</div>
 					{tasks.length === 0 && (
 						<p className="px-1 text-muted-foreground text-xs">
-							<Trans>
-								Write /task and what needs doing in the chat to add one.
-							</Trans>
+							<Trans>Nothing to do in this chat yet.</Trans>
 						</p>
 					)}
 					{tasks.map((task) => (

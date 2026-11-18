@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Je account is gedeactiveerd en wordt over #
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} begint nu en herinnert je er dan aan"
+
+msgid "{devName} starts then"
+msgstr "{devName} begint dan"
+
 msgid "{distance} ago"
 msgstr "{distance} geleden"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Geef minstens één repository op.} channel {
 
 msgid "{openCount} open"
 msgstr "{openCount} open"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# taak} other {# taken}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Ook gewijzigd in deze werkruimte: # bestand} other {Ook gewijzigd in deze werkruimte: # bestanden}}"
@@ -2016,6 +2025,9 @@ msgstr "Kant-en-klare Dev toevoegen"
 
 msgid "Add a short summary…"
 msgstr "Voeg een korte samenvatting toe…"
+
+msgid "Add a task to this chat"
+msgstr "Een taak aan deze chat toevoegen"
 
 msgid "Add account"
 msgstr "Account toevoegen"
@@ -6664,6 +6676,9 @@ msgstr "Data en API's"
 msgid "Data display"
 msgstr "Gegevensweergave"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Date created"
 msgstr "Aanmaakdatum"
 
@@ -7054,6 +7069,9 @@ msgstr "Losgekoppeld"
 
 msgid "Details"
 msgstr "Details"
+
+msgid "Details (optional)"
+msgstr "Details (optioneel)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details zijn hier niet beschikbaar, maar de link opent nog steeds."
@@ -12459,9 +12477,6 @@ msgstr "Geen contributors gevonden."
 msgid "No credit card required."
 msgstr "Geen creditcard nodig."
 
-msgid "No date"
-msgstr "Geen datum"
-
 msgid "No description"
 msgstr "Geen beschrijving"
 
@@ -13131,6 +13146,9 @@ msgstr "Nog niets gepubliceerd in de laatste 30 dagen. Je positie verschijnt zod
 msgid "Nothing to connect: it works on its own."
 msgstr "Niets te koppelen: hij werkt op zichzelf."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Er is nog niets te doen in deze chat."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nog niets om te openen. Stuur eerst een bericht."
 
@@ -13389,6 +13407,9 @@ msgstr "Alleen uitgenodigde personen"
 
 msgid "Only people who opted in appear here."
 msgstr "Alleen mensen die zich hebben aangemeld verschijnen hier."
+
+msgid "Only remind me then"
+msgstr "Mij er dan alleen aan herinneren"
 
 msgid "Only the author can change a comment"
 msgstr "Alleen de auteur kan een reactie wijzigen"
@@ -19532,6 +19553,9 @@ msgstr "De knop valt nu op. Ik heb het gecontroleerd in je paneel."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "De wijziging gaat nu in. Je betaalt alleen het verschil voor de rest van deze periode."
 
+msgid "The chat gets a reminder then"
+msgstr "De chat krijgt dan een herinnering"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "De chat blijft zoals hij is. Bestanden die sinds deze beurt door wie dan ook zijn bewerkt, blijven ongemoeid en worden vermeld."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunnel opgezet"
 msgid "Turn Fast mode on or off"
 msgstr "Snelle modus in- of uitschakelen"
 
+msgid "Turn into task"
+msgstr "Omzetten in taak"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Je kunt het weer aanzetten via Instellingen → Algemeen."
 
@@ -21874,6 +21901,9 @@ msgstr "Wat hij doet"
 msgid "What it does, and how you want it to work"
 msgstr "Wat hij doet en hoe je wilt dat hij werkt"
 
+msgid "What needs doing"
+msgstr "Wat er moet gebeuren"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Op welke platforms draait Paradev?"
 
@@ -22194,9 +22224,6 @@ msgstr "Wil je hem opnieuw toewijzen?"
 
 msgid "Wrap lines"
 msgstr "Regels afbreken"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Schrijf /task en wat er moet gebeuren in de chat om er een toe te voegen."
 
 msgid "Write a comment"
 msgstr "Schrijf een reactie"

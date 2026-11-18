@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
 	chatDevs,
 	directDev,
@@ -8,6 +8,7 @@ import {
 	messageCopyText,
 	messagesOf,
 	renderMentions,
+	tasksOf,
 	typingLabel,
 } from "@superset/chats-core";
 import { chatTurns } from "@superset/chats-sync";
@@ -20,7 +21,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
-import { LuChevronRight, LuPlug } from "react-icons/lu";
+import { LuChevronRight, LuPlug, LuSquareCheck } from "react-icons/lu";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { useNow } from "renderer/hooks/useNow";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
@@ -39,6 +40,7 @@ import { ChatDetailsPanel } from "../ChatDetailsPanel";
 import { ChatThread } from "../ChatThread";
 import { MessageDetailsPanel } from "../MessageDetailsPanel";
 import type { MessageActions } from "../MessageItem";
+import { NewTaskDialog } from "../NewTaskDialog";
 import { PagePanel } from "../PagePanel";
 import { TaskPanel } from "../TaskPanel";
 import { WorkspaceChatPanel } from "../WorkspaceChatPanel";
@@ -53,6 +55,7 @@ type Panel =
 
 const NOW_TICK_MS = 30_000;
 const HIGHLIGHT_MS = 1600;
+const TASK_TITLE_MAX = 120;
 
 /** One chat: its header pill, the conversation, the composer, and the details beside it. */
 export function ChatScreen({ chatId }: { chatId: string }) {
@@ -64,6 +67,10 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 	const [editing, setEditing] = useState<Message | null>(null);
 	const [panel, setPanel] = useState<Panel | null>(null);
 	const [showsPlugins, setShowsPlugins] = useState(false);
+	const [newTask, setNewTask] = useState<{
+		title: string;
+		description: string;
+	} | null>(null);
 	const preview = useMemo<Preview>(
 		() => ({
 			openWorkspace: (id) => setPanel({ kind: "workspace", id }),
@@ -138,6 +145,20 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			answerForm: (questionId, answers) =>
 				dispatch?.({ type: "answer-form", questionId, answers }),
 			details: (message) => setPanel({ kind: "message", id: message.id }),
+			turnIntoTask: (message) => {
+				const current = stateRef.current;
+				const text = (
+					current ? messageCopyText(current, message) : message.text
+				).trim();
+				const [first = "", ...rest] = text.split("\n");
+				const long = first.length > TASK_TITLE_MAX;
+				setNewTask({
+					title: long
+						? `${first.slice(0, TASK_TITLE_MAX - 1).trimEnd()}…`
+						: first,
+					description: long ? text : rest.join("\n").trim(),
+				});
+			},
 			openTask: (id) => setPanel({ kind: "task", id }),
 			toggleTask: (taskId) => dispatch?.({ type: "toggle-task", taskId }),
 			retry: (message) =>
@@ -238,6 +259,9 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 			? state.tasks.find((task) => task.id === panel.id)
 			: undefined;
 	const close = () => setPanel(null);
+	const openTaskCount = tasksOf(state, chatId).filter(
+		(task) => task.status !== "done",
+	).length;
 
 	return (
 		<div className="flex h-full w-full min-w-0 flex-1 overflow-hidden">
@@ -261,7 +285,23 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 						</span>
 						<LuChevronRight className="size-3.5 shrink-0 text-muted-foreground" />
 					</button>
-					<div className="drag flex h-full flex-1 basis-0 items-center justify-end pr-2">
+					<div className="drag flex h-full flex-1 basis-0 items-center justify-end gap-1 pr-2">
+						<button
+							type="button"
+							onClick={() =>
+								openTaskCount === 0
+									? setNewTask({ title: "", description: "" })
+									: setPanel({ kind: "details" })
+							}
+							className="no-drag flex h-8 shrink-0 whitespace-nowrap items-center gap-1.5 rounded-lg px-2 text-muted-foreground text-sm hover:bg-fill-hover hover:text-foreground"
+						>
+							<LuSquareCheck className="size-3.5 shrink-0" />
+							{openTaskCount === 0 ? (
+								<Trans>New task</Trans>
+							) : (
+								<Plural value={openTaskCount} one="# task" other="# tasks" />
+							)}
+						</button>
 						{ownDev && (
 							<button
 								type="button"
@@ -357,6 +397,7 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 							setReplyTo(null);
 							setEditing(null);
 						}}
+						onNewTask={() => setNewTask({ title: "", description: "" })}
 						onEditLast={() => {
 							const last = lastEditableMessage(state, chatId);
 							if (last) setEditing(last);
@@ -408,6 +449,18 @@ export function ChatScreen({ chatId }: { chatId: string }) {
 					title={title}
 					onClose={close}
 					onOpenTask={(id) => setPanel({ kind: "task", id })}
+					onNewTask={() => setNewTask({ title: "", description: "" })}
+				/>
+			)}
+			{newTask && (
+				<NewTaskDialog
+					state={state}
+					chat={chat}
+					now={now}
+					initial={newTask}
+					onOpenChange={(open) => !open && setNewTask(null)}
+					onCreate={(form) => chats.taskActions.create(chatId, form)}
+					onCreated={(id) => setPanel({ kind: "task", id })}
 				/>
 			)}
 		</div>

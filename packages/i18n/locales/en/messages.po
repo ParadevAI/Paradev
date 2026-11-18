@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Your account is deactivated and will be per
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} starts now and reminds you then"
+
+msgid "{devName} starts then"
+msgstr "{devName} starts then"
+
 msgid "{distance} ago"
 msgstr "{distance} ago"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Specify at least one repository.} channel {Sp
 
 msgid "{openCount} open"
 msgstr "{openCount} open"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, one {# task} other {# tasks}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
@@ -2016,6 +2025,9 @@ msgstr "Add a ready-made Dev"
 
 msgid "Add a short summary…"
 msgstr "Add a short summary…"
+
+msgid "Add a task to this chat"
+msgstr "Add a task to this chat"
 
 msgid "Add account"
 msgstr "Add account"
@@ -6664,6 +6676,9 @@ msgstr "Data & APIs"
 msgid "Data display"
 msgstr "Data display"
 
+msgid "Date"
+msgstr "Date"
+
 msgid "Date created"
 msgstr "Date created"
 
@@ -7054,6 +7069,9 @@ msgstr "Detached"
 
 msgid "Details"
 msgstr "Details"
+
+msgid "Details (optional)"
+msgstr "Details (optional)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Details are not available here, but the link still opens."
@@ -12459,9 +12477,6 @@ msgstr "No contributors found."
 msgid "No credit card required."
 msgstr "No credit card required."
 
-msgid "No date"
-msgstr "No date"
-
 msgid "No description"
 msgstr "No description"
 
@@ -13131,6 +13146,9 @@ msgstr "Nothing published in the last 30 days yet. Your rank appears once usage 
 msgid "Nothing to connect: it works on its own."
 msgstr "Nothing to connect: it works on its own."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Nothing to do in this chat yet."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Nothing to open yet. Send a message first."
 
@@ -13389,6 +13407,9 @@ msgstr "Only people invited"
 
 msgid "Only people who opted in appear here."
 msgstr "Only people who opted in appear here."
+
+msgid "Only remind me then"
+msgstr "Only remind me then"
 
 msgid "Only the author can change a comment"
 msgstr "Only the author can change a comment"
@@ -19532,6 +19553,9 @@ msgstr "The button now stands out. I checked it in your pane."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "The change starts now. You pay only the difference for the rest of this period."
 
+msgid "The chat gets a reminder then"
+msgstr "The chat gets a reminder then"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunnel established"
 msgid "Turn Fast mode on or off"
 msgstr "Turn Fast mode on or off"
 
+msgid "Turn into task"
+msgstr "Turn into task"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Turn it back on in Settings → General."
 
@@ -21874,6 +21901,9 @@ msgstr "What it does"
 msgid "What it does, and how you want it to work"
 msgstr "What it does, and how you want it to work"
 
+msgid "What needs doing"
+msgstr "What needs doing"
+
 msgid "What platforms does Paradev run on?"
 msgstr "What platforms does Paradev run on?"
 
@@ -22194,9 +22224,6 @@ msgstr "Would you like to reassign it?"
 
 msgid "Wrap lines"
 msgstr "Wrap lines"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Write /task and what needs doing in the chat to add one."
 
 msgid "Write a comment"
 msgstr "Write a comment"

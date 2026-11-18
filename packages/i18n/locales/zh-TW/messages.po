@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {你的帳戶已停用，將在#天後被永
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} 現在開始,並在那時提醒你"
+
+msgid "{devName} starts then"
+msgstr "{devName} 在那時開始"
+
 msgid "{distance} ago"
 msgstr "{distance}前"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {請至少指定一個倉庫。} channel {請�
 
 msgid "{openCount} open"
 msgstr "{openCount}項已開啟"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, other {# 個任務}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {此工作區中還有更改：# 個檔案} other {此工作區中還有更改：# 個檔案}}"
@@ -2016,6 +2025,9 @@ msgstr "新增現成的 Dev"
 
 msgid "Add a short summary…"
 msgstr "新增簡短摘要…"
+
+msgid "Add a task to this chat"
+msgstr "在此聊天新增任務"
 
 msgid "Add account"
 msgstr "新增帳戶"
@@ -6664,6 +6676,9 @@ msgstr "資料與 API"
 msgid "Data display"
 msgstr "資料展示"
 
+msgid "Date"
+msgstr "日期"
+
 msgid "Date created"
 msgstr "建立日期"
 
@@ -7054,6 +7069,9 @@ msgstr "已分離"
 
 msgid "Details"
 msgstr "詳情"
+
+msgid "Details (optional)"
+msgstr "詳細資訊(選填)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "此處無法顯示詳細資料，但連結仍可開啟。"
@@ -12459,9 +12477,6 @@ msgstr "未找到貢獻者。"
 msgid "No credit card required."
 msgstr "無需信用卡。"
 
-msgid "No date"
-msgstr "無日期"
-
 msgid "No description"
 msgstr "無描述"
 
@@ -13131,6 +13146,9 @@ msgstr "最近 30 天尚未發佈任何資料。這台機器的用量同步後�
 msgid "Nothing to connect: it works on its own."
 msgstr "不需要連接任何項目：它可以獨立運作。"
 
+msgid "Nothing to do in this chat yet."
+msgstr "此聊天目前沒有待辦事項。"
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "目前沒有可開啟的內容。請先傳送一則訊息。"
 
@@ -13389,6 +13407,9 @@ msgstr "僅受邀者"
 
 msgid "Only people who opted in appear here."
 msgstr "只有選擇加入的人才會出現在這裡。"
+
+msgid "Only remind me then"
+msgstr "到時僅提醒我"
 
 msgid "Only the author can change a comment"
 msgstr "只有作者可以修改留言"
@@ -19532,6 +19553,9 @@ msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "變更立即生效。您只需支付本期剩餘時間的差額。"
 
+msgid "The chat gets a reminder then"
+msgstr "聊天會在那時收到提醒"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "聊天保持不變。自本輪以來被任何人編輯過的檔案將保持不動並列出。"
 
@@ -20766,6 +20790,9 @@ msgstr "通道已建立"
 msgid "Turn Fast mode on or off"
 msgstr "開啟或關閉快速模式"
 
+msgid "Turn into task"
+msgstr "轉為任務"
+
 msgid "Turn it back on in Settings → General."
 msgstr "可在「設定 → 通用」中重新開啟。"
 
@@ -21874,6 +21901,9 @@ msgstr "它做什麼"
 msgid "What it does, and how you want it to work"
 msgstr "它做什麼，以及你希望它如何工作"
 
+msgid "What needs doing"
+msgstr "需要做什麼"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev支援哪些平臺？"
 
@@ -22194,9 +22224,6 @@ msgstr "要重新分配嗎？"
 
 msgid "Wrap lines"
 msgstr "自動換行"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "在聊天中輸入 /task 和要做的事即可新增。"
 
 msgid "Write a comment"
 msgstr "撰寫留言"

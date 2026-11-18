@@ -978,6 +978,12 @@ msgstr "{daysRemaining, plural, one {Akun Anda dinonaktifkan dan akan dihapus pe
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
 
+msgid "{devName} starts now and reminds you then"
+msgstr "{devName} mulai sekarang dan mengingatkan Anda saat itu"
+
+msgid "{devName} starts then"
+msgstr "{devName} mulai saat itu"
+
 msgid "{distance} ago"
 msgstr "{distance} lalu"
 
@@ -1200,6 +1206,9 @@ msgstr "{noun, select, repository {Tentukan minimal satu repositori.} channel {T
 
 msgid "{openCount} open"
 msgstr "{openCount} terbuka"
+
+msgid "{openTaskCount, plural, one {# task} other {# tasks}}"
+msgstr "{openTaskCount, plural, other {# tugas}}"
 
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Juga berubah di workspace ini: # file} other {Juga berubah di workspace ini: # file}}"
@@ -2016,6 +2025,9 @@ msgstr "Tambahkan Dev siap pakai"
 
 msgid "Add a short summary…"
 msgstr "Tambahkan ringkasan singkat…"
+
+msgid "Add a task to this chat"
+msgstr "Tambahkan tugas ke chat ini"
 
 msgid "Add account"
 msgstr "Tambah akun"
@@ -6664,6 +6676,9 @@ msgstr "Data & API"
 msgid "Data display"
 msgstr "Tampilan data"
 
+msgid "Date"
+msgstr "Tanggal"
+
 msgid "Date created"
 msgstr "Tanggal dibuat"
 
@@ -7054,6 +7069,9 @@ msgstr "Terlepas"
 
 msgid "Details"
 msgstr "Detail"
+
+msgid "Details (optional)"
+msgstr "Detail (opsional)"
 
 msgid "Details are not available here, but the link still opens."
 msgstr "Detail tidak tersedia di sini, tetapi tautan tetap bisa dibuka."
@@ -12459,9 +12477,6 @@ msgstr "Tidak ada kontributor ditemukan."
 msgid "No credit card required."
 msgstr "Tanpa kartu kredit."
 
-msgid "No date"
-msgstr "Tanpa tanggal"
-
 msgid "No description"
 msgstr "Tidak ada deskripsi"
 
@@ -13131,6 +13146,9 @@ msgstr "Belum ada yang dipublikasikan dalam 30 hari terakhir. Peringkat Anda mun
 msgid "Nothing to connect: it works on its own."
 msgstr "Tidak ada yang perlu dihubungkan: ia bekerja sendiri."
 
+msgid "Nothing to do in this chat yet."
+msgstr "Belum ada yang perlu dikerjakan di chat ini."
+
 msgid "Nothing to open yet. Send a message first."
 msgstr "Belum ada yang bisa dibuka. Kirim pesan dulu."
 
@@ -13389,6 +13407,9 @@ msgstr "Hanya orang yang diundang"
 
 msgid "Only people who opted in appear here."
 msgstr "Hanya orang yang memilih ikut serta yang muncul di sini."
+
+msgid "Only remind me then"
+msgstr "Hanya ingatkan saya saat itu"
 
 msgid "Only the author can change a comment"
 msgstr "Hanya penulis yang bisa mengubah komentar"
@@ -19532,6 +19553,9 @@ msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Perubahan berlaku sekarang. Anda hanya membayar selisih untuk sisa periode ini."
 
+msgid "The chat gets a reminder then"
+msgstr "Chat mendapat pengingat saat itu"
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Chat tetap seperti adanya. File yang diedit sejak giliran ini, oleh siapa pun, dibiarkan dan dicantumkan."
 
@@ -20766,6 +20790,9 @@ msgstr "Tunnel tersambung"
 msgid "Turn Fast mode on or off"
 msgstr "Aktifkan atau nonaktifkan mode cepat"
 
+msgid "Turn into task"
+msgstr "Jadikan tugas"
+
 msgid "Turn it back on in Settings → General."
 msgstr "Anda dapat mengaktifkannya lagi di Pengaturan → Umum."
 
@@ -21874,6 +21901,9 @@ msgstr "Yang dilakukannya"
 msgid "What it does, and how you want it to work"
 msgstr "Apa yang dilakukannya dan bagaimana Anda ingin ia bekerja"
 
+msgid "What needs doing"
+msgstr "Apa yang perlu dikerjakan"
+
 msgid "What platforms does Paradev run on?"
 msgstr "Paradev berjalan di platform apa saja?"
 
@@ -22194,9 +22224,6 @@ msgstr "Ingin menetapkannya ulang?"
 
 msgid "Wrap lines"
 msgstr "Bungkus baris"
-
-msgid "Write /task and what needs doing in the chat to add one."
-msgstr "Tulis /task dan apa yang perlu dikerjakan di chat untuk menambahkannya."
 
 msgid "Write a comment"
 msgstr "Tulis komentar"
