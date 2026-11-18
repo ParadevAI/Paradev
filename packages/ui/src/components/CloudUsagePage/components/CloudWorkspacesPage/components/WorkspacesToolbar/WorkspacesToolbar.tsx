@@ -15,7 +15,7 @@ const SEARCH_DELAY_MS = 300;
 
 interface WorkspacesToolbarProps {
 	filters: WorkspacesFilters;
-	/** Owners and admins filter by person; a member sees only their own workspaces. */
+	/** Null for a member, who has only the search box, as in the design. */
 	people: PersonRef[] | null;
 	onChange: (filters: WorkspacesFilters) => void;
 }
@@ -53,34 +53,36 @@ export function WorkspacesToolbar({
 				/>
 			</div>
 			{people && (
-				<FilterSelect
-					any={t({ message: "Any person" })}
-					value={filters.user}
-					options={people.map((person) => ({
-						value: person.id,
-						label: person.name,
-					}))}
-					onChange={(user) => onChange({ ...filters, user })}
-				/>
+				<>
+					<FilterSelect
+						any={t({ message: "Any person" })}
+						value={filters.user}
+						options={people.map((person) => ({
+							value: person.id,
+							label: person.name,
+						}))}
+						onChange={(user) => onChange({ ...filters, user })}
+					/>
+					<FilterSelect
+						any={t({ message: "Any size" })}
+						value={filters.size}
+						options={MACHINE_SIZES.map((size) => ({
+							value: size,
+							label: i18n._(MACHINE_SIZE_NAMES[size]),
+						}))}
+						onChange={(size) => onChange({ ...filters, size })}
+					/>
+					<FilterSelect
+						any={t({ message: "Any status" })}
+						value={filters.status}
+						options={FILTER_STATUSES.map((status) => ({
+							value: status,
+							label: i18n._(STATUS_PILLS[status].label),
+						}))}
+						onChange={(status) => onChange({ ...filters, status })}
+					/>
+				</>
 			)}
-			<FilterSelect
-				any={t({ message: "Any size" })}
-				value={filters.size}
-				options={MACHINE_SIZES.map((size) => ({
-					value: size,
-					label: i18n._(MACHINE_SIZE_NAMES[size]),
-				}))}
-				onChange={(size) => onChange({ ...filters, size })}
-			/>
-			<FilterSelect
-				any={t({ message: "Any status" })}
-				value={filters.status}
-				options={FILTER_STATUSES.map((status) => ({
-					value: status,
-					label: i18n._(STATUS_PILLS[status].label),
-				}))}
-				onChange={(status) => onChange({ ...filters, status })}
-			/>
 		</div>
 	);
 }
