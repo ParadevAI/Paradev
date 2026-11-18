@@ -29,6 +29,7 @@ const ROW = {
 let running = false;
 let boxVcpus = 8;
 let restartedWith: string[] = [];
+let woken: string[] = [];
 
 const ENVIRONMENT_ID = "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b";
 let inserted: unknown[] = [];
@@ -128,6 +129,13 @@ stub(sandbox, {
 	workspaceBranchName: () => "paradev/ws-1",
 });
 stub(wake, {
+	wakeCloudWorkspace: async (row: { id: string }) => {
+		woken.push(row.id);
+		return {
+			hostTarget: "https://box-1.example",
+			agentCredentialsChanged: false,
+		};
+	},
 	restartCloudWorkspace: async (row: { machineSize: string }) => {
 		restartedWith.push(row.machineSize);
 		boxVcpus = 16;
@@ -160,6 +168,7 @@ beforeEach(() => {
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
+	woken = [];
 	recordedAsleep = [];
 	inserted = [];
 	queuedJobs = [];
@@ -250,6 +259,21 @@ describe("cloudWorkspace.setMachineSize", () => {
 				machineSize: "2xlarge",
 			}),
 		).rejects.toThrow('Machine size "2xlarge" is not available');
+	});
+});
+
+describe("cloudWorkspace.applySignIns", () => {
+	test("hands sign-ins to a running box, and leaves a stopped one for its next wake", async () => {
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: false });
+		expect(woken).toEqual([]);
+
+		running = true;
+		expect(
+			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
+		).toEqual({ applied: true });
+		expect(woken).toEqual([WORKSPACE_ID]);
 	});
 });
 
