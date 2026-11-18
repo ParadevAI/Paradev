@@ -2,8 +2,11 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Kbd } from "@superset/ui/kbd";
 import { ArrowLeft, Bot, Square } from "lucide-react";
 import type { KeyboardEvent, Ref } from "react";
+import { formatHotkeyDisplay, PLATFORM } from "renderer/hotkeys";
 import { PILL_TRIGGER_CLASS } from "renderer/routes/_authenticated/components/AgentComposer/constants";
 import type { ComposerTarget } from "../../../Composer";
+
+const BACK_KEYS = formatHotkeyDisplay("escape", PLATFORM).text;
 
 export function SubagentNotice({
 	target,
@@ -89,7 +92,7 @@ export function SubagentNotice({
 					{parentTitle
 						? t({ message: `Back to ${parentTitle}` })
 						: t({ message: "Back to main chat" })}
-					<Kbd className="ml-0.5">Esc</Kbd>
+					<Kbd className="ml-0.5">{BACK_KEYS}</Kbd>
 				</button>
 			</div>
 		</div>
