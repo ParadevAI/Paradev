@@ -18,7 +18,7 @@ import {
 	createTRPCContext,
 	createTRPCRouter,
 } from "../../trpc";
-import { type CloudDeps, cloudRouterWith } from "./cloud";
+import { type CloudDeps, catalogListRate, cloudRouterWith } from "./cloud";
 
 const CLOUD_USAGE: CloudUsage = {
 	includedGbMinutes: 1200,
@@ -47,15 +47,18 @@ function caller(
 	{
 		enabled = true,
 		readCloudUsage = async () => CLOUD_USAGE,
+		listRatePerGbHour = async () => null,
 	}: {
 		enabled?: boolean;
 		readCloudUsage?: CloudDeps["cloudUsage"];
+		listRatePerGbHour?: CloudDeps["listRatePerGbHour"];
 	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
 			cloudUsage: readCloudUsage,
+			listRatePerGbHour,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
 	});
@@ -521,4 +524,92 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 			(field) => ({ field, reason: "not_read" }),
 		),
 	);
+});
+
+describe("an organization with no rate of its own", () => {
+	const LIST_RATE = 0.06;
+
+	test("with no subscription, usage is in dollars at the list rate", async () => {
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total).toMatchObject({ gbHours: 34, usageUsd: 2.04 });
+		const boots = await owner.boots.list({ range: NOVEMBER });
+		expect(boots.items.every((boot) => boot.usageUsd !== null)).toBe(true);
+	});
+
+	test("with a billing value but no plan rate, the period and its allowance are at the list rate", async () => {
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: null }),
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const [open] = (await owner.periods.list({})).items;
+		expect(open?.metrics.usageUsd).toBe(2.04);
+		expect(open?.allowance).toMatchObject({ usedUsd: 2.04, includedUsd: 1.2 });
+	});
+
+	test("in an Autumn outage, usage is priced from the cached catalog", async () => {
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => null,
+			listRatePerGbHour: () =>
+				catalogListRate(async () => [
+					{
+						id: "team_seat",
+						name: "Team seat",
+						price: { amount: 60, interval: "month" },
+						items: [{ featureId: "box_gb_minutes", included: 72000 }],
+					},
+					{
+						id: "team",
+						name: "Team",
+						metadata: { self_serve: true, family: "team", display_order: 2 },
+						licenses: [{ licensePlanId: "team_seat" }],
+						items: [
+							{
+								featureId: "box_gb_minutes",
+								price: { amount: 1, interval: "month", billingUnits: 1000 },
+							},
+						],
+					},
+				]),
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBe(2.04);
+	});
+
+	test("when the catalog cannot be read either, there is no price, never a wrong one", async () => {
+		const failing = async () => {
+			throw new Error("Autumn is down and nothing is cached");
+		};
+		expect(await catalogListRate(failing)).toBeNull();
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => ({
+				...CLOUD_USAGE,
+				overagePerGbHour: null,
+				bought: null,
+			}),
+			listRatePerGbHour: () => catalogListRate(failing),
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+		const [open] = (await owner.periods.list({})).items;
+		expect(open?.allowance?.usedUsd).toBeNull();
+		expect(open?.unavailable).toContainEqual({
+			field: "seats",
+			reason: "not_read",
+		});
+	});
+
+	test("an organization with its own rate keeps it, and the catalog is not read", async () => {
+		const listRatePerGbHour = mock(async () => LIST_RATE);
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: 0.1 }),
+			listRatePerGbHour,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeCloseTo(3.4);
+		expect(listRatePerGbHour).not.toHaveBeenCalled();
+	});
 });
