@@ -1163,6 +1163,9 @@ msgstr "{name} đã thất bại"
 msgid "{name} finished"
 msgstr "{name} đã xong"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Nhóm {name}, {count, plural, other {# workspace}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} là tích hợp sẵn nên không thể gỡ"
@@ -6018,6 +6021,9 @@ msgstr "Không thể tạo nhánh hội thoại"
 msgid "Couldn't cancel the move"
 msgstr "Không thể hủy việc chuyển"
 
+msgid "Couldn't change the group color"
+msgstr "Không thể đổi màu nhóm"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Không thể đổi kích thước máy: {0}"
@@ -6064,8 +6070,14 @@ msgstr "Không thể tạo stack"
 msgid "Couldn't create the channel"
 msgstr "Không thể tạo kênh"
 
+msgid "Couldn't create the group"
+msgstr "Không thể tạo nhóm"
+
 msgid "Couldn't create workspace"
 msgstr "Không thể tạo workspace"
+
+msgid "Couldn't delete the group"
+msgstr "Không thể xóa nhóm"
 
 msgid "Couldn't discard changes"
 msgstr "Không thể bỏ các thay đổi"
@@ -6153,6 +6165,9 @@ msgstr "Không thể chuyển {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Không thể chuyển agent con sang chạy nền"
 
+msgid "Couldn't move the workspace"
+msgstr "Không thể di chuyển workspace"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Không thể tự động đặt tên cho \"{name}\""
 
@@ -6202,6 +6217,9 @@ msgstr "Không thể gỡ khỏi hàng đợi merge"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Không thể xóa phiên đăng nhập cục bộ"
+
+msgid "Couldn't rename the group"
+msgstr "Không thể đổi tên nhóm"
 
 msgid "Couldn't restart terminals"
 msgstr "Không thể khởi động lại terminal"

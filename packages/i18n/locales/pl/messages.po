@@ -1163,6 +1163,9 @@ msgstr "{name} — błąd"
 msgid "{name} finished"
 msgstr "{name} skończył"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Grupa {name}, {count, plural, one {# obszar roboczy} few {# obszary robocze} many {# obszarów roboczych} other {# obszaru roboczego}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} jest wbudowany i nie można go usunąć"
@@ -6018,6 +6021,9 @@ msgstr "Nie udało się rozgałęzić rozmowy"
 msgid "Couldn't cancel the move"
 msgstr "Nie udało się anulować przenoszenia"
 
+msgid "Couldn't change the group color"
+msgstr "Nie udało się zmienić koloru grupy"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Nie udało się zmienić rozmiaru maszyny: {0}"
@@ -6064,8 +6070,14 @@ msgstr "Nie udało się utworzyć stosu"
 msgid "Couldn't create the channel"
 msgstr "Nie udało się utworzyć kanału"
 
+msgid "Couldn't create the group"
+msgstr "Nie udało się utworzyć grupy"
+
 msgid "Couldn't create workspace"
 msgstr "Nie udało się utworzyć obszaru roboczego"
+
+msgid "Couldn't delete the group"
+msgstr "Nie udało się usunąć grupy"
 
 msgid "Couldn't discard changes"
 msgstr "Nie udało się odrzucić zmian"
@@ -6153,6 +6165,9 @@ msgstr "Nie udało się przenieść {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Nie udało się przenieść subagenta w tło"
 
+msgid "Couldn't move the workspace"
+msgstr "Nie udało się przenieść obszaru roboczego"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nie udało się automatycznie nazwać „{name}”"
 
@@ -6202,6 +6217,9 @@ msgstr "Nie udało się usunąć z kolejki scalania"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Nie udało się usunąć lokalnego logowania"
+
+msgid "Couldn't rename the group"
+msgstr "Nie udało się zmienić nazwy grupy"
 
 msgid "Couldn't restart terminals"
 msgstr "Nie udało się zrestartować terminali"

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "bun:test";
-import { SESSIONS_TAG_SCOPE } from "@superset/shared/workspace-tags";
 import {
 	applyFolderTagChange,
 	buildSidebarFolderKey,
@@ -14,7 +13,8 @@ import {
 	resolveWorkspaceSectionId,
 	type TagFolderSectionInput,
 	type TagFolderWorkspaceInput,
-} from "./workspaceTagFolders";
+} from "./workspace-tag-folders";
+import { SESSIONS_TAG_SCOPE } from "./workspace-tags";
 
 const PROJECT_A = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const PROJECT_B = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -516,7 +516,7 @@ describe("deriveTagFolders with host settings and hidden folders", () => {
 			hiddenTagsByProject: new Map<string, ReadonlySet<string>>(),
 		};
 		for (const row of [stored, JSON.parse(JSON.stringify(stored))]) {
-			expect(deriveTagFolders([row], [], context)[0].tabOrder).toBe(1);
+			expect(deriveTagFolders([row], [], context)[0]?.tabOrder).toBe(1);
 		}
 	});
 

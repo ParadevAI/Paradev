@@ -1,3 +1,4 @@
+import type { TagFolderContext } from "@superset/shared/workspace-tag-folders";
 import { useMemo } from "react";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import {
@@ -5,7 +6,6 @@ import {
 	useHostTagFolders,
 } from "renderer/hooks/host-projects/useHostTagFolders";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
-import type { TagFolderContext } from "./workspaceTagFolders";
 
 /**
  * The one presentation context every membership pass shares: host-side tag

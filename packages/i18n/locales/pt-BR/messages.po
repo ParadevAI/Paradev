@@ -1163,6 +1163,9 @@ msgstr "{name} falhou"
 msgid "{name} finished"
 msgstr "{name} terminou"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Grupo {name}, {count, plural, one {# área de trabalho} other {# áreas de trabalho}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} é integrado e não pode ser removido"
@@ -6018,6 +6021,9 @@ msgstr "Não foi possível ramificar a conversa"
 msgid "Couldn't cancel the move"
 msgstr "Não foi possível cancelar a movimentação"
 
+msgid "Couldn't change the group color"
+msgstr "Não foi possível alterar a cor do grupo"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Não foi possível alterar o tamanho da máquina: {0}"
@@ -6064,8 +6070,14 @@ msgstr "Não foi possível criar a pilha"
 msgid "Couldn't create the channel"
 msgstr "Não foi possível criar o canal"
 
+msgid "Couldn't create the group"
+msgstr "Não foi possível criar o grupo"
+
 msgid "Couldn't create workspace"
 msgstr "Não foi possível criar a área de trabalho"
+
+msgid "Couldn't delete the group"
+msgstr "Não foi possível excluir o grupo"
 
 msgid "Couldn't discard changes"
 msgstr "Não foi possível descartar as alterações"
@@ -6153,6 +6165,9 @@ msgstr "Não foi possível mover {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Não foi possível mover o subagente para segundo plano"
 
+msgid "Couldn't move the workspace"
+msgstr "Não foi possível mover a área de trabalho"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Não foi possível nomear \"{name}\" automaticamente"
 
@@ -6202,6 +6217,9 @@ msgstr "Não foi possível remover da fila de merge"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Não foi possível remover o login local"
+
+msgid "Couldn't rename the group"
+msgstr "Não foi possível renomear o grupo"
 
 msgid "Couldn't restart terminals"
 msgstr "Não foi possível reiniciar os terminais"

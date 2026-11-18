@@ -1163,6 +1163,9 @@ msgstr "{name} 실패"
 msgid "{name} finished"
 msgstr "{name} 완료"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} 그룹, {count, plural, other {워크스페이스 #개}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name}은(는) 기본 제공이라 제거할 수 없습니다"
@@ -6018,6 +6021,9 @@ msgstr "대화를 분기할 수 없습니다"
 msgid "Couldn't cancel the move"
 msgstr "옮기기를 취소하지 못했습니다"
 
+msgid "Couldn't change the group color"
+msgstr "그룹 색상을 바꿀 수 없습니다"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "머신 크기를 변경하지 못했습니다: {0}"
@@ -6064,8 +6070,14 @@ msgstr "스택을 만들지 못했습니다"
 msgid "Couldn't create the channel"
 msgstr "채널을 만들 수 없습니다"
 
+msgid "Couldn't create the group"
+msgstr "그룹을 만들 수 없습니다"
+
 msgid "Couldn't create workspace"
 msgstr "워크스페이스를 만들지 못했습니다"
+
+msgid "Couldn't delete the group"
+msgstr "그룹을 삭제할 수 없습니다"
 
 msgid "Couldn't discard changes"
 msgstr "변경 사항을 버리지 못했습니다"
@@ -6153,6 +6165,9 @@ msgstr "{name}을(를) 옮기지 못했습니다"
 msgid "Couldn't move the subagent to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
+msgid "Couldn't move the workspace"
+msgstr "워크스페이스를 이동할 수 없습니다"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
 
@@ -6202,6 +6217,9 @@ msgstr "머지 대기열에서 빼지 못했습니다"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "로컬 로그인 정보를 제거하지 못했습니다"
+
+msgid "Couldn't rename the group"
+msgstr "그룹 이름을 바꿀 수 없습니다"
 
 msgid "Couldn't restart terminals"
 msgstr "터미널을 다시 시작하지 못했습니다"

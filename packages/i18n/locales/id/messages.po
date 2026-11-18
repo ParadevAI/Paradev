@@ -1163,6 +1163,9 @@ msgstr "{name} gagal"
 msgid "{name} finished"
 msgstr "{name} selesai"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Grup {name}, {count, plural, other {# workspace}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} bawaan dan tidak dapat dihapus"
@@ -6018,6 +6021,9 @@ msgstr "Tidak dapat mencabangkan percakapan"
 msgid "Couldn't cancel the move"
 msgstr "Tidak dapat membatalkan pemindahan"
 
+msgid "Couldn't change the group color"
+msgstr "Tidak dapat mengubah warna grup"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Tidak dapat mengubah ukuran mesin: {0}"
@@ -6064,8 +6070,14 @@ msgstr "Gagal membuat stack"
 msgid "Couldn't create the channel"
 msgstr "Tidak dapat membuat kanal"
 
+msgid "Couldn't create the group"
+msgstr "Tidak dapat membuat grup"
+
 msgid "Couldn't create workspace"
 msgstr "Tidak bisa membuat workspace"
+
+msgid "Couldn't delete the group"
+msgstr "Tidak dapat menghapus grup"
 
 msgid "Couldn't discard changes"
 msgstr "Tidak bisa membuang perubahan"
@@ -6153,6 +6165,9 @@ msgstr "Tidak dapat memindahkan {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Tidak dapat memindahkan subagen ke latar belakang"
 
+msgid "Couldn't move the workspace"
+msgstr "Tidak dapat memindahkan workspace"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Tidak dapat menamai \"{name}\" secara otomatis"
 
@@ -6202,6 +6217,9 @@ msgstr "Gagal mengeluarkan dari antrean merge"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Tidak bisa menghapus sesi masuk lokal"
+
+msgid "Couldn't rename the group"
+msgstr "Tidak dapat mengganti nama grup"
 
 msgid "Couldn't restart terminals"
 msgstr "Tidak bisa memulai ulang terminal"

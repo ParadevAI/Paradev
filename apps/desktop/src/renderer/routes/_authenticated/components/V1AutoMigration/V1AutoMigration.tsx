@@ -1,3 +1,4 @@
+import { buildSidebarFolderKey } from "@superset/shared/workspace-tag-folders";
 import { useEffect, useRef, useState } from "react";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { authClient } from "renderer/lib/auth-client";
@@ -36,7 +37,6 @@ import { useFinalizeProjectSetup } from "renderer/react-query/projects";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { buildSidebarFolderKey } from "renderer/routes/_authenticated/utils/workspaceTagFolders/workspaceTagFolders";
 import { useV1MigrationStatusStore } from "renderer/stores/v1-migration-status";
 import { appendPendingMigratedTerminals } from "renderer/stores/workspace-creates/appendPendingMigratedTerminals";
 
