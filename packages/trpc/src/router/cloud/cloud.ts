@@ -109,14 +109,11 @@ export function cloudRouterWith(deps: CloudDeps) {
 			ctx,
 			deps.db,
 		);
-		const [enabled, cloudUsage] = await Promise.all([
-			organizationFlagEnabled(
-				deps.flags,
-				FEATURE_FLAGS.CLOUD_USAGE,
-				organizationId,
-			),
-			deps.cloudUsage(organizationId),
-		]);
+		const enabled = await organizationFlagEnabled(
+			deps.flags,
+			FEATURE_FLAGS.CLOUD_USAGE,
+			organizationId,
+		);
 		if (!enabled) {
 			throw userError({
 				code: "FORBIDDEN",
@@ -124,6 +121,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
 			});
 		}
+		const cloudUsage = await deps.cloudUsage(organizationId);
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };

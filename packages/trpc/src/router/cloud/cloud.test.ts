@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "bun:test";
+import { beforeAll, describe, expect, mock, test } from "bun:test";
 import type { CloudUsage } from "@superset/auth/billing";
 import {
 	ADA,
@@ -18,7 +18,7 @@ import {
 	createTRPCContext,
 	createTRPCRouter,
 } from "../../trpc";
-import { cloudRouterWith } from "./cloud";
+import { type CloudDeps, cloudRouterWith } from "./cloud";
 
 const CLOUD_USAGE: CloudUsage = {
 	includedGbMinutes: 1200,
@@ -42,12 +42,17 @@ function caller(
 	{
 		cloudUsage = CLOUD_USAGE,
 		enabled = true,
-	}: { cloudUsage?: CloudUsage | null; enabled?: boolean } = {},
+		readCloudUsage = async () => cloudUsage,
+	}: {
+		cloudUsage?: CloudUsage | null;
+		enabled?: boolean;
+		readCloudUsage?: CloudDeps["cloudUsage"];
+	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
-			cloudUsage: async () => cloudUsage,
+			cloudUsage: readCloudUsage,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
 	});
@@ -201,8 +206,9 @@ test("paging one row at a time with the opaque cursor returns every row once", a
 	).toEqual(boots.map((boot) => boot.id));
 });
 
-test("with the flag off every procedure is FORBIDDEN", async () => {
-	const off = caller(MAYA, { enabled: false });
+test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {
+	const readCloudUsage = mock(async () => CLOUD_USAGE);
+	const off = caller(MAYA, { enabled: false, readCloudUsage });
 	for (const call of [
 		() => off.usage.query({ range: "7d" }),
 		() => off.boots.list({ range: "7d" }),
@@ -210,6 +216,7 @@ test("with the flag off every procedure is FORBIDDEN", async () => {
 	]) {
 		await expect(call()).rejects.toMatchObject({ code: "FORBIDDEN" });
 	}
+	expect(readCloudUsage).not.toHaveBeenCalled();
 });
 
 test("periods run from the open one back to the one the organization was created in", async () => {
