@@ -16,6 +16,10 @@
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
 		},
+		"./feature-flags": {
+			"types": "./src/lib/feature-flags.ts",
+			"default": "./src/lib/feature-flags.ts"
+		},
 		"./sync-policy": {
 			"types": "./src/lib/sync-policy/syncPolicy.ts",
 			"default": "./src/lib/sync-policy/syncPolicy.ts"

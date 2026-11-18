@@ -1,4 +1,5 @@
 import { DashboardShell } from "./components/DashboardShell";
+import { cloudUsageEnabled } from "./utils/cloudUsageEnabled";
 import { requireSession } from "./utils/requireSession";
 
 export default async function AppLayout({
@@ -8,5 +9,9 @@ export default async function AppLayout({
 }) {
 	await requireSession();
 
-	return <DashboardShell>{children}</DashboardShell>;
+	return (
+		<DashboardShell showCloudUsage={await cloudUsageEnabled()}>
+			{children}
+		</DashboardShell>
+	);
 }

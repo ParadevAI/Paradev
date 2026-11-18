@@ -5,18 +5,27 @@ import { cn } from "@superset/ui/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { NAV_ITEMS } from "./constants";
+import { CLOUD_USAGE_NAV_ITEM, NAV_ITEMS } from "./constants";
 
 function isNavItemActive(pathname: string, href: string) {
 	return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarNav({
+	showCloudUsage,
+	onNavigate,
+}: {
+	showCloudUsage: boolean;
+	onNavigate?: () => void;
+}) {
 	const pathname = usePathname();
+	const items = showCloudUsage
+		? [...NAV_ITEMS, CLOUD_USAGE_NAV_ITEM]
+		: NAV_ITEMS;
 
 	return (
 		<nav className="flex flex-col gap-px px-2">
-			{NAV_ITEMS.map((item) => {
+			{items.map((item) => {
 				const isActive = isNavItemActive(pathname, item.href);
 				const Icon = item.icon;
 				const NavLink = item.reloadDocument ? "a" : Link;

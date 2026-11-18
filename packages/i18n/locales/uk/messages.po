@@ -1037,6 +1037,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} ГБ-годин"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# прихований рядок} few {# приховані рядки} many {# прихованих рядків} other {# прихованого рядка}}"
 
@@ -1355,6 +1358,12 @@ msgstr "{skipped, plural, one {# пропущено} few {# пропущено} 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} зірок, і це не межа"
 
+msgid "{start} to {end}"
+msgstr "З {start} по {end}"
+
+msgid "{start} to {end} (current)"
+msgstr "З {start} по {end} (поточний)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
 
@@ -1441,6 +1450,9 @@ msgstr "{user} знову приєднався(-лася)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} vCPU, {memory} ГБ"
 
 msgid "{waiting} Waiting"
 msgstr "Очікують: {waiting}"
@@ -3088,6 +3100,10 @@ msgstr "Архівувати робочий простір"
 msgid "Archived"
 msgstr "Архівовано"
 
+msgctxt "cloud workspace status"
+msgid "Archived"
+msgstr "В архіві"
+
 #. placeholder {0}: formatCompactRelativeTime(archivedAt, now)
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
@@ -3184,6 +3200,10 @@ msgstr "Запитує перед змінами й командами"
 
 msgid "Asks only for risky actions"
 msgstr "Запитує лише щодо ризикованих дій"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "Сплячий"
 
 msgid "Aspect Ratio"
 msgstr "Співвідношення сторін"
@@ -3557,6 +3577,9 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платіжні дані"
 
+msgid "Billing period"
+msgstr "Розрахунковий період"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Система оплати не дозволила запустити хмарний робочий простір: тариф організації не передбачає хмарних робочих просторів або досягнуто ліміту хмарного використання. Для хмарних робочих просторів потрібен тариф Team або Ultra. Перейдіть на вищий тариф або підвищте ліміт у Налаштування > Оплата чи запустіть автоматизацію на пристрої."
 
@@ -3621,6 +3644,9 @@ msgstr "Запустити"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "Запуск {0}…"
+
+msgid "Boots"
+msgstr "Запуски"
 
 msgid "Border"
 msgstr "Рамка"
@@ -4793,6 +4819,9 @@ msgstr "Використання хмари не ввімкнено для ці�
 msgid "Cloud workspace"
 msgstr "Хмарний робочий простір"
 
+msgid "Cloud workspace usage for the whole organization."
+msgstr "Використання хмарних робочих просторів у всій організації."
+
 msgid "Cloud workspace: asleep"
 msgstr "Хмарний робочий простір: у сплячому режимі"
 
@@ -4823,6 +4852,9 @@ msgstr "Хмарні робочі простори комітять, пушат�
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Хмарні робочі простори ігнорують цю змінну. Натомість агенти входять у розділі Налаштування › Агенти."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "Для хмарних робочих просторів потрібен платний тариф."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Для хмарних робочих просторів потрібен тариф Team або Ultra. Щоб запустити такий простір, перейдіть на вищий тариф у розділі Налаштування, Оплата."
@@ -5771,6 +5803,9 @@ msgstr "Не вдалося отримати вміст папки"
 msgid "Could not load agents from {0}"
 msgstr "Не вдалося завантажити агентів з {0}"
 
+msgid "Could not load cloud usage."
+msgstr "Не вдалося завантажити використання хмари."
+
 msgid "Could not load environments"
 msgstr "Не вдалося завантажити середовища"
 
@@ -5929,6 +5964,9 @@ msgstr "Не вдалося поділитися"
 
 msgid "Could not sign out. Please try again."
 msgstr "Не вдалося вийти. Спробуйте ще раз."
+
+msgid "Could not start"
+msgstr "Не вдалося запустити"
 
 msgid "Could not start agent"
 msgstr "Не вдалося запустити агента"
@@ -6352,6 +6390,9 @@ msgstr "Ядра CPU"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "Упирається в CPU"
+
+msgid "Crashed"
+msgstr "Збій"
 
 msgid "Create"
 msgstr "Створити"
@@ -6998,6 +7039,10 @@ msgstr "видалено"
 msgid "Deleted"
 msgstr "Видалено"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "Видалено"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "Видалено"
@@ -7044,6 +7089,9 @@ msgstr "Видалені проєкти можна відновити протя
 
 msgid "Deleted user"
 msgstr "Видалений користувач"
+
+msgid "Deleted workspace"
+msgstr "Видалений робочий простір"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "Робочі простори видалено, але не вдалося до кінця оновити бічну панель"
@@ -8256,6 +8304,13 @@ msgstr "Помилка"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "Помилка"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "Помилка"
+
+msgid "Failed {failedAt}"
+msgstr "Помилка: {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Невдалі запуски <0>· 7 дн.</0>"
@@ -9857,6 +9912,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Щогодини"
 
+msgid "Hours"
+msgstr "Години"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Години спільні для всієї команди. Вони розраховані на стандартний робочий простір {vcpus} vCPU / {memoryGb} ГБ, а потужніші машини витрачають їх швидше."
 
@@ -10647,6 +10705,9 @@ msgstr "Його коментарі та історію буде видален�
 msgid "Its connected accounts were disconnected."
 msgstr "Його підключені облікові записи від'єднано."
 
+msgid "Its machine no longer exists."
+msgstr "Його машини більше не існує."
+
 msgid "Its own branch and copy of the files"
 msgstr "Власна гілка й власна копія файлів"
 
@@ -10655,6 +10716,9 @@ msgstr "Його плагіни з'являться, коли синхроніз
 
 msgid "Its replies go with it."
 msgstr "Відповіді на нього буде видалено разом із ним."
+
+msgid "Its saved state expired."
+msgstr "Термін його збереженого стану минув."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на {computerName} починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."
@@ -12591,6 +12655,9 @@ msgstr "Немає відповідних автоматизацій"
 msgid "No billing period starts on {0}."
 msgstr "Жоден розрахунковий період не починається {0}."
 
+msgid "No boots in this period."
+msgstr "За цей період запусків немає."
+
 msgid "No branches found"
 msgstr "Гілок не знайдено"
 
@@ -12632,6 +12699,9 @@ msgstr "На цій машині ще не знайдено використан
 
 msgid "No cloud environment opens {repository}."
 msgstr "Жодне хмарне середовище не відкриває {repository}."
+
+msgid "No cloud usage in this period."
+msgstr "За цей період хмара не використовувалась."
 
 msgid "No cloud workspaces"
 msgstr "Немає хмарних робочих просторів"
@@ -12929,6 +12999,9 @@ msgstr "Немає запрошень, що очікують"
 
 msgid "No people found."
 msgstr "Людей не знайдено."
+
+msgid "No person recorded"
+msgstr "Особу не записано"
 
 msgid "No plugins available yet."
 msgstr "Доступних плагінів ще немає."
@@ -13694,6 +13767,9 @@ msgstr "Лише ви можете використовувати це підк�
 
 msgid "Only you. Teammates forward their own."
 msgstr "Лише ви. Колеги переадресовують власні."
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "Лише ваші робочі простори. Підсумки організації доступні власникам і адміністраторам."
 
 msgid "open"
 msgstr "відкрити"
@@ -15845,6 +15921,10 @@ msgstr "Читає й публікує"
 msgid "Ready"
 msgstr "Готово"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "Готово"
+
 msgid "Ready for review"
 msgstr "Готово до рев'ю"
 
@@ -16050,6 +16130,9 @@ msgstr "Віддати керування"
 
 msgid "Release…"
 msgstr "Реліз…"
+
+msgid "Released before use"
+msgstr "Звільнено до використання"
 
 msgid "Reload"
 msgstr "Перезавантажити"
@@ -16619,6 +16702,9 @@ msgstr "Перезапустити робочий простір"
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "Перезапустіть робочі простори, щоб застосувати нові облікові дані агента."
 
+msgid "Restarted"
+msgstr "Перезапущено"
+
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "Служби хоста перезапущено: {restartedOrgCount}"
 
@@ -17092,6 +17178,10 @@ msgstr "працює"
 
 msgid "Running"
 msgstr "Виконується"
+
+msgctxt "cloud workspace status"
+msgid "Running"
+msgstr "Працює"
 
 msgid "Running \"{name}\" now"
 msgstr "Запускаємо «{name}»"
@@ -17606,6 +17696,9 @@ msgstr "Перегляньте вакансії або спершу спробу
 
 msgid "See this gate on the scorecard"
 msgstr "Переглянути цей поріг у таблиці оцінок"
+
+msgid "See usage"
+msgstr "Переглянути використання"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Подивіться, що змінилося, залиште відгук і злийте роботу, коли вона буде готова."
@@ -19028,6 +19121,10 @@ msgstr "запускається"
 msgid "Starting"
 msgstr "Запуск"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "Запускається"
+
 msgid "Starting {agentLabel}"
 msgstr "Запускаємо {agentLabel}"
 
@@ -19181,11 +19278,17 @@ msgstr "Зупинено"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "Зупинено {0} ({1} ГБ), щоб звільнити пам'ять"
 
+msgid "Stopped by a person"
+msgstr "Зупинено людиною"
+
 msgid "Stopped by the usage limit"
 msgstr "Зупинено через ліміт використання"
 
 msgid "Stopped moving {name}"
 msgstr "Перенесення {name} зупинено"
+
+msgid "Stopped when idle"
+msgstr "Зупинено під час простою"
 
 msgid "Stopping the agent in {what}"
 msgstr "Зупинка агента в {what}"
@@ -20015,6 +20118,9 @@ msgstr "Людина читає кожен рядок перед злиттям.
 msgid "The image upload expired — attach it again"
 msgstr "Термін дії завантаженого зображення минув — прикріпіть його знову"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "Включені ГБ-години та ГБ-години понад тариф зберігаються лише для поточного періоду."
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Суть професії змінюється. Інженери перестають бути друкарями зі смаком і стають диспетчерами зі смаком: розбивають роботу на частини, розподіляють її між флотами агентів, розв'язують конфлікти між агентами, які змінили той самий модуль."
 
@@ -20086,6 +20192,9 @@ msgstr "Робочий простір з відкритим кодом для Cl
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Робочий простір з відкритим кодом для Claude Code, Codex, OpenCode і будь-якого кодинг-агента. Запускайте задачі паралельно в окремих гілках і переглядайте все в одному місці."
+
+msgid "The organization reached its usage limit."
+msgstr "Організація досягла ліміту використання."
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "Інша сторона переміщення використовує старішу версію. Перезапустіть хмарний робочий простір або оновіть хост пристрою, а потім спробуйте ще раз."
@@ -20231,8 +20340,17 @@ msgstr "Оновлення також зможе:"
 msgid "The very beginning"
 msgstr "Самісінький початок"
 
+msgid "The workspace could not be created."
+msgstr "Не вдалося створити робочий простір."
+
+msgid "The workspace could not be queued to start."
+msgstr "Не вдалося поставити запуск робочого простору в чергу."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "Не вдалося підключитися до робочого простору. Перевірте, що він запущений, і спробуйте ще раз."
+
+msgid "The workspace did not become ready."
+msgstr "Робочий простір не став готовим."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Робочий простір ще не готовий. Спробуйте ще раз."
@@ -20510,6 +20628,9 @@ msgstr "Це змінює лише відображувану назву, а н�
 
 msgid "this organization"
 msgstr "ця організація"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "Ця організація не має розрахункових періодів, тому на сторінці показано останні 30 днів."
 
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Ця організація не має розрахункових періодів. Виберіть часовий діапазон."
@@ -21625,8 +21746,17 @@ msgstr "Ідентифікатор для URL, унікальний у межа�
 msgid "Usage"
 msgstr "Використання"
 
+msgid "Usage by day"
+msgstr "Використання за днями"
+
+msgid "Usage by person"
+msgstr "Використання за людьми"
+
 msgid "Usage is out of date"
 msgstr "Дані про використання застаріли"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "Використання показано в день (UTC), коли його виставлено в рахунок; це може бути трохи пізніше, ніж працював робочий простір."
 
 msgid "Usage limit reached"
 msgstr "Досягнуто ліміту використання"
@@ -22763,6 +22893,9 @@ msgstr "У вас немає доступу до цього термінала."
 msgid "You don't have permission to remove this member"
 msgstr "У вас немає дозволу видалити цього учасника"
 
+msgid "You have no cloud usage in this period."
+msgstr "У цьому періоді ви не використовували хмару."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас є незбережені змінні середовища. Справді закрити?"
 
@@ -22878,6 +23011,9 @@ msgstr "Якщо не зберегти зміни, їх буде втрачен�
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "Історія чату збережеться. Перезапуститься лише агент."
 
+msgid "Your cloud usage"
+msgstr "Ваше використання хмари"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваші хмарні робочі простори більше не матимуть доступу до цього хоста."
 
@@ -22962,6 +23098,9 @@ msgstr "Ваш тариф не передбачає хмарних середо�
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Ваш тариф не передбачає хмарних середовищ. Покращте тариф у розділі «Налаштування», «Оплата», щоб створити середовище."
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "Ваш тариф не містить хмарних ГБ-годин."
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Ваш тариф зміниться на {planName} {startDate}. Сьогодні нічого не списується."
 
@@ -23009,6 +23148,9 @@ msgstr "Ваш рівень — це зважена оцінка за вимір
 msgid "Your tokens"
 msgstr "Ваші токени"
 
+msgid "Your usage by day"
+msgstr "Ваше використання за днями"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "Ваші проєкти й робочі простори з v1 переносяться в новий Paradev. Вони з'являються на бічній панелі в міру готовності."
 
@@ -23023,6 +23165,9 @@ msgstr "Адміністратор вашого робочого простор�
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "Ваш робочий простір не змінився. Його можна перенести знову за кілька хвилин."
+
+msgid "Your workspaces"
+msgstr "Ваші робочі простори"
 
 msgid "Zap"
 msgstr "Блискавка"

@@ -4,6 +4,7 @@ import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { Progress } from "@superset/ui/progress";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useTRPC } from "@/trpc/react";
 import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 import { GbHourPurchase } from "./components/GbHourPurchase";
@@ -11,11 +12,13 @@ import { GbHourPurchase } from "./components/GbHourPurchase";
 interface CloudUsageCardProps {
 	organizationId: string | null;
 	canBuy: boolean;
+	showUsageLink: boolean;
 }
 
 export function CloudUsageCard({
 	organizationId,
 	canBuy,
+	showUsageLink,
 }: CloudUsageCardProps) {
 	const trpc = useTRPC();
 	const { formatDate } = useFormat();
@@ -55,11 +58,21 @@ export function CloudUsageCard({
 				<div className="flex items-center gap-2 text-sm font-medium">
 					<Trans>Cloud usage</Trans>
 				</div>
-				{resetDate && (
-					<div className="text-sm text-muted-foreground">
-						<Trans>Resets {resetDate}</Trans>
-					</div>
-				)}
+				<div className="flex items-baseline gap-3 text-sm">
+					{resetDate && (
+						<span className="text-muted-foreground">
+							<Trans>Resets {resetDate}</Trans>
+						</span>
+					)}
+					{showUsageLink && (
+						<Link
+							href="/settings/cloud-usage"
+							className="text-primary hover:underline"
+						>
+							<Trans>See usage</Trans>
+						</Link>
+					)}
+				</div>
 			</div>
 			<div className="text-sm tabular-nums">
 				{included === null ? (

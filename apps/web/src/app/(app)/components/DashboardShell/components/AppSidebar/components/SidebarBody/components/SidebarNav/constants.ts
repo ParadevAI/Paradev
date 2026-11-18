@@ -3,6 +3,7 @@ import { msg } from "@lingui/core/macro";
 import {
 	Blocks,
 	Bot,
+	Cloud,
 	CreditCard,
 	Home,
 	type LucideIcon,
@@ -45,3 +46,9 @@ export const NAV_ITEMS: NavItem[] = [
 		icon: CreditCard,
 	},
 ];
+
+export const CLOUD_USAGE_NAV_ITEM: NavItem = {
+	href: "/settings/cloud-usage",
+	label: msg({ message: "Cloud usage" }),
+	icon: Cloud,
+};
