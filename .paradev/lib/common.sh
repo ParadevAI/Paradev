@@ -104,8 +104,7 @@ validate_json() {
 
   if ! echo "$output" | jq empty 2>/dev/null; then
     error "$error_context: Invalid JSON output"
-    echo "Raw output:" >&2
-    echo "$output" >&2
+    echo "Output length: ${#output} characters (not printed: it can hold credentials)" >&2
     return 1
   fi
 
