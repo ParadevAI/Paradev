@@ -6039,6 +6039,9 @@ msgstr "Die Nutzlast dieser Ausführung konnte nicht geladen werden."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Deine Chats konnten nicht geladen werden. Neuer Versuch…"
 
+msgid "Couldn't load your plugins."
+msgstr "Deine Plugins konnten nicht geladen werden."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Dein Profil konnte nicht geladen werden, deshalb ist das Bearbeiten deaktiviert."
 

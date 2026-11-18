@@ -6039,6 +6039,9 @@ msgstr "Kan de payload van deze run niet laden."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Je chats konden niet worden geladen. Opnieuw proberen…"
 
+msgid "Couldn't load your plugins."
+msgstr "Je plugins konden niet worden geladen."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Je profiel kon niet worden geladen, daarom is bewerken uitgeschakeld."
 

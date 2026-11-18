@@ -6039,6 +6039,9 @@ msgstr "이 실행의 페이로드를 불러오지 못했습니다."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "채팅을 불러오지 못했습니다. 다시 시도하는 중…"
 
+msgid "Couldn't load your plugins."
+msgstr "플러그인을 불러오지 못했습니다."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "프로필을 불러오지 못해 편집이 비활성화되었습니다."
 

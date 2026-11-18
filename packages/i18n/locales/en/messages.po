@@ -6039,6 +6039,9 @@ msgstr "Couldn't load this run's payload."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Couldn't load your chats. Trying again…"
 
+msgid "Couldn't load your plugins."
+msgstr "Couldn't load your plugins."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Couldn't load your profile, so editing is disabled."
 

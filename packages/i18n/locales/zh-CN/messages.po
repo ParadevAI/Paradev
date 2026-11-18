@@ -6039,6 +6039,9 @@ msgstr "无法加载此次运行的负载。"
 msgid "Couldn't load your chats. Trying again…"
 msgstr "无法加载你的聊天。正在重试…"
 
+msgid "Couldn't load your plugins."
+msgstr "无法加载你的插件。"
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "无法加载你的资料，编辑已停用。"
 

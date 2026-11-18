@@ -6039,6 +6039,9 @@ msgstr "Impossibile caricare il payload di questa esecuzione."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Impossibile caricare le tue chat. Nuovo tentativo…"
 
+msgid "Couldn't load your plugins."
+msgstr "Impossibile caricare i tuoi plugin."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Non è stato possibile caricare il tuo profilo, quindi la modifica è disattivata."
 

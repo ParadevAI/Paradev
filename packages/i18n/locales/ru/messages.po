@@ -6039,6 +6039,9 @@ msgstr "Не удалось загрузить полезную нагрузку
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Не удалось загрузить чаты. Повторная попытка…"
 
+msgid "Couldn't load your plugins."
+msgstr "Не удалось загрузить ваши плагины."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Не удалось загрузить профиль, поэтому редактирование отключено."
 

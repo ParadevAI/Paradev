@@ -11,6 +11,7 @@ import {
 import { Switch } from "@superset/ui/switch";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { LuLoader } from "react-icons/lu";
 import { PluginIcon } from "renderer/components/PluginIcon";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 
@@ -40,12 +41,13 @@ export function DevPluginsDialog({
 	);
 	const [plugins, setPlugins] = useState(dev.plugins ?? []);
 	const [isBusy, setBusy] = useState(false);
-	const installed = cloudTrpc.plugins.list
-		.useQuery(undefined, { staleTime: 60_000 })
-		.data?.filter(
-			(plugin) =>
-				plugin.installed && plugin.enabled && plugin.name !== "superset",
-		);
+	const list = cloudTrpc.plugins.list.useQuery(undefined, {
+		staleTime: 60_000,
+	});
+	const installed = list.data?.filter(
+		(plugin) =>
+			plugin.installed && plugin.enabled && plugin.name !== "superset",
+	);
 	const save = async () => {
 		if (isBusy) return;
 		setBusy(true);
@@ -119,6 +121,28 @@ export function DevPluginsDialog({
 										: current.filter((name) => name !== plugin.name),
 								),
 						),
+					)}
+					{!installed && (
+						<div className="flex items-center gap-2 px-2 py-3 text-muted-foreground text-sm">
+							{list.isError ? (
+								<>
+									<Trans>Couldn't load your plugins.</Trans>
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										onClick={() => void list.refetch()}
+									>
+										<Trans>Try again</Trans>
+									</Button>
+								</>
+							) : (
+								<>
+									<LuLoader className="size-4 animate-spin" />
+									<Trans>Loading…</Trans>
+								</>
+							)}
+						</div>
 					)}
 				</div>
 				<div className="flex items-center justify-between gap-3">

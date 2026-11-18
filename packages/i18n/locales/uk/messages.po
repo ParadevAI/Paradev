@@ -6033,6 +6033,9 @@ msgstr "Не вдалося завантажити дані цього запу�
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Не вдалося завантажити чати. Повторна спроба…"
 
+msgid "Couldn't load your plugins."
+msgstr "Не вдалося завантажити ваші плагіни."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Не вдалося завантажити ваш профіль, тому редагування вимкнено."
 

@@ -6039,6 +6039,9 @@ msgstr "Nie udało się wczytać ładunku tego uruchomienia."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Nie udało się wczytać czatów. Ponawianie…"
 
+msgid "Couldn't load your plugins."
+msgstr "Nie udało się wczytać Twoich wtyczek."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Nie udało się wczytać Twojego profilu, więc edycja jest wyłączona."
 

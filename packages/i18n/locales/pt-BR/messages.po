@@ -6039,6 +6039,9 @@ msgstr "Não foi possível carregar a carga útil desta execução."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Não foi possível carregar seus chats. Tentando novamente…"
 
+msgid "Couldn't load your plugins."
+msgstr "Não foi possível carregar seus plugins."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Não foi possível carregar seu perfil, então a edição está desativada."
 

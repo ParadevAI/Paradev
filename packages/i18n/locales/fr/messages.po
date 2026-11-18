@@ -6039,6 +6039,9 @@ msgstr "Impossible de charger la charge utile de cette exécution."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Impossible de charger vos discussions. Nouvelle tentative…"
 
+msgid "Couldn't load your plugins."
+msgstr "Impossible de charger vos plugins."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Impossible de charger votre profil, l'édition est désactivée."
 

@@ -6039,6 +6039,9 @@ msgstr "無法載入此次執行的酬載。"
 msgid "Couldn't load your chats. Trying again…"
 msgstr "無法載入你的聊天。正在重試…"
 
+msgid "Couldn't load your plugins."
+msgstr "無法載入你的外掛程式。"
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "無法載入你的個人檔案，編輯已停用。"
 

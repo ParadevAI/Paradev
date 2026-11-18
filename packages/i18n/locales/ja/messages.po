@@ -6039,6 +6039,9 @@ msgstr "この実行のペイロードを読み込めませんでした。"
 msgid "Couldn't load your chats. Trying again…"
 msgstr "チャットを読み込めませんでした。再試行しています…"
 
+msgid "Couldn't load your plugins."
+msgstr "プラグインを読み込めませんでした。"
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "プロフィールを読み込めなかったため、編集は無効です。"
 

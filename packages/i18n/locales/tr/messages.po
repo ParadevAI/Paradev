@@ -6039,6 +6039,9 @@ msgstr "Bu çalıştırmanın yükü yüklenemedi."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Sohbetleriniz yüklenemedi. Yeniden deneniyor…"
 
+msgid "Couldn't load your plugins."
+msgstr "Eklentileriniz yüklenemedi."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Profilin yüklenemedi, bu yüzden düzenleme devre dışı."
 

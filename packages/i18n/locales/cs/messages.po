@@ -6039,6 +6039,9 @@ msgstr "Data tohoto běhu se nepodařilo načíst."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Vaše chaty se nepodařilo načíst. Zkoušíme to znovu…"
 
+msgid "Couldn't load your plugins."
+msgstr "Vaše pluginy se nepodařilo načíst."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Tvůj profil se nepodařilo načíst, úpravy jsou proto vypnuté."
 

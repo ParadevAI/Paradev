@@ -6039,6 +6039,9 @@ msgstr "Không thể tải payload của lần chạy này."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Không tải được các cuộc trò chuyện. Đang thử lại…"
 
+msgid "Couldn't load your plugins."
+msgstr "Không thể tải các plugin của bạn."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Không tải được hồ sơ của bạn nên chức năng chỉnh sửa đã bị tắt."
 

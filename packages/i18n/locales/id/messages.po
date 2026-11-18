@@ -6039,6 +6039,9 @@ msgstr "Tidak dapat memuat payload run ini."
 msgid "Couldn't load your chats. Trying again…"
 msgstr "Tidak dapat memuat chat Anda. Mencoba lagi…"
 
+msgid "Couldn't load your plugins."
+msgstr "Tidak dapat memuat plugin Anda."
+
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Profil Anda tidak dapat dimuat, sehingga penyuntingan dinonaktifkan."
 
