@@ -14,6 +14,7 @@ function ownRootOf(hostname: string): string | undefined {
 /** Browsers without fetch metadata still send `Accept: text/html` on navigation. */
 export function isBrowserNavigation(request: Request): boolean {
 	if (request.method !== "GET" && request.method !== "HEAD") return false;
+	if (request.headers.has("x-api-key")) return false;
 	const dest = request.headers.get("sec-fetch-dest");
 	if (dest) return dest === "document";
 	return (request.headers.get("accept") ?? "").includes("text/html");

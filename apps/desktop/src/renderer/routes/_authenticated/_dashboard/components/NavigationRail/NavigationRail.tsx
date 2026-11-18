@@ -1,19 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
-import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { useFeatureFlagEnabled } from "posthog-js/react";
-import { PiChatsCircle, PiClockClockwise } from "react-icons/pi";
-import { TbGitPullRequest, TbNote, TbSmartHome } from "react-icons/tb";
-import { VscExtensions } from "react-icons/vsc";
+import { TbSmartHome } from "react-icons/tb";
 import { UpdatesPill } from "renderer/components/UpdatesPill";
-import { env } from "renderer/env.renderer";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { RailButton } from "renderer/routes/_authenticated/_dashboard/components/RailButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
-import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
+import { PinnableRailButton } from "./components/PinnableRailButton";
 import { RailMoreMenu } from "./components/RailMoreMenu";
 import { RailUsage } from "./components/RailUsage";
-import { SolarCheckCircleIcon } from "./components/SolarCheckCircleIcon";
+import { useRailDestinations } from "./hooks/useRailDestinations";
 
 export const NAVIGATION_RAIL_WIDTH = 52;
 
@@ -21,15 +16,7 @@ export const NAVIGATION_RAIL_WIDTH = 52;
 export function NavigationRail() {
 	const { t } = useLingui();
 	const navigation = useDashboardNavigation();
-	const isChannelsEnabled =
-		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
-	// `?? false`: the hook returns undefined until PostHog flags resolve.
-	// Dev builds bypass the flag — the local dev account isn't in the
-	// @superset.sh release condition.
-	const isPluginsEnabled =
-		(useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS) ?? false) ||
-		env.NODE_ENV === "development";
-	const { myFailedCount } = useFailedAutomations();
+	const destinations = useRailDestinations(navigation);
 
 	return (
 		<nav
@@ -43,66 +30,19 @@ export function NavigationRail() {
 				isActive={navigation.isHomeOpen}
 				onClick={navigation.openHome}
 			/>
-			{isChannelsEnabled && (
-				<RailButton
-					label={t({ message: "Chat" })}
-					icon={PiChatsCircle}
-					isIconFilled
-					isActive={navigation.isChannelsOpen}
-					onClick={navigation.openChannels}
-				/>
-			)}
-			<RailButton
-				label={t({ message: "Pages" })}
-				icon={TbNote}
-				isActive={navigation.isPagesOpen}
-				onClick={navigation.openPages}
-			/>
-			{isPluginsEnabled && (
-				<RailButton
-					label={t({ message: "Plugins" })}
-					icon={VscExtensions}
-					isIconFilled
-					isActive={navigation.isPluginsOpen}
-					onClick={navigation.openPlugins}
-				/>
-			)}
-			<RailButton
-				label={
-					myFailedCount > 0
-						? t({ message: `Automations (${myFailedCount} failing)` })
-						: t({ message: "Automations" })
+			{destinations
+				.filter((destination) => destination.isPinned || destination.isActive)
+				.map((destination) => (
+					<PinnableRailButton key={destination.id} destination={destination} />
+				))}
+			<RailMoreMenu
+				destinations={destinations}
+				isActive={
+					navigation.isChannelsOpen &&
+					!destinations.some((destination) => destination.id === "chat")
 				}
-				icon={PiClockClockwise}
-				isIconFilled
-				isActive={navigation.isAutomationsOpen}
-				onClick={
-					myFailedCount > 0
-						? navigation.openFailedAutomations
-						: navigation.openAutomations
-				}
-				badge={
-					myFailedCount > 0 ? (
-						<span
-							aria-hidden="true"
-							className="absolute top-2 right-2 size-1.5 rounded-full bg-red-500"
-						/>
-					) : undefined
-				}
+				onOpenUsage={navigation.openUsage}
 			/>
-			<RailButton
-				label={t({ message: "Tasks" })}
-				icon={SolarCheckCircleIcon}
-				isActive={navigation.isTasksOpen}
-				onClick={navigation.openTasks}
-			/>
-			<RailButton
-				label={t({ message: "Pull requests" })}
-				icon={TbGitPullRequest}
-				isActive={navigation.isPullRequestsOpen}
-				onClick={navigation.openPullRequests}
-			/>
-			<RailMoreMenu />
 			<div className="mt-auto flex flex-col items-center gap-1.5">
 				<RailUsage />
 				<ParadevAnywhereButton variant="rail" />

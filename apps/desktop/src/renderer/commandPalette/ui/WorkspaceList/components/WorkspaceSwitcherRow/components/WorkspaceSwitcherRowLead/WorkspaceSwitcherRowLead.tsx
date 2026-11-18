@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
-import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/components/WorkspaceStateGlyph";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
-import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/utils/hasLiveWorkspaceState";
+import { WorkspaceStateGlyph } from "renderer/routes/_authenticated/_dashboard/workspaces/components/WorkspaceStateGlyph";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
+import { hasLiveWorkspaceState } from "renderer/routes/_authenticated/_dashboard/workspaces/utils/hasLiveWorkspaceState";
 import { PRIcon } from "renderer/screens/main/components/PRIcon/PRIcon";
 
 interface WorkspaceSwitcherRowLeadProps {

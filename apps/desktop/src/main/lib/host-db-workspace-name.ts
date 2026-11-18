@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { defaultAppHomeDir } from "@superset/agent-setup/paths";
 
 /** Minimal readonly handle satisfied by both better-sqlite3 and bun:sqlite. */
-export interface ReadonlySqlite {
+interface ReadonlySqlite {
 	prepare(sql: string): {
 		get(...params: unknown[]): unknown;
 		all(...params: unknown[]): unknown[];

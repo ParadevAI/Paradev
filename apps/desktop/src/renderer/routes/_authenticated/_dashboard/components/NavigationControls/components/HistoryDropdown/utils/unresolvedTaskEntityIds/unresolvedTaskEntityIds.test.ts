@@ -20,7 +20,7 @@ describe("unresolvedTaskEntityIds", () => {
 					entry("task", "id-in-window"),
 					entry("task", "SUPER-2"),
 					entry("task", "SUPER-1"),
-					entry("v2-workspace", "ws-1"),
+					entry("workspace", "ws-1"),
 				],
 				[
 					{ task: { id: "id-in-window", slug: "SUPER-3" } },

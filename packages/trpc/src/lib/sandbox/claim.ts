@@ -7,12 +7,16 @@
 import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
-import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import {
+	GOLDEN_BOX_VCPUS,
+	LEGACY_MACHINE_SIZE,
+} from "@superset/shared/billing";
 import { BRAND } from "@superset/shared/brand";
 import {
 	type CloudAgentLaunch,
 	cloudAgentLaunchToEnv,
 } from "@superset/shared/cloud-agent-launch";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
@@ -25,10 +29,12 @@ import {
 	resolveAgentSignIns,
 } from "../../router/agent-credential";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
+import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import { boxLogsEnabled, organizationFlagEnabled } from "./feature-flags";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -68,7 +74,7 @@ async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
 	const size =
 		(await resolveMachineSize(
 			row.organizationId,
-			row.machineSize ?? "large",
+			row.machineSize ?? LEGACY_MACHINE_SIZE,
 		)) ?? (await resolveMachineSize(row.organizationId, null));
 	return size?.vcpus ?? GOLDEN_BOX_VCPUS;
 }
@@ -87,11 +93,14 @@ export async function buildSandboxClaim(args: {
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
 }> {
-	const [environment, signIns] = await Promise.all([
+	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
+		env.SENTRY_DSN_SANDBOX
+			? boxLogsEnabled(posthog, args.row.organizationId)
+			: false,
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
@@ -146,6 +155,7 @@ export async function buildSandboxClaim(args: {
 						env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
 				}
 			: {}),
+		...(boxLogs ? { SUPERSET_SANDBOX_BOX_LOGS: "1" as const } : {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
 	const { networkPolicy, managedEnv, files } = await deriveSandboxCredentials({
@@ -174,6 +184,11 @@ export async function buildSandboxClaim(args: {
 			files,
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
+			agentTools: await organizationFlagEnabled(
+				posthog,
+				FEATURE_FLAGS.SANDBOX_AGENT_TOOLS_DRIVE,
+				args.row.organizationId,
+			),
 		},
 		environment: {
 			sourceKind: environment.sourceKind,

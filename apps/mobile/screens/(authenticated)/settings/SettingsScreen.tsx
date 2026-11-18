@@ -139,7 +139,7 @@ export function SettingsScreen() {
 				t({ message: "Disconnect GitHub?" }),
 				t({
 					message:
-						"Pull requests, comments and pushes from Superset will no longer be made as you.",
+						"Pull requests, comments and pushes from Paradev will no longer be made as you.",
 				}),
 				[
 					{ style: "cancel", text: t({ message: "Cancel" }) },
@@ -283,7 +283,7 @@ export function SettingsScreen() {
 								github.connection
 									? t({
 											message:
-												"Pull requests, comments and pushes from Superset are made as you.",
+												"Pull requests, comments and pushes from Paradev are made as you.",
 										})
 									: t({
 											message:

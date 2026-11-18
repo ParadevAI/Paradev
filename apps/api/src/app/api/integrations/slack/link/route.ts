@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
 import { accountConnection } from "@superset/trpc/connectors";
 import { headers } from "next/headers";
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
 		return new Response("Invalid token", { status: 400 });
 	}
 
-	const session = await auth.api.getSession({ headers: await headers() });
+	const session = await getRequestSession(await headers());
 	if (!session?.user) {
 		return Response.redirect(signInUrl(request).toString(), 302);
 	}

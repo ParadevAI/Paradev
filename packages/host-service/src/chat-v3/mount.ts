@@ -25,6 +25,7 @@ import {
 } from "@superset/chat-runtime";
 import { HOST_CHAT_RESUME_MARKER_FILE } from "@superset/shared/host-version";
 import type { Hono, MiddlewareHandler } from "hono";
+import { trackChatAgentLaunched } from "../agent-launch-analytics";
 import type { HostDb } from "../db";
 import { reportAttachmentResolveFailure } from "../sentry";
 import { storedChatConfig } from "../trpc/router/agents/agents";
@@ -189,7 +190,10 @@ export function createChatV3Mount(options: {
 		recordTimer.unref?.();
 	};
 	const observer: LiveSessionObserver = {
-		started: (session) => options.agents?.started(session),
+		started: (session) => {
+			options.agents?.started(session);
+			trackChatAgentLaunched(options.api, options.db, session);
+		},
 		published: (envelope, session) => {
 			options.agents?.published(envelope, session);
 			if (!isDurableEnvelope(envelope)) return;

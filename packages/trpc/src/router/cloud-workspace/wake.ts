@@ -1,12 +1,18 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import {
 	CLOUD_WORKSPACE_BOOTED_ATTRIBUTE,
 	CLOUD_WORKSPACE_WAKE_TRANSACTION,
 } from "@superset/shared/constants";
 import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
+import {
+	type ControlScope,
+	controlTags,
+	logControl,
+} from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	bootBeganSince,
@@ -47,7 +53,7 @@ export async function wakeCloudWorkspace(
 				attributes: { "cloud_workspace.id": row.id },
 			},
 			async (span) => {
-				const { booted, rebooted, ...woken } = await wake(row, options);
+				const { booted, rebooted, ...woken } = await wake(row, options, span);
 				span.setAttributes({
 					"cloud_workspace.resumed": booted,
 					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
@@ -67,11 +73,16 @@ export async function wakeCloudWorkspace(
 async function wake(
 	row: CloudWorkspaceRow,
 	{ adoptSignIns = false }: { adoptSignIns?: boolean },
+	span: Sentry.Span,
 ): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
 		() => buildSandboxClaim({ row }),
 	);
+	const scope: ControlScope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
 	let bootId: string | null = null;
 	const wakeStartedAt = Date.now();
 	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
@@ -89,8 +100,20 @@ async function wake(
 							...box,
 						}),
 				));
+				if (bootId) {
+					scope.bootId = bootId;
+					span.setAttribute("boot.id", bootId);
+				}
 			},
 		}).catch(async (error) => {
+			if (!isCloudUsageRefusal(error)) {
+				logControl(
+					"wake.failed",
+					scope,
+					{ ms: Date.now() - wakeStartedAt },
+					"error",
+				);
+			}
 			if (bootId) {
 				await attachBootSession({
 					bootId,
@@ -103,7 +126,9 @@ async function wake(
 		await attachBootSession({
 			bootId,
 			providerSandboxId: row.providerSandboxId,
-		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
+		}).catch((error) =>
+			Sentry.captureException(error, { tags: controlTags(scope) }),
+		);
 	}
 	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
 		try {
@@ -128,6 +153,12 @@ async function wake(
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
 	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	if (rebooted) {
+		logControl("wake.completed", scope, {
+			ms: Date.now() - wakeStartedAt,
+			"box.resumed": booted,
+		});
+	}
 	return {
 		hostTarget,
 		booted,
@@ -164,7 +195,7 @@ export async function markSandboxUnavailable(
 	row: CloudWorkspaceRow,
 	error: unknown,
 ): Promise<void> {
-	await transitionCloudWorkspace({
+	const changed = await transitionCloudWorkspace({
 		id: row.id,
 		from: ["awake", "asleep"],
 		to: "failed",
@@ -172,4 +203,15 @@ export async function markSandboxUnavailable(
 	});
 	nudge(row.organizationId, "cloud_workspaces");
 	console.error(`[cloud-workspace] ${row.id} sandbox unavailable`, error);
+	const scope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
+	logControl(
+		"workspace.failed",
+		scope,
+		{ "failure.site": "sandbox_unavailable", "status.changed": changed },
+		"error",
+	);
+	if (changed) Sentry.captureException(error, { tags: controlTags(scope) });
 }

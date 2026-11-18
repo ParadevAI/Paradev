@@ -55,7 +55,7 @@ export function useOpenNewWorkspaceInViewedProject(): () => void {
 	const organizationId = useActiveOrganizationId();
 	const { workspaces, cache } = useHostWorkspaces();
 	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
-	const match = matchRoute({ to: "/v2-workspace/$workspaceId", fuzzy: true });
+	const match = matchRoute({ to: "/workspace/$workspaceId", fuzzy: true });
 	const workspaceId = match !== false ? match.workspaceId : null;
 	const { primaryRepositoryById } = useCloudWorkspaceRepositories({
 		organizationId,

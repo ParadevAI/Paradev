@@ -447,14 +447,15 @@ export class GitWatcher {
 		void listGitIgnoredDirs(worktreePath, entry.controller.signal)
 			.then(async (dirs) => {
 				if (!stillCurrent()) return;
+				const grew = dirs.some((dir) => !state.dirs.has(dir));
 				state.dirs = new Set(dirs);
 				state.lastRefreshAt = Date.now();
-				if (rulesChanged) {
+				if (rulesChanged || grew) {
 					// Ignore rules changed: a dir may have been UN-ignored, leaving
 					// the native watcher's attach-time prune stale (events for that
-					// dir silently suppressed until restart). refreshIgnores
-					// re-derives the set and swaps the subscription only when it
-					// actually shrank; after a swap, force one broad status refresh
+					// dir silently suppressed until restart). A new ignored dir
+					// must be pruned from a per-entry watch. refreshIgnores decides
+					// whether to swap; after a swap, force one broad status refresh
 					// to cover anything written during the swap gap.
 					const swapped = await this.filesystem
 						.refreshWatcherIgnores(workspaceId)

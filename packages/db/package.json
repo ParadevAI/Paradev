@@ -12,6 +12,10 @@
 			"types": "./src/client.ts",
 			"default": "./src/client.ts"
 		},
+		"./cloud-usage-query": {
+			"types": "./src/cloud-usage-query.ts",
+			"default": "./src/cloud-usage-query.ts"
+		},
 		"./enums": {
 			"types": "./src/schema/enums.ts",
 			"default": "./src/schema/enums.ts"
@@ -42,6 +46,7 @@
 		"push": "drizzle-kit push",
 		"migrate": "drizzle-kit migrate",
 		"studio": "drizzle-kit studio",
+		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false"
 	},
 	"dependencies": {
@@ -53,6 +58,7 @@
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@electric-sql/pglite": "0.5.16",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",
 		"bun-types": "1.4.3",
