@@ -14,6 +14,7 @@ import {
 	logControl,
 } from "../../lib/control-log";
 import {
+	apiPhases,
 	bootBeganSince,
 	bootPhases,
 	buildSandboxClaim,
@@ -30,7 +31,11 @@ import {
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordBoxStopped, recordSandboxAsleep } from "./sandbox-sleep";
+import {
+	recordBootPhases,
+	recordBoxStopped,
+	recordSandboxAsleep,
+} from "./sandbox-sleep";
 import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -116,6 +121,7 @@ async function wake(
 						createdByUserId: row.createdByUserId,
 						...box,
 						origin: "wake",
+						traceId: span.spanContext().traceId,
 					}),
 			));
 			if (bootId) {
@@ -171,15 +177,21 @@ async function wake(
 			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);
 	}
-	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
-		try {
-			recordBootSpans(bootPhases(answer));
-		} catch (error) {
-			console.error(
-				`[cloud-workspace] could not trace the boot of ${row.id}`,
-				error,
-			);
-		}
+	const boxPhases =
+		rebooted && bootBeganSince(answer, wakeStartedAt) ? bootPhases(answer) : [];
+	try {
+		recordBootSpans(boxPhases);
+	} catch (error) {
+		console.error(
+			`[cloud-workspace] could not trace the boot of ${row.id}`,
+			error,
+		);
+	}
+	if (bootId) {
+		await recordBootPhases({ ...scope, bootId }, [
+			...apiPhases(span),
+			...boxPhases,
+		]);
 	}
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),

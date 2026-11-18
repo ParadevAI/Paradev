@@ -145,6 +145,110 @@ describe("wakeAfterStop", () => {
 	});
 });
 
+describe("a wake that boots the box", () => {
+	const authorized: { traceId: string }[] = [];
+	const sets: Record<string, unknown>[] = [];
+	const captured: unknown[] = [];
+	let phasesWriteError: Error | null = null;
+	let stamps: { phase: string; at: number }[] = [];
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({
+			claim: {},
+			agentCredentialDigest: "digest",
+		}),
+		wakeSandbox: async (args: {
+			beforeResume: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+		}) => {
+			await args.beforeResume({ memoryMb: 8192, vcpus: 4 });
+			return {
+				hostTarget: "https://box.test",
+				booted: true,
+				rebooted: true,
+				answer: { stamps, answeredAt: (stamps.at(-1)?.at ?? 0) + 100 },
+				expiresAt: null,
+				sessionId: "sess_1",
+			};
+		},
+	});
+	stub(meter, {
+		authorizeBoot: async (args: { traceId: string }) => {
+			authorized.push(args);
+			return { bootId: "boot_3" };
+		},
+		attachBootSession: async () => {},
+	});
+	stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
+	stub(db, {
+		update: () => ({
+			set: (values: Record<string, unknown>) => ({
+				where: async () => {
+					if ("phases" in values && phasesWriteError) throw phasesWriteError;
+					sets.push(values);
+					return [];
+				},
+			}),
+		}),
+	});
+	stub(Sentry, {
+		captureException: (...args: unknown[]) => captured.push(args),
+	});
+	beforeEach(() => {
+		authorized.length = 0;
+		sets.length = 0;
+		captured.length = 0;
+		phasesWriteError = null;
+		const at = Date.now();
+		stamps = [
+			{ phase: "boot.start", at },
+			{ phase: "rootfs.start", at: at + 50 },
+			{ phase: "host.ready", at: at + 900 },
+		];
+	});
+
+	test("authorizes the boot with the wake's trace id and stores its phases on the row", async () => {
+		await wakeCloudWorkspace(ROW);
+		expect(authorized[0]?.traceId).toMatch(/^[0-9a-f]{32}$/);
+		const [start] = stamps;
+		expect(sets.filter((set) => "phases" in set)).toEqual([
+			{
+				phases: [
+					{ name: "boot.start", at: start?.at, ms: 50 },
+					{ name: "rootfs.start", at: (start?.at ?? 0) + 50, ms: 850 },
+					{ name: "host.ready", at: (start?.at ?? 0) + 900, ms: 100 },
+				],
+			},
+		]);
+	});
+
+	test("stores at most 64 phases", async () => {
+		const at = Date.now();
+		stamps = Array.from({ length: 100 }, (_, index) => ({
+			phase: index === 0 ? "boot.start" : `checkout.cloned-${index}`,
+			at: at + index,
+		}));
+		await wakeCloudWorkspace(ROW);
+		const [written] = sets.filter((set) => "phases" in set);
+		expect((written?.phases as unknown[]).length).toBe(64);
+	});
+
+	test("a failed phases write is reported and the wake still answers", async () => {
+		phasesWriteError = new Error("db down");
+		expect((await wakeCloudWorkspace(ROW)).hostTarget).toBe("https://box.test");
+		expect(captured).toEqual([
+			[
+				phasesWriteError,
+				{
+					tags: {
+						"cloud_workspace.id": "ws_1",
+						"organization.id": "org_1",
+						"boot.id": "boot_3",
+					},
+				},
+			],
+		]);
+	});
+});
+
 describe("a refused wake", () => {
 	const calls: string[] = [];
 	const recordedAsleep: Array<[string, { sessionId: string | null }]> = [];

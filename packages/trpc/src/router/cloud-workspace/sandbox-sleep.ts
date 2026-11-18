@@ -1,7 +1,11 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import type { CloudWorkspaceBootEndReason } from "@superset/db/enums";
-import { cloudWorkspaceBoots, cloudWorkspaces } from "@superset/db/schema";
+import {
+	type CloudWorkspaceBootPhase,
+	cloudWorkspaceBoots,
+	cloudWorkspaces,
+} from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
 import {
 	type ControlScope,
@@ -73,6 +77,22 @@ export async function recordBootEnd(
 						),
 			),
 		)
+		.catch((error) =>
+			Sentry.captureException(error, { tags: controlTags(scope) }),
+		);
+}
+
+const MAX_BOOT_PHASES = 64;
+
+/** How the boot went, once host-service answered. A failed write is reported and the boot goes on. */
+export async function recordBootPhases(
+	scope: ControlScope & { bootId: string },
+	phases: CloudWorkspaceBootPhase[],
+): Promise<void> {
+	await db
+		.update(cloudWorkspaceBoots)
+		.set({ phases: phases.slice(0, MAX_BOOT_PHASES) })
+		.where(eq(cloudWorkspaceBoots.id, scope.bootId))
 		.catch((error) =>
 			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);

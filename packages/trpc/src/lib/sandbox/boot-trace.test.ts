@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { bootBeganSince, bootPhases, bootStampsFrom } from "./boot-trace";
+import { addChildSpanToSpan, SentrySpan } from "@sentry/core";
+import {
+	apiPhases,
+	bootBeganSince,
+	bootPhases,
+	bootStampsFrom,
+} from "./boot-trace";
 
 const stamps = [
 	{ phase: "boot.start", at: 1_789_000_000_000 },
@@ -61,5 +67,40 @@ describe("bootPhases", () => {
 			answeredAt: 1_789_000_001_150,
 		});
 		expect(last?.ms).toBe(0);
+	});
+});
+
+describe("apiPhases", () => {
+	test("lists the provision steps that ended, in order, and nothing else", () => {
+		const transaction = new SentrySpan({
+			name: "cloud-workspace.provision",
+			op: "job",
+			sampled: true,
+			startTimestamp: 1_789_000_000,
+		});
+		const child = (
+			name: string,
+			op: string,
+			startTimestamp: number,
+			endTimestamp?: number,
+		) =>
+			addChildSpanToSpan(
+				transaction,
+				new SentrySpan({
+					name,
+					op,
+					sampled: true,
+					startTimestamp,
+					endTimestamp,
+				}),
+			);
+		child("create", "sandbox", 1_789_000_000.4, 1_789_000_009.4);
+		child("claim", "sandbox", 1_789_000_000, 1_789_000_000.4);
+		child("GET /v1/sandboxes", "http.client", 1_789_000_001, 1_789_000_002);
+		child("settle", "sandbox", 1_789_000_009.4);
+		expect(apiPhases(transaction)).toEqual([
+			{ name: "claim", at: 1_789_000_000_000, ms: 400 },
+			{ name: "create", at: 1_789_000_000_400, ms: 9_000 },
+		]);
 	});
 });

@@ -77,3 +77,24 @@ export function recordBootSpans(phases: CloudWorkspaceBootPhase[]): void {
 	});
 	boot.end(last.at + last.ms);
 }
+
+const API_PHASE_OPS = new Set(["sandbox", "sandbox.provider", "billing"]);
+
+/**
+ * The provision or wake steps that already ended under `transaction`: claim,
+ * create, apply claim, start boot and the like. An unsampled transaction
+ * records no spans, so it has none.
+ */
+export function apiPhases(transaction: Sentry.Span): CloudWorkspaceBootPhase[] {
+	return Sentry.getSpanDescendants(transaction)
+		.flatMap((span) => {
+			const { op, description, start_timestamp, timestamp } =
+				Sentry.spanToJSON(span);
+			if (!op || !API_PHASE_OPS.has(op) || !description || !timestamp) {
+				return [];
+			}
+			const at = Math.round(start_timestamp * 1000);
+			return [{ name: description, at, ms: Math.round(timestamp * 1000) - at }];
+		})
+		.sort((a, b) => a.at - b.at);
+}

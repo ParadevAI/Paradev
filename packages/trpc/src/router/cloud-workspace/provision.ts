@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	apiPhases,
 	bootPhases,
 	buildSandboxClaim,
 	deleteSandbox,
@@ -26,6 +27,7 @@ import {
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordBootPhases } from "./sandbox-sleep";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -139,6 +141,7 @@ async function provision(
 			createdByUserId: row.createdByUserId,
 			...boxFor(claim.vcpus),
 			origin: "create",
+			traceId: span.spanContext().traceId,
 		}));
 		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
@@ -214,12 +217,23 @@ async function provision(
 				error,
 			),
 		);
+		const boxPhases = bootPhases(answer);
 		try {
-			recordBootSpans(bootPhases(answer));
+			recordBootSpans(boxPhases);
 		} catch (error) {
 			console.error(
 				`[cloud-workspace] could not trace the boot of ${row.id}`,
 				error,
+			);
+		}
+		if (bootId) {
+			await recordBootPhases(
+				{
+					cloudWorkspaceId: row.id,
+					organizationId: row.organizationId,
+					bootId,
+				},
+				[...apiPhases(span), ...boxPhases],
 			);
 		}
 		await naming.catch((error) =>

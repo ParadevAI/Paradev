@@ -843,7 +843,7 @@ export async function listFleetCloudBoots(
 	return withFleetFields(db, await bootRows(db, { organizationId }, options));
 }
 
-/** One boot by boot id or Vercel session id, in any organization, or null. Staff only. */
+/** One boot by boot id or Vercel session id, in any organization, or null, with its phases and trace id. Staff only. */
 export async function getFleetCloudBoot(
 	db: Db,
 	boot: string,
@@ -859,5 +859,14 @@ export async function getFleetCloudBoot(
 			{ ...options, boot, limit: 1 },
 		),
 	);
-	return found ?? null;
+	if (!found) return null;
+	const [trace] = await db
+		.select({ phases: boots.phases, traceId: boots.traceId })
+		.from(boots)
+		.where(eq(boots.id, found.id));
+	return {
+		...found,
+		phases: trace?.phases ?? null,
+		traceId: trace?.traceId ?? null,
+	};
 }
