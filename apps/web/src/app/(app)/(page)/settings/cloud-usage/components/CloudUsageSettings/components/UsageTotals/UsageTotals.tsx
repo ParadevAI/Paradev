@@ -3,13 +3,11 @@
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { RouterOutputs } from "@superset/trpc";
-import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 
 type Metrics = RouterOutputs["cloud"]["usage"]["query"]["total"];
 
 export function UsageTotals({ total }: { total: Metrics }) {
-	const { formatNumber } = useFormat();
-	const formatGbHours = useFormatGbHours();
+	const { formatNumber, formatGbHours } = useFormat();
 	const tiles = [
 		{
 			key: "gbHours",

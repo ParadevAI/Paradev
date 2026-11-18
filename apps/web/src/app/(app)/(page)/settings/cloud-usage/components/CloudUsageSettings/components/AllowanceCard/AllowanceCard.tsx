@@ -4,15 +4,13 @@ import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { RouterOutputs } from "@superset/trpc";
 import { Progress } from "@superset/ui/progress";
-import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 
 type Allowance = NonNullable<
 	RouterOutputs["cloud"]["periods"]["list"]["items"][number]["allowance"]
 >;
 
 export function AllowanceCard({ allowance }: { allowance: Allowance }) {
-	const { formatDate } = useFormat();
-	const formatGbHours = useFormatGbHours();
+	const { formatDate, formatGbHours } = useFormat();
 	const { includedGbHours, usedGbHours, overageGbHours } = allowance;
 	const used = formatGbHours(usedGbHours);
 	const included = includedGbHours ? formatGbHours(includedGbHours) : null;

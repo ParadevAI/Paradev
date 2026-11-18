@@ -1,10 +1,10 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { useFormat } from "@superset/i18n/react";
 import type { RouterInputs } from "@superset/trpc";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
-import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 import { QueryStatus } from "../QueryStatus";
 
 interface UsageByPersonProps {
@@ -13,7 +13,7 @@ interface UsageByPersonProps {
 
 export function UsageByPerson({ range }: UsageByPersonProps) {
 	const trpc = useTRPC();
-	const formatGbHours = useFormatGbHours();
+	const { formatGbHours } = useFormat();
 	const byPerson = useQuery(
 		trpc.cloud.usage.query.queryOptions({ range, groupBy: "user", limit: 100 }),
 	);

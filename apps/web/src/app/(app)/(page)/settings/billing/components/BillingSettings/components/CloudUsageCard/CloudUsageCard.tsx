@@ -6,7 +6,6 @@ import { Progress } from "@superset/ui/progress";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTRPC } from "@/trpc/react";
-import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 import { GbHourPurchase } from "./components/GbHourPurchase";
 
 interface CloudUsageCardProps {
@@ -21,8 +20,7 @@ export function CloudUsageCard({
 	showUsageLink,
 }: CloudUsageCardProps) {
 	const trpc = useTRPC();
-	const { formatDate } = useFormat();
-	const formatGbHours = useFormatGbHours();
+	const { formatDate, formatGbHours } = useFormat();
 	const { data: usage } = useQuery(trpc.billing.cloudUsage.queryOptions());
 
 	if (

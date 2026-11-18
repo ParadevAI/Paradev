@@ -22,7 +22,6 @@ import {
 } from "@superset/ui/table";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/react";
-import { useFormatGbHours } from "../../../../../../../hooks/useFormatGbHours";
 import { QueryStatus } from "../../../QueryStatus";
 import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
 import type { WorkspaceRef } from "../../types";
@@ -41,8 +40,7 @@ export function WorkspaceBootsSheet({
 }: WorkspaceBootsSheetProps) {
 	const { i18n } = useLingui();
 	const trpc = useTRPC();
-	const { formatDateTime, formatNumber } = useFormat();
-	const formatGbHours = useFormatGbHours();
+	const { formatDateTime, formatNumber, formatGbHours } = useFormat();
 	const pages = useInfiniteQuery({
 		...trpc.cloud.boots.list.infiniteQueryOptions(
 			{ workspace: workspace?.id, range, limit: 25 },

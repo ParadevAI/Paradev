@@ -16,7 +16,6 @@ import {
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useTRPC } from "@/trpc/react";
-import { useFormatGbHours } from "../../../../../hooks/useFormatGbHours";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspaceBootsSheet } from "./components/WorkspaceBootsSheet";
 import { FAILURE_REASONS, STATUS_LABELS } from "./constants";
@@ -30,8 +29,7 @@ interface WorkspacesTableProps {
 export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
 	const trpc = useTRPC();
-	const { formatNumber } = useFormat();
-	const formatGbHours = useFormatGbHours();
+	const { formatNumber, formatGbHours } = useFormat();
 	const [selected, setSelected] = useState<WorkspaceRef | null>(null);
 	const pages = useInfiniteQuery(
 		trpc.cloud.usage.query.infiniteQueryOptions(
