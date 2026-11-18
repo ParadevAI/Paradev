@@ -17762,6 +17762,9 @@ msgstr "Searching for Kbd usages"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Seats removed mid-cycle stay active until {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "The environment this automation starts cloud workspaces from was archive
 msgid "The extension and its local data are deleted from this browser."
 msgstr "The extension and its local data are deleted from this browser."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+
 msgid "The factory"
 msgstr "The factory"
 
@@ -20756,6 +20762,9 @@ msgstr "This organization has no billing periods. Choose a time range instead."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "This page cannot tell when the usage limit is reached."
 
 msgid "This page could not be loaded"
 msgstr "This page could not be loaded"

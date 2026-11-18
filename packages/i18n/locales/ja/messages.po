@@ -17762,6 +17762,9 @@ msgstr "Kbdの使用箇所を検索中"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "期間の途中で削除した席は {0} まで有効です。"
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "シート、クレジット、追加使用量の上限はまだ読み込まれていません。次に請求データが更新されると表示されます。"
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "このオートメーションがクラウドワークスペースを起
 msgid "The extension and its local data are deleted from this browser."
 msgstr "拡張機能とそのローカルデータがこのブラウザから削除されます。"
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "追加使用量の上限はプランに対する割合で決まるため、金額は表示されません。また、このページでは上限に達したかどうかを判断できません。"
+
 msgid "The factory"
 msgstr "工場"
 
@@ -20756,6 +20762,9 @@ msgstr "この組織には請求期間がありません。代わりに期間を
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "この組織はFreeプランです。{appName} MobileはProプランの組織でご利用いただけます。"
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "このページでは使用量の上限に達したかどうかを判断できません。"
 
 msgid "This page could not be loaded"
 msgstr "このページを読み込めませんでした"

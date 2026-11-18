@@ -17762,6 +17762,9 @@ msgstr "Hledám použití Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Místa odebraná v průběhu období zůstanou aktivní do {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Místa, kredity a limit využití navíc zatím nejsou načteny. Zobrazí se po příští aktualizaci fakturačních údajů."
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Rozšíření a jeho místní data se z tohoto prohlížeče smažou."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Limit využití navíc je procento z plánu, proto se jeho částka nezobrazuje a tato stránka nepozná, kdy je dosažen."
+
 msgid "The factory"
 msgstr "Továrna"
 
@@ -20756,6 +20762,9 @@ msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Tato stránka nepozná, kdy je dosažen limit využití."
 
 msgid "This page could not be loaded"
 msgstr "Tuto stránku se nepodařilo načíst"

@@ -17762,6 +17762,9 @@ msgstr "Szukanie użyć Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Stanowiska usunięte w trakcie okresu pozostają aktywne do {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Miejsca, kredyty i limit dodatkowego zużycia nie są jeszcze wczytane. Pojawią się po następnym odświeżeniu danych rozliczeniowych."
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "Środowisko, z którego ta automatyzacja uruchamia obszary robocze w chm
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Rozszerzenie i jego dane lokalne zostaną usunięte z tej przeglądarki."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Limit dodatkowego zużycia jest procentem planu, więc jego kwota nie jest pokazana, a ta strona nie może ustalić, kiedy zostanie osiągnięty."
+
 msgid "The factory"
 msgstr "Fabryka"
 
@@ -20756,6 +20762,9 @@ msgstr "Ta organizacja nie ma okresów rozliczeniowych. Wybierz zamiast tego zak
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Ta organizacja korzysta z planu darmowego. {appName} Mobile jest dostępny dla organizacji w planie Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Ta strona nie może ustalić, kiedy osiągnięto limit użycia."
 
 msgid "This page could not be loaded"
 msgstr "Nie udało się wczytać tej strony"

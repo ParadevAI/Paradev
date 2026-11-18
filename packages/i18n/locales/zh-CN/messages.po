@@ -17762,6 +17762,9 @@ msgstr "正在搜索Kbd的使用处"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "周期中途移除的席位在 {0} 前仍然有效。"
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "席位、额度和额外用量上限尚未加载。下次账单数据刷新后会显示。"
+
 msgid "Secondary"
 msgstr "次要"
 
@@ -20167,6 +20170,9 @@ msgstr "该自动化用于启动云端工作区的环境已被归档或没有仓
 msgid "The extension and its local data are deleted from this browser."
 msgstr "该扩展程序及其本地数据将从此浏览器中删除。"
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "额外用量上限是套餐的一个百分比，因此不显示金额，此页面也无法判断何时达到上限。"
+
 msgid "The factory"
 msgstr "工厂"
 
@@ -20756,6 +20762,9 @@ msgstr "此组织没有结算周期。请改为选择一个时间范围。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "此页面无法判断何时达到使用上限。"
 
 msgid "This page could not be loaded"
 msgstr "无法加载这个页面"

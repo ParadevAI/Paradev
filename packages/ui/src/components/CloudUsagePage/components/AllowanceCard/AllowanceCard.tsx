@@ -6,30 +6,47 @@ import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { CloudMetrics, CloudPeriod } from "../../types";
 import { AllowanceLines } from "./components/AllowanceLines";
 import { type Amount, allowanceLines } from "./utils/allowanceLines";
+import { type AllowanceNote, allowanceNotes } from "./utils/allowanceNotes";
 
 interface AllowanceCardProps {
 	total: CloudMetrics;
-	/** Null for a past period, or when the organization has no plan data. */
-	allowance: CloudPeriod["allowance"];
-	/** False when the organization has no billing periods and the range is the last 30 days. */
-	isPeriod: boolean;
+	/** Undefined when the organization has no billing periods and the range is the last 30 days. */
+	period: CloudPeriod | undefined;
 	billing: ReactNode;
 }
 
-export function AllowanceCard({
-	total,
-	allowance,
-	isPeriod,
-	billing,
-}: AllowanceCardProps) {
+const NOTES: Record<AllowanceNote, ReactNode> = {
+	closed_period: (
+		<Trans>The breakdown by plan is kept for the current period only.</Trans>
+	),
+	not_read: (
+		<Trans>
+			Seats, credits and the extra-usage limit are not loaded yet. They show
+			after billing data next refreshes.
+		</Trans>
+	),
+	percent_of_allowance: (
+		<Trans>
+			The extra-usage limit is a percentage of the plan, so its amount is not
+			shown, and this page cannot tell when it is reached.
+		</Trans>
+	),
+	not_tracked: (
+		<Trans>This page cannot tell when the usage limit is reached.</Trans>
+	),
+};
+
+export function AllowanceCard({ total, period, billing }: AllowanceCardProps) {
 	const { usage, dollars, gbHours } = useUsageFormat();
 	const format = (amount: Amount) =>
 		amount.usd === null ? gbHours(amount.gbHours) : dollars(amount.usd);
 	const used = usage(total);
+	const allowance = period?.allowance ?? null;
 	const included = allowance?.includedGbHours ?? null;
 	const summary =
 		allowance && included !== null ? allowanceLines(allowance, included) : null;
 	const cap = summary && format(summary.cap);
+	const notes = allowanceNotes(period?.unavailable ?? []);
 
 	return (
 		<section className="space-y-3 rounded-lg bg-muted/60 p-4">
@@ -43,7 +60,7 @@ export function AllowanceCard({
 							<Trans>of {cap} limit</Trans>
 						) : summary ? (
 							<Trans>of {cap} included</Trans>
-						) : isPeriod ? (
+						) : period ? (
 							<Trans>in this period</Trans>
 						) : (
 							<Trans>in the last 30 days</Trans>
@@ -52,22 +69,19 @@ export function AllowanceCard({
 				</h3>
 				{billing}
 			</div>
-			{summary && allowance ? (
+			{summary && allowance && (
 				<AllowanceLines
 					lines={summary.lines}
 					scale={summary.scale}
 					seats={allowance.seats}
 					format={format}
 				/>
-			) : (
-				isPeriod && (
-					<p className="text-xs text-muted-foreground">
-						<Trans>
-							The breakdown by plan is kept for the current period only.
-						</Trans>
-					</p>
-				)
 			)}
+			{notes.map((note) => (
+				<p key={note} className="text-xs text-muted-foreground">
+					{NOTES[note]}
+				</p>
+			))}
 		</section>
 	);
 }

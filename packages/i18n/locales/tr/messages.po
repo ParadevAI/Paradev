@@ -17762,6 +17762,9 @@ msgstr "Kbd kullanımları aranıyor"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Dönem ortasında kaldırılan koltuklar {0} tarihine kadar aktif kalır."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Koltuklar, krediler ve ek kullanım sınırı henüz yüklenmedi. Faturalandırma verileri bir sonraki yenilendiğinde görünürler."
+
 msgid "Secondary"
 msgstr "İkincil"
 
@@ -20167,6 +20170,9 @@ msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşiv
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Ek kullanım sınırı planın bir yüzdesi olduğundan tutarı gösterilmez ve bu sayfa sınıra ne zaman ulaşıldığını bilemez."
+
 msgid "The factory"
 msgstr "Fabrika"
 
@@ -20756,6 +20762,9 @@ msgstr "Bu kuruluşun faturalama dönemi yok. Bunun yerine bir zaman aralığı 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Bu kuruluş Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Bu sayfa kullanım sınırına ne zaman ulaşıldığını bilemez."
 
 msgid "This page could not be loaded"
 msgstr "Bu sayfa yüklenemedi"

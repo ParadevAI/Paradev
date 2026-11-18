@@ -82,8 +82,7 @@ export function CloudUsagePage({
 					{isAdmin ? (
 						<AllowanceCard
 							total={byDay.data.total}
-							allowance={period?.allowance ?? null}
-							isPeriod={period !== undefined}
+							period={period}
 							billing={
 								<MoreLink Link={Link} to={{ page: "billing" }}>
 									<Trans>Billing</Trans>

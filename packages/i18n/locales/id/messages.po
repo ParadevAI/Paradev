@@ -17762,6 +17762,9 @@ msgstr "Mencari penggunaan Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Kursi yang dihapus di tengah siklus tetap aktif hingga {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Kursi, kredit, dan batas penggunaan tambahan belum dimuat. Semuanya muncul saat data penagihan diperbarui berikutnya."
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "Environment yang digunakan otomatisasi ini untuk memulai workspace cloud
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Ekstensi dan data lokalnya dihapus dari browser ini."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Batas penggunaan tambahan adalah persentase dari paket, jadi jumlahnya tidak ditampilkan dan halaman ini tidak dapat mengetahui kapan batas itu tercapai."
+
 msgid "The factory"
 msgstr "Pabriknya"
 
@@ -20756,6 +20762,9 @@ msgstr "Organisasi ini tidak memiliki periode penagihan. Pilih rentang waktu seb
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Organisasi ini memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Halaman ini tidak dapat mengetahui kapan batas penggunaan tercapai."
 
 msgid "This page could not be loaded"
 msgstr "Halaman ini tidak bisa dimuat"

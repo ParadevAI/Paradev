@@ -17762,6 +17762,9 @@ msgstr "正在搜尋Kbd的使用處"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "週期中途移除的席位在 {0} 前仍然有效。"
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "席位、額度和額外用量上限尚未載入。下次帳單資料更新後會顯示。"
+
 msgid "Secondary"
 msgstr "次要"
 
@@ -20167,6 +20170,9 @@ msgstr "此自動化用來啟動雲端工作區的環境已被封存或沒有儲
 msgid "The extension and its local data are deleted from this browser."
 msgstr "此擴充功能及其本機資料將從這個瀏覽器中刪除。"
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "額外用量上限是方案的一個百分比，因此不顯示金額，此頁面也無法判斷何時達到上限。"
+
 msgid "The factory"
 msgstr "工廠"
 
@@ -20756,6 +20762,9 @@ msgstr "此組織沒有帳單週期。請改為選擇一個時間範圍。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此組織使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "此頁面無法判斷何時達到使用上限。"
 
 msgid "This page could not be loaded"
 msgstr "無法載入這個頁面"

@@ -17762,6 +17762,9 @@ msgstr "Zoeken naar Kbd-gebruik"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Plekken die halverwege de periode zijn verwijderd, blijven actief tot {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Plekken, tegoed en de limiet voor extra gebruik zijn nog niet geladen. Ze verschijnen wanneer de factureringsgegevens de volgende keer worden vernieuwd."
+
 msgid "Secondary"
 msgstr "Secundair"
 
@@ -20167,6 +20170,9 @@ msgstr "De omgeving waaruit deze automatisering cloudwerkruimtes start, is gearc
 msgid "The extension and its local data are deleted from this browser."
 msgstr "De extensie en de lokale gegevens ervan worden uit deze browser verwijderd."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "De limiet voor extra gebruik is een percentage van het abonnement. Daarom wordt het bedrag niet getoond en kan deze pagina niet zien wanneer de limiet is bereikt."
+
 msgid "The factory"
 msgstr "De fabriek"
 
@@ -20756,6 +20762,9 @@ msgstr "Deze organisatie heeft geen factuurperiodes. Kies in plaats daarvan een 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Deze organisatie zit op het Free-plan. {appName} Mobile is beschikbaar voor organisaties met Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Deze pagina kan niet zien wanneer de gebruikslimiet is bereikt."
 
 msgid "This page could not be loaded"
 msgstr "Deze pagina kon niet worden geladen"

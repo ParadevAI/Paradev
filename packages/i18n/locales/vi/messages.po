@@ -17762,6 +17762,9 @@ msgstr "Đang tìm các chỗ dùng Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Chỗ ngồi bị gỡ giữa chu kỳ vẫn hoạt động đến {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Số chỗ, tín dụng và giới hạn mức dùng thêm chưa được tải. Chúng sẽ hiện ra ở lần làm mới dữ liệu thanh toán tiếp theo."
+
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20167,6 +20170,9 @@ msgstr "Environment mà tự động hóa này dùng để khởi động worksp
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Tiện ích mở rộng và dữ liệu cục bộ của nó sẽ bị xóa khỏi trình duyệt này."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Giới hạn mức dùng thêm là một tỷ lệ phần trăm của gói, nên số tiền không được hiển thị và trang này không thể biết khi nào đạt giới hạn."
+
 msgid "The factory"
 msgstr "Nhà máy"
 
@@ -20756,6 +20762,9 @@ msgstr "Tổ chức này không có kỳ thanh toán nào. Hãy chọn một kho
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tổ chức này đang dùng gói Free. {appName} Mobile chỉ dành cho tổ chức dùng gói Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Trang này không thể biết khi nào đạt giới hạn sử dụng."
 
 msgid "This page could not be loaded"
 msgstr "Không thể tải trang này"

@@ -17762,6 +17762,9 @@ msgstr "Ищем использования Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Места, удалённые в середине периода, остаются активными до {0}."
 
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Места, кредиты и лимит дополнительного использования ещё не загружены. Они появятся при следующем обновлении платёжных данных."
+
 msgid "Secondary"
 msgstr "Вторичная"
 
@@ -20167,6 +20170,9 @@ msgstr "Окружение, из которого эта автоматизац�
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Расширение и его локальные данные удаляются из этого браузера."
 
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown, and this page cannot tell when it is reached."
+msgstr "Лимит дополнительного использования задан процентом от тарифа, поэтому его сумма не показана, и эта страница не может определить, когда он достигнут."
+
 msgid "The factory"
 msgstr "Фабрика"
 
@@ -20756,6 +20762,9 @@ msgstr "У этой организации нет расчётных перио�
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Эта страница не может определить, когда достигнут лимит использования."
 
 msgid "This page could not be loaded"
 msgstr "Не удалось загрузить эту страницу"
