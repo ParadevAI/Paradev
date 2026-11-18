@@ -114,7 +114,7 @@ Channels: `preview` for internal builds, `production` for the store build.
 | Change | Lane |
 |---|---|
 | JS merged to main, under the `deploy.yml` trigger paths | `deploy.yml` publishes to `preview` and `production` |
-| Native merged to main | `deploy.yml` builds and uploads to App Store Connect; App Review stays manual |
+| Native merged to main | `deploy.yml` builds both platforms, uploads to App Store Connect and to the Play internal track as a draft; App Review and Play promotion stay manual |
 | JS on a pull request | `pr-preview.yml` publishes to a branch named after the git branch and comments a QR code, when a development build matches the fingerprint |
 | Native on a pull request | Add the `mobile-build` label; `build-pr.yml` builds a development client |
 
@@ -122,7 +122,7 @@ Channels: `preview` for internal builds, `production` for the store build.
 
 Every merge to main that touches the app or a package it imports (the
 `deploy.yml` trigger paths) publishes to everyone on the production channel,
-TestFlight and App Store alike — one binary, one channel. A new workspace
+TestFlight, App Store and Play alike — one channel. A new workspace
 dependency of the app goes in those paths, or its fixes never publish. Installed builds have to track
 main: the API and host-service move with every merge, and a build left on old
 JS meets them without the client half of each change. The runtime version
@@ -206,11 +206,10 @@ eas build --platform android --profile production
 eas submit --platform android --profile production --latest
 ```
 
-`.eas/workflows/deploy-android.yml` runs the same two steps, skipping the build
-when one already matches the fingerprint. It is manual (`workflow_dispatch`)
-until the first hand upload is done and Android takes OTA updates; then its
-jobs move into `deploy.yml`. Promote from internal to production in Play
-Console.
+`deploy.yml` runs the same two steps on every merge to main, skipping the
+build when one already matches the fingerprint, and publishes each merge's JS
+to Android as an OTA update, as it does for iOS. Promote a new build from
+internal to production in Play Console.
 
 ### Checking a release build without publishing
 
