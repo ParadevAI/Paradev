@@ -18,7 +18,7 @@ import { Wordmark } from "./components/Wordmark";
 
 const SIDEBAR_SURFACE = "border-border bg-sidebar dark:bg-muted/35";
 
-export function AppSidebar({ showCloudUsage }: { showCloudUsage: boolean }) {
+export function AppSidebar() {
 	const { t } = useLingui();
 	const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -46,10 +46,7 @@ export function AppSidebar({ showCloudUsage }: { showCloudUsage: boolean }) {
 						</SheetTitle>
 						{/* The translucent sidebar tint needs the opaque sheet under it. */}
 						<div className={cn("h-full", SIDEBAR_SURFACE)}>
-							<SidebarBody
-								showCloudUsage={showCloudUsage}
-								onNavigate={() => setSheetOpen(false)}
-							/>
+							<SidebarBody onNavigate={() => setSheetOpen(false)} />
 						</div>
 					</SheetContent>
 				</Sheet>
@@ -67,7 +64,7 @@ export function AppSidebar({ showCloudUsage }: { showCloudUsage: boolean }) {
 					SIDEBAR_SURFACE,
 				)}
 			>
-				<SidebarBody showCloudUsage={showCloudUsage} />
+				<SidebarBody />
 			</aside>
 		</>
 	);

@@ -4,32 +4,25 @@ import { i18n } from "@superset/i18n";
 import { cn } from "@superset/ui/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
-import { CLOUD_USAGE_NAV_ITEM, NAV_ITEMS } from "./constants";
+import { FlagGate } from "./components/FlagGate";
+import { NAV_ITEMS } from "./constants";
 
 function isNavItemActive(pathname: string, href: string) {
 	return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SidebarNav({
-	showCloudUsage,
-	onNavigate,
-}: {
-	showCloudUsage: boolean;
-	onNavigate?: () => void;
-}) {
+export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 	const pathname = usePathname();
-	const items = showCloudUsage
-		? [...NAV_ITEMS, CLOUD_USAGE_NAV_ITEM]
-		: NAV_ITEMS;
 
 	return (
 		<nav className="flex flex-col gap-px px-2">
-			{items.map((item) => {
+			{NAV_ITEMS.map((item) => {
 				const isActive = isNavItemActive(pathname, item.href);
 				const Icon = item.icon;
 				const NavLink = item.reloadDocument ? "a" : Link;
-				return (
+				const link = (
 					<NavLink
 						key={item.href}
 						href={item.href}
@@ -50,6 +43,13 @@ export function SidebarNav({
 							{i18n._(item.label)}
 						</span>
 					</NavLink>
+				);
+				return item.flag ? (
+					<Suspense key={item.href} fallback={null}>
+						<FlagGate flag={item.flag}>{link}</FlagGate>
+					</Suspense>
+				) : (
+					link
 				);
 			})}
 		</nav>

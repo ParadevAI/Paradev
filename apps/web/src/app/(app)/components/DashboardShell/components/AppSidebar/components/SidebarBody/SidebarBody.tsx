@@ -7,13 +7,7 @@ import { Wordmark } from "../Wordmark";
 import { OrganizationMenu } from "./components/OrganizationMenu";
 import { SidebarNav } from "./components/SidebarNav";
 
-export function SidebarBody({
-	showCloudUsage,
-	onNavigate,
-}: {
-	showCloudUsage: boolean;
-	onNavigate?: () => void;
-}) {
+export function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 	const { t } = useLingui();
 
 	return (
@@ -27,7 +21,7 @@ export function SidebarBody({
 					<Wordmark />
 				</Link>
 			</div>
-			<SidebarNav showCloudUsage={showCloudUsage} onNavigate={onNavigate} />
+			<SidebarNav onNavigate={onNavigate} />
 			<div className="flex-1" />
 			<div className="p-2">
 				<OrganizationMenu />

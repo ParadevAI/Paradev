@@ -1,4 +1,5 @@
 import { DashboardShell } from "./components/DashboardShell";
+import { FeatureFlagsProvider } from "./providers/FeatureFlagsProvider";
 import { cloudUsageEnabled } from "./utils/cloudUsageEnabled";
 import { requireSession } from "./utils/requireSession";
 
@@ -10,8 +11,10 @@ export default async function AppLayout({
 	await requireSession();
 
 	return (
-		<DashboardShell showCloudUsage={await cloudUsageEnabled()}>
-			{children}
-		</DashboardShell>
+		<FeatureFlagsProvider
+			flags={cloudUsageEnabled().then((cloudUsage) => ({ cloudUsage }))}
+		>
+			<DashboardShell>{children}</DashboardShell>
+		</FeatureFlagsProvider>
 	);
 }
