@@ -72,6 +72,7 @@ describe("queryCloudUsage", () => {
 				gbHours: 34,
 				usageUsd: 2.04,
 			},
+			count: 0,
 			nextCursor: null,
 		});
 	});
@@ -216,6 +217,52 @@ test("paging one row at a time returns every row once, in order", async () => {
 	expect(await pages((cursor) => boots({ limit: 1, cursor }))).toEqual(
 		(await boots({})).items,
 	);
+});
+
+test("a search matches workspace names, any case, and its wildcards are text", async () => {
+	const keys = async (search: string) =>
+		(await usage({ groupBy: "workspace", filters: { search } })).items.map(
+			(item) => item.key,
+		);
+	expect(await keys("CHECK")).toEqual([CHECKOUT]);
+	expect(await keys("-")).toEqual([CHECKOUT, BILLING_PAGE, BROKEN]);
+	expect(await keys("%")).toEqual([]);
+});
+
+test.each([
+	["gbHours", "desc", [CHECKOUT, BILLING_PAGE, BROKEN]],
+	["hours", "asc", [BROKEN, BILLING_PAGE, CHECKOUT]],
+	["boots", "desc", [CHECKOUT, BILLING_PAGE, BROKEN]],
+	["name", "asc", [BILLING_PAGE, BROKEN, CHECKOUT]],
+	["name", "desc", [CHECKOUT, BROKEN, BILLING_PAGE]],
+	["status", "asc", [BROKEN, BILLING_PAGE, CHECKOUT]],
+] as const)("sorted by %s %s, pages of one row give the same rows", async (by, order, expected) => {
+	const sort = { by, order };
+	const all = await usage({ groupBy: "workspace", sort });
+	expect(all.items.map((item) => item.key)).toEqual([...expected]);
+	const paged: typeof all.items = [];
+	let cursor: (typeof all)["nextCursor"] | undefined;
+	do {
+		const page = await usage({ groupBy: "workspace", sort, limit: 1, cursor });
+		paged.push(...page.items);
+		cursor = page.nextCursor;
+	} while (cursor && paged.length < 10);
+	expect(paged).toEqual(all.items);
+});
+
+test("count is every group of the filter, on every page", async () => {
+	const first = await usage({ groupBy: "workspace", limit: 1 });
+	expect(first.count).toBe(3);
+	const second = await usage({
+		groupBy: "workspace",
+		limit: 1,
+		cursor: first.nextCursor ?? undefined,
+	});
+	expect(second.count).toBe(3);
+	expect(
+		(await usage({ groupBy: "workspace", filters: { status: ["failed"] } }))
+			.count,
+	).toBe(1);
 });
 
 test("billing periods keep Autumn's reset day through short months", () => {

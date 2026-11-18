@@ -139,6 +139,64 @@ describe("scope", () => {
 		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
 	});
 
+	test("an owner filters workspaces by person, size, status and name, with a count", async () => {
+		const workspaces = async (filters: object) => {
+			const { items, count } = await caller(MAYA).usage.query({
+				range: NOVEMBER,
+				groupBy: "workspace",
+				...filters,
+			});
+			return { keys: items.map((item) => item.key), count };
+		};
+		expect(await workspaces({ user: SAM })).toEqual({
+			keys: [BILLING_PAGE],
+			count: 1,
+		});
+		expect(await workspaces({ size: "medium" })).toEqual({
+			keys: [CHECKOUT],
+			count: 1,
+		});
+		expect(await workspaces({ status: ["failed", "awake"] })).toEqual({
+			keys: [BILLING_PAGE, BROKEN],
+			count: 2,
+		});
+		expect(await workspaces({ search: "BILLING" })).toEqual({
+			keys: [BILLING_PAGE],
+			count: 1,
+		});
+	});
+
+	test("a member's filters never reach past their own workspaces", async () => {
+		const member = (filters: object) =>
+			caller(SAM).usage.query({
+				range: NOVEMBER,
+				groupBy: "workspace",
+				...filters,
+			});
+		const own = await member({});
+		expect(await member({ user: MAYA })).toEqual(own);
+		for (const filters of [
+			{ status: ["asleep", "failed"] },
+			{ size: "medium" },
+			{ search: "check" },
+		]) {
+			const { items, total, count } = await member(filters);
+			expect(items).toEqual([]);
+			expect(count).toBe(0);
+			expect(total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+		}
+	});
+
+	test("a person of another organization returns nothing", async () => {
+		const usage = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "workspace",
+			user: BEN,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+	});
+
 	test("a signed-in person outside the organization is FORBIDDEN", async () => {
 		await expect(
 			caller(BEN).usage.query({ range: NOVEMBER }),
@@ -204,6 +262,12 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 		{ range: NOVEMBER, groupBy: "user" },
 		{ range: "30d", groupBy: "workspace" },
 		{ range: NOVEMBER, groupBy: "workspace", workspace: CHECKOUT },
+		{ range: NOVEMBER, groupBy: "workspace", user: MAYA },
+		{ range: NOVEMBER, groupBy: "workspace", size: "medium" },
+		{ range: NOVEMBER, groupBy: "workspace", status: ["asleep"] },
+		{ range: NOVEMBER, groupBy: "workspace", search: "e" },
+		{ range: NOVEMBER, groupBy: "workspace", sort: "hours" },
+		{ range: NOVEMBER, groupBy: "workspace", order: "asc" },
 	] as const) {
 		await expect(
 			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
@@ -261,12 +325,18 @@ test("paging one row at a time with the opaque cursor returns every row once", a
 		}
 		return all;
 	}
-	for (const groupBy of ["workspace", "day"] as const) {
+	for (const input of [
+		{ groupBy: "workspace" },
+		{ groupBy: "day" },
+		{ groupBy: "workspace", sort: "name", order: "asc" },
+		{ groupBy: "workspace", sort: "status" },
+		{ groupBy: "user", sort: "boots", order: "asc" },
+	] as const) {
 		expect(
 			await pages((cursor) =>
-				owner.usage.query({ range: NOVEMBER, groupBy, limit: 1, cursor }),
+				owner.usage.query({ range: NOVEMBER, ...input, limit: 1, cursor }),
 			),
-		).toEqual((await owner.usage.query({ range: NOVEMBER, groupBy })).items);
+		).toEqual((await owner.usage.query({ range: NOVEMBER, ...input })).items);
 	}
 	const boots = (await owner.boots.list({ range: NOVEMBER })).items;
 	expect(
@@ -276,6 +346,16 @@ test("paging one row at a time with the opaque cursor returns every row once", a
 			)
 		).map((boot) => boot.id),
 	).toEqual(boots.map((boot) => boot.id));
+});
+
+test("sorting by name or status needs grouping by workspace", async () => {
+	await expect(
+		caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "user",
+			sort: "name",
+		}),
+	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
 test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {

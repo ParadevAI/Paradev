@@ -4,7 +4,10 @@ import type {
 	CloudUsageResult,
 	CloudUsageWindow,
 } from "@superset/db/cloud-usage-query";
-import { cloudUsageGroupByValues } from "@superset/db/cloud-usage-query";
+import {
+	cloudUsageGroupByValues,
+	cloudUsageSortValues,
+} from "@superset/db/cloud-usage-query";
 import {
 	cloudWorkspaceBootEndReasonEnum,
 	cloudWorkspaceFailureReasonEnum,
@@ -36,17 +39,38 @@ const cloudListInputSchema = z.object({
 	cursor: z.string().optional(),
 });
 
-export const cloudUsageInputSchema = cloudListInputSchema.extend({
-	groupBy: z.enum(cloudUsageGroupByValues).optional(),
-});
+export const cloudUsageInputSchema = cloudListInputSchema
+	.extend({
+		groupBy: z.enum(cloudUsageGroupByValues).optional(),
+		/** Owners and admins only: a member always gets their own rows. */
+		user: z.string().optional(),
+		size: machineSizeSchema.optional(),
+		status: z.array(cloudWorkspaceStatusEnum).optional(),
+		search: z.string().max(200).optional(),
+		sort: z.enum(cloudUsageSortValues).optional(),
+		order: z.enum(["asc", "desc"]).optional(),
+	})
+	.refine(
+		({ sort, groupBy }) =>
+			(sort !== "name" && sort !== "status") || groupBy === "workspace",
+		"sort by name or status needs groupBy workspace",
+	);
 
-/** Inside the opaque usage cursor, by sort. `value` is cast to numeric in SQL, so it must be decimal digits. */
+const decimalSchema = z.string().regex(/^\d+(\.\d+)?$/);
+
+const valueKeyset = <Sort extends string>(sort: Sort, value = decimalSchema) =>
+	z.object({ sort: z.literal(sort), value, key: z.string() });
+
+/**
+ * Inside the opaque usage cursor, by sort. `value` is cast to numeric in SQL, so it must be decimal
+ * digits, except for a name. GB-hours keep the name `gbMinutes` they had before other sorts.
+ */
 export const usageKeysetSchemas = {
-	gbMinutes: z.object({
-		sort: z.literal("gbMinutes"),
-		value: z.string().regex(/^\d+(\.\d+)?$/),
-		key: z.string(),
-	}),
+	gbMinutes: valueKeyset("gbMinutes"),
+	hours: valueKeyset("hours"),
+	boots: valueKeyset("boots"),
+	status: valueKeyset("status"),
+	name: valueKeyset("name", z.string()),
 	key: z.object({ sort: z.literal("key"), key: z.string() }),
 };
 
@@ -125,6 +149,8 @@ export const cloudUsageOutputSchema = z.object({
 		}),
 	),
 	total: metricsSchema,
+	/** Groups across every page; 0 with no groupBy. */
+	count: z.number(),
 	nextCursor: z.string().nullable(),
 }) satisfies z.ZodType<Page<CloudUsageResult>>;
 

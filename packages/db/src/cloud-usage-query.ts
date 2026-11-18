@@ -12,6 +12,7 @@ import {
 	desc,
 	eq,
 	gte,
+	ilike,
 	inArray,
 	isNotNull,
 	isNull,
@@ -37,6 +38,7 @@ import {
 	taskProjects,
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
+import { escapeLikePattern } from "./utils/like";
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
@@ -73,6 +75,8 @@ export interface CloudUsageFilters {
 	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
+	/** Part of the workspace name, in any case. */
+	search?: string;
 }
 
 export interface CloudFleetFilters extends CloudUsageFilters {
@@ -84,12 +88,27 @@ export interface CloudUsageWindow {
 	to: Date;
 }
 
+export const cloudUsageSortValues = [
+	"gbHours",
+	"hours",
+	"boots",
+	"name",
+	"status",
+] as const;
+
+/** `name` and `status` are the workspace's, so they need grouping by workspace. */
+export interface CloudUsageSort {
+	by: (typeof cloudUsageSortValues)[number];
+	order: "asc" | "desc";
+}
+
 /**
- * `gbMinutes` is the exact sum as decimal digits with an optional fraction (`1080`, `16.5`); it is
- * cast to numeric in SQL, so the router must check that format. Grouped by day, only `key` is used.
+ * `value` is the last row's sort value: the workspace name for `name`, else decimal digits with an
+ * optional fraction (`1080`, `16.5`) that is cast to numeric in SQL, so the router must check that
+ * format. Grouped by day with no sort, only `key` is used.
  */
 export interface CloudUsageCursor {
-	gbMinutes: string;
+	value: string;
 	key: string;
 }
 
@@ -204,6 +223,11 @@ function scopeConditions(
 	if (filters.status?.length) {
 		conditions.push(inArray(workspaces.status, filters.status));
 	}
+	if (filters.search) {
+		conditions.push(
+			ilike(workspaces.name, `%${escapeLikePattern(filters.search)}%`),
+		);
+	}
 	return conditions;
 }
 
@@ -215,6 +239,21 @@ const sizeOfBoot = sql`case ${boots.vcpus} ${sql.join(
 )} end`;
 
 const sizeOfWorkspace = sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE})`;
+
+const STATUS_ORDER: CloudWorkspaceStatus[] = [
+	"failed",
+	"provisioning",
+	"awake",
+	"asleep",
+	"archived",
+];
+
+const statusRank = sql`case ${workspaces.status} ${sql.join(
+	STATUS_ORDER.map(
+		(status, rank) => sql`when ${status} then ${sql.raw(String(rank))}`,
+	),
+	sql` `,
+)} end`;
 
 const bootSize = (size: MachineSize) =>
 	eq(boots.vcpus, MACHINE_SIZE_VCPUS[size]);
@@ -491,6 +530,8 @@ interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
 	window: CloudUsageWindow;
 	filters?: Filters;
 	groupBy?: GroupBy;
+	/** Default: by day newest first, else by GB-hours, most first. */
+	sort?: CloudUsageSort;
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
@@ -534,36 +575,79 @@ async function usageRows(
 		return {
 			items: [],
 			total: toMetrics(await totalRow, overagePerGbHour),
+			count: 0,
 			nextCursor: null,
 		};
 	}
 
+	const sort =
+		options.sort ??
+		(groupBy === "day" ? null : { by: "gbHours", order: "desc" });
+	if (
+		(sort?.by === "name" || sort?.by === "status") &&
+		groupBy !== "workspace"
+	) {
+		throw new Error(`Sorting by ${sort.by} needs grouping by workspace`);
+	}
 	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
 	const metrics = metricColumns(facts);
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
-	const [rows, total] = await Promise.all([
+	const ofWorkspace = (column: AnyPgColumn | SQL) =>
+		sql`(select ${column} from ${workspaces} where ${workspaces.id} = ${facts.key}::uuid)`;
+	const sortValue = !sort
+		? sortKey
+		: {
+				gbHours: metrics.gbMinutes,
+				hours: metrics.seconds,
+				boots: metrics.boots,
+				name: sql`coalesce(${ofWorkspace(workspaces.name)}, '')`,
+				status: sql`coalesce(${ofWorkspace(statusRank)}, ${sql.raw(String(STATUS_ORDER.length))})`,
+			}[sort.by];
+	const cursorValue =
+		cursor &&
+		(sort?.by === "name"
+			? sql`${cursor.value}`
+			: sql`${cursor.value}::numeric`);
+	const [rows, total, count] = await Promise.all([
 		db
 			.with(facts)
-			.select({ key: facts.key, sortKey, ...metrics })
+			.select({
+				key: facts.key,
+				sortKey,
+				sortValue: sql<string>`(${sortValue})::text`,
+				...metrics,
+			})
 			.from(facts)
 			.groupBy(facts.key)
 			.having(
 				!cursor
 					? undefined
-					: groupBy === "day"
+					: !sort
 						? sql`${facts.key} < ${cursor.key}`
 						: or(
-								sql`${metrics.gbMinutes} < ${cursor.gbMinutes}::numeric`,
-								sql`${metrics.gbMinutes} = ${cursor.gbMinutes}::numeric and ${sortKey} > ${cursor.key}`,
+								sort.order === "desc"
+									? sql`${sortValue} < ${cursorValue}`
+									: sql`${sortValue} > ${cursorValue}`,
+								sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
 							),
 			)
 			.orderBy(
-				...(groupBy === "day"
+				...(!sort
 					? [desc(facts.key)]
-					: [desc(metrics.gbMinutes), asc(sortKey)]),
+					: [
+							sort.order === "desc" ? desc(sortValue) : asc(sortValue),
+							asc(sortKey),
+						]),
 			)
 			.limit(limit + 1),
 		totalRow,
+		db
+			.with(facts)
+			.select({
+				count: sql<number>`count(distinct ${sortKey})`.mapWith(Number),
+			})
+			.from(facts)
+			.then(([row]) => row?.count ?? 0),
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
@@ -577,7 +661,7 @@ async function usageRows(
 					page.flatMap((row) => (row.key ? [row.key] : [])),
 				);
 	return {
-		items: page.map(({ key, sortKey: _, ...row }) => {
+		items: page.map(({ key, sortKey: _, sortValue: __, ...row }) => {
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
@@ -587,9 +671,10 @@ async function usageRows(
 			};
 		}),
 		total: toMetrics(total, overagePerGbHour),
+		count,
 		nextCursor:
 			rows.length > limit && last
-				? { gbMinutes: last.gbMinutes, key: last.sortKey }
+				? { value: last.sortValue, key: last.sortKey }
 				: null,
 	};
 }

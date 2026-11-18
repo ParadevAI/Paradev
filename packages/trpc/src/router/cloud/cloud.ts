@@ -133,7 +133,13 @@ const CURSOR_FILTER_KEYS = Object.keys({
 	endReason: true,
 	groupBy: true,
 	open: true,
+	order: true,
 	range: true,
+	search: true,
+	size: true,
+	sort: true,
+	status: true,
+	user: true,
 	workspace: true,
 } satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
 
@@ -233,10 +239,13 @@ export function cloudRouterWith(deps: CloudDeps) {
 							i18nKey: "serverError.cloud.onlyAdminsSeeUsageByPerson",
 						});
 					}
-					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
+					const sort =
+						input.sort ?? (input.groupBy === "day" ? null : "gbHours");
+					const keysetSort =
+						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(
 						input,
-						usageKeysetSchemas[sort],
+						usageKeysetSchemas[keysetSort],
 					);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await queryCloudUsage(
@@ -244,11 +253,21 @@ export function cloudRouterWith(deps: CloudDeps) {
 						ctx.scope,
 						{
 							window,
-							filters: { workspace: input.workspace },
+							filters: {
+								workspace: input.workspace,
+								user: ctx.isAdmin ? input.user : undefined,
+								size: input.size,
+								status: input.status,
+								search: input.search,
+							},
 							groupBy: input.groupBy,
+							sort:
+								sort === null
+									? undefined
+									: { by: sort, order: input.order ?? "desc" },
 							limit: input.limit,
 							cursor: keyset && {
-								gbMinutes: keyset.sort === "gbMinutes" ? keyset.value : "0",
+								value: keyset.sort === "key" ? "0" : keyset.value,
 								key: keyset.key,
 							},
 							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
@@ -261,9 +280,13 @@ export function cloudRouterWith(deps: CloudDeps) {
 							nextCursor &&
 							writeCursor(
 								input,
-								sort === "key"
-									? { sort, key: nextCursor.key }
-									: { sort, value: nextCursor.gbMinutes, key: nextCursor.key },
+								keysetSort === "key"
+									? { sort: keysetSort, key: nextCursor.key }
+									: {
+											sort: keysetSort,
+											value: nextCursor.value,
+											key: nextCursor.key,
+										},
 							),
 					};
 				}),
