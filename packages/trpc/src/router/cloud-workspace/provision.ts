@@ -27,7 +27,13 @@ import {
 	queueChatMovesTo,
 } from "../chat-move/utils/queueChatMove";
 import { generateCloudWorkspaceName } from "./generate-name";
-import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
+import {
+	attachBootSession,
+	authorizeBoot,
+	boxFor,
+	isUsageRefusal,
+	releaseBoot,
+} from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
 import { transitionCloudWorkspace } from "./transition";
 
@@ -182,10 +188,14 @@ async function provision(
 		nudge(row.organizationId, "cloud_workspaces");
 		logControl("provision.awake", scope, { ms: Date.now() - startedAt });
 		if (sandbox.expiresAt) {
-			await recordSandboxAwake(row.id, {
-				expiresAt: sandbox.expiresAt,
-				sessionId: sandbox.sessionId,
-			});
+			await recordSandboxAwake(
+				row.id,
+				{
+					expiresAt: sandbox.expiresAt,
+					sessionId: sandbox.sessionId,
+				},
+				row.organizationId,
+			);
 		}
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
@@ -228,6 +238,7 @@ async function provision(
 		// from the sidebar still removes it. Any other failure must not leak
 		// a box, since billing started at provision.
 		const keepForDiagnosis = error instanceof SandboxNotReadyError;
+		const refused = isUsageRefusal(error);
 		await (keepForDiagnosis ? stopSandbox : deleteSandbox)(
 			providerSandboxId,
 		).catch((teardownError) =>
@@ -250,11 +261,14 @@ async function provision(
 				"failure.site": "provision",
 				"error.class": errorClass(error),
 				"status.changed": changed,
+				"failure.refused": refused,
 				"sandbox.kept": keepForDiagnosis,
 			},
 			error,
 		);
-		captureControlException(error, scope, { failureSite: "provision" });
+		if (!refused) {
+			captureControlException(error, scope, { failureSite: "provision" });
+		}
 		return "failed";
 	}
 }

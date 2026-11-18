@@ -149,11 +149,19 @@ async function addressSandbox(
 			const described = await describeSandbox(row.providerSandboxId);
 			const { expiresAt, sessionId } = described;
 			if (expiresAt) {
-				await recordSandboxAwake(row.id, { expiresAt, sessionId });
+				await recordSandboxAwake(
+					row.id,
+					{ expiresAt, sessionId },
+					row.organizationId,
+				);
 			} else {
-				await recordSandboxAsleep(row.id, {
-					sessionId: sessionId ?? row.sandboxSessionId,
-				});
+				await recordSandboxAsleep(
+					row.id,
+					{
+						sessionId: sessionId ?? row.sandboxSessionId,
+					},
+					row.organizationId,
+				);
 			}
 			return {
 				hostTarget: described.hostTarget,
@@ -754,9 +762,13 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id, {
-					sessionId: stopped.sessionId ?? row.sandboxSessionId,
-				});
+				await recordSandboxAsleep(
+					row.id,
+					{
+						sessionId: stopped.sessionId ?? row.sandboxSessionId,
+					},
+					row.organizationId,
+				);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };

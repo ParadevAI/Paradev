@@ -290,12 +290,14 @@ async function start(args: StartCloudWorkspaceInput) {
 	try {
 		await args.beforeProvision?.(row.id);
 	} catch (error) {
-		await transitionCloudWorkspace({
+		const archived = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
 			to: "archived",
 		});
-		logControl("workspace.archived", scope, { trigger: "move_failed" });
+		if (archived) {
+			logControl("workspace.archived", scope, { trigger: "move_failed" });
+		}
 		throw error;
 	}
 	nudge(row.organizationId, "cloud_workspaces");

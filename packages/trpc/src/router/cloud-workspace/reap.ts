@@ -107,9 +107,13 @@ export async function reapArchivedCloudWorkspace(
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
-	await recordSandboxAsleep(row.id, {
-		sessionId: stopped.sessionId ?? row.sandboxSessionId,
-	});
+	await recordSandboxAsleep(
+		row.id,
+		{
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+		},
+		row.organizationId,
+	);
 	await queueSettleWorkspace(row.id);
 	logControl("archive.stopped", scope, {});
 	return "stopped";
@@ -169,8 +173,12 @@ export async function queueReap(
 			error,
 		);
 		const stopped = await stopSandbox(box.providerSandboxId);
-		await recordSandboxAsleep(input.cloudWorkspaceId, {
-			sessionId: stopped.sessionId ?? box.sandboxSessionId,
-		});
+		await recordSandboxAsleep(
+			input.cloudWorkspaceId,
+			{
+				sessionId: stopped.sessionId ?? box.sandboxSessionId,
+			},
+			box.organizationId,
+		);
 	});
 }

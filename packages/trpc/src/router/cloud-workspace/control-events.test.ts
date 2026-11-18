@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
+import { userError } from "../../i18n-error";
 import {
 	type ControlRecord,
 	type ControlScope,
@@ -11,8 +12,10 @@ import * as sandbox from "../../lib/sandbox";
 import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as jobs from "./jobs";
 import { provisionCloudWorkspace } from "./provision";
+import * as sandboxExpiry from "./sandbox-expiry";
 import { queueProvision } from "./start";
 import * as transition from "./transition";
+import { wakeCloudWorkspace } from "./wake";
 
 const records: ControlRecord[] = [];
 const captured: Array<[unknown, ControlScope, unknown]> = [];
@@ -33,6 +36,7 @@ stub(transition, {
 	},
 });
 stub(realtime, { nudge: () => {} });
+stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
 stub(chatMoves, { failChatMovesTo: async () => {} });
 stub(jobs, {
 	publishCloudWorkspaceJob: async () => {
@@ -48,10 +52,20 @@ stub(db.query.cloudWorkspaces, {
 		name: "Cloud workspace",
 	}),
 });
+let claimError: Error | null = new TypeError("claim failed");
+let woken = { booted: false, rebooted: false };
 stub(sandbox, {
 	buildSandboxClaim: async () => {
-		throw new TypeError("claim failed");
+		if (claimError) throw claimError;
+		return { claim: {}, agentCredentialDigest: "digest" };
 	},
+	wakeSandbox: async () => ({
+		hostTarget: "https://box.test",
+		...woken,
+		answer: { stamps: [] },
+		expiresAt: null,
+		sessionId: null,
+	}),
 	deleteSandbox: async () => {},
 });
 
@@ -105,5 +119,56 @@ describe("a workspace marked failed is logged and captured", () => {
 		expect(captured).toEqual([
 			[expect.any(TypeError), SCOPE, { failureSite: "provision" }],
 		]);
+	});
+
+	test("a refused boot is a warning and not an exception", async () => {
+		reset();
+		claimError = userError({
+			code: "FORBIDDEN",
+			message: "limit reached",
+			i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+		});
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
+			"failed",
+		);
+		claimError = new TypeError("claim failed");
+		expect(transitions).toEqual([{ to: "failed" }]);
+		const failed = records.at(-1);
+		expect(failed?.level).toBe("warn");
+		expect(failed?.attributes).toMatchObject({
+			"failure.site": "provision",
+			"error.class": "TRPCError",
+			"failure.refused": true,
+		});
+		expect(captured).toEqual([]);
+	});
+});
+
+describe("wake events", () => {
+	const row = {
+		id: "ws_1",
+		organizationId: "org_1",
+		providerSandboxId: "ws-box",
+		sandboxUrl: "https://box.test",
+		bootAgentCredentialDigest: "digest",
+	} as Parameters<typeof wakeCloudWorkspace>[0];
+
+	test("a keepalive wake of a serving box writes nothing", async () => {
+		reset();
+		claimError = null;
+		woken = { booted: false, rebooted: false };
+		await wakeCloudWorkspace(row);
+		expect(records).toEqual([]);
+	});
+
+	test("a wake that boots the box again is logged", async () => {
+		reset();
+		claimError = null;
+		woken = { booted: false, rebooted: true };
+		await wakeCloudWorkspace(row);
+		expect(records.map((r) => [r.body, r.attributes["box.rebooted"]])).toEqual([
+			["wake.completed", true],
+		]);
+		claimError = new TypeError("claim failed");
 	});
 });

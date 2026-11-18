@@ -65,6 +65,18 @@ describe("controlRecord", () => {
 			}
 		}
 	});
+
+	test("a failure Autumn refused is a warning, any other an error", () => {
+		const failed = (refused: boolean) =>
+			controlRecord("workspace.failed", SCOPE, {
+				"failure.site": "provision",
+				"error.class": "TRPCError",
+				"status.changed": true,
+				"failure.refused": refused,
+			}).level;
+		expect(failed(true)).toBe("warn");
+		expect(failed(false)).toBe("error");
+	});
 });
 
 describe("errorClass", () => {

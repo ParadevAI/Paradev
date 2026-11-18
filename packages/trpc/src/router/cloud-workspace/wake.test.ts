@@ -46,7 +46,8 @@ describe("restartCloudWorkspace", () => {
 describe("markSandboxUnavailable", () => {
 	const records: ControlRecord[] = [];
 	const captured: Array<[unknown, ControlScope, unknown]> = [];
-	stub(transition, { transitionCloudWorkspace: async () => true });
+	let changed = true;
+	stub(transition, { transitionCloudWorkspace: async () => changed });
 	stub(realtime, { nudge: () => {} });
 	stub(controlLog, {
 		sink: (record: ControlRecord) => {
@@ -89,5 +90,20 @@ describe("markSandboxUnavailable", () => {
 				{ failureSite: "sandbox_unavailable" },
 			],
 		]);
+	});
+
+	test("a row that was not moved is logged but not captured again", async () => {
+		records.length = 0;
+		captured.length = 0;
+		changed = false;
+		await markSandboxUnavailable(
+			{ id: "ws_1", organizationId: "org_1" } as Parameters<
+				typeof markSandboxUnavailable
+			>[0],
+			new sandbox.SandboxUnavailableError("ws-box", new Error("gone")),
+		);
+		changed = true;
+		expect(records[0]?.attributes["status.changed"]).toBe(false);
+		expect(captured).toEqual([]);
 	});
 });

@@ -25,6 +25,7 @@ export interface ControlEvents {
 		"failure.site": "provision" | "queue" | "sandbox_unavailable";
 		"error.class": string;
 		"status.changed": boolean;
+		"failure.refused"?: boolean;
 		"sandbox.kept"?: boolean;
 	};
 	"workspace.archived": {
@@ -102,9 +103,14 @@ export type ControlStep =
 
 export type ControlEvent = keyof ControlEvents;
 
-export const CONTROL_EVENT_LEVELS: { [E in ControlEvent]: ControlLevel } = {
+export const CONTROL_EVENT_LEVELS: {
+	[E in ControlEvent]:
+		| ControlLevel
+		| ((fields: ControlEvents[E]) => ControlLevel);
+} = {
 	"workspace.created": "info",
-	"workspace.failed": "error",
+	"workspace.failed": (fields) =>
+		fields["failure.refused"] ? "warn" : "error",
 	"workspace.archived": "info",
 	"workspace.unarchived": "info",
 	"workspace.awake": "info",
@@ -167,7 +173,13 @@ export function controlRecord<E extends ControlEvent>(
 	for (const [key, value] of Object.entries(fields as Fields)) {
 		if (value !== undefined) attributes[key] = value;
 	}
-	return { level: CONTROL_EVENT_LEVELS[event], body: event, attributes };
+	const level: ControlLevel | ((fields: ControlEvents[E]) => ControlLevel) =
+		CONTROL_EVENT_LEVELS[event];
+	return {
+		level: typeof level === "function" ? level(fields) : level,
+		body: event,
+		attributes,
+	};
 }
 
 const CONSOLE_METHOD = { info: "log", warn: "warn", error: "error" } as const;

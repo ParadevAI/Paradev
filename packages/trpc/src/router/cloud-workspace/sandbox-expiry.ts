@@ -37,9 +37,10 @@ export interface WatchSandboxExpiryInput {
 export async function recordSandboxAwake(
 	cloudWorkspaceId: string,
 	session: { expiresAt: Date; sessionId: string | null },
+	organizationId?: string,
 ): Promise<void> {
 	await markAwake(cloudWorkspaceId, session).catch((error) =>
-		reportSleepWriteFailure(cloudWorkspaceId, error),
+		reportSleepWriteFailure(cloudWorkspaceId, error, organizationId),
 	);
 }
 
@@ -125,6 +126,7 @@ export async function watchSandboxExpiry({
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 		columns: {
+			organizationId: true,
 			providerSandboxId: true,
 			sandboxExpiresAt: true,
 			sandboxSessionId: true,
@@ -140,15 +142,23 @@ export async function watchSandboxExpiry({
 		throw error;
 	});
 	if (live?.expiresAt && live.expiresAt.getTime() > Date.now()) {
-		await recordSandboxAwake(cloudWorkspaceId, {
-			expiresAt: live.expiresAt,
-			sessionId: live.sessionId,
-		});
+		await recordSandboxAwake(
+			cloudWorkspaceId,
+			{
+				expiresAt: live.expiresAt,
+				sessionId: live.sessionId,
+			},
+			row.organizationId,
+		);
 		return "rewatched";
 	}
-	await recordSandboxAsleep(cloudWorkspaceId, {
-		sessionId: live?.sessionId ?? row.sandboxSessionId,
-	});
+	await recordSandboxAsleep(
+		cloudWorkspaceId,
+		{
+			sessionId: live?.sessionId ?? row.sandboxSessionId,
+		},
+		row.organizationId,
+	);
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
 }
@@ -166,6 +176,7 @@ export async function syncSandboxExpiries(
 	const rows = await db
 		.select({
 			id: cloudWorkspaces.id,
+			organizationId: cloudWorkspaces.organizationId,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 		})
 		.from(cloudWorkspaces)
@@ -181,10 +192,14 @@ export async function syncSandboxExpiries(
 		if (!listed) continue;
 		const { expiresAt, sessionId } = listed;
 		if (expiresAt && expiresAt.getTime() > now) {
-			await recordSandboxAwake(row.id, { expiresAt, sessionId });
+			await recordSandboxAwake(
+				row.id,
+				{ expiresAt, sessionId },
+				row.organizationId,
+			);
 			await queueWatch(row.id, expiresAt);
 		} else if (sessionId) {
-			await recordSandboxAsleep(row.id, { sessionId });
+			await recordSandboxAsleep(row.id, { sessionId }, row.organizationId);
 		}
 	}
 }

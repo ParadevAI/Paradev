@@ -80,6 +80,13 @@ const REFUSAL_MESSAGES: Record<Refusal, string> = {
 		"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
 };
 
+/** Autumn refused a boot: an expected customer state, not a fault. */
+export function isUsageRefusal(error: unknown): boolean {
+	return (CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(
+		String((error as { cause?: { i18nKey?: unknown } }).cause?.i18nKey),
+	);
+}
+
 function refusalError(refusal: Refusal) {
 	return userError({
 		code: "FORBIDDEN",
@@ -557,9 +564,13 @@ export async function settleBoot(
 		}
 		if (stopAt.getTime() > Date.now()) return settled("warned");
 		const stopped = await stopSandbox(workspace.providerSandboxId);
-		await recordSandboxAsleep(boot.cloudWorkspaceId, {
-			sessionId: stopped.sessionId ?? boot.vercelSessionId,
-		});
+		await recordSandboxAsleep(
+			boot.cloudWorkspaceId,
+			{
+				sessionId: stopped.sessionId ?? boot.vercelSessionId,
+			},
+			boot.organizationId,
+		);
 		await setUsageStopAt(boot, null);
 		if (scope) logControl("meter.cap_stopped", scope, { source: "settle" });
 		return settled("stopped");
@@ -668,9 +679,13 @@ export async function settleOrganizationNow(
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
 						.then((stopped) =>
-							recordSandboxAsleep(cloudWorkspaceId, {
-								sessionId: stopped.sessionId ?? vercelSessionId,
-							}),
+							recordSandboxAsleep(
+								cloudWorkspaceId,
+								{
+									sessionId: stopped.sessionId ?? vercelSessionId,
+								},
+								organizationId,
+							),
 						)
 						.catch((error) =>
 							captureControlException(error, {
@@ -766,18 +781,19 @@ async function adoptRunningBoxes(
 			adopted += 1;
 		} catch (error) {
 			if (bootId) await releaseBoot(bootId, "adopt_failed").catch(() => {});
-			const refused = (CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(
-				String((error as { cause?: { i18nKey?: unknown } }).cause?.i18nKey),
-			);
-			if (!refused) {
+			if (!isUsageRefusal(error)) {
 				captureControlException(error, { ...scope, bootId });
 				continue;
 			}
-			logControl("meter.cap_stopped", scope, { source: "reconcile" });
 			const stopped = await stopSandbox(workspace.providerSandboxId);
-			await recordSandboxAsleep(workspace.id, {
-				sessionId: stopped.sessionId ?? session.id,
-			});
+			await recordSandboxAsleep(
+				workspace.id,
+				{
+					sessionId: stopped.sessionId ?? session.id,
+				},
+				workspace.organizationId,
+			);
+			logControl("meter.cap_stopped", scope, { source: "reconcile" });
 		}
 	}
 	return adopted;

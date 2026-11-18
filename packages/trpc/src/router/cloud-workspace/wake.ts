@@ -27,6 +27,7 @@ import {
 import {
 	attachBootSession,
 	authorizeBoot,
+	isUsageRefusal,
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
@@ -81,7 +82,6 @@ async function wake(
 		cloudWorkspaceId: row.id,
 		organizationId: row.organizationId,
 	};
-	logControl("wake.started", scope, {});
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
 		() => buildSandboxClaim({ row }),
@@ -93,6 +93,7 @@ async function wake(
 			providerSandboxId: row.providerSandboxId,
 			claim,
 			beforeResume: async (box) => {
+				logControl("wake.started", scope, {});
 				({ bootId } = await Sentry.startSpan(
 					{ name: "authorize boot", op: "billing" },
 					() =>
@@ -109,16 +110,18 @@ async function wake(
 				}
 			},
 		}).catch(async (error) => {
-			logControl(
-				"wake.failed",
-				scope,
-				{
-					ms: Date.now() - wakeStartedAt,
-					"error.class": errorClass(error),
-					"sandbox.unavailable": error instanceof SandboxUnavailableError,
-				},
-				error,
-			);
+			if (!isUsageRefusal(error)) {
+				logControl(
+					"wake.failed",
+					scope,
+					{
+						ms: Date.now() - wakeStartedAt,
+						"error.class": errorClass(error),
+						"sandbox.unavailable": error instanceof SandboxUnavailableError,
+					},
+					error,
+				);
+			}
 			if (bootId) {
 				await attachBootSession({
 					bootId,
@@ -152,12 +155,19 @@ async function wake(
 			.set(set)
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
-	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
-	logControl("wake.completed", scope, {
-		ms: Date.now() - wakeStartedAt,
-		"box.resumed": booted,
-		"box.rebooted": rebooted,
-	});
+	if (expiresAt)
+		await recordSandboxAwake(
+			row.id,
+			{ expiresAt, sessionId },
+			row.organizationId,
+		);
+	if (rebooted) {
+		logControl("wake.completed", scope, {
+			ms: Date.now() - wakeStartedAt,
+			"box.resumed": booted,
+			"box.rebooted": rebooted,
+		});
+	}
 	return {
 		hostTarget,
 		booted,
@@ -182,9 +192,13 @@ export async function restartCloudWorkspace(
 	);
 	if (running) {
 		const stopped = await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id, {
-			sessionId: stopped.sessionId ?? row.sandboxSessionId,
-		});
+		await recordSandboxAsleep(
+			row.id,
+			{
+				sessionId: stopped.sessionId ?? row.sandboxSessionId,
+			},
+			row.organizationId,
+		);
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);
@@ -220,5 +234,9 @@ export async function markSandboxUnavailable(
 		},
 		error,
 	);
-	captureControlException(error, scope, { failureSite: "sandbox_unavailable" });
+	if (changed) {
+		captureControlException(error, scope, {
+			failureSite: "sandbox_unavailable",
+		});
+	}
 }

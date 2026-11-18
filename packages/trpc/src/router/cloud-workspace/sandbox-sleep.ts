@@ -16,13 +16,17 @@ export const keepUpdatedAt = { updatedAt: sql`${cloudWorkspaces.updatedAt}` };
 export function reportSleepWriteFailure(
 	cloudWorkspaceId: string,
 	error: unknown,
+	organizationId?: string,
 ): void {
 	console.error(
 		`[cloud-workspace] could not record sleep state of ${cloudWorkspaceId}`,
 		error,
 	);
 	Sentry.captureException(error, {
-		tags: { "cloud_workspace.id": cloudWorkspaceId },
+		tags: {
+			"cloud_workspace.id": cloudWorkspaceId,
+			...(organizationId ? { "organization.id": organizationId } : {}),
+		},
 	});
 }
 
@@ -43,9 +47,10 @@ export function stillStoppedSession(sessionId: string | null): SQL | undefined {
 export async function recordSandboxAsleep(
 	cloudWorkspaceId: string,
 	{ sessionId }: { sessionId: string | null },
+	organizationId?: string,
 ): Promise<void> {
 	await markAsleep(cloudWorkspaceId, sessionId).catch((error) =>
-		reportSleepWriteFailure(cloudWorkspaceId, error),
+		reportSleepWriteFailure(cloudWorkspaceId, error, organizationId),
 	);
 }
 
