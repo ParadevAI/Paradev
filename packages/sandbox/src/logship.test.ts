@@ -24,12 +24,7 @@ type Item = {
 	body: string;
 	attributes: Record<string, { value: unknown; type: string }>;
 };
-type Received = {
-	auth: string | null;
-	header: string;
-	item: string;
-	items: Item[];
-};
+type Received = { auth: string | null; item: string; items: Item[] };
 
 let status = 200;
 let headers: Record<string, string> = {};
@@ -37,12 +32,9 @@ let received: Received[] = [];
 const sentry = Bun.serve({
 	port: 0,
 	async fetch(req) {
-		const [header = "", item = "", payload = "{}"] = (await req.text()).split(
-			"\n",
-		);
+		const [, item = "", payload = "{}"] = (await req.text()).split("\n");
 		received.push({
 			auth: req.headers.get("x-sentry-auth"),
-			header,
 			item,
 			items: JSON.parse(payload).items ?? [],
 		});
@@ -53,6 +45,12 @@ afterAll(() => sentry.stop(true));
 
 const HOUR_MS = 3_600_000;
 const NOW = 1_794_960_000_000;
+/** 2026-11-17T21:13:20.000Z, the first boot of every test. */
+const BOOT1 = 1_794_950_000_000;
+const iso = (ms: number) => new Date(ms).toISOString();
+const WS = "11111111-1111-4111-8111-111111111111";
+const ORG = "22222222-2222-4222-8222-222222222222";
+
 let root = "";
 const logs = () => join(root, "log");
 const state = () => join(root, "state", "logship");
@@ -60,6 +58,8 @@ const write = (name: string, text: string) =>
 	writeFileSync(join(logs(), name), text);
 const append = (name: string, text: string) =>
 	appendFileSync(join(logs(), name), text);
+const bootStart = (ms: number) =>
+	append("boot.log", `${ms} boot.start pid=1\n`);
 
 beforeEach(() => {
 	if (root) rmSync(root, { recursive: true, force: true });
@@ -85,9 +85,8 @@ async function ship(
 			SUPERSET_CONTRACT: join(root, "contract.sh"),
 			SUPERSET_SANDBOX_BOX_LOGS: "1",
 			HOST_SERVICE_SENTRY_DSN: `http://publickey@127.0.0.1:${sentry.port}/42`,
-			HOST_SERVICE_SENTRY_ENVIRONMENT: "test",
-			SUPERSET_SANDBOX_WORKSPACE_ID: "11111111-1111-4111-8111-111111111111",
-			SUPERSET_SANDBOX_ORGANIZATION_ID: "22222222-2222-4222-8222-222222222222",
+			SUPERSET_SANDBOX_WORKSPACE_ID: WS,
+			SUPERSET_SANDBOX_ORGANIZATION_ID: ORG,
 			SUPERSET_LOGSHIP_NOW_MS: String(NOW),
 			...env,
 		},
@@ -101,7 +100,9 @@ async function ship(
 		proc.kill("SIGTERM");
 	}
 	await proc.exited;
-	return `${await new Response(proc.stdout).text()}${await new Response(proc.stderr).text()}`;
+	const stderr = await new Response(proc.stderr).text();
+	if (stderr) throw new Error(`superset-logship wrote to stderr: ${stderr}`);
+	return await new Response(proc.stdout).text();
 }
 
 const items = () => received.flatMap((r) => r.items);
@@ -109,20 +110,16 @@ const bodies = () => items().map((i) => i.body);
 const attr = (i: Item | undefined, key: string) => i?.attributes[key]?.value;
 const bySource = (source: string) =>
 	items().filter((i) => attr(i, "log.source") === source);
+const isCap = (i: Item) => i.body.startsWith("log shipper: cap of");
 
 describe("superset-logship", () => {
-	test("sends each line as a Sentry log record with its source, ids, offset, time and boot", async () => {
-		write(
-			"boot.log",
-			"1794950000000 boot.start pid=1 bundle=aaa\n1794950000100 host.ready\n1794955000000 boot.start pid=2 bundle=aaa\n1794955000250 hook.exited exit=0 ms=900\n",
-		);
+	test("sends each line with exactly the record contract's attributes", async () => {
+		bootStart(BOOT1);
+		append("boot.log", `${BOOT1 + 123} host.ready\n`);
 		write(
 			"host-service.log",
-			"2026-11-17T21:30:00.822Z [host-service] listening on 4879\ncontinued stack line\n",
+			`${iso(BOOT1 + 5_000).replace("000Z", "822Z")} [host-service] boom\n    at stack (file.js:1)\n`,
 		);
-		write("desktop.log", "1794955001000 desktop X ready pid=7\n");
-		mkdirSync(state(), { recursive: true });
-		writeFileSync(join(state(), "boot.offset"), "0\n");
 		await ship();
 
 		expect(received[0]?.auth).toContain("sentry_key=publickey");
@@ -130,73 +127,75 @@ describe("superset-logship", () => {
 			type: "log",
 			content_type: "application/vnd.sentry.items.log+json",
 		});
-		const [first, ready, second, hook] = bySource("boot");
-		expect(first).toMatchObject({ level: "info", timestamp: 1_794_950_000 });
-		expect(first?.trace_id).toMatch(/^[0-9a-f]{32}$/);
-		expect(attr(first, "cloud_workspace.id")).toBe(
-			"11111111-1111-4111-8111-111111111111",
-		);
-		expect(attr(first, "organization.id")).toBe(
-			"22222222-2222-4222-8222-222222222222",
-		);
-		expect(attr(first, "sentry.environment")).toBe("test");
-		expect(attr(first, "log.offset")).toBe(0);
-		expect(attr(ready, "log.offset")).toBe(42);
-		expect(bySource("boot")).toHaveLength(4);
-		expect(attr(ready, "boot.started_at")).toBe("2026-11-17T21:13:20Z");
-		expect(attr(second, "boot.started_at")).toBe("2026-11-17T22:36:40Z");
-		expect(hook?.body).toBe("1794955000250 hook.exited exit=0 ms=900");
+		const [start, ready] = bySource("boot");
+		expect(start).toMatchObject({
+			level: "info",
+			timestamp: BOOT1 / 1000,
+			body: `${BOOT1} boot.start pid=1`,
+		});
+		expect(start?.trace_id).toMatch(/^[0-9a-f]{32}$/);
+		expect(start?.attributes).toEqual({
+			"log.source": { value: "boot", type: "string" },
+			"cloud_workspace.id": { value: WS, type: "string" },
+			"organization.id": { value: ORG, type: "string" },
+			"log.file.offset": { value: 0, type: "integer" },
+			"box.boot_started_at": { value: BOOT1, type: "integer" },
+		});
+		expect(attr(ready, "log.file.offset")).toBe(31);
+		expect(ready?.timestamp).toBe((BOOT1 + 123) / 1000);
 
-		const [listening, stack] = bySource("host-service");
-		expect(listening?.timestamp).toBeCloseTo(1_794_951_000.822, 3);
-		expect(attr(listening, "boot.started_at")).toBe("2026-11-17T21:13:20Z");
-		expect(stack?.timestamp).toBe(NOW / 1000);
-		expect(bySource("desktop")[0]?.body).toBe(
-			"1794955001000 desktop X ready pid=7",
-		);
+		const [line, stack] = bySource("host-service");
+		expect(line?.timestamp).toBe((BOOT1 + 5_822) / 1000);
+		expect(attr(line, "box.boot_started_at")).toBe(BOOT1);
+		// No time of its own: the line before it gives both its time and boot.
+		expect(stack?.timestamp).toBe(line?.timestamp as number);
+		expect(attr(stack, "box.boot_started_at")).toBe(BOOT1);
 	});
 
 	test("never reads the setup script's or the clone's output", async () => {
-		write("start-hook.log", "CUSTOMER-SETUP-OUTPUT\n");
-		write("checkout.log", "CUSTOMER-CLONE-OUTPUT\n");
-		write("boot.log", "1794955000000 boot.start pid=1\n");
+		bootStart(BOOT1);
+		write("start-hook.log", `${BOOT1 + 1} CUSTOMER-SETUP-OUTPUT\n`);
+		write("checkout.log", `${BOOT1 + 1} CUSTOMER-CLONE-OUTPUT\n`);
 		await ship();
 		expect(JSON.stringify(received)).not.toContain("CUSTOMER");
-		expect(readdirSync(state()).sort()).not.toContain("start-hook.offset");
+		expect(readdirSync(state())).not.toContain("start-hook.offset");
 	});
 
 	test("drops vitals and memguard rank lines, keeps kills, and hides hook commands", async () => {
+		bootStart(BOOT1);
+		const t = (s: number) => iso(BOOT1 + s * 1000);
 		write(
 			"host-service.log",
 			[
-				'2026-11-17T22:33:39.822Z [host-service:vitals] {"rss":120}',
-				"2026-11-17T22:33:40.000Z [sandbox] start hook running (pid 42): pnpm i && pnpm dev --acme",
-				"2026-11-17T22:33:41.000Z [sandbox] start hook running in terminal t1: docker compose up",
-				"2026-11-17T22:33:42.000Z [sandbox] start hook failed (exit 1): ./setup-acme.sh",
-				"2026-11-17T22:33:43.000Z [sandbox] archive hook exited 0: ./teardown --env acme",
+				`${t(1)} [host-service:vitals] {"rss":120}`,
+				`${t(2)} [sandbox] start hook running (pid 42): pnpm i && pnpm dev --acme`,
+				`${t(3)} [sandbox] start hook running in terminal t1: docker compose up`,
+				`${t(4)} [sandbox] start hook failed (exit 1): ./setup-acme.sh`,
+				`${t(5)} [sandbox] archive hook exited 0: ./teardown --env acme`,
 				"",
 			].join("\n"),
 		);
 		write(
 			"memguard.log",
-			"1794955000000 memguard rank pid=9 node 0->500\n1794955000500 memguard reap pid=9 node rss=900MB adj=500 available=100MB floor=200MB\n",
+			`${BOOT1 + 10} memguard rank pid=9 node 0->500\n${BOOT1 + 500} memguard reap pid=9 node rss=900MB adj=500\n`,
 		);
 		await ship();
 		expect(bodies().join("\n")).not.toMatch(
 			/vitals|rank pid|acme|pnpm|docker|setup-/,
 		);
 		expect(bySource("host-service").map((i) => i.body)).toEqual([
-			"2026-11-17T22:33:40.000Z [sandbox] start hook running (pid 42): [command not sent]",
-			"2026-11-17T22:33:41.000Z [sandbox] start hook running in terminal t1: [command not sent]",
-			"2026-11-17T22:33:42.000Z [sandbox] start hook failed (exit 1): [command not sent]",
-			"2026-11-17T22:33:43.000Z [sandbox] archive hook exited 0: [command not sent]",
+			`${t(2)} [sandbox] start hook running (pid 42): [command not sent]`,
+			`${t(3)} [sandbox] start hook running in terminal t1: [command not sent]`,
+			`${t(4)} [sandbox] start hook failed (exit 1): [command not sent]`,
+			`${t(5)} [sandbox] archive hook exited 0: [command not sent]`,
 		]);
 		expect(bySource("memguard").map((i) => i.body)).toEqual([
-			"1794955000500 memguard reap pid=9 node rss=900MB adj=500 available=100MB floor=200MB",
+			`${BOOT1 + 500} memguard reap pid=9 node rss=900MB adj=500`,
 		]);
 	});
 
 	test("scrubs token formats before a line leaves", async () => {
+		bootStart(BOOT1);
 		const secrets = [
 			"ghp_abcdefghijklmnopqrstuvwxyz0123456789",
 			"ghs_ABCDEFGHIJKLMNOPQRSTUVWXYZ012345",
@@ -209,14 +208,15 @@ describe("superset-logship", () => {
 			"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N",
 			"npm_abcdefghijklmnopqrstuvwxyz0123456789",
 		];
+		const t = (s: number) => iso(BOOT1 + s * 1000);
 		write(
 			"host-service.log",
 			[
-				...secrets.map((s, n) => `2026-11-17T22:00:0${n}.000Z value ${s} end`),
-				"2026-11-17T22:01:00.000Z clone https://x-access-token:opaque-token-value@github.com/acme/api.git",
-				"2026-11-17T22:01:01.000Z Authorization: Bearer abc.def-ghi_jkl123",
-				'2026-11-17T22:01:02.000Z {"api_key":"plain-value-1234","HOST_SERVICE_SECRET=s3cr3tvalue"}',
-				"2026-11-17T22:01:03.000Z password=hunter2hunter2 next",
+				...secrets.map((s, n) => `${t(n)} value ${s} end`),
+				`${t(20)} clone https://x-access-token:opaque-token-value@github.com/acme/api.git`,
+				`${t(21)} Authorization: Bearer abc.def-ghi_jkl123`,
+				`${t(22)} {"api_key":"plain-value-1234","HOST_SERVICE_SECRET=s3cr3tvalue"}`,
+				`${t(23)} password=hunter2hunter2 next`,
 				"",
 			].join("\n"),
 		);
@@ -237,33 +237,49 @@ describe("superset-logship", () => {
 		expect(bySource("host-service")).toHaveLength(secrets.length + 4);
 	});
 
-	test("collapses a run of identical lines into one record with a count", async () => {
+	test("collapses a run of identical lines into one record with a count, across dropped lines", async () => {
+		bootStart(BOOT1);
 		write(
 			"desktop.log",
-			"1794955000000 desktop websockify retry\n1794955000100 desktop websockify retry\n1794955000200 desktop websockify retry\n1794955000300 desktop X ready\n",
+			`${BOOT1 + 1} desktop websockify retry\n${BOOT1 + 2} desktop websockify retry\n${BOOT1 + 3} desktop websockify retry\n${BOOT1 + 4} desktop X ready\n`,
+		);
+		const t = (s: number) => iso(BOOT1 + s * 1000);
+		write(
+			"host-service.log",
+			`${t(1)} sweep done\n${t(2)} [host-service:vitals] {}\n${t(3)} sweep done\n`,
 		);
 		await ship();
 		const [retry, ready] = bySource("desktop");
 		expect(bySource("desktop")).toHaveLength(2);
-		expect(retry?.body).toBe("1794955000000 desktop websockify retry");
+		expect(retry?.body).toBe(`${BOOT1 + 1} desktop websockify retry`);
 		expect(attr(retry, "log.repeat_count")).toBe(3);
 		expect(attr(ready, "log.repeat_count")).toBeUndefined();
-		expect(attr(ready, "log.offset")).toBe(117);
+		expect(attr(ready, "log.file.offset")).toBe(117);
+		expect(
+			bySource("host-service").map((i) => attr(i, "log.repeat_count")),
+		).toEqual([2]);
+		expect(
+			readFileSync(join(state(), "host-service.time"), "utf8").trim(),
+		).toBe(String(BOOT1 + 3000));
 	});
 
-	test("stops at the hour's byte cap with one record, and starts again the next hour", async () => {
-		const line = (n: number) =>
-			`1794955000000 desktop line ${n} ${"x".repeat(60)}\n`;
+	test("the hour's cap counts each record's serialized size, with one cap record", async () => {
+		bootStart(BOOT1);
+		const line = (n: number) => `${BOOT1 + 10 + n} desktop line ${n}\n`;
 		write(
 			"desktop.log",
 			Array.from({ length: 10 }, (_, n) => line(n)).join(""),
 		);
-		const cap = { SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES: "300" };
+		const cap = { SUPERSET_SANDBOX_BOX_LOGS_CAP_BYTES: "1000" };
 		await ship(cap);
-		expect(
-			bySource("desktop").filter((i) => !attr(i, "log.cap_reached")),
-		).toHaveLength(3);
-		expect(items().filter((i) => attr(i, "log.cap_reached"))).toHaveLength(1);
+		const kept = items().filter((i) => !isCap(i));
+		const size = (i: Item) => Buffer.byteLength(JSON.stringify(i));
+		const keptBytes = kept.reduce((n, i) => n + size(i), 0);
+		expect(keptBytes).toBeLessThanOrEqual(1000);
+		expect(keptBytes + size(kept[0] as Item)).toBeGreaterThan(1000);
+		// Counting bodies alone would have kept every line.
+		expect(kept.length).toBeLessThan(11);
+		expect(items().filter(isCap)).toHaveLength(1);
 
 		append("desktop.log", line(10));
 		received = [];
@@ -276,32 +292,33 @@ describe("superset-logship", () => {
 	});
 
 	test("sends lines written before a sleep at the next wake, once, and waits for a line's end", async () => {
-		write(
-			"boot.log",
-			"1794955000000 boot.start pid=1\n1794955000100 host.ready\n",
-		);
+		bootStart(BOOT1);
+		append("boot.log", `${BOOT1 + 100} host.ready\n`);
 		await ship();
 		expect(bySource("boot")).toHaveLength(2);
 
 		// Written after the last pass, then the box sleeps: no process survives.
 		append(
 			"boot.log",
-			"1794955000200 desktop.start\n1794955000300 checkout.en",
+			`${BOOT1 + 200} desktop.start\n${BOOT1 + 300} checkout.en`,
 		);
 		received = [];
 		await ship();
-		expect(bodies()).toEqual(["1794955000200 desktop.start"]);
+		expect(bodies()).toEqual([`${BOOT1 + 200} desktop.start`]);
 
 		// The wake: a new boot appends to the same file.
-		append("boot.log", "d\n1794956000000 boot.start pid=2\n");
+		const boot2 = BOOT1 + 1_000_000;
+		append("boot.log", `d\n${boot2} boot.start pid=2\n`);
 		received = [];
 		await ship();
 		expect(bodies()).toEqual([
-			"1794955000300 checkout.end",
-			"1794956000000 boot.start pid=2",
+			`${BOOT1 + 300} checkout.end`,
+			`${boot2} boot.start pid=2`,
 		]);
-		expect(attr(items()[0], "boot.started_at")).toBe("2026-11-17T22:36:40Z");
-		expect(attr(items()[1], "boot.started_at")).toBe("2026-11-17T22:53:20Z");
+		expect(items().map((i) => attr(i, "box.boot_started_at"))).toEqual([
+			BOOT1,
+			boot2,
+		]);
 
 		received = [];
 		await ship();
@@ -311,25 +328,58 @@ describe("superset-logship", () => {
 		);
 	});
 
-	test("a boot log seen for the first time starts at the current boot", async () => {
+	test("turned on for the first time, every file starts at the current boot", async () => {
+		const boot2 = BOOT1 + 1_000_000;
+		bootStart(BOOT1);
+		append("boot.log", `${BOOT1 + 1} host.ready\n`);
+		bootStart(boot2);
 		write(
-			"boot.log",
-			"1794950000000 boot.start pid=1\n1794950000100 host.ready\n1794955000000 boot.start pid=2\n",
+			"host-service.log",
+			`${iso(BOOT1 + 5)} old\n    old stack\n${iso(boot2 - 1)} last old\n    old stack\n${iso(boot2 + 7)} new\n    new stack\n`,
 		);
+		write("memguard.log", `${BOOT1 + 9} memguard old\n${boot2} memguard new\n`);
+		write("desktop.log", `${BOOT1 + 9} desktop old\n`);
 		await ship();
-		expect(bodies()).toEqual(["1794955000000 boot.start pid=2"]);
+		expect(bodies()).toEqual([
+			`${boot2} boot.start pid=1`,
+			`${boot2} memguard new`,
+			`${iso(boot2 + 7)} new`,
+			"    new stack",
+		]);
+		expect(readFileSync(join(state(), "desktop.offset"), "utf8").trim()).toBe(
+			String(statSync(join(logs(), "desktop.log")).size),
+		);
 	});
 
-	test("a file seen for the first time starts at its last 64 KB, from a whole line", async () => {
-		const old = `2026-11-17T20:00:00.000Z old ${"o".repeat(100)}\n`.repeat(700);
-		write("host-service.log", `${old}2026-11-17T22:00:00.000Z new\n`);
+	test("on, then off for a boot, then on again: nothing written while off is sent", async () => {
+		bootStart(BOOT1);
+		write("host-service.log", `${iso(BOOT1 + 1)} on in boot 1\n`);
 		await ship();
-		const sent = bySource("host-service");
-		expect(sent.at(-1)?.body).toBe("2026-11-17T22:00:00.000Z new");
-		expect(sent.length).toBeLessThan(700);
-		expect(
-			sent.every((i) => /^2026-11-17T2\d:00:00\.000Z (old|new)/.test(i.body)),
-		).toBe(true);
+		expect(bodies()).toEqual([
+			`${BOOT1} boot.start pid=1`,
+			`${iso(BOOT1 + 1)} on in boot 1`,
+		]);
+
+		// Boot 2 runs with the flag off. Its runner should remove the state; an
+		// older runner leaves it, so the shipper must not trust it either.
+		const boot2 = BOOT1 + 1_000_000;
+		bootStart(boot2);
+		append(
+			"host-service.log",
+			`${iso(boot2 + 1)} WHILE-OFF\n    WHILE-OFF stack\n`,
+		);
+		write("desktop.log", `${boot2 + 2} desktop WHILE-OFF\n`);
+
+		const boot3 = BOOT1 + 2_000_000;
+		bootStart(boot3);
+		append("host-service.log", `${iso(boot3 + 1)} on in boot 3\n`);
+		received = [];
+		await ship();
+		expect(JSON.stringify(received)).not.toContain("WHILE-OFF");
+		expect(bodies()).toEqual([
+			`${boot3} boot.start pid=1`,
+			`${iso(boot3 + 1)} on in boot 3`,
+		]);
 	});
 
 	test.each([
@@ -338,7 +388,7 @@ describe("superset-logship", () => {
 	])("a %i from Sentry waits quietly and keeps every offset", async (code, reply) => {
 		status = code;
 		headers = reply;
-		write("boot.log", "1794955000000 boot.start pid=1\n");
+		bootStart(BOOT1);
 		const out = await ship(
 			{ SUPERSET_LOGSHIP_INTERVAL_S: "0.02" },
 			[],
@@ -349,7 +399,7 @@ describe("superset-logship", () => {
 		expect(out).toContain(`refused: ${code}`);
 		expect(existsSync(join(state(), "boot.offset"))).toBe(false);
 		const files = readdirSync(state()).sort();
-		expect(files).toEqual(["lock", "retry", "said"]);
+		expect(files).toEqual(["boot", "lock", "retry", "said"]);
 
 		await ship({ SUPERSET_LOGSHIP_NOW_MS: String(NOW + 30_000) });
 		expect(received).toHaveLength(1);
@@ -364,7 +414,7 @@ describe("superset-logship", () => {
 	});
 
 	test("does nothing when the claim did not turn it on", async () => {
-		write("boot.log", "1794955000000 boot.start pid=1\n");
+		bootStart(BOOT1);
 		await ship({ SUPERSET_SANDBOX_BOX_LOGS: "" });
 		await ship({ HOST_SERVICE_SENTRY_DSN: "" });
 		expect(received).toHaveLength(0);
@@ -373,9 +423,9 @@ describe("superset-logship", () => {
 });
 
 describe("superset-boot and the shipper", () => {
-	test("starts the shipper only when sandbox.conf turns it on, without the host secret", () => {
+	test("starts the shipper only when sandbox.conf turns it on, and removes its state otherwise", () => {
 		expect(boot).toMatch(
-			/if \[ "\$\{SUPERSET_SANDBOX_BOX_LOGS:-\}" = 1 \] && \[ -n "\$\{HOST_SERVICE_SENTRY_DSN:-\}" \][^\n]*\n\tenv -u HOST_SERVICE_SECRET nice -n 10 \/usr\/local\/bin\/superset-logship [^\n]*9>&- &/,
+			/if \[ "\$\{SUPERSET_SANDBOX_BOX_LOGS:-\}" = 1 \] && \[ -n "\$\{HOST_SERVICE_SENTRY_DSN:-\}" \][^\n]*\n\tenv -u HOST_SERVICE_SECRET nice -n 10 \/usr\/local\/bin\/superset-logship [^\n]*9>&- &\n[\s\S]*?\nelse\n[^\n]*\n\trm -rf "\$\{SUPERSET_STATE_DIR\}\/logship"\nfi/,
 		);
 		expect(boot.indexOf("superset-logship >>")).toBeGreaterThan(
 			boot.indexOf("superset-memguard >>"),
@@ -387,8 +437,12 @@ describe("the start hook's stamps", () => {
 	const fn = /\nstart_hook\(\) \{\n[\s\S]*?\n\}\n/.exec(boot)?.[0] ?? "";
 	const CUSTOMER = "CUSTOMER-OUTPUT secret-db-url pnpm run acme";
 
-	async function runHook(answer: object, states: object[]): Promise<string> {
-		let polls = 0;
+	async function runHook(
+		answer: object,
+		states: object[],
+		env: Record<string, string> = {},
+	): Promise<{ log: string; polls: number[] }> {
+		const polls: number[] = [];
 		const host = Bun.serve({
 			port: 0,
 			fetch(req) {
@@ -396,7 +450,10 @@ describe("the start hook's stamps", () => {
 					Response.json({ result: { data: { json } } });
 				if (new URL(req.url).pathname.endsWith(".runStartHook"))
 					return wrap(answer);
-				const startHook = states[Math.min(polls++, states.length - 1)] ?? {
+				polls.push(Date.now());
+				const startHook = states[
+					Math.min(polls.length - 1, states.length - 1)
+				] ?? {
 					state: "none",
 				};
 				return wrap({ environmentPushed: true, startHook });
@@ -420,17 +477,18 @@ describe("the start hook's stamps", () => {
 					SUPERSET_RUN_DIR: run,
 					HOST_SERVICE_SECRET: "boot-secret",
 					SUPERSET_HOOK_POLL_S: "0.01",
+					...env,
 				},
 			},
 		);
 		await proc.exited;
 		host.stop(true);
-		return readFileSync(log, "utf8");
+		return { log: readFileSync(log, "utf8"), polls };
 	}
 
 	test("a hook that fails at once leaves its exit code and duration, never its output", async () => {
 		expect(fn).not.toBe("");
-		const log = await runHook(
+		const { log } = await runHook(
 			{
 				started: false,
 				reason: "failed",
@@ -452,17 +510,20 @@ describe("the start hook's stamps", () => {
 	});
 
 	test("a setup that runs then fails is stamped started, then failed with its exit code", async () => {
-		const log = await runHook({ started: true, pid: 4321, command: CUSTOMER }, [
-			{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
-			{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
-			{
-				state: "exited",
-				command: CUSTOMER,
-				exitCode: 7,
-				since: 2,
-				log: CUSTOMER,
-			},
-		]);
+		const { log } = await runHook(
+			{ started: true, pid: 4321, command: CUSTOMER },
+			[
+				{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
+				{ state: "running", command: CUSTOMER, pid: 4321, since: 1 },
+				{
+					state: "exited",
+					command: CUSTOMER,
+					exitCode: 7,
+					since: 2,
+					log: CUSTOMER,
+				},
+			],
+		);
 		expect(log).not.toContain("CUSTOMER");
 		expect(log).toMatch(
 			/^\d{13} hook\.started pid=4321\n\d{13} hook\.failed exit=7 ms=\d+\n$/,
@@ -479,14 +540,33 @@ describe("the start hook's stamps", () => {
 				log: CUSTOMER,
 			},
 		]);
-		expect(ok).toMatch(
+		expect(ok.log).toMatch(
 			/hook\.started pid=9\n\d{13} hook\.exited exit=0 ms=\d+\n$/,
 		);
 		const runOnly = await runHook(
 			{ started: true, pid: 0, command: CUSTOMER },
 			[{ state: "none" }],
 		);
-		expect(runOnly).toMatch(/^\d{13} hook\.started pid=0\n$/);
-		expect(`${ok}${runOnly}`).not.toContain("CUSTOMER");
+		expect(runOnly.log).toMatch(/^\d{13} hook\.started pid=0\n$/);
+		expect(`${ok.log}${runOnly.log}`).not.toContain("CUSTOMER");
+	});
+
+	test("a setup that never ends is polled fast, then slowly, then stamped running and left", async () => {
+		const { log, polls } = await runHook(
+			{ started: true, pid: 5, command: CUSTOMER },
+			[{ state: "running", command: CUSTOMER, pid: 5, since: 1 }],
+			{
+				SUPERSET_HOOK_POLL_FAST_FOR_S: "1",
+				SUPERSET_HOOK_POLL_SLOW_S: "0.25",
+				SUPERSET_HOOK_POLL_LIMIT_S: "2",
+			},
+		);
+		expect(log).toMatch(
+			/^\d{13} hook\.started pid=5\n\d{13} hook\.running ms=\d+ no longer polled\n$/,
+		);
+		const start = polls[0] ?? 0;
+		const slow = polls.filter((t) => t - start > 1100);
+		expect(polls.length - slow.length).toBeGreaterThan(10);
+		expect(slow.length).toBeLessThanOrEqual(5);
 	});
 });

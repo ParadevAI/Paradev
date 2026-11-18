@@ -5,11 +5,14 @@
 #
 #   read    boot, memguard, desktop and host-service logs from the byte offset
 #           saved for each under the state directory. start-hook.log and
-#           checkout.log are the customer's output and are never read.
+#           checkout.log are the customer's output and are never read. Offsets
+#           are trusted only if this script also ran in the previous boot; else
+#           each file starts at its first line of the current boot.
 #   filter  drop host-service vitals and memguard rank lines; replace the start
 #           hook's command with a marker; scrub token formats; collapse a run
 #           of identical lines into one record with a count.
-#   cap     a byte budget per box per clock hour; one record says it was reached,
+#   cap     a budget of serialized record bytes per box per clock hour; one record
+#           says it was reached,
 #           and the lines after it are dropped, not held.
 #   send    one envelope per file per pass. The offset moves only on a 2xx, so a
 #           box that sleeps first sends those lines at its next wake. A refusal
@@ -36,7 +39,6 @@ INTERVAL_S="${SUPERSET_LOGSHIP_INTERVAL_S:-5}"
 MAX_READ=65536
 MAX_RECORDS=100
 MAX_BODY=8192
-FIRST_TAIL=65536
 MAX_WAIT_S=3600
 
 mkdir -p "$STATE"
@@ -49,23 +51,26 @@ TRACE_ID="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
 read_state() { local v; v="$(cat "${STATE}/$1" 2>/dev/null)" && echo "$v" || echo "$2"; }
 write_state() { printf '%s\n' "$2" > "${STATE}/$1.tmp" && mv -f "${STATE}/$1.tmp" "${STATE}/$1"; }
 
-# Byte offset, count and line for each record, then `E <offset>` for how far the
-# file is read. A trailing line with no newline yet is left for the next pass.
+# `R <offset> <count> <line>` for each record and `D <line start>` for each dropped
+# line, whose time a following line without one inherits; then `E <offset>` for
+# how far the file is read. A trailing line with no newline yet waits a pass.
 read -r -d '' SPLIT <<'AWK'
 function handle(line, len,   key, plen, i) {
 	if (stop) return
-	if (skip) { skip = 0; pos += len; return }
 	key = line
 	sub(/^[0-9]+ /, "", key)
 	sub(/^[0-9][0-9-]*T[0-9:.]*Z /, "", key)
-	if (src == "host-service" && index(key, "[host-service:vitals]") == 1) { pos += len; return }
-	if (src == "memguard" && index(key, "memguard rank ") == 1) { pos += len; return }
+	if ((src == "host-service" && index(key, "[host-service:vitals]") == 1) ||
+		(src == "memguard" && index(key, "memguard rank ") == 1)) {
+		if (!have) { printf "D\t%s\n", substr(line, 1, 30); pos += len; return }
+		dropped = dropped substr(line, 1, 30) "\n"; pos += len; return
+	}
 	if (src == "host-service" && (index(key, "[sandbox] start hook ") == 1 || index(key, "[sandbox] archive hook ") == 1) && (i = index(key, ": ")) > 0) {
 		plen = length(line) - length(key)
 		key = substr(key, 1, i + 1) "[command not sent]"
 		line = substr(line, 1, plen) key
 	}
-	if (have && key == prevkey) { count++; pos += len; return }
+	if (have && key == prevkey) { count++; dropped = dropped substr(line, 1, 30) "\n"; pos += len; return }
 	if (emitted + have >= maxrec) { flush(); stop = 1; return }
 	flush()
 	have = 1; prevkey = key; prevline = line; prevoff = pos; count = 1; pos += len
@@ -74,6 +79,7 @@ function flush() {
 	if (!have) return
 	printf "R\t%d\t%d\t%s\n", prevoff, count, substr(prevline, 1, maxbody)
 	emitted++; have = 0
+	if (dropped != "") { n = split(dropped, d, "\n"); for (i = 1; i < n; i++) printf "D\t%s\n", d[i]; dropped = "" }
 }
 { if (NR > 1) handle(buf, buflen); buf = $0; buflen = length($0) + 1 }
 END {
@@ -84,6 +90,15 @@ END {
 	flush()
 	printf "E\t%d\n", pos
 }
+AWK
+
+# The byte of the first line stamped at or after the boot start (`ms`, and `iso`
+# for ISO stamps, which compare as strings).
+read -r -d '' FIRST <<'AWK'
+$0 ~ /^[0-9]+ / && $1 + 0 >= ms { found = 1; exit }
+$0 ~ /^[0-9][0-9-]*T[0-9:.]*Z / && substr($0, 1, 24) >= iso { found = 1; exit }
+{ pos += length($0) + 1 }
+END { pos += 0; if (pos > size) pos = size; print pos }
 AWK
 
 read -r -d '' SCRUB <<'SED'
@@ -103,46 +118,54 @@ s/([A-Za-z0-9_-]*(token|secret|password|passwd|api[_-]?key|authorization|credent
 SED
 
 # Records within the hour's budget as a Sentry log item, after one metadata line:
-# bytes used, whether the cap is now reached, the offset read to, records kept.
+# bytes used, whether the cap is now reached, the offset read to, records kept,
+# and the time of the last line read. Times are epoch milliseconds.
 read -r -d '' BUILD <<'JQ'
 def stamp($l):
-	if ($l | test("^[0-9]{13} ")) then ($l[0:13] | tonumber) / 1000
+	if ($l | test("^[0-9]{13} ")) then ($l[0:13] | tonumber)
 	elif ($l | test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z ")) then
-		(($l[0:19] + "Z") | fromdateiso8601) + (($l | capture("^.{19}(?<f>\\.[0-9]+)?").f // "0") | tonumber)
-	else $now / 1000 end;
+		(($l[0:19] + "Z") | fromdateiso8601) * 1000
+		+ ((($l | capture("^.{19}(?<f>\\.[0-9]+)?").f // "0") | tonumber) * 1000 + 0.5 | floor)
+	else null end;
 def str($v): {value: $v, type: "string"};
 def int($v): {value: $v, type: "integer"};
 def common: {
 	"log.source": str($src),
 	"cloud_workspace.id": str($ws),
 	"organization.id": str($org)
-} + (if $env == "" then {} else {"sentry.environment": str($env)} end);
-def record($r):
-	stamp($r.b) as $t
-	| ([$starts[] | select(. <= ($t * 1000))] | max) as $boot
+};
+def record($r; $t):
+	([$starts[] | select(. <= $t)] | max) as $boot
 	| {
-		timestamp: $t, trace_id: $trace, level: "info", body: $r.b,
+		timestamp: ($t / 1000), trace_id: $trace, level: "info", body: $r.b,
 		attributes: (common
-			+ {"log.offset": int($r.o | tonumber)}
-			+ (if $boot == null then {} else {"boot.started_at": str($boot / 1000 | floor | todate)} end)
+			+ {"log.file.offset": int($r.o | tonumber)}
+			+ (if $boot == null then {} else {"box.boot_started_at": int($boot)} end)
 			+ (if $r.c == "1" then {} else {"log.repeat_count": int($r.c | tonumber)} end))
 	};
 [inputs] as $lines
 | ($lines | map(select(startswith("E\t")))[0][2:] | tonumber) as $read_to
-| ($lines | map(select(startswith("R\t")) | capture("^R\t(?<o>[0-9]+)\t(?<c>[0-9]+)\t(?<b>.*)$"))) as $recs
-| reduce $recs[] as $r ({items: [], used: $used, over: false};
-	($r.b | utf8bytelength) as $n
-	| if .over or (.used + $n > $cap) then .over = true
-	  else .items += [record($r)] | .used += $n end)
+| reduce ($lines[] | select(startswith("R\t") or startswith("D\t"))) as $l
+	({items: [], used: $used, over: false, prev: $prev};
+	if ($l | startswith("D\t")) then .prev = (stamp($l[2:]) // .prev)
+	else
+		($l | capture("^R\t(?<o>[0-9]+)\t(?<c>[0-9]+)\t(?<b>.*)$")) as $r
+		| (stamp($r.b) // .prev // $now) as $t
+		| .prev = $t
+		| record($r; $t) as $rec
+		| ($rec | tojson | utf8bytelength) as $n
+		| if .over or (.used + $n > $cap) then .over = true
+		  else .items += [$rec] | .used += $n end
+	end)
 | if .over and ($capped == "0") then
 	.items += [{
 		timestamp: ($now / 1000), trace_id: $trace, level: "info",
-		body: "log shipper: \($cap) bytes sent this hour, the cap; lines are dropped until the next hour",
-		attributes: (common + {"log.cap_reached": {value: true, type: "boolean"}})
+		body: "log shipper: cap of \($cap) bytes this hour reached; lines are dropped until the next hour",
+		attributes: common
 	}]
 	| .capped = "1"
   else .capped = (if .over then "1" else $capped end) end
-| ([.used, .capped, $read_to, (.items | length)] | @tsv), ({items: .items} | tojson)
+| ([.used, .capped, $read_to, (.items | length), (.prev // "")] | @tsv), ({items: .items} | tojson)
 JQ
 
 say() { local last; last="$(read_state said "")"; [ "$last" = "$1" ] && return; write_state said "$1"; echo "$(now_ms) logship $1"; }
@@ -175,47 +198,41 @@ send() {
 	return 1
 }
 
-# The byte where the current boot began, so turning the shipper on does not
-# send a box's history.
+# Turning the shipper on sends no history: each file starts at the current boot.
 first_offset() {
-	local src="$1" file="$2" size="$3"
-	if [ "$src" = boot ]; then
-		grep -abE '^[0-9]+ boot\.start' "$file" | tail -n 1 | cut -d: -f1 | grep . || echo 0
-	elif [ "$size" -gt "$FIRST_TAIL" ]; then
-		echo $((size - FIRST_TAIL))
-	else
-		echo 0
-	fi
+	local file="$1" size="$2"
+	[ -n "$BOOT_MS" ] || { echo "$size"; return; }
+	LC_ALL=C awk -v ms="$BOOT_MS" -v iso="$BOOT_ISO" -v size="$size" "$FIRST" "$file"
 }
 
 ship_file() {
-	local src="$1" file="${SUPERSET_LOG_DIR}/${src}.log" size off skip=0 partial=0 full=0 meta used capped read_to count payload
+	local src="$1" file="${SUPERSET_LOG_DIR}/${src}.log" size off partial=0 full=0 used capped read_to count last payload
 	[ -f "$file" ] || return 0
 	size="$(stat -c %s "$file")"
 	off="$(read_state "${src}.offset" "")"
 	if [ -z "$off" ]; then
-		off="$(first_offset "$src" "$file" "$size")"
-		[ "$src" != boot ] && [ "$off" -gt 0 ] && skip=1
+		off="$(first_offset "$file" "$size")"
 	fi
 	[ "$size" -lt "$off" ] && off=0
 	[ "$size" -eq "$off" ] && { write_state "${src}.offset" "$off"; return 0; }
 	tail -c +"$((off + 1))" "$file" | head -c "$MAX_READ" > "${STATE}/chunk"
 	[ -n "$(tail -c 1 "${STATE}/chunk")" ] && partial=1
 	[ "$(stat -c %s "${STATE}/chunk")" -ge "$MAX_READ" ] && full=1
-	LC_ALL=C awk -v src="$src" -v pos="$off" -v skip="$skip" -v partial="$partial" -v full="$full" \
+	LC_ALL=C awk -v src="$src" -v pos="$off" -v partial="$partial" -v full="$full" \
 		-v maxrec="$MAX_RECORDS" -v maxbody="$MAX_BODY" "$SPLIT" "${STATE}/chunk" |
 		LC_ALL=C sed -E "$SCRUB" |
 		jq -R -n -r --arg src "$src" --arg ws "${SUPERSET_SANDBOX_WORKSPACE_ID:-}" \
-			--arg org "${SUPERSET_SANDBOX_ORGANIZATION_ID:-}" --arg env "${HOST_SERVICE_SENTRY_ENVIRONMENT:-}" \
+			--arg org "${SUPERSET_SANDBOX_ORGANIZATION_ID:-}" --argjson prev "$(read_state "${src}.time" null)" \
 			--arg trace "$TRACE_ID" --argjson now "$NOW" --argjson starts "$BOOT_STARTS" \
 			--argjson cap "$CAP" --argjson used "$USED" --arg capped "$CAPPED" "$BUILD" > "${STATE}/batch"
-	{ IFS=$'\t' read -r used capped read_to count; read -r payload; } < "${STATE}/batch"
+	{ IFS=$'\t' read -r used capped read_to count last; read -r payload; } < "${STATE}/batch"
 	[ -n "${read_to:-}" ] || return 0
 	if [ "$count" -gt 0 ]; then
 		send "$payload" "$count" || return 1
 	fi
 	USED="$used"; CAPPED="$capped"
 	write_state hour "${HOUR} ${USED} ${CAPPED}"
+	[ -n "${last:-}" ] && write_state "${src}.time" "$last"
 	write_state "${src}.offset" "$read_to"
 }
 
@@ -234,12 +251,28 @@ pass() {
 		[ "$size" = "$off" ] || { idle=0; break; }
 	done
 	[ "$idle" = 1 ] && return 0
-	BOOT_STARTS="$(grep -oE '^[0-9]+ boot\.start' "$SUPERSET_BOOT_LOG" 2>/dev/null | cut -d' ' -f1 | jq -sc .)"
+	read_boots
 	for src in "${SOURCES[@]}"; do
 		ship_file "$src" || break
 	done
 	rm -f "${STATE}/chunk" "${STATE}/batch" "${STATE}/headers"
 }
+
+read_boots() {
+	BOOT_STARTS="$(grep -oE '^[0-9]+ boot\.start' "$SUPERSET_BOOT_LOG" 2>/dev/null | cut -d' ' -f1 | jq -sc .)"
+	BOOT_MS="$(jq -r '.[-1] // ""' <<< "$BOOT_STARTS")"
+	BOOT_ISO=""
+	[ -n "$BOOT_MS" ] && BOOT_ISO="$(date -u -d "@$((BOOT_MS / 1000))" +%Y-%m-%dT%H:%M:%S).$(printf '%03d' $((BOOT_MS % 1000)))Z"
+}
+
+# Offsets saved in a boot this script did not run in (the flag was off, or an older
+# runner left the state behind) would send what that boot wrote; start again.
+read_boots
+if [ "$(read_state boot "")" != "${BOOT_MS:-}" ] &&
+	[ "$(read_state boot "")" != "$(jq -r '.[-2] // "none"' <<< "$BOOT_STARTS")" ]; then
+	rm -f "${STATE}"/*.offset "${STATE}"/*.time
+fi
+write_state boot "${BOOT_MS:-}"
 
 [ "${1:-}" = --once ] && { pass; exit 0; }
 trap 'exit 0' TERM INT

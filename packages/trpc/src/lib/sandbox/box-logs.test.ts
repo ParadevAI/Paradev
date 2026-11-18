@@ -29,6 +29,16 @@ describe("boxLogsIdentity", () => {
 		expect(org?.[2]).toMatchObject({ groups: { organization: ORG } });
 	});
 
+	test("does not ask the organization's flag while the fleet switch is off", async () => {
+		answers = {
+			"sandbox-box-logs-fleet": () => Promise.resolve(false),
+			"sandbox-box-logs": on,
+		};
+		asked.length = 0;
+		expect(await boxLogsIdentity(ORG)).toEqual({});
+		expect(asked.map((a) => a[0])).toEqual(["sandbox-box-logs-fleet"]);
+	});
+
 	test("fails closed when either switch is off, unloaded or PostHog is down", async () => {
 		const off = [
 			() => Promise.resolve(false),

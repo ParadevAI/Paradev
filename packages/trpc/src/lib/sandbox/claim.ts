@@ -89,11 +89,14 @@ export async function buildSandboxClaim(args: {
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
 }> {
-	const [environment, signIns] = await Promise.all([
+	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
 		args.row.createdByUserId
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
+		env.SENTRY_DSN_SANDBOX
+			? boxLogsIdentity(args.row.organizationId)
+			: Promise.resolve({}),
 	]);
 	if (!environment) throw new Error("Environment not found");
 	const checkouts = await workspaceRepositories({
@@ -129,9 +132,6 @@ export async function buildSandboxClaim(args: {
 				})
 			: null;
 	const repositories = toSandboxRepositories(checkouts);
-	const boxLogs = env.SENTRY_DSN_SANDBOX
-		? await boxLogsIdentity(args.row.organizationId)
-		: {};
 
 	const identity: SandboxIdentity = {
 		SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
