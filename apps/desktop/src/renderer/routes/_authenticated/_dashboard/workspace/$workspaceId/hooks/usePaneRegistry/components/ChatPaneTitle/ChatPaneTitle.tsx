@@ -207,10 +207,6 @@ export function ChatPaneTitle({
 								<Search />
 								<Trans>Search all chats…</Trans>
 							</DropdownMenuItem>
-							<AccountUsageMenuSection
-								workspaceId={workspaceId}
-								terminalId={chatKey}
-							/>
 							{(forkSource || forkIntoChat) && (
 								<>
 									<DropdownMenuSeparator />
@@ -224,6 +220,10 @@ export function ChatPaneTitle({
 									/>
 								</>
 							)}
+							<AccountUsageMenuSection
+								workspaceId={workspaceId}
+								terminalId={chatKey}
+							/>
 						</DropdownMenuContent>
 					</StopHeaderEvents>
 				</DropdownMenu>

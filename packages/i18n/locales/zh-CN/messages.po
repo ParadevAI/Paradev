@@ -1954,9 +1954,6 @@ msgstr "账户名称"
 msgid "Account pending deletion"
 msgstr "账户待删除"
 
-msgid "Account usage"
-msgstr "账户用量"
-
 msgid "Account usage: {percent} used"
 msgstr "账户用量：已使用 {percent}"
 
@@ -16493,9 +16490,6 @@ msgstr "重置位置"
 
 msgid "Reset terminal"
 msgstr "重置终端"
-
-msgid "Reset time unavailable"
-msgstr "重置时间不可用"
 
 msgid "Reset to default"
 msgstr "恢复默认"

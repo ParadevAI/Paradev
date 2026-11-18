@@ -1948,9 +1948,6 @@ msgstr "Назва облікового запису"
 msgid "Account pending deletion"
 msgstr "Обліковий запис очікує на видалення"
 
-msgid "Account usage"
-msgstr "Використання облікового запису"
-
 msgid "Account usage: {percent} used"
 msgstr "Використання облікового запису: використано {percent}"
 
@@ -16487,9 +16484,6 @@ msgstr "Скинути розташування"
 
 msgid "Reset terminal"
 msgstr "Скинути термінал"
-
-msgid "Reset time unavailable"
-msgstr "Час скидання недоступний"
 
 msgid "Reset to default"
 msgstr "Скинути до значення за замовчуванням"

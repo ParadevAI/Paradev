@@ -1954,9 +1954,6 @@ msgstr "Имя аккаунта"
 msgid "Account pending deletion"
 msgstr "Аккаунт ожидает удаления"
 
-msgid "Account usage"
-msgstr "Использование аккаунта"
-
 msgid "Account usage: {percent} used"
 msgstr "Использование аккаунта: {percent} использовано"
 
@@ -16493,9 +16490,6 @@ msgstr "Сбросить расположение"
 
 msgid "Reset terminal"
 msgstr "Сбросить терминал"
-
-msgid "Reset time unavailable"
-msgstr "Время сброса недоступно"
 
 msgid "Reset to default"
 msgstr "Сбросить к значению по умолчанию"

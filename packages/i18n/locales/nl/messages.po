@@ -1954,9 +1954,6 @@ msgstr "Accountnaam"
 msgid "Account pending deletion"
 msgstr "Account wordt verwijderd"
 
-msgid "Account usage"
-msgstr "Accountgebruik"
-
 msgid "Account usage: {percent} used"
 msgstr "Accountgebruik: {percent} gebruikt"
 
@@ -16493,9 +16490,6 @@ msgstr "Locatie resetten"
 
 msgid "Reset terminal"
 msgstr "Terminal resetten"
-
-msgid "Reset time unavailable"
-msgstr "Resettijd niet beschikbaar"
 
 msgid "Reset to default"
 msgstr "Terug naar standaard"
