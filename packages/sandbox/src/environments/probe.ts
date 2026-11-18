@@ -29,6 +29,12 @@ export interface ProbeArgs {
 	expectDependencies?: boolean;
 	/** Set when a brokered Anthropic rule is on the box's firewall. */
 	expectAnthropicRule?: boolean;
+	/**
+	 * True when the box's image was built from this checkout, so its root disk
+	 * must hold no agent CLI. An older image still has its own copies; then only
+	 * the bundle is checked, which must install none.
+	 */
+	imageFromThisCheckout?: boolean;
 	/** A gate to mint a ticket at; skipped when the secret is absent. */
 	gate?: { workspaceId: string; userId: string } | null;
 	log: (line: string) => void;
@@ -151,11 +157,27 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		);
 	}
 	const rootDiskAgents = (await run(ROOT_DISK_AGENTS_COMMAND)).trim();
-	check(
-		"no agent CLI on the box's root disk, so none in its golden",
-		rootDiskAgents === "",
-		rootDiskAgents.replaceAll("\n", " "),
-	);
+	if (args.imageFromThisCheckout) {
+		check(
+			"no agent CLI on the box's root disk, so none in its golden",
+			rootDiskAgents === "",
+			rootDiskAgents.replaceAll("\n", " "),
+		);
+	} else {
+		const steps = await run(
+			`cut -f1 ${SANDBOX_PATHS.bundleRoot}/current/steps.tsv`,
+		);
+		check(
+			"the bundle installs no agent CLI on the root disk",
+			/\binstall-host\b/.test(steps) && !/install-agent-clis/.test(steps),
+			steps.trim().replaceAll("\n", " "),
+		);
+		if (rootDiskAgents) {
+			log(
+				`info the image predates this checkout and still holds: ${rootDiskAgents.replaceAll("\n", " ")}`,
+			);
+		}
+	}
 	const cliVersion = await run("superset --version");
 	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());
 	if (

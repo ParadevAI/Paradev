@@ -368,12 +368,14 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 	["ntn", "ntn --version", /\d+\.\d+\.\d+/],
 	["agent-device", "agent-device --version", /\d+\.\d+\.\d+/],
 	["stripe", "stripe --version", /\d+\.\d+\.\d+/],
-	[
+];
+if (!SKIP_IMAGE) {
+	checks.push([
 		"no agent CLI on the golden's root disk",
 		`[ -z "$(${ROOT_DISK_AGENTS_COMMAND})" ] && echo clean`,
 		/^clean$/m,
-	],
-];
+	]);
+}
 let failed = 0;
 for (const [label, command, expect] of checks) {
 	const { logs } = await run(goldenBox, command);
@@ -461,6 +463,7 @@ await provisionSandbox({
 await wakeSandbox({ providerSandboxId: probe, claim: probeClaim });
 let probeFailed = await probeBox({
 	name: probe,
+	imageFromThisCheckout: !SKIP_IMAGE,
 	credentials,
 	hostSecret: probeSecret,
 	bundleSha: bundle.sha256,
