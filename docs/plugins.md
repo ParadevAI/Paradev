@@ -110,6 +110,15 @@ checked against the discovered issuer before the code is redeemed (RFC 9207), an
 before a tool call. This is what lets a hosted MCP server be installable without anyone registering an
 OAuth app first.
 
+A dynamic connector's `authorization_url` may be a `${env.NAME}` template over the method's
+`requires_env`, so the registry can point at a deployment without naming its host; a connector whose
+variable is unset has no tool server and is refused for an organization plugin. Three optional fields
+cover servers that differ from the common case: `token_max_age` (seconds) stores a token as expiring
+sooner than the server's `expires_in`, so it is refreshed before a resource server that limits token
+age refuses it; `resource_on_refresh` sends the `resource` indicator on refresh requests as well as on
+the first token request; and `hidden` on the connector keeps it out of the public catalog, for one that
+only a plugin names.
+
 Credentials never reach the manifest, the renderer, or the agent's machine. They are sealed at rest
 by `packages/trpc/src/lib/secret-box.ts` under `SECRETS_ENCRYPTION_KEY` and attached by the proxy in
 `packages/trpc/src/router/plugins/proxy/`, so a tool call goes out from the API, not from the

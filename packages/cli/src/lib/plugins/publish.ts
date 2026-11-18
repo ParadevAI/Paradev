@@ -3,7 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { promisify } from "node:util";
 import { CLIError } from "@superset/cli-framework";
-import { CONNECTOR_SLUGS } from "@superset/shared/connectors";
+import {
+	CONNECTOR_SLUGS,
+	PUBLIC_CONNECTOR_SLUGS,
+} from "@superset/shared/connectors";
 import { isSupersetHosted } from "@superset/shared/plugins";
 import { pluginManifestSchema } from "@superset/shared/plugins/manifest-schema";
 import {
@@ -136,7 +139,7 @@ function checkManifest(plugin: ResolvedPlugin): CheckIssue[] {
 		return [
 			{
 				name,
-				problem: `names connector "${slug}", which is not in the registry (${CONNECTOR_SLUGS.join(", ")})`,
+				problem: `names connector "${slug}", which is not in the registry (${PUBLIC_CONNECTOR_SLUGS.join(", ")})`,
 			},
 		];
 	}

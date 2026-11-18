@@ -147,6 +147,29 @@ describe("checkPlugin", () => {
 	});
 });
 
+describe("a plugin naming a connector", () => {
+	const naming = (slug: string) => {
+		const { ctx, plugin: p } = plugin("acme", "1.0.0");
+		(
+			p.manifest as unknown as {
+				extensions: { superset: { connector: { slug: string } } };
+			}
+		).extensions.superset.connector = { slug };
+		return checkPlugin(ctx, p);
+	};
+
+	test("a hidden connector is accepted", async () => {
+		expect(await naming("superset_admin_mcp")).toEqual([]);
+	});
+
+	test("an unknown one is refused without listing the hidden connector", async () => {
+		const [issue] = await naming("nope");
+		expect(issue?.problem).toContain('"nope"');
+		expect(issue?.problem).toContain("linear_mcp");
+		expect(issue?.problem).not.toContain("superset_admin_mcp");
+	});
+});
+
 describe("generatedManifestDrift", () => {
 	function sharedPluginsDir(): string {
 		const dir = path.join(root, "packages", "shared", "src", "plugins");

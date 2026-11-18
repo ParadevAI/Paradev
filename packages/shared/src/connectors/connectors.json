@@ -381,6 +381,38 @@
 				}
 			]
 		},
+		"superset_admin_mcp": {
+			"displayName": "Paradev Admin",
+			"icon": "paradev",
+			"category": "Developer Tools",
+			"scope": "user",
+			"hidden": true,
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "Paradev account",
+					"client": "dynamic",
+					"authorization_url": "${env.NEXT_PUBLIC_ADMIN_URL}/api/mcp/cloud",
+					"requires_env": ["NEXT_PUBLIC_ADMIN_URL", "NEXT_PUBLIC_API_URL"],
+					"scopes": ["openid", "profile", "email", "offline_access"],
+					"token_max_age": 3000,
+					"resource_on_refresh": true,
+					"identity": {
+						"url": "${env.NEXT_PUBLIC_API_URL}/api/auth/oauth2/userinfo",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": { "id": "$.sub", "label": "$.email" },
+						"user": { "id": "$.sub", "label": "$.name" }
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
 		"autumn_mcp": {
 			"displayName": "Autumn",
 			"icon": "autumn",

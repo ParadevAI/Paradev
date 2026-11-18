@@ -569,3 +569,96 @@ describe("a dynamic client's connection", () => {
 		expect(updates[0]).toMatchObject({ disconnectReason: NEEDS_REAUTH });
 	});
 });
+
+describe("what a refresh sends and stores", () => {
+	const ADMIN_ENV = { NEXT_PUBLIC_ADMIN_URL: "https://admin.example.test" };
+	const savedEnv: Record<string, string | undefined> = {};
+	beforeEach(() => {
+		for (const [key, value] of Object.entries(ADMIN_ENV)) {
+			savedEnv[key] = process.env[key];
+			process.env[key] = value;
+		}
+		response = {
+			ok: true,
+			status: 200,
+			body: { access_token: "new-access", expires_in: 604800 },
+		};
+	});
+	afterAll(() => {
+		for (const [key, value] of Object.entries(savedEnv)) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
+	});
+
+	const dynamic = (connector: string, clientId: string) => {
+		oauthClients = [
+			{
+				issuer: ISSUER,
+				redirectUri: redirectUriFor(connector),
+				clientId,
+				clientSecret: null,
+				clientSecretExpiresAt: null,
+				tokenEndpointAuthMethod: "none",
+				scopes: null,
+			},
+		];
+		const row = connection({ connector, oauthClientId: clientId });
+		stored = row;
+		return row;
+	};
+
+	test("the admin connector names its resource on refresh", async () => {
+		await ensureFreshConnection(dynamic("superset_admin_mcp", "admin-client"));
+		expect([...(tokenRequests[0]?.entries() ?? [])]).toEqual([
+			["grant_type", "refresh_token"],
+			["refresh_token", "refresh"],
+			["resource", "https://mcp.useautumn.com/mcp"],
+			["client_id", "admin-client"],
+		]);
+	});
+
+	test("the admin connector's stored expiry is capped, not the seven days the server says", async () => {
+		const before = Date.now();
+		await ensureFreshConnection(dynamic("superset_admin_mcp", "admin-client"));
+		const expiresAt = (updates[0]?.tokenExpiresAt as Date).getTime();
+		expect(expiresAt - before).toBeGreaterThanOrEqual(3000 * 1000);
+		expect(expiresAt - before).toBeLessThan(3000 * 1000 + 5000);
+	});
+
+	test.each([
+		[
+			"autumn_mcp",
+			"autumn-client",
+			["grant_type", "refresh_token", "client_id"],
+		],
+		[
+			"notion_mcp",
+			"notion-client",
+			["grant_type", "refresh_token", "client_id"],
+		],
+	])("%s sends the refresh body it always sent, with no resource", async (connector, clientId, keys) => {
+		await ensureFreshConnection(dynamic(connector, clientId));
+		expect([...(tokenRequests[0]?.keys() ?? [])]).toEqual(keys);
+	});
+
+	test("linear sends the refresh body it always sent, with no resource", async () => {
+		await ensureFreshConnection(connection());
+		expect([...(tokenRequests[0]?.keys() ?? [])]).toEqual([
+			"grant_type",
+			"refresh_token",
+			"client_id",
+			"client_secret",
+		]);
+	});
+
+	test.each([
+		"autumn_mcp",
+		"notion_mcp",
+	])("%s keeps the expiry the server gave", async (connector) => {
+		const before = Date.now();
+		await ensureFreshConnection(dynamic(connector, "c"));
+		const expiresAt = (updates[0]?.tokenExpiresAt as Date).getTime();
+		expect(expiresAt - before).toBeGreaterThanOrEqual(604800 * 1000);
+	});
+});

@@ -62,6 +62,10 @@ const oauth2Method = z.object({
 	authorization_params: z.record(z.string(), z.string()).optional(),
 	token_params: z.record(z.string(), z.string()).optional(),
 	pkce: z.boolean().default(false),
+	/** Seconds after which a stored token counts as expired, whatever the server's `expires_in` says. */
+	token_max_age: z.number().int().positive().optional(),
+	/** Send the RFC 8707 `resource` on refresh requests too; off unless a server needs it. */
+	resource_on_refresh: z.boolean().default(false),
 	scope_identifier: z.string().default("scope"),
 	client: z.enum(["static", "dynamic"]).default("static"),
 	token: z.string().default("$.access_token"),
@@ -112,6 +116,8 @@ const connector = z.object({
 	icon: z.string(),
 	category: z.string(),
 	scope: z.enum(["user", "org"]),
+	/** Known to the API but never listed to people: reached only through a plugin that names it. */
+	hidden: z.boolean().default(false),
 	methods: z.array(connectorMethod).min(1),
 });
 
@@ -132,6 +138,9 @@ const parsed = registry.parse(raw);
 
 export const CONNECTORS: Record<string, Connector> = parsed.connectors;
 export const CONNECTOR_SLUGS = Object.keys(CONNECTORS) as ConnectorSlug[];
+export const PUBLIC_CONNECTOR_SLUGS = CONNECTOR_SLUGS.filter(
+	(slug) => !CONNECTORS[slug]?.hidden,
+);
 
 export const getConnector = (slug: string): Connector | undefined =>
 	Object.hasOwn(CONNECTORS, slug) ? CONNECTORS[slug] : undefined;

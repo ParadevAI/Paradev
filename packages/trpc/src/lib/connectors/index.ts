@@ -81,6 +81,26 @@ export function connectorEnv(
 	return resolved;
 }
 
+/**
+ * Where a dynamic connector's tool server lives. The address may be a
+ * `${env.NAME}` template over the method's `requires_env`, so a connector
+ * can point at a deployment without naming its host in the registry. Null when
+ * the method has no server or a variable it needs is unset.
+ */
+export function connectorServerUrl(method: ConnectorMethod): string | null {
+	if (
+		method.type !== "oauth2" ||
+		method.client !== "dynamic" ||
+		!method.authorization_url
+	)
+		return null;
+	const env = Object.fromEntries(
+		method.requires_env.map((name) => [name, process.env[name]]),
+	);
+	const url = resolveConnectorTemplate(method.authorization_url, { env });
+	return url.includes("${") ? null : url;
+}
+
 export function clientCredentials(
 	slug: string,
 	method: ConnectorMethod,
@@ -123,7 +143,15 @@ export async function resolveEndpoints(
 			throw new Error(
 				`Connector "${slug}" uses a dynamic client but names no authorization_url to discover from.`,
 			);
-		const server = await discoverServer(method.authorization_url);
+		const serverUrl = connectorServerUrl(method);
+		if (!serverUrl) {
+			const unset = method.requires_env.filter((name) => !process.env[name]);
+			if (unset.length) throw new MissingConnectorEnvError(slug, unset);
+			throw new Error(
+				`Connector "${slug}" has no resolvable server address in ${method.authorization_url}.`,
+			);
+		}
+		const server = await discoverServer(serverUrl);
 		const identity = await resolveClientIdentity(
 			slug,
 			server,
@@ -249,6 +277,17 @@ export async function authorizeUrl(
 	}
 
 	return { url: url.toString(), codeVerifier };
+}
+
+/** Seconds a token is stored for: the server's `expires_in`, held to the method's `token_max_age`. */
+export function cappedExpiresIn(
+	method: ConnectorMethod,
+	expiresIn: unknown,
+): number | undefined {
+	const cap = method.type === "oauth2" ? method.token_max_age : undefined;
+	const given = typeof expiresIn === "number" ? expiresIn : undefined;
+	if (cap === undefined) return given;
+	return given === undefined ? cap : Math.min(given, cap);
 }
 
 export interface ConnectorTokens {
@@ -380,7 +419,7 @@ export async function exchangeCode(
 		for (const [key, path] of Object.entries(method.store))
 			stored[key] = readPath(payload, path);
 
-	const expiresIn = payload.expires_in;
+	const expiresIn = cappedExpiresIn(method, payload.expires_in);
 	const rawScope = payload.scope;
 
 	return {
@@ -628,7 +667,11 @@ export async function probeIdentity(
 			);
 		}
 	} else if ("mcp" in probe) {
-		payload = await mcpIdentity(slug, probe, accessToken);
+		payload = await mcpIdentity(
+			slug,
+			{ ...probe, mcp: resolveConnectorTemplate(probe.mcp, scope) },
+			accessToken,
+		);
 	} else {
 		if (!tokenPayload)
 			throw new Error(

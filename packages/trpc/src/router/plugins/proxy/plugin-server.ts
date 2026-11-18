@@ -132,6 +132,12 @@ function remoteServer(
 				await session.close();
 			}
 		} catch (error) {
+			// The credential is good and the person is not allowed: reconnecting
+			// cannot help, so say what the server said and leave the connection be.
+			if (credentialForbidden(error))
+				return errorResult(
+					`${target.plugin} refused this account: ${forbiddenReason(error)}`,
+				);
 			if (!credentialRejected(error)) throw error;
 			await recordRejection(target.connectionId, target.storedAccessToken);
 			return errorResult(
@@ -216,6 +222,20 @@ function accountNames(target: {
 
 function credentialRejected(error: unknown): boolean {
 	return (error as { code?: unknown } | null)?.code === 401;
+}
+
+function credentialForbidden(error: unknown): boolean {
+	return (error as { code?: unknown } | null)?.code === 403;
+}
+
+function forbiddenReason(error: unknown): string {
+	const message = error instanceof Error ? error.message : String(error);
+	const body = message.slice(message.indexOf("{"));
+	try {
+		const parsed = JSON.parse(body) as { error?: { message?: unknown } };
+		if (typeof parsed.error?.message === "string") return parsed.error.message;
+	} catch {}
+	return message;
 }
 
 type RecordRejection = (

@@ -6,6 +6,7 @@ import {
 	secretInputNames,
 } from "@superset/shared/connectors";
 import { env } from "../../../env";
+import { connectorServerUrl } from "../../../lib/connectors";
 import {
 	connectionById,
 	userConnections,
@@ -148,9 +149,7 @@ export function targetKey(target: PluginTarget): string {
 export function connectorServer(
 	method: ConnectorMethod | undefined,
 ): string | null {
-	return method?.type === "oauth2" && method.client === "dynamic"
-		? (method.authorization_url ?? null)
-		: null;
+	return method ? connectorServerUrl(method) : null;
 }
 
 function remoteBinding(

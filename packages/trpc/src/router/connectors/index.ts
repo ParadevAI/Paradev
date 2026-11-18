@@ -1,10 +1,6 @@
 import { db } from "@superset/db/client";
 import { connections } from "@superset/db/schema";
-import {
-	CONNECTOR_SLUGS,
-	type ConnectorMethod,
-	getConnector,
-} from "@superset/shared/connectors";
+import { getConnector } from "@superset/shared/connectors";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { and, eq, isNull, or } from "drizzle-orm";
@@ -19,29 +15,10 @@ import {
 import { personProcedure } from "../../trpc";
 import { verifyOrgAdmin, verifyOrgMembership } from "../integration/utils";
 import { forgetUpstreamTools } from "../plugins/proxy";
-
-function methodSummary(method: ConnectorMethod) {
-	return {
-		type: method.type,
-		label: method.label ?? method.type,
-		inputs: method.type === "api_key" ? method.inputs : [],
-	};
-}
+import { connectorCatalog, methodSummary } from "./catalog";
 
 export const connectorsRouter = {
-	catalog: personProcedure.query(() =>
-		CONNECTOR_SLUGS.map((slug) => {
-			const connector = requireConnector(slug);
-			return {
-				slug,
-				displayName: connector.displayName,
-				icon: connector.icon,
-				category: connector.category,
-				scope: connector.scope,
-				methods: connector.methods.map(methodSummary),
-			};
-		}),
-	),
+	catalog: personProcedure.query(() => connectorCatalog()),
 
 	get: personProcedure
 		.input(z.object({ slug: z.string() }))

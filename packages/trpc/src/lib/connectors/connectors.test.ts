@@ -1,10 +1,14 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { CONNECTOR_SLUGS, getConnector } from "@superset/shared/connectors";
 import { generateCodeChallenge } from "better-auth/oauth2";
+import type { PluginManifest } from "../../router/plugins/manifest";
+import { connectorServer } from "../../router/plugins/proxy/resolve-target";
+import { organizationPluginProblem } from "../organization-plugins/rules";
 import {
 	assertRespondingIssuer,
 	authorizeUrl,
 	connectorMethod,
+	exchangeCode,
 	IssuerMismatchError,
 	MissingConnectorEnvError,
 	probeIdentity,
@@ -976,5 +980,173 @@ describe("authorizeUrl for a dynamic client", () => {
 		);
 		expect(url.searchParams.get("resource")).toBe("https://mcp.resend.com");
 		expect(url.searchParams.get("scope")).toBe("full_access");
+	});
+});
+
+describe("the admin connector", () => {
+	const realFetch = globalThis.fetch;
+	const ADMIN = "https://admin.example.test";
+	const API = "https://api.example.test";
+	const saved: Record<string, string | undefined> = {};
+	let calls: { url: string; method: string; auth: string | null }[] = [];
+
+	beforeEach(() => {
+		for (const [key, value] of Object.entries({
+			NEXT_PUBLIC_ADMIN_URL: ADMIN,
+			NEXT_PUBLIC_API_URL: API,
+			PLUGIN_CLIENT_METADATA_BASE_URL: "https://api.test",
+		})) {
+			saved[key] = process.env[key];
+			process.env[key] = value;
+		}
+		calls = [];
+		const routes: Record<string, unknown> = {
+			[`${ADMIN}/.well-known/oauth-protected-resource/api/mcp/cloud`]: {
+				resource: `${ADMIN}/api/mcp/cloud`,
+				authorization_servers: [API],
+			},
+			[`${API}/.well-known/oauth-authorization-server`]: {
+				issuer: API,
+				authorization_endpoint: `${API}/api/auth/oauth2/authorize`,
+				token_endpoint: `${API}/api/auth/oauth2/token`,
+				code_challenge_methods_supported: ["S256"],
+				client_id_metadata_document_supported: true,
+			},
+			[`${API}/api/auth/oauth2/userinfo`]: {
+				sub: "user-1",
+				email: "a@example.test",
+				name: "A",
+			},
+			[`${API}/api/auth/oauth2/token`]: {
+				access_token: "jwt",
+				refresh_token: "r",
+				expires_in: 604800,
+			},
+		};
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const url = String(input);
+			calls.push({
+				url,
+				method: init?.method ?? "GET",
+				auth: new Headers(init?.headers).get("Authorization"),
+			});
+			const route = routes[url];
+			if (route === undefined) return new Response("no route", { status: 404 });
+			return new Response(JSON.stringify(route), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			});
+		}) as typeof fetch;
+	});
+
+	afterEach(() => {
+		globalThis.fetch = realFetch;
+		for (const [key, value] of Object.entries(saved)) {
+			if (value === undefined) delete process.env[key];
+			else process.env[key] = value;
+		}
+	});
+
+	const method = () => connectorMethod(requireConnector("superset_admin_mcp"));
+
+	test("discovers its authorization server from the address in the environment", async () => {
+		const url = await authorize("superset_admin_mcp");
+		expect(`${url.origin}${url.pathname}`).toBe(
+			`${API}/api/auth/oauth2/authorize`,
+		);
+		expect(url.searchParams.get("resource")).toBe(`${ADMIN}/api/mcp/cloud`);
+		expect(url.searchParams.get("scope")).toBe(
+			"openid profile email offline_access",
+		);
+		expect(url.searchParams.get("code_challenge_method")).toBe("S256");
+	});
+
+	test("asks the product API who the token belongs to", async () => {
+		const identity = await probeIdentity("superset_admin_mcp", method(), "tok");
+		expect(calls).toEqual([
+			{
+				url: `${API}/api/auth/oauth2/userinfo`,
+				method: "GET",
+				auth: "Bearer tok",
+			},
+		]);
+		expect(identity.account).toEqual({ id: "user-1", label: "a@example.test" });
+		expect(identity.user).toEqual({ id: "user-1", label: "A" });
+	});
+
+	test("stores a token for the cap, not for the seven days the server gave", async () => {
+		const before = Date.now();
+		const tokens = await exchangeCode("superset_admin_mcp", method(), {
+			code: "c",
+			redirectUri: "https://api.test/cb",
+			codeVerifier: "v",
+			issuer: API,
+			clientId:
+				"https://api.test/api/connectors/superset_admin_mcp/client-metadata",
+		});
+		expect(tokens.expiresAt?.getTime()).toBeGreaterThanOrEqual(
+			before + 3000 * 1000,
+		);
+		expect(tokens.expiresAt?.getTime()).toBeLessThan(
+			before + 3000 * 1000 + 5000,
+		);
+	});
+
+	test("granola_mcp still stores the expiry the server gave", async () => {
+		const routes = globalThis.fetch;
+		globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+			const url = String(input);
+			if (
+				url ===
+				"https://mcp.granola.ai/.well-known/oauth-protected-resource/mcp"
+			)
+				return Response.json({
+					resource: "https://mcp.granola.ai/mcp",
+					authorization_servers: ["https://mcp-auth.granola.ai"],
+				});
+			if (url.endsWith("/oauth-authorization-server"))
+				return Response.json({
+					issuer: "https://mcp-auth.granola.ai",
+					authorization_endpoint: "https://mcp-auth.granola.ai/a",
+					token_endpoint: "https://mcp-auth.granola.ai/oauth2/token",
+					client_id_metadata_document_supported: true,
+				});
+			if (
+				url.startsWith("https://mcp-auth.granola.ai/") &&
+				url.includes("token")
+			)
+				return Response.json({ access_token: "x", expires_in: 604800 });
+			return routes(input, init);
+		}) as typeof fetch;
+		const before = Date.now();
+		const tokens = await exchangeCode(
+			"granola_mcp",
+			connectorMethod(requireConnector("granola_mcp")),
+			{
+				code: "c",
+				redirectUri: "https://api.test/cb",
+				issuer: "https://mcp-auth.granola.ai",
+				clientId: "https://api.test/api/connectors/granola_mcp/client-metadata",
+			},
+		);
+		expect(tokens.expiresAt?.getTime()).toBeGreaterThanOrEqual(
+			before + 604800 * 1000,
+		);
+	});
+
+	test("the tool server is the templated address, and unknown while the address is unset", () => {
+		expect(connectorServer(method())).toBe(`${ADMIN}/api/mcp/cloud`);
+		delete process.env.NEXT_PUBLIC_ADMIN_URL;
+		expect(connectorServer(method())).toBeNull();
+	});
+
+	test("an organization plugin may name it", () => {
+		const manifest = {
+			name: "some-org-plugin",
+			version: "1.0.0",
+			description: "x",
+			extensions: { superset: { connector: { slug: "superset_admin_mcp" } } },
+		} as unknown as PluginManifest;
+		expect(organizationPluginProblem(manifest)).toBeNull();
 	});
 });

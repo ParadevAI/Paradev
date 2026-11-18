@@ -597,3 +597,54 @@ describe("superset-home review", () => {
 		}
 	});
 });
+
+describe("an upstream that answers 403 for a signed-in person", () => {
+	const realFetch = globalThis.fetch;
+	const REFUSAL = "Forbidden: this account is not on the staff list.";
+	const remote: PluginTarget = {
+		kind: "remote",
+		plugin: "superset-admin",
+		version: "1.0.0",
+		url: "https://admin.example.test/api/mcp/cloud",
+		headers: { Authorization: "Bearer jwt" },
+		connectionId: "conn-1",
+	};
+
+	function refuse() {
+		globalThis.fetch = (async () =>
+			new Response(JSON.stringify({ error: { message: REFUSAL } }), {
+				status: 403,
+				headers: { "content-type": "application/json" },
+			})) as unknown as typeof fetch;
+	}
+
+	test("a tool call answers with the server's reason, and the connection is not marked", async () => {
+		refuse();
+		const rejected: string[] = [];
+		const { client, close } = await connect(remote, rejected);
+		try {
+			const result = await client.callTool({ name: "any", arguments: {} });
+			expect(result.isError).toBe(true);
+			const text = JSON.stringify(result.content);
+			expect(text).toContain(REFUSAL);
+			expect(text).not.toContain("reconnect");
+			expect(rejected).toEqual([]);
+		} finally {
+			globalThis.fetch = realFetch;
+			await close();
+		}
+	});
+
+	test("a tool list fails with the server's reason, and the connection is not marked", async () => {
+		refuse();
+		const rejected: string[] = [];
+		const { client, close } = await connect(remote, rejected);
+		try {
+			await expect(client.listTools()).rejects.toThrow(REFUSAL);
+			expect(rejected).toEqual([]);
+		} finally {
+			globalThis.fetch = realFetch;
+			await close();
+		}
+	});
+});

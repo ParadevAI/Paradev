@@ -15,6 +15,7 @@ import {
 	redirectUriFor,
 } from "./client-identity";
 import {
+	cappedExpiresIn,
 	connectorMethod,
 	type ResolvedEndpoints,
 	requireConnector,
@@ -48,6 +49,13 @@ export class ConnectorUnavailableError extends Error {
 		super(`The ${connector} token endpoint is unavailable: ${detail}`);
 		this.name = "ConnectorUnavailableError";
 	}
+}
+
+function methodOf(row: SelectConnection) {
+	return connectorMethod(
+		requireConnector(row.connector),
+		row.authMethod as never as undefined,
+	);
 }
 
 function expiringSoon(expiresAt: Date | null, bufferSeconds: number): boolean {
@@ -232,6 +240,13 @@ async function redeem(
 		"Content-Type": "application/x-www-form-urlencoded",
 		Accept: "application/json",
 	};
+	const method = methodOf(connection);
+	if (
+		method.type === "oauth2" &&
+		method.resource_on_refresh &&
+		endpoints.resource
+	)
+		body.set("resource", endpoints.resource);
 	if (endpoints.authentication === "basic")
 		headers.Authorization = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`;
 	else {
@@ -293,7 +308,7 @@ async function store(
 	tokens: IssuedTokens,
 	redeemedToken: string,
 ): Promise<SelectConnection | undefined> {
-	const expiresIn = tokens.expires_in;
+	const expiresIn = cappedExpiresIn(methodOf(base), tokens.expires_in);
 	const [updated] = await db
 		.update(connections)
 		.set({
