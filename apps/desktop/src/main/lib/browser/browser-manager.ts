@@ -77,7 +77,7 @@ export interface BrowserOpenRequest {
 	requestId: string;
 }
 
-export interface CdpSession {
+interface CdpSession {
 	send: (rawMessage: string) => void;
 	detach: () => void;
 }
@@ -164,7 +164,7 @@ export function isAllowedGuestUrl(url: string): boolean {
 	return protocol !== null && ALLOWED_GUEST_SCHEMES.has(protocol);
 }
 
-export function isDeepLinkUrl(url: string): boolean {
+function isDeepLinkUrl(url: string): boolean {
 	const protocol = protocolOf(url);
 	return protocol !== null && DEEP_LINK_SCHEMES.has(protocol);
 }

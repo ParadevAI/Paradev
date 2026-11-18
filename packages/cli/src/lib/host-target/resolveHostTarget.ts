@@ -4,6 +4,7 @@ import { getHostId } from "@superset/shared/host-info";
 import {
 	buildHostRoutingKey,
 	CLOUD_HOST_ID,
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
@@ -81,6 +82,7 @@ export async function resolveHostTarget(
 						headers: {
 							Authorization: `Bearer ${manifest.authToken}`,
 							"x-superset-client-machine-id": localHostId,
+							[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 							// Names the user to the local host so it can stamp
 							// createdByUserId; the relay does this for remote hosts.
 							...(userId ? { [SUPERSET_USER_ID_HEADER]: userId } : {}),
@@ -117,6 +119,7 @@ export async function resolveHostTarget(
 					headers: {
 						...(userJwt ? { Authorization: `Bearer ${userJwt}` } : {}),
 						"x-superset-client-machine-id": localHostId,
+						[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 					},
 				}),
 			],

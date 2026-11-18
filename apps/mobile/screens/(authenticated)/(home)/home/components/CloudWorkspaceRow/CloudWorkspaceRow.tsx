@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { RowLink } from "@/components/RowLink";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceRow as CloudWorkspaceRowData } from "@/hooks/useCloudWorkspaces";
+import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type { HostWorkspacesCacheOps } from "@/hooks/useHostWorkspaces";
 import { cn } from "@/lib/utils";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
@@ -43,7 +45,8 @@ export function CloudWorkspaceRow({
 }) {
 	const { t } = useLingui();
 	const router = useRouter();
-	const archived = row.status === "deleted";
+	const enlargedText = useEnlargedText();
+	const archived = isArchivedCloudWorkspaceStatus(row.status);
 	const readAt = useUnreadWorkspacesStore((state) => state.cloudReadAt[row.id]);
 	const manuallyUnread = useUnreadWorkspacesStore(
 		(state) => row.id in state.manualUnread,
@@ -100,7 +103,7 @@ export function CloudWorkspaceRow({
 						"shrink font-medium text-[15px]",
 						archived && "text-muted-foreground",
 					)}
-					numberOfLines={1}
+					numberOfLines={enlargedText ? undefined : 1}
 				>
 					{row.name || t({ message: "Untitled workspace" })}
 				</Text>

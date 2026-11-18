@@ -57,6 +57,8 @@ export function DashboardSidebarWorkspaceHostGlyph({
 				{hostType === "cloud" ? (
 					cloudState === "connecting" ? (
 						<Trans>Cloud workspace: connecting</Trans>
+					) : cloudState === "asleep" ? (
+						<Trans>Cloud workspace: asleep</Trans>
 					) : pressure === "critical" ? (
 						<Trans>Cloud workspace: out of memory</Trans>
 					) : pressure === "busy" ? (

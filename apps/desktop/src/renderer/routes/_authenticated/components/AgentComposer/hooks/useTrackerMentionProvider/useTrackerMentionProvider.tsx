@@ -66,7 +66,6 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 							{
 								organizationId,
 								status: includeClosed ? "all" : "open",
-								assignee: search ? null : "me",
 								search,
 							},
 						);

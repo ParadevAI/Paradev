@@ -11,6 +11,7 @@ import { migrate } from "drizzle-orm/bun-sqlite/migrator";
 import type { HostDb } from "../../../db";
 import * as schema from "../../../db/schema";
 import { TerminalAgentStore } from "../../../terminal-agents";
+import type { HostServiceContext } from "../../../types";
 import { importCloudAttachments } from "../attachments/attachments";
 import {
 	type AttachmentMetadata,
@@ -25,6 +26,7 @@ import {
 	chatContinuationTarget,
 	chatLaunchTarget,
 	continuationTarget,
+	continueAgent,
 	validateAgentEffortSelection,
 	validateAgentForkSelection,
 	validateAgentLaunchOptions,
@@ -1089,6 +1091,30 @@ describe("continuationTarget", () => {
 		expect(continuationTarget(db, boundStore(), run)).toEqual({
 			terminalId,
 			label: "Claude",
+		});
+	});
+
+	it("continues a terminal agent without opening the chat runtime", async () => {
+		const db = createTestDb();
+		seedClaude(db);
+		let chatOpened = false;
+		const continued = await continueAgent(
+			{
+				db,
+				eventBus: {} as HostServiceContext["eventBus"],
+				terminalAgentStore: boundStore(),
+				runtime: {
+					chat: () => {
+						chatOpened = true;
+						throw new Error("chat runtime opened");
+					},
+				} as unknown as HostServiceContext["runtime"],
+			},
+			run,
+		);
+		expect({ continued, chatOpened }).toEqual({
+			continued: null,
+			chatOpened: false,
 		});
 	});
 

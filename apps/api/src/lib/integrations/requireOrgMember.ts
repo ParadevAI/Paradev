@@ -1,5 +1,9 @@
-import { auth } from "@superset/auth/server";
+import { getRequestSession } from "@superset/auth/server";
 import { findOrgMembership } from "@superset/db/utils";
+import {
+	unauthenticatedResponse,
+	wrongAccountResponse,
+} from "@/lib/signInRedirect";
 
 export type OrgMember = {
 	organizationId: string;
@@ -9,8 +13,9 @@ export type OrgMember = {
 
 /**
  * The connect-route preamble: who is asking, for which organization, and
- * whether they belong to it. Returns the error response to send when a check
- * fails.
+ * whether they belong to it. Returns the response to send when a check fails:
+ * for a browser, a sign-in or switch-account page that comes back here;
+ * otherwise an error.
  *
  * It deliberately hands back no state token: a state is only ever minted by
  * `beginOAuthFlow`, which binds it to the asking browser in the same step.
@@ -18,9 +23,12 @@ export type OrgMember = {
 export async function requireOrgMember(
 	request: Request,
 ): Promise<OrgMember | Response> {
-	const session = await auth.api.getSession({ headers: request.headers });
+	const session = await getRequestSession(request.headers);
 	if (!session?.user) {
-		return Response.json({ error: "Unauthorized" }, { status: 401 });
+		return unauthenticatedResponse(
+			request,
+			Response.json({ error: "Unauthorized" }, { status: 401 }),
+		);
 	}
 
 	const organizationId = new URL(request.url).searchParams.get(
@@ -38,9 +46,12 @@ export async function requireOrgMember(
 		organizationId,
 	});
 	if (!membership) {
-		return Response.json(
-			{ error: "User is not a member of this organization" },
-			{ status: 403 },
+		return wrongAccountResponse(
+			request,
+			Response.json(
+				{ error: "User is not a member of this organization" },
+				{ status: 403 },
+			),
 		);
 	}
 

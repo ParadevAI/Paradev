@@ -44,7 +44,7 @@ export function useDashboardSidebarPortsData(enabled = true): {
 
 	const { targets: sandboxes } = useSandboxAccess();
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const openWorkspaceId = openMatch ? openMatch.workspaceId : undefined;

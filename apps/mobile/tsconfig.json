@@ -17,6 +17,7 @@
 			"@superset/google-credential": [
 				"./modules/google-credential/src/index.ts"
 			],
+			"@superset/storefront": ["./modules/storefront/src/index.ts"],
 			"@superset/symbol-button": ["./modules/symbol-button/src/index.tsx"],
 			"@superset/live-activity": ["./modules/live-activity/src/index.ts"],
 			"@superset/title-press": ["./modules/title-press/src/index.tsx"],

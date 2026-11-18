@@ -31,6 +31,7 @@ import {
 } from "../../lib/sandbox";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
+import { isLiveStatus } from "../cloud-workspace/live";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
 import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
@@ -229,7 +230,7 @@ async function loadPromotable(
 	cloudWorkspaceId: string,
 ) {
 	const workspace = await loadVisibleWorkspace(ctx, cloudWorkspaceId);
-	if (workspace.status !== "ready") {
+	if (!isLiveStatus(workspace.status)) {
 		throw userError({
 			code: "PRECONDITION_FAILED",
 			message: "Only a ready workspace can become an environment",

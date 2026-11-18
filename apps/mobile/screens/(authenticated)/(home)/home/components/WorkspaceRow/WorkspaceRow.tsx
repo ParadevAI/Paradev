@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SelectGithubPullRequest } from "@superset/db/schema";
+import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { useRouter } from "expo-router";
 import { FolderGit2 } from "lucide-react-native";
 import { Pressable, View } from "react-native";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { CloudWorkspaceStatus } from "@/hooks/useCloudWorkspaceItems";
+import { useEnlargedText } from "@/hooks/useEnlargedText";
 import type {
 	HostWorkspaceItem,
 	HostWorkspacesCacheOps,
@@ -60,6 +62,7 @@ export function WorkspaceRow({
 	card?: boolean;
 }) {
 	const { t } = useLingui();
+	const enlargedText = useEnlargedText();
 	const router = useRouter();
 	const theme = useTheme();
 	const prIcon = pullRequest
@@ -91,7 +94,9 @@ export function WorkspaceRow({
 				// failed one only needs disposing of. Deleting a local workspace
 				// retires the record and leaves the checkout alone, so every row on
 				// a host is deletable.
-				canRename={cloudStatus === undefined || cloudStatus === "ready"}
+				canRename={
+					cloudStatus === undefined || isLiveCloudWorkspaceStatus(cloudStatus)
+				}
 				canDelete={cloudStatus === undefined || cloudStatus !== "provisioning"}
 				isCloud={cloudStatus !== undefined}
 				isUnread={isUnread}
@@ -167,16 +172,24 @@ export function WorkspaceRow({
 						</View>
 					)}
 					<View className="flex-1">
-						<Text className="font-medium text-[15px]" numberOfLines={1}>
+						<Text
+							className="font-medium text-[15px]"
+							numberOfLines={enlargedText ? undefined : 1}
+						>
 							{workspace.name}
 						</Text>
-						<View className="flex-row items-center gap-1">
+						<View
+							className={cn(
+								"flex-row items-center gap-1",
+								enlargedText && "flex-wrap",
+							)}
+						>
 							{/* A workspace named after its branch says it twice otherwise —
 						    common now that every project shows its `main`. */}
 							{workspace.branch === workspace.name ? null : (
 								<Text
 									className="text-muted-foreground shrink text-xs"
-									numberOfLines={1}
+									numberOfLines={enlargedText ? undefined : 1}
 								>
 									{workspace.branch}
 								</Text>

@@ -10,7 +10,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { AppState } from "react-native";
+import { AppState, useWindowDimensions } from "react-native";
 import { useOpenLink } from "@/hooks/useOpenLink";
 import { getHostAuthToken, getRelayUrl } from "@/lib/host/client";
 import { ensureSandboxAccess, isSandboxHost } from "@/lib/sandbox-access";
@@ -23,6 +23,10 @@ import type {
 	TerminalWebViewHandle,
 	TerminalWebViewProps,
 } from "../../TerminalWebView.types";
+
+// The host sizes the PTY to its smallest visible client, so an accessibility
+// text size would shrink every desktop pane to a few columns.
+const MAX_FONT_SCALE = 1.5;
 
 /**
  * The page side of the terminal bridge, shared by the WebView and the
@@ -136,6 +140,10 @@ export function useTerminalBridge(
 	// Held in a ref so the handshake doesn't re-run on every change.
 	const visibleRef = useRef(screenFocused && appActive);
 
+	const fontScale = Math.min(useWindowDimensions().fontScale, MAX_FONT_SCALE);
+	const fontScaleRef = useRef(fontScale);
+	fontScaleRef.current = fontScale;
+
 	const handleMessage = useCallback(
 		(data: string) => {
 			let message: PageMessage;
@@ -152,6 +160,7 @@ export function useTerminalBridge(
 				// else. `ready` precedes the page's first connect, so re-asserting
 				// here lands before it attaches.
 				postToPage({ type: "visible", visible: visibleRef.current });
+				postToPage({ type: "fontScale", scale: fontScaleRef.current });
 				// The page waits for this before dialling, so whatever we hold
 				// for this session is painted first and the attach asks only for
 				// what came after it.
@@ -215,6 +224,10 @@ export function useTerminalBridge(
 		visibleRef.current = visible;
 		postToPage({ type: "visible", visible });
 	}, [screenFocused, appActive, postToPage]);
+
+	useEffect(() => {
+		postToPage({ type: "fontScale", scale: fontScale });
+	}, [fontScale, postToPage]);
 
 	// Tab switches swap sessions inside the live page instead of remounting
 	// the WebView — a remount pays the 400KB xterm parse and two cold TLS

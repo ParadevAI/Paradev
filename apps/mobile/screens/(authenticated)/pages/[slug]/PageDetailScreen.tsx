@@ -23,6 +23,7 @@ import { getHostAuthToken } from "@/lib/host/client";
 import { contentScrollsUnderHeader, HeaderToolbar } from "@/lib/navigation";
 import { pageUrlForSlug } from "@/lib/web-links";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
+import { usePageActions } from "../hooks/usePageActions";
 import { usePageQuery } from "../hooks/usePages";
 import { CommentPin } from "./components/CommentPin";
 import { PageFrame, type PageFrameHandle } from "./components/PageFrame";
@@ -91,6 +92,7 @@ export function PageDetailScreen({
 
 	const page = usePageQuery(slug);
 	const pageId = page.data?.id;
+	const actions = usePageActions(page.data, { onDeleted: router.back });
 	const version = page.data?.version;
 	const viewUrl = page.data?.viewUrl;
 	const loaded = viewUrl !== undefined && loadedSrc === viewUrl;
@@ -298,17 +300,41 @@ export function PageDetailScreen({
 						});
 					}}
 				/>
-				<HeaderToolbar.Button
-					icon="share"
-					accessibilityLabel={t({ message: "Share this page" })}
-					onPress={() => {
-						void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-						router.push({
-							pathname: "/(authenticated)/pages/[slug]/share",
-							params: { slug },
-						});
-					}}
-				/>
+				<HeaderToolbar.Menu
+					icon="more"
+					accessibilityLabel={t({ message: "Page actions" })}
+				>
+					<HeaderToolbar.MenuAction
+						icon="share"
+						onPress={() =>
+							router.push({
+								pathname: "/(authenticated)/pages/[slug]/share",
+								params: { slug },
+							})
+						}
+					>
+						{t({ message: "Share" })}
+					</HeaderToolbar.MenuAction>
+					{actions ? (
+						<HeaderToolbar.MenuAction icon="copy" onPress={actions.duplicate}>
+							{t({ message: "Duplicate" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+					{actions?.rename ? (
+						<HeaderToolbar.MenuAction icon="rename" onPress={actions.rename}>
+							{t({ message: "Rename" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+					{actions?.remove ? (
+						<HeaderToolbar.MenuAction
+							icon="delete"
+							destructive
+							onPress={actions.remove}
+						>
+							{t({ message: "Delete" })}
+						</HeaderToolbar.MenuAction>
+					) : null}
+				</HeaderToolbar.Menu>
 			</HeaderToolbar>
 
 			{pageError || offline ? (

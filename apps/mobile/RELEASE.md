@@ -49,9 +49,8 @@ eas build --platform ios --profile production
 eas submit --platform ios --profile production --latest
 
 # 3. Listing + App Review notes, once App Store Connect has processed the
-#    build. APP_REVIEW_VIDEO_URL is optional but worth it: a two-minute screen
-#    recording of sign-in and the main flows is the single most effective
-#    thing in the notes.
+#    build. Recordings go in the version's App Review attachment, not the
+#    notes: the notes are near the 4,000-character limit.
 eas metadata:push   # from the main checkout; APP_REVIEW_EMAIL / APP_REVIEW_PASSWORD come from the root .env
 
 # 4. In App Store Connect, attach the processed build to the version and
@@ -72,10 +71,24 @@ rejections in this category are one of these.
       (the headings in that file map to the guidelines reviewers check:
       payments, Sign in with Apple, account deletion, on-device code execution,
       permissions).
-- [ ] No in-app button, link, or copy points at a web page where a plan can be
-      bought (guideline 3.1.1 outside the US storefront; we ship one build
-      worldwide). Mentioning that plans are managed on the web is fine;
-      linking to it is not.
+- [ ] On iOS, no button, link, or copy points at a web page where a plan can
+      be bought, or says how to upgrade (guideline 3.1.1). Our Nov 6, 2026 reply
+      to App Review promised this for every storefront, so the US link-out that
+      3.1.1(a) allows stays off until a release says otherwise in its notes. On
+      Android (Google Play Payments: we sell nothing in-app), a
+      paid organization gets a "Manage Plan" link and a Free one gets plain,
+      non-tappable "Upgrade to Pro at <host>" text. Billing URLs live only in
+      `lib/web-links.ts` and `lib/upgrade/checkout`, read only by `useUpgrade`,
+      which decides through `billingAccess`; `no-purchase-links.test.ts`
+      enforces it.
+      Reviewers sign in with Sign in with Apple as a new free account every
+      time, so they always see the paywall.
+- [ ] Every `UIBackgroundModes` entry has a feature the reviewer can reach, and
+      the voice-mode recording on a physical device is in the version's App
+      Review attachment (2.5.4). Attachments do not carry over to a new
+      version, and the review notes say the recording is attached.
+- [ ] The review notes are 4,000 characters or fewer (App Store Connect
+      rejects longer notes; `store.config.test.ts` enforces it).
 - [ ] Sign in with Apple is present on the sign-in screen whenever any other
       third-party sign-in is (4.8).
 - [ ] Account deletion works from Settings without leaving the app (5.1.1 v).
@@ -101,7 +114,7 @@ Channels: `preview` for internal builds, `production` for the store build.
 | Change | Lane |
 |---|---|
 | JS merged to main, under the `deploy.yml` trigger paths | `deploy.yml` publishes to `preview` and `production` |
-| Native merged to main | `deploy.yml` builds and uploads to App Store Connect; App Review stays manual |
+| Native merged to main | `deploy.yml` builds both platforms, uploads to App Store Connect and to the Play internal track as a draft; App Review and Play promotion stay manual |
 | JS on a pull request | `pr-preview.yml` publishes to a branch named after the git branch and comments a QR code, when a development build matches the fingerprint |
 | Native on a pull request | Add the `mobile-build` label; `build-pr.yml` builds a development client |
 
@@ -109,7 +122,7 @@ Channels: `preview` for internal builds, `production` for the store build.
 
 Every merge to main that touches the app or a package it imports (the
 `deploy.yml` trigger paths) publishes to everyone on the production channel,
-TestFlight and App Store alike — one binary, one channel. A new workspace
+TestFlight, App Store and Play alike — one channel. A new workspace
 dependency of the app goes in those paths, or its fixes never publish. Installed builds have to track
 main: the API and host-service move with every merge, and a build left on old
 JS meets them without the client half of each change. The runtime version
@@ -193,11 +206,10 @@ eas build --platform android --profile production
 eas submit --platform android --profile production --latest
 ```
 
-`.eas/workflows/deploy-android.yml` runs the same two steps, skipping the build
-when one already matches the fingerprint. It is manual (`workflow_dispatch`)
-until the first hand upload is done and Android takes OTA updates; then its
-jobs move into `deploy.yml`. Promote from internal to production in Play
-Console.
+`deploy.yml` runs the same two steps on every merge to main, skipping the
+build when one already matches the fingerprint, and publishes each merge's JS
+to Android as an OTA update, as it does for iOS. Promote a new build from
+internal to production in Play Console.
 
 ### Checking a release build without publishing
 

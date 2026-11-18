@@ -13,7 +13,7 @@ import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { usePageFavorites } from "../usePageFavorites";
 import { useShareDirectory } from "../useShareDirectory";
 
-export interface PageHeaderTarget {
+interface PageHeaderTarget {
 	slug: string;
 	pageId?: string;
 	title?: string;

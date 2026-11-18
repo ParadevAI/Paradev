@@ -11,6 +11,7 @@ const retained = [
 	"/cli/auth",
 	"/auth/desktop",
 	"/auth/integration-connect",
+	"/auth/switch-account",
 	"/integrations/sentry",
 	"/integrations/notion",
 	"/integrations/microsoft-teams",

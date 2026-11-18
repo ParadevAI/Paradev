@@ -4,6 +4,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
@@ -17,12 +18,12 @@ import { TRPCError } from "@trpc/server";
 import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { parseLaunchSource, withLaunchSource } from "./agent-launch-analytics";
 import { createApiClient } from "./api";
 import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
 	createChatAgentBridge,
 	createChatV3Mount,
-	promptChatSession,
 	registerChatV3Routes,
 } from "./chat-v3";
 import { createDb, type HostDb } from "./db";
@@ -55,13 +56,12 @@ import {
 import {
 	isAgentTerminalAlive,
 	registerWorkspaceTerminalRoute,
-	sendAgentMessage,
 } from "./terminal/terminal";
 import {
 	SqliteTerminalAgentBindingPersistence,
 	TerminalAgentStore,
 } from "./terminal-agents";
-import { matchesAgentBinding } from "./terminal-agents/matches-agent-binding";
+import { sendToAgent } from "./terminal-agents/send-to-agent";
 import { appRouter } from "./trpc/router";
 import {
 	ATTACHMENT_SWEEP_INTERVAL_MS,
@@ -235,6 +235,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			],
 		}),
 	);
+	app.use("*", (c, next) =>
+		withLaunchSource(
+			parseLaunchSource(c.req.header(SUPERSET_LAUNCH_SOURCE_HEADER)),
+			next,
+		),
+	);
 
 	const eventBus = new EventBus({ db, filesystem, gitWatcher });
 	eventBus.start();
@@ -277,22 +283,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 			text,
 			signal,
 		}) => {
-			const chat = terminalAgentStore.getChat(terminalId);
-			const chatSessionId = chat?.chatSessionId;
-			if (chatSessionId) {
-				if (!matchesAgentBinding(chat, expectedAgent)) {
-					throw new Error("The chat's agent changed before delivery");
-				}
-				await promptChatSession({
-					runtime: chatV3.runtime(),
-					chatSessionId,
-					text,
-					acquireDelivery,
-					signal,
-				});
-				return;
-			}
-			const result = await sendAgentMessage({
+			const result = await sendToAgent({
 				terminalId,
 				workspaceId,
 				text,
@@ -301,6 +292,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				acquireDelivery,
 				signal,
 				terminalAgentStore,
+				chatRuntime: () => chatV3.runtime(),
 				db,
 				eventBus,
 			});
@@ -319,15 +311,10 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		},
 		isAgentBusy: (terminalId) =>
 			agentIsBusy(
-				(
-					terminalAgentStore.getChat(terminalId) ??
-					terminalAgentStore.get(terminalId)
-				)?.lastEventType,
+				terminalAgentStore.getChatOrTerminalAgent(terminalId)?.lastEventType,
 			),
 		getAgent: (terminalId) => {
-			const binding =
-				terminalAgentStore.getChat(terminalId) ??
-				terminalAgentStore.get(terminalId);
+			const binding = terminalAgentStore.getChatOrTerminalAgent(terminalId);
 			return binding?.endedAt === undefined ? binding : undefined;
 		},
 	});

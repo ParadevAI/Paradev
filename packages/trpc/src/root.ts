@@ -35,6 +35,7 @@ import { organizationRouter } from "./router/organization";
 import { pageRouter } from "./router/page";
 import { pageCommentRouter } from "./router/page-comment";
 import { pluginsRouter } from "./router/plugins";
+import { projectRouter } from "./router/project";
 import { sandboxRouter } from "./router/sandbox";
 import { suggestionRouter } from "./router/suggestion";
 import { supportRouter } from "./router/support/support";
@@ -45,9 +46,9 @@ import { taskRecordRouter } from "./router/task-record";
 import { teamRouter } from "./router/team";
 import { userRouter } from "./router/user";
 import { userSettingsRouter } from "./router/user-settings";
-import { v2ProjectRouter } from "./router/v2-project";
-import { v2WorkspaceRouter } from "./router/v2-workspace";
 import { voiceRouter } from "./router/voice";
+import { workspaceRouter } from "./router/workspace";
+import { legacyWorkspaceRouter } from "./router/workspace/legacy";
 import { workspaceMoveRouter } from "./router/workspace-move";
 import { createCallerFactory, createTRPCRouter } from "./trpc";
 
@@ -105,8 +106,13 @@ export const appRouter = createTRPCRouter({
 		removeMember: hostManagementRouter.removeMember,
 		setMemberRole: hostManagementRouter.setMemberRole,
 	},
-	v2Project: v2ProjectRouter,
-	v2Workspace: v2WorkspaceRouter,
+	project: projectRouter,
+	workspace: workspaceRouter,
+	// Every released host-service calls these names, and so does this one until
+	// the API with the new names is live. Keep them until MINIMUM_DESKTOP_VERSION
+	// is past the first release that calls the new ones.
+	v2Project: projectRouter,
+	v2Workspace: { ...workspaceRouter, ...legacyWorkspaceRouter },
 });
 
 export type AppRouter = typeof appRouter;

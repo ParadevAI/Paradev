@@ -75,11 +75,11 @@ The listing lives in `apps/mobile/play-store.config.js`. Its text comes from the
 `store.config.js`, and the icon and feature graphic are in `apps/mobile/store/android/`.
 `bun apps/mobile/scripts/play-listing.ts` checks it against Play's limits.
 
-- [x] **Phone screenshots** — 3 drafts taken 2026-10-29 from the review account on production
-      (Home, workspace sheet, new task). Retake the new-task shot once the Android composer's project
-      chip stops overlapping the list header. Was: (2 to 8 PNGs) in `apps/mobile/store/android/phone/`. Take them from the
-      review demo account (`APP_REVIEW_EMAIL`), whose organization has sample sessions, never from
-      a real account. Use `apps/mobile/scripts/android-dev.sh --shot`.
+- [x] **Phone screenshots and feature graphic**: six shots (2026-11-15) in the App Store set's style,
+      with Android captures from a local emulator ("Acme" demo org, real agent sessions). The source is
+      the Graphics repo (ParadevAI/graphics, `src/store/`, captures in `public/play-store/`):
+      `npm run render:play-store` writes them to `out/play-store/`; copy them to `apps/mobile/store/android/`.
+      Never capture a real account.
 - [ ] **Push text and images**:
       `PLAY_SERVICE_ACCOUNT_KEY=key.json bun apps/mobile/scripts/play-listing.ts --push`. Needs
       the service account above. The push code has not run against Play yet.
@@ -108,9 +108,8 @@ to $0 (3 seats, 216,000 box GB-minutes, overage billing off, past-due ignored). 
 - [ ] **Screens not yet checked on a device:** the Page sheets (preview, comments, share), voice
       sheets, line comment, and `ValueMenu` in share-invite. The PR checks and reviewers sheets
       render on Android (2026-10-30, fixture data: the local dev account has no GitHub).
-- [ ] **CI and EAS workflows.** `.eas/workflows/deploy-android.yml` builds and submits to the Play
-      internal track, run by hand. It moves into `deploy.yml` after the first manual upload and once
-      Android takes OTA updates (`RELEASE.md`).
+- [x] **CI and EAS workflows.** Done: `deploy.yml` publishes OTA updates to Android and, when the
+      fingerprint changes, builds and submits to the Play internal track (`RELEASE.md`).
 - [x] **Home-screen name.** Done: `withAndroidLabel` sets the launcher label to the brand name.
 
 ### Composer, after the MVP

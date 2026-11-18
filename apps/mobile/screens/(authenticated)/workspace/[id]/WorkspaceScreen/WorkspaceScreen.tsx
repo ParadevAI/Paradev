@@ -109,6 +109,7 @@ import { keyboardOverlap } from "../utils/keyboardOverlap";
 import { orderTerminalRows } from "../utils/orderTerminalRows";
 import { PULL_REQUEST_SYMBOL, pullRequestStatus } from "../utils/pullRequest";
 import { resumeChat } from "../utils/resumeChat";
+import { CloudRefusalPlaceholder } from "./components/CloudRefusalPlaceholder";
 import { WorkspaceCreateFailedState } from "./components/WorkspaceCreateFailedState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspacePlaceholder } from "./components/WorkspacePlaceholder";
@@ -1177,25 +1178,11 @@ export function WorkspaceScreen() {
 						})}
 					/>
 				) : cloud && sandboxRefusal ? (
-					<WorkspacePlaceholder
-						action={
-							<Pressable
-								accessibilityRole="button"
-								className="bg-secondary h-[38px] flex-row items-center justify-center gap-1.5 rounded-md px-5 active:opacity-80"
-								onPress={retrySandbox}
-							>
-								<Text className="font-medium text-[15px]">
-									<Trans>Try again</Trans>
-								</Text>
-							</Pressable>
-						}
-						body={sandboxRefusal}
-						icon={CloudOff}
+					<CloudRefusalPlaceholder
+						message={sandboxRefusal}
 						onRefresh={onRefresh}
+						onRetry={retrySandbox}
 						refreshing={refreshing}
-						title={t({
-							message: "This cloud workspace can't start",
-						})}
 					/>
 				) : activeIsChat && activeTerminalId && host && hostUrl && id ? (
 					<ChatSessionView

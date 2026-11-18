@@ -6,7 +6,7 @@ import {
 import type { MachineSize } from "@superset/shared/billing";
 import { useMemo, useState } from "react";
 
-export interface AutomationDraft {
+interface AutomationDraft {
 	name: string;
 	prompt: string;
 	agent: string;

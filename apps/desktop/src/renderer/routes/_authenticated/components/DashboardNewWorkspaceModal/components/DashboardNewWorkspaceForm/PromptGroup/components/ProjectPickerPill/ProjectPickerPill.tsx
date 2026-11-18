@@ -22,7 +22,6 @@ import {
 	LuFolderPlus,
 	LuTriangleAlert,
 } from "react-icons/lu";
-import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useFolderFirstImport } from "renderer/routes/_authenticated/_dashboard/components/AddRepositoryModals/hooks/useFolderFirstImport";
 import {
@@ -34,6 +33,7 @@ import {
 	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
 } from "renderer/stores/add-repository-modal";
+import { useNewWorkspacePageEnabled } from "renderer/stores/new-workspace-page";
 import { PickerChevron } from "../../../components/PickerChevron";
 import type {
 	GitHubConnectionAction,
@@ -68,7 +68,7 @@ export function ProjectPickerPill({
 	isLoading = false,
 }: ProjectPickerPillProps) {
 	const { t } = useLingui();
-	const isParadevShell = useParadevShell();
+	const isNewPage = useNewWorkspacePageEnabled();
 	const [open, setOpen] = useState(false);
 	const openEmptyProject = useOpenEmptyProjectModal();
 	const openNewProject = useOpenNewProjectModal();
@@ -143,14 +143,14 @@ export function ProjectPickerPill({
 						<ProjectThumbnail
 							projectName={selectedProject.name}
 							iconUrl={selectedProject.iconUrl}
-							className={isParadevShell ? "size-3.5" : "size-4"}
+							className={isNewPage ? "size-3.5" : "size-4"}
 						/>
 					)}
 					{isSessionSelected && !selectedProject && (
 						<LuBox
 							className={cn(
 								"shrink-0 text-muted-foreground",
-								isParadevShell ? "size-3.5" : "size-4",
+								isNewPage ? "size-3.5" : "size-4",
 							)}
 						/>
 					)}
