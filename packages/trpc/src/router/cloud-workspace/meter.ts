@@ -7,9 +7,9 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
+import { recordUsageEvent } from "@superset/db/cloud-usage-events";
 import type { CloudUsageFeature } from "@superset/db/enums";
 import {
-	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
 	users,
@@ -338,41 +338,23 @@ async function recordSentUsage(
 	feature: CloudUsageFeature,
 	window: UsageWindow,
 ): Promise<void> {
-	try {
-		await db
-			.insert(cloudUsageEvents)
-			.values({
-				bootId: boot.id,
-				lockSeq: boot.lockSeq,
-				feature,
-				organizationId: boot.organizationId,
-				cloudWorkspaceId: boot.cloudWorkspaceId,
-				userId: window.user?.id ?? null,
-				windowFrom: new Date(window.from),
-				windowTo: new Date(window.to),
-				amount: String(window.amount),
-				sentAt: new Date(),
-			})
-			.onConflictDoUpdate({
-				target: [
-					cloudUsageEvents.bootId,
-					cloudUsageEvents.lockSeq,
-					cloudUsageEvents.feature,
-				],
-				set: {
-					amount: sql`${cloudUsageEvents.amount} + excluded.amount`,
-					windowTo: sql`excluded.window_to`,
-					sentAt: sql`excluded.sent_at`,
-				},
-				// Autumn sums a later window tracked under the same lock; a retried window it kept once.
-				setWhere: sql`excluded.window_from >= ${cloudUsageEvents.windowTo}`,
-			});
-	} catch (error) {
+	await recordUsageEvent(db, {
+		bootId: boot.id,
+		lockSeq: boot.lockSeq,
+		feature,
+		organizationId: boot.organizationId,
+		cloudWorkspaceId: boot.cloudWorkspaceId,
+		userId: window.user?.id ?? null,
+		windowFrom: new Date(window.from),
+		windowTo: new Date(window.to),
+		amount: String(window.amount),
+		sentAt: new Date(),
+	}).catch((error) => {
 		Sentry.captureException(error, {
 			tags: bootTags(boot),
 			extra: { feature, lockSeq: boot.lockSeq },
 		});
-	}
+	});
 }
 
 /**
@@ -401,7 +383,7 @@ async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 			return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 		} catch (error) {
 			if (!(error instanceof AutumnError)) throw error;
-			if (error.statusCode === 409) {
+			if (error.statusCode === 409 || confirmedEarlier(boot, error)) {
 				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 			}
 			if (error.statusCode >= 500) throw error;
@@ -409,9 +391,6 @@ async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 				tags: bootTags(boot),
 				extra: { lockId },
 			});
-			if (confirmedEarlier(boot, error)) {
-				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
-			}
 		}
 	}
 	if (amount <= 0) return;

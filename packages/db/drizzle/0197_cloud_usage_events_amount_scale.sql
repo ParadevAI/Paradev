@@ -1,1 +1,0 @@
-ALTER TABLE "cloud_usage_events" ALTER COLUMN "amount" SET DATA TYPE numeric(20, 6);

@@ -1,5 +1,5 @@
 {
-  "id": "2e28813f-55c3-4b2e-b325-55f60dd7d83b",
+  "id": "94b38224-3499-48ba-8c2d-e038baf84734",
   "prevId": "07c5648f-1019-4a86-ab27-0d3b79c1ece9",
   "version": "7",
   "dialect": "postgresql",
@@ -9250,12 +9250,13 @@
         }
       },
       "compositePrimaryKeys": {
-        "cloud_usage_events_boot_id_lock_seq_feature_pk": {
-          "name": "cloud_usage_events_boot_id_lock_seq_feature_pk",
+        "cloud_usage_events_boot_id_lock_seq_feature_window_from_pk": {
+          "name": "cloud_usage_events_boot_id_lock_seq_feature_window_from_pk",
           "columns": [
             "boot_id",
             "lock_seq",
-            "feature"
+            "feature",
+            "window_from"
           ]
         }
       },

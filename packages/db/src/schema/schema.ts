@@ -1187,7 +1187,7 @@ export const cloudWorkspaceBoots = pgTable(
 	],
 );
 
-/** One amount we sent to Autumn for one lock of a boot, one row per feature. */
+/** One amount we sent to Autumn: one window of one lock of a boot, for one feature. */
 export const cloudUsageEvents = pgTable(
 	"cloud_usage_events",
 	{
@@ -1213,7 +1213,9 @@ export const cloudUsageEvents = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		primaryKey({ columns: [table.bootId, table.lockSeq, table.feature] }),
+		primaryKey({
+			columns: [table.bootId, table.lockSeq, table.feature, table.windowFrom],
+		}),
 		index("cloud_usage_events_organization_id_sent_at_idx").on(
 			table.organizationId,
 			table.sentAt,

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import * as Sentry from "@sentry/core";
 import { autumnClient } from "@superset/auth/autumn";
 import * as billing from "@superset/auth/billing";
 import { db } from "@superset/db/client";
@@ -42,6 +43,7 @@ let updateMatches: boolean;
 let insertConflicts: boolean;
 let insertError: Error | null;
 let usageRowError: Error | null;
+let reported: unknown[];
 let queuedSettles: string[];
 let listed: BoxSession[];
 type UsageEvent = {
@@ -78,15 +80,18 @@ stub(db, {
 		values: (values: Record<string, unknown>) => {
 			writes.push(values);
 			return Object.assign(Promise.resolve(), {
-				onConflictDoUpdate: async () => {
-					if (usageRowError) throw usageRowError;
-				},
-				onConflictDoNothing: () => ({
-					returning: async () => {
-						if (insertError) throw insertError;
-						return insertConflicts ? [] : [{ id: values.id }];
-					},
-				}),
+				onConflictDoNothing: () =>
+					Object.assign(
+						"feature" in values && usageRowError
+							? Promise.reject(usageRowError)
+							: Promise.resolve(),
+						{
+							returning: async () => {
+								if (insertError) throw insertError;
+								return insertConflicts ? [] : [{ id: values.id }];
+							},
+						},
+					),
 			});
 		},
 	}),
@@ -125,6 +130,12 @@ stub(sandbox, {
 	},
 });
 stub(realtime, { nudge: () => {} });
+stub(Sentry, {
+	captureException: (error: unknown) => {
+		reported.push(error);
+		return "";
+	},
+});
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
 stub(sandboxSleep, {
 	recordSandboxAsleep: async (
@@ -244,6 +255,7 @@ beforeEach(() => {
 	insertConflicts = false;
 	insertError = null;
 	usageRowError = null;
+	reported = [];
 	queuedSettles = [];
 	listed = [];
 	usageEvents = null;
@@ -437,6 +449,7 @@ describe("settleBoot", () => {
 		expect(await settleBoot("boot_1")).toBe("renewed");
 		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
 		expect(usageRows()).toHaveLength(1);
+		expect(reported).toEqual([]);
 	});
 
 	test("a lock Autumn no longer finds after it could have expired is tracked", async () => {

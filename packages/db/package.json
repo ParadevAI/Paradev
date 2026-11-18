@@ -16,6 +16,10 @@
 			"types": "./src/cloud-usage-autumn.ts",
 			"default": "./src/cloud-usage-autumn.ts"
 		},
+		"./cloud-usage-events": {
+			"types": "./src/cloud-usage-events.ts",
+			"default": "./src/cloud-usage-events.ts"
+		},
 		"./cloud-usage-query": {
 			"types": "./src/cloud-usage-query.ts",
 			"default": "./src/cloud-usage-query.ts"
