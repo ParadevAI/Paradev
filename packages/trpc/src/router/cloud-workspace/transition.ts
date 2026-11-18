@@ -54,14 +54,15 @@ export async function failCloudWorkspace(
 		set: args.set,
 	});
 	nudge(scope.organizationId, "cloud_workspaces");
+	if (!changed) return;
 	const refused = isCloudUsageRefusal(args.error);
 	logControl(
 		"workspace.failed",
 		scope,
-		{ "failure.site": args.site, "status.changed": changed },
+		{ "failure.site": args.site },
 		refused ? "warn" : "error",
 	);
-	if (changed && !refused) {
+	if (!refused) {
 		Sentry.captureException(args.error, { tags: controlTags(scope) });
 	}
 }
