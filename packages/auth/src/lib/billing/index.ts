@@ -1,4 +1,5 @@
 export type { OrganizationBilling, PaymentState } from "./autumn/billing-state";
+export { listRatePerGbHour } from "./autumn/catalog";
 export type { CloudUsage } from "./autumn/cloud-usage";
 export {
 	ensureAutumnCustomer,

@@ -13,6 +13,7 @@ import {
 	SAM,
 	seedCloudUsage,
 } from "@superset/db/testing";
+import type { PlanTier } from "@superset/shared/billing";
 import {
 	createCallerFactory,
 	createTRPCContext,
@@ -46,16 +47,24 @@ function caller(
 	userId: string,
 	{
 		enabled = true,
-		readCloudUsage = async () => CLOUD_USAGE,
+		readCloudUsage = async (): Promise<CloudUsage | null> => CLOUD_USAGE,
+		tier = "pro",
+		billingOff = false,
+		listRatePerGbHour = async () => null,
 	}: {
 		enabled?: boolean;
-		readCloudUsage?: CloudDeps["cloudUsage"];
+		readCloudUsage?: () => Promise<CloudUsage | null>;
+		tier?: PlanTier;
+		billingOff?: boolean;
+		listRatePerGbHour?: CloudDeps["listRatePerGbHour"];
 	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
-			cloudUsage: readCloudUsage,
+			billing: async () =>
+				billingOff ? null : { tier, cloudUsage: await readCloudUsage() },
+			listRatePerGbHour,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
 	});
@@ -428,7 +437,10 @@ test("periods run from the open one back to the one the organization was created
 });
 
 test("with billing off there are no periods and no prices", async () => {
-	const owner = caller(MAYA, { readCloudUsage: async () => null });
+	const owner = caller(MAYA, {
+		billingOff: true,
+		listRatePerGbHour: async () => 0.06,
+	});
 	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
@@ -521,4 +533,77 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 			(field) => ({ field, reason: "not_read" }),
 		),
 	);
+});
+
+describe("the list rate", () => {
+	const LIST_RATE = 0.06;
+
+	test("prices an organization with no paid plan", async () => {
+		const owner = caller(MAYA, {
+			tier: "free",
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total).toMatchObject({ gbHours: 34, usageUsd: 2.04 });
+		const boots = await owner.boots.list({ range: NOVEMBER });
+		expect(boots.items.every((boot) => boot.usageUsd !== null)).toBe(true);
+	});
+
+	test("prices a free organization's open period and its allowance", async () => {
+		const owner = caller(MAYA, {
+			tier: "free",
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: null }),
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const [open] = (await owner.periods.list({})).items;
+		expect(open?.metrics.usageUsd).toBe(2.04);
+		expect(open?.allowance).toMatchObject({ usedUsd: 2.04, includedUsd: 1.2 });
+	});
+
+	test("never prices a paid plan whose own rate could not be read", async () => {
+		const listRatePerGbHour = mock(async () => LIST_RATE);
+		const owner = caller(MAYA, {
+			tier: "pro",
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: null }),
+			listRatePerGbHour,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+		const [open] = (await owner.periods.list({})).items;
+		expect(open?.metrics.usageUsd).toBeNull();
+		expect(open?.allowance?.usedUsd).toBeNull();
+		expect(listRatePerGbHour).not.toHaveBeenCalled();
+	});
+
+	test("never prices an organization whose plan is unknown (billing unreachable, fail-open)", async () => {
+		const owner = caller(MAYA, {
+			tier: "pro",
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+	});
+
+	test("is no price when the catalog has none", async () => {
+		const owner = caller(MAYA, {
+			tier: "free",
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => null,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+	});
+
+	test("does not replace an organization's own rate, and is not read for it", async () => {
+		const listRatePerGbHour = mock(async () => LIST_RATE);
+		const owner = caller(MAYA, {
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: 0.1 }),
+			listRatePerGbHour,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeCloseTo(3.4);
+		expect(listRatePerGbHour).not.toHaveBeenCalled();
+	});
 });

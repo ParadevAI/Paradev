@@ -1,5 +1,10 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
-import { type CloudUsage, organizationBilling } from "@superset/auth/billing";
+import {
+	type CloudUsage,
+	listRatePerGbHour,
+	type OrganizationBilling,
+	organizationBilling,
+} from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
@@ -41,7 +46,12 @@ import {
 export interface CloudDeps {
 	db: Parameters<typeof queryCloudUsage>[0] &
 		NonNullable<Parameters<typeof requireActiveOrgRole>[1]>;
-	cloudUsage: (organizationId: string) => Promise<CloudUsage | null>;
+	/** Null when billing is not Autumn. */
+	billing: (
+		organizationId: string,
+	) => Promise<Pick<OrganizationBilling, "tier" | "cloudUsage"> | null>;
+	/** For an organization with no paid plan; null when the price cannot be known. */
+	listRatePerGbHour: () => Promise<number | null>;
 	flags: Parameters<typeof organizationFlagEnabled>[0];
 }
 
@@ -70,8 +80,11 @@ function creditLine(credit: CloudUsage["bought"], rate: number | null) {
 	};
 }
 
-function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
-	const rate = cloudUsage.overagePerGbHour;
+function allowanceOf(
+	cloudUsage: CloudUsage,
+	resetsAt: Date,
+	rate: number | null,
+) {
 	const included = cloudUsage.includedGbMinutes;
 	const limit = cloudUsage.overageLimit;
 	const unavailable: CloudPeriodUnavailable[] =
@@ -231,11 +244,21 @@ export function cloudRouterWith(deps: CloudDeps) {
 				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
 			});
 		}
-		const cloudUsage = await deps.cloudUsage(organizationId);
+		const billing = await deps.billing(organizationId);
+		const cloudUsage = billing?.cloudUsage ?? null;
+		// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
+		const rate =
+			cloudUsage?.overagePerGbHour ??
+			(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
+		if (rate === null && cloudUsage && billing?.tier !== "free") {
+			console.warn(
+				`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+			);
+		}
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };
-		return next({ ctx: { scope, isAdmin, cloudUsage } });
+		return next({ ctx: { scope, isAdmin, cloudUsage, rate } });
 	});
 
 	return {
@@ -282,7 +305,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 								value: keyset.sort === "key" ? "0" : keyset.value,
 								key: keyset.key,
 							},
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -325,7 +348,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 								id: keyset.key,
 							},
 							now: new Date(),
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -365,7 +388,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 					).filter((period) => period.to > createdAt);
 					const page = await queryCloudUsageByPeriod(deps.db, ctx.scope, {
 						periods: periods.slice(0, input.limit),
-						overagePerGbHour: cloudUsage.overagePerGbHour,
+						overagePerGbHour: ctx.rate,
 					});
 					const last = page.at(-1);
 					return {
@@ -380,7 +403,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 									? noAllowance("closed_period")
 									: !ctx.isAdmin
 										? noAllowance("owners_and_admins_only")
-										: allowanceOf(cloudUsage, to)),
+										: allowanceOf(cloudUsage, to, ctx.rate)),
 								metrics,
 							};
 						}),
@@ -394,9 +417,17 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 export const cloudRouter = cloudRouterWith({
 	db,
-	cloudUsage: async (organizationId) =>
+	billing: async (organizationId) =>
+		billingUsesAutumn ? organizationBilling(organizationId) : null,
+	listRatePerGbHour: async () =>
 		billingUsesAutumn
-			? (await organizationBilling(organizationId)).cloudUsage
+			? listRatePerGbHour().catch((error) => {
+					console.error(
+						"[cloud] catalog unavailable; usage has no price",
+						error,
+					);
+					return null;
+				})
 			: null,
 	flags: posthog,
 });

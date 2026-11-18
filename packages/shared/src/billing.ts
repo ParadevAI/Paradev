@@ -439,6 +439,16 @@ export function planCatalogFromAutumn(
 	);
 }
 
+/** The GB-hour price every self-serve family charges; null when none sells GB-minutes or they disagree. */
+export function lineupRatePerGbHour(lineup: PlanFamily[]): number | null {
+	const rates = new Set(
+		lineup.flatMap((family) =>
+			family.overagePerGbHour === null ? [] : [family.overagePerGbHour],
+		),
+	);
+	return rates.size === 1 ? ([...rates][0] ?? null) : null;
+}
+
 /** Yearly only counts as an option when it costs less than twelve months. */
 export function offersYearlyDiscount(family: PlanFamily): boolean {
 	return Boolean(
