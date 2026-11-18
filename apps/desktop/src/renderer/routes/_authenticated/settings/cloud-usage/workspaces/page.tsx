@@ -12,14 +12,14 @@ export const Route = createFileRoute(
 });
 
 function CloudWorkspacesSettingsPage() {
-	const { period, user } = Route.useSearch();
+	const { period, ...filters } = Route.useSearch();
 	return (
 		<CloudUsageGate key={useActiveOrganizationId()}>
 			{(isAdmin) => (
 				<CloudWorkspacesSettings
 					isAdmin={isAdmin}
 					periodId={period}
-					person={user}
+					filters={filters}
 				/>
 			)}
 		</CloudUsageGate>

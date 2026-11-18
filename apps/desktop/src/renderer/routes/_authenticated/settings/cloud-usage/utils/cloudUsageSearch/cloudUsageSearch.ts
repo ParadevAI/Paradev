@@ -1,10 +1,16 @@
-const text = (value: unknown) =>
-	typeof value === "string" && value.length > 0 ? value : undefined;
+import {
+	type WorkspacesFilters,
+	workspacesFilters,
+} from "@superset/ui/cloud-usage-page";
 
-/** `period` is a period id; absent means the newest. `user` filters the Workspaces page by person. */
-export function cloudUsageSearch(search: Record<string, unknown>): {
-	period?: string;
-	user?: string;
-} {
-	return { period: text(search.period), user: text(search.user) };
+/** `period` is a period id; absent means the newest. The rest are the Workspaces page's filters. */
+export function cloudUsageSearch(
+	search: Record<string, unknown>,
+): { period?: string } & WorkspacesFilters {
+	const period = search.period;
+	return {
+		period:
+			typeof period === "string" && period.length > 0 ? period : undefined,
+		...workspacesFilters((key) => search[key]),
+	};
 }

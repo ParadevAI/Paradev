@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {Arsipkan # Workspace Cloud} other {Arsipk
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} other {Tertinggal # commit dari main, perlu rebase}}"
 
-msgid "{boughtLabel} left"
-msgstr "Sisa {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} dari {totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}j {minutes}m"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Mengimpor # worktree sebagai workspace} other {Mengimpor # worktree sebagai workspace}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} dari {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} mengundang Anda bergabung sebagai {role}."
 
@@ -1359,6 +1353,12 @@ msgstr "Sisa {remaining} token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Perubahan pada # file dibatalkan.} other {Perubahan pada # file dibatalkan.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {{first}–{last} dari # baris}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {Termasuk dengan # kursi}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} dtk"
 
@@ -1444,6 +1444,9 @@ msgstr "{used} dari {limit} lingkungan"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} dari {size} token"
+
+msgid "{used} of {total}"
+msgstr "{used} dari {total}"
 
 msgid "{used} used"
 msgstr "{used} terpakai"
@@ -2900,6 +2903,9 @@ msgstr "Nama apa pun"
 msgid "Any page"
 msgstr "Halaman mana pun"
 
+msgid "Any person"
+msgstr "Siapa saja"
+
 msgid "Any project"
 msgstr "Proyek mana pun"
 
@@ -2914,6 +2920,9 @@ msgstr "Semua reviewer"
 
 msgid "any sender"
 msgstr "pengirim mana pun"
+
+msgid "Any size"
+msgstr "Ukuran apa saja"
 
 msgid "Any status"
 msgstr "Status apa pun"
@@ -3685,8 +3694,8 @@ msgstr "Dipinjam dari cara mobil swakemudi dinilai, diterapkan pada cara perangk
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Laci bawah, ramah geser di perangkat sentuh."
 
-msgid "Bought GB-hours"
-msgstr "GB-jam yang dibeli"
+msgid "Bought credits"
+msgstr "Kredit yang dibeli"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Sisa GB-jam yang dibeli: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersed
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Ruang kerja cloud tidak termasuk dalam paket Anda."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Workspace cloud tidak dapat dimulai."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
@@ -8326,6 +8338,9 @@ msgstr "Sangat tinggi"
 msgid "Extra small"
 msgstr "Ekstra kecil"
 
+msgid "Extra usage"
+msgstr "Penggunaan tambahan"
+
 msgid "Extra usage limit reached"
 msgstr "Batas penggunaan tambahan tercapai"
 
@@ -9041,6 +9056,9 @@ msgstr "selesai · bekerja 7 dtk"
 msgid "Finishing the move…"
 msgstr "Menyelesaikan pemindahan…"
 
+msgid "First page"
+msgstr "Halaman pertama"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Pertama kali? Aktifkan masuk dengan kode perangkat di <0>pengaturan ChatGPT</0>."
 
@@ -9309,6 +9327,9 @@ msgstr "Gratis"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Gratis"
+
+msgid "Free credits"
+msgstr "Kredit gratis"
 
 msgid "Free for everyone"
 msgstr "Gratis untuk semua orang"
@@ -12615,6 +12636,9 @@ msgstr "Gambar berikutnya"
 msgid "Next match"
 msgstr "Kecocokan berikutnya"
 
+msgid "Next page"
+msgstr "Halaman berikutnya"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Tab Sidebar Kanan Berikutnya"
 
@@ -13571,8 +13595,11 @@ msgstr "Objek"
 msgid "of {0}"
 msgstr "dari {0}"
 
-msgid "of {includedLabel} included"
-msgstr "dari {includedLabel} yang termasuk"
+msgid "of {cap} included"
+msgstr "dari {cap} yang termasuk"
+
+msgid "of {cap} limit"
+msgstr "dari batas {cap}"
 
 msgid "of {total}"
 msgstr "dari {total}"
@@ -14518,9 +14545,6 @@ msgstr "Output dipotong"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Di luar jam ini, kanal tidak memberi Anda notifikasi."
 
-msgid "Over the plan"
-msgstr "Di atas paket"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Halaman"
+
+msgid "Page {page} of {pages}"
+msgstr "Halaman {page} dari {pages}"
 
 msgid "Page actions"
 msgstr "Tindakan halaman"
@@ -15394,6 +15421,9 @@ msgstr "Gambar sebelumnya"
 
 msgid "Previous match"
 msgstr "Kecocokan sebelumnya"
+
+msgid "Previous page"
+msgstr "Halaman sebelumnya"
 
 msgid "Previous prompts"
 msgstr "Prompt sebelumnya"
@@ -16394,11 +16424,11 @@ msgstr "Hapus sesi terminal"
 msgid "remove the agent"
 msgstr "menghapus agen"
 
-msgid "Remove the person filter"
-msgstr "Hapus filter orang"
-
 msgid "remove the PR link"
 msgstr "menghapus tautan PR"
+
+msgid "Remove this filter"
+msgstr "Hapus filter ini"
 
 msgid "Remove trigger"
 msgstr "Hapus pemicu"
@@ -21841,11 +21871,17 @@ msgstr "Penggunaan"
 msgid "Usage is out of date"
 msgstr "Data penggunaan sudah tidak mutakhir"
 
+msgid "usage limit"
+msgstr "batas penggunaan"
+
 msgid "Usage limit"
 msgstr "Batas penggunaan"
 
 msgid "Usage limit reached"
 msgstr "Batas penggunaan tercapai"
+
+msgid "Usage limit reached."
+msgstr "Batas penggunaan tercapai."
 
 msgid "Usage sections"
 msgstr "Bagian penggunaan"

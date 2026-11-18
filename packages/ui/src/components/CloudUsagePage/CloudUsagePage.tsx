@@ -71,7 +71,14 @@ export function CloudUsagePage({
 				/>
 			) : (
 				<>
-					{/* A "usage limit reached" banner goes here once the router says the organization hit its limit. */}
+					{period?.allowance?.limitReached && !period.closed && (
+						<div className="rounded-lg border border-warning/60 px-4 py-3 text-sm">
+							<span className="font-semibold text-warning">
+								<Trans>Usage limit reached.</Trans>
+							</span>{" "}
+							<Trans>Cloud workspaces cannot start.</Trans>
+						</div>
+					)}
 					{isAdmin ? (
 						<AllowanceCard
 							total={byDay.data.total}

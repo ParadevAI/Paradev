@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {클라우드 워크스페이스 #개 보�
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {main보다 커밋 #개 뒤처짐, 리베이스 필요} other {main보다 커밋 #개 뒤처짐, 리베이스 필요}}"
 
-msgid "{boughtLabel} left"
-msgstr "{boughtLabel} 남음"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches}개 중 {branchPosition}번째"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}시간 {minutes}분"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {worktree #개를 워크스페이스로 가져왔습니다} other {worktree #개를 워크스페이스로 가져왔습니다}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} / {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter}님이 {role}(으)로 초대했습니다."
 
@@ -1359,6 +1353,12 @@ msgstr "{remaining} 토큰 남음"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {#개 행 중 {first}–{last}}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {좌석 #개에 포함}}"
+
 msgid "{seconds}s"
 msgstr "{seconds}초"
 
@@ -1444,6 +1444,9 @@ msgstr "환경 {limit}개 중 {used}개"
 
 msgid "{used} of {size} tokens"
 msgstr "{size} 토큰 중 {used}"
+
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
 
 msgid "{used} used"
 msgstr "{used} 사용됨"
@@ -2900,6 +2903,9 @@ msgstr "모든 이름"
 msgid "Any page"
 msgstr "모든 페이지"
 
+msgid "Any person"
+msgstr "모든 사람"
+
 msgid "Any project"
 msgstr "모든 프로젝트"
 
@@ -2914,6 +2920,9 @@ msgstr "모든 리뷰어"
 
 msgid "any sender"
 msgstr "모든 발신자"
+
+msgid "Any size"
+msgstr "모든 크기"
 
 msgid "Any status"
 msgstr "모든 상태"
@@ -3685,8 +3694,8 @@ msgstr "자율 주행차를 등급으로 나누는 방식을 빌려 소프트웨
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "하단 드로어로, 터치 기기에서 스와이프하기 좋습니다."
 
-msgid "Bought GB-hours"
-msgstr "구매한 GB 시간"
+msgid "Bought credits"
+msgstr "구매한 크레딧"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "구매한 GB 시간 잔여: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "{account}에는 클라우드 워크스페이스가 활성화되어 있�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "클라우드 워크스페이스는 현재 플랜에 포함되어 있지 않습니다."
+
+msgid "Cloud workspaces cannot start."
+msgstr "클라우드 워크스페이스를 시작할 수 없습니다."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시하고 풀 리퀘스트를 엽니다"
@@ -8326,6 +8338,9 @@ msgstr "매우 높음"
 msgid "Extra small"
 msgstr "아주 작음"
 
+msgid "Extra usage"
+msgstr "추가 사용량"
+
 msgid "Extra usage limit reached"
 msgstr "추가 사용량 한도에 도달했습니다"
 
@@ -9041,6 +9056,9 @@ msgstr "완료 · 7초 작업"
 msgid "Finishing the move…"
 msgstr "이동을 마무리하는 중…"
 
+msgid "First page"
+msgstr "첫 페이지"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "처음이신가요? <0>ChatGPT 설정</0>에서 기기 코드 로그인을 켜세요."
 
@@ -9309,6 +9327,9 @@ msgstr "무료"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "무료"
+
+msgid "Free credits"
+msgstr "무료 크레딧"
 
 msgid "Free for everyone"
 msgstr "누구나 무료"
@@ -12615,6 +12636,9 @@ msgstr "다음 이미지"
 msgid "Next match"
 msgstr "다음 일치 항목"
 
+msgid "Next page"
+msgstr "다음 페이지"
+
 msgid "Next Right Sidebar Tab"
 msgstr "오른쪽 사이드바 다음 탭"
 
@@ -13571,8 +13595,11 @@ msgstr "사물"
 msgid "of {0}"
 msgstr "{0} 중"
 
-msgid "of {includedLabel} included"
-msgstr "({includedLabel} 포함)"
+msgid "of {cap} included"
+msgstr "({cap} 포함)"
+
+msgid "of {cap} limit"
+msgstr "(한도 {cap})"
 
 msgid "of {total}"
 msgstr "{total}명 중"
@@ -14518,9 +14545,6 @@ msgstr "출력이 잘렸습니다"
 msgid "Outside these hours, channels do not notify you."
 msgstr "이 시간 외에는 채널 알림을 받지 않습니다."
 
-msgid "Over the plan"
-msgstr "요금제 초과"
-
 msgid "Overflow Fade"
 msgstr "오버플로 페이드"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "페이지"
+
+msgid "Page {page} of {pages}"
+msgstr "{page} / {pages} 페이지"
 
 msgid "Page actions"
 msgstr "페이지 작업"
@@ -15394,6 +15421,9 @@ msgstr "이전 이미지"
 
 msgid "Previous match"
 msgstr "이전 일치 항목"
+
+msgid "Previous page"
+msgstr "이전 페이지"
 
 msgid "Previous prompts"
 msgstr "이전 프롬프트"
@@ -16394,11 +16424,11 @@ msgstr "터미널 세션 제거"
 msgid "remove the agent"
 msgstr "에이전트를 제거할"
 
-msgid "Remove the person filter"
-msgstr "사람 필터 제거"
-
 msgid "remove the PR link"
 msgstr "PR 링크를 제거할"
+
+msgid "Remove this filter"
+msgstr "이 필터 제거"
 
 msgid "Remove trigger"
 msgstr "트리거 제거"
@@ -21841,11 +21871,17 @@ msgstr "사용량"
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
 
+msgid "usage limit"
+msgstr "사용량 한도"
+
 msgid "Usage limit"
 msgstr "사용량 한도"
 
 msgid "Usage limit reached"
 msgstr "사용량 한도에 도달했습니다"
+
+msgid "Usage limit reached."
+msgstr "사용량 한도에 도달했습니다."
 
 msgid "Usage sections"
 msgstr "사용량 섹션"

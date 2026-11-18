@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {Archivovat # cloudový pracovní prostor}
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Zaostává za main o # commit, je potřeba rebase} few {Zaostává za main o # commity, je potřeba rebase} many {Zaostává za main o # commitu, je potřeba rebase} other {Zaostává za main o # commitů, je potřeba rebase}}"
 
-msgid "{boughtLabel} left"
-msgstr "Zbývá {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} z {totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours} h {minutes} m"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Importován # worktree jako pracovní prostor} few {Importovány # worktree jako pracovní prostory} many {Importováno # worktree jako pracovní prostory} other {Importováno # worktree jako pracovní prostory}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} z {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} vás pozval jako {role}."
 
@@ -1359,6 +1353,12 @@ msgstr "Zbývající tokeny: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} z # řádku} few {{first}–{last} z # řádků} many {{first}–{last} z # řádku} other {{first}–{last} z # řádků}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Zahrnuto s # místem} few {Zahrnuto se # místy} many {Zahrnuto s # místa} other {Zahrnuto s # místy}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1444,6 +1444,9 @@ msgstr "{used} z {limit} prostředí"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} z {size} tokenů"
+
+msgid "{used} of {total}"
+msgstr "{used} z {total}"
 
 msgid "{used} used"
 msgstr "Využito {used}"
@@ -2900,6 +2903,9 @@ msgstr "Jakékoli jméno"
 msgid "Any page"
 msgstr "Jakákoli stránka"
 
+msgid "Any person"
+msgstr "Kdokoli"
+
 msgid "Any project"
 msgstr "Jakýkoli projekt"
 
@@ -2914,6 +2920,9 @@ msgstr "Libovolný recenzent"
 
 msgid "any sender"
 msgstr "jakýkoli odesílatel"
+
+msgid "Any size"
+msgstr "Jakákoli velikost"
 
 msgid "Any status"
 msgstr "Jakýkoli stav"
@@ -3685,8 +3694,8 @@ msgstr "Vypůjčeno z toho, jak se známkují samořídící auta, a použito na
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Spodní drawer, na dotykových zařízeních ovladatelný přejetím prstem."
 
-msgid "Bought GB-hours"
-msgstr "Zakoupené GB-hodiny"
+msgid "Bought credits"
+msgstr "Zakoupené kredity"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Zbývající zakoupené GB-hodiny: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součá
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Cloudové pracovní prostory se nemohou spustit."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
@@ -8326,6 +8338,9 @@ msgstr "Velmi vysoké"
 msgid "Extra small"
 msgstr "Velmi malé"
 
+msgid "Extra usage"
+msgstr "Využití navíc"
+
 msgid "Extra usage limit reached"
 msgstr "Dosažen limit dodatečného využití"
 
@@ -9041,6 +9056,9 @@ msgstr "hotovo · pracoval 7 s"
 msgid "Finishing the move…"
 msgstr "Dokončování přesunu…"
 
+msgid "First page"
+msgstr "První stránka"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Poprvé? Zapněte přihlášení kódem zařízení v <0>nastavení ChatGPT</0>."
 
@@ -9309,6 +9327,9 @@ msgstr "Free"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Zdarma"
+
+msgid "Free credits"
+msgstr "Kredity zdarma"
 
 msgid "Free for everyone"
 msgstr "Zdarma pro všechny"
@@ -12615,6 +12636,9 @@ msgstr "Další obrázek"
 msgid "Next match"
 msgstr "Další shoda"
 
+msgid "Next page"
+msgstr "Další stránka"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Další karta pravého postranního panelu"
 
@@ -13571,8 +13595,11 @@ msgstr "Předměty"
 msgid "of {0}"
 msgstr "z {0}"
 
-msgid "of {includedLabel} included"
-msgstr "z {includedLabel} v plánu"
+msgid "of {cap} included"
+msgstr "z {cap} v plánu"
+
+msgid "of {cap} limit"
+msgstr "z limitu {cap}"
 
 msgid "of {total}"
 msgstr "z {total}"
@@ -14518,9 +14545,6 @@ msgstr "Výstup zkrácen"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Mimo tyto hodiny vás kanály neupozorňují."
 
-msgid "Over the plan"
-msgstr "Nad rámec plánu"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Stránka"
+
+msgid "Page {page} of {pages}"
+msgstr "Stránka {page} z {pages}"
 
 msgid "Page actions"
 msgstr "Akce stránky"
@@ -15394,6 +15421,9 @@ msgstr "Předchozí obrázek"
 
 msgid "Previous match"
 msgstr "Předchozí shoda"
+
+msgid "Previous page"
+msgstr "Předchozí stránka"
 
 msgid "Previous prompts"
 msgstr "Předchozí prompty"
@@ -16394,11 +16424,11 @@ msgstr "Odebrat relaci terminálu"
 msgid "remove the agent"
 msgstr "odebrat agenta"
 
-msgid "Remove the person filter"
-msgstr "Odebrat filtr osoby"
-
 msgid "remove the PR link"
 msgstr "odebrat propojení s PR"
+
+msgid "Remove this filter"
+msgstr "Odebrat tento filtr"
 
 msgid "Remove trigger"
 msgstr "Odebrat spouštěč"
@@ -21841,11 +21871,17 @@ msgstr "Využití"
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
+msgid "usage limit"
+msgstr "limit využití"
+
 msgid "Usage limit"
 msgstr "Limit využití"
 
 msgid "Usage limit reached"
 msgstr "Dosažen limit využití"
+
+msgid "Usage limit reached."
+msgstr "Dosažen limit využití."
 
 msgid "Usage sections"
 msgstr "Sekce využití"

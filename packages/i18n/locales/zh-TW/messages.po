@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {歸檔#個雲端工作區} other {歸檔#
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落後main #個提交，需要變基} other {落後main #個提交，需要變基}}"
 
-msgid "{boughtLabel} left"
-msgstr "剩餘 {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition}/{totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}小時{minutes}分"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {已將#個worktree匯入為工作區} other {已將#個worktree匯入為工作區}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} / {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter}邀請你以{role}的身份加入。"
 
@@ -1359,6 +1353,12 @@ msgstr "剩餘 {remaining} 個 token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {共 # 列，第 {first}–{last} 列}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {# 個席位包含}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
 
@@ -1444,6 +1444,9 @@ msgstr "已用 {used}/{limit} 個環境"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} / {size} 個 token"
+
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
 
 msgid "{used} used"
 msgstr "已使用 {used}"
@@ -2900,6 +2903,9 @@ msgstr "任意名稱"
 msgid "Any page"
 msgstr "任意頁面"
 
+msgid "Any person"
+msgstr "所有人員"
+
 msgid "Any project"
 msgstr "任意專案"
 
@@ -2914,6 +2920,9 @@ msgstr "任何審查者"
 
 msgid "any sender"
 msgstr "任意發件人"
+
+msgid "Any size"
+msgstr "所有規格"
 
 msgid "Any status"
 msgstr "任意狀態"
@@ -3685,8 +3694,8 @@ msgstr "借用自動駕駛汽車的分級方式，用來衡量軟體的構建方
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "底部抽屜，在觸控螢幕裝置上便於滑動操作。"
 
-msgid "Bought GB-hours"
-msgstr "已購買的 GB 小時"
+msgid "Bought credits"
+msgstr "已購買的額度"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "已購 GB 小時剩餘：{prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "{account} 尚未啟用雲端工作區。雲端工作區包含在 Team �
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "您的方案不包含雲端工作區。"
+
+msgid "Cloud workspaces cannot start."
+msgstr "雲端工作區無法啟動。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "雲端工作區會以你的身分提交、推送並建立提取要求"
@@ -8326,6 +8338,9 @@ msgstr "極高"
 msgid "Extra small"
 msgstr "超小"
 
+msgid "Extra usage"
+msgstr "額外用量"
+
 msgid "Extra usage limit reached"
 msgstr "已達到額外用量上限"
 
@@ -9041,6 +9056,9 @@ msgstr "已完成 · 用時7秒"
 msgid "Finishing the move…"
 msgstr "正在完成移動…"
 
+msgid "First page"
+msgstr "第一頁"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "第一次使用？請在 <0>ChatGPT 設定</0>中開啟裝置代碼登入。"
 
@@ -9309,6 +9327,9 @@ msgstr "免費版"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "免費"
+
+msgid "Free credits"
+msgstr "免費額度"
 
 msgid "Free for everyone"
 msgstr "對所有人免費"
@@ -12615,6 +12636,9 @@ msgstr "下一張圖片"
 msgid "Next match"
 msgstr "下一個匹配"
 
+msgid "Next page"
+msgstr "下一頁"
+
 msgid "Next Right Sidebar Tab"
 msgstr "右側邊欄下一個分頁"
 
@@ -13571,8 +13595,11 @@ msgstr "物品"
 msgid "of {0}"
 msgstr "／共 {0} 人"
 
-msgid "of {includedLabel} included"
-msgstr "（共包含 {includedLabel}）"
+msgid "of {cap} included"
+msgstr "（共包含 {cap}）"
+
+msgid "of {cap} limit"
+msgstr "（上限 {cap}）"
 
 msgid "of {total}"
 msgstr "共{total}名"
@@ -14518,9 +14545,6 @@ msgstr "輸出已截斷"
 msgid "Outside these hours, channels do not notify you."
 msgstr "在這些時段以外，頻道不會通知你。"
 
-msgid "Over the plan"
-msgstr "超出方案"
-
 msgid "Overflow Fade"
 msgstr "溢位漸隱"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "頁面"
+
+msgid "Page {page} of {pages}"
+msgstr "第 {page} / {pages} 頁"
 
 msgid "Page actions"
 msgstr "頁面操作"
@@ -15394,6 +15421,9 @@ msgstr "上一張圖片"
 
 msgid "Previous match"
 msgstr "上一個匹配"
+
+msgid "Previous page"
+msgstr "上一頁"
 
 msgid "Previous prompts"
 msgstr "歷史提示詞"
@@ -16394,11 +16424,11 @@ msgstr "移除終端會話"
 msgid "remove the agent"
 msgstr "移除代理程式"
 
-msgid "Remove the person filter"
-msgstr "移除人員篩選"
-
 msgid "remove the PR link"
 msgstr "移除PR連結"
+
+msgid "Remove this filter"
+msgstr "移除此篩選"
 
 msgid "Remove trigger"
 msgstr "移除觸發條件"
@@ -21841,11 +21871,17 @@ msgstr "用量"
 msgid "Usage is out of date"
 msgstr "用量資料已過期"
 
+msgid "usage limit"
+msgstr "使用上限"
+
 msgid "Usage limit"
 msgstr "使用上限"
 
 msgid "Usage limit reached"
 msgstr "已達到使用上限"
+
+msgid "Usage limit reached."
+msgstr "已達到使用上限。"
 
 msgid "Usage sections"
 msgstr "用量分區"

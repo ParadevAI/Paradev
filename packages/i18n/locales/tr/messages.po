@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {# bulut çalışma alanını arşivle} ot
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {main dalının # commit gerisinde, rebase gerekiyor} other {main dalının # commit gerisinde, rebase gerekiyor}}"
 
-msgid "{boughtLabel} left"
-msgstr "{boughtLabel} kaldı"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches} içinden {branchPosition}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}sa {minutes}dk"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree çalışma alanı olarak içe aktarıldı} other {# worktree çalışma alanı olarak içe aktarıldı}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} / {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} sizi {role} olarak katılmaya davet etti."
 
@@ -1359,6 +1353,12 @@ msgstr "{remaining} token kaldı"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {# satırdan {first}–{last}} other {# satırdan {first}–{last}}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {# koltukla dahil} other {# koltukla dahil}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} sn"
 
@@ -1444,6 +1444,9 @@ msgstr "{limit} ortamdan {used} tanesi"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} / {size} token"
+
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
 
 msgid "{used} used"
 msgstr "{used} kullanıldı"
@@ -2900,6 +2903,9 @@ msgstr "Tüm adlar"
 msgid "Any page"
 msgstr "Tüm sayfalar"
 
+msgid "Any person"
+msgstr "Herhangi bir kişi"
+
 msgid "Any project"
 msgstr "Tüm projeler"
 
@@ -2914,6 +2920,9 @@ msgstr "Tüm inceleyenler"
 
 msgid "any sender"
 msgstr "tüm gönderenler"
+
+msgid "Any size"
+msgstr "Herhangi bir boyut"
 
 msgid "Any status"
 msgstr "Tüm durumlar"
@@ -3685,8 +3694,8 @@ msgstr "Otonom araçların notlandırılma biçiminden ödünç alındı, yazıl
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Alt çekmece, dokunmatik cihazlarda kaydırmaya uygun."
 
-msgid "Bought GB-hours"
-msgstr "Satın alınan GB-saat"
+msgid "Bought credits"
+msgstr "Satın alınan krediler"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Kalan satın alınmış GB-saat: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Bulut çalışma alanları {account} için etkin değil. Team ve Ultra p
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Bulut çalışma alanları planınıza dahil değil."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Bulut çalışma alanları başlatılamıyor."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Bulut çalışma alanları sizin adınıza commit, push yapar ve pull request açar"
@@ -8326,6 +8338,9 @@ msgstr "Çok yüksek"
 msgid "Extra small"
 msgstr "Çok küçük"
 
+msgid "Extra usage"
+msgstr "Ek kullanım"
+
 msgid "Extra usage limit reached"
 msgstr "Ek kullanım sınırına ulaşıldı"
 
@@ -9041,6 +9056,9 @@ msgstr "bitti · 7 sn çalıştı"
 msgid "Finishing the move…"
 msgstr "Taşıma tamamlanıyor…"
 
+msgid "First page"
+msgstr "İlk sayfa"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "İlk kez mi? <0>ChatGPT ayarlarında</0> cihaz koduyla oturum açmayı etkinleştirin."
 
@@ -9309,6 +9327,9 @@ msgstr "Ücretsiz"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Ücretsiz"
+
+msgid "Free credits"
+msgstr "Ücretsiz krediler"
 
 msgid "Free for everyone"
 msgstr "Herkes için ücretsiz"
@@ -12615,6 +12636,9 @@ msgstr "Sonraki görsel"
 msgid "Next match"
 msgstr "Sonraki eşleşme"
 
+msgid "Next page"
+msgstr "Sonraki sayfa"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Sağ kenar çubuğunda sonraki sekme"
 
@@ -13571,8 +13595,11 @@ msgstr "Nesneler"
 msgid "of {0}"
 msgstr "{0} içinde"
 
-msgid "of {includedLabel} included"
-msgstr "/ {includedLabel} dahil"
+msgid "of {cap} included"
+msgstr "/ {cap} dahil"
+
+msgid "of {cap} limit"
+msgstr "/ {cap} sınır"
 
 msgid "of {total}"
 msgstr "{total} içinde"
@@ -14518,9 +14545,6 @@ msgstr "Çıktı kısaltıldı"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Bu saatlerin dışında kanallar sana bildirim göndermez."
 
-msgid "Over the plan"
-msgstr "Planın üzerinde"
-
 msgid "Overflow Fade"
 msgstr "Taşma solması"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Sayfa"
+
+msgid "Page {page} of {pages}"
+msgstr "Sayfa {page} / {pages}"
 
 msgid "Page actions"
 msgstr "Sayfa işlemleri"
@@ -15394,6 +15421,9 @@ msgstr "Önceki görsel"
 
 msgid "Previous match"
 msgstr "Önceki eşleşme"
+
+msgid "Previous page"
+msgstr "Önceki sayfa"
 
 msgid "Previous prompts"
 msgstr "Önceki istemler"
@@ -16394,11 +16424,11 @@ msgstr "Terminal oturumunu kaldır"
 msgid "remove the agent"
 msgstr "ajanı kaldırma"
 
-msgid "Remove the person filter"
-msgstr "Kişi filtresini kaldır"
-
 msgid "remove the PR link"
 msgstr "PR bağlantısını kaldırma"
+
+msgid "Remove this filter"
+msgstr "Bu filtreyi kaldır"
 
 msgid "Remove trigger"
 msgstr "Tetikleyiciyi kaldır"
@@ -21841,11 +21871,17 @@ msgstr "Kullanım"
 msgid "Usage is out of date"
 msgstr "Kullanım verileri güncel değil"
 
+msgid "usage limit"
+msgstr "kullanım sınırı"
+
 msgid "Usage limit"
 msgstr "Kullanım sınırı"
 
 msgid "Usage limit reached"
 msgstr "Kullanım sınırına ulaşıldı"
+
+msgid "Usage limit reached."
+msgstr "Kullanım sınırına ulaşıldı."
 
 msgid "Usage sections"
 msgstr "Kullanım bölümleri"

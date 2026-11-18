@@ -35,14 +35,35 @@ describe("cloudUsageQueries", () => {
 		});
 	});
 
-	it("asks for large pages while it filters by person", () => {
-		const queries = cloudUsageQueries({
+	it("passes the Workspaces page's filters to the router, and a person only for admins", () => {
+		const filters = {
+			user: "u1",
+			size: "large",
+			status: "asleep",
+			q: "fix",
+			sort: "name",
+		} as const;
+		const admin = cloudUsageQueries({
 			range: "30d",
 			periodsLoaded: true,
 			isAdmin: true,
-			person: "u1",
+			filters,
 		});
-		expect(queries.workspaces.input.limit).toBe(100);
-		expect(queries.topWorkspaces.input.limit).toBe(8);
+		expect(admin.workspaces.input).toMatchObject({
+			user: "u1",
+			size: "large",
+			status: ["asleep"],
+			search: "fix",
+			sort: "name",
+			order: "asc",
+		});
+		const member = cloudUsageQueries({
+			range: "30d",
+			periodsLoaded: true,
+			isAdmin: false,
+			filters,
+		});
+		expect(member.workspaces.input.user).toBeUndefined();
+		expect(member.topWorkspaces.input.limit).toBe(8);
 	});
 });

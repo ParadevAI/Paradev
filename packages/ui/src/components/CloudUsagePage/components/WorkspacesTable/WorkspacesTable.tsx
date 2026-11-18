@@ -3,6 +3,7 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
+import type { ReactNode } from "react";
 import { cn } from "../../../../lib/utils";
 import {
 	Table,
@@ -13,7 +14,12 @@ import {
 	TableRow,
 } from "../../../ui/table";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudUsageLink, CloudUsageRow } from "../../types";
+import type {
+	CloudUsageLink,
+	CloudUsageRow,
+	CloudUsageTarget,
+	WorkspacesSort,
+} from "../../types";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Person } from "../Person";
 import { StatusPill } from "../StatusPill";
@@ -24,6 +30,8 @@ interface WorkspacesTableProps {
 	isAdmin: boolean;
 	inDollars: boolean;
 	period: string | undefined;
+	/** Makes the headers sort links, on the Workspaces page. */
+	sort?: { by: WorkspacesSort; to: (sort: WorkspacesSort) => CloudUsageTarget };
 }
 
 const HEAD =
@@ -39,17 +47,27 @@ export function WorkspacesTable({
 	isAdmin,
 	inDollars,
 	period,
+	sort,
 }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
 	const { formatNumber } = useFormat();
 	const { dollars, formatGbHours } = useUsageFormat();
+	const head = (by: WorkspacesSort, label: ReactNode, marked = true) =>
+		sort ? (
+			<Link to={sort.to(by)} className="hover:text-foreground">
+				{label}
+				{marked && sort.by === by && <span aria-hidden> ↓</span>}
+			</Link>
+		) : (
+			label
+		);
 
 	return (
 		<Table>
 			<TableHeader>
 				<TableRow className="hover:bg-transparent">
 					<TableHead className={HEAD}>
-						<Trans>Workspace</Trans>
+						{head("name", <Trans>Workspace</Trans>)}
 					</TableHead>
 					{isAdmin && (
 						<TableHead className={cn(HEAD, WIDE)}>
@@ -57,20 +75,20 @@ export function WorkspacesTable({
 						</TableHead>
 					)}
 					<TableHead className={HEAD}>
-						<Trans>Status</Trans>
+						{head("status", <Trans>Status</Trans>)}
 					</TableHead>
 					<TableHead className={cn(HEAD, MEDIUM)}>
 						<Trans>Size</Trans>
 					</TableHead>
 					<TableHead className={cn(HEAD, WIDE, "text-right")}>
-						<Trans>Hours</Trans>
+						{head("hours", <Trans>Hours</Trans>)}
 					</TableHead>
 					<TableHead className={cn(HEAD, "text-right", inDollars && NARROW)}>
-						<Trans>GB-hours</Trans>
+						{head("gbHours", <Trans>GB-hours</Trans>, !inDollars)}
 					</TableHead>
 					{inDollars && (
 						<TableHead className={cn(HEAD, "text-right")}>
-							<Trans>Usage</Trans>
+							{head("gbHours", <Trans>Usage</Trans>)}
 						</TableHead>
 					)}
 				</TableRow>
@@ -125,8 +143,17 @@ export function WorkspacesTable({
 								</TableCell>
 							)}
 							<TableCell>
-								{/* A "usage limit" note goes beside the pill once the row carries the last boot's end reason. */}
-								{workspace && <StatusPill status={workspace.status} />}
+								{workspace && (
+									<span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5">
+										<StatusPill status={workspace.status} />
+										{workspace.status === "asleep" &&
+											workspace.lastBoot?.endReason === "usage_limit" && (
+												<span className="text-xs text-warning">
+													<Trans>usage limit</Trans>
+												</span>
+											)}
+									</span>
+								)}
 							</TableCell>
 							<TableCell className={MEDIUM}>{size}</TableCell>
 							<TableCell className={cn(WIDE, "text-right tabular-nums")}>

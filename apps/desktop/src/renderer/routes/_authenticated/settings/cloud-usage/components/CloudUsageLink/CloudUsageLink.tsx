@@ -11,14 +11,16 @@ export const CloudUsageLink: LinkType = ({ to, ...props }) => {
 					{...props}
 				/>
 			);
-		case "workspaces":
+		case "workspaces": {
+			const { page: _, ...search } = to;
 			return (
 				<Link
 					to="/settings/cloud-usage/workspaces"
-					search={{ period: to.period, user: to.user }}
+					search={search}
 					{...props}
 				/>
 			);
+		}
 		case "workspace":
 			return (
 				<Link

@@ -1,7 +1,8 @@
+import type { WorkspacesFilters } from "../../types";
 import type { usageRange } from "../usageRange";
 
 const PAGE_SIZE = 25;
-const MAX_PAGE_SIZE = 100;
+const CHART_LIMIT = 100;
 const TOP_WORKSPACES = 8;
 
 export const PERIODS_INPUT = { limit: 24 } as const;
@@ -12,22 +13,22 @@ export function cloudUsageQueries({
 	periodsLoaded,
 	isAdmin,
 	workspaceId,
-	person,
+	filters = {},
 }: {
 	range: ReturnType<typeof usageRange>;
 	periodsLoaded: boolean;
 	isAdmin: boolean;
 	workspaceId?: string;
-	/** The router cannot filter by person yet, so the Workspaces page loads every page and filters. */
-	person?: string;
+	filters?: WorkspacesFilters;
 }) {
+	const { user, size, status, q, sort } = filters;
 	return {
 		byDay: {
-			input: { range, groupBy: "day", limit: MAX_PAGE_SIZE } as const,
+			input: { range, groupBy: "day", limit: CHART_LIMIT } as const,
 			enabled: periodsLoaded,
 		},
 		byPerson: {
-			input: { range, groupBy: "user", limit: MAX_PAGE_SIZE } as const,
+			input: { range, groupBy: "user", limit: CHART_LIMIT } as const,
 			enabled: periodsLoaded && isAdmin,
 		},
 		topWorkspaces: {
@@ -38,7 +39,13 @@ export function cloudUsageQueries({
 			input: {
 				range,
 				groupBy: "workspace",
-				limit: person ? MAX_PAGE_SIZE : PAGE_SIZE,
+				limit: PAGE_SIZE,
+				user: isAdmin ? user : undefined,
+				size,
+				status: status && [status],
+				search: q,
+				sort,
+				order: sort === "name" || sort === "status" ? "asc" : undefined,
 			} as const,
 			enabled: periodsLoaded,
 		},

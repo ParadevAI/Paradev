@@ -798,9 +798,6 @@ msgstr "{archivableCount, plural, one {Архівувати # хмарний р�
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Відстає від main на # коміт, потрібен ребейз} few {Відстає від main на # коміти, потрібен ребейз} many {Відстає від main на # комітів, потрібен ребейз} other {Відстає від main на # коміту, потрібен ребейз}}"
 
-msgid "{boughtLabel} left"
-msgstr "Залишилося {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} з {totalBranches}"
 
@@ -1091,9 +1088,6 @@ msgstr "{hours} год {minutes} хв"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Імпортовано # worktree як робочий простір} few {Імпортовано # worktree як робочі простори} many {Імпортовано # worktree як робочі простори} other {Імпортовано # worktree як робочі простори}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} з {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} запрошує вас приєднатися в ролі {role}."
 
@@ -1353,6 +1347,12 @@ msgstr "Залишилося токенів: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Скасовано зміни в # файлі.} few {Скасовано зміни в # файлах.} many {Скасовано зміни в # файлах.} other {Скасовано зміни в # файла.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} з # рядка} few {{first}–{last} з # рядків} many {{first}–{last} з # рядків} other {{first}–{last} з # рядка}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Входить у # місце} few {Входить у # місця} many {Входить у # місць} other {Входить у # місця}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} с"
 
@@ -1438,6 +1438,9 @@ msgstr "{used} з {limit} середовищ"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} з {size} токенів"
+
+msgid "{used} of {total}"
+msgstr "{used} з {total}"
 
 msgid "{used} used"
 msgstr "Використано {used}"
@@ -2894,6 +2897,9 @@ msgstr "Будь-яка назва"
 msgid "Any page"
 msgstr "Будь-яка сторінка"
 
+msgid "Any person"
+msgstr "Усі люди"
+
 msgid "Any project"
 msgstr "Будь-який проєкт"
 
@@ -2908,6 +2914,9 @@ msgstr "Будь-який рецензент"
 
 msgid "any sender"
 msgstr "будь-який відправник"
+
+msgid "Any size"
+msgstr "Будь-який розмір"
 
 msgid "Any status"
 msgstr "Будь-який статус"
@@ -3679,8 +3688,8 @@ msgstr "Запозичено з того, як оцінюють безпілот
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Нижня висувна панель, зручна для свайпів на сенсорних пристроях."
 
-msgid "Bought GB-hours"
-msgstr "Куплені ГБ-години"
+msgid "Bought credits"
+msgstr "Куплені кредити"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Залишок куплених ГБ-годин: {prepaid}"
@@ -4871,6 +4880,9 @@ msgstr "Хмарні робочі простори не ввімкнено дл�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Хмарні робочі простори не входять у ваш тариф."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Хмарні робочі простори не можуть запуститися."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Хмарні робочі простори комітять, пушать і відкривають пул-реквести від вашого імені"
@@ -8320,6 +8332,9 @@ msgstr "Дуже високий"
 msgid "Extra small"
 msgstr "Дуже малий"
 
+msgid "Extra usage"
+msgstr "Додаткове використання"
+
 msgid "Extra usage limit reached"
 msgstr "Досягнуто ліміту додаткового використання"
 
@@ -9035,6 +9050,9 @@ msgstr "завершив · працював 7 с"
 msgid "Finishing the move…"
 msgstr "Завершення переміщення…"
 
+msgid "First page"
+msgstr "Перша сторінка"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Уперше? Увімкніть вхід за кодом пристрою в <0>налаштуваннях ChatGPT</0>."
 
@@ -9303,6 +9321,9 @@ msgstr "Безкоштовно"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Безкоштовно"
+
+msgid "Free credits"
+msgstr "Безкоштовні кредити"
 
 msgid "Free for everyone"
 msgstr "Безкоштовно для всіх"
@@ -12609,6 +12630,9 @@ msgstr "Наступне зображення"
 msgid "Next match"
 msgstr "Наступний збіг"
 
+msgid "Next page"
+msgstr "Наступна сторінка"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Наступна вкладка правої бічної панелі"
 
@@ -13565,8 +13589,11 @@ msgstr "Об'єкти"
 msgid "of {0}"
 msgstr "з {0}"
 
-msgid "of {includedLabel} included"
-msgstr "з {includedLabel} за тарифом"
+msgid "of {cap} included"
+msgstr "з {cap} за тарифом"
+
+msgid "of {cap} limit"
+msgstr "з ліміту {cap}"
 
 msgid "of {total}"
 msgstr "з {total}"
@@ -14512,9 +14539,6 @@ msgstr "Вивід обрізано"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Поза цими годинами канали не надсилають вам сповіщень."
 
-msgid "Over the plan"
-msgstr "Понад тариф"
-
 msgid "Overflow Fade"
 msgstr "Згасання при переповненні"
 
@@ -14554,6 +14578,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Сторінка"
+
+msgid "Page {page} of {pages}"
+msgstr "Сторінка {page} з {pages}"
 
 msgid "Page actions"
 msgstr "Дії зі сторінкою"
@@ -15388,6 +15415,9 @@ msgstr "Попереднє зображення"
 
 msgid "Previous match"
 msgstr "Попередній збіг"
+
+msgid "Previous page"
+msgstr "Попередня сторінка"
 
 msgid "Previous prompts"
 msgstr "Попередні промпти"
@@ -16388,11 +16418,11 @@ msgstr "Видалити сеанс термінала"
 msgid "remove the agent"
 msgstr "видалити агента"
 
-msgid "Remove the person filter"
-msgstr "Прибрати фільтр за людиною"
-
 msgid "remove the PR link"
 msgstr "прибрати посилання на PR"
+
+msgid "Remove this filter"
+msgstr "Прибрати цей фільтр"
 
 msgid "Remove trigger"
 msgstr "Видалити тригер"
@@ -21835,11 +21865,17 @@ msgstr "Використання"
 msgid "Usage is out of date"
 msgstr "Дані про використання застаріли"
 
+msgid "usage limit"
+msgstr "ліміт використання"
+
 msgid "Usage limit"
 msgstr "Ліміт використання"
 
 msgid "Usage limit reached"
 msgstr "Досягнуто ліміту використання"
+
+msgid "Usage limit reached."
+msgstr "Досягнуто ліміту використання."
 
 msgid "Usage sections"
 msgstr "Розділи використання"

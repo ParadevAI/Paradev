@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { CloudMetrics, CloudPeriod } from "../../types";
 import { AllowanceLines } from "./components/AllowanceLines";
+import { type Amount, allowanceLines } from "./utils/allowanceLines";
 
 interface AllowanceCardProps {
 	total: CloudMetrics;
@@ -21,10 +22,14 @@ export function AllowanceCard({
 	isPeriod,
 	billing,
 }: AllowanceCardProps) {
-	const { usage, gbHours } = useUsageFormat();
+	const { usage, dollars, gbHours } = useUsageFormat();
+	const format = (amount: Amount) =>
+		amount.usd === null ? gbHours(amount.gbHours) : dollars(amount.usd);
 	const used = usage(total);
 	const included = allowance?.includedGbHours ?? null;
-	const includedLabel = included === null ? null : gbHours(included);
+	const summary =
+		allowance && included !== null ? allowanceLines(allowance, included) : null;
+	const cap = summary && format(summary.cap);
 
 	return (
 		<section className="space-y-3 rounded-lg bg-muted/60 p-4">
@@ -34,8 +39,10 @@ export function AllowanceCard({
 						<Trans>{used} used</Trans>
 					</span>{" "}
 					<span className="text-muted-foreground">
-						{includedLabel !== null ? (
-							<Trans>of {includedLabel} included</Trans>
+						{summary?.hasCap ? (
+							<Trans>of {cap} limit</Trans>
+						) : summary ? (
+							<Trans>of {cap} included</Trans>
 						) : isPeriod ? (
 							<Trans>in this period</Trans>
 						) : (
@@ -45,8 +52,13 @@ export function AllowanceCard({
 				</h3>
 				{billing}
 			</div>
-			{allowance && included !== null ? (
-				<AllowanceLines allowance={allowance} included={included} />
+			{summary && allowance ? (
+				<AllowanceLines
+					lines={summary.lines}
+					scale={summary.scale}
+					seats={allowance.seats}
+					format={format}
+				/>
 			) : (
 				isPeriod && (
 					<p className="text-xs text-muted-foreground">

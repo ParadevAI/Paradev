@@ -1,9 +1,7 @@
 "use client";
 
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useEffect } from "react";
-import { LuX } from "react-icons/lu";
-import { Button } from "../../../ui/button";
+import { Trans } from "@lingui/react/macro";
+import { useState } from "react";
 import { usePeriodLabel } from "../../hooks/usePeriodLabel";
 import type {
 	CloudPages,
@@ -12,52 +10,63 @@ import type {
 	CloudQuery,
 	CloudUsage,
 	CloudUsageLink,
+	WorkspacesFilters,
+	WorkspacesTarget,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
-import { workspaceOf } from "../../utils/workspaceOf";
 import { PageHeader } from "../PageHeader";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspacesTable } from "../WorkspacesTable";
+import { FilterChips } from "./components/FilterChips";
+import { Pager } from "./components/Pager";
+import { WorkspacesToolbar } from "./components/WorkspacesToolbar";
 
 interface CloudWorkspacesPageProps {
 	Link: CloudUsageLink;
+	navigate: (to: WorkspacesTarget) => void;
 	isAdmin: boolean;
 	periods: CloudQuery<CloudPeriods>;
 	period: CloudPeriod | undefined;
 	workspaces: CloudPages<CloudUsage>;
-	/** A person's user id from the URL; owners and admins only. */
-	person: string | undefined;
-	/** To name the person in the filter. */
+	filters: WorkspacesFilters;
+	/** The people to filter by; owners and admins only. */
 	byPerson: CloudQuery<CloudUsage>;
 }
 
 export function CloudWorkspacesPage({
 	Link,
+	navigate,
 	isAdmin,
 	periods,
 	period,
 	workspaces,
-	person,
+	filters,
 	byPerson,
 }: CloudWorkspacesPageProps) {
-	const { t } = useLingui();
 	const periodLabel = usePeriodLabel();
 	const param = periodParam(periods.data?.items, period);
-	const filtering = isAdmin && person !== undefined;
-	const { hasNextPage, isFetchingNextPage, fetchNextPage } = workspaces;
-	const rows = (
-		workspaces.data?.pages.flatMap((page) => page.items) ?? []
-	).filter((row) => !filtering || workspaceOf(row)?.owner?.id === person);
-	const personName = byPerson.data?.items.find((item) => item.key === person)
-		?.ref?.name;
-
-	// Until the router filters by person, a filtered list is complete only when every page is loaded.
-	useEffect(() => {
-		if (filtering && hasNextPage && !isFetchingNextPage) fetchNextPage();
-	}, [filtering, hasNextPage, isFetchingNextPage, fetchNextPage]);
+	const to = (next: WorkspacesFilters): WorkspacesTarget => ({
+		page: "workspaces",
+		period: param,
+		...next,
+	});
+	const pages = workspaces.data?.pages ?? [];
+	const pagingKey = JSON.stringify([param, filters]);
+	const [paging, setPaging] = useState({ key: pagingKey, index: 0 });
+	const index = paging.key === pagingKey ? paging.index : 0;
+	const onPage = async (next: number) => {
+		if (next >= pages.length) await workspaces.fetchNextPage();
+		setPaging({ key: pagingKey, index: next });
+	};
+	const people = isAdmin
+		? (byPerson.data?.items.flatMap((item) =>
+				item.ref && !("status" in item.ref) ? [item.ref] : [],
+			) ?? [])
+		: null;
+	const personName = people?.find((person) => person.id === filters.user)?.name;
 
 	return (
-		<div className="@container space-y-6">
+		<div className="@container space-y-4">
 			<PageHeader
 				Link={Link}
 				crumbs={[
@@ -70,35 +79,22 @@ export function CloudWorkspacesPage({
 					isAdmin ? <Trans>Workspaces</Trans> : <Trans>Your workspaces</Trans>
 				}
 				actions={
-					period ? (
-						<span className="text-sm text-muted-foreground tabular-nums">
-							{periodLabel(period)}
-						</span>
-					) : (
-						<span className="text-sm text-muted-foreground">
-							<Trans>Last 30 days</Trans>
-						</span>
-					)
+					<span className="text-sm text-muted-foreground tabular-nums">
+						{period ? periodLabel(period) : <Trans>Last 30 days</Trans>}
+					</span>
 				}
 			/>
-			{/* Search, and filters by person, size and status, go here once cloud.usage.query accepts them. */}
-			{filtering && (
-				<div className="flex flex-wrap gap-2">
-					<span className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-sm">
-						<span className="text-muted-foreground">
-							<Trans>Person</Trans>
-						</span>
-						{personName ?? "…"}
-						<Link
-							to={{ page: "workspaces", period: param }}
-							aria-label={t({ message: "Remove the person filter" })}
-							className="text-muted-foreground hover:text-foreground"
-						>
-							<LuX className="size-3.5" />
-						</Link>
-					</span>
-				</div>
-			)}
+			<WorkspacesToolbar
+				filters={filters}
+				people={people}
+				onChange={(next) => navigate(to(next))}
+			/>
+			<FilterChips
+				Link={Link}
+				filters={filters}
+				personName={personName}
+				to={to}
+			/>
 			{!periods.data || !workspaces.data ? (
 				<QueryStatus
 					isError={periods.isError || workspaces.isError}
@@ -107,25 +103,28 @@ export function CloudWorkspacesPage({
 					}
 				/>
 			) : (
-				<WorkspacesTable
-					Link={Link}
-					rows={rows}
-					isAdmin={isAdmin}
-					inDollars={
-						(workspaces.data.pages[0]?.total.usageUsd ?? null) !== null
-					}
-					period={param}
-				/>
-			)}
-			{!filtering && hasNextPage && (
-				<Button
-					variant="outline"
-					size="sm"
-					disabled={isFetchingNextPage}
-					onClick={() => fetchNextPage()}
-				>
-					<Trans>Show more</Trans>
-				</Button>
+				<>
+					<WorkspacesTable
+						Link={Link}
+						rows={pages[index]?.items ?? []}
+						isAdmin={isAdmin}
+						inDollars={(pages[0]?.total.usageUsd ?? null) !== null}
+						period={param}
+						sort={{
+							by: filters.sort ?? "gbHours",
+							to: (sort) =>
+								to({ ...filters, sort: sort === "gbHours" ? undefined : sort }),
+						}}
+					/>
+					<Pager
+						pageSizes={pages.map((page) => page.items.length)}
+						index={index}
+						rowCount={pages[0]?.rowCount ?? 0}
+						hasNextPage={workspaces.hasNextPage}
+						isFetchingNextPage={workspaces.isFetchingNextPage}
+						onPage={onPage}
+					/>
+				</>
 			)}
 		</div>
 	);

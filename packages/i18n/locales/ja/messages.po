@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {#件のクラウドワークスペース�
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {mainより#コミット遅れています。リベースが必要です} other {mainより#コミット遅れています。リベースが必要です}}"
 
-msgid "{boughtLabel} left"
-msgstr "残り {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{totalBranches}件中{branchPosition}件目"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}時間{minutes}分"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {#件のワークツリーをワークスペースとしてインポートしました} other {#件のワークツリーをワークスペースとしてインポートしました}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} / {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter}があなたを{role}として招待しました。"
 
@@ -1359,6 +1353,12 @@ msgstr "残り {remaining} トークン"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {# 行中 {first}–{last}}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {# シート分に含まれる}}"
+
 msgid "{seconds}s"
 msgstr "{seconds}秒"
 
@@ -1444,6 +1444,9 @@ msgstr "{limit} 件中 {used} 件の環境"
 
 msgid "{used} of {size} tokens"
 msgstr "{size} トークン中 {used}"
+
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
 
 msgid "{used} used"
 msgstr "{used} 使用済み"
@@ -2900,6 +2903,9 @@ msgstr "すべての名前"
 msgid "Any page"
 msgstr "すべてのページ"
 
+msgid "Any person"
+msgstr "すべての人"
+
 msgid "Any project"
 msgstr "すべてのプロジェクト"
 
@@ -2914,6 +2920,9 @@ msgstr "すべてのレビュアー"
 
 msgid "any sender"
 msgstr "すべての送信者"
+
+msgid "Any size"
+msgstr "すべてのサイズ"
 
 msgid "Any status"
 msgstr "すべてのステータス"
@@ -3685,8 +3694,8 @@ msgstr "自動運転車の等級付けを借りて、ソフトウェアの作ら
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "下部ドロワー。タッチデバイスではスワイプで操作できます。"
 
-msgid "Bought GB-hours"
-msgstr "購入した GB 時間"
+msgid "Bought credits"
+msgstr "購入したクレジット"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "購入済み GB 時間の残り: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "{account} ではクラウドワークスペースが有効になって�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "クラウドワークスペースはご利用のプランに含まれていません。"
+
+msgid "Cloud workspaces cannot start."
+msgstr "クラウドワークスペースを起動できません。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
@@ -8326,6 +8338,9 @@ msgstr "最高"
 msgid "Extra small"
 msgstr "極小"
 
+msgid "Extra usage"
+msgstr "追加使用量"
+
 msgid "Extra usage limit reached"
 msgstr "追加使用量の上限に達しました"
 
@@ -9041,6 +9056,9 @@ msgstr "完了 · 7秒稼働"
 msgid "Finishing the move…"
 msgstr "移動を完了しています…"
 
+msgid "First page"
+msgstr "最初のページ"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "初めてですか？<0>ChatGPTの設定</0>でデバイスコードによるサインインを有効にしてください。"
 
@@ -9309,6 +9327,9 @@ msgstr "Free"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "無料"
+
+msgid "Free credits"
+msgstr "無料クレジット"
 
 msgid "Free for everyone"
 msgstr "誰でも無料"
@@ -12615,6 +12636,9 @@ msgstr "次の画像"
 msgid "Next match"
 msgstr "次の一致"
 
+msgid "Next page"
+msgstr "次のページ"
+
 msgid "Next Right Sidebar Tab"
 msgstr "右サイドバーの次のタブ"
 
@@ -13571,8 +13595,11 @@ msgstr "物"
 msgid "of {0}"
 msgstr "{0}人中"
 
-msgid "of {includedLabel} included"
-msgstr "（{includedLabel} 含む）"
+msgid "of {cap} included"
+msgstr "（{cap} 含む）"
+
+msgid "of {cap} limit"
+msgstr "（上限 {cap}）"
 
 msgid "of {total}"
 msgstr "{total}人中"
@@ -14518,9 +14545,6 @@ msgstr "出力は省略されました"
 msgid "Outside these hours, channels do not notify you."
 msgstr "この時間外はチャンネルから通知されません。"
 
-msgid "Over the plan"
-msgstr "プラン超過分"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "ページ"
+
+msgid "Page {page} of {pages}"
+msgstr "{page} / {pages} ページ"
 
 msgid "Page actions"
 msgstr "ページの操作"
@@ -15394,6 +15421,9 @@ msgstr "前の画像"
 
 msgid "Previous match"
 msgstr "前の一致"
+
+msgid "Previous page"
+msgstr "前のページ"
 
 msgid "Previous prompts"
 msgstr "以前のプロンプト"
@@ -16394,11 +16424,11 @@ msgstr "ターミナルセッションを削除"
 msgid "remove the agent"
 msgstr "エージェントを削除する"
 
-msgid "Remove the person filter"
-msgstr "人のフィルターを解除"
-
 msgid "remove the PR link"
 msgstr "PRリンクを削除する"
+
+msgid "Remove this filter"
+msgstr "このフィルターを解除"
 
 msgid "Remove trigger"
 msgstr "トリガーを削除"
@@ -21841,11 +21871,17 @@ msgstr "使用量"
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
+msgid "usage limit"
+msgstr "使用量の上限"
+
 msgid "Usage limit"
 msgstr "使用量の上限"
 
 msgid "Usage limit reached"
 msgstr "使用量の上限に達しました"
+
+msgid "Usage limit reached."
+msgstr "使用量の上限に達しました。"
 
 msgid "Usage sections"
 msgstr "使用量セクション"

@@ -27,15 +27,31 @@ export interface CloudQuery<TData> {
 export interface CloudPages<TPage> extends CloudQuery<{ pages: TPage[] }> {
 	hasNextPage: boolean;
 	isFetchingNextPage: boolean;
-	fetchNextPage: () => unknown;
+	fetchNextPage: () => Promise<unknown>;
+}
+
+export type WorkspacesSort = "gbHours" | "hours" | "name" | "status";
+
+/** The Workspaces page's filters and sort, kept in the URL. Absent means any, and GB-hours for the sort. */
+export interface WorkspacesFilters {
+	user?: string;
+	size?: WorkspaceRef["size"];
+	status?: WorkspaceRef["status"];
+	q?: string;
+	sort?: WorkspacesSort;
 }
 
 /** A place in the cloud usage pages; each app maps it to its own router. `period` is a period id, absent for the newest. */
 export type CloudUsageTarget =
 	| { page: "overview"; period?: string }
-	| { page: "workspaces"; period?: string; user?: string }
+	| ({ page: "workspaces"; period?: string } & WorkspacesFilters)
 	| { page: "workspace"; workspaceId: string; period?: string }
 	| { page: "billing" };
+
+export type WorkspacesTarget = Extract<
+	CloudUsageTarget,
+	{ page: "workspaces" }
+>;
 
 export type CloudUsageLink = ComponentType<{
 	to: CloudUsageTarget;

@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {# cloudwerkruimte archiveren} other {# cl
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {# commit achter op main, rebase nodig} other {# commits achter op main, rebase nodig}}"
 
-msgid "{boughtLabel} left"
-msgstr "Nog {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} van {totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours}u {minutes}m"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree als werkruimte geïmporteerd} other {# worktrees als werkruimtes geïmporteerd}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} van {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} heeft je uitgenodigd om deel te nemen als {role}."
 
@@ -1359,6 +1353,12 @@ msgstr "Nog {remaining} tokens over"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Wijzigingen in # bestand ongedaan gemaakt.} other {Wijzigingen in # bestanden ongedaan gemaakt.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} van # rij} other {{first}–{last} van # rijen}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Inbegrepen bij # plek} other {Inbegrepen bij # plekken}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1444,6 +1444,9 @@ msgstr "{used} van {limit} omgevingen"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} van {size} tokens"
+
+msgid "{used} of {total}"
+msgstr "{used} van {total}"
 
 msgid "{used} used"
 msgstr "{used} gebruikt"
@@ -2900,6 +2903,9 @@ msgstr "Elke naam"
 msgid "Any page"
 msgstr "Elke pagina"
 
+msgid "Any person"
+msgstr "Iedere persoon"
+
 msgid "Any project"
 msgstr "Elk project"
 
@@ -2914,6 +2920,9 @@ msgstr "Alle reviewers"
 
 msgid "any sender"
 msgstr "elke afzender"
+
+msgid "Any size"
+msgstr "Elke grootte"
 
 msgid "Any status"
 msgstr "Elke status"
@@ -3685,8 +3694,8 @@ msgstr "Geleend van hoe zelfrijdende auto's worden beoordeeld, toegepast op hoe 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Lade onderaan, swipevriendelijk op touchapparaten."
 
-msgid "Bought GB-hours"
-msgstr "Gekochte GB-uren"
+msgid "Bought credits"
+msgstr "Gekocht tegoed"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Gekochte GB-uren over: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Cloudwerkruimtes zijn niet ingeschakeld voor {account}. Ze horen bij de 
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloudwerkruimtes zijn niet inbegrepen in je plan."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Cloudwerkruimtes kunnen niet starten."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudwerkruimtes committen, pushen en openen pull requests als jou"
@@ -8326,6 +8338,9 @@ msgstr "Zeer hoog"
 msgid "Extra small"
 msgstr "Extra klein"
 
+msgid "Extra usage"
+msgstr "Extra gebruik"
+
 msgid "Extra usage limit reached"
 msgstr "Limiet voor extra gebruik bereikt"
 
@@ -9041,6 +9056,9 @@ msgstr "klaar · 7s gewerkt"
 msgid "Finishing the move…"
 msgstr "Verplaatsing afronden…"
 
+msgid "First page"
+msgstr "Eerste pagina"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Eerste keer? Zet inloggen met apparaatcode aan in de <0>ChatGPT-instellingen</0>."
 
@@ -9309,6 +9327,9 @@ msgstr "Free"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Gratis"
+
+msgid "Free credits"
+msgstr "Gratis tegoed"
 
 msgid "Free for everyone"
 msgstr "Gratis voor iedereen"
@@ -12615,6 +12636,9 @@ msgstr "Volgende afbeelding"
 msgid "Next match"
 msgstr "Volgende overeenkomst"
 
+msgid "Next page"
+msgstr "Volgende pagina"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Volgend tabblad in de rechterzijbalk"
 
@@ -13571,8 +13595,11 @@ msgstr "Objecten"
 msgid "of {0}"
 msgstr "van {0}"
 
-msgid "of {includedLabel} included"
-msgstr "van {includedLabel} inbegrepen"
+msgid "of {cap} included"
+msgstr "van {cap} inbegrepen"
+
+msgid "of {cap} limit"
+msgstr "van een limiet van {cap}"
 
 msgid "of {total}"
 msgstr "van {total}"
@@ -14518,9 +14545,6 @@ msgstr "Uitvoer afgekapt"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Buiten deze uren krijg je geen meldingen van kanalen."
 
-msgid "Over the plan"
-msgstr "Boven het abonnement"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Pagina"
+
+msgid "Page {page} of {pages}"
+msgstr "Pagina {page} van {pages}"
 
 msgid "Page actions"
 msgstr "Pagina-acties"
@@ -15394,6 +15421,9 @@ msgstr "Vorige afbeelding"
 
 msgid "Previous match"
 msgstr "Vorige overeenkomst"
+
+msgid "Previous page"
+msgstr "Vorige pagina"
 
 msgid "Previous prompts"
 msgstr "Eerdere prompts"
@@ -16394,11 +16424,11 @@ msgstr "Terminalsessie verwijderen"
 msgid "remove the agent"
 msgstr "de agent verwijderen"
 
-msgid "Remove the person filter"
-msgstr "Persoonsfilter verwijderen"
-
 msgid "remove the PR link"
 msgstr "de PR-koppeling verwijderen"
+
+msgid "Remove this filter"
+msgstr "Dit filter verwijderen"
 
 msgid "Remove trigger"
 msgstr "Trigger verwijderen"
@@ -21841,11 +21871,17 @@ msgstr "Gebruik"
 msgid "Usage is out of date"
 msgstr "De gebruiksgegevens zijn verouderd"
 
+msgid "usage limit"
+msgstr "gebruikslimiet"
+
 msgid "Usage limit"
 msgstr "Gebruikslimiet"
 
 msgid "Usage limit reached"
 msgstr "Gebruikslimiet bereikt"
+
+msgid "Usage limit reached."
+msgstr "Gebruikslimiet bereikt."
 
 msgid "Usage sections"
 msgstr "Onderdelen van gebruik"

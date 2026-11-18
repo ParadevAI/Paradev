@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {Archiver # espace de travail cloud} other
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {En retard de # commit sur main, rebase nécessaire} other {En retard de # commits sur main, rebase nécessaire}}"
 
-msgid "{boughtLabel} left"
-msgstr "{boughtLabel} restantes"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} sur {totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours} h {minutes} min"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {# worktree importé en tant qu'espace de travail} other {# worktrees importés en tant qu'espaces de travail}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} sur {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} vous a invité à rejoindre l'organisation en tant que {role}."
 
@@ -1359,6 +1353,12 @@ msgstr "{remaining} tokens restants"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Modifications annulées sur # fichier.} other {Modifications annulées sur # fichiers.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} sur # ligne} other {{first}–{last} sur # lignes}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Inclus avec # siège} other {Inclus avec # sièges}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1444,6 +1444,9 @@ msgstr "{used} environnements sur {limit}"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} sur {size} tokens"
+
+msgid "{used} of {total}"
+msgstr "{used} sur {total}"
 
 msgid "{used} used"
 msgstr "{used} utilisés"
@@ -2900,6 +2903,9 @@ msgstr "Tout nom"
 msgid "Any page"
 msgstr "Toute page"
 
+msgid "Any person"
+msgstr "Toutes les personnes"
+
 msgid "Any project"
 msgstr "Tout projet"
 
@@ -2914,6 +2920,9 @@ msgstr "N'importe quel relecteur"
 
 msgid "any sender"
 msgstr "tout expéditeur"
+
+msgid "Any size"
+msgstr "Toutes les tailles"
 
 msgid "Any status"
 msgstr "Tout statut"
@@ -3685,8 +3694,8 @@ msgstr "Empruntée à la façon dont on note les voitures autonomes, appliquée 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Tiroir inférieur, adapté au balayage sur les appareils tactiles."
 
-msgid "Bought GB-hours"
-msgstr "Go-heures achetées"
+msgid "Bought credits"
+msgstr "Crédits achetés"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Go-heures achetées restantes : {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Les espaces de travail cloud ne sont pas activés pour {account}. Ils so
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Les espaces de travail cloud ne sont pas inclus dans votre forfait."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Les espaces de travail cloud ne peuvent pas démarrer."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Les espaces de travail cloud commitent, poussent et ouvrent des pull requests en votre nom"
@@ -8326,6 +8338,9 @@ msgstr "Très élevé"
 msgid "Extra small"
 msgstr "Très petit"
 
+msgid "Extra usage"
+msgstr "Utilisation supplémentaire"
+
 msgid "Extra usage limit reached"
 msgstr "Limite d'utilisation supplémentaire atteinte"
 
@@ -9041,6 +9056,9 @@ msgstr "terminé · a travaillé 7 s"
 msgid "Finishing the move…"
 msgstr "Finalisation du déplacement…"
 
+msgid "First page"
+msgstr "Première page"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Première fois ? Activez la connexion par code d'appareil dans les <0>paramètres de ChatGPT</0>."
 
@@ -9309,6 +9327,9 @@ msgstr "Free"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Gratuit"
+
+msgid "Free credits"
+msgstr "Crédits gratuits"
 
 msgid "Free for everyone"
 msgstr "Gratuit pour tout le monde"
@@ -12615,6 +12636,9 @@ msgstr "Image suivante"
 msgid "Next match"
 msgstr "Résultat suivant"
 
+msgid "Next page"
+msgstr "Page suivante"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Onglet suivant de la barre latérale droite"
 
@@ -13571,8 +13595,11 @@ msgstr "Objets"
 msgid "of {0}"
 msgstr "sur {0}"
 
-msgid "of {includedLabel} included"
-msgstr "sur {includedLabel} inclus"
+msgid "of {cap} included"
+msgstr "sur {cap} inclus"
+
+msgid "of {cap} limit"
+msgstr "sur une limite de {cap}"
 
 msgid "of {total}"
 msgstr "sur {total}"
@@ -14518,9 +14545,6 @@ msgstr "Sortie tronquée"
 msgid "Outside these hours, channels do not notify you."
 msgstr "En dehors de ces horaires, les canaux ne vous notifient pas."
 
-msgid "Over the plan"
-msgstr "Au-delà de l'offre"
-
 msgid "Overflow Fade"
 msgstr "Fondu de débordement"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Page"
+
+msgid "Page {page} of {pages}"
+msgstr "Page {page} sur {pages}"
 
 msgid "Page actions"
 msgstr "Actions de la page"
@@ -15394,6 +15421,9 @@ msgstr "Image précédente"
 
 msgid "Previous match"
 msgstr "Résultat précédent"
+
+msgid "Previous page"
+msgstr "Page précédente"
 
 msgid "Previous prompts"
 msgstr "Prompts précédents"
@@ -16394,11 +16424,11 @@ msgstr "Supprimer la session de terminal"
 msgid "remove the agent"
 msgstr "supprimer l'agent"
 
-msgid "Remove the person filter"
-msgstr "Retirer le filtre de personne"
-
 msgid "remove the PR link"
 msgstr "retirer le lien de la PR"
+
+msgid "Remove this filter"
+msgstr "Retirer ce filtre"
 
 msgid "Remove trigger"
 msgstr "Supprimer le déclencheur"
@@ -21841,11 +21871,17 @@ msgstr "Utilisation"
 msgid "Usage is out of date"
 msgstr "Les données d’utilisation ne sont plus à jour"
 
+msgid "usage limit"
+msgstr "limite d'utilisation"
+
 msgid "Usage limit"
 msgstr "Limite d'utilisation"
 
 msgid "Usage limit reached"
 msgstr "Limite d'utilisation atteinte"
+
+msgid "Usage limit reached."
+msgstr "Limite d'utilisation atteinte."
 
 msgid "Usage sections"
 msgstr "Sections d'utilisation"

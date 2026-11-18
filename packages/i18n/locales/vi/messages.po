@@ -804,9 +804,6 @@ msgstr "{archivableCount, plural, one {Lưu trữ # workspace đám mây} other 
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
 
-msgid "{boughtLabel} left"
-msgstr "Còn {boughtLabel}"
-
 msgid "{branchPosition} of {totalBranches}"
 msgstr "{branchPosition} trong {totalBranches}"
 
@@ -1097,9 +1094,6 @@ msgstr "{hours} giờ {minutes} phút"
 msgid "{imported, plural, one {Imported # worktree as a workspace} other {Imported # worktrees as workspaces}}"
 msgstr "{imported, plural, one {Đã nhập # worktree thành workspace} other {Đã nhập # worktree thành workspace}}"
 
-msgid "{includedUsedLabel} of {includedLabel}"
-msgstr "{includedUsedLabel} / {includedLabel}"
-
 msgid "{inviter} invited you to join as a {role}."
 msgstr "{inviter} đã mời bạn tham gia với vai trò {role}."
 
@@ -1359,6 +1353,12 @@ msgstr "Còn {remaining} token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Đã hoàn tác thay đổi ở # tệp.} other {Đã hoàn tác thay đổi ở # tệp.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {{first}–{last} trên # hàng}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {Gồm trong # chỗ}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} giây"
 
@@ -1444,6 +1444,9 @@ msgstr "{used}/{limit} môi trường"
 
 msgid "{used} of {size} tokens"
 msgstr "{used} / {size} token"
+
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
 
 msgid "{used} used"
 msgstr "Đã dùng {used}"
@@ -2900,6 +2903,9 @@ msgstr "Tên bất kỳ"
 msgid "Any page"
 msgstr "Trang bất kỳ"
 
+msgid "Any person"
+msgstr "Bất kỳ ai"
+
 msgid "Any project"
 msgstr "Dự án bất kỳ"
 
@@ -2914,6 +2920,9 @@ msgstr "Tất cả người review"
 
 msgid "any sender"
 msgstr "người gửi bất kỳ"
+
+msgid "Any size"
+msgstr "Mọi kích thước"
 
 msgid "Any status"
 msgstr "Trạng thái bất kỳ"
@@ -3685,8 +3694,8 @@ msgstr "Mượn từ cách chấm mức tự lái của ô tô, áp vào cách p
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Ngăn kéo dưới đáy, vuốt tiện trên thiết bị cảm ứng."
 
-msgid "Bought GB-hours"
-msgstr "GB-giờ đã mua"
+msgid "Bought credits"
+msgstr "Tín dụng đã mua"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "GB-giờ đã mua còn lại: {prepaid}"
@@ -4877,6 +4886,9 @@ msgstr "Không gian làm việc trên đám mây chưa được bật cho {accou
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Gói của bạn không bao gồm không gian làm việc đám mây."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Không thể khởi động workspace trên đám mây."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace đám mây commit, push và mở pull request với tư cách là bạn"
@@ -8326,6 +8338,9 @@ msgstr "Rất cao"
 msgid "Extra small"
 msgstr "Rất nhỏ"
 
+msgid "Extra usage"
+msgstr "Mức dùng thêm"
+
 msgid "Extra usage limit reached"
 msgstr "Đã đạt giới hạn sử dụng thêm"
 
@@ -9041,6 +9056,9 @@ msgstr "đã xong · làm trong 7s"
 msgid "Finishing the move…"
 msgstr "Đang hoàn tất việc chuyển…"
 
+msgid "First page"
+msgstr "Trang đầu"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Lần đầu? Bật đăng nhập bằng mã thiết bị trong <0>cài đặt ChatGPT</0>."
 
@@ -9309,6 +9327,9 @@ msgstr "Free"
 msgctxt "cloud allowance group"
 msgid "Free"
 msgstr "Miễn phí"
+
+msgid "Free credits"
+msgstr "Tín dụng miễn phí"
 
 msgid "Free for everyone"
 msgstr "Miễn phí cho tất cả"
@@ -12615,6 +12636,9 @@ msgstr "Ảnh tiếp theo"
 msgid "Next match"
 msgstr "Kết quả kế tiếp"
 
+msgid "Next page"
+msgstr "Trang sau"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Tab kế tiếp của thanh bên phải"
 
@@ -13571,8 +13595,11 @@ msgstr "Đồ vật"
 msgid "of {0}"
 msgstr "trên {0}"
 
-msgid "of {includedLabel} included"
-msgstr "trên {includedLabel} được gồm"
+msgid "of {cap} included"
+msgstr "trên {cap} được gồm"
+
+msgid "of {cap} limit"
+msgstr "trên giới hạn {cap}"
 
 msgid "of {total}"
 msgstr "trong {total}"
@@ -14518,9 +14545,6 @@ msgstr "Kết quả đã bị cắt bớt"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Ngoài khung giờ này, các kênh sẽ không thông báo cho bạn."
 
-msgid "Over the plan"
-msgstr "Vượt gói"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14560,6 +14584,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Trang"
+
+msgid "Page {page} of {pages}"
+msgstr "Trang {page} / {pages}"
 
 msgid "Page actions"
 msgstr "Thao tác với trang"
@@ -15394,6 +15421,9 @@ msgstr "Ảnh trước"
 
 msgid "Previous match"
 msgstr "Kết quả trước"
+
+msgid "Previous page"
+msgstr "Trang trước"
 
 msgid "Previous prompts"
 msgstr "Prompt trước đó"
@@ -16394,11 +16424,11 @@ msgstr "Gỡ phiên terminal"
 msgid "remove the agent"
 msgstr "gỡ agent"
 
-msgid "Remove the person filter"
-msgstr "Xóa bộ lọc theo người"
-
 msgid "remove the PR link"
 msgstr "gỡ liên kết PR"
+
+msgid "Remove this filter"
+msgstr "Xóa bộ lọc này"
 
 msgid "Remove trigger"
 msgstr "Xóa trình kích hoạt"
@@ -21841,11 +21871,17 @@ msgstr "Mức sử dụng"
 msgid "Usage is out of date"
 msgstr "Dữ liệu sử dụng đã cũ"
 
+msgid "usage limit"
+msgstr "giới hạn sử dụng"
+
 msgid "Usage limit"
 msgstr "Giới hạn sử dụng"
 
 msgid "Usage limit reached"
 msgstr "Đã đạt giới hạn sử dụng"
+
+msgid "Usage limit reached."
+msgstr "Đã đạt giới hạn sử dụng."
 
 msgid "Usage sections"
 msgstr "Các mục mức sử dụng"
