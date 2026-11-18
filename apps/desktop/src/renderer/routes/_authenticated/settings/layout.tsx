@@ -178,7 +178,11 @@ function SettingsLayout() {
 	useHotkeys(
 		"escape",
 		(event) => {
-			if (document.querySelector('[data-state="open"]')) return;
+			if (
+				event.defaultPrevented ||
+				document.querySelector('[data-state="open"]')
+			)
+				return;
 			const segments = location.pathname.split("/").filter(Boolean);
 			event.preventDefault();
 			if (segments.length <= 2) {
