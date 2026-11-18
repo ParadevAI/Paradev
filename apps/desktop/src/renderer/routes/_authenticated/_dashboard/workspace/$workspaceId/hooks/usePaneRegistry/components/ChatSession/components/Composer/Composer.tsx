@@ -50,6 +50,7 @@ import { useFooterTier } from "renderer/routes/_authenticated/components/AgentCo
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
+import type { RunInTerminal } from "../../../../hooks/useAgentCliUpdate";
 import { useChatComposerStore } from "../../../../stores/chatComposerStore";
 import { CHAT_COLUMN_CLASSNAME, CHAT_GUTTER_CLASSNAME } from "../../constants";
 import { useChatWiring } from "../../hooks/useSessionClient";
@@ -65,6 +66,7 @@ import { fileMentionChip, fileMentionMatches } from "../../utils/fileMentions";
 import { mcpContextLine } from "../../utils/mcpServerChips";
 import { elementsForChips } from "../../utils/messageElements";
 import { AccountLimitNotice } from "./components/AccountLimitNotice";
+import { AgentCliUpdateNotice } from "./components/AgentCliUpdateNotice";
 import { ContextWindowRing } from "./components/ContextWindowRing";
 import { EnvironmentSetupNotice } from "./components/EnvironmentSetupNotice";
 import { FILE_SEARCH_LIMIT } from "./constants";
@@ -136,6 +138,10 @@ export type ComposerProps = {
 	awaitingBackground?: boolean;
 	terminalId?: string;
 	agentLabel?: string;
+	onRunInTerminal?: RunInTerminal;
+	onRestartAgent?: (prompt?: string) => Promise<boolean>;
+	/** The CLI version this chat's agent process was started from. */
+	cliVersion?: string;
 	/** A usage limit holds the chat; its notice sits above the composer. */
 	usageLimited?: boolean;
 };
@@ -200,6 +206,9 @@ export const Composer = memo(function Composer({
 	onOpenFind,
 	onSend,
 	onOpenHistory,
+	onRestartAgent,
+	onRunInTerminal,
+	cliVersion,
 	placeholder,
 	sessionUsage,
 	target,
@@ -647,6 +656,17 @@ export const Composer = memo(function Composer({
 					workspaceId={workspaceId}
 				/>
 			)}
+			<AgentCliUpdateNotice
+				agentLabel={agentLabel}
+				className={CHAT_COLUMN_CLASSNAME}
+				onRestartAgent={onRestartAgent}
+				onRunInTerminal={onRunInTerminal}
+				presetId={presetId}
+				{...(cliVersion ? { runningVersion: cliVersion } : {})}
+				sessionId={sessionId ?? null}
+				turnRunning={turnRunning}
+				workspaceId={workspaceId}
+			/>
 			{!target && (
 				<EnvironmentSetupNotice
 					className={CHAT_COLUMN_CLASSNAME}

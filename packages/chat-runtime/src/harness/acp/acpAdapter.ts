@@ -217,6 +217,11 @@ const CLIENT_APPROVAL_MODES = [
 	{ id: "bypassPermissions", label: "Full access" },
 ];
 
+function errorCode(error: unknown): string | undefined {
+	const code = (error as { code?: unknown } | null)?.code;
+	return typeof code === "string" ? code : undefined;
+}
+
 function sessionMissing(error: unknown): boolean {
 	return (
 		error instanceof AcpRpcError &&
@@ -231,6 +236,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	launch?: () => Promise<
 		Pick<SpawnAcpOptions, "command" | "args" | "env"> & {
 			loginCommand?: string;
+			cliVersion?: string;
 		}
 	>;
 	/** Selected for a new session that asks for no mode, when the agent offers it. */
@@ -969,6 +975,7 @@ export class AcpAdapter implements HarnessAdapter {
 		const launch = await this.options.launch?.();
 		if (this.disposed) return;
 		this.loginCommand = launch?.loginCommand;
+		if (launch?.cliVersion) this.emitSession({ cliVersion: launch.cliVersion });
 		const client = new AcpRpcClient({
 			createTransport: (handlers) => {
 				const transport = (this.options.createTransport ?? spawnAcpTransport)(
@@ -1165,7 +1172,11 @@ export class AcpAdapter implements HarnessAdapter {
 				}
 				return;
 			}
-			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
+			this.emitNotice(
+				"error",
+				this.withStderr(this.authAwareMessage(error)),
+				errorCode(error),
+			);
 			this.dead = true;
 			this.emitSession({ status: "dead" });
 			this.queue.close();
@@ -2826,6 +2837,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private emitNotice(
 		noticeKind: "info" | "error" | "compaction" | "config_change",
 		text?: string,
+		code?: string,
 	): void {
 		this.emitItem(
 			{
@@ -2835,6 +2847,7 @@ export class AcpAdapter implements HarnessAdapter {
 				startedAtMs: this.nextStartMs(),
 				completedAtMs: this.now(),
 				...(text ? { text } : {}),
+				...(code ? { code } : {}),
 			},
 			this.resolveTurnId(),
 		);

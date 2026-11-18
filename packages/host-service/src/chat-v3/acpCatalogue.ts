@@ -12,6 +12,7 @@ export type AcpHarness = {
 	binary: string;
 	args: string[];
 	minVersion: string;
+	/** Only for a CLI with no install-aware update in `agentCliUpdate.ts`. */
 	upgrade?: string;
 	/** The agent's own id for its unrestricted mode; chats start in it. */
 	fullAccessModeId?: string;
@@ -34,7 +35,6 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		// The adapter serves ACP v2 since 0.95, where steering is not yet
 		// supported and turns end differently. Chat is built and tested on v1.
 		adapterEnv: { CLAUDE_AGENT_ACP_PROTOCOL: "v1" },
-		upgrade: "npm i -g @anthropic-ai/claude-code@latest",
 		fullAccessModeId: "bypassPermissions",
 		forkAtMessage: true,
 		note: "2.1.226 verified against adapter 0.85.0: session/new returns the same modes and configOptions as 2.1.286. Adapter 0.107.0 verified with 2.1.226 and 2.1.311: a background subagent ends the turn at its reply, the follow-up arrives as a `turn` async task, and steering is advertised.",
@@ -46,7 +46,6 @@ export const ACP_HARNESSES: Record<string, AcpHarness> = {
 		minVersion: "0.160.0",
 		adapter: "@agentclientprotocol/codex-acp",
 		executableEnv: "CODEX_PATH",
-		upgrade: "npm i -g @openai/codex@latest",
 		fullAccessModeId: "agent-full-access",
 		forkAtMessage: true,
 		note: "Conservative: the adapter drives `codex app-server`, and the release that introduced it is not pinned. The native codex adapter's MIN_CODEX_VERSION is 0.143.0, so this floor is probably lowerable once app-server is verified against an older build.",

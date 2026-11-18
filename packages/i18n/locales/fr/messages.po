@@ -1106,6 +1106,15 @@ msgstr "{label} redevient non configuré. Rien ne change dans vos espaces de tra
 msgid "{label} is set to manual"
 msgstr "{label} est en connexion manuelle"
 
+msgid "{label} needs an update"
+msgstr "{label} doit être mis à jour"
+
+msgid "{label} update available"
+msgstr "Mise à jour de {label} disponible"
+
+msgid "{label} updated"
+msgstr "{label} mis à jour"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4257,6 +4266,9 @@ msgstr "Interface de chat"
 msgid "Chat name"
 msgstr "Nom de la discussion"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Le chat nécessite la version {minVersion} ou ultérieure. La version {installed} est installée."
+
 msgid "Chat session not found"
 msgstr "Session de chat introuvable"
 
@@ -6208,6 +6220,9 @@ msgstr "Impossible de déplacer l’espace de travail"
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossible de nommer « {name} » automatiquement"
+
+msgid "Couldn't open a terminal"
+msgstr "Impossible d'ouvrir un terminal"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Impossible d’ouvrir dans l’interface de chat"
@@ -9118,6 +9133,9 @@ msgstr "Vue par dossiers"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Dossiers à extraire dans les nouveaux worktrees, un par ligne, relatifs à la racine du dépôt. Les fichiers à la racine sont toujours inclus. Vide, tout est extrait."
 
+msgid "Follow along in the terminal below."
+msgstr "Suivez la progression dans le terminal ci-dessous."
+
 msgid "FOLLOW ON X"
 msgstr "SUIVRE SUR X"
 
@@ -10025,6 +10043,9 @@ msgstr "Comment installer {name} dans Paradev"
 
 msgid "How to install Paradev"
 msgstr "Comment installer Paradev"
+
+msgid "How to update"
+msgstr "Comment mettre à jour"
 
 msgid "How we build it, in long form."
 msgstr "Comment nous le construisons, en détail."
@@ -16723,6 +16744,9 @@ msgstr "Redémarrer le démon de terminal ?"
 msgid "Restart terminals"
 msgstr "Redémarrer les terminaux"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Redémarrez le chat pour utiliser la version {installed}."
+
 msgid "Restart workspace"
 msgstr "Redémarrer l'espace de travail"
 
@@ -20003,6 +20027,9 @@ msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Le changement s'applique tout de suite. Vous payez seulement la différence pour le reste de la période."
 
+msgid "The chat resumes after the update."
+msgstr "Le chat reprendra après la mise à jour."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Le chat reste tel quel. Les fichiers modifiés depuis ce tour, par qui que ce soit, ne sont pas touchés et sont listés."
 
@@ -21616,6 +21643,9 @@ msgstr "Mettre à jour"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Mettez à jour {appName} sur cette machine pour joindre des fichiers"
 
+msgid "Update {label}"
+msgstr "Mettre à jour {label}"
+
 msgid "Update available"
 msgstr "Mise à jour disponible"
 
@@ -21708,6 +21738,9 @@ msgstr "Mis à jour à l'instant depuis {0}."
 
 msgid "Updates"
 msgstr "Mises à jour"
+
+msgid "Updating {label}…"
+msgstr "Mise à jour de {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"

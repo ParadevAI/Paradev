@@ -1100,6 +1100,15 @@ msgstr "{label} знову стане неналаштованим. У робо�
 msgid "{label} is set to manual"
 msgstr "Для {label} увімкнено ручний вхід"
 
+msgid "{label} needs an update"
+msgstr "{label} потребує оновлення"
+
+msgid "{label} update available"
+msgstr "Доступне оновлення {label}"
+
+msgid "{label} updated"
+msgstr "{label} оновлено"
+
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
 
@@ -4251,6 +4260,9 @@ msgstr "Інтерфейс чату"
 msgid "Chat name"
 msgstr "Назва чату"
 
+msgid "Chat needs {minVersion} or newer. {installed} is installed."
+msgstr "Для чату потрібна версія {minVersion} або новіша. Встановлено {installed}."
+
 msgid "Chat session not found"
 msgstr "Сеанс чату не знайдено"
 
@@ -6202,6 +6214,9 @@ msgstr "Не вдалося перемістити робочий простір
 
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
+
+msgid "Couldn't open a terminal"
+msgstr "Не вдалося відкрити термінал"
 
 msgid "Couldn't open in Chat Interface"
 msgstr "Не вдалося відкрити в інтерфейсі чату"
@@ -9112,6 +9127,9 @@ msgstr "Перегляд папок"
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Папки, що потрапляють у нові worktree, по одній у рядку, відносно кореня репозиторію. Файли в корені включаються завжди. Якщо поле порожнє, буде включено все."
 
+msgid "Follow along in the terminal below."
+msgstr "Стежте за ходом у терміналі нижче."
+
 msgid "FOLLOW ON X"
 msgstr "СТЕЖТЕ ЗА НАМИ В X"
 
@@ -10019,6 +10037,9 @@ msgstr "Як установити {name} у Paradev"
 
 msgid "How to install Paradev"
 msgstr "Як установити Paradev"
+
+msgid "How to update"
+msgstr "Як оновити"
 
 msgid "How we build it, in long form."
 msgstr "Як ми це будуємо, докладно."
@@ -16717,6 +16738,9 @@ msgstr "Перезапустити демон термінала?"
 msgid "Restart terminals"
 msgstr "Перезапустити термінали"
 
+msgid "Restart the chat to use {installed}."
+msgstr "Перезапустіть чат, щоб використовувати {installed}."
+
 msgid "Restart workspace"
 msgstr "Перезапустити робочий простір"
 
@@ -19997,6 +20021,9 @@ msgstr "Тепер кнопка помітніша. Я перевірив її �
 msgid "The change starts now. You pay only the difference for the rest of this period."
 msgstr "Зміна діє вже зараз. За решту цього періоду ви сплачуєте лише різницю."
 
+msgid "The chat resumes after the update."
+msgstr "Чат продовжиться після оновлення."
+
 msgid "The chat stays as it is. Files edited since this turn, by anyone, are left alone and listed."
 msgstr "Чат залишиться без змін. Файли, які будь-хто змінив після цього ходу, не зачіпаються й показуються в списку."
 
@@ -21610,6 +21637,9 @@ msgstr "Оновити"
 msgid "Update {appName} on this machine to attach files"
 msgstr "Оновіть {appName} на цій машині, щоб прикріплювати файли"
 
+msgid "Update {label}"
+msgstr "Оновити {label}"
+
 msgid "Update available"
 msgstr "Доступне оновлення"
 
@@ -21702,6 +21732,9 @@ msgstr "Щойно оновлено з версії {0}."
 
 msgid "Updates"
 msgstr "Оновлення"
+
+msgid "Updating {label}…"
+msgstr "Оновлення {label}…"
 
 #. placeholder {0}: update.progress.target
 msgid "Updating to {0}"
