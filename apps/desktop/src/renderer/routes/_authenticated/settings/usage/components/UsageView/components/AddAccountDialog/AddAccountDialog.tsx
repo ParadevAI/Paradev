@@ -109,6 +109,7 @@ export function AddAccountDialog({
 	const agent = switchTarget?.agent ?? addAgent;
 	const billingId = useId();
 	const nameId = useId();
+	const nameErrorId = useId();
 	const [name, setName] = useState("work");
 	const [credentialKind, setCredentialKind] =
 		useState<AccountCredentialKind>("subscription");
@@ -376,10 +377,11 @@ export function AddAccountDialog({
 										className="h-9 min-w-0 flex-1 text-sm"
 										placeholder="work"
 										aria-invalid={nameTaken}
+										aria-describedby={nameTaken ? nameErrorId : undefined}
 									/>
 								</div>
 								{nameTaken && (
-									<p className="text-xs text-destructive">
+									<p id={nameErrorId} className="text-xs text-destructive">
 										<Trans>
 											A profile with this name is already signed in. Choose
 											another name.
@@ -424,7 +426,10 @@ export function AddAccountDialog({
 							</div>
 						)}
 
-						{!canRunLocally && !nameTaken && commandDetails}
+						{!canRunLocally &&
+							(switchTarget || loginsQuery.data || loginsQuery.isError) &&
+							!nameTaken &&
+							commandDetails}
 
 						{canRunLocally && open && terminalAttempt > 0 && (
 							<div className="min-w-0 overflow-hidden rounded-lg border">
