@@ -15,6 +15,7 @@ import {
 	type QuotaMeterTone,
 	quotaMeterTone,
 } from "renderer/utils/usage/quotaMeterTone";
+import { isModelScopedWindow } from "../../utils/isModelScopedWindow";
 import type { RailUsageEntry } from "../../utils/selectRailUsage";
 
 // Sized to fit the 36px rail button: two tracks get a larger box, thinner
@@ -47,11 +48,9 @@ export function RailUsageRing({
 	const center = geometry.size / 2;
 	const outerRadius = (geometry.size - geometry.stroke) / 2;
 	const primaryWindows = account.windows.filter(
-		(window) => !window.id.includes(":"),
+		(window) => !isModelScopedWindow(window),
 	);
-	const scopedWindows = account.windows.filter((window) =>
-		window.id.includes(":"),
-	);
+	const scopedWindows = account.windows.filter(isModelScopedWindow);
 	const summary = rings
 		.map((ring) => `${ring.label} ${ring.usedPercent}%`)
 		.join(", ");

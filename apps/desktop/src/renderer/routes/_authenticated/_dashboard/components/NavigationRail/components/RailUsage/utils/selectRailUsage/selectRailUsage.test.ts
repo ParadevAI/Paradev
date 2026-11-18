@@ -44,13 +44,14 @@ describe("selectRailUsage", () => {
 		expect(entries.map((entry) => entry.account.accountKey)).toEqual(["main"]);
 	});
 
-	it("drops model-scoped windows and keeps the two tightest of the rest", () => {
+	it("drops model-scoped windows and keeps the two tightest of the rest in host order", () => {
 		const [claude, agy] = selectRailUsage([
 			account({
 				windows: [
 					quotaWindow("five_hour", 10),
 					quotaWindow("seven_day", 40),
-					quotaWindow("weekly_scoped:sonnet", 99),
+					quotaWindow("seven_day_sonnet", 99),
+					quotaWindow("weekly_scoped:Fable", 99),
 				],
 			}),
 			account({
@@ -68,8 +69,8 @@ describe("selectRailUsage", () => {
 			"seven_day",
 		]);
 		expect(agy?.rings.map((ring) => ring.id)).toEqual([
-			"3p-5h",
 			"gemini-weekly",
+			"3p-5h",
 		]);
 	});
 

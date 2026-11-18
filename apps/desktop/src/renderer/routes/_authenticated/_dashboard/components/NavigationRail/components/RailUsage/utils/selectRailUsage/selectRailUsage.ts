@@ -2,6 +2,7 @@ import type {
 	UsageAccount,
 	UsageQuotaWindow,
 } from "renderer/hooks/host-service/useHostUsageQuota";
+import { isModelScopedWindow } from "../isModelScopedWindow";
 
 const RAIL_AGENT_ORDER: UsageAccount["agent"][] = [
 	"claude",
@@ -19,15 +20,18 @@ export interface RailUsageEntry {
 	rings: UsageQuotaWindow[];
 }
 
-/** Account-wide windows; ids with ":" are model-scoped sublimits. */
 function ringWindows(windows: UsageQuotaWindow[]): UsageQuotaWindow[] {
 	const accountWide = windows.filter(
-		(window) => Number.isFinite(window.usedPercent) && !window.id.includes(":"),
+		(window) =>
+			Number.isFinite(window.usedPercent) && !isModelScopedWindow(window),
 	);
 	if (accountWide.length <= MAX_RINGS_PER_ACCOUNT) return accountWide;
-	return [...accountWide]
-		.sort((a, b) => b.usedPercent - a.usedPercent)
-		.slice(0, MAX_RINGS_PER_ACCOUNT);
+	const tightest = new Set(
+		[...accountWide]
+			.sort((a, b) => b.usedPercent - a.usedPercent)
+			.slice(0, MAX_RINGS_PER_ACCOUNT),
+	);
+	return accountWide.filter((window) => tightest.has(window));
 }
 
 export function selectRailUsage(
