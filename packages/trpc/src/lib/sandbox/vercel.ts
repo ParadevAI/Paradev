@@ -38,6 +38,7 @@ import {
 } from "./credentials";
 import {
 	type DriveHost,
+	DriveStillAttachedError,
 	deleteWorkspaceDrive,
 	goldenDriveNameFor,
 	vercelDrives,
@@ -458,10 +459,9 @@ export class SandboxNotReadyError extends Error {
 
 /** Another caller holds the box's resume lock: retry later, nothing is wrong with the box. */
 export class SandboxBusyError extends SandboxNotReadyError {
-	constructor(key: string) {
-		super(key);
+	constructor(readonly key: string) {
+		super("a sandbox another caller is starting");
 		this.name = "SandboxBusyError";
-		this.message = `Another caller is resuming or creating the box on ${key}`;
 	}
 }
 
@@ -478,14 +478,13 @@ export class SandboxDriveMissingError extends SandboxNotReadyError {
 	) {
 		super(providerSandboxId);
 		this.name = "SandboxDriveMissingError";
-		this.message = `Sandbox ${providerSandboxId} did not come up on its drive ${driveName}: ${reason}`;
 	}
 }
 
 /**
  * The drive refused for good: the same refusal that no remount can change, in
- * several boots in a row. The workspace is marked failed with this message;
- * its drive and box are kept.
+ * several boots in a row. The workspace is marked failed; its drive and box
+ * are kept.
  */
 export class SandboxDriveRefusedError extends SandboxUnavailableError {
 	constructor(
@@ -496,7 +495,6 @@ export class SandboxDriveRefusedError extends SandboxUnavailableError {
 	) {
 		super(providerSandboxId, new Error(reason));
 		this.name = "SandboxDriveRefusedError";
-		this.message = `Sandbox ${providerSandboxId} refused its drive ${driveName} in ${boots} boots in a row: ${reason}`;
 	}
 }
 
@@ -645,7 +643,12 @@ export async function settleSandbox(args: {
 			reason,
 			boots,
 		);
-		Sentry.captureException(refused);
+		console.warn(
+			`[sandbox] ${args.providerSandboxId}: ${reason} in ${boots} boots in a row`,
+		);
+		Sentry.captureException(refused, {
+			extra: { driveName, reason, boots },
+		});
 		return refused;
 	};
 	const bootId = args.bootId;
@@ -1084,6 +1087,11 @@ export async function wakeSandbox(args: {
 	} catch (error) {
 		if (isUnavailable(error))
 			throw new SandboxUnavailableError(args.providerSandboxId, error);
+		// The last session is still flushing: the box is starting, as any caller sees it.
+		if (error instanceof DriveStillAttachedError) {
+			console.warn(`[sandbox] ${args.providerSandboxId}: ${error.message}`);
+			throw new SandboxNotReadyError(args.providerSandboxId);
+		}
 		throw error;
 	}
 }

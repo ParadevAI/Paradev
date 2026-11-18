@@ -239,12 +239,19 @@ Documented by Vercel or the SDK, not measured:
   fork fell back to main's reclone, which empties the checkout. A fresh fork has no user work, and
   the later-boot refetch of an untouched copy covers it, so it retries three times and then keeps
   the golden's checkout. Date/Author: 2026-11-18, coordinator.
-- Decision: a workspace's drive is deleted when its snapshot expires (30 days after last use).
-  Rationale: the box can never resume, and the drive would bill storage for good. Vercel expires
-  the snapshot itself; the control plane learns of it only from the 410 a wake, an agent turn or an
-  automation dispatch gets, so that is where the drive goes, through the retried teardown. A
-  workspace nobody opens again keeps its drive until the drive sweep runs. Date/Author: 2026-11-18,
-  Satya.
+- Decision: a workspace's drive is deleted when its snapshot expires. Rationale: the box can never
+  resume, and the drive would bill storage for good. Retention will be ours: a separate reaper
+  deletes an expired workspace's box, snapshots and drive itself, instead of relying on Vercel's
+  30-day `snapshotExpiration`. It calls `retireAndTearDown`, the one function that retires a row's
+  box and drive names and queues their retried teardown. Until then, and as a fallback after,
+  the 410 a wake, an agent turn or an automation dispatch gets on an expired snapshot takes
+  `markSandboxUnavailable` to the same function. Date/Author: 2026-11-18, Satya.
+- Decision: a customer never reads that the box has a drive. A drive that refused for good fails
+  the workspace with `host_not_ready` ("The workspace did not become ready."), a drive still
+  flushing at a wake answers "still starting", the error messages a client can be handed name no
+  drive, and a promote of a workspace on a drive that fails, or is refused with drives off, says
+  "This workspace could not be saved as an environment. Try again later." The detail stays in the
+  logs and in the errors' fields. Date/Author: 2026-11-18, coordinator.
 - Decision: a checkout with no marker on a drive is fetched only while it is the golden's untouched
   copy (`state/golden-head`), else kept (the model's FixFetchIfUntouched). Rationale: removing
   `state/fresh` after the first attempt keeps a failed first checkout from being refetched over the
@@ -533,6 +540,9 @@ never shown as their work.
   unless `drive_sweep_delete` is set, so a drive whose teardown gave up stays until someone runs it
   (the model's NoOrphanForever holds only if it is run). Once it has run dry in production a few
   times and listed nothing it should not, run it on a schedule without the dry run.
+- Our own retention (a separate PR): delete an expired workspace's box, snapshots and drive
+  through `retireAndTearDown`. Until it ships, a drive goes only when someone opens its workspace
+  after Vercel expired the snapshot.
 
 
 ## Follow-ups (out of scope)

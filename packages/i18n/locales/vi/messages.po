@@ -20981,6 +20981,9 @@ msgstr "Thao tác này sẽ bỏ stage và hoàn nguyên toàn bộ thay đổi 
 msgid "This workspace"
 msgstr "Workspace này"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Không thể lưu không gian làm việc này thành môi trường. Hãy thử lại sau."
+
 msgid "This workspace has no project to branch from"
 msgstr "Workspace này không có dự án để tạo nhánh"
 
@@ -22756,9 +22759,6 @@ msgstr "Đã tạo workspace"
 
 msgid "Workspace details"
 msgstr "Chi tiết workspace"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Ổ đĩa workspace đã bị tắt cho tổ chức này, nên một workspace có tệp nằm trên ổ đĩa không thể trở thành môi trường."
 
 msgid "Workspace ID copied"
 msgstr "Đã sao chép ID workspace"

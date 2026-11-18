@@ -20981,6 +20981,9 @@ msgstr "ステージ済みの変更をすべてステージ解除して元に戻
 msgid "This workspace"
 msgstr "このワークスペース"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "このワークスペースを環境として保存できませんでした。しばらくしてからもう一度お試しください。"
+
 msgid "This workspace has no project to branch from"
 msgstr "このワークスペースには分岐元のプロジェクトがありません"
 
@@ -22756,9 +22759,6 @@ msgstr "ワークスペースを作成しました"
 
 msgid "Workspace details"
 msgstr "ワークスペースの詳細"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "この組織ではワークスペースのドライブが無効になっているため、ファイルがドライブ上にあるワークスペースは環境にできません。"
 
 msgid "Workspace ID copied"
 msgstr "ワークスペースIDをコピーしました"

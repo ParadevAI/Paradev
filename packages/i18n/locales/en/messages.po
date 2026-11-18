@@ -20981,6 +20981,9 @@ msgstr "This will unstage and revert all staged changes. Staged new files will b
 msgid "This workspace"
 msgstr "This workspace"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "This workspace could not be saved as an environment. Try again later."
+
 msgid "This workspace has no project to branch from"
 msgstr "This workspace has no project to branch from"
 
@@ -22756,9 +22759,6 @@ msgstr "Workspace created"
 
 msgid "Workspace details"
 msgstr "Workspace details"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
 
 msgid "Workspace ID copied"
 msgstr "Workspace ID copied"

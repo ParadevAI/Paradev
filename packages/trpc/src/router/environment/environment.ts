@@ -12,6 +12,7 @@ import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -538,8 +539,8 @@ export const environmentRouter = {
 				throw userError({
 					code: "PRECONDITION_FAILED",
 					message:
-						"Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment.",
-					i18nKey: "serverError.environment.drivesOff",
+						"This workspace could not be saved as an environment. Try again later.",
+					i18nKey: "serverError.environment.couldNotPromote",
 				});
 			}
 			const golden = await promoteSandboxToEnvironment({
@@ -552,7 +553,18 @@ export const environmentRouter = {
 					goldenName,
 					workspace.driveName ? goldenDriveNameFor(goldenName) : null,
 				);
-				throw error;
+				if (!workspace.driveName || error instanceof TRPCError) throw error;
+				// What went wrong names the drive; the user sees the failure any promote can have.
+				console.error(
+					`[environment/promote] ${workspace.id} could not be promoted`,
+					error,
+				);
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"This workspace could not be saved as an environment. Try again later.",
+					i18nKey: "serverError.environment.couldNotPromote",
+				});
 			});
 			const { stopped } = golden;
 			const restart = async () => {

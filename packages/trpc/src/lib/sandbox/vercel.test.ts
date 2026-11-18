@@ -1145,7 +1145,8 @@ describe("settleSandbox with a drive", () => {
 		}).catch((caught: unknown) => caught);
 		expect(error).toBeInstanceOf(SandboxDriveRefusedError);
 		expect(error).toBeInstanceOf(SandboxUnavailableError);
-		expect(String(error)).toContain(`in ${DRIVE_REFUSAL_LIMIT} boots in a row`);
+		expect(error).toMatchObject({ boots: DRIVE_REFUSAL_LIMIT });
+		expect(String(error)).not.toContain("drive");
 	});
 
 	test("a boot that answers without laying the drive out fails the settle", async () => {
