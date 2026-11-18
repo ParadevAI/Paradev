@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { resolveAgentLaunchPresetId } from "@superset/shared/agent-models";
+import { isMissingProcedureError } from "@superset/shared/missing-procedure-error";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -95,13 +96,17 @@ export function usePullRequestAgentHandoff(
 				throw new Error(t({ message: "The linked workspace changed" }));
 			}
 			if (linkedWorkspaceId && reuse && !choice?.configId) {
-				const result = await getHostServiceClientByUrl(
-					target.hostUrl,
-				).terminalAgents.handOffPrompt.mutate({
-					workspaceId: linkedWorkspaceId,
-					prompt,
-					selected: choice?.selected,
-				});
+				const result = await getHostServiceClientByUrl(target.hostUrl)
+					.terminalAgents.handOffPrompt.mutate({
+						workspaceId: linkedWorkspaceId,
+						prompt,
+						selected: choice?.selected,
+					})
+					.catch((error: unknown) => {
+						if (choice?.selected || !isMissingProcedureError(error))
+							throw error;
+						return { kind: "empty" as const };
+					});
 				if (result.kind === "choose") {
 					return {
 						opened: "choose" as const,
