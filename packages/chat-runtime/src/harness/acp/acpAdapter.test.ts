@@ -5985,18 +5985,23 @@ describe("AcpAdapter config options", () => {
 		{ optionId: "plan", name: "No, keep planning", kind: "reject_once" },
 	];
 
+	const PLAN_MODEL_OPTION = {
+		...MODEL_OPTION,
+		options: [
+			{ value: "default", name: "Default (recommended)" },
+			...MODEL_OPTION.options,
+		],
+	};
+
 	const approvePlan = async (
 		decision: Decision,
-		reported: { model: string; effort: string },
+		picked: ChatSelections = { modelId: "sonnet", effortId: "low" },
 	) => {
 		const agent = new FakeAcpAgent();
 		agent.protocolVersion = 1;
-		agent.newSessionConfigOptions = [MODEL_OPTION, EFFORT_OPTION];
+		agent.newSessionConfigOptions = [PLAN_MODEL_OPTION, EFFORT_OPTION];
 		agent.holdPrompts = true;
-		const { adapter, events } = startAdapter(agent, undefined, {
-			modelId: "sonnet",
-			effortId: "low",
-		});
+		const { adapter, events } = startAdapter(agent, undefined, picked);
 		await flush();
 		adapter.prompt([{ type: "text", text: "plan it" }]);
 		await flush();
@@ -6013,27 +6018,33 @@ describe("AcpAdapter config options", () => {
 		);
 		const before = agent.sent.length;
 		adapter.respondToApproval(approval?.id ?? "", decision);
-		agent.notify("sess-1", {
-			sessionUpdate: "config_option_update",
-			configOptions: [
-				{ ...MODEL_OPTION, currentValue: reported.model },
-				{ ...EFFORT_OPTION, currentValue: reported.effort },
-			],
-		});
-		await flush();
+		const report = async (model: string, effort: string) => {
+			agent.notify("sess-1", {
+				sessionUpdate: "config_option_update",
+				configOptions: [
+					{ ...PLAN_MODEL_OPTION, currentValue: model },
+					{ ...EFFORT_OPTION, currentValue: effort },
+				],
+			});
+			await flush();
+		};
 		const configured = () =>
 			agent.sent
 				.slice(before)
 				.filter((f) => f.method === "session/set_config_option")
 				.map((f) => f.params);
-		return { adapter, agent, configured };
+		return { adapter, agent, configured, report };
 	};
 
-	it("puts the model and effort back after a plan approval clears the context", async () => {
-		const { adapter, configured } = await approvePlan(
-			{ type: "option", optionId: "exit-plan-clear-auto" },
-			{ model: "opus", effort: "high" },
-		);
+	it.each([
+		["Default", "default"],
+		["the settings model", "opus"],
+	])("puts the model and effort back when the cleared context reports %s", async (_, reported) => {
+		const { adapter, configured, report } = await approvePlan({
+			type: "option",
+			optionId: "exit-plan-clear-auto",
+		});
+		await report(reported, "high");
 		expect(configured()).toEqual([
 			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
 			{ sessionId: "sess-1", configId: "effort", value: "low" },
@@ -6042,10 +6053,10 @@ describe("AcpAdapter config options", () => {
 	});
 
 	it("treats a plain accept of a plan as the clear-context option it selects", async () => {
-		const { adapter, configured } = await approvePlan(
-			{ type: "accept" },
-			{ model: "opus", effort: "high" },
-		);
+		const { adapter, configured, report } = await approvePlan({
+			type: "accept",
+		});
+		await report("default", "high");
 		expect(configured()).toEqual([
 			{ sessionId: "sess-1", configId: "model", value: "sonnet" },
 			{ sessionId: "sess-1", configId: "effort", value: "low" },
@@ -6054,28 +6065,41 @@ describe("AcpAdapter config options", () => {
 	});
 
 	it("leaves the model alone when a plan approval keeps the context", async () => {
-		const { adapter, configured } = await approvePlan(
-			{ type: "option", optionId: "exit-plan-auto" },
-			{ model: "opus", effort: "high" },
-		);
+		const { adapter, configured, report } = await approvePlan({
+			type: "option",
+			optionId: "exit-plan-auto",
+		});
+		await report("default", "high");
 		expect(configured()).toEqual([]);
 		await adapter.dispose();
 	});
 
-	it("keeps a model the user picks after the context reset", async () => {
-		const { adapter, agent, configured } = await approvePlan(
-			{ type: "option", optionId: "exit-plan-clear-auto" },
-			{ model: "sonnet", effort: "low" },
-		);
-		adapter.setConfigOption("model", "opus");
-		agent.notify("sess-1", {
-			sessionUpdate: "config_option_update",
-			configOptions: [MODEL_OPTION, EFFORT_OPTION],
+	it("puts back the model the user picks while the context resets", async () => {
+		const { adapter, configured, report } = await approvePlan({
+			type: "option",
+			optionId: "exit-plan-clear-auto",
 		});
+		adapter.setConfigOption("model", "opus");
 		await flush();
+		await report("default", "low");
 		expect(configured()).toEqual([
 			{ sessionId: "sess-1", configId: "model", value: "opus" },
+			{ sessionId: "sess-1", configId: "model", value: "opus" },
 		]);
+		await adapter.dispose();
+	});
+
+	it.each([
+		["Default", "default"],
+		["a model the reset reports truly", "sonnet"],
+	])("does not undo a later model fallback after a reset that kept %s", async (_, modelId) => {
+		const { adapter, configured, report } = await approvePlan(
+			{ type: "option", optionId: "exit-plan-clear-auto" },
+			{ modelId, effortId: "low" },
+		);
+		await report(modelId, "low");
+		await report("opus", "low");
+		expect(configured()).toEqual([]);
 		await adapter.dispose();
 	});
 
@@ -6083,19 +6107,15 @@ describe("AcpAdapter config options", () => {
 		["finishes", (agent: FakeAcpAgent) => agent.releasePrompts("end_turn")],
 		["fails", (agent: FakeAcpAgent) => agent.failHeldPrompts(-32603, "boom")],
 	])("does not carry the saved picks past a turn that %s", async (_, end) => {
-		const { adapter, agent, configured } = await approvePlan(
-			{ type: "option", optionId: "exit-plan-clear-auto" },
-			{ model: "sonnet", effort: "low" },
-		);
+		const { adapter, agent, configured, report } = await approvePlan({
+			type: "option",
+			optionId: "exit-plan-clear-auto",
+		});
 		end(agent);
 		await flush();
 		adapter.prompt([{ type: "text", text: "next" }]);
 		await flush();
-		agent.notify("sess-1", {
-			sessionUpdate: "config_option_update",
-			configOptions: [MODEL_OPTION, EFFORT_OPTION],
-		});
-		await flush();
+		await report("default", "high");
 		expect(configured()).toEqual([]);
 		await adapter.dispose();
 	});

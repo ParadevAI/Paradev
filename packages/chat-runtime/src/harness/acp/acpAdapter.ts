@@ -203,7 +203,7 @@ export type AcpImageStoreContext = {
 
 const STARTUP_TIMEOUT_MS = 120_000;
 const START_OPTIONS_GRACE_MS = 1_000;
-// claude-agent-acp reports model "default" for the fresh context these plan approvals start, whatever it runs.
+// claude-agent-acp reports the default or settings model for the fresh context these plan approvals start, whatever it runs.
 const CONTEXT_RESET_OPTION = /^exit-plan-clear-/;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
@@ -714,8 +714,10 @@ export class AcpAdapter implements HarnessAdapter {
 		const previous = this.configOptions;
 		const changed = previous.find((option) => option.id === configId);
 		const category = changed && selectionCategoryOf(changed);
-		if (category === "model" || category === "thought_level")
-			this.picksBeforeContextReset = null;
+		if (this.picksBeforeContextReset && category === "model")
+			this.picksBeforeContextReset.modelId = value;
+		if (this.picksBeforeContextReset && category === "thought_level")
+			this.picksBeforeContextReset.effortId = value;
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -2018,11 +2020,10 @@ export class AcpAdapter implements HarnessAdapter {
 	private restorePicksAfterContextReset(): void {
 		const picks = this.picksBeforeContextReset;
 		if (!picks) return;
-		const now = this.modelAndEffort();
-		if (now.modelId === picks.modelId && now.effortId === picks.effortId)
-			return;
 		this.picksBeforeContextReset = null;
-		void this.applyConfigSelections(picks);
+		const now = this.modelAndEffort();
+		if (now.modelId !== picks.modelId || now.effortId !== picks.effortId)
+			void this.applyConfigSelections(picks);
 	}
 
 	private startModeId(
