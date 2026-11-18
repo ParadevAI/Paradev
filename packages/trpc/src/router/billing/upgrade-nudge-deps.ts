@@ -1,4 +1,7 @@
+import { db } from "@superset/db/client";
+import { members } from "@superset/db/schema";
 import { Redis } from "@upstash/redis";
+import { and, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { env } from "../../env";
 import { posthog } from "../../lib/analytics";
@@ -31,6 +34,17 @@ export const upgradeNudgeDeps: UpgradeNudgeDeps = {
 			event: "upgrade_intent_recorded",
 			properties: { feature, outcome, organizationId },
 		});
+	},
+
+	async isOrganizationOwner(userId, organizationId) {
+		const member = await db.query.members.findFirst({
+			where: and(
+				eq(members.userId, userId),
+				eq(members.organizationId, organizationId),
+			),
+			columns: { role: true },
+		});
+		return member?.role === "owner";
 	},
 
 	async isOrganizationPaid(organizationId) {
