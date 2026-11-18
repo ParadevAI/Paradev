@@ -29,7 +29,6 @@ const ROW = {
 let running = false;
 let boxVcpus = 8;
 let restartedWith: string[] = [];
-let woken: string[] = [];
 
 const ENVIRONMENT_ID = "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b";
 let inserted: unknown[] = [];
@@ -129,8 +128,8 @@ stub(sandbox, {
 	workspaceBranchName: () => "paradev/ws-1",
 });
 stub(wake, {
-	wakeCloudWorkspace: async (row: { id: string }) => {
-		woken.push(row.id);
+	wakeCloudWorkspace: async () => {
+		if (!running) return null;
 		return {
 			hostTarget: "https://box-1.example",
 			agentCredentialsChanged: false,
@@ -168,7 +167,6 @@ beforeEach(() => {
 	running = false;
 	boxVcpus = 8;
 	restartedWith = [];
-	woken = [];
 	recordedAsleep = [];
 	inserted = [];
 	queuedJobs = [];
@@ -267,13 +265,11 @@ describe("cloudWorkspace.applySignIns", () => {
 		expect(
 			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
 		).toEqual({ applied: false });
-		expect(woken).toEqual([]);
 
 		running = true;
 		expect(
 			await caller.cloudWorkspace.applySignIns({ id: WORKSPACE_ID }),
 		).toEqual({ applied: true });
-		expect(woken).toEqual([WORKSPACE_ID]);
 	});
 });
 

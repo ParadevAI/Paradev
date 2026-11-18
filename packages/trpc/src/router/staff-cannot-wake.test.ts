@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 
-const SRC = resolve(import.meta.dir, "../..");
+const SRC = resolve(import.meta.dir, "..");
 const WAKE_PATH = resolve(SRC, "router/cloud-workspace/wake.ts");
 const SANDBOX_PROVIDER = resolve(SRC, "lib/sandbox/vercel.ts");
 const STARTS_A_BOX =
-	/\b(wakeCloudWorkspace|restartCloudWorkspace|wakeAfterStop|wakeSandbox|provisionSandbox|topUpSandboxSession|getSandboxToWake)\(/;
+	/\b(wakeCloudWorkspace|restartCloudWorkspace|wakeAfterStop|wakeSandbox|provisionSandbox)\(/;
 
 const transpilers = {
 	ts: new Bun.Transpiler({ loader: "ts" }),

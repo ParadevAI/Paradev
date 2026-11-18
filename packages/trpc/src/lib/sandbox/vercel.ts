@@ -547,6 +547,8 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
+	/** A stopped box is left stopped, and the wake answers null. */
+	onlyIfRunning?: boolean;
 	/**
 	 * Runs once the box is known to be stopped, before anything resumes it; or,
 	 * for a box read running that a call here resumed (`resumedSession`), once
@@ -566,7 +568,7 @@ export async function wakeSandbox(args: {
 	answer: HostAnswer;
 	expiresAt: Date | null;
 	sessionId: string | null;
-}> {
+} | null> {
 	try {
 		let wasRunning = false;
 		let resumed = null as { vcpus: number; sessionId: string | null } | null;
@@ -581,6 +583,7 @@ export async function wakeSandbox(args: {
 		if (!sandbox) throw new SandboxUnavailableError(args.providerSandboxId);
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
 		wasRunning = sandbox.status === "running";
+		if (args.onlyIfRunning && !wasRunning) return null;
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
 			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
@@ -785,11 +788,13 @@ async function snapshotNow(source: NonResumingSandbox): Promise<string> {
 		} catch (error) {
 			if (!isSessionStopped(error)) throw error;
 		}
+	} else if (source.status === "stopped") {
+		if (source.currentSnapshotId) return source.currentSnapshotId;
+		throw new SandboxUnavailableError(source.name);
+	} else if (source.status !== "stopping" && source.status !== "snapshotting") {
+		throw new SandboxUnavailableError(source.name);
 	}
-	return waitForStopSnapshot(
-		source.name,
-		source.status === "stopped" ? undefined : source.currentSnapshotId,
-	);
+	return waitForStopSnapshot(source.name, source.currentSnapshotId);
 }
 
 /**

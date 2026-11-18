@@ -43,8 +43,16 @@ export interface WokenCloudWorkspace {
 /** Resumes or extends the sandbox and records its current address. */
 export async function wakeCloudWorkspace(
 	row: CloudWorkspaceRow,
+): Promise<WokenCloudWorkspace>;
+/** Hands the current sign-ins to a running box; null when the box is stopped. */
+export async function wakeCloudWorkspace(
+	row: CloudWorkspaceRow,
+	options: { adoptSignIns: true },
+): Promise<WokenCloudWorkspace | null>;
+export async function wakeCloudWorkspace(
+	row: CloudWorkspaceRow,
 	options: { adoptSignIns?: boolean } = {},
-): Promise<WokenCloudWorkspace> {
+): Promise<WokenCloudWorkspace | null> {
 	try {
 		return await Sentry.startSpan(
 			{
@@ -54,7 +62,9 @@ export async function wakeCloudWorkspace(
 				attributes: { "cloud_workspace.id": row.id },
 			},
 			async (span) => {
-				const { booted, rebooted, ...woken } = await wake(row, options, span);
+				const result = await wake(row, options, span);
+				if (!result) return null;
+				const { booted, rebooted, ...woken } = result;
 				span.setAttributes({
 					"cloud_workspace.resumed": booted,
 					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
@@ -68,14 +78,17 @@ export async function wakeCloudWorkspace(
 }
 
 /**
- * `adoptSignIns` marks the box's sign-ins current without a boot: the caller
- * restarts the one agent that needs them, and the others keep theirs.
+ * `adoptSignIns` marks a running box's sign-ins current without a boot: the
+ * caller restarts the one agent that needs them, and the others keep theirs.
+ * A stopped box is left for its next wake, which hands them over anyway.
  */
 async function wake(
 	row: CloudWorkspaceRow,
 	{ adoptSignIns = false }: { adoptSignIns?: boolean },
 	span: Sentry.Span,
-): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
+): Promise<
+	(WokenCloudWorkspace & { booted: boolean; rebooted: boolean }) | null
+> {
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
 		() => buildSandboxClaim({ row }),
@@ -87,65 +100,67 @@ async function wake(
 	let bootId: string | null = null;
 	let resumed: { sessionId: string | null; expiresAt: Date | null } | undefined;
 	const wakeStartedAt = Date.now();
-	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
-		await wakeSandbox({
-			providerSandboxId: row.providerSandboxId,
-			claim,
-			beforeResume: async ({ resumedSession, ...box }) => {
-				resumed = resumedSession;
-				({ bootId } = await Sentry.startSpan(
-					{ name: "authorize boot", op: "billing" },
-					() =>
-						authorizeBoot({
-							organizationId: row.organizationId,
-							cloudWorkspaceId: row.id,
-							createdByUserId: row.createdByUserId,
-							...box,
-						}),
-				));
-				if (bootId) {
-					scope.bootId = bootId;
-					span.setAttribute("boot.id", bootId);
-				}
-			},
-		}).catch(async (error) => {
-			if (!isCloudUsageRefusal(error)) {
-				logControl(
-					"wake.failed",
-					scope,
-					{ ms: Date.now() - wakeStartedAt },
-					"error",
-				);
-			}
+	const woken = await wakeSandbox({
+		providerSandboxId: row.providerSandboxId,
+		claim,
+		onlyIfRunning: adoptSignIns,
+		beforeResume: async ({ resumedSession, ...box }) => {
+			resumed = resumedSession;
+			({ bootId } = await Sentry.startSpan(
+				{ name: "authorize boot", op: "billing" },
+				() =>
+					authorizeBoot({
+						organizationId: row.organizationId,
+						cloudWorkspaceId: row.id,
+						createdByUserId: row.createdByUserId,
+						...box,
+					}),
+			));
 			if (bootId) {
-				await attachBootSession({
-					bootId,
-					providerSandboxId: row.providerSandboxId,
-				}).catch(() => {});
+				scope.bootId = bootId;
+				span.setAttribute("boot.id", bootId);
 			}
-			// A call here resumed the box, and no boot meters that session.
-			if (resumed && isCloudUsageRefusal(error)) {
-				console.error(
-					`[cloud-workspace] ${row.id} was resumed past its limit; stopping it`,
-				);
-				try {
-					if (resumed.expiresAt) {
-						await recordSandboxAwake(row.id, {
-							expiresAt: resumed.expiresAt,
-							sessionId: resumed.sessionId,
-						});
-					}
-					const stopped = await stopSandbox(row.providerSandboxId);
-					await recordSandboxAsleep(row.id, {
-						sessionId: stopped.sessionId ?? resumed.sessionId,
+		},
+	}).catch(async (error) => {
+		if (!isCloudUsageRefusal(error)) {
+			logControl(
+				"wake.failed",
+				scope,
+				{ ms: Date.now() - wakeStartedAt },
+				"error",
+			);
+		}
+		if (bootId) {
+			await attachBootSession({
+				bootId,
+				providerSandboxId: row.providerSandboxId,
+			}).catch(() => {});
+		}
+		// A call here resumed the box, and no boot meters that session.
+		if (resumed && isCloudUsageRefusal(error)) {
+			console.error(
+				`[cloud-workspace] ${row.id} was resumed past its limit; stopping it`,
+			);
+			try {
+				if (resumed.expiresAt) {
+					await recordSandboxAwake(row.id, {
+						expiresAt: resumed.expiresAt,
+						sessionId: resumed.sessionId,
 					});
-					logControl("meter.cap_stopped", scope, { source: "wake" }, "warn");
-				} catch (stopError) {
-					Sentry.captureException(stopError, { tags: controlTags(scope) });
 				}
+				const stopped = await stopSandbox(row.providerSandboxId);
+				await recordSandboxAsleep(row.id, {
+					sessionId: stopped.sessionId ?? resumed.sessionId,
+				});
+				logControl("meter.cap_stopped", scope, { source: "wake" }, "warn");
+			} catch (stopError) {
+				Sentry.captureException(stopError, { tags: controlTags(scope) });
 			}
-			throw error;
-		});
+		}
+		throw error;
+	});
+	if (!woken) return null;
+	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } = woken;
 	if (bootId) {
 		await attachBootSession({
 			bootId,

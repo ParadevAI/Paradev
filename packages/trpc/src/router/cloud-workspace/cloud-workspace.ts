@@ -664,12 +664,8 @@ export const cloudWorkspaceRouter = {
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadReadyWorkspace(ctx, input.id);
-			// A stopped box takes the current sign-ins when it next wakes.
-			if (!(await describeSandbox(row.providerSandboxId)).running) {
-				return { applied: false };
-			}
-			await wakeCloudWorkspace(row, { adoptSignIns: true });
-			return { applied: true };
+			const woken = await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: woken !== null };
 		}),
 
 	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */

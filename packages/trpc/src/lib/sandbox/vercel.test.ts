@@ -18,6 +18,7 @@ import {
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
 	type SandboxClaim,
+	SandboxUnavailableError,
 	SESSION_TIMEOUT_MS,
 	sandboxExists,
 	stopSandbox,
@@ -328,6 +329,15 @@ describe("promoteSandboxToEnvironment", () => {
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 
+	test("a stopped source with no snapshot to build from fails at once", async () => {
+		fake = fakeBox("stopped");
+		fake.box.snapshotId = undefined;
+		sourceSnapshot = undefined;
+		await expect(promote()).rejects.toBeInstanceOf(SandboxUnavailableError);
+		expect(sourceSnapshot).toBeUndefined();
+		expect(fake.box.resumes).toEqual([]);
+	});
+
 	test("a source that stops before its snapshot is built from that stop's snapshot", async () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		await promote();
@@ -340,6 +350,7 @@ describe("wakeSandbox", () => {
 	type Box = { memoryMb: number; vcpus: number };
 	let running: boolean;
 	let onResume: (sandbox: unknown) => Promise<void>;
+	const calls: string[] = [];
 	const box = {
 		get status() {
 			return running ? "running" : "stopped";
@@ -348,13 +359,19 @@ describe("wakeSandbox", () => {
 		vcpus: 4,
 		domain: () => "https://box.test",
 		currentSession: () => ({ vcpus: 8, sessionId: "sess_new" }),
-		update: async () => {},
-		writeFiles: async () => {},
+		update: async () => {
+			calls.push("update");
+		},
+		writeFiles: async () => {
+			calls.push("writeFiles");
+		},
 		// The SDK's withResume: a call on a stopped session resumes it, then retries.
 		extendTimeout: async () => {
+			calls.push("extendTimeout");
 			await onResume(box);
 		},
 		runCommand: async () => {
+			calls.push("runCommand");
 			await onResume(box);
 			throw new Error("stop before settle");
 		},
@@ -405,6 +422,21 @@ describe("wakeSandbox", () => {
 	test("a box read stopped runs beforeResume once, before its own resume", async () => {
 		running = false;
 		expect(await wake()).toEqual([{ memoryMb: 8192, vcpus: 4 }]);
+	});
+
+	test("a wake only for a running box leaves a box that stopped since the caller looked", async () => {
+		running = false;
+		calls.length = 0;
+		const woken = await wakeSandbox({
+			providerSandboxId: "ws-box",
+			claim: { vcpus: 4, identity, networkPolicy: {} } as never,
+			onlyIfRunning: true,
+			beforeResume: async () => {
+				calls.push("beforeResume");
+			},
+		});
+		expect(woken).toBeNull();
+		expect(calls).toEqual([]);
 	});
 });
 
