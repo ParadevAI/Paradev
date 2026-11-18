@@ -250,3 +250,17 @@ Until that deployment, the enabled Resend automation receives no events from thi
 code. Stop the automation in Resend to disable campaign sending. Never test by
 emitting an event for a customer; local eligibility and deduplication tests live
 beside the job route.
+
+## Mobile upgrade nudge
+
+`billing.recordUpgradeIntent` emits `billing.upgrade_nudge_due` (payload
+`featureName`, `upgradeUrl`) at most once per user per 7 days, through a KV
+claim. It skips organizations on a paid plan and unsubscribed contacts. The
+`upgrade-nudge` automation in `scripts/sync-automations.ts` sends the
+`billing-upgrade-nudge` template. That path gives the email Resend's unsubscribe
+link and `List-Unsubscribe` headers, which a direct `emails.send()` does not get.
+
+To change the email, edit `src/emails/billing/upgrade-nudge.tsx`, then run
+`bun scripts/publish-upgrade-nudge-template.ts --apply` before
+`bun scripts/sync-automations.ts --apply`. The sync fails until the template
+alias exists. Stop the automation in Resend to stop these emails.

@@ -34,7 +34,7 @@ export async function reportSandboxAgentStatus(args: {
 		.where(
 			and(
 				eq(cloudWorkspaces.id, args.workspaceId),
-				ne(cloudWorkspaces.status, "deleted"),
+				ne(cloudWorkspaces.status, "archived"),
 			),
 		)
 		.returning({

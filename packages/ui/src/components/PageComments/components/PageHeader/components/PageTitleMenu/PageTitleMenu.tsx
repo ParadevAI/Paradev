@@ -1,8 +1,10 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
+import { errorMessage } from "@superset/i18n/errors";
 import {
 	ChevronDown,
+	Copy,
 	FileText,
 	History,
 	Pencil,
@@ -10,7 +12,8 @@ import {
 	Share2,
 	Trash2,
 } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
+import { useNow } from "../../../../../../hooks/use-now";
 import { cn } from "../../../../../../lib/utils";
 import { Button } from "../../../../../ui/button";
 import {
@@ -24,6 +27,7 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "../../../../../ui/dropdown-menu";
+import { toast } from "../../../../../ui/sonner";
 import { useFramePointerDown } from "../../../../hooks/useFramePointerDown";
 import { relativeTime } from "../../../../utils/relativeTime";
 import type { PageHeaderPage, PageHeaderVersion } from "../../types";
@@ -38,6 +42,7 @@ interface PageTitleMenuProps {
 	onOpenChange: (open: boolean) => void;
 	onShare: () => void;
 	onDelete: () => void;
+	onDuplicate: (title: string) => Promise<void>;
 	onRename: () => void;
 	onRefresh: () => void;
 	onPreviewVersion: (version: number) => void;
@@ -53,16 +58,18 @@ export function PageTitleMenu({
 	onOpenChange,
 	onShare,
 	onDelete,
+	onDuplicate,
 	onRename,
 	onRefresh,
 	onPreviewVersion,
 	compact = false,
 }: PageTitleMenuProps) {
+	const now = useNow(60_000);
 	const { t } = useLingui();
 	useFramePointerDown(useCallback(() => onOpenChange(false), [onOpenChange]));
 
 	const served = page.servedVersion;
-	const updatedAgo = relativeTime(page.updatedAt);
+	const updatedAgo = relativeTime(page.updatedAt, now);
 	const itemClass = compact ? "text-xs" : undefined;
 	const iconClass = compact ? "size-3.5" : undefined;
 
@@ -70,6 +77,22 @@ export function PageTitleMenu({
 		event.preventDefault();
 		onOpenChange(false);
 		action();
+	};
+
+	const duplicating = useRef(false);
+	const duplicate = async () => {
+		if (duplicating.current) return;
+		duplicating.current = true;
+		const title = page.title;
+		try {
+			await onDuplicate(t({ message: `${title} (copy)` }).slice(0, 200));
+		} catch (error) {
+			toast.error(
+				errorMessage(error, t({ message: "Could not duplicate this page" })),
+			);
+		} finally {
+			duplicating.current = false;
+		}
 	};
 
 	return (
@@ -123,6 +146,14 @@ export function PageTitleMenu({
 				<DropdownMenuItem className={itemClass} onSelect={run(onShare)}>
 					<Share2 className={iconClass} />
 					<Trans>Share</Trans>
+				</DropdownMenuItem>
+
+				<DropdownMenuItem
+					className={itemClass}
+					onSelect={run(() => void duplicate())}
+				>
+					<Copy className={iconClass} />
+					<Trans>Duplicate</Trans>
 				</DropdownMenuItem>
 
 				<DropdownMenuSub>

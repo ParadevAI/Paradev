@@ -206,6 +206,11 @@ export const deletePageSchema = z.object({
 	onlyIfEmpty: z.boolean().optional(),
 });
 
+export const duplicatePageSchema = z.object({
+	id: pageFields.id,
+	title: pageFields.title.optional(),
+});
+
 export const reportPageSchema = z.object({
 	slug: pageFields.slug,
 	reason: z.enum(pageReportReasonValues),
@@ -241,7 +246,10 @@ export const setPageWatchSchema = z.object({
 
 export const clearPageWatchSchema = z.object({ id: pageFields.id });
 
-export const publicPageSchema = z.object({ slug: pageFields.slug });
+export const publicPageSchema = z.object({
+	slug: pageFields.slug,
+	download: z.boolean().optional(),
+});
 
 export const pagePreviewSchema = z.object({ slug: pageFields.slug });
 

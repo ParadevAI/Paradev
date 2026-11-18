@@ -528,31 +528,6 @@ diagnostic and changes no codegen: the package uses no Swift-6-only syntax.
 **Guard:** `apps/mobile/expo-observe-swift-version-patch.test.ts`. Check
 whether upstream relaxed the podspec before re-applying after an SDK bump.
 
-## react-native-enriched-markdown (`react-native-enriched-markdown@<version>.patch`)
-
-**Why:** an agent message with a code block inside a numbered list item drew
-the item's number ("3.") on every line of the code, laid the code box over the
-item's own text, and drew more empty "3." lines after it. `ListItemRenderer`
-styles the item in ranges and only skips a range that *starts* in a code
-block. A range that starts in the item's text and runs on into the code block
-gets the list paragraph style and marker attributes for the whole block. Then
-`ListMarkerDrawer` draws a marker at the start of every paragraph that has
-them, and each code line is a paragraph.
-
-**What it changes:** `ios/renderer/ListItemRenderer.m` enumerates code blocks
-inside each range and styles only the parts outside them. It also marks every
-paragraph after the item's first one with `ListContinuationAttribute`.
-`ios/utils/ListMarkerDrawer.m` draws no marker on a paragraph with that mark.
-
-**Guard test:** `apps/mobile/react-native-enriched-markdown-list-patch.test.ts`.
-
-**Regenerating after a version bump:** apply the same two changes to the new
-version's files, write the diff to
-`patches/react-native-enriched-markdown@<version>.patch` (paths relative to the
-package root), update the key in `patchedDependencies`, run `bun install`, then
-`bun test apps/mobile/react-native-enriched-markdown-list-patch.test.ts`. It is
-a native change: rebuild the app to see it.
-
 ## @better-auth/oauth-provider (`@better-auth%2Foauth-provider@<version>.patch`)
 
 **Why:** the token endpoint rotates the refresh token on every refresh. When a
@@ -801,3 +776,27 @@ listener. Then `CI=1 bun patch --commit
 'node_modules/electron-chrome-extensions'`, drop the empty `.bun-tag-*` entry
 it adds, run `bun install`, and run the guard test. A new handler or event in
 a ruled namespace fails that test until it has a rule.
+
+## @vercel/sandbox (`@vercel%2Fsandbox@<version>.patch`)
+
+**Why:** from 4.0.0 the SDK imports `Dispatcher1Wrapper` and `fetch` from
+`undici` 8. Bun replaces the bare `undici` specifier with its own built-in
+module, which has no `Dispatcher1Wrapper` (checked on Bun 1.4.3, 1.4.4 and the
+2026-11-12 canary), so the SDK fails at import: `Export named
+'Dispatcher1Wrapper' not found in module 'undici'`. Every Bun test that
+reaches `packages/trpc/src/lib/sandbox/vercel.ts` fails, and so do
+`bun run release` and the other `packages/sandbox` scripts. Node is not
+affected.
+
+**What it changes** (`dist/api-client/base-client.js` and `.cjs`): the import
+specifier `undici` becomes `undici/index.js`. Bun does not replace a path
+import, so it loads the undici 8 the SDK depends on. Under Node both
+specifiers resolve to the same file.
+
+**Guard test:** `packages/trpc/src/lib/sandbox/vercel-sandbox-undici-patch.test.ts`.
+
+**Regenerating after a version bump:** first check if the patch is still
+needed: `bun -e 'import("@vercel/sandbox")'` without it. If the import
+succeeds, delete the patch, this section and the guard test. If not,
+`bun patch @vercel/sandbox`, change the two specifiers,
+`bun patch --commit 'node_modules/@vercel/sandbox'`, then run the guard test.

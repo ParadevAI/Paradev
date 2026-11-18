@@ -1,0 +1,1 @@
+export { withSearchMatches } from "./withSearchMatches";

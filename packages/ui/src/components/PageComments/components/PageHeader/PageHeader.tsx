@@ -35,6 +35,7 @@ export function PageHeader({
 	onSetVisibility,
 	onSetSharedVersion,
 	onDelete,
+	onDuplicate,
 	onRename,
 	onRefresh,
 	onPreviewVersion,
@@ -75,6 +76,7 @@ export function PageHeader({
 							setMenuOpen(false);
 							setDeleteOpen(true);
 						}}
+						onDuplicate={onDuplicate}
 						onRename={() => setRenameOpen(true)}
 						onRefresh={onRefresh}
 						onPreviewVersion={onPreviewVersion}

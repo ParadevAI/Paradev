@@ -824,6 +824,8 @@ export const environments = pgTable(
 			{ onDelete: "set null" },
 		),
 		scope: environmentScope().notNull().default("organization"),
+		/** The size a workspace boots at when its create names none; null means the organization's default. */
+		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -981,6 +983,10 @@ export const cloudWorkspaces = pgTable(
 		deletedAt: timestamp("deleted_at", { withTimezone: true }),
 		/** When the box stops because its organization reached its usage limit; null otherwise. */
 		usageStopAt: timestamp("usage_stop_at", { withTimezone: true }),
+		/** When the box's session ends unless extended; past once it stopped, null if never seen. */
+		sandboxExpiresAt: timestamp("sandbox_expires_at", { withTimezone: true }),
+		/** Vercel's id for the box's current session; a stop or sweep writes asleep only while it is unchanged. */
+		sandboxSessionId: text("sandbox_session_id"),
 		/** Null on workspaces made before sizes existed; they run large. */
 		machineSize: text("machine_size"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {

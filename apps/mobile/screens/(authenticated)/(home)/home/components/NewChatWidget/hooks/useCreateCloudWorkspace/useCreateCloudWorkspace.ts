@@ -7,9 +7,14 @@ import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import type { CloudWorkspaceRow } from "@/hooks/useCloudWorkspaces";
 import { getCloudWorkspacesQueryKey } from "@/hooks/useCloudWorkspaces";
 import { useSession } from "@/lib/auth/client";
-import { errorCopy, transportFailureKind } from "@/lib/errors";
+import {
+	billingRefusalKey,
+	errorCopy,
+	transportFailureKind,
+} from "@/lib/errors";
 import { posthog } from "@/lib/posthog";
 import { apiClient } from "@/lib/trpc/client";
+import { recordUpgradeIntent, useUpgrade } from "@/lib/upgrade";
 import { useAppReviewStore } from "@/screens/(authenticated)/stores/appReviewStore";
 
 interface CreateCloudWorkspaceArgs {
@@ -39,6 +44,7 @@ export function useCreateCloudWorkspace() {
 	const queryClient = useQueryClient();
 	const { data: session } = useSession();
 	const organizationId = session?.session?.activeOrganizationId ?? null;
+	const { canManagePlan, openBillingSettings } = useUpgrade();
 
 	return useMutation({
 		mutationFn: async ({
@@ -110,6 +116,8 @@ export function useCreateCloudWorkspace() {
 				// Stable English, never the display copy below.
 				failure_kind: transportFailureKind(error) ?? "server",
 			});
+			const refusal = billingRefusalKey(error) !== null;
+			if (refusal && !canManagePlan) recordUpgradeIntent("cloud-workspaces");
 			Alert.alert(
 				i18n._(
 					msg({
@@ -117,6 +125,15 @@ export function useCreateCloudWorkspace() {
 					}),
 				),
 				errorCopy(error),
+				refusal && canManagePlan
+					? [
+							{ style: "cancel", text: i18n._(msg({ message: "Dismiss" })) },
+							{
+								onPress: openBillingSettings,
+								text: i18n._(msg({ message: "Manage plan" })),
+							},
+						]
+					: undefined,
 			);
 		},
 	});

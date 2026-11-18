@@ -1,15 +1,12 @@
 ---
 title: Migrate from Conductor Cloud
-description: Move your Conductor Cloud workspaces to Paradev before Conductor Cloud shuts down
+description: Move your Conductor Cloud workspaces to Paradev on your Mac or in the cloud
 ---
 
-Conductor is [joining Meta](https://www.conductor.build/announcement), and Conductor Cloud is shutting down. This guide gets your cloud work out of Conductor and into Paradev, either on your Mac or in a Paradev cloud workspace.
+If you choose to move from Conductor Cloud, this guide helps you continue on your Mac or in a Paradev cloud workspace.
 
-<Callout type="warn" title="Conductor Cloud's timeline">
-- **November 13, 2026:** Conductor Cloud goes read-only. You can still read chats and export data, but you cannot send messages to agents.
-- **November 20, 2026:** Conductor Cloud shuts down and Conductor begins to delete cloud data.
-
-Work that exists only in a Conductor Cloud workspace is not on your machine. Move every workspace you want to keep before November 20.
+<Callout type="info" title="Save your work">
+Work that exists only in a Conductor Cloud workspace is not on your machine. Save the branches and files you want to move before switching.
 </Callout>
 
 For the local Conductor app, see [Migrate from Conductor](/migrate-from-conductor).
@@ -27,10 +24,10 @@ For the local Conductor app, see [Migrate from Conductor](/migrate-from-conducto
 
 ## 1. Save Your Work in Conductor
 
-Do this first, before November 13 if you can.
+Save the work you want to move before switching.
 
 1. **Push every branch.** In each Conductor Cloud workspace, commit all changes, including new files (`git add -A`), and push the branch. A pushed branch is safe on GitHub whatever you choose next.
-   A push does not include Git-ignored files, such as `.env` files or local data. Copy out any you need before November 20.
+   A push does not include Git-ignored files, such as `.env` files or local data. Copy any you need before leaving the workspace.
 2. **Export your data.** In Conductor, go to **Settings → Account → Export data**. This keeps a copy of your chats. Paradev cannot import Conductor chats, so this export is your record of them.
 
 Then pick where to continue: on your Mac, or in a Paradev cloud workspace.
@@ -52,7 +49,7 @@ If you only pushed the branch, add the repository in Paradev and create a worksp
 
 ## 2b. Continue in a Paradev Cloud Workspace
 
-Paradev cloud workspaces keep agents working when your laptop is closed, and you can open them from desktop, iPhone, or iPad. They come with the Team and Ultra plans, and the GitHub repository must be shared with the Paradev GitHub App. See [Requirements](/cloud-workspaces#requirements).
+Paradev cloud workspaces keep agents working when your laptop is closed, and you can open them from desktop, iPhone, or iPad. They are available on paid plans, with shared included usage and metered extras. The GitHub repository must be shared with the Paradev GitHub App. See [Requirements](/cloud-workspaces#requirements).
 
 ### Add your setup scripts
 

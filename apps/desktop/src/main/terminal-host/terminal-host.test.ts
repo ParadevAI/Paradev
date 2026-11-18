@@ -95,6 +95,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -127,6 +128,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -159,6 +161,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -187,7 +190,8 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 		await session.dispose();
 	});
 
-	it("healthy session has both isAlive=true and pid set", async () => {
+	it("healthy session has both isAlive=true and pid set, and dispose kills only through the injected tree kill", async () => {
+		const killed: number[] = [];
 		const session = new Session({
 			sessionId: "session-healthy",
 			workspaceId: "workspace-1",
@@ -197,6 +201,9 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell: "/bin/bash",
+			killProcessTree: async (pid) => {
+				killed.push(pid);
+			},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 
@@ -216,6 +223,7 @@ describe("TerminalHost — PTY spawn failure handling", () => {
 		expect(session.pid).toBe(12345);
 
 		await session.dispose();
+		expect(killed).toEqual([4242, 12345]);
 	});
 });
 
@@ -250,6 +258,7 @@ describe("TerminalHost — spawn failure cause", () => {
 			rows: 24,
 			cwd: "/tmp",
 			shell,
+			killProcessTree: async () => {},
 			spawnProcess: () => fakeChild as unknown as ChildProcess,
 		});
 		session.spawn({

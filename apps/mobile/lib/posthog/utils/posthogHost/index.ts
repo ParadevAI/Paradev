@@ -1,0 +1,1 @@
+export { posthogHost } from "./posthogHost";

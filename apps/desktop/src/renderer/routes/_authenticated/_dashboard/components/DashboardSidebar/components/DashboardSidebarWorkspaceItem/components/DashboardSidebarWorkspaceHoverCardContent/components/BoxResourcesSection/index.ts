@@ -1,0 +1,1 @@
+export { BoxResourcesSection } from "./BoxResourcesSection";

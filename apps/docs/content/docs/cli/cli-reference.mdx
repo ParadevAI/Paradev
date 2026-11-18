@@ -1,5 +1,6 @@
 ---
 title: Paradev CLI Reference
+seoTitle: "Paradev CLI Reference (formerly Superset CLI)"
 description: Complete reference for Paradev command-line interface, including commands and flags.
 ---
 
@@ -1184,6 +1185,39 @@ superset worktrees open --project prj_… --all
 ```
 </Command>
 
+### ports
+
+Which ports of a cloud workspace people forwarded to their own machines. A person forwards a port from **Share → Ports** in the desktop app. Both commands are read-only. Outside a cloud workspace, pass `--workspace`.
+
+<Command
+	name="superset ports list"
+	options={[
+		{ flag: "--workspace <id>", description: "Cloud workspace ID. Defaults to the workspace this terminal is in." },
+	]}
+	output={`Array<{ port: number; localUrl: string; user: string; userId: string; since: string }>`}
+>
+List the forwarded ports, with each person's local address and when they forwarded it.
+
+```bash
+superset ports list
+```
+</Command>
+
+<Command
+	name="superset ports port"
+	options={[
+		{ flag: "<port>", required: true, description: "Port inside the workspace." },
+		{ flag: "--workspace <id>", description: "Cloud workspace ID. Defaults to the workspace this terminal is in." },
+	]}
+	output={`Array<{ port: number; localUrl: string; user: string; userId: string; since: string }>`}
+>
+Print where one port is forwarded, one local address per person. Exits non-zero when nobody forwarded it.
+
+```bash
+superset ports port 5173
+```
+</Command>
+
 ### environments
 
 An environment is what a cloud workspace starts from: its repositories, its variables, and a
@@ -2101,6 +2135,21 @@ Page metadata including `id`, `title`, `version`, and `url`, plus `unanchored`,
 >
 Delete a page and every version. Interactive terminals ask for confirmation
 unless `--yes` is passed; non-interactive input does not prompt.
+</Command>
+
+<Command
+	name="superset pages duplicate <page>"
+	args={[
+		{ name: "page", required: true, description: "Page ID or slug." },
+	]}
+	options={[
+		{ flag: "--title <title>", description: 'Title of the copy. Defaults to "<title> (copy)".' },
+	]}
+	output="{ id, slug, url, title, visibility }"
+>
+Copy the version a page currently serves into a new page that only you can
+see. The copy starts at version 1 and does not carry comments, shares, or
+version history.
 </Command>
 
 <Command

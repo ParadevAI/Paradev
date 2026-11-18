@@ -16,8 +16,8 @@ import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
 	type SandboxIdentity,
-} from "@superset/shared/sandbox-contract";
-import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox-regions";
+} from "@superset/shared/sandbox/contract";
+import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";

@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { BRAND } from "@superset/shared/brand";
-import { COMPANY } from "@superset/shared/constants";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
@@ -10,8 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useTheme } from "@/hooks/useTheme";
 import { useSession } from "@/lib/auth/client";
-import { openUrl } from "@/lib/open-url";
-import { billingSettingsUrl } from "@/lib/web-links";
+import { recordUpgradeIntent, useUpgrade } from "@/lib/upgrade";
 import { useOrganizations } from "@/screens/(authenticated)/hooks/useOrganizations";
 import { OrganizationHeaderButton } from "../home/components/OrganizationHeaderButton";
 
@@ -27,7 +25,13 @@ export function HomePaywallScreen() {
 	const theme = useTheme();
 	const router = useRouter();
 	const { refetch } = useSession();
-	const { activeOrganization, activeOrganizationId } = useOrganizations();
+	const { activeOrganization } = useOrganizations();
+	const { isResolved, canUpgrade, upgradeHost, upgrade, isUpgrading } =
+		useUpgrade();
+
+	useEffect(() => {
+		if (isResolved && !canUpgrade) recordUpgradeIntent("mobile-app");
+	}, [isResolved, canUpgrade]);
 
 	// Paying happens in the browser, so the plan flips while this screen is
 	// up or backgrounded. iOS freezes timers in the background; the AppState
@@ -74,17 +78,25 @@ export function HomePaywallScreen() {
 									message: `This organization is on the Free plan. ${appName} Mobile is available for organizations on Pro.`,
 								})}
 					</Text>
+					{upgradeHost ? (
+						<Text className="text-center text-base text-muted-foreground">
+							<Trans>Upgrade to Pro at {upgradeHost}</Trans>
+						</Text>
+					) : null}
 				</View>
 
-				<Button
-					size="lg"
-					className="w-4/5 max-w-sm"
-					onPress={() => openUrl(billingSettingsUrl(activeOrganizationId))}
-				>
-					<Text>
-						<Trans>Upgrade on {COMPANY.DOMAIN}</Trans>
-					</Text>
-				</Button>
+				{canUpgrade ? (
+					<Button
+						size="lg"
+						className="w-4/5 max-w-sm"
+						disabled={isUpgrading}
+						onPress={upgrade}
+					>
+						<Text>
+							<Trans>Upgrade</Trans>
+						</Text>
+					</Button>
+				) : null}
 			</View>
 		</>
 	);
