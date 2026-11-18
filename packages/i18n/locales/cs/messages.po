@@ -1166,6 +1166,9 @@ msgstr "{name} nemůže přijímat zprávy"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} teď nemůže přijímat zprávy. Vraťte se a napište hlavnímu agentovi."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} nemůže přijímat zprávy. Váš text je zpět v hlavním chatu."
+
 msgid "{name} failed"
 msgstr "{name} selhal"
 
@@ -21706,6 +21709,9 @@ msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům. Vraťte se a napište hlavnímu agentovi."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům. Váš text je zpět v hlavním chatu."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli přesouvat subagenty na pozadí"

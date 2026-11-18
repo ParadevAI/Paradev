@@ -1166,6 +1166,9 @@ msgstr "{name} にはメッセージを送れません"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} は現在メッセージを受け取れません。メインエージェントにメッセージを送るには戻ってください。"
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} はメッセージを受け取れません。テキストはメインチャットに戻しました。"
+
 msgid "{name} failed"
 msgstr "{name} が失敗しました"
 
@@ -21706,6 +21709,9 @@ msgstr "サブエージェントにメッセージを送るには、このホス
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。メインエージェントにメッセージを送るには戻ってください。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。テキストはメインチャットに戻しました。"
 
 msgid "Update this host to move subagents to the background"
 msgstr "サブエージェントをバックグラウンドに移動するには、このホストを更新してください"

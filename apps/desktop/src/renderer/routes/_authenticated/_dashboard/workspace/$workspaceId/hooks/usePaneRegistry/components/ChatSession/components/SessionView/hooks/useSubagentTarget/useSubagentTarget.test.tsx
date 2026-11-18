@@ -175,6 +175,29 @@ test("a host too old to message subagents gives the text back and says so", asyn
 	expect(hook.result.current.target?.blockedBy).toBe("host");
 });
 
+test("a refused steer gives the text back where it can still be sent", async () => {
+	const live = renderTarget(explore, "finished");
+	await act(async () => {
+		await live.hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
+	});
+	expect(live.onUnsent).toHaveBeenCalledWith(
+		typed,
+		`chat-v3-draft:t1:subagent:${explore.id}`,
+	);
+
+	const ended = renderTarget({ ...explore, canSteer: false }, "finished");
+	await act(async () => {
+		await ended.hook.result.current.onSend(typed, {
+			steer: false,
+			draft: textDraft(""),
+		});
+	});
+	expect(ended.onUnsent).toHaveBeenCalledWith(typed, "chat-v3-draft:t1");
+});
+
 test("drafts are kept per target", () => {
 	const hook = renderHook(
 		({ focusedId }: { focusedId: string | null }) => {

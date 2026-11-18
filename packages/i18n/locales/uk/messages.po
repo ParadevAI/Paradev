@@ -1160,6 +1160,9 @@ msgstr "{name} не може отримувати повідомлення"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} зараз не може отримувати повідомлення. Поверніться, щоб написати основному агенту."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} не може отримувати повідомлення. Ваш текст знову в основному чаті."
+
 msgid "{name} failed"
 msgstr "{name}: помилка"
 
@@ -21700,6 +21703,9 @@ msgstr "Оновіть цей хост, щоб надсилати повідом
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам. Поверніться, щоб написати основному агенту."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам. Ваш текст знову в основному чаті."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Оновіть цей хост, щоб переводити субагентів у фоновий режим"

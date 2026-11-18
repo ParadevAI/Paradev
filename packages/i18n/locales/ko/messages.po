@@ -1166,6 +1166,9 @@ msgstr "{name}에게 메시지를 보낼 수 없습니다"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name}은(는) 지금 메시지를 받을 수 없습니다. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name}은(는) 메시지를 받을 수 없습니다. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
+
 msgid "{name} failed"
 msgstr "{name} 실패"
 
@@ -21706,6 +21709,9 @@ msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요. 기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
 
 msgid "Update this host to move subagents to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 업데이트하세요"

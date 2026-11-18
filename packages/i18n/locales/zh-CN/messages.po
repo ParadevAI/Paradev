@@ -1166,6 +1166,9 @@ msgstr "无法向 {name} 发送消息"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} 目前无法接收消息。返回以向主智能体发送消息。"
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} 无法接收消息。你的文本已放回主聊天。"
+
 msgid "{name} failed"
 msgstr "{name} 失败"
 
@@ -21706,6 +21709,9 @@ msgstr "请更新此主机以向子智能体发送消息"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "更新此主机以向子智能体发送消息。返回以向主智能体发送消息。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "更新此主机以向子智能体发送消息。你的文本已放回主聊天。"
 
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"

@@ -1166,6 +1166,9 @@ msgstr "{name} can't be messaged"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} can't take messages now. Go back to message the main agent."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} can't take messages. Your text is back in the main chat."
+
 msgid "{name} failed"
 msgstr "{name} failed"
 
@@ -21706,6 +21709,9 @@ msgstr "Update this host to message subagents"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Update this host to message subagents. Go back to message the main agent."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Update this host to message subagents. Your text is back in the main chat."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Update this host to move subagents to the background"

@@ -1166,6 +1166,9 @@ msgstr "Không thể nhắn tin cho {name}"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} hiện không thể nhận tin nhắn. Quay lại để nhắn tin cho agent chính."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} không thể nhận tin nhắn. Văn bản của bạn đã quay lại cuộc trò chuyện chính."
+
 msgid "{name} failed"
 msgstr "{name} đã thất bại"
 
@@ -21706,6 +21709,9 @@ msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Cập nhật host này để nhắn tin cho agent con. Quay lại để nhắn tin cho agent chính."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Cập nhật host này để nhắn tin cho agent con. Văn bản của bạn đã quay lại cuộc trò chuyện chính."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Cập nhật máy chủ này để chuyển agent con sang chạy nền"

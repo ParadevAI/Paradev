@@ -1166,6 +1166,9 @@ msgstr "{name} kan geen berichten ontvangen"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} kan nu geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} kan geen berichten ontvangen. Je tekst staat weer in de hoofdchat."
+
 msgid "{name} failed"
 msgstr "{name} is mislukt"
 
@@ -21706,6 +21709,9 @@ msgstr "Werk deze host bij om subagents berichten te sturen"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Werk deze host bij om subagents berichten te sturen. Ga terug om de hoofdagent een bericht te sturen."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Werk deze host bij om subagents berichten te sturen. Je tekst staat weer in de hoofdchat."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"

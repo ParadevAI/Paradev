@@ -1166,6 +1166,9 @@ msgstr "{name} tidak bisa dikirimi pesan"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} tidak dapat menerima pesan sekarang. Kembali untuk mengirim pesan ke agen utama."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} tidak dapat menerima pesan. Teks Anda kembali ke obrolan utama."
+
 msgid "{name} failed"
 msgstr "{name} gagal"
 
@@ -21706,6 +21709,9 @@ msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen. Kembali untuk mengirim pesan ke agen utama."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Perbarui host ini untuk mengirim pesan ke subagen. Teks Anda kembali ke obrolan utama."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"

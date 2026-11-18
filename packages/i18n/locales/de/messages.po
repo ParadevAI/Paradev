@@ -1166,6 +1166,9 @@ msgstr "{name} kann keine Nachrichten empfangen"
 msgid "{name} can't take messages now. Go back to message the main agent."
 msgstr "{name} kann gerade keine Nachrichten empfangen. Geh zurück, um dem Hauptagenten zu schreiben."
 
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} kann keine Nachrichten empfangen. Dein Text ist wieder im Hauptchat."
+
 msgid "{name} failed"
 msgstr "{name} ist fehlgeschlagen"
 
@@ -21706,6 +21709,9 @@ msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden"
 
 msgid "Update this host to message subagents. Go back to message the main agent."
 msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden. Geh zurück, um dem Hauptagenten zu schreiben."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Aktualisiere diesen Host, um Subagents Nachrichten zu senden. Dein Text ist wieder im Hauptchat."
 
 msgid "Update this host to move subagents to the background"
 msgstr "Aktualisiere diesen Host, um Subagents in den Hintergrund zu verschieben"
