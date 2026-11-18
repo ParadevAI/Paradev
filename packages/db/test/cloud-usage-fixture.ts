@@ -63,11 +63,13 @@ export async function seedCloudUsage() {
 		{ id: OTHER_ORG, name: "Other", slug: "other" },
 	]);
 	await db.insert(schema.users).values(
-		[
-			[MAYA, "Maya"],
-			[SAM, "Sam"],
-			[BEN, "Ben"],
-		].map(([id, name]) => ({ id, name, email: `${name}@example.com` })),
+		(
+			[
+				[MAYA, "Maya"],
+				[SAM, "Sam"],
+				[BEN, "Ben"],
+			] as const
+		).map(([id, name]) => ({ id, name, email: `${name}@example.com` })),
 	);
 	const [env, otherEnv] = await db
 		.insert(schema.environments)
