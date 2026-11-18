@@ -1,0 +1,1 @@
+export { connectorNameFromRedirect } from "./connectorNameFromRedirect";

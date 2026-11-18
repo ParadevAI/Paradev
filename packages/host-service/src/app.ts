@@ -4,6 +4,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { Octokit } from "@octokit/rest";
 import { resolveAppHomeDir } from "@superset/agent-setup/paths";
 import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_RELAYED_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
@@ -17,6 +18,7 @@ import { TRPCError } from "@trpc/server";
 import type { MiddlewareHandler } from "hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { parseLaunchSource, withLaunchSource } from "./agent-launch-analytics";
 import { createApiClient } from "./api";
 import { createChatSync, syncWhenEnabled } from "./chat-sync";
 import {
@@ -232,6 +234,12 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				SUPERSET_USER_ID_HEADER,
 			],
 		}),
+	);
+	app.use("*", (c, next) =>
+		withLaunchSource(
+			parseLaunchSource(c.req.header(SUPERSET_LAUNCH_SOURCE_HEADER)),
+			next,
+		),
 	);
 
 	const eventBus = new EventBus({ db, filesystem, gitWatcher });

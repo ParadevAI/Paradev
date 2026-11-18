@@ -10,7 +10,7 @@ import {
 	startWorkspaceMoveProgress,
 	type WorkspaceMoveProgressHandle,
 } from "../../../../utils/startWorkspaceMoveProgress";
-import { navigateToV2Workspace } from "../../../../utils/workspace-navigation";
+import { navigateToWorkspace } from "../../../../utils/workspace-navigation";
 
 type MoveResult = {
 	toWorkspaceId: string;
@@ -47,7 +47,7 @@ export function useStartWorkspaceMove(workspace: MovableWorkspace) {
 	) =>
 		progress.follow(toWorkspaceId, {
 			stayed,
-			open: () => void navigateToV2Workspace(toWorkspaceId, navigate),
+			open: () => void navigateToWorkspace(toWorkspaceId, navigate),
 			terminals: terminalHandoff,
 			terminalsPending: movingTerminals,
 		});

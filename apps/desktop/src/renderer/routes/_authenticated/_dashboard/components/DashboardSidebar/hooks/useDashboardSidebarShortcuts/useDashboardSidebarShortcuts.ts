@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useHotkey } from "renderer/hotkeys";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import type {
@@ -152,10 +152,6 @@ export function useDashboardSidebarShortcuts(
 			if (pinnedWorkspaces.some((workspace) => workspace.id === workspaceId)) {
 				const { collapsed, toggle } =
 					useSidebarSectionsCollapseStore.getState();
-				// The Pinned section itself only renders while the Workspaces
-				// list isn't collapsed — un-collapsing "pinned" alone still
-				// leaves the target invisible if "workspaces" is collapsed too.
-				if (collapsed.workspaces) toggle("workspaces");
 				if (collapsed.pinned) toggle("pinned");
 				return;
 			}
@@ -181,7 +177,7 @@ export function useDashboardSidebarShortcuts(
 			const workspace = flattenedWorkspaces[index];
 			if (workspace) {
 				if (revealCollapsed) revealWorkspace(workspace.id);
-				navigateToV2Workspace(workspace.id, navigate);
+				navigateToWorkspace(workspace.id, navigate);
 			}
 		},
 		[flattenedWorkspaces, navigate, revealCollapsed, revealWorkspace],
@@ -199,7 +195,7 @@ export function useDashboardSidebarShortcuts(
 
 	const matchRoute = useMatchRoute();
 	const currentWorkspaceMatch = matchRoute({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const currentWorkspaceId =
@@ -213,7 +209,7 @@ export function useDashboardSidebarShortcuts(
 		const prevIndex = index <= 0 ? navigationWorkspaces.length - 1 : index - 1;
 		const target = navigationWorkspaces[prevIndex];
 		revealWorkspace(target.id);
-		navigateToV2Workspace(target.id, navigate);
+		navigateToWorkspace(target.id, navigate);
 	});
 
 	useHotkey("NEXT_WORKSPACE", () => {
@@ -224,7 +220,7 @@ export function useDashboardSidebarShortcuts(
 		const nextIndex = index >= navigationWorkspaces.length - 1 ? 0 : index + 1;
 		const target = navigationWorkspaces[nextIndex];
 		revealWorkspace(target.id);
-		navigateToV2Workspace(target.id, navigate);
+		navigateToWorkspace(target.id, navigate);
 	});
 
 	return workspaceShortcutLabels;

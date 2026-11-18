@@ -14,7 +14,7 @@ interface UploadStoreState {
 	entries: Record<string, Record<string, UploadState>>;
 }
 
-export const useAttachmentUploadsStore = create<UploadStoreState>(() => ({
+const useAttachmentUploadsStore = create<UploadStoreState>(() => ({
 	entries: {},
 }));
 
@@ -58,7 +58,7 @@ function setEntry(fileId: string, hostUrl: string, state: UploadState): void {
 	}));
 }
 
-export interface StartUploadInput {
+interface StartUploadInput {
 	id: string;
 	file: File;
 }

@@ -8,7 +8,7 @@ const RENDERER_ROOT = import.meta.dir.split("/").slice(0, -3).join("/");
 
 // Ctrl+C is a keystroke, not text.
 const KEYSTROKE_WRITERS = [
-	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useV2WorkspaceRun/useV2WorkspaceRun.ts",
+	"routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useWorkspaceRun/useWorkspaceRun.ts",
 ];
 
 const RAW_WRITE =
@@ -40,7 +40,7 @@ describe("text never reaches a terminal through the raw keystroke channel", () =
 });
 
 const V2_PANES =
-	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components";
+	"routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components";
 
 // Design mode stages a note in a terminal agent's input so the user can add
 // more before sending (#8566). A chat has no input to stage in, so it sends.
@@ -52,7 +52,7 @@ const EXPECTED_SUBMIT: Record<string, string> = {
 		"true",
 	[`${V2_PANES}/TerminalPane/components/TerminalRichInput/TerminalRichInput.tsx`]:
 		"true",
-	"routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/NewPageComposer/NewPageComposer.tsx":
+	"routes/_authenticated/_dashboard/workspace/$workspaceId/components/NewPageComposer/NewPageComposer.tsx":
 		"true",
 };
 

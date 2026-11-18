@@ -20,8 +20,10 @@ import {
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
+	Drive,
 	type NetworkPolicy,
 	Sandbox,
+	type SandboxMounts,
 	type SandboxRegion,
 } from "@vercel/sandbox";
 import { env } from "../../env";
@@ -119,6 +121,8 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
+	/** The bundle's agent-tools drive to mount read-only; absent keeps the image's agents. */
+	agentToolsDrive?: string | null;
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -135,6 +139,41 @@ function sandboxTags(
 		workspace: identity.SUPERSET_SANDBOX_WORKSPACE_ID,
 		...(user ? { user } : {}),
 	};
+}
+
+const publishedAgentToolsDrives = new Set<string>();
+
+/**
+ * A mount of a drive that does not exist fails the create, and a drive a
+ * writer still holds read-write mounts corrupt. Only a drive that exists and
+ * is detached is mounted; that answer is final for a drive, so it is cached.
+ */
+export async function agentToolsMounts(
+	driveName: string | null | undefined,
+	getDrive: (name: string) => Promise<Pick<Drive, "currentSandboxName">> = (
+		name,
+	) => Drive.get({ ...credentials(), name }),
+): Promise<SandboxMounts | undefined> {
+	if (!driveName) return undefined;
+	if (!publishedAgentToolsDrives.has(driveName)) {
+		try {
+			const drive = await getDrive(driveName);
+			if (drive.currentSandboxName) {
+				console.warn(
+					`[sandbox] agent-tools drive ${driveName} is attached to ${drive.currentSandboxName}; not mounting`,
+				);
+				return undefined;
+			}
+		} catch (error) {
+			console.warn(
+				`[sandbox] agent-tools drive ${driveName} unavailable; not mounting`,
+				error,
+			);
+			return undefined;
+		}
+		publishedAgentToolsDrives.add(driveName);
+	}
+	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
 }
 
 function publishedPorts(extra: readonly number[] = []): number[] {
@@ -222,6 +261,7 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
+	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
 	const sandbox =
 		(await getSandbox(args.name)) ??
 		(await Sentry.startSpan(
@@ -242,11 +282,13 @@ export async function provisionSandbox(args: {
 						// it was taken.
 						Sandbox.fork({
 							...config,
+							...(mounts ? { mounts } : {}),
 							sourceSandbox: args.environment.sourceRef,
 							resources: { vcpus: args.claim.vcpus },
 						})
 					: Sandbox.create({
 							...config,
+							...(mounts ? { mounts } : {}),
 							image: args.environment.sourceRef,
 							region: args.environment.region as SandboxRegion,
 							resources: { vcpus: args.claim.vcpus },
@@ -476,6 +518,21 @@ export async function wakeSandbox(args: {
 						),
 					),
 			);
+		}
+		if (!wasRunning) {
+			const { [SANDBOX_PATHS.agents]: previous, ...others } =
+				sandbox.mounts ?? {};
+			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+			if (agents || previous) {
+				await sandbox
+					.update({ mounts: { ...others, ...agents } })
+					.catch((error) =>
+						console.warn(
+							`[sandbox] mount update failed for ${args.providerSandboxId}`,
+							error,
+						),
+					);
+			}
 		}
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });

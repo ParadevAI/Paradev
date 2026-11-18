@@ -1,5 +1,5 @@
 import type { HostServiceClient } from "renderer/lib/host-service-client";
-import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { WORKTREE_NEEDS_ATTENTION } from "./attention";
 import { migrateV1Groups, type V1GroupTarget } from "./groups";
 import type { V1MigrationIpc } from "./ipc";
@@ -69,7 +69,7 @@ export interface RunV1MigrationDeps {
 	presetTarget?: {
 		agents: AgentConfigLike[];
 		existing: V2PresetLike[];
-		insert: (row: V2TerminalPresetRow) => void;
+		insert: (row: TerminalPresetRow) => void;
 	};
 	onProjectImported?: (result: {
 		v2ProjectId: string;
@@ -321,7 +321,7 @@ async function migrateWorkspaces(
 			return false;
 		});
 
-	const mappedV2ProjectIds = new Set(
+	const mappedProjectIds = new Set(
 		pendingWorkspaces
 			.map((w) => v2ProjectIdByV1ProjectId.get(w.projectId))
 			.filter((id): id is string => !!id),
@@ -330,7 +330,7 @@ async function migrateWorkspaces(
 	const mainBranchByV2ProjectId = new Map<string, string>();
 	const onDiskWorktrees: OnDiskWorktree[] = [];
 	await Promise.all(
-		Array.from(mappedV2ProjectIds, async (v2ProjectId) => {
+		Array.from(mappedProjectIds, async (v2ProjectId) => {
 			try {
 				const result =
 					await deps.hostClient.workspaceCreation.listProjectWorktrees.query({

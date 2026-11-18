@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset } from "@superset/chat/core";
 import { draftText } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
@@ -8,9 +7,9 @@ import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
 import { toast } from "@superset/ui/sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useResolveAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
+import { useResolveOpenAsChat } from "renderer/hooks/useResolveOpenAsChat";
 import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
@@ -62,7 +61,7 @@ export function useSubmitWorkspace(
 	const { submit } = useWorkspaceCreates();
 	const collections = useCollections();
 	const activeOrganizationId = useActiveOrganizationId();
-	const resolveAcpChatEnabled = useResolveAcpChatEnabled();
+	const resolveOpenAsChat = useResolveOpenAsChat();
 	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
 	const utils = cloudTrpc.useUtils();
 
@@ -249,7 +248,7 @@ export function useSubmitWorkspace(
 						rows ? [created, ...rows] : [created],
 					);
 					void navigate({
-						to: "/v2-workspace/$workspaceId",
+						to: "/workspace/$workspaceId",
 						params: { workspaceId: created.id },
 					}).catch((error) => {
 						console.error(
@@ -308,9 +307,7 @@ export function useSubmitWorkspace(
 				: null;
 
 			const openAsChat =
-				wantAgent &&
-				Boolean(acpHarnessForPreset(selectedPresetId)) &&
-				(await resolveAcpChatEnabled());
+				wantAgent && (await resolveOpenAsChat(selectedPresetId));
 			const agents = wantAgent
 				? [
 						{
@@ -389,7 +386,7 @@ export function useSubmitWorkspace(
 			closeAndResetDraft();
 			const { completed } = submit({ hostId, snapshot });
 			void navigate({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				params: { workspaceId },
 			}).catch((error) => {
 				console.error("[useSubmitWorkspace] failed to open workspace", error);
@@ -397,7 +394,7 @@ export function useSubmitWorkspace(
 
 			const isViewingOptimisticWorkspace = () => {
 				const workspaceMatch = matchRoute({
-					to: "/v2-workspace/$workspaceId",
+					to: "/workspace/$workspaceId",
 				});
 				return (
 					workspaceMatch !== false && workspaceMatch.workspaceId === workspaceId
@@ -412,7 +409,7 @@ export function useSubmitWorkspace(
 				if (outcome.workspaceId === workspaceId) return;
 				if (!isViewingOptimisticWorkspace()) return;
 				void navigate({
-					to: "/v2-workspace/$workspaceId",
+					to: "/workspace/$workspaceId",
 					params: { workspaceId: outcome.workspaceId },
 					replace: true,
 				}).catch((error) => {
@@ -426,7 +423,7 @@ export function useSubmitWorkspace(
 		},
 		[
 			activeOrganizationId,
-			resolveAcpChatEnabled,
+			resolveOpenAsChat,
 			selectedPresetId,
 			closeAndResetDraft,
 			closeModal,

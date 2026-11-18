@@ -8,6 +8,7 @@ import {
 	workspaces,
 	worktrees,
 } from "@superset/local-db";
+import { userGitSimpleGitOptions } from "@superset/shared/simple-git-options";
 import { TRPCError } from "@trpc/server";
 import { and, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 import type { BrowserWindow } from "electron";
@@ -16,9 +17,11 @@ import { appState } from "main/lib/app-state";
 import { localDb } from "main/lib/local-db";
 import { stopV1Sessions } from "main/lib/terminal/stop-v1-sessions";
 import { getTerminalHostClient } from "main/lib/terminal-host/client";
+import { simpleGit } from "simple-git";
 import { z } from "zod";
 import { publicProcedure, router } from "../..";
-import { runGitTask } from "../changes/workers/git-task-runner";
+import { getProcessEnvWithShellPath } from "../utils/shell-env";
+import { branchDetachedWorktree } from "./utils/branch-detached-worktree";
 import { createRunLock } from "./utils/run-lock";
 import { collectV1TerminalPanes } from "./utils/v1-terminal-panes";
 
@@ -145,10 +148,9 @@ export const createMigrationRouter = () => {
 						message: `Folder not found: ${input.path}`,
 					});
 				}
-				return runGitTask("branchDetachedWorktree", {
-					worktreePath: path,
-					preferredBranch: input.branch,
-				});
+				const env = await getProcessEnvWithShellPath();
+				const git = simpleGit(path, userGitSimpleGitOptions(env)).env(env);
+				return branchDetachedWorktree(git, input.branch);
 			}),
 
 		stopV1Panes: publicProcedure

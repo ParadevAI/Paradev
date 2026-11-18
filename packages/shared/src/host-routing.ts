@@ -42,6 +42,11 @@ export const SUPERSET_USER_ID_HEADER = "x-superset-user-id";
  */
 export const SUPERSET_RELAYED_HEADER = "x-superset-relayed";
 
+/** Names the caller that asked a host to start an agent, for analytics only. */
+export const SUPERSET_LAUNCH_SOURCE_HEADER = "x-superset-launch-source";
+export const LAUNCH_SOURCES = ["cli", "automation"] as const;
+export type LaunchSource = (typeof LAUNCH_SOURCES)[number];
+
 /**
  * Headers a relay forwards to a host over its tunnel. The relay is the only
  * party that verified the caller's JWT, so it is the one that names the user:

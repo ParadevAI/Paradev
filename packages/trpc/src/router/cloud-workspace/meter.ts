@@ -250,7 +250,13 @@ export async function attachBootSession(args: {
 			if (isUniqueViolation(error)) return [];
 			throw error;
 		});
-	if (attached.length === 0) await releaseBoot(args.bootId);
+	if (attached.length > 0) return;
+	const [current] = await db
+		.select({ vercelSessionId: cloudWorkspaceBoots.vercelSessionId })
+		.from(cloudWorkspaceBoots)
+		.where(eq(cloudWorkspaceBoots.id, args.bootId));
+	if (current?.vercelSessionId === session.id) return;
+	await releaseBoot(args.bootId);
 }
 
 async function recordUsage(

@@ -24,6 +24,7 @@ import {
 } from "react-icons/lu";
 
 import { env } from "@/env";
+import type { RedirectTarget } from "../../utils/getRedirectTarget";
 
 interface Organization {
 	id: string;
@@ -33,6 +34,7 @@ interface Organization {
 interface ConsentFormProps {
 	clientId: string;
 	clientName?: string;
+	redirect?: RedirectTarget;
 	scopes: string[];
 	userName: string;
 	organizations: Organization[];
@@ -72,6 +74,7 @@ const SCOPE_DESCRIPTIONS: Record<
 export function ConsentForm({
 	clientId,
 	clientName,
+	redirect,
 	scopes,
 	userName,
 	organizations,
@@ -160,6 +163,25 @@ export function ConsentForm({
 			</div>
 
 			<div className="bg-muted/50 rounded-lg border p-4">
+				{redirect && (
+					<p className="text-muted-foreground mb-3 text-sm">
+						{redirect.isLocal ? (
+							<Trans>
+								Sends you back to{" "}
+								<span className="font-medium text-foreground">
+									an app on this computer
+								</span>
+							</Trans>
+						) : (
+							<Trans>
+								Sends you back to{" "}
+								<span className="break-all font-mono font-medium text-foreground">
+									{redirect.host}
+								</span>
+							</Trans>
+						)}
+					</p>
+				)}
 				<p className="text-muted-foreground mb-3 text-sm">
 					<Trans>
 						Signed in as{" "}
