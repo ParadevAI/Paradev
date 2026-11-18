@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
+import { eq } from "drizzle-orm";
 import {
+	BEN,
 	BILLING_PAGE,
 	BROKEN,
 	CHECKOUT,
@@ -8,6 +10,8 @@ import {
 	NOW,
 	OCTOBER,
 	ORG,
+	OTHER_ORG,
+	OTHER_WS,
 	RATE,
 	SAM,
 	seedCloudUsage,
@@ -16,9 +20,12 @@ import {
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
 	listCloudBoots,
+	listFleetCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
+	queryFleetCloudUsage,
 } from "./cloud-usage-query";
+import { cloudWorkspaces, taskProjects } from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 
@@ -231,4 +238,161 @@ test("billing periods keep Autumn's reset day through short months", () => {
 	expect(cloudBillingPeriod(thirtieth, 1).from).toEqual(
 		new Date("2026-09-30T05:00:00Z"),
 	);
+});
+
+describe("fleet scope", () => {
+	const fleet = (
+		options: Partial<Parameters<typeof queryFleetCloudUsage>[2]>,
+		organizationId: string | null = null,
+	) =>
+		queryFleetCloudUsage(db, organizationId, {
+			window: NOVEMBER,
+			limit: 25,
+			overagePerGbHour: RATE,
+			...options,
+		});
+
+	test("with no organization the total is every organization's, and one organization's matches the customer's", async () => {
+		const all = await fleet({});
+		expect(all.total).toMatchObject({
+			boots: 5,
+			gbHours: expect.closeTo(35.6667, 3),
+		});
+		expect((await fleet({}, ORG)).total).toEqual((await usage({})).total);
+	});
+
+	test("groups by organization, size, end reason and project", async () => {
+		const brief = async (groupBy: Parameters<typeof fleet>[0]["groupBy"]) =>
+			(await fleet({ groupBy })).items.map((item) => [
+				item.key,
+				item.label,
+				item.boots,
+				item.failedBoots,
+				item.workspaces,
+			]);
+		expect(await brief("organization")).toEqual([
+			[ORG, "Northwind", 4, 1, 3],
+			[OTHER_ORG, "Other", 1, 0, 1],
+		]);
+		expect(await brief("size")).toEqual([
+			["medium", "medium", 4, 1, 2],
+			["large", "large", 1, 0, 2],
+		]);
+		expect(await brief("endReason")).toEqual([
+			["idle", "idle", 2, 0, 2],
+			["user", "user", 0, 0, 1],
+			[null, null, 1, 0, 1],
+			["failed", "failed", 1, 1, 2],
+			["released", "released", 1, 0, 1],
+		]);
+		expect(await brief("project")).toEqual([[null, null, 5, 1, 4]]);
+	});
+
+	test("groups by project, named", async () => {
+		const [project] = await db
+			.insert(taskProjects)
+			.values({ organizationId: ORG, name: "Checkout revamp" })
+			.returning();
+		if (!project) throw new Error("no project");
+		await db
+			.update(cloudWorkspaces)
+			.set({ projectId: project.id })
+			.where(eq(cloudWorkspaces.id, CHECKOUT));
+		try {
+			const { items } = await fleet({ groupBy: "project" });
+			expect(
+				items.map((item) => [item.label, item.boots, item.gbHours]),
+			).toEqual([
+				["Checkout revamp", 3, 18],
+				[null, 2, 16 + 100 / 60],
+			]);
+		} finally {
+			await db
+				.update(cloudWorkspaces)
+				.set({ projectId: null })
+				.where(eq(cloudWorkspaces.id, CHECKOUT));
+		}
+	});
+
+	test("a failed workspace counts the same way on every path", async () => {
+		const failedWorkspaces = (result: { items: { workspaces: number }[] }) =>
+			result.items.reduce((sum, item) => sum + item.workspaces, 0);
+		const total = (await fleet({}, ORG)).total.workspaces;
+		for (const groupBy of ["workspace", "size", "organization"] as const) {
+			expect(failedWorkspaces(await fleet({ groupBy }, ORG)), groupBy).toBe(
+				total,
+			);
+		}
+		expect(total).toBe(3);
+		const [byPeriod] = await queryCloudUsageByPeriod(
+			db,
+			{ organizationId: ORG },
+			{ periods: [NOVEMBER], overagePerGbHour: RATE },
+		);
+		expect(byPeriod?.metrics.workspaces).toBe(total);
+	});
+
+	test("lists boots across organizations with CPU, egress and the organization", async () => {
+		const { items } = await listFleetCloudBoots(db, null, {
+			window: NOVEMBER,
+			limit: 25,
+			now: NOW,
+			overagePerGbHour: RATE,
+		});
+		expect(items.map((boot) => boot.id)).toEqual([
+			"boot_4",
+			"boot_6",
+			"boot_2",
+			"boot_5",
+			"boot_1",
+		]);
+		expect(items.find((boot) => boot.id === "boot_5")).toMatchObject({
+			organization: { id: OTHER_ORG, slug: "other" },
+			workspace: { id: OTHER_WS },
+			user: { id: BEN },
+			activeCpuMinutes: null,
+			egressGb: null,
+		});
+	});
+
+	test("a customer's boots have no organization, CPU or egress fields", async () => {
+		const { items } = await boots({});
+		expect(items.length).toBeGreaterThan(0);
+		for (const boot of items) {
+			expect(Object.keys(boot)).not.toContain("organization");
+			expect(Object.keys(boot)).not.toContain("activeCpuMinutes");
+			expect(Object.keys(boot)).not.toContain("egressGb");
+		}
+	});
+
+	test("a customer scope reads only its own organization", async () => {
+		const empty = await queryCloudUsage(
+			db,
+			{ organizationId: "a0000000-0000-4000-8000-0000000000ff" },
+			{ window: NOVEMBER, limit: 1, overagePerGbHour: RATE },
+		);
+		expect(empty.total).toMatchObject({ boots: 0, workspaces: 0, gbHours: 0 });
+		const others = await listCloudBoots(
+			db,
+			{ organizationId: OTHER_ORG },
+			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
+		);
+		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
+	});
+
+	test("a customer scope cannot group by more than user, day or workspace", () => {
+		const groupByOrganization = () =>
+			queryCloudUsage(
+				db,
+				{ organizationId: ORG },
+				{
+					window: NOVEMBER,
+					limit: 1,
+					// @ts-expect-error a customer scope groups by user, day or workspace
+					groupBy: "organization",
+					overagePerGbHour: RATE,
+				},
+			);
+		expect(groupByOrganization).toBeFunction();
+	});
 });

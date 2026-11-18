@@ -25,14 +25,16 @@ import type {
 	PgDatabase,
 	PgQueryResultHKT,
 } from "drizzle-orm/pg-core";
-import { users } from "./schema/auth";
+import { organizations, users } from "./schema/auth";
 import type {
 	CloudWorkspaceBootEndReason,
+	CloudWorkspaceFailureReason,
 	CloudWorkspaceStatus,
 } from "./schema/enums";
 import {
 	cloudWorkspaceBoots as boots,
 	cloudUsageEvents as events,
+	taskProjects,
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
 
@@ -41,11 +43,26 @@ export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
 export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];
 
+export const cloudFleetGroupByValues = [
+	...cloudUsageGroupByValues,
+	"organization",
+	"project",
+	"size",
+	"endReason",
+] as const;
+export type CloudFleetGroupBy = (typeof cloudFleetGroupByValues)[number];
+
 export interface CloudUsageScope {
 	organizationId: string;
 	/** Set for a member: every result holds only this user's rows. */
 	userId?: string;
 }
+
+/** Only the fleet entry points pass `null`, which reads every organization. */
+type Scope = { organizationId: string | null; userId?: string };
+
+const inOrganization = (scope: Scope, column: AnyPgColumn) =>
+	scope.organizationId === null ? undefined : eq(column, scope.organizationId);
 
 export interface CloudUsageFilters {
 	user?: string;
@@ -151,7 +168,7 @@ function usd(gbMinutes: number, overagePerGbHour: number | null) {
 }
 
 function scopeConditions(
-	scope: CloudUsageScope,
+	scope: Scope,
 	filters: CloudUsageFilters,
 	columns: {
 		user: AnyPgColumn;
@@ -171,6 +188,15 @@ function scopeConditions(
 	}
 	return conditions;
 }
+
+const sizeOfBoot = sql`case ${boots.vcpus} ${sql.join(
+	MACHINE_SIZES.map(
+		(size) => sql`when ${MACHINE_SIZE_VCPUS[size]} then ${size}`,
+	),
+	sql` `,
+)} end`;
+
+const sizeOfWorkspace = sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE})`;
 
 const bootSize = (size: MachineSize) =>
 	eq(boots.vcpus, MACHINE_SIZE_VCPUS[size]);
@@ -196,7 +222,27 @@ const groupKeys = {
 		boot: sql`${boots.cloudWorkspaceId}`,
 		failed: sql`${workspaces.id}`,
 	},
-} satisfies Record<CloudUsageGroupBy, FactKeys>;
+	organization: {
+		event: sql`${events.organizationId}`,
+		boot: sql`${boots.organizationId}`,
+		failed: sql`${workspaces.organizationId}`,
+	},
+	project: {
+		event: sql`${workspaces.projectId}`,
+		boot: sql`${workspaces.projectId}`,
+		failed: sql`${workspaces.projectId}`,
+	},
+	size: {
+		event: sizeOfBoot,
+		boot: sizeOfBoot,
+		failed: sizeOfWorkspace,
+	},
+	endReason: {
+		event: sql`${boots.endReason}`,
+		boot: sql`${boots.endReason}`,
+		failed: sql`'failed'`,
+	},
+} satisfies Record<CloudFleetGroupBy, FactKeys>;
 
 const NO_KEY: FactKeys = {
 	event: sql`null`,
@@ -207,11 +253,12 @@ const NO_KEY: FactKeys = {
 /**
  * One row per sent event (placed at sent_at) and one per boot (placed at started_at), in one
  * shape, so a single GROUP BY gives usage and boot counts for any key. Each workspace that failed
- * in the window adds a row with no usage, so one with no boot still counts and has a group.
+ * in the window adds a row with no usage, so one with no boot still counts and has a group; grouped
+ * by end reason it is keyed `failed`, as a boot that failed is.
  */
 function usageFacts(
 	db: Db,
-	scope: CloudUsageScope,
+	scope: Scope,
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
@@ -235,7 +282,7 @@ function usageFacts(
 		.leftJoin(workspaces, eq(workspaces.id, events.cloudWorkspaceId))
 		.where(
 			and(
-				eq(events.organizationId, scope.organizationId),
+				inOrganization(scope, events.organizationId),
 				eq(events.feature, BILLED_FEATURE),
 				gte(events.sentAt, window.from),
 				lt(events.sentAt, window.to),
@@ -259,7 +306,7 @@ function usageFacts(
 		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
 		.where(
 			and(
-				eq(boots.organizationId, scope.organizationId),
+				inOrganization(scope, boots.organizationId),
 				gte(boots.startedAt, window.from),
 				lt(boots.startedAt, window.to),
 				...scopeConditions(scope, filters, {
@@ -281,7 +328,7 @@ function usageFacts(
 		.from(workspaces)
 		.where(
 			and(
-				eq(workspaces.organizationId, scope.organizationId),
+				inOrganization(scope, workspaces.organizationId),
 				eq(workspaces.status, "failed"),
 				isNull(workspaces.deletedAt),
 				gte(workspaces.failedAt, window.from),
@@ -289,8 +336,7 @@ function usageFacts(
 				...scopeConditions(scope, filters, {
 					user: workspaces.createdByUserId,
 					workspace: workspaces.id,
-					size: (size) =>
-						sql`coalesce(${workspaces.machineSize}, ${LEGACY_MACHINE_SIZE}) = ${size}`,
+					size: (size) => sql`${sizeOfWorkspace} = ${size}`,
 				}),
 			),
 		);
@@ -328,13 +374,61 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 
 export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
+/** These groupings have no entity behind the key: the key is the label. */
+const isPlainKey = (groupBy: CloudFleetGroupBy) =>
+	groupBy === "day" || groupBy === "size" || groupBy === "endReason";
+
+interface UserRef {
+	id: string;
+	name: string;
+	email: string;
+}
+
+interface WorkspaceRef {
+	id: string;
+	name: string;
+	status: CloudWorkspaceStatus;
+	size: MachineSize;
+	owner: UserRef | null;
+	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
+}
+
+interface OrganizationRef {
+	id: string;
+	name: string;
+	slug: string;
+}
+
+interface ProjectRef {
+	id: string;
+	name: string;
+}
+
 async function refsFor(
 	db: Db,
-	organizationId: string,
-	groupBy: CloudUsageGroupBy,
+	organizationId: string | null,
+	groupBy: CloudFleetGroupBy,
 	keys: string[],
-) {
-	if (groupBy === "day" || keys.length === 0) return new Map<string, never>();
+): Promise<Map<string, UserRef | WorkspaceRef | OrganizationRef | ProjectRef>> {
+	if (keys.length === 0 || isPlainKey(groupBy)) return new Map();
+	if (groupBy === "organization") {
+		const rows = await db
+			.select({
+				id: organizations.id,
+				name: organizations.name,
+				slug: organizations.slug,
+			})
+			.from(organizations)
+			.where(inArray(organizations.id, keys));
+		return new Map(rows.map((row) => [row.id, row]));
+	}
+	if (groupBy === "project") {
+		const rows = await db
+			.select({ id: taskProjects.id, name: taskProjects.name })
+			.from(taskProjects)
+			.where(inArray(taskProjects.id, keys));
+		return new Map(rows.map((row) => [row.id, row]));
+	}
 	if (groupBy === "user") {
 		const rows = await db
 			.select({ id: users.id, name: users.name, email: users.email })
@@ -356,7 +450,9 @@ async function refsFor(
 		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
 		.where(
 			and(
-				eq(workspaces.organizationId, organizationId),
+				organizationId === null
+					? undefined
+					: eq(workspaces.organizationId, organizationId),
 				inArray(workspaces.id, keys),
 			),
 		);
@@ -375,22 +471,25 @@ async function refsFor(
 	);
 }
 
+interface CloudUsageOptions<GroupBy> {
+	window: CloudUsageWindow;
+	filters?: CloudUsageFilters;
+	groupBy?: GroupBy;
+	limit: number;
+	cursor?: CloudUsageCursor;
+	overagePerGbHour: number | null;
+}
+
 /**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
- * in the window: a total, and with `groupBy` one row per user, UTC day or workspace. Pages ordered
- * by amount are read at each call: an event sent between pages can move a row across the cursor.
+ * in the window: a total, and with `groupBy` one row per user, UTC day or workspace (a fleet scope
+ * adds organization, project, size and end reason). Pages ordered by amount are read at each call:
+ * an event sent between pages can move a row across the cursor.
  */
-export async function queryCloudUsage(
+async function usageRows(
 	db: Db,
-	scope: CloudUsageScope,
-	options: {
-		window: CloudUsageWindow;
-		filters?: CloudUsageFilters;
-		groupBy?: CloudUsageGroupBy;
-		limit: number;
-		cursor?: CloudUsageCursor;
-		overagePerGbHour: number | null;
-	},
+	scope: Scope,
+	options: CloudUsageOptions<CloudFleetGroupBy>,
 ) {
 	const {
 		window,
@@ -458,7 +557,7 @@ export async function queryCloudUsage(
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
-				label: groupBy === "day" ? key : (ref?.name ?? null),
+				label: ref ? ref.name : isPlainKey(groupBy) ? key : null,
 				ref,
 				...toMetrics(row, overagePerGbHour),
 			};
@@ -471,7 +570,36 @@ export async function queryCloudUsage(
 	};
 }
 
-export type CloudUsageResult = Awaited<ReturnType<typeof queryCloudUsage>>;
+type CloudFleetUsageResult = Awaited<ReturnType<typeof usageRows>>;
+
+export type CloudUsageResult = Omit<CloudFleetUsageResult, "items"> & {
+	items: Array<
+		Omit<CloudFleetUsageResult["items"][number], "ref"> & {
+			ref: UserRef | WorkspaceRef | null;
+		}
+	>;
+};
+
+export function queryCloudUsage(
+	db: Db,
+	scope: CloudUsageScope,
+	options: CloudUsageOptions<CloudUsageGroupBy>,
+): Promise<CloudUsageResult> {
+	return usageRows(db, scope, options) as Promise<CloudUsageResult>;
+}
+
+/**
+ * `queryCloudUsage` across organizations (`organizationId: null`) or for one, with more groupings.
+ * Staff only: biome.jsonc forbids importing it outside this package, and `queryCloudUsage` accepts
+ * only a `CloudUsageScope`, whose organization id is a string.
+ */
+export function queryFleetCloudUsage(
+	db: Db,
+	organizationId: string | null,
+	options: CloudUsageOptions<CloudFleetGroupBy>,
+): Promise<CloudFleetUsageResult> {
+	return usageRows(db, { organizationId }, options);
+}
 
 const NO_USAGE: MetricRow = {
 	gbMinutes: "0",
@@ -521,21 +649,18 @@ export async function queryCloudUsageByPeriod(
 	}));
 }
 
-/** Boot rows that started in the window, newest first, each with the sum of its sent events. */
-export async function listCloudBoots(
-	db: Db,
-	scope: CloudUsageScope,
-	options: {
-		window: CloudUsageWindow;
-		filters?: CloudUsageFilters;
-		endReason?: CloudWorkspaceBootEndReason[];
-		open?: boolean;
-		limit: number;
-		cursor?: CloudBootCursor;
-		now: Date;
-		overagePerGbHour: number | null;
-	},
-) {
+interface CloudBootsOptions {
+	window: CloudUsageWindow;
+	filters?: CloudUsageFilters;
+	endReason?: CloudWorkspaceBootEndReason[];
+	open?: boolean;
+	limit: number;
+	cursor?: CloudBootCursor;
+	now: Date;
+	overagePerGbHour: number | null;
+}
+
+async function bootRows(db: Db, scope: Scope, options: CloudBootsOptions) {
 	const {
 		window,
 		filters = {},
@@ -562,7 +687,7 @@ export async function listCloudBoots(
 		.leftJoin(users, eq(users.id, boots.createdByUserId))
 		.where(
 			and(
-				eq(boots.organizationId, scope.organizationId),
+				inOrganization(scope, boots.organizationId),
 				gte(boots.startedAt, window.from),
 				lt(boots.startedAt, window.to),
 				...scopeConditions(scope, filters, {
@@ -606,4 +731,82 @@ export async function listCloudBoots(
 	};
 }
 
-export type CloudBootsResult = Awaited<ReturnType<typeof listCloudBoots>>;
+export type CloudBootsResult = Awaited<ReturnType<typeof bootRows>>;
+
+export type CloudFleetBootsResult = Omit<CloudBootsResult, "items"> & {
+	items: Array<CloudBootsResult["items"][number] & FleetBootFields>;
+};
+
+interface FleetBootFields {
+	organization: OrganizationRef | null;
+	activeCpuMinutes: number | null;
+	egressGb: number | null;
+}
+
+const NO_FLEET_BOOT_FIELDS: FleetBootFields = {
+	organization: null,
+	activeCpuMinutes: null,
+	egressGb: null,
+};
+
+async function fleetBootFields(db: Db, ids: string[]) {
+	const fields = new Map<string, FleetBootFields>();
+	if (ids.length === 0) return fields;
+	const rows = await db
+		.select({
+			id: boots.id,
+			organization: {
+				id: organizations.id,
+				name: organizations.name,
+				slug: organizations.slug,
+			},
+			activeCpuMs: boots.activeCpuMs,
+			egressBytes: boots.egressBytes,
+		})
+		.from(boots)
+		.leftJoin(organizations, eq(organizations.id, boots.organizationId))
+		.where(inArray(boots.id, ids));
+	for (const { id, activeCpuMs, egressBytes, organization } of rows) {
+		fields.set(id, {
+			organization,
+			activeCpuMinutes: activeCpuMs === null ? null : activeCpuMs / 60_000,
+			egressGb: egressBytes === null ? null : egressBytes / 1024 ** 3,
+		});
+	}
+	return fields;
+}
+
+/**
+ * Boot rows that started in the window, newest first, each with the sum of its sent events. A failed
+ * start with no boot row is not listed: it is a workspace, counted by `queryCloudUsage`.
+ */
+export function listCloudBoots(
+	db: Db,
+	scope: CloudUsageScope,
+	options: CloudBootsOptions,
+) {
+	return bootRows(db, scope, options);
+}
+
+/**
+ * `listCloudBoots` across organizations (`organizationId: null`) or for one, with the organization,
+ * active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function listFleetCloudBoots(
+	db: Db,
+	organizationId: string | null,
+	options: CloudBootsOptions,
+): Promise<CloudFleetBootsResult> {
+	const result = await bootRows(db, { organizationId }, options);
+	const fields = await fleetBootFields(
+		db,
+		result.items.map((boot) => boot.id),
+	);
+	return {
+		...result,
+		items: result.items.map((boot) => ({
+			...boot,
+			...(fields.get(boot.id) ?? NO_FLEET_BOOT_FIELDS),
+		})),
+	};
+}
