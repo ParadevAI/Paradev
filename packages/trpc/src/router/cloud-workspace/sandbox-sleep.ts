@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
@@ -15,12 +16,18 @@ export const keepUpdatedAt = { updatedAt: sql`${cloudWorkspaces.updatedAt}` };
 export function reportSleepWriteFailure(
 	cloudWorkspaceId: string,
 	error: unknown,
+	organizationId?: string,
 ): void {
 	console.error(
 		`[cloud-workspace] could not record sleep state of ${cloudWorkspaceId}`,
 		error,
 	);
-	Sentry.captureException(error, { extra: { cloudWorkspaceId } });
+	Sentry.captureException(error, {
+		tags: {
+			"cloud_workspace.id": cloudWorkspaceId,
+			...(organizationId ? { "organization.id": organizationId } : {}),
+		},
+	});
 }
 
 /**
@@ -40,9 +47,10 @@ export function stillStoppedSession(sessionId: string | null): SQL | undefined {
 export async function recordSandboxAsleep(
 	cloudWorkspaceId: string,
 	{ sessionId }: { sessionId: string | null },
+	organizationId?: string,
 ): Promise<void> {
 	await markAsleep(cloudWorkspaceId, sessionId).catch((error) =>
-		reportSleepWriteFailure(cloudWorkspaceId, error),
+		reportSleepWriteFailure(cloudWorkspaceId, error, organizationId),
 	);
 }
 
@@ -68,6 +76,11 @@ async function markAsleep(
 		.returning({ organizationId: cloudWorkspaces.organizationId });
 	if (slept) {
 		nudge(slept.organizationId, "cloud_workspaces");
+		logControl(
+			"workspace.asleep",
+			{ cloudWorkspaceId, organizationId: slept.organizationId },
+			{ "sandbox.session_id": sessionId ?? undefined },
+		);
 		return;
 	}
 	await db

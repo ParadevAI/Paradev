@@ -318,7 +318,7 @@ export const dashboardSidebarSectionSchema = z.object({
 	tag: z.string().nullable().default(null),
 });
 
-const v2ExecutionModeSchema = z.enum([
+const executionModeSchema = z.enum([
 	"split-pane",
 	"new-tab",
 	"new-tab-split-pane",
@@ -327,7 +327,7 @@ const v2ExecutionModeSchema = z.enum([
 
 // projectIds uses plain z.string() (not uuid) because v1 accepts arbitrary
 // string IDs and the migration copies them verbatim.
-export const v2TerminalPresetSchema = z.object({
+export const terminalPresetSchema = z.object({
 	id: z.string().uuid(),
 	name: z.string(),
 	description: z.string().optional(),
@@ -338,7 +338,7 @@ export const v2TerminalPresetSchema = z.object({
 	useAsWorkspaceRun: z.boolean().optional(),
 	applyOnWorkspaceCreated: z.boolean().optional(),
 	applyOnNewTab: z.boolean().optional(),
-	executionMode: v2ExecutionModeSchema.default("new-tab"),
+	executionMode: executionModeSchema.default("new-tab"),
 	tabOrder: z.number().int().default(0),
 	createdAt: persistedDateSchema,
 	// When set, the preset is live-linked to a host-service agent config id.
@@ -358,7 +358,7 @@ export type WorkspaceRunTerminalState = z.infer<
 export type DashboardSidebarSectionRow = z.infer<
 	typeof dashboardSidebarSectionSchema
 >;
-export type V2TerminalPresetRow = z.infer<typeof v2TerminalPresetSchema>;
+export type TerminalPresetRow = z.infer<typeof terminalPresetSchema>;
 
 /**
  * Singleton row of user-scoped preferences.
@@ -502,7 +502,7 @@ export type SidebarProjectHostFilter = z.infer<
 const persistedSidebarProjectHostFilterSchema =
 	sidebarProjectHostFilterSchema.catch("all");
 
-export const v2UserPreferencesSchema = z.object({
+export const userPreferencesSchema = z.object({
 	id: z.literal("preferences"),
 	fileLinks: linkTierMapSchema.default(DEFAULT_LINK_TIER_MAP),
 	urlLinks: linkTierMapSchema.default(DEFAULT_URL_LINKS),
@@ -526,7 +526,7 @@ export const v2UserPreferencesSchema = z.object({
 	// a device, or only cloud sandboxes.
 	sidebarProjectHostFilter: persistedSidebarProjectHostFilterSchema,
 	// Built-in (synthetic, app-shipped) presets the user hid from the preset
-	// bar. Synthetic presets have no v2TerminalPresets row, so visibility can't
+	// bar. Synthetic presets have no terminalPresets row, so visibility can't
 	// live on the row's pinnedToBar like user presets. Pruned against
 	// KNOWN_BUILTIN_PRESET_IDS at heal time so retired ids can't persist.
 	hiddenBuiltinPresetIds: z.array(z.string()).default([]),
@@ -544,11 +544,11 @@ export const KNOWN_BUILTIN_PRESET_IDS = ["superset-cli"] as const;
 
 export const MAX_FAVORITE_PAGE_IDS = 200;
 
-export type V2UserPreferencesRow = z.infer<typeof v2UserPreferencesSchema>;
+export type UserPreferencesRow = z.infer<typeof userPreferencesSchema>;
 
 export const V2_USER_PREFERENCES_ID = "preferences" as const;
 
-export const DEFAULT_V2_USER_PREFERENCES: V2UserPreferencesRow = {
+export const DEFAULT_V2_USER_PREFERENCES: UserPreferencesRow = {
 	id: V2_USER_PREFERENCES_ID,
 	fileLinks: DEFAULT_LINK_TIER_MAP,
 	urlLinks: DEFAULT_URL_LINKS,
@@ -628,10 +628,10 @@ export function healWorkspaceLocalState(raw: unknown): WorkspaceLocalStateRow {
  * to consumers. Per-tier defaults vary by map, so we deep-merge each tier map
  * against its own default rather than relying on a single Zod default.
  */
-export function healV2UserPreferences(raw: unknown): V2UserPreferencesRow {
+export function healUserPreferences(raw: unknown): UserPreferencesRow {
 	const r = (
 		raw && typeof raw === "object" ? raw : {}
-	) as Partial<V2UserPreferencesRow>;
+	) as Partial<UserPreferencesRow>;
 	const sidebarFileLinks = r.sidebarFileLinks
 		? {
 				...DEFAULT_V2_USER_PREFERENCES.sidebarFileLinks,

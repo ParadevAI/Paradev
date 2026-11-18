@@ -140,7 +140,22 @@ try {
 	docker(["exec", "-i", NAME, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
 		stdin: identity,
 	});
-	const boot = (_n: number) => {
+	// host-service answers before the remaining steps finish; a log read for
+	// what the steps did waits for this boot's steps.end.
+	const waitForSteps = () =>
+		exec(
+			`for i in $(seq 1 3000); do awk '/ boot\\.start/ { d = 0 } / steps\\.end/ { d = 1 } END { exit !d }' ${SANDBOX_PATHS.bootLog} && exit 0; sleep 0.2; done; exit 1`,
+			{ check: false },
+		);
+	const sinceBootStart = (log: string, phase: string) => {
+		const boot = log.split(/(?=^\d+ boot\.start)/m).at(-1) ?? "";
+		const at = (p: string) =>
+			Number(
+				new RegExp(`^(\\d+) ${p.replace(".", "\\.")}\\b`, "m").exec(boot)?.[1],
+			);
+		return at(phase) - at("boot.start");
+	};
+	const boot = (n: number) => {
 		const started = Date.now();
 		bootAsUser();
 		// Wait for host-service (up to 60 s) so the second boot sees a clean run dir cleared by the first.
@@ -148,7 +163,13 @@ try {
 			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
 			{ check: false },
 		);
-		return Date.now() - started;
+		const elapsed = Date.now() - started;
+		waitForSteps();
+		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`);
+		console.log(
+			`boot ${n}: boot.start to host.ready ${sinceBootStart(log, "host.ready")} ms, to steps.end ${sinceBootStart(log, "steps.end")} ms`,
+		);
+		return elapsed;
 	};
 
 	const first = boot(1);
@@ -358,14 +379,20 @@ try {
 	const stubSha = "f".repeat(64);
 	stop();
 	exec(
-		`: > ${SANDBOX_PATHS.bootLog}; mkdir -p ${SANDBOX_PATHS.agents}/claude/${stubSha} && printf '#!/bin/sh\\necho drive-claude\\n' > ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && chmod 755 ${SANDBOX_PATHS.agents}/claude/${stubSha}/claude && printf '%s' '${JSON.stringify([{ name: "claude", sha: stubSha, bin: "claude" }])}' > ${SANDBOX_PATHS.agents}/manifest.json`,
+		`: > ${SANDBOX_PATHS.bootLog}; for name in claude pi; do mkdir -p ${SANDBOX_PATHS.agents}/$name/${stubSha} && printf '#!/bin/sh\\necho drive-%s\\n' $name > ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name && chmod 755 ${SANDBOX_PATHS.agents}/$name/${stubSha}/$name; done && printf '%s' '${JSON.stringify(
+			[
+				{ name: "claude", sha: stubSha, bin: "claude" },
+				{ name: "pi", sha: stubSha, bin: "pi" },
+			],
+		)}' > ${SANDBOX_PATHS.agents}/manifest.json`,
 	);
 	boot(3);
 	const logDrive = exec(`cat ${SANDBOX_PATHS.bootLog}`);
 	expect(
-		"drive: listed agent linked",
-		/agents\.linked 1/.test(logDrive) &&
-			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })),
+		"drive: listed agents linked",
+		/agents\.linked 2/.test(logDrive) &&
+			/drive-claude/.test(exec("claude", { check: false, user: "ubuntu" })) &&
+			/drive-pi/.test(exec("pi", { check: false, user: "ubuntu" })),
 		logDrive.match(/agents\..*/)?.[0],
 	);
 	stop();
@@ -390,6 +417,12 @@ try {
 			SANDBOX_PATHS.media,
 		),
 		exec("readlink -f /usr/local/bin/claude", { check: false }).trim(),
+	);
+	expect(
+		"no drive: a drive-only agent's link is gone",
+		exec("test -L /usr/local/bin/pi && echo dangling", {
+			check: false,
+		}).trim() === "",
 	);
 
 	// Third boot, with host-service deliberately broken: the box must stay

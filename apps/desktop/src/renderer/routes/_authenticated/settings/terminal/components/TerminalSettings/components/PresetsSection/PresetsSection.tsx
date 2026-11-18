@@ -12,10 +12,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { getAgentCommandText } from "renderer/lib/agent-launch-command";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { HighlightText } from "renderer/routes/_authenticated/settings/components/HighlightText";
 import type { PresetColumnKey } from "renderer/routes/_authenticated/settings/presets/types";
@@ -44,7 +44,7 @@ interface PresetsSectionProps {
 }
 
 /**
- * Presets section wired to the renderer-side v2TerminalPresets
+ * Presets section wired to the renderer-side terminalPresets
  * collection. Reuses PresetsTable / PresetEditorDialog / QuickAddPresets from
  * the v1 directory (they're prop-driven renderers). When v1 is deprecated,
  * delete PresetsSection and move the shared sub-components here.
@@ -66,31 +66,31 @@ export function PresetsSection({
 	// data source the /settings/agents page reads and writes, so edits
 	// there propagate here. The query is invalidated by those mutations.
 	const { activeHostUrl } = useLocalHostService();
-	const { data: agents = [] } = useV2AgentConfigs(activeHostUrl);
+	const { data: agents = [] } = useAgentConfigs(activeHostUrl);
 
-	const { data: v2Presets = [] } = useLiveQuery(
+	const { data: presetRows = [] } = useLiveQuery(
 		(query) =>
 			query
-				.from({ v2TerminalPresets: collections.v2TerminalPresets })
-				.orderBy(({ v2TerminalPresets }) => v2TerminalPresets.tabOrder),
+				.from({ terminalPresets: collections.terminalPresets })
+				.orderBy(({ terminalPresets }) => terminalPresets.tabOrder),
 		[collections],
 	);
 
 	// Projects are fully local — identity comes from the host fan-out.
-	const { projects: v2Projects } = useHostProjects();
+	const { projects: hostProjects } = useHostProjects();
 	const projectChoices = useMemo(
 		() =>
-			[...v2Projects]
+			[...hostProjects]
 				.sort((a, b) => a.name.localeCompare(b.name))
 				.map((project) => ({ id: project.projectKey, name: project.name })),
-		[v2Projects],
+		[hostProjects],
 	);
 
-	// V2TerminalPresetRow is a superset of TerminalPreset — safe to cast
+	// TerminalPresetRow is a superset of TerminalPreset — safe to cast
 	// for the prop-driven sub-components.
 	const serverPresets = useMemo<TerminalPreset[]>(
-		() => v2Presets as unknown as TerminalPreset[],
-		[v2Presets],
+		() => presetRows as unknown as TerminalPreset[],
+		[presetRows],
 	);
 
 	const [localPresets, setLocalPresets] =
@@ -190,7 +190,7 @@ export function PresetsSection({
 		() =>
 			new Set(
 				serverPresets
-					.map((preset) => (preset as V2TerminalPresetRow).agentId)
+					.map((preset) => (preset as TerminalPresetRow).agentId)
 					.filter((id): id is string => !!id),
 			),
 		[serverPresets],
@@ -232,11 +232,11 @@ export function PresetsSection({
 			executionMode?: ExecutionMode;
 			agentId?: string;
 		}) => {
-			const maxTabOrder = v2Presets.reduce(
+			const maxTabOrder = presetRows.reduce(
 				(max, preset) => Math.max(max, preset.tabOrder),
 				-1,
 			);
-			collections.v2TerminalPresets.insert({
+			collections.terminalPresets.insert({
 				id: crypto.randomUUID(),
 				name: input.name,
 				description: input.description,
@@ -251,21 +251,21 @@ export function PresetsSection({
 				agentId: input.agentId,
 			});
 		},
-		[collections.v2TerminalPresets, v2Presets],
+		[collections.terminalPresets, presetRows],
 	);
 
 	const updatePreset = useCallback(
-		(id: string, patch: Partial<V2TerminalPresetRow>) => {
-			collections.v2TerminalPresets.update(id, (draft) => {
+		(id: string, patch: Partial<TerminalPresetRow>) => {
+			collections.terminalPresets.update(id, (draft) => {
 				for (const [key, value] of Object.entries(patch) as Array<
-					[keyof V2TerminalPresetRow, unknown]
+					[keyof TerminalPresetRow, unknown]
 				>) {
 					// biome-ignore lint/suspicious/noExplicitAny: narrow assignment across union
 					(draft as any)[key] = value;
 				}
 			});
 		},
-		[collections.v2TerminalPresets],
+		[collections.terminalPresets],
 	);
 
 	// Migrate legacy rows whose agentId still holds a presetId. Skip when the
@@ -274,7 +274,7 @@ export function PresetsSection({
 		if (agents.length === 0 || serverPresets.length === 0) return;
 
 		for (const preset of serverPresets) {
-			const row = preset as V2TerminalPresetRow;
+			const row = preset as TerminalPresetRow;
 			if (!row.agentId) continue;
 			if (agents.some((agent) => agent.id === row.agentId)) continue;
 
@@ -291,9 +291,9 @@ export function PresetsSection({
 
 	const deletePreset = useCallback(
 		(id: string) => {
-			collections.v2TerminalPresets.delete(id);
+			collections.terminalPresets.delete(id);
 		},
-		[collections.v2TerminalPresets],
+		[collections.terminalPresets],
 	);
 
 	// The stored `commands` array is the launch fallback used whenever the
@@ -304,7 +304,7 @@ export function PresetsSection({
 			const commandText = getAgentCommandText(updated);
 			if (commandText.trim().length === 0) return;
 			for (const preset of serverPresetsRef.current) {
-				const row = preset as V2TerminalPresetRow;
+				const row = preset as TerminalPresetRow;
 				if (row.agentId !== updated.id && row.agentId !== updated.presetId) {
 					continue;
 				}
@@ -319,7 +319,7 @@ export function PresetsSection({
 
 	const reorderPresets = useCallback(
 		(presetId: string, targetIndex: number) => {
-			const orderedIds = v2Presets.map((preset) => preset.id);
+			const orderedIds = presetRows.map((preset) => preset.id);
 			const currentIndex = orderedIds.indexOf(presetId);
 			if (currentIndex === -1) return;
 			if (targetIndex < 0 || targetIndex >= orderedIds.length) return;
@@ -328,12 +328,12 @@ export function PresetsSection({
 			orderedIds.splice(targetIndex, 0, moved);
 
 			for (const [index, id] of orderedIds.entries()) {
-				collections.v2TerminalPresets.update(id, (draft) => {
+				collections.terminalPresets.update(id, (draft) => {
 					draft.tabOrder = index;
 				});
 			}
 		},
-		[collections.v2TerminalPresets, v2Presets],
+		[collections.terminalPresets, presetRows],
 	);
 
 	const handleCellChange = useCallback(

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
-import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
+import { browserRuntimeRegistry } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { showAgentBrowserPane } from "../../utils/agentBrowserReveal";
 

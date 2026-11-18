@@ -7,10 +7,10 @@ import {
 } from "@superset/ui/command";
 import { useMemo } from "react";
 import { FileResultItem } from "renderer/components/FileResultItem";
-import { matchRecentFiles } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
+import { matchRecentFiles } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRecentlyViewedFiles";
 import { useFrameStackStore } from "../../core/frames";
 import { useCommandPaletteQuery } from "../CommandPalette/CommandPalette";
-import { useV2FileSearch } from "./hooks/useV2FileSearch";
+import { useFileSearch } from "./hooks/useFileSearch";
 import { useQuickOpenStore } from "./quickOpenStore";
 
 function fileNameOf(relativePath: string): string {
@@ -21,7 +21,7 @@ export function QuickOpenFrame() {
 	const query = useCommandPaletteQuery();
 	const provider = useQuickOpenStore((s) => s.provider);
 	const setOpen = useFrameStackStore((s) => s.setOpen);
-	const { results } = useV2FileSearch(provider, query);
+	const { results } = useFileSearch(provider, query);
 
 	const recent = useMemo(
 		() =>

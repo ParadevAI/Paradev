@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { LayoutNode, WorkspaceState } from "@superset/panes";
-import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/types";
+import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import {
 	applyPaneLayoutOp,
 	type PaneAreas,

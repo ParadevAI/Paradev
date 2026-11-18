@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
+import { logControl, logStepFailed } from "../../lib/control-log";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
 	deleteSandbox,
@@ -58,15 +59,19 @@ async function runArchiveHook(
 ): Promise<boolean> {
 	const box = await describeSandbox(row.providerSandboxId).catch(() => null);
 	if (!box?.running) return true;
+	const scope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
 	const hostSecret = await sandboxHostSecretFor(row.id);
 	const outcome = await runBoxArchiveHook({
 		hostTarget: box.hostTarget,
 		hostSecret,
 	});
 	if (outcome.kind === "error") {
-		console.error(`[cloud-workspace] ${row.id} archive hook`, outcome.message);
+		logStepFailed("archive.hook", scope, outcome.message);
 	} else if (outcome.kind === "ran" && outcome.status !== "skipped") {
-		console.log(`[cloud-workspace] ${row.id} archive hook ${outcome.status}`);
+		logControl("archive.hook_ran", scope, { "hook.status": outcome.status });
 	}
 	if (isStillArchived(await findRow(row.id), input)) return true;
 	// Undone mid-hook: setup re-creates what the hook released.
@@ -75,7 +80,7 @@ async function runArchiveHook(
 		hostSecret,
 	});
 	if (rerun.kind === "error") {
-		console.error(`[cloud-workspace] ${row.id} setup re-run`, rerun.message);
+		logStepFailed("setup.rerun", scope, rerun.message);
 	}
 	return false;
 }
@@ -87,35 +92,45 @@ export async function reapArchivedCloudWorkspace(
 	if (!isStillArchived(row, input)) {
 		return "skipped";
 	}
+	const scope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
 	if (input.stage === "delete") {
 		await settleWorkspaceNow(row.id).catch((error) =>
-			console.error(`[cloud-workspace] ${row.id} final settle failed`, error),
+			logStepFailed("meter.settle", scope, error),
 		);
 		await deleteSandbox(row.providerSandboxId);
-		await reapWorkspaceFiles(row.id);
+		await reapWorkspaceFiles(row.id, row.organizationId);
+		logControl("archive.deleted", scope, {});
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
 	const stopped = await stopSandbox(row.providerSandboxId);
-	await recordSandboxAsleep(row.id, {
-		sessionId: stopped.sessionId ?? row.sandboxSessionId,
-	});
+	await recordSandboxAsleep(
+		row.id,
+		{
+			sessionId: stopped.sessionId ?? row.sandboxSessionId,
+		},
+		row.organizationId,
+	);
 	await queueSettleWorkspace(row.id);
+	logControl("archive.stopped", scope, {});
 	return "stopped";
 }
 
 /** Drops the files sent to a workspace whose box is gone for good. */
-export async function reapWorkspaceFiles(cloudWorkspaceId: string) {
+export async function reapWorkspaceFiles(
+	cloudWorkspaceId: string,
+	organizationId: string,
+) {
 	await reapOrphanFiles(
 		await detachAll({
 			parentKind: "cloud_workspace",
 			parentIds: [cloudWorkspaceId],
 		}),
 	).catch((error) =>
-		console.error(
-			`[cloud-workspace] ${cloudWorkspaceId} file reap failed`,
-			error,
-		),
+		logStepFailed("files.reap", { cloudWorkspaceId, organizationId }, error),
 	);
 }
 
@@ -138,20 +153,32 @@ function queueReapStage(
  */
 export async function queueReap(
 	input: Omit<ReapArchivedCloudWorkspaceInput, "stage">,
-	box: { providerSandboxId: string; sandboxSessionId: string | null },
+	box: {
+		organizationId: string;
+		providerSandboxId: string;
+		sandboxSessionId: string | null;
+	},
 ): Promise<void> {
 	await queueReapStage({ ...input, stage: "delete" }, ARCHIVE_GRACE_SECONDS);
 	await queueReapStage(
 		{ ...input, stage: "stop" },
 		ARCHIVE_STOP_DELAY_SECONDS,
 	).catch(async (error) => {
-		console.error(
-			`[cloud-workspace] could not queue the stop for ${input.cloudWorkspaceId}`,
+		logStepFailed(
+			"reap.stop_queue",
+			{
+				cloudWorkspaceId: input.cloudWorkspaceId,
+				organizationId: box.organizationId,
+			},
 			error,
 		);
 		const stopped = await stopSandbox(box.providerSandboxId);
-		await recordSandboxAsleep(input.cloudWorkspaceId, {
-			sessionId: stopped.sessionId ?? box.sandboxSessionId,
-		});
+		await recordSandboxAsleep(
+			input.cloudWorkspaceId,
+			{
+				sessionId: stopped.sessionId ?? box.sandboxSessionId,
+			},
+			box.organizationId,
+		);
 	});
 }

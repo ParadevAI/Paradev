@@ -19,7 +19,7 @@ import { PageHeader } from "renderer/routes/_authenticated/_dashboard/components
 import { ProjectFilter } from "renderer/routes/_authenticated/_dashboard/components/ProjectFilter";
 import { WorkItemsSearch } from "renderer/routes/_authenticated/_dashboard/components/WorkItemsSearch";
 import type { ViewMode } from "../../../../stores/tasks-filter-state";
-import { RunInWorkspacePopoverV2 } from "../../../RunInWorkspacePopoverV2";
+import { RunInWorkspacePopover } from "../../../RunInWorkspacePopover";
 import type { TaskWithStatus } from "../../hooks/useTasksData";
 import type { SelectedIssue } from "../GitHubIssuesContent";
 import { AssigneeFilter } from "./components/AssigneeFilter";
@@ -166,7 +166,7 @@ export function TasksTopBar({
 										onComplete={onClearIssueSelection ?? (() => {})}
 									/>
 								) : (
-									<RunInWorkspacePopoverV2
+									<RunInWorkspacePopover
 										tasks={selectedTasks}
 										onComplete={onClearSelection ?? (() => {})}
 									/>

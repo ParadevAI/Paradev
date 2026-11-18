@@ -1,0 +1,1 @@
+export { useSetupScriptCard } from "./useSetupScriptCard";

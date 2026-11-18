@@ -268,8 +268,8 @@ export function useWorkspaceCreates(): UseWorkspaceCreatesApi {
 			};
 
 			const deleteWorkspaceLocalState = (id: string) => {
-				if (collections.v2WorkspaceLocalState.get(id)) {
-					collections.v2WorkspaceLocalState.delete(id);
+				if (collections.workspaceLocalState.get(id)) {
+					collections.workspaceLocalState.delete(id);
 				}
 			};
 

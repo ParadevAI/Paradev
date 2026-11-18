@@ -79,6 +79,8 @@ export const SETTING_ITEM_ID = {
 	EXPERIMENTAL_WAIT_FOR_SETUP_BEFORE_AGENT:
 		"experimental-wait-for-setup-before-agent",
 	EXPERIMENTAL_RESTART_ONBOARDING: "experimental-restart-onboarding",
+	EXPERIMENTAL_NEW_LAYOUT: "experimental-new-layout",
+	EXPERIMENTAL_NEW_WORKSPACE_PAGE: "experimental-new-workspace-page",
 
 	BILLING_OVERVIEW: "billing-overview",
 	BILLING_PLANS: "billing-plans",
@@ -1346,6 +1348,46 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"reuse",
 			"sequential",
 			"install",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_LAYOUT,
+		section: "experimental",
+		title: "New layout",
+		description:
+			"Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards",
+		keywords: [
+			"experimental",
+			"layout",
+			"shell",
+			"redesign",
+			"design",
+			"sidebar",
+			"rail",
+			"tabs",
+			"title bar",
+			"cards",
+			"toggle",
+			"switch",
+		],
+	},
+	{
+		id: SETTING_ITEM_ID.EXPERIMENTAL_NEW_WORKSPACE_PAGE,
+		section: "experimental",
+		title: "New workspace page",
+		description:
+			"Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it",
+		keywords: [
+			"experimental",
+			"new workspace",
+			"home",
+			"composer",
+			"prompt",
+			"redesign",
+			"layout",
+			"pickers",
+			"toggle",
+			"switch",
 		],
 	},
 	{

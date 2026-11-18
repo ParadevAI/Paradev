@@ -19,7 +19,7 @@ export interface SubagentLinkParams {
 	agentType?: string;
 }
 
-export interface SubagentLinkSearchParams {
+interface SubagentLinkSearchParams {
 	subagentTerminalId?: string;
 	subagentId?: string;
 	subagentAgentId?: string;
@@ -73,7 +73,7 @@ export function parseSubagentSearch(
 	};
 }
 
-export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
+export interface WorkspaceSearchParams extends SubagentLinkSearchParams {
 	sessionId?: string;
 	terminalId?: string;
 	focusRequestId?: string;
@@ -83,18 +83,18 @@ export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
 }
 
 /**
- * Navigate to a V2 workspace route.
+ * Navigate to a workspace route.
  */
-export function navigateToV2Workspace(
+export function navigateToWorkspace(
 	workspaceId: string,
 	navigate: UseNavigateResult<string>,
 	options?: Omit<NavigateOptions, "to" | "params" | "search"> & {
-		search?: V2WorkspaceSearchParams;
+		search?: WorkspaceSearchParams;
 	},
 ): Promise<void> {
 	const { search, ...rest } = options ?? {};
 	return navigate({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		params: { workspaceId },
 		search: search ?? {},
 		...rest,

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { V2GitSettings } from "./components/V2GitSettings";
+import { GitSettings } from "./components/GitSettings";
 
 export const Route = createFileRoute("/_authenticated/settings/git/")({
 	component: GitSettingsPage,
@@ -10,5 +10,5 @@ export const Route = createFileRoute("/_authenticated/settings/git/")({
 
 function GitSettingsPage() {
 	const { hostId } = Route.useSearch();
-	return <V2GitSettings hostId={hostId ?? null} />;
+	return <GitSettings hostId={hostId ?? null} />;
 }

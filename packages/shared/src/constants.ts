@@ -152,12 +152,6 @@ export const FEATURE_FLAGS = {
 	/** In-app channels in the desktop sidebar. */
 	CHANNELS: "channels",
 	/**
-	 * The redesigned desktop shell: icon rail, title-bar tabs, inset content
-	 * card, pane cards and the inline home composer. Read once per launch, so
-	 * a change in PostHog applies on the next start.
-	 */
-	PARADEV_SHELL: "paradev-shell",
-	/**
 	 * Kill switch for stacked pull requests on the desktop: the stack read and
 	 * chip, stack merge, merge queue actions, and switching a workspace between
 	 * layers. On for everyone. Unloaded or offline means on, and so does a

@@ -1,6 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import type { SessionConfigOption } from "@superset/chat/protocol";
 import { DropdownMenuItem } from "@superset/ui/dropdown-menu";
+import { OverflowFadeContainer } from "@superset/ui/overflow-fade-container";
 import { cn } from "@superset/ui/utils";
 import {
 	type KeyboardEvent,
@@ -33,6 +34,14 @@ const SHORTCUT_MODIFIER =
 	navigator.platform.toLowerCase().includes("mac")
 		? "⌘"
 		: "Ctrl ";
+
+function scrollSelectedTabIntoView(tab: HTMLButtonElement | null) {
+	tab?.scrollIntoView({
+		block: "nearest",
+		inline: "nearest",
+		container: "nearest",
+	});
+}
 
 export function ModelPanel({
 	agentSwitcher,
@@ -239,51 +248,56 @@ export function ModelPanel({
 	return (
 		<div className="flex min-h-0 flex-col" onKeyDownCapture={onPanelKeyDown}>
 			{tabs.length > 0 ? (
-				<div
-					className="flex shrink-0 items-center gap-0.5 border-b px-1.5 py-1.5"
-					role="tablist"
-				>
-					{tabs.map((entry) => {
-						const selected = entry.presetId === tab;
-						const icon =
-							entry.presetId === FAVORITES_TAB
-								? null
-								: getPresetIcon(entry.iconId ?? entry.presetId, isDark);
-						return (
-							<button
-								aria-label={entry.label}
-								aria-selected={selected}
-								className={cn(
-									"relative flex h-7 min-w-7 shrink-0 cursor-pointer items-center justify-center rounded-md px-1.5 text-[11px] text-muted-foreground/70 transition-colors hover:bg-foreground/[0.07] hover:text-foreground",
-									selected &&
-										"text-foreground after:absolute after:inset-x-1.5 after:-bottom-1.5 after:h-0.5 after:rounded-full after:bg-foreground",
-								)}
-								key={entry.presetId}
-								onClick={() => selectTab(entry.presetId)}
-								role="tab"
-								tabIndex={-1}
-								title={entry.label}
-								type="button"
-							>
-								{entry.presetId === FAVORITES_TAB ? (
-									<LuStar
-										className={cn("size-3.5", selected && "fill-current")}
-									/>
-								) : icon ? (
-									<img
-										alt=""
-										className={cn(
-											"size-4 object-contain",
-											!selected && "opacity-70",
-										)}
-										src={icon}
-									/>
-								) : (
-									entry.label.slice(0, 2)
-								)}
-							</button>
-						);
-					})}
+				<div className="shrink-0 border-b">
+					<OverflowFadeContainer
+						className="hide-scrollbar flex scroll-px-12 items-center gap-0.5 overflow-x-auto overflow-y-hidden px-1.5 py-1.5"
+						fadeEdges={["left", "right"]}
+						observeChildren
+						role="tablist"
+					>
+						{tabs.map((entry) => {
+							const selected = entry.presetId === tab;
+							const icon =
+								entry.presetId === FAVORITES_TAB
+									? null
+									: getPresetIcon(entry.iconId ?? entry.presetId, isDark);
+							return (
+								<button
+									aria-label={entry.label}
+									aria-selected={selected}
+									className={cn(
+										"relative flex h-7 min-w-7 shrink-0 cursor-pointer items-center justify-center rounded-md px-1.5 text-[11px] text-muted-foreground/70 transition-colors hover:bg-foreground/[0.07] hover:text-foreground",
+										selected &&
+											"text-foreground after:absolute after:inset-x-1.5 after:-bottom-1.5 after:h-0.5 after:rounded-full after:bg-foreground",
+									)}
+									key={entry.presetId}
+									onClick={() => selectTab(entry.presetId)}
+									ref={selected ? scrollSelectedTabIntoView : undefined}
+									role="tab"
+									tabIndex={-1}
+									title={entry.label}
+									type="button"
+								>
+									{entry.presetId === FAVORITES_TAB ? (
+										<LuStar
+											className={cn("size-3.5", selected && "fill-current")}
+										/>
+									) : icon ? (
+										<img
+											alt=""
+											className={cn(
+												"size-4 object-contain",
+												!selected && "opacity-70",
+											)}
+											src={icon}
+										/>
+									) : (
+										entry.label.slice(0, 2)
+									)}
+								</button>
+							);
+						})}
+					</OverflowFadeContainer>
 				</div>
 			) : null}
 			<label className="flex shrink-0 items-center gap-2 border-b px-2.5 text-muted-foreground">

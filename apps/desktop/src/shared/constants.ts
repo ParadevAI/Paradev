@@ -19,7 +19,7 @@ export const APP_PARTITION = "persist:superset";
 export const BROWSER_PARTITION = "persist:browser";
 
 export const NOTIFICATION_EVENTS = {
-	FOCUS_V2_NOTIFICATION_SOURCE: "focus-v2-notification-source",
+	FOCUS_NOTIFICATION_SOURCE: "focus-v2-notification-source",
 	SETTINGS_EXTERNAL_CHANGE: "settings-external-change",
 	OPEN_ROUTE: "open-route",
 	NOTIFICATION_REPLY: "notification-reply",

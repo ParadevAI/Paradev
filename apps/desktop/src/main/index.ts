@@ -194,7 +194,11 @@ async function processDeepLink(url: string): Promise<void> {
 
 	// Non-auth deep links: extract path and navigate in renderer
 	// e.g. superset://tasks/my-slug -> /tasks/my-slug
-	const path = `/${url.slice(url.indexOf("://") + 3)}`;
+	// Links minted before the route rename (older CLIs, published pages).
+	const path = `/${url.slice(url.indexOf("://") + 3)}`.replace(
+		/^\/v2-workspace(s)?\b/,
+		"/workspace$1",
+	);
 	focusMainWindow();
 
 	const target = getFocusedOrLastWindow();

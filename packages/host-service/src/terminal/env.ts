@@ -299,7 +299,7 @@ export function buildV2TerminalEnv(
 	env.SUPERSET_WORKSPACE_PATH = workspacePath;
 	env.SUPERSET_ROOT_PATH = rootPath;
 	env.SUPERSET_ENV = supersetEnv;
-	// v2 hooks post here; without it the notify-hook script finds the
+	// Agent hooks post here; without it the notify-hook script finds the
 	// host-service through the host manifests. No auth token: the endpoint is
 	// unauthenticated by design (chimes plus an idempotent linked-task nudge).
 	if (hostAgentHookUrl) {

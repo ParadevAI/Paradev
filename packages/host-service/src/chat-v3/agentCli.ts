@@ -32,7 +32,10 @@ function candidateNames(binary: string): string[] {
 	return WIN32_DIRECT_EXEC_EXTENSIONS.map((ext) => binary + ext);
 }
 
-function findOnPath(binary: string, env: NodeJS.ProcessEnv): string | null {
+export function findOnPath(
+	binary: string,
+	env: NodeJS.ProcessEnv,
+): string | null {
 	for (const dir of (env.PATH ?? "").split(delimiter)) {
 		if (!dir) continue;
 		for (const name of candidateNames(binary)) {

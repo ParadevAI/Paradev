@@ -443,7 +443,7 @@ describe("getNotifyScriptContent", () => {
 	});
 });
 
-describe("per-agent hook scripts dispatch to v2", () => {
+describe("per-agent hook scripts dispatch to host-service", () => {
 	const buildExpectedV2Payload = (agentIdVar: string) =>
 		`PAYLOAD="{\\"json\\":{\\"terminalId\\":\\"$(json_escape "$SUPERSET_TERMINAL_ID")\\",\\"eventType\\":\\"$(json_escape "$EVENT_TYPE")\\",\\"agent\\":{\\"agentId\\":\\"$(json_escape "$${agentIdVar}")\\",\\"sessionId\\":\\"$(json_escape "$HOOK_SESSION_ID")\\"}}}"`;
 

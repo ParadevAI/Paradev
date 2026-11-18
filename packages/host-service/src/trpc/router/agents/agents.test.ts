@@ -118,6 +118,14 @@ describe("buildAgentCommandString", () => {
 		);
 	});
 
+	it("ends option parsing before a positional prompt that starts with a dash", () => {
+		expect(
+			buildAgentCommandString(argvConfig, "- fix flags\n- add geo", [], {
+				randomId: RANDOM_ID,
+			}),
+		).toBe("claude --dangerously-skip-permissions -- '- fix flags\n- add geo'");
+	});
+
 	it("includes promptArgs before the prompt when a prompt is present", () => {
 		const config = { ...argvConfig, promptArgs: ["-p"] };
 		expect(

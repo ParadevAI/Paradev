@@ -798,6 +798,9 @@ msgstr "{appName} MobileはProの一部です"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobileは、接続したコンピュータ上でエージェントを実行します。"
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {#件のクラウドワークスペースをアーカイブ} other {#件のクラウドワークスペースをアーカイブ}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {mainより#コミット遅れています。リベースが必要です} other {mainより#コミット遅れています。リベースが必要です}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {が#件のコミットを追加しました} other 
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {#件のワークスペースを作成しました} other {#件のワークスペースを作成しました}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {#件のワークスペースを削除} other {#件のワークスペースを削除}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {残り # 日}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {アカウントは無効化されており、#日後に完全に削除されます。再有効化すると元の状態に戻ります。} other {アカウントは無効化されており、#日後に完全に削除されます。再有効化すると元の状態に戻ります。}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {#件のワークスペースを削除} other {#件のワークスペースを削除}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3091,6 +3094,9 @@ msgstr "環境をアーカイブ"
 msgid "Archive failed"
 msgstr "アーカイブに失敗しました"
 
+msgid "Archive selected cloud workspaces"
+msgstr "選択したクラウドワークスペースをアーカイブ"
+
 msgid "Archive this automation before you delete it."
 msgstr "削除する前に、このオートメーションをアーカイブしてください。"
 
@@ -5042,6 +5048,10 @@ msgstr "プランを比較"
 
 msgid "Compared against the default style"
 msgstr "デフォルトスタイルと比較"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "比較"
 
 msgid "complete"
 msgstr "終了"
@@ -12379,6 +12389,9 @@ msgstr "新しいグループ…"
 msgid "New issue"
 msgstr "新規issue"
 
+msgid "New layout"
+msgstr "新しいレイアウト"
+
 msgid "New messages"
 msgstr "新着メッセージ"
 
@@ -12444,6 +12457,9 @@ msgstr "新規ワークスペース({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "{name} に新規ワークスペース"
+
+msgid "New workspace page"
+msgstr "新しいワークスペースページ"
 
 msgid "Newer than this app"
 msgstr "このアプリより新しい"
@@ -16031,6 +16047,9 @@ msgstr "{others} と一緒に {channel} に再参加しました。"
 msgid "rejoined {channel}."
 msgstr "{channel} に再参加しました。"
 
+msgid "Related comparisons"
+msgstr "関連する比較"
+
 msgid "Related Posts"
 msgstr "関連記事"
 
@@ -16060,6 +16079,9 @@ msgstr "ディスクから再読み込み"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Paradevを再読み込みしてワークスペース一覧を更新してください。"
+
+msgid "Reload to apply"
+msgstr "再読み込みして適用"
 
 msgid "Reload window"
 msgstr "ウィンドウを再読み込み"
@@ -16925,6 +16947,10 @@ msgstr "回転"
 
 msgid "Rotate device"
 msgstr "デバイスを回転"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "まとめ"
 
 msgid "Roundups"
 msgstr "まとめ"
@@ -21130,6 +21156,10 @@ msgstr "オンボーディングの調査結果をページにして"
 msgid "Turned off because its files changed"
 msgstr "ファイルが変更されたためオフになっています"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "チュートリアル"
+
 msgid "Two Hands"
 msgstr "両手"
 
@@ -21705,6 +21735,12 @@ msgstr "デスクトップアプリで並列コーディングエージェント
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Paradevのトレイメニューから「ホストサービス」>「再起動」を実行してから、再試行してください。"
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "刷新された「新規ワークスペース」ページを使用します：中央にプロンプト入力欄、その上にプロジェクトとブランチの選択。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "刷新されたウィンドウレイアウトを使用します：アイコンレール、タイトルバーのタブ、カード形式のペイン。"
 
 msgid "Use this account"
 msgstr "このアカウントを使用"

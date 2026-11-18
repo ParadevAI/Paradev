@@ -20,6 +20,7 @@ posthog.init(env.NEXT_PUBLIC_POSTHOG_KEY, {
 	debug: false,
 	cross_subdomain_cookie: true,
 	person_profiles: "always",
+	custom_campaign_params: ["utm_id", "matchtype"],
 	persistence: "cookie",
 	persistence_name: POSTHOG_COOKIE_NAME,
 	before_send: sanitizePosthogEvent,

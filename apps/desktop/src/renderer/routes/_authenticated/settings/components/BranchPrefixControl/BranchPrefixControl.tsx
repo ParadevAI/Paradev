@@ -41,7 +41,7 @@ interface BranchPrefixControlProps {
 
 /**
  * Shared select+input for the branch-prefix setting. Used by the host-wide
- * default (`V2GitSettings`) and the per-project override (`BranchPrefixSection`).
+ * default (`GitSettings`) and the per-project override (`BranchPrefixSection`).
  * Sanitizes the custom prefix on blur. Empty custom on blur is treated as
  * "user is still typing": the input clears but no mutation fires.
  */

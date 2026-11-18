@@ -792,6 +792,9 @@ msgstr "{appName} Mobile входить до Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile запускає агентів на комп'ютерах, які ви підключили."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Архівувати # хмарний робочий простір} few {Архівувати # хмарні робочі простори} many {Архівувати # хмарних робочих просторів} other {Архівувати # хмарного робочого простору}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Відстає від main на # коміт, потрібен ребейз} few {Відстає від main на # коміти, потрібен ребейз} many {Відстає від main на # комітів, потрібен ребейз} other {Відстає від main на # коміту, потрібен ребейз}}"
 
@@ -879,9 +882,6 @@ msgstr "{count, plural, =1 {додав(-ла) коміт} one {додав(-ла)
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Створено # робочий простір} few {Створено # робочі простори} many {Створено # робочих просторів} other {Створено # робочого простору}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Видалити # робочий простір} few {Видалити # робочі простори} many {Видалити # робочих просторів} other {Видалити # робочого простору}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {змінено # файл} few {змінено # файли} many {змінено # файлів} other {змінено # файлу}}"
@@ -984,6 +984,9 @@ msgstr "{daysLeft, plural, one {Залишився # день} few {Залиши
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Ваш обліковий запис деактивовано, і його буде остаточно видалено через # день. Активуйте його знову, щоб відновити все точно так, як було.} few {Ваш обліковий запис деактивовано, і його буде остаточно видалено через # дні. Активуйте його знову, щоб відновити все точно так, як було.} many {Ваш обліковий запис деактивовано, і його буде остаточно видалено через # днів. Активуйте його знову, щоб відновити все точно так, як було.} other {Ваш обліковий запис деактивовано, і його буде остаточно видалено через # дня. Активуйте його знову, щоб відновити все точно так, як було.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Видалити # робочий простір} few {Видалити # робочі простори} many {Видалити # робочих просторів} other {Видалити # робочого простору}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3085,6 +3088,9 @@ msgstr "Архівувати середовище"
 msgid "Archive failed"
 msgstr "Не вдалося архівувати"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Архівувати вибрані хмарні робочі простори"
+
 msgid "Archive this automation before you delete it."
 msgstr "Архівуйте цю автоматизацію, перш ніж видалити її."
 
@@ -5036,6 +5042,10 @@ msgstr "Порівняти тарифи"
 
 msgid "Compared against the default style"
 msgstr "Порівняно зі стилем за замовчуванням"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Порівняння"
 
 msgid "complete"
 msgstr "завершено"
@@ -12373,6 +12383,9 @@ msgstr "Нова група…"
 msgid "New issue"
 msgstr "Нове issue"
 
+msgid "New layout"
+msgstr "Новий макет"
+
 msgid "New messages"
 msgstr "Нові повідомлення"
 
@@ -12438,6 +12451,9 @@ msgstr "Новий робочий простір ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Новий робочий простір у {name}"
+
+msgid "New workspace page"
+msgstr "Нова сторінка робочого простору"
 
 msgid "Newer than this app"
 msgstr "Новіша за цей застосунок"
@@ -16025,6 +16041,9 @@ msgstr "знову приєднався(-лася) до {channel}, як і {othe
 msgid "rejoined {channel}."
 msgstr "знову приєднався(-лася) до {channel}."
 
+msgid "Related comparisons"
+msgstr "Схожі порівняння"
+
 msgid "Related Posts"
 msgstr "Схожі публікації"
 
@@ -16054,6 +16073,9 @@ msgstr "Перезавантажити з диска"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Перезавантажте Paradev, щоб оновити список робочих просторів."
+
+msgid "Reload to apply"
+msgstr "Перезавантажити, щоб застосувати"
 
 msgid "Reload window"
 msgstr "Перезавантажити вікно"
@@ -16919,6 +16941,10 @@ msgstr "Повернути"
 
 msgid "Rotate device"
 msgstr "Повернути пристрій"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Огляд"
 
 msgid "Roundups"
 msgstr "Огляди"
@@ -21124,6 +21150,10 @@ msgstr "перетвори висновки з онбордингу на сто�
 msgid "Turned off because its files changed"
 msgstr "Вимкнено, бо його файли змінилися"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Посібник"
+
 msgid "Two Hands"
 msgstr "Дві руки"
 
@@ -21699,6 +21729,12 @@ msgstr "Використовуйте десктопний застосунок, 
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Виберіть у меню Paradev у системному треї «Служба хоста» > «Перезапустити», а потім повторіть спробу."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Використовувати оновлену сторінку «Новий робочий простір»: поле запиту посередині, над ним вибір проєкту та гілки."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Використовувати оновлений макет вікна: панель значків, вкладки в заголовку вікна та панелі у вигляді карток."
 
 msgid "Use this account"
 msgstr "Використати цей обліковий запис"
