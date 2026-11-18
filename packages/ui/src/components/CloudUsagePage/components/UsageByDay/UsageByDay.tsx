@@ -30,9 +30,11 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 	const format = useUsageFormat();
 	const inDollars = usage.total.usageUsd !== null;
 	const byDay = new Map(usage.items.map((item) => [item.key, item]));
+	const today = new Date().toISOString().slice(0, 10);
 	const data = utcDays(usage.range).map((day) => {
 		const item = byDay.get(day);
-		return { day, value: (inDollars ? item?.usageUsd : item?.gbHours) ?? 0 };
+		const value = (inDollars ? item?.usageUsd : item?.gbHours) ?? 0;
+		return { day, value: day > today ? null : value };
 	});
 	const ticks = data
 		.filter(
@@ -82,13 +84,18 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 						}
 					/>
 					<ChartTooltip
-						content={
-							<ChartTooltipContent
-								labelFormatter={(_, payload) =>
-									formatDay(payload[0]?.payload.day)
-								}
-								formatter={(value) => formatValue(Number(value))}
-							/>
+						content={(props) =>
+							props.payload?.[0]?.value == null ? null : (
+								<ChartTooltipContent
+									active={props.active}
+									payload={props.payload}
+									label={props.label}
+									labelFormatter={(_, payload) =>
+										formatDay(payload[0]?.payload.day)
+									}
+									formatter={(value) => formatValue(Number(value))}
+								/>
+							)
 						}
 					/>
 					<Bar dataKey="value" fill="var(--color-value)" radius={2} />

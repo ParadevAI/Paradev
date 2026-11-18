@@ -14,6 +14,7 @@ import type {
 	WorkspacesTarget,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
+import { workspaceOf } from "../../utils/workspaceOf";
 import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
 import { PageHeader } from "../PageHeader";
 import { QueryStatus } from "../QueryStatus";
@@ -69,7 +70,12 @@ export function CloudWorkspacesPage({
 				item.ref && !("status" in item.ref) ? [item.ref] : [],
 			) ?? [])
 		: null;
-	const personName = people?.find((person) => person.id === filters.user)?.name;
+	const personName =
+		people?.find((person) => person.id === filters.user)?.name ??
+		pages
+			.flatMap((page) => page.items)
+			.map((row) => workspaceOf(row)?.owner)
+			.find((owner) => owner?.id === filters.user)?.name;
 
 	return (
 		<div className="@container space-y-4">

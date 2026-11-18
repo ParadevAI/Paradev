@@ -29,14 +29,15 @@ export function FilterChips({
 	const chips: {
 		key: keyof WorkspacesFilters;
 		label: ReactNode;
-		value: string;
+		/** Undefined when the person's name is not known. */
+		value: string | undefined;
 	}[] = [
 		...(filters.user
 			? [
 					{
 						key: "user" as const,
 						label: <Trans>Person</Trans>,
-						value: personName ?? "…",
+						value: personName,
 					},
 				]
 			: []),
