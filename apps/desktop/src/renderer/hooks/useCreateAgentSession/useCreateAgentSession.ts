@@ -42,7 +42,8 @@ export function useCreateAgentSession() {
 		const choice =
 			terminalAgents.find(
 				(option) =>
-					options.preset !== undefined && agentLaunchPreset(option) === options.preset,
+					options.preset !== undefined &&
+					agentLaunchPreset(option) === options.preset,
 			) ??
 			terminalAgents.find((option) => option.id === stored) ??
 			terminalAgents[0];
