@@ -9,7 +9,7 @@ export {
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "./api-credential";
-export { bootBeganSince, recordBootSpans } from "./boot-trace";
+export { bootBeganSince, bootPhases, recordBootSpans } from "./boot-trace";
 export {
 	type BoxHookOutcome,
 	rerunBoxStartHook,

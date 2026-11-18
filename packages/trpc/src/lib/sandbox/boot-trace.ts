@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/core";
+import type { CloudWorkspaceBootPhase } from "@superset/db/schema";
 import { z } from "zod";
 
 /** A phase of the box's boot: `at` is epoch ms on the box's own clock. */
@@ -44,46 +45,35 @@ export function bootBeganSince(answer: HostAnswer, since: number): boolean {
 	return first !== undefined && first.at >= since - CLOCK_SKEW_MS;
 }
 
-export interface BootSegment {
-	name: string;
-	start: number;
-	end: number;
-}
-
-/** One segment per stamp, running to the next stamp; the last runs to the answer. */
-export function bootSegments({
+/** One phase per stamp, running to the next stamp; the last runs to the answer. */
+export function bootPhases({
 	stamps,
 	answeredAt,
-}: HostAnswer): BootSegment[] {
+}: HostAnswer): CloudWorkspaceBootPhase[] {
 	return stamps.map((stamp, index) => {
-		const next = stamps[index + 1];
-		return {
-			name: `${stamp.phase} → ${next?.phase ?? "host answered"}`,
-			start: stamp.at,
-			// The answer is on our clock, which can trail the box's a little.
-			end: Math.max(stamp.at, next?.at ?? answeredAt),
-		};
+		// The answer is on our clock, which can trail the box's a little.
+		const end = Math.max(stamp.at, stamps[index + 1]?.at ?? answeredAt);
+		return { name: stamp.phase, at: stamp.at, ms: end - stamp.at };
 	});
 }
 
 /** The box's boot as spans under the active one, at the times the box stamped. */
-export function recordBootSpans(answer: HostAnswer): void {
-	const segments = bootSegments(answer);
-	const first = segments[0];
-	const last = segments.at(-1);
+export function recordBootSpans(phases: CloudWorkspaceBootPhase[]): void {
+	const first = phases[0];
+	const last = phases.at(-1);
 	if (!first || !last) return;
 	const boot = Sentry.startInactiveSpan({
 		name: "box boot",
 		op: "sandbox.boot",
-		startTime: first.start,
+		startTime: first.at,
 	});
-	for (const segment of segments) {
+	phases.forEach((phase, index) => {
 		Sentry.startInactiveSpan({
-			name: segment.name,
+			name: `${phase.name} → ${phases[index + 1]?.name ?? "host answered"}`,
 			op: "sandbox.boot",
-			startTime: segment.start,
+			startTime: phase.at,
 			parentSpan: boot,
-		}).end(segment.end);
-	}
-	boot.end(last.end);
+		}).end(phase.at + phase.ms);
+	});
+	boot.end(last.at + last.ms);
 }

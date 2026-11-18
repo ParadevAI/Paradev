@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { bootBeganSince, bootSegments, bootStampsFrom } from "./boot-trace";
+import { bootBeganSince, bootPhases, bootStampsFrom } from "./boot-trace";
 
 const stamps = [
 	{ phase: "boot.start", at: 1_789_000_000_000 },
@@ -46,32 +46,20 @@ describe("bootBeganSince", () => {
 	});
 });
 
-describe("bootSegments", () => {
+describe("bootPhases", () => {
 	test("runs each stamp to the next and the last to the answer", () => {
-		expect(bootSegments({ stamps, answeredAt: 1_789_000_001_300 })).toEqual([
-			{
-				name: "boot.start → host.exec",
-				start: 1_789_000_000_000,
-				end: 1_789_000_000_400,
-			},
-			{
-				name: "host.exec → host.listening",
-				start: 1_789_000_000_400,
-				end: 1_789_000_001_200,
-			},
-			{
-				name: "host.listening → host answered",
-				start: 1_789_000_001_200,
-				end: 1_789_000_001_300,
-			},
+		expect(bootPhases({ stamps, answeredAt: 1_789_000_001_300 })).toEqual([
+			{ name: "boot.start", at: 1_789_000_000_000, ms: 400 },
+			{ name: "host.exec", at: 1_789_000_000_400, ms: 800 },
+			{ name: "host.listening", at: 1_789_000_001_200, ms: 100 },
 		]);
 	});
 
-	test("never ends a segment before it starts when our clock trails the box's", () => {
-		const [last] = bootSegments({
+	test("never runs a phase backwards when our clock trails the box's", () => {
+		const [last] = bootPhases({
 			stamps: [{ phase: "host.listening", at: 1_789_000_001_200 }],
 			answeredAt: 1_789_000_001_150,
 		});
-		expect(last?.end).toBe(1_789_000_001_200);
+		expect(last?.ms).toBe(0);
 	});
 });

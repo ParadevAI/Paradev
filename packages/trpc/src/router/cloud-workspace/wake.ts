@@ -15,6 +15,7 @@ import {
 } from "../../lib/control-log";
 import {
 	bootBeganSince,
+	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
 	recordBootSpans,
@@ -172,7 +173,7 @@ async function wake(
 	}
 	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
 		try {
-			recordBootSpans(answer);
+			recordBootSpans(bootPhases(answer));
 		} catch (error) {
 			console.error(
 				`[cloud-workspace] could not trace the boot of ${row.id}`,

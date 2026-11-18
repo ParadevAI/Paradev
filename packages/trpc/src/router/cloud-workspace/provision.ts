@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	bootPhases,
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
@@ -214,7 +215,7 @@ async function provision(
 			),
 		);
 		try {
-			recordBootSpans(answer);
+			recordBootSpans(bootPhases(answer));
 		} catch (error) {
 			console.error(
 				`[cloud-workspace] could not trace the boot of ${row.id}`,
