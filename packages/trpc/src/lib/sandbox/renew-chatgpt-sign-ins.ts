@@ -67,7 +67,12 @@ export async function renewChatgptSignInsAndBoxes(args: {
 			});
 			if (outcome === "applied") boxesUpdated++;
 		} catch (error) {
-			Sentry.captureException(error, { extra: { workspaceId: row.id } });
+			Sentry.captureException(error, {
+				tags: {
+					"cloud_workspace.id": row.id,
+					"organization.id": row.organizationId,
+				},
+			});
 		}
 	}
 	return { checked, boxesUpdated, boxesLeft: boxes.length - done };
