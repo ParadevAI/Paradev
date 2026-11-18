@@ -16,10 +16,6 @@
 			"types": "./src/cloud-usage-query.ts",
 			"default": "./src/cloud-usage-query.ts"
 		},
-		"./cloud-usage-schemas": {
-			"types": "./src/cloud-usage-schemas.ts",
-			"default": "./src/cloud-usage-schemas.ts"
-		},
 		"./enums": {
 			"types": "./src/schema/enums.ts",
 			"default": "./src/schema/enums.ts"

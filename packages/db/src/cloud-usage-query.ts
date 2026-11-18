@@ -14,6 +14,7 @@ import {
 	isNotNull,
 	isNull,
 	lt,
+	or,
 	type SQL,
 	sql,
 } from "drizzle-orm";
@@ -22,19 +23,11 @@ import type {
 	PgDatabase,
 	PgQueryResultHKT,
 } from "drizzle-orm/pg-core";
-import { z } from "zod";
-import {
-	type bootsResultSchema,
-	type CloudUsageFilters,
-	type Metrics,
-	type periodsResultSchema,
-	type Range,
-	rangePresetDays,
-	type UsageGroupBy,
-	type usageResultSchema,
-} from "./cloud-usage-schemas";
 import { users } from "./schema/auth";
-import type { CloudWorkspaceBootEndReason } from "./schema/enums";
+import type {
+	CloudWorkspaceBootEndReason,
+	CloudWorkspaceStatus,
+} from "./schema/enums";
 import {
 	cloudWorkspaceBoots as boots,
 	cloudUsageEvents as events,
@@ -43,121 +36,43 @@ import {
 
 type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
+export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
+export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];
+
 export interface CloudUsageScope {
 	organizationId: string;
 	/** Set for a member: every result holds only this user's rows. */
 	userId?: string;
 }
 
-export interface Window {
+export interface CloudUsageFilters {
+	user?: string;
+	workspace?: string;
+	size?: MachineSize;
+	status?: CloudWorkspaceStatus[];
+}
+
+export interface CloudUsageWindow {
 	from: Date;
 	to: Date;
 }
 
-/** The open period as Autumn reports it, in GB-hours, with the plan's overage rate. */
-export interface CloudBilling {
-	includedGbHours: number | null;
-	usedGbHours: number;
-	overageGbHours: number;
-	prepaidRemainingGbHours: number;
-	resetsAt: Date;
-	overagePerGbHour: number | null;
+/** `gbMinutes` is the exact numeric sum as text; grouped by day, only `key` is used. */
+export interface CloudUsageCursor {
+	gbMinutes: string;
+	key: string;
 }
 
-export interface CloudBillingReader {
-	/** null when billing is off, the organization has no Autumn customer, or Autumn has no reset time. */
-	billing(organizationId: string): Promise<CloudBilling | null>;
-}
-
-export class CloudUsageInputError extends Error {
-	override name = "CloudUsageInputError";
+export interface CloudBootCursor {
+	startedAt: Date;
+	id: string;
 }
 
 const BILLED_FEATURE = "box_gb_minutes";
-const DAY_MS = 86_400_000;
-
-function addUtcMonths(date: Date, months: number): Date {
-	const result = new Date(date);
-	result.setUTCDate(1);
-	result.setUTCMonth(result.getUTCMonth() + months);
-	const lastDay = new Date(
-		Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0),
-	).getUTCDate();
-	result.setUTCDate(Math.min(date.getUTCDate(), lastDay));
-	return result;
-}
-
-/** Period 0 is the open one; each step back is one month from Autumn's next reset. */
-function periodWindow(resetsAt: Date, index: number): Window {
-	return {
-		from: addUtcMonths(resetsAt, -(index + 1)),
-		to: addUtcMonths(resetsAt, -index),
-	};
-}
-
-function utcDate(date: Date): string {
-	return date.toISOString().slice(0, 10);
-}
-
-function periodIndex(resetsAt: Date, id: string): number | null {
-	const [year, month] = id.split("-").map(Number) as [number, number];
-	const index =
-		(resetsAt.getUTCFullYear() - year) * 12 + resetsAt.getUTCMonth() - month;
-	return index >= 0 && utcDate(periodWindow(resetsAt, index).from) === id
-		? index
-		: null;
-}
-
-export function resolveRange(
-	range: Range,
-	now: Date,
-	resetsAt: Date | null,
-): Window {
-	if (typeof range === "string") {
-		return {
-			from: new Date(now.getTime() - rangePresetDays[range] * DAY_MS),
-			to: now,
-		};
-	}
-	if ("from" in range) {
-		const window = { from: new Date(range.from), to: new Date(range.to) };
-		if (window.from > window.to) {
-			throw new CloudUsageInputError("range.from is after range.to");
-		}
-		return window;
-	}
-	if (!resetsAt) {
-		throw new CloudUsageInputError("A period range needs a billing period");
-	}
-	const index =
-		range.period === "current" ? 0 : periodIndex(resetsAt, range.period);
-	if (index === null) {
-		throw new CloudUsageInputError(`No billing period ${range.period}`);
-	}
-	return periodWindow(resetsAt, index);
-}
-
-function encodeCursor(value: object): string {
-	return Buffer.from(JSON.stringify(value)).toString("base64url");
-}
-
-function decodeCursor<T>(schema: z.ZodType<T>, cursor: string): T {
-	try {
-		return schema.parse(
-			JSON.parse(Buffer.from(cursor, "base64url").toString("utf8")),
-		);
-	} catch {
-		throw new CloudUsageInputError("Invalid cursor");
-	}
-}
 
 const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
-
-function utcDay(column: AnyPgColumn): SQL<string> {
-	return sql<string>`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD')`;
-}
 
 function usd(gbMinutes: number, overagePerGbHour: number | null) {
 	return overagePerGbHour === null
@@ -165,16 +80,14 @@ function usd(gbMinutes: number, overagePerGbHour: number | null) {
 		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
 }
 
-interface ScopedColumns {
-	user: AnyPgColumn;
-	workspace: AnyPgColumn;
-	size: (size: MachineSize) => SQL;
-}
-
 function scopeConditions(
 	scope: CloudUsageScope,
 	filters: CloudUsageFilters,
-	columns: ScopedColumns,
+	columns: {
+		user: AnyPgColumn;
+		workspace: AnyPgColumn;
+		size: (size: MachineSize) => SQL;
+	},
 ): SQL[] {
 	const conditions: SQL[] = [];
 	if (scope.userId) conditions.push(eq(columns.user, scope.userId));
@@ -192,28 +105,36 @@ function scopeConditions(
 const bootSize = (size: MachineSize) =>
 	eq(boots.vcpus, MACHINE_SIZE_VCPUS[size]);
 
-interface FactKeys {
-	event: SQL;
-	boot: SQL;
-	/** Adds a zero row for each workspace that failed in the window, so one with no boot still has a group. */
-	failedWorkspace?: SQL;
-}
+const utcDay = (column: AnyPgColumn) =>
+	sql`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD')`;
+
+const groupKeys = {
+	user: { event: sql`${events.userId}`, boot: sql`${boots.createdByUserId}` },
+	day: { event: utcDay(events.sentAt), boot: utcDay(boots.startedAt) },
+	workspace: {
+		event: sql`${events.cloudWorkspaceId}`,
+		boot: sql`${boots.cloudWorkspaceId}`,
+	},
+} satisfies Record<CloudUsageGroupBy, { event: SQL; boot: SQL }>;
 
 /**
- * One row per billed event (counted at sent_at) and one per boot (counted at started_at), in the
- * same shape, so a single GROUP BY gives usage and boot counts for any key.
+ * One row per sent event (placed at sent_at) and one per boot (placed at started_at), in one
+ * shape, so a single GROUP BY gives usage and boot counts for any key. Grouped by workspace, each
+ * workspace that failed in the window adds a zero row, so one with no boot still has a group.
  */
 function usageFacts(
 	db: Db,
 	scope: CloudUsageScope,
 	filters: CloudUsageFilters,
-	window: Window,
-	keys: FactKeys | null,
+	window: CloudUsageWindow,
+	groupBy: CloudUsageGroupBy | undefined,
 ) {
-	const noKey = sql`null`;
-	const billed = db
+	const keys = groupBy
+		? groupKeys[groupBy]
+		: { event: sql`null`, boot: sql`null` };
+	const sent = db
 		.select({
-			key: sql<string | null>`${keys?.event ?? noKey}::text`.as("key"),
+			key: sql<string | null>`${keys.event}::text`.as("key"),
 			workspaceId: sql<string | null>`${events.cloudWorkspaceId}`.as(
 				"workspace_id",
 			),
@@ -243,7 +164,7 @@ function usageFacts(
 		);
 	const started = db
 		.select({
-			key: sql<string | null>`${keys?.boot ?? noKey}::text`,
+			key: sql<string | null>`${keys.boot}::text`,
 			workspaceId: sql<string | null>`${boots.cloudWorkspaceId}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
@@ -264,12 +185,12 @@ function usageFacts(
 				}),
 			),
 		);
-	if (!keys?.failedWorkspace) {
-		return db.$with("facts").as(billed.unionAll(started));
+	if (groupBy !== "workspace") {
+		return db.$with("facts").as(sent.unionAll(started));
 	}
 	const failed = db
 		.select({
-			key: sql<string | null>`${keys.failedWorkspace}::text`,
+			key: sql<string | null>`${workspaces.id}::text`,
 			workspaceId: sql<string | null>`null::uuid`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
@@ -292,12 +213,10 @@ function usageFacts(
 				}),
 			),
 		);
-	return db.$with("facts").as(billed.unionAll(started).unionAll(failed));
+	return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
 }
 
-type Facts = ReturnType<typeof usageFacts>;
-
-function metricColumns(facts: Facts) {
+function metricColumns(facts: ReturnType<typeof usageFacts>) {
 	return {
 		gbMinutes: sql<string>`coalesce(sum(${facts.gbMinutes}), 0)`,
 		seconds: sql<string>`coalesce(sum(${facts.seconds}), 0)`,
@@ -319,7 +238,8 @@ type MetricRow = {
 	workspaces: number;
 };
 
-const ZERO: MetricRow = {
+/** An aggregate without GROUP BY always returns one row; this only satisfies the type. */
+const NO_ROWS: MetricRow = {
 	gbMinutes: "0",
 	seconds: "0",
 	boots: 0,
@@ -327,7 +247,7 @@ const ZERO: MetricRow = {
 	workspaces: 0,
 };
 
-function toMetrics(row: MetricRow, overagePerGbHour: number | null): Metrics {
+function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 	const gbMinutes = Number(row.gbMinutes);
 	return {
 		workspaces: row.workspaces,
@@ -339,38 +259,10 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null): Metrics {
 	};
 }
 
-function groupKeys(groupBy: UsageGroupBy): FactKeys {
-	switch (groupBy) {
-		case "user":
-			return {
-				event: sql`${events.userId}`,
-				boot: sql`${boots.createdByUserId}`,
-			};
-		case "workspace":
-			return {
-				event: sql`${events.cloudWorkspaceId}`,
-				boot: sql`${boots.cloudWorkspaceId}`,
-				failedWorkspace: sql`${workspaces.id}`,
-			};
-		case "day":
-			return { event: utcDay(events.sentAt), boot: utcDay(boots.startedAt) };
-	}
-}
+export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
-const dayCursor = z.object({ key: z.iso.date() });
-const amountCursor = z.object({
-	gbMinutes: z.string().regex(/^\d+(\.\d+)?$/),
-	key: z.string(),
-});
-
-async function labelsFor(
-	db: Db,
-	groupBy: UsageGroupBy,
-	keys: string[],
-): Promise<
-	Map<string, z.infer<typeof usageResultSchema>["items"][number]["ref"]>
-> {
-	if (groupBy === "day" || keys.length === 0) return new Map();
+async function refsFor(db: Db, groupBy: CloudUsageGroupBy, keys: string[]) {
+	if (groupBy === "day" || keys.length === 0) return new Map<string, never>();
 	if (groupBy === "user") {
 		const rows = await db
 			.select({ id: users.id, name: users.name, email: users.email })
@@ -392,17 +284,14 @@ async function labelsFor(
 		.leftJoin(users, eq(users.id, workspaces.createdByUserId))
 		.where(inArray(workspaces.id, keys));
 	return new Map(
-		rows.map((row) => [
+		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
 			row.id,
 			{
-				id: row.id,
-				name: row.name,
-				status: row.status,
-				size: isMachineSize(row.machineSize) ? row.machineSize : "large",
-				owner: row.owner,
+				...row,
+				size: isMachineSize(machineSize) ? machineSize : ("large" as const),
 				failure:
-					row.status === "failed" && row.failureReason && row.failedAt
-						? { reason: row.failureReason, at: row.failedAt.toISOString() }
+					row.status === "failed" && failureReason && failedAt
+						? { reason: failureReason, at: failedAt }
 						: null,
 			},
 		]),
@@ -410,58 +299,62 @@ async function labelsFor(
 }
 
 /**
- * Billed usage (cloud_usage_events, box_gb_minutes, placed by sent_at) and boot counts (placed by
- * started_at), as a total and optionally grouped by user, UTC day or workspace.
+ * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
+ * in the window: a total, and with `groupBy` one row per user, UTC day or workspace.
  */
 export async function queryCloudUsage(
 	db: Db,
 	scope: CloudUsageScope,
 	options: {
-		range: Window;
+		window: CloudUsageWindow;
 		filters?: CloudUsageFilters;
-		groupBy?: UsageGroupBy;
+		groupBy?: CloudUsageGroupBy;
 		limit: number;
-		cursor?: string | null;
+		cursor?: CloudUsageCursor;
 		overagePerGbHour: number | null;
 	},
-): Promise<z.infer<typeof usageResultSchema>> {
-	const { range, filters = {}, groupBy, limit, overagePerGbHour } = options;
-	const result = {
-		range: { from: range.from.toISOString(), to: range.to.toISOString() },
-		groupBy: groupBy ?? null,
-	};
-	const totalFacts = usageFacts(db, scope, filters, range, null);
+) {
+	const {
+		window,
+		filters = {},
+		groupBy,
+		cursor,
+		limit,
+		overagePerGbHour,
+	} = options;
+	const totalFacts = usageFacts(db, scope, filters, window, undefined);
 	const totalQuery = db
 		.with(totalFacts)
 		.select(metricColumns(totalFacts))
 		.from(totalFacts);
 	if (!groupBy) {
-		const [total] = await totalQuery;
+		const [total = NO_ROWS] = await totalQuery;
 		return {
-			...result,
 			items: [],
-			total: toMetrics(total ?? ZERO, overagePerGbHour),
+			total: toMetrics(total, overagePerGbHour),
 			nextCursor: null,
 		};
 	}
 
-	const facts = usageFacts(db, scope, filters, range, groupKeys(groupBy));
+	const facts = usageFacts(db, scope, filters, window, groupBy);
 	const metrics = metricColumns(facts);
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
-	let after: SQL | undefined;
-	if (options.cursor && groupBy === "day") {
-		after = sql`${facts.key} < ${decodeCursor(dayCursor, options.cursor).key}`;
-	} else if (options.cursor) {
-		const cursor = decodeCursor(amountCursor, options.cursor);
-		after = sql`(${metrics.gbMinutes} < ${cursor.gbMinutes}::numeric or (${metrics.gbMinutes} = ${cursor.gbMinutes}::numeric and ${sortKey} > ${cursor.key}))`;
-	}
-	const [rows, [total]] = await Promise.all([
+	const [rows, [total = NO_ROWS]] = await Promise.all([
 		db
 			.with(facts)
 			.select({ key: facts.key, sortKey, ...metrics })
 			.from(facts)
 			.groupBy(facts.key)
-			.having(after)
+			.having(
+				!cursor
+					? undefined
+					: groupBy === "day"
+						? sql`${facts.key} < ${cursor.key}`
+						: or(
+								sql`${metrics.gbMinutes} < ${cursor.gbMinutes}::numeric`,
+								sql`${metrics.gbMinutes} = ${cursor.gbMinutes}::numeric and ${sortKey} > ${cursor.key}`,
+							),
+			)
 			.orderBy(
 				...(groupBy === "day"
 					? [desc(facts.key)]
@@ -472,58 +365,54 @@ export async function queryCloudUsage(
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
-	const refs = await labelsFor(
+	const refs = await refsFor(
 		db,
 		groupBy,
 		page.flatMap((row) => (row.key ? [row.key] : [])),
 	);
 	return {
-		...result,
-		items: page.map((row) => {
-			const ref = (row.key && refs.get(row.key)) || null;
+		items: page.map(({ key, sortKey: _, ...row }) => {
+			const ref = (key && refs.get(key)) || null;
 			return {
-				key: row.key,
-				label: groupBy === "day" ? row.key : (ref?.name ?? null),
+				key,
+				label: groupBy === "day" ? key : (ref?.name ?? null),
 				ref,
 				...toMetrics(row, overagePerGbHour),
 			};
 		}),
-		total: toMetrics(total ?? ZERO, overagePerGbHour),
+		total: toMetrics(total, overagePerGbHour),
 		nextCursor:
 			rows.length > limit && last
-				? encodeCursor(
-						groupBy === "day"
-							? { key: last.key }
-							: { gbMinutes: last.gbMinutes, key: last.sortKey },
-					)
+				? { gbMinutes: last.gbMinutes, key: last.sortKey }
 				: null,
 	};
 }
 
-const bootCursor = z.object({
-	startedAt: z.iso.datetime({ precision: 6 }),
-	id: z.string(),
-});
+export type CloudUsageResult = Awaited<ReturnType<typeof queryCloudUsage>>;
 
-/** Boot rows that started in the range, newest first, each with the sum of its sent usage events. */
+/** Boot rows that started in the window, newest first, each with the sum of its sent events. */
 export async function listCloudBoots(
 	db: Db,
 	scope: CloudUsageScope,
 	options: {
-		range: Window;
+		window: CloudUsageWindow;
 		filters?: CloudUsageFilters;
 		endReason?: CloudWorkspaceBootEndReason[];
 		open?: boolean;
 		limit: number;
-		cursor?: string | null;
+		cursor?: CloudBootCursor;
 		now: Date;
 		overagePerGbHour: number | null;
 	},
-): Promise<z.infer<typeof bootsResultSchema>> {
-	const { range, filters = {}, limit, now, overagePerGbHour } = options;
-	const cursor = options.cursor
-		? decodeCursor(bootCursor, options.cursor)
-		: null;
+) {
+	const {
+		window,
+		filters = {},
+		cursor,
+		limit,
+		now,
+		overagePerGbHour,
+	} = options;
 	const rows = await db
 		.select({
 			id: boots.id,
@@ -531,7 +420,6 @@ export async function listCloudBoots(
 			workspace: { id: workspaces.id, name: workspaces.name },
 			user: { id: users.id, name: users.name, email: users.email },
 			startedAt: boots.startedAt,
-			startedAtKey: sql<string>`to_char(${boots.startedAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
 			stoppedAt: boots.stoppedAt,
 			memoryMb: boots.memoryMb,
 			vcpus: boots.vcpus,
@@ -544,8 +432,8 @@ export async function listCloudBoots(
 		.where(
 			and(
 				eq(boots.organizationId, scope.organizationId),
-				gte(boots.startedAt, range.from),
-				lt(boots.startedAt, range.to),
+				gte(boots.startedAt, window.from),
+				lt(boots.startedAt, window.to),
 				...scopeConditions(scope, filters, {
 					user: boots.createdByUserId,
 					workspace: boots.cloudWorkspaceId,
@@ -559,9 +447,11 @@ export async function listCloudBoots(
 					: options.open
 						? isNull(boots.stoppedAt)
 						: isNotNull(boots.stoppedAt),
-				cursor
-					? sql`(${boots.startedAt}, ${boots.id}) < (${cursor.startedAt}::timestamptz, ${cursor.id})`
-					: undefined,
+				cursor &&
+					or(
+						lt(boots.startedAt, cursor.startedAt),
+						and(eq(boots.startedAt, cursor.startedAt), lt(boots.id, cursor.id)),
+					),
 			),
 		)
 		.orderBy(desc(boots.startedAt), desc(boots.id))
@@ -569,125 +459,20 @@ export async function listCloudBoots(
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
 	return {
-		range: { from: range.from.toISOString(), to: range.to.toISOString() },
-		items: page.map((row) => {
-			const gbMinutes = Number(row.gbMinutes);
-			return {
-				id: row.id,
-				sessionId: row.sessionId,
-				workspace: row.workspace,
-				user: row.user,
-				startedAt: row.startedAt.toISOString(),
-				stoppedAt: row.stoppedAt?.toISOString() ?? null,
-				minutes:
-					((row.stoppedAt ?? now).getTime() - row.startedAt.getTime()) / 60_000,
-				size: sizeOfVcpus.get(row.vcpus) ?? null,
-				memoryGb: row.memoryMb / 1024,
-				vcpus: row.vcpus,
-				endReason: row.endReason,
-				gbHours: gbMinutes / 60,
-				usageUsd: usd(gbMinutes, overagePerGbHour),
-			};
-		}),
+		items: page.map(({ gbMinutes, memoryMb, ...row }) => ({
+			...row,
+			minutes:
+				((row.stoppedAt ?? now).getTime() - row.startedAt.getTime()) / 60_000,
+			size: sizeOfVcpus.get(row.vcpus) ?? null,
+			memoryGb: memoryMb / 1024,
+			gbHours: Number(gbMinutes) / 60,
+			usageUsd: usd(Number(gbMinutes), overagePerGbHour),
+		})),
 		nextCursor:
 			rows.length > limit && last
-				? encodeCursor({ startedAt: last.startedAtKey, id: last.id })
+				? { startedAt: last.startedAt, id: last.id }
 				: null,
 	};
 }
 
-const periodCursor = z.object({ id: z.iso.date() });
-
-/**
- * Billing periods newest first, from Autumn's next reset back one month at a time to the period of
- * the organization's first boot. The open period's allowance is Autumn's; a closed one has none.
- */
-export async function listCloudPeriods(
-	db: Db,
-	scope: CloudUsageScope,
-	reader: CloudBillingReader,
-	options: { limit: number; cursor?: string | null },
-): Promise<z.infer<typeof periodsResultSchema>> {
-	const billing = await reader.billing(scope.organizationId);
-	if (!billing) return { items: [], nextCursor: null };
-	const { resetsAt } = billing;
-
-	let first = 0;
-	if (options.cursor) {
-		const index = periodIndex(
-			resetsAt,
-			decodeCursor(periodCursor, options.cursor).id,
-		);
-		if (index === null) throw new CloudUsageInputError("Invalid cursor");
-		first = index + 1;
-	}
-	const [firstBoot] = await db
-		.select({
-			startedAt: sql<Date | null>`min(${boots.startedAt})`.mapWith(
-				boots.startedAt,
-			),
-		})
-		.from(boots)
-		.where(eq(boots.organizationId, scope.organizationId));
-	let oldest = 0;
-	while (
-		firstBoot?.startedAt &&
-		periodWindow(resetsAt, oldest).from > firstBoot.startedAt
-	) {
-		oldest++;
-	}
-	const page = Array.from(
-		{ length: Math.max(0, Math.min(options.limit, oldest - first + 1)) },
-		(_, offset) => {
-			const index = first + offset;
-			const window = periodWindow(resetsAt, index);
-			return { index, id: utcDate(window.from), ...window };
-		},
-	);
-	const newest = page[0];
-	const last = page.at(-1);
-	if (!newest || !last) return { items: [], nextCursor: null };
-
-	const periodOf = (column: AnyPgColumn) =>
-		sql`case ${sql.join(
-			page.map(
-				(period) =>
-					sql`when ${column} >= ${period.from.toISOString()}::timestamptz and ${column} < ${period.to.toISOString()}::timestamptz then ${period.id}`,
-			),
-			sql` `,
-		)} end`;
-	const facts = usageFacts(
-		db,
-		scope,
-		{},
-		{ from: last.from, to: newest.to },
-		{ event: periodOf(events.sentAt), boot: periodOf(boots.startedAt) },
-	);
-	const rows = await db
-		.with(facts)
-		.select({ key: facts.key, ...metricColumns(facts) })
-		.from(facts)
-		.groupBy(facts.key);
-	const byId = new Map(rows.map((row) => [row.key, row]));
-
-	return {
-		items: page.map((period) => ({
-			id: period.id,
-			start: period.from.toISOString(),
-			end: period.to.toISOString(),
-			closed: period.index > 0,
-			allowance:
-				period.index === 0 && !scope.userId
-					? {
-							includedGbHours: billing.includedGbHours,
-							usedGbHours: billing.usedGbHours,
-							overageGbHours: billing.overageGbHours,
-							prepaidRemainingGbHours: billing.prepaidRemainingGbHours,
-							resetsAt: resetsAt.toISOString(),
-						}
-					: null,
-			metrics: toMetrics(byId.get(period.id) ?? ZERO, billing.overagePerGbHour),
-		})),
-		nextCursor: last.index < oldest ? encodeCursor({ id: last.id }) : null,
-	};
-}
+export type CloudBootsResult = Awaited<ReturnType<typeof listCloudBoots>>;
