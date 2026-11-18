@@ -17,9 +17,14 @@ import {
 	pendingLaunchSurface,
 	releasePendingCloudChat,
 	seedPendingCloudLaunch,
+	withPendingCloudLaunch,
 } from "./pendingCloudLaunch";
 
-type Row = { workspaceId: string; paneLayout: WorkspaceState<PaneViewerData> };
+type Row = {
+	workspaceId: string;
+	paneLayout: WorkspaceState<PaneViewerData>;
+	rightPaneLayout?: WorkspaceState<PaneViewerData>;
+};
 const launch: CloudAgentLaunchDescriptor = {
 	agent: "claude",
 	surface: "chat",
@@ -110,24 +115,79 @@ test("older APIs and unpromised ids do not seed a waiting pane", () => {
 	expect(state.rows.size).toBe(0);
 });
 
-test("an existing nonempty pane layout is never replaced", () => {
-	const state = collections();
+type SeedPane = { kind: string; data: PaneViewerData };
+
+function layoutWith(panes: SeedPane[]): WorkspaceState<PaneViewerData> {
 	const store = createWorkspaceStore<PaneViewerData>();
-	store.getState().addTab({
-		panes: [{ kind: "terminal", data: { terminalId: "existing" } }],
-	});
+	for (const pane of panes) store.getState().addTab({ panes: [pane] });
 	const { version, tabs, activeTabId } = store.getState();
-	const original = { version, tabs, activeTabId };
-	state.rows.set("existing-cloud", {
-		workspaceId: "existing-cloud",
-		paneLayout: original,
+	return { version, tabs, activeTabId };
+}
+
+test("an existing layout keeps its tabs and gets the waiting pane beside them", () => {
+	const existing = layoutWith([
+		{ kind: "terminal", data: { terminalId: "start-hook" } },
+	]);
+	const next = withPendingCloudLaunch(existing, launch);
+	expect(next?.tabs).toHaveLength(2);
+	expect(next?.tabs[0]).toEqual(existing.tabs[0]);
+	expect(pendingCloudLaunchPane(next ?? undefined)?.data.terminalId).toBe(
+		"promised-terminal",
+	);
+});
+
+test("a layout with any pane claiming the launch's terminal is left alone", () => {
+	for (const pane of [
+		{ kind: "terminal", data: { terminalId: "promised-terminal" } },
+		{
+			kind: "chat-v3",
+			data: {
+				terminalId: "promised-terminal",
+				sessionId: "s",
+				draftId: "d",
+			},
+		},
+	] as SeedPane[]) {
+		const existing = layoutWith([pane]);
+		expect(withPendingCloudLaunch(existing, launch)).toBeNull();
+		const state = collections();
+		state.rows.set("claimed", { workspaceId: "claimed", paneLayout: existing });
+		seedPendingCloudLaunch({
+			collections: state.collections,
+			workspaceId: "claimed",
+			launch,
+		});
+		expect(state.rows.get("claimed")?.paneLayout).toEqual(existing);
+	}
+});
+
+test("a pane in the workspace's other pane area claims the launch for both sources", () => {
+	const right = layoutWith([
+		{ kind: "terminal", data: { terminalId: "promised-terminal" } },
+	]);
+	expect(
+		withPendingCloudLaunch(layoutWith([]), launch, {}, [right]),
+	).toBeNull();
+	const state = collections();
+	const center = layoutWith([]);
+	state.rows.set("moved", {
+		workspaceId: "moved",
+		paneLayout: center,
+		rightPaneLayout: right,
 	});
 	seedPendingCloudLaunch({
 		collections: state.collections,
-		workspaceId: "existing-cloud",
+		workspaceId: "moved",
 		launch,
 	});
-	expect(state.rows.get("existing-cloud")?.paneLayout).toEqual(original);
+	expect(state.rows.get("moved")?.paneLayout).toEqual(center);
+});
+
+test("seeding twice from either source opens one waiting pane", () => {
+	const once = withPendingCloudLaunch(layoutWith([]), launch);
+	if (!once) throw new Error("expected a waiting pane");
+	expect(withPendingCloudLaunch(once, launch)).toBeNull();
+	expect(withPendingCloudLaunch(layoutWith([]), null)).toBeNull();
 });
 
 test("attaching preserves the pane, tab, draft, queued messages and model without replaying the initial prompt", () => {
@@ -243,4 +303,19 @@ test("a launch that fell back to a terminal turns the waiting pane into that ter
 	expect(pane?.kind).toBe("terminal");
 	expect(pane?.data).toEqual({ terminalId: "promised-terminal" });
 	expect(pendingCloudLaunchPane(next)).toBeNull();
+});
+
+const RENDERER_ROOT = `${import.meta.dir}/../../..`;
+
+test("only the pending-launch store builds the waiting pane", async () => {
+	const builders: string[] = [];
+	for await (const path of new Bun.Glob("**/*.{ts,tsx}").scan(RENDERER_ROOT)) {
+		if (/\.test\.tsx?$/.test(path)) continue;
+		const source = await Bun.file(`${RENDERER_ROOT}/${path}`).text();
+		if (/kind:\s*PENDING_CLOUD_LAUNCH_PANE_KIND\b/.test(source))
+			builders.push(path);
+	}
+	expect(builders).toEqual([
+		"stores/workspace-creates/pendingCloudLaunch/pendingCloudLaunch.ts",
+	]);
 });

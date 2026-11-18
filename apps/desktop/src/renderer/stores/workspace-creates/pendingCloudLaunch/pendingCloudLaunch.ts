@@ -44,45 +44,59 @@ export function pendingLaunchSurface(
 	return data.surface ?? "chat";
 }
 
-export function seedPendingCloudLaunch({
-	collections,
-	workspaceId,
-	launch,
-	prompt,
-	modelId,
-	modeId,
-}: {
-	collections: AppCollections;
-	workspaceId: string;
-	launch: CloudAgentLaunchDescriptor | null | undefined;
+export interface PendingCloudLaunchContext {
 	prompt?: string;
 	modelId?: string | null;
 	modeId?: string | null;
-}): void {
-	if (!launch?.terminalId) return;
-	const existing = collections.workspaceLocalState.get(workspaceId)
-		?.paneLayout as WorkspaceState<PaneViewerData> | undefined;
-	if (existing?.tabs.length) return;
-	writeWorkspacePaneLayout(
-		collections,
-		{ id: workspaceId, projectId: null },
-		[],
-		[],
+}
+
+const EMPTY_LAYOUT: WorkspaceState<PaneViewerData> = {
+	version: 1,
+	tabs: [],
+	activeTabId: null,
+};
+
+/** Whether any pane in these tabs, from any of the workspace's pane areas, holds the terminal. */
+function isTerminalClaimed(
+	tabs: readonly WorkspaceState<PaneViewerData>["tabs"][number][],
+	terminalId: string,
+): boolean {
+	return tabs.some((tab) =>
+		Object.values(tab.panes).some(
+			(pane) =>
+				(pane.data as { terminalId?: unknown } | undefined)?.terminalId ===
+				terminalId,
+		),
 	);
-	const label = cloudLaunchAgentLabel(launch.agent);
-	const store = createWorkspaceStore<PaneViewerData>({
-		initialState: existing,
-	});
+}
+
+/**
+ * The one rule for opening a launch's waiting pane, whoever learned of the
+ * launch: a new tab, unless a pane in any of the workspace's pane areas
+ * already claims its terminal id. Null
+ * when there is nothing to add.
+ */
+export function withPendingCloudLaunch(
+	layout: WorkspaceState<PaneViewerData>,
+	launch: CloudAgentLaunchDescriptor | null | undefined,
+	{ prompt, modelId, modeId }: PendingCloudLaunchContext = {},
+	otherLayouts: readonly WorkspaceState<PaneViewerData>[] = [],
+): WorkspaceState<PaneViewerData> | null {
+	const terminalId = launch?.terminalId;
+	if (!launch || !terminalId) return null;
+	const workspaceTabs = [layout, ...otherLayouts].flatMap((each) => each.tabs);
+	if (isTerminalClaimed(workspaceTabs, terminalId)) return null;
+	const store = createWorkspaceStore<PaneViewerData>({ initialState: layout });
 	store.getState().addTab({
 		panes: [
 			{
 				kind: PENDING_CLOUD_LAUNCH_PANE_KIND,
-				titleOverride: label,
+				titleOverride: cloudLaunchAgentLabel(launch.agent),
 				data: {
 					draftId: crypto.randomUUID(),
 					agentId: launch.agent,
 					surface: launch.surface,
-					terminalId: launch.terminalId,
+					terminalId,
 					...(prompt ? { launchPrompt: prompt } : {}),
 					...(modelId ? { chatModelId: modelId } : {}),
 					...(modeId ? { chatModeId: modeId } : {}),
@@ -91,8 +105,41 @@ export function seedPendingCloudLaunch({
 		],
 	});
 	const { version, tabs, activeTabId } = store.getState();
+	return { version, tabs, activeTabId };
+}
+
+export function seedPendingCloudLaunch({
+	collections,
+	workspaceId,
+	launch,
+	...context
+}: PendingCloudLaunchContext & {
+	collections: AppCollections;
+	workspaceId: string;
+	launch: CloudAgentLaunchDescriptor | null | undefined;
+}): void {
+	const row = collections.workspaceLocalState.get(workspaceId);
+	const rightPaneLayout = row?.rightPaneLayout as
+		| WorkspaceState<PaneViewerData>
+		| undefined;
+	const next = withPendingCloudLaunch(
+		(row?.paneLayout as WorkspaceState<PaneViewerData> | undefined) ??
+			EMPTY_LAYOUT,
+		launch,
+		context,
+		rightPaneLayout ? [rightPaneLayout] : [],
+	);
+	if (!next) return;
+	if (!row) {
+		writeWorkspacePaneLayout(
+			collections,
+			{ id: workspaceId, projectId: null },
+			[],
+			[],
+		);
+	}
 	collections.workspaceLocalState.update(workspaceId, (draft) => {
-		draft.paneLayout = { version, tabs, activeTabId };
+		draft.paneLayout = next;
 	});
 }
 

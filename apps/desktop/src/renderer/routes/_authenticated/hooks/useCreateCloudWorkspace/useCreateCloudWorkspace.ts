@@ -2,19 +2,16 @@ import type { RouterInputs } from "@superset/trpc";
 import { useCallback } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { seedPendingCloudLaunch } from "renderer/stores/workspace-creates/pendingCloudLaunch";
+import {
+	type PendingCloudLaunchContext,
+	seedPendingCloudLaunch,
+} from "renderer/stores/workspace-creates/pendingCloudLaunch";
 import { withCreatedCloudWorkspace } from "./utils/withCreatedCloudWorkspace";
 
 export type CreateCloudWorkspaceInput = Omit<
 	RouterInputs["cloudWorkspace"]["create"],
 	"agentTerminalId"
 >;
-
-export interface CloudLaunchContext {
-	prompt?: string;
-	modelId?: string | null;
-	modeId?: string | null;
-}
 
 export function useCreateCloudWorkspace() {
 	const collections = useCollections();
@@ -25,12 +22,9 @@ export function useCreateCloudWorkspace() {
 	const create = useCallback(
 		async (
 			input: CreateCloudWorkspaceInput,
-			launchContext: CloudLaunchContext = {},
+			launchContext: PendingCloudLaunchContext = {},
 		) => {
-			const { initialLaunch, ...created } = await mutateAsync({
-				...input,
-				...(input.agent ? { agentTerminalId: crypto.randomUUID() } : {}),
-			});
+			const { initialLaunch, ...created } = await mutateAsync(input);
 			seedPendingCloudLaunch({
 				collections,
 				workspaceId: created.id,

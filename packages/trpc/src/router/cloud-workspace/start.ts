@@ -40,6 +40,7 @@ import {
 	provisionCloudWorkspace,
 	sandboxNameFor,
 } from "./provision";
+import { queuedLaunch } from "./queued-launch";
 import { linkTask } from "./record";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
@@ -267,14 +268,7 @@ async function start(args: StartCloudWorkspaceInput) {
 	const job = {
 		cloudWorkspaceId: row.id,
 		...(args.name ? {} : { namingPrompt: args.prompt ?? "" }),
-		...(args.launch
-			? {
-					launch: {
-						...args.launch,
-						surface: openAsChat ? ("chat" as const) : undefined,
-					},
-				}
-			: {}),
+		...(args.launch ? { launch: queuedLaunch(args.launch, openAsChat) } : {}),
 	};
 
 	pushWorkspaceAccess(row.organizationId, row.id);
