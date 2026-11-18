@@ -1187,7 +1187,7 @@ export const cloudWorkspaceBoots = pgTable(
 	],
 );
 
-/** One amount we sent to Autumn for one lock of a boot, one row per feature. */
+/** One amount we sent to Autumn: one window of one lock of a boot, for one feature. */
 export const cloudUsageEvents = pgTable(
 	"cloud_usage_events",
 	{
@@ -1202,7 +1202,7 @@ export const cloudUsageEvents = pgTable(
 		userId: uuid("user_id"),
 		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
 		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
-		amount: numeric().notNull(),
+		amount: numeric({ precision: 20, scale: 6 }).notNull(),
 		sentAt: timestamp("sent_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
@@ -1213,7 +1213,9 @@ export const cloudUsageEvents = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		primaryKey({ columns: [table.bootId, table.lockSeq, table.feature] }),
+		primaryKey({
+			columns: [table.bootId, table.lockSeq, table.feature, table.windowFrom],
+		}),
 		index("cloud_usage_events_organization_id_sent_at_idx").on(
 			table.organizationId,
 			table.sentAt,

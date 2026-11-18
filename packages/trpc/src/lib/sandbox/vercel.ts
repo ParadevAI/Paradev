@@ -847,6 +847,7 @@ export interface BoxSession {
 	startedAt: number;
 	endedAt: number | null;
 	activeCpuMs: number | null;
+	egressBytes: number | null;
 }
 
 const LIVE_STATUSES = new Set(["pending", "running"]);
@@ -879,6 +880,7 @@ interface RawSession {
 	requestedStopAt?: number;
 	updatedAt: number;
 	activeCpuDurationMs?: number;
+	networkTransfer?: { ingress: number; egress: number };
 }
 
 function toBoxSession(session: RawSession): BoxSession | null {
@@ -890,6 +892,7 @@ function toBoxSession(session: RawSession): BoxSession | null {
 		startedAt: session.startedAt,
 		endedAt: sessionEndedAt(session),
 		activeCpuMs: session.activeCpuDurationMs ?? null,
+		egressBytes: session.networkTransfer?.egress ?? null,
 	};
 }
 

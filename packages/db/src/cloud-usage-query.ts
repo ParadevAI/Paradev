@@ -36,7 +36,7 @@ import {
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
 
-type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
+export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
 export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
 export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];

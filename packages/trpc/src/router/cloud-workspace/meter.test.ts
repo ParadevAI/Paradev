@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import * as Sentry from "@sentry/core";
 import { autumnClient } from "@superset/auth/autumn";
 import * as billing from "@superset/auth/billing";
 import { db } from "@superset/db/client";
@@ -36,10 +37,13 @@ let writes: Record<string, unknown>[];
 let autumnCalls: { method: string; params: unknown; headers?: unknown }[];
 let stopped: string[];
 let usageStopAt: Date | null;
+let creatorId: string | null;
 let delayedSettles: number[];
 let updateMatches: boolean;
 let insertConflicts: boolean;
 let insertError: Error | null;
+let usageRowError: Error | null;
+let reported: unknown[];
 let queuedSettles: string[];
 let listed: BoxSession[];
 type UsageEvent = {
@@ -76,12 +80,18 @@ stub(db, {
 		values: (values: Record<string, unknown>) => {
 			writes.push(values);
 			return Object.assign(Promise.resolve(), {
-				onConflictDoNothing: () => ({
-					returning: async () => {
-						if (insertError) throw insertError;
-						return insertConflicts ? [] : [{ id: values.id }];
-					},
-				}),
+				onConflictDoNothing: () =>
+					Object.assign(
+						"feature" in values && usageRowError
+							? Promise.reject(usageRowError)
+							: Promise.resolve(),
+						{
+							returning: async () => {
+								if (insertError) throw insertError;
+								return insertConflicts ? [] : [{ id: values.id }];
+							},
+						},
+					),
 			});
 		},
 	}),
@@ -98,7 +108,7 @@ stub(db, {
 						id: "ws_1",
 						organizationId: "org_1",
 						providerSandboxId: "ws-box",
-						createdByUserId: "user_1",
+						createdByUserId: creatorId,
 						usageStopAt,
 						userName: "Ada Lovelace",
 						userEmail: "ada@example.com",
@@ -120,6 +130,12 @@ stub(sandbox, {
 	},
 });
 stub(realtime, { nudge: () => {} });
+stub(Sentry, {
+	captureException: (error: unknown) => {
+		reported.push(error);
+		return "";
+	},
+});
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
 stub(sandboxSleep, {
 	recordSandboxAsleep: async (
@@ -192,11 +208,15 @@ stub(autumnClient.balances, {
 	},
 });
 
-function autumnError(status: number) {
+function usageRows() {
+	return writes.filter((write) => "feature" in write);
+}
+
+function autumnError(status: number, body = "") {
 	return new AutumnError(`status ${status}`, {
-		response: new Response("", { status }),
+		response: new Response(body, { status }),
 		request: new Request("https://api.useautumn.com/v1"),
-		body: "",
+		body,
 	});
 }
 
@@ -218,6 +238,7 @@ beforeEach(() => {
 		startedAt: NOW - 20 * MINUTE,
 		endedAt: null,
 		activeCpuMs: null,
+		egressBytes: null,
 	};
 	renewalAllowed = true;
 	finalizeError = null;
@@ -228,10 +249,13 @@ beforeEach(() => {
 	stopped = [];
 	recordedAsleep = [];
 	usageStopAt = null;
+	creatorId = "user_1";
 	delayedSettles = [];
 	updateMatches = true;
 	insertConflicts = false;
 	insertError = null;
+	usageRowError = null;
+	reported = [];
 	queuedSettles = [];
 	listed = [];
 	usageEvents = null;
@@ -417,6 +441,29 @@ describe("settleBoot", () => {
 		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
 	});
 
+	test("a retried confirm whose lock Autumn already consumed is not tracked again", async () => {
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
+		expect(usageRows()).toHaveLength(1);
+		expect(reported).toEqual([]);
+	});
+
+	test("a lock Autumn no longer finds after it could have expired is tracked", async () => {
+		boot = { ...boot, finalizedThrough: new Date(NOW - 45 * MINUTE) };
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		await settleBoot("boot_1");
+		expect(
+			autumnCalls.find((call) => call.method === "track")?.params,
+		).toMatchObject({ featureId: "box_gb_minutes" });
+	});
+
 	test("a confirm that fails on Autumn's side is retried, not tracked", async () => {
 		finalizeError = autumnError(503);
 		await expect(settleBoot("boot_1")).rejects.toThrow("status 503");
@@ -431,6 +478,78 @@ describe("settleBoot", () => {
 				lockOpen: false,
 				finalizedThrough: expect.any(Date),
 			}),
+		);
+	});
+
+	test("each amount Autumn accepts is written as a usage row for its lock and window", async () => {
+		await settleBoot("boot_1");
+		const [row] = usageRows();
+		expect(usageRows()).toHaveLength(1);
+		expect(row).toMatchObject({
+			bootId: "boot_1",
+			lockSeq: 0,
+			feature: "box_gb_minutes",
+			organizationId: "org_1",
+			cloudWorkspaceId: "ws_1",
+			userId: "user_1",
+			windowFrom: new Date(NOW - 10 * MINUTE),
+			sentAt: expect.any(Date),
+		});
+		const sent = autumnCalls.find((call) => call.method === "finalize")
+			?.params as { overrideValue: number };
+		expect(row?.amount).toBe(String(sent.overrideValue));
+		expect(
+			(row?.windowTo as Date).getTime() - (row?.windowFrom as Date).getTime(),
+		).toBe((sent.overrideValue / 16) * MINUTE);
+	});
+
+	test("a closed boot writes its CPU row and its CPU time and egress on the boot", async () => {
+		session = {
+			...(session as BoxSession),
+			endedAt: NOW - 4 * MINUTE,
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		};
+		await settleBoot("boot_1");
+		expect(
+			usageRows().find((row) => row.feature === "active_cpu_minutes"),
+		).toMatchObject({
+			lockSeq: 0,
+			amount: "3",
+			windowFrom: new Date(NOW - 20 * MINUTE),
+			windowTo: new Date(NOW - 4 * MINUTE),
+		});
+		expect(writes.at(-1)).toMatchObject({
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		});
+	});
+
+	test("a usage row for a workspace with no creator has no user, where Autumn has unattributed", async () => {
+		creatorId = null;
+		await settleBoot("boot_1");
+		expect(usageRows()[0]).toMatchObject({ userId: null });
+		expect(
+			autumnCalls.find((call) => call.method === "check")?.params,
+		).toMatchObject({ properties: { userId: "unattributed" } });
+	});
+
+	test("an amount Autumn has not accepted writes no usage row", async () => {
+		finalizeError = autumnError(503);
+		await expect(settleBoot("boot_1")).rejects.toThrow("status 503");
+		expect(usageRows()).toEqual([]);
+	});
+
+	test("a usage row that fails to write is reported and the settle goes on unchanged", async () => {
+		usageRowError = new Error("db down");
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(reported).toEqual([usageRowError]);
+		expect(autumnCalls.map((call) => call.method)).toEqual([
+			"finalize",
+			"check",
+		]);
+		expect(writes).toContainEqual(
+			expect.objectContaining({ finalizedThrough: expect.any(Date) }),
 		);
 	});
 
@@ -451,6 +570,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		startedAt: NOW - 12 * MINUTE,
 		endedAt,
 		activeCpuMs: null,
+		egressBytes: null,
 	});
 	const timedOut: BoxSession = {
 		id: "sess_1",
@@ -459,6 +579,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		startedAt: NOW - 72 * MINUTE,
 		endedAt: NOW - 12 * MINUTE - 1_000,
 		activeCpuMs: null,
+		egressBytes: null,
 	};
 	const reconcile = () =>
 		reconcileCloudWorkspaceUsage({ active: [box], billingEnabled: true });
@@ -638,6 +759,11 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 		await reserve(null);
 		expect(userTotal("box_gb_minutes", "unattributed")).toBe(480);
 		expect(usageEvents?.[0]?.properties).not.toHaveProperty("userEmail");
+	});
+
+	test("a boot records who created it", async () => {
+		await reserve();
+		expect(writes[0]).toMatchObject({ createdByUserId: "user_1" });
 	});
 });
 
