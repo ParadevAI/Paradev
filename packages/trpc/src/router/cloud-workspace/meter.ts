@@ -313,6 +313,16 @@ export async function attachBootSession(args: {
 	await releaseBoot(args.bootId, "session_taken");
 }
 
+function bootTags(boot: Boot): Record<string, string> {
+	return {
+		"organization.id": boot.organizationId,
+		"boot.id": boot.id,
+		...(boot.cloudWorkspaceId
+			? { "cloud_workspace.id": boot.cloudWorkspaceId }
+			: {}),
+	};
+}
+
 async function recordUsage(
 	boot: Boot,
 	window: { from: number; amount: number; user: UsageUser | null },
@@ -333,13 +343,7 @@ async function recordUsage(
 			if (error.statusCode === 409) return;
 			if (error.statusCode >= 500) throw error;
 			Sentry.captureException(error, {
-				tags: {
-					"organization.id": boot.organizationId,
-					"boot.id": boot.id,
-					...(boot.cloudWorkspaceId
-						? { "cloud_workspace.id": boot.cloudWorkspaceId }
-						: {}),
-				},
+				tags: bootTags(boot),
 				extra: { lockId },
 			});
 		}
