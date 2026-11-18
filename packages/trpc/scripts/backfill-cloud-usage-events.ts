@@ -25,6 +25,9 @@ import { eq, sql } from "drizzle-orm";
  * the lock's last event; window_from is window_to less the amount at the boot's GB. A CPU row has
  * the boot's start and stop. An event that cannot be tied to a boot is reported, not written.
  *
+ * A lock with a higher sequence than its boot row's lock_seq was taken but never recorded by the
+ * boot; Autumn refunds it days later, so it is listed, not written: a row could never be corrected.
+ *
  * A lock is settled when its boot has moved past it or closed, and its last event is
  * LOCK_SETTLED_MS older than the export. Reports what it would do unless `--apply` is passed.
  * Safe to run again: it only inserts, and only for a lock with no row.
@@ -91,6 +94,7 @@ const { locks, untied } = autumnUsageByLock(
 
 const skipped = {
 	recorded: 0,
+	unrecorded: 0,
 	open: 0,
 	notSettled: 0,
 	zero: 0,
@@ -98,6 +102,7 @@ const skipped = {
 };
 const rows: InsertCloudUsageEvent[] = [];
 const anomalies = [];
+const unrecorded = [];
 for (const lock of locks) {
 	const boot = bootById.get(lock.bootId);
 	if (!boot) throw new Error(`autumnUsageByLock kept unknown ${lock.bootId}`);
@@ -106,7 +111,17 @@ for (const lock of locks) {
 		boot.finalizedThrough === null ||
 		boot.finalizedThrough < boot.stoppedAt;
 	if (recorded.has(lockKey(lock))) skipped.recorded += 1;
-	else if (open && lock.lockSeq === boot.lockSeq) skipped.open += 1;
+	else if (lock.lockSeq > boot.lockSeq) {
+		skipped.unrecorded += 1;
+		unrecorded.push({
+			bootId: lock.bootId,
+			lockSeq: lock.lockSeq,
+			bootLockSeq: boot.lockSeq,
+			feature: lock.feature,
+			amount: lock.amount,
+			lastEventAt: new Date(lock.lastEventAt).toISOString(),
+		});
+	} else if (open && lock.lockSeq === boot.lockSeq) skipped.open += 1;
 	else if (lock.lastEventAt >= settledBefore) skipped.notSettled += 1;
 	else if (Math.abs(lock.amount) < HALF_MICRO) skipped.zero += 1;
 	else if (lock.amount < 0) skipped.negative += 1;
@@ -199,6 +214,7 @@ console.log(
 			rowsByDay: totalBy((row) => day(row.sentAt as Date)),
 			untied: { events: untied.length, byOrganizationDayFeature: untiedBy },
 			anomalies: { count: anomalies.length, locks: anomalies },
+			unrecordedLocks: { count: unrecorded.length, locks: unrecorded },
 			createdByUserId: creators,
 		},
 		(_, value) =>
@@ -211,8 +227,12 @@ if (!values.apply) process.exit(0);
 let written = 0;
 for (let index = 0; index < rows.length; index += BATCH) {
 	const batch = rows.slice(index, index + BATCH);
-	await db.insert(cloudUsageEvents).values(batch).onConflictDoNothing();
-	written += batch.length;
+	const inserted = await db
+		.insert(cloudUsageEvents)
+		.values(batch)
+		.onConflictDoNothing()
+		.returning({ bootId: cloudUsageEvents.bootId });
+	written += inserted.length;
 }
 let filled = 0;
 for (let index = 0; index < creatorUpdates.length; index += BATCH) {

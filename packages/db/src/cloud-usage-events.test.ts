@@ -1,6 +1,11 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { CHECKOUT, MAYA, ORG, seedCloudUsage } from "@superset/db/testing";
 import { and, eq } from "drizzle-orm";
+import {
+	CHECKOUT,
+	MAYA,
+	ORG,
+	seedCloudUsage,
+} from "../test/cloud-usage-fixture";
 import { recordUsageEvent } from "./cloud-usage-events";
 import { cloudUsageEvents } from "./schema";
 

@@ -39,7 +39,11 @@ It does not write:
 
 - **Locks with a row.** The meter wrote them, or an earlier run did.
 - **Open locks and locks not settled yet.** The meter writes them when it settles.
-- **Locks that net to zero**: releases, and refunds of locks the boot row never recorded.
+- **Locks the boot row never recorded**: a lock sequence above the boot's `lock_seq`. The meter
+  took the lock but its boot row never moved to it, and Autumn refunds it days later (2.5 to 7.5 on
+  2026-11-04), so a row written before the refund could never be corrected. They are listed under
+  `unrecordedLocks`. On 2026-11-18 there were 5, all refunded and netting to 0.
+- **Locks that net to zero**: releases.
 - **Locks that net below zero**: on launch night, 109 confirm adjustments were keyed to a boot but
   their reservations were not. Each reservation has several candidates (same customer, value and
   hour), so they are not paired. They are listed under `anomalies`, and their reservations are
@@ -87,6 +91,7 @@ A `fail` result is expected. These differences are known; anything else is a fin
 | Where | What | Why |
 |---|---|---|
 | `onlyAutumn` | The 109 launch-night locks that net below zero (the dry run's `skipped.negative`) | The reservation was sent with no boot, so the backfill writes no row. |
+| `onlyAutumn` | A lock in `unrecordedLocks` whose refund has not landed yet | Autumn still holds its reservation; it nets to 0 once refunded and then drops out. |
 | `amountDiffers`, ours a little higher | A lock whose confirm Autumn applied but answered 503, after the deploy | Our row holds the retry's window; Autumn kept the first confirm's amount. The difference is the seconds between the two tries (the 409 gap, closed by M5c). |
 | `amountDiffers`, ours lower | A lock with several windows where one window's row write failed | The backfill skips a lock that has any row. Sentry has the write error. |
 

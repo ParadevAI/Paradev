@@ -543,6 +543,7 @@ describe("settleBoot", () => {
 	test("a usage row that fails to write is reported and the settle goes on unchanged", async () => {
 		usageRowError = new Error("db down");
 		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(reported).toEqual([usageRowError]);
 		expect(autumnCalls.map((call) => call.method)).toEqual([
 			"finalize",
 			"check",

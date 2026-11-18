@@ -1,7 +1,5 @@
-import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import type { Db } from "./cloud-usage-query";
 import { cloudUsageEvents, type InsertCloudUsageEvent } from "./schema/schema";
-
-type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
 /** Writes one amount sent to Autumn. A retried send of the same window writes nothing. */
 export async function recordUsageEvent(
