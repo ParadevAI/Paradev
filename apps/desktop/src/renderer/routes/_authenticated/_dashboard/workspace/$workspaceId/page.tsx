@@ -356,7 +356,8 @@ function WorkspaceContent() {
 	const { canShowEmptyLayout } = useHostPendingCloudLaunch({
 		workspaceId,
 		store,
-		isLayoutReady,
+		linkedStores: linkedPaneStores,
+		isLayoutReady: isLayoutReady && isRightLayoutReady,
 	});
 	useRunWorkspaceCreationPresets({
 		workspaceId,

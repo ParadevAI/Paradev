@@ -8,14 +8,20 @@ import { isChatTerminalIgnored } from "../../../../utils/closedChatSessions";
 /** Opens the waiting pane the box reported, unless the user closed it. */
 export function seedHostPendingLaunch(
 	store: StoreApi<WorkspaceStore<PaneViewerData>>,
+	linkedStores: readonly StoreApi<WorkspaceStore<PaneViewerData>>[],
 	launch: PendingCloudAgentLaunch,
 ): void {
 	if (!launch.terminalId || isChatTerminalIgnored(launch.terminalId)) return;
+	const linkedLayouts = linkedStores.map((linked) => linked.getState());
 	store
 		.getState()
 		.replaceState(
 			(state) =>
-				withPendingCloudLaunch(state, launch, { prompt: launch.prompt }) ??
-				state,
+				withPendingCloudLaunch(
+					state,
+					launch,
+					{ prompt: launch.prompt },
+					linkedLayouts,
+				) ?? state,
 		);
 }

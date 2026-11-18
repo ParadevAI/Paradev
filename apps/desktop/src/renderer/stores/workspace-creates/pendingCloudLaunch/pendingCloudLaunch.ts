@@ -56,11 +56,12 @@ const EMPTY_LAYOUT: WorkspaceState<PaneViewerData> = {
 	activeTabId: null,
 };
 
-function claimsTerminal(
-	layout: WorkspaceState<PaneViewerData>,
+/** Whether any pane in these tabs, from any of the workspace's pane areas, holds the terminal. */
+function isTerminalClaimed(
+	tabs: readonly WorkspaceState<PaneViewerData>["tabs"][number][],
 	terminalId: string,
 ): boolean {
-	return layout.tabs.some((tab) =>
+	return tabs.some((tab) =>
 		Object.values(tab.panes).some(
 			(pane) =>
 				(pane.data as { terminalId?: unknown } | undefined)?.terminalId ===
@@ -71,16 +72,20 @@ function claimsTerminal(
 
 /**
  * The one rule for opening a launch's waiting pane, whoever learned of the
- * launch: a new tab, unless a pane already claims its terminal id. Null
+ * launch: a new tab, unless a pane in any of the workspace's pane areas
+ * already claims its terminal id. Null
  * when there is nothing to add.
  */
 export function withPendingCloudLaunch(
 	layout: WorkspaceState<PaneViewerData>,
 	launch: CloudAgentLaunchDescriptor | null | undefined,
 	{ prompt, modelId, modeId }: PendingCloudLaunchContext = {},
+	otherLayouts: readonly WorkspaceState<PaneViewerData>[] = [],
 ): WorkspaceState<PaneViewerData> | null {
 	const terminalId = launch?.terminalId;
-	if (!launch || !terminalId || claimsTerminal(layout, terminalId)) return null;
+	if (!launch || !terminalId) return null;
+	const workspaceTabs = [layout, ...otherLayouts].flatMap((each) => each.tabs);
+	if (isTerminalClaimed(workspaceTabs, terminalId)) return null;
 	const store = createWorkspaceStore<PaneViewerData>({ initialState: layout });
 	store.getState().addTab({
 		panes: [
@@ -114,11 +119,15 @@ export function seedPendingCloudLaunch({
 	launch: CloudAgentLaunchDescriptor | null | undefined;
 }): void {
 	const row = collections.workspaceLocalState.get(workspaceId);
+	const rightPaneLayout = row?.rightPaneLayout as
+		| WorkspaceState<PaneViewerData>
+		| undefined;
 	const next = withPendingCloudLaunch(
 		(row?.paneLayout as WorkspaceState<PaneViewerData> | undefined) ??
 			EMPTY_LAYOUT,
 		launch,
 		context,
+		rightPaneLayout ? [rightPaneLayout] : [],
 	);
 	if (!next) return;
 	if (!row) {

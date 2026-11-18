@@ -20,7 +20,11 @@ import {
 	withPendingCloudLaunch,
 } from "./pendingCloudLaunch";
 
-type Row = { workspaceId: string; paneLayout: WorkspaceState<PaneViewerData> };
+type Row = {
+	workspaceId: string;
+	paneLayout: WorkspaceState<PaneViewerData>;
+	rightPaneLayout?: WorkspaceState<PaneViewerData>;
+};
 const launch: CloudAgentLaunchDescriptor = {
 	agent: "claude",
 	surface: "chat",
@@ -155,6 +159,28 @@ test("a layout with any pane claiming the launch's terminal is left alone", () =
 		});
 		expect(state.rows.get("claimed")?.paneLayout).toEqual(existing);
 	}
+});
+
+test("a pane in the workspace's other pane area claims the launch for both sources", () => {
+	const right = layoutWith([
+		{ kind: "terminal", data: { terminalId: "promised-terminal" } },
+	]);
+	expect(
+		withPendingCloudLaunch(layoutWith([]), launch, {}, [right]),
+	).toBeNull();
+	const state = collections();
+	const center = layoutWith([]);
+	state.rows.set("moved", {
+		workspaceId: "moved",
+		paneLayout: center,
+		rightPaneLayout: right,
+	});
+	seedPendingCloudLaunch({
+		collections: state.collections,
+		workspaceId: "moved",
+		launch,
+	});
+	expect(state.rows.get("moved")?.paneLayout).toEqual(center);
 });
 
 test("seeding twice from either source opens one waiting pane", () => {

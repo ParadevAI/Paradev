@@ -17,10 +17,14 @@ import { seedHostPendingLaunch } from "./utils/seedHostPendingLaunch";
 export function useHostPendingCloudLaunch({
 	workspaceId,
 	store,
+	linkedStores,
 	isLayoutReady,
 }: {
 	workspaceId: string;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
+	/** The workspace's other pane areas: a pane moved there still claims its terminal. */
+	linkedStores: readonly StoreApi<WorkspaceStore<PaneViewerData>>[];
+	/** Every one of those layouts is ready. */
 	isLayoutReady: boolean;
 }): { canShowEmptyLayout: boolean } {
 	const target = useWorkspaceHostTarget(workspaceId);
@@ -48,13 +52,14 @@ export function useHostPendingCloudLaunch({
 
 	// Before paint, so the frame that has the answer never shows the empty view.
 	useLayoutEffect(() => {
-		if (isLayoutReady && launch) seedHostPendingLaunch(store, launch);
-	}, [isLayoutReady, launch, store]);
+		if (isLayoutReady && launch)
+			seedHostPendingLaunch(store, linkedStores, launch);
+	}, [isLayoutReady, launch, store, linkedStores]);
 
 	return {
 		canShowEmptyLayout: canShowEmptyLayout({
 			isLayoutReady,
-			isSandboxHost: hostUrl !== null,
+			hostTarget: target,
 			pendingLaunchStatus: status,
 		}),
 	};

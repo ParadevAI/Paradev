@@ -19,8 +19,8 @@ function launchOn(terminalId: string): PendingCloudAgentLaunch {
 test("the box's launch opens one waiting pane that shows its prompt", () => {
 	const store = createWorkspaceStore<PaneViewerData>();
 	const launch = launchOn("external-terminal");
-	seedHostPendingLaunch(store, launch);
-	seedHostPendingLaunch(store, launch);
+	seedHostPendingLaunch(store, [], launch);
+	seedHostPendingLaunch(store, [], launch);
 	expect(store.getState().tabs).toHaveLength(1);
 	expect(pendingCloudLaunchPane(store.getState())?.data).toMatchObject({
 		terminalId: "external-terminal",
@@ -31,7 +31,7 @@ test("the box's launch opens one waiting pane that shows its prompt", () => {
 test("a waiting pane the user closed does not come back when the host answers", () => {
 	const store = createWorkspaceStore<PaneViewerData>();
 	const launch = launchOn("closed-terminal");
-	seedHostPendingLaunch(store, launch);
+	seedHostPendingLaunch(store, [], launch);
 	const tab = store.getState().tabs[0];
 	const pane = pendingCloudLaunchPane(store.getState());
 	if (!tab || !pane) throw new Error("expected a waiting pane");
@@ -39,6 +39,16 @@ test("a waiting pane the user closed does not come back when the host answers", 
 		.getState()
 		.closePane({ tabId: tab.id, paneId: pane.id, intent: "remove" });
 	ignoreChatTerminal("closed-terminal");
-	seedHostPendingLaunch(store, launch);
+	seedHostPendingLaunch(store, [], launch);
 	expect(store.getState().tabs).toHaveLength(0);
+});
+
+test("a waiting pane moved to another pane area still claims its launch", () => {
+	const center = createWorkspaceStore<PaneViewerData>();
+	const right = createWorkspaceStore<PaneViewerData>();
+	const launch = launchOn("moved-terminal");
+	seedHostPendingLaunch(right, [], launch);
+	seedHostPendingLaunch(center, [right], launch);
+	expect(center.getState().tabs).toHaveLength(0);
+	expect(pendingCloudLaunchPane(right.getState())).not.toBeNull();
 });

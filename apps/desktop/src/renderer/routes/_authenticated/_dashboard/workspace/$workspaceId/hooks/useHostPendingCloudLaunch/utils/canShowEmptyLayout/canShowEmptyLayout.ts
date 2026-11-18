@@ -1,17 +1,29 @@
+import type { WorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
+
 /**
- * Whether the workspace is known to have nothing to show. A sandbox may
- * still report a launch whose waiting pane is about to open, so its first
- * answer is part of knowing the layout.
+ * Whether the workspace is known to have nothing to show. Only a sandbox
+ * can report a launch whose waiting pane is about to open, so its first
+ * answer is part of knowing the layout, and so is knowing the host kind.
  */
 export function canShowEmptyLayout({
 	isLayoutReady,
-	isSandboxHost,
+	hostTarget,
 	pendingLaunchStatus,
 }: {
 	isLayoutReady: boolean;
-	isSandboxHost: boolean;
+	hostTarget: WorkspaceHostTarget;
 	pendingLaunchStatus: "pending" | "success" | "error";
 }): boolean {
 	if (!isLayoutReady) return false;
-	return !isSandboxHost || pendingLaunchStatus !== "pending";
+	switch (hostTarget.status) {
+		case "loading":
+			return false;
+		case "not-found":
+		case "local-starting":
+			return true;
+		case "ready":
+			return hostTarget.kind !== "sandbox" || pendingLaunchStatus !== "pending";
+		default:
+			return hostTarget satisfies never;
+	}
 }
