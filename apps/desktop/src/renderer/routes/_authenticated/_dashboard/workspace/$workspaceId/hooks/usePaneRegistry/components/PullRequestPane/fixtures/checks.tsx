@@ -27,6 +27,18 @@ mock.module(`${pane}/hooks/usePullRequestPaneDetail`, () => ({
 mock.module("@superset/workspace-client", () => ({
 	workspaceTrpc: {
 		git: { getPullRequest: { useQuery: () => ({ data: null }) } },
+		pullRequests: {
+			refreshByWorkspaces: {
+				useMutation: () => ({
+					mutateAsync: mock(() => Promise.resolve()),
+					isPending: false,
+				}),
+			},
+		},
+		useUtils: () => ({
+			pullRequests: { historyByWorkspaces: { invalidate: mock() } },
+			git: { getPullRequest: { invalidate: mock() } },
+		}),
 	},
 }));
 mock.module(`${root}/pull-requests/hooks/usePullRequestThreads`, () => ({

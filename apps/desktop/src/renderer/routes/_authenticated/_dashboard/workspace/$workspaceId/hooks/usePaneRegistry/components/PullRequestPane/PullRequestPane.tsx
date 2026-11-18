@@ -64,10 +64,29 @@ export function PullRequestPane({
 		}),
 		[organizationId, data.repoFullName, data.number],
 	);
-	const { refresh, isRefreshing } = useRefreshPullRequest({
+	const { refresh: refreshDetail, isRefreshing } = useRefreshPullRequest({
 		target,
 		url: detail.data?.url,
 	});
+	const workspaceUtils = workspaceTrpc.useUtils();
+	const syncWorkspacePullRequests =
+		workspaceTrpc.pullRequests.refreshByWorkspaces.useMutation();
+	const refresh = () => {
+		refreshDetail();
+		syncWorkspacePullRequests
+			.mutateAsync({ workspaceIds: [workspace.id] })
+			.then(() =>
+				Promise.all([
+					workspaceUtils.pullRequests.historyByWorkspaces.invalidate(),
+					workspaceUtils.git.getPullRequest.invalidate({
+						workspaceId: workspace.id,
+					}),
+				]),
+			)
+			.catch((error: unknown) => {
+				console.warn("Failed to sync workspace pull requests", error);
+			});
+	};
 
 	// "Open in diff" belongs to the workspace, so it exists only when this
 	// workspace's linked PR is the one on screen.
@@ -174,7 +193,7 @@ export function PullRequestPane({
 						flow={flow}
 						showStartWorkspace={false}
 						onRefresh={refresh}
-						isRefreshing={isRefreshing}
+						isRefreshing={isRefreshing || syncWorkspacePullRequests.isPending}
 					/>
 				</div>
 			</div>
