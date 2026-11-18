@@ -16,6 +16,17 @@ device=()
 [ -n "${UDID:-}" ] && device=(--udid "$UDID")
 
 scratch="$(mktemp -d)"
+shots="$(mktemp -d)"
+created=()
+# Archiving removes each workspace's worktree. The CLI cannot delete a
+# project, so the two project rows stay on the host.
+cleanup() {
+	if [ ${#created[@]} -gt 0 ]; then
+		"$SUPERSET" workspaces archive --local "${created[@]}" --quiet >/dev/null || true
+	fi
+}
+trap cleanup EXIT
+
 for repo in demo-app api-server; do
 	git init -q -b main "$scratch/$repo"
 	git -C "$scratch/$repo" -c user.email=e2e@local.test -c user.name=e2e \
@@ -29,8 +40,9 @@ project() {
 workspace() {
 	local project=$1 name=$2
 	shift 2
-	"$SUPERSET" workspaces create --local --project "$project" --name "$name" \
-		--branch "$name" --skip-branch-prefix "$@" --quiet >/dev/null
+	created+=("$("$SUPERSET" workspaces create --local --project "$project" \
+		--name "$name" --branch "$name" --skip-branch-prefix "$@" --json |
+		bun -e 'console.log(JSON.parse(await Bun.stdin.text()).workspace.id)')")
 	# createdAt is the order under test; keep the rows apart.
 	sleep 1.1
 }
@@ -50,13 +62,12 @@ workspace "$api" health-check
 host="$("$SUPERSET" status --json | bun -e 'console.log(JSON.parse(await Bun.stdin.text()).hostId)')"
 bun --env-file=../../.env scripts/e2e/tag-folder-settings.ts --host "$host" --project "$demo"
 
-shots="$scratch/shots"
-mkdir -p "$shots"
 maestro ${device[@]+"${device[@]}"} test --test-output-dir "$shots" .maestro/flows/tag-folders/grouped.yml
 maestro ${device[@]+"${device[@]}"} test --test-output-dir "$shots" -e METRO_PORT="$METRO_PORT" \
 	.maestro/flows/tag-folders/collapse.yml
 maestro ${device[@]+"${device[@]}"} test --test-output-dir "$shots" \
 	-e FIX_LOGIN_Y="${FIX_LOGIN_Y:-79%}" .maestro/flows/tag-folders/move.yml
 maestro ${device[@]+"${device[@]}"} test --test-output-dir "$shots" .maestro/flows/tag-folders/group-menu.yml
-bun --env-file=../../.env scripts/e2e/tag-folder-check.ts --host "$host"
+bun --env-file=../../.env scripts/e2e/tag-folder-check.ts --host "$host" \
+	--project "$demo"
 echo "tag folders: passed. Check the screenshots in $shots"

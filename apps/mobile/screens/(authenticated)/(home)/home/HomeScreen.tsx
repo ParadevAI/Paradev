@@ -125,6 +125,7 @@ const NO_PROJECT_SECTION_ID = "__none";
 interface ProjectGroups {
 	projectId: string | null;
 	folders: TagFolderGroup<HostWorkspaceItem>[];
+	folderTags: string[];
 	workspaces: HostWorkspaceItem[];
 }
 
@@ -466,20 +467,22 @@ export function HomeScreen() {
 			if (isCollapsed) continue;
 			const projectId =
 				section.projectId === NO_PROJECT_SECTION_ID ? null : section.projectId;
-			const grouped = groupByTagFolder(
-				projectId,
-				section.workspaces,
-				tagSettings,
-			);
-			const groups: ProjectGroups = {
-				projectId,
-				folders: grouped.folders,
-				workspaces: section.workspaces,
-			};
 			// "No project" also holds rows of projects the host stopped
 			// reporting; only true sessions can be grouped there.
 			const canGroup = (workspace: HostWorkspaceItem) =>
 				projectId !== null || workspace.projectId === null;
+			const groupable = section.workspaces.filter(canGroup);
+			const grouped = groupByTagFolder(projectId, groupable, tagSettings);
+			const loose = new Set(grouped.ungrouped);
+			grouped.ungrouped = section.workspaces.filter(
+				(workspace) => loose.has(workspace) || !canGroup(workspace),
+			);
+			const groups: ProjectGroups = {
+				projectId,
+				folders: grouped.folders,
+				folderTags: grouped.folderTags,
+				workspaces: groupable,
+			};
 			const children = orderProjectChildren(
 				grouped,
 				sort,
@@ -784,7 +787,7 @@ export function HomeScreen() {
 				);
 			}
 			const { workspace, groups } = item;
-			const folderTags = groups?.folders.map((folder) => folder.tag) ?? [];
+			const folderTags = groups?.folderTags ?? [];
 			const repoPrefix = workspace.projectId
 				? repoPrefixesByProject.get(workspace.projectId)
 				: undefined;

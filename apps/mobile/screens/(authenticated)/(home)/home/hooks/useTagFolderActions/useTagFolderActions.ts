@@ -13,13 +13,15 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { Alert } from "react-native";
-import type {
-	HostWorkspaceItem,
-	HostWorkspacesCacheOps,
-	WorkspacesHost,
+import {
+	getHostWorkspacesQueryKey,
+	type HostWorkspaceItem,
+	type HostWorkspacesCacheOps,
+	type WorkspacesHost,
 } from "@/hooks/useHostWorkspaces";
 import {
 	getHostServiceClientByUrl,
+	type HostWorkspaceRow,
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import type { TagFolderGroup } from "../../utils/groupByTagFolder";
@@ -55,6 +57,18 @@ export function useTagFolderActions(
 		[host?.machineId, hostUrl],
 	);
 
+	/** The workspace as the cache holds it now, after any wait for input. */
+	const latest = useCallback(
+		(workspace: HostWorkspaceItem): HostWorkspaceItem => {
+			const rows = queryClient.getQueryData<HostWorkspaceRow[]>(
+				getHostWorkspacesQueryKey(host?.machineId ?? null, hostUrl),
+			);
+			const row = rows?.find((item) => item.id === workspace.id);
+			return row ? { ...workspace, ...row } : workspace;
+		},
+		[queryClient, host?.machineId, hostUrl],
+	);
+
 	const writeTags = useCallback(
 		async (workspace: HostWorkspaceItem, tags: string[]) => {
 			if (!hostUrl) throw new Error("host offline");
@@ -81,14 +95,16 @@ export function useTagFolderActions(
 		) => {
 			if (!hostUrl) throw new Error("host offline");
 			await queryClient.cancelQueries({ queryKey: settingsKey });
+			const isTarget = (row: FolderSettingRow) =>
+				row.scope === scope && row.tag === tag;
+			const before = queryClient
+				.getQueryData<FolderSettingRow[]>(settingsKey)
+				?.find(isTarget);
+			const written: FolderSettingRow = { scope, tag, ...before, ...patch };
 			queryClient.setQueryData<FolderSettingRow[]>(settingsKey, (rows = []) =>
-				rows.some((row) => row.scope === scope && row.tag === tag)
-					? rows.map((row) =>
-							row.scope === scope && row.tag === tag
-								? { ...row, ...patch }
-								: row,
-						)
-					: [...rows, { scope, tag, ...patch }],
+				rows.some(isTarget)
+					? rows.map((row) => (isTarget(row) ? written : row))
+					: [...rows, written],
 			);
 			try {
 				await getHostServiceClientByUrl(hostUrl).tagFolders.upsert.mutate({
@@ -96,6 +112,15 @@ export function useTagFolderActions(
 					tag,
 					...patch,
 				});
+			} catch (error) {
+				// Undo only this write: a newer edit has replaced `written`.
+				queryClient.setQueryData<FolderSettingRow[]>(settingsKey, (rows = []) =>
+					rows.flatMap((row) => {
+						if (row !== written) return [row];
+						return before ? [before] : [];
+					}),
+				);
+				throw error;
 			} finally {
 				void queryClient.invalidateQueries({ queryKey: settingsKey });
 			}
@@ -143,15 +168,16 @@ export function useTagFolderActions(
 					displayName: name,
 					color: randomGroupColor(),
 				});
+				const current = latest(workspace);
 				await writeTags(
-					workspace,
-					applyFolderTagChange(workspace.tags, folderTags, tag),
+					current,
+					applyFolderTagChange(current.tags, folderTags, tag),
 				);
 			} catch {
 				Alert.alert(t({ message: "Couldn't create the group" }));
 			}
 		},
-		[writeSetting, writeTags, t],
+		[writeSetting, writeTags, latest, t],
 	);
 
 	const renameFolder = useCallback(

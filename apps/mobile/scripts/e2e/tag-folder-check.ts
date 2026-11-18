@@ -3,14 +3,19 @@
  * moved fix-login into Feature work and deleted the bugs group. This is what
  * desktop reads, so it checks more than the phone's screen.
  *
- *   bun --env-file=../../.env scripts/e2e/tag-folder-check.ts --host <machineId>
+ *   bun --env-file=../../.env scripts/e2e/tag-folder-check.ts --host <machineId> --project <projectId>
  */
 import { parseArgs } from "node:util";
 import { mintJwt, relayUrl, signIn } from "./dev-session";
 
-const { values } = parseArgs({ options: { host: { type: "string" } } });
-if (!values.host)
-	throw new Error("usage: tag-folder-check.ts --host <machineId>");
+const { values } = parseArgs({
+	options: { host: { type: "string" }, project: { type: "string" } },
+});
+if (!values.host || !values.project) {
+	throw new Error(
+		"usage: tag-folder-check.ts --host <machineId> --project <projectId>",
+	);
+}
 
 const { cookie, organizationId } = await signIn();
 const jwt = await mintJwt(cookie);
@@ -24,9 +29,14 @@ async function query<T>(path: string): Promise<T> {
 	return (await response.json()).result.data.json as T;
 }
 
-const workspaces =
-	await query<{ name: string; tags?: string[] }[]>("workspace.list");
-const settings = await query<{ tag: string }[]>("tagFolders.list");
+const workspaces = (
+	await query<{ name: string; projectId: string | null; tags?: string[] }[]>(
+		"workspace.list",
+	)
+).filter((workspace) => workspace.projectId === values.project);
+const settings = (
+	await query<{ scope: string; tag: string }[]>("tagFolders.list")
+).filter((setting) => setting.scope === values.project);
 const tagsOf = (name: string) =>
 	JSON.stringify(workspaces.find((workspace) => workspace.name === name)?.tags);
 

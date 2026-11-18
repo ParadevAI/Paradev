@@ -46,4 +46,14 @@ describe("groupByTagFolder", () => {
 		);
 		expect(result.folders.map((f) => f.name)).toEqual(["fix"]);
 	});
+
+	it("lists every group tag, including groups with no shown workspace", () => {
+		const result = groupByTagFolder(
+			PROJECT,
+			[ws("a", ["fix", "later"]), ws("b", ["fix"])],
+			[{ projectId: PROJECT, tag: "fix", tabOrder: 1 }],
+		);
+		expect(result.folders.map((f) => f.tag)).toEqual(["fix"]);
+		expect(result.folderTags.sort()).toEqual(["fix", "later"]);
+	});
 });

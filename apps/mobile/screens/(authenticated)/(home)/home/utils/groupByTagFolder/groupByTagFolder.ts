@@ -18,6 +18,12 @@ export interface TagFolderGroup<W> {
 export interface ProjectTagFolders<W> {
 	ungrouped: W[];
 	folders: TagFolderGroup<W>[];
+	/**
+	 * Every group tag in the project, including groups not shown because all
+	 * their workspaces resolve to another group. A move or ungroup strips
+	 * these, or a second group tag would pull the workspace into its group.
+	 */
+	folderTags: string[];
 }
 
 /**
@@ -67,6 +73,7 @@ export function groupByTagFolder<
 	const orderOf = (tag: string) => index.get(tag)?.tabOrder ?? 0;
 	return {
 		ungrouped,
+		folderTags: [...index.keys()],
 		folders: [...groups.entries()]
 			.filter(([, group]) => group.workspaces.length > 0)
 			.sort(([a], [b]) => orderOf(a) - orderOf(b) || a.localeCompare(b))
