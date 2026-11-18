@@ -17,6 +17,7 @@ import {
 	pendingLaunchSurface,
 	releasePendingCloudChat,
 	seedPendingCloudLaunch,
+	withPendingCloudLaunch,
 } from "./pendingCloudLaunch";
 
 type Row = { workspaceId: string; paneLayout: WorkspaceState<PaneViewerData> };
@@ -110,24 +111,57 @@ test("older APIs and unpromised ids do not seed a waiting pane", () => {
 	expect(state.rows.size).toBe(0);
 });
 
-test("an existing nonempty pane layout is never replaced", () => {
-	const state = collections();
+type SeedPane = { kind: string; data: PaneViewerData };
+
+function layoutWith(panes: SeedPane[]): WorkspaceState<PaneViewerData> {
 	const store = createWorkspaceStore<PaneViewerData>();
-	store.getState().addTab({
-		panes: [{ kind: "terminal", data: { terminalId: "existing" } }],
-	});
+	for (const pane of panes) store.getState().addTab({ panes: [pane] });
 	const { version, tabs, activeTabId } = store.getState();
-	const original = { version, tabs, activeTabId };
-	state.rows.set("existing-cloud", {
-		workspaceId: "existing-cloud",
-		paneLayout: original,
-	});
-	seedPendingCloudLaunch({
-		collections: state.collections,
-		workspaceId: "existing-cloud",
-		launch,
-	});
-	expect(state.rows.get("existing-cloud")?.paneLayout).toEqual(original);
+	return { version, tabs, activeTabId };
+}
+
+test("an existing layout keeps its tabs and gets the waiting pane beside them", () => {
+	const existing = layoutWith([
+		{ kind: "terminal", data: { terminalId: "start-hook" } },
+	]);
+	const next = withPendingCloudLaunch(existing, launch);
+	expect(next?.tabs).toHaveLength(2);
+	expect(next?.tabs[0]).toEqual(existing.tabs[0]);
+	expect(pendingCloudLaunchPane(next ?? undefined)?.data.terminalId).toBe(
+		"promised-terminal",
+	);
+});
+
+test("a layout with any pane claiming the launch's terminal is left alone", () => {
+	for (const pane of [
+		{ kind: "terminal", data: { terminalId: "promised-terminal" } },
+		{
+			kind: "chat-v3",
+			data: {
+				terminalId: "promised-terminal",
+				sessionId: "s",
+				draftId: "d",
+			},
+		},
+	] as SeedPane[]) {
+		const existing = layoutWith([pane]);
+		expect(withPendingCloudLaunch(existing, launch)).toBeNull();
+		const state = collections();
+		state.rows.set("claimed", { workspaceId: "claimed", paneLayout: existing });
+		seedPendingCloudLaunch({
+			collections: state.collections,
+			workspaceId: "claimed",
+			launch,
+		});
+		expect(state.rows.get("claimed")?.paneLayout).toEqual(existing);
+	}
+});
+
+test("seeding twice from either source opens one waiting pane", () => {
+	const once = withPendingCloudLaunch(layoutWith([]), launch);
+	if (!once) throw new Error("expected a waiting pane");
+	expect(withPendingCloudLaunch(once, launch)).toBeNull();
+	expect(withPendingCloudLaunch(layoutWith([]), null)).toBeNull();
 });
 
 test("attaching preserves the pane, tab, draft, queued messages and model without replaying the initial prompt", () => {

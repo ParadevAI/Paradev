@@ -76,6 +76,7 @@ import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
+import { useHostPendingCloudLaunch } from "./hooks/useHostPendingCloudLaunch";
 import { useOpenNewTabWhenRightPaneOpensEmpty } from "./hooks/useOpenNewTabWhenRightPaneOpensEmpty";
 import { usePaneAreaMoveActions } from "./hooks/usePaneAreaMoveActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
@@ -352,6 +353,7 @@ function WorkspaceContent() {
 		consumeSearch,
 	});
 	useCreatePendingMigratedTerminals({ workspaceId, isLayoutReady });
+	useHostPendingCloudLaunch({ workspaceId, store, isLayoutReady });
 	useRunWorkspaceCreationPresets({
 		workspaceId,
 		isLayoutReady,
