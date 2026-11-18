@@ -200,7 +200,7 @@ export class TerminalHost {
 				error instanceof TerminalAttachCanceledError &&
 				shouldDisposeIfCanceled &&
 				session &&
-				session.clientCount === 0
+				(this.sessions.get(sessionId) !== session || session.clientCount === 0)
 			) {
 				void session.dispose();
 				this.sessions.delete(sessionId);

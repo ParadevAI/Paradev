@@ -438,3 +438,54 @@ it("streams a command prompt emitted before spawn readiness resolves", async () 
 		await session?.dispose();
 	}
 });
+
+it("disposes a command canceled after attachment but before publication", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	const child = new FakeChildProcess();
+	const killed: number[] = [];
+	let session: InstanceType<typeof Session> | undefined;
+	const host = new TerminalHost({
+		createSession: (request) => {
+			session = new Session({
+				...request,
+				cwd: "/tmp",
+				shell: "/bin/sh",
+				killProcessTree: async (pid) => {
+					killed.push(pid);
+				},
+				spawnProcess: () => {
+					queueMicrotask(() => {
+						host.cancelCreateOrAttach({
+							sessionId: "canceled-command",
+							requestId: "cancel-request",
+						});
+						emitReadyAndSpawned(child);
+					});
+					return child as unknown as ChildProcess;
+				},
+			});
+			return session;
+		},
+	});
+	const socket = {
+		destroyed: false,
+		write: () => true,
+	} as unknown as import("node:net").Socket;
+	try {
+		await expect(
+			host.createOrAttach(socket, {
+				sessionId: "canceled-command",
+				requestId: "cancel-request",
+				paneId: "pane",
+				tabId: "tab",
+				workspaceId: "workspace",
+				cols: 80,
+				rows: 24,
+				command: "login",
+			}),
+		).rejects.toThrow();
+		expect(killed).toContain(4242);
+	} finally {
+		await session?.dispose();
+	}
+});
