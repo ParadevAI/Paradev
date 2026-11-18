@@ -6,8 +6,11 @@ import type { ChatPaneData, PaneViewerData } from "../../types";
 export function useLastChatTerminalId(
 	store: StoreApi<WorkspaceStore<PaneViewerData>> | undefined,
 ) {
+	const [trackedStore, setTrackedStore] = useState(store);
 	const [lastChat, setLastChat] = useState<string | null>(null);
 	useEffect(() => {
+		setTrackedStore(store);
+		setLastChat(null);
 		if (!store) return;
 		const update = (state: WorkspaceStore<PaneViewerData>) => {
 			const pane = state.getActivePane()?.pane;
@@ -18,5 +21,5 @@ export function useLastChatTerminalId(
 		update(store.getState());
 		return store.subscribe(update);
 	}, [store]);
-	return lastChat;
+	return trackedStore === store ? lastChat : null;
 }
