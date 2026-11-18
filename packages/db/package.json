@@ -32,13 +32,13 @@
 			"types": "./src/seed-default-statuses.ts",
 			"default": "./src/seed-default-statuses.ts"
 		},
-		"./test/cloud-usage-fixture": {
-			"types": "./test/cloud-usage-fixture.ts",
-			"default": "./test/cloud-usage-fixture.ts"
-		},
 		"./task-list-query": {
 			"types": "./src/task-list-query.ts",
 			"default": "./src/task-list-query.ts"
+		},
+		"./testing": {
+			"types": "./test/cloud-usage-fixture.ts",
+			"default": "./test/cloud-usage-fixture.ts"
 		},
 		"./utils": {
 			"types": "./src/utils/index.ts",

@@ -56,7 +56,7 @@ export async function seedCloudUsage() {
 	);
 	const client = new PGlite();
 	await client.exec(ddl.join(";\n"));
-	const db = drizzle({ client, casing: "snake_case" });
+	const db = drizzle({ client, schema, casing: "snake_case" });
 
 	await db.insert(schema.organizations).values([
 		{ id: ORG, name: "Northwind", slug: "northwind" },
