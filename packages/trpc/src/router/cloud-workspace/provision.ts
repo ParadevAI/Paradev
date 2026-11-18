@@ -234,15 +234,17 @@ async function provision(
 				teardownError,
 			);
 		});
-		await failCloudWorkspace(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
-			{
-				from: ["provisioning", "awake", "asleep"],
-				set: keepForDiagnosis ? { providerSandboxId } : {},
-				site: "provision",
-				error,
+		await failCloudWorkspace({
+			scope: {
+				cloudWorkspaceId: row.id,
+				organizationId: row.organizationId,
+				bootId,
 			},
-		);
+			from: ["provisioning", "awake", "asleep"],
+			set: keepForDiagnosis ? { providerSandboxId } : {},
+			site: "provision",
+			error,
+		});
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
 			(moveError) =>
 				console.error(

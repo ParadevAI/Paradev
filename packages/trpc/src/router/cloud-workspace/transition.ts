@@ -38,15 +38,14 @@ export async function transitionCloudWorkspace(args: {
 }
 
 /** An Autumn refusal is an expected state: it is logged as a warning and opens no Sentry issue. */
-export async function failCloudWorkspace(
-	scope: ControlScope,
-	args: {
-		from: readonly CloudWorkspaceStatus[];
-		set?: Partial<typeof cloudWorkspaces.$inferInsert>;
-		site: "provision" | "queue";
-		error: unknown;
-	},
-): Promise<void> {
+export async function failCloudWorkspace(args: {
+	scope: ControlScope;
+	from: readonly CloudWorkspaceStatus[];
+	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
+	site: "provision" | "queue";
+	error: unknown;
+}): Promise<void> {
+	const { scope } = args;
 	const changed = await transitionCloudWorkspace({
 		id: scope.cloudWorkspaceId,
 		from: args.from,
