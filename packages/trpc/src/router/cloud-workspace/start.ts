@@ -17,6 +17,12 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import {
+	captureControlException,
+	errorClass,
+	logControl,
+	logStepFailed,
+} from "../../lib/control-log";
+import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
 } from "../../lib/github-user";
@@ -220,6 +226,15 @@ async function start(args: StartCloudWorkspaceInput) {
 			i18nKey: "serverError.cloudWorkspace.couldNotRecordCloudWorkspace",
 		});
 	}
+	const scope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
+	logControl("workspace.created", scope, {
+		"machine.size": machineSize,
+		"repositories.count": repositories.length,
+		"launch.agent": args.launch?.agent,
+	});
 	await recordWorkspaceRepositories({
 		cloudWorkspaceId: row.id,
 		repositories,
@@ -255,12 +270,7 @@ async function start(args: StartCloudWorkspaceInput) {
 		parentId: row.id,
 		organizationId: args.organizationId,
 		fileIds: args.attachmentFileIds ?? [],
-	}).catch((error) => {
-		console.error(
-			`[cloud-workspace] could not keep the prompt's files for ${row.id}`,
-			error,
-		);
-	});
+	}).catch((error) => logStepFailed("files.anchor", scope, error));
 
 	// Naming reads the prompt, and only when nobody typed a name.
 	const job = {
@@ -285,10 +295,11 @@ async function start(args: StartCloudWorkspaceInput) {
 			from: ["provisioning"],
 			to: "archived",
 		});
+		logControl("workspace.archived", scope, { trigger: "move_failed" });
 		throw error;
 	}
 	nudge(row.organizationId, "cloud_workspaces");
-	await queueProvision(job);
+	await queueProvision(job, row.organizationId);
 	return {
 		...row,
 		initialLaunch: await describeCloudAgentLaunch(job.launch),
@@ -301,6 +312,7 @@ async function start(args: StartCloudWorkspaceInput) {
  */
 export async function queueProvision(
 	job: ProvisionCloudWorkspaceInput,
+	organizationId: string,
 ): Promise<void> {
 	try {
 		await publishCloudWorkspaceJob({
@@ -311,7 +323,8 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		await transitionCloudWorkspace({
+		const scope = { cloudWorkspaceId: job.cloudWorkspaceId, organizationId };
+		const changed = await transitionCloudWorkspace({
 			id: job.cloudWorkspaceId,
 			from: ["provisioning"],
 			to: "failed",
@@ -319,16 +332,18 @@ export async function queueProvision(
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",
-		).catch((moveError) =>
-			console.error(
-				`[cloud-workspace] could not fail the chat moves into ${job.cloudWorkspaceId}`,
-				moveError,
-			),
-		);
-		console.error(
-			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
+		).catch((moveError) => logStepFailed("chat_moves.fail", scope, moveError));
+		logControl(
+			"workspace.failed",
+			scope,
+			{
+				"failure.site": "queue",
+				"error.class": errorClass(error),
+				"status.changed": changed,
+			},
 			error,
 		);
+		captureControlException(error, scope, { failureSite: "queue" });
 		throw userError({
 			code: "INTERNAL_SERVER_ERROR",
 			message: "Could not start cloud workspace provisioning",

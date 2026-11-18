@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	type ActiveWorkspaceSandbox,
@@ -89,6 +90,11 @@ async function markAwake(
 		return;
 	}
 	nudge(woke.organizationId, "cloud_workspaces");
+	logControl(
+		"workspace.awake",
+		{ cloudWorkspaceId, organizationId: woke.organizationId },
+		{ "sandbox.session_id": sessionId ?? undefined },
+	);
 	await queueWatch(cloudWorkspaceId, expiresAt);
 }
 

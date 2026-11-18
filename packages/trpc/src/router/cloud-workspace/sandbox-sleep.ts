@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, gt, isNull, ne, or, type SQL, sql } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 
 /** Sleep writes must not count as an edit: `updatedAt` orders and dates rows. */
@@ -20,7 +21,9 @@ export function reportSleepWriteFailure(
 		`[cloud-workspace] could not record sleep state of ${cloudWorkspaceId}`,
 		error,
 	);
-	Sentry.captureException(error, { extra: { cloudWorkspaceId } });
+	Sentry.captureException(error, {
+		tags: { "cloud_workspace.id": cloudWorkspaceId },
+	});
 }
 
 /**
@@ -68,6 +71,11 @@ async function markAsleep(
 		.returning({ organizationId: cloudWorkspaces.organizationId });
 	if (slept) {
 		nudge(slept.organizationId, "cloud_workspaces");
+		logControl(
+			"workspace.asleep",
+			{ cloudWorkspaceId, organizationId: slept.organizationId },
+			{ "sandbox.session_id": sessionId ?? undefined },
+		);
 		return;
 	}
 	await db
