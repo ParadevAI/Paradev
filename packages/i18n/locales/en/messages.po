@@ -6060,6 +6060,9 @@ msgstr "Couldn't load your plugins."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Couldn't load your profile, so editing is disabled."
 
+msgid "Couldn't load your tasks."
+msgstr "Couldn't load your tasks."
+
 msgid "Couldn't mark ready for review"
 msgstr "Couldn't mark ready for review"
 
@@ -8010,6 +8013,9 @@ msgstr "Existing repo path"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Existing repo path on {hostName}"
+
+msgid "Existing task"
+msgstr "Existing task"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
@@ -17228,6 +17234,9 @@ msgstr "Search workspaces…"
 
 msgid "Search your meeting notes"
 msgstr "Search your meeting notes"
+
+msgid "Search your Paradev tasks"
+msgstr "Search your Paradev tasks"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Search your workspaces and open one, or start a new workspace"

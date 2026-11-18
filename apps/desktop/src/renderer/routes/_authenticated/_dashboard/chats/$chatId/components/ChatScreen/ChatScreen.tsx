@@ -468,6 +468,7 @@ export function ChatScreen({ chatId, initialTaskId }: ChatScreenProps) {
 					initial={newTask}
 					onOpenChange={(open) => !open && setNewTask(null)}
 					onCreate={(form) => chats.taskActions.create(chatId, form)}
+					onImport={(taskId) => chats.taskActions.importTask(chatId, taskId)}
 					onCreated={(id) => setPanel({ kind: "task", id })}
 				/>
 			)}

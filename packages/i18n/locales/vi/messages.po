@@ -6060,6 +6060,9 @@ msgstr "Không thể tải các plugin của bạn."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Không tải được hồ sơ của bạn nên chức năng chỉnh sửa đã bị tắt."
 
+msgid "Couldn't load your tasks."
+msgstr "Không thể tải nhiệm vụ của bạn."
+
 msgid "Couldn't mark ready for review"
 msgstr "Không thể đánh dấu sẵn sàng để review"
 
@@ -8010,6 +8013,9 @@ msgstr "Đường dẫn repo có sẵn"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Đường dẫn repo có sẵn trên {hostName}"
+
+msgid "Existing task"
+msgstr "Nhiệm vụ có sẵn"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Các worktree hiện có dưới đường dẫn cũ sẽ bị bỏ rơi. Bạn có thể nhập lại chúng từ luồng worktree."
@@ -17228,6 +17234,9 @@ msgstr "Tìm workspace…"
 
 msgid "Search your meeting notes"
 msgstr "Tìm trong ghi chú cuộc họp của bạn"
+
+msgid "Search your Paradev tasks"
+msgstr "Tìm trong nhiệm vụ Paradev của bạn"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Tìm kiếm workspace của bạn và mở một workspace, hoặc tạo workspace mới"

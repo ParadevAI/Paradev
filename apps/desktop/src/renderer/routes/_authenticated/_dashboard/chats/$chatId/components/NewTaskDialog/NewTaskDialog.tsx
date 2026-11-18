@@ -19,10 +19,12 @@ import {
 } from "@superset/ui/dialog";
 import { Input } from "@superset/ui/input";
 import { Textarea } from "@superset/ui/textarea";
-import { useState } from "react";
+import { cn } from "@superset/ui/utils";
+import { useMemo, useState } from "react";
 import { TaskAssigneeMenu } from "../../../components/TaskAssigneeMenu";
 import { TaskWhenMenu } from "../../../components/TaskWhenMenu";
 import { NO_SCHEDULE } from "../../../utils/taskSchedule";
+import { ExistingTaskPicker } from "./components/ExistingTaskPicker";
 
 interface NewTaskDialogProps {
 	state: ChatState;
@@ -33,6 +35,8 @@ interface NewTaskDialogProps {
 	onOpenChange: (open: boolean) => void;
 	/** The new task's id, or null when it was not made. */
 	onCreate: (form: TaskForm) => Promise<string | null>;
+	/** Adds a task made outside the chats; its id, or null when it was not added. */
+	onImport: (taskId: string) => Promise<string | null>;
 	onCreated: (taskId: string) => void;
 }
 
@@ -44,6 +48,7 @@ export function NewTaskDialog({
 	initial,
 	onOpenChange,
 	onCreate,
+	onImport,
 	onCreated,
 }: NewTaskDialogProps) {
 	const { t } = useLingui();
@@ -54,6 +59,23 @@ export function NewTaskDialog({
 	);
 	const [schedule, setSchedule] = useState<TaskSchedule>(NO_SCHEDULE);
 	const [isCreating, setIsCreating] = useState(false);
+	const [mode, setMode] = useState<"new" | "existing">("new");
+	const takenIds = useMemo(
+		() => new Set(state.tasks.map((task) => task.id)),
+		[state.tasks],
+	);
+	const modes = [
+		{ id: "new" as const, label: t({ message: "New" }) },
+		{ id: "existing" as const, label: t({ message: "Existing task" }) },
+	];
+	const finish = async (work: Promise<string | null>) => {
+		setIsCreating(true);
+		const taskId = await work;
+		setIsCreating(false);
+		if (!taskId) return;
+		onOpenChange(false);
+		onCreated(taskId);
+	};
 
 	const options = taskAssigneeOptions(state, chat);
 	const [ref] = assignee ? parseMentionTokens(assignee) : [];
@@ -65,17 +87,14 @@ export function NewTaskDialog({
 
 	const create = async () => {
 		if (!name || isCreating) return;
-		setIsCreating(true);
-		const taskId = await onCreate({
-			title: name,
-			description: description.trim(),
-			assignee: chosen ? assignee : null,
-			...schedule,
-		});
-		setIsCreating(false);
-		if (!taskId) return;
-		onOpenChange(false);
-		onCreated(taskId);
+		await finish(
+			onCreate({
+				title: name,
+				description: description.trim(),
+				assignee: chosen ? assignee : null,
+				...schedule,
+			}),
+		);
 	};
 
 	return (
@@ -86,8 +105,34 @@ export function NewTaskDialog({
 						<Trans>New task</Trans>
 					</DialogTitle>
 				</DialogHeader>
+				<div className="flex gap-1">
+					{modes.map((entry) => (
+						<button
+							key={entry.id}
+							type="button"
+							aria-pressed={entry.id === mode}
+							onClick={() => setMode(entry.id)}
+							className={cn(
+								"h-7 rounded-md px-2.5 text-muted-foreground text-sm hover:bg-fill-hover hover:text-foreground",
+								entry.id === mode && "bg-fill-selected text-foreground",
+							)}
+						>
+							{entry.label}
+						</button>
+					))}
+				</div>
+				{mode === "existing" && (
+					<ExistingTaskPicker
+						takenIds={takenIds}
+						isAdding={isCreating}
+						onPick={(taskId) => void finish(onImport(taskId))}
+					/>
+				)}
 				<form
-					className="flex flex-col gap-3"
+					className={cn(
+						"flex min-w-0 flex-col gap-3",
+						mode !== "new" && "hidden",
+					)}
 					onSubmit={(event) => {
 						event.preventDefault();
 						void create();

@@ -194,3 +194,42 @@ test("a person's task with a time posts a reminder card when the time comes, onc
 	await owner.chats.deleteTask({ taskId });
 	expect(await thread(group.id)).toEqual([]);
 });
+
+test("a task made outside the chats is added to one chat, once, with its card", async () => {
+	const { insertTask } = await import("../../task/task");
+	const { task: outside } = await insertTask({
+		organizationId: ORG,
+		creatorId: OWNER,
+		input: {
+			title: "renew the domain",
+			description: null,
+			priority: "none",
+			assigneeId: OWNER,
+			dueDate: null,
+		},
+	});
+	const taskId = outside?.id ?? "";
+	const dev = { organizationId: ORG, color: "#F2B23E", description: "Ops" };
+	const first = await owner.chats.createDev({ ...dev, name: "Ops" });
+	const second = await owner.chats.createDev({ ...dev, name: "Ops two" });
+
+	const { task } = await owner.chats.importTask({
+		groupId: first.group.id,
+		taskId,
+	});
+	expect(task).toMatchObject({
+		id: taskId,
+		title: "renew the domain",
+		assigneeId: OWNER,
+		assigneeDevId: null,
+	});
+	await owner.chats.importTask({ groupId: first.group.id, taskId });
+	expect(await thread(first.group.id)).toEqual([
+		"person (card): Added a task: renew the domain",
+	]);
+	expect(
+		owner.chats.importTask({ groupId: second.group.id, taskId }),
+	).rejects.toMatchObject({ code: "CONFLICT" });
+	await runs.idle();
+	expect(started).toEqual([]);
+});

@@ -6060,6 +6060,9 @@ msgstr "Je plugins konden niet worden geladen."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Je profiel kon niet worden geladen, daarom is bewerken uitgeschakeld."
 
+msgid "Couldn't load your tasks."
+msgstr "Je taken konden niet worden geladen."
+
 msgid "Couldn't mark ready for review"
 msgstr "Kon niet markeren als klaar voor review"
 
@@ -8010,6 +8013,9 @@ msgstr "Pad van bestaande repo"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Pad van bestaande repo op {hostName}"
+
+msgid "Existing task"
+msgstr "Bestaande taak"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Bestaande worktrees onder het oude pad raken los. Je kunt ze opnieuw importeren via de worktree-flow."
@@ -17228,6 +17234,9 @@ msgstr "Werkruimtes zoeken…"
 
 msgid "Search your meeting notes"
 msgstr "Doorzoek je vergadernotities"
+
+msgid "Search your Paradev tasks"
+msgstr "Zoek in je Paradev-taken"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Zoek in je werkruimtes en open er een, of start een nieuwe werkruimte"

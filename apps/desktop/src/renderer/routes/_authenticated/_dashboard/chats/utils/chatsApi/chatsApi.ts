@@ -41,6 +41,7 @@ export type ChatsApi = Pick<
 	| "installListing"
 	| "messageDetails"
 	| "createTask"
+	| "importTask"
 	| "updateTask"
 	| "deleteTask"
 	| "startTask"
@@ -176,6 +177,8 @@ export function createChatsApi(
 					task: taskInput(form),
 				}),
 			),
+		importTask: (groupId, body) =>
+			call(chats.importTask.mutate({ groupId, ...body })),
 		updateTask: (taskId, patch) =>
 			call(
 				chats.updateTask.mutate({

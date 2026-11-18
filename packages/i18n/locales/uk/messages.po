@@ -6054,6 +6054,9 @@ msgstr "Не вдалося завантажити ваші плагіни."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Не вдалося завантажити ваш профіль, тому редагування вимкнено."
 
+msgid "Couldn't load your tasks."
+msgstr "Не вдалося завантажити ваші завдання."
+
 msgid "Couldn't mark ready for review"
 msgstr "Не вдалося позначити як готовий до рев'ю"
 
@@ -8004,6 +8007,9 @@ msgstr "Шлях до наявного репозиторію"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Шлях до наявного репозиторію на {hostName}"
+
+msgid "Existing task"
+msgstr "Наявне завдання"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Наявні worktree за старим шляхом втратять прив'язку. Їх можна повторно імпортувати через імпорт worktree."
@@ -17222,6 +17228,9 @@ msgstr "Пошук робочих просторів…"
 
 msgid "Search your meeting notes"
 msgstr "Пошук у ваших нотатках із зустрічей"
+
+msgid "Search your Paradev tasks"
+msgstr "Пошук у ваших завданнях Paradev"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Знайдіть робочий простір і відкрийте його або створіть новий"

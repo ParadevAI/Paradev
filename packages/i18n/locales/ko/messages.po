@@ -6060,6 +6060,9 @@ msgstr "플러그인을 불러오지 못했습니다."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "프로필을 불러오지 못해 편집이 비활성화되었습니다."
 
+msgid "Couldn't load your tasks."
+msgstr "작업을 불러오지 못했습니다."
+
 msgid "Couldn't mark ready for review"
 msgstr "리뷰 준비 완료로 표시할 수 없습니다"
 
@@ -8010,6 +8013,9 @@ msgstr "기존 리포지토리 경로"
 
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName}의 기존 리포지토리 경로"
+
+msgid "Existing task"
+msgstr "기존 작업"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "기존 경로 아래의 worktree는 연결이 끊깁니다. worktree 흐름에서 다시 가져올 수 있습니다."
@@ -17228,6 +17234,9 @@ msgstr "워크스페이스 검색…"
 
 msgid "Search your meeting notes"
 msgstr "회의 노트 검색"
+
+msgid "Search your Paradev tasks"
+msgstr "Paradev 작업 검색"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "워크스페이스를 검색해 열거나 새 워크스페이스를 시작합니다"

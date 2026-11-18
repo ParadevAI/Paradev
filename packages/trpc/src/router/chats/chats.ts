@@ -73,6 +73,7 @@ import {
 	commentOnChatTask,
 	createChatTask,
 	deleteChatTask,
+	importChatTask,
 	startChatTask,
 	TaskError,
 	taskInputSchema,
@@ -829,6 +830,26 @@ export const chatsRouter = {
 						{ kind: "user", userId: ctx.session.user.id },
 						input.groupId,
 						input.task,
+						{ clientId: input.clientId },
+					),
+				),
+		),
+
+	/** An organization task from outside the chats, added to a chat with its card. */
+	importTask: personProcedure
+		.input(
+			groupInput.extend({
+				taskId: z.string().uuid(),
+				clientId: z.string().min(1).max(100).optional(),
+			}),
+		)
+		.mutation(
+			({ ctx, input }): Promise<SendResult> =>
+				tasked(
+					importChatTask(
+						{ kind: "user", userId: ctx.session.user.id },
+						input.groupId,
+						input.taskId,
 						{ clientId: input.clientId },
 					),
 				),

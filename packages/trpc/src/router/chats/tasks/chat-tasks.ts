@@ -474,6 +474,78 @@ export async function createChatTask(
 	return card;
 }
 
+/**
+ * An organization task that was made outside the chats, brought into a chat:
+ * the task keeps its title, status, assignee and due date, and gets a card.
+ */
+export async function importChatTask(
+	actor: TaskActor,
+	groupId: string,
+	taskId: string,
+	options: { clientId?: string } = {},
+): Promise<TaskCard> {
+	const chat = await loadChat(groupId);
+	assertActorIn(actor, chat);
+	const already = await findChatTask(taskId);
+	if (already) {
+		if (already.chat.groupId !== groupId)
+			throw new TaskError(
+				409,
+				"in_another_chat",
+				"That task is already in another chat",
+			);
+		const [card] = await db
+			.select()
+			.from(chatsMessages)
+			.where(
+				and(
+					eq(chatsMessages.groupId, groupId),
+					eq(chatsMessages.taskId, taskId),
+				),
+			)
+			.limit(1);
+		if (!card)
+			throw new TaskError(409, "in_chat", "That task is already in this chat");
+		return { message: await messageView(card), task: taskView(already) };
+	}
+	const [task] = await db
+		.select({ id: tasks.id, title: tasks.title })
+		.from(tasks)
+		.where(
+			and(
+				eq(tasks.id, taskId),
+				eq(tasks.organizationId, chat.group.organizationId),
+				isNull(tasks.deletedAt),
+			),
+		);
+	if (!task) throw new TaskError(404, "not_found", "Task not found");
+	await db.insert(chatsTasks).values({
+		taskId,
+		groupId,
+		createdByAgentId: actor.kind === "dev" ? actor.agentId : null,
+	});
+	const [message] = await db
+		.insert(chatsMessages)
+		.values({
+			groupId,
+			authorId: actor.kind === "user" ? actor.userId : null,
+			authorAgentId: actor.kind === "dev" ? actor.agentId : null,
+			turnId: actor.kind === "dev" ? (actor.turnId ?? null) : null,
+			text: `Added a task: ${task.title}`,
+			taskId,
+			clientId: options.clientId,
+		})
+		.returning();
+	const found = await findChatTask(taskId);
+	if (!message || !found) throw new Error("The task's card was not stored");
+	const card = { message: await messageView(message), task: taskView(found) };
+	publishChats(chatsGroupChannel(groupId), {
+		type: "message.created",
+		...card,
+	});
+	return card;
+}
+
 async function actingOn(actor: TaskActor, taskId: string) {
 	const found = await findChatTask(taskId);
 	if (!found) throw new TaskError(404, "not_found", "Task not found");

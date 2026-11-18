@@ -24,6 +24,7 @@ interface Deps {
 	api: Pick<
 		SyncApi,
 		| "createTask"
+		| "importTask"
 		| "updateTask"
 		| "deleteTask"
 		| "startTask"
@@ -150,6 +151,22 @@ export function createTaskActions({
 			try {
 				const sent = await retryOnNetworkError(
 					() => api.createTask(chatId, { ...form, clientId }),
+					retryDelaysMs,
+				);
+				update((s) => applySentMessage(s, sent));
+				return sent.task?.id ?? null;
+			} catch (err) {
+				fail("Couldn't add the task", err);
+				return null;
+			}
+		},
+
+		/** Adds a task made outside the chats to this chat; its id, or null when it could not be added. */
+		async importTask(chatId: string, taskId: string): Promise<string | null> {
+			const clientId = newClientId();
+			try {
+				const sent = await retryOnNetworkError(
+					() => api.importTask(chatId, { taskId, clientId }),
 					retryDelaysMs,
 				);
 				update((s) => applySentMessage(s, sent));

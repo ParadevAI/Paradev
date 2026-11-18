@@ -6060,6 +6060,9 @@ msgstr "Nie udało się wczytać Twoich wtyczek."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Nie udało się wczytać Twojego profilu, więc edycja jest wyłączona."
 
+msgid "Couldn't load your tasks."
+msgstr "Nie udało się wczytać Twoich zadań."
+
 msgid "Couldn't mark ready for review"
 msgstr "Nie udało się oznaczyć jako gotowy do recenzji"
 
@@ -8010,6 +8013,9 @@ msgstr "Ścieżka istniejącego repozytorium"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Ścieżka istniejącego repozytorium na {hostName}"
+
+msgid "Existing task"
+msgstr "Istniejące zadanie"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Istniejące worktree pod starą ścieżką zostaną osierocone. Można je ponownie zaimportować przez ścieżkę worktree."
@@ -17228,6 +17234,9 @@ msgstr "Szukaj obszarów roboczych…"
 
 msgid "Search your meeting notes"
 msgstr "Przeszukuj notatki ze spotkań"
+
+msgid "Search your Paradev tasks"
+msgstr "Szukaj w swoich zadaniach Paradev"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Przeszukaj swoje obszary robocze i otwórz jeden lub utwórz nowy obszar roboczy"

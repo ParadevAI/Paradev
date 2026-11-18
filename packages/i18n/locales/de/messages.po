@@ -6060,6 +6060,9 @@ msgstr "Deine Plugins konnten nicht geladen werden."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Dein Profil konnte nicht geladen werden, deshalb ist das Bearbeiten deaktiviert."
 
+msgid "Couldn't load your tasks."
+msgstr "Deine Aufgaben konnten nicht geladen werden."
+
 msgid "Couldn't mark ready for review"
 msgstr "Konnte nicht als bereit zum Review markiert werden"
 
@@ -8010,6 +8013,9 @@ msgstr "Pfad zum vorhandenen Repo"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Pfad zum vorhandenen Repo auf {hostName}"
+
+msgid "Existing task"
+msgstr "Vorhandene Aufgabe"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Vorhandene Worktrees unter dem alten Pfad werden verwaist. Du kannst sie über den Worktree-Import erneut einlesen."
@@ -17228,6 +17234,9 @@ msgstr "Arbeitsbereiche durchsuchen…"
 
 msgid "Search your meeting notes"
 msgstr "Durchsuche deine Meeting-Notizen"
+
+msgid "Search your Paradev tasks"
+msgstr "Deine Paradev-Aufgaben durchsuchen"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Durchsuche deine Arbeitsbereiche und öffne einen oder starte einen neuen Arbeitsbereich"

@@ -6060,6 +6060,9 @@ msgstr "Tidak dapat memuat plugin Anda."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Profil Anda tidak dapat dimuat, sehingga penyuntingan dinonaktifkan."
 
+msgid "Couldn't load your tasks."
+msgstr "Tidak dapat memuat tugas Anda."
+
 msgid "Couldn't mark ready for review"
 msgstr "Tidak dapat menandai siap ditinjau"
 
@@ -8010,6 +8013,9 @@ msgstr "Path repo yang sudah ada"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Path repo yang sudah ada di {hostName}"
+
+msgid "Existing task"
+msgstr "Tugas yang sudah ada"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Worktree yang ada di bawah path lama akan menjadi yatim. Anda bisa mengimpornya lagi lewat alur worktree."
@@ -17228,6 +17234,9 @@ msgstr "Cari workspace…"
 
 msgid "Search your meeting notes"
 msgstr "Cari catatan rapat Anda"
+
+msgid "Search your Paradev tasks"
+msgstr "Cari tugas Paradev Anda"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Cari workspace Anda dan buka salah satunya, atau mulai workspace baru"

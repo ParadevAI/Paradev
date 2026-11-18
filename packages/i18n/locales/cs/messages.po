@@ -6060,6 +6060,9 @@ msgstr "Vaše pluginy se nepodařilo načíst."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Tvůj profil se nepodařilo načíst, úpravy jsou proto vypnuté."
 
+msgid "Couldn't load your tasks."
+msgstr "Úkoly se nepodařilo načíst."
+
 msgid "Couldn't mark ready for review"
 msgstr "Nepodařilo se označit jako připravený k revizi"
 
@@ -8010,6 +8013,9 @@ msgstr "Cesta k existujícímu repozitáři"
 
 msgid "Existing repo path on {hostName}"
 msgstr "Cesta k existujícímu repozitáři na {hostName}"
+
+msgid "Existing task"
+msgstr "Existující úkol"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Stávající worktree pod původní cestou osiří. Můžete je znovu naimportovat přes import worktree."
@@ -17228,6 +17234,9 @@ msgstr "Hledat pracovní prostory…"
 
 msgid "Search your meeting notes"
 msgstr "Prohledávání poznámek ze schůzek"
+
+msgid "Search your Paradev tasks"
+msgstr "Hledat ve vašich úkolech Paradev"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Prohledejte své pracovní prostory a otevřete jeden, nebo založte nový"

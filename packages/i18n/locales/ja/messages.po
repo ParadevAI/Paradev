@@ -6060,6 +6060,9 @@ msgstr "プラグインを読み込めませんでした。"
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "プロフィールを読み込めなかったため、編集は無効です。"
 
+msgid "Couldn't load your tasks."
+msgstr "タスクを読み込めませんでした。"
+
 msgid "Couldn't mark ready for review"
 msgstr "レビュー準備完了にできませんでした"
 
@@ -8010,6 +8013,9 @@ msgstr "既存リポジトリのパス"
 
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName}上の既存リポジトリのパス"
+
+msgid "Existing task"
+msgstr "既存のタスク"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "旧パス配下の既存ワークツリーは孤立します。ワークツリーフローから再インポートできます。"
@@ -17228,6 +17234,9 @@ msgstr "ワークスペースを検索…"
 
 msgid "Search your meeting notes"
 msgstr "会議メモを検索"
+
+msgid "Search your Paradev tasks"
+msgstr "Paradev のタスクを検索"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "ワークスペースを検索して開くか、新しいワークスペースを作成します"

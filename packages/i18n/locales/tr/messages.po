@@ -6060,6 +6060,9 @@ msgstr "Eklentileriniz yüklenemedi."
 msgid "Couldn't load your profile, so editing is disabled."
 msgstr "Profilin yüklenemedi, bu yüzden düzenleme devre dışı."
 
+msgid "Couldn't load your tasks."
+msgstr "Görevleriniz yüklenemedi."
+
 msgid "Couldn't mark ready for review"
 msgstr "İncelemeye hazır olarak işaretlenemedi"
 
@@ -8010,6 +8013,9 @@ msgstr "Mevcut depo yolu"
 
 msgid "Existing repo path on {hostName}"
 msgstr "{hostName} üzerindeki mevcut depo yolu"
+
+msgid "Existing task"
+msgstr "Mevcut görev"
 
 msgid "Existing worktrees under the old path will be orphaned. You can re-import them from the worktrees flow."
 msgstr "Eski yolun altındaki mevcut worktree'ler sahipsiz kalacak. Bunları worktree akışından yeniden içe aktarabilirsiniz."
@@ -17228,6 +17234,9 @@ msgstr "Çalışma alanlarında ara…"
 
 msgid "Search your meeting notes"
 msgstr "Toplantı notlarınızda arayın"
+
+msgid "Search your Paradev tasks"
+msgstr "Paradev görevlerinizde arayın"
 
 msgid "Search your workspaces and open one, or start a new workspace"
 msgstr "Çalışma alanlarınızda arama yapıp birini açın veya yeni bir çalışma alanı başlatın"

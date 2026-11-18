@@ -282,6 +282,13 @@ export function createSyncApi(baseUrl: string, token: string) {
 				body,
 				timeoutMs: CHANGE_TIMEOUT_MS,
 			}),
+		/** Brings a task made outside the chats into this chat. */
+		importTask: (groupId: string, body: { taskId: string; clientId: string }) =>
+			call<SentMessage>(`/groups/${groupId}/tasks/import`, {
+				method: "POST",
+				body,
+				timeoutMs: CHANGE_TIMEOUT_MS,
+			}),
 		updateTask: (taskId: string, patch: TaskPatch) =>
 			call<ApiTask>(`/tasks/${taskId}`, {
 				method: "PATCH",
