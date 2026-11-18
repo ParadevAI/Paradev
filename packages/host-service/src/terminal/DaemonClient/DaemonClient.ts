@@ -21,6 +21,8 @@ import {
 	CURRENT_PROTOCOL_VERSION,
 	encodeFrame,
 	FrameDecoder,
+	type ListMessage,
+	type PrepareUpgradeMessage,
 	type ServerMessage,
 	type SessionInfo,
 	type SessionMeta,
@@ -99,6 +101,8 @@ export class DaemonClient {
 	private connected = false;
 	private modeSnapshots = false;
 	private colorQueries = false;
+	private listRequestIds = false;
+	private lastListRequestId = 0;
 
 	constructor(opts: DaemonClientOptions) {
 		this.opts = opts;
@@ -179,8 +183,11 @@ export class DaemonClient {
 	}
 
 	async list(): Promise<SessionInfo[]> {
+		const requestId = this.listRequestIds
+			? ++this.lastListRequestId
+			: undefined;
 		const reply = await this.requestNonSession(
-			{ type: "list" },
+			{ type: "list", requestId },
 			"list-reply",
 			LIST_TIMEOUT_MS,
 		);
@@ -331,6 +338,7 @@ export class DaemonClient {
 		}
 		this.modeSnapshots = ack.supportsModeSnapshots === true;
 		this.colorQueries = ack.supportsColorQueries === true;
+		this.listRequestIds = ack.supportsListRequestIds === true;
 		this.daemonVersion = ack.daemonVersion;
 		this.negotiated = ack.protocol;
 	}
@@ -385,10 +393,11 @@ export class DaemonClient {
 	}
 
 	private requestNonSession(
-		req: { type: "list" } | { type: "prepare-upgrade" },
+		req: ListMessage | PrepareUpgradeMessage,
 		expectType: "list-reply" | "upgrade-prepared",
 		timeoutMs: number,
 	): Promise<ServerMessage> {
+		const requestId = req.type === "list" ? req.requestId : undefined;
 		return new Promise<ServerMessage>((resolve, reject) => {
 			let resolved = false;
 			const settle = (m: ServerMessage) => {
@@ -405,14 +414,17 @@ export class DaemonClient {
 			};
 			const off = this.on((m) => {
 				if (m.type === expectType) {
-					settle(m);
+					if (m.type !== "list-reply" || m.requestId === requestId) settle(m);
 					return;
 				}
-				// Non-session error frames (no `id`) belong to the
-				// most-recent non-session request — settle on those. Errors
-				// keyed to a session id come from concurrent ops on that
-				// session; ignore them here.
-				if (m.type === "error" && m.id === undefined) settle(m);
+				// An untagged error cannot be attributed to a tagged list request.
+				if (
+					requestId === undefined &&
+					m.type === "error" &&
+					m.id === undefined
+				) {
+					settle(m);
+				}
 			});
 			const offDisc = this.onDisconnect((err) =>
 				fail(new DaemonUnavailableError(err?.message ?? "daemon disconnected")),

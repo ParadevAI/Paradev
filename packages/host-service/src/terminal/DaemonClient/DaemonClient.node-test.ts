@@ -9,9 +9,11 @@ import * as path from "node:path";
 import { after, before, test } from "node:test";
 import { Server } from "@superset/pty-daemon";
 import {
+	type ClientMessage,
 	CURRENT_PROTOCOL_VERSION,
 	encodeFrame,
 	FrameDecoder,
+	type ListMessage,
 } from "@superset/pty-daemon/protocol";
 import { TerminalModes } from "@superset/pty-daemon/terminal-modes";
 import { DaemonClient, DaemonUnavailableError } from "./DaemonClient.ts";
@@ -403,6 +405,74 @@ test("adoption flow: client A opens, drops, client B finds + subscribes-with-rep
 	unsubB();
 	await b.close(id, "SIGTERM");
 	await b.dispose();
+});
+
+test("a timed-out list reply cannot settle the next list request", async (t) => {
+	const socketPath = path.join(
+		os.tmpdir(),
+		`host-list-reply-${process.pid}.sock`,
+	);
+	const firstRequest = Promise.withResolvers<ListMessage>();
+	const secondRequest = Promise.withResolvers<{
+		message: ListMessage;
+		socket: net.Socket;
+	}>();
+	let count = 0;
+	const fake = net.createServer((socket) => {
+		const decoder = new FrameDecoder();
+		socket.on("data", (chunk) => {
+			decoder.push(chunk);
+			for (const frame of decoder.drain()) {
+				const message = frame.message as ClientMessage;
+				if (message.type === "hello") {
+					socket.write(
+						encodeFrame({
+							type: "hello-ack",
+							protocol: CURRENT_PROTOCOL_VERSION,
+							daemonVersion: "test",
+							supportsListRequestIds: true,
+						}),
+					);
+				} else if (message.type === "list") {
+					if (++count === 1) firstRequest.resolve(message);
+					else secondRequest.resolve({ message, socket });
+				}
+			}
+		});
+	});
+	await new Promise<void>((resolve) => fake.listen(socketPath, resolve));
+	const client = new DaemonClient({ socketPath });
+	try {
+		await client.connect();
+		t.mock.timers.enable({ apis: ["setTimeout"] });
+		const timeout = assert.rejects(client.list(), DaemonUnavailableError);
+		const first = await firstRequest.promise;
+		t.mock.timers.runAll();
+		await timeout;
+
+		const next = client.list();
+		const { message: second, socket } = await secondRequest.promise;
+		const session = { id: "current", pid: 1, cols: 80, rows: 24, alive: true };
+		socket.write(
+			Buffer.concat([
+				encodeFrame({
+					type: "list-reply",
+					requestId: first.requestId,
+					sessions: [],
+				}),
+				encodeFrame({
+					type: "list-reply",
+					requestId: second.requestId,
+					sessions: [session],
+				}),
+			]),
+		);
+		assert.deepEqual(await next, [session]);
+	} finally {
+		t.mock.timers.reset();
+		await client.dispose();
+		await new Promise<void>((resolve) => fake.close(() => resolve()));
+	}
 });
 
 test("open rejects with DaemonUnavailableError when the daemon dies mid-request", async () => {
