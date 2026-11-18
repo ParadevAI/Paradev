@@ -345,13 +345,17 @@ export function WorkspaceActivityMenu({
 			isLayoutReady
 				? getBackgroundTerminalSessions(
 						terminalSessionsQuery.data?.sessions ?? [],
-						parseAttachedTerminalIdsKey(settledAttachedTerminalIdsKey),
+						[
+							...parseAttachedTerminalIdsKey(settledAttachedTerminalIdsKey),
+							...parseAttachedTerminalIdsKey(attachedTerminalIdsKey),
+						],
 					)
 				: [],
 		[
 			isLayoutReady,
 			terminalSessionsQuery.data?.sessions,
 			settledAttachedTerminalIdsKey,
+			attachedTerminalIdsKey,
 		],
 	);
 	const processes = useMemo(
