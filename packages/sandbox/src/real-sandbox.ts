@@ -6,7 +6,8 @@
  *
  *   bun run src/real-sandbox.ts            (VERCEL_SANDBOX_*, SANDBOX_GATE_SECRET, CDN_R2_*)
  *
- * Publishes the bundle first so the box can fetch it if the image is older.
+ * Publishes the bundle first so the box can fetch it if the image is older,
+ * and its agent-tools drive, which the box mounts.
  * Leaves the sandbox up for inspection on failure; deletes it on success.
  */
 
@@ -47,6 +48,28 @@ if (
 const { buildBundle, publishBundle } = await import("./build");
 const bundle = buildBundle();
 await publishBundle(bundle, { dry: false });
+const agentTools = await import("./agent-tools");
+const drives = [
+	{
+		region: DEFAULT_SANDBOX_REGION,
+		result: await agentTools.publishAgentToolsDrive({
+			host: agentTools.vercelDriveHost(credentials),
+			region: DEFAULT_SANDBOX_REGION,
+			bundleSha: bundle.sha256,
+			assets: bundle.assets,
+		}),
+	},
+];
+for (const line of agentTools.describeAgentToolsPublish(drives, bundle.assets))
+	log(line);
+const gaps = agentTools.agentToolsGaps(
+	drives,
+	new Set([DEFAULT_SANDBOX_REGION]),
+);
+if (gaps.length) {
+	console.error(`agent-tools: ${gaps.join("; ")}`);
+	process.exit(1);
+}
 
 const { deleteSandbox, provisionSandbox, wakeSandbox } = await import(
 	"@superset/trpc/lib/sandbox/vercel"
@@ -85,6 +108,7 @@ const claim = {
 	managedEnv: { SUPERSET_REAL_CHECK: "1" },
 	networkPolicy: "allow-all" as const,
 	vcpus: GOLDEN_BOX_VCPUS,
+	agentTools: true,
 };
 
 log(

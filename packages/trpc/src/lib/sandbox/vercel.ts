@@ -17,6 +17,7 @@ import {
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
 	type SandboxIdentity,
+	sandboxAgentToolsDrive,
 } from "@superset/shared/sandbox/contract";
 import {
 	APIError,
@@ -121,8 +122,8 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
-	/** The bundle's agent-tools drive to mount read-only; absent keeps the image's agents. */
-	agentToolsDrive?: string | null;
+	/** Mount the bundle's agent-tools drive read-only; absent keeps the image's agents. */
+	agentTools?: boolean;
 }
 
 /** Vercel allows 5 tags per sandbox. */
@@ -174,6 +175,16 @@ export async function agentToolsMounts(
 		publishedAgentToolsDrives.add(driveName);
 	}
 	return { [SANDBOX_PATHS.agents]: { drive: driveName, mode: "snapshot" } };
+}
+
+/** The box's own region names the drive: a workspace stays where it was created when its environment moves. */
+export function agentToolsDriveName(
+	claim: Pick<SandboxClaim, "agentTools" | "identity">,
+	region: string,
+): string | null {
+	return claim.agentTools
+		? sandboxAgentToolsDrive(region, claim.identity.SUPERSET_BUNDLE_SHA)
+		: null;
 }
 
 function publishedPorts(extra: readonly number[] = []): number[] {
@@ -261,7 +272,9 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
-	const mounts = await agentToolsMounts(args.claim.agentToolsDrive);
+	const mounts = await agentToolsMounts(
+		agentToolsDriveName(args.claim, args.environment.region),
+	);
 	const sandbox =
 		(await getSandbox(args.name)) ??
 		(await Sentry.startSpan(
@@ -522,7 +535,9 @@ export async function wakeSandbox(args: {
 		if (!wasRunning) {
 			const { [SANDBOX_PATHS.agents]: previous, ...others } =
 				sandbox.mounts ?? {};
-			const agents = await agentToolsMounts(args.claim.agentToolsDrive);
+			const agents = await agentToolsMounts(
+				agentToolsDriveName(args.claim, sandbox.region),
+			);
 			if (agents || previous) {
 				await sandbox
 					.update({ mounts: { ...others, ...agents } })
