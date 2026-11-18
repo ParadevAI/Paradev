@@ -146,16 +146,21 @@ describe("wakeAfterStop", () => {
 });
 
 describe("a wake that boots the box", () => {
-	const authorized: { traceId: string }[] = [];
+	const authorized: { traceId: string; transactionTraceId?: string }[] = [];
 	const sets: Record<string, unknown>[] = [];
 	const captured: unknown[] = [];
 	let phasesWriteError: Error | null = null;
 	let stamps: { phase: string; at: number }[] = [];
+	let apiPhasesError: Error | null = null;
 	stub(sandbox, {
 		buildSandboxClaim: async () => ({
 			claim: {},
 			agentCredentialDigest: "digest",
 		}),
+		apiPhases: () => {
+			if (apiPhasesError) throw apiPhasesError;
+			return [];
+		},
 		wakeSandbox: async (args: {
 			beforeResume: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
 		}) => {
@@ -172,7 +177,12 @@ describe("a wake that boots the box", () => {
 	});
 	stub(meter, {
 		authorizeBoot: async (args: { traceId: string }) => {
-			authorized.push(args);
+			const active = Sentry.getActiveSpan();
+			const transaction = active && Sentry.getRootSpan(active);
+			authorized.push({
+				traceId: args.traceId,
+				transactionTraceId: transaction?.spanContext().traceId,
+			});
 			return { bootId: "boot_3" };
 		},
 		attachBootSession: async () => {},
@@ -197,6 +207,7 @@ describe("a wake that boots the box", () => {
 		sets.length = 0;
 		captured.length = 0;
 		phasesWriteError = null;
+		apiPhasesError = null;
 		const at = Date.now();
 		stamps = [
 			{ phase: "boot.start", at },
@@ -207,44 +218,65 @@ describe("a wake that boots the box", () => {
 
 	test("authorizes the boot with the wake's trace id and stores its phases on the row", async () => {
 		await wakeCloudWorkspace(ROW);
-		expect(authorized[0]?.traceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.transactionTraceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.traceId).toBe(authorized[0]?.transactionTraceId);
 		const [start] = stamps;
 		expect(sets.filter((set) => "phases" in set)).toEqual([
 			{
 				phases: [
-					{ name: "boot.start", at: start?.at, ms: 50 },
-					{ name: "rootfs.start", at: (start?.at ?? 0) + 50, ms: 850 },
-					{ name: "host.ready", at: (start?.at ?? 0) + 900, ms: 100 },
+					{ name: "boot.start", source: "box", at: start?.at, ms: 50 },
+					{
+						name: "rootfs.start",
+						source: "box",
+						at: (start?.at ?? 0) + 50,
+						ms: 850,
+					},
+					{
+						name: "host.ready",
+						source: "box",
+						at: (start?.at ?? 0) + 900,
+						ms: 100,
+					},
 				],
 			},
 		]);
 	});
 
-	test("stores at most 64 phases", async () => {
+	test("stores at most 64 phases, keeping the last one the host answered after", async () => {
 		const at = Date.now();
 		stamps = Array.from({ length: 100 }, (_, index) => ({
-			phase: index === 0 ? "boot.start" : `checkout.cloned-${index}`,
+			phase:
+				index === 0
+					? "boot.start"
+					: index === 99
+						? "host.ready"
+						: `checkout.cloned-${index}`,
 			at: at + index,
 		}));
 		await wakeCloudWorkspace(ROW);
 		const [written] = sets.filter((set) => "phases" in set);
-		expect((written?.phases as unknown[]).length).toBe(64);
+		const phases = written?.phases as { name: string }[];
+		expect(phases).toHaveLength(64);
+		expect(phases.slice(-2).map((phase) => phase.name)).toEqual([
+			"checkout.cloned-62",
+			"host.ready",
+		]);
 	});
 
-	test("a failed phases write is reported and the wake still answers", async () => {
+	test("a failed phases write or API phase read is reported and the wake still answers", async () => {
+		const tags = {
+			"cloud_workspace.id": "ws_1",
+			"organization.id": "org_1",
+			"boot.id": "boot_3",
+		};
 		phasesWriteError = new Error("db down");
 		expect((await wakeCloudWorkspace(ROW)).hostTarget).toBe("https://box.test");
+		phasesWriteError = null;
+		apiPhasesError = new Error("span gone");
+		expect((await wakeCloudWorkspace(ROW)).hostTarget).toBe("https://box.test");
 		expect(captured).toEqual([
-			[
-				phasesWriteError,
-				{
-					tags: {
-						"cloud_workspace.id": "ws_1",
-						"organization.id": "org_1",
-						"boot.id": "boot_3",
-					},
-				},
-			],
+			[new Error("db down"), { tags }],
+			[apiPhasesError, { tags }],
 		]);
 	});
 });

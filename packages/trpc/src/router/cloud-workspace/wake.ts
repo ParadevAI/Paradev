@@ -14,12 +14,10 @@ import {
 	logControl,
 } from "../../lib/control-log";
 import {
-	apiPhases,
 	bootBeganSince,
 	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
-	recordBootSpans,
 	type SandboxUnavailableError,
 	stopAndSnapshot,
 	stopSandbox,
@@ -32,7 +30,7 @@ import {
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
 import {
-	recordBootPhases,
+	recordBootTrace,
 	recordBoxStopped,
 	recordSandboxAsleep,
 } from "./sandbox-sleep";
@@ -177,22 +175,11 @@ async function wake(
 			Sentry.captureException(error, { tags: controlTags(scope) }),
 		);
 	}
-	const boxPhases =
-		rebooted && bootBeganSince(answer, wakeStartedAt) ? bootPhases(answer) : [];
-	try {
-		recordBootSpans(boxPhases);
-	} catch (error) {
-		console.error(
-			`[cloud-workspace] could not trace the boot of ${row.id}`,
-			error,
-		);
-	}
-	if (bootId) {
-		await recordBootPhases({ ...scope, bootId }, [
-			...apiPhases(span),
-			...boxPhases,
-		]);
-	}
+	await recordBootTrace(
+		scope,
+		span,
+		rebooted && bootBeganSince(answer, wakeStartedAt) ? bootPhases(answer) : [],
+	);
 	const set: Partial<CloudWorkspaceRow> = {
 		...(hostTarget !== row.sandboxUrl ? { sandboxUrl: hostTarget } : {}),
 		...(booted || adoptSignIns

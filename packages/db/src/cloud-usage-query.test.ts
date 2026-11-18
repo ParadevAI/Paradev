@@ -400,8 +400,13 @@ describe("fleet scope", () => {
 
 	test("phases and the trace id on the fleet reads, not on the customer list", async () => {
 		const phases = [
-			{ name: "claim", at: 1_789_000_000_000, ms: 400 },
-			{ name: "boot.start", at: 1_789_000_000_500, ms: 900 },
+			{ name: "claim", source: "api" as const, at: 1_789_000_000_000, ms: 400 },
+			{
+				name: "boot.start",
+				source: "box" as const,
+				at: 1_789_000_000_500,
+				ms: 900,
+			},
 		];
 		const setTrace = (trace: {
 			phases: typeof phases | null;

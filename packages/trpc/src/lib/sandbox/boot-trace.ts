@@ -53,7 +53,12 @@ export function bootPhases({
 	return stamps.map((stamp, index) => {
 		// The answer is on our clock, which can trail the box's a little.
 		const end = Math.max(stamp.at, stamps[index + 1]?.at ?? answeredAt);
-		return { name: stamp.phase, at: stamp.at, ms: end - stamp.at };
+		return {
+			name: stamp.phase,
+			source: "box",
+			at: stamp.at,
+			ms: end - stamp.at,
+		};
 	});
 }
 
@@ -93,8 +98,14 @@ export function apiPhases(transaction: Sentry.Span): CloudWorkspaceBootPhase[] {
 			if (!op || !API_PHASE_OPS.has(op) || !description || !timestamp) {
 				return [];
 			}
-			const at = Math.round(start_timestamp * 1000);
-			return [{ name: description, at, ms: Math.round(timestamp * 1000) - at }];
+			return [
+				{
+					name: description,
+					source: "api" as const,
+					at: Math.round(start_timestamp * 1000),
+					ms: Math.round((timestamp - start_timestamp) * 1000),
+				},
+			];
 		})
 		.sort((a, b) => a.at - b.at);
 }

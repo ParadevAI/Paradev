@@ -131,7 +131,7 @@ describe("a provision whose row another write already moved", () => {
 });
 
 describe("a provision whose host answered", () => {
-	const authorized: { traceId: string }[] = [];
+	const authorized: { traceId: string; transactionTraceId?: string }[] = [];
 	const sets: Record<string, unknown>[] = [];
 	const at = 1_789_000_000_000;
 	stub(sandbox, {
@@ -157,7 +157,12 @@ describe("a provision whose host answered", () => {
 	});
 	stub(meter, {
 		authorizeBoot: async (args: { traceId: string }) => {
-			authorized.push(args);
+			const active = Sentry.getActiveSpan();
+			const transaction = active && Sentry.getRootSpan(active);
+			authorized.push({
+				traceId: args.traceId,
+				transactionTraceId: transaction?.spanContext().traceId,
+			});
 			return { bootId: "boot_1" };
 		},
 		attachBootSession: async () => {},
@@ -181,12 +186,13 @@ describe("a provision whose host answered", () => {
 		expect(await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" })).toBe(
 			"provisioned",
 		);
-		expect(authorized[0]?.traceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.transactionTraceId).toMatch(/^[0-9a-f]{32}$/);
+		expect(authorized[0]?.traceId).toBe(authorized[0]?.transactionTraceId);
 		expect(sets.filter((set) => "phases" in set)).toEqual([
 			{
 				phases: [
-					{ name: "boot.start", at, ms: 700 },
-					{ name: "host.ready", at: at + 700, ms: 50 },
+					{ name: "boot.start", source: "box", at, ms: 700 },
+					{ name: "host.ready", source: "box", at: at + 700, ms: 50 },
 				],
 			},
 		]);
