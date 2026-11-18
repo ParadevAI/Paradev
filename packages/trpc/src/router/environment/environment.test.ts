@@ -134,7 +134,7 @@ describe("environment.promote onto an environment", () => {
 
 describe("environment.promote of a running workspace", () => {
 	const restarted: Array<[string, { sessionId: string | null }]> = [];
-	let saved = 0;
+	const order: string[] = [];
 	stub(sandbox, {
 		promoteSandboxToEnvironment: async () => ({
 			goldenName: "env-new",
@@ -149,6 +149,7 @@ describe("environment.promote of a running workspace", () => {
 			stopped: { sessionId: string | null },
 		) => {
 			restarted.push([row.id, stopped]);
+			order.push("restart");
 			throw userError({
 				code: "FORBIDDEN",
 				message: "limit reached",
@@ -171,17 +172,18 @@ describe("environment.promote of a running workspace", () => {
 				}),
 				delete: () => ({ where: async () => {} }),
 			};
-			saved += 1;
-			return run(tx);
+			const saved = await run(tx);
+			order.push("save");
+			return saved;
 		},
 	});
 
-	test("starts the box again through the wake path, and a refused restart still saves the environment", async () => {
+	test("saves the environment, then starts the box again through the wake path; a refused restart does not fail the promote", async () => {
 		await caller.environment.promote({
 			cloudWorkspaceId: WORKSPACE_ID,
 			name: "Saved",
 		});
 		expect(restarted).toEqual([[WORKSPACE_ID, { sessionId: "sess_A" }]]);
-		expect(saved).toBe(1);
+		expect(order).toEqual(["save", "restart"]);
 	});
 });

@@ -126,16 +126,21 @@ export interface SandboxClaim {
 }
 
 /** Vercel allows 5 tags per sandbox. */
+function environmentTags(organizationId: string): Record<string, string> {
+	return { kind: "environment", org: organizationId };
+}
+
 function sandboxTags(
 	kind: "workspace" | "environment",
 	identity: SandboxIdentity,
 ): Record<string, string> {
-	const tags = { kind, org: identity.SUPERSET_SANDBOX_ORGANIZATION_ID };
+	const org = identity.SUPERSET_SANDBOX_ORGANIZATION_ID;
 	// A golden's identity is the workspace it was built from, not its own.
-	if (kind === "environment") return tags;
+	if (kind === "environment") return environmentTags(org);
 	const user = identity.SUPERSET_SANDBOX_CREATOR_USER_ID;
 	return {
-		...tags,
+		kind,
+		org,
 		workspace: identity.SUPERSET_SANDBOX_WORKSPACE_ID,
 		...(user ? { user } : {}),
 	};
@@ -485,9 +490,14 @@ export async function wakeSandbox(args: {
 	claim: SandboxClaim;
 	/**
 	 * Runs once the box is known to be stopped, before anything resumes it; or,
-	 * for a box read running that a call here resumed, once those calls end.
+	 * for a box read running that a call here resumed (`resumedSession`), once
+	 * those calls end.
 	 */
-	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+	beforeResume?: (box: {
+		memoryMb: number;
+		vcpus: number;
+		resumedSession?: { sessionId: string | null; expiresAt: Date | null };
+	}) => Promise<void>;
 }): Promise<{
 	hostTarget: string;
 	/** The session was stopped, so every process on the box started from this claim. */
@@ -500,14 +510,16 @@ export async function wakeSandbox(args: {
 }> {
 	try {
 		let wasRunning = false;
-		let resumedVcpus: number | null = null;
+		let resumed = null as { vcpus: number; sessionId: string | null } | null;
 		const sandbox = await Sandbox.get({
 			...credentials(),
 			name: args.providerSandboxId,
 			resume: false,
 			// Any call on a Sandbox object resumes a stopped session and retries.
-			onResume: async (resumed) => {
-				if (wasRunning) resumedVcpus = resumed.currentSession().vcpus;
+			onResume: async (box) => {
+				if (!wasRunning) return;
+				const session = box.currentSession();
+				resumed = { vcpus: session.vcpus, sessionId: session.sessionId };
 			},
 		});
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
@@ -578,10 +590,14 @@ export async function wakeSandbox(args: {
 				runBoot(sandbox, args.claim.hostSecret),
 			);
 		}
-		if (resumedVcpus && args.beforeResume) {
+		if (resumed && args.beforeResume) {
 			await args.beforeResume({
-				memoryMb: resumedVcpus * MEMORY_MB_PER_VCPU,
-				vcpus: resumedVcpus,
+				memoryMb: resumed.vcpus * MEMORY_MB_PER_VCPU,
+				vcpus: resumed.vcpus,
+				resumedSession: {
+					sessionId: resumed.sessionId,
+					expiresAt: sandbox.expiresAt ?? null,
+				},
 			});
 		}
 		const answer = await Sentry.startSpan(
@@ -693,7 +709,7 @@ export async function promoteSandboxToEnvironment(args: {
 		persistent: true,
 		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
-		tags: { kind: "environment", org: args.organizationId },
+		tags: environmentTags(args.organizationId),
 	});
 	await stripWorkspaceIdentity(golden);
 	const created = golden.currentSnapshotId;

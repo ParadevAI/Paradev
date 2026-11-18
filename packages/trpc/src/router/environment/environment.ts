@@ -20,6 +20,7 @@ import {
 	isMember,
 	type MemberContext,
 } from "../../lib/cloud-guards";
+import { controlTags } from "../../lib/control-log";
 import {
 	deleteSandbox,
 	loadRepositories,
@@ -504,21 +505,23 @@ export const environmentRouter = {
 				goldenName,
 				organizationId: workspace.organizationId,
 			});
-			if (golden.stopped) {
-				await wakeAfterStop(workspace, golden.stopped).catch((error) => {
+			const { stopped } = golden;
+			const restart = async () => {
+				if (!stopped) return;
+				await wakeAfterStop(workspace, stopped).catch((error) => {
 					console.error(
 						`[environment/promote] could not restart ${workspace.id} after its snapshot`,
 						error,
 					);
 					if (isCloudUsageRefusal(error)) return;
 					Sentry.captureException(error, {
-						tags: {
-							"cloud_workspace.id": workspace.id,
-							"organization.id": workspace.organizationId,
-						},
+						tags: controlTags({
+							cloudWorkspaceId: workspace.id,
+							organizationId: workspace.organizationId,
+						}),
 					});
 				});
-			}
+			};
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,
@@ -619,6 +622,7 @@ export const environmentRouter = {
 							cleanup,
 						),
 					);
+					await restart();
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
@@ -629,6 +633,7 @@ export const environmentRouter = {
 					),
 				);
 			}
+			await restart();
 			return row;
 		}),
 

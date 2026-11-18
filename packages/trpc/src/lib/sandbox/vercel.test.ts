@@ -218,7 +218,7 @@ describe("wakeSandbox", () => {
 		expiresAt: new Date(NOW + 60_000),
 		vcpus: 4,
 		domain: () => "https://box.test",
-		currentSession: () => ({ vcpus: 8 }),
+		currentSession: () => ({ vcpus: 8, sessionId: "sess_new" }),
 		update: async () => {},
 		writeFiles: async () => {},
 		// The SDK's withResume: a call on a stopped session resumes it, then retries.
@@ -264,7 +264,13 @@ describe("wakeSandbox", () => {
 
 	test("a box read running that a call resumed runs beforeResume for the new session", async () => {
 		running = true;
-		expect(await wake()).toEqual([{ memoryMb: 16_384, vcpus: 8 }]);
+		expect(await wake()).toEqual([
+			{
+				memoryMb: 16_384,
+				vcpus: 8,
+				resumedSession: { sessionId: "sess_new", expiresAt: box.expiresAt },
+			},
+		]);
 	});
 
 	test("a box read stopped runs beforeResume once, before its own resume", async () => {

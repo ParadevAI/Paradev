@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
@@ -132,20 +132,25 @@ describe("wakeAfterStop", () => {
 describe("a refused wake", () => {
 	const calls: string[] = [];
 	const recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+	let resumedSession: { sessionId: string; expiresAt: Date } | undefined;
 	stub(sandbox, {
 		buildSandboxClaim: async () => ({
 			claim: {},
 			agentCredentialDigest: "digest",
 		}),
 		wakeSandbox: async (args: {
-			beforeResume: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+			beforeResume: (box: {
+				memoryMb: number;
+				vcpus: number;
+				resumedSession?: { sessionId: string; expiresAt: Date };
+			}) => Promise<void>;
 		}) => {
-			await args.beforeResume({ memoryMb: 16_384, vcpus: 8 });
+			await args.beforeResume({ memoryMb: 16_384, vcpus: 8, resumedSession });
 		},
 		describeSandbox: async () => ({
 			running: true,
 			expiresAt: new Date(Date.now() + 60_000),
-			sessionId: "sess_C",
+			sessionId: "sess_B",
 		}),
 		stopSandbox: async () => {
 			calls.push("stop");
@@ -174,11 +179,26 @@ describe("a refused wake", () => {
 			recordedAsleep.push([id, stopped]);
 		},
 	});
+	beforeEach(() => {
+		calls.length = 0;
+		recordedAsleep.length = 0;
+	});
 
-	test("stops a box a call resumed before the refusal, and records it asleep for that session", async () => {
+	test("stops the box a call here resumed, and records it asleep for that session", async () => {
+		resumedSession = {
+			sessionId: "sess_C",
+			expiresAt: new Date(Date.now() + 60_000),
+		};
 		await expect(wakeCloudWorkspace(ROW)).rejects.toThrow("limit reached");
 		expect(calls).toEqual(["awake sess_C", "stop"]);
 		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "sess_C" }]]);
+	});
+
+	test("leaves alone a box another wake authorized and resumed meanwhile", async () => {
+		resumedSession = undefined;
+		await expect(wakeCloudWorkspace(ROW)).rejects.toThrow("limit reached");
+		expect(calls).toEqual([]);
+		expect(recordedAsleep).toEqual([]);
 	});
 });
 

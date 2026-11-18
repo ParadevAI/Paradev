@@ -85,12 +85,14 @@ async function wake(
 		organizationId: row.organizationId,
 	};
 	let bootId: string | null = null;
+	let resumed: { sessionId: string | null; expiresAt: Date | null } | undefined;
 	const wakeStartedAt = Date.now();
 	const { hostTarget, booted, rebooted, answer, expiresAt, sessionId } =
 		await wakeSandbox({
 			providerSandboxId: row.providerSandboxId,
 			claim,
-			beforeResume: async (box) => {
+			beforeResume: async ({ resumedSession, ...box }) => {
+				resumed = resumedSession;
 				({ bootId } = await Sentry.startSpan(
 					{ name: "authorize boot", op: "billing" },
 					() =>
@@ -121,20 +123,23 @@ async function wake(
 					providerSandboxId: row.providerSandboxId,
 				}).catch(() => {});
 			}
-			// A call here may have resumed the box before the refusal.
-			if (isCloudUsageRefusal(error)) {
+			// A call here resumed the box, and no boot meters that session.
+			if (resumed && isCloudUsageRefusal(error)) {
+				console.error(
+					`[cloud-workspace] ${row.id} was resumed past its limit; stopping it`,
+				);
 				try {
-					const live = await describeSandbox(row.providerSandboxId);
-					if (live.running && live.expiresAt) {
+					if (resumed.expiresAt) {
 						await recordSandboxAwake(row.id, {
-							expiresAt: live.expiresAt,
-							sessionId: live.sessionId,
-						});
-						const stopped = await stopSandbox(row.providerSandboxId);
-						await recordSandboxAsleep(row.id, {
-							sessionId: stopped.sessionId ?? live.sessionId,
+							expiresAt: resumed.expiresAt,
+							sessionId: resumed.sessionId,
 						});
 					}
+					const stopped = await stopSandbox(row.providerSandboxId);
+					await recordSandboxAsleep(row.id, {
+						sessionId: stopped.sessionId ?? resumed.sessionId,
+					});
+					logControl("meter.cap_stopped", scope, { source: "wake" }, "warn");
 				} catch (stopError) {
 					Sentry.captureException(stopError, { tags: controlTags(scope) });
 				}
