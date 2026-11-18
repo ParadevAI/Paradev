@@ -15077,6 +15077,9 @@ msgstr "遠端主機上的連接埠"
 msgid "Ports on this computer"
 msgstr "此電腦上的連接埠"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "此電腦上的連接埠：已轉送 {forwardedCount} 個"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "埠：{totalPortCount}個活動"
 

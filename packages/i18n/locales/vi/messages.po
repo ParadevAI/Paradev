@@ -15077,6 +15077,9 @@ msgstr "Cổng trên host từ xa"
 msgid "Ports on this computer"
 msgstr "Cổng trên máy tính này"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Cổng trên máy tính này: đã chuyển tiếp {forwardedCount}"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Cổng: {totalPortCount} đang mở"
 

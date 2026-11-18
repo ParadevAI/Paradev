@@ -15077,6 +15077,9 @@ msgstr "Portas em hosts remotos"
 msgid "Ports on this computer"
 msgstr "Portas neste computador"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Portas neste computador: {forwardedCount} encaminhadas"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Portas: {totalPortCount} ativas"
 

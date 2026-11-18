@@ -15077,6 +15077,9 @@ msgstr "リモートホストのポート"
 msgid "Ports on this computer"
 msgstr "このコンピューターのポート"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "このコンピューターのポート: {forwardedCount} 件を転送中"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "ポート：{totalPortCount}個がライブ"
 

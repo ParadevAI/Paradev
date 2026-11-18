@@ -10,9 +10,13 @@ import {
 	usePortForwardLookup,
 } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortsCountIcon } from "renderer/routes/_authenticated/_dashboard/components/PortsCountIcon";
-import { portForwardId } from "shared/types";
+import { type PortForward, portForwardId } from "shared/types";
 import { WorkspacePortRow } from "./components/WorkspacePortRow";
 import { WorkspaceStaleForwardRow } from "./components/WorkspaceStaleForwardRow";
+
+function isBound(forward: PortForward | null): boolean {
+	return forward !== null && forward.localPort !== null;
+}
 
 interface WorkspacePortsButtonProps {
 	workspaceId: string;
@@ -37,9 +41,8 @@ export function WorkspacePortsButton({
 	);
 	const lookupForward = usePortForwardLookup();
 	const forwardedCount =
-		ports.filter((port) => lookupForward(port)?.status.state === "active")
-			.length +
-		stale.filter((forward) => forward.status.state === "active").length;
+		ports.filter((port) => isBound(lookupForward(port))).length +
+		stale.filter(isBound).length;
 
 	if (ports.length === 0 && stale.length === 0) return null;
 
@@ -50,7 +53,9 @@ export function WorkspacePortsButton({
 					<PopoverTrigger asChild>
 						<button
 							type="button"
-							aria-label={t({ message: "Ports on this computer" })}
+							aria-label={t({
+								message: `Ports on this computer: ${forwardedCount} forwarded`,
+							})}
 							className={cn(
 								"no-drag data-[state=open]:bg-fill-hover data-[state=open]:text-foreground",
 								HEADER_ICON_BUTTON_CLASS,

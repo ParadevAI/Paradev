@@ -15077,6 +15077,9 @@ msgstr "Порты на удалённых хостах"
 msgid "Ports on this computer"
 msgstr "Порты на этом компьютере"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Порты на этом компьютере: перенаправлено {forwardedCount}"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Активных портов: {totalPortCount}"
 

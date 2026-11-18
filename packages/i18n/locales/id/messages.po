@@ -15077,6 +15077,9 @@ msgstr "Port di host jarak jauh"
 msgid "Ports on this computer"
 msgstr "Port di komputer ini"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Port di komputer ini: {forwardedCount} diteruskan"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Port: {totalPortCount} aktif"
 
