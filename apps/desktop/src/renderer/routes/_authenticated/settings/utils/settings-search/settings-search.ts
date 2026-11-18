@@ -1967,13 +1967,12 @@ function isItemOffered(
 /** Like `getMatchCountBySection`, but excludes items that are not offered. */
 export function getVisibleMatchCountBySection(
 	query: string,
-	cloudWorkspaces: boolean,
-	pluginsVisible = false,
+	visible: { cloudWorkspaces: boolean; plugins: boolean },
 ): Partial<Record<SettingsSection, number>> {
 	const matches = searchSettings(query).filter(
 		(item) =>
-			isItemOffered(item, cloudWorkspaces) &&
-			(item.section !== "plugins" || pluginsVisible),
+			isItemOffered(item, visible.cloudWorkspaces) &&
+			(item.section !== "plugins" || visible.plugins),
 	);
 	const counts: Partial<Record<SettingsSection, number>> = {};
 	for (const item of matches) {

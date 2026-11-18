@@ -37,11 +37,10 @@ export function SettingsSidebar() {
 	const pluginsVisible = usePluginsSettingsVisible();
 	const normalizedSearchQuery = searchQuery.trim();
 	const matchCounts = normalizedSearchQuery
-		? getVisibleMatchCountBySection(
-				normalizedSearchQuery,
-				cloudWorkspacesEnabled,
-				pluginsVisible,
-			)
+		? getVisibleMatchCountBySection(normalizedSearchQuery, {
+				cloudWorkspaces: cloudWorkspacesEnabled,
+				plugins: pluginsVisible,
+			})
 		: null;
 
 	return (

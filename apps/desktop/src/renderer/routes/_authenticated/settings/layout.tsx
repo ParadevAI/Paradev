@@ -130,11 +130,10 @@ function SettingsLayout() {
 	const matchCounts = useMemo(
 		() =>
 			isSearchActive
-				? getVisibleMatchCountBySection(
-						normalizedSearchQuery,
-						cloudWorkspacesEnabled,
-						pluginsVisible,
-					)
+				? getVisibleMatchCountBySection(normalizedSearchQuery, {
+						cloudWorkspaces: cloudWorkspacesEnabled,
+						plugins: pluginsVisible,
+					})
 				: {},
 		[
 			isSearchActive,

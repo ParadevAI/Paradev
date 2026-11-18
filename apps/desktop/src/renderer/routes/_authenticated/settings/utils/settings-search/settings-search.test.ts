@@ -127,17 +127,28 @@ describe("settings search - auto save", () => {
 
 describe("settings search - mobile", () => {
 	it("finds the mobile section", () => {
-		expect(getVisibleMatchCountBySection("iPhone", false).mobile).toBe(1);
+		expect(
+			getVisibleMatchCountBySection("iPhone", {
+				cloudWorkspaces: false,
+				plugins: false,
+			}).mobile,
+		).toBe(1);
 	});
 });
 
 describe("settings search - plugins visibility", () => {
 	it("excludes plugin matches unless the plugins section is visible", () => {
 		expect(
-			getVisibleMatchCountBySection("marketplace", false, false).plugins,
+			getVisibleMatchCountBySection("marketplace", {
+				cloudWorkspaces: false,
+				plugins: false,
+			}).plugins,
 		).toBeUndefined();
 		expect(
-			getVisibleMatchCountBySection("marketplace", false, true).plugins,
+			getVisibleMatchCountBySection("marketplace", {
+				cloudWorkspaces: false,
+				plugins: true,
+			}).plugins,
 		).toBeGreaterThan(0);
 	});
 });
