@@ -4,7 +4,7 @@ import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import type { CloudWorkspaceStatus } from "@superset/db/schema";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, type SQL } from "drizzle-orm";
 import {
 	type ControlScope,
 	controlTags,
@@ -16,6 +16,7 @@ type Move = {
 	id: string;
 	from: readonly CloudWorkspaceStatus[];
 	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
+	where?: SQL;
 };
 
 async function moveCloudWorkspace(
@@ -28,6 +29,7 @@ async function moveCloudWorkspace(
 			and(
 				eq(cloudWorkspaces.id, args.id),
 				inArray(cloudWorkspaces.status, [...args.from]),
+				args.where,
 			),
 		)
 		.returning({ id: cloudWorkspaces.id });
@@ -53,31 +55,39 @@ export function transitionCloudWorkspace(
 	);
 }
 
-/** An Autumn refusal is an expected state: it is logged as a warning and opens no Sentry issue. */
+/**
+ * An expected failure (an Autumn refusal, or `expected`) is logged as a
+ * warning and opens no Sentry issue. Returns whether the row moved.
+ */
 export async function failCloudWorkspace(args: {
 	scope: ControlScope;
 	from: readonly CloudWorkspaceStatus[];
 	set?: Partial<typeof cloudWorkspaces.$inferInsert>;
+	/** Further conditions the same update must meet. */
+	where?: SQL;
 	reason: CloudWorkspaceFailureReason;
 	error: unknown;
-}): Promise<void> {
+	expected?: boolean;
+}): Promise<boolean> {
 	const { scope } = args;
 	const changed = await moveCloudWorkspace({
 		id: scope.cloudWorkspaceId,
 		from: args.from,
 		to: "failed",
 		set: { ...args.set, failureReason: args.reason, failedAt: new Date() },
+		where: args.where,
 	});
 	nudge(scope.organizationId, "cloud_workspaces");
-	if (!changed) return;
-	const refused = isCloudUsageRefusal(args.error);
+	if (!changed) return false;
+	const expected = args.expected || isCloudUsageRefusal(args.error);
 	logControl(
 		"workspace.failed",
 		scope,
 		{ "failure.reason": args.reason },
-		refused ? "warn" : "error",
+		expected ? "warn" : "error",
 	);
-	if (!refused) {
+	if (!expected) {
 		Sentry.captureException(args.error, { tags: controlTags(scope) });
 	}
+	return true;
 }

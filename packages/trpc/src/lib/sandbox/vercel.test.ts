@@ -17,6 +17,7 @@ import {
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
+	provisionSandbox,
 	type SandboxClaim,
 	SandboxUnavailableError,
 	SESSION_TIMEOUT_MS,
@@ -304,6 +305,34 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+});
+
+describe("provisionSandbox", () => {
+	let created: { snapshotExpiration?: number } | undefined;
+	stub(Sandbox, {
+		get: async () => {
+			throw new APIError(new Response(null, { status: 404 }));
+		},
+		create: async (params: { snapshotExpiration?: number }) => {
+			created = params;
+			throw new Error("created");
+		},
+	});
+
+	test("a workspace box's snapshots never expire on Vercel's clock", async () => {
+		const provision = provisionSandbox({
+			name: "ws-new",
+			environment: { sourceKind: "image", sourceRef: "img", region: "iad1" },
+			claim: {
+				identity: {},
+				hostSecret: "secret",
+				networkPolicy: "allow-all",
+				vcpus: 2,
+			} as unknown as SandboxClaim,
+		});
+		await expect(provision).rejects.toThrow("created");
+		expect(created?.snapshotExpiration).toBe(0);
 	});
 });
 

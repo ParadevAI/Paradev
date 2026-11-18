@@ -783,6 +783,29 @@ sandbox is gone or unresumable is marked `failed` by the next `access`, so it
 gets the failed screen and a Remove button rather than a sidebar entry that
 never opens.
 
+**Vercel's snapshot expiry was silent, so we own retention now.** The app
+assumed a stopped box keeps its disk until someone deletes it. In fact Vercel
+expired a workspace box's snapshot 30 days after its last use. Nothing told us:
+the row learned only from the 410 that its next wake, agent turn or automation
+dispatch got. A workspace nobody opened again stayed `asleep` over a box that
+could not resume, and the box itself stayed in Vercel. New workspace boxes are
+now created with `snapshotExpiration: 0`. The daily `reap-retention` job
+(`router/cloud-workspace/retention.ts`) does three things. It moves a workspace
+that is asleep and unused for 30 days to `failed`/`snapshot_expired`, the same
+state as the 410. It gives the row a new box name in that same update. Then it
+queues `teardownSandbox`, which deletes the box only if no row names it. "Unused"
+means no boot started or stopped since then, with `sandbox_expires_at` and
+`created_at` older too, so a wake in flight (its boot row is written before
+Vercel resumes) keeps the box. In production only, the same job tears down
+tagged boxes that no row and no unarchived environment names, once they are
+7 days old: every deployment shares one Vercel project, so a dev or preview
+database would see production's boxes as orphans. Boxes created before this
+change keep a 30-day expiry until `bun run backfill-snapshot-expiration
+--apply` (`packages/sandbox`) is run. That run changes only snapshots taken
+afterwards, so until a box's next stop the 410 path stays its fallback.
+**Open:** drives are not reaped yet. No row names a workspace drive on main,
+so that half waits for the drive columns (#9847).
+
 **Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
 `runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
 "stopped" answer it resumes and retries. A box read `running` that hits its

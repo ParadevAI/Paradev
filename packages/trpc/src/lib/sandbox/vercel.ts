@@ -46,7 +46,6 @@ export const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
 /** Above the 10-minute client keepalive, so an open workspace is always extended in time. */
 const EXTEND_BELOW_MS = 30 * 60 * 1000;
 const MIN_TOP_UP_MS = 60 * 1000;
-const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
@@ -304,7 +303,6 @@ export async function provisionSandbox(args: {
 	name: string;
 	environment: SandboxEnvironment;
 	claim: SandboxClaim;
-	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
 }): Promise<{
 	providerSandboxId: string;
@@ -322,8 +320,8 @@ export async function provisionSandbox(args: {
 		env: {},
 		networkPolicy: args.claim.networkPolicy,
 		persistent: true,
-		snapshotExpiration:
-			kind === "environment" ? 0 : WORKSPACE_SNAPSHOT_EXPIRATION_MS,
+		// Vercel never expires a snapshot: the retention reaper decides when a box goes.
+		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
@@ -985,6 +983,34 @@ export async function listActiveWorkspaceSandboxes(
 				sessionId: sandbox.currentSessionId ?? null,
 			});
 		}
+	}
+	return found;
+}
+
+export interface TaggedSandbox {
+	name: string;
+	createdAt: number;
+	statusUpdatedAt: number;
+	status: string;
+	snapshotExpiration: number | undefined;
+}
+
+/** Every box we tagged with this kind, whatever its age. */
+export async function listTaggedSandboxes(
+	kind: "workspace" | "environment",
+): Promise<TaggedSandbox[]> {
+	const found: TaggedSandbox[] = [];
+	for await (const sandbox of await Sandbox.list({
+		...credentials(),
+		tags: { kind },
+	})) {
+		found.push({
+			name: sandbox.name,
+			createdAt: sandbox.createdAt,
+			statusUpdatedAt: sandbox.statusUpdatedAt ?? sandbox.updatedAt,
+			status: sandbox.status,
+			snapshotExpiration: sandbox.snapshotExpiration,
+		});
 	}
 	return found;
 }

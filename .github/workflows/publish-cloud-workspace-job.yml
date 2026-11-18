@@ -9,6 +9,7 @@ on:
         options:
           - reconcile-usage
           - renew-chatgpt-sign-ins
+          - reap-retention
         default: reconcile-usage
 
 jobs:
