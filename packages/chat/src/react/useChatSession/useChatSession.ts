@@ -66,8 +66,44 @@ const defaultWait: Wait = (callback, delayMs) => {
 };
 
 const SEED_TIMEOUT_MS = 10_000;
+const HISTORY_RETRY_MAX_MS = 60_000;
 const MAX_BODIES_PER_REQUEST = 100;
 const MAX_BODY_ATTEMPTS = 3;
+
+function timedWith(wait: Wait) {
+	return <T>(request: Promise<T>) =>
+		new Promise<T>((resolve, reject) => {
+			const cancelTimeout = wait(
+				() => reject(new Error("timed out")),
+				SEED_TIMEOUT_MS,
+			);
+			request.then(
+				(value) => {
+					cancelTimeout();
+					resolve(value);
+				},
+				(error: unknown) => {
+					cancelTimeout();
+					reject(error);
+				},
+			);
+		});
+}
+
+function withSessionRow(
+	snapshot: SessionSnapshot,
+	row: NonNullable<InitialLoad[0]["session"]>,
+): SessionSnapshot {
+	return {
+		...snapshot,
+		session: {
+			...snapshot.session,
+			status: row.status,
+			harness: row.harness,
+			...(row.title ? { title: row.title } : {}),
+		},
+	};
+}
 
 type Seed =
 	| { kind: "outline"; snapshot: SessionSnapshot }
@@ -171,6 +207,7 @@ export type ChatSession = {
 	status: ChatSessionStatus;
 	connection: StreamStatus;
 	unreachable: boolean;
+	historyUnavailable: boolean;
 	outbox: OutboxEntry[];
 	hasOlder: boolean;
 	requestItemBodies(itemIds: readonly string[]): void;
@@ -228,6 +265,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const [status, setStatus] = useState<ChatSessionStatus>("loading");
 	const [connection, setConnection] = useState<StreamStatus>("connecting");
 	const [unreachable, setUnreachable] = useState(false);
+	const [historyUnavailable, setHistoryUnavailable] = useState(false);
 	const [outboxEntries, setOutboxEntries] = useState<OutboxEntry[]>([]);
 	const [hasOlder, setHasOlder] = useState(false);
 
@@ -245,6 +283,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	const resyncBufferRef = useRef<Envelope[] | null>(null);
 	const clientRef = useRef(client);
 	clientRef.current = client;
+	const historyRecoveredRef = useRef<(() => void) | null>(null);
 
 	const outbox = useMemo(
 		() =>
@@ -395,23 +434,31 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 	);
 
 	const resync = useCallback(
-		async (afterReset = false) => {
+		async (afterReset = false): Promise<boolean> => {
 			if (resyncingRef.current) {
 				if (afterReset) resyncAgainRef.current = true;
-				return;
+				return false;
 			}
 			resyncingRef.current = true;
+			let applied = false;
 			try {
 				do {
 					resyncAgainRef.current = false;
 					resyncBufferRef.current = [];
-					const seed = await fetchSeed(client, pageSize).catch(() => null);
-					if (clientRef.current !== client) return;
+					const seed = await fetchSeed(
+						client,
+						pageSize,
+						timedWith(waitRef.current),
+					).catch(() => null);
+					if (clientRef.current !== client) return false;
 					const seeded = seed
 						? applySeed(seed, true, resyncBufferRef.current)
 						: null;
+					applied = seed !== null;
 					if (seeded?.pendingReset) resyncAgainRef.current = true;
 				} while (resyncAgainRef.current);
+				if (applied) historyRecoveredRef.current?.();
+				return applied;
 			} finally {
 				resyncingRef.current = false;
 				resyncBufferRef.current = null;
@@ -431,6 +478,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 
 		setStatus("loading");
 		setUnreachable(false);
+		setHistoryUnavailable(false);
 		setConnection("connecting");
 		const primed = takePrimedSnapshot(client.sessionId);
 		const cached = cachedSnapshot(client.sessionId);
@@ -441,34 +489,45 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		pendingRef.current = [];
 
 		let cancelRetry: (() => void) | null = null;
-		const retry = (attempt: number) => {
-			const delayMs = Math.min(
+		const backoffMs = (attempt: number) =>
+			Math.min(
 				DEFAULT_BACKOFF_INITIAL_MS * 2 ** attempt,
 				DEFAULT_BACKOFF_MAX_MS,
 			);
+		const retry = (attempt: number) => {
 			cancelRetry = waitRef.current(() => {
 				cancelRetry = null;
 				void seed(attempt + 1);
-			}, delayMs);
+			}, backoffMs(attempt));
+		};
+		let historyPending = false;
+		const historyRecovered = () => {
+			if (!historyPending) return;
+			historyPending = false;
+			loaded = true;
+			cancelRetry?.();
+			cancelRetry = null;
+			setHistoryUnavailable(false);
+		};
+		historyRecoveredRef.current = historyRecovered;
+		const retryHistory = (attempt: number) => {
+			historyPending = true;
+			setHistoryUnavailable(true);
+			cancelRetry = waitRef.current(
+				() => {
+					cancelRetry = null;
+					void resync().then(() => {
+						if (!cancelled && historyPending) retryHistory(attempt + 1);
+					});
+				},
+				Math.min(
+					DEFAULT_BACKOFF_INITIAL_MS * 2 ** attempt,
+					HISTORY_RETRY_MAX_MS,
+				),
+			);
 		};
 
-		const timed = <T>(request: Promise<T>) =>
-			new Promise<T>((resolve, reject) => {
-				const cancelTimeout = waitRef.current(
-					() => reject(new Error("timed out")),
-					SEED_TIMEOUT_MS,
-				);
-				request.then(
-					(value) => {
-						cancelTimeout();
-						resolve(value);
-					},
-					(error: unknown) => {
-						cancelTimeout();
-						reject(error);
-					},
-				);
-			});
+		const timed = timedWith(waitRef.current);
 
 		const seed = async (attempt: number) => {
 			let session: InitialLoad[0];
@@ -489,13 +548,22 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 					cached ? withCachedBodies(seed, cached) : seed,
 					false,
 				);
-			} else {
-				if (!session.session) forgetSnapshot(client.sessionId);
+			} else if (!session.session) {
+				forgetSnapshot(client.sessionId);
 				setSnapshot(emptySnapshot());
+			} else {
+				const row = session.session;
+				const otherEpoch =
+					cached?.cursor != null && cached.cursor.epoch !== row.epoch;
+				if (otherEpoch) forgetSnapshot(client.sessionId);
+				setSnapshot((prev) =>
+					withSessionRow(otherEpoch ? emptySnapshot() : prev, row),
+				);
 			}
 			loaded = seed !== null;
 			setStatus("ready");
 			subscribe(seeded?.cursor ?? session.cursor);
+			if (!seed && session.session) retryHistory(0);
 		};
 		const subscribe = (since: Cursor | null) => {
 			stream = client.subscribe({
@@ -524,6 +592,9 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		}
 
 		return () => {
+			if (historyRecoveredRef.current === historyRecovered) {
+				historyRecoveredRef.current = null;
+			}
 			if (loaded && !snapshotRef.current.pendingReset) {
 				cacheSnapshot(client.sessionId, snapshotRef.current);
 			}
@@ -635,6 +706,7 @@ export function useChatSession(options: UseChatSessionOptions): ChatSession {
 		status,
 		connection,
 		unreachable,
+		historyUnavailable,
 		outbox: outboxEntries,
 		hasOlder,
 		requestItemBodies,

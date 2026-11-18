@@ -4000,6 +4000,9 @@ msgstr "Nie można otwierać ścieżek zdalnego obszaru roboczego w Finderze"
 msgid "Can't reach the host"
 msgstr "Nie można połączyć się z hostem"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Nie można połączyć się z hostem tego obszaru roboczego. Ponawianie…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Nie można cofnąć, gdy czat w tym obszarze roboczym pracuje."
 
@@ -6181,6 +6184,9 @@ msgstr "Nie udało się wczytać komentarzy przeglądu"
 
 msgid "Couldn't load runs"
 msgstr "Nie udało się wczytać uruchomień"
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Nie udało się wczytać wiadomości tego czatu. Ponawianie…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Nie udało się wczytać ładunku tego uruchomienia."

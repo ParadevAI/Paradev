@@ -4000,6 +4000,9 @@ msgstr "無法在Finder中開啟遠端工作區路徑"
 msgid "Can't reach the host"
 msgstr "無法連線至主機"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "無法連線到此工作區的主機。正在重試…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "此工作區中有聊天正在工作，無法撤銷。"
 
@@ -6181,6 +6184,9 @@ msgstr "無法載入審查評論"
 
 msgid "Couldn't load runs"
 msgstr "無法載入執行紀錄"
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "無法載入此聊天的訊息。正在重試…"
 
 msgid "Couldn't load this run's payload."
 msgstr "無法載入此次執行的酬載。"

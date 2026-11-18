@@ -4000,6 +4000,9 @@ msgstr "Không thể mở đường dẫn workspace từ xa trong Finder"
 msgid "Can't reach the host"
 msgstr "Không thể kết nối với host"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "Không thể kết nối tới máy chủ của workspace này. Đang thử lại…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "Không thể hoàn tác khi một chat trong workspace này đang làm việc."
 
@@ -6181,6 +6184,9 @@ msgstr "Không thể tải bình luận review"
 
 msgid "Couldn't load runs"
 msgstr "Không thể tải các lần chạy"
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "Không thể tải tin nhắn của cuộc trò chuyện này. Đang thử lại…"
 
 msgid "Couldn't load this run's payload."
 msgstr "Không thể tải payload của lần chạy này."

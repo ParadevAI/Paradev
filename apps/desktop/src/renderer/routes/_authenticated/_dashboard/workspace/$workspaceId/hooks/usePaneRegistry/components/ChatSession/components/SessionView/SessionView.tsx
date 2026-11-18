@@ -75,6 +75,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { TranscriptLoadState } from "./components/TranscriptLoadState";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -750,6 +751,14 @@ export function SessionView({
 								</NestedItemsProvider>
 							</TranscriptPluginsProvider>
 						</SessionModeProvider>
+						{!focusedSubagentId && (
+							<TranscriptLoadState
+								empty={timeline.length === 0 && transcriptOutbox.length === 0}
+								historyUnavailable={session.historyUnavailable}
+								loading={!loaded}
+								unreachable={session.unreachable}
+							/>
+						)}
 						{!focusedSubagentId && rail.length > 1 && (
 							<ChatHistorySidebarScroller
 								className="absolute inset-y-0 left-0 my-auto hidden h-fit max-h-full flex-col pl-3 @[56rem]:flex"

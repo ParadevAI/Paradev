@@ -1007,6 +1007,74 @@ describe("useChatSession", () => {
 	test("keeps the cached transcript when the journal cannot be read", async () => {
 		expect(await cacheAndFailLoad("journal_missing")).toBeGreaterThan(0);
 	});
+
+	test("shows the cached transcript and loads the history again while the host cannot read it", async () => {
+		const stack = await startStack();
+		const first = stack.makeClient();
+		const firstView = render(<Probe client={first} />);
+		await domWaitFor(() => expect(session().status).toBe("ready"));
+		act(() => {
+			session().sendPrompt([{ type: "text", text: "hello" }]);
+		});
+		await domWaitFor(() =>
+			expect(session().snapshot.session?.status).toBe("idle"),
+		);
+		const cachedItems = session().snapshot.items.size;
+		expect(cachedItems).toBeGreaterThan(0);
+		firstView.unmount();
+		first.close();
+
+		let readable = false;
+		const flaky: ChatTransport = new Proxy(stack.transport, {
+			get: (target, prop, receiver) => {
+				if ((prop === "getOutline" || prop === "getItems") && !readable) {
+					return async () => ({ ok: false, reset: "journal_missing" });
+				}
+				return Reflect.get(target, prop, receiver);
+			},
+		});
+		const manual = createManualWait();
+		const client = stack.makeClient({ transport: flaky, wait: manual.wait });
+		const view = render(<Probe client={client} wait={manual.wait} />);
+
+		await domWaitFor(() => expect(session().historyUnavailable).toBe(true));
+		expect(session().status).toBe("ready");
+		expect(session().snapshot.items.size).toBe(cachedItems);
+
+		readable = true;
+		await domWaitFor(() => {
+			act(() => manual.flush());
+			expect(session().historyUnavailable).toBe(false);
+		});
+		expect(session().snapshot.items.size).toBe(cachedItems);
+		view.unmount();
+		client.close();
+		await stack.runtime.dispose();
+	});
+
+	test("stops asking for an unreadable history once the chat closes", async () => {
+		const stack = await startStack();
+		const unreadable: ChatTransport = new Proxy(stack.transport, {
+			get: (target, prop, receiver) =>
+				prop === "getOutline" || prop === "getItems"
+					? async () => ({ ok: false, reset: "journal_missing" })
+					: Reflect.get(target, prop, receiver),
+		});
+		const manual = createManualWait();
+		const client = stack.makeClient({
+			transport: unreadable,
+			wait: manual.wait,
+		});
+		const view = render(<Probe client={client} wait={manual.wait} />);
+		await domWaitFor(() => expect(session().historyUnavailable).toBe(true));
+		expect(session().snapshot.session?.harness).toBe(FAKE_HARNESS);
+
+		view.unmount();
+		client.close();
+		act(() => manual.flush());
+		expect(manual.pendingCount()).toBe(0);
+		await stack.runtime.dispose();
+	});
 });
 
 test("a chat subscribes to background steps by default", () => {

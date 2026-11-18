@@ -4000,6 +4000,9 @@ msgstr "リモートワークスペースのパスはFinderで開けません"
 msgid "Can't reach the host"
 msgstr "ホストに接続できません"
 
+msgid "Can't reach this workspace's host. Retrying…"
+msgstr "このワークスペースのホストに接続できません。再試行中…"
+
 msgid "Can't undo while a chat in this workspace is working."
 msgstr "このワークスペースでチャットが作業中のため取り消せません。"
 
@@ -6181,6 +6184,9 @@ msgstr "レビューコメントを読み込めませんでした"
 
 msgid "Couldn't load runs"
 msgstr "実行履歴を読み込めませんでした"
+
+msgid "Couldn't load this chat's messages. Retrying…"
+msgstr "このチャットのメッセージを読み込めませんでした。再試行中…"
 
 msgid "Couldn't load this run's payload."
 msgstr "この実行のペイロードを読み込めませんでした。"
