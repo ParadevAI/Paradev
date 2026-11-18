@@ -185,6 +185,21 @@ interface NormalizedRepoIdentity {
 
 type PullRequestRow = typeof pullRequests.$inferSelect;
 
+interface CachedGitHubRequest<T> {
+	promise: Promise<T>;
+	fetchedAt: number;
+	consecutiveFailures: number;
+	fingerprint?: string;
+	sequence: number;
+}
+
+interface PullRequestMatch {
+	id: string;
+	isOpen: boolean;
+	headSha: string;
+	sequence: number;
+}
+
 export interface CheckoutPullRequestMetadata {
 	number: number;
 	url: string;
@@ -262,11 +277,7 @@ export class PullRequestRuntimeManager {
 	>();
 	private readonly pullRequestHeadCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode | null>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		CachedGitHubRequest<GitHubPullRequestNode | null>
 	>();
 	// Review decision, checks, and merge-queue state per PR head. These were
 	// the bulk of the runtime's GitHub traffic: four uncached calls per linked
@@ -274,29 +285,18 @@ export class PullRequestRuntimeManager {
 	// spends the user's hourly quota by itself (SUPER-2107).
 	private pullRequestDetailsCache = new Map<
 		string,
-		{
-			promise: Promise<PullRequestDetails>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-			fingerprint?: string;
-		}
+		CachedGitHubRequest<PullRequestDetails>
 	>();
 	private readonly openPullRequestsCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode[]>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		CachedGitHubRequest<GitHubPullRequestNode[]>
 	>();
 	private readonly pullRequestNumberCache = new Map<
 		string,
-		{
-			promise: Promise<GitHubPullRequestNode | null>;
-			fetchedAt: number;
-			consecutiveFailures: number;
-		}
+		CachedGitHubRequest<GitHubPullRequestNode | null>
 	>();
+	private requestSequence = 0;
+	private readonly appliedPullRequestSequence = new Map<string, number>();
 	private readonly readWorkspaceRefs: (
 		worktreePath: string,
 	) => Promise<WorkspaceRefsSnapshot>;
@@ -659,6 +659,7 @@ export class PullRequestRuntimeManager {
 			error: null,
 			now,
 		});
+		this.appliedPullRequestSequence.set(rowId, ++this.requestSequence);
 
 		const upstream = deriveCheckoutPullRequestUpstream(repo, pullRequest);
 		this.db
@@ -1064,8 +1065,11 @@ export class PullRequestRuntimeManager {
 			}
 		}
 
-		const { failedKeys, matched: keyToPullRequest } =
-			await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
+		const {
+			failedKeys,
+			supersededKeys,
+			matched: keyToPullRequest,
+		} = await this.fetchRepoPullRequests(projectId, repo, wantedRefs, options);
 		await this.refreshPastPullRequests(
 			projectId,
 			repo,
@@ -1102,6 +1106,7 @@ export class PullRequestRuntimeManager {
 				}
 				continue;
 			}
+			if (supersededKeys.has(key)) continue;
 			const rawMatch = keyToPullRequest.get(key);
 			const head = wantedRefs.get(key);
 			const isSyntheticCheckout =
@@ -1113,6 +1118,13 @@ export class PullRequestRuntimeManager {
 				isNull(workspaces.archivedAt),
 			);
 			if (isSyntheticCheckout) {
+				if (
+					rawMatch &&
+					(this.appliedPullRequestSequence.get(rawMatch.id) ?? 0) >
+						rawMatch.sequence &&
+					!this.pullRequestHeadMatches(rawMatch.id, rawMatch.headSha)
+				)
+					continue;
 				const sameCheckout = and(
 					linkCondition,
 					eq(workspaces.projectId, projectId),
@@ -1135,6 +1147,7 @@ export class PullRequestRuntimeManager {
 					continue;
 				}
 				headSha = current.headSha;
+				if (!headSha) continue;
 				linkCondition = and(
 					sameCheckout,
 					sql`${workspaces.headSha} IS ${headSha}`,
@@ -1143,7 +1156,7 @@ export class PullRequestRuntimeManager {
 			const checkoutHeadChanged =
 				!!rawMatch &&
 				isSyntheticCheckout &&
-				!this.pullRequestHeadMatches(rawMatch.id, headSha);
+				rawMatch.headSha.toLowerCase() !== headSha?.trim().toLowerCase();
 			// A head=<default> PR that is merged or closed is a past promotion
 			// (e.g. main -> staging), never the default-branch workspace's work.
 			const isPastPromotion =
@@ -1491,20 +1504,12 @@ export class PullRequestRuntimeManager {
 	// retried, hit the same 403, and re-evicted. Network blips heal at the
 	// next TTL boundary instead. Gate-held calls are the exception: they never
 	// reached GitHub, and must retry as soon as another lookup restores access.
-	private cachedGitHubFetch<T>(
-		cache: Map<
-			string,
-			{
-				promise: Promise<T>;
-				fetchedAt: number;
-				consecutiveFailures: number;
-				fingerprint?: string;
-			}
-		>,
+	private cachedGitHubRequest<T>(
+		cache: Map<string, CachedGitHubRequest<T>>,
 		cacheKey: string,
 		options: { bypassCache?: boolean; fingerprint?: string },
 		fetcher: () => Promise<T>,
-	): Promise<T> {
+	): CachedGitHubRequest<T> {
 		const existing = cache.get(cacheKey);
 		// A fingerprint names the version of the thing cached (a PR's head
 		// SHA): a different one is a miss and a fresh failure streak, while
@@ -1519,13 +1524,14 @@ export class PullRequestRuntimeManager {
 				REPO_PULL_REQUEST_CACHE_MAX_TTL_MS,
 			);
 			if (Date.now() - cached.fetchedAt < ttl) {
-				return cached.promise;
+				return cached;
 			}
 		}
 
 		// Carry the failure streak forward so an in-flight retry keeps the
 		// backed-off TTL until it actually resolves.
 		const entry = {
+			sequence: ++this.requestSequence,
 			promise: fetcher(),
 			fetchedAt: Date.now(),
 			consecutiveFailures: cached?.consecutiveFailures ?? 0,
@@ -1552,15 +1558,17 @@ export class PullRequestRuntimeManager {
 			},
 		);
 		cache.set(cacheKey, entry);
-		return entry.promise;
+		return entry;
 	}
 
-	private async getCachedPullRequestForRef(
+	private getCachedPullRequestForRef(
 		repo: NormalizedRepoIdentity,
 		head: GitHubPullRequestHeadRef,
 		options: { bypassCache?: boolean } = {},
-	): Promise<GitHubPullRequestNode | null> {
+	): CachedGitHubRequest<GitHubPullRequestNode | null> {
 		const prNumber = syntheticPullRequestNumber(head, repo);
+		if (prNumber !== null)
+			return this.getCachedPullRequestByNumber(repo, prNumber, options);
 		// Branch stays case-sensitive so two case-variant branches can't share
 		// a cache entry and return each other's PR.
 		const cacheKey = [
@@ -1570,30 +1578,37 @@ export class PullRequestRuntimeManager {
 			head.repo.toLowerCase(),
 			head.branch,
 		].join("/");
-		return this.cachedGitHubFetch(
+		return this.cachedGitHubRequest(
 			this.pullRequestHeadCache,
 			cacheKey,
 			options,
 			() =>
 				this.fetchFromGitHub(
-					prNumber === null ? "PR head lookup" : "PR number lookup",
+					"PR head lookup",
 					{ owner: repo.owner, name: repo.name, head },
-					() =>
-						prNumber !== null
-							? fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber)
-							: fetchPullRequestByHeadFromGh(
-									this.execGh,
-									{ owner: repo.owner, name: repo.name },
-									head,
-								),
+					() => fetchPullRequestByHeadFromGh(this.execGh, repo, head),
+					async () => fetchPullRequestByHead(await this.github(), repo, head),
+					{ probe: options.bypassCache === true },
+				),
+		);
+	}
+
+	private getCachedPullRequestByNumber(
+		repo: NormalizedRepoIdentity,
+		prNumber: number,
+		options: { bypassCache?: boolean },
+	): CachedGitHubRequest<GitHubPullRequestNode | null> {
+		return this.cachedGitHubRequest(
+			this.pullRequestNumberCache,
+			`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${prNumber}`,
+			options,
+			() =>
+				this.fetchFromGitHub(
+					"PR number lookup",
+					{ owner: repo.owner, name: repo.name, prNumber },
+					() => fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber),
 					async () =>
-						prNumber !== null
-							? fetchPullRequestByNumber(await this.github(), repo, prNumber)
-							: fetchPullRequestByHead(
-									await this.github(),
-									{ owner: repo.owner, name: repo.name },
-									head,
-								),
+						fetchPullRequestByNumber(await this.github(), repo, prNumber),
 					{ probe: options.bypassCache === true },
 				),
 		);
@@ -1613,7 +1628,7 @@ export class PullRequestRuntimeManager {
 			name: repo.name,
 			prNumber: node.number,
 		};
-		return this.cachedGitHubFetch(
+		return this.cachedGitHubRequest(
 			this.pullRequestDetailsCache,
 			cacheKey,
 			{ ...options, fingerprint: node.headRefOid },
@@ -1678,18 +1693,18 @@ export class PullRequestRuntimeManager {
 				}
 				return { reviewDecision, checks, isInMergeQueue };
 			},
-		);
+		).promise;
 	}
 
 	// Deliberately narrow: repo-wide listing was removed in #4268/#4291 (the
 	// GraphQL sweep 504'd on large repos). This is a shallow `pulls?state=open`
 	// page, no checks, once per repo per TTL, only when a per-head lookup missed.
-	private async getCachedOpenPullRequests(
+	private getCachedOpenPullRequests(
 		repo: NormalizedRepoIdentity,
 		options: { bypassCache?: boolean } = {},
-	): Promise<GitHubPullRequestNode[]> {
+	): CachedGitHubRequest<GitHubPullRequestNode[]> {
 		const cacheKey = `${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}`;
-		return this.cachedGitHubFetch(
+		return this.cachedGitHubRequest(
 			this.openPullRequestsCache,
 			cacheKey,
 			options,
@@ -1774,20 +1789,12 @@ export class PullRequestRuntimeManager {
 		};
 		const startedAt = Date.now();
 		try {
-			const node = await this.cachedGitHubFetch(
-				this.pullRequestNumberCache,
-				`${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}#${prNumber}`,
+			const request = this.getCachedPullRequestByNumber(
+				repo,
+				prNumber,
 				options,
-				() =>
-					this.fetchFromGitHub(
-						"PR number lookup",
-						context,
-						() => fetchPullRequestByNumberFromGh(this.execGh, repo, prNumber),
-						async () =>
-							fetchPullRequestByNumber(await this.github(), repo, prNumber),
-						{ probe: options.bypassCache === true },
-					),
 			);
+			const node = await request.promise;
 			if (!node || node.number !== prNumber) return;
 			// A lookup that started earlier can resolve later; never let it
 			// overwrite what a newer one already stored.
@@ -1795,6 +1802,7 @@ export class PullRequestRuntimeManager {
 			if (
 				!latest ||
 				!PAST_PULL_REQUEST_REFRESH_STATES.includes(latest.state) ||
+				(this.appliedPullRequestSequence.get(rowId) ?? 0) > request.sequence ||
 				(latest.lastFetchedAt ?? 0) > startedAt
 			) {
 				return;
@@ -1822,6 +1830,7 @@ export class PullRequestRuntimeManager {
 				error: null,
 				now,
 			});
+			this.appliedPullRequestSequence.set(rowId, request.sequence);
 		} catch (error) {
 			console.warn(
 				"[host-service:pull-request-runtime] Failed to fetch past PR by number",
@@ -1836,22 +1845,24 @@ export class PullRequestRuntimeManager {
 		wantedRefs: Map<string, GitHubPullRequestHeadRef>,
 		options: { bypassCache?: boolean } = {},
 	): Promise<{
-		matched: Map<string, { id: string; isOpen: boolean }>;
+		matched: Map<string, PullRequestMatch>;
 		failedKeys: Set<string>;
+		supersededKeys: Set<string>;
 	}> {
-		const matched = new Map<string, { id: string; isOpen: boolean }>();
+		const matched = new Map<string, PullRequestMatch>();
 		const failedKeys = new Set<string>();
-		if (wantedRefs.size === 0) return { matched, failedKeys };
+		const supersededKeys = new Set<string>();
+		if (wantedRefs.size === 0) return { matched, failedKeys, supersededKeys };
 
-		const latestByKey = new Map<string, GitHubPullRequestNode>();
+		const latestByKey = new Map<
+			string,
+			{ node: GitHubPullRequestNode; sequence: number }
+		>();
 		await Promise.all(
 			Array.from(wantedRefs.entries()).map(async ([key, head]) => {
 				try {
-					const node = await this.getCachedPullRequestForRef(
-						repo,
-						head,
-						options,
-					);
+					const request = this.getCachedPullRequestForRef(repo, head, options);
+					const node = await request.promise;
 					if (!node) return;
 
 					const nodeKey = upstreamKey(
@@ -1863,7 +1874,7 @@ export class PullRequestRuntimeManager {
 						nodeKey === key ||
 						node.number === syntheticPullRequestNumber(head, repo)
 					) {
-						latestByKey.set(key, node);
+						latestByKey.set(key, { node, sequence: request.sequence });
 					}
 				} catch (error) {
 					failedKeys.add(key);
@@ -1895,7 +1906,8 @@ export class PullRequestRuntimeManager {
 			.map(([key]) => key);
 		if (unmatchedKeys.length > 0) {
 			try {
-				const openNodes = await this.getCachedOpenPullRequests(repo, options);
+				const request = this.getCachedOpenPullRequests(repo, options);
+				const openNodes = await request.promise;
 				// The one place drift is tolerated: index open PRs by a lowercased
 				// key. latestByKey stays keyed by the exact workspace key, so link
 				// assignment downstream is unchanged.
@@ -1913,7 +1925,7 @@ export class PullRequestRuntimeManager {
 				}
 				for (const key of unmatchedKeys) {
 					const node = openByLowerKey.get(key.toLowerCase());
-					if (node) latestByKey.set(key, node);
+					if (node) latestByKey.set(key, { node, sequence: request.sequence });
 				}
 			} catch (error) {
 				// Treat the whole sweep as failed lookups so existing links are
@@ -1927,10 +1939,20 @@ export class PullRequestRuntimeManager {
 		}
 
 		const now = Date.now();
+		// Different refs can identify the same PR. A cached branch response can
+		// outlive a newer numbered lookup, even within a single refresh.
+		const observations = [...latestByKey].sort(
+			(a, b) => b[1].sequence - a[1].sequence,
+		);
+		const latestByNumber = new Map<number, GitHubPullRequestNode>();
+		for (const [, { node }] of observations) {
+			if (!latestByNumber.has(node.number))
+				latestByNumber.set(node.number, node);
+		}
 
 		const detailsByNumber = new Map<number, PullRequestDetails>();
 		await Promise.all(
-			Array.from(latestByKey.values()).map(async (node) => {
+			Array.from(latestByNumber.values()).map(async (node) => {
 				try {
 					detailsByNumber.set(
 						node.number,
@@ -1951,8 +1973,30 @@ export class PullRequestRuntimeManager {
 			}),
 		);
 
-		for (const [key, node] of latestByKey) {
+		for (const [key, { node, sequence }] of observations) {
 			const existing = this.findPullRequestRow(repo, node.number);
+			if (
+				existing &&
+				(this.appliedPullRequestSequence.get(existing.id) ?? 0) > sequence
+			) {
+				if (
+					existing.headSha === node.headRefOid &&
+					existing.headBranch === node.headRefName
+				) {
+					matched.set(key, {
+						id: existing.id,
+						headSha: node.headRefOid,
+						sequence,
+						isOpen:
+							existing.state === "open" ||
+							existing.state === "draft" ||
+							existing.state === "queued",
+					});
+				} else {
+					supersededKeys.add(key);
+				}
+				continue;
+			}
 			// A failed fetch keeps the last-known state rather than blanking it.
 			const details = detailsByNumber.get(node.number);
 			const checks = details
@@ -1984,9 +2028,15 @@ export class PullRequestRuntimeManager {
 				now,
 			});
 
-			matched.set(key, { id: rowId, isOpen: node.state === "OPEN" });
+			this.appliedPullRequestSequence.set(rowId, sequence);
+			matched.set(key, {
+				id: rowId,
+				isOpen: node.state === "OPEN",
+				headSha: node.headRefOid,
+				sequence,
+			});
 		}
 
-		return { matched, failedKeys };
+		return { matched, failedKeys, supersededKeys };
 	}
 }
