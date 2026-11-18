@@ -70,10 +70,15 @@ const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 
 export interface CloudUsageFilters {
 	user?: string;
-	workspace?: string | string[];
-	project?: string;
+	workspace?: string;
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
+}
+
+export interface CloudFleetFilters
+	extends Omit<CloudUsageFilters, "workspace"> {
+	workspace?: string | string[];
+	project?: string;
 }
 
 export interface CloudUsageWindow {
@@ -174,7 +179,7 @@ function usd(gbMinutes: number, overagePerGbHour: number | null) {
 
 function scopeConditions(
 	scope: Scope,
-	filters: CloudUsageFilters,
+	filters: CloudFleetFilters,
 	columns: {
 		user: AnyPgColumn;
 		workspace: AnyPgColumn;
@@ -271,7 +276,7 @@ const NO_KEY: FactKeys = {
 function usageFacts(
 	db: Db,
 	scope: Scope,
-	filters: CloudUsageFilters,
+	filters: CloudFleetFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
 ) {
@@ -481,14 +486,19 @@ async function refsFor(
 	);
 }
 
-interface CloudUsageOptions<GroupBy> {
+interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
 	window: CloudUsageWindow;
-	filters?: CloudUsageFilters;
+	filters?: Filters;
 	groupBy?: GroupBy;
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
 }
+
+type CloudFleetUsageOptions = CloudUsageOptions<
+	CloudFleetGroupBy,
+	CloudFleetFilters
+> & { refs?: boolean };
 
 /**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
@@ -499,7 +509,7 @@ interface CloudUsageOptions<GroupBy> {
 async function usageRows(
 	db: Db,
 	scope: Scope,
-	options: CloudUsageOptions<CloudFleetGroupBy> & { refs?: boolean },
+	options: CloudFleetUsageOptions,
 ) {
 	const {
 		window,
@@ -610,7 +620,7 @@ export function queryCloudUsage(
 export function queryFleetCloudUsage(
 	db: Db,
 	organizationId: string | string[] | null,
-	options: CloudUsageOptions<CloudFleetGroupBy> & { refs?: boolean },
+	options: CloudFleetUsageOptions,
 ): Promise<CloudFleetUsageResult> {
 	return usageRows(db, { organizationId }, options);
 }
@@ -663,9 +673,9 @@ export async function queryCloudUsageByPeriod(
 	}));
 }
 
-interface CloudBootsOptions {
+interface CloudBootsOptions<Filters = CloudUsageFilters> {
 	window: CloudUsageWindow;
-	filters?: CloudUsageFilters;
+	filters?: Filters;
 	endReason?: CloudWorkspaceBootEndReason[];
 	open?: boolean;
 	limit: number;
@@ -674,70 +684,68 @@ interface CloudBootsOptions {
 	overagePerGbHour: number | null;
 }
 
-interface BootReadOptions extends Omit<CloudBootsOptions, "window"> {
+interface BootReadOptions
+	extends Omit<CloudBootsOptions<CloudFleetFilters>, "window"> {
 	window?: CloudUsageWindow;
 	/** A boot id or a Vercel session id. */
 	boot?: string;
 }
 
-async function bootRows(db: Db, scope: Scope, options: BootReadOptions) {
-	const {
-		window,
-		filters = {},
-		cursor,
-		limit,
-		now,
-		overagePerGbHour,
-	} = options;
-	const rows = await db
-		.select({
-			id: boots.id,
-			sessionId: boots.vercelSessionId,
-			workspace: { id: workspaces.id, name: workspaces.name },
-			user: { id: users.id, name: users.name, email: users.email },
-			startedAt: boots.startedAt,
-			stoppedAt: boots.stoppedAt,
-			memoryMb: boots.memoryMb,
-			vcpus: boots.vcpus,
-			endReason: boots.endReason,
-			gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BILLED_FEATURE} and ${events.sentAt} is not null)`,
-		})
+const bootColumns = {
+	id: boots.id,
+	sessionId: boots.vercelSessionId,
+	workspace: { id: workspaces.id, name: workspaces.name },
+	user: { id: users.id, name: users.name, email: users.email },
+	startedAt: boots.startedAt,
+	stoppedAt: boots.stoppedAt,
+	memoryMb: boots.memoryMb,
+	vcpus: boots.vcpus,
+	endReason: boots.endReason,
+	gbMinutes: sql<string>`(select coalesce(sum(${events.amount}), 0) from ${events} where ${events.bootId} = ${boots.id} and ${events.feature} = ${BILLED_FEATURE} and ${events.sentAt} is not null)`,
+};
+
+function bootConditions(scope: Scope, options: BootReadOptions) {
+	const { window, cursor } = options;
+	return and(
+		inOrganization(scope, boots.organizationId),
+		window && gte(boots.startedAt, window.from),
+		window && lt(boots.startedAt, window.to),
+		options.boot
+			? or(eq(boots.id, options.boot), eq(boots.vercelSessionId, options.boot))
+			: undefined,
+		...scopeConditions(scope, options.filters ?? {}, {
+			user: boots.createdByUserId,
+			workspace: boots.cloudWorkspaceId,
+			size: bootSize,
+		}),
+		options.endReason?.length
+			? inArray(boots.endReason, options.endReason)
+			: undefined,
+		options.open === undefined
+			? undefined
+			: options.open
+				? isNull(boots.stoppedAt)
+				: isNotNull(boots.stoppedAt),
+		cursor &&
+			or(
+				lt(boots.startedAt, cursor.startedAt),
+				and(eq(boots.startedAt, cursor.startedAt), lt(boots.id, cursor.id)),
+			),
+	);
+}
+
+/** Rows come fetched one past the limit. */
+const selectBootRows = (db: Db) =>
+	db
+		.select(bootColumns)
 		.from(boots)
 		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
-		.leftJoin(users, eq(users.id, boots.createdByUserId))
-		.where(
-			and(
-				inOrganization(scope, boots.organizationId),
-				window && gte(boots.startedAt, window.from),
-				window && lt(boots.startedAt, window.to),
-				options.boot
-					? or(
-							eq(boots.id, options.boot),
-							eq(boots.vercelSessionId, options.boot),
-						)
-					: undefined,
-				...scopeConditions(scope, filters, {
-					user: boots.createdByUserId,
-					workspace: boots.cloudWorkspaceId,
-					size: bootSize,
-				}),
-				options.endReason?.length
-					? inArray(boots.endReason, options.endReason)
-					: undefined,
-				options.open === undefined
-					? undefined
-					: options.open
-						? isNull(boots.stoppedAt)
-						: isNotNull(boots.stoppedAt),
-				cursor &&
-					or(
-						lt(boots.startedAt, cursor.startedAt),
-						and(eq(boots.startedAt, cursor.startedAt), lt(boots.id, cursor.id)),
-					),
-			),
-		)
-		.orderBy(desc(boots.startedAt), desc(boots.id))
-		.limit(limit + 1);
+		.leftJoin(users, eq(users.id, boots.createdByUserId));
+
+type BootRow = Awaited<ReturnType<typeof selectBootRows>>[number];
+
+function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
+	const { limit, now, overagePerGbHour } = options;
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
 	return {
@@ -757,30 +765,28 @@ async function bootRows(db: Db, scope: Scope, options: BootReadOptions) {
 	};
 }
 
-export type CloudBootsResult = Awaited<ReturnType<typeof bootRows>>;
-
-export type CloudFleetBootsResult = Omit<CloudBootsResult, "items"> & {
-	items: Array<CloudBootsResult["items"][number] & FleetBootFields>;
-};
-
-interface FleetBootFields {
-	organization: OrganizationRef | null;
-	activeCpuMinutes: number | null;
-	egressGb: number | null;
+/**
+ * Boot rows that started in the window, newest first, each with the sum of its sent events. A failed
+ * start with no boot row is not listed: it is a workspace, counted by `queryCloudUsage`.
+ */
+export async function listCloudBoots(
+	db: Db,
+	scope: CloudUsageScope,
+	options: CloudBootsOptions,
+) {
+	const rows = await selectBootRows(db)
+		.where(bootConditions(scope, options))
+		.orderBy(desc(boots.startedAt), desc(boots.id))
+		.limit(options.limit + 1);
+	return bootPage(rows, options);
 }
 
-const NO_FLEET_BOOT_FIELDS: FleetBootFields = {
-	organization: null,
-	activeCpuMinutes: null,
-	egressGb: null,
-};
+export type CloudBootsResult = Awaited<ReturnType<typeof listCloudBoots>>;
 
-async function fleetBootFields(db: Db, ids: string[]) {
-	const fields = new Map<string, FleetBootFields>();
-	if (ids.length === 0) return fields;
+async function fleetBoots(db: Db, scope: Scope, options: BootReadOptions) {
 	const rows = await db
 		.select({
-			id: boots.id,
+			...bootColumns,
 			organization: {
 				id: organizations.id,
 				name: organizations.name,
@@ -791,56 +797,34 @@ async function fleetBootFields(db: Db, ids: string[]) {
 		})
 		.from(boots)
 		.leftJoin(organizations, eq(organizations.id, boots.organizationId))
-		.where(inArray(boots.id, ids));
-	for (const { id, activeCpuMs, egressBytes, organization } of rows) {
-		fields.set(id, {
-			organization,
+		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
+		.leftJoin(users, eq(users.id, boots.createdByUserId))
+		.where(bootConditions(scope, options))
+		.orderBy(desc(boots.startedAt), desc(boots.id))
+		.limit(options.limit + 1);
+	const { items, nextCursor } = bootPage(rows, options);
+	return {
+		items: items.map(({ activeCpuMs, egressBytes, ...boot }) => ({
+			...boot,
 			activeCpuMinutes: activeCpuMs === null ? null : activeCpuMs / 60_000,
 			egressGb: egressBytes === null ? null : egressBytes / 1024 ** 3,
-		});
-	}
-	return fields;
-}
-
-/**
- * Boot rows that started in the window, newest first, each with the sum of its sent events. A failed
- * start with no boot row is not listed: it is a workspace, counted by `queryCloudUsage`.
- */
-export function listCloudBoots(
-	db: Db,
-	scope: CloudUsageScope,
-	options: CloudBootsOptions,
-) {
-	return bootRows(db, scope, options);
-}
-
-async function withFleetFields(
-	db: Db,
-	result: Awaited<ReturnType<typeof bootRows>>,
-): Promise<CloudFleetBootsResult> {
-	const fields = await fleetBootFields(
-		db,
-		result.items.map((boot) => boot.id),
-	);
-	return {
-		...result,
-		items: result.items.map((boot) => ({
-			...boot,
-			...(fields.get(boot.id) ?? NO_FLEET_BOOT_FIELDS),
 		})),
+		nextCursor,
 	};
 }
+
+export type CloudFleetBootsResult = Awaited<ReturnType<typeof fleetBoots>>;
 
 /**
  * `listCloudBoots` across organizations (`organizationId: null`), for some or for one, with the
  * organization, active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
  */
-export async function listFleetCloudBoots(
+export function listFleetCloudBoots(
 	db: Db,
 	organizationId: string | string[] | null,
-	options: CloudBootsOptions,
+	options: CloudBootsOptions<CloudFleetFilters>,
 ) {
-	return withFleetFields(db, await bootRows(db, { organizationId }, options));
+	return fleetBoots(db, { organizationId }, options);
 }
 
 /** One boot by boot id or Vercel session id, in any organization, or null. Staff only. */
@@ -851,13 +835,10 @@ export async function getFleetCloudBoot(
 ) {
 	const {
 		items: [found],
-	} = await withFleetFields(
+	} = await fleetBoots(
 		db,
-		await bootRows(
-			db,
-			{ organizationId: null },
-			{ ...options, boot, limit: 1 },
-		),
+		{ organizationId: null },
+		{ ...options, boot, limit: 1 },
 	);
 	return found ?? null;
 }

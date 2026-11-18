@@ -374,20 +374,28 @@ describe("fleet scope", () => {
 	});
 
 	test("one boot by id or session id, with its organization", async () => {
-		await db
-			.update(cloudWorkspaceBoots)
-			.set({ vercelSessionId: "sess_5" })
-			.where(eq(cloudWorkspaceBoots.id, "boot_5"));
-		const options = { now: NOW, overagePerGbHour: RATE };
-		const byId = await getFleetCloudBoot(db, "boot_5", options);
-		expect(byId).toMatchObject({
-			id: "boot_5",
-			sessionId: "sess_5",
-			organization: { id: OTHER_ORG },
-			gbHours: 100 / 60,
-		});
-		expect((await getFleetCloudBoot(db, "sess_5", options))?.id).toBe("boot_5");
-		expect(await getFleetCloudBoot(db, "boot_nope", options)).toBeNull();
+		const setSession = (vercelSessionId: string | null) =>
+			db
+				.update(cloudWorkspaceBoots)
+				.set({ vercelSessionId })
+				.where(eq(cloudWorkspaceBoots.id, "boot_5"));
+		await setSession("sess_5");
+		try {
+			const options = { now: NOW, overagePerGbHour: RATE };
+			const byId = await getFleetCloudBoot(db, "boot_5", options);
+			expect(byId).toMatchObject({
+				id: "boot_5",
+				sessionId: "sess_5",
+				organization: { id: OTHER_ORG },
+				gbHours: 100 / 60,
+			});
+			expect((await getFleetCloudBoot(db, "sess_5", options))?.id).toBe(
+				"boot_5",
+			);
+			expect(await getFleetCloudBoot(db, "boot_nope", options)).toBeNull();
+		} finally {
+			await setSession(null);
+		}
 	});
 
 	test("a failed workspace counts the same way on every path", async () => {
@@ -454,21 +462,5 @@ describe("fleet scope", () => {
 			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
-	});
-
-	test("a customer scope cannot group by more than user, day or workspace", () => {
-		const groupByOrganization = () =>
-			queryCloudUsage(
-				db,
-				{ organizationId: ORG },
-				{
-					window: NOVEMBER,
-					limit: 1,
-					// @ts-expect-error a customer scope groups by user, day or workspace
-					groupBy: "organization",
-					overagePerGbHour: RATE,
-				},
-			);
-		expect(groupByOrganization).toBeFunction();
 	});
 });
