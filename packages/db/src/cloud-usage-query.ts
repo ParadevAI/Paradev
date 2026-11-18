@@ -70,6 +70,12 @@ const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 			? inArray(column, scope.organizationId)
 			: eq(column, scope.organizationId);
 
+const workspaceOf = (scope: Scope, column: AnyPgColumn) =>
+	and(
+		eq(workspaces.id, column),
+		inOrganization(scope, workspaces.organizationId),
+	);
+
 export interface CloudUsageFilters {
 	user?: string;
 	workspace?: string | string[];
@@ -336,7 +342,7 @@ function usageFacts(
 		})
 		.from(events)
 		.leftJoin(boots, eq(boots.id, events.bootId))
-		.leftJoin(workspaces, eq(workspaces.id, events.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, events.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, events.organizationId),
@@ -360,7 +366,7 @@ function usageFacts(
 			failed: sql<boolean>`${boots.endReason} is not distinct from 'failed'`,
 		})
 		.from(boots)
-		.leftJoin(workspaces, eq(workspaces.id, boots.cloudWorkspaceId))
+		.leftJoin(workspaces, workspaceOf(scope, boots.cloudWorkspaceId))
 		.where(
 			and(
 				inOrganization(scope, boots.organizationId),
@@ -448,8 +454,14 @@ interface WorkspaceRef {
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
-	/** The newest boot in any window; its end reason is null while it runs. */
-	lastBoot: { endReason: CloudWorkspaceBootEndReason | null } | null;
+	/**
+	 * The newest boot the scope may see, in any window. `stoppedAt` is null while it runs; a stopped
+	 * boot with no end reason is from before end reasons were kept.
+	 */
+	lastBoot: {
+		endReason: CloudWorkspaceBootEndReason | null;
+		stoppedAt: Date | null;
+	} | null;
 }
 
 interface OrganizationRef {
@@ -518,18 +530,20 @@ async function refsFor(
 			.selectDistinctOn([boots.cloudWorkspaceId], {
 				workspaceId: boots.cloudWorkspaceId,
 				endReason: boots.endReason,
+				stoppedAt: boots.stoppedAt,
 			})
 			.from(boots)
 			.where(
 				and(
 					inOrganization(scope, boots.organizationId),
 					inArray(boots.cloudWorkspaceId, keys),
+					scope.userId ? eq(boots.createdByUserId, scope.userId) : undefined,
 				),
 			)
 			.orderBy(boots.cloudWorkspaceId, desc(boots.startedAt), desc(boots.id)),
 	]);
 	const lastBootOf = new Map(
-		lastBoots.map(({ workspaceId, endReason }) => [workspaceId, { endReason }]),
+		lastBoots.map(({ workspaceId, ...lastBoot }) => [workspaceId, lastBoot]),
 	);
 	return new Map(
 		rows.map(({ machineSize, failureReason, failedAt, ...row }) => [
@@ -596,7 +610,7 @@ async function usageRows(
 		return {
 			items: [],
 			total: toMetrics(await totalRow, overagePerGbHour),
-			count: 0,
+			rowCount: 0,
 			nextCursor: null,
 		};
 	}
@@ -629,7 +643,7 @@ async function usageRows(
 		(sort?.by === "name"
 			? sql`${cursor.value}`
 			: sql`${cursor.value}::numeric`);
-	const [rows, total, count] = await Promise.all([
+	const [rows, total, rowCount] = await Promise.all([
 		db
 			.with(facts)
 			.select({
@@ -665,10 +679,10 @@ async function usageRows(
 		db
 			.with(facts)
 			.select({
-				count: sql<number>`count(distinct ${sortKey})`.mapWith(Number),
+				rowCount: sql<number>`count(distinct ${sortKey})`.mapWith(Number),
 			})
 			.from(facts)
-			.then(([row]) => row?.count ?? 0),
+			.then(([row]) => row?.rowCount ?? 0),
 	]);
 	const page = rows.slice(0, limit);
 	const last = page.at(-1);
@@ -692,7 +706,7 @@ async function usageRows(
 			};
 		}),
 		total: toMetrics(total, overagePerGbHour),
-		count,
+		rowCount,
 		nextCursor:
 			rows.length > limit && last
 				? { value: last.sortValue, key: last.sortKey }

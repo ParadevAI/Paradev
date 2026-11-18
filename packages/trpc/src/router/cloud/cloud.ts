@@ -59,25 +59,42 @@ function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
 		: null;
 }
 
+function creditLine(credit: CloudUsage["bought"], rate: number | null) {
+	if (!credit?.grantedGbMinutes) return null;
+	const used = credit.grantedGbMinutes - credit.remainingGbMinutes;
+	return {
+		usedGbHours: used / 60,
+		totalGbHours: credit.grantedGbMinutes / 60,
+		usedUsd: gbMinutesUsd(used, rate),
+		totalUsd: gbMinutesUsd(credit.grantedGbMinutes, rate),
+	};
+}
+
 function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
 	const rate = cloudUsage.overagePerGbHour;
 	const included = cloudUsage.includedGbMinutes;
-	const bought = cloudUsage.prepaidGrantedGbMinutes;
 	const limit = cloudUsage.overageLimit;
-	const unavailable: CloudPeriodUnavailable[] = [];
-	if (bought === null)
-		unavailable.push({ field: "bought", reason: "not_read" });
-	unavailable.push({ field: "freeCredits", reason: "pooled_with_seats" });
-	if (limit === null) {
-		unavailable.push({ field: "extraUsageLimit", reason: "not_read" });
-	} else if (limit.type === "usage_percentage") {
+	const unavailable: CloudPeriodUnavailable[] =
+		cloudUsage.bought === null
+			? (
+					[
+						"seats",
+						"bought",
+						"freeCredits",
+						"extraUsageLimit",
+						"limitReached",
+					] as const
+				).map((field) => ({ field, reason: "not_read" }))
+			: [];
+	if (limit?.type === "usage_percentage") {
 		unavailable.push({
 			field: "extraUsageLimit",
 			reason: "percent_of_allowance",
 		});
 	}
-	unavailable.push({ field: "limitReached", reason: "not_tracked" });
-	const boughtUsed = (bought ?? 0) - cloudUsage.prepaidGbMinutes;
+	if (cloudUsage.bought !== null && cloudUsage.limitReached === null) {
+		unavailable.push({ field: "limitReached", reason: "not_tracked" });
+	}
 	return {
 		allowance: {
 			includedGbHours: included === null ? null : included / 60,
@@ -89,14 +106,8 @@ function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
 			includedUsd: included === null ? null : gbMinutesUsd(included, rate),
 			overageUsd: gbMinutesUsd(cloudUsage.overageGbMinutes, rate),
 			seats: cloudUsage.seats,
-			bought: bought
-				? {
-						usedGbHours: boughtUsed / 60,
-						totalGbHours: bought / 60,
-						usedUsd: gbMinutesUsd(boughtUsed, rate),
-						totalUsd: gbMinutesUsd(bought, rate),
-					}
-				: null,
+			bought: creditLine(cloudUsage.bought, rate),
+			freeCredits: creditLine(cloudUsage.freeCredits, rate),
 			extraUsageLimit:
 				limit?.type === "absolute"
 					? {
@@ -104,6 +115,7 @@ function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
 							usd: gbMinutesUsd(limit.gbMinutes, rate),
 						}
 					: null,
+			limitReached: cloudUsage.limitReached,
 		},
 		unavailable,
 	};

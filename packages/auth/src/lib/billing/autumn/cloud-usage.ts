@@ -14,15 +14,26 @@ type CloudOverageLimit =
 	| { type: "absolute"; gbMinutes: number }
 	| { type: "usage_percentage"; percent: number };
 
-/** `null` in a field added after release means a cached value from before it. */
+/** One-off credit, in GB-minutes. */
+interface CloudCredit {
+	grantedGbMinutes: number;
+	remainingGbMinutes: number;
+}
+
+/** `null` in `bought` means a cached value from before it and the fields after it. */
 export interface CloudUsage {
 	includedGbMinutes: number | null;
 	usedGbMinutes: number;
 	overageGbMinutes: number;
 	prepaidGbMinutes: number;
-	prepaidGrantedGbMinutes: number | null;
+	/** One-off rows sold at a prepaid price, with credit carried from an earlier pack. */
+	bought: CloudCredit | null;
+	/** One-off rows with no prepaid price: a grant. */
+	freeCredits: CloudCredit | null;
 	seats: number | null;
 	overageLimit: CloudOverageLimit | null;
+	/** Null when Autumn decides it on a rule this does not read: a percentage cap, a usage limit. */
+	limitReached: boolean | null;
 	autoTopup: CloudAutoTopup | null;
 	pack: GbHourPack | null;
 	overagePerGbHour: number | null;
@@ -48,6 +59,14 @@ export function cloudUsageFromBalances(
 	const prepaid = breakdown.filter(
 		(item) => item.reset?.interval === "one_off",
 	);
+	const credit = (rows: typeof prepaid): CloudCredit => ({
+		grantedGbMinutes: sum(
+			rows.map((item) => item.includedGrant + item.prepaidGrant),
+		),
+		remainingGbMinutes: sum(rows.map((item) => item.remaining)),
+	});
+	const isBought = (item: (typeof prepaid)[number]) =>
+		item.price?.billingMethod === "prepaid";
 	const recurring = breakdown.filter(
 		(item) => item.reset?.interval !== "one_off",
 	);
@@ -61,6 +80,18 @@ export function cloudUsageFromBalances(
 	const spendLimit = billingControls?.spendLimits?.find(
 		(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID && item.enabled,
 	);
+	const hasUsageLimit = billingControls?.usageLimits?.some(
+		(item) => item.featureId === BOX_GB_MINUTES_FEATURE_ID && item.enabled,
+	);
+	const overageLimit: CloudOverageLimit = balance.unlimited
+		? { type: "none" }
+		: !overageAllowed
+			? { type: "absolute", gbMinutes: 0 }
+			: spendLimit?.overageLimit === undefined
+				? { type: "none" }
+				: spendLimit.limitType === "usage_percentage"
+					? { type: "usage_percentage", percent: spendLimit.overageLimit }
+					: { type: "absolute", gbMinutes: spendLimit.overageLimit };
 	return {
 		includedGbMinutes: balance.unlimited
 			? null
@@ -74,19 +105,15 @@ export function cloudUsageFromBalances(
 			? 0
 			: Math.max(0, balance.usage - balance.granted),
 		prepaidGbMinutes: Math.max(0, sum(prepaid.map((item) => item.remaining))),
-		prepaidGrantedGbMinutes: sum(
-			prepaid.map((item) => item.includedGrant + item.prepaidGrant),
-		),
+		bought: credit(prepaid.filter(isBought)),
+		freeCredits: credit(prepaid.filter((item) => !isBought(item))),
 		seats,
-		overageLimit: balance.unlimited
-			? { type: "none" }
-			: !overageAllowed
-				? { type: "absolute", gbMinutes: 0 }
-				: spendLimit?.overageLimit === undefined
-					? { type: "none" }
-					: spendLimit.limitType === "usage_percentage"
-						? { type: "usage_percentage", percent: spendLimit.overageLimit }
-						: { type: "absolute", gbMinutes: spendLimit.overageLimit },
+		overageLimit,
+		limitReached:
+			hasUsageLimit || overageLimit.type === "usage_percentage"
+				? null
+				: overageLimit.type === "absolute" &&
+					balance.remaining <= -overageLimit.gbMinutes,
 		autoTopup: topup
 			? {
 					enabled: topup.enabled,

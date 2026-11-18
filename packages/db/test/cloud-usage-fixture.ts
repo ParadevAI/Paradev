@@ -177,6 +177,16 @@ export async function seedCloudUsage() {
 					"2026-11-10T10:00Z",
 					"idle",
 				],
+				// Another person's boot of Sam's workspace, after every window the tests read.
+				[
+					"boot_7",
+					BILLING_PAGE,
+					MAYA,
+					8,
+					"2026-12-05T08:00Z",
+					"2026-12-05T09:00Z",
+					"user",
+				],
 			] as const
 		).map(
 			([

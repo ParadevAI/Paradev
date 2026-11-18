@@ -43,7 +43,7 @@ export const cloudUsageInputSchema = cloudListInputSchema
 	.extend({
 		groupBy: z.enum(cloudUsageGroupByValues).optional(),
 		/** Owners and admins only: a member always gets their own rows. */
-		user: z.string().optional(),
+		user: z.uuid().optional(),
 		size: machineSizeSchema.optional(),
 		status: z.array(cloudWorkspaceStatusEnum).optional(),
 		search: z.string().max(200).optional(),
@@ -145,6 +145,7 @@ export const cloudUsageOutputSchema = z.object({
 						lastBoot: z
 							.object({
 								endReason: cloudWorkspaceBootEndReasonEnum.nullable(),
+								stoppedAt: z.date().nullable(),
 							})
 							.nullable(),
 					}),
@@ -154,8 +155,11 @@ export const cloudUsageOutputSchema = z.object({
 		}),
 	),
 	total: metricsSchema,
-	/** Groups across every page; 0 with no groupBy. */
-	count: z.number(),
+	/**
+	 * Rows across every page; 0 with no groupBy. Grouped by workspace it counts the one row of usage
+	 * with no workspace (key null), which `total.workspaces` does not.
+	 */
+	rowCount: z.number(),
 	nextCursor: z.string().nullable(),
 }) satisfies z.ZodType<Page<CloudUsageResult>>;
 
@@ -185,6 +189,7 @@ export const cloudBootsOutputSchema = z.object({
 const periodUnavailableSchema = z.object({
 	field: z.enum([
 		"allowance",
+		"seats",
 		"bought",
 		"freeCredits",
 		"extraUsageLimit",
@@ -194,13 +199,22 @@ const periodUnavailableSchema = z.object({
 		"closed_period",
 		"owners_and_admins_only",
 		"not_read",
-		"pooled_with_seats",
 		"percent_of_allowance",
 		"not_tracked",
 	]),
 });
 
 export type CloudPeriodUnavailable = z.infer<typeof periodUnavailableSchema>;
+
+/** Null when there is none of it. */
+const creditLineSchema = z
+	.object({
+		usedGbHours: z.number(),
+		totalGbHours: z.number(),
+		usedUsd: z.number().nullable(),
+		totalUsd: z.number().nullable(),
+	})
+	.nullable();
 
 export const cloudPeriodsOutputSchema = z.object({
 	items: z.array(
@@ -220,18 +234,14 @@ export const cloudPeriodsOutputSchema = z.object({
 					includedUsd: z.number().nullable(),
 					overageUsd: z.number().nullable(),
 					seats: z.number().nullable(),
-					bought: z
-						.object({
-							usedGbHours: z.number(),
-							totalGbHours: z.number(),
-							usedUsd: z.number().nullable(),
-							totalUsd: z.number().nullable(),
-						})
-						.nullable(),
+					bought: creditLineSchema,
+					freeCredits: creditLineSchema,
 					/** Null with no cap, or with an `unavailable` entry when the cap is not known. */
 					extraUsageLimit: z
 						.object({ gbHours: z.number(), usd: z.number().nullable() })
 						.nullable(),
+					/** True at the cap: nothing left with overage off, or the absolute cap used up. */
+					limitReached: z.boolean().nullable(),
 				})
 				.nullable(),
 			unavailable: z.array(periodUnavailableSchema),
