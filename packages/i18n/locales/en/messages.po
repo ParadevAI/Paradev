@@ -1043,6 +1043,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} GB-hours"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 
@@ -1162,6 +1165,9 @@ msgstr "{name} failed"
 
 msgid "{name} finished"
 msgstr "{name} finished"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1361,6 +1367,12 @@ msgstr "{skipped, plural, one {# skipped} other {# skipped}}"
 msgid "{starCount} stars and counting"
 msgstr "{starCount} stars and counting"
 
+msgid "{start} to {end}"
+msgstr "{start} to {end}"
+
+msgid "{start} to {end} (current)"
+msgstr "{start} to {end} (current)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Started # automation} other {Started # automations}}"
 
@@ -1447,6 +1459,9 @@ msgstr "{user} rejoined."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} vCPU, {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Waiting"
@@ -1953,9 +1968,6 @@ msgstr "Account name"
 
 msgid "Account pending deletion"
 msgstr "Account pending deletion"
-
-msgid "Account usage"
-msgstr "Account usage"
 
 msgid "Account usage: {percent} used"
 msgstr "Account usage: {percent} used"
@@ -3097,6 +3109,10 @@ msgstr "Archive workspace"
 msgid "Archived"
 msgstr "Archived"
 
+msgctxt "cloud workspace status"
+msgid "Archived"
+msgstr "Archived"
+
 #. placeholder {0}: formatCompactRelativeTime(archivedAt, now)
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
@@ -3193,6 +3209,10 @@ msgstr "Asks before edits and commands"
 
 msgid "Asks only for risky actions"
 msgstr "Asks only for risky actions"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "Asleep"
 
 msgid "Aspect Ratio"
 msgstr "Aspect Ratio"
@@ -3566,6 +3586,9 @@ msgstr "Billing"
 msgid "Billing details"
 msgstr "Billing details"
 
+msgid "Billing period"
+msgstr "Billing period"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 
@@ -3630,6 +3653,9 @@ msgstr "Boot"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "Booting {0}…"
+
+msgid "Boots"
+msgstr "Boots"
 
 msgid "Border"
 msgstr "Border"
@@ -4356,6 +4382,9 @@ msgstr "Checks passed"
 msgid "Checks Skipped"
 msgstr "Checks Skipped"
 
+msgid "Checks unavailable"
+msgstr "Checks unavailable"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Choose a {pluginLabel} account"
 
@@ -4793,8 +4822,14 @@ msgstr "Cloud sandboxes"
 msgid "Cloud usage"
 msgstr "Cloud usage"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Cloud usage is not enabled for this organization."
+
 msgid "Cloud workspace"
 msgstr "Cloud workspace"
+
+msgid "Cloud workspace usage for the whole organization."
+msgstr "Cloud workspace usage for the whole organization."
 
 msgid "Cloud workspace: asleep"
 msgstr "Cloud workspace: asleep"
@@ -4826,6 +4861,9 @@ msgstr "Cloud workspaces commit, push and open pull requests as you"
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "Cloud workspaces need a paid plan."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
@@ -5774,6 +5812,9 @@ msgstr "Could not list directory"
 msgid "Could not load agents from {0}"
 msgstr "Could not load agents from {0}"
 
+msgid "Could not load cloud usage."
+msgstr "Could not load cloud usage."
+
 msgid "Could not load environments"
 msgstr "Could not load environments"
 
@@ -5933,6 +5974,9 @@ msgstr "Could not share"
 msgid "Could not sign out. Please try again."
 msgstr "Could not sign out. Please try again."
 
+msgid "Could not start"
+msgstr "Could not start"
+
 msgid "Could not start agent"
 msgstr "Could not start agent"
 
@@ -6015,6 +6059,9 @@ msgstr "Couldn't branch the conversation"
 msgid "Couldn't cancel the move"
 msgstr "Couldn't cancel the move"
 
+msgid "Couldn't change the group color"
+msgstr "Couldn't change the group color"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Couldn't change the machine size: {0}"
@@ -6061,8 +6108,14 @@ msgstr "Couldn't create stack"
 msgid "Couldn't create the channel"
 msgstr "Couldn't create the channel"
 
+msgid "Couldn't create the group"
+msgstr "Couldn't create the group"
+
 msgid "Couldn't create workspace"
 msgstr "Couldn't create workspace"
+
+msgid "Couldn't delete the group"
+msgstr "Couldn't delete the group"
 
 msgid "Couldn't discard changes"
 msgstr "Couldn't discard changes"
@@ -6150,6 +6203,9 @@ msgstr "Couldn't move {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
 
+msgid "Couldn't move the workspace"
+msgstr "Couldn't move the workspace"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
 
@@ -6199,6 +6255,9 @@ msgstr "Couldn't remove from the merge queue"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Couldn't remove the local sign-in"
+
+msgid "Couldn't rename the group"
+msgstr "Couldn't rename the group"
 
 msgid "Couldn't restart terminals"
 msgstr "Couldn't restart terminals"
@@ -6355,6 +6414,9 @@ msgstr "CPU cores"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "CPU-bound"
+
+msgid "Crashed"
+msgstr "Crashed"
 
 msgid "Create"
 msgstr "Create"
@@ -7001,6 +7063,10 @@ msgstr "deleted"
 msgid "Deleted"
 msgstr "Deleted"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "Deleted"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "Deleted"
@@ -7047,6 +7113,9 @@ msgstr "Deleted projects can be restored for 30 days, with the workspaces that w
 
 msgid "Deleted user"
 msgstr "Deleted user"
+
+msgid "Deleted workspace"
+msgstr "Deleted workspace"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "Deleted workspaces, but couldn’t finish updating the sidebar"
@@ -8259,6 +8328,13 @@ msgstr "Failed"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "Failed"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "Failed"
+
+msgid "Failed {failedAt}"
+msgstr "Failed {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Failed runs <0>· 7d</0>"
@@ -9860,6 +9936,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Hourly"
 
+msgid "Hours"
+msgstr "Hours"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 
@@ -10650,6 +10729,9 @@ msgstr "Its comments and history go with it."
 msgid "Its connected accounts were disconnected."
 msgstr "Its connected accounts were disconnected."
 
+msgid "Its machine no longer exists."
+msgstr "Its machine no longer exists."
+
 msgid "Its own branch and copy of the files"
 msgstr "Its own branch and copy of the files"
 
@@ -10658,6 +10740,12 @@ msgstr "Its plugins appear when the sync finishes."
 
 msgid "Its replies go with it."
 msgstr "Its replies go with it."
+
+msgid "Its saved state expired."
+msgstr "Its saved state expired."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Its terminal opens here when the cloud workspace starts it."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
@@ -12590,6 +12678,13 @@ msgstr "No authors found."
 msgid "No automations match"
 msgstr "No automations match"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "No billing period starts on {0}."
+
+msgid "No boots in this period."
+msgstr "No boots in this period."
+
 msgid "No branches found"
 msgstr "No branches found"
 
@@ -12631,6 +12726,9 @@ msgstr "No Claude or Codex usage found on this machine yet. Join now and you'll 
 
 msgid "No cloud environment opens {repository}."
 msgstr "No cloud environment opens {repository}."
+
+msgid "No cloud usage in this period."
+msgstr "No cloud usage in this period."
 
 msgid "No cloud workspaces"
 msgstr "No cloud workspaces"
@@ -12928,6 +13026,9 @@ msgstr "No pending invitations"
 
 msgid "No people found."
 msgstr "No people found."
+
+msgid "No person recorded"
+msgstr "No person recorded"
 
 msgid "No plugins available yet."
 msgstr "No plugins available yet."
@@ -13604,6 +13705,9 @@ msgstr "Only organization owners can modify these settings."
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Only organization owners or the device's owner can delete this project."
 
+msgid "Only owners and admins can see usage by person."
+msgstr "Only owners and admins can see usage by person."
+
 msgid "Only owners can change membership."
 msgstr "Only owners can change membership."
 
@@ -13690,6 +13794,9 @@ msgstr "Only you can use this connection. Teammates connect their own {name} acc
 
 msgid "Only you. Teammates forward their own."
 msgstr "Only you. Teammates forward their own."
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "Only your own workspaces. Organization totals are for owners and admins."
 
 msgid "open"
 msgstr "open"
@@ -15841,6 +15948,10 @@ msgstr "Reads and posts"
 msgid "Ready"
 msgstr "Ready"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "Ready"
+
 msgid "Ready for review"
 msgstr "Ready for review"
 
@@ -16046,6 +16157,9 @@ msgstr "Release control"
 
 msgid "Release…"
 msgstr "Release…"
+
+msgid "Released before use"
+msgstr "Released before use"
 
 msgid "Reload"
 msgstr "Reload"
@@ -16494,9 +16608,6 @@ msgstr "Reset location"
 msgid "Reset terminal"
 msgstr "Reset terminal"
 
-msgid "Reset time unavailable"
-msgstr "Reset time unavailable"
-
 msgid "Reset to default"
 msgstr "Reset to default"
 
@@ -16617,6 +16728,9 @@ msgstr "Restart workspace"
 
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "Restart workspaces to pick up new agent credentials."
+
+msgid "Restarted"
+msgstr "Restarted"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "Restarted {restartedOrgCount} host services"
@@ -17089,6 +17203,10 @@ msgstr "Run."
 msgid "running"
 msgstr "running"
 
+msgid "Running"
+msgstr "Running"
+
+msgctxt "cloud workspace status"
 msgid "Running"
 msgstr "Running"
 
@@ -17605,6 +17723,9 @@ msgstr "See the open roles, or try Paradev first."
 
 msgid "See this gate on the scorecard"
 msgstr "See this gate on the scorecard"
+
+msgid "See usage"
+msgstr "See usage"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "See what changed, give feedback, and merge the work when it's ready."
@@ -19027,6 +19148,10 @@ msgstr "starting"
 msgid "Starting"
 msgstr "Starting"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "Starting"
+
 msgid "Starting {agentLabel}"
 msgstr "Starting {agentLabel}"
 
@@ -19180,11 +19305,17 @@ msgstr "Stopped"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "Stopped {0} ({1} GB) to free memory"
 
+msgid "Stopped by a person"
+msgstr "Stopped by a person"
+
 msgid "Stopped by the usage limit"
 msgstr "Stopped by the usage limit"
 
 msgid "Stopped moving {name}"
 msgstr "Stopped moving {name}"
+
+msgid "Stopped when idle"
+msgstr "Stopped when idle"
 
 msgid "Stopping the agent in {what}"
 msgstr "Stopping the agent in {what}"
@@ -19766,6 +19897,9 @@ msgstr "That account is no longer connected — choose another."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "That agent session has no conversation to open yet. It was started but never prompted."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "That cursor could not be read. Drop it to start from the first page."
+
 msgid "that device"
 msgstr "that device"
 
@@ -20011,6 +20145,9 @@ msgstr "The human reads every line before it merges."
 msgid "The image upload expired — attach it again"
 msgstr "The image upload expired — attach it again"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "The included and overage GB-hours are kept for the current period only."
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 
@@ -20082,6 +20219,9 @@ msgstr "The open-source workspace for Claude Code, Codex, and any coding agent."
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
+
+msgid "The organization reached its usage limit."
+msgstr "The organization reached its usage limit."
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
@@ -20227,8 +20367,17 @@ msgstr "The update can also:"
 msgid "The very beginning"
 msgstr "The very beginning"
 
+msgid "The workspace could not be created."
+msgstr "The workspace could not be created."
+
+msgid "The workspace could not be queued to start."
+msgstr "The workspace could not be queued to start."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "The workspace couldn't be reached. Check that it is running, then try again."
+
+msgid "The workspace did not become ready."
+msgstr "The workspace did not become ready."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "The workspace is not ready yet. Try again."
@@ -20506,6 +20655,12 @@ msgstr "This only changes the display name, not the branch."
 
 msgid "this organization"
 msgstr "this organization"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "This organization has no billing periods, so this page shows the last 30 days."
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "This organization has no billing periods. Choose a time range instead."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
@@ -21618,8 +21773,17 @@ msgstr "URL-friendly identifier, unique within your organization."
 msgid "Usage"
 msgstr "Usage"
 
+msgid "Usage by day"
+msgstr "Usage by day"
+
+msgid "Usage by person"
+msgstr "Usage by person"
+
 msgid "Usage is out of date"
 msgstr "Usage is out of date"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
 
 msgid "Usage limit reached"
 msgstr "Usage limit reached"
@@ -22756,6 +22920,9 @@ msgstr "You don't have access to this terminal."
 msgid "You don't have permission to remove this member"
 msgstr "You don't have permission to remove this member"
 
+msgid "You have no cloud usage in this period."
+msgstr "You have no cloud usage in this period."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "You have unsaved environment variables. Are you sure you want to close?"
 
@@ -22871,6 +23038,9 @@ msgstr "Your changes will be lost if you don't save them."
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "Your chat history stays. Only the agent restarts."
 
+msgid "Your cloud usage"
+msgstr "Your cloud usage"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Your cloud workspaces will no longer be able to reach this host."
 
@@ -22955,6 +23125,9 @@ msgstr "Your plan does not include cloud environments."
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "Your plan includes no cloud GB-hours."
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 
@@ -23002,6 +23175,9 @@ msgstr "Your tier is a weighted score across the {0} axes measured for you, so a
 msgid "Your tokens"
 msgstr "Your tokens"
 
+msgid "Your usage by day"
+msgstr "Your usage by day"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 
@@ -23016,6 +23192,9 @@ msgstr "Your workspace admin turns on device code sign-in for Codex."
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "Your workspace is unchanged. You can move it again in a few minutes."
+
+msgid "Your workspaces"
+msgstr "Your workspaces"
 
 msgid "Zap"
 msgstr "Zap"

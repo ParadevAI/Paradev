@@ -21,6 +21,7 @@ import {
 import { createPortal } from "react-dom";
 import { env } from "renderer/env.renderer";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useDebouncedValue } from "renderer/hooks/useDebouncedValue";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -328,14 +329,11 @@ export function WorkspaceActivityMenu({
 		getAttachedSnapshot,
 		getAttachedSnapshot,
 	);
-	const terminalSessionsQuery = workspaceTrpc.terminal.list.useQuery(
-		{ workspaceId },
-		{
-			refetchInterval: getBackgroundTerminalRefetchInterval(open),
-			refetchOnWindowFocus: open,
-			staleTime: open ? 1_000 : 5_000,
-		},
-	);
+	const terminalSessionsQuery = useWorkspaceTerminalSessions(workspaceId, {
+		refetchInterval: getBackgroundTerminalRefetchInterval(open),
+		refetchOnWindowFocus: open,
+		staleTime: open ? 1_000 : 5_000,
+	});
 	const settledAttachedTerminalIdsKey = useDebouncedValue(
 		attachedTerminalIdsKey,
 		BACKGROUND_TERMINAL_ATTACHMENT_DEBOUNCE_MS,

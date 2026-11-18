@@ -70,6 +70,10 @@ async function readShared(key: string): Promise<OrganizationBilling | null> {
 			planTier: value.planTier ?? value.tier,
 			scheduledPlanId: value.scheduledPlanId ?? null,
 			scheduledAt: value.scheduledAt ?? null,
+			cloudUsage: value.cloudUsage && {
+				...value.cloudUsage,
+				overagePerGbHour: value.cloudUsage.overagePerGbHour ?? null,
+			},
 			environmentLimit:
 				value.environmentLimit !== undefined
 					? value.environmentLimit

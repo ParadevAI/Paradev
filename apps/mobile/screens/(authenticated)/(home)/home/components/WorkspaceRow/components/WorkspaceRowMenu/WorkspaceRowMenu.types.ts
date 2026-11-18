@@ -24,5 +24,13 @@ export interface WorkspaceRowMenuProps {
 		moveToCloud: () => void;
 		moveToComputer: (computer: MoveDestinationComputer) => void;
 	};
+	/** Desktop's sidebar groups in the workspace's project. */
+	groups?: {
+		options: { tag: string; name: string }[];
+		/** The group the workspace is in, or null. */
+		current: string | null;
+		onMove: (tag: string | null) => void;
+		onCreate: () => void;
+	};
 	children: ReactNode;
 }

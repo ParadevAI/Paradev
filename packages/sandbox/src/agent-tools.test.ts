@@ -11,6 +11,7 @@ import { join } from "node:path";
 import {
 	type AgentToolsManifest,
 	agentToolsDrivesToPrune,
+	agentToolsGaps,
 	agentToolsManifest,
 	type DriveHost,
 	describeAgentToolsPublish,
@@ -19,6 +20,8 @@ import {
 	pruneAgentToolsDrives,
 	publishAgentToolsDrive,
 	publishAgentToolsDrives,
+	type RegionPublish,
+	referencedAgentToolsDrives,
 	renderBuilderScript,
 } from "./agent-tools";
 import { type Assets, loadAssets, sha256 } from "./manifest";
@@ -284,12 +287,20 @@ describe("publishAgentToolsDrive", () => {
 		expect(agentLine(scripts[drive], "chrome")).toEndWith(
 			"'--headless' '--version'",
 		);
-		const lines = describeAgentToolsPublish([{ region: "sfo1", result }]);
+		expect(result.available.map(({ name }) => name)).toEqual([
+			"claude",
+			"codex",
+			"pdev",
+		]);
+		const lines = describeAgentToolsPublish([{ region: "sfo1", result }], {
+			...agentAssets,
+			pdev: { ...(agentAssets.pdev as Assets[string]), version: "0.2.6" },
+		});
 		expect(lines[0]).toBe(
 			`agent-tools: ${drive} published: claude written, codex reused, pdev kept-previous, chrome dropped`,
 		);
 		expect(lines.slice(1)).toEqual([
-			expect.stringMatching(/^::warning::.*pdev kept 999999999999/),
+			`::warning::agent-tools: sfo1: pdev 0.2.6 failed; ${drive} keeps 999999999999 from the earlier drive`,
 			expect.stringMatching(/^::warning::.*chrome left out/),
 		]);
 	});
@@ -339,6 +350,61 @@ test("builder results ignore lines that are not results", () => {
 			`claude: written\nagent-tools-result claude reused ${sha("a")}\nagent-tools-result x bogus\n`,
 		),
 	).toEqual([{ name: "claude", outcome: "reused", sha: sha("a") }]);
+});
+
+describe("agentToolsGaps", () => {
+	const published = (
+		region: "sfo1" | "iad1" | "fra1",
+		names: string[],
+	): RegionPublish => ({
+		region,
+		result: {
+			drive: `agent-tools-${region}-0123456789ab`,
+			outcome: "exists",
+			agents: [],
+			available: names.map((name) => ({ name, sha: sha("a") })),
+		},
+	});
+
+	test("names each needed region whose drive is missing or lacks a required agent", () => {
+		const results: RegionPublish[] = [
+			published("sfo1", ["claude", "codex", "pdev", "pi"]),
+			published("iad1", ["claude", "pi"]),
+			{ region: "fra1", error: new Error("builder exited 1") },
+		];
+		expect(agentToolsGaps(results, new Set(["sfo1", "iad1", "fra1"]))).toEqual([
+			"iad1: agent-tools-iad1-0123456789ab has no codex, pdev",
+			"fra1: no drive",
+		]);
+	});
+
+	test("ignores regions no box needs, and an optional agent left out", () => {
+		const results: RegionPublish[] = [
+			published("sfo1", ["claude", "codex", "pdev"]),
+			{ region: "fra1", error: new Error("builder exited 1") },
+		];
+		expect(agentToolsGaps(results, new Set(["sfo1"]))).toEqual([]);
+	});
+});
+
+test("referenced drives: every row's bundle in its region, and the recent bundles in every region", () => {
+	const older = "1".repeat(64);
+	expect(
+		[
+			...referencedAgentToolsDrives({
+				rows: [
+					{ region: "iad1", bundleSha: older },
+					{ region: "fra1", bundleSha: null },
+				],
+				recentBundles: [BUNDLE],
+				regions: ["sfo1", "iad1"],
+			}),
+		].sort(),
+	).toEqual([
+		"agent-tools-iad1-0123456789ab",
+		"agent-tools-iad1-111111111111",
+		"agent-tools-sfo1-0123456789ab",
+	]);
 });
 
 describe("pruning", () => {

@@ -31,16 +31,16 @@ one TLC worker, so a failure always prints the shortest trace. A pass takes abou
 
 ## Coverage record
 
-Synced with commit `623b52bf4`. Paths are under `packages/trpc/src/`.
+Synced with commit `0ca8daad`. Paths are under `packages/trpc/src/`.
 
 | Action | Code |
 | --- | --- |
 | `ProvisionDone` | `provisionCloudWorkspace` in `router/cloud-workspace/provision.ts`: `provisionSandbox`, the transition to `awake`, then `recordSandboxAwake` |
-| `WakeResume` / `WakeRecord` | `wakeCloudWorkspace` in `router/cloud-workspace/wake.ts`: `wakeSandbox` in `lib/sandbox/vercel.ts`, then `recordSandboxAwake` in `router/cloud-workspace/sandbox-expiry.ts` |
+| `WakeResume` / `WakeRecord` | `wakeCloudWorkspace` in `router/cloud-workspace/wake.ts`: `wakeSandbox` in `lib/sandbox/vercel.ts`, then `recordSandboxAwake` in `router/cloud-workspace/sandbox-expiry.ts`. A wake that read the box running and resumed it after a timeout stop is the same `WakeResume`: the box was stopped when the call resumed it |
 | `TopUpExtend` / `TopUpRecord` | `sandbox.keepalive` in `router/sandbox/sandbox.ts`: `topUpSandboxSession`, then `recordSandboxAwake` |
-| `StopBox` / `StopRecord` | `stopAndSnapshot` or `stopSandbox`, then `recordSandboxAsleep` in `router/cloud-workspace/sandbox-sleep.ts`, from `cloudWorkspace.sleep` (`cloud-workspace.ts`), `restartCloudWorkspace` (`wake.ts`), and the spend-cap stops in `meter.ts` (`settleBoot`, `settleOrganizationNow`, the refused adopt in `adoptRunningBoxes`) |
+| `StopBox` / `StopRecord` | `stopAndSnapshot` or `stopSandbox`, then `recordSandboxAsleep` in `router/cloud-workspace/sandbox-sleep.ts` (most sites call it through `recordBoxStopped`, which first writes the boot's end reason, a write the model leaves out), from `cloudWorkspace.sleep` (`cloud-workspace.ts`), `restartCloudWorkspace` and `wakeAfterStop` (`wake.ts`; `environment.promote` calls `wakeAfterStop` after the snapshot in `promoteSandboxToEnvironment` stopped the source, so `StopBox` there is the snapshot), a refused `wakeCloudWorkspace` whose own call resumed the box (it records that session awake first, a `WakeRecord`, then stops it; a refusal for a box another wake resumed stops nothing), and the spend-cap stops in `meter.ts` (`settleBoot`, `settleOrganizationNow`, the refused adopt in `adoptRunningBoxes`) |
 | `WatchFire` | `watchSandboxExpiry` in `sandbox-expiry.ts`, queued by `queueWatch` through `publishCloudWorkspaceJob` (`jobs.ts`), served by `apps/api/src/app/api/cloud-workspaces/sandbox-expiry/route.ts` |
-| `ReconcileList` / `ReconcileApply` | `reconcileCloudWorkspaces` in `sandbox-expiry.ts`: `listActiveWorkspaceSandboxes`, then `syncSandboxExpiries` against each listing's `currentSessionId` |
+| `ReconcileList` / `ReconcileApply` | `reconcileCloudWorkspaces` in `sandbox-expiry.ts`: `listActiveWorkspaceSandboxes`, then `syncSandboxExpiries` against each listing's `currentSessionId`; a stopped listing goes through `recordStopSeen` in `sandbox-sleep.ts` (`recordSandboxAsleep`, with the end reason first when the recorded expiry has passed) |
 | `Archive` | `cloudWorkspace.delete` in `cloud-workspace.ts`: the transition to `archived`, then `queueReap` |
 | `Reap` | the stop stage of `reapArchivedCloudWorkspace` in `reap.ts`, and the `queueReap` fallback that stops at once when the stop cannot be queued. Both call `recordSandboxAsleep`, which on an archived row writes only the expiry and session id |
 | `Tick` / `Crash` | Vercel ends a session at its timeout, or a session fails on its own |

@@ -99,6 +99,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["list-display"],
 	],
 	[
+		"src/renderer/routes/_authenticated/_dashboard/components/NavigationRail/stores/railPinsStore/railPinsStore.ts",
+		["rail-pins"],
+	],
+	[
 		"src/renderer/routes/_authenticated/_dashboard/channels/$channelId/stores/channelPanelStore/channelPanelStore.ts",
 		["channel-panels-v1"],
 	],

@@ -1043,6 +1043,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} GB 시간"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {숨겨진 #줄} other {숨겨진 #줄}}"
 
@@ -1162,6 +1165,9 @@ msgstr "{name} 실패"
 
 msgid "{name} finished"
 msgstr "{name} 완료"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} 그룹, {count, plural, other {워크스페이스 #개}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1361,6 +1367,12 @@ msgstr "{skipped, plural, one {#개 건너뜀} other {#개 건너뜀}}"
 msgid "{starCount} stars and counting"
 msgstr "스타 {starCount}개, 계속 늘어나는 중"
 
+msgid "{start} to {end}"
+msgstr "{start}~{end}"
+
+msgid "{start} to {end} (current)"
+msgstr "{start}~{end}(현재)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {자동화 #개를 시작했습니다} other {자동화 #개를 시작했습니다}}"
 
@@ -1447,6 +1459,9 @@ msgstr "{user}님이 다시 참여했습니다."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} vCPU, {memory}GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}명 대기 중"
@@ -1953,9 +1968,6 @@ msgstr "계정 이름"
 
 msgid "Account pending deletion"
 msgstr "삭제 예정 계정"
-
-msgid "Account usage"
-msgstr "계정 사용량"
 
 msgid "Account usage: {percent} used"
 msgstr "계정 사용량: {percent} 사용"
@@ -3097,6 +3109,10 @@ msgstr "워크스페이스 보관"
 msgid "Archived"
 msgstr "보관됨"
 
+msgctxt "cloud workspace status"
+msgid "Archived"
+msgstr "보관됨"
+
 #. placeholder {0}: formatCompactRelativeTime(archivedAt, now)
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
@@ -3193,6 +3209,10 @@ msgstr "편집과 명령 전에 확인"
 
 msgid "Asks only for risky actions"
 msgstr "위험한 작업만 확인"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "절전 중"
 
 msgid "Aspect Ratio"
 msgstr "종횡비"
@@ -3566,6 +3586,9 @@ msgstr "결제"
 msgid "Billing details"
 msgstr "결제 정보"
 
+msgid "Billing period"
+msgstr "결제 기간"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "결제에서 클라우드 워크스페이스 시작을 거부했습니다. 조직의 플랜에 클라우드 워크스페이스가 포함되어 있지 않거나 클라우드 사용 한도에 도달했습니다. 클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 설정 > 결제에서 업그레이드하거나 한도를 높이거나, 기기에서 자동화를 실행하세요."
 
@@ -3630,6 +3653,9 @@ msgstr "부팅"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "{0} 부팅 중…"
+
+msgid "Boots"
+msgstr "부팅"
 
 msgid "Border"
 msgstr "테두리"
@@ -4356,6 +4382,9 @@ msgstr "검사 통과"
 msgid "Checks Skipped"
 msgstr "검사 건너뜀"
 
+msgid "Checks unavailable"
+msgstr "검사를 사용할 수 없음"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "{pluginLabel} 계정 선택"
 
@@ -4793,8 +4822,14 @@ msgstr "클라우드 샌드박스"
 msgid "Cloud usage"
 msgstr "클라우드 사용량"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "이 조직에는 클라우드 사용량이 켜져 있지 않습니다."
+
 msgid "Cloud workspace"
 msgstr "클라우드 워크스페이스"
+
+msgid "Cloud workspace usage for the whole organization."
+msgstr "조직 전체의 클라우드 워크스페이스 사용량입니다."
 
 msgid "Cloud workspace: asleep"
 msgstr "클라우드 워크스페이스: 절전 중"
@@ -4826,6 +4861,9 @@ msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "클라우드 워크스페이스는 이 변수를 무시합니다. 에이전트는 대신 설정 › 에이전트에서 로그인합니다."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "클라우드 워크스페이스에는 유료 플랜이 필요합니다."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 시작하려면 설정의 결제에서 업그레이드하세요."
@@ -5774,6 +5812,9 @@ msgstr "디렉터리를 나열할 수 없습니다"
 msgid "Could not load agents from {0}"
 msgstr "{0}에서 에이전트를 불러오지 못했습니다"
 
+msgid "Could not load cloud usage."
+msgstr "클라우드 사용량을 불러올 수 없습니다."
+
 msgid "Could not load environments"
 msgstr "환경을 불러오지 못했습니다"
 
@@ -5933,6 +5974,9 @@ msgstr "공유할 수 없습니다"
 msgid "Could not sign out. Please try again."
 msgstr "로그아웃할 수 없습니다. 다시 시도하세요."
 
+msgid "Could not start"
+msgstr "시작할 수 없음"
+
 msgid "Could not start agent"
 msgstr "에이전트를 시작하지 못했습니다"
 
@@ -6015,6 +6059,9 @@ msgstr "대화를 분기할 수 없습니다"
 msgid "Couldn't cancel the move"
 msgstr "옮기기를 취소하지 못했습니다"
 
+msgid "Couldn't change the group color"
+msgstr "그룹 색상을 바꿀 수 없습니다"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "머신 크기를 변경하지 못했습니다: {0}"
@@ -6061,8 +6108,14 @@ msgstr "스택을 만들지 못했습니다"
 msgid "Couldn't create the channel"
 msgstr "채널을 만들 수 없습니다"
 
+msgid "Couldn't create the group"
+msgstr "그룹을 만들 수 없습니다"
+
 msgid "Couldn't create workspace"
 msgstr "워크스페이스를 만들지 못했습니다"
+
+msgid "Couldn't delete the group"
+msgstr "그룹을 삭제할 수 없습니다"
 
 msgid "Couldn't discard changes"
 msgstr "변경 사항을 버리지 못했습니다"
@@ -6150,6 +6203,9 @@ msgstr "{name}을(를) 옮기지 못했습니다"
 msgid "Couldn't move the subagent to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기지 못했습니다"
 
+msgid "Couldn't move the workspace"
+msgstr "워크스페이스를 이동할 수 없습니다"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\"의 이름을 자동으로 지정하지 못했습니다"
 
@@ -6199,6 +6255,9 @@ msgstr "머지 대기열에서 빼지 못했습니다"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "로컬 로그인 정보를 제거하지 못했습니다"
+
+msgid "Couldn't rename the group"
+msgstr "그룹 이름을 바꿀 수 없습니다"
 
 msgid "Couldn't restart terminals"
 msgstr "터미널을 다시 시작하지 못했습니다"
@@ -6355,6 +6414,9 @@ msgstr "CPU 코어"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "CPU 부족"
+
+msgid "Crashed"
+msgstr "비정상 종료"
 
 msgid "Create"
 msgstr "만들기"
@@ -7001,6 +7063,10 @@ msgstr "삭제됨"
 msgid "Deleted"
 msgstr "삭제됨"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "삭제됨"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "삭제함"
@@ -7047,6 +7113,9 @@ msgstr "삭제된 프로젝트는 함께 삭제된 작업 공간과 함께 30일
 
 msgid "Deleted user"
 msgstr "삭제된 사용자"
+
+msgid "Deleted workspace"
+msgstr "삭제된 워크스페이스"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "워크스페이스는 삭제했지만 사이드바 업데이트를 끝내지 못했습니다"
@@ -8259,6 +8328,13 @@ msgstr "실패"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "실패"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "실패"
+
+msgid "Failed {failedAt}"
+msgstr "{failedAt}에 실패"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "실패한 실행 <0>· 7일</0>"
@@ -9860,6 +9936,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "매시간"
 
+msgid "Hours"
+msgstr "시간"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "시간은 팀 전체가 공유합니다. 표준 {vcpus} vCPU / {memoryGb} GB 워크스페이스 기준이며, 더 큰 머신은 더 빨리 사용합니다."
 
@@ -10650,6 +10729,9 @@ msgstr "댓글과 기록도 함께 삭제됩니다."
 msgid "Its connected accounts were disconnected."
 msgstr "연결된 계정의 연결이 해제되었습니다."
 
+msgid "Its machine no longer exists."
+msgstr "해당 머신이 더 이상 존재하지 않습니다."
+
 msgid "Its own branch and copy of the files"
 msgstr "독립된 브랜치와 파일 사본"
 
@@ -10658,6 +10740,12 @@ msgstr "동기화가 끝나면 플러그인이 표시됩니다."
 
 msgid "Its replies go with it."
 msgstr "답글도 함께 삭제됩니다."
+
+msgid "Its saved state expired."
+msgstr "저장된 상태가 만료되었습니다."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "클라우드 워크스페이스가 시작하면 여기에 터미널이 열립니다."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "커밋하지 않은 변경 사항을 포함한 작업이 새 브랜치로 푸시됩니다. {computerName}의 워크스페이스가 그 브랜치에서 시작되고, 각 Claude 채팅은 그곳에서 이어집니다. 작업 중인 에이전트는 먼저 멈춥니다. 터미널과 다른 채팅은 그대로 남습니다."
@@ -12590,6 +12678,13 @@ msgstr "작성자를 찾을 수 없습니다."
 msgid "No automations match"
 msgstr "일치하는 자동화가 없습니다"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "{0}에 시작하는 청구 기간이 없습니다."
+
+msgid "No boots in this period."
+msgstr "이 기간에 부팅이 없습니다."
+
 msgid "No branches found"
 msgstr "브랜치를 찾을 수 없습니다"
 
@@ -12631,6 +12726,9 @@ msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못�
 
 msgid "No cloud environment opens {repository}."
 msgstr "{repository}을(를) 여는 클라우드 환경이 없습니다."
+
+msgid "No cloud usage in this period."
+msgstr "이 기간에 클라우드 사용량이 없습니다."
 
 msgid "No cloud workspaces"
 msgstr "클라우드 워크스페이스 없음"
@@ -12928,6 +13026,9 @@ msgstr "대기 중인 초대가 없습니다"
 
 msgid "No people found."
 msgstr "사용자를 찾을 수 없습니다."
+
+msgid "No person recorded"
+msgstr "기록된 사용자 없음"
 
 msgid "No plugins available yet."
 msgstr "아직 사용할 수 있는 플러그인이 없습니다."
@@ -13604,6 +13705,9 @@ msgstr "조직 소유자만 이 설정을 변경할 수 있습니다."
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "이 프로젝트는 조직 소유자 또는 기기 소유자만 삭제할 수 있습니다."
 
+msgid "Only owners and admins can see usage by person."
+msgstr "사람별 사용량은 소유자와 관리자만 볼 수 있습니다."
+
 msgid "Only owners can change membership."
 msgstr "소유자만 멤버십을 변경할 수 있습니다."
 
@@ -13690,6 +13794,9 @@ msgstr "이 연결은 나만 사용할 수 있습니다. 팀원은 각자의 {na
 
 msgid "Only you. Teammates forward their own."
 msgstr "나만 사용합니다. 팀원은 각자 전달합니다."
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "내 워크스페이스만 표시됩니다. 조직 합계는 소유자와 관리자용입니다."
 
 msgid "open"
 msgstr "열기"
@@ -15841,6 +15948,10 @@ msgstr "읽기 및 게시"
 msgid "Ready"
 msgstr "준비됨"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "준비됨"
+
 msgid "Ready for review"
 msgstr "리뷰 준비됨"
 
@@ -16046,6 +16157,9 @@ msgstr "제어 해제"
 
 msgid "Release…"
 msgstr "릴리스…"
+
+msgid "Released before use"
+msgstr "사용 전에 해제됨"
 
 msgid "Reload"
 msgstr "다시 로드"
@@ -16494,9 +16608,6 @@ msgstr "위치 초기화"
 msgid "Reset terminal"
 msgstr "터미널 초기화"
 
-msgid "Reset time unavailable"
-msgstr "초기화 시간을 확인할 수 없음"
-
 msgid "Reset to default"
 msgstr "기본값으로 재설정"
 
@@ -16617,6 +16728,9 @@ msgstr "워크스페이스 다시 시작"
 
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "새 에이전트 자격 증명을 적용하려면 워크스페이스를 다시 시작하세요."
+
+msgid "Restarted"
+msgstr "다시 시작됨"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "호스트 서비스 {restartedOrgCount}개를 재시작했습니다"
@@ -17089,6 +17203,10 @@ msgstr "실행."
 msgid "running"
 msgstr "실행 중"
 
+msgid "Running"
+msgstr "실행 중"
+
+msgctxt "cloud workspace status"
 msgid "Running"
 msgstr "실행 중"
 
@@ -17605,6 +17723,9 @@ msgstr "채용 공고를 확인하거나 먼저 Paradev를 사용해 보세요."
 
 msgid "See this gate on the scorecard"
 msgstr "성적표에서 이 관문 보기"
+
+msgid "See usage"
+msgstr "사용량 보기"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "무엇이 바뀌었는지 보고, 피드백을 주고, 준비되면 머지하세요."
@@ -19027,6 +19148,10 @@ msgstr "시작 중"
 msgid "Starting"
 msgstr "시작 중"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "시작 중"
+
 msgid "Starting {agentLabel}"
 msgstr "{agentLabel} 시작 중"
 
@@ -19180,11 +19305,17 @@ msgstr "중지됨"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "메모리를 확보하려고 {0}({1} GB)을(를) 중지했습니다"
 
+msgid "Stopped by a person"
+msgstr "사용자가 중지함"
+
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
 
 msgid "Stopped moving {name}"
 msgstr "{name} 옮기기를 중지했습니다"
+
+msgid "Stopped when idle"
+msgstr "유휴 상태로 중지됨"
 
 msgid "Stopping the agent in {what}"
 msgstr "{what}의 에이전트 중지 중"
@@ -19766,6 +19897,9 @@ msgstr "해당 계정은 더 이상 연결되어 있지 않습니다. 다른 계
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "이 에이전트 세션에는 아직 열 대화가 없습니다. 시작되었지만 한 번도 요청을 받지 않았습니다."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "이 커서를 읽을 수 없습니다. 커서를 빼고 첫 페이지부터 시작하세요."
+
 msgid "that device"
 msgstr "그 기기"
 
@@ -20011,6 +20145,9 @@ msgstr "사람이 머지 전에 모든 줄을 읽습니다."
 msgid "The image upload expired — attach it again"
 msgstr "이미지 업로드가 만료되었습니다 — 다시 첨부하세요"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "포함된 GB 시간과 초과 GB 시간은 현재 기간에만 보관됩니다."
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "직무의 성격이 바뀝니다. 엔지니어는 안목 있는 타자수가 아니라 안목 있는 배차원이 됩니다. 일을 쪼개고, 플릿에 배분하고, 같은 모듈을 건드린 에이전트들 사이의 충돌을 중재합니다."
 
@@ -20082,6 +20219,9 @@ msgstr "Claude Code, Codex, 그리고 모든 코딩 에이전트를 위한 오�
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Claude Code, Codex, OpenCode, 그리고 모든 코딩 에이전트를 위한 오픈 소스 워크스페이스. 작업을 서로 다른 브랜치에서 병렬로 실행하고 모든 것을 한곳에서 리뷰하세요."
+
+msgid "The organization reached its usage limit."
+msgstr "조직이 사용량 한도에 도달했습니다."
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "이동의 다른 쪽에서 이전 버전을 실행 중입니다. 클라우드 워크스페이스를 다시 시작하거나 기기의 호스트를 업데이트한 다음 다시 시도하세요."
@@ -20227,8 +20367,17 @@ msgstr "업데이트 후 추가로 가능한 작업:"
 msgid "The very beginning"
 msgstr "맨 처음"
 
+msgid "The workspace could not be created."
+msgstr "워크스페이스를 만들 수 없습니다."
+
+msgid "The workspace could not be queued to start."
+msgstr "워크스페이스 시작을 대기열에 넣을 수 없습니다."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "워크스페이스에 연결할 수 없습니다. 실행 중인지 확인한 다음 다시 시도하세요."
+
+msgid "The workspace did not become ready."
+msgstr "워크스페이스가 준비되지 않았습니다."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "워크스페이스가 아직 준비되지 않았습니다. 다시 시도하세요."
@@ -20506,6 +20655,12 @@ msgstr "표시 이름만 변경되며 브랜치는 바뀌지 않습니다."
 
 msgid "this organization"
 msgstr "이 조직"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "이 조직에는 결제 기간이 없으므로 이 페이지에는 최근 30일이 표시됩니다."
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "이 조직에는 청구 기간이 없습니다. 대신 시간 범위를 선택하세요."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
@@ -21618,8 +21773,17 @@ msgstr "URL에 쓰기 좋은 식별자로, 조직 안에서 고유해야 합니�
 msgid "Usage"
 msgstr "사용량"
 
+msgid "Usage by day"
+msgstr "일별 사용량"
+
+msgid "Usage by person"
+msgstr "사용자별 사용량"
+
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "사용량은 청구된 UTC 날짜에 표시되며, 워크스페이스가 실행된 시점보다 조금 늦을 수 있습니다."
 
 msgid "Usage limit reached"
 msgstr "사용량 한도에 도달했습니다"
@@ -22756,6 +22920,9 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
 
+msgid "You have no cloud usage in this period."
+msgstr "이 기간에 내 클라우드 사용량이 없습니다."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
 
@@ -22871,6 +23038,9 @@ msgstr "저장하지 않으면 변경 사항이 사라집니다."
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "채팅 기록은 유지됩니다. 에이전트만 다시 시작됩니다."
 
+msgid "Your cloud usage"
+msgstr "내 클라우드 사용량"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "클라우드 워크스페이스가 더 이상 이 호스트에 접근할 수 없습니다."
 
@@ -22955,6 +23125,9 @@ msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "현재 플랜에는 클라우드 환경이 포함되어 있지 않습니다. 환경을 만들려면 설정, 결제에서 업그레이드하세요."
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "플랜에 클라우드 GB 시간이 포함되어 있지 않습니다."
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "{startDate}에 플랜이 {planName}(으)로 바뀝니다. 오늘은 결제되지 않습니다."
 
@@ -23002,6 +23175,9 @@ msgstr "티어는 측정된 {0}개 축의 가중 점수라서 강한 축이 약�
 msgid "Your tokens"
 msgstr "내 토큰"
 
+msgid "Your usage by day"
+msgstr "내 일별 사용량"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "v1 프로젝트와 워크스페이스를 새 Paradev로 옮기는 중입니다. 각 항목이 준비되는 대로 사이드바에 표시됩니다."
 
@@ -23016,6 +23192,9 @@ msgstr "Codex용 기기 코드 로그인은 워크스페이스 관리자가 켭�
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "워크스페이스는 변경되지 않았습니다. 몇 분 후에 다시 옮길 수 있습니다."
+
+msgid "Your workspaces"
+msgstr "내 워크스페이스"
 
 msgid "Zap"
 msgstr "번개"

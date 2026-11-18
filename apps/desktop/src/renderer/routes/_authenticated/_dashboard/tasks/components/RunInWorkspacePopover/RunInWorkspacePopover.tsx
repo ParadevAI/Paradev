@@ -36,6 +36,7 @@ import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unava
 import { DevicePicker } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker";
 import { useWorkspaceHostOptions } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker/hooks/useWorkspaceHostOptions";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
+import { useCreateCloudWorkspace } from "renderer/routes/_authenticated/hooks/useCreateCloudWorkspace";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { deriveBranchName } from "renderer/routes/_authenticated/utils/deriveBranchName";
 import { useWorkspaceCreateDefaultsStore } from "renderer/stores/workspace-create-defaults";
@@ -104,7 +105,6 @@ export function RunInWorkspacePopover({
 	const isCloud = hostId === CLOUD_HOST_ID;
 	const cloudEnabled = useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES);
 	const organizationId = useActiveOrganizationId();
-	const utils = cloudTrpc.useUtils();
 	const environmentsQuery = cloudTrpc.environment.list.useQuery(
 		{ organizationId: organizationId ?? "" },
 		{ enabled: isCloud && organizationId !== null },
@@ -114,7 +114,7 @@ export function RunInWorkspacePopover({
 	const selectedEnvironment =
 		environments.find((environment) => environment.id === environmentId) ??
 		environments[0];
-	const createCloudWorkspace = cloudTrpc.cloudWorkspace.create.useMutation();
+	const { create: createCloudWorkspace } = useCreateCloudWorkspace();
 	const launchHostUrl = useHostUrl(isCloud ? null : hostId);
 	const setUpProjectIds = useSelectedHostProjectIds(hostId);
 
@@ -263,30 +263,24 @@ export function RunInWorkspacePopover({
 	]);
 
 	const runInCloud = (environment: { id: string }, organizationId: string) => {
-		const listInput = { organizationId };
 		const promise = Promise.allSettled(
-			tasks.map((task) =>
-				createCloudWorkspace.mutateAsync({
-					organizationId,
-					environmentId: environment.id,
-					name: task.title,
-					taskIds: [task.id],
-					...(selectedAgent === NONE
-						? {}
-						: {
-								agent: selectedAgent,
-								prompt: synthesizeTaskPrompt(task).slice(0, 20_000),
-							}),
-				}),
-			),
+			tasks.map((task) => {
+				const prompt = synthesizeTaskPrompt(task).slice(0, 20_000);
+				return createCloudWorkspace(
+					{
+						organizationId,
+						environmentId: environment.id,
+						name: task.title,
+						taskIds: [task.id],
+						...(selectedAgent === NONE ? {} : { agent: selectedAgent, prompt }),
+					},
+					{ prompt },
+				);
+			}),
 		).then((results) => {
 			const created = results.flatMap((result) =>
 				result.status === "fulfilled" ? [result.value] : [],
 			);
-			utils.cloudWorkspace.list.setData(listInput, (rows) =>
-				rows ? [...created, ...rows] : created,
-			);
-			void utils.cloudWorkspace.list.invalidate(listInput);
 			const failure = results.find((result) => result.status === "rejected");
 			if (failure) {
 				throw new Error(

@@ -56,6 +56,7 @@ import type { OpenFile } from "renderer/routes/_authenticated/_dashboard/workspa
 import { useWorkspace } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { getNotificationSourcesForPane } from "renderer/stores/notifications";
+import { pendingLaunchSurface } from "renderer/stores/workspace-creates/pendingCloudLaunch";
 import type { StoreApi } from "zustand/vanilla";
 import { NotificationStatusIndicator } from "../../components/NotificationStatusIndicator";
 import { RightPaneNewTab } from "../../components/RightPaneNewTab";
@@ -73,8 +74,8 @@ import {
 	type PagePaneData,
 	type PagesListPaneData,
 	type PaneViewerData,
-	PENDING_CLOUD_CHAT_PANE_KIND,
-	type PendingCloudChatPaneData,
+	PENDING_CLOUD_LAUNCH_PANE_KIND,
+	type PendingCloudLaunchPaneData,
 	type PullRequestPaneData,
 	SUBAGENT_PANE_KIND,
 	type SubagentPaneData,
@@ -117,7 +118,7 @@ import { PagePaneHeaderExtras } from "./components/PagePaneHeaderExtras";
 import { PagePaneTitle } from "./components/PagePaneTitle";
 import { PagesListPane } from "./components/PagesListPane";
 import { PagesListPaneTitle } from "./components/PagesListPaneTitle";
-import { PendingCloudChatPane } from "./components/PendingCloudChatPane";
+import { PendingCloudLaunchPane } from "./components/PendingCloudLaunchPane";
 import { PullRequestPane } from "./components/PullRequestPane";
 import { PullRequestPaneHeaderExtras } from "./components/PullRequestPane/components/PullRequestPaneHeaderExtras";
 import { ReviewPane } from "./components/ReviewPane";
@@ -961,23 +962,35 @@ export function usePaneRegistry({
 						}),
 					renderPane: () => <MobilePane workspaceId={workspaceId} />,
 				},
-				[PENDING_CLOUD_CHAT_PANE_KIND]: {
+				[PENDING_CLOUD_LAUNCH_PANE_KIND]: {
 					getIcon: (ctx) => {
-						const data = ctx.pane.data as PendingCloudChatPaneData;
+						const data = ctx.pane.data as PendingCloudLaunchPaneData;
 						return chatPaneIcon({
 							terminalId: data.draftId,
 							sessionId: null,
 							agent: { id: data.agentId },
 						});
 					},
-					getTitle: () => t({ message: "Chat" }),
+					getTitle: (pane) => {
+						const surface = pendingLaunchSurface(
+							pane.data as PendingCloudLaunchPaneData,
+						);
+						switch (surface) {
+							case "chat":
+								return t({ message: "Chat" });
+							case "terminal":
+								return t({ message: "Terminal" });
+							default:
+								return surface satisfies never;
+						}
+					},
 					onAfterClose: (pane) => {
-						const { terminalId } = pane.data as PendingCloudChatPaneData;
+						const { terminalId } = pane.data as PendingCloudLaunchPaneData;
 						if (terminalId) ignoreChatTerminal(terminalId);
 					},
 					insetsAside: true,
 					renderPane: (ctx: RendererContext<PaneViewerData>) => (
-						<PendingCloudChatPane ctx={ctx} workspaceId={workspaceId} />
+						<PendingCloudLaunchPane ctx={ctx} workspaceId={workspaceId} />
 					),
 				},
 				"chat-v3": {

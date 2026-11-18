@@ -1,6 +1,6 @@
 import type { WorkspaceStore } from "@superset/panes";
-import { workspaceTrpc } from "@superset/workspace-client";
 import { useEffect } from "react";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
 import { logStressEvent } from "renderer/lib/performance/stress-instrumentation";
 import { getTerminalBackgroundMarkerIdsKey } from "renderer/lib/terminal/terminal-background-intents";
 import type { StoreApi } from "zustand/vanilla";
@@ -42,10 +42,9 @@ export function useAutoAdoptBackgroundSessions({
 	workspaceId,
 	isLayoutReady,
 }: UseAutoAdoptBackgroundSessionsArgs): void {
-	const sessionsQuery = workspaceTrpc.terminal.list.useQuery(
-		{ workspaceId },
-		{ enabled: isLayoutReady, refetchOnWindowFocus: false },
-	);
+	const sessionsQuery = useWorkspaceTerminalSessions(workspaceId, {
+		enabled: isLayoutReady,
+	});
 	const sessions = sessionsQuery.data?.sessions;
 	// Don't act on a cached list still being refetched — it may name a session
 	// killed while the workspace was closed, which would adopt a ghost pane.

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "bun:test";
 import { createWorkspaceStore } from "@superset/panes";
 import {
 	type PaneViewerData,
-	PENDING_CLOUD_CHAT_PANE_KIND,
+	PENDING_CLOUD_LAUNCH_PANE_KIND,
 } from "../../../../types";
 import {
 	ignoreChatTerminal,
@@ -110,7 +110,7 @@ describe("chatSessionsToAdopt", () => {
 		store.getState().addTab({
 			panes: [
 				{
-					kind: PENDING_CLOUD_CHAT_PANE_KIND,
+					kind: PENDING_CLOUD_LAUNCH_PANE_KIND,
 					data: {
 						draftId: "draft-1",
 						agentId: "claude",

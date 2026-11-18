@@ -577,7 +577,8 @@ forked by every workspace of its environment, so each of its blocks is paid
 once per fork. **What we did:** the golden setup hook
 (`packages/sandbox/src/environments/satya-setup.sh`) keeps its npm, Electron
 and node-gyp download caches in `/dev/shm`. **Open:** workspace snapshots
-carry every block a box ever wrote, swap included.
+carry every block a box ever wrote. Boxes have had no swap since 2026-11-17,
+so swap no longer adds to that; a snapshot that already holds swap keeps it.
 
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum
@@ -775,9 +776,31 @@ obvious tidy-up once the golden exists — leaves the workspace unable to ever
 resume (`410 Cannot resume sandbox: no snapshot available`), which is how one
 e2e workspace died. So the snapshot stays (`keepLastSnapshots` evicts it on
 the source's next stop), and a source that was running is started again
-before promote returns. A row whose sandbox is gone or unresumable is marked
-`failed` by the next `access`, so it gets the failed screen and a Remove
-button rather than a sidebar entry that never opens.
+before promote returns, through `wakeAfterStop`: the new session is a wake,
+authorized and metered like any other. Until 2026-11 the restart ran the boot
+command directly, and 69 sessions in a week ran with no boot row. A row whose
+sandbox is gone or unresumable is marked `failed` by the next `access`, so it
+gets the failed screen and a Remove button rather than a sidebar entry that
+never opens.
+
+**Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
+`runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
+"stopped" answer it resumes and retries. A box read `running` that hits its
+timeout a moment later is resumed by the next call on that object, and no
+code chose to start it. Measured: 9 sessions in a week started 0.8–1.5 s after
+a timeout stop. `wakeSandbox` passes `onResume` to `Sandbox.get` and runs
+`beforeResume` (which authorizes the boot) for such a session; a refused one is
+stopped at once. **What we did:** only `wakeSandbox` and `provisionSandbox`
+get a full handle (`getSandboxToWake` in `vercel.ts`). Every other caller gets
+`getSandbox`, typed to the members that cannot resume (`stop`, `update`,
+`delete`, `listSessions`, `currentSession()` and reads), and acts on a running
+box through the session, whose calls answer 410 or 422 on a stopped one
+instead. Top-up and the credential refresh treat that answer as "not
+running"; promote builds a stopped source's golden from the snapshot its
+stop took (measured: a create from that automatic snapshot has the stopped
+box's files). An HTTP request to a stopped box's port does not resume it
+either: measured, it answers `410 This sandbox was stopped` and no session
+starts, so the archive hook and other host-service calls cannot wake a box.
 
 **`stop()` returns before the stop's snapshot is current.** The sandbox is
 still `stopping` when the call resolves, and a fork taken then boots from

@@ -5,8 +5,9 @@ import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useRelayUrl } from "renderer/hooks/useRelayUrl";
-import { cloudTrpc, cloudTrpcClient } from "renderer/lib/cloud-trpc";
+import { cloudTrpcClient } from "renderer/lib/cloud-trpc";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { useCreateCloudWorkspace } from "renderer/routes/_authenticated/hooks/useCreateCloudWorkspace";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { sandboxAccess } from "renderer/routes/_authenticated/utils/sandboxAccess";
@@ -31,7 +32,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 	const { t } = useLingui();
 	const organizationId = useActiveOrganizationId();
 	const collections = useCollections();
-	const utils = cloudTrpc.useUtils();
+	const { create: createCloudWorkspace } = useCreateCloudWorkspace();
 	const { activeHostUrl, machineId } = useLocalHostService();
 	const relayUrl = useRelayUrl();
 	const { projects } = useHostProjects();
@@ -128,7 +129,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					assertEnvironmentOpens(prepared.repositoryFullName);
 					moveSignal.throwIfAborted();
 					onStage("starting");
-					const created = await cloudTrpcClient.cloudWorkspace.create.mutate({
+					const created = await createCloudWorkspace({
 						organizationId,
 						environmentId: environment.id,
 						name: workspace.name,
@@ -176,12 +177,6 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 					title: chat.title,
 				});
 			}
-			const listInput = { organizationId };
-			await utils.cloudWorkspace.list.cancel(listInput);
-			utils.cloudWorkspace.list.setData(listInput, (rows) =>
-				rows ? [created, ...rows] : [created],
-			);
-			void utils.cloudWorkspace.list.invalidate();
 			// A host older than terminal moves returns neither list.
 			const terminals: MovingTerminal[] = prepared.terminals ?? [];
 			const skippedTerminals = skippedTerminalNames(prepared.skippedTerminals);
@@ -214,7 +209,7 @@ export function useMoveWorkspaceToCloud(workspace: MovableWorkspace) {
 			relayUrl,
 			t,
 			workspace,
-			utils,
+			createCloudWorkspace,
 			collections,
 			sourceRepository,
 		],

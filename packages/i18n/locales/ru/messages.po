@@ -1043,6 +1043,9 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
+msgid "{gbHours} GB-hours"
+msgstr "{gbHours} ГБ-часов"
+
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# скрытая строка} few {# скрытые строки} many {# скрытых строк} other {# скрытой строки}}"
 
@@ -1162,6 +1165,9 @@ msgstr "{name}: ошибка"
 
 msgid "{name} finished"
 msgstr "{name} завершил работу"
+
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Группа {name}, {count, plural, one {# рабочая область} few {# рабочие области} many {# рабочих областей} other {# рабочей области}}"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
@@ -1361,6 +1367,12 @@ msgstr "{skipped, plural, one {# пропущено} few {# пропущено} 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} звёзд и продолжаем"
 
+msgid "{start} to {end}"
+msgstr "С {start} по {end}"
+
+msgid "{start} to {end} (current)"
+msgstr "С {start} по {end} (текущий)"
+
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущена # автоматизация} few {Запущено # автоматизации} many {Запущено # автоматизаций} other {Запущено # автоматизаций}}"
 
@@ -1447,6 +1459,9 @@ msgstr "{user} снова присоединился(-ась)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
+
+msgid "{vcpus} vCPU, {memory} GB"
+msgstr "{vcpus} vCPU, {memory} ГБ"
 
 msgid "{waiting} Waiting"
 msgstr "Ожидают: {waiting}"
@@ -1953,9 +1968,6 @@ msgstr "Имя аккаунта"
 
 msgid "Account pending deletion"
 msgstr "Аккаунт ожидает удаления"
-
-msgid "Account usage"
-msgstr "Использование аккаунта"
 
 msgid "Account usage: {percent} used"
 msgstr "Использование аккаунта: {percent} использовано"
@@ -3097,6 +3109,10 @@ msgstr "Архивировать рабочую область"
 msgid "Archived"
 msgstr "Архив"
 
+msgctxt "cloud workspace status"
+msgid "Archived"
+msgstr "В архиве"
+
 #. placeholder {0}: formatCompactRelativeTime(archivedAt, now)
 #. placeholder {0}: formatCompactRelativeTime(cloud.deletedAt)
 msgid "Archived · {0}"
@@ -3193,6 +3209,10 @@ msgstr "Спрашивает перед правками и командами"
 
 msgid "Asks only for risky actions"
 msgstr "Спрашивает только при риске"
+
+msgctxt "cloud workspace status"
+msgid "Asleep"
+msgstr "Спит"
 
 msgid "Aspect Ratio"
 msgstr "Соотношение сторон"
@@ -3566,6 +3586,9 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платёжные данные"
 
+msgid "Billing period"
+msgstr "Расчётный период"
+
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Биллинг отказался запустить облачное рабочее пространство: план организации не включает облачные рабочие пространства, или достигнут лимит использования облака. Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план или увеличьте лимит в разделе Настройки > Оплата, либо запустите автоматизацию на устройстве."
 
@@ -3630,6 +3653,9 @@ msgstr "Запустить"
 #. placeholder {0}: selected.name
 msgid "Booting {0}…"
 msgstr "Запуск {0}…"
+
+msgid "Boots"
+msgstr "Запуски"
 
 msgid "Border"
 msgstr "Граница"
@@ -4356,6 +4382,9 @@ msgstr "Проверки пройдены"
 msgid "Checks Skipped"
 msgstr "Проверки пропущены"
 
+msgid "Checks unavailable"
+msgstr "Проверки недоступны"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Выберите аккаунт {pluginLabel}"
 
@@ -4793,8 +4822,14 @@ msgstr "Облачные песочницы"
 msgid "Cloud usage"
 msgstr "Использование облака"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Использование облака не включено для этой организации."
+
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
+
+msgid "Cloud workspace usage for the whole organization."
+msgstr "Использование облачных рабочих областей во всей организации."
 
 msgid "Cloud workspace: asleep"
 msgstr "Облачная рабочая область: в спящем режиме"
@@ -4826,6 +4861,9 @@ msgstr "Облачные рабочие области делают коммит
 
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Облачные рабочие пространства игнорируют эту переменную. Вместо этого агенты входят в систему в разделе «Настройки › Агенты»."
+
+msgid "Cloud workspaces need a paid plan."
+msgstr "Для облачных рабочих областей нужен платный тариф."
 
 msgid "Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one."
 msgstr "Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план в разделе Настройки, Оплата, чтобы запустить его."
@@ -5774,6 +5812,9 @@ msgstr "Не удалось прочитать содержимое папки"
 msgid "Could not load agents from {0}"
 msgstr "Не удалось загрузить агентов с {0}"
 
+msgid "Could not load cloud usage."
+msgstr "Не удалось загрузить использование облака."
+
 msgid "Could not load environments"
 msgstr "Не удалось загрузить окружения"
 
@@ -5933,6 +5974,9 @@ msgstr "Не удалось поделиться"
 msgid "Could not sign out. Please try again."
 msgstr "Не удалось выйти. Попробуйте ещё раз."
 
+msgid "Could not start"
+msgstr "Не удалось запустить"
+
 msgid "Could not start agent"
 msgstr "Не удалось запустить агента"
 
@@ -6015,6 +6059,9 @@ msgstr "Не удалось ответвить разговор"
 msgid "Couldn't cancel the move"
 msgstr "Не удалось отменить перенос"
 
+msgid "Couldn't change the group color"
+msgstr "Не удалось изменить цвет группы"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Не удалось изменить размер машины: {0}"
@@ -6061,8 +6108,14 @@ msgstr "Не удалось создать стек"
 msgid "Couldn't create the channel"
 msgstr "Не удалось создать канал"
 
+msgid "Couldn't create the group"
+msgstr "Не удалось создать группу"
+
 msgid "Couldn't create workspace"
 msgstr "Не удалось создать рабочую область"
+
+msgid "Couldn't delete the group"
+msgstr "Не удалось удалить группу"
 
 msgid "Couldn't discard changes"
 msgstr "Не удалось отменить изменения"
@@ -6150,6 +6203,9 @@ msgstr "Не удалось перенести {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не удалось перевести субагента в фон"
 
+msgid "Couldn't move the workspace"
+msgstr "Не удалось переместить рабочую область"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
 
@@ -6199,6 +6255,9 @@ msgstr "Не удалось убрать из очереди объединен�
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не удалось удалить локальный вход"
+
+msgid "Couldn't rename the group"
+msgstr "Не удалось переименовать группу"
 
 msgid "Couldn't restart terminals"
 msgstr "Не удалось перезапустить терминалы"
@@ -6355,6 +6414,9 @@ msgstr "Ядра CPU"
 msgctxt "machine pressure"
 msgid "CPU-bound"
 msgstr "Упирается в CPU"
+
+msgid "Crashed"
+msgstr "Сбой"
 
 msgid "Create"
 msgstr "Создать"
@@ -7001,6 +7063,10 @@ msgstr "удалён"
 msgid "Deleted"
 msgstr "Удалено"
 
+msgctxt "cloud workspace status"
+msgid "Deleted"
+msgstr "Удалено"
+
 msgctxt "file change"
 msgid "Deleted"
 msgstr "Удалён"
@@ -7047,6 +7113,9 @@ msgstr "Удалённые проекты можно восстановить в
 
 msgid "Deleted user"
 msgstr "Удалённый пользователь"
+
+msgid "Deleted workspace"
+msgstr "Удалённая рабочая область"
 
 msgid "Deleted workspaces, but couldn’t finish updating the sidebar"
 msgstr "Рабочие области удалены, но обновить боковую панель до конца не удалось"
@@ -8259,6 +8328,13 @@ msgstr "Ошибка"
 msgctxt "agent status"
 msgid "Failed"
 msgstr "Ошибка"
+
+msgctxt "cloud workspace status"
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Failed {failedAt}"
+msgstr "Ошибка: {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Неудачные запуски <0>· 7 дн.</0>"
@@ -9860,6 +9936,9 @@ msgstr "HotkeyTooltip.tsx"
 msgid "Hourly"
 msgstr "Ежечасно"
 
+msgid "Hours"
+msgstr "Часы"
+
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Часы общие для всей команды. Они рассчитаны на стандартную рабочую область {vcpus} vCPU / {memoryGb} ГБ, а более мощные машины расходуют их быстрее."
 
@@ -10650,6 +10729,9 @@ msgstr "Комментарии и история тоже будут удале�
 msgid "Its connected accounts were disconnected."
 msgstr "Подключённые аккаунты были отключены."
 
+msgid "Its machine no longer exists."
+msgstr "Его машина больше не существует."
+
 msgid "Its own branch and copy of the files"
 msgstr "Собственная ветка и собственная копия файлов"
 
@@ -10658,6 +10740,12 @@ msgstr "Его плагины появятся после завершения �
 
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
+
+msgid "Its saved state expired."
+msgstr "Срок его сохранённого состояния истёк."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Его терминал откроется здесь, когда облачная рабочая область его запустит."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на {computerName} начинается с этой ветки, и каждый чат Claude продолжается там. Работающие агенты сначала останавливаются. Терминалы и другие чаты остаются на месте."
@@ -12590,6 +12678,13 @@ msgstr "Авторы не найдены."
 msgid "No automations match"
 msgstr "Нет подходящих автоматизаций"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Ни один расчётный период не начинается {0}."
+
+msgid "No boots in this period."
+msgstr "За этот период запусков нет."
+
 msgid "No branches found"
 msgstr "Ветки не найдены"
 
@@ -12631,6 +12726,9 @@ msgstr "На этой машине пока нет данных об испол�
 
 msgid "No cloud environment opens {repository}."
 msgstr "Ни одна облачная среда не открывает {repository}."
+
+msgid "No cloud usage in this period."
+msgstr "За этот период облако не использовалось."
 
 msgid "No cloud workspaces"
 msgstr "Нет облачных рабочих пространств"
@@ -12928,6 +13026,9 @@ msgstr "Нет ожидающих приглашений"
 
 msgid "No people found."
 msgstr "Люди не найдены."
+
+msgid "No person recorded"
+msgstr "Человек не записан"
 
 msgid "No plugins available yet."
 msgstr "Плагинов пока нет."
@@ -13604,6 +13705,9 @@ msgstr "Изменять эти настройки могут только вл�
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Удалить этот проект могут только владельцы организации или владелец устройства."
 
+msgid "Only owners and admins can see usage by person."
+msgstr "Использование по людям видят только владельцы и администраторы."
+
 msgid "Only owners can change membership."
 msgstr "Изменять состав участников могут только владельцы."
 
@@ -13690,6 +13794,9 @@ msgstr "Только вы можете использовать это подк�
 
 msgid "Only you. Teammates forward their own."
 msgstr "Только для вас. Коллеги перенаправляют свои сами."
+
+msgid "Only your own workspaces. Organization totals are for owners and admins."
+msgstr "Только ваши рабочие области. Итоги организации доступны владельцам и администраторам."
 
 msgid "open"
 msgstr "открыть"
@@ -15841,6 +15948,10 @@ msgstr "Читает и пишет"
 msgid "Ready"
 msgstr "Готов"
 
+msgctxt "cloud workspace status"
+msgid "Ready"
+msgstr "Готово"
+
 msgid "Ready for review"
 msgstr "Готово к ревью"
 
@@ -16046,6 +16157,9 @@ msgstr "Отпустить управление"
 
 msgid "Release…"
 msgstr "Релиз…"
+
+msgid "Released before use"
+msgstr "Освобождено до использования"
 
 msgid "Reload"
 msgstr "Перезагрузить"
@@ -16494,9 +16608,6 @@ msgstr "Сбросить расположение"
 msgid "Reset terminal"
 msgstr "Сбросить терминал"
 
-msgid "Reset time unavailable"
-msgstr "Время сброса недоступно"
-
 msgid "Reset to default"
 msgstr "Сбросить к значению по умолчанию"
 
@@ -16617,6 +16728,9 @@ msgstr "Перезапустить рабочую область"
 
 msgid "Restart workspaces to pick up new agent credentials."
 msgstr "Перезапустите рабочие пространства, чтобы применить новые учётные данные агента."
+
+msgid "Restarted"
+msgstr "Перезапущено"
 
 msgid "Restarted {restartedOrgCount} host services"
 msgstr "Перезапущено служб хоста: {restartedOrgCount}"
@@ -17091,6 +17205,10 @@ msgstr "работает"
 
 msgid "Running"
 msgstr "Выполняется"
+
+msgctxt "cloud workspace status"
+msgid "Running"
+msgstr "Работает"
 
 msgid "Running \"{name}\" now"
 msgstr "«{name}» запускается"
@@ -17605,6 +17723,9 @@ msgstr "Посмотрите вакансии или сначала попроб
 
 msgid "See this gate on the scorecard"
 msgstr "Посмотреть этот шлюз в таблице"
+
+msgid "See usage"
+msgstr "Посмотреть использование"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Посмотрите, что изменилось, дайте обратную связь и объедините работу, когда она готова."
@@ -19027,6 +19148,10 @@ msgstr "запускается"
 msgid "Starting"
 msgstr "Запуск"
 
+msgctxt "cloud workspace status"
+msgid "Starting"
+msgstr "Запускается"
+
 msgid "Starting {agentLabel}"
 msgstr "Запуск {agentLabel}"
 
@@ -19180,11 +19305,17 @@ msgstr "Остановлено"
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "Остановлен {0} ({1} ГБ), чтобы освободить память"
 
+msgid "Stopped by a person"
+msgstr "Остановлено человеком"
+
 msgid "Stopped by the usage limit"
 msgstr "Остановлено лимитом использования"
 
 msgid "Stopped moving {name}"
 msgstr "Перенос {name} остановлен"
+
+msgid "Stopped when idle"
+msgstr "Остановлено при простое"
 
 msgid "Stopping the agent in {what}"
 msgstr "Остановка агента в {what}"
@@ -19766,6 +19897,9 @@ msgstr "Этот аккаунт больше не подключён — выб�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У этой сессии агента пока нет разговора, который можно открыть: она была запущена, но ни разу не получила запрос."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Не удалось прочитать этот курсор. Уберите его, чтобы начать с первой страницы."
+
 msgid "that device"
 msgstr "этом устройстве"
 
@@ -20011,6 +20145,9 @@ msgstr "Человек читает каждую строку перед сли�
 msgid "The image upload expired — attach it again"
 msgstr "Срок загрузки изображения истёк — прикрепите его снова"
 
+msgid "The included and overage GB-hours are kept for the current period only."
+msgstr "Включённые ГБ-часы и ГБ-часы сверх тарифа хранятся только для текущего периода."
+
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Описание работы меняется. Инженеры перестают быть машинистками со вкусом и становятся диспетчерами со вкусом: декомпозируют работу, раздают её флотам, разрешают конфликты между агентами, которые оба тронули один модуль."
 
@@ -20082,6 +20219,9 @@ msgstr "Рабочая область с открытым исходным ко�
 
 msgid "The open-source workspace for Claude Code, Codex, OpenCode, and any coding agent. Run tasks in parallel on separate branches, and review everything in one place."
 msgstr "Рабочее пространство с открытым исходным кодом для Claude Code, Codex, OpenCode и любого другого агента для кода. Запускайте задачи параллельно в отдельных ветках и проверяйте всё в одном месте."
+
+msgid "The organization reached its usage limit."
+msgstr "Организация достигла лимита использования."
 
 msgid "The other side of the move runs an older version. Restart a cloud workspace or update the device's host, then try again."
 msgstr "На другой стороне переноса работает более старая версия. Перезапустите облачную рабочую область или обновите хост устройства, затем повторите попытку."
@@ -20227,8 +20367,17 @@ msgstr "После обновления расширение также смож
 msgid "The very beginning"
 msgstr "Самое начало"
 
+msgid "The workspace could not be created."
+msgstr "Не удалось создать рабочую область."
+
+msgid "The workspace could not be queued to start."
+msgstr "Не удалось поставить запуск рабочей области в очередь."
+
 msgid "The workspace couldn't be reached. Check that it is running, then try again."
 msgstr "Не удалось подключиться к рабочей области. Убедитесь, что она запущена, и повторите попытку."
+
+msgid "The workspace did not become ready."
+msgstr "Рабочая область не стала готовой."
 
 msgid "The workspace is not ready yet. Try again."
 msgstr "Рабочая область ещё не готова. Повторите."
@@ -20506,6 +20655,12 @@ msgstr "Это меняет только отображаемое имя, а н�
 
 msgid "this organization"
 msgstr "эта организация"
+
+msgid "This organization has no billing periods, so this page shows the last 30 days."
+msgstr "У этой организации нет расчётных периодов, поэтому на странице показаны последние 30 дней."
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "У этой организации нет расчётных периодов. Выберите временной диапазон."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."
@@ -21618,8 +21773,17 @@ msgstr "Идентификатор для URL, уникальный внутри
 msgid "Usage"
 msgstr "Использование"
 
+msgid "Usage by day"
+msgstr "Использование по дням"
+
+msgid "Usage by person"
+msgstr "Использование по людям"
+
 msgid "Usage is out of date"
 msgstr "Данные об использовании устарели"
+
+msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
+msgstr "Использование показано в день (UTC), когда оно было выставлено в счёт; это может быть немного позже работы рабочей области."
 
 msgid "Usage limit reached"
 msgstr "Достигнут лимит использования"
@@ -22756,6 +22920,9 @@ msgstr "У вас нет доступа к этому терминалу."
 msgid "You don't have permission to remove this member"
 msgstr "У вас нет прав удалить этого участника"
 
+msgid "You have no cloud usage in this period."
+msgstr "В этом периоде вы не использовали облако."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас есть несохранённые переменные окружения. Точно закрыть?"
 
@@ -22871,6 +23038,9 @@ msgstr "Изменения будут потеряны, если их не со�
 msgid "Your chat history stays. Only the agent restarts."
 msgstr "История чата сохранится. Перезапустится только агент."
 
+msgid "Your cloud usage"
+msgstr "Ваше использование облака"
+
 msgid "Your cloud workspaces will no longer be able to reach this host."
 msgstr "Ваши облачные рабочие области больше не смогут получить доступ к этому хосту."
 
@@ -22955,6 +23125,9 @@ msgstr "Ваш тариф не включает облачные окружен�
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Ваш тариф не включает облачные окружения. Чтобы создать окружение, перейдите на другой тариф в разделе Настройки, Оплата."
 
+msgid "Your plan includes no cloud GB-hours."
+msgstr "Ваш тариф не включает облачные ГБ-часы."
+
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Ваш план перейдёт на {planName} {startDate}. Сегодня ничего не списывается."
 
@@ -23002,6 +23175,9 @@ msgstr "Ваш уровень — взвешенная оценка по ося�
 msgid "Your tokens"
 msgstr "Ваши токены"
 
+msgid "Your usage by day"
+msgstr "Ваше использование по дням"
+
 msgid "Your v1 projects and workspaces are moving to the new Paradev. They appear in the sidebar as each one is ready."
 msgstr "Ваши проекты и рабочие пространства из v1 переносятся в новый Paradev. Они появляются на боковой панели по мере готовности."
 
@@ -23016,6 +23192,9 @@ msgstr "Вход по коду устройства для Codex включае�
 
 msgid "Your workspace is unchanged. You can move it again in a few minutes."
 msgstr "Ваша рабочая область не изменилась. Её можно перенести снова через несколько минут."
+
+msgid "Your workspaces"
+msgstr "Ваши рабочие области"
 
 msgid "Zap"
 msgstr "Молния"
