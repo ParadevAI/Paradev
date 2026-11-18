@@ -1764,6 +1764,9 @@ msgstr "Bu oturumda 200K token'ın 87,4K'sı kullanıldı."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Daha iyi bir uygulama içi tarayıcı: değişikliklerinizi önizleyin ve herhangi bir öğeye tıklayarak bağlam olarak ajana gönderin."
 
+msgid "A build of this environment is already running"
+msgstr "Bu ortamın bir derlemesi zaten çalışıyor"
+
 msgid "A CDP endpoint per pane"
 msgstr "Her bölme için bir CDP uç noktası"
 
@@ -2020,6 +2023,9 @@ msgstr "{lastActive} aktif"
 msgid "Active agent sessions."
 msgstr "Etkin ajan oturumları."
 
+msgid "Active build status"
+msgstr "Etkin derlemenin durumu"
+
 msgid "active days"
 msgstr "aktif gün"
 
@@ -2271,6 +2277,9 @@ msgstr "Kenar çubuğuna ekle"
 
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
+
+msgid "Add variable"
+msgstr "Değişken ekle"
 
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
@@ -2569,6 +2578,9 @@ msgstr "Tüm veriler {0} üyenin tamamı için kalıcı olarak silinecek. Bu ger
 
 msgid "All downloads"
 msgstr "Tüm indirmeler"
+
+msgid "All environment variables ({total})"
+msgstr "Tüm ortam değişkenleri ({total})"
 
 msgid "All features, side by side"
 msgstr "Tüm özellikler, yan yana"
@@ -3569,9 +3581,6 @@ msgstr "Bu host'taki yeni worktree çalışma alanları için temel dizin."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName} üzerindeki yeni worktree'ler için temel dizin."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Temel imaj · henüz kontrol noktası yok"
-
 msgid "Base URL"
 msgstr "Temel URL"
 
@@ -3835,8 +3844,14 @@ msgstr "Böcek"
 msgid "Bug reports"
 msgstr "Hata raporları"
 
+msgid "Build ID"
+msgstr "Derleme kimliği"
+
 msgid "Build in public"
 msgstr "Herkesin gözü önünde geliştiriyoruz"
+
+msgid "Build started"
+msgstr "Derleme başlatıldı"
 
 msgid "Build your own"
 msgstr "Kendinizinkini oluşturun"
@@ -3846,6 +3861,18 @@ msgstr "Son yazılım parçasını inşa etmek"
 
 msgid "Building the last piece of software."
 msgstr "Son yazılım parçasını inşa ediyoruz."
+
+msgid "Building with the new repositories"
+msgstr "Yeni depolarla derleniyor"
+
+msgid "Building…"
+msgstr "Derleniyor…"
+
+msgid "Builds"
+msgstr "Derlemeler"
+
+msgid "Built"
+msgstr "Derlendi"
 
 msgid "Built a plugin? Submit it here."
 msgstr "Bir eklenti mi geliştirdiniz? Buradan gönderin."
@@ -4390,10 +4417,6 @@ msgstr "Kontrol noktası"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrol noktası · tooltip yeniden düzenlemesinden önce"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Kontrol noktası kaydedildi {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Kontrol noktası {name} ortamına kaydedildi"
@@ -6617,7 +6640,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Oluşturuldu"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7871,6 +7893,9 @@ msgstr "GitHub'da düzenle"
 msgid "Edit queued message"
 msgstr "Kuyruktaki mesajı düzenle"
 
+msgid "Edit repositories"
+msgstr "Depoları düzenle"
+
 msgid "Edit routine"
 msgstr "Rutini düzenle"
 
@@ -8065,11 +8090,23 @@ msgstr "Ortam"
 msgid "Environment archived"
 msgstr "Ortam arşivlendi"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Ortam derlemeleri Team ve Ultra planlarına dahildir. Ayarlar, Faturalandırma bölümünden yükseltin."
+
+msgid "Environment history"
+msgstr "Ortam geçmişi"
+
 msgid "Environment not found"
 msgstr "Ortam bulunamadı"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Ortam kurulumu, kararsız testler ve kimlik bilgisi tesisatı, yani 2025'te gözetimsiz çalıştırmaları öldüren sıkıcı hata biçimleri, modelleyerek değil mühendislikle büyük ölçüde ortadan kaldırılır."
+
+msgid "Environment updated"
+msgstr "Ortam güncellendi"
+
+msgid "Environment variables"
+msgstr "Ortam değişkenleri"
 
 msgid "Environment Variables"
 msgstr "Ortam değişkenleri"
@@ -12766,6 +12803,12 @@ msgstr "Bu dönemde başlatma yok."
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
+msgid "No build yet"
+msgstr "Henüz derleme yok"
+
+msgid "No builds yet"
+msgstr "Henüz derleme yok"
+
 msgid "No changed files."
 msgstr "Değişen dosya yok."
 
@@ -12876,6 +12919,9 @@ msgstr "Henüz ortam değişkeni yok"
 
 msgid "No environments available"
 msgstr "Kullanılabilir ortam yok"
+
+msgid "No environments built yet"
+msgstr "Henüz derlenmiş ortam yok"
 
 msgid "No environments found."
 msgstr "Ortam bulunamadı."
@@ -13333,6 +13379,9 @@ msgstr "v1 terminal betiği bulunamadı."
 
 msgid "No valid environment variables found in file"
 msgstr "Dosyada geçerli ortam değişkeni bulunamadı"
+
+msgid "No variables set yet."
+msgstr "Henüz değişken ayarlanmadı."
 
 msgid "No versions yet"
 msgstr "Henüz sürüm yok"
@@ -15136,6 +15185,9 @@ msgstr "{hostName} üzerindeki proje worktree klasörünü seçin."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Alınacak depoları seçin. Bulut çalışma alanındaki bir ajan neyin kurulacağını belirler ve çalışır hale getirir."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Bu ortamın çektiği depoları seçin. Kaydetmek yeni bir derleme başlatır; çalışma alanları başarılı olana kadar mevcut olandan başlamaya devam eder."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName} üzerindeki worktree klasörünü seçin."
 
@@ -16103,6 +16155,9 @@ msgstr "Rebase ve birleştir"
 
 msgid "Rebase and merge"
 msgstr "Rebase ve birleştir"
+
+msgid "Rebuild environment"
+msgstr "Ortamı yeniden derle"
 
 msgid "Recall what was said in meetings"
 msgstr "Toplantılarda söylenenleri hatırlayın"
@@ -17396,6 +17451,9 @@ msgstr "{name} ortamına kontrol noktası kaydedilsin mi?"
 msgid "Save All"
 msgstr "Tümünü kaydet"
 
+msgid "Save and build"
+msgstr "Kaydet ve derle"
+
 msgid "Save and continue"
 msgstr "Kaydet ve devam et"
 
@@ -17456,6 +17514,9 @@ msgstr "{name} kaydedildi"
 
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} kaydedildi, ancak kurulum çalışma alanı başlatılamadı: {reason}"
+
+msgid "Saved from a workspace"
+msgstr "Bir çalışma alanından kaydedildi"
 
 msgid "Saved to Downloads"
 msgstr "İndirilenler klasörüne kaydedildi"
@@ -18852,9 +18913,6 @@ msgstr "Suratlar ve İnsanlar"
 msgid "Smoother onboarding"
 msgstr "Daha akıcı ilk kurulum"
 
-msgid "Snapshot"
-msgstr "Anlık görüntü"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
 
@@ -20177,6 +20235,9 @@ msgstr "Dağıtıcı ortaya çıkar"
 msgid "The endpoint must use https."
 msgstr "Uç nokta https kullanmalıdır."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Ortam geri yüklenirken değişti. Tekrar deneyin."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşivlendi veya hiç deposu yok. Otomasyonun ayarlarından başka bir ortam seçin."
 
@@ -20602,6 +20663,9 @@ msgstr "Bu otomasyon başka bir kuruluşta"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Bu tarayıcıda Paradev oturumu açık değil. {connectorName} ile devam etmek için oturum açın."
 
+msgid "This build has no snapshot to restore"
+msgstr "Bu derlemenin geri yüklenecek bir anlık görüntüsü yok"
+
 msgid "This cannot be undone."
 msgstr "Bu geri alınamaz."
 
@@ -20673,6 +20737,12 @@ msgstr "Bu dizin mevcut değil. Terminal betiği çalışma alanı köküne geri
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağlayıcı bunu doğrulanmış olarak onaylamadı. Daha önce kullandığınız yöntemle oturum açın."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Bu ortamın derlenecek bir [install] bölümü yok. Temel dalındaki .paradev/config.toml dosyasına bir tane ekleyin."
+
+msgid "This environment has no repositories to build"
+msgstr "Bu ortamın derlenecek deposu yok"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"
@@ -21755,6 +21825,9 @@ msgstr "Güncelleme oturumları koruyamadı"
 msgid "Update daemon"
 msgstr "Daemon'u güncelle"
 
+msgid "Update environment"
+msgstr "Ortamı güncelle"
+
 msgid "Update Error"
 msgstr "Güncelleme hatası"
 
@@ -22063,9 +22136,6 @@ msgstr "v2ProjectId, çalışma alanının projesiyle eşleşmiyor"
 
 msgid "Value"
 msgstr "Değer"
-
-msgid "Variables"
-msgstr "Değişkenler"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

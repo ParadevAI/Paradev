@@ -1764,6 +1764,9 @@ msgstr "本次会话已使用87.4K/200K个token。"
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "更好用的应用内浏览器：预览改动，点击任意元素即可作为上下文发给智能体。"
 
+msgid "A build of this environment is already running"
+msgstr "此环境已有构建正在运行"
+
 msgid "A CDP endpoint per pane"
 msgstr "每个窗格一个 CDP 端点"
 
@@ -2020,6 +2023,9 @@ msgstr "{lastActive}活跃"
 msgid "Active agent sessions."
 msgstr "活跃的智能体会话。"
 
+msgid "Active build status"
+msgstr "当前构建状态"
+
 msgid "active days"
 msgstr "活跃天数"
 
@@ -2271,6 +2277,9 @@ msgstr "添加到侧边栏"
 
 msgid "Add to workspace"
 msgstr "添加到工作区"
+
+msgid "Add variable"
+msgstr "添加变量"
 
 msgid "Add what it does"
 msgstr "添加它的用途"
@@ -2569,6 +2578,9 @@ msgstr "全部{0}名成员的所有数据都将被永久删除。此操作无法
 
 msgid "All downloads"
 msgstr "所有下载"
+
+msgid "All environment variables ({total})"
+msgstr "所有环境变量（{total}）"
 
 msgid "All features, side by side"
 msgstr "所有功能逐项对比"
@@ -3569,9 +3581,6 @@ msgstr "此主机上新建worktree工作区的基准目录。"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}上新建worktree的基准目录。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "基础镜像 · 尚无检查点"
-
 msgid "Base URL"
 msgstr "基础URL"
 
@@ -3835,8 +3844,14 @@ msgstr "虫子"
 msgid "Bug reports"
 msgstr "Bug 报告"
 
+msgid "Build ID"
+msgstr "构建 ID"
+
 msgid "Build in public"
 msgstr "公开构建"
+
+msgid "Build started"
+msgstr "构建已开始"
 
 msgid "Build your own"
 msgstr "自己动手构建"
@@ -3846,6 +3861,18 @@ msgstr "打造最后一款软件"
 
 msgid "Building the last piece of software."
 msgstr "打造最后一款软件。"
+
+msgid "Building with the new repositories"
+msgstr "正在使用新仓库构建"
+
+msgid "Building…"
+msgstr "正在构建…"
+
+msgid "Builds"
+msgstr "构建"
+
+msgid "Built"
+msgstr "构建时间"
 
 msgid "Built a plugin? Submit it here."
 msgstr "做了插件？在这里提交。"
@@ -4390,10 +4417,6 @@ msgstr "检查点"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "检查点 · tooltip重构之前"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "检查点已保存 {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "已将检查点保存到 {name}"
@@ -6617,7 +6640,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "已创建"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7871,6 +7893,9 @@ msgstr "在GitHub上编辑"
 msgid "Edit queued message"
 msgstr "编辑排队消息"
 
+msgid "Edit repositories"
+msgstr "编辑仓库"
+
 msgid "Edit routine"
 msgstr "编辑例行任务"
 
@@ -8065,11 +8090,23 @@ msgstr "环境"
 msgid "Environment archived"
 msgstr "环境已归档"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "环境构建包含在 Team 和 Ultra 套餐中。请在设置的账单中升级。"
+
+msgid "Environment history"
+msgstr "环境历史"
+
 msgid "Environment not found"
 msgstr "未找到环境"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "环境搭建、不稳定的测试、凭据串联，这些在2025年让无人值守运行折戟的无聊失败模式，大多是被工程手段消除的，而不是被模型消除的。"
+
+msgid "Environment updated"
+msgstr "环境已更新"
+
+msgid "Environment variables"
+msgstr "环境变量"
 
 msgid "Environment Variables"
 msgstr "环境变量"
@@ -12766,6 +12803,12 @@ msgstr "此周期内没有启动。"
 msgid "No branches found"
 msgstr "未找到分支"
 
+msgid "No build yet"
+msgstr "尚无构建"
+
+msgid "No builds yet"
+msgstr "尚无构建"
+
 msgid "No changed files."
 msgstr "没有更改的文件。"
 
@@ -12876,6 +12919,9 @@ msgstr "还没有环境变量"
 
 msgid "No environments available"
 msgstr "没有可用的环境"
+
+msgid "No environments built yet"
+msgstr "尚未构建任何环境"
 
 msgid "No environments found."
 msgstr "未找到环境。"
@@ -13333,6 +13379,9 @@ msgstr "未找到 v1 终端脚本。"
 
 msgid "No valid environment variables found in file"
 msgstr "文件中未找到有效的环境变量"
+
+msgid "No variables set yet."
+msgstr "尚未设置变量。"
 
 msgid "No versions yet"
 msgstr "还没有版本"
@@ -15136,6 +15185,9 @@ msgstr "在{hostName}上选择项目的worktree文件夹。"
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "选择要检出的仓库。云工作区中的代理会确定需要安装的内容并让它运行起来。"
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "选择此环境要检出的仓库。保存后会开始新的构建；在构建成功之前，工作区仍从当前版本启动。"
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "在{hostName}上选择worktree文件夹。"
 
@@ -16103,6 +16155,9 @@ msgstr "变基并合并"
 
 msgid "Rebase and merge"
 msgstr "变基并合并"
+
+msgid "Rebuild environment"
+msgstr "重新构建环境"
 
 msgid "Recall what was said in meetings"
 msgstr "回顾会议中说过的内容"
@@ -17396,6 +17451,9 @@ msgstr "将检查点保存到 {name}？"
 msgid "Save All"
 msgstr "全部保存"
 
+msgid "Save and build"
+msgstr "保存并构建"
+
 msgid "Save and continue"
 msgstr "保存并继续"
 
@@ -17456,6 +17514,9 @@ msgstr "已保存 {name}"
 
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "已保存 {name}，但其设置工作区无法启动：{reason}"
+
+msgid "Saved from a workspace"
+msgstr "从工作区保存"
 
 msgid "Saved to Downloads"
 msgstr "已保存到“下载”文件夹"
@@ -18852,9 +18913,6 @@ msgstr "笑脸与人物"
 msgid "Smoother onboarding"
 msgstr "更顺畅的上手流程"
 
-msgid "Snapshot"
-msgstr "快照"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "在每轮聊天前后为 worktree 创建快照，使该轮的卡片列出每个更改的文件（包括 shell 编辑）并可以撤销。每条提示词会先等待其快照完成。"
 
@@ -20177,6 +20235,9 @@ msgstr "调度员出现"
 msgid "The endpoint must use https."
 msgstr "端点必须使用 https。"
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "恢复期间环境已发生变化。请重试。"
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "该自动化用于启动云端工作区的环境已被归档或没有仓库。请在自动化的设置中选择其他环境。"
 
@@ -20602,6 +20663,9 @@ msgstr "此自动化位于其他组织"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "此浏览器未登录 Paradev。请登录以继续前往 {connectorName}。"
 
+msgid "This build has no snapshot to restore"
+msgstr "此构建没有可恢复的快照"
+
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
 
@@ -20673,6 +20737,12 @@ msgstr "此目录不存在。终端脚本将回退到工作区根目录。"
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认为已验证。请使用你之前使用的方式登录。"
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "此环境没有可构建的 [install]。请在其基础分支的 .paradev/config.toml 中添加。"
+
+msgid "This environment has no repositories to build"
+msgstr "此环境没有可构建的仓库"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此环境没有仓库。请先在设置中创建包含仓库的环境，再从该环境启动工作区"
@@ -21755,6 +21825,9 @@ msgstr "更新无法保留会话"
 msgid "Update daemon"
 msgstr "更新守护进程"
 
+msgid "Update environment"
+msgstr "更新环境"
+
 msgid "Update Error"
 msgstr "更新出错"
 
@@ -22063,9 +22136,6 @@ msgstr "v2ProjectId与该工作区的项目不匹配"
 
 msgid "Value"
 msgstr "值"
-
-msgid "Variables"
-msgstr "变量"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

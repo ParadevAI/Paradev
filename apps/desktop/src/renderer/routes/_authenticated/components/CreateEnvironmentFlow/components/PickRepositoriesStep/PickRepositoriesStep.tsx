@@ -31,6 +31,8 @@ interface PickRepositoriesStepProps {
 	accountLogin: string | null;
 	isStarting: boolean;
 	reachedLimit?: number | null;
+	/** Changing an existing environment's repositories rather than creating one. */
+	editing?: boolean;
 	onManageEnvironments: () => void;
 	onUpgrade: () => void;
 	/** Picked earlier, when coming back from choosing the primary. */
@@ -50,6 +52,7 @@ export function PickRepositoriesStep({
 	accountLogin,
 	isStarting,
 	reachedLimit = null,
+	editing = false,
 	onManageEnvironments,
 	onUpgrade,
 	initialSelectedIds = [],
@@ -98,13 +101,25 @@ export function PickRepositoriesStep({
 		<>
 			<DialogHeader className="px-5 pt-5 pb-4 text-left">
 				<DialogTitle className="text-base leading-tight">
-					<Trans>Create a cloud environment</Trans>
+					{editing ? (
+						<Trans>Edit repositories</Trans>
+					) : (
+						<Trans>Create a cloud environment</Trans>
+					)}
 				</DialogTitle>
 				<DialogDescription className="text-sm leading-snug">
-					<Trans>
-						Pick the repositories it checks out. An agent in a cloud workspace
-						works out what to install and gets it running.
-					</Trans>
+					{editing ? (
+						<Trans>
+							Pick the repositories this environment checks out. Saving starts a
+							new build; workspaces keep starting from the current one until it
+							succeeds.
+						</Trans>
+					) : (
+						<Trans>
+							Pick the repositories it checks out. An agent in a cloud workspace
+							works out what to install and gets it running.
+						</Trans>
+					)}
 				</DialogDescription>
 				{accountLogin && (
 					<p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -219,7 +234,7 @@ export function PickRepositoriesStep({
 				<Button onClick={onCancel} size="sm" variant="ghost">
 					<Trans>Cancel</Trans>
 				</Button>
-				{isLastStep && (
+				{isLastStep && !editing && (
 					<Button
 						disabled={
 							selected.length === 0 || isStarting || reachedLimit !== null
@@ -239,9 +254,15 @@ export function PickRepositoriesStep({
 					size="sm"
 				>
 					{isStarting ? (
-						<Trans>Starting…</Trans>
+						editing ? (
+							<Trans>Saving…</Trans>
+						) : (
+							<Trans>Starting…</Trans>
+						)
 					) : selected.length > 1 ? (
 						<Trans>Next</Trans>
+					) : editing ? (
+						<Trans>Save and build</Trans>
 					) : (
 						<Trans>Start agent</Trans>
 					)}

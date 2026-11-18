@@ -18,6 +18,8 @@ interface ChoosePrimaryStepProps {
 	onBack: () => void;
 	onGetStarted: (primaryId: string) => void;
 	onSkip: (primaryId: string) => void;
+	initialPrimaryId?: string | null;
+	editing?: boolean;
 }
 
 export function ChoosePrimaryStep({
@@ -26,8 +28,14 @@ export function ChoosePrimaryStep({
 	onBack,
 	onGetStarted,
 	onSkip,
+	initialPrimaryId,
+	editing = false,
 }: ChoosePrimaryStepProps) {
-	const [primaryId, setPrimaryId] = useState(repositories[0]?.id ?? "");
+	const [primaryId, setPrimaryId] = useState(
+		repositories.find((repository) => repository.id === initialPrimaryId)?.id ??
+			repositories[0]?.id ??
+			"",
+	);
 
 	return (
 		<>
@@ -72,20 +80,32 @@ export function ChoosePrimaryStep({
 				<Button onClick={onBack} size="sm" variant="ghost">
 					<Trans>Back</Trans>
 				</Button>
-				<Button
-					disabled={!primaryId || isStarting}
-					onClick={() => onSkip(primaryId)}
-					size="sm"
-					variant="outline"
-				>
-					<Trans>Skip & save</Trans>
-				</Button>
+				{!editing && (
+					<Button
+						disabled={!primaryId || isStarting}
+						onClick={() => onSkip(primaryId)}
+						size="sm"
+						variant="outline"
+					>
+						<Trans>Skip & save</Trans>
+					</Button>
+				)}
 				<Button
 					disabled={!primaryId || isStarting}
 					onClick={() => onGetStarted(primaryId)}
 					size="sm"
 				>
-					{isStarting ? <Trans>Starting…</Trans> : <Trans>Start agent</Trans>}
+					{isStarting ? (
+						editing ? (
+							<Trans>Saving…</Trans>
+						) : (
+							<Trans>Starting…</Trans>
+						)
+					) : editing ? (
+						<Trans>Save and build</Trans>
+					) : (
+						<Trans>Start agent</Trans>
+					)}
 				</Button>
 			</DialogFooter>
 		</>
