@@ -53,6 +53,10 @@ function parseWorkspaceLink(url: string): string | null {
 	});
 }
 
+export function isWorkspaceLink(url: string): boolean {
+	return parseWorkspaceLink(url) !== null;
+}
+
 export function isAppDeepLink(url: string): boolean {
 	try {
 		return new URL(url).protocol === `${PROTOCOL_SCHEME}:`;

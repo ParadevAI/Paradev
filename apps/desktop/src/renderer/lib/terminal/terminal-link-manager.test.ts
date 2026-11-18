@@ -3,6 +3,8 @@ import type { ILinkProvider, Terminal as XTerm } from "@xterm/xterm";
 import { TerminalLinkManager } from "./terminal-link-manager";
 
 const COLS = 80;
+const APP_LINKS = new Set(["superset://v2-workspace/abc"]);
+const isOscAppLink = (uri: string) => APP_LINKS.has(uri);
 
 function bufferLine(text: string) {
 	return {
@@ -87,7 +89,7 @@ describe("TerminalLinkManager", () => {
 		expect(onLinkLeave).toHaveBeenCalled();
 	});
 
-	describe("with an extra OSC 8 protocol", () => {
+	describe("with an OSC 8 app link check", () => {
 		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
 		const event = {} as MouseEvent;
 		let terminal: XTerm;
@@ -102,7 +104,7 @@ describe("TerminalLinkManager", () => {
 				stat: async () => null,
 				onUrlClick,
 				onLinkHover,
-				extraOscLinkProtocols: ["superset:"],
+				isOscAppLink,
 			});
 		});
 
@@ -183,7 +185,7 @@ describe("TerminalLinkManager", () => {
 				onUrlClick,
 				onFileLinkClick,
 				onLinkHover,
-				extraOscLinkProtocols: ["superset:"],
+				isOscAppLink,
 			});
 		});
 
@@ -241,6 +243,37 @@ describe("TerminalLinkManager", () => {
 			await flush();
 
 			expect(stat).toHaveBeenCalledWith("/tmp/report?draft.txt");
+		});
+
+		it("keeps a line-like suffix in the file name", async () => {
+			terminal.options.linkHandler?.activate(
+				event,
+				"file:///tmp/report:42",
+				range,
+			);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/tmp/report:42");
+		});
+
+		it("ignores a file URL whose path does not decode", async () => {
+			terminal.options.linkHandler?.activate(
+				event,
+				"file:///tmp/report%ZZ.txt",
+				range,
+			);
+			await flush();
+
+			expect(stat).not.toHaveBeenCalled();
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+		});
+
+		it("drops a pending hover when the handlers are replaced without stat", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			manager.setHandlers({});
+			await flush();
+
+			expect(onLinkHover).not.toHaveBeenCalled();
 		});
 
 		it("drops a pending hover when the handlers are replaced", async () => {
@@ -303,13 +336,14 @@ describe("TerminalLinkManager", () => {
 				}),
 				onUrlClick,
 				onFileLinkClick,
-				extraOscLinkProtocols: ["superset:"],
+				isOscAppLink,
 			});
 		});
 
 		it.each([
 			"cursor:///Users/me/repo/src/index.ts",
 			"file:///Users/me/repo/src/index.ts",
+			"superset://tasks/abc",
 		])("opens the visible path with its position for %s", async (uri) => {
 			terminal.options.linkHandler?.activate(event, uri, range);
 			await flush();
@@ -322,6 +356,36 @@ describe("TerminalLinkManager", () => {
 					row: 12,
 					col: 3,
 				}),
+			);
+		});
+	});
+
+	describe("with an OSC 8 file link over two visible paths", () => {
+		const event = {} as MouseEvent;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		const range = { start: { x: 1, y: 1 }, end: { x: 40, y: 1 } };
+		let terminal: XTerm;
+		let onFileLinkClick: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal(["/tmp/a.ts:12:3 /tmp/b.ts:20:4"]).terminal;
+			onFileLinkClick = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat: async (path) => ({ isDirectory: false, resolvedPath: path }),
+				onUrlClick: mock(),
+				onFileLinkClick,
+				isOscAppLink,
+			});
+		});
+
+		it("opens the link target instead of guessing a visible path", async () => {
+			terminal.options.linkHandler?.activate(event, "file:///tmp/c.ts", range);
+			await flush();
+
+			expect(onFileLinkClick).toHaveBeenCalledTimes(1);
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({ resolvedPath: "/tmp/c.ts" }),
 			);
 		});
 	});

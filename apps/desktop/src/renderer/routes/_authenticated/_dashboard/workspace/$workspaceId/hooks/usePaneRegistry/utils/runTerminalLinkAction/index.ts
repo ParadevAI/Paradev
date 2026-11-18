@@ -1,5 +1,6 @@
 export {
 	isAppDeepLink,
+	isWorkspaceLink,
 	runChatPullRequestLink,
 	runFileLinkAction,
 	runFolderLinkAction,

@@ -49,11 +49,11 @@ import { TerminalSearch } from "renderer/screens/main/components/WorkspaceView/C
 import { useTheme } from "renderer/stores/theme";
 import { resolveTerminalThemeType } from "renderer/stores/theme/utils";
 import { isWithinWorkspacePath } from "shared/absolute-paths";
-import { PROTOCOL_SCHEME } from "shared/constants";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { useSendAttachments } from "../../hooks/useSendAttachments";
 import {
 	isAppDeepLink,
+	isWorkspaceLink,
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
@@ -388,7 +388,7 @@ export function TerminalPane({
 						action,
 					);
 				},
-				extraOscLinkProtocols: [`${PROTOCOL_SCHEME}:`],
+				isOscAppLink: isWorkspaceLink,
 				onUrlClick: (event, url) => {
 					const linkedWorkspaceId = terminalWorkspaceLinkTarget(event, url);
 					if (linkedWorkspaceId) {
