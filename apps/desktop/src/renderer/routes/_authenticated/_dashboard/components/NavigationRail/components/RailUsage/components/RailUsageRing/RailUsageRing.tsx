@@ -23,6 +23,8 @@ const SINGLE_RING = { size: 28, stroke: 2.5, iconClassName: "size-3.5" };
 const DOUBLE_RING = { size: 34, stroke: 2.25, iconClassName: "size-3" };
 const RING_SPACING = 4.5;
 
+const WINDOW_ROW_CLASS = "grid-cols-[minmax(0,7rem)_1fr_2.5rem_4.5rem] gap-2.5";
+
 const RING_STROKE_CLASS: Record<QuotaMeterTone, string> = {
 	normal: "stroke-muted-foreground/60 group-hover:stroke-foreground",
 	warning: "stroke-amber-500/30 group-hover:stroke-amber-500",
@@ -44,12 +46,18 @@ export function RailUsageRing({
 	const geometry = rings.length > 1 ? DOUBLE_RING : SINGLE_RING;
 	const center = geometry.size / 2;
 	const outerRadius = (geometry.size - geometry.stroke) / 2;
+	const primaryWindows = account.windows.filter(
+		(window) => !window.id.includes(":"),
+	);
+	const scopedWindows = account.windows.filter((window) =>
+		window.id.includes(":"),
+	);
 	const summary = rings
 		.map((ring) => `${ring.label} ${ring.usedPercent}%`)
 		.join(", ");
 
 	return (
-		<HoverCard openDelay={150} closeDelay={100}>
+		<HoverCard openDelay={0} closeDelay={80}>
 			<HoverCardTrigger asChild>
 				<button
 					type="button"
@@ -110,26 +118,38 @@ export function RailUsageRing({
 			<HoverCardContent
 				side="right"
 				align="end"
-				sideOffset={6}
-				className="w-80 p-2.5"
+				sideOffset={10}
+				className="w-80 rounded-lg p-0 duration-100"
 			>
-				<div className="mb-2 flex items-baseline gap-1.5">
-					<span className="truncate text-xs font-medium">{label}</span>
+				<div className="flex items-center gap-2 border-b px-3 py-2.5">
+					{icon && <img src={icon} alt="" className="size-4 object-contain" />}
+					<span className="truncate text-[13px] font-medium">{label}</span>
 					{account.plan && (
-						<span className="rounded bg-muted px-1 text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+						<span className="ml-auto rounded bg-muted px-1.5 py-0.5 text-[9px] font-medium uppercase leading-none tracking-wide text-muted-foreground">
 							{account.plan}
 						</span>
 					)}
 				</div>
-				<div className="space-y-1.5">
-					{account.windows.map((window) => (
+				<div className="space-y-2 px-3 py-2.5">
+					{primaryWindows.map((window) => (
 						<QuotaWindowRow
 							key={window.id}
 							window={window}
-							className="grid-cols-[minmax(0,7rem)_1fr_2.5rem_4.5rem]"
+							className={WINDOW_ROW_CLASS}
 						/>
 					))}
 				</div>
+				{scopedWindows.length > 0 && (
+					<div className="space-y-2 border-t px-3 py-2.5">
+						{scopedWindows.map((window) => (
+							<QuotaWindowRow
+								key={window.id}
+								window={window}
+								className={WINDOW_ROW_CLASS}
+							/>
+						))}
+					</div>
+				)}
 			</HoverCardContent>
 		</HoverCard>
 	);
