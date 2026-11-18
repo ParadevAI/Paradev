@@ -162,22 +162,38 @@ export function useTagFolderActions(
 				})
 			)?.trim();
 			if (!name) return;
-			const tag = mintFolderTag(name, folderTags);
+			const scope = tagFolderScope(projectId);
+			// A setting can outlive its group; a new group must not inherit it.
+			const storedTags = (
+				queryClient.getQueryData<FolderSettingRow[]>(settingsKey) ?? []
+			).flatMap((row) => (row.scope === scope ? [row.tag] : []));
+			const tag = mintFolderTag(name, [...folderTags, ...storedTags]);
+			let settingWritten = false;
 			try {
-				await writeSetting(tagFolderScope(projectId), tag, {
+				await writeSetting(scope, tag, {
 					displayName: name,
 					color: randomGroupColor(),
 				});
+				settingWritten = true;
 				const current = latest(workspace);
 				await writeTags(
 					current,
 					applyFolderTagChange(current.tags, folderTags, tag),
 				);
 			} catch {
+				if (settingWritten && hostUrl) {
+					void getHostServiceClientByUrl(hostUrl)
+						.tagFolders.delete.mutate({ scope, tag })
+						.catch(() => {})
+						.finally(
+							() =>
+								void queryClient.invalidateQueries({ queryKey: settingsKey }),
+						);
+				}
 				Alert.alert(t({ message: "Couldn't create the group" }));
 			}
 		},
-		[writeSetting, writeTags, latest, t],
+		[writeSetting, writeTags, latest, queryClient, settingsKey, hostUrl, t],
 	);
 
 	const renameFolder = useCallback(
