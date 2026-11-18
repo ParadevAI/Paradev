@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { SessionUpdate } from "@agentclientprotocol/sdk";
 import {
+	chatNote,
 	createChatUi,
 	describeSelect,
 	type QuestionApi,
@@ -228,4 +229,19 @@ describe("chat extension UI", () => {
 		expect(() => ui.editor("Edit", "")).toThrow(/terminal/);
 		ui.setStatus("x", "y");
 	});
+});
+
+test("a harness warning about apps that did not open is put in plain words", () => {
+	const warning = [
+		"MCP servers need attention:",
+		'  plugin-linear: failed: MCP HTTP request failed: {"code":"plugin_unavailable"}',
+		"  plugin-google-calendar: needs-auth",
+		"Run /mcp to fix.",
+	].join("\n");
+	expect(chatNote(warning)).toBe(
+		"Linear and Google Calendar couldn't be opened. Reconnect them in Plugins, then ask again.",
+	);
+	expect(chatNote("Couldn't reach the booking site")).toBe(
+		"Couldn't reach the booking site",
+	);
 });

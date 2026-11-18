@@ -13,6 +13,32 @@ interface FormPart {
 	multiSelect: boolean;
 }
 
+const APP_PROBLEMS = "MCP servers need attention:";
+
+/**
+ * A harness notice as the chat reads it. Its warning about apps that did not
+ * open names servers and transport errors and points at a terminal command;
+ * the chat gets which apps, and where a person fixes it.
+ */
+export function chatNote(message: string): string {
+	if (!message.startsWith(APP_PROBLEMS)) return message;
+	const apps = [
+		...new Set(
+			[...message.matchAll(/^\s+plugin-([A-Za-z0-9_-]+):/gm)].map(([, name]) =>
+				(name ?? "")
+					.split(/[-_]/)
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(" "),
+			),
+		),
+	];
+	const which =
+		apps.length === 0
+			? "A connected app"
+			: new Intl.ListFormat("en", { type: "conjunction" }).format(apps);
+	return `${which} couldn't be opened. Reconnect ${apps.length > 1 ? "them" : "it"} in Plugins, then ask again.`;
+}
+
 /** One form question's answer: the options picked, and what was typed under "Other…". */
 export interface FormAnswer {
 	picked: string[];
@@ -274,7 +300,7 @@ export function createChatUi(opts: {
 		},
 		notify(message) {
 			void opts.api
-				.notify(message)
+				.notify(chatNote(message))
 				.catch((err: unknown) =>
 					console.error("dev-runner: couldn't post a note:", err),
 				);
