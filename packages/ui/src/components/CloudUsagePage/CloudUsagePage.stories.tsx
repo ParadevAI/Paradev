@@ -4,6 +4,7 @@ import {
 	noPeriodsArgs,
 	overviewArgs,
 	query,
+	STORY_TODAY,
 	StoryLink,
 	withSettingsShell,
 } from "./fixtures";
@@ -13,7 +14,12 @@ const meta = {
 	title: "Cloud usage/Overview",
 	component: CloudUsagePage,
 	decorators: [withSettingsShell],
-	args: { Link: StoryLink, isAdmin: true, ...overviewArgs("northwind") },
+	args: {
+		Link: StoryLink,
+		isAdmin: true,
+		today: STORY_TODAY,
+		...overviewArgs("northwind"),
+	},
 } satisfies Meta<typeof CloudUsagePage>;
 
 export default meta;

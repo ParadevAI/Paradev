@@ -1658,6 +1658,9 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "由 Union Square Ventures 领投的 1150 万美元种子轮"
 
+msgid "0 rows"
+msgstr "0 行"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "此服务器不可用"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "未绑定 · 在设置→链接中配置"
+
+msgid "Not broken down yet"
+msgstr "尚未细分"
 
 msgid "Not configured"
 msgstr "未配置"

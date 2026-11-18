@@ -1658,6 +1658,9 @@ msgstr "0 $"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "11,5 Mio. $ Seed-Runde unter Führung von Union Square Ventures"
 
+msgid "0 rows"
+msgstr "0 Zeilen"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "Auf diesem Server nicht verfügbar"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Nicht belegt · in Einstellungen → Links konfigurieren"
+
+msgid "Not broken down yet"
+msgstr "Noch nicht aufgeschlüsselt"
 
 msgid "Not configured"
 msgstr "Nicht konfiguriert"

@@ -8,8 +8,6 @@ import {
 	type MachineSize,
 } from "@superset/shared/billing";
 
-export { gbMinutesUsd };
-
 import {
 	and,
 	asc,
@@ -43,6 +41,8 @@ import {
 	cloudWorkspaces as workspaces,
 } from "./schema/schema";
 import { escapeLikePattern } from "./utils/like";
+
+export { gbMinutesUsd };
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 

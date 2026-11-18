@@ -19,6 +19,7 @@ const SWATCH: Record<AllowanceLine["kind"], string> = {
 	bought: "bg-teal-500",
 	extra: "bg-orange-500",
 	beyond: "bg-amber-400",
+	notBrokenDown: "bg-foreground/20",
 };
 
 export function AllowanceLines({
@@ -48,6 +49,8 @@ export function AllowanceLines({
 				return <Trans>Bought credits</Trans>;
 			case "extra":
 				return <Trans>Extra usage</Trans>;
+			case "notBrokenDown":
+				return <Trans>Not broken down yet</Trans>;
 			case "beyond":
 				return <Trans>Not counted by billing yet</Trans>;
 		}
@@ -90,7 +93,9 @@ export function AllowanceLines({
 				{items.map(row)}
 			</>
 		);
-	const billed = lines.filter((line) => line.kind !== "beyond");
+	const isOther = (line: AllowanceLine) =>
+		line.kind === "beyond" || line.kind === "notBrokenDown";
+	const billed = lines.filter((line) => !isOther(line));
 
 	return (
 		<>
@@ -115,7 +120,7 @@ export function AllowanceLines({
 					)}
 					{group(
 						<Trans context="cloud allowance group">Other</Trans>,
-						lines.filter((line) => line.kind === "beyond"),
+						lines.filter(isOther),
 					)}
 				</tbody>
 			</table>

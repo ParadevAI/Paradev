@@ -50,11 +50,15 @@ export function Pager({
 	return (
 		<div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
 			<span className="tabular-nums">
-				<Plural
-					value={rowCount}
-					one={`${first}–${last} of # row`}
-					other={`${first}–${last} of # rows`}
-				/>
+				{rowCount === 0 ? (
+					<Trans>0 rows</Trans>
+				) : (
+					<Plural
+						value={rowCount}
+						one={`${first}–${last} of # row`}
+						other={`${first}–${last} of # rows`}
+					/>
+				)}
 			</span>
 			<div className="flex flex-wrap items-center gap-3">
 				<span className="flex items-center gap-2">

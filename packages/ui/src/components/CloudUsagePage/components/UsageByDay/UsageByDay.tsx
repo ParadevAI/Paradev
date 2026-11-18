@@ -22,14 +22,15 @@ const LAST_TICK_GAP_DAYS = 2;
 interface UsageByDayProps {
 	usage: PricedUsage;
 	title: ReactNode;
+	/** The UTC day the chart counts as today; days after it have no value. */
+	today: string;
 }
 
-export function UsageByDay({ usage, title }: UsageByDayProps) {
+export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 	const { t } = useLingui();
 	const { formatCurrency, formatDate } = useFormat();
 	const { dollars } = useUsageFormat();
 	const byDay = new Map(usage.items.map((item) => [item.key, item]));
-	const today = new Date().toISOString().slice(0, 10);
 	const data = utcDays(usage.range).map((day) => {
 		const item = byDay.get(day);
 		const value = item?.usageUsd ?? 0;

@@ -32,6 +32,8 @@ interface CloudUsagePageProps {
 	byPerson: CloudQuery<CloudUsage>;
 	/** The top workspaces; the Workspaces page has the rest. */
 	workspaces: CloudQuery<CloudUsage>;
+	/** The UTC day the page counts as today; the current day by default. */
+	today?: string;
 }
 
 export function CloudUsagePage({
@@ -42,6 +44,7 @@ export function CloudUsagePage({
 	byDay: unpricedByDay,
 	byPerson: unpricedByPerson,
 	workspaces: unpricedWorkspaces,
+	today = new Date().toISOString().slice(0, 10),
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
 	const byDay = pricedQuery(unpricedByDay);
@@ -114,6 +117,7 @@ export function CloudUsagePage({
 					) : (
 						<>
 							<UsageByDay
+								today={today}
 								usage={byDay.data}
 								title={
 									isAdmin ? (

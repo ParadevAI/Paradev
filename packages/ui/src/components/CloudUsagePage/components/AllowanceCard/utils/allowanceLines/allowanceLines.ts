@@ -6,17 +6,26 @@ export interface Amount {
 }
 
 /**
- * What each line holds. The first four are what billing counted; together they are its total.
+ * What each line holds. The lines always add up to the headline.
  * - `included`: usage of the seats' monthly amount, of that amount.
  * - `freeCredits`, `bought`: usage of a granted or bought credit, of the credit.
  * - `extra`: usage past the included amount and the credits, of the extra-usage cap when there is one.
- * - `beyond`: usage the period's events hold past what billing counted, such as usage not sent yet.
+ * - `beyond`: usage the period's events hold past billing's own total (its monthly usage plus each
+ *   credit's usage), such as usage not sent yet. Only when every credit was read.
+ * - `notBrokenDown`: usage the other lines cannot place because a credit was not read. Billing
+ *   may or may not have counted it, so it is never called unbilled.
  */
 export interface AllowanceLine {
-	kind: "included" | "freeCredits" | "bought" | "extra" | "beyond";
+	kind:
+		| "included"
+		| "freeCredits"
+		| "bought"
+		| "extra"
+		| "beyond"
+		| "notBrokenDown";
 	paid: boolean;
 	used: Amount;
-	/** Null for extra usage with no cap or an unknown one, and for `beyond`. */
+	/** Null for extra usage with no cap or an unknown one, and for `beyond` and `notBrokenDown`. */
 	total: Amount | null;
 }
 
@@ -46,6 +55,8 @@ export function allowanceLines(
 	allowance: PricedAllowance,
 	included: Amount,
 	periodUsed: Amount,
+	/** The fields the router marks `not_read`. */
+	unread: readonly string[] = [],
 ) {
 	const credit = (
 		kind: "freeCredits" | "bought",
@@ -84,11 +95,32 @@ export function allowanceLines(
 				? [{ kind: "extra", paid: true, used: overage, total: null } as const]
 				: []),
 	];
-	const beyond = minus(periodUsed, sum(billed.map((line) => line.used)));
-	const lines: AllowanceLine[] =
-		beyond.gbHours >= BEYOND_MIN_GB_HOURS
-			? [...billed, { kind: "beyond", paid: false, used: beyond, total: null }]
-			: billed;
+	const itemised = sum(billed.map((line) => line.used));
+	const creditsRead = !unread.some(
+		(field) => field === "bought" || field === "freeCredits",
+	);
+	const own = sum([
+		{ gbHours: allowance.usedGbHours, usd: allowance.usedUsd },
+		...billed
+			.filter((line) => line.kind === "freeCredits" || line.kind === "bought")
+			.map((line) => line.used),
+	]);
+	const counted =
+		creditsRead && own.gbHours > itemised.gbHours ? own : itemised;
+	const line = (
+		kind: "beyond" | "notBrokenDown",
+		used: Amount,
+	): AllowanceLine[] =>
+		used.gbHours >= BEYOND_MIN_GB_HOURS
+			? [{ kind, paid: false, used, total: null }]
+			: [];
+	const lines: AllowanceLine[] = creditsRead
+		? [
+				...billed,
+				...line("notBrokenDown", minus(counted, itemised)),
+				...line("beyond", minus(periodUsed, counted)),
+			]
+		: [...billed, ...line("notBrokenDown", minus(periodUsed, itemised))];
 
 	const totalsOf = (items: AllowanceLine[]) =>
 		items.flatMap((item) => (item.total ? [item.total] : []));

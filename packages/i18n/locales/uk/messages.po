@@ -1652,6 +1652,9 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Seed-раунд на $11,5 млн на чолі з Union Square Ventures"
 
+msgid "0 rows"
+msgstr "0 рядків"
+
 msgid "1"
 msgstr "1"
 
@@ -13405,6 +13408,9 @@ msgstr "Недоступно на цьому сервері"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Не прив'язано · налаштуйте в Налаштування → Посилання"
+
+msgid "Not broken down yet"
+msgstr "Ще не розбито за статтями"
 
 msgid "Not configured"
 msgstr "Не налаштовано"

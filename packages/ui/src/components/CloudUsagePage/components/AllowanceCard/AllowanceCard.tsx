@@ -54,6 +54,9 @@ export function AllowanceCard({
 					allowance,
 					{ gbHours: allowance.includedGbHours, usd: allowance.includedUsd },
 					{ gbHours: total.gbHours, usd: total.usageUsd },
+					period?.unavailable
+						.filter((item) => item.reason === "not_read")
+						.map((item) => item.field),
 				)
 			: null;
 	const dollars = dollarsFor([

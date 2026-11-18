@@ -1658,6 +1658,9 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures liderliğinde 11,5 milyon $ tohum yatırım"
 
+msgid "0 rows"
+msgstr "0 satır"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "Bu sunucuda kullanılamıyor"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Atanmadı · Ayarlar → Bağlantılar bölümünden yapılandırın"
+
+msgid "Not broken down yet"
+msgstr "Henüz ayrıntılandırılmadı"
 
 msgid "Not configured"
 msgstr "Yapılandırılmadı"

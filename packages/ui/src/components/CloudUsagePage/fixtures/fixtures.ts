@@ -1,9 +1,9 @@
 import {
+	allowanceOf,
 	type CloudUsage as BillingValue,
 	cloudUsageFromBalances,
 } from "@superset/auth/billing/cloud-usage";
 import { type MachineSize, machineSpec } from "@superset/shared/billing";
-import { allowanceOf } from "@superset/trpc/cloud-allowance";
 import type {
 	CloudBoot,
 	CloudPages,
@@ -26,8 +26,9 @@ import { type Priced, priced } from "../utils/priced";
 const RATE = 0.06;
 const MINUTES = 60;
 const DAY_MS = 24 * 60 * 60 * 1000;
-/** The stories' clock; `.storybook/fixedClock.ts` sets the same instant. */
+/** The stories' clock, so captures do not change from day to day. */
 export const STORY_NOW = new Date("2026-11-18T14:00:00Z");
+export const STORY_TODAY = "2026-11-18";
 const PERIOD_END = new Date("2026-11-27T00:00:00Z");
 /** The share of the open period's usage each earlier period had, newest first. */
 const PERIOD_SHARE = [1, 0.86, 0.71, 0.58, 0.44, 0];
@@ -131,7 +132,7 @@ const workspaceRef = (row: Row) =>
 interface Seed {
 	ref: WorkspaceRef;
 	weight: number;
-	stoppedAtLimit: boolean;
+	number: number;
 }
 
 function workspaceSeeds(count: number, names?: string[]): Seed[] {
@@ -152,32 +153,54 @@ function workspaceSeeds(count: number, names?: string[]): Seed[] {
 		return {
 			ref,
 			weight: 0.3 + random(),
-			stoppedAtLimit: status === "asleep" && i % 5 === 2,
+			number: i,
 		};
 	});
 }
 
-/** A workspace's boots in a range: `gbHours` split over boots of about `BOOT_HOURS`, newest first; the newest is open when awake. */
-function bootsOf(seed: Seed, gbHours: number, range: Range): Boot[] {
+/** How long a boot that could not start ran, as in the design. */
+const FAILED_BOOT_MINUTES = 0.8;
+
+/**
+ * A workspace's boots in a range: `gbHours` over boots of about `BOOT_HOURS` each, of mixed
+ * lengths, newest first. The newest is open when the workspace is awake, a failed start that
+ * billed nothing when it failed, and stopped at the usage limit when the organization reached it.
+ */
+function bootsOf(
+	seed: Seed,
+	gbHours: number,
+	range: Range,
+	atLimit: boolean,
+): Boot[] {
 	const { ref } = seed;
 	const { memoryGb, vcpus } = machineSpec(ref.size);
+	const failed = ref.status === "failed";
 	const count = Math.min(
 		MAX_BOOTS,
 		Math.max(1, Math.round(gbHours / memoryGb / BOOT_HOURS)),
 	);
+	const lengths = seeded(seed.number + 1);
+	const weights = Array.from({ length: count }, (_, i) =>
+		failed && i === 0 ? 0 : 0.25 + 1.75 * lengths(),
+	);
+	const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1;
 	const end = Math.min(range.to.getTime(), STORY_NOW.getTime());
 	const span = end - range.from.getTime();
-	const minutes = ((gbHours / count) * MINUTES) / memoryGb;
-	return Array.from({ length: count }, (_, i) => {
-		const open = i === 0 && ref.status === "awake";
+	return weights.map((weight, i) => {
+		const bootGbHours = (gbHours * weight) / weightSum;
+		const minutes =
+			failed && i === 0
+				? FAILED_BOOT_MINUTES
+				: (bootGbHours * MINUTES) / memoryGb;
+		const open = i === 0 && ref.status === "awake" && !atLimit;
 		const startedAt = new Date(
 			end - ((i + 0.5) / count) * span - (open ? 0 : minutes * MINUTES * 1000),
 		);
 		const endReason: CloudBoot["endReason"] = open
 			? null
-			: i === 0 && ref.status === "failed"
+			: i === 0 && failed
 				? "failed"
-				: i === 0 && seed.stoppedAtLimit
+				: i === 0 && atLimit && ref.status === "awake"
 					? "usage_limit"
 					: (STOP_REASONS[i % STOP_REASONS.length] ?? "idle");
 		return {
@@ -194,20 +217,22 @@ function bootsOf(seed: Seed, gbHours: number, range: Range): Boot[] {
 			memoryGb,
 			vcpus,
 			endReason,
-			gbHours: (minutes / MINUTES) * memoryGb,
-			usageUsd: round2((minutes / MINUTES) * memoryGb * RATE),
+			gbHours: bootGbHours,
+			usageUsd: round2(bootGbHours * RATE),
 		};
 	});
 }
 
+/** A group's metrics, priced from its GB-hours at one rate as the router prices a row. */
 function metricsOf(boots: Boot[]) {
+	const gbHours = boots.reduce((sum, boot) => sum + boot.gbHours, 0);
 	return {
 		workspaces: new Set(boots.map((boot) => boot.workspace?.id)).size,
 		boots: boots.length,
 		failedBoots: boots.filter((boot) => boot.endReason === "failed").length,
 		hours: boots.reduce((sum, boot) => sum + boot.minutes / MINUTES, 0),
-		gbHours: boots.reduce((sum, boot) => sum + boot.gbHours, 0),
-		usageUsd: round2(boots.reduce((sum, boot) => sum + boot.usageUsd, 0)),
+		gbHours,
+		usageUsd: round2(gbHours * RATE),
 	};
 }
 
@@ -216,17 +241,29 @@ interface Fleet {
 	boots: Boot[];
 }
 
-/** The fleet's usage rows and boots for a range, holding `gbHours` in all. */
-function fleet(seeds: Seed[], gbHours: number, range: Range): Fleet {
+/** The fleet's usage rows and boots for a range, holding `gbHours` in all. `atLimit`: the organization reached its usage limit, so no workspace is awake. */
+function fleet(
+	seeds: Seed[],
+	gbHours: number,
+	range: Range,
+	atLimit = false,
+): Fleet {
 	if (gbHours <= 0) return { rows: [], boots: [] };
 	const weights = seeds.reduce((sum, seed) => sum + seed.weight, 0);
 	const boots: Boot[] = [];
 	const rows = seeds.map((seed) => {
-		const own = bootsOf(seed, (gbHours * seed.weight) / weights, range);
+		const own = bootsOf(
+			seed,
+			(gbHours * seed.weight) / weights,
+			range,
+			atLimit,
+		);
 		boots.push(...own);
 		const latest = own[0];
 		const ref: WorkspaceRef = {
 			...seed.ref,
+			status:
+				atLimit && seed.ref.status === "awake" ? "asleep" : seed.ref.status,
 			lastBoot: latest
 				? { endReason: latest.endReason, stoppedAt: latest.stoppedAt }
 				: null,
@@ -245,7 +282,7 @@ const total = (rows: Row[]) => {
 		failedBoots: sum((row) => row.failedBoots),
 		hours: sum((row) => row.hours),
 		gbHours: sum((row) => row.gbHours),
-		usageUsd: round2(sum((row) => row.usageUsd)),
+		usageUsd: round2(sum((row) => row.gbHours) * RATE),
 	};
 };
 
@@ -499,8 +536,14 @@ const eventsOf = (state: BillingState) => {
 	return entry.eventsGbHours ?? entry.billing.usedGbHours;
 };
 
+/** A state's fleet `back` periods ago; only the open period of the limit-reached state is at its limit. */
 const fleetIn = (state: BillingState, back: number, seeds = NORTHWIND_SEEDS) =>
-	fleet(seeds, eventsOf(state) * (PERIOD_SHARE[back] ?? 0), periodRange(back));
+	fleet(
+		seeds,
+		eventsOf(state) * (PERIOD_SHARE[back] ?? 0),
+		periodRange(back),
+		state === "limitReached" && back === 0,
+	);
 
 /** The router's period list for a state, newest first; the earlier periods are closed. A member gets no allowance and their own metrics. */
 function periodList(state: BillingState, member = false): CloudPeriods {

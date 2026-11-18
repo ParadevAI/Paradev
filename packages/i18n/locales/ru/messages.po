@@ -1658,6 +1658,9 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Посевной раунд на 11,5 млн $ под руководством Union Square Ventures"
 
+msgid "0 rows"
+msgstr "0 строк"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "Недоступно на этом сервере"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Не назначено · настройте в Настройки → Ссылки"
+
+msgid "Not broken down yet"
+msgstr "Ещё не разбито по статьям"
 
 msgid "Not configured"
 msgstr "Не настроено"

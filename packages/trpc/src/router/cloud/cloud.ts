@@ -5,6 +5,7 @@ import {
 	type OrganizationBilling,
 	organizationBilling,
 } from "@superset/auth/billing";
+import { allowanceOf } from "@superset/auth/billing/cloud-usage";
 import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
@@ -26,7 +27,6 @@ import { decodeCursor, encodeCursor } from "../../lib/cursor";
 import { organizationFlagEnabled } from "../../lib/feature-flags";
 import { personProcedure } from "../../trpc";
 import { requireActiveOrgRole } from "../utils/active-org";
-import { allowanceOf } from "./allowance";
 import {
 	bootKeysetSchema,
 	type CloudListFilters,

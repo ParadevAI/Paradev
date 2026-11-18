@@ -23,6 +23,7 @@ import type { PricedRow } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Person } from "../Person";
 import { StatusPill } from "../StatusPill";
+import { nameParts } from "./utils/nameParts";
 
 interface WorkspacesTableProps {
 	Link: CloudUsageLink;
@@ -117,8 +118,13 @@ export function WorkspacesTable({
 										}}
 										className="font-semibold break-words after:absolute after:inset-0"
 									>
-										<span title={workspace.name} className="line-clamp-2">
-											{workspace.name}
+										<span title={workspace.name} className="flex min-w-0">
+											<span className="truncate">
+												{nameParts(workspace.name).head}
+											</span>
+											<span className="shrink-0">
+												{nameParts(workspace.name).tail}
+											</span>
 										</span>
 									</Link>
 								) : (
@@ -138,7 +144,7 @@ export function WorkspacesTable({
 								</div>
 							</TableCell>
 							{isAdmin && (
-								<TableCell className={cn(WIDE, "max-w-48")}>
+								<TableCell className={cn(WIDE, "max-w-32 @4xl:max-w-48")}>
 									{owner && <Person name={owner} />}
 								</TableCell>
 							)}

@@ -1,4 +1,3 @@
-import "./fixedClock";
 import { I18nProvider } from "@lingui/react";
 import type { Preview } from "@storybook/react-vite";
 import { i18n, initI18n } from "@superset/i18n";

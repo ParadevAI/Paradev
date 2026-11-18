@@ -1658,6 +1658,9 @@ msgstr "$0"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt"
 
+msgid "0 rows"
+msgstr "0 hàng"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "Không khả dụng trên máy chủ này"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Chưa gán · cấu hình trong Cài đặt → Liên kết"
+
+msgid "Not broken down yet"
+msgstr "Chưa được chia nhỏ"
 
 msgid "Not configured"
 msgstr "Chưa cấu hình"

@@ -1658,6 +1658,9 @@ msgstr "0 $"
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Seed kolo 11,5 mil. USD pod vedením Union Square Ventures"
 
+msgid "0 rows"
+msgstr "0 řádků"
+
 msgid "1"
 msgstr "1"
 
@@ -13411,6 +13414,9 @@ msgstr "Na tomto serveru není k dispozici"
 
 msgid "Not bound · configure in Settings → Links"
 msgstr "Nepřiřazeno · nastavte v Nastavení → Odkazy"
+
+msgid "Not broken down yet"
+msgstr "Zatím nerozepsáno"
 
 msgid "Not configured"
 msgstr "Nenastaveno"
