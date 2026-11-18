@@ -16,7 +16,7 @@ import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
-import { controlTags, logControl } from "../../lib/control-log";
+import { logControl } from "../../lib/control-log";
 import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
@@ -41,7 +41,7 @@ import {
 	sandboxNameFor,
 } from "./provision";
 import { linkTask } from "./record";
-import { transitionCloudWorkspace } from "./transition";
+import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 /** An environment this user may start a workspace from, or a user-facing NOT_FOUND. */
 export async function loadUsableEnvironment(args: {
@@ -320,11 +320,10 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		const changed = await transitionCloudWorkspace({
-			id: job.cloudWorkspaceId,
-			from: ["provisioning"],
-			to: "failed",
-		});
+		await failCloudWorkspace(
+			{ cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
+			{ from: ["provisioning"], site: "queue", error },
+		);
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",
@@ -338,14 +337,6 @@ export async function queueProvision(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,
 		);
-		const scope = { cloudWorkspaceId: job.cloudWorkspaceId, organizationId };
-		logControl(
-			"workspace.failed",
-			scope,
-			{ "failure.site": "queue", "status.changed": changed },
-			"error",
-		);
-		if (changed) Sentry.captureException(error, { tags: controlTags(scope) });
 		throw userError({
 			code: "INTERNAL_SERVER_ERROR",
 			message: "Could not start cloud workspace provisioning",
