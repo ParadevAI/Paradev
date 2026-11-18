@@ -2,16 +2,14 @@
 
 import { useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterOutputs } from "@superset/trpc";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@superset/ui/select";
-
-type Period = RouterOutputs["cloud"]["periods"]["list"]["items"][number];
+} from "../../../ui/select";
+import type { CloudPeriod as Period } from "../../types";
 
 interface PeriodPickerProps {
 	periods: Period[];

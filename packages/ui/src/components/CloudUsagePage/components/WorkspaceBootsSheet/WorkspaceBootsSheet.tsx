@@ -2,15 +2,14 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterInputs } from "@superset/trpc";
-import { Button } from "@superset/ui/button";
+import { Button } from "../../../ui/button";
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-} from "@superset/ui/sheet";
+} from "../../../ui/sheet";
 import {
 	Table,
 	TableBody,
@@ -18,37 +17,27 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "@superset/ui/table";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useTRPC } from "@/trpc/react";
-import { QueryStatus } from "../../../QueryStatus";
+} from "../../../ui/table";
 import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
-import type { WorkspaceRef } from "../../types";
+import type { CloudBoots, CloudPages, WorkspaceRef } from "../../types";
+import { QueryStatus } from "../QueryStatus";
 import { SizeLabel } from "../SizeLabel";
 import { END_REASONS } from "./constants";
 import { bootEnd } from "./utils/bootEnd";
 
 interface WorkspaceBootsSheetProps {
 	workspace: WorkspaceRef | null;
-	range: RouterInputs["cloud"]["boots"]["list"]["range"];
+	pages: CloudPages<CloudBoots>;
 	onClose: () => void;
 }
 
 export function WorkspaceBootsSheet({
 	workspace,
-	range,
+	pages,
 	onClose,
 }: WorkspaceBootsSheetProps) {
 	const { i18n } = useLingui();
-	const trpc = useTRPC();
 	const { formatDateTime, formatNumber, formatGbHours } = useFormat();
-	const pages = useInfiniteQuery({
-		...trpc.cloud.boots.list.infiniteQueryOptions(
-			{ workspace: workspace?.id, range, limit: 25 },
-			{ getNextPageParam: (page) => page.nextCursor },
-		),
-		enabled: !!workspace,
-	});
 	const boots = pages.data?.pages.flatMap((page) => page.items) ?? [];
 	const failedAt = workspace?.failure && formatDateTime(workspace.failure.at);
 	const formatMinutes = (minutes: number) =>

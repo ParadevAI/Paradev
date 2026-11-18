@@ -2,10 +2,10 @@
 
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterOutputs } from "@superset/trpc";
-import { cn } from "@superset/ui/utils";
+import { cn } from "../../../../lib/utils";
+import type { CloudUsage } from "../../types";
 
-type Metrics = RouterOutputs["cloud"]["usage"]["query"]["total"];
+type Metrics = CloudUsage["total"];
 
 interface UsageTotalsProps {
 	total: Metrics;

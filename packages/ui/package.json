@@ -26,10 +26,12 @@
 		"./atoms/*": "./src/atoms/*/index.ts",
 		"./*": "./src/components/ui/*.tsx",
 		"./app-store-qr": "./src/components/AppStoreQr/index.ts",
-		"./pro-features-dialog": "./src/components/ProFeaturesDialog/index.ts"
+		"./pro-features-dialog": "./src/components/ProFeaturesDialog/index.ts",
+		"./cloud-usage": "./src/components/CloudUsagePage/index.ts"
 	},
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",
+		"test": "bun test",
 		"typecheck": "tsc --noEmit --emitDeclarationOnly false",
 		"ui-add": "bunx shadcn@latest add",
 		"storybook": "storybook dev -p 6006",
@@ -106,6 +108,7 @@
 		"@lingui/babel-plugin-lingui-macro": "6.12.0",
 		"@rolldown/plugin-babel": "0.3.0",
 		"@storybook/react-vite": "10.6.2",
+		"@superset/trpc": "workspace:*",
 		"@superset/typescript": "workspace:*",
 		"@tailwindcss/postcss": "4.2.2",
 		"@tailwindcss/vite": "4.2.2",

@@ -2,8 +2,8 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterInputs } from "@superset/trpc";
-import { Button } from "@superset/ui/button";
+import { cn } from "../../../../lib/utils";
+import { Button } from "../../../ui/button";
 import {
 	Table,
 	TableBody,
@@ -11,33 +11,25 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "@superset/ui/table";
-import { cn } from "@superset/ui/utils";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { useTRPC } from "@/trpc/react";
+} from "../../../ui/table";
+import { FAILURE_REASONS, STATUS_LABELS } from "../../constants";
+import type { CloudPages, CloudUsage, WorkspaceRef } from "../../types";
 import { QueryStatus } from "../QueryStatus";
-import { SizeLabel } from "./components/SizeLabel";
-import { WorkspaceBootsSheet } from "./components/WorkspaceBootsSheet";
-import { FAILURE_REASONS, STATUS_LABELS } from "./constants";
-import type { WorkspaceRef } from "./types";
+import { SizeLabel } from "../SizeLabel";
 
 interface WorkspacesTableProps {
-	range: RouterInputs["cloud"]["usage"]["query"]["range"];
+	pages: CloudPages<CloudUsage>;
 	isAdmin: boolean;
+	onSelect: (workspace: WorkspaceRef) => void;
 }
 
-export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
+export function WorkspacesTable({
+	pages,
+	isAdmin,
+	onSelect,
+}: WorkspacesTableProps) {
 	const { i18n } = useLingui();
-	const trpc = useTRPC();
 	const { formatNumber, formatGbHours } = useFormat();
-	const [selected, setSelected] = useState<WorkspaceRef | null>(null);
-	const pages = useInfiniteQuery(
-		trpc.cloud.usage.query.infiniteQueryOptions(
-			{ range, groupBy: "workspace", limit: 25 },
-			{ getNextPageParam: (page) => page.nextCursor },
-		),
-	);
 	const rows = pages.data?.pages.flatMap((page) => page.items) ?? [];
 
 	return (
@@ -87,7 +79,7 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 												<button
 													type="button"
 													className="text-left font-medium break-words hover:underline"
-													onClick={() => setSelected(workspace)}
+													onClick={() => onSelect(workspace)}
 												>
 													{workspace.name}
 												</button>
@@ -151,11 +143,6 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 					<Trans>Show more</Trans>
 				</Button>
 			)}
-			<WorkspaceBootsSheet
-				workspace={selected}
-				range={range}
-				onClose={() => setSelected(null)}
-			/>
 		</section>
 	);
 }

@@ -2,19 +2,17 @@
 
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterOutputs } from "@superset/trpc";
+import type { ReactNode } from "react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { cn } from "../../../../lib/utils";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
-} from "@superset/ui/chart";
-import { cn } from "@superset/ui/utils";
-import type { ReactNode } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+} from "../../../ui/chart";
+import type { CloudUsage as Usage } from "../../types";
 import { utcDays } from "./utils/utcDays";
-
-type Usage = RouterOutputs["cloud"]["usage"]["query"];
 
 interface UsageByDayProps {
 	items: Usage["items"];

@@ -1,7 +1,7 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
-import { Button } from "@superset/ui/button";
+import { Button } from "../../../ui/button";
 
 interface QueryStatusProps {
 	isError: boolean;

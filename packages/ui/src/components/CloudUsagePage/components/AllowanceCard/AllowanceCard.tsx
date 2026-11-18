@@ -2,12 +2,10 @@
 
 import { Trans } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
-import type { RouterOutputs } from "@superset/trpc";
-import { Progress } from "@superset/ui/progress";
+import { Progress } from "../../../ui/progress";
+import type { CloudPeriod } from "../../types";
 
-type Allowance = NonNullable<
-	RouterOutputs["cloud"]["periods"]["list"]["items"][number]["allowance"]
->;
+type Allowance = NonNullable<CloudPeriod["allowance"]>;
 
 export function AllowanceCard({ allowance }: { allowance: Allowance }) {
 	const { formatDate, formatGbHours } = useFormat();
