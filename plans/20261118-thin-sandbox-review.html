@@ -48,15 +48,15 @@
 <h3>All decisions in one place</h3>
 <ol>
 <li><a href="#swap">Swap</a>: ship no swap with the faster memguard? <strong>Decided: yes, shipped.</strong></li>
-<li><a href="#agents">Agents</a>: when the agents drive cannot be mounted, open the box without agents, or fail the open?</li>
+<li><a href="#agents">Agents</a>: when the agents drive cannot be mounted, open the box without agents, or fail the open? <strong>Decided: fail the open; agents only from the drive, and no golden keeps agents on its disk.</strong></li>
 <li><a href="#agents">Agents</a>: should workspaces of archived environments move to the current bundle? <strong>Decided: yes, shipped in #9929.</strong></li>
 <li><a href="#agents">Agents</a>: publish drives in all 19 regions on every release, or only regions that have an environment? <strong>Decided: all 19, shipped in #9929.</strong></li>
 <li><a href="#builds">Builds</a>: bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0? <strong>Decided: yes, shipped in #9980.</strong></li>
 <li><a href="#builds">Builds</a>: what is the build limit? <strong>Decided: 10 minutes, a hard ceiling.</strong></li>
 <li><a href="#builds">Builds</a>: who rebases #9282, and when? <strong>Decided: the #9906 worker; done.</strong></li>
-<li><a href="#drive">Drive</a>: enable it for one internal environment, new workspaces only?</li>
-<li><a href="#drive">Drive</a>: which environment?</li>
-<li><a href="#drive">Drive</a>: what happens to a drive when its workspace's snapshot expires after 30 days?</li>
+<li><a href="#drive">Drive</a>: enable it for one internal environment, new workspaces only? <strong>Decided: yes, after #9847 merges.</strong></li>
+<li><a href="#drive">Drive</a>: which environment? <strong>Decided: the team Paradev environment (1dcfb8ac).</strong></li>
+<li><a href="#drive">Drive</a>: what happens to a drive when its workspace's snapshot expires after 30 days? <strong>Decided: delete it through the retried cleanup; being added to #9847 and the model.</strong></li>
 </ol>
 
 <!-- ============================================================ -->
