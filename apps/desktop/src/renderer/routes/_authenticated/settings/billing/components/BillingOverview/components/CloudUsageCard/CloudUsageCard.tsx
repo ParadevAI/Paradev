@@ -13,7 +13,7 @@ export function CloudUsageCard({
 	organizationId,
 	canBuy,
 }: CloudUsageCardProps) {
-	const { formatNumber, formatDate } = useFormat();
+	const { formatDate, formatGbHours } = useFormat();
 	const { data: usage } = cloudTrpc.billing.cloudUsage.useQuery(undefined);
 
 	if (
@@ -27,11 +27,7 @@ export function CloudUsageCard({
 		return null;
 	}
 
-	const gbHours = (gbMinutes: number) => {
-		const hours = gbMinutes / 60;
-		if (hours > 0 && hours < 0.1) return `<${formatNumber(0.1)}`;
-		return formatNumber(hours, { maximumFractionDigits: 1 });
-	};
+	const gbHours = (gbMinutes: number) => formatGbHours(gbMinutes / 60);
 	const used = gbHours(usage.usedGbMinutes);
 	const included =
 		usage.includedGbMinutes === null ? null : gbHours(usage.includedGbMinutes);
