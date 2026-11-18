@@ -7,7 +7,7 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 	readonly [file: string, keys: readonly string[]]
 > = [
 	[
-		"src/renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/WorkspaceActivityMenu/stores/activityPanelStore/activityPanelStore.ts",
+		"src/renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/WorkspaceActivityMenu/stores/activityPanelStore/activityPanelStore.ts",
 		["workspace-activity-panel"],
 	],
 	["src/renderer/stores/getting-started/store.ts", ["pro-getting-started-v1"]],
