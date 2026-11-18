@@ -341,7 +341,8 @@ function environmentLimit(plan: AutumnCatalogPlan): number | null {
 	);
 }
 
-function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
+/** The plan's monthly price for a GB-hour beyond the allowance, when it sells overage. */
+export function overagePerGbHour(plan: AutumnCatalogPlan): number | null {
 	const price = plan.items.find(
 		(item) =>
 			item.featureId === "box_gb_minutes" && item.price?.interval === "month",
