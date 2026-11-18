@@ -139,14 +139,7 @@ export const cloudBootsOutputSchema = z.object({
 		}),
 	),
 	nextCursor: z.string().nullable(),
-}) satisfies z.ZodType<
-	Page<{
-		items: Omit<
-			CloudBootsResult["items"][number],
-			"organization" | "activeCpuMinutes" | "egressGb"
-		>[];
-	}>
->;
+}) satisfies z.ZodType<Page<CloudBootsResult>>;
 
 export const cloudPeriodsOutputSchema = z.object({
 	items: z.array(

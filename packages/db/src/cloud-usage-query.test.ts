@@ -16,11 +16,11 @@ import {
 	SAM,
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
-import { cloudFleetScope } from "./cloud-usage-fleet";
 import {
 	type CloudFleetScope,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
+	cloudFleetScope,
 	listCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
@@ -281,8 +281,8 @@ describe("fleet scope", () => {
 		expect(await brief("endReason")).toEqual([
 			["idle", "idle", 2, 0, 2],
 			["user", "user", 0, 0, 1],
-			[null, null, 1, 0, 2],
-			["failed", "failed", 1, 1, 1],
+			[null, null, 1, 0, 1],
+			["failed", "failed", 1, 1, 2],
 			["released", "released", 1, 0, 1],
 		]);
 		expect(await brief("project")).toEqual([[null, null, 5, 1, 4]]);
@@ -353,6 +353,25 @@ describe("fleet scope", () => {
 			activeCpuMinutes: null,
 			egressGb: null,
 		});
+	});
+
+	test("a customer's boots have no organization, CPU or egress fields", async () => {
+		const { items } = await boots({});
+		expect(items.length).toBeGreaterThan(0);
+		for (const boot of items) {
+			expect(Object.keys(boot)).not.toContain("organization");
+			expect(Object.keys(boot)).not.toContain("activeCpuMinutes");
+			expect(Object.keys(boot)).not.toContain("egressGb");
+		}
+	});
+
+	test("a customer scope never reads another organization", async () => {
+		const unknown = queryCloudUsage(
+			db,
+			{ organizationId: "" },
+			{ window: NOVEMBER, limit: 1, overagePerGbHour: RATE },
+		);
+		await expect(unknown).rejects.toThrow();
 	});
 
 	test("a customer scope is not a fleet scope and cannot group by more", () => {

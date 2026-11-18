@@ -142,18 +142,6 @@ test("a cursor that does not decode is BAD_REQUEST", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
-test("a customer's boots carry no organization, CPU or egress", async () => {
-	const { items } = await caller(MAYA).boots.list({ range: NOVEMBER });
-	expect(items.length).toBeGreaterThan(0);
-	for (const boot of items) {
-		expect(Object.keys(boot)).not.toContainAnyValues([
-			"organization",
-			"activeCpuMinutes",
-			"egressGb",
-		]);
-	}
-});
-
 test("paging one row at a time with the opaque cursor returns every row once", async () => {
 	const owner = caller(MAYA);
 	async function pages<Item>(
