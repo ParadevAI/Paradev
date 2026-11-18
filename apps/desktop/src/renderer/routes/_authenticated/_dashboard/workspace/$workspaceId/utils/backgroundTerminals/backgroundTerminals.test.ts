@@ -3,6 +3,7 @@ import {
 	getAttachedTerminalIdsKey,
 	getBackgroundTerminalRefetchInterval,
 	getBackgroundTerminalSessions,
+	getTabbedTerminalIds,
 	parseAttachedTerminalIdsKey,
 } from "./backgroundTerminals";
 
@@ -58,6 +59,23 @@ describe("backgroundTerminals", () => {
 				["attached"],
 			).map((session) => session.terminalId),
 		).toEqual(["new", "old"]);
+	});
+
+	test("a terminal whose tab just opened is not background before the snapshot settles", () => {
+		const tabbed = getTabbedTerminalIds(
+			JSON.stringify(["old-tab", "new-tab"]),
+			JSON.stringify(["old-tab", "closing-tab"]),
+		);
+		expect(
+			getBackgroundTerminalSessions(
+				[
+					{ terminalId: "new-tab" },
+					{ terminalId: "closing-tab" },
+					{ terminalId: "detached" },
+				],
+				tabbed,
+			).map((session) => session.terminalId),
+		).toEqual(["detached"]);
 	});
 
 	test("polls slowly while closed and fast while open", () => {

@@ -192,11 +192,21 @@ export function TabBar<TData>({
 	const insertIndexRef = useRef<number | null>(null);
 	const [insertLineLeft, setInsertLineLeft] = useState<number | null>(null);
 	const rootRef = useRef<HTMLDivElement | null>(null);
-	const [heldTabWidth, setHeldTabWidth] = useState<number | null>(null);
+	const [tabWidthHold, setTabWidthHold] = useState<{
+		width: number;
+		tabCount: number;
+	} | null>(null);
+	const heldTabWidth =
+		tabWidthHold && tabs.length <= tabWidthHold.tabCount
+			? tabWidthHold.width
+			: null;
 	const closeTabHoldingWidths = (tabId: string) => {
 		const track = tabsTrackRef.current;
 		if (track && rootRef.current?.matches(":hover")) {
-			setHeldTabWidth(drawnTabWidth(track));
+			setTabWidthHold({
+				width: drawnTabWidth(track),
+				tabCount: tabs.length - 1,
+			});
 		}
 		onCloseTab(tabId);
 	};
@@ -216,10 +226,8 @@ export function TabBar<TData>({
 					tabs.length,
 					tabWidth,
 				);
-				if (idx !== insertIndexRef.current) {
-					insertIndexRef.current = idx;
-					setInsertLineLeft(idx * tabWidth);
-				}
+				insertIndexRef.current = idx;
+				setInsertLineLeft(idx * tabWidth);
 			},
 			drop: (item: TabDragItem | PaneDragItem, monitor) => {
 				const idx = insertIndexRef.current;
@@ -299,7 +307,7 @@ export function TabBar<TData>({
 		// biome-ignore lint/a11y/noStaticElementInteractions: leaving the bar only releases held tab widths
 		<div
 			ref={setRootRef}
-			onMouseLeave={() => setHeldTabWidth(null)}
+			onMouseLeave={() => setTabWidthHold(null)}
 			// Only the empty filler right of the tabs is an
 			// Electron window-drag region — marking the whole bar `drag` and carving
 			// children out with `no-drag` loses the carve-outs once they sit inside
@@ -348,7 +356,11 @@ export function TabBar<TData>({
 											minWidth: TAB_MIN_WIDTH,
 											contain: "inline-size",
 										}
-									: { flex: `0 0 ${heldTabWidth}px` }
+									: {
+											flex: `0 0 ${heldTabWidth}px`,
+											minWidth: 0,
+											contain: "inline-size",
+										}
 							}
 						>
 							<TabItem

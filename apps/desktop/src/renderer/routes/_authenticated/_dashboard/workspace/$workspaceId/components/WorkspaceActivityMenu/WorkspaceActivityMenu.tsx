@@ -63,7 +63,7 @@ import {
 	getAttachedTerminalIdsKey,
 	getBackgroundTerminalRefetchInterval,
 	getBackgroundTerminalSessions,
-	parseAttachedTerminalIdsKey,
+	getTabbedTerminalIds,
 } from "../../utils/backgroundTerminals";
 import { changesPillStats } from "../../utils/changesPillStats";
 import type { AgentWork } from "../../utils/collectAgentWork";
@@ -345,10 +345,10 @@ export function WorkspaceActivityMenu({
 			isLayoutReady
 				? getBackgroundTerminalSessions(
 						terminalSessionsQuery.data?.sessions ?? [],
-						[
-							...parseAttachedTerminalIdsKey(settledAttachedTerminalIdsKey),
-							...parseAttachedTerminalIdsKey(attachedTerminalIdsKey),
-						],
+						getTabbedTerminalIds(
+							attachedTerminalIdsKey,
+							settledAttachedTerminalIdsKey,
+						),
 					)
 				: [],
 		[
