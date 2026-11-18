@@ -22,7 +22,7 @@ export function useVisibleSidebarWorkspaceIds(): Set<string> {
 	const { data: sidebarPlacementRows = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sidebarProjects: collections.v2SidebarProjects })
+				.from({ sidebarProjects: collections.sidebarProjects })
 				.select(({ sidebarProjects }) => ({
 					projectId: sidebarProjects.projectId,
 					isHidden: sidebarProjects.isHidden,
@@ -42,7 +42,7 @@ export function useVisibleSidebarWorkspaceIds(): Set<string> {
 	const { data: localStateRows = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sidebarWorkspaces: collections.v2WorkspaceLocalState })
+				.from({ sidebarWorkspaces: collections.workspaceLocalState })
 				.select(({ sidebarWorkspaces }) => ({
 					id: sidebarWorkspaces.workspaceId,
 					projectId: sidebarWorkspaces.sidebarState.projectId,

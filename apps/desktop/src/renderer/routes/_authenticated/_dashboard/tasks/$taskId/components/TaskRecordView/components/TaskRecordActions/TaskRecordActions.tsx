@@ -3,7 +3,7 @@ import { Button } from "@superset/ui/button";
 import { ButtonGroup } from "@superset/ui/button-group";
 import { LuArrowRight, LuHash, LuLink } from "react-icons/lu";
 import { RecordIconButton } from "renderer/routes/_authenticated/_dashboard/components/RecordIconButton";
-import { RunInWorkspacePopoverV2 } from "../../../../../components/RunInWorkspacePopoverV2";
+import { RunInWorkspacePopover } from "../../../../../components/RunInWorkspacePopover";
 import { TaskRecordMenu } from "./components/TaskRecordMenu";
 
 interface TaskRecordActionsProps {
@@ -45,7 +45,7 @@ export function TaskRecordActions({
 				</RecordIconButton>
 				<TaskRecordMenu onOpenExternal={onOpenExternal} onDelete={onDelete} />
 			</ButtonGroup>
-			<RunInWorkspacePopoverV2
+			<RunInWorkspacePopover
 				tasks={[task]}
 				onComplete={() => {}}
 				align="end"

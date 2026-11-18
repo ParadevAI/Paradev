@@ -128,7 +128,7 @@ function press(id: string) {
 function expectTarget(workspaceId: string) {
 	expect(navigate).toHaveBeenLastCalledWith(
 		expect.objectContaining({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId },
 		}),
 	);

@@ -1,4 +1,4 @@
-// v2 ids are runtime host_agent_configs UUIDs, not a static enum like v1.
+// Agent ids are runtime host_agent_configs UUIDs, not a static enum like v1.
 export type WorkspaceCreateAgent = string;
 
 // New key — old one held preset slugs that no longer match agent UUIDs.

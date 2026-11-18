@@ -10,7 +10,7 @@ import {
 } from "@superset/ui/select";
 import { toast } from "@superset/ui/sonner";
 import { useCallback } from "react";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import type { FolderTierMap, LinkTierMap } from "renderer/lib/clickPolicy";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useSettingsSearchQuery } from "renderer/stores/settings-state";
@@ -35,7 +35,7 @@ export function FilesSettings({ visibleItems }: FilesSettingsProps) {
 		setSidebarFileLinks,
 		setFolderLinks,
 		setPageLinks,
-	} = useV2UserPreferences();
+	} = useUserPreferences();
 
 	const searchQuery = useSettingsSearchQuery();
 	const utils = electronTrpc.useUtils();

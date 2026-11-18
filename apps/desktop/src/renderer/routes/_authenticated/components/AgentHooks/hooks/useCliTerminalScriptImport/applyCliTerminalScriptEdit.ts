@@ -1,10 +1,10 @@
 import type { TerminalPreset } from "@superset/local-db";
-import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 
 /** The subset of a row the CLI owns; the collection's update draft is typed looser than the row. */
 type CliEditableFields = Partial<
 	Pick<
-		V2TerminalPresetRow,
+		TerminalPresetRow,
 		| "name"
 		| "description"
 		| "cwd"

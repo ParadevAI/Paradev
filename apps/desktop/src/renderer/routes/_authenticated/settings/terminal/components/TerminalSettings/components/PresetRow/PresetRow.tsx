@@ -10,7 +10,7 @@ import { HiMiniCommandLine } from "react-icons/hi2";
 import { LuGripVertical } from "react-icons/lu";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { resolvePresetLaunchCommands } from "renderer/lib/agent-launch-command";
-import { resolveV2PresetIcon } from "renderer/lib/preset-icon";
+import { resolvePresetIcon } from "renderer/lib/preset-icon";
 import type { TerminalPreset } from "renderer/routes/_authenticated/settings/presets/types";
 import {
 	getPresetProjectTargetLabel,
@@ -87,7 +87,7 @@ export function PresetRow({
 	}, [preview, drop, drag]);
 
 	const isDark = useIsDarkTheme();
-	const presetIcon = resolveV2PresetIcon(
+	const presetIcon = resolvePresetIcon(
 		preset as PresetWithAgent,
 		agents,
 		isDark,

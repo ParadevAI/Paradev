@@ -26,7 +26,7 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { deriveWorkspaceStatus } from "renderer/routes/_authenticated/_dashboard/utils/deriveWorkspaceStatus";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
+import { useNotificationStore } from "renderer/stores/notifications";
 import type { ActivePaneStatus, PaneStatus } from "shared/tabs-types";
 
 interface SidebarWorkspaceStatusEntry {
@@ -175,7 +175,7 @@ function entriesEqual(
  * subscriptions for every visible workspace, replacing the per-row copies
  * (~4 query observers + 2 bus listeners per row). Query keys, fetch shape,
  * and staleTime match useTerminalAgentBindings exactly, so the react-query
- * cache semantics (and consumers like useV2AttentionWorkspaceCount, which
+ * cache semantics (and consumers like useAttentionWorkspaceCount, which
  * aggregates over these keys) are unchanged — this reduces subscription
  * fan-out, not fetches.
  */
@@ -208,7 +208,7 @@ export function DashboardSidebarWorkspaceStatusProvider({
 			),
 		[workspaces],
 	);
-	const workspaceSeenAt = useV2NotificationStore(
+	const workspaceSeenAt = useNotificationStore(
 		(state) => state.workspaceSeenAt,
 	);
 
@@ -331,10 +331,8 @@ export function DashboardSidebarWorkspaceStatusProvider({
 		enabled: activeWorkspaceId !== null,
 	});
 
-	const manualUnread = useV2NotificationStore((state) => state.manualUnread);
-	const terminalSeenAt = useV2NotificationStore(
-		(state) => state.terminalSeenAt,
-	);
+	const manualUnread = useNotificationStore((state) => state.manualUnread);
+	const terminalSeenAt = useNotificationStore((state) => state.terminalSeenAt);
 
 	const previousEntriesRef = useRef(
 		new Map<string, SidebarWorkspaceStatusEntry>(),
@@ -454,10 +452,10 @@ export function useMarkSidebarWorkspaceTerminalsSeen(
 	workspaceId: string,
 ): () => void {
 	const store = useSidebarWorkspaceStatusStore();
-	const markTerminalSeen = useV2NotificationStore(
+	const markTerminalSeen = useNotificationStore(
 		(state) => state.markTerminalSeen,
 	);
-	const markWorkspaceSeen = useV2NotificationStore(
+	const markWorkspaceSeen = useNotificationStore(
 		(state) => state.markWorkspaceSeen,
 	);
 	return useCallback(() => {

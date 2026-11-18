@@ -22,10 +22,10 @@ function parseResourceEntry(entry: {
 }): RecentlyViewedEntry | null {
 	const pathname = pathnameOf(entry.path);
 
-	const wsMatch = pathname.match(/^\/v2-workspace\/([^/]+)/);
+	const wsMatch = pathname.match(/^\/workspace\/([^/]+)/);
 	if (wsMatch?.[1])
 		return {
-			path: `/v2-workspace/${wsMatch[1]}`,
+			path: `/workspace/${wsMatch[1]}`,
 			type: "workspace",
 			entityId: wsMatch[1],
 			timestamp: entry.timestamp,

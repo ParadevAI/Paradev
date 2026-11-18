@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { authClient } from "renderer/lib/auth-client";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { posthog } from "renderer/lib/posthog";
@@ -83,7 +83,7 @@ export function V1AutoMigration() {
 	const collections = useCollections();
 	const finalizeSetup = useFinalizeProjectSetup();
 	const { ensureWorkspaceInSidebar } = useDashboardSidebarState();
-	const agentsQuery = useV2AgentConfigs(activeHostUrl);
+	const agentsQuery = useAgentConfigs(activeHostUrl);
 	const setMigrationStatus = useV1MigrationStatusStore((s) => s.setStatus);
 	const clearRunningStatus = useV1MigrationStatusStore((s) => s.clearRunning);
 	const startedOrgsRef = useRef<Set<string>>(new Set());
@@ -233,8 +233,8 @@ export function V1AutoMigration() {
 
 				const groupTarget: V1GroupTarget = (group, projectId, tag) => {
 					const sectionId = buildSidebarFolderKey(projectId, tag);
-					if (collections.v2SidebarSections.get(sectionId)) return;
-					collections.v2SidebarSections.insert({
+					if (collections.sidebarSections.get(sectionId)) return;
+					collections.sidebarSections.insert({
 						sectionId,
 						projectId,
 						tag,
@@ -266,9 +266,9 @@ export function V1AutoMigration() {
 					presetTarget: {
 						agents,
 						existing: Array.from(
-							collections.v2TerminalPresets.state.values(),
+							collections.terminalPresets.state.values(),
 						).map((p) => ({ name: p.name, agentId: p.agentId })),
-						insert: (row) => collections.v2TerminalPresets.insert(row),
+						insert: (row) => collections.terminalPresets.insert(row),
 					},
 					terminalTarget: {
 						appendPending: (workspace, terminals) =>

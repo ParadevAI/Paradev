@@ -1,5 +1,5 @@
 import type { AppCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider/collections";
-import type { V2TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
+import type { TerminalPresetRow } from "renderer/routes/_authenticated/providers/CollectionsProvider/dashboardSidebarLocal";
 import { getPresetsForTriggerField } from "shared/preset-trigger-selection";
 import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
 
@@ -8,7 +8,7 @@ import { writeWorkspacePaneLayout } from "./writeWorkspacePaneLayout";
  * in presets-bar order.
  */
 export function selectWorkspaceCreationPresetIds(
-	presets: readonly V2TerminalPresetRow[],
+	presets: readonly TerminalPresetRow[],
 	projectId: string,
 ): string[] {
 	return getPresetsForTriggerField(
@@ -32,14 +32,14 @@ export function queueWorkspaceCreationPresets(
 	workspace: { id: string; projectId: string },
 ): void {
 	const presetIds = selectWorkspaceCreationPresetIds(
-		Array.from(collections.v2TerminalPresets.state.values()),
+		Array.from(collections.terminalPresets.state.values()),
 		workspace.projectId,
 	);
 	if (presetIds.length === 0) return;
-	if (!collections.v2WorkspaceLocalState.get(workspace.id)) {
+	if (!collections.workspaceLocalState.get(workspace.id)) {
 		writeWorkspacePaneLayout(collections, workspace, [], []);
 	}
-	collections.v2WorkspaceLocalState.update(workspace.id, (draft) => {
+	collections.workspaceLocalState.update(workspace.id, (draft) => {
 		draft.pendingCreationPresetIds = presetIds;
 	});
 }

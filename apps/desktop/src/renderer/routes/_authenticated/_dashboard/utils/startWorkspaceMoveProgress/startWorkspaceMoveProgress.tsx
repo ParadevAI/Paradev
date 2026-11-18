@@ -90,7 +90,7 @@ export function startWorkspaceMoveProgress(args: {
 	});
 
 	const stillViewingSource = () =>
-		window.location.hash.includes(`/v2-workspace/${args.sourceWorkspaceId}`);
+		window.location.hash.includes(`/workspace/${args.sourceWorkspaceId}`);
 	let terminalsSettled: Promise<void> = Promise.resolve();
 	const finish = (stage: WorkspaceMoveProgressStage, land: () => void) => {
 		if (stage === "failed") return;

@@ -34,7 +34,7 @@ export function RecentlyViewedFrame() {
 	const { workspaces: hostWorkspaces } = useHostWorkspaces();
 	// Projects are fully local — identity comes from the host fan-out.
 	const { projects: hostProjects } = useHostProjects();
-	const v2ProjectData = useMemo(
+	const projectData = useMemo(
 		() =>
 			hostProjects.map((project) => ({
 				id: project.projectKey,
@@ -44,7 +44,7 @@ export function RecentlyViewedFrame() {
 	);
 	const workspaceData = useMemo(() => {
 		const projectNamesById = new Map(
-			(v2ProjectData ?? []).map((p) => [p.id, p.name]),
+			(projectData ?? []).map((p) => [p.id, p.name]),
 		);
 		// Inner join: drop workspaces whose project isn't synced yet (and
 		// project-less session workspaces).
@@ -54,7 +54,7 @@ export function RecentlyViewedFrame() {
 			if (projectName === undefined) return [];
 			return [{ id: workspace.id, projectName, branch: workspace.branch }];
 		});
-	}, [hostWorkspaces, v2ProjectData]);
+	}, [hostWorkspaces, projectData]);
 
 	const { data: automations = [] } =
 		cloudTrpc.automation.list.useQuery(undefined);

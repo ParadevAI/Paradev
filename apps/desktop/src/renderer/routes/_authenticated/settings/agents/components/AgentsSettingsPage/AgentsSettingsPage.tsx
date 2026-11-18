@@ -1,4 +1,4 @@
-import { V2AgentsSettings } from "../V2AgentsSettings";
+import { AgentsSettings } from "../AgentsSettings";
 
 interface AgentsSettingsPageProps {
 	initialAgentId?: string | null;
@@ -7,5 +7,5 @@ interface AgentsSettingsPageProps {
 export function AgentsSettingsPage({
 	initialAgentId = null,
 }: AgentsSettingsPageProps) {
-	return <V2AgentsSettings initialAgentId={initialAgentId} />;
+	return <AgentsSettings initialAgentId={initialAgentId} />;
 }

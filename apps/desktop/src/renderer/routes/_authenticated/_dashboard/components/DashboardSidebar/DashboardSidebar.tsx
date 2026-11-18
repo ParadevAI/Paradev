@@ -23,16 +23,16 @@ import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
-import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { ParadevAnywhereButton } from "renderer/routes/_authenticated/_dashboard/components/ParadevAnywhereButton";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { useIsChatSection } from "renderer/routes/_authenticated/_dashboard/hooks/useIsChatSection";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import { useNotificationStore } from "renderer/stores/notifications";
 import { useReleaseNotesCardStore } from "renderer/stores/release-notes-card";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
-import { useV2NotificationStore } from "renderer/stores/v2-notifications";
 import { DashboardSidebarBulkActions } from "./components/DashboardSidebarBulkActions";
 import { DashboardSidebarBulkDeleteMount } from "./components/DashboardSidebarBulkDeleteMount";
 import { DashboardSidebarChannelsSection } from "./components/DashboardSidebarChannelsSection";
@@ -48,7 +48,7 @@ import { DashboardSidebarSessionsSection } from "./components/DashboardSidebarSe
 import { DashboardSidebarShellHeader } from "./components/DashboardSidebarShellHeader";
 import { DashboardSidebarWorkspacesHeader } from "./components/DashboardSidebarWorkspacesHeader";
 import { useGettingStartedCard } from "./components/GettingStartedCard";
-import { useV2SetupScriptCard } from "./components/V2SetupScriptCard";
+import { useSetupScriptCard } from "./components/SetupScriptCard";
 import {
 	getBlockedDragProps,
 	useBlockedDragNotice,
@@ -190,8 +190,10 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	const isSettingsOpen = !!matchRoute({ to: "/settings", fuzzy: true });
 	const footerRef = useRef<HTMLDivElement>(null);
 	const { activeHostUrl } = useLocalHostService();
-	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
-	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
+	const workspaceRouteMatch = matchRoute({ to: "/workspace/$workspaceId" });
+	const activeWorkspaceId = workspaceRouteMatch
+		? workspaceRouteMatch.workspaceId
+		: null;
 	const isParadevShell = useParadevShell();
 	const isChatSection = useIsChatSection();
 	const workspacesListCollapsed = useSidebarSectionsCollapseStore(
@@ -201,7 +203,7 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		preferences,
 		setSidebarProjectSortMode,
 		setSidebarProjectHostFilter,
-	} = useV2UserPreferences();
+	} = useUserPreferences();
 	const sortMode = preferences.sidebarProjectSortMode;
 	// The icon rail has no control for the filter, so it rests there.
 	const hostFilter =
@@ -337,14 +339,14 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	// don't churn per keystroke.
 	const { workspaces: cloudWorkspaces, isFresh: isCloudListFresh } =
 		useCloudWorkspaces();
-	const pruneWorkspaceSeen = useV2NotificationStore(
+	const pruneWorkspaceSeen = useNotificationStore(
 		(state) => state.pruneWorkspaceSeen,
 	);
 	useEffect(() => {
 		if (!cloudWorkspaces || !isCloudListFresh) return;
 		const live = new Set(cloudWorkspaces.map((cloud) => cloud.id));
 		for (const id of Object.keys(
-			useV2NotificationStore.getState().workspaceSeenAt,
+			useNotificationStore.getState().workspaceSeenAt,
 		)) {
 			if (!live.has(id)) pruneWorkspaceSeen(id);
 		}
@@ -374,12 +376,12 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 		return [...byId.values()];
 	}, [pinnedWorkspaces, sessionWorkspaces, orderedGroups, cloudWorkspaces]);
 
-	const activeV2Project = useMemo(() => {
-		if (!activeV2WorkspaceId) return null;
+	const activeProject = useMemo(() => {
+		if (!activeWorkspaceId) return null;
 		// A pinned active workspace renders outside its project group, so
 		// resolve its project by id instead.
 		const pinned = pinnedWorkspaces.find(
-			(workspace) => workspace.id === activeV2WorkspaceId,
+			(workspace) => workspace.id === activeWorkspaceId,
 		);
 		if (pinned) {
 			return groups.find((project) => project.id === pinned.projectId) ?? null;
@@ -388,27 +390,27 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 			for (const child of project.children) {
 				if (
 					child.type === "workspace" &&
-					child.workspace.id === activeV2WorkspaceId
+					child.workspace.id === activeWorkspaceId
 				) {
 					return project;
 				}
 				if (child.type === "section") {
 					for (const ws of child.section.workspaces) {
-						if (ws.id === activeV2WorkspaceId) return project;
+						if (ws.id === activeWorkspaceId) return project;
 					}
 				}
 			}
 		}
 		return null;
-	}, [groups, pinnedWorkspaces, activeV2WorkspaceId]);
+	}, [groups, pinnedWorkspaces, activeWorkspaceId]);
 
 	// Ordered by priority for the single card slot below — blocking first,
 	// then actionable, then nags.
 	const paymentFailedCard = usePaymentFailedCard({ surface: "v2" });
-	const setupScriptCard = useV2SetupScriptCard({
+	const setupScriptCard = useSetupScriptCard({
 		hostUrl: activeHostUrl,
-		projectId: activeV2Project?.id ?? null,
-		projectName: activeV2Project?.name ?? null,
+		projectId: activeProject?.id ?? null,
+		projectName: activeProject?.name ?? null,
 	});
 	const gettingStartedCard = useGettingStartedCard();
 	const releaseNotesCard = useReleaseNotesCard();
@@ -509,14 +511,14 @@ const DashboardSidebarContent = memo(function DashboardSidebarContent({
 	return (
 		<DashboardSidebarSelectionProvider
 			availableWorkspaceIds={selectableWorkspaceIds}
-			activeWorkspaceId={activeV2WorkspaceId}
+			activeWorkspaceId={activeWorkspaceId}
 		>
 			<DashboardSidebarBulkDeleteMount />
 			<DashboardSidebarSectionRenameProvider>
 				<DashboardSidebarHoverProvider>
 					<DashboardSidebarWorkspaceStatusProvider
 						workspaces={statusWorkspaces}
-						activeWorkspaceId={activeV2WorkspaceId}
+						activeWorkspaceId={activeWorkspaceId}
 					>
 						{/* Port data comes from the single DashboardSidebarPortsProvider in the
 						    dashboard layout, which wraps this sidebar. */}

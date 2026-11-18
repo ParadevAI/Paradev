@@ -72,11 +72,11 @@ export function useArchiveCloudWorkspace() {
 		const { pathname } = router.state.location;
 		const stillAtTarget =
 			target.kind === "workspace"
-				? pathname.startsWith(`/v2-workspace/${target.workspaceId}`)
+				? pathname.startsWith(`/workspace/${target.workspaceId}`)
 				: pathname === "/new-workspace";
 		if (!stillAtTarget) return;
 		void navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: id },
 			replace: true,
 		});
@@ -105,7 +105,7 @@ export function useArchiveCloudWorkspace() {
 						onClick: () => {
 							clearUndoable(id);
 							void navigate({
-								to: "/v2-workspace/$workspaceId",
+								to: "/workspace/$workspaceId",
 								params: { workspaceId: id },
 							});
 						},
