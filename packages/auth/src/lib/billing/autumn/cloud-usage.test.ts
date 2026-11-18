@@ -30,6 +30,9 @@ describe("cloudUsageFromBalances", () => {
 			usedGbMinutes: 2400,
 			overageGbMinutes: 0,
 			prepaidGbMinutes: 0,
+			prepaidGrantedGbMinutes: 0,
+			seats: null,
+			overageLimit: { type: "none" },
 			autoTopup: null,
 			pack: null,
 			overagePerGbHour: null,
@@ -53,6 +56,9 @@ describe("cloudUsageFromBalances", () => {
 			usedGbMinutes: 50000,
 			overageGbMinutes: 0,
 			prepaidGbMinutes: 0,
+			prepaidGrantedGbMinutes: 0,
+			seats: null,
+			overageLimit: { type: "none" },
 			autoTopup: null,
 			pack: null,
 			overagePerGbHour: null,
@@ -113,11 +119,49 @@ describe("cloudUsageFromBalances", () => {
 			usedGbMinutes: 360000,
 			overageGbMinutes: 0,
 			prepaidGbMinutes: 50000,
+			prepaidGrantedGbMinutes: 60000,
 			autoTopup: {
 				enabled: true,
 				thresholdGbMinutes: 15000,
 				quantityGbMinutes: 60000,
 			},
 		});
+	});
+
+	test.each([
+		["no spend limit is no cap", {}, { type: "none" }],
+		[
+			"overage turned off is a cap of zero",
+			{ overageAllowed: [{ featureId: "box_gb_minutes", enabled: false }] },
+			{ type: "absolute", gbMinutes: 0 },
+		],
+		[
+			"an absolute spend limit is a cap in GB-minutes",
+			{
+				spendLimits: [
+					{ featureId: "box_gb_minutes", enabled: true, overageLimit: 6000 },
+				],
+			},
+			{ type: "absolute", gbMinutes: 6000 },
+		],
+		[
+			"a percentage spend limit stays a percentage",
+			{
+				spendLimits: [
+					{
+						featureId: "box_gb_minutes",
+						enabled: true,
+						limitType: "usage_percentage",
+						overageLimit: 300,
+					},
+				],
+			},
+			{ type: "usage_percentage", percent: 300 },
+		],
+	] as const)("%s", (_, billingControls, overageLimit) => {
+		expect(
+			cloudUsageFromBalances(boxBalance({}), billingControls as never)
+				?.overageLimit,
+		).toEqual(overageLimit);
 	});
 });

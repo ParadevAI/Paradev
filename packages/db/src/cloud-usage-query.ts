@@ -169,7 +169,10 @@ const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
 
-function usd(gbMinutes: number, overagePerGbHour: number | null) {
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
 	return overagePerGbHour === null
 		? null
 		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
@@ -383,7 +386,7 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 		failedBoots: row.failedBoots,
 		hours: Number(row.seconds) / 3600,
 		gbHours: gbMinutes / 60,
-		usageUsd: usd(gbMinutes, overagePerGbHour),
+		usageUsd: gbMinutesUsd(gbMinutes, overagePerGbHour),
 	};
 }
 
@@ -754,7 +757,7 @@ function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 			size: sizeOfVcpus.get(row.vcpus) ?? null,
 			memoryGb: memoryMb / 1024,
 			gbHours: Number(gbMinutes) / 60,
-			usageUsd: usd(Number(gbMinutes), overagePerGbHour),
+			usageUsd: gbMinutesUsd(Number(gbMinutes), overagePerGbHour),
 		})),
 		nextCursor:
 			rows.length > limit && last

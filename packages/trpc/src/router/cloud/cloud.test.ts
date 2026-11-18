@@ -25,6 +25,9 @@ const CLOUD_USAGE: CloudUsage = {
 	usedGbMinutes: 2040,
 	overageGbMinutes: 840,
 	prepaidGbMinutes: 0,
+	prepaidGrantedGbMinutes: 0,
+	seats: 2,
+	overageLimit: { type: "none" },
 	autoTopup: null,
 	pack: null,
 	overagePerGbHour: 0.06,
@@ -106,6 +109,9 @@ describe("scope", () => {
 		expect(boots.items.map((boot) => boot.user?.id)).toEqual([SAM]);
 		const [open] = (await member.periods.list({})).items;
 		expect(open?.allowance).toBeNull();
+		expect(open?.unavailable).toEqual([
+			{ field: "allowance", reason: "owners_and_admins_only" },
+		]);
 		expect(open?.metrics.gbHours).toBe(16);
 	});
 
@@ -294,6 +300,9 @@ test("periods run from the open one back to the one the organization was created
 	]);
 	expect(first.items.map((period) => period.metrics.gbHours)).toEqual([34, 16]);
 	expect(first.items[1]?.allowance).toBeNull();
+	expect(first.items[1]?.unavailable).toEqual([
+		{ field: "allowance", reason: "closed_period" },
+	]);
 	expect(first.nextCursor).toBe("2026-10-01");
 	const rest = await owner.periods.list({ limit: 2, cursor: "2026-10-01" });
 	expect(rest.items.map((period) => period.id)).toEqual(["2026-09-01"]);
@@ -317,4 +326,71 @@ test("with billing off there are no periods and no prices", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 	const usage = await owner.usage.query({ range: NOVEMBER });
 	expect(usage.total).toMatchObject({ gbHours: 34, usageUsd: null });
+});
+
+test("the open period's allowance is in dollars at the usage rate, and names what billing does not hold", async () => {
+	const owner = caller(MAYA, {
+		readCloudUsage: async () => ({
+			...CLOUD_USAGE,
+			prepaidGbMinutes: 300,
+			prepaidGrantedGbMinutes: 600,
+			overageLimit: { type: "absolute", gbMinutes: 6000 },
+		}),
+	});
+	const [open] = (await owner.periods.list({})).items;
+	expect(open?.allowance).toMatchObject({
+		usedUsd: 2.04,
+		includedUsd: 1.2,
+		overageUsd: 0.84,
+		seats: 2,
+		bought: { usedGbHours: 5, totalGbHours: 10, usedUsd: 0.3, totalUsd: 0.6 },
+		extraUsageLimit: { gbHours: 100, usd: 6 },
+	});
+	expect(open?.unavailable).toEqual([
+		{ field: "freeCredits", reason: "pooled_with_seats" },
+		{ field: "limitReached", reason: "not_tracked" },
+	]);
+});
+
+test.each([
+	["no cap", { type: "none" }, []],
+	[
+		"a percentage of the allowance",
+		{ type: "usage_percentage", percent: 300 },
+		[{ field: "extraUsageLimit", reason: "percent_of_allowance" }],
+	],
+] as const)("an extra-usage limit of %s has no amount", async (_, overageLimit, reasons) => {
+	const owner = caller(MAYA, {
+		readCloudUsage: async () => ({ ...CLOUD_USAGE, overageLimit }),
+	});
+	const [open] = (await owner.periods.list({})).items;
+	expect(open?.allowance?.extraUsageLimit).toBeNull();
+	expect(open?.unavailable).toEqual([
+		{ field: "freeCredits", reason: "pooled_with_seats" },
+		...reasons,
+		{ field: "limitReached", reason: "not_tracked" },
+	]);
+});
+
+test("a billing value cached before bought totals, seats and limits were read says so", async () => {
+	const owner = caller(MAYA, {
+		readCloudUsage: async () => ({
+			...CLOUD_USAGE,
+			prepaidGrantedGbMinutes: null,
+			seats: null,
+			overageLimit: null,
+		}),
+	});
+	const [open] = (await owner.periods.list({})).items;
+	expect(open?.allowance).toMatchObject({
+		seats: null,
+		bought: null,
+		extraUsageLimit: null,
+	});
+	expect(open?.unavailable).toEqual([
+		{ field: "bought", reason: "not_read" },
+		{ field: "freeCredits", reason: "pooled_with_seats" },
+		{ field: "extraUsageLimit", reason: "not_read" },
+		{ field: "limitReached", reason: "not_tracked" },
+	]);
 });

@@ -6,6 +6,7 @@ import {
 	type CloudUsageScope,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
+	gbMinutesUsd,
 	listCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
@@ -24,6 +25,7 @@ import { requireActiveOrgRole } from "../utils/active-org";
 import {
 	bootKeysetSchema,
 	type CloudListFilters,
+	type CloudPeriodUnavailable,
 	type CloudRange,
 	cloudBootsInputSchema,
 	cloudBootsOutputSchema,
@@ -55,6 +57,63 @@ function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
 	return cloudUsage?.resetsAt
 		? { resetsAt: new Date(cloudUsage.resetsAt), previousResetAt: null }
 		: null;
+}
+
+function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
+	const rate = cloudUsage.overagePerGbHour;
+	const included = cloudUsage.includedGbMinutes;
+	const bought = cloudUsage.prepaidGrantedGbMinutes;
+	const limit = cloudUsage.overageLimit;
+	const unavailable: CloudPeriodUnavailable[] = [];
+	if (bought === null)
+		unavailable.push({ field: "bought", reason: "not_read" });
+	unavailable.push({ field: "freeCredits", reason: "pooled_with_seats" });
+	if (limit === null) {
+		unavailable.push({ field: "extraUsageLimit", reason: "not_read" });
+	} else if (limit.type === "usage_percentage") {
+		unavailable.push({
+			field: "extraUsageLimit",
+			reason: "percent_of_allowance",
+		});
+	}
+	unavailable.push({ field: "limitReached", reason: "not_tracked" });
+	const boughtUsed = (bought ?? 0) - cloudUsage.prepaidGbMinutes;
+	return {
+		allowance: {
+			includedGbHours: included === null ? null : included / 60,
+			usedGbHours: cloudUsage.usedGbMinutes / 60,
+			overageGbHours: cloudUsage.overageGbMinutes / 60,
+			prepaidRemainingGbHours: cloudUsage.prepaidGbMinutes / 60,
+			resetsAt,
+			usedUsd: gbMinutesUsd(cloudUsage.usedGbMinutes, rate),
+			includedUsd: included === null ? null : gbMinutesUsd(included, rate),
+			overageUsd: gbMinutesUsd(cloudUsage.overageGbMinutes, rate),
+			seats: cloudUsage.seats,
+			bought: bought
+				? {
+						usedGbHours: boughtUsed / 60,
+						totalGbHours: bought / 60,
+						usedUsd: gbMinutesUsd(boughtUsed, rate),
+						totalUsd: gbMinutesUsd(bought, rate),
+					}
+				: null,
+			extraUsageLimit:
+				limit?.type === "absolute"
+					? {
+							gbHours: limit.gbMinutes / 60,
+							usd: gbMinutesUsd(limit.gbMinutes, rate),
+						}
+					: null,
+		},
+		unavailable,
+	};
+}
+
+function noAllowance(reason: "closed_period" | "owners_and_admins_only") {
+	return {
+		allowance: null,
+		unavailable: [{ field: "allowance", reason } as const],
+	};
 }
 
 function periodId(start: Date): string {
@@ -254,8 +313,9 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudPeriodsInputSchema)
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const anchor = anchorOf(ctx.cloudUsage);
-					if (!anchor) return { items: [], nextCursor: null };
+					const { cloudUsage } = ctx;
+					const anchor = anchorOf(cloudUsage);
+					if (!cloudUsage || !anchor) return { items: [], nextCursor: null };
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
 						: -1;
@@ -270,9 +330,8 @@ export function cloudRouterWith(deps: CloudDeps) {
 					).filter((period) => period.to > createdAt);
 					const page = await queryCloudUsageByPeriod(deps.db, ctx.scope, {
 						periods: periods.slice(0, input.limit),
-						overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+						overagePerGbHour: cloudUsage.overagePerGbHour,
 					});
-					const allowance = ctx.isAdmin ? ctx.cloudUsage : null;
 					const last = page.at(-1);
 					return {
 						items: page.map(({ from, to, metrics }, i) => {
@@ -282,20 +341,11 @@ export function cloudRouterWith(deps: CloudDeps) {
 								start: from,
 								end: to,
 								closed: !open,
-								allowance:
-									open && allowance
-										? {
-												includedGbHours:
-													allowance.includedGbMinutes === null
-														? null
-														: allowance.includedGbMinutes / 60,
-												usedGbHours: allowance.usedGbMinutes / 60,
-												overageGbHours: allowance.overageGbMinutes / 60,
-												prepaidRemainingGbHours:
-													allowance.prepaidGbMinutes / 60,
-												resetsAt: to,
-											}
-										: null,
+								...(!open
+									? noAllowance("closed_period")
+									: !ctx.isAdmin
+										? noAllowance("owners_and_admins_only")
+										: allowanceOf(cloudUsage, to)),
 								metrics,
 							};
 						}),

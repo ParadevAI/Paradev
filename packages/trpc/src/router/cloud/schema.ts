@@ -150,6 +150,27 @@ export const cloudBootsOutputSchema = z.object({
 	nextCursor: z.string().nullable(),
 }) satisfies z.ZodType<Page<CloudBootsResult>>;
 
+/** A value the page shows that billing does not hold for this period, and why. */
+const periodUnavailableSchema = z.object({
+	field: z.enum([
+		"allowance",
+		"bought",
+		"freeCredits",
+		"extraUsageLimit",
+		"limitReached",
+	]),
+	reason: z.enum([
+		"closed_period",
+		"owners_and_admins_only",
+		"not_read",
+		"pooled_with_seats",
+		"percent_of_allowance",
+		"not_tracked",
+	]),
+});
+
+export type CloudPeriodUnavailable = z.infer<typeof periodUnavailableSchema>;
+
 export const cloudPeriodsOutputSchema = z.object({
 	items: z.array(
 		z.object({
@@ -164,8 +185,25 @@ export const cloudPeriodsOutputSchema = z.object({
 					overageGbHours: z.number(),
 					prepaidRemainingGbHours: z.number(),
 					resetsAt: z.date(),
+					usedUsd: z.number().nullable(),
+					includedUsd: z.number().nullable(),
+					overageUsd: z.number().nullable(),
+					seats: z.number().nullable(),
+					bought: z
+						.object({
+							usedGbHours: z.number(),
+							totalGbHours: z.number(),
+							usedUsd: z.number().nullable(),
+							totalUsd: z.number().nullable(),
+						})
+						.nullable(),
+					/** Null with no cap, or with an `unavailable` entry when the cap is not known. */
+					extraUsageLimit: z
+						.object({ gbHours: z.number(), usd: z.number().nullable() })
+						.nullable(),
 				})
 				.nullable(),
+			unavailable: z.array(periodUnavailableSchema),
 			metrics: metricsSchema,
 		}),
 	),
