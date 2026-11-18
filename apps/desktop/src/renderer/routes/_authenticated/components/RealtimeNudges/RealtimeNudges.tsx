@@ -1,3 +1,4 @@
+import { parseBoxPressureMessage } from "@superset/shared/box-pressure";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	ORG_PRESENCE_AWAY_AFTER_MS,
@@ -21,6 +22,7 @@ import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { ensureFreshJwt } from "renderer/lib/auth-client";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { useBoxPressureStore } from "renderer/stores/box-pressure";
 import { useOrgPresenceStore } from "renderer/stores/org-presence";
 
 /**
@@ -34,7 +36,8 @@ import { useOrgPresenceStore } from "renderer/stores/org-presence";
  * With channels on, the same socket carries presence: the window pings so
  * the hub can drop it if it goes silent, reports away after ten minutes
  * without input, and hears who else in the organization has a window open.
- * The hub only sends presence to windows that report it.
+ * The hub only sends presence to windows that report it. It also sends the
+ * cloud boxes under pressure: the whole set on open, then each change.
  */
 export function RealtimeNudges() {
 	const organizationId = useActiveOrganizationId();
@@ -150,6 +153,11 @@ export function RealtimeNudges() {
 				useOrgPresenceStore.getState().setUsers(presence.users);
 				return;
 			}
+			const boxPressure = parseBoxPressureMessage(event.data);
+			if (boxPressure) {
+				useBoxPressureStore.getState().apply(boxPressure);
+				return;
+			}
 			const message = parseRealtimeNudgeMessage(event.data);
 			if (!message) return;
 			patch(message.updates);
@@ -160,6 +168,7 @@ export function RealtimeNudges() {
 			clearInterval(ping);
 			clearInterval(awayCheck);
 			useOrgPresenceStore.getState().setUsers({});
+			useBoxPressureStore.getState().clear();
 			socket.close(1000, "unsubscribed");
 		};
 	}, [organizationId, utils, reportsPresence]);

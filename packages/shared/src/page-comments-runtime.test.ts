@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { createContext, runInContext } from "node:vm";
-import { PAGE_COMMENTS_RUNTIME_SOURCE } from "./page-comments-runtime";
+import {
+	PAGE_COMMENTS_RUNTIME_SOURCE,
+	PAGE_FIND_REFRESH_MS,
+} from "./page-comments-runtime";
 
 interface Posted {
 	[key: string]: unknown;
@@ -14,6 +17,7 @@ function setup({ baseUrl = "https://page.example/view" } = {}) {
 	let timers: { at: number; fn: () => void; id: number }[] = [];
 	let now = 1_000_000;
 	let nextTimerId = 1;
+	const mutationCallbacks: ((records: { type: string }[]) => void)[] = [];
 
 	const element = {
 		getBoundingClientRect: () => ({
@@ -67,6 +71,9 @@ function setup({ baseUrl = "https://page.example/view" } = {}) {
 			observe() {}
 		},
 		MutationObserver: class {
+			constructor(callback: (records: { type: string }[]) => void) {
+				mutationCallbacks.push(callback);
+			}
 			observe() {}
 		},
 		Date: { now: () => now },
@@ -166,6 +173,27 @@ function setup({ baseUrl = "https://page.example/view" } = {}) {
 			now += ms;
 			listeners.get("scroll")?.({});
 			pump();
+		},
+		send: (data: Record<string, unknown>, trusted = true) =>
+			listeners.get("message")?.({
+				source: trusted ? context.parent : {},
+				data: { channel: "superset-comments/host", ...data },
+			}),
+		keydown: (event: Record<string, unknown>) => {
+			let prevented = false;
+			listeners.get("document:keydown")?.({
+				preventDefault: () => {
+					prevented = true;
+				},
+				stopPropagation: () => {},
+				...event,
+			});
+			return prevented;
+		},
+		mutate: () => {
+			for (const callback of mutationCallbacks) {
+				callback([{ type: "characterData" }]);
+			}
 		},
 		clear: () => posted.splice(0, posted.length),
 	};
@@ -359,5 +387,74 @@ describe("page link edge cases", () => {
 			false,
 		);
 		expect(page.posted).toEqual([]);
+	});
+});
+
+describe("page find bridge", () => {
+	test("announces find in every ready", () => {
+		const page = setup();
+		expect(page.posted[0]).toMatchObject({ type: "ready", features: ["find"] });
+		page.clear();
+		page.send({ type: "ready" });
+		expect(page.posted).toEqual([
+			{ channel: "superset-comments/frame", type: "ready", features: ["find"] },
+		]);
+	});
+
+	test("forwards only the chords the parent asked for", () => {
+		const page = setup();
+		const findKey = { key: "f", code: "KeyF", metaKey: true };
+		page.clear();
+		expect(page.keydown(findKey)).toBe(false);
+
+		page.send({ type: "set-find-chords", chords: ["meta+f"] }, false);
+		expect(page.keydown(findKey)).toBe(false);
+
+		page.send({ type: "set-find-chords", chords: ["meta+f"] });
+		expect(page.keydown({ ...findKey, shiftKey: true })).toBe(false);
+		expect(page.keydown(findKey)).toBe(true);
+		expect(page.posted).toEqual([
+			{ channel: "superset-comments/frame", type: "find-shortcut" },
+		]);
+	});
+
+	test("answers a search from the parent only", () => {
+		const page = setup();
+		page.clear();
+		page.send({ type: "find", query: "anything" }, false);
+		expect(page.posted).toEqual([]);
+
+		page.send({ type: "find", query: "anything" });
+		expect(page.posted).toEqual([
+			{
+				channel: "superset-comments/frame",
+				type: "find-result",
+				query: "anything",
+				total: 0,
+				index: -1,
+				capped: false,
+			},
+		]);
+	});
+
+	test("re-runs an open search after the page changes", () => {
+		const page = setup();
+		page.mutate();
+		page.advance(PAGE_FIND_REFRESH_MS);
+		page.send({ type: "find", query: "anything" });
+		page.clear();
+
+		page.mutate();
+		page.mutate();
+		page.advance(PAGE_FIND_REFRESH_MS - 1);
+		expect(page.posted.filter((m) => m.type === "find-result")).toEqual([]);
+		page.advance(1);
+		expect(page.posted.filter((m) => m.type === "find-result")).toHaveLength(1);
+
+		page.send({ type: "find-clear" });
+		page.clear();
+		page.mutate();
+		page.advance(PAGE_FIND_REFRESH_MS);
+		expect(page.posted.filter((m) => m.type === "find-result")).toEqual([]);
 	});
 });

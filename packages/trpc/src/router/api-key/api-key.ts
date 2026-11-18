@@ -3,7 +3,7 @@ import { apikeys } from "@superset/db/schema";
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-
+import { withAuthUserErrors } from "../../lib/auth-user-error";
 import { personProcedure, userError } from "../../trpc";
 
 export const apiKeyRouter = {
@@ -38,13 +38,15 @@ export const apiKeyRouter = {
 
 			// A server call naming the user, since better-auth cannot resolve the
 			// synthesized session of a CLI OAuth token from the request headers.
-			const result = await ctx.auth.api.createApiKey({
-				body: {
-					userId: ctx.session.user.id,
-					name: input.name,
-					metadata: { organizationId },
-				},
-			});
+			const result = await withAuthUserErrors(
+				ctx.auth.api.createApiKey({
+					body: {
+						userId: ctx.session.user.id,
+						name: input.name,
+						metadata: { organizationId },
+					},
+				}),
+			);
 
 			return { key: result.key };
 		}),

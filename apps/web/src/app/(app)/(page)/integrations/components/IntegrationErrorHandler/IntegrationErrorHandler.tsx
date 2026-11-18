@@ -16,6 +16,7 @@ import { useEffect } from "react";
 type CallbackKeys = {
 	github: {
 		error:
+			| "admin_required"
 			| "already_connected"
 			| "installation_cancelled"
 			| "installation_fetch_failed"

@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { toast } from "@superset/ui/sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useV2AgentConfigs } from "renderer/hooks/useV2AgentConfigs";
+import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { useWorkspaceCreates } from "renderer/stores/workspace-creates";
 
@@ -23,9 +23,7 @@ export function usePullRequestAgentHandoff(
 ) {
 	const { t } = useLingui();
 	const queryClient = useQueryClient();
-	const { data: agentConfigs = [] } = useV2AgentConfigs(
-		target?.hostUrl ?? null,
-	);
+	const { data: agentConfigs = [] } = useAgentConfigs(target?.hostUrl ?? null);
 	const agent = agentConfigs[0] ?? null;
 	const linkedWorkspaceQueryKey = [
 		"pullRequests",

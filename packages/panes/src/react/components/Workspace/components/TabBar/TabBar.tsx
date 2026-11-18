@@ -160,15 +160,22 @@ export function TabBar<TData>({
 			);
 			if (next !== null) scroller.scrollTo({ left: next, behavior });
 		};
-		reveal("smooth");
-		let revealedWidth = scroller.clientWidth;
+		let revealedWidth: number | null = null;
+		const frame = requestAnimationFrame(() => {
+			revealedWidth = scroller.clientWidth;
+			reveal("smooth");
+		});
 		const observer = new ResizeObserver(() => {
-			if (scroller.clientWidth === revealedWidth) return;
+			if (revealedWidth === null || scroller.clientWidth === revealedWidth)
+				return;
 			revealedWidth = scroller.clientWidth;
 			reveal("instant");
 		});
 		observer.observe(scroller);
-		return () => observer.disconnect();
+		return () => {
+			cancelAnimationFrame(frame);
+			observer.disconnect();
+		};
 	}, [activeTabIndex, hasHorizontalOverflow]);
 
 	const insertIndexRef = useRef<number | null>(null);

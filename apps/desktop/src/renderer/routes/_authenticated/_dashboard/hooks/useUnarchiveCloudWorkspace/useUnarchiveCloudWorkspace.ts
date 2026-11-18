@@ -52,7 +52,7 @@ export function useUnarchiveCloudWorkspace() {
 			.catch(() => {});
 		if (options?.open === false) return;
 		void navigate({
-			to: "/v2-workspace/$workspaceId",
+			to: "/workspace/$workspaceId",
 			params: { workspaceId: id },
 		});
 	};

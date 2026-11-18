@@ -3,9 +3,9 @@ import { realpath } from "node:fs/promises";
 import { resolve, win32 } from "node:path";
 import {
 	type ChatSelections,
+	deriveQueuedPrompts,
 	deriveTimeline,
 	emptySnapshot,
-	isSelectionCategory,
 	isStartingMode,
 	outlineSnapshot,
 	reduceMany,
@@ -14,8 +14,10 @@ import {
 	type SessionOutline,
 	type SessionSnapshot,
 	type StoredItem,
+	selectionCategoryOf,
 	selectionKey,
 	sessionSelections,
+	userStopOf,
 } from "@superset/chat/core";
 import type {
 	AgentMessage,
@@ -39,6 +41,7 @@ import type {
 	SteerSubagentInput,
 	StopBackgroundTaskInput,
 	Turn,
+	UserMessage,
 } from "@superset/chat/protocol";
 import {
 	AGENT_DEFAULT_MODE,
@@ -83,11 +86,13 @@ import type { ChatResetReason, PageResult } from "../../replay";
 import { latestSeq, readPage, readSince } from "../../replay";
 import type { SelectionMemory } from "../../selections";
 import type {
+	CarriedSession,
 	LiveSessionRegistry,
 	PromptResult,
 	QueueState,
 	UnfinishedSession,
 } from "../../sessions";
+import { replayKey } from "../../sessions";
 import { SubagentItems } from "../../stream";
 
 export const createSessionCommandSchema = createSessionInputSchema
@@ -97,6 +102,8 @@ export const createSessionCommandSchema = createSessionInputSchema
 		cwd: z.string().min(1),
 		/** Opened by a person, who can answer an approval, so the remembered mode is safe to start in. */
 		interactive: z.boolean().optional(),
+		/** `null` launches on the default account and inherits no config from another chat. */
+		agentConfigId: z.string().min(1).nullable().optional(),
 		resume: z
 			.object({
 				harnessSessionId: z.string().min(1),
@@ -143,11 +150,12 @@ function lastAgentMessageId(events: DurableEvent[]): string | null {
 function transcriptBefore(
 	snapshot: SessionSnapshot,
 	itemId: string,
+	harness: string,
 ): { events: DurableEvent[]; midTurn: boolean } | null {
 	const events: DurableEvent[] = [];
-	for (const group of deriveTimeline(snapshot)) {
+	for (const group of deriveTimeline(snapshot, { harness })) {
 		const items = group.entries.flatMap((entry) =>
-			entry.kind === "item" ? [entry.item] : entry.items,
+			entry.kind === "tool_run" ? entry.items : [entry.item],
 		);
 		const index = items.findIndex((item) => item.id === itemId);
 		const kept = (index === -1 ? items : items.slice(0, index)).filter(
@@ -177,9 +185,42 @@ export function sessionsTitled<Row extends { title: string | null }>(
 		: rows;
 }
 
+function carriedFrom(
+	snapshot: SessionSnapshot,
+	harness: string,
+): CarriedSession {
+	const canceledToolIds = new Set<string>();
+	const hiddenStopKeys = new Set<string>();
+	for (const { item } of snapshot.items.values()) {
+		if (item.kind === "tool_call" && item.status === "canceled") {
+			canceledToolIds.add(item.id);
+			continue;
+		}
+		if (
+			item.kind === "user_message" &&
+			(item as UserMessage).discarded &&
+			userStopOf(item, harness)
+		)
+			hiddenStopKeys.add(replayKey(item.id));
+	}
+	const queued = deriveQueuedPrompts(snapshot)
+		.sort((a, b) => a.startedAtMs - b.startedAtMs)
+		.map((message) => message.content);
+	return {
+		turn: failedLastTurn(snapshot),
+		canceledToolIds,
+		hiddenStopKeys,
+		queued,
+	};
+}
+
+/** A turn that ended without the user asking stays visible in the session that replaces it. */
 function failedLastTurn(snapshot: SessionSnapshot): Turn | null {
 	const last = deriveTimeline(snapshot).at(-1)?.turn;
-	return last?.status === "failed" ? last : null;
+	if (last?.status === "failed") return last;
+	return last?.status === "interrupted" && last.error?.kind === "host_stopped"
+		? last
+		: null;
 }
 
 export const listSessionsCommandSchema = listSessionsInputSchema
@@ -220,7 +261,21 @@ export type GetSessionResult = {
 export type ResumeSessionInput = Omit<
 	UnfinishedSession,
 	"sessionId" | "interrupted"
-> & { cwd: string };
+> & {
+	cwd: string;
+	/** The cut-off session this one continues, whose ending it carries over. */
+	replacesSessionId?: string;
+	/** The chat this one continues; its agent config is launched again. */
+	sourceSessionId?: string;
+};
+
+/** A chat whose journal is already here (imported from another host) brought back to life. */
+export type ContinueSessionInput = {
+	sessionId: string;
+	cwd: string;
+	harnessSessionId: string;
+	terminalId?: string;
+};
 
 type ResumedChat = {
 	terminalId: string;
@@ -240,6 +295,7 @@ export type ChatSessionListEntry = ChatSessionRow & {
 export type ChatCommands = {
 	createSession(input: CreateSessionCommandInput): CreateSessionResult;
 	resumeSession(input: ResumeSessionInput): CreateSessionResult;
+	continueSession(input: ContinueSessionInput): CreateSessionResult;
 	prompt(input: PromptInput): PromptResult;
 	removeQueuedPrompt(input: QueuedPromptInput): void;
 	steerQueuedPrompt(input: QueuedPromptInput): void;
@@ -305,6 +361,7 @@ function explicitSelections(input: ChatSelections): ChatSelections {
 		...(input.modelId ? { modelId: input.modelId } : {}),
 		...(input.effortId ? { effortId: input.effortId } : {}),
 		...(input.modeId ? { modeId: input.modeId } : {}),
+		...(input.fast ? { fast: input.fast } : {}),
 	};
 }
 
@@ -390,6 +447,73 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 		return { ok: true, snapshot };
 	};
 
+	/** A source chat on the default account passes `null`, so no other chat's config is inherited. */
+	const sourceAgentConfig = (
+		sourceSessionId: string | undefined,
+	): { agentConfigId?: string | null } => {
+		const source = sourceSessionId
+			? options.sessions.get(sourceSessionId)
+			: null;
+		return source ? { agentConfigId: source.agentConfigId ?? null } : {};
+	};
+	const runsConfig = (
+		sessionId: string,
+		agentConfigId: string | null | undefined,
+	): boolean =>
+		agentConfigId === undefined ||
+		(options.sessions.get(sessionId)?.agentConfigId ?? null) === agentConfigId;
+	const running = (sessionId: string): boolean => {
+		const live = options.live.get(sessionId);
+		return live !== null && live.state.status !== "dead";
+	};
+	const openOnAgentSession = (
+		input: z.output<typeof createSessionCommandSchema>,
+	): ChatSessionRow[] => {
+		const harnessSessionId = input.resume?.harnessSessionId;
+		if (!harnessSessionId) return [];
+		return options.sessions
+			.listByScope(input.scopeId)
+			.filter(
+				(row) =>
+					!row.closedAt &&
+					row.harness === input.harness &&
+					row.harnessSessionId === harnessSessionId,
+			);
+	};
+
+	const closeChat = async (
+		sessionId: string,
+		{ userClosed = false } = {},
+	): Promise<void> => {
+		const wasLive = options.live.get(sessionId) !== null;
+		options.sessions.markClosed(sessionId, { byUser: userClosed });
+		replays.delete(sessionId);
+		subagentItems.forget(sessionId);
+		for (const category of SELECTION_CATEGORIES) {
+			savedPicks.delete(`${sessionId}:${category}`);
+		}
+		try {
+			await options.live.dispose(sessionId);
+		} finally {
+			if (wasLive) options.journal.announce(sessionId);
+		}
+	};
+
+	const retireStopped = (
+		sharing: readonly ChatSessionRow[],
+		keptSessionId: string,
+	): void => {
+		for (const row of sharing) {
+			if (row.sessionId === keptSessionId || running(row.sessionId)) continue;
+			void closeChat(row.sessionId).catch((error: unknown) =>
+				console.warn(
+					`[chat-runtime] could not close ${row.sessionId}, which ${keptSessionId} now resumes`,
+					error,
+				),
+			);
+		}
+	};
+
 	const resumedByTerminal = new Map<string, ResumedChat>();
 	const resumedFor = (
 		input: z.output<typeof createSessionCommandSchema>,
@@ -460,13 +584,57 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			});
 	};
 
+	/**
+	 * A resumed chat keeps the agent config it ran under, so it reopens on the
+	 * same account even when the caller only names the harness.
+	 */
+	const launchedAgentConfigId = (
+		input: z.output<typeof createSessionCommandSchema>,
+		replacedRow: ChatSessionRow | null,
+	): string | null => {
+		if (input.agentConfigId !== undefined) return input.agentConfigId;
+		if (!input.resume) return null;
+		if (
+			replacedRow?.scopeId === input.scopeId &&
+			replacedRow.harness === input.harness &&
+			replacedRow.harnessSessionId === input.resume.harnessSessionId
+		)
+			return replacedRow.agentConfigId ?? null;
+		return (
+			options.sessions.findByHarnessSession(
+				input.scopeId,
+				input.harness,
+				input.resume.harnessSessionId,
+			)?.agentConfigId ?? null
+		);
+	};
+
 	return {
 		createSession(input) {
 			const parsed = createSessionCommandSchema.parse(input);
 			return options.dedupe.run(`createSession:${parsed.commandId}`, () => {
-				const resumed = resumedFor(parsed);
+				const pending = resumedFor(parsed);
+				// Recovery prompts stay with the account they were queued under.
+				const resumed =
+					pending && runsConfig(pending.sessionId, parsed.agentConfigId)
+						? pending
+						: null;
 				const handedOff = resumed && handOff(resumed);
 				if (handedOff) return handedOff;
+				const sharing = openOnAgentSession(parsed);
+				const alreadyRunning = sharing.find(
+					(row) =>
+						running(row.sessionId) &&
+						runsConfig(row.sessionId, parsed.agentConfigId),
+				);
+				if (alreadyRunning) {
+					if (resumed) sendPending(resumed, alreadyRunning.sessionId);
+					retireStopped(sharing, alreadyRunning.sessionId);
+					return {
+						sessionId: alreadyRunning.sessionId,
+						epoch: alreadyRunning.epoch,
+					};
+				}
 				if (!options.live.supports(parsed.harness)) {
 					throw new Error(`unknown harness ${parsed.harness}`);
 				}
@@ -476,7 +644,6 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					replaced && replacedRow?.scopeId === parsed.scopeId
 						? replaySession(replaced)
 						: null;
-				const carried = replay?.ok ? failedLastTurn(replay.snapshot) : null;
 				const continued =
 					replay?.ok && replacedRow?.harness === parsed.harness
 						? sessionSelections(replay.snapshot.session)
@@ -494,17 +661,20 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				if (!selections.modeId && parsed.fallbackModeId) {
 					selections.modeId = parsed.fallbackModeId;
 				}
+				const agentConfigId = launchedAgentConfigId(parsed, replacedRow);
 				const sessionId = mintSessionId();
 				const opened = options.journal.open({
 					sessionId,
 					scopeId: parsed.scopeId,
 					harness: parsed.harness,
+					agentConfigId,
 				});
 				try {
 					options.live.create({
 						sessionId,
 						scopeId: parsed.scopeId,
 						harness: parsed.harness,
+						...(agentConfigId ? { agentConfigId } : {}),
 						cwd: parsed.cwd,
 						...selections,
 						resume: parsed.resume,
@@ -527,8 +697,13 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						}
 					});
 				}
-				if (carried) options.live.require(sessionId).carryFailedTurn(carried);
+				if (replay?.ok) {
+					options.live
+						.require(sessionId)
+						.carryFrom(carriedFrom(replay.snapshot, parsed.harness));
+				}
 				if (resumed) sendPending(resumed, sessionId);
+				retireStopped(sharing, sessionId);
 				return { sessionId, epoch: opened.epoch };
 			});
 		},
@@ -539,9 +714,15 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				scopeId: input.scopeId,
 				cwd: input.cwd,
 				harness: input.harness,
+				...sourceAgentConfig(input.sourceSessionId),
 				...explicitSelections(input),
 				terminalId: input.terminalId,
-				resume: { harnessSessionId: input.harnessSessionId },
+				resume: {
+					harnessSessionId: input.harnessSessionId,
+					...(input.replacesSessionId
+						? { replacesSessionId: input.replacesSessionId }
+						: {}),
+				},
 			});
 			const pending = {
 				prompts: input.prompts,
@@ -563,6 +744,52 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 			resumedByTerminal.set(input.terminalId, resumed);
 			sendPending(resumed, created.sessionId);
 			return created;
+		},
+
+		continueSession(input) {
+			const session = options.sessions.get(input.sessionId);
+			if (!session)
+				throw new Error(`chat session ${input.sessionId} not found`);
+			const live = options.live.get(input.sessionId);
+			if (live && live.state.status !== "dead") {
+				return { sessionId: input.sessionId, epoch: session.epoch };
+			}
+			if (!options.live.supports(session.harness)) {
+				throw new Error(`unknown harness ${session.harness}`);
+			}
+			// A chat moved from another host keeps the mode and model it had there.
+			const replay = replaySession(input.sessionId);
+			const selections = replay.ok
+				? sessionSelections(replay.snapshot.session)
+				: {};
+			const opened = options.journal.open({
+				sessionId: input.sessionId,
+				scopeId: session.scopeId,
+				harness: session.harness,
+				harnessSessionId: input.harnessSessionId,
+			});
+			// Removes the dead entry at once, so `create` can take its id.
+			if (live) {
+				void options.live
+					.dispose(input.sessionId)
+					.catch((error: unknown) =>
+						console.warn(
+							`[chat-runtime] could not dispose the dead agent of ${input.sessionId}`,
+							error,
+						),
+					);
+			}
+			options.live.create({
+				sessionId: input.sessionId,
+				scopeId: session.scopeId,
+				harness: session.harness,
+				cwd: input.cwd,
+				...selections,
+				// The history is already in the journal: replaying it again would show it twice.
+				resume: { harnessSessionId: input.harnessSessionId, quiet: true },
+				terminalId: input.terminalId,
+			});
+			return { sessionId: input.sessionId, epoch: opened.epoch };
 		},
 
 		prompt(input) {
@@ -682,11 +909,12 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				setConfigOptionInputSchema.parse(input);
 			return options.dedupe.run(`setConfigOption:${parsed.commandId}`, () => {
 				const live = options.live.require(parsed.sessionId);
-				const category = live.state.configOptions?.find(
-					(option) => option.id === parsed.configId,
-				)?.category;
+				const option = live.state.configOptions?.find(
+					(entry) => entry.id === parsed.configId,
+				);
+				const category = option ? selectionCategoryOf(option) : undefined;
 				const taken = live.setConfigOption(parsed.configId, parsed.value);
-				if (isSelectionCategory(category)) {
+				if (category) {
 					const order = pickOrder();
 					void taken.then((accepted) => {
 						if (accepted) rememberTaken(live, category, parsed.value, order);
@@ -720,6 +948,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 				cwd: parsed.cwd,
 				harness,
 				...(harness === source.harness ? sessionSelections(live.state) : {}),
+				...(harness === source.harness && source.agentConfigId
+					? { agentConfigId: source.agentConfigId }
+					: {}),
 				resume: { harnessSessionId: forked },
 				terminalId: parsed.terminalId ?? live.terminalId,
 			});
@@ -741,7 +972,11 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					if (!source || !replay.ok) {
 						throw new Error(`chat session ${parsed.sessionId} is not running`);
 					}
-					const before = transcriptBefore(replay.snapshot, parsed.itemId);
+					const before = transcriptBefore(
+						replay.snapshot,
+						parsed.itemId,
+						source.harness,
+					);
 					if (!before) {
 						throw new Error(
 							`message ${parsed.itemId} is not in chat session ${parsed.sessionId}`,
@@ -769,6 +1004,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 						scopeId: source.scopeId,
 						cwd: parsed.cwd,
 						harness: source.harness,
+						...(source.agentConfigId
+							? { agentConfigId: source.agentConfigId }
+							: {}),
 						...sessionSelections(sourceLive?.state ?? replay.snapshot.session),
 						...explicitSelections(parsed),
 						terminalId: sourceLive?.terminalId,
@@ -808,20 +1046,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 
 		async closeSession(input) {
 			const parsed: CloseSessionInput = closeSessionInputSchema.parse(input);
-			const wasLive = options.live.get(parsed.sessionId) !== null;
-			options.sessions.markClosed(parsed.sessionId, {
-				byUser: parsed.userClosed === true,
+			await closeChat(parsed.sessionId, {
+				userClosed: parsed.userClosed === true,
 			});
-			replays.delete(parsed.sessionId);
-			subagentItems.forget(parsed.sessionId);
-			for (const category of SELECTION_CATEGORIES) {
-				savedPicks.delete(`${parsed.sessionId}:${category}`);
-			}
-			try {
-				await options.live.dispose(parsed.sessionId);
-			} finally {
-				if (wasLive) options.journal.announce(parsed.sessionId);
-			}
 		},
 
 		async closeScope(scopeId) {
@@ -904,6 +1131,9 @@ export function createCommands(options: CommandsOptions): ChatCommands {
 					harness: parsed.harness,
 					scopeId: parsed.scopeId,
 					cwd: parsed.cwd,
+					...(parsed.agentConfigId
+						? { agentConfigId: parsed.agentConfigId }
+						: {}),
 					...(parsed.cursor ? { cursor: parsed.cursor } : {}),
 				}),
 				equivalentPaths(parsed.cwd),

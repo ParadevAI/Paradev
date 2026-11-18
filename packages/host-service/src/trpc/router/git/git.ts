@@ -9,18 +9,23 @@ import { createUserSimpleGit } from "../../../runtime/git/simple-git";
 import type { HostServiceContext } from "../../../types";
 import { getHostWorkerPool } from "../../../workers/host-worker-pool";
 import {
+	gitCheckoutBranchTask,
 	gitCommitFilesTask,
 	gitCommitTask,
 	gitDiffBulkTask,
 	gitDiffPatchTask,
 	gitDiffSideBlobTask,
 	gitFetchBaseRefTask,
+	gitFetchBranchesTask,
 	gitPushTask,
 	gitStagePathsTask,
 	gitStatusPartialTask,
 	gitStatusSnapshotTask,
 } from "../../../workers/tasks/git";
-import { getLocalWorkspace } from "../../../workspaces/local-workspace-store";
+import {
+	getLocalWorkspace,
+	updateLocalWorkspace,
+} from "../../../workspaces/local-workspace-store";
 import { cancelAndWaitWorkspaceTitleCommit } from "../../../workspaces/workspace-title-jobs";
 import { protectedProcedure, queryProcedure, router } from "../../index";
 import { rethrowWorkerTaskAbort } from "../../worker-abort";
@@ -129,6 +134,32 @@ export const MAX_DIFF_STATS_BATCH = 500;
 function invalidateStatus(workspaceId: string): void {
 	gitStatusStore.recordChange(workspaceId, undefined);
 }
+
+// A name git could read as an option (`--upload-pack=...`) never reaches it.
+const branchName = z
+	.string()
+	.min(1)
+	.refine((name) => !name.startsWith("-"), "Not a branch name");
+
+const CHECKOUT_REFUSALS = {
+	dirty: {
+		code: "PRECONDITION_FAILED",
+		message: () => "Commit or discard the changes in this workspace first.",
+	},
+	"held-elsewhere": {
+		code: "CONFLICT",
+		message: (branch: string) =>
+			`${branch} is checked out in another workspace.`,
+	},
+	"fetch-failed": {
+		code: "INTERNAL_SERVER_ERROR",
+		message: (branch: string) => `Could not fetch ${branch} from origin.`,
+	},
+	"not-found": {
+		code: "NOT_FOUND",
+		message: (branch: string) => `No branch ${branch} here or on origin.`,
+	},
+} as const;
 
 function runStatusSnapshot(
 	ctx: Parameters<typeof resolveWorktreePath>[0] &
@@ -544,6 +575,75 @@ export const gitRouter = router({
 			await git.raw(["branch", "-m", oldName, input.newName]);
 			invalidateStatus(input.workspaceId);
 			return { name: input.newName };
+		}),
+
+	/**
+	 * Moves the workspace onto another branch of its repository. A branch that
+	 * only exists on the remote is fetched first; `git switch` then creates the
+	 * tracking branch. Refused while the tree is dirty, because the switch
+	 * would carry the changes along, and while another worktree holds the
+	 * branch, because git allows a branch in one worktree at a time.
+	 */
+	checkoutBranch: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), branch: branchName }))
+		.mutation(async ({ ctx, input }) => {
+			await cancelAndWaitWorkspaceTitleCommit(ctx.db, input.workspaceId);
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitCheckoutBranchTask,
+					{ worktreePath, branch: input.branch, gitEnv },
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
+			if (!result.ok) {
+				const refusal = CHECKOUT_REFUSALS[result.reason];
+				throw new TRPCError({
+					code: refusal.code,
+					message: refusal.message(input.branch),
+				});
+			}
+			updateLocalWorkspace(
+				{ db: ctx.db, eventBus: ctx.eventBus, userId: ctx.userId },
+				input.workspaceId,
+				{ branch: input.branch },
+			);
+			invalidateStatus(input.workspaceId);
+			return { branch: input.branch };
+		}),
+
+	fetchBranches: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				branches: z.array(branchName).max(20),
+				missingOnly: z.boolean().default(false),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const worktreePath = resolveWorktreePath(ctx, input.workspaceId);
+			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
+			const result = await getHostWorkerPool()
+				.run(
+					gitFetchBranchesTask,
+					{
+						worktreePath,
+						branches: input.branches,
+						missingOnly: input.missingOnly,
+						gitEnv,
+					},
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
+			if (result.fetched.length > 0) invalidateStatus(input.workspaceId);
+			return result;
 		}),
 
 	discardChanges: protectedProcedure

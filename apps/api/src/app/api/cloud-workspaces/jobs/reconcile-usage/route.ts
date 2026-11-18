@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { reconcileCloudWorkspaceUsage } from "@superset/trpc/cloud-workspace-meter";
+import { reconcileCloudWorkspaces } from "@superset/trpc/cloud-workspace-sandbox-expiry";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
 
 	const outcome = await Sentry.withMonitor(
 		"reconcile-usage",
-		reconcileCloudWorkspaceUsage,
+		reconcileCloudWorkspaces,
 		{ schedule: { type: "crontab", value: "*/30 * * * *" } },
 	);
 	// Turbopack builds do not wrap route handlers, so nothing else flushes the closing check-in.

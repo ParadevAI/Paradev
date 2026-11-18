@@ -23,6 +23,24 @@ mock.module("@tanstack/react-router", () => ({
 		options,
 		useParams: () => ({ prNumber: "12" }),
 	}),
+	useNavigate: () => mock(),
+}));
+mock.module(`${root}/hooks/useOpenPullRequestInApp`, () => ({
+	useOpenPullRequestInApp: () => mock(),
+}));
+mock.module(`${root}/pull-requests/hooks/usePullRequestMergeFlow`, () => ({
+	usePullRequestMergeFlow: () => ({
+		stack: null,
+		stackQuery: {
+			stack: null,
+			isLoading: false,
+			isIncomplete: false,
+			refetch: mock(),
+		},
+	}),
+}));
+mock.module(`${root}/pull-requests/hooks/useStackRestack`, () => ({
+	useStackRestack: () => null,
 }));
 mock.module(`${root}/pull-requests/layout`, () => ({
 	Route: { useSearch: () => search },

@@ -12,9 +12,11 @@ import { createPortal } from "react-dom";
 interface TitleBarSlots {
 	main: HTMLElement | null;
 	side: HTMLElement | null;
+	contentCard: HTMLElement | null;
 	mainClaims: number;
 	setMain: (element: HTMLElement | null) => void;
 	setSide: (element: HTMLElement | null) => void;
+	setContentCard: (element: HTMLElement | null) => void;
 	claimMain: () => () => void;
 	setSideWidth: (width: number | null) => void;
 }
@@ -27,6 +29,7 @@ const TitleBarSideWidthContext = createContext<number | null>(null);
 export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 	const [main, setMain] = useState<HTMLElement | null>(null);
 	const [side, setSide] = useState<HTMLElement | null>(null);
+	const [contentCard, setContentCard] = useState<HTMLElement | null>(null);
 	const [mainClaims, setMainClaims] = useState(0);
 	const [sideWidth, setSideWidth] = useState<number | null>(null);
 	const claimMain = useCallback(() => {
@@ -37,13 +40,15 @@ export function TitleBarSlotsProvider({ children }: { children: ReactNode }) {
 		() => ({
 			main,
 			side,
+			contentCard,
 			mainClaims,
 			setMain,
 			setSide,
+			setContentCard,
 			claimMain,
 			setSideWidth,
 		}),
-		[main, side, mainClaims, claimMain],
+		[main, side, contentCard, mainClaims, claimMain],
 	);
 	return (
 		<TitleBarSlotsContext.Provider value={slots}>

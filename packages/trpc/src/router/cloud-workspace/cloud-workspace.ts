@@ -20,6 +20,7 @@ import {
 } from "@superset/shared/workspace-tags";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
+import { waitUntil } from "@vercel/functions";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -32,7 +33,8 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
-import { nudge } from "../../lib/realtime";
+import { callMoves } from "../../lib/moves";
+import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
 	deleteSandbox,
 	describeSandbox,
@@ -50,6 +52,12 @@ import { acpChatEnabled } from "../../lib/user-settings";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { personProcedure, userError } from "../../trpc";
 import { hostServiceMutation } from "../automation/relay-client";
+import { MAX_MOVED_CHATS } from "../chat-move/schema";
+import {
+	attachWorkspaceMove,
+	type SkippedChat,
+} from "../chat-move/utils/createWorkspaceMove";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import {
 	canOpenWorkspace,
 	isListed,
@@ -58,6 +66,8 @@ import {
 	visibleTo,
 } from "./access";
 import { recordCloudWorkspaceActivity } from "./activity";
+import { withClientStatus } from "./client-status";
+import { isLiveStatus } from "./live";
 import {
 	assertMayBoot,
 	queueSettleWorkspace,
@@ -67,6 +77,8 @@ import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordSandboxAsleep } from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -106,7 +118,7 @@ async function loadReadyWorkspace(
 	await assertMember(ctx, row.organizationId);
 	await assertCloudAccess(ctx, row.organizationId);
 	if (!(await canOpenWorkspace(row, ctx.principal.userId))) throw notFound();
-	if (row.status !== "ready") {
+	if (!isLiveStatus(row.status)) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",
 			message: `Cloud workspace is ${row.status}`,
@@ -133,8 +145,19 @@ async function addressSandbox(
 }> {
 	try {
 		if (mode === "address") {
+			const described = await describeSandbox(row.providerSandboxId);
+			const { expiresAt, sessionId } = described;
+			if (expiresAt) {
+				await recordSandboxAwake(row.id, { expiresAt, sessionId });
+			} else {
+				await recordSandboxAsleep(row.id, {
+					sessionId: sessionId ?? row.sandboxSessionId,
+				});
+			}
 			return {
-				...(await describeSandbox(row.providerSandboxId)),
+				hostTarget: described.hostTarget,
+				running: described.running,
+				vcpus: described.vcpus,
 				agentCredentialsChanged: false,
 			};
 		}
@@ -250,7 +273,7 @@ export const cloudWorkspaceRouter = {
 				ctx.principal.userId,
 			);
 			return rows.map(({ workspace, createdBy }) => ({
-				...workspace,
+				...withClientStatus(ctx.client, workspace),
 				createdBy,
 				presence: NO_PRESENCE,
 				tags: tagsByWorkspaceId.get(workspace.id) ?? [],
@@ -394,13 +417,49 @@ export const cloudWorkspaceRouter = {
 				typedPrompt: z.string().max(20000).optional(),
 				/** Tasks the composer linked; each must be in this organization. */
 				taskIds: z.array(z.string().uuid()).max(10).optional(),
-				/** A size the organization offers (see `machineSizes`); omitted = its default. */
+				/** A size the organization offers (see `machineSizes`); omitted = the environment's size, else the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).optional(),
+				/** The caller's own tags, as `setTags` files them. */
+				tags: workspaceTagsInputSchema.optional(),
+				/**
+				 * A workspace that moves into the new one, in place of an agent:
+				 * the move `workspaceMove.begin` recorded. The new workspace starts
+				 * from `branch`, and these chats move once its host answers. Their
+				 * history and session bundles must be in `chatHistory` first;
+				 * `workspaceMove.latest` tracks the move.
+				 */
+				move: z
+					.object({
+						workspaceMoveId: z.string().uuid(),
+						chatSessionIds: z
+							.array(z.string().uuid())
+							.max(MAX_MOVED_CHATS)
+							.default([]),
+					})
+					.optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			await assertMember(ctx, input.organizationId);
 			await assertCloudAccess(ctx, input.organizationId);
+			if (input.move && input.agent) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace a chat moves into starts no agent of its own",
+				});
+			}
+			if (input.move && !input.branch) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "A workspace that moves starts from its snapshot branch",
+				});
+			}
+			if (input.move && ctx.sandboxCaller) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "A cloud workspace cannot move chats",
+				});
+			}
 			if (input.agent && !isCloudAgentId(input.agent)) {
 				// Only the built-in presets exist inside a sandbox; the clients offer
 				// nothing else, so this is a developer error, not a user one.
@@ -410,6 +469,7 @@ export const cloudWorkspaceRouter = {
 				});
 			}
 
+			let skippedChats: SkippedChat[] = [];
 			const row = await startCloudWorkspace({
 				organizationId: input.organizationId,
 				userId: ctx.principal.userId,
@@ -421,6 +481,7 @@ export const cloudWorkspaceRouter = {
 				taskIds: input.taskIds,
 				attachmentFileIds: input.attachmentFileIds,
 				machineSize: input.machineSize,
+				tags: input.tags,
 				chat: !!input.agent && (await acpChatEnabled(ctx.principal.userId)),
 				...(input.agent
 					? {
@@ -435,6 +496,35 @@ export const cloudWorkspaceRouter = {
 							},
 						}
 					: {}),
+				...(input.move
+					? {
+							beforeProvision: async (workspaceId: string) => {
+								const move = input.move as NonNullable<typeof input.move>;
+								const attached = await attachWorkspaceMove({
+									workspaceMoveId: move.workspaceMoveId,
+									toWorkspaceId: workspaceId,
+									branch: input.branch as string,
+									chatSessionIds: move.chatSessionIds,
+									organizationId: input.organizationId,
+									userId: ctx.principal.userId,
+								}).catch(async (error: unknown) => {
+									// An attach that landed before its reply was lost would block the workspace's next move.
+									await callMoves(input.organizationId, {
+										op: "failInto",
+										toWorkspaceId: workspaceId,
+										error: "The cloud workspace could not start",
+									}).catch((failError: unknown) =>
+										console.error(
+											`[cloud-workspace] could not end the move into ${workspaceId}`,
+											failError,
+										),
+									);
+									throw error;
+								});
+								skippedChats = attached.skipped;
+							},
+						}
+					: {}),
 			});
 			// Shaped like a `list` row: clients seed the list with it.
 			const creator = await db.query.users.findFirst({
@@ -442,12 +532,14 @@ export const cloudWorkspaceRouter = {
 				columns: { id: true, name: true, image: true },
 			});
 			return {
-				...row,
+				...withClientStatus(ctx.client, row),
 				createdBy: creator
 					? { userId: creator.id, name: creator.name, image: creator.image }
 					: null,
 				presence: NO_PRESENCE,
-				tags: [] as string[],
+				tags: input.tags ?? [],
+				/** Chats of a moving workspace that could not move, and stay where they were. */
+				skippedChats,
 			};
 		}),
 
@@ -476,7 +568,7 @@ export const cloudWorkspaceRouter = {
 				);
 			}
 			nudge(row.organizationId, "cloud_workspaces");
-			return renamed ?? row;
+			return withClientStatus(ctx.client, renamed ?? row);
 		}),
 
 	/**
@@ -517,7 +609,7 @@ export const cloudWorkspaceRouter = {
 			// Tags are personal, but the caller's other windows learn of the
 			// change only through the organization channel.
 			nudge(row.organizationId, "cloud_workspaces");
-			return { ...row, tags: input.tags };
+			return { ...withClientStatus(ctx.client, row), tags: input.tags };
 		}),
 
 	/**
@@ -560,6 +652,41 @@ export const cloudWorkspaceRouter = {
 				// ticket. The sandbox's own desktop port is not published.
 				desktop: { url: host.url, token: host.token },
 			};
+		}),
+
+	/**
+	 * Hands the creator's current sign-ins to a running box in place: the
+	 * firewall rules, login files and managed environment, without a restart.
+	 * Agents started before it keep the sign-in they started with.
+	 */
+	applySignIns: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const row = await loadReadyWorkspace(ctx, input.id);
+			await wakeCloudWorkspace(row, { adoptSignIns: true });
+			return { applied: true };
+		}),
+
+	/** Who forwarded which of the workspace's ports to which local port, for `superset ports`. */
+	forwards: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.query(async ({ ctx, input }) => {
+			// A box reads its own workspace's forwards, not every one its creator can open.
+			if (ctx.sandboxCaller && ctx.sandboxCaller.workspaceId !== input.id) {
+				throw new TRPCError({ code: "NOT_FOUND", message: "Not found" });
+			}
+			const row = await loadVisibleWorkspace(ctx, input.id);
+			try {
+				return {
+					forwards: await readWorkspaceForwards(row.organizationId, row.id),
+				};
+			} catch (error) {
+				throw new TRPCError({
+					code: "SERVICE_UNAVAILABLE",
+					message: "Forwarded ports can't be read right now",
+					cause: error,
+				});
+			}
 		}),
 
 	/** Ends every terminal and agent on the box so they start again with the current agent sign-ins. */
@@ -621,7 +748,10 @@ export const cloudWorkspaceRouter = {
 			const row = await loadReadyWorkspace(ctx, input.id);
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
-				await stopAndSnapshot(row.providerSandboxId);
+				const stopped = await stopAndSnapshot(row.providerSandboxId);
+				await recordSandboxAsleep(row.id, {
+					sessionId: stopped.sessionId ?? row.sandboxSessionId,
+				});
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -735,16 +865,25 @@ export const cloudWorkspaceRouter = {
 			// The box keeps running until the reap stops it, so an undo is instant.
 			const archived = await transitionCloudWorkspace({
 				id: row.id,
-				from: ["provisioning", "ready", "failed"],
-				to: "deleted",
+				from: ["provisioning", "awake", "asleep", "failed"],
+				to: "archived",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				waitUntil(
+					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
+						(error) =>
+							console.error(
+								`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+								error,
+							),
+					),
+				);
 				// A row from a retired provider has no sandbox left to keep.
 				if (row.provider === "vercel") {
 					await queueReap(
 						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
-						row.providerSandboxId,
+						row,
 					).catch(async (error) => {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
@@ -781,7 +920,7 @@ export const cloudWorkspaceRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const row = await loadVisibleWorkspace(ctx, input.id);
 			const resumable =
-				row.status === "deleted" &&
+				row.status === "archived" &&
 				row.provider === "vercel" &&
 				(await sandboxExists(row.providerSandboxId));
 			// Inside the grace period the box is still there, running for the
@@ -791,13 +930,17 @@ export const cloudWorkspaceRouter = {
 				resumable
 					? {
 							id: row.id,
-							from: ["deleted"],
-							to: "ready",
+							from: ["archived"],
+							to:
+								row.sandboxExpiresAt &&
+								row.sandboxExpiresAt.getTime() <= Date.now()
+									? "asleep"
+									: "awake",
 							set: { deletedAt: null },
 						}
 					: {
 							id: row.id,
-							from: ["deleted"],
+							from: ["archived"],
 							to: "provisioning",
 							set: {
 								provider: "vercel",

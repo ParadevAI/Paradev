@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { mergeMethodChoices } from "@superset/shared/pull-request-merge-methods";
 import { Fragment, type ReactElement } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -55,7 +56,7 @@ export function PullRequestCard({
 	const state = resolvePullRequestState(detail);
 	const actions = resolveActions(state, detail);
 	const tally = tallyChecks(checks);
-	const mergeMethod = mergeability.allowedMergeMethods[0] ?? "squash";
+	const mergeMethod = mergeMethodChoices(mergeability).primary;
 
 	const rows: ReactElement[] = resolveCardRows(state, detail).flatMap((row) => {
 		if (row === "checks") {

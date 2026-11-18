@@ -58,7 +58,7 @@ export function CurrentPlanCard({
 				? null
 				: isCancelingAtPeriodEnd && cancelAt
 					? t({
-							message: `Cancels ${format(new Date(cancelAt), "MMMM d, yyyy")} — downgrades to Free at the end of the billing period.`,
+							message: `Cancels ${format(new Date(cancelAt), "MMMM d, yyyy")}, then downgrades to Free at the end of the billing period.`,
 						})
 					: isEnterprise
 						? t({

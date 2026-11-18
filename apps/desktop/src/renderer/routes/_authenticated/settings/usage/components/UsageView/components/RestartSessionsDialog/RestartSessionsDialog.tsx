@@ -64,8 +64,8 @@ export function RestartSessionsDialog({
 						    placeholders, hiding the sentence from translators. */}
 						<Plural
 							value={shown?.count ?? 0}
-							one="A running agent still uses the previous account — the switch only reaches new launches."
-							other="# running agents still use the previous account — the switch only reaches new launches."
+							one="A running agent still uses the previous account. The switch only reaches new launches."
+							other="# running agents still use the previous account. The switch only reaches new launches."
 						/>{" "}
 						<Trans>
 							Restart now to move them to {accountLabel}; each session picks its

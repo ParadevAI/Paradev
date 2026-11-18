@@ -15,7 +15,7 @@
 		"@superset/agent-harness": "workspace:*",
 		"@superset/chat": "workspace:*",
 		"@superset/shared": "workspace:*",
-		"hono": "4.13.7",
+		"hono": "4.13.11",
 		"partyserver": "0.5.9"
 	},
 	"devDependencies": {

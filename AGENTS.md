@@ -134,7 +134,7 @@ workspace, what's running, what an agent is doing right now, and cleanup when yo
 
 Those agents run in terminals. A user who asks for a new *session* or a *chat* means a chat agent
 session, which is a different namespace: use `superset sessions`, not `agents create` or
-`terminals`. `terminals read` and `send` cannot control a chat session.
+`terminals`. `terminals read` cannot read a chat session; prompt one with `sessions send`.
 
 ```bash
 superset sessions create --local --workspace WORKSPACE_ID --agent claude --prompt "..."
@@ -237,6 +237,7 @@ earns its place by catching a regression quickly.
 - `.agents/skills/`: CDP UI verification, mobile simulator verification, DB migrations, tRPC
   compatibility, ticket format, and more. Read the matching `SKILL.md` when a task fits its
   description.
+- `.agents/skills/autumn/SKILL.md`: read first for anything billing.
 - `docs/agent-tooling.md`: where commands, skills, and per-agent-CLI config live.
 - `docs/plugins.md`: authoring, publishing, and installing marketplace plugins — the manifest
   contract, the credential proxy, and which files are generated.

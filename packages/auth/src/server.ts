@@ -15,7 +15,9 @@ import { MemberRemovedEmail } from "@superset/email/emails/team/member-removed";
 import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
+import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { COMPANY } from "@superset/shared/constants";
+import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
 import { Client } from "@upstash/qstash";
@@ -60,6 +62,7 @@ import {
 	removeMemberShares,
 } from "./lib/pending-shares";
 import { invitationRateLimit } from "./lib/rate-limit";
+import { nullOnRejectedApiKey } from "./lib/rejected-api-key";
 import { resend } from "./lib/resend";
 import {
 	resolveSessionOrganizationState,
@@ -112,7 +115,7 @@ const desktopDevOrigins =
 		: [];
 
 export const auth = betterAuth({
-	baseURL: env.NEXT_PUBLIC_API_URL,
+	baseURL: getBrowserApiUrl(env),
 	secret: env.BETTER_AUTH_SECRET,
 	onAPIError: {
 		// Without this, production better-auth sends OAuth failures to the API root, a 404.
@@ -128,10 +131,12 @@ export const auth = betterAuth({
 		...withOwnDomainTwins([
 			env.NEXT_PUBLIC_WEB_URL,
 			env.NEXT_PUBLIC_API_URL,
+			getBrowserApiUrl(env),
 			env.NEXT_PUBLIC_MARKETING_URL,
 			env.NEXT_PUBLIC_ADMIN_URL,
 			env.NEXT_PUBLIC_DESKTOP_URL,
 		]),
+		...parseOriginList(env.MOBILE_WEB_ORIGINS),
 		...getTrustedVercelPreviewOrigins(request?.url ?? env.NEXT_PUBLIC_API_URL),
 		...desktopDevOrigins,
 		"superset://app",
@@ -607,7 +612,10 @@ export const auth = betterAuth({
 							),
 						);
 					if ((otherMemberships?.value ?? 0) === 0) {
-						throw new Error("You should be a member of at least one team");
+						throw new APIError("BAD_REQUEST", {
+							message: "You should be a member of at least one team",
+							code: "MUST_BELONG_TO_A_TEAM",
+						});
 					}
 				},
 
@@ -1275,6 +1283,11 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;
+
+/** `auth.api.getSession` for a request, where a rejected API key means no session instead of a thrown error. */
+export function getRequestSession(headers: Headers) {
+	return nullOnRejectedApiKey(auth.api.getSession({ headers }));
+}
 
 /**
  * Mints a short-lived JWT signed with the same JWKS key the Better Auth JWT
