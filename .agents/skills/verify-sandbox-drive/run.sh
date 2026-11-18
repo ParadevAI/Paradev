@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Model-checks Drive.tla.
-#   ./run.sh               the six scenarios with the proposed fixes; every rule must hold
+#   ./run.sh               the seven scenarios with the proposed fixes; every rule must hold
 #   ./run.sh CONFIG.cfg    one config, one worker, so a failure prints the shortest trace
 #   ./run.sh head          each rule alone against the code at head (the scenarios, fixes off)
 #   ./run.sh bugs          each Drive-bug-*.cfg: every fix but one; prints the rule it breaks
@@ -16,7 +16,7 @@ if [ ! -s "$JAR" ]; then
 fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-SCENARIOS="Drive.cfg Drive-rearchive.cfg Drive-race.cfg Drive-boot.cfg Drive-env.cfg Drive-twoprov.cfg"
+SCENARIOS="Drive.cfg Drive-rearchive.cfg Drive-race.cfg Drive-boot.cfg Drive-env.cfg Drive-twoprov.cfg Drive-fresh.cfg"
 RULES="NoWorkLost NeverEmptyShownAsWork SingleWriter NoTeardownOfLive NoDriveUnchanged
   NoStuckForever FreshForkIsFetched TransientIsRetried NoOrphanForever DriveOnlyByProvision"
 

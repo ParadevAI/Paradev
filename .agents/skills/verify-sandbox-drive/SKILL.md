@@ -15,26 +15,44 @@ one's states past what fits in two minutes.
 
 ```bash
 .agents/skills/verify-sandbox-drive/run.sh          # the design with the fixes: every scenario must pass
-.agents/skills/verify-sandbox-drive/run.sh head     # each rule against the code as it is (about 5 min)
+.agents/skills/verify-sandbox-drive/run.sh head     # each rule against the code as it is (about 12 min on 8 cores)
 .agents/skills/verify-sandbox-drive/run.sh bugs     # every fix but one: prints the bug each fix closes
 .agents/skills/verify-sandbox-drive/run.sh broken   # each Drive-broken-*.cfg must fail its rule
-.agents/skills/verify-sandbox-drive/run.sh Drive-bug-FixRunningResume.cfg   # one config, shortest trace
+.agents/skills/verify-sandbox-drive/run.sh Drive-bug-FixFailOwnOnly.cfg   # one config, shortest trace
 ```
 
 `run.sh` needs Java 17 or later and downloads `tla2tools.jar` once into `~/.cache/tla`. The pass
 check and `head` run TLC with every core and, on a failure, run the config again with one worker so
 the trace is the shortest. `bugs`, `broken` and a single config use one worker.
 
-A pass of `./run.sh` takes about 55 s on 8 cores and finds, per scenario:
+## Changing the model
+
+The model is an independent check of the code, so it must be derived from the code, never fitted
+to it.
+
+- **A product change must not edit the model in the same PR.** If a product PR needs the model to
+  change, the model is re-derived from the code as merged, action by action, by someone who reads
+  the code rather than the PR's description, and lands in its own PR.
+- A guard the code has is a constant in the first list of `Drive.tla` (TRUE is the code), with the
+  file and line that enforces it in the coverage record. A fix the code does not have is a `Fix*`
+  constant (FALSE is the code). `./run.sh head` turns every `Fix*` off; never narrow `head_of` to
+  keep a fix on. A fix that lands in the code becomes a guard, with its file and line, in the same
+  change that re-derives the model.
+- Before you trust a pass, check that each bound still lets the failure through: a scenario whose
+  budget makes an action unreachable (for example `MaxRedeliveries = 0`, which disables
+  `ProvError`) passes without testing anything. `./run.sh bugs` and `./run.sh broken` must still fail.
+
+A pass of `./run.sh` takes about 90 s on 8 cores and finds, per scenario:
 
 | Config | Scenario | Distinct states |
 | --- | --- | --- |
-| `Drive.cfg` | lifecycle: provision, 2 wakes, one archive and unarchive, the grace, the reap, teardown, the sweep, a transient mount failure, a redelivery | 2,826,054 |
-| `Drive-rearchive.cfg` | archive, unarchive, archive again | 767,114 |
-| `Drive-race.cfg` | two concurrent wakes | 29,202 |
-| `Drive-boot.cfg` | bundle change (and downgrade), an aborted session, environment entering or leaving drive mode | 367,392 |
-| `Drive-env.cfg` | environment change with archive and unarchive | 366,712 |
-| `Drive-twoprov.cfg` | two provision jobs for one row (an unarchive while the first still runs) | 97,514 |
+| `Drive.cfg` | lifecycle: provision, 2 wakes, one archive and unarchive, the grace, the reap, teardown, the sweep, a transient mount failure, a redelivery | 3,035,176 |
+| `Drive-rearchive.cfg` | archive, unarchive, archive again | 798,554 |
+| `Drive-race.cfg` | two concurrent wakes | 30,752 |
+| `Drive-boot.cfg` | bundle change (and downgrade), an aborted session, environment entering or leaving drive mode | 382,878 |
+| `Drive-env.cfg` | environment change with archive and unarchive | 381,744 |
+| `Drive-twoprov.cfg` | two provision jobs for one row: a delivery still queued from before an archive plus the unarchive's, or a QStash duplicate | 2,228,466 |
+| `Drive-fresh.cfg` | a fresh fork whose first fetch fails | 35,670 |
 
 A pass with far fewer states means a guard or a bound cut the search short. Treat that as a broken
 run, not a pass.
@@ -52,71 +70,99 @@ run, not a pass.
   grace period. Nothing else destroys it. Work done after an unarchive is protected again. Harm if
   broken: a user's commits, uncommitted changes or installed state disappear.
 - **NeverEmptyShownAsWork** (requirement 2): the control plane reports a workspace ready only over
-  a running box that has this workspace's own drive mounted, laid out and holding its work. Not
-  nothing mounted, not another workspace's drive, not a drive that was never laid out, not the
-  root disk's empty `/workspace`. Harm if broken: the user opens an empty workspace, thinks the
-  work is gone, and may start again over it.
+  a running box that has this workspace's own drive mounted, laid out and holding its work. Harm if
+  broken: the user opens an empty workspace, thinks the work is gone, and may start again over it.
 - **SingleWriter**: no session mounts a drive while another session (or the previous session of
   the same box, still flushing) holds it. Harm if broken: the drive's filesystem is corrupt or
   appears empty (measured: `plans/20261116-thin-sandbox-findings.md`).
 - **NoTeardownOfLive**: neither the teardown job nor the sweep deletes a box or a drive that a live
-  row (provisioning, awake or asleep) names. Harm if broken: a workspace in use loses its box or
-  drive.
+  row names. Harm if broken: a workspace in use loses its box or drive.
 - **DriveOnlyByProvision**: a row gets a drive name only in a provision; a wake never gives it one.
   Harm if broken: an old workspace boots onto a drive it never had and hides its own files.
 - **NoDriveUnchanged** (requirement 3): a row with no drive gets no mount, no drive in its identity
   file and no layout. Harm if broken: workspaces made before drive mode stop working as they did.
 - **NoStuckForever**: a live workspace never reaches a state in which every future wake fails
-  without ever being reported as failed. Harm if broken: the user sees "still starting" for ever,
-  with no reason and no way out.
+  without ever being reported as failed. Harm if broken: "still starting" for ever, with no reason.
 - **FreshForkIsFetched**: a new workspace's checkout on a fresh fork of the golden drive fetches its
   branch; it does not keep the golden's copy as if it were the user's work. Harm if broken: the
   user starts on stale code that looks like their branch.
-- **TransientIsRetried**: a mount that fails for one session does not mark the workspace failed.
-  Harm if broken: a workspace that would come up on the next try is shown as broken.
+- **TransientIsRetried**: a passing failure (a mount that fails once, a lock held for a moment)
+  does not mark the workspace failed. Harm if broken: a workspace that would come up on the next
+  try is shown as broken.
 - **NoOrphanForever**: every drive that exists is owned by a row, by a queued teardown or provision,
   or else the sweep will delete it. Harm if broken: drives no one can reach bill storage for ever.
 
-## Status at head `707eabd97`
+## Status at head `3f7b5ec3`
 
 `./run.sh head` checks each rule alone against the code as it is (every `Fix*` off). `./run.sh
 bugs` turns off one fix at a time with every other fix on, so each trace there is exactly the bug
-that fix closes. Paths are under `packages/trpc/src/` unless they start with `packages/` or
-`.github/`.
+that fix closes.
 
-| Rule | Holds at `707eabd97`? | If not |
+| Rule | Holds at `3f7b5ec3`? | If not |
 | --- | --- | --- |
-| NoWorkLost | **No** | Real bug, `FixSweepNamed`. The grace period ends, but the reap's delete stage has not run yet (QStash is late, or it is retrying), so the row is archived and still names its box and drive. The sweep lists the drive as an orphan, because an archived row older than the grace owns nothing (`packages/sandbox/src/drive-sweep.ts:41-62`). The user unarchives; the box exists, so it resumes (`router/cloud-workspace/cloud-workspace.ts:928-946`); the user works; the sweep deletes the drive from its list (`drive-sweep.ts:145-157`). |
-| NeverEmptyShownAsWork | Yes | Fixed: a lost provision no longer tears down (`provision.ts:199-216`). |
-| SingleWriter | **No** | Real bugs, two ways. (1) `FixRunningResume`, the shortest: a wake finds the box running, so under the lock it skips the detach wait (`lib/sandbox/vercel.ts:767-826`). The session then ends (for example, the extension past the plan's cap is refused, as the comment at `vercel.ts:830-835` says). The next calls on the box, `Sandbox.extendTimeout` (835), `update({ networkPolicy })` (847) and `writeSignInFiles` (855), resume the stopped session through the SDK, with no drive check, while the session that just ended may still hold the drive. A provision that finds its box running has the same shape (`writeIdentity`, `vercel.ts:344`). (2) `FixOneProvision` (`Drive-twoprov.cfg`): the user deletes a workspace while its provision is between its claim and its create, then undoes; the box does not exist yet, so the unarchive gives the row a new box name and queues a second provision with the same drive name (`cloud-workspace.ts:946-969`). The first creates box 1 with the drive and wins `provisioning → awake`, writing its own box name back (`provision.ts:189-198`); a wake resumes box 1 under box 1's lock while the second creates box 2 with the same drive under box 2's lock (`provision.ts:186`, `router/cloud-workspace/resume-lock.ts`). The lock is per box name, so it does not keep them apart. |
-| NoTeardownOfLive | **No** | Real bug, `FixSweepNamed`: as NoWorkLost, but the unarchive reprovisions (the box is gone, the drive name kept), and the sweep deletes the drive the provisioning row now names. |
+| NoWorkLost | **No** | Real bug, `FixFailOwnOnly` (`Drive-twoprov.cfg`). The user deletes a workspace before its provision has run, then undoes: the box does not exist, so the unarchive gives the row a new box name and queues a second provision (`cloud-workspace.ts:924-969`). The first delivery, still queued, now reads the row too, so both jobs provision the same box name. One creates the box, moves the row to `awake` and settles; the user works. The other then throws in its claim, `authorizeBoot` (a spend-cap refusal), fork or create. Its catch transitions the row `from: ["provisioning", "awake", "asleep"]` to `failed` with `onBox` (`provision.ts:317-329`): the live row is on that very box, so it matches. The row is failed, its box name retired, and the box with the user's work deleted at once (`provision.ts:329-338`, `deleteSandboxAndDriveLater` with no drive). With a drive the box goes and the drive stays. A QStash duplicate of the first provision does the same without any archive. `onBox` cannot tell the two jobs apart: they share the box name. |
+| NeverEmptyShownAsWork | Yes | |
+| SingleWriter | Yes | The lock on the drive, the waits under it and `RunningResumeChecked` hold it, including in the two-provision scenario. |
+| NoTeardownOfLive | Yes | `RetireNames`, `GuardAnyRow`, `SweepKeepsNamed`. |
 | NoDriveUnchanged | Yes | |
 | DriveOnlyByProvision | Yes | |
-| NoStuckForever | **No** | Real bug, `FixSweepNamed`: as NoWorkLost, with the sweep's delete before the unarchive. The box exists, so the unarchive resumes it (`cloud-workspace.ts:928-946`) with a drive that is gone; every wake's mount update throws (`vercel.ts:808-812`). It ends in `failed` only if Vercel answers that update with 404 or 410 (`vercel.ts:83-88`); the status is not measured. |
-| FreshForkIsFetched | **No** | Real bug, `FixFreshDurable`, unchanged since `e0263ca77`. A fresh fork's first session lays the drive out (sentinel and `SUPERSET_DRIVE_FRESH=1`, `packages/sandbox/bundle/rootfs/usr/local/bin/superset-boot:131-136`) and ends before the checkout. The flag lives only in that boot's environment (`superset-boot:73`), so the next boot sees a laid-out drive, `drive_has_work` is true (`superset-boot:375`), and a branch the golden already had is kept unfetched (`superset-boot:386-388`). |
-| TransientIsRetried | Yes | |
-| NoOrphanForever | Yes | Given that someone runs the sweep. It is a `workflow_dispatch` job only (`.github/workflows/sandbox.yml:222-224`), dry run unless `drive_sweep_delete` is set; nothing schedules it. |
+| NoStuckForever | Yes | The sweep no longer deletes a named drive. |
+| FreshForkIsFetched | **No** | The deliberate deviation (below), `FixFetchIfUntouched` (`Drive-fresh.cfg`): the first boot lays out the fresh fork and its fetch fails; `checkout()` removes `state/fresh` anyway (`superset-boot:439-440`); the next boot keeps the golden's copy of a same-named branch as the user's work, unfetched (`superset-boot:384-386`). |
+| TransientIsRetried | **No** | Real bug, `FixProvLockRetry` and `FixFailOwnOnly`. A provision waits up to 20 s for the resume lock (`resume-lock.ts:21-31`); when the wait runs out it throws `SandboxNotReadyError`, which the provision's catch handles as a box kept for diagnosis: `stopSandbox` and `failed` onBox (`provision.ts:305-322`). Two ways to get there: a redelivered provision while the user's wake holds the lock on the restored workspace (it stops the user's box and fails a live workspace, `Drive.cfg`), or two provisions of the same box while one holds the lock (`Drive-twoprov.cfg`). |
+| NoOrphanForever | Yes | Given that someone runs the sweep (`.github/workflows/sandbox.yml:222-224`, `workflow_dispatch` only; `plans/20261116-workspace-drive.md` lists scheduling it). |
 
-### What `707eabd97` closed, and the suspicions handed to this run
+### The claims of `3f7b5ec3`, checked against the code
 
-- **A redelivered provision auto-resumes a stopped box with no detach wait.** FIXED for a box
-  found stopped: `provisionSandbox` now waits and updates the mounts under the resume lock
-  (`vercel.ts:294-307`). Still open when the box was found running and stops before
-  `writeIdentity` (SingleWriter (1)).
-- **Two concurrent wakes; the second resumes after the first's refusal stop.** FIXED: the drive
-  check and the resume are one locked step (`vercel.ts:760-866`, `resume-lock.ts`), and the
-  refusal stop takes the lock (`vercel.ts:885`). Still open: the running-box path (SingleWriter
-  (1)).
-- **A provision still running across archive, unarchive, work, archive.** FIXED: a lost provision
-  tears nothing down (`provision.ts:199-216`); the archive's reap does.
-- **Delete during provisioning, then an immediate undo.** FIXED: nothing tears down on the lost
-  transition, and every teardown now retires the row's names in the same write
-  (`teardown.ts:130-155`, `reap.ts:95`, `provision.ts:306-326`), so an unarchive never gets a box or
-  drive that a teardown is deleting.
-- **Two provision jobs for one row.** STILL FAILS (SingleWriter (2)).
-- From `e0263ca77`'s run: the stale teardown that deleted a drive after an unarchive and a later
-  failure, and the teardown's check-then-delete window, are both closed by the retirement of names.
-  The sweep's listing race is still open (NoWorkLost, NoTeardownOfLive, NoStuckForever above).
+- **One lock from a stopped box's drive check to its resume.** TRUE (`RunningResumeChecked`,
+  `ResumeLock`, `LockOnDrive`): every resume goes through `resumeSession` (`vercel.ts:741`) under the
+  lock, after the drive check; a box read as running is used through its `Session`, which cannot
+  resume it, and falls back to the stopped path under the lock (`withLiveSession`,
+  `vercel.ts:758-783`). The key is the drive, so boxes of different names on one drive exclude each
+  other.
+- **A redelivered provision waits for the detach.** TRUE (`vercel.ts:305-312` for a stopped box,
+  `:315` before a create). New: the provision waits for the lock (`lock_timeout` 20 s) and, if it
+  runs out, fails the row (TransientIsRetried above).
+- **A lost provision tears nothing down and leaves the box to that archive's reap.** TRUE for a row
+  archived meanwhile (`provision.ts:219-232`). A row that names another box: the lost job's box goes
+  with `keepDrive` (`provision.ts:212-219`, `teardown.ts:66`). The drive is never deleted, but the
+  teardown still waits for the drive to detach from any box, so the box leaks (left out, below).
+- **Deleting retires the names in the same write.** TRUE (`retireAndTearDown`, `reap.ts:95`, the
+  delete fallback; the failed provision's new box name, `provision.ts:317-329`).
+- **The first run's own NoWorkLost (a lost job's teardown deleted the drive once the row went
+  failed)** is closed: `keepDrive` returns before any drive step (`teardown.ts:66`), the flag
+  survives a retry (`retryOrAbandon` requeues `...input`), and the route accepts it
+  (`apps/api/src/app/api/cloud-workspaces/teardown/route.ts`). `GuardAnyRow` closes it a second way.
+- **"All 10 rules hold" did not hold.** The patch on `superset/drive-model-9847-local-patch`
+  (`6d0dbf9a`) was reviewed and taken in part:
+  - Taken: the lock keyed on the drive, the create's drive wait, `onBox` on both provision
+    transitions, the lost job's `keepDrive` teardown, `GuardAnyRow` and keeping `ld` across a
+    teardown retry. Each is in the code (above) and is now a guard, not a fix.
+  - Rejected: narrowing `head_of` to turn off only `FixOneProvision`. That ran "head" with
+    `FixRunningResume`, `FixSweepNamed`, `FixFreshDurable`, `FixOneProvByDrive` and `GuardAnyRow`
+    on, as if the code had them; the right way is to make what the code has a guard. Here all five
+    are in the code, but `FixFreshDurable` was not: the code clears `state/fresh` after an attempt,
+    which the patch did not model.
+  - Weaker than the code: the provision's lock was modeled as waiting for ever, which hid the
+    `lock_timeout` failure (TransientIsRetried); and the stopped box's drive wait was not under the
+    lock. Its two-provision scenario had `MaxRedeliveries = 0`, which disables `ProvError`, so the
+    NoWorkLost trace above could not happen in it. No duplicate delivery was modeled.
+  - Stronger than the code: the settle's failure path still failed the row without `onBox`.
+
+### The fresh-fork deviation
+
+`state/fresh` is written with the sentinel and removed after the first checkout *attempt*
+(`superset-boot:133-135`, `439-440`), not only after a success. Modeled as written
+(`FreshClearedOnAttempt`), with a fetch that can fail (`MaxFetchFails` in `Drive-fresh.cfg`):
+
+- **NoWorkLost holds.** After a failed first checkout the box is usable, and what the user does in
+  the golden's copy is never refetched or recloned over.
+- **FreshForkIsFetched fails.** If that first fetch failed and the golden's checkout already has the
+  workspace's branch, every later boot keeps the golden's copy as the user's work, unfetched (trace
+  above). Stale code, nothing lost.
+- **The other choice is worse.** `Drive-variant-FreshUntilSuccess.cfg` removes `state/fresh` only
+  after a success: NoWorkLost fails: the next boot still sees a fresh fork and runs `checkout -B <branch> FETCH_HEAD` over what the user wrote on that branch after the failed checkout (or reclones over it if the fetch fails again).
+- `FixFetchIfUntouched` keeps both rules: a later boot fetches a checkout that has no marker only
+  while it is still the golden's, untouched (HEAD at the golden's commit, a clean tree).
 
 ## The proposed fixes
 
@@ -125,99 +171,113 @@ scenario. They are proposals for the product branch, not code in it.
 
 | Constant | Fix |
 | --- | --- |
-| `FixRunningResume` | A call that found its box running must not resume it later without the drive check. In `wakeSandbox` and `provisionSandbox`, after `Sandbox.get` says running, re-read the status before each call that can resume (`extendTimeout`, `update`, `writeSignInFiles`, `writeIdentity`, `runBoot`); if the box has stopped, go back to the stopped path (wait for the detach, update the mounts) under the same lock. Or extend through `currentSession()`, as `topUpSandboxSession` already does (`vercel.ts:664-683`), which never resumes. |
-| `FixOneProvision` | An unarchive starts no second provision while one may still run for the row. For example a `provisioning_since` lease the provision sets and clears; the unarchive of a row whose lease is live returns it to `provisioning` on the same box name and queues nothing. Or key the resume lock on the drive name instead of the box name, and make the provision's transition require `providerSandboxId` to be its own box. |
-| `FixSweepNamed` | The sweep keeps every drive a row still names, whatever its status (`drive-sweep.ts:41-62`). The 7-day exception is no longer needed: the reap's delete stage clears the names (`retireAndTearDown`), so after it no row names the drive. A drive is an orphan only once nothing names it. |
-| `FixFreshDurable` | "Fresh fork" is recorded on the drive with the sentinel (for example `state/fresh`) and removed after the first checkout, instead of only in `SUPERSET_DRIVE_FRESH`. |
+| `FixFailOwnOnly` | A provision fails the row, and stops its box, only while the row is still `provisioning`, or after this very job moved it to `awake`. `provision.ts:305-332` fails it `from: ["provisioning", "awake", "asleep"]`, so a second delivery on the same box name fails a live workspace and tears down its box. |
+| `FixProvLockRetry` | A provision whose lock wait runs out (`resume-lock.ts:21-31`, `SandboxNotReadyError`) is retried (throw to QStash, or requeue), not handled as a box kept for diagnosis (`provision.ts:305-322`), which stops the box and fails the row. |
+| `FixFetchIfUntouched` | A checkout with no marker that a boot would keep as the user's work is fetched (`checkout -B` from the base) when it is still the golden's copy: HEAD at the golden's commit and a clean tree (`superset-boot:384-388`). |
+
+`FixFailOwnOnly` and `FixProvLockRetry` are both needed: with either off and the other on, a rule
+fails (`./run.sh bugs`). An unarchive lease (no second provision while one may run) can stand in
+for either one, but not for both. By reading (not checked at these bounds), it would not cover a
+QStash duplicate of the provision, which needs no unarchive.
 
 ## Coverage record
 
-Synced with commit `707eabd97` of `superset/thin-workspace-drive-draft-c4ad5f56`.
+Synced with commit `3f7b5ec3` of `superset/thin-workspace-drive-draft-c4ad5f56`. Paths are under
+`packages/trpc/src/` unless they start with `packages/` or `.github/`.
+
+### The code's guards
+
+Each guard constant, TRUE in every config except the `Drive-broken-*` that turns it off, and the
+code that enforces it.
+
+| Constant | Code |
+| --- | --- |
+| `WaitDetach` | `waitForDriveDetached` before a stopped box resumes: `lib/sandbox/vercel.ts:305-312` (provision), `:844-857` (wake), `:766-781` (`withLiveSession`) |
+| `BootRefusesMissing` | `layout_drive`'s `drive.missing` (`superset-boot:101-110`) |
+| `SettleNeedsLayout` | `settleSandbox`'s `drive.layout` check (`vercel.ts`, `settleSandbox`) |
+| `ReapChecksEpoch` | `isStillArchived` (`router/cloud-workspace/reap.ts:87`) |
+| `LostRowLeftToReap` | a provision that lost its row to an archive tears nothing down (`provision.ts:219-232`) |
+| `RetireNames` | `retireAndTearDown` (`teardown.ts`), from the reap (`reap.ts:95`) and the delete fallback; the failed provision's new box name (`provision.ts:317-329`) |
+| `ResumeLock` | `sandboxResumeLock` (`router/cloud-workspace/resume-lock.ts`), around `provisionSandbox` (`provision.ts:186`) and `wakeSandbox` (`wake.ts:85`), and the refusal stop (`vercel.ts:978`) |
+| `LockOnDrive` | the lock's key is `driveName ?? providerSandboxId` (`provision.ts:186`, `wake.ts:85`) |
+| `CreateWaitsDetach` | `if (drive) await waitForDriveDetached(drive)` before a create (`vercel.ts:315`) |
+| `RunningResumeChecked` | a box read as running is used through `currentSession()` (`vercel.ts:302-304`, `:903-905`); a `Session` call fails on an ended session (`@vercel/sandbox` 4.0.0: only `Sandbox` methods go through `withResume`), and `withLiveSession` (`vercel.ts:758-783`) then waits for the drive, remounts and resumes under the lock; `resumeSession` (`:741`) is the only resume |
+| `TransitionOnBox` | `onBox` on `transitionCloudWorkspace` (`router/cloud-workspace/transition.ts:19-30`), used for `→ awake` (`provision.ts:195`) and `→ failed` (`provision.ts:321`) |
+| `LostJobKeepsDrive` | a lost job whose row names another box tears its own box down with `keepDrive` (`provision.ts:212-219`, `teardown.ts:66`) |
+| `GuardAnyRow` | `liveReferences` matches any row, any status (`router/cloud-workspace/teardown-guard.ts:21`, `:37`) |
+| `TeardownChecksRows` | `teardownOnce`'s three `liveReferences` checks (`teardown.ts:51`, `:63`, `:67`) |
+| `SweepKeepsNamed` | `orphanCandidates` keeps every named drive (`packages/sandbox/src/drive-sweep.ts:31-44`), and `stillOrphaned` checks again before each delete (`:78`, `:182-186`) |
+| `SweepRuns` | the sweep is a `workflow_dispatch` job (`.github/workflows/sandbox.yml:222-224`); nothing schedules it |
+| `DowngradeRefused` | `drive.downgrade` before a re-exec (`superset-boot`) |
+| `FreshByLayout`, `FreshOnDrive` | `state/fresh` written with the sentinel (`superset-boot:133-135`), read by `drive_has_work` (`:374`) |
+| `FreshClearedOnAttempt` | `checkout()` removes `state/fresh` after the attempt, failed or not (`superset-boot:439-440`) |
+| `LaidColumn` | `drive_laid_out_at` (`router/cloud-workspace/drive-laid-out.ts`, `lib/sandbox/drives.ts`) |
+| `ProvRetriesMissing` | `SandboxDriveMissingError` at provision leaves the row asleep (`provision.ts:279-291`) |
+| `RefusalLimitOn` | `persistentDriveRefusals` and `SandboxDriveRefusedError` (`vercel.ts`) |
+| `StripIdentity` | `stripWorkspaceIdentity` refuses an unmounted drive (`vercel.ts`) |
+
+### Actions
 
 | Action | Code | Unit test of the same transition |
 | --- | --- | --- |
-| `ProvClaim` | `provision` in `router/cloud-workspace/provision.ts`: the `provisioning` check, `buildSandboxClaim({ provisioning: true })` (`lib/sandbox/claim.ts`), `claimedWorkspaceDrive` with the drives flag (`lib/sandbox/drives.ts:56-86`), `claimWorkspaceDrive`'s row write (`provision.ts:63-88`) | `drives.test.ts` "an environment in drive mode gives a new workspace a drive", "a re-delivered provision keeps the name already on the row"; `claim.test.ts` "a provision in drive mode claims a new drive, not yet laid out", "with the organization's flag off a new workspace gets no drive; one that has a drive keeps it" |
-| `ProvFork` | `forkWorkspaceDrive` (`drives.ts`): `"existing"` by name, else `"forked"`; a fork clears `drive_laid_out_at` | `drives.test.ts` "forks the golden drive", "finds the drive a previous delivery made", "never creates an empty drive" |
-| `ProvCreate` | `provisionSandbox` under `sandboxResumeLock(providerSandboxId)` (`vercel.ts:259-356`, `provision.ts:186`): a box found stopped waits for its drive and gets its mounts (`vercel.ts:297-307`); a missing box is created with the mounts | `vercel.test.ts` (provision under the lock) |
-| `ProvWrite` | `writeIdentity` and `runBoot` on a box that was running when read (`vercel.ts:342-347`); they resume it if its session ended meanwhile | none |
-| `ProvError` | the `catch` for a non-not-ready error: `failed` with a new box name and, if this job forked the drive, no drive (`provision.ts:306-316`), then `deleteSandboxAndDriveLater` of the old names (`provision.ts:317-326`) | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |
-| `ProvMark` | `transitionCloudWorkspace(provisioning → awake, providerSandboxId)`; a lost row is left to the archive's reap (`provision.ts:189-216`) | `provision.test.ts` |
-| `ProvSettle` | `settleSandbox` with the boot id (`vercel.ts:508`), then `recordDriveLaidOut` (`provision.ts:246`); a `SandboxDriveMissingError` stops the box and records it asleep (`provision.ts:268-280`); a `SandboxDriveRefusedError` or a not-ready stops the box and fails the row | `provision.test.ts` "records the drive laid out once the boot answered", "a drive refusal at create leaves the workspace asleep for the next wake, never failed" |
-| `ProvDie` | the function dies (its lock's transaction ends with it); QStash delivers the provision again or gives up | none |
-| `WakeStart` | `wake` in `router/cloud-workspace/wake.ts`: `buildSandboxClaim({ row })` (laid-out iff `drive_laid_out_at`), then `wakeSandbox` under `sandboxResumeLock` (`wake.ts:85`, `vercel.ts:760`): `Sandbox.get` and, for a stopped box, `waitForDriveDetached` (`vercel.ts:767-805`). Another holder: `SandboxNotReadyError` | `claim.test.ts` "a wake expects the drive laid out only once the row recorded a boot that laid it out"; `vercel.test.ts` "a stopped box waits for its drive, then gets its mounts, then resumes" |
-| `WakeResume` | still under the lock: `update({ mounts })` for a stopped box (a drive update throws, `vercel.ts:806-819`), then `extendTimeout` for a running one (835), `update({ networkPolicy })`, `writeIdentity`, `writeSignInFiles` (845-856) and `runBoot` (858-862), which resume a stopped session | `vercel.test.ts` "the drive and the agent-tools drive share one mounts object", "a box without a drive gets no mount update"; `wake.test.ts` "a workspace without a drive is woken with no mounts, whatever its environment" |
-| `WakeSettle` | `settleSandbox`; a refusal stops the box under the lock (`vercel.ts:878-886`), skipped if another caller holds it; `SandboxDriveMissingError` answers `TIMEOUT`, `SandboxDriveRefusedError` runs `markSandboxUnavailable` (`cloud-workspace.ts:170-185`); a settled wake records the layout (`wake.ts:137`) | `vercel.test.ts` "only this boot's lines count…", "counts the persistent refusals in a row…", "a refusal no remount can change ends the retries after several boots in a row" |
-| `WakeDie` | the wake throws or its function dies; the lock goes with its transaction | `drives.test.ts` "fails rather than mount a drive another session still writes" |
-| `WakeUnavailable` | `markSandboxUnavailable` (`wake.ts`) | none for drives |
-| `Boot1` | `superset-boot`'s first `layout_drive` (lines 101-143): `drive.missing`, `drive.foreign`, `drive.unlaid`, the sentinel and `SUPERSET_DRIVE_FRESH` (131-136) | `packages/sandbox/src/boot-twice.ts`: "drive: …", "drive foreign", "drive empty", "drive missing: …" |
-| `Boot2` | `ensure_bundle`, `apply-rootfs` (190), `drive.downgrade` (198-201), the re-exec (202-205) and its layout, `checkout_one` with `drive_has_work` (375-429), host-service | `boot-twice.ts` "drive, older boot script: refused before the reexec, nothing checked out", "fresh fork, new branch…", "fresh fork, a branch the golden has: reset to its base, not kept", "fresh fork, fetch failed…", "drive, root rolled back…", "drive, marker lost…", "drive, fetch failed…". No test ends a session between the layout and the checkout. |
-| `SessionEnds` / `Abort` / `Detach` | Vercel: a clean stop (snapshot), an abort (root disk and boot log back to the last snapshot, drive kept), the drive detaching later | platform facts; see "How to re-validate on real Vercel" |
+| `ProvClaim` | `provision`: the `provisioning` check, `buildSandboxClaim({ provisioning: true })`, `claimWorkspaceDrive`'s row write | `drives.test.ts`, `claim.test.ts` (claims) |
+| `ProvFork` | `forkWorkspaceDrive`: `"existing"` or `"forked"`; a fork clears `drive_laid_out_at` | `drives.test.ts` |
+| `ProvCreate` | `provisionSandbox` (`vercel.ts:263-370`) under the lock, waiting for it (`lock_timeout` 20 s): a missing box is created after the drive wait; a stopped or running box is taken under the lock to `ProvWaitDone` or `ProvWrite` | `vercel.test.ts`, `provision.test.ts` |
+| `ProvWaitDone` | the stopped box: `waitForDriveDetached`, `update({ mounts })`, `resumeSession`, under the lock | `vercel.test.ts` |
+| `ProvWrite` | `withLiveSession` on a box read as running (`vercel.ts:340-360`) | `vercel.test.ts` |
+| `ProvError` | the `catch` for a non-not-ready error (`provision.ts:305-340`): `failed` onBox with a new box name, then the teardown of the old names | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |
+| `ProvLockTimeout` | the lock wait runs out: `SandboxNotReadyError` (`resume-lock.ts:28-30`), handled as kept for diagnosis (`provision.ts:305-322`): stop the box, `failed` onBox | none |
+| `ProvMark` | `→ awake` onBox (`provision.ts:191-200`); a row that names another box: delete this box, keep the drive (`provision.ts:212-219`); an archived row: left to the reap | `provision.test.ts` |
+| `ProvSettle` | `settleSandbox`, `recordDriveLaidOut`; `SandboxDriveMissingError` leaves it asleep; a refusal or a timeout fails the row onBox | `provision.test.ts` |
+| `ProvDie` / `ProvDup` | the function dies (its lock's transaction ends with it); QStash delivers the job again, or twice | none |
+| `WakeStart` / `WakeWaitDone` | `wake` (`wake.ts`): the claim, then `wakeSandbox` (`vercel.ts:800`) under `sandboxResumeLock` without waiting (`SandboxNotReadyError` when held): `Sandbox.get`, and for a stopped box `waitForDriveDetached` with the lock held | `vercel.test.ts` |
+| `WakeResume` | still under the lock: `update({ mounts })`, `resumeSession`, then `withLiveSession` with `extendTimeout`, `update`, `writeIdentity`, `writeSignInFiles`, `runBoot` on the Session (`vercel.ts:903-960`) | `vercel.test.ts` |
+| `WakeSettle` | `settleSandbox`; a refusal stops the session under the lock (`vercel.ts:972-980`); terminal refusals fail the row | `vercel.test.ts` |
+| `WakeDie` / `WakeUnavailable` | a failed wake; `markSandboxUnavailable` | none for drives |
+| `Boot1` / `Boot2` | `superset-boot`: the first `layout_drive`, then `apply-rootfs`, `drive.downgrade`, the re-exec, `checkout_one` with `drive_has_work`, `checkout()`'s removal of `state/fresh`, host-service; a fetch can fail | `packages/sandbox/src/boot-twice.ts` (the "fresh fork, …" and "drive, …" checks) |
+| `SessionEnds` / `Abort` / `Detach` | Vercel | platform facts; see "How to re-validate on real Vercel" |
 | `UserWork` | the user writes under `/workspace` of a ready box | none |
-| `Archive` | `cloudWorkspace.delete` (`cloud-workspace.ts:849-922`): `archived`, `queueReap` | `reap.test.ts` "queues the delete after seven days and the stop after a minute" |
-| `GraceEnds` | seven days pass (`ARCHIVE_GRACE_SECONDS`); the sweep's 7-day rule starts to apply | none |
-| `ReapRun` | `reapArchivedCloudWorkspace` (`reap.ts:84-111`): `isStillArchived`; the stop stage; the delete stage's `retireAndTearDown` (`reap.ts:95`, `teardown.ts:130-155`): a new box name, no drive, no `drive_laid_out_at`, in the write that checks the archive, then the teardown of the old names | `reap.test.ts` (the delete stage) |
-| `Unarchive` | `cloudWorkspace.unarchive` (`cloud-workspace.ts:924-969`): resumable iff `sandboxExists` (a retired name never is); else `provisioning` with `nextSandboxNameFor`, `driveName` kept (null if retired) | none |
-| `TdRun` | `teardownSandbox` (`router/cloud-workspace/teardown.ts:35-67`): `liveReferences` (49), `stopSandbox`, `waitForDriveDetached` (20 s), `liveReferences` (61), `deleteSandbox` (63), `liveReferences` (65), `deleteWorkspaceDrive` (66); any failure requeues from the top (`retryOrAbandon`, 80-96) | `teardown.test.ts` "stops the box, waits for its drive, then deletes the box and the drive", "a drive still attached requeues the job and deletes nothing", "a box a revived workspace runs on is left alone", "an unarchived workspace's new box keeps the drive; only the old box goes", "any other failure is retried, not dropped" |
-| `TdAbandon` | `retryOrAbandon` after `TEARDOWN_ATTEMPTS` | `teardown.test.ts` "gives up after the last attempt instead of requeuing forever" |
-| `SweepList` / `SweepDelete` | `packages/sandbox/src/drive-sweep.ts`: `orphanDrives` from one read of the rows and the drives (41-62), then `Drive.delete` per listed drive (145-157); dispatched by hand (`.github/workflows/sandbox.yml:222-224`) | `drive-sweep.test.ts` "only an old, detached drive that no workspace or live environment names…" |
-| `NewGoldenDrive` | the release with the flag on (`packages/sandbox/src/environments/release.ts`), or `environment.promote` with a source drive and the flag on; `stripWorkspaceIdentity` refuses an unmounted drive (`vercel.ts:945`) | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive", "a golden whose drive did not mount is not stripped and fails the promote" |
-| `LeaveDriveMode` | a release with the flag off, a promote of a source without a drive, or the drives flag turned off (new workspaces only) | `vercel.test.ts` "a source without a drive leaves the environment out of drive mode" |
-| `BundleChange` | a release or rollback writing a new `bundleSha` | `boot-twice.ts` "drive, older boot script…" |
-
-When you change a step, change its action here and in `Drive.tla`, run every mode, and set the
-sync commit to the commit that holds the change.
+| `Archive` / `GraceEnds` | `cloudWorkspace.delete`, `queueReap`; seven days pass | `reap.test.ts` |
+| `ReapRun` | `reapArchivedCloudWorkspace`: the stop stage; the delete stage's `retireAndTearDown` | `reap.test.ts` |
+| `Unarchive` | `cloudWorkspace.unarchive`: resumable iff `sandboxExists`; else a new box name and a new provision | none |
+| `TdRun` / `TdAbandon` | `teardownSandbox` (`teardown.ts:37-70`), with `keepDrive` returning after `deleteSandbox` (`:66`); `retryOrAbandon` | `teardown.test.ts` |
+| `SweepList` / `SweepDelete` | `sweepDrives` (`drive-sweep.ts:52-97`): `orphanCandidates`, then `stillOrphaned` and `remove` per drive | `drive-sweep.test.ts` |
+| `NewGoldenDrive` / `LeaveDriveMode` / `BundleChange` | the release, promote, the drives flag, a new `bundleSha` | `vercel.test.ts`, `environment.test.ts` |
 
 ## Bounds
 
-- One workspace, one environment, sandbox ids 1 and 2 plus the retired name 0, drives 1 and 2
-  (`drive-<id>`); one reprovision; at most 3 sessions; `DRIVE_REFUSAL_LIMIT = 3`.
+- One workspace, one environment, sandbox ids 1 and 2 plus the retired name 0, drives 1 and 2; one
+  reprovision; at most 3 sessions; `DRIVE_REFUSAL_LIMIT = 3`.
 - Per scenario (the table above): wakes, concurrent wakers, provision jobs, archives, environment
-  changes, bundle changes, aborted sessions, transient mount failures, redeliveries and sweeps,
-  each 0 to 2. The scenarios split the perturbations so each stays small; a bug that needs two
-  perturbations from different scenarios is not covered.
-- QStash is late and duplicated: the reap's stop stage fires any time after its archive, its
-  delete stage any time after the grace (late), a teardown can run twice, a provision can be
-  delivered again from the top. The grace ends only once no provision or wake from before the
-  archive still runs.
-- A function can die after any step of a provision or a wake; its lock goes with it.
+  changes, bundle changes, aborted sessions, transient mount failures, failed fetches,
+  redeliveries (a provision delivered again or twice, a teardown twice) and sweeps, each 0 to 2.
+  A bug that needs perturbations from two scenarios is not covered.
+- The grace ends only once no provision or wake from before the archive still runs.
 
 ## What is left out
 
-- The sleep state machine (`awake`/`asleep`, expiry, the watch, the reconcile): see
-  `verify-sandbox-asleep`. Here `awake` stands for both live statuses. The keepalive top-up extends
-  through `currentSession()` and never resumes, so it is not a separate action.
-- The `cloudWorkspace.delete` fallback when the reap cannot be queued (`retireAndTearDown` at once,
-  `cloud-workspace.ts:898`): the same write as the reap's delete stage, earlier.
-- Root-disk work lost by an aborted session: today's behaviour with or without a drive. Root-disk
-  work of a workspace with a drive (a deleted box loses it) is caught by NoTeardownOfLive.
-- A second boot in the same session (a wake that finds host-service dead runs `runBoot` again).
-- The agent-tools drive, home subtrees, swap and Docker on the drive; regions; the sweep's
-  minimum age and golden drives; promote of the source workspace itself; golden drive deletion.
-- Vercel's own refusal of a second read-write mount: the model lets the platform allow it and
-  counts that as a `SingleWriter` violation, because our code must not rely on it.
+- The sleep state machine (`verify-sandbox-asleep`); `awake` stands for both live statuses.
+- A user who works on a box while its first checkout still runs (the checkout runs in the
+  background after host-service answers; the model's boot is atomic). On a fresh fork that
+  checkout may reclone over what the user wrote meanwhile, as on main.
+- Root-disk work lost by an aborted session (today's behaviour); a second boot in one session.
+- The agent-tools drive, home subtrees, swap, Docker on the drive; regions; the sweep's minimum age
+  and golden drives; promote of the source workspace itself.
+- A lost provision's leaked box: its `keepDrive` teardown still waits for the drive to detach from
+  any box (`teardown.ts:53-60`), and the winning box holds it, so it retries and gives up and the
+  stopped box is never deleted. Storage only; no rule covers boxes no row names.
 
 ## Where the model and the code differ
 
-Checked on 2026-11-18:
-
-- A boot is two steps: the first `layout_drive`, then everything else (`apply-rootfs`, downgrade
-  check, re-exec and its layout, checkout, host-service). In the code the checkout runs in the
-  background after host-service starts.
-- Checkout content is abstract (golden copy, fresh, stale, work, clobbered).
-- The resume lock is a set of box names. `pg_try_advisory_xact_lock` fails at once; the model
-  disables the step instead, which is the same as a "still starting" answer and a later retry.
-- The locked part of a wake is two steps, `WakeStart` (claim, `Sandbox.get`, detach wait) and
-  `WakeResume` (mount update and the calls that resume). Between them only the platform acts: a
-  session can end, a drive can detach. The locked part of a provision is one step (`ProvCreate`),
-  or two for a box found running (`ProvCreate`, `ProvWrite`).
-- The settle reads the caller's claim, and a refusal is "this boot's"; the boot-id match is
-  modeled as the box's current boot.
-- The persistent-refusal count is kept on the box (the boot log is on the root disk, so an abort
-  rolls it back) and counted as `persistentDriveRefusals` does.
-- The drives flag and the golden drive are one variable: a new workspace gets a drive only when
-  both are set.
-- `liveReferences`'s environment checks (a golden sandbox or golden drive) are not modeled: one
-  workspace, and its drive is never a golden.
+- A boot is two steps: the first `layout_drive`, then everything else.
+- Checkout content is abstract (golden copy, fresh, stale, work, clobbered); a failed fetch fails
+  the reclone too (the network is down).
+- The resume lock is a set of keys. A wake that finds it held fails ("still starting"); a provision
+  waits (`ProvCreate` is disabled) or times out (`ProvLockTimeout`), as `lock_timeout` does.
+- A wake holds the lock from `WakeStart` to `WakeResume`; a provision from `ProvCreate` to
+  `ProvWaitDone` or `ProvWrite`. Between them only the platform acts.
+- The persistent-refusal count lives on the box; the drives flag and the golden drive are one
+  variable; `liveReferences`'s environment checks are not modeled.
 
 ## A real bug or a model error
 
@@ -232,18 +292,16 @@ TLC prints the shortest trace that breaks a rule. Replay it against the code, on
 
 Model errors found and fixed:
 
-- (`e560e42c`) A wake re-read the row at its mount step; the code passes the `row` it loaded at the
-  start. The settle checked the boot's claim, not the caller's. The teardown's give-up was allowed
-  with the drive detached. Two first drafts of fixes failed their own check.
+- (`e560e42c`) A wake re-read the row at its mount step; the settle checked the boot's claim; the
+  teardown's give-up was allowed with the drive detached; two first drafts of fixes failed their
+  own check.
 - (`e0263ca77`) The reap's delete stage fired while a provision or a wake from before the archive
-  still ran, which seven days rule out. A first teardown token keyed on status and archive count
-  matched again after an unarchive and a later failure.
-- (`707eabd97`) The model had treated a wake of a running box as needing no resume step, which hid
-  `FixRunningResume`: the calls after `Sandbox.get` resume a session that ended meanwhile. The
-  grace period and the reap's delete stage were one step, which hid the sweep's window between
-  them. Four of the fixes proposed at `e0263ca77` (`FixProvWait`, `FixTdToken`,
-  `FixTeardownAtomic`, `FixUnarchiveDrive`) are no longer needed: the code's lock and its
-  retirement of names close them, or `FixSweepNamed` does.
+  still ran; a first teardown token matched again after an unarchive and a later failure.
+- (`707eabd97`) A wake of a running box had no resume step; the grace and the reap were one step.
+- (`3f7b5ec3`) `update({ networkPolicy })` was listed among the calls that resume a stopped box; the
+  SDK's `Sandbox.update` does not. A patch to this model from #9847's branch
+  (`superset/drive-model-9847-local-patch`) was reviewed and partly taken; see "The claims of
+  `3f7b5ec3`".
 
 ## Proof that the check can fail
 
@@ -252,37 +310,31 @@ Each `Drive-broken-<Rule>.cfg` has every fix on, turns guards off, and checks on
 
 | Config | Guards off | Fails in |
 | --- | --- | --- |
-| `Drive-broken-NoWorkLost.cfg` | `RetireNames = FALSE`: the reap and a failed provision keep the row's names | 20 states |
+| `Drive-broken-NoWorkLost.cfg` | `SweepKeepsNamed = FALSE`: the sweep's 7-day exception | 19 states |
 | `Drive-broken-NeverEmptyShownAsWork.cfg` | `BootRefusesMissing = FALSE`, `SettleNeedsLayout = FALSE` | 8 states |
 | `Drive-broken-SingleWriter.cfg` | `WaitDetach = FALSE`: no detach wait anywhere | 8 states |
 | `Drive-broken-NoTeardownOfLive.cfg` | `TeardownChecksRows = FALSE`, `RetireNames = FALSE` | 11 states |
-| `Drive-broken-DriveOnlyByProvision.cfg` | `WakeWritesDrive = TRUE`: a wake gives the row the environment's drive | 8 states |
-| `Drive-broken-NoDriveUnchanged.cfg` | `WakeClaimFromEnv = TRUE`: a wake's claim names the environment's drive | 9 states |
+| `Drive-broken-DriveOnlyByProvision.cfg` | `WakeWritesDrive = TRUE` | 8 states |
+| `Drive-broken-NoDriveUnchanged.cfg` | `WakeClaimFromEnv = TRUE` | 9 states |
 | `Drive-broken-NoStuckForever.cfg` | `RefusalLimitOn = FALSE`, `StripIdentity = FALSE` | 7 states |
-| `Drive-broken-FreshForkIsFetched.cfg` | `FreshByLayout = FALSE`: no fresh-fork detection | 6 states |
-| `Drive-broken-TransientIsRetried.cfg` | `ProvRetriesMissing = FALSE`: a provision fails on a drive refusal | 7 states |
-| `Drive-broken-NoOrphanForever.cfg` | `SweepRuns = FALSE`: nobody runs the sweep | 10 states |
+| `Drive-broken-FreshForkIsFetched.cfg` | `FreshByLayout = FALSE` (in `Drive-fresh.cfg`) | 6 states |
+| `Drive-broken-TransientIsRetried.cfg` | `ProvRetriesMissing = FALSE` | 7 states |
+| `Drive-broken-NoOrphanForever.cfg` | `SweepRuns = FALSE` | 10 states |
 
-`NeverEmptyShownAsWork` has two independent guards (the boot's `drive.missing` and the settle's
-`drive.layout` check), `NoStuckForever` needs both a persistent refusal and no terminal state, and
-`NoTeardownOfLive` is kept both by the teardown's row checks and by the retirement of names, so
-those three configs turn two guards off. `WaitDetach` also governs the `FixRunningResume` check.
+Two guards in one config where the rule has two independent guards (either keeps it).
 
 The `Drive-bug-<Fix>.cfg` configs are the second half of the proof: each turns one fix off and must
-fail (`./run.sh bugs`): `FixRunningResume` 8 states, `FixOneProvision` 9, `FixSweepNamed` 9, `FixFreshDurable` 12.
+fail (`./run.sh bugs`): `FixFailOwnOnly` 13 states, `FixProvLockRetry` 13, `FixFetchIfUntouched` 13.
 
 ## How to re-validate on real Vercel
 
-The model assumes these platform facts. Each has, or needs, a probe on real Vercel:
-
 | Fact | Probe |
 | --- | --- |
-| A drive has at most one read-write session; a mount taken while a writer holds it is unsafe | Measured by hand on 2026-11-16 (findings, "A snapshot mount taken while a writer holds the drive"). Not measured: whether a resume of a box whose drive is still attached to its previous session, or a create with a drive another box holds, is refused or mounts. Probe: stop a box after writing 5 GB to its drive, resume it at once (`writeFiles` on the stopped box), `findmnt` and `fsck -n` the drive; then create a second box with the same drive while the first runs. |
-| Mounts are fixed per session and `update()` sets them for the next session | `REAL_SANDBOX_DRIVE=1 bun run src/real-sandbox.ts` checks the drive after a wake. Probe for the gap: `update({ mounts: {} })` on a running box, then check the running session still has the drive. |
-| An abort rolls the root disk back to the last snapshot and the drive does not roll back | `real-sandbox.ts` stops a box uncleanly; confirm it checks a root sentinel gone and a drive sentinel kept. |
-| The drive detaches some time after a stop | Measured (stop times 6 to 44 s). Probe: poll `Drive.get().currentSandboxName` every 0.5 s after `stop()`, at 0, 1 and 12 GB written. |
-| Deleting a running sandbox leaves the drive attached for a while | Measured by hand ("left the drive attached for minutes"). Probe: delete a running box that holds a drive, poll `currentSandboxName`. |
-| A mount can transiently fail and the session starts with nothing mounted | Not measured; assumed. Probe: create boxes with a drive in a loop and count sessions whose `findmnt /mnt/superset-drive` is empty; the boot log must say `drive.missing`. |
-| `update({ mounts })` naming a deleted drive fails with some status | Not measured; decides whether NoStuckForever's trace loops or ends in `failed`. Probe: delete a drive, `update({ mounts })` a stopped box with it, record the `APIError` status. |
-| `Sandbox.extendTimeout`, `update`, `writeFiles` and `runCommand` on a stopped persistent sandbox resume it | Documented in `@vercel/sandbox` 4.0.0 (`GetSandboxParams.resume`) and in `vercel.ts:664-668`. Probe: `Sandbox.get({ resume: false })`, `stop()`, then each call in turn, and check `status`. |
+| A drive has at most one read-write session; a mount taken while a writer holds it is unsafe | Measured by hand on 2026-11-16. Not measured: whether a resume of a box whose drive is still attached to its previous session, or a create with a drive another box holds, is refused or mounts. Probe: stop a box after writing 5 GB to its drive, resume it at once, `fsck -n` the drive; create a second box with the same drive while the first runs. |
+| A `Session` method on an ended session fails; a `Sandbox` method resumes it | Read from `@vercel/sandbox` 4.0.0 (`withResume` wraps only `Sandbox` methods). Probe: take `currentSession()` of a running box, stop the box, call `session.writeFiles`, and check it throws and the box stays stopped; then `sandbox.writeFiles` and check it resumes. |
+| Mounts are fixed per session and `update()` sets them for the next session | `REAL_SANDBOX_DRIVE=1 bun run src/real-sandbox.ts`. Probe: `update({ mounts: {} })` on a running box, then check the running session still has the drive. |
+| An abort rolls the root disk back and the drive does not roll back | `real-sandbox.ts` stops a box uncleanly; confirm a root sentinel gone and a drive sentinel kept. |
+| The drive detaches some time after a stop; deleting a running box leaves it attached for a while | Measured (6 to 44 s; minutes). Probe: poll `currentSandboxName` after `stop()` and after `delete()`. |
+| A mount can transiently fail | Not measured. Probe: create boxes with a drive in a loop and count sessions with nothing at `/mnt/superset-drive`. |
+| `update({ mounts })` naming a deleted drive fails with some status | Not measured. Probe: delete a drive, `update({ mounts })` a stopped box with it, record the status. |
 | QStash delivers late, twice, and retries | Documented by Upstash; no probe needed. |
