@@ -325,6 +325,7 @@ export async function queueProvision(
 			from: ["provisioning"],
 			to: "failed",
 		});
+		nudge(organizationId, "cloud_workspaces");
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",
