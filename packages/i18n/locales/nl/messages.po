@@ -1749,6 +1749,9 @@ msgstr "87,4K van 200K tokens gebruikt in deze sessie."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Een betere ingebouwde browser: bekijk je wijzigingen en klik op elk element om het als context naar de agent te sturen."
 
+msgid "A build of this environment is already running"
+msgstr "Er loopt al een build van deze omgeving"
+
 msgid "A CDP endpoint per pane"
 msgstr "Een CDP-endpoint per paneel"
 
@@ -2005,6 +2008,9 @@ msgstr "actief {lastActive}"
 msgid "Active agent sessions."
 msgstr "Actieve agentsessies."
 
+msgid "Active build status"
+msgstr "Status van de actieve build"
+
 msgid "active days"
 msgstr "actieve dagen"
 
@@ -2256,6 +2262,9 @@ msgstr "Aan zijbalk toevoegen"
 
 msgid "Add to workspace"
 msgstr "Toevoegen aan werkruimte"
+
+msgid "Add variable"
+msgstr "Variabele toevoegen"
 
 msgid "Add what it does"
 msgstr "Toevoegen wat hij doet"
@@ -2554,6 +2563,9 @@ msgstr "Alle gegevens worden definitief verwijderd voor alle {0} leden. Dit kan 
 
 msgid "All downloads"
 msgstr "Alle downloads"
+
+msgid "All environment variables ({total})"
+msgstr "Alle omgevingsvariabelen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle functies naast elkaar"
@@ -3544,9 +3556,6 @@ msgstr "Basismap voor nieuwe worktree-werkruimtes op deze host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Basismap voor nieuwe worktrees op {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Basisimage · nog geen checkpoint"
-
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -3810,8 +3819,14 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Bugmeldingen"
 
+msgid "Build ID"
+msgstr "Build-ID"
+
 msgid "Build in public"
 msgstr "Bouwen in het openbaar"
+
+msgid "Build started"
+msgstr "Build gestart"
 
 msgid "Build your own"
 msgstr "Bouw je eigen"
@@ -3821,6 +3836,18 @@ msgstr "Het laatste stuk software bouwen"
 
 msgid "Building the last piece of software."
 msgstr "Het laatste stuk software bouwen."
+
+msgid "Building with the new repositories"
+msgstr "Bezig met bouwen met de nieuwe repositories"
+
+msgid "Building…"
+msgstr "Bezig met bouwen…"
+
+msgid "Builds"
+msgstr "Builds"
+
+msgid "Built"
+msgstr "Gebouwd"
 
 msgid "Built a plugin? Submit it here."
 msgstr "Een plugin gebouwd? Dien hem hier in."
@@ -4359,10 +4386,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · voor de tooltip-refactor"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint opgeslagen {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint opgeslagen in {name}"
@@ -6586,7 +6609,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Aangemaakt"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7837,6 +7859,9 @@ msgstr "Bewerken op GitHub"
 msgid "Edit queued message"
 msgstr "Bericht in wachtrij bewerken"
 
+msgid "Edit repositories"
+msgstr "Repositories bewerken"
+
 msgid "Edit routine"
 msgstr "Routine bewerken"
 
@@ -8031,11 +8056,23 @@ msgstr "Omgeving"
 msgid "Environment archived"
 msgstr "Omgeving gearchiveerd"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Omgevingsbuilds horen bij de abonnementen Team en Ultra. Upgrade in Instellingen, Facturering."
+
+msgid "Environment history"
+msgstr "Omgevingsgeschiedenis"
+
 msgid "Environment not found"
 msgstr "Omgeving niet gevonden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Omgevingsopzet, flaky tests en credential-geknutsel — de saaie faalvormen die onbewaakte runs in 2025 om zeep hielpen — zijn grotendeels weggewerkt met engineering in plaats van met modellen."
+
+msgid "Environment updated"
+msgstr "Omgeving bijgewerkt"
+
+msgid "Environment variables"
+msgstr "Omgevingsvariabelen"
 
 msgid "Environment Variables"
 msgstr "Omgevingsvariabelen"
@@ -12691,6 +12728,12 @@ msgstr "Geen starts in deze periode."
 msgid "No branches found"
 msgstr "Geen branches gevonden"
 
+msgid "No build yet"
+msgstr "Nog geen build"
+
+msgid "No builds yet"
+msgstr "Nog geen builds"
+
 msgid "No changed files."
 msgstr "Geen gewijzigde bestanden."
 
@@ -12801,6 +12844,9 @@ msgstr "Nog geen omgevingsvariabelen"
 
 msgid "No environments available"
 msgstr "Geen omgevingen beschikbaar"
+
+msgid "No environments built yet"
+msgstr "Nog geen omgevingen gebouwd"
 
 msgid "No environments found."
 msgstr "Geen omgevingen gevonden."
@@ -13258,6 +13304,9 @@ msgstr "Geen v1-terminalscripts gevonden."
 
 msgid "No valid environment variables found in file"
 msgstr "Geen geldige omgevingsvariabelen gevonden in bestand"
+
+msgid "No variables set yet."
+msgstr "Nog geen variabelen ingesteld."
 
 msgid "No versions yet"
 msgstr "Nog geen versies"
@@ -15035,6 +15084,9 @@ msgstr "Kies de worktree-map van het project op {hostName}."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Kies de repositories die worden uitgecheckt. Een agent in een cloudworkspace zoekt uit wat er geïnstalleerd moet worden en zorgt dat het draait."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Kies de repositories die deze omgeving uitcheckt. Opslaan start een nieuwe build; werkruimtes blijven vanaf de huidige starten tot die slaagt."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Kies de worktree-map op {hostName}."
 
@@ -15995,6 +16047,9 @@ msgstr "Rebasen en mergen"
 
 msgid "Rebase and merge"
 msgstr "Rebasen en mergen"
+
+msgid "Rebuild environment"
+msgstr "Omgeving opnieuw bouwen"
 
 msgid "Recall what was said in meetings"
 msgstr "Terugvinden wat er in vergaderingen is gezegd"
@@ -17282,6 +17337,9 @@ msgstr "Checkpoint opslaan in {name}?"
 msgid "Save All"
 msgstr "Alles opslaan"
 
+msgid "Save and build"
+msgstr "Opslaan en bouwen"
+
 msgid "Save and continue"
 msgstr "Opslaan en doorgaan"
 
@@ -17342,6 +17400,9 @@ msgstr "{name} opgeslagen"
 
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} opgeslagen, maar de setup-workspace kon niet starten: {reason}"
+
+msgid "Saved from a workspace"
+msgstr "Opgeslagen vanuit een werkruimte"
 
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
@@ -18735,9 +18796,6 @@ msgstr "Smileys en mensen"
 msgid "Smoother onboarding"
 msgstr "Soepelere onboarding"
 
-msgid "Snapshot"
-msgstr "Snapshot"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Maak voor en na elke chatbeurt een snapshot van de worktree, zodat de kaart elk gewijzigd bestand toont, ook wijzigingen via de shell, en ze ongedaan kan maken. Elke prompt wacht eerst op zijn snapshot."
 
@@ -20063,6 +20121,9 @@ msgstr "De dispatcher verschijnt"
 msgid "The endpoint must use https."
 msgstr "Het endpoint moet https gebruiken."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "De omgeving is gewijzigd tijdens het herstellen. Probeer het opnieuw."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "De omgeving waaruit deze automatisering cloudwerkruimtes start, is gearchiveerd of heeft geen repository's. Kies een andere omgeving in de instellingen van de automatisering."
 
@@ -20488,6 +20549,9 @@ msgstr "Deze automatisering staat in een andere organisatie"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Deze browser is niet aangemeld bij Paradev. Meld je aan om door te gaan naar {connectorName}."
 
+msgid "This build has no snapshot to restore"
+msgstr "Deze build heeft geen snapshot om te herstellen"
+
 msgid "This cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
@@ -20559,6 +20623,12 @@ msgstr "Deze map bestaat niet. Het terminalscript valt terug op de root van de w
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de provider heeft het niet als geverifieerd bevestigd. Log in met de methode die je eerder gebruikte."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan .paradev/config.toml op de basisbranch."
+
+msgid "This environment has no repositories to build"
+msgstr "Deze omgeving heeft geen repositories om te bouwen"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"
@@ -21631,6 +21701,9 @@ msgstr "Update kon sessies niet behouden"
 msgid "Update daemon"
 msgstr "Daemon bijwerken"
 
+msgid "Update environment"
+msgstr "Omgeving bijwerken"
+
 msgid "Update Error"
 msgstr "Updatefout"
 
@@ -21939,9 +22012,6 @@ msgstr "v2ProjectId komt niet overeen met het project van de werkruimte"
 
 msgid "Value"
 msgstr "Waarde"
-
-msgid "Variables"
-msgstr "Variabelen"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

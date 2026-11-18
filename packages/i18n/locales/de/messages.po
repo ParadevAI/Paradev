@@ -1749,6 +1749,9 @@ msgstr "87,4 Tsd. von 200 Tsd. Tokens in dieser Sitzung verbraucht."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Ein besserer In-App-Browser: Änderungen in der Vorschau ansehen und ein beliebiges Element anklicken, um es dem Agenten als Kontext zu schicken."
 
+msgid "A build of this environment is already running"
+msgstr "Ein Build dieser Umgebung läuft bereits"
+
 msgid "A CDP endpoint per pane"
 msgstr "Ein CDP-Endpunkt pro Bereich"
 
@@ -2005,6 +2008,9 @@ msgstr "aktiv {lastActive}"
 msgid "Active agent sessions."
 msgstr "Aktive Agenten-Sitzungen."
 
+msgid "Active build status"
+msgstr "Status des aktiven Builds"
+
 msgid "active days"
 msgstr "aktive Tage"
 
@@ -2256,6 +2262,9 @@ msgstr "Zur Seitenleiste hinzufügen"
 
 msgid "Add to workspace"
 msgstr "Zum Arbeitsbereich hinzufügen"
+
+msgid "Add variable"
+msgstr "Variable hinzufügen"
 
 msgid "Add what it does"
 msgstr "Beschreiben, was er macht"
@@ -2554,6 +2563,9 @@ msgstr "Alle Daten werden für alle {0} Mitglieder endgültig gelöscht. Das lä
 
 msgid "All downloads"
 msgstr "Alle Downloads"
+
+msgid "All environment variables ({total})"
+msgstr "Alle Umgebungsvariablen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle Funktionen im Vergleich"
@@ -3544,9 +3556,6 @@ msgstr "Basisverzeichnis für neue Worktree-Arbeitsbereiche auf diesem Host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Basisverzeichnis für neue Worktrees auf {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Basis-Image · noch kein Checkpoint"
-
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -3810,8 +3819,14 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Fehlerberichte"
 
+msgid "Build ID"
+msgstr "Build-ID"
+
 msgid "Build in public"
 msgstr "Öffentlich entwickeln"
+
+msgid "Build started"
+msgstr "Build gestartet"
 
 msgid "Build your own"
 msgstr "Bau dein eigenes"
@@ -3821,6 +3836,18 @@ msgstr "Wir bauen das letzte Stück Software"
 
 msgid "Building the last piece of software."
 msgstr "Wir bauen das letzte Stück Software."
+
+msgid "Building with the new repositories"
+msgstr "Build mit den neuen Repositories läuft"
+
+msgid "Building…"
+msgstr "Wird gebaut…"
+
+msgid "Builds"
+msgstr "Builds"
+
+msgid "Built"
+msgstr "Gebaut"
 
 msgid "Built a plugin? Submit it here."
 msgstr "Ein Plugin gebaut? Reiche es hier ein."
@@ -4359,10 +4386,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · vor dem Tooltip-Refactoring"
-
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Checkpoint gespeichert {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint in {name} gespeichert"
@@ -6586,7 +6609,6 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Erstellt"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -7837,6 +7859,9 @@ msgstr "Auf GitHub bearbeiten"
 msgid "Edit queued message"
 msgstr "Nachricht in der Warteschlange bearbeiten"
 
+msgid "Edit repositories"
+msgstr "Repositories bearbeiten"
+
 msgid "Edit routine"
 msgstr "Routine bearbeiten"
 
@@ -8031,11 +8056,23 @@ msgstr "Umgebung"
 msgid "Environment archived"
 msgstr "Umgebung archiviert"
 
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Umgebungs-Builds sind in den Plänen Team und Ultra enthalten. Upgrade unter Einstellungen, Abrechnung."
+
+msgid "Environment history"
+msgstr "Umgebungsverlauf"
+
 msgid "Environment not found"
 msgstr "Umgebung nicht gefunden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Umgebungs-Setup, flaky Tests und Zugangsdaten-Verkabelung — die langweiligen Fehlerquellen, die 2025 unbeaufsichtigte Läufe zerlegt haben — werden größtenteils wegkonstruiert statt wegmodelliert."
+
+msgid "Environment updated"
+msgstr "Umgebung aktualisiert"
+
+msgid "Environment variables"
+msgstr "Umgebungsvariablen"
 
 msgid "Environment Variables"
 msgstr "Umgebungsvariablen"
@@ -12691,6 +12728,12 @@ msgstr "Keine Starts in diesem Zeitraum."
 msgid "No branches found"
 msgstr "Keine Branches gefunden"
 
+msgid "No build yet"
+msgstr "Noch kein Build"
+
+msgid "No builds yet"
+msgstr "Noch keine Builds"
+
 msgid "No changed files."
 msgstr "Keine geänderten Dateien."
 
@@ -12801,6 +12844,9 @@ msgstr "Noch keine Umgebungsvariablen"
 
 msgid "No environments available"
 msgstr "Keine Umgebungen verfügbar"
+
+msgid "No environments built yet"
+msgstr "Noch keine Umgebungen gebaut"
 
 msgid "No environments found."
 msgstr "Keine Umgebungen gefunden."
@@ -13258,6 +13304,9 @@ msgstr "Keine v1-Terminalskripte gefunden."
 
 msgid "No valid environment variables found in file"
 msgstr "Keine gültigen Umgebungsvariablen in der Datei gefunden"
+
+msgid "No variables set yet."
+msgstr "Noch keine Variablen gesetzt."
 
 msgid "No versions yet"
 msgstr "Noch keine Versionen"
@@ -15035,6 +15084,9 @@ msgstr "Wähle den Worktree-Ordner des Projekts auf {hostName}."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Wähle die Repositories, die sie auscheckt. Ein Agent in einem Cloud-Workspace findet heraus, was installiert werden muss, und bringt sie zum Laufen."
 
+msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
+msgstr "Wähle die Repositories, die diese Umgebung auscheckt. Speichern startet einen neuen Build; Arbeitsbereiche starten weiter vom aktuellen, bis er erfolgreich ist."
+
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Wähle den Worktree-Ordner auf {hostName}."
 
@@ -15995,6 +16047,9 @@ msgstr "Rebase & zusammenführen"
 
 msgid "Rebase and merge"
 msgstr "Rebase und zusammenführen"
+
+msgid "Rebuild environment"
+msgstr "Umgebung neu bauen"
 
 msgid "Recall what was said in meetings"
 msgstr "Nachlesen, was in Meetings gesagt wurde"
@@ -17282,6 +17337,9 @@ msgstr "Checkpoint in {name} speichern?"
 msgid "Save All"
 msgstr "Alle speichern"
 
+msgid "Save and build"
+msgstr "Speichern und bauen"
+
 msgid "Save and continue"
 msgstr "Speichern und fortfahren"
 
@@ -17342,6 +17400,9 @@ msgstr "{name} gespeichert"
 
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} gespeichert, aber der Setup-Workspace konnte nicht starten: {reason}"
+
+msgid "Saved from a workspace"
+msgstr "Aus einem Arbeitsbereich gespeichert"
 
 msgid "Saved to Downloads"
 msgstr "In Downloads gespeichert"
@@ -18735,9 +18796,6 @@ msgstr "Smileys & Personen"
 msgid "Smoother onboarding"
 msgstr "Reibungsloseres Onboarding"
 
-msgid "Snapshot"
-msgstr "Snapshot"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Vor und nach jedem Chat-Durchlauf einen Snapshot des Worktrees erstellen, damit seine Karte jede geänderte Datei auflistet, auch Shell-Änderungen, und sie rückgängig machen kann. Jeder Prompt wartet zuerst auf seinen Snapshot."
 
@@ -20063,6 +20121,9 @@ msgstr "Der Disponent tritt auf"
 msgid "The endpoint must use https."
 msgstr "Der Endpunkt muss https verwenden."
 
+msgid "The environment changed while it was being restored. Try again."
+msgstr "Die Umgebung hat sich während der Wiederherstellung geändert. Versuche es erneut."
+
 msgid "The environment this automation starts cloud workspaces from was archived or has no repositories. Pick another environment in the automation's settings."
 msgstr "Die Umgebung, aus der diese Automatisierung Cloud-Arbeitsbereiche startet, wurde archiviert oder hat keine Repositories. Wähle in den Einstellungen der Automatisierung eine andere Umgebung."
 
@@ -20488,6 +20549,9 @@ msgstr "Diese Automatisierung befindet sich in einer anderen Organisation"
 msgid "This browser is not signed in to Paradev. Sign in to continue to {connectorName}."
 msgstr "Dieser Browser ist nicht bei Paradev angemeldet. Melde dich an, um mit {connectorName} fortzufahren."
 
+msgid "This build has no snapshot to restore"
+msgstr "Dieser Build hat keinen Snapshot zum Wiederherstellen"
+
 msgid "This cannot be undone."
 msgstr "Das lässt sich nicht rückgängig machen."
 
@@ -20559,6 +20623,12 @@ msgstr "Dieses Verzeichnis existiert nicht. Das Terminal-Skript greift auf die W
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Diese E-Mail-Adresse ist bereits mit einer anderen Anmeldemethode registriert, und der Anbieter hat sie nicht als verifiziert bestätigt. Melde dich mit der zuvor verwendeten Methode an."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Diese Umgebung hat kein [install] zum Bauen. Füge eines in .paradev/config.toml auf ihrem Basis-Branch hinzu."
+
+msgid "This environment has no repositories to build"
+msgstr "Diese Umgebung hat keine Repositories zum Bauen"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Diese Umgebung hat keine Repositories. Erstelle in den Einstellungen eine Umgebung mit Repositories und starte den Arbeitsbereich daraus"
@@ -21631,6 +21701,9 @@ msgstr "Update konnte die Sitzungen nicht erhalten"
 msgid "Update daemon"
 msgstr "Daemon aktualisieren"
 
+msgid "Update environment"
+msgstr "Umgebung aktualisieren"
+
 msgid "Update Error"
 msgstr "Update-Fehler"
 
@@ -21939,9 +22012,6 @@ msgstr "v2ProjectId passt nicht zum Projekt des Arbeitsbereichs"
 
 msgid "Value"
 msgstr "Wert"
-
-msgid "Variables"
-msgstr "Variablen"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

@@ -1,8 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
-import { AddSecretSheet } from "./components/AddSecretSheet";
-import { EditSecretDialog } from "./components/EditSecretDialog";
+import { AddSecretSheet } from "renderer/routes/_authenticated/components/AddSecretSheet";
+import { EditSecretDialog } from "renderer/routes/_authenticated/components/EditSecretDialog";
 import { EnvironmentVariablesList } from "./components/EnvironmentVariablesList";
+
+interface EnvironmentSecretsProps {
+	environmentId: string;
+}
 
 interface EditingSecret {
 	id: string;
@@ -11,13 +15,7 @@ interface EditingSecret {
 	sensitive: boolean;
 }
 
-interface EnvironmentVariablesProps {
-	environmentId: string;
-}
-
-export function EnvironmentVariables({
-	environmentId,
-}: EnvironmentVariablesProps) {
+export function EnvironmentSecrets({ environmentId }: EnvironmentSecretsProps) {
 	const [isAddOpen, setIsAddOpen] = useState(false);
 	const [editing, setEditing] = useState<EditingSecret | null>(null);
 	const [reloadKey, setReloadKey] = useState(0);
@@ -25,10 +23,13 @@ export function EnvironmentVariables({
 	const reload = useCallback(() => setReloadKey((key) => key + 1), []);
 
 	return (
-		<div>
-			<span className="mb-2 block text-xs font-medium">
-				<Trans>Variables</Trans>
-			</span>
+		<div className="w-full p-6">
+			<div className="mb-8">
+				<h2 className="text-xl font-semibold">
+					<Trans>Environment variables</Trans>
+				</h2>
+			</div>
+
 			<EnvironmentVariablesList
 				environmentId={environmentId}
 				onAdd={() => setIsAddOpen(true)}
@@ -42,12 +43,14 @@ export function EnvironmentVariables({
 					})
 				}
 			/>
+
 			<AddSecretSheet
 				environmentId={environmentId}
 				onOpenChange={setIsAddOpen}
 				onSaved={reload}
 				open={isAddOpen}
 			/>
+
 			{editing && (
 				<EditSecretDialog
 					environmentId={environmentId}
@@ -55,7 +58,7 @@ export function EnvironmentVariables({
 						if (!open) setEditing(null);
 					}}
 					onSaved={reload}
-					open
+					open={Boolean(editing)}
 					secret={editing}
 				/>
 			)}
