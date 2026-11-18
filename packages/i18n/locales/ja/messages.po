@@ -1163,6 +1163,9 @@ msgstr "{name} が失敗しました"
 msgid "{name} finished"
 msgstr "{name} が完了しました"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "グループ {name}、{count, plural, other {# 件のワークスペース}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} は組み込みのため削除できません"
@@ -6015,6 +6018,9 @@ msgstr "会話を分岐できませんでした"
 msgid "Couldn't cancel the move"
 msgstr "移動をキャンセルできませんでした"
 
+msgid "Couldn't change the group color"
+msgstr "グループの色を変更できませんでした"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "マシンサイズを変更できませんでした: {0}"
@@ -6061,8 +6067,14 @@ msgstr "スタックを作成できませんでした"
 msgid "Couldn't create the channel"
 msgstr "チャンネルを作成できませんでした"
 
+msgid "Couldn't create the group"
+msgstr "グループを作成できませんでした"
+
 msgid "Couldn't create workspace"
 msgstr "ワークスペースを作成できませんでした"
+
+msgid "Couldn't delete the group"
+msgstr "グループを削除できませんでした"
 
 msgid "Couldn't discard changes"
 msgstr "変更を破棄できませんでした"
@@ -6150,6 +6162,9 @@ msgstr "{name} を移動できませんでした"
 msgid "Couldn't move the subagent to the background"
 msgstr "サブエージェントをバックグラウンドに移動できませんでした"
 
+msgid "Couldn't move the workspace"
+msgstr "ワークスペースを移動できませんでした"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "「{name}」に自動で名前を付けられませんでした"
 
@@ -6199,6 +6214,9 @@ msgstr "マージキューから外せませんでした"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "ローカルのサインインを削除できませんでした"
+
+msgid "Couldn't rename the group"
+msgstr "グループ名を変更できませんでした"
 
 msgid "Couldn't restart terminals"
 msgstr "ターミナルを再起動できませんでした"

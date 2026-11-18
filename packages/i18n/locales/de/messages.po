@@ -1163,6 +1163,9 @@ msgstr "{name} ist fehlgeschlagen"
 msgid "{name} finished"
 msgstr "{name} ist fertig"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Gruppe {name}, {count, plural, one {# Arbeitsbereich} other {# Arbeitsbereiche}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} ist integriert und kann nicht entfernt werden"
@@ -6015,6 +6018,9 @@ msgstr "Unterhaltung konnte nicht verzweigt werden"
 msgid "Couldn't cancel the move"
 msgstr "Das Verschieben konnte nicht abgebrochen werden"
 
+msgid "Couldn't change the group color"
+msgstr "Gruppenfarbe konnte nicht geändert werden"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Maschinengröße konnte nicht geändert werden: {0}"
@@ -6061,8 +6067,14 @@ msgstr "Stack konnte nicht erstellt werden"
 msgid "Couldn't create the channel"
 msgstr "Kanal konnte nicht erstellt werden"
 
+msgid "Couldn't create the group"
+msgstr "Gruppe konnte nicht erstellt werden"
+
 msgid "Couldn't create workspace"
 msgstr "Arbeitsbereich konnte nicht erstellt werden"
+
+msgid "Couldn't delete the group"
+msgstr "Gruppe konnte nicht gelöscht werden"
 
 msgid "Couldn't discard changes"
 msgstr "Änderungen konnten nicht verworfen werden"
@@ -6150,6 +6162,9 @@ msgstr "{name} konnte nicht verschoben werden"
 msgid "Couldn't move the subagent to the background"
 msgstr "Der Subagent konnte nicht in den Hintergrund verschoben werden"
 
+msgid "Couldn't move the workspace"
+msgstr "Arbeitsbereich konnte nicht verschoben werden"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "„{name}“ konnte nicht automatisch benannt werden"
 
@@ -6199,6 +6214,9 @@ msgstr "Konnte nicht aus der Merge-Warteschlange entfernt werden"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Die lokale Anmeldung konnte nicht entfernt werden"
+
+msgid "Couldn't rename the group"
+msgstr "Gruppe konnte nicht umbenannt werden"
 
 msgid "Couldn't restart terminals"
 msgstr "Terminals konnten nicht neu gestartet werden"

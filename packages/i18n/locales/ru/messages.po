@@ -1163,6 +1163,9 @@ msgstr "{name}: ошибка"
 msgid "{name} finished"
 msgstr "{name} завершил работу"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Группа {name}, {count, plural, one {# рабочая область} few {# рабочие области} many {# рабочих областей} other {# рабочей области}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} встроен и не может быть удалён"
@@ -6015,6 +6018,9 @@ msgstr "Не удалось ответвить разговор"
 msgid "Couldn't cancel the move"
 msgstr "Не удалось отменить перенос"
 
+msgid "Couldn't change the group color"
+msgstr "Не удалось изменить цвет группы"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Не удалось изменить размер машины: {0}"
@@ -6061,8 +6067,14 @@ msgstr "Не удалось создать стек"
 msgid "Couldn't create the channel"
 msgstr "Не удалось создать канал"
 
+msgid "Couldn't create the group"
+msgstr "Не удалось создать группу"
+
 msgid "Couldn't create workspace"
 msgstr "Не удалось создать рабочую область"
+
+msgid "Couldn't delete the group"
+msgstr "Не удалось удалить группу"
 
 msgid "Couldn't discard changes"
 msgstr "Не удалось отменить изменения"
@@ -6150,6 +6162,9 @@ msgstr "Не удалось перенести {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не удалось перевести субагента в фон"
 
+msgid "Couldn't move the workspace"
+msgstr "Не удалось переместить рабочую область"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не удалось автоматически назвать «{name}»"
 
@@ -6199,6 +6214,9 @@ msgstr "Не удалось убрать из очереди объединен�
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не удалось удалить локальный вход"
+
+msgid "Couldn't rename the group"
+msgstr "Не удалось переименовать группу"
 
 msgid "Couldn't restart terminals"
 msgstr "Не удалось перезапустить терминалы"

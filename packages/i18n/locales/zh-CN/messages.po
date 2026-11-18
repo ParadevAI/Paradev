@@ -1163,6 +1163,9 @@ msgstr "{name} 失败"
 msgid "{name} finished"
 msgstr "{name} 已完成"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} 分组，{count, plural, other {# 个工作区}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} 是内置的，无法移除"
@@ -6015,6 +6018,9 @@ msgstr "无法分叉对话"
 msgid "Couldn't cancel the move"
 msgstr "无法取消移动"
 
+msgid "Couldn't change the group color"
+msgstr "无法更改分组颜色"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "无法更改机器规格：{0}"
@@ -6061,8 +6067,14 @@ msgstr "无法创建堆栈"
 msgid "Couldn't create the channel"
 msgstr "无法创建频道"
 
+msgid "Couldn't create the group"
+msgstr "无法创建分组"
+
 msgid "Couldn't create workspace"
 msgstr "无法创建工作区"
+
+msgid "Couldn't delete the group"
+msgstr "无法删除分组"
 
 msgid "Couldn't discard changes"
 msgstr "无法放弃更改"
@@ -6150,6 +6162,9 @@ msgstr "无法移动 {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "无法将子智能体移到后台"
 
+msgid "Couldn't move the workspace"
+msgstr "无法移动工作区"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "无法自动命名“{name}”"
 
@@ -6199,6 +6214,9 @@ msgstr "无法移出合并队列"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "无法移除本地登录"
+
+msgid "Couldn't rename the group"
+msgstr "无法重命名分组"
 
 msgid "Couldn't restart terminals"
 msgstr "无法重启终端"
