@@ -16,7 +16,10 @@ step reads the same events.
 
 Each script prints the database host it uses. `packages/db` loads the root `.env`, which has more
 than one `DATABASE_URL`, so always set `DATABASE_URL` on the command line, and read the host in the
-output before you go on.
+output before you go on. None of the root `.env` URLs is production. Production is the default branch
+of the Neon project `Superset`; its host starts with `ep-icy-feather`. Get its URL from Neon
+(`get_connection_string`): for steps 3 and 5 use the `readonly` role, which cannot write; only step 4
+needs the owner role.
 
 ## What it writes
 
@@ -25,8 +28,9 @@ that way. Autumn's events do not say which is a reservation, an adjustment, a tr
 the windows of a lock with several sends are not known. The backfill writes **one row per lock**,
 Autumn's net: the sum of the lock's events per boot id, lock sequence and feature. Its `sent_at` and
 `window_to` are the lock's last event; `window_from` is `window_to` less the amount at the boot's GB.
-A CPU row has the boot's start and stop. A lock with several sends therefore lands on the day of its
-last event. Rules for the launch-night events are in `packages/db/src/cloud-usage-autumn.ts`.
+A CPU row has the boot's start and stop. A lock therefore lands on the day of its last event: a lock
+reserved before midnight and confirmed after it moves to the next day. Per organization the rows and
+Autumn agree; per day they differ by those locks. Rules for the launch-night events are in `packages/db/src/cloud-usage-autumn.ts`.
 
 It fills **every settled lock that has no row**, whenever it runs. That covers the history and also
 repairs a lock whose row write failed after the deploy (the meter reports those to Sentry). It needs
@@ -54,7 +58,18 @@ It does not write:
 
 ## Steps
 
-1. **Export Autumn's events.** About 77 Autumn calls and 2 minutes for 114k events:
+1. **Export Autumn's events.** The Autumn plugin must be connected to live Autumn. This must print
+   `"env":"live"`:
+
+   ```bash
+   superset mcp call-tool getCurrentOrganization '{}' --plugin autumn --json
+   ```
+
+   Take the export for step 4 at least 80 minutes after the M5a deploy finished. A lock settled in
+   the 80 minutes before the deploy has no row, and the meter never writes one. An earlier export
+   counts it as `notSettled`, and the apply skips it until a run with a later export (375 locks,
+   66,048 GB-minutes and 3,588 CPU-minutes in an export taken at the deploy on 2026-11-18). About 77
+   Autumn calls and 2 minutes for 114k events:
 
    ```bash
    bun run packages/trpc/scripts/export-autumn-usage-events.ts --out /tmp/autumn-usage-events.jsonl
@@ -72,12 +87,15 @@ It does not write:
    DATABASE_URL=$B bun run packages/trpc/scripts/check-cloud-usage-events.ts --events $F
    ```
 
-   The second `--apply` prints `{"written":0,"createdByUserIdFilled":0}`.
+   The second `--apply` prints `{"written":0,"createdByUserIdFilled":0}`. The check prints `fail`
+   with only `onlyAutumn`, equal to the dry run's `skipped.negative`. Delete the branch when you are
+   done.
 
 3. **Dry run against production** (it only reads). Show the owner `rows`, `skipped`,
    `rowsByOrganization`, `rowsByDay`, `untied`, `anomalies` and `createdByUserId`. Get a yes.
 
-4. **Apply on production** with the same file and `--apply`.
+4. **Apply on production** with the same file and `--apply`. Write down the time first
+   (`date -u +%FT%TZ`); the undo needs it.
 
 5. **Check production** with the check script, and read a failure with the list below.
 
@@ -86,7 +104,8 @@ failed write.
 
 ## Expected differences in the check
 
-A `fail` result is expected. These differences are known; anything else is a finding to report.
+A `fail` result is expected. Before the apply, `onlyAutumn` holds nearly every settled lock (62,823
+on 2026-11-18). After it, these differences are known; anything else is a finding to report.
 
 | Where | What | Why |
 |---|---|---|
