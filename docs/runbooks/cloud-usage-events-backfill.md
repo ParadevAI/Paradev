@@ -16,10 +16,9 @@ step reads the same events.
 
 Each script prints the database host it uses. `packages/db` loads the root `.env`, which has more
 than one `DATABASE_URL`, so always set `DATABASE_URL` on the command line, and read the host in the
-output before you go on. None of the root `.env` URLs is production. Production is the default branch
-of the Neon project `Superset`; its host starts with `ep-icy-feather`. Get its URL from Neon
-(`get_connection_string`): for steps 3 and 5 use the `readonly` role, which cannot write; only step 4
-needs the owner role.
+output before you go on. Production is the default branch of the product Neon project; compare the
+printed host with the connection string for that branch. For steps 3 and 5 use a role that cannot
+write; only step 4 needs one that can.
 
 ## What it writes
 
@@ -29,8 +28,11 @@ the windows of a lock with several sends are not known. The backfill writes **on
 Autumn's net: the sum of the lock's events per boot id, lock sequence and feature. Its `sent_at` and
 `window_to` are the lock's last event; `window_from` is `window_to` less the amount at the boot's GB.
 A CPU row has the boot's start and stop. A lock therefore lands on the day of its last event: a lock
-reserved before midnight and confirmed after it moves to the next day. Per organization the rows and
-Autumn agree; per day they differ by those locks. Rules for the launch-night events are in `packages/db/src/cloud-usage-autumn.ts`.
+reserved before midnight and confirmed after it moves to the next day. Per organization, Autumn's
+net equals the rows plus the locks the backfill skips: locks with a row, open and unsettled locks,
+unrecorded locks, and locks that net below zero, plus the events with no boot row (all listed
+below). Per day the rows also differ from Autumn by the locks that cross midnight. Rules for the
+launch-night events are in `packages/db/src/cloud-usage-autumn.ts`.
 
 It fills **every settled lock that has no row**, whenever it runs. That covers the history and also
 repairs a lock whose row write failed after the deploy (the meter reports those to Sentry). It needs
@@ -88,8 +90,8 @@ It does not write:
    ```
 
    The second `--apply` prints `{"written":0,"createdByUserIdFilled":0}`. The check prints `fail`
-   with only `onlyAutumn`, equal to the dry run's `skipped.negative`. Delete the branch when you are
-   done.
+   with only `onlyAutumn`: the dry run's `skipped.negative` locks, and any lock in `unrecordedLocks`
+   whose refund has not landed yet. Delete the branch when you are done.
 
 3. **Dry run against production** (it only reads). Show the owner `rows`, `skipped`,
    `rowsByOrganization`, `rowsByDay`, `untied`, `anomalies` and `createdByUserId`. Get a yes.
@@ -121,12 +123,12 @@ on 2026-11-18). After it, these differences are known; anything else is a findin
 The backfill copies what Autumn charged, so these rows hold Autumn's amount, not the intended one.
 They are in the `anomalies` list, and they are not differences in the check:
 
-- The 4 locks confirmed and then also tracked in full (`c3f74f0c` seq 0, `a4a954d5` seq 5,
-  `76b305a3` seq 2, `b9a3efb4` seq 6): a confirm answered 503 but applied, the retry found no lock,
-  and the meter tracked the window again. M5a fixes the cause; a refund is a separate decision.
+- The 4 locks confirmed and then also tracked in full: a confirm answered 503 but applied, the retry
+  found no lock, and the meter tracked the window again. M5a fixes the cause; a refund is a separate
+  decision.
 - Locks with 3 or more events: tracks after an `insufficient_balance` confirm and the lock's later
   refund, and boots whose renewal failed so several windows were tracked under one lock (up to 108
-  events, boot `e9656cb0` seq 12).
+  events).
 
 ## Undo
 
