@@ -250,6 +250,12 @@ export const acpCompactionSummaryChunkSchema = z.looseObject({
 	compactionId: z.string().min(1),
 });
 
+export const acpNoticeSchema = z.looseObject({
+	severity: z.string(),
+	title: z.string().min(1),
+	description: z.string().nullable().optional(),
+});
+
 /**
  * v2 `state_update`: a snapshot of the agent's foreground work, not a mode.
  * `idle` carries the stop reason that ended it.

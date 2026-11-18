@@ -4,7 +4,11 @@ export type {
 	AcpImageStoreContext,
 	AcpStoredImage,
 } from "./acpAdapter";
-export { AcpAdapter, createAcpAdapter } from "./acpAdapter";
+export {
+	ACP_INITIALIZE_PARAMS,
+	AcpAdapter,
+	createAcpAdapter,
+} from "./acpAdapter";
 export type { AcpImageSource } from "./imageBlocks";
 export type {
 	AcpNotification,

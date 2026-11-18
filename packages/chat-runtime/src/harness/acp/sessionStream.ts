@@ -23,6 +23,7 @@ import {
 	acpCompactionUpdateSchema,
 	acpContentBlockSchema,
 	acpMessageSchema,
+	acpNoticeSchema,
 	acpPlanSchema,
 	acpPlanUpdateSchema,
 	acpToolCallContentChunkSchema,
@@ -168,6 +169,9 @@ export class SessionStream {
 			case "compaction_update":
 			case "compaction_summary_chunk":
 				this.handleCompaction(variant, raw, turnId);
+				return;
+			case "notice":
+				this.handleNotice(raw, turnId);
 				return;
 			default:
 				return;
@@ -511,6 +515,27 @@ export class SessionStream {
 					: {}),
 				startedAtMs,
 				entries: planEntryItems(entries),
+			},
+			turnId,
+		);
+	}
+
+	private handleNotice(raw: unknown, turnId: string): void {
+		const parsed = acpNoticeSchema.safeParse(raw);
+		if (!parsed.success) return;
+		const { severity, title, description } = parsed.data;
+		this.flush();
+		this.emit(
+			{
+				id: `${this.options.idPrefix}notice:${this.options.mintId()}`,
+				kind: "notice",
+				noticeKind: severity === "error" ? "error" : "info",
+				...(this.options.parentItemId
+					? { parentItemId: this.options.parentItemId }
+					: {}),
+				startedAtMs: this.options.nextStartMs(),
+				completedAtMs: this.options.now(),
+				text: description ? `${title}: ${description}` : title,
 			},
 			turnId,
 		);

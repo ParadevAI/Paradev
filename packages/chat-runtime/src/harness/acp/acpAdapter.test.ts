@@ -562,7 +562,6 @@ function startAdapter(
 		| "startupTimeoutMs"
 		| "startOptionsGraceMs"
 		| "launch"
-		| "protocolVersion"
 	> = {},
 ): { adapter: AcpAdapter; events: AdapterEvent[] } {
 	let counter = 0;
@@ -1010,36 +1009,14 @@ describe("AcpAdapter", () => {
 		await adapter.dispose();
 	});
 
-	it("advertises compaction updates", async () => {
+	it("advertises compaction updates and notices", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter } = startAdapter(agent);
 		await flush();
 
 		const initialize = agent.sent.find((f) => f.method === "initialize");
 		expect(initialize?.params).toMatchObject({
-			clientCapabilities: { session: { compaction: {} } },
-		});
-		await adapter.dispose();
-	});
-
-	it("asks a v1-pinned agent for v1 with what the SDK router grants a v2 client", async () => {
-		const agent = new FakeAcpAgent();
-		agent.protocolVersion = 1;
-		const { adapter } = startAdapter(
-			agent,
-			undefined,
-			{},
-			{ protocolVersion: 1 },
-		);
-		await flush();
-
-		const initialize = agent.sent.find((f) => f.method === "initialize");
-		expect(initialize?.params).toMatchObject({
-			protocolVersion: 1,
-			clientCapabilities: {
-				plan: {},
-				session: { compaction: {}, configOptions: { boolean: {} } },
-			},
+			clientCapabilities: { session: { compaction: {}, notices: {} } },
 		});
 		await adapter.dispose();
 	});
@@ -1117,6 +1094,36 @@ describe("AcpAdapter", () => {
 			noticeKind: "error",
 			text: "Could not compact conversation history: Prompt is too long",
 		});
+		await adapter.dispose();
+	});
+
+	it("shows an agent notice as a notice line, and an error notice as an error", async () => {
+		const agent = new FakeAcpAgent();
+		agent.holdPrompts = true;
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+		adapter.prompt([{ type: "text", text: "first" }]);
+		await flush();
+		agent.notify("sess-1", {
+			sessionUpdate: "notice",
+			severity: "warning",
+			title: "Fast mode is off",
+			description: "It is not available for this model.",
+		});
+		agent.notify("sess-1", {
+			sessionUpdate: "notice",
+			severity: "error",
+			title: "MCP server github failed to start",
+		});
+		await flush();
+
+		expect(itemsOf(events).filter((i) => i.kind === "notice")).toMatchObject([
+			{
+				noticeKind: "info",
+				text: "Fast mode is off: It is not available for this model.",
+			},
+			{ noticeKind: "error", text: "MCP server github failed to start" },
+		]);
 		await adapter.dispose();
 	});
 
