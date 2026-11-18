@@ -383,3 +383,58 @@ describe("TerminalHost — spawn failure cause", () => {
 		await session.dispose();
 	});
 });
+
+it("streams a command prompt emitted before spawn readiness resolves", async () => {
+	const { TerminalHost } = await import("./terminal-host");
+	const child = new FakeChildProcess();
+	let session: InstanceType<typeof Session> | undefined;
+	const host = new TerminalHost({
+		createSession: (request) => {
+			session = new Session({
+				...request,
+				cwd: "/tmp",
+				shell: "/bin/sh",
+				killProcessTree: async () => {},
+				spawnProcess: () => {
+					queueMicrotask(() => {
+						emitReadyAndSpawned(child);
+						const prompt = Buffer.from("Paste code here > ");
+						child.stdout.emit(
+							"data",
+							Buffer.concat([
+								createFrameHeader(PtySubprocessIpcType.Data, prompt.length),
+								prompt,
+							]),
+						);
+					});
+					return child as unknown as ChildProcess;
+				},
+			});
+			return session;
+		},
+	});
+	const messages: string[] = [];
+	const socket = {
+		destroyed: false,
+		write: (message: string) => {
+			messages.push(message);
+			return true;
+		},
+	} as unknown as import("node:net").Socket;
+	try {
+		await host.createOrAttach(socket, {
+			sessionId: "early-command",
+			paneId: "early-command",
+			tabId: "early-command",
+			workspaceId: "early-command",
+			cols: 80,
+			rows: 24,
+			command: "login",
+		});
+		expect(
+			messages.some((message) => message.includes("Paste code here > ")),
+		).toBe(true);
+	} finally {
+		await session?.dispose();
+	}
+});

@@ -90,6 +90,15 @@ export function CommandTerminal({
 			onExitRef.current(exitCode);
 		};
 
+		const fail = (error: unknown) => {
+			if (disposed || exited) return;
+			toast.error(errorMessage(error));
+			fireExit(null);
+			if (paneReady) {
+				void electronTrpcClient.terminal.kill.mutate({ paneId });
+			}
+		};
+
 		const writeToPty = (data: string) => {
 			if (disposed || exited) return;
 			if (!paneReady) {
@@ -101,8 +110,39 @@ export function CommandTerminal({
 		const inputDisposable = runtime.terminal.onData(writeToPty);
 		onWriterReadyRef.current?.(writeToPty);
 
+		const start = () => {
+			if (disposed || exited) return;
+			void electronTrpcClient.terminal.createOrAttach
+				.mutate({
+					paneId,
+					tabId: paneId,
+					workspaceId: paneId,
+					command: commandRef.current,
+					cols: runtime.terminal.cols,
+					rows: runtime.terminal.rows,
+					skipColdRestore: true,
+				})
+				.then(() => {
+					if (disposed || exited) {
+						void electronTrpcClient.terminal.kill.mutate({ paneId });
+						return;
+					}
+					paneReady = true;
+					syncSize();
+					for (const data of pendingInput.splice(0)) {
+						void electronTrpcClient.terminal.write.mutate({ paneId, data });
+					}
+					if (exitBeforeReady !== null) fireExit(exitBeforeReady);
+				})
+				// A failed create would otherwise leave the dialog running forever
+				// with a dead terminal silently swallowing queued input.
+				.catch(fail);
+		};
+
 		const subscription = electronTrpcClient.terminal.stream.subscribe(paneId, {
+			onStarted: start,
 			onData: (event) => {
+				if (disposed || exited) return;
 				if (event.type === "data") {
 					runtime.terminal.write(event.data);
 					onOutputRef.current?.(event.data);
@@ -110,34 +150,14 @@ export function CommandTerminal({
 					const exitCode = event.signal ? 128 + event.signal : event.exitCode;
 					if (paneReady) fireExit(exitCode);
 					else exitBeforeReady = exitCode;
+				} else if (event.type === "error") {
+					fail(new Error(event.error));
+				} else if (event.type === "disconnect") {
+					fail(new Error(event.reason));
 				}
 			},
+			onError: fail,
 		});
-
-		void electronTrpcClient.terminal.createOrAttach
-			.mutate({
-				paneId,
-				tabId: paneId,
-				workspaceId: paneId,
-				command: commandRef.current,
-				cols: runtime.terminal.cols,
-				rows: runtime.terminal.rows,
-				skipColdRestore: true,
-			})
-			.then(() => {
-				if (disposed) {
-					void electronTrpcClient.terminal.kill.mutate({ paneId });
-					return;
-				}
-				paneReady = true;
-				for (const data of pendingInput.splice(0)) {
-					void electronTrpcClient.terminal.write.mutate({ paneId, data });
-				}
-				if (exitBeforeReady !== null) fireExit(exitBeforeReady);
-			})
-			// A failed create would otherwise leave the dialog running forever
-			// with a dead terminal silently swallowing queued input.
-			.catch(() => fireExit(null));
 
 		return () => {
 			disposed = true;
