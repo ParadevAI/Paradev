@@ -16,7 +16,7 @@ import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
-import { logControl } from "../../lib/control-log";
+import { controlTags, logControl } from "../../lib/control-log";
 import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
@@ -296,7 +296,7 @@ async function start(args: StartCloudWorkspaceInput) {
 		throw error;
 	}
 	nudge(row.organizationId, "cloud_workspaces");
-	await queueProvision(job);
+	await queueProvision(job, row.organizationId);
 	return {
 		...row,
 		initialLaunch: await describeCloudAgentLaunch(job.launch),
@@ -309,6 +309,7 @@ async function start(args: StartCloudWorkspaceInput) {
  */
 export async function queueProvision(
 	job: ProvisionCloudWorkspaceInput,
+	organizationId: string,
 ): Promise<void> {
 	try {
 		await publishCloudWorkspaceJob({
@@ -337,11 +338,14 @@ export async function queueProvision(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,
 		);
-		if (changed) {
-			Sentry.captureException(error, {
-				tags: { "cloud_workspace.id": job.cloudWorkspaceId },
-			});
-		}
+		const scope = { cloudWorkspaceId: job.cloudWorkspaceId, organizationId };
+		logControl(
+			"workspace.failed",
+			scope,
+			{ "failure.site": "queue", "status.changed": changed },
+			"error",
+		);
+		if (changed) Sentry.captureException(error, { tags: controlTags(scope) });
 		throw userError({
 			code: "INTERNAL_SERVER_ERROR",
 			message: "Could not start cloud workspace provisioning",

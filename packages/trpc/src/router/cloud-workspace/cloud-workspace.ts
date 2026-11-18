@@ -964,7 +964,9 @@ export const cloudWorkspaceRouter = {
 				{ event: "unarchived" },
 			);
 			nudge(row.organizationId, "cloud_workspaces");
-			if (!resumable) await queueProvision({ cloudWorkspaceId: row.id });
+			if (!resumable) {
+				await queueProvision({ cloudWorkspaceId: row.id }, row.organizationId);
+			}
 			return { unarchived: true };
 		}),
 } satisfies TRPCRouterRecord;
