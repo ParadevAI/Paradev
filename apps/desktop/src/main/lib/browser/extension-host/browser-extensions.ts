@@ -69,6 +69,7 @@ interface Host {
 	session: Electron.Session;
 	actions: BrowserActionApi;
 	tabOf(paneId: string): Electron.WebContents | undefined;
+	selectPane(paneId: string): void;
 	onRemoved(extensionId: string): void;
 }
 
@@ -140,6 +141,7 @@ export function attachBrowserExtensions(options: {
 	session: Electron.Session;
 	extensions: ElectronChromeExtensions;
 	tabOf: (paneId: string) => Electron.WebContents | undefined;
+	selectPane: (paneId: string) => void;
 	onRemoved: (extensionId: string) => void;
 }): void {
 	const actions = browserActionApi(options.extensions);
@@ -147,6 +149,7 @@ export function attachBrowserExtensions(options: {
 		session: options.session,
 		actions,
 		tabOf: options.tabOf,
+		selectPane: options.selectPane,
 		onRemoved: options.onRemoved,
 	};
 	actions.observers.add({
@@ -330,6 +333,8 @@ export function activateBrowserExtension(
 	) {
 		return;
 	}
+	// A popup asks for the active tab, which must be the pane whose button was clicked.
+	host.selectPane(paneId);
 	activating = target;
 	try {
 		host.actions.activate(

@@ -7,11 +7,6 @@ import type {
 	UseNavigateResult,
 } from "@tanstack/react-router";
 
-export interface WorkspaceSearchParams {
-	tabId?: string;
-	paneId?: string;
-}
-
 /**
  * Deep link into a subagent's transcript pane. The sidebar cannot reach a
  * workspace's pane store, so it navigates with these and the workspace
@@ -24,7 +19,7 @@ export interface SubagentLinkParams {
 	agentType?: string;
 }
 
-export interface SubagentLinkSearchParams {
+interface SubagentLinkSearchParams {
 	subagentTerminalId?: string;
 	subagentId?: string;
 	subagentAgentId?: string;
@@ -78,54 +73,28 @@ export function parseSubagentSearch(
 	};
 }
 
-export interface V2WorkspaceSearchParams extends SubagentLinkSearchParams {
+export interface WorkspaceSearchParams extends SubagentLinkSearchParams {
 	sessionId?: string;
 	terminalId?: string;
 	focusRequestId?: string;
 	openUrl?: string;
 	openUrlTarget?: "current-tab" | "new-tab";
 	openUrlRequestId?: string;
-	openUrlAgent?: true;
 }
 
 /**
- * Navigate to a workspace and update localStorage to remember it as the last viewed workspace.
- * This ensures the workspace will be restored when the app is reopened.
- *
- * @param workspaceId - The ID of the workspace to navigate to
- * @param navigate - The navigate function from useNavigate()
- * @param options - Optional navigation options (replace, resetScroll, etc.)
+ * Navigate to a workspace route.
  */
 export function navigateToWorkspace(
 	workspaceId: string,
 	navigate: UseNavigateResult<string>,
-	options?: Omit<NavigateOptions, "to" | "params"> & {
+	options?: Omit<NavigateOptions, "to" | "params" | "search"> & {
 		search?: WorkspaceSearchParams;
 	},
 ): Promise<void> {
 	const { search, ...rest } = options ?? {};
-	localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 	return navigate({
 		to: "/workspace/$workspaceId",
-		params: { workspaceId },
-		search: search ?? {},
-		...rest,
-	});
-}
-
-/**
- * Navigate to a V2 workspace route.
- */
-export function navigateToV2Workspace(
-	workspaceId: string,
-	navigate: UseNavigateResult<string>,
-	options?: Omit<NavigateOptions, "to" | "params" | "search"> & {
-		search?: V2WorkspaceSearchParams;
-	},
-): Promise<void> {
-	const { search, ...rest } = options ?? {};
-	return navigate({
-		to: "/v2-workspace/$workspaceId",
 		params: { workspaceId },
 		search: search ?? {},
 		...rest,

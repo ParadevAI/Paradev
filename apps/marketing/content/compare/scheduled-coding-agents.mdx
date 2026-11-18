@@ -2,7 +2,7 @@
 title: "Scheduled Coding Agents in 2026: Nightly Maintenance, Weekly Flaky-Test Fixes, and Team Runs You Review"
 description: "How to run coding agents on a schedule and review their work in the morning: nightly maintenance, a weekly flaky-test agent that leaves a reviewable fix, and dispatching runs from a CLI. GitHub Actions, Claude Code Routines, Codex, Cursor, and Paradev Automations compared."
 date: 2026-10-07
-lastUpdated: 2026-11-05
+lastUpdated: 2026-11-15
 type: "roundup"
 competitors:
   - github-actions
@@ -99,7 +99,7 @@ One automation can have several triggers, for example weekdays at 9:00 and Frida
 
 ## How can I schedule a coding agent to investigate flaky tests each week and leave a reviewable proposed fix?
 
-Schedule a weekly run, have the agent reproduce the flake with repeated runs before it edits anything, and require it to stop with a report when it cannot prove a fix. The proposed fix lands on its own branch for a human to review. Never let it merge.
+Schedule a weekly run with a [Paradev automation](https://docs.paradev.com/automations) or a GitHub Actions cron, have the agent reproduce the flake with repeated runs before it edits anything, and require it to stop with a report when it cannot prove a fix. The proposed fix lands on its own branch for a human to review. Never let it merge.
 
 With GitHub Actions, that is a `schedule:` cron such as `0 3 * * 1`, a step that runs your agent CLI with the prompt below, and a step that opens a draft PR. With Paradev, create an automation with the weekly RRule `FREQ=WEEKLY;BYDAY=MO;BYHOUR=3;BYMINUTE=0` and paste the prompt. Monday morning, open the run's workspace and review the diff and the report.
 

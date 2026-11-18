@@ -1,6 +1,10 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import {
+	isArchivedCloudWorkspaceStatus,
+	isLiveCloudWorkspaceStatus,
+} from "@superset/shared/cloud-workspace-status";
+import {
 	AlertCircle,
 	Archive,
 	ArchiveRestore,
@@ -47,7 +51,7 @@ export function CloudWorkspaceProvisioningState({
 	const { t } = useLingui();
 	const elapsed = useElapsedSeconds();
 
-	if (cloud.status === "deleted") {
+	if (isArchivedCloudWorkspaceStatus(cloud.status)) {
 		return <CloudWorkspaceArchivedState cloud={cloud} />;
 	}
 	if (cloud.status === "failed") {
@@ -55,7 +59,7 @@ export function CloudWorkspaceProvisioningState({
 	}
 	// A booting sandbox fails its first requests too; only a stuck one is unreachable.
 	if (
-		cloud.status === "ready" &&
+		isLiveCloudWorkspaceStatus(cloud.status) &&
 		unreachable &&
 		elapsed >= STUCK_AFTER_SECONDS
 	) {

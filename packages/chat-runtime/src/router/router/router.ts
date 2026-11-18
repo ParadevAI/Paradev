@@ -266,6 +266,9 @@ export function createChatRouter(
 						harness: input.harness,
 						scopeId: input.workspaceId,
 						cwd,
+						...(input.agentConfigId
+							? { agentConfigId: input.agentConfigId }
+							: {}),
 						...(input.cursor ? { cursor: input.cursor } : {}),
 					});
 				} catch (error) {

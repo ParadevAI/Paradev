@@ -77,11 +77,29 @@ describe("refreshChatgptTokens", () => {
 		});
 	});
 
-	test("a refused refresh is an error, not a silent keep", async () => {
+	test("a refusal naming a dead session is rejected", async () => {
 		answer([[401, { error: "refresh_token_reused" }]]);
-		await expect(refreshChatgptTokens(tokens)).rejects.toBeInstanceOf(
-			ChatgptSignInError,
-		);
+		await expect(refreshChatgptTokens(tokens)).rejects.toMatchObject({
+			reason: "rejected",
+			code: "refresh_token_reused",
+		});
+		answer([[401, { error: { code: "refresh_token_expired" } }]]);
+		await expect(refreshChatgptTokens(tokens)).rejects.toMatchObject({
+			reason: "rejected",
+		});
+	});
+
+	test("a 400 or 401 that does not prove the session dead keeps it", async () => {
+		answer([[400, { error: "invalid_request" }]]);
+		const error = await refreshChatgptTokens(tokens).catch((e) => e);
+		expect(error).toBeInstanceOf(ChatgptSignInError);
+		expect(error).toMatchObject({ reason: "unexpected" });
+		globalThis.fetch = mock(
+			async () => new Response("not json", { status: 401 }),
+		) as unknown as typeof fetch;
+		await expect(refreshChatgptTokens(tokens)).rejects.toMatchObject({
+			reason: "unexpected",
+		});
 	});
 });
 

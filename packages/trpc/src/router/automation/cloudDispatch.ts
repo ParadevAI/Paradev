@@ -9,7 +9,10 @@ import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
 	supportsCloudAgentChat,
 } from "@superset/shared/cloud-agent-launch";
-import { SUPERSET_USER_ID_HEADER } from "@superset/shared/host-routing";
+import {
+	SUPERSET_LAUNCH_SOURCE_HEADER,
+	SUPERSET_USER_ID_HEADER,
+} from "@superset/shared/host-routing";
 import { and, eq } from "drizzle-orm";
 import { resolveMachineSize } from "../../lib/billing/plan";
 import { cloudAccess } from "../../lib/cloud-guards";
@@ -108,12 +111,14 @@ export async function runInCloud(
 		launch: { agent: automation.agent, prompt, automationRunId: runId },
 		chat,
 		tags: automation.tags,
-		machineSize: (
-			await resolveMachineSize(
-				automation.organizationId,
-				automation.machineSize,
-			)
-		)?.name,
+		machineSize: automation.machineSize
+			? (
+					await resolveMachineSize(
+						automation.organizationId,
+						automation.machineSize,
+					)
+				)?.name
+			: undefined,
 		beforeProvision: async (workspaceId) => {
 			placed({ cloudWorkspaceId: workspaceId });
 			const bound = await db
@@ -184,6 +189,7 @@ async function prepareLaunch({
 		const headers = {
 			authorization: `Bearer ${await sandboxHostSecretFor(pinned.row.id)}`,
 			[SUPERSET_USER_ID_HEADER]: automation.ownerUserId,
+			[SUPERSET_LAUNCH_SOURCE_HEADER]: "automation",
 		};
 		// Listing the agents adds the built-in ones. Without this, `agents.run` fails
 		// on a box that never ran an agent.
@@ -257,7 +263,7 @@ async function reachablePin(
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 	});
-	if (!row || row.status === "deleted" || row.status === "failed") {
+	if (!row || row.status === "archived" || row.status === "failed") {
 		return null;
 	}
 	if (row.status === "provisioning") {

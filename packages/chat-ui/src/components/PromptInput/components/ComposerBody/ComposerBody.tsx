@@ -13,7 +13,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import { $getNearestNodeOfType } from "@lexical/utils";
+import { $getNearestNodeOfType, IS_APPLE } from "@lexical/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { isLargePaste, normalizePastedText } from "@superset/chat/core";
 import { getClipboardFiles } from "@superset/ui/lib/clipboard-files";
@@ -36,6 +36,7 @@ import {
 	CUT_COMMAND,
 	DROP_COMMAND,
 	FORMAT_TEXT_COMMAND,
+	HISTORY_PUSH_TAG,
 	INDENT_CONTENT_COMMAND,
 	INSERT_PARAGRAPH_COMMAND,
 	KEY_ARROW_RIGHT_COMMAND,
@@ -45,6 +46,7 @@ import {
 	KEY_ENTER_COMMAND,
 	KEY_ESCAPE_COMMAND,
 	KEY_TAB_COMMAND,
+	type LexicalEditor,
 	type LexicalNode,
 	OUTDENT_CONTENT_COMMAND,
 	PASTE_COMMAND,
@@ -93,6 +95,7 @@ import type {
 	ComposerMentionProvider,
 	ComposerPanelContent,
 	PromptInputAttachment,
+	PromptInputCommand,
 	PromptInputLayout,
 	PromptInputProps,
 } from "../../types";
@@ -108,6 +111,12 @@ import { registerHistoryNavigation } from "../../utils/historyNavigation";
 import { registerInlineCodeExit } from "../../utils/inlineCodeExit";
 import { $insertTranscript } from "../../utils/insertTranscript";
 import { $isInCode } from "../../utils/isInCode";
+import {
+	$commandTokenStart,
+	$textAfterCaret,
+	type CommandTokenMatch,
+	matchCommandToken,
+} from "../../utils/matchCommandToken";
 import { rankCommands } from "../../utils/rankCommands";
 import { tablesToMarkdown } from "../../utils/tablesToMarkdown";
 import { registerTrailingParagraph } from "../../utils/trailingParagraph";
@@ -123,6 +132,7 @@ import { ContextButton } from "../ContextButton";
 import { DictationBar } from "../DictationBar";
 import { MentionMenu } from "../MentionMenu";
 import { MentionSubmenu } from "../MentionSubmenu";
+import { getFormatShortcutTarget } from "./utils/getFormatShortcutTarget";
 
 function footerButtonClasses(base: string, ghost: string) {
 	return {
@@ -156,15 +166,19 @@ const FOOTER_BUTTONS: Record<
 const INLINE_CONTEXT_BUTTON_CLASS =
 	"size-7 rounded-full bg-secondary hover:bg-secondary/80 disabled:hover:bg-secondary";
 
-// Slash commands only trigger while the "/token" is the entire message.
-function matchCommandToken(text: string) {
-	const match = /^\/([^/\r\n]*)$/.exec(text);
-	if (!match) return null;
-	return {
-		leadOffset: 0,
-		matchingString: match[1] ?? "",
-		replaceableString: match[0],
-	};
+function rankForToken(
+	commands: PromptInputCommand[],
+	token: Pick<CommandTokenMatch, "leading" | "sigil">,
+	query: string,
+): PromptInputCommand[] {
+	const eligible = token.leading
+		? commands
+		: commands.filter(
+				(command) =>
+					command.inline &&
+					(token.sigil === "/" || command.title.startsWith(token.sigil)),
+			);
+	return rankCommands(eligible, query, { prefixOnly: !token.leading });
 }
 
 export type ComposerBodyProps = Required<
@@ -206,6 +220,11 @@ function $insertChipAtSelection(chip: ComposerChip) {
 	if (!$isRangeSelection(selection)) return;
 	const chipNode = MentionChipNode.fromChip(chip);
 	selection.insertNodes([chipNode, $createTextNode(" ")]);
+}
+
+/** A chip is its own undo step, even when it lands right after typing. */
+function insertChip(editor: LexicalEditor, chip: ComposerChip) {
+	editor.update(() => $insertChipAtSelection(chip), { tag: HISTORY_PUSH_TAG });
 }
 
 function $collectChips(): ComposerChip[] {
@@ -301,7 +320,7 @@ export function ComposerBody({
 				focusAtEnd();
 			},
 			insertChip(chip: ComposerChip) {
-				editor.update(() => $insertChipAtSelection(chip));
+				insertChip(editor, chip);
 			},
 			openFileDialog() {
 				fileInputRef.current?.click();
@@ -328,6 +347,10 @@ export function ComposerBody({
 	const [mentionQuery, setMentionQuery] = useState<string | null>(null);
 	const [commandQuery, setCommandQuery] = useState<string | null>(null);
 	const [commandDismissed, setCommandDismissed] = useState(false);
+	const [commandToken, setCommandToken] = useState<{
+		leading: boolean;
+		sigil: "/" | "$";
+	}>({ leading: true, sigil: "/" });
 	const [panel, setPanel] = useState<ComposerPanelContent | null>(null);
 	const [menuSlot, setMenuSlot] = useState<HTMLDivElement | null>(null);
 	const [browseOpen, setBrowseOpen] = useState(false);
@@ -448,9 +471,7 @@ export function ComposerBody({
 	}, [editor]);
 
 	const actionContext: ComposerActionContext = {
-		insertChip: (chip) => {
-			editor.update(() => $insertChipAtSelection(chip));
-		},
+		insertChip: (chip) => insertChip(editor, chip),
 		attachFiles: () => fileInputRef.current?.click(),
 		openPanel: setPanel,
 		query: mentionQuery ?? "",
@@ -537,8 +558,8 @@ export function ComposerBody({
 	);
 
 	const rankedCommands = useMemo(
-		() => rankCommands(commands ?? [], commandQuery ?? ""),
-		[commands, commandQuery],
+		() => rankForToken(commands ?? [], commandToken, commandQuery ?? ""),
+		[commands, commandQuery, commandToken],
 	);
 	const commandOptions = useMemo(
 		() => rankedCommands.map((command) => new CommandTypeaheadOption(command)),
@@ -748,15 +769,17 @@ export function ComposerBody({
 				const key = event.key.toLowerCase();
 				const mod = event.metaKey || event.ctrlKey;
 				pasteAsTextRef.current = event.shiftKey && mod && key === "v";
-				// ⌘B and ⌘I format here; app hotkeys on the same keys must not also fire.
-				if (
-					mod &&
-					!event.shiftKey &&
-					!event.altKey &&
-					(key === "b" || key === "i")
-				)
-					event.stopPropagation();
-				return false;
+				const selection = $getSelection();
+				const target = getFormatShortcutTarget(event, {
+					isApple: IS_APPLE,
+					hasSelection:
+						$isRangeSelection(selection) && !selection.isCollapsed(),
+				});
+				if (target === "editor") event.stopPropagation();
+				if (target !== "app") return false;
+				// true skips Lexical's bold shortcut; preventDefault stops the native formatBold.
+				event.preventDefault();
+				return true;
 			},
 			COMMAND_PRIORITY_LOW,
 		);
@@ -801,7 +824,7 @@ export function ComposerBody({
 					trimmed && !asText ? chipForPasteRef.current?.(trimmed) : null;
 				if (chip) {
 					event.preventDefault();
-					editor.update(() => $insertChipAtSelection(chip));
+					insertChip(editor, chip);
 					return true;
 				}
 				const text = normalizePastedText(raw);
@@ -1155,7 +1178,27 @@ export function ComposerBody({
 					else void option.command.onSelect(actionContextRef.current);
 				}}
 				options={commandOptions}
-				triggerFn={(text) => ($isInCode() ? null : matchCommandToken(text))}
+				triggerFn={(text) => {
+					const match = $isInCode()
+						? null
+						: matchCommandToken(text, $commandTokenStart(), $textAfterCaret());
+					if (
+						match &&
+						rankForToken(commands ?? [], match, match.matchingString).length ===
+							0
+					)
+						// Lexical keeps a matched menu's arrow keys even when it shows nothing.
+						return null;
+					if (match) {
+						const { leading, sigil } = match;
+						setCommandToken((current) =>
+							current.leading === leading && current.sigil === sigil
+								? current
+								: { leading, sigil },
+						);
+					}
+					return match;
+				}}
 				commandPriority={COMMAND_PRIORITY_HIGH}
 				menuRenderFn={(
 					anchorElementRef,

@@ -5,12 +5,43 @@ agent settings, workspace creation, and host-side CLI validation.
 `SUPERSET_CHAT_MODELS` in the same file supplies the cloud chat model list.
 Model names are provider identifiers and are not translated.
 
+## GPT-6.2 and Fable 5.2 follow-up: November 17, 2026
+
+Live `codex app-server` → `model/list` (codex 0.169.0) lists GPT-6.2 Sol and
+GPT-6.2 Astra first, ahead of the October list. Both take `max` and `ultra`.
+Added them to the Codex picker, Paradev chat, and OpenCode (models.dev lists
+`openai/gpt-6.2-astra` and `openai/gpt-6.2-sol`). Priced Astra at $8/$40 with
+$0.40 cache reads and Sol at $2/$10 with $0.10 cache reads; above 272k input
+tokens input and cache rates double and output is 1.5x
+([Astra](https://developers.openai.com/api/docs/models/gpt-6.2-astra),
+[Sol](https://developers.openai.com/api/docs/models/gpt-6.2-sol)).
+models.dev now lists Fable 5.2 for Anthropic (`claude-fable-5-2`) and
+Copilot (`claude-fable-5.2`), so OpenCode and Copilot offer it. Not added yet:
+GPT-6.2 in OMP (pi-catalog 18.22.0 does not list it) and Copilot (models.dev
+does not list it), and Fable 5.2 in Cursor (no published model id).
+
+Smoke test (`Reply with exactly MODEL_SMOKE_OK`): Codex 0.169.0 returned it
+on GPT-6.2 Sol and Astra; Codex 0.162.1 rejects both with `model_not_found`,
+so users need a current Codex. OpenCode returned it on `openai/gpt-6.2-sol`.
+OpenCode Anthropic models and Copilot failed on this account for existing
+models too (no Anthropic provider; Copilot policy), as on September 27.
+
 ## Codex refresh: October 30, 2026
 
 Live `codex app-server` → `model/list` (codex 0.162.1) lists GPT-6.1 Sol,
 GPT-6 Astra, GPT-6.1 Terra, GPT-6 Sol, GPT-6 Luna, and GPT-5.6 Sol, Terra, and
 Luna. Added GPT-6.1 Terra and removed the retired GPT-5.5. Every model takes
 `max`; all but the two Luna models take `ultra`.
+
+## Fable 5.2: November 9, 2026
+
+Added `claude-fable-5-2` to the Claude picker and Paradev chat, and priced
+Fable 5.2 and Mythos 5.2 at $8/$40 with $0.20 cache reads
+([Anthropic models overview](https://platform.claude.com/docs/en/models/overview)).
+OMP lists `anthropic/claude-fable-5-2` in pi-catalog 18.18.5, so OMP offers it.
+Copilot, Cursor, and OpenCode do not offer it yet: Copilot has not announced
+it, Cursor has not published its model id, and models.dev (which OpenCode
+reads) does not list it. Add it to those pickers once their catalogs do.
 
 ## Verification: September 26, 2026
 

@@ -20,6 +20,7 @@ import { type ReactNode, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { Tab } from "../../../../../../../types";
 import { usePaneAppearance } from "../../../../../../hooks/usePaneAppearance";
+import { usePaneAreaFocused } from "../../../../../../hooks/usePaneAreaFocused";
 import type { PaneRegistry } from "../../../../../../types";
 import { useTabTitle } from "../../../../utils/useTabTitle";
 import { PANE_DRAG_TYPE } from "../../../Tab/components/Pane/components/PaneHeader";
@@ -64,6 +65,7 @@ export function TabItem<TData>({
 }: TabItemProps<TData>) {
 	const { t } = useLingui();
 	const isCards = usePaneAppearance() === "cards";
+	const isAreaFocused = usePaneAreaFocused();
 	const [isEditing, setIsEditing] = useState(false);
 	const [editValue, setEditValue] = useState("");
 	const title = useTabTitle(tab, tabs, registry);
@@ -140,6 +142,7 @@ export function TabItem<TData>({
 										? "border border-border/70 border-b-transparent bg-background text-foreground"
 										: "border border-transparent border-b-border text-muted-foreground/70 hover:bg-muted/40 hover:text-muted-foreground",
 								),
+						isActive && !isAreaFocused && "text-muted-foreground",
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}

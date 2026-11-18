@@ -6,7 +6,6 @@ import {
 	useOverflowFade,
 } from "../../../hooks/use-overflow-fade";
 import { cn } from "../../../lib/utils";
-import "../fade-edge.css";
 
 type OverflowFadeEdge = "top" | "right" | "bottom" | "left";
 

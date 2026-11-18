@@ -1,0 +1,1 @@
+export { TerminalSessionEndedFooter } from "./TerminalSessionEndedFooter";

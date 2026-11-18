@@ -22,7 +22,7 @@ export type Slot =
 	| "toStatus"
 	| "assignee";
 
-export type SentencePart = { text: string } | { slot: Slot };
+type SentencePart = { text: string } | { slot: Slot };
 
 export const LINEAR_SENTENCES: Record<LinearTriggerEvent, SentencePart[]> = {
 	"issue.created": [
@@ -109,7 +109,7 @@ function leaf(label: MessageDescriptor, event: LinearTriggerEvent) {
  * trigger cannot fire on every team; the optional narrowings start at "any"
  * because an empty list would read as "Any project" while matching nothing.
  */
-export function createLinearConfig(event: LinearTriggerEvent): LinearConfig {
+function createLinearConfig(event: LinearTriggerEvent): LinearConfig {
 	return {
 		kind: "linear",
 		event,

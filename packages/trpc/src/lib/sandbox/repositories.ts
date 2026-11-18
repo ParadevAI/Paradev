@@ -22,7 +22,7 @@ import {
 import {
 	type SandboxRepository,
 	sandboxRepositoryPath,
-} from "@superset/shared/sandbox-contract";
+} from "@superset/shared/sandbox/contract";
 import { and, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { installationOctokit } from "./clone-token";

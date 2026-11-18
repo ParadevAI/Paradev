@@ -12,7 +12,7 @@ const meta = {
 	],
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: "working",
 			agentStatusAt: new Date("2026-09-25T11:58:00Z"),
 		},
@@ -47,7 +47,7 @@ export const SandboxFailed: Story = {
 export const NeedsYou: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: "permission",
 			agentStatusAt: new Date("2026-09-25T11:57:00Z"),
 		},
@@ -57,7 +57,7 @@ export const NeedsYou: Story = {
 export const AgentFailed: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: "failed",
 			agentStatusAt: new Date("2026-09-25T11:40:00Z"),
 		},
@@ -69,7 +69,7 @@ export const Working: Story = {};
 export const DoneUnread: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: "review",
 			agentStatusAt: new Date("2026-09-25T11:50:00Z"),
 		},
@@ -80,7 +80,7 @@ export const DoneUnread: Story = {
 export const DoneRead: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: "review",
 			agentStatusAt: new Date("2026-09-25T11:50:00Z"),
 		},
@@ -90,7 +90,7 @@ export const DoneRead: Story = {
 export const IdleNow: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: null,
 			agentStatusAt: new Date("2026-09-25T11:59:40Z"),
 		},
@@ -100,7 +100,7 @@ export const IdleNow: Story = {
 export const IdleFiftyNineMinutes: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: null,
 			agentStatusAt: new Date("2026-09-25T11:01:00Z"),
 		},
@@ -110,7 +110,7 @@ export const IdleFiftyNineMinutes: Story = {
 export const IdleFiftyTwoWeeks: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: null,
 			agentStatusAt: new Date("2025-09-26T12:00:00Z"),
 		},
@@ -120,7 +120,7 @@ export const IdleFiftyTwoWeeks: Story = {
 export const NeverNotified: Story = {
 	args: {
 		workspace: {
-			status: "ready",
+			status: "awake",
 			agentStatus: null,
 			agentStatusAt: null,
 		},

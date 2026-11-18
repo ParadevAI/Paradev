@@ -1,5 +1,9 @@
 import { randomUUID } from "node:crypto";
-import type { ChatSelections } from "@superset/chat/core";
+import {
+	type ChatSelections,
+	type SelectionCategory,
+	selectionCategoryOf,
+} from "@superset/chat/core";
 import type {
 	ApprovalRequest,
 	AvailableCommand,
@@ -37,11 +41,13 @@ import {
 } from "../usageLimit";
 import {
 	AIR_ASYNC_TASK_STOP_METHOD,
+	AIR_AUTONOMOUS_TURN_TASK_TYPE,
 	AIR_CLIENT_META,
 	airAsyncTaskProgressSchema,
 	airAsyncTaskSpawnedSchema,
 	airAsyncTaskStateSchema,
 	airForkPointMeta,
+	airPermissionReason,
 	airSubagentSpawnedSchema,
 	airSubagentStateSchema,
 	isCompactionCall,
@@ -449,6 +455,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private sessionUsage: SessionUsage | undefined;
 	private reportedCostUsd: number | undefined;
 	private readonly backgroundTaskTurns = new Map<string, string | undefined>();
+	/** Async task id of each turn the agent started on its own, to the turn shown for it. */
+	private readonly autonomousTurns = new Map<string, string>();
+	private lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
 	private awaitingBackground = false;
 	/** The v2 config option that stands in for v1's session mode, once seen. */
 	private modeConfigId: string | null = null;
@@ -467,6 +476,8 @@ export class AcpAdapter implements HarnessAdapter {
 	private quietReplay = false;
 	private unkeyedImageSequence = 0;
 	private queuedPrompts: UserContent[][] = [];
+	/** The session could not open signed out; each prompt fails with this until a restart. */
+	private signedOut: TurnError | null = null;
 	private disposed = false;
 	private dead = false;
 	private stderrTail = "";
@@ -506,7 +517,9 @@ export class AcpAdapter implements HarnessAdapter {
 			(tasks) => {
 				const live = new Set(tasks.map((task) => task.id));
 				for (const id of this.backgroundTaskTurns.keys()) {
-					if (!live.has(id)) this.backgroundTaskTurns.delete(id);
+					if (live.has(id)) continue;
+					this.backgroundTaskTurns.delete(id);
+					this.lastBackgroundEndMs = this.now();
 				}
 				for (const id of live) {
 					if (!this.backgroundTaskTurns.has(id)) {
@@ -532,6 +545,10 @@ export class AcpAdapter implements HarnessAdapter {
 	}
 
 	prompt(content: UserContent[]): void {
+		if (this.signedOut) {
+			this.failSignedOutTurn(this.signedOut);
+			return;
+		}
 		if (!this.client || !this.sessionId) {
 			this.queuedPrompts.push(content);
 			return;
@@ -594,10 +611,39 @@ export class AcpAdapter implements HarnessAdapter {
 			this.emitSession({ status: "idle" });
 			return;
 		}
-		this.client.notify("session/cancel", { sessionId: this.sessionId });
-		if (this.cancelPendingApprovals(this.currentTurn.id)) {
+		const turnId = this.currentTurn.id;
+		const autonomousTask = [...this.autonomousTurns].find(
+			([, id]) => id === turnId,
+		)?.[0];
+		if (autonomousTask) void this.stopAutonomousTurn(autonomousTask, turnId);
+		else this.client.notify("session/cancel", { sessionId: this.sessionId });
+		if (this.cancelPendingApprovals(turnId)) {
 			this.emitSession({ status: this.statusAfterApprovals() });
 		}
+	}
+
+	/** `session/cancel` would also stop the session's background workflows. */
+	private async stopAutonomousTurn(
+		asyncTaskId: string,
+		turnId: string,
+	): Promise<void> {
+		const client = this.client;
+		const sessionId = this.sessionId;
+		if (!client || !sessionId) return;
+		const response = await client
+			.request(
+				AIR_ASYNC_TASK_STOP_METHOD,
+				{ sessionId, asyncTaskId },
+				this.requestTimeoutMs(),
+			)
+			.catch(() => null);
+		if ((response as { stopped?: unknown } | null)?.stopped === true) return;
+		if (
+			this.autonomousTurns.get(asyncTaskId) === turnId &&
+			this.currentTurn?.id === turnId &&
+			this.currentTurn.status === "running"
+		)
+			client.notify("session/cancel", { sessionId });
 	}
 
 	respondToApproval(approvalId: string, decision: Decision): void {
@@ -1110,6 +1156,15 @@ export class AcpAdapter implements HarnessAdapter {
 			const queued = this.queuedPrompts.splice(0, this.queuedPrompts.length);
 			for (const content of queued) await this.runTurn(content);
 		} catch (error) {
+			const failure = this.turnError(error);
+			if (failure.kind === "auth") {
+				this.signedOut = failure;
+				this.emitSession({ status: this.statusAfterApprovals() });
+				if (this.queuedPrompts.splice(0).length > 0) {
+					this.failSignedOutTurn(failure);
+				}
+				return;
+			}
 			this.emitNotice("error", this.withStderr(this.authAwareMessage(error)));
 			this.dead = true;
 			this.emitSession({ status: "dead" });
@@ -1236,6 +1291,16 @@ export class AcpAdapter implements HarnessAdapter {
 			turnId,
 			limit ? { ...failure, kind: "usage_limit" } : failure,
 		);
+	}
+
+	private failSignedOutTurn(failure: TurnError): void {
+		const turnId = this.mintId();
+		this.emitTurn({
+			id: turnId,
+			status: "running",
+			startedAtMs: this.nextStartMs(),
+		});
+		this.failTurn(turnId, failure);
 	}
 
 	private failTurn(turnId: string, error: TurnError): void {
@@ -1915,7 +1980,11 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskSpawned(sessionId: string, raw: unknown): void {
 		const parsed = airAsyncTaskSpawnedSchema.safeParse(raw);
 		if (!parsed.success) return;
-		const { asyncTaskId, name, description, canStop } = parsed.data;
+		const { asyncTaskId, name, description, canStop, taskType } = parsed.data;
+		if (taskType === AIR_AUTONOMOUS_TURN_TASK_TYPE) {
+			if (sessionId === this.sessionId) this.startAutonomousTurn(asyncTaskId);
+			return;
+		}
 		if (this.finishedSubagents.has(sessionId)) return;
 		const owner = this.subagents.get(sessionId);
 		if (owner) {
@@ -1942,7 +2011,64 @@ export class AcpAdapter implements HarnessAdapter {
 	private handleAsyncTaskState(raw: unknown): void {
 		const parsed = airAsyncTaskStateSchema.safeParse(raw);
 		if (!parsed.success || !isTerminalAirState(parsed.data.state)) return;
-		this.backgroundTasks.end(parsed.data.asyncTaskId);
+		const { asyncTaskId, state } = parsed.data;
+		if (this.autonomousTurns.has(asyncTaskId)) {
+			this.endAutonomousTurn(asyncTaskId, state);
+			return;
+		}
+		this.backgroundTasks.end(asyncTaskId);
+	}
+
+	/**
+	 * A turn the agent starts after its answer, such as the reply to a
+	 * finished background subagent, reopens the latest turn, so the reply
+	 * reads as part of it and the turn's clock stays its last line.
+	 */
+	private startAutonomousTurn(asyncTaskId: string): void {
+		const latest = this.currentTurn;
+		if (latest?.status === "running") return;
+		if (!latest || !this.continuesBackgroundWork(latest)) {
+			const turnId = this.mintId();
+			this.autonomousTurns.set(asyncTaskId, turnId);
+			this.emitTurn({
+				id: turnId,
+				status: "running",
+				startedAtMs: this.nextStartMs(),
+			});
+		} else {
+			const { completedAtMs: _completedAtMs, ...reopened } = latest;
+			this.lastBackgroundEndMs = Number.NEGATIVE_INFINITY;
+			this.autonomousTurns.set(asyncTaskId, latest.id);
+			this.emitTurn({ ...reopened, status: "running" });
+		}
+		this.emitSession({ status: this.statusAfterApprovals() });
+	}
+
+	/**
+	 * Only a reply to background work continues the turn. A stopped or failed
+	 * turn keeps its ending, and a scheduled wakeup gets a turn of its own.
+	 */
+	private continuesBackgroundWork(turn: Turn): boolean {
+		return (
+			turn.status === "completed" &&
+			(this.backgroundTaskTurns.size > 0 ||
+				this.lastBackgroundEndMs >= turn.startedAtMs)
+		);
+	}
+
+	private endAutonomousTurn(asyncTaskId: string, state: string): void {
+		const turnId = this.autonomousTurns.get(asyncTaskId);
+		this.autonomousTurns.delete(asyncTaskId);
+		const turn = this.currentTurn;
+		if (!turnId || turn?.id !== turnId || turn.status !== "running") return;
+		this.main.flush();
+		this.emitTurn({
+			...turn,
+			status: state === "cancelled" ? "interrupted" : "completed",
+			completedAtMs: this.now(),
+		});
+		this.emitSession({ status: this.statusAfterApprovals() });
+		this.sendCustomAnswer();
 	}
 
 	private handleConfigOptions(raw: unknown): void {
@@ -1997,15 +2123,15 @@ export class AcpAdapter implements HarnessAdapter {
 
 	/** Resolves to the value the agent took, or undefined when it took none. */
 	private applyStartSelection(
-		category: "model" | "thought_level" | "mode",
+		category: SelectionCategory,
 		wanted: string | undefined,
 	): Promise<string | undefined> {
 		const option = this.configOptions.find(
-			(entry) => entry.category === category,
+			(entry) => selectionCategoryOf(entry) === category,
 		);
 		if (!wanted || !option) return Promise.resolve(undefined);
 		const value =
-			category === "mode"
+			category === "mode" || category === "fast"
 				? option.options.some((entry) => entry.id === wanted)
 					? wanted
 					: undefined
@@ -2029,12 +2155,25 @@ export class AcpAdapter implements HarnessAdapter {
 				: undefined,
 		);
 		this.trackSelection(effort);
+		// Fast mode also belongs to the model. It waits for effort too: a refused
+		// setting rolls back every option to before it was sent.
+		const fast = wanted.fast
+			? effort
+					.then(() => model)
+					.then((modelId) =>
+						modelId || !wanted.modelId
+							? this.applyStartSelection("fast", wanted.fast)
+							: undefined,
+					)
+			: Promise.resolve(undefined);
+		if (wanted.fast) this.trackSelection(fast);
 		const mode = this.applyStartSelection("mode", wanted.modeId);
-		return Promise.all([model, effort, mode]).then(
-			([modelId, effortId, modeId]) => ({
+		return Promise.all([model, effort, mode, fast]).then(
+			([modelId, effortId, modeId, fastTaken]) => ({
 				...(modelId ? { modelId } : {}),
 				...(effortId ? { effortId } : {}),
 				...(modeId ? { modeId } : {}),
+				...(fastTaken ? { fast: fastTaken } : {}),
 			}),
 		);
 	}
@@ -2067,9 +2206,10 @@ export class AcpAdapter implements HarnessAdapter {
 		const wanted: ChatSelections = {
 			...(startOptions.modelId ? { modelId: startOptions.modelId } : {}),
 			...(startOptions.effortId ? { effortId: startOptions.effortId } : {}),
+			...(startOptions.fast ? { fast: startOptions.fast } : {}),
 			...(modeId && !this.options.clientApprovalModes ? { modeId } : {}),
 		};
-		const configured =
+		const configured: Promise<ChatSelections> =
 			this.configOptions.length > 0
 				? this.applyConfigSelections(wanted)
 				: Object.keys(wanted).length > 0
@@ -2095,12 +2235,16 @@ export class AcpAdapter implements HarnessAdapter {
 				taken ? modeId : undefined,
 			);
 		}
-		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) =>
+		void Promise.all([configured, sessionMode]).then(([taken, takenMode]) => {
+			if (wanted.effortId && !taken.effortId)
+				console.warn(
+					`[acp] the agent did not take reasoning effort "${wanted.effortId}"; it runs at its default`,
+				);
 			this.settleStartSelections({
 				...taken,
 				...(takenMode ? { modeId: takenMode } : {}),
-			}),
-		);
+			});
+		});
 	}
 
 	/** The start model, effort and mode the agent took. */
@@ -2139,6 +2283,7 @@ export class AcpAdapter implements HarnessAdapter {
 			parsed.data.subject?.toolCall?.title ??
 			"Permission required";
 		const description = parsed.data.description;
+		const reason = airPermissionReason(request.params);
 		const asking = [...this.main.allToolCalls()].some(
 			(call) => call.status === "running" && call.title === "ask_user_question",
 		);
@@ -2176,6 +2321,7 @@ export class AcpAdapter implements HarnessAdapter {
 			...(description && description !== title
 				? { detail: [{ type: "text" as const, text: description }] }
 				: {}),
+			...(reason ? { reason } : {}),
 			status: "pending",
 			startedAtMs: this.nextStartMs(),
 			...(question
@@ -2552,7 +2698,9 @@ export class AcpAdapter implements HarnessAdapter {
 	private authAwareMessage(error: unknown): string {
 		const message = error instanceof Error ? error.message : String(error);
 		if (/auth/i.test(message)) {
-			return `${message}. Run the agent's login in a terminal (e.g. \`claude /login\`), then reopen this chat.`;
+			return this.loginCommand
+				? `${message}. Run \`${this.loginCommand}\` in a terminal, then reopen this chat.`
+				: `${message}. Sign in to the agent in a terminal, then reopen this chat.`;
 		}
 		return message;
 	}

@@ -146,7 +146,7 @@ export const useTasksFilterStore = create<TasksFilterState>()(
 	),
 );
 
-export interface TasksFilters {
+interface TasksFilters {
 	tab: FilterTab;
 	assignee: string | null;
 	label: string | null;

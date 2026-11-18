@@ -1,57 +1,80 @@
-import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
-import Rive, { Fit, type RiveRef } from "rive-react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Easing, View } from "react-native";
 import type { VoiceStatus } from "@/lib/voice/voiceStore";
+import type { VoiceOrbComponent } from "./VoiceOrb.types";
 
-const STATE_MACHINE = "default";
-const INPUTS = ["listening", "thinking", "speaking", "asleep"] as const;
-type PersonaInput = (typeof INPUTS)[number];
+const PULSE: Record<VoiceStatus, { scale: number; period: number }> = {
+	idle: { scale: 1, period: 0 },
+	connecting: { scale: 1.06, period: 900 },
+	reconnecting: { scale: 1.06, period: 900 },
+	listening: { scale: 1.04, period: 1800 },
+	thinking: { scale: 1.08, period: 700 },
+	speaking: { scale: 1.14, period: 420 },
+	ended: { scale: 1, period: 0 },
+};
 
-function personaInput(status: VoiceStatus): PersonaInput | null {
-	switch (status) {
-		case "listening":
-		case "thinking":
-		case "speaking":
-			return status;
-		case "connecting":
-		case "reconnecting":
-			return "thinking";
-		case "ended":
-			return "asleep";
-		case "idle":
-			return null;
-	}
-}
-
-export function VoiceOrb({
-	status,
-	size,
-}: {
-	status: VoiceStatus;
-	size: number;
-}) {
-	const rive = useRef<RiveRef>(null);
-	const [playing, setPlaying] = useState(false);
+export const VoiceOrb: VoiceOrbComponent = ({ status, size }) => {
+	const pulse = useRef(new Animated.Value(0)).current;
+	const { scale, period } = PULSE[status];
+	const asleep = status === "idle" || status === "ended";
 
 	useEffect(() => {
-		if (!playing) return;
-		const active = personaInput(status);
-		for (const input of INPUTS) {
-			rive.current?.setInputState(STATE_MACHINE, input, input === active);
-		}
-	}, [status, playing]);
+		pulse.setValue(0);
+		if (!period) return;
+		const half = { duration: period / 2, easing: Easing.inOut(Easing.sin) };
+		const loop = Animated.loop(
+			Animated.sequence([
+				Animated.timing(pulse, { toValue: 1, useNativeDriver: false, ...half }),
+				Animated.timing(pulse, { toValue: 0, useNativeDriver: false, ...half }),
+			]),
+		);
+		loop.start();
+		return () => loop.stop();
+	}, [pulse, period]);
+
+	const grow = pulse.interpolate({
+		inputRange: [0, 1],
+		outputRange: [1, scale],
+	});
+	const glow = pulse.interpolate({
+		inputRange: [0, 1],
+		outputRange: [0.25, 0.55],
+	});
+	const core = size * 0.62;
 
 	return (
-		<View style={{ width: size, height: size }} accessibilityElementsHidden>
-			<Rive
-				ref={rive}
-				source={require("@/assets/voice/opal.riv")}
-				stateMachineName={STATE_MACHINE}
-				fit={Fit.Contain}
-				autoplay
-				onPlay={() => setPlaying(true)}
-				style={{ width: size, height: size }}
+		<View
+			accessibilityElementsHidden
+			style={{
+				width: size,
+				height: size,
+				alignItems: "center",
+				justifyContent: "center",
+				opacity: asleep ? 0.55 : 1,
+			}}
+		>
+			<Animated.View
+				style={{
+					position: "absolute",
+					width: size,
+					height: size,
+					borderRadius: size / 2,
+					backgroundColor: "#93c5fd",
+					opacity: glow,
+					transform: [{ scale: grow }],
+				}}
+			/>
+			<Animated.View
+				style={{
+					width: core,
+					height: core,
+					borderRadius: core / 2,
+					backgroundColor: "#e0f2fe",
+					borderWidth: core * 0.08,
+					borderColor: "#bfdbfe",
+					transform: [{ scale: grow }],
+				}}
 			/>
 		</View>
 	);
-}
+};

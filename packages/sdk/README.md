@@ -28,7 +28,7 @@ const workspace = await client.workspaces.create({
   prompt: 'Fix the flaky login test',
 });
 
-// Provisioning runs in the background: wait for `ready`
+// Provisioning runs in the background: wait for it to finish
 let current = workspace;
 while (current.status === 'provisioning') {
   await new Promise((resolve) => setTimeout(resolve, 5_000));
@@ -36,7 +36,7 @@ while (current.status === 'provisioning') {
   if (!next) throw new Error('Workspace was deleted');
   current = next;
 }
-if (current.status !== 'ready') throw new Error(`Workspace is ${current.status}`);
+if (current.status === 'failed') throw new Error('Workspace failed to start');
 
 // Drive it: open a terminal, launch another agent, read its screen
 const { terminalId } = await client.terminals.create({ workspaceId: workspace.id, command: 'bun test' });
@@ -87,7 +87,7 @@ try {
 
 Most methods hit `api.superset.sh` directly. `terminals.*` and `agents.create` run inside a workspace's sandbox: the SDK asks the API for a short-lived ticket for that workspace (waking its sandbox if it had stopped), caches it, and calls the sandbox through Paradev's gate with it. Your API key is only ever sent to the API.
 
-The workspace must be `ready`; otherwise the ticket request fails with a `412`.
+The workspace must be `awake` or `asleep`; otherwise the ticket request fails with a `412`.
 
 ## License
 

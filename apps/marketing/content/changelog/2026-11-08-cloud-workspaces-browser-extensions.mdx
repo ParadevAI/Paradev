@@ -1,0 +1,88 @@
+---
+title: Cloud Workspaces Out of Beta and Chrome Extensions in the Browser
+date: 2026-11-08
+image: /changelog/2026-11-08-cloud-hero.png
+version: 2.0.6
+highlights:
+  - icon: cloud
+    title: Cloud workspaces are out of beta
+    description: On Team and Ultra, with port forwarding, resizing and your own agent sign-in
+  - icon: shield
+    title: Chrome extensions in the browser
+    description: Install from the Chrome Web Store and sign in with 1Password or LastPass, passkeys included
+  - icon: message
+    title: The chat interface is out of Experimental
+    description: Pick Terminal or Chat during onboarding, or switch in Settings → General
+---
+
+## Cloud Workspaces Are Out of Beta <PRBadge url="https://github.com/superset-sh/superset/pull/9427" />
+
+Cloud workspaces run your agents on a cloud machine, so they keep working when your laptop sleeps. They are now part of the Team and Ultra plans <PRBadge url="https://github.com/superset-sh/superset/pull/9363" />.
+
+<Video src="/changelog/2026-11-08-cloud-workspaces.mp4" title="Starting a Large cloud workspace from the new-workspace dialog, then the agent editing and building" />
+
+- **Forward ports to your computer** - click **Forward** in the Share popover to open a cloud dev server on localhost <PRBadge url="https://github.com/superset-sh/superset/pull/9493" />
+- **Manual sign-in** - keep Claude Code or Codex signed in with your own script, in **Settings → Agents** <PRBadge url="https://github.com/superset-sh/superset/pull/9372" />
+- **Reach your own machines** - turn on **Settings → Hosts → Cloud workspaces** to let cloud agents use a host you own <PRBadge url="https://github.com/superset-sh/superset/pull/9409" />
+
+Resize a workspace or list its forwards from the CLI <PRBadge url="https://github.com/superset-sh/superset/pull/9371" />:
+
+```bash
+superset ws update <id> --machine-size xlarge
+superset ports list
+```
+
+Pick **Cloud** as the host when you create a workspace. Docs: [Cloud Workspaces](https://docs.paradev.com/cloud-workspaces).
+
+## Chrome Extensions in the Browser <PRBadge url="https://github.com/superset-sh/superset/pull/9221" />
+
+The browser pane now runs Chrome extensions. Install them from the Chrome Web Store, pin them to the toolbar, and sign in with 1Password or LastPass, passkeys included. Contributed by [@serhii-kucherenko](https://github.com/serhii-kucherenko).
+
+<Video src="/changelog/2026-11-08-browser-extensions.mp4" title="Installing Dark Reader from the Chrome Web Store, using extension popups and right-click items, then managing extensions from the CLI" />
+
+- 1Password talks to its desktop app, ad blockers like uBlock Origin Lite block ads, and Vimium and Google Translate work <PRBadge url="https://github.com/superset-sh/superset/pull/9327" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9328" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9330" />
+- Agents get their own browser without your extensions, and every install asks you first
+- Machines with more memory keep more pages open in the background, and a page that plays audio or holds a half-filled form is never closed <PRBadge url="https://github.com/superset-sh/superset/pull/9498" />
+
+Open a browser pane with ⌘⇧B and click the puzzle icon. From the CLI: `superset browser extensions list` <PRBadge url="https://github.com/superset-sh/superset/pull/9306" />.
+
+## The Chat Interface Is Out of Experimental <PRBadge url="https://github.com/superset-sh/superset/pull/9403" />
+
+Chat runs your agent as a conversation instead of a terminal. New users pick **Terminal** or **Chat** during onboarding <PRBadge url="https://github.com/superset-sh/superset/pull/9367" />.
+
+![The onboarding step that asks whether to work in a terminal or a chat](/changelog/2026-11-08-chat-onboarding.png)
+
+- Chips above the composer show running subagents and background tasks <PRBadge url="https://github.com/superset-sh/superset/pull/9289" />
+- A chat cut off by a quit or crash asks to resume on the next launch <PRBadge url="https://github.com/superset-sh/superset/pull/9432" />
+- New chats keep each agent's last model, effort and mode <PRBadge url="https://github.com/superset-sh/superset/pull/9410" />
+
+Turn it on in **Settings → General → Chat interface**. Docs: [Chat interface](https://docs.paradev.com/chat).
+
+## Paradev Is MIT Licensed <PRBadge url="https://github.com/superset-sh/superset/pull/9356" />
+
+Paradev moved from the Elastic License to MIT, so you can use and change the code however you want.
+
+## Improvements
+
+- **Import from other tools** - onboarding finds worktrees left by Conductor, T3 Code, Orca and others and imports them <PRBadge url="https://github.com/superset-sh/superset/pull/9362" />
+- **Archive automations** - archiving replaces delete and has Undo. Restore or delete permanently from the **Archived** tab <PRBadge url="https://github.com/superset-sh/superset/pull/9338" />
+- **Same workspace for automations** - every run can reuse one workspace, and **Continue** picks up the last conversation <PRBadge url="https://github.com/superset-sh/superset/pull/9378" />
+- **Set up a workspace from the keyboard** - type `#` in the new-workspace composer to pick project, host, environment and size <PRBadge url="https://github.com/superset-sh/superset/pull/9291" />
+- **Several GitHub organizations** - connect more than one GitHub organization to one Paradev organization <PRBadge url="https://github.com/superset-sh/superset/pull/9396" />
+- **Pages** - share a page with **Can edit**, and pinned pages show in the sidebar <PRBadge url="https://github.com/superset-sh/superset/pull/9302" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9295" />
+- **New plugins** - Inngest, Supabase, Firecrawl and Wispr Flow <PRBadge url="https://github.com/superset-sh/superset/pull/9273" />
+- **Tribute ringtone** - the train whistle Conductor played when a workspace finished, in **Settings → Ringtones** <PRBadge url="https://github.com/superset-sh/superset/pull/9415" />
+- **`.paradev` folders** - app data moves to `~/.paradev` by itself, and repos keep working from `.superset/` <PRBadge url="https://github.com/superset-sh/superset/pull/9158" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9248" />
+
+---
+
+**Bug fixes**
+
+- Copy in cloud workspace terminals reaches your clipboard <PRBadge url="https://github.com/superset-sh/superset/pull/9364" />
+- Narrow panes and small windows no longer paint text over text <PRBadge url="https://github.com/superset-sh/superset/pull/9226" />
+- Pull request lists show rows before their checks load <PRBadge url="https://github.com/superset-sh/superset/pull/9384" />
+- Schedules whose hours wrap past midnight fire every slot <PRBadge url="https://github.com/superset-sh/superset/pull/9274" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9278" />
+- Chats keep their permission mode across resume and fork, and prompts queue while a turn waits <PRBadge url="https://github.com/superset-sh/superset/pull/9354" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9361" />
+- Chats started from the CLI or mobile open as tabs <PRBadge url="https://github.com/superset-sh/superset/pull/9399" />
+- A failed plugin connect says why, and plugin accounts connect in more than one organization <PRBadge url="https://github.com/superset-sh/superset/pull/9418" /> <PRBadge url="https://github.com/superset-sh/superset/pull/9433" />
+- Only organization admins can connect a GitHub account <PRBadge url="https://github.com/superset-sh/superset/pull/9499" />
