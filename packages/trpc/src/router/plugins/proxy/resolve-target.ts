@@ -1,10 +1,6 @@
 import type { SelectConnection } from "@superset/db/schema";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
-import {
-	type ConnectorMethod,
-	getConnector,
-	secretInputNames,
-} from "@superset/shared/connectors";
+import { getConnector, secretInputNames } from "@superset/shared/connectors";
 import { env } from "../../../env";
 import { connectorServerUrl } from "../../../lib/connectors";
 import {
