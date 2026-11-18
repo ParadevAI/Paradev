@@ -5,12 +5,11 @@ import {
 	markAgentBrowsingSidebar,
 } from "renderer/stores/agent-sidebar-reveal";
 
-type Collections = Pick<AppCollections, "v2WorkspaceLocalState">;
+type Collections = Pick<AppCollections, "workspaceLocalState">;
 
 function isSidebarOpen(collections: Collections, workspaceId: string) {
 	return (
-		collections.v2WorkspaceLocalState.get(workspaceId)?.rightSidebarOpen ??
-		false
+		collections.workspaceLocalState.get(workspaceId)?.rightSidebarOpen ?? false
 	);
 }
 

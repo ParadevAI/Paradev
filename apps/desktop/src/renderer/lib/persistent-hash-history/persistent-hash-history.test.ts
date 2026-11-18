@@ -83,7 +83,7 @@ afterEach(() => {
 });
 
 describe("createPersistentHashHistory", () => {
-	it("lands a restart on the dashboard when the last page was a v1 route", () => {
+	it("drops v1 routes saved by builds before the route rename", () => {
 		storage.set(
 			"router-history",
 			JSON.stringify({
@@ -96,7 +96,37 @@ describe("createPersistentHashHistory", () => {
 		history.back();
 		expect(history.location.pathname).toBe("/");
 		history.back();
-		expect(history.location.pathname).toBe("/v2-workspace/abc");
+		expect(history.location.pathname).toBe("/workspace/abc");
+	});
+
+	it("rewrites entries saved under the old v2-workspace routes", () => {
+		storage.set(
+			"router-history",
+			JSON.stringify({
+				entries: ["/", "/v2-workspace/abc", "/v2-workspaces"],
+				index: 2,
+			}),
+		);
+		const history = createPersistentHashHistory();
+		expect(history.location.pathname).toBe("/workspaces");
+		history.back();
+		expect(history.location.pathname).toBe("/workspace/abc");
+	});
+
+	it("keeps entries saved by this build", () => {
+		storage.set(
+			"router-history",
+			JSON.stringify({
+				entries: ["/", "/workspace/abc", "/workspaces"],
+				index: 1,
+				routes: 2,
+			}),
+		);
+		const history = createPersistentHashHistory();
+		expect(history.location.pathname).toBe("/workspace/abc");
+		history.push("/tasks");
+		const stored = JSON.parse(storage.get("router-history") ?? "{}");
+		expect(stored.routes).toBe(2);
 	});
 
 	describe("push", () => {
@@ -247,6 +277,7 @@ describe("createPersistentHashHistory", () => {
 				JSON.stringify({
 					entries: ["/", "/tasks", "/workspace/xyz"],
 					index: 1,
+					routes: 2,
 				}),
 			);
 
@@ -351,14 +382,15 @@ describe("createPersistentHashHistory", () => {
 			storage.set(
 				"router-history",
 				JSON.stringify({
-					entries: ["/", "/tasks", "/v2-workspace/abc"],
+					entries: ["/", "/tasks", "/workspace/abc"],
 					index: 2,
+					routes: 2,
 				}),
 			);
 
 			const history = createPersistentHashHistory();
 			expect(history.length).toBe(3);
-			expect(history.location.pathname).toBe("/v2-workspace/abc");
+			expect(history.location.pathname).toBe("/workspace/abc");
 		});
 	});
 

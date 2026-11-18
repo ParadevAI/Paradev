@@ -798,6 +798,9 @@ msgstr "{appName} Mobile je součástí tarifu Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile spouští agenty na počítačích, které připojíte."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Archivovat # cloudový pracovní prostor} few {Archivovat # cloudové pracovní prostory} many {Archivovat # cloudového pracovního prostoru} other {Archivovat # cloudových pracovních prostorů}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Zaostává za main o # commit, je potřeba rebase} few {Zaostává za main o # commity, je potřeba rebase} many {Zaostává za main o # commitu, je potřeba rebase} other {Zaostává za main o # commitů, je potřeba rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {přidal(a) commit} few {přidal(a) # commity} many 
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Vytvořen # pracovní prostor} few {Vytvořeny # pracovní prostory} many {Vytvořeno # pracovního prostoru} other {Vytvořeno # pracovních prostorů}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Smazat # pracovní prostor} few {Smazat # pracovní prostory} many {Smazat # pracovního prostoru} other {Smazat # pracovních prostorů}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {upraven # soubor} few {upraveny # soubory} many {upraveno # souboru} other {upraveno # souborů}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, one {Zbývá # den} few {Zbývají # dny} many {Zbýv
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Váš účet je deaktivovaný a za # den bude trvale smazán. Obnovte ho a bude přesně takový, jaký jste ho opustili.} few {Váš účet je deaktivovaný a za # dny bude trvale smazán. Obnovte ho a bude přesně takový, jaký jste ho opustili.} many {Váš účet je deaktivovaný a za # dne bude trvale smazán. Obnovte ho a bude přesně takový, jaký jste ho opustili.} other {Váš účet je deaktivovaný a za # dní bude trvale smazán. Obnovte ho a bude přesně takový, jaký jste ho opustili.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Smazat # pracovní prostor} few {Smazat # pracovní prostory} many {Smazat # pracovního prostoru} other {Smazat # pracovních prostorů}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "Archivovat prostředí"
 msgid "Archive failed"
 msgstr "Archivace selhala"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Archivovat vybrané cloudové pracovní prostory"
+
 msgid "Archive this automation before you delete it."
 msgstr "Před smazáním tuto automatizaci archivujte."
 
@@ -5030,6 +5036,10 @@ msgstr "Porovnat tarify"
 
 msgid "Compared against the default style"
 msgstr "Porovnáno s výchozím stylem"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Srovnání"
 
 msgid "complete"
 msgstr "dokončeno"
@@ -12358,6 +12368,9 @@ msgstr "Nová skupina…"
 msgid "New issue"
 msgstr "Nová issue"
 
+msgid "New layout"
+msgstr "Nové rozvržení"
+
 msgid "New messages"
 msgstr "Nové zprávy"
 
@@ -12423,6 +12436,9 @@ msgstr "Nový pracovní prostor ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nový pracovní prostor v {name}"
+
+msgid "New workspace page"
+msgstr "Nová stránka pracovního prostoru"
 
 msgid "Newer than this app"
 msgstr "Novější než tato aplikace"
@@ -16010,6 +16026,9 @@ msgstr "se znovu připojil(a) ke kanálu {channel}, stejně jako {others}."
 msgid "rejoined {channel}."
 msgstr "se znovu připojil(a) ke kanálu {channel}."
 
+msgid "Related comparisons"
+msgstr "Související srovnání"
+
 msgid "Related Posts"
 msgstr "Související články"
 
@@ -16039,6 +16058,9 @@ msgstr "Znovu načíst z disku"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Načtěte Paradev znovu, aby se seznam pracovních prostorů obnovil."
+
+msgid "Reload to apply"
+msgstr "Znovu načíst pro použití"
 
 msgid "Reload window"
 msgstr "Načíst okno znovu"
@@ -16901,6 +16923,10 @@ msgstr "Otočit"
 
 msgid "Rotate device"
 msgstr "Otočit zařízení"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Přehled"
 
 msgid "Roundups"
 msgstr "Přehledy"
@@ -21103,6 +21129,10 @@ msgstr "udělej z poznatků o onboardingu stránku"
 msgid "Turned off because its files changed"
 msgstr "Vypnuto, protože se změnily jeho soubory"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Návod"
+
 msgid "Two Hands"
 msgstr "Obě ruce"
 
@@ -21672,6 +21702,12 @@ msgstr "Pro spouštění paralelních kódovacích agentů použijte desktopovou
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Použijte nabídku Paradev na liště > Host Service > Restart a zkuste to znovu."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Použít přepracovanou stránku „Nový pracovní prostor“: pole pro zadání uprostřed, nad ním výběr projektu a větve."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Použít přepracované rozvržení okna: lištu ikon, karty v záhlaví okna a panely jako karty."
 
 msgid "Use this account"
 msgstr "Použít tento účet"

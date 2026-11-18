@@ -798,6 +798,9 @@ msgstr "{appName} Mobile is part of Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile runs agents on the computers you connect."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {added a commit} other {added # commits}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Created # workspace} other {Created # workspaces}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {edited # file} other {edited # files}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, one {# day left} other {# days left}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "Archive environment"
 msgid "Archive failed"
 msgstr "Archive failed"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Archive selected cloud workspaces"
+
 msgid "Archive this automation before you delete it."
 msgstr "Archive this automation before you delete it."
 
@@ -5030,6 +5036,10 @@ msgstr "Compare plans"
 
 msgid "Compared against the default style"
 msgstr "Compared against the default style"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Comparison"
 
 msgid "complete"
 msgstr "complete"
@@ -12358,6 +12368,9 @@ msgstr "New group…"
 msgid "New issue"
 msgstr "New issue"
 
+msgid "New layout"
+msgstr "New layout"
+
 msgid "New messages"
 msgstr "New messages"
 
@@ -12423,6 +12436,9 @@ msgstr "New Workspace ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "New workspace in {name}"
+
+msgid "New workspace page"
+msgstr "New workspace page"
 
 msgid "Newer than this app"
 msgstr "Newer than this app"
@@ -16010,6 +16026,9 @@ msgstr "rejoined {channel}, along with {others}."
 msgid "rejoined {channel}."
 msgstr "rejoined {channel}."
 
+msgid "Related comparisons"
+msgstr "Related comparisons"
+
 msgid "Related Posts"
 msgstr "Related Posts"
 
@@ -16039,6 +16058,9 @@ msgstr "Reload from disk"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Reload Paradev to refresh the workspace list."
+
+msgid "Reload to apply"
+msgstr "Reload to apply"
 
 msgid "Reload window"
 msgstr "Reload window"
@@ -16901,6 +16923,10 @@ msgstr "Rotate"
 
 msgid "Rotate device"
 msgstr "Rotate device"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Roundup"
 
 msgid "Roundups"
 msgstr "Roundups"
@@ -21103,6 +21129,10 @@ msgstr "turn the onboarding findings into a page"
 msgid "Turned off because its files changed"
 msgstr "Turned off because its files changed"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
+
 msgid "Two Hands"
 msgstr "Two Hands"
 
@@ -21672,6 +21702,12 @@ msgstr "Use the desktop app to start running parallel coding agents."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Use the Paradev tray menu > Host Service > Restart, then retry."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
 
 msgid "Use this account"
 msgstr "Use this account"

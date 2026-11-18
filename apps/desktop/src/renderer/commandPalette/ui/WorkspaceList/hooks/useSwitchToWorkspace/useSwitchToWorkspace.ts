@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { track } from "renderer/lib/analytics";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useFrameStackStore } from "../../../../core/frames";
 import type { SwitcherRow } from "../../utils/bucketWorkspaces";
 
@@ -30,7 +30,7 @@ export function useSwitchToWorkspace(via: SwitchedVia) {
 				index,
 				...details,
 			});
-			void navigateToV2Workspace(row.workspace.id, navigate);
+			void navigateToWorkspace(row.workspace.id, navigate);
 		},
 		[via, setOpen, navigate],
 	);

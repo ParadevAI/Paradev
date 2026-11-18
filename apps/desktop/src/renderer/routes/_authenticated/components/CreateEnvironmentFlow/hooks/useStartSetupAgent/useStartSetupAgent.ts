@@ -53,7 +53,7 @@ export function useStartSetupAgent() {
 				rows ? [created, ...rows] : [created],
 			);
 			void navigate({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				params: { workspaceId: created.id },
 			});
 			void utils.cloudWorkspace.list.invalidate();

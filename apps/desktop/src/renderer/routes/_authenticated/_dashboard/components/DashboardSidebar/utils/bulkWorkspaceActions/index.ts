@@ -1,1 +1,4 @@
-export { workspaceIdsForSectionMove } from "./bulkWorkspaceActions";
+export {
+	splitBulkRemovalTargets,
+	workspaceIdsForSectionMove,
+} from "./bulkWorkspaceActions";

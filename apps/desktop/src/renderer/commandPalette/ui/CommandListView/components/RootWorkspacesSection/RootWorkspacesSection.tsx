@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { CommandGroup, CommandItem } from "@superset/ui/command";
 import { Layers } from "lucide-react";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { openWorkspaceList } from "../../../../modules/navigation/commands";
 import { KeyCaps } from "../../../KeyCaps";
 import { WorkspaceSwitcherRow } from "../../../WorkspaceList/components/WorkspaceSwitcherRow";

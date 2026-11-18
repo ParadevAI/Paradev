@@ -1,9 +1,6 @@
 import type { HostAgentConfig } from "@superset/host-service/settings";
 import { getPresetIcon } from "renderer/assets/app-icons/preset-icons";
-import {
-	type PresetIconSource,
-	resolveV2PresetIconKey,
-} from "./preset-icon-key";
+import { type PresetIconSource, resolvePresetIconKey } from "./preset-icon-key";
 
 /**
  * Resolves the preset-icon key for a terminal preset.
@@ -22,11 +19,11 @@ import {
  * Never resolve by `preset.name` — it's user-editable display text and would
  * silently break for any label with spaces, casing differences, or edits.
  */
-export function resolveV2PresetIcon(
+export function resolvePresetIcon(
 	preset: PresetIconSource,
 	agents: HostAgentConfig[] | undefined,
 	isDark: boolean,
 ): string | undefined {
-	const iconKey = resolveV2PresetIconKey(preset, agents);
+	const iconKey = resolvePresetIconKey(preset, agents);
 	return iconKey ? getPresetIcon(iconKey, isDark) : undefined;
 }

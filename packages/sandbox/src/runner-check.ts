@@ -314,6 +314,51 @@ try {
 		"status shows every step current",
 		!/pending|never run|failed/.test(sh("/bundle/setup status")),
 	);
+
+	// A stale file a link on PATH points at stays until the link moves.
+	sh(
+		`printf old > ${media}/linked.bin && printf ${sha256("old")} > ${media}/linked.bin.hash && ln -sfn ${media}/linked.bin /usr/local/bin/check-linked`,
+	);
+	sh("/bundle/setup sync-assets >/dev/null 2>&1");
+	expect(
+		"sync-assets keeps a stale file a link on PATH points at",
+		sh("cat /usr/local/bin/check-linked") === "old",
+	);
+	sh("rm /usr/local/bin/check-linked");
+	expect(
+		"run-steps prunes it once the link is gone",
+		/pruned .*linked\.bin/.test(sh("/bundle/setup run-steps")),
+	);
+
+	// Phases: flaky becomes a before-host step at a version it has not run.
+	sh(
+		`rm -f /opt/check/steps.log && awk -F'\t' -v OFS='\t' '$1 == "flaky" { $2 = "v-flaky-3"; $5 = "host" } { print }' /bundle/steps.tsv > /tmp/steps.tsv && mv /tmp/steps.tsv /bundle/steps.tsv && sed -i 's/v-after/v-after-2/; s/v-other/v-other-2/' /bundle/steps.tsv`,
+	);
+	const after1 = sh("/bundle/setup run-steps after-host");
+	expect(
+		"after-host does not run a before-host step, and skips what depends on one that is not current",
+		!/flaky ran/.test(sh("cat /opt/check/steps.log")) &&
+			/other ran/.test(sh("cat /opt/check/steps.log")) &&
+			/step after skipped: downstream of failed flaky/.test(after1),
+		after1
+			.trim()
+			.split("\n")
+			.filter((l) => /step/.test(l))
+			.join(" | "),
+	);
+	sh("rm -f /opt/check/steps.log");
+	sh("/bundle/setup run-steps before-host >/dev/null");
+	expect(
+		"before-host runs only the before-host steps",
+		sh("cat /opt/check/steps.log").trim() === "flaky ran",
+		sh("cat /opt/check/steps.log").trim().replaceAll("\n", ", "),
+	);
+	sh("/bundle/setup run-steps after-host >/dev/null");
+	expect(
+		"after-host then runs what depends on it",
+		/after ran/.test(sh("cat /opt/check/steps.log")) &&
+			!/pending|never run|failed/.test(sh("/bundle/setup status")),
+	);
 } finally {
 	docker(["rm", "-f", NAME], false);
 	rmSync(dir, { recursive: true, force: true });

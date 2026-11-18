@@ -1,4 +1,4 @@
-import { MIN_RIGHT_PANE_AREA_WIDTH } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/components/RightPaneArea/constants";
+import { MIN_RIGHT_PANE_AREA_WIDTH } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/RightPaneArea/constants";
 import {
 	MAX_WORKSPACE_SIDEBAR_WIDTH,
 	MIN_WORKSPACE_SIDEBAR_WIDTH,

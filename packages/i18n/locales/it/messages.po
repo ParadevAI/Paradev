@@ -798,6 +798,9 @@ msgstr "{appName} Mobile fa parte di Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile esegue gli agenti sui computer che colleghi."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Archivia # workspace cloud} other {Archivia # workspace cloud}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Indietro di # commit rispetto a main, serve un rebase} other {Indietro di # commit rispetto a main, serve un rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {ha aggiunto un commit} other {ha aggiunto # commit}
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Creato # workspace} other {Creati # workspace}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Elimina # workspace} other {Elimina # workspace}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {modificato # file} other {modificati # file}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, one {# giorno rimanente} other {# giorni rimanenti}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Il tuo account è disattivato e sarà eliminato definitivamente tra # giorno. Riattivalo per ripristinarlo esattamente come l'hai lasciato.} other {Il tuo account è disattivato e sarà eliminato definitivamente tra # giorni. Riattivalo per ripristinarlo esattamente come l'hai lasciato.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Elimina # workspace} other {Elimina # workspace}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "Archivia ambiente"
 msgid "Archive failed"
 msgstr "Archiviazione non riuscita"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Archivia i workspace cloud selezionati"
+
 msgid "Archive this automation before you delete it."
 msgstr "Archivia questa automazione prima di eliminarla."
 
@@ -5030,6 +5036,10 @@ msgstr "Confronta i piani"
 
 msgid "Compared against the default style"
 msgstr "Confrontato con lo stile predefinito"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Confronto"
 
 msgid "complete"
 msgstr "conclusa"
@@ -12358,6 +12368,9 @@ msgstr "Nuovo gruppo…"
 msgid "New issue"
 msgstr "Nuova issue"
 
+msgid "New layout"
+msgstr "Nuovo layout"
+
 msgid "New messages"
 msgstr "Nuovi messaggi"
 
@@ -12423,6 +12436,9 @@ msgstr "Nuovo workspace ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Nuovo workspace in {name}"
+
+msgid "New workspace page"
+msgstr "Nuova pagina workspace"
 
 msgid "Newer than this app"
 msgstr "Più recente di questa app"
@@ -16010,6 +16026,9 @@ msgstr "ha raggiunto di nuovo {channel}, insieme a {others}."
 msgid "rejoined {channel}."
 msgstr "ha raggiunto di nuovo {channel}."
 
+msgid "Related comparisons"
+msgstr "Confronti correlati"
+
 msgid "Related Posts"
 msgstr "Post correlati"
 
@@ -16039,6 +16058,9 @@ msgstr "Ricarica dal disco"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Ricarica Paradev per aggiornare l'elenco dei workspace."
+
+msgid "Reload to apply"
+msgstr "Ricarica per applicare"
 
 msgid "Reload window"
 msgstr "Ricarica la finestra"
@@ -16901,6 +16923,10 @@ msgstr "Ruota"
 
 msgid "Rotate device"
 msgstr "Ruota il dispositivo"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Rassegna"
 
 msgid "Roundups"
 msgstr "Panoramiche"
@@ -21103,6 +21129,10 @@ msgstr "trasforma i risultati sull'onboarding in una pagina"
 msgid "Turned off because its files changed"
 msgstr "Disattivata perché i suoi file sono cambiati"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
+
 msgid "Two Hands"
 msgstr "Due mani"
 
@@ -21672,6 +21702,12 @@ msgstr "Usa l'app desktop per iniziare a eseguire agenti di programmazione in pa
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Usa il menu della barra di stato di Paradev > Servizio host > Riavvia, poi riprova."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Usa la pagina «Nuovo workspace» riprogettata: la casella del prompt al centro, con i selettori di progetto e branch sopra."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Usa il layout della finestra riprogettato: una barra di icone, schede nella barra del titolo e pannelli come schede."
 
 msgid "Use this account"
 msgstr "Usa questo account"

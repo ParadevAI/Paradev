@@ -3,7 +3,7 @@ import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { type ReactNode, useMemo } from "react";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useCommandContext } from "../../core/ContextProvider";
 import { rankSections, scoreCommand } from "../../core/rankCommands";
 import type { Command } from "../../core/types";

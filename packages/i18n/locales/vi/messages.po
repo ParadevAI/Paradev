@@ -798,6 +798,9 @@ msgstr "{appName} Mobile thuộc gói Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile chạy agent trên những máy tính bạn kết nối."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Lưu trữ # workspace đám mây} other {Lưu trữ # workspace đám mây}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Chậm hơn main # commit, cần rebase} other {Chậm hơn main # commit, cần rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {đã thêm một commit} other {đã thêm # commit
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Đã tạo # workspace} other {Đã tạo # workspace}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Xóa # workspace} other {Xóa # workspace}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {đã sửa # tệp} other {đã sửa # tệp}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {Còn # ngày}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Tài khoản của bạn đã bị vô hiệu hóa và sẽ bị xóa vĩnh viễn sau # ngày. Kích hoạt lại để khôi phục đúng như lúc bạn rời đi.} other {Tài khoản của bạn đã bị vô hiệu hóa và sẽ bị xóa vĩnh viễn sau # ngày. Kích hoạt lại để khôi phục đúng như lúc bạn rời đi.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Xóa # workspace} other {Xóa # workspace}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "Lưu trữ environment"
 msgid "Archive failed"
 msgstr "Lưu trữ thất bại"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Lưu trữ các workspace đám mây đã chọn"
+
 msgid "Archive this automation before you delete it."
 msgstr "Hãy lưu trữ tự động hóa này trước khi xóa."
 
@@ -5030,6 +5036,10 @@ msgstr "So sánh gói"
 
 msgid "Compared against the default style"
 msgstr "So sánh với kiểu mặc định"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "So sánh"
 
 msgid "complete"
 msgstr "đã kết thúc"
@@ -12358,6 +12368,9 @@ msgstr "Nhóm mới…"
 msgid "New issue"
 msgstr "Issue mới"
 
+msgid "New layout"
+msgstr "Bố cục mới"
+
 msgid "New messages"
 msgstr "Tin nhắn mới"
 
@@ -12423,6 +12436,9 @@ msgstr "Workspace mới ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Workspace mới trong {name}"
+
+msgid "New workspace page"
+msgstr "Trang workspace mới"
 
 msgid "Newer than this app"
 msgstr "Mới hơn ứng dụng này"
@@ -16010,6 +16026,9 @@ msgstr "đã tham gia lại {channel}, cùng với {others}."
 msgid "rejoined {channel}."
 msgstr "đã tham gia lại {channel}."
 
+msgid "Related comparisons"
+msgstr "So sánh liên quan"
+
 msgid "Related Posts"
 msgstr "Bài viết liên quan"
 
@@ -16039,6 +16058,9 @@ msgstr "Tải lại từ đĩa"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Tải lại Paradev để làm mới danh sách workspace."
+
+msgid "Reload to apply"
+msgstr "Tải lại để áp dụng"
 
 msgid "Reload window"
 msgstr "Tải lại cửa sổ"
@@ -16901,6 +16923,10 @@ msgstr "Xoay"
 
 msgid "Rotate device"
 msgstr "Xoay thiết bị"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Tổng hợp"
 
 msgid "Roundups"
 msgstr "Tổng hợp"
@@ -21103,6 +21129,10 @@ msgstr "biến kết quả nghiên cứu onboarding thành một trang"
 msgid "Turned off because its files changed"
 msgstr "Đã tắt vì các tệp của tiện ích đã thay đổi"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Hướng dẫn"
+
 msgid "Two Hands"
 msgstr "Hai tay"
 
@@ -21672,6 +21702,12 @@ msgstr "Dùng ứng dụng máy tính để chạy song song nhiều agent lập
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Dùng menu khay Paradev > Host Service > Restart, rồi thử lại."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Dùng trang Workspace mới được thiết kế lại: ô nhập prompt ở giữa, phía trên là bộ chọn dự án và nhánh."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Dùng bố cục cửa sổ được thiết kế lại: thanh biểu tượng, các tab trên thanh tiêu đề và các ngăn dạng thẻ."
 
 msgid "Use this account"
 msgstr "Dùng tài khoản này"

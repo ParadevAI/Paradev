@@ -10,11 +10,11 @@ import {
 } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
 import { buildCloudSidebar } from "renderer/routes/_authenticated/_dashboard/utils/buildCloudSidebar";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useTagFolderContext } from "renderer/routes/_authenticated/utils/workspaceTagFolders";
-import { getFlattenedV2WorkspaceIds } from "../../utils/getFlattenedV2WorkspaceIds";
+import { getFlattenedWorkspaceIds } from "../../utils/getFlattenedWorkspaceIds";
 import { resolveWorkspaceRemovalNavigationTarget } from "./navigationTarget";
 
 function reportRemovalNavigationError(error: unknown) {
@@ -64,7 +64,7 @@ export function useNavigateAwayFromWorkspace() {
 			additionalDeletingWorkspaceIds?: ReadonlySet<string>,
 		) => {
 			const workspaceMatch = matchRoute({
-				to: "/v2-workspace/$workspaceId",
+				to: "/workspace/$workspaceId",
 				fuzzy: true,
 			});
 			const activeWorkspaceId =
@@ -76,7 +76,7 @@ export function useNavigateAwayFromWorkspace() {
 				// The cloud section renders above the sessions and projects.
 				orderedWorkspaceIds: [
 					...cloudWorkspaceIds,
-					...getFlattenedV2WorkspaceIds(
+					...getFlattenedWorkspaceIds(
 						collections,
 						workspaces,
 						tagFolderContext,
@@ -97,7 +97,7 @@ export function useNavigateAwayFromWorkspace() {
 
 			if (!target) return null;
 			if (target.kind === "workspace") {
-				void navigateToV2Workspace(target.workspaceId, navigate, {
+				void navigateToWorkspace(target.workspaceId, navigate, {
 					replace: true,
 				}).catch(reportRemovalNavigationError);
 				return target;

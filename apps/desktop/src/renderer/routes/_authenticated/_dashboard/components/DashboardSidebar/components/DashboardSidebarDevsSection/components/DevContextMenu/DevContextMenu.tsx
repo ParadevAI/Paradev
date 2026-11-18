@@ -53,7 +53,7 @@ export function DevContextMenu({
 		...options,
 		onSuccess: () => {
 			void utils.agent.invalidate();
-			if (isActive) void navigate({ to: "/v2-workspaces" });
+			if (isActive) void navigate({ to: "/workspaces" });
 		},
 	});
 	const isPaused = dev.pausedAt !== null;

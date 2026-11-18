@@ -47,7 +47,7 @@ export function DevScreen({ devId }: { devId: string }) {
 		...options,
 		onSuccess: () => {
 			void utils.agent.invalidate();
-			void navigate({ to: "/v2-workspaces" });
+			void navigate({ to: "/workspaces" });
 		},
 	});
 

@@ -43,21 +43,21 @@ export function useCliTerminalScriptImport(
 		// construction, and reading `.state` imperatively keeps this
 		// app-lifetime hook from subscribing to every preset change just to
 		// serve a rare one-shot sync.
-		const v2Presets = [...collections.v2TerminalPresets.state.values()];
-		const existingIds = new Set(v2Presets.map((preset) => preset.id));
-		let tabOrder = getNextTabOrder(v2Presets);
+		const presets = [...collections.terminalPresets.state.values()];
+		const existingIds = new Set(presets.map((preset) => preset.id));
+		let tabOrder = getNextTabOrder(presets);
 		const appliedIds: string[] = [];
 		for (const script of pendingScripts) {
 			try {
 				if (script.cliDeletePending) {
 					if (existingIds.has(script.id))
-						collections.v2TerminalPresets.delete(script.id);
+						collections.terminalPresets.delete(script.id);
 				} else if (existingIds.has(script.id)) {
-					collections.v2TerminalPresets.update(script.id, (draft) =>
+					collections.terminalPresets.update(script.id, (draft) =>
 						applyCliTerminalScriptEdit(draft, script),
 					);
 				} else {
-					collections.v2TerminalPresets.insert(
+					collections.terminalPresets.insert(
 						// No agent resolution: the user's explicit command must not be
 						// swapped for a live agent launch command.
 						buildV2TerminalPresetRow(
@@ -80,7 +80,7 @@ export function useCliTerminalScriptImport(
 		if (appliedIds.length > 0) acknowledge({ organizationId, ids: appliedIds });
 	}, [
 		acknowledge,
-		collections.v2TerminalPresets,
+		collections.terminalPresets,
 		organizationId,
 		pendingQuery.data,
 	]);

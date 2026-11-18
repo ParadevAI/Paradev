@@ -798,6 +798,9 @@ msgstr "{appName} Mobile termasuk dalam Pro"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile menjalankan agen di komputer yang Anda hubungkan."
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {Arsipkan # Workspace Cloud} other {Arsipkan # Workspace Cloud}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {Tertinggal # commit dari main, perlu rebase} other {Tertinggal # commit dari main, perlu rebase}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {menambahkan satu commit} other {menambahkan # commi
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {Membuat # workspace} other {Membuat # workspace}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {Hapus # Workspace} other {Hapus # Workspace}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {mengedit # file} other {mengedit # file}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {Sisa # hari}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Akun Anda dinonaktifkan dan akan dihapus permanen dalam # hari. Aktifkan kembali untuk memulihkannya persis seperti yang Anda tinggalkan.} other {Akun Anda dinonaktifkan dan akan dihapus permanen dalam # hari. Aktifkan kembali untuk memulihkannya persis seperti yang Anda tinggalkan.}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {Hapus # Workspace} other {Hapus # Workspace}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "Arsipkan environment"
 msgid "Archive failed"
 msgstr "Pengarsipan gagal"
 
+msgid "Archive selected cloud workspaces"
+msgstr "Arsipkan workspace cloud yang dipilih"
+
 msgid "Archive this automation before you delete it."
 msgstr "Arsipkan otomatisasi ini sebelum menghapusnya."
 
@@ -5030,6 +5036,10 @@ msgstr "Bandingkan paket"
 
 msgid "Compared against the default style"
 msgstr "Dibandingkan dengan gaya bawaan"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "Perbandingan"
 
 msgid "complete"
 msgstr "selesai"
@@ -12358,6 +12368,9 @@ msgstr "Grup baru…"
 msgid "New issue"
 msgstr "Issue baru"
 
+msgid "New layout"
+msgstr "Tata letak baru"
+
 msgid "New messages"
 msgstr "Pesan baru"
 
@@ -12423,6 +12436,9 @@ msgstr "Workspace Baru ({shortcutText})"
 
 msgid "New workspace in {name}"
 msgstr "Workspace baru di {name}"
+
+msgid "New workspace page"
+msgstr "Halaman workspace baru"
 
 msgid "Newer than this app"
 msgstr "Lebih baru dari aplikasi ini"
@@ -16010,6 +16026,9 @@ msgstr "bergabung kembali dengan {channel}, bersama {others}."
 msgid "rejoined {channel}."
 msgstr "bergabung kembali dengan {channel}."
 
+msgid "Related comparisons"
+msgstr "Perbandingan terkait"
+
 msgid "Related Posts"
 msgstr "Tulisan Terkait"
 
@@ -16039,6 +16058,9 @@ msgstr "Muat ulang dari disk"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "Muat ulang Paradev untuk menyegarkan daftar workspace."
+
+msgid "Reload to apply"
+msgstr "Muat ulang untuk menerapkan"
 
 msgid "Reload window"
 msgstr "Muat ulang jendela"
@@ -16901,6 +16923,10 @@ msgstr "Putar"
 
 msgid "Rotate device"
 msgstr "Putar perangkat"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "Rangkuman"
 
 msgid "Roundups"
 msgstr "Rangkuman"
@@ -21103,6 +21129,10 @@ msgstr "ubah temuan onboarding menjadi halaman"
 msgid "Turned off because its files changed"
 msgstr "Dimatikan karena file-nya berubah"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "Tutorial"
+
 msgid "Two Hands"
 msgstr "Dua tangan"
 
@@ -21672,6 +21702,12 @@ msgstr "Pakai aplikasi desktop untuk mulai menjalankan agen coding paralel."
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "Pakai menu tray Paradev > Host Service > Restart, lalu coba lagi."
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "Gunakan halaman Workspace Baru yang didesain ulang: kotak prompt di tengah, dengan pemilih proyek dan branch di atasnya."
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "Gunakan tata letak jendela yang didesain ulang: bilah ikon, tab di bilah judul, dan panel sebagai kartu."
 
 msgid "Use this account"
 msgstr "Gunakan akun ini"

@@ -18,7 +18,7 @@ export function useBoxResources(
 	{ enabled }: { enabled: boolean },
 ): BoxResources | null {
 	const openMatch = useMatchRoute()({
-		to: "/v2-workspace/$workspaceId",
+		to: "/workspace/$workspaceId",
 		fuzzy: true,
 	});
 	const isOpen = openMatch !== false && openMatch.workspaceId === workspaceId;

@@ -798,6 +798,9 @@ msgstr "{appName} Mobile屬於專業版"
 msgid "{appName} Mobile runs agents on the computers you connect."
 msgstr "{appName} Mobile在你連線的電腦上執行代理程式。"
 
+msgid "{archivableCount, plural, one {Archive # Cloud Workspace} other {Archive # Cloud Workspaces}}"
+msgstr "{archivableCount, plural, one {歸檔#個雲端工作區} other {歸檔#個雲端工作區}}"
+
 msgid "{behindCount, plural, one {Behind main by # commit, needs rebase} other {Behind main by # commits, needs rebase}}"
 msgstr "{behindCount, plural, one {落後main #個提交，需要變基} other {落後main #個提交，需要變基}}"
 
@@ -885,9 +888,6 @@ msgstr "{count, plural, one {新增了#個提交} other {新增了#個提交}}"
 
 msgid "{count, plural, one {Created # workspace} other {Created # workspaces}}"
 msgstr "{count, plural, one {已建立#個工作區} other {已建立#個工作區}}"
-
-msgid "{count, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
-msgstr "{count, plural, one {刪除#個工作區} other {刪除#個工作區}}"
 
 msgid "{count, plural, one {edited # file} other {edited # files}}"
 msgstr "{count, plural, one {編輯了 # 個檔案} other {編輯了 # 個檔案}}"
@@ -990,6 +990,9 @@ msgstr "{daysLeft, plural, other {剩餘 # 天}}"
 
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {你的帳戶已停用，將在#天後被永久刪除。重新啟用即可恢復到你離開時的狀態。} other {你的帳戶已停用，將在#天後被永久刪除。重新啟用即可恢復到你離開時的狀態。}}"
+
+msgid "{deletableCount, plural, one {Delete # Workspace} other {Delete # Workspaces}}"
+msgstr "{deletableCount, plural, one {刪除#個工作區} other {刪除#個工作區}}"
 
 msgid "{developerCount}+"
 msgstr "{developerCount}+"
@@ -3082,6 +3085,9 @@ msgstr "封存環境"
 msgid "Archive failed"
 msgstr "封存失敗"
 
+msgid "Archive selected cloud workspaces"
+msgstr "歸檔選中的雲端工作區"
+
 msgid "Archive this automation before you delete it."
 msgstr "請先歸檔此自動化，再刪除它。"
 
@@ -5030,6 +5036,10 @@ msgstr "方案對比"
 
 msgid "Compared against the default style"
 msgstr "與預設樣式做了對比"
+
+msgctxt "compare page type"
+msgid "Comparison"
+msgstr "比較"
 
 msgid "complete"
 msgstr "已結束"
@@ -12358,6 +12368,9 @@ msgstr "新增群組…"
 msgid "New issue"
 msgstr "新建議題"
 
+msgid "New layout"
+msgstr "新版面配置"
+
 msgid "New messages"
 msgstr "新訊息"
 
@@ -12423,6 +12436,9 @@ msgstr "新建工作區（{shortcutText}）"
 
 msgid "New workspace in {name}"
 msgstr "在 {name} 中新建工作區"
+
+msgid "New workspace page"
+msgstr "新版新建工作區頁面"
 
 msgid "Newer than this app"
 msgstr "比此應用程式新"
@@ -16010,6 +16026,9 @@ msgstr "與 {others} 一起重新加入了 {channel}。"
 msgid "rejoined {channel}."
 msgstr "已重新加入 {channel}。"
 
+msgid "Related comparisons"
+msgstr "相關比較"
+
 msgid "Related Posts"
 msgstr "相關文章"
 
@@ -16039,6 +16058,9 @@ msgstr "從磁碟重新載入"
 
 msgid "Reload Paradev to refresh the workspace list."
 msgstr "重新載入Paradev以重新整理工作區列表。"
+
+msgid "Reload to apply"
+msgstr "重新載入以套用"
 
 msgid "Reload window"
 msgstr "重新載入視窗"
@@ -16901,6 +16923,10 @@ msgstr "旋轉"
 
 msgid "Rotate device"
 msgstr "旋轉裝置"
+
+msgctxt "compare page type"
+msgid "Roundup"
+msgstr "彙整"
 
 msgid "Roundups"
 msgstr "綜合評測"
@@ -21103,6 +21129,10 @@ msgstr "把新手引導的調查結果做成頁面"
 msgid "Turned off because its files changed"
 msgstr "已關閉，因為其檔案已變更"
 
+msgctxt "compare page type"
+msgid "Tutorial"
+msgstr "教學"
+
 msgid "Two Hands"
 msgstr "雙手齊開"
 
@@ -21672,6 +21702,12 @@ msgstr "使用桌面應用程式開始並行執行編碼代理程式。"
 
 msgid "Use the Paradev tray menu > Host Service > Restart, then retry."
 msgstr "請使用Paradev托盤選單 > 主機服務 > 重啟，然後重試。"
+
+msgid "Use the redesigned New Workspace page: the prompt box in the middle, with project and branch pickers above it."
+msgstr "使用重新設計的「新建工作區」頁面：提示輸入框位於中間，上方是專案與分支選擇器。"
+
+msgid "Use the redesigned window layout: an icon rail, tabs in the title bar, and panes as cards."
+msgstr "使用重新設計的視窗版面配置：圖示欄、標題列中的分頁，以及卡片式窗格。"
 
 msgid "Use this account"
 msgstr "使用此帳戶"

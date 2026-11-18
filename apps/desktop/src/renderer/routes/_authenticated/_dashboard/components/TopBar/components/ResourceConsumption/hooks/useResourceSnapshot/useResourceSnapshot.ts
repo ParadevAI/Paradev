@@ -65,7 +65,7 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 	const { data: rawSidebarProjects = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ sp: collections.v2SidebarProjects })
+				.from({ sp: collections.sidebarProjects })
 				.orderBy(({ sp }) => sp.tabOrder, "asc")
 				.select(({ sp }) => ({ projectId: sp.projectId })),
 		[collections],
@@ -74,7 +74,7 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 	const { data: rawSidebarWorkspaces = [] } = useLiveQuery(
 		(q) =>
 			q
-				.from({ ws: collections.v2WorkspaceLocalState })
+				.from({ ws: collections.workspaceLocalState })
 				.orderBy(({ ws }) => ws.sidebarState.tabOrder, "asc")
 				.select(({ ws }) => ({
 					workspaceId: ws.workspaceId,
@@ -104,7 +104,7 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 
 	// Projects are fully local — identity comes from the host fan-out.
 	const { projects: hostProjects } = useHostProjects();
-	const rawV2Projects = useMemo(
+	const rawProjects = useMemo(
 		() =>
 			hostProjects.map((project) => ({
 				id: project.projectKey,
@@ -113,7 +113,7 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 		[hostProjects],
 	);
 
-	const { workspaces: rawV2Workspaces } = useHostWorkspaces();
+	const { workspaces: rawWorkspaces } = useHostWorkspaces();
 
 	const shouldQueryMetrics = shouldQueryResourceMonitor({
 		enabled: true,
@@ -145,23 +145,23 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 		if (!normalized) return normalized;
 
 		const projectById = new Map(
-			rawV2Projects.map((project) => [project.id, project]),
+			rawProjects.map((project) => [project.id, project]),
 		);
 		const workspaceById = new Map(
-			rawV2Workspaces.map((workspace) => [workspace.id, workspace]),
+			rawWorkspaces.map((workspace) => [workspace.id, workspace]),
 		);
 
 		return {
 			...normalized,
 			workspaces: normalized.workspaces.map((workspace) => {
-				const v2Workspace = workspaceById.get(workspace.workspaceId);
-				const projectId = v2Workspace?.projectId ?? workspace.projectId;
+				const hostWorkspace = workspaceById.get(workspace.workspaceId);
+				const projectId = hostWorkspace?.projectId ?? workspace.projectId;
 				const project = projectById.get(projectId);
 				return {
 					...workspace,
 					projectId,
 					projectName: project?.name ?? workspace.projectName,
-					workspaceName: v2Workspace?.name ?? workspace.workspaceName,
+					workspaceName: hostWorkspace?.name ?? workspace.workspaceName,
 					sessions: workspace.sessions.map((session) => ({
 						...session,
 						title:
@@ -172,7 +172,7 @@ export function useResourceSnapshot(): UseResourceSnapshotResult {
 				};
 			}),
 		};
-	}, [snapshot, rawV2Projects, rawV2Workspaces, terminalTitleOverrides]);
+	}, [snapshot, rawProjects, rawWorkspaces, terminalTitleOverrides]);
 
 	return {
 		snapshot: normalizedSnapshot,
