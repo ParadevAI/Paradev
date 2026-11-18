@@ -10,6 +10,7 @@ import {
 	index,
 	integer,
 	jsonb,
+	numeric,
 	pgEnum,
 	pgTable,
 	primaryKey,
@@ -31,7 +32,10 @@ import {
 	automationRunStatusValues,
 	automationSessionKindValues,
 	automationTriggerKindValues,
+	cloudUsageFeatureValues,
 	cloudWorkspaceActivityEventValues,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceFailureReasonValues,
 	cloudWorkspaceStatusValues,
 	cloudWorkspaceVisibilityValues,
 	commandStatusValues,
@@ -61,6 +65,7 @@ import {
 import { githubRepositories } from "./github";
 import type {
 	AutomationEventDispatchInput,
+	CloudWorkspaceBootPhase,
 	IntegrationConfig,
 	TriggerConfig,
 	UserIdentityMetadata,
@@ -85,6 +90,18 @@ export const cloudWorkspaceStatus = pgEnum(
 export const cloudWorkspaceVisibility = pgEnum(
 	"cloud_workspace_visibility",
 	cloudWorkspaceVisibilityValues,
+);
+export const cloudWorkspaceBootEndReason = pgEnum(
+	"cloud_workspace_boot_end_reason",
+	cloudWorkspaceBootEndReasonValues,
+);
+export const cloudWorkspaceFailureReason = pgEnum(
+	"cloud_workspace_failure_reason",
+	cloudWorkspaceFailureReasonValues,
+);
+export const cloudUsageFeature = pgEnum(
+	"cloud_usage_feature",
+	cloudUsageFeatureValues,
 );
 export const actorKind = pgEnum("actor_kind", actorKindValues);
 export const cloudWorkspaceActivityEvent = pgEnum(
@@ -992,6 +1009,8 @@ export const cloudWorkspaces = pgTable(
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
+		failureReason: cloudWorkspaceFailureReason("failure_reason"),
+		failedAt: timestamp("failed_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -1140,6 +1159,13 @@ export const cloudWorkspaceBoots = pgTable(
 		lockOpen: boolean("lock_open").notNull().default(true),
 		finalizedThrough: timestamp("finalized_through", { withTimezone: true }),
 		settleLeaseUntil: timestamp("settle_lease_until", { withTimezone: true }),
+		endReason: cloudWorkspaceBootEndReason("end_reason"),
+		activeCpuMs: bigint("active_cpu_ms", { mode: "number" }),
+		egressBytes: bigint("egress_bytes", { mode: "number" }),
+		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),
+		traceId: text("trace_id"),
+		// No foreign key, like organization_id: the boot keeps who it bills after the user is deleted.
+		createdByUserId: uuid("created_by_user_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
 			.defaultNow(),
@@ -1160,6 +1186,46 @@ export const cloudWorkspaceBoots = pgTable(
 			),
 	],
 );
+
+/** One amount we sent to Autumn for one lock of a boot, one row per feature. */
+export const cloudUsageEvents = pgTable(
+	"cloud_usage_events",
+	{
+		bootId: text("boot_id")
+			.notNull()
+			.references(() => cloudWorkspaceBoots.id),
+		lockSeq: integer("lock_seq").notNull(),
+		feature: cloudUsageFeature().notNull(),
+		// The attribution as sent to Autumn, so no foreign keys: a deleted row must not change billed history.
+		organizationId: uuid("organization_id").notNull(),
+		cloudWorkspaceId: uuid("cloud_workspace_id"),
+		userId: uuid("user_id"),
+		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
+		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
+		amount: numeric().notNull(),
+		sentAt: timestamp("sent_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		primaryKey({ columns: [table.bootId, table.lockSeq, table.feature] }),
+		index("cloud_usage_events_organization_id_sent_at_idx").on(
+			table.organizationId,
+			table.sentAt,
+		),
+		index("cloud_usage_events_unsent_idx")
+			.on(table.createdAt)
+			.where(sql`${table.sentAt} is null`),
+	],
+);
+
+export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
+export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
 
 export const cloudWorkspacePullRequests = pgTable(
 	"cloud_workspace_pull_requests",
