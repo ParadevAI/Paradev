@@ -2,11 +2,10 @@ import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
-import { isCloudUsageRefusal } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
-import { controlTags, logControl } from "../../lib/control-log";
+import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	buildSandboxClaim,
@@ -24,7 +23,7 @@ import {
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { transitionCloudWorkspace } from "./transition";
+import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
 
@@ -235,13 +234,15 @@ async function provision(
 				teardownError,
 			);
 		});
-		const changed = await transitionCloudWorkspace({
-			id: row.id,
-			from: ["provisioning", "awake", "asleep"],
-			to: "failed",
-			set: keepForDiagnosis ? { providerSandboxId } : {},
-		});
-		nudge(row.organizationId, "cloud_workspaces");
+		await failCloudWorkspace(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
+			{
+				from: ["provisioning", "awake", "asleep"],
+				set: keepForDiagnosis ? { providerSandboxId } : {},
+				site: "provision",
+				error,
+			},
+		);
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
 			(moveError) =>
 				console.error(
@@ -250,21 +251,6 @@ async function provision(
 				),
 		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
-		const scope = {
-			cloudWorkspaceId: row.id,
-			organizationId: row.organizationId,
-			bootId,
-		};
-		const refused = isCloudUsageRefusal(error);
-		logControl(
-			"workspace.failed",
-			scope,
-			{ "failure.site": "provision", "status.changed": changed },
-			refused ? "warn" : "error",
-		);
-		if (changed && !refused) {
-			Sentry.captureException(error, { tags: controlTags(scope) });
-		}
 		return "failed";
 	}
 }
