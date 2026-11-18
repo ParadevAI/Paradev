@@ -62,23 +62,6 @@ export function CloudWorkspacePage({
 		},
 	];
 
-	if (!periods.data || !query.data) {
-		return (
-			<div className="@container space-y-6">
-				<PageHeader
-					Link={Link}
-					crumbs={crumbs}
-					title={<Trans>Workspace</Trans>}
-				/>
-				<QueryStatus
-					isError={periods.isError || query.isError}
-					onRetry={() =>
-						periods.isError ? periods.refetch() : query.refetch()
-					}
-				/>
-			</div>
-		);
-	}
 	if (!row || !workspace) {
 		return (
 			<div className="@container space-y-6">
@@ -87,9 +70,18 @@ export function CloudWorkspacePage({
 					crumbs={crumbs}
 					title={<Trans>Workspace</Trans>}
 				/>
-				<Notice>
-					<Trans>This workspace has no usage in this period.</Trans>
-				</Notice>
+				{periods.data && query.data ? (
+					<Notice>
+						<Trans>This workspace has no usage in this period.</Trans>
+					</Notice>
+				) : (
+					<QueryStatus
+						isError={periods.isError || query.isError}
+						onRetry={() =>
+							periods.isError ? periods.refetch() : query.refetch()
+						}
+					/>
+				)}
 			</div>
 		);
 	}
