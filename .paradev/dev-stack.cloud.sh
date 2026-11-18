@@ -36,7 +36,7 @@ fi
 tmux new-window -t paradev -n realtime -c "$ROOT_DIR" \
   "bash '$ROOT_DIR/apps/realtime/scripts/dev-local.sh' 2>&1 | tee '$LOG_DIR/realtime-dev.log'"
 # shellcheck source=/dev/null
-. "$ROOT_DIR/.paradev/lib/setup/admin.sh"
+. "$ROOT_DIR/.paradev/lib/admin.sh"
 if ADMIN_DIR="$(admin_checkout_dir)"; then
   if [ -f "$ADMIN_DIR/.env.workspace" ] && [ -d "$ADMIN_DIR/node_modules" ]; then
     tmux new-window -t paradev -n admin -c "$ADMIN_DIR" \

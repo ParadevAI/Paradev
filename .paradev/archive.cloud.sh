@@ -11,7 +11,7 @@ source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/teardown/steps.sh"
 # shellcheck source=/dev/null
-source "$PARADEV_SCRIPT_DIR/lib/setup/admin.sh"
+source "$PARADEV_SCRIPT_DIR/lib/admin.sh"
 
 FAILED_STEPS=()
 SKIPPED_STEPS=()

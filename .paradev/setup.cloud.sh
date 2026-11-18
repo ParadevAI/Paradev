@@ -13,6 +13,8 @@ source "$PARADEV_SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/setup/steps.sh"
 # shellcheck source=/dev/null
+source "$PARADEV_SCRIPT_DIR/lib/admin.sh"
+# shellcheck source=/dev/null
 source "$PARADEV_SCRIPT_DIR/lib/setup/admin.sh"
 cd "$ROOT_DIR" || exit 1
 
