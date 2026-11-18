@@ -237,6 +237,14 @@ if [ -x /usr/local/bin/superset-memguard ]; then
 	stamp "memguard.start pid=$!"
 fi
 
+# Sends this box's own logs to Sentry, only when the claim turned it on; see the script.
+if [ "${SUPERSET_SANDBOX_BOX_LOGS:-}" = 1 ] && [ -n "${HOST_SERVICE_SENTRY_DSN:-}" ]; then
+	install -d -o "$SUPERSET_USER" -g "$SUPERSET_USER" "${SUPERSET_STATE_DIR}/logship"
+	env -u HOST_SERVICE_SECRET nice -n 10 setpriv --reuid="$SUPERSET_USER" --regid="$SUPERSET_USER" --init-groups \
+		/usr/local/bin/superset-logship >> "${SUPERSET_LOG_DIR}/logship.log" 2>&1 9>&- &
+	stamp "logship.start pid=$!"
+fi
+
 # The fixed swapfile of an earlier bundle; boxes have no swap now.
 [ -f /swapfile ] && ! grep -q "^/swapfile " /proc/swaps && rm -f /swapfile
 
@@ -244,23 +252,27 @@ fi
 # host-service runs it, because the environment the hook needs is pushed
 # into host-service after boot and never leaves it; this runner decides
 # when: once host-service answers, the push has landed and the checkout is in.
+# boot.log leaves the box, so it gets the outcome only: no command, no output.
 start_hook() {
 	local api="http://127.0.0.1:${SUPERSET_HOST_SERVICE_PORT}/trpc/sandbox"
 	local auth="Authorization: Bearer ${HOST_SERVICE_SECRET}"
-	local i
+	local i out started reason pid
 	for i in $(seq 1 1200); do
 		[ -f "${SUPERSET_RUN_DIR}/host-service.ready" ] &&
 			curl -fs -H "$auth" "${api}.status" 2>/dev/null | grep -q '"environmentPushed":true' && break
 		sleep 0.1
 	done
 	if [ "$i" -ge 1200 ]; then stamp "hook.skipped no environment push within 120s"; return 0; fi
-	local out
-	out="$(curl -fs -X POST -H "$auth" -H 'Content-Type: application/json' -d '{}' "${api}.runStartHook" 2>&1)" ||
-		{ stamp "hook.failed ${out:0:160}"; return 0; }
-	case "$out" in
-		*'"started":true'*) stamp "hook.started ${out}" ;;
-		*'"no-hook"'*) stamp "hook.none" ;;
-		*) stamp "hook.skipped ${out:0:160}" ;;
+	# host-service stamps how a setup exited; this stamps only whether it started.
+	out="$(curl -fs -X POST -H "$auth" -H 'Content-Type: application/json' -d '{}' "${api}.runStartHook" 2>/dev/null |
+		jq -r '.result.data.json | [(.started | tostring), (.reason // ""), (.pid // "" | tostring)] | join("|")' 2>/dev/null)"
+	IFS='|' read -r started reason pid <<< "$out"
+	case "${started}:${reason}" in
+		true:*) stamp "hook.started pid=${pid}" ;;
+		false:no-hook) stamp "hook.none" ;;
+		false:failed) stamp "hook.start.failed" ;;
+		false:*) stamp "hook.skipped ${reason//[^a-z-]/}" ;;
+		*) stamp "hook.start.failed no answer from host-service" ;;
 	esac
 }
 
