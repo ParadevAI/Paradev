@@ -1,9 +1,11 @@
 import * as Sentry from "@sentry/core";
+import { db } from "@superset/db/client";
+import { cloudWorkspaces } from "@superset/db/schema";
+import { and, eq, type SQL } from "drizzle-orm";
 import { deleteSandbox, stopSandbox } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
+import { nextSandboxNameFor } from "./provision";
 import { liveReferences } from "./teardown-guard";
-
-export const TEARDOWN_JOB_PATH = "/api/cloud-workspaces/teardown";
 
 export interface TeardownSandboxInput {
 	providerSandboxId: string;
@@ -69,14 +71,61 @@ async function retryOrAbandon(
 	return "retrying";
 }
 
-export function queueTeardown(
+function queueTeardown(
 	input: TeardownSandboxInput,
 	delaySeconds?: number,
 ): Promise<void> {
 	return publishCloudWorkspaceJob({
-		path: TEARDOWN_JOB_PATH,
+		path: "/api/cloud-workspaces/teardown",
 		body: input,
 		delaySeconds,
 		runLocally: teardownSandbox,
 	});
+}
+
+/** Every box goes through the retried job, which reads the rows again just before it deletes. */
+export async function deleteSandboxAndDriveLater(args: {
+	providerSandboxId: string;
+	driveName: string | null | undefined;
+	keepDrive?: boolean;
+}): Promise<void> {
+	if (args.driveName) {
+		throw new Error(
+			`no drive teardown yet: ${args.providerSandboxId} names drive ${args.driveName}`,
+		);
+	}
+	await queueTeardown({
+		providerSandboxId: args.providerSandboxId,
+		driveName: null,
+		attempt: 0,
+	});
+}
+
+/**
+ * Takes the row's box name out of use in the same write that commits to
+ * deleting the box, then queues its teardown. A wake after it finds a name
+ * that does not exist, never the box being deleted. Returns false when the
+ * row no longer matches `condition` or names another box.
+ */
+export async function retireAndTearDown(
+	row: { id: string; providerSandboxId: string; driveName: string | null },
+	condition: SQL | undefined,
+): Promise<boolean> {
+	const [retired] = await db
+		.update(cloudWorkspaces)
+		.set({ providerSandboxId: nextSandboxNameFor(row.id) })
+		.where(
+			and(
+				eq(cloudWorkspaces.id, row.id),
+				eq(cloudWorkspaces.providerSandboxId, row.providerSandboxId),
+				condition,
+			),
+		)
+		.returning({ id: cloudWorkspaces.id });
+	if (!retired) return false;
+	await deleteSandboxAndDriveLater({
+		providerSandboxId: row.providerSandboxId,
+		driveName: row.driveName,
+	});
+	return true;
 }

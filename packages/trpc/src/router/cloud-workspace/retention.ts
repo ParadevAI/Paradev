@@ -20,13 +20,12 @@ import {
 	listAllSandboxes,
 	SandboxUnavailableError,
 } from "../../lib/sandbox";
-import { nextSandboxNameFor } from "./provision";
 import {
 	ARCHIVE_GRACE_SECONDS,
 	reapArchivedCloudWorkspace,
 	reapUndatedArchivedCloudWorkspace,
 } from "./reap";
-import { queueTeardown } from "./teardown";
+import { deleteSandboxAndDriveLater, retireAndTearDown } from "./teardown";
 import { namedSandboxes } from "./teardown-guard";
 import { failCloudWorkspace } from "./transition";
 
@@ -49,8 +48,8 @@ export const ARCHIVED_BATCH = 20;
 export const ARCHIVED_BACKSTOP_AFTER_MS = ARCHIVE_GRACE_SECONDS * 1000 + DAY_MS;
 /** Stops starting new work here, well inside the route's 300 s; the rest waits for the next run. */
 export const RUN_BUDGET_MS = 200_000;
-/** One delete a second: far under Vercel's 20 deletions a second per team. */
-const TEARDOWN_SPACING_SECONDS = 1;
+/** At most 4 teardowns queued a second: far under Vercel's 20 deletions a second per team. */
+export const TEARDOWN_SPACING_MS = 250;
 const NAME_LOOKUP_CHUNK = 500;
 const SETTLED_STATUSES = new Set(["stopped", "failed", "aborted"]);
 
@@ -105,29 +104,30 @@ async function findIdleWorkspaces(
 }
 
 /**
- * The 410 path's terminal state, and the box's name taken off the row in the
- * same update, so nothing can wake the box being deleted. False when the row
+ * Takes the box's name off the row while it is still asleep and idle, and
+ * queues the box's teardown; then fails the row as the 410 path does. A wake
+ * between the two finds no box and fails the row itself. False when the row
  * changed since it was read: woken, archived, or given another box.
  */
-export function retireIdleWorkspace(
+export async function retireIdleWorkspace(
 	row: IdleWorkspace,
 	cutoff: Date,
 ): Promise<boolean> {
-	return failCloudWorkspace({
+	const retired = await retireAndTearDown(
+		{ id: row.id, providerSandboxId: row.providerSandboxId, driveName: null },
+		and(eq(cloudWorkspaces.status, "asleep"), stillIdleAndAsleep(cutoff)),
+	);
+	if (!retired) return false;
+	await failCloudWorkspace({
 		scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 		from: ["asleep"],
-		where: and(
-			eq(cloudWorkspaces.providerSandboxId, row.providerSandboxId),
-			stillIdleAndAsleep(cutoff),
-		),
-		set: {
-			sandboxUrl: null,
-			providerSandboxId: nextSandboxNameFor(row.id),
-		},
+		where: stillIdleAndAsleep(cutoff),
+		set: { sandboxUrl: null },
 		reason: "snapshot_expired",
 		error: new Error(`idle since before ${cutoff.toISOString()}`),
 		expected: true,
 	});
+	return true;
 }
 
 /** True when the box runs a session now; false when it is stopped or gone. */
@@ -222,10 +222,8 @@ export interface RetentionDeps {
 	findArchivedPastGraceAmong: typeof findArchivedPastGraceAmong;
 	reapArchived: typeof reapArchivedCloudWorkspace;
 	reapUndatedArchived: typeof reapUndatedArchivedCloudWorkspace;
-	queueTeardown: (
-		providerSandboxId: string,
-		delaySeconds: number,
-	) => Promise<void>;
+	tearDownOrphan: (providerSandboxId: string) => Promise<void>;
+	pause: (ms: number) => Promise<void>;
 }
 
 const defaultDeps: RetentionDeps = {
@@ -238,11 +236,9 @@ const defaultDeps: RetentionDeps = {
 	findArchivedPastGraceAmong,
 	reapArchived: reapArchivedCloudWorkspace,
 	reapUndatedArchived: reapUndatedArchivedCloudWorkspace,
-	queueTeardown: (providerSandboxId, delaySeconds) =>
-		queueTeardown(
-			{ providerSandboxId, driveName: null, attempt: 0 },
-			delaySeconds,
-		),
+	tearDownOrphan: (providerSandboxId) =>
+		deleteSandboxAndDriveLater({ providerSandboxId, driveName: null }),
+	pause: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
 export interface RetentionRun {
@@ -297,18 +293,15 @@ export async function reapCloudWorkspaceRetention({
 }): Promise<RetentionRun> {
 	const startedAt = clock();
 	const outOfTime = () => clock() - startedAt > RUN_BUDGET_MS;
-	let slot = 0;
-	const queue = (name: string) =>
-		deps.queueTeardown(name, slot++ * TEARDOWN_SPACING_SECONDS);
 	const retiredNames = new Set<string>();
-	const idle = await reapIdle({ now, deps, queue, retiredNames, outOfTime });
+	const idle = await reapIdle({ now, deps, retiredNames, outOfTime });
 	const notProduction = { skipped: "not production" } as const;
 	const boxes = production ? await deps.listAllSandboxes() : [];
 	const archived = production
 		? await reapArchived({ now, deps, boxes, outOfTime })
 		: notProduction;
 	const orphans = production
-		? await reapOrphans({ now, deps, boxes, queue, retiredNames, outOfTime })
+		? await reapOrphans({ now, deps, boxes, retiredNames, outOfTime })
 		: notProduction;
 	const run = { idle, archived, orphans };
 	console.log("[cloud-workspace] retention run", JSON.stringify(run));
@@ -329,13 +322,11 @@ export async function reapCloudWorkspaceRetention({
 async function reapIdle({
 	now,
 	deps,
-	queue,
 	retiredNames,
 	outOfTime,
 }: {
 	now: number;
 	deps: RetentionDeps;
-	queue: (name: string) => Promise<void>;
 	retiredNames: Set<string>;
 	outOfTime: () => boolean;
 }): Promise<RetentionRun["idle"]> {
@@ -365,8 +356,7 @@ async function reapIdle({
 			}
 			counts.retired++;
 			retiredNames.add(row.providerSandboxId);
-			// A retired box whose teardown is not queued is an orphan: a later run queues it.
-			await queue(row.providerSandboxId);
+			await deps.pause(TEARDOWN_SPACING_MS);
 		} catch (error) {
 			counts.failed++;
 			Sentry.captureException(error, {
@@ -443,14 +433,12 @@ async function reapOrphans({
 	now,
 	deps,
 	boxes,
-	queue,
 	retiredNames,
 	outOfTime,
 }: {
 	now: number;
 	deps: RetentionDeps;
 	boxes: ListedSandbox[];
-	queue: (name: string) => Promise<void>;
 	retiredNames: Set<string>;
 	outOfTime: () => boolean;
 }): Promise<Exclude<RetentionRun["orphans"], { skipped: string }>> {
@@ -472,8 +460,9 @@ async function reapOrphans({
 			break;
 		}
 		try {
-			await queue(name);
+			await deps.tearDownOrphan(name);
 			queued++;
+			await deps.pause(TEARDOWN_SPACING_MS);
 		} catch (error) {
 			failed++;
 			Sentry.captureException(error, { extra: { providerSandboxId: name } });

@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import * as sandbox from "../../lib/sandbox";
 import * as jobs from "./jobs";
 import {
+	deleteSandboxAndDriveLater,
+	retireAndTearDown,
 	TEARDOWN_ATTEMPTS,
-	TEARDOWN_JOB_PATH,
 	teardownSandbox,
 } from "./teardown";
 import * as guard from "./teardown-guard";
@@ -13,6 +15,8 @@ let calls: string[] = [];
 let namedOnRead: boolean[] = [];
 let deleteFails = false;
 let queued: Array<{ path: string; body: unknown; delaySeconds?: number }> = [];
+let updateMatches = true;
+let renamedTo: unknown;
 
 stub(guard, {
 	liveReferences: async () => ({ sandbox: namedOnRead.shift() ?? false }),
@@ -26,6 +30,18 @@ stub(sandbox, {
 		if (deleteFails) throw new Error("vercel down");
 		calls.push(`delete:${name}`);
 	},
+});
+stub(db, {
+	update: () => ({
+		set: (values: { providerSandboxId: string }) => {
+			renamedTo = values.providerSandboxId;
+			return {
+				where: () => ({
+					returning: async () => (updateMatches ? [{ id: "ws_1" }] : []),
+				}),
+			};
+		},
+	}),
 });
 stub(jobs, {
 	publishCloudWorkspaceJob: async (job: {
@@ -42,6 +58,8 @@ beforeEach(() => {
 	namedOnRead = [];
 	deleteFails = false;
 	queued = [];
+	updateMatches = true;
+	renamedTo = undefined;
 });
 
 const input = { providerSandboxId: "ws-old", driveName: null, attempt: 0 };
@@ -62,12 +80,45 @@ describe("teardownSandbox", () => {
 		deleteFails = true;
 		expect(await teardownSandbox(input)).toBe("retrying");
 		expect(queued).toMatchObject([
-			{ path: TEARDOWN_JOB_PATH, body: { ...input, attempt: 1 } },
+			{
+				path: "/api/cloud-workspaces/teardown",
+				body: { ...input, attempt: 1 },
+			},
 		]);
 		queued = [];
 		expect(
 			await teardownSandbox({ ...input, attempt: TEARDOWN_ATTEMPTS - 1 }),
 		).toBe("abandoned");
 		expect(queued).toEqual([]);
+	});
+});
+
+describe("retireAndTearDown", () => {
+	const row = { id: "ws_1", providerSandboxId: "ws-old", driveName: null };
+
+	test("gives the row a new box name and queues the old box's teardown only when the update matched", async () => {
+		updateMatches = false;
+		expect(await retireAndTearDown(row, undefined)).toBe(false);
+		expect(queued).toEqual([]);
+		updateMatches = true;
+		expect(await retireAndTearDown(row, undefined)).toBe(true);
+		expect(renamedTo).toMatch(/^ws-ws_1[0-9a-f]{8}$/);
+		expect(queued).toMatchObject([
+			{ path: "/api/cloud-workspaces/teardown", body: input },
+		]);
+		expect(calls).toEqual([]);
+	});
+});
+
+describe("deleteSandboxAndDriveLater", () => {
+	test("a box without a drive goes through the retried job too, not an inline delete", async () => {
+		await deleteSandboxAndDriveLater({
+			providerSandboxId: "ws-old",
+			driveName: null,
+		});
+		expect(calls).toEqual([]);
+		expect(queued).toMatchObject([
+			{ path: "/api/cloud-workspaces/teardown", body: input },
+		]);
 	});
 });

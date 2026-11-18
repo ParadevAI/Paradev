@@ -9,7 +9,9 @@ import {
 	RUN_BUDGET_MS,
 	reapCloudWorkspaceRetention,
 	retireIdleWorkspace,
+	TEARDOWN_SPACING_MS,
 } from "./retention";
+import * as teardown from "./teardown";
 import * as transition from "./transition";
 
 const NOW = Date.parse("2026-11-18T06:00:00Z");
@@ -34,7 +36,8 @@ const box = (
 });
 
 function fakeDeps(overrides: Partial<RetentionDeps> = {}) {
-	const queued: Array<[string, number]> = [];
+	const queued: string[] = [];
+	const paused: number[] = [];
 	const retired: string[] = [];
 	const reaped: unknown[] = [];
 	const deps: RetentionDeps = {
@@ -56,18 +59,21 @@ function fakeDeps(overrides: Partial<RetentionDeps> = {}) {
 			reaped.push(input);
 			return "reaped";
 		},
-		queueTeardown: async (name, delaySeconds) => {
-			queued.push([name, delaySeconds]);
+		tearDownOrphan: async (name) => {
+			queued.push(name);
+		},
+		pause: async (ms) => {
+			paused.push(ms);
 		},
 		...overrides,
 	};
-	return { deps, queued, retired, reaped };
+	return { deps, queued, paused, retired, reaped };
 }
 
 describe("reapCloudWorkspaceRetention", () => {
-	test("retires each idle workspace and queues its box's teardown a second apart", async () => {
+	test("retires each idle workspace, a pause apart", async () => {
 		let cutoff: Date | undefined;
-		const { deps, queued, retired } = fakeDeps({
+		const { deps, paused, retired } = fakeDeps({
 			findIdleWorkspaces: async (at) => {
 				cutoff = at;
 				return [idleRow(1), idleRow(2)];
@@ -80,15 +86,12 @@ describe("reapCloudWorkspaceRetention", () => {
 		});
 		expect(cutoff?.getTime()).toBe(NOW - RETENTION_IDLE_MS);
 		expect(retired).toEqual(["ws_1", "ws_2"]);
-		expect(queued).toEqual([
-			["ws-box1", 0],
-			["ws-box2", 1],
-		]);
+		expect(paused).toEqual([TEARDOWN_SPACING_MS, TEARDOWN_SPACING_MS]);
 		expect(run.idle).toMatchObject({ found: 2, retired: 2 });
 	});
 
 	test("a box that runs a session now is skipped, not retired", async () => {
-		const { deps, queued, retired } = fakeDeps({
+		const { deps, retired } = fakeDeps({
 			findIdleWorkspaces: async () => [idleRow(1)],
 			boxIsRunning: async () => true,
 		});
@@ -98,12 +101,11 @@ describe("reapCloudWorkspaceRetention", () => {
 			deps,
 		});
 		expect(retired).toEqual([]);
-		expect(queued).toEqual([]);
 		expect(run.idle.skippedRunning).toBe(1);
 	});
 
 	test("a row woken or changed after it was read keeps its box", async () => {
-		const { deps, queued } = fakeDeps({
+		const { deps, paused } = fakeDeps({
 			findIdleWorkspaces: async () => [idleRow(1)],
 			retireIdleWorkspace: async () => false,
 		});
@@ -112,7 +114,7 @@ describe("reapCloudWorkspaceRetention", () => {
 			production: false,
 			deps,
 		});
-		expect(queued).toEqual([]);
+		expect(paused).toEqual([]);
 		expect(run.idle.skippedChanged).toBe(1);
 	});
 
@@ -136,11 +138,7 @@ describe("reapCloudWorkspaceRetention", () => {
 			production: true,
 			deps,
 		});
-		expect(queued).toEqual([
-			["ws-box1", 0],
-			["ws-orphan", 1],
-			["env-orphan", 2],
-		]);
+		expect(queued).toEqual(["ws-orphan", "env-orphan"]);
 		expect(run.orphans).toEqual({
 			listed: 7,
 			orphaned: 2,
@@ -270,7 +268,17 @@ describe("reapCloudWorkspaceRetention", () => {
 });
 
 describe("retireIdleWorkspace", () => {
+	let retiring: Parameters<typeof teardown.retireAndTearDown> | undefined;
+	let retires = true;
 	let failed: Parameters<typeof transition.failCloudWorkspace>[0] | undefined;
+	stub(teardown, {
+		retireAndTearDown: async (
+			...args: Parameters<typeof teardown.retireAndTearDown>
+		) => {
+			retiring = args;
+			return retires;
+		},
+	});
 	stub(transition, {
 		failCloudWorkspace: async (
 			args: Parameters<typeof transition.failCloudWorkspace>[0],
@@ -280,8 +288,19 @@ describe("retireIdleWorkspace", () => {
 		},
 	});
 
-	test("fails the row as an expired snapshot and gives it a new box name in the same update", async () => {
-		await retireIdleWorkspace(idleRow(1), new Date(NOW - RETENTION_IDLE_MS));
+	test("retires the box name while the row is asleep and idle, then fails the row as an expired snapshot", async () => {
+		const cutoff = new Date(NOW - RETENTION_IDLE_MS);
+		retires = false;
+		expect(await retireIdleWorkspace(idleRow(1), cutoff)).toBe(false);
+		expect(failed).toBeUndefined();
+		retires = true;
+		expect(await retireIdleWorkspace(idleRow(1), cutoff)).toBe(true);
+		expect(retiring?.[0]).toEqual({
+			id: "ws_1",
+			providerSandboxId: "ws-box1",
+			driveName: null,
+		});
+		expect(retiring?.[1]).toBeDefined();
 		expect(failed).toMatchObject({
 			scope: { cloudWorkspaceId: "ws_1", organizationId: "org_1" },
 			from: ["asleep"],
@@ -289,8 +308,5 @@ describe("retireIdleWorkspace", () => {
 			expected: true,
 			set: { sandboxUrl: null },
 		});
-		expect(failed?.set?.providerSandboxId).toMatch(/^ws-ws_1[0-9a-f]{8}$/);
-		expect(failed?.set?.providerSandboxId).not.toBe("ws-box1");
-		expect(failed?.where).toBeDefined();
 	});
 });

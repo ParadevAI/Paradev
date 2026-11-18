@@ -1,7 +1,4 @@
-import {
-	TEARDOWN_JOB_PATH,
-	teardownSandbox,
-} from "@superset/trpc/cloud-workspace-teardown";
+import { teardownSandbox } from "@superset/trpc/cloud-workspace-teardown";
 import { z } from "zod";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
@@ -19,7 +16,11 @@ const payloadSchema = z
 /** Stops a box, then deletes it with its snapshots; requeues itself on failure. */
 export async function POST(request: Request): Promise<Response> {
 	const body = await request.text();
-	const rejected = await verifyQstashRequest(request, body, TEARDOWN_JOB_PATH);
+	const rejected = await verifyQstashRequest(
+		request,
+		body,
+		"/api/cloud-workspaces/teardown",
+	);
 	if (rejected) return rejected;
 
 	const parsed = payloadSchema.safeParse(JSON.parse(body));

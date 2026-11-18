@@ -792,8 +792,9 @@ could not resume, and the box itself stayed in Vercel. New workspace boxes are
 now created with `snapshotExpiration: 0`. The `reap-retention` job, every 6 hours,
 (`router/cloud-workspace/retention.ts`) does three things. It moves a workspace
 that is asleep and unused for 30 days to `failed`/`snapshot_expired`, the same
-state as the 410. It gives the row a new box name in that same update. Then it
-queues `teardownSandbox`, which deletes the box only if no row names it. "Unused"
+state as the 410. First `retireAndTearDown` gives the row a new box name and
+queues `teardownSandbox`, which deletes the box only if no row names it; then
+the row fails. A wake between the two finds no box and fails the row itself. "Unused"
 means no boot started or stopped since then, with `sandbox_expires_at` and
 `created_at` older too, so a wake in flight (its boot row is written before
 Vercel resumes) keeps the box. Archive deletes its box at the end of the
