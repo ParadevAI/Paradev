@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Model-checks Drive.tla.
-#   ./run.sh               the seven scenarios with the proposed fixes; every rule must hold
+#   ./run.sh               the eight scenarios with the proposed fixes; every rule must hold
 #   ./run.sh CONFIG.cfg    one config, one worker, so a failure prints the shortest trace
 #   ./run.sh head          each rule alone against the code at head (the scenarios, fixes off)
 #   ./run.sh bugs          each Drive-bug-*.cfg: every fix but one; prints the rule it breaks
@@ -16,9 +16,10 @@ if [ ! -s "$JAR" ]; then
 fi
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
-SCENARIOS="Drive.cfg Drive-rearchive.cfg Drive-race.cfg Drive-boot.cfg Drive-env.cfg Drive-twoprov.cfg Drive-fresh.cfg"
+SCENARIOS="Drive.cfg Drive-rearchive.cfg Drive-race.cfg Drive-boot.cfg Drive-env.cfg Drive-twoprov.cfg Drive-fresh.cfg Drive-expiry.cfg"
 RULES="NoWorkLost NeverEmptyShownAsWork SingleWriter NoTeardownOfLive NoDriveUnchanged
-  NoStuckForever FreshForkIsFetched TransientIsRetried NoOrphanForever DriveOnlyByProvision"
+  NoStuckForever FreshForkIsFetched TransientIsRetried NoOrphanForever DriveOnlyByProvision
+  NoDeleteWhileMountable ExpiredDriveDeleted"
 
 # tlc CONFIG WORKERS: prints TLC's output.
 tlc() {
@@ -41,8 +42,8 @@ check() {
 }
 only_rule() {  # only_rule CONFIG RULE OUT
   local check="INVARIANTS $2"
-  [ "$2" = DriveOnlyByProvision ] && check="PROPERTIES $2"
-  awk -v check="$check" '/^INVARIANTS|^PROPERTIES/ { skip = 1 } /^SYMMETRY/ { skip = 0; print check } !skip' \
+  case "$2" in DriveOnlyByProvision|NoDeleteWhileMountable|ExpiredDriveDeleted) check="PROPERTIES $2" ;; esac
+  awk -v check="$check" '/^INVARIANTS|^PROPERTIES/ { skip = 1 } /^SYMMETRY|^CONSTRAINT/ && skip { skip = 0; print check } !skip' \
     "$1" > "$3"
 }
 head_of() { sed -E 's/(Fix[A-Za-z]+|HasSweep) = TRUE/\1 = FALSE/g' "$1"; }

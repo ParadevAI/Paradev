@@ -42,11 +42,14 @@ CONSTANTS
   WakeClaimFromEnv,    \* broken only: a wake's claim names the environment's drive
   WakeWritesDrive,     \* broken only: a wake writes a drive name to the row
   \* Fixes the code does not have. FALSE is the code.
+  FixCronStranded,     \* the expiry probe also takes a provisioning row whose box expired, and
+                       \* fails it (onBox) before the retire
 
   \* Bounds
   RefusalLimit,  \* DRIVE_REFUSAL_LIMIT
   MaxSessions, MaxMountFails, MaxRedeliveries, MaxArchives, MaxEnvChanges,
   MaxBundleChanges, MaxWakes, MaxAborts, MaxSweeps, MaxFetchFails,
+  MaxExpiries,   \* snapshot expiries (30 days after a box's last use)
   Wakers,        \* concurrent wake calls, as model values
   ProvJobs       \* provision jobs that can run at once; the first is the create's
 
@@ -77,17 +80,24 @@ VARIABLES
   bundle,    \* the environment's pinned bundle: aware | old (no drive support)
   hasWork, workDrive, workBox,            \* ghost: the user's work and where it is
   doubleMount, badDel, failedTransient,   \* ghosts for the rules
-  sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails   \* bounds
+  sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails,  \* bounds
+  expD,      \* ghost: the drive the row named when its box's snapshot expired, or 0
+  expiries,
+  gone,      \* box names whose snapshot expired: Sandbox.get answers 410
+  uv         \* a caller that got SandboxUnavailableError: [ph, b, d] (markSandboxUnavailable)
 
 vars == <<status, rowBox, rowDrive, rowLaid, epoch, graceOver, pj, wk, boxes, drives,
           reapQ, tdQ, sweepD, locked, reprovs, envDrive, gOwn, gBr, bundle, hasWork, workDrive, workBox,
           doubleMount, badDel, failedTransient,
-          sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails>>
+          sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails,
+          expD, expiries, gone, uv>>
 rowVars == <<status, rowBox, rowDrive, rowLaid, epoch, graceOver>>
 envVars == <<envDrive, gOwn, gBr, bundle>>
 workVars == <<hasWork, workDrive, workBox>>
 ghostVars == <<hasWork, workDrive, workBox, doubleMount, badDel, failedTransient>>
 budgetVars == <<sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails>>
+expVars == <<expD, expiries, gone, uv>>
+IdleUv == [ph |-> "idle", b |-> 0, d |-> 0, c |-> FALSE]
 
 NoBox == [ex |-> FALSE, run |-> FALSE, mount |-> 0, next |-> 0, cD |-> 0, cL |-> FALSE,
           boot |-> "none", why |-> "none", bound |-> FALSE, lay |-> FALSE, fresh |-> FALSE,
@@ -119,6 +129,7 @@ Init ==
   /\ doubleMount = FALSE /\ badDel = FALSE /\ failedTransient = FALSE
   /\ sessions = 0 /\ mfail = 0 /\ redeliveries = 0 /\ envCh = 0 /\ bundleCh = 0
   /\ wakes = 0 /\ aborts = 0 /\ sweeps = 0 /\ fetchFails = 0
+  /\ expD = 0 /\ expiries = 0 /\ gone = {} /\ uv = IdleUv
 
 \* ---------------------------------------------------------------- boxes
 \* The boot log is on the root disk; a boot that refused for good, or started
@@ -178,7 +189,7 @@ Boot1(b) ==
        ELSE /\ boxes' = [boxes EXCEPT ![b].boot = "p2"]
             /\ UNCHANGED drives
   /\ UNCHANGED <<rowVars, pj, wk, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* checkout_one on a laid-out drive, then checkout()'s removal of state/fresh.
 \* con: golden = the golden's copy, untouched; fresh = fetched for this workspace;
@@ -237,7 +248,7 @@ Boot2(b) ==
                                ELSE d2
   /\ UNCHANGED <<rowVars, pj, wk, reapQ, tdQ, sweepD, envVars, ghostVars,
                  sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* settleSandbox, with the caller's claim cd.
 SettleOK(bx, cd) == bx.run /\ bx.boot = "up" /\ (cd # 0 /\ SettleNeedsLayout => bx.lay)
@@ -252,7 +263,7 @@ SessionEnds(b) ==
   /\ boxes[b].ex /\ boxes[b].run
   /\ boxes' = [boxes EXCEPT ![b] = CleanStop(@)]
   /\ UNCHANGED <<rowVars, pj, wk, drives, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 Abort(b) ==
   /\ boxes[b].ex /\ boxes[b].run /\ aborts < MaxAborts
@@ -260,7 +271,7 @@ Abort(b) ==
   /\ aborts' = aborts + 1
   /\ UNCHANGED <<rowVars, pj, wk, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
                  sessions, mfail, redeliveries, envCh, bundleCh, wakes, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 Detach(d) ==
   LET a == drives[d].att IN
@@ -268,7 +279,28 @@ Detach(d) ==
   /\ ~(boxes[a].ex /\ boxes[a].run /\ boxes[a].mount = d)
   /\ drives' = [drives EXCEPT ![d].att = 0]
   /\ UNCHANGED <<rowVars, pj, wk, boxes, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
+
+\* WORKSPACE_SNAPSHOT_EXPIRATION_MS (vercel.ts:59): 30 days after a box's last use its
+\* snapshot expires and a resume answers 410 (SandboxUnavailableError). Nothing used the
+\* box in those days, so no call is in flight on it and its drive has detached. The work
+\* on that box and on the row's drive is no longer the user's to keep (decided 2026-11-18).
+\* Archiving does not use the box, so it can expire inside an archive's grace too.
+SnapshotExpires(b) ==
+  /\ expiries < MaxExpiries /\ b # 0
+  /\ boxes[b].ex /\ ~boxes[b].run
+  /\ \A d \in DriveIds : drives[d].att # b
+  /\ \A w \in Wakers : wk[w].ph = "idle" \/ wk[w].b # b
+  /\ \A j \in ProvJobs : pj[j].pc = "none" \/ pj[j].box # b
+  /\ b = rowBox => ProvIdle   \* a queued provision is redelivered within minutes
+  /\ uv.ph = "idle" \/ uv.b # b
+  /\ boxes' = [boxes EXCEPT ![b] = NoBox]
+  /\ expiries' = expiries + 1 /\ gone' = gone \cup {b}
+  /\ IF b = rowBox
+       THEN /\ hasWork' = FALSE /\ expD' = rowDrive
+       ELSE UNCHANGED <<hasWork, expD>>
+  /\ UNCHANGED <<rowVars, pj, wk, drives, reapQ, tdQ, sweepD, envVars, workDrive, workBox,
+                 doubleMount, badDel, failedTransient, budgetVars, locked, reprovs, uv>>
 
 UserWork ==
   LET bx == boxes[rowBox] IN
@@ -285,7 +317,7 @@ UserWork ==
   /\ hasWork' = TRUE
   /\ UNCHANGED <<rowVars, pj, wk, reapQ, tdQ, sweepD, envVars, doubleMount, badDel,
                  failedTransient, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* ------------------------------------------------------------- provision
 \* kd: keepDrive (a lost provision's own box; the drive is never deleted); ld: the drive is kept.
@@ -308,7 +340,7 @@ ProvClaim(j) ==
                                          ep |-> epoch, forked |-> FALSE, own |-> FALSE]]
   /\ UNCHANGED <<status, rowBox, rowLaid, epoch, graceOver, wk, boxes, drives, reapQ, tdQ,
                  sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* deleteSandboxAndDriveLater for a box the caller itself gives up on.
 OwnTearDown(b, d) ==
@@ -361,7 +393,7 @@ ProvFork(j) ==
               /\ UNCHANGED <<status, rowBox, rowDrive, boxes, tdQ, badDel>>
   /\ UNCHANGED <<epoch, graceOver, wk, reapQ, sweepD, envVars, workVars,
                  doubleMount, failedTransient, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* provisionSandbox under the resume lock (a provision waits for it): a missing box is
 \* created with the drive (after waiting for the drive); a stopped box waits for its
@@ -376,12 +408,12 @@ ProvCreate(j) ==
        THEN /\ pj' = [pj EXCEPT ![j].pc = "mark"]
             /\ (CreateWaitsDetach /\ WaitDetach) => Detached(J.d)
             /\ Start(J.box, [NoBox EXCEPT !.next = J.d], J.d, J.d, FALSE)
-            /\ UNCHANGED locked
+            /\ UNCHANGED <<locked, expVars>>
        ELSE /\ pj' = [pj EXCEPT ![j].pc = IF bx.run THEN "write" ELSE "waitd"]
             /\ locked' = IF ResumeLock THEN locked \cup {key} ELSE locked
             /\ UNCHANGED <<boxes, drives, doubleMount, mfail, sessions>>
   /\ UNCHANGED <<rowVars, wk, reapQ, tdQ, sweepD, envVars, workVars, badDel, failedTransient,
-                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs>>
+                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* Still under the lock: the drive has detached; update the mounts and resume.
 ProvWaitDone(j) ==
@@ -396,7 +428,7 @@ ProvWaitDone(j) ==
        THEN UNCHANGED <<boxes, drives, doubleMount, mfail, sessions>>
        ELSE Start(J.box, [bx EXCEPT !.next = next], next, J.d, FALSE)
   /\ UNCHANGED <<rowVars, wk, reapQ, tdQ, sweepD, envVars, workVars, badDel, failedTransient,
-                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs>>
+                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* writeIdentity and runBoot on a box that was running when read. Through its Session
 \* they fail if the session ended; the stopped path then runs under the lock. Without
@@ -414,7 +446,7 @@ ProvWrite(j) ==
                      IF RunningResumeChecked THEN next ELSE bx.next, J.d, FALSE)
        ELSE UNCHANGED <<boxes, drives, doubleMount, mfail, sessions>>
   /\ UNCHANGED <<rowVars, wk, reapQ, tdQ, sweepD, envVars, workVars, badDel, failedTransient,
-                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs>>
+                 redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* The fork, the create, or the drive wait (DriveStillAttachedError) throws.
 ProvError(j) ==
@@ -424,7 +456,7 @@ ProvError(j) ==
   /\ redeliveries' = redeliveries + 1
   /\ ProvFailNow(j)
   /\ locked' = IF pj[j].pc = "waitd" THEN locked \ {LockKey(pj[j].box, pj[j].d)} ELSE locked
-  /\ UNCHANGED <<sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs>>
+  /\ UNCHANGED <<sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* The lock wait (lock_timeout 20s) runs out: SandboxBusyError. With ProvLockRetry the
 \* provision requeues itself and touches nothing; without it the catch handles it as a
@@ -442,7 +474,7 @@ ProvLockTimeout(j) ==
             /\ failedTransient' = (failedTransient \/ won)
   /\ UNCHANGED <<rowBox, rowDrive, rowLaid, epoch, graceOver, wk, drives, reapQ, tdQ, sweepD,
                  envVars, workVars, doubleMount, badDel, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* transitionCloudWorkspace(provisioning -> awake, onBox). A row that names another box
 \* (an undo gave it a second provision) is not this job's: its box goes, keeping the
@@ -466,7 +498,7 @@ ProvMark(j) ==
                  ELSE UNCHANGED <<boxes, tdQ, badDel>>
   /\ UNCHANGED <<rowDrive, rowLaid, epoch, graceOver, wk, drives, reapQ, sweepD, envVars,
                  workVars, doubleMount, failedTransient, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* settleSandbox, then recordDriveLaidOut. A SandboxDriveMissingError leaves the row
 \* asleep with the box stopped; a terminal refusal or a timeout keeps the box, stopped,
@@ -491,7 +523,7 @@ ProvSettle(j) ==
               /\ UNCHANGED rowLaid
   /\ UNCHANGED <<rowBox, rowDrive, epoch, graceOver, wk, drives, reapQ, tdQ, sweepD, envVars,
                  workVars, doubleMount, badDel, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* The function dies between two steps (a lock goes with its transaction); QStash may
 \* deliver the job again from the top.
@@ -503,7 +535,7 @@ ProvDie(j) ==
   /\ locked' = IF pj[j].pc \in {"write", "waitd"} THEN locked \ {LockKey(pj[j].box, pj[j].d)}
                ELSE locked
   /\ UNCHANGED <<rowVars, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
-                 sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs>>
+                 sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* QStash delivers the provision a second time while the first still runs.
 ProvDup(j) ==
@@ -514,7 +546,7 @@ ProvDup(j) ==
   /\ pj' = [pj EXCEPT ![j] = [IdleJob EXCEPT !.pc = "claim"]]
   /\ UNCHANGED <<rowVars, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
                  sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* ------------------------------------------------------------------ wake
 WakeD == IF rowDrive # 0 THEN rowDrive ELSE IF WakeClaimFromEnv /\ envDrive THEN rowBox ELSE 0
@@ -535,7 +567,7 @@ WakeStart(w) ==
                                b |-> rowBox, d |-> rowDrive, cd |-> WakeD,
                                cl |-> WakeL, laid |-> rowLaid, run |-> bx.run]]
   /\ UNCHANGED <<rowVars, pj, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
-                 sessions, mfail, redeliveries, envCh, bundleCh, aborts, sweeps, fetchFails, reprovs>>
+                 sessions, mfail, redeliveries, envCh, bundleCh, aborts, sweeps, fetchFails, reprovs, expVars>>
 
 WakeWaitDone(w) ==
   LET W == wk[w]
@@ -543,7 +575,7 @@ WakeWaitDone(w) ==
   /\ W.ph = "waitd" /\ Detached(dd)
   /\ wk' = [wk EXCEPT ![w].ph = "waited"]
   /\ UNCHANGED <<rowVars, pj, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* Still under the lock: a stopped box gets update({ mounts }) (a failed drive update
 \* throws), then resumeSession, writeIdentity and runBoot. A box read as running is used
@@ -571,7 +603,7 @@ WakeResume(w) ==
                    ELSE Start(b, [bx EXCEPT !.next = next], next, W.cd, W.cl)
   /\ UNCHANGED <<status, rowBox, rowLaid, epoch, graceOver, pj, reapQ, tdQ, sweepD, envVars,
                  workVars, badDel, failedTransient, redeliveries, envCh, bundleCh, wakes,
-                 aborts, sweeps, fetchFails, reprovs>>
+                 aborts, sweeps, fetchFails, reprovs, expVars>>
 
 \* settleSandbox; a refusal stops the box under the lock (skipped if another caller holds
 \* it): retried ("still starting"), or, terminal, markSandboxUnavailable fails the row.
@@ -593,7 +625,7 @@ WakeSettle(w) ==
             /\ UNCHANGED rowLaid
   /\ UNCHANGED <<rowBox, rowDrive, epoch, graceOver, pj, drives, reapQ, tdQ, sweepD, envVars,
                  ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 WakeDie(w) ==
   /\ wk[w].ph # "idle"
@@ -601,15 +633,58 @@ WakeDie(w) ==
   /\ locked' = IF wk[w].ph \in {"waited", "waitd"} THEN locked \ {LockKey(wk[w].b, wk[w].d)}
                ELSE locked
   /\ UNCHANGED <<rowVars, pj, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars, budgetVars,
-                 reprovs>>
+                 reprovs, expVars>>
 
-\* markSandboxUnavailable: the box is gone, the row is failed.
-WakeUnavailable ==
-  /\ status = "awake" /\ ~boxes[rowBox].ex
-  /\ status' = "failed"
+\* A wake, an agent turn or an automation dispatch reads the row (status awake or
+\* asleep) and finds its box gone (404) or expired (410): SandboxUnavailableError.
+UnavailRead ==
+  /\ uv.ph = "idle" /\ status = "awake" /\ ~boxes[rowBox].ex
+  /\ uv' = [ph |-> "read", b |-> rowBox, d |-> rowDrive, c |-> FALSE]
+  /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
+                 budgetVars, locked, reprovs, expD, expiries, gone>>
+
+\* markSandboxUnavailable (wake.ts:220): transitionCloudWorkspace by id, from awake or
+\* asleep to failed, with no onBox; the row it was given is the caller's read.
+UnavailFail ==
+  /\ uv.ph = "read"
+  /\ status' = IF status = "awake" \/ (FixCronStranded /\ uv.c /\ status = "provisioning" /\ rowBox = uv.b)
+                THEN "failed" ELSE status
+  /\ uv' = IF uv.d # 0 /\ uv.b \in gone THEN [uv EXCEPT !.ph = "failed"] ELSE IdleUv
   /\ UNCHANGED <<rowBox, rowDrive, rowLaid, epoch, graceOver, pj, wk, boxes, drives, reapQ,
-                 tdQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+                 tdQ, sweepD, envVars, ghostVars, budgetVars, locked, reprovs, expD, expiries, gone>>
+
+\* On a 410 with a drive (wake.ts:250-262): retireAndTearDown where the row is failed and
+\* still names that box and drive; then the retried teardown. A failure is only logged.
+UnavailRetire ==
+  /\ uv.ph = "failed"
+  /\ uv' = IdleUv
+  /\ IF ~RetireNames
+       THEN /\ tdQ' = tdQ \cup {TdJob(uv.b, uv.d, "failed")}
+            /\ UNCHANGED <<rowBox, rowDrive, rowLaid>>
+     ELSE IF status = "failed" /\ rowBox = uv.b /\ rowDrive = uv.d
+       THEN /\ rowBox' = 0 /\ rowDrive' = 0 /\ rowLaid' = FALSE
+            /\ tdQ' = tdQ \cup {TdJob(uv.b, uv.d, "failed")}
+       ELSE UNCHANGED <<rowBox, rowDrive, rowLaid, tdQ>>
+  /\ UNCHANGED <<status, epoch, graceOver, pj, wk, boxes, drives, reapQ, sweepD, envVars,
+                 ghostVars, budgetVars, locked, reprovs, expD, expiries, gone>>
+
+\* expireWorkspaceDrives (drive-expiry.ts), daily: a row asleep or failed that names a drive,
+\* its box stopped over 30 days ago (workspaceDriveExpiryCandidates); describeSandbox, and a
+\* 410 goes to markSandboxUnavailable with the row as read. Any other answer: nothing.
+CronRead ==
+  /\ uv.ph = "idle"
+  /\ status \in {"awake", "failed"} \cup (IF FixCronStranded THEN {"provisioning"} ELSE {})
+  /\ rowDrive # 0 /\ rowBox \in gone
+  /\ uv' = [ph |-> "read", b |-> rowBox, d |-> rowDrive, c |-> TRUE]
+  /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
+                 budgetVars, locked, reprovs, expD, expiries, gone>>
+
+\* The function dies, or retireAndTearDown throws (caught and logged): nothing retries it.
+UnavailDie ==
+  /\ uv.ph # "idle"
+  /\ uv' = IdleUv
+  /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
+                 budgetVars, locked, reprovs, expD, expiries, gone>>
 
 \* ------------------------------------------------- archive, reap, unarchive
 Archive ==
@@ -619,17 +694,18 @@ Archive ==
   /\ boxes' = [boxes EXCEPT ![rowBox].ok = FALSE]
   /\ UNCHANGED <<rowBox, rowDrive, rowLaid, pj, wk, drives, tdQ, sweepD, envVars,
                  ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* Seven days pass: the user's deletion is due; their work may now go.
 GraceEnds ==
   /\ status = "archived" /\ ~graceOver
   /\ ProvIdle /\ \A w \in Wakers : wk[w].ph = "idle"
+  /\ uv.ph = "idle"
   /\ graceOver' = TRUE /\ hasWork' = FALSE
   /\ UNCHANGED <<status, rowBox, rowDrive, rowLaid, epoch, pj, wk, boxes, drives, reapQ, tdQ,
                  sweepD, envVars, workDrive, workBox, doubleMount, badDel, failedTransient,
                  budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* The stop stage after a minute; the delete stage after the grace, which retires the
 \* row's names in the write that checks the archive (retireAndTearDown), then queues
@@ -655,15 +731,16 @@ ReapRun(j) ==
               /\ UNCHANGED <<rowBox, rowDrive, rowLaid>>
   /\ UNCHANGED <<status, epoch, graceOver, pj, wk, drives, sweepD, envVars,
                  workVars, doubleMount, failedTransient, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* Resumable while the old box exists; otherwise a new box name, the drive name kept,
 \* and a new provision job.
+\* sandboxExists (cloud-workspace.ts:941) throws on a 410: an unarchive fails, changing nothing.
 Unarchive ==
-  /\ status = "archived"
+  /\ status = "archived" /\ rowBox \notin gone
   /\ IF rowBox # 0 /\ boxes[rowBox].ex
        THEN /\ status' = "awake"
-            /\ UNCHANGED <<rowBox, pj, reprovs>>
+            /\ UNCHANGED <<rowBox, pj, reprovs, expVars>>
        ELSE /\ rowBox # 2 /\ reprovs = 0 /\ ~boxes[2].ex
             /\ \E j \in ProvJobs :
                  /\ pj[j].pc = "none"
@@ -672,7 +749,7 @@ Unarchive ==
   /\ graceOver' = FALSE
   /\ UNCHANGED <<rowDrive, rowLaid, epoch, wk, boxes, drives, reapQ, tdQ, sweepD, envVars,
                  ghostVars, budgetVars>>
-  /\ UNCHANGED locked
+  /\ UNCHANGED <<locked, expVars>>
 
 \* teardownSandbox: [check rows, stop] [wait detach, check rows] [delete box]
 \* [check rows] [delete drive]. Keyed on names; any failure requeues from the top.
@@ -715,7 +792,7 @@ TdRun(j) ==
                     /\ UNCHANGED boxes
   /\ UNCHANGED <<rowVars, pj, wk, reapQ, sweepD, envVars, workVars, doubleMount,
                  failedTransient, sessions, mfail, envCh, bundleCh, wakes, aborts, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* After TEARDOWN_ATTEMPTS with the drive still attached the job gives up.
 TdAbandon(j) ==
@@ -723,7 +800,7 @@ TdAbandon(j) ==
   /\ ~(KeepDriveWaitsOwnBox /\ j.kd /\ drives[j.d].att # j.b)
   /\ Done(j)
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, sweepD, envVars, ghostVars, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* drive-sweep: a drive no row owns (a row archived past its grace owns nothing),
 \* not attached when listed; deleted later from that list.
@@ -737,7 +814,7 @@ SweepList(d) ==
   /\ sweepD' = d /\ sweeps' = sweeps + 1
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, envVars, ghostVars,
                  sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 SweepDelete ==
   /\ sweepD # 0
@@ -748,7 +825,7 @@ SweepDelete ==
        ELSE UNCHANGED <<drives, badDel>>
   /\ UNCHANGED <<rowVars, pj, wk, boxes, reapQ, tdQ, envVars, workVars, doubleMount,
                  failedTransient, budgetVars>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* ----------------------------------------------------------- environment
 NewGoldenDrive ==
@@ -758,7 +835,7 @@ NewGoldenDrive ==
   /\ gBr' \in BOOLEAN
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, bundle, ghostVars,
                  sessions, mfail, redeliveries, bundleCh, wakes, aborts, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 \* A release or promote leaving drive mode, or the drives flag turned off.
 LeaveDriveMode ==
@@ -766,14 +843,14 @@ LeaveDriveMode ==
   /\ envDrive' = FALSE
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, gOwn, gBr, bundle,
                  ghostVars, sessions, mfail, redeliveries, bundleCh, wakes, aborts, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 BundleChange ==
   /\ bundleCh < MaxBundleChanges /\ bundleCh' = bundleCh + 1
   /\ bundle' = IF bundle = "aware" THEN "old" ELSE "aware"
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envDrive, gOwn, gBr,
                  ghostVars, sessions, mfail, redeliveries, envCh, wakes, aborts, sweeps, fetchFails>>
-  /\ UNCHANGED <<locked, reprovs>>
+  /\ UNCHANGED <<locked, reprovs, expVars>>
 
 Next ==
   \/ \E j \in ProvJobs : ProvClaim(j) \/ ProvFork(j) \/ ProvCreate(j) \/ ProvWaitDone(j)
@@ -781,7 +858,7 @@ Next ==
                          \/ ProvSettle(j) \/ ProvDie(j) \/ ProvDup(j)
   \/ \E w \in Wakers : WakeStart(w) \/ WakeWaitDone(w) \/ WakeResume(w) \/ WakeSettle(w)
                        \/ WakeDie(w)
-  \/ WakeUnavailable
+  \/ UnavailRead \/ CronRead \/ UnavailFail \/ UnavailRetire \/ UnavailDie
   \/ \E b \in Boxes : Boot1(b) \/ Boot2(b) \/ SessionEnds(b) \/ Abort(b)
   \/ \E d \in DriveIds : Detach(d) \/ SweepList(d)
   \/ SweepDelete
@@ -790,8 +867,20 @@ Next ==
   \/ \E j \in reapQ : ReapRun(j)
   \/ \E j \in tdQ : TdRun(j) \/ TdAbandon(j)
   \/ NewGoldenDrive \/ LeaveDriveMode \/ BundleChange
+  \/ \E b \in Boxes : SnapshotExpires(b)
 
 Spec == Init /\ [][Next]_vars
+\* The retried cleanup: every queued job runs again until it is done, a stopped box's
+\* drive detaches, and an archive's grace ends.
+FairSpec == /\ Spec
+            /\ WF_vars(\E j \in tdQ : TdRun(j))
+            /\ WF_vars(\E j \in reapQ : ReapRun(j))
+            /\ WF_vars(\E d \in DriveIds : Detach(d))
+            /\ WF_vars(GraceEnds)   \* time passes
+\* And the daily expiry probe runs: it reaches every candidate, and a call it keeps
+\* retrying does not die every time.
+FairSpecCron == /\ FairSpec
+                /\ WF_vars(CronRead) /\ SF_vars(UnavailFail) /\ SF_vars(UnavailRetire)
 
 WakerSymmetry == Permutations(Wakers)
 
@@ -837,5 +926,18 @@ FreshForkIsFetched == \A d \in DriveIds : drives[d].con # "stale"
 TransientIsRetried == ~failedTransient
 
 NoOrphanForever == \A d \in DriveIds : Orphan(d) => SweepRuns
+
+\* A drive a workspace can still mount: the row names it, and the row is not an archive
+\* past its grace (failed and archived rows come back through unarchive). The golden
+\* drive is never one of DriveIds: no delete in the model can name it.
+Mountable(d) == rowDrive = d /\ ~(status = "archived" /\ graceOver)
+NoDeleteWhileMountable ==
+  [][\A d \in DriveIds : (drives[d].ex /\ ~drives'[d].ex) => ~Mountable(d)]_vars
+
+\* Under FairSpecCron: the drive of a workspace whose snapshot expired is deleted, unless
+\* the workspace mounts it again first.
+ExpiredDriveDeleted ==
+  \A d \in DriveIds :
+    (expD = d) ~> (~drives[d].ex \/ (boxes[rowBox].run /\ boxes[rowBox].mount = d))
 
 =============================================================================
