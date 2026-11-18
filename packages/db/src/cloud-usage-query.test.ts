@@ -17,6 +17,7 @@ import {
 	cloudBillingPeriodIndex,
 	listCloudBoots,
 	queryCloudUsage,
+	queryCloudUsageByPeriod,
 } from "./cloud-usage-query";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
@@ -118,6 +119,34 @@ describe("queryCloudUsage", () => {
 		expect((await usage({ window: OCTOBER })).total.gbHours).toBe(16);
 		expect((await usage({ filters: { user: SAM } })).total.gbHours).toBe(16);
 	});
+});
+
+test("usage by period in one query matches each period's total", async () => {
+	const periods = [
+		NOVEMBER,
+		OCTOBER,
+		{ from: new Date("2026-09-01T00:00:00Z"), to: OCTOBER.from },
+	];
+	expect(
+		await queryCloudUsageByPeriod(
+			db,
+			{ organizationId: ORG },
+			{ periods, overagePerGbHour: RATE },
+		),
+	).toEqual(
+		await Promise.all(
+			periods.map(async (window) => ({
+				...window,
+				metrics: (await usage({ window })).total,
+			})),
+		),
+	);
+	const [own] = await queryCloudUsageByPeriod(
+		db,
+		{ organizationId: ORG, userId: SAM },
+		{ periods: [NOVEMBER], overagePerGbHour: RATE },
+	);
+	expect(own?.metrics).toEqual((await usage({}, SAM)).total);
 });
 
 describe("listCloudBoots", () => {
