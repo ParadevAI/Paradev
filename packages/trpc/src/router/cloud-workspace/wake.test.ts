@@ -1,6 +1,8 @@
-import { describe, expect, test } from "bun:test";
+import { beforeEach, describe, expect, test } from "bun:test";
 import * as Sentry from "@sentry/core";
+import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
+import { userError } from "../../i18n-error";
 import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as meter from "./meter";
@@ -10,6 +12,7 @@ import * as transition from "./transition";
 import {
 	markSandboxUnavailable,
 	restartCloudWorkspace,
+	wakeAfterStop,
 	wakeCloudWorkspace,
 } from "./wake";
 
@@ -78,6 +81,124 @@ describe("a keepalive wake of a serving box", () => {
 	test("writes no control record", async () => {
 		await wakeCloudWorkspace(ROW);
 		expect(logged).toEqual([]);
+	});
+});
+
+describe("wakeAfterStop", () => {
+	const calls: string[] = [];
+	const recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({
+			claim: {},
+			agentCredentialDigest: "digest",
+		}),
+		wakeSandbox: async (args: {
+			beforeResume: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
+		}) => {
+			await args.beforeResume({ memoryMb: 8192, vcpus: 4 });
+			return { hostTarget: "https://box.test", answer: { stamps: [] } };
+		},
+	});
+	stub(meter, {
+		queueSettleWorkspace: async () => {
+			calls.push("settle");
+		},
+		authorizeBoot: async () => {
+			calls.push("authorize");
+			return { bootId: "boot_2" };
+		},
+		attachBootSession: async ({ bootId }: { bootId: string }) => {
+			calls.push(`attach ${bootId}`);
+		},
+	});
+	stub(sandboxSleep, {
+		recordSandboxAsleep: async (
+			id: string,
+			stopped: { sessionId: string | null },
+		) => {
+			recordedAsleep.push([id, stopped]);
+		},
+	});
+	stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
+	stub(db, { update: () => ({ set: () => ({ where: async () => [] }) }) });
+
+	test("the box a promote snapshot stopped is recorded asleep, then woken through authorizeBoot and attached", async () => {
+		await wakeAfterStop(ROW, { sessionId: "sess_A" });
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "sess_A" }]]);
+		expect(calls).toEqual(["settle", "authorize", "attach boot_2"]);
+	});
+});
+
+describe("a refused wake", () => {
+	const calls: string[] = [];
+	const recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+	let resumedSession: { sessionId: string; expiresAt: Date } | undefined;
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({
+			claim: {},
+			agentCredentialDigest: "digest",
+		}),
+		wakeSandbox: async (args: {
+			beforeResume: (box: {
+				memoryMb: number;
+				vcpus: number;
+				resumedSession?: { sessionId: string; expiresAt: Date };
+			}) => Promise<void>;
+		}) => {
+			await args.beforeResume({ memoryMb: 16_384, vcpus: 8, resumedSession });
+		},
+		describeSandbox: async () => ({
+			running: true,
+			expiresAt: new Date(Date.now() + 60_000),
+			sessionId: "sess_B",
+		}),
+		stopSandbox: async () => {
+			calls.push("stop");
+			return { sessionId: "sess_C" };
+		},
+	});
+	stub(meter, {
+		authorizeBoot: async () => {
+			throw userError({
+				code: "FORBIDDEN",
+				message: "limit reached",
+				i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+			});
+		},
+	});
+	stub(sandboxExpiry, {
+		recordSandboxAwake: async (_: string, session: { sessionId: string }) => {
+			calls.push(`awake ${session.sessionId}`);
+		},
+	});
+	stub(sandboxSleep, {
+		recordSandboxAsleep: async (
+			id: string,
+			stopped: { sessionId: string | null },
+		) => {
+			recordedAsleep.push([id, stopped]);
+		},
+	});
+	beforeEach(() => {
+		calls.length = 0;
+		recordedAsleep.length = 0;
+	});
+
+	test("stops the box a call here resumed, and records it asleep for that session", async () => {
+		resumedSession = {
+			sessionId: "sess_C",
+			expiresAt: new Date(Date.now() + 60_000),
+		};
+		await expect(wakeCloudWorkspace(ROW)).rejects.toThrow("limit reached");
+		expect(calls).toEqual(["awake sess_C", "stop"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "sess_C" }]]);
+	});
+
+	test("leaves alone a box another wake authorized and resumed meanwhile", async () => {
+		resumedSession = undefined;
+		await expect(wakeCloudWorkspace(ROW)).rejects.toThrow("limit reached");
+		expect(calls).toEqual([]);
+		expect(recordedAsleep).toEqual([]);
 	});
 });
 

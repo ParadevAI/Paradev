@@ -55,6 +55,7 @@ export {
 	findSandboxSession,
 	HOST_SERVICE_PORT,
 	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	promoteSandboxToEnvironment,
 	provisionSandbox,

@@ -12,6 +12,8 @@ import {
 	agentToolsMounts,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
+	listSandboxSessions,
+	promoteSandboxToEnvironment,
 	type SandboxClaim,
 	SESSION_TIMEOUT_MS,
 	topUpSandboxSession,
@@ -113,6 +115,168 @@ describe("findSandboxSession", () => {
 				activeCpuMs: null,
 			},
 		});
+	});
+});
+
+describe("listSandboxSessions", () => {
+	const raw = (id: string, startedAt: number, stoppedAt?: number) => ({
+		id,
+		memory: 8192,
+		vcpus: 4,
+		status: stoppedAt === undefined ? "running" : "stopped",
+		startedAt,
+		...(stoppedAt === undefined ? {} : { stoppedAt }),
+		updatedAt: stoppedAt ?? startedAt,
+	});
+	let read = 0;
+	stub(Sandbox, {
+		get: async () => ({
+			listSessions: async () =>
+				(async function* () {
+					for (const session of [
+						raw("live", NOW - 10 * 60_000),
+						raw("recent", NOW - 50 * 60_000, NOW - 20 * 60_000),
+						raw("old", NOW - 3 * HOUR, NOW - 2 * HOUR),
+						raw("older", NOW - 5 * HOUR, NOW - 4 * HOUR),
+					]) {
+						read += 1;
+						yield session;
+					}
+				})(),
+		}),
+	});
+
+	test("lists the live session and those ended since, and reads no further back", async () => {
+		const sessions = await listSandboxSessions("ws-box", NOW - HOUR);
+		expect(sessions?.map((session) => session.id)).toEqual(["live", "recent"]);
+		expect(read).toBe(3);
+	});
+});
+
+describe("promoteSandboxToEnvironment", () => {
+	const sourceCalls: string[] = [];
+	const source = {
+		status: "running",
+		region: "iad1",
+		vcpus: 4,
+		currentSession: () => ({ sessionId: "sess_A" }),
+		snapshot: async () => {
+			sourceCalls.push("snapshot");
+			return { snapshotId: "snap_1" };
+		},
+		writeFiles: async () => {
+			sourceCalls.push("writeFiles");
+		},
+		runCommand: async () => {
+			sourceCalls.push("runCommand");
+		},
+		mkDir: async () => {
+			sourceCalls.push("mkDir");
+		},
+	};
+	const golden = {
+		currentSnapshotId: "snap_golden_0",
+		runCommand: async () => {},
+		stop: async () => {},
+	};
+	let createTags: unknown;
+	stub(Sandbox, {
+		get: async ({ name }: { name: string }) =>
+			name === "ws-box"
+				? source
+				: { status: "stopped", currentSnapshotId: "snap_golden_1" },
+		create: async (params: { tags: unknown }) => {
+			createTags = params.tags;
+			return golden;
+		},
+	});
+
+	test("ends the source's session for the snapshot and leaves its restart to the caller", async () => {
+		expect(
+			await promoteSandboxToEnvironment({
+				sourceSandbox: "ws-box",
+				goldenName: "env-1",
+				organizationId: "org_1",
+			}),
+		).toEqual({
+			goldenName: "env-1",
+			region: "iad1",
+			stopped: { sessionId: "sess_A" },
+		});
+		expect(sourceCalls).toEqual(["snapshot"]);
+		expect(createTags).toEqual({ kind: "environment", org: "org_1" });
+	});
+});
+
+describe("wakeSandbox", () => {
+	type Box = { memoryMb: number; vcpus: number };
+	let running: boolean;
+	let onResume: (sandbox: unknown) => Promise<void>;
+	const box = {
+		get status() {
+			return running ? "running" : "stopped";
+		},
+		expiresAt: new Date(NOW + 60_000),
+		vcpus: 4,
+		domain: () => "https://box.test",
+		currentSession: () => ({ vcpus: 8, sessionId: "sess_new" }),
+		update: async () => {},
+		writeFiles: async () => {},
+		// The SDK's withResume: a call on a stopped session resumes it, then retries.
+		extendTimeout: async () => {
+			await onResume(box);
+		},
+		runCommand: async () => {
+			await onResume(box);
+			throw new Error("stop before settle");
+		},
+	};
+	stub(Sandbox, {
+		get: async (params: { onResume: typeof onResume }) => {
+			onResume = params.onResume;
+			return box;
+		},
+	});
+	stub(globalThis, { fetch: async () => new Response("{}") });
+	const identity = {
+		SUPERSET_SANDBOX_CONTRACT: "1",
+		SUPERSET_API_URL: "https://api.test",
+		SUPERSET_SANDBOX_WORKSPACE_ID: "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e",
+		SUPERSET_SANDBOX_ORGANIZATION_ID: "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+		SUPERSET_SANDBOX_REPOSITORIES: "[]",
+		SUPERSET_SANDBOX_IMAGE_TAG: "image",
+		SUPERSET_SANDBOX_PROVIDER: "vercel",
+		SUPERSET_BUNDLE_SHA: "a".repeat(64),
+	};
+	async function wake(): Promise<Box[]> {
+		const authorized: Box[] = [];
+		await wakeSandbox({
+			providerSandboxId: "ws-box",
+			claim: { vcpus: 4, identity, networkPolicy: {} } as never,
+			beforeResume: async (resumed) => {
+				authorized.push(resumed);
+				if (running) throw new Error("stop before settle");
+			},
+		}).catch((error: Error) => {
+			if (error.message !== "stop before settle") throw error;
+		});
+		return authorized;
+	}
+
+	test("a box read running that a call resumed runs beforeResume for the new session", async () => {
+		running = true;
+		expect(await wake()).toEqual([
+			{
+				memoryMb: 16_384,
+				vcpus: 8,
+				resumedSession: { sessionId: "sess_new", expiresAt: box.expiresAt },
+			},
+		]);
+	});
+
+	test("a box read stopped runs beforeResume once, before its own resume", async () => {
+		running = false;
+		expect(await wake()).toEqual([{ memoryMb: 8192, vcpus: 4 }]);
 	});
 });
 
