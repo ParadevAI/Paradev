@@ -1166,6 +1166,9 @@ msgstr "{name} başarısız oldu"
 msgid "{name} finished"
 msgstr "{name} bitti"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} grubu, {count, plural, one {# çalışma alanı} other {# çalışma alanı}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} yerleşiktir ve kaldırılamaz"
@@ -6056,6 +6059,9 @@ msgstr "Konuşma çatallanamadı"
 msgid "Couldn't cancel the move"
 msgstr "Taşıma iptal edilemedi"
 
+msgid "Couldn't change the group color"
+msgstr "Grup rengi değiştirilemedi"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Makine boyutu değiştirilemedi: {0}"
@@ -6102,8 +6108,14 @@ msgstr "Yığın oluşturulamadı"
 msgid "Couldn't create the channel"
 msgstr "Kanal oluşturulamadı"
 
+msgid "Couldn't create the group"
+msgstr "Grup oluşturulamadı"
+
 msgid "Couldn't create workspace"
 msgstr "Çalışma alanı oluşturulamadı"
+
+msgid "Couldn't delete the group"
+msgstr "Grup silinemedi"
 
 msgid "Couldn't discard changes"
 msgstr "Değişiklikler atılamadı"
@@ -6191,6 +6203,9 @@ msgstr "{name} taşınamadı"
 msgid "Couldn't move the subagent to the background"
 msgstr "Alt ajan arka plana taşınamadı"
 
+msgid "Couldn't move the workspace"
+msgstr "Çalışma alanı taşınamadı"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "\"{name}\" otomatik olarak adlandırılamadı"
 
@@ -6240,6 +6255,9 @@ msgstr "Birleştirme kuyruğundan çıkarılamadı"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Yerel oturum kaydı kaldırılamadı"
+
+msgid "Couldn't rename the group"
+msgstr "Grup yeniden adlandırılamadı"
 
 msgid "Couldn't restart terminals"
 msgstr "Terminaller yeniden başlatılamadı"
@@ -10725,6 +10743,9 @@ msgstr "Yanıtları da silinir."
 
 msgid "Its saved state expired."
 msgstr "Kaydedilmiş durumunun süresi doldu."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Bulut çalışma alanı onu başlattığında terminali burada açılır."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Commit edilmemiş değişiklikler dahil çalışması yeni bir branch'e gönderilir. {computerName} üzerindeki çalışma alanı bu branch'ten başlar ve her Claude sohbeti orada devam eder. Çalışan ajanlar önce durur. Terminaller ve diğer sohbetler oldukları yerde kalır."

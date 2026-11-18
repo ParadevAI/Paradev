@@ -1,17 +1,19 @@
 import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { cloudUsageRefusalKey } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
 import { controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
+	bootPhases,
 	buildSandboxClaim,
 	deleteSandbox,
 	provisionSandbox,
-	recordBootSpans,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
@@ -23,6 +25,7 @@ import {
 import { generateCloudWorkspaceName } from "./generate-name";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { recordBootTrace } from "./sandbox-sleep";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -50,6 +53,18 @@ export interface ProvisionCloudWorkspaceInput {
 	namingPrompt?: string;
 	/** A built-in agent to run once the sandbox is up; see cloud-agent-launch. */
 	launch?: CloudAgentLaunch;
+}
+
+function provisionFailureReason(error: unknown): CloudWorkspaceFailureReason {
+	switch (cloudUsageRefusalKey(error)) {
+		case "serverError.cloudWorkspace.usageLimitReached":
+			return "usage_limit";
+		case "serverError.cloudWorkspace.cloudNeedsPaidPlan":
+			return "needs_paid_plan";
+	}
+	return error instanceof SandboxNotReadyError
+		? "host_not_ready"
+		: "create_failed";
 }
 
 export type ProvisionCloudWorkspaceOutcome =
@@ -118,12 +133,18 @@ async function provision(
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
 				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
 			);
-		({ bootId } = await authorizeBoot({
-			organizationId: row.organizationId,
-			cloudWorkspaceId: row.id,
-			createdByUserId: row.createdByUserId,
-			...boxFor(claim.vcpus),
-		}));
+		({ bootId } = await Sentry.startSpan(
+			{ name: "authorize boot", op: "billing" },
+			() =>
+				authorizeBoot({
+					organizationId: row.organizationId,
+					cloudWorkspaceId: row.id,
+					createdByUserId: row.createdByUserId,
+					...boxFor(claim.vcpus),
+					origin: "create",
+					traceId: span.spanContext().traceId,
+				}),
+		));
 		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
@@ -198,14 +219,11 @@ async function provision(
 				error,
 			),
 		);
-		try {
-			recordBootSpans(answer);
-		} catch (error) {
-			console.error(
-				`[cloud-workspace] could not trace the boot of ${row.id}`,
-				error,
-			);
-		}
+		await recordBootTrace(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
+			span,
+			bootPhases(answer),
+		);
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);
@@ -234,15 +252,17 @@ async function provision(
 				teardownError,
 			);
 		});
-		await failCloudWorkspace(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
-			{
-				from: ["provisioning", "awake", "asleep"],
-				set: keepForDiagnosis ? { providerSandboxId } : {},
-				site: "provision",
-				error,
+		await failCloudWorkspace({
+			scope: {
+				cloudWorkspaceId: row.id,
+				organizationId: row.organizationId,
+				bootId,
 			},
-		);
+			from: ["provisioning", "awake", "asleep"],
+			set: keepForDiagnosis ? { providerSandboxId } : {},
+			reason: provisionFailureReason(error),
+			error,
+		});
 		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
 			(moveError) =>
 				console.error(

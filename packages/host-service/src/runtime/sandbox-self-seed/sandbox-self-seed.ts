@@ -6,6 +6,8 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
 	type CloudAgentLaunch,
+	describeCloudAgentLaunch,
+	type PendingCloudAgentLaunch,
 	readCloudAgentLaunch,
 } from "@superset/shared/cloud-agent-launch";
 import { parseGitHubRemote } from "@superset/shared/github-remote";
@@ -498,6 +500,23 @@ function approveClaudeApiKey(): void {
 		rejected: rejected.filter((entry) => entry !== suffix),
 	};
 	writeFileSync(path, JSON.stringify(config, null, 2));
+}
+
+/**
+ * The launch a client can open a waiting pane for: promised a terminal id
+ * and not yet claimed by `launchSandboxAgentOnce`.
+ */
+export async function readPendingSandboxLaunch(
+	workspaceId: string,
+	env: NodeJS.ProcessEnv = process.env,
+): Promise<PendingCloudAgentLaunch | null> {
+	if (env.SUPERSET_HOST_RUN_MODE !== "sandbox") return null;
+	const identity = readSandboxIdentity(env);
+	if (identity?.workspaceId !== workspaceId) return null;
+	if (!identity.launch?.terminalId) return null;
+	if (existsSync(identity.launchMarkerPath)) return null;
+	const descriptor = await describeCloudAgentLaunch(identity.launch);
+	return descriptor && { ...descriptor, prompt: identity.launch.prompt };
 }
 
 /**

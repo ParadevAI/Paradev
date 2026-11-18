@@ -9,10 +9,12 @@ import * as realtime from "../../lib/realtime";
 import * as sandbox from "../../lib/sandbox";
 import * as userSettings from "../../lib/user-settings";
 import * as workspaceAccess from "../../lib/workspace-access";
+import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as access from "./access";
 import * as activity from "./activity";
 import * as jobs from "./jobs";
 import * as meter from "./meter";
+import * as reap from "./reap";
 import * as sandboxExpiry from "./sandbox-expiry";
 import * as sandboxSleep from "./sandbox-sleep";
 import * as wake from "./wake";
@@ -22,6 +24,7 @@ const ROW = {
 	id: WORKSPACE_ID,
 	organizationId: "org-1",
 	status: "awake",
+	provider: "vercel",
 	providerSandboxId: "box-1",
 	machineSize: "large",
 };
@@ -90,8 +93,10 @@ stub(plan, {
 stub(meter, {
 	assertMayBoot: async () => {},
 	queueSettleWorkspace: async () => {},
+	settleWorkspaceNow: async () => {},
 });
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+let endedBoots: unknown[] = [];
 stub(sandboxSleep, {
 	recordSandboxAsleep: async (
 		id: string,
@@ -99,7 +104,20 @@ stub(sandboxSleep, {
 	) => {
 		recordedAsleep.push([id, stopped]);
 	},
+	recordBootEnd: async (
+		scope: { cloudWorkspaceId: string },
+		ended: unknown,
+	) => {
+		endedBoots.push([scope.cloudWorkspaceId, ended]);
+	},
 });
+stub(reap, {
+	queueReap: async () => {
+		throw new Error("queue down");
+	},
+	reapWorkspaceFiles: async () => {},
+});
+stub(chatMoves, { failChatMovesTo: async () => {} });
 stub(sandboxExpiry, { recordSandboxAwake: async () => {} });
 const FORWARD = {
 	port: 5173,
@@ -120,6 +138,7 @@ stub(sandbox, {
 		sessionId: "session_1",
 	}),
 	stopAndSnapshot: async () => ({ sessionId: "session_1" }),
+	deleteSandbox: async () => {},
 	environmentRepositoryRows: async () => [
 		{ id: "repo-1", defaultBranch: "main" },
 	],
@@ -168,6 +187,7 @@ beforeEach(() => {
 	boxVcpus = 8;
 	restartedWith = [];
 	recordedAsleep = [];
+	endedBoots = [];
 	inserted = [];
 	queuedJobs = [];
 	environmentSize = null;
@@ -281,6 +301,43 @@ describe("cloudWorkspace.sleep", () => {
 		});
 		expect(recordedAsleep).toEqual([
 			[WORKSPACE_ID, { sessionId: "session_1" }],
+		]);
+	});
+});
+
+describe("cloudWorkspace.sleep ends the boot", () => {
+	test("as the user's stop, for the session it stopped", async () => {
+		running = true;
+		await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID });
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1", reason: "user" }],
+		]);
+	});
+});
+
+describe("an address read that finds the box stopped", () => {
+	test("labels the boot idle when the recorded expiry has passed", async () => {
+		Object.assign(ROW, { sandboxExpiresAt: new Date(Date.now() - 60_000) });
+		try {
+			expect(await caller.cloudWorkspace.sleep({ id: WORKSPACE_ID })).toEqual({
+				stopped: false,
+			});
+		} finally {
+			Object.assign(ROW, { sandboxExpiresAt: undefined });
+		}
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: "session_1", reason: "idle" }],
+		]);
+	});
+});
+
+describe("cloudWorkspace.delete when the reap cannot be queued", () => {
+	test("ends every open boot as archived before the final settle", async () => {
+		expect(await caller.cloudWorkspace.delete({ id: WORKSPACE_ID })).toEqual({
+			deleted: true,
+		});
+		expect(endedBoots).toEqual([
+			[WORKSPACE_ID, { sessionId: null, reason: "archived" }],
 		]);
 	});
 });

@@ -113,6 +113,19 @@ export type CloudWorkspaceBootEndReason = z.infer<
 	typeof cloudWorkspaceBootEndReasonEnum
 >;
 
+/** Who inserted a boot row: a create or a wake that authorized it, or the reconcile that found its session unmetered. */
+export const cloudWorkspaceBootOriginValues = [
+	"create",
+	"wake",
+	"adopt",
+] as const;
+export const cloudWorkspaceBootOriginEnum = z.enum(
+	cloudWorkspaceBootOriginValues,
+);
+export type CloudWorkspaceBootOrigin = z.infer<
+	typeof cloudWorkspaceBootOriginEnum
+>;
+
 export const cloudWorkspaceFailureReasonValues = [
 	"usage_limit",
 	"needs_paid_plan",

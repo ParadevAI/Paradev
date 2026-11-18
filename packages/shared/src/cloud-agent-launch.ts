@@ -31,6 +31,10 @@ export function supportsCloudAgentChat(agent: string | undefined): boolean {
 	return !!agent && CHAT_IN_SANDBOX.has(agent);
 }
 
+export const CLOUD_AGENT_LAUNCH_SURFACES = ["terminal", "chat"] as const;
+export type CloudAgentLaunchSurface =
+	(typeof CLOUD_AGENT_LAUNCH_SURFACES)[number];
+
 /**
  * What a cloud workspace launches on first boot: a built-in agent and its
  * prompt. The API validates it, provisioning hands it to the sandbox as
@@ -50,7 +54,7 @@ export const cloudAgentLaunchSchema = z.object({
 	 * itself once host-service is up.
 	 */
 	attachmentFileIds: z.array(z.string().uuid()).max(MAX_ATTACHMENTS).optional(),
-	surface: z.enum(["terminal", "chat"]).optional(),
+	surface: z.enum(CLOUD_AGENT_LAUNCH_SURFACES).optional(),
 	/**
 	 * Set only by cloud automation dispatch. A manual create must not name a
 	 * run: the box reports this id, and the API trusts it as the correlation.
@@ -67,10 +71,15 @@ export type CloudAgentLaunch = z.infer<typeof cloudAgentLaunchSchema>;
 
 export type CloudAgentLaunchDescriptor = {
 	agent: string;
-	surface: "chat" | "terminal";
+	surface: CloudAgentLaunchSurface;
 	promptHash: string | null;
 	/** Null when the launch picks its own terminal id. */
 	terminalId: string | null;
+};
+
+/** A launch a box has not started yet, with the prompt its waiting pane shows. */
+export type PendingCloudAgentLaunch = CloudAgentLaunchDescriptor & {
+	prompt: string;
 };
 
 export async function hashCloudAgentPrompt(prompt: string): Promise<string> {

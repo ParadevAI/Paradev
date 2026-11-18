@@ -53,7 +53,15 @@
 								"importNames": ["execSync", "spawnSync", "execFileSync"],
 								"message": "Sync subprocesses freeze the serving event loop (Electron main / host-service / pty-daemon) until the child exits — every request queues behind them. Prefer async spawn/execFile: the caller awaits the same result, but the loop keeps serving while the child runs. Git reads belong in the worker pools."
 							},
-							"@vercel/sandbox": "Most calls on a raw sandbox handle resume a stopped box. Use the functions in packages/trpc/src/lib/sandbox, where only a wake or a create may resume one."
+							"@vercel/sandbox": "Most calls on a raw sandbox handle resume a stopped box. Use the functions in packages/trpc/src/lib/sandbox, where only a wake or a create may resume one.",
+							"@superset/db/cloud-usage-query": {
+								"importNames": [
+									"queryFleetCloudUsage",
+									"listFleetCloudBoots",
+									"getFleetCloudBoot"
+								],
+								"message": "These read every organization and are for staff tools only (the admin app). A customer procedure uses queryCloudUsage and listCloudBoots, which take one organization."
+							}
 						}
 					}
 				}

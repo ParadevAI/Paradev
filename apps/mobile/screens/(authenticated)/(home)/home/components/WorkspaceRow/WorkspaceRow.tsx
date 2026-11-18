@@ -29,7 +29,10 @@ import type {
 	TerminalRowData,
 } from "../../hooks/useHostTerminals";
 import type { DiffStats } from "../../hooks/useVisibleDiffStats";
-import { WorkspaceRowMenu } from "./components/WorkspaceRowMenu";
+import {
+	WorkspaceRowMenu,
+	type WorkspaceRowMenuProps,
+} from "./components/WorkspaceRowMenu";
 import { useWorkspaceMove } from "./hooks/useWorkspaceMove";
 import { useWorkspaceRowActions } from "./hooks/useWorkspaceRowActions";
 
@@ -47,6 +50,7 @@ export function WorkspaceRow({
 	cloudStatus,
 	onCopied,
 	card = false,
+	groups,
 }: {
 	workspace: HostWorkspaceItem;
 	pullRequest?: SelectGithubPullRequest;
@@ -60,6 +64,7 @@ export function WorkspaceRow({
 	onCopied: () => void;
 	/** A cell of Home's wide grid rather than a row indented under its project. */
 	card?: boolean;
+	groups?: WorkspaceRowMenuProps["groups"];
 }) {
 	const { t } = useLingui();
 	const enlargedText = useEnlargedText();
@@ -109,6 +114,7 @@ export function WorkspaceRow({
 				onShare={shareWorkspace}
 				link={{ href, onCopied }}
 				move={move}
+				groups={groups}
 			>
 				{/* Default press behavior on purpose: the system context-menu lift
 			    owns the hold animation, and custom press feedback fights it. */}

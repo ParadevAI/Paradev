@@ -151,17 +151,20 @@ export const CLOUD_USAGE_REFUSAL_KEYS = [
 ] as const;
 
 /** Clients read the key from `data`; the server's own `TRPCError` still holds it in `cause`. */
-export function isCloudUsageRefusal(error: unknown): boolean {
+export function cloudUsageRefusalKey(
+	error: unknown,
+): (typeof CLOUD_USAGE_REFUSAL_KEYS)[number] | null {
 	const { data, cause } =
 		(error as {
 			data?: { i18nKey?: unknown } | null;
 			cause?: { i18nKey?: unknown } | null;
 		} | null) ?? {};
 	const i18nKey = data?.i18nKey ?? cause?.i18nKey;
-	return (
-		typeof i18nKey === "string" &&
-		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(i18nKey)
-	);
+	return CLOUD_USAGE_REFUSAL_KEYS.find((key) => key === i18nKey) ?? null;
+}
+
+export function isCloudUsageRefusal(error: unknown): boolean {
+	return cloudUsageRefusalKey(error) !== null;
 }
 
 export const PLAN_PRICE_CURRENCY = "USD";

@@ -1166,6 +1166,9 @@ msgstr "{name} non è riuscito"
 msgid "{name} finished"
 msgstr "{name} ha finito"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Gruppo {name}, {count, plural, one {# workspace} other {# workspace}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} è integrato e non può essere rimosso"
@@ -6056,6 +6059,9 @@ msgstr "Non è stato possibile diramare la conversazione"
 msgid "Couldn't cancel the move"
 msgstr "Impossibile annullare lo spostamento"
 
+msgid "Couldn't change the group color"
+msgstr "Impossibile cambiare il colore del gruppo"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Impossibile cambiare la dimensione della macchina: {0}"
@@ -6102,8 +6108,14 @@ msgstr "Impossibile creare lo stack"
 msgid "Couldn't create the channel"
 msgstr "Impossibile creare il canale"
 
+msgid "Couldn't create the group"
+msgstr "Impossibile creare il gruppo"
+
 msgid "Couldn't create workspace"
 msgstr "Impossibile creare il workspace"
+
+msgid "Couldn't delete the group"
+msgstr "Impossibile eliminare il gruppo"
 
 msgid "Couldn't discard changes"
 msgstr "Impossibile scartare le modifiche"
@@ -6191,6 +6203,9 @@ msgstr "Impossibile spostare {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Impossibile spostare il sottoagente in background"
 
+msgid "Couldn't move the workspace"
+msgstr "Impossibile spostare il workspace"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Impossibile assegnare automaticamente un nome a \"{name}\""
 
@@ -6240,6 +6255,9 @@ msgstr "Impossibile rimuovere dalla coda di unione"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Impossibile rimuovere l'accesso locale"
+
+msgid "Couldn't rename the group"
+msgstr "Impossibile rinominare il gruppo"
 
 msgid "Couldn't restart terminals"
 msgstr "Impossibile riavviare i terminali"
@@ -10725,6 +10743,9 @@ msgstr "Anche le risposte verranno eliminate."
 
 msgid "Its saved state expired."
 msgstr "Il suo stato salvato è scaduto."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Il suo terminale si apre qui quando il workspace cloud lo avvia."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Il suo lavoro, comprese le modifiche non committate, viene inviato a un nuovo branch. Un workspace su {computerName} parte da quel branch, e ogni chat di Claude continua lì. Gli agenti al lavoro si fermano prima. I terminali e le altre chat restano dove sono."

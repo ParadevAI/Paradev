@@ -77,6 +77,10 @@ export class SandboxUnavailableError extends Error {
 	) {
 		super(`Sandbox ${providerSandboxId} is unavailable`, { cause });
 	}
+
+	get snapshotExpired(): boolean {
+		return this.cause instanceof APIError && this.cause.response.status === 410;
+	}
 }
 
 function isUnavailable(error: unknown): boolean {
@@ -847,9 +851,13 @@ export interface BoxSession {
 	startedAt: number;
 	endedAt: number | null;
 	activeCpuMs: number | null;
+	egressBytes: number | null;
+	/** Vercel marked it failed or aborted; a timeout and our own stops both end as `stopped`. */
+	crashed: boolean;
 }
 
 const LIVE_STATUSES = new Set(["pending", "running"]);
+const CRASHED_STATUSES = new Set(["failed", "aborted"]);
 const SESSION_PAGE_SIZE = 20;
 
 export function sessionEndedAt(session: {
@@ -879,6 +887,7 @@ interface RawSession {
 	requestedStopAt?: number;
 	updatedAt: number;
 	activeCpuDurationMs?: number;
+	networkTransfer?: { ingress: number; egress: number };
 }
 
 function toBoxSession(session: RawSession): BoxSession | null {
@@ -890,6 +899,8 @@ function toBoxSession(session: RawSession): BoxSession | null {
 		startedAt: session.startedAt,
 		endedAt: sessionEndedAt(session),
 		activeCpuMs: session.activeCpuDurationMs ?? null,
+		egressBytes: session.networkTransfer?.egress ?? null,
+		crashed: CRASHED_STATUSES.has(session.status),
 	};
 }
 

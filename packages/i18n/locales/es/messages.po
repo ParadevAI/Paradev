@@ -1166,6 +1166,9 @@ msgstr "{name} falló"
 msgid "{name} finished"
 msgstr "{name} terminó"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Grupo {name}, {count, plural, one {# espacio de trabajo} other {# espacios de trabajo}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} es integrado y no se puede quitar"
@@ -6056,6 +6059,9 @@ msgstr "No se pudo bifurcar la conversación"
 msgid "Couldn't cancel the move"
 msgstr "No se pudo cancelar el traslado"
 
+msgid "Couldn't change the group color"
+msgstr "No se pudo cambiar el color del grupo"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "No se pudo cambiar el tamaño de la máquina: {0}"
@@ -6102,8 +6108,14 @@ msgstr "No se pudo crear la pila"
 msgid "Couldn't create the channel"
 msgstr "No se pudo crear el canal"
 
+msgid "Couldn't create the group"
+msgstr "No se pudo crear el grupo"
+
 msgid "Couldn't create workspace"
 msgstr "No se pudo crear el espacio de trabajo"
+
+msgid "Couldn't delete the group"
+msgstr "No se pudo eliminar el grupo"
 
 msgid "Couldn't discard changes"
 msgstr "No se pudieron descartar los cambios"
@@ -6191,6 +6203,9 @@ msgstr "No se pudo mover {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "No se pudo mover el subagente a segundo plano"
 
+msgid "Couldn't move the workspace"
+msgstr "No se pudo mover el espacio de trabajo"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "No se pudo nombrar «{name}» automáticamente"
 
@@ -6240,6 +6255,9 @@ msgstr "No se pudo quitar de la cola de fusión"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "No se pudo eliminar el inicio de sesión local"
+
+msgid "Couldn't rename the group"
+msgstr "No se pudo cambiar el nombre del grupo"
 
 msgid "Couldn't restart terminals"
 msgstr "No se pudieron reiniciar las terminales"
@@ -10725,6 +10743,9 @@ msgstr "Sus respuestas también se eliminan."
 
 msgid "Its saved state expired."
 msgstr "Su estado guardado caducó."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Su terminal se abre aquí cuando el espacio de trabajo en la nube lo inicia."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Su trabajo, incluidos los cambios sin confirmar, se sube a una rama nueva. Un espacio de trabajo en {computerName} empieza desde esa rama, y cada chat de Claude continúa allí. Los agentes que estén trabajando se detienen primero. Las terminales y los demás chats se quedan donde están."

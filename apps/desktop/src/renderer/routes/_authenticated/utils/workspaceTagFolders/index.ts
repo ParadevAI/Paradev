@@ -1,10 +1,4 @@
 export {
-	type CloudTagFolderWorkspace,
-	type HostTagFolderWorkspace,
-	mergeTagFolderWorkspaces,
-} from "./tagFolderWorkspaces";
-export { useTagFolderContext } from "./useTagFolderContext";
-export {
 	applyFolderTagChange,
 	buildSidebarFolderKey,
 	deriveSessionTagFolders,
@@ -18,4 +12,10 @@ export {
 	type TagFolderContext,
 	type TagFolderRef,
 	type TagFolderWorkspaceInput,
-} from "./workspaceTagFolders";
+} from "@superset/shared/workspace-tag-folders";
+export {
+	type CloudTagFolderWorkspace,
+	type HostTagFolderWorkspace,
+	mergeTagFolderWorkspaces,
+} from "./tagFolderWorkspaces";
+export { useTagFolderContext } from "./useTagFolderContext";

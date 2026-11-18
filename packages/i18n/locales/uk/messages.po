@@ -1160,6 +1160,9 @@ msgstr "{name}: помилка"
 msgid "{name} finished"
 msgstr "{name}: роботу завершено"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Група {name}, {count, plural, one {# робочий простір} few {# робочі простори} many {# робочих просторів} other {# робочого простору}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} вбудовано, тому його не можна видалити"
@@ -6050,6 +6053,9 @@ msgstr "Не вдалося створити гілку розмови"
 msgid "Couldn't cancel the move"
 msgstr "Не вдалося скасувати перенесення"
 
+msgid "Couldn't change the group color"
+msgstr "Не вдалося змінити колір групи"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Не вдалося змінити розмір машини: {0}"
@@ -6096,8 +6102,14 @@ msgstr "Не вдалося створити стек"
 msgid "Couldn't create the channel"
 msgstr "Не вдалося створити канал"
 
+msgid "Couldn't create the group"
+msgstr "Не вдалося створити групу"
+
 msgid "Couldn't create workspace"
 msgstr "Не вдалося створити робочий простір"
+
+msgid "Couldn't delete the group"
+msgstr "Не вдалося видалити групу"
 
 msgid "Couldn't discard changes"
 msgstr "Не вдалося відкинути зміни"
@@ -6185,6 +6197,9 @@ msgstr "Не вдалося перемістити {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Не вдалося перевести субагента у фоновий режим"
 
+msgid "Couldn't move the workspace"
+msgstr "Не вдалося перемістити робочий простір"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Не вдалося автоматично назвати «{name}»"
 
@@ -6234,6 +6249,9 @@ msgstr "Не вдалося прибрати з черги злиття"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Не вдалося видалити локальні дані входу"
+
+msgid "Couldn't rename the group"
+msgstr "Не вдалося перейменувати групу"
 
 msgid "Couldn't restart terminals"
 msgstr "Не вдалося перезапустити термінали"
@@ -10719,6 +10737,9 @@ msgstr "Відповіді на нього буде видалено разом 
 
 msgid "Its saved state expired."
 msgstr "Термін його збереженого стану минув."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Його термінал відкриється тут, коли хмарний робочий простір його запустить."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Його робота, зокрема незакомічені зміни, пушиться в нову гілку. Робочий простір на {computerName} починається з цієї гілки, і кожен чат Claude продовжується там. Агенти, що працюють, спершу зупиняються. Термінали та інші чати залишаються на місці."

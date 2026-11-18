@@ -1166,6 +1166,9 @@ msgstr "{name} failed"
 msgid "{name} finished"
 msgstr "{name} finished"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} is built in and cannot be removed"
@@ -6056,6 +6059,9 @@ msgstr "Couldn't branch the conversation"
 msgid "Couldn't cancel the move"
 msgstr "Couldn't cancel the move"
 
+msgid "Couldn't change the group color"
+msgstr "Couldn't change the group color"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Couldn't change the machine size: {0}"
@@ -6102,8 +6108,14 @@ msgstr "Couldn't create stack"
 msgid "Couldn't create the channel"
 msgstr "Couldn't create the channel"
 
+msgid "Couldn't create the group"
+msgstr "Couldn't create the group"
+
 msgid "Couldn't create workspace"
 msgstr "Couldn't create workspace"
+
+msgid "Couldn't delete the group"
+msgstr "Couldn't delete the group"
 
 msgid "Couldn't discard changes"
 msgstr "Couldn't discard changes"
@@ -6191,6 +6203,9 @@ msgstr "Couldn't move {name}"
 msgid "Couldn't move the subagent to the background"
 msgstr "Couldn't move the subagent to the background"
 
+msgid "Couldn't move the workspace"
+msgstr "Couldn't move the workspace"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Couldn't name \"{name}\" automatically"
 
@@ -6240,6 +6255,9 @@ msgstr "Couldn't remove from the merge queue"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Couldn't remove the local sign-in"
+
+msgid "Couldn't rename the group"
+msgstr "Couldn't rename the group"
 
 msgid "Couldn't restart terminals"
 msgstr "Couldn't restart terminals"
@@ -10725,6 +10743,9 @@ msgstr "Its replies go with it."
 
 msgid "Its saved state expired."
 msgstr "Its saved state expired."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Its terminal opens here when the cloud workspace starts it."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."

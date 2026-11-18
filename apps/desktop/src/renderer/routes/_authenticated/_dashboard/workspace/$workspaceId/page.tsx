@@ -34,7 +34,7 @@ import { getNotificationSourcesForTab } from "renderer/stores/notifications";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { useStore } from "zustand";
-import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
+import { usePendingCloudLaunchPane } from "../hooks/usePendingCloudLaunchPane";
 import { useWorkspace } from "../providers/WorkspaceProvider";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
@@ -76,6 +76,7 @@ import { useDefaultBrowserUrl } from "./hooks/useDefaultBrowserUrl";
 import { useDefaultContextMenuActions } from "./hooks/useDefaultContextMenuActions";
 import { useDefaultPaneActions } from "./hooks/useDefaultPaneActions";
 import { useDiffPaneTarget } from "./hooks/useDiffPaneTarget";
+import { useHostPendingCloudLaunch } from "./hooks/useHostPendingCloudLaunch";
 import { useOpenNewTabWhenRightPaneOpensEmpty } from "./hooks/useOpenNewTabWhenRightPaneOpensEmpty";
 import { usePaneAreaMoveActions } from "./hooks/usePaneAreaMoveActions";
 import { usePaneRegistry } from "./hooks/usePaneRegistry";
@@ -167,17 +168,17 @@ export const Route = createFileRoute(
 
 function WorkspacePage() {
 	const { workspace } = useWorkspace();
-	const pendingCloudChat = usePendingCloudChat(workspace.id);
+	const pendingCloudLaunch = usePendingCloudLaunchPane(workspace.id);
 	const workspaceStatusQuery = workspaceTrpc.workspace.get.useQuery(
 		{ id: workspace.id },
 		{
-			enabled: !pendingCloudChat,
+			enabled: !pendingCloudLaunch,
 			staleTime: 0,
 			refetchOnWindowFocus: true,
 		},
 	);
 
-	if (isWorktreeMissing(workspaceStatusQuery, !!pendingCloudChat)) {
+	if (isWorktreeMissing(workspaceStatusQuery, !!pendingCloudLaunch)) {
 		return (
 			<StateScreenShell>
 				<WorkspaceMissingWorktreeState
@@ -352,6 +353,12 @@ function WorkspaceContent() {
 		consumeSearch,
 	});
 	useCreatePendingMigratedTerminals({ workspaceId, isLayoutReady });
+	const { canShowEmptyLayout } = useHostPendingCloudLaunch({
+		workspaceId,
+		store,
+		linkedStores: linkedPaneStores,
+		isLayoutReady: isLayoutReady && isRightLayoutReady,
+	});
 	useRunWorkspaceCreationPresets({
 		workspaceId,
 		isLayoutReady,
@@ -847,15 +854,20 @@ function WorkspaceContent() {
 												)}
 											</div>
 										)}
-										renderEmptyState={() => (
-											<WorkspaceEmptyState
-												onOpenBrowser={addBrowserTab}
-												onOpenChanges={openChanges}
-												onOpenChat={addChatTab}
-												onOpenQuickOpen={handleQuickOpen}
-												onOpenTerminal={addTerminalTab}
-											/>
-										)}
+										renderEmptyState={() =>
+											canShowEmptyLayout ? (
+												<WorkspaceEmptyState
+													onOpenBrowser={addBrowserTab}
+													onOpenChanges={openChanges}
+													onOpenChat={addChatTab}
+													onOpenQuickOpen={handleQuickOpen}
+													onOpenTerminal={addTerminalTab}
+												/>
+											) : (
+												// Not null: Workspace shows "No tabs open" for null.
+												<div aria-hidden />
+											)
+										}
 										onBeforeCloseTab={onBeforeCloseTab}
 										onInteractionStateChange={onWorkspaceInteractionStateChange}
 										store={store}

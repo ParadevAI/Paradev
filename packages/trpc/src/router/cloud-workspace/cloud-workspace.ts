@@ -79,7 +79,11 @@ import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import {
+	recordBootEnd,
+	recordBoxStopped,
+	recordStopSeen,
+} from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
@@ -151,7 +155,7 @@ async function addressSandbox(
 			if (expiresAt) {
 				await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			} else {
-				await recordSandboxAsleep(row.id, {
+				await recordStopSeen(row, {
 					sessionId: sessionId ?? row.sandboxSessionId,
 				});
 			}
@@ -750,9 +754,13 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(row.id, {
-					sessionId: stopped.sessionId ?? row.sandboxSessionId,
-				});
+				await recordBoxStopped(
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{
+						sessionId: stopped.sessionId ?? row.sandboxSessionId,
+						reason: "user",
+					},
+				);
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -894,6 +902,13 @@ export const cloudWorkspaceRouter = {
 						console.error(
 							`[cloud-workspace] could not queue the reap for ${row.id}`,
 							error,
+						);
+						await recordBootEnd(
+							{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+							{
+								sessionId: null,
+								reason: "archived",
+							},
 						);
 						await settleWorkspaceNow(row.id).catch((meterError) =>
 							console.error(

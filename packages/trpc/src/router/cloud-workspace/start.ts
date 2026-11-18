@@ -40,6 +40,7 @@ import {
 	provisionCloudWorkspace,
 	sandboxNameFor,
 } from "./provision";
+import { queuedLaunch } from "./queued-launch";
 import { linkTask } from "./record";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
@@ -267,14 +268,7 @@ async function start(args: StartCloudWorkspaceInput) {
 	const job = {
 		cloudWorkspaceId: row.id,
 		...(args.name ? {} : { namingPrompt: args.prompt ?? "" }),
-		...(args.launch
-			? {
-					launch: {
-						...args.launch,
-						surface: openAsChat ? ("chat" as const) : undefined,
-					},
-				}
-			: {}),
+		...(args.launch ? { launch: queuedLaunch(args.launch, openAsChat) } : {}),
 	};
 
 	pushWorkspaceAccess(row.organizationId, row.id);
@@ -320,10 +314,12 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		await failCloudWorkspace(
-			{ cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
-			{ from: ["provisioning"], site: "queue", error },
-		);
+		await failCloudWorkspace({
+			scope: { cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
+			from: ["provisioning"],
+			reason: "queue_failed",
+			error,
+		});
 		await failChatMovesTo(
 			job.cloudWorkspaceId,
 			"The cloud workspace could not start",

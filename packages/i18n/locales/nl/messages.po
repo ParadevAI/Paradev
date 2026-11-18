@@ -1166,6 +1166,9 @@ msgstr "{name} is mislukt"
 msgid "{name} finished"
 msgstr "{name} is klaar"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Groep {name}, {count, plural, one {# werkruimte} other {# werkruimtes}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} is ingebouwd en kan niet worden verwijderd"
@@ -6056,6 +6059,9 @@ msgstr "Kon het gesprek niet afsplitsen"
 msgid "Couldn't cancel the move"
 msgstr "Kan het verplaatsen niet annuleren"
 
+msgid "Couldn't change the group color"
+msgstr "Kan de groepskleur niet wijzigen"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Kan de machinegrootte niet wijzigen: {0}"
@@ -6102,8 +6108,14 @@ msgstr "Stack maken mislukt"
 msgid "Couldn't create the channel"
 msgstr "Kan het kanaal niet maken"
 
+msgid "Couldn't create the group"
+msgstr "Kan de groep niet maken"
+
 msgid "Couldn't create workspace"
 msgstr "Kan werkruimte niet aanmaken"
+
+msgid "Couldn't delete the group"
+msgstr "Kan de groep niet verwijderen"
 
 msgid "Couldn't discard changes"
 msgstr "Kan wijzigingen niet verwerpen"
@@ -6191,6 +6203,9 @@ msgstr "{name} kon niet worden verplaatst"
 msgid "Couldn't move the subagent to the background"
 msgstr "Kan de subagent niet naar de achtergrond verplaatsen"
 
+msgid "Couldn't move the workspace"
+msgstr "Kan de werkruimte niet verplaatsen"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Kon \"{name}\" niet automatisch een naam geven"
 
@@ -6240,6 +6255,9 @@ msgstr "Verwijderen uit mergewachtrij mislukt"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Kan de lokale login niet verwijderen"
+
+msgid "Couldn't rename the group"
+msgstr "Kan de groep niet hernoemen"
 
 msgid "Couldn't restart terminals"
 msgstr "Kan terminals niet herstarten"
@@ -10725,6 +10743,9 @@ msgstr "De antwoorden worden ook verwijderd."
 
 msgid "Its saved state expired."
 msgstr "De opgeslagen status is verlopen."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "De terminal opent hier zodra de cloudwerkruimte hem start."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Het werk, inclusief niet-gecommitte wijzigingen, wordt naar een nieuwe branch gepusht. Een werkruimte op {computerName} begint vanaf die branch, en elke Claude-chat gaat daar verder. Agents die aan het werk zijn, stoppen eerst. Terminals en andere chats blijven waar ze zijn."

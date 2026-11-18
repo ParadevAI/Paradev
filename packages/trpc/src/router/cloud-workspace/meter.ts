@@ -7,6 +7,12 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
+import { recordUsageEvent } from "@superset/db/cloud-usage-events";
+import type {
+	CloudUsageFeature,
+	CloudWorkspaceBootEndReason,
+	CloudWorkspaceBootOrigin,
+} from "@superset/db/enums";
 import {
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
@@ -25,7 +31,7 @@ import {
 	stopSandbox,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import { recordSandboxAsleep } from "./sandbox-sleep";
+import { recordBoxStopped } from "./sandbox-sleep";
 
 const LOCK_WINDOW_MS = 30 * 60 * 1000;
 const LOCK_TTL_MS = 70 * 60 * 1000;
@@ -177,6 +183,8 @@ export async function authorizeBoot(
 		createdByUserId: string | null;
 		memoryMb: number;
 		vcpus: number;
+		origin: CloudWorkspaceBootOrigin;
+		traceId: string;
 	},
 	{ billingEnabled = billingUsesAutumn }: { billingEnabled?: boolean } = {},
 ): Promise<{ bootId: string | null }> {
@@ -212,6 +220,9 @@ export async function authorizeBoot(
 		vcpus: args.vcpus,
 		startedAt: new Date(),
 		lockOpen: result !== null,
+		createdByUserId: args.createdByUserId,
+		origin: args.origin,
+		traceId: args.traceId,
 	});
 	logControl(
 		"boot.authorized",
@@ -225,7 +236,7 @@ export async function authorizeBoot(
 	return { bootId };
 }
 
-type BootReleaseReason =
+type BootReleaseCause =
 	| "provision_failed"
 	| "provision_abandoned"
 	| "session_taken"
@@ -234,7 +245,7 @@ type BootReleaseReason =
 
 export async function releaseBoot(
 	bootId: string,
-	reason: BootReleaseReason,
+	cause: BootReleaseCause,
 ): Promise<void> {
 	const [boot] = await db
 		.select()
@@ -255,16 +266,20 @@ export async function releaseBoot(
 			);
 	}
 	const now = new Date();
-	await db
+	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
 			lockOpen: false,
 			settleLeaseUntil: null,
+			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
-		.where(eq(cloudWorkspaceBoots.id, bootId));
-	if (boot.cloudWorkspaceId) {
+		.where(eq(cloudWorkspaceBoots.id, bootId))
+		.returning({
+			endReason: sql<CloudWorkspaceBootEndReason>`${cloudWorkspaceBoots.endReason}`,
+		});
+	if (boot.cloudWorkspaceId && released) {
 		logControl(
 			"boot.released",
 			{
@@ -272,7 +287,7 @@ export async function releaseBoot(
 				organizationId: boot.organizationId,
 				bootId,
 			},
-			{ reason },
+			{ "end.reason": released.endReason, "release.cause": cause },
 		);
 	}
 }
@@ -313,10 +328,60 @@ export async function attachBootSession(args: {
 	await releaseBoot(args.bootId, "session_taken");
 }
 
-async function recordUsage(
+function bootTags(boot: Boot): Record<string, string> {
+	return {
+		"organization.id": boot.organizationId,
+		"boot.id": boot.id,
+		...(boot.cloudWorkspaceId
+			? { "cloud_workspace.id": boot.cloudWorkspaceId }
+			: {}),
+	};
+}
+
+type UsageWindow = {
+	from: number;
+	to: number;
+	amount: number;
+	user: UsageUser | null;
+};
+
+async function recordSentUsage(
 	boot: Boot,
-	window: { from: number; amount: number; user: UsageUser | null },
+	feature: CloudUsageFeature,
+	window: UsageWindow,
 ): Promise<void> {
+	await recordUsageEvent(db, {
+		bootId: boot.id,
+		lockSeq: boot.lockSeq,
+		feature,
+		organizationId: boot.organizationId,
+		cloudWorkspaceId: boot.cloudWorkspaceId,
+		userId: window.user?.id ?? null,
+		windowFrom: new Date(window.from),
+		windowTo: new Date(window.to),
+		amount: String(window.amount),
+		sentAt: new Date(),
+	}).catch((error) => {
+		Sentry.captureException(error, {
+			tags: bootTags(boot),
+			extra: { feature, lockSeq: boot.lockSeq },
+		});
+	});
+}
+
+/**
+ * Autumn can apply a confirm and still answer 503; the retry then finds no lock.
+ * A lock taken less than its lifetime ago cannot have expired, so that confirm went through.
+ */
+function confirmedEarlier(boot: Boot, error: AutumnError): boolean {
+	const takenAt = boot.finalizedThrough ?? boot.createdAt;
+	return (
+		error.body.includes("Lock not found") &&
+		Date.now() < takenAt.getTime() + LOCK_TTL_MS - LOCK_WINDOW_MS
+	);
+}
+
+async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 	const { amount } = window;
 	const properties = usageProperties(boot, window.user);
 	const lockId = lockIdFor(boot.id, boot.lockSeq);
@@ -327,19 +392,15 @@ async function recordUsage(
 				{ lockId, action: "confirm", overrideValue: amount },
 				{ headers: { "Idempotency-Key": `${lockId}:confirm` } },
 			);
-			return;
+			return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 		} catch (error) {
 			if (!(error instanceof AutumnError)) throw error;
-			if (error.statusCode === 409) return;
+			if (error.statusCode === 409 || confirmedEarlier(boot, error)) {
+				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
+			}
 			if (error.statusCode >= 500) throw error;
 			Sentry.captureException(error, {
-				tags: {
-					"organization.id": boot.organizationId,
-					"boot.id": boot.id,
-					...(boot.cloudWorkspaceId
-						? { "cloud_workspace.id": boot.cloudWorkspaceId }
-						: {}),
-				},
+				tags: bootTags(boot),
 				extra: { lockId },
 			});
 		}
@@ -358,9 +419,10 @@ async function recordUsage(
 			{ headers: { "Idempotency-Key": `${lockId}:track:${window.from}` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 }
 
 async function claimSettle(bootId: string): Promise<Boot | null> {
@@ -388,26 +450,23 @@ function clearLease(bootId: string) {
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 }
 
-async function recordActiveCpu(
-	boot: Boot,
-	activeCpuMs: number,
-	user: UsageUser | null,
-) {
+async function recordActiveCpu(boot: Boot, window: UsageWindow) {
 	try {
 		await autumnClient.track(
 			{
 				customerId: boot.organizationId,
 				featureId: ACTIVE_CPU_MINUTES_FEATURE_ID,
-				value: activeCpuMs / 60_000,
+				value: window.amount,
 				async: false,
-				properties: usageProperties(boot, user),
+				properties: usageProperties(boot, window.user),
 			},
 			{ headers: { "Idempotency-Key": `${boot.id}:active-cpu` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, ACTIVE_CPU_MINUTES_FEATURE_ID, window);
 }
 
 /**
@@ -476,6 +535,7 @@ export async function settleBoot(
 		).getTime();
 		await recordUsage(boot, {
 			from,
+			to: end,
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
 			user,
 		});
@@ -486,11 +546,24 @@ export async function settleBoot(
 
 		if (session.endedAt !== null) {
 			if (session.activeCpuMs) {
-				await recordActiveCpu(boot, session.activeCpuMs, user);
+				await recordActiveCpu(boot, {
+					from: session.startedAt,
+					to: end,
+					amount: session.activeCpuMs / 60_000,
+					user,
+				});
 			}
 			await db
 				.update(cloudWorkspaceBoots)
-				.set({ stoppedAt: new Date(end), settleLeaseUntil: null })
+				.set({
+					stoppedAt: new Date(end),
+					settleLeaseUntil: null,
+					activeCpuMs: session.activeCpuMs,
+					egressBytes: session.egressBytes,
+					endReason: session.crashed
+						? "crashed"
+						: sql`coalesce(${cloudWorkspaceBoots.endReason}, 'unknown')`,
+				})
 				.where(eq(cloudWorkspaceBoots.id, bootId));
 			if (workspace?.usageStopAt && !(await otherOpenBoot(boot))) {
 				await setUsageStopAt(boot, null);
@@ -538,8 +611,9 @@ export async function settleBoot(
 		}
 		if (stopAt.getTime() > Date.now()) return "warned";
 		const stopped = await stopSandbox(workspace.providerSandboxId);
-		await recordSandboxAsleep(boot.cloudWorkspaceId, {
+		await recordBoxStopped(scope, {
 			sessionId: stopped.sessionId ?? boot.vercelSessionId,
+			reason: "usage_limit",
 		});
 		await setUsageStopAt(boot, null);
 		logControl("meter.cap_stopped", scope, { source: "settle" }, "warn");
@@ -641,9 +715,13 @@ export async function settleOrganizationNow(
 			cloudWorkspaceId && providerSandboxId
 				? stopSandbox(providerSandboxId)
 						.then((stopped) =>
-							recordSandboxAsleep(cloudWorkspaceId, {
-								sessionId: stopped.sessionId ?? vercelSessionId,
-							}),
+							recordBoxStopped(
+								{ cloudWorkspaceId, organizationId },
+								{
+									sessionId: stopped.sessionId ?? vercelSessionId,
+									reason: "archived",
+								},
+							),
 						)
 						.catch((error) =>
 							Sentry.captureException(error, {
@@ -760,6 +838,8 @@ async function adoptRunningBoxes(
 						vcpus: session.vcpus,
 						startedAt: new Date(session.startedAt),
 						lockOpen,
+						createdByUserId: workspace.createdByUserId,
+						origin: "adopt",
 					})
 					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
 					.returning({ id: cloudWorkspaceBoots.id });
@@ -779,9 +859,13 @@ async function adoptRunningBoxes(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
 			const stopped = await stopSandbox(workspace.providerSandboxId);
-			await recordSandboxAsleep(workspace.id, {
-				sessionId: stopped.sessionId ?? session.id,
-			});
+			await recordBoxStopped(
+				{
+					cloudWorkspaceId: workspace.id,
+					organizationId: workspace.organizationId,
+				},
+				{ sessionId: stopped.sessionId ?? session.id, reason: "usage_limit" },
+			);
 			logControl(
 				"meter.cap_stopped",
 				{

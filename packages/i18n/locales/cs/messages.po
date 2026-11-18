@@ -1166,6 +1166,9 @@ msgstr "{name} selhal"
 msgid "{name} finished"
 msgstr "{name} skončil"
 
+msgid "{name} group, {count, plural, one {# workspace} other {# workspaces}}"
+msgstr "Skupina {name}, {count, plural, one {# pracovní prostor} few {# pracovní prostory} many {# pracovního prostoru} other {# pracovních prostorů}}"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceBuiltinRemove"
 msgstr "{name} je vestavěný a nelze jej odebrat"
@@ -6056,6 +6059,9 @@ msgstr "Konverzaci se nepodařilo rozvětvit"
 msgid "Couldn't cancel the move"
 msgstr "Přesun se nepodařilo zrušit"
 
+msgid "Couldn't change the group color"
+msgstr "Barvu skupiny se nepodařilo změnit"
+
 #. placeholder {0}: errorMessage(error)
 msgid "Couldn't change the machine size: {0}"
 msgstr "Velikost stroje se nepodařilo změnit: {0}"
@@ -6102,8 +6108,14 @@ msgstr "Stack se nepodařilo vytvořit"
 msgid "Couldn't create the channel"
 msgstr "Kanál se nepodařilo vytvořit"
 
+msgid "Couldn't create the group"
+msgstr "Skupinu se nepodařilo vytvořit"
+
 msgid "Couldn't create workspace"
 msgstr "Pracovní prostor se nepodařilo vytvořit"
+
+msgid "Couldn't delete the group"
+msgstr "Skupinu se nepodařilo smazat"
 
 msgid "Couldn't discard changes"
 msgstr "Nepodařilo se zahodit změny"
@@ -6191,6 +6203,9 @@ msgstr "{name} se nepodařilo přesunout"
 msgid "Couldn't move the subagent to the background"
 msgstr "Subagenta se nepodařilo přesunout na pozadí"
 
+msgid "Couldn't move the workspace"
+msgstr "Pracovní prostor se nepodařilo přesunout"
+
 msgid "Couldn't name \"{name}\" automatically"
 msgstr "Nepodařilo se automaticky pojmenovat „{name}“"
 
@@ -6240,6 +6255,9 @@ msgstr "Z fronty slučování se nepodařilo odebrat"
 
 msgid "Couldn't remove the local sign-in"
 msgstr "Nepodařilo se odebrat místní přihlášení"
+
+msgid "Couldn't rename the group"
+msgstr "Skupinu se nepodařilo přejmenovat"
 
 msgid "Couldn't restart terminals"
 msgstr "Nepodařilo se restartovat terminály"
@@ -10725,6 +10743,9 @@ msgstr "Smažou se i odpovědi."
 
 msgid "Its saved state expired."
 msgstr "Jeho uložený stav vypršel."
+
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Jeho terminál se otevře tady, až ho cloudový pracovní prostor spustí."
 
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na {computerName} začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
