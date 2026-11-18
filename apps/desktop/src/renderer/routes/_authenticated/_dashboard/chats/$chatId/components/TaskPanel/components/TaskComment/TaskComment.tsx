@@ -39,7 +39,7 @@ export function TaskComment({ devName, onComment }: TaskCommentProps) {
 						? t({ message: `Comment, or tell ${devName} more…` })
 						: t({ message: "Add a comment…" })
 				}
-				className="min-h-6 flex-1 resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+				className="min-h-6 flex-1 resize-none rounded-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0 dark:bg-transparent"
 			/>
 			<button
 				type="button"
