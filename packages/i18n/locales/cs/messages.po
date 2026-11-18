@@ -6171,6 +6171,9 @@ msgstr "Nepodařilo se uložit. Upravte pole nebo klikněte jinam a zkuste to zn
 msgid "Couldn't save. Retrying…"
 msgstr "Nepodařilo se uložit. Zkouším znovu…"
 
+msgid "Couldn't search Linear"
+msgstr "Linear se nepodařilo prohledat"
+
 msgid "Couldn't search your chats"
 msgstr "Chaty se nepodařilo prohledat"
 

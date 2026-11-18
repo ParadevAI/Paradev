@@ -6165,6 +6165,9 @@ msgstr "Не вдалося зберегти. Змініть текст або �
 msgid "Couldn't save. Retrying…"
 msgstr "Не вдалося зберегти. Повторна спроба…"
 
+msgid "Couldn't search Linear"
+msgstr "Не вдалося виконати пошук у Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Не вдалося виконати пошук у чатах"
 

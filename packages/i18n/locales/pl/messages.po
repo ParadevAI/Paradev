@@ -6171,6 +6171,9 @@ msgstr "Nie udało się zapisać. Edytuj lub kliknij poza polem, aby ponowić"
 msgid "Couldn't save. Retrying…"
 msgstr "Nie udało się zapisać. Ponawianie…"
 
+msgid "Couldn't search Linear"
+msgstr "Nie udało się przeszukać Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Nie udało się przeszukać czatów"
 

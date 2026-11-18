@@ -6171,6 +6171,9 @@ msgstr "Échec de l'enregistrement. Modifiez ou cliquez ailleurs pour réessayer
 msgid "Couldn't save. Retrying…"
 msgstr "Échec de l'enregistrement. Nouvelle tentative…"
 
+msgid "Couldn't search Linear"
+msgstr "Impossible de rechercher dans Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Impossible de rechercher dans vos discussions"
 

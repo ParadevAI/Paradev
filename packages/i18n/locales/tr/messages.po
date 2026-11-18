@@ -6171,6 +6171,9 @@ msgstr "Kaydedilemedi. Yeniden denemek için düzenleyin veya başka bir yere t�
 msgid "Couldn't save. Retrying…"
 msgstr "Kaydedilemedi. Yeniden deneniyor…"
 
+msgid "Couldn't search Linear"
+msgstr "Linear'da arama yapılamadı"
+
 msgid "Couldn't search your chats"
 msgstr "Sohbetleriniz aranamadı"
 

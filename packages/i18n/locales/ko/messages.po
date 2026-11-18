@@ -6171,6 +6171,9 @@ msgstr "저장하지 못했습니다. 수정하거나 다른 곳을 클릭하면
 msgid "Couldn't save. Retrying…"
 msgstr "저장하지 못했습니다. 다시 시도하는 중…"
 
+msgid "Couldn't search Linear"
+msgstr "Linear를 검색하지 못했습니다"
+
 msgid "Couldn't search your chats"
 msgstr "채팅을 검색할 수 없습니다"
 

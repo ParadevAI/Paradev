@@ -14,10 +14,15 @@ import {
 import { Avatar } from "@superset/ui/atoms/Avatar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuPencil, LuReply, LuSquareCheck, LuX } from "react-icons/lu";
+import { useHostProjectIds } from "renderer/react-query/projects";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
 import { AgentComposer } from "renderer/routes/_authenticated/components/AgentComposer";
+import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
+import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 
 const MENTION_PRIORITY = -1;
+/** A chat searches the issues and pull requests of this many of the machine's projects. */
+const MAX_GITHUB_PROJECTS = 8;
 
 const chipFor = (candidate: MentionCandidate) => ({
 	label: candidate.label,
@@ -85,6 +90,19 @@ export function ChatComposer({
 		composer.current?.focus();
 	}, [editingText]);
 
+	const { activeHostUrl } = useLocalHostService();
+	const projectIds = useHostProjectIds(activeHostUrl);
+	const githubProviders = useGitHubMentionProviders(
+		useMemo(
+			() =>
+				activeHostUrl && projectIds
+					? [...projectIds]
+							.slice(0, MAX_GITHUB_PROJECTS)
+							.map((projectId) => ({ projectId, hostUrl: activeHostUrl }))
+					: null,
+			[activeHostUrl, projectIds],
+		),
+	);
 	const newTaskRef = useRef(onNewTask);
 	newTaskRef.current = onNewTask;
 	// The composer takes focus back after a menu pick, which would close a dialog opened in the same tick.
@@ -165,6 +183,11 @@ export function ChatComposer({
 		],
 	);
 
+	const allProviders = useMemo(
+		() => [...githubProviders, ...mentionProviders],
+		[githubProviders, mentionProviders],
+	);
+
 	// The composer has no way to empty itself, so dropping an edit mounts a new one.
 	const [draftEpoch, setDraftEpoch] = useState(0);
 	const cancel = () => {
@@ -221,7 +244,7 @@ export function ChatComposer({
 				ref={composer}
 				layout="inline"
 				placeholder={placeholder}
-				mentionProviders={mentionProviders}
+				mentionProviders={allProviders}
 				commands={commands}
 				autoFocus
 				onDraftChange={(draft) => onTextChange(draftText(draft.segments))}

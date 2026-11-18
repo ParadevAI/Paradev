@@ -6171,6 +6171,9 @@ msgstr "Không lưu được. Hãy sửa hoặc nhấp ra ngoài để thử l�
 msgid "Couldn't save. Retrying…"
 msgstr "Không lưu được. Đang thử lại…"
 
+msgid "Couldn't search Linear"
+msgstr "Không thể tìm kiếm trong Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Không thể tìm kiếm các cuộc trò chuyện của bạn"
 

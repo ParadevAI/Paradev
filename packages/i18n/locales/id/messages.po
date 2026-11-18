@@ -6171,6 +6171,9 @@ msgstr "Tidak bisa menyimpan. Edit atau klik di luar untuk mencoba lagi"
 msgid "Couldn't save. Retrying…"
 msgstr "Tidak bisa menyimpan. Mencoba lagi…"
 
+msgid "Couldn't search Linear"
+msgstr "Tidak dapat mencari di Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Tidak dapat mencari chat Anda"
 

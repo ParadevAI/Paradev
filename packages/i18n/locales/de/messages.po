@@ -6171,6 +6171,9 @@ msgstr "Konnte nicht gespeichert werden. Bearbeite das Feld oder klicke daneben,
 msgid "Couldn't save. Retrying…"
 msgstr "Konnte nicht gespeichert werden. Wird erneut versucht…"
 
+msgid "Couldn't search Linear"
+msgstr "Linear konnte nicht durchsucht werden"
+
 msgid "Couldn't search your chats"
 msgstr "Deine Chats konnten nicht durchsucht werden"
 

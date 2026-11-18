@@ -39,18 +39,43 @@ function prState(pr: LinkedPR) {
 		: "open";
 }
 
+const REPO_OF_URL = /github\.com\/[^/]+\/([^/]+)\//;
+
+/** Runs a search in every repository and joins what the reachable ones return. */
+async function inEachRepo<T>(
+	repos: readonly GitHubRepo[],
+	search: (repo: GitHubRepo) => Promise<T[]>,
+): Promise<T[]> {
+	const found = await Promise.allSettled(repos.map(search));
+	return found
+		.flatMap((result) => (result.status === "fulfilled" ? result.value : []))
+		.slice(0, MAX_RESULTS);
+}
+
+/**
+ * `repo`: the one project a composer works in, or a list (a chat has no
+ * project, so it searches every project on this machine and names the
+ * repository on each row).
+ */
 export function useGitHubMentionProviders(
-	repo: GitHubRepo | null,
+	repo: GitHubRepo | readonly GitHubRepo[] | null,
 ): ComposerMentionProvider[] {
 	const { t } = useLingui();
 	const isDark = useIsDarkTheme();
 	return useMemo(() => {
-		const client = () =>
-			repo ? getHostServiceClientByUrl(repo.hostUrl) : null;
+		const repos: readonly GitHubRepo[] = !repo
+			? []
+			: "projectId" in repo
+				? [repo]
+				: repo;
+		const titled = (title: string, url: string | undefined) => {
+			const name = repos.length > 1 && url ? REPO_OF_URL.exec(url)?.[1] : null;
+			return name ? `${name} · ${title}` : title;
+		};
 		const issueEntry = (issue: LinkedIssue): ComposerMentionEntry => ({
 			id: issue.url ?? issue.slug,
 			label: issue.slug,
-			description: issue.title,
+			description: titled(issue.title ?? "", issue.url),
 			icon:
 				issue.state === "closed" ? (
 					<GoIssueClosed className="size-4 text-purple-500" />
@@ -64,7 +89,7 @@ export function useGitHubMentionProviders(
 			return {
 				id: pr.url,
 				label: `#${pr.prNumber}`,
-				description: pr.title,
+				description: titled(pr.title ?? "", pr.url),
 				icon: (
 					<Icon
 						className={cn("size-4", PULL_REQUEST_COLOR[prState(pr)])}
@@ -86,21 +111,23 @@ export function useGitHubMentionProviders(
 				},
 				source: {
 					kind: "search",
-					emptyState: repo
+					emptyState: repos.length
 						? t({ message: "No matching issues" })
 						: t({ message: "Choose a project to search its issues" }),
 					search: async (query) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-issue") return [];
-						const host = client();
-						if (!repo || !host) return [];
-						const { issues } =
-							await host.workspaceCreation.searchGitHubIssues.query({
-								projectId: repo.projectId,
+						const issues = await inEachRepo(repos, async (target) => {
+							const found = await getHostServiceClientByUrl(
+								target.hostUrl,
+							).workspaceCreation.searchGitHubIssues.query({
+								projectId: target.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
 								includeClosed: query !== "",
 							});
+							return found.issues;
+						});
 						return issues
 							.filter((issue) => !ref || issue.issueNumber === ref.number)
 							.map((issue) =>
@@ -128,22 +155,24 @@ export function useGitHubMentionProviders(
 				},
 				source: {
 					kind: "search",
-					emptyState: repo
+					emptyState: repos.length
 						? t({ message: "No matching pull requests" })
 						: t({ message: "Choose a project to search its pull requests" }),
 					search: async (query) => {
 						const ref = linkedRefFromText(query);
 						if (ref && ref.kind !== "github-pr") return [];
-						const host = client();
-						if (!repo || !host) return [];
-						const { pullRequests } =
-							await host.workspaceCreation.searchPullRequests.query({
-								projectId: repo.projectId,
+						const pullRequests = await inEachRepo(repos, async (target) => {
+							const found = await getHostServiceClientByUrl(
+								target.hostUrl,
+							).workspaceCreation.searchPullRequests.query({
+								projectId: target.projectId,
 								query: ref ? String(ref.number) : query || undefined,
 								limit: MAX_RESULTS,
 								includeClosed: query !== "",
 								deferChecks: true,
 							});
+							return found.pullRequests;
+						});
 						return pullRequests
 							.filter((pr) => !ref || pr.prNumber === ref.number)
 							.map((pr) =>

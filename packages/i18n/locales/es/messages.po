@@ -6171,6 +6171,9 @@ msgstr "No se pudo guardar: edita o haz clic fuera para reintentarlo"
 msgid "Couldn't save. Retrying…"
 msgstr "No se pudo guardar: reintentando…"
 
+msgid "Couldn't search Linear"
+msgstr "No se pudo buscar en Linear"
+
 msgid "Couldn't search your chats"
 msgstr "No se pudieron buscar tus chats"
 

@@ -6171,6 +6171,9 @@ msgstr "Couldn't save. Edit or click away to retry"
 msgid "Couldn't save. Retrying…"
 msgstr "Couldn't save. Retrying…"
 
+msgid "Couldn't search Linear"
+msgstr "Couldn't search Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Couldn't search your chats"
 

@@ -6171,6 +6171,9 @@ msgstr "保存できませんでした。編集するかフォーカスを外し
 msgid "Couldn't save. Retrying…"
 msgstr "保存できませんでした。再試行中…"
 
+msgid "Couldn't search Linear"
+msgstr "Linear を検索できませんでした"
+
 msgid "Couldn't search your chats"
 msgstr "チャットを検索できませんでした"
 

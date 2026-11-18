@@ -6171,6 +6171,9 @@ msgstr "儲存失敗。編輯或點選別處以重試"
 msgid "Couldn't save. Retrying…"
 msgstr "儲存失敗。正在重試…"
 
+msgid "Couldn't search Linear"
+msgstr "無法搜尋 Linear"
+
 msgid "Couldn't search your chats"
 msgstr "無法搜尋你的聊天"
 

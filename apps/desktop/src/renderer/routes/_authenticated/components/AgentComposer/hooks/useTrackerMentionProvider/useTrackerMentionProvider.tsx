@@ -3,13 +3,16 @@ import type {
 	ComposerMentionEntry,
 	ComposerMentionProvider,
 } from "@superset/chat-ui/PromptInput";
+import { errorMessage } from "@superset/i18n/errors";
 import Fuse from "fuse.js";
 import { useMemo } from "react";
 import { useIsDarkTheme } from "renderer/assets/app-icons/preset-icons";
 import { PluginIcon } from "renderer/components/PluginIcon";
+import { env } from "renderer/env.renderer";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useTaskTracker } from "renderer/hooks/useTaskTracker";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
+import { electronTrpcClient } from "renderer/lib/trpc-client";
 import type { StatusType } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/components/shared/StatusIcon";
 import { TASK_PICKER_INPUT } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/hooks/useTasksData";
 import { withSearchMatches } from "renderer/routes/_authenticated/_dashboard/tasks/components/TasksView/utils/withSearchMatches";
@@ -62,13 +65,30 @@ export function useTrackerMentionProvider(): ComposerMentionProvider | null {
 						if (ref && ref.kind !== "linear") return [];
 						const includeClosed = query !== "";
 						const search = ref ? ref.identifier : query || null;
-						const { issues } = await cloudUtils.integration.linear.issues.fetch(
-							{
+						let issues: Awaited<
+							ReturnType<typeof cloudUtils.integration.linear.issues.fetch>
+						>["issues"];
+						try {
+							({ issues } = await cloudUtils.integration.linear.issues.fetch({
 								organizationId,
 								status: includeClosed ? "all" : "open",
 								search,
-							},
-						);
+							}));
+						} catch (error) {
+							return [
+								{
+									id: "linear-unavailable",
+									label: t({ message: "Couldn't search Linear" }),
+									description: errorMessage(error),
+									icon: <PluginIcon className="size-4" pluginName="linear" />,
+									select: () => {
+										void electronTrpcClient.external.openUrl.mutate(
+											`${env.NEXT_PUBLIC_WEB_URL}/integrations/linear`,
+										);
+									},
+								},
+							];
+						}
 						return issues
 							.filter((issue) => !ref || issue.identifier === ref.identifier)
 							.map((issue) => entry(linkedIssueFromLinear(issue), "linear"));

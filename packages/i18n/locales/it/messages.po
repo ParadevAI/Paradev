@@ -6171,6 +6171,9 @@ msgstr "Impossibile salvare. Modifica o clicca fuori per riprovare"
 msgid "Couldn't save. Retrying…"
 msgstr "Impossibile salvare. Nuovo tentativo…"
 
+msgid "Couldn't search Linear"
+msgstr "Impossibile cercare in Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Impossibile cercare nelle tue chat"
 

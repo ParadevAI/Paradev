@@ -6171,6 +6171,9 @@ msgstr "Kan niet opslaan. Bewerk of klik ernaast om opnieuw te proberen"
 msgid "Couldn't save. Retrying…"
 msgstr "Kan niet opslaan. Opnieuw proberen…"
 
+msgid "Couldn't search Linear"
+msgstr "Kon niet zoeken in Linear"
+
 msgid "Couldn't search your chats"
 msgstr "Kon je chats niet doorzoeken"
 
