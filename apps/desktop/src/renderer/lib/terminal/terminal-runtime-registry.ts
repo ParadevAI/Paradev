@@ -400,7 +400,6 @@ class TerminalRuntimeRegistryImpl {
 		const victims = selectRuntimesToEvict(
 			this.entries.values(),
 			this.parkedRuntimeCap,
-			// Alternate-screen TUIs restore as a garbled static snapshot — never evict them.
 			(entry) => entry.runtime?.terminal.buffer.active.type === "alternate",
 		);
 		for (const entry of victims) {

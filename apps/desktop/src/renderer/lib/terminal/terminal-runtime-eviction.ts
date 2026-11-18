@@ -18,21 +18,20 @@ export function normalizeParkedRuntimeCap(cap: number): number | null {
 /**
  * Pick the parked (live runtime, no container) entries to release, oldest
  * `lastUsedAt` first, so at most `cap` parked runtimes remain. Attached
- * runtimes and runtime-less entries are never candidates. Exempt entries
- * (e.g. an active alternate-screen TUI) still occupy the parked count but
- * are never selected — eviction stops early when only exempt entries remain.
+ * runtimes and runtime-less entries are never candidates.
  */
 export function selectRuntimesToEvict<T extends EvictionCandidate>(
 	entries: Iterable<T>,
 	cap: number,
-	isExempt: (entry: T) => boolean = () => false,
+	evictLast: (entry: T) => boolean = () => false,
 ): T[] {
 	const parked = Array.from(entries).filter(
 		(entry) => entry.runtime !== null && entry.runtime.container === null,
 	);
 	const excess = parked.length - cap;
 	if (excess <= 0) return [];
-	const evictable = parked.filter((entry) => !isExempt(entry));
-	evictable.sort((a, b) => a.lastUsedAt - b.lastUsedAt);
-	return evictable.slice(0, excess);
+	const byAge = (a: T, b: T) => a.lastUsedAt - b.lastUsedAt;
+	const last = parked.filter(evictLast).sort(byAge);
+	const first = parked.filter((entry) => !evictLast(entry)).sort(byAge);
+	return [...first, ...last].slice(0, excess);
 }
