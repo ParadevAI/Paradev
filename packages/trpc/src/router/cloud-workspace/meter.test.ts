@@ -36,10 +36,12 @@ let writes: Record<string, unknown>[];
 let autumnCalls: { method: string; params: unknown; headers?: unknown }[];
 let stopped: string[];
 let usageStopAt: Date | null;
+let creatorId: string | null;
 let delayedSettles: number[];
 let updateMatches: boolean;
 let insertConflicts: boolean;
 let insertError: Error | null;
+let usageRowError: Error | null;
 let queuedSettles: string[];
 let listed: BoxSession[];
 type UsageEvent = {
@@ -76,6 +78,9 @@ stub(db, {
 		values: (values: Record<string, unknown>) => {
 			writes.push(values);
 			return Object.assign(Promise.resolve(), {
+				onConflictDoUpdate: async () => {
+					if (usageRowError) throw usageRowError;
+				},
 				onConflictDoNothing: () => ({
 					returning: async () => {
 						if (insertError) throw insertError;
@@ -98,7 +103,7 @@ stub(db, {
 						id: "ws_1",
 						organizationId: "org_1",
 						providerSandboxId: "ws-box",
-						createdByUserId: "user_1",
+						createdByUserId: creatorId,
 						usageStopAt,
 						userName: "Ada Lovelace",
 						userEmail: "ada@example.com",
@@ -192,6 +197,10 @@ stub(autumnClient.balances, {
 	},
 });
 
+function usageRows() {
+	return writes.filter((write) => "feature" in write);
+}
+
 function autumnError(status: number) {
 	return new AutumnError(`status ${status}`, {
 		response: new Response("", { status }),
@@ -218,6 +227,7 @@ beforeEach(() => {
 		startedAt: NOW - 20 * MINUTE,
 		endedAt: null,
 		activeCpuMs: null,
+		egressBytes: null,
 	};
 	renewalAllowed = true;
 	finalizeError = null;
@@ -228,10 +238,12 @@ beforeEach(() => {
 	stopped = [];
 	recordedAsleep = [];
 	usageStopAt = null;
+	creatorId = "user_1";
 	delayedSettles = [];
 	updateMatches = true;
 	insertConflicts = false;
 	insertError = null;
+	usageRowError = null;
 	queuedSettles = [];
 	listed = [];
 	usageEvents = null;
@@ -434,6 +446,77 @@ describe("settleBoot", () => {
 		);
 	});
 
+	test("each amount Autumn accepts is written as a usage row for its lock and window", async () => {
+		await settleBoot("boot_1");
+		const [row] = usageRows();
+		expect(usageRows()).toHaveLength(1);
+		expect(row).toMatchObject({
+			bootId: "boot_1",
+			lockSeq: 0,
+			feature: "box_gb_minutes",
+			organizationId: "org_1",
+			cloudWorkspaceId: "ws_1",
+			userId: "user_1",
+			windowFrom: new Date(NOW - 10 * MINUTE),
+			sentAt: expect.any(Date),
+		});
+		const sent = autumnCalls.find((call) => call.method === "finalize")
+			?.params as { overrideValue: number };
+		expect(row?.amount).toBe(String(sent.overrideValue));
+		expect(
+			(row?.windowTo as Date).getTime() - (row?.windowFrom as Date).getTime(),
+		).toBe((sent.overrideValue / 16) * MINUTE);
+	});
+
+	test("a closed boot writes its CPU row and its CPU time and egress on the boot", async () => {
+		session = {
+			...(session as BoxSession),
+			endedAt: NOW - 4 * MINUTE,
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		};
+		await settleBoot("boot_1");
+		expect(
+			usageRows().find((row) => row.feature === "active_cpu_minutes"),
+		).toMatchObject({
+			lockSeq: 0,
+			amount: "3",
+			windowFrom: new Date(NOW - 20 * MINUTE),
+			windowTo: new Date(NOW - 4 * MINUTE),
+		});
+		expect(writes.at(-1)).toMatchObject({
+			activeCpuMs: 3 * MINUTE,
+			egressBytes: 5_000,
+		});
+	});
+
+	test("a usage row for a workspace with no creator has no user, where Autumn has unattributed", async () => {
+		creatorId = null;
+		await settleBoot("boot_1");
+		expect(usageRows()[0]).toMatchObject({ userId: null });
+		expect(
+			autumnCalls.find((call) => call.method === "check")?.params,
+		).toMatchObject({ properties: { userId: "unattributed" } });
+	});
+
+	test("an amount Autumn has not accepted writes no usage row", async () => {
+		finalizeError = autumnError(503);
+		await expect(settleBoot("boot_1")).rejects.toThrow("status 503");
+		expect(usageRows()).toEqual([]);
+	});
+
+	test("a usage row that fails to write is reported and the settle goes on unchanged", async () => {
+		usageRowError = new Error("db down");
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(autumnCalls.map((call) => call.method)).toEqual([
+			"finalize",
+			"check",
+		]);
+		expect(writes).toContainEqual(
+			expect.objectContaining({ finalizedThrough: expect.any(Date) }),
+		);
+	});
+
 	test("a boot another run is settling is left alone", async () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
@@ -451,6 +534,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		startedAt: NOW - 12 * MINUTE,
 		endedAt,
 		activeCpuMs: null,
+		egressBytes: null,
 	});
 	const timedOut: BoxSession = {
 		id: "sess_1",
@@ -459,6 +543,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		startedAt: NOW - 72 * MINUTE,
 		endedAt: NOW - 12 * MINUTE - 1_000,
 		activeCpuMs: null,
+		egressBytes: null,
 	};
 	const reconcile = () =>
 		reconcileCloudWorkspaceUsage({ active: [box], billingEnabled: true });
@@ -638,6 +723,11 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 		await reserve(null);
 		expect(userTotal("box_gb_minutes", "unattributed")).toBe(480);
 		expect(usageEvents?.[0]?.properties).not.toHaveProperty("userEmail");
+	});
+
+	test("a boot records who created it", async () => {
+		await reserve();
+		expect(writes[0]).toMatchObject({ createdByUserId: "user_1" });
 	});
 });
 

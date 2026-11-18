@@ -98,6 +98,7 @@ describe("findSandboxSession", () => {
 							startedAt: NOW - HOUR,
 							stoppedAt: NOW,
 							updatedAt: NOW,
+							networkTransfer: { ingress: 4_096, egress: 2_048 },
 						};
 					}
 				})(),
@@ -113,6 +114,7 @@ describe("findSandboxSession", () => {
 				startedAt: NOW - HOUR,
 				endedAt: NOW,
 				activeCpuMs: null,
+				egressBytes: 2_048,
 			},
 		});
 	});

@@ -7,7 +7,9 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
+import type { CloudUsageFeature } from "@superset/db/enums";
 import {
+	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
 	users,
@@ -212,6 +214,7 @@ export async function authorizeBoot(
 		vcpus: args.vcpus,
 		startedAt: new Date(),
 		lockOpen: result !== null,
+		createdByUserId: args.createdByUserId,
 	});
 	logControl(
 		"boot.authorized",
@@ -323,10 +326,56 @@ function bootTags(boot: Boot): Record<string, string> {
 	};
 }
 
-async function recordUsage(
+type UsageWindow = {
+	from: number;
+	to: number;
+	amount: number;
+	user: UsageUser | null;
+};
+
+async function recordSentUsage(
 	boot: Boot,
-	window: { from: number; amount: number; user: UsageUser | null },
+	feature: CloudUsageFeature,
+	window: UsageWindow,
 ): Promise<void> {
+	try {
+		await db
+			.insert(cloudUsageEvents)
+			.values({
+				bootId: boot.id,
+				lockSeq: boot.lockSeq,
+				feature,
+				organizationId: boot.organizationId,
+				cloudWorkspaceId: boot.cloudWorkspaceId,
+				userId: window.user?.id ?? null,
+				windowFrom: new Date(window.from),
+				windowTo: new Date(window.to),
+				amount: String(window.amount),
+				sentAt: new Date(),
+			})
+			.onConflictDoUpdate({
+				target: [
+					cloudUsageEvents.bootId,
+					cloudUsageEvents.lockSeq,
+					cloudUsageEvents.feature,
+				],
+				set: {
+					amount: sql`${cloudUsageEvents.amount} + excluded.amount`,
+					windowTo: sql`excluded.window_to`,
+					sentAt: sql`excluded.sent_at`,
+				},
+				// Autumn sums a later window tracked under the same lock; a retried window it kept once.
+				setWhere: sql`excluded.window_from >= ${cloudUsageEvents.windowTo}`,
+			});
+	} catch (error) {
+		Sentry.captureException(error, {
+			tags: bootTags(boot),
+			extra: { feature, lockSeq: boot.lockSeq },
+		});
+	}
+}
+
+async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 	const { amount } = window;
 	const properties = usageProperties(boot, window.user);
 	const lockId = lockIdFor(boot.id, boot.lockSeq);
@@ -337,10 +386,12 @@ async function recordUsage(
 				{ lockId, action: "confirm", overrideValue: amount },
 				{ headers: { "Idempotency-Key": `${lockId}:confirm` } },
 			);
-			return;
+			return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 		} catch (error) {
 			if (!(error instanceof AutumnError)) throw error;
-			if (error.statusCode === 409) return;
+			if (error.statusCode === 409) {
+				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
+			}
 			if (error.statusCode >= 500) throw error;
 			Sentry.captureException(error, {
 				tags: bootTags(boot),
@@ -362,9 +413,10 @@ async function recordUsage(
 			{ headers: { "Idempotency-Key": `${lockId}:track:${window.from}` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
 }
 
 async function claimSettle(bootId: string): Promise<Boot | null> {
@@ -392,26 +444,23 @@ function clearLease(bootId: string) {
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 }
 
-async function recordActiveCpu(
-	boot: Boot,
-	activeCpuMs: number,
-	user: UsageUser | null,
-) {
+async function recordActiveCpu(boot: Boot, window: UsageWindow) {
 	try {
 		await autumnClient.track(
 			{
 				customerId: boot.organizationId,
 				featureId: ACTIVE_CPU_MINUTES_FEATURE_ID,
-				value: activeCpuMs / 60_000,
+				value: window.amount,
 				async: false,
-				properties: usageProperties(boot, user),
+				properties: usageProperties(boot, window.user),
 			},
 			{ headers: { "Idempotency-Key": `${boot.id}:active-cpu` } },
 		);
 	} catch (error) {
-		if (error instanceof AutumnError && error.statusCode === 409) return;
-		throw error;
+		if (!(error instanceof AutumnError && error.statusCode === 409))
+			throw error;
 	}
+	await recordSentUsage(boot, ACTIVE_CPU_MINUTES_FEATURE_ID, window);
 }
 
 /**
@@ -480,6 +529,7 @@ export async function settleBoot(
 		).getTime();
 		await recordUsage(boot, {
 			from,
+			to: end,
 			amount: gbMinutes({ ms: end - from, memoryMb: session.memoryMb }),
 			user,
 		});
@@ -490,11 +540,21 @@ export async function settleBoot(
 
 		if (session.endedAt !== null) {
 			if (session.activeCpuMs) {
-				await recordActiveCpu(boot, session.activeCpuMs, user);
+				await recordActiveCpu(boot, {
+					from: session.startedAt,
+					to: end,
+					amount: session.activeCpuMs / 60_000,
+					user,
+				});
 			}
 			await db
 				.update(cloudWorkspaceBoots)
-				.set({ stoppedAt: new Date(end), settleLeaseUntil: null })
+				.set({
+					stoppedAt: new Date(end),
+					settleLeaseUntil: null,
+					activeCpuMs: session.activeCpuMs,
+					egressBytes: session.egressBytes,
+				})
 				.where(eq(cloudWorkspaceBoots.id, bootId));
 			if (workspace?.usageStopAt && !(await otherOpenBoot(boot))) {
 				await setUsageStopAt(boot, null);
@@ -764,6 +824,7 @@ async function adoptRunningBoxes(
 						vcpus: session.vcpus,
 						startedAt: new Date(session.startedAt),
 						lockOpen,
+						createdByUserId: workspace.createdByUserId,
 					})
 					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
 					.returning({ id: cloudWorkspaceBoots.id });
