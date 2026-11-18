@@ -58,23 +58,10 @@ export interface CloudUsageScope {
 	userId?: string;
 }
 
-/**
- * Staff only. `organizationId: null` reads every organization, which a `CloudUsageScope` cannot
- * say. The staff-only boundary test fails when code outside this package names it.
- */
-export interface CloudFleetScope {
-	readonly fleet: true;
-	organizationId: string | null;
-	userId?: undefined;
-}
+/** Only the fleet entry points pass `null`, which reads every organization. */
+type Scope = { organizationId: string | null; userId?: string };
 
-export const cloudFleetScope = (
-	organizationId: string | null = null,
-): CloudFleetScope => ({ fleet: true, organizationId });
-
-type AnyScope = CloudUsageScope | CloudFleetScope;
-
-const inOrganization = (scope: AnyScope, column: AnyPgColumn) =>
+const inOrganization = (scope: Scope, column: AnyPgColumn) =>
 	scope.organizationId === null ? undefined : eq(column, scope.organizationId);
 
 export interface CloudUsageFilters {
@@ -181,7 +168,7 @@ function usd(gbMinutes: number, overagePerGbHour: number | null) {
 }
 
 function scopeConditions(
-	scope: AnyScope,
+	scope: Scope,
 	filters: CloudUsageFilters,
 	columns: {
 		user: AnyPgColumn;
@@ -271,7 +258,7 @@ const NO_KEY: FactKeys = {
  */
 function usageFacts(
 	db: Db,
-	scope: AnyScope,
+	scope: Scope,
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
@@ -499,9 +486,9 @@ interface CloudUsageOptions<GroupBy> {
  * adds organization, project, size and end reason). Pages ordered by amount are read at each call:
  * an event sent between pages can move a row across the cursor.
  */
-async function runUsage(
+async function usageRows(
 	db: Db,
-	scope: AnyScope,
+	scope: Scope,
 	options: CloudUsageOptions<CloudFleetGroupBy>,
 ) {
 	const {
@@ -583,7 +570,7 @@ async function runUsage(
 	};
 }
 
-type CloudFleetUsageResult = Awaited<ReturnType<typeof runUsage>>;
+type CloudFleetUsageResult = Awaited<ReturnType<typeof usageRows>>;
 
 export type CloudUsageResult = Omit<CloudFleetUsageResult, "items"> & {
 	items: Array<
@@ -597,18 +584,21 @@ export function queryCloudUsage(
 	db: Db,
 	scope: CloudUsageScope,
 	options: CloudUsageOptions<CloudUsageGroupBy>,
-): Promise<CloudUsageResult>;
-export function queryCloudUsage(
+): Promise<CloudUsageResult> {
+	return usageRows(db, scope, options) as Promise<CloudUsageResult>;
+}
+
+/**
+ * `queryCloudUsage` across organizations (`organizationId: null`) or for one, with more groupings.
+ * Staff only: biome.jsonc forbids importing it outside this package, and `queryCloudUsage` accepts
+ * only a `CloudUsageScope`, whose organization id is a string.
+ */
+export function queryFleetCloudUsage(
 	db: Db,
-	scope: CloudFleetScope,
+	organizationId: string | null,
 	options: CloudUsageOptions<CloudFleetGroupBy>,
-): Promise<CloudFleetUsageResult>;
-export function queryCloudUsage(
-	db: Db,
-	scope: AnyScope,
-	options: CloudUsageOptions<CloudFleetGroupBy>,
-) {
-	return runUsage(db, scope, options);
+): Promise<CloudFleetUsageResult> {
+	return usageRows(db, { organizationId }, options);
 }
 
 const NO_USAGE: MetricRow = {
@@ -670,7 +660,7 @@ interface CloudBootsOptions {
 	overagePerGbHour: number | null;
 }
 
-async function bootRows(db: Db, scope: AnyScope, options: CloudBootsOptions) {
+async function bootRows(db: Db, scope: Scope, options: CloudBootsOptions) {
 	const {
 		window,
 		filters = {},
@@ -744,17 +734,24 @@ async function bootRows(db: Db, scope: AnyScope, options: CloudBootsOptions) {
 export type CloudBootsResult = Awaited<ReturnType<typeof bootRows>>;
 
 export type CloudFleetBootsResult = Omit<CloudBootsResult, "items"> & {
-	items: Array<
-		CloudBootsResult["items"][number] & {
-			organization: OrganizationRef | null;
-			activeCpuMinutes: number | null;
-			egressGb: number | null;
-		}
-	>;
+	items: Array<CloudBootsResult["items"][number] & FleetBootFields>;
+};
+
+interface FleetBootFields {
+	organization: OrganizationRef | null;
+	activeCpuMinutes: number | null;
+	egressGb: number | null;
+}
+
+const NO_FLEET_BOOT_FIELDS: FleetBootFields = {
+	organization: null,
+	activeCpuMinutes: null,
+	egressGb: null,
 };
 
 async function fleetBootFields(db: Db, ids: string[]) {
-	if (ids.length === 0) return new Map();
+	const fields = new Map<string, FleetBootFields>();
+	if (ids.length === 0) return fields;
 	const rows = await db
 		.select({
 			id: boots.id,
@@ -769,46 +766,47 @@ async function fleetBootFields(db: Db, ids: string[]) {
 		.from(boots)
 		.leftJoin(organizations, eq(organizations.id, boots.organizationId))
 		.where(inArray(boots.id, ids));
-	return new Map(
-		rows.map(({ id, activeCpuMs, egressBytes, organization }) => [
-			id,
-			{
-				organization,
-				activeCpuMinutes: activeCpuMs === null ? null : activeCpuMs / 60_000,
-				egressGb: egressBytes === null ? null : egressBytes / 1024 ** 3,
-			},
-		]),
-	);
+	for (const { id, activeCpuMs, egressBytes, organization } of rows) {
+		fields.set(id, {
+			organization,
+			activeCpuMinutes: activeCpuMs === null ? null : activeCpuMs / 60_000,
+			egressGb: egressBytes === null ? null : egressBytes / 1024 ** 3,
+		});
+	}
+	return fields;
 }
 
 /**
- * Boot rows that started in the window, newest first, each with the sum of its sent events. A fleet
- * scope lists across organizations and adds the organization, active CPU and egress. A failed start
- * with no boot row is not listed: it is a workspace, counted by `queryCloudUsage`.
+ * Boot rows that started in the window, newest first, each with the sum of its sent events. A failed
+ * start with no boot row is not listed: it is a workspace, counted by `queryCloudUsage`.
  */
 export function listCloudBoots(
 	db: Db,
 	scope: CloudUsageScope,
 	options: CloudBootsOptions,
-): Promise<CloudBootsResult>;
-export function listCloudBoots(
-	db: Db,
-	scope: CloudFleetScope,
-	options: CloudBootsOptions,
-): Promise<CloudFleetBootsResult>;
-export async function listCloudBoots(
-	db: Db,
-	scope: AnyScope,
-	options: CloudBootsOptions,
 ) {
-	const result = await bootRows(db, scope, options);
-	if (!("fleet" in scope)) return result;
+	return bootRows(db, scope, options);
+}
+
+/**
+ * `listCloudBoots` across organizations (`organizationId: null`) or for one, with the organization,
+ * active CPU and egress of each boot. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function listFleetCloudBoots(
+	db: Db,
+	organizationId: string | null,
+	options: CloudBootsOptions,
+): Promise<CloudFleetBootsResult> {
+	const result = await bootRows(db, { organizationId }, options);
 	const fields = await fleetBootFields(
 		db,
 		result.items.map((boot) => boot.id),
 	);
 	return {
 		...result,
-		items: result.items.map((boot) => ({ ...boot, ...fields.get(boot.id) })),
+		items: result.items.map((boot) => ({
+			...boot,
+			...(fields.get(boot.id) ?? NO_FLEET_BOOT_FIELDS),
+		})),
 	};
 }

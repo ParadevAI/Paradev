@@ -17,13 +17,13 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import {
-	type CloudFleetScope,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
-	cloudFleetScope,
 	listCloudBoots,
+	listFleetCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
+	queryFleetCloudUsage,
 } from "./cloud-usage-query";
 import { cloudWorkspaces, taskProjects } from "./schema";
 
@@ -242,10 +242,10 @@ test("billing periods keep Autumn's reset day through short months", () => {
 
 describe("fleet scope", () => {
 	const fleet = (
-		options: Partial<Parameters<typeof queryCloudUsage>[2]>,
-		organizationId?: string,
+		options: Partial<Parameters<typeof queryFleetCloudUsage>[2]>,
+		organizationId: string | null = null,
 	) =>
-		queryCloudUsage(db, cloudFleetScope(organizationId), {
+		queryFleetCloudUsage(db, organizationId, {
 			window: NOVEMBER,
 			limit: 25,
 			overagePerGbHour: RATE,
@@ -333,7 +333,7 @@ describe("fleet scope", () => {
 	});
 
 	test("lists boots across organizations with CPU, egress and the organization", async () => {
-		const { items } = await listCloudBoots(db, cloudFleetScope(), {
+		const { items } = await listFleetCloudBoots(db, null, {
 			window: NOVEMBER,
 			limit: 25,
 			now: NOW,
@@ -365,19 +365,22 @@ describe("fleet scope", () => {
 		}
 	});
 
-	test("a customer scope never reads another organization", async () => {
-		const unknown = queryCloudUsage(
+	test("a customer scope reads only its own organization", async () => {
+		const empty = await queryCloudUsage(
 			db,
-			{ organizationId: "" },
+			{ organizationId: "a0000000-0000-4000-8000-0000000000ff" },
 			{ window: NOVEMBER, limit: 1, overagePerGbHour: RATE },
 		);
-		await expect(unknown).rejects.toThrow();
+		expect(empty.total).toMatchObject({ boots: 0, workspaces: 0, gbHours: 0 });
+		const others = await listCloudBoots(
+			db,
+			{ organizationId: OTHER_ORG },
+			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
+		);
+		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
 	});
 
-	test("a customer scope is not a fleet scope and cannot group by more", () => {
-		// @ts-expect-error CloudUsageScope lacks the fleet brand
-		const asFleet: CloudFleetScope = { organizationId: ORG };
-		expect(asFleet.organizationId).toBe(ORG);
+	test("a customer scope cannot group by more than user, day or workspace", () => {
 		const groupByOrganization = () =>
 			queryCloudUsage(
 				db,
