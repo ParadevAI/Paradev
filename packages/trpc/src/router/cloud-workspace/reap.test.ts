@@ -28,6 +28,22 @@ let onArchiveHook: () => void = () => {};
 let reapedFiles: string[] = [];
 
 stub(db.query.cloudWorkspaces, { findFirst: () => Promise.resolve(row) });
+// Whether the retiring write still finds the row as the reap read it.
+let retires = true;
+let retiredTo: Record<string, unknown> | null = null;
+stub(db, {
+	update: () => ({
+		set: (values: Record<string, unknown>) => ({
+			where: () => ({
+				returning: async () => {
+					if (!retires) return [];
+					retiredTo = values;
+					return [{ id: "row" }];
+				},
+			}),
+		}),
+	}),
+});
 let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
 let endedBoots: unknown[] = [];
 stub(sandboxSleep, {
@@ -187,6 +203,8 @@ describe("reapArchivedCloudWorkspace", () => {
 		reapedFiles = [];
 		recordedAsleep = [];
 		endedBoots = [];
+		retires = true;
+		retiredTo = null;
 	});
 
 	test("the stop stage ends the stopped session's boot as archived", async () => {
@@ -258,6 +276,36 @@ describe("reapArchivedCloudWorkspace", () => {
 		).toBe("reaped");
 		expect(meterCalls).toEqual(["settle"]);
 		expect(sandboxCalls).toEqual(["delete:ws-box"]);
+	});
+
+	test("the delete stage retires the box's names before it deletes them, so an undo gets a new box and drive", async () => {
+		row = { ...(row as Row), driveName: "drive-ws-box" } as Row;
+		expect(
+			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
+		).toBe("reaped");
+		expect(retiredTo).toMatchObject({ driveName: null, driveLaidOutAt: null });
+		expect(retiredTo?.providerSandboxId).not.toBe("ws-box");
+		expect(queued).toContainEqual(
+			expect.objectContaining({
+				path: "/api/cloud-workspaces/teardown",
+				body: {
+					providerSandboxId: "ws-box",
+					driveName: "drive-ws-box",
+					attempt: 0,
+				},
+			}),
+		);
+	});
+
+	test("an undo that wins the row before the retire leaves the box and drive alone", async () => {
+		row = { ...(row as Row), driveName: "drive-ws-box" } as Row;
+		retires = false;
+		expect(
+			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
+		).toBe("skipped");
+		expect(sandboxCalls).toEqual([]);
+		expect(queued).toEqual([]);
+		expect(reapedFiles).toEqual([]);
 	});
 
 	test("the delete stage removes the files sent to the workspace", async () => {

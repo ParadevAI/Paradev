@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
@@ -7,25 +6,35 @@ import { cloudUsageRefusalKey } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
-import { controlTags } from "../../lib/control-log";
+import { type ControlScope, controlTags } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	bootPhases,
 	buildSandboxClaim,
-	deleteSandbox,
+	forkWorkspaceDrive,
 	provisionSandbox,
+	SandboxBusyError,
+	SandboxDriveMissingError,
+	SandboxDriveRefusedError,
+	type SandboxEnvironment,
 	SandboxNotReadyError,
 	settleSandbox,
 	stopSandbox,
+	workspaceDriveMounts,
 } from "../../lib/sandbox";
 import {
 	failChatMovesTo,
 	queueChatMovesTo,
 } from "../chat-move/utils/queueChatMove";
+import { recordDriveLaidOut } from "./drive-laid-out";
 import { generateCloudWorkspaceName } from "./generate-name";
+import { publishCloudWorkspaceJob } from "./jobs";
 import { attachBootSession, authorizeBoot, boxFor, releaseBoot } from "./meter";
+import { sandboxResumeLock } from "./resume-lock";
 import { recordSandboxAwake } from "./sandbox-expiry";
-import { recordBootTrace } from "./sandbox-sleep";
+import { nextSandboxNameFor } from "./sandbox-name";
+import { recordBootTrace, recordSandboxAsleep } from "./sandbox-sleep";
+import { deleteSandboxAndDriveLater } from "./teardown";
 import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 export const FALLBACK_NAME = "Cloud workspace";
@@ -35,14 +44,7 @@ export function sandboxNameFor(cloudWorkspaceId: string): string {
 	return `ws-${cloudWorkspaceId.replaceAll("-", "").slice(0, 24)}`;
 }
 
-/**
- * A later box for the same row. Vercel refuses a deleted sandbox's name
- * with `image_not_ready` for a few minutes after the delete.
- */
-export function nextSandboxNameFor(cloudWorkspaceId: string): string {
-	const prefix = cloudWorkspaceId.replaceAll("-", "").slice(0, 16);
-	return `ws-${prefix}${randomBytes(4).toString("hex")}`;
-}
+export { nextSandboxNameFor } from "./sandbox-name";
 
 export interface ProvisionCloudWorkspaceInput {
 	cloudWorkspaceId: string;
@@ -53,7 +55,15 @@ export interface ProvisionCloudWorkspaceInput {
 	namingPrompt?: string;
 	/** A built-in agent to run once the sandbox is up; see cloud-agent-launch. */
 	launch?: CloudAgentLaunch;
+	/** How many times this provision found the box's resume lock held and requeued itself. */
+	lockRetries?: number;
 }
+
+/** A lock held this long by others means something is stuck: the row is failed as for any error. */
+const PROVISION_LOCK_RETRIES = 10;
+const PROVISION_LOCK_RETRY_SECONDS = 15;
+
+type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
 function provisionFailureReason(error: unknown): CloudWorkspaceFailureReason {
 	switch (cloudUsageRefusalKey(error)) {
@@ -62,14 +72,48 @@ function provisionFailureReason(error: unknown): CloudWorkspaceFailureReason {
 		case "serverError.cloudWorkspace.cloudNeedsPaidPlan":
 			return "needs_paid_plan";
 	}
-	return error instanceof SandboxNotReadyError
+	return error instanceof SandboxNotReadyError ||
+		error instanceof SandboxDriveRefusedError
 		? "host_not_ready"
 		: "create_failed";
+}
+
+/**
+ * The name is on the row before the drive exists, so a delete that races
+ * this provision still finds it. An unarchived workspace keeps its drive when
+ * it still exists; a drive forked afresh has not been laid out yet.
+ */
+async function claimWorkspaceDrive(
+	row: CloudWorkspaceRow,
+	driveName: string,
+	environment: SandboxEnvironment,
+): Promise<"existing" | "forked"> {
+	if (!row.driveName) {
+		await db
+			.update(cloudWorkspaces)
+			.set({ driveName })
+			.where(eq(cloudWorkspaces.id, row.id));
+	}
+	const outcome = await Sentry.startSpan({ name: "drive", op: "sandbox" }, () =>
+		forkWorkspaceDrive({
+			name: driveName,
+			region: environment.region,
+			goldenDriveName: environment.goldenDriveName ?? null,
+		}),
+	);
+	if (outcome === "forked" && row.driveLaidOutAt) {
+		await db
+			.update(cloudWorkspaces)
+			.set({ driveLaidOutAt: null })
+			.where(eq(cloudWorkspaces.id, row.id));
+	}
+	return outcome;
 }
 
 export type ProvisionCloudWorkspaceOutcome =
 	| "provisioned"
 	| "skipped"
+	| "retrying"
 	| "failed";
 
 /**
@@ -111,6 +155,10 @@ async function provision(
 		where: eq(cloudWorkspaces.id, input.cloudWorkspaceId),
 	});
 	if (!row) return "skipped";
+	const scope: ControlScope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
 	if (row.status !== "provisioning") return "skipped";
 
 	const providerSandboxId = row.providerSandboxId;
@@ -128,11 +176,25 @@ async function provision(
 					},
 				);
 	let bootId: string | null = null;
+	let driveName = row.driveName;
+	// Only a drive this provision forked may go with a failed box; an unarchived workspace's is its work.
+	let forkedDrive = false;
+	// Another delivery on the same box name, or a wake, may have brought the row up: only this job's own row is its to fail.
+	let madeAwake = false;
 	try {
-		const { claim, environment, agentCredentialDigest } =
-			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
-				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
-			);
+		const {
+			claim,
+			environment,
+			agentCredentialDigest,
+			driveName: claimedDrive,
+		} = await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
+			buildSandboxClaim({
+				row,
+				launch: input.launch,
+				withRepoHooks: true,
+				provisioning: true,
+			}),
+		);
 		({ bootId } = await Sentry.startSpan(
 			{ name: "authorize boot", op: "billing" },
 			() =>
@@ -145,31 +207,61 @@ async function provision(
 					traceId: span.spanContext().traceId,
 				}),
 		));
-		if (bootId) span.setAttribute("boot.id", bootId);
+		if (bootId) {
+			scope.bootId = bootId;
+			span.setAttribute("boot.id", bootId);
+		}
+		driveName = claimedDrive;
+		if (driveName) {
+			forkedDrive =
+				(await claimWorkspaceDrive(row, driveName, environment)) === "forked";
+		}
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
-			() => provisionSandbox({ name: providerSandboxId, environment, claim }),
+			() =>
+				provisionSandbox({
+					name: providerSandboxId,
+					environment,
+					claim,
+					mounts: workspaceDriveMounts(driveName),
+					exclusive: sandboxResumeLock(driveName ?? providerSandboxId, {
+						wait: true,
+					}),
+				}),
 		);
 		const ready = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
 			to: "awake",
+			onBox: providerSandboxId,
 			set: {
 				providerSandboxId: sandbox.providerSandboxId,
 				sandboxUrl: sandbox.sandboxUrl,
 				bootAgentCredentialDigest: agentCredentialDigest,
 			},
 		});
+		madeAwake = ready;
 		if (!ready) {
-			// Deleted while the box was being made: the delete won the row, so
-			// the box it never knew about goes with it. A duplicate delivery of
-			// this job loses the row to the first one and must leave the box be:
-			// the name is per workspace, so it is the same box.
+			// Deleted while the box was being made. The box is the row's, and the
+			// archive's own reap stops and deletes it after that archive's grace
+			// period: an undo, more work and a later archive must not lose it to
+			// this job. A duplicate delivery loses the row to the first one.
 			const current = await db.query.cloudWorkspaces.findFirst({
 				where: eq(cloudWorkspaces.id, row.id),
-				columns: { status: true },
+				columns: { status: true, providerSandboxId: true },
 			});
-			if (current?.status === "archived") {
+			// An undo gave the row another box and a second provision: this box is no row's, and must not keep the drive.
+			const overtaken =
+				current !== undefined &&
+				current.providerSandboxId !== providerSandboxId;
+			if (overtaken) {
+				if (bootId) await releaseBoot(bootId, "provision_abandoned");
+				await deleteSandboxAndDriveLater({
+					providerSandboxId,
+					driveName,
+					keepDrive: true,
+				});
+			} else if (current?.status === "archived") {
 				await failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
 					(error) =>
 						console.error(
@@ -177,7 +269,6 @@ async function provision(
 							error,
 						),
 				);
-				await deleteSandbox(providerSandboxId);
 				if (bootId) await releaseBoot(bootId, "provision_abandoned");
 			}
 			await naming.catch(() => {});
@@ -192,13 +283,7 @@ async function provision(
 		}
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
-				Sentry.captureException(error, {
-					tags: controlTags({
-						cloudWorkspaceId: row.id,
-						organizationId: row.organizationId,
-						bootId,
-					}),
-				}),
+				Sentry.captureException(error, { tags: controlTags(scope) }),
 			);
 		}
 		// The box is booting; the environment it needs arrives once host-service
@@ -211,25 +296,71 @@ async function provision(
 					providerSandboxId,
 					hostTarget: sandbox.hostTarget,
 					claim,
+					bootId: sandbox.bootId,
 				}),
 		);
+		if (driveName) await recordDriveLaidOut(row.id);
 		await queueChatMovesTo(row.id).catch((error) =>
 			console.error(
 				`[cloud-workspace] could not start the chat moving into ${row.id}`,
 				error,
 			),
 		);
-		await recordBootTrace(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId, bootId },
-			span,
-			bootPhases(answer),
-		);
+		await recordBootTrace(scope, span, bootPhases(answer));
 		await naming.catch((error) =>
 			console.error(`[cloud-workspace] naming failed for ${row.id}`, error),
 		);
 		return "provisioned";
 	} catch (error) {
 		await naming.catch(() => {});
+		// Another caller holds the box's lock: try again later, and touch nothing meanwhile.
+		const lockRetries = input.lockRetries ?? 0;
+		if (
+			error instanceof SandboxBusyError &&
+			lockRetries < PROVISION_LOCK_RETRIES
+		) {
+			if (bootId) {
+				await releaseBoot(bootId, "provision_abandoned").catch((releaseError) =>
+					console.error(
+						`[cloud-workspace] could not release boot ${bootId}`,
+						releaseError,
+					),
+				);
+			}
+			await publishCloudWorkspaceJob({
+				path: "/api/cloud-workspaces/provision",
+				body: { ...input, lockRetries: lockRetries + 1 },
+				delaySeconds: PROVISION_LOCK_RETRY_SECONDS,
+				runLocally: provisionCloudWorkspace,
+			});
+			return "retrying";
+		}
+		// The drive did not come up but its data is intact: the box sleeps, and the next wake mounts it afresh.
+		if (error instanceof SandboxDriveMissingError && madeAwake) {
+			const stopped = await stopSandbox(providerSandboxId).catch(() => ({
+				sessionId: null,
+			}));
+			await recordSandboxAsleep(row.id, stopped);
+			nudge(row.organizationId, "cloud_workspaces");
+			if (bootId) {
+				await releaseBoot(bootId, "provision_failed").catch((releaseError) =>
+					console.error(
+						`[cloud-workspace] could not release boot ${bootId}`,
+						releaseError,
+					),
+				);
+			}
+			await queueChatMovesTo(row.id).catch((moveError) =>
+				console.error(
+					`[cloud-workspace] could not start the chat moving into ${row.id}`,
+					moveError,
+				),
+			);
+			console.warn(
+				`[cloud-workspace] ${row.id} left asleep: its drive did not come up at create`,
+			);
+			return "provisioned";
+		}
 		if (bootId) {
 			await releaseBoot(bootId, "provision_failed").catch((releaseError) =>
 				console.error(
@@ -243,33 +374,48 @@ async function provision(
 		// away, it costs storage rather than compute meanwhile, and a delete
 		// from the sidebar still removes it. Any other failure must not leak
 		// a box, since billing started at provision.
-		const keepForDiagnosis = error instanceof SandboxNotReadyError;
-		await (keepForDiagnosis ? stopSandbox : deleteSandbox)(
-			providerSandboxId,
-		).catch((teardownError) => {
+		const keepForDiagnosis =
+			error instanceof SandboxNotReadyError ||
+			error instanceof SandboxDriveRefusedError;
+		// A box that goes is retired with the transition, so nothing can wake it while it is deleted.
+		const changed = await failCloudWorkspace({
+			scope,
+			from: madeAwake ? ["provisioning", "awake", "asleep"] : ["provisioning"],
+			onBox: providerSandboxId,
+			set: keepForDiagnosis
+				? { providerSandboxId }
+				: {
+						providerSandboxId: nextSandboxNameFor(row.id),
+						...(forkedDrive ? { driveName: null, driveLaidOutAt: null } : {}),
+					},
+			reason: provisionFailureReason(error),
+			error,
+		});
+		const teardownFailed = (teardownError: unknown) =>
 			console.error(
 				`[cloud-workspace] ${keepForDiagnosis ? "could not stop" : "leaked"} sandbox ${providerSandboxId}`,
 				teardownError,
 			);
-		});
-		await failCloudWorkspace({
-			scope: {
-				cloudWorkspaceId: row.id,
-				organizationId: row.organizationId,
-				bootId,
-			},
-			from: ["provisioning", "awake", "asleep"],
-			set: keepForDiagnosis ? { providerSandboxId } : {},
-			reason: provisionFailureReason(error),
-			error,
-		});
-		await failChatMovesTo(row.id, "The cloud workspace could not start").catch(
-			(moveError) =>
+		if (changed && keepForDiagnosis) {
+			await stopSandbox(providerSandboxId).catch(teardownFailed);
+		}
+		if (changed && !keepForDiagnosis) {
+			await deleteSandboxAndDriveLater({
+				providerSandboxId,
+				driveName: forkedDrive ? driveName : null,
+			}).catch(teardownFailed);
+		}
+		if (changed) {
+			await failChatMovesTo(
+				row.id,
+				"The cloud workspace could not start",
+			).catch((moveError) =>
 				console.error(
 					`[cloud-workspace] could not fail the chat moves into ${row.id}`,
 					moveError,
 				),
-		);
+			);
+		}
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
 		return "failed";
 	}

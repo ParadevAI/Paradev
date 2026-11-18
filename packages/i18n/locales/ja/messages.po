@@ -22633,6 +22633,9 @@ msgstr "ワークスペースを作成しました"
 msgid "Workspace details"
 msgstr "ワークスペースの詳細"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "この組織ではワークスペースのドライブが無効になっているため、ファイルがドライブ上にあるワークスペースは環境にできません。"
+
 msgid "Workspace ID copied"
 msgstr "ワークスペースIDをコピーしました"
 

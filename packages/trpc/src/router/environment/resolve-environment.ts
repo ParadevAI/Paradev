@@ -12,6 +12,8 @@ export interface ResolvedEnvironment {
 	region: string;
 	bundleSha: string;
 	primaryRepositoryId: string | null;
+	/** Set when the environment is in drive mode: every workspace's drive forks from it. */
+	goldenDriveName: string | null;
 	envs: Record<string, string>;
 }
 
@@ -60,6 +62,7 @@ export async function resolveEnvironment(
 		region: row.region,
 		bundleSha: row.bundleSha,
 		primaryRepositoryId: row.primaryRepositoryId,
+		goldenDriveName: row.goldenDriveName,
 		envs,
 	};
 }

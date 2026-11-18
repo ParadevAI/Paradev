@@ -9,6 +9,7 @@
 		"pin": "bun run src/pin.ts",
 		"assets": "bun run src/assets/produce.ts",
 		"inventory": "bun run src/inventory.ts",
+		"drive-sweep": "bun run src/drive-sweep.ts",
 		"release": "bun run src/environments/release.ts",
 		"agent-tools": "bun run src/agent-tools.ts",
 		"record-bundle": "bun run src/environments/record-bundle.ts",

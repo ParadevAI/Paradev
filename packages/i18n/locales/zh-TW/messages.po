@@ -22633,6 +22633,9 @@ msgstr "工作區已建立"
 msgid "Workspace details"
 msgstr "工作區詳細資料"
 
+msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
+msgstr "此組織已關閉工作區磁碟，因此檔案位於磁碟上的工作區無法成為環境。"
+
 msgid "Workspace ID copied"
 msgstr "已複製工作區ID"
 

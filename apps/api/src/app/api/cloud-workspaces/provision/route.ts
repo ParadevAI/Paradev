@@ -18,6 +18,7 @@ const payloadSchema = z
 		/** Absent when the user typed a name, which the row already holds. */
 		namingPrompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH).optional(),
 		launch: cloudAgentLaunchSchema.optional(),
+		lockRetries: z.number().int().min(0).optional(),
 	})
 	.strict();
 

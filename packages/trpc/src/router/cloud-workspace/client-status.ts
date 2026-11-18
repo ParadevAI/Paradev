@@ -38,9 +38,17 @@ export function cloudWorkspaceStatusFor(
 	return status;
 }
 
+/** Only the control plane reads these; released clients never saw them. */
+type DriveColumns = "driveName" | "driveLaidOutAt";
+
 export function withClientStatus<Row extends { status: CloudWorkspaceStatus }>(
 	client: ApiClientInfo | null,
 	row: Row,
-): Row {
-	return { ...row, status: cloudWorkspaceStatusFor(client, row.status) };
+): Omit<Row, DriveColumns> {
+	const {
+		driveName: _driveName,
+		driveLaidOutAt: _driveLaidOutAt,
+		...rest
+	} = row as Row & Partial<Record<DriveColumns, unknown>>;
+	return { ...rest, status: cloudWorkspaceStatusFor(client, row.status) };
 }
