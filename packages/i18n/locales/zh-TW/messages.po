@@ -4793,6 +4793,9 @@ msgstr "雲端沙箱"
 msgid "Cloud usage"
 msgstr "雲端用量"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "此組織未啟用雲端用量。"
+
 msgid "Cloud workspace"
 msgstr "雲端工作區"
 
@@ -12590,6 +12593,10 @@ msgstr "未找到作者。"
 msgid "No automations match"
 msgstr "沒有匹配的自動化"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "沒有從 {0} 開始的帳單週期。"
+
 msgid "No branches found"
 msgstr "未找到分支"
 
@@ -13603,6 +13610,9 @@ msgstr "只有組織擁有者可以修改這些設定。"
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "只有組織擁有者或裝置擁有者可以刪除此專案。"
+
+msgid "Only owners and admins can see usage by person."
+msgstr "只有擁有者和管理員可以依人員查看用量。"
 
 msgid "Only owners can change membership."
 msgstr "只有擁有者可以更改成員。"
@@ -19763,6 +19773,9 @@ msgstr "該帳號已中斷連線，請選擇其他帳號。"
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "該代理工作階段還沒有可開啟的對話。它已啟動但從未收到指令。"
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "無法讀取這個游標。移除它即可從第一頁開始。"
+
 msgid "that device"
 msgstr "那台裝置"
 
@@ -20503,6 +20516,9 @@ msgstr "這只會更改顯示名稱，不會更改分支。"
 
 msgid "this organization"
 msgstr "此組織"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "此組織沒有帳單週期。請改為選擇一個時間範圍。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此組織使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"

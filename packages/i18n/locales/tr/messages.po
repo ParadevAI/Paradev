@@ -4793,6 +4793,9 @@ msgstr "Bulut sandbox'ları"
 msgid "Cloud usage"
 msgstr "Bulut kullanımı"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Bu kuruluş için bulut kullanımı açık değil."
+
 msgid "Cloud workspace"
 msgstr "Bulut çalışma alanı"
 
@@ -12590,6 +12593,10 @@ msgstr "Yazar bulunamadı."
 msgid "No automations match"
 msgstr "Eşleşen otomasyon yok"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "{0} tarihinde başlayan bir faturalama dönemi yok."
+
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
@@ -13603,6 +13610,9 @@ msgstr "Bu ayarları yalnızca kuruluş sahipleri değiştirebilir."
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Bu projeyi yalnızca kuruluş sahipleri veya cihazın sahibi silebilir."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Kişiye göre kullanımı yalnızca sahipler ve yöneticiler görebilir."
 
 msgid "Only owners can change membership."
 msgstr "Üyeliği yalnızca sahipler değiştirebilir."
@@ -19763,6 +19773,9 @@ msgstr "Bu hesap artık bağlı değil — başka bir hesap seçin."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Bu aracı oturumunda açılacak bir konuşma yok. Başlatıldı ama hiç istek almadı."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Bu imleç okunamadı. İlk sayfadan başlamak için imleci kaldırın."
+
 msgid "that device"
 msgstr "o cihaz"
 
@@ -20503,6 +20516,9 @@ msgstr "Bu yalnızca görünen adı değiştirir, dalı değil."
 
 msgid "this organization"
 msgstr "bu kuruluş"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Bu kuruluşun faturalama dönemi yok. Bunun yerine bir zaman aralığı seçin."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Bu kuruluş Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."

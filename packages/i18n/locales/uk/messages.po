@@ -4787,6 +4787,9 @@ msgstr "Хмарні пісочниці"
 msgid "Cloud usage"
 msgstr "Використання хмари"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Використання хмари не ввімкнено для цієї організації."
+
 msgid "Cloud workspace"
 msgstr "Хмарний робочий простір"
 
@@ -12584,6 +12587,10 @@ msgstr "Авторів не знайдено."
 msgid "No automations match"
 msgstr "Немає відповідних автоматизацій"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Жоден розрахунковий період не починається {0}."
+
 msgid "No branches found"
 msgstr "Гілок не знайдено"
 
@@ -13597,6 +13604,9 @@ msgstr "Лише власники організації можуть зміню
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Лише власники організації або власник пристрою можуть видалити цей проєкт."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Використання за людьми бачать лише власники та адміністратори."
 
 msgid "Only owners can change membership."
 msgstr "Лише власники можуть змінювати склад учасників."
@@ -19757,6 +19767,9 @@ msgstr "Цей обліковий запис більше не підключе�
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "У цьому сеансі агента ще немає розмови, яку можна відкрити. Його запустили, але так і не надіслали промпт."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Не вдалося прочитати цей курсор. Приберіть його, щоб почати з першої сторінки."
+
 msgid "that device"
 msgstr "цьому пристрої"
 
@@ -20497,6 +20510,9 @@ msgstr "Це змінює лише відображувану назву, а н�
 
 msgid "this organization"
 msgstr "ця організація"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Ця організація не має розрахункових періодів. Виберіть часовий діапазон."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Ця організація на тарифі Free. {appName} Mobile доступний для організацій на тарифі Pro."

@@ -246,3 +246,25 @@ describe("environment limit", () => {
 		).toBeNull();
 	});
 });
+
+test("cloud usage carries the plan's overage price per GB-hour", () => {
+	const source = customer({
+		flags: pro,
+		subscription: {
+			plan: {
+				items: [
+					{
+						featureId: "box_gb_minutes",
+						price: { amount: 0.25, interval: "month", billingUnits: 250 },
+					},
+				],
+			},
+		} as never,
+	});
+	source.balances = {
+		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
+	} as never;
+	expect(billingFromCustomer(source, NOW).cloudUsage?.overagePerGbHour).toBe(
+		0.06,
+	);
+});

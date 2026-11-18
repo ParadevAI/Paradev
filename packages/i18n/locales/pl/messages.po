@@ -4793,6 +4793,9 @@ msgstr "Piaskownice w chmurze"
 msgid "Cloud usage"
 msgstr "Użycie chmury"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "Użycie chmury nie jest włączone dla tej organizacji."
+
 msgid "Cloud workspace"
 msgstr "Obszar roboczy w chmurze"
 
@@ -12590,6 +12593,10 @@ msgstr "Nie znaleziono autorów."
 msgid "No automations match"
 msgstr "Brak pasujących automatyzacji"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "Żaden okres rozliczeniowy nie zaczyna się {0}."
+
 msgid "No branches found"
 msgstr "Nie znaleziono gałęzi"
 
@@ -13603,6 +13610,9 @@ msgstr "Tylko właściciele organizacji mogą zmieniać te ustawienia."
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "Ten projekt mogą usunąć tylko właściciele organizacji lub właściciel urządzenia."
+
+msgid "Only owners and admins can see usage by person."
+msgstr "Tylko właściciele i administratorzy widzą użycie według osób."
 
 msgid "Only owners can change membership."
 msgstr "Tylko właściciele mogą zmieniać dostęp."
@@ -19763,6 +19773,9 @@ msgstr "To konto nie jest już połączone — wybierz inne."
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "Ta sesja agenta nie ma jeszcze rozmowy do otwarcia. Została uruchomiona, ale nigdy nie dostała polecenia."
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "Nie można odczytać tego kursora. Pomiń go, aby zacząć od pierwszej strony."
+
 msgid "that device"
 msgstr "tym urządzeniu"
 
@@ -20503,6 +20516,9 @@ msgstr "Zmienia to tylko nazwę wyświetlaną, nie gałąź."
 
 msgid "this organization"
 msgstr "tej organizacji"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "Ta organizacja nie ma okresów rozliczeniowych. Wybierz zamiast tego zakres czasu."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Ta organizacja korzysta z planu darmowego. {appName} Mobile jest dostępny dla organizacji w planie Pro."

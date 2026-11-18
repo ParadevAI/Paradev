@@ -1,283 +1,29 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { PGlite } from "@electric-sql/pglite";
-import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
 import {
-	getTableConfig,
-	isPgEnum,
-	isPgSchema,
-	type PgTable,
-} from "drizzle-orm/pg-core";
-import { drizzle } from "drizzle-orm/pglite";
+	BILLING_PAGE,
+	BROKEN,
+	CHECKOUT,
+	MAYA,
+	NOVEMBER,
+	NOW,
+	OCTOBER,
+	ORG,
+	RATE,
+	SAM,
+	seedCloudUsage,
+} from "../test/cloud-usage-fixture";
 import {
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
 	listCloudBoots,
 	queryCloudUsage,
+	queryCloudUsageByPeriod,
 } from "./cloud-usage-query";
-import * as schema from "./schema";
 
-const ORG = "a0000000-0000-4000-8000-000000000001";
-const OTHER_ORG = "a0000000-0000-4000-8000-000000000002";
-const MAYA = "b0000000-0000-4000-8000-000000000001";
-const SAM = "b0000000-0000-4000-8000-000000000002";
-const BEN = "b0000000-0000-4000-8000-000000000003";
-const CHECKOUT = "c0000000-0000-4000-8000-000000000001";
-const BILLING_PAGE = "c0000000-0000-4000-8000-000000000002";
-const BROKEN = "c0000000-0000-4000-8000-000000000003";
-const OTHER_WS = "c0000000-0000-4000-8000-000000000004";
-
-const NOW = new Date("2026-11-18T00:00:00Z");
-const OCTOBER = {
-	from: new Date("2026-10-01T00:00:00Z"),
-	to: new Date("2026-11-01T00:00:00Z"),
-};
-const NOVEMBER = { from: OCTOBER.to, to: new Date("2026-12-01T00:00:00Z") };
-const RATE = 0.06;
-
-let db: ReturnType<typeof drizzle>;
+let db: Awaited<ReturnType<typeof seedCloudUsage>>;
 
 beforeAll(async () => {
-	const tables = new Set<PgTable>();
-	const withParents = (table: PgTable) => {
-		if (tables.has(table)) return;
-		tables.add(table);
-		for (const key of getTableConfig(table).foreignKeys) {
-			withParents(key.reference().foreignTable);
-		}
-	};
-	withParents(schema.cloudUsageEvents);
-	withParents(schema.users);
-	const types = Object.values(schema).filter(
-		(value) => isPgEnum(value) || isPgSchema(value),
-	);
-	const ddl = await generateMigration(
-		generateDrizzleJson({}),
-		generateDrizzleJson(
-			Object.fromEntries([...types, ...tables].map((value, i) => [i, value])),
-			undefined,
-			undefined,
-			"snake_case",
-		),
-	);
-	const client = new PGlite();
-	await client.exec(ddl.join(";\n"));
-	db = drizzle({ client, casing: "snake_case" });
-
-	await db.insert(schema.organizations).values([
-		{ id: ORG, name: "Northwind", slug: "northwind" },
-		{ id: OTHER_ORG, name: "Other", slug: "other" },
-	]);
-	await db.insert(schema.users).values(
-		[
-			[MAYA, "Maya"],
-			[SAM, "Sam"],
-			[BEN, "Ben"],
-		].map(([id, name]) => ({ id, name, email: `${name}@example.com` })),
-	);
-	const [env, otherEnv] = await db
-		.insert(schema.environments)
-		.values(
-			[ORG, OTHER_ORG].map((organizationId) => ({
-				organizationId,
-				name: "env",
-				sourceKind: "image" as const,
-				sourceRef: "img",
-				bundleSha: "sha",
-			})),
-		)
-		.returning();
-	if (!env || !otherEnv) throw new Error("no environments");
-	const workspace = (
-		id: string,
-		name: string,
-		createdByUserId: string,
-		organizationId = ORG,
-		environmentId = env.id,
-	) => ({
-		id,
-		name,
-		createdByUserId,
-		organizationId,
-		environmentId,
-		branch: "main",
-		baseBranch: "main",
-		providerSandboxId: `sbx-${id}`,
-	});
-	await db.insert(schema.cloudWorkspaces).values([
-		{
-			...workspace(CHECKOUT, "fix-flaky-checkout", MAYA),
-			status: "asleep",
-			machineSize: "medium",
-		},
-		{ ...workspace(BILLING_PAGE, "billing-page", SAM), status: "awake" },
-		{
-			...workspace(BROKEN, "broken-env", MAYA),
-			status: "failed",
-			failureReason: "snapshot_expired",
-			failedAt: new Date("2026-11-16T14:03:00Z"),
-		},
-		workspace(OTHER_WS, "other", BEN, OTHER_ORG, otherEnv.id),
-	]);
-	await db.insert(schema.cloudWorkspaceBoots).values(
-		(
-			[
-				[
-					"boot_1",
-					CHECKOUT,
-					MAYA,
-					4,
-					"2026-11-10T09:00Z",
-					"2026-11-10T11:15Z",
-					"idle",
-				],
-				[
-					"boot_2",
-					CHECKOUT,
-					MAYA,
-					4,
-					"2026-11-12T08:00Z",
-					"2026-11-12T08:01Z",
-					"failed",
-				],
-				[
-					"boot_3",
-					BILLING_PAGE,
-					SAM,
-					8,
-					"2026-10-31T23:00Z",
-					"2026-11-01T01:00Z",
-					"user",
-				],
-				["boot_4", BILLING_PAGE, SAM, 8, "2026-11-17T08:00Z", null, null],
-				[
-					"boot_6",
-					CHECKOUT,
-					MAYA,
-					4,
-					"2026-11-12T08:00Z",
-					"2026-11-12T08:05Z",
-					"released",
-				],
-				[
-					"boot_5",
-					OTHER_WS,
-					BEN,
-					4,
-					"2026-11-10T09:00Z",
-					"2026-11-10T10:00Z",
-					"idle",
-				],
-			] as const
-		).map(
-			([
-				id,
-				cloudWorkspaceId,
-				createdByUserId,
-				vcpus,
-				startedAt,
-				stoppedAt,
-				endReason,
-			]) => ({
-				id,
-				organizationId: cloudWorkspaceId === OTHER_WS ? OTHER_ORG : ORG,
-				cloudWorkspaceId,
-				createdByUserId,
-				vcpus,
-				memoryMb: vcpus * 2048,
-				startedAt: new Date(startedAt),
-				stoppedAt: stoppedAt && new Date(stoppedAt),
-				endReason,
-			}),
-		),
-	);
-	await db.insert(schema.cloudUsageEvents).values(
-		(
-			[
-				[
-					"boot_1",
-					1,
-					CHECKOUT,
-					MAYA,
-					"2026-11-10T09:00Z",
-					"2026-11-10T10:00Z",
-					480,
-					"2026-11-10T10:05Z",
-				],
-				[
-					"boot_1",
-					2,
-					CHECKOUT,
-					MAYA,
-					"2026-11-10T10:00Z",
-					"2026-11-10T11:15Z",
-					600,
-					"2026-11-10T11:20Z",
-				],
-				[
-					"boot_3",
-					1,
-					BILLING_PAGE,
-					SAM,
-					"2026-10-31T23:00Z",
-					"2026-11-01T00:00Z",
-					960,
-					"2026-10-31T23:59:59.999Z",
-				],
-				[
-					"boot_3",
-					2,
-					BILLING_PAGE,
-					SAM,
-					"2026-11-01T00:00Z",
-					"2026-11-01T01:00Z",
-					960,
-					"2026-11-01T00:00Z",
-				],
-				[
-					"boot_4",
-					1,
-					BILLING_PAGE,
-					SAM,
-					"2026-11-17T08:00Z",
-					"2026-11-17T09:00Z",
-					960,
-					null,
-				],
-				[
-					"boot_5",
-					1,
-					OTHER_WS,
-					BEN,
-					"2026-11-10T09:00Z",
-					"2026-11-10T10:00Z",
-					100,
-					"2026-11-10T10:05Z",
-				],
-			] as const
-		).map(
-			([
-				bootId,
-				lockSeq,
-				cloudWorkspaceId,
-				userId,
-				windowFrom,
-				windowTo,
-				amount,
-				sentAt,
-			]) => ({
-				bootId,
-				lockSeq,
-				feature: "box_gb_minutes" as const,
-				organizationId: cloudWorkspaceId === OTHER_WS ? OTHER_ORG : ORG,
-				cloudWorkspaceId,
-				userId,
-				windowFrom: new Date(windowFrom),
-				windowTo: new Date(windowTo),
-				amount: String(amount),
-				sentAt: sentAt && new Date(sentAt),
-			}),
-		),
-	);
+	db = await seedCloudUsage();
 });
 
 const usage = (
@@ -373,6 +119,34 @@ describe("queryCloudUsage", () => {
 		expect((await usage({ window: OCTOBER })).total.gbHours).toBe(16);
 		expect((await usage({ filters: { user: SAM } })).total.gbHours).toBe(16);
 	});
+});
+
+test("usage by period in one query matches each period's total", async () => {
+	const periods = [
+		NOVEMBER,
+		OCTOBER,
+		{ from: new Date("2026-09-01T00:00:00Z"), to: OCTOBER.from },
+	];
+	expect(
+		await queryCloudUsageByPeriod(
+			db,
+			{ organizationId: ORG },
+			{ periods, overagePerGbHour: RATE },
+		),
+	).toEqual(
+		await Promise.all(
+			periods.map(async (window) => ({
+				...window,
+				metrics: (await usage({ window })).total,
+			})),
+		),
+	);
+	const [own] = await queryCloudUsageByPeriod(
+		db,
+		{ organizationId: ORG, userId: SAM },
+		{ periods: [NOVEMBER], overagePerGbHour: RATE },
+	);
+	expect(own?.metrics).toEqual((await usage({}, SAM)).total);
 });
 
 describe("listCloudBoots", () => {

@@ -4793,6 +4793,9 @@ msgstr "クラウドサンドボックス"
 msgid "Cloud usage"
 msgstr "クラウド使用量"
 
+msgid "Cloud usage is not enabled for this organization."
+msgstr "この組織ではクラウド使用量が有効になっていません。"
+
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
@@ -12590,6 +12593,10 @@ msgstr "作成者が見つかりません。"
 msgid "No automations match"
 msgstr "一致するオートメーションがありません"
 
+#. placeholder {0}: params?.period
+msgid "No billing period starts on {0}."
+msgstr "{0} に始まる請求期間はありません。"
+
 msgid "No branches found"
 msgstr "ブランチが見つかりません"
 
@@ -13603,6 +13610,9 @@ msgstr "これらの設定を変更できるのは組織のオーナーのみで
 
 msgid "Only organization owners or the device's owner can delete this project."
 msgstr "このプロジェクトを削除できるのは、組織のオーナーまたはデバイスのオーナーのみです。"
+
+msgid "Only owners and admins can see usage by person."
+msgstr "人ごとの使用量を見られるのはオーナーと管理者だけです。"
 
 msgid "Only owners can change membership."
 msgstr "メンバーシップを変更できるのはオーナーのみです。"
@@ -19763,6 +19773,9 @@ msgstr "このアカウントは接続されていません。別のアカウン
 msgid "That agent session has no conversation to open yet. It was started but never prompted."
 msgstr "このエージェントセッションにはまだ開ける会話がありません。開始されましたが、一度も指示を受けていません。"
 
+msgid "That cursor could not be read. Drop it to start from the first page."
+msgstr "このカーソルを読み取れませんでした。外して最初のページから始めてください。"
+
 msgid "that device"
 msgstr "そのデバイス"
 
@@ -20503,6 +20516,9 @@ msgstr "変更されるのは表示名だけで、ブランチは変わりませ
 
 msgid "this organization"
 msgstr "この組織"
+
+msgid "This organization has no billing periods. Choose a time range instead."
+msgstr "この組織には請求期間がありません。代わりに期間を選んでください。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "この組織はFreeプランです。{appName} MobileはProプランの組織でご利用いただけます。"
