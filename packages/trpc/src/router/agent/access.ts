@@ -3,7 +3,7 @@ import { agents, type SelectAgent } from "@superset/db/schema";
 import { findOrgMembership } from "@superset/db/utils";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { userError } from "../../i18n-error";
-import { isOrgAdmin } from "../channel/access";
+import { isOrgAdmin } from "../utils/active-org";
 
 export const agentNotFound = () =>
 	userError({
