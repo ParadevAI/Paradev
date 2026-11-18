@@ -39,7 +39,7 @@
 <tbody>
 <tr><td><a href="#swap">Remove swap</a></td><td>#9924</td><td><span class="state ready">Shipped 18 November</span></td><td>No swap in snapshots (up to 6 to 16 GB per workspace that hit memory pressure). No long stalls under a fast allocator.</td><td>Decided: ship</td></tr>
 <tr><td><a href="#agents">Agents only from the drive</a></td><td>#9929, then #9911</td><td><span class="state ready">A: shipped</span> <span class="state hold">B: needs your decision</span></td><td>0.79 GB off the image. A PostHog outage can no longer affect agents.</td><td>3</td></tr>
-<tr><td><a href="#builds">Environment builds on Vercel Workflow</a></td><td>#9906, on #9282</td><td><span class="state hold">Waiting on your decisions</span></td><td>Builds can run 30 minutes, not about 3. The build log updates while it runs.</td><td>3</td></tr>
+<tr><td><a href="#builds">Environment builds on Vercel Workflow</a></td><td>#9906, on #9282</td><td><span class="state ready">Decided; ready for your review</span></td><td>Builds can run 10 minutes, not about 3. The build log updates while it runs.</td><td>Decided</td></tr>
 <tr><td><a href="#drive">Workspace drive</a></td><td>#9915, #9847, model #9914</td><td><span class="state ready">Ready for review</span></td><td>Root snapshot 2.65 to 2.79 GB against 7.86 to 8.02 GB for the same work.</td><td>3</td></tr>
 </tbody>
 </table>
@@ -51,9 +51,9 @@
 <li><a href="#agents">Agents</a>: when the agents drive cannot be mounted, open the box without agents, or fail the open?</li>
 <li><a href="#agents">Agents</a>: should workspaces of archived environments move to the current bundle? <strong>Decided: yes, shipped in #9929.</strong></li>
 <li><a href="#agents">Agents</a>: publish drives in all 19 regions on every release, or only regions that have an environment? <strong>Decided: all 19, shipped in #9929.</strong></li>
-<li><a href="#builds">Builds</a>: bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0?</li>
-<li><a href="#builds">Builds</a>: is 30 minutes the right build limit?</li>
-<li><a href="#builds">Builds</a>: who rebases #9282, and when?</li>
+<li><a href="#builds">Builds</a>: bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0? <strong>Decided: yes, shipped in #9980.</strong></li>
+<li><a href="#builds">Builds</a>: what is the build limit? <strong>Decided: 10 minutes, a hard ceiling.</strong></li>
+<li><a href="#builds">Builds</a>: who rebases #9282, and when? <strong>Decided: the #9906 worker; done.</strong></li>
 <li><a href="#drive">Drive</a>: enable it for one internal environment, new workspaces only?</li>
 <li><a href="#drive">Drive</a>: which environment?</li>
 <li><a href="#drive">Drive</a>: what happens to a drive when its workspace's snapshot expires after 30 days?</li>
@@ -180,7 +180,7 @@ agent launched with no drive:
 </div>
 
 <!-- ============================================================ -->
-<h2 id="builds">3. Environment builds on Vercel Workflow <span class="state hold">Waiting on your decisions</span></h2>
+<h2 id="builds">3. Environment builds on Vercel Workflow <span class="state ready">Decided; ready for your review</span></h2>
 <p><strong>PR:</strong> <a href="https://github.com/ParadevAI/Paradev/pull/9906">#9906</a>, draft, stacked on your #9282.</p>
 
 <h3>What it does</h3>
@@ -188,7 +188,7 @@ agent launched with no drive:
 
 <h3>Pseudocode</h3>
 <pre>environmentBuildWorkflow(buildId):
-    deadline = now + 30 min
+    deadline = now + 10 min
     create the build box                   # found by name on retry, never a second box
     for command in [checkout, install]:
         start it detached on the box       # runs once per command
@@ -201,7 +201,7 @@ agent launched with no drive:
 
 <h3>What a customer sees</h3>
 <ul>
-<li>A build can take up to 30 minutes. Today an install over about 3 minutes fails.</li>
+<li>A build can take up to 10 minutes. Today an install over about 3 minutes fails. A longer build stops with "The build ran for more than 10 minutes and was stopped".</li>
 <li>Same build IDs, statuses and table columns. No tRPC output changes.</li>
 <li>The stored log updates every 5 seconds during a build. Nothing in the UI reads it yet.</li>
 </ul>
@@ -211,25 +211,16 @@ agent launched with no drive:
 <li>A local run of the API app with Workflow's local runner and a fake build box: a successful build and a cancelled build both ran end to end.</li>
 <li>Tests with no real waiting: slow install, failed install, a step that fails then succeeds on retry, the limit, cleanup.</li>
 <li>Preview deploys of API, Web, Docs and Marketing pass on the newer CLI.</li>
-<li>Cost at Vercel's listed price: about $0.004 for a typical build, $0.04 for a 30-minute one.</li>
+<li>Cost at Vercel's listed price: about $0.004 for a typical build, $0.012 for a 10-minute one, in Workflow events. The build box itself (8 vCPU, 16 GB) costs at most about $0.23 for 10 minutes.</li>
 </ul>
-<p><strong>Not verified:</strong> a real build on Vercel's workflow runtime with a real sandbox. A run stays pinned to the deployment that started it; one whose deployment is deleted is failed by the stale check after 40 minutes.</p>
+<p><strong>Not verified:</strong> a real build on Vercel's workflow runtime with a real sandbox. A run stays pinned to the deployment that started it; one whose deployment is deleted is failed by the stale check after 20 minutes.</p>
 
-<h3>Your decisions</h3>
-<div class="decision">
-<p><strong>Bump the Vercel CLI for staging and production from 50.22.1 to 50.31.0?</strong></p>
-<p>Workflow hard-codes a setting our pinned CLI rejects. 50.31.0 is the lowest version that accepts it, and it is the same major. It is set for previews in this draft only.</p>
-<p class="rec">Recommendation: yes, as its own small PR, watched on staging first.</p>
-</div>
-<div class="decision">
-<p><strong>Is 30 minutes the right build limit?</strong></p>
-<p class="rec">Recommendation: yes to start. It is one constant.</p>
-</div>
-<div class="decision">
-<p><strong>Who rebases #9282 onto main, and when?</strong></p>
-<p>Its migration number is stale, which is why the preview database step fails. It is your in-progress work, so I have not touched it.</p>
-<p class="rec">Recommendation: I can start a worker on the rebase if you want it off your plate.</p>
-</div>
+<h3>Decided</h3>
+<ul>
+<li>Vercel CLI 50.31.0 for every deploy: shipped in #9980; the production deploy passed on it.</li>
+<li>Build limit: 10 minutes, a hard ceiling. Environments will rebuild daily, so a longer limit does not scale in cost.</li>
+<li>#9282 is rebased onto main (migration 0199); #9906 sits on it (migration 0200). Preview deploys pass on both.</li>
+</ul>
 <p>Also needed before it runs anywhere: "Enable access to System Environment Variables" on the API's Vercel project. Nobody has checked whether it is on.</p>
 
 <!-- ============================================================ -->
