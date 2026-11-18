@@ -789,7 +789,7 @@ expired a workspace box's snapshot 30 days after its last use. Nothing told us:
 the row learned only from the 410 that its next wake, agent turn or automation
 dispatch got. A workspace nobody opened again stayed `asleep` over a box that
 could not resume, and the box itself stayed in Vercel. New workspace boxes are
-now created with `snapshotExpiration: 0`. The daily `reap-retention` job
+now created with `snapshotExpiration: 0`. The `reap-retention` job, every 6 hours,
 (`router/cloud-workspace/retention.ts`) does three things. It moves a workspace
 that is asleep and unused for 30 days to `failed`/`snapshot_expired`, the same
 state as the 410. It gives the row a new box name in that same update. Then it

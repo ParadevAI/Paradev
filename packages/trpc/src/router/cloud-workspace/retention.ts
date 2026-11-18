@@ -20,8 +20,14 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export const RETENTION_IDLE_MS = 30 * DAY_MS;
 /** Longer than a release or a promote takes to write the name of a golden it built. */
 export const ORPHAN_MIN_AGE_MS = 7 * DAY_MS;
-export const REAP_BATCH = 50;
-export const ORPHAN_BATCH = 50;
+/**
+ * Every 6 hours, so 800 a day: production made a median 156 workspaces a day
+ * and at most 725 in the 30 days to 2026-11-18. A backlog takes more runs.
+ */
+export const REAP_BATCH = 200;
+export const ORPHAN_BATCH = 200;
+/** Stops starting new work here, well inside the route's 300 s; the rest waits for the next run. */
+export const RUN_BUDGET_MS = 200_000;
 /** One delete a second: far under Vercel's 20 deletions a second per team. */
 const TEARDOWN_SPACING_SECONDS = 1;
 const NAME_LOOKUP_CHUNK = 500;
@@ -156,6 +162,7 @@ export interface RetentionRun {
 		retired: number;
 		skippedRunning: number;
 		skippedChanged: number;
+		deferred: number;
 		failed: number;
 	};
 	orphans:
@@ -170,7 +177,7 @@ export interface RetentionRun {
 }
 
 /**
- * The one place a workspace box is deleted for age. Daily: a workspace asleep
+ * The one place a workspace box is deleted for age. Every 6 hours: a workspace asleep
  * and unused for `RETENTION_IDLE_MS` fails as `snapshot_expired`, exactly as a
  * wake that met Vercel's expiry did, and its box is torn down. Then, in
  * production only, boxes we tagged that no row names are torn down. Every
@@ -181,18 +188,22 @@ export async function reapCloudWorkspaceRetention({
 	now = Date.now(),
 	production,
 	deps = defaultDeps,
+	clock = Date.now,
 }: {
 	now?: number;
 	production: boolean;
 	deps?: RetentionDeps;
+	clock?: () => number;
 }): Promise<RetentionRun> {
+	const startedAt = clock();
+	const outOfTime = () => clock() - startedAt > RUN_BUDGET_MS;
 	let slot = 0;
 	const queue = (name: string) =>
 		deps.queueTeardown(name, slot++ * TEARDOWN_SPACING_SECONDS);
 	const retiredNames = new Set<string>();
-	const idle = await reapIdle({ now, deps, queue, retiredNames });
+	const idle = await reapIdle({ now, deps, queue, retiredNames, outOfTime });
 	const orphans = production
-		? await reapOrphans({ now, deps, queue, retiredNames })
+		? await reapOrphans({ now, deps, queue, retiredNames, outOfTime })
 		: ({ skipped: "not production" } as const);
 	const run = { idle, orphans };
 	console.log("[cloud-workspace] retention run", JSON.stringify(run));
@@ -211,11 +222,13 @@ async function reapIdle({
 	deps,
 	queue,
 	retiredNames,
+	outOfTime,
 }: {
 	now: number;
 	deps: RetentionDeps;
 	queue: (name: string) => Promise<void>;
 	retiredNames: Set<string>;
+	outOfTime: () => boolean;
 }): Promise<RetentionRun["idle"]> {
 	const cutoff = new Date(now - RETENTION_IDLE_MS);
 	const rows = await deps.findIdleWorkspaces(cutoff, REAP_BATCH);
@@ -224,9 +237,14 @@ async function reapIdle({
 		retired: 0,
 		skippedRunning: 0,
 		skippedChanged: 0,
+		deferred: 0,
 		failed: 0,
 	};
-	for (const row of rows) {
+	for (const [index, row] of rows.entries()) {
+		if (outOfTime()) {
+			counts.deferred = rows.length - index;
+			break;
+		}
 		try {
 			if (await deps.boxIsRunning(row.providerSandboxId)) {
 				counts.skippedRunning++;
@@ -263,11 +281,13 @@ async function reapOrphans({
 	deps,
 	queue,
 	retiredNames,
+	outOfTime,
 }: {
 	now: number;
 	deps: RetentionDeps;
 	queue: (name: string) => Promise<void>;
 	retiredNames: Set<string>;
+	outOfTime: () => boolean;
 }): Promise<Exclude<RetentionRun["orphans"], { skipped: string }>> {
 	const boxes = [
 		...(await deps.listTaggedSandboxes("workspace")),
@@ -281,7 +301,12 @@ async function reapOrphans({
 	const batch = orphaned.slice(0, ORPHAN_BATCH);
 	let queued = 0;
 	let failed = 0;
-	for (const name of batch) {
+	let unstarted = 0;
+	for (const [index, name] of batch.entries()) {
+		if (outOfTime()) {
+			unstarted = batch.length - index;
+			break;
+		}
 		try {
 			await queue(name);
 			queued++;
@@ -294,7 +319,7 @@ async function reapOrphans({
 		listed: boxes.length,
 		orphaned: orphaned.length,
 		queued,
-		deferred: orphaned.length - batch.length,
+		deferred: orphaned.length - batch.length + unstarted,
 		failed,
 	};
 }

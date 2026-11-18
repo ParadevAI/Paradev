@@ -8,7 +8,7 @@ Reference: This plan follows conventions from AGENTS.md and the ExecPlan templat
 
 A cloud workspace is a row in `cloud_workspaces` backed by a Vercel sandbox ("box"). When the box stops, Vercel keeps a snapshot of its disk, and the next wake resumes from it. Today `provisionSandbox` in `packages/trpc/src/lib/sandbox/vercel.ts` creates workspace boxes with `snapshotExpiration: 30 days`, so Vercel deletes the snapshot of a box nobody used for 30 days. The app learns this only when a wake, an agent turn or an automation dispatch gets a 410 and calls `markSandboxUnavailable` (`router/cloud-workspace/wake.ts`), which moves the row to `failed` with reason `snapshot_expired`. A workspace nobody opens again never learns. The box itself, and boxes that no row names (orphans), stay in Vercel and use storage.
 
-After this change Vercel never expires a new workspace's snapshot. A daily job decides instead. It moves a workspace that has been asleep with no activity for 30 days to the same `failed`/`snapshot_expired` state the 410 path gives, takes the box name off the row in the same update, and queues a retried teardown that deletes the box. The same job queues teardown for orphan boxes. Each run logs and returns how many it retired, queued and skipped, and a Sentry cron monitor reports a run that did not happen. The customer sees the same 30-day retention as today.
+After this change Vercel never expires a new workspace's snapshot. A job that runs every 6 hours decides instead. It moves a workspace that has been asleep with no activity for 30 days to the same `failed`/`snapshot_expired` state the 410 path gives, takes the box name off the row in the same update, and queues a retried teardown that deletes the box. The same job queues teardown for orphan boxes. Each run logs and returns how many it retired, queued and skipped, and a Sentry cron monitor reports a run that did not happen. The customer sees the same 30-day retention as today.
 
 ## Context and Orientation
 
@@ -32,7 +32,7 @@ Last activity. `sandbox_expires_at` on an asleep row is when its last session en
    - Orphan stage (only when `production`): list `workspace` and `environment` tagged boxes. Keep those in a settled status whose `createdAt` and `statusUpdatedAt` are older than `ORPHAN_MIN_AGE` (7 days). Drop every name a workspace row or an unarchived environment names, and queue teardown for up to `ORPHAN_BATCH`.
    - Teardowns are staggered one per second (`delaySeconds = index`), far below Vercel's 20 deletions/s per team.
    - It returns counts (`retired`, `orphansQueued`, `skipped{running,raced,orphanBatchFull,…}`) and logs them as one line.
-5. `apps/api/.../cloud-workspaces/jobs/reap-retention/route.ts` (daily, `Sentry.withMonitor("reap-retention", …, "0 6 * * *")`) and `.../cloud-workspaces/teardown/route.ts`. Add `reap-retention` to the publish workflow's choices. Add package exports.
+5. `apps/api/.../cloud-workspaces/jobs/reap-retention/route.ts` (every 6 hours, `Sentry.withMonitor("reap-retention", …, "0 */6 * * *")`) and `.../cloud-workspaces/teardown/route.ts`. Add `reap-retention` to the publish workflow's choices. Add package exports.
 6. `packages/sandbox/src/backfill-snapshot-expiration.ts` (new, not run): a dry run by default. `--apply` calls `sandbox.update({snapshotExpiration: 0})` on workspace boxes whose `snapshotExpiration` is not 0, at 2/s.
 7. Docs: an entry in `docs/cloud-sandbox-mismatches.md`. The TLA+ model is not edited; the PR says which action this maps to.
 
@@ -60,7 +60,7 @@ None blocking. The QStash schedule must be created in the Upstash console by som
 - [x] (2026-11-18 15:00Z) Discovery, production counts, plan.
 - [x] (2026-11-18 22:10Z) Implementation: `snapshotExpiration: 0`, `teardownSandbox` (box only), `failCloudWorkspace` `where`/`expected`, `retention.ts`, both routes, the backfill script, docs.
 - [x] (2026-11-18 22:20Z) trpc 1104 pass, sandbox 85 pass; lint; typecheck of trpc, api and sandbox. Ran the reaper's `idleSince` SQL read-only on production: 0 reapable at 30 days, 0 at 7, 518 at 2.
-- [ ] Create the QStash schedule `0 6 * * *` for `/api/cloud-workspaces/jobs/reap-retention` in the Upstash console (needs console access; not done here).
+- [ ] Create the QStash schedule `0 */6 * * *` for `/api/cloud-workspaces/jobs/reap-retention` in the Upstash console (needs console access; not done here).
 - [ ] Run `bun run backfill-snapshot-expiration` dry, then `--apply` (not done here, on purpose).
 
 ## Surprises & Discoveries
@@ -77,6 +77,9 @@ None blocking. The QStash schedule must be created in the Upstash console by som
   Rationale: deleting too late costs storage; deleting too early loses someone's work. Date/Author: 2026-11-18, agent.
 - Decision: the orphan stage covers boxes only, not drives.
   Rationale: on main no row names a workspace drive, so every `drive-` drive would look orphaned. Once #9847's columns exist, a drive stage must check them, and #9847's `teardownSandbox` deletes drives. Agent-tools drives are pruned by the release. Date/Author: 2026-11-18, agent.
+
+- Decision: run every 6 hours (`0 */6 * * *`) with batches of 200 idle rows and 200 orphans, and stop starting work after 200 s of a run (`RUN_BUDGET_MS`).
+  Rationale: Satya asked for 6-hourly runs sized to clear a normal day with room to spare. Production made a median 156 workspaces a day and at most 725 in the 30 days to 2026-11-18. Four runs of 200 is 800 a day, so even the peak day clears within one day, and a backlog takes several runs. The time budget keeps a large run inside the route's 300 s; the rest is reported as `deferred`. Date/Author: 2026-11-18, Satya via orchestrator.
 
 ## Outcomes & Retrospective
 

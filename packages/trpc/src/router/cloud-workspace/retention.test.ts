@@ -5,6 +5,7 @@ import {
 	ORPHAN_BATCH,
 	RETENTION_IDLE_MS,
 	type RetentionDeps,
+	RUN_BUDGET_MS,
 	reapCloudWorkspaceRetention,
 	retireIdleWorkspace,
 } from "./retention";
@@ -166,6 +167,26 @@ describe("reapCloudWorkspaceRetention", () => {
 		});
 		expect(queued).toHaveLength(ORPHAN_BATCH);
 		expect(run.orphans).toMatchObject({ queued: ORPHAN_BATCH, deferred: 3 });
+	});
+
+	test("stops starting work when its time is up and leaves the rest for the next run", async () => {
+		let time = 0;
+		const { deps, retired } = fakeDeps({
+			findIdleWorkspaces: async () => [idleRow(1), idleRow(2), idleRow(3)],
+			retireIdleWorkspace: async (row) => {
+				retired.push(row.id);
+				time += RUN_BUDGET_MS + 1;
+				return true;
+			},
+		});
+		const run = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: false,
+			deps,
+			clock: () => time,
+		});
+		expect(retired).toEqual(["ws_1"]);
+		expect(run.idle).toMatchObject({ retired: 1, deferred: 2 });
 	});
 });
 

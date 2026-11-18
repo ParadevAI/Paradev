@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 /**
- * Run by a QStash schedule daily at 06:00 UTC. That schedule lives in the
+ * Run by a QStash schedule every 6 hours. That schedule lives in the
  * Upstash console, not in this repo.
  */
 export async function POST(request: Request): Promise<Response> {
@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<Response> {
 			reapCloudWorkspaceRetention({
 				production: process.env.VERCEL_ENV === "production",
 			}),
-		{ schedule: { type: "crontab", value: "0 6 * * *" } },
+		{ schedule: { type: "crontab", value: "0 */6 * * *" } },
 	);
 	// Turbopack builds do not wrap route handlers, so nothing else flushes the closing check-in.
 	await Sentry.flush(2_000).catch(() => false);
