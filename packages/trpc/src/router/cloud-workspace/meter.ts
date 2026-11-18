@@ -375,6 +375,18 @@ async function recordSentUsage(
 	}
 }
 
+/**
+ * Autumn can apply a confirm and still answer 503; the retry then finds no lock.
+ * A lock taken less than its lifetime ago cannot have expired, so that confirm went through.
+ */
+function confirmedEarlier(boot: Boot, error: AutumnError): boolean {
+	const takenAt = boot.finalizedThrough ?? boot.createdAt;
+	return (
+		error.body.includes("Lock not found") &&
+		Date.now() < takenAt.getTime() + LOCK_TTL_MS - LOCK_WINDOW_MS
+	);
+}
+
 async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 	const { amount } = window;
 	const properties = usageProperties(boot, window.user);
@@ -397,6 +409,9 @@ async function recordUsage(boot: Boot, window: UsageWindow): Promise<void> {
 				tags: bootTags(boot),
 				extra: { lockId },
 			});
+			if (confirmedEarlier(boot, error)) {
+				return recordSentUsage(boot, BOX_GB_MINUTES_FEATURE_ID, window);
+			}
 		}
 	}
 	if (amount <= 0) return;

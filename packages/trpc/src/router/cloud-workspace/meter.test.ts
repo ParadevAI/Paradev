@@ -201,11 +201,11 @@ function usageRows() {
 	return writes.filter((write) => "feature" in write);
 }
 
-function autumnError(status: number) {
+function autumnError(status: number, body = "") {
 	return new AutumnError(`status ${status}`, {
-		response: new Response("", { status }),
+		response: new Response(body, { status }),
 		request: new Request("https://api.useautumn.com/v1"),
-		body: "",
+		body,
 	});
 }
 
@@ -427,6 +427,28 @@ describe("settleBoot", () => {
 			autumnCalls.find((call) => call.method === "finalize")?.headers,
 		).toEqual({ "Idempotency-Key": "boot_1:0:confirm" });
 		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
+	});
+
+	test("a retried confirm whose lock Autumn already consumed is not tracked again", async () => {
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		expect(await settleBoot("boot_1")).toBe("renewed");
+		expect(autumnCalls.some((call) => call.method === "track")).toBe(false);
+		expect(usageRows()).toHaveLength(1);
+	});
+
+	test("a lock Autumn no longer finds after it could have expired is tracked", async () => {
+		boot = { ...boot, finalizedThrough: new Date(NOW - 45 * MINUTE) };
+		finalizeError = autumnError(
+			400,
+			'{"code":"invalid_request","message":"Lock not found for ID: boot_1:0"}',
+		);
+		await settleBoot("boot_1");
+		expect(
+			autumnCalls.find((call) => call.method === "track")?.params,
+		).toMatchObject({ featureId: "box_gb_minutes" });
 	});
 
 	test("a confirm that fails on Autumn's side is retried, not tracked", async () => {
