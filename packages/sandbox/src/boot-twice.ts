@@ -844,6 +844,14 @@ try {
 			.split("\n")
 			.find((line) => line.startsWith("SUPERSET_SANDBOX_PLUGINS=")) ?? "unset",
 	);
+	expect(
+		"host-service's own env turns the agents' self-updates off, whatever its shell probe finds",
+		[
+			"DISABLE_AUTOUPDATER=1",
+			"OPENCODE_DISABLE_AUTOUPDATE=1",
+			"PI_SKIP_VERSION_CHECK=1",
+		].every((line) => hostEnv.split("\n").includes(line)),
+	);
 
 	// The control plane's push, so the runner's hook sequencing runs: this
 	// checkout declares no start hook, which the log must say.
