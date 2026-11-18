@@ -10662,6 +10662,9 @@ msgstr "Plugin của nó sẽ hiện khi đồng bộ xong."
 msgid "Its replies go with it."
 msgstr "Các câu trả lời cũng bị xóa theo."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Terminal của nó sẽ mở ở đây khi workspace trên cloud khởi động nó."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Công việc của nó, bao gồm các thay đổi chưa commit, được đẩy lên một nhánh mới. Không gian làm việc trên {computerName} bắt đầu từ nhánh đó, và mỗi cuộc trò chuyện Claude tiếp tục ở đó. Các agent đang làm việc sẽ dừng trước. Terminal và các cuộc trò chuyện khác vẫn ở nguyên chỗ."
 

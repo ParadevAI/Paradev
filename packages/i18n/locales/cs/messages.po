@@ -10662,6 +10662,9 @@ msgstr "Jeho pluginy se objeví po dokončení synchronizace."
 msgid "Its replies go with it."
 msgstr "Smažou se i odpovědi."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Jeho terminál se otevře tady, až ho cloudový pracovní prostor spustí."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Jeho práce včetně necommitnutých změn se odešle do nové větve. Pracovní prostor na {computerName} začne z této větve a každý chat Claude tam bude pokračovat. Agenti, kteří pracují, se nejdřív zastaví. Terminály a ostatní chaty zůstanou, kde jsou."
 

@@ -5,40 +5,45 @@ import { useEffect, useMemo, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
+import { provisioningSince } from "renderer/routes/_authenticated/_dashboard/utils/provisioningSince";
 import {
 	attachCloudChatSession,
 	attachCloudTerminal,
+	pendingLaunchSurface,
 	releasePendingCloudChat,
-} from "renderer/stores/workspace-creates/pendingCloudChat";
+} from "renderer/stores/workspace-creates/pendingCloudLaunch";
 import type {
 	PaneViewerData,
-	PendingCloudChatPaneData,
+	PendingCloudLaunchPaneData,
 } from "../../../../../../types";
 import { markChatSessionLive } from "../../../ChatPane/components/AcpChatPane/hooks/useChatSessionLiveness";
 import { hasComposerDraft } from "../../../ChatSession/components/Composer/hooks/useComposerDraft";
 import { useChatWiring } from "../../../ChatSession/hooks/useSessionClient";
 import {
-	PENDING_CLOUD_CHAT_POLL_MS,
-	PENDING_CLOUD_CHAT_SESSIONS_LIMIT,
-	PENDING_CLOUD_CHAT_TIMEOUT_MS,
+	PENDING_CLOUD_LAUNCH_POLL_MS,
+	PENDING_CLOUD_LAUNCH_SESSIONS_LIMIT,
+	PENDING_CLOUD_LAUNCH_TIMEOUT_MS,
 } from "./constants";
 import { pendingLaunchOutcome } from "./utils/pendingLaunchOutcome";
 
-export function usePendingCloudChatLaunch({
+export function usePendingCloudLaunch({
 	ctx,
 	workspaceId,
-	timeoutMs = PENDING_CLOUD_CHAT_TIMEOUT_MS,
+	timeoutMs = PENDING_CLOUD_LAUNCH_TIMEOUT_MS,
 }: {
 	ctx: RendererContext<PaneViewerData>;
 	workspaceId: string;
 	timeoutMs?: number;
 }): void {
-	const data = ctx.pane.data as PendingCloudChatPaneData;
+	const data = ctx.pane.data as PendingCloudLaunchPaneData;
 	const { terminalId } = data;
+	const surface = pendingLaunchSurface(data);
+	const watchesChats = !!terminalId && surface === "chat";
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const queryClient = useQueryClient();
-	const [sinceMs] = useState(Date.now);
+	const [sinceMs] = useState(() => provisioningSince(workspaceId));
 	const [nowMs, setNowMs] = useState(sinceMs);
 	const queryKey = useMemo(
 		() => ["chat-v3", hostUrl, "pendingLaunch", workspaceId],
@@ -49,35 +54,40 @@ export function usePendingCloudChatLaunch({
 		queryFn: () =>
 			transport.listSessions({
 				workspaceId,
-				limit: PENDING_CLOUD_CHAT_SESSIONS_LIMIT,
+				limit: PENDING_CLOUD_LAUNCH_SESSIONS_LIMIT,
 			}),
-		enabled: !!terminalId,
-		refetchInterval: PENDING_CLOUD_CHAT_POLL_MS,
+		enabled: watchesChats,
+		refetchInterval: PENDING_CLOUD_LAUNCH_POLL_MS,
 		refetchOnWindowFocus: false,
 	});
 	const refresh = useWorkspaceConnectionRefresh(
 		workspaceId,
 		queryKey,
-		!!terminalId,
+		watchesChats,
 	);
 	useWorkspaceEvent(
 		"chat:sessions-changed",
 		workspaceId,
 		refresh,
-		!!terminalId,
+		watchesChats,
 	);
 	const bindings = useTerminalAgentBindings(workspaceId, {
 		enabled: !!terminalId,
 	});
 	const terminalBinding = terminalId ? bindings.get(terminalId) : undefined;
+	const terminalSessions = useWorkspaceTerminalSessions(workspaceId, {
+		enabled: !!terminalId && surface === "terminal",
+	});
+	const terminalListed = !!terminalSessions.data?.sessions.some(
+		(session) => session.terminalId === terminalId,
+	);
 
 	const outcome = pendingLaunchOutcome({
+		surface,
 		terminalId,
 		sessions: sessionsQuery.data ?? [],
-		launchedTerminal:
-			!!terminalBinding &&
-			!terminalBinding.chatSessionId &&
-			terminalBinding.endedAt === undefined,
+		terminalListed,
+		terminalBinding,
 		typed:
 			!!data.queuedPrompts?.length ||
 			hasComposerDraft(`chat-v3-draft:${data.draftId}`),
@@ -87,25 +97,58 @@ export function usePendingCloudChatLaunch({
 	});
 
 	const paneId = ctx.pane.id;
+	const tabId = ctx.tab.id;
 	const store = ctx.store;
 	const { kind } = outcome;
 	const session = outcome.kind === "chat" ? outcome.session : null;
 	const untilMs = outcome.kind === "wait" ? outcome.untilMs : null;
 	useEffect(() => {
-		if (untilMs !== null) {
-			const timer = setTimeout(
-				() => setNowMs(Date.now()),
-				Math.max(0, untilMs - Date.now()),
-			);
-			return () => clearTimeout(timer);
-		}
-		store.getState().replaceState((state) => {
-			if (session) return attachCloudChatSession(state, paneId, session);
-			if (kind === "terminal" && terminalId) {
-				return attachCloudTerminal(state, paneId, terminalId);
+		switch (kind) {
+			case "wait": {
+				if (untilMs === null) return;
+				const timer = setTimeout(
+					() => setNowMs(Date.now()),
+					Math.max(0, untilMs - Date.now()),
+				);
+				return () => clearTimeout(timer);
 			}
-			return releasePendingCloudChat(state, paneId);
-		});
-		if (session) markChatSessionLive(queryClient, hostUrl, session.sessionId);
-	}, [kind, session, untilMs, store, paneId, terminalId, queryClient, hostUrl]);
+			case "chat":
+				if (!session) return;
+				store
+					.getState()
+					.replaceState((state) =>
+						attachCloudChatSession(state, paneId, session),
+					);
+				markChatSessionLive(queryClient, hostUrl, session.sessionId);
+				return;
+			case "terminal":
+				if (!terminalId) return;
+				store
+					.getState()
+					.replaceState((state) =>
+						attachCloudTerminal(state, paneId, terminalId),
+					);
+				return;
+			case "release":
+				store
+					.getState()
+					.replaceState((state) => releasePendingCloudChat(state, paneId));
+				return;
+			case "drop":
+				store.getState().closePane({ tabId, paneId, intent: "remove" });
+				return;
+			default:
+				return kind satisfies never;
+		}
+	}, [
+		kind,
+		session,
+		untilMs,
+		store,
+		paneId,
+		tabId,
+		terminalId,
+		queryClient,
+		hostUrl,
+	]);
 }

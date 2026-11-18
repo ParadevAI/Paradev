@@ -10662,6 +10662,9 @@ msgstr "Его плагины появятся после завершения �
 msgid "Its replies go with it."
 msgstr "Ответы тоже будут удалены."
 
+msgid "Its terminal opens here when the cloud workspace starts it."
+msgstr "Его терминал откроется здесь, когда облачная рабочая область его запустит."
+
 msgid "Its work, including uncommitted changes, is pushed to a new branch. A workspace on {computerName} starts from that branch, and each Claude chat continues there. Agents that are working stop first. Terminals and other chats stay where they are."
 msgstr "Его работа, включая незакоммиченные изменения, отправляется в новую ветку. Рабочая область на {computerName} начинается с этой ветки, и каждый чат Claude продолжается там. Работающие агенты сначала останавливаются. Терминалы и другие чаты остаются на месте."
 

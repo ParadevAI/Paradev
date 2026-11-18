@@ -2,6 +2,7 @@ import type { WorkspaceStore } from "@superset/panes";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
 import type { StoreApi } from "zustand/vanilla";
 import type { ConsumeSearch, PaneViewerData } from "../../types";
 import { focusChatSession } from "../../utils/focusChatSession";
@@ -85,13 +86,10 @@ export function useConsumeAutomationRunLink({
 		store,
 		linkedStores,
 	]);
-	const terminalSessionsQuery = workspaceTrpc.terminal.list.useQuery(
-		{ workspaceId },
-		{
-			enabled: terminalId != null && !sessionId,
-			refetchOnWindowFocus: false,
-		},
-	);
+	const terminalSessionsQuery = useWorkspaceTerminalSessions(workspaceId, {
+		enabled: terminalId != null && !sessionId,
+		refetchOnWindowFocus: false,
+	});
 	const linkedTerminalIsLive =
 		terminalId != null &&
 		terminalSessionsQuery.isSuccess &&

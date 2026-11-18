@@ -34,7 +34,7 @@ import { getNotificationSourcesForTab } from "renderer/stores/notifications";
 import { useRightPaneAreaEnabled } from "renderer/stores/right-pane-area";
 import { useWorkspaceSidebarStore } from "renderer/stores/workspace-sidebar-state";
 import { useStore } from "zustand";
-import { usePendingCloudChat } from "../hooks/usePendingCloudChat";
+import { usePendingCloudLaunchPane } from "../hooks/usePendingCloudLaunchPane";
 import { useWorkspace } from "../providers/WorkspaceProvider";
 import { AddTabMenu } from "./components/AddTabMenu";
 import { ChangesControl } from "./components/ChangesControl";
@@ -167,17 +167,17 @@ export const Route = createFileRoute(
 
 function WorkspacePage() {
 	const { workspace } = useWorkspace();
-	const pendingCloudChat = usePendingCloudChat(workspace.id);
+	const pendingCloudLaunch = usePendingCloudLaunchPane(workspace.id);
 	const workspaceStatusQuery = workspaceTrpc.workspace.get.useQuery(
 		{ id: workspace.id },
 		{
-			enabled: !pendingCloudChat,
+			enabled: !pendingCloudLaunch,
 			staleTime: 0,
 			refetchOnWindowFocus: true,
 		},
 	);
 
-	if (isWorktreeMissing(workspaceStatusQuery, !!pendingCloudChat)) {
+	if (isWorktreeMissing(workspaceStatusQuery, !!pendingCloudLaunch)) {
 		return (
 			<StateScreenShell>
 				<WorkspaceMissingWorktreeState

@@ -3,9 +3,9 @@ import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import type { PaneViewerData } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
-import { pendingCloudChatPane } from "renderer/stores/workspace-creates/pendingCloudChat";
+import { pendingCloudLaunchPane } from "renderer/stores/workspace-creates/pendingCloudLaunch";
 
-export function usePendingCloudChat(workspaceId: string) {
+export function usePendingCloudLaunchPane(workspaceId: string) {
 	const collections = useCollections();
 	const { data: rows = [], isReady } = useLiveQuery(
 		(query) =>
@@ -17,7 +17,7 @@ export function usePendingCloudChat(workspaceId: string) {
 	const row = isReady
 		? rows.find((candidate) => candidate.workspaceId === workspaceId)
 		: collections.workspaceLocalState.get(workspaceId);
-	return pendingCloudChatPane(
+	return pendingCloudLaunchPane(
 		row?.paneLayout as WorkspaceState<PaneViewerData> | undefined,
 	);
 }

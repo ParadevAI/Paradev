@@ -1,6 +1,7 @@
 import type { UserContent } from "@superset/chat/protocol";
 import type { WorkspaceStore } from "@superset/panes";
 import type { AgentIdentityId } from "@superset/shared/agent-catalog";
+import type { CloudAgentLaunchSurface } from "@superset/shared/cloud-agent-launch";
 import type { StoreApi } from "zustand/vanilla";
 export interface FilePosition {
 	line: number;
@@ -88,11 +89,14 @@ export interface PagePaneData {
 	title?: string;
 }
 
-export const PENDING_CLOUD_CHAT_PANE_KIND = "pending-cloud-chat";
+/** Persisted in saved layouts; the value predates terminal launches. */
+export const PENDING_CLOUD_LAUNCH_PANE_KIND = "pending-cloud-chat";
 
-export interface PendingCloudChatPaneData {
+export interface PendingCloudLaunchPaneData {
 	draftId: string;
 	agentId: string;
+	/** Absent on panes saved before terminal launches had one, which were all chat. */
+	surface?: CloudAgentLaunchSurface;
 	/** The id the box launches the agent under; the pane opens whatever starts with it. */
 	terminalId?: string;
 	/** What the user typed; shown until the box's transcript has it. */
@@ -201,7 +205,7 @@ export type PaneViewerData =
 	| FilePaneData
 	| TerminalPaneData
 	| ChatPaneData
-	| PendingCloudChatPaneData
+	| PendingCloudLaunchPaneData
 	| BrowserPaneData
 	| DevtoolsPaneData
 	| DiffPaneData

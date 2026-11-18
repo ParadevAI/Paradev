@@ -34,6 +34,7 @@ import {
 	useState,
 	useSyncExternalStore,
 } from "react";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
 import { useRenderStressInstrumentation } from "renderer/lib/performance/stress-instrumentation";
 import { markTerminalForBackground } from "renderer/lib/terminal/terminal-background-intents";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
@@ -156,8 +157,7 @@ export function TerminalSessionDropdown({
 		kind: "terminal",
 		data: { terminalId },
 	});
-	const sessionsInput = useMemo(() => ({ workspaceId }), [workspaceId]);
-	const sessionsQuery = workspaceTrpc.terminal.list.useQuery(sessionsInput, {
+	const sessionsQuery = useWorkspaceTerminalSessions(workspaceId, {
 		enabled: shouldQueryTerminalSessionList(isOpen, Boolean(binding)),
 		notifyOnChangeProps: isOpen ? ["data", "isFetching"] : ["data"],
 		refetchInterval: getTerminalSessionListRefetchInterval(isOpen),
