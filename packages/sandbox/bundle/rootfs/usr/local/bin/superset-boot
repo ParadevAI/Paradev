@@ -9,7 +9,7 @@
 #   install the pinned bundle      only when its hash differs from current
 #   apply-rootfs, and the steps    each a hash compare per file and step;
 #   marked beforeHost              the only steps host-service waits for
-#   link the drive's agents        only when the control plane mounted one
+#   link the drive's agents        refused without the drive's manifest
 #   start host-service as ubuntu   first; everything else is a side effect
 #   then, detached: sync-assets and the other steps, then the desktop;
 #   the checkout beside them; checkout.ready and the start hook after both
@@ -118,34 +118,32 @@ if [ -z "${SUPERSET_BOOT_REEXEC:-}" ] && [ "$(self_hash)" != "$BOOT_HASH_BEFORE"
 fi
 stamp "steps.host.start"; "$BUNDLE/setup" run-steps before-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.host.end"
 
-# --- the agent CLIs from the region's agent-tools drive, when the control
-# plane mounted one. Without it the image's agents stay on PATH. Mounts are
-# per session, so a link into a mount this session lacks points nowhere.
+# --- the agent CLIs, only from the region's agent-tools drive; the box has no
+# other copy, so a boot without the drive's manifest is refused. Each listed
+# agent's link is replaced, so an older bundle's link on PATH cannot win. Mounts
+# are per session, so a link into a mount this session lacks points nowhere.
 link_agents() {
 	local dir="${SUPERSET_AGENTS_DIR:-/opt/agents}" linked=0 name sha bin target
 	local manifest="${dir}/manifest.json"
-	if find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -print -quit | grep -q .; then
-		SUPERSET_BUNDLE_DIR="$BUNDLE" bash "$BUNDLE/steps/install-agent-clis.sh" >> "$SUPERSET_BOOT_LOG" 2>&1 ||
-			stamp "agents.restore.failed"
-		# What is still dangling has no image copy to restore: opencode, pi.
-		find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -delete
-	fi
+	find /usr/local/bin -maxdepth 1 -lname "${dir}/*" ! -exec test -e {} \; -delete
 	if ! jq -e 'type == "array"' "$manifest" > /dev/null 2>&1; then
 		stamp "agents.unavailable no manifest at ${dir}"
-		return 0
+		refuse "no agents drive at ${dir}; the control plane mounts it on every create and wake"
 	fi
 	while IFS=$'\t' read -r name sha bin; do
 		if ! [[ "$name" =~ ^[a-z0-9-]+$ && "$sha" =~ ^[0-9a-f]{64}$ && "$bin" =~ ^[A-Za-z0-9._/-]+$ && "$bin" != *..* ]]; then
 			stamp "agents.skipped invalid entry ${name:0:32}"; continue
 		fi
 		target="${dir}/${name}/${sha}/${bin}"
-		[ -x "$target" ] || { stamp "agents.missing ${name} ${sha:0:12}"; continue; }
+		if [ ! -x "$target" ]; then
+			rm -f "/usr/local/bin/${name}"
+			stamp "agents.missing ${name} ${sha:0:12}"; continue
+		fi
 		ln -sfn "$target" "/usr/local/bin/${name}.tmp" && mv -T "/usr/local/bin/${name}.tmp" "/usr/local/bin/${name}" &&
 			linked=$((linked + 1))
 	done < <(jq -r '.[] | [.name, .sha, .bin] | map(tostring) | @tsv' "$manifest")
 	stamp "agents.linked ${linked} from ${dir}"
 }
-drive_links() { find /usr/local/bin -maxdepth 1 -lname "${SUPERSET_AGENTS_DIR:-/opt/agents}/*" -printf '%f %l\n' | sort; }
 link_agents
 
 # --- host-service, as the sandbox user, first. A runtime that cannot start
@@ -342,10 +340,8 @@ checkout() {
 	checkout_pid=$!
 	exec 8> /run/superset-steps.lock
 	flock 8
-	links_before="$(drive_links)"
 	stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
 	stamp "steps.start"; "$BUNDLE/setup" run-steps after-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
-	[ "$(drive_links)" = "$links_before" ] || link_agents
 	exec 8>&-
 	as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \
 		"SUPERSET_SANDBOX_WORKSPACE_ID=${SUPERSET_SANDBOX_WORKSPACE_ID}" \

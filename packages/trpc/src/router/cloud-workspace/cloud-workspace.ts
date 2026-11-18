@@ -37,6 +37,7 @@ import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
+	AgentToolsUnavailableError,
 	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
@@ -172,6 +173,14 @@ async function addressSandbox(
 				: await wakeCloudWorkspace(row);
 		return { ...woken, running: true };
 	} catch (error) {
+		if (error instanceof AgentToolsUnavailableError) {
+			throw userError({
+				code: "SERVICE_UNAVAILABLE",
+				message: error.message,
+				i18nKey: "serverError.cloudWorkspace.agentsUnavailable",
+				params: { region: error.region },
+			});
+		}
 		if (error instanceof SandboxNotReadyError) {
 			throw new TRPCError({
 				code: "TIMEOUT",

@@ -54,6 +54,7 @@ export {
 } from "./repositories";
 export {
 	type ActiveWorkspaceSandbox,
+	AgentToolsUnavailableError,
 	type BoxSession,
 	deleteSandbox,
 	describeSandbox,

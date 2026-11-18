@@ -2416,6 +2416,9 @@ msgstr "Ajanın yönettiği önizlemeler"
 msgid "Agents"
 msgstr "Ajanlar"
 
+msgid "Agents are unavailable in {region} right now; try again"
+msgstr "Ajanlar şu anda {region} bölgesinde kullanılamıyor; tekrar deneyin"
+
 #. placeholder {0}: displayName(name)
 msgid "Agents cannot reach {0}'s tools"
 msgstr "Ajanlar {0} araçlarına erişemiyor"

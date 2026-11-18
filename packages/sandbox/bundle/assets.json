@@ -10,7 +10,6 @@
 	"claude": {
 		"sha256": "1e08503dbdf3c2cb0d706d32f3408277388d1c76ef108673e8fe42c1b322925b",
 		"suffix": "",
-		"dest": "/usr/local/share/superset/media/claude-2.1.280",
 		"mode": "0755",
 		"source": "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.280/linux-x64/claude",
 		"version": "2.1.280"
@@ -25,7 +24,6 @@
 	"codex": {
 		"sha256": "a676f5722aae0d86cbe3764332f08eab1fdd89dc0a300b3ad4ffbf48611fa3e3",
 		"suffix": ".tar.gz",
-		"dest": "/usr/local/share/superset/media/codex-0.162.1.tar.gz",
 		"mode": "0644",
 		"source": "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-x86_64-unknown-linux-musl.tar.gz",
 		"version": "0.162.1"
@@ -176,7 +174,6 @@
 	"pdev": {
 		"sha256": "5a51852a4de0a40e20c0137b873f83e1b26255b4c5d01b6b0a2f608e152d8535",
 		"suffix": ".tar.gz",
-		"dest": "/usr/local/share/superset/media/pdev-0.2.5.tar.gz",
 		"mode": "0644",
 		"source": "https://github.com/ParadevAI/pdev/releases/download/v0.2.5/pdev-0.2.5-linux-x64.tar.gz",
 		"version": "0.2.5"

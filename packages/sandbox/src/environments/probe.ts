@@ -8,6 +8,7 @@ import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
 import { HOST_AGENT_PRESETS } from "@superset/shared/host-agent-presets";
 import {
+	ROOT_DISK_AGENTS_COMMAND,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	sandboxCheckoutDir,
@@ -149,6 +150,12 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 			out.trim().split("\n").slice(0, 2).join(" "),
 		);
 	}
+	const rootDiskAgents = (await run(ROOT_DISK_AGENTS_COMMAND)).trim();
+	check(
+		"no agent CLI on the box's root disk, so none in its golden",
+		rootDiskAgents === "",
+		rootDiskAgents.replaceAll("\n", " "),
+	);
 	const cliVersion = await run("superset --version");
 	check("superset runs", /^\d+\.\d+\.\d+/m.test(cliVersion), cliVersion.trim());
 	if (

@@ -3,9 +3,9 @@ import { MAX_ATTACHMENTS } from "./attachment-limits";
 import { HOST_AGENT_PRESETS } from "./host-agent-presets";
 
 /**
- * The presets a sandbox can actually run: the CLIs the bundle installs
- * (`packages/sandbox/bundle/steps.json`, install-agent-clis). Adding one there
- * is what makes it launchable here.
+ * The presets a sandbox can launch. Their CLIs come from the agents drive
+ * (`AGENT_TOOLS` in `packages/sandbox/src/agent-tools.ts`), which also
+ * carries opencode and pi; carrying a CLI does not make it launchable here.
  */
 const INSTALLED_IN_SANDBOX = new Set(["claude", "codex", "pdev"]);
 

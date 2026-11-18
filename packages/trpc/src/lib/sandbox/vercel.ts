@@ -172,8 +172,6 @@ export interface SandboxClaim {
 	/** Ports the workspace's repository asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
-	/** Mount the bundle's agent-tools drive read-only; absent keeps the image's agents. */
-	agentTools?: boolean;
 }
 
 function environmentTags(organizationId: string): Record<string, string> {
@@ -199,33 +197,94 @@ function sandboxTags(
 
 const publishedAgentToolsDrives = new Set<string>();
 
+/** A box has no agents without its drive, so a transient refusal gets a few quick tries. */
+export const AGENT_TOOLS_RETRY = { attempts: 3, delayMs: 500 };
+
+/** The open fails: a box without its agents drive has no agent CLIs at all. */
+export class AgentToolsUnavailableError extends Error {
+	readonly region: string;
+	readonly bundle: string;
+	constructor(
+		readonly driveName: string,
+		cause?: unknown,
+	) {
+		const [, region = "", bundle = ""] =
+			/^agent-tools-([a-z]+[0-9]+)-([0-9a-f]{12})$/.exec(driveName) ?? [];
+		super(`Agents are unavailable in ${region} right now; try again`, {
+			cause,
+		});
+		this.name = "AgentToolsUnavailableError";
+		this.region = region;
+		this.bundle = bundle;
+	}
+}
+
+function agentToolsUnavailable(
+	driveName: string,
+	reason: string,
+	cause?: unknown,
+): AgentToolsUnavailableError {
+	const error = new AgentToolsUnavailableError(driveName, cause);
+	console.error(
+		`[sandbox] agent-tools drive ${driveName} ${reason}`,
+		cause ?? "",
+	);
+	Sentry.captureMessage(`agent-tools drive not mounted: ${reason}`, {
+		level: "error",
+		tags: {
+			"sandbox.agent_tools_drive": driveName,
+			"sandbox.region": error.region,
+			"sandbox.bundle": error.bundle,
+		},
+		extra: { error: cause ? String(cause) : undefined },
+	});
+	return error;
+}
+
+function isTransient(error: unknown): boolean {
+	return (
+		error instanceof APIError &&
+		(error.response.status === 429 || error.response.status >= 500)
+	);
+}
+
+async function withTransientRetry<T>(run: () => Promise<T>): Promise<T> {
+	for (let attempt = 1; ; attempt++) {
+		try {
+			return await run();
+		} catch (error) {
+			if (attempt >= AGENT_TOOLS_RETRY.attempts || !isTransient(error))
+				throw error;
+			await new Promise((resolve) =>
+				setTimeout(resolve, AGENT_TOOLS_RETRY.delayMs * attempt),
+			);
+		}
+	}
+}
+
 /**
  * A mount of a drive that does not exist fails the create, and a drive a
  * writer still holds read-write mounts corrupt. Only a drive that exists and
  * is detached is mounted; that answer is final for a drive, so it is cached.
  */
 export async function agentToolsMounts(
-	driveName: string | null | undefined,
+	driveName: string,
 	getDrive: (name: string) => Promise<Pick<Drive, "currentSandboxName">> = (
 		name,
 	) => Drive.get({ ...credentials(), name }),
-): Promise<SandboxMounts | undefined> {
-	if (!driveName) return undefined;
+): Promise<SandboxMounts> {
 	if (!publishedAgentToolsDrives.has(driveName)) {
+		let drive: Pick<Drive, "currentSandboxName">;
 		try {
-			const drive = await getDrive(driveName);
-			if (drive.currentSandboxName) {
-				console.warn(
-					`[sandbox] agent-tools drive ${driveName} is attached to ${drive.currentSandboxName}; not mounting`,
-				);
-				return undefined;
-			}
+			drive = await withTransientRetry(() => getDrive(driveName));
 		} catch (error) {
-			console.warn(
-				`[sandbox] agent-tools drive ${driveName} unavailable; not mounting`,
-				error,
+			throw agentToolsUnavailable(driveName, "is unavailable", error);
+		}
+		if (drive.currentSandboxName) {
+			throw agentToolsUnavailable(
+				driveName,
+				`is attached to ${drive.currentSandboxName}`,
 			);
-			return undefined;
 		}
 		publishedAgentToolsDrives.add(driveName);
 	}
@@ -234,12 +293,27 @@ export async function agentToolsMounts(
 
 /** The box's own region names the drive: a workspace stays where it was created when its environment moves. */
 export function agentToolsDriveName(
-	claim: Pick<SandboxClaim, "agentTools" | "identity">,
+	claim: Pick<SandboxClaim, "identity">,
 	region: string,
-): string | null {
-	return claim.agentTools
-		? sandboxAgentToolsDrive(region, claim.identity.SUPERSET_BUNDLE_SHA)
-		: null;
+): string {
+	return sandboxAgentToolsDrive(region, claim.identity.SUPERSET_BUNDLE_SHA);
+}
+
+/** Mounts last one session, so a stopped box is handed the drive again before it resumes. */
+async function remountAgentTools(
+	sandbox: Sandbox,
+	claim: SandboxClaim,
+): Promise<void> {
+	const { [SANDBOX_PATHS.agents]: _previous, ...others } = sandbox.mounts ?? {};
+	const driveName = agentToolsDriveName(claim, sandbox.region);
+	const agents = await agentToolsMounts(driveName);
+	try {
+		await withTransientRetry(() =>
+			sandbox.update({ mounts: { ...others, ...agents } }),
+		);
+	} catch (error) {
+		throw agentToolsUnavailable(driveName, "mount update failed", error);
+	}
 }
 
 function publishedPorts(extra: readonly number[] = []): number[] {
@@ -330,38 +404,41 @@ export async function provisionSandbox(args: {
 	const mounts = await agentToolsMounts(
 		agentToolsDriveName(args.claim, args.environment.region),
 	);
-	const sandbox =
-		(await getSandboxToWake(args.name)) ??
-		(await Sentry.startSpan(
-			{
-				name:
-					args.environment.sourceKind === "fork" ? "fork" : "create from image",
-				op: "sandbox.provider",
-				attributes: {
-					"sandbox.name": args.name,
-					"sandbox.source": args.environment.sourceRef,
-					"sandbox.region": args.environment.region,
-					"sandbox.vcpus": args.claim.vcpus,
-				},
+	const sandbox = await Sentry.startSpan(
+		{
+			name:
+				args.environment.sourceKind === "fork" ? "fork" : "create from image",
+			op: "sandbox.provider",
+			attributes: {
+				"sandbox.name": args.name,
+				"sandbox.source": args.environment.sourceRef,
+				"sandbox.region": args.environment.region,
+				"sandbox.vcpus": args.claim.vcpus,
 			},
-			() =>
-				args.environment.sourceKind === "fork"
-					? // A fork copies the golden's region; a snapshot only exists where
-						// it was taken.
-						Sandbox.fork({
-							...config,
-							...(mounts ? { mounts } : {}),
-							sourceSandbox: args.environment.sourceRef,
-							resources: { vcpus: args.claim.vcpus },
-						})
-					: Sandbox.create({
-							...config,
-							...(mounts ? { mounts } : {}),
-							image: args.environment.sourceRef,
-							region: args.environment.region as SandboxRegion,
-							resources: { vcpus: args.claim.vcpus },
-						}),
-		));
+		},
+		() =>
+			// Idempotent on the name: a retry after a create that did land finds it.
+			withTransientRetry(
+				async () =>
+					(await getSandboxToWake(args.name)) ??
+					(args.environment.sourceKind === "fork"
+						? // A fork copies the golden's region; a snapshot only exists where
+							// it was taken.
+							Sandbox.fork({
+								...config,
+								mounts,
+								sourceSandbox: args.environment.sourceRef,
+								resources: { vcpus: args.claim.vcpus },
+							})
+						: Sandbox.create({
+								...config,
+								mounts,
+								image: args.environment.sourceRef,
+								region: args.environment.region as SandboxRegion,
+								resources: { vcpus: args.claim.vcpus },
+							})),
+			),
+	);
 	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
 		await writeIdentity(sandbox, args.claim.identity);
 		await writeSignInFiles(sandbox, args.claim.files);
@@ -604,23 +681,7 @@ export async function wakeSandbox(args: {
 					),
 			);
 		}
-		if (!wasRunning) {
-			const { [SANDBOX_PATHS.agents]: previous, ...others } =
-				sandbox.mounts ?? {};
-			const agents = await agentToolsMounts(
-				agentToolsDriveName(args.claim, sandbox.region),
-			);
-			if (agents || previous) {
-				await sandbox
-					.update({ mounts: { ...others, ...agents } })
-					.catch((error) =>
-						console.warn(
-							`[sandbox] mount update failed for ${args.providerSandboxId}`,
-							error,
-						),
-					);
-			}
-		}
+		if (!wasRunning) await remountAgentTools(sandbox, args.claim);
 		if (!wasRunning && args.beforeResume) {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
 		}
