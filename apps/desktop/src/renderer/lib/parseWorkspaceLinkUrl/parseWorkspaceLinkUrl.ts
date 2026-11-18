@@ -1,6 +1,6 @@
 import { isOwnOriginTwin } from "@superset/shared/own-domains";
 
-const DEEP_LINK_HOST = "v2-workspace";
+const DEEP_LINK_HOSTS = ["workspace", "v2-workspace"];
 const SINGLE_SEGMENT = /^\/([^/]+)\/?$/;
 const WEB_WORKSPACE_PATH = /^\/workspaces\/([^/]+)\/?$/;
 
@@ -14,7 +14,7 @@ function decode(segment: string): string {
 
 function workspaceSegment(parsed: URL, protocolScheme: string, web: URL) {
 	if (parsed.protocol === `${protocolScheme}:`) {
-		if (parsed.host !== DEEP_LINK_HOST) return undefined;
+		if (!DEEP_LINK_HOSTS.includes(parsed.host)) return undefined;
 		return parsed.pathname.match(SINGLE_SEGMENT)?.[1];
 	}
 	if (!isOwnOriginTwin(parsed.origin, web.origin)) return undefined;

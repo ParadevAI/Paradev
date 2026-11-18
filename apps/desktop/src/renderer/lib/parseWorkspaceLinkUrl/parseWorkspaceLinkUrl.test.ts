@@ -8,6 +8,7 @@ const WORKSPACE_ID = "eb417a4d-96f9-4f29-89ad-5cefe15e869a";
 describe("parseWorkspaceLinkUrl", () => {
 	it.each([
 		`superset://v2-workspace/${WORKSPACE_ID}`,
+		`superset://workspace/${WORKSPACE_ID}`,
 		`superset://v2-workspace/${WORKSPACE_ID}/`,
 		`superset://v2-workspace/${WORKSPACE_ID}?sessionId=abc#top`,
 		`${WEB_URL}/workspaces/${WORKSPACE_ID}`,
@@ -48,6 +49,7 @@ describe("parseWorkspaceLinkUrl", () => {
 	it.each([
 		["another app scheme", `superset-dev://v2-workspace/${WORKSPACE_ID}`],
 		["another deep link", `superset://tasks/${WORKSPACE_ID}`],
+		["a plural deep link host", `superset://workspaces/${WORKSPACE_ID}`],
 		["a deep link with no id", "superset://v2-workspace"],
 		["a deep link with an empty id", "superset://v2-workspace/"],
 		["a nested deep link", `superset://v2-workspace/${WORKSPACE_ID}/files`],

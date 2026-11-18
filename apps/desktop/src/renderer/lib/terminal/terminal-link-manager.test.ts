@@ -144,6 +144,7 @@ describe("TerminalLinkManager", () => {
 		const uri = "file://host/Users/me/repo/src/index.ts";
 		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 		let terminal: XTerm;
+		let manager: TerminalLinkManager;
 		let stat: ReturnType<typeof mock>;
 		let onUrlClick: ReturnType<typeof mock>;
 		let onFileLinkClick: ReturnType<typeof mock>;
@@ -158,7 +159,8 @@ describe("TerminalLinkManager", () => {
 			onUrlClick = mock();
 			onFileLinkClick = mock();
 			onLinkHover = mock();
-			new TerminalLinkManager(terminal).setHandlers({
+			manager = new TerminalLinkManager(terminal);
+			manager.setHandlers({
 				stat,
 				onUrlClick,
 				onFileLinkClick,
@@ -199,6 +201,39 @@ describe("TerminalLinkManager", () => {
 			await flush();
 
 			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			"FILE:///Users/me/repo/src/index.ts",
+			"file:/Users/me/repo/src/index.ts",
+			"file:///Users/me/repo/src/index%2Ets",
+		])("passes the decoded path of %s to stat", async (variant) => {
+			terminal.options.linkHandler?.activate(event, variant, range);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/Users/me/repo/src/index.ts");
+		});
+
+		it("drops a click whose stat returns after dispose", async () => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			manager.dispose();
+			await flush();
+
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+		});
+
+		it("reports only the latest hover of the same link", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			terminal.options.linkHandler?.leave?.(event, uri, range);
+			const latestEvent = { clientX: 5 } as MouseEvent;
+			terminal.options.linkHandler?.hover?.(latestEvent, uri, range);
+			await flush();
+
+			expect(onLinkHover).toHaveBeenCalledTimes(1);
+			expect(onLinkHover).toHaveBeenCalledWith(
+				latestEvent,
+				expect.objectContaining({ kind: "file" }),
+			);
 		});
 
 		it("does nothing when the path does not exist", async () => {

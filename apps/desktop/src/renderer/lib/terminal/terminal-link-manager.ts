@@ -52,6 +52,15 @@ export interface TerminalLinkHandlers {
 	stat?: StatCallback;
 }
 
+function fileUriPath(uri: string): string | null {
+	try {
+		const url = new URL(uri);
+		return url.protocol === "file:" ? decodeURIComponent(url.pathname) : null;
+	} catch {
+		return null;
+	}
+}
+
 function fileLink(
 	uri: string,
 	resolved: { path: string; isDirectory: boolean },
@@ -86,6 +95,7 @@ export class TerminalLinkManager {
 	private _resolver: TerminalLinkResolver | null = null;
 	private _handlers: TerminalLinkHandlers | null = null;
 	private _oscLinkHandler: ILinkHandler | null = null;
+	private _hoverRequest = 0;
 
 	constructor(private readonly _terminal: XTerm) {}
 
@@ -110,6 +120,7 @@ export class TerminalLinkManager {
 	}
 
 	dispose(): void {
+		this._hoverRequest++;
 		for (const d of this._disposables) d.dispose();
 		this._disposables = [];
 		this._clearOscLinkHandler();
@@ -189,11 +200,10 @@ export class TerminalLinkManager {
 				}
 			};
 			const webProtocols = ["http:", "https:"];
-			const fileProtocols = ["file:"];
 			const activeProtocols = [...webProtocols, ...extraProtocols];
 			const resolver = this._resolver;
 			const onFileLinkClick = handlers.onFileLinkClick;
-			let hoveredUri: string | null = null;
+			this._hoverRequest++;
 			// xterm drops non-http(s) OSC 8 links unless this is true, and then
 			// hands every scheme to activate/hover, so those filter them again.
 			// Its OSC provider also runs before ours, so a kept file: link must
@@ -202,10 +212,12 @@ export class TerminalLinkManager {
 			this._oscLinkHandler = {
 				allowNonHttpProtocols: extraProtocols.length > 0,
 				activate: (event, uri) => {
-					if (hasProtocol(uri, fileProtocols)) {
+					const path = fileUriPath(uri);
+					if (path !== null) {
 						if (!onFileLinkClick) return;
-						void resolver.resolveLink(uri).then((resolved) => {
-							if (resolved) onFileLinkClick(event, fileLink(uri, resolved));
+						void resolver.resolveLink(path).then((resolved) => {
+							if (!resolved || !this._handlers) return;
+							onFileLinkClick(event, fileLink(uri, resolved));
 						});
 						return;
 					}
@@ -213,14 +225,15 @@ export class TerminalLinkManager {
 				},
 				hover: onLinkHover
 					? (event, uri) => {
-							hoveredUri = uri;
+							const request = ++this._hoverRequest;
 							if (hasProtocol(uri, webProtocols)) {
 								onLinkHover(event, { kind: "url", url: uri });
 								return;
 							}
-							if (!hasProtocol(uri, fileProtocols)) return;
-							void resolver.resolveLink(uri).then((resolved) => {
-								if (!resolved || hoveredUri !== uri) return;
+							const path = fileUriPath(uri);
+							if (path === null) return;
+							void resolver.resolveLink(path).then((resolved) => {
+								if (!resolved || request !== this._hoverRequest) return;
 								onLinkHover(event, {
 									kind: "file",
 									isDirectory: resolved.isDirectory,
@@ -230,7 +243,7 @@ export class TerminalLinkManager {
 						}
 					: undefined,
 				leave: () => {
-					hoveredUri = null;
+					this._hoverRequest++;
 					onLinkLeave?.();
 				},
 			};
