@@ -2,7 +2,6 @@ import { describe, expect, it } from "bun:test";
 import { dirname, join } from "node:path";
 import { ACP_INITIALIZE_PARAMS } from "@superset/chat-runtime";
 
-// The adapter's own SDK copy and capability checks, by path: the package exports neither.
 const adapterDist = dirname(
 	Bun.resolveSync("@agentclientprotocol/claude-agent-acp", import.meta.dir),
 );
@@ -36,7 +35,6 @@ async function capabilitiesSeenByV1Agent(params: unknown): Promise<unknown> {
 }
 
 describe("claude-agent-acp held at v1 behind the SDK's protocol router", () => {
-	// Guards patches/@agentclientprotocol%2Fsdk@2.6.0.patch.
 	it("sees compaction, notices, plans and boolean options from our v2 initialize", async () => {
 		const seen = await capabilitiesSeenByV1Agent(ACP_INITIALIZE_PARAMS);
 		const { clientSupportsCompactionUpdates } = await import(

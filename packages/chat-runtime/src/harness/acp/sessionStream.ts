@@ -178,7 +178,6 @@ export class SessionStream {
 		}
 	}
 
-	/** Undefined for a summary chunk of a compaction already shown: the notice keeps no summary. */
 	handleCompaction(
 		variant: "compaction_update" | "compaction_summary_chunk",
 		raw: unknown,

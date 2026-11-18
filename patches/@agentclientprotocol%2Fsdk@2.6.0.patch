@@ -1,14 +1,12 @@
 diff --git a/dist/protocol-router.js b/dist/protocol-router.js
-index 3156a16363a2ee3e24062b4dceb8f7b38fa8f1f4..906bea3d7bb191f716961d9c044b6808ef30d034 100644
+index 3156a16363a2ee3e24062b4dceb8f7b38fa8f1f4..52eb6f38de50bf193fc535c105dfd18628809908 100644
 --- a/dist/protocol-router.js
 +++ b/dist/protocol-router.js
-@@ -422,7 +422,9 @@ function v2ClientCapabilitiesToV1(capabilities) {
+@@ -422,7 +422,7 @@ function v2ClientCapabilitiesToV1(capabilities) {
      const result = {
          fs: { readTextFile: false, writeTextFile: false },
          terminal: false,
 -        session: { configOptions: { boolean: {} } },
-+        // Compaction and notice updates are part of the v2 contract, so every v2
-+        // client takes them; v1 agents only send them when advertised.
 +        session: { configOptions: { boolean: {} }, compaction: {}, notices: {} },
          plan: {},
          auth: v2ClientAuthCapabilitiesToV1(capabilities?.auth),

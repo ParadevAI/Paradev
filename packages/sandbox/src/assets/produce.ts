@@ -290,7 +290,6 @@ function hostService(): void {
 		return `${dep}@${version}`;
 	};
 	const natives = ["better-sqlite3", "node-pty"].map(pinned);
-	// npm skips the repo's bun patches, so the one the Claude adapter needs is applied by hand.
 	const { patchedDependencies } = JSON.parse(
 		readFileSync(join(REPO_ROOT, "package.json"), "utf8"),
 	) as { patchedDependencies: Record<string, string> };

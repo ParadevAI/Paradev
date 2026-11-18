@@ -236,10 +236,6 @@ export const acpCompactionStatusSchema = z.enum([
 ]);
 export type AcpCompactionStatus = z.infer<typeof acpCompactionStatusSchema>;
 
-/**
- * An upsert keyed by `compactionId`: the first update fixes its place in the
- * transcript. An omitted `error` keeps the last one, and null clears it.
- */
 export const acpCompactionUpdateSchema = z.looseObject({
 	compactionId: z.string().min(1),
 	status: acpCompactionStatusSchema,
