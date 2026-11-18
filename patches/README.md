@@ -575,8 +575,7 @@ types in `dist/oauth-*.d.mts`), `bun patch --commit
 WHERE <guard> LIMIT 1)`. Under READ COMMITTED a second concurrent UPDATE waits
 for the first, then re-checks only `id IN (…)`, not the guard. Two parallel
 refreshes of one token both passed the `revoked IS NULL` guard and created two
-live children; revoking the one the client kept left the other working. In
-production on 2026-11-18, 86 superset-cli rotations had forked this way.
+live children; revoking the one the client kept left the other working.
 
 **What it changes** (`dist/index.mjs`, `incrementOne`, non-MySQL path): the
 guard is repeated on the UPDATE itself, so the second caller gets no row and
