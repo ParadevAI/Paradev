@@ -84,6 +84,24 @@ function reservation(memoryMb: number): number {
 	return gbMinutes({ ms: LOCK_WINDOW_MS, memoryMb });
 }
 
+function reserveLock(
+	boot: Pick<Boot, "id" | "lockSeq" | "organizationId" | "cloudWorkspaceId">,
+	memoryMb: number,
+	user: UsageUser | null,
+) {
+	return autumnClient.check({
+		customerId: boot.organizationId,
+		featureId: BOX_GB_MINUTES_FEATURE_ID,
+		requiredBalance: reservation(memoryMb),
+		properties: usageProperties(boot, user),
+		lock: {
+			enabled: true,
+			lockId: lockIdFor(boot.id, boot.lockSeq),
+			expiresAt: Date.now() + LOCK_TTL_MS,
+		},
+	});
+}
+
 function usageProperties(
 	boot: Pick<Boot, "id" | "lockSeq" | "cloudWorkspaceId">,
 	user: UsageUser | null,
@@ -166,20 +184,16 @@ export async function authorizeBoot(
 	const bootId = `boot_${randomUUID()}`;
 	const user = await usageUser(args.createdByUserId);
 	const result = await checkOrFailOpen(args.organizationId, () =>
-		autumnClient.check({
-			customerId: args.organizationId,
-			featureId: BOX_GB_MINUTES_FEATURE_ID,
-			requiredBalance: reservation(args.memoryMb),
-			properties: usageProperties(
-				{ id: bootId, lockSeq: 0, cloudWorkspaceId: args.cloudWorkspaceId },
-				user,
-			),
-			lock: {
-				enabled: true,
-				lockId: lockIdFor(bootId, 0),
-				expiresAt: Date.now() + LOCK_TTL_MS,
+		reserveLock(
+			{
+				id: bootId,
+				lockSeq: 0,
+				organizationId: args.organizationId,
+				cloudWorkspaceId: args.cloudWorkspaceId,
 			},
-		}),
+			args.memoryMb,
+			user,
+		),
 	);
 	const scope = {
 		cloudWorkspaceId: args.cloudWorkspaceId,
@@ -486,17 +500,11 @@ export async function settleBoot(
 		}
 
 		const nextSeq = boot.lockSeq + 1;
-		const renewal = await autumnClient.check({
-			customerId: boot.organizationId,
-			featureId: BOX_GB_MINUTES_FEATURE_ID,
-			requiredBalance: reservation(session.memoryMb),
-			properties: usageProperties({ ...boot, lockSeq: nextSeq }, user),
-			lock: {
-				enabled: true,
-				lockId: lockIdFor(bootId, nextSeq),
-				expiresAt: Date.now() + LOCK_TTL_MS,
-			},
-		});
+		const renewal = await reserveLock(
+			{ ...boot, lockSeq: nextSeq },
+			session.memoryMb,
+			user,
+		);
 		await db
 			.update(cloudWorkspaceBoots)
 			.set({
