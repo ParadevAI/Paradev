@@ -16,6 +16,7 @@ import {
 	keepUpdatedAt,
 	recordBoxStopped,
 	recordSandboxAsleep,
+	recordStopSeen,
 	reportSleepWriteFailure,
 } from "./sandbox-sleep";
 
@@ -110,28 +111,6 @@ function queueWatch(cloudWorkspaceId: string, expiresAt: Date): Promise<void> {
 			error,
 		),
 	);
-}
-
-/**
- * A stop seen in a provider read, not caused here. Past the recorded expiry it
- * is the timeout the expiry watch would have labelled idle.
- */
-export async function recordStopSeen(
-	row: {
-		id: string;
-		organizationId: string;
-		sandboxExpiresAt: Date | null;
-	},
-	{ sessionId }: { sessionId: string | null },
-): Promise<void> {
-	if (row.sandboxExpiresAt && row.sandboxExpiresAt.getTime() <= Date.now()) {
-		await recordBoxStopped(
-			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
-			{ sessionId, reason: "idle" },
-		);
-		return;
-	}
-	await recordSandboxAsleep(row.id, { sessionId });
 }
 
 /**

@@ -272,9 +272,7 @@ export async function reachablePin(
 				scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 				from: ["provisioning"],
 				reason: "create_failed",
-				error: new Error(
-					`Provisioning of ${row.id} did not finish in ${STRANDED_PROVISIONING_MS / 60_000} minutes`,
-				),
+				error: new Error("A pinned workspace stayed in provisioning"),
 			});
 			return null;
 		}

@@ -34,6 +34,7 @@ let boot: Record<string, unknown> | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
+let duringFinalize: () => void;
 let trackError: Error | null;
 let renewalError: Error | null;
 let writes: Record<string, unknown>[];
@@ -197,6 +198,7 @@ stub(autumnClient, {
 stub(autumnClient.balances, {
 	finalize: async (params: unknown, options?: { headers?: unknown }) => {
 		autumnCalls.push({ method: "finalize", params, headers: options?.headers });
+		duringFinalize();
 		if (finalizeError) throw finalizeError;
 		const finalize = params as Parameters<
 			typeof autumnClient.balances.finalize
@@ -263,6 +265,7 @@ beforeEach(() => {
 	};
 	renewalAllowed = true;
 	finalizeError = null;
+	duringFinalize = () => {};
 	trackError = null;
 	renewalError = null;
 	writes = [];
@@ -310,25 +313,29 @@ describe("releaseBoot", () => {
 			logged.push([event, attributes]),
 	});
 
-	test("a failed start ends as failed, any other release as released, and a reason already written stays", async () => {
+	test("a failed start falls back to failed, any other release to released", async () => {
 		await releaseBoot("boot_1", "provision_failed");
 		await releaseBoot("boot_1", "never_attached");
-		boot = { ...boot, endReason: "archived" };
-		await releaseBoot("boot_1", "sandbox_lost");
-		expect(writes.map((write) => write.endReason)).toEqual([
-			"failed",
-			"released",
-			"archived",
+		expect(writes.map(endReasonOf)).toEqual([
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
 		]);
-		expect(
-			logged.map(([, attributes]) => [
-				(attributes as Record<string, unknown>)["end.reason"],
-				(attributes as Record<string, unknown>)["release.cause"],
-			]),
-		).toEqual([
-			["failed", "provision_failed"],
-			["released", "never_attached"],
-			["archived", "sandbox_lost"],
+	});
+
+	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
+		duringFinalize = () => {
+			boot = { ...boot, endReason: "archived" };
+		};
+		await releaseBoot("boot_1", "sandbox_lost");
+		expect(endReasonOf(writes.at(-1))).toBe(
+			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
+		);
+		expect(logged.at(-1)).toEqual([
+			"boot.released",
+			expect.objectContaining({
+				"end.reason": "archived",
+				"release.cause": "sandbox_lost",
+			}),
 		]);
 	});
 });

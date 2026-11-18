@@ -10,6 +10,7 @@ import { db } from "@superset/db/client";
 import { recordUsageEvent } from "@superset/db/cloud-usage-events";
 import type {
 	CloudUsageFeature,
+	CloudWorkspaceBootEndReason,
 	CloudWorkspaceBootOrigin,
 } from "@superset/db/enums";
 import {
@@ -262,20 +263,21 @@ export async function releaseBoot(
 				),
 			);
 	}
-	const endReason =
-		boot.endReason ?? (cause === "provision_failed" ? "failed" : "released");
 	const now = new Date();
-	await db
+	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
 			lockOpen: false,
 			settleLeaseUntil: null,
-			endReason,
+			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
-		.where(eq(cloudWorkspaceBoots.id, bootId));
-	if (boot.cloudWorkspaceId) {
+		.where(eq(cloudWorkspaceBoots.id, bootId))
+		.returning({
+			endReason: sql<CloudWorkspaceBootEndReason>`${cloudWorkspaceBoots.endReason}`,
+		});
+	if (boot.cloudWorkspaceId && released) {
 		logControl(
 			"boot.released",
 			{
@@ -283,7 +285,7 @@ export async function releaseBoot(
 				organizationId: boot.organizationId,
 				bootId,
 			},
-			{ "end.reason": endReason, "release.cause": cause },
+			{ "end.reason": released.endReason, "release.cause": cause },
 		);
 	}
 }

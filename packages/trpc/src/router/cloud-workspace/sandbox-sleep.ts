@@ -93,6 +93,31 @@ export async function recordBoxStopped(
 	});
 }
 
+/**
+ * A stop seen in a provider read, not caused here. Past the recorded expiry it
+ * is the timeout the expiry watch would have labelled idle. After one of our
+ * own stops the recorded expiry is always past (the asleep write sets it to
+ * now), so that boot's reason is right only because `recordBoxStopped` wrote
+ * it first, and the first write wins.
+ */
+export async function recordStopSeen(
+	row: {
+		id: string;
+		organizationId: string;
+		sandboxExpiresAt: Date | null;
+	},
+	{ sessionId }: { sessionId: string | null },
+): Promise<void> {
+	if (row.sandboxExpiresAt && row.sandboxExpiresAt.getTime() <= Date.now()) {
+		await recordBoxStopped(
+			{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+			{ sessionId, reason: "idle" },
+		);
+		return;
+	}
+	await recordSandboxAsleep(row.id, { sessionId });
+}
+
 /** `sessionId` is the session the caller saw stopped, read before or at the stop. */
 export async function recordSandboxAsleep(
 	cloudWorkspaceId: string,

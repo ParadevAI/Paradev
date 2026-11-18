@@ -78,8 +78,12 @@ import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
-import { recordSandboxAwake, recordStopSeen } from "./sandbox-expiry";
-import { recordBootEnd, recordBoxStopped } from "./sandbox-sleep";
+import { recordSandboxAwake } from "./sandbox-expiry";
+import {
+	recordBootEnd,
+	recordBoxStopped,
+	recordStopSeen,
+} from "./sandbox-sleep";
 import { cloudWorkspaceSharingRouter } from "./sharing";
 import {
 	machineSizeNotAvailable,
