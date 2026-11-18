@@ -1202,7 +1202,7 @@ export const cloudUsageEvents = pgTable(
 		userId: uuid("user_id"),
 		windowFrom: timestamp("window_from", { withTimezone: true }).notNull(),
 		windowTo: timestamp("window_to", { withTimezone: true }).notNull(),
-		amount: numeric().notNull(),
+		amount: numeric({ precision: 20, scale: 6 }).notNull(),
 		sentAt: timestamp("sent_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
