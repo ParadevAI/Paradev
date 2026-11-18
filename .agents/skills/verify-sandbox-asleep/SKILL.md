@@ -31,7 +31,7 @@ one TLC worker, so a failure always prints the shortest trace. A pass takes abou
 
 ## Coverage record
 
-Synced with commit `cf52bc20`. Paths are under `packages/trpc/src/`.
+Synced with commit `a2c4629d`. Paths are under `packages/trpc/src/`.
 
 | Action | Code |
 | --- | --- |
