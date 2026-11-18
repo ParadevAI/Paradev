@@ -18131,9 +18131,6 @@ msgstr "Mostra uma confirmação ao encerrar o app"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Mostrar um microfone no campo do chat. A fala é transcrita pelo ChatGPT quando o Codex está conectado a ele; caso contrário, no seu Mac quando possível e, por fim, pelos servidores do Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Mostra um botão “Uso” na barra lateral da página inicial, abaixo de “Pull requests”"
-
 msgid "Show all {count}"
 msgstr "Mostrar todos os {count}"
 
@@ -18292,9 +18289,6 @@ msgstr "Mostrar a carga útil que disparou"
 
 msgid "Show translation"
 msgstr "Mostrar a tradução"
-
-msgid "Show usage tab on sidebar"
-msgstr "Mostrar aba de uso na barra lateral"
 
 msgid "Show workspace activity"
 msgstr "Mostrar atividade da área de trabalho"

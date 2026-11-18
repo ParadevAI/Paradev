@@ -18131,9 +18131,6 @@ msgstr "Hiện hộp thoại xác nhận khi thoát ứng dụng"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Hiển thị micrô trong ô soạn chat. Giọng nói được ChatGPT chuyển thành văn bản khi Codex đã đăng nhập vào đó, nếu không thì trên máy Mac của bạn khi có thể, và nếu không nữa thì trên máy chủ của Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Hiện nút Mức sử dụng trong thanh bên trang chủ, bên dưới Pull request"
-
 msgid "Show all {count}"
 msgstr "Hiện tất cả {count}"
 
@@ -18292,9 +18289,6 @@ msgstr "Hiển thị payload kích hoạt"
 
 msgid "Show translation"
 msgstr "Xem bản dịch"
-
-msgid "Show usage tab on sidebar"
-msgstr "Hiển thị thẻ mức sử dụng trên thanh bên"
 
 msgid "Show workspace activity"
 msgstr "Hiện hoạt động của workspace"

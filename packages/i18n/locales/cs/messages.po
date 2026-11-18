@@ -18131,9 +18131,6 @@ msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Zobrazit v editoru chatu mikrofon. Řeč přepisuje ChatGPT, pokud je k němu přihlášen Codex, jinak se přepisuje na vašem Macu, když to jde, a jinak na serverech Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Zobrazovat tlačítko Využití v postranním panelu domovské obrazovky pod pull requesty"
-
 msgid "Show all {count}"
 msgstr "Zobrazit všech {count}"
 
@@ -18292,9 +18289,6 @@ msgstr "Zobrazit spouštěcí data"
 
 msgid "Show translation"
 msgstr "Zobrazit překlad"
-
-msgid "Show usage tab on sidebar"
-msgstr "Zobrazit kartu využití v postranním panelu"
 
 msgid "Show workspace activity"
 msgstr "Zobrazit aktivitu pracovního prostoru"

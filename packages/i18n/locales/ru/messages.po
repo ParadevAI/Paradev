@@ -18131,9 +18131,6 @@ msgstr "Показывать подтверждение при выходе из
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Показывать микрофон в поле ввода чата. Речь расшифровывает ChatGPT, если в Codex выполнен вход в ChatGPT, иначе по возможности ваш Mac, а в остальных случаях серверы Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Показывать кнопку «Использование» в боковой панели главного экрана под пул-реквестами"
-
 msgid "Show all {count}"
 msgstr "Показать все {count}"
 
@@ -18292,9 +18289,6 @@ msgstr "Показать полезную нагрузку триггера"
 
 msgid "Show translation"
 msgstr "Показать перевод"
-
-msgid "Show usage tab on sidebar"
-msgstr "Показывать вкладку использования на боковой панели"
 
 msgid "Show workspace activity"
 msgstr "Показать активность рабочего пространства"

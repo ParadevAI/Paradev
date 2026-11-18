@@ -13,7 +13,6 @@ import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
 import {
 	LuClock,
 	LuFileText,
-	LuGauge,
 	LuPlus,
 	LuPuzzle,
 	LuSearch,
@@ -69,8 +68,6 @@ export function DashboardSidebarHeader({
 		(useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS) ?? false) ||
 		env.NODE_ENV === "development";
 	const { myFailedCount } = useFailedAutomations();
-	const { data: isUsageInSidebarEnabled } =
-		electronTrpc.settings.getShowUsageInSidebar.useQuery();
 
 	if (isCollapsed) {
 		return (
@@ -248,26 +245,6 @@ export function DashboardSidebarHeader({
 							<Trans>Pull requests</Trans>
 						</TooltipContent>
 					</Tooltip>
-
-					{isUsageInSidebarEnabled && (
-						<Tooltip delayDuration={300}>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									onClick={navigation.openUsage}
-									aria-label={t({
-										message: "Usage",
-									})}
-									className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-fill-hover"
-								>
-									<LuGauge className="size-3.5" strokeWidth={1.5} />
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="right">
-								<Trans>Usage</Trans>
-							</TooltipContent>
-						</Tooltip>
-					)}
 
 					<Tooltip delayDuration={300}>
 						<TooltipTrigger asChild>
@@ -497,25 +474,6 @@ export function DashboardSidebarHeader({
 					<Trans>Pull requests</Trans>
 				</span>
 			</button>
-
-			{isUsageInSidebarEnabled && (
-				<button
-					type="button"
-					onClick={navigation.openUsage}
-					aria-label={t({
-						message: "Usage",
-					})}
-					className="flex h-7 w-full items-center gap-2 rounded-md px-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
-				>
-					<LuGauge
-						className="size-4 shrink-0 text-muted-foreground"
-						strokeWidth={1.5}
-					/>
-					<span className="flex-1 text-left">
-						<Trans>Usage</Trans>
-					</span>
-				</button>
-			)}
 
 			<button
 				type="button"

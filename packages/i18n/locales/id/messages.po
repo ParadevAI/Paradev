@@ -18131,9 +18131,6 @@ msgstr "Tampilkan dialog konfirmasi saat keluar dari aplikasi"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Tampilkan mikrofon di kolom chat. Ucapan ditranskripsi oleh ChatGPT jika Codex masuk ke ChatGPT, jika tidak di Mac Anda bila memungkinkan, dan jika tidak oleh server Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Tampilkan tombol Penggunaan di sidebar beranda, di bawah Pull request"
-
 msgid "Show all {count}"
 msgstr "Tampilkan semua {count}"
 
@@ -18292,9 +18289,6 @@ msgstr "Tampilkan payload pemicu"
 
 msgid "Show translation"
 msgstr "Tampilkan terjemahan"
-
-msgid "Show usage tab on sidebar"
-msgstr "Tampilkan tab penggunaan di bilah samping"
 
 msgid "Show workspace activity"
 msgstr "Tampilkan aktivitas workspace"

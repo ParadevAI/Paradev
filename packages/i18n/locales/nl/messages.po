@@ -18131,9 +18131,6 @@ msgstr "Toon een bevestiging bij het afsluiten van de app"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Een microfoon in het chatinvoerveld tonen. Spraak wordt getranscribeerd door ChatGPT als Codex daarbij is ingelogd, anders waar mogelijk op je Mac, en anders door de servers van Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Toon een knop Gebruik in de zijbalk van het startscherm, onder Pull requests"
-
 msgid "Show all {count}"
 msgstr "Alle {count} tonen"
 
@@ -18292,9 +18289,6 @@ msgstr "Activerende payload tonen"
 
 msgid "Show translation"
 msgstr "Vertaling tonen"
-
-msgid "Show usage tab on sidebar"
-msgstr "Gebruikstabblad tonen in zijbalk"
 
 msgid "Show workspace activity"
 msgstr "Werkruimteactiviteit tonen"

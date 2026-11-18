@@ -45,7 +45,6 @@ export const SETTING_ITEM_ID = {
 	BEHAVIOR_RESOURCE_MONITOR: "behavior-resource-monitor",
 	BEHAVIOR_DICTATION: "behavior-dictation",
 	BEHAVIOR_PARADEV_ANYWHERE: "behavior-paradev-anywhere",
-	USAGE_IN_SIDEBAR: "usage-in-sidebar",
 	USAGE_RAIL_RINGS: "usage-rail-rings",
 	BEHAVIOR_STAR_GITHUB: "behavior-star-github",
 
@@ -797,23 +796,6 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 			"cli",
 			"self-hosted",
 			"devices",
-		],
-	},
-	{
-		id: SETTING_ITEM_ID.USAGE_IN_SIDEBAR,
-		section: "usage",
-		title: "Show usage tab on sidebar",
-		description: "Show a Usage button in the home sidebar, under Pull requests",
-		keywords: [
-			"sidebar",
-			"rail",
-			"button",
-			"shortcut",
-			"nav",
-			"home",
-			"gauge",
-			"pull requests",
-			"usage",
 		],
 	},
 	{

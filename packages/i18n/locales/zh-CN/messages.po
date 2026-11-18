@@ -18131,9 +18131,6 @@ msgstr "退出应用时显示确认对话框"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "在聊天输入框中显示麦克风。如果 Codex 已登录 ChatGPT，语音由 ChatGPT 转写；否则在可行时于你的 Mac 上转写，再不行则由 Paradev 的服务器转写。"
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "在主页侧边栏的“拉取请求”下方显示“用量”按钮"
-
 msgid "Show all {count}"
 msgstr "显示全部{count}条"
 
@@ -18292,9 +18289,6 @@ msgstr "显示触发负载"
 
 msgid "Show translation"
 msgstr "显示译文"
-
-msgid "Show usage tab on sidebar"
-msgstr "在侧边栏显示用量选项卡"
 
 msgid "Show workspace activity"
 msgstr "显示工作区动态"

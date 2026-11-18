@@ -18131,9 +18131,6 @@ msgstr "앱을 종료할 때 확인 대화 상자를 표시합니다"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "채팅 입력창에 마이크를 표시합니다. Codex가 ChatGPT에 로그인되어 있으면 ChatGPT가 받아쓰고, 그렇지 않으면 가능한 경우 Mac에서, 그 외에는 Paradev 서버에서 받아씁니다."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "홈 사이드바의 풀 리퀘스트 아래에 사용량 버튼을 표시합니다"
-
 msgid "Show all {count}"
 msgstr "{count}개 모두 보기"
 
@@ -18292,9 +18289,6 @@ msgstr "트리거 페이로드 표시"
 
 msgid "Show translation"
 msgstr "번역 보기"
-
-msgid "Show usage tab on sidebar"
-msgstr "사이드바에 사용량 탭 표시"
 
 msgid "Show workspace activity"
 msgstr "워크스페이스 활동 표시"

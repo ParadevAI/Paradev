@@ -18131,9 +18131,6 @@ msgstr "Pokaż okno potwierdzenia przy zamykaniu aplikacji"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Pokaż mikrofon w polu czatu. Mowę transkrybuje ChatGPT, gdy Codex jest w nim zalogowany, w przeciwnym razie Twój Mac, gdy to możliwe, a w ostateczności serwery Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Pokazuj przycisk Zużycie na pasku bocznym strony głównej, pod pull requestami"
-
 msgid "Show all {count}"
 msgstr "Pokaż wszystkie ({count})"
 
@@ -18292,9 +18289,6 @@ msgstr "Pokaż ładunek wyzwalający"
 
 msgid "Show translation"
 msgstr "Pokaż tłumaczenie"
-
-msgid "Show usage tab on sidebar"
-msgstr "Pokaż kartę użycia na pasku bocznym"
 
 msgid "Show workspace activity"
 msgstr "Pokaż aktywność obszaru roboczego"
