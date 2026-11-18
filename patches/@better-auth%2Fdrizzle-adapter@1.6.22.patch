@@ -1,0 +1,14 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 40df2d593cf03b3b3112f60774ae45457ea93355..8293e641607f57bf38afcc728dd5026618d213aa 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -543,7 +543,8 @@ const drizzleAdapter = (db, config) => {
+ 				}
+ 				if (!idColumn) return null;
+ 				const targetIds = db.select({ id: idColumn }).from(schemaModel).where(...clause).limit(1);
+-				return (await db.update(schemaModel).set(assignments).where(inArray(idColumn, targetIds)).returning())[0] ?? null;
++				// superset-patch: atomic-increment-one. Repeat the guard on the UPDATE so Postgres re-checks it after a concurrent write; the subquery alone lets two callers claim one row.
++				return (await db.update(schemaModel).set(assignments).where(and(inArray(idColumn, targetIds), ...clause)).returning())[0] ?? null;
+ 			},
+ 			options: config
+ 		};

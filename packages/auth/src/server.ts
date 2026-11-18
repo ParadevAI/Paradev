@@ -57,6 +57,11 @@ import { jwksAdapter } from "./lib/cached-jwks";
 import { generateMagicTokenForInvite } from "./lib/generate-magic-token";
 import { loadCustomSessionData } from "./lib/load-custom-session-data";
 import {
+	isOAuthAccessTokenLive,
+	revokeOAuthAccessTokenGrant,
+	revokeOAuthRefreshTokenGrant,
+} from "./lib/oauth-grant";
+import {
 	convertPendingShares,
 	removeInvitationShares,
 	removeMemberShares,
@@ -408,6 +413,12 @@ export const auth = betterAuth({
 			allowDynamicClientRegistration: true,
 			allowUnauthenticatedClientRegistration: true,
 			accessTokenExpiresIn: 60 * 60 * 24 * 7,
+			isJwtAccessTokenLive: (ctx, payload) =>
+				isOAuthAccessTokenLive(ctx.context.adapter, payload),
+			onJwtAccessTokenRevoked: (ctx, payload) =>
+				revokeOAuthAccessTokenGrant(ctx.context.adapter, payload),
+			onRefreshTokenRevoked: (ctx, refreshToken) =>
+				revokeOAuthRefreshTokenGrant(ctx.context.adapter, refreshToken),
 			validAudiences: [
 				env.NEXT_PUBLIC_API_URL,
 				`${env.NEXT_PUBLIC_API_URL}/`,
@@ -1287,6 +1298,11 @@ export type User = typeof auth.$Infer.Session.user;
 /** `auth.api.getSession` for a request, where a rejected API key means no session instead of a thrown error. */
 export function getRequestSession(headers: Headers) {
 	return nullOnRejectedApiKey(auth.api.getSession({ headers }));
+}
+
+/** For callers that verify an OAuth access token themselves: false once its grant is revoked. */
+export async function isOAuthBearerLive(claims: Record<string, unknown>) {
+	return isOAuthAccessTokenLive((await auth.$context).adapter, claims);
 }
 
 /**

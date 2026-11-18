@@ -1,4 +1,4 @@
-import { auth, mintUserJwt } from "@superset/auth/server";
+import { auth, isOAuthBearerLive, mintUserJwt } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
@@ -158,6 +158,9 @@ async function resolveOAuth(
 	}
 	if (typeof payload.sub !== "string" || !payload.sub) {
 		throw new McpUnauthorizedError("OAuth token missing sub claim");
+	}
+	if (!(await isOAuthBearerLive(payload))) {
+		throw new McpUnauthorizedError("OAuth token revoked");
 	}
 	let organizationId: string;
 	try {
