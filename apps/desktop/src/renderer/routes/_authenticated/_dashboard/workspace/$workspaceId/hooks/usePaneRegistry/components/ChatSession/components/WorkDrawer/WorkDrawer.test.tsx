@@ -79,7 +79,7 @@ test("a notice heads the drawer and speaks for a queue the limit paused", () => 
 	expect(rowNames(view)).toEqual(["next"]);
 });
 
-test("the drawer caps its height and scrolls", () => {
+test("the drawer caps its height and scrolls only the queue body", () => {
 	const paneRef: { current: HTMLDivElement | null } = { current: null };
 	const attachPane = (node: HTMLDivElement | null) => {
 		if (node)
@@ -106,10 +106,11 @@ test("the drawer caps its height and scrolls", () => {
 		"[data-work-drawer-scroller]",
 	);
 	expect(scroller?.className).toContain("overflow-y-auto");
-	expect(scroller?.style.maxHeight).toBe("min(13.5rem, 200px)");
+	expect(scroller?.parentElement?.style.maxHeight).toBe("min(13.5rem, 200px)");
 	expect(view.getAllByRole("option")).toHaveLength(10);
 	const header = view.getByRole("button", { name: /^Queued 10/ });
-	expect(header.className).toContain("sticky");
+	expect(scroller?.contains(header)).toBe(false);
+	expect(scroller?.querySelectorAll('[role="option"]')).toHaveLength(10);
 });
 
 test("the queue collapses", () => {
