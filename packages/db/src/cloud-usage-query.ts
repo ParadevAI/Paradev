@@ -1,11 +1,15 @@
 // Runs whole queries, unlike task-list-query's condition builders: the admin repo shares them and vendors packages/db but not packages/trpc.
 import {
+	gbMinutesUsd,
 	isMachineSize,
 	LEGACY_MACHINE_SIZE,
 	MACHINE_SIZE_VCPUS,
 	MACHINE_SIZES,
 	type MachineSize,
 } from "@superset/shared/billing";
+
+export { gbMinutesUsd };
+
 import {
 	and,
 	asc,
@@ -193,15 +197,6 @@ const BILLED_FEATURE = "box_gb_minutes";
 const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
 );
-
-export function gbMinutesUsd(
-	gbMinutes: number,
-	overagePerGbHour: number | null,
-) {
-	return overagePerGbHour === null
-		? null
-		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
-}
 
 function scopeConditions(
 	scope: Scope,

@@ -383,6 +383,15 @@ export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	};
 }
 
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
+	return overagePerGbHour === null
+		? null
+		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
+}
+
 export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
 	return (pack.price * 60) / pack.gbMinutes;
 }

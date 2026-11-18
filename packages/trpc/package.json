@@ -12,6 +12,10 @@
 			"types": "./src/i18n-error.ts",
 			"default": "./src/i18n-error.ts"
 		},
+		"./cloud-allowance": {
+			"types": "./src/router/cloud/allowance.ts",
+			"default": "./src/router/cloud/allowance.ts"
+		},
 		"./billing": {
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
