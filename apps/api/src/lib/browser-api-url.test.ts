@@ -12,6 +12,7 @@ for (const browserUrl of [
 		const env = {
 			...process.env,
 			NEXT_PUBLIC_API_URL: identityUrl,
+			NEXT_PUBLIC_ADMIN_URL: "https://admin.test",
 			BROWSER_API_URL: browserUrl,
 			PLUGIN_CLIENT_METADATA_BASE_URL:
 				browserUrl === "" ? "https://metadata.test" : undefined,
@@ -127,6 +128,7 @@ for (const browserUrl of [
 			`${identityUrl}/`,
 			`${identityUrl}/api/v2/agent/mcp`,
 			`${identityUrl}/mcp`,
+			"https://admin.test/api/mcp/cloud",
 		]);
 		expect(config.connectorRedirect).toBe(
 			`${expectedUrl}/api/connectors/callback/test`,
