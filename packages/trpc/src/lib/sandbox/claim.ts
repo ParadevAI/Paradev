@@ -31,10 +31,10 @@ import {
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
 import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
+import { boxLogsEnabled, organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
-import { boxLogsEnabled, organizationFlagEnabled } from "./feature-flags";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
