@@ -55,7 +55,7 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 									<Trans>Workspace</Trans>
 								</TableHead>
 								{isAdmin && (
-									<TableHead className="hidden md:table-cell">
+									<TableHead className="hidden lg:table-cell">
 										<Trans>Owner</Trans>
 									</TableHead>
 								)}
@@ -93,9 +93,14 @@ export function WorkspacesTable({ range, isAdmin }: WorkspacesTableProps) {
 													<Trans>Deleted workspace</Trans>
 												</span>
 											)}
+											{isAdmin && workspace?.owner && (
+												<div className="text-xs text-muted-foreground lg:hidden">
+													{workspace.owner.name}
+												</div>
+											)}
 										</TableCell>
 										{isAdmin && (
-											<TableCell className="hidden md:table-cell">
+											<TableCell className="hidden lg:table-cell">
 												{workspace?.owner?.name}
 											</TableCell>
 										)}
