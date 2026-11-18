@@ -11,7 +11,7 @@ import {
 	ChartTooltipContent,
 } from "../../../ui/chart";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudUsage } from "../../types";
+import type { PricedUsage } from "../../utils/priced";
 import { Section } from "../Section";
 import { utcDays } from "./utils/utcDays";
 
@@ -20,20 +20,19 @@ const TICK_STEP_DAYS = 5;
 const LAST_TICK_GAP_DAYS = 2;
 
 interface UsageByDayProps {
-	usage: CloudUsage;
+	usage: PricedUsage;
 	title: ReactNode;
 }
 
 export function UsageByDay({ usage, title }: UsageByDayProps) {
 	const { t } = useLingui();
-	const { formatCurrency, formatDate, formatNumber } = useFormat();
-	const format = useUsageFormat();
-	const inDollars = usage.total.usageUsd !== null;
+	const { formatCurrency, formatDate } = useFormat();
+	const { dollars } = useUsageFormat();
 	const byDay = new Map(usage.items.map((item) => [item.key, item]));
 	const today = new Date().toISOString().slice(0, 10);
 	const data = utcDays(usage.range).map((day) => {
 		const item = byDay.get(day);
-		const value = (inDollars ? item?.usageUsd : item?.gbHours) ?? 0;
+		const value = item?.usageUsd ?? 0;
 		return { day, value: day > today ? null : value };
 	});
 	const ticks = data
@@ -44,7 +43,7 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 		.map((item) => item.day);
 	const config = {
 		value: {
-			label: inDollars ? t({ message: "Usage" }) : t({ message: "GB-hours" }),
+			label: t({ message: "Usage" }),
 			color: "var(--muted-foreground)",
 		},
 	} satisfies ChartConfig;
@@ -54,8 +53,6 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 			day: "numeric",
 			timeZone: "UTC",
 		});
-	const formatValue = (value: number) =>
-		inDollars ? format.dollars(value) : format.formatGbHours(value);
 
 	return (
 		<Section title={title}>
@@ -75,12 +72,10 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 						tickLine={false}
 						axisLine={false}
 						tickFormatter={(value: number) =>
-							inDollars
-								? formatCurrency(value, "USD", {
-										minimumFractionDigits: 0,
-										maximumFractionDigits: 0,
-									})
-								: formatNumber(value)
+							formatCurrency(value, "USD", {
+								minimumFractionDigits: 0,
+								maximumFractionDigits: 0,
+							})
 						}
 					/>
 					<ChartTooltip
@@ -93,7 +88,7 @@ export function UsageByDay({ usage, title }: UsageByDayProps) {
 									labelFormatter={(_, payload) =>
 										formatDay(payload[0]?.payload.day)
 									}
-									formatter={(value) => formatValue(Number(value))}
+									formatter={(value) => dollars(Number(value))}
 								/>
 							)
 						}

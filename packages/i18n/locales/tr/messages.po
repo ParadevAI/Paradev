@@ -1049,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB-saat"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# gizli satır} other {# gizli satır}}"
 
@@ -5849,9 +5846,6 @@ msgstr "Dizin listelenemedi"
 msgid "Could not load agents from {0}"
 msgstr "{0} üzerinden ajanlar yüklenemedi"
 
-msgid "Could not load cloud usage."
-msgstr "Bulut kullanımı yüklenemedi."
-
 msgid "Could not load environments"
 msgstr "Ortamlar yüklenemedi"
 
@@ -8571,6 +8565,9 @@ msgstr "Görsel yüklenemedi"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Depolar yüklenemedi. Lütfen yeniden deneyin."
+
+msgid "Failed to load usage"
+msgstr "Kullanım yüklenemedi"
 
 msgid "Failed to log out. Please try again."
 msgstr "Oturum kapatılamadı. Lütfen yeniden deneyin."

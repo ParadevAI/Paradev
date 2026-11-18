@@ -16,19 +16,18 @@ import {
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type {
 	CloudUsageLink,
-	CloudUsageRow,
 	CloudUsageTarget,
 	WorkspacesSort,
 } from "../../types";
+import type { PricedRow } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Person } from "../Person";
 import { StatusPill } from "../StatusPill";
 
 interface WorkspacesTableProps {
 	Link: CloudUsageLink;
-	rows: CloudUsageRow[];
+	rows: PricedRow[];
 	isAdmin: boolean;
-	inDollars: boolean;
 	period: string | undefined;
 	/** Makes the headers sort links, on the Workspaces page. */
 	sort?: { by: WorkspacesSort; to: (sort: WorkspacesSort) => CloudUsageTarget };
@@ -45,7 +44,6 @@ export function WorkspacesTable({
 	Link,
 	rows,
 	isAdmin,
-	inDollars,
 	period,
 	sort,
 }: WorkspacesTableProps) {
@@ -83,14 +81,12 @@ export function WorkspacesTable({
 					<TableHead className={cn(HEAD, WIDE, "text-right")}>
 						{head("hours", <Trans>Hours</Trans>)}
 					</TableHead>
-					<TableHead className={cn(HEAD, "text-right", inDollars && NARROW)}>
-						{head("gbHours", <Trans>GB-hours</Trans>, !inDollars)}
+					<TableHead className={cn(HEAD, "text-right", NARROW)}>
+						{head("gbHours", <Trans>GB-hours</Trans>, false)}
 					</TableHead>
-					{inDollars && (
-						<TableHead className={cn(HEAD, "text-right")}>
-							{head("gbHours", <Trans>Usage</Trans>)}
-						</TableHead>
-					)}
+					<TableHead className={cn(HEAD, "text-right")}>
+						{head("gbHours", <Trans>Usage</Trans>)}
+					</TableHead>
 				</TableRow>
 			</TableHeader>
 			<TableBody>
@@ -159,16 +155,12 @@ export function WorkspacesTable({
 							<TableCell className={cn(WIDE, "text-right tabular-nums")}>
 								{formatNumber(row.hours, { maximumFractionDigits: 0 })}
 							</TableCell>
-							<TableCell
-								className={cn("text-right tabular-nums", inDollars && NARROW)}
-							>
+							<TableCell className={cn("text-right tabular-nums", NARROW)}>
 								{formatGbHours(row.gbHours)}
 							</TableCell>
-							{inDollars && (
-								<TableCell className="text-right tabular-nums">
-									{row.usageUsd === null ? null : dollars(row.usageUsd)}
-								</TableCell>
-							)}
+							<TableCell className="text-right tabular-nums">
+								{dollars(row.usageUsd)}
+							</TableCell>
 						</TableRow>
 					);
 				})}

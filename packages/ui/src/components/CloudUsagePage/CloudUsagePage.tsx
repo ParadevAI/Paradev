@@ -21,6 +21,7 @@ import type {
 } from "./types";
 import { hasUsage } from "./utils/hasUsage";
 import { periodParam } from "./utils/periodParam";
+import { pricedAllowance, pricedQuery, pricedUsage } from "./utils/priced";
 
 interface CloudUsagePageProps {
 	Link: CloudUsageLink;
@@ -38,11 +39,18 @@ export function CloudUsagePage({
 	isAdmin,
 	periods,
 	period,
-	byDay,
-	byPerson,
-	workspaces,
+	byDay: unpricedByDay,
+	byPerson: unpricedByPerson,
+	workspaces: unpricedWorkspaces,
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
+	const byDay = pricedQuery(unpricedByDay, pricedUsage);
+	const byPerson = pricedQuery(unpricedByPerson, pricedUsage);
+	const workspaces = pricedQuery(unpricedWorkspaces, pricedUsage);
+	const allowance = period?.allowance
+		? pricedAllowance(period.allowance)
+		: null;
+	const unpriced = Boolean(period?.allowance) && allowance === null;
 
 	return (
 		<div className="@container space-y-6">
@@ -62,12 +70,13 @@ export function CloudUsagePage({
 					)
 				}
 			/>
-			{!periods.data || !byDay.data ? (
+			{!periods.data || !byDay.data || unpriced ? (
 				<QueryStatus
-					isError={periods.isError || byDay.isError}
-					onRetry={() =>
-						periods.isError ? periods.refetch() : byDay.refetch()
-					}
+					isError={periods.isError || byDay.isError || unpriced}
+					onRetry={() => {
+						periods.refetch();
+						byDay.refetch();
+					}}
 				/>
 			) : (
 				<>
@@ -83,6 +92,7 @@ export function CloudUsagePage({
 						<AllowanceCard
 							total={byDay.data.total}
 							period={period}
+							allowance={allowance}
 							billing={
 								<MoreLink Link={Link} to={{ view: "billing" }}>
 									<Trans>Billing</Trans>
@@ -145,7 +155,6 @@ export function CloudUsagePage({
 										Link={Link}
 										rows={workspaces.data.items}
 										isAdmin={isAdmin}
-										inDollars={byDay.data.total.usageUsd !== null}
 										period={param}
 									/>
 								)}

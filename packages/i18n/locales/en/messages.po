@@ -1049,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB-hours"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 
@@ -5849,9 +5846,6 @@ msgstr "Could not list directory"
 msgid "Could not load agents from {0}"
 msgstr "Could not load agents from {0}"
 
-msgid "Could not load cloud usage."
-msgstr "Could not load cloud usage."
-
 msgid "Could not load environments"
 msgstr "Could not load environments"
 
@@ -8571,6 +8565,9 @@ msgstr "Failed to load image"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Failed to load repositories. Please try again."
+
+msgid "Failed to load usage"
+msgstr "Failed to load usage"
 
 msgid "Failed to log out. Please try again."
 msgstr "Failed to log out. Please try again."

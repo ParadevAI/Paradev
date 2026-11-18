@@ -3,16 +3,19 @@
 import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudMetrics, CloudPeriod } from "../../types";
+import type { CloudPeriod } from "../../types";
+import type { PricedAllowance, PricedMetrics } from "../../utils/priced";
 import { AllowanceLines } from "./components/AllowanceLines";
-import { type Amount, allowanceLines } from "./utils/allowanceLines";
+import { allowanceLines } from "./utils/allowanceLines";
 
 type Reason = CloudPeriod["unavailable"][number]["reason"];
 
 interface AllowanceCardProps {
-	total: CloudMetrics;
+	total: PricedMetrics;
 	/** Undefined when the organization has no billing periods and the range is the last 30 days. */
 	period: CloudPeriod | undefined;
+	/** The period's allowance; null for a closed period. */
+	allowance: PricedAllowance | null;
 	billing: ReactNode;
 }
 
@@ -38,21 +41,23 @@ const NOTES: Record<Exclude<Reason, "owners_and_admins_only">, ReactNode> = {
 	),
 };
 
-export function AllowanceCard({ total, period, billing }: AllowanceCardProps) {
-	const { usage, dollars, gbHours } = useUsageFormat();
-	const format = (amount: Amount) =>
-		amount.usd === null ? gbHours(amount.gbHours) : dollars(amount.usd);
-	const allowance = period?.allowance ?? null;
-	const included = allowance?.includedGbHours ?? null;
+export function AllowanceCard({
+	total,
+	period,
+	allowance,
+	billing,
+}: AllowanceCardProps) {
+	const { dollars } = useUsageFormat();
 	const summary =
-		allowance && included !== null
-			? allowanceLines(allowance, included, {
-					gbHours: total.gbHours,
-					usd: total.usageUsd,
-				})
+		allowance?.includedGbHours != null && allowance.includedUsd !== null
+			? allowanceLines(
+					allowance,
+					{ gbHours: allowance.includedGbHours, usd: allowance.includedUsd },
+					{ gbHours: total.gbHours, usd: total.usageUsd },
+				)
 			: null;
-	const used = summary ? format(summary.used) : usage(total);
-	const cap = summary && format(summary.cap);
+	const used = dollars(summary ? summary.used.usd : total.usageUsd);
+	const cap = summary && dollars(summary.cap.usd);
 	const reasons = new Set(period?.unavailable.map((item) => item.reason));
 	const notes = (Object.keys(NOTES) as (keyof typeof NOTES)[]).filter(
 		(reason) => reasons.has(reason),
@@ -84,7 +89,7 @@ export function AllowanceCard({ total, period, billing }: AllowanceCardProps) {
 					lines={summary.lines}
 					scale={summary.scale}
 					seats={allowance.seats}
-					format={format}
+					format={dollars}
 				/>
 			)}
 			{notes.map((reason) => (

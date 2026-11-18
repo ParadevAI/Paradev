@@ -1,11 +1,8 @@
-import type { CloudPeriod } from "../../../../types";
+import type { PricedAllowance } from "../../../../utils/priced";
 
-type Allowance = NonNullable<CloudPeriod["allowance"]>;
-
-/** An amount in GB-hours, and in dollars when the organization has a rate. */
 export interface Amount {
 	gbHours: number;
-	usd: number | null;
+	usd: number;
 }
 
 export interface AllowanceLine {
@@ -24,14 +21,12 @@ const BEYOND_MIN_GB_HOURS = 0.5;
 
 const sum = (amounts: Amount[]): Amount => ({
 	gbHours: amounts.reduce((total, amount) => total + amount.gbHours, 0),
-	usd: amounts.every((amount) => amount.usd !== null)
-		? amounts.reduce((total, amount) => total + (amount.usd ?? 0), 0)
-		: null,
+	usd: amounts.reduce((total, amount) => total + amount.usd, 0),
 });
 
 const minus = (a: Amount, b: Amount): Amount => ({
 	gbHours: a.gbHours - b.gbHours,
-	usd: a.usd === null || b.usd === null ? null : a.usd - b.usd,
+	usd: a.usd - b.usd,
 });
 
 /**
@@ -41,13 +36,13 @@ const minus = (a: Amount, b: Amount): Amount => ({
  * the included total, plus the extra-usage limit when there is one.
  */
 export function allowanceLines(
-	allowance: Allowance,
-	included: number,
+	allowance: PricedAllowance,
+	included: Amount,
 	periodUsed: Amount,
 ) {
 	const credit = (
 		kind: "freeCredits" | "bought",
-		line: Allowance["bought"],
+		line: PricedAllowance["bought"],
 	): AllowanceLine[] =>
 		line
 			? [
@@ -69,13 +64,10 @@ export function allowanceLines(
 			kind: "included",
 			paid: false,
 			used: {
-				gbHours: Math.min(allowance.usedGbHours, included),
-				usd:
-					allowance.usedUsd === null || allowance.includedUsd === null
-						? null
-						: Math.min(allowance.usedUsd, allowance.includedUsd),
+				gbHours: Math.min(allowance.usedGbHours, included.gbHours),
+				usd: Math.min(allowance.usedUsd, included.usd),
 			},
-			total: { gbHours: included, usd: allowance.includedUsd },
+			total: included,
 		},
 		...credit("freeCredits", allowance.freeCredits),
 		...credit("bought", allowance.bought),
@@ -108,7 +100,7 @@ export function allowanceLines(
 		scale: leaveOpen
 			? {
 					gbHours: filled.gbHours / (1 - OPEN_END),
-					usd: filled.usd === null ? null : filled.usd / (1 - OPEN_END),
+					usd: filled.usd / (1 - OPEN_END),
 				}
 			: filled,
 	};

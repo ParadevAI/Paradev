@@ -7,7 +7,6 @@ import {
 	StoryLink,
 	unavailableFixtures,
 	usageFixtures,
-	withoutRate,
 	withSettingsShell,
 } from "./fixtures";
 import type { CloudUsage } from "./types";
@@ -58,14 +57,6 @@ export const PercentCap: Story = {
 	args: withAllowance("percentCap", "percentCap"),
 };
 export const NotRead: Story = { args: withAllowance("notRead", "notRead") };
-export const NoRate: Story = {
-	args: {
-		...withAllowance("noRate"),
-		byDay: query(withoutRate(usageFixtures.byDay)),
-		byPerson: query(withoutRate(usageFixtures.byPerson)),
-		workspaces: query(withoutRate(usageFixtures.top)),
-	},
-};
 export const PastPeriod: Story = {
 	args: { period: base.items[1] },
 };
@@ -81,9 +72,9 @@ export const NoPeriods: Story = {
 	args: {
 		periods: query({ items: [], nextCursor: null }),
 		period: undefined,
-		byDay: query(withoutRate(usageFixtures.byDay)),
-		byPerson: query(withoutRate(usageFixtures.byPerson)),
-		workspaces: query(withoutRate(usageFixtures.top)),
+		byDay: query(usageFixtures.byDay),
+		byPerson: query(usageFixtures.byPerson),
+		workspaces: query(usageFixtures.top),
 	},
 };
 export const Loading: Story = { args: { byDay: query<CloudUsage>(undefined) } };

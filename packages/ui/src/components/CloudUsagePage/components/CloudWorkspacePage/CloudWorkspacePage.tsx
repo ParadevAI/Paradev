@@ -17,6 +17,12 @@ import type {
 	CloudUsageLink,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
+import {
+	pricedBoots,
+	pricedPages,
+	pricedQuery,
+	pricedUsage,
+} from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
@@ -41,10 +47,12 @@ export function CloudWorkspacePage({
 	Link,
 	periods,
 	period,
-	workspace: query,
-	boots,
+	workspace: unpriced,
+	boots: unpricedBoots,
 	openWorkspace,
 }: CloudWorkspacePageProps) {
+	const query = pricedQuery(unpriced, pricedUsage);
+	const boots = pricedPages(unpricedBoots, pricedBoots);
 	const { i18n } = useLingui();
 	const { formatNumber } = useFormat();
 	const { dollars, formatGbHours } = useUsageFormat();
@@ -88,17 +96,12 @@ export function CloudWorkspacePage({
 
 	const size = i18n._(MACHINE_SIZE_NAMES[workspace.size]);
 	const memory = formatNumber(machineSpec(workspace.size).memoryGb);
-	const inDollars = row.usageUsd !== null;
 	const tiles = [
-		...(row.usageUsd === null
-			? []
-			: [
-					{
-						key: "usage",
-						label: <Trans>Usage</Trans>,
-						value: dollars(row.usageUsd),
-					},
-				]),
+		{
+			key: "usage",
+			label: <Trans>Usage</Trans>,
+			value: dollars(row.usageUsd),
+		},
 		{
 			key: "gbHours",
 			label: <Trans>GB-hours</Trans>,
@@ -157,7 +160,7 @@ export function CloudWorkspacePage({
 				))}
 			</dl>
 			<Section title={<Trans>Boots</Trans>}>
-				<BootsTable pages={boots} inDollars={inDollars} />
+				<BootsTable pages={boots} />
 			</Section>
 		</div>
 	);

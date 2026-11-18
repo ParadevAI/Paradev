@@ -1049,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB 小時"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隱藏} other {#行已隱藏}}"
 
@@ -5849,9 +5846,6 @@ msgstr "無法列出目錄"
 msgid "Could not load agents from {0}"
 msgstr "無法從{0}載入代理程式"
 
-msgid "Could not load cloud usage."
-msgstr "無法載入雲端用量。"
-
 msgid "Could not load environments"
 msgstr "無法載入環境"
 
@@ -8571,6 +8565,9 @@ msgstr "載入圖片失敗"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "載入儲存庫失敗。請重試。"
+
+msgid "Failed to load usage"
+msgstr "無法載入用量"
 
 msgid "Failed to log out. Please try again."
 msgstr "登出失敗。請重試。"

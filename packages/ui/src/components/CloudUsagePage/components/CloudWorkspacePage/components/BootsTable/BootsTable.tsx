@@ -14,15 +14,15 @@ import {
 	TableRow,
 } from "../../../../../ui/table";
 import { useUsageFormat } from "../../../../hooks/useUsageFormat";
-import type { CloudBoots, CloudPages } from "../../../../types";
+import type { CloudPages } from "../../../../types";
+import type { PricedBoots } from "../../../../utils/priced";
 import { Pill } from "../../../Pill";
 import { QueryStatus } from "../../../QueryStatus";
 import { END_PILLS } from "./constants";
 import { bootEnd } from "./utils/bootEnd";
 
 interface BootsTableProps {
-	pages: CloudPages<CloudBoots>;
-	inDollars: boolean;
+	pages: CloudPages<PricedBoots>;
 }
 
 const HEAD =
@@ -30,7 +30,7 @@ const HEAD =
 const MEDIUM = "hidden @xl:table-cell";
 const NARROW = "hidden @md:table-cell";
 
-export function BootsTable({ pages, inDollars }: BootsTableProps) {
+export function BootsTable({ pages }: BootsTableProps) {
 	const { i18n } = useLingui();
 	const { formatDateTime, formatList, formatNumber } = useFormat();
 	const { dollars, formatGbHours } = useUsageFormat();
@@ -72,14 +72,12 @@ export function BootsTable({ pages, inDollars }: BootsTableProps) {
 						<TableHead className={HEAD}>
 							<Trans>Ended</Trans>
 						</TableHead>
-						<TableHead className={cn(HEAD, "text-right", inDollars && NARROW)}>
+						<TableHead className={cn(HEAD, "text-right", NARROW)}>
 							<Trans>GB-hours</Trans>
 						</TableHead>
-						{inDollars && (
-							<TableHead className={cn(HEAD, "text-right")}>
-								<Trans>Usage</Trans>
-							</TableHead>
-						)}
+						<TableHead className={cn(HEAD, "text-right")}>
+							<Trans>Usage</Trans>
+						</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -119,16 +117,12 @@ export function BootsTable({ pages, inDollars }: BootsTableProps) {
 								<TableCell>
 									{pill && <Pill tone={pill.tone}>{i18n._(pill.label)}</Pill>}
 								</TableCell>
-								<TableCell
-									className={cn("text-right tabular-nums", inDollars && NARROW)}
-								>
+								<TableCell className={cn("text-right tabular-nums", NARROW)}>
 									{formatGbHours(boot.gbHours)}
 								</TableCell>
-								{inDollars && (
-									<TableCell className="text-right tabular-nums">
-										{boot.usageUsd === null ? null : dollars(boot.usageUsd)}
-									</TableCell>
-								)}
+								<TableCell className="text-right tabular-nums">
+									{dollars(boot.usageUsd)}
+								</TableCell>
 							</TableRow>
 						);
 					})}

@@ -2,17 +2,17 @@
 
 import { Plural, Trans } from "@lingui/react/macro";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudMetrics } from "../../types";
+import type { PricedMetrics } from "../../utils/priced";
 
 export function MemberSummary({
 	total,
 	isPeriod,
 }: {
-	total: CloudMetrics;
+	total: PricedMetrics;
 	isPeriod: boolean;
 }) {
-	const { usage } = useUsageFormat();
-	const used = usage(total);
+	const { dollars } = useUsageFormat();
+	const used = dollars(total.usageUsd);
 	const count = total.workspaces;
 
 	return (

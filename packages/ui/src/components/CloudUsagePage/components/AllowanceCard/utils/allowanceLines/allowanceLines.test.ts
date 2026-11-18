@@ -16,10 +16,8 @@ const base = {
 	extraUsageLimit: null,
 	limitReached: false,
 };
-const used = (gbHours: number, usd: number | null = gbHours * 0.06) => ({
-	gbHours,
-	usd,
-});
+const used = (gbHours: number) => ({ gbHours, usd: gbHours * 0.06 });
+const INCLUDED = used(4000);
 
 describe("allowanceLines", () => {
 	it("measures against the included total plus the cap, with lines in the design's order", () => {
@@ -41,7 +39,7 @@ describe("allowanceLines", () => {
 				},
 				extraUsageLimit: { gbHours: 4000, usd: 240 },
 			},
-			4000,
+			INCLUDED,
 			used(5500),
 		);
 		expect(lines.map((line) => line.kind)).toEqual([
@@ -61,7 +59,7 @@ describe("allowanceLines", () => {
 			scale,
 		} = allowanceLines(
 			{ ...base, extraUsageLimit: { gbHours: 0, usd: 0 }, limitReached: true },
-			4000,
+			INCLUDED,
 			used(4500),
 		);
 		expect(lines.at(-1)).toMatchObject({
@@ -75,20 +73,11 @@ describe("allowanceLines", () => {
 	it("leaves the bar open when no cap is known and the limit is not reached", () => {
 		const { lines, hasCap, scale } = allowanceLines(
 			{ ...base, overageGbHours: 800, overageUsd: 48, limitReached: null },
-			4000,
+			INCLUDED,
 			used(4800),
 		);
 		expect(lines.at(-1)).toMatchObject({ kind: "extra", total: null });
 		expect(hasCap).toBe(false);
 		expect(scale.gbHours).toBe(6000);
-	});
-
-	it("keeps GB-hours and drops dollars when there is no rate", () => {
-		const { cap } = allowanceLines(
-			{ ...base, usedUsd: null, includedUsd: null, overageUsd: null },
-			4000,
-			used(4000, null),
-		);
-		expect(cap).toEqual({ gbHours: 4000, usd: null });
 	});
 });

@@ -1,16 +1,21 @@
 import { type MachineSize, machineSpec } from "@superset/shared/billing";
 import type {
 	CloudBoot,
-	CloudBoots,
 	CloudPages,
 	CloudPeriod,
 	CloudPeriods,
 	CloudQuery,
 	CloudUsage,
-	CloudUsageRow,
 	PersonRef,
 	WorkspaceRef,
 } from "../types";
+import type {
+	PricedAllowance,
+	PricedBoot,
+	PricedBoots,
+	PricedRow,
+	PricedUsage,
+} from "../utils/priced";
 
 /** Story data in the router's output shapes. Seeded, so every build draws the same pages. */
 
@@ -113,8 +118,8 @@ const metrics = (
 	usageUsd: gbHours * RATE,
 });
 
-function workspaceRows(count: number, names?: string[]): CloudUsageRow[] {
-	const rows: CloudUsageRow[] = Array.from({ length: count }, (_, i) => {
+function workspaceRows(count: number, names?: string[]): PricedRow[] {
+	const rows: PricedRow[] = Array.from({ length: count }, (_, i) => {
 		const size = pick(SIZES);
 		const owner = i === 0 ? SAM : pick([PRIYA, PRIYA, INES, SAM, THEO]);
 		const status = i === 1 || i === count - 2 ? "failed" : pick(STATUSES);
@@ -165,8 +170,8 @@ const LONG_ROWS = workspaceRows(12, [
 		: row,
 );
 
-const total = (rows: CloudUsageRow[]) => {
-	const sum = (pick: (row: CloudUsageRow) => number) =>
+const total = (rows: PricedRow[]) => {
+	const sum = (pick: (row: PricedRow) => number) =>
 		rows.reduce((value, row) => value + pick(row), 0);
 	return {
 		workspaces: rows.length,
@@ -174,28 +179,28 @@ const total = (rows: CloudUsageRow[]) => {
 		failedBoots: 0,
 		hours: sum((row) => row.hours),
 		gbHours: sum((row) => row.gbHours),
-		usageUsd: sum((row) => row.usageUsd ?? 0),
+		usageUsd: sum((row) => row.usageUsd),
 	};
 };
 
 const range = { from: PERIOD_START, to: PERIOD_END };
 
 function usage(
-	items: CloudUsageRow[],
-	rows: CloudUsageRow[],
+	items: PricedRow[],
+	rows: PricedRow[],
 	rowCount = items.length,
-): CloudUsage {
+): PricedUsage {
 	return { range, items, total: total(rows), rowCount, nextCursor: null };
 }
 
 /** Removes dollars, as the router does with no rate. */
-export const withoutRate = (page: CloudUsage): CloudUsage => ({
+export const withoutRate = (page: PricedUsage): CloudUsage => ({
 	...page,
 	items: page.items.map((item) => ({ ...item, usageUsd: null })),
 	total: { ...page.total, usageUsd: null },
 });
 
-function byDay(rows: CloudUsageRow[]): CloudUsage {
+function byDay(rows: PricedRow[]): PricedUsage {
 	const days: string[] = [];
 	for (
 		let day = PERIOD_START.getTime();
@@ -221,7 +226,7 @@ function byDay(rows: CloudUsageRow[]): CloudUsage {
 	return usage(items, rows);
 }
 
-function byPerson(rows: CloudUsageRow[]): CloudUsage {
+function byPerson(rows: PricedRow[]): PricedUsage {
 	const items = PEOPLE.map((person) => {
 		const own = rows.filter(
 			(row) =>
@@ -257,10 +262,10 @@ export const usageFixtures = {
 
 /** The Workspaces page's cursor pages, `rows` at a time. */
 export function workspacePages(
-	rows: CloudUsageRow[] = ALL_ROWS,
+	rows: PricedRow[] = ALL_ROWS,
 	perPage = 15,
-): CloudUsage[] {
-	const pages: CloudUsage[] = [];
+): PricedUsage[] {
+	const pages: PricedUsage[] = [];
 	for (let start = 0; start === 0 || start < rows.length; start += perPage) {
 		pages.push({
 			...usage(rows.slice(start, start + perPage), rows, rows.length),
@@ -284,7 +289,7 @@ export const rowsFixtures = {
 	sync: ALL_ROWS.filter((row) => row.label?.includes("sync")),
 };
 
-type Allowance = NonNullable<CloudPeriod["allowance"]>;
+type Allowance = PricedAllowance;
 
 const gbh = (gbHours: number) => ({ gbHours, usd: gbHours * RATE });
 const credit = (used: number, totalGbHours: number) => ({
@@ -360,13 +365,6 @@ export const allowanceFixtures = {
 		extraUsageLimit: null,
 		limitReached: null,
 	}),
-	noRate: {
-		...allowance({ includedGbHours: 7000, usedGbHours: used }),
-		usedUsd: null,
-		includedUsd: null,
-		overageUsd: null,
-		extraUsageLimit: { gbHours: 0, usd: null },
-	},
 };
 
 const NOT_READ = (
@@ -411,7 +409,7 @@ export function periods(
 	return { items, nextCursor: null };
 }
 
-export function boots(workspace: WorkspaceRef, failed = false): CloudBoots {
+export function boots(workspace: WorkspaceRef, failed = false): PricedBoots {
 	const memoryGb = machineSpec(workspace.size).memoryGb;
 	const vcpus = machineSpec(workspace.size).vcpus;
 	const boot = (
@@ -420,7 +418,7 @@ export function boots(workspace: WorkspaceRef, failed = false): CloudBoots {
 		minutes: number,
 		endReason: CloudBoot["endReason"],
 		open = false,
-	): CloudBoot => ({
+	): PricedBoot => ({
 		id,
 		sessionId: null,
 		workspace: { id: workspace.id, name: workspace.name },
@@ -470,9 +468,7 @@ export const workspaceRefs = {
 };
 
 export const rowOf = (ref: WorkspaceRef) =>
-	[...ALL_ROWS, ...LONG_ROWS].find(
-		(row) => row.key === ref.id,
-	) as CloudUsageRow;
+	[...ALL_ROWS, ...LONG_ROWS].find((row) => row.key === ref.id) as PricedRow;
 
 const noop = () => undefined;
 

@@ -1043,9 +1043,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} ГБ-годин"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# прихований рядок} few {# приховані рядки} many {# прихованих рядків} other {# прихованого рядка}}"
 
@@ -5843,9 +5840,6 @@ msgstr "Не вдалося отримати вміст папки"
 msgid "Could not load agents from {0}"
 msgstr "Не вдалося завантажити агентів з {0}"
 
-msgid "Could not load cloud usage."
-msgstr "Не вдалося завантажити використання хмари."
-
 msgid "Could not load environments"
 msgstr "Не вдалося завантажити середовища"
 
@@ -8565,6 +8559,9 @@ msgstr "Не вдалося завантажити зображення"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Не вдалося завантажити репозиторії. Спробуйте ще раз."
+
+msgid "Failed to load usage"
+msgstr "Не вдалося завантажити використання"
 
 msgid "Failed to log out. Please try again."
 msgstr "Не вдалося вийти. Спробуйте ще раз."

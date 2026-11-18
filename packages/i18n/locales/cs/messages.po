@@ -1049,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB-hodin"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# skrytý řádek} few {# skryté řádky} many {# skrytého řádku} other {# skrytých řádků}}"
 
@@ -5849,9 +5846,6 @@ msgstr "Nepodařilo se vypsat adresář"
 msgid "Could not load agents from {0}"
 msgstr "Nepodařilo se načíst agenty z {0}"
 
-msgid "Could not load cloud usage."
-msgstr "Využití cloudu se nepodařilo načíst."
-
 msgid "Could not load environments"
 msgstr "Nepodařilo se načíst prostředí"
 
@@ -8571,6 +8565,9 @@ msgstr "Nepodařilo se načíst obrázek"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Nepodařilo se načíst repozitáře. Zkuste to prosím znovu."
+
+msgid "Failed to load usage"
+msgstr "Využití se nepodařilo načíst"
 
 msgid "Failed to log out. Please try again."
 msgstr "Nepodařilo se odhlásit. Zkuste to prosím znovu."

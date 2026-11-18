@@ -9,7 +9,7 @@ interface AllowanceLinesProps {
 	lines: AllowanceLine[];
 	scale: Amount;
 	seats: number | null;
-	format: (amount: Amount) => string;
+	format: (usd: number) => string;
 }
 
 const SWATCH: Record<AllowanceLine["kind"], string> = {
@@ -27,9 +27,7 @@ export function AllowanceLines({
 	format,
 }: AllowanceLinesProps) {
 	const share = (amount: Amount) => {
-		const whole = scale.usd ?? scale.gbHours;
-		const part = scale.usd === null ? amount.gbHours : (amount.usd ?? 0);
-		return whole > 0 ? (part / whole) * 100 : 0;
+		return scale.usd > 0 ? (amount.usd / scale.usd) * 100 : 0;
 	};
 	const label = (line: AllowanceLine): ReactNode => {
 		switch (line.kind) {
@@ -54,9 +52,9 @@ export function AllowanceLines({
 		}
 	};
 	const value = (line: AllowanceLine) => {
-		const used = format(line.used);
+		const used = format(line.used.usd);
 		if (!line.total) return used;
-		const total = format(line.total);
+		const total = format(line.total.usd);
 		return (
 			<Trans>
 				{used} of {total}

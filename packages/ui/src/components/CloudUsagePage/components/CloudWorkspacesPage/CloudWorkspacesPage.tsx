@@ -14,6 +14,7 @@ import type {
 	WorkspacesTarget,
 } from "../../types";
 import { periodParam } from "../../utils/periodParam";
+import { pricedPages, pricedUsage } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
 import { PageHeader } from "../PageHeader";
@@ -43,10 +44,11 @@ export function CloudWorkspacesPage({
 	isAdmin,
 	periods,
 	period,
-	workspaces,
+	workspaces: unpriced,
 	filters,
 	byPerson,
 }: CloudWorkspacesPageProps) {
+	const workspaces = pricedPages(unpriced, pricedUsage);
 	const periodLabel = usePeriodLabel();
 	const param = periodParam(periods.data?.items, period);
 	/** Any change but the page itself goes back to the first page. */
@@ -60,7 +62,7 @@ export function CloudWorkspacesPage({
 	const { hasNextPage, isFetchingNextPage, fetchNextPage } = workspaces;
 	const wanted = (filters.page ?? 1) - 1;
 	// Pages are cursor pages: a page from the URL is reached by loading the pages before it.
-	const walking = wanted >= pages.length && hasNextPage;
+	const walking = !workspaces.isError && wanted >= pages.length && hasNextPage;
 	useEffect(() => {
 		if (walking && !isFetchingNextPage) fetchNextPage();
 	}, [walking, isFetchingNextPage, fetchNextPage]);
@@ -121,7 +123,6 @@ export function CloudWorkspacesPage({
 						Link={Link}
 						rows={pages[index]?.items ?? []}
 						isAdmin={isAdmin}
-						inDollars={(pages[0]?.total.usageUsd ?? null) !== null}
 						period={param}
 						sort={{
 							by: filters.sort ?? "gbHours",

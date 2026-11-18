@@ -20,7 +20,7 @@ export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 	return (
 		<Notice>
 			<span className="flex flex-wrap items-center justify-center gap-3">
-				<Trans>Could not load cloud usage.</Trans>
+				<Trans>Failed to load usage</Trans>
 				<Button size="sm" variant="outline" onClick={onRetry}>
 					<Trans>Retry</Trans>
 				</Button>

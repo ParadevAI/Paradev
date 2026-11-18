@@ -2,19 +2,20 @@
 
 import { Trans } from "@lingui/react/macro";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
-import type { CloudQuery, CloudUsage, CloudUsageLink } from "../../types";
+import type { CloudQuery, CloudUsageLink } from "../../types";
+import type { PricedUsage } from "../../utils/priced";
 import { Person } from "../Person";
 import { QueryStatus } from "../QueryStatus";
 import { Section } from "../Section";
 
 interface UsageByPersonProps {
 	Link: CloudUsageLink;
-	byPerson: CloudQuery<CloudUsage>;
+	byPerson: CloudQuery<PricedUsage>;
 	period: string | undefined;
 }
 
 export function UsageByPerson({ Link, byPerson, period }: UsageByPersonProps) {
-	const { usage } = useUsageFormat();
+	const { dollars } = useUsageFormat();
 	const items = byPerson.data?.items ?? [];
 	const max = Math.max(...items.map((item) => item.gbHours), 0);
 
@@ -38,7 +39,9 @@ export function UsageByPerson({ Link, byPerson, period }: UsageByPersonProps) {
 										<Trans>No person recorded</Trans>
 									</span>
 								)}
-								<span className="shrink-0 tabular-nums">{usage(item)}</span>
+								<span className="shrink-0 tabular-nums">
+									{dollars(item.usageUsd)}
+								</span>
 							</span>
 						);
 						return (

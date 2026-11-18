@@ -1049,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB 시간"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {숨겨진 #줄} other {숨겨진 #줄}}"
 
@@ -5849,9 +5846,6 @@ msgstr "디렉터리를 나열할 수 없습니다"
 msgid "Could not load agents from {0}"
 msgstr "{0}에서 에이전트를 불러오지 못했습니다"
 
-msgid "Could not load cloud usage."
-msgstr "클라우드 사용량을 불러올 수 없습니다."
-
 msgid "Could not load environments"
 msgstr "환경을 불러오지 못했습니다"
 
@@ -8571,6 +8565,9 @@ msgstr "이미지를 불러오지 못했습니다"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "리포지토리를 불러오지 못했습니다. 다시 시도해 주세요."
+
+msgid "Failed to load usage"
+msgstr "사용량을 불러오지 못했습니다"
 
 msgid "Failed to log out. Please try again."
 msgstr "로그아웃하지 못했습니다. 다시 시도해 주세요."

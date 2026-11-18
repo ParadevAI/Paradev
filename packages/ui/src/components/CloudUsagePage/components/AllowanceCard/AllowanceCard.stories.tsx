@@ -6,20 +6,21 @@ import {
 	StoryLink,
 	unavailableFixtures,
 	usageFixtures,
-	withoutRate,
 	withSettingsShell,
 } from "../../fixtures";
 import { MoreLink } from "../MoreLink";
 import { AllowanceCard } from "./AllowanceCard";
 
-const period = (
+const card = (
 	allowance: keyof typeof allowanceFixtures,
 	unavailable: keyof typeof unavailableFixtures = "none",
-) =>
-	periods({
+) => ({
+	period: periods({
 		allowance: allowanceFixtures[allowance],
 		unavailable: unavailableFixtures[unavailable],
-	}).items[0];
+	}).items[0],
+	allowance: allowanceFixtures[allowance],
+});
 
 const meta = {
 	title: "Cloud usage/Allowance card",
@@ -27,7 +28,7 @@ const meta = {
 	decorators: [withSettingsShell],
 	args: {
 		total: usageFixtures.byDay.total,
-		period: period("freeCredits"),
+		...card("freeCredits"),
 		billing: (
 			<MoreLink Link={StoryLink} to={{ view: "billing" }}>
 				<Trans>Billing</Trans>
@@ -40,21 +41,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FreeCredits: Story = {};
-export const SeatsOnly: Story = { args: { period: period("seatsOnly") } };
-export const Over: Story = { args: { period: period("over") } };
-export const Bought: Story = { args: { period: period("bought") } };
-export const LimitReached: Story = { args: { period: period("limitReached") } };
+export const SeatsOnly: Story = { args: card("seatsOnly") };
+export const Over: Story = { args: card("over") };
+export const Bought: Story = { args: card("bought") };
+export const LimitReached: Story = { args: card("limitReached") };
 export const PercentCap: Story = {
-	args: { period: period("percentCap", "percentCap") },
+	args: card("percentCap", "percentCap"),
 };
 export const NotRead: Story = {
-	args: { period: period("notRead", "notRead") },
-};
-export const NoRate: Story = {
-	args: {
-		total: withoutRate(usageFixtures.byDay).total,
-		period: period("noRate"),
-	},
+	args: card("notRead", "notRead"),
 };
 export const PastPeriod: Story = {
 	args: {
@@ -62,8 +57,13 @@ export const PastPeriod: Story = {
 			allowance: null,
 			unavailable: unavailableFixtures.none,
 		}).items[1],
+		allowance: null,
 	},
 };
 export const LastThirtyDays: Story = {
-	args: { total: withoutRate(usageFixtures.byDay).total, period: undefined },
+	args: {
+		total: usageFixtures.byDay.total,
+		period: undefined,
+		allowance: null,
+	},
 };
