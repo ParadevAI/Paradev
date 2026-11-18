@@ -412,6 +412,14 @@
 			"types": "./src/workspace-tags.ts",
 			"default": "./src/workspace-tags.ts"
 		},
+		"./project-colors": {
+			"types": "./src/project-colors.ts",
+			"default": "./src/project-colors.ts"
+		},
+		"./workspace-tag-folders": {
+			"types": "./src/workspace-tag-folders.ts",
+			"default": "./src/workspace-tag-folders.ts"
+		},
 		"./workspace-attachments": {
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"

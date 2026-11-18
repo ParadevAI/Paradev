@@ -4,7 +4,7 @@ import {
 	SESSIONS_TAG_SCOPE,
 	tagFolderScope,
 	WORKSPACE_TAG_MAX_LENGTH,
-} from "@superset/shared/workspace-tags";
+} from "./workspace-tags";
 
 /**
  * A sidebar folder IS a tag: the folder exists because some workspace in the
