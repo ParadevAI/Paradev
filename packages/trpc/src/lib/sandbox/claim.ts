@@ -180,6 +180,7 @@ export async function buildSandboxClaim(args: {
 			ports: repoHooks?.ports,
 			vcpus: await boxVcpus(args.row),
 			agentToolsDrive: await agentToolsDriveFor({
+				flags: posthog,
 				organizationId: args.row.organizationId,
 				region: environment.region,
 				bundleSha: environment.bundleSha,
