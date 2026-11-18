@@ -562,6 +562,7 @@ function startAdapter(
 		| "startupTimeoutMs"
 		| "startOptionsGraceMs"
 		| "launch"
+		| "protocolVersion"
 	> = {},
 ): { adapter: AcpAdapter; events: AdapterEvent[] } {
 	let counter = 0;
@@ -1016,7 +1017,35 @@ describe("AcpAdapter", () => {
 
 		const initialize = agent.sent.find((f) => f.method === "initialize");
 		expect(initialize?.params).toMatchObject({
+			protocolVersion: 2,
 			clientCapabilities: { session: { compaction: {}, notices: {} } },
+		});
+		expect(initialize?.params).not.toHaveProperty("clientCapabilities.plan");
+		await adapter.dispose();
+	});
+
+	it("asks an agent held at v1 for v1, with the plan and boolean options its SDK router granted", async () => {
+		const agent = new FakeAcpAgent();
+		agent.protocolVersion = 1;
+		const { adapter } = startAdapter(
+			agent,
+			undefined,
+			{},
+			{ protocolVersion: 1 },
+		);
+		await flush();
+
+		const initialize = agent.sent.find((f) => f.method === "initialize");
+		expect(initialize?.params).toMatchObject({
+			protocolVersion: 1,
+			clientCapabilities: {
+				plan: {},
+				session: {
+					compaction: {},
+					notices: {},
+					configOptions: { boolean: {} },
+				},
+			},
 		});
 		await adapter.dispose();
 	});

@@ -4,11 +4,7 @@ export type {
 	AcpImageStoreContext,
 	AcpStoredImage,
 } from "./acp";
-export {
-	ACP_INITIALIZE_PARAMS,
-	AcpAdapter,
-	createAcpAdapter,
-} from "./acp";
+export { AcpAdapter, createAcpAdapter } from "./acp";
 export { attachedFilesBlock } from "./attachedFiles";
 export { BackgroundTasks } from "./backgroundTasks";
 export type {

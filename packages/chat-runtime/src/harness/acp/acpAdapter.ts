@@ -115,24 +115,21 @@ const LATEST_PROTOCOL_VERSION = 2;
 /** Who `initialize` says we are; v2 requires a name and a version. */
 const CLIENT_INFO = { name: "superset", version: "1.0.0" };
 
-export const ACP_INITIALIZE_PARAMS = {
-	protocolVersion: LATEST_PROTOCOL_VERSION,
-	// v2 requires `info` and renamed `clientCapabilities` to `capabilities`, so
-	// both names go out and one request serves either side of the bump.
-	info: CLIENT_INFO,
-	// v2 moved fs and terminal out of client capabilities entirely.
-	// Without form elicitation, claude-agent-acp drops AskUserQuestion.
-	capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
-	// Do not advertise fs/terminal: the agent falls back to its own
-	// Read/Edit/Bash tools, which run headless in the workspace.
-	clientCapabilities: {
+function clientCapabilitiesFor(protocolVersion: number) {
+	const heldAtV1 = protocolVersion < LATEST_PROTOCOL_VERSION;
+	return {
 		fs: { readTextFile: false, writeTextFile: false },
 		terminal: false,
 		elicitation: { form: {} },
-		session: { compaction: {}, notices: {} },
+		...(heldAtV1 ? { plan: {} } : {}),
+		session: {
+			compaction: {},
+			notices: {},
+			...(heldAtV1 ? { configOptions: { boolean: {} } } : {}),
+		},
 		_meta: AIR_CLIENT_META,
-	},
-};
+	};
+}
 
 function unconfirmedSelectionMessage(error: AcpTimeoutError): string {
 	return `${error.message}. The agent can still apply the change, so the selection stays as you set it.`;
@@ -256,6 +253,7 @@ export type AcpAdapterOptions = SpawnAcpOptions & {
 	defaultModeId?: string;
 	clientApprovalModes?: boolean;
 	forkAtMessage?: boolean;
+	protocolVersion?: number;
 	shellPollMs?: number;
 	startupTimeoutMs?: number;
 	requestTimeoutMs?: number;
@@ -1024,9 +1022,23 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 
+		const protocolVersion =
+			this.options.protocolVersion ?? LATEST_PROTOCOL_VERSION;
 		const initialized = await client.request(
 			"initialize",
-			ACP_INITIALIZE_PARAMS,
+			{
+				protocolVersion,
+				// v2 requires `info` and renamed `clientCapabilities` to
+				// `capabilities`, so both names go out and one request serves either
+				// side of the bump.
+				info: CLIENT_INFO,
+				// v2 moved fs and terminal out of client capabilities entirely.
+				// Without form elicitation, claude-agent-acp drops AskUserQuestion.
+				capabilities: { elicitation: { form: {} }, _meta: AIR_CLIENT_META },
+				// Do not advertise fs/terminal: the agent falls back to its own
+				// Read/Edit/Bash tools, which run headless in the workspace.
+				clientCapabilities: clientCapabilitiesFor(protocolVersion),
+			},
 			this.options.startupTimeoutMs ?? STARTUP_TIMEOUT_MS,
 		);
 		if (this.disposed) return;

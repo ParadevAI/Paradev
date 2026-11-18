@@ -801,34 +801,6 @@ succeeds, delete the patch, this section and the guard test. If not,
 `bun patch @vercel/sandbox`, change the two specifiers,
 `bun patch --commit 'node_modules/@vercel/sandbox'`, then run the guard test.
 
-## @agentclientprotocol/sdk (`@agentclientprotocol%2Fsdk@<version>.patch`)
-
-**Why:** chat asks every ACP agent for protocol v2, but claude-agent-acp runs
-held at v1 (`CLAUDE_AGENT_ACP_PROTOCOL: "v1"` in
-`packages/host-service/src/chat-v3/acpCatalogue.ts`), because its v2 has no
-steering yet. The SDK's protocol router serves the v2 `initialize` on the v1
-agent with a fixed set of client capabilities, not the ones chat sends. That
-set has no `session.compaction` and no `session.notices`, though in v2 both
-updates are part of the base contract. So the agent replays a compaction
-summary as a user message and sends notices as agent text.
-
-**What it changes** (`dist/protocol-router.js`, `v2ClientCapabilitiesToV1`):
-adds `compaction: {}` and `notices: {}` to the `session` capabilities the
-router grants a v2 client.
-
-**Guard test:** `packages/host-service/src/chat-v3/claudeAcpCapabilities.test.ts`.
-It sends chat's real `initialize` through the adapter's own SDK copy and asks
-the adapter's own capability checks.
-
-**Cloud sandboxes:** the sandbox host runtime is installed with npm, which
-skips bun patches. `packages/sandbox/src/assets/produce.ts` applies this patch
-by hand and fails the build when it does not apply.
-
-**Remove when** claude-agent-acp ships an SDK with the fix, or chat runs Claude
-on v2 (drop `CLAUDE_AGENT_ACP_PROTOCOL` from the catalogue): delete the patch,
-its `patchedDependencies` entry, this section, the step in `produce.ts` and the
-guard test, then run `bun install` to update `bun.lock`.
-
 ## sonner (`sonner@<version>.patch`)
 
 **Why:** #9938. Sonner treats a `loading` toast as not dismissable: it hides the

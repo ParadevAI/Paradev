@@ -294,11 +294,6 @@ function hostService(): void {
 		return `${dep}@${version}`;
 	};
 	const natives = ["better-sqlite3", "node-pty"].map(pinned);
-	const { patchedDependencies } = JSON.parse(
-		readFileSync(join(REPO_ROOT, "package.json"), "utf8"),
-	) as { patchedDependencies: Record<string, string> };
-	const acpSdkPatch = patchedDependencies["@agentclientprotocol/sdk@2.6.0"];
-	if (!acpSdkPatch) throw new Error("the ACP SDK patch is not in package.json");
 	const acpAdapters = [
 		"@agentclientprotocol/claude-agent-acp",
 		"@agentclientprotocol/codex-acp",
@@ -344,12 +339,11 @@ function hostService(): void {
 	copy("packages/agent-setup/templates", "agent-templates");
 	copy("plugins", "agent-templates/plugins");
 	copy("packages/pty-daemon/dist", "pty-daemon");
-	copy(acpSdkPatch, "acp-sdk.patch");
 	writeFileSync(join(stage, "RUNTIME"), `version=${version}\nnode=24\n`);
 	inContainer(
 		NODE_IMAGE,
 		[
-			"apt-get update -qq && apt-get install -y -qq --no-install-recommends python3 make g++ patch >/dev/null",
+			"apt-get update -qq && apt-get install -y -qq --no-install-recommends python3 make g++ >/dev/null",
 			"mkdir -p /rt && cd /rt && cp -R /out/stage/dist/. /rt/ && cp -R /out/stage/drizzle /rt/drizzle && cp -R /out/stage/agent-templates /rt/agent-templates && cp /out/stage/RUNTIME /rt/RUNTIME",
 			// host-service resolves the daemon side by side with itself, the way the desktop ships it.
 			"cp /out/stage/pty-daemon/pty-daemon.js /rt/pty-daemon.js",
@@ -357,7 +351,6 @@ function hostService(): void {
 			"cp /usr/local/bin/node /rt/node",
 			"cd /rt && npm init -y >/dev/null && npm pkg set type=module >/dev/null",
 			`npm install ${[...natives, ...acpAdapters.map(pinned)].join(" ")} @parcel/watcher @xterm/headless --no-audit --no-fund >/dev/null`,
-			"(SDK=node_modules/@agentclientprotocol/claude-agent-acp/node_modules/@agentclientprotocol/sdk; test -d $SDK || SDK=node_modules/@agentclientprotocol/sdk; patch --batch -s -p1 -d $SDK < /out/stage/acp-sdk.patch && grep -q 'compaction: {}, notices: {}' $SDK/dist/protocol-router.js) || (echo 'ACP SDK patch did not apply' && exit 1)",
 			// The adapters bring their own claude and codex binaries (~650 MB); host-service points them at the box's pinned CLIs instead.
 			"rm -rf node_modules/@anthropic-ai/claude-agent-sdk-linux-* node_modules/@openai/codex-linux-*",
 			"cd /rt/node_modules/node-pty/prebuilds && find . -mindepth 1 -maxdepth 1 ! -name linux-x64 -exec rm -rf {} + && cd /rt",
