@@ -20867,6 +20867,9 @@ msgstr "Ini akan meng-unstage dan mengembalikan semua perubahan yang di-stage. F
 msgid "This workspace"
 msgstr "Workspace ini"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Workspace ini tidak dapat disimpan sebagai lingkungan. Coba lagi nanti."
+
 msgid "This workspace has no project to branch from"
 msgstr "Ruang kerja ini tidak memiliki proyek untuk dicabangkan"
 
@@ -22632,9 +22635,6 @@ msgstr "Workspace dibuat"
 
 msgid "Workspace details"
 msgstr "Detail workspace"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Drive workspace dinonaktifkan untuk organisasi ini, jadi workspace yang file-nya ada di drive tidak bisa menjadi lingkungan."
 
 msgid "Workspace ID copied"
 msgstr "ID workspace disalin"

@@ -20867,6 +20867,9 @@ msgstr "Questo toglierà dallo stage e annullerà tutte le modifiche in stage. I
 msgid "This workspace"
 msgstr "Questo workspace"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Impossibile salvare questo workspace come ambiente. Riprova più tardi."
+
 msgid "This workspace has no project to branch from"
 msgstr "Questo workspace non ha un progetto da cui diramare"
 
@@ -22632,9 +22635,6 @@ msgstr "Workspace creato"
 
 msgid "Workspace details"
 msgstr "Dettagli del workspace"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "I dischi dei workspace sono disattivati per questa organizzazione, quindi un workspace i cui file si trovano su un disco non può diventare un ambiente."
 
 msgid "Workspace ID copied"
 msgstr "ID del workspace copiato"

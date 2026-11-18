@@ -229,14 +229,18 @@ const failingPromote = {
 
 describe("environment.promote that fails", () => {
 	stub(sandbox, failingPromote);
-	test("hands the golden and its forked drive to the retried teardown", async () => {
+	test("hands the golden and its forked drive to the retried teardown, and tells the user only that the promote failed", async () => {
 		environment.createdByUserId = "user-1";
-		await expect(
-			caller.environment.promote({
+		const failure = await caller.environment
+			.promote({
 				cloudWorkspaceId: WORKSPACE_ID,
 				environmentId: ENVIRONMENT_ID,
-			}),
-		).rejects.toThrow("snapshot failed after the fork");
+			})
+			.catch((error: Error) => error);
+		expect(failure).toMatchObject({
+			message:
+				"This workspace could not be saved as an environment. Try again later.",
+		});
 		expect(abandoned).toHaveLength(1);
 		const [golden] = abandoned;
 		expect(golden?.providerSandboxId).toMatch(/^env-/);
@@ -255,7 +259,11 @@ describe("environment.promote with drives off", () => {
 				cloudWorkspaceId: WORKSPACE_ID,
 				environmentId: ENVIRONMENT_ID,
 			}),
-		).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+		).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message:
+				"This workspace could not be saved as an environment. Try again later.",
+		});
 		expect(promoted).toBe(0);
 		expect(abandoned).toEqual([]);
 	});

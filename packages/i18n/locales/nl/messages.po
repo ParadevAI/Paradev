@@ -20867,6 +20867,9 @@ msgstr "Hiermee worden alle gestagede wijzigingen ge-unstaged en teruggedraaid. 
 msgid "This workspace"
 msgstr "Deze werkruimte"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Deze werkruimte kon niet als omgeving worden opgeslagen. Probeer het later opnieuw."
+
 msgid "This workspace has no project to branch from"
 msgstr "Deze workspace heeft geen project om vanaf af te splitsen"
 
@@ -22632,9 +22635,6 @@ msgstr "Werkruimte aangemaakt"
 
 msgid "Workspace details"
 msgstr "Werkruimtedetails"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Werkruimteschijven zijn uitgeschakeld voor deze organisatie, dus een werkruimte waarvan de bestanden op een schijf staan, kan geen omgeving worden."
 
 msgid "Workspace ID copied"
 msgstr "Werkruimte-ID gekopieerd"

@@ -20867,6 +20867,9 @@ msgstr "Damit werden alle gestageden Änderungen aus dem Index genommen und zur�
 msgid "This workspace"
 msgstr "Dieser Arbeitsbereich"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Dieser Arbeitsbereich konnte nicht als Umgebung gespeichert werden. Versuche es später erneut."
+
 msgid "This workspace has no project to branch from"
 msgstr "Dieser Workspace hat kein Projekt, von dem aus verzweigt werden kann"
 
@@ -22632,9 +22635,6 @@ msgstr "Arbeitsbereich erstellt"
 
 msgid "Workspace details"
 msgstr "Arbeitsbereichsdetails"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Arbeitsbereich-Laufwerke sind für diese Organisation ausgeschaltet, daher kann ein Arbeitsbereich, dessen Dateien auf einem Laufwerk liegen, nicht zu einer Umgebung werden."
 
 msgid "Workspace ID copied"
 msgstr "Arbeitsbereich-ID kopiert"

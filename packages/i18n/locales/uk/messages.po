@@ -20861,6 +20861,9 @@ msgstr "Це зніме з індексу та відкотить усі про�
 msgid "This workspace"
 msgstr "Цей робочий простір"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Не вдалося зберегти цей робочий простір як середовище. Спробуйте пізніше."
+
 msgid "This workspace has no project to branch from"
 msgstr "У цього робочого простору немає проєкту, від якого можна створити гілку"
 
@@ -22626,9 +22629,6 @@ msgstr "Робочий простір створено"
 
 msgid "Workspace details"
 msgstr "Відомості про робочий простір"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Диски робочих просторів вимкнено для цієї організації, тому робочий простір, файли якого на диску, не може стати середовищем."
 
 msgid "Workspace ID copied"
 msgstr "ID робочого простору скопійовано"

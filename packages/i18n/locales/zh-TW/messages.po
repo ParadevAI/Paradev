@@ -20867,6 +20867,9 @@ msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔
 msgid "This workspace"
 msgstr "此工作區"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "無法將此工作區儲存為環境。請稍後再試。"
+
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
 
@@ -22632,9 +22635,6 @@ msgstr "工作區已建立"
 
 msgid "Workspace details"
 msgstr "工作區詳細資料"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "此組織已關閉工作區磁碟，因此檔案位於磁碟上的工作區無法成為環境。"
 
 msgid "Workspace ID copied"
 msgstr "已複製工作區ID"

@@ -20867,6 +20867,9 @@ msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. P�
 msgid "This workspace"
 msgstr "Tento pracovní prostor"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Tento pracovní prostor se nepodařilo uložit jako prostředí. Zkuste to později."
+
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
 
@@ -22632,9 +22635,6 @@ msgstr "Pracovní prostor vytvořen"
 
 msgid "Workspace details"
 msgstr "Podrobnosti pracovního prostoru"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Disky pracovních prostorů jsou pro tuto organizaci vypnuté, takže pracovní prostor, jehož soubory jsou na disku, se nemůže stát prostředím."
 
 msgid "Workspace ID copied"
 msgstr "ID pracovního prostoru zkopírováno"

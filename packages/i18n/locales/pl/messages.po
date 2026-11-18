@@ -20867,6 +20867,9 @@ msgstr "Usunie to z indeksu i cofnie wszystkie zaindeksowane zmiany. Zaindeksowa
 msgid "This workspace"
 msgstr "Ten obszar roboczy"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Nie udało się zapisać tego obszaru roboczego jako środowiska. Spróbuj ponownie później."
+
 msgid "This workspace has no project to branch from"
 msgstr "Ten obszar roboczy nie ma projektu, z którego można się rozgałęzić"
 
@@ -22632,9 +22635,6 @@ msgstr "Obszar roboczy utworzony"
 
 msgid "Workspace details"
 msgstr "Szczegóły obszaru roboczego"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Dyski obszarów roboczych są wyłączone w tej organizacji, więc obszar roboczy, którego pliki są na dysku, nie może stać się środowiskiem."
 
 msgid "Workspace ID copied"
 msgstr "Skopiowano ID obszaru roboczego"

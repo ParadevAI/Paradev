@@ -20867,6 +20867,9 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Bu çalışma alanı ortam olarak kaydedilemedi. Daha sonra tekrar deneyin."
+
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 
@@ -22632,9 +22635,6 @@ msgstr "Çalışma alanı oluşturuldu"
 
 msgid "Workspace details"
 msgstr "Çalışma alanı ayrıntıları"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Bu kuruluş için çalışma alanı sürücüleri kapalı; bu yüzden dosyaları bir sürücüde olan bir çalışma alanı ortama dönüştürülemez."
 
 msgid "Workspace ID copied"
 msgstr "Çalışma alanı kimliği kopyalandı"

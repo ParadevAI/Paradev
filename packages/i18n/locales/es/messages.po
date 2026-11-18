@@ -20867,6 +20867,9 @@ msgstr "Esto quitará de preparados y revertirá todos los cambios preparados. L
 msgid "This workspace"
 msgstr "Este espacio de trabajo"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "No se pudo guardar este espacio de trabajo como entorno. Inténtalo de nuevo más tarde."
+
 msgid "This workspace has no project to branch from"
 msgstr "Este espacio de trabajo no tiene un proyecto desde el que bifurcar"
 
@@ -22632,9 +22635,6 @@ msgstr "Espacio de trabajo creado"
 
 msgid "Workspace details"
 msgstr "Detalles del espacio de trabajo"
-
-msgid "Workspace drives are turned off for this organization, so a workspace whose files are on a drive cannot become an environment."
-msgstr "Las unidades de espacio de trabajo están desactivadas para esta organización, así que un espacio de trabajo cuyos archivos están en una unidad no puede convertirse en un entorno."
 
 msgid "Workspace ID copied"
 msgstr "ID del espacio de trabajo copiado"

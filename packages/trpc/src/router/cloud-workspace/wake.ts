@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import {
@@ -18,6 +19,7 @@ import {
 	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
+	SandboxDriveRefusedError,
 	type SandboxUnavailableError,
 	stopAndSnapshot,
 	stopSandbox,
@@ -244,6 +246,14 @@ export async function wakeAfterStop(
 	return wakeCloudWorkspace(row);
 }
 
+/** A drive that refused reads as any box that would not start. */
+function unavailableReason(
+	error: SandboxUnavailableError,
+): CloudWorkspaceFailureReason {
+	if (error instanceof SandboxDriveRefusedError) return "host_not_ready";
+	return error.snapshotExpired ? "snapshot_expired" : "sandbox_gone";
+}
+
 /**
  * For a sandbox that is gone or can never resume. An `awake` row nothing can
  * open would sit in the sidebar forever; failed is the state the client
@@ -258,7 +268,7 @@ export async function markSandboxUnavailable(
 		scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 		from: ["awake", "asleep"],
 		set: { sandboxUrl: null },
-		reason: error.snapshotExpired ? "snapshot_expired" : "sandbox_gone",
+		reason: unavailableReason(error),
 		error,
 	});
 	if (row.driveName && error.snapshotExpired) {
