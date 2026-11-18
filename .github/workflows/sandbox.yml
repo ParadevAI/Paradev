@@ -23,7 +23,6 @@ on:
         options:
           - real-sandbox
           - production-release
-          - drive-fork-probe
           - inventory
         default: real-sandbox
 
@@ -148,31 +147,6 @@ jobs:
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
         run: bun run src/real-sandbox.ts
-
-  drive-fork-probe:
-    name: Drive fork probe
-    if: github.event_name == 'workflow_dispatch' && inputs.run == 'drive-fork-probe'
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Check out code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version-file: .bun-version
-
-      - name: Install dependencies
-        run: bun install --frozen --ignore-scripts
-
-      - name: Measure drive forks on throwaway drives
-        working-directory: packages/sandbox
-        env:
-          VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
-          VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
-          VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
-        run: bun run src/drive-fork-probe.ts
 
   inventory:
     name: Snapshot inventory

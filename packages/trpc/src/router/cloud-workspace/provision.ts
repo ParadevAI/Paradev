@@ -2,9 +2,11 @@ import { randomBytes } from "node:crypto";
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
+import { isCloudUsageRefusal } from "@superset/shared/billing";
 import type { CloudAgentLaunch } from "@superset/shared/cloud-agent-launch";
 import { CLOUD_WORKSPACE_PROVISION_TRANSACTION } from "@superset/shared/constants";
 import { eq } from "drizzle-orm";
+import { controlTags, logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	buildSandboxClaim,
@@ -79,7 +81,7 @@ export async function provisionCloudWorkspace(
 			forceTransaction: true,
 			attributes: { "cloud_workspace.id": input.cloudWorkspaceId },
 		},
-		() => provision(input),
+		(span) => provision(input, span),
 	);
 	// The job runs after its request has answered, so nothing else flushes
 	// the transaction before the runtime moves on.
@@ -89,6 +91,7 @@ export async function provisionCloudWorkspace(
 
 async function provision(
 	input: ProvisionCloudWorkspaceInput,
+	span: Sentry.Span,
 ): Promise<ProvisionCloudWorkspaceOutcome> {
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, input.cloudWorkspaceId),
@@ -122,6 +125,7 @@ async function provision(
 			createdByUserId: row.createdByUserId,
 			...boxFor(claim.vcpus),
 		}));
+		if (bootId) span.setAttribute("boot.id", bootId);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() => provisionSandbox({ name: providerSandboxId, environment, claim }),
@@ -154,7 +158,7 @@ async function provision(
 						),
 				);
 				await deleteSandbox(providerSandboxId);
-				if (bootId) await releaseBoot(bootId);
+				if (bootId) await releaseBoot(bootId, "provision_abandoned");
 			}
 			await naming.catch(() => {});
 			return "skipped";
@@ -168,7 +172,13 @@ async function provision(
 		}
 		if (bootId) {
 			await attachBootSession({ bootId, providerSandboxId }).catch((error) =>
-				Sentry.captureException(error, { extra: { bootId } }),
+				Sentry.captureException(error, {
+					tags: controlTags({
+						cloudWorkspaceId: row.id,
+						organizationId: row.organizationId,
+						bootId,
+					}),
+				}),
 			);
 		}
 		// The box is booting; the environment it needs arrives once host-service
@@ -204,7 +214,7 @@ async function provision(
 	} catch (error) {
 		await naming.catch(() => {});
 		if (bootId) {
-			await releaseBoot(bootId).catch((releaseError) =>
+			await releaseBoot(bootId, "provision_failed").catch((releaseError) =>
 				console.error(
 					`[cloud-workspace] could not release boot ${bootId}`,
 					releaseError,
@@ -225,7 +235,7 @@ async function provision(
 				teardownError,
 			);
 		});
-		await transitionCloudWorkspace({
+		const changed = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning", "awake", "asleep"],
 			to: "failed",
@@ -240,6 +250,21 @@ async function provision(
 				),
 		);
 		console.error(`[cloud-workspace] provisioning failed for ${row.id}`, error);
+		const scope = {
+			cloudWorkspaceId: row.id,
+			organizationId: row.organizationId,
+			bootId,
+		};
+		const refused = isCloudUsageRefusal(error);
+		logControl(
+			"workspace.failed",
+			scope,
+			{ "failure.site": "provision", "status.changed": changed },
+			refused ? "warn" : "error",
+		);
+		if (changed && !refused) {
+			Sentry.captureException(error, { tags: controlTags(scope) });
+		}
 		return "failed";
 	}
 }

@@ -1476,6 +1476,7 @@
     "trpc-electron@0.1.2": "patches/trpc-electron@0.1.2.patch",
     "metro@0.87.1": "patches/metro@0.87.1.patch",
     "@vercel/sandbox@4.0.0": "patches/@vercel%2Fsandbox@4.0.0.patch",
+    "sonner@2.0.7": "patches/sonner@2.0.7.patch",
     "electron-chrome-web-store@0.13.0": "patches/electron-chrome-web-store@0.13.0.patch",
     "@xterm/addon-ligatures@0.11.0-beta.310": "patches/@xterm%2Faddon-ligatures@0.11.0-beta.310.patch",
   },

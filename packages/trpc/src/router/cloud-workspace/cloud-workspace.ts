@@ -33,6 +33,7 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
+import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
@@ -870,6 +871,11 @@ export const cloudWorkspaceRouter = {
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
 			if (archived) {
+				logControl(
+					"workspace.archived",
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{ trigger: "user", "workspace.from_status": row.status },
+				);
 				waitUntil(
 					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
 						(error) =>
@@ -958,7 +964,9 @@ export const cloudWorkspaceRouter = {
 				{ event: "unarchived" },
 			);
 			nudge(row.organizationId, "cloud_workspaces");
-			if (!resumable) await queueProvision({ cloudWorkspaceId: row.id });
+			if (!resumable) {
+				await queueProvision({ cloudWorkspaceId: row.id }, row.organizationId);
+			}
 			return { unarchived: true };
 		}),
 } satisfies TRPCRouterRecord;

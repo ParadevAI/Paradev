@@ -1954,9 +1954,6 @@ msgstr "Tên tài khoản"
 msgid "Account pending deletion"
 msgstr "Tài khoản đang chờ xóa"
 
-msgid "Account usage"
-msgstr "Mức sử dụng tài khoản"
-
 msgid "Account usage: {percent} used"
 msgstr "Mức sử dụng tài khoản: đã dùng {percent}"
 
@@ -16493,9 +16490,6 @@ msgstr "Đặt lại vị trí"
 
 msgid "Reset terminal"
 msgstr "Đặt lại terminal"
-
-msgid "Reset time unavailable"
-msgstr "Không có thời gian đặt lại"
 
 msgid "Reset to default"
 msgstr "Đặt lại về mặc định"

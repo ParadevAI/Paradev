@@ -16,6 +16,7 @@ import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
+import { controlTags, logControl } from "../../lib/control-log";
 import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
@@ -280,15 +281,22 @@ async function start(args: StartCloudWorkspaceInput) {
 	try {
 		await args.beforeProvision?.(row.id);
 	} catch (error) {
-		await transitionCloudWorkspace({
+		const archived = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
 			to: "archived",
 		});
+		if (archived) {
+			logControl(
+				"workspace.archived",
+				{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+				{ trigger: "move_failed" },
+			);
+		}
 		throw error;
 	}
 	nudge(row.organizationId, "cloud_workspaces");
-	await queueProvision(job);
+	await queueProvision(job, row.organizationId);
 	return {
 		...row,
 		initialLaunch: await describeCloudAgentLaunch(job.launch),
@@ -301,6 +309,7 @@ async function start(args: StartCloudWorkspaceInput) {
  */
 export async function queueProvision(
 	job: ProvisionCloudWorkspaceInput,
+	organizationId: string,
 ): Promise<void> {
 	try {
 		await publishCloudWorkspaceJob({
@@ -311,7 +320,7 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		await transitionCloudWorkspace({
+		const changed = await transitionCloudWorkspace({
 			id: job.cloudWorkspaceId,
 			from: ["provisioning"],
 			to: "failed",
@@ -329,6 +338,14 @@ export async function queueProvision(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,
 		);
+		const scope = { cloudWorkspaceId: job.cloudWorkspaceId, organizationId };
+		logControl(
+			"workspace.failed",
+			scope,
+			{ "failure.site": "queue", "status.changed": changed },
+			"error",
+		);
+		if (changed) Sentry.captureException(error, { tags: controlTags(scope) });
 		throw userError({
 			code: "INTERNAL_SERVER_ERROR",
 			message: "Could not start cloud workspace provisioning",

@@ -577,7 +577,8 @@ forked by every workspace of its environment, so each of its blocks is paid
 once per fork. **What we did:** the golden setup hook
 (`packages/sandbox/src/environments/satya-setup.sh`) keeps its npm, Electron
 and node-gyp download caches in `/dev/shm`. **Open:** workspace snapshots
-carry every block a box ever wrote, swap included.
+carry every block a box ever wrote. Boxes have had no swap since 2026-11-17,
+so swap no longer adds to that; a snapshot that already holds swap keeps it.
 
 **A tag-filtered sandbox list is not sorted by status time. Fixed.** The usage
 reconciler scans by `statusUpdatedAt` and stops at entries older than the maximum

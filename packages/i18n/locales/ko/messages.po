@@ -1954,9 +1954,6 @@ msgstr "계정 이름"
 msgid "Account pending deletion"
 msgstr "삭제 예정 계정"
 
-msgid "Account usage"
-msgstr "계정 사용량"
-
 msgid "Account usage: {percent} used"
 msgstr "계정 사용량: {percent} 사용"
 
@@ -16493,9 +16490,6 @@ msgstr "위치 초기화"
 
 msgid "Reset terminal"
 msgstr "터미널 초기화"
-
-msgid "Reset time unavailable"
-msgstr "초기화 시간을 확인할 수 없음"
 
 msgid "Reset to default"
 msgstr "기본값으로 재설정"

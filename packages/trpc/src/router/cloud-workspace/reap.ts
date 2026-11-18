@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { eq } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { detachAll, reapOrphanFiles } from "../../lib/files";
 import {
 	deleteSandbox,
@@ -93,6 +94,10 @@ export async function reapArchivedCloudWorkspace(
 		);
 		await deleteSandbox(row.providerSandboxId);
 		await reapWorkspaceFiles(row.id);
+		logControl("archive.deleted", {
+			cloudWorkspaceId: row.id,
+			organizationId: row.organizationId,
+		});
 		return "reaped";
 	}
 	if (!(await runArchiveHook(row, input))) return "skipped";
@@ -101,6 +106,10 @@ export async function reapArchivedCloudWorkspace(
 		sessionId: stopped.sessionId ?? row.sandboxSessionId,
 	});
 	await queueSettleWorkspace(row.id);
+	logControl("archive.stopped", {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	});
 	return "stopped";
 }
 
