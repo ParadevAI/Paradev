@@ -49,7 +49,7 @@ export function AccountUsageMenuSection({
 			<DropdownMenuSeparator />
 			<DropdownMenuItem
 				asChild
-				className="flex-col items-stretch gap-2 rounded-md border border-border/60 bg-muted/30 p-2.5 focus:bg-muted/60"
+				className="flex-col items-stretch gap-2 rounded-md border border-border/60 bg-muted/30 p-2.5 focus:border-border focus:bg-accent"
 			>
 				<Link
 					to="/settings/usage"
@@ -65,7 +65,7 @@ export function AccountUsageMenuSection({
 							{account?.email ?? AGENT_IDENTITY_LABELS[binding.agentId]}
 						</span>
 						{account?.plan && (
-							<span className="shrink-0 rounded bg-muted px-1 text-[10px] text-muted-foreground capitalize">
+							<span className="shrink-0 rounded bg-foreground/10 px-1 text-[10px] text-muted-foreground capitalize">
 								{account.plan}
 							</span>
 						)}
@@ -95,7 +95,7 @@ export function AccountUsageMenuSection({
 										{formatPercent(window.usedPercent / 100)}
 									</span>
 								</div>
-								<div className="mt-1 h-1 overflow-hidden rounded-full bg-muted">
+								<div className="mt-1 h-1 overflow-hidden rounded-full bg-foreground/10">
 									<div
 										className={cn(
 											"h-full rounded-full",
