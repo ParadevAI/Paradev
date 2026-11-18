@@ -246,6 +246,10 @@ Documented by Vercel or the SDK, not measured:
   box and drive names and queues their retried teardown. Until then, and as a fallback after,
   the 410 a wake, an agent turn or an automation dispatch gets on an expired snapshot takes
   `markSandboxUnavailable` to the same function. Date/Author: 2026-11-18, Satya.
+- Decision: every box, with a drive or without, is deleted through the retried `teardownSandbox`
+  job (`deleteSandboxAndDriveLater` no longer deletes a drive-less box inline), so each delete is
+  preceded by the re-read of what still names the box. `nextSandboxNameFor` lives only in
+  `cloud-workspace/sandbox-name.ts`. Date/Author: 2026-11-18, coordinator, with #9987.
 - Decision: a customer never reads that the box has a drive. A drive that refused for good fails
   the workspace with `host_not_ready` ("The workspace did not become ready."), a drive still
   flushing at a wake answers "still starting", the error messages a client can be handed name no

@@ -8,6 +8,7 @@ import * as sandbox from "../../lib/sandbox";
 import * as chatMoves from "../chat-move/utils/queueChatMove";
 import * as meter from "./meter";
 import { provisionCloudWorkspace } from "./provision";
+import * as teardown from "./teardown";
 
 const logged: unknown[] = [];
 const captured: unknown[] = [];
@@ -196,5 +197,32 @@ describe("a provision whose host answered", () => {
 				],
 			},
 		]);
+	});
+});
+
+describe("a failed create of a workspace without a drive", () => {
+	const tornDown: unknown[] = [];
+	const deleted: string[] = [];
+	stub(db, rowUpdate(true));
+	stub(sandbox, {
+		buildSandboxClaim: async () => {
+			throw new Error("create failed");
+		},
+		deleteSandbox: async (id: string) => {
+			deleted.push(id);
+		},
+	});
+	stub(teardown, {
+		deleteSandboxAndDriveLater: async (args: unknown) => {
+			tornDown.push(args);
+		},
+	});
+
+	test("hands its box to the retried teardown under the name it had, and deletes nothing inline", async () => {
+		await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });
+		expect(tornDown).toEqual([
+			{ providerSandboxId: "ws-box", driveName: null },
+		]);
+		expect(deleted).toEqual([]);
 	});
 });

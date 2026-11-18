@@ -49,6 +49,7 @@ stub(integration, {
 		}
 	},
 });
+let workspaceDrive: string | null = "drive-ws-box";
 stub(access, {
 	loadVisibleWorkspace: async () => ({
 		id: WORKSPACE_ID,
@@ -58,7 +59,7 @@ stub(access, {
 		baseBranch: "main",
 		branch: "main",
 		providerSandboxId: "ws-box",
-		driveName: "drive-ws-box",
+		driveName: workspaceDrive,
 	}),
 });
 let drivesOn = true;
@@ -246,6 +247,28 @@ describe("environment.promote that fails", () => {
 		expect(golden?.providerSandboxId).toMatch(/^env-/);
 		expect(golden?.driveName).toBe(`env-drive-${golden?.providerSandboxId}`);
 		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.promote of a workspace without a drive that fails", () => {
+	stub(sandbox, failingPromote);
+	test("hands the golden alone to the retried teardown", async () => {
+		environment.createdByUserId = "user-1";
+		workspaceDrive = null;
+		abandoned = [];
+		try {
+			await expect(
+				caller.environment.promote({
+					cloudWorkspaceId: WORKSPACE_ID,
+					environmentId: ENVIRONMENT_ID,
+				}),
+			).rejects.toThrow("snapshot failed after the fork");
+		} finally {
+			workspaceDrive = "drive-ws-box";
+		}
+		expect(abandoned).toHaveLength(1);
+		expect(abandoned[0]?.providerSandboxId).toMatch(/^env-/);
+		expect(abandoned[0]?.driveName).toBeNull();
 	});
 });
 

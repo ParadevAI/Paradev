@@ -44,8 +44,6 @@ export function sandboxNameFor(cloudWorkspaceId: string): string {
 	return `ws-${cloudWorkspaceId.replaceAll("-", "").slice(0, 24)}`;
 }
 
-export { nextSandboxNameFor } from "./sandbox-name";
-
 export interface ProvisionCloudWorkspaceInput {
 	cloudWorkspaceId: string;
 	/**

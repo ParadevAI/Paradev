@@ -270,12 +270,18 @@ describe("reapArchivedCloudWorkspace", () => {
 		expect(meterCalls).toEqual([]);
 	});
 
-	test("the delete stage settles the box's usage before deleting it", async () => {
+	test("the delete stage settles the box's usage, then hands a box without a drive to the retried teardown", async () => {
 		expect(
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
 		).toBe("reaped");
 		expect(meterCalls).toEqual(["settle"]);
-		expect(sandboxCalls).toEqual(["delete:ws-box"]);
+		expect(sandboxCalls).toEqual([]);
+		expect(queued).toContainEqual(
+			expect.objectContaining({
+				path: "/api/cloud-workspaces/teardown",
+				body: { providerSandboxId: "ws-box", driveName: null, attempt: 0 },
+			}),
+		);
 	});
 
 	test("the delete stage retires the box's names before it deletes them, so an undo gets a new box and drive", async () => {
@@ -318,7 +324,13 @@ describe("reapArchivedCloudWorkspace", () => {
 		expect(
 			await reapArchivedCloudWorkspace({ ...input, stage: "delete" }),
 		).toBe("reaped");
-		expect(sandboxCalls).toEqual(["delete:ws-box"]);
+		expect(sandboxCalls).toEqual([]);
+		expect(queued).toContainEqual(
+			expect.objectContaining({
+				path: "/api/cloud-workspaces/teardown",
+				body: { providerSandboxId: "ws-box", driveName: null, attempt: 0 },
+			}),
+		);
 	});
 
 	for (const stage of ["stop", "delete"] as const) {

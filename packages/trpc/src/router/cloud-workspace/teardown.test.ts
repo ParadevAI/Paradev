@@ -195,6 +195,43 @@ describe("teardownSandbox", () => {
 		]);
 	});
 
+	test("a box without a drive is stopped and deleted, with no drive to wait for", async () => {
+		expect(
+			await teardownSandbox({
+				providerSandboxId: "plain",
+				driveName: null,
+				attempt: 0,
+			}),
+		).toBe("deleted");
+		expect(calls).toEqual(["stop:plain", "delete:plain"]);
+	});
+
+	test("a box without a drive that a row names again is left alone", async () => {
+		live = { sandbox: true, drive: false };
+		expect(
+			await teardownSandbox({
+				providerSandboxId: "plain",
+				driveName: null,
+				attempt: 0,
+			}),
+		).toBe("kept");
+		expect(calls).toEqual([]);
+	});
+
+	test("a box without a drive whose delete fails is retried", async () => {
+		stopFails = true;
+		expect(
+			await teardownSandbox({
+				providerSandboxId: "plain",
+				driveName: null,
+				attempt: 0,
+			}),
+		).toBe("retrying");
+		expect(queued.map((job) => job.body)).toEqual([
+			{ providerSandboxId: "plain", driveName: null, attempt: 1 },
+		]);
+	});
+
 	test("gives up after the last attempt instead of requeuing forever", async () => {
 		attached = true;
 		expect(
@@ -209,7 +246,7 @@ describe("teardownSandbox", () => {
 });
 
 describe("deleteSandboxAndDriveLater", () => {
-	test("a box without a drive is deleted now; one with a drive goes to the job", async () => {
+	test("every box goes to the retried job, with a drive or without; nothing is deleted inline", async () => {
 		await deleteSandboxAndDriveLater({
 			providerSandboxId: "plain",
 			driveName: null,
@@ -218,11 +255,20 @@ describe("deleteSandboxAndDriveLater", () => {
 			providerSandboxId: "box",
 			driveName: "drive-box",
 		});
-		expect(calls).toEqual(["delete:plain"]);
-		expect(queued).toEqual([
+		await deleteSandboxAndDriveLater({
+			providerSandboxId: "lost-box",
+			driveName: undefined,
+			keepDrive: true,
+		});
+		expect(calls).toEqual([]);
+		expect(queued.map((job) => job.body)).toEqual([
+			{ providerSandboxId: "plain", driveName: null, attempt: 0 },
+			{ providerSandboxId: "box", driveName: "drive-box", attempt: 0 },
 			{
-				body: { providerSandboxId: "box", driveName: "drive-box", attempt: 0 },
-				delaySeconds: undefined,
+				providerSandboxId: "lost-box",
+				driveName: null,
+				attempt: 0,
+				keepDrive: true,
 			},
 		]);
 	});

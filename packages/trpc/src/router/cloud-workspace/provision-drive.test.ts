@@ -39,6 +39,7 @@ let authorize: () => Promise<{ bootId: string | null }>;
 let requeued: unknown[];
 
 let reads = 0;
+let claimedDrive: string | null = "drive-ws-box";
 stub(db.query.cloudWorkspaces, {
 	findFirst: async () => (reads++ === 0 ? row : current),
 });
@@ -56,7 +57,7 @@ stub(sandbox, {
 		claim: { vcpus: 4 },
 		environment: { region: "iad1", goldenDriveName: "env-drive-g" },
 		agentCredentialDigest: "d",
-		driveName: "drive-ws-box",
+		driveName: claimedDrive,
 	}),
 	forkWorkspaceDrive: async () => fork,
 	provisionSandbox: async () => {
@@ -150,6 +151,7 @@ beforeEach(() => {
 	wins = () => true;
 	current = undefined;
 	reads = 0;
+	claimedDrive = "drive-ws-box";
 	lockKeys = [];
 	rowBox = "ws-box";
 	rowStatus = "provisioning";
@@ -231,6 +233,17 @@ describe("provisionCloudWorkspace with a drive", () => {
 		expect(events).toContain("teardown drive=drive-ws-box kept");
 		expect(events.some((event) => event.startsWith("to "))).toBe(false);
 		expect(events).not.toContain("laid out");
+	});
+
+	test("an overtaken provision of a workspace without a drive hands its box to the retried teardown too", async () => {
+		claimedDrive = null;
+		rowBox = "ws-box-2";
+		current = { status: "provisioning", providerSandboxId: "ws-box-2" };
+		expect(await provisionCloudWorkspace({ cloudWorkspaceId: ROW.id })).toBe(
+			"skipped",
+		);
+		expect(events).toContain("teardown drive=null kept");
+		expect(events).not.toContain("stop");
 	});
 
 	test("the create holds the lock of the drive, whatever the box is called", async () => {

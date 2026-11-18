@@ -73,11 +73,11 @@ import {
 	queueSettleWorkspace,
 	settleWorkspaceNow,
 } from "./meter";
-import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { nextSandboxNameFor } from "./sandbox-name";
 import {
 	recordBootEnd,
 	recordBoxStopped,

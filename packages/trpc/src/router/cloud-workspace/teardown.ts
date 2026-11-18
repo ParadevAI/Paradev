@@ -117,16 +117,15 @@ function queueTeardown(
 	});
 }
 
-/** A box without a drive is deleted now, as before; one with a drive through the retried job. */
+/** Every box, with a drive or without, goes through the retried job and its re-read before the delete. */
 export async function deleteSandboxAndDriveLater(args: {
 	providerSandboxId: string;
 	driveName: string | null | undefined;
 	keepDrive?: boolean;
 }): Promise<void> {
-	if (!args.driveName) return deleteSandbox(args.providerSandboxId);
 	await queueTeardown({
 		providerSandboxId: args.providerSandboxId,
-		driveName: args.driveName,
+		driveName: args.driveName ?? null,
 		attempt: 0,
 		...(args.keepDrive ? { keepDrive: true } : {}),
 	});
