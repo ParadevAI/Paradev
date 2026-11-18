@@ -483,7 +483,10 @@ async function hostServiceAnswers(hostTarget: string): Promise<boolean> {
 export async function wakeSandbox(args: {
 	providerSandboxId: string;
 	claim: SandboxClaim;
-	/** Runs once the box is known to be stopped, before anything resumes it. */
+	/**
+	 * Runs once the box is known to be stopped, before anything resumes it; or,
+	 * for a box read running that a call here resumed, once those calls end.
+	 */
 	beforeResume?: (box: { memoryMb: number; vcpus: number }) => Promise<void>;
 }): Promise<{
 	hostTarget: string;
@@ -496,13 +499,19 @@ export async function wakeSandbox(args: {
 	sessionId: string | null;
 }> {
 	try {
+		let wasRunning = false;
+		let resumedVcpus: number | null = null;
 		const sandbox = await Sandbox.get({
 			...credentials(),
 			name: args.providerSandboxId,
 			resume: false,
+			// Any call on a Sandbox object resumes a stopped session and retries.
+			onResume: async (resumed) => {
+				if (wasRunning) resumedVcpus = resumed.currentSession().vcpus;
+			},
 		});
 		const hostTarget = sandbox.domain(HOST_SERVICE_PORT);
-		const wasRunning = sandbox.status === "running";
+		wasRunning = sandbox.status === "running";
 		let vcpus = sandbox.vcpus ?? args.claim.vcpus;
 		if (!wasRunning && vcpus !== args.claim.vcpus) {
 			await Sentry.startSpan({ name: "resize", op: "sandbox.provider" }, () =>
@@ -568,6 +577,12 @@ export async function wakeSandbox(args: {
 			await Sentry.startSpan({ name: "start boot", op: "sandbox" }, () =>
 				runBoot(sandbox, args.claim.hostSecret),
 			);
+		}
+		if (resumedVcpus && args.beforeResume) {
+			await args.beforeResume({
+				memoryMb: resumedVcpus * MEMORY_MB_PER_VCPU,
+				vcpus: resumedVcpus,
+			});
 		}
 		const answer = await Sentry.startSpan(
 			{ name: "settle", op: "sandbox" },
@@ -645,21 +660,26 @@ export async function stopAndSnapshot(
  * A golden is a stopped sandbox whose current snapshot is what forks start
  * from. It is built from a snapshot of the source taken now (a fork alone
  * would start from the source's last stop) and created with an empty env.
- * Taking that snapshot ends the source's session, so a running source is
- * started again before this returns.
+ * Taking that snapshot ends the source's session. The source stays stopped:
+ * the caller starts it again through a wake, which meters the new session.
  */
 export async function promoteSandboxToEnvironment(args: {
 	sourceSandbox: string;
 	goldenName: string;
-	/** What restarts the source: it boots the same way a wake does. */
-	claim: SandboxClaim;
-}): Promise<{ goldenName: string; region: string }> {
+	organizationId: string;
+}): Promise<{
+	goldenName: string;
+	region: string;
+	/** The session the snapshot ended; null when the source was not running. */
+	stopped: { sessionId: string | null } | null;
+}> {
 	const source = await Sandbox.get({
 		...credentials(),
 		name: args.sourceSandbox,
 		resume: false,
 	});
-	const wasRunning = source.status === "running";
+	const stopped =
+		source.status === "running" ? { sessionId: sessionIdOf(source) } : null;
 	const snapshot = await source.snapshot();
 	const golden = await Sandbox.create({
 		...credentials(),
@@ -673,18 +693,13 @@ export async function promoteSandboxToEnvironment(args: {
 		persistent: true,
 		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
-		tags: sandboxTags("environment", args.claim.identity),
+		tags: { kind: "environment", org: args.organizationId },
 	});
 	await stripWorkspaceIdentity(golden);
 	const created = golden.currentSnapshotId;
 	await golden.stop();
 	await waitForStopSnapshot(args.goldenName, created);
-	if (wasRunning) {
-		await writeIdentity(source, args.claim.identity);
-		await writeSignInFiles(source, args.claim.files);
-		await runBoot(source, args.claim.hostSecret);
-	}
-	return { goldenName: args.goldenName, region: source.region };
+	return { goldenName: args.goldenName, region: source.region, stopped };
 }
 
 /**
@@ -782,6 +797,29 @@ function toBoxSession(session: RawSession): BoxSession | null {
 		endedAt: sessionEndedAt(session),
 		activeCpuMs: session.activeCpuDurationMs ?? null,
 	};
+}
+
+/**
+ * The box's sessions that are live or ended at or after `since`, newest
+ * first. Null when the sandbox no longer exists.
+ */
+export async function listSandboxSessions(
+	providerSandboxId: string,
+	since: number,
+): Promise<BoxSession[] | null> {
+	const sandbox = await getSandbox(providerSandboxId);
+	if (!sandbox) return null;
+	const sessions: BoxSession[] = [];
+	for await (const raw of await sandbox.listSessions({
+		sortOrder: "desc",
+		limit: SESSION_PAGE_SIZE,
+	})) {
+		const session = toBoxSession(raw);
+		if (!session) continue;
+		if (session.endedAt !== null && session.endedAt < since) break;
+		sessions.push(session);
+	}
+	return sessions;
 }
 
 /** Null when the sandbox no longer exists. */

@@ -20,6 +20,7 @@ import {
 	describeSandbox,
 	recordBootSpans,
 	stopAndSnapshot,
+	stopSandbox,
 	wakeSandbox,
 } from "../../lib/sandbox";
 import {
@@ -120,6 +121,24 @@ async function wake(
 					providerSandboxId: row.providerSandboxId,
 				}).catch(() => {});
 			}
+			// A call here may have resumed the box before the refusal.
+			if (isCloudUsageRefusal(error)) {
+				try {
+					const live = await describeSandbox(row.providerSandboxId);
+					if (live.running && live.expiresAt) {
+						await recordSandboxAwake(row.id, {
+							expiresAt: live.expiresAt,
+							sessionId: live.sessionId,
+						});
+						const stopped = await stopSandbox(row.providerSandboxId);
+						await recordSandboxAsleep(row.id, {
+							sessionId: stopped.sessionId ?? live.sessionId,
+						});
+					}
+				} catch (stopError) {
+					Sentry.captureException(stopError, { tags: controlTags(scope) });
+				}
+			}
 			throw error;
 		});
 	if (bootId) {
@@ -176,13 +195,19 @@ export async function restartCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
-	if (running) {
-		const stopped = await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id, {
-			sessionId: stopped.sessionId ?? row.sandboxSessionId,
-		});
-		await queueSettleWorkspace(row.id);
-	}
+	if (!running) return wakeCloudWorkspace(row);
+	return wakeAfterStop(row, await stopAndSnapshot(row.providerSandboxId));
+}
+
+/** Starts a box again after the caller ended its session, as a metered wake. */
+export async function wakeAfterStop(
+	row: CloudWorkspaceRow,
+	stopped: { sessionId: string | null },
+): Promise<WokenCloudWorkspace> {
+	await recordSandboxAsleep(row.id, {
+		sessionId: stopped.sessionId ?? row.sandboxSessionId,
+	});
+	await queueSettleWorkspace(row.id);
 	return wakeCloudWorkspace(row);
 }
 

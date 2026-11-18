@@ -38,6 +38,10 @@ let stopped: string[];
 let usageStopAt: Date | null;
 let delayedSettles: number[];
 let updateMatches: boolean;
+let insertConflicts: boolean;
+let insertError: Error | null;
+let queuedSettles: string[];
+let listed: BoxSession[];
 type UsageEvent = {
 	featureId: string;
 	value: number;
@@ -69,8 +73,16 @@ function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 stub(db, {
 	update: () => chain(() => (boot && updateMatches ? [boot] : [])),
 	insert: () => ({
-		values: async (values: Record<string, unknown>) => {
+		values: (values: Record<string, unknown>) => {
 			writes.push(values);
+			return Object.assign(Promise.resolve(), {
+				onConflictDoNothing: () => ({
+					returning: async () => {
+						if (insertError) throw insertError;
+						return insertConflicts ? [] : [{ id: values.id }];
+					},
+				}),
+			});
 		},
 	}),
 	select: () => {
@@ -83,6 +95,8 @@ stub(db, {
 				}
 				return [
 					{
+						id: "ws_1",
+						organizationId: "org_1",
 						providerSandboxId: "ws-box",
 						createdByUserId: "user_1",
 						usageStopAt,
@@ -99,6 +113,7 @@ stub(db, {
 });
 stub(sandbox, {
 	findSandboxSession: async () => ({ session }),
+	listSandboxSessions: async () => listed,
 	stopSandbox: async (id: string) => {
 		stopped.push(id);
 		return { sessionId: "session_1" };
@@ -115,8 +130,12 @@ stub(sandboxSleep, {
 	},
 });
 stub(jobs, {
-	publishCloudWorkspaceJob: async (job: { delaySeconds?: number }) => {
+	publishCloudWorkspaceJob: async (job: {
+		delaySeconds?: number;
+		body: { bootId: string };
+	}) => {
 		delayedSettles.push(job.delaySeconds ?? 0);
+		queuedSettles.push(job.body.bootId);
 	},
 });
 stub(autumnClient, {
@@ -211,6 +230,10 @@ beforeEach(() => {
 	usageStopAt = null;
 	delayedSettles = [];
 	updateMatches = true;
+	insertConflicts = false;
+	insertError = null;
+	queuedSettles = [];
+	listed = [];
 	usageEvents = null;
 	reservations = new Map();
 });
@@ -415,6 +438,118 @@ describe("settleBoot", () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("the reconcile adopts sessions no boot meters", () => {
+	stub(billing, { ensureAutumnCustomer: async () => ({ id: "org_1" }) });
+	const box = { name: "ws-box", expiresAt: null, sessionId: "sess_C" };
+	const resumed = (endedAt: number | null): BoxSession => ({
+		id: "sess_C",
+		memoryMb: 16_384,
+		vcpus: 8,
+		startedAt: NOW - 12 * MINUTE,
+		endedAt,
+		activeCpuMs: null,
+	});
+	const timedOut: BoxSession = {
+		id: "sess_1",
+		memoryMb: 16_384,
+		vcpus: 8,
+		startedAt: NOW - 72 * MINUTE,
+		endedAt: NOW - 12 * MINUTE - 1_000,
+		activeCpuMs: null,
+	};
+	const reconcile = () =>
+		reconcileCloudWorkspaceUsage({ active: [box], billingEnabled: true });
+	const adoptedBoot = () =>
+		writes.find((write) => write.vercelSessionId === "sess_C");
+
+	test("a session resumed after a timeout stop is adopted in the same run, though the stopped session's boot is still open", async () => {
+		listed = [resumed(NOW - 2 * MINUTE), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toMatchObject({
+			cloudWorkspaceId: "ws_1",
+			startedAt: new Date(NOW - 12 * MINUTE),
+			memoryMb: 16_384,
+			lockOpen: false,
+		});
+		expect(adoptedBoot()).not.toHaveProperty("finalizedThrough");
+		expect(autumnCalls.some((call) => call.method === "check")).toBe(false);
+		expect(stopped).toEqual([]);
+	});
+
+	test("a running unmetered session takes a lock and is billed from its start, not from the adopt", async () => {
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toMatchObject({
+			startedAt: new Date(NOW - 12 * MINUTE),
+		});
+		expect(adoptedBoot()).not.toHaveProperty("finalizedThrough");
+		expect(
+			autumnCalls.find((call) => call.method === "check")?.params,
+		).toMatchObject({
+			lock: { lockId: `${adoptedBoot()?.id}:0` },
+		});
+		expect(adoptedBoot()).toMatchObject({ lockOpen: true });
+	});
+
+	test("a session that already has a boot is not adopted again", async () => {
+		boot = { ...boot, vercelSessionId: "sess_C" };
+		listed = [resumed(null)];
+		expect((await reconcile()).adopted).toBe(0);
+		expect(adoptedBoot()).toBeUndefined();
+	});
+
+	test("a session another caller attached meanwhile is left to that boot, and the lock taken for it is released", async () => {
+		insertConflicts = true;
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(0);
+		const lockId = (
+			autumnCalls.find((call) => call.method === "check")?.params as {
+				lock: { lockId: string };
+			}
+		).lock.lockId;
+		expect(
+			autumnCalls.find((call) => call.method === "finalize")?.params,
+		).toEqual({ lockId, action: "release" });
+	});
+
+	test("a lock taken for an adopt whose insert fails is released", async () => {
+		insertError = new Error("db down");
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(0);
+		expect(
+			autumnCalls.find((call) => call.method === "finalize")?.params,
+		).toMatchObject({ action: "release" });
+	});
+
+	test("the run's settles are queued before the adopt, and an adopted boot queues its own", async () => {
+		listed = [resumed(NOW - 2 * MINUTE), timedOut];
+		await reconcile();
+		const adoptedId = adoptedBoot()?.id;
+		expect(adoptedId).toEqual(expect.any(String));
+		expect(queuedSettles).toEqual(["boot_1", adoptedId]);
+	});
+
+	test("a refused running session is stopped and recorded asleep, and its minutes stay on the boot", async () => {
+		renewalAllowed = false;
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toBeDefined();
+		expect(stopped).toEqual(["ws-box"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "session_1" }]]);
+		expect(adoptedBoot()).toMatchObject({ lockOpen: false });
+	});
+
+	test("the newest session is left to an open boot that has not attached yet", async () => {
+		boot = { ...boot, vercelSessionId: null };
+		listed = [resumed(null), timedOut];
+		expect((await reconcile()).adopted).toBe(1);
+		expect(adoptedBoot()).toBeUndefined();
+		expect(writes).toContainEqual(
+			expect.objectContaining({ vercelSessionId: "sess_1" }),
+		);
 	});
 });
 

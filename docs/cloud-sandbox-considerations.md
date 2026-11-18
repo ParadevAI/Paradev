@@ -38,6 +38,8 @@ schedule (`/api/cloud-workspaces/jobs/reconcile-usage`, every 30 minutes, set
 in the Upstash console and watched by a Sentry cron monitor) finalizes each
 running box's memory GB-minutes and takes the next lock; a box whose next lock
 is refused is stopped. Stopping, archiving or deleting a box settles the rest.
+The same run opens a boot for any session from the last hour that has none
+(`adoptRunningBoxes` in `meter.ts`), billed from the session's start.
 Environment builds are not billed. Prices and limits live in Autumn, not here.
 Each paid seat adds its plan's GB-minutes to one team pool through Autumn
 seat licenses; see [Seats and cloud hours in Autumn](autumn-seat-licenses.md).

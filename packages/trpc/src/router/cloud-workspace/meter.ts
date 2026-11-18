@@ -12,15 +12,15 @@ import {
 	cloudWorkspaces,
 	users,
 } from "@superset/db/schema";
-import { isCloudUsageRefusal } from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
-import { and, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { userError } from "../../i18n-error";
 import { controlTags, logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	type ActiveWorkspaceSandbox,
 	findSandboxSession,
+	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,
 	stopSandbox,
 } from "../../lib/sandbox";
@@ -230,8 +230,7 @@ type BootReleaseReason =
 	| "provision_abandoned"
 	| "session_taken"
 	| "never_attached"
-	| "sandbox_lost"
-	| "adopt_failed";
+	| "sandbox_lost";
 
 export async function releaseBoot(
 	bootId: string,
@@ -696,50 +695,86 @@ async function adoptRunningBoxes(
 				eq(cloudWorkspaces.provider, "vercel"),
 				ne(cloudWorkspaces.status, "failed"),
 				inArray(cloudWorkspaces.providerSandboxId, names),
-				sql`not exists (select 1 from ${cloudWorkspaceBoots} boot where boot.cloud_workspace_id = ${cloudWorkspaces.id} and boot.stopped_at is null)`,
 			),
 		);
-	let adopted = 0;
-	for (const workspace of unmetered) {
-		const found = await findSandboxSession(workspace.providerSandboxId, null);
-		const session = found?.session;
-		if (!session || session.endedAt !== null) continue;
-		const claimed = await db
-			.select({ id: cloudWorkspaceBoots.id })
+	const adoptSessions = async (workspace: (typeof unmetered)[number]) => {
+		const sessions = await listSandboxSessions(
+			workspace.providerSandboxId,
+			Date.now() - RECONCILE_LOOKBACK_MS,
+		);
+		if (!sessions?.length) return 0;
+		const boots = await db
+			.select({ vercelSessionId: cloudWorkspaceBoots.vercelSessionId })
 			.from(cloudWorkspaceBoots)
-			.where(eq(cloudWorkspaceBoots.vercelSessionId, session.id));
-		if (claimed.length > 0) continue;
-		let bootId: string | null = null;
-		try {
-			({ bootId } = await authorizeBoot({
-				organizationId: workspace.organizationId,
-				cloudWorkspaceId: workspace.id,
-				createdByUserId: workspace.createdByUserId,
-				memoryMb: session.memoryMb,
-				vcpus: session.vcpus,
-			}));
-			if (!bootId) continue;
-			await db
-				.update(cloudWorkspaceBoots)
-				.set({
-					vercelSessionId: session.id,
-					startedAt: new Date(session.startedAt),
-					finalizedThrough: new Date(),
-				})
-				.where(eq(cloudWorkspaceBoots.id, bootId));
-			adopted += 1;
-		} catch (error) {
-			if (bootId) await releaseBoot(bootId, "adopt_failed").catch(() => {});
-			if (!isCloudUsageRefusal(error)) {
-				Sentry.captureException(error, {
-					tags: controlTags({
-						cloudWorkspaceId: workspace.id,
-						organizationId: workspace.organizationId,
-						bootId,
-					}),
-				});
+			.where(
+				or(
+					inArray(
+						cloudWorkspaceBoots.vercelSessionId,
+						sessions.map((session) => session.id),
+					),
+					and(
+						eq(cloudWorkspaceBoots.cloudWorkspaceId, workspace.id),
+						isNull(cloudWorkspaceBoots.vercelSessionId),
+						isNull(cloudWorkspaceBoots.stoppedAt),
+						gt(
+							cloudWorkspaceBoots.createdAt,
+							new Date(Date.now() - UNATTACHED_BOOT_GRACE_MS),
+						),
+					),
+				),
+			);
+		const metered = new Set(boots.map((boot) => boot.vercelSessionId));
+		let adopted = 0;
+		for (const [index, session] of sessions.entries()) {
+			// An open boot with no session yet attaches the newest one itself.
+			if (metered.has(session.id) || (index === 0 && metered.has(null))) {
 				continue;
 			}
+			const bootId = `boot_${randomUUID()}`;
+			const lock =
+				session.endedAt === null
+					? await checkOrFailOpen(workspace.organizationId, async () =>
+							reserveLock(
+								{
+									id: bootId,
+									lockSeq: 0,
+									organizationId: workspace.organizationId,
+									cloudWorkspaceId: workspace.id,
+								},
+								session.memoryMb,
+								await usageUser(workspace.createdByUserId),
+							),
+						)
+					: null;
+			const lockOpen = lock?.allowed === true;
+			let inserted: { id: string }[] = [];
+			try {
+				inserted = await db
+					.insert(cloudWorkspaceBoots)
+					.values({
+						id: bootId,
+						organizationId: workspace.organizationId,
+						cloudWorkspaceId: workspace.id,
+						vercelSessionId: session.id,
+						memoryMb: session.memoryMb,
+						vcpus: session.vcpus,
+						startedAt: new Date(session.startedAt),
+						lockOpen,
+					})
+					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
+					.returning({ id: cloudWorkspaceBoots.id });
+			} finally {
+				if (inserted.length === 0 && lockOpen) {
+					await autumnClient.balances.finalize({
+						lockId: lockIdFor(bootId, 0),
+						action: "release",
+					});
+				}
+			}
+			if (inserted.length === 0) continue;
+			adopted += 1;
+			await queueSettle(bootId);
+			if (!lock || lockOpen) continue;
 			console.error(
 				`[cloud-workspace/meter] ${workspace.id} runs past its limit; stopping it`,
 			);
@@ -757,31 +792,45 @@ async function adoptRunningBoxes(
 				"warn",
 			);
 		}
+		return adopted;
+	};
+	let adopted = 0;
+	for (let i = 0; i < unmetered.length; i += RECONCILE_CONCURRENCY) {
+		const batch = unmetered.slice(i, i + RECONCILE_CONCURRENCY);
+		const results = await Promise.allSettled(batch.map(adoptSessions));
+		for (const [index, result] of results.entries()) {
+			if (result.status === "fulfilled") adopted += result.value;
+			else {
+				const workspace = batch[index] as (typeof unmetered)[number];
+				Sentry.captureException(result.reason, {
+					tags: controlTags({
+						cloudWorkspaceId: workspace.id,
+						organizationId: workspace.organizationId,
+					}),
+				});
+			}
+		}
 	}
 	return adopted;
 }
 
 /**
- * Queues a settle for every open boot, and starts metering boxes running
- * without one (boxes already up when metering shipped).
+ * Queues a settle for every open boot, then opens a boot for every recent
+ * session that has none (a box resumed by a call no one authorized).
  */
 export async function reconcileCloudWorkspaceUsage({
 	active = null,
+	billingEnabled = billingUsesAutumn,
 }: {
 	/** Workspace boxes whose state changed lately; null when the listing failed. */
 	active?: ActiveWorkspaceSandbox[] | null;
+	billingEnabled?: boolean;
 } = {}): Promise<{
 	adopted: number;
 	queued: number;
 	failed: number;
 }> {
-	if (!billingUsesAutumn) return { adopted: 0, queued: 0, failed: 0 };
-	const adopted = active
-		? await adoptRunningBoxes(active).catch((error) => {
-				Sentry.captureException(error);
-				return 0;
-			})
-		: 0;
+	if (!billingEnabled) return { adopted: 0, queued: 0, failed: 0 };
 	const ids = await openBootIds();
 	let failed = 0;
 	for (let i = 0; i < ids.length; i += RECONCILE_CONCURRENCY) {
@@ -795,5 +844,11 @@ export async function reconcileCloudWorkspaceUsage({
 			}
 		}
 	}
+	const adopted = active
+		? await adoptRunningBoxes(active).catch((error) => {
+				Sentry.captureException(error);
+				return 0;
+			})
+		: 0;
 	return { adopted, queued: ids.length - failed, failed };
 }

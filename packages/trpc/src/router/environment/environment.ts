@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
 	environmentProjects,
@@ -7,7 +8,7 @@ import {
 	environments,
 	githubRepositories,
 } from "@superset/db/schema";
-import { MACHINE_SIZES } from "@superset/shared/billing";
+import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
@@ -20,7 +21,6 @@ import {
 	type MemberContext,
 } from "../../lib/cloud-guards";
 import {
-	buildSandboxClaim,
 	deleteSandbox,
 	loadRepositories,
 	primaryRepository,
@@ -33,6 +33,7 @@ import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { isLiveStatus } from "../cloud-workspace/live";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { wakeAfterStop } from "../cloud-workspace/wake";
 import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
 import {
@@ -498,12 +499,26 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
-			const { claim } = await buildSandboxClaim({ row: workspace });
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
-				claim,
+				organizationId: workspace.organizationId,
 			});
+			if (golden.stopped) {
+				await wakeAfterStop(workspace, golden.stopped).catch((error) => {
+					console.error(
+						`[environment/promote] could not restart ${workspace.id} after its snapshot`,
+						error,
+					);
+					if (isCloudUsageRefusal(error)) return;
+					Sentry.captureException(error, {
+						tags: {
+							"cloud_workspace.id": workspace.id,
+							"organization.id": workspace.organizationId,
+						},
+					});
+				});
+			}
 			const primaryRepositoryId = checkouts[0]?.repository.id ?? null;
 			const fromGolden = {
 				provider: workspace.provider,

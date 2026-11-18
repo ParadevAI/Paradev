@@ -776,9 +776,26 @@ obvious tidy-up once the golden exists — leaves the workspace unable to ever
 resume (`410 Cannot resume sandbox: no snapshot available`), which is how one
 e2e workspace died. So the snapshot stays (`keepLastSnapshots` evicts it on
 the source's next stop), and a source that was running is started again
-before promote returns. A row whose sandbox is gone or unresumable is marked
-`failed` by the next `access`, so it gets the failed screen and a Remove
-button rather than a sidebar entry that never opens.
+before promote returns, through `wakeAfterStop`: the new session is a wake,
+authorized and metered like any other. Until 2026-11 the restart ran the boot
+command directly, and 69 sessions in a week ran with no boot row. A row whose
+sandbox is gone or unresumable is marked `failed` by the next `access`, so it
+gets the failed screen and a Remove button rather than a sidebar entry that
+never opens.
+
+**Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
+`runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
+"stopped" answer it resumes and retries. A box read `running` that hits its
+timeout a moment later is resumed by the next call on that object, and no
+code chose to start it. Measured: 9 sessions in a week started 0.8–1.5 s after
+a timeout stop. `wakeSandbox` passes `onResume` to `Sandbox.get` and runs
+`beforeResume` (which authorizes the boot) for such a session; a refused one is
+stopped at once. A top-up goes through the session, which never resumes.
+Other callers on a box read `running` are covered only by the reconcile, which
+adopts any session that has no boot row within one run: promote's
+`source.snapshot()` (wrapped in `withResume`), and `applySandboxPolicy`, whose
+`update` does not resume in SDK 4.0.0 but would if a later SDK wrapped it.
+`provisionSandbox` on a box it already made is covered by its own boot.
 
 **`stop()` returns before the stop's snapshot is current.** The sandbox is
 still `stopping` when the call resolves, and a fork taken then boots from
