@@ -1846,6 +1846,9 @@ msgstr "V této kartě pořád běží proces"
 msgid "A process is still running in this terminal"
 msgstr "V tomto terminálu pořád běží proces"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Profil s tímto názvem je již přihlášen. Zvolte jiný název."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Prompt, pár spouštěčů a pracovní prostor pro každý běh"
 

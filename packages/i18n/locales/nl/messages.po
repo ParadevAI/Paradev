@@ -1846,6 +1846,9 @@ msgstr "Er draait nog een proces in dit tabblad"
 msgid "A process is still running in this terminal"
 msgstr "Er draait nog een proces in deze terminal"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Er is al een profiel met deze naam aangemeld. Kies een andere naam."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Een prompt, een paar triggers en een werkruimte per run"
 

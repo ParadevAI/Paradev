@@ -1846,6 +1846,9 @@ msgstr "В этой вкладке ещё работает процесс"
 msgid "A process is still running in this terminal"
 msgstr "В этом терминале ещё работает процесс"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Профиль с таким именем уже выполнил вход. Выберите другое имя."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Промпт, несколько триггеров и рабочая область для каждого запуска"
 

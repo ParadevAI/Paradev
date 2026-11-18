@@ -32,6 +32,11 @@ import {
 	type FoundLogin,
 	findCompletedLogin,
 } from "../../utils/findCompletedLogin";
+import {
+	freeProfileName,
+	isProfileSignedIn,
+	profileDir,
+} from "../../utils/profileNames";
 import { switchSignInCommand } from "../../utils/switchSignInCommand";
 import type { ManagedAgent } from "../../utils/visibleQuotaAgents";
 
@@ -110,6 +115,7 @@ export function AddAccountDialog({
 	const [copied, setCopied] = useState(false);
 	const [found, setFound] = useState<FoundLogin | null>(null);
 	const baselineRef = useRef<UsageLogins | null>(null);
+	const nameEdited = useRef(false);
 	const slug = slugify(name);
 
 	const loginsQuery = useHostUsageLogins(hostUrl, open && !found);
@@ -120,6 +126,7 @@ export function AddAccountDialog({
 	useEffect(() => {
 		if (!open) {
 			baselineRef.current = null;
+			nameEdited.current = false;
 			setFound(null);
 			setCopied(false);
 			setTerminalAttempt(0);
@@ -130,6 +137,9 @@ export function AddAccountDialog({
 		}
 		const logins = loginsQuery.data;
 		if (!logins) return;
+		if (!switchTarget && !nameEdited.current && terminalAttempt === 0) {
+			setName(freeProfileName(logins, agent));
+		}
 		if (!baselineRef.current) {
 			baselineRef.current = logins;
 			return;
@@ -149,7 +159,7 @@ export function AddAccountDialog({
 
 		const selection = switchTarget
 			? switchTarget.selection
-			: `${logins.homeDir}/.${agent}-${slug}`;
+			: profileDir(logins.homeDir, agent, slug);
 		const fresh = findCompletedLogin({
 			agent,
 			credentialKind: switchTarget?.credentialKind ?? credentialKind,
@@ -177,6 +187,11 @@ export function AddAccountDialog({
 		slug,
 	]);
 
+	const nameTaken =
+		!switchTarget &&
+		terminalAttempt === 0 &&
+		!!loginsQuery.data &&
+		isProfileSignedIn(loginsQuery.data, agent, slug);
 	const command = switchTarget
 		? switchSignInCommand(switchTarget)
 		: addAccountCommand(agent, slug, credentialKind);
@@ -354,11 +369,23 @@ export function AddAccountDialog({
 									<Input
 										id={nameId}
 										value={name}
-										onChange={(event) => setName(event.target.value)}
+										onChange={(event) => {
+											nameEdited.current = true;
+											setName(event.target.value);
+										}}
 										className="h-9 min-w-0 flex-1 text-sm"
 										placeholder="work"
+										aria-invalid={nameTaken}
 									/>
 								</div>
+								{nameTaken && (
+									<p className="text-xs text-destructive">
+										<Trans>
+											A profile with this name is already signed in. Choose
+											another name.
+										</Trans>
+									</p>
+								)}
 								<div className="flex items-center gap-2">
 									<span className="w-24 shrink-0 text-sm text-muted-foreground">
 										<Trans>Billing</Trans>
@@ -397,7 +424,7 @@ export function AddAccountDialog({
 							</div>
 						)}
 
-						{!canRunLocally && commandDetails}
+						{!canRunLocally && !nameTaken && commandDetails}
 
 						{canRunLocally && open && terminalAttempt > 0 && (
 							<div className="min-w-0 overflow-hidden rounded-lg border">
@@ -471,7 +498,7 @@ export function AddAccountDialog({
 								{canRunLocally && !terminalRunning && (
 									<Button
 										size="sm"
-										disabled={!loginsQuery.data}
+										disabled={!loginsQuery.data || nameTaken}
 										onClick={() => {
 											setCommandSucceeded(false);
 											setTerminalRunning(true);

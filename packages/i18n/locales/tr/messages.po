@@ -1846,6 +1846,9 @@ msgstr "Bu sekmede hâlâ bir süreç çalışıyor"
 msgid "A process is still running in this terminal"
 msgstr "Bu terminalde hâlâ bir süreç çalışıyor"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Bu ada sahip bir profil zaten oturum açmış. Başka bir ad seçin."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Bir istem, birkaç tetikleyici ve her çalıştırma için bir çalışma alanı"
 

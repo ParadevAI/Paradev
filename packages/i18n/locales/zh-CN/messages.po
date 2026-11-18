@@ -1846,6 +1846,9 @@ msgstr "此标签页中仍有进程在运行"
 msgid "A process is still running in this terminal"
 msgstr "此终端中仍有进程在运行"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "已有同名的配置文件处于登录状态。请选择其他名称。"
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "一个提示词、几个触发器，每次运行一个工作区"
 

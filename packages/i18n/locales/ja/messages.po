@@ -1846,6 +1846,9 @@ msgstr "このタブではプロセスがまだ実行中です"
 msgid "A process is still running in this terminal"
 msgstr "このターミナルではプロセスがまだ実行中です"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "この名前のプロファイルはすでにサインインしています。別の名前を選んでください。"
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "プロンプトとトリガー、そして実行ごとのワークスペース"
 

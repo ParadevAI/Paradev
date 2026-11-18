@@ -1846,6 +1846,9 @@ msgstr "W tej karcie wciąż działa proces"
 msgid "A process is still running in this terminal"
 msgstr "W tym terminalu wciąż działa proces"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Profil o tej nazwie jest już zalogowany. Wybierz inną nazwę."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Prompt, kilka wyzwalaczy i obszar roboczy dla każdego uruchomienia"
 

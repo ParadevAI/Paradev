@@ -1846,6 +1846,9 @@ msgstr "Masih ada proses yang berjalan di tab ini"
 msgid "A process is still running in this terminal"
 msgstr "Masih ada proses yang berjalan di terminal ini"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Profil dengan nama ini sudah masuk. Pilih nama lain."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Prompt, beberapa pemicu, dan workspace untuk setiap run"
 

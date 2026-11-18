@@ -1846,6 +1846,9 @@ msgstr "此分頁中仍有處理程序在執行"
 msgid "A process is still running in this terminal"
 msgstr "此終端中仍有處理程序在執行"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "已有同名的設定檔處於登入狀態。請選擇其他名稱。"
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "一個提示詞、幾個觸發器，每次執行一個工作區"
 

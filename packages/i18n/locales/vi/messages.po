@@ -1846,6 +1846,9 @@ msgstr "Vẫn còn một tiến trình đang chạy trong tab này"
 msgid "A process is still running in this terminal"
 msgstr "Vẫn còn một tiến trình đang chạy trong terminal này"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Một hồ sơ có tên này đã đăng nhập. Hãy chọn tên khác."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Một prompt, vài trigger và một workspace cho mỗi lượt chạy"
 

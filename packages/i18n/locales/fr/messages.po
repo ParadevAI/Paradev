@@ -1846,6 +1846,9 @@ msgstr "Un processus est toujours en cours dans cet onglet"
 msgid "A process is still running in this terminal"
 msgstr "Un processus est toujours en cours dans ce terminal"
 
+msgid "A profile with this name is already signed in. Choose another name."
+msgstr "Un profil portant ce nom est déjà connecté. Choisissez un autre nom."
+
 msgid "A prompt, some triggers, and a workspace for each run"
 msgstr "Un prompt, quelques déclencheurs et un espace de travail par exécution"
 
