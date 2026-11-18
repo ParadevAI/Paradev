@@ -33,7 +33,7 @@ import {
 	type MemberContext,
 	organizationOrFirst,
 } from "../../lib/cloud-guards";
-import { logControl, logStepFailed } from "../../lib/control-log";
+import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
@@ -149,19 +149,11 @@ async function addressSandbox(
 			const described = await describeSandbox(row.providerSandboxId);
 			const { expiresAt, sessionId } = described;
 			if (expiresAt) {
-				await recordSandboxAwake(
-					row.id,
-					{ expiresAt, sessionId },
-					row.organizationId,
-				);
+				await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			} else {
-				await recordSandboxAsleep(
-					row.id,
-					{
-						sessionId: sessionId ?? row.sandboxSessionId,
-					},
-					row.organizationId,
-				);
+				await recordSandboxAsleep(row.id, {
+					sessionId: sessionId ?? row.sandboxSessionId,
+				});
 			}
 			return {
 				hostTarget: described.hostTarget,
@@ -523,12 +515,8 @@ export const cloudWorkspaceRouter = {
 										toWorkspaceId: workspaceId,
 										error: "The cloud workspace could not start",
 									}).catch((failError: unknown) =>
-										logStepFailed(
-											"move.end",
-											{
-												cloudWorkspaceId: workspaceId,
-												organizationId: input.organizationId,
-											},
+										console.error(
+											`[cloud-workspace] could not end the move into ${workspaceId}`,
 											failError,
 										),
 									);
@@ -762,13 +750,9 @@ export const cloudWorkspaceRouter = {
 			const { running } = await addressSandbox(row, "address");
 			if (running) {
 				const stopped = await stopAndSnapshot(row.providerSandboxId);
-				await recordSandboxAsleep(
-					row.id,
-					{
-						sessionId: stopped.sessionId ?? row.sandboxSessionId,
-					},
-					row.organizationId,
-				);
+				await recordSandboxAsleep(row.id, {
+					sessionId: stopped.sessionId ?? row.sandboxSessionId,
+				});
 				await queueSettleWorkspace(row.id);
 			}
 			return { stopped: running };
@@ -886,18 +870,19 @@ export const cloudWorkspaceRouter = {
 				to: "archived",
 				set: { sandboxUrl: null, deletedAt: archivedAt },
 			});
-			const scope = {
-				cloudWorkspaceId: row.id,
-				organizationId: row.organizationId,
-			};
 			if (archived) {
-				logControl("workspace.archived", scope, {
-					trigger: "user",
-					"workspace.from_status": row.status,
-				});
+				logControl(
+					"workspace.archived",
+					{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+					{ trigger: "user", "workspace.from_status": row.status },
+				);
 				waitUntil(
 					failChatMovesTo(row.id, "The cloud workspace was deleted").catch(
-						(error) => logStepFailed("chat_moves.fail", scope, error),
+						(error) =>
+							console.error(
+								`[cloud-workspace] could not fail the chat moves into ${row.id}`,
+								error,
+							),
 					),
 				);
 				// A row from a retired provider has no sandbox left to keep.
@@ -906,12 +891,18 @@ export const cloudWorkspaceRouter = {
 						{ cloudWorkspaceId: row.id, archivedAt: archivedAt.toISOString() },
 						row,
 					).catch(async (error) => {
-						logStepFailed("reap.queue", scope, error);
+						console.error(
+							`[cloud-workspace] could not queue the reap for ${row.id}`,
+							error,
+						);
 						await settleWorkspaceNow(row.id).catch((meterError) =>
-							logStepFailed("meter.settle", scope, meterError),
+							console.error(
+								`[cloud-workspace] ${row.id} final meter failed`,
+								meterError,
+							),
 						);
 						await deleteSandbox(row.providerSandboxId);
-						await reapWorkspaceFiles(row.id, row.organizationId);
+						await reapWorkspaceFiles(row.id);
 					});
 				}
 				await recordCloudWorkspaceActivity(
@@ -919,7 +910,12 @@ export const cloudWorkspaceRouter = {
 					row.id,
 					{ kind: "user", userId: ctx.principal.userId },
 					{ event: "archived" },
-				).catch((error) => logStepFailed("archive.activity", scope, error));
+				).catch((error) => {
+					console.error(
+						`[cloud-workspace] ${row.id} archive activity write failed`,
+						error,
+					);
+				});
 			}
 			nudge(row.organizationId, "cloud_workspaces");
 			return { deleted: true };
@@ -961,11 +957,6 @@ export const cloudWorkspaceRouter = {
 						},
 			);
 			if (!revived) return { unarchived: false };
-			logControl(
-				"workspace.unarchived",
-				{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
-				{ "box.resumable": resumable },
-			);
 			await recordCloudWorkspaceActivity(
 				db,
 				row.id,

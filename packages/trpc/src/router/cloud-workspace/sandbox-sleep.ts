@@ -16,17 +16,13 @@ export const keepUpdatedAt = { updatedAt: sql`${cloudWorkspaces.updatedAt}` };
 export function reportSleepWriteFailure(
 	cloudWorkspaceId: string,
 	error: unknown,
-	organizationId?: string,
 ): void {
 	console.error(
 		`[cloud-workspace] could not record sleep state of ${cloudWorkspaceId}`,
 		error,
 	);
 	Sentry.captureException(error, {
-		tags: {
-			"cloud_workspace.id": cloudWorkspaceId,
-			...(organizationId ? { "organization.id": organizationId } : {}),
-		},
+		tags: { "cloud_workspace.id": cloudWorkspaceId },
 	});
 }
 
@@ -47,10 +43,9 @@ export function stillStoppedSession(sessionId: string | null): SQL | undefined {
 export async function recordSandboxAsleep(
 	cloudWorkspaceId: string,
 	{ sessionId }: { sessionId: string | null },
-	organizationId?: string,
 ): Promise<void> {
 	await markAsleep(cloudWorkspaceId, sessionId).catch((error) =>
-		reportSleepWriteFailure(cloudWorkspaceId, error, organizationId),
+		reportSleepWriteFailure(cloudWorkspaceId, error),
 	);
 }
 
@@ -76,11 +71,10 @@ async function markAsleep(
 		.returning({ organizationId: cloudWorkspaces.organizationId });
 	if (slept) {
 		nudge(slept.organizationId, "cloud_workspaces");
-		logControl(
-			"workspace.asleep",
-			{ cloudWorkspaceId, organizationId: slept.organizationId },
-			{ "sandbox.session_id": sessionId ?? undefined },
-		);
+		logControl("workspace.asleep", {
+			cloudWorkspaceId,
+			organizationId: slept.organizationId,
+		});
 		return;
 	}
 	await db

@@ -148,11 +148,17 @@ export const CLOUD_USAGE_REFUSAL_KEYS = [
 	"serverError.cloudWorkspace.usageLimitReached",
 ] as const;
 
+/** Clients read the key from `data`; the server's own `TRPCError` still holds it in `cause`. */
 export function isCloudUsageRefusal(error: unknown): boolean {
-	const data = (error as { data?: { i18nKey?: unknown } | null } | null)?.data;
+	const { data, cause } =
+		(error as {
+			data?: { i18nKey?: unknown } | null;
+			cause?: { i18nKey?: unknown } | null;
+		} | null) ?? {};
+	const i18nKey = data?.i18nKey ?? cause?.i18nKey;
 	return (
-		typeof data?.i18nKey === "string" &&
-		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(data.i18nKey)
+		typeof i18nKey === "string" &&
+		(CLOUD_USAGE_REFUSAL_KEYS as readonly string[]).includes(i18nKey)
 	);
 }
 
