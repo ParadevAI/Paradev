@@ -5,6 +5,7 @@ import { db } from "@superset/db/client";
 import { cloudWorkspaceBoots, users } from "@superset/db/schema";
 import { AutumnError } from "autumn-js";
 import { stub } from "../../../test/stub";
+import { type ControlRecord, controlLog } from "../../lib/control-log";
 import * as realtime from "../../lib/realtime";
 import type { BoxSession } from "../../lib/sandbox";
 import * as sandbox from "../../lib/sandbox";
@@ -45,6 +46,12 @@ type UsageEvent = {
 };
 let usageEvents: UsageEvent[] | null;
 let reservations: Map<string, UsageEvent>;
+let records: ControlRecord[] = [];
+stub(controlLog, {
+	sink: (record: ControlRecord) => {
+		records.push(record);
+	},
+});
 
 function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 	const link = {
@@ -213,6 +220,7 @@ beforeEach(() => {
 	updateMatches = true;
 	usageEvents = null;
 	reservations = new Map();
+	records = [];
 });
 
 describe("attachBootSession", () => {
@@ -485,7 +493,7 @@ describe("Autumn attribution and Vercel runtime parity", () => {
 
 	test("a release refunds the same user instead of leaving a negative user-only total", async () => {
 		const bootId = await reserve();
-		await releaseBoot(bootId);
+		await releaseBoot(bootId, "provision_failed");
 		expect(userTotal("box_gb_minutes")).toBe(0);
 		expect(reservations.size).toBe(0);
 	});
@@ -558,5 +566,97 @@ describe("with BILLING_PROVIDER=stripe", () => {
 			failed: 0,
 		});
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("control-plane events", () => {
+	stub(billing, { ensureAutumnCustomer: async () => ({ id: "org_1" }) });
+
+	test("an authorized boot is logged with its ids and box", async () => {
+		const { bootId } = await authorizeBoot(
+			{
+				organizationId: "org_1",
+				cloudWorkspaceId: "ws_1",
+				createdByUserId: "user_1",
+				memoryMb: 16_384,
+				vcpus: 8,
+			},
+			{ billingEnabled: true },
+		);
+		expect(records).toEqual([
+			{
+				level: "info",
+				body: "boot.authorized",
+				attributes: {
+					"log.source": "control",
+					"cloud_workspace.id": "ws_1",
+					"organization.id": "org_1",
+					"boot.id": bootId as string,
+					"box.vcpus": 8,
+					"box.memory_mb": 16_384,
+					"lock.open": true,
+				},
+			},
+		]);
+	});
+
+	test("a refused boot is a warning with the refusal and no boot id", async () => {
+		renewalAllowed = false;
+		await expect(
+			authorizeBoot(
+				{
+					organizationId: "org_1",
+					cloudWorkspaceId: "ws_1",
+					createdByUserId: null,
+					memoryMb: 2048,
+					vcpus: 1,
+				},
+				{ billingEnabled: true },
+			),
+		).rejects.toThrow();
+		expect(records.map((r) => [r.level, r.body, r.attributes])).toEqual([
+			[
+				"warn",
+				"boot.refused",
+				{
+					"log.source": "control",
+					"cloud_workspace.id": "ws_1",
+					"organization.id": "org_1",
+					refusal: "usageLimitReached",
+				},
+			],
+		]);
+	});
+
+	test("a settle logs its outcome and the GB-minutes it billed", async () => {
+		await settleBoot("boot_1");
+		const [settled] = records;
+		expect(settled?.body).toBe("meter.settled");
+		expect(settled?.attributes).toMatchObject({
+			"boot.id": "boot_1",
+			outcome: "renewed",
+		});
+		expect(settled?.attributes["usage.gb_minutes"] as number).toBeCloseTo(
+			160,
+			0,
+		);
+	});
+
+	test("the spend cap is a warning before the box is stopped", async () => {
+		renewalAllowed = false;
+		await settleBoot("boot_1");
+		expect(records.map((r) => [r.level, r.body])).toEqual([
+			["warn", "meter.cap_reached"],
+			["info", "meter.settled"],
+		]);
+	});
+
+	test("a failed settle is an error with only the error class", async () => {
+		renewalError = new TypeError("token=secret in a message");
+		await expect(settleBoot("boot_1")).rejects.toThrow();
+		const failed = records.find((r) => r.body === "meter.settle_failed");
+		expect(failed?.level).toBe("error");
+		expect(failed?.attributes["error.class"]).toBe("TypeError");
+		expect(JSON.stringify(records)).not.toContain("secret");
 	});
 });

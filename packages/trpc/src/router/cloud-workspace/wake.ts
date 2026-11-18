@@ -7,18 +7,27 @@ import {
 } from "@superset/shared/constants";
 import { waitUntil } from "@vercel/functions";
 import { eq } from "drizzle-orm";
+import {
+	type ControlScope,
+	captureControlException,
+	errorClass,
+	logControl,
+	logStepFailed,
+} from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	bootBeganSince,
 	buildSandboxClaim,
 	describeSandbox,
 	recordBootSpans,
+	SandboxUnavailableError,
 	stopAndSnapshot,
 	wakeSandbox,
 } from "../../lib/sandbox";
 import {
 	attachBootSession,
 	authorizeBoot,
+	isUsageRefusal,
 	queueSettleWorkspace,
 } from "./meter";
 import { recordSandboxAwake } from "./sandbox-expiry";
@@ -47,7 +56,7 @@ export async function wakeCloudWorkspace(
 				attributes: { "cloud_workspace.id": row.id },
 			},
 			async (span) => {
-				const { booted, rebooted, ...woken } = await wake(row, options);
+				const { booted, rebooted, ...woken } = await wake(row, options, span);
 				span.setAttributes({
 					"cloud_workspace.resumed": booted,
 					[CLOUD_WORKSPACE_BOOTED_ATTRIBUTE]: rebooted,
@@ -67,7 +76,12 @@ export async function wakeCloudWorkspace(
 async function wake(
 	row: CloudWorkspaceRow,
 	{ adoptSignIns = false }: { adoptSignIns?: boolean },
+	span: Sentry.Span,
 ): Promise<WokenCloudWorkspace & { booted: boolean; rebooted: boolean }> {
+	const scope: ControlScope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
 	const { claim, agentCredentialDigest } = await Sentry.startSpan(
 		{ name: "claim", op: "sandbox" },
 		() => buildSandboxClaim({ row }),
@@ -79,6 +93,7 @@ async function wake(
 			providerSandboxId: row.providerSandboxId,
 			claim,
 			beforeResume: async (box) => {
+				logControl("wake.started", scope, {});
 				({ bootId } = await Sentry.startSpan(
 					{ name: "authorize boot", op: "billing" },
 					() =>
@@ -89,8 +104,24 @@ async function wake(
 							...box,
 						}),
 				));
+				if (bootId) {
+					scope.bootId = bootId;
+					span.setAttribute("boot.id", bootId);
+				}
 			},
 		}).catch(async (error) => {
+			if (!isUsageRefusal(error)) {
+				logControl(
+					"wake.failed",
+					scope,
+					{
+						ms: Date.now() - wakeStartedAt,
+						"error.class": errorClass(error),
+						"sandbox.unavailable": error instanceof SandboxUnavailableError,
+					},
+					error,
+				);
+			}
 			if (bootId) {
 				await attachBootSession({
 					bootId,
@@ -103,16 +134,13 @@ async function wake(
 		await attachBootSession({
 			bootId,
 			providerSandboxId: row.providerSandboxId,
-		}).catch((error) => Sentry.captureException(error, { extra: { bootId } }));
+		}).catch((error) => captureControlException(error, scope));
 	}
 	if (rebooted && bootBeganSince(answer, wakeStartedAt)) {
 		try {
 			recordBootSpans(answer);
 		} catch (error) {
-			console.error(
-				`[cloud-workspace] could not trace the boot of ${row.id}`,
-				error,
-			);
+			logStepFailed("boot.trace", scope, error);
 		}
 	}
 	const set: Partial<CloudWorkspaceRow> = {
@@ -127,7 +155,19 @@ async function wake(
 			.set(set)
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
-	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	if (expiresAt)
+		await recordSandboxAwake(
+			row.id,
+			{ expiresAt, sessionId },
+			row.organizationId,
+		);
+	if (rebooted) {
+		logControl("wake.completed", scope, {
+			ms: Date.now() - wakeStartedAt,
+			"box.resumed": booted,
+			"box.rebooted": rebooted,
+		});
+	}
 	return {
 		hostTarget,
 		booted,
@@ -145,11 +185,20 @@ export async function restartCloudWorkspace(
 	row: CloudWorkspaceRow,
 ): Promise<WokenCloudWorkspace> {
 	const { running } = await describeSandbox(row.providerSandboxId);
+	logControl(
+		"restart.started",
+		{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+		{ "box.running": running },
+	);
 	if (running) {
 		const stopped = await stopAndSnapshot(row.providerSandboxId);
-		await recordSandboxAsleep(row.id, {
-			sessionId: stopped.sessionId ?? row.sandboxSessionId,
-		});
+		await recordSandboxAsleep(
+			row.id,
+			{
+				sessionId: stopped.sessionId ?? row.sandboxSessionId,
+			},
+			row.organizationId,
+		);
 		await queueSettleWorkspace(row.id);
 	}
 	return wakeCloudWorkspace(row);
@@ -164,12 +213,30 @@ export async function markSandboxUnavailable(
 	row: CloudWorkspaceRow,
 	error: unknown,
 ): Promise<void> {
-	await transitionCloudWorkspace({
+	const changed = await transitionCloudWorkspace({
 		id: row.id,
 		from: ["awake", "asleep"],
 		to: "failed",
 		set: { sandboxUrl: null },
 	});
 	nudge(row.organizationId, "cloud_workspaces");
-	console.error(`[cloud-workspace] ${row.id} sandbox unavailable`, error);
+	const scope = {
+		cloudWorkspaceId: row.id,
+		organizationId: row.organizationId,
+	};
+	logControl(
+		"workspace.failed",
+		scope,
+		{
+			"failure.site": "sandbox_unavailable",
+			"error.class": errorClass(error),
+			"status.changed": changed,
+		},
+		error,
+	);
+	if (changed) {
+		captureControlException(error, scope, {
+			failureSite: "sandbox_unavailable",
+		});
+	}
 }
