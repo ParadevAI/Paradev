@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useTerminalAgentBindings } from "renderer/hooks/host-service/useTerminalAgentBindings";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceEvent } from "renderer/hooks/host-service/useWorkspaceEvent";
+import { useWorkspaceTerminalSessions } from "renderer/hooks/host-service/useWorkspaceTerminalSessions";
+import { provisioningSince } from "renderer/routes/_authenticated/_dashboard/utils/provisioningSince";
 import {
 	attachCloudChatSession,
 	attachCloudTerminal,
@@ -41,7 +43,7 @@ export function usePendingCloudLaunch({
 	const { hostUrl } = useWorkspaceClient();
 	const { transport } = useChatWiring();
 	const queryClient = useQueryClient();
-	const [sinceMs] = useState(Date.now);
+	const [sinceMs] = useState(() => provisioningSince(workspaceId));
 	const [nowMs, setNowMs] = useState(sinceMs);
 	const queryKey = useMemo(
 		() => ["chat-v3", hostUrl, "pendingLaunch", workspaceId],
@@ -73,15 +75,19 @@ export function usePendingCloudLaunch({
 		enabled: !!terminalId,
 	});
 	const terminalBinding = terminalId ? bindings.get(terminalId) : undefined;
+	const terminalSessions = useWorkspaceTerminalSessions(workspaceId, {
+		enabled: !!terminalId && surface === "terminal",
+	});
+	const terminalListed = !!terminalSessions.data?.sessions.some(
+		(session) => session.terminalId === terminalId,
+	);
 
 	const outcome = pendingLaunchOutcome({
 		surface,
 		terminalId,
 		sessions: sessionsQuery.data ?? [],
-		launchedTerminal:
-			!!terminalBinding &&
-			!terminalBinding.chatSessionId &&
-			terminalBinding.endedAt === undefined,
+		terminalListed,
+		terminalBinding,
 		typed:
 			!!data.queuedPrompts?.length ||
 			hasComposerDraft(`chat-v3-draft:${data.draftId}`),

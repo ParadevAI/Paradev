@@ -24,7 +24,8 @@ export function pendingLaunchOutcome({
 	surface,
 	terminalId,
 	sessions,
-	launchedTerminal,
+	terminalListed,
+	terminalBinding,
 	typed,
 	sinceMs,
 	nowMs,
@@ -33,8 +34,10 @@ export function pendingLaunchOutcome({
 	surface: CloudAgentLaunchSurface;
 	terminalId: string | undefined;
 	sessions: readonly LaunchedChatSession[];
-	/** The launch ran in a terminal: a live agent with no chat holds `terminalId`. */
-	launchedTerminal: boolean;
+	/** `terminalId` is in the host's terminal list. */
+	terminalListed: boolean;
+	/** The agent binding on `terminalId`, live or ended. */
+	terminalBinding: { chatSessionId?: string | null } | undefined;
 	typed: boolean;
 	sinceMs: number;
 	nowMs: number;
@@ -46,10 +49,27 @@ export function pendingLaunchOutcome({
 		(candidate) => candidate.live && candidate.terminalId === terminalId,
 	);
 	if (session) return { kind: "chat", session };
-	if (launchedTerminal)
+	if (launchedInTerminal(surface, terminalListed, terminalBinding))
 		return typed ? { kind: "release" } : { kind: "terminal" };
 	const untilMs = sinceMs + timeoutMs;
 	return nowMs >= untilMs ? giveUp : { kind: "wait", untilMs };
+}
+
+function launchedInTerminal(
+	surface: CloudAgentLaunchSurface,
+	terminalListed: boolean,
+	terminalBinding: { chatSessionId?: string | null } | undefined,
+): boolean {
+	if (terminalBinding && !terminalBinding.chatSessionId) return true;
+	switch (surface) {
+		case "terminal":
+			return terminalListed;
+		case "chat":
+			// A chat launch hands its id to the chat runtime, not to a listed terminal.
+			return false;
+		default:
+			return surface satisfies never;
+	}
 }
 
 function givingUpOutcome(

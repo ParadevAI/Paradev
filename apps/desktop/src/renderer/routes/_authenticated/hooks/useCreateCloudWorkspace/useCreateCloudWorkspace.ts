@@ -40,7 +40,9 @@ export function useCreateCloudWorkspace() {
 			const listInput = { organizationId: input.organizationId };
 			await utils.cloudWorkspace.list.cancel(listInput);
 			utils.cloudWorkspace.list.setData(listInput, (rows) =>
-				rows ? [created, ...rows] : [created],
+				rows
+					? [created, ...rows.filter((row) => row.id !== created.id)]
+					: [created],
 			);
 			void utils.cloudWorkspace.list.invalidate(listInput);
 			return created;

@@ -13,7 +13,8 @@ const base = {
 	surface: "chat" as const,
 	terminalId: T,
 	sessions: [],
-	launchedTerminal: false,
+	terminalListed: false,
+	terminalBinding: undefined,
 	typed: false,
 	sinceMs: 0,
 	nowMs: 10,
@@ -32,11 +33,11 @@ describe("pendingLaunchOutcome", () => {
 	});
 
 	it("becomes the terminal the launch fell back to, unless the user typed", () => {
-		expect(pendingLaunchOutcome({ ...base, launchedTerminal: true })).toEqual({
+		expect(pendingLaunchOutcome({ ...base, terminalBinding: {} })).toEqual({
 			kind: "terminal",
 		});
 		expect(
-			pendingLaunchOutcome({ ...base, launchedTerminal: true, typed: true }),
+			pendingLaunchOutcome({ ...base, terminalBinding: {}, typed: true }),
 		).toEqual({ kind: "release" });
 	});
 
@@ -59,9 +60,7 @@ describe("pendingLaunchOutcome", () => {
 			kind: "wait",
 			untilMs: 100,
 		});
-		expect(
-			pendingLaunchOutcome({ ...terminal, launchedTerminal: true }),
-		).toEqual({
+		expect(pendingLaunchOutcome({ ...terminal, terminalBinding: {} })).toEqual({
 			kind: "terminal",
 		});
 	});
@@ -74,5 +73,30 @@ describe("pendingLaunchOutcome", () => {
 		expect(
 			pendingLaunchOutcome({ ...terminal, terminalId: undefined }),
 		).toEqual({ kind: "drop" });
+	});
+
+	it("a terminal launch attaches as soon as its terminal is listed, before any agent binding", () => {
+		const terminal = { ...base, surface: "terminal" as const };
+		expect(pendingLaunchOutcome({ ...terminal, terminalListed: true })).toEqual(
+			{
+				kind: "terminal",
+			},
+		);
+	});
+
+	it("an agent that already ended still attaches instead of waiting out the timeout", () => {
+		expect(
+			pendingLaunchOutcome({
+				...base,
+				terminalBinding: { chatSessionId: null },
+			}),
+		).toEqual({ kind: "terminal" });
+	});
+
+	it("a listed terminal does not resolve a chat launch, whose id belongs to the chat runtime", () => {
+		expect(pendingLaunchOutcome({ ...base, terminalListed: true })).toEqual({
+			kind: "wait",
+			untilMs: 100,
+		});
 	});
 });

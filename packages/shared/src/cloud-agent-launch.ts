@@ -31,6 +31,10 @@ export function supportsCloudAgentChat(agent: string | undefined): boolean {
 	return !!agent && CHAT_IN_SANDBOX.has(agent);
 }
 
+export const CLOUD_AGENT_LAUNCH_SURFACES = ["terminal", "chat"] as const;
+export type CloudAgentLaunchSurface =
+	(typeof CLOUD_AGENT_LAUNCH_SURFACES)[number];
+
 /**
  * What a cloud workspace launches on first boot: a built-in agent and its
  * prompt. The API validates it, provisioning hands it to the sandbox as
@@ -38,10 +42,6 @@ export function supportsCloudAgentChat(agent: string | undefined): boolean {
  * for a new workspace. Custom agents follow once they live in the cloud
  * (SUPER-2127); until then only the built-in presets are launchable here.
  */
-export const CLOUD_AGENT_LAUNCH_SURFACES = ["terminal", "chat"] as const;
-export type CloudAgentLaunchSurface =
-	(typeof CLOUD_AGENT_LAUNCH_SURFACES)[number];
-
 export const cloudAgentLaunchSchema = z.object({
 	agent: z.string().refine(isCloudAgentId, "unknown cloud agent"),
 	prompt: z.string().max(CLOUD_AGENT_PROMPT_MAX_LENGTH),
