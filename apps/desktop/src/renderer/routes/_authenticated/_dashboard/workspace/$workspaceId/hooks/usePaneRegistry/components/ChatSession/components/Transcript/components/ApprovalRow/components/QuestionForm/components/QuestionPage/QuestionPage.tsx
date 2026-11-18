@@ -9,7 +9,7 @@ import type { FormField } from "@superset/chat/protocol";
 import { isImeComposing } from "@superset/ui/lib/keyboard";
 import { cn } from "@superset/ui/utils";
 import { Check, PencilLine } from "lucide-react";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 type Choice = NonNullable<FormField["options"]>[number];
 
@@ -42,10 +42,12 @@ export function QuestionPage({
 	const textValue = textField ? values[textField.id] : undefined;
 	const typed = answerText(textValue);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const descriptionId = useId();
 	const writtenChoice = field.input === "single" && other !== undefined;
 	const ownAnswer =
 		writtenChoice && current === undefined && textValue !== undefined;
 	const note = writtenChoice && current !== undefined;
+	const description = ownAnswer || note ? other?.description : undefined;
 	const invalid = isInvalidNumber(field, values[field.id]);
 
 	return (
@@ -146,6 +148,7 @@ export function QuestionPage({
 						)}
 						<input
 							ref={inputRef}
+							aria-describedby={description ? descriptionId : undefined}
 							aria-invalid={invalid || undefined}
 							aria-label={
 								note
@@ -185,6 +188,11 @@ export function QuestionPage({
 							value={typeof textValue === "string" ? textValue : typed}
 						/>
 					</label>
+				)}
+				{description && (
+					<p id={descriptionId} className="px-3 text-muted-foreground text-xs">
+						{description}
+					</p>
 				)}
 				{invalid && (
 					<p className="px-3 text-destructive text-xs">

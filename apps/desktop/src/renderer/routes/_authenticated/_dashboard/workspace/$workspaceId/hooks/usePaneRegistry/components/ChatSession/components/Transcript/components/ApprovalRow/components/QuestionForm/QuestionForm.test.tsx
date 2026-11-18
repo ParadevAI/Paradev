@@ -99,3 +99,35 @@ test("changing the suggested choice keeps its note in the submitted answer", () 
 		values: { delivery: "courier", delivery_note: "Use the side entrance" },
 	});
 });
+
+test("describes the linked text input in both answer modes", () => {
+	const description = "Include the desk number.";
+	const view = render(
+		<QuestionForm
+			form={{
+				...form,
+				fields: [
+					...form.fields.filter((field) => field.id === "choice"),
+					{
+						id: "provider_note",
+						input: "text",
+						answerFor: "choice",
+						description,
+					},
+				],
+			}}
+			item={item}
+			onRespond={mock()}
+		/>,
+	);
+	for (const [action, name] of [
+		["Write my own answer", "Write my own answer"],
+		["Sample", "Add a note"],
+	] as const) {
+		fireEvent.click(view.getByRole("button", { name: new RegExp(action) }));
+		const input = view.getByRole("textbox", { name });
+		expect(input.getAttribute("aria-describedby")).toBe(
+			view.getByText(description).id,
+		);
+	}
+});

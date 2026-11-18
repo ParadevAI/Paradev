@@ -2,8 +2,8 @@ import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import {
 	answerText,
 	type FormValues,
-	isInvalidNumber,
 	isPageAnswered,
+	isPageComplete,
 	questionPages,
 } from "@superset/chat/core";
 import type {
@@ -131,11 +131,7 @@ export function QuestionForm({
 		);
 	}
 
-	const blocked = pages.some(
-		(entry) =>
-			(entry.field.required && !isPageAnswered(entry, values)) ||
-			isInvalidNumber(entry.field, values[entry.field.id]),
-	);
+	const blocked = pages.some((entry) => !isPageComplete(entry, values));
 	const submit = () => {
 		if (blocked) return;
 		const filled = Object.fromEntries(

@@ -1730,7 +1730,12 @@ describe("AcpAdapter", () => {
 				required: ["delivery"],
 				properties: {
 					delivery: { type: "string", oneOf: [{ const: "Mail" }] },
+					delivery_custom: { type: "string" },
 					delivery_note: {
+						type: "string",
+						_meta: { codex: { role: "user_note", questionId: "delivery" } },
+					},
+					second_note: {
 						type: "string",
 						_meta: { codex: { role: "user_note", questionId: "delivery" } },
 					},
@@ -1745,10 +1750,20 @@ describe("AcpAdapter", () => {
 			form: {
 				fields: [
 					{ id: "delivery" },
+					{ id: "delivery_custom" },
 					{ id: "delivery_note", answerFor: "delivery" },
+					{ id: "second_note", answerFor: "delivery" },
 				],
 			},
 		});
+		for (const field of ["delivery_custom", "second_note"]) {
+			adapter.respondToApproval(approval?.id ?? "", {
+				type: "form",
+				values: { [field]: "Pickup" },
+			});
+			await flush();
+			expect(agent.responseTo(id)).toBeUndefined();
+		}
 		adapter.respondToApproval(approval?.id ?? "", {
 			type: "form",
 			values: { delivery_note: "Pickup" },

@@ -3,6 +3,7 @@ import type { FormField } from "../../protocol";
 import {
 	isInvalidNumber,
 	isPageAnswered,
+	isPageComplete,
 	questionPages,
 } from "./questionPages";
 
@@ -56,6 +57,66 @@ describe("questionPages", () => {
 		]);
 	});
 
+	it("attaches a preceding note without moving its choice ahead of other questions", () => {
+		const pages = questionPages([
+			{ ...text("note"), answerFor: "delivery" },
+			text("address"),
+			choice("delivery"),
+		]);
+		expect(pages.map(({ field, other }) => [field.id, other?.id])).toEqual([
+			["address", undefined],
+			["delivery", "note"],
+		]);
+	});
+
+	it("prefers an explicit note and keeps the legacy field separately editable", () => {
+		const pages = questionPages([
+			choice("delivery"),
+			text("delivery_custom"),
+			{ ...text("note"), answerFor: "delivery" },
+		]);
+		expect(pages.map(({ field, other }) => [field.id, other?.id])).toEqual([
+			["delivery", "note"],
+			["delivery_custom", undefined],
+		]);
+	});
+
+	it("requires a linked field marked required even after picking a choice", () => {
+		const [page] = questionPages([
+			{ ...choice("delivery"), required: true },
+			{ ...text("note"), answerFor: "delivery", required: true },
+		]);
+		if (!page) throw new Error("Missing question");
+		expect(isPageComplete(page, { delivery: "a" })).toBe(false);
+		expect(isPageComplete(page, { note: "Pickup" })).toBe(true);
+		expect(
+			isPageComplete(page, { delivery: "a", note: "Leave at reception" }),
+		).toBe(true);
+	});
+
+	it("keeps a suffix field independent of an unrelated required scalar", () => {
+		const pages = questionPages([
+			{ id: "count", input: "integer", required: true },
+			text("count_custom"),
+		]);
+		expect(pages).toHaveLength(2);
+		const [count] = pages;
+		if (!count) throw new Error("Missing count");
+		expect(isPageComplete(count, { count_custom: "several" })).toBe(false);
+	});
+
+	it("still requires an array selection when a required multi-choice has a legacy note", () => {
+		const [page] = questionPages([
+			{ ...choice("meals"), input: "multi", required: true },
+			text("meals_custom"),
+		]);
+		if (!page) throw new Error("Missing meals");
+		expect(isPageComplete(page, { meals_custom: "a note" })).toBe(false);
+		expect(isPageComplete(page, { meals: ["a"], meals_custom: "a note" })).toBe(
+			true,
+		);
+	});
+
 	it("keeps a generic text field on its own page", () => {
 		const pages = questionPages([choice("priority"), text("notes")]);
 		expect(pages.map((page) => [page.field.id, page.other?.id])).toEqual([
@@ -71,5 +132,6 @@ describe("questionPages", () => {
 		expect(isInvalidNumber(integer, "4")).toBe(false);
 		expect(isInvalidNumber(integer, "")).toBe(false);
 		expect(isInvalidNumber(number, "3.9")).toBe(false);
+		expect(isInvalidNumber(number, ["3"])).toBe(true);
 	});
 });

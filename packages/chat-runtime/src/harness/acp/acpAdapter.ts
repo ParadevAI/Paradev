@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import {
 	type ChatSelections,
+	isPageComplete,
+	questionPages,
 	type SelectionCategory,
 	selectionCategoryOf,
 } from "@superset/chat/core";
@@ -394,47 +396,6 @@ function formContent(
 	return content;
 }
 
-function formErrors(
-	values: Record<string, string | string[]>,
-	fields: readonly FormField[],
-	fieldTypes: Record<string, string | undefined>,
-): string[] {
-	const errors: string[] = [];
-	for (const field of fields) {
-		const value = values[field.id];
-		const empty =
-			value === undefined ||
-			(Array.isArray(value) ? value.length === 0 : value.trim() === "");
-		if (empty) {
-			if (field.required) {
-				const hasWrittenAnswer =
-					field.input === "single" &&
-					fields.some((other) => {
-						const text = values[other.id];
-						return (
-							other.answerFor === field.id &&
-							typeof text === "string" &&
-							text.trim() !== ""
-						);
-					});
-				if (!hasWrittenAnswer) errors.push(field.id);
-			}
-			continue;
-		}
-		const type = fieldTypes[field.id];
-		if (type !== "number" && type !== "integer") continue;
-		const parsed = Number(value);
-		if (
-			typeof value !== "string" ||
-			!Number.isFinite(parsed) ||
-			(type === "integer" && !Number.isInteger(parsed))
-		) {
-			errors.push(field.id);
-		}
-	}
-	return errors;
-}
-
 export class AcpAdapter implements HarnessAdapter {
 	private readonly queue = new EventQueue();
 	private readonly pendingApprovals = new Map<string, PendingApproval>();
@@ -668,11 +629,9 @@ export class AcpAdapter implements HarnessAdapter {
 		if (
 			decision.type === "form" &&
 			pending.item.form &&
-			formErrors(
-				decision.values,
-				pending.item.form.fields,
-				pending.fieldTypes ?? {},
-			).length > 0
+			questionPages(pending.item.form.fields).some(
+				(page) => !isPageComplete(page, decision.values),
+			)
 		) {
 			this.emitNotice(
 				"error",
