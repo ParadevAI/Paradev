@@ -23,6 +23,7 @@ import { personProcedure } from "../../trpc";
 import { requireActiveOrgRole } from "../utils/active-org";
 import {
 	bootKeysetSchema,
+	type CloudListFilters,
 	type CloudRange,
 	cloudBootsInputSchema,
 	cloudBootsOutputSchema,
@@ -30,9 +31,9 @@ import {
 	cloudPeriodsOutputSchema,
 	cloudUsageInputSchema,
 	cloudUsageOutputSchema,
-	type PageInput,
 	type RangePreset,
-	usageKeysetSchema,
+	type UsageKeyset,
+	usageKeysetSchemas,
 } from "./schema";
 
 export interface CloudDeps {
@@ -69,21 +70,40 @@ function cursorNotValid() {
 	});
 }
 
-function filtersOf({ limit, cursor, ...filters }: PageInput): string {
-	return JSON.stringify(filters);
+const CURSOR_FILTER_KEYS = Object.keys({
+	endReason: true,
+	groupBy: true,
+	open: true,
+	range: true,
+	workspace: true,
+} satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
+
+function filtersOf(filters: Partial<Record<keyof CloudListFilters, unknown>>) {
+	return Object.fromEntries(
+		CURSOR_FILTER_KEYS.map((key) => [key, filters[key]]),
+	);
 }
 
-function readCursor<T>(input: PageInput, keyset: z.ZodType<T>): T | undefined {
+function readCursor<T>(
+	input: Partial<CloudListFilters> & { cursor?: string },
+	keyset: z.ZodType<T>,
+): T | undefined {
 	if (input.cursor === undefined) return undefined;
 	const cursor = decodeCursor(
 		input.cursor,
-		z.object({ filters: z.literal(filtersOf(input)), keyset }),
+		z.object({ filters: z.record(z.string(), z.unknown()), keyset }),
 	);
-	if (!cursor) throw cursorNotValid();
+	if (
+		!cursor ||
+		JSON.stringify(filtersOf(cursor.filters)) !==
+			JSON.stringify(filtersOf(input))
+	) {
+		throw cursorNotValid();
+	}
 	return cursor.keyset;
 }
 
-function writeCursor(input: PageInput, keyset: object): string {
+function writeCursor(input: Partial<CloudListFilters>, keyset: object): string {
 	return encodeCursor({ filters: filtersOf(input), keyset });
 }
 
@@ -155,8 +175,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort = input.groupBy === "day" ? "key" : "gbMinutes";
-					const keyset = readCursor(input, usageKeysetSchema);
-					if (keyset && keyset.sort !== sort) throw cursorNotValid();
+					const keyset = readCursor<UsageKeyset>(
+						input,
+						usageKeysetSchemas[sort],
+					);
 					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
 					const { nextCursor, ...result } = await queryCloudUsage(
 						deps.db,

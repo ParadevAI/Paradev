@@ -40,11 +40,9 @@ beforeAll(async () => {
 function caller(
 	userId: string,
 	{
-		cloudUsage = CLOUD_USAGE,
 		enabled = true,
-		readCloudUsage = async () => cloudUsage,
+		readCloudUsage = async () => CLOUD_USAGE,
 	}: {
-		cloudUsage?: CloudUsage | null;
 		enabled?: boolean;
 		readCloudUsage?: CloudDeps["cloudUsage"];
 	} = {},
@@ -148,14 +146,22 @@ describe("scope", () => {
 	});
 });
 
+const encoded = (cursor: object) =>
+	Buffer.from(JSON.stringify(cursor)).toString("base64url");
+
+const decoded = (cursor: string) =>
+	JSON.parse(Buffer.from(cursor, "base64url").toString("utf8"));
+
 test("a cursor that does not decode is BAD_REQUEST", async () => {
 	const owner = caller(MAYA);
-	const encoded = (keyset: object) =>
-		Buffer.from(JSON.stringify(keyset)).toString("base64url");
+	const filters = { groupBy: "workspace", range: NOVEMBER };
 	for (const cursor of [
 		"not-a-cursor",
-		encoded({ sort: "gbMinutes", value: "1 or 1=1", key: "" }),
-		encoded({ sort: "key", key: "2026-11-17" }),
+		encoded({
+			filters,
+			keyset: { sort: "gbMinutes", value: "1 or 1=1", key: "" },
+		}),
+		encoded({ filters, keyset: { sort: "key", key: "2026-11-17" } }),
 	]) {
 		await expect(
 			owner.usage.query({ range: NOVEMBER, groupBy: "workspace", cursor }),
@@ -164,7 +170,10 @@ test("a cursor that does not decode is BAD_REQUEST", async () => {
 	await expect(
 		owner.boots.list({
 			range: NOVEMBER,
-			cursor: encoded({ sort: "startedAt", value: "yesterday", key: "boot_1" }),
+			cursor: encoded({
+				filters: { range: NOVEMBER },
+				keyset: { sort: "startedAt", value: "yesterday", key: "boot_1" },
+			}),
 		}),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 	await expect(
@@ -203,9 +212,7 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 			owner.boots.list({ ...input, limit: 1, cursor: bootsCursor }),
 		).rejects.toMatchObject(notValid);
 	}
-	const unbound = Buffer.from(
-		JSON.stringify({ sort: "gbMinutes", value: "1080", key: CHECKOUT }),
-	).toString("base64url");
+	const unbound = encoded({ sort: "gbMinutes", value: "1080", key: CHECKOUT });
 	await expect(
 		owner.usage.query({
 			range: NOVEMBER,
@@ -213,6 +220,22 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 			cursor: unbound,
 		}),
 	).rejects.toMatchObject(notValid);
+});
+
+test("a cursor's filters match in any key order", async () => {
+	const owner = caller(MAYA);
+	const input = { range: NOVEMBER, groupBy: "workspace", limit: 1 } as const;
+	const { nextCursor } = await owner.usage.query(input);
+	if (!nextCursor) throw new Error("No second page to read");
+	const { filters, keyset } = decoded(nextCursor);
+	expect(Object.keys(filters)).toEqual(["groupBy", "range"]);
+	const reordered = encoded({
+		keyset,
+		filters: { range: filters.range, groupBy: filters.groupBy },
+	});
+	expect(await owner.usage.query({ ...input, cursor: reordered })).toEqual(
+		await owner.usage.query({ ...input, cursor: nextCursor }),
+	);
 });
 
 test("paging one row at a time with the opaque cursor returns every row once", async () => {
@@ -287,7 +310,7 @@ test("periods run from the open one back to the one the organization was created
 });
 
 test("with billing off there are no periods and no prices", async () => {
-	const owner = caller(MAYA, { cloudUsage: null });
+	const owner = caller(MAYA, { readCloudUsage: async () => null });
 	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
