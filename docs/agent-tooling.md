@@ -96,8 +96,9 @@ exists only in this worktree, read the from-source CLI with
 `bun run --cwd packages/cli dev schema 2>/dev/null | jq ...`; it can list commands the installed
 CLI does not have yet.
 
-`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`) is the chat-only
-namespace targeting `sessions.*` on the host. The host accepts only supported chat providers, with
+`superset sessions` (`create`, `list`, `read`, `send`, `close`, `resume`, `open`, `import`) is the
+chat-only namespace targeting `sessions.*` on the host; `search`, in the same namespace, asks the
+cloud API instead. The host accepts only supported chat providers, with
 no fallback to `agents.run` or `terminal.*`; `superset agents` and
 `superset terminals` remain unchanged for terminal-backed agent runs.
 
@@ -132,7 +133,13 @@ superset sessions open --local --workspace WORKSPACE_ID --session CHAT_SESSION_I
 superset sessions close --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions resume --local --workspace WORKSPACE_ID --session CHAT_SESSION_ID
 superset sessions import --local --workspace WORKSPACE_ID --agent claude --native-session PROVIDER_SESSION_ID
+superset sessions search "acpAdapter upload" --limit 10
 ```
+
+`sessions search` asks the cloud API, not a host: it finds your chats that are stored in the cloud,
+which are every chat on a cloud workspace, every chat moved there, and every chat whose move started
+but did not finish, one row per conversation.
+It takes no `--workspace`.
 
 The host resolves the selected agent to an installed ACP harness. It does not check the `acp-chat`
 rollout flag: the desktop gates the chat UI and the API gates automation dispatch. Unsupported

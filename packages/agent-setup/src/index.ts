@@ -123,6 +123,10 @@ export { serializePluginChange } from "./plugin-changes";
 export { mcpHeadersHelperCommand } from "./plugin-connections";
 export { PluginError, type PluginErrorCode } from "./plugin-error";
 export {
+	type InstalledPluginIcon,
+	readInstalledPluginIcons,
+} from "./plugin-icon";
+export {
 	type AvailablePlugin,
 	availablePlugins,
 	type ChangedPlugin,

@@ -12,6 +12,7 @@ import {
 import type { DiffStats } from "renderer/hooks/host-service/useDiffStats";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import type { DashboardSidebarWorkspace } from "../../../../types";
+import { BoxResourcesSection } from "./components/BoxResourcesSection";
 import { ChecksList } from "./components/ChecksList";
 import { ChecksSummary } from "./components/ChecksSummary";
 import { LinkedTaskSection } from "./components/LinkedTaskSection";
@@ -119,6 +120,10 @@ export function DashboardSidebarWorkspaceHoverCardContent({
 			</div>
 
 			{taskId && <LinkedTaskSection taskId={taskId} />}
+
+			{workspace.hostType === "cloud" && (
+				<BoxResourcesSection key={workspace.id} workspaceId={workspace.id} />
+			)}
 
 			{needsRebase && (
 				<div className="flex items-center gap-2 text-amber-500 text-xs bg-amber-500/10 px-2 py-1.5 rounded-md">

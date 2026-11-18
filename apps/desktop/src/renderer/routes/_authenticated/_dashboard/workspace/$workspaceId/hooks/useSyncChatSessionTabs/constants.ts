@@ -1,0 +1,2 @@
+export const CHAT_ADOPT_POLL_MS = 15_000;
+export const CHAT_ADOPT_SESSIONS_LIMIT = 200;

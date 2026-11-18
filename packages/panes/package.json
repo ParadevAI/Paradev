@@ -15,7 +15,7 @@
 		"test": "bun test"
 	},
 	"dependencies": {
-		"@lingui/react": "6.8.0",
+		"@lingui/react": "6.12.0",
 		"@superset/ui": "workspace:*",
 		"lucide-react": "0.563.0",
 		"react-dnd": "16.0.1",

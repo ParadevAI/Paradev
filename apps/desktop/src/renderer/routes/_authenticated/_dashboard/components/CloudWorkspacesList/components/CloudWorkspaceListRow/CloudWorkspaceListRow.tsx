@@ -1,4 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import { isArchivedCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import { AvatarStack } from "@superset/ui/atoms/AvatarStack";
 import { Button } from "@superset/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
@@ -52,7 +53,7 @@ export function CloudWorkspaceListRow({
 }: CloudWorkspaceListRowProps) {
 	const { t } = useLingui();
 	const { workspace, repos, pullRequests, isInSidebar } = item;
-	const isArchived = workspace.status === "deleted";
+	const isArchived = isArchivedCloudWorkspaceStatus(workspace.status);
 	const canUnarchive = isArchived && onUnarchive !== undefined;
 	return (
 		<tr

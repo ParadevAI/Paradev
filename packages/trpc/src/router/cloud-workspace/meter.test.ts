@@ -12,6 +12,7 @@ import { sessionEndedAt } from "../../lib/sandbox/vercel";
 import * as jobs from "./jobs";
 import {
 	assertMayBoot,
+	attachBootSession,
 	authorizeBoot,
 	gbMinutes,
 	lockIdFor,
@@ -20,6 +21,7 @@ import {
 	releaseBoot,
 	settleBoot,
 } from "./meter";
+import * as sandboxSleep from "./sandbox-sleep";
 
 const MINUTE = 60_000;
 const NOW = Date.now();
@@ -35,6 +37,7 @@ let autumnCalls: { method: string; params: unknown; headers?: unknown }[];
 let stopped: string[];
 let usageStopAt: Date | null;
 let delayedSettles: number[];
+let updateMatches: boolean;
 type UsageEvent = {
 	featureId: string;
 	value: number;
@@ -64,7 +67,7 @@ function chain(rows: () => unknown[], onFrom?: (table: unknown) => void) {
 }
 
 stub(db, {
-	update: () => chain(() => (boot ? [boot] : [])),
+	update: () => chain(() => (boot && updateMatches ? [boot] : [])),
 	insert: () => ({
 		values: async (values: Record<string, unknown>) => {
 			writes.push(values);
@@ -98,9 +101,19 @@ stub(sandbox, {
 	findSandboxSession: async () => ({ session }),
 	stopSandbox: async (id: string) => {
 		stopped.push(id);
+		return { sessionId: "session_1" };
 	},
 });
 stub(realtime, { nudge: () => {} });
+let recordedAsleep: Array<[string, { sessionId: string | null }]> = [];
+stub(sandboxSleep, {
+	recordSandboxAsleep: async (
+		id: string,
+		stopped: { sessionId: string | null },
+	) => {
+		recordedAsleep.push([id, stopped]);
+	},
+});
 stub(jobs, {
 	publishCloudWorkspaceJob: async (job: { delaySeconds?: number }) => {
 		delayedSettles.push(job.delaySeconds ?? 0);
@@ -194,10 +207,31 @@ beforeEach(() => {
 	writes = [];
 	autumnCalls = [];
 	stopped = [];
+	recordedAsleep = [];
 	usageStopAt = null;
 	delayedSettles = [];
+	updateMatches = true;
 	usageEvents = null;
 	reservations = new Map();
+});
+
+describe("attachBootSession", () => {
+	test("a boot another caller already attached to this session stays open", async () => {
+		updateMatches = false;
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls).toEqual([]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(false);
+	});
+
+	test("a boot that lost its session to another boot is released", async () => {
+		updateMatches = false;
+		boot = { ...boot, vercelSessionId: null };
+		await attachBootSession({ bootId: "boot_1", providerSandboxId: "ws-box" });
+		expect(autumnCalls.map((call) => call.params)).toMatchObject([
+			{ lockId: "boot_1:0", action: "release" },
+		]);
+		expect(writes.some((write) => "stoppedAt" in write)).toBe(true);
+	});
 });
 
 describe("settleBoot", () => {
@@ -291,11 +325,12 @@ describe("settleBoot", () => {
 		);
 	});
 
-	test("a box still refused once its grace ends is stopped and the warning cleared", async () => {
+	test("a box still refused once its grace ends is stopped, recorded asleep for the session it stopped, and the warning cleared", async () => {
 		renewalAllowed = false;
 		usageStopAt = new Date(NOW - MINUTE);
 		expect(await settleBoot("boot_1")).toBe("stopped");
 		expect(stopped).toEqual(["ws-box"]);
+		expect(recordedAsleep).toEqual([["ws_1", { sessionId: "session_1" }]]);
 		expect(writes.at(-1)).toEqual({ usageStopAt: null });
 	});
 

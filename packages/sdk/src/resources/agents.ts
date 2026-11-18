@@ -4,7 +4,7 @@ import type { RequestOptions } from "../internal/request-options";
 
 /**
  * Agents run in terminal sessions inside a cloud workspace's sandbox. The
- * workspace must be `ready` (see `workspaces.retrieve`).
+ * workspace must be `awake` or `asleep` (see `workspaces.retrieve`).
  *
  * Mirrors the CLI's `superset agents create`.
  */

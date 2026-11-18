@@ -1,3 +1,4 @@
+export { billingRefusalKey } from "./billingRefusalKeys";
 export {
 	errorCopy,
 	isTransportError,
@@ -5,5 +6,9 @@ export {
 	transportFailureKind,
 	watchNetworkState,
 } from "./errors";
-export { TransportError, transportFetch } from "./transport-fetch";
+export {
+	deadlineFetch,
+	TransportError,
+	transportFetch,
+} from "./transport-fetch";
 export { transportRetryLink } from "./transport-retry";

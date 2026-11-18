@@ -77,6 +77,11 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 	{ id: "anthropic/claude-opus-4-8", label: "Opus 4.8", provider: "Anthropic" },
 	{ id: "anthropic/claude-opus-4-7", label: "Opus 4.7", provider: "Anthropic" },
 	{
+		id: "anthropic/claude-fable-5-2",
+		label: "Fable 5.2",
+		provider: "Anthropic",
+	},
+	{
 		id: "anthropic/claude-fable-5-1",
 		label: "Fable 5.1",
 		provider: "Anthropic",
@@ -98,6 +103,8 @@ export const SUPERSET_CHAT_MODELS: readonly SupersetChatModel[] = [
 		label: "Haiku 4.5",
 		provider: "Anthropic",
 	},
+	{ id: "openai/gpt-6.2-astra", label: "GPT-6.2 Astra", provider: "OpenAI" },
+	{ id: "openai/gpt-6.2-sol", label: "GPT-6.2 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6.1-sol", label: "GPT-6.1 Sol", provider: "OpenAI" },
 	{ id: "openai/gpt-6-astra", label: "GPT-6 Astra", provider: "OpenAI" },
 	{ id: "openai/gpt-6-sol", label: "GPT-6 Sol", provider: "OpenAI" },
@@ -131,6 +138,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "opus", label: "Opus", group: LATEST_GROUP },
 			{ id: "sonnet", label: "Sonnet", group: LATEST_GROUP },
 			{ id: "haiku", label: "Haiku", group: LATEST_GROUP },
+			{ id: "claude-fable-5-2", label: "Fable 5.2", group: PINNED_GROUP },
 			{ id: "claude-fable-5-1", label: "Fable 5.1", group: PINNED_GROUP },
 			{ id: "claude-fable-5", label: "Fable 5", group: PINNED_GROUP },
 			{ id: "claude-opus-5-5", label: "Opus 5.5", group: PINNED_GROUP },
@@ -150,10 +158,12 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 		modelFlag: "--model",
 		models: [
 			// Availability is account-dependent; ids and order follow Codex's
-			// live catalog (`codex app-server` → `model/list`, codex 0.162.1).
+			// live catalog (`codex app-server` → `model/list`, codex 0.169.0).
+			{ id: "gpt-6.2-sol", label: "GPT-6.2 Sol" },
+			{ id: "gpt-6.2-astra", label: "GPT-6.2 Astra" },
+			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
 			{ id: "gpt-6.1-sol", label: "GPT-6.1 Sol" },
 			{ id: "gpt-6-astra", label: "GPT-6 Astra" },
-			{ id: "gpt-6.1-terra", label: "GPT-6.1 Terra" },
 			{ id: "gpt-6-sol", label: "GPT-6 Sol" },
 			{ id: "gpt-6-luna", label: "GPT-6 Luna" },
 			{ id: "gpt-5.6-sol", label: "GPT-5.6 Sol" },
@@ -194,6 +204,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "auto", label: "Auto" },
 			{ id: "claude-opus-5.5", label: "Claude Opus 5.5" },
 			{ id: "claude-opus-5", label: "Claude Opus 5" },
+			{ id: "claude-fable-5.2", label: "Claude Fable 5.2" },
 			{ id: "claude-fable-5.1", label: "Claude Fable 5.1" },
 			{ id: "claude-sonnet-5.5", label: "Claude Sonnet 5.5" },
 			{ id: "claude-sonnet-5", label: "Claude Sonnet 5" },
@@ -321,16 +332,20 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// same models.dev catalog but need an authed anthropic provider to
 			// appear in that listing; `claude-fable-5-1` was checked against
 			// models.dev directly (2026-09-01), the gpt-6 family likewise
-			// (2026-09-23).
+			// (2026-09-23), `claude-fable-5-2` and the gpt-6.2 family likewise
+			// (2026-11-17).
 			{ id: "anthropic/claude-opus-5-5", label: "Claude Opus 5.5" },
 			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-2", label: "Claude Fable 5.2" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{ id: "anthropic/claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
 			{ id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5" },
 			{ id: "google/gemini-3.8-flash", label: "Gemini 3.8 Flash" },
+			{ id: "openai/gpt-6.2-astra", label: "GPT-6.2 Astra" },
+			{ id: "openai/gpt-6.2-sol", label: "GPT-6.2 Sol" },
 			{ id: "openai/gpt-6-astra", label: "GPT-6 Astra" },
 			{ id: "openai/gpt-6-sol", label: "GPT-6 Sol" },
 			{ id: "openai/gpt-6-luna", label: "GPT-6 Luna" },
@@ -347,7 +362,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			// provider/model selectors. Exact ids verified against
 			// `omp models --json` in OMP 18.0.1; `claude-fable-5-1` against the
 			// catalog bundled in OMP 18.1.2; the gpt-6 family against
-			// pi-catalog 18.2.11.
+			// pi-catalog 18.2.11; `claude-fable-5-2` against pi-catalog 18.18.5.
 			{ id: "@smol", label: "Configured fast model" },
 			{ id: "@slow", label: "Configured slow model" },
 			{ id: "@plan", label: "Configured plan model" },
@@ -355,6 +370,7 @@ export const AGENT_MODEL_SUPPORT: readonly AgentModelSupport[] = [
 			{ id: "anthropic/claude-sonnet-5-5", label: "Claude Sonnet 5.5" },
 			{ id: "anthropic/claude-sonnet-5", label: "Claude Sonnet 5" },
 			{ id: "anthropic/claude-opus-5", label: "Claude Opus 5" },
+			{ id: "anthropic/claude-fable-5-2", label: "Claude Fable 5.2" },
 			{ id: "anthropic/claude-fable-5-1", label: "Claude Fable 5.1" },
 			{ id: "anthropic/claude-fable-5", label: "Claude Fable 5" },
 			{
@@ -633,9 +649,11 @@ export const AGENT_EFFORT_SUPPORT: readonly AgentEffortSupport[] = [
 				id: "ultra",
 				label: "Ultra",
 				models: [
+					"gpt-6.2-sol",
+					"gpt-6.2-astra",
+					"gpt-6.1-terra",
 					"gpt-6.1-sol",
 					"gpt-6-astra",
-					"gpt-6.1-terra",
 					"gpt-6-sol",
 					"gpt-5.6-sol",
 					"gpt-5.6-terra",

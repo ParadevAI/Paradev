@@ -14,6 +14,7 @@ interface Room {
 	client: PagePresenceClient;
 	viewers: PagePresenceViewer[];
 	visitors: PresenceVisitor[];
+	published: Set<() => void>;
 	holders: number;
 }
 
@@ -29,12 +30,14 @@ const notify = () => {
 export function joinPresence(
 	roomId: string,
 	url: () => Promise<string | null>,
+	onPublished?: () => void,
 ): () => void {
 	let room = rooms.get(roomId);
 	if (!room) {
 		const created = {
 			viewers: NONE,
 			visitors: NO_VISITORS,
+			published: new Set(),
 			holders: 0,
 		} as Room;
 		created.client = openPagePresence({
@@ -47,13 +50,18 @@ export function joinPresence(
 				created.visitors = visitors;
 				notify();
 			},
+			onPublished: () => {
+				for (const listener of created.published) listener();
+			},
 		});
 		rooms.set(roomId, created);
 		room = created;
 	}
 	const joined = room;
 	joined.holders += 1;
+	if (onPublished) joined.published.add(onPublished);
 	return () => {
+		if (onPublished) joined.published.delete(onPublished);
 		joined.holders -= 1;
 		if (joined.holders > 0) return;
 		joined.client.stop();

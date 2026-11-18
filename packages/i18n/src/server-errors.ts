@@ -285,6 +285,12 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
+	"serverError.chatMove.moveStopped": () =>
+		i18n._(
+			msg({
+				message: "This move stopped. The chat is still in its old workspace.",
+			}),
+		),
 	"serverError.channel.notFound": () =>
 		i18n._(
 			msg({
@@ -719,6 +725,12 @@ export const serverErrorMessages: Record<
 				message: "Cannot remove yourself",
 			}),
 		),
+	"serverError.organization.alreadyExists": () =>
+		i18n._(
+			msg({
+				message: "Organization already exists",
+			}),
+		),
 	"serverError.organization.createFailed": () =>
 		i18n._(
 			msg({
@@ -772,6 +784,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Only owners can update organization settings",
+			}),
+		),
+	"serverError.organization.onlyOwnerCannotLeave": () =>
+		i18n._(
+			msg({
+				message: "You cannot leave the organization as the only owner",
 			}),
 		),
 	"serverError.organization.organizationNotFound": () =>
@@ -1197,6 +1215,12 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message: "Too many support reports. Try again later.",
+			}),
+		),
+	"serverError.team.mustBelongToATeam": () =>
+		i18n._(
+			msg({
+				message: "You should be a member of at least one team",
 			}),
 		),
 	"serverError.team.taskKeyInvalid": () =>

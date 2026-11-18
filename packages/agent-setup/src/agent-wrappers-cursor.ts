@@ -6,7 +6,7 @@ import {
 	isSupersetManagedHookCommand,
 	writeFileIfChanged,
 } from "./agent-wrappers-common";
-import { getTemplatePath, getV1NotificationsPort } from "./config";
+import { getTemplatePath } from "./config";
 import {
 	ensureManagedJsonHooks,
 	getManagedJsonHooksContent,
@@ -18,7 +18,7 @@ import { APP_HOME_DIR_NAME, getHooksDir, resolveUserHomeDir } from "./paths";
 export const CURSOR_HOOK_SCRIPT_NAME = "cursor-hook.sh";
 
 const CURSOR_HOOK_SIGNATURE = "# Superset cursor hook";
-const CURSOR_HOOK_VERSION = "v8";
+const CURSOR_HOOK_VERSION = "v9";
 export const CURSOR_HOOK_MARKER = `${CURSOR_HOOK_SIGNATURE} ${CURSOR_HOOK_VERSION}`;
 
 interface CursorHookEntry {
@@ -41,8 +41,7 @@ export function getCursorHookScriptContent(): string {
 	);
 	return template
 		.replace("{{MARKER}}", CURSOR_HOOK_MARKER)
-		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME)
-		.replaceAll("{{DEFAULT_PORT}}", String(getV1NotificationsPort()));
+		.replaceAll("{{APP_HOME_DIR_NAME}}", APP_HOME_DIR_NAME);
 }
 
 // Cursor invokes the hook script with the event name as argv; the script

@@ -5,12 +5,13 @@ import {
 } from "@superset/shared/workspace-tags";
 import { and, eq, inArray } from "drizzle-orm";
 import type { HostDb } from "../db";
-import { projects, tagFolderSettings } from "../db/schema";
+import { tagFolderSettings } from "../db/schema";
 import type { EventBus } from "../events";
 import type {
 	TagFolderSettingSnapshot,
 	TagSettingSnapshot,
 } from "../events/types";
+import { getLocalProject } from "../projects/local-project-store";
 
 export interface TagFolderStoreContext {
 	db: HostDb;
@@ -74,13 +75,7 @@ function toSnapshot(row: TagFolderSettingRow): TagSettingSnapshot {
 /** Sessions is virtual; every other accepted scope must be a local project. */
 export function hasTagFolderScope(db: HostDb, scope: string): boolean {
 	if (scope === SESSIONS_TAG_SCOPE) return true;
-	return (
-		db
-			.select({ id: projects.id })
-			.from(projects)
-			.where(eq(projects.id, scope))
-			.all()[0] !== undefined
-	);
+	return getLocalProject(db, scope) !== undefined;
 }
 
 /**

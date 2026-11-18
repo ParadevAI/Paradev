@@ -1,8 +1,9 @@
 import { statSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { TRPCError } from "@trpc/server";
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { ne } from "drizzle-orm";
 import { projects } from "../../../../db/schema";
+import { getLocalProject } from "../../../../projects/local-project-store";
 import type { HostServiceContext } from "../../../../types";
 import type { ProjectDirMissingCause } from "../../../error-types";
 import { projectNotSetupError } from "./project-helpers";
@@ -14,11 +15,7 @@ export function findLocalProject(
 	ctx: HostServiceContext,
 	projectId: string,
 ): LocalProject | undefined {
-	return ctx.db.query.projects
-		.findFirst({
-			where: and(eq(projects.id, projectId), isNull(projects.deletedAt)),
-		})
-		.sync();
+	return getLocalProject(ctx.db, projectId);
 }
 
 export function requireLocalProject(

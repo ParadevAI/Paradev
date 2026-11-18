@@ -9,6 +9,7 @@ import {
 import { Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
+	agentToolsMounts,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	SESSION_TIMEOUT_MS,
@@ -58,6 +59,8 @@ const sandboxes = [
 		createdAt: NOW - 7 * DAY,
 		updatedAt: NOW - 7 * DAY,
 		statusUpdatedAt: NOW - 3 * HOUR,
+		expiresAt: NOW + HOUR,
+		currentSessionId: "session_resumed",
 		tags: { kind: "workspace" },
 	},
 ];
@@ -114,8 +117,12 @@ describe("findSandboxSession", () => {
 describe("listActiveWorkspaceSandboxes", () => {
 	test("finds older resumed workspaces when tag-filtered lists use creation order", async () => {
 		expect(await listActiveWorkspaceSandboxes(NOW - 4 * HOUR)).toEqual([
-			"recently-stopped",
-			"resumed-workspace",
+			{ name: "recently-stopped", expiresAt: null, sessionId: null },
+			{
+				name: "resumed-workspace",
+				expiresAt: new Date(NOW + HOUR),
+				sessionId: "session_resumed",
+			},
 		]);
 		expect(listOptions).toMatchObject({
 			sortBy: "statusUpdatedAt",
@@ -152,5 +159,60 @@ describe("topUpSandboxSession", () => {
 		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS - 30_000);
 		await topUpSandboxSession("sbx");
 		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
+	});
+});
+
+describe("agentToolsMounts", () => {
+	const detached = () => Promise.resolve({ currentSandboxName: undefined });
+
+	test("mounts nothing without a drive name", async () => {
+		let asked = 0;
+		const getDrive = () => {
+			asked++;
+			return detached();
+		};
+		expect(await agentToolsMounts(null, getDrive)).toBeUndefined();
+		expect(asked).toBe(0);
+	});
+
+	test("mounts a detached drive read-only, and asks only once", async () => {
+		let asked = 0;
+		const getDrive = () => {
+			asked++;
+			return detached();
+		};
+		const want = {
+			"/opt/agents": {
+				drive: "agent-tools-iad1-0123456789ab",
+				mode: "snapshot",
+			},
+		};
+		expect(
+			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
+		).toEqual(want);
+		expect(
+			await agentToolsMounts("agent-tools-iad1-0123456789ab", getDrive),
+		).toEqual(want);
+		expect(asked).toBe(1);
+	});
+
+	test("skips a missing drive, or one a writer still holds", async () => {
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-aaaaaaaaaaaa", () =>
+				Promise.reject(new Error("404")),
+			),
+		).toBeUndefined();
+		let asked = 0;
+		const attached = () => {
+			asked++;
+			return Promise.resolve({ currentSandboxName: "builder" });
+		};
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
+		).toBeUndefined();
+		expect(
+			await agentToolsMounts("agent-tools-sfo1-bbbbbbbbbbbb", attached),
+		).toBeUndefined();
+		expect(asked).toBe(2);
 	});
 });

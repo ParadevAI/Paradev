@@ -31,7 +31,7 @@ We ask that you give us a reasonable window to remediate before disclosing publi
 In scope:
 
 - The Paradev desktop app, CLI, and host service (this repository)
-- The Paradev API and web app (superset.sh, app.superset.sh, relay.superset.sh)
+- The Paradev API and web app (paradev.com, app.paradev.com, api.paradev.com, relay.superset.sh, and the superset.sh hosts that still serve the app and API)
 
 Out of scope:
 
