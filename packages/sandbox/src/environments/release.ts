@@ -43,13 +43,12 @@ import {
 	SANDBOX_PATHS,
 	SANDBOX_ROOT_CHECKOUT,
 	type SandboxIdentity,
-	sandboxAgentToolsDrive,
 	sandboxCheckoutDir,
 } from "@superset/shared/sandbox/contract";
 import {
 	DEFAULT_SANDBOX_REGION,
 	isSandboxRegionId,
-	type SandboxRegionId,
+	SANDBOX_REGION_IDS,
 } from "@superset/shared/sandbox/regions";
 import { Sandbox } from "@vercel/sandbox";
 
@@ -60,6 +59,8 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
+/** Released bundles whose drives stay in every region, so a rollback to one of them has its drives. */
+const KEPT_RELEASED_BUNDLES = 3;
 const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome", "opencode", "pi"];
 /** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
 const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
@@ -152,34 +153,38 @@ log(
 await publishBundle(bundle, { dry: false });
 log(`bundle: ${bundle.sha256} published`);
 
-// 1b. the bundle's agent-tools drive in every region with an environment,
-// before any row points at the bundle so no box mounts one mid-write. Boxes
-// fail open to the image's agents, so a failed publish only warns.
+// 1b. the bundle's agent-tools drive in every region, before any row points
+// at the bundle so no box mounts one mid-write. Every region, so an
+// environment created there before the next release finds its drive. A
+// region a box is in must have a drive with every required agent.
 const agentTools = await import("../agent-tools");
 const driveHost = agentTools.vercelDriveHost(credentials);
-async function environmentRegions(): Promise<SandboxRegionId[]> {
+async function environmentRegions(): Promise<Set<string>> {
 	const { db } = await import("@superset/db/client");
 	const rows = await db.query.environments.findMany({
 		columns: { region: true },
-		where: (row, { isNull: unset }) => unset(row.archivedAt),
 	});
-	return [
-		...new Set(
-			[REGION, ...rows.map((row) => row.region)].filter(isSandboxRegionId),
-		),
-	];
+	return new Set(
+		[REGION, ...rows.map((row) => row.region)].filter(isSandboxRegionId),
+	);
 }
+const neededRegions = await environmentRegions();
+const published = await agentTools.publishAgentToolsDrives({
+	host: driveHost,
+	regions: SANDBOX_REGION_IDS,
+	bundleSha: bundle.sha256,
+	assets: bundle.assets,
+});
 for (const line of agentTools.describeAgentToolsPublish(
-	await agentTools.publishAgentToolsDrives({
-		host: driveHost,
-		regions: await environmentRegions(),
-		bundleSha: bundle.sha256,
-		assets: bundle.assets,
-	}),
+	published,
+	bundle.assets,
 )) {
 	if (line.startsWith("::warning::")) console.log(line);
 	else log(line);
 }
+const gaps = agentTools.agentToolsGaps(published, neededRegions);
+if (gaps.length)
+	fail(`agent-tools: ${gaps.join("; ")}; no image, golden or row changed`);
 
 // 2. image
 const candidateTag = `release-${bundle.sha256.slice(0, 12)}`;
@@ -256,6 +261,7 @@ for (;;) {
 				managedEnv: {},
 				networkPolicy: "allow-all",
 				vcpus: GOLDEN_BOX_VCPUS,
+				agentTools: true,
 			},
 		});
 		break;
@@ -279,6 +285,7 @@ await wakeSandbox({
 		managedEnv: {},
 		networkPolicy: "allow-all",
 		vcpus: GOLDEN_BOX_VCPUS,
+		agentTools: true,
 	},
 });
 log("golden: host-service up; waiting for the checkout");
@@ -440,6 +447,7 @@ const probeClaim = {
 	managedEnv,
 	networkPolicy,
 	vcpus: GOLDEN_BOX_VCPUS,
+	agentTools: true,
 };
 log(`probe: provisioning ${probe} as a fork of ${golden}`);
 await provisionSandbox({
@@ -513,7 +521,7 @@ const { db, dbWs } = await import("@superset/db/client");
 const { environments, environmentRepositories } = await import(
 	"@superset/db/schema"
 );
-const { eq, isNull } = await import("drizzle-orm");
+const { desc, eq } = await import("drizzle-orm");
 const { releaseRepositoryWhere } = await import(
 	"./utils/releaseRepositoryWhere"
 );
@@ -560,7 +568,6 @@ const { internal, bundled } = await dbWs.transaction(async (tx) => {
 	const bundled = await tx
 		.update(environments)
 		.set({ bundleSha: bundle.sha256 })
-		.where(isNull(environments.archivedAt))
 		.returning({ id: environments.id });
 	const [internal] = previous
 		? await tx
@@ -598,24 +605,38 @@ if (!previous)
 		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
 	);
 
-try {
-	const live = await db.query.environments.findMany({
-		columns: { region: true, bundleSha: true },
-		where: (row, { isNull: unset }) => unset(row.archivedAt),
-	});
-	const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
-		host: driveHost,
-		referenced: new Set(
-			live.map((row) => sandboxAgentToolsDrive(row.region, row.bundleSha)),
-		),
-	});
-	log(
-		`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
-	);
-} catch (error) {
-	console.log(
-		`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
-	);
+// One Vercel project holds every database's drives (staging shares
+// production's rows; preview branches copy them), so only the production
+// release, whose rows the others mirror, may delete one.
+if (!PRODUCTION) {
+	log("agent-tools: prune skipped; only --production prunes drives");
+} else {
+	try {
+		const { sandboxBundles } = await import("@superset/db/schema");
+		const rows = await db.query.environments.findMany({
+			columns: { region: true, bundleSha: true },
+		});
+		const recent = await db
+			.select({ sha: sandboxBundles.sha })
+			.from(sandboxBundles)
+			.orderBy(desc(sandboxBundles.releasedAt))
+			.limit(KEPT_RELEASED_BUNDLES);
+		const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
+			host: driveHost,
+			referenced: agentTools.referencedAgentToolsDrives({
+				rows,
+				recentBundles: [bundle.sha256, ...recent.map((row) => row.sha)],
+				regions: SANDBOX_REGION_IDS,
+			}),
+		});
+		log(
+			`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
+		);
+	} catch (error) {
+		console.log(
+			`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
+		);
+	}
 }
 
 if (
