@@ -4353,6 +4353,9 @@ msgstr "Check lulus"
 msgid "Checks Skipped"
 msgstr "Check Dilewati"
 
+msgid "Checks unavailable"
+msgstr "Check tidak tersedia"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "Pilih akun {pluginLabel}"
 

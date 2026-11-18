@@ -4353,6 +4353,9 @@ msgstr "チェックが成功しました"
 msgid "Checks Skipped"
 msgstr "チェックをスキップ"
 
+msgid "Checks unavailable"
+msgstr "チェックを取得できません"
+
 msgid "Choose a {pluginLabel} account"
 msgstr "{pluginLabel} アカウントを選択"
 

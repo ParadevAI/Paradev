@@ -44,6 +44,8 @@ export type PullRequestDetail = PullRequestDetailBase &
 		mergeMethods: MergeMethodChoices;
 		/** Absent from details cached by builds older than this field. */
 		mergeQueue?: PullRequestMergeQueue;
+		/** GitHub refused the login some status checks. */
+		checksUnavailable?: boolean;
 	};
 
 export interface PullRequestMergeQueue {
