@@ -14476,6 +14476,10 @@ msgstr "Riêng của Paradev"
 msgid "Other"
 msgstr "Khác"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Khác"
+
 msgid "Other apps"
 msgstr "Ứng dụng khác"
 

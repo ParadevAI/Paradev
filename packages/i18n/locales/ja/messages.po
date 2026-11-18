@@ -14476,6 +14476,10 @@ msgstr "独自コンポーネント"
 msgid "Other"
 msgstr "その他"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "その他"
+
 msgid "Other apps"
 msgstr "他のアプリ"
 

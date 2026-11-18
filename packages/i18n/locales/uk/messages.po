@@ -14470,6 +14470,10 @@ msgstr "Оригінали"
 msgid "Other"
 msgstr "Інше"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Інше"
+
 msgid "Other apps"
 msgstr "Інші застосунки"
 

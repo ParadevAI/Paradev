@@ -14476,6 +14476,10 @@ msgstr "Özgünler"
 msgid "Other"
 msgstr "Diğer"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Diğer"
+
 msgid "Other apps"
 msgstr "Diğer uygulamalar"
 

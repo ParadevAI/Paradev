@@ -14476,6 +14476,10 @@ msgstr "Originals"
 msgid "Other"
 msgstr "Other"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Other"
+
 msgid "Other apps"
 msgstr "Other apps"
 

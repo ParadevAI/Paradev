@@ -77,29 +77,21 @@ export function AllowanceLines({
 			<td className="py-2 pl-3 text-right tabular-nums">{value(line)}</td>
 		</tr>
 	);
-	const group = (paid: boolean) => {
-		const items = lines.filter(
-			(line) => line.paid === paid && line.kind !== "beyond",
-		);
-		if (items.length === 0) return null;
-		return (
+	const group = (heading: ReactNode, items: AllowanceLine[]) =>
+		items.length > 0 && (
 			<>
 				<tr>
 					<td
 						colSpan={2}
 						className="pt-3 pb-1 text-xs tracking-wide text-muted-foreground uppercase"
 					>
-						{paid ? (
-							<Trans context="cloud allowance group">Paid</Trans>
-						) : (
-							<Trans context="cloud allowance group">Free</Trans>
-						)}
+						{heading}
 					</td>
 				</tr>
 				{items.map(row)}
 			</>
 		);
-	};
+	const billed = lines.filter((line) => line.kind !== "beyond");
 
 	return (
 		<>
@@ -114,9 +106,18 @@ export function AllowanceLines({
 			</div>
 			<table className="w-full text-sm">
 				<tbody>
-					{group(false)}
-					{group(true)}
-					{lines.filter((line) => line.kind === "beyond").map(row)}
+					{group(
+						<Trans context="cloud allowance group">Free</Trans>,
+						billed.filter((line) => !line.paid),
+					)}
+					{group(
+						<Trans context="cloud allowance group">Paid</Trans>,
+						billed.filter((line) => line.paid),
+					)}
+					{group(
+						<Trans context="cloud allowance group">Other</Trans>,
+						lines.filter((line) => line.kind === "beyond"),
+					)}
 				</tbody>
 			</table>
 		</>

@@ -14476,6 +14476,10 @@ msgstr "原創元件"
 msgid "Other"
 msgstr "其他"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "其他"
+
 msgid "Other apps"
 msgstr "其他應用程式"
 
