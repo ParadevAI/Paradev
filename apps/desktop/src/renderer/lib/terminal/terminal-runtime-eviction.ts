@@ -23,15 +23,12 @@ export function normalizeParkedRuntimeCap(cap: number): number | null {
 export function selectRuntimesToEvict<T extends EvictionCandidate>(
 	entries: Iterable<T>,
 	cap: number,
-	evictLast: (entry: T) => boolean = () => false,
 ): T[] {
 	const parked = Array.from(entries).filter(
 		(entry) => entry.runtime !== null && entry.runtime.container === null,
 	);
 	const excess = parked.length - cap;
 	if (excess <= 0) return [];
-	const byAge = (a: T, b: T) => a.lastUsedAt - b.lastUsedAt;
-	const last = parked.filter(evictLast).sort(byAge);
-	const first = parked.filter((entry) => !evictLast(entry)).sort(byAge);
-	return [...first, ...last].slice(0, excess);
+	parked.sort((a, b) => a.lastUsedAt - b.lastUsedAt);
+	return parked.slice(0, excess);
 }

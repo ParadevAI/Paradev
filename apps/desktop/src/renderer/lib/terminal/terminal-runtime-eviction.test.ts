@@ -58,25 +58,14 @@ describe("selectRuntimesToEvict", () => {
 		expect(ids(selectRuntimesToEvict(entries, 1))).toEqual(["a"]);
 	});
 
-	it("evicts evict-last entries only after every other parked entry", () => {
-		const entries = [parked("tui", 1), parked("a", 2), parked("b", 3)];
-		const evictLast = (e: { id: string }) => e.id === "tui";
-		expect(ids(selectRuntimesToEvict(entries, 2, evictLast))).toEqual(["a"]);
-	});
-
-	it("keeps the cap a hard bound when evict-last entries fill it", () => {
+	it("keeps the cap a hard bound, oldest first", () => {
 		const entries = [
-			parked("tui2", 2),
-			parked("tui1", 1),
-			parked("tui3", 3),
-			parked("a", 4),
+			parked("b", 2),
+			parked("a", 1),
+			parked("c", 3),
+			parked("d", 4),
 		];
-		const evictLast = (e: { id: string }) => e.id.startsWith("tui");
-		expect(ids(selectRuntimesToEvict(entries, 1, evictLast))).toEqual([
-			"a",
-			"tui1",
-			"tui2",
-		]);
+		expect(ids(selectRuntimesToEvict(entries, 1))).toEqual(["a", "b", "c"]);
 	});
 });
 
