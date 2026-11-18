@@ -727,6 +727,7 @@
         "react": "19.3.0",
         "react-dom": "19.3.0",
         "react-icons": "5.6.0",
+        "recharts": "2.15.4",
         "require-in-the-middle": "8.0.1",
         "server-only": "0.0.1",
         "superjson": "2.2.6",

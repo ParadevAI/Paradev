@@ -3,11 +3,13 @@ import { msg } from "@lingui/core/macro";
 import {
 	Blocks,
 	Bot,
+	Cloud,
 	CreditCard,
 	Home,
 	type LucideIcon,
 	User,
 } from "lucide-react";
+import type { FeatureFlags } from "@/app/(app)/providers/FeatureFlagsProvider";
 
 export interface NavItem {
 	href: string;
@@ -15,6 +17,8 @@ export interface NavItem {
 	icon: LucideIcon;
 	/** Served by another deployment through a rewrite, so client navigation cannot reach it. */
 	reloadDocument?: boolean;
+	/** Shown only when this flag is on for the active organization. */
+	flag?: keyof FeatureFlags;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -43,5 +47,11 @@ export const NAV_ITEMS: NavItem[] = [
 		href: "/settings/billing",
 		label: msg({ message: "Billing" }),
 		icon: CreditCard,
+	},
+	{
+		href: "/settings/cloud-usage",
+		label: msg({ message: "Cloud usage" }),
+		icon: Cloud,
+		flag: "cloudUsage",
 	},
 ];
