@@ -6,7 +6,7 @@ import {
 	getHostServiceHeaders,
 	getHostServiceWsToken,
 } from "renderer/lib/host-service-auth";
-import { LOCAL_HOST_SERVICE_DETAIL } from "renderer/routes/_authenticated/_dashboard/v2-workspace/providers/WorkspaceProvider/utils/localHostServiceDetail";
+import { LOCAL_HOST_SERVICE_DETAIL } from "renderer/routes/_authenticated/_dashboard/workspace/providers/WorkspaceProvider/utils/localHostServiceDetail";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
 import { PaneMessage } from "../PaneMessage";
 import { useLastKnown } from "./hooks/useLastKnown";
