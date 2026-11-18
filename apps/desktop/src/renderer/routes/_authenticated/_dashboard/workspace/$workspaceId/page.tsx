@@ -353,7 +353,11 @@ function WorkspaceContent() {
 		consumeSearch,
 	});
 	useCreatePendingMigratedTerminals({ workspaceId, isLayoutReady });
-	useHostPendingCloudLaunch({ workspaceId, store, isLayoutReady });
+	const { canShowEmptyLayout } = useHostPendingCloudLaunch({
+		workspaceId,
+		store,
+		isLayoutReady,
+	});
 	useRunWorkspaceCreationPresets({
 		workspaceId,
 		isLayoutReady,
@@ -849,15 +853,20 @@ function WorkspaceContent() {
 												)}
 											</div>
 										)}
-										renderEmptyState={() => (
-											<WorkspaceEmptyState
-												onOpenBrowser={addBrowserTab}
-												onOpenChanges={openChanges}
-												onOpenChat={addChatTab}
-												onOpenQuickOpen={handleQuickOpen}
-												onOpenTerminal={addTerminalTab}
-											/>
-										)}
+										renderEmptyState={() =>
+											canShowEmptyLayout ? (
+												<WorkspaceEmptyState
+													onOpenBrowser={addBrowserTab}
+													onOpenChanges={openChanges}
+													onOpenChat={addChatTab}
+													onOpenQuickOpen={handleQuickOpen}
+													onOpenTerminal={addTerminalTab}
+												/>
+											) : (
+												// Not null: Workspace shows "No tabs open" for null.
+												<div aria-hidden />
+											)
+										}
 										onBeforeCloseTab={onBeforeCloseTab}
 										onInteractionStateChange={onWorkspaceInteractionStateChange}
 										store={store}

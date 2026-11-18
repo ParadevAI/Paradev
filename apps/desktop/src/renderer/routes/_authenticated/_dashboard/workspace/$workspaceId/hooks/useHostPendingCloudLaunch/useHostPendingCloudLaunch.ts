@@ -1,12 +1,13 @@
 import type { WorkspaceStore } from "@superset/panes";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useWorkspaceConnectionRefresh } from "renderer/hooks/host-service/useWorkspaceConnectionRefresh";
 import { useWorkspaceHostTarget } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { withPendingCloudLaunch } from "renderer/stores/workspace-creates/pendingCloudLaunch";
 import type { StoreApi } from "zustand";
 import type { PaneViewerData } from "../../types";
+import { canShowEmptyLayout } from "./utils/canShowEmptyLayout";
 import { fetchPendingCloudLaunch } from "./utils/fetchPendingCloudLaunch";
 
 const seededLaunches = new Set<string>();
@@ -23,7 +24,7 @@ export function useHostPendingCloudLaunch({
 	workspaceId: string;
 	store: StoreApi<WorkspaceStore<PaneViewerData>>;
 	isLayoutReady: boolean;
-}): void {
+}): { canShowEmptyLayout: boolean } {
 	const target = useWorkspaceHostTarget(workspaceId);
 	const hostUrl =
 		target.status === "ready" && target.kind === "sandbox" ? target.url : null;
@@ -32,7 +33,7 @@ export function useHostPendingCloudLaunch({
 		() => ["sandbox-pending-launch", hostUrl, workspaceId],
 		[hostUrl, workspaceId],
 	);
-	const { data: launch } = useQuery({
+	const { data: launch, status } = useQuery({
 		queryKey,
 		enabled,
 		queryFn: () =>
@@ -47,7 +48,8 @@ export function useHostPendingCloudLaunch({
 	});
 	useWorkspaceConnectionRefresh(workspaceId, queryKey, enabled);
 
-	useEffect(() => {
+	// Before paint, so the frame that has the answer never shows the empty view.
+	useLayoutEffect(() => {
 		if (!isLayoutReady || !launch?.terminalId) return;
 		const key = `${workspaceId}:${launch.terminalId}`;
 		if (seededLaunches.has(key)) return;
@@ -56,4 +58,12 @@ export function useHostPendingCloudLaunch({
 			.getState()
 			.replaceState((state) => withPendingCloudLaunch(state, launch) ?? state);
 	}, [isLayoutReady, launch, store, workspaceId]);
+
+	return {
+		canShowEmptyLayout: canShowEmptyLayout({
+			isLayoutReady,
+			isSandboxHost: hostUrl !== null,
+			pendingLaunchStatus: status,
+		}),
+	};
 }
