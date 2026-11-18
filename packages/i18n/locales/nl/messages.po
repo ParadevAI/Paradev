@@ -18067,9 +18067,6 @@ msgstr "Deel."
 msgid "Shared"
 msgstr "Gedeeld"
 
-msgid "Shared across sessions using this login."
-msgstr "Gedeeld door sessies die deze aanmelding gebruiken."
-
 msgid "Shared app components"
 msgstr "Gedeelde app-componenten"
 

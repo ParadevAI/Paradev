@@ -18067,9 +18067,6 @@ msgstr "Chia sẻ."
 msgid "Shared"
 msgstr "Dùng chung"
 
-msgid "Shared across sessions using this login."
-msgstr "Dùng chung giữa các phiên sử dụng tài khoản đăng nhập này."
-
 msgid "Shared app components"
 msgstr "Component dùng chung của ứng dụng"
 

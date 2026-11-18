@@ -18067,9 +18067,6 @@ msgstr "共有。"
 msgid "Shared"
 msgstr "共有"
 
-msgid "Shared across sessions using this login."
-msgstr "このログインを使用するセッション間で共有されます。"
-
 msgid "Shared app components"
 msgstr "共有アプリコンポーネント"
 

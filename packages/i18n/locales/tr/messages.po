@@ -18067,9 +18067,6 @@ msgstr "Paylaşın."
 msgid "Shared"
 msgstr "Paylaşılan"
 
-msgid "Shared across sessions using this login."
-msgstr "Bu hesabı kullanan oturumlar arasında paylaşılır."
-
 msgid "Shared app components"
 msgstr "Paylaşılan uygulama bileşenleri"
 

@@ -18067,9 +18067,6 @@ msgstr "Поделитесь."
 msgid "Shared"
 msgstr "Общий"
 
-msgid "Shared across sessions using this login."
-msgstr "Общий лимит для сеансов с этим аккаунтом."
-
 msgid "Shared app components"
 msgstr "Общие компоненты приложения"
 

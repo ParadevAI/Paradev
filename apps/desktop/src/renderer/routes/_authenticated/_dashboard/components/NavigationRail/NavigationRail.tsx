@@ -41,7 +41,6 @@ export function NavigationRail() {
 					navigation.isChannelsOpen &&
 					!destinations.some((destination) => destination.id === "chat")
 				}
-				onOpenUsage={navigation.openUsage}
 			/>
 			<div className="mt-auto flex flex-col items-center gap-1.5">
 				<RailUsage />

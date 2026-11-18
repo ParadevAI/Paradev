@@ -18061,9 +18061,6 @@ msgstr "Поділіться."
 msgid "Shared"
 msgstr "Спільний"
 
-msgid "Shared across sessions using this login."
-msgstr "Спільний ліміт для сеансів із цим обліковим записом."
-
 msgid "Shared app components"
 msgstr "Спільні компоненти застосунку"
 

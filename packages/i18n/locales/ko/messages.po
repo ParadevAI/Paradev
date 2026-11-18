@@ -18067,9 +18067,6 @@ msgstr "공유."
 msgid "Shared"
 msgstr "공유"
 
-msgid "Shared across sessions using this login."
-msgstr "이 로그인을 사용하는 세션 간에 공유됩니다."
-
 msgid "Shared app components"
 msgstr "공용 앱 컴포넌트"
 

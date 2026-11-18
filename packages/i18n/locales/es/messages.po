@@ -18067,9 +18067,6 @@ msgstr "Comparte."
 msgid "Shared"
 msgstr "Compartido"
 
-msgid "Shared across sessions using this login."
-msgstr "Compartido entre las sesiones que usan este inicio de sesión."
-
 msgid "Shared app components"
 msgstr "Componentes compartidos de la app"
 

@@ -18067,9 +18067,6 @@ msgstr "Bagikan."
 msgid "Shared"
 msgstr "Dibagikan"
 
-msgid "Shared across sessions using this login."
-msgstr "Dibagikan di semua sesi yang menggunakan login ini."
-
 msgid "Shared app components"
 msgstr "Komponen aplikasi bersama"
 

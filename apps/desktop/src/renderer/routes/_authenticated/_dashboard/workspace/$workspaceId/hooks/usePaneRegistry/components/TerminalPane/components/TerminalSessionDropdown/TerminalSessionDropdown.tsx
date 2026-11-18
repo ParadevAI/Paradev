@@ -47,7 +47,6 @@ import type {
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
 import type { SurfaceForkSource } from "../../../../hooks/useSurfaceFork";
 import { useSurfaceForkSource } from "../../../../hooks/useSurfaceForkSource";
-import { AccountUsageMenuSection } from "../../../AccountUsageMenuSection";
 import { ForkMenuItems } from "../../../ForkMenuItems";
 import { StopHeaderEvents } from "../../../StopHeaderEvents";
 import { UsageWarningDot } from "../../../UsageWarningDot";
@@ -636,10 +635,6 @@ export function TerminalSessionDropdown({
 								</DropdownMenuItem>
 							</>
 						)}
-						<AccountUsageMenuSection
-							workspaceId={workspaceId}
-							terminalId={terminalId}
-						/>
 					</DropdownMenuContent>
 				</StopHeaderEvents>
 			</DropdownMenu>

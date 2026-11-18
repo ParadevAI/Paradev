@@ -18067,9 +18067,6 @@ msgstr "分享。"
 msgid "Shared"
 msgstr "共享"
 
-msgid "Shared across sessions using this login."
-msgstr "使用此登入的所有工作階段共用此額度。"
-
 msgid "Shared app components"
 msgstr "共享應用元件"
 

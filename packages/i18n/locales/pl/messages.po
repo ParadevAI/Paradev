@@ -18067,9 +18067,6 @@ msgstr "Udostępnij."
 msgid "Shared"
 msgstr "Wspólny"
 
-msgid "Shared across sessions using this login."
-msgstr "Współdzielone przez sesje korzystające z tego logowania."
-
 msgid "Shared app components"
 msgstr "Wspólne komponenty aplikacji"
 

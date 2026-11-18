@@ -18067,9 +18067,6 @@ msgstr "Sdílejte."
 msgid "Shared"
 msgstr "Sdílené"
 
-msgid "Shared across sessions using this login."
-msgstr "Sdíleno mezi relacemi používajícími toto přihlášení."
-
 msgid "Shared app components"
 msgstr "Sdílené komponenty aplikace"
 
