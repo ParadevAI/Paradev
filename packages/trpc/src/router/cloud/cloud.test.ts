@@ -13,12 +13,13 @@ import {
 	SAM,
 	seedCloudUsage,
 } from "@superset/db/testing";
+import type { PlanTier } from "@superset/shared/billing";
 import {
 	createCallerFactory,
 	createTRPCContext,
 	createTRPCRouter,
 } from "../../trpc";
-import { type CloudDeps, catalogListRate, cloudRouterWith } from "./cloud";
+import { type CloudDeps, cloudRouterWith } from "./cloud";
 
 const CLOUD_USAGE: CloudUsage = {
 	includedGbMinutes: 1200,
@@ -46,18 +47,23 @@ function caller(
 	userId: string,
 	{
 		enabled = true,
-		readCloudUsage = async () => CLOUD_USAGE,
+		readCloudUsage = async (): Promise<CloudUsage | null> => CLOUD_USAGE,
+		tier = "pro",
+		billingOff = false,
 		listRatePerGbHour = async () => null,
 	}: {
 		enabled?: boolean;
-		readCloudUsage?: CloudDeps["cloudUsage"];
+		readCloudUsage?: () => Promise<CloudUsage | null>;
+		tier?: PlanTier;
+		billingOff?: boolean;
 		listRatePerGbHour?: CloudDeps["listRatePerGbHour"];
 	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
-			cloudUsage: readCloudUsage,
+			billing: async () =>
+				billingOff ? null : { tier, cloudUsage: await readCloudUsage() },
 			listRatePerGbHour,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
@@ -431,7 +437,10 @@ test("periods run from the open one back to the one the organization was created
 });
 
 test("with billing off there are no periods and no prices", async () => {
-	const owner = caller(MAYA, { readCloudUsage: async () => null });
+	const owner = caller(MAYA, {
+		billingOff: true,
+		listRatePerGbHour: async () => 0.06,
+	});
 	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
@@ -526,11 +535,12 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 	);
 });
 
-describe("an organization with no rate of its own", () => {
+describe("the list rate", () => {
 	const LIST_RATE = 0.06;
 
-	test("with no subscription, usage is in dollars at the list rate", async () => {
+	test("prices an organization with no paid plan", async () => {
 		const owner = caller(MAYA, {
+			tier: "free",
 			readCloudUsage: async () => null,
 			listRatePerGbHour: async () => LIST_RATE,
 		});
@@ -540,8 +550,9 @@ describe("an organization with no rate of its own", () => {
 		expect(boots.items.every((boot) => boot.usageUsd !== null)).toBe(true);
 	});
 
-	test("with a billing value but no plan rate, the period and its allowance are at the list rate", async () => {
+	test("prices a free organization's open period and its allowance", async () => {
 		const owner = caller(MAYA, {
+			tier: "free",
 			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: null }),
 			listRatePerGbHour: async () => LIST_RATE,
 		});
@@ -550,59 +561,42 @@ describe("an organization with no rate of its own", () => {
 		expect(open?.allowance).toMatchObject({ usedUsd: 2.04, includedUsd: 1.2 });
 	});
 
-	test("in an Autumn outage, usage is priced from the cached catalog", async () => {
+	test("never prices a paid plan whose own rate could not be read", async () => {
+		const listRatePerGbHour = mock(async () => LIST_RATE);
 		const owner = caller(MAYA, {
-			readCloudUsage: async () => null,
-			listRatePerGbHour: () =>
-				catalogListRate(async () => [
-					{
-						id: "team_seat",
-						name: "Team seat",
-						price: { amount: 60, interval: "month" },
-						items: [{ featureId: "box_gb_minutes", included: 72000 }],
-					},
-					{
-						id: "team",
-						name: "Team",
-						metadata: { self_serve: true, family: "team", display_order: 2 },
-						licenses: [{ licensePlanId: "team_seat" }],
-						items: [
-							{
-								featureId: "box_gb_minutes",
-								price: { amount: 1, interval: "month", billingUnits: 1000 },
-							},
-						],
-					},
-				]),
-		});
-		const usage = await owner.usage.query({ range: NOVEMBER });
-		expect(usage.total.usageUsd).toBe(2.04);
-	});
-
-	test("when the catalog cannot be read either, there is no price, never a wrong one", async () => {
-		const failing = async () => {
-			throw new Error("Autumn is down and nothing is cached");
-		};
-		expect(await catalogListRate(failing)).toBeNull();
-		const owner = caller(MAYA, {
-			readCloudUsage: async () => ({
-				...CLOUD_USAGE,
-				overagePerGbHour: null,
-				bought: null,
-			}),
-			listRatePerGbHour: () => catalogListRate(failing),
+			tier: "pro",
+			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: null }),
+			listRatePerGbHour,
 		});
 		const usage = await owner.usage.query({ range: NOVEMBER });
 		expect(usage.total.usageUsd).toBeNull();
 		const [open] = (await owner.periods.list({})).items;
+		expect(open?.metrics.usageUsd).toBeNull();
 		expect(open?.allowance?.usedUsd).toBeNull();
-		expect(open?.unavailable).toContainEqual({
-			field: "seats",
-			reason: "not_read",
-		});
+		expect(listRatePerGbHour).not.toHaveBeenCalled();
 	});
 
-	test("an organization with its own rate keeps it, and the catalog is not read", async () => {
+	test("never prices an organization whose plan is unknown (billing unreachable, fail-open)", async () => {
+		const owner = caller(MAYA, {
+			tier: "pro",
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => LIST_RATE,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+	});
+
+	test("is no price when the catalog has none", async () => {
+		const owner = caller(MAYA, {
+			tier: "free",
+			readCloudUsage: async () => null,
+			listRatePerGbHour: async () => null,
+		});
+		const usage = await owner.usage.query({ range: NOVEMBER });
+		expect(usage.total.usageUsd).toBeNull();
+	});
+
+	test("does not replace an organization's own rate, and is not read for it", async () => {
 		const listRatePerGbHour = mock(async () => LIST_RATE);
 		const owner = caller(MAYA, {
 			readCloudUsage: async () => ({ ...CLOUD_USAGE, overagePerGbHour: 0.1 }),

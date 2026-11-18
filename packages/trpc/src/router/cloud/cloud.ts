@@ -1,7 +1,8 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
 import {
 	type CloudUsage,
-	catalogAutumnPlans,
+	listRatePerGbHour,
+	type OrganizationBilling,
 	organizationBilling,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
@@ -16,10 +17,6 @@ import {
 	queryCloudUsageByPeriod,
 } from "@superset/db/cloud-usage-query";
 import { organizations } from "@superset/db/schema";
-import {
-	type AutumnCatalogPlan,
-	planCatalogFromAutumn,
-} from "@superset/shared/billing";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -49,26 +46,13 @@ import {
 export interface CloudDeps {
 	db: Parameters<typeof queryCloudUsage>[0] &
 		NonNullable<Parameters<typeof requireActiveOrgRole>[1]>;
-	cloudUsage: (organizationId: string) => Promise<CloudUsage | null>;
-	/** The catalog's price per GB-hour, for an organization with no plan rate; null when it cannot be known. */
+	/** Null when billing is not Autumn. */
+	billing: (
+		organizationId: string,
+	) => Promise<Pick<OrganizationBilling, "tier" | "cloudUsage"> | null>;
+	/** For an organization with no paid plan; null when the price cannot be known. */
 	listRatePerGbHour: () => Promise<number | null>;
 	flags: Parameters<typeof organizationFlagEnabled>[0];
-}
-
-/** The lineup's price per GB-hour, in display order. Null, never a guess, when the catalog cannot be read. */
-export async function catalogListRate(
-	readCatalog: () => Promise<AutumnCatalogPlan[]>,
-): Promise<number | null> {
-	try {
-		return (
-			planCatalogFromAutumn(await readCatalog()).find(
-				(family) => family.overagePerGbHour !== null,
-			)?.overagePerGbHour ?? null
-		);
-	} catch (error) {
-		console.error("[cloud] catalog unavailable; usage has no price", error);
-		return null;
-	}
 }
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -260,9 +244,17 @@ export function cloudRouterWith(deps: CloudDeps) {
 				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
 			});
 		}
-		const cloudUsage = await deps.cloudUsage(organizationId);
+		const billing = await deps.billing(organizationId);
+		const cloudUsage = billing?.cloudUsage ?? null;
+		// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
 		const rate =
-			cloudUsage?.overagePerGbHour ?? (await deps.listRatePerGbHour());
+			cloudUsage?.overagePerGbHour ??
+			(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
+		if (rate === null && cloudUsage && billing?.tier !== "free") {
+			console.warn(
+				`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+			);
+		}
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };
@@ -425,11 +417,17 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 export const cloudRouter = cloudRouterWith({
 	db,
-	cloudUsage: async (organizationId) =>
-		billingUsesAutumn
-			? (await organizationBilling(organizationId)).cloudUsage
-			: null,
+	billing: async (organizationId) =>
+		billingUsesAutumn ? organizationBilling(organizationId) : null,
 	listRatePerGbHour: async () =>
-		billingUsesAutumn ? catalogListRate(catalogAutumnPlans) : null,
+		billingUsesAutumn
+			? listRatePerGbHour().catch((error) => {
+					console.error(
+						"[cloud] catalog unavailable; usage has no price",
+						error,
+					);
+					return null;
+				})
+			: null,
 	flags: posthog,
 });
