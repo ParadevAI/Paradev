@@ -5,9 +5,18 @@ export const Route = createFileRoute(
 	"/_authenticated/_dashboard/chats/$chatId/",
 )({
 	component: ChatPage,
+	validateSearch: (search: Record<string, unknown>): { task?: string } =>
+		typeof search.task === "string" ? { task: search.task } : {},
 });
 
 function ChatPage() {
 	const { chatId } = Route.useParams();
-	return <ChatScreen key={chatId} chatId={chatId} />;
+	const { task } = Route.useSearch();
+	return (
+		<ChatScreen
+			key={`${chatId}:${task ?? ""}`}
+			chatId={chatId}
+			initialTaskId={task}
+		/>
+	);
 }

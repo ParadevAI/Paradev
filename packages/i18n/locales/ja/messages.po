@@ -2539,6 +2539,9 @@ msgstr "{ACCOUNT_DELETION_GRACE_DAYS}日後にすべてのデータが完全に�
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "すべてのデータは{ACCOUNT_DELETION_GRACE_DAYS}日後に完全に削除されます。それまでに再度サインインすればアカウントを復元できます。"
 
+msgid "All open"
+msgstr "未完了すべて"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "開いているターミナルセッションはすべて終了し、実行中のhost-serviceも停止します。次回の起動までサービスを実行し続けたい場合は、「{displayName}を閉じる」を使用してください。"
 
@@ -13125,6 +13128,9 @@ msgstr "メモ"
 msgid "Notes"
 msgstr "ノート"
 
+msgid "Nothing finished yet."
+msgstr "完了したものはまだありません。"
+
 msgid "Nothing here yet."
 msgstr "まだ何もありません。"
 
@@ -13148,6 +13154,9 @@ msgstr "接続するものはありません。単独で動作します。"
 
 msgid "Nothing to do in this chat yet."
 msgstr "このチャットにはまだやることがありません。"
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "やることはありません。任意のチャットのプラスメニューからタスクを追加できます。"
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "まだ開く内容がありません。先にメッセージを送信してください。"

@@ -2539,6 +2539,9 @@ msgstr "Všechna vaše data budou po {ACCOUNT_DELETION_GRACE_DAYS} dnech trvale 
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Všechna vaše data budou po {ACCOUNT_DELETION_GRACE_DAYS} dnech trvale smazána. Do té doby se můžete znovu přihlásit a účet obnovit."
 
+msgid "All open"
+msgstr "Vše otevřené"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Všechny otevřené relace terminálu budou ukončeny a všechny běžící host-services zastaveny. Pokud chcete, aby služby běžely dál do příštího spuštění, použijte místo toho „Zavřít {displayName}“."
 
@@ -13125,6 +13128,9 @@ msgstr "Poznámka"
 msgid "Notes"
 msgstr "Poznámky"
 
+msgid "Nothing finished yet."
+msgstr "Zatím nic dokončeného."
+
 msgid "Nothing here yet."
 msgstr "Zatím tu nic není."
 
@@ -13148,6 +13154,9 @@ msgstr "Není co připojovat: funguje sám."
 
 msgid "Nothing to do in this chat yet."
 msgstr "V tomto chatu zatím není co dělat."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Není co dělat. Přidejte úkol z nabídky plus v kterémkoli chatu."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Zatím není co otevřít. Nejdřív pošlete zprávu."

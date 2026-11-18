@@ -2539,6 +2539,9 @@ msgstr "Toàn bộ dữ liệu của bạn sẽ bị xóa vĩnh viễn sau {ACCO
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Toàn bộ dữ liệu của bạn sẽ bị xóa vĩnh viễn sau {ACCOUNT_DELETION_GRACE_DAYS} ngày. Hãy đăng nhập lại trước thời điểm đó để khôi phục tài khoản."
 
+msgid "All open"
+msgstr "Tất cả đang mở"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Mọi phiên terminal đang mở sẽ bị kết thúc và các host-service đang chạy sẽ bị dừng. Hãy dùng “Đóng {displayName}” nếu bạn muốn các dịch vụ tiếp tục chạy cho lần khởi động sau."
 
@@ -13125,6 +13128,9 @@ msgstr "Lưu ý"
 msgid "Notes"
 msgstr "Ghi chú"
 
+msgid "Nothing finished yet."
+msgstr "Chưa có gì hoàn thành."
+
 msgid "Nothing here yet."
 msgstr "Chưa có gì ở đây."
 
@@ -13148,6 +13154,9 @@ msgstr "Không cần kết nối gì: nó tự hoạt động."
 
 msgid "Nothing to do in this chat yet."
 msgstr "Cuộc trò chuyện này chưa có việc gì cần làm."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Không có việc gì cần làm. Thêm nhiệm vụ từ menu dấu cộng của bất kỳ cuộc trò chuyện nào."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Chưa có gì để mở. Hãy gửi tin nhắn trước."

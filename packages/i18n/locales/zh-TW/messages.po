@@ -2539,6 +2539,9 @@ msgstr "你的所有資料將在{ACCOUNT_DELETION_GRACE_DAYS}天後被永久刪�
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "你的所有資料將在{ACCOUNT_DELETION_GRACE_DAYS}天後被永久刪除。在此之前重新登入即可恢復帳戶。"
 
+msgid "All open"
+msgstr "全部未完成"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "所有開啟的終端會話都會被結束，正在執行的主機服務也會停止。如果希望服務繼續執行以便下次啟動，請改用「關閉{displayName}」。"
 
@@ -13125,6 +13128,9 @@ msgstr "注意"
 msgid "Notes"
 msgstr "筆記"
 
+msgid "Nothing finished yet."
+msgstr "尚無已完成的任務。"
+
 msgid "Nothing here yet."
 msgstr "這裡還沒有內容。"
 
@@ -13148,6 +13154,9 @@ msgstr "不需要連接任何項目：它可以獨立運作。"
 
 msgid "Nothing to do in this chat yet."
 msgstr "此聊天目前沒有待辦事項。"
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "沒有待辦事項。可從任一聊天的加號選單新增任務。"
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "目前沒有可開啟的內容。請先傳送一則訊息。"

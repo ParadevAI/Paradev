@@ -2539,6 +2539,9 @@ msgstr "Alle deine Daten werden nach {ACCOUNT_DELETION_GRACE_DAYS} Tagen endgül
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Alle deine Daten werden nach {ACCOUNT_DELETION_GRACE_DAYS} Tagen endgültig gelöscht. Melde dich vorher wieder an, um dein Konto wiederherzustellen."
 
+msgid "All open"
+msgstr "Alle offenen"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Alle offenen Terminal-Sitzungen werden beendet und laufende Host-Dienste gestoppt. Nutze stattdessen “{displayName} schließen”, wenn die Dienste für den nächsten Start weiterlaufen sollen."
 
@@ -13125,6 +13128,9 @@ msgstr "Hinweis"
 msgid "Notes"
 msgstr "Notizen"
 
+msgid "Nothing finished yet."
+msgstr "Noch nichts erledigt."
+
 msgid "Nothing here yet."
 msgstr "Hier ist noch nichts."
 
@@ -13148,6 +13154,9 @@ msgstr "Nichts zu verbinden: Er funktioniert allein."
 
 msgid "Nothing to do in this chat yet."
 msgstr "In diesem Chat gibt es noch nichts zu tun."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Nichts zu tun. Füge über das Plus-Menü eines Chats eine Aufgabe hinzu."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Noch nichts zum Öffnen. Sende zuerst eine Nachricht."

@@ -2539,6 +2539,9 @@ msgstr "Semua data Anda akan dihapus permanen setelah {ACCOUNT_DELETION_GRACE_DA
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Semua data Anda akan dihapus permanen setelah {ACCOUNT_DELETION_GRACE_DAYS} hari. Masuk lagi sebelum itu untuk memulihkan akun Anda."
 
+msgid "All open"
+msgstr "Semua yang terbuka"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Semua sesi terminal yang terbuka akan dimatikan dan host-service yang berjalan akan dihentikan. Pakai “Close {displayName}” kalau Anda ingin layanannya tetap berjalan untuk peluncuran berikutnya."
 
@@ -13125,6 +13128,9 @@ msgstr "Catatan"
 msgid "Notes"
 msgstr "Catatan"
 
+msgid "Nothing finished yet."
+msgstr "Belum ada yang selesai."
+
 msgid "Nothing here yet."
 msgstr "Belum ada apa-apa di sini."
 
@@ -13148,6 +13154,9 @@ msgstr "Tidak ada yang perlu dihubungkan: ia bekerja sendiri."
 
 msgid "Nothing to do in this chat yet."
 msgstr "Belum ada yang perlu dikerjakan di chat ini."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Tidak ada yang perlu dikerjakan. Tambahkan tugas dari menu plus di chat mana pun."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Belum ada yang bisa dibuka. Kirim pesan dulu."

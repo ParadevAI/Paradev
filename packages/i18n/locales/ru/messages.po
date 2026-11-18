@@ -2539,6 +2539,9 @@ msgstr "Все ваши данные будут безвозвратно уда�
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Все ваши данные будут безвозвратно удалены через {ACCOUNT_DELETION_GRACE_DAYS} дней. Войдите снова до этого срока, чтобы восстановить аккаунт."
 
+msgid "All open"
+msgstr "Все открытые"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Все открытые сессии терминала будут завершены, а работающие службы хоста остановлены. Если нужно, чтобы службы продолжили работу до следующего запуска, используйте «Закрыть {displayName}»."
 
@@ -13125,6 +13128,9 @@ msgstr "Примечание"
 msgid "Notes"
 msgstr "Заметки"
 
+msgid "Nothing finished yet."
+msgstr "Пока ничего не завершено."
+
 msgid "Nothing here yet."
 msgstr "Здесь пока пусто."
 
@@ -13148,6 +13154,9 @@ msgstr "Подключать нечего: он работает сам."
 
 msgid "Nothing to do in this chat yet."
 msgstr "В этом чате пока нечего делать."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Делать нечего. Добавьте задачу из меню «плюс» в любом чате."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Пока нечего открывать. Сначала отправьте сообщение."

@@ -2539,6 +2539,9 @@ msgstr "모든 데이터가 {ACCOUNT_DELETION_GRACE_DAYS}일 후에 영구적으
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "모든 데이터가 {ACCOUNT_DELETION_GRACE_DAYS}일 후에 영구적으로 삭제됩니다. 그 전에 다시 로그인하면 계정이 복원됩니다."
 
+msgid "All open"
+msgstr "열린 작업 전체"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "열려 있는 모든 터미널 세션이 종료되고 실행 중인 호스트 서비스가 모두 중지됩니다. 다음 실행까지 서비스를 계속 실행하려면 “{displayName} 닫기”를 사용하세요."
 
@@ -13125,6 +13128,9 @@ msgstr "참고"
 msgid "Notes"
 msgstr "노트"
 
+msgid "Nothing finished yet."
+msgstr "아직 완료된 작업이 없습니다."
+
 msgid "Nothing here yet."
 msgstr "아직 아무것도 없습니다."
 
@@ -13148,6 +13154,9 @@ msgstr "연결할 것이 없습니다. 단독으로 작동합니다."
 
 msgid "Nothing to do in this chat yet."
 msgstr "이 채팅에는 아직 할 일이 없습니다."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "할 일이 없습니다. 아무 채팅의 더하기 메뉴에서 작업을 추가하세요."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "아직 열 내용이 없습니다. 먼저 메시지를 보내세요."

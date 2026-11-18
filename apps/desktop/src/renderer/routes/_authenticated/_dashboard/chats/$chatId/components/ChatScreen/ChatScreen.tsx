@@ -58,14 +58,22 @@ const HIGHLIGHT_MS = 1600;
 const TASK_TITLE_MAX = 120;
 
 /** One chat: its header pill, the conversation, the composer, and the details beside it. */
-export function ChatScreen({ chatId }: { chatId: string }) {
+interface ChatScreenProps {
+	chatId: string;
+	/** The task whose panel is open when the chat opens. */
+	initialTaskId?: string;
+}
+
+export function ChatScreen({ chatId, initialTaskId }: ChatScreenProps) {
 	const { t } = useLingui();
 	const chats = useChats();
 	const now = useNow(NOW_TICK_MS);
 	const { copyToClipboard } = useCopyToClipboard();
 	const [replyTo, setReplyTo] = useState<Message | null>(null);
 	const [editing, setEditing] = useState<Message | null>(null);
-	const [panel, setPanel] = useState<Panel | null>(null);
+	const [panel, setPanel] = useState<Panel | null>(
+		initialTaskId ? { kind: "task", id: initialTaskId } : null,
+	);
 	const [showsPlugins, setShowsPlugins] = useState(false);
 	const [newTask, setNewTask] = useState<{
 		title: string;

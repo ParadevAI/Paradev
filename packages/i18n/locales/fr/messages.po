@@ -2539,6 +2539,9 @@ msgstr "Toutes vos données seront définitivement supprimées après {ACCOUNT_D
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Toutes vos données seront définitivement supprimées après {ACCOUNT_DELETION_GRACE_DAYS} jours. Reconnectez-vous avant cette échéance pour restaurer votre compte."
 
+msgid "All open"
+msgstr "Toutes les ouvertes"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Toutes les sessions de terminal ouvertes seront interrompues et les services hôtes en cours seront arrêtés. Utilisez plutôt « Fermer {displayName} » si vous voulez que les services continuent de tourner pour le prochain lancement."
 
@@ -13125,6 +13128,9 @@ msgstr "Remarque"
 msgid "Notes"
 msgstr "Notes"
 
+msgid "Nothing finished yet."
+msgstr "Rien de terminé pour le moment."
+
 msgid "Nothing here yet."
 msgstr "Rien pour l'instant."
 
@@ -13148,6 +13154,9 @@ msgstr "Rien à connecter : il fonctionne seul."
 
 msgid "Nothing to do in this chat yet."
 msgstr "Rien à faire dans ce chat pour le moment."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Rien à faire. Ajoutez une tâche depuis le menu plus de n’importe quel chat."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Rien à ouvrir pour l’instant. Envoyez d’abord un message."

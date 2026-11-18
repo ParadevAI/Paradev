@@ -2533,6 +2533,9 @@ msgstr "Усі ваші дані буде остаточно видалено ч
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Усі ваші дані буде остаточно видалено через {ACCOUNT_DELETION_GRACE_DAYS} дн. Увійдіть знову до цього часу, щоб відновити обліковий запис."
 
+msgid "All open"
+msgstr "Усі відкриті"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Усі відкриті сеанси термінала буде завершено, а запущені служби хоста — зупинено. Якщо потрібно, щоб служби працювали до наступного запуску, скористайтеся «Закрити {displayName}»."
 
@@ -13119,6 +13122,9 @@ msgstr "Примітка"
 msgid "Notes"
 msgstr "Нотатки"
 
+msgid "Nothing finished yet."
+msgstr "Поки нічого не завершено."
+
 msgid "Nothing here yet."
 msgstr "Тут поки нічого немає."
 
@@ -13142,6 +13148,9 @@ msgstr "Підключати нічого: він працює сам."
 
 msgid "Nothing to do in this chat yet."
 msgstr "У цьому чаті поки нічого робити."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Робити нічого. Додайте завдання з меню «плюс» у будь-якому чаті."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Поки що нічого відкривати. Спершу надішліть повідомлення."

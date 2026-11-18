@@ -1,8 +1,9 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { chatRows, directDev } from "@superset/chats-core";
 import { workingGroupIds } from "@superset/chats-sync";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
+import { LuSquareCheck } from "react-icons/lu";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useNow } from "renderer/hooks/useNow";
 import { FaceAvatar } from "renderer/routes/_authenticated/_dashboard/components/FaceAvatar";
@@ -79,8 +80,29 @@ export function ChatsSidebar() {
 			/>
 		));
 
+	const openTasks = state.tasks.filter((task) => task.status !== "done").length;
+	const onTasks = Boolean(matchRoute({ to: "/chats/tasks" }));
+
 	return (
 		<>
+			<div className="px-2 pt-1">
+				<button
+					type="button"
+					aria-current={onTasks ? "page" : undefined}
+					onClick={() => void navigate({ to: "/chats/tasks" })}
+					className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-sm hover:bg-fill-hover aria-[current=page]:bg-fill-selected"
+				>
+					<LuSquareCheck className="size-4 text-muted-foreground" />
+					<span className="flex-1 text-left">
+						<Trans>All tasks</Trans>
+					</span>
+					{openTasks > 0 && (
+						<span className="text-muted-foreground text-xs tabular-nums">
+							{openTasks}
+						</span>
+					)}
+				</button>
+			</div>
 			<ChatsSection
 				label={t({ message: "Devs" })}
 				addLabel={t({ message: "New Dev" })}

@@ -2539,6 +2539,9 @@ msgstr "Tüm verileriniz {ACCOUNT_DELETION_GRACE_DAYS} gün sonra kalıcı olara
 msgid "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRACE_DAYS} days. Sign back in before then to restore your account."
 msgstr "Tüm verileriniz {ACCOUNT_DELETION_GRACE_DAYS} gün sonra kalıcı olarak silinecek. Hesabınızı geri yüklemek için o tarihten önce yeniden oturum açın."
 
+msgid "All open"
+msgstr "Tüm açıklar"
+
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close {displayName}” instead if you want services to keep running for the next launch."
 msgstr "Açık tüm terminal oturumları sonlandırılacak ve çalışan host hizmetleri durdurulacak. Hizmetlerin sonraki açılış için çalışmaya devam etmesini istiyorsanız “{displayName}'i kapat” seçeneğini kullanın."
 
@@ -13125,6 +13128,9 @@ msgstr "Not"
 msgid "Notes"
 msgstr "Notlar"
 
+msgid "Nothing finished yet."
+msgstr "Henüz biten bir şey yok."
+
 msgid "Nothing here yet."
 msgstr "Burada henüz bir şey yok."
 
@@ -13148,6 +13154,9 @@ msgstr "Bağlanacak bir şey yok: kendi başına çalışır."
 
 msgid "Nothing to do in this chat yet."
 msgstr "Bu sohbette henüz yapılacak bir şey yok."
+
+msgid "Nothing to do. Add a task from any chat's plus menu."
+msgstr "Yapılacak bir şey yok. Herhangi bir sohbetin artı menüsünden görev ekleyin."
 
 msgid "Nothing to open yet. Send a message first."
 msgstr "Henüz açılacak bir şey yok. Önce bir mesaj gönderin."
