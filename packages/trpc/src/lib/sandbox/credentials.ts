@@ -124,6 +124,21 @@ supports_websockets = false
 supports_standalone_web_search = true
 `;
 
+/** The same fix for an API key: the built-in `openai` provider is reserved, so this is a copy. */
+function codexApiKeyProviderConfig(baseUrl: string | undefined): string {
+	return `model_provider = "openai-api-key"
+
+[model_providers.openai-api-key]
+name = "OpenAI"
+base_url = ${JSON.stringify(baseUrl || "https://api.openai.com/v1")}
+wire_api = "responses"
+env_key = "OPENAI_API_KEY"
+env_http_headers = { "OpenAI-Organization" = "OPENAI_ORGANIZATION", "OpenAI-Project" = "OPENAI_PROJECT" }
+supports_websockets = false
+supports_standalone_web_search = true
+`;
+}
+
 function unsignedJwt(claims: Record<string, unknown>): string {
 	const part = (value: unknown) =>
 		Buffer.from(JSON.stringify(value)).toString("base64url");
@@ -280,7 +295,11 @@ export async function deriveSandboxCredentials(
 	}
 	files.push({
 		path: CODEX_SYSTEM_CONFIG_PATH,
-		content: inputs.codexChatgpt ? CODEX_CHATGPT_PROVIDER_CONFIG : "",
+		content: inputs.codexChatgpt
+			? CODEX_CHATGPT_PROVIDER_CONFIG
+			: signIn.OPENAI_API_KEY
+				? codexApiKeyProviderConfig(signIn.OPENAI_BASE_URL)
+				: "",
 	});
 
 	// GitHub: git speaks Basic with the token as the password, gh and the
