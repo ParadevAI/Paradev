@@ -10,7 +10,7 @@ import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
-	applySandboxPolicy,
+	applyClaimInPlace,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
@@ -205,6 +205,9 @@ function fakeBox(read: "running" | "stopped") {
 		update: async () => {
 			if (box.live !== "running") throw stoppedError();
 		},
+		writeFiles: async () => {
+			if (box.live !== "running") throw stoppedError();
+		},
 		extendTimeout: async () => {
 			if (box.live !== "running") throw stoppedError();
 		},
@@ -274,7 +277,7 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 	let fake = fakeBox("stopped");
 	stub(Sandbox, { get: async () => fake.get() });
 
-	test("reads, stops, deletes, session lists, policy and top-up", async () => {
+	test("reads, stops, deletes, session lists, claim and top-up", async () => {
 		fake = fakeBox("stopped");
 		await describeSandbox("ws-box");
 		await sandboxExists("ws-box");
@@ -282,9 +285,9 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		await listSandboxSessions("ws-box", NOW - HOUR);
 		await findSandboxSession("ws-box", null);
 		expect(
-			await applySandboxPolicy({
+			await applyClaimInPlace({
 				providerSandboxId: "ws-box",
-				networkPolicy: {},
+				claim: { networkPolicy: {}, managedEnv: {}, hostSecret: "s" },
 			}),
 		).toBe("not-running");
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
@@ -292,18 +295,40 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 
-	test("policy and top-up find the box stopped since they read it running", async () => {
+	test("claim and top-up find the box stopped since they read it running", async () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(
-			await applySandboxPolicy({
+			await applyClaimInPlace({
 				providerSandboxId: "ws-box",
-				networkPolicy: {},
+				claim: { networkPolicy: {}, managedEnv: {}, hostSecret: "s" },
 			}),
 		).toBe("not-running");
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+
+	test("a box that stops between the policy and its files is left stopped", async () => {
+		fake = fakeBox("running");
+		const session = (await fake.get()).currentSession();
+		const update = session.update;
+		session.update = async () => {
+			await update();
+			fake.stopNow();
+		};
+		expect(
+			await applyClaimInPlace({
+				providerSandboxId: "ws-box",
+				claim: {
+					networkPolicy: {},
+					files: [{ path: "/a", content: "" }],
+					managedEnv: {},
+					hostSecret: "s",
+				},
+			}),
+		).toBe("not-running");
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 });

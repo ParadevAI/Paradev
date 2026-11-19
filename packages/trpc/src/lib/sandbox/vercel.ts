@@ -285,7 +285,7 @@ async function writeIdentity(
  * started there. They hold placeholders only.
  */
 async function writeSignInFiles(
-	sandbox: Sandbox,
+	sandbox: Pick<Sandbox, "writeFiles">,
 	files: SandboxFile[] = [],
 ): Promise<void> {
 	if (files.length === 0) return;
@@ -491,20 +491,29 @@ export async function pushManagedEnv(
 }
 
 /**
- * Re-applies the credential rules to a running box: the GitHub token in them
- * lasts an hour (a user token eight), so a box nobody reopens asks for this
- * before it expires. Wakes nothing; a stopped box gets fresh rules on wake.
+ * Hands a running box its current rules, login files and managed environment,
+ * waking nothing. A box that stops part way through is left stopped.
  */
-export async function applySandboxPolicy(args: {
+export async function applyClaimInPlace(args: {
 	providerSandboxId: string;
-	networkPolicy: NetworkPolicy;
+	claim: Pick<
+		SandboxClaim,
+		"networkPolicy" | "files" | "managedEnv" | "hostSecret"
+	>;
 }): Promise<"applied" | "not-running"> {
 	const sandbox = await getSandbox(args.providerSandboxId);
 	if (sandbox?.status !== "running") return "not-running";
 	try {
-		await sandbox.update({ networkPolicy: args.networkPolicy });
+		await sandbox.update({ networkPolicy: args.claim.networkPolicy });
+		await writeSignInFiles(sandbox.currentSession(), args.claim.files);
+		await pushManagedEnv(
+			sandbox.domain(HOST_SERVICE_PORT),
+			args.claim.hostSecret,
+			args.claim.managedEnv,
+		);
 	} catch (error) {
-		if (isSessionStopped(error)) return "not-running";
+		const now = await getSandbox(args.providerSandboxId);
+		if (now?.status !== "running") return "not-running";
 		throw error;
 	}
 	return "applied";

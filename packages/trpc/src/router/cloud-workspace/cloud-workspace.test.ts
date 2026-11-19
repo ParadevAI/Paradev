@@ -151,6 +151,7 @@ stub(wake, {
 		if (!running) return null;
 		return {
 			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
 			agentCredentialsChanged: false,
 		};
 	},
@@ -159,6 +160,7 @@ stub(wake, {
 		boxVcpus = 16;
 		return {
 			hostTarget: "https://box-1.example",
+			agentsToRestart: [],
 			agentCredentialsChanged: false,
 		};
 	},

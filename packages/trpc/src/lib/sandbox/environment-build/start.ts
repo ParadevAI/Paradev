@@ -167,7 +167,7 @@ export async function startEnvironmentBuild(args: {
 	const hooks = await readRepoHooks({
 		repo: primary,
 		branch: primary.defaultBranch,
-		token: await installationTokenFor(repositories),
+		token: (await installationTokenFor(repositories))?.token ?? null,
 	});
 	if (!hooks?.install) {
 		throw new BuildRefused(
