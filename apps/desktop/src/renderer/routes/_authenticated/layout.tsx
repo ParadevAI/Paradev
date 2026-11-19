@@ -11,6 +11,7 @@ import {
 	Outlet,
 	useLocation,
 	useNavigate,
+	useRouter,
 	useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -26,7 +27,9 @@ import { useSignOut } from "renderer/hooks/useSignOut";
 import { authClient, getAuthToken } from "renderer/lib/auth-client";
 import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
 import { DiffThemeSync } from "renderer/routes/_authenticated/components/DiffThemeSync";
@@ -104,6 +107,7 @@ function AuthenticatedLayout() {
 	const hasLocalToken = !!getAuthToken();
 	const isOnline = useOnlineStatus();
 	const navigate = useNavigate();
+	const router = useRouter();
 	const location = useLocation();
 	// The onboarding gate below must key off the route being RENDERED, not
 	// `useLocation()`. `location` is the pending navigation, so the instant the
@@ -148,16 +152,20 @@ function AuthenticatedLayout() {
 				event.type === NOTIFICATION_EVENTS.FOCUS_NOTIFICATION_SOURCE &&
 				event.data
 			) {
-				localStorage.setItem("lastViewedWorkspaceId", event.data.workspaceId);
-				const source = event.data.source;
-				void navigate({
-					to: "/workspace/$workspaceId",
-					params: { workspaceId: event.data.workspaceId },
-					search: {
-						terminalId: source.id,
-						focusRequestId: crypto.randomUUID(),
+				const { workspaceId, source } = event.data;
+				void navigateToWorkspaceAndThen(
+					workspaceId,
+					router,
+					() => {
+						localStorage.setItem("lastViewedWorkspaceId", workspaceId);
 					},
-				});
+					{
+						search: {
+							terminalId: source.id,
+							focusRequestId: crypto.randomUUID(),
+						},
+					},
+				).catch(reportRendererError);
 			}
 		},
 	});

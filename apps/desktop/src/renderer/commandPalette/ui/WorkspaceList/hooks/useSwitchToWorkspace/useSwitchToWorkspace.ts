@@ -1,7 +1,8 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { track } from "renderer/lib/analytics";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
+import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useFrameStackStore } from "../../../../core/frames";
 import type { SwitcherRow } from "../../utils/bucketWorkspaces";
@@ -14,7 +15,7 @@ export interface SwitchDetails {
 }
 
 export function useSwitchToWorkspace(via: SwitchedVia) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const setOpen = useFrameStackStore((s) => s.setOpen);
 	return useCallback(
 		(
@@ -24,14 +25,15 @@ export function useSwitchToWorkspace(via: SwitchedVia) {
 		) => {
 			setOpen(false);
 			if (row.isCurrent) return;
-			track("workspace_switched", {
-				via,
-				bucket: row.bucket,
-				index,
-				...details,
-			});
-			void navigateToWorkspace(row.workspace.id, navigate);
+			void navigateToWorkspaceAndThen(row.workspace.id, router, () => {
+				track("workspace_switched", {
+					via,
+					bucket: row.bucket,
+					index,
+					...details,
+				});
+			}).catch(reportRendererError);
 		},
-		[via, setOpen, navigate],
+		[via, setOpen, router],
 	);
 }

@@ -3,9 +3,12 @@ import {
 	type AgentIdentityId,
 } from "@superset/shared/agent-catalog";
 import type {
+	AnyRouter,
+	HistoryLocation,
 	NavigateOptions,
 	UseNavigateResult,
 } from "@tanstack/react-router";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 
 /**
  * Deep link into a subagent's transcript pane. The sidebar cannot reach a
@@ -82,15 +85,17 @@ export interface WorkspaceSearchParams extends SubagentLinkSearchParams {
 	openUrlRequestId?: string;
 }
 
-/**
- * Navigate to a workspace route.
- */
+type WorkspaceNavigationOptions = Omit<
+	NavigateOptions,
+	"to" | "params" | "search"
+> & {
+	search?: WorkspaceSearchParams;
+};
+
 export function navigateToWorkspace(
 	workspaceId: string,
 	navigate: UseNavigateResult<string>,
-	options?: Omit<NavigateOptions, "to" | "params" | "search"> & {
-		search?: WorkspaceSearchParams;
-	},
+	options?: WorkspaceNavigationOptions,
 ): Promise<void> {
 	const { search, ...rest } = options ?? {};
 	return navigate({
@@ -98,5 +103,57 @@ export function navigateToWorkspace(
 		params: { workspaceId },
 		search: search ?? {},
 		...rest,
+	});
+}
+
+export async function navigateToWorkspaceAndThen(
+	workspaceId: string,
+	router: AnyRouter,
+	afterNavigate: () => void | Promise<void>,
+	options?: WorkspaceNavigationOptions,
+): Promise<void> {
+	const destination = router
+		.buildLocation({
+			to: "/workspace/$workspaceId",
+			params: { workspaceId },
+		})
+		.pathname.replace(/\/$/, "");
+	let cancelled = false;
+	const unsubscribe = router.history.subscribe(
+		({ location }: { location: HistoryLocation }) => {
+			if (location.pathname.replace(/\/$/, "") !== destination) {
+				cancelled = true;
+				unsubscribe();
+			}
+		},
+	);
+	try {
+		await navigateToWorkspace(workspaceId, router.navigate, options);
+	} catch (error) {
+		unsubscribe();
+		throw error;
+	}
+	const isCurrent = () =>
+		!cancelled &&
+		!router.state.isLoading &&
+		router.state.matches.every((match) => match.status === "success") &&
+		router.state.matches.some(
+			(match) =>
+				"workspaceId" in match.params &&
+				match.params.workspaceId === workspaceId,
+		);
+	if (!isCurrent()) {
+		unsubscribe();
+		return;
+	}
+	requestAnimationFrame(() => {
+		setTimeout(() => {
+			void Promise.resolve()
+				.then(() => {
+					unsubscribe();
+					if (isCurrent()) return afterNavigate();
+				})
+				.catch(reportRendererError);
+		}, 0);
 	});
 }

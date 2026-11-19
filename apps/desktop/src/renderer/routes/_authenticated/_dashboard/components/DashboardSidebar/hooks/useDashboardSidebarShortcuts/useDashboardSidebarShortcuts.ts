@@ -1,9 +1,10 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { useCallback, useMemo, useRef } from "react";
 import { useMatchRoute } from "renderer/hooks/useMatchRoute";
 import { useHotkey } from "renderer/hotkeys";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useDeletingWorkspacesStore } from "renderer/routes/_authenticated/_dashboard/stores/deletingWorkspacesStore";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useSidebarSectionsCollapseStore } from "renderer/stores/sidebar-sections-collapse";
 import type {
@@ -75,7 +76,7 @@ export function useDashboardSidebarShortcuts(
 		pinnedWorkspaces = [],
 	}: UseDashboardSidebarShortcutsOptions = {},
 ) {
-	const navigate = useNavigate();
+	const router = useRouter();
 	const { toggleProjectCollapsed, toggleSectionCollapsed } =
 		useDashboardSidebarState();
 	const deletingIds = useDeletingWorkspacesStore((state) => state.deletingIds);
@@ -176,11 +177,12 @@ export function useDashboardSidebarShortcuts(
 		(index: number) => {
 			const workspace = flattenedWorkspaces[index];
 			if (workspace) {
-				if (revealCollapsed) revealWorkspace(workspace.id);
-				navigateToWorkspace(workspace.id, navigate);
+				void navigateToWorkspaceAndThen(workspace.id, router, () => {
+					if (revealCollapsed) revealWorkspace(workspace.id);
+				}).catch(reportRendererError);
 			}
 		},
-		[flattenedWorkspaces, navigate, revealCollapsed, revealWorkspace],
+		[flattenedWorkspaces, router, revealCollapsed, revealWorkspace],
 	);
 
 	useHotkey("JUMP_TO_WORKSPACE_1", () => switchToWorkspace(0));
@@ -208,8 +210,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const prevIndex = index <= 0 ? navigationWorkspaces.length - 1 : index - 1;
 		const target = navigationWorkspaces[prevIndex];
-		revealWorkspace(target.id);
-		navigateToWorkspace(target.id, navigate);
+		void navigateToWorkspaceAndThen(target.id, router, () =>
+			revealWorkspace(target.id),
+		).catch(reportRendererError);
 	});
 
 	useHotkey("NEXT_WORKSPACE", () => {
@@ -219,8 +222,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const nextIndex = index >= navigationWorkspaces.length - 1 ? 0 : index + 1;
 		const target = navigationWorkspaces[nextIndex];
-		revealWorkspace(target.id);
-		navigateToWorkspace(target.id, navigate);
+		void navigateToWorkspaceAndThen(target.id, router, () =>
+			revealWorkspace(target.id),
+		).catch(reportRendererError);
 	});
 
 	return workspaceShortcutLabels;
