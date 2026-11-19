@@ -16,7 +16,6 @@
 import type { IncomingMessage } from "node:http";
 import type { Duplex } from "node:stream";
 import * as Sentry from "@sentry/node";
-import { errorType, logBoxEvent } from "./sentry";
 
 let safetyNetInstalled = false;
 
@@ -57,20 +56,10 @@ export function installProcessSafetyNet(): void {
 			origin,
 			error,
 		});
-		logBoxEvent(
-			"host.uncaught",
-			{ origin, "error.type": errorType(error) },
-			"error",
-		);
 	});
 
 	process.on("unhandledRejection", (reason) => {
 		console.error("[host-service] unhandledRejection — staying up", { reason });
-		logBoxEvent(
-			"host.uncaught",
-			{ origin: "unhandledRejection", "error.type": errorType(reason) },
-			"error",
-		);
 		Sentry.captureException(reason);
 	});
 }

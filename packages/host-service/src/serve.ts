@@ -25,12 +25,7 @@ import { startVitalsLog } from "./runtime/vitals";
 import { detachFromLaunchDirectory } from "./runtime/working-directory";
 import { installProcessSafetyNet, installUpgradeSocketGuard } from "./safety";
 import { configureSelfUpdater } from "./self-update";
-import {
-	captureFatalStartupError,
-	errorType,
-	initSentry,
-	logBoxEvent,
-} from "./sentry";
+import { captureFatalStartupError, initSentry } from "./sentry";
 import { startTerminalBaseEnvResolution } from "./terminal/env";
 import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay, type TunnelClient } from "./tunnel";
@@ -171,7 +166,6 @@ async function main(): Promise<void> {
 			: info.address;
 		console.log(`[host-service] listening on http://${address}:${info.port}`);
 		recordBootStamp("host.listening");
-		logBoxEvent("host.started", { ms: Math.round(process.uptime() * 1000) });
 
 		startTerminalReaper(db);
 		startVitalsLog();
@@ -265,7 +259,6 @@ async function main(): Promise<void> {
 
 void main().catch(async (error) => {
 	console.error("[host-service] Failed to start:", error);
-	logBoxEvent("host.start_failed", { "error.type": errorType(error) }, "error");
 	await captureFatalStartupError(error);
 	process.exit(1);
 });

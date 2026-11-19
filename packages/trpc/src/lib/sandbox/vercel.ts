@@ -399,7 +399,7 @@ export class SandboxNotReadyError extends Error {
 	}
 }
 
-async function readBootStamps(name: string): Promise<BootStamp[] | null> {
+async function readBoxBootStamps(name: string): Promise<BootStamp[] | null> {
 	const sandbox = await getSandbox(name);
 	const log = await sandbox
 		?.currentSession()
@@ -430,7 +430,7 @@ async function waitForHostService(
 	}
 	throw new SandboxNotReadyError(
 		providerSandboxId,
-		await readBootStamps(providerSandboxId).catch(() => null),
+		await readBoxBootStamps(providerSandboxId).catch(() => null),
 	);
 }
 

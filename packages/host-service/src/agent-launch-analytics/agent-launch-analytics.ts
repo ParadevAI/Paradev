@@ -14,7 +14,6 @@ import {
 import { harnessBinary } from "../chat-v3/acpCatalogue";
 import { findOnPath, isExecutableFile } from "../chat-v3/agentCli";
 import type { HostDb } from "../db";
-import { logBoxEvent } from "../sentry";
 import { getTerminalBaseEnv } from "../terminal/env";
 import {
 	agentLaunchEnv,
@@ -191,12 +190,6 @@ export function trackAgentLaunched(
 				launchPathEnv(launch.env),
 				getBinDir(),
 			),
-		});
-		logBoxEvent("agent.started", {
-			"agent.id": properties.agent_id,
-			"agent.session_kind": properties.session_kind,
-			"agent.resumed": properties.resumed,
-			"agent.command_found": properties.command_found,
 		});
 		void api.analytics.captureEvent
 			.mutate({

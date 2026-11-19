@@ -1,5 +1,7 @@
 import * as Sentry from "@sentry/node";
+import type { BuiltinAgentId } from "@superset/shared/agent-catalog";
 import { createSentryEventThrottle } from "@superset/shared/sentry-throttle";
+import type { TerminalAgentEndReason } from "./terminal-agents/types";
 
 let initialized = false;
 
@@ -40,26 +42,25 @@ export function initSentry(options: { organizationId?: string }): void {
 	initialized = true;
 }
 
-type BoxEvent =
-	| "host.started"
-	| "host.start_failed"
-	| "host.uncaught"
-	| "agent.started"
-	| "agent.ended"
-	| "box.reaped";
+type BoxAgentId = BuiltinAgentId | "custom";
 
-/** Fixed names and attributes only: Sentry Logs is not a place for customer text. */
-export function logBoxEvent(
-	event: BoxEvent,
-	attributes: Record<string, string | number | boolean>,
-	level: "info" | "warn" | "error" = "info",
-): void {
-	Sentry.logger[level](event, attributes);
+interface BoxEventAttributes {
+	"agent.ended": {
+		"agent.id": BoxAgentId;
+		"agent.end_reason": TerminalAgentEndReason;
+		ms: number;
+	};
+	"box.reaped": { "reap.rss_mb": number; "memory.limit_mb": number };
+	"hook.finished": { "hook.exit": number | NodeJS.Signals; ms: number };
 }
 
-/** The class name only: a message can carry paths and commands. */
-export function errorType(error: unknown): string {
-	return error instanceof Error ? error.name : typeof error;
+/** Typed per event so no free text can reach Sentry Logs. */
+export function logBoxEvent<E extends keyof BoxEventAttributes>(
+	event: E,
+	attributes: BoxEventAttributes[E],
+	level: "info" | "warn" = "info",
+): void {
+	Sentry.logger[level](event, attributes);
 }
 
 /** A file a user attached that the agent did not get. */
