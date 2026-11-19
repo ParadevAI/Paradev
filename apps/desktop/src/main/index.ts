@@ -454,6 +454,17 @@ if (process.env.NODE_ENV === "development") {
 // roughly 128 MB.
 app.commandLine.appendSwitch("disk-cache-size", String(1024 * 1024 * 1024));
 
+// Chromium 152 crashes in soft-navigation paint metrics (Sentry DESKTOP-1F1).
+app.commandLine.appendSwitch(
+	"disable-features",
+	[
+		app.commandLine.getSwitchValue("disable-features"),
+		"SoftNavigationDetection",
+	]
+		.filter(Boolean)
+		.join(","),
+);
+
 protocol.registerSchemesAsPrivileged([
 	{
 		scheme: "superset-icon",
