@@ -88,10 +88,6 @@ export interface CloudUsageFilters {
 	search?: string;
 }
 
-export interface CloudFleetFilters extends CloudUsageFilters {
-	project?: string;
-}
-
 export interface CloudUsageWindow {
 	from: Date;
 	to: Date;
@@ -206,7 +202,7 @@ const sizeOfVcpus = new Map<number, MachineSize>(
 
 function scopeConditions(
 	scope: Scope,
-	filters: CloudFleetFilters,
+	filters: CloudUsageFilters,
 	columns: {
 		user: AnyPgColumn;
 		workspace: AnyPgColumn;
@@ -222,9 +218,6 @@ function scopeConditions(
 				? inArray(columns.workspace, filters.workspace)
 				: eq(columns.workspace, filters.workspace),
 		);
-	}
-	if (filters.project) {
-		conditions.push(eq(workspaces.projectId, filters.project));
 	}
 	if (filters.size) conditions.push(columns.size(filters.size));
 	if (filters.status?.length) {
@@ -323,7 +316,7 @@ const NO_KEY: FactKeys = {
 function usageFacts(
 	db: Db,
 	scope: Scope,
-	filters: CloudFleetFilters,
+	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
 ) {
@@ -562,9 +555,9 @@ async function refsFor(
 	);
 }
 
-interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
+interface CloudUsageOptions<GroupBy> {
 	window: CloudUsageWindow;
-	filters?: Filters;
+	filters?: CloudUsageFilters;
 	groupBy?: GroupBy;
 	/** Default: by day newest first, else by GB-hours, most first. */
 	sort?: CloudUsageSort;
@@ -573,10 +566,9 @@ interface CloudUsageOptions<GroupBy, Filters = CloudUsageFilters> {
 	overagePerGbHour: number | null;
 }
 
-type CloudFleetUsageOptions = CloudUsageOptions<
-	CloudFleetGroupBy,
-	CloudFleetFilters
-> & { refs?: boolean };
+type CloudFleetUsageOptions = CloudUsageOptions<CloudFleetGroupBy> & {
+	refs?: boolean;
+};
 
 /**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
@@ -795,9 +787,9 @@ export async function queryCloudUsageByPeriod(
 	}));
 }
 
-interface CloudBootsOptions<Filters = CloudUsageFilters> {
+interface CloudBootsOptions {
 	window: CloudUsageWindow;
-	filters?: Filters;
+	filters?: CloudUsageFilters;
 	endReason?: CloudWorkspaceBootEndReason[];
 	open?: boolean;
 	limit: number;
@@ -806,8 +798,7 @@ interface CloudBootsOptions<Filters = CloudUsageFilters> {
 	overagePerGbHour: number | null;
 }
 
-interface BootReadOptions
-	extends Omit<CloudBootsOptions<CloudFleetFilters>, "window"> {
+interface BootReadOptions extends Omit<CloudBootsOptions, "window"> {
 	window?: CloudUsageWindow;
 	/** A boot id or a Vercel session id. */
 	boot?: string;
@@ -856,7 +847,6 @@ function bootConditions(scope: Scope, options: BootReadOptions) {
 	);
 }
 
-/** Rows come fetched one past the limit. */
 const selectBootRows = (db: Db) =>
 	db
 		.select(bootColumns)
@@ -866,6 +856,7 @@ const selectBootRows = (db: Db) =>
 
 type BootRow = Awaited<ReturnType<typeof selectBootRows>>[number];
 
+/** `rows` were fetched one past the limit. */
 function bootPage<Row extends BootRow>(rows: Row[], options: BootReadOptions) {
 	const { limit, now, overagePerGbHour } = options;
 	const page = rows.slice(0, limit);
@@ -947,7 +938,7 @@ export type CloudFleetBootsResult = Awaited<ReturnType<typeof fleetBoots>>;
 export function listFleetCloudBoots(
 	db: Db,
 	organizationId: string | string[] | null,
-	options: CloudBootsOptions<CloudFleetFilters>,
+	options: CloudBootsOptions,
 ) {
 	return fleetBoots(db, { organizationId }, options);
 }

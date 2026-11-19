@@ -472,42 +472,12 @@ describe("fleet scope", () => {
 		).toBe(2);
 	});
 
-	test("a list of organizations, and the project filter", async () => {
+	test("a list of organizations", async () => {
 		expect((await fleet({}, [ORG, OTHER_ORG])).total).toEqual(
 			(await fleet({})).total,
 		);
 		expect((await fleet({}, [OTHER_ORG])).total.boots).toBe(1);
 		expect((await fleet({}, [])).total.boots).toBe(0);
-		const [project] = await db
-			.insert(taskProjects)
-			.values({ organizationId: ORG, name: "Checkout revamp" })
-			.returning();
-		if (!project) throw new Error("no project");
-		await db
-			.update(cloudWorkspaces)
-			.set({ projectId: project.id })
-			.where(eq(cloudWorkspaces.id, CHECKOUT));
-		try {
-			const inProject = await fleet({ filters: { project: project.id } });
-			expect(inProject.total).toMatchObject({ boots: 3, workspaces: 1 });
-			const listed = await listFleetCloudBoots(db, null, {
-				window: NOVEMBER,
-				filters: { project: project.id },
-				limit: 25,
-				now: NOW,
-				overagePerGbHour: RATE,
-			});
-			expect(listed.items.map((boot) => boot.id)).toEqual([
-				"boot_6",
-				"boot_2",
-				"boot_1",
-			]);
-		} finally {
-			await db
-				.update(cloudWorkspaces)
-				.set({ projectId: null })
-				.where(eq(cloudWorkspaces.id, CHECKOUT));
-		}
 	});
 
 	test("one boot by id or session id, with its organization", async () => {
