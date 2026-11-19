@@ -1,9 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import {
-	allowanceOf,
-	cloudUsageDisplay,
-} from "@superset/shared/cloud-usage-display";
-import { cloudUsageFromBalances } from "./cloud-usage";
+import { cloudUsageDisplay } from "@superset/shared/cloud-usage-display";
+import { allowanceOf, cloudUsageFromBalances } from "./cloud-usage";
 import SANDBOX from "./cloud-usage.sandbox.json";
 
 /**

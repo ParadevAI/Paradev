@@ -1,50 +1,31 @@
 "use client";
 
-import {
-	allowanceOf,
-	type BillingCloudUsage,
-} from "@superset/shared/cloud-usage-display";
 import type { ReactNode } from "react";
+import type { CloudPeriod } from "../../types";
 import { priced } from "../../utils/priced";
 import { AllowanceCard } from "../AllowanceCard";
 
 interface BillingUsageCardProps {
-	/** `billing.cloudUsage`: null for a member, who sees no cloud card. */
-	usage:
-		| (BillingCloudUsage & {
-				resetsAt: string | null;
-				overagePerGbHour: number | null;
-		  })
-		| null
-		| undefined;
-	/** The link to the cloud usage page, when the organization has it. */
+	/** The open period from `cloud.periods.list`; it has no allowance for a member. */
+	period: CloudPeriod | undefined;
+	/** The link to the cloud usage page. */
 	link: ReactNode;
 }
 
-/** The cloud usage page's allowance card, on Billing settings. */
-export function BillingUsageCard({ usage, link }: BillingUsageCardProps) {
-	if (
-		!usage?.resetsAt ||
-		(!usage.includedGbMinutes &&
-			!usage.usedGbMinutes &&
-			!usage.prepaidGbMinutes)
-	) {
-		return null;
-	}
-	const { allowance, unavailable } = allowanceOf(
-		usage,
-		new Date(usage.resetsAt),
-		usage.overagePerGbHour,
-	);
-	const shown = priced(allowance);
-	if (!shown) return null;
+/** The cloud usage page's card on Billing settings, from the same period. */
+export function BillingUsageCard({ period, link }: BillingUsageCardProps) {
+	const allowance = priced(period?.allowance ?? null);
+	if (!period || !allowance || period.metrics.usageUsd === null) return null;
 	return (
 		<AllowanceCard
-			metered={{ gbHours: shown.usedGbHours, usd: shown.usedUsd }}
-			allowance={shown}
-			unavailable={unavailable}
+			metered={{
+				gbHours: period.metrics.gbHours,
+				usd: period.metrics.usageUsd,
+			}}
+			allowance={allowance}
+			unavailable={period.unavailable}
 			isPeriod
-			seats={shown.seats}
+			seats={allowance.seats}
 			billing={link}
 		/>
 	);

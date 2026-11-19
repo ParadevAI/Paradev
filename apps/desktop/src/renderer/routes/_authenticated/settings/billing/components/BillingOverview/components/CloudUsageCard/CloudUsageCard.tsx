@@ -21,20 +21,22 @@ export function CloudUsageCard({
 	const utils = cloudTrpc.useUtils();
 	const { data: usage } = cloudTrpc.billing.cloudUsage.useQuery(undefined);
 	const showUsageLink = useCloudUsageEnabled();
+	const { data: periods } = cloudTrpc.cloud.periods.list.useQuery(
+		{ limit: 1 },
+		{ enabled: showUsageLink },
+	);
 	if (!usage) return null;
 
 	return (
 		<div className="space-y-3">
 			<BillingUsageCard
-				usage={usage}
+				period={periods?.items[0]}
 				link={
-					showUsageLink && (
-						<PageLink>
-							<Link to="/settings/cloud-usage">
-								<Trans>Cloud usage</Trans>
-							</Link>
-						</PageLink>
-					)
+					<PageLink>
+						<Link to="/settings/cloud-usage">
+							<Trans>Cloud usage</Trans>
+						</Link>
+					</PageLink>
 				}
 			/>
 			{canBuy && usage.pack && organizationId && (
