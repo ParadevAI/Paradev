@@ -18,6 +18,15 @@ const guard = (n: string) => {
 	return n;
 };
 const t0 = () => performance.now();
+// Production's swap rules: the box only ever holds the placeholder, the egress firewall puts the key in.
+const PLACEHOLDER = "proxy-injected-see-network-routing";
+function keyPolicy(): any {
+	if (!rest.includes("--keys")) return undefined;
+	const a = process.env.SERVER_ANTHROPIC_API_KEY, o = process.env.SERVER_OPENAI_API_KEY;
+	if (!a || !o) throw new Error("--keys needs both server keys in the env");
+	const swap = (header: string, placeholder: string, value: string) => [{ match: { headers: [{ key: { exact: header }, value: { exact: placeholder } }] }, transform: [{ headers: { [header]: value } }] }];
+	return { allow: { "api.anthropic.com": swap("x-api-key", PLACEHOLDER, a), "api.openai.com": swap("authorization", `Bearer ${PLACEHOLDER}`, `Bearer ${o}`), "*": [] } };
+}
 const ms = (s: number) => Math.round(performance.now() - s);
 
 async function mountsFor(): Promise<Record<string, any> | undefined> {
@@ -125,12 +134,12 @@ async function main() {
 				box = flag("fork") ? await Sandbox.fork({
 					...creds, name, sourceSandbox: flag("fork")!, timeout: 45 * 60_000, persistent: flag("persistent", "false") === "true",
 					snapshotExpiration: 2 * 86400_000, keepLastSnapshots: { count: 1 }, ports: [4879], resources: { vcpus: Number(flag("vcpus", "8")) },
-					...(mounts ? { mounts } : {}), tags: { spike: "overlay-root" },
+					...(mounts ? { mounts } : {}), tags: { spike: "overlay-root" }, ...(keyPolicy() ? { networkPolicy: keyPolicy() } : {}),
 				} as any) : await Sandbox.create({
 					...creds, name, region: flag("region", "sfo1"), source: { type: "snapshot", snapshotId: flag("snapshot", "snap_GOHUP7OzoEKe6IhFA81vVcSCCmsp")! },
 					timeout: 45 * 60_000, persistent: flag("persistent", "false") === "true", snapshotExpiration: 2 * 86400_000,
 					keepLastSnapshots: { count: 1 }, ports: [4879], resources: { vcpus: Number(flag("vcpus", "8")) },
-					...(mounts ? { mounts } : {}), tags: { spike: "overlay-root" },
+					...(mounts ? { mounts } : {}), tags: { spike: "overlay-root" }, ...(keyPolicy() ? { networkPolicy: keyPolicy() } : {}),
 				} as any);
 				mark("provider.create");
 			} else {
