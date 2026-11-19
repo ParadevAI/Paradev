@@ -2,6 +2,7 @@ import { Trans } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
+import { useEffect, useRef } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { EnvironmentBuildsTable } from "./components/EnvironmentBuildsTable";
 
@@ -29,6 +30,11 @@ export function EnvironmentBuilds({ environmentId }: EnvironmentBuildsProps) {
 	});
 	const rows = builds.data?.builds ?? [];
 	const running = rows.some((build) => build.status === "running");
+	const wasRunning = useRef(running);
+	useEffect(() => {
+		if (wasRunning.current && !running) void utils.environment.invalidate();
+		wasRunning.current = running;
+	}, [running, utils]);
 
 	return (
 		<div>

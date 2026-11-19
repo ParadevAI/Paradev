@@ -222,7 +222,7 @@ export function PickRepositoriesStep({
 					)}
 				</div>
 			)}
-			{isLastStep && <SetupAgentNote />}
+			{isLastStep && !editing && <SetupAgentNote />}
 			<DialogFooter className="items-center border-t border-border/70 bg-muted/20 px-5 py-3">
 				<span className="flex-1 text-xs text-muted-foreground">
 					{selected.length === 0 ? (
