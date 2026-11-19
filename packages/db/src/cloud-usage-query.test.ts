@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { eq } from "drizzle-orm";
+import { eq, gte } from "drizzle-orm";
 import {
 	BEN,
 	BILLING_PAGE,
@@ -26,6 +26,7 @@ import {
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
 	queryFleetCloudUsage,
+	queryFleetCloudUsageByWorkspaceDay,
 } from "./cloud-usage-query";
 import {
 	cloudUsageEvents,
@@ -616,5 +617,220 @@ describe("fleet scope", () => {
 			{ window: NOVEMBER, limit: 25, now: NOW, overagePerGbHour: RATE },
 		);
 		expect(others.items.map((boot) => boot.id)).toEqual(["boot_5"]);
+	});
+});
+
+describe("queryFleetCloudUsageByWorkspaceDay", () => {
+	const YEAR = {
+		from: new Date("2026-03-01T00:00:00Z"),
+		to: new Date("2027-01-01T00:00:00Z"),
+	};
+	const eventAt = (
+		lockSeq: number,
+		cloudWorkspaceId: string | null,
+		sentAt: string,
+	) => ({
+		bootId: "boot_1",
+		lockSeq,
+		feature: "box_gb_minutes" as const,
+		organizationId: ORG,
+		cloudWorkspaceId,
+		userId: MAYA,
+		windowFrom: new Date(sentAt),
+		windowTo: new Date(sentAt),
+		amount: "60",
+		sentAt: new Date(sentAt),
+	});
+
+	const pacificHour = new Intl.DateTimeFormat("en-US", {
+		timeZone: "America/Los_Angeles",
+		hour: "numeric",
+		hourCycle: "h23",
+	});
+	const pacificMidnight = (date: string) => {
+		const at = ["07", "08"]
+			.map((hour) => new Date(`${date}T${hour}:00:00Z`))
+			.find((candidate) => Number(pacificHour.format(candidate)) === 0);
+		if (!at) throw new Error(`No Pacific midnight on ${date}`);
+		return at;
+	};
+	const nextDate = (date: string) =>
+		new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000)
+			.toISOString()
+			.slice(0, 10);
+
+	const round = (value: number) => Math.round(value * 1e6) / 1e6;
+	const brief = (row: {
+		boots: number;
+		failedBoots: number;
+		hours: number;
+		gbHours: number;
+	}) => [row.boots, row.failedBoots, round(row.hours), round(row.gbHours)];
+	const byWorkspace = async (window = YEAR, filters = {}) =>
+		(
+			await queryFleetCloudUsage(db, ORG, {
+				window,
+				filters,
+				groupBy: "workspace",
+				limit: 100,
+				overagePerGbHour: null,
+				refs: false,
+			})
+		).items
+			.map((item) => [item.key, ...brief(item)])
+			.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+
+	const seedEdges = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				eventAt(21, CHECKOUT, "2026-03-08T07:59:00Z"),
+				eventAt(22, CHECKOUT, "2026-03-08T08:00:00Z"),
+				eventAt(23, CHECKOUT, "2026-03-09T06:59:00Z"),
+				eventAt(24, BILLING_PAGE, "2026-03-09T07:00:00Z"),
+				eventAt(25, BILLING_PAGE, "2026-07-15T07:30:00Z"),
+				eventAt(26, BILLING_PAGE, "2026-12-15T07:30:00Z"),
+				eventAt(27, null, "2026-12-15T08:00:00Z"),
+			]);
+	const dropEdges = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 21));
+
+	test("a billing day starts at 07:00 UTC in summer and 08:00 UTC in winter", async () => {
+		await db
+			.insert(cloudUsageEvents)
+			.values([
+				eventAt(31, CHECKOUT, "2026-07-15T06:59:59Z"),
+				eventAt(32, CHECKOUT, "2026-07-15T07:00:00Z"),
+				eventAt(33, CHECKOUT, "2026-11-15T07:59:59Z"),
+				eventAt(34, CHECKOUT, "2026-11-15T08:00:00Z"),
+			]);
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+				filters: { workspace: CHECKOUT },
+			});
+			const gbHoursOn = (day: string) =>
+				rows.find((row) => row.day === day)?.gbHours;
+			expect(gbHoursOn("2026-07-14")).toBe(1);
+			expect(gbHoursOn("2026-07-15")).toBe(1);
+			expect(gbHoursOn("2026-11-14")).toBe(1);
+			expect(gbHoursOn("2026-11-15")).toBe(1);
+		} finally {
+			await db
+				.delete(cloudUsageEvents)
+				.where(gte(cloudUsageEvents.lockSeq, 31));
+		}
+	});
+
+	test("rows by day add up to the workspace totals, and each day matches its Pacific day", async () => {
+		await seedEdges();
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+			});
+			const days = [...new Set(rows.map((row) => row.day))];
+			expect(days).toEqual(
+				expect.arrayContaining([
+					"2026-03-07",
+					"2026-03-08",
+					"2026-03-09",
+					"2026-07-15",
+					"2026-12-14",
+					"2026-12-15",
+				]),
+			);
+			expect(
+				rows.find((row) => row.day === "2026-12-14" && row.gbHours > 0),
+			).toMatchObject({ workspaceId: BILLING_PAGE, gbHours: 1 });
+
+			const totals = new Map<string | null, number[]>();
+			for (const row of rows) {
+				const sum = totals.get(row.workspaceId) ?? [0, 0, 0, 0];
+				const [boots, failedBoots, hours, gbHours] = brief(row);
+				totals.set(row.workspaceId, [
+					sum[0] + (boots ?? 0),
+					sum[1] + (failedBoots ?? 0),
+					sum[2] + (hours ?? 0),
+					sum[3] + (gbHours ?? 0),
+				]);
+			}
+			expect(
+				[...totals]
+					.map(([key, sum]) => [key, ...sum.map(round)])
+					.sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+			).toEqual(await byWorkspace());
+
+			for (const day of days) {
+				const window = {
+					from: pacificMidnight(day),
+					to: pacificMidnight(nextDate(day)),
+				};
+				expect(
+					rows
+						.filter((row) => row.day === day)
+						.map((row) => [row.workspaceId, ...brief(row)])
+						.sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+					day,
+				).toEqual(await byWorkspace(window));
+			}
+		} finally {
+			await dropEdges();
+		}
+	});
+
+	test("usage with no workspace has a null workspace id", async () => {
+		await seedEdges();
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+			});
+			expect(rows.filter((row) => row.workspaceId === null)).toEqual([
+				{
+					workspaceId: null,
+					day: "2026-12-15",
+					boots: 0,
+					failedBoots: 0,
+					hours: 0,
+					gbHours: 1,
+				},
+			]);
+		} finally {
+			await dropEdges();
+		}
+	});
+
+	test("filters and organizations narrow it like the fleet query", async () => {
+		const rows = (organizationId: string | string[] | null, filters = {}) =>
+			queryFleetCloudUsageByWorkspaceDay(db, organizationId, {
+				window: NOVEMBER,
+				filters,
+			});
+		const workspaceIds = async (
+			organizationId: string | string[] | null,
+			filters = {},
+		) => [
+			...new Set(
+				(await rows(organizationId, filters)).map((row) => row.workspaceId),
+			),
+		];
+		expect(await workspaceIds(ORG, { workspace: CHECKOUT })).toEqual([
+			CHECKOUT,
+		]);
+		expect(await workspaceIds(ORG, { user: SAM })).toEqual([BILLING_PAGE]);
+		expect(await workspaceIds(ORG, { status: ["failed"] })).toEqual([BROKEN]);
+		expect(await workspaceIds(ORG, { search: "BILLING" })).toEqual([
+			BILLING_PAGE,
+		]);
+		expect(await workspaceIds([OTHER_ORG])).toEqual([OTHER_WS]);
+		expect(await workspaceIds([])).toEqual([]);
+		expect((await rows(null)).map((row) => [row.workspaceId, row.day])).toEqual(
+			expect.arrayContaining([
+				[OTHER_WS, "2026-11-10"],
+				[CHECKOUT, "2026-11-10"],
+			]),
+		);
+		expect(
+			(await rows(ORG, { size: "medium" })).map((row) => row.workspaceId),
+		).not.toContain(BILLING_PAGE);
 	});
 });
