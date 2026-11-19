@@ -24,15 +24,18 @@ export function useSessionGoneHandoff({
 	onSessionGone: (prompts: UserContent[][]) => boolean;
 } {
 	const [hold, setHold] = useState<Hold | null>(null);
-	const [toQueue, setToQueue] = useState<UserContent[][]>([]);
+	const [appended, setAppended] = useState(0);
 	const holdRef = useRef<Hold | null>(null);
+	// A ref, not state: the child SessionView's effects call onSessionGone before this hook's effects run.
+	const pending = useRef<UserContent[][]>([]);
 	const lastHandoff = useRef<Hold | null>(null);
 
 	const onSessionGone = useCallback(
 		(prompts: UserContent[][]) => {
 			if (!sessionId) return false;
 			if (holdRef.current?.sessionId === sessionId) {
-				setToQueue((queued) => [...queued, ...prompts]);
+				pending.current.push(...prompts);
+				setAppended((count) => count + 1);
 				return true;
 			}
 			const at = now();
@@ -43,8 +46,8 @@ export function useSessionGoneHandoff({
 			const next = { sessionId, at };
 			lastHandoff.current = next;
 			holdRef.current = next;
+			pending.current.push(...prompts);
 			setHold(next);
-			setToQueue(prompts);
 			recheck();
 			return true;
 		},
@@ -52,18 +55,13 @@ export function useSessionGoneHandoff({
 	);
 
 	useEffect(() => {
-		if (!hold || toQueue.length === 0) return;
-		for (const prompt of toQueue) onQueuePrompt(prompt);
-		setToQueue([]);
-	}, [hold, toQueue, onQueuePrompt]);
-
-	useEffect(() => {
-		if (!hold || toQueue.length > 0) return;
+		if (!hold) return;
+		for (const prompt of pending.current.splice(0)) onQueuePrompt(prompt);
 		const answered = !checking && checkedAt >= hold.at;
 		if (hold.sessionId === sessionId && !answered) return;
 		holdRef.current = null;
 		setHold(null);
-	}, [hold, toQueue, checking, checkedAt, sessionId]);
+	}, [hold, appended, checking, checkedAt, sessionId, onQueuePrompt]);
 
 	return { holding: hold?.sessionId === sessionId, onSessionGone };
 }
