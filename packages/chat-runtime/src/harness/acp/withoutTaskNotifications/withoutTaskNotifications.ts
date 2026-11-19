@@ -58,7 +58,20 @@ function blockEnd(text: string, index: number, messageEnded: boolean): UnitEnd {
 	return tail && !messageEnded ? "hold" : afterClose;
 }
 
-function unitEnd(text: string, start: number, messageEnded: boolean): UnitEnd {
+function codeStartsIn(
+	ranges: readonly Range[],
+	from: number,
+	to: number,
+): boolean {
+	return ranges.some(([open]) => open >= from && open <= to);
+}
+
+function unitEnd(
+	text: string,
+	start: number,
+	messageEnded: boolean,
+	code: readonly Range[],
+): UnitEnd {
 	let i = start;
 	const reminder = marker(text, i, REMINDER_OPEN);
 	if (reminder === "partial") return messageEnded ? null : "hold";
@@ -71,6 +84,8 @@ function unitEnd(text: string, start: number, messageEnded: boolean): UnitEnd {
 		const lineEnd = endsLine(text, afterHeader);
 		if (lineEnd === "no") return null;
 		const open = text.indexOf(OPEN, afterHeader);
+		if (codeStartsIn(code, afterHeader, open === -1 ? text.length : open))
+			return null;
 		if (open === -1)
 			return !messageEnded && text.length - afterHeader <= HEADER_TO_BLOCK_MAX
 				? "hold"
@@ -155,7 +170,7 @@ export function withoutTaskNotifications(
 	) {
 		const start = match.index;
 		if (within(code, start)) continue;
-		const end = unitEnd(text, start, messageEnded);
+		const end = unitEnd(text, start, messageEnded, code);
 		if (end === null) continue;
 		visible += text.slice(from, start);
 		if (end === "hold") return visible;

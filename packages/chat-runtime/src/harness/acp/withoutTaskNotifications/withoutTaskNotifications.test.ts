@@ -66,6 +66,7 @@ describe("withoutTaskNotifications", () => {
 			`The format:\n\n\`\`\`xml\n${REPEATED}\n\`\`\`\n\nThat is all.`,
 			`Nested:\n\n\`\`\`\`md\n\`\`\`xml\n${REPEATED}\n\`\`\`\n\`\`\`\`\n\nThat is all.`,
 			"The [SYSTEM NOTIFICATION - NOT USER INPUT] header marks an automated event.",
+			"[SYSTEM NOTIFICATION - NOT USER INPUT]\n`payload: <task-notification><task-id>x</task-id></task-notification>`",
 		]) {
 			expect(withoutTaskNotifications(text, true)).toBe(text);
 		}
