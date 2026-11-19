@@ -204,5 +204,17 @@ describe("allowanceLines on hand-built values", () => {
 		expect(linesOf("percentCap").headline).toBe("period");
 		expect(linesOf("notRead").headline).toBe("period");
 		expect(lines(CACHED, 15200, ALL_UNREAD).headline).toBe("period");
+		const unknownCap = {
+			...NORTHWIND,
+			usedGbHours: 6600,
+			usedUsd: 6600 * RATE,
+			overageGbHours: 0,
+			overageUsd: 0,
+			freeCredits: null,
+			extraUsageLimit: null,
+			limitReached: null,
+		};
+		expect(lines(unknownCap, 6600).headline).toBe("included");
+		expect(lines(unknownCap, 7600).headline).toBe("period");
 	});
 });

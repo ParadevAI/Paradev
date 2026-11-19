@@ -149,21 +149,25 @@ export function allowanceLines(
 	const capKnown = limit !== null;
 	const leaveOpen =
 		!capKnown && open.length > 0 && allowance.limitReached !== true;
-	const openExtra = lines.some((item) => item.kind === "extra" && !item.total);
+	const used = sum(lines.map((line) => line.used));
+	const cap = hasCap
+		? sum(totalsOf(lines))
+		: sum(totalsOf(lines.filter((item) => item.kind !== "extra")));
+	/**
+	 * What the headline measures usage against: the cap when it is known; the included total when
+	 * extra usage is known off or usage stays within it; else nothing, as "of $X included" would
+	 * read as more than the allowance.
+	 */
+	const headline: "limit" | "period" | "included" = hasCap
+		? "limit"
+		: extraOff || used.gbHours <= cap.gbHours
+			? "included"
+			: "period";
 	return {
 		lines,
-		/**
-		 * What the headline measures usage against: the cap when it is known, the included total
-		 * when nothing goes past it, else nothing, as "of $X included" would read as over it.
-		 */
-		headline: (hasCap ? "limit" : openExtra ? "period" : "included") as
-			| "limit"
-			| "period"
-			| "included",
-		used: sum(lines.map((line) => line.used)),
-		cap: hasCap
-			? sum(totalsOf(lines))
-			: sum(totalsOf(lines.filter((item) => item.kind !== "extra"))),
+		headline,
+		used,
+		cap,
 		hasCap,
 		/** The bar's full width. */
 		scale: leaveOpen

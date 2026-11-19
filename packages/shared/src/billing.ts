@@ -383,6 +383,22 @@ export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	};
 }
 
+/** The allowance fields a billing value can fail to give; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_FIELDS = [
+	"seats",
+	"bought",
+	"freeCredits",
+	"extraUsageLimit",
+	"limitReached",
+] as const;
+
+/** Why a billing value cannot give a field; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_REASONS = [
+	"not_read",
+	"percent_of_allowance",
+	"not_tracked",
+] as const;
+
 export function gbMinutesUsd(
 	gbMinutes: number,
 	overagePerGbHour: number | null,

@@ -1,7 +1,3 @@
-import {
-	ALLOWANCE_UNAVAILABLE_FIELDS,
-	ALLOWANCE_UNAVAILABLE_REASONS,
-} from "@superset/auth/billing/cloud-usage";
 import type {
 	CloudBootsResult,
 	CloudUsageMetrics,
@@ -17,7 +13,11 @@ import {
 	cloudWorkspaceFailureReasonEnum,
 	cloudWorkspaceStatusEnum,
 } from "@superset/db/enums";
-import { machineSizeSchema } from "@superset/shared/billing";
+import {
+	ALLOWANCE_UNAVAILABLE_FIELDS,
+	ALLOWANCE_UNAVAILABLE_REASONS,
+	machineSizeSchema,
+} from "@superset/shared/billing";
 import { z } from "zod";
 
 const rangePresetSchema = z.enum(["24h", "7d", "30d", "90d"]);

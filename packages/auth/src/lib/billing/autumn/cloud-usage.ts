@@ -1,4 +1,9 @@
-import { type GbHourPack, gbMinutesUsd } from "@superset/shared/billing";
+import {
+	ALLOWANCE_UNAVAILABLE_FIELDS,
+	type ALLOWANCE_UNAVAILABLE_REASONS,
+	type GbHourPack,
+	gbMinutesUsd,
+} from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
 import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 
@@ -128,22 +133,6 @@ export function cloudUsageFromBalances(
 			: null,
 	};
 }
-
-/** The allowance fields a billing value can fail to give; the router's output lists them. */
-export const ALLOWANCE_UNAVAILABLE_FIELDS = [
-	"seats",
-	"bought",
-	"freeCredits",
-	"extraUsageLimit",
-	"limitReached",
-] as const;
-
-/** Why a billing value cannot give a field; the router's output lists them. */
-export const ALLOWANCE_UNAVAILABLE_REASONS = [
-	"not_read",
-	"percent_of_allowance",
-	"not_tracked",
-] as const;
 
 /** A field of the period's allowance this value cannot give, and why. */
 export interface AllowanceUnavailable {

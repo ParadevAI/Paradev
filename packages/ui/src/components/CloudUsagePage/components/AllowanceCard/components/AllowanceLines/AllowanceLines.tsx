@@ -12,17 +12,17 @@ interface AllowanceLinesProps {
 	format: (usd: number) => string;
 }
 
-/** Fixed palette hues for the paid and beyond segments, so each keeps one colour in both themes. */
 /** The bar's order: the free and unplaced usage, which billing draws first, before the paid segments. */
-const BAR_ORDER: AllowanceLine["kind"][] = [
-	"included",
-	"freeCredits",
-	"notBrokenDown",
-	"bought",
-	"extra",
-	"beyond",
-];
+const BAR_ORDER: Record<AllowanceLine["kind"], number> = {
+	included: 0,
+	freeCredits: 1,
+	notBrokenDown: 2,
+	bought: 3,
+	extra: 4,
+	beyond: 5,
+};
 
+/** Fixed palette hues for the paid and beyond segments, so each keeps one colour in both themes. */
 const SWATCH: Record<AllowanceLine["kind"], string> = {
 	included: "bg-foreground/70",
 	freeCredits: "bg-foreground/35",
@@ -111,7 +111,7 @@ export function AllowanceLines({
 		<>
 			<div className="flex h-2 overflow-hidden rounded-full bg-foreground/10">
 				{[...lines]
-					.sort((a, b) => BAR_ORDER.indexOf(a.kind) - BAR_ORDER.indexOf(b.kind))
+					.sort((a, b) => BAR_ORDER[a.kind] - BAR_ORDER[b.kind])
 					.map((line) => (
 						<span
 							key={line.kind}
