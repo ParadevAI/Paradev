@@ -1,6 +1,5 @@
 import { db, dbWs } from "@superset/db/client";
 import {
-	cloudWorkspaces,
 	environmentBuilds,
 	environmentRepositories,
 	environments,
@@ -17,8 +16,7 @@ import {
 	ne,
 	sql,
 } from "drizzle-orm";
-import { STALE_BUILD_MS } from "./limits";
-import { type FreshRebuildClaim, freshRebuildClaim } from "./policy";
+import { FRESH_REBUILDS_AT_ONCE, STALE_BUILD_MS } from "./limits";
 
 type EnvironmentRow = typeof environments.$inferSelect;
 
@@ -191,79 +189,57 @@ export async function markGoldenDeleted(buildId: string): Promise<void> {
 		.where(eq(environmentBuilds.id, buildId));
 }
 
-const BUSY_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** Busiest first: most cloud workspaces created in the last week. */
 export async function activeEnvironments(): Promise<
 	Array<{ id: string; organizationId: string }>
 > {
-	const recent = db
-		.select({
-			environmentId: cloudWorkspaces.environmentId,
-			workspaces: count().as("workspaces"),
-		})
-		.from(cloudWorkspaces)
-		.where(gt(cloudWorkspaces.createdAt, new Date(Date.now() - BUSY_WINDOW_MS)))
-		.groupBy(cloudWorkspaces.environmentId)
-		.as("recent");
 	return db
 		.select({
 			id: environments.id,
 			organizationId: environments.organizationId,
 		})
 		.from(environments)
-		.leftJoin(recent, eq(recent.environmentId, environments.id))
-		.where(isNull(environments.archivedAt))
-		.orderBy(desc(sql`coalesce(${recent.workspaces}, 0)`), environments.id);
+		.where(isNull(environments.archivedAt));
 }
 
 /**
- * Makes a running build fresh if the caps allow it. A claimed or waiting
- * build restarts its clock, so the stale rule does not expire it while it
- * waits. The lock makes the count and the update one decision across builds.
+ * Makes a running build fresh while fewer than `FRESH_REBUILDS_AT_ONCE` are;
+ * null when the build is no longer running. The lock makes the count and the
+ * update one decision across builds.
  */
 export async function claimFreshRebuild(
 	buildId: string,
-): Promise<FreshRebuildClaim | null> {
+): Promise<boolean | null> {
 	return dbWs.transaction(async (tx) => {
 		await tx.execute(
 			sql`select pg_advisory_xact_lock(hashtext('environment_builds.fresh_rebuild'))`,
 		);
 		const [build] = await tx
-			.select()
+			.select({
+				status: environmentBuilds.status,
+				kind: environmentBuilds.kind,
+			})
 			.from(environmentBuilds)
 			.where(eq(environmentBuilds.id, buildId));
 		if (!build || build.status !== "running") return null;
-		if (build.kind === "fresh") return "claimed";
-		const now = Date.now();
-		const [counts] = await tx
-			.select({
-				running: count(
-					sql`case when ${environmentBuilds.status} = 'running' and ${environmentBuilds.startedAt} > ${new Date(now - STALE_BUILD_MS)} then 1 end`,
-				),
-				startedLastHour: count(),
-			})
+		if (build.kind === "fresh") return true;
+		const [fresh] = await tx
+			.select({ running: count() })
 			.from(environmentBuilds)
 			.where(
 				and(
 					eq(environmentBuilds.kind, "fresh"),
-					gt(environmentBuilds.startedAt, new Date(now - 60 * 60 * 1000)),
+					eq(environmentBuilds.status, "running"),
+					gt(
+						environmentBuilds.startedAt,
+						new Date(Date.now() - STALE_BUILD_MS),
+					),
 				),
 			);
-		const claim = freshRebuildClaim({
-			running: counts?.running ?? 0,
-			startedLastHour: counts?.startedLastHour ?? 0,
-			trigger: build.trigger,
-		});
-		if (claim !== "refused") {
-			await tx
-				.update(environmentBuilds)
-				.set({
-					startedAt: new Date(now),
-					...(claim === "claimed" ? { kind: "fresh" as const } : {}),
-				})
-				.where(eq(environmentBuilds.id, buildId));
-		}
-		return claim;
+		if ((fresh?.running ?? 0) >= FRESH_REBUILDS_AT_ONCE) return false;
+		await tx
+			.update(environmentBuilds)
+			.set({ kind: "fresh" })
+			.where(eq(environmentBuilds.id, buildId));
+		return true;
 	});
 }

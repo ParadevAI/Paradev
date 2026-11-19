@@ -272,11 +272,11 @@ const BUILD_REFUSALS: Record<
 	},
 	"not-paid": {
 		code: "FORBIDDEN",
-		i18nKey: "serverError.environment.buildsNotIncluded",
+		i18nKey: "serverError.environment.notIncluded",
 	},
 	"no-repositories": {
 		code: "PRECONDITION_FAILED",
-		i18nKey: "serverError.environment.noRepositoriesToBuild",
+		i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
 	},
 	"no-install": {
 		code: "PRECONDITION_FAILED",

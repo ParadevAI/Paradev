@@ -26,11 +26,7 @@ import {
 	within,
 } from "./environment-build";
 import { BUILD_LIMIT_MS } from "./limits";
-import {
-	checkoutScript,
-	type FreshRebuildClaim,
-	goldensToDelete,
-} from "./policy";
+import { checkoutScript, goldensToDelete } from "./policy";
 import {
 	claimFreshRebuild,
 	failBuild,
@@ -59,18 +55,12 @@ async function runningBoxName(buildId: string): Promise<string> {
 
 /**
  * The golden the build starts from, which is also what its swap is guarded
- * on; null for a build that already finished. Fails one with no `[install]`.
+ * on; null for a build that already finished.
  */
 export async function beginBuild(buildId: string): Promise<string | null> {
 	"use step";
 	const loaded = await loadBuild(buildId);
 	if (!loaded || loaded.build.status !== "running") return null;
-	const inputs = await prepareBuild(loaded.build);
-	if (!inputs.install) {
-		throw new BuildFailure(
-			`No [install] in .paradev/config.toml on ${inputs.installSource}`,
-		);
-	}
 	return loaded.environment.sourceRef;
 }
 
@@ -113,14 +103,12 @@ export async function deleteFork(buildId: string): Promise<void> {
 	await deleteSandbox(buildBoxName(buildId));
 }
 
-/** Makes the build fresh when the caps allow it; see `freshRebuildClaim`. */
-export async function claimFreshBuild(
-	buildId: string,
-): Promise<FreshRebuildClaim> {
+/** Makes the build fresh if a slot is free; false keeps its fork. */
+export async function claimFreshBuild(buildId: string): Promise<boolean> {
 	"use step";
-	const claim = await claimFreshRebuild(buildId);
-	if (claim === null) throw new FatalError(NOT_RUNNING);
-	return claim;
+	const claimed = await claimFreshRebuild(buildId);
+	if (claimed === null) throw new FatalError(NOT_RUNNING);
+	return claimed;
 }
 
 export async function startCommand(

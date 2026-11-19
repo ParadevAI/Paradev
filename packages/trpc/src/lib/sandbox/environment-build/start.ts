@@ -153,10 +153,9 @@ export async function startEnvironmentBuild(args: {
 	}
 	if (!build) throw new Error("Could not record the build");
 
-	const queued = build;
 	try {
-		await start(environmentBuildWorkflow, [queued.id], {
-			attributes: { buildId: queued.id, environmentId: queued.environmentId },
+		await start(environmentBuildWorkflow, [build.id], {
+			attributes: { buildId: build.id, environmentId: build.environmentId },
 		});
 	} catch (error) {
 		await db
@@ -166,8 +165,8 @@ export async function startEnvironmentBuild(args: {
 				error: "The build could not be started",
 				finishedAt: new Date(),
 			})
-			.where(eq(environmentBuilds.id, queued.id));
+			.where(eq(environmentBuilds.id, build.id));
 		throw error;
 	}
-	return queued;
+	return build;
 }

@@ -8068,9 +8068,6 @@ msgstr "Окружение"
 msgid "Environment archived"
 msgstr "Окружение архивировано"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Сборки окружений доступны в тарифах Team и Ultra. Перейдите на другой тариф в разделе Настройки, Оплата."
-
 msgid "Environment not found"
 msgstr "Окружение не найдено"
 
@@ -20682,9 +20679,6 @@ msgstr "Этот адрес электронной почты уже зарег�
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "У этого окружения нет [install] для сборки. Добавьте его в .paradev/config.toml в базовой ветке."
-
-msgid "This environment has no repositories to build"
-msgstr "У этого окружения нет репозиториев для сборки"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "В этом окружении нет репозиториев. Создайте окружение с репозиториями в Настройках и запустите рабочую область из него"

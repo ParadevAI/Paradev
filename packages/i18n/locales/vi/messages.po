@@ -8068,9 +8068,6 @@ msgstr "Môi trường"
 msgid "Environment archived"
 msgstr "Đã lưu trữ environment"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Build environment có trong gói Team và Ultra. Nâng cấp trong Cài đặt, Thanh toán."
-
 msgid "Environment not found"
 msgstr "Không tìm thấy environment"
 
@@ -20682,9 +20679,6 @@ msgstr "Email này đã được đăng ký bằng phương thức đăng nhập
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Environment này không có [install] để build. Hãy thêm vào .paradev/config.toml trên nhánh gốc của nó."
-
-msgid "This environment has no repositories to build"
-msgstr "Environment này không có repository nào để build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"

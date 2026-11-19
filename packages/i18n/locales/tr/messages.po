@@ -8068,9 +8068,6 @@ msgstr "Ortam"
 msgid "Environment archived"
 msgstr "Ortam arşivlendi"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Ortam derlemeleri Team ve Ultra planlarına dahildir. Ayarlar, Faturalandırma bölümünden yükseltin."
-
 msgid "Environment not found"
 msgstr "Ortam bulunamadı"
 
@@ -20682,9 +20679,6 @@ msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağla
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Bu ortamın derlenecek bir [install] bölümü yok. Temel dalındaki .paradev/config.toml dosyasına bir tane ekleyin."
-
-msgid "This environment has no repositories to build"
-msgstr "Bu ortamın derlenecek deposu yok"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Bu ortamda depo yok. Ayarlar'da depoları olan bir ortam oluşturun, ardından çalışma alanını o ortamdan başlatın"

@@ -9,9 +9,5 @@ export const STALE_BUILD_MS = 20 * 60 * 1000;
 /** Goldens kept per environment: the active one and the newest ones before it. */
 export const KEPT_GOLDENS = 3;
 
-/** Caps on goldens rebuilt from the image because their disk holds agent CLIs. */
+/** Goldens rebuilt from the image at once because their disk holds agent CLIs. */
 export const FRESH_REBUILDS_AT_ONCE = 10;
-export const FRESH_REBUILDS_PER_HOUR = 40;
-/** How long a daily build waits for a fresh slot before it forks as before. */
-export const FRESH_REBUILD_WAIT_MS = 60 * 60 * 1000;
-export const FRESH_REBUILD_POLL_MS = 30_000;

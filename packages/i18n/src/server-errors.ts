@@ -514,19 +514,6 @@ export const serverErrorMessages: Record<
 				message: "Could not record environment",
 			}),
 		),
-	"serverError.environment.buildsNotIncluded": () =>
-		i18n._(
-			msg({
-				message:
-					"Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing.",
-			}),
-		),
-	"serverError.environment.noRepositoriesToBuild": () =>
-		i18n._(
-			msg({
-				message: "This environment has no repositories to build",
-			}),
-		),
 	"serverError.environment.noInstall": () =>
 		i18n._(
 			msg({

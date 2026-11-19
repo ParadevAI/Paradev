@@ -8068,9 +8068,6 @@ msgstr "Prostředí"
 msgid "Environment archived"
 msgstr "Prostředí archivováno"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
-
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
 
@@ -20682,9 +20679,6 @@ msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a po
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do .paradev/config.toml v jeho základní větvi."
-
-msgid "This environment has no repositories to build"
-msgstr "Toto prostředí nemá žádné repozitáře k sestavení"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"

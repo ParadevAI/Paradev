@@ -1,14 +1,6 @@
-import type {
-	EnvironmentBuildStatus,
-	EnvironmentBuildTrigger,
-} from "@superset/db/schema";
+import type { EnvironmentBuildStatus } from "@superset/db/schema";
 import { sandboxCheckoutDir } from "@superset/shared/sandbox/contract";
-import {
-	FRESH_REBUILDS_AT_ONCE,
-	FRESH_REBUILDS_PER_HOUR,
-	KEPT_GOLDENS,
-	STALE_BUILD_MS,
-} from "./limits";
+import { KEPT_GOLDENS, STALE_BUILD_MS } from "./limits";
 
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 
@@ -45,19 +37,6 @@ export function dailyBuildsPaused(
 		recent.length === DAILY_PAUSE_AFTER_FAILURES &&
 		recent.every((build) => build.status === "failed")
 	);
-}
-
-/** `wait` while fresh rebuilds are at the cap but the hour has room; only a daily build waits. */
-export type FreshRebuildClaim = "claimed" | "wait" | "refused";
-
-export function freshRebuildClaim(args: {
-	running: number;
-	startedLastHour: number;
-	trigger: EnvironmentBuildTrigger;
-}): FreshRebuildClaim {
-	if (args.startedLastHour >= FRESH_REBUILDS_PER_HOUR) return "refused";
-	if (args.running < FRESH_REBUILDS_AT_ONCE) return "claimed";
-	return args.trigger === "daily" ? "wait" : "refused";
 }
 
 function quote(value: string): string {

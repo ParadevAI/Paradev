@@ -15,13 +15,7 @@ import {
 	startCommand,
 	stopBox,
 } from "./build-steps";
-import {
-	BUILD_LIMIT_MESSAGE,
-	BUILD_LIMIT_MS,
-	BUILD_POLL_MS,
-	FRESH_REBUILD_POLL_MS,
-	FRESH_REBUILD_WAIT_MS,
-} from "./limits";
+import { BUILD_LIMIT_MESSAGE, BUILD_LIMIT_MS, BUILD_POLL_MS } from "./limits";
 
 export type BuildOutcome = "succeeded" | "failed" | "skipped";
 
@@ -30,14 +24,15 @@ export type BuildOutcome = "succeeded" | "failed" | "skipped";
  * workspaces start from. The box does the long work; each step only starts
  * or checks it. A failure leaves the current golden in place; a success
  * deletes the goldens past `KEPT_GOLDENS`, last. A fork whose
- * disk holds agent CLIs is rebuilt from the image within the caps in
- * `limits.ts`; past them it is forked as before and checked again next time.
+ * disk holds agent CLIs is rebuilt from the image while fewer than
+ * `FRESH_REBUILDS_AT_ONCE` are; otherwise it is forked as before and
+ * checked again next time.
  */
 export async function environmentBuildWorkflow(
 	buildId: string,
 ): Promise<BuildOutcome> {
 	"use workflow";
-	let deadline = Date.now() + BUILD_LIMIT_MS;
+	const deadline = Date.now() + BUILD_LIMIT_MS;
 
 	async function waitFor(done: () => Promise<boolean>): Promise<void> {
 		while (!(await done())) {
@@ -65,19 +60,12 @@ export async function environmentBuildWorkflow(
 	try {
 		const sourceRef = await beginBuild(buildId);
 		if (sourceRef === null) return "skipped";
-		if ((await createBox(buildId, sourceRef, true)) === "root-disk-agents") {
-			let claim = await claimFreshBuild(buildId);
-			// Refused: no slot this hour, so the fork it has is built as before.
-			if (claim !== "refused") {
-				await deleteFork(buildId);
-				const waitUntil = Date.now() + FRESH_REBUILD_WAIT_MS;
-				while (claim === "wait" && Date.now() < waitUntil) {
-					await sleep(FRESH_REBUILD_POLL_MS);
-					claim = await claimFreshBuild(buildId);
-				}
-				await createBox(buildId, sourceRef, false);
-				deadline = Date.now() + BUILD_LIMIT_MS;
-			}
+		if (
+			(await createBox(buildId, sourceRef, true)) === "root-disk-agents" &&
+			(await claimFreshBuild(buildId))
+		) {
+			await deleteFork(buildId);
+			await createBox(buildId, sourceRef, false);
 		}
 
 		const checkout = await runOnBox("checkout");

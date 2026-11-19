@@ -8068,9 +8068,6 @@ msgstr "Środowisko"
 msgid "Environment archived"
 msgstr "Środowisko zarchiwizowane"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Kompilacje środowisk są dostępne w planach Team i Ultra. Przejdź na wyższy plan w Ustawienia, Rozliczenia."
-
 msgid "Environment not found"
 msgstr "Nie znaleziono środowiska"
 
@@ -20682,9 +20679,6 @@ msgstr "Ten e-mail jest już zarejestrowany inną metodą logowania, a dostawca 
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "To środowisko nie ma [install] do zbudowania. Dodaj go do .paradev/config.toml w gałęzi bazowej."
-
-msgid "This environment has no repositories to build"
-msgstr "To środowisko nie ma repozytoriów do zbudowania"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "To środowisko nie ma repozytoriów. Utwórz w Ustawieniach środowisko z repozytoriami i uruchom z niego obszar roboczy"

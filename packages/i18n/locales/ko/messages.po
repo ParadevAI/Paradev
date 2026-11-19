@@ -8068,9 +8068,6 @@ msgstr "환경"
 msgid "Environment archived"
 msgstr "환경을 보관했습니다"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "환경 빌드는 Team 및 Ultra 플랜에 포함되어 있습니다. 설정, 결제에서 업그레이드하세요."
-
 msgid "Environment not found"
 msgstr "환경을 찾을 수 없습니다"
 
@@ -20682,9 +20679,6 @@ msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있�
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "이 환경에는 빌드할 [install]이 없습니다. 기본 브랜치의 .paradev/config.toml에 추가하세요."
-
-msgid "This environment has no repositories to build"
-msgstr "이 환경에는 빌드할 리포지토리가 없습니다"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 있는 환경을 만든 다음 그 환경에서 워크스페이스를 시작하세요"

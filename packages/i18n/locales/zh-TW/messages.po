@@ -8068,9 +8068,6 @@ msgstr "環境"
 msgid "Environment archived"
 msgstr "環境已封存"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "環境建置包含在 Team 和 Ultra 方案中。請在設定的帳單中升級。"
-
 msgid "Environment not found"
 msgstr "找不到環境"
 
@@ -20682,9 +20679,6 @@ msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "此環境沒有可建置的 [install]。請在其基礎分支的 .paradev/config.toml 中新增。"
-
-msgid "This environment has no repositories to build"
-msgstr "此環境沒有可建置的儲存庫"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"

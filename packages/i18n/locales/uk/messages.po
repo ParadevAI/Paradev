@@ -8062,9 +8062,6 @@ msgstr "Середовище"
 msgid "Environment archived"
 msgstr "Середовище архівовано"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Збірки середовищ доступні в тарифах Team і Ultra. Покращте тариф у розділі «Налаштування», «Оплата»."
-
 msgid "Environment not found"
 msgstr "Середовище не знайдено"
 
@@ -20676,9 +20673,6 @@ msgstr "Цю електронну адресу вже зареєстровано
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Це середовище не має [install] для збірки. Додайте його в .paradev/config.toml у базовій гілці."
-
-msgid "This environment has no repositories to build"
-msgstr "У цього середовища немає репозиторіїв для збірки"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"

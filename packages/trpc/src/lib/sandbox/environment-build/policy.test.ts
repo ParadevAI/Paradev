@@ -3,7 +3,6 @@ import { STALE_BUILD_MS } from "./limits";
 import {
 	checkoutScript,
 	dailyBuildsPaused,
-	freshRebuildClaim,
 	goldensToDelete,
 	isStale,
 } from "./policy";
@@ -73,27 +72,5 @@ describe("checkoutScript", () => {
 			checkouts: [{ url: "u", branch: "it's", path: "." }],
 		});
 		expect(script).toContain(`origin 'it'\\''s'`);
-	});
-});
-
-describe("freshRebuildClaim", () => {
-	test("allows ten at once and forty an hour; only a daily build waits", () => {
-		const daily = { trigger: "daily" as const };
-		expect(
-			freshRebuildClaim({ ...daily, running: 9, startedLastHour: 39 }),
-		).toBe("claimed");
-		expect(
-			freshRebuildClaim({ ...daily, running: 10, startedLastHour: 20 }),
-		).toBe("wait");
-		expect(
-			freshRebuildClaim({ ...daily, running: 0, startedLastHour: 40 }),
-		).toBe("refused");
-		expect(
-			freshRebuildClaim({
-				trigger: "manual",
-				running: 10,
-				startedLastHour: 20,
-			}),
-		).toBe("refused");
 	});
 });

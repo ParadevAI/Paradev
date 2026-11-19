@@ -8068,9 +8068,6 @@ msgstr "環境"
 msgid "Environment archived"
 msgstr "環境をアーカイブしました"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "環境のビルドは Team プランと Ultra プランで利用できます。設定の請求からアップグレードしてください。"
-
 msgid "Environment not found"
 msgstr "環境が見つかりません"
 
@@ -20682,9 +20679,6 @@ msgstr "このメールアドレスは別のサインイン方法で既に登録
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "この環境にはビルドする [install] がありません。ベースブランチの .paradev/config.toml に追加してください。"
-
-msgid "This environment has no repositories to build"
-msgstr "この環境にはビルドするリポジトリがありません"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "この環境にはリポジトリがありません。設定でリポジトリを含む環境を作成し、その環境からワークスペースを開始してください"

@@ -8068,9 +8068,6 @@ msgstr "Lingkungan"
 msgid "Environment archived"
 msgstr "Environment diarsipkan"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Build environment tersedia di paket Team dan Ultra. Tingkatkan paket di Pengaturan, Penagihan."
-
 msgid "Environment not found"
 msgstr "Environment tidak ditemukan"
 
@@ -20682,9 +20679,6 @@ msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak m
 
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Environment ini tidak memiliki [install] untuk di-build. Tambahkan di .paradev/config.toml pada branch dasarnya."
-
-msgid "This environment has no repositories to build"
-msgstr "Environment ini tidak memiliki repositori untuk di-build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"

@@ -12,12 +12,7 @@ import * as repositories from "../repositories";
 import * as vercel from "../vercel";
 import * as steps from "./build-steps";
 import * as deployment from "./deployment";
-import {
-	BUILD_LIMIT_MESSAGE,
-	BUILD_LIMIT_MS,
-	FRESH_REBUILD_WAIT_MS,
-} from "./limits";
-import type { FreshRebuildClaim } from "./policy";
+import { BUILD_LIMIT_MESSAGE, BUILD_LIMIT_MS } from "./limits";
 import * as store from "./store";
 
 const ENVIRONMENT_ID = "00000000-0000-0000-0000-0000000000e1";
@@ -82,7 +77,7 @@ let install: { durationMs: number; exitCode: number; output: string };
 let failNext: Partial<Record<string, number>>;
 let swapAllowed: boolean;
 let rootDiskAgents: string;
-let claims: FreshRebuildClaim[];
+let freeSlot: boolean;
 let production: boolean;
 let goldens: Array<{ id: string; goldenRef: string }>;
 let deleteFails: Set<string>;
@@ -183,10 +178,9 @@ stub(store, {
 		goldensDeleted.push(id);
 	},
 	claimFreshRebuild: async () => {
-		const claim = claims.shift() ?? "wait";
-		calls.push(`claim:${claim}`);
-		if (claim === "claimed") build = { ...build, kind: "fresh" };
-		return claim;
+		calls.push(`claim:${freeSlot}`);
+		if (freeSlot) build = { ...build, kind: "fresh" };
+		return freeSlot;
 	},
 });
 stub(repositories, {
@@ -260,7 +254,7 @@ beforeEach(() => {
 	failNext = {};
 	swapAllowed = true;
 	rootDiskAgents = "";
-	claims = [];
+	freeSlot = true;
 	production = true;
 	goldens = [];
 	deleteFails = new Set();
@@ -365,11 +359,11 @@ describe("environmentBuildWorkflow", () => {
 
 	test("a fork with agent CLIs on its disk is rebuilt from the image", async () => {
 		rootDiskAgents = "/opt/codex\n/opt/pdev";
-		claims = ["claimed"];
+
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
 		expect(calls.slice(0, 5)).toEqual([
 			"create",
-			"claim:claimed",
+			"claim:true",
 			`delete:${BOX}`,
 			`create:image:${BOX}-fresh`,
 			"start:checkout",
@@ -387,28 +381,16 @@ describe("environmentBuildWorkflow", () => {
 		expect(build.kind).toBe("incremental");
 	});
 
-	test("a daily build at the cap waits an hour, then forks as before", async () => {
+	test("with no free fresh slot the build keeps its fork", async () => {
 		rootDiskAgents = "/opt/codex";
-		build = makeBuild({ trigger: "daily" });
-		const started = now;
-		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
-		expect(now - started).toBeGreaterThanOrEqual(FRESH_REBUILD_WAIT_MS);
-		expect(calls.filter((call) => call === "create")).toHaveLength(2);
-		expect(calls.some((call) => call.startsWith("create:image"))).toBe(false);
-		expect(build).toMatchObject({ kind: "incremental", goldenRef: BOX });
-	});
-
-	test("a build refused a fresh slot keeps its fork and does not wait", async () => {
-		rootDiskAgents = "/opt/codex";
-		claims = ["refused"];
-		const started = now;
+		freeSlot = false;
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
 		expect(calls.slice(0, 3)).toEqual([
 			"create",
-			"claim:refused",
+			"claim:false",
 			"start:checkout",
 		]);
-		expect(now - started).toBeLessThan(FRESH_REBUILD_WAIT_MS);
+		expect(build).toMatchObject({ kind: "incremental", goldenRef: BOX });
 	});
 
 	describe("old goldens", () => {
