@@ -10181,6 +10181,9 @@ msgstr "Nhập tất cả"
 msgid "Import cookies and passwords…"
 msgstr "Nhập cookie và mật khẩu…"
 
+msgid "Import custom theme?"
+msgstr "Nhập giao diện tùy chỉnh?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Nhập từng dự án v1 vào v2. Dự án đã nhập sẽ được đánh dấu là đã nhập."
 
@@ -13689,6 +13692,9 @@ msgstr "Chỉ chủ sở hữu host hoặc chủ sở hữu tổ chức mới x�
 
 msgid "Only images can be attached to a comment"
 msgstr "Chỉ có thể đính kèm hình ảnh vào bình luận"
+
+msgid "Only import themes from sources you trust."
+msgstr "Chỉ nhập giao diện từ các nguồn đáng tin cậy."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Chỉ người tạo hoặc quản trị viên tổ chức mới có thể thay đổi agent này"
@@ -21594,6 +21600,9 @@ msgstr "Script chưa đặt tên"
 
 msgid "Untitled workspace"
 msgstr "Workspace không tên"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Giao diện không đáng tin cậy có thể gây rủi ro cho dữ liệu của bạn."
 
 msgid "Up next"
 msgstr "Sắp tới"

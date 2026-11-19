@@ -10181,6 +10181,9 @@ msgstr "Импортировать все"
 msgid "Import cookies and passwords…"
 msgstr "Импортировать cookies и пароли…"
 
+msgid "Import custom theme?"
+msgstr "Импортировать пользовательскую тему?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Импортируйте каждый проект v1 в v2. Уже импортированные проекты отмечены как импортированные."
 
@@ -13689,6 +13692,9 @@ msgstr "Удалить этот хост могут только владель�
 
 msgid "Only images can be attached to a comment"
 msgstr "К комментарию можно прикреплять только изображения"
+
+msgid "Only import themes from sources you trust."
+msgstr "Импортируйте темы только из доверенных источников."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Изменить этого агента может только его создатель или администратор организации"
@@ -21594,6 +21600,9 @@ msgstr "Скрипт без названия"
 
 msgid "Untitled workspace"
 msgstr "Рабочая область без названия"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Темы из ненадёжных источников могут подвергнуть ваши данные риску."
 
 msgid "Up next"
 msgstr "Далее"

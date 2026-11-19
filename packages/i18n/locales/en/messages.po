@@ -10181,6 +10181,9 @@ msgstr "Import all"
 msgid "Import cookies and passwords…"
 msgstr "Import cookies and passwords…"
 
+msgid "Import custom theme?"
+msgstr "Import custom theme?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Import each v1 project into v2. Already-imported projects show as Imported."
 
@@ -13689,6 +13692,9 @@ msgstr "Only host owners or organization owners can delete this host"
 
 msgid "Only images can be attached to a comment"
 msgstr "Only images can be attached to a comment"
+
+msgid "Only import themes from sources you trust."
+msgstr "Only import themes from sources you trust."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Only its creator or an organization admin can change this agent"
@@ -21594,6 +21600,9 @@ msgstr "Untitled script"
 
 msgid "Untitled workspace"
 msgstr "Untitled workspace"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Untrusted themes may put your data at risk."
 
 msgid "Up next"
 msgstr "Up next"

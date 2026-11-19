@@ -10181,6 +10181,9 @@ msgstr "Alles importeren"
 msgid "Import cookies and passwords…"
 msgstr "Cookies en wachtwoorden importeren…"
 
+msgid "Import custom theme?"
+msgstr "Aangepast thema importeren?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Importeer elk v1-project in v2. Al geïmporteerde projecten worden als geïmporteerd weergegeven."
 
@@ -13689,6 +13692,9 @@ msgstr "Alleen eigenaren van de host of organisatie-eigenaren kunnen deze host v
 
 msgid "Only images can be attached to a comment"
 msgstr "Aan een reactie kunnen alleen afbeeldingen worden toegevoegd"
+
+msgid "Only import themes from sources you trust."
+msgstr "Importeer alleen thema’s uit vertrouwde bronnen."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Alleen de maker of een organisatiebeheerder kan deze agent wijzigen"
@@ -21594,6 +21600,9 @@ msgstr "Naamloos script"
 
 msgid "Untitled workspace"
 msgstr "Naamloze werkruimte"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Onbetrouwbare thema’s kunnen je gegevens in gevaar brengen."
 
 msgid "Up next"
 msgstr "Straks aan de beurt"

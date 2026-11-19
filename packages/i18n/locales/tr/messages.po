@@ -10181,6 +10181,9 @@ msgstr "Tümünü içe aktar"
 msgid "Import cookies and passwords…"
 msgstr "Çerezleri ve parolaları içe aktar…"
 
+msgid "Import custom theme?"
+msgstr "Özel tema içe aktarılsın mı?"
+
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Her v1 projesini v2'ye aktarın. Önceden aktarılan projeler içe aktarılmış olarak görünür."
 
@@ -13689,6 +13692,9 @@ msgstr "Bu host'u yalnızca host sahipleri veya kuruluş sahipleri silebilir"
 
 msgid "Only images can be attached to a comment"
 msgstr "Bir yoruma yalnızca görsel eklenebilir"
+
+msgid "Only import themes from sources you trust."
+msgstr "Yalnızca güvendiğiniz kaynaklardan tema içe aktarın."
 
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Bu ajanı yalnızca oluşturan kişi veya bir kuruluş yöneticisi değiştirebilir"
@@ -21594,6 +21600,9 @@ msgstr "Adsız betik"
 
 msgid "Untitled workspace"
 msgstr "Adsız çalışma alanı"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Güvenilir olmayan temalar verilerinizi riske atabilir."
 
 msgid "Up next"
 msgstr "Sırada"
