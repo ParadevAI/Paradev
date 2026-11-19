@@ -8,12 +8,12 @@ import {
 	TableHeader,
 	TableRow,
 } from "@superset/ui/table";
-import { EnvironmentBuildStatus } from "renderer/routes/_authenticated/components/EnvironmentBuildStatus";
 import {
 	BUILD_TRIGGER_LABELS,
 	type EnvironmentBuild,
-} from "renderer/routes/_authenticated/utils/environmentBuildMeta";
+} from "renderer/routes/_authenticated/components/EnvironmentView/components/EnvironmentBuilds/utils/environmentBuildMeta";
 import { BuildIdCell } from "./components/BuildIdCell";
+import { EnvironmentBuildStatus } from "./components/EnvironmentBuildStatus";
 
 interface EnvironmentBuildsTableProps {
 	builds: readonly EnvironmentBuild[];

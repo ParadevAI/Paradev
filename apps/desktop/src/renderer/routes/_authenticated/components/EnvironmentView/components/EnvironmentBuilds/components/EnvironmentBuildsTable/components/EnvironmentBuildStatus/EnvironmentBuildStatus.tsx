@@ -6,7 +6,7 @@ import { HiCheckCircle, HiXCircle } from "react-icons/hi2";
 import {
 	BUILD_STATUS_LABELS,
 	type EnvironmentBuild,
-} from "renderer/routes/_authenticated/utils/environmentBuildMeta";
+} from "renderer/routes/_authenticated/components/EnvironmentView/components/EnvironmentBuilds/utils/environmentBuildMeta";
 
 interface EnvironmentBuildStatusProps {
 	status: EnvironmentBuild["status"];

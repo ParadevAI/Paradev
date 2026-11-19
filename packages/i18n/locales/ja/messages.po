@@ -2023,9 +2023,6 @@ msgstr "{lastActive}にアクティブ"
 msgid "Active agent sessions."
 msgstr "実行中のエージェントセッション。"
 
-msgid "Active build status"
-msgstr "アクティブなビルドのステータス"
-
 msgid "active days"
 msgstr "アクティブ日数"
 
@@ -2277,9 +2274,6 @@ msgstr "サイドバーに追加"
 
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
-
-msgid "Add variable"
-msgstr "変数を追加"
 
 msgid "Add what it does"
 msgstr "役割を追加"
@@ -2578,9 +2572,6 @@ msgstr "{0}人のメンバー全員のデータが完全に削除されます。
 
 msgid "All downloads"
 msgstr "すべてのダウンロード"
-
-msgid "All environment variables ({total})"
-msgstr "すべての環境変数 ({total})"
 
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
@@ -3581,6 +3572,9 @@ msgstr "このホストの新規ワークツリーワークスペースのベー
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}の新規ワークツリーのベースディレクトリ。"
 
+msgid "Base image · no checkpoint yet"
+msgstr "ベースイメージ · チェックポイントはまだありません"
+
 msgid "Base URL"
 msgstr "ベースURL"
 
@@ -3849,9 +3843,6 @@ msgstr "ビルド ID"
 
 msgid "Build in public"
 msgstr "オープンに開発"
-
-msgid "Build started"
-msgstr "ビルドを開始しました"
 
 msgid "Build your own"
 msgstr "自分で作る"
@@ -4417,6 +4408,10 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "チェックポイント保存 {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "{name} にチェックポイントを保存しました"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "作成"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "環境が見つかりません"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境構築、不安定なテスト、認証情報の受け渡し。2025年に無人実行を潰していた退屈な失敗要因は、モデルの進歩ではなくエンジニアリングでほぼ取り除かれます。"
-
-msgid "Environment updated"
-msgstr "環境を更新しました"
-
-msgid "Environment variables"
-msgstr "環境変数"
 
 msgid "Environment Variables"
 msgstr "環境変数"
@@ -12803,9 +12793,6 @@ msgstr "この期間の起動はありません。"
 msgid "No branches found"
 msgstr "ブランチが見つかりません"
 
-msgid "No build yet"
-msgstr "まだビルドがありません"
-
 msgid "No builds yet"
 msgstr "まだビルドがありません"
 
@@ -13379,9 +13366,6 @@ msgstr "v1ターミナルスクリプトが見つかりません。"
 
 msgid "No valid environment variables found in file"
 msgstr "ファイルに有効な環境変数が見つかりませんでした"
-
-msgid "No variables set yet."
-msgstr "変数はまだ設定されていません。"
 
 msgid "No versions yet"
 msgstr "バージョンはまだありません"
@@ -18913,6 +18897,9 @@ msgstr "スマイリーと人"
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
 
+msgid "Snapshot"
+msgstr "スナップショット"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
 
@@ -21825,9 +21812,6 @@ msgstr "更新でセッションを維持できませんでした"
 msgid "Update daemon"
 msgstr "デーモンを更新"
 
-msgid "Update environment"
-msgstr "環境を更新"
-
 msgid "Update Error"
 msgstr "アップデートエラー"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectIdがワークスペースのプロジェクトと一致しま�
 
 msgid "Value"
 msgstr "値"
+
+msgid "Variables"
+msgstr "変数"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

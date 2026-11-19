@@ -2023,9 +2023,6 @@ msgstr "attivo {lastActive}"
 msgid "Active agent sessions."
 msgstr "Sessioni degli agenti attive."
 
-msgid "Active build status"
-msgstr "Stato della build attiva"
-
 msgid "active days"
 msgstr "giorni attivi"
 
@@ -2277,9 +2274,6 @@ msgstr "Aggiungi alla barra laterale"
 
 msgid "Add to workspace"
 msgstr "Aggiungi al workspace"
-
-msgid "Add variable"
-msgstr "Aggiungi variabile"
 
 msgid "Add what it does"
 msgstr "Aggiungi cosa fa"
@@ -2578,9 +2572,6 @@ msgstr "Tutti i dati verranno eliminati definitivamente per tutti i {0} membri. 
 
 msgid "All downloads"
 msgstr "Tutti i download"
-
-msgid "All environment variables ({total})"
-msgstr "Tutte le variabili d'ambiente ({total})"
 
 msgid "All features, side by side"
 msgstr "Tutte le funzioni, a confronto"
@@ -3581,6 +3572,9 @@ msgstr "Directory di base per i nuovi workspace worktree su questo host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Directory di base per i nuovi worktree su {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Immagine di base · ancora nessun checkpoint"
+
 msgid "Base URL"
 msgstr "URL di base"
 
@@ -3849,9 +3843,6 @@ msgstr "ID build"
 
 msgid "Build in public"
 msgstr "Costruire in pubblico"
-
-msgid "Build started"
-msgstr "Build avviata"
 
 msgid "Build your own"
 msgstr "Crea il tuo"
@@ -4417,6 +4408,10 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · prima del refactor dei tooltip"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Checkpoint salvato {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint salvato in {name}"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Creato"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Ambiente non trovato"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "La preparazione dell'ambiente, i test instabili e la gestione delle credenziali, le noiose cause di fallimento che uccidevano le esecuzioni non presidiate nel 2025, vengono per lo più risolte con l'ingegneria più che con i modelli."
-
-msgid "Environment updated"
-msgstr "Ambiente aggiornato"
-
-msgid "Environment variables"
-msgstr "Variabili d'ambiente"
 
 msgid "Environment Variables"
 msgstr "Variabili d'ambiente"
@@ -12803,9 +12793,6 @@ msgstr "Nessun avvio in questo periodo."
 msgid "No branches found"
 msgstr "Nessun branch trovato"
 
-msgid "No build yet"
-msgstr "Ancora nessuna build"
-
 msgid "No builds yet"
 msgstr "Ancora nessuna build"
 
@@ -13379,9 +13366,6 @@ msgstr "Nessuno script del terminale v1 trovato."
 
 msgid "No valid environment variables found in file"
 msgstr "Nessuna variabile d’ambiente valida trovata nel file"
-
-msgid "No variables set yet."
-msgstr "Ancora nessuna variabile impostata."
 
 msgid "No versions yet"
 msgstr "Ancora nessuna versione"
@@ -18913,6 +18897,9 @@ msgstr "Faccine e persone"
 msgid "Smoother onboarding"
 msgstr "Onboarding più fluido"
 
+msgid "Snapshot"
+msgstr "Snapshot"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Crea uno snapshot del worktree prima e dopo ogni turno della chat, così la sua scheda elenca ogni file modificato, incluse le modifiche fatte dalla shell, e può annullarle. Ogni prompt attende prima il proprio snapshot."
 
@@ -21825,9 +21812,6 @@ msgstr "L'aggiornamento non ha potuto conservare le sessioni"
 msgid "Update daemon"
 msgstr "Aggiorna il daemon"
 
-msgid "Update environment"
-msgstr "Aggiorna ambiente"
-
 msgid "Update Error"
 msgstr "Errore di aggiornamento"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId non corrisponde al progetto del workspace"
 
 msgid "Value"
 msgstr "Valore"
+
+msgid "Variables"
+msgstr "Variabili"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

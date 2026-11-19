@@ -1,19 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@superset/ui/dropdown-menu";
 import { Skeleton } from "@superset/ui/skeleton";
 import { toast } from "@superset/ui/sonner";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { HiOutlineCube, HiOutlinePlus } from "react-icons/hi2";
-import { LuArchive, LuEllipsis } from "react-icons/lu";
+import {
+	HiOutlineArchiveBox,
+	HiOutlineCube,
+	HiOutlinePlus,
+} from "react-icons/hi2";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "renderer/routes/_authenticated/components/ArchiveEnvironmentDialog";
@@ -63,14 +59,6 @@ export function EnvironmentsSettings({
 	const atLimit = usage?.limit != null && usage.used >= usage.limit;
 	const used = usage?.used ?? 0;
 	const limit = usage?.limit ?? 0;
-
-	const rebuild = cloudTrpc.environment.rebuild.useMutation({
-		onSuccess: () => {
-			toast.success(t({ message: "Build started" }));
-			return utils.environment.invalidate();
-		},
-		onError: (error) => toast.error(errorMessage(error)),
-	});
 
 	const archive = cloudTrpc.environment.archive.useMutation({
 		onSuccess: async () => {
@@ -181,50 +169,19 @@ export function EnvironmentsSettings({
 									</div>
 								</div>
 							</button>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
-										aria-label={t({ message: "More actions" })}
-										className="size-8 text-muted-foreground"
-										size="icon"
-										variant="ghost"
-									>
-										<LuEllipsis className="size-4" />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-48">
-									<DropdownMenuItem
-										onSelect={() =>
-											navigate({
-												to: "/settings/environments/$environmentId/edit",
-												params: { environmentId: environment.id },
-											})
-										}
-									>
-										<Trans>Edit</Trans>
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onSelect={() =>
-											rebuild.mutate({ environmentId: environment.id })
-										}
-									>
-										<Trans>Rebuild environment</Trans>
-									</DropdownMenuItem>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem
-										variant="destructive"
-										onSelect={() =>
-											setArchiving({
-												id: environment.id,
-												name: environment.name,
-											})
-										}
-									>
-										<LuArchive className="size-3.5" />
-										<Trans>Archive</Trans>
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+								<Button
+									aria-label={t({ message: "Archive environment" })}
+									className="h-8 w-8 text-muted-foreground hover:text-destructive"
+									onClick={() =>
+										setArchiving({ id: environment.id, name: environment.name })
+									}
+									size="icon"
+									variant="ghost"
+								>
+									<HiOutlineArchiveBox className="h-4 w-4" />
+								</Button>
+							</div>
 						</div>
 					))}
 				</div>

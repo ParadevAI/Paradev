@@ -2017,9 +2017,6 @@ msgstr "активність: {lastActive}"
 msgid "Active agent sessions."
 msgstr "Активні сеанси агентів."
 
-msgid "Active build status"
-msgstr "Стан активної збірки"
-
 msgid "active days"
 msgstr "активних днів"
 
@@ -2271,9 +2268,6 @@ msgstr "Додати на бічну панель"
 
 msgid "Add to workspace"
 msgstr "Додати до робочого простору"
-
-msgid "Add variable"
-msgstr "Додати змінну"
 
 msgid "Add what it does"
 msgstr "Опишіть, що він робить"
@@ -2572,9 +2566,6 @@ msgstr "Усі дані всіх учасників ({0}) буде остато�
 
 msgid "All downloads"
 msgstr "Усі варіанти завантаження"
-
-msgid "All environment variables ({total})"
-msgstr "Усі змінні середовища ({total})"
 
 msgid "All features, side by side"
 msgstr "Усі можливості поруч"
@@ -3575,6 +3566,9 @@ msgstr "Базова папка для нових робочих простор�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Базова папка для нових worktree на {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Базовий образ · контрольної точки ще немає"
+
 msgid "Base URL"
 msgstr "Базовий URL"
 
@@ -3843,9 +3837,6 @@ msgstr "ID збірки"
 
 msgid "Build in public"
 msgstr "Працюємо відкрито"
-
-msgid "Build started"
-msgstr "Збірку запущено"
 
 msgid "Build your own"
 msgstr "Створіть свій"
@@ -4411,6 +4402,10 @@ msgstr "Контрольна точка"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольна точка · до рефакторингу підказок"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Контрольну точку збережено {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Контрольну точку збережено в {name}"
@@ -6634,6 +6629,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Створено"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8095,12 +8091,6 @@ msgstr "Середовище не знайдено"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Налаштування середовища, нестабільні тести та морока з обліковими даними, нудні причини збоїв, що зривали автономні запуски у 2025-му, здебільшого усунено інженерними засобами, а не моделлю."
-
-msgid "Environment updated"
-msgstr "Середовище оновлено"
-
-msgid "Environment variables"
-msgstr "Змінні середовища"
 
 msgid "Environment Variables"
 msgstr "Змінні середовища"
@@ -12797,9 +12787,6 @@ msgstr "За цей період запусків немає."
 msgid "No branches found"
 msgstr "Гілок не знайдено"
 
-msgid "No build yet"
-msgstr "Збірки ще немає"
-
 msgid "No builds yet"
 msgstr "Збірок ще немає"
 
@@ -13373,9 +13360,6 @@ msgstr "Скриптів термінала v1 не знайдено."
 
 msgid "No valid environment variables found in file"
 msgstr "У файлі не знайдено коректних змінних середовища"
-
-msgid "No variables set yet."
-msgstr "Змінних ще не задано."
 
 msgid "No versions yet"
 msgstr "Версій ще немає"
@@ -18907,6 +18891,9 @@ msgstr "Смайлики й люди"
 msgid "Smoother onboarding"
 msgstr "Плавніший онбординг"
 
+msgid "Snapshot"
+msgstr "Знімок"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Робити знімок worktree до і після кожного ходу чату, щоб його картка показувала кожен змінений файл, зокрема зміни, зроблені через shell, і могла їх скасувати. Кожен промпт спершу чекає на свій знімок."
 
@@ -21819,9 +21806,6 @@ msgstr "Під час оновлення не вдалося зберегти с
 msgid "Update daemon"
 msgstr "Оновити демон"
 
-msgid "Update environment"
-msgstr "Оновити середовище"
-
 msgid "Update Error"
 msgstr "Помилка оновлення"
 
@@ -22130,6 +22114,9 @@ msgstr "v2ProjectId не відповідає проєкту робочого п
 
 msgid "Value"
 msgstr "Значення"
+
+msgid "Variables"
+msgstr "Змінні"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

@@ -2023,9 +2023,6 @@ msgstr "{lastActive} aktif"
 msgid "Active agent sessions."
 msgstr "Etkin ajan oturumları."
 
-msgid "Active build status"
-msgstr "Etkin derlemenin durumu"
-
 msgid "active days"
 msgstr "aktif gün"
 
@@ -2277,9 +2274,6 @@ msgstr "Kenar çubuğuna ekle"
 
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
-
-msgid "Add variable"
-msgstr "Değişken ekle"
 
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
@@ -2578,9 +2572,6 @@ msgstr "Tüm veriler {0} üyenin tamamı için kalıcı olarak silinecek. Bu ger
 
 msgid "All downloads"
 msgstr "Tüm indirmeler"
-
-msgid "All environment variables ({total})"
-msgstr "Tüm ortam değişkenleri ({total})"
 
 msgid "All features, side by side"
 msgstr "Tüm özellikler, yan yana"
@@ -3581,6 +3572,9 @@ msgstr "Bu host'taki yeni worktree çalışma alanları için temel dizin."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName} üzerindeki yeni worktree'ler için temel dizin."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Temel imaj · henüz kontrol noktası yok"
+
 msgid "Base URL"
 msgstr "Temel URL"
 
@@ -3849,9 +3843,6 @@ msgstr "Derleme kimliği"
 
 msgid "Build in public"
 msgstr "Herkesin gözü önünde geliştiriyoruz"
-
-msgid "Build started"
-msgstr "Derleme başlatıldı"
 
 msgid "Build your own"
 msgstr "Kendinizinkini oluşturun"
@@ -4417,6 +4408,10 @@ msgstr "Kontrol noktası"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrol noktası · tooltip yeniden düzenlemesinden önce"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Kontrol noktası kaydedildi {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Kontrol noktası {name} ortamına kaydedildi"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Oluşturuldu"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Ortam bulunamadı"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Ortam kurulumu, kararsız testler ve kimlik bilgisi tesisatı, yani 2025'te gözetimsiz çalıştırmaları öldüren sıkıcı hata biçimleri, modelleyerek değil mühendislikle büyük ölçüde ortadan kaldırılır."
-
-msgid "Environment updated"
-msgstr "Ortam güncellendi"
-
-msgid "Environment variables"
-msgstr "Ortam değişkenleri"
 
 msgid "Environment Variables"
 msgstr "Ortam değişkenleri"
@@ -12803,9 +12793,6 @@ msgstr "Bu dönemde başlatma yok."
 msgid "No branches found"
 msgstr "Dal bulunamadı"
 
-msgid "No build yet"
-msgstr "Henüz derleme yok"
-
 msgid "No builds yet"
 msgstr "Henüz derleme yok"
 
@@ -13379,9 +13366,6 @@ msgstr "v1 terminal betiği bulunamadı."
 
 msgid "No valid environment variables found in file"
 msgstr "Dosyada geçerli ortam değişkeni bulunamadı"
-
-msgid "No variables set yet."
-msgstr "Henüz değişken ayarlanmadı."
 
 msgid "No versions yet"
 msgstr "Henüz sürüm yok"
@@ -18913,6 +18897,9 @@ msgstr "Suratlar ve İnsanlar"
 msgid "Smoother onboarding"
 msgstr "Daha akıcı ilk kurulum"
 
+msgid "Snapshot"
+msgstr "Anlık görüntü"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Her sohbet turundan önce ve sonra worktree'nin anlık görüntüsünü alır; böylece kartı, kabukta yapılan düzenlemeler dahil değişen her dosyayı listeler ve bunları geri alabilir. Her istem önce kendi anlık görüntüsünü bekler."
 
@@ -21825,9 +21812,6 @@ msgstr "Güncelleme oturumları koruyamadı"
 msgid "Update daemon"
 msgstr "Daemon'u güncelle"
 
-msgid "Update environment"
-msgstr "Ortamı güncelle"
-
 msgid "Update Error"
 msgstr "Güncelleme hatası"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId, çalışma alanının projesiyle eşleşmiyor"
 
 msgid "Value"
 msgstr "Değer"
+
+msgid "Variables"
+msgstr "Değişkenler"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

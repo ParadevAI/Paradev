@@ -35,12 +35,10 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 		[];
 
 	return (
-		<section className="space-y-3">
-			<div>
-				<h3 className="text-base font-semibold">
-					<Trans>Environment history</Trans>
-				</h3>
-			</div>
+		<div>
+			<span className="mb-2 block text-xs font-medium">
+				<Trans>Environment history</Trans>
+			</span>
 			<div className="overflow-hidden rounded-md border">
 				<Table>
 					<TableHeader>
@@ -104,6 +102,6 @@ export function EnvironmentHistory({ environmentId }: EnvironmentHistoryProps) {
 					</TableBody>
 				</Table>
 			</div>
-		</section>
+		</div>
 	);
 }

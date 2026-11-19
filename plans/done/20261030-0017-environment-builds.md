@@ -38,7 +38,8 @@ None blocking. Reviewers should check decision D3 (time budget) in the Decision 
 - [x] (2026-10-30) Milestone 3: repository changes through a build, behind `update({ startBuild: true })`.
 - [x] (2026-10-30) Milestone 4: desktop screens.
 - [x] (2026-11-02) Everything squashed into one PR on current `main` (the user dropped the separate-migration rule for this work), adapted to the `.paradev/` config directory, migration regenerated as 0186, Ukrainian added.
-- [x] (2026-11-18) Rebased onto `main`: migration regenerated as 0199; the environment page and its Edit and Variables pages live under Settings (`/settings/environments/<id>`, as #9707 moved it), and the machine size from #9707 is on the Edit page.
+- [x] (2026-11-18) Rebased onto `main`: migration regenerated as 0199; the environment page and its Edit and Variables pages live under Settings (`/settings/environments/<id>`, as #9707 moved it).
+- [x] (2026-11-19) The environment page is #9707's `EnvironmentView` as shipped (rows, machine size, inline variables, archive). This change only adds an Edit button on the Repositories row (it opens the edit mode of `CreateEnvironmentFlow`), and the Builds and Environment history sections. The Edit and Variables pages, the Overview grid, the rename and the list's ⋯ menu are dropped.
 - [ ] End-to-end on a real box: needs ParadevAI/acme-demo#8 merged and a browser login to the PR preview (this workspace has placeholder sandbox credentials).
 
 ## Surprises & Discoveries

@@ -2023,9 +2023,6 @@ msgstr "active {lastActive}"
 msgid "Active agent sessions."
 msgstr "Active agent sessions."
 
-msgid "Active build status"
-msgstr "Active build status"
-
 msgid "active days"
 msgstr "active days"
 
@@ -2277,9 +2274,6 @@ msgstr "Add to sidebar"
 
 msgid "Add to workspace"
 msgstr "Add to workspace"
-
-msgid "Add variable"
-msgstr "Add variable"
 
 msgid "Add what it does"
 msgstr "Add what it does"
@@ -2578,9 +2572,6 @@ msgstr "All data will be permanently deleted for all {0} members. This cannot be
 
 msgid "All downloads"
 msgstr "All downloads"
-
-msgid "All environment variables ({total})"
-msgstr "All environment variables ({total})"
 
 msgid "All features, side by side"
 msgstr "All features, side by side"
@@ -3581,6 +3572,9 @@ msgstr "Base directory for new worktree workspaces on this host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Base directory for new worktrees on {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Base image · no checkpoint yet"
+
 msgid "Base URL"
 msgstr "Base URL"
 
@@ -3849,9 +3843,6 @@ msgstr "Build ID"
 
 msgid "Build in public"
 msgstr "Build in public"
-
-msgid "Build started"
-msgstr "Build started"
 
 msgid "Build your own"
 msgstr "Build your own"
@@ -4417,6 +4408,10 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · before tooltip refactor"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Checkpoint saved {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint saved to {name}"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Created"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Environment not found"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
-
-msgid "Environment updated"
-msgstr "Environment updated"
-
-msgid "Environment variables"
-msgstr "Environment variables"
 
 msgid "Environment Variables"
 msgstr "Environment Variables"
@@ -12803,9 +12793,6 @@ msgstr "No boots in this period."
 msgid "No branches found"
 msgstr "No branches found"
 
-msgid "No build yet"
-msgstr "No build yet"
-
 msgid "No builds yet"
 msgstr "No builds yet"
 
@@ -13379,9 +13366,6 @@ msgstr "No v1 terminal scripts found."
 
 msgid "No valid environment variables found in file"
 msgstr "No valid environment variables found in file"
-
-msgid "No variables set yet."
-msgstr "No variables set yet."
 
 msgid "No versions yet"
 msgstr "No versions yet"
@@ -18913,6 +18897,9 @@ msgstr "Smileys & People"
 msgid "Smoother onboarding"
 msgstr "Smoother onboarding"
 
+msgid "Snapshot"
+msgstr "Snapshot"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 
@@ -21825,9 +21812,6 @@ msgstr "Update couldn't preserve sessions"
 msgid "Update daemon"
 msgstr "Update daemon"
 
-msgid "Update environment"
-msgstr "Update environment"
-
 msgid "Update Error"
 msgstr "Update Error"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId does not match the workspace's project"
 
 msgid "Value"
 msgstr "Value"
+
+msgid "Variables"
+msgstr "Variables"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

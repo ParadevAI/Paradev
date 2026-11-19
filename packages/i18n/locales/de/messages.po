@@ -2023,9 +2023,6 @@ msgstr "aktiv {lastActive}"
 msgid "Active agent sessions."
 msgstr "Aktive Agenten-Sitzungen."
 
-msgid "Active build status"
-msgstr "Status des aktiven Builds"
-
 msgid "active days"
 msgstr "aktive Tage"
 
@@ -2277,9 +2274,6 @@ msgstr "Zur Seitenleiste hinzufügen"
 
 msgid "Add to workspace"
 msgstr "Zum Arbeitsbereich hinzufügen"
-
-msgid "Add variable"
-msgstr "Variable hinzufügen"
 
 msgid "Add what it does"
 msgstr "Beschreiben, was er macht"
@@ -2578,9 +2572,6 @@ msgstr "Alle Daten werden für alle {0} Mitglieder endgültig gelöscht. Das lä
 
 msgid "All downloads"
 msgstr "Alle Downloads"
-
-msgid "All environment variables ({total})"
-msgstr "Alle Umgebungsvariablen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle Funktionen im Vergleich"
@@ -3581,6 +3572,9 @@ msgstr "Basisverzeichnis für neue Worktree-Arbeitsbereiche auf diesem Host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Basisverzeichnis für neue Worktrees auf {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Basis-Image · noch kein Checkpoint"
+
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -3849,9 +3843,6 @@ msgstr "Build-ID"
 
 msgid "Build in public"
 msgstr "Öffentlich entwickeln"
-
-msgid "Build started"
-msgstr "Build gestartet"
 
 msgid "Build your own"
 msgstr "Bau dein eigenes"
@@ -4417,6 +4408,10 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · vor dem Tooltip-Refactoring"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Checkpoint gespeichert {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint in {name} gespeichert"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Erstellt"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Umgebung nicht gefunden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Umgebungs-Setup, flaky Tests und Zugangsdaten-Verkabelung — die langweiligen Fehlerquellen, die 2025 unbeaufsichtigte Läufe zerlegt haben — werden größtenteils wegkonstruiert statt wegmodelliert."
-
-msgid "Environment updated"
-msgstr "Umgebung aktualisiert"
-
-msgid "Environment variables"
-msgstr "Umgebungsvariablen"
 
 msgid "Environment Variables"
 msgstr "Umgebungsvariablen"
@@ -12803,9 +12793,6 @@ msgstr "Keine Starts in diesem Zeitraum."
 msgid "No branches found"
 msgstr "Keine Branches gefunden"
 
-msgid "No build yet"
-msgstr "Noch kein Build"
-
 msgid "No builds yet"
 msgstr "Noch keine Builds"
 
@@ -13379,9 +13366,6 @@ msgstr "Keine v1-Terminalskripte gefunden."
 
 msgid "No valid environment variables found in file"
 msgstr "Keine gültigen Umgebungsvariablen in der Datei gefunden"
-
-msgid "No variables set yet."
-msgstr "Noch keine Variablen gesetzt."
 
 msgid "No versions yet"
 msgstr "Noch keine Versionen"
@@ -18913,6 +18897,9 @@ msgstr "Smileys & Personen"
 msgid "Smoother onboarding"
 msgstr "Reibungsloseres Onboarding"
 
+msgid "Snapshot"
+msgstr "Snapshot"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Vor und nach jedem Chat-Durchlauf einen Snapshot des Worktrees erstellen, damit seine Karte jede geänderte Datei auflistet, auch Shell-Änderungen, und sie rückgängig machen kann. Jeder Prompt wartet zuerst auf seinen Snapshot."
 
@@ -21825,9 +21812,6 @@ msgstr "Update konnte die Sitzungen nicht erhalten"
 msgid "Update daemon"
 msgstr "Daemon aktualisieren"
 
-msgid "Update environment"
-msgstr "Umgebung aktualisieren"
-
 msgid "Update Error"
 msgstr "Update-Fehler"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId passt nicht zum Projekt des Arbeitsbereichs"
 
 msgid "Value"
 msgstr "Wert"
+
+msgid "Variables"
+msgstr "Variablen"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

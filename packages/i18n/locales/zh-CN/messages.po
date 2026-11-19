@@ -2023,9 +2023,6 @@ msgstr "{lastActive}活跃"
 msgid "Active agent sessions."
 msgstr "活跃的智能体会话。"
 
-msgid "Active build status"
-msgstr "当前构建状态"
-
 msgid "active days"
 msgstr "活跃天数"
 
@@ -2277,9 +2274,6 @@ msgstr "添加到侧边栏"
 
 msgid "Add to workspace"
 msgstr "添加到工作区"
-
-msgid "Add variable"
-msgstr "添加变量"
 
 msgid "Add what it does"
 msgstr "添加它的用途"
@@ -2578,9 +2572,6 @@ msgstr "全部{0}名成员的所有数据都将被永久删除。此操作无法
 
 msgid "All downloads"
 msgstr "所有下载"
-
-msgid "All environment variables ({total})"
-msgstr "所有环境变量（{total}）"
 
 msgid "All features, side by side"
 msgstr "所有功能逐项对比"
@@ -3581,6 +3572,9 @@ msgstr "此主机上新建worktree工作区的基准目录。"
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}上新建worktree的基准目录。"
 
+msgid "Base image · no checkpoint yet"
+msgstr "基础镜像 · 尚无检查点"
+
 msgid "Base URL"
 msgstr "基础URL"
 
@@ -3849,9 +3843,6 @@ msgstr "构建 ID"
 
 msgid "Build in public"
 msgstr "公开构建"
-
-msgid "Build started"
-msgstr "构建已开始"
 
 msgid "Build your own"
 msgstr "自己动手构建"
@@ -4417,6 +4408,10 @@ msgstr "检查点"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "检查点 · tooltip重构之前"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "检查点已保存 {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "已将检查点保存到 {name}"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "已创建"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "未找到环境"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "环境搭建、不稳定的测试、凭据串联，这些在2025年让无人值守运行折戟的无聊失败模式，大多是被工程手段消除的，而不是被模型消除的。"
-
-msgid "Environment updated"
-msgstr "环境已更新"
-
-msgid "Environment variables"
-msgstr "环境变量"
 
 msgid "Environment Variables"
 msgstr "环境变量"
@@ -12803,9 +12793,6 @@ msgstr "此周期内没有启动。"
 msgid "No branches found"
 msgstr "未找到分支"
 
-msgid "No build yet"
-msgstr "尚无构建"
-
 msgid "No builds yet"
 msgstr "尚无构建"
 
@@ -13379,9 +13366,6 @@ msgstr "未找到 v1 终端脚本。"
 
 msgid "No valid environment variables found in file"
 msgstr "文件中未找到有效的环境变量"
-
-msgid "No variables set yet."
-msgstr "尚未设置变量。"
 
 msgid "No versions yet"
 msgstr "还没有版本"
@@ -18913,6 +18897,9 @@ msgstr "笑脸与人物"
 msgid "Smoother onboarding"
 msgstr "更顺畅的上手流程"
 
+msgid "Snapshot"
+msgstr "快照"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "在每轮聊天前后为 worktree 创建快照，使该轮的卡片列出每个更改的文件（包括 shell 编辑）并可以撤销。每条提示词会先等待其快照完成。"
 
@@ -21825,9 +21812,6 @@ msgstr "更新无法保留会话"
 msgid "Update daemon"
 msgstr "更新守护进程"
 
-msgid "Update environment"
-msgstr "更新环境"
-
 msgid "Update Error"
 msgstr "更新出错"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId与该工作区的项目不匹配"
 
 msgid "Value"
 msgstr "值"
+
+msgid "Variables"
+msgstr "变量"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

@@ -2023,9 +2023,6 @@ msgstr "{lastActive} 활동"
 msgid "Active agent sessions."
 msgstr "활성 에이전트 세션입니다."
 
-msgid "Active build status"
-msgstr "활성 빌드 상태"
-
 msgid "active days"
 msgstr "활동 일수"
 
@@ -2277,9 +2274,6 @@ msgstr "사이드바에 추가"
 
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
-
-msgid "Add variable"
-msgstr "변수 추가"
 
 msgid "Add what it does"
 msgstr "하는 일 추가"
@@ -2578,9 +2572,6 @@ msgstr "멤버 {0}명 전원의 모든 데이터가 영구적으로 삭제되며
 
 msgid "All downloads"
 msgstr "모든 다운로드"
-
-msgid "All environment variables ({total})"
-msgstr "모든 환경 변수 ({total})"
 
 msgid "All features, side by side"
 msgstr "모든 기능 한눈에 비교"
@@ -3581,6 +3572,9 @@ msgstr "이 호스트에서 새 worktree 워크스페이스가 만들어질 기�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}에서 새 worktree를 만들 기본 디렉터리입니다."
 
+msgid "Base image · no checkpoint yet"
+msgstr "기본 이미지 · 아직 체크포인트 없음"
+
 msgid "Base URL"
 msgstr "기본 URL"
 
@@ -3849,9 +3843,6 @@ msgstr "빌드 ID"
 
 msgid "Build in public"
 msgstr "공개적으로 개발합니다"
-
-msgid "Build started"
-msgstr "빌드를 시작했습니다"
 
 msgid "Build your own"
 msgstr "직접 만들기"
@@ -4417,6 +4408,10 @@ msgstr "체크포인트"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "체크포인트 · 툴팁 리팩터링 전"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "체크포인트 저장됨 {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "{name}에 체크포인트를 저장했습니다"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "생성됨"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "환경을 찾을 수 없습니다"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "환경 설정, 불안정한 테스트, 자격 증명 연결처럼 2025년에 무인 실행을 망가뜨렸던 지루한 실패 유형은 대부분 모델링이 아니라 엔지니어링으로 해결됩니다."
-
-msgid "Environment updated"
-msgstr "환경이 업데이트되었습니다"
-
-msgid "Environment variables"
-msgstr "환경 변수"
 
 msgid "Environment Variables"
 msgstr "환경 변수"
@@ -12803,9 +12793,6 @@ msgstr "이 기간에 부팅이 없습니다."
 msgid "No branches found"
 msgstr "브랜치를 찾을 수 없습니다"
 
-msgid "No build yet"
-msgstr "아직 빌드 없음"
-
 msgid "No builds yet"
 msgstr "아직 빌드가 없습니다"
 
@@ -13379,9 +13366,6 @@ msgstr "v1 터미널 스크립트를 찾을 수 없습니다."
 
 msgid "No valid environment variables found in file"
 msgstr "파일에서 유효한 환경 변수를 찾지 못했습니다"
-
-msgid "No variables set yet."
-msgstr "아직 설정된 변수가 없습니다."
 
 msgid "No versions yet"
 msgstr "아직 버전이 없습니다"
@@ -18913,6 +18897,9 @@ msgstr "스마일리 및 사람"
 msgid "Smoother onboarding"
 msgstr "더 매끄러운 온보딩"
 
+msgid "Snapshot"
+msgstr "스냅샷"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "각 채팅 턴 전후로 worktree 스냅샷을 만들어, 카드에 셸 편집을 포함한 모든 변경된 파일을 표시하고 되돌릴 수 있게 합니다. 각 프롬프트는 먼저 스냅샷이 끝나기를 기다립니다."
 
@@ -21825,9 +21812,6 @@ msgstr "업데이트가 세션을 유지하지 못했습니다"
 msgid "Update daemon"
 msgstr "데몬 업데이트"
 
-msgid "Update environment"
-msgstr "환경 업데이트"
-
 msgid "Update Error"
 msgstr "업데이트 오류"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId가 워크스페이스의 프로젝트와 일치하지 않습
 
 msgid "Value"
 msgstr "값"
+
+msgid "Variables"
+msgstr "변수"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

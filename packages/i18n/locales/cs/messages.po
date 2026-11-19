@@ -2023,9 +2023,6 @@ msgstr "aktivní {lastActive}"
 msgid "Active agent sessions."
 msgstr "Aktivní relace agentů."
 
-msgid "Active build status"
-msgstr "Stav aktivního sestavení"
-
 msgid "active days"
 msgstr "aktivních dní"
 
@@ -2277,9 +2274,6 @@ msgstr "Přidat do postranního panelu"
 
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
-
-msgid "Add variable"
-msgstr "Přidat proměnnou"
 
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
@@ -2578,9 +2572,6 @@ msgstr "Všechna data budou trvale smazána pro všechny členy ({0}). Nelze vr�
 
 msgid "All downloads"
 msgstr "Všechna stažení"
-
-msgid "All environment variables ({total})"
-msgstr "Všechny proměnné prostředí ({total})"
 
 msgid "All features, side by side"
 msgstr "Všechny funkce vedle sebe"
@@ -3581,6 +3572,9 @@ msgstr "Základní adresář pro nové pracovní prostory s worktree na tomto ho
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Základní adresář pro nové worktree na {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Základní obraz · zatím bez kontrolního bodu"
+
 msgid "Base URL"
 msgstr "Základní URL"
 
@@ -3849,9 +3843,6 @@ msgstr "ID sestavení"
 
 msgid "Build in public"
 msgstr "Vyvíjíme veřejně"
-
-msgid "Build started"
-msgstr "Sestavení spuštěno"
 
 msgid "Build your own"
 msgstr "Vytvořte vlastní"
@@ -4417,6 +4408,10 @@ msgstr "Kontrolní bod"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrolní bod · před refaktorem tooltipů"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Kontrolní bod uložen {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint uložen do {name}"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Vytvořeno"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Prostředí nebylo nalezeno"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Příprava prostředí, nestabilní testy a rozvody přihlašovacích údajů — nudné příčiny selhání, které v roce 2025 zabíjely běhy bez dozoru — se většinou vyřeší inženýrsky, ne modelem."
-
-msgid "Environment updated"
-msgstr "Prostředí aktualizováno"
-
-msgid "Environment variables"
-msgstr "Proměnné prostředí"
 
 msgid "Environment Variables"
 msgstr "Proměnné prostředí"
@@ -12803,9 +12793,6 @@ msgstr "V tomto období žádná spuštění."
 msgid "No branches found"
 msgstr "Nenalezeny žádné větve"
 
-msgid "No build yet"
-msgstr "Zatím žádné sestavení"
-
 msgid "No builds yet"
 msgstr "Zatím žádná sestavení"
 
@@ -13379,9 +13366,6 @@ msgstr "Nebyly nalezeny žádné terminálové skripty v1."
 
 msgid "No valid environment variables found in file"
 msgstr "V souboru nebyly nalezeny žádné platné proměnné prostředí"
-
-msgid "No variables set yet."
-msgstr "Zatím nejsou nastaveny žádné proměnné."
 
 msgid "No versions yet"
 msgstr "Zatím žádné verze"
@@ -18913,6 +18897,9 @@ msgstr "Smajlíci a lidé"
 msgid "Smoother onboarding"
 msgstr "Plynulejší onboarding"
 
+msgid "Snapshot"
+msgstr "Snímek"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Pořizovat snímek worktree před každým tahem chatu a po něm, aby jeho karta uváděla každý změněný soubor včetně změn ze shellu a dokázala je vrátit zpět. Každý prompt nejdřív počká na svůj snímek."
 
@@ -21825,9 +21812,6 @@ msgstr "Aktualizace nedokázala zachovat relace"
 msgid "Update daemon"
 msgstr "Aktualizovat démona"
 
-msgid "Update environment"
-msgstr "Aktualizovat prostředí"
-
 msgid "Update Error"
 msgstr "Chyba aktualizace"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId neodpovídá projektu pracovního prostoru"
 
 msgid "Value"
 msgstr "Hodnota"
+
+msgid "Variables"
+msgstr "Proměnné"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"

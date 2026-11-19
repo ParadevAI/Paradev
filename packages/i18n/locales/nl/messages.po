@@ -2023,9 +2023,6 @@ msgstr "actief {lastActive}"
 msgid "Active agent sessions."
 msgstr "Actieve agentsessies."
 
-msgid "Active build status"
-msgstr "Status van de actieve build"
-
 msgid "active days"
 msgstr "actieve dagen"
 
@@ -2277,9 +2274,6 @@ msgstr "Aan zijbalk toevoegen"
 
 msgid "Add to workspace"
 msgstr "Toevoegen aan werkruimte"
-
-msgid "Add variable"
-msgstr "Variabele toevoegen"
 
 msgid "Add what it does"
 msgstr "Toevoegen wat hij doet"
@@ -2578,9 +2572,6 @@ msgstr "Alle gegevens worden definitief verwijderd voor alle {0} leden. Dit kan 
 
 msgid "All downloads"
 msgstr "Alle downloads"
-
-msgid "All environment variables ({total})"
-msgstr "Alle omgevingsvariabelen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle functies naast elkaar"
@@ -3581,6 +3572,9 @@ msgstr "Basismap voor nieuwe worktree-werkruimtes op deze host."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Basismap voor nieuwe worktrees op {selectedHostName}."
 
+msgid "Base image · no checkpoint yet"
+msgstr "Basisimage · nog geen checkpoint"
+
 msgid "Base URL"
 msgstr "Basis-URL"
 
@@ -3849,9 +3843,6 @@ msgstr "Build-ID"
 
 msgid "Build in public"
 msgstr "Bouwen in het openbaar"
-
-msgid "Build started"
-msgstr "Build gestart"
 
 msgid "Build your own"
 msgstr "Bouw je eigen"
@@ -4417,6 +4408,10 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · voor de tooltip-refactor"
+
+#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
+msgid "Checkpoint saved {0}"
+msgstr "Checkpoint opgeslagen {0}"
 
 msgid "Checkpoint saved to {name}"
 msgstr "Checkpoint opgeslagen in {name}"
@@ -6640,6 +6635,7 @@ msgctxt "github release action"
 msgid "Created"
 msgstr "Aangemaakt"
 
+#. placeholder {0}: formatRelativeTime(new Date(row.createdAt), now)
 #. placeholder {0}: issue.identifier
 #. placeholder {0}: result.task.slug
 msgid "Created {0}"
@@ -8101,12 +8097,6 @@ msgstr "Omgeving niet gevonden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Omgevingsopzet, flaky tests en credential-geknutsel — de saaie faalvormen die onbewaakte runs in 2025 om zeep hielpen — zijn grotendeels weggewerkt met engineering in plaats van met modellen."
-
-msgid "Environment updated"
-msgstr "Omgeving bijgewerkt"
-
-msgid "Environment variables"
-msgstr "Omgevingsvariabelen"
 
 msgid "Environment Variables"
 msgstr "Omgevingsvariabelen"
@@ -12803,9 +12793,6 @@ msgstr "Geen starts in deze periode."
 msgid "No branches found"
 msgstr "Geen branches gevonden"
 
-msgid "No build yet"
-msgstr "Nog geen build"
-
 msgid "No builds yet"
 msgstr "Nog geen builds"
 
@@ -13379,9 +13366,6 @@ msgstr "Geen v1-terminalscripts gevonden."
 
 msgid "No valid environment variables found in file"
 msgstr "Geen geldige omgevingsvariabelen gevonden in bestand"
-
-msgid "No variables set yet."
-msgstr "Nog geen variabelen ingesteld."
 
 msgid "No versions yet"
 msgstr "Nog geen versies"
@@ -18913,6 +18897,9 @@ msgstr "Smileys en mensen"
 msgid "Smoother onboarding"
 msgstr "Soepelere onboarding"
 
+msgid "Snapshot"
+msgstr "Snapshot"
+
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Maak voor en na elke chatbeurt een snapshot van de worktree, zodat de kaart elk gewijzigd bestand toont, ook wijzigingen via de shell, en ze ongedaan kan maken. Elke prompt wacht eerst op zijn snapshot."
 
@@ -21825,9 +21812,6 @@ msgstr "Update kon sessies niet behouden"
 msgid "Update daemon"
 msgstr "Daemon bijwerken"
 
-msgid "Update environment"
-msgstr "Omgeving bijwerken"
-
 msgid "Update Error"
 msgstr "Updatefout"
 
@@ -22136,6 +22120,9 @@ msgstr "v2ProjectId komt niet overeen met het project van de werkruimte"
 
 msgid "Value"
 msgstr "Waarde"
+
+msgid "Variables"
+msgstr "Variabelen"
 
 msgid "Vercel AI Gateway"
 msgstr "Vercel AI Gateway"
