@@ -42,16 +42,26 @@ export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
  * is active (`topUpSandboxSession`) is extended before it gets there, so this
  * is really the idle stop.
  */
-export const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
-/** Above the 10-minute client keepalive, so an open workspace is always extended in time. */
-const EXTEND_BELOW_MS = 30 * 60 * 1000;
+export const SESSION_TIMEOUT_MS = 15 * 60 * 1000;
 const MIN_TOP_UP_MS = 60 * 1000;
+/** What host-service bundles that do not report their keepalive interval ping at. */
+const LEGACY_KEEPALIVE_INTERVAL_MS = 15 * 60 * 1000;
+const KEEPALIVE_MARGIN_MS = 5 * 60 * 1000;
 const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 const BOOT_COMMAND = "/usr/local/bin/superset-boot";
 const HOST_PROBE_TIMEOUT_MS = 1_500;
+
+/** How long an agent keepalive keeps a session running: past the box's next ping. */
+export function keepaliveWindowMs(pingsEveryMs?: number): number {
+	const interval = Math.min(
+		pingsEveryMs ?? LEGACY_KEEPALIVE_INTERVAL_MS,
+		LEGACY_KEEPALIVE_INTERVAL_MS,
+	);
+	return Math.max(SESSION_TIMEOUT_MS, interval + KEEPALIVE_MARGIN_MS);
+}
 
 function credentials() {
 	return {
@@ -501,20 +511,29 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 	}
 }
 
+/** How much to extend a session by so it ends `windowMs` from now; 0 when it nearly does already. */
+function extensionToEnd(
+	expiresAt: Date | undefined,
+	windowMs: number,
+): number {
+	const extension = Date.now() + windowMs - (expiresAt?.getTime() ?? 0);
+	return extension > MIN_TOP_UP_MS ? extension : 0;
+}
+
 /**
- * Extends a running session so it ends `SESSION_TIMEOUT_MS` from now; never
+ * Extends a running session so it ends `windowMs` from now; never
  * wakes a stopped one. The provider only extends by a duration, and refuses
  * past the plan's 24h session cap. Goes through the session:
  * `Sandbox.extendTimeout` resumes a session that stopped meanwhile.
  */
 export async function topUpSandboxSession(
 	providerSandboxId: string,
+	windowMs = SESSION_TIMEOUT_MS,
 ): Promise<{ expiresAt: Date; sessionId: string | null } | null> {
 	const sandbox = await getSandbox(providerSandboxId);
 	if (sandbox?.status !== "running" || !sandbox.expiresAt) return null;
-	const extension =
-		Date.now() + SESSION_TIMEOUT_MS - sandbox.expiresAt.getTime();
-	if (extension > MIN_TOP_UP_MS) {
+	const extension = extensionToEnd(sandbox.expiresAt, windowMs);
+	if (extension) {
 		try {
 			await sandbox.currentSession().extendTimeout(extension);
 		} catch (error) {
@@ -625,11 +644,11 @@ export async function wakeSandbox(args: {
 			await args.beforeResume({ memoryMb: vcpus * MEMORY_MB_PER_VCPU, vcpus });
 		}
 		if (wasRunning) {
-			const remaining = (sandbox.expiresAt?.getTime() ?? 0) - Date.now();
-			if (remaining < EXTEND_BELOW_MS) {
+			const extension = extensionToEnd(sandbox.expiresAt, SESSION_TIMEOUT_MS);
+			if (extension) {
 				// Past the plan's per-session cap the extension is refused; the
 				// session then ends and the next open resumes it.
-				await sandbox.extendTimeout(SESSION_TIMEOUT_MS).catch(() => {});
+				await sandbox.extendTimeout(extension).catch(() => {});
 			}
 		}
 		// A box that is already serving needs neither a fresh identity file nor

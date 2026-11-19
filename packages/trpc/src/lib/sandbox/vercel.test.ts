@@ -14,6 +14,7 @@ import {
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
@@ -512,6 +513,14 @@ describe("topUpSandboxSession", () => {
 		expiresAt = new Date(NOW + SESSION_TIMEOUT_MS - 30_000);
 		await topUpSandboxSession("sbx");
 		expect(extended).toEqual([SESSION_TIMEOUT_MS / 2]);
+	});
+});
+
+describe("keepaliveWindowMs", () => {
+	test("outlives the box's next ping, and never exceeds what a legacy box gets", () => {
+		expect(keepaliveWindowMs(5 * 60_000)).toBe(SESSION_TIMEOUT_MS);
+		expect(keepaliveWindowMs()).toBe(20 * 60_000);
+		expect(keepaliveWindowMs(24 * 60 * 60_000)).toBe(20 * 60_000);
 	});
 });
 
