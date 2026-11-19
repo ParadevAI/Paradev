@@ -33,6 +33,10 @@ on:
         description: "real-sandbox only: keep the boxes (stopped) and the box drive for inspection instead of deleting them"
         type: boolean
         default: false
+      real_sandbox_wake:
+        description: "real-sandbox only: instead of the checks, the wake measurement (wake-measure.ts): prepare, then cold <suffix> at least 2 h later, or delete <suffix>"
+        type: string
+        default: ""
       real_sandbox_work_gb:
         description: "real-sandbox drive pass only: GB written under /workspace on the drive box and the plain box"
         type: string
@@ -131,7 +135,7 @@ jobs:
     name: Real sandbox
     if: github.event_name == 'workflow_dispatch' && inputs.run == 'real-sandbox'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -161,6 +165,7 @@ jobs:
           REAL_SANDBOX_DRIVE: ${{ inputs.real_sandbox_drive && '1' || '' }}
           REAL_SANDBOX_KEEP: ${{ inputs.real_sandbox_keep && '1' || '' }}
           REAL_SANDBOX_WORK_GB: ${{ inputs.real_sandbox_work_gb }}
+          REAL_SANDBOX_WAKE: ${{ inputs.real_sandbox_wake }}
         run: bun run src/real-sandbox.ts
 
   inventory:

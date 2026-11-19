@@ -21,6 +21,9 @@
  * production path. One table compares them (drive-comparison.ts). A wake
  * that is not served from a warm snapshot cache cannot be forced from here.
  *
+ * REAL_SANDBOX_WAKE=prepare | cold <suffix> | delete <suffix> runs only the
+ * wake measurement of wake-measure.ts instead of the checks.
+ *
  * Every box and drive it made is deleted at the end, pass or fail: the box
  * stopped first, each drive once detached. REAL_SANDBOX_KEEP=1 keeps the
  * boxes (stopped) and the box drive for inspection instead. Exits 1 when
@@ -114,6 +117,56 @@ const { sandboxHostSecretFor } = await import(
 );
 const { checkWakeLog, probeBox } = await import("./environments/probe");
 
+// Only stdout is compared: sudo on the box warns on stderr that it cannot resolve the hostname.
+const runOn =
+	(name: string): BoxRun =>
+	async (command, options = {}) => {
+		const sandbox = await Sandbox.get({ ...credentials, name });
+		const script = Buffer.from(command).toString("base64");
+		const result = await sandbox.runCommand({
+			cmd: "bash",
+			args: options.root
+				? ["-lc", command]
+				: [
+						"-c",
+						`echo ${script} | base64 -d | runuser -u ${SANDBOX_USER} -- bash -l`,
+					],
+			sudo: true,
+		});
+		const out = (await result.stdout()).trim();
+		const err = (await result.stderr()).trim();
+		return {
+			out,
+			detail: [out, err && `stderr: ${err}`, `exit=${result.exitCode}`]
+				.filter(Boolean)
+				.join("\n"),
+		};
+	};
+
+const stopMeasured = async (name: string): Promise<StopMeasure> => {
+	const before = (await Sandbox.get({ ...credentials, name, resume: false }))
+		.currentSnapshotId;
+	const stopStarted = Date.now();
+	await stopSandbox(name);
+	while (Date.now() - stopStarted < 10 * 60_000) {
+		const now = await Sandbox.get({ ...credentials, name, resume: false });
+		if (
+			now.status === "stopped" &&
+			now.currentSnapshotId &&
+			now.currentSnapshotId !== before
+		) {
+			const ms = Date.now() - stopStarted;
+			const snapshot = await Snapshot.get({
+				...credentials,
+				snapshotId: now.currentSnapshotId,
+			});
+			return { ms, snapshotBytes: snapshot.sizeBytes };
+		}
+		await new Promise((resolve) => setTimeout(resolve, 1000));
+	}
+	throw new Error(`${name} did not snapshot within 10 minutes of its stop`);
+};
+
 const name = `ws-real-check-${Date.now().toString(36)}`;
 const workspaceId = randomUUID();
 // Cut from main the way a real workspace is, so the probe's branch check
@@ -176,6 +229,64 @@ async function provisionFromImage(
 			await new Promise((resolve) => setTimeout(resolve, 15_000));
 		}
 	}
+}
+
+const wakeMode = process.env.REAL_SANDBOX_WAKE?.trim();
+if (wakeMode) {
+	const wake = await import("./wake-measure");
+	const driveHelpers = await import("@superset/trpc/lib/sandbox/drives");
+	const wakeDrives = driveHelpers.vercelDrives();
+	const deps = {
+		log,
+		runOn,
+		stopMeasured,
+		provision: (
+			box: string,
+			mounts: Parameters<typeof provisionFromImage>[1],
+			boxClaim: typeof claim,
+		) => provisionFromImage(box, mounts, boxClaim),
+		wake: (args: Parameters<typeof wakeSandbox>[0]) => wakeSandbox(args),
+		claimFor: (driveName: string | null, laidOut: boolean) => ({
+			...claim,
+			identity: {
+				...identity,
+				...driveHelpers.workspaceDriveIdentity(driveName, { laidOut }),
+			},
+		}),
+		createDrive: (driveName: string) =>
+			wakeDrives.create(driveName, DEFAULT_SANDBOX_REGION),
+		driveNameFor: driveHelpers.workspaceDriveNameFor,
+		mountsFor: driveHelpers.workspaceDriveMounts,
+		deleteBox: async (box: string, driveName: string | null) => {
+			await stopSandbox(box).catch(() => {});
+			await deleteSandboxAndDrive(box, driveName, wakeDrives);
+		},
+		stoppedAt: async (box: string) => {
+			const snapshotId = (
+				await Sandbox.get({ ...credentials, name: box, resume: false })
+			).currentSnapshotId;
+			if (!snapshotId) return null;
+			return (
+				await Snapshot.get({ ...credentials, snapshotId })
+			).createdAt.getTime();
+		},
+	};
+	const [mode, suffix] = wakeMode.split(/\s+/);
+	if (mode === "prepare") {
+		process.exit(
+			(await wake.prepareWakeMeasure(deps, Date.now().toString(36))) ? 1 : 0,
+		);
+	}
+	if (mode === "cold" && suffix) {
+		process.exit((await wake.coldWakeMeasure(deps, suffix)) ? 1 : 0);
+	}
+	if (mode === "delete" && suffix) {
+		process.exit((await wake.deleteWakeMeasure(deps, suffix)) ? 1 : 0);
+	}
+	console.error(
+		`REAL_SANDBOX_WAKE: prepare | cold <suffix> | delete <suffix>, not "${wakeMode}"`,
+	);
+	process.exit(64);
 }
 
 log(
@@ -297,31 +408,6 @@ async function drivePass(): Promise<number> {
 		);
 		if (!ok) failures++;
 	};
-	// Only stdout is compared: sudo on the box warns on stderr that it cannot resolve the hostname.
-	const runOn =
-		(name: string): BoxRun =>
-		async (command, options = {}) => {
-			const sandbox = await Sandbox.get({ ...credentials, name });
-			const script = Buffer.from(command).toString("base64");
-			const result = await sandbox.runCommand({
-				cmd: "bash",
-				args: options.root
-					? ["-lc", command]
-					: [
-							"-c",
-							`echo ${script} | base64 -d | runuser -u ${SANDBOX_USER} -- bash -l`,
-						],
-				sudo: true,
-			});
-			const out = (await result.stdout()).trim();
-			const err = (await result.stderr()).trim();
-			return {
-				out,
-				detail: [out, err && `stderr: ${err}`, `exit=${result.exitCode}`]
-					.filter(Boolean)
-					.join("\n"),
-			};
-		};
 	const run = runOn(box);
 	const root = (command: string) => run(command, { root: true });
 	const layouts = async () =>
@@ -357,30 +443,6 @@ async function drivePass(): Promise<number> {
 			{ root: true },
 		).catch((error) => ({ detail: `diagnosis failed: ${error}` }));
 		log(`drive: diagnosis ${when}:\n${report.detail}`);
-	};
-
-	const stopMeasured = async (name: string): Promise<StopMeasure> => {
-		const before = (await Sandbox.get({ ...credentials, name, resume: false }))
-			.currentSnapshotId;
-		const stopStarted = Date.now();
-		await stopSandbox(name);
-		while (Date.now() - stopStarted < 10 * 60_000) {
-			const now = await Sandbox.get({ ...credentials, name, resume: false });
-			if (
-				now.status === "stopped" &&
-				now.currentSnapshotId &&
-				now.currentSnapshotId !== before
-			) {
-				const ms = Date.now() - stopStarted;
-				const snapshot = await Snapshot.get({
-					...credentials,
-					snapshotId: now.currentSnapshotId,
-				});
-				return { ms, snapshotBytes: snapshot.sizeBytes };
-			}
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-		}
-		throw new Error(`${name} did not snapshot within 10 minutes of its stop`);
 	};
 
 	const measures: Record<"plain" | "drive" | "golden", BoxMeasures> = {
