@@ -27,6 +27,7 @@ import {
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
+	sandboxDeletesAllowed,
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
@@ -625,7 +626,10 @@ export const environmentRouter = {
 					await restart();
 					throw error;
 				});
-			if (target?.sourceKind === "fork") {
+			if (
+				target?.sourceKind === "fork" &&
+				sandboxDeletesAllowed(`golden ${target.sourceRef}`)
+			) {
 				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
 					console.error(
 						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
@@ -722,19 +726,11 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const environment = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, environment.organizationId);
-			const [archived] = await db
+			await db
 				.update(environments)
 				.set({ archivedAt: new Date() })
-				.where(eq(environments.id, environment.id))
-				.returning({
-					sourceKind: environments.sourceKind,
-					sourceRef: environments.sourceRef,
-				});
-			// A golden is one environment's alone, and an archived environment
-			// never forks from it again; without this it bills storage forever.
-			if (archived?.sourceKind === "fork") {
-				await deleteSandbox(archived.sourceRef);
-			}
+				.where(eq(environments.id, environment.id));
+			// Only a status: the cleanup job deletes an archived environment's goldens (rule 2).
 			return { archived: true };
 		}),
 } satisfies TRPCRouterRecord;

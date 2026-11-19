@@ -59,8 +59,6 @@ process.env.SKIP_ENV_VALIDATION ??= "1";
 const SKIP_IMAGE = process.argv.includes("--skip-image");
 const KEEP_OLD = process.argv.includes("--keep-old");
 const PRODUCTION = process.argv.includes("--production");
-/** Released bundles whose drives stay in every region, so a rollback to one of them has its drives. */
-const KEPT_RELEASED_BUNDLES = 3;
 const FOLLOWED_UPSTREAM = ["claude", "codex", "chrome", "opencode", "pi"];
 /** The environment the release rebuilds; without it, the release creates one named INTERNAL_NAME. */
 const ENVIRONMENT_ID = process.env.SUPERSET_INTERNAL_ENVIRONMENT_ID;
@@ -521,7 +519,7 @@ const { db, dbWs } = await import("@superset/db/client");
 const { environments, environmentRepositories } = await import(
 	"@superset/db/schema"
 );
-const { desc, eq } = await import("drizzle-orm");
+const { eq } = await import("drizzle-orm");
 const { releaseRepositoryWhere } = await import(
 	"./utils/releaseRepositoryWhere"
 );
@@ -605,39 +603,7 @@ if (!previous)
 		`rows: created; set SUPERSET_INTERNAL_ENVIRONMENT_ID=${internal.id} so the next release updates it`,
 	);
 
-// One Vercel project holds every database's drives (staging shares
-// production's rows; preview branches copy them), so only the production
-// release, whose rows the others mirror, may delete one.
-if (!PRODUCTION) {
-	log("agent-tools: prune skipped; only --production prunes drives");
-} else {
-	try {
-		const { sandboxBundles } = await import("@superset/db/schema");
-		const rows = await db.query.environments.findMany({
-			columns: { region: true, bundleSha: true },
-		});
-		const recent = await db
-			.select({ sha: sandboxBundles.sha })
-			.from(sandboxBundles)
-			.orderBy(desc(sandboxBundles.releasedAt))
-			.limit(KEPT_RELEASED_BUNDLES);
-		const { deleted, kept } = await agentTools.pruneAgentToolsDrives({
-			host: driveHost,
-			referenced: agentTools.referencedAgentToolsDrives({
-				rows,
-				recentBundles: [bundle.sha256, ...recent.map((row) => row.sha)],
-				regions: SANDBOX_REGION_IDS,
-			}),
-		});
-		log(
-			`agent-tools: pruned ${deleted.length}${kept.length ? `; ${kept.join(", ")} still attached, next release retries` : ""}`,
-		);
-	} catch (error) {
-		console.log(
-			`::warning::agent-tools: prune failed: ${String(error).slice(0, 300)}`,
-		);
-	}
-}
+// Old agents drives are deleted by the API's cleanup job (rule 3), once no box mounts them.
 
 if (
 	previous &&

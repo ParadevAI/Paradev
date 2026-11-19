@@ -8,15 +8,19 @@ import {
 } from "bun:test";
 import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
+import { sandboxDeletesAllowed } from "./deletes";
 import {
 	agentToolsMounts,
 	applySandboxPolicy,
+	deleteDrive,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
+	listWhole,
 	promoteSandboxToEnvironment,
+	provisionSandbox,
 	type SandboxClaim,
 	SandboxNotReadyError,
 	SandboxUnavailableError,
@@ -305,6 +309,100 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+});
+
+describe("only production deletes", () => {
+	stub(Drive, {
+		get: async () => {
+			throw new Error("reached Vercel");
+		},
+	});
+
+	test("outside production a drive delete logs and returns without reaching Vercel", async () => {
+		process.env.VERCEL_ENV = "preview";
+		try {
+			await deleteDrive("drive-1");
+		} finally {
+			process.env.VERCEL_ENV = "production";
+		}
+		expect(sandboxDeletesAllowed("box b", "production")).toBe(true);
+		expect(sandboxDeletesAllowed("box b", "preview")).toBe(false);
+		expect(sandboxDeletesAllowed("box b", "development")).toBe(false);
+	});
+});
+
+describe("listWhole", () => {
+	const pages = (...list: Array<{ items: string[]; next: string | null }>) => {
+		let index = 0;
+		return async () => {
+			const page = list[index++];
+			if (!page) throw new Error("no such page");
+			return { items: page.items.map((name) => ({ name })), next: page.next };
+		};
+	};
+
+	test("returns every page, and throws on a repeated cursor, a missing known name or an empty listing", async () => {
+		expect(
+			await listWhole({
+				fetchPage: pages(
+					{ items: ["a"], next: "c1" },
+					{ items: ["b"], next: null },
+				),
+				expected: ["b"],
+				nonEmpty: true,
+			}),
+		).toEqual([{ name: "a" }, { name: "b" }]);
+		await expect(
+			listWhole({
+				fetchPage: pages(
+					{ items: ["a"], next: "c1" },
+					{ items: ["b"], next: "c1" },
+				),
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("repeated cursor");
+		await expect(
+			listWhole({
+				fetchPage: pages({ items: ["a"], next: null }),
+				expected: ["ws-running"],
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("lacks ws-running");
+		await expect(
+			listWhole({
+				fetchPage: pages({ items: [], next: null }),
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("empty");
+	});
+});
+
+describe("provisionSandbox", () => {
+	let created: { snapshotExpiration?: number } | undefined;
+	stub(Sandbox, {
+		get: async () => {
+			throw new APIError(new Response(null, { status: 404 }));
+		},
+		create: async (params: { snapshotExpiration?: number }) => {
+			created = params;
+			throw new Error("created");
+		},
+	});
+
+	test("a workspace box's snapshots never expire on Vercel's clock", async () => {
+		const provision = provisionSandbox({
+			name: "ws-new",
+			environment: { sourceKind: "image", sourceRef: "img", region: "iad1" },
+			claim: {
+				identity: {},
+				hostSecret: "secret",
+				networkPolicy: "allow-all",
+				vcpus: 2,
+			} as unknown as SandboxClaim,
+		});
+		await expect(provision).rejects.toThrow("created");
+		expect(created?.snapshotExpiration).toBe(0);
 	});
 });
 

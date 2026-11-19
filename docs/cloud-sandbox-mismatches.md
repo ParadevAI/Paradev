@@ -786,6 +786,23 @@ sandbox is gone or unresumable is marked `failed` by the next `access`, so it
 gets the failed screen and a Remove button rather than a sidebar entry that
 never opens.
 
+**Vercel's snapshot expiry was silent, so we own retention now.** Vercel
+expired a workspace box's snapshot 30 days after its last use, and the row
+learned only from the 410 its next wake got. New boxes are created with
+`snapshotExpiration: 0`, and one cleanup job (`router/cloud-workspace/retention.ts`,
+every 6 hours, production only) is the only thing that deletes for age, from
+one rules table: (1) a workspace past its wait (asleep 30 days after last use,
+archived 7, failed 30, stuck creating 1) is retired by one conditional write,
+then torn down; (2) an archived environment's goldens, and a live one's beyond
+its newest 3; (3) a box, drive or golden no production row names, 7 days after
+it was made, and an agents drive that is not current and that no box mounts.
+Archive, a failed create and a 410 only set a status, and an unarchive after 7
+days is refused. Only production deletes (`sandboxDeletesAllowed`): every
+deployment shares one Vercel project, and a preview database copied from
+production names production's boxes. The job reads the whole listing first and
+deletes nothing if it cannot. **Open:** #9847's `drive_name` and
+`golden_drive_name` must join rule 3's names when it lands.
+
 **Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
 `runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
 "stopped" answer it resumes and retries. A box read `running` that hits its

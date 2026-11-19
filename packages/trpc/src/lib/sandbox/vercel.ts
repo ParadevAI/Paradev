@@ -38,6 +38,7 @@ import {
 	CODEX_SYSTEM_CONFIG_PATH,
 	type SandboxFile,
 } from "./credentials";
+import { sandboxDeletesAllowed } from "./deletes";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
@@ -50,7 +51,6 @@ export const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
 /** Above the 10-minute client keepalive, so an open workspace is always extended in time. */
 const EXTEND_BELOW_MS = 30 * 60 * 1000;
 const MIN_TOP_UP_MS = 60 * 1000;
-const WORKSPACE_SNAPSHOT_EXPIRATION_MS = 30 * 24 * 60 * 60 * 1000;
 /** 2 GB of memory per vCPU; disk is 64 GB regardless. */
 export const MEMORY_MB_PER_VCPU = 2048;
 const GOLDEN_SESSION_TIMEOUT_MS = 30 * 60 * 1000;
@@ -308,7 +308,6 @@ export async function provisionSandbox(args: {
 	name: string;
 	environment: SandboxEnvironment;
 	claim: SandboxClaim;
-	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
 }): Promise<{
 	providerSandboxId: string;
@@ -326,8 +325,8 @@ export async function provisionSandbox(args: {
 		env: {},
 		networkPolicy: args.claim.networkPolicy,
 		persistent: true,
-		snapshotExpiration:
-			kind === "environment" ? 0 : WORKSPACE_SNAPSHOT_EXPIRATION_MS,
+		// Vercel never expires a snapshot: the retention reaper decides when a box goes.
+		snapshotExpiration: 0,
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
@@ -1014,6 +1013,124 @@ export async function listActiveWorkspaceSandboxes(
 		}
 	}
 	return found;
+}
+
+export interface ListedSandbox {
+	name: string;
+	createdAt: number;
+	status: string;
+	/** What it mounts, running or stopped: a stopped box mounts it again on its next boot. */
+	mounts: string[];
+}
+
+export interface ListedDrive {
+	name: string;
+	createdAt: number;
+	attachedTo: string | undefined;
+}
+
+const MAX_LISTING_PAGES = 10_000;
+
+/**
+ * Every page of a listing, or a throw: each page answered, no cursor seen
+ * twice, and the names the caller knows exist all in it. A deleter that acts
+ * on a partial listing deletes what it did not see named.
+ */
+export async function listWhole<T extends { name: string }>({
+	fetchPage,
+	expected = [],
+	nonEmpty,
+}: {
+	fetchPage: (
+		cursor: string | null,
+	) => Promise<{ items: T[]; next: string | null }>;
+	expected?: readonly string[];
+	nonEmpty: boolean;
+}): Promise<T[]> {
+	const items: T[] = [];
+	const seen = new Set<string>();
+	let cursor: string | null = null;
+	for (let pages = 0; ; pages++) {
+		if (pages >= MAX_LISTING_PAGES) {
+			throw new Error(`listing has more than ${pages} pages`);
+		}
+		const page = await fetchPage(cursor);
+		items.push(...page.items);
+		if (page.next === null) break;
+		if (seen.has(page.next)) {
+			throw new Error(`listing repeated cursor ${page.next.slice(0, 16)}`);
+		}
+		seen.add(page.next);
+		cursor = page.next;
+	}
+	if (nonEmpty && items.length === 0) throw new Error("listing is empty");
+	const names = new Set(items.map((item) => item.name));
+	const missing = expected.filter((name) => !names.has(name));
+	if (missing.length) throw new Error(`listing lacks ${missing.join(", ")}`);
+	return items;
+}
+
+/** The page size #9943 used against the same endpoint. */
+const LISTING_PAGE_SIZE = 50;
+
+/** Every box in the project, whatever its status, tags or database; throws unless whole. */
+export function listProjectSandboxes(
+	expected: readonly string[],
+): Promise<ListedSandbox[]> {
+	return listWhole({
+		expected,
+		nonEmpty: true,
+		fetchPage: async (cursor) => {
+			const page = await Sandbox.list({
+				...credentials(),
+				limit: LISTING_PAGE_SIZE,
+				...(cursor ? { cursor } : {}),
+			});
+			return {
+				items: page.sandboxes.map((sandbox) => ({
+					name: sandbox.name,
+					createdAt: sandbox.createdAt,
+					status: sandbox.status,
+					mounts: Object.values(sandbox.mounts ?? {}).map(
+						(mount) => mount.drive,
+					),
+				})),
+				next: page.pagination.next,
+			};
+		},
+	});
+}
+
+/** Every drive in the project; throws unless whole. */
+export function listProjectDrives(): Promise<ListedDrive[]> {
+	return listWhole({
+		nonEmpty: false,
+		fetchPage: async (cursor) => {
+			const page = await Drive.list({
+				...credentials(),
+				limit: LISTING_PAGE_SIZE,
+				...(cursor ? { cursor } : {}),
+			});
+			return {
+				items: page.drives.map((drive) => ({
+					name: drive.name,
+					createdAt: drive.createdAt.getTime(),
+					attachedTo: drive.currentSandboxName,
+				})),
+				next: page.pagination.next,
+			};
+		},
+	});
+}
+
+/** Throws while a box holds it; a drive already gone is the state we wanted. */
+export async function deleteDrive(name: string): Promise<void> {
+	if (!sandboxDeletesAllowed(`drive ${name}`)) return;
+	const drive = await Drive.get({ ...credentials(), name }).catch((error) => {
+		if (isNotFound(error)) return null;
+		throw error;
+	});
+	await drive?.delete();
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */
