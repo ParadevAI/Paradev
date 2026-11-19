@@ -11,11 +11,14 @@
  */
 
 import * as Sentry from "@sentry/core";
+import { GOLDEN_BOX_VCPUS } from "@superset/shared/billing";
+import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
 	SANDBOX_PUBLISHED_PORTS,
+	SANDBOX_USER,
 	type SandboxIdentity,
 	sandboxAgentToolsDrive,
 } from "@superset/shared/sandbox/contract";
@@ -29,6 +32,13 @@ import {
 } from "@vercel/sandbox";
 import { env } from "../../env";
 import { bootStampsFrom, type HostAnswer } from "./boot-trace";
+import {
+	BUILD_COMMANDS_DIR,
+	buildCommandDir,
+	detachedCommandScript,
+	parseCommandState,
+	readCommandScript,
+} from "./build-command";
 import {
 	CODEX_AUTH_PATH,
 	CODEX_SYSTEM_CONFIG_PATH,
@@ -820,6 +830,149 @@ export async function waitForStopSnapshot(
 		await new Promise((resolve) => setTimeout(resolve, 2000));
 	}
 	throw new Error(`${name} did not snapshot in time`);
+}
+
+/** Where an environment build's box starts: the current golden, or the image. */
+export type BuildBoxSource =
+	| { kind: "fork"; golden: string }
+	| { kind: "image"; region: string };
+
+/**
+ * The box an environment build runs in. Never booted, so neither
+ * host-service nor the repository's start hook runs. Its session ends on its
+ * own if the workflow that drives it dies.
+ */
+export async function createBuildBox(args: {
+	name: string;
+	source: BuildBoxSource;
+	networkPolicy: NetworkPolicy;
+	organizationId: string;
+	sessionTimeoutMs: number;
+}): Promise<void> {
+	const config = {
+		...credentials(),
+		name: args.name,
+		timeout: args.sessionTimeoutMs,
+		env: {},
+		networkPolicy: args.networkPolicy,
+		persistent: true,
+		snapshotExpiration: 0,
+		keepLastSnapshots: { count: 1 },
+		tags: { kind: "environment", org: args.organizationId },
+		resources: { vcpus: GOLDEN_BOX_VCPUS },
+	};
+	if (await getSandbox(args.name)) return;
+	if (args.source.kind === "fork") {
+		await Sandbox.fork({ ...config, sourceSandbox: args.source.golden });
+		return;
+	}
+	await Sandbox.create({
+		...config,
+		image: SANDBOX_IMAGE_NAME,
+		region: args.source.region as SandboxRegion,
+	});
+}
+
+/** What a build command left on the box; `exitCode` is null while it runs. */
+export interface BuildCommandState {
+	exitCode: number | null;
+	tail: string;
+}
+
+/**
+ * Starts a script detached and returns at once: the box runs it, not the
+ * caller. Starting the same key again does not start a second copy.
+ */
+export async function startBuildCommand(args: {
+	name: string;
+	key: string;
+	script: string;
+	env: Record<string, string>;
+	cwd?: string;
+	timeoutSeconds: number;
+}): Promise<void> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: [
+			"-c",
+			detachedCommandScript({
+				dir: buildCommandDir(args.key),
+				script: args.script,
+				timeoutSeconds: args.timeoutSeconds,
+			}),
+		],
+		env: args.env,
+		...(args.cwd ? { cwd: args.cwd } : {}),
+		detached: true,
+	});
+}
+
+export async function readBuildCommand(args: {
+	name: string;
+	key: string;
+}): Promise<BuildCommandState> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name: args.name,
+		resume: false,
+	});
+	const read = await sandbox.asUser(SANDBOX_USER).runCommand({
+		cmd: "bash",
+		args: ["-c", readCommandScript(buildCommandDir(args.key))],
+	});
+	return parseCommandState(await read.stdout());
+}
+
+// TODO: import ROOT_DISK_AGENTS_COMMAND from @superset/shared/sandbox/contract once #9911 merges.
+export const ROOT_DISK_AGENTS_COMMAND = `ls -d /opt/codex /opt/pdev ${SANDBOX_PATHS.media}/claude-* ${SANDBOX_PATHS.steps}/install-agent-clis.version 2>/dev/null || true`;
+
+/** The agent CLI paths on the box's own disk; empty when the disk is clean. */
+export async function buildBoxRootDiskAgents(name: string): Promise<string> {
+	const sandbox = await Sandbox.get({
+		...credentials(),
+		name,
+		resume: false,
+	});
+	const read = await sandbox.runCommand({
+		cmd: "bash",
+		args: ["-c", ROOT_DISK_AGENTS_COMMAND],
+	});
+	return (await read.stdout()).trim();
+}
+
+export async function buildBoxSnapshotId(name: string): Promise<string | null> {
+	const sandbox = await getSandbox(name);
+	return sandbox?.currentSnapshotId ?? null;
+}
+
+/** Strips workspace identity and the build's own files, then stops; a box already stopping is left alone. */
+export async function stopBuildBox(name: string): Promise<void> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	if (sandbox.status !== "running") return;
+	await stripWorkspaceIdentity(sandbox);
+	await sandbox.runCommand({
+		cmd: "rm",
+		args: ["-rf", BUILD_COMMANDS_DIR],
+		sudo: true,
+	});
+	await sandbox.stop();
+}
+
+/** True once forks of the box start from the snapshot its stop took. */
+export async function buildBoxSnapshotTaken(
+	name: string,
+	previous: string | null,
+): Promise<boolean> {
+	const sandbox = await Sandbox.get({ ...credentials(), name, resume: false });
+	const current = sandbox.currentSnapshotId;
+	return (
+		sandbox.status === "stopped" && Boolean(current) && current !== previous
+	);
 }
 
 /**

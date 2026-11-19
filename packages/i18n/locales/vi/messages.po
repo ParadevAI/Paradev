@@ -1764,6 +1764,9 @@ msgstr "Đã dùng 87.4K trên 200K token trong phiên này."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Trình duyệt trong ứng dụng tốt hơn: xem trước thay đổi và nhấp vào bất kỳ phần tử nào để gửi cho agent làm ngữ cảnh."
 
+msgid "A build of this environment is already running"
+msgstr "Một bản build của environment này đang chạy"
+
 msgid "A CDP endpoint per pane"
 msgstr "Một endpoint CDP cho mỗi ngăn"
 
@@ -8064,6 +8067,9 @@ msgstr "Môi trường"
 
 msgid "Environment archived"
 msgstr "Đã lưu trữ environment"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Build environment có trong gói Team và Ultra. Nâng cấp trong Cài đặt, Thanh toán."
 
 msgid "Environment not found"
 msgstr "Không tìm thấy environment"
@@ -20673,6 +20679,12 @@ msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư 
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email này đã được đăng ký bằng phương thức đăng nhập khác và nhà cung cấp chưa xác nhận email đã được xác minh. Hãy đăng nhập bằng phương thức bạn đã dùng trước đây."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Environment này không có [install] để build. Hãy thêm vào .paradev/config.toml trên nhánh gốc của nó."
+
+msgid "This environment has no repositories to build"
+msgstr "Environment này không có repository nào để build"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"

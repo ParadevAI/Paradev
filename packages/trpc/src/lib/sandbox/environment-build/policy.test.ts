@@ -1,0 +1,80 @@
+import { describe, expect, test } from "bun:test";
+import { STALE_BUILD_MS } from "./limits";
+import {
+	checkoutScript,
+	dailyBuildsPaused,
+	freshRebuildClaim,
+	isStale,
+} from "./policy";
+
+describe("isStale", () => {
+	test("a running build past the stale limit is stale; a finished one never is", () => {
+		const old = new Date(Date.now() - STALE_BUILD_MS - 1000);
+		const recent = new Date(Date.now() - 1000);
+		expect(isStale({ status: "running", startedAt: old })).toBe(true);
+		expect(isStale({ status: "running", startedAt: recent })).toBe(false);
+		expect(isStale({ status: "failed", startedAt: old })).toBe(false);
+	});
+});
+
+describe("dailyBuildsPaused", () => {
+	const failed = { status: "failed" as const };
+	const succeeded = { status: "succeeded" as const };
+
+	test("three failures in a row pause; a success among them does not", () => {
+		expect(dailyBuildsPaused([failed, failed, failed, succeeded])).toBe(true);
+		expect(dailyBuildsPaused([succeeded, failed, failed, failed])).toBe(false);
+		expect(dailyBuildsPaused([failed, failed])).toBe(false);
+	});
+});
+
+describe("checkoutScript", () => {
+	test("fetches or clones each checkout and prints the primary's commit", () => {
+		const script = checkoutScript({
+			root: "/workspace",
+			checkouts: [
+				{ url: "https://github.com/a/web.git", branch: "main", path: "web" },
+				{ url: "https://github.com/a/api.git", branch: "dev", path: "api" },
+			],
+		});
+		expect(script).toContain(
+			"git -C '/workspace/web' fetch -q --depth 1 origin 'main'",
+		);
+		expect(script).toContain(
+			"git clone -q --depth 1 --single-branch --branch 'dev' 'https://github.com/a/api.git'",
+		);
+		expect(script.split("\n").at(-1)).toBe(
+			"git -C '/workspace/web' rev-parse HEAD",
+		);
+	});
+
+	test("quotes a branch name with a quote in it", () => {
+		const script = checkoutScript({
+			root: "/workspace",
+			checkouts: [{ url: "u", branch: "it's", path: "." }],
+		});
+		expect(script).toContain(`origin 'it'\\''s'`);
+	});
+});
+
+describe("freshRebuildClaim", () => {
+	test("allows ten at once and forty an hour; only a daily build waits", () => {
+		const daily = { trigger: "daily" as const };
+		expect(
+			freshRebuildClaim({ ...daily, running: 9, startedLastHour: 39 }),
+		).toBe("claimed");
+		expect(
+			freshRebuildClaim({ ...daily, running: 10, startedLastHour: 20 }),
+		).toBe("wait");
+		expect(
+			freshRebuildClaim({ ...daily, running: 0, startedLastHour: 40 }),
+		).toBe("refused");
+		expect(
+			freshRebuildClaim({
+				trigger: "manual",
+				running: 10,
+				startedLastHour: 20,
+			}),
+		).toBe("refused");
+	});
+});

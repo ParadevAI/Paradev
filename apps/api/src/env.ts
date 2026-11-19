@@ -10,6 +10,10 @@ export const env = createEnv({
 	},
 	server: {
 		DOMAIN_MOVE_ENABLED: z.string().optional(),
+		// Set by Vercel on every deployment.
+		VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
+		// "1" turns on daily environment builds; read only in production.
+		ENVIRONMENT_DAILY_BUILDS: z.enum(["1"]).optional(),
 		BROWSER_API_URL: z.string().url().optional(),
 		DATABASE_URL: z.string(),
 		DATABASE_URL_UNPOOLED: z.string(),

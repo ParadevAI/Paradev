@@ -1764,6 +1764,9 @@ msgstr "87,4K van 200K tokens gebruikt in deze sessie."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Een betere ingebouwde browser: bekijk je wijzigingen en klik op elk element om het als context naar de agent te sturen."
 
+msgid "A build of this environment is already running"
+msgstr "Er loopt al een build van deze omgeving"
+
 msgid "A CDP endpoint per pane"
 msgstr "Een CDP-endpoint per paneel"
 
@@ -8064,6 +8067,9 @@ msgstr "Omgeving"
 
 msgid "Environment archived"
 msgstr "Omgeving gearchiveerd"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Omgevingsbuilds horen bij de abonnementen Team en Ultra. Upgrade in Instellingen, Facturering."
 
 msgid "Environment not found"
 msgstr "Omgeving niet gevonden"
@@ -20673,6 +20679,12 @@ msgstr "Deze map bestaat niet. Het terminalscript valt terug op de root van de w
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de provider heeft het niet als geverifieerd bevestigd. Log in met de methode die je eerder gebruikte."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan .paradev/config.toml op de basisbranch."
+
+msgid "This environment has no repositories to build"
+msgstr "Deze omgeving heeft geen repositories om te bouwen"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Deze omgeving heeft geen repository's. Maak in Instellingen een omgeving met repository's en start de werkruimte daarvandaan"

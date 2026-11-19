@@ -1764,6 +1764,9 @@ msgstr "V této relaci využito 87,4 tis. z 200 tis. tokenů."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Lepší vestavěný prohlížeč: prohlédněte si své změny a kliknutím na libovolný prvek ho pošlete agentovi jako kontext."
 
+msgid "A build of this environment is already running"
+msgstr "Sestavení tohoto prostředí už probíhá"
+
 msgid "A CDP endpoint per pane"
 msgstr "Jeden CDP endpoint na panel"
 
@@ -8064,6 +8067,9 @@ msgstr "Prostředí"
 
 msgid "Environment archived"
 msgstr "Prostředí archivováno"
+
+msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
+msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
 
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
@@ -20673,6 +20679,12 @@ msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni p
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a poskytovatel jej nepotvrdil jako ověřený. Přihlaste se způsobem, který jste použili dříve."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do .paradev/config.toml v jeho základní větvi."
+
+msgid "This environment has no repositories to build"
+msgstr "Toto prostředí nemá žádné repozitáře k sestavení"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"

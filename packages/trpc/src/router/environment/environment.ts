@@ -1,18 +1,20 @@
 import * as Sentry from "@sentry/core";
 import { db, dbWs } from "@superset/db/client";
 import {
+	environmentBuilds,
 	environmentProjects,
 	environmentRepositories,
 	environmentScopeValues,
 	environmentSecrets,
 	environments,
 	githubRepositories,
+	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
 import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
 	assertCloudAccess,
@@ -30,6 +32,12 @@ import {
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
+import {
+	type BuildRefusalReason,
+	BuildRefused,
+	isStale,
+	startEnvironmentBuild,
+} from "../../lib/sandbox/environment-build";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { isLiveStatus } from "../cloud-workspace/live";
@@ -249,6 +257,50 @@ async function loadPromotable(
 		workingBranch: workspace.branch,
 	});
 	return { workspace, source, checkouts };
+}
+
+const BUILD_REFUSALS: Record<
+	BuildRefusalReason,
+	{
+		code: "NOT_FOUND" | "FORBIDDEN" | "PRECONDITION_FAILED" | "CONFLICT";
+		i18nKey: string;
+	}
+> = {
+	"not-found": {
+		code: "NOT_FOUND",
+		i18nKey: "serverError.environment.environmentNotFound",
+	},
+	"not-paid": {
+		code: "FORBIDDEN",
+		i18nKey: "serverError.environment.buildsNotIncluded",
+	},
+	"no-repositories": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.environment.noRepositoriesToBuild",
+	},
+	"no-install": {
+		code: "PRECONDITION_FAILED",
+		i18nKey: "serverError.environment.noInstall",
+	},
+	"already-running": {
+		code: "CONFLICT",
+		i18nKey: "serverError.environment.buildAlreadyRunning",
+	},
+};
+
+/** What a client sees of a build; a running build whose workflow died reads as failed. */
+function toBuildView(build: SelectEnvironmentBuild) {
+	const stale = isStale(build);
+	return {
+		id: build.id,
+		status: stale ? ("failed" as const) : build.status,
+		trigger: build.trigger,
+		kind: build.kind,
+		commitSha: build.commitSha,
+		error: stale ? "The build stopped unexpectedly" : build.error,
+		startedAt: build.startedAt,
+		finishedAt: build.finishedAt,
+	};
 }
 
 export const environmentRouter = {
@@ -635,6 +687,50 @@ export const environmentRouter = {
 			}
 			await restart();
 			return row;
+		}),
+
+	/** Builds the environment's golden from `[install]`; returns the running build at once. */
+	rebuild: personProcedure
+		.input(z.object({ environmentId: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			try {
+				return toBuildView(
+					await startEnvironmentBuild({
+						environmentId: environment.id,
+						trigger: "manual",
+					}),
+				);
+			} catch (error) {
+				if (error instanceof BuildRefused) {
+					throw userError({
+						...BUILD_REFUSALS[error.reason],
+						message: error.message,
+					});
+				}
+				throw error;
+			}
+		}),
+
+	/** The environment's builds, newest first, each with its failure reason. */
+	builds: personProcedure
+		.input(
+			z.object({
+				environmentId: z.string().uuid(),
+				limit: z.number().int().min(1).max(100).optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const environment = await loadEnvironment(input.environmentId, ctx);
+			await assertCloudAccess(ctx, environment.organizationId);
+			const rows = await db
+				.select()
+				.from(environmentBuilds)
+				.where(eq(environmentBuilds.environmentId, environment.id))
+				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
+				.limit(input.limit ?? 20);
+			return { builds: rows.map(toBuildView) };
 		}),
 
 	update: personProcedure
