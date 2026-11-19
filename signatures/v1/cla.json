@@ -487,6 +487,14 @@
       "created_at": "2026-11-17T17:46:23Z",
       "repoId": 1080370450,
       "pullRequestNo": 9892
+    },
+    {
+      "name": "g-bastianelli",
+      "id": 15146913,
+      "comment_id": 7004250105,
+      "created_at": "2026-11-19T08:47:06Z",
+      "repoId": 1080370450,
+      "pullRequestNo": 6246
     }
   ]
 }
