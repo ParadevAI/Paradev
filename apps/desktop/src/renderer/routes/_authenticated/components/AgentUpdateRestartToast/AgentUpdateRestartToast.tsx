@@ -64,6 +64,16 @@ export function AgentUpdateRestartToast() {
 		const markOffered = () => {
 			setOfferedTerminalIds((offered) => new Set([...offered, ...terminalIds]));
 		};
+		const unmarkOffered = (unoffered: string[]) => {
+			setOfferedTerminalIds(
+				(offered) =>
+					new Set(
+						[...offered].filter(
+							(terminalId) => !unoffered.includes(terminalId),
+						),
+					),
+			);
+		};
 		toast(t({ message: "Claude Code was updated" }), {
 			id: TOAST_ID,
 			duration: Number.POSITIVE_INFINITY,
@@ -78,16 +88,14 @@ export function AgentUpdateRestartToast() {
 				onClick: () => {
 					markOffered();
 					restartSessions(undefined, {
-						onError: () => {
-							setOfferedTerminalIds(
-								(offered) =>
-									new Set(
-										[...offered].filter(
-											(terminalId) => !terminalIds.includes(terminalId),
-										),
-									),
+						onSuccess: ({ restartedTerminalIds }) => {
+							unmarkOffered(
+								terminalIds.filter(
+									(terminalId) => !restartedTerminalIds.includes(terminalId),
+								),
 							);
 						},
+						onError: () => unmarkOffered(terminalIds),
 					});
 				},
 			},
