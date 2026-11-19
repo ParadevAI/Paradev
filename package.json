@@ -52,7 +52,7 @@
 		"check:plugins": "bun scripts/check-plugins.ts",
 		"check:i18n": "bun run --cwd packages/i18n check",
 		"typecheck:release": "tsc -p scripts/release/tsconfig.json",
-		"test:release": "bun test scripts/release scripts/copy-secret-to-vercel-project.test.ts",
+		"test:release": "bun test scripts/release",
 		"db:push": "bun run --cwd packages/db push",
 		"db:migrate": "bun run --cwd packages/db migrate",
 		"db:seed-dev": "NODE_ENV=development bun run packages/auth/src/seed-dev.ts",
