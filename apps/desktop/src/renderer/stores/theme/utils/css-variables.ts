@@ -1,5 +1,5 @@
-import { sanitizeThemeCss } from "shared/themes";
 import type { UIColors } from "shared/themes/types";
+import { sanitizeThemeCss } from "./sanitizeThemeCss";
 
 /**
  * Maps UI color keys to CSS variable names
