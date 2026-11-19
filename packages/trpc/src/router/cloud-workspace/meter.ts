@@ -14,6 +14,7 @@ import type {
 	CloudWorkspaceBootOrigin,
 } from "@superset/db/enums";
 import {
+	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
 	users,
@@ -312,6 +313,7 @@ export async function attachBootSession(args: {
 				eq(cloudWorkspaceBoots.id, args.bootId),
 				isNull(cloudWorkspaceBoots.vercelSessionId),
 				sql`not exists (select 1 from ${cloudWorkspaceBoots} other where other.vercel_session_id = ${session.id})`,
+				sql`not exists (select 1 from ${cloudUsageEvents} where ${cloudUsageEvents.bootId} = ${args.bootId})`,
 			),
 		)
 		.returning({ id: cloudWorkspaceBoots.id })

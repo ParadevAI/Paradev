@@ -1,7 +1,4 @@
--- Keeps cloud_usage_daily equal to the billed cloud_usage_events in the same
--- transaction. Drizzle has no syntax for functions or triggers, so this is a
--- custom migration. An error here must never fail the event insert: the event
--- is the record of usage Autumn already billed, so a caught error only warns.
+-- An error here must never fail the event insert: the event is the record of usage Autumn already billed.
 
 CREATE FUNCTION public.cloud_usage_daily_add(e public.cloud_usage_events, sign integer)
 RETURNS void
@@ -9,7 +6,7 @@ LANGUAGE sql
 AS $$
 	INSERT INTO public.cloud_usage_daily AS d
 		(organization_id, day, user_id, vcpus, gb_minutes, seconds, events)
-	SELECT e.organization_id, (e.sent_at AT TIME ZONE 'UTC')::date, e.user_id, b.vcpus,
+	SELECT e.organization_id, (e.sent_at AT TIME ZONE 'America/Los_Angeles')::date, e.user_id, b.vcpus,
 		sign * e.amount, sign * extract(epoch FROM e.window_to - e.window_from), sign
 	FROM public.cloud_workspace_boots b
 	WHERE b.id = e.boot_id
@@ -35,7 +32,7 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN
 	RAISE WARNING 'cloud_usage_daily not updated: organization % day % sqlstate %',
 		coalesce(NEW.organization_id, OLD.organization_id),
-		(coalesce(NEW.sent_at, OLD.sent_at) AT TIME ZONE 'UTC')::date,
+		(coalesce(NEW.sent_at, OLD.sent_at) AT TIME ZONE 'America/Los_Angeles')::date,
 		SQLSTATE;
 	RETURN NULL;
 END;

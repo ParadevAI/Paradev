@@ -1235,7 +1235,11 @@ export const cloudUsageEvents = pgTable(
 export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
 export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
 
-/** Billed box_gb_minutes events per UTC day of sent_at. Written only by the trigger in drizzle/0200_cloud_usage_daily_trigger.sql. */
+/**
+ * Billed box_gb_minutes events per billing day of sent_at: Vercel's day, Pacific time with daylight saving.
+ * Written only by the trigger in drizzle/0200_cloud_usage_daily_trigger.sql. It keys on the boot's vcpus when
+ * the event is written, so a boot's vcpus must not change after its first event.
+ */
 export const cloudUsageDaily = pgTable(
 	"cloud_usage_daily",
 	{

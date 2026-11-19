@@ -194,7 +194,7 @@ export function cloudBillingPeriodIndex(
 		: null;
 }
 
-const BILLED_FEATURE = "box_gb_minutes";
+export const BILLED_FEATURE = "box_gb_minutes";
 
 const sizeOfVcpus = new Map<number, MachineSize>(
 	MACHINE_SIZES.map((size) => [MACHINE_SIZE_VCPUS[size], size]),
