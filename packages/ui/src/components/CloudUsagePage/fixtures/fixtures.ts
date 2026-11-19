@@ -515,9 +515,9 @@ const STATES = {
 			extra: { capGbHours: 129000 },
 		},
 	},
-	/** Seats only with extra usage off, and the allowance used up. */
+	/** Seats only with extra usage off, the allowance used up, and usage past it before the workspaces stopped. */
 	limitReached: {
-		billing: { seats: 9, perSeatGbHours: 500, usedGbHours: 4500, extra: "off" },
+		billing: { seats: 9, perSeatGbHours: 500, usedGbHours: 4650, extra: "off" },
 	},
 	/** Northwind's own cap in the design, 300% of its allowance: the router cannot give its amount. */
 	percentCap: {

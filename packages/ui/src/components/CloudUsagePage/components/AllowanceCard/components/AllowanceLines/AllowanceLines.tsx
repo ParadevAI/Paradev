@@ -13,6 +13,16 @@ interface AllowanceLinesProps {
 }
 
 /** Fixed palette hues for the paid and beyond segments, so each keeps one colour in both themes. */
+/** The bar's order: the free and unplaced usage, which billing draws first, before the paid segments. */
+const BAR_ORDER: AllowanceLine["kind"][] = [
+	"included",
+	"freeCredits",
+	"notBrokenDown",
+	"bought",
+	"extra",
+	"beyond",
+];
+
 const SWATCH: Record<AllowanceLine["kind"], string> = {
 	included: "bg-foreground/70",
 	freeCredits: "bg-foreground/35",
@@ -100,13 +110,15 @@ export function AllowanceLines({
 	return (
 		<>
 			<div className="flex h-2 overflow-hidden rounded-full bg-foreground/10">
-				{lines.map((line) => (
-					<span
-						key={line.kind}
-						className={SWATCH[line.kind]}
-						style={{ width: `${share(line.used)}%` }}
-					/>
-				))}
+				{[...lines]
+					.sort((a, b) => BAR_ORDER.indexOf(a.kind) - BAR_ORDER.indexOf(b.kind))
+					.map((line) => (
+						<span
+							key={line.kind}
+							className={SWATCH[line.kind]}
+							style={{ width: `${share(line.used)}%` }}
+						/>
+					))}
 			</div>
 			<table className="w-full text-sm">
 				<tbody>

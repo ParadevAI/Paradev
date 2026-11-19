@@ -14,6 +14,8 @@ export interface Amount {
  *   credit's usage), such as usage not sent yet. Only when every credit was read.
  * - `notBrokenDown`: usage the other lines cannot place because a credit was not read. Billing
  *   may or may not have counted it, so it is never called unbilled.
+ * With extra usage off there is no extra line, and the included line holds all of billing's
+ * monthly usage, so a stop that overshoots shows as the included line past its total.
  */
 export interface AllowanceLine {
 	kind:
@@ -77,36 +79,45 @@ export function allowanceLines(
 		gbHours: allowance.overageGbHours,
 		usd: allowance.overageUsd,
 	};
+	// With extra usage off there is no extra line: all of billing's monthly usage is the included
+	// line's, past its total when workspaces ran on before they stopped at the limit.
+	const extraOff = limit !== null && limit.gbHours === 0;
+	const monthly: Amount = {
+		gbHours: allowance.usedGbHours,
+		usd: allowance.usedUsd,
+	};
 	const billed: AllowanceLine[] = [
 		{
 			kind: "included",
 			paid: false,
-			used: {
-				gbHours: Math.min(allowance.usedGbHours, included.gbHours),
-				usd: Math.min(allowance.usedUsd, included.usd),
-			},
+			used: extraOff
+				? monthly
+				: {
+						gbHours: Math.max(0, monthly.gbHours - overage.gbHours),
+						usd: Math.max(0, monthly.usd - overage.usd),
+					},
 			total: included,
 		},
 		...credit("freeCredits", allowance.freeCredits),
 		...credit("bought", allowance.bought),
-		...(limit && limit.gbHours > 0
-			? [{ kind: "extra", paid: true, used: overage, total: limit } as const]
-			: overage.gbHours > 0
-				? [{ kind: "extra", paid: true, used: overage, total: null } as const]
-				: []),
+		...(extraOff
+			? []
+			: limit && limit.gbHours > 0
+				? [{ kind: "extra", paid: true, used: overage, total: limit } as const]
+				: overage.gbHours > 0
+					? [{ kind: "extra", paid: true, used: overage, total: null } as const]
+					: []),
 	];
-	const itemised = sum(billed.map((line) => line.used));
 	const creditsRead = !unread.some(
 		(field) => field === "bought" || field === "freeCredits",
 	);
+	/** Billing's own total: its monthly usage, extra usage included, plus each credit's usage. */
 	const own = sum([
-		{ gbHours: allowance.usedGbHours, usd: allowance.usedUsd },
+		monthly,
 		...billed
 			.filter((line) => line.kind === "freeCredits" || line.kind === "bought")
 			.map((line) => line.used),
 	]);
-	const counted =
-		creditsRead && own.gbHours > itemised.gbHours ? own : itemised;
 	const line = (
 		kind: "beyond" | "notBrokenDown",
 		used: Amount,
@@ -114,19 +125,27 @@ export function allowanceLines(
 		used.gbHours >= BEYOND_MIN_GB_HOURS
 			? [{ kind, paid: false, used, total: null }]
 			: [];
-	const lines: AllowanceLine[] = creditsRead
-		? [
-				...billed,
-				...line("notBrokenDown", minus(counted, itemised)),
-				...line("beyond", minus(periodUsed, counted)),
-			]
-		: [...billed, ...line("notBrokenDown", minus(periodUsed, itemised))];
+	const lines: AllowanceLine[] = [
+		...billed,
+		...(creditsRead
+			? line("beyond", minus(periodUsed, own))
+			: line(
+					"notBrokenDown",
+					minus(periodUsed, sum(billed.map((item) => item.used))),
+				)),
+	];
 
 	const totalsOf = (items: AllowanceLine[]) =>
 		items.flatMap((item) => (item.total ? [item.total] : []));
 	const hasCap = lines.some((item) => item.kind === "extra" && item.total);
 	const open = lines.filter((item) => !item.total);
-	const filled = sum([...totalsOf(lines), ...open.map((item) => item.used)]);
+	const filled = sum(
+		lines.map((item) =>
+			item.total && item.total.gbHours >= item.used.gbHours
+				? item.total
+				: item.used,
+		),
+	);
 	const capKnown = limit !== null;
 	const leaveOpen =
 		!capKnown && open.length > 0 && allowance.limitReached !== true;

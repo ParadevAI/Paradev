@@ -106,6 +106,7 @@ export function WorkspacesTable({
 					const workspace = workspaceOf(row);
 					const owner = workspace?.owner?.name;
 					const size = workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
+					const name = workspace && nameParts(workspace.name);
 					return (
 						<TableRow key={row.key ?? ""} className="relative">
 							<TableCell className="w-full min-w-28 max-w-0 py-2.5 whitespace-normal @xl:min-w-40">
@@ -119,12 +120,8 @@ export function WorkspacesTable({
 										className="font-semibold break-words after:absolute after:inset-0"
 									>
 										<span title={workspace.name} className="flex min-w-0">
-											<span className="truncate">
-												{nameParts(workspace.name).head}
-											</span>
-											<span className="shrink-0">
-												{nameParts(workspace.name).tail}
-											</span>
+											<span className="truncate">{name?.head}</span>
+											<span className="shrink-0">{name?.tail}</span>
 										</span>
 									</Link>
 								) : (
@@ -144,7 +141,7 @@ export function WorkspacesTable({
 								</div>
 							</TableCell>
 							{isAdmin && (
-								<TableCell className={cn(WIDE, "max-w-32 @4xl:max-w-48")}>
+								<TableCell className={cn(WIDE, "max-w-48")}>
 									{owner && <Person name={owner} />}
 								</TableCell>
 							)}

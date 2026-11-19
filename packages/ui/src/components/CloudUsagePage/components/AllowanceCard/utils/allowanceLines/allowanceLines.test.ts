@@ -122,12 +122,13 @@ describe("allowanceLines on story data", () => {
 		expectHeadline(trial, 3100);
 	});
 
-	it("reports the limit reached when extra usage is off and the allowance is used up", () => {
+	it("with extra usage off, holds usage past the included amount in the included line when the stop overshoots", () => {
 		const result = linesOf("limitReached");
 		expect(result.allowance.limitReached).toBe(true);
 		expect(kinds(result.lines)).toEqual(["included"]);
-		expect(result.scale).toEqual(result.cap);
-		expectHeadline(result, 4500);
+		expect(result.lines[0]?.used.gbHours).toBeCloseTo(4650);
+		expect(result.lines[0]?.total?.gbHours).toBeCloseTo(4500);
+		expectHeadline(result, 4650);
 	});
 
 	it("leaves the bar open when the cap is not known and the limit is not reached", () => {
@@ -167,6 +168,27 @@ describe("allowanceLines on hand-built values", () => {
 		expect(kinds(result.lines)).toContain("notBrokenDown");
 		expect(result.scale.gbHours).toBeGreaterThan(result.used.gbHours);
 		expectHeadline(result, 15200);
+	});
+
+	it("with extra usage off, never calls usage billing counted past the included amount not broken down", () => {
+		const result = allowanceLines(
+			{
+				...NORTHWIND,
+				usedGbHours: 7300,
+				usedUsd: 7300 * RATE,
+				overageGbHours: 0,
+				overageUsd: 0,
+				freeCredits: null,
+				extraUsageLimit: gbh(0),
+				limitReached: true,
+			},
+			gbh(7000),
+			gbh(7600),
+		);
+		expect(kinds(result.lines)).toEqual(["included", "beyond"]);
+		near(result.lines[0]?.used.gbHours ?? 0, 7300);
+		near(result.lines[1]?.used.gbHours ?? 0, 300);
+		expectHeadline(result, 7600);
 	});
 
 	it("events below what billing counted add no line, and the lines still add up", () => {
