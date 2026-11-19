@@ -35,6 +35,14 @@ describe("withoutTaskNotifications", () => {
 		expect(withoutTaskNotifications(`${TASK_NOTIFICATION}\nOK.`, true)).toBe(
 			"OK.",
 		);
+		expect(
+			withoutTaskNotifications(
+				`The [SYSTEM NOTIFICATION - NOT USER INPUT] header marks it.\n\n${REPEATED}\n\nCI passed.`,
+				true,
+			),
+		).toBe(
+			"The [SYSTEM NOTIFICATION - NOT USER INPUT] header marks it.\n\nCI passed.",
+		);
 	});
 
 	it("shows no part of it while the reply streams", () => {
@@ -54,7 +62,9 @@ describe("withoutTaskNotifications", () => {
 	it("keeps the format when the reply quotes it in code or names it in prose", () => {
 		for (const text of [
 			"Claude wraps it in `<task-notification>` and ends it with `</task-notification>`.",
+			"A payload: `notice: <task-notification><task-id>x</task-id></task-notification>` is one line.",
 			`The format:\n\n\`\`\`xml\n${REPEATED}\n\`\`\`\n\nThat is all.`,
+			`Nested:\n\n\`\`\`\`md\n\`\`\`xml\n${REPEATED}\n\`\`\`\n\`\`\`\`\n\nThat is all.`,
 			"The [SYSTEM NOTIFICATION - NOT USER INPUT] header marks an automated event.",
 		]) {
 			expect(withoutTaskNotifications(text, true)).toBe(text);
@@ -68,7 +78,11 @@ describe("withoutTaskNotifications", () => {
 				true,
 			),
 		).toBe("Done.\n\n");
-		expect(withoutTaskNotifications("See [", false)).toBe("See ");
-		expect(withoutTaskNotifications("See [", true)).toBe("See [");
+		expect(
+			withoutTaskNotifications("Done.\n\n<task-notification>\n", true),
+		).toBe("Done.\n\n");
+		expect(withoutTaskNotifications("See:\n[", false)).toBe("See:\n");
+		expect(withoutTaskNotifications("See:\n[", true)).toBe("See:\n[");
+		expect(withoutTaskNotifications("See [", false)).toBe("See [");
 	});
 });

@@ -7,11 +7,29 @@ const REMINDER_CLOSE = "</system-reminder>";
 const HEADER_TO_BLOCK_MAX = 2000;
 
 type UnitEnd = number | "hold" | null;
+type Range = [number, number];
 
 function skipSpace(text: string, index: number): number {
 	let i = index;
 	while (i < text.length && /\s/.test(text.charAt(i))) i++;
 	return i;
+}
+
+function isBlank(char: string): boolean {
+	return char === " " || char === "\t";
+}
+
+function startsLine(text: string, index: number): boolean {
+	let i = index;
+	while (i > 0 && isBlank(text.charAt(i - 1))) i--;
+	return i === 0 || text.charAt(i - 1) === "\n";
+}
+
+function endsLine(text: string, index: number): "yes" | "partial" | "no" {
+	let i = index;
+	while (i < text.length && isBlank(text.charAt(i))) i++;
+	if (i === text.length) return "partial";
+	return text.charAt(i) === "\n" || text.charAt(i) === "\r" ? "yes" : "no";
 }
 
 function marker(
@@ -29,7 +47,8 @@ function blockEnd(text: string, index: number, messageEnded: boolean): UnitEnd {
 	if (open !== "full") return open && !messageEnded ? "hold" : null;
 	const fieldAt = skipSpace(text, index + OPEN.length);
 	const field = marker(text, fieldAt, FIRST_FIELD);
-	if (field !== "full") return field && !messageEnded ? "hold" : null;
+	if (field === null) return null;
+	if (field === "partial") return messageEnded ? text.length : "hold";
 	const close = text.indexOf(CLOSE, fieldAt);
 	if (close === -1) return messageEnded ? text.length : "hold";
 	const afterClose = close + CLOSE.length;
@@ -44,10 +63,13 @@ function unitEnd(text: string, start: number, messageEnded: boolean): UnitEnd {
 	const reminder = marker(text, i, REMINDER_OPEN);
 	if (reminder === "partial") return messageEnded ? null : "hold";
 	if (reminder === "full") i = skipSpace(text, i + REMINDER_OPEN.length);
-	const header = marker(text, i, HEADER);
+	const header =
+		reminder === "full" || startsLine(text, i) ? marker(text, i, HEADER) : null;
 	if (header === "partial") return messageEnded ? null : "hold";
 	if (header === "full") {
 		const afterHeader = i + HEADER.length;
+		const lineEnd = endsLine(text, afterHeader);
+		if (lineEnd === "no") return null;
 		const open = text.indexOf(OPEN, afterHeader);
 		if (open === -1)
 			return !messageEnded && text.length - afterHeader <= HEADER_TO_BLOCK_MAX
@@ -59,21 +81,53 @@ function unitEnd(text: string, start: number, messageEnded: boolean): UnitEnd {
 	return blockEnd(text, i, messageEnded);
 }
 
-function fencedRanges(text: string): Array<[number, number]> {
-	const ranges: Array<[number, number]> = [];
-	let openAt = -1;
+function within(ranges: readonly Range[], index: number): boolean {
+	return ranges.some(([open, close]) => index >= open && index < close);
+}
+
+function closingRun(text: string, from: number, run: string): number {
+	const blankLine = text.indexOf("\n\n", from);
+	const limit = blankLine === -1 ? text.length : blankLine;
+	const runs = /`+/g;
+	runs.lastIndex = from;
+	for (let match = runs.exec(text); match; match = runs.exec(text)) {
+		if (match.index >= limit) break;
+		if (match[0].length === run.length) return match.index + run.length;
+	}
+	return blankLine === -1 ? -1 : -2;
+}
+
+function codeRanges(text: string, messageEnded: boolean): Range[] {
+	const ranges: Range[] = [];
+	let fenceAt = -1;
 	let fence = "";
 	for (const match of text.matchAll(/^ {0,3}(`{3,}|~{3,})/gm)) {
-		const char = match[1]?.charAt(0) ?? "";
-		if (openAt === -1) {
-			openAt = match.index;
-			fence = char;
-		} else if (char === fence) {
-			ranges.push([openAt, match.index + match[0].length]);
-			openAt = -1;
+		const run = match[1] ?? "";
+		if (fenceAt === -1) {
+			fenceAt = match.index;
+			fence = run;
+		} else if (
+			run.charAt(0) === fence.charAt(0) &&
+			run.length >= fence.length
+		) {
+			ranges.push([fenceAt, match.index + match[0].length]);
+			fenceAt = -1;
 		}
 	}
-	if (openAt !== -1) ranges.push([openAt, text.length]);
+	if (fenceAt !== -1) ranges.push([fenceAt, text.length]);
+	const fences = [...ranges];
+	const runs = /`+/g;
+	for (let match = runs.exec(text); match; match = runs.exec(text)) {
+		if (within(fences, match.index)) continue;
+		const close = closingRun(text, match.index + match[0].length, match[0]);
+		if (close >= 0) {
+			ranges.push([match.index, close]);
+			runs.lastIndex = close;
+		} else if (close === -1 && !messageEnded) {
+			ranges.push([match.index, text.length]);
+			break;
+		}
+	}
 	return ranges;
 }
 
@@ -90,7 +144,7 @@ export function withoutTaskNotifications(
 	messageEnded: boolean,
 ): string {
 	if (!mayHoldNotification(text)) return text;
-	const fences = fencedRanges(text);
+	const code = codeRanges(text, messageEnded);
 	const candidates = /[<[]/g;
 	let visible = "";
 	let from = 0;
@@ -100,11 +154,7 @@ export function withoutTaskNotifications(
 		match = candidates.exec(text)
 	) {
 		const start = match.index;
-		if (
-			text.charAt(start - 1) === "`" ||
-			fences.some(([open, close]) => start >= open && start < close)
-		)
-			continue;
+		if (within(code, start)) continue;
 		const end = unitEnd(text, start, messageEnded);
 		if (end === null) continue;
 		visible += text.slice(from, start);
