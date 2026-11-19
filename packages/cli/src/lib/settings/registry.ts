@@ -217,7 +217,7 @@ export const SETTINGS: SettingDefinition[] = [
 		type: "boolean",
 		section: "terminal",
 		description: "Show the terminal scripts bar",
-		defaultValue: true,
+		defaultValue: false,
 	},
 	{
 		key: "useCompactTerminalAddButton",
