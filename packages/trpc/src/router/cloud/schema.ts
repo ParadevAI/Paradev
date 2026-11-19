@@ -1,9 +1,3 @@
-import type {
-	CloudBootsResult,
-	CloudUsageMetrics,
-	CloudUsageResult,
-	CloudUsageWindow,
-} from "@superset/db/cloud-usage-query";
 import {
 	cloudUsageGroupByValues,
 	cloudUsageSortValues,
@@ -13,7 +7,6 @@ import {
 	cloudWorkspaceStatusEnum,
 } from "@superset/db/enums";
 import { machineSizeSchema } from "@superset/shared/billing";
-import * as api from "@superset/shared/cloud-usage-api";
 import { z } from "zod";
 
 const rangePresetSchema = z.enum(["24h", "7d", "30d", "90d"]);
@@ -99,16 +92,3 @@ export const cloudPeriodsInputSchema = z.object({
 	limit: z.number().int().min(1).max(24).default(6),
 	cursor: z.iso.date().optional(),
 });
-
-type Page<Result> = Omit<Result, "nextCursor"> & {
-	range: CloudUsageWindow;
-	nextCursor: string | null;
-};
-
-export const cloudUsageOutputSchema =
-	api.cloudUsageOutputSchema satisfies z.ZodType<Page<CloudUsageResult>>;
-export const cloudBootsOutputSchema =
-	api.cloudBootsOutputSchema satisfies z.ZodType<Page<CloudBootsResult>>;
-export const cloudPeriodsOutputSchema = api.cloudPeriodsOutputSchema;
-api.metricsSchema satisfies z.ZodType<CloudUsageMetrics>;
-api.windowSchema satisfies z.ZodType<CloudUsageWindow>;
