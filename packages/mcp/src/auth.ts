@@ -3,7 +3,10 @@ import { db } from "@superset/db/client";
 import { members, users } from "@superset/db/schema";
 import { ORGANIZATION_HEADER } from "@superset/shared/constants";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
-import { verifyUserBearer } from "@superset/shared/verify-jwt";
+import {
+	productAudiences,
+	verifyUserBearer,
+} from "@superset/shared/verify-jwt";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
@@ -139,12 +142,11 @@ async function resolveOAuth(
 	organizationId: string;
 	clientLabel: string | null;
 }> {
-	const payload = await verifyUserBearer(token, apiUrl, [
+	const payload = await verifyUserBearer(
+		token,
 		apiUrl,
-		`${apiUrl}/`,
-		`${apiUrl}/api/v2/agent/mcp`,
-		`${apiUrl}/mcp`,
-	]);
+		productAudiences(apiUrl),
+	);
 	if (!payload) throw new McpUnauthorizedError("Invalid OAuth token");
 	let organizationId: string;
 	try {

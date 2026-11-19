@@ -20,6 +20,7 @@ import { COMPANY } from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
+import { productAudiences } from "@superset/shared/verify-jwt";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -408,12 +409,7 @@ export const auth = betterAuth({
 			allowDynamicClientRegistration: true,
 			allowUnauthenticatedClientRegistration: true,
 			accessTokenExpiresIn: 60 * 60 * 24 * 7,
-			validAudiences: [
-				env.NEXT_PUBLIC_API_URL,
-				`${env.NEXT_PUBLIC_API_URL}/`,
-				`${env.NEXT_PUBLIC_API_URL}/api/v2/agent/mcp`,
-				`${env.NEXT_PUBLIC_API_URL}/mcp`,
-			],
+			validAudiences: productAudiences(env.NEXT_PUBLIC_API_URL),
 			silenceWarnings: {
 				oauthAuthServerConfig: true,
 				openidConfig: true,

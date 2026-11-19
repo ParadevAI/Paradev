@@ -3,7 +3,10 @@ import { auth, getRequestSession, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
-import { verifyUserBearer } from "@superset/shared/verify-jwt";
+import {
+	productAudiences,
+	verifyUserBearer,
+} from "@superset/shared/verify-jwt";
 import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
@@ -30,7 +33,11 @@ async function sessionFromOAuthBearer(
 	const token = match?.[1];
 	if (!token || !looksLikeJwt(token)) return null;
 
-	const payload = await verifyUserBearer(token, apiUrl, [apiUrl, `${apiUrl}/`]);
+	const payload = await verifyUserBearer(
+		token,
+		apiUrl,
+		productAudiences(apiUrl),
+	);
 	if (!payload) return null;
 
 	const authorizedClientId =

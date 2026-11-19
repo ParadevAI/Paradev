@@ -22,10 +22,18 @@ function getJWKS(authUrl: string): ReturnType<typeof createRemoteJWKSet> {
 	return jwks;
 }
 
+/** The addresses the product API accepts as a token's audience. */
+export const productAudiences = (apiUrl: string): string[] => [
+	apiUrl,
+	`${apiUrl}/`,
+	`${apiUrl}/api/v2/agent/mcp`,
+	`${apiUrl}/mcp`,
+];
+
 /**
- * Verify a user JWT the API issued, addressed to one of `audience`. Hourly
- * rotation expiries are expected and silent; anything else is logged tersely,
- * never with the decoded payload (it carries plaintext emails).
+ * Verify a user JWT the API issued, addressed to one of `audience`. An
+ * expired token is silent; any other failure is logged without the decoded
+ * payload (it carries plaintext emails).
  */
 export async function verifyUserBearer(
 	token: string,
