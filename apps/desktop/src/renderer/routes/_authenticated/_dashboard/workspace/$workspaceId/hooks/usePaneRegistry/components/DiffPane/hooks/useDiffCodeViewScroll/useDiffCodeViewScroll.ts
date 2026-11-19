@@ -1,4 +1,9 @@
-import type { CodeViewItem, CodeViewScrollTarget } from "@pierre/diffs";
+import type {
+	CodeViewItem,
+	CodeViewLineScrollTarget,
+	CodeViewScrollTarget,
+	FileDiffMetadata,
+} from "@pierre/diffs";
 import type { CodeViewHandle } from "@pierre/diffs/react";
 import { type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 import type { DiffPaneData } from "../../../../../../types";
@@ -21,6 +26,7 @@ interface UseDiffCodeViewScrollOptions {
 	data: DiffPaneData;
 	fileByItemId: ReadonlyMap<string, ChangesetFile>;
 	items: CodeViewItem<DiffAnnotationMetadata>[];
+	expandUnchanged: boolean;
 	collapsedSet: ReadonlySet<string>;
 	setCollapsed: (path: string, value: boolean) => void;
 	scrollStateKey: string;
@@ -46,11 +52,34 @@ interface UseDiffCodeViewScrollResult {
 // scrollbar.
 const PROGRAMMATIC_SCROLL_SETTLE_MS = 700;
 
+function getFirstChangedLine(
+	fileDiff: FileDiffMetadata,
+): Pick<CodeViewLineScrollTarget, "lineNumber" | "side"> | undefined {
+	const hunk = fileDiff.hunks[0];
+	if (!hunk) return undefined;
+	const change = hunk.hunkContent.find((block) => block.type === "change");
+	if (!change) return undefined;
+	if (change.additions > 0) {
+		return {
+			lineNumber:
+				hunk.additionStart +
+				(change.additionLineIndex - hunk.additionLineIndex),
+			side: "additions",
+		};
+	}
+	return {
+		lineNumber:
+			hunk.deletionStart + (change.deletionLineIndex - hunk.deletionLineIndex),
+		side: "deletions",
+	};
+}
+
 export function useDiffCodeViewScroll({
 	codeViewRef,
 	data,
 	fileByItemId,
 	items,
+	expandUnchanged,
 	collapsedSet,
 	setCollapsed,
 	scrollStateKey,
@@ -121,31 +150,35 @@ export function useDiffCodeViewScroll({
 
 		if (!targetItemId) return;
 		const file = fileByItemId.get(targetItemId);
-		if (!file) return;
-		if (!itemById.has(targetItemId)) return;
+		const targetItem = itemById.get(targetItemId);
+		if (!file || !targetItem) return;
 		const changeKey = getChangesetFileKey(file);
 		if (collapsedSet.has(changeKey)) {
 			setCollapsed(changeKey, false);
 			return;
 		}
 
-		const targetItem = itemById.get(targetItemId);
-		const target: CodeViewScrollTarget =
-			data.focusLine != null && targetItem?.type === "diff"
-				? {
-						type: "line",
-						id: targetItemId,
-						lineNumber: data.focusLine,
-						side: data.focusSide,
-						align: "center",
-						behavior: "smooth-auto",
-					}
-				: {
-						type: "item",
-						id: targetItemId,
-						align: "start",
-						behavior: "smooth-auto",
-					};
+		let line: Pick<CodeViewLineScrollTarget, "lineNumber" | "side"> | undefined;
+		if (targetItem.type === "diff") {
+			if (data.focusLine != null) {
+				line = { lineNumber: data.focusLine, side: data.focusSide };
+			} else if (expandUnchanged) {
+				line = getFirstChangedLine(targetItem.fileDiff);
+			}
+		}
+		const fileTarget = {
+			type: "item",
+			id: targetItemId,
+			align: "start",
+			behavior: "smooth-auto",
+		} as const;
+		const target: CodeViewScrollTarget = line
+			? { ...fileTarget, type: "line", ...line, align: "center" }
+			: fileTarget;
+		// A placeholder can gain a line target without changing the item top.
+		const assertedScrollKey = line
+			? `${scrollKey}:${line.side ?? ""}:${line.lineNumber}`
+			: scrollKey;
 
 		// Re-assert only when the target actually moved under us (or this is a
 		// new request). CodeView suspends pointer events on its pinned header
@@ -155,27 +188,27 @@ export function useDiffCodeViewScroll({
 		const targetTop = codeViewRef.current
 			?.getInstance()
 			?.getTopForItem(targetItemId);
-		if (!shouldReassertScroll(lastAssertedRef.current, scrollKey, targetTop))
+		if (
+			!shouldReassertScroll(
+				lastAssertedRef.current,
+				assertedScrollKey,
+				targetTop,
+			)
+		)
 			return;
 
 		// Pierre drops a line it cannot place (an outdated comment's line, or
 		// one in folded context); the file scroll queued first then stands.
-		if (target.type === "line") {
-			codeViewRef.current?.scrollTo({
-				type: "item",
-				id: targetItemId,
-				align: "start",
-				behavior: "smooth-auto",
-			});
-		}
+		if (line) codeViewRef.current?.scrollTo(fileTarget);
 		codeViewRef.current?.scrollTo(target);
-		lastAssertedRef.current = { scrollKey, targetTop };
+		lastAssertedRef.current = { scrollKey: assertedScrollKey, targetTop };
 		lastProgrammaticScrollAtRef.current = Date.now();
 	}, [
 		codeViewRef,
 		data.focusLine,
 		data.focusSide,
 		data.focusTick,
+		expandUnchanged,
 		initialScrollState,
 		items,
 		scrollStateKey,
