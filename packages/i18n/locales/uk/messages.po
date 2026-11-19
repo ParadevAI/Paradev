@@ -1328,8 +1328,8 @@ msgstr "{pullRequests} · у {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# повідомлення чекає в черзі} few {# повідомлення чекають у черзі} many {# повідомлень чекають у черзі} other {# повідомлення чекає в черзі}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} за ГБ-год. Використовуються після місячного пулу й не згорають."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} за ГБ-годину. Використовуються після включеного в план використання і не згорають."
 
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
@@ -2777,6 +2777,9 @@ msgstr "Також: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Завжди знайте, якому агенту ви потрібні, завдяки сповіщенням, що ведуть просто до заблокованого агента."
+
+msgid "Amount of GB-hours"
+msgstr "Кількість ГБ-годин"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
@@ -4271,9 +4274,6 @@ msgstr "Параметри каналу"
 msgid "Channels"
 msgstr "Канали"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Списувати кошти зі збереженої картки за нові ГБ-години, коли куплені ГБ-години закінчуються."
-
 msgid "Chat"
 msgstr "Чат"
 
@@ -4856,6 +4856,12 @@ msgstr "Використання хмари"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Використання хмари не ввімкнено для цієї організації."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Хмарне використання за цей період вичерпано. Цей робочий простір зупиниться через 10 хвилин. Власник може докупити, щоб він працював далі."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Хмарне використання за цей період вичерпано. Цей робочий простір зупиниться через 10 хвилин. Власник може перейти на Team або Ultra, щоб він працював далі."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Хмарне використання за цей період вичерпано. Робочі простори не можуть запуститися."
@@ -13587,8 +13593,9 @@ msgstr "від усіх токенів"
 msgid "Off"
 msgstr "Вимкнено"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Вимкнено. Докуповує ГБ-години, коли вони закінчуються."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Вимкнено"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23150,12 +23157,6 @@ msgstr "Ваша організація використала все хмарн
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "Ваша організація використала все хмарне використання за цей період. Власник може перейти на Team або Ultra в розділі Налаштування, Оплата."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "Ваша організація використала все хмарне використання за цей період. Цей робочий простір зупиниться за кілька хвилин. Власник може докупити ще в розділі Налаштування, Оплата."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Ваша організація використала все хмарне використання за цей період. Цей робочий простір зупиниться за кілька хвилин. Власник може перейти на Team або Ultra в розділі Налаштування, Оплата."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

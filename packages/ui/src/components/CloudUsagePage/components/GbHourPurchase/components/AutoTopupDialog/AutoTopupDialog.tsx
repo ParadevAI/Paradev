@@ -13,7 +13,6 @@ import { Button } from "../../../../../ui/button";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -91,17 +90,11 @@ export function AutoTopupDialog({
 			open={open}
 			onOpenChange={(next) => !isSaving && onOpenChange(next)}
 		>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md" aria-describedby={undefined}>
 				<DialogHeader>
 					<DialogTitle>
 						<Trans>Auto top-up</Trans>
 					</DialogTitle>
-					<DialogDescription>
-						<Trans>
-							Charge your saved card for more GB-hours when bought GB-hours run
-							low.
-						</Trans>
-					</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4">
 					<div className="space-y-1.5">

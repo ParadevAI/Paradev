@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · verso {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# messaggio in attesa nella coda} other {# messaggi in attesa nella coda}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} per GB-ora. Usate dopo il pool mensile, non scadono mai."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} per GB-ora. Usate dopo l’utilizzo incluso nel piano e non scadono mai."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% letto"
@@ -2783,6 +2783,9 @@ msgstr "Anche: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Sai sempre quale agente ha bisogno di te, con notifiche che portano dritte all'agente bloccato."
+
+msgid "Amount of GB-hours"
+msgstr "Quantità di GB-ore"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Un agente completa modifiche su più file dall'inizio alla fine."
@@ -4277,9 +4280,6 @@ msgstr "Opzioni canale"
 msgid "Channels"
 msgstr "Canali"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Addebita sulla carta salvata altre GB-ore quando le GB-ore acquistate stanno per finire."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4862,6 +4862,12 @@ msgstr "Utilizzo del cloud"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "L’utilizzo del cloud non è attivo per questa organizzazione."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "L’utilizzo cloud di questo periodo è esaurito. Questo spazio di lavoro si fermerà tra 10 minuti. Un proprietario può acquistarne altro per mantenerlo attivo."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "L’utilizzo cloud di questo periodo è esaurito. Questo spazio di lavoro si fermerà tra 10 minuti. Un proprietario può passare a Team o Ultra per mantenerlo attivo."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "L’utilizzo cloud di questo periodo è esaurito. Gli spazi di lavoro non possono avviarsi."
@@ -13593,8 +13599,9 @@ msgstr "di tutti i token"
 msgid "Off"
 msgstr "Off"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Disattivata. Acquista altre GB-ore quando stanno per finire."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Disattivato"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo pe
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo. Un proprietario può passare a Team o Ultra in Impostazioni, Fatturazione."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo. Questo workspace si ferma tra pochi minuti. Un proprietario può acquistarne altro in Impostazioni, Fatturazione."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo. Questo workspace si ferma tra pochi minuti. Un proprietario può passare a Team o Ultra in Impostazioni, Fatturazione."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

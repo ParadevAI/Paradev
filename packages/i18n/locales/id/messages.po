@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · ke {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# pesan menunggu dalam antrean} other {# pesan menunggu dalam antrean}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} per GB-jam. Dipakai setelah kumpulan bulanan, dan tidak pernah kedaluwarsa."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} per GB-jam. Dipakai setelah penggunaan yang termasuk dalam paket, dan tidak pernah kedaluwarsa."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% dibaca"
@@ -2783,6 +2783,9 @@ msgstr "Juga: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Selalu tahu agen mana yang membutuhkan Anda, dengan notifikasi yang langsung menuju agen yang terhambat."
+
+msgid "Amount of GB-hours"
+msgstr "Jumlah GB-jam"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agen menyelesaikan perubahan lintas file dari awal sampai akhir."
@@ -4277,9 +4280,6 @@ msgstr "Opsi kanal"
 msgid "Channels"
 msgstr "Kanal"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Menagih kartu tersimpan untuk GB-jam tambahan saat GB-jam yang dibeli hampir habis."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4862,6 +4862,12 @@ msgstr "Penggunaan cloud"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace ini berhenti dalam 10 menit. Pemilik dapat membeli lagi agar tetap berjalan."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace ini berhenti dalam 10 menit. Pemilik dapat upgrade ke Team atau Ultra agar tetap berjalan."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace tidak dapat dimulai."
@@ -13593,8 +13599,9 @@ msgstr "dari semua token"
 msgid "Off"
 msgstr "Mati"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Nonaktif. Membeli GB-jam lagi saat hampir habis."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Mati"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

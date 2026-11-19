@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · 대상 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "GB 시간당 {rate}. 월간 풀 다음에 사용되며 만료되지 않습니다."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "GB-시간당 {rate}. 플랜에 포함된 사용량 다음에 사용되며 만료되지 않습니다."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% 읽음"
@@ -2783,6 +2783,9 @@ msgstr "참고: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습니다. 알림을 누르면 막힌 에이전트로 바로 이동합니다."
+
+msgid "Amount of GB-hours"
+msgstr "GB-시간 수량"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
@@ -4277,9 +4280,6 @@ msgstr "채널 옵션"
 msgid "Channels"
 msgstr "채널"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 더 결제합니다."
-
 msgid "Chat"
 msgstr "채팅"
 
@@ -4862,6 +4862,12 @@ msgstr "클라우드 사용량"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "이 조직에는 클라우드 사용량이 켜져 있지 않습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 더 구매하면 계속 실행할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 Team 또는 Ultra로 업그레이드하면 계속 실행할 수 있습니다."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 워크스페이스를 시작할 수 없습니다."
@@ -13593,8 +13599,9 @@ msgstr "전체 토큰 대비"
 msgid "Off"
 msgstr "끔"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "꺼짐. 부족해지면 GB 시간을 더 구매합니다."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "끔"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 소유자가 설정의 결제에서 더 구매할 수 있습니다."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

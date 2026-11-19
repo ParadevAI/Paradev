@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · 目標 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {佇列中有 # 則訊息等待} other {佇列中有 # 則訊息等待}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "每 GB 小時 {rate}。在每月額度池之後使用，永不過期。"
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "每 GB 小時 {rate}。在方案包含的用量之後使用，永不過期。"
 
 msgid "{readPercent}% read"
 msgstr "已讀{readPercent}%"
@@ -2783,6 +2783,9 @@ msgstr "另有：@superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "隨時知道哪個代理程式需要你，通知可直接跳轉到被阻塞的代理程式。"
+
+msgid "Amount of GB-hours"
+msgstr "GB 小時數量"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "代理程式能端到端完成跨檔案改動。"
@@ -4277,9 +4280,6 @@ msgstr "頻道選項"
 msgid "Channels"
 msgstr "頻道"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "當購買的 GB 小時不足時，從已儲存的卡扣款購買更多 GB 小時。"
-
 msgid "Chat"
 msgstr "聊天"
 
@@ -4862,6 +4862,12 @@ msgstr "雲端用量"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "此組織未啟用雲端用量。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "本週期的雲端用量已用完。此工作區將在 10 分鐘後停止。擁有者可以購買更多以讓它繼續執行。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "本週期的雲端用量已用完。此工作區將在 10 分鐘後停止。擁有者可以升級到 Team 或 Ultra 以讓它繼續執行。"
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "本週期的雲端用量已用完。工作區無法啟動。"
@@ -13593,8 +13599,9 @@ msgstr "佔全部token"
 msgid "Off"
 msgstr "關閉"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "已關閉。不足時購買更多 GB 小時。"
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "關閉"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。擁有者可以在設定的帳單中購買更多。"
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

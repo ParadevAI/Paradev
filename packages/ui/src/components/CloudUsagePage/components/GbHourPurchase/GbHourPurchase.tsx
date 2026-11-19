@@ -5,12 +5,19 @@ import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import {
 	type GbHourPack,
-	gbHourPackPricePerGbHour,
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
 import { useState } from "react";
 import { Button } from "../../../ui/button";
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemGroup,
+	ItemTitle,
+} from "../../../ui/item";
 import { toast } from "../../../ui/sonner";
 import { Switch } from "../../../ui/switch";
 import { AutoTopupDialog } from "./components/AutoTopupDialog";
@@ -60,11 +67,6 @@ export function GbHourPurchase({
 
 	const price = (value: number) =>
 		formatCurrency(value, PLAN_PRICE_CURRENCY, PRICE_FORMAT);
-	const rate = formatCurrency(
-		gbHourPackPricePerGbHour(pack),
-		PLAN_PRICE_CURRENCY,
-		PRICE_FORMAT,
-	);
 	const topupThreshold = formatNumber(topup.thresholdGbHours);
 	const topupGbHours = formatNumber(topup.gbHours);
 	const topupPrice = price(gbHourPurchase(pack, topup.gbHours).price);
@@ -95,39 +97,36 @@ export function GbHourPurchase({
 	};
 
 	return (
-		<div className="space-y-4 border-t pt-4">
-			<div className="flex items-center justify-between gap-4">
-				<div className="min-w-0">
-					<div className="text-sm">
+		<ItemGroup className="border-t pt-2">
+			<Item size="sm" className="px-0">
+				<ItemContent>
+					<ItemTitle className="font-normal">
 						<Trans>Extra GB-hours</Trans>
-					</div>
-					<div className="text-xs text-muted-foreground">
-						<Trans>
-							{rate} per GB-hour. Used after the monthly pool, and never expire.
-						</Trans>
-					</div>
-				</div>
-				<Button size="sm" onClick={() => setIsBuyOpen(true)}>
-					<Trans>Buy GB-hours</Trans>
-				</Button>
-			</div>
-			<div className="flex items-center justify-between gap-4">
-				<div className="min-w-0">
-					<div className="text-sm">
+					</ItemTitle>
+				</ItemContent>
+				<ItemActions>
+					<Button size="sm" onClick={() => setIsBuyOpen(true)}>
+						<Trans>Buy GB-hours</Trans>
+					</Button>
+				</ItemActions>
+			</Item>
+			<Item size="sm" className="px-0">
+				<ItemContent>
+					<ItemTitle className="font-normal">
 						<Trans>Auto top-up</Trans>
-					</div>
-					<div className="text-xs text-muted-foreground">
+					</ItemTitle>
+					<ItemDescription>
 						{topup.enabled ? (
 							<Trans>
 								When fewer than {topupThreshold} GB-hours remain, add{" "}
 								{topupPrice} ({topupGbHours} GB-hours).
 							</Trans>
 						) : (
-							<Trans>Off. Buys more GB-hours when they run low.</Trans>
+							<Trans context="auto top-up">Off</Trans>
 						)}
-					</div>
-				</div>
-				<div className="flex shrink-0 items-center gap-2">
+					</ItemDescription>
+				</ItemContent>
+				<ItemActions>
 					{topup.enabled && (
 						<Button
 							size="sm"
@@ -146,8 +145,8 @@ export function GbHourPurchase({
 						}
 						aria-label={t`Auto top-up`}
 					/>
-				</div>
-			</div>
+				</ItemActions>
+			</Item>
 			<BuyGbHoursDialog
 				open={isBuyOpen}
 				onOpenChange={setIsBuyOpen}
@@ -161,6 +160,6 @@ export function GbHourPurchase({
 				initial={topup}
 				onSave={(settings) => saveTopup({ ...settings, enabled: true })}
 			/>
-		</div>
+		</ItemGroup>
 	);
 }

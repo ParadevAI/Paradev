@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · cíl {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# zpráva čeká ve frontě} few {# zprávy čekají ve frontě} many {# zprávy čeká ve frontě} other {# zpráv čeká ve frontě}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} za GB-hodinu. Čerpají se po měsíčním fondu a nikdy nevyprší."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} za GB-hodinu. Použijí se po využití zahrnutém v plánu a nikdy nevyprší."
 
 msgid "{readPercent}% read"
 msgstr "přečteno {readPercent} %"
@@ -2783,6 +2783,9 @@ msgstr "Také: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Vždy víte, který agent vás potřebuje — oznámení vedou přímo na zablokovaného agenta."
+
+msgid "Amount of GB-hours"
+msgstr "Množství GB-hodin"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agent dokončí změnu napříč více soubory od začátku do konce."
@@ -4277,9 +4280,6 @@ msgstr "Možnosti kanálu"
 msgid "Channels"
 msgstr "Kanály"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Strhne z uložené karty další GB-hodiny, když koupené GB-hodiny docházejí."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4862,6 +4862,12 @@ msgstr "Využití cloudu"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Využití cloudu není pro tuto organizaci zapnuto."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Tento pracovní prostor se zastaví za 10 minut. Vlastník může dokoupit další, aby běžel dál."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Tento pracovní prostor se zastaví za 10 minut. Vlastník může přejít na Team nebo Ultra, aby běžel dál."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Cloudové využití je pro toto období vyčerpáno. Pracovní prostory nelze spustit."
@@ -13593,8 +13599,9 @@ msgstr "ze všech tokenů"
 msgid "Off"
 msgstr "Vypnuto"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Vypnuto. Koupí další GB-hodiny, když docházejí."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Vypnuto"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. 
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. Vlastník může přejít na Team nebo Ultra v Nastavení, Fakturace."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. Tento pracovní prostor se za pár minut zastaví. Vlastník může dokoupit další v Nastavení, Fakturace."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. Tento pracovní prostor se za pár minut zastaví. Vlastník může přejít na Team nebo Ultra v Nastavení, Fakturace."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

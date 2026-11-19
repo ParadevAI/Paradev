@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · cible {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# message en attente dans la file} other {# messages en attente dans la file}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} par Go-heure. Utilisées après la réserve mensuelle, elles n'expirent jamais."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} par Go-heure. Utilisées après l’utilisation incluse dans le forfait, et n’expirent jamais."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent} % lu"
@@ -2783,6 +2783,9 @@ msgstr "Également : @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Sachez toujours quel agent a besoin de vous, grâce à des notifications qui mènent directement à l'agent bloqué."
+
+msgid "Amount of GB-hours"
+msgstr "Quantité de Go-heures"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Un agent mène des changements multi-fichiers de bout en bout."
@@ -4277,9 +4280,6 @@ msgstr "Options du canal"
 msgid "Channels"
 msgstr "Canaux"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Débite votre carte enregistrée pour plus de Go-heures quand les Go-heures achetées s'épuisent."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4862,6 +4862,12 @@ msgstr "Utilisation du cloud"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "L’utilisation du cloud n’est pas activée pour cette organisation."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "L’utilisation cloud de cette période est épuisée. Cet espace de travail s’arrête dans 10 minutes. Un propriétaire peut en acheter davantage pour qu’il continue."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "L’utilisation cloud de cette période est épuisée. Cet espace de travail s’arrête dans 10 minutes. Un propriétaire peut passer à Team ou Ultra pour qu’il continue."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "L’utilisation cloud de cette période est épuisée. Les espaces de travail ne peuvent pas démarrer."
@@ -13593,8 +13599,9 @@ msgstr "de tous les tokens"
 msgid "Off"
 msgstr "Désactivée"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Désactivée. Achète des Go-heures quand elles s'épuisent."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Désactivé"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "Votre organisation a utilisé tout son usage cloud pour cette période. 
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "Votre organisation a utilisé tout son usage cloud pour cette période. Un propriétaire peut passer à Team ou Ultra dans Paramètres, Facturation."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "Votre organisation a utilisé tout son usage cloud pour cette période. Cet espace de travail s'arrête dans quelques minutes. Un propriétaire peut en acheter plus dans Paramètres, Facturation."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Votre organisation a utilisé tout son usage cloud pour cette période. Cet espace de travail s'arrête dans quelques minutes. Un propriétaire peut passer à Team ou Ultra dans Paramètres, Facturation."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

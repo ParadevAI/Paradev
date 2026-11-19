@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · naar {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# bericht wacht in de wachtrij} other {# berichten wachten in de wachtrij}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} per GB-uur. Gebruikt na de maandelijkse pool, en verlopen nooit."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} per GB-uur. Worden gebruikt na het in het abonnement inbegrepen gebruik en verlopen nooit."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% gelezen"
@@ -2783,6 +2783,9 @@ msgstr "Ook: @superset/ui/spinner"
 
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Weet altijd welke agent jou nodig heeft, met meldingen die rechtstreeks naar de vastgelopen agent linken."
+
+msgid "Amount of GB-hours"
+msgstr "Aantal GB-uren"
 
 msgid "An agent completes multi-file changes end to end."
 msgstr "Een agent voltooit wijzigingen over meerdere bestanden van begin tot eind."
@@ -4277,9 +4280,6 @@ msgstr "Kanaalopties"
 msgid "Channels"
 msgstr "Kanalen"
 
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Schrijft meer GB-uren af van je opgeslagen kaart wanneer gekochte GB-uren opraken."
-
 msgid "Chat"
 msgstr "Chat"
 
@@ -4862,6 +4862,12 @@ msgstr "Cloudgebruik"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Cloudgebruik is niet ingeschakeld voor deze organisatie."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Het cloudgebruik voor deze periode is op. Deze workspace stopt over 10 minuten. Een eigenaar kan meer kopen om hem te laten doordraaien."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Het cloudgebruik voor deze periode is op. Deze workspace stopt over 10 minuten. Een eigenaar kan upgraden naar Team of Ultra om hem te laten doordraaien."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Het cloudgebruik voor deze periode is op. Workspaces kunnen niet starten."
@@ -13593,8 +13599,9 @@ msgstr "van alle tokens"
 msgid "Off"
 msgstr "Uit"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Uit. Koopt meer GB-uren wanneer ze opraken."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Uit"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -23156,12 +23163,6 @@ msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. E
 
 msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Een eigenaar kan meer kopen in Instellingen, Facturering."
-
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
