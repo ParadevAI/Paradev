@@ -974,6 +974,48 @@ describe("meter", () => {
 	});
 });
 
+describe("the usage limit refusal", () => {
+	let pack: { gbMinutes: number; price: number } | null = null;
+	stub(billing, {
+		ensureAutumnCustomer: async () => ({ id: "org_1" }),
+		organizationBilling: async () => ({ cloudUsage: { pack } }),
+	});
+	const start = () =>
+		authorizeBoot(
+			{
+				organizationId: "org_1",
+				cloudWorkspaceId: "ws_1",
+				createdByUserId: null,
+				memoryMb: 16_384,
+				vcpus: 8,
+				origin: "create",
+				traceId: "trace_1",
+			},
+			{ billingEnabled: true },
+		);
+
+	test.each([
+		[
+			"a plan that sells GB-hours, none bought yet",
+			{ gbMinutes: 60, price: 0.06 },
+			"buy",
+		],
+		["a plan with no pack", null, "upgrade"],
+	])("%s: the next step is to %s", async (_, plan, next) => {
+		pack = plan;
+		renewalAllowed = false;
+		const error = (await start().catch((caught: unknown) => caught)) as {
+			code: string;
+			cause: { i18nKey: string; i18nParams: unknown };
+		};
+		expect(error.code).toBe("FORBIDDEN");
+		expect(error.cause.i18nKey).toBe(
+			"serverError.cloudWorkspace.usageLimitReached",
+		);
+		expect(error.cause.i18nParams).toEqual({ next });
+	});
+});
+
 describe("with BILLING_PROVIDER=stripe", () => {
 	test("boxes start, wake and reconcile without asking Autumn", async () => {
 		await assertMayBoot("org_1", 4);

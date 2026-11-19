@@ -422,17 +422,24 @@ test("sorting by name or status needs grouping by workspace", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
-test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {
+test("with the flag off the usage pages are FORBIDDEN and billing is not read", async () => {
 	const readCloudUsage = mock(async () => CLOUD_USAGE);
 	const off = caller(MAYA, { enabled: false, readCloudUsage });
 	for (const call of [
 		() => off.usage.query({ range: "7d" }),
 		() => off.boots.list({ range: "7d" }),
-		() => off.periods.list({}),
 	]) {
 		await expect(call()).rejects.toMatchObject({ code: "FORBIDDEN" });
 	}
 	expect(readCloudUsage).not.toHaveBeenCalled();
+});
+
+test("with the flag off Billing still reads the open period and its allowance", async () => {
+	const [open] = (await caller(MAYA, { enabled: false }).periods.list({}))
+		.items;
+	expect(open?.closed).toBe(false);
+	expect(open?.allowance).toMatchObject({ includedGbHours: 20 });
+	expect(open?.metrics.gbHours).toBe(34);
 });
 
 test("periods run from the open one back to the one the organization was created in", async () => {

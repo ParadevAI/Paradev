@@ -5,6 +5,7 @@ import {
 	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	BOX_GB_MINUTES_FEATURE_ID,
 	ensureAutumnCustomer,
+	organizationBilling,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
@@ -24,6 +25,7 @@ import {
 	type PendingUsageEvent,
 	users,
 } from "@superset/db/schema";
+import { offersGbHourPack } from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
 import {
 	and,
@@ -88,18 +90,31 @@ export function refusalFor(result: {
 	return result.balance ? "usageLimitReached" : "cloudNeedsPaidPlan";
 }
 
-const REFUSAL_MESSAGES: Record<Refusal, string> = {
-	cloudNeedsPaidPlan:
-		"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
-	usageLimitReached:
-		"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
+const LIMIT_MESSAGES = {
+	buy: "Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
+	upgrade:
+		"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
 };
 
-function refusalError(refusal: Refusal) {
+async function refusalError(refusal: Refusal, organizationId: string) {
+	if (refusal === "cloudNeedsPaidPlan") {
+		return userError({
+			code: "FORBIDDEN",
+			message:
+				"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
+			i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan",
+		});
+	}
+	const next = offersGbHourPack(
+		(await organizationBilling(organizationId)).cloudUsage,
+	)
+		? "buy"
+		: "upgrade";
 	return userError({
 		code: "FORBIDDEN",
-		message: REFUSAL_MESSAGES[refusal],
-		i18nKey: `serverError.cloudWorkspace.${refusal}`,
+		message: LIMIT_MESSAGES[next],
+		i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+		params: { next },
 	});
 }
 
@@ -190,7 +205,7 @@ export async function assertMayBoot(
 	);
 	if (!result) return;
 	const refusal = refusalFor(result);
-	if (refusal) throw refusalError(refusal);
+	if (refusal) throw await refusalError(refusal, organizationId);
 }
 
 export async function authorizeBoot(
@@ -227,7 +242,7 @@ export async function authorizeBoot(
 	const refusal = result && refusalFor(result);
 	if (refusal) {
 		logControl("boot.refused", scope, { refusal }, "warn");
-		throw refusalError(refusal);
+		throw await refusalError(refusal, args.organizationId);
 	}
 	await db.insert(cloudWorkspaceBoots).values({
 		id: bootId,

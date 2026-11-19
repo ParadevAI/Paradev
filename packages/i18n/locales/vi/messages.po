@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · vào {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# tin nhắn đang chờ trong hàng đợi} other {# tin nhắn đang chờ trong hàng đợi}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} cho mỗi GB-giờ. Được dùng sau quỹ hằng tháng và không bao giờ hết hạn."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} mỗi GB-giờ. Được dùng sau mức sử dụng có trong gói và không bao giờ hết hạn."
 
 msgid "{readPercent}% read"
 msgstr "đã đọc {readPercent}%"
@@ -2784,6 +2784,9 @@ msgstr "Ngoài ra: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Luôn biết agent nào cần bạn, với thông báo dẫn thẳng tới agent đang bị chặn."
 
+msgid "Amount of GB-hours"
+msgstr "Số GB-giờ"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agent hoàn thành trọn vẹn các thay đổi trên nhiều tệp."
 
@@ -3621,8 +3624,8 @@ msgstr "Thanh toán"
 msgid "Billing details"
 msgstr "Thông tin thanh toán"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Thanh toán đã từ chối khởi động không gian làm việc trên đám mây: gói của tổ chức không bao gồm không gian làm việc trên đám mây, hoặc tổ chức đã đạt giới hạn sử dụng đám mây. Không gian làm việc trên đám mây cần gói Team hoặc Ultra. Nâng cấp hoặc tăng giới hạn trong Cài đặt > Thanh toán, hoặc chạy tự động hóa trên một thiết bị."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Thanh toán đã từ chối khởi động không gian làm việc trên đám mây: gói không bao gồm không gian làm việc trên đám mây, hoặc tổ chức đã dùng hết mức sử dụng đám mây của kỳ này. Xem Cài đặt, Thanh toán, hoặc chạy tự động hóa trên một thiết bị."
 
 msgid "Binary"
 msgstr "Nhị phân"
@@ -3703,9 +3706,6 @@ msgstr "Ngăn kéo dưới đáy, vuốt tiện trên thiết bị cảm ứng."
 
 msgid "Bought credits"
 msgstr "Tín dụng đã mua"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "GB-giờ đã mua còn lại: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Nảy biểu tượng trên Dock"
@@ -3905,9 +3905,6 @@ msgstr "Nút, công tắc và gợi ý phím"
 
 msgid "Buy"
 msgstr "Mua"
-
-msgid "Buy extra GB-hours"
-msgstr "Mua thêm GB-giờ"
 
 msgid "Buy for {total}"
 msgstr "Mua với giá {total}"
@@ -4279,9 +4276,6 @@ msgstr "Tùy chọn kênh"
 
 msgid "Channels"
 msgstr "Kênh"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Trừ tiền thẻ đã lưu để mua thêm GB-giờ khi số GB-giờ đã mua sắp hết."
 
 msgid "Chat"
 msgstr "Chat"
@@ -4865,6 +4859,21 @@ msgstr "Mức sử dụng đám mây"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Mức sử dụng đám mây chưa được bật cho tổ chức này."
+
+msgid "Cloud usage is used up for this period."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể mua thêm trong Cài đặt, Thanh toán."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể nâng cấp lên Team hoặc Ultra trong Cài đặt, Thanh toán."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Workspace này sẽ dừng sau 10 phút. Chủ sở hữu có thể mua thêm để nó tiếp tục chạy."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Workspace này sẽ dừng sau 10 phút. Chủ sở hữu có thể nâng cấp lên Team hoặc Ultra để nó tiếp tục chạy."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Không thể khởi động workspace."
@@ -8330,9 +8339,6 @@ msgstr "Trình duyệt ngoài"
 msgid "extra ${used} of ${limit}"
 msgstr "dùng thêm ${used} trên ${limit}"
 
-msgid "Extra GB-hours"
-msgstr "GB-giờ bổ sung"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-giờ bổ sung, mua khi cần"
 
@@ -9429,18 +9435,6 @@ msgstr "Cổng còn mở"
 
 msgid "GB-hours"
 msgstr "GB-giờ"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-giờ vượt gói: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-giờ vượt quỹ"
-
-msgid "GB-hours used: {used}"
-msgstr "GB-giờ đã dùng: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "GB-giờ đã dùng: {used} trên {included}"
 
 msgid "General"
 msgstr "Chung"
@@ -13608,8 +13602,9 @@ msgstr "trên tổng số token"
 msgid "Off"
 msgstr "Tắt"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Tắt. Mua thêm GB-giờ khi sắp hết."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Tắt"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16709,9 +16704,6 @@ msgstr "Đặt lại thu phóng"
 msgid "Reset Zoom"
 msgstr "Đặt lại thu phóng"
 
-msgid "Resets {resetDate}"
-msgstr "Đặt lại vào {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Đặt lại lúc {until}"
 
@@ -17815,9 +17807,6 @@ msgstr "Xem các vị trí đang tuyển, hoặc dùng thử Paradev trước."
 
 msgid "See this gate on the scorecard"
 msgstr "Xem cổng này trên bảng điểm"
-
-msgid "See usage"
-msgstr "Xem mức sử dụng"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Xem những gì đã thay đổi, góp ý, và merge khi đã sẵn sàng."
@@ -20352,8 +20341,8 @@ msgstr "Đường dẫn phải nằm trong repository"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Thay đổi plugin chưa hoàn tất trong {seconds} giây."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Quỹ được làm mới mỗi tháng. Phần sử dụng vượt quỹ được tính theo GB-giờ với mức giá hiển thị ở từng gói."
+msgid "The pool resets every month."
+msgstr "Nhóm dung lượng được đặt lại mỗi tháng."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Kho lưu trữ chính phải là một trong các kho lưu trữ của môi trường"
@@ -23162,9 +23151,6 @@ msgstr "Tên của bạn <0>(nếu dùng prompt của bạn, chúng tôi sẽ gh
 msgid "Your organization"
 msgstr "Tổ chức của bạn"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Hãy tăng giới hạn hoặc nâng cấp trong Cài đặt, Thanh toán để khởi động workspace này."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). Hãy lưu trữ một môi trường hoặc nâng cấp trong Cài đặt, Thanh toán để thêm."
@@ -23178,12 +23164,6 @@ msgstr "Tổ chức của bạn cài {plugin} cho bạn nên không thể gỡ c
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Tổ chức của bạn cài plugin này cho bạn. Bạn có thể tắt nhưng không thể gỡ nó."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng đám mây."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Tổ chức của bạn đã đạt giới hạn sử dụng cloud. Workspace này sẽ dừng sau vài phút nếu giới hạn không được tăng."
 
 msgid "Your organization reached its environment limit."
 msgstr "Tổ chức của bạn đã đạt giới hạn môi trường."

@@ -1,6 +1,8 @@
 export { CloudUsagePage } from "./CloudUsagePage";
+export { BillingUsageCard } from "./components/BillingUsageCard";
 export { CloudWorkspacePage } from "./components/CloudWorkspacePage";
 export { CloudWorkspacesPage } from "./components/CloudWorkspacesPage";
+export { GbHourPurchase } from "./components/GbHourPurchase";
 export { QueryStatus } from "./components/QueryStatus";
 export type {
 	CloudUsageLink,

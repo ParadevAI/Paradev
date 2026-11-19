@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · hedef {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {Kuyrukta bekleyen # mesaj} other {Kuyrukta bekleyen # mesaj}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "GB-saat başına {rate}. Aylık havuzdan sonra kullanılır ve süresi dolmaz."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "GB-saat başına {rate}. Plana dahil kullanımdan sonra kullanılır ve süresi dolmaz."
 
 msgid "{readPercent}% read"
 msgstr "%{readPercent} okundu"
@@ -2784,6 +2784,9 @@ msgstr "Ayrıca: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Doğrudan engellenen ajana bağlanan bildirimlerle, hangi ajanın size ihtiyacı olduğunu her zaman bilin."
 
+msgid "Amount of GB-hours"
+msgstr "GB-saat miktarı"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Bir ajan, çok dosyalı değişiklikleri baştan sona tamamlar."
 
@@ -3621,8 +3624,8 @@ msgstr "Faturalandırma"
 msgid "Billing details"
 msgstr "Faturalandırma bilgileri"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Faturalandırma bir bulut çalışma alanını başlatmayı reddetti: kuruluşun planı bulut çalışma alanlarını içermiyor veya bulut kullanım sınırına ulaşıldı. Bulut çalışma alanları Team veya Ultra planı gerektirir. Ayarlar > Faturalandırma bölümünden yükseltin veya sınırı artırın ya da otomasyonu bir cihazda çalıştırın."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Faturalandırma bir bulut çalışma alanını başlatmayı reddetti: plan bulut çalışma alanlarını içermiyor veya kuruluş bu dönemdeki tüm bulut kullanımını tüketti. Ayarlar, Faturalandırma bölümüne bakın veya otomasyonu bir cihazda çalıştırın."
 
 msgid "Binary"
 msgstr "İkili"
@@ -3703,9 +3706,6 @@ msgstr "Alt çekmece, dokunmatik cihazlarda kaydırmaya uygun."
 
 msgid "Bought credits"
 msgstr "Satın alınan krediler"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Kalan satın alınmış GB-saat: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dock simgesini zıplat"
@@ -3905,9 +3905,6 @@ msgstr "Düğmeler, anahtarlar ve klavye ipuçları"
 
 msgid "Buy"
 msgstr "Satın al"
-
-msgid "Buy extra GB-hours"
-msgstr "Ek GB-saat satın al"
 
 msgid "Buy for {total}"
 msgstr "{total} karşılığında satın al"
@@ -4279,9 +4276,6 @@ msgstr "Kanal seçenekleri"
 
 msgid "Channels"
 msgstr "Kanallar"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Satın alınan GB-saatler azaldığında kayıtlı kartınızdan daha fazla GB-saat için ücret alır."
 
 msgid "Chat"
 msgstr "Sohbet"
@@ -4865,6 +4859,21 @@ msgstr "Bulut kullanımı"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Bu kuruluş için bulut kullanımı açık değil."
+
+msgid "Cloud usage is used up for this period."
+msgstr "Bu dönemin bulut kullanımı tükendi."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Bu dönemin bulut kullanımı tükendi. Bir sahip Ayarlar, Faturalandırma bölümünden daha fazla satın alabilir."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Bu dönemin bulut kullanımı tükendi. Bir sahip Ayarlar, Faturalandırma bölümünden Team veya Ultra'ya geçebilir."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Bu dönemin bulut kullanımı tükendi. Bu çalışma alanı 10 dakika içinde durur. Bir sahip çalışmaya devam etmesi için daha fazla satın alabilir."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Bu dönemin bulut kullanımı tükendi. Bu çalışma alanı 10 dakika içinde durur. Bir sahip çalışmaya devam etmesi için Team veya Ultra'ya yükseltebilir."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Bu dönemin bulut kullanımı tükendi. Çalışma alanları başlatılamaz."
@@ -8330,9 +8339,6 @@ msgstr "Harici Tarayıcı"
 msgid "extra ${used} of ${limit}"
 msgstr "ek ${used}/${limit}"
 
-msgid "Extra GB-hours"
-msgstr "Ek GB-saat"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "İhtiyaç duyuldukça satın alınan ek GB-saat"
 
@@ -9429,18 +9435,6 @@ msgstr "Açık eşikler"
 
 msgid "GB-hours"
 msgstr "GB-saat"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "Plan dışı GB-saat: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "Havuzu aşan GB-saatler"
-
-msgid "GB-hours used: {used}"
-msgstr "Kullanılan GB-saat: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Kullanılan GB-saat: {used} / {included}"
 
 msgid "General"
 msgstr "Genel"
@@ -13608,8 +13602,9 @@ msgstr "tüm token'ların"
 msgid "Off"
 msgstr "Kapalı"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Kapalı. Azaldığında daha fazla GB-saat satın alır."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Kapalı"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16709,9 +16704,6 @@ msgstr "Yakınlaştırmayı sıfırla"
 msgid "Reset Zoom"
 msgstr "Yakınlaştırmayı sıfırla"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate} tarihinde sıfırlanır"
-
 msgid "Resets at {until}"
 msgstr "{until} saatinde sıfırlanır"
 
@@ -17815,9 +17807,6 @@ msgstr "Açık pozisyonlara bakın ya da önce Paradev'i deneyin."
 
 msgid "See this gate on the scorecard"
 msgstr "Bu eşiği puan tablosunda gör"
-
-msgid "See usage"
-msgstr "Kullanımı gör"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Neyin değiştiğini görün, geri bildirim verin ve hazır olduğunda işi birleştirin."
@@ -20352,8 +20341,8 @@ msgstr "Yol deponun içinde kalmalı"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Eklenti değişikliği {seconds} saniye içinde tamamlanmadı."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Havuz her ay sıfırlanır. Havuzu aşan kullanım her planda gösterilen GB-saat ücretiyle faturalandırılır."
+msgid "The pool resets every month."
+msgstr "Havuz her ay sıfırlanır."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Birincil depo, ortamın depolarından biri olmalıdır"
@@ -23162,9 +23151,6 @@ msgstr "Adınız <0>(isteminizi kullanırsak değişiklik günlüğünde size te
 msgid "Your organization"
 msgstr "Kuruluşunuz"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Bu çalışma alanını başlatmak için Ayarlar, Faturalandırma bölümünden sınırı artırın veya planı yükseltin."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Kuruluşunuz ortam sınırına ({0}) ulaştı. Bir ortamı arşivleyin veya daha fazla eklemek için Ayarlar, Faturalandırma bölümünden planı yükseltin."
@@ -23178,12 +23164,6 @@ msgstr "Kuruluşunuz {plugin} eklentisini sizin için yüklüyor, bu yüzden kal
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Kuruluşunuz bu eklentiyi sizin için yüklüyor. Devre dışı bırakabilirsiniz ama kaldıramazsınız."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Kuruluşunuz bulut kullanım sınırına ulaştı. Sınır artırılmazsa bu çalışma alanı birkaç dakika içinde durdurulacak."
 
 msgid "Your organization reached its environment limit."
 msgstr "Kuruluşunuz ortam sınırına ulaştı."

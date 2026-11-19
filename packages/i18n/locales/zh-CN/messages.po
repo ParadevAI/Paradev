@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · 目标 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {队列中有 # 条消息等待} other {队列中有 # 条消息等待}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "每 GB 小时 {rate}。在每月额度池之后使用，永不过期。"
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "每 GB 小时 {rate}。在套餐包含的用量之后使用，永不过期。"
 
 msgid "{readPercent}% read"
 msgstr "已读{readPercent}%"
@@ -2784,6 +2784,9 @@ msgstr "另有：@superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "随时知道哪个智能体需要你，通知可直接跳转到被阻塞的智能体。"
 
+msgid "Amount of GB-hours"
+msgstr "GB 小时数量"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "智能体能端到端完成跨文件改动。"
 
@@ -3621,8 +3624,8 @@ msgstr "账单"
 msgid "Billing details"
 msgstr "账单信息"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "计费系统拒绝启动云工作区：组织的方案不包含云工作区，或已达到云使用上限。云工作区需要 Team 或 Ultra 方案。请在设置 > 账单中升级或提高上限，或在设备上运行此自动化。"
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "账单拒绝启动云工作区：方案不包含云工作区，或组织已用完本周期的全部云用量。请查看设置的账单，或在设备上运行此自动化。"
 
 msgid "Binary"
 msgstr "二进制"
@@ -3703,9 +3706,6 @@ msgstr "底部抽屉，在触屏设备上便于滑动操作。"
 
 msgid "Bought credits"
 msgstr "已购买的额度"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "已购 GB 小时剩余：{prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "弹跳程序坞图标"
@@ -3905,9 +3905,6 @@ msgstr "按钮、切换控件和键盘提示"
 
 msgid "Buy"
 msgstr "购买"
-
-msgid "Buy extra GB-hours"
-msgstr "购买额外 GB 小时"
 
 msgid "Buy for {total}"
 msgstr "以 {total} 购买"
@@ -4279,9 +4276,6 @@ msgstr "频道选项"
 
 msgid "Channels"
 msgstr "频道"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "当购买的 GB 小时不足时，从已保存的卡扣款购买更多 GB 小时。"
 
 msgid "Chat"
 msgstr "聊天"
@@ -4865,6 +4859,21 @@ msgstr "云端用量"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "此组织未启用云端用量。"
+
+msgid "Cloud usage is used up for this period."
+msgstr "本周期的云用量已用完。"
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "本周期的云用量已用完。所有者可以在设置的账单中购买更多。"
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "本周期的云用量已用完。所有者可以在设置的账单中升级到 Team 或 Ultra。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "本周期的云用量已用完。此工作区将在 10 分钟后停止。所有者可以购买更多以使其继续运行。"
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "本周期的云用量已用完。此工作区将在 10 分钟后停止。所有者可以升级到 Team 或 Ultra 以使其继续运行。"
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "本周期的云用量已用完。工作区无法启动。"
@@ -8330,9 +8339,6 @@ msgstr "外部浏览器"
 msgid "extra ${used} of ${limit}"
 msgstr "额外用量${used}/${limit}"
 
-msgid "Extra GB-hours"
-msgstr "额外 GB 小时"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "按需购买的额外 GB 小时"
 
@@ -9429,18 +9435,6 @@ msgstr "已开启关卡"
 
 msgid "GB-hours"
 msgstr "GB 小时"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "超出套餐的 GB 小时：{overage}"
-
-msgid "GB-hours past the pool"
-msgstr "超出额度池的 GB 小时"
-
-msgid "GB-hours used: {used}"
-msgstr "已用 GB 小时：{used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "已用 GB 小时：{used} / {included}"
 
 msgid "General"
 msgstr "通用"
@@ -13608,8 +13602,9 @@ msgstr "占全部token"
 msgid "Off"
 msgstr "关闭"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "已关闭。不足时购买更多 GB 小时。"
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "关闭"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16709,9 +16704,6 @@ msgstr "重置缩放"
 msgid "Reset Zoom"
 msgstr "重置缩放"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate} 重置"
-
 msgid "Resets at {until}"
 msgstr "将于 {until} 重置"
 
@@ -17815,9 +17807,6 @@ msgstr "查看空缺职位，或先试用 Paradev。"
 
 msgid "See this gate on the scorecard"
 msgstr "在评分表中查看这道关卡"
-
-msgid "See usage"
-msgstr "查看用量"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "查看改动、给出反馈，就绪后合并成果。"
@@ -20352,8 +20341,8 @@ msgstr "路径必须位于仓库内"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "插件更改未在 {seconds} 秒内完成。"
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "时长池每月重置。超出部分按各套餐标注的每 GB 小时价格计费。"
+msgid "The pool resets every month."
+msgstr "额度池每月重置。"
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "主仓库必须是该环境的仓库之一"
@@ -23162,9 +23151,6 @@ msgstr "你的名字 <0>（若我们采用你的提示词，会在更新日志�
 msgid "Your organization"
 msgstr "你的组织"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "你的组织已达到云端用量上限。请在“设置”中的“账单”提高上限或升级，以启动此工作区。"
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "你的组织已达到环境数量上限（{0}）。请归档一个环境，或在“设置”中的“账单”升级以添加更多。"
@@ -23178,12 +23164,6 @@ msgstr "你的组织为你安装了 {plugin}，因此无法卸载。你可以停
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "你的组织为你安装了此插件。你可以停用它，但不能移除。"
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "您的组织已达到云使用上限。"
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "你的组织已达到云端用量上限。除非提高上限，此工作区将在几分钟后停止。"
 
 msgid "Your organization reached its environment limit."
 msgstr "您的组织已达到环境数量上限。"

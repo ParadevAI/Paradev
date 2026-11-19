@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · ke {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# pesan menunggu dalam antrean} other {# pesan menunggu dalam antrean}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} per GB-jam. Dipakai setelah kumpulan bulanan, dan tidak pernah kedaluwarsa."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} per GB-jam. Dipakai setelah penggunaan yang termasuk dalam paket, dan tidak pernah kedaluwarsa."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% dibaca"
@@ -2784,6 +2784,9 @@ msgstr "Juga: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Selalu tahu agen mana yang membutuhkan Anda, dengan notifikasi yang langsung menuju agen yang terhambat."
 
+msgid "Amount of GB-hours"
+msgstr "Jumlah GB-jam"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agen menyelesaikan perubahan lintas file dari awal sampai akhir."
 
@@ -3621,8 +3624,8 @@ msgstr "Penagihan"
 msgid "Billing details"
 msgstr "Detail penagihan"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Penagihan menolak memulai workspace cloud: paket organisasi tidak mencakup workspace cloud, atau organisasi mencapai batas pemakaian cloud. Workspace cloud memerlukan paket Team atau Ultra. Upgrade atau naikkan batas di Pengaturan > Penagihan, atau jalankan otomatisasi di perangkat."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Penagihan menolak memulai workspace cloud: paket tidak menyertakan workspace cloud, atau organisasi telah memakai seluruh penggunaan cloud untuk periode ini. Lihat Pengaturan, Penagihan, atau jalankan otomatisasi di perangkat."
 
 msgid "Binary"
 msgstr "Biner"
@@ -3703,9 +3706,6 @@ msgstr "Laci bawah, ramah geser di perangkat sentuh."
 
 msgid "Bought credits"
 msgstr "Kredit yang dibeli"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Sisa GB-jam yang dibeli: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Pantulkan ikon Dock"
@@ -3905,9 +3905,6 @@ msgstr "Tombol, toggle, dan afordansi keyboard"
 
 msgid "Buy"
 msgstr "Beli"
-
-msgid "Buy extra GB-hours"
-msgstr "Beli GB-jam tambahan"
 
 msgid "Buy for {total}"
 msgstr "Beli seharga {total}"
@@ -4279,9 +4276,6 @@ msgstr "Opsi kanal"
 
 msgid "Channels"
 msgstr "Kanal"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Menagih kartu tersimpan untuk GB-jam tambahan saat GB-jam yang dibeli hampir habis."
 
 msgid "Chat"
 msgstr "Chat"
@@ -4865,6 +4859,21 @@ msgstr "Penggunaan cloud"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
+
+msgid "Cloud usage is used up for this period."
+msgstr "Penggunaan cloud untuk periode ini sudah habis."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace ini berhenti dalam 10 menit. Pemilik dapat membeli lagi agar tetap berjalan."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace ini berhenti dalam 10 menit. Pemilik dapat upgrade ke Team atau Ultra agar tetap berjalan."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace tidak dapat dimulai."
@@ -8330,9 +8339,6 @@ msgstr "Browser Eksternal"
 msgid "extra ${used} of ${limit}"
 msgstr "tambahan ${used} dari ${limit}"
 
-msgid "Extra GB-hours"
-msgstr "GB-jam tambahan"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-jam tambahan, dibeli sesuai kebutuhan"
 
@@ -9429,18 +9435,6 @@ msgstr "Gerbang terbuka"
 
 msgid "GB-hours"
 msgstr "GB-jam"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-jam di atas paket: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-jam di luar kumpulan"
-
-msgid "GB-hours used: {used}"
-msgstr "GB-jam terpakai: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "GB-jam terpakai: {used} dari {included}"
 
 msgid "General"
 msgstr "Umum"
@@ -13608,8 +13602,9 @@ msgstr "dari semua token"
 msgid "Off"
 msgstr "Mati"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Nonaktif. Membeli GB-jam lagi saat hampir habis."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Mati"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16709,9 +16704,6 @@ msgstr "Reset zoom"
 msgid "Reset Zoom"
 msgstr "Reset zoom"
 
-msgid "Resets {resetDate}"
-msgstr "Direset pada {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Direset pada {until}"
 
@@ -17815,9 +17807,6 @@ msgstr "Lihat lowongan yang ada, atau coba Paradev dulu."
 
 msgid "See this gate on the scorecard"
 msgstr "Lihat gerbang ini di kartu skor"
-
-msgid "See usage"
-msgstr "Lihat penggunaan"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Lihat apa yang berubah, beri masukan, dan merge pekerjaannya saat siap."
@@ -20352,8 +20341,8 @@ msgstr "Path harus tetap di dalam repositori"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Perubahan plugin tidak selesai dalam {seconds} detik."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Kumpulan direset setiap bulan. Penggunaan di atasnya ditagih per GB-jam sesuai tarif di setiap paket."
+msgid "The pool resets every month."
+msgstr "Kumpulan direset setiap bulan."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Repositori utama harus salah satu repositori lingkungan"
@@ -23162,9 +23151,6 @@ msgstr "Nama Anda <0>(kalau prompt Anda kami pakai, kami akan mencantumkan Anda 
 msgid "Your organization"
 msgstr "Organisasi Anda"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Naikkan batas atau upgrade di Pengaturan, Penagihan untuk memulai workspace ini."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Organisasi Anda telah mencapai batas lingkungan ({0}). Arsipkan satu lingkungan, atau upgrade di Pengaturan, Penagihan untuk menambah lagi."
@@ -23178,12 +23164,6 @@ msgstr "Organisasi Anda memasang {plugin} untuk Anda, jadi plugin ini tidak dapa
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Organisasi Anda memasang plugin ini untuk Anda. Anda dapat menonaktifkannya, tetapi tidak dapat menghapusnya."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Organisasi Anda telah mencapai batas penggunaan cloud."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Organisasi Anda telah mencapai batas penggunaan cloud. Workspace ini akan berhenti dalam beberapa menit kecuali batasnya dinaikkan."
 
 msgid "Your organization reached its environment limit."
 msgstr "Organisasi Anda telah mencapai batas lingkungan."

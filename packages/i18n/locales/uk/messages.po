@@ -1328,8 +1328,8 @@ msgstr "{pullRequests} · у {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# повідомлення чекає в черзі} few {# повідомлення чекають у черзі} many {# повідомлень чекають у черзі} other {# повідомлення чекає в черзі}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} за ГБ-год. Використовуються після місячного пулу й не згорають."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} за ГБ-годину. Використовуються після включеного в план використання і не згорають."
 
 msgid "{readPercent}% read"
 msgstr "прочитано {readPercent}%"
@@ -2778,6 +2778,9 @@ msgstr "Також: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Завжди знайте, якому агенту ви потрібні, завдяки сповіщенням, що ведуть просто до заблокованого агента."
 
+msgid "Amount of GB-hours"
+msgstr "Кількість ГБ-годин"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Агент повністю виконує зміни в кількох файлах."
 
@@ -3615,8 +3618,8 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платіжні дані"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Система оплати не дозволила запустити хмарний робочий простір: тариф організації не передбачає хмарних робочих просторів або досягнуто ліміту хмарного використання. Для хмарних робочих просторів потрібен тариф Team або Ultra. Перейдіть на вищий тариф або підвищте ліміт у Налаштування > Оплата чи запустіть автоматизацію на пристрої."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Оплата не дозволила запустити хмарний робочий простір: тариф не містить хмарних робочих просторів, або організація використала все хмарне використання за цей період. Перегляньте Налаштування, Оплата або запустіть автоматизацію на пристрої."
 
 msgid "Binary"
 msgstr "Двійковий"
@@ -3697,9 +3700,6 @@ msgstr "Нижня висувна панель, зручна для свайпі
 
 msgid "Bought credits"
 msgstr "Куплені кредити"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Залишок куплених ГБ-годин: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Підстрибування значка в Dock"
@@ -3899,9 +3899,6 @@ msgstr "Кнопки, перемикачі та клавіатурні підк�
 
 msgid "Buy"
 msgstr "Купити"
-
-msgid "Buy extra GB-hours"
-msgstr "Купити додаткові ГБ-години"
 
 msgid "Buy for {total}"
 msgstr "Купити за {total}"
@@ -4273,9 +4270,6 @@ msgstr "Параметри каналу"
 
 msgid "Channels"
 msgstr "Канали"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Списувати кошти зі збереженої картки за нові ГБ-години, коли куплені ГБ-години закінчуються."
 
 msgid "Chat"
 msgstr "Чат"
@@ -4859,6 +4853,21 @@ msgstr "Використання хмари"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Використання хмари не ввімкнено для цієї організації."
+
+msgid "Cloud usage is used up for this period."
+msgstr "Хмарне використання за цей період вичерпано."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Хмарне використання за цей період вичерпано. Власник може докупити ще в розділі Налаштування, Оплата."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Хмарне використання за цей період вичерпано. Власник може перейти на Team або Ultra в розділі Налаштування, Оплата."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Хмарне використання за цей період вичерпано. Цей робочий простір зупиниться через 10 хвилин. Власник може докупити, щоб він працював далі."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Хмарне використання за цей період вичерпано. Цей робочий простір зупиниться через 10 хвилин. Власник може перейти на Team або Ultra, щоб він працював далі."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Хмарне використання за цей період вичерпано. Робочі простори не можуть запуститися."
@@ -8324,9 +8333,6 @@ msgstr "Зовнішній браузер"
 msgid "extra ${used} of ${limit}"
 msgstr "додатково ${used} з ${limit}"
 
-msgid "Extra GB-hours"
-msgstr "Додаткові ГБ-години"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "Додаткові ГБ-години, за потреби"
 
@@ -9423,18 +9429,6 @@ msgstr "Відкрито порогів"
 
 msgid "GB-hours"
 msgstr "ГБ-години"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "ГБ-години понад тариф: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "ГБ-години понад пул"
-
-msgid "GB-hours used: {used}"
-msgstr "Використано ГБ-годин: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Використано ГБ-годин: {used} з {included}"
 
 msgid "General"
 msgstr "Загальні"
@@ -13602,8 +13596,9 @@ msgstr "від усіх токенів"
 msgid "Off"
 msgstr "Вимкнено"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Вимкнено. Докуповує ГБ-години, коли вони закінчуються."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Вимкнено"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16703,9 +16698,6 @@ msgstr "Скинути масштаб"
 msgid "Reset Zoom"
 msgstr "Скинути масштаб"
 
-msgid "Resets {resetDate}"
-msgstr "Скидання {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Скидання о {until}"
 
@@ -17809,9 +17801,6 @@ msgstr "Перегляньте вакансії або спершу спробу
 
 msgid "See this gate on the scorecard"
 msgstr "Переглянути цей поріг у таблиці оцінок"
-
-msgid "See usage"
-msgstr "Переглянути використання"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Подивіться, що змінилося, залиште відгук і злийте роботу, коли вона буде готова."
@@ -20346,8 +20335,8 @@ msgstr "Шлях має бути всередині репозиторію"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Зміну плагіна не завершено за {seconds} с."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Пул оновлюється щомісяця. Використання понад нього оплачується за кожну ГБ-годину за ставкою, указаною в кожному тарифі."
+msgid "The pool resets every month."
+msgstr "Пул оновлюється щомісяця."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Основний репозиторій має бути одним із репозиторіїв середовища"
@@ -23156,9 +23145,6 @@ msgstr "Ваше ім'я <0>(якщо ми використаємо ваш пр�
 msgid "Your organization"
 msgstr "Ваша організація"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Ваша організація досягла ліміту хмарного використання. Щоб запустити цей робочий простір, підвищте ліміт або покращте тариф у розділі «Налаштування», «Оплата»."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Ваша організація досягла ліміту середовищ ({0}). Архівуйте середовище або покращте тариф у розділі «Налаштування», «Оплата», щоб додати більше."
@@ -23172,12 +23158,6 @@ msgstr "Ваша організація встановлює {plugin} для в�
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Ваша організація встановлює цей плагін для вас. Ви можете його вимкнути, але не видалити."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Ваша організація досягла ліміту використання хмари."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Ваша організація досягла ліміту хмарного використання. Цей робочий простір зупиниться за кілька хвилин, якщо ліміт не підвищать."
 
 msgid "Your organization reached its environment limit."
 msgstr "Ваша організація досягла ліміту середовищ."

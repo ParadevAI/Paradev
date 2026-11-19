@@ -1334,8 +1334,8 @@ msgstr "{pullRequests} · 대상 {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {대기열에서 대기 중인 메시지 #개} other {대기열에서 대기 중인 메시지 #개}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "GB 시간당 {rate}. 월간 풀 다음에 사용되며 만료되지 않습니다."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "GB-시간당 {rate}. 플랜에 포함된 사용량 다음에 사용되며 만료되지 않습니다."
 
 msgid "{readPercent}% read"
 msgstr "{readPercent}% 읽음"
@@ -2784,6 +2784,9 @@ msgstr "참고: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "어떤 에이전트가 나를 필요로 하는지 항상 알 수 있습니다. 알림을 누르면 막힌 에이전트로 바로 이동합니다."
 
+msgid "Amount of GB-hours"
+msgstr "GB-시간 수량"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "에이전트가 여러 파일에 걸친 변경을 처음부터 끝까지 완료합니다."
 
@@ -3621,8 +3624,8 @@ msgstr "결제"
 msgid "Billing details"
 msgstr "결제 정보"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "결제에서 클라우드 워크스페이스 시작을 거부했습니다. 조직의 플랜에 클라우드 워크스페이스가 포함되어 있지 않거나 클라우드 사용 한도에 도달했습니다. 클라우드 워크스페이스에는 Team 또는 Ultra 플랜이 필요합니다. 설정 > 결제에서 업그레이드하거나 한도를 높이거나, 기기에서 자동화를 실행하세요."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "결제에서 클라우드 워크스페이스 시작을 거부했습니다. 플랜에 클라우드 워크스페이스가 포함되어 있지 않거나, 조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 설정의 결제를 확인하거나 기기에서 자동화를 실행하세요."
 
 msgid "Binary"
 msgstr "바이너리"
@@ -3703,9 +3706,6 @@ msgstr "하단 드로어로, 터치 기기에서 스와이프하기 좋습니다
 
 msgid "Bought credits"
 msgstr "구매한 크레딧"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "구매한 GB 시간 잔여: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dock 아이콘 튀기기"
@@ -3905,9 +3905,6 @@ msgstr "버튼, 토글, 키보드 어포던스"
 
 msgid "Buy"
 msgstr "구매"
-
-msgid "Buy extra GB-hours"
-msgstr "추가 GB 시간 구매"
 
 msgid "Buy for {total}"
 msgstr "{total}에 구매"
@@ -4279,9 +4276,6 @@ msgstr "채널 옵션"
 
 msgid "Channels"
 msgstr "채널"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "구매한 GB 시간이 부족해지면 저장된 카드로 GB 시간을 더 결제합니다."
 
 msgid "Chat"
 msgstr "채팅"
@@ -4865,6 +4859,21 @@ msgstr "클라우드 사용량"
 
 msgid "Cloud usage is not enabled for this organization."
 msgstr "이 조직에는 클라우드 사용량이 켜져 있지 않습니다."
+
+msgid "Cloud usage is used up for this period."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 더 구매할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 더 구매하면 계속 실행할 수 있습니다."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 10분 후에 중지됩니다. 소유자가 Team 또는 Ultra로 업그레이드하면 계속 실행할 수 있습니다."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 워크스페이스를 시작할 수 없습니다."
@@ -8330,9 +8339,6 @@ msgstr "외부 브라우저"
 msgid "extra ${used} of ${limit}"
 msgstr "${limit} 중 추가 ${used}"
 
-msgid "Extra GB-hours"
-msgstr "추가 GB 시간"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "필요할 때 구매하는 추가 GB 시간"
 
@@ -9429,18 +9435,6 @@ msgstr "열린 관문"
 
 msgid "GB-hours"
 msgstr "GB 시간"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "플랜 초과 GB 시간: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "풀을 넘는 GB 시간"
-
-msgid "GB-hours used: {used}"
-msgstr "사용한 GB 시간: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "사용한 GB 시간: {included} 중 {used}"
 
 msgid "General"
 msgstr "일반"
@@ -13608,8 +13602,9 @@ msgstr "전체 토큰 대비"
 msgid "Off"
 msgstr "끔"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "꺼짐. 부족해지면 GB 시간을 더 구매합니다."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "끔"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -16709,9 +16704,6 @@ msgstr "확대/축소 초기화"
 msgid "Reset Zoom"
 msgstr "확대/축소 초기화"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate}에 초기화"
-
 msgid "Resets at {until}"
 msgstr "{until}에 재설정"
 
@@ -17815,9 +17807,6 @@ msgstr "채용 공고를 확인하거나 먼저 Paradev를 사용해 보세요."
 
 msgid "See this gate on the scorecard"
 msgstr "성적표에서 이 관문 보기"
-
-msgid "See usage"
-msgstr "사용량 보기"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "무엇이 바뀌었는지 보고, 피드백을 주고, 준비되면 머지하세요."
@@ -20352,8 +20341,8 @@ msgstr "경로는 리포지토리 안에 있어야 합니다"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "플러그인 변경이 {seconds}초 안에 완료되지 않았습니다."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "풀은 매달 초기화됩니다. 초과 사용량은 각 플랜에 표시된 GB 시간당 요금으로 청구됩니다."
+msgid "The pool resets every month."
+msgstr "풀은 매달 초기화됩니다."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "기본 저장소는 환경의 저장소 중 하나여야 합니다"
@@ -23162,9 +23151,6 @@ msgstr "이름 <0>(프롬프트를 채택하면 변경 로그에 이름을 남�
 msgid "Your organization"
 msgstr "내 조직"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 한도를 올리거나 업그레이드하세요."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "조직이 환경 한도({0})에 도달했습니다. 환경을 보관하거나 설정의 결제에서 업그레이드하여 더 추가하세요."
@@ -23178,12 +23164,6 @@ msgstr "조직에서 {plugin}을(를) 대신 설치하므로 제거할 수 없�
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "조직에서 이 플러그인을 대신 설치합니다. 비활성화할 수는 있지만 제거할 수는 없습니다."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "조직이 클라우드 사용 한도에 도달했습니다. 한도를 올리지 않으면 이 워크스페이스는 몇 분 후에 중지됩니다."
 
 msgid "Your organization reached its environment limit."
 msgstr "조직이 환경 한도에 도달했습니다."

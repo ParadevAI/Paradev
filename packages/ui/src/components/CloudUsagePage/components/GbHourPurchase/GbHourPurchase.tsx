@@ -1,21 +1,25 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { authClient } from "@superset/auth/client";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import {
 	type GbHourPack,
-	gbHourPackPricePerGbHour,
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
-import { Switch } from "@superset/ui/switch";
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useTRPC } from "@/trpc/react";
+import { Button } from "../../../ui/button";
+import {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemGroup,
+	ItemTitle,
+} from "../../../ui/item";
+import { toast } from "../../../ui/sonner";
+import { Switch } from "../../../ui/switch";
 import { AutoTopupDialog } from "./components/AutoTopupDialog";
 import { BuyGbHoursDialog } from "./components/BuyGbHoursDialog";
 import { DEFAULT_TOPUP, PRICE_FORMAT } from "./constants";
@@ -28,6 +32,10 @@ interface GbHourPurchaseProps {
 		thresholdGbMinutes: number;
 		quantityGbMinutes: number;
 	} | null;
+	/** The app's auth client call to a billing endpoint. */
+	post: (path: string, body: Record<string, unknown>) => Promise<unknown>;
+	/** Refetches the app's billing queries after a change. */
+	refresh: () => Promise<unknown>;
 }
 
 interface TopupSettings {
@@ -40,20 +48,11 @@ export function GbHourPurchase({
 	organizationId,
 	pack,
 	autoTopup,
+	post,
+	refresh,
 }: GbHourPurchaseProps) {
 	const { t } = useLingui();
 	const { formatNumber, formatCurrency } = useFormat();
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-	const refresh = () =>
-		Promise.all([
-			queryClient.invalidateQueries({
-				queryKey: trpc.billing.cloudUsage.queryKey(),
-			}),
-			queryClient.invalidateQueries({
-				queryKey: trpc.billing.activePlan.queryKey(),
-			}),
-		]);
 	const [isBuyOpen, setIsBuyOpen] = useState(false);
 	const [isTopupOpen, setIsTopupOpen] = useState(false);
 	const [topup, setTopup] = useState<TopupSettings>(
@@ -68,22 +67,13 @@ export function GbHourPurchase({
 
 	const price = (value: number) =>
 		formatCurrency(value, PLAN_PRICE_CURRENCY, PRICE_FORMAT);
-	const rate = formatCurrency(
-		gbHourPackPricePerGbHour(pack),
-		PLAN_PRICE_CURRENCY,
-		PRICE_FORMAT,
-	);
 	const topupThreshold = formatNumber(topup.thresholdGbHours);
 	const topupGbHours = formatNumber(topup.gbHours);
 	const topupPrice = price(gbHourPurchase(pack, topup.gbHours).price);
 
 	const buy = async (gbHours: number) => {
 		const bought = formatNumber(gbHours);
-		await authClient.$fetch("/autumn/buyGbHours", {
-			method: "POST",
-			body: { organizationId, gbHours },
-			throw: true,
-		});
+		await post("/autumn/buyGbHours", { organizationId, gbHours });
 		toast.success(t`Added ${bought} GB-hours.`);
 		await refresh();
 	};
@@ -92,15 +82,11 @@ export function GbHourPurchase({
 		const previous = topup;
 		setTopup(next);
 		try {
-			await authClient.$fetch("/autumn/setAutoTopup", {
-				method: "POST",
-				body: {
-					organizationId,
-					enabled: next.enabled,
-					thresholdGbHours: next.thresholdGbHours,
-					gbHours: next.gbHours,
-				},
-				throw: true,
+			await post("/autumn/setAutoTopup", {
+				organizationId,
+				enabled: next.enabled,
+				thresholdGbHours: next.thresholdGbHours,
+				gbHours: next.gbHours,
 			});
 			await refresh();
 		} catch (error) {
@@ -111,39 +97,36 @@ export function GbHourPurchase({
 	};
 
 	return (
-		<div className="space-y-4 border-t pt-4">
-			<div className="flex items-center justify-between gap-4">
-				<div className="min-w-0">
-					<div className="text-sm">
-						<Trans>Extra GB-hours</Trans>
-					</div>
-					<div className="text-xs text-muted-foreground">
-						<Trans>
-							{rate} per GB-hour. Used after the monthly pool, and never expire.
-						</Trans>
-					</div>
-				</div>
-				<Button size="sm" onClick={() => setIsBuyOpen(true)}>
-					<Trans>Buy GB-hours</Trans>
-				</Button>
-			</div>
-			<div className="flex items-center justify-between gap-4">
-				<div className="min-w-0">
-					<div className="text-sm">
+		<ItemGroup className="border-t pt-2">
+			<Item size="sm" className="px-0">
+				<ItemContent>
+					<ItemTitle className="font-normal">
+						<Trans>Bought credits</Trans>
+					</ItemTitle>
+				</ItemContent>
+				<ItemActions>
+					<Button size="sm" onClick={() => setIsBuyOpen(true)}>
+						<Trans>Buy GB-hours</Trans>
+					</Button>
+				</ItemActions>
+			</Item>
+			<Item size="sm" className="px-0">
+				<ItemContent>
+					<ItemTitle className="font-normal">
 						<Trans>Auto top-up</Trans>
-					</div>
-					<div className="text-xs text-muted-foreground">
+					</ItemTitle>
+					<ItemDescription className="line-clamp-none">
 						{topup.enabled ? (
 							<Trans>
 								When fewer than {topupThreshold} GB-hours remain, add{" "}
 								{topupPrice} ({topupGbHours} GB-hours).
 							</Trans>
 						) : (
-							<Trans>Off. Buys more GB-hours when they run low.</Trans>
+							<Trans context="auto top-up">Off</Trans>
 						)}
-					</div>
-				</div>
-				<div className="flex shrink-0 items-center gap-2">
+					</ItemDescription>
+				</ItemContent>
+				<ItemActions>
 					{topup.enabled && (
 						<Button
 							size="sm"
@@ -162,8 +145,8 @@ export function GbHourPurchase({
 						}
 						aria-label={t`Auto top-up`}
 					/>
-				</div>
-			</div>
+				</ItemActions>
+			</Item>
 			<BuyGbHoursDialog
 				open={isBuyOpen}
 				onOpenChange={setIsBuyOpen}
@@ -177,6 +160,6 @@ export function GbHourPurchase({
 				initial={topup}
 				onSave={(settings) => saveTopup({ ...settings, enabled: true })}
 			/>
-		</div>
+		</ItemGroup>
 	);
 }

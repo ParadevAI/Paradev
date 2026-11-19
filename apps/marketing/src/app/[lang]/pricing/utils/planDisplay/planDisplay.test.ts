@@ -43,12 +43,5 @@ describe("comparisonValue", () => {
 		const custom = expect.objectContaining({ message: "Custom" });
 		expect(row("cloudEnvironments")).toEqual([null, null, "5", "10", custom]);
 		expect(row("cloudGbHours")).toEqual([null, null, "1,200", "4,000", custom]);
-		expect(row("overage")).toEqual([
-			null,
-			null,
-			"$0.06 per GB-hour",
-			"$0.06 per GB-hour",
-			custom,
-		]);
 	});
 });

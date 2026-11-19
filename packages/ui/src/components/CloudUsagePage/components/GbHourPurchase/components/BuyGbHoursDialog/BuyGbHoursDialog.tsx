@@ -1,3 +1,5 @@
+"use client";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
@@ -8,7 +10,9 @@ import {
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
+import { useState } from "react";
+import { cn } from "../../../../../../lib/utils";
+import { Button } from "../../../../../ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -16,16 +20,15 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@superset/ui/dialog";
+} from "../../../../../ui/dialog";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 	InputGroupText,
-} from "@superset/ui/input-group";
-import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
-import { useState } from "react";
+} from "../../../../../ui/input-group";
+import { toast } from "../../../../../ui/sonner";
+import { ToggleGroup, ToggleGroupItem } from "../../../../../ui/toggle-group";
 import { PRESET_GB_HOURS, PRICE_FORMAT } from "../../constants";
 
 interface BuyGbHoursDialogProps {
@@ -91,36 +94,39 @@ export function BuyGbHoursDialog({
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>
-						<Trans>Buy extra GB-hours</Trans>
+						<Trans>Buy GB-hours</Trans>
 					</DialogTitle>
 					<DialogDescription>
 						<Trans>
-							{rate} per GB-hour. Used after the monthly pool, and never expire.
+							{rate} per GB-hour. Used after the plan's included usage, and
+							never expire.
 						</Trans>
 					</DialogDescription>
 				</DialogHeader>
-				<div className="grid grid-cols-2 gap-2">
+				<ToggleGroup
+					type="single"
+					variant="outline"
+					spacing={2}
+					className="grid w-full grid-cols-2"
+					value={selected === "custom" ? "" : String(selected)}
+					onValueChange={(value) => value && setSelected(Number(value))}
+					aria-label={t`Amount of GB-hours`}
+				>
 					{PRESET_GB_HOURS.map((hours) => (
-						<button
+						<ToggleGroupItem
 							key={hours}
-							type="button"
-							onClick={() => setSelected(hours)}
-							className={cn(
-								"rounded-md border px-3 py-2.5 text-left transition-colors",
-								selected === hours
-									? "border-foreground bg-accent"
-									: "hover:bg-accent/50",
-							)}
+							value={String(hours)}
+							className="h-auto w-full flex-col items-start gap-0 px-3 py-2.5"
 						>
-							<div className="text-sm font-medium tabular-nums">
+							<span className="text-sm font-medium tabular-nums">
 								<Trans>{formatNumber(hours)} GB-hours</Trans>
-							</div>
-							<div className="text-xs text-muted-foreground tabular-nums">
+							</span>
+							<span className="text-xs text-muted-foreground tabular-nums">
 								{price(gbHourPurchase(pack, hours).price)}
-							</div>
-						</button>
+							</span>
+						</ToggleGroupItem>
 					))}
-				</div>
+				</ToggleGroup>
 				<div className="space-y-1.5">
 					<InputGroup
 						className={cn(selected === "custom" && "border-foreground")}
@@ -154,10 +160,6 @@ export function BuyGbHoursDialog({
 							</Trans>
 						</p>
 					)}
-				</div>
-				<div className="flex items-center justify-between border-t pt-3 text-sm">
-					<Trans>Total</Trans>
-					<span className="font-medium tabular-nums">{total ?? "–"}</span>
 				</div>
 				<DialogFooter>
 					<Button

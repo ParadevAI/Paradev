@@ -8,24 +8,23 @@ import {
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
+import { useEffect, useState } from "react";
+import { Button } from "../../../../../ui/button";
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@superset/ui/dialog";
-import { Label } from "@superset/ui/label";
+} from "../../../../../ui/dialog";
+import { Label } from "../../../../../ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@superset/ui/select";
-import { useEffect, useState } from "react";
+} from "../../../../../ui/select";
 import {
 	PRESET_GB_HOURS,
 	PRICE_FORMAT,
@@ -91,17 +90,11 @@ export function AutoTopupDialog({
 			open={open}
 			onOpenChange={(next) => !isSaving && onOpenChange(next)}
 		>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md" aria-describedby={undefined}>
 				<DialogHeader>
 					<DialogTitle>
 						<Trans>Auto top-up</Trans>
 					</DialogTitle>
-					<DialogDescription>
-						<Trans>
-							Charge your saved card for more GB-hours when bought GB-hours run
-							low.
-						</Trans>
-					</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4">
 					<div className="space-y-1.5">
