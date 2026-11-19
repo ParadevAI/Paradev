@@ -3,6 +3,8 @@
 // daemon spawns real PTYs via node-pty.
 
 import { strict as assert } from "node:assert";
+import { once } from "node:events";
+import { mkdtempSync, rmSync } from "node:fs";
 import * as net from "node:net";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -411,10 +413,8 @@ test(
 	"a timed-out list reply cannot settle the next list request",
 	{ timeout: 5000 },
 	async (t) => {
-		const socketPath = path.join(
-			os.tmpdir(),
-			`host-list-reply-${process.pid}.sock`,
-		);
+		const socketDir = mkdtempSync(path.join(os.tmpdir(), "paradev-list-"));
+		const socketPath = path.join(socketDir, "daemon.sock");
 		const firstRequest = Promise.withResolvers<ListMessage>();
 		const secondRequest = Promise.withResolvers<{
 			message: ListMessage;
@@ -452,9 +452,8 @@ test(
 		const wait = <T>(promise: Promise<T>) =>
 			Promise.race([promise, cancelled.promise]);
 		try {
-			await wait(
-				new Promise<void>((resolve) => fake.listen(socketPath, resolve)),
-			);
+			t.signal.throwIfAborted();
+			await once(fake.listen(socketPath), "listening", { signal: t.signal });
 			await client.connect();
 			t.signal.throwIfAborted();
 			t.mock.timers.enable({ apis: ["setTimeout"] });
@@ -520,8 +519,12 @@ test(
 			t.signal.removeEventListener("abort", cancel);
 			cancel();
 			t.mock.timers.reset();
-			await client.dispose();
-			await new Promise<void>((resolve) => fake.close(() => resolve()));
+			try {
+				await client.dispose();
+				await new Promise<void>((resolve) => fake.close(() => resolve()));
+			} finally {
+				rmSync(socketDir, { recursive: true, force: true });
+			}
 		}
 	},
 );
