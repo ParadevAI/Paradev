@@ -16,6 +16,7 @@ import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
+import { getConnector } from "@superset/shared/connectors";
 import { COMPANY } from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
@@ -114,6 +115,10 @@ const desktopDevOrigins =
 				`http://127.0.0.1:${desktopDevPort}`,
 			]
 		: [];
+
+const adminMcpUrl = getConnector("paradev_admin_mcp")?.methods.find(
+	(method) => method.type === "oauth2",
+)?.authorization_url;
 
 export const auth = betterAuth({
 	baseURL: getBrowserApiUrl(env),
@@ -409,7 +414,10 @@ export const auth = betterAuth({
 			allowDynamicClientRegistration: true,
 			allowUnauthenticatedClientRegistration: true,
 			accessTokenExpiresIn: 60 * 60 * 24 * 7,
-			validAudiences: productAudiences(env.NEXT_PUBLIC_API_URL),
+			validAudiences: [
+				...productAudiences(env.NEXT_PUBLIC_API_URL),
+				...(adminMcpUrl ? [adminMcpUrl] : []),
+			],
 			silenceWarnings: {
 				oauthAuthServerConfig: true,
 				openidConfig: true,
