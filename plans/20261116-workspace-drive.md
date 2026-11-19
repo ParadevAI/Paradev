@@ -239,13 +239,17 @@ Documented by Vercel or the SDK, not measured:
   fork fell back to main's reclone, which empties the checkout. A fresh fork has no user work, and
   the later-boot refetch of an untouched copy covers it, so it retries three times and then keeps
   the golden's checkout. Date/Author: 2026-11-18, coordinator.
-- Decision: a workspace's drive is deleted when its snapshot expires. Rationale: the box can never
-  resume, and the drive would bill storage for good. Retention will be ours: the reaper of #9987
-  (every 6 h) deletes an expired workspace's box, snapshots and drive itself, instead of relying on Vercel's
-  30-day `snapshotExpiration`. It calls `retireAndTearDown`, the one function that retires a row's
-  box and drive names and queues their retried teardown. Until then, and as a fallback after,
-  the 410 a wake, an agent turn or an automation dispatch gets on an expired snapshot takes
-  `markSandboxUnavailable` to the same function. Date/Author: 2026-11-18, Satya.
+- Decision: a 410 on a wake, an agent turn or an automation dispatch only marks the workspace
+  failed (`snapshot_expired`); nothing is torn down then. The cleanup job's rule 1 (#9987) tears a
+  failed workspace down 30 days later, box, snapshots and drive, through `retireAndTearDown`.
+  Supersedes the 2026-11-18 decision to delete the drive at the 410. Rationale: in the lifecycle
+  end state only the cleanup job deletes; everything else sets a status. Date/Author: 2026-11-19,
+  Satya.
+- Decision: teardown and every drive delete do nothing outside production (`VERCEL_ENV` is not
+  `production`): they log "would delete" and stop. Production and staging share a database with
+  previews and local dev, which must not delete production's boxes and drives. A job's own
+  temporary boxes and drives (`deleteSandboxAndDrive` in the release probe and real-sandbox) are
+  deleted by that job wherever it runs. Date/Author: 2026-11-19, Satya.
 - Decision: every box, with a drive or without, is deleted through the retried `teardownSandbox`
   job (`deleteSandboxAndDriveLater` no longer deletes a drive-less box inline), so each delete is
   preceded by the re-read of what still names the box. `nextSandboxNameFor` lives only in
@@ -307,7 +311,8 @@ Affected: the API (`apps/api`, which serves the tRPC routers), the packages `db`
 - Wake: `wakeCloudWorkspace` (`wake.ts`) passes `workspaceDriveMounts(row.driveName)` to
   `wakeSandbox` (`packages/trpc/src/lib/sandbox/vercel.ts`).
 - Delete: the reap's delete stage (`reap.ts`), the `cloudWorkspace.delete` fallback and the
-  provision teardowns call `deleteSandboxAndDrive`.
+  provision teardowns call `retireAndTearDown` or `deleteSandboxAndDriveLater`, which queue
+  `teardownSandbox` (`teardown.ts`).
 - Promote, replace and archive: `environment.promote` and `environment.archive` in
   `packages/trpc/src/router/environment/environment.ts`; `promoteSandboxToEnvironment` in
   `vercel.ts`.
@@ -507,6 +512,7 @@ never shown as their work.
 | Committing to delete a box and drive retires their names in the same write, so an undo after it gets a new box and a new drive, never the ones being deleted. | `retireAndTearDown` (`teardown.ts`) from the reap's delete stage and the archive fallback; the provision failure's transition to `failed` | `reap.test.ts` "the delete stage retires the box's names before it deletes them…", "an undo that wins the row before the retire leaves the box and drive alone"; `provision.test.ts` "a failed create retires the box's name in the same write…" |
 | A box is stopped and its drive detached before either is deleted. Deletes never wait in a request, except promote, which must wait for the source's drive before it can fork it. | `teardownSandbox`, `deleteSandboxAndDriveLater` (`teardown.ts`), route `/api/cloud-workspaces/teardown`; promote's two detach waits (up to 2 minutes each) inside the 300 s tRPC route | `teardown.test.ts` "stops the box, waits for its drive, then deletes…" |
 | A teardown never deletes what a workspace row, in any status, or a live environment names. Every real teardown clears the names first, so a name still on a row is that row's: an archived row may be undone onto it, a failed one keeps its box and drive for diagnosis. | `liveReferences` (`teardown-guard.ts`), read before each destructive call | `teardown.test.ts` "a box a revived workspace runs on is left alone", "an unarchived workspace's new box keeps the drive…" |
+| Outside production, teardown and every drive delete log "would delete" and stop. | `sandboxDeletesAllowed` (`lib/sandbox/deletes.ts`), checked by `teardownSandbox`, `deleteWorkspaceDrive`, `deleteGoldenDriveIfUnreferenced` | teardown "outside production it logs what it would delete and deletes nothing" |
 | A provision fails or stops only its own row: one still `provisioning`, or one this job itself made `awake`. A row another delivery or a wake brought up is never failed, stopped or torn down by it. | `madeAwake` and the `from` of the failure transition in `provision.ts`; the stop, teardown and failed chat moves follow only a transition it won | `provision.test.ts` "a second delivery on the same box that fails after the first brought the row up leaves the live workspace alone" |
 | A provision that finds the box's lock held is retried, never failed or stopped for it. | `SandboxBusyError` from `sandboxResumeLock`; `provision.ts` requeues itself every 15 s, at most 10 times, then fails only a row still `provisioning` | `provision.test.ts` "a lock held by another caller requeues the provision…", "a lock still held after the last retry fails only a row still provisioning" |
 | A lost provision's box is deleted even while the row's live box holds the kept drive. | `teardownSandbox` with `keepDrive` waits only for the drive to leave this box | `teardown.test.ts` "a lost box goes even while the row's live box holds the kept drive" |

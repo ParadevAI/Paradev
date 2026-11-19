@@ -61,6 +61,22 @@ beforeEach(() => {
 });
 
 describe("teardownSandbox", () => {
+	test("outside production it logs what it would delete and deletes nothing", async () => {
+		process.env.VERCEL_ENV = "preview";
+		try {
+			const outcome = await teardownSandbox({
+				providerSandboxId: "box",
+				driveName: "drive-ws-1",
+				attempt: 0,
+			});
+			expect(outcome).toBe("skipped");
+		} finally {
+			process.env.VERCEL_ENV = "production";
+		}
+		expect(calls).toEqual([]);
+		expect(queued).toEqual([]);
+	});
+
 	test("stops the box, waits for its drive, then deletes the box and the drive", async () => {
 		expect(
 			await teardownSandbox({

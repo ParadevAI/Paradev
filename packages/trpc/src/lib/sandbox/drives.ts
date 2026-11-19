@@ -9,6 +9,7 @@ import {
 	type SandboxMounts,
 	type SandboxRegion,
 } from "@vercel/sandbox";
+import { sandboxDeletesAllowed } from "./deletes";
 import { credentials } from "./vercel-credentials";
 
 /** Vercel allows one read-write mount per drive, so the whole drive sits at one path. */
@@ -204,7 +205,7 @@ export async function deleteWorkspaceDrive(
 	name: string | null | undefined,
 	drives: DriveHost = vercelDrives(),
 ): Promise<void> {
-	if (!name) return;
+	if (!name || !sandboxDeletesAllowed(`drive ${name}`)) return;
 	await drives.remove(name);
 }
 

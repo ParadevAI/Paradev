@@ -6,6 +6,7 @@ import {
 	DriveStillAttachedError,
 	deleteSandbox,
 	deleteWorkspaceDrive,
+	sandboxDeletesAllowed,
 	stopSandbox,
 	waitForDriveDetached,
 } from "../../lib/sandbox";
@@ -26,7 +27,12 @@ export const TEARDOWN_DETACH_WAIT_MS = 20_000;
 export const TEARDOWN_RETRY_SECONDS = 30;
 export const TEARDOWN_ATTEMPTS = 20;
 
-export type TeardownOutcome = "deleted" | "kept" | "retrying" | "abandoned";
+export type TeardownOutcome =
+	| "deleted"
+	| "kept"
+	| "retrying"
+	| "abandoned"
+	| "skipped";
 
 /**
  * Stops the box, waits briefly for its drive to detach, then deletes the box
@@ -37,6 +43,8 @@ export type TeardownOutcome = "deleted" | "kept" | "retrying" | "abandoned";
 export async function teardownSandbox(
 	input: TeardownSandboxInput,
 ): Promise<TeardownOutcome> {
+	const what = `box ${input.providerSandboxId} and ${input.keepDrive || !input.driveName ? "no drive" : `drive ${input.driveName}`}`;
+	if (!sandboxDeletesAllowed(what)) return "skipped";
 	try {
 		return await teardownOnce(input);
 	} catch (error) {

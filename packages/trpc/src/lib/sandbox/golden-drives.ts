@@ -1,6 +1,7 @@
 import { db } from "@superset/db/client";
 import { environments } from "@superset/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
+import { sandboxDeletesAllowed } from "./deletes";
 import { type DriveHost, vercelDrives } from "./drives";
 
 /**
@@ -19,6 +20,6 @@ export async function deleteGoldenDriveIfUnreferenced(
 		),
 		columns: { id: true },
 	});
-	if (referenced) return;
+	if (referenced || !sandboxDeletesAllowed(`golden drive ${name}`)) return;
 	await drives.remove(name);
 }

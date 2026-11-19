@@ -39,7 +39,6 @@ import {
 import {
 	type DriveHost,
 	DriveStillAttachedError,
-	deleteWorkspaceDrive,
 	goldenDriveNameFor,
 	vercelDrives,
 	waitForDriveDetached,
@@ -1484,5 +1483,5 @@ export async function deleteSandboxAndDrive(
 	await stopSandbox(providerSandboxId);
 	await waitForDriveDetached(driveName, { drives });
 	await deleteSandbox(providerSandboxId);
-	await deleteWorkspaceDrive(driveName, drives);
+	await drives.remove(driveName);
 }
