@@ -61,7 +61,7 @@ export async function seedCloudUsage() {
 	await client.exec(ddl.join(";\n"));
 	await client.exec(
 		readFileSync(
-			new URL("../drizzle/0200_cloud_usage_daily_trigger.sql", import.meta.url),
+			new URL("../drizzle/0201_cloud_usage_daily_trigger.sql", import.meta.url),
 			"utf8",
 		),
 	);

@@ -1758,6 +1758,9 @@ msgstr "У цьому сеансі використано 87,4K із 200K ток
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "Кращий вбудований браузер: переглядайте свої зміни й клацайте будь-який елемент, щоб надіслати його агенту як контекст."
 
+msgid "A build of this environment is already running"
+msgstr "Збірка цього середовища вже виконується"
+
 msgid "A CDP endpoint per pane"
 msgstr "Окремий CDP-ендпоінт для кожної панелі"
 
@@ -20667,6 +20670,13 @@ msgstr "Цієї папки не існує. Скрипт термінала в�
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Цю електронну адресу вже зареєстровано з іншим способом входу, і провайдер не підтвердив, що її перевірено. Увійдіть способом, яким користувалися раніше."
+
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "У цьому середовищі можна запустити не більше 3 ручних збірок на годину. Спробуйте ще раз через {0} хв."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "Це середовище не має [install] для збірки. Додайте його в .paradev/config.toml у базовій гілці."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "У цьому середовищі немає репозиторіїв. Створіть середовище з репозиторіями в налаштуваннях, а потім запустіть робочий простір із нього"

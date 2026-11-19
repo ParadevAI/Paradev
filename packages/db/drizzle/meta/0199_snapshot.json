@@ -1,5 +1,5 @@
 {
-  "id": "29deba47-a168-48ce-a9a4-bf392ae7fad2",
+  "id": "b92e73aa-4ca2-4840-ae8f-7dc6008d61a7",
   "prevId": "6330e502-5955-4c44-b22b-ff26051a9209",
   "version": "7",
   "dialect": "postgresql",
@@ -9115,72 +9115,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.cloud_usage_daily": {
-      "name": "cloud_usage_daily",
-      "schema": "",
-      "columns": {
-        "organization_id": {
-          "name": "organization_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "day": {
-          "name": "day",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "vcpus": {
-          "name": "vcpus",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "gb_minutes": {
-          "name": "gb_minutes",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "seconds": {
-          "name": "seconds",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "events": {
-          "name": "events",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "cloud_usage_daily_key": {
-          "name": "cloud_usage_daily_key",
-          "nullsNotDistinct": true,
-          "columns": [
-            "organization_id",
-            "day",
-            "user_id",
-            "vcpus"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.cloud_usage_events": {
       "name": "cloud_usage_events",
       "schema": "",
@@ -11487,6 +11421,161 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.environment_builds": {
+      "name": "environment_builds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "environment_id": {
+          "name": "environment_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "environment_build_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'running'"
+        },
+        "trigger": {
+          "name": "trigger",
+          "type": "environment_build_trigger",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "environment_build_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "repository_ids": {
+          "name": "repository_ids",
+          "type": "uuid[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "primary_repository_id": {
+          "name": "primary_repository_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "commit_sha": {
+          "name": "commit_sha",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "golden_ref": {
+          "name": "golden_ref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "golden_deleted_at": {
+          "name": "golden_deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "environment_builds_environment_id_started_at_idx": {
+          "name": "environment_builds_environment_id_started_at_idx",
+          "columns": [
+            {
+              "expression": "environment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"started_at\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "environment_builds_one_running_idx": {
+          "name": "environment_builds_one_running_idx",
+          "columns": [
+            {
+              "expression": "environment_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"environment_builds\".\"status\" = 'running'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "environment_builds_environment_id_environments_id_fk": {
+          "name": "environment_builds_environment_id_environments_id_fk",
+          "tableFrom": "environment_builds",
+          "tableTo": "environments",
+          "columnsFrom": [
+            "environment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -17905,6 +17994,32 @@
         "immediate",
         "pre-update",
         "post-update"
+      ]
+    },
+    "public.environment_build_kind": {
+      "name": "environment_build_kind",
+      "schema": "public",
+      "values": [
+        "incremental",
+        "fresh"
+      ]
+    },
+    "public.environment_build_status": {
+      "name": "environment_build_status",
+      "schema": "public",
+      "values": [
+        "running",
+        "succeeded",
+        "failed"
+      ]
+    },
+    "public.environment_build_trigger": {
+      "name": "environment_build_trigger",
+      "schema": "public",
+      "values": [
+        "manual",
+        "daily",
+        "promote"
       ]
     },
     "public.environment_scope": {

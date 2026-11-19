@@ -202,6 +202,27 @@ export type SuggestionEntity = (typeof suggestionEntityValues)[number];
 export const environmentScopeValues = ["organization", "personal"] as const;
 export type EnvironmentScope = (typeof environmentScopeValues)[number];
 
+export const environmentBuildStatusValues = [
+	"running",
+	"succeeded",
+	"failed",
+] as const;
+export type EnvironmentBuildStatus =
+	(typeof environmentBuildStatusValues)[number];
+
+/** `promote` records a golden saved from a workspace that a build replaced, so retention can delete it. */
+export const environmentBuildTriggerValues = [
+	"manual",
+	"daily",
+	"promote",
+] as const;
+export type EnvironmentBuildTrigger =
+	(typeof environmentBuildTriggerValues)[number];
+
+/** `incremental` forks the current golden; `fresh` starts from the base image. */
+export const environmentBuildKindValues = ["incremental", "fresh"] as const;
+export type EnvironmentBuildKind = (typeof environmentBuildKindValues)[number];
+
 export const environmentSourceKindValues = ["image", "fork"] as const;
 export const environmentSourceKindEnum = z.enum(environmentSourceKindValues);
 export type EnvironmentSourceKind = z.infer<typeof environmentSourceKindEnum>;

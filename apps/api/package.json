@@ -48,6 +48,7 @@
 		"rrule": "2.8.1",
 		"stripe": "20.4.1",
 		"svix": "2.8.0",
+		"workflow": "5.5.0",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
