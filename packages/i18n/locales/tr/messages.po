@@ -23151,17 +23151,17 @@ msgstr "Kuruluşunuz {reachedLimit} ortam sınırına ulaştı. Yer açmak için
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanını başlatmak için Ayarlar, Faturalandırma bölümünden daha fazla satın alın."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bir sahip Ayarlar, Faturalandırma bölümünden daha fazla satın alabilir."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanı birkaç dakika içinde durur. Çalışmaya devam etmesi için Ayarlar, Faturalandırma bölümünden daha fazla satın alın."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bir sahip Ayarlar, Faturalandırma bölümünden Team veya Ultra'ya geçebilir."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanı birkaç dakika içinde durur. Çalışmaya devam etmesi için Ayarlar, Faturalandırma bölümünden Team veya Ultra'ya geçin."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanı birkaç dakika içinde durur. Bir sahip Ayarlar, Faturalandırma bölümünden daha fazla satın alabilir."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanını başlatmak için Ayarlar, Faturalandırma bölümünden Team veya Ultra'ya geçin."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Kuruluşunuz bu dönemdeki tüm bulut kullanımını tüketti. Bu çalışma alanı birkaç dakika içinde durur. Bir sahip Ayarlar, Faturalandırma bölümünden Team veya Ultra'ya geçebilir."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

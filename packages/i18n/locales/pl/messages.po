@@ -23151,17 +23151,17 @@ msgstr "Twoja organizacja osiągnęła limit {reachedLimit} środowisk. Zarchiwi
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Dokup więcej w Ustawieniach, Rozliczenia, aby uruchomić tę przestrzeń roboczą."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Właściciel może dokupić więcej w Ustawieniach, Rozliczenia."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Ta przestrzeń robocza zatrzyma się za kilka minut. Dokup więcej w Ustawieniach, Rozliczenia, aby dalej działała."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Właściciel może przejść na Team lub Ultra w Ustawieniach, Rozliczenia."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Ta przestrzeń robocza zatrzyma się za kilka minut. Przejdź na Team lub Ultra w Ustawieniach, Rozliczenia, aby dalej działała."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Ta przestrzeń robocza zatrzyma się za kilka minut. Właściciel może dokupić więcej w Ustawieniach, Rozliczenia."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Przejdź na Team lub Ultra w Ustawieniach, Rozliczenia, aby uruchomić tę przestrzeń roboczą."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Twoja organizacja wykorzystała całe użycie chmury w tym okresie. Ta przestrzeń robocza zatrzyma się za kilka minut. Właściciel może przejść na Team lub Ultra w Ustawieniach, Rozliczenia."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

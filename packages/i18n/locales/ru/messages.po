@@ -23151,17 +23151,17 @@ msgstr "Ваша организация достигла лимита в {reache
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "Ваша организация израсходовала всё облачное использование за этот период."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Докупите ещё в разделе Настройки, Оплата, чтобы запустить это рабочее пространство."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Владелец может докупить ещё в разделе Настройки, Оплата."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Докупите ещё в разделе Настройки, Оплата, чтобы оно продолжило работать."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Владелец может перейти на Team или Ultra в разделе Настройки, Оплата."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Перейдите на Team или Ultra в разделе Настройки, Оплата, чтобы оно продолжило работать."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Владелец может докупить ещё в разделе Настройки, Оплата."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Перейдите на Team или Ultra в разделе Настройки, Оплата, чтобы запустить это рабочее пространство."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Владелец может перейти на Team или Ultra в разделе Настройки, Оплата."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

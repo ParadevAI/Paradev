@@ -23151,17 +23151,17 @@ msgstr "Je organisatie heeft de limiet van {reachedLimit} omgevingen bereikt. Ar
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Koop meer in Instellingen, Facturering om deze werkruimte te starten."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Een eigenaar kan meer kopen in Instellingen, Facturering."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Koop meer in Instellingen, Facturering om hem te laten draaien."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Stap over op Team of Ultra in Instellingen, Facturering om hem te laten draaien."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Een eigenaar kan meer kopen in Instellingen, Facturering."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Stap over op Team of Ultra in Instellingen, Facturering om deze werkruimte te starten."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

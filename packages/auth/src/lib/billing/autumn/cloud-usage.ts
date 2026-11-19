@@ -1,4 +1,9 @@
 import type { GbHourPack } from "@superset/shared/billing";
+import type {
+	BillingCloudUsage,
+	CloudCredit,
+	CloudOverageLimit,
+} from "@superset/shared/cloud-usage-display";
 import type { getAutumnCustomer } from "./customer";
 import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 
@@ -8,32 +13,8 @@ export interface CloudAutoTopup {
 	quantityGbMinutes: number;
 }
 
-/** Autumn's cap on overage: `usage_percentage` is a percent of the plan's allowance. */
-type CloudOverageLimit =
-	| { type: "none" }
-	| { type: "absolute"; gbMinutes: number }
-	| { type: "usage_percentage"; percent: number };
-
-/** One-off credit, in GB-minutes. */
-interface CloudCredit {
-	grantedGbMinutes: number;
-	remainingGbMinutes: number;
-}
-
 /** `null` in `bought` means a cached value from before it and the fields after it. */
-export interface CloudUsage {
-	includedGbMinutes: number | null;
-	usedGbMinutes: number;
-	overageGbMinutes: number;
-	prepaidGbMinutes: number;
-	/** One-off rows sold at a prepaid price, with credit carried from an earlier pack. */
-	bought: CloudCredit | null;
-	/** One-off rows with no prepaid price: a grant. */
-	freeCredits: CloudCredit | null;
-	seats: number | null;
-	overageLimit: CloudOverageLimit | null;
-	/** Null when Autumn decides it on a rule this does not read: a percentage cap, a usage limit. */
-	limitReached: boolean | null;
+export interface CloudUsage extends BillingCloudUsage {
 	autoTopup: CloudAutoTopup | null;
 	pack: GbHourPack | null;
 	overagePerGbHour: number | null;

@@ -23151,17 +23151,17 @@ msgstr "조직이 환경 한도 {reachedLimit}개에 도달했습니다. 공간�
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 더 구매하세요."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 더 구매할 수 있습니다."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 계속 실행하려면 설정의 결제에서 더 구매하세요."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 계속 실행하려면 설정의 결제에서 Team 또는 Ultra로 업그레이드하세요."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 소유자가 설정의 결제에서 더 구매할 수 있습니다."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스를 시작하려면 설정의 결제에서 Team 또는 Ultra로 업그레이드하세요."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "조직이 이번 기간의 클라우드 사용량을 모두 사용했습니다. 이 워크스페이스는 몇 분 후 중지됩니다. 소유자가 설정의 결제에서 Team 또는 Ultra로 업그레이드할 수 있습니다."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

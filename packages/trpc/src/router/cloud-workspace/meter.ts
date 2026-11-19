@@ -5,6 +5,7 @@ import {
 	ACTIVE_CPU_MINUTES_FEATURE_ID,
 	BOX_GB_MINUTES_FEATURE_ID,
 	ensureAutumnCustomer,
+	organizationBilling,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
@@ -24,6 +25,7 @@ import {
 	type PendingUsageEvent,
 	users,
 } from "@superset/db/schema";
+import { offersGbHourPack } from "@superset/shared/billing";
 import { AutumnError } from "autumn-js";
 import {
 	and,
@@ -64,7 +66,7 @@ export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
 
 type Boot = typeof cloudWorkspaceBoots.$inferSelect;
 type UsageUser = { id: string; name: string | null; email: string | null };
-type Refusal = "cloudNeedsPaidPlan" | "usageLimitReached" | "usageLimitUpgrade";
+type Refusal = "cloudNeedsPaidPlan" | "usageLimitReached";
 
 export function gbMinutes({
 	ms,
@@ -82,39 +84,37 @@ export function lockIdFor(bootId: string, seq: number): string {
 
 export function refusalFor(result: {
 	allowed: boolean;
-	balance: {
-		breakdown?: { price?: { billingMethod?: string } | null }[];
-	} | null;
+	balance: unknown;
 }): Refusal | null {
 	if (result.allowed) return null;
-	if (!result.balance) return "cloudNeedsPaidPlan";
-	return result.balance.breakdown?.some(
-		(row) => row.price?.billingMethod === "prepaid",
-	)
-		? "usageLimitReached"
-		: "usageLimitUpgrade";
+	return result.balance ? "usageLimitReached" : "cloudNeedsPaidPlan";
 }
 
-const REFUSAL_MESSAGES: Record<Refusal, string> = {
-	cloudNeedsPaidPlan:
-		"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
-	usageLimitReached:
-		"Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace.",
-	usageLimitUpgrade:
-		"Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace.",
+const LIMIT_MESSAGES = {
+	buy: "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing.",
+	upgrade:
+		"Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
 };
 
-/** Both limit refusals share one key, which released clients already know; `next` picks the sentence. */
-function refusalError(refusal: Refusal) {
+async function refusalError(refusal: Refusal, organizationId: string) {
+	if (refusal === "cloudNeedsPaidPlan") {
+		return userError({
+			code: "FORBIDDEN",
+			message:
+				"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
+			i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan",
+		});
+	}
+	const next = offersGbHourPack(
+		(await organizationBilling(organizationId)).cloudUsage,
+	)
+		? "buy"
+		: "upgrade";
 	return userError({
 		code: "FORBIDDEN",
-		message: REFUSAL_MESSAGES[refusal],
-		...(refusal === "cloudNeedsPaidPlan"
-			? { i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan" }
-			: {
-					i18nKey: "serverError.cloudWorkspace.usageLimitReached",
-					params: { next: refusal === "usageLimitReached" ? "buy" : "upgrade" },
-				}),
+		message: LIMIT_MESSAGES[next],
+		i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+		params: { next },
 	});
 }
 
@@ -205,7 +205,7 @@ export async function assertMayBoot(
 	);
 	if (!result) return;
 	const refusal = refusalFor(result);
-	if (refusal) throw refusalError(refusal);
+	if (refusal) throw await refusalError(refusal, organizationId);
 }
 
 export async function authorizeBoot(
@@ -242,7 +242,7 @@ export async function authorizeBoot(
 	const refusal = result && refusalFor(result);
 	if (refusal) {
 		logControl("boot.refused", scope, { refusal }, "warn");
-		throw refusalError(refusal);
+		throw await refusalError(refusal, args.organizationId);
 	}
 	await db.insert(cloudWorkspaceBoots).values({
 		id: bootId,

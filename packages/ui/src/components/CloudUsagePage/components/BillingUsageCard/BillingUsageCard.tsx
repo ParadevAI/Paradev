@@ -41,9 +41,8 @@ export function BillingUsageCard({ usage, link }: BillingUsageCardProps) {
 	return (
 		<AllowanceCard
 			metered={{ gbHours: shown.usedGbHours, usd: shown.usedUsd }}
-			allowance={
-				unavailable.some((item) => item.reason === "not_read") ? null : shown
-			}
+			allowance={shown}
+			unavailable={unavailable}
 			isPeriod
 			seats={shown.seats}
 			billing={link}

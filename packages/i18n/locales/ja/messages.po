@@ -23151,17 +23151,17 @@ msgstr "組織の環境数が上限の {reachedLimit} に達しました。空�
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。"
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースを起動するには、設定の請求から追加購入してください。"
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。オーナーは設定の請求から追加購入できます。"
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。動かし続けるには、設定の請求から追加購入してください。"
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。オーナーは設定の請求から Team または Ultra にアップグレードできます。"
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。動かし続けるには、設定の請求から Team または Ultra にアップグレードしてください。"
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。オーナーは設定の請求から追加購入できます。"
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースを起動するには、設定の請求から Team または Ultra にアップグレードしてください。"
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。オーナーは設定の請求から Team または Ultra にアップグレードできます。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

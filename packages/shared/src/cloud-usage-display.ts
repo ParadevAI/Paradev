@@ -119,25 +119,31 @@ export function cloudUsageDisplay(
 	};
 }
 
-interface BillingCredit {
+/** One-off credit, in GB-minutes. */
+export interface CloudCredit {
 	grantedGbMinutes: number;
 	remainingGbMinutes: number;
 }
 
-/** The parts of the billing reader's value (`CloudUsage` in packages/auth) the allowance reads. */
+/** Autumn's cap on overage: `usage_percentage` is a percent of the plan's allowance. */
+export type CloudOverageLimit =
+	| { type: "none" }
+	| { type: "absolute"; gbMinutes: number }
+	| { type: "usage_percentage"; percent: number };
+
+/** What the billing reader reads from Autumn's balance for the allowance; packages/auth's `CloudUsage` adds the rest. */
 export interface BillingCloudUsage {
 	includedGbMinutes: number | null;
 	usedGbMinutes: number;
 	overageGbMinutes: number;
 	prepaidGbMinutes: number;
-	bought: BillingCredit | null;
-	freeCredits: BillingCredit | null;
+	/** One-off rows sold at a prepaid price, with credit carried from an earlier pack. */
+	bought: CloudCredit | null;
+	/** One-off rows with no prepaid price: a grant. */
+	freeCredits: CloudCredit | null;
 	seats: number | null;
-	overageLimit:
-		| { type: "none" }
-		| { type: "absolute"; gbMinutes: number }
-		| { type: "usage_percentage"; percent: number }
-		| null;
+	overageLimit: CloudOverageLimit | null;
+	/** Null when Autumn decides it on a rule this does not read: a percentage cap, a usage limit. */
 	limitReached: boolean | null;
 }
 
@@ -147,7 +153,7 @@ export interface AllowanceUnavailable {
 	reason: (typeof ALLOWANCE_UNAVAILABLE_REASONS)[number];
 }
 
-function creditLine(credit: BillingCredit | null, rate: number | null) {
+function creditLine(credit: CloudCredit | null, rate: number | null) {
 	if (!credit?.grantedGbMinutes) return null;
 	const used = credit.grantedGbMinutes - credit.remainingGbMinutes;
 	return {

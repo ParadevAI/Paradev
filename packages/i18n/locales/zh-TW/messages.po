@@ -23151,17 +23151,17 @@ msgstr "你的組織已達到 {reachedLimit} 個環境的上限。封存一個�
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "你的組織已用完本週期的全部雲端用量。"
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "你的組織已用完本週期的全部雲端用量。請在設定的帳單中購買更多，以啟動此工作區。"
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在設定的帳單中購買更多。"
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。請在設定的帳單中購買更多，讓它繼續執行。"
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。請在設定的帳單中升級到 Team 或 Ultra，讓它繼續執行。"
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。擁有者可以在設定的帳單中購買更多。"
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "你的組織已用完本週期的全部雲端用量。請在設定的帳單中升級到 Team 或 Ultra，以啟動此工作區。"
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "你的組織已用完本週期的全部雲端用量。此工作區將在幾分鐘後停止。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

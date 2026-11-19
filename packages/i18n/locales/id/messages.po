@@ -23151,17 +23151,17 @@ msgstr "Organisasi Anda telah mencapai batas {reachedLimit} environment. Arsipka
 msgid "Your organization has used all its cloud usage for this period."
 msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini."
 
-msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Beli lagi di Pengaturan, Penagihan untuk memulai workspace ini."
+msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
+msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Beli lagi di Pengaturan, Penagihan agar tetap berjalan."
+msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
 
-msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Upgrade ke Team atau Ultra di Pengaturan, Penagihan agar tetap berjalan."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can buy more in Settings, Billing."
+msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
 
-msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Upgrade ke Team atau Ultra di Pengaturan, Penagihan untuk memulai workspace ini."
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Workspace ini berhenti dalam beberapa menit. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
