@@ -38,6 +38,16 @@ export const cloudUsageOutputSchema = z.object({
 		metricsSchema.extend({
 			key: z.string().nullable(),
 			label: z.string().nullable(),
+			/** Grouped by user only: the person's usage on each UTC day that has any. */
+			days: z
+				.array(
+					z.object({
+						day: z.iso.date(),
+						gbHours: z.number(),
+						usageUsd: z.number().nullable(),
+					}),
+				)
+				.optional(),
 			ref: z
 				.union([
 					z.object({

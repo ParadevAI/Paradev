@@ -314,34 +314,29 @@ function byDay({ rows, boots }: Fleet, range: Range): Usage {
 	return usage(items, rows, range);
 }
 
-function byPerson({ rows }: Fleet, range: Range): Usage {
+/** `groupBy: "user"`, with each person's days. */
+function byPerson({ rows, boots }: Fleet, range: Range): Usage {
+	const daysOf = (personId: string) => {
+		const days = new Map<string, Boot[]>();
+		for (const boot of boots)
+			if (boot.user?.id === personId) {
+				const key = day(boot.startedAt);
+				days.set(key, [...(days.get(key) ?? []), boot]);
+			}
+		return [...days].sort().map(([key, list]) => {
+			const { gbHours, usageUsd } = metricsOf(list);
+			return { day: key, gbHours, usageUsd };
+		});
+	};
 	const items = PEOPLE.map((person) => ({
 		key: person.id,
 		label: person.name,
 		ref: person,
 		...total(rows.filter((row) => workspaceRef(row)?.owner?.id === person.id)),
+		days: daysOf(person.id),
 	}))
 		.filter((item) => item.gbHours > 0)
 		.sort((a, b) => b.gbHours - a.gbHours);
-	return usage(items, rows, range);
-}
-
-/** `groupBy: "userDay"`: each person's days, keyed by person and labelled by day. */
-function byPersonDays({ rows, boots }: Fleet, range: Range): Usage {
-	const items = PEOPLE.flatMap((person) => {
-		const days = new Map<string, Boot[]>();
-		for (const boot of boots)
-			if (boot.user?.id === person.id) {
-				const key = day(boot.startedAt);
-				days.set(key, [...(days.get(key) ?? []), boot]);
-			}
-		return [...days].map(([key, list]) => ({
-			key: person.id,
-			label: key,
-			ref: person,
-			...metricsOf(list),
-		}));
-	});
 	return usage(items, rows, range);
 }
 
@@ -472,7 +467,6 @@ function overviewQueries({ rows, boots }: Fleet, range: Range) {
 	return {
 		byDay: query(byDay(fleetOf, range)),
 		byPerson: query(byPerson(fleetOf, range)),
-		byPersonDays: query(byPersonDays(fleetOf, range)),
 		workspaces: query(
 			usage(rows.slice(0, TOP_WORKSPACES), rows, range, rows.length),
 		),
@@ -518,19 +512,25 @@ export function noPeriodsArgs() {
 /** The allowance card's arguments in a billing state. */
 export function cardArgs(state: BillingState, back = 0) {
 	const args = overviewArgs(state, { back });
+	const { total } = args.byDay.data as Usage;
+	const allowance = priced(args.period?.allowance ?? null);
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: args.period,
-		allowance: priced(args.period?.allowance ?? null),
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		allowance,
+		unavailable: args.period?.unavailable ?? [],
+		isPeriod: true,
+		seats: allowance?.seats ?? null,
 	};
 }
 
 export function lastThirtyDaysCardArgs() {
-	const args = noPeriodsArgs();
+	const { total } = noPeriodsArgs().byDay.data as Usage;
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: undefined,
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
 		allowance: null,
+		unavailable: [],
+		isPeriod: false,
+		seats: null,
 	};
 }
 

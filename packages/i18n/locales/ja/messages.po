@@ -469,6 +469,7 @@ msgstr "{0}(末尾{1})"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}には{0}件のファイルがすでに存在します。置き換えますか?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 時間"

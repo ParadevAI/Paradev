@@ -1,7 +1,9 @@
 "use client";
 
 import { Plural, Trans } from "@lingui/react/macro";
+import { cn } from "../../../../lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
+import { BOX } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { PricedMetrics } from "../../utils/priced";
 
@@ -17,7 +19,7 @@ export function MemberSummary({
 	const count = total.workspaces;
 
 	return (
-		<Card className="gap-2 py-5">
+		<Card className={cn("gap-2 py-5", BOX)}>
 			<CardHeader className="px-5">
 				<CardTitle
 					role="heading"

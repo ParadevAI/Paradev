@@ -469,6 +469,7 @@ msgstr "{0} kết thúc bằng {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{0} tệp đã tồn tại trong {where}. Bạn có muốn thay thế chúng không?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-giờ"

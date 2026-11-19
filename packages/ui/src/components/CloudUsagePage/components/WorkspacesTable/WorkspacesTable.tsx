@@ -23,7 +23,6 @@ import type { PricedRow } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Person } from "../Person";
 import { StatusBadge } from "../StatusBadge";
-import { nameParts } from "./utils/nameParts";
 
 interface WorkspacesTableProps {
 	Link: CloudUsageLink;
@@ -106,7 +105,6 @@ export function WorkspacesTable({
 					const owner = workspace?.owner?.name;
 					const ownerImage = workspace?.owner?.image ?? null;
 					const size = workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
-					const name = workspace && nameParts(workspace.name);
 					return (
 						<TableRow key={row.key ?? ""} className="relative">
 							<TableCell className="w-full min-w-28 max-w-0 py-2.5 whitespace-normal @xl:min-w-40">
@@ -119,10 +117,7 @@ export function WorkspacesTable({
 										}}
 										className="font-semibold break-words after:absolute after:inset-0"
 									>
-										<span title={workspace.name} className="flex min-w-0">
-											<span className="truncate">{name?.head}</span>
-											<span className="shrink-0">{name?.tail}</span>
-										</span>
+										{workspace.name}
 									</Link>
 								) : (
 									<span className="text-muted-foreground">
@@ -131,9 +126,7 @@ export function WorkspacesTable({
 								)}
 								<div className="flex min-w-0 flex-wrap gap-x-3 text-xs text-muted-foreground @2xl:hidden">
 									{isAdmin && owner && (
-										<span title={owner} className="max-w-full truncate">
-											{owner}
-										</span>
+										<span className="break-words">{owner}</span>
 									)}
 									{size && (
 										<span className="whitespace-nowrap @xl:hidden">{size}</span>
@@ -141,7 +134,9 @@ export function WorkspacesTable({
 								</div>
 							</TableCell>
 							{isAdmin && (
-								<TableCell className={cn(WIDE, "max-w-40")}>
+								<TableCell
+									className={cn(WIDE, "min-w-40 max-w-56 whitespace-normal")}
+								>
 									{owner && <Person name={owner} image={ownerImage} />}
 								</TableCell>
 							)}

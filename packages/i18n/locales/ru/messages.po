@@ -469,6 +469,7 @@ msgstr "{0}, оканчивается на {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "В {where} уже есть {0} таких файлов. Заменить их?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} ГБ-часов"

@@ -1,11 +1,4 @@
 import type { ReactNode } from "react";
-import {
-	Card,
-	CardAction,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "../../../ui/card";
 
 interface SectionProps {
 	title: ReactNode;
@@ -13,17 +6,15 @@ interface SectionProps {
 	children: ReactNode;
 }
 
-/** The pages' one card surface: a titled kit card. */
+/** A titled part of a page, on the page background. */
 export function Section({ title, action, children }: SectionProps) {
 	return (
-		<Card className="min-w-0 gap-4 py-5">
-			<CardHeader className="items-center px-5">
-				<CardTitle role="heading" aria-level={3} className="text-base">
-					{title}
-				</CardTitle>
-				{action && <CardAction>{action}</CardAction>}
-			</CardHeader>
-			<CardContent className="px-5">{children}</CardContent>
-		</Card>
+		<section className="min-w-0 space-y-3">
+			<div className="flex min-h-8 items-center justify-between gap-4">
+				<h3 className="text-base font-semibold">{title}</h3>
+				{action}
+			</div>
+			{children}
+		</section>
 	);
 }

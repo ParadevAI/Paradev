@@ -49,21 +49,11 @@ export const cloudUsageInputSchema = cloudListInputSchema
 		search: z.string().max(200).optional(),
 		sort: z.enum(cloudUsageSortValues).optional(),
 		order: z.enum(["asc", "desc"]).optional(),
-		/** Owners and admins only, with groupBy "userDay": the people whose days to return. */
-		users: z.array(z.uuid()).min(1).max(100).optional(),
 	})
 	.refine(
 		({ sort, groupBy }) =>
 			(sort !== "name" && sort !== "status") || groupBy === "workspace",
 		"sort by name or status needs groupBy workspace",
-	)
-	.refine(
-		({ users, groupBy }) => (groupBy === "userDay") === (users !== undefined),
-		"groupBy userDay takes users, and users only goes with it",
-	)
-	.refine(
-		({ cursor, groupBy }) => !cursor || groupBy !== "userDay",
-		"grouped by person and day, usage comes as one page",
 	);
 
 const decimalSchema = z.string().regex(/^\d+(\.\d+)?$/);

@@ -31,8 +31,6 @@ interface CloudUsagePageProps {
 	period: CloudPeriod | undefined;
 	byDay: CloudQuery<CloudUsage>;
 	byPerson: CloudQuery<CloudUsage>;
-	/** Each person's usage by day: `groupBy: "userDay"`. */
-	byPersonDays: CloudQuery<CloudUsage>;
 	/** The top workspaces; the Workspaces page has the rest. */
 	workspaces: CloudQuery<CloudUsage>;
 	/** The UTC day the page counts as today; the current day by default. */
@@ -46,14 +44,12 @@ export function CloudUsagePage({
 	period,
 	byDay: unpricedByDay,
 	byPerson: unpricedByPerson,
-	byPersonDays: unpricedByPersonDays,
 	workspaces: unpricedWorkspaces,
 	today = new Date().toISOString().slice(0, 10),
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
 	const byDay = pricedQuery(unpricedByDay);
 	const byPerson = pricedQuery(unpricedByPerson);
-	const byPersonDays = pricedQuery(unpricedByPersonDays);
 	const workspaces = pricedQuery(unpricedWorkspaces);
 	const allowance = period?.allowance ? priced(period.allowance) : null;
 	const unpriced = Boolean(period?.allowance) && allowance === null;
@@ -98,9 +94,14 @@ export function CloudUsagePage({
 					)}
 					{isAdmin ? (
 						<AllowanceCard
-							total={byDay.data.total}
-							period={period}
+							metered={{
+								gbHours: byDay.data.total.gbHours,
+								usd: byDay.data.total.usageUsd,
+							}}
 							allowance={allowance}
+							unavailable={period?.unavailable ?? []}
+							isPeriod={period !== undefined}
+							seats={allowance?.seats ?? null}
 							billing={
 								<PageLink>
 									<Link to={{ view: "billing" }}>
@@ -141,12 +142,7 @@ export function CloudUsagePage({
 								}
 							/>
 							{isAdmin && (
-								<UsageByPerson
-									Link={Link}
-									byPerson={byPerson}
-									byPersonDays={byPersonDays}
-									period={param}
-								/>
+								<UsageByPerson Link={Link} byPerson={byPerson} period={param} />
 							)}
 							<Section
 								title={

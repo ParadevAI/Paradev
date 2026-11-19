@@ -3,6 +3,7 @@
 import { Plural, Trans } from "@lingui/react/macro";
 import type { HeldLine } from "@superset/shared/cloud-usage-display";
 import type { ReactNode } from "react";
+import { cn } from "../../../../../../lib/utils";
 import {
 	Item,
 	ItemActions,
@@ -10,6 +11,7 @@ import {
 	ItemGroup,
 	ItemTitle,
 } from "../../../../../ui/item";
+import { SEGMENT_COLORS } from "../../constants";
 
 interface AllowanceLinesProps {
 	lines: HeldLine[];
@@ -47,7 +49,13 @@ export function AllowanceLines({ lines, seats, format }: AllowanceLinesProps) {
 		return (
 			<Item key={line.kind} role="listitem" size="sm" className="px-0">
 				<ItemContent>
-					<ItemTitle className="font-normal">{label(line)}</ItemTitle>
+					<ItemTitle className="font-normal">
+						<span
+							aria-hidden
+							className={cn("size-2 rounded-[2px]", SEGMENT_COLORS[line.kind])}
+						/>
+						{label(line)}
+					</ItemTitle>
 				</ItemContent>
 				<ItemActions className="tabular-nums">
 					<Trans>

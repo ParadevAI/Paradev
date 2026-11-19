@@ -4,12 +4,14 @@ import { useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { cn } from "../../../../lib/utils";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "../../../ui/chart";
+import { CHART_BAR } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { PricedUsage } from "../../utils/priced";
 import { Section } from "../Section";
@@ -45,7 +47,7 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 	const config = {
 		value: {
 			label: t({ message: "Usage" }),
-			color: "var(--primary)",
+			color: CHART_BAR.color,
 		},
 	} satisfies ChartConfig;
 	const formatDay = (day: string) =>
@@ -57,7 +59,10 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 
 	return (
 		<Section title={title}>
-			<ChartContainer config={config} className="aspect-auto h-44 w-full">
+			<ChartContainer
+				config={config}
+				className={cn("aspect-auto h-44 w-full", CHART_BAR.className)}
+			>
 				<BarChart data={data} margin={{ left: 0, right: 0, top: 4 }}>
 					<CartesianGrid vertical={false} />
 					<XAxis

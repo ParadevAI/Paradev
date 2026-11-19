@@ -45,12 +45,7 @@ export { gbMinutesUsd };
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
-export const cloudUsageGroupByValues = [
-	"user",
-	"day",
-	"workspace",
-	"userDay",
-] as const;
+export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
 export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];
 
 export const cloudFleetGroupByValues = [
@@ -85,7 +80,7 @@ const workspaceOf = (scope: Scope, column: AnyPgColumn) =>
 	);
 
 export interface CloudUsageFilters {
-	user?: string | string[];
+	user?: string;
 	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
@@ -216,13 +211,7 @@ function scopeConditions(
 ): SQL[] {
 	const conditions: SQL[] = [];
 	if (scope.userId) conditions.push(eq(columns.user, scope.userId));
-	if (filters.user) {
-		conditions.push(
-			Array.isArray(filters.user)
-				? inArray(columns.user, filters.user)
-				: eq(columns.user, filters.user),
-		);
-	}
+	if (filters.user) conditions.push(eq(columns.user, filters.user));
 	if (filters.workspace) {
 		conditions.push(
 			Array.isArray(filters.workspace)
@@ -284,12 +273,6 @@ const groupKeys = {
 		event: utcDay(events.sentAt),
 		boot: utcDay(boots.startedAt),
 		failed: utcDay(workspaces.failedAt),
-	},
-	/** `user id|YYYY-MM-DD`, split again before rows are returned. */
-	userDay: {
-		event: sql`coalesce(${events.userId}::text, '') || '|' || ${utcDay(events.sentAt)}`,
-		boot: sql`coalesce(${boots.createdByUserId}::text, '') || '|' || ${utcDay(boots.startedAt)}`,
-		failed: sql`coalesce(${workspaces.createdByUserId}::text, '') || '|' || ${utcDay(workspaces.failedAt)}`,
 	},
 	workspace: {
 		event: sql`${events.cloudWorkspaceId}`,
@@ -355,6 +338,7 @@ function usageFacts(
 				),
 			bootId: sql<string | null>`null::text`.as("boot_id"),
 			failed: sql<boolean>`false`.as("failed"),
+			day: sql<string>`${utcDay(events.sentAt)}`.as("day"),
 		})
 		.from(events)
 		.leftJoin(boots, eq(boots.id, events.bootId))
@@ -381,6 +365,7 @@ function usageFacts(
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`${boots.id}`,
 			failed: sql<boolean>`${boots.endReason} is not distinct from 'failed'`,
+			day: sql<string>`${utcDay(boots.startedAt)}`,
 		})
 		.from(boots)
 		.leftJoin(workspaces, workspaceOf(scope, boots.cloudWorkspaceId))
@@ -405,6 +390,7 @@ function usageFacts(
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`null::text`,
 			failed: sql<boolean>`false`,
+			day: sql<string>`${utcDay(workspaces.failedAt)}`,
 		})
 		.from(workspaces)
 		.where(
@@ -422,6 +408,11 @@ function usageFacts(
 			),
 		);
 	return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
+}
+
+interface DayRow {
+	day: string;
+	gbMinutes: number;
 }
 
 function metricColumns(facts: ReturnType<typeof usageFacts>) {
@@ -606,6 +597,92 @@ type CloudFleetUsageOptions = CloudUsageOptions<CloudFleetGroupBy> & {
 };
 
 /**
+ * One page of rows grouped by person, each with the person's days. The page is ranked first, so
+ * the days are summed for its people only, once each, in the same statement.
+ */
+function pageWithDays(
+	db: Db,
+	facts: ReturnType<typeof usageFacts>,
+	{
+		sortKey,
+		sortValue,
+		having,
+		order,
+		limit,
+	}: {
+		sortKey: SQL<string>;
+		sortValue: SQL;
+		having: SQL | undefined;
+		order: SQL[];
+		limit: number;
+	},
+) {
+	const metrics = metricColumns(facts);
+	const page = db.$with("page").as(
+		db
+			.select({
+				key: facts.key,
+				sortKey: sortKey.as("sort_key"),
+				sortValue: sql<string>`(${sortValue})::text`.as("sort_value"),
+				gbMinutes: metrics.gbMinutes.as("total_gb_minutes"),
+				seconds: metrics.seconds.as("total_seconds"),
+				boots: metrics.boots.as("total_boots"),
+				failedBoots: metrics.failedBoots.as("total_failed_boots"),
+				workspaces: metrics.workspaces.as("total_workspaces"),
+				rank: sql<number>`row_number() over (order by ${sql.join(order, sql`, `)})`.as(
+					"rank",
+				),
+			})
+			.from(facts)
+			.groupBy(facts.key)
+			.having(having)
+			.orderBy(...order)
+			.limit(limit),
+	);
+	const perDay = db
+		.select({
+			key: sql<string>`coalesce(${facts.key}, '')`.as("days_key"),
+			day: facts.day,
+			gbMinutes: sql<string>`sum(${facts.gbMinutes})`.as("day_gb_minutes"),
+		})
+		.from(facts)
+		.where(
+			sql`coalesce(${facts.key}, '') in (select ${page.sortKey} from ${page})`,
+		)
+		.groupBy(facts.key, facts.day)
+		.as("per_day");
+	const userDays = db.$with("user_days").as(
+		db
+			.select({
+				key: perDay.key,
+				days: sql<
+					DayRow[]
+				>`json_agg(json_build_object('day', ${perDay.day}, 'gbMinutes', ${perDay.gbMinutes}) order by ${perDay.day})`.as(
+					"days",
+				),
+			})
+			.from(perDay)
+			.groupBy(perDay.key),
+	);
+	return db
+		.with(facts, page, userDays)
+		.select({
+			key: page.key,
+			sortKey: page.sortKey,
+			sortValue: page.sortValue,
+			gbMinutes: page.gbMinutes,
+			seconds: page.seconds,
+			boots: page.boots,
+			failedBoots: page.failedBoots,
+			workspaces: page.workspaces,
+			days: userDays.days,
+		})
+		.from(page)
+		.leftJoin(userDays, eq(userDays.key, page.sortKey))
+		.orderBy(page.rank);
+}
+
+/**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
  * in the window: a total, and with `groupBy` one row per user, UTC day or workspace (a fleet scope
  * adds organization, project, size and end reason). Pages ordered by amount are read at each call:
@@ -643,13 +720,6 @@ async function usageRows(
 		};
 	}
 
-	if (groupBy === "userDay") {
-		return {
-			...(await userDayRows(db, scope, filters, window, overagePerGbHour)),
-			total: toMetrics(await totalRow, overagePerGbHour),
-		};
-	}
-
 	const sort =
 		options.sort ??
 		(groupBy === "day" ? null : { by: "gbHours", order: "desc" });
@@ -661,6 +731,7 @@ async function usageRows(
 	}
 	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
 	const metrics = metricColumns(facts);
+	const withDays = groupBy === "user";
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
 	const ofWorkspace = (column: AnyPgColumn | SQL) =>
 		sql`(select ${column} from ${workspaces} where ${workspaces.id} = ${facts.key}::uuid)`;
@@ -678,38 +749,42 @@ async function usageRows(
 		(sort?.by === "name"
 			? sql`${cursor.value}`
 			: sql`${cursor.value}::numeric`);
+	const having = !cursor
+		? undefined
+		: !sort
+			? sql`${facts.key} < ${cursor.key}`
+			: or(
+					sort.order === "desc"
+						? sql`${sortValue} < ${cursorValue}`
+						: sql`${sortValue} > ${cursorValue}`,
+					sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
+				);
+	const order = !sort
+		? [desc(facts.key)]
+		: [sort.order === "desc" ? desc(sortValue) : asc(sortValue), asc(sortKey)];
 	const [rows, total, rowCount] = await Promise.all([
-		db
-			.with(facts)
-			.select({
-				key: facts.key,
-				sortKey,
-				sortValue: sql<string>`(${sortValue})::text`,
-				...metrics,
-			})
-			.from(facts)
-			.groupBy(facts.key)
-			.having(
-				!cursor
-					? undefined
-					: !sort
-						? sql`${facts.key} < ${cursor.key}`
-						: or(
-								sort.order === "desc"
-									? sql`${sortValue} < ${cursorValue}`
-									: sql`${sortValue} > ${cursorValue}`,
-								sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
-							),
-			)
-			.orderBy(
-				...(!sort
-					? [desc(facts.key)]
-					: [
-							sort.order === "desc" ? desc(sortValue) : asc(sortValue),
-							asc(sortKey),
-						]),
-			)
-			.limit(limit + 1),
+		withDays
+			? pageWithDays(db, facts, {
+					sortKey,
+					sortValue,
+					having,
+					order,
+					limit: limit + 1,
+				})
+			: db
+					.with(facts)
+					.select({
+						key: facts.key,
+						sortKey,
+						sortValue: sql<string>`(${sortValue})::text`,
+						days: sql<null>`null`,
+						...metrics,
+					})
+					.from(facts)
+					.groupBy(facts.key)
+					.having(having)
+					.orderBy(...order)
+					.limit(limit + 1),
 		totalRow,
 		db
 			.with(facts)
@@ -731,13 +806,21 @@ async function usageRows(
 					page.flatMap((row) => (row.key ? [row.key] : [])),
 				);
 	return {
-		items: page.map(({ key, sortKey: _, sortValue: __, ...row }) => {
+		items: page.map((row) => {
+			const { key, sortKey: _, sortValue: __, days, ...metricRow } = row;
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
 				label: ref ? ref.name : isPlainKey(groupBy) ? key : null,
 				ref,
-				...toMetrics(row, overagePerGbHour),
+				...toMetrics(metricRow, overagePerGbHour),
+				...(withDays && {
+					days: (days ?? []).map((day) => ({
+						day: day.day,
+						gbHours: day.gbMinutes / 60,
+						usageUsd: gbMinutesUsd(day.gbMinutes, overagePerGbHour),
+					})),
+				}),
 			};
 		}),
 		total: toMetrics(total, overagePerGbHour),
@@ -746,41 +829,6 @@ async function usageRows(
 			rows.length > limit && last
 				? { value: last.sortValue, key: last.sortKey }
 				: null,
-	};
-}
-
-/** One page, no cursor: each person's days, people with the most usage first. */
-/** Every day of the filtered people, one row per person and day, in one page. */
-async function userDayRows(
-	db: Db,
-	scope: Scope,
-	filters: CloudUsageFilters,
-	window: CloudUsageWindow,
-	overagePerGbHour: number | null,
-) {
-	const facts = usageFacts(db, scope, filters, window, groupKeys.userDay);
-	const rows = await db
-		.with(facts)
-		.select({ key: facts.key, ...metricColumns(facts) })
-		.from(facts)
-		.groupBy(facts.key)
-		.orderBy(asc(facts.key));
-	const userOf = (key: string | null) => key?.split("|")[0] || null;
-	const refs = await refsFor(db, scope, "user", [
-		...new Set(rows.flatMap((row) => userOf(row.key) ?? [])),
-	]);
-	return {
-		items: rows.map(({ key, ...row }) => {
-			const userId = userOf(key);
-			return {
-				key: userId,
-				label: key?.split("|")[1] ?? null,
-				ref: (userId && refs.get(userId)) || null,
-				...toMetrics(row, overagePerGbHour),
-			};
-		}),
-		rowCount: rows.length,
-		nextCursor: null,
 	};
 }
 

@@ -5,10 +5,11 @@ import { useFormat } from "@superset/i18n/react";
 import { machineSpec } from "@superset/shared/billing";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import type { ReactNode } from "react";
+import { cn } from "../../../../lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "../../../ui/alert";
 import { Card } from "../../../ui/card";
 import { Empty, EmptyDescription, EmptyHeader } from "../../../ui/empty";
-import { FAILURE_REASONS } from "../../constants";
+import { BOX, FAILURE_REASONS } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type {
 	CloudBoots,
@@ -171,7 +172,7 @@ export function CloudWorkspacePage({
 			)}
 			<dl className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
 				{tiles.map((tile) => (
-					<Card key={tile.key} className="gap-1 p-4">
+					<Card key={tile.key} className={cn("gap-1 p-4", BOX)}>
 						<dt className="text-xs tracking-wide text-muted-foreground uppercase">
 							{tile.label}
 						</dt>

@@ -469,6 +469,7 @@ msgstr "{0} 끝자리 {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}에 파일 {0}개가 이미 있습니다. 바꿀까요?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 시간"

@@ -1,4 +1,4 @@
-import type { CloudUsage, WorkspacesFilters } from "../../types";
+import type { WorkspacesFilters } from "../../types";
 import { usageRange } from "../usageRange";
 import { ROWS_PER_PAGE } from "../workspacesFilters";
 
@@ -33,14 +33,6 @@ export function cloudUsageQueries({
 		byPerson: {
 			input: { range, groupBy: "user", limit: CHART_LIMIT } as const,
 			enabled: periodsLoaded && isAdmin,
-		},
-		/** The days of the people By person shows, once it has loaded. */
-		byPersonDays: (people: CloudUsage | undefined) => {
-			const users = people?.items.flatMap((item) => item.key ?? []) ?? [];
-			return {
-				input: { range, groupBy: "userDay", users } as const,
-				enabled: periodsLoaded && isAdmin && users.length > 0,
-			};
 		},
 		topWorkspaces: {
 			input: { range, groupBy: "workspace", limit: TOP_WORKSPACES } as const,

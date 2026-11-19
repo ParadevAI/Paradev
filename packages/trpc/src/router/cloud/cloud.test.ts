@@ -105,6 +105,11 @@ describe("scope", () => {
 			groupBy: "user",
 		});
 		expect(byUser.items.map((item) => item.key)).toEqual([MAYA, SAM]);
+		expect(byUser.items[1]?.days?.[0]).toEqual({
+			day: "2026-11-01",
+			gbHours: 16,
+			usageUsd: 0.96,
+		});
 		const [open] = (await owner.periods.list({})).items;
 		expect(open?.allowance).toMatchObject({
 			includedGbHours: 20,
@@ -245,12 +250,9 @@ describe("scope", () => {
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 	});
 
-	test.each([
-		["user", {}],
-		["userDay", { users: [MAYA] }],
-	] as const)("a member cannot group by person (%s)", async (groupBy, extra) => {
+	test("a member cannot group by person", async () => {
 		await expect(
-			caller(SAM).usage.query({ range: NOVEMBER, groupBy, ...extra }),
+			caller(SAM).usage.query({ range: NOVEMBER, groupBy: "user" }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 	});
 

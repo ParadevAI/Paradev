@@ -4,10 +4,10 @@ import { Badge } from "../../../ui/badge";
 import type { Tone } from "../../constants";
 
 const TONES: Record<Tone, string> = {
-	ok: "border-success/40 text-success",
-	warn: "border-warning/50 text-warning",
-	bad: "border-destructive/50 text-destructive",
-	idle: "text-muted-foreground",
+	ok: "border-success/40 bg-success/10 text-success",
+	warn: "border-warning/50 bg-warning/10 text-warning",
+	bad: "border-destructive/50 bg-destructive/10 text-destructive",
+	idle: "border-foreground/25 bg-foreground/5 text-foreground",
 };
 
 export function ToneBadge({

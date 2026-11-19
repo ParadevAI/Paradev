@@ -111,26 +111,27 @@ describe("queryCloudUsage", () => {
 		]);
 	});
 
-	test("groups the given people by day, every day in one page", async () => {
-		const { items, nextCursor } = await usage({
-			groupBy: "userDay",
-			filters: { user: [MAYA, SAM] },
-		});
-		expect(
-			items.map((item) => [item.ref?.name, item.label, item.gbHours]),
-		).toEqual([
-			["Maya", "2026-11-10", 18],
-			["Maya", "2026-11-12", 0],
-			["Maya", "2026-11-16", 0],
-			["Sam", "2026-11-01", 16],
-			["Sam", "2026-11-17", 0],
+	test("each person's row holds their days, in the same page", async () => {
+		const days = (items: { days?: { day: string; gbHours: number }[] }[]) =>
+			items.map((item) => item.days?.map((day) => [day.day, day.gbHours]));
+		const people = await usage({ groupBy: "user" });
+		expect(people.items.map((item) => item.ref?.name)).toEqual(["Maya", "Sam"]);
+		expect(days(people.items)).toEqual([
+			[
+				["2026-11-10", 18],
+				["2026-11-12", 0],
+				["2026-11-16", 0],
+			],
+			[
+				["2026-11-01", 16],
+				["2026-11-17", 0],
+			],
 		]);
-		expect(nextCursor).toBeNull();
-		const sam = await usage({ groupBy: "userDay", filters: { user: [SAM] } });
-		expect(sam.items.map((item) => item.label)).toEqual([
-			"2026-11-01",
-			"2026-11-17",
-		]);
+		const first = await usage({ groupBy: "user", limit: 1 });
+		expect(days(first.items)).toEqual([days(people.items)[0]]);
+		expect((await usage({ groupBy: "day" })).items[0]).not.toHaveProperty(
+			"days",
+		);
 	});
 
 	test("a workspace that failed with no boot appears with its failure", async () => {

@@ -25,12 +25,6 @@ export function CloudUsageSettings({ isAdmin }: { isAdmin: boolean }) {
 		...trpc.cloud.usage.query.queryOptions(queries.byPerson.input),
 		enabled: queries.byPerson.enabled,
 	});
-	const byPersonDays = useQuery({
-		...trpc.cloud.usage.query.queryOptions(
-			queries.byPersonDays(byPerson.data).input,
-		),
-		enabled: queries.byPersonDays(byPerson.data).enabled,
-	});
 	const workspaces = useQuery({
 		...trpc.cloud.usage.query.queryOptions(queries.topWorkspaces.input),
 		enabled: queries.topWorkspaces.enabled,
@@ -45,7 +39,6 @@ export function CloudUsageSettings({ isAdmin }: { isAdmin: boolean }) {
 				period={period}
 				byDay={byDay}
 				byPerson={byPerson}
-				byPersonDays={byPersonDays}
 				workspaces={workspaces}
 			/>
 		</div>

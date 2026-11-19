@@ -1,13 +1,12 @@
 import { Trans } from "@lingui/react/macro";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
-import { Button } from "@superset/ui/button";
 import {
 	CloudWorkspacePage,
 	cloudUsageQueries,
 } from "@superset/ui/cloud-usage-page";
+import { PageLink } from "@superset/ui/page-link";
 import { Link } from "@tanstack/react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
-import { LuArrowUpRight } from "react-icons/lu";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { CloudUsageLink } from "../../../../components/CloudUsageLink";
 import { useCloudUsagePeriod } from "../../../../hooks/useCloudUsagePeriod";
@@ -59,15 +58,14 @@ export function CloudWorkspaceSettings({
 			openWorkspace={
 				canOpen
 					? (id) => (
-							<Button variant="outline" size="sm" asChild>
+							<PageLink>
 								<Link
 									to="/cloud-workspaces/$workspaceId"
 									params={{ workspaceId: id }}
 								>
-									<Trans>Open workspace</Trans>
-									<LuArrowUpRight />
+									<Trans>Workspace</Trans>
 								</Link>
-							</Button>
+							</PageLink>
 						)
 					: undefined
 			}

@@ -98,7 +98,6 @@ const CURSOR_FILTER_KEYS = Object.keys({
 	sort: true,
 	status: true,
 	user: true,
-	users: true,
 	workspace: true,
 } satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
 
@@ -207,10 +206,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudUsageInputSchema)
 				.output(cloudUsageOutputSchema)
 				.query(async ({ ctx, input }) => {
-					if (
-						(input.groupBy === "user" || input.groupBy === "userDay") &&
-						!ctx.isAdmin
-					) {
+					if (input.groupBy === "user" && !ctx.isAdmin) {
 						throw userError({
 							code: "FORBIDDEN",
 							message: "Only owners and admins can see usage by person.",
@@ -233,7 +229,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 							window,
 							filters: {
 								workspace: input.workspace,
-								user: ctx.isAdmin ? (input.users ?? input.user) : undefined,
+								user: ctx.isAdmin ? input.user : undefined,
 								size: input.size,
 								status: input.status,
 								search: input.search,

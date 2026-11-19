@@ -469,6 +469,7 @@ msgstr "{0} berakhiran {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{0} file sudah ada di {where}. Ingin menggantinya?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-jam"

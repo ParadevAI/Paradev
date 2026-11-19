@@ -50,3 +50,16 @@ export const FAILURE_REASONS: Record<
 	sandbox_gone: msg({ message: "Its machine no longer exists." }),
 	snapshot_expired: msg({ message: "Its saved state expired." }),
 };
+
+/**
+ * The design's bar grey, the text colour at 60%, for a chart: the kit's chart colours take no nested
+ * `var()`, so the chart gets the variable and its container the class that sets it.
+ */
+export const CHART_BAR = {
+	color: "var(--usage-bar)",
+	className:
+		"[--usage-bar:color-mix(in_oklab,var(--foreground)_60%,transparent)]",
+};
+
+/** The design's one boxed surface: the allowance, the member summary and the workspace figures. */
+export const BOX = "border-0 bg-muted shadow-none";

@@ -1,13 +1,9 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { LuCircleAlert } from "react-icons/lu";
+import { Alert, AlertTitle } from "../../../ui/alert";
 import { Button } from "../../../ui/button";
-import {
-	Empty,
-	EmptyContent,
-	EmptyHeader,
-	EmptyTitle,
-} from "../../../ui/empty";
 import { Skeleton } from "../../../ui/skeleton";
 
 interface QueryStatusProps {
@@ -22,26 +18,19 @@ export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 				<output className="sr-only">
 					<Trans>Loading...</Trans>
 				</output>
-				<div className="space-y-2" aria-hidden>
-					<Skeleton className="h-6 w-1/3" />
-					<Skeleton className="h-4 w-full" />
-					<Skeleton className="h-4 w-2/3" />
-				</div>
+				<Skeleton aria-hidden className="h-32 w-full rounded-xl" />
 			</div>
 		);
 	}
 	return (
-		<Empty>
-			<EmptyHeader>
-				<EmptyTitle>
-					<Trans>Failed to load usage</Trans>
-				</EmptyTitle>
-			</EmptyHeader>
-			<EmptyContent>
+		<Alert variant="destructive" className="items-center">
+			<LuCircleAlert />
+			<AlertTitle className="flex items-center justify-between gap-4">
+				<Trans>Failed to load usage</Trans>
 				<Button size="sm" variant="outline" onClick={onRetry}>
 					<Trans>Retry</Trans>
 				</Button>
-			</EmptyContent>
-		</Empty>
+			</AlertTitle>
+		</Alert>
 	);
 }

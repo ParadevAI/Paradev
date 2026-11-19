@@ -43,10 +43,6 @@ export const Loading: Story = { args: { byDay: query<CloudUsage>(undefined) } };
 export const LoadError: Story = {
 	args: { byDay: query<CloudUsage>(undefined, true) },
 };
-/** By person loaded, its sparklines did not. */
-export const SparklinesError: Story = {
-	args: { byPersonDays: query<CloudUsage>(undefined, true) },
-};
 export const Member: Story = {
 	args: { isAdmin: false, ...overviewArgs("northwind", { member: true }) },
 };
