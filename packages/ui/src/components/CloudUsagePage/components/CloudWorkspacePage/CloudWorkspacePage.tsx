@@ -148,7 +148,9 @@ export function CloudWorkspacePage({
 					actions={openWorkspace?.(workspace.id)}
 				/>
 				<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-					{workspace.owner && <Person name={workspace.owner.name} />}
+					{workspace.owner && (
+						<Person name={workspace.owner.name} image={workspace.owner.image} />
+					)}
 					{workspace.owner && <span aria-hidden>·</span>}
 					<span>
 						<Trans>

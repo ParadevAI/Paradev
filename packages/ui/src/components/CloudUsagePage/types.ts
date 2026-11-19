@@ -20,7 +20,12 @@ export interface CloudMetrics {
 	usageUsd: number | null;
 }
 
-export type PersonRef = { id: string; name: string; email: string };
+export type PersonRef = {
+	id: string;
+	name: string;
+	email: string;
+	image: string | null;
+};
 
 export interface WorkspaceRef {
 	id: string;

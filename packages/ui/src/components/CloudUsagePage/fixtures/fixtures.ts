@@ -54,6 +54,7 @@ export const PEOPLE: PersonRef[] = [
 	id: `00000000-0000-4000-8000-00000000000${i + 1}`,
 	name,
 	email: `${name.split(" ")[0]?.toLowerCase()}@example.com`,
+	image: null,
 }));
 const [PRIYA, INES, SAM, THEO, MAYA] = PEOPLE as [
 	PersonRef,
@@ -501,6 +502,25 @@ const STATES = {
 			usedGbHours: 4590,
 			boughtGbHours: 4500,
 			extra: "off",
+		},
+	},
+	/** Overage off with a free credit partly used past the seats' amount. */
+	freeCredit: {
+		billing: {
+			seats: 9,
+			perSeatGbHours: 500,
+			usedGbHours: 4800,
+			freeCreditGbHours: 1000,
+			extra: "off",
+		},
+	},
+	/** A contract that bills overage, past its seats' amount, with no credits. */
+	contractOver: {
+		billing: {
+			seats: 14,
+			perSeatGbHours: 500,
+			usedGbHours: 9000,
+			extra: { capGbHours: 1_000_000 },
 		},
 	},
 	/** Northwind, from a billing value cached before seats, credits and the cap were read. */

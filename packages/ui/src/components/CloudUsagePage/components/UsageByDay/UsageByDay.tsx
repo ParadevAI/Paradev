@@ -65,7 +65,8 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 						tickLine={false}
 						axisLine={false}
 						ticks={ticks}
-						interval={0}
+						interval="preserveStart"
+						minTickGap={8}
 						tickFormatter={formatDay}
 					/>
 					<YAxis

@@ -23219,6 +23219,9 @@ msgstr "Je organisatie heeft de limiet voor omgevingen bereikt."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Je eigen accounts. De integraties van je organisatie geven Paradev toegang tot haar tools; als je die van jou koppelt, verschijnt het werk dat Paradev voor je doet onder jouw naam."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Alleen je eigen gebruik. De totalen van de organisatie, haar tegoed en het gebruik per persoon zijn voor eigenaren en beheerders."
+
 msgid "Your Paradev download is starting."
 msgstr "Je Paradev-download start."
 

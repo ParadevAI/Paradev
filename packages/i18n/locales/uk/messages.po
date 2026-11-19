@@ -23213,6 +23213,9 @@ msgstr "Ваша організація досягла ліміту середо
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Лише ваше власне використання. Підсумки організації, її ліміт і використання за людьми доступні власникам і адміністраторам."
+
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."
 

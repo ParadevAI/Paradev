@@ -23219,6 +23219,9 @@ msgstr "Organisasi Anda telah mencapai batas lingkungan."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Hanya penggunaan Anda sendiri. Total organisasi, jatahnya, dan penggunaan per orang hanya untuk pemilik dan admin."
+
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."
 

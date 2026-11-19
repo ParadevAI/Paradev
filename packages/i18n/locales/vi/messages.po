@@ -23219,6 +23219,9 @@ msgstr "Tổ chức của bạn đã đạt giới hạn môi trường."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Paradev truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Paradev làm cho bạn hiển thị dưới tên bạn."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Chỉ mức sử dụng của riêng bạn. Tổng của tổ chức, hạn mức và mức sử dụng theo người chỉ dành cho chủ sở hữu và quản trị viên."
+
 msgid "Your Paradev download is starting."
 msgstr "Bản tải xuống Paradev của bạn đang bắt đầu."
 

@@ -104,6 +104,7 @@ export function WorkspacesTable({
 				{rows.map((row) => {
 					const workspace = workspaceOf(row);
 					const owner = workspace?.owner?.name;
+					const ownerImage = workspace?.owner?.image ?? null;
 					const size = workspace && i18n._(MACHINE_SIZE_NAMES[workspace.size]);
 					const name = workspace && nameParts(workspace.name);
 					return (
@@ -140,8 +141,8 @@ export function WorkspacesTable({
 								</div>
 							</TableCell>
 							{isAdmin && (
-								<TableCell className={cn(WIDE, "max-w-48")}>
-									{owner && <Person name={owner} />}
+								<TableCell className={cn(WIDE, "max-w-40")}>
+									{owner && <Person name={owner} image={ownerImage} />}
 								</TableCell>
 							)}
 							<TableCell>

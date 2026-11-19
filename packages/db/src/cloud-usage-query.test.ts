@@ -145,7 +145,12 @@ describe("queryCloudUsage", () => {
 				name: "broken-env",
 				status: "failed",
 				size: "large",
-				owner: { id: MAYA, name: "Maya", email: "Maya@example.com" },
+				owner: {
+					id: MAYA,
+					name: "Maya",
+					email: "Maya@example.com",
+					image: null,
+				},
 				failure: {
 					reason: "snapshot_expired",
 					at: new Date("2026-11-16T14:03:00Z"),

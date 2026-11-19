@@ -457,6 +457,7 @@ interface UserRef {
 	id: string;
 	name: string;
 	email: string;
+	image: string | null;
 }
 
 interface WorkspaceRef {
@@ -514,7 +515,12 @@ async function refsFor(
 	}
 	if (groupBy === "user") {
 		const rows = await db
-			.select({ id: users.id, name: users.name, email: users.email })
+			.select({
+				id: users.id,
+				name: users.name,
+				email: users.email,
+				image: users.image,
+			})
 			.from(users)
 			.where(inArray(users.id, keys));
 		return new Map(rows.map((row) => [row.id, row]));
@@ -528,7 +534,12 @@ async function refsFor(
 				machineSize: workspaces.machineSize,
 				failureReason: workspaces.failureReason,
 				failedAt: workspaces.failedAt,
-				owner: { id: users.id, name: users.name, email: users.email },
+				owner: {
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image,
+				},
 			})
 			.from(workspaces)
 			.leftJoin(users, eq(users.id, workspaces.createdByUserId))
@@ -934,7 +945,12 @@ const bootColumns = {
 	id: boots.id,
 	sessionId: boots.vercelSessionId,
 	workspace: { id: workspaces.id, name: workspaces.name },
-	user: { id: users.id, name: users.name, email: users.email },
+	user: {
+		id: users.id,
+		name: users.name,
+		email: users.email,
+		image: users.image,
+	},
 	startedAt: boots.startedAt,
 	stoppedAt: boots.stoppedAt,
 	memoryMb: boots.memoryMb,

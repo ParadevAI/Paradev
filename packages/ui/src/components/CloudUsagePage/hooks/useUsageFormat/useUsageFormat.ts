@@ -4,9 +4,9 @@ import { useFormat } from "@superset/i18n/react";
 
 export function useUsageFormat() {
 	const { formatCurrency, formatNumber } = useFormat();
-	/** One rule on every page: cents under $100, whole dollars from there. */
+	/** One rule on every page, as in the design: $0, cents under $100, whole dollars from there. */
 	const dollars = (usd: number) => {
-		const digits = Math.abs(usd) < 100 ? 2 : 0;
+		const digits = usd !== 0 && Math.abs(usd) < 100 ? 2 : 0;
 		return formatCurrency(usd, "USD", {
 			minimumFractionDigits: digits,
 			maximumFractionDigits: digits,

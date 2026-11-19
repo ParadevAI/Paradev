@@ -23219,6 +23219,9 @@ msgstr "Kuruluşunuz ortam sınırına ulaştı."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlarına erişmesini sağlar; kendi hesaplarını bağladığında Paradev'in senin için yaptığı işler senin adınla görünür."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Yalnızca kendi kullanımınız. Kuruluşun toplamları, kotası ve kişiye göre kullanım sahipler ve yöneticiler içindir."
+
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."
 

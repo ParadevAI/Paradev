@@ -56,16 +56,17 @@ export function UsageByPerson({
 					<TableBody>
 						{items.map((item) => {
 							const share = total > 0 ? item.usageUsd / total : 0;
-							const name = item.ref?.name;
+							const person =
+								item.ref && !("status" in item.ref) ? item.ref : null;
 							return (
-								<TableRow key={item.key ?? ""}>
+								<TableRow key={item.key ?? ""} className="relative">
 									<TableCell className="max-w-48">
-										{name && item.key ? (
+										{person ? (
 											<Link
-												to={{ view: "workspaces", period, user: item.key }}
-												className="block min-w-0"
+												to={{ view: "workspaces", period, user: person.id }}
+												className="block min-w-0 after:absolute after:inset-0"
 											>
-												<Person name={name} />
+												<Person name={person.name} image={person.image} />
 											</Link>
 										) : (
 											<span className="text-muted-foreground">
@@ -73,7 +74,7 @@ export function UsageByPerson({
 											</span>
 										)}
 									</TableCell>
-									<TableCell className="w-28">
+									<TableCell className="hidden w-28 @xl:table-cell">
 										{days.some((day) => usdOn.has(`${item.key}|${day}`)) && (
 											<ChartContainer
 												config={config}
@@ -99,9 +100,12 @@ export function UsageByPerson({
 											</ChartContainer>
 										)}
 									</TableCell>
-									<TableCell className="w-40">
-										<span className="flex items-center gap-2">
-											<Progress value={share * 100} className="h-1.5" />
+									<TableCell className="w-14 @xl:w-40">
+										<span className="flex items-center justify-end gap-2">
+											<Progress
+												value={share * 100}
+												className="hidden h-1.5 @xl:block"
+											/>
 											<span className="w-9 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
 												{formatNumber(share, {
 													style: "percent",

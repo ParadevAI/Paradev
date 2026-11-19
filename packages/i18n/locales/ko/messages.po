@@ -23219,6 +23219,9 @@ msgstr "조직이 환경 한도에 도달했습니다."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "내 사용량만 표시됩니다. 조직의 합계, 할당량, 사람별 사용량은 소유자와 관리자만 볼 수 있습니다."
+
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."
 

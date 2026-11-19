@@ -23219,6 +23219,9 @@ msgstr "您的組織已達到環境數量上限。"
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "僅顯示你自己的用量。組織的總量、額度和依人員的用量僅限擁有者和管理員查看。"
+
 msgid "Your Paradev download is starting."
 msgstr "您的 Paradev 下載即將開始。"
 

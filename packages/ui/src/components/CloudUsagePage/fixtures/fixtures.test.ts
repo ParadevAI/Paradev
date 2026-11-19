@@ -13,6 +13,8 @@ const STATES: BillingState[] = [
 	"prepaid",
 	"limitReached",
 	"toppedUp",
+	"freeCredit",
+	"contractOver",
 	"notRead",
 	"unbilled",
 ];
