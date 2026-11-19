@@ -44,6 +44,7 @@ import { RemoveAccountDialog } from "./components/RemoveAccountDialog";
 import type { RestartSessionsPrompt } from "./components/RestartSessionsDialog";
 import { RestartSessionsDialog } from "./components/RestartSessionsDialog";
 import { API_BILLING_LINKS } from "./utils/apiBilling";
+import { dedupeUsageAccounts } from "./utils/dedupeUsageAccounts";
 import { switchSignInCommand } from "./utils/switchSignInCommand";
 import type { ManagedAgent, QuotaAgent } from "./utils/visibleQuotaAgents";
 import { isManagedAgent, visibleQuotaAgents } from "./utils/visibleQuotaAgents";
@@ -348,7 +349,7 @@ export function UsageView({
 	const { countRestartCandidates, restartMutation } =
 		useRestartAgentSessions(hostUrl);
 
-	const accounts = quotaQuery.data ?? [];
+	const accounts = dedupeUsageAccounts(quotaQuery.data ?? []);
 	useEffect(() => {
 		const key = `${hostUrl}:${focusedAgent}:${focusedAccountKey}`;
 		if (

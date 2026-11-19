@@ -1,0 +1,1 @@
+export { initials } from "./initials";

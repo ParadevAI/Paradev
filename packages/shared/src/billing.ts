@@ -383,6 +383,31 @@ export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	};
 }
 
+/** The allowance fields a billing value can fail to give; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_FIELDS = [
+	"seats",
+	"bought",
+	"freeCredits",
+	"extraUsageLimit",
+	"limitReached",
+] as const;
+
+/** Why a billing value cannot give a field; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_REASONS = [
+	"not_read",
+	"percent_of_allowance",
+	"not_tracked",
+] as const;
+
+export function gbMinutesUsd(
+	gbMinutes: number,
+	overagePerGbHour: number | null,
+) {
+	return overagePerGbHour === null
+		? null
+		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
+}
+
 export function gbHourPackPricePerGbHour(pack: GbHourPack): number {
 	return (pack.price * 60) / pack.gbMinutes;
 }
@@ -437,6 +462,16 @@ export function planCatalogFromAutumn(
 		(a, b) =>
 			a.displayOrder - b.displayOrder || a.family.localeCompare(b.family),
 	);
+}
+
+/** The GB-hour price every self-serve family charges; null when none sells GB-minutes or they disagree. */
+export function lineupRatePerGbHour(lineup: PlanFamily[]): number | null {
+	const rates = new Set(
+		lineup.flatMap((family) =>
+			family.overagePerGbHour === null ? [] : [family.overagePerGbHour],
+		),
+	);
+	return rates.size === 1 ? ([...rates][0] ?? null) : null;
 }
 
 /** Yearly only counts as an option when it costs less than twelve months. */

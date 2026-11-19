@@ -916,6 +916,12 @@ msgstr "{count, plural, one {擷取了 # 個頁面} other {擷取了 # 個頁面
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {匯入#個worktree} other {匯入#個worktree}}"
 
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, other {過去 30 天內在 # 個工作區中}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, other {本期在 # 個工作區中}}"
+
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, other {合併 # 個拉取請求?}}"
 
@@ -1042,9 +1048,6 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}：{statusLabel}"
-
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB 小時"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {#行已隱藏} other {#行已隱藏}}"
@@ -1347,6 +1350,12 @@ msgstr "剩餘 {remaining} 個 token"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤銷 # 個檔案的更改。} other {已撤銷 # 個檔案的更改。}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, other {共 # 列，第 {first}–{last} 列}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, other {# 個席位包含}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} 秒"
 
@@ -1364,17 +1373,17 @@ msgstr "{shown}/{total}"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "顯示{shownCount}個 · {0} · {1}個token"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}，{memory} GB"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {#項已跳過} other {#項已跳過}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount}個星標，還在成長"
 
-msgid "{start} to {end}"
-msgstr "{start} 至 {end}"
-
-msgid "{start} to {end} (current)"
-msgstr "{start} 至 {end}(目前)"
+msgid "{start} – {end}"
+msgstr "{start} – {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已啟動 # 個自動化} other {已啟動 # 個自動化}}"
@@ -1433,8 +1442,14 @@ msgstr "已用 {used}/{limit} 個環境"
 msgid "{used} of {size} tokens"
 msgstr "{used} / {size} 個 token"
 
+msgid "{used} of {total}"
+msgstr "{used} / {total}"
+
 msgid "{used} used"
 msgstr "已使用 {used}"
+
+msgid "{used} used by you"
+msgstr "你已使用 {used}"
 
 msgid "{user} and {others} joined and left."
 msgstr "{user} 和 {others} 加入後又離開了。"
@@ -1462,9 +1477,6 @@ msgstr "{user} 已重新加入。"
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vcpus} vCPU, {memory} GB"
-msgstr "{vcpus} 個 vCPU,{memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
@@ -1645,6 +1657,9 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "由 Union Square Ventures 領投的 1,150 萬美元種子輪"
+
+msgid "0 rows"
+msgstr "0 列"
 
 msgid "1"
 msgstr "1"
@@ -2888,6 +2903,9 @@ msgstr "任意名稱"
 msgid "Any page"
 msgstr "任意頁面"
 
+msgid "Any person"
+msgstr "所有人員"
+
 msgid "Any project"
 msgstr "任意專案"
 
@@ -2902,6 +2920,9 @@ msgstr "任何審查者"
 
 msgid "any sender"
 msgstr "任意發件人"
+
+msgid "Any size"
+msgstr "所有規格"
 
 msgid "Any status"
 msgstr "任意狀態"
@@ -3462,6 +3483,10 @@ msgstr "等待你的審查"
 msgid "Awaiting review from you or your team"
 msgstr "等待你或你團隊的審查"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "執行中"
+
 msgid "Away"
 msgstr "離開"
 
@@ -3589,9 +3614,6 @@ msgstr "帳單"
 msgid "Billing details"
 msgstr "帳單資訊"
 
-msgid "Billing period"
-msgstr "帳單週期"
-
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "計費系統拒絕啟動雲端工作區：組織的方案不包含雲端工作區，或已達到雲端使用上限。雲端工作區需要 Team 或 Ultra 方案。請在設定 > 帳單中升級或提高上限，或在裝置上執行此自動化。"
 
@@ -3671,6 +3693,9 @@ msgstr "借用自動駕駛汽車的分級方式，用來衡量軟體的構建方
 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "底部抽屜，在觸控螢幕裝置上便於滑動操作。"
+
+msgid "Bought credits"
+msgstr "已購買的額度"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "已購 GB 小時剩餘：{prepaid}"
@@ -3895,6 +3920,12 @@ msgstr "授權即表示你允許該應用程式按照其服務條款和隱私政
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "點選繼續即表示你同意我們的<0>服務條款</0>和<1>隱私政策</1>。"
+
+msgid "By day"
+msgstr "按日"
+
+msgid "By person"
+msgstr "按人員"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4831,9 +4862,6 @@ msgstr "此組織未啟用雲端用量。"
 msgid "Cloud workspace"
 msgstr "雲端工作區"
 
-msgid "Cloud workspace usage for the whole organization."
-msgstr "整個組織的雲端工作區用量。"
-
 msgid "Cloud workspace: asleep"
 msgstr "雲端工作區，已休眠"
 
@@ -4858,6 +4886,9 @@ msgstr "{account} 尚未啟用雲端工作區。雲端工作區包含在 Team �
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "您的方案不包含雲端工作區。"
+
+msgid "Cloud workspaces cannot start."
+msgstr "雲端工作區無法啟動。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "雲端工作區會以你的身分提交、推送並建立提取要求"
@@ -5815,9 +5846,6 @@ msgstr "無法列出目錄"
 msgid "Could not load agents from {0}"
 msgstr "無法從{0}載入代理程式"
 
-msgid "Could not load cloud usage."
-msgstr "無法載入雲端用量。"
-
 msgid "Could not load environments"
 msgstr "無法載入環境"
 
@@ -5997,6 +6025,9 @@ msgstr "無法啟動會話"
 
 msgid "Could not start the chat"
 msgstr "無法開始聊天"
+
+msgid "Could not start."
+msgstr "無法啟動。"
 
 msgid "Could not steer"
 msgstr "無法引導"
@@ -7776,6 +7807,9 @@ msgstr "每個介面都有各自的排版設定。更改會立即體現在即時
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "每個工作區都有獨立的雲端機器，筆電闔上也能繼續工作。可在桌面版、iPhone 或 iPad 上查看進度。"
 
+msgid "Earlier period"
+msgstr "上一個週期"
+
 msgid "Early 2024"
 msgstr "2024年初"
 
@@ -8301,6 +8335,9 @@ msgstr "極高"
 msgid "Extra small"
 msgstr "超小"
 
+msgid "Extra usage"
+msgstr "額外用量"
+
 msgid "Extra usage limit reached"
 msgstr "已達到額外用量上限"
 
@@ -8335,9 +8372,6 @@ msgstr "失敗"
 msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "失敗"
-
-msgid "Failed {failedAt}"
-msgstr "失敗於 {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "失敗執行 <0>· 7天</0>"
@@ -8531,6 +8565,9 @@ msgstr "載入圖片失敗"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "載入儲存庫失敗。請重試。"
+
+msgid "Failed to load usage"
+msgstr "無法載入用量"
 
 msgid "Failed to log out. Please try again."
 msgstr "登出失敗。請重試。"
@@ -9019,6 +9056,9 @@ msgstr "已完成 · 用時7秒"
 msgid "Finishing the move…"
 msgstr "正在完成移動…"
 
+msgid "First page"
+msgstr "第一頁"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "第一次使用？請在 <0>ChatGPT 設定</0>中開啟裝置代碼登入。"
 
@@ -9283,6 +9323,13 @@ msgstr "創始工程師"
 
 msgid "Free"
 msgstr "免費版"
+
+msgctxt "cloud allowance group"
+msgid "Free"
+msgstr "免費"
+
+msgid "Free credits"
+msgstr "免費額度"
 
 msgid "Free for everyone"
 msgstr "對所有人免費"
@@ -10110,6 +10157,10 @@ msgstr "身份"
 msgid "Idle"
 msgstr "空閒"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "閒置"
+
 msgid "Idle · branch pushed"
 msgstr "空閒 · 分支已推送"
 
@@ -10180,6 +10231,9 @@ msgstr "全部匯入"
 
 msgid "Import cookies and passwords…"
 msgstr "匯入cookie和密碼…"
+
+msgid "Import custom theme?"
+msgstr "匯入自訂佈景主題？"
 
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "將每個 v1 專案匯入 v2。已匯入的專案會顯示為已匯入。"
@@ -10300,6 +10354,9 @@ msgstr "審查中"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "在{appName}桌面應用程式中開啟「設定 → 遠端存取」，開啟「允許遠端工作區通過中繼存取此裝置」。"
 
+msgid "in the last 30 days"
+msgstr "過去 30 天內"
+
 msgid "In the merge queue"
 msgstr "在合併佇列中"
 
@@ -10308,6 +10365,9 @@ msgstr "在合併佇列中。輪到它時 GitHub 會合併它。"
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "在Paradev桌面應用程式中開啟<0>設定 → 外觀 → 主題</0>。"
+
+msgid "in this period"
+msgstr "本期"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "不到一年，來自 180 個國家、超過 145,000 名開發者執行過 {productName}，並建立了超過 185 萬個 agent 工作區。"
@@ -10338,6 +10398,9 @@ msgstr "企業版包含"
 
 msgid "Included with Team and Ultra."
 msgstr "包含在 Team 和 Ultra 中。"
+
+msgid "Included with the plan"
+msgstr "方案包含"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "包含Paradev特有的box變體"
@@ -10960,6 +11023,9 @@ msgstr "最近3個月"
 msgid "last 30 days"
 msgstr "最近 30 天"
 
+msgid "Last 30 days"
+msgstr "過去 30 天"
+
 msgid "Last 4 weeks"
 msgstr "最近4週"
 
@@ -11033,6 +11099,9 @@ msgstr "延遲"
 
 msgid "Later messages are removed."
 msgstr "之後的訊息將被移除。"
+
+msgid "Later period"
+msgstr "下一個週期"
 
 msgid "Latest"
 msgstr "最新"
@@ -11440,6 +11509,9 @@ msgstr "正在載入更多..."
 
 msgid "Loading more…"
 msgstr "正在載入更多…"
+
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "正在載入第 {loadingPage} 頁，共 {targetPage} 頁..."
 
 msgid "Loading project…"
 msgstr "正在載入專案…"
@@ -12567,6 +12639,9 @@ msgstr "下一張圖片"
 msgid "Next match"
 msgstr "下一個匹配"
 
+msgid "Next page"
+msgstr "下一頁"
+
 msgid "Next Right Sidebar Tab"
 msgstr "右側邊欄下一個分頁"
 
@@ -13289,6 +13364,9 @@ msgstr "此主機上還沒有工作區"
 msgid "No workspaces yet"
 msgstr "暫無工作區"
 
+msgid "No workspaces."
+msgstr "沒有工作區。"
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "不會。{companyName} 從不代理模型呼叫。代理程式使用你自己的訂閱和金鑰。"
 
@@ -13337,6 +13415,9 @@ msgstr "此伺服器無法使用"
 msgid "Not bound · configure in Settings → Links"
 msgstr "未繫結 · 在設定→連結中配置"
 
+msgid "Not broken down yet"
+msgstr "尚未細分"
+
 msgid "Not configured"
 msgstr "未配置"
 
@@ -13348,6 +13429,9 @@ msgstr "未連線"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
+
+msgid "Not counted by billing yet"
+msgstr "尚未計入帳單"
 
 msgid "Not demoed here"
 msgstr "此處未做演示"
@@ -13520,6 +13604,12 @@ msgstr "物品"
 msgid "of {0}"
 msgstr "／共 {0} 人"
 
+msgid "of {cap} included"
+msgstr "（共包含 {cap}）"
+
+msgid "of {cap} limit"
+msgstr "（上限 {cap}）"
+
 msgid "of {total}"
 msgstr "共{total}名"
 
@@ -13690,6 +13780,9 @@ msgstr "只有主機擁有者或組織擁有者才能刪除此主機"
 msgid "Only images can be attached to a comment"
 msgstr "評論只能附加圖片"
 
+msgid "Only import themes from sources you trust."
+msgstr "請僅匯入來自可信來源的佈景主題。"
+
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "只有建立者或組織管理員可以變更此代理程式"
 
@@ -13797,9 +13890,6 @@ msgstr "只有你可以使用此連線。隊友會連結自己的 {name} 帳號�
 
 msgid "Only you. Teammates forward their own."
 msgstr "僅限你自己。隊友各自轉送。"
-
-msgid "Only your own workspaces. Organization totals are for owners and admins."
-msgstr "僅顯示你自己的工作區。組織總計僅供擁有者和管理員查看。"
 
 msgid "open"
 msgstr "開啟"
@@ -14392,6 +14482,10 @@ msgstr "原創元件"
 msgid "Other"
 msgstr "其他"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "其他"
+
 msgid "Other apps"
 msgstr "其他應用程式"
 
@@ -14504,6 +14598,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "頁面"
 
+msgid "Page {page} of {pages}"
+msgstr "第 {page} / {pages} 頁"
+
 msgid "Page actions"
 msgstr "頁面操作"
 
@@ -14560,6 +14657,10 @@ msgstr "分頁"
 
 msgid "Pagination"
 msgstr "分頁"
+
+msgctxt "cloud allowance group"
+msgid "Paid"
+msgstr "付費"
 
 msgid "Paid plans"
 msgstr "付費方案"
@@ -15334,6 +15435,9 @@ msgstr "上一張圖片"
 msgid "Previous match"
 msgstr "上一個匹配"
 
+msgid "Previous page"
+msgstr "上一頁"
+
 msgid "Previous prompts"
 msgstr "歷史提示詞"
 
@@ -15569,6 +15673,10 @@ msgstr "屬性"
 
 msgid "Provide either id or slug"
 msgstr "請提供id或slug"
+
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "正在準備"
 
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "預配失敗，沙箱已被銷燬。目前沒有任何處理程序在執行，此工作區也無法開啟。請新建一個再試。"
@@ -16332,6 +16440,9 @@ msgstr "移除代理程式"
 msgid "remove the PR link"
 msgstr "移除PR連結"
 
+msgid "Remove this filter"
+msgstr "移除此篩選"
+
 msgid "Remove trigger"
 msgstr "移除觸發條件"
 
@@ -17069,6 +17180,9 @@ msgstr "行操作"
 msgid "Rows changed"
 msgstr "行有變更"
 
+msgid "Rows per page"
+msgstr "每頁列數"
+
 msgid "Rule"
 msgstr "規則"
 
@@ -17209,7 +17323,7 @@ msgstr "執行中"
 msgid "Running"
 msgstr "執行中"
 
-msgctxt "cloud workspace status"
+msgctxt "cloud workspace boot"
 msgid "Running"
 msgstr "執行中"
 
@@ -17660,6 +17774,9 @@ msgstr "正在搜尋Kbd的使用處"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "週期中途移除的席位在 {0} 前仍然有效。"
+
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "席位、額度和額外用量上限尚未載入。下次帳單資料更新後會顯示。"
 
 msgid "Secondary"
 msgstr "次要"
@@ -19148,10 +19265,6 @@ msgstr "啟動中"
 msgid "Starting"
 msgstr "啟動中"
 
-msgctxt "cloud workspace status"
-msgid "Starting"
-msgstr "啟動中"
-
 msgid "Starting {agentLabel}"
 msgstr "正在啟動{agentLabel}"
 
@@ -19300,22 +19413,20 @@ msgstr "已停止"
 msgid "Stopped"
 msgstr "已停止"
 
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "已停止"
+
 #. placeholder {0}: pressure.reap.processName
 #. placeholder {1}: gb(pressure.reap.rssMb)
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "已停止 {0}（{1} GB）以釋放記憶體"
-
-msgid "Stopped by a person"
-msgstr "由使用者停止"
 
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
 msgid "Stopped moving {name}"
 msgstr "已停止移動 {name}"
-
-msgid "Stopped when idle"
-msgstr "閒置時停止"
 
 msgid "Stopping the agent in {what}"
 msgstr "正在停止 {what} 中的代理程式"
@@ -19997,6 +20108,9 @@ msgstr "最好的代理程式會變。<0/>你的工作流不該變。"
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "機器以 {actual} vCPU 啟動，而非 {wanted} vCPU。請重新啟動後再試一次。"
 
+msgid "The breakdown by plan is kept for the current period only."
+msgstr "依方案的明細只保留目前的週期。"
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按鈕現在更醒目了。我已在你的窗格中確認過。"
 
@@ -20068,6 +20182,9 @@ msgstr "此自動化用來啟動雲端工作區的環境已被封存或沒有儲
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "此擴充功能及其本機資料將從這個瀏覽器中刪除。"
+
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "額外用量上限是方案的一個百分比，因此不顯示金額。"
 
 msgid "The factory"
 msgstr "工廠"
@@ -20144,9 +20261,6 @@ msgstr "合併前人類會逐行閱讀。"
 
 msgid "The image upload expired — attach it again"
 msgstr "圖片上傳已過期 — 請重新附加"
-
-msgid "The included and overage GB-hours are kept for the current period only."
-msgstr "包含的 GB 小時和超額 GB 小時僅保留目前週期的資料。"
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "崗位描述變了。工程師不再是有品味的打字員，而成了有品味的排程員：拆解工作、分派給代理程式叢集、在兩個改了同一個模組的代理程式之間做裁決。"
@@ -20656,14 +20770,14 @@ msgstr "這只會更改顯示名稱，不會更改分支。"
 msgid "this organization"
 msgstr "此組織"
 
-msgid "This organization has no billing periods, so this page shows the last 30 days."
-msgstr "此組織沒有帳單週期,因此本頁顯示最近 30 天。"
-
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "此組織沒有帳單週期。請改為選擇一個時間範圍。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此組織使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "此頁面無法判斷何時達到使用上限。"
 
 msgid "This page could not be loaded"
 msgstr "無法載入這個頁面"
@@ -20869,6 +20983,9 @@ msgstr "此工作區"
 
 msgid "This workspace has no project to branch from"
 msgstr "此工作區沒有可供分叉的專案"
+
+msgid "This workspace has no usage in this period."
+msgstr "此工作區在本期沒有用量。"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作區可能已被移除，或者你不再擁有它的存取權限。"
@@ -21452,6 +21569,10 @@ msgstr "未知"
 msgid "Unknown"
 msgstr "未知"
 
+msgctxt "boot end"
+msgid "Unknown"
+msgstr "未知"
+
 msgctxt "person"
 msgid "Unknown"
 msgstr "未知"
@@ -21594,6 +21715,9 @@ msgstr "未命名指令碼"
 
 msgid "Untitled workspace"
 msgstr "未命名工作區"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "不可信的佈景主題可能危及你的資料安全。"
 
 msgid "Up next"
 msgstr "即將執行"
@@ -21773,20 +21897,20 @@ msgstr "URL友好的識別符號，在你的組織內唯一。"
 msgid "Usage"
 msgstr "用量"
 
-msgid "Usage by day"
-msgstr "按天用量"
-
-msgid "Usage by person"
-msgstr "按人員用量"
-
 msgid "Usage is out of date"
 msgstr "用量資料已過期"
 
-msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
-msgstr "用量顯示在計費當天(UTC),可能略晚於工作區實際執行的時間。"
+msgid "usage limit"
+msgstr "使用上限"
+
+msgid "Usage limit"
+msgstr "使用上限"
 
 msgid "Usage limit reached"
 msgstr "已達到使用上限"
+
+msgid "Usage limit reached."
+msgstr "已達到使用上限。"
 
 msgid "Usage sections"
 msgstr "用量分區"
@@ -23110,6 +23234,9 @@ msgstr "您的組織已達到環境數量上限。"
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的帳戶。組織的整合讓 Paradev 存取其工具；連結你自己的帳戶後，Paradev 為你完成的工作會以你的名義顯示。"
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "僅顯示你自己的用量。組織的總量、額度和依人員的用量僅限擁有者和管理員查看。"
+
 msgid "Your Paradev download is starting."
 msgstr "您的 Paradev 下載即將開始。"
 
@@ -23124,9 +23251,6 @@ msgstr "你的方案不包含雲端環境。"
 
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "你的方案不包含雲端環境。請在設定的帳單中升級後再建立。"
-
-msgid "Your plan includes no cloud GB-hours."
-msgstr "你的方案不包含雲端 GB 小時。"
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "您的方案將於 {startDate} 切換到 {planName}。今天不扣款。"

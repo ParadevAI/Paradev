@@ -1,12 +1,17 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
-import { type CloudUsage, organizationBilling } from "@superset/auth/billing";
+import {
+	type CloudUsage,
+	listRatePerGbHour,
+	type OrganizationBilling,
+	organizationBilling,
+} from "@superset/auth/billing";
+import { allowanceOf } from "@superset/auth/billing/cloud-usage";
 import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
 	type CloudUsageScope,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
-	gbMinutesUsd,
 	listCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
@@ -25,7 +30,6 @@ import { requireActiveOrgRole } from "../utils/active-org";
 import {
 	bootKeysetSchema,
 	type CloudListFilters,
-	type CloudPeriodUnavailable,
 	type CloudRange,
 	cloudBootsInputSchema,
 	cloudBootsOutputSchema,
@@ -41,7 +45,12 @@ import {
 export interface CloudDeps {
 	db: Parameters<typeof queryCloudUsage>[0] &
 		NonNullable<Parameters<typeof requireActiveOrgRole>[1]>;
-	cloudUsage: (organizationId: string) => Promise<CloudUsage | null>;
+	/** Null when billing is not Autumn. */
+	billing: (
+		organizationId: string,
+	) => Promise<Pick<OrganizationBilling, "tier" | "cloudUsage"> | null>;
+	/** For an organization with no paid plan; null when the price cannot be known. */
+	listRatePerGbHour: () => Promise<number | null>;
 	flags: Parameters<typeof organizationFlagEnabled>[0];
 }
 
@@ -57,68 +66,6 @@ function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
 	return cloudUsage?.resetsAt
 		? { resetsAt: new Date(cloudUsage.resetsAt), previousResetAt: null }
 		: null;
-}
-
-function creditLine(credit: CloudUsage["bought"], rate: number | null) {
-	if (!credit?.grantedGbMinutes) return null;
-	const used = credit.grantedGbMinutes - credit.remainingGbMinutes;
-	return {
-		usedGbHours: used / 60,
-		totalGbHours: credit.grantedGbMinutes / 60,
-		usedUsd: gbMinutesUsd(used, rate),
-		totalUsd: gbMinutesUsd(credit.grantedGbMinutes, rate),
-	};
-}
-
-function allowanceOf(cloudUsage: CloudUsage, resetsAt: Date) {
-	const rate = cloudUsage.overagePerGbHour;
-	const included = cloudUsage.includedGbMinutes;
-	const limit = cloudUsage.overageLimit;
-	const unavailable: CloudPeriodUnavailable[] =
-		cloudUsage.bought === null
-			? (
-					[
-						"seats",
-						"bought",
-						"freeCredits",
-						"extraUsageLimit",
-						"limitReached",
-					] as const
-				).map((field) => ({ field, reason: "not_read" }))
-			: [];
-	if (limit?.type === "usage_percentage") {
-		unavailable.push({
-			field: "extraUsageLimit",
-			reason: "percent_of_allowance",
-		});
-	}
-	if (cloudUsage.bought !== null && cloudUsage.limitReached === null) {
-		unavailable.push({ field: "limitReached", reason: "not_tracked" });
-	}
-	return {
-		allowance: {
-			includedGbHours: included === null ? null : included / 60,
-			usedGbHours: cloudUsage.usedGbMinutes / 60,
-			overageGbHours: cloudUsage.overageGbMinutes / 60,
-			prepaidRemainingGbHours: cloudUsage.prepaidGbMinutes / 60,
-			resetsAt,
-			usedUsd: gbMinutesUsd(cloudUsage.usedGbMinutes, rate),
-			includedUsd: included === null ? null : gbMinutesUsd(included, rate),
-			overageUsd: gbMinutesUsd(cloudUsage.overageGbMinutes, rate),
-			seats: cloudUsage.seats,
-			bought: creditLine(cloudUsage.bought, rate),
-			freeCredits: creditLine(cloudUsage.freeCredits, rate),
-			extraUsageLimit:
-				limit?.type === "absolute"
-					? {
-							gbHours: limit.gbMinutes / 60,
-							usd: gbMinutesUsd(limit.gbMinutes, rate),
-						}
-					: null,
-			limitReached: cloudUsage.limitReached,
-		},
-		unavailable,
-	};
 }
 
 function noAllowance(reason: "closed_period" | "owners_and_admins_only") {
@@ -231,11 +178,21 @@ export function cloudRouterWith(deps: CloudDeps) {
 				i18nKey: "serverError.cloud.cloudUsageNotEnabled",
 			});
 		}
-		const cloudUsage = await deps.cloudUsage(organizationId);
+		const billing = await deps.billing(organizationId);
+		const cloudUsage = billing?.cloudUsage ?? null;
+		// A paid plan whose own rate was not read gets no price: the list rate could be the wrong one.
+		const rate =
+			cloudUsage?.overagePerGbHour ??
+			(billing?.tier === "free" ? await deps.listRatePerGbHour() : null);
+		if (rate === null && cloudUsage && billing?.tier !== "free") {
+			console.warn(
+				`[cloud] ${organizationId} has a paid plan but no GB-hour rate; usage has no price`,
+			);
+		}
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };
-		return next({ ctx: { scope, isAdmin, cloudUsage } });
+		return next({ ctx: { scope, isAdmin, cloudUsage, rate } });
 	});
 
 	return {
@@ -282,7 +239,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 								value: keyset.sort === "key" ? "0" : keyset.value,
 								key: keyset.key,
 							},
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -325,7 +282,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 								id: keyset.key,
 							},
 							now: new Date(),
-							overagePerGbHour: ctx.cloudUsage?.overagePerGbHour ?? null,
+							overagePerGbHour: ctx.rate,
 						},
 					);
 					return {
@@ -365,7 +322,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 					).filter((period) => period.to > createdAt);
 					const page = await queryCloudUsageByPeriod(deps.db, ctx.scope, {
 						periods: periods.slice(0, input.limit),
-						overagePerGbHour: cloudUsage.overagePerGbHour,
+						overagePerGbHour: ctx.rate,
 					});
 					const last = page.at(-1);
 					return {
@@ -380,7 +337,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 									? noAllowance("closed_period")
 									: !ctx.isAdmin
 										? noAllowance("owners_and_admins_only")
-										: allowanceOf(cloudUsage, to)),
+										: allowanceOf(cloudUsage, to, ctx.rate)),
 								metrics,
 							};
 						}),
@@ -394,9 +351,17 @@ export function cloudRouterWith(deps: CloudDeps) {
 
 export const cloudRouter = cloudRouterWith({
 	db,
-	cloudUsage: async (organizationId) =>
+	billing: async (organizationId) =>
+		billingUsesAutumn ? organizationBilling(organizationId) : null,
+	listRatePerGbHour: async () =>
 		billingUsesAutumn
-			? (await organizationBilling(organizationId)).cloudUsage
+			? listRatePerGbHour().catch((error) => {
+					console.error(
+						"[cloud] catalog unavailable; usage has no price",
+						error,
+					);
+					return null;
+				})
 			: null,
 	flags: posthog,
 });
