@@ -57,6 +57,22 @@ export function parseAttachedTerminalIdsKey(key: string): string[] {
 	}
 }
 
+/**
+ * Terminals that have a tab now or had one in the settled snapshot. A new tab
+ * counts at once; a tab that goes away still counts until the snapshot settles.
+ */
+export function getTabbedTerminalIds(
+	currentKey: string,
+	settledKey: string,
+): string[] {
+	return [
+		...new Set([
+			...parseAttachedTerminalIdsKey(currentKey),
+			...parseAttachedTerminalIdsKey(settledKey),
+		]),
+	];
+}
+
 export function getBackgroundTerminalSessions<
 	T extends BackgroundTerminalSessionLike,
 >(sessions: readonly T[], attachedTerminalIds: Iterable<string>): T[] {

@@ -16,10 +16,12 @@ import { NOREPLY_FROM } from "@superset/email/sender";
 import { canInvite, type OrganizationRole } from "@superset/shared/auth";
 import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
+import { getConnector } from "@superset/shared/connectors";
 import { COMPANY } from "@superset/shared/constants";
 import { parseOriginList } from "@superset/shared/origin-list";
 import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { getTrustedVercelPreviewOrigins } from "@superset/shared/vercel-preview-origins";
+import { productAudiences } from "@superset/shared/verify-jwt";
 import { Client } from "@upstash/qstash";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -113,6 +115,10 @@ const desktopDevOrigins =
 				`http://127.0.0.1:${desktopDevPort}`,
 			]
 		: [];
+
+const adminMcpUrl = getConnector("paradev_admin_mcp")?.methods.find(
+	(method) => method.type === "oauth2",
+)?.authorization_url;
 
 export const auth = betterAuth({
 	baseURL: getBrowserApiUrl(env),
@@ -409,10 +415,8 @@ export const auth = betterAuth({
 			allowUnauthenticatedClientRegistration: true,
 			accessTokenExpiresIn: 60 * 60 * 24 * 7,
 			validAudiences: [
-				env.NEXT_PUBLIC_API_URL,
-				`${env.NEXT_PUBLIC_API_URL}/`,
-				`${env.NEXT_PUBLIC_API_URL}/api/v2/agent/mcp`,
-				`${env.NEXT_PUBLIC_API_URL}/mcp`,
+				...productAudiences(env.NEXT_PUBLIC_API_URL),
+				...(adminMcpUrl ? [adminMcpUrl] : []),
 			],
 			silenceWarnings: {
 				oauthAuthServerConfig: true,

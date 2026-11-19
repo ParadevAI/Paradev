@@ -18,6 +18,7 @@ import {
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
 	type SandboxClaim,
+	SandboxNotReadyError,
 	SandboxUnavailableError,
 	SESSION_TIMEOUT_MS,
 	sandboxExists,
@@ -617,4 +618,17 @@ describe("wakeSandbox", () => {
 			},
 		]);
 	});
+});
+
+test("a box that did not get ready names the boot phases it reached, with offsets", () => {
+	const stamps = [
+		{ phase: "boot.start", at: 1_000 },
+		{ phase: "host.exec", at: 4_200 },
+	];
+	expect(new SandboxNotReadyError("ws-box", stamps).message).toBe(
+		"host-service in ws-box did not answer in time; the boot reached boot.start +0ms, host.exec +3200ms",
+	);
+	expect(new SandboxNotReadyError("ws-box", null).message).toEndWith(
+		"the boot reached an unreadable boot log",
+	);
 });

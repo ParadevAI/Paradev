@@ -6,9 +6,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-error() { echo -e "${RED}✗${NC} $1"; }
+error() { echo -e "${RED}✗${NC} $1" >&2; }
 success() { echo -e "${GREEN}✓${NC} $1"; }
-warn() { echo -e "${YELLOW}!${NC} $1"; }
+warn() { echo -e "${YELLOW}!${NC} $1" >&2; }
 
 # Track step failure
 step_failed() {
@@ -104,8 +104,7 @@ validate_json() {
 
   if ! echo "$output" | jq empty 2>/dev/null; then
     error "$error_context: Invalid JSON output"
-    echo "Raw output:" >&2
-    echo "$output" >&2
+    echo "Output length: ${#output} characters (not printed: it can hold credentials)" >&2
     return 1
   fi
 

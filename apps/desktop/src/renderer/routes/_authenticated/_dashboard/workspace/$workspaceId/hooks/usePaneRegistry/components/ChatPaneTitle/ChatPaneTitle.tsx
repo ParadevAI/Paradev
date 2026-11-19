@@ -29,7 +29,6 @@ import {
 	useChatSubagentStore,
 } from "../../stores/chatSubagentStore";
 import { onOpenChatHistory } from "../../utils/chatHistoryOpen";
-import { AccountUsageMenuSection } from "../AccountUsageMenuSection";
 import { ForkMenuItems } from "../ForkMenuItems";
 import { StopHeaderEvents } from "../StopHeaderEvents";
 import { UsageWarningDot } from "../UsageWarningDot";
@@ -220,10 +219,6 @@ export function ChatPaneTitle({
 									/>
 								</>
 							)}
-							<AccountUsageMenuSection
-								workspaceId={workspaceId}
-								terminalId={chatKey}
-							/>
 						</DropdownMenuContent>
 					</StopHeaderEvents>
 				</DropdownMenu>

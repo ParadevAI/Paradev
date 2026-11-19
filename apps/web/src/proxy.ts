@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 import {
+	adminReturnUrl,
 	agentsRewriteUrl,
 	isAgentsRoute,
 	isAuthPageRoute,
@@ -56,10 +57,10 @@ async function legacyProxy(
 		pathname.startsWith("/trpc/");
 
 	if (session && isAuthPageRoute(pathname)) {
-		const target = safeRedirectUrl(
-			req.nextUrl.searchParams.get("redirect"),
-			req.nextUrl.origin,
-		);
+		const redirect = req.nextUrl.searchParams.get("redirect");
+		const target =
+			safeRedirectUrl(redirect, req.nextUrl.origin) ??
+			adminReturnUrl(redirect, process.env.NEXT_PUBLIC_ADMIN_URL);
 		return NextResponse.redirect(target ?? new URL("/", req.url));
 	}
 

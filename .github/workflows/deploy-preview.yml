@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  VERCEL_CLI_VERSION: 50.22.1
+  VERCEL_CLI_VERSION: 50.31.0
   PR_NUMBER: ${{ github.event.pull_request.number }}
   API_ALIAS: api-pr-${{ github.event.pull_request.number }}-superset.vercel.app
   BROWSER_API_ALIAS: ${{ contains(github.event.pull_request.labels.*.name, 'domain-preview') && format('api.pr-{0}.paradev.com', github.event.pull_request.number) || format('api-pr-{0}-superset.vercel.app', github.event.pull_request.number) }}

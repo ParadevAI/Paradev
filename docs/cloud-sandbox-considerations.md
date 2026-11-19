@@ -232,16 +232,16 @@ reaped while its terminal survived.
 
 ## Box logs leave the box
 
-`superset-logship` sends `boot.log`, `memguard.log`, `desktop.log` and
-`host-service.log` to the sandbox Sentry project when the claim sets
-`SUPERSET_SANDBOX_BOX_LOGS=1`. That needs both PostHog flags:
-`sandbox-box-logs-fleet` and the organization's `sandbox-box-logs`. The setup
-script and the clone output are never read. **Open:** host-service lines can
-still carry customer text: worktree paths, branch names, repository URLs, and
-git or `gh` errors that print the command. The shipper scrubs token formats;
-host-service no longer prints hook commands. Before the flag is on for a customer organization,
-the policy wording (L1) must be live, and someone must decide which of those
-lines to drop.
+When the organization's PostHog flag `sandbox-box-logs` is on, the claim sets
+`SUPERSET_SANDBOX_BOX_LOGS=1` and host-service turns on the Sentry SDK's logs
+(`logBoxEvent` in `packages/host-service/src/sentry.ts`). Only those fixed
+events leave the box, each with ids, counts and durations: no log file, no
+console line, no error message. A box whose host-service never answers is
+reported by the control plane: `SandboxNotReadyError` names the boot phases
+`boot.log` reached, not the step output between them. `memguard.log`,
+`desktop.log`, `checkout.log` and `host-service.log` stay on the box.
+Before the flag is on for a customer organization, the policy wording (L1)
+must be live.
 
 ## Untested behaviour
 

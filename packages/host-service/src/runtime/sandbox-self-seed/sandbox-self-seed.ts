@@ -21,6 +21,7 @@ import {
 import { eq } from "drizzle-orm";
 import type { HostDb } from "../../db";
 import { projects, workspaces } from "../../db/schema";
+import { logBoxEvent } from "../../sentry";
 import {
 	createTerminalSessionInternal,
 	isAgentTerminalAlive,
@@ -392,6 +393,7 @@ export async function runSandboxStartHook(
 				? `hook.exited exit=0 ms=${ms}`
 				: `hook.failed exit=${code ?? signal} ms=${ms}`,
 		);
+		logBoxEvent("hook.finished", { "hook.exit": code ?? signal ?? -1, ms });
 		startHookState = {
 			state: "exited",
 			command,

@@ -118,6 +118,18 @@ describe("parseThemeConfigFile", () => {
 		expect(result.themes[0]?.ui.foreground).toBe("#f4f7fb");
 	});
 
+	it("keeps custom css", () => {
+		const css = "body { background: url(data:image/png;base64,AA==); }";
+		const result = parseThemeConfigFile(
+			JSON.stringify({ name: "Styled Theme", type: "dark", css }),
+		);
+
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+
+		expect(result.themes[0]?.css).toBe(css);
+	});
+
 	it("returns an error for invalid JSON", () => {
 		const result = parseThemeConfigFile("{invalid-json");
 		expect(result.ok).toBe(false);
@@ -146,4 +158,11 @@ describe("parseThemeConfigFile", () => {
 		if (result.ok) return;
 		expect(result.error).toContain("reserved");
 	});
+});
+
+it("rejects oversized stylesheets", () => {
+	const oversized = parseThemeConfigFile(
+		JSON.stringify({ name: "Too large", css: " ".repeat(65537) }),
+	);
+	expect(oversized.ok).toBe(false);
 });

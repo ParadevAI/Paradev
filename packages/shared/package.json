@@ -40,6 +40,10 @@
 			"types": "./src/account-labels.ts",
 			"default": "./src/account-labels.ts"
 		},
+		"./machine-size-names": {
+			"types": "./src/machine-size-names.ts",
+			"default": "./src/machine-size-names.ts"
+		},
 		"./html-preview": {
 			"types": "./src/html-preview.ts",
 			"default": "./src/html-preview.ts"
@@ -195,6 +199,10 @@
 		"./sandbox/regions": {
 			"types": "./src/sandbox/regions.ts",
 			"default": "./src/sandbox/regions.ts"
+		},
+		"./sandbox/boot-stamps": {
+			"types": "./src/sandbox/boot-stamps.ts",
+			"default": "./src/sandbox/boot-stamps.ts"
 		},
 		"./sandbox/contract": {
 			"types": "./src/sandbox/contract.ts",

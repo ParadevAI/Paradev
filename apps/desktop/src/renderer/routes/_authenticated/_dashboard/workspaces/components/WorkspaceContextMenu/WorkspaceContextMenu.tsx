@@ -8,7 +8,7 @@ import {
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
 import { toast } from "@superset/ui/sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { type ReactNode, useCallback } from "react";
 import {
 	LuArchive,
@@ -26,9 +26,13 @@ import { useHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { useCopyShareLink } from "renderer/routes/_authenticated/_dashboard/hooks/useCopyShareLink";
 import { useCloudSidebarStore } from "renderer/routes/_authenticated/_dashboard/stores/cloudSidebarStore";
-import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import {
+	navigateToWorkspace,
+	navigateToWorkspaceAndThen,
+} from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useDeleteWorkspaceIntent } from "renderer/stores/delete-workspace-intent";
@@ -73,6 +77,7 @@ export function WorkspaceContextMenu({
 }: WorkspaceContextMenuProps) {
 	const { t } = useLingui();
 	const navigate = useNavigate();
+	const router = useRouter();
 	const { gateFeature } = usePaywall();
 	const { ensureWorkspaceInSidebar, hideWorkspaceInSidebar } =
 		useDashboardSidebarState();
@@ -112,7 +117,9 @@ export function WorkspaceContextMenu({
 	const open = useCallback(() => {
 		if (isArchived) return;
 		const go = () => {
-			void navigateToWorkspace(workspace.id, navigate).then(markSeen);
+			void navigateToWorkspaceAndThen(workspace.id, router, markSeen).catch(
+				reportRendererError,
+			);
 		};
 		if (workspace.hostType === "remote-device") {
 			gateFeature(GATED_FEATURES.REMOTE_ACCESS, go);
@@ -123,7 +130,7 @@ export function WorkspaceContextMenu({
 		gateFeature,
 		isArchived,
 		markSeen,
-		navigate,
+		router,
 		workspace.hostType,
 		workspace.id,
 	]);

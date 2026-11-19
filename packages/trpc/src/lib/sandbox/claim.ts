@@ -31,7 +31,7 @@ import {
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
 import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
-import { boxLogsEnabled, organizationFlagEnabled } from "../feature-flags";
+import { organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
@@ -99,7 +99,11 @@ export async function buildSandboxClaim(args: {
 			? resolveAgentSignIns({ userId: args.row.createdByUserId })
 			: Promise.resolve({ env: {}, codexChatgpt: null }),
 		env.SENTRY_DSN_SANDBOX
-			? boxLogsEnabled(posthog, args.row.organizationId)
+			? organizationFlagEnabled(
+					posthog,
+					FEATURE_FLAGS.SANDBOX_BOX_LOGS,
+					args.row.organizationId,
+				)
 			: false,
 	]);
 	if (!environment) throw new Error("Environment not found");

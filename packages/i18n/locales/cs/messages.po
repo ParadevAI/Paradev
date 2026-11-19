@@ -916,6 +916,12 @@ msgstr "{count, plural, one {načtena # stránka} few {načteny # stránky} many
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Importovat # worktree} few {Importovat # worktree} many {Importovat # worktree} other {Importovat # worktree}}"
 
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, one {v # pracovním prostoru za posledních 30 dní} few {ve # pracovních prostorech za posledních 30 dní} many {v # pracovního prostoru za posledních 30 dní} other {v # pracovních prostorech za posledních 30 dní}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, one {v # pracovním prostoru v tomto období} few {ve # pracovních prostorech v tomto období} many {v # pracovního prostoru v tomto období} other {v # pracovních prostorech v tomto období}}"
+
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, one {Sloučit # pull request?} few {Sloučit # pull requesty?} many {Sloučit # pull requestu?} other {Sloučit # pull requestů?}}"
 
@@ -1043,9 +1049,6 @@ msgstr "{gate} · {statusLabel}"
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
 
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} GB-hodin"
-
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# skrytý řádek} few {# skryté řádky} many {# skrytého řádku} other {# skrytých řádků}}"
 
@@ -1105,6 +1108,9 @@ msgstr "{label} se vrátí do nenastaveného stavu. V pracovních prostorech se 
 
 msgid "{label} is set to manual"
 msgstr "{label} nyní používá ruční přihlášení"
+
+msgid "{label} quota used: {summary}. Open usage settings"
+msgstr "Využitá kvóta {label}: {summary}. Otevřít nastavení využití"
 
 msgid "{level} · {gate} · {statusLabel}"
 msgstr "{level} · {gate} · {statusLabel}"
@@ -1344,6 +1350,12 @@ msgstr "Zbývající tokeny: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} z # řádku} few {{first}–{last} z # řádků} many {{first}–{last} z # řádku} other {{first}–{last} z # řádků}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Zahrnuto s # místem} few {Zahrnuto se # místy} many {Zahrnuto s # místa} other {Zahrnuto s # místy}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} s"
 
@@ -1361,17 +1373,17 @@ msgstr "{shown} z {total}"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "zobrazeno {shownCount} · {0} · {1} tokenů"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}, {memory} GB"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# přeskočeno} few {# přeskočeno} many {# přeskočeno} other {# přeskočeno}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} hvězd a přibývá"
 
-msgid "{start} to {end}"
-msgstr "{start} až {end}"
-
-msgid "{start} to {end} (current)"
-msgstr "{start} až {end} (aktuální)"
+msgid "{start} – {end}"
+msgstr "{start} – {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
@@ -1430,8 +1442,14 @@ msgstr "{used} z {limit} prostředí"
 msgid "{used} of {size} tokens"
 msgstr "{used} z {size} tokenů"
 
+msgid "{used} of {total}"
+msgstr "{used} z {total}"
+
 msgid "{used} used"
 msgstr "Využito {used}"
+
+msgid "{used} used by you"
+msgstr "Vaše využití: {used}"
 
 msgid "{user} and {others} joined and left."
 msgstr "{user} a {others} se připojili a zase kanál opustili."
@@ -1459,9 +1477,6 @@ msgstr "{user} se znovu připojil(a)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} GB"
-
-msgid "{vcpus} vCPU, {memory} GB"
-msgstr "{vcpus} vCPU, {memory} GB"
 
 msgid "{waiting} Waiting"
 msgstr "Čeká: {waiting}"
@@ -1642,6 +1657,9 @@ msgstr "0 $"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Seed kolo 11,5 mil. USD pod vedením Union Square Ventures"
+
+msgid "0 rows"
+msgstr "0 řádků"
 
 msgid "1"
 msgstr "1"
@@ -2885,6 +2903,9 @@ msgstr "Jakékoli jméno"
 msgid "Any page"
 msgstr "Jakákoli stránka"
 
+msgid "Any person"
+msgstr "Kdokoli"
+
 msgid "Any project"
 msgstr "Jakýkoli projekt"
 
@@ -2899,6 +2920,9 @@ msgstr "Libovolný recenzent"
 
 msgid "any sender"
 msgstr "jakýkoli odesílatel"
+
+msgid "Any size"
+msgstr "Jakákoli velikost"
 
 msgid "Any status"
 msgstr "Jakýkoli stav"
@@ -3459,6 +3483,10 @@ msgstr "Čeká na vaši revizi"
 msgid "Awaiting review from you or your team"
 msgstr "Čeká na revizi od vás nebo vašeho týmu"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "Běží"
+
 msgid "Away"
 msgstr "Nepřítomen"
 
@@ -3586,9 +3614,6 @@ msgstr "Fakturace"
 msgid "Billing details"
 msgstr "Fakturační údaje"
 
-msgid "Billing period"
-msgstr "Fakturační období"
-
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Fakturace odmítla spustit cloudový pracovní prostor: plán organizace nezahrnuje cloudové pracovní prostory, nebo organizace dosáhla limitu využití cloudu. Cloudové pracovní prostory vyžadují plán Team nebo Ultra. Přejděte na vyšší plán nebo zvyšte limit v Nastavení > Fakturace, nebo spusťte automatizaci na zařízení."
 
@@ -3668,6 +3693,9 @@ msgstr "Vypůjčeno z toho, jak se známkují samořídící auta, a použito na
 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Spodní drawer, na dotykových zařízeních ovladatelný přejetím prstem."
+
+msgid "Bought credits"
+msgstr "Zakoupené kredity"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Zbývající zakoupené GB-hodiny: {prepaid}"
@@ -3892,6 +3920,12 @@ msgstr "Autorizací umožníte této aplikaci přístup k vašim datům podle je
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "Kliknutím na Pokračovat souhlasíte s <0>podmínkami služby</0> a <1>zásadami ochrany soukromí</1>."
+
+msgid "By day"
+msgstr "Podle dnů"
+
+msgid "By person"
+msgstr "Podle osob"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4828,9 +4862,6 @@ msgstr "Využití cloudu není pro tuto organizaci zapnuto."
 msgid "Cloud workspace"
 msgstr "Cloudový pracovní prostor"
 
-msgid "Cloud workspace usage for the whole organization."
-msgstr "Využití cloudových pracovních prostorů za celou organizaci."
-
 msgid "Cloud workspace: asleep"
 msgstr "Cloudový pracovní prostor: uspaný"
 
@@ -4855,6 +4886,9 @@ msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součá
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Cloudové pracovní prostory se nemohou spustit."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
@@ -5812,9 +5846,6 @@ msgstr "Nepodařilo se vypsat adresář"
 msgid "Could not load agents from {0}"
 msgstr "Nepodařilo se načíst agenty z {0}"
 
-msgid "Could not load cloud usage."
-msgstr "Využití cloudu se nepodařilo načíst."
-
 msgid "Could not load environments"
 msgstr "Nepodařilo se načíst prostředí"
 
@@ -5994,6 +6025,9 @@ msgstr "Relaci se nepodařilo spustit"
 
 msgid "Could not start the chat"
 msgstr "Chat se nepodařilo spustit"
+
+msgid "Could not start."
+msgstr "Nepodařilo se spustit."
 
 msgid "Could not steer"
 msgstr "Změna směru se nezdařila"
@@ -7773,6 +7807,9 @@ msgstr "Každá plocha má vlastní typografii. Změny se okamžitě projeví v 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Každý pracovní prostor dostane vlastní cloudový stroj a pracuje dál i se zavřeným notebookem. Stav sledujte na počítači, iPhonu nebo iPadu."
 
+msgid "Earlier period"
+msgstr "Předchozí období"
+
 msgid "Early 2024"
 msgstr "Zač. 2024"
 
@@ -8298,6 +8335,9 @@ msgstr "Velmi vysoké"
 msgid "Extra small"
 msgstr "Velmi malé"
 
+msgid "Extra usage"
+msgstr "Využití navíc"
+
 msgid "Extra usage limit reached"
 msgstr "Dosažen limit dodatečného využití"
 
@@ -8332,9 +8372,6 @@ msgstr "Selhalo"
 msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "Selhalo"
-
-msgid "Failed {failedAt}"
-msgstr "Selhalo {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Neúspěšná spuštění <0>· 7 d</0>"
@@ -8528,6 +8565,9 @@ msgstr "Nepodařilo se načíst obrázek"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Nepodařilo se načíst repozitáře. Zkuste to prosím znovu."
+
+msgid "Failed to load usage"
+msgstr "Využití se nepodařilo načíst"
 
 msgid "Failed to log out. Please try again."
 msgstr "Nepodařilo se odhlásit. Zkuste to prosím znovu."
@@ -9016,6 +9056,9 @@ msgstr "hotovo · pracoval 7 s"
 msgid "Finishing the move…"
 msgstr "Dokončování přesunu…"
 
+msgid "First page"
+msgstr "První stránka"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Poprvé? Zapněte přihlášení kódem zařízení v <0>nastavení ChatGPT</0>."
 
@@ -9280,6 +9323,13 @@ msgstr "Zakládající inženýr"
 
 msgid "Free"
 msgstr "Free"
+
+msgctxt "cloud allowance group"
+msgid "Free"
+msgstr "Zdarma"
+
+msgid "Free credits"
+msgstr "Kredity zdarma"
 
 msgid "Free for everyone"
 msgstr "Zdarma pro všechny"
@@ -10107,6 +10157,10 @@ msgstr "Identita"
 msgid "Idle"
 msgstr "Nečinný"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "Nečinný"
+
 msgid "Idle · branch pushed"
 msgstr "Nečinné · větev odeslána"
 
@@ -10177,6 +10231,9 @@ msgstr "Importovat vše"
 
 msgid "Import cookies and passwords…"
 msgstr "Importovat cookies a hesla…"
+
+msgid "Import custom theme?"
+msgstr "Importovat vlastní motiv?"
 
 msgid "Import each v1 project into v2. Already-imported projects show as Imported."
 msgstr "Importujte každý projekt v1 do v2. Již importované projekty jsou označeny jako importované."
@@ -10297,6 +10354,9 @@ msgstr "V revizi"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "V desktopové aplikaci {appName} otevřete Nastavení → Vzdálený přístup a zapněte „Povolit vzdálený přístup k tomuto zařízení přes relay“."
 
+msgid "in the last 30 days"
+msgstr "za posledních 30 dní"
+
 msgid "In the merge queue"
 msgstr "Ve frontě slučování"
 
@@ -10305,6 +10365,9 @@ msgstr "Ve frontě slučování. GitHub ho sloučí, až přijde na řadu."
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "V desktopové aplikaci Paradev otevřete <0>Nastavení → Vzhled → Motiv</0>."
+
+msgid "in this period"
+msgstr "v tomto období"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "Za méně než rok spustilo {productName} více než 145 000 vývojářů ze 180 zemí a vytvořilo přes 1,85 milionu pracovních prostorů agentů."
@@ -10335,6 +10398,9 @@ msgstr "Zahrnuto v Enterprise"
 
 msgid "Included with Team and Ultra."
 msgstr "Součástí plánů Team a Ultra."
+
+msgid "Included with the plan"
+msgstr "Zahrnuto v plánu"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Obsahuje variantu box specifickou pro Paradev"
@@ -10957,6 +11023,9 @@ msgstr "Poslední 3 měsíce"
 msgid "last 30 days"
 msgstr "posledních 30 dní"
 
+msgid "Last 30 days"
+msgstr "Posledních 30 dní"
+
 msgid "Last 4 weeks"
 msgstr "Poslední 4 týdny"
 
@@ -11030,6 +11099,9 @@ msgstr "Latence"
 
 msgid "Later messages are removed."
 msgstr "Pozdější zprávy budou odstraněny."
+
+msgid "Later period"
+msgstr "Další období"
 
 msgid "Latest"
 msgstr "Nejnovější"
@@ -11437,6 +11509,9 @@ msgstr "Načítám další..."
 
 msgid "Loading more…"
 msgstr "Načítám další…"
+
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Načítání stránky {loadingPage} z {targetPage}..."
 
 msgid "Loading project…"
 msgstr "Načítám projekt…"
@@ -12564,6 +12639,9 @@ msgstr "Další obrázek"
 msgid "Next match"
 msgstr "Další shoda"
 
+msgid "Next page"
+msgstr "Další stránka"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Další karta pravého postranního panelu"
 
@@ -12607,7 +12685,7 @@ msgstr "Noční audit"
 msgid "No"
 msgstr "Ne"
 
-#. placeholder {0}: AGENT_LABELS[agent]
+#. placeholder {0}: QUOTA_AGENT_LABELS[agent]
 msgid "No {0} logins on this host. Sign in and usage appears here."
 msgstr "Na tomto hostu nejsou žádná přihlášení {0}. Přihlaste se a využití se objeví tady."
 
@@ -13286,6 +13364,9 @@ msgstr "Na tomto hostu zatím nejsou žádné pracovní prostory"
 msgid "No workspaces yet"
 msgstr "Zatím žádné pracovní prostory"
 
+msgid "No workspaces."
+msgstr "Žádné pracovní prostory."
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Ne. {companyName} nikdy nezprostředkovává volání modelů přes proxy. Agenti používají vaše vlastní předplatná a klíče."
 
@@ -13334,6 +13415,9 @@ msgstr "Na tomto serveru není k dispozici"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Nepřiřazeno · nastavte v Nastavení → Odkazy"
 
+msgid "Not broken down yet"
+msgstr "Zatím nerozepsáno"
+
 msgid "Not configured"
 msgstr "Nenastaveno"
 
@@ -13345,6 +13429,9 @@ msgstr "Nepřipojeno"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App vaší organizace"
+
+msgid "Not counted by billing yet"
+msgstr "Zatím nezapočteno ve vyúčtování"
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
@@ -13517,6 +13604,12 @@ msgstr "Předměty"
 msgid "of {0}"
 msgstr "z {0}"
 
+msgid "of {cap} included"
+msgstr "z {cap} v plánu"
+
+msgid "of {cap} limit"
+msgstr "z limitu {cap}"
+
 msgid "of {total}"
 msgstr "z {total}"
 
@@ -13687,6 +13780,9 @@ msgstr "Tohoto hosta mohou smazat jen jeho vlastníci nebo vlastníci organizace
 msgid "Only images can be attached to a comment"
 msgstr "Ke komentáři lze připojit pouze obrázky"
 
+msgid "Only import themes from sources you trust."
+msgstr "Importujte motivy pouze z důvěryhodných zdrojů."
+
 msgid "Only its creator or an organization admin can change this agent"
 msgstr "Tohoto agenta může změnit jen jeho tvůrce nebo správce organizace"
 
@@ -13794,9 +13890,6 @@ msgstr "Toto připojení můžete používat jen vy. Kolegové si připojí vlas
 
 msgid "Only you. Teammates forward their own."
 msgstr "Jen vy. Kolegové si přesměrují vlastní."
-
-msgid "Only your own workspaces. Organization totals are for owners and admins."
-msgstr "Pouze vaše vlastní pracovní prostory. Souhrny organizace vidí vlastníci a správci."
 
 msgid "open"
 msgstr "otevřít"
@@ -14389,6 +14482,10 @@ msgstr "Originály"
 msgid "Other"
 msgstr "Ostatní"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Ostatní"
+
 msgid "Other apps"
 msgstr "Ostatní aplikace"
 
@@ -14501,6 +14598,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Stránka"
 
+msgid "Page {page} of {pages}"
+msgstr "Stránka {page} z {pages}"
+
 msgid "Page actions"
 msgstr "Akce stránky"
 
@@ -14557,6 +14657,10 @@ msgstr "stránkování"
 
 msgid "Pagination"
 msgstr "Stránkování"
+
+msgctxt "cloud allowance group"
+msgid "Paid"
+msgstr "Placené"
 
 msgid "Paid plans"
 msgstr "Placené tarify"
@@ -15331,6 +15435,9 @@ msgstr "Předchozí obrázek"
 msgid "Previous match"
 msgstr "Předchozí shoda"
 
+msgid "Previous page"
+msgstr "Předchozí stránka"
+
 msgid "Previous prompts"
 msgstr "Předchozí prompty"
 
@@ -15566,6 +15673,10 @@ msgstr "Vlastnosti"
 
 msgid "Provide either id or slug"
 msgstr "Zadejte buď id, nebo slug"
+
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "Připravuje se"
 
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Provisioning selhal a sandbox byl zrušen. Nic neběží a tento pracovní prostor nejde otevřít. Zkuste to znovu vytvořením nového."
@@ -16329,6 +16440,9 @@ msgstr "odebrat agenta"
 msgid "remove the PR link"
 msgstr "odebrat propojení s PR"
 
+msgid "Remove this filter"
+msgstr "Odebrat tento filtr"
+
 msgid "Remove trigger"
 msgstr "Odebrat spouštěč"
 
@@ -17066,6 +17180,9 @@ msgstr "Akce řádku"
 msgid "Rows changed"
 msgstr "Změněny řádky"
 
+msgid "Rows per page"
+msgstr "Řádků na stránku"
+
 msgid "Rule"
 msgstr "Pravidlo"
 
@@ -17206,7 +17323,7 @@ msgstr "běží"
 msgid "Running"
 msgstr "Běží"
 
-msgctxt "cloud workspace status"
+msgctxt "cloud workspace boot"
 msgid "Running"
 msgstr "Běží"
 
@@ -17657,6 +17774,9 @@ msgstr "Hledám použití Kbd"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Místa odebraná v průběhu období zůstanou aktivní do {0}."
+
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Místa, kredity a limit využití navíc zatím nejsou načteny. Zobrazí se po příští aktualizaci fakturačních údajů."
 
 msgid "Secondary"
 msgstr "Secondary"
@@ -18191,9 +18311,6 @@ msgstr "Sdílejte."
 msgid "Shared"
 msgstr "Sdílené"
 
-msgid "Shared across sessions using this login."
-msgstr "Sdíleno mezi relacemi používajícími toto přihlášení."
-
 msgid "Shared app components"
 msgstr "Sdílené komponenty aplikace"
 
@@ -18258,9 +18375,6 @@ msgstr "Zobrazit před ukončením aplikace potvrzovací dialog"
 msgid "Show a microphone in the chat composer. Speech is transcribed by ChatGPT when Codex is signed in to it, otherwise on your Mac when possible, and otherwise by Paradev's servers."
 msgstr "Zobrazit v editoru chatu mikrofon. Řeč přepisuje ChatGPT, pokud je k němu přihlášen Codex, jinak se přepisuje na vašem Macu, když to jde, a jinak na serverech Paradev."
 
-msgid "Show a Usage button in the home sidebar, under Pull requests"
-msgstr "Zobrazovat tlačítko Využití v postranním panelu domovské obrazovky pod pull requesty"
-
 msgid "Show all {count}"
 msgstr "Zobrazit všech {count}"
 
@@ -18324,6 +18438,9 @@ msgstr "Zobrazit méně souborů"
 msgid "Show file tree"
 msgstr "Zobrazit strom souborů"
 
+msgid "Show how much quota each model provider has used, at the bottom of the sidebar"
+msgstr "Zobrazit dole v postranním panelu, kolik kvóty každý poskytovatel modelů využil"
+
 msgid "Show in bar"
 msgstr "Zobrazit v liště"
 
@@ -18381,6 +18498,9 @@ msgstr "Zobrazit seznam pull requestů"
 msgid "Show pull request preview"
 msgstr "Zobrazit náhled pull requestu"
 
+msgid "Show quota rings on sidebar"
+msgstr "Zobrazit kroužky kvót v postranním panelu"
+
 msgid "Show resolved ({resolvedCount})"
 msgstr "Zobrazit vyřešené ({resolvedCount})"
 
@@ -18413,9 +18533,6 @@ msgstr "Zobrazit spouštěcí data"
 
 msgid "Show translation"
 msgstr "Zobrazit překlad"
-
-msgid "Show usage tab on sidebar"
-msgstr "Zobrazit kartu využití v postranním panelu"
 
 msgid "Show workspace activity"
 msgstr "Zobrazit aktivitu pracovního prostoru"
@@ -19148,10 +19265,6 @@ msgstr "spouští se"
 msgid "Starting"
 msgstr "Spouštím"
 
-msgctxt "cloud workspace status"
-msgid "Starting"
-msgstr "Spouští se"
-
 msgid "Starting {agentLabel}"
 msgstr "Spouštím {agentLabel}"
 
@@ -19300,22 +19413,20 @@ msgstr "zastaveno"
 msgid "Stopped"
 msgstr "Zastaveno"
 
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "Zastaveno"
+
 #. placeholder {0}: pressure.reap.processName
 #. placeholder {1}: gb(pressure.reap.rssMb)
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "Zastaveno {0} ({1} GB) pro uvolnění paměti"
-
-msgid "Stopped by a person"
-msgstr "Zastaveno osobou"
 
 msgid "Stopped by the usage limit"
 msgstr "Zastaveno limitem využití"
 
 msgid "Stopped moving {name}"
 msgstr "Přesun {name} byl zastaven"
-
-msgid "Stopped when idle"
-msgstr "Zastaveno při nečinnosti"
 
 msgid "Stopping the agent in {what}"
 msgstr "Zastavuje se agent v {what}"
@@ -19997,6 +20108,9 @@ msgstr "Nejlepší agent se změní.<0/>Vaše workflow ne."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Stroj se spustil s {actual} vCPU místo {wanted}. Restartujte ho a zkuste to znovu."
 
+msgid "The breakdown by plan is kept for the current period only."
+msgstr "Rozpis podle plánu se uchovává jen pro aktuální období."
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 
@@ -20068,6 +20182,9 @@ msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Rozšíření a jeho místní data se z tohoto prohlížeče smažou."
+
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "Limit využití navíc je procento z plánu, proto se jeho částka nezobrazuje."
 
 msgid "The factory"
 msgstr "Továrna"
@@ -20144,9 +20261,6 @@ msgstr "Člověk přečte každý řádek, než se sloučí."
 
 msgid "The image upload expired — attach it again"
 msgstr "Platnost nahrání obrázku vypršela — připojte ho znovu"
-
-msgid "The included and overage GB-hours are kept for the current period only."
-msgstr "Zahrnuté GB-hodiny a GB-hodiny nad rámec plánu se uchovávají jen pro aktuální období."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Popis práce se posouvá. Z inženýrů přestávají být písaři s vkusem a stávají se dispečery s vkusem: rozkládají práci, směrují ji flotilám a rozsuzují konflikty mezi agenty, kteří sáhli na stejný modul."
@@ -20656,14 +20770,14 @@ msgstr "Změní se jen zobrazovaný název, ne větev."
 msgid "this organization"
 msgstr "této organizace"
 
-msgid "This organization has no billing periods, so this page shows the last 30 days."
-msgstr "Tato organizace nemá fakturační období, proto stránka zobrazuje posledních 30 dní."
-
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho časový rozsah."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Tato stránka nepozná, kdy je dosažen limit využití."
 
 msgid "This page could not be loaded"
 msgstr "Tuto stránku se nepodařilo načíst"
@@ -20869,6 +20983,9 @@ msgstr "Tento pracovní prostor"
 
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
+
+msgid "This workspace has no usage in this period."
+msgstr "Tento pracovní prostor nemá v tomto období žádné využití."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Tento pracovní prostor mohl být odstraněn, nebo k němu už nemáte přístup."
@@ -21452,6 +21569,10 @@ msgstr "neznámý"
 msgid "Unknown"
 msgstr "Neznámá"
 
+msgctxt "boot end"
+msgid "Unknown"
+msgstr "Neznámé"
+
 msgctxt "person"
 msgid "Unknown"
 msgstr "Neznámá"
@@ -21594,6 +21715,9 @@ msgstr "Skript bez názvu"
 
 msgid "Untitled workspace"
 msgstr "Pracovní prostor bez názvu"
+
+msgid "Untrusted themes may put your data at risk."
+msgstr "Nedůvěryhodné motivy mohou ohrozit vaše data."
 
 msgid "Up next"
 msgstr "Další na řadě"
@@ -21773,20 +21897,20 @@ msgstr "Identifikátor vhodný do URL, jedinečný v rámci vaší organizace."
 msgid "Usage"
 msgstr "Využití"
 
-msgid "Usage by day"
-msgstr "Využití podle dnů"
-
-msgid "Usage by person"
-msgstr "Využití podle osob"
-
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
-msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
-msgstr "Využití se zobrazuje v den (UTC), kdy bylo vyúčtováno, což může být o něco později, než pracovní prostor běžel."
+msgid "usage limit"
+msgstr "limit využití"
+
+msgid "Usage limit"
+msgstr "Limit využití"
 
 msgid "Usage limit reached"
 msgstr "Dosažen limit využití"
+
+msgid "Usage limit reached."
+msgstr "Dosažen limit využití."
 
 msgid "Usage sections"
 msgstr "Sekce využití"
@@ -23110,6 +23234,9 @@ msgstr "Vaše organizace dosáhla limitu prostředí."
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Pouze vaše vlastní využití. Souhrny organizace, její kvóta a využití podle osob jsou pro vlastníky a administrátory."
+
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."
 
@@ -23124,9 +23251,6 @@ msgstr "Váš plán nezahrnuje cloudová prostředí."
 
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Váš plán nezahrnuje cloudová prostředí. Pro vytvoření přejděte na vyšší plán v Nastavení, Fakturace."
-
-msgid "Your plan includes no cloud GB-hours."
-msgstr "Váš plán nezahrnuje žádné cloudové GB-hodiny."
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Váš plán se změní na {planName} dne {startDate}. Dnes se nic neúčtuje."
