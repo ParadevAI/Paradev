@@ -111,6 +111,29 @@ describe("queryCloudUsage", () => {
 		]);
 	});
 
+	test("each person's row holds their days, in the same page", async () => {
+		const days = (items: { days?: { day: string; gbHours: number }[] }[]) =>
+			items.map((item) => item.days?.map((day) => [day.day, day.gbHours]));
+		const people = await usage({ groupBy: "user" });
+		expect(people.items.map((item) => item.ref?.name)).toEqual(["Maya", "Sam"]);
+		expect(days(people.items)).toEqual([
+			[
+				["2026-11-10", 18],
+				["2026-11-12", 0],
+				["2026-11-16", 0],
+			],
+			[
+				["2026-11-01", 16],
+				["2026-11-17", 0],
+			],
+		]);
+		const first = await usage({ groupBy: "user", limit: 1 });
+		expect(days(first.items)).toEqual([days(people.items)[0]]);
+		expect((await usage({ groupBy: "day" })).items[0]).not.toHaveProperty(
+			"days",
+		);
+	});
+
 	test("a workspace that failed with no boot appears with its failure", async () => {
 		const { items } = await usage({
 			groupBy: "workspace",
@@ -121,8 +144,14 @@ describe("queryCloudUsage", () => {
 				id: BROKEN,
 				name: "broken-env",
 				status: "failed",
+				deleted: false,
 				size: "large",
-				owner: { id: MAYA, name: "Maya", email: "Maya@example.com" },
+				owner: {
+					id: MAYA,
+					name: "Maya",
+					email: "Maya@example.com",
+					image: null,
+				},
 				failure: {
 					reason: "snapshot_expired",
 					at: new Date("2026-11-16T14:03:00Z"),

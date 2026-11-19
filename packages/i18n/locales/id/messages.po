@@ -469,6 +469,7 @@ msgstr "{0} berakhiran {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{0} file sudah ada di {where}. Ingin menggantinya?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-jam"
@@ -1028,6 +1029,9 @@ msgstr "{fileCount, plural, one {# file berubah di workspace ini} other {# file 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Mengedit # file} other {Mengedit # file}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} dari {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} untuk fokus"
 
@@ -1226,6 +1230,9 @@ msgstr "{openCount} terbuka"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Juga berubah di workspace ini: # file} other {Juga berubah di workspace ini: # file}}"
 
+msgid "{over} overage"
+msgstr "kelebihan {over}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} dapat membaca dan mengubah data di akun {pluginLabel} Anda atas nama Anda, termasuk di versi halaman ini yang akan datang. Halaman ini dapat mengirim apa yang dibacanya ke situs web lain. Izinkan hanya halaman yang Anda percayai."
 
@@ -1349,9 +1356,6 @@ msgstr "Sisa {remaining} token"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Perubahan pada # file dibatalkan.} other {Perubahan pada # file dibatalkan.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {{first}–{last} dari # baris}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {Termasuk dengan # kursi}}"
@@ -1657,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Pendanaan awal $11,5 juta yang dipimpin Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 baris"
 
 msgid "1"
 msgstr "1"
@@ -3602,6 +3603,9 @@ msgstr "Sedang dibangun sekarang."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Di luar itu: F5 bukan klaim jangka dekat"
 
+msgid "Billed hours"
+msgstr "Jam yang ditagih"
+
 msgid "Billed monthly"
 msgstr "Ditagih bulanan"
 
@@ -4862,6 +4866,9 @@ msgstr "Penggunaan cloud"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace tidak dapat dimulai."
+
 msgid "Cloud workspace"
 msgstr "Workspace cloud"
 
@@ -4889,9 +4896,6 @@ msgstr "Workspace cloud tidak diaktifkan untuk {account}. Workspace cloud tersed
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Ruang kerja cloud tidak termasuk dalam paket Anda."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Workspace cloud tidak dapat dimulai."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
@@ -8338,9 +8342,6 @@ msgstr "Sangat tinggi"
 msgid "Extra small"
 msgstr "Ekstra kecil"
 
-msgid "Extra usage"
-msgstr "Penggunaan tambahan"
-
 msgid "Extra usage limit reached"
 msgstr "Batas penggunaan tambahan tercapai"
 
@@ -9327,10 +9328,6 @@ msgstr "Engineer Pendiri"
 msgid "Free"
 msgstr "Gratis"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Gratis"
-
 msgid "Free credits"
 msgstr "Kredit gratis"
 
@@ -9988,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Tiap jam"
-
-msgid "Hours"
-msgstr "Jam"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Jam dibagi ke seluruh tim Anda. Jam dihitung dengan workspace standar {vcpus} vCPU / {memoryGb} GB, dan mesin yang lebih besar menghabiskannya lebih cepat."
@@ -11513,9 +11507,6 @@ msgstr "Memuat lagi..."
 msgid "Loading more…"
 msgstr "Memuat lagi…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Memuat halaman {loadingPage} dari {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Memuat proyek…"
 
@@ -12808,9 +12799,6 @@ msgstr "Belum ada penggunaan Claude atau Codex di mesin ini. Gabung sekarang dan
 msgid "No cloud environment opens {repository}."
 msgstr "Tidak ada lingkungan cloud yang membuka {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "Tidak ada penggunaan cloud pada periode ini."
-
 msgid "No cloud workspaces"
 msgstr "Tidak ada workspace cloud"
 
@@ -13418,9 +13406,6 @@ msgstr "Tidak tersedia di server ini"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Tidak terikat · atur di Pengaturan → Tautan"
 
-msgid "Not broken down yet"
-msgstr "Belum dirinci"
-
 msgid "Not configured"
 msgstr "Belum dikonfigurasi"
 
@@ -13432,9 +13417,6 @@ msgstr "Tidak Terhubung"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Belum terhubung · workspace cloud melakukan push sebagai GitHub App organisasi Anda"
-
-msgid "Not counted by billing yet"
-msgstr "Belum dihitung oleh penagihan"
 
 msgid "Not demoed here"
 msgstr "Tidak didemokan di sini"
@@ -13474,6 +13456,10 @@ msgstr "Tidak ada di versi ini"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Belum menerima event: Microsoft Graph menolak langganan notifikasi. Periksa persetujuan admin aplikasi dan persetujuan protected API, lalu hubungkan ulang."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Tidak tercatat"
 
 msgid "Not reported yet"
 msgstr "Belum dilaporkan"
@@ -13607,11 +13593,8 @@ msgstr "Objek"
 msgid "of {0}"
 msgstr "dari {0}"
 
-msgid "of {cap} included"
-msgstr "dari {cap} yang termasuk"
-
-msgid "of {cap} limit"
-msgstr "dari batas {cap}"
+msgid "of {held}"
+msgstr "dari {held}"
 
 msgid "of {total}"
 msgstr "dari {total}"
@@ -14485,10 +14468,6 @@ msgstr "Orisinal"
 msgid "Other"
 msgstr "Lainnya"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Lainnya"
-
 msgid "Other apps"
 msgstr "Aplikasi lain"
 
@@ -14601,9 +14580,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Halaman"
 
-msgid "Page {page} of {pages}"
-msgstr "Halaman {page} dari {pages}"
-
 msgid "Page actions"
 msgstr "Tindakan halaman"
 
@@ -14660,10 +14636,6 @@ msgstr "paginasi"
 
 msgid "Pagination"
 msgstr "Paginasi"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Berbayar"
 
 msgid "Paid plans"
 msgstr "Paket berbayar"
@@ -16443,9 +16415,6 @@ msgstr "menghapus agen"
 msgid "remove the PR link"
 msgstr "menghapus tautan PR"
 
-msgid "Remove this filter"
-msgstr "Hapus filter ini"
-
 msgid "Remove trigger"
 msgstr "Hapus pemicu"
 
@@ -17305,6 +17274,9 @@ msgstr "Jalankan ini di terminal, lalu lanjutkan:"
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Jalankan ini di terminal, lalu tempel token yang ditampilkannya:"
 
+msgid "Run time"
+msgstr "Waktu berjalan"
+
 msgid "Run workspace command"
 msgstr "Jalankan perintah workspace"
 
@@ -17777,9 +17749,6 @@ msgstr "Mencari penggunaan Kbd"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Kursi yang dihapus di tengah siklus tetap aktif hingga {0}."
-
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Kursi, kredit, dan batas penggunaan tambahan belum dimuat. Semuanya muncul saat data penagihan diperbarui berikutnya."
 
 msgid "Secondary"
 msgstr "Secondary"
@@ -20111,9 +20080,6 @@ msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Mesin aktif kembali dengan {actual} vCPU, bukan {wanted}. Mulai ulang untuk mencoba lagi."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Rincian per paket hanya disimpan untuk periode saat ini."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tombolnya kini menonjol. Saya sudah memeriksanya di panel Anda."
 
@@ -20185,9 +20151,6 @@ msgstr "Environment yang digunakan otomatisasi ini untuk memulai workspace cloud
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Ekstensi dan data lokalnya dihapus dari browser ini."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Batas penggunaan tambahan adalah persentase dari paket, jadi jumlahnya tidak ditampilkan."
 
 msgid "The factory"
 msgstr "Pabriknya"
@@ -20785,9 +20748,6 @@ msgstr "Organisasi ini tidak memiliki periode penagihan. Pilih rentang waktu seb
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Organisasi ini memakai paket Gratis. {appName} Mobile tersedia untuk organisasi dengan paket Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Halaman ini tidak dapat mengetahui kapan batas penggunaan tercapai."
 
 msgid "This page could not be loaded"
 msgstr "Halaman ini tidak bisa dimuat"
@@ -21579,10 +21539,6 @@ msgstr "tidak diketahui"
 msgid "Unknown"
 msgstr "Tidak diketahui"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Tidak diketahui"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Tidak diketahui"
@@ -21910,17 +21866,11 @@ msgstr "Penggunaan"
 msgid "Usage is out of date"
 msgstr "Data penggunaan sudah tidak mutakhir"
 
-msgid "usage limit"
-msgstr "batas penggunaan"
-
 msgid "Usage limit"
 msgstr "Batas penggunaan"
 
 msgid "Usage limit reached"
 msgstr "Batas penggunaan tercapai"
-
-msgid "Usage limit reached."
-msgstr "Batas penggunaan tercapai."
 
 msgid "Usage sections"
 msgstr "Bagian penggunaan"
@@ -23054,9 +23004,6 @@ msgstr "Anda tidak punya akses ke terminal ini."
 msgid "You don't have permission to remove this member"
 msgstr "Anda tidak punya izin untuk menghapus anggota ini"
 
-msgid "You have no cloud usage in this period."
-msgstr "Anda tidak memiliki penggunaan cloud pada periode ini."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Ada variabel environment yang belum disimpan. Yakin ingin menutup?"
 
@@ -23243,9 +23190,6 @@ msgstr "Organisasi Anda telah mencapai batas lingkungan."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Paradev menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Paradev untuk Anda tampil atas nama Anda."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Hanya penggunaan Anda sendiri. Total organisasi, jatahnya, dan penggunaan per orang hanya untuk pemilik dan admin."
 
 msgid "Your Paradev download is starting."
 msgstr "Unduhan Paradev Anda sedang dimulai."

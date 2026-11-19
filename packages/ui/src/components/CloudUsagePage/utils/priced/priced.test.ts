@@ -9,7 +9,7 @@ import {
 import type { CloudPeriod, CloudUsage } from "../../types";
 import { priced, pricedPages, pricedQuery } from "./priced";
 
-const { allowance, total } = cardArgs("northwind");
+const { allowance, metered } = cardArgs("northwind");
 const page = workspacePages()[0] as NonNullable<
 	ReturnType<typeof workspacePages>[number]
 >;
@@ -20,7 +20,7 @@ describe("priced", () => {
 			data: page,
 			isError: false,
 		});
-		expect(total.usageUsd).toBeGreaterThan(0);
+		expect(metered.usd).toBeGreaterThan(0);
 	});
 
 	it("turns usage without prices into a load failure", () => {

@@ -53,6 +53,7 @@ export const PEOPLE: PersonRef[] = [
 	id: `00000000-0000-4000-8000-00000000000${i + 1}`,
 	name,
 	email: `${name.split(" ")[0]?.toLowerCase()}@example.com`,
+	image: null,
 }));
 const [PRIYA, INES, SAM, THEO, MAYA] = PEOPLE as [
 	PersonRef,
@@ -136,6 +137,7 @@ function workspaceSeeds(count: number, names?: string[]): Seed[] {
 			id: `ws-${i + 1}`,
 			name: names?.[i] ?? `${pick(WORDS)}-${pick(WORDS)}-${pick(WORDS)}`,
 			status,
+			deleted: false,
 			size: pick(SIZES),
 			owner: i === 0 ? SAM : pick([PRIYA, PRIYA, INES, SAM, THEO, MAYA]),
 			failure:
@@ -312,12 +314,26 @@ function byDay({ rows, boots }: Fleet, range: Range): Usage {
 	return usage(items, rows, range);
 }
 
-function byPerson({ rows }: Fleet, range: Range): Usage {
+/** `groupBy: "user"`, with each person's days. */
+function byPerson({ rows, boots }: Fleet, range: Range): Usage {
+	const daysOf = (personId: string) => {
+		const days = new Map<string, Boot[]>();
+		for (const boot of boots)
+			if (boot.user?.id === personId) {
+				const key = day(boot.startedAt);
+				days.set(key, [...(days.get(key) ?? []), boot]);
+			}
+		return [...days].sort().map(([key, list]) => {
+			const { gbHours, usageUsd } = metricsOf(list);
+			return { day: key, gbHours, usageUsd };
+		});
+	};
 	const items = PEOPLE.map((person) => ({
 		key: person.id,
 		label: person.name,
 		ref: person,
 		...total(rows.filter((row) => workspaceRef(row)?.owner?.id === person.id)),
+		days: daysOf(person.id),
 	}))
 		.filter((item) => item.gbHours > 0)
 		.sort((a, b) => b.gbHours - a.gbHours);
@@ -326,7 +342,6 @@ function byPerson({ rows }: Fleet, range: Range): Usage {
 
 const TOP_WORKSPACES = 8;
 
-// The organizations of the design's Customer tab: their seats, seat grant and usage.
 const NORTHWIND_SEEDS = workspaceSeeds(43);
 const LONG_SEEDS = workspaceSeeds(12, [
 	"migrate-the-whole-billing-pipeline-to-the-new-event-store-without-downtime",
@@ -426,15 +441,15 @@ const STATES = {
 		unavailable: [],
 	},
 	limitReached: {
-		eventsGbHours: 4650,
+		eventsGbHours: 4590,
 		allowance: {
 			includedGbHours: 4500,
-			usedGbHours: 4650,
-			overageGbHours: 150,
+			usedGbHours: 4500,
+			overageGbHours: 0,
 			prepaidRemainingGbHours: 0,
-			usedUsd: 279,
+			usedUsd: 270,
 			includedUsd: 270,
-			overageUsd: 9,
+			overageUsd: 0,
 			seats: 9,
 			bought: null,
 			freeCredits: null,
@@ -444,32 +459,72 @@ const STATES = {
 		},
 		unavailable: [],
 	},
-	percentCap: {
-		eventsGbHours: 15200,
+	toppedUp: {
+		eventsGbHours: 4590,
 		allowance: {
-			includedGbHours: 7000,
-			usedGbHours: 13200,
-			overageGbHours: 6200,
-			prepaidRemainingGbHours: 0,
-			usedUsd: 792,
-			includedUsd: 420,
-			overageUsd: 372,
-			seats: 14,
-			bought: null,
-			freeCredits: {
-				usedGbHours: 2000,
-				totalGbHours: 2000,
-				usedUsd: 120,
-				totalUsd: 120,
+			includedGbHours: 4500,
+			usedGbHours: 4500,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 4410,
+			usedUsd: 270,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: {
+				usedGbHours: 90,
+				totalGbHours: 4500,
+				usedUsd: 5.4,
+				totalUsd: 270,
 			},
-			extraUsageLimit: null,
-			limitReached: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
 			resetsAt: PERIOD_END,
 		},
-		unavailable: [
-			{ field: "extraUsageLimit", reason: "percent_of_allowance" },
-			{ field: "limitReached", reason: "not_tracked" },
-		],
+		unavailable: [],
+	},
+	freeCredit: {
+		eventsGbHours: 4800,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 4500,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 700,
+			usedUsd: 270,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 300,
+				totalGbHours: 1000,
+				usedUsd: 18,
+				totalUsd: 60,
+			},
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	contractOver: {
+		eventsGbHours: 9000,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 9000,
+			overageGbHours: 2000,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 540,
+			includedUsd: 420,
+			overageUsd: 120,
+			seats: 14,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 1000000, usd: 60000 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
 	},
 	notRead: {
 		eventsGbHours: 15200,
@@ -516,6 +571,71 @@ const STATES = {
 			},
 			extraUsageLimit: { gbHours: 27000, usd: 1620 },
 			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	reattached: {
+		eventsGbHours: 17159.5,
+		allowance: {
+			includedGbHours: 6000,
+			usedGbHours: 6000,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 3847.85,
+			usedUsd: 360,
+			includedUsd: 360,
+			overageUsd: 0,
+			seats: 5,
+			bought: {
+				usedGbHours: 3178.08,
+				totalGbHours: 7025.929999999999,
+				usedUsd: 190.68,
+				totalUsd: 421.56,
+			},
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	raisedByHand: {
+		eventsGbHours: 3000,
+		allowance: {
+			includedGbHours: 833.33,
+			usedGbHours: -850.98,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 0,
+			usedUsd: -51.06,
+			includedUsd: 50,
+			overageUsd: 0,
+			seats: 1,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: null,
+			limitReached: null,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [
+			{ field: "extraUsageLimit", reason: "percent_of_allowance" },
+			{ field: "limitReached", reason: "not_tracked" },
+		],
+	},
+	overageOffBilled: {
+		eventsGbHours: 2732.54,
+		allowance: {
+			includedGbHours: 1200,
+			usedGbHours: 2732.54,
+			overageGbHours: 1532.54,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 163.95,
+			includedUsd: 72,
+			overageUsd: 91.95,
+			seats: 1,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: true,
 			resetsAt: PERIOD_END,
 		},
 		unavailable: [],
@@ -637,19 +757,25 @@ export function noPeriodsArgs() {
 /** The allowance card's arguments in a billing state. */
 export function cardArgs(state: BillingState, back = 0) {
 	const args = overviewArgs(state, { back });
+	const { total } = args.byDay.data as Usage;
+	const allowance = priced(args.period?.allowance ?? null);
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: args.period,
-		allowance: priced(args.period?.allowance ?? null),
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		allowance,
+		unavailable: args.period?.unavailable ?? [],
+		isPeriod: true,
+		seats: allowance?.seats ?? null,
 	};
 }
 
 export function lastThirtyDaysCardArgs() {
-	const args = noPeriodsArgs();
+	const { total } = noPeriodsArgs().byDay.data as Usage;
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: undefined,
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
 		allowance: null,
+		unavailable: [],
+		isPeriod: false,
+		seats: null,
 	};
 }
 
@@ -694,6 +820,7 @@ export function workspaceArgs(which: WorkspaceRef["status"] | "long") {
 	) as Row;
 	const one = query(usage([row], [row], CURRENT));
 	return {
+		workspaceId: row.key ?? "",
 		periods: query(workspacesPeriods),
 		period: workspacesPeriods.items[0],
 		workspace: one,

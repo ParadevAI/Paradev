@@ -469,6 +469,7 @@ msgstr "{0} 끝자리 {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{where}에 파일 {0}개가 이미 있습니다. 바꿀까요?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB 시간"
@@ -1028,6 +1029,9 @@ msgstr "{fileCount, plural, one {이 워크스페이스에서 변경된 파일 #
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {파일 #개 편집} other {파일 #개 편집}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{total}개 중 {first}–{last}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "포커스하려면 {focusShortcutText}"
 
@@ -1226,6 +1230,9 @@ msgstr "{openCount}개 열림"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {이 워크스페이스에서 함께 변경됨: 파일 #개} other {이 워크스페이스에서 함께 변경됨: 파일 #개}}"
 
+msgid "{over} overage"
+msgstr "초과 {over}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle}은(는) 사용자 본인으로서 {pluginLabel} 계정의 데이터를 읽고 변경할 수 있으며, 이 페이지의 향후 버전에도 적용됩니다. 읽은 내용을 다른 웹사이트로 보낼 수 있습니다. 신뢰하는 페이지만 허용하세요."
 
@@ -1349,9 +1356,6 @@ msgstr "{remaining} 토큰 남음"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {파일 #개의 변경을 취소했습니다.} other {파일 #개의 변경을 취소했습니다.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {#개 행 중 {first}–{last}}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {좌석 #개에 포함}}"
@@ -1657,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures가 주도한 1,150만 달러 시드 투자"
-
-msgid "0 rows"
-msgstr "0개 행"
 
 msgid "1"
 msgstr "1"
@@ -3602,6 +3603,9 @@ msgstr "지금 만들고 있습니다."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "그 너머: F5는 단기 전망이 아닙니다"
 
+msgid "Billed hours"
+msgstr "청구 시간"
+
 msgid "Billed monthly"
 msgstr "월간 결제"
 
@@ -4862,6 +4866,9 @@ msgstr "클라우드 사용량"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "이 조직에는 클라우드 사용량이 켜져 있지 않습니다."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "이번 기간의 클라우드 사용량을 모두 사용했습니다. 워크스페이스를 시작할 수 없습니다."
+
 msgid "Cloud workspace"
 msgstr "클라우드 워크스페이스"
 
@@ -4889,9 +4896,6 @@ msgstr "{account}에는 클라우드 워크스페이스가 활성화되어 있�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "클라우드 워크스페이스는 현재 플랜에 포함되어 있지 않습니다."
-
-msgid "Cloud workspaces cannot start."
-msgstr "클라우드 워크스페이스를 시작할 수 없습니다."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시하고 풀 리퀘스트를 엽니다"
@@ -8338,9 +8342,6 @@ msgstr "매우 높음"
 msgid "Extra small"
 msgstr "아주 작음"
 
-msgid "Extra usage"
-msgstr "추가 사용량"
-
 msgid "Extra usage limit reached"
 msgstr "추가 사용량 한도에 도달했습니다"
 
@@ -9327,10 +9328,6 @@ msgstr "창립 엔지니어"
 msgid "Free"
 msgstr "무료"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "무료"
-
 msgid "Free credits"
 msgstr "무료 크레딧"
 
@@ -9988,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "매시간"
-
-msgid "Hours"
-msgstr "시간"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "시간은 팀 전체가 공유합니다. 표준 {vcpus} vCPU / {memoryGb} GB 워크스페이스 기준이며, 더 큰 머신은 더 빨리 사용합니다."
@@ -11513,9 +11507,6 @@ msgstr "더 불러오는 중..."
 msgid "Loading more…"
 msgstr "더 불러오는 중…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "{targetPage}페이지 중 {loadingPage}페이지를 불러오는 중..."
-
 msgid "Loading project…"
 msgstr "프로젝트 불러오는 중…"
 
@@ -12808,9 +12799,6 @@ msgstr "이 컴퓨터에서 아직 Claude 또는 Codex 사용량을 찾지 못�
 msgid "No cloud environment opens {repository}."
 msgstr "{repository}을(를) 여는 클라우드 환경이 없습니다."
 
-msgid "No cloud usage in this period."
-msgstr "이 기간에 클라우드 사용량이 없습니다."
-
 msgid "No cloud workspaces"
 msgstr "클라우드 워크스페이스 없음"
 
@@ -13418,9 +13406,6 @@ msgstr "이 서버에서는 사용할 수 없습니다"
 msgid "Not bound · configure in Settings → Links"
 msgstr "지정되지 않음 · 설정 → 링크에서 구성하세요"
 
-msgid "Not broken down yet"
-msgstr "아직 세부 내역 없음"
-
 msgid "Not configured"
 msgstr "구성되지 않음"
 
@@ -13432,9 +13417,6 @@ msgstr "연결 안 됨"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "연결되지 않음 · 클라우드 워크스페이스가 조직의 GitHub App으로 푸시합니다"
-
-msgid "Not counted by billing yet"
-msgstr "아직 청구에 반영되지 않음"
 
 msgid "Not demoed here"
 msgstr "여기서는 시연하지 않음"
@@ -13474,6 +13456,10 @@ msgstr "이 버전에는 없음"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "아직 이벤트를 받지 못하고 있습니다. Microsoft Graph가 알림 구독을 거부했습니다. 앱의 관리자 동의와 보호된 API 승인을 확인한 뒤 다시 연결하세요."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "기록 없음"
 
 msgid "Not reported yet"
 msgstr "아직 보고되지 않음"
@@ -13607,11 +13593,8 @@ msgstr "사물"
 msgid "of {0}"
 msgstr "{0} 중"
 
-msgid "of {cap} included"
-msgstr "({cap} 포함)"
-
-msgid "of {cap} limit"
-msgstr "(한도 {cap})"
+msgid "of {held}"
+msgstr "/ {held}"
 
 msgid "of {total}"
 msgstr "{total}명 중"
@@ -14485,10 +14468,6 @@ msgstr "오리지널"
 msgid "Other"
 msgstr "기타"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "기타"
-
 msgid "Other apps"
 msgstr "다른 앱"
 
@@ -14601,9 +14580,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "페이지"
 
-msgid "Page {page} of {pages}"
-msgstr "{page} / {pages} 페이지"
-
 msgid "Page actions"
 msgstr "페이지 작업"
 
@@ -14660,10 +14636,6 @@ msgstr "페이지 매김"
 
 msgid "Pagination"
 msgstr "페이지네이션"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "유료"
 
 msgid "Paid plans"
 msgstr "유료 요금제"
@@ -16443,9 +16415,6 @@ msgstr "에이전트를 제거할"
 msgid "remove the PR link"
 msgstr "PR 링크를 제거할"
 
-msgid "Remove this filter"
-msgstr "이 필터 제거"
-
 msgid "Remove trigger"
 msgstr "트리거 제거"
 
@@ -17305,6 +17274,9 @@ msgstr "터미널에서 이 명령을 실행한 후 계속하세요:"
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "터미널에서 이 명령을 실행한 다음 출력된 토큰을 붙여 넣으세요:"
 
+msgid "Run time"
+msgstr "실행 시간"
+
 msgid "Run workspace command"
 msgstr "워크스페이스 명령 실행"
 
@@ -17777,9 +17749,6 @@ msgstr "Kbd 사용처를 검색하는 중"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "주기 중간에 제거한 좌석은 {0}까지 활성 상태로 유지됩니다."
-
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "좌석, 크레딧, 추가 사용량 한도가 아직 로드되지 않았습니다. 다음에 결제 데이터가 새로 고쳐지면 표시됩니다."
 
 msgid "Secondary"
 msgstr "보조"
@@ -20111,9 +20080,6 @@ msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "요금제별 내역은 현재 기간에만 보관됩니다."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 
@@ -20185,9 +20151,6 @@ msgstr "이 자동화가 클라우드 워크스페이스를 시작하는 환경�
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "확장 프로그램과 로컬 데이터가 이 브라우저에서 삭제됩니다."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "추가 사용량 한도는 요금제에 대한 비율이므로 금액이 표시되지 않습니다."
 
 msgid "The factory"
 msgstr "공장"
@@ -20785,9 +20748,6 @@ msgstr "이 조직에는 청구 기간이 없습니다. 대신 시간 범위를 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "이 페이지에서는 사용량 한도에 도달했는지 알 수 없습니다."
 
 msgid "This page could not be loaded"
 msgstr "이 페이지를 불러올 수 없습니다"
@@ -21579,10 +21539,6 @@ msgstr "알 수 없음"
 msgid "Unknown"
 msgstr "알 수 없음"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "알 수 없음"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "알 수 없음"
@@ -21910,17 +21866,11 @@ msgstr "사용량"
 msgid "Usage is out of date"
 msgstr "사용량 정보가 오래되었습니다"
 
-msgid "usage limit"
-msgstr "사용량 한도"
-
 msgid "Usage limit"
 msgstr "사용량 한도"
 
 msgid "Usage limit reached"
 msgstr "사용량 한도에 도달했습니다"
-
-msgid "Usage limit reached."
-msgstr "사용량 한도에 도달했습니다."
 
 msgid "Usage sections"
 msgstr "사용량 섹션"
@@ -23054,9 +23004,6 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
 
-msgid "You have no cloud usage in this period."
-msgstr "이 기간에 내 클라우드 사용량이 없습니다."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
 
@@ -23243,9 +23190,6 @@ msgstr "조직이 환경 한도에 도달했습니다."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "내 사용량만 표시됩니다. 조직의 합계, 할당량, 사람별 사용량은 소유자와 관리자만 볼 수 있습니다."
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."

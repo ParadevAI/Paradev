@@ -105,6 +105,11 @@ describe("scope", () => {
 			groupBy: "user",
 		});
 		expect(byUser.items.map((item) => item.key)).toEqual([MAYA, SAM]);
+		expect(byUser.items[1]?.days?.[0]).toEqual({
+			day: "2026-11-01",
+			gbHours: 16,
+			usageUsd: 0.96,
+		});
 		const [open] = (await owner.periods.list({})).items;
 		expect(open?.allowance).toMatchObject({
 			includedGbHours: 20,
@@ -249,6 +254,23 @@ describe("scope", () => {
 		await expect(
 			caller(SAM).usage.query({ range: NOVEMBER, groupBy: "user" }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
+	});
+
+	test("a member opening another person's workspace by id gets nothing of it", async () => {
+		const member = caller(SAM);
+		const usage = await member.usage.query({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+			groupBy: "workspace",
+			limit: 1,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+		const boots = await member.boots.list({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+		});
+		expect(boots.items).toEqual([]);
 	});
 });
 

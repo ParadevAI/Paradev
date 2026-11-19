@@ -20,6 +20,7 @@ const userRefSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	email: z.string(),
+	image: z.string().nullable(),
 });
 
 export const metricsSchema = z.object({
@@ -37,12 +38,23 @@ export const cloudUsageOutputSchema = z.object({
 		metricsSchema.extend({
 			key: z.string().nullable(),
 			label: z.string().nullable(),
+			/** Grouped by user only: the person's usage on each UTC day that has any. */
+			days: z
+				.array(
+					z.object({
+						day: z.iso.date(),
+						gbHours: z.number(),
+						usageUsd: z.number().nullable(),
+					}),
+				)
+				.optional(),
 			ref: z
 				.union([
 					z.object({
 						id: z.string(),
 						name: z.string(),
 						status: cloudWorkspaceStatusEnum,
+						deleted: z.boolean(),
 						size: machineSizeSchema,
 						owner: userRefSchema.nullable(),
 						failure: z
@@ -100,6 +112,8 @@ const periodUnavailableSchema = z.object({
 		...ALLOWANCE_UNAVAILABLE_REASONS,
 	]),
 });
+
+export type CloudPeriodUnavailable = z.infer<typeof periodUnavailableSchema>;
 
 /** Null when there is none of it. */
 const creditLineSchema = z

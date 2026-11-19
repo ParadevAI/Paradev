@@ -469,6 +469,7 @@ msgstr "{0} se terminant par {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "{0} fichiers existent déjà dans {where}. Voulez-vous les remplacer ?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} Go-heures"
@@ -1028,6 +1029,9 @@ msgstr "{fileCount, plural, one {# fichier modifié dans cet espace de travail} 
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# fichier modifié} other {# fichiers modifiés}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} sur {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pour activer"
 
@@ -1226,6 +1230,9 @@ msgstr "{openCount} ouvertes"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Aussi modifié dans cet espace de travail : # fichier} other {Aussi modifiés dans cet espace de travail : # fichiers}}"
 
+msgid "{over} overage"
+msgstr "{over} de dépassement"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} peut lire et modifier les données de votre compte {pluginLabel} en votre nom, y compris dans les futures versions de cette page. Elle peut envoyer ce qu’elle lit à d’autres sites web. N’autorisez que les pages de confiance."
 
@@ -1349,9 +1356,6 @@ msgstr "{remaining} tokens restants"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Modifications annulées sur # fichier.} other {Modifications annulées sur # fichiers.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} sur # ligne} other {{first}–{last} sur # lignes}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Inclus avec # siège} other {Inclus avec # sièges}}"
@@ -1657,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Levée d’amorçage de 11,5 M$ menée par Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 ligne"
 
 msgid "1"
 msgstr "1"
@@ -3602,6 +3603,9 @@ msgstr "En cours de construction en ce moment."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Au-delà : F5 n'est pas une promesse à court terme"
 
+msgid "Billed hours"
+msgstr "Heures facturées"
+
 msgid "Billed monthly"
 msgstr "Facturation mensuelle"
 
@@ -4862,6 +4866,9 @@ msgstr "Utilisation du cloud"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "L’utilisation du cloud n’est pas activée pour cette organisation."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "L’utilisation cloud de cette période est épuisée. Les espaces de travail ne peuvent pas démarrer."
+
 msgid "Cloud workspace"
 msgstr "Espace de travail cloud"
 
@@ -4889,9 +4896,6 @@ msgstr "Les espaces de travail cloud ne sont pas activés pour {account}. Ils so
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Les espaces de travail cloud ne sont pas inclus dans votre forfait."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Les espaces de travail cloud ne peuvent pas démarrer."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Les espaces de travail cloud commitent, poussent et ouvrent des pull requests en votre nom"
@@ -8338,9 +8342,6 @@ msgstr "Très élevé"
 msgid "Extra small"
 msgstr "Très petit"
 
-msgid "Extra usage"
-msgstr "Utilisation supplémentaire"
-
 msgid "Extra usage limit reached"
 msgstr "Limite d'utilisation supplémentaire atteinte"
 
@@ -9327,10 +9328,6 @@ msgstr "Ingénieur fondateur"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Gratuit"
-
 msgid "Free credits"
 msgstr "Crédits gratuits"
 
@@ -9988,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Toutes les heures"
-
-msgid "Hours"
-msgstr "Heures"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Les heures sont partagées par toute votre équipe. Elles sont calculées sur un espace de travail standard de {vcpus} vCPU / {memoryGb} Go, et les machines plus grandes les consomment plus vite."
@@ -11513,9 +11507,6 @@ msgstr "Chargement..."
 msgid "Loading more…"
 msgstr "Chargement…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Chargement de la page {loadingPage} sur {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Chargement du projet…"
 
@@ -12808,9 +12799,6 @@ msgstr "Aucune utilisation de Claude ou Codex trouvée sur cette machine pour l'
 msgid "No cloud environment opens {repository}."
 msgstr "Aucun environnement cloud n'ouvre {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "Aucune utilisation du cloud sur cette période."
-
 msgid "No cloud workspaces"
 msgstr "Aucun espace de travail cloud"
 
@@ -13418,9 +13406,6 @@ msgstr "Indisponible sur ce serveur"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Non associé · à configurer dans Paramètres → Liens"
 
-msgid "Not broken down yet"
-msgstr "Pas encore détaillé"
-
 msgid "Not configured"
 msgstr "Non configuré"
 
@@ -13432,9 +13417,6 @@ msgstr "Non connecté"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Non connecté · les espaces de travail cloud poussent en tant que GitHub App de votre organisation"
-
-msgid "Not counted by billing yet"
-msgstr "Pas encore comptabilisé par la facturation"
 
 msgid "Not demoed here"
 msgstr "Non démontré ici"
@@ -13474,6 +13456,10 @@ msgstr "Absent de cette version"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Aucun événement reçu pour l'instant : Microsoft Graph a refusé les abonnements aux notifications. Vérifiez le consentement administrateur de l'application et l'approbation des API protégées, puis reconnectez-vous."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Non enregistré"
 
 msgid "Not reported yet"
 msgstr "Pas encore signalé"
@@ -13607,11 +13593,8 @@ msgstr "Objets"
 msgid "of {0}"
 msgstr "sur {0}"
 
-msgid "of {cap} included"
-msgstr "sur {cap} inclus"
-
-msgid "of {cap} limit"
-msgstr "sur une limite de {cap}"
+msgid "of {held}"
+msgstr "sur {held}"
 
 msgid "of {total}"
 msgstr "sur {total}"
@@ -14485,10 +14468,6 @@ msgstr "Originaux"
 msgid "Other"
 msgstr "Autres"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Autre"
-
 msgid "Other apps"
 msgstr "Autres applications"
 
@@ -14601,9 +14580,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Page"
 
-msgid "Page {page} of {pages}"
-msgstr "Page {page} sur {pages}"
-
 msgid "Page actions"
 msgstr "Actions de la page"
 
@@ -14660,10 +14636,6 @@ msgstr "pagination"
 
 msgid "Pagination"
 msgstr "Pagination"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Payant"
 
 msgid "Paid plans"
 msgstr "Offres payantes"
@@ -16443,9 +16415,6 @@ msgstr "supprimer l'agent"
 msgid "remove the PR link"
 msgstr "retirer le lien de la PR"
 
-msgid "Remove this filter"
-msgstr "Retirer ce filtre"
-
 msgid "Remove trigger"
 msgstr "Supprimer le déclencheur"
 
@@ -17305,6 +17274,9 @@ msgstr "Exécutez ceci dans un terminal, puis continuez :"
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Exécutez ceci dans un terminal, puis collez le jeton qu'il affiche :"
 
+msgid "Run time"
+msgstr "Durée d’exécution"
+
 msgid "Run workspace command"
 msgstr "Exécuter la commande de l'espace de travail"
 
@@ -17777,9 +17749,6 @@ msgstr "Recherche des utilisations de Kbd"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Les sièges retirés en cours de période restent actifs jusqu'au {0}."
-
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Les sièges, les crédits et la limite d'utilisation supplémentaire ne sont pas encore chargés. Ils s'affichent à la prochaine actualisation des données de facturation."
 
 msgid "Secondary"
 msgstr "Secondaire"
@@ -20111,9 +20080,6 @@ msgstr "Le meilleur agent changera.<0/>Pas votre façon de travailler."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "La machine a redémarré avec {actual} vCPU au lieu de {wanted}. Redémarrez-la pour réessayer."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Le détail par offre n'est conservé que pour la période en cours."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Le bouton ressort maintenant. Je l'ai vérifié dans votre volet."
 
@@ -20185,9 +20151,6 @@ msgstr "L'environnement à partir duquel cette automatisation démarre des espac
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "L’extension et ses données locales sont supprimées de ce navigateur."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "La limite d'utilisation supplémentaire est un pourcentage de l'offre, son montant n'est donc pas affiché."
 
 msgid "The factory"
 msgstr "L'usine"
@@ -20785,9 +20748,6 @@ msgstr "Cette organisation n’a aucune période de facturation. Choisissez plut
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Cette organisation utilise le forfait Free. {appName} Mobile est disponible pour les organisations avec le forfait Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Cette page ne peut pas savoir quand la limite d'utilisation est atteinte."
 
 msgid "This page could not be loaded"
 msgstr "Cette page n'a pas pu être chargée"
@@ -21579,10 +21539,6 @@ msgstr "inconnu"
 msgid "Unknown"
 msgstr "Inconnue"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Inconnu"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Inconnu"
@@ -21910,17 +21866,11 @@ msgstr "Utilisation"
 msgid "Usage is out of date"
 msgstr "Les données d’utilisation ne sont plus à jour"
 
-msgid "usage limit"
-msgstr "limite d'utilisation"
-
 msgid "Usage limit"
 msgstr "Limite d'utilisation"
 
 msgid "Usage limit reached"
 msgstr "Limite d'utilisation atteinte"
-
-msgid "Usage limit reached."
-msgstr "Limite d'utilisation atteinte."
 
 msgid "Usage sections"
 msgstr "Sections d'utilisation"
@@ -23054,9 +23004,6 @@ msgstr "Vous n'avez pas accès à ce terminal."
 msgid "You don't have permission to remove this member"
 msgstr "Vous n'avez pas la permission de retirer ce membre"
 
-msgid "You have no cloud usage in this period."
-msgstr "Vous n'avez aucune utilisation du cloud sur cette période."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Vous avez des variables d’environnement non enregistrées. Voulez-vous vraiment fermer ?"
 
@@ -23243,9 +23190,6 @@ msgstr "Votre organisation a atteint sa limite d'environnements."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vos propres comptes. Les intégrations de votre organisation permettent à Paradev d'accéder à ses outils ; connecter les vôtres fait apparaître à votre nom le travail que Paradev fait pour vous."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Votre propre utilisation uniquement. Les totaux de l'organisation, son quota et l'utilisation par personne sont réservés aux propriétaires et aux administrateurs."
 
 msgid "Your Paradev download is starting."
 msgstr "Votre téléchargement de Paradev démarre."

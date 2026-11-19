@@ -32,7 +32,6 @@ export const Trial: Story = { args: overviewArgs("trial") };
 /** Acme Robotics, as in the design: a bought pack not drawn yet. */
 export const Prepaid: Story = { args: overviewArgs("prepaid") };
 export const LimitReached: Story = { args: overviewArgs("limitReached") };
-export const PercentCap: Story = { args: overviewArgs("percentCap") };
 export const NotRead: Story = { args: overviewArgs("notRead") };
 export const Unbilled: Story = { args: overviewArgs("unbilled") };
 export const PastPeriod: Story = {

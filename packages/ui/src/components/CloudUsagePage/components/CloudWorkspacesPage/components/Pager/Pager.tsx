@@ -1,9 +1,14 @@
 "use client";
 
-import { Plural, Trans, useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { LuChevronLeft, LuChevronRight, LuChevronsLeft } from "react-icons/lu";
 import { Button } from "../../../../../ui/button";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+} from "../../../../../ui/pagination";
 import {
 	Select,
 	SelectContent,
@@ -41,24 +46,17 @@ export function Pager({
 	const { t } = useLingui();
 	const { formatNumber } = useFormat();
 	const before = pageSizes.slice(0, index).reduce((sum, size) => sum + size, 0);
-	const first = formatNumber(rowCount === 0 ? 0 : before + 1);
+	const first = formatNumber(before + 1);
 	const last = formatNumber(before + (pageSizes[index] ?? 0));
-	const page = formatNumber(index + 1);
-	const pages = formatNumber(Math.max(1, Math.ceil(rowCount / rows)));
+	const total = formatNumber(rowCount);
 	const canGoOn = index + 1 < pageSizes.length || hasNextPage;
 
 	return (
 		<div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
 			<span className="tabular-nums">
-				{rowCount === 0 ? (
-					<Trans>0 rows</Trans>
-				) : (
-					<Plural
-						value={rowCount}
-						one={`${first}–${last} of # row`}
-						other={`${first}–${last} of # rows`}
-					/>
-				)}
+				<Trans>
+					{first}–{last} of {total}
+				</Trans>
 			</span>
 			<div className="flex flex-wrap items-center gap-3">
 				<span className="flex items-center gap-2">
@@ -87,40 +85,43 @@ export function Pager({
 						</SelectContent>
 					</Select>
 				</span>
-				<span className="tabular-nums">
-					<Trans>
-						Page {page} of {pages}
-					</Trans>
-				</span>
-				<div className="flex gap-1">
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={index === 0}
-						onClick={() => onPage(0)}
-						aria-label={t({ message: "First page" })}
-					>
-						<LuChevronsLeft />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={index === 0}
-						onClick={() => onPage(index - 1)}
-						aria-label={t({ message: "Previous page" })}
-					>
-						<LuChevronLeft />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={!canGoOn || isFetchingNextPage}
-						onClick={() => onPage(index + 1)}
-						aria-label={t({ message: "Next page" })}
-					>
-						<LuChevronRight />
-					</Button>
-				</div>
+				<Pagination className="mx-0 w-auto">
+					<PaginationContent>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={index === 0}
+								onClick={() => onPage(0)}
+								aria-label={t({ message: "First page" })}
+							>
+								<LuChevronsLeft />
+							</Button>
+						</PaginationItem>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={index === 0}
+								onClick={() => onPage(index - 1)}
+								aria-label={t({ message: "Previous page" })}
+							>
+								<LuChevronLeft />
+							</Button>
+						</PaginationItem>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={!canGoOn || isFetchingNextPage}
+								onClick={() => onPage(index + 1)}
+								aria-label={t({ message: "Next page" })}
+							>
+								<LuChevronRight />
+							</Button>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
 			</div>
 		</div>
 	);

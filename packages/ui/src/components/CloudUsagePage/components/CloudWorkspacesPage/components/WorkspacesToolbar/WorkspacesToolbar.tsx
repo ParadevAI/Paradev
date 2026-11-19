@@ -1,12 +1,18 @@
 "use client";
 
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import { useEffect, useState } from "react";
 import { LuSearch, LuX } from "react-icons/lu";
-import { Input } from "../../../../../ui/input";
-import { STATUS_PILLS } from "../../../../constants";
+import { Button } from "../../../../../ui/button";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+} from "../../../../../ui/input-group";
+import { STATUS_BADGES } from "../../../../constants";
 import type { PersonRef, WorkspacesFilters } from "../../../../types";
 import { FILTER_STATUSES } from "../../../../utils/workspacesFilters";
 import { FilterSelect } from "../FilterSelect";
@@ -41,26 +47,28 @@ export function WorkspacesToolbar({
 
 	return (
 		<div className="flex flex-wrap items-center gap-2">
-			<div className="relative w-full @xl:w-auto @xl:min-w-48 @xl:flex-1">
-				<LuSearch className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-				<Input
+			<InputGroup className="h-8 w-full @xl:w-auto @xl:min-w-48 @xl:flex-1">
+				<InputGroupAddon>
+					<LuSearch />
+				</InputGroupAddon>
+				<InputGroupInput
 					value={text}
 					onChange={(event) => setText(event.target.value)}
 					placeholder={t({ message: "Search" })}
 					aria-label={t({ message: "Search workspaces" })}
-					className="h-8 px-8"
 				/>
 				{text && (
-					<button
-						type="button"
-						onClick={() => setText("")}
-						aria-label={t({ message: "Clear search" })}
-						className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-					>
-						<LuX className="size-4" />
-					</button>
+					<InputGroupAddon align="inline-end">
+						<InputGroupButton
+							size="icon-xs"
+							onClick={() => setText("")}
+							aria-label={t({ message: "Clear search" })}
+						>
+							<LuX />
+						</InputGroupButton>
+					</InputGroupAddon>
 				)}
-			</div>
+			</InputGroup>
 			{people && (
 				<>
 					<FilterSelect
@@ -86,11 +94,23 @@ export function WorkspacesToolbar({
 						value={filters.status}
 						options={FILTER_STATUSES.map((status) => ({
 							value: status,
-							label: i18n._(STATUS_PILLS[status].label),
+							label: i18n._(STATUS_BADGES[status].label),
 						}))}
 						onChange={(status) => onChange({ ...filters, status })}
 					/>
 				</>
+			)}
+			{(filters.q || filters.user || filters.size || filters.status) && (
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => {
+						setText("");
+						onChange({ rows: filters.rows, sort: filters.sort });
+					}}
+				>
+					<Trans>Clear all</Trans>
+				</Button>
 			)}
 		</div>
 	);

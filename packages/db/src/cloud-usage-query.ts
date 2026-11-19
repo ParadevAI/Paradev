@@ -338,6 +338,7 @@ function usageFacts(
 				),
 			bootId: sql<string | null>`null::text`.as("boot_id"),
 			failed: sql<boolean>`false`.as("failed"),
+			day: sql<string>`${utcDay(events.sentAt)}`.as("day"),
 		})
 		.from(events)
 		.leftJoin(boots, eq(boots.id, events.bootId))
@@ -364,6 +365,7 @@ function usageFacts(
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`${boots.id}`,
 			failed: sql<boolean>`${boots.endReason} is not distinct from 'failed'`,
+			day: sql<string>`${utcDay(boots.startedAt)}`,
 		})
 		.from(boots)
 		.leftJoin(workspaces, workspaceOf(scope, boots.cloudWorkspaceId))
@@ -388,6 +390,7 @@ function usageFacts(
 			seconds: sql<string>`0::numeric`,
 			bootId: sql<string | null>`null::text`,
 			failed: sql<boolean>`false`,
+			day: sql<string>`${utcDay(workspaces.failedAt)}`,
 		})
 		.from(workspaces)
 		.where(
@@ -405,6 +408,11 @@ function usageFacts(
 			),
 		);
 	return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
+}
+
+interface DayRow {
+	day: string;
+	gbMinutes: number;
 }
 
 function metricColumns(facts: ReturnType<typeof usageFacts>) {
@@ -446,12 +454,15 @@ interface UserRef {
 	id: string;
 	name: string;
 	email: string;
+	image: string | null;
 }
 
 interface WorkspaceRef {
 	id: string;
 	name: string;
 	status: CloudWorkspaceStatus;
+	/** Deleted workspaces keep the status they had; this says they are gone. */
+	deleted: boolean;
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
@@ -503,7 +514,12 @@ async function refsFor(
 	}
 	if (groupBy === "user") {
 		const rows = await db
-			.select({ id: users.id, name: users.name, email: users.email })
+			.select({
+				id: users.id,
+				name: users.name,
+				email: users.email,
+				image: users.image,
+			})
 			.from(users)
 			.where(inArray(users.id, keys));
 		return new Map(rows.map((row) => [row.id, row]));
@@ -514,10 +530,16 @@ async function refsFor(
 				id: workspaces.id,
 				name: workspaces.name,
 				status: workspaces.status,
+				deleted: sql<boolean>`${workspaces.deletedAt} is not null`,
 				machineSize: workspaces.machineSize,
 				failureReason: workspaces.failureReason,
 				failedAt: workspaces.failedAt,
-				owner: { id: users.id, name: users.name, email: users.email },
+				owner: {
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image,
+				},
 			})
 			.from(workspaces)
 			.leftJoin(users, eq(users.id, workspaces.createdByUserId))
@@ -578,6 +600,92 @@ type CloudFleetUsageOptions = CloudUsageOptions<CloudFleetGroupBy> & {
 };
 
 /**
+ * One page of rows grouped by person, each with the person's days. The page is ranked first, so
+ * the days are summed for its people only, once each, in the same statement.
+ */
+function pageWithDays(
+	db: Db,
+	facts: ReturnType<typeof usageFacts>,
+	{
+		sortKey,
+		sortValue,
+		having,
+		order,
+		limit,
+	}: {
+		sortKey: SQL<string>;
+		sortValue: SQL;
+		having: SQL | undefined;
+		order: SQL[];
+		limit: number;
+	},
+) {
+	const metrics = metricColumns(facts);
+	const page = db.$with("page").as(
+		db
+			.select({
+				key: facts.key,
+				sortKey: sortKey.as("sort_key"),
+				sortValue: sql<string>`(${sortValue})::text`.as("sort_value"),
+				gbMinutes: metrics.gbMinutes.as("total_gb_minutes"),
+				seconds: metrics.seconds.as("total_seconds"),
+				boots: metrics.boots.as("total_boots"),
+				failedBoots: metrics.failedBoots.as("total_failed_boots"),
+				workspaces: metrics.workspaces.as("total_workspaces"),
+				rank: sql<number>`row_number() over (order by ${sql.join(order, sql`, `)})`.as(
+					"rank",
+				),
+			})
+			.from(facts)
+			.groupBy(facts.key)
+			.having(having)
+			.orderBy(...order)
+			.limit(limit),
+	);
+	const perDay = db
+		.select({
+			key: sql<string>`coalesce(${facts.key}, '')`.as("days_key"),
+			day: facts.day,
+			gbMinutes: sql<string>`sum(${facts.gbMinutes})`.as("day_gb_minutes"),
+		})
+		.from(facts)
+		.where(
+			sql`coalesce(${facts.key}, '') in (select ${page.sortKey} from ${page})`,
+		)
+		.groupBy(facts.key, facts.day)
+		.as("per_day");
+	const userDays = db.$with("user_days").as(
+		db
+			.select({
+				key: perDay.key,
+				days: sql<
+					DayRow[]
+				>`json_agg(json_build_object('day', ${perDay.day}, 'gbMinutes', ${perDay.gbMinutes}) order by ${perDay.day})`.as(
+					"days",
+				),
+			})
+			.from(perDay)
+			.groupBy(perDay.key),
+	);
+	return db
+		.with(facts, page, userDays)
+		.select({
+			key: page.key,
+			sortKey: page.sortKey,
+			sortValue: page.sortValue,
+			gbMinutes: page.gbMinutes,
+			seconds: page.seconds,
+			boots: page.boots,
+			failedBoots: page.failedBoots,
+			workspaces: page.workspaces,
+			days: userDays.days,
+		})
+		.from(page)
+		.leftJoin(userDays, eq(userDays.key, page.sortKey))
+		.orderBy(page.rank);
+}
+
+/**
  * Billed usage (box_gb_minutes events, placed by sent_at) and boot counts (placed by started_at)
  * in the window: a total, and with `groupBy` one row per user, UTC day or workspace (a fleet scope
  * adds organization, project, size and end reason). Pages ordered by amount are read at each call:
@@ -626,6 +734,7 @@ async function usageRows(
 	}
 	const facts = usageFacts(db, scope, filters, window, groupKeys[groupBy]);
 	const metrics = metricColumns(facts);
+	const withDays = groupBy === "user";
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
 	const ofWorkspace = (column: AnyPgColumn | SQL) =>
 		sql`(select ${column} from ${workspaces} where ${workspaces.id} = ${facts.key}::uuid)`;
@@ -643,38 +752,42 @@ async function usageRows(
 		(sort?.by === "name"
 			? sql`${cursor.value}`
 			: sql`${cursor.value}::numeric`);
+	const having = !cursor
+		? undefined
+		: !sort
+			? sql`${facts.key} < ${cursor.key}`
+			: or(
+					sort.order === "desc"
+						? sql`${sortValue} < ${cursorValue}`
+						: sql`${sortValue} > ${cursorValue}`,
+					sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
+				);
+	const order = !sort
+		? [desc(facts.key)]
+		: [sort.order === "desc" ? desc(sortValue) : asc(sortValue), asc(sortKey)];
 	const [rows, total, rowCount] = await Promise.all([
-		db
-			.with(facts)
-			.select({
-				key: facts.key,
-				sortKey,
-				sortValue: sql<string>`(${sortValue})::text`,
-				...metrics,
-			})
-			.from(facts)
-			.groupBy(facts.key)
-			.having(
-				!cursor
-					? undefined
-					: !sort
-						? sql`${facts.key} < ${cursor.key}`
-						: or(
-								sort.order === "desc"
-									? sql`${sortValue} < ${cursorValue}`
-									: sql`${sortValue} > ${cursorValue}`,
-								sql`${sortValue} = ${cursorValue} and ${sortKey} > ${cursor.key}`,
-							),
-			)
-			.orderBy(
-				...(!sort
-					? [desc(facts.key)]
-					: [
-							sort.order === "desc" ? desc(sortValue) : asc(sortValue),
-							asc(sortKey),
-						]),
-			)
-			.limit(limit + 1),
+		withDays
+			? pageWithDays(db, facts, {
+					sortKey,
+					sortValue,
+					having,
+					order,
+					limit: limit + 1,
+				})
+			: db
+					.with(facts)
+					.select({
+						key: facts.key,
+						sortKey,
+						sortValue: sql<string>`(${sortValue})::text`,
+						days: sql<null>`null`,
+						...metrics,
+					})
+					.from(facts)
+					.groupBy(facts.key)
+					.having(having)
+					.orderBy(...order)
+					.limit(limit + 1),
 		totalRow,
 		db
 			.with(facts)
@@ -696,13 +809,21 @@ async function usageRows(
 					page.flatMap((row) => (row.key ? [row.key] : [])),
 				);
 	return {
-		items: page.map(({ key, sortKey: _, sortValue: __, ...row }) => {
+		items: page.map((row) => {
+			const { key, sortKey: _, sortValue: __, days, ...metricRow } = row;
 			const ref = (key && refs.get(key)) || null;
 			return {
 				key,
 				label: ref ? ref.name : isPlainKey(groupBy) ? key : null,
 				ref,
-				...toMetrics(row, overagePerGbHour),
+				...toMetrics(metricRow, overagePerGbHour),
+				...(withDays && {
+					days: (days ?? []).map((day) => ({
+						day: day.day,
+						gbHours: day.gbMinutes / 60,
+						usageUsd: gbMinutesUsd(day.gbMinutes, overagePerGbHour),
+					})),
+				}),
 			};
 		}),
 		total: toMetrics(total, overagePerGbHour),
@@ -860,7 +981,12 @@ const bootColumns = {
 	id: boots.id,
 	sessionId: boots.vercelSessionId,
 	workspace: { id: workspaces.id, name: workspaces.name },
-	user: { id: users.id, name: users.name, email: users.email },
+	user: {
+		id: users.id,
+		name: users.name,
+		email: users.email,
+		image: users.image,
+	},
 	startedAt: boots.startedAt,
 	stoppedAt: boots.stoppedAt,
 	memoryMb: boots.memoryMb,
