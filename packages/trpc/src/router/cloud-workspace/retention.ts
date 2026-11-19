@@ -42,6 +42,10 @@ export const ORPHAN_MIN_AGE_MS = 7 * DAY_MS;
  */
 export const REAP_BATCH = 200;
 export const ORPHAN_BATCH = 200;
+/** Longer than any provision takes, its QStash retries included: minutes. */
+export const STRANDED_PROVISIONING_MS = DAY_MS;
+/** Failed and stranded rows are rare: 2 failed and none stranded on 2026-11-19. */
+export const STRANDED_BATCH = 50;
 /** A backstop for a lost archive delete, which deletes inline: few a run. */
 export const ARCHIVED_BATCH = 20;
 /** The archive's own delete runs at the grace; a day later it has had its retries. */
@@ -140,6 +144,125 @@ async function boxIsRunning(providerSandboxId: string): Promise<boolean> {
 	}
 }
 
+export interface StrandedWorkspace {
+	id: string;
+	organizationId: string;
+	providerSandboxId: string;
+	status: "failed" | "provisioning";
+}
+
+/** Failed before `cutoff`; rows failed before `failed_at` existed count from their last write. */
+export function failedBefore(cutoff: Date): SQL {
+	return and(
+		eq(cloudWorkspaces.provider, "vercel"),
+		isNull(cloudWorkspaces.deletedAt),
+		eq(cloudWorkspaces.status, "failed"),
+		sql`coalesce(${cloudWorkspaces.failedAt}, ${cloudWorkspaces.updatedAt}) < ${cutoff.toISOString()}::timestamptz`,
+	) as SQL;
+}
+
+/**
+ * Provisioning since before `cutoff` with no boot since: every delivery of
+ * its job died. An unarchive moves a row to provisioning, so `updated_at`
+ * counts, not only `created_at`.
+ */
+export function strandedSince(cutoff: Date): SQL {
+	return and(
+		eq(cloudWorkspaces.provider, "vercel"),
+		isNull(cloudWorkspaces.deletedAt),
+		eq(cloudWorkspaces.status, "provisioning"),
+		lt(cloudWorkspaces.createdAt, cutoff),
+		lt(cloudWorkspaces.updatedAt, cutoff),
+		sql`not exists (select 1 from ${cloudWorkspaceBoots} where ${cloudWorkspaceBoots.cloudWorkspaceId} = ${cloudWorkspaces.id} and ${cloudWorkspaceBoots.startedAt} >= ${cutoff.toISOString()}::timestamptz)`,
+	) as SQL;
+}
+
+const strandedColumns = {
+	id: cloudWorkspaces.id,
+	organizationId: cloudWorkspaces.organizationId,
+	providerSandboxId: cloudWorkspaces.providerSandboxId,
+	status: cloudWorkspaces.status,
+};
+
+/**
+ * Stranded provisioning rows by their status alone: retiring fails them, so
+ * they leave. Failed rows only while their box is in `names`: a retired name
+ * is in no listing, so they leave too, and none can fill the batch forever.
+ */
+export async function findStranded({
+	failedCutoff,
+	provisioningCutoff,
+	names,
+	limit,
+}: {
+	failedCutoff: Date;
+	provisioningCutoff: Date;
+	names: string[];
+	limit: number;
+}): Promise<StrandedWorkspace[]> {
+	const found = (await db
+		.select(strandedColumns)
+		.from(cloudWorkspaces)
+		.where(strandedSince(provisioningCutoff))
+		.orderBy(asc(cloudWorkspaces.updatedAt))
+		.limit(limit)) as StrandedWorkspace[];
+	for (
+		let i = 0;
+		i < names.length && found.length < limit;
+		i += NAME_LOOKUP_CHUNK
+	) {
+		found.push(
+			...((await db
+				.select(strandedColumns)
+				.from(cloudWorkspaces)
+				.where(
+					and(
+						failedBefore(failedCutoff),
+						inArray(
+							cloudWorkspaces.providerSandboxId,
+							names.slice(i, i + NAME_LOOKUP_CHUNK),
+						),
+					),
+				)
+				.limit(limit - found.length)) as StrandedWorkspace[]),
+		);
+	}
+	return found;
+}
+
+/**
+ * Takes the box name off a failed or stranded row and queues the box's
+ * teardown, on the status and age read. A stranded row then fails, so the
+ * client stops waiting for it. False when the row changed since it was read.
+ */
+export async function retireStrandedWorkspace(
+	row: StrandedWorkspace,
+	cutoffs: { failed: Date; provisioning: Date },
+): Promise<boolean> {
+	const stillStranded =
+		row.status === "failed"
+			? failedBefore(cutoffs.failed)
+			: strandedSince(cutoffs.provisioning);
+	const retired = await retireAndTearDown(
+		{ id: row.id, providerSandboxId: row.providerSandboxId, driveName: null },
+		stillStranded,
+	);
+	if (!retired) return false;
+	if (row.status === "provisioning") {
+		await failCloudWorkspace({
+			scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
+			from: ["provisioning"],
+			set: { sandboxUrl: null },
+			reason: "create_failed",
+			error: new Error(
+				`provisioning since before ${cutoffs.provisioning.toISOString()}`,
+			),
+			expected: true,
+		});
+	}
+	return true;
+}
+
 function archivedPastGrace(cutoff: Date): SQL {
 	return and(
 		eq(cloudWorkspaces.provider, "vercel"),
@@ -222,6 +345,8 @@ export interface RetentionDeps {
 	findArchivedPastGraceAmong: typeof findArchivedPastGraceAmong;
 	reapArchived: typeof reapArchivedCloudWorkspace;
 	reapUndatedArchived: typeof reapUndatedArchivedCloudWorkspace;
+	findStranded: typeof findStranded;
+	retireStrandedWorkspace: typeof retireStrandedWorkspace;
 	tearDownOrphan: (providerSandboxId: string) => Promise<void>;
 	pause: (ms: number) => Promise<void>;
 }
@@ -236,6 +361,8 @@ const defaultDeps: RetentionDeps = {
 	findArchivedPastGraceAmong,
 	reapArchived: reapArchivedCloudWorkspace,
 	reapUndatedArchived: reapUndatedArchivedCloudWorkspace,
+	findStranded,
+	retireStrandedWorkspace,
 	tearDownOrphan: (providerSandboxId) =>
 		deleteSandboxAndDriveLater({ providerSandboxId, driveName: null }),
 	pause: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
@@ -260,6 +387,15 @@ export interface RetentionRun {
 				failed: number;
 		  }
 		| { skipped: "not production" };
+	stranded:
+		| {
+				found: number;
+				retired: number;
+				skippedChanged: number;
+				deferred: number;
+				failed: number;
+		  }
+		| { skipped: "not production" };
 	orphans:
 		| {
 				listed: number;
@@ -276,8 +412,9 @@ export interface RetentionRun {
  * and unused for `RETENTION_IDLE_MS` fails as `snapshot_expired`, exactly as a
  * wake that met Vercel's expiry did, and its box is torn down. Then, in
  * production only: an archived box still there a day after its grace is
- * deleted (its own delete was lost), and boxes we tagged that no row names
- * are torn down. Every deployment shares the Vercel project, and a dev
+ * deleted (its own delete was lost); a row failed for `RETENTION_IDLE_MS`, or
+ * stuck provisioning for `STRANDED_PROVISIONING_MS`, gives up its box; and
+ * boxes we tagged that no row names are torn down. Every deployment shares the Vercel project, and a dev
  * database copied from production names production's boxes.
  */
 export async function reapCloudWorkspaceRetention({
@@ -300,15 +437,19 @@ export async function reapCloudWorkspaceRetention({
 	const archived = production
 		? await reapArchived({ now, deps, boxes, outOfTime })
 		: notProduction;
+	const stranded = production
+		? await reapStranded({ now, deps, boxes, retiredNames, outOfTime })
+		: notProduction;
 	const orphans = production
 		? await reapOrphans({ now, deps, boxes, retiredNames, outOfTime })
 		: notProduction;
-	const run = { idle, archived, orphans };
+	const run = { idle, archived, stranded, orphans };
 	console.log("[cloud-workspace] retention run", JSON.stringify(run));
 	Sentry.logger.info("retention.run", flatten(run));
 	if (
 		idle.failed ||
 		("failed" in archived && archived.failed) ||
+		("failed" in stranded && stranded.failed) ||
 		("failed" in orphans && orphans.failed)
 	) {
 		Sentry.captureMessage("cloud workspace retention run had failures", {
@@ -421,6 +562,59 @@ async function reapArchived({
 	return counts;
 }
 
+async function reapStranded({
+	now,
+	deps,
+	boxes,
+	retiredNames,
+	outOfTime,
+}: {
+	now: number;
+	deps: RetentionDeps;
+	boxes: ListedSandbox[];
+	retiredNames: Set<string>;
+	outOfTime: () => boolean;
+}): Promise<Exclude<RetentionRun["stranded"], { skipped: string }>> {
+	const cutoffs = {
+		failed: new Date(now - RETENTION_IDLE_MS),
+		provisioning: new Date(now - STRANDED_PROVISIONING_MS),
+	};
+	const rows = await deps.findStranded({
+		failedCutoff: cutoffs.failed,
+		provisioningCutoff: cutoffs.provisioning,
+		names: boxes.map((box) => box.name),
+		limit: STRANDED_BATCH,
+	});
+	const counts = {
+		found: rows.length,
+		retired: 0,
+		skippedChanged: 0,
+		deferred: 0,
+		failed: 0,
+	};
+	for (const [index, row] of rows.entries()) {
+		if (outOfTime()) {
+			counts.deferred = rows.length - index;
+			break;
+		}
+		try {
+			if (!(await deps.retireStrandedWorkspace(row, cutoffs))) {
+				counts.skippedChanged++;
+				continue;
+			}
+			counts.retired++;
+			retiredNames.add(row.providerSandboxId);
+			await deps.pause(TEARDOWN_SPACING_MS);
+		} catch (error) {
+			counts.failed++;
+			Sentry.captureException(error, {
+				tags: { "cloud_workspace.id": row.id },
+			});
+		}
+	}
+	return counts;
+}
+
 function isOldAndSettled(box: ListedSandbox, now: number): boolean {
 	return (
 		SETTLED_STATUSES.has(box.status) &&
@@ -485,6 +679,12 @@ function flatten(run: RetentionRun): Record<string, number | string> {
 		...Object.fromEntries(
 			Object.entries(run.archived).map(([key, value]) => [
 				`archived.${key}`,
+				value,
+			]),
+		),
+		...Object.fromEntries(
+			Object.entries(run.stranded).map(([key, value]) => [
+				`stranded.${key}`,
 				value,
 			]),
 		),

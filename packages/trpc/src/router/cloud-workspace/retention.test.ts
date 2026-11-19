@@ -1,14 +1,20 @@
 import { describe, expect, test } from "bun:test";
+import { db } from "@superset/db/client";
 import { stub } from "../../../test/stub";
 import type { ListedSandbox } from "../../lib/sandbox";
 import {
 	ARCHIVED_BACKSTOP_AFTER_MS,
+	findStranded,
 	ORPHAN_BATCH,
 	RETENTION_IDLE_MS,
 	type RetentionDeps,
 	RUN_BUDGET_MS,
 	reapCloudWorkspaceRetention,
 	retireIdleWorkspace,
+	retireStrandedWorkspace,
+	STRANDED_BATCH,
+	STRANDED_PROVISIONING_MS,
+	type StrandedWorkspace,
 	TEARDOWN_SPACING_MS,
 } from "./retention";
 import * as teardown from "./teardown";
@@ -21,6 +27,17 @@ const idleRow = (n: number) => ({
 	id: `ws_${n}`,
 	organizationId: "org_1",
 	providerSandboxId: `ws-box${n}`,
+});
+
+const strandedRow = (
+	id: string,
+	providerSandboxId: string,
+	status: StrandedWorkspace["status"],
+): StrandedWorkspace => ({
+	id,
+	organizationId: "org_1",
+	providerSandboxId,
+	status,
 });
 
 const box = (
@@ -58,6 +75,11 @@ function fakeDeps(overrides: Partial<RetentionDeps> = {}) {
 		reapUndatedArchived: async (input) => {
 			reaped.push(input);
 			return "reaped";
+		},
+		findStranded: async () => [],
+		retireStrandedWorkspace: async (row) => {
+			retired.push(row.id);
+			return true;
 		},
 		tearDownOrphan: async (name) => {
 			queued.push(name);
@@ -167,7 +189,66 @@ describe("reapCloudWorkspaceRetention", () => {
 		expect(listed).toBe(false);
 		expect(reaped).toEqual([]);
 		expect(run.archived).toEqual({ skipped: "not production" });
+		expect(run.stranded).toEqual({ skipped: "not production" });
 		expect(run.orphans).toEqual({ skipped: "not production" });
+	});
+
+	test("retires failed and stranded rows that still name a box, a pause apart, and does not queue their boxes again as orphans", async () => {
+		let asked: Parameters<RetentionDeps["findStranded"]>[0] | undefined;
+		const { deps, retired, queued, paused } = fakeDeps({
+			listAllSandboxes: async () => [box("ws-failed"), box("ws-stranded")],
+			findStranded: async (args) => {
+				asked = args;
+				return [
+					strandedRow("ws_f", "ws-failed", "failed"),
+					strandedRow("ws_p", "ws-stranded", "provisioning"),
+				];
+			},
+		});
+		const run = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: true,
+			deps,
+		});
+		expect(asked).toEqual({
+			failedCutoff: new Date(NOW - RETENTION_IDLE_MS),
+			provisioningCutoff: new Date(NOW - STRANDED_PROVISIONING_MS),
+			names: ["ws-failed", "ws-stranded"],
+			limit: STRANDED_BATCH,
+		});
+		expect(retired).toEqual(["ws_f", "ws_p"]);
+		expect(paused).toEqual([TEARDOWN_SPACING_MS, TEARDOWN_SPACING_MS]);
+		expect(queued).toEqual([]);
+		expect(run.stranded).toEqual({
+			found: 2,
+			retired: 2,
+			skippedChanged: 0,
+			deferred: 0,
+			failed: 0,
+		});
+	});
+
+	test("a failed or stranded row that changed or could not be retired is counted, and the next run tries again", async () => {
+		const { deps } = fakeDeps({
+			findStranded: async () => [
+				strandedRow("ws_f", "ws-failed", "failed"),
+				strandedRow("ws_p", "ws-stranded", "provisioning"),
+			],
+			retireStrandedWorkspace: async (row) => {
+				if (row.status === "failed") return false;
+				throw new Error("db down");
+			},
+		});
+		const run = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: true,
+			deps,
+		});
+		expect(run.stranded).toMatchObject({
+			retired: 0,
+			skippedChanged: 1,
+			failed: 1,
+		});
 	});
 
 	test("deletes an archived box still there past its grace through the archive's own delete, by the guard that fits the row", async () => {
@@ -308,5 +389,64 @@ describe("retireIdleWorkspace", () => {
 			expected: true,
 			set: { sandboxUrl: null },
 		});
+	});
+
+	test("a stranded provisioning row gives up its box and fails; a failed row only gives up its box", async () => {
+		const cutoffs = {
+			failed: new Date(NOW - RETENTION_IDLE_MS),
+			provisioning: new Date(NOW - STRANDED_PROVISIONING_MS),
+		};
+		retires = true;
+		failed = undefined;
+		expect(
+			await retireStrandedWorkspace(
+				strandedRow("ws_f", "ws-failed", "failed"),
+				cutoffs,
+			),
+		).toBe(true);
+		expect(retiring?.[0]).toEqual({
+			id: "ws_f",
+			providerSandboxId: "ws-failed",
+			driveName: null,
+		});
+		expect(failed).toBeUndefined();
+		expect(
+			await retireStrandedWorkspace(
+				strandedRow("ws_p", "ws-stranded", "provisioning"),
+				cutoffs,
+			),
+		).toBe(true);
+		expect(failed).toMatchObject({
+			scope: { cloudWorkspaceId: "ws_p" },
+			from: ["provisioning"],
+			reason: "create_failed",
+			expected: true,
+		});
+	});
+});
+
+describe("findStranded", () => {
+	let queries = 0;
+	const chain = {
+		from: () => chain,
+		where: () => chain,
+		orderBy: () => chain,
+		limit: async () => {
+			queries++;
+			return [];
+		},
+	};
+	stub(db, { select: () => chain });
+
+	test("looks for failed rows only among listed boxes, so a retired name leaves the selection", async () => {
+		const args = {
+			failedCutoff: new Date(NOW - RETENTION_IDLE_MS),
+			provisioningCutoff: new Date(NOW - STRANDED_PROVISIONING_MS),
+			limit: STRANDED_BATCH,
+		};
+		await findStranded({ ...args, names: [] });
+		expect(queries).toBe(1);
+		await findStranded({ ...args, names: ["ws-a"] });
+		expect(queries).toBe(3);
 	});
 });

@@ -803,7 +803,11 @@ to clean up after a lost one. That backstop is gone, so in production the job
 also deletes an archived box still listed a day after its grace, through the
 archive's own delete stage (`reapUndatedArchivedCloudWorkspace` for the rows
 archived before `deleted_at` existed). It matches rows against one listing of
-every box, so a box already gone costs no provider call. In production only,
+every box, so a box already gone costs no provider call. It also takes the box
+from a row failed 30 days ago whose box is still listed, and from a row stuck
+in `provisioning` for a day (every delivery of its job died), which then fails
+as `create_failed`. A retired name is in no listing and a failed row is no
+longer provisioning, so these rows leave the selection. In production only,
 the same job also tears down
 tagged boxes that no row and no unarchived environment names, once they are
 7 days old: every deployment shares one Vercel project, so a dev or preview
