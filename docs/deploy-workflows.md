@@ -32,6 +32,13 @@ Anything that needs a production secret must run as an Actions workflow with
 `environment: production`. `.github/workflows/backfill-connections.yml` is the pattern: manual
 dispatch, dry run by default, writes only when the `apply` input is checked.
 
+`copy-secret-to-vercel-project.yml` copies `BETTER_AUTH_SECRET` from the GitHub `production`
+environment to one Vercel project (type `sensitive`, production and preview), when an app that
+must share the product's sessions needs the same value and nobody holds it in plaintext. Run the
+dry run first: it prints only whether the key exists, its targets, and the count of other
+variables. It fails if the count changes or the key is not sensitive on both targets. It copies
+this one secret only; do not extend it to other names.
+
 ## One run shows about ten deployment rows
 
 Every job that declares `environment: production` creates its own row on the GitHub Deployments
