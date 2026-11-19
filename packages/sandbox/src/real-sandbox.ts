@@ -19,7 +19,7 @@ import {
 	type SandboxIdentity,
 } from "@superset/shared/sandbox/contract";
 import { DEFAULT_SANDBOX_REGION } from "@superset/shared/sandbox/regions";
-import { Sandbox } from "@vercel/sandbox";
+import { Drive, Sandbox } from "@vercel/sandbox";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
 
@@ -77,9 +77,21 @@ const { deleteSandbox, provisionSandbox, wakeSandbox } = await import(
 const { sandboxHostSecretFor } = await import(
 	"@superset/trpc/lib/sandbox/access"
 );
-const { checkWakeLog, probeBox } = await import("./environments/probe");
+const { checkGateTerminal, checkWakeLog, insideOverlay, probeBox } =
+	await import("./environments/probe");
 
-const name = `ws-real-check-${Date.now().toString(36)}`;
+// Spike only: the overlay root (packages/sandbox/spike-overlay), with its own drive.
+const overlay = process.env.REAL_SANDBOX_OVERLAY === "1";
+const name = `${overlay ? "ovl-spike-ci" : "ws-real-check"}-${Date.now().toString(36)}`;
+const driveName = overlay ? `${name}-drive` : null;
+if (driveName) {
+	await Drive.getOrCreate({
+		...credentials,
+		name: driveName,
+		region: DEFAULT_SANDBOX_REGION,
+	});
+	log(`overlay mode: drive ${driveName}`);
+}
 const workspaceId = randomUUID();
 // Cut from main the way a real workspace is, so the probe's branch check
 // covers the branching itself and not just that a checkout happened.
@@ -100,6 +112,7 @@ const identity: SandboxIdentity = {
 	]),
 	SUPERSET_SANDBOX_IMAGE_TAG: SANDBOX_IMAGE_NAME,
 	SUPERSET_SANDBOX_PROVIDER: "vercel",
+	...(overlay ? { SUPERSET_SANDBOX_OVERLAY: "1" as const } : {}),
 };
 const hostSecret = await sandboxHostSecretFor(workspaceId);
 const claim = {
@@ -127,6 +140,16 @@ for (;;) {
 				region: DEFAULT_SANDBOX_REGION,
 			},
 			claim,
+			...(driveName
+				? {
+						extraMounts: {
+							"/mnt/superset-drive": {
+								drive: driveName,
+								mode: "read-write" as const,
+							},
+						},
+					}
+				: {}),
 		});
 		break;
 	} catch (error) {
@@ -153,8 +176,45 @@ let failed = await probeBox({
 	gate: process.env.SANDBOX_GATE_ORIGIN
 		? { workspaceId, userId: randomUUID() }
 		: null,
+	overlay,
 	log,
 });
+const gateUser = { workspaceId, userId: randomUUID() };
+const wokenHost = woken.hostTarget;
+async function overlayChecks(label: string): Promise<number> {
+	if (!overlay) return 0;
+	const box = await Sandbox.get({ ...credentials, name });
+	const r = await box.runCommand({
+		cmd: "sudo",
+		args: [
+			"-n",
+			...insideOverlay(
+				'echo "root=$(findmnt -no FSTYPE /) host_ns=$(sudo -n readlink /proc/$(cat /run/superset/host-service.pid)/ns/mnt) pid1_ns=$(sudo -n readlink /proc/1/ns/mnt) branch=$(git -C /workspace branch --show-current) inside=$(grep -c overlay.inside /var/log/superset/boot.log)"',
+			),
+		],
+	});
+	const out = (await r.stdout()).trim();
+	const m =
+		/root=(\S+) host_ns=(\S+) pid1_ns=(\S+) branch=(\S*) inside=(\d+)/.exec(
+			out,
+		);
+	const ok =
+		!!m && m[1] === "overlay" && m[2] !== m[3] && m[4] === workingBranch;
+	log(
+		`${ok ? "ok  " : "FAIL"} ${label}: overlay root, host-service in its own namespace, branch inside: ${out}`,
+	);
+	let failed = ok ? 0 : 1;
+	if (process.env.SANDBOX_GATE_ORIGIN) {
+		failed += await checkGateTerminal({
+			gate: gateUser,
+			host: wokenHost,
+			label,
+			log,
+		});
+	}
+	return failed;
+}
+failed += await overlayChecks("first boot");
 {
 	const box = await Sandbox.get({ ...credentials, name });
 	await box.stop();
@@ -162,11 +222,23 @@ let failed = await probeBox({
 	await wakeSandbox({ providerSandboxId: name, claim });
 	log(`woken again in ${Date.now() - wakeStarted} ms`);
 	failed += await checkWakeLog({ name, credentials, log });
+	failed += await overlayChecks("after sleep and wake");
 }
 if (failed) {
 	console.error(`${failed} check(s) failed; ${name} left for inspection`);
 	process.exit(1);
 }
 await deleteSandbox(name);
+if (driveName) {
+	for (let i = 0; i < 90; i++) {
+		if (
+			!(await Drive.get({ ...credentials, name: driveName })).currentSandboxName
+		)
+			break;
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+	}
+	await (await Drive.get({ ...credentials, name: driveName })).delete();
+	log(`${driveName} deleted`);
+}
 log(`${name} deleted; all checks passed`);
 process.exit(0);

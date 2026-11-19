@@ -51,6 +51,7 @@ if [ -f "${SUPERSET_RUN_DIR}/host-service.pid" ] && kill -0 "$(cat "${SUPERSET_R
 	exit 0
 fi
 
+if [ -z "${SUPERSET_OVERLAY_INNER:-}" ]; then
 stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"
 
 # --- per-boot state: a restored disk carries the previous session's pids
@@ -147,6 +148,21 @@ link_agents() {
 }
 drive_links() { find /usr/local/bin -maxdepth 1 -lname "${SUPERSET_AGENTS_DIR:-/opt/agents}/*" -printf '%f %l\n' | sort; }
 link_agents
+
+# --- spike: in overlay mode every pass that changes the platform runs on the
+# real root, which is the overlay's lower and is frozen from here on.
+if [ "${SUPERSET_SANDBOX_OVERLAY:-}" = 1 ]; then
+	mountpoint -q "${SUPERSET_DRIVE_DIR:-/mnt/superset-drive}" || refuse "overlay mode and no workspace drive is mounted"
+	stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
+	stamp "steps.start"; "$BUNDLE/setup" run-steps after-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
+	link_agents
+	stamp "overlay.enter"
+	SUPERSET_OVERLAY_INNER=1 SUPERSET_BOOT_REEXEC=1 exec /usr/local/bin/superset-overlay-root enter "$0" "$@"
+fi
+else
+	BUNDLE="${SUPERSET_BUNDLE_ROOT}/current"
+	stamp "overlay.inside root=$(findmnt -no FSTYPE /)"
+fi
 
 # --- host-service, as the sandbox user, first. A runtime that cannot start
 # is logged, not fatal: the desktop and the checkout still come up so the
@@ -342,10 +358,12 @@ checkout() {
 	checkout_pid=$!
 	exec 8> /run/superset-steps.lock
 	flock 8
+	if [ -z "${SUPERSET_OVERLAY_INNER:-}" ]; then
 	links_before="$(drive_links)"
 	stamp "assets.start"; "$BUNDLE/setup" sync-assets >> "$SUPERSET_BOOT_LOG" 2>&1 || stamp "assets.failed continuing"; stamp "assets.end"
 	stamp "steps.start"; "$BUNDLE/setup" run-steps after-host >> "$SUPERSET_BOOT_LOG" 2>&1; stamp "steps.end"
 	[ "$(drive_links)" = "$links_before" ] || link_agents
+	fi
 	exec 8>&-
 	as_user env "DISPLAY=${SUPERSET_DISPLAY}" "HOME=${SUPERSET_USER_HOME}" "USER=${SUPERSET_USER}" \
 		"SUPERSET_SANDBOX_WORKSPACE_ID=${SUPERSET_SANDBOX_WORKSPACE_ID}" \

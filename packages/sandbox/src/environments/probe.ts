@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 /**
  * What a person gets from a box: the checks a release runs against its
  * probe fork and the dispatch job runs against a fresh dev sandbox. Every
@@ -28,6 +29,8 @@ export interface ProbeArgs {
 	expectDependencies?: boolean;
 	/** Set when a brokered Anthropic rule is on the box's firewall. */
 	expectAnthropicRule?: boolean;
+	/** Spike only: the box's root is an overlay; commands run inside its namespace as the user. */
+	overlay?: boolean;
 	/** A gate to mint a ticket at; skipped when the secret is absent. */
 	gate?: { workspaceId: string; userId: string } | null;
 	log: (line: string) => void;
@@ -50,7 +53,12 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		if (!ok) failed++;
 	};
 	const run = async (command: string): Promise<string> => {
-		const result = await sandbox.runCommand("bash", ["-lc", command]);
+		const result = args.overlay
+			? await sandbox.runCommand({
+					cmd: "sudo",
+					args: ["-n", ...insideOverlay(command)],
+				})
+			: await sandbox.runCommand("bash", ["-lc", command]);
 		return `${await result.stdout()}${await result.stderr()}`;
 	};
 	const until = async (
@@ -221,6 +229,89 @@ export async function probeBox(args: ProbeArgs): Promise<number> {
 		);
 	}
 	return failed;
+}
+
+/** Spike only: a command run in the overlay namespace, as the sandbox user, from outside. */
+export function insideOverlay(command: string): string[] {
+	return [
+		"superset-overlay-root",
+		"run",
+		"runuser",
+		"-u",
+		"ubuntu",
+		"--",
+		"env",
+		"HOME=/home/ubuntu",
+		"bash",
+		"-lc",
+		command,
+	];
+}
+
+/**
+ * Spike only: what the desktop renderer does through the gate. A terminal
+ * attached by WebSocket with a ticket, typed into, read back; and the box's
+ * root as that terminal sees it.
+ */
+export async function checkGateTerminal(args: {
+	gate: { workspaceId: string; userId: string };
+	host: string;
+	label: string;
+	log: (line: string) => void;
+}): Promise<number> {
+	const access = await mintSandboxGateAccess({
+		...args.gate,
+		port: SANDBOX_PORTS.hostService,
+		target: args.host,
+	});
+	const terminalId = randomUUID();
+	const url = `${access.url.replace(/^http/, "ws")}/terminal/${terminalId}?workspaceId=${args.gate.workspaceId}&create=1&token=${encodeURIComponent(access.token)}`;
+	const started = Date.now();
+	const seen = await new Promise<string>((resolve) => {
+		const out: string[] = [];
+		const socket = new WebSocket(url);
+		const timer = setTimeout(() => {
+			socket.close();
+			resolve(`timeout after ${out.length} frames`);
+		}, 30_000);
+		socket.onmessage = (event) => {
+			const raw =
+				typeof event.data === "string"
+					? event.data
+					: new TextDecoder().decode(event.data as ArrayBuffer);
+			let message: { type?: string; data?: string } | null = null;
+			try {
+				message = JSON.parse(raw);
+			} catch {}
+			if (message?.type === "attached") {
+				socket.send(
+					JSON.stringify({
+						type: "input",
+						data: "echo GATE-OK root=$(findmnt -no FSTYPE /) cwd=$(pwd -P)\r",
+					}),
+				);
+			}
+			out.push(message ? (message.data ?? "") : raw);
+			const hit = out
+				.join("")
+				.match(/GATE-OK root=\w+ cwd=\S+/g)
+				?.find((line) => !line.includes("$("));
+			if (hit) {
+				clearTimeout(timer);
+				socket.close();
+				resolve(hit);
+			}
+		};
+		socket.onerror = () => {
+			clearTimeout(timer);
+			resolve("socket error");
+		};
+	});
+	const ok = seen.startsWith("GATE-OK root=overlay");
+	args.log(
+		`${ok ? "ok  " : "FAIL"} ${args.label}: terminal over the deployed gate: ${seen} (${Date.now() - started} ms)`,
+	);
+	return ok ? 0 : 1;
 }
 
 /** The second boot of a box: what a wake looks like in its log. */

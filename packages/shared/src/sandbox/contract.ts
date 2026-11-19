@@ -115,6 +115,8 @@ export const sandboxIdentitySchema = z.object({
 	HOST_SERVICE_SENTRY_ENVIRONMENT: z.string().optional(),
 	/** Starts `superset-logship`, which sends the platform's box logs to Sentry. Absent is off. */
 	SUPERSET_SANDBOX_BOX_LOGS: z.literal("1").optional(),
+	/** Spike only: the workspace's root is an overlay on its drive (packages/sandbox/spike-overlay). */
+	SUPERSET_SANDBOX_OVERLAY: z.literal("1").optional(),
 	/** A built-in agent to run once on first boot; see cloud-agent-launch. */
 	SUPERSET_SANDBOX_AGENT: z.string().optional(),
 	SUPERSET_SANDBOX_AGENT_PROMPT: z.string().optional(),

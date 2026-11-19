@@ -306,6 +306,8 @@ export async function provisionSandbox(args: {
 	claim: SandboxClaim;
 	/** A golden under construction keeps its snapshots until its row goes. */
 	kind?: "workspace" | "environment";
+	/** Spike only (overlay root): drives mounted beside the agent-tools drive. */
+	extraMounts?: SandboxMounts;
 }): Promise<{
 	providerSandboxId: string;
 	sandboxUrl: string;
@@ -327,9 +329,13 @@ export async function provisionSandbox(args: {
 		keepLastSnapshots: { count: 1 },
 		tags: sandboxTags(kind, args.claim.identity),
 	};
-	const mounts = await agentToolsMounts(
+	const agentMounts = await agentToolsMounts(
 		agentToolsDriveName(args.claim, args.environment.region),
 	);
+	const mounts =
+		agentMounts || args.extraMounts
+			? { ...args.extraMounts, ...agentMounts }
+			: undefined;
 	const sandbox =
 		(await getSandboxToWake(args.name)) ??
 		(await Sentry.startSpan(

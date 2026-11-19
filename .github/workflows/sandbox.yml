@@ -146,6 +146,8 @@ jobs:
           CDN_R2_ENDPOINT: ${{ secrets.CDN_R2_ENDPOINT }}
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
+          # Spike branch only: boot the overlay-root prototype.
+          REAL_SANDBOX_OVERLAY: "1"
         run: bun run src/real-sandbox.ts
 
   inventory:
