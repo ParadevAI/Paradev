@@ -301,8 +301,8 @@ const groupKeys = {
 	},
 } satisfies Record<CloudFleetGroupBy, FactKeys>;
 
-const pacificDay = (column: AnyPgColumn) =>
-	sql`to_char((${column} at time zone 'America/Los_Angeles')::date, 'YYYY-MM-DD')`;
+export const billingDay = (column: AnyPgColumn | SQL) =>
+	sql<string>`to_char(public.cloud_billing_day(${column}), 'YYYY-MM-DD')`;
 
 const NO_KEY: FactKeys = {
 	event: sql`null`,
@@ -762,9 +762,9 @@ export async function queryFleetCloudUsageByWorkspaceDay(
 		options.window,
 		groupKeys.workspace,
 		{
-			event: pacificDay(events.sentAt),
-			boot: pacificDay(boots.startedAt),
-			failed: pacificDay(workspaces.failedAt),
+			event: billingDay(events.sentAt),
+			boot: billingDay(boots.startedAt),
+			failed: billingDay(workspaces.failedAt),
 		},
 	);
 	const rows = await db

@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import {
 	CHECKOUT,
@@ -8,7 +9,7 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import { recordUsageEvent } from "./cloud-usage-events";
-import { BILLED_FEATURE } from "./cloud-usage-query";
+import { BILLED_FEATURE, billingDay } from "./cloud-usage-query";
 import { cloudUsageDaily, cloudUsageEvents } from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
@@ -44,7 +45,7 @@ async function rollup() {
 
 async function fromEvents() {
 	const { rows } = await db.execute<Row>(sql`
-		select e.organization_id, (e.sent_at at time zone 'America/Los_Angeles')::date::text as day, e.user_id, b.vcpus,
+		select e.organization_id, ${billingDay(sql`e.sent_at`)}::text as day, e.user_id, b.vcpus,
 			sum(e.amount) as gb_minutes, sum(extract(epoch from e.window_to - e.window_from)) as seconds,
 			count(*)::int as events
 		from cloud_usage_events e join cloud_workspace_boots b on b.id = e.boot_id
@@ -208,6 +209,30 @@ describe("cloud_usage_daily trigger", () => {
 			{ gbMinutes: "0.000000", seconds: "0.000000", events: 0 },
 		]);
 		expect(await rollup()).toEqual(await fromEvents());
+	});
+
+	test("the backfill rebuilds a rollup that lost or gained rows, and leaves no empty row", async () => {
+		await db.execute(sql`delete from cloud_usage_daily where user_id = ${SAM}`);
+		await db.execute(
+			sql`update cloud_usage_daily set gb_minutes = gb_minutes + 1 where user_id = ${MAYA}`,
+		);
+		expect(await rollup()).not.toEqual(await fromEvents());
+
+		await db.$client.exec(
+			readFileSync(
+				new URL(
+					"../drizzle/0202_cloud_usage_daily_backfill.sql",
+					import.meta.url,
+				),
+				"utf8",
+			),
+		);
+
+		expect(await rollup()).toEqual(await fromEvents());
+		const { rows } = await db.execute<{ n: number }>(
+			sql`select count(*)::int as n from cloud_usage_daily where events = 0`,
+		);
+		expect(rows).toEqual([{ n: 0 }]);
 	});
 
 	test("the day does not depend on the session's time zone", async () => {
