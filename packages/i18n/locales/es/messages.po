@@ -1218,6 +1218,9 @@ msgstr "{name}: {monthly} por usuario/mes"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} por usuario/mes, o {yearly} con facturación anual"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} todavía usa tu inicio de sesión anterior. Reinicia para usar el nuevo."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Especifica al menos una persona, o elige {choice}.} sender {Especifica al menos un remitente, o elige {choice}.} other {Especifica al menos un elemento, o elige {choice}.}}"
 
@@ -2374,9 +2377,6 @@ msgstr "Comandos de agente"
 
 msgid "Agent Configs"
 msgstr "Configuraciones de agente"
-
-msgid "Agent credentials changed"
-msgstr "Las credenciales del agente cambiaron"
 
 msgid "Agent finished"
 msgstr "El agente terminó"
@@ -16793,9 +16793,6 @@ msgstr "Reiniciar la introducción"
 msgid "Restart running {providerLabel} agents?"
 msgstr "¿Reiniciar los agentes de {providerLabel} en marcha?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Reinicia los espacios de trabajo en ejecución para que sus agentes apliquen el cambio."
-
 msgid "Restart terminal daemon?"
 msgstr "¿Reiniciar el daemon de terminal?"
 
@@ -16804,9 +16801,6 @@ msgstr "Reiniciar las terminales"
 
 msgid "Restart workspace"
 msgstr "Reiniciar espacio de trabajo"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Reinicia los espacios de trabajo para aplicar las nuevas credenciales del agente."
 
 msgid "Restarted"
 msgstr "Reiniciado"

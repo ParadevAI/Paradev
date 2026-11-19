@@ -40,10 +40,6 @@ export {
 	reapplyRulesFor,
 	scheduleRulesRefresh,
 } from "./reapply-rules";
-export {
-	type RefreshSandboxCredentialsOutcome,
-	refreshSandboxCredentials,
-} from "./refresh-credentials";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,

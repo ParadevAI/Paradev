@@ -1212,6 +1212,9 @@ msgstr "{name}: {monthly} за користувача на місяць"
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за користувача на місяць або {yearly} у разі річної оплати"
 
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} досі використовує ваш попередній вхід. Перезапустіть, щоб використати новий."
+
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажіть принаймні одну людину або виберіть {choice}.} sender {Укажіть принаймні одного відправника або виберіть {choice}.} other {Укажіть принаймні одне значення або виберіть {choice}.}}"
 
@@ -2368,9 +2371,6 @@ msgstr "Команди агентів"
 
 msgid "Agent Configs"
 msgstr "Конфігурації агентів"
-
-msgid "Agent credentials changed"
-msgstr "Облікові дані агента змінилися"
 
 msgid "Agent finished"
 msgstr "Агент завершив роботу"
@@ -16787,9 +16787,6 @@ msgstr "Пройти онбординг заново"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустити запущених агентів {providerLabel}?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Перезапустіть запущені робочі простори, щоб їхні агенти застосували зміну."
-
 msgid "Restart terminal daemon?"
 msgstr "Перезапустити демон термінала?"
 
@@ -16798,9 +16795,6 @@ msgstr "Перезапустити термінали"
 
 msgid "Restart workspace"
 msgstr "Перезапустити робочий простір"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Перезапустіть робочі простори, щоб застосувати нові облікові дані агента."
 
 msgid "Restarted"
 msgstr "Перезапущено"
