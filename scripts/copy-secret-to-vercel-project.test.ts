@@ -17,8 +17,15 @@ afterEach(() => {
 function startFakeVercel(
 	initial: Env[],
 	onPost: (envs: Env[], body: Record<string, unknown>) => void,
-	options: { listExtra?: object; failed?: object[] } = {},
+	options: {
+		listExtra?: object;
+		listExtraAfterPost?: object;
+		listBody?: object;
+		failed?: object[];
+		dropPost?: boolean;
+	} = {},
 ) {
+	let posted = false;
 	const envs = [...initial];
 	const seen: Seen[] = [];
 	server = Bun.serve({
@@ -35,13 +42,25 @@ function startFakeVercel(
 				return Response.json({ error: { code: "forbidden" } }, { status: 403 });
 			}
 			if (request.method === "POST") {
+				posted = true;
 				onPost(envs, JSON.parse(body));
+				if (options.dropPost) {
+					return new Response(
+						new ReadableStream({ start: (c) => c.error(new Error("drop")) }),
+						{ status: 201, headers: { "content-length": "100" } },
+					);
+				}
 				return Response.json(
 					{ created: envs.at(-1), failed: options.failed ?? [] },
 					{ status: 201 },
 				);
 			}
-			return Response.json({ envs, ...options.listExtra });
+			return Response.json(
+				options.listBody ?? {
+					envs,
+					...(posted ? options.listExtraAfterPost : options.listExtra),
+				},
+			);
 		},
 	});
 	return { seen, url: `http://localhost:${server.port}` };
@@ -210,6 +229,43 @@ describe("copy-secret-to-vercel-project.sh", () => {
 			expect(code).toBe(0);
 			expect(fake.seen.filter((r) => r.method === "POST")).toHaveLength(1);
 		});
+	});
+
+	it("stops on a list that is not an envs array", async () => {
+		const fake = startFakeVercel(OTHERS, upsertSensitive, {
+			listBody: { key: "A", type: "plain", target: ["production"] },
+		});
+		const { output, code } = await run(fake.url, { APPLY: "true" });
+		expect(code).not.toBe(0);
+		expect(output).toContain("cannot be trusted");
+		expect(output).not.toContain("jq: error");
+		expect(fake.seen.map((r) => r.method)).toEqual(["GET"]);
+	});
+
+	it("says the value may be written when the read after the write is paged", async () => {
+		const fake = startFakeVercel(OTHERS, upsertSensitive, {
+			listExtraAfterPost: { pagination: { count: 3, next: 5, prev: null } },
+		});
+		const { output, code } = await run(fake.url, { APPLY: "true" });
+		expect(code).not.toBe(0);
+		expect(output).toContain("The value may have been written");
+		expect(output).not.toContain(FAKE_SECRET);
+	});
+
+	it("says the value may be written when the POST connection drops", async () => {
+		const fake = startFakeVercel(OTHERS, upsertSensitive, { dropPost: true });
+		const { output, code } = await run(fake.url, { APPLY: "true" });
+		expect(code).not.toBe(0);
+		expect(output).toContain("The value may have been written");
+		expect(output).not.toContain(FAKE_SECRET);
+	});
+
+	it("does not say it when nothing was written", async () => {
+		const fake = startFakeVercel(OTHERS, upsertSensitive, {
+			listExtra: { hiddenProductionEnvCount: 1 },
+		});
+		const { output } = await run(fake.url, { APPLY: "true" });
+		expect(output).not.toContain("may have been written");
 	});
 
 	it("stops on a failed entry and never prints the value it echoes", async () => {

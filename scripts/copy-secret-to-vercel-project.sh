@@ -24,7 +24,15 @@ if [ -z "${BETTER_AUTH_SECRET:-}" ]; then
 fi
 
 response="$(mktemp)"
-trap 'rm -f "$response"' EXIT
+written=false
+finish() {
+  local code=$?
+  rm -f "$response"
+  if [ "$written" = "true" ] && [ "$code" -ne 0 ]; then
+    echo "The value may have been written; the check after it failed. Verify in Vercel." >&2
+  fi
+}
+trap finish EXIT
 
 DEFS='def envs: (.envs // .) | map(.target |= (if type == "array" then . else [.] end));'
 
@@ -37,8 +45,8 @@ list_envs() {
   curl --fail-with-body -sS -o "$response" \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
     "$API/v10/projects/$PROJECT/env?teamId=$VERCEL_ORG_ID" || fail_with_code "Reading the project env list"
-  if ! jq -e '(.pagination.next // null) == null and (.hiddenProductionEnvCount // 0) == 0' "$response" >/dev/null; then
-    echo "The env list is paged or hides production variables, so it cannot be trusted. Stopping." >&2
+  if ! jq -e '(.envs | type) == "array" and (.pagination.next // null) == null and (.hiddenProductionEnvCount // 0) == 0' "$response" >/dev/null; then
+    echo "The env list is paged, hides production variables or has an unexpected shape, so it cannot be trusted. Stopping." >&2
     exit 1
   fi
 }
@@ -81,6 +89,7 @@ if [ "$present" = "true" ] && [ "${OVERWRITE:-false}" != "true" ]; then
   exit 1
 fi
 
+written=true
 jq -n '{key: "BETTER_AUTH_SECRET", value: $ENV.BETTER_AUTH_SECRET, type: "sensitive", target: ["production", "preview"]}' |
   curl --fail-with-body -sS -o "$response" -X POST \
     -H "Authorization: Bearer $VERCEL_TOKEN" \
