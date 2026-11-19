@@ -20981,6 +20981,9 @@ msgstr "Cette action désindexera et annulera toutes les modifications indexées
 msgid "This workspace"
 msgstr "Cet espace de travail"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Impossible d’enregistrer cet espace de travail comme environnement. Réessayez plus tard."
+
 msgid "This workspace has no project to branch from"
 msgstr "Cet espace de travail n'a aucun projet depuis lequel dupliquer"
 

@@ -35,6 +35,7 @@ import { boxLogsEnabled, organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
+import { claimedWorkspaceDrive, workspaceDrivesEnabled } from "./drives";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
 import {
@@ -87,11 +88,15 @@ export async function buildSandboxClaim(args: {
 	 * are fixed once the box exists), and it costs a GitHub request.
 	 */
 	withRepoHooks?: boolean;
+	/** A create, the only claim that may give the workspace its environment's drive. */
+	provisioning?: boolean;
 }): Promise<{
 	claim: SandboxClaim;
 	environment: SandboxEnvironment;
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
+	/** The drive the claim names; what a provision must fork and mount. */
+	driveName: string | null;
 }> {
 	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
@@ -137,6 +142,18 @@ export async function buildSandboxClaim(args: {
 			: null;
 	const repositories = toSandboxRepositories(checkouts);
 
+	const provisioning = args.provisioning ?? false;
+	const drive = claimedWorkspaceDrive({
+		row: args.row,
+		goldenDriveName: environment.goldenDriveName,
+		provisioning,
+		// The kill switch: with the flag off, a new workspace gets no drive.
+		drivesEnabled:
+			provisioning &&
+			!args.row.driveName &&
+			Boolean(environment.goldenDriveName) &&
+			(await workspaceDrivesEnabled(args.row.organizationId)),
+	});
 	const identity: SandboxIdentity = {
 		SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
 		SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
@@ -147,6 +164,7 @@ export async function buildSandboxClaim(args: {
 		SUPERSET_SANDBOX_PLUGINS: JSON.stringify(plugins),
 		SUPERSET_SANDBOX_IMAGE_TAG: environment.sourceRef,
 		SUPERSET_SANDBOX_PROVIDER: args.row.provider,
+		...drive.identity,
 		SUPERSET_BUNDLE_SHA: environment.bundleSha,
 		...(env.SENTRY_DSN_SANDBOX
 			? {
@@ -194,8 +212,10 @@ export async function buildSandboxClaim(args: {
 			sourceKind: environment.sourceKind,
 			sourceRef: environment.sourceRef,
 			region: environment.region,
+			goldenDriveName: environment.goldenDriveName,
 		},
 		repositories,
 		agentCredentialDigest: agentCredentialDigest(signIns),
+		driveName: drive.driveName,
 	};
 }

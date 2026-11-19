@@ -20981,6 +20981,9 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 msgid "This workspace"
 msgstr "Bu çalışma alanı"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Bu çalışma alanı ortam olarak kaydedilemedi. Daha sonra tekrar deneyin."
+
 msgid "This workspace has no project to branch from"
 msgstr "Bu çalışma alanının çatallanacak bir projesi yok"
 

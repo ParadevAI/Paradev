@@ -699,6 +699,56 @@ socket, all describing processes that no longer exist. The boot runner
 deletes and recreates it first thing; anything that reads a flag there must
 tolerate a stale one for the milliseconds before that.
 
+**A workspace drive is not a disk the box owns.** In drive mode
+(`environments.golden_drive_name` set), `/workspace` and large home subtrees
+live on a Vercel drive at `/mnt/superset-drive`, so they never enter the
+box's snapshot. Three things a machine someone owns never makes you think
+about:
+
+- *Bind mounts end with the session.* Vercel attaches the drive on every
+  session (the control plane passes `mounts` on every create and wake), but
+  the `mount --bind` of `/workspace` and each home subtree is gone after a
+  stop. `superset-boot` lays them out again on every boot, before
+  host-service and the checkout read `/workspace` (`drive.layout` in the
+  boot log). Anything that runs before that sees the root disk's empty
+  `/workspace`.
+- *Hardlinks must stay inside `/workspace`.* Each bind mount is its own
+  `vfsmount`, and `link(2)` across two of them fails with `EXDEV` even on the
+  same filesystem. bun and pnpm then copy every package instead of linking
+  it. So their stores are inside the `/workspace` mount
+  (`BUN_INSTALL_CACHE_DIR=/workspace/.superset/stores/bun`,
+  `npm_config_store_dir=/workspace/.superset/stores/pnpm`, in host-service's
+  env and the login profile), not under `~/.bun` or `~/.cache`.
+- *A drive needs detach before the next mount.* After a stop the drive stays
+  attached while the session flushes what it wrote (6 s after 1 GB, 44 s
+  after 12 GB), and a mount taken meanwhile reads a corrupt or empty
+  filesystem. `wakeSandbox` waits for `Drive.get(...).currentSandboxName` to
+  clear, at most 2 minutes, and fails the wake rather than mount. A sandbox
+  deleted while it still holds its drive leaves the drive attached for
+  minutes, so every delete stops the box first (`deleteSandboxAndDrive`).
+
+A drive has no discard either: deleting a file on it does not lower its
+billed size.
+A drive that did not mount leaves the root disk's empty `/workspace` in its
+place, which would look like the user's work is gone. So the identity file
+names the drive (`SUPERSET_SANDBOX_DRIVE`), the drive names its owner
+(`/mnt/superset-drive/state/workspace-id`), and `superset-boot` refuses to
+continue (`drive.missing`, `drive.foreign`, `drive.unlaid`) before the bundle,
+host-service and the checkout. The control plane spots the refusal in this
+boot's lines of the boot log within about 2 s and answers "still starting";
+the next wake mounts the drive afresh, and a create records the box asleep.
+A refusal no remount can change (another workspace's drive, a laid-out drive
+that mounts empty, a boot script that predates the drive) ends after 3 boots
+in a row as `failed`, with the box and the drive kept. A boot that answers
+without `drive.layout` is refused the same way.
+A box on an image whose runner predates the guard gets it after the reexec
+into the bundle's runner, still before host-service.
+
+*The root disk and the drive can disagree.* A stop whose snapshot does not
+land rolls the root back and not the drive. So in drive mode the checkout
+markers and `host.db` live on the drive, and the checkout never replaces a
+non-empty checkout there.
+
 **The control plane's command runs from the image's workdir, which the
 checkout replaces.** The first boot cloned `/workspace` by deleting and
 recreating it, and every child of the boot command — host-service, git,
@@ -961,7 +1011,9 @@ OpenCode and Pi update in place, beside their binary. On a box they run from
 a read-only mount and are pinned by the bundle. `/etc/profile.d/superset.sh`
 turns off their update checks (`OPENCODE_DISABLE_AUTOUPDATE`,
 `PI_SKIP_VERSION_CHECK`), the same way `DISABLE_AUTOUPDATER` does for
-Claude. They keep their state under `~/.local/share/opencode`,
+Claude. `superset-boot` also puts all three in host-service's own env: a chat
+agent gets host-service's env, not a terminal's, whenever host-service's
+login-shell probe fails. They keep their state under `~/.local/share/opencode`,
 `~/.config/opencode` and `~/.pi/agent`, as they do on a laptop.
 
 **A read-only snapshot mount taken while a writer holds the drive is corrupt.**
@@ -1076,3 +1128,12 @@ doesn't re-spend a session on it; the next thing to try is attaching to the
 `win.setSize()` directly rather than simulating it from outside, or watching
 `app.on("child-process-gone")` / `render-process-gone` across a CDP-reload
 loop to catch the actual GPU-process death this is presumably downstream of.
+
+**`sudo` cannot resolve the box's hostname.** A machine someone owns has its
+hostname in `/etc/hosts`; a Vercel box does not, so every `sudo` (including
+`runCommand({ sudo: true })`) writes `sudo: unable to resolve host <name>:
+Name or service not known` to stderr. The command still runs. A check that
+reads `stdout + stderr` then sees an extra line and fails a comparison that
+was correct; the first real drive check failed 7 expectations that way.
+**What we did:** the real-sandbox drive pass compares stdout only and shows
+stderr as detail. **Open:** the hostname is still missing from `/etc/hosts`.

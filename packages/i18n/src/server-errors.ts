@@ -508,6 +508,13 @@ export const serverErrorMessages: Record<
 					"This environment's repositories are fixed; promote a workspace again to change them",
 			}),
 		),
+	"serverError.environment.couldNotPromote": () =>
+		i18n._(
+			msg({
+				message:
+					"This workspace could not be saved as an environment. Try again later.",
+			}),
+		),
 	"serverError.environment.couldNotRecord": () =>
 		i18n._(
 			msg({

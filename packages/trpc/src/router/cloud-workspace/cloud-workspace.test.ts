@@ -17,6 +17,7 @@ import * as meter from "./meter";
 import * as reap from "./reap";
 import * as sandboxExpiry from "./sandbox-expiry";
 import * as sandboxSleep from "./sandbox-sleep";
+import * as teardown from "./teardown";
 import * as wake from "./wake";
 
 const WORKSPACE_ID = "0b8f4c1e-2a3d-4e5f-8a9b-1c2d3e4f5a6b";
@@ -332,6 +333,19 @@ describe("an address read that finds the box stopped", () => {
 });
 
 describe("cloudWorkspace.delete when the reap cannot be queued", () => {
+	const retired: string[] = [];
+	stub(teardown, {
+		retireAndTearDown: async (row: { providerSandboxId: string }) => {
+			retired.push(row.providerSandboxId);
+			return true;
+		},
+	});
+
+	test("retires the box's names and hands it to the retried teardown", async () => {
+		await caller.cloudWorkspace.delete({ id: WORKSPACE_ID });
+		expect(retired).toEqual(["box-1"]);
+	});
+
 	test("ends every open boot as archived before the final settle", async () => {
 		expect(await caller.cloudWorkspace.delete({ id: WORKSPACE_ID })).toEqual({
 			deleted: true,

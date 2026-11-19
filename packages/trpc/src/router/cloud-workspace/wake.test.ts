@@ -9,6 +9,7 @@ import * as sandbox from "../../lib/sandbox";
 import * as meter from "./meter";
 import * as sandboxExpiry from "./sandbox-expiry";
 import * as sandboxSleep from "./sandbox-sleep";
+import * as teardown from "./teardown";
 import {
 	markSandboxUnavailable,
 	restartCloudWorkspace,
@@ -438,5 +439,55 @@ describe("markSandboxUnavailable", () => {
 			);
 			expect(captured).toEqual([]);
 		});
+	});
+});
+
+describe("a workspace on a drive whose snapshot expired", () => {
+	const retired: unknown[] = [];
+	const failed: unknown[] = [];
+	stub(realtime, { nudge: () => {} });
+	stub(db, rowUpdate(true, failed));
+	stub(Sentry, { captureException: () => "" });
+	stub(teardown, {
+		retireAndTearDown: async (row: unknown) => {
+			retired.push(row);
+			return true;
+		},
+	});
+
+	test("is only marked failed; its box and drive stay for the cleanup job", async () => {
+		await markSandboxUnavailable(
+			{ ...ROW, driveName: "drive-ws-box" } as Row,
+			new sandbox.SandboxUnavailableError(
+				"ws-box",
+				new APIError(new Response(null, { status: 410 })),
+			),
+		);
+		expect(failed).toEqual([
+			expect.objectContaining({
+				status: "failed",
+				failureReason: "snapshot_expired",
+			}),
+		]);
+		expect(retired).toEqual([]);
+	});
+});
+
+describe("a wake of a workspace without a drive", () => {
+	const wakes: Array<{ mounts?: unknown }> = [];
+	stub(sandbox, {
+		buildSandboxClaim: async () => ({ claim: {}, agentCredentialDigest: "" }),
+		wakeSandbox: async (args: { mounts?: unknown }) => {
+			wakes.push(args);
+			throw new Error("wake not under test");
+		},
+	});
+
+	test("mounts nothing, whatever its environment", async () => {
+		await expect(
+			wakeCloudWorkspace({ ...ROW, driveName: null } as Row),
+		).rejects.toThrow("wake not under test");
+		expect(wakes).toHaveLength(1);
+		expect(wakes[0]?.mounts).toBeUndefined();
 	});
 });

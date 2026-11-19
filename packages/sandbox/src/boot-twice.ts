@@ -9,6 +9,9 @@
  *
  *   bun run src/boot-twice.ts            expects superset-sandbox:local
  *   SANDBOX_IMAGE=... bun run src/boot-twice.ts
+ *   BOOT_TWICE_CA_FILE=/etc/ssl/certs/ca-certificates.crt bun run src/boot-twice.ts
+ *       in a cloud workspace, whose egress firewall re-signs TLS: without
+ *       its CA the checkout cannot reach GitHub
  *
  * Exits non-zero on any failed expectation, with the boot log printed.
  */
@@ -17,14 +20,24 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
 	renderSandboxConf,
+	SANDBOX_DRIVE_HOME_SUBTREES,
+	SANDBOX_DRIVE_STORES,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
+	type SandboxIdentity,
 } from "@superset/shared/sandbox/contract";
 import { BUNDLE_SRC, PACKAGE_ROOT } from "./build";
 import { discardingSteps, loadAssets, loadSteps } from "./manifest";
 
 const IMAGE = process.env.SANDBOX_IMAGE ?? "superset-sandbox:local";
 const NAME = `superset-boot-twice-${Date.now().toString(36)}`;
+const DRIVE_NAME = `${NAME}-drive`;
+const CA_MOUNT = process.env.BOOT_TWICE_CA_FILE
+	? [
+			"-v",
+			`${process.env.BOOT_TWICE_CA_FILE}:/etc/ssl/certs/ca-certificates.crt:ro`,
+		]
+	: [];
 const bundleSha = readFileSync(
 	join(PACKAGE_ROOT, "dist", "bundle.sha256"),
 	"utf8",
@@ -47,9 +60,19 @@ function docker(
 	}
 	return out;
 }
-const exec = (cmd: string, opts: { user?: string; check?: boolean } = {}) =>
+const exec = (
+	cmd: string,
+	opts: { user?: string; check?: boolean; on?: string } = {},
+) =>
 	docker(
-		["exec", ...(opts.user ? ["-u", opts.user] : []), NAME, "bash", "-lc", cmd],
+		[
+			"exec",
+			...(opts.user ? ["-u", opts.user] : []),
+			opts.on ?? NAME,
+			"bash",
+			"-lc",
+			cmd,
+		],
 		{ check: opts.check },
 	);
 
@@ -57,7 +80,7 @@ const exec = (cmd: string, opts: { user?: string; check?: boolean } = {}) =>
  * The way the control plane starts boot: as the image user, through sudo
  * with the secret preserved from the command's env, never on the argv.
  */
-function bootAsUser(): string {
+function bootAsUser(on = NAME): string {
 	const proc = Bun.spawnSync(
 		[
 			"docker",
@@ -66,7 +89,7 @@ function bootAsUser(): string {
 			"ubuntu",
 			"-e",
 			"HOST_SERVICE_SECRET=boot-twice-secret",
-			NAME,
+			on,
 			"sudo",
 			"--preserve-env=HOST_SERVICE_SECRET",
 			"/usr/local/bin/superset-boot",
@@ -87,7 +110,7 @@ function expect(label: string, ok: boolean, detail = ""): void {
 	if (!ok) failures.push(label);
 }
 
-const identity = renderSandboxConf({
+const identityFields: SandboxIdentity = {
 	SUPERSET_SANDBOX_CONTRACT: "1",
 	SUPERSET_BUNDLE_SHA: bundleSha,
 	SUPERSET_API_URL: "https://api.example.invalid",
@@ -116,9 +139,561 @@ const identity = renderSandboxConf({
 			enabled: true,
 		},
 	]),
-});
+};
+const identity = renderSandboxConf(identityFields);
 
-docker(["rm", "-f", NAME], { check: false });
+/**
+ * Drive mode, with a tmpfs standing in for the Vercel drive at its mount
+ * path: the layout, the store variables and Docker's data-root, then a second boot after the session's bind mounts are gone.
+ */
+function drivePass(): void {
+	const drive = SANDBOX_PATHS.drive;
+	const on = DRIVE_NAME;
+	docker([
+		"run",
+		"-d",
+		"--name",
+		on,
+		"--platform",
+		"linux/amd64",
+		"--privileged",
+		"--user",
+		"root",
+		...CA_MOUNT,
+		"--tmpfs",
+		`${drive}:exec,mode=0755`,
+		IMAGE,
+		"sleep",
+		"infinity",
+	]);
+	const driveIdentity: SandboxIdentity = {
+		...identityFields,
+		SUPERSET_SANDBOX_DRIVE: DRIVE_NAME,
+	};
+	const writeConf = (fields: SandboxIdentity) =>
+		docker(["exec", "-i", on, "bash", "-c", `cat > ${SANDBOX_PATHS.conf}`], {
+			stdin: renderSandboxConf(fields),
+		});
+	writeConf(driveIdentity);
+	const bootDrive = () => {
+		bootAsUser(on);
+		exec(
+			`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/host-service.ready ] && exit 0; sleep 0.1; done; exit 1`,
+			{ check: false, on },
+		);
+	};
+	const homeMounts = SANDBOX_DRIVE_HOME_SUBTREES.map(
+		(sub) => `${SANDBOX_PATHS.home}/${sub}`,
+	);
+	const allMounted = () =>
+		exec(
+			[SANDBOX_PATHS.workspace, ...homeMounts]
+				.map((path) => `mountpoint -q ${path} || echo "not mounted ${path}"`)
+				.join("; "),
+			{ check: false, on },
+		).trim();
+
+	bootDrive();
+	const log = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive: layout stamped with its milliseconds",
+		/drive\.layout ms=\d+/.test(log),
+		log.match(/drive\.layout.*/)?.[0],
+	);
+	expect(
+		"drive: /workspace and every home subtree are bind mounts",
+		allMounted() === "",
+		allMounted(),
+	);
+	expect(
+		"drive: /workspace is backed by the drive",
+		/\/workspace/.test(
+			exec(`findmnt -no FSROOT ${SANDBOX_PATHS.workspace}`, {
+				check: false,
+				on,
+			}),
+		),
+		exec(`findmnt -no SOURCE,FSROOT ${SANDBOX_PATHS.workspace}`, {
+			check: false,
+			on,
+		}).trim(),
+	);
+	expect(
+		"drive: its directories belong to the sandbox user",
+		exec(
+			`stat -c %U ${drive}/workspace ${drive}/home ${drive}/home/.local ${SANDBOX_PATHS.home}/.local ${SANDBOX_PATHS.home}/.cargo`,
+			{ check: false, on },
+		).trim() === Array(5).fill("ubuntu").join("\n"),
+	);
+	const hostEnv = exec(
+		`tr '\\0' '\\n' < /proc/$(cat ${SANDBOX_PATHS.run}/host-service.pid)/environ`,
+		{ check: false, on },
+	);
+	expect(
+		"drive: host-service gets the stores inside /workspace",
+		hostEnv.includes(`BUN_INSTALL_CACHE_DIR=${SANDBOX_DRIVE_STORES.bun}`) &&
+			hostEnv.includes(`npm_config_store_dir=${SANDBOX_DRIVE_STORES.pnpm}`),
+	);
+	expect(
+		"drive: a login shell gets them too",
+		exec("echo $BUN_INSTALL_CACHE_DIR", {
+			user: "ubuntu",
+			check: false,
+			on,
+		}).trim() === SANDBOX_DRIVE_STORES.bun,
+	);
+	expect(
+		"drive: Docker's data-root is on the drive, storage driver kept",
+		/"data-root":"\/mnt\/superset-drive\/docker"/.test(
+			exec("jq -c . /etc/docker/daemon.json", { check: false, on }),
+		) &&
+			/fuse-overlayfs/.test(
+				exec("cat /etc/docker/daemon.json", { check: false, on }),
+			),
+		exec("cat /etc/docker/daemon.json", { check: false, on }).trim(),
+	);
+	const checkedOut = /ready/.test(
+		exec(
+			`for i in $(seq 1 1200); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+			{ check: false, on },
+		),
+	);
+	expect("drive: checkout done", checkedOut);
+	expect(
+		"drive: the checkout landed on the drive",
+		/ok/.test(
+			exec(`test -d ${drive}/workspace/.git && echo ok`, { check: false, on }),
+		),
+	);
+	expect(
+		"drive: git ignores the stores of a root checkout",
+		/\/\.superset\/stores\//.test(
+			exec(`cat ${SANDBOX_PATHS.workspace}/.git/info/exclude`, {
+				check: false,
+				on,
+			}),
+		),
+	);
+
+	// A new session: no processes and no bind mounts survive; the drive does.
+	const endSession = () =>
+		exec(
+			`pkill -u ubuntu -TERM || true; pkill -x superset-memgua || true; sleep 1; pkill -u ubuntu -KILL || true; pkill -x Xvnc || true; rm -rf ${SANDBOX_PATHS.run}; for m in $(findmnt -rn -o TARGET | grep -E '^(${SANDBOX_PATHS.workspace}|${SANDBOX_PATHS.home}/)' | sort -r); do umount -l "$m"; done; : > ${SANDBOX_PATHS.bootLog}`,
+			{ check: false, on },
+		);
+	endSession();
+	bootDrive();
+	const log2 = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive, second boot: layout redone",
+		/drive\.layout ms=\d+/.test(log2),
+	);
+	expect(
+		"drive, second boot: every bind mount back",
+		allMounted() === "",
+		allMounted(),
+	);
+	expect(
+		"drive, second boot: nothing installed",
+		/apply-rootfs installed=0/.test(log2),
+	);
+	expect(
+		"drive, second boot: the checkout is still there",
+		/checkout\.(skipped|fetched)/.test(
+			exec(
+				`for i in $(seq 1 600); do grep -qE 'checkout.(skipped|fetched|cloned|clone)' ${SANDBOX_PATHS.bootLog} && break; sleep 0.1; done; cat ${SANDBOX_PATHS.bootLog}`,
+				{ check: false, on },
+			),
+		) || !checkedOut,
+		log2.match(/checkout\..*/)?.[0],
+	);
+	console.log(`\nboot log (drive, second boot):\n${log2}`);
+
+	const state = SANDBOX_PATHS.driveState;
+	expect(
+		"drive: the drive names its workspace",
+		exec(`cat ${state}/workspace-id`, { check: false, on }).trim() ===
+			identityFields.SUPERSET_SANDBOX_WORKSPACE_ID,
+	);
+	expect(
+		"drive: host.db and the checkout markers are on the drive, not the root disk",
+		exec(
+			`test -f ${state}/host.db && test -f ${state}/checkouts/@root && ! test -e ${SANDBOX_PATHS.checkouts}/@root && echo ok`,
+			{ check: false, on },
+		).trim() === "ok",
+		exec(`ls ${state} ${state}/checkouts ${SANDBOX_PATHS.state}`, {
+			check: false,
+			on,
+		}),
+	);
+
+	// The user's work: a local commit and an uncommitted file.
+	const ws = SANDBOX_PATHS.workspace;
+	exec(
+		`git -C ${ws} -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m user-work && echo user > ${ws}/user-file.txt`,
+		{ user: "ubuntu", on },
+	);
+	const head = () =>
+		exec(`git -C ${ws} rev-parse HEAD`, {
+			check: false,
+			user: "ubuntu",
+			on,
+		}).trim();
+	const work = head();
+	const bootAndCheckout = () => {
+		bootDrive();
+		return exec(
+			`for i in $(seq 1 1200); do grep -q 'checkout.end' ${SANDBOX_PATHS.bootLog} && break; sleep 0.1; done; cat ${SANDBOX_PATHS.bootLog}`,
+			{ check: false, on },
+		);
+	};
+	const workKept = () =>
+		head() === work &&
+		exec(`cat ${ws}/user-file.txt`, { check: false, on }).trim() === "user";
+
+	// The root disk rolled back to before the checkout; the drive did not.
+	endSession();
+	exec(
+		`rm -rf ${SANDBOX_PATHS.checkouts} ${SANDBOX_PATHS.hostDb} ${SANDBOX_PATHS.hostDb}-wal ${SANDBOX_PATHS.hostDb}-shm`,
+		{ on },
+	);
+	const rolledBack = bootAndCheckout();
+	expect(
+		"drive, root rolled back: checkout skipped, the work kept",
+		/checkout\.skipped \. /.test(rolledBack) && workKept(),
+		rolledBack.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// Even with its marker gone, a checkout that has the branch is the user's.
+	endSession();
+	exec(`rm -rf ${state}/checkouts`, { on });
+	const markerLost = bootAndCheckout();
+	expect(
+		"drive, marker lost: the branch is kept, not reset",
+		/checkout\.kept \. main is already on the drive/.test(markerLost) &&
+			workKept(),
+		markerLost.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// A fetch that fails must never turn into a reclone over the drive.
+	endSession();
+	exec(`rm -rf ${state}/checkouts`, { on });
+	exec(`git -C ${drive}/workspace branch -q -m main user-main`, {
+		user: "ubuntu",
+		on,
+	});
+	writeConf({
+		...driveIdentity,
+		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+			{
+				url: "https://github.com/paradevai/paradev.git",
+				branch: "superset/boot-twice-no-such-branch",
+				baseBranch: "superset/boot-twice-no-such-branch",
+				path: ".",
+			},
+		]),
+	});
+	const fetchFailed = bootAndCheckout();
+	expect(
+		"drive, fetch failed: nothing on the drive is replaced",
+		/checkout\.kept \. fetch failed/.test(fetchFailed) &&
+			!/checkout\.cloned/.test(fetchFailed) &&
+			workKept(),
+		fetchFailed.match(/checkout\..*/g)?.join(" | "),
+	);
+	exec(`git -C ${drive}/workspace branch -q -m user-main main`, {
+		user: "ubuntu",
+		on,
+	});
+	writeConf(driveIdentity);
+
+	// A pinned bundle whose boot script predates the drive: it must never run over the laid-out drive.
+	endSession();
+	const installedBoot = "/usr/local/bin/superset-boot";
+	const bundledBoot = `${SANDBOX_PATHS.bundleRoot}/current/rootfs${installedBoot}`;
+	exec(
+		`cp ${bundledBoot} /tmp/superset-boot.keep && sed -i '/^# superset-boot drive-contract:/d' ${bundledBoot} && rm -f ${installedBoot}.hash`,
+		{ on },
+	);
+	const downgraded = bootAsUser(on);
+	const downgradeLog = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive, older boot script: refused before the reexec, nothing checked out",
+		/exit=[1-9]/.test(downgraded) &&
+			/drive\.downgrade /.test(downgradeLog) &&
+			!/boot\.reexec|checkout\.start|host\.exec/.test(downgradeLog) &&
+			workKept(),
+		downgradeLog.match(/drive\.downgrade.*/)?.[0] ?? downgraded.slice(-200),
+	);
+	exec(
+		`cp /tmp/superset-boot.keep ${bundledBoot} && rm -f ${installedBoot}.hash`,
+		{
+			on,
+		},
+	);
+
+	// A fresh fork of a golden drive: promote stripped its state, and a new workspace boots on it.
+	const repo = "https://github.com/paradevai/paradev.git";
+	const currentBranch = () =>
+		exec(`git -C ${ws} rev-parse --abbrev-ref HEAD`, {
+			check: false,
+			user: "ubuntu",
+			on,
+		}).trim();
+	const forkBoot = (branch: string, baseBranch: string) => {
+		endSession();
+		exec(`rm -rf ${state}`, { on });
+		writeConf({
+			...driveIdentity,
+			SUPERSET_SANDBOX_WORKSPACE_ID: randomUUID(),
+			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+				{ url: repo, branch, baseBranch, path: "." },
+			]),
+		});
+		return bootAndCheckout();
+	};
+	const newBranch = forkBoot("superset/boot-twice-fork", "main");
+	expect(
+		"fresh fork, new branch: fetched from its base, on the branch",
+		/checkout\.fetched \. superset\/boot-twice-fork from main/.test(
+			newBranch,
+		) && currentBranch() === "superset/boot-twice-fork",
+		newBranch.match(/checkout\..*/g)?.join(" | "),
+	);
+	const sameBranch = forkBoot("main", "main");
+	expect(
+		"fresh fork, a branch the golden has: reset to its base, not kept",
+		/checkout\.fetched \. main from main/.test(sameBranch) &&
+			currentBranch() === "main" &&
+			head() !== work,
+		sameBranch.match(/checkout\..*/g)?.join(" | "),
+	);
+	const fetchFails = forkBoot(
+		"superset/boot-twice-fork-2",
+		"superset/boot-twice-no-such-branch",
+	);
+	expect(
+		"fresh fork, fetch failed: never recloned; the golden's checkout is kept and the box is ready",
+		/checkout\.fresh\.failed \. superset\/boot-twice-fork-2/.test(fetchFails) &&
+			!/checkout\.cloned/.test(fetchFails) &&
+			currentBranch() === "main" &&
+			exec(
+				`for i in $(seq 1 600); do [ -f ${SANDBOX_PATHS.run}/checkout.ready ] && echo ready && exit 0; sleep 0.1; done; echo missing`,
+				{ check: false, on },
+			).trim() === "ready",
+		fetchFails.match(/checkout\..*/g)?.join(" | "),
+	);
+	// A fork of a golden whose checkout carries its installed dependencies, on a new branch.
+	endSession();
+	exec(
+		`git -C ${drive}/workspace checkout -q main && mkdir -p ${drive}/workspace/node_modules/golden-dep && echo installed > ${drive}/workspace/node_modules/golden-dep/index.js`,
+		{ user: "ubuntu", on },
+	);
+	exec(`rm -rf ${state}`, { on });
+	writeConf({
+		...driveIdentity,
+		SUPERSET_SANDBOX_WORKSPACE_ID: randomUUID(),
+		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+			{
+				url: repo,
+				branch: "superset/boot-twice-fork-deps",
+				baseBranch: "main",
+				path: ".",
+			},
+		]),
+	});
+	const withDeps = bootAndCheckout();
+	expect(
+		"fresh fork of a golden with node_modules, new branch: the dependencies survive",
+		/checkout\.fetched \. superset\/boot-twice-fork-deps from main/.test(
+			withDeps,
+		) &&
+			exec(`cat ${ws}/node_modules/golden-dep/index.js`, {
+				check: false,
+				on,
+			}).trim() === "installed",
+		withDeps.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// A fresh fork whose first session ended between its layout and its checkout.
+	endSession();
+	const interrupted = randomUUID();
+	exec(
+		`git -C ${drive}/workspace checkout -q main && git -C ${drive}/workspace -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m stale-golden-copy`,
+		{ user: "ubuntu", on },
+	);
+	const staleCopy = exec(`git -C ${drive}/workspace rev-parse main`, {
+		user: "ubuntu",
+		on,
+	}).trim();
+	exec(
+		`rm -rf ${state} && mkdir -p ${state} && : > ${state}/fresh && echo ${interrupted} > ${state}/workspace-id && chown -R ubuntu:ubuntu ${state}`,
+		{ on },
+	);
+	writeConf({
+		...driveIdentity,
+		SUPERSET_SANDBOX_WORKSPACE_ID: interrupted,
+		SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+			{ url: repo, branch: "main", baseBranch: "main", path: "." },
+		]),
+	});
+	const resumedFresh = bootAndCheckout();
+	expect(
+		"fresh fork, first session ended before its checkout: the next boot still fetches",
+		/checkout\.fetched \. main from main/.test(resumedFresh) &&
+			head() !== staleCopy &&
+			exec(`test -e ${state}/fresh && echo still || echo gone`, {
+				check: false,
+				on,
+			}).trim() === "gone",
+		resumedFresh.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	// A fresh fork whose first fetch and clone both fail: a later boot still fetches the untouched golden copy.
+	endSession();
+	const failedFirst = randomUUID();
+	const unreachable = "https://example.invalid/paradev.git";
+	// The golden is clean: the earlier cases' user file is not part of it.
+	exec(
+		`rm -f ${drive}/workspace/user-file.txt && git -C ${drive}/workspace checkout -q main && git -C ${drive}/workspace -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m stale-golden-copy-2 && git -C ${drive}/workspace remote set-url origin ${unreachable}`,
+		{ user: "ubuntu", on },
+	);
+	const staleCopy2 = exec(`git -C ${drive}/workspace rev-parse main`, {
+		user: "ubuntu",
+		on,
+	}).trim();
+	exec(`rm -rf ${state}`, { on });
+	const forkOn = (url: string) =>
+		writeConf({
+			...driveIdentity,
+			SUPERSET_SANDBOX_WORKSPACE_ID: failedFirst,
+			SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
+				{ url, branch: "main", baseBranch: "main", path: "." },
+			]),
+		});
+	forkOn(unreachable);
+	const firstAttempt = bootAndCheckout();
+	endSession();
+	exec(`git -C ${drive}/workspace remote set-url origin ${repo}`, {
+		user: "ubuntu",
+		on,
+	});
+	forkOn(repo);
+	const statusAfterFailure = exec(
+		`git -C ${drive}/workspace status --porcelain 2>&1 | head -10`,
+		{ check: false, user: "ubuntu", on },
+	).trim();
+	const depsAfterFailure = exec(
+		`cat ${drive}/workspace/node_modules/golden-dep/index.js`,
+		{ check: false, on },
+	).trim();
+	const laterBoot = bootAndCheckout();
+	expect(
+		"fresh fork of a golden with node_modules, first fetch failed: the dependencies survive and a later boot fetches",
+		/checkout\.fresh\.failed/.test(firstAttempt) &&
+			!/checkout\.cloned/.test(firstAttempt) &&
+			depsAfterFailure === "installed" &&
+			exec(`cat ${ws}/node_modules/golden-dep/index.js`, {
+				check: false,
+				on,
+			}).trim() === "installed" &&
+			/checkout\.fetched \. main from main \(an untouched golden copy\)/.test(
+				laterBoot,
+			) &&
+			head() !== staleCopy2,
+		`${firstAttempt.match(/checkout\..*/g)?.join(" | ")} || ${laterBoot.match(/checkout\..*/g)?.join(" | ")} || status after the failure: ${statusAfterFailure || "clean"}`,
+	);
+
+	// The same, but the user committed after the failed first fetch: that copy is theirs now, kept.
+	endSession();
+	exec(`git -C ${drive}/workspace remote set-url origin ${unreachable}`, {
+		user: "ubuntu",
+		on,
+	});
+	exec(`rm -rf ${state}`, { on });
+	forkOn(unreachable);
+	bootAndCheckout();
+	endSession();
+	exec(
+		`git -C ${drive}/workspace -c user.name=t -c user.email=t@example.invalid commit -q --allow-empty -m user-work-after-failed-fetch && git -C ${drive}/workspace remote set-url origin ${repo}`,
+		{ user: "ubuntu", on },
+	);
+	const usersCommit = exec(`git -C ${drive}/workspace rev-parse HEAD`, {
+		user: "ubuntu",
+		on,
+	}).trim();
+	forkOn(repo);
+	const touched = bootAndCheckout();
+	expect(
+		"fresh fork, first fetch failed, then the user committed: their copy is kept",
+		/checkout\.kept \. main is already on the drive/.test(touched) &&
+			head() === usersCommit,
+		touched.match(/checkout\..*/g)?.join(" | "),
+	);
+
+	writeConf(driveIdentity);
+
+	const refuses = (label: string, phase: string) => {
+		const answer = bootAsUser(on);
+		const log = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+		expect(
+			`${label}: refused before host-service, stamped ${phase}`,
+			/exit=[1-9]/.test(answer) &&
+				new RegExp(`${phase.replace(".", "\\.")} `).test(log) &&
+				!/host\.exec|checkout\.start/.test(log) &&
+				exec(`mountpoint -q ${ws} && echo bound`, {
+					check: false,
+					on,
+				}).trim() === "",
+			log.match(/drive\..*/)?.[0] ?? answer.slice(-200),
+		);
+	};
+
+	// Another workspace's drive.
+	endSession();
+	writeConf({ ...driveIdentity, SUPERSET_SANDBOX_WORKSPACE_ID: randomUUID() });
+	refuses("drive foreign", "drive.foreign");
+	writeConf(driveIdentity);
+
+	// A drive that mounts empty though the workspace was laid out before.
+	endSession();
+	exec(`umount ${drive} && mount -t tmpfs -o exec,mode=0755 tmpfs ${drive}`, {
+		on,
+	});
+	writeConf({ ...driveIdentity, SUPERSET_SANDBOX_DRIVE_LAID_OUT: "1" });
+	refuses("drive empty", "drive.unlaid");
+
+	// A session whose drive did not mount, while sandbox.conf still names one.
+	endSession();
+	exec(`umount ${drive}`, { on });
+	const refused = bootAsUser(on);
+	const log3 = exec(`cat ${SANDBOX_PATHS.bootLog}`, { on });
+	expect(
+		"drive missing: boot exits non-zero",
+		/exit=[1-9]/.test(refused),
+		refused.slice(-200).replaceAll("\n", " | "),
+	);
+	expect(
+		"drive missing: stamped drive.missing",
+		/drive\.missing /.test(log3),
+		log3.match(/drive\.missing.*/)?.[0],
+	);
+	expect(
+		"drive missing: no host-service, no checkout",
+		!/host\.exec|checkout\.start|steps\.start/.test(log3) &&
+			exec(`ls ${SANDBOX_PATHS.run}`, { check: false, on }).trim() === "",
+		log3,
+	);
+	expect(
+		"drive missing: /workspace is not bound",
+		exec(`mountpoint -q ${SANDBOX_PATHS.workspace} && echo bound`, {
+			check: false,
+			on,
+		}).trim() === "",
+	);
+}
+
+docker(["rm", "-f", NAME, DRIVE_NAME], { check: false });
 // Privileged for the /dev/shm remount and the X socket dir, like the VM. No
 // network policy here; the checkout needs the internet.
 docker([
@@ -131,6 +706,7 @@ docker([
 	"--privileged",
 	"--user",
 	"root",
+	...CA_MOUNT,
 	IMAGE,
 	"sleep",
 	"infinity",
@@ -267,6 +843,14 @@ try {
 		hostEnv
 			.split("\n")
 			.find((line) => line.startsWith("SUPERSET_SANDBOX_PLUGINS=")) ?? "unset",
+	);
+	expect(
+		"host-service's own env turns the agents' self-updates off, whatever its shell probe finds",
+		[
+			"DISABLE_AUTOUPDATER=1",
+			"OPENCODE_DISABLE_AUTOUPDATE=1",
+			"PI_SKIP_VERSION_CHECK=1",
+		].every((line) => hostEnv.split("\n").includes(line)),
 	);
 
 	// The control plane's push, so the runner's hook sequencing runs: this
@@ -471,8 +1055,10 @@ try {
 			exec(`ls ${SANDBOX_PATHS.run}`, { check: false }),
 		),
 	);
+
+	drivePass();
 } finally {
-	docker(["rm", "-f", NAME], { check: false });
+	docker(["rm", "-f", NAME, DRIVE_NAME], { check: false });
 }
 if (failures.length) {
 	console.error(

@@ -1,26 +1,40 @@
 import {
 	afterAll,
 	beforeAll,
+	beforeEach,
 	describe,
 	expect,
 	setSystemTime,
 	test,
 } from "bun:test";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
 	applySandboxPolicy,
+	composeMounts,
+	DRIVE_REFUSAL_LIMIT,
 	deleteSandbox,
+	deleteSandboxAndDrive,
 	describeSandbox,
+	driveBootsIn,
+	driveRefusalIn,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
+	persistentDriveRefusals,
 	promoteSandboxToEnvironment,
+	provisionSandbox,
+	type ResumeLock,
 	type SandboxClaim,
+	SandboxDriveMissingError,
+	SandboxDriveRefusedError,
+	SandboxNotReadyError,
 	SandboxUnavailableError,
 	SESSION_TIMEOUT_MS,
 	sandboxExists,
+	settleSandbox,
 	stopSandbox,
 	topUpSandboxSession,
 	wakeSandbox,
@@ -313,7 +327,7 @@ describe("promoteSandboxToEnvironment", () => {
 	let createTags: unknown;
 	const golden = {
 		currentSnapshotId: "snap_golden_0",
-		runCommand: async () => {},
+		runCommand: async () => ({ exitCode: 0 }),
 		stop: async () => {},
 	};
 	stub(Sandbox, {
@@ -342,6 +356,7 @@ describe("promoteSandboxToEnvironment", () => {
 		expect(await promote()).toEqual({
 			goldenName: "env-1",
 			region: "iad1",
+			goldenDriveName: null,
 			stopped: { sessionId: "sess_A" },
 		});
 		expect(sourceSnapshot).toBe("snap_now");
@@ -420,7 +435,7 @@ describe("wakeSandbox", () => {
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
 		SUPERSET_BUNDLE_SHA: "a".repeat(64),
 	};
-	async function wake(): Promise<Box[]> {
+	async function _wake(): Promise<Box[]> {
 		const authorized: Box[] = [];
 		await wakeSandbox({
 			providerSandboxId: "ws-box",
@@ -434,22 +449,6 @@ describe("wakeSandbox", () => {
 		});
 		return authorized;
 	}
-
-	test("a box read running that a call resumed runs beforeResume for the new session", async () => {
-		running = true;
-		expect(await wake()).toEqual([
-			{
-				memoryMb: 16_384,
-				vcpus: 8,
-				resumedSession: { sessionId: "sess_new", expiresAt: box.expiresAt },
-			},
-		]);
-	});
-
-	test("a box read stopped runs beforeResume once, before its own resume", async () => {
-		running = false;
-		expect(await wake()).toEqual([{ memoryMb: 8192, vcpus: 4 }]);
-	});
 
 	test("a wake only for a running box leaves a box that stopped since the caller looked", async () => {
 		running = false;
@@ -482,6 +481,869 @@ describe("listActiveWorkspaceSandboxes", () => {
 			sortOrder: "desc",
 		});
 		expect(listOptions).not.toHaveProperty("tags");
+	});
+});
+
+describe("wakeSandbox mounts", () => {
+	const RESUMED = new Error("resumed");
+	let status: "running" | "stopped";
+	let current: Record<string, unknown>;
+	let events: string[];
+	let updates: Array<Record<string, unknown>>;
+	const fake = {
+		get status() {
+			return status;
+		},
+		get mounts() {
+			return current;
+		},
+		vcpus: 4,
+		region: "iad1",
+		domain: () => "https://box.invalid",
+		update: async (params: Record<string, unknown>) => {
+			events.push("update");
+			updates.push(params);
+		},
+		extendTimeout: async () => {},
+		writeFiles: async () => {
+			throw RESUMED;
+		},
+		currentSession: () => fake,
+	};
+	stub(Sandbox, { get: async () => fake });
+	let attachedTo: string | undefined;
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			events.push(`drive:${name}`);
+			// The concurrent wake that took the drive has resumed the box.
+			if (attachedTo) status = "running";
+			return { name, currentSandboxName: attachedTo };
+		},
+	});
+	stub(globalThis, {
+		fetch: async () => {
+			throw new Error("no network in tests");
+		},
+	});
+	const drive = { drive: "drive-1", mode: "read-write" };
+	const mounts = { [SANDBOX_PATHS.drive]: drive };
+	const claim = { vcpus: 4, files: [], networkPolicy: {} } as never;
+	const withAgentTools = {
+		...(claim as object),
+		agentTools: true,
+		identity: { SUPERSET_BUNDLE_SHA: `feedfacecafe${"0".repeat(52)}` },
+	} as never;
+	const stopAtResume = async () => {
+		events.push("resume");
+		throw RESUMED;
+	};
+
+	beforeEach(() => {
+		current = {};
+		events = [];
+		updates = [];
+		attachedTo = undefined;
+	});
+
+	test("a drive a concurrent wake already resumed this box with is not foreign", async () => {
+		status = "stopped";
+		attachedTo = "sbx";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toThrow();
+		expect(events).not.toContain("resume");
+		expect(updates.some((update) => "mounts" in update)).toBe(false);
+	});
+
+	test("a stopped box waits for its drive, then gets its mounts, then resumes", async () => {
+		status = "stopped";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(events).toEqual(["drive:drive-1", "update", "resume"]);
+		expect(updates).toEqual([{ mounts }]);
+	});
+
+	test("the drive and the agent-tools drive share one mounts object", async () => {
+		status = "stopped";
+		const agents = "agent-tools-iad1-feedfacecafe";
+		current = {
+			[SANDBOX_PATHS.agents]: { drive: "agent-tools-old", mode: "snapshot" },
+		};
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: withAgentTools,
+				mounts: mounts as never,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates).toEqual([
+			{
+				mounts: {
+					[SANDBOX_PATHS.drive]: drive,
+					[SANDBOX_PATHS.agents]: { drive: agents, mode: "snapshot" },
+				},
+			},
+		]);
+	});
+
+	test("an agent-tools update keeps the drive the box already has", async () => {
+		status = "stopped";
+		current = { [SANDBOX_PATHS.drive]: drive };
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: withAgentTools,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates[0]?.mounts).toMatchObject({ [SANDBOX_PATHS.drive]: drive });
+	});
+
+	test("a box without a drive gets no mount update", async () => {
+		status = "stopped";
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim,
+				beforeResume: stopAtResume,
+			}),
+		).rejects.toBe(RESUMED);
+		expect(updates).toEqual([]);
+	});
+
+	test("a running box keeps the mounts its session started with", async () => {
+		status = "running";
+		await expect(
+			wakeSandbox({ providerSandboxId: "sbx", claim, mounts: mounts as never }),
+		).rejects.toThrow();
+		expect(updates).toEqual([{ networkPolicy: {} }]);
+		expect(events).not.toContain("drive:drive-1");
+	});
+});
+
+describe("resume under one lock", () => {
+	let status: "running" | "stopped";
+	let attachedTo: string | undefined;
+	let events: string[];
+	let gate: Promise<void>;
+	let bootLog: string;
+	let refuse: boolean;
+	const box = () => ({
+		get status() {
+			return status;
+		},
+		mounts: {},
+		vcpus: 4,
+		domain: () => "https://box.invalid",
+		expiresAt: undefined,
+		update: async (params: Record<string, unknown>) => {
+			if (params.mounts) {
+				events.push("mount");
+				await gate;
+			}
+		},
+		writeFiles: async () => {
+			events.push("write");
+		},
+		runCommand: async (command: { env?: Record<string, string> }) => {
+			events.push("boot");
+			status = "running";
+			const id = command.env?.SUPERSET_BOOT_ID ?? "";
+			if (refuse) {
+				bootLog = `1 boot.start pid=1 boot=${id}\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n`;
+			}
+		},
+		readFileToBuffer: async () => Buffer.from(bootLog),
+		stop: async () => {
+			events.push("stop");
+			status = "stopped";
+		},
+	});
+	stub(Sandbox, {
+		get: async () => {
+			const fake = box();
+			return { ...fake, currentSession: () => fake };
+		},
+	});
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			events.push(`drive:${attachedTo ?? "detached"}`);
+			const holder = attachedTo;
+			// The session that stopped finishes saving and lets go.
+			attachedTo = undefined;
+			return { name, currentSandboxName: holder };
+		},
+	});
+	stub(globalThis, {
+		fetch: async () => {
+			throw new Error("not answering");
+		},
+	});
+	const mounts = {
+		[SANDBOX_PATHS.drive]: { drive: "drive-1", mode: "read-write" },
+	} as never;
+	const claim = {
+		identity: {
+			SUPERSET_SANDBOX_CONTRACT: "1",
+			SUPERSET_BUNDLE_SHA: "0".repeat(64),
+			SUPERSET_API_URL: "https://api.invalid",
+			SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+			SUPERSET_SANDBOX_ORGANIZATION_ID: "00000000-0000-4000-8000-000000000002",
+			SUPERSET_SANDBOX_REPOSITORIES: "[]",
+			SUPERSET_SANDBOX_IMAGE_TAG: "env-g",
+			SUPERSET_SANDBOX_PROVIDER: "vercel",
+			SUPERSET_SANDBOX_DRIVE: "drive-1",
+		},
+		hostSecret: "s",
+		files: [],
+		vcpus: 4,
+		networkPolicy: {},
+	} as never;
+	let holder: string | null;
+	const lock =
+		(who: string): ResumeLock =>
+		async (step) => {
+			if (holder) throw new SandboxNotReadyError("sbx");
+			holder = who;
+			events.push(`lock:${who}`);
+			try {
+				return await step();
+			} finally {
+				holder = null;
+			}
+		};
+
+	beforeEach(() => {
+		status = "stopped";
+		attachedTo = undefined;
+		events = [];
+		gate = Promise.resolve();
+		bootLog = "";
+		refuse = false;
+		holder = null;
+	});
+
+	test("a redelivered provision whose box stopped waits for the drive before anything resumes it", async () => {
+		attachedTo = "sbx";
+		await provisionSandbox({
+			name: "sbx",
+			environment: { sourceKind: "fork", sourceRef: "env-g", region: "iad1" },
+			claim,
+			mounts,
+			exclusive: lock("provision"),
+		});
+		expect(events).toEqual([
+			"lock:provision",
+			"drive:sbx",
+			"drive:detached",
+			"mount",
+			"write",
+			"boot",
+		]);
+	});
+
+	test("a second wake while the first resumes does not resume the box; it answers still starting", async () => {
+		let open = () => {};
+		gate = new Promise((resolve) => {
+			open = resolve;
+		});
+		const first = wakeSandbox({
+			providerSandboxId: "sbx",
+			claim,
+			mounts,
+			exclusive: lock("first"),
+		}).catch((error: unknown) => error);
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		const second = await wakeSandbox({
+			providerSandboxId: "sbx",
+			claim,
+			mounts,
+			exclusive: lock("second"),
+		}).catch((error: unknown) => error);
+		expect(second).toBeInstanceOf(SandboxNotReadyError);
+		expect(events).toEqual(["lock:first", "drive:detached", "mount"]);
+		refuse = true;
+		open();
+		const outcome = await first;
+		expect(outcome).toBeInstanceOf(SandboxDriveMissingError);
+		// The refused box is stopped under the lock, so no wake can resume it in between.
+		expect(events).toEqual([
+			"lock:first",
+			"drive:detached",
+			"mount",
+			"write",
+			"boot",
+			"lock:first",
+			"stop",
+		]);
+	});
+});
+
+describe("a box found running", () => {
+	const ended = new Error("session ended");
+	const booted = new Error("booted on the new session");
+	let calls: string[];
+	let status: "running" | "stopped";
+	let attachedTo: string | undefined;
+	const endedSession = {
+		extendTimeout: async () => {
+			calls.push("old-session:extend");
+			// The extension past the plan's cap is refused, and the session ends.
+			status = "stopped";
+			attachedTo = "sbx";
+			throw ended;
+		},
+		update: async () => {
+			calls.push("old-session:policy");
+			throw ended;
+		},
+		writeFiles: async () => {
+			calls.push("old-session:write");
+			throw ended;
+		},
+		runCommand: async () => {
+			calls.push("old-session:boot");
+			throw ended;
+		},
+	};
+	const newSession = {
+		sessionId: "sess-new",
+		vcpus: 8,
+		extendTimeout: async () => {},
+		update: async () => {},
+		writeFiles: async () => {
+			calls.push("new-session:write");
+		},
+		runCommand: async () => {
+			calls.push("new-session:boot");
+			throw booted;
+		},
+	};
+	// A Sandbox method other than a config update would resume a session that ended.
+	const resumes = (name: string) => async () => {
+		calls.push(`sandbox:${name}`);
+	};
+	stub(Sandbox, {
+		get: async ({ resume }: { resume?: boolean }) => {
+			if (resume) {
+				calls.push("resume");
+				status = "running";
+			}
+			return {
+				status,
+				mounts: {},
+				vcpus: 4,
+				expiresAt: new Date(Date.now() + 1000),
+				domain: () => "https://box.invalid",
+				extendTimeout: resumes("extend"),
+				update: async (params: Record<string, unknown>) => {
+					calls.push(params.mounts ? "mount" : "sandbox:update");
+				},
+				writeFiles: resumes("write"),
+				runCommand: resumes("boot"),
+				currentSession: () => (resume ? newSession : endedSession),
+			};
+		},
+	});
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			calls.push(`drive:${attachedTo ?? "detached"}`);
+			const holder = attachedTo;
+			attachedTo = undefined;
+			return { name, currentSandboxName: holder };
+		},
+	});
+	stub(globalThis, {
+		fetch: async () => {
+			throw new Error("not answering");
+		},
+	});
+
+	beforeEach(() => {
+		calls = [];
+		status = "running";
+		attachedTo = undefined;
+	});
+
+	const wake = (
+		beforeResume?: Parameters<typeof wakeSandbox>[0]["beforeResume"],
+	) =>
+		wakeSandbox({
+			providerSandboxId: "sbx",
+			claim: {
+				identity: {
+					SUPERSET_SANDBOX_CONTRACT: "1",
+					SUPERSET_BUNDLE_SHA: "0".repeat(64),
+					SUPERSET_API_URL: "https://api.invalid",
+					SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+					SUPERSET_SANDBOX_ORGANIZATION_ID:
+						"00000000-0000-4000-8000-000000000002",
+					SUPERSET_SANDBOX_REPOSITORIES: "[]",
+					SUPERSET_SANDBOX_IMAGE_TAG: "env-g",
+					SUPERSET_SANDBOX_PROVIDER: "vercel",
+					SUPERSET_SANDBOX_DRIVE: "drive-1",
+				},
+				files: [{ path: "/x", content: "y" }],
+				networkPolicy: {},
+				vcpus: 4,
+			} as never,
+			mounts: {
+				[SANDBOX_PATHS.drive]: { drive: "drive-1", mode: "read-write" },
+			} as never,
+			beforeResume,
+		});
+
+	test("whose session ends during the wake is resumed only after the drive check", async () => {
+		await expect(wake()).rejects.toBe(booted);
+		expect(calls.filter((call) => call.startsWith("sandbox:"))).toEqual([]);
+		const resumedAt = calls.indexOf("resume");
+		expect(calls.slice(0, resumedAt)).toContain("drive:sbx");
+		expect(calls.slice(0, resumedAt)).toContain("drive:detached");
+		expect(calls.slice(0, resumedAt)).toContain("mount");
+		expect(calls.slice(resumedAt)).toEqual([
+			"resume",
+			"new-session:write",
+			"new-session:write",
+			"new-session:boot",
+		]);
+	});
+
+	test("whose session ends during the wake meters the session resumed here before it boots", async () => {
+		const metered: unknown[] = [];
+		await expect(
+			wake(async (box) => {
+				metered.push(box);
+				calls.push("metered");
+			}),
+		).rejects.toBe(booted);
+		expect(metered).toEqual([
+			{
+				memoryMb: 16_384,
+				vcpus: 8,
+				resumedSession: { sessionId: "sess-new", expiresAt: expect.any(Date) },
+			},
+		]);
+		expect(calls.indexOf("metered")).toBeLessThan(
+			calls.indexOf("new-session:boot"),
+		);
+	});
+});
+
+describe("a new box on a drive", () => {
+	let events: string[];
+	let attachedTo: string | undefined;
+	const session = {
+		writeFiles: async () => {
+			events.push("write");
+		},
+		runCommand: async () => {
+			events.push("boot");
+		},
+	};
+	stub(Sandbox, {
+		get: async () => {
+			throw new APIError(new Response(null, { status: 404 }));
+		},
+		fork: async () => {
+			events.push("create");
+			return {
+				domain: () => "https://box.invalid",
+				expiresAt: undefined,
+				currentSession: () => session,
+			};
+		},
+	});
+	stub(Drive, {
+		get: async ({ name }: { name: string }) => {
+			events.push(`drive:${attachedTo ?? "detached"}`);
+			const holder = attachedTo;
+			attachedTo = undefined;
+			return { name, currentSandboxName: holder };
+		},
+	});
+
+	beforeEach(() => {
+		events = [];
+		attachedTo = undefined;
+	});
+
+	test("is created only once a box of another name has let go of the drive", async () => {
+		// An undo's second provision: the first job's box still holds the drive.
+		attachedTo = "ws-box-1";
+		await provisionSandbox({
+			name: "ws-box-2",
+			environment: { sourceKind: "fork", sourceRef: "env-g", region: "iad1" },
+			claim: {
+				identity: {
+					SUPERSET_SANDBOX_CONTRACT: "1",
+					SUPERSET_BUNDLE_SHA: "0".repeat(64),
+					SUPERSET_API_URL: "https://api.invalid",
+					SUPERSET_SANDBOX_WORKSPACE_ID: "00000000-0000-4000-8000-000000000001",
+					SUPERSET_SANDBOX_ORGANIZATION_ID:
+						"00000000-0000-4000-8000-000000000002",
+					SUPERSET_SANDBOX_REPOSITORIES: "[]",
+					SUPERSET_SANDBOX_IMAGE_TAG: "env-g",
+					SUPERSET_SANDBOX_PROVIDER: "vercel",
+				},
+				hostSecret: "s",
+				files: [],
+				vcpus: 4,
+				networkPolicy: {},
+			} as never,
+			mounts: {
+				[SANDBOX_PATHS.drive]: { drive: "drive-1", mode: "read-write" },
+			} as never,
+		});
+		expect(events).toEqual([
+			"drive:ws-box-1",
+			"drive:detached",
+			"create",
+			"write",
+			"boot",
+		]);
+	});
+});
+
+describe("composeMounts", () => {
+	test("merges parts, a later part winning a shared path, and drops empty", () => {
+		const a = { "/a": { drive: "a", mode: "read-write" as const } };
+		const b = { "/a": { drive: "b", mode: "snapshot" as const } };
+		expect(composeMounts(a, undefined, b)).toEqual(b);
+		expect(composeMounts(undefined, {})).toBeUndefined();
+	});
+});
+
+describe("drive refusals in the boot log", () => {
+	const boot = (at: number, id: string, ...lines: string[]) =>
+		[`${at} boot.start pid=1 bundle=abc boot=${id}`, ...lines].join("\n");
+
+	test("only this boot's lines count, so a previous boot's refusal never stops a healthy box", () => {
+		const log = [
+			boot(
+				1,
+				"old",
+				"2 drive.missing drive-1 is not mounted at /mnt/superset-drive",
+			),
+			boot(3, "new", "4 run.cleared"),
+		].join("\n");
+		expect(driveRefusalIn(log, "old")).toBe(
+			"drive.missing drive-1 is not mounted at /mnt/superset-drive",
+		);
+		expect(driveRefusalIn(log, "new")).toBeNull();
+		expect(driveRefusalIn(log, "not-started-yet")).toBeNull();
+	});
+
+	test("a reexec's second boot.start joins its boot", () => {
+		const log = boot(
+			1,
+			"b",
+			"2 boot.reexec into the installed bundle's script",
+			"3 boot.start pid=2 bundle=abc boot=b",
+			"4 drive.foreign drive-1 belongs to workspace w",
+		);
+		expect(driveBootsIn(log)).toHaveLength(1);
+		expect(driveRefusalIn(log, "b")).toBe(
+			"drive.foreign drive-1 belongs to workspace w",
+		);
+	});
+
+	test("counts the persistent refusals in a row; a missing drive or a laid-out boot ends the run", () => {
+		const foreign = (at: number, id: string) =>
+			boot(at, id, `${at + 1} drive.foreign d belongs to workspace w`);
+		const log = [
+			boot(1, "a", "2 drive.layout ms=3", "3 host.exec 1.0"),
+			foreign(10, "b"),
+			boot(20, "c", "21 host.exec 1.0"),
+			foreign(30, "d"),
+		].join("\n");
+		expect(persistentDriveRefusals(log)).toBe(3);
+		expect(
+			persistentDriveRefusals(
+				`${log}\n${boot(40, "e", "41 drive.missing d is not mounted")}`,
+			),
+		).toBe(0);
+	});
+});
+
+describe("settleSandbox with a drive", () => {
+	let health: unknown = null;
+	let bootLog = "";
+	stub(globalThis, {
+		fetch: async (url: string) => {
+			if (String(url).endsWith("/trpc/health.check") && health !== null) {
+				return new Response(JSON.stringify(health));
+			}
+			if (String(url).endsWith("/trpc/sandbox.setEnvironment")) {
+				return new Response("{}");
+			}
+			throw new Error("not answering");
+		},
+	});
+	const box = {
+		status: "running",
+		readFileToBuffer: async () => Buffer.from(bootLog),
+	} as never;
+	const claim = {
+		identity: { SUPERSET_SANDBOX_DRIVE: "drive-1" },
+		hostSecret: "secret",
+		managedEnv: {},
+	} as never;
+	const answering = (phases: string[]) => ({
+		result: {
+			data: {
+				json: {
+					sandboxBoot: {
+						stamps: phases.map((phase, at) => ({ phase, at })),
+					},
+				},
+			},
+		},
+	});
+
+	test("a refused boot is a retryable not-ready, found without the full host wait", async () => {
+		health = null;
+		bootLog =
+			"1 boot.start pid=1 boot=this\n2 drive.missing drive-1 is not mounted at /mnt/superset-drive\n";
+		const started = Date.now();
+		const error = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			bootId: "this",
+			getSession: async () => box,
+		}).catch((caught: unknown) => caught);
+		expect(error).toBeInstanceOf(SandboxDriveMissingError);
+		expect(error).toBeInstanceOf(SandboxNotReadyError);
+		expect(Date.now() - started).toBeLessThan(1_000);
+	});
+
+	test("a refusal no remount can change ends the retries after several boots in a row", async () => {
+		health = null;
+		bootLog = Array.from(
+			{ length: DRIVE_REFUSAL_LIMIT },
+			(_, i) =>
+				`${i * 10} boot.start pid=1 boot=b${i}\n${i * 10 + 1} drive.unlaid drive-1 carries no workspace id`,
+		).join("\n");
+		const error = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			bootId: `b${DRIVE_REFUSAL_LIMIT - 1}`,
+			getSession: async () => box,
+		}).catch((caught: unknown) => caught);
+		expect(error).toBeInstanceOf(SandboxDriveRefusedError);
+		expect(error).toBeInstanceOf(SandboxUnavailableError);
+		expect(error).toMatchObject({ boots: DRIVE_REFUSAL_LIMIT });
+		expect(String(error)).not.toContain("drive");
+	});
+
+	test("a boot that answers without laying the drive out fails the settle", async () => {
+		health = answering(["boot.start", "host.ready"]);
+		bootLog = "";
+		await expect(
+			settleSandbox({
+				providerSandboxId: "sbx",
+				hostTarget: "https://box.invalid",
+				claim,
+				getSession: async () => box,
+			}),
+		).rejects.toBeInstanceOf(SandboxDriveMissingError);
+	});
+
+	test("a boot that laid the drive out settles", async () => {
+		health = answering(["boot.start", "drive.layout", "host.ready"]);
+		bootLog = "";
+		const answer = await settleSandbox({
+			providerSandboxId: "sbx",
+			hostTarget: "https://box.invalid",
+			claim,
+			getSession: async () => box,
+		});
+		expect(answer.stamps.map((stamp) => stamp.phase)).toContain("drive.layout");
+	});
+});
+
+describe("promoteSandboxToEnvironment", () => {
+	let events: string[];
+	let created: Record<string, unknown> | null;
+	let goldenStatus: string;
+	let goldenSnapshot: string;
+	let stripExit: number;
+	const source = {
+		status: "running",
+		region: "iad1",
+		vcpus: 4,
+		currentSession: () => ({
+			sessionId: "sess-source",
+			snapshot: async () => {
+				events.push("snapshot source");
+				return { snapshotId: "snap-1" };
+			},
+		}),
+	};
+	const golden = {
+		get status() {
+			return goldenStatus;
+		},
+		get currentSnapshotId() {
+			return goldenSnapshot;
+		},
+		runCommand: async (command: { args: string[] }) => {
+			events.push(`strip ${command.args.join(" ")}`);
+			return { exitCode: stripExit };
+		},
+		stop: async () => {
+			goldenStatus = "stopped";
+			goldenSnapshot = "snap-golden";
+		},
+	};
+	stub(Sandbox, {
+		get: async ({ name }: { name: string }) =>
+			name === "ws-source" ? source : golden,
+		create: async (params: Record<string, unknown>) => {
+			created = params;
+			return golden;
+		},
+	});
+	const drives = {
+		find: async (name: string) => {
+			events.push(`find ${name}`);
+			return { region: "iad1" };
+		},
+		create: async () => {},
+		fork: async (from: string, to: string) => {
+			events.push(`fork ${from} ${to}`);
+		},
+		remove: async () => {},
+	};
+	beforeEach(() => {
+		events = [];
+		created = null;
+		goldenStatus = "running";
+		goldenSnapshot = "snap-0";
+		stripExit = 0;
+	});
+
+	test("a golden whose drive did not mount is not stripped and fails the promote", async () => {
+		stripExit = 3;
+		await expect(
+			promoteSandboxToEnvironment({
+				sourceSandbox: "ws-source",
+				goldenName: "env-g",
+				organizationId: "org_1",
+				sourceDriveName: "drive-ws-source",
+				drives,
+			}),
+		).rejects.toThrow(`${SANDBOX_PATHS.drive} is not mounted`);
+		const strip = events.find((event) => event.startsWith("strip")) ?? "";
+		expect(strip).toContain(`mountpoint -q ${SANDBOX_PATHS.drive} || exit 3;`);
+	});
+
+	test("forks the source's drive once it is released, strips identity on the drive, and leaves the source's restart to the caller", async () => {
+		const result = await promoteSandboxToEnvironment({
+			sourceSandbox: "ws-source",
+			goldenName: "env-g",
+			organizationId: "org_1",
+			sourceDriveName: "drive-ws-source",
+			drives,
+		});
+		expect(result.goldenDriveName).toBe("env-drive-env-g");
+		expect(created?.mounts).toEqual({
+			[SANDBOX_PATHS.drive]: { drive: "env-drive-env-g", mode: "read-write" },
+		});
+		const strip = events.find((event) => event.startsWith("strip")) ?? "";
+		expect(strip).toContain(`${SANDBOX_PATHS.drive}/workspace/.env`);
+		expect(strip).toContain(`${SANDBOX_PATHS.drive}/home/.codex/sessions`);
+		expect(strip).toContain(SANDBOX_PATHS.driveState);
+		expect(events).toEqual([
+			"snapshot source",
+			"find drive-ws-source",
+			"fork drive-ws-source env-drive-env-g",
+			strip,
+			"find env-drive-env-g",
+		]);
+		expect(result.stopped).toEqual({ sessionId: "sess-source" });
+	});
+
+	test("a source without a drive leaves the environment out of drive mode", async () => {
+		const result = await promoteSandboxToEnvironment({
+			sourceSandbox: "ws-source",
+			goldenName: "env-g",
+			organizationId: "org_1",
+			drives,
+		});
+		expect(result.goldenDriveName).toBeNull();
+		expect(created).not.toHaveProperty("mounts");
+		expect(events.some((event) => event.startsWith("fork"))).toBe(false);
+		expect(events.join("\n")).not.toContain(SANDBOX_PATHS.drive);
+	});
+});
+
+describe("deleteSandboxAndDrive", () => {
+	let events: string[];
+	let status: string;
+	let expired = false;
+	stub(Sandbox, {
+		get: async () => {
+			if (expired) throw new APIError(new Response(null, { status: 410 }));
+			return box();
+		},
+	});
+	const box = () => ({
+		get status() {
+			return status;
+		},
+		currentSession: () => ({ sessionId: "s" }),
+		stop: async () => {
+			events.push("stop");
+			status = "stopped";
+		},
+		delete: async () => {
+			events.push("delete sandbox");
+		},
+	});
+	const drives = {
+		find: async () => {
+			events.push("find");
+			return { region: "iad1" };
+		},
+		create: async () => {},
+		fork: async () => {},
+		remove: async (name: string) => {
+			events.push(`delete ${name}`);
+		},
+	};
+
+	test("stops the box and waits for the drive before deleting either", async () => {
+		events = [];
+		status = "running";
+		await deleteSandboxAndDrive("ws-1", "drive-ws-1", drives);
+		expect(events).toEqual([
+			"stop",
+			"find",
+			"delete sandbox",
+			"delete drive-ws-1",
+		]);
+	});
+
+	test("a box whose snapshot expired, which cannot be fetched, still lets its drive go", async () => {
+		events = [];
+		expired = true;
+		await deleteSandboxAndDrive("ws-1", "drive-ws-1", drives);
+		expired = false;
+		expect(events).toEqual(["find", "delete drive-ws-1"]);
 	});
 });
 

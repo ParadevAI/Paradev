@@ -25,6 +25,22 @@ on:
           - production-release
           - inventory
         default: real-sandbox
+      real_sandbox_drive:
+        description: "real-sandbox only: also run the drive-mode pass (a throwaway golden drive, a box on a fork of it, a stop and a wake)"
+        type: boolean
+        default: false
+      real_sandbox_keep:
+        description: "real-sandbox only: keep the boxes (stopped) and the box drive for inspection instead of deleting them"
+        type: boolean
+        default: false
+      real_sandbox_wake:
+        description: "real-sandbox only: instead of the checks, the wake measurement (wake-measure.ts): prepare, then cold <suffix> at least 2 h later, or delete <suffix>"
+        type: string
+        default: ""
+      real_sandbox_work_gb:
+        description: "real-sandbox drive pass only: GB written under /workspace on the drive box and the plain box"
+        type: string
+        default: "4"
 
 jobs:
   boot-twice:
@@ -119,7 +135,7 @@ jobs:
     name: Real sandbox
     if: github.event_name == 'workflow_dispatch' && inputs.run == 'real-sandbox'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 150
     steps:
       - name: Check out code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -146,6 +162,10 @@ jobs:
           CDN_R2_ENDPOINT: ${{ secrets.CDN_R2_ENDPOINT }}
           CDN_R2_BUCKET: ${{ secrets.CDN_R2_BUCKET }}
           CDN_URL: ${{ secrets.CDN_URL }}
+          REAL_SANDBOX_DRIVE: ${{ inputs.real_sandbox_drive && '1' || '' }}
+          REAL_SANDBOX_KEEP: ${{ inputs.real_sandbox_keep && '1' || '' }}
+          REAL_SANDBOX_WORK_GB: ${{ inputs.real_sandbox_work_gb }}
+          REAL_SANDBOX_WAKE: ${{ inputs.real_sandbox_wake }}
         run: bun run src/real-sandbox.ts
 
   inventory:
@@ -214,6 +234,7 @@ jobs:
       - name: Release
         working-directory: packages/sandbox
         env:
+          VERCEL_ENV: production
           SUPERSET_INTERNAL_ORGANIZATION_ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890
           SUPERSET_INTERNAL_ENVIRONMENT_ID: 1dcfb8ac-da71-4860-b2a2-9cf24878f703
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}

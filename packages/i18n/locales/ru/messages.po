@@ -20981,6 +20981,9 @@ msgstr "Это снимет индексацию и откатит все про
 msgid "This workspace"
 msgstr "Эта рабочая область"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Не удалось сохранить это рабочее пространство как окружение. Повторите попытку позже."
+
 msgid "This workspace has no project to branch from"
 msgstr "В этом рабочем пространстве нет проекта для ответвления"
 

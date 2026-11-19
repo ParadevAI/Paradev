@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
+import type { CloudWorkspaceFailureReason } from "@superset/db/enums";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
 import {
@@ -18,16 +19,20 @@ import {
 	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
+	SandboxDriveRefusedError,
 	type SandboxUnavailableError,
 	stopAndSnapshot,
 	stopSandbox,
 	wakeSandbox,
+	workspaceDriveMounts,
 } from "../../lib/sandbox";
+import { recordDriveLaidOut } from "./drive-laid-out";
 import {
 	attachBootSession,
 	authorizeBoot,
 	queueSettleWorkspace,
 } from "./meter";
+import { sandboxResumeLock } from "./resume-lock";
 import { recordSandboxAwake } from "./sandbox-expiry";
 import {
 	recordBootTrace,
@@ -108,6 +113,8 @@ async function wake(
 		providerSandboxId: row.providerSandboxId,
 		claim,
 		onlyIfRunning: adoptSignIns,
+		mounts: workspaceDriveMounts(row.driveName),
+		exclusive: sandboxResumeLock(row.driveName ?? row.providerSandboxId),
 		beforeResume: async ({ resumedSession, ...box }) => {
 			resumed = resumedSession;
 			({ bootId } = await Sentry.startSpan(
@@ -193,6 +200,8 @@ async function wake(
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
 	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	// settleSandbox only answers for a drive whose boot laid it out.
+	if (row.driveName && !row.driveLaidOutAt) await recordDriveLaidOut(row.id);
 	if (rebooted) {
 		logControl("wake.completed", scope, {
 			ms: Date.now() - wakeStartedAt,
@@ -236,6 +245,14 @@ export async function wakeAfterStop(
 	return wakeCloudWorkspace(row);
 }
 
+/** A drive that refused reads as any box that would not start. */
+function unavailableReason(
+	error: SandboxUnavailableError,
+): CloudWorkspaceFailureReason {
+	if (error instanceof SandboxDriveRefusedError) return "host_not_ready";
+	return error.snapshotExpired ? "snapshot_expired" : "sandbox_gone";
+}
+
 /**
  * For a sandbox that is gone or can never resume. An `awake` row nothing can
  * open would sit in the sidebar forever; failed is the state the client
@@ -250,7 +267,7 @@ export async function markSandboxUnavailable(
 		scope: { cloudWorkspaceId: row.id, organizationId: row.organizationId },
 		from: ["awake", "asleep"],
 		set: { sandboxUrl: null },
-		reason: error.snapshotExpired ? "snapshot_expired" : "sandbox_gone",
+		reason: unavailableReason(error),
 		error,
 	});
 }

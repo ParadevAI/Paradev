@@ -12,6 +12,7 @@ import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
@@ -22,18 +23,22 @@ import {
 } from "../../lib/cloud-guards";
 import { controlTags } from "../../lib/control-log";
 import {
+	deleteGoldenDriveIfUnreferenced,
 	deleteSandbox,
+	goldenDriveNameFor,
 	loadRepositories,
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
 	sortRepositories,
+	workspaceDrivesEnabled,
 	workspaceRepositories,
 } from "../../lib/sandbox";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
 import { isLiveStatus } from "../cloud-workspace/live";
 import { assertMachineSizeOffered } from "../cloud-workspace/start";
+import { deleteSandboxAndDriveLater } from "../cloud-workspace/teardown";
 import { wakeAfterStop } from "../cloud-workspace/wake";
 import { verifyOrgAdmin } from "../integration/utils";
 import { currentBundleSha } from "./current-bundle";
@@ -251,6 +256,29 @@ async function loadPromotable(
 	return { workspace, source, checkouts };
 }
 
+/** Only the control plane reads the golden drive; released clients never saw it. */
+function publicEnvironment<Row extends { goldenDriveName?: string | null }>(
+	row: Row,
+): Omit<Row, "goldenDriveName"> {
+	const { goldenDriveName: _goldenDriveName, ...rest } = row;
+	return rest;
+}
+
+/** A golden nothing will point at, and its drive: deleted through the retried job. */
+async function abandonGolden(
+	goldenName: string,
+	goldenDriveName: string | null,
+): Promise<void> {
+	await deleteSandboxAndDriveLater({
+		providerSandboxId: goldenName,
+		driveName: goldenDriveName,
+	}).catch((cleanup: unknown) =>
+		console.error(
+			`[environment/promote] could not delete unused golden ${goldenName}`,
+			cleanup,
+		),
+	);
+}
 export const environmentRouter = {
 	secrets: secretsRouter,
 
@@ -284,7 +312,7 @@ export const environmentRouter = {
 				projectIdsByEnvironment(ids),
 			]);
 			return rows.map((row) => ({
-				...row,
+				...publicEnvironment(row),
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
 			}));
@@ -300,7 +328,7 @@ export const environmentRouter = {
 				projectIdsByEnvironment([row.id]),
 			]);
 			return {
-				...row,
+				...publicEnvironment(row),
 				repositories: repos.get(row.id) ?? [],
 				projectIds: projects.get(row.id) ?? [],
 			};
@@ -374,7 +402,10 @@ export const environmentRouter = {
 				await db.delete(environments).where(eq(environments.id, row.id));
 				throw error;
 			}
-			return { ...row, primaryRepositoryId: input.primaryRepositoryId };
+			return {
+				...publicEnvironment(row),
+				primaryRepositoryId: input.primaryRepositoryId,
+			};
 		}),
 
 	linkProject: personProcedure
@@ -500,10 +531,40 @@ export const environmentRouter = {
 			const limit = target
 				? null
 				: await assertEnvironmentCapacity(workspace.organizationId);
+			// The kill switch: with drives off, no promote spreads drive mode to a new golden.
+			if (
+				workspace.driveName &&
+				!(await workspaceDrivesEnabled(workspace.organizationId))
+			) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"This workspace could not be saved as an environment. Try again later.",
+					i18nKey: "serverError.environment.couldNotPromote",
+				});
+			}
 			const golden = await promoteSandboxToEnvironment({
 				sourceSandbox: workspace.providerSandboxId,
 				goldenName,
 				organizationId: workspace.organizationId,
+				sourceDriveName: workspace.driveName,
+			}).catch(async (error: unknown) => {
+				await abandonGolden(
+					goldenName,
+					workspace.driveName ? goldenDriveNameFor(goldenName) : null,
+				);
+				if (!workspace.driveName || error instanceof TRPCError) throw error;
+				// What went wrong names the drive; the user sees the failure any promote can have.
+				console.error(
+					`[environment/promote] ${workspace.id} could not be promoted`,
+					error,
+				);
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message:
+						"This workspace could not be saved as an environment. Try again later.",
+					i18nKey: "serverError.environment.couldNotPromote",
+				});
 			});
 			const { stopped } = golden;
 			const restart = async () => {
@@ -528,6 +589,7 @@ export const environmentRouter = {
 				sourceKind: "fork" as const,
 				sourceRef: goldenName,
 				region: golden.region,
+				goldenDriveName: golden.goldenDriveName,
 				bundleSha: await currentBundleSha(),
 				primaryRepositoryId,
 			};
@@ -616,25 +678,22 @@ export const environmentRouter = {
 					return saved;
 				})
 				.catch(async (error: unknown) => {
-					await deleteSandbox(goldenName).catch((cleanup: unknown) =>
-						console.error(
-							`[environment/promote] could not delete unused golden ${goldenName}`,
-							cleanup,
-						),
-					);
+					await abandonGolden(goldenName, golden.goldenDriveName);
 					await restart();
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
-				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
-					console.error(
-						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
-						error,
-					),
-				);
+				await deleteSandbox(target.sourceRef)
+					.then(() => deleteGoldenDriveIfUnreferenced(target.goldenDriveName))
+					.catch((error: unknown) =>
+						console.error(
+							`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
+							error,
+						),
+					);
 			}
 			await restart();
-			return row;
+			return publicEnvironment(row);
 		}),
 
 	update: personProcedure
@@ -707,14 +766,14 @@ export const environmentRouter = {
 					: {}),
 			};
 			if (Object.keys(patch).length === 0) {
-				return loadEnvironment(input.id, ctx);
+				return publicEnvironment(await loadEnvironment(input.id, ctx));
 			}
 			const [row] = await db
 				.update(environments)
 				.set(patch)
 				.where(eq(environments.id, input.id))
 				.returning();
-			return row;
+			return row && publicEnvironment(row);
 		}),
 
 	archive: personProcedure
@@ -729,11 +788,13 @@ export const environmentRouter = {
 				.returning({
 					sourceKind: environments.sourceKind,
 					sourceRef: environments.sourceRef,
+					goldenDriveName: environments.goldenDriveName,
 				});
 			// A golden is one environment's alone, and an archived environment
 			// never forks from it again; without this it bills storage forever.
 			if (archived?.sourceKind === "fork") {
 				await deleteSandbox(archived.sourceRef);
+				await deleteGoldenDriveIfUnreferenced(archived.goldenDriveName);
 			}
 			return { archived: true };
 		}),

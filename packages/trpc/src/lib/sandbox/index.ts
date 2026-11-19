@@ -26,6 +26,19 @@ export {
 } from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
 export { deriveSandboxCredentials } from "./credentials";
+export { sandboxDeletesAllowed } from "./deletes";
+export {
+	DriveStillAttachedError,
+	deleteWorkspaceDrive,
+	forkWorkspaceDrive,
+	goldenDriveNameFor,
+	WORKSPACE_DRIVE_MOUNT_PATH,
+	waitForDriveDetached,
+	workspaceDriveMounts,
+	workspaceDriveNameToClaim,
+	workspaceDrivesEnabled,
+} from "./drives";
+export { deleteGoldenDriveIfUnreferenced } from "./golden-drives";
 export {
 	listRemoteBranches,
 	type RemoteBranch,
@@ -56,6 +69,7 @@ export {
 	type ActiveWorkspaceSandbox,
 	type BoxSession,
 	deleteSandbox,
+	deleteSandboxAndDrive,
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
@@ -65,7 +79,11 @@ export {
 	promoteSandboxToEnvironment,
 	provisionSandbox,
 	pushManagedEnv,
+	type ResumeLock,
+	SandboxBusyError,
 	type SandboxClaim,
+	SandboxDriveMissingError,
+	SandboxDriveRefusedError,
 	type SandboxEnvironment,
 	SandboxNotReadyError,
 	SandboxUnavailableError,

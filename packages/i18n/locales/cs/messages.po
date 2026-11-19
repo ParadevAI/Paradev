@@ -20981,6 +20981,9 @@ msgstr "Tímto zrušíte přípravu a vrátíte všechny připravené změny. P�
 msgid "This workspace"
 msgstr "Tento pracovní prostor"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "Tento pracovní prostor se nepodařilo uložit jako prostředí. Zkuste to později."
+
 msgid "This workspace has no project to branch from"
 msgstr "Tento pracovní prostor nemá projekt, ze kterého by šlo větvit"
 

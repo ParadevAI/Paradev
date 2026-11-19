@@ -20981,6 +20981,9 @@ msgstr "Esto quitará de preparados y revertirá todos los cambios preparados. L
 msgid "This workspace"
 msgstr "Este espacio de trabajo"
 
+msgid "This workspace could not be saved as an environment. Try again later."
+msgstr "No se pudo guardar este espacio de trabajo como entorno. Inténtalo de nuevo más tarde."
+
 msgid "This workspace has no project to branch from"
 msgstr "Este espacio de trabajo no tiene un proyecto desde el que bifurcar"
 

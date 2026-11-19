@@ -37,7 +37,6 @@ import { logControl } from "../../lib/control-log";
 import { callMoves } from "../../lib/moves";
 import { nudge, readWorkspaceForwards } from "../../lib/realtime";
 import {
-	deleteSandbox,
 	describeSandbox,
 	HOST_SERVICE_PORT,
 	listRemoteBranches,
@@ -74,11 +73,11 @@ import {
 	queueSettleWorkspace,
 	settleWorkspaceNow,
 } from "./meter";
-import { nextSandboxNameFor } from "./provision";
 import { listPullRequests } from "./pull-requests";
 import { queueReap, reapWorkspaceFiles } from "./reap";
 import { cloudWorkspaceRecordRouter } from "./record";
 import { recordSandboxAwake } from "./sandbox-expiry";
+import { nextSandboxNameFor } from "./sandbox-name";
 import {
 	recordBootEnd,
 	recordBoxStopped,
@@ -90,6 +89,7 @@ import {
 	queueProvision,
 	startCloudWorkspace,
 } from "./start";
+import { retireAndTearDown } from "./teardown";
 import { transitionCloudWorkspace } from "./transition";
 import {
 	markSandboxUnavailable,
@@ -916,7 +916,13 @@ export const cloudWorkspaceRouter = {
 								meterError,
 							),
 						);
-						await deleteSandbox(row.providerSandboxId);
+						await retireAndTearDown(
+							row,
+							and(
+								eq(cloudWorkspaces.status, "archived"),
+								eq(cloudWorkspaces.deletedAt, archivedAt),
+							),
+						);
 						await reapWorkspaceFiles(row.id);
 					});
 				}
