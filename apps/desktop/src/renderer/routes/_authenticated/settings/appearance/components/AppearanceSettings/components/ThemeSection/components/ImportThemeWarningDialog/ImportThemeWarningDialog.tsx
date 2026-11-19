@@ -10,10 +10,12 @@ import {
 	AlertDialogTitle,
 } from "@superset/ui/alert-dialog";
 
+import type { RefObject } from "react";
 import { LuTriangleAlert } from "react-icons/lu";
 
 interface ImportThemeWarningDialogProps {
 	open: boolean;
+	returnFocusRef: RefObject<HTMLButtonElement | null>;
 	onOpenChange: (open: boolean) => void;
 	onContinue: () => void;
 }
@@ -22,10 +24,18 @@ export function ImportThemeWarningDialog({
 	open,
 	onOpenChange,
 	onContinue,
+	returnFocusRef,
 }: ImportThemeWarningDialogProps) {
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
-			<AlertDialogContent>
+			<AlertDialogContent
+				onCloseAutoFocus={(event) => {
+					if (returnFocusRef.current) {
+						event.preventDefault();
+						returnFocusRef.current.focus();
+					}
+				}}
+			>
 				<AlertDialogHeader className="gap-3">
 					<AlertDialogTitle className="flex items-center gap-2">
 						<LuTriangleAlert

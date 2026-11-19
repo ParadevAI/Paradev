@@ -201,7 +201,7 @@ export function sanitizeThemeCss(css: string | undefined): string {
 		walk(ast, {
 			leave(node: CssNode, item: ListItem<CssNode>, list: List<CssNode>) {
 				if (
-					(node.type === "Rule" || node.type === "Atrule") &&
+					node.type === "Rule" &&
 					node.block?.children.isEmpty &&
 					item &&
 					list
@@ -209,7 +209,8 @@ export function sanitizeThemeCss(css: string | undefined): string {
 					list.remove(item);
 			},
 		});
-		return generate(ast);
+		const output = generate(ast);
+		return output.length <= MAX_THEME_CSS_LENGTH ? output : "";
 	} catch {
 		return "";
 	}

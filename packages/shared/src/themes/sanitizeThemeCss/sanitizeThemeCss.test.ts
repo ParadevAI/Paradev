@@ -76,3 +76,17 @@ describe("sanitizeThemeCss", () => {
 it("bounds stylesheet complexity", () => {
 	expect(sanitizeThemeCss("a{color:red}".repeat(3000))).toBe("");
 });
+
+it("preserves empty layers that establish cascade order", () => {
+	const css =
+		"@layer first{}@layer second{a{color:red}}@layer first{a{color:blue}}";
+	expect(sanitizeThemeCss(css)).toBe(css);
+});
+
+it("bounds output expanded by custom property namespacing", () => {
+	const css = `a{${Array.from({ length: 3000 }, (_, i) => `--x${i.toString().padStart(4, "0")}:0;`).join("")}}`;
+	expect(css.length).toBeLessThan(MAX_THEME_CSS_LENGTH);
+	const output = sanitizeThemeCss(css);
+	expect(output).toBe("");
+	expect(sanitizeThemeCss(output)).toBe(output);
+});

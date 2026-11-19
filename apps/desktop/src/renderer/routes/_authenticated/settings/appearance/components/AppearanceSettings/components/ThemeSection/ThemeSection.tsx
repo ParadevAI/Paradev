@@ -153,6 +153,7 @@ export function ThemeSection() {
 	const { t } = useLingui();
 	const searchQuery = useSettingsSearchQuery();
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const importButtonRef = useRef<HTMLButtonElement>(null);
 	const [isImporting, setIsImporting] = useState(false);
 	const [showImportWarning, setShowImportWarning] = useState(false);
 	const activeThemeId = useThemeId();
@@ -357,6 +358,7 @@ export function ThemeSection() {
 	return (
 		<>
 			<ImportThemeWarningDialog
+				returnFocusRef={importButtonRef}
 				open={showImportWarning}
 				onOpenChange={setShowImportWarning}
 				onContinue={() => fileInputRef.current?.click()}
@@ -467,6 +469,7 @@ export function ThemeSection() {
 						type="button"
 						variant="outline"
 						size="sm"
+						ref={importButtonRef}
 						onClick={() => setShowImportWarning(true)}
 						disabled={isImporting}
 					>
