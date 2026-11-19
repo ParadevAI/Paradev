@@ -125,6 +125,15 @@ describe("queryCloudUsage", () => {
 		expect(nextCursor).toBeNull();
 	});
 
+	test("a page of person-by-day rows leaves out a person it would cut short", async () => {
+		const { items } = await usage({ groupBy: "userDay", limit: 4 });
+		expect(items.map((item) => [item.ref?.name, item.label])).toEqual([
+			["Maya", "2026-11-10"],
+			["Maya", "2026-11-12"],
+			["Maya", "2026-11-16"],
+		]);
+	});
+
 	test("a workspace that failed with no boot appears with its failure", async () => {
 		const { items } = await usage({
 			groupBy: "workspace",

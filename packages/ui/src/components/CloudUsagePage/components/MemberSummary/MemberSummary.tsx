@@ -19,7 +19,11 @@ export function MemberSummary({
 	return (
 		<Card className="py-5">
 			<CardHeader className="px-5">
-				<CardTitle className="text-base font-normal tabular-nums">
+				<CardTitle
+					role="heading"
+					aria-level={3}
+					className="text-base font-normal tabular-nums"
+				>
 					<span className="font-semibold">
 						<Trans>{used} used by you</Trans>
 					</span>{" "}

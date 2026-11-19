@@ -18,10 +18,15 @@ interface QueryStatusProps {
 export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 	if (!isError) {
 		return (
-			<div className="space-y-2" aria-busy>
-				<Skeleton className="h-6 w-1/3" />
-				<Skeleton className="h-4 w-full" />
-				<Skeleton className="h-4 w-2/3" />
+			<div>
+				<output className="sr-only">
+					<Trans>Loading...</Trans>
+				</output>
+				<div className="space-y-2" aria-hidden>
+					<Skeleton className="h-6 w-1/3" />
+					<Skeleton className="h-4 w-full" />
+					<Skeleton className="h-4 w-2/3" />
+				</div>
 			</div>
 		);
 	}

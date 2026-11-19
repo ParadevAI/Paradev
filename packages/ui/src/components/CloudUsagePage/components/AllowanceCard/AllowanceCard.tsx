@@ -47,7 +47,11 @@ export function AllowanceCard({
 	return (
 		<Card className="gap-4 py-5">
 			<CardHeader className="items-center px-5">
-				<CardTitle className="flex flex-wrap items-baseline gap-x-1.5 text-base font-normal tabular-nums">
+				<CardTitle
+					role="heading"
+					aria-level={3}
+					className="flex flex-wrap items-baseline gap-x-1.5 text-base font-normal tabular-nums"
+				>
 					<span className="font-semibold">
 						<Trans>{used} used</Trans>
 					</span>

@@ -18,7 +18,9 @@ export function Section({ title, action, children }: SectionProps) {
 	return (
 		<Card className="min-w-0 gap-4 py-5">
 			<CardHeader className="items-center px-5">
-				<CardTitle className="text-base">{title}</CardTitle>
+				<CardTitle role="heading" aria-level={3} className="text-base">
+					{title}
+				</CardTitle>
 				{action && <CardAction>{action}</CardAction>}
 			</CardHeader>
 			<CardContent className="px-5">{children}</CardContent>

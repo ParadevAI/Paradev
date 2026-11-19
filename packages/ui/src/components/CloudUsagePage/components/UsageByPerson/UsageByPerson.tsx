@@ -74,7 +74,7 @@ export function UsageByPerson({
 										)}
 									</TableCell>
 									<TableCell className="w-28">
-										{byPersonDays.data && (
+										{days.some((day) => usdOn.has(`${item.key}|${day}`)) && (
 											<ChartContainer
 												config={config}
 												className="aspect-auto h-6 w-24"

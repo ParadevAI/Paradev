@@ -8,7 +8,8 @@ The card shows billing's own numbers, as they are:
 - One line for each thing the organization holds, as "X of Y": the amount included with its
   seats, free credits and bought credits. Usage draws the seats' amount first, then credits.
 - "Over" is the usage on billing's priced monthly row, which billing charges at the period end.
-  With overage off, billing stops at what is held and charges nothing past it, so over stays 0.
+  With overage off, billing stops at what is held and charges nothing past it. Usage recorded
+  on the priced row while overage was on is still charged when overage is turned off.
 - The seats' amount starts again each period. Credits never expire and carry over; their line
   counts use since they were given.
 - Our own usage tables can show a few minutes more than the card: workspaces stop a few minutes

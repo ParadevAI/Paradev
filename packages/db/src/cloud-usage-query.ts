@@ -761,13 +761,20 @@ async function userDayRows(
 			asc(user),
 			asc(facts.key),
 		)
-		.limit(limit);
+		.limit(limit + 1);
 	const userOf = (key: string | null) => key?.split("|")[0] || null;
+	// A page cut inside the last person's days would read their missing days as zero, so it drops that person.
+	const cut =
+		rows.length > limit ? userOf(rows[limit - 1]?.key ?? null) : undefined;
+	const page =
+		cut === undefined
+			? rows
+			: rows.slice(0, limit).filter((row) => userOf(row.key) !== cut);
 	const refs = await refsFor(db, scope, "user", [
 		...new Set(rows.flatMap((row) => userOf(row.key) ?? [])),
 	]);
 	return {
-		items: rows.map(({ key, ...row }) => {
+		items: page.map(({ key, ...row }) => {
 			const userId = userOf(key);
 			return {
 				key: userId,
@@ -776,7 +783,7 @@ async function userDayRows(
 				...toMetrics(row, overagePerGbHour),
 			};
 		}),
-		rowCount: rows.length,
+		rowCount: page.length,
 		nextCursor: null,
 	};
 }

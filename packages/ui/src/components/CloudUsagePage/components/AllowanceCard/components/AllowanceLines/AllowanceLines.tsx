@@ -45,7 +45,7 @@ export function AllowanceLines({ lines, seats, format }: AllowanceLinesProps) {
 		const used = format(line.used.usd);
 		const total = format(line.total.usd);
 		return (
-			<Item key={line.kind} size="sm" className="px-0">
+			<Item key={line.kind} role="listitem" size="sm" className="px-0">
 				<ItemContent>
 					<ItemTitle className="font-normal">{label(line)}</ItemTitle>
 				</ItemContent>
