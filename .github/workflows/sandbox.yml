@@ -24,7 +24,12 @@ on:
           - real-sandbox
           - production-release
           - inventory
+          - drive-prune-dry-run
         default: real-sandbox
+      bundle:
+        description: "drive-prune-dry-run: the current release's bundle sha256"
+        type: string
+        required: false
 
 jobs:
   boot-twice:
@@ -172,6 +177,32 @@ jobs:
           VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
           VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
         run: bun run inventory
+
+  drive-prune-dry-run:
+    name: Agent-tools drive prune, dry run
+    if: github.event_name == 'workflow_dispatch' && inputs.run == 'drive-prune-dry-run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen --ignore-scripts
+
+      - name: List what the prune would delete
+        working-directory: packages/sandbox
+        env:
+          VERCEL_SANDBOX_TOKEN: ${{ secrets.VERCEL_SANDBOX_TOKEN }}
+          VERCEL_SANDBOX_TEAM_ID: ${{ secrets.VERCEL_SANDBOX_TEAM_ID }}
+          VERCEL_SANDBOX_PROJECT_ID: ${{ secrets.VERCEL_SANDBOX_PROJECT_ID }}
+          BUNDLE: ${{ inputs.bundle }}
+        run: bun run agent-tools --bundle "$BUNDLE" --prune-dry-run
 
   production-release:
     name: Production release
