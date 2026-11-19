@@ -500,6 +500,16 @@ export function useDashboardSidebarState() {
 		[collections, tagWorkspaces, tagFolderContext],
 	);
 
+	const expandProject = useCallback(
+		(projectId: string) => {
+			if (!collections.sidebarProjects.get(projectId)?.isCollapsed) return;
+			collections.sidebarProjects.update(projectId, (draft) => {
+				draft.isCollapsed = false;
+			});
+		},
+		[collections],
+	);
+
 	const toggleProjectCollapsed = useCallback(
 		(projectId: string) => {
 			const existing = collections.sidebarProjects.get(projectId);
@@ -743,6 +753,16 @@ export function useDashboardSidebarState() {
 			return sectionId;
 		},
 		[collections, tagWorkspaces, tagFolderContext, writeTagSetting],
+	);
+
+	const expandSection = useCallback(
+		(sectionId: string) => {
+			if (!collections.sidebarSections.get(sectionId)?.isCollapsed) return;
+			collections.sidebarSections.update(sectionId, (draft) => {
+				draft.isCollapsed = false;
+			});
+		},
+		[collections],
 	);
 
 	const toggleSectionCollapsed = useCallback(
@@ -1142,6 +1162,8 @@ export function useDashboardSidebarState() {
 	);
 
 	return {
+		expandProject,
+		expandSection,
 		createSection,
 		deleteSection,
 		ensureProjectInSidebar,

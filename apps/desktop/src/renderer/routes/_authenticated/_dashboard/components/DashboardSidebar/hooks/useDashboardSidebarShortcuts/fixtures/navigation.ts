@@ -34,8 +34,8 @@ const router = {
 };
 const frames: FrameRequestCallback[] = [];
 const originalFrame = globalThis.requestAnimationFrame;
-const toggleProjectCollapsed = mock(() => {});
-const toggleSectionCollapsed = mock(() => {});
+const expandProject = mock(() => {});
+const expandSection = mock(() => {});
 mock.module("renderer/hotkeys", () => ({
 	useHotkey: (id: string, callback: () => void) => hotkeys.set(id, callback),
 }));
@@ -49,8 +49,8 @@ mock.module(
 	"renderer/routes/_authenticated/hooks/useDashboardSidebarState",
 	() => ({
 		useDashboardSidebarState: () => ({
-			toggleProjectCollapsed,
-			toggleSectionCollapsed,
+			expandProject,
+			expandSection,
 		}),
 	}),
 );
@@ -129,8 +129,8 @@ beforeEach(() => {
 	globalThis.requestAnimationFrame = (callback) => frames.push(callback);
 	hotkeys.clear();
 	navigate.mockClear();
-	toggleProjectCollapsed.mockClear();
-	toggleSectionCollapsed.mockClear();
+	expandProject.mockClear();
+	expandSection.mockClear();
 	useDeletingWorkspacesStore.setState({ deletingIds: new Set() });
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
@@ -214,7 +214,7 @@ test("navigates when every workspace is pinned and reveals collapsed pins", asyn
 	expect(useSidebarSectionsCollapseStore.getState().collapsed.pinned).toBe(
 		false,
 	);
-	expect(toggleProjectCollapsed).not.toHaveBeenCalled();
+	expect(expandProject).not.toHaveBeenCalled();
 });
 
 test("leaves a collapsed Projects section collapsed for a pinned target", async () => {
@@ -270,7 +270,39 @@ test("pin changes update navigation without renumbering regular workspace shortc
 	rerender({ pins: [] });
 	press("PREV_WORKSPACE");
 	expectTarget("project-workspace");
-	expect(toggleProjectCollapsed).not.toHaveBeenCalled();
+	expect(expandProject).not.toHaveBeenCalled();
 	await flushNavigationEffects();
-	expect(toggleProjectCollapsed).toHaveBeenCalledWith("project");
+	expect(expandProject).toHaveBeenCalledWith("project");
+});
+
+test.each([
+	"JUMP_TO_WORKSPACE_2",
+	"NEXT_WORKSPACE",
+	"PREV_WORKSPACE",
+])("%s expands rather than toggles containers after navigation", async (key) => {
+	currentWorkspaceId = "session";
+	const sectionGroups = [
+		{
+			...groups[0],
+			children: [
+				{
+					type: "section" as const,
+					section: {
+						id: "section",
+						name: "Section",
+						isCollapsed: true,
+						workspaces: [workspace("project-workspace", "project")],
+					},
+				},
+			],
+		},
+	] as DashboardSidebarProject[];
+	renderHook(() => useDashboardSidebarShortcuts(sectionGroups, sessions));
+	press(key);
+	expectTarget("project-workspace");
+	expect(expandProject).not.toHaveBeenCalled();
+	expect(expandSection).not.toHaveBeenCalled();
+	await flushNavigationEffects();
+	expect(expandProject).toHaveBeenCalledWith("project");
+	expect(expandSection).toHaveBeenCalledWith("section");
 });

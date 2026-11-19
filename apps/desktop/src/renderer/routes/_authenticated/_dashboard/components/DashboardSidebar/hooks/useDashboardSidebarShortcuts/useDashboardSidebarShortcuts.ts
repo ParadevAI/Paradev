@@ -77,8 +77,7 @@ export function useDashboardSidebarShortcuts(
 	}: UseDashboardSidebarShortcutsOptions = {},
 ) {
 	const router = useRouter();
-	const { toggleProjectCollapsed, toggleSectionCollapsed } =
-		useDashboardSidebarState();
+	const { expandProject, expandSection } = useDashboardSidebarState();
 	const deletingIds = useDeletingWorkspacesStore((state) => state.deletingIds);
 	const flattenedWorkspaces = useMemo(
 		() =>
@@ -159,18 +158,13 @@ export function useDashboardSidebarShortcuts(
 			const location = workspaceLocations.get(workspaceId);
 			if (!location) return;
 			if (location.projectId !== null && location.projectIsCollapsed) {
-				toggleProjectCollapsed(location.projectId);
+				expandProject(location.projectId);
 			}
 			if (location.sectionId && location.sectionIsCollapsed) {
-				toggleSectionCollapsed(location.sectionId);
+				expandSection(location.sectionId);
 			}
 		},
-		[
-			pinnedWorkspaces,
-			workspaceLocations,
-			toggleProjectCollapsed,
-			toggleSectionCollapsed,
-		],
+		[pinnedWorkspaces, workspaceLocations, expandProject, expandSection],
 	);
 
 	const switchToWorkspace = useCallback(
