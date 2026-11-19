@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { resolveCommand } from "@superset/shared/resolve-command";
 import {
 	type DiffCategory,
 	type DiffCategoryRefs,
@@ -181,7 +182,8 @@ function runDiff(
 	if (budget.exhausted) return Promise.resolve({ patch: "", truncated: true });
 
 	return new Promise<DiffSection>((resolve, reject) => {
-		const child = spawn("git", [...CONFIG_ARGS, ...args], {
+		const git = resolveCommand("git", { env: options.env });
+		const child = spawn(git, [...CONFIG_ARGS, ...args], {
 			...options,
 			windowsHide: true,
 		});

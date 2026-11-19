@@ -2,7 +2,12 @@ import { execFile } from "node:child_process";
 import os from "node:os";
 import { promisify } from "node:util";
 import pidtree from "pidtree";
-import { EXEC_TIMEOUT_MS, runTolerant } from "./exec.ts";
+import {
+	EXEC_TIMEOUT_MS,
+	lsofCommand,
+	psCommand,
+	runTolerant,
+} from "./exec.ts";
 import { getListeningPortsLinuxProcfs } from "./procfs.ts";
 
 const execFileAsync = promisify(execFile);
@@ -20,16 +25,40 @@ export interface ProcessTableEntry {
 }
 
 /**
- * One system-wide process-table read. pidtree spawns a full `ps`/`wmic` per
- * invocation, so a scan reads the table once and derives everything (session
+ * One system-wide process-table read. Each read spawns a full `ps` (or
+ * `wmic` through pidtree on Windows), so a scan reads the table once and derives everything (session
  * trees, detached-process attribution) from that single snapshot.
  *
  * Throws when the table can't be read, so callers can keep previous state
  * instead of treating every session as exited.
  */
 export async function readProcessTable(): Promise<ProcessTableEntry[]> {
+	if (os.platform() !== "win32") return readProcessTablePs();
 	const table = await pidtree(-1, { advanced: true });
 	return table.map(({ pid, ppid }) => ({ pid, ppid }));
+}
+
+async function readProcessTablePs(): Promise<ProcessTableEntry[]> {
+	const { stdout } = await execFileAsync(
+		psCommand(),
+		["-A", "-o", "pid=,ppid="],
+		{
+			maxBuffer: 10 * 1024 * 1024,
+			timeout: EXEC_TIMEOUT_MS,
+		},
+	);
+	return parseProcessTable(stdout);
+}
+
+export function parseProcessTable(output: string): ProcessTableEntry[] {
+	const table: ProcessTableEntry[] = [];
+	for (const line of output.split("\n")) {
+		const match = line.match(/^\s*(\d+)\s+(\d+)\s*$/);
+		if (match?.[1] && match[2]) {
+			table.push({ pid: Number(match[1]), ppid: Number(match[2]) });
+		}
+	}
+	return table;
 }
 
 /**
@@ -125,7 +154,7 @@ async function getListeningPortsLsof(
 		// -P: don't convert port numbers to names
 		// -n: don't resolve hostnames
 		const output = await runTolerant(
-			"lsof",
+			lsofCommand(),
 			["-a", "-p", pidArg, "-iTCP", "-sTCP:LISTEN", "-P", "-n"],
 			{ maxBuffer: 10 * 1024 * 1024, timeout: EXEC_TIMEOUT_MS, signal },
 		);
