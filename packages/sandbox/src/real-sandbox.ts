@@ -53,6 +53,7 @@ import {
 	waitForCheckout,
 	writeSentinels,
 } from "./drive-comparison";
+import { wakeIds } from "./wake-measure";
 
 process.env.SKIP_ENV_VALIDATION ??= "1";
 
@@ -168,7 +169,11 @@ const stopMeasured = async (name: string): Promise<StopMeasure> => {
 };
 
 const name = `ws-real-check-${Date.now().toString(36)}`;
-const workspaceId = randomUUID();
+const wakeMode = process.env.REAL_SANDBOX_WAKE?.trim();
+const [wakeStage, wakeArg] = wakeMode?.split(/\s+/) ?? [];
+const wakeSuffix = wakeStage === "prepare" ? Date.now().toString(36) : wakeArg;
+// A drive belongs to the workspace that laid it out, so a later wake run must claim the same ids.
+const workspaceId = wakeSuffix ? wakeIds(wakeSuffix).workspaceId : randomUUID();
 // Cut from main the way a real workspace is, so the probe's branch check
 // covers the branching itself and not just that a checkout happened.
 const workingBranch = `superset/real-check-${workspaceId.slice(0, 8)}`;
@@ -177,7 +182,9 @@ const identity: SandboxIdentity = {
 	SUPERSET_BUNDLE_SHA: bundle.sha256,
 	SUPERSET_API_URL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
 	SUPERSET_SANDBOX_WORKSPACE_ID: workspaceId,
-	SUPERSET_SANDBOX_ORGANIZATION_ID: randomUUID(),
+	SUPERSET_SANDBOX_ORGANIZATION_ID: wakeSuffix
+		? wakeIds(wakeSuffix).organizationId
+		: randomUUID(),
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
 			url: "https://github.com/paradevai/paradev.git",
@@ -231,7 +238,6 @@ async function provisionFromImage(
 	}
 }
 
-const wakeMode = process.env.REAL_SANDBOX_WAKE?.trim();
 if (wakeMode) {
 	const wake = await import("./wake-measure");
 	const driveHelpers = await import("@superset/trpc/lib/sandbox/drives");
@@ -271,11 +277,9 @@ if (wakeMode) {
 			).createdAt.getTime();
 		},
 	};
-	const [mode, suffix] = wakeMode.split(/\s+/);
+	const [mode, suffix] = [wakeStage, wakeSuffix];
 	if (mode === "prepare") {
-		process.exit(
-			(await wake.prepareWakeMeasure(deps, Date.now().toString(36))) ? 1 : 0,
-		);
+		process.exit((await wake.prepareWakeMeasure(deps, suffix ?? "")) ? 1 : 0);
 	}
 	if (mode === "cold" && suffix) {
 		process.exit((await wake.coldWakeMeasure(deps, suffix)) ? 1 : 0);

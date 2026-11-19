@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import type { BoxRun, StopMeasure } from "./drive-comparison";
 
@@ -7,10 +8,26 @@ import type { BoxRun, StopMeasure } from "./drive-comparison";
  * Three boxes per variant. `prepare` builds them, measures that stop, wakes
  * each once right away (warm) and stops it again. `cold`, dispatched at least
  * two hours later, wakes each once more, measures, and deletes every box and
- * drive. Each measure is one `WAKE-MEASURE {json}` line.
+ * drive, or keeps them all when a wake failed. Each measure is one `WAKE-MEASURE {json}` line.
  */
 export const WAKE_BOXES_PER_VARIANT = 3;
 export const WAKE_BOX_PREFIX = "d-expiry-wake";
+
+function uuidFrom(seed: string): string {
+	const hex = createHash("sha256").update(seed).digest("hex");
+	return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-8${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+/** The same ids for every run on one suffix: the cold run wakes drives the prepare run laid out. */
+export function wakeIds(suffix: string): {
+	workspaceId: string;
+	organizationId: string;
+} {
+	return {
+		workspaceId: uuidFrom(`${WAKE_BOX_PREFIX}-workspace-${suffix}`),
+		organizationId: uuidFrom(`${WAKE_BOX_PREFIX}-organization-${suffix}`),
+	};
+}
 
 type Variant = "A" | "B";
 
@@ -224,7 +241,13 @@ export async function coldWakeMeasure<Claim, Mounts>(
 		);
 		await stopAndRecord(deps, box, "cold");
 	});
-	return failures + (await deleteWakeMeasure(deps, suffix));
+	if (failures) {
+		deps.log(
+			`wake-measure: boxes kept for diagnosis; dispatch "delete ${suffix}" to remove them`,
+		);
+		return failures;
+	}
+	return deleteWakeMeasure(deps, suffix);
 }
 
 export async function deleteWakeMeasure<Claim, Mounts>(
