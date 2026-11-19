@@ -227,11 +227,14 @@ export function reconstructTerminalTranscript(
 		for (const chunk of splitForSampling(stream, cols, rows)) {
 			scrolledRows = 0;
 			hasPartialScroll = false;
+			const startsAfterVisibleOutput =
+				term.buffer.active.cursorY >= previousRowCount;
 			write(chunk);
 			const viewport = readViewport(term);
 			// Text written in order cannot overlap rows that scrolled out of view.
 			// Keep text matching for redraws and confined scroll regions.
 			const overlapLimit =
+				startsAfterVisibleOutput &&
 				scrolledRows > 0 &&
 				!hasPartialScroll &&
 				!/\p{Cc}/u.test(chunk.replace(LINEAR_OUTPUT_CONTROLS, ""))

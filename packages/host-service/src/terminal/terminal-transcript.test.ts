@@ -102,6 +102,17 @@ describe("reconstructTerminalTranscript", () => {
 		expect(text).toBe("persistent header");
 	});
 
+	test("does not append an unchanged redraw that crosses a sample boundary", () => {
+		const size = { cols: 80, rows: 24 };
+		const frame = "unchanged status\r\n".repeat(size.rows);
+		// Pad before cursor-home so the marker ends a sample.
+		const stylePadding = `${ESC}[0m`.repeat(8);
+		const redraw = `${stylePadding}${ESC}[H${frame}`;
+		expect(reconstructTerminalTranscript(frame + redraw.repeat(12), size)).toBe(
+			reconstructTerminalTranscript(frame, size),
+		);
+	});
+
 	test("keeps wrapped double-width output, which code-unit chunking lost", () => {
 		// A CJK line at 80 characters is 160 columns wide, so it wraps to two
 		// rendered rows. Chunking on code units let more than a screen scroll
