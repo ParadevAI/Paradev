@@ -281,14 +281,18 @@ test.each([
 	"PREV_WORKSPACE",
 ])("%s expands rather than toggles containers after navigation", async (key) => {
 	currentWorkspaceId = "session";
-	const sectionGroups = [
+	const sectionGroups: DashboardSidebarProject[] = [
 		{
 			...groups[0],
 			children: [
 				{
-					type: "section" as const,
+					type: "section",
 					section: {
 						id: "section",
+						projectId: "project",
+						createdAt: new Date(0),
+						tabOrder: 0,
+						color: null,
 						name: "Section",
 						isCollapsed: true,
 						workspaces: [workspace("project-workspace", "project")],
@@ -296,7 +300,7 @@ test.each([
 				},
 			],
 		},
-	] as DashboardSidebarProject[];
+	];
 	renderHook(() => useDashboardSidebarShortcuts(sectionGroups, sessions));
 	press(key);
 	expectTarget("project-workspace");

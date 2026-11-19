@@ -17,9 +17,7 @@ import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
 interface WorkspaceLocation {
 	/** Null for the Sessions section — no project row to expand. */
 	projectId: string | null;
-	projectIsCollapsed: boolean;
 	sectionId: string | null;
-	sectionIsCollapsed: boolean;
 }
 
 const MAX_SHORTCUT_COUNT = 9;
@@ -109,18 +107,14 @@ export function useDashboardSidebarShortcuts(
 				if (child.type === "workspace") {
 					map.set(child.workspace.id, {
 						projectId: project.id,
-						projectIsCollapsed: project.isCollapsed,
 						sectionId: null,
-						sectionIsCollapsed: false,
 					});
 					continue;
 				}
 				for (const workspace of child.section.workspaces) {
 					map.set(workspace.id, {
 						projectId: project.id,
-						projectIsCollapsed: project.isCollapsed,
 						sectionId: child.section.id,
-						sectionIsCollapsed: child.section.isCollapsed,
 					});
 				}
 			}
@@ -128,9 +122,7 @@ export function useDashboardSidebarShortcuts(
 		for (const workspace of sessionWorkspaces) {
 			map.set(workspace.id, {
 				projectId: null,
-				projectIsCollapsed: false,
 				sectionId: null,
-				sectionIsCollapsed: false,
 			});
 		}
 		for (const child of sessionChildren) {
@@ -138,9 +130,7 @@ export function useDashboardSidebarShortcuts(
 			for (const workspace of child.section.workspaces) {
 				map.set(workspace.id, {
 					projectId: null,
-					projectIsCollapsed: false,
 					sectionId: child.section.id,
-					sectionIsCollapsed: child.section.isCollapsed,
 				});
 			}
 		}
@@ -157,10 +147,10 @@ export function useDashboardSidebarShortcuts(
 			}
 			const location = workspaceLocations.get(workspaceId);
 			if (!location) return;
-			if (location.projectId !== null && location.projectIsCollapsed) {
+			if (location.projectId !== null) {
 				expandProject(location.projectId);
 			}
-			if (location.sectionId && location.sectionIsCollapsed) {
+			if (location.sectionId !== null) {
 				expandSection(location.sectionId);
 			}
 		},

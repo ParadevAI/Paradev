@@ -146,14 +146,15 @@ export async function navigateToWorkspaceAndThen(
 		unsubscribe();
 		return;
 	}
+	// Animation-frame callbacks run before paint; a task gives paint a turn first.
 	requestAnimationFrame(() => {
-		setTimeout(() => {
-			void Promise.resolve()
-				.then(() => {
-					unsubscribe();
-					if (isCurrent()) return afterNavigate();
-				})
-				.catch(reportRendererError);
+		setTimeout(async () => {
+			unsubscribe();
+			try {
+				if (isCurrent()) await afterNavigate();
+			} catch (error) {
+				reportRendererError(error);
+			}
 		}, 0);
 	});
 }
