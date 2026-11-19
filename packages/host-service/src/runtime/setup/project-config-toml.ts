@@ -12,6 +12,7 @@ import {
 	resolveProjectConfig,
 } from "@superset/shared/project-config";
 import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 
 export type TomlConfigLoad =
 	| { kind: "ok"; path: string; resolved: ResolvedProjectConfig }
@@ -34,11 +35,16 @@ export function getLocalTomlConfigPath(repoPath: string): string {
 	return join(resolveProjectConfigDir(repoPath), PROJECT_LOCAL_CONFIG_FILE);
 }
 
-/** The shared file comes from the workspace's checkout, else the main checkout's. */
+/**
+ * In the cloud the environment's config, which the API writes into the box,
+ * is the only source; a repository's own file is not read. Locally the shared
+ * file comes from the workspace's checkout, else the main checkout's.
+ */
 export function findTomlConfigPath(args: {
 	repoPath: string;
 	worktreePath?: string;
 }): string | null {
+	if (configEnvironment() === "cloud") return environmentConfigPath();
 	const roots = args.worktreePath
 		? [args.worktreePath, args.repoPath]
 		: [args.repoPath];
@@ -47,6 +53,14 @@ export function findTomlConfigPath(args: {
 		if (existsSync(path)) return path;
 	}
 	return null;
+}
+
+function environmentConfigPath(): string | null {
+	const path =
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH ||
+		SANDBOX_PATHS.environmentConfig;
+	if (!existsSync(path)) return null;
+	return readFileSync(path, "utf-8").trim() ? path : null;
 }
 
 function readConfig(

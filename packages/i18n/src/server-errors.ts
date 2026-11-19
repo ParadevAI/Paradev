@@ -501,6 +501,12 @@ export const serverErrorMessages: Record<
 					"Your GitHub account cannot reach a repository in this environment",
 			}),
 		),
+	"serverError.environment.invalidConfig": (params) =>
+		i18n._(
+			msg({
+				message: `This config is invalid: ${params?.details}`,
+			}),
+		),
 	"serverError.environment.repositoriesFrozen": () =>
 		i18n._(
 			msg({
@@ -531,7 +537,7 @@ export const serverErrorMessages: Record<
 		i18n._(
 			msg({
 				message:
-					"This environment has no [install] to build. Add one to .paradev/config.toml on its base branch.",
+					"This environment has no [install] to build. Add one to its config in Settings, Environments.",
 			}),
 		),
 	"serverError.environment.buildAlreadyRunning": () =>

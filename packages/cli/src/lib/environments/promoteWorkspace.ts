@@ -4,13 +4,8 @@ import { environmentLimitHint } from "./environmentLimitHint";
 
 type EnvironmentScope = "organization" | "personal";
 
-/** A new environment by name, or an existing one whose golden the workspace replaces. */
-export type PromoteInto =
-	| { name: string }
-	| { environment: { id: string; sourceRef: string } };
-
 /**
- * Snapshots a cloud workspace into an environment. The snapshot can outlast
+ * Snapshots a cloud workspace into a new environment. The snapshot can outlast
  * the gateway's request timeout while the server finishes it, so a gateway
  * error waits for the row instead of failing.
  */
@@ -18,7 +13,7 @@ export async function promoteWorkspace({
 	api,
 	organizationId,
 	workspaceId,
-	into,
+	name,
 	scope,
 	pollIntervalMs = 5_000,
 	pollTimeoutMs = 5 * 60_000,
@@ -26,37 +21,25 @@ export async function promoteWorkspace({
 	api: ApiClient;
 	organizationId: string;
 	workspaceId: string;
-	into: PromoteInto;
+	name: string;
 	scope?: EnvironmentScope;
 	pollIntervalMs?: number;
 	pollTimeoutMs?: number;
 }) {
-	const target = "environment" in into ? into.environment : null;
-	const name = "name" in into ? into.name : undefined;
 	// Names are not unique, so a new environment is the named row that was not there before.
-	const existingIds = target
-		? new Set<string>()
-		: new Set(
-				(await api.environment.list.query({ organizationId })).map(
-					(row) => row.id,
-				),
-			);
+	const existingIds = new Set(
+		(await api.environment.list.query({ organizationId })).map((row) => row.id),
+	);
 
 	const waitForRow = async () => {
 		const deadline = Date.now() + pollTimeoutMs;
 		while (Date.now() < deadline) {
 			await new Promise((r) => setTimeout(r, pollIntervalMs));
 			const rows = await api.environment.list.query({ organizationId });
-			const row = target
-				? rows.find(
-						(candidate) =>
-							candidate.id === target.id &&
-							candidate.sourceRef !== target.sourceRef,
-					)
-				: rows.find(
-						(candidate) =>
-							candidate.name === name && !existingIds.has(candidate.id),
-					);
+			const row = rows.find(
+				(candidate) =>
+					candidate.name === name && !existingIds.has(candidate.id),
+			);
 			if (row) return row;
 		}
 		throw new CLIError(
@@ -69,7 +52,6 @@ export async function promoteWorkspace({
 		.mutate({
 			cloudWorkspaceId: workspaceId,
 			name,
-			environmentId: target?.id,
 			scope,
 		})
 		.catch((error: unknown) => {

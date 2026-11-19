@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { isLiveCloudWorkspaceStatus } from "@superset/shared/cloud-workspace-status";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,20 +10,9 @@ import {
 import { useRunAfterMenuClose } from "@superset/ui/hooks/use-run-after-menu-close";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { useNavigate } from "@tanstack/react-router";
-import {
-	Container,
-	DatabaseBackup,
-	Ellipsis,
-	Play,
-	Settings,
-	Square,
-	X,
-} from "lucide-react";
+import { Container, Ellipsis, Play, Settings, Square, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { useCloudWorkspaces } from "renderer/hooks/useCloudWorkspaces";
-import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
 import { useHotkeyDisplay } from "renderer/hotkeys";
-import { authClient } from "renderer/lib/auth-client";
 import { useWorkspaceEnvironment } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceEnvironment";
 import { useWorkspaceMoveDirections } from "renderer/routes/_authenticated/_dashboard/hooks/useWorkspaceMoveDirections";
 import { RenameDialog } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/components/RenameDialog";
@@ -32,7 +20,6 @@ import { useOptimisticActions } from "renderer/routes/_authenticated/hooks/useOp
 import type { WorkspaceRunDefinition } from "shared/workspace-run-definition";
 import { useWorkspace } from "../../../providers/WorkspaceProvider";
 import { useConfigureWorkspaceRun } from "../../hooks/useConfigureWorkspaceRun";
-import { SaveCheckpointDialog } from "./components/SaveCheckpointDialog";
 import { WorkspaceMoreMenuItems } from "./components/WorkspaceMoreMenuItems";
 
 interface WorkspaceMoreMenuProps {
@@ -70,20 +57,6 @@ export function WorkspaceMoreMenu({
 		runAfterClose(action);
 	};
 	const environment = useWorkspaceEnvironment(workspace.id);
-	const { workspaces: cloudWorkspaces } = useCloudWorkspaces();
-	const cloudStatus = cloudWorkspaces?.find(
-		(row) => row.id === workspace.id,
-	)?.status;
-	const isWorkspaceReady =
-		cloudStatus !== undefined && isLiveCloudWorkspaceStatus(cloudStatus);
-	const { data: session } = authClient.useSession();
-	const isAdmin = useIsOrganizationAdmin() === true;
-	const canSaveCheckpoint =
-		!!environment &&
-		(environment.scope !== "organization" ||
-			environment.createdByUserId === session?.user?.id ||
-			isAdmin);
-	const [checkpointOpen, setCheckpointOpen] = useState(false);
 	const navigate = useNavigate();
 
 	const runItems = (
@@ -149,15 +122,6 @@ export function WorkspaceMoreMenu({
 						<Container className="size-4" />
 						<Trans>Manage environment</Trans>
 					</DropdownMenuItem>
-					{canSaveCheckpoint && (
-						<DropdownMenuItem
-							disabled={!isWorkspaceReady}
-							onSelect={() => openAfterClose(() => setCheckpointOpen(true))}
-						>
-							<DatabaseBackup className="size-4" />
-							<Trans>Save checkpoint</Trans>
-						</DropdownMenuItem>
-					)}
 				</>
 			)}
 		</>
@@ -209,14 +173,6 @@ export function WorkspaceMoreMenu({
 						if (!trimmed) return;
 						workspaceActions.renameWorkspace(workspace.id, trimmed, rename);
 					}}
-				/>
-			)}
-			{environment && canSaveCheckpoint && (
-				<SaveCheckpointDialog
-					cloudWorkspaceId={workspace.id}
-					environment={environment}
-					open={checkpointOpen}
-					onOpenChange={setCheckpointOpen}
 				/>
 			)}
 		</>

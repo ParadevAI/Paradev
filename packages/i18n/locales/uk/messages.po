@@ -2257,9 +2257,6 @@ msgstr "Додати на бічну панель"
 msgid "Add to workspace"
 msgstr "Додати до робочого простору"
 
-msgid "Add variable"
-msgstr "Додати змінну"
-
 msgid "Add what it does"
 msgstr "Опишіть, що він робить"
 
@@ -2557,9 +2554,6 @@ msgstr "Усі дані всіх учасників ({0}) буде остато�
 
 msgid "All downloads"
 msgstr "Усі варіанти завантаження"
-
-msgid "All environment variables ({total})"
-msgstr "Усі змінні середовища ({total})"
 
 msgid "All features, side by side"
 msgstr "Усі можливості поруч"
@@ -3840,9 +3834,6 @@ msgstr "Триває збірка…"
 msgid "Builds"
 msgstr "Збірки"
 
-msgid "Built"
-msgstr "Зібрано"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Створили плагін? Надішліть його тут."
 
@@ -4380,9 +4371,6 @@ msgstr "Контрольна точка"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольна точка · до рефакторингу підказок"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Контрольну точку збережено в {name}"
 
 msgid "Checks"
 msgstr "Перевірки"
@@ -5131,6 +5119,9 @@ msgstr "Conductor — торговельна марка її власника. {
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Робочі простори Conductor — це звичайні Git worktree. {0} використовує їх там, де вони є."
+
+msgid "Config"
+msgstr "Конфігурація"
 
 msgid "Config file contents"
 msgstr "Вміст файлу конфігурації"
@@ -8053,17 +8044,11 @@ msgstr "Середовище архівовано"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Збірки середовищ доступні в тарифах Team і Ultra. Покращте тариф у розділі «Налаштування», «Оплата»."
 
-msgid "Environment history"
-msgstr "Історія середовища"
-
 msgid "Environment not found"
 msgstr "Середовище не знайдено"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Налаштування середовища, нестабільні тести та морока з обліковими даними, нудні причини збоїв, що зривали автономні запуски у 2025-му, здебільшого усунено інженерними засобами, а не моделлю."
-
-msgid "Environment updated"
-msgstr "Середовище оновлено"
 
 msgid "Environment variables"
 msgstr "Змінні середовища"
@@ -12562,6 +12547,9 @@ msgstr "Новий робочий простір у {name}"
 msgid "New workspace page"
 msgstr "Нова сторінка робочого простору"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Нові робочі простори та наступна збірка використовують цю конфігурацію. Запущені робочі простори застосують її після перезапуску."
+
 msgid "Newer than this app"
 msgstr "Новіша за цей застосунок"
 
@@ -12806,6 +12794,9 @@ msgstr "Немає комітів, з яких можна відкрити пу�
 msgid "No comparisons yet."
 msgstr "Порівнянь ще немає."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Конфігурації ще немає: робочі простори цього середовища не запускають setup і термінали, а збірки завершуються помилкою, доки конфігурацію не збережено."
+
 msgid "No contributors found."
 msgstr "Учасників не знайдено."
 
@@ -12838,9 +12829,6 @@ msgstr "Змінних середовища ще немає"
 
 msgid "No environments available"
 msgstr "Немає доступних середовищ"
-
-msgid "No environments built yet"
-msgstr "Середовища ще не збиралися"
 
 msgid "No environments found."
 msgstr "Середовищ не знайдено."
@@ -13298,9 +13286,6 @@ msgstr "Скриптів термінала v1 не знайдено."
 
 msgid "No valid environment variables found in file"
 msgstr "У файлі не знайдено коректних змінних середовища"
-
-msgid "No variables set yet."
-msgstr "Змінних ще не задано."
 
 msgid "No versions yet"
 msgstr "Версій ще немає"
@@ -17325,9 +17310,6 @@ msgstr "Пісочниця перестала відповідати"
 msgid "Save"
 msgstr "Зберегти"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Зберегти контрольну точку в {name}?"
-
 msgid "Save All"
 msgstr "Зберегти все"
 
@@ -17346,8 +17328,8 @@ msgstr "Зберегти як подання"
 msgid "Save Changes"
 msgstr "Зберегти зміни"
 
-msgid "Save checkpoint"
-msgstr "Зберегти контрольну точку"
+msgid "Save config"
+msgstr "Зберегти конфігурацію"
 
 msgid "Save edits"
 msgstr "Зберегти правки"
@@ -17395,17 +17377,8 @@ msgstr "{name} збережено"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} збережено, але не вдалося запустити робочий простір для налаштування: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Збережено з робочого простору"
-
 msgid "Saved to Downloads"
 msgstr "Збережено в «Завантаження»"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Зберігає цей робочий простір у поточному стані з усім, що в ньому встановлено. Нові робочі простори з {name} починатимуться з цієї контрольної точки. Під час збереження робочий простір ненадовго зупиниться."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Збереження контрольної точки в {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Збереження як середовища..."
@@ -20076,6 +20049,9 @@ msgstr "Команди з config.toml репозиторію, які Paradev в�
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Компанія залучила $11,5 млн у seed-раунді на чолі з Union Square Ventures за участі Y Combinator і Пола Грема. TechCrunch назвав її одним із найпомітніших стартапів YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Файл config.toml, який запускають збірки та хмарні робочі простори цього середовища. Власний config.toml репозиторію в хмарі не використовується."
+
 msgid "The connection timed out"
 msgstr "Час очікування з'єднання минув"
 
@@ -20591,6 +20567,10 @@ msgstr "Цей хмарний робочий простір не може зап
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Ця конфігурація недійсна: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Ця розмова задовга для моделі"
 
@@ -20618,8 +20598,8 @@ msgstr "Цієї папки не існує. Скрипт термінала в�
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Цю електронну адресу вже зареєстровано з іншим способом входу, і провайдер не підтвердив, що її перевірено. Увійдіть способом, яким користувалися раніше."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Це середовище не має [install] для збірки. Додайте його в .paradev/config.toml у базовій гілці."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "У цього середовища немає [install] для збірки. Додайте його до конфігурації середовища в розділі Налаштування, Середовища."
 
 msgid "This environment has no repositories to build"
 msgstr "У цього середовища немає репозиторіїв для збірки"
@@ -21694,9 +21674,6 @@ msgstr "Під час оновлення не вдалося зберегти с
 
 msgid "Update daemon"
 msgstr "Оновити демон"
-
-msgid "Update environment"
-msgstr "Оновити середовище"
 
 msgid "Update Error"
 msgstr "Помилка оновлення"

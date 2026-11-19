@@ -2263,9 +2263,6 @@ msgstr "Añadir a la barra lateral"
 msgid "Add to workspace"
 msgstr "Añadir al espacio de trabajo"
 
-msgid "Add variable"
-msgstr "Añadir variable"
-
 msgid "Add what it does"
 msgstr "Añadir qué hace"
 
@@ -2563,9 +2560,6 @@ msgstr "Se eliminarán de forma permanente todos los datos de los {0} miembros. 
 
 msgid "All downloads"
 msgstr "Todas las descargas"
-
-msgid "All environment variables ({total})"
-msgstr "Todas las variables de entorno ({total})"
 
 msgid "All features, side by side"
 msgstr "Todas las funciones, una al lado de la otra"
@@ -3846,9 +3840,6 @@ msgstr "Compilando…"
 msgid "Builds"
 msgstr "Compilaciones"
 
-msgid "Built"
-msgstr "Compilado"
-
 msgid "Built a plugin? Submit it here."
 msgstr "¿Has creado un plugin? Envíalo aquí."
 
@@ -4386,9 +4377,6 @@ msgstr "Punto de control"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Punto de control · antes de refactorizar los tooltips"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Punto de control guardado en {name}"
 
 msgid "Checks"
 msgstr "Comprobaciones"
@@ -5137,6 +5125,9 @@ msgstr "Conductor es una marca de su propietario. {0} no está afiliado a Conduc
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Los espacios de trabajo de Conductor son worktrees de Git normales. {0} los usa donde están."
+
+msgid "Config"
+msgstr "Archivo de configuración"
 
 msgid "Config file contents"
 msgstr "Contenido del archivo de configuración"
@@ -8059,17 +8050,11 @@ msgstr "Entorno archivado"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Las compilaciones de entornos se incluyen en los planes Team y Ultra. Mejora tu plan en Configuración, Facturación."
 
-msgid "Environment history"
-msgstr "Historial del entorno"
-
 msgid "Environment not found"
 msgstr "No se encontró el entorno"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "La preparación del entorno, las pruebas inestables y la gestión de credenciales, los aburridos modos de fallo que arruinaron las ejecuciones desatendidas en 2025, se resuelven sobre todo con ingeniería, no con modelos."
-
-msgid "Environment updated"
-msgstr "Entorno actualizado"
 
 msgid "Environment variables"
 msgstr "Variables de entorno"
@@ -12568,6 +12553,9 @@ msgstr "Nuevo espacio de trabajo en {name}"
 msgid "New workspace page"
 msgstr "Nueva página de espacio de trabajo"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Los nuevos espacios de trabajo y la próxima compilación usan esta configuración. Los espacios de trabajo en ejecución la aplican al reiniciarse."
+
 msgid "Newer than this app"
 msgstr "Más reciente que esta app"
 
@@ -12812,6 +12800,9 @@ msgstr "No hay commits desde los que abrir un pull request"
 msgid "No comparisons yet."
 msgstr "Aún no hay comparativas."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Aún no hay configuración: los espacios de trabajo de este entorno no ejecutan el setup ni abren terminales, y las compilaciones fallan hasta que se guarde una configuración."
+
 msgid "No contributors found."
 msgstr "No se encontraron colaboradores."
 
@@ -12844,9 +12835,6 @@ msgstr "Aún no hay variables de entorno"
 
 msgid "No environments available"
 msgstr "No hay entornos disponibles"
-
-msgid "No environments built yet"
-msgstr "Aún no se ha compilado ningún entorno"
 
 msgid "No environments found."
 msgstr "No se encontraron entornos."
@@ -13304,9 +13292,6 @@ msgstr "No se encontraron scripts de terminal v1."
 
 msgid "No valid environment variables found in file"
 msgstr "No se encontraron variables de entorno válidas en el archivo"
-
-msgid "No variables set yet."
-msgstr "Aún no hay variables definidas."
 
 msgid "No versions yet"
 msgstr "Aún no hay versiones"
@@ -17331,9 +17316,6 @@ msgstr "El sandbox dejó de responder"
 msgid "Save"
 msgstr "Guardar"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "¿Guardar un punto de control en {name}?"
-
 msgid "Save All"
 msgstr "Guardar todo"
 
@@ -17352,8 +17334,8 @@ msgstr "Guardar como vista"
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
-msgid "Save checkpoint"
-msgstr "Guardar punto de control"
+msgid "Save config"
+msgstr "Guardar configuración"
 
 msgid "Save edits"
 msgstr "Guardar las ediciones"
@@ -17401,17 +17383,8 @@ msgstr "{name} guardado"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} guardado, pero no se pudo iniciar su espacio de trabajo de configuración: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Guardado desde un espacio de trabajo"
-
 msgid "Saved to Downloads"
 msgstr "Guardada en Descargas"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Guarda este espacio de trabajo tal como está ahora, con todo lo instalado en él. Los nuevos espacios de trabajo de {name} empezarán desde este punto de control. El espacio de trabajo se detiene un momento mientras se guarda."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Guardando un punto de control en {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Guardando como entorno..."
@@ -20082,6 +20055,9 @@ msgstr "Los comandos que Paradev ejecuta para preparar, iniciar y archivar los e
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "La empresa levantó una ronda semilla de 11,5 millones de dólares liderada por Union Square Ventures, con Y Combinator y Paul Graham. TechCrunch la nombró una de las startups destacadas del YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "El config.toml que ejecutan las compilaciones y los espacios de trabajo en la nube de este entorno. El config.toml propio de un repositorio no se usa en la nube."
+
 msgid "The connection timed out"
 msgstr "Se agotó el tiempo de conexión"
 
@@ -20597,6 +20573,10 @@ msgstr "No se puede iniciar este espacio de trabajo en la nube"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este espacio de trabajo en la nube se está reactivando, lo que puede tardar hasta 30 segundos tras un periodo de inactividad."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Esta configuración no es válida: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Esta conversación es demasiado larga para el modelo"
 
@@ -20624,8 +20604,8 @@ msgstr "Este directorio no existe. El script de terminal usará la raíz del esp
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Este correo ya está registrado con otro método de inicio de sesión y el proveedor no lo confirmó como verificado. Inicia sesión con el método que usaste antes."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Este entorno no tiene [install] para compilar. Añade uno a .paradev/config.toml en su rama base."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Este entorno no tiene [install] que compilar. Añade uno a su configuración en Configuración, Entornos."
 
 msgid "This environment has no repositories to build"
 msgstr "Este entorno no tiene repositorios que compilar"
@@ -21700,9 +21680,6 @@ msgstr "La actualización no pudo conservar las sesiones"
 
 msgid "Update daemon"
 msgstr "Actualizar el daemon"
-
-msgid "Update environment"
-msgstr "Actualizar entorno"
 
 msgid "Update Error"
 msgstr "Error de actualización"

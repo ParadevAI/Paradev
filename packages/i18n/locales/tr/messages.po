@@ -2263,9 +2263,6 @@ msgstr "Kenar çubuğuna ekle"
 msgid "Add to workspace"
 msgstr "Çalışma alanına ekle"
 
-msgid "Add variable"
-msgstr "Değişken ekle"
-
 msgid "Add what it does"
 msgstr "Ne yaptığını ekle"
 
@@ -2563,9 +2560,6 @@ msgstr "Tüm veriler {0} üyenin tamamı için kalıcı olarak silinecek. Bu ger
 
 msgid "All downloads"
 msgstr "Tüm indirmeler"
-
-msgid "All environment variables ({total})"
-msgstr "Tüm ortam değişkenleri ({total})"
 
 msgid "All features, side by side"
 msgstr "Tüm özellikler, yan yana"
@@ -3846,9 +3840,6 @@ msgstr "Derleniyor…"
 msgid "Builds"
 msgstr "Derlemeler"
 
-msgid "Built"
-msgstr "Derlendi"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Bir eklenti mi geliştirdiniz? Buradan gönderin."
 
@@ -4386,9 +4377,6 @@ msgstr "Kontrol noktası"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrol noktası · tooltip yeniden düzenlemesinden önce"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Kontrol noktası {name} ortamına kaydedildi"
 
 msgid "Checks"
 msgstr "Kontroller"
@@ -5137,6 +5125,9 @@ msgstr "Conductor, sahibinin ticari markasıdır. {0}, Conductor veya Meta ile b
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor çalışma alanları sıradan Git worktree'leridir. {0} bunları oldukları yerde kullanır."
+
+msgid "Config"
+msgstr "Yapılandırma"
 
 msgid "Config file contents"
 msgstr "Yapılandırma dosyasının içeriği"
@@ -8059,17 +8050,11 @@ msgstr "Ortam arşivlendi"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Ortam derlemeleri Team ve Ultra planlarına dahildir. Ayarlar, Faturalandırma bölümünden yükseltin."
 
-msgid "Environment history"
-msgstr "Ortam geçmişi"
-
 msgid "Environment not found"
 msgstr "Ortam bulunamadı"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Ortam kurulumu, kararsız testler ve kimlik bilgisi tesisatı, yani 2025'te gözetimsiz çalıştırmaları öldüren sıkıcı hata biçimleri, modelleyerek değil mühendislikle büyük ölçüde ortadan kaldırılır."
-
-msgid "Environment updated"
-msgstr "Ortam güncellendi"
 
 msgid "Environment variables"
 msgstr "Ortam değişkenleri"
@@ -12568,6 +12553,9 @@ msgstr "{name} içinde yeni çalışma alanı"
 msgid "New workspace page"
 msgstr "Yeni çalışma alanı sayfası"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Yeni çalışma alanları ve bir sonraki derleme bu yapılandırmayı kullanır. Çalışan çalışma alanları yeniden başladıklarında bunu alır."
+
 msgid "Newer than this app"
 msgstr "Bu uygulamadan daha yeni"
 
@@ -12812,6 +12800,9 @@ msgstr "Pull request açılabilecek commit yok"
 msgid "No comparisons yet."
 msgstr "Henüz karşılaştırma yok."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Henüz yapılandırma yok: bir yapılandırma kaydedilene kadar bu ortamdaki çalışma alanları setup ya da terminal çalıştırmaz ve derlemeler başarısız olur."
+
 msgid "No contributors found."
 msgstr "Katkıda bulunan bulunamadı."
 
@@ -12844,9 +12835,6 @@ msgstr "Henüz ortam değişkeni yok"
 
 msgid "No environments available"
 msgstr "Kullanılabilir ortam yok"
-
-msgid "No environments built yet"
-msgstr "Henüz derlenmiş ortam yok"
 
 msgid "No environments found."
 msgstr "Ortam bulunamadı."
@@ -13304,9 +13292,6 @@ msgstr "v1 terminal betiği bulunamadı."
 
 msgid "No valid environment variables found in file"
 msgstr "Dosyada geçerli ortam değişkeni bulunamadı"
-
-msgid "No variables set yet."
-msgstr "Henüz değişken ayarlanmadı."
 
 msgid "No versions yet"
 msgstr "Henüz sürüm yok"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox yanıt vermiyor"
 msgid "Save"
 msgstr "Kaydet"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "{name} ortamına kontrol noktası kaydedilsin mi?"
-
 msgid "Save All"
 msgstr "Tümünü kaydet"
 
@@ -17352,8 +17334,8 @@ msgstr "Görünüm olarak kaydet"
 msgid "Save Changes"
 msgstr "Değişiklikleri Kaydet"
 
-msgid "Save checkpoint"
-msgstr "Kontrol noktası kaydet"
+msgid "Save config"
+msgstr "Yapılandırmayı kaydet"
 
 msgid "Save edits"
 msgstr "Düzenlemeleri kaydet"
@@ -17401,17 +17383,8 @@ msgstr "{name} kaydedildi"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} kaydedildi, ancak kurulum çalışma alanı başlatılamadı: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Bir çalışma alanından kaydedildi"
-
 msgid "Saved to Downloads"
 msgstr "İndirilenler klasörüne kaydedildi"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Bu çalışma alanını, içine kurulan her şeyle birlikte şu anki haliyle kaydeder. {name} ortamından açılan yeni çalışma alanları bu kontrol noktasından başlar. Kaydederken çalışma alanı kısa bir süre durur."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "{name} ortamına kontrol noktası kaydediliyor..."
 
 msgid "Saving as an environment..."
 msgstr "Ortam olarak kaydediliyor..."
@@ -20082,6 +20055,9 @@ msgstr "Paradev'in bu projenin çalışma alanlarını hazırlamak, çalıştır
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Şirket, Union Square Ventures liderliğinde, Y Combinator ve Paul Graham'ın katılımıyla 11,5 milyon dolarlık tohum yatırımı aldı. TechCrunch, şirketi YC Demo Day'in öne çıkan girişimlerinden biri olarak gösterdi."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Bu ortamın derlemelerinin ve bulut çalışma alanlarının çalıştırdığı config.toml. Bir deponun kendi config.toml dosyası bulutta kullanılmaz."
+
 msgid "The connection timed out"
 msgstr "Bağlantı zaman aşımına uğradı"
 
@@ -20597,6 +20573,10 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Bu yapılandırma geçersiz: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Bu konuşma model için fazla uzun"
 
@@ -20624,8 +20604,8 @@ msgstr "Bu dizin mevcut değil. Terminal betiği çalışma alanı köküne geri
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Bu e-posta zaten başka bir oturum açma yöntemiyle kayıtlı ve sağlayıcı bunu doğrulanmış olarak onaylamadı. Daha önce kullandığınız yöntemle oturum açın."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Bu ortamın derlenecek bir [install] bölümü yok. Temel dalındaki .paradev/config.toml dosyasına bir tane ekleyin."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Bu ortamda derlenecek bir [install] yok. Ayarlar, Ortamlar bölümünde ortamın yapılandırmasına bir tane ekleyin."
 
 msgid "This environment has no repositories to build"
 msgstr "Bu ortamın derlenecek deposu yok"
@@ -21700,9 +21680,6 @@ msgstr "Güncelleme oturumları koruyamadı"
 
 msgid "Update daemon"
 msgstr "Daemon'u güncelle"
-
-msgid "Update environment"
-msgstr "Ortamı güncelle"
 
 msgid "Update Error"
 msgstr "Güncelleme hatası"

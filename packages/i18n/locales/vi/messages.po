@@ -2263,9 +2263,6 @@ msgstr "Thêm vào thanh bên"
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
 
-msgid "Add variable"
-msgstr "Thêm biến"
-
 msgid "Add what it does"
 msgstr "Thêm việc nó làm"
 
@@ -2563,9 +2560,6 @@ msgstr "Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn với cả {0} thành
 
 msgid "All downloads"
 msgstr "Tất cả bản tải xuống"
-
-msgid "All environment variables ({total})"
-msgstr "Tất cả biến môi trường ({total})"
 
 msgid "All features, side by side"
 msgstr "Toàn bộ tính năng, đặt cạnh nhau"
@@ -3846,9 +3840,6 @@ msgstr "Đang build…"
 msgid "Builds"
 msgstr "Bản build"
 
-msgid "Built"
-msgstr "Đã build"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Bạn đã tạo plugin? Gửi tại đây."
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · trước khi refactor tooltip"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Đã lưu checkpoint vào {name}"
 
 msgid "Checks"
 msgstr "Check"
@@ -5137,6 +5125,9 @@ msgstr "Conductor là nhãn hiệu của chủ sở hữu. {0} không liên kế
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Workspace của Conductor chỉ là Git worktree thông thường. {0} dùng chúng ngay tại chỗ."
+
+msgid "Config"
+msgstr "Cấu hình"
 
 msgid "Config file contents"
 msgstr "Nội dung tệp cấu hình"
@@ -8059,17 +8050,11 @@ msgstr "Đã lưu trữ environment"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Build environment có trong gói Team và Ultra. Nâng cấp trong Cài đặt, Thanh toán."
 
-msgid "Environment history"
-msgstr "Lịch sử environment"
-
 msgid "Environment not found"
 msgstr "Không tìm thấy environment"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối thông tin đăng nhập, những kiểu hỏng buồn tẻ đã giết các lần chạy không giám sát năm 2025, phần lớn được xử lý bằng kỹ thuật chứ không phải bằng mô hình."
-
-msgid "Environment updated"
-msgstr "Đã cập nhật environment"
 
 msgid "Environment variables"
 msgstr "Biến môi trường"
@@ -12568,6 +12553,9 @@ msgstr "Workspace mới trong {name}"
 msgid "New workspace page"
 msgstr "Trang workspace mới"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Workspace mới và bản build tiếp theo dùng cấu hình này. Workspace đang chạy sẽ nhận nó khi khởi động lại."
+
 msgid "Newer than this app"
 msgstr "Mới hơn ứng dụng này"
 
@@ -12812,6 +12800,9 @@ msgstr "Không có commit nào để mở pull request"
 msgid "No comparisons yet."
 msgstr "Chưa có so sánh nào."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Chưa có cấu hình: các workspace trên environment này không chạy setup hay terminal, và build sẽ thất bại cho đến khi lưu cấu hình."
+
 msgid "No contributors found."
 msgstr "Không tìm thấy người đóng góp nào."
 
@@ -12844,9 +12835,6 @@ msgstr "Chưa có biến môi trường nào"
 
 msgid "No environments available"
 msgstr "Không có environment nào"
-
-msgid "No environments built yet"
-msgstr "Chưa có environment nào được build"
 
 msgid "No environments found."
 msgstr "Không tìm thấy environment nào."
@@ -13304,9 +13292,6 @@ msgstr "Không tìm thấy tập lệnh terminal v1."
 
 msgid "No valid environment variables found in file"
 msgstr "Không tìm thấy biến môi trường hợp lệ trong tệp"
-
-msgid "No variables set yet."
-msgstr "Chưa đặt biến nào."
 
 msgid "No versions yet"
 msgstr "Chưa có phiên bản nào"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox đã ngừng phản hồi"
 msgid "Save"
 msgstr "Lưu"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Lưu checkpoint vào {name}?"
-
 msgid "Save All"
 msgstr "Lưu tất cả"
 
@@ -17352,8 +17334,8 @@ msgstr "Lưu thành chế độ xem"
 msgid "Save Changes"
 msgstr "Lưu thay đổi"
 
-msgid "Save checkpoint"
-msgstr "Lưu checkpoint"
+msgid "Save config"
+msgstr "Lưu cấu hình"
 
 msgid "Save edits"
 msgstr "Lưu chỉnh sửa"
@@ -17401,17 +17383,8 @@ msgstr "Đã lưu {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "Đã lưu {name}, nhưng không thể khởi động workspace thiết lập: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Được lưu từ một workspace"
-
 msgid "Saved to Downloads"
 msgstr "Đã lưu vào Downloads"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Lưu workspace này ở trạng thái hiện tại, cùng mọi thứ đã cài trong đó. Các workspace mới từ {name} sẽ bắt đầu từ checkpoint này. Workspace sẽ dừng một lúc trong khi lưu."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Đang lưu checkpoint vào {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Đang lưu làm môi trường..."
@@ -20082,6 +20055,9 @@ msgstr "Các lệnh Paradev chạy để thiết lập, chạy và lưu trữ c�
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Công ty đã gọi được vòng hạt giống 11,5 triệu USD do Union Square Ventures dẫn dắt, cùng Y Combinator và Paul Graham. TechCrunch đã chọn công ty là một trong những startup nổi bật tại YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Tệp config.toml mà các bản build và workspace đám mây của environment này chạy. config.toml riêng của repository không được dùng trên đám mây."
+
 msgid "The connection timed out"
 msgstr "Kết nối đã quá thời gian"
 
@@ -20597,6 +20573,10 @@ msgstr "Không thể khởi động workspace cloud này"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Cấu hình này không hợp lệ: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
 
@@ -20624,8 +20604,8 @@ msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email này đã được đăng ký bằng phương thức đăng nhập khác và nhà cung cấp chưa xác nhận email đã được xác minh. Hãy đăng nhập bằng phương thức bạn đã dùng trước đây."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Environment này không có [install] để build. Hãy thêm vào .paradev/config.toml trên nhánh gốc của nó."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Environment này không có [install] để build. Hãy thêm vào cấu hình của nó trong Cài đặt, Môi trường."
 
 msgid "This environment has no repositories to build"
 msgstr "Environment này không có repository nào để build"
@@ -21700,9 +21680,6 @@ msgstr "Bản cập nhật không giữ được các phiên"
 
 msgid "Update daemon"
 msgstr "Cập nhật daemon"
-
-msgid "Update environment"
-msgstr "Cập nhật environment"
 
 msgid "Update Error"
 msgstr "Lỗi cập nhật"

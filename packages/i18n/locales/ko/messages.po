@@ -2263,9 +2263,6 @@ msgstr "사이드바에 추가"
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
 
-msgid "Add variable"
-msgstr "변수 추가"
-
 msgid "Add what it does"
 msgstr "하는 일 추가"
 
@@ -2563,9 +2560,6 @@ msgstr "멤버 {0}명 전원의 모든 데이터가 영구적으로 삭제되며
 
 msgid "All downloads"
 msgstr "모든 다운로드"
-
-msgid "All environment variables ({total})"
-msgstr "모든 환경 변수 ({total})"
 
 msgid "All features, side by side"
 msgstr "모든 기능 한눈에 비교"
@@ -3846,9 +3840,6 @@ msgstr "빌드 중…"
 msgid "Builds"
 msgstr "빌드"
 
-msgid "Built"
-msgstr "빌드 시각"
-
 msgid "Built a plugin? Submit it here."
 msgstr "플러그인을 만드셨나요? 여기에서 제출하세요."
 
@@ -4386,9 +4377,6 @@ msgstr "체크포인트"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "체크포인트 · 툴팁 리팩터링 전"
-
-msgid "Checkpoint saved to {name}"
-msgstr "{name}에 체크포인트를 저장했습니다"
 
 msgid "Checks"
 msgstr "검사"
@@ -5137,6 +5125,9 @@ msgstr "Conductor는 해당 소유자의 상표입니다. {0}는 Conductor 또�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor 워크스페이스는 일반 Git worktree입니다. {0}는 그 자리 그대로 사용합니다."
+
+msgid "Config"
+msgstr "구성"
 
 msgid "Config file contents"
 msgstr "설정 파일 내용"
@@ -8059,17 +8050,11 @@ msgstr "환경을 보관했습니다"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "환경 빌드는 Team 및 Ultra 플랜에 포함되어 있습니다. 설정, 결제에서 업그레이드하세요."
 
-msgid "Environment history"
-msgstr "환경 기록"
-
 msgid "Environment not found"
 msgstr "환경을 찾을 수 없습니다"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "환경 설정, 불안정한 테스트, 자격 증명 연결처럼 2025년에 무인 실행을 망가뜨렸던 지루한 실패 유형은 대부분 모델링이 아니라 엔지니어링으로 해결됩니다."
-
-msgid "Environment updated"
-msgstr "환경이 업데이트되었습니다"
 
 msgid "Environment variables"
 msgstr "환경 변수"
@@ -12568,6 +12553,9 @@ msgstr "{name}에 새 워크스페이스"
 msgid "New workspace page"
 msgstr "새 워크스페이스 페이지"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "새 워크스페이스와 다음 빌드에서 이 구성을 사용합니다. 실행 중인 워크스페이스에는 다시 시작할 때 반영됩니다."
+
 msgid "Newer than this app"
 msgstr "이 앱보다 최신"
 
@@ -12812,6 +12800,9 @@ msgstr "풀 리퀘스트를 만들 커밋이 없습니다"
 msgid "No comparisons yet."
 msgstr "아직 비교가 없습니다."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "아직 구성이 없습니다. 구성을 저장할 때까지 이 환경의 워크스페이스는 셋업이나 터미널을 실행하지 않으며 빌드가 실패합니다."
+
 msgid "No contributors found."
 msgstr "기여자를 찾을 수 없습니다."
 
@@ -12844,9 +12835,6 @@ msgstr "아직 환경 변수가 없습니다"
 
 msgid "No environments available"
 msgstr "사용 가능한 환경 없음"
-
-msgid "No environments built yet"
-msgstr "아직 빌드된 환경이 없습니다"
 
 msgid "No environments found."
 msgstr "환경을 찾을 수 없습니다."
@@ -13304,9 +13292,6 @@ msgstr "v1 터미널 스크립트를 찾을 수 없습니다."
 
 msgid "No valid environment variables found in file"
 msgstr "파일에서 유효한 환경 변수를 찾지 못했습니다"
-
-msgid "No variables set yet."
-msgstr "아직 설정된 변수가 없습니다."
 
 msgid "No versions yet"
 msgstr "아직 버전이 없습니다"
@@ -17331,9 +17316,6 @@ msgstr "샌드박스가 응답하지 않습니다"
 msgid "Save"
 msgstr "저장"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "{name}에 체크포인트를 저장할까요?"
-
 msgid "Save All"
 msgstr "모두 저장"
 
@@ -17352,8 +17334,8 @@ msgstr "뷰로 저장"
 msgid "Save Changes"
 msgstr "변경사항 저장"
 
-msgid "Save checkpoint"
-msgstr "체크포인트 저장"
+msgid "Save config"
+msgstr "구성 저장"
 
 msgid "Save edits"
 msgstr "편집 저장"
@@ -17401,17 +17383,8 @@ msgstr "{name} 저장됨"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name}을(를) 저장했지만 설정용 워크스페이스를 시작할 수 없습니다: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "워크스페이스에서 저장됨"
-
 msgid "Saved to Downloads"
 msgstr "다운로드 폴더에 저장했습니다"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "설치된 모든 것을 포함해 이 워크스페이스의 현재 상태를 저장합니다. {name}에서 만드는 새 워크스페이스는 이 체크포인트에서 시작합니다. 저장하는 동안 워크스페이스가 잠시 멈춥니다."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "{name}에 체크포인트 저장 중..."
 
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."
@@ -20082,6 +20055,9 @@ msgstr "Paradev가 이 프로젝트의 워크스페이스를 설정, 실행, 보
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "회사는 Union Square Ventures가 리드하고 Y Combinator와 Paul Graham이 참여한 1,150만 달러 규모의 시드 라운드를 유치했습니다. TechCrunch는 이 회사를 YC Demo Day의 주목할 만한 스타트업 중 하나로 선정했습니다."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "이 환경의 빌드와 클라우드 워크스페이스가 실행하는 config.toml입니다. 저장소 자체의 config.toml은 클라우드에서 사용되지 않습니다."
+
 msgid "The connection timed out"
 msgstr "연결 시간이 초과되었습니다"
 
@@ -20597,6 +20573,10 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "이 구성이 올바르지 않습니다: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
 
@@ -20624,8 +20604,8 @@ msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있으며, 제공자가 이를 인증된 것으로 확인하지 않았습니다. 이전에 사용한 방법으로 로그인하세요."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "이 환경에는 빌드할 [install]이 없습니다. 기본 브랜치의 .paradev/config.toml에 추가하세요."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "이 환경에는 빌드할 [install]이 없습니다. ‘설정’의 ‘환경’에서 이 환경의 구성에 추가하세요."
 
 msgid "This environment has no repositories to build"
 msgstr "이 환경에는 빌드할 리포지토리가 없습니다"
@@ -21700,9 +21680,6 @@ msgstr "업데이트가 세션을 유지하지 못했습니다"
 
 msgid "Update daemon"
 msgstr "데몬 업데이트"
-
-msgid "Update environment"
-msgstr "환경 업데이트"
 
 msgid "Update Error"
 msgstr "업데이트 오류"

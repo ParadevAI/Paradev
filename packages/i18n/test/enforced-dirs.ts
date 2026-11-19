@@ -19,7 +19,6 @@ export const ENFORCED_DIRS: readonly string[] = [
 	"apps/desktop/src/renderer/routes/_authenticated/_dashboard/workspaces",
 	"apps/desktop/src/renderer/routes/_authenticated/components/DashboardNewWorkspaceModal",
 	"apps/desktop/src/renderer/routes/_authenticated/components/CreateEnvironmentFlow",
-	"apps/desktop/src/renderer/routes/_authenticated/components/EnvironmentView",
 	// settings — everything except `project/` ($projectId), the v1 counterpart
 	// of v2-project that dies with the v1 sunset.
 	"apps/desktop/src/renderer/routes/_authenticated/settings/account",

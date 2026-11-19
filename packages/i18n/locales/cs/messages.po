@@ -2263,9 +2263,6 @@ msgstr "Přidat do postranního panelu"
 msgid "Add to workspace"
 msgstr "Přidat do pracovního prostoru"
 
-msgid "Add variable"
-msgstr "Přidat proměnnou"
-
 msgid "Add what it does"
 msgstr "Přidat, co dělá"
 
@@ -2563,9 +2560,6 @@ msgstr "Všechna data budou trvale smazána pro všechny členy ({0}). Nelze vr�
 
 msgid "All downloads"
 msgstr "Všechna stažení"
-
-msgid "All environment variables ({total})"
-msgstr "Všechny proměnné prostředí ({total})"
 
 msgid "All features, side by side"
 msgstr "Všechny funkce vedle sebe"
@@ -3846,9 +3840,6 @@ msgstr "Sestavuje se…"
 msgid "Builds"
 msgstr "Sestavení"
 
-msgid "Built"
-msgstr "Sestaveno"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Vytvořili jste plugin? Odešlete ho sem."
 
@@ -4386,9 +4377,6 @@ msgstr "Kontrolní bod"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Kontrolní bod · před refaktorem tooltipů"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Checkpoint uložen do {name}"
 
 msgid "Checks"
 msgstr "Kontroly"
@@ -5137,6 +5125,9 @@ msgstr "Conductor je ochranná známka svého vlastníka. {0} není s Conductor 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Pracovní prostory Conductor jsou obyčejné Git worktree. {0} je používá tam, kde jsou."
+
+msgid "Config"
+msgstr "Konfigurace"
 
 msgid "Config file contents"
 msgstr "Obsah konfiguračního souboru"
@@ -8059,17 +8050,11 @@ msgstr "Prostředí archivováno"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
 
-msgid "Environment history"
-msgstr "Historie prostředí"
-
 msgid "Environment not found"
 msgstr "Prostředí nebylo nalezeno"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Příprava prostředí, nestabilní testy a rozvody přihlašovacích údajů — nudné příčiny selhání, které v roce 2025 zabíjely běhy bez dozoru — se většinou vyřeší inženýrsky, ne modelem."
-
-msgid "Environment updated"
-msgstr "Prostředí aktualizováno"
 
 msgid "Environment variables"
 msgstr "Proměnné prostředí"
@@ -12568,6 +12553,9 @@ msgstr "Nový pracovní prostor v {name}"
 msgid "New workspace page"
 msgstr "Nová stránka pracovního prostoru"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Nové pracovní prostory a příští sestavení použijí tuto konfiguraci. Spuštěné pracovní prostory ji převezmou po restartu."
+
 msgid "Newer than this app"
 msgstr "Novější než tato aplikace"
 
@@ -12812,6 +12800,9 @@ msgstr "Žádné commity, ze kterých by šel otevřít pull request"
 msgid "No comparisons yet."
 msgstr "Zatím žádná srovnání."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Zatím žádná konfigurace: pracovní prostory v tomto prostředí nespouštějí setup ani terminály a sestavení selžou, dokud konfiguraci neuložíte."
+
 msgid "No contributors found."
 msgstr "Nenalezeni žádní přispěvatelé."
 
@@ -12844,9 +12835,6 @@ msgstr "Zatím žádné proměnné prostředí"
 
 msgid "No environments available"
 msgstr "Žádná dostupná prostředí"
-
-msgid "No environments built yet"
-msgstr "Zatím nebylo sestaveno žádné prostředí"
 
 msgid "No environments found."
 msgstr "Nenalezena žádná prostředí."
@@ -13304,9 +13292,6 @@ msgstr "Nebyly nalezeny žádné terminálové skripty v1."
 
 msgid "No valid environment variables found in file"
 msgstr "V souboru nebyly nalezeny žádné platné proměnné prostředí"
-
-msgid "No variables set yet."
-msgstr "Zatím nejsou nastaveny žádné proměnné."
 
 msgid "No versions yet"
 msgstr "Zatím žádné verze"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox přestal odpovídat"
 msgid "Save"
 msgstr "Uložit"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Uložit checkpoint do {name}?"
-
 msgid "Save All"
 msgstr "Uložit vše"
 
@@ -17352,8 +17334,8 @@ msgstr "Uložit jako pohled"
 msgid "Save Changes"
 msgstr "Uložit změny"
 
-msgid "Save checkpoint"
-msgstr "Uložit checkpoint"
+msgid "Save config"
+msgstr "Uložit konfiguraci"
 
 msgid "Save edits"
 msgstr "Uložit úpravy"
@@ -17401,17 +17383,8 @@ msgstr "Uloženo: {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} uloženo, ale jeho pracovní prostor pro nastavení se nepodařilo spustit: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Uloženo z pracovního prostoru"
-
 msgid "Saved to Downloads"
 msgstr "Uloženo do Stažených souborů"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Uloží tento pracovní prostor tak, jak je teď, se vším, co je v něm nainstalované. Nové pracovní prostory z {name} začnou z tohoto checkpointu. Pracovní prostor se během ukládání na chvíli zastaví."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Ukládání checkpointu do {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Ukládání jako prostředí..."
@@ -20082,6 +20055,9 @@ msgstr "Příkazy, které Paradev spouští při přípravě, spuštění a arch
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Společnost získala 11,5 milionu dolarů v seed kole, které vedl fond Union Square Ventures za účasti Y Combinatoru a Paula Grahama. TechCrunch ji zařadil mezi nejvýraznější startupy YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Soubor config.toml, který spouštějí sestavení a cloudové pracovní prostory tohoto prostředí. Vlastní config.toml repozitáře se v cloudu nepoužívá."
+
 msgid "The connection timed out"
 msgstr "Vypršel časový limit spojení"
 
@@ -20597,6 +20573,10 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Tato konfigurace je neplatná: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Tato konverzace je pro model příliš dlouhá"
 
@@ -20624,8 +20604,8 @@ msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni p
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a poskytovatel jej nepotvrdil jako ověřený. Přihlaste se způsobem, který jste použili dříve."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do .paradev/config.toml v jeho základní větvi."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Toto prostředí nemá žádný [install] k sestavení. Přidejte ho do jeho konfigurace v Nastavení, Prostředí."
 
 msgid "This environment has no repositories to build"
 msgstr "Toto prostředí nemá žádné repozitáře k sestavení"
@@ -21700,9 +21680,6 @@ msgstr "Aktualizace nedokázala zachovat relace"
 
 msgid "Update daemon"
 msgstr "Aktualizovat démona"
-
-msgid "Update environment"
-msgstr "Aktualizovat prostředí"
 
 msgid "Update Error"
 msgstr "Chyba aktualizace"

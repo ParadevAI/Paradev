@@ -2263,9 +2263,6 @@ msgstr "サイドバーに追加"
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
 
-msgid "Add variable"
-msgstr "変数を追加"
-
 msgid "Add what it does"
 msgstr "役割を追加"
 
@@ -2563,9 +2560,6 @@ msgstr "{0}人のメンバー全員のデータが完全に削除されます。
 
 msgid "All downloads"
 msgstr "すべてのダウンロード"
-
-msgid "All environment variables ({total})"
-msgstr "すべての環境変数 ({total})"
 
 msgid "All features, side by side"
 msgstr "全機能を並べて比較"
@@ -3846,9 +3840,6 @@ msgstr "ビルド中…"
 msgid "Builds"
 msgstr "ビルド"
 
-msgid "Built"
-msgstr "ビルド日時"
-
 msgid "Built a plugin? Submit it here."
 msgstr "プラグインを作りましたか？ここから送信してください。"
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
-
-msgid "Checkpoint saved to {name}"
-msgstr "{name} にチェックポイントを保存しました"
 
 msgid "Checks"
 msgstr "チェック"
@@ -5137,6 +5125,9 @@ msgstr "Conductor はその所有者の商標です。{0} は Conductor およ�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor のワークスペースはただの Git ワークツリーです。{0} はそのままの場所で使います。"
+
+msgid "Config"
+msgstr "構成"
 
 msgid "Config file contents"
 msgstr "設定ファイルの内容"
@@ -8059,17 +8050,11 @@ msgstr "環境をアーカイブしました"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "環境のビルドは Team プランと Ultra プランで利用できます。設定の請求からアップグレードしてください。"
 
-msgid "Environment history"
-msgstr "環境の履歴"
-
 msgid "Environment not found"
 msgstr "環境が見つかりません"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境構築、不安定なテスト、認証情報の受け渡し。2025年に無人実行を潰していた退屈な失敗要因は、モデルの進歩ではなくエンジニアリングでほぼ取り除かれます。"
-
-msgid "Environment updated"
-msgstr "環境を更新しました"
 
 msgid "Environment variables"
 msgstr "環境変数"
@@ -12568,6 +12553,9 @@ msgstr "{name} に新規ワークスペース"
 msgid "New workspace page"
 msgstr "新しいワークスペースページ"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "新しいワークスペースと次のビルドでこの構成が使われます。実行中のワークスペースには再起動時に反映されます。"
+
 msgid "Newer than this app"
 msgstr "このアプリより新しい"
 
@@ -12812,6 +12800,9 @@ msgstr "プルリクエストを作成できるコミットがありません"
 msgid "No comparisons yet."
 msgstr "比較はまだありません。"
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "構成がまだありません。構成を保存するまで、この環境のワークスペースではセットアップもターミナルも実行されず、ビルドは失敗します。"
+
 msgid "No contributors found."
 msgstr "コントリビューターが見つかりません。"
 
@@ -12844,9 +12835,6 @@ msgstr "環境変数はまだありません"
 
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
-
-msgid "No environments built yet"
-msgstr "まだビルドされた環境がありません"
 
 msgid "No environments found."
 msgstr "環境が見つかりません。"
@@ -13304,9 +13292,6 @@ msgstr "v1ターミナルスクリプトが見つかりません。"
 
 msgid "No valid environment variables found in file"
 msgstr "ファイルに有効な環境変数が見つかりませんでした"
-
-msgid "No variables set yet."
-msgstr "変数はまだ設定されていません。"
 
 msgid "No versions yet"
 msgstr "バージョンはまだありません"
@@ -17331,9 +17316,6 @@ msgstr "サンドボックスが応答しなくなりました"
 msgid "Save"
 msgstr "保存"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "{name} にチェックポイントを保存しますか？"
-
 msgid "Save All"
 msgstr "すべて保存"
 
@@ -17352,8 +17334,8 @@ msgstr "ビューとして保存"
 msgid "Save Changes"
 msgstr "変更を保存"
 
-msgid "Save checkpoint"
-msgstr "チェックポイントを保存"
+msgid "Save config"
+msgstr "構成を保存"
 
 msgid "Save edits"
 msgstr "編集を保存"
@@ -17401,17 +17383,8 @@ msgstr "{name} を保存しました"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} を保存しましたが、セットアップ用ワークスペースを開始できませんでした: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "ワークスペースから保存"
-
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "このワークスペースを、インストール済みのものも含めて現在の状態で保存します。{name} から作成する新しいワークスペースはこのチェックポイントから始まります。保存中、ワークスペースは少しの間停止します。"
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "{name} にチェックポイントを保存中..."
 
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."
@@ -20082,6 +20055,9 @@ msgstr "このプロジェクトのワークスペースをセットアップ、
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "同社は、Union Square Ventures がリードし、Y Combinator と Paul Graham が参加した 1,150 万ドルのシードラウンドを調達しました。TechCrunch は同社を YC Demo Day の注目スタートアップの 1 社に選びました。"
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "この環境のビルドとクラウドワークスペースが実行する config.toml です。リポジトリ自身の config.toml はクラウドでは使われません。"
+
 msgid "The connection timed out"
 msgstr "接続がタイムアウトしました"
 
@@ -20597,6 +20573,10 @@ msgstr "このクラウドワークスペースを起動できません"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "この構成は無効です: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "この会話はモデルには長すぎます"
 
@@ -20624,8 +20604,8 @@ msgstr "このディレクトリは存在しません。ターミナルスクリ
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "このメールアドレスは別のサインイン方法で既に登録されており、プロバイダーが確認済みとして認証しませんでした。以前使用した方法でサインインしてください。"
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "この環境にはビルドする [install] がありません。ベースブランチの .paradev/config.toml に追加してください。"
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "この環境にはビルドする [install] がありません。「設定」の「環境」で、この環境の構成に追加してください。"
 
 msgid "This environment has no repositories to build"
 msgstr "この環境にはビルドするリポジトリがありません"
@@ -21700,9 +21680,6 @@ msgstr "更新でセッションを維持できませんでした"
 
 msgid "Update daemon"
 msgstr "デーモンを更新"
-
-msgid "Update environment"
-msgstr "環境を更新"
 
 msgid "Update Error"
 msgstr "アップデートエラー"

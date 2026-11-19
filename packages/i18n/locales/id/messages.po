@@ -2263,9 +2263,6 @@ msgstr "Tambahkan ke sidebar"
 msgid "Add to workspace"
 msgstr "Tambahkan ke workspace"
 
-msgid "Add variable"
-msgstr "Tambah variabel"
-
 msgid "Add what it does"
 msgstr "Tambahkan apa yang dilakukannya"
 
@@ -2563,9 +2560,6 @@ msgstr "Semua data akan dihapus permanen untuk seluruh {0} anggota. Ini tidak bi
 
 msgid "All downloads"
 msgstr "Semua unduhan"
-
-msgid "All environment variables ({total})"
-msgstr "Semua variabel environment ({total})"
 
 msgid "All features, side by side"
 msgstr "Semua fitur, berdampingan"
@@ -3846,9 +3840,6 @@ msgstr "Sedang build…"
 msgid "Builds"
 msgstr "Build"
 
-msgid "Built"
-msgstr "Di-build"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Sudah membuat plugin? Kirimkan di sini."
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · sebelum refactor tooltip"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Checkpoint disimpan ke {name}"
 
 msgid "Checks"
 msgstr "Check"
@@ -5137,6 +5125,9 @@ msgstr "Conductor adalah merek dagang milik pemiliknya. {0} tidak berafiliasi de
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Workspace Conductor adalah Git worktree biasa. {0} menggunakannya di lokasi aslinya."
+
+msgid "Config"
+msgstr "Konfigurasi"
 
 msgid "Config file contents"
 msgstr "Isi file konfigurasi"
@@ -8059,17 +8050,11 @@ msgstr "Environment diarsipkan"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Build environment tersedia di paket Team dan Ultra. Tingkatkan paket di Pengaturan, Penagihan."
 
-msgid "Environment history"
-msgstr "Riwayat environment"
-
 msgid "Environment not found"
 msgstr "Environment tidak ditemukan"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Penyiapan environment, tes flaky, dan urusan kredensial — mode kegagalan membosankan yang mematikan run tanpa pengawasan pada 2025 — sebagian besar diselesaikan lewat rekayasa, bukan lewat model."
-
-msgid "Environment updated"
-msgstr "Environment diperbarui"
 
 msgid "Environment variables"
 msgstr "Variabel environment"
@@ -12568,6 +12553,9 @@ msgstr "Workspace baru di {name}"
 msgid "New workspace page"
 msgstr "Halaman workspace baru"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Workspace baru dan build berikutnya memakai konfigurasi ini. Workspace yang sedang berjalan memakainya saat dimulai ulang."
+
 msgid "Newer than this app"
 msgstr "Lebih baru dari aplikasi ini"
 
@@ -12812,6 +12800,9 @@ msgstr "Tidak ada commit untuk membuka pull request"
 msgid "No comparisons yet."
 msgstr "Belum ada perbandingan."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Belum ada konfigurasi: workspace di environment ini tidak menjalankan setup atau terminal, dan build gagal sampai konfigurasi disimpan."
+
 msgid "No contributors found."
 msgstr "Tidak ada kontributor ditemukan."
 
@@ -12844,9 +12835,6 @@ msgstr "Belum ada variabel environment"
 
 msgid "No environments available"
 msgstr "Tidak ada environment yang tersedia"
-
-msgid "No environments built yet"
-msgstr "Belum ada environment yang di-build"
 
 msgid "No environments found."
 msgstr "Environment tidak ditemukan."
@@ -13304,9 +13292,6 @@ msgstr "Tidak ada skrip terminal v1."
 
 msgid "No valid environment variables found in file"
 msgstr "Tidak ada variabel environment yang valid di file"
-
-msgid "No variables set yet."
-msgstr "Belum ada variabel yang diatur."
 
 msgid "No versions yet"
 msgstr "Belum ada versi"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox berhenti merespons"
 msgid "Save"
 msgstr "Simpan"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Simpan checkpoint ke {name}?"
-
 msgid "Save All"
 msgstr "Simpan Semua"
 
@@ -17352,8 +17334,8 @@ msgstr "Simpan sebagai tampilan"
 msgid "Save Changes"
 msgstr "Simpan Perubahan"
 
-msgid "Save checkpoint"
-msgstr "Simpan checkpoint"
+msgid "Save config"
+msgstr "Simpan konfigurasi"
 
 msgid "Save edits"
 msgstr "Simpan suntingan"
@@ -17401,17 +17383,8 @@ msgstr "{name} disimpan"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} disimpan, tetapi workspace penyiapannya tidak dapat dimulai: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Disimpan dari workspace"
-
 msgid "Saved to Downloads"
 msgstr "Disimpan ke Downloads"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Menyimpan workspace ini seperti sekarang, dengan semua yang terpasang di dalamnya. Workspace baru dari {name} akan dimulai dari checkpoint ini. Workspace berhenti sebentar saat menyimpan."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Menyimpan checkpoint ke {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Menyimpan sebagai lingkungan..."
@@ -20082,6 +20055,9 @@ msgstr "Perintah yang dijalankan Paradev untuk menyiapkan, menjalankan, dan meng
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Perusahaan ini meraih pendanaan seed sebesar 11,5 juta dolar AS yang dipimpin oleh Union Square Ventures, bersama Y Combinator dan Paul Graham. TechCrunch menyebutnya sebagai salah satu startup unggulan dari YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "config.toml yang dijalankan oleh build dan workspace cloud environment ini. config.toml milik repositori sendiri tidak dipakai di cloud."
+
 msgid "The connection timed out"
 msgstr "Koneksinya kehabisan waktu"
 
@@ -20597,6 +20573,10 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Konfigurasi ini tidak valid: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Percakapan ini terlalu panjang untuk model"
 
@@ -20624,8 +20604,8 @@ msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak mengonfirmasinya sebagai terverifikasi. Masuk dengan metode yang Anda gunakan sebelumnya."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Environment ini tidak memiliki [install] untuk di-build. Tambahkan di .paradev/config.toml pada branch dasarnya."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Environment ini tidak punya [install] untuk di-build. Tambahkan satu ke konfigurasinya di Pengaturan, Environment."
 
 msgid "This environment has no repositories to build"
 msgstr "Environment ini tidak memiliki repositori untuk di-build"
@@ -21700,9 +21680,6 @@ msgstr "Pembaruan tidak bisa mempertahankan sesi"
 
 msgid "Update daemon"
 msgstr "Perbarui daemon"
-
-msgid "Update environment"
-msgstr "Perbarui environment"
 
 msgid "Update Error"
 msgstr "Kesalahan Pembaruan"

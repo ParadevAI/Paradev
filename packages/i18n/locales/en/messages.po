@@ -2263,9 +2263,6 @@ msgstr "Add to sidebar"
 msgid "Add to workspace"
 msgstr "Add to workspace"
 
-msgid "Add variable"
-msgstr "Add variable"
-
 msgid "Add what it does"
 msgstr "Add what it does"
 
@@ -2563,9 +2560,6 @@ msgstr "All data will be permanently deleted for all {0} members. This cannot be
 
 msgid "All downloads"
 msgstr "All downloads"
-
-msgid "All environment variables ({total})"
-msgstr "All environment variables ({total})"
 
 msgid "All features, side by side"
 msgstr "All features, side by side"
@@ -3846,9 +3840,6 @@ msgstr "Building…"
 msgid "Builds"
 msgstr "Builds"
 
-msgid "Built"
-msgstr "Built"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Built a plugin? Submit it here."
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · before tooltip refactor"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Checkpoint saved to {name}"
 
 msgid "Checks"
 msgstr "Checks"
@@ -5137,6 +5125,9 @@ msgstr "Conductor is a trademark of its owner. {0} is not affiliated with or end
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
+
+msgid "Config"
+msgstr "Config"
 
 msgid "Config file contents"
 msgstr "Config file contents"
@@ -8059,17 +8050,11 @@ msgstr "Environment archived"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 
-msgid "Environment history"
-msgstr "Environment history"
-
 msgid "Environment not found"
 msgstr "Environment not found"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
-
-msgid "Environment updated"
-msgstr "Environment updated"
 
 msgid "Environment variables"
 msgstr "Environment variables"
@@ -12568,6 +12553,9 @@ msgstr "New workspace in {name}"
 msgid "New workspace page"
 msgstr "New workspace page"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+
 msgid "Newer than this app"
 msgstr "Newer than this app"
 
@@ -12812,6 +12800,9 @@ msgstr "No commits to open a pull request from"
 msgid "No comparisons yet."
 msgstr "No comparisons yet."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+
 msgid "No contributors found."
 msgstr "No contributors found."
 
@@ -12844,9 +12835,6 @@ msgstr "No environment variables yet"
 
 msgid "No environments available"
 msgstr "No environments available"
-
-msgid "No environments built yet"
-msgstr "No environments built yet"
 
 msgid "No environments found."
 msgstr "No environments found."
@@ -13304,9 +13292,6 @@ msgstr "No v1 terminal scripts found."
 
 msgid "No valid environment variables found in file"
 msgstr "No valid environment variables found in file"
-
-msgid "No variables set yet."
-msgstr "No variables set yet."
 
 msgid "No versions yet"
 msgstr "No versions yet"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox stopped responding"
 msgid "Save"
 msgstr "Save"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Save a checkpoint to {name}?"
-
 msgid "Save All"
 msgstr "Save All"
 
@@ -17352,8 +17334,8 @@ msgstr "Save as view"
 msgid "Save Changes"
 msgstr "Save Changes"
 
-msgid "Save checkpoint"
-msgstr "Save checkpoint"
+msgid "Save config"
+msgstr "Save config"
 
 msgid "Save edits"
 msgstr "Save edits"
@@ -17401,17 +17383,8 @@ msgstr "Saved {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "Saved {name}, but its setup workspace could not start: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Saved from a workspace"
-
 msgid "Saved to Downloads"
 msgstr "Saved to Downloads"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Saving a checkpoint to {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Saving as an environment..."
@@ -20082,6 +20055,9 @@ msgstr "The commands Paradev runs to set up, run and archive this project's work
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+
 msgid "The connection timed out"
 msgstr "The connection timed out"
 
@@ -20597,6 +20573,10 @@ msgstr "This cloud workspace can't start"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "This config is invalid: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "This conversation is too long for the model"
 
@@ -20624,8 +20604,8 @@ msgstr "This directory does not exist. The terminal script will fall back to the
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "This environment has no [install] to build. Add one to its config in Settings, Environments."
 
 msgid "This environment has no repositories to build"
 msgstr "This environment has no repositories to build"
@@ -21700,9 +21680,6 @@ msgstr "Update couldn't preserve sessions"
 
 msgid "Update daemon"
 msgstr "Update daemon"
-
-msgid "Update environment"
-msgstr "Update environment"
 
 msgid "Update Error"
 msgstr "Update Error"

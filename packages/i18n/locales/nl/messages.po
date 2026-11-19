@@ -2263,9 +2263,6 @@ msgstr "Aan zijbalk toevoegen"
 msgid "Add to workspace"
 msgstr "Toevoegen aan werkruimte"
 
-msgid "Add variable"
-msgstr "Variabele toevoegen"
-
 msgid "Add what it does"
 msgstr "Toevoegen wat hij doet"
 
@@ -2563,9 +2560,6 @@ msgstr "Alle gegevens worden definitief verwijderd voor alle {0} leden. Dit kan 
 
 msgid "All downloads"
 msgstr "Alle downloads"
-
-msgid "All environment variables ({total})"
-msgstr "Alle omgevingsvariabelen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle functies naast elkaar"
@@ -3846,9 +3840,6 @@ msgstr "Bezig met bouwen…"
 msgid "Builds"
 msgstr "Builds"
 
-msgid "Built"
-msgstr "Gebouwd"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Een plugin gebouwd? Dien hem hier in."
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · voor de tooltip-refactor"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Checkpoint opgeslagen in {name}"
 
 msgid "Checks"
 msgstr "Checks"
@@ -5137,6 +5125,9 @@ msgstr "Conductor is een handelsmerk van de eigenaar. {0} is niet verbonden aan 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor-werkruimtes zijn gewone Git-worktrees. {0} gebruikt ze waar ze staan."
+
+msgid "Config"
+msgstr "Configuratie"
 
 msgid "Config file contents"
 msgstr "Inhoud van het configuratiebestand"
@@ -8059,17 +8050,11 @@ msgstr "Omgeving gearchiveerd"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Omgevingsbuilds horen bij de abonnementen Team en Ultra. Upgrade in Instellingen, Facturering."
 
-msgid "Environment history"
-msgstr "Omgevingsgeschiedenis"
-
 msgid "Environment not found"
 msgstr "Omgeving niet gevonden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Omgevingsopzet, flaky tests en credential-geknutsel — de saaie faalvormen die onbewaakte runs in 2025 om zeep hielpen — zijn grotendeels weggewerkt met engineering in plaats van met modellen."
-
-msgid "Environment updated"
-msgstr "Omgeving bijgewerkt"
 
 msgid "Environment variables"
 msgstr "Omgevingsvariabelen"
@@ -12568,6 +12553,9 @@ msgstr "Nieuwe werkruimte in {name}"
 msgid "New workspace page"
 msgstr "Nieuwe werkruimtepagina"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Nieuwe werkruimtes en de volgende build gebruiken deze configuratie. Actieve werkruimtes nemen haar over wanneer ze herstarten."
+
 msgid "Newer than this app"
 msgstr "Nieuwer dan deze app"
 
@@ -12812,6 +12800,9 @@ msgstr "Geen commits om een pull request van te openen"
 msgid "No comparisons yet."
 msgstr "Nog geen vergelijkingen."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Nog geen configuratie: werkruimtes in deze omgeving voeren geen setup of terminals uit, en builds mislukken totdat er een configuratie is opgeslagen."
+
 msgid "No contributors found."
 msgstr "Geen contributors gevonden."
 
@@ -12844,9 +12835,6 @@ msgstr "Nog geen omgevingsvariabelen"
 
 msgid "No environments available"
 msgstr "Geen omgevingen beschikbaar"
-
-msgid "No environments built yet"
-msgstr "Nog geen omgevingen gebouwd"
 
 msgid "No environments found."
 msgstr "Geen omgevingen gevonden."
@@ -13304,9 +13292,6 @@ msgstr "Geen v1-terminalscripts gevonden."
 
 msgid "No valid environment variables found in file"
 msgstr "Geen geldige omgevingsvariabelen gevonden in bestand"
-
-msgid "No variables set yet."
-msgstr "Nog geen variabelen ingesteld."
 
 msgid "No versions yet"
 msgstr "Nog geen versies"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox reageert niet meer"
 msgid "Save"
 msgstr "Opslaan"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Checkpoint opslaan in {name}?"
-
 msgid "Save All"
 msgstr "Alles opslaan"
 
@@ -17352,8 +17334,8 @@ msgstr "Opslaan als weergave"
 msgid "Save Changes"
 msgstr "Wijzigingen opslaan"
 
-msgid "Save checkpoint"
-msgstr "Checkpoint opslaan"
+msgid "Save config"
+msgstr "Configuratie opslaan"
 
 msgid "Save edits"
 msgstr "Bewerkingen opslaan"
@@ -17401,17 +17383,8 @@ msgstr "{name} opgeslagen"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} opgeslagen, maar de setup-workspace kon niet starten: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Opgeslagen vanuit een werkruimte"
-
 msgid "Saved to Downloads"
 msgstr "Opgeslagen in Downloads"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Slaat deze workspace op zoals hij nu is, met alles wat erin is geïnstalleerd. Nieuwe workspaces uit {name} starten vanaf dit checkpoint. De workspace stopt even tijdens het opslaan."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Checkpoint opslaan in {name}..."
 
 msgid "Saving as an environment..."
 msgstr "Opslaan als omgeving..."
@@ -20082,6 +20055,9 @@ msgstr "De opdrachten die Paradev uitvoert om de werkruimtes van dit project in 
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Het bedrijf haalde een seedronde van 11,5 miljoen dollar op onder leiding van Union Square Ventures, met Y Combinator en Paul Graham. TechCrunch noemde het een van de opvallendste startups van YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "De config.toml die de builds en cloudwerkruimtes van deze omgeving uitvoeren. De eigen config.toml van een repository wordt in de cloud niet gebruikt."
+
 msgid "The connection timed out"
 msgstr "De verbinding is verlopen"
 
@@ -20597,6 +20573,10 @@ msgstr "Deze cloudwerkruimte kan niet starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Deze cloudwerkruimte wordt gewekt. Na inactiviteit kan dat tot 30 seconden duren."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Deze configuratie is ongeldig: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Dit gesprek is te lang voor het model"
 
@@ -20624,8 +20604,8 @@ msgstr "Deze map bestaat niet. Het terminalscript valt terug op de root van de w
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Dit e-mailadres is al geregistreerd met een andere inlogmethode en de provider heeft het niet als geverifieerd bevestigd. Log in met de methode die je eerder gebruikte."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan .paradev/config.toml op de basisbranch."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Deze omgeving heeft geen [install] om te bouwen. Voeg er een toe aan de configuratie in Instellingen, Omgevingen."
 
 msgid "This environment has no repositories to build"
 msgstr "Deze omgeving heeft geen repositories om te bouwen"
@@ -21700,9 +21680,6 @@ msgstr "Update kon sessies niet behouden"
 
 msgid "Update daemon"
 msgstr "Daemon bijwerken"
-
-msgid "Update environment"
-msgstr "Omgeving bijwerken"
 
 msgid "Update Error"
 msgstr "Updatefout"

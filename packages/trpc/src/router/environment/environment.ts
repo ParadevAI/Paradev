@@ -12,6 +12,7 @@ import {
 } from "@superset/db/schema";
 import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import { parseProjectConfig } from "@superset/shared/project-config";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, lt, or } from "drizzle-orm";
@@ -70,6 +71,28 @@ async function assertCanChangeForEveryone(
 	) {
 		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
 	}
+}
+
+const CONFIG_MAX_LENGTH = 64 * 1024;
+
+/** Blank clears the config; anything else must parse as a `config.toml`. */
+function validConfig(text: string | null): string | null {
+	if (text === null || text.trim().length === 0) return null;
+	const parsed = parseProjectConfig(text);
+	if (!parsed.ok) {
+		const details = parsed.errors
+			.map((error) =>
+				error.line ? `line ${error.line}: ${error.message}` : error.message,
+			)
+			.join("; ");
+		throw userError({
+			code: "BAD_REQUEST",
+			message: `This config is invalid: ${details}`,
+			i18nKey: "serverError.environment.invalidConfig",
+			params: { details },
+		});
+	}
+	return text;
 }
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
@@ -893,14 +916,18 @@ export const environmentRouter = {
 				 * refusing to change them once it has a snapshot.
 				 */
 				startBuild: z.boolean().optional(),
+				/** The environment's `config.toml`; null clears it. */
+				config: z.string().max(CONFIG_MAX_LENGTH).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
-			if (input.machineSize !== undefined) {
+			if (input.machineSize !== undefined || input.config !== undefined) {
 				await assertCanChangeForEveryone(current, ctx);
 			}
+			const config =
+				input.config === undefined ? undefined : validConfig(input.config);
 			await assertMachineSizeOffered(current.organizationId, input.machineSize);
 
 			// A golden was built for its repositories and set up by its primary.
@@ -965,6 +992,7 @@ export const environmentRouter = {
 				...(input.machineSize !== undefined
 					? { machineSize: input.machineSize }
 					: {}),
+				...(config !== undefined ? { config } : {}),
 				...(input.scope === "personal"
 					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),

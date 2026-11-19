@@ -8,7 +8,7 @@ const WAIT_MS = 10 * 60_000;
 export default command({
 	sandbox: false,
 	description:
-		"Build an environment's snapshot again from [install] on its base branch; new workspaces keep starting from the current one until it succeeds",
+		"Build an environment's snapshot again from the [install] in its config; new workspaces keep starting from the current one until it succeeds",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
 		wait: boolean().desc("Wait for the build to finish; exit 1 if it fails"),

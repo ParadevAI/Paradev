@@ -2263,9 +2263,6 @@ msgstr "Zur Seitenleiste hinzufügen"
 msgid "Add to workspace"
 msgstr "Zum Arbeitsbereich hinzufügen"
 
-msgid "Add variable"
-msgstr "Variable hinzufügen"
-
 msgid "Add what it does"
 msgstr "Beschreiben, was er macht"
 
@@ -2563,9 +2560,6 @@ msgstr "Alle Daten werden für alle {0} Mitglieder endgültig gelöscht. Das lä
 
 msgid "All downloads"
 msgstr "Alle Downloads"
-
-msgid "All environment variables ({total})"
-msgstr "Alle Umgebungsvariablen ({total})"
 
 msgid "All features, side by side"
 msgstr "Alle Funktionen im Vergleich"
@@ -3846,9 +3840,6 @@ msgstr "Wird gebaut…"
 msgid "Builds"
 msgstr "Builds"
 
-msgid "Built"
-msgstr "Gebaut"
-
 msgid "Built a plugin? Submit it here."
 msgstr "Ein Plugin gebaut? Reiche es hier ein."
 
@@ -4386,9 +4377,6 @@ msgstr "Checkpoint"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · vor dem Tooltip-Refactoring"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Checkpoint in {name} gespeichert"
 
 msgid "Checks"
 msgstr "Prüfungen"
@@ -5137,6 +5125,9 @@ msgstr "Conductor ist eine Marke ihres Inhabers. {0} ist weder mit Conductor ode
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor-Arbeitsbereiche sind einfache Git-Worktrees. {0} nutzt sie dort, wo sie liegen."
+
+msgid "Config"
+msgstr "Konfiguration"
 
 msgid "Config file contents"
 msgstr "Inhalt der Konfigurationsdatei"
@@ -8059,17 +8050,11 @@ msgstr "Umgebung archiviert"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "Umgebungs-Builds sind in den Plänen Team und Ultra enthalten. Upgrade unter Einstellungen, Abrechnung."
 
-msgid "Environment history"
-msgstr "Umgebungsverlauf"
-
 msgid "Environment not found"
 msgstr "Umgebung nicht gefunden"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Umgebungs-Setup, flaky Tests und Zugangsdaten-Verkabelung — die langweiligen Fehlerquellen, die 2025 unbeaufsichtigte Läufe zerlegt haben — werden größtenteils wegkonstruiert statt wegmodelliert."
-
-msgid "Environment updated"
-msgstr "Umgebung aktualisiert"
 
 msgid "Environment variables"
 msgstr "Umgebungsvariablen"
@@ -12568,6 +12553,9 @@ msgstr "Neuer Arbeitsbereich in {name}"
 msgid "New workspace page"
 msgstr "Neue Arbeitsbereich-Seite"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "Neue Arbeitsbereiche und der nächste Build verwenden diese Konfiguration. Laufende Arbeitsbereiche übernehmen sie bei ihrem Neustart."
+
 msgid "Newer than this app"
 msgstr "Neuer als diese App"
 
@@ -12812,6 +12800,9 @@ msgstr "Keine Commits, aus denen ein Pull Request erstellt werden kann"
 msgid "No comparisons yet."
 msgstr "Noch keine Vergleiche."
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "Noch keine Konfiguration: Arbeitsbereiche in dieser Umgebung führen kein Setup aus und öffnen keine Terminals, und Builds schlagen fehl, bis eine Konfiguration gespeichert ist."
+
 msgid "No contributors found."
 msgstr "Keine Mitwirkenden gefunden."
 
@@ -12844,9 +12835,6 @@ msgstr "Noch keine Umgebungsvariablen"
 
 msgid "No environments available"
 msgstr "Keine Umgebungen verfügbar"
-
-msgid "No environments built yet"
-msgstr "Noch keine Umgebungen gebaut"
 
 msgid "No environments found."
 msgstr "Keine Umgebungen gefunden."
@@ -13304,9 +13292,6 @@ msgstr "Keine v1-Terminalskripte gefunden."
 
 msgid "No valid environment variables found in file"
 msgstr "Keine gültigen Umgebungsvariablen in der Datei gefunden"
-
-msgid "No variables set yet."
-msgstr "Noch keine Variablen gesetzt."
 
 msgid "No versions yet"
 msgstr "Noch keine Versionen"
@@ -17331,9 +17316,6 @@ msgstr "Sandbox reagiert nicht mehr"
 msgid "Save"
 msgstr "Speichern"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Checkpoint in {name} speichern?"
-
 msgid "Save All"
 msgstr "Alle speichern"
 
@@ -17352,8 +17334,8 @@ msgstr "Als Ansicht speichern"
 msgid "Save Changes"
 msgstr "Änderungen speichern"
 
-msgid "Save checkpoint"
-msgstr "Checkpoint speichern"
+msgid "Save config"
+msgstr "Konfiguration speichern"
 
 msgid "Save edits"
 msgstr "Bearbeitung speichern"
@@ -17401,17 +17383,8 @@ msgstr "{name} gespeichert"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "{name} gespeichert, aber der Setup-Workspace konnte nicht starten: {reason}"
 
-msgid "Saved from a workspace"
-msgstr "Aus einem Arbeitsbereich gespeichert"
-
 msgid "Saved to Downloads"
 msgstr "In Downloads gespeichert"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Speichert diesen Workspace im aktuellen Zustand, mit allem, was darin installiert ist. Neue Workspaces aus {name} starten von diesem Checkpoint. Der Workspace hält während des Speicherns kurz an."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Checkpoint wird in {name} gespeichert..."
 
 msgid "Saving as an environment..."
 msgstr "Wird als Umgebung gespeichert..."
@@ -20082,6 +20055,9 @@ msgstr "Die Befehle aus der config.toml des Repositorys, mit denen Paradev die A
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "Das Unternehmen hat eine Seed-Finanzierungsrunde über 11,5 Mio. US-Dollar abgeschlossen, angeführt von Union Square Ventures, mit Y Combinator und Paul Graham. TechCrunch zählte es zu den herausragenden Startups des YC Demo Day."
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Die config.toml, die die Builds und Cloud-Arbeitsbereiche dieser Umgebung ausführen. Die eigene config.toml eines Repositorys wird in der Cloud nicht verwendet."
+
 msgid "The connection timed out"
 msgstr "Zeitüberschreitung bei der Verbindung"
 
@@ -20597,6 +20573,10 @@ msgstr "Dieser Cloud-Arbeitsbereich kann nicht starten"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Dieser Cloud-Workspace wird gerade aufgeweckt. Nach Inaktivität kann das bis zu 30 Sekunden dauern."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Diese Konfiguration ist ungültig: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Diese Unterhaltung ist zu lang für das Modell"
 
@@ -20624,8 +20604,8 @@ msgstr "Dieses Verzeichnis existiert nicht. Das Terminal-Skript greift auf die W
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Diese E-Mail-Adresse ist bereits mit einer anderen Anmeldemethode registriert, und der Anbieter hat sie nicht als verifiziert bestätigt. Melde dich mit der zuvor verwendeten Methode an."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Diese Umgebung hat kein [install] zum Bauen. Füge eines in .paradev/config.toml auf ihrem Basis-Branch hinzu."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Diese Umgebung hat kein [install] zum Bauen. Füge eines in ihrer Konfiguration unter Einstellungen, Umgebungen hinzu."
 
 msgid "This environment has no repositories to build"
 msgstr "Diese Umgebung hat keine Repositories zum Bauen"
@@ -21700,9 +21680,6 @@ msgstr "Update konnte die Sitzungen nicht erhalten"
 
 msgid "Update daemon"
 msgstr "Daemon aktualisieren"
-
-msgid "Update environment"
-msgstr "Umgebung aktualisieren"
 
 msgid "Update Error"
 msgstr "Update-Fehler"

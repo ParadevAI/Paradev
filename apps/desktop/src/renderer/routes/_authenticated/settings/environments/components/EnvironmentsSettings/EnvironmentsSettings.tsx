@@ -195,16 +195,6 @@ export function EnvironmentsSettings({
 								<DropdownMenuContent align="end" className="w-48">
 									<DropdownMenuItem
 										onSelect={() =>
-											navigate({
-												to: "/settings/environments/$environmentId/edit",
-												params: { environmentId: environment.id },
-											})
-										}
-									>
-										<Trans>Edit</Trans>
-									</DropdownMenuItem>
-									<DropdownMenuItem
-										onSelect={() =>
 											rebuild.mutate({ environmentId: environment.id })
 										}
 									>

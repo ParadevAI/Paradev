@@ -7,8 +7,8 @@ import {
 } from "@superset/shared/sandbox/contract";
 import type { NetworkPolicy } from "@vercel/sandbox";
 import { resolveEnvironment } from "../../../router/environment/resolve-environment";
+import { configHooks } from "../config-hooks";
 import { deriveSandboxCredentials } from "../credentials";
-import { readRepoHooks } from "../repo-hooks";
 import {
 	cloneUrl,
 	environmentRepositoryRows,
@@ -51,7 +51,6 @@ export function buildBoxName(buildId: string): string {
 
 interface BuildInputs {
 	install: ResolvedPhase | null;
-	installSource: string;
 	checkouts: BuildCheckout[];
 	removedPaths: string[];
 	networkPolicy: NetworkPolicy;
@@ -102,8 +101,7 @@ async function prepareBuild(
 	];
 	const baseBranch = primary.defaultBranch;
 	const token = await installationTokenFor(ordered);
-	const [hooks, environment, current] = await Promise.all([
-		readRepoHooks({ repo: primary, branch: baseBranch, token }),
+	const [environment, current] = await Promise.all([
 		resolveEnvironment(build.environmentId, build.organizationId),
 		environmentRepositoryRows(build.environmentId),
 	]);
@@ -115,8 +113,7 @@ async function prepareBuild(
 		gitAuthor: BUILD_AUTHOR,
 	});
 	return {
-		install: hooks?.install ?? null,
-		installSource: `${primary.fullName}@${baseBranch}`,
+		install: configHooks(environment?.config ?? null)?.install ?? null,
 		checkouts: ordered.map((repository) => ({
 			url: cloneUrl(repository),
 			branch:
@@ -157,9 +154,7 @@ export async function rebuildEnvironment(args: {
 	try {
 		const inputs = await prepareBuild(build);
 		if (!inputs.install) {
-			throw new BuildFailure(
-				`No [install] in .paradev/config.toml on ${inputs.installSource}`,
-			);
+			throw new BuildFailure("No [install] in the environment's config");
 		}
 		const source: BuildBoxSource =
 			build.kind === "incremental" && environment.sourceKind === "fork"

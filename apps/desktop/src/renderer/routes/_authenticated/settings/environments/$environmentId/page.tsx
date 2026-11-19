@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { EnvironmentView } from "renderer/routes/_authenticated/components/EnvironmentView";
 import { EnvironmentPageLayout } from "./components/EnvironmentPageLayout";
+import { EnvironmentView } from "./components/EnvironmentView";
 
 export const Route = createFileRoute(
 	"/_authenticated/settings/environments/$environmentId/",

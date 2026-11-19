@@ -1,6 +1,6 @@
 ---
 name: environment
-description: Set up a Paradev (formerly Superset) cloud environment end to end from this machine - work out what the repositories need, set the environment's variables, boot a cloud box on it, get the project running there, and save checkpoints until new cloud workspaces start ready. Use when the user asks to set up, onboard, or finish a cloud environment, or when a setup session hands you an environment ID.
+description: Set up a Paradev (formerly Superset) cloud environment end to end from this machine - work out what the repositories need, set the environment's variables, boot a cloud box on it, get the project running there, store the environment's config.toml, and build it until new cloud workspaces start ready. Use when the user asks to set up, onboard, or finish a cloud environment, or when a setup session hands you an environment ID.
 argument-hint: environment ID, or the repositories to set up
 allowed-tools: Bash(superset:*)
 ---
@@ -13,18 +13,19 @@ Terms you will use with the user:
 
 - **Environment**: what a cloud workspace boots from. It has repositories (the first is primary), variables, a region, and a visibility.
 - **Box**: one cloud workspace running on the environment.
-- **Checkpoint**: a snapshot of the box saved into the environment, so the next workspace starts from it. `superset environments replace` saves one. Only the latest checkpoint is kept.
+- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud; a repository's `.paradev/config.toml` is not read there. `superset environments update --config` sets it.
+- **Build**: runs the config's `[install]` on a fresh box and saves the result as the snapshot new workspaces start from. `superset environments rebuild` starts one.
 
 ## What a box already has
 
 Do not install or upgrade these:
 
-- Node 24, Bun, Python 3 (pip, pipx, venv), a JDK, build-essential, clang, git, git-lfs, `gh`, and Docker with Compose. They come with the image, and a checkpoint keeps the versions it was saved with.
-- Chrome, Claude Code, Codex and the `superset` CLI. Every boot updates them to the platform's current release, so a checkpoint does not freeze their versions.
+- Node 24, Bun, Python 3 (pip, pipx, venv), a JDK, build-essential, clang, git, git-lfs, `gh`, and Docker with Compose. They come with the image, and a build keeps the versions it was built with.
+- Chrome, Claude Code, Codex and the `superset` CLI. Every boot updates them to the platform's current release, so a build does not freeze their versions.
 - A Linux desktop (XFCE over VNC, Xvfb), ffmpeg and ImageMagick.
 - GitHub access for git and `gh`. Do not run `gh auth login` or put a token in the box.
 
-There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, tell the user. Install only what the project needs, and do it through the repository's `config.toml` so a fresh checkout repeats it.
+There is no macOS: no Xcode, iOS simulator or Safari. If the project needs one, tell the user. Install only what the project needs, and do it through the environment's config so every build repeats it.
 
 ## 0. Connect GitHub
 
@@ -50,12 +51,12 @@ Read each repository before asking anything. Use the local clone when there is o
 
 - the README, package manifests and lockfiles (they decide the package manager and install command);
 - CI config (it is the most honest list of what a working build needs);
-- `.env.example` and the repository's config folder (`.paradev/`, or `.superset/` in repos set up before the rename): `config.toml`, or the old `config.json`;
+- `.env.example` and the repository's config folder (`.paradev/`, or `.superset/` in repos set up before the rename): a `config.toml` there is a good start for the environment's config, but the cloud does not read it;
 - services the project expects, such as Postgres, Redis or Docker Compose.
 
 Then ask only what you could not infer: missing secret values and extra repositories. Check extra repositories against `superset environments repos` as in step 0.
 
-**The repository list cannot change after the first checkpoint.** Confirm it with the user before step 5, and fix it with `superset environments update` while you still can.
+**Confirm the repository list with the user before the first build in step 5.** Changing it afterwards starts a new build.
 
 ## 3. Variables
 
@@ -89,32 +90,38 @@ superset terminals send --workspace <workspace-id> --terminal <terminal-id> --te
 
 Install toolchains and dependencies, start the services, and check that the project builds and its tests or dev server run.
 
-Write what worked into the primary repository's `config.toml` (in `.paradev/`, or the existing `.superset/`), so every box repeats it. If the repository has no `config.toml`, or still has the old `config.json`, follow the superset:setup skill to write one; it converts `config.json`. In the cloud:
+Write what worked into a `config.toml` on this machine, starting from the repository's own file when it has one; the superset:setup skill describes the format and converts an old `config.json`. In the cloud:
 
 - `[install]` runs when the environment's image is built: workspace-independent installs go there.
 - `[setup]`, with `[setup.cloud]` for cloud-only steps, runs on every boot and resume, so it must be safe to run again.
 - `[terminals.<name>]` with `default = true` start on boot, after `setup`.
 - `[ports.<name>]` with `preview = true` get a preview URL.
 
-Show the user the file and commit it on a branch. Boxes read the file from their branch, so it applies to new workspaces only once it is on the base branch.
-
-## 5. Checkpoint
-
-When a meaningful step works (dependencies installed, services running, tests green), save a checkpoint. Say first that the box stops for a moment and anything running in it is interrupted:
+Show the user the file, then store it as the environment's config:
 
 ```bash
-superset environments replace <environment-id> --workspace <workspace-id> --yes
+superset environments update <environment-id> --config path/to/config.toml
 ```
 
-The box must be `awake` or `asleep` (`ready` from a CLI older than 2.0.10). It comes back with the same ID; restart services you need afterwards. Repeat after each meaningful step rather than once at the end, so a later failure loses little.
+The server refuses a file that does not parse and says why. New workspaces and the next build use the stored config; a running box picks it up when it restarts.
+
+## 5. Build
+
+When the config's `[install]` works on the box, build the environment from it:
+
+```bash
+superset environments rebuild <environment-id> --wait
+```
+
+A build checks out the repositories on a fresh box, runs `[install]`, and saves the result as the snapshot new workspaces start from. It exits 1 with the error when the build fails; read the full history with `superset environments builds <environment-id>`, fix the config, store it again, and rebuild. Builds come with the Team and Ultra plans; if the server refuses for the plan, tell the user and stop. Rebuild after each change to `[install]` rather than once at the end, so a later failure loses little.
 
 ## 6. Finish
 
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
 2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
-3. If the `config.toml` change is not in a pull request yet, offer to open one, and ask before pushing.
+3. The environment's config drives only the cloud. Offer to commit the same file as the repository's `.paradev/config.toml` so local workspaces get it too, and ask before pushing.
 4. Archive the setup box: `superset workspaces archive <workspace-id>`.
-5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. If the `config.toml` change is not on the base branch yet, the workspace runs the base branch's config; say so rather than treating missing steps as a failure. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
+5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
 6. End with a final message in this structure, and nothing after it. Keep each section short. Write "none" for an empty section; do not drop it.
 
 ```markdown
@@ -133,7 +140,7 @@ The box must be `awake` or `asleep` (`ready` from a CLI older than 2.0.10). It c
 - Missing: <name> (read in <file>), to be provided by <who>
 
 ### Still to do
-- <config.toml pull request link, or "merge it so new workspaces use it">
+- <a failed build and its error, or "none">
 - <anything that failed or that you skipped, and why>
 
 More workspaces: new-workspace screen → Cloud → <project> → <environment name>.
@@ -141,4 +148,4 @@ More workspaces: new-workspace screen → Cloud → <project> → <environment n
 
    If the fresh workspace from step 5 failed, write **Try it:** as the failure and its cause, not a link.
 
-If you stop early, say where things stand and what the next session should do first; the environment and its latest checkpoint are all it needs to continue.
+If you stop early, say where things stand and what the next session should do first; the environment, its config and its latest build are all it needs to continue.

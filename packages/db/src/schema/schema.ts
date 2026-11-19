@@ -863,6 +863,8 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
+		/** The `config.toml` its builds and boxes run; a repository's own file is not read in the cloud. */
+		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),

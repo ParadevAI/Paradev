@@ -2263,9 +2263,6 @@ msgstr "新增到側邊欄"
 msgid "Add to workspace"
 msgstr "新增到工作區"
 
-msgid "Add variable"
-msgstr "新增變數"
-
 msgid "Add what it does"
 msgstr "新增它的用途"
 
@@ -2563,9 +2560,6 @@ msgstr "全部{0}名成員的所有資料都將被永久刪除。此操作無法
 
 msgid "All downloads"
 msgstr "所有下載"
-
-msgid "All environment variables ({total})"
-msgstr "所有環境變數（{total}）"
 
 msgid "All features, side by side"
 msgstr "所有功能逐項對比"
@@ -3846,9 +3840,6 @@ msgstr "建置中…"
 msgid "Builds"
 msgstr "建置"
 
-msgid "Built"
-msgstr "建置時間"
-
 msgid "Built a plugin? Submit it here."
 msgstr "做了外掛？在這裡提交。"
 
@@ -4386,9 +4377,6 @@ msgstr "檢查點"
 
 msgid "Checkpoint · before tooltip refactor"
 msgstr "檢查點 · tooltip重構之前"
-
-msgid "Checkpoint saved to {name}"
-msgstr "已將檢查點儲存到 {name}"
 
 msgid "Checks"
 msgstr "檢查"
@@ -5137,6 +5125,9 @@ msgstr "Conductor 是其所有者的商標。{0} 與 Conductor 或 Meta 無關�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor 工作區就是普通的 Git worktree。{0} 會在原位置直接使用它們。"
+
+msgid "Config"
+msgstr "組態"
 
 msgid "Config file contents"
 msgstr "設定檔內容"
@@ -8059,17 +8050,11 @@ msgstr "環境已封存"
 msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
 msgstr "環境建置包含在 Team 和 Ultra 方案中。請在設定的帳單中升級。"
 
-msgid "Environment history"
-msgstr "環境歷史"
-
 msgid "Environment not found"
 msgstr "找不到環境"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境搭建、不穩定的測試、憑證串聯，這些在2025年讓無人值守執行折戟的無聊失敗模式，大多是被工程手段消除的，而不是被模型消除的。"
-
-msgid "Environment updated"
-msgstr "環境已更新"
 
 msgid "Environment variables"
 msgstr "環境變數"
@@ -12568,6 +12553,9 @@ msgstr "在 {name} 中新建工作區"
 msgid "New workspace page"
 msgstr "新版新建工作區頁面"
 
+msgid "New workspaces and the next build use this config. Running workspaces pick it up when they restart."
+msgstr "新工作區和下一次建置會使用此組態。執行中的工作區會在重新啟動時套用它。"
+
 msgid "Newer than this app"
 msgstr "比此應用程式新"
 
@@ -12812,6 +12800,9 @@ msgstr "沒有可用於建立拉取請求的提交"
 msgid "No comparisons yet."
 msgstr "暫無對比。"
 
+msgid "No config yet: workspaces on this environment run no setup or terminals, and builds fail until a config is saved."
+msgstr "尚無組態：在儲存組態之前，此環境上的工作區不會執行 setup 或終端，建置也會失敗。"
+
 msgid "No contributors found."
 msgstr "未找到貢獻者。"
 
@@ -12844,9 +12835,6 @@ msgstr "尚無環境變數"
 
 msgid "No environments available"
 msgstr "沒有可用的環境"
-
-msgid "No environments built yet"
-msgstr "尚未建置任何環境"
 
 msgid "No environments found."
 msgstr "找不到環境。"
@@ -13304,9 +13292,6 @@ msgstr "找不到 v1 終端機指令碼。"
 
 msgid "No valid environment variables found in file"
 msgstr "檔案中找不到有效的環境變數"
-
-msgid "No variables set yet."
-msgstr "尚未設定變數。"
 
 msgid "No versions yet"
 msgstr "還沒有版本"
@@ -17331,9 +17316,6 @@ msgstr "沙箱已停止回應"
 msgid "Save"
 msgstr "儲存"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "要將檢查點儲存到 {name} 嗎？"
-
 msgid "Save All"
 msgstr "全部儲存"
 
@@ -17352,8 +17334,8 @@ msgstr "另存為檢視"
 msgid "Save Changes"
 msgstr "儲存變更"
 
-msgid "Save checkpoint"
-msgstr "儲存檢查點"
+msgid "Save config"
+msgstr "儲存組態"
 
 msgid "Save edits"
 msgstr "儲存編輯"
@@ -17401,17 +17383,8 @@ msgstr "已儲存 {name}"
 msgid "Saved {name}, but its setup workspace could not start: {reason}"
 msgstr "已儲存 {name}，但其設定工作區無法啟動：{reason}"
 
-msgid "Saved from a workspace"
-msgstr "從工作區儲存"
-
 msgid "Saved to Downloads"
 msgstr "已儲存到「下載」資料夾"
-
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "以目前狀態儲存此工作區，包括其中安裝的所有內容。從 {name} 建立的新工作區將從此檢查點開始。儲存期間工作區會短暫停止。"
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "正在將檢查點儲存到 {name}..."
 
 msgid "Saving as an environment..."
 msgstr "正在儲存為環境..."
@@ -20082,6 +20055,9 @@ msgstr "Paradev 在設定、執行及封存此專案的工作區時執行的命�
 msgid "The company raised an $11.5M seed round led by Union Square Ventures, with Y Combinator and Paul Graham. TechCrunch named it one of the standout startups from YC Demo Day."
 msgstr "公司完成了 1,150 萬美元的種子輪募資，由 Union Square Ventures 領投，Y Combinator 與 Paul Graham 參投。TechCrunch 將其評為 YC Demo Day 的傑出新創公司之一。"
 
+msgid "The config.toml this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "此環境的建置和雲端工作區執行的 config.toml。儲存庫本身的 config.toml 在雲端不會使用。"
+
 msgid "The connection timed out"
 msgstr "連線已逾時"
 
@@ -20597,6 +20573,10 @@ msgstr "無法啟動此雲端工作區"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "此組態無效：{0}"
+
 msgid "This conversation is too long for the model"
 msgstr "此對話對模型來說太長了"
 
@@ -20624,8 +20604,8 @@ msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其確認為已驗證。請使用你先前使用的方式登入。"
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "此環境沒有可建置的 [install]。請在其基礎分支的 .paradev/config.toml 中新增。"
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "此環境沒有可建置的 [install]。請在「設定」中的「環境」將其新增到此環境的組態。"
 
 msgid "This environment has no repositories to build"
 msgstr "此環境沒有可建置的儲存庫"
@@ -21700,9 +21680,6 @@ msgstr "更新無法保留會話"
 
 msgid "Update daemon"
 msgstr "更新守護程式"
-
-msgid "Update environment"
-msgstr "更新環境"
 
 msgid "Update Error"
 msgstr "更新出錯"

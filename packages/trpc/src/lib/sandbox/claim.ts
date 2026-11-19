@@ -19,6 +19,7 @@ import {
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import {
 	SANDBOX_CONTRACT_VERSION,
+	SANDBOX_PATHS,
 	type SandboxIdentity,
 	type SandboxRepository,
 } from "@superset/shared/sandbox/contract";
@@ -34,9 +35,9 @@ import { resolveMachineSize } from "../billing/plan";
 import { boxLogsEnabled, organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
+import { configHooks } from "./config-hooks";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
 import { creatorPlugins } from "./plugins";
-import { readRepoHooks } from "./repo-hooks";
 import {
 	installationTokenFor,
 	toSandboxRepositories,
@@ -82,11 +83,6 @@ async function boxVcpus(row: CloudWorkspaceRow): Promise<number> {
 export async function buildSandboxClaim(args: {
 	row: CloudWorkspaceRow;
 	launch?: CloudAgentLaunch;
-	/**
-	 * Read the repository's own hooks too. Only a create needs them (ports
-	 * are fixed once the box exists), and it costs a GitHub request.
-	 */
-	withRepoHooks?: boolean;
 }): Promise<{
 	claim: SandboxClaim;
 	environment: SandboxEnvironment;
@@ -126,15 +122,6 @@ export async function buildSandboxClaim(args: {
 	const token =
 		userToken ??
 		(await installationTokenFor(checkouts.map((entry) => entry.repository)));
-	const primaryCheckout = checkouts[0];
-	const repoHooks =
-		args.withRepoHooks && primaryCheckout
-			? await readRepoHooks({
-					repo: primaryCheckout.repository,
-					branch: primaryCheckout.baseBranch,
-					token,
-				})
-			: null;
 	const repositories = toSandboxRepositories(checkouts);
 
 	const identity: SandboxIdentity = {
@@ -181,8 +168,14 @@ export async function buildSandboxClaim(args: {
 			hostSecret: await sandboxHostSecretFor(args.row.id),
 			managedEnv,
 			networkPolicy,
-			files,
-			ports: repoHooks?.ports,
+			files: [
+				...files,
+				{
+					path: SANDBOX_PATHS.environmentConfig,
+					content: environment.config ?? "",
+				},
+			],
+			ports: configHooks(environment.config)?.ports,
 			vcpus: await boxVcpus(args.row),
 			agentTools: await organizationFlagEnabled(
 				posthog,

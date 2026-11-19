@@ -3,7 +3,6 @@ import type { SelectEnvironmentBuild } from "@superset/db/schema";
 import { stub } from "../../../../test/stub";
 import * as resolveEnvironmentModule from "../../../router/environment/resolve-environment";
 import * as credentials from "../credentials";
-import * as repoHooks from "../repo-hooks";
 import * as repositories from "../repositories";
 import * as vercel from "../vercel";
 import * as store from "./store";
@@ -119,11 +118,21 @@ stub(repositories, {
 	installationTokenFor: async () => null,
 	environmentRepositoryRows: async () => [],
 });
-stub(repoHooks, {
-	readRepoHooks: async () =>
-		installCommands ? { install: { commands: installCommands } } : null,
+stub(resolveEnvironmentModule, {
+	resolveEnvironment: async () => ({
+		id: ENVIRONMENT_ID,
+		provider: "vercel",
+		sourceKind: "fork",
+		sourceRef: "golden",
+		region: "sfo1",
+		bundleSha: "bundle",
+		primaryRepositoryId: "repo",
+		config: installCommands
+			? `[install]\nrun = ${JSON.stringify(installCommands)}\n`
+			: null,
+		envs: {},
+	}),
 });
-stub(resolveEnvironmentModule, { resolveEnvironment: async () => null });
 stub(credentials, {
 	deriveSandboxCredentials: async () => ({
 		networkPolicy: "allow-all",
@@ -202,9 +211,7 @@ describe("rebuildEnvironment", () => {
 	test("no [install] fails before any box is made", async () => {
 		installCommands = null;
 		await rebuildEnvironment({ buildId: BUILD_ID });
-		expect(build.error).toBe(
-			"No [install] in .paradev/config.toml on acme/web@main",
-		);
+		expect(build.error).toBe("No [install] in the environment's config");
 		expect(calls).toEqual([]);
 	});
 

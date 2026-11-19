@@ -25,6 +25,7 @@ export {
 	reportSandboxBoxPressure,
 } from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
+export { type ConfigHooks, configHooks } from "./config-hooks";
 export { deriveSandboxCredentials } from "./credentials";
 export {
 	listRemoteBranches,
@@ -36,7 +37,6 @@ export {
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
 export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
-export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
 	environmentRepositoryRows,

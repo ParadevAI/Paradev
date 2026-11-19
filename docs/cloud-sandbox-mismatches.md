@@ -616,7 +616,7 @@ leaked: this repository's per-workspace Neon branches piled up until 383 were
 deleted by hand (2026-10-20). **Fixed:** the reap job's 60-second stop stage
 calls `sandbox.runArchiveHook` on the still-running box (direct with the host
 secret, the same 60-second limit as a local archive) before stopping it, which runs `[archive]` from
-`.paradev/config.toml` resolved for the cloud. A failing hook never blocks the
+the environment's config resolved for the cloud. A failing hook never blocks the
 stop, and an undo that lands during the hook re-runs setup (`runStartHook`
 with `force`) instead of stopping the box. A box whose host-service predates
 the procedure answers 404 and is stopped as before, so the fix reaches a box
@@ -632,6 +632,24 @@ branch through Neon's own expiry. **Open:** running `[archive]` at least once,
 in a fresh short-lived box from the environment's image when the original is
 stopped or gone. That works because `[archive]` only releases outside
 resources: it needs the workspace's identity and secrets, not its disk.
+
+**The project config is the environment's, not the repository's.** Locally,
+host-service reads `.paradev/config.toml` from the worktree, so a branch can
+change its own setup. A cloud environment builds one snapshot for every
+workspace, and a build runs before any workspace or branch exists, so its
+`[install]` had to come from the base branch: an environment could not be set
+up until its config change merged. The environment now stores its own
+`config.toml` (`environments.config`). Builds read `[install]` from it, a
+create publishes its `preview = true` ports from it, and every create and wake
+writes it to `SANDBOX_PATHS.environmentConfig` before boot. In a box,
+host-service reads only that file: no repository `config.toml`, no
+`config.local.toml`, no v1 `config.json`. An empty file means no config: no
+setup, no default terminals, no ports, and builds are refused. Existing
+environments had no config when this shipped and were not backfilled. A box
+whose host-service predates this reads the repository file until a sandbox
+release. **Open:** a saved config reaches a running box only on its next wake
+or restart. The desktop's project settings still edit the repository file on a
+cloud host, where it no longer applies.
 
 **Sidebar affordances are driven by local state, not by the row.** Visibility,
 pinning and ordering live in `v2WorkspaceLocalState`; a section that renders
