@@ -51,19 +51,23 @@ function caller(
 		tier = "pro",
 		billingOff = false,
 		listRatePerGbHour = async () => null,
+		startedAt = null,
 	}: {
 		enabled?: boolean;
 		readCloudUsage?: () => Promise<CloudUsage | null>;
 		tier?: PlanTier;
 		billingOff?: boolean;
 		listRatePerGbHour?: CloudDeps["listRatePerGbHour"];
+		startedAt?: string | null;
 	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
 			billing: async () =>
-				billingOff ? null : { tier, cloudUsage: await readCloudUsage() },
+				billingOff
+					? null
+					: { tier, startedAt, cloudUsage: await readCloudUsage() },
 			listRatePerGbHour,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
@@ -606,4 +610,19 @@ describe("the list rate", () => {
 		expect(usage.total.usageUsd).toBeCloseTo(3.4);
 		expect(listRatePerGbHour).not.toHaveBeenCalled();
 	});
+});
+
+test("an organization billed on the 31st sees its period start on the 31st", async () => {
+	const owner = caller(MAYA, {
+		startedAt: "2026-08-31T05:00:00.000Z",
+		readCloudUsage: async () => ({
+			...CLOUD_USAGE,
+			resetsAt: "2026-11-30T05:00:00.000Z",
+		}),
+	});
+	const [open] = (await owner.periods.list({})).items;
+	expect(open?.id).toBe("2026-10-31");
+	await expect(
+		owner.usage.query({ range: { period: "2026-10-31" } }),
+	).resolves.toBeDefined();
 });

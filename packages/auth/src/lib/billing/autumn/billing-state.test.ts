@@ -77,6 +77,7 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			scheduledPlanId: null,
 			scheduledAt: null,
 			periodStart: new Date(NOW - 10 * DAY).toISOString(),
+			startedAt: new Date(NOW - 40 * DAY).toISOString(),
 			periodEnd: new Date(NOW + 20 * DAY).toISOString(),
 			billingInterval: "month",
 			lapsed: false,

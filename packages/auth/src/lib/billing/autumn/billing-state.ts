@@ -38,6 +38,8 @@ export interface OrganizationBilling {
 	scheduledAt: string | null;
 	periodStart: string | null;
 	periodEnd: string | null;
+	/** Autumn anchors the monthly GB-minute reset on it. */
+	startedAt: string | null;
 	billingInterval: string | null;
 	lapsed: boolean;
 	paymentState: PaymentState;
@@ -139,6 +141,7 @@ export function billingFromCustomer(
 		scheduledAt:
 			next && next.planId !== paidPlanId ? iso(next.startedAt) : null,
 		periodStart: iso(paid?.currentPeriodStart),
+		startedAt: iso(paid?.startedAt),
 		periodEnd: iso(
 			seatRenewal({
 				startedAt: paid?.startedAt,

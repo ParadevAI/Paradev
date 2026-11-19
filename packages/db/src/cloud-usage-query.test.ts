@@ -17,6 +17,7 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import {
+	cloudBillingAnchor,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
 	getFleetCloudBoot,
@@ -327,27 +328,54 @@ test("rowCount counts the row of usage with no workspace, which total.workspaces
 	}
 });
 
-test("billing periods keep Autumn's reset day through short months", () => {
-	const anchor = {
-		resetsAt: new Date("2026-02-28T05:00:00Z"),
-		previousResetAt: new Date("2026-01-31T05:00:00Z"),
-	};
+test.each([
+	[
+		"the 31st, ending in a 30-day month",
+		"2026-08-31T05:00:00.000Z",
+		"2026-11-30",
+		"2026-10-31",
+	],
+	[
+		"the 30th, ending in February",
+		"2026-12-30T05:00:00.000Z",
+		"2027-02-28",
+		"2027-01-30",
+	],
+	[
+		"the 29th, ending on a leap day",
+		"2027-12-29T05:00:00.000Z",
+		"2028-02-29",
+		"2028-01-29",
+	],
+	["the 15th", "2026-03-15T05:00:00.000Z", "2026-11-15", "2026-10-15"],
+	[
+		"the 31st, on a yearly plan",
+		"2026-01-31T05:00:00.000Z",
+		"2026-11-30",
+		"2026-10-31",
+	],
+	[
+		"the 28th, after a plan change on the 30th",
+		"2027-01-30T14:22:05.123Z",
+		"2027-02-28",
+		"2027-01-28",
+	],
+	[
+		"the 30th, after a plan change on the 10th",
+		"2026-11-10T09:00:00.000Z",
+		"2026-11-30",
+		"2026-10-30",
+	],
+])("billing periods reset on %s", (_, startedAt, resetDay, periodStart) => {
+	const anchor = cloudBillingAnchor(
+		new Date(`${resetDay}T05:00:00.000Z`),
+		new Date(startedAt),
+	);
 	expect(cloudBillingPeriod(anchor, 0)).toEqual({
-		from: anchor.previousResetAt,
+		from: new Date(`${periodStart}T05:00:00.000Z`),
 		to: anchor.resetsAt,
 	});
-	expect(cloudBillingPeriod(anchor, 1).from).toEqual(
-		new Date("2025-12-31T05:00:00Z"),
-	);
-	expect(cloudBillingPeriodIndex(anchor, "2025-12-31")).toBe(1);
-	expect(cloudBillingPeriodIndex(anchor, "2026-01-28")).toBeNull();
-	const thirtieth = {
-		resetsAt: new Date("2026-11-30T05:00:00Z"),
-		previousResetAt: new Date("2026-10-30T05:00:00Z"),
-	};
-	expect(cloudBillingPeriod(thirtieth, 1).from).toEqual(
-		new Date("2026-09-30T05:00:00Z"),
-	);
+	expect(cloudBillingPeriodIndex(anchor, periodStart)).toBe(0);
 });
 
 describe("fleet scope", () => {
