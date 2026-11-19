@@ -1764,6 +1764,9 @@ msgstr "87.4K of 200K tokens used in this session."
 msgid "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 msgstr "A better in-app browser: preview your changes and click any element to send it to the agent as context."
 
+msgid "A build of this environment is already running"
+msgstr "A build of this environment is already running"
+
 msgid "A CDP endpoint per pane"
 msgstr "A CDP endpoint per pane"
 
@@ -20673,6 +20676,13 @@ msgstr "This directory does not exist. The terminal script will fall back to the
 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+
+msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
+msgstr "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
