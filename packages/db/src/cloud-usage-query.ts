@@ -301,6 +301,9 @@ const groupKeys = {
 	},
 } satisfies Record<CloudFleetGroupBy, FactKeys>;
 
+const pacificDay = (column: AnyPgColumn) =>
+	sql`to_char((${column} at time zone 'America/Los_Angeles')::date, 'YYYY-MM-DD')`;
+
 const NO_KEY: FactKeys = {
 	event: sql`null`,
 	boot: sql`null`,
@@ -319,10 +322,12 @@ function usageFacts(
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	keys: FactKeys,
+	secondKeys: FactKeys = NO_KEY,
 ) {
 	const sent = db
 		.select({
 			key: sql<string | null>`${keys.event}::text`.as("key"),
+			secondKey: sql<string | null>`${secondKeys.event}::text`.as("second_key"),
 			workspaceId: sql<string | null>`${events.cloudWorkspaceId}`.as(
 				"workspace_id",
 			),
@@ -353,6 +358,7 @@ function usageFacts(
 	const started = db
 		.select({
 			key: sql<string | null>`${keys.boot}::text`,
+			secondKey: sql<string | null>`${secondKeys.boot}::text`,
 			workspaceId: sql<string | null>`${boots.cloudWorkspaceId}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
@@ -376,6 +382,7 @@ function usageFacts(
 	const failed = db
 		.select({
 			key: sql<string | null>`${keys.failed}::text`,
+			secondKey: sql<string | null>`${secondKeys.failed}::text`,
 			workspaceId: sql<string | null>`${workspaces.id}`,
 			gbMinutes: sql<string>`0::numeric`,
 			seconds: sql<string>`0::numeric`,
@@ -737,6 +744,59 @@ export function queryFleetCloudUsage(
 	options: CloudFleetUsageOptions,
 ): Promise<CloudFleetUsageResult> {
 	return usageRows(db, { organizationId }, options);
+}
+
+/**
+ * `queryFleetCloudUsage` grouped by workspace and Pacific billing day in one query: a row for each
+ * pair with a fact, no limit, so the caller windows it. Staff only, like `queryFleetCloudUsage`.
+ */
+export async function queryCloudUsageByWorkspaceDay(
+	db: Db,
+	organizationId: string | string[] | null,
+	options: { window: CloudUsageWindow; filters?: CloudUsageFilters },
+): Promise<
+	Array<{
+		workspaceId: string | null;
+		day: string;
+		boots: number;
+		failedBoots: number;
+		hours: number;
+		gbHours: number;
+	}>
+> {
+	const facts = usageFacts(
+		db,
+		{ organizationId },
+		options.filters ?? {},
+		options.window,
+		groupKeys.workspace,
+		{
+			event: pacificDay(events.sentAt),
+			boot: pacificDay(boots.startedAt),
+			failed: pacificDay(workspaces.failedAt),
+		},
+	);
+	const rows = await db
+		.with(facts)
+		.select({
+			workspaceId: facts.key,
+			day: facts.secondKey,
+			...metricColumns(facts),
+		})
+		.from(facts)
+		.groupBy(facts.key, facts.secondKey)
+		.orderBy(asc(facts.key), asc(facts.secondKey));
+	return rows.map(({ workspaceId, day, ...row }) => {
+		const { boots, failedBoots, hours, gbHours } = toMetrics(row, null);
+		return {
+			workspaceId,
+			day: day ?? "",
+			boots,
+			failedBoots,
+			hours,
+			gbHours,
+		};
+	});
 }
 
 const NO_USAGE: MetricRow = {

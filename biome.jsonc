@@ -57,6 +57,7 @@
 							"@superset/db/cloud-usage-query": {
 								"importNames": [
 									"queryFleetCloudUsage",
+									"queryCloudUsageByWorkspaceDay",
 									"listFleetCloudBoots",
 									"getFleetCloudBoot"
 								],
