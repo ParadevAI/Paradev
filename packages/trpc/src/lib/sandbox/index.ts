@@ -63,7 +63,6 @@ export {
 	HOST_SERVICE_PORT,
 	type ListedDrive,
 	type ListedSandbox,
-	type ListingPage,
 	listActiveWorkspaceSandboxes,
 	listProjectDrives,
 	listProjectSandboxes,

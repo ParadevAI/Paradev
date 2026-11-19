@@ -990,13 +990,10 @@ export async function listActiveWorkspaceSandboxes(
 
 export interface ListedSandbox {
 	name: string;
-	/** Our `kind` tag; absent on a box made before tags or not made by us. */
-	kind: string | undefined;
 	createdAt: number;
 	status: string;
 	/** What it mounts, running or stopped: a stopped box mounts it again on its next boot. */
 	mounts: string[];
-	tags: Record<string, string>;
 }
 
 export interface ListedDrive {
@@ -1005,12 +1002,7 @@ export interface ListedDrive {
 	attachedTo: string | undefined;
 }
 
-export interface ListingPage<T> {
-	items: T[];
-	next: string | null;
-}
-
-export const MAX_LISTING_PAGES = 10_000;
+const MAX_LISTING_PAGES = 10_000;
 
 /**
  * Every page of a listing, or a throw: each page answered, no cursor seen
@@ -1022,7 +1014,9 @@ export async function listWhole<T extends { name: string }>({
 	expected = [],
 	nonEmpty,
 }: {
-	fetchPage: (cursor: string | null) => Promise<ListingPage<T>>;
+	fetchPage: (
+		cursor: string | null,
+	) => Promise<{ items: T[]; next: string | null }>;
 	expected?: readonly string[];
 	nonEmpty: boolean;
 }): Promise<T[]> {
@@ -1068,13 +1062,11 @@ export function listProjectSandboxes(
 			return {
 				items: page.sandboxes.map((sandbox) => ({
 					name: sandbox.name,
-					kind: sandbox.tags?.kind,
 					createdAt: sandbox.createdAt,
 					status: sandbox.status,
 					mounts: Object.values(sandbox.mounts ?? {}).map(
 						(mount) => mount.drive,
 					),
-					tags: sandbox.tags ?? {},
 				})),
 				next: page.pagination.next,
 			};

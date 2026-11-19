@@ -783,41 +783,22 @@ sandbox is gone or unresumable is marked `failed` by the next `access`, so it
 gets the failed screen and a Remove button rather than a sidebar entry that
 never opens.
 
-**Vercel's snapshot expiry was silent, so we own retention now.** The app
-assumed a stopped box keeps its disk until someone deletes it. In fact Vercel
-expired a workspace box's snapshot 30 days after its last use, and nothing told
-us: the row learned only from the 410 its next wake got. New workspace boxes
-are now created with `snapshotExpiration: 0`, and one cleanup job
-(`router/cloud-workspace/retention.ts`, every 6 hours, production only) is the
-only thing that deletes for age. It applies three rules from one table:
-
-1. A workspace not in use is retired after its wait: asleep 30 days after last
-   use, archived 7 days, failed 30 days, stuck creating with no boot 1 day.
-   Retiring is one conditional write (still in that status, still past the
-   wait) that takes the box name off the row, then the retried teardown job
-   deletes the box. A wake that lands first wins. An unarchive after the 7 days
-   is refused even before the job runs.
-2. An environment keeps its active golden and its newest others, 3 in all; an
-   archived environment keeps none. On main an environment records only its
-   active golden, so the job deletes archived environments' goldens.
-3. A box, drive or golden no production row names goes 7 days after it was
-   made; an agents drive goes once it is not the current release's and no box,
-   stopped ones included, mounts it.
-
-Everything else only sets a status: archive (its 60 s stop stays), a failed
-create and a 410 on wake. Only production deletes: `sandboxDeletesAllowed`
-(`lib/sandbox/deletes.ts`), checked by the teardown job, the drive delete and a
-replaced golden's delete, logs "would delete" unless `VERCEL_ENV` is
-`production`. `deleteSandbox` itself stays unchecked so a job still deletes the
-temporary boxes it made (the release probe, real-sandbox). This is because
-every deployment shares one Vercel project and a preview database copied from
-production names production's boxes. Staging deploys as production on the
-production database, so it counts. The job reads the whole box and drive
-listing first and deletes nothing if it cannot. Boxes created before this
-change keep a 30-day expiry until `bun run backfill-snapshot-expiration
---apply` (`packages/sandbox`) is run by hand. **Open:** no row names a
-workspace drive on main; #9847's `drive_name` and `golden_drive_name` must
-join rule 3's names when it lands.
+**Vercel's snapshot expiry was silent, so we own retention now.** Vercel
+expired a workspace box's snapshot 30 days after its last use, and the row
+learned only from the 410 its next wake got. New boxes are created with
+`snapshotExpiration: 0`, and one cleanup job (`router/cloud-workspace/retention.ts`,
+every 6 hours, production only) is the only thing that deletes for age, from
+one rules table: (1) a workspace past its wait (asleep 30 days after last use,
+archived 7, failed 30, stuck creating 1) is retired by one conditional write,
+then torn down; (2) an archived environment's goldens, and a live one's beyond
+its newest 3; (3) a box, drive or golden no production row names, 7 days after
+it was made, and an agents drive that is not current and that no box mounts.
+Archive, a failed create and a 410 only set a status, and an unarchive after 7
+days is refused. Only production deletes (`sandboxDeletesAllowed`): every
+deployment shares one Vercel project, and a preview database copied from
+production names production's boxes. The job reads the whole listing first and
+deletes nothing if it cannot. **Open:** #9847's `drive_name` and
+`golden_drive_name` must join rule 3's names when it lands.
 
 **Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
 `runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a
