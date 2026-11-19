@@ -260,7 +260,10 @@ Codex spends ~10 s on retries before it falls back to HTTPS, once per session.
 The built-in provider cannot be reconfigured, so the claim writes
 `/etc/codex/config.toml` (Codex's system layer, below the person's own config)
 with the same endpoint and `supports_websockets = false`. Measured: 13.3 s →
-3.6 s for one `codex exec`.
+3.6 s for one `codex exec`. An OpenAI API key has the same problem on
+`api.openai.com` (or `OPENAI_BASE_URL`'s host), so it gets an `openai-api-key`
+provider for that endpoint, with `env_key = "OPENAI_API_KEY"` and no
+WebSockets. Measured on Codex 0.170.0: 8.7 s → 1.9 s.
 
 **The firewall terminates TLS for the domains it rewrites, and the terminal
 must trust its CA.** The CA is in the image's system bundle, which curl, git,
