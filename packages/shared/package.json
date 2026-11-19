@@ -392,6 +392,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./cloud-usage-api": {
+			"types": "./src/cloud-usage-api.ts",
+			"default": "./src/cloud-usage-api.ts"
+		},
 		"./box-pressure": {
 			"types": "./src/box-pressure.ts",
 			"default": "./src/box-pressure.ts"
