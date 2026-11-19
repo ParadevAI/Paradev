@@ -8,10 +8,10 @@ import {
 } from "bun:test";
 import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
+import { sandboxDeletesAllowed } from "./deletes";
 import {
 	agentToolsMounts,
 	applySandboxPolicy,
-	canDelete,
 	deleteDrive,
 	deleteSandbox,
 	describeSandbox,
@@ -312,29 +312,22 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 });
 
 describe("only production deletes", () => {
-	stub(Sandbox, {
-		get: async () => {
-			throw new Error("reached Vercel");
-		},
-	});
 	stub(Drive, {
 		get: async () => {
 			throw new Error("reached Vercel");
 		},
 	});
 
-	test("outside production a box or drive delete logs and returns without reaching Vercel", async () => {
-		const vercelEnv = process.env.VERCEL_ENV;
+	test("outside production a drive delete logs and returns without reaching Vercel", async () => {
 		process.env.VERCEL_ENV = "preview";
 		try {
-			await deleteSandbox("ws-box");
 			await deleteDrive("drive-1");
 		} finally {
-			process.env.VERCEL_ENV = vercelEnv;
+			process.env.VERCEL_ENV = "production";
 		}
-		expect(canDelete("production")).toBe(true);
-		expect(canDelete("preview")).toBe(false);
-		expect(canDelete(undefined)).toBe(false);
+		expect(sandboxDeletesAllowed("box b", "production")).toBe(true);
+		expect(sandboxDeletesAllowed("box b", "preview")).toBe(false);
+		expect(sandboxDeletesAllowed("box b", "development")).toBe(false);
 	});
 });
 

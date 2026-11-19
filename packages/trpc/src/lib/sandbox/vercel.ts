@@ -34,6 +34,7 @@ import {
 	CODEX_SYSTEM_CONFIG_PATH,
 	type SandboxFile,
 } from "./credentials";
+import { sandboxDeletesAllowed } from "./deletes";
 
 export const HOST_SERVICE_PORT = SANDBOX_PORTS.hostService;
 /**
@@ -1101,24 +1102,9 @@ export function listProjectDrives(): Promise<ListedDrive[]> {
 	});
 }
 
-/**
- * Only production deletes. Staging deploys as production on the same
- * database, so it counts; a preview or local database, copied from
- * production, names production's boxes and only logs.
- */
-export function canDelete(vercelEnv = process.env.VERCEL_ENV): boolean {
-	return vercelEnv === "production";
-}
-
-function wouldDelete(kind: string, name: string): boolean {
-	if (canDelete()) return false;
-	console.log(`[sandbox] would delete ${kind} ${name}: not production`);
-	return true;
-}
-
 /** Throws while a box holds it; a drive already gone is the state we wanted. */
 export async function deleteDrive(name: string): Promise<void> {
-	if (wouldDelete("drive", name)) return;
+	if (!sandboxDeletesAllowed(`drive ${name}`)) return;
 	const drive = await Drive.get({ ...credentials(), name }).catch((error) => {
 		if (isNotFound(error)) return null;
 		throw error;
@@ -1128,7 +1114,6 @@ export async function deleteDrive(name: string): Promise<void> {
 
 /** Best-effort: a sandbox already gone is the state we wanted. */
 export async function deleteSandbox(providerSandboxId: string): Promise<void> {
-	if (wouldDelete("sandbox", providerSandboxId)) return;
 	const sandbox = await getSandbox(providerSandboxId);
 	if (!sandbox) return;
 	// Snapshots outlive a sandbox by default and keep billing storage.

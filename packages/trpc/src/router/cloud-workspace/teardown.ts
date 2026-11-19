@@ -2,7 +2,11 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, type SQL } from "drizzle-orm";
-import { deleteSandbox, stopSandbox } from "../../lib/sandbox";
+import {
+	deleteSandbox,
+	sandboxDeletesAllowed,
+	stopSandbox,
+} from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { nextSandboxNameFor } from "./provision";
 import { liveReferences } from "./teardown-guard";
@@ -17,7 +21,12 @@ export interface TeardownSandboxInput {
 export const TEARDOWN_RETRY_SECONDS = 30;
 export const TEARDOWN_ATTEMPTS = 20;
 
-export type TeardownOutcome = "deleted" | "kept" | "retrying" | "abandoned";
+export type TeardownOutcome =
+	| "deleted"
+	| "kept"
+	| "retrying"
+	| "abandoned"
+	| "skipped";
 
 /**
  * Stops the box, then deletes it with its snapshots. Before each destructive
@@ -27,6 +36,9 @@ export type TeardownOutcome = "deleted" | "kept" | "retrying" | "abandoned";
 export async function teardownSandbox(
 	input: TeardownSandboxInput,
 ): Promise<TeardownOutcome> {
+	if (!sandboxDeletesAllowed(`box ${input.providerSandboxId} and no drive`)) {
+		return "skipped";
+	}
 	try {
 		return await teardownOnce(input);
 	} catch (error) {

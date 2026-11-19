@@ -27,6 +27,7 @@ import {
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
+	sandboxDeletesAllowed,
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
@@ -625,7 +626,10 @@ export const environmentRouter = {
 					await restart();
 					throw error;
 				});
-			if (target?.sourceKind === "fork") {
+			if (
+				target?.sourceKind === "fork" &&
+				sandboxDeletesAllowed(`golden ${target.sourceRef}`)
+			) {
 				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
 					console.error(
 						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,

@@ -67,6 +67,16 @@ beforeEach(() => {
 const input = { providerSandboxId: "ws-old", driveName: null, attempt: 0 };
 
 describe("teardownSandbox", () => {
+	test("outside production it stops and deletes nothing", async () => {
+		process.env.VERCEL_ENV = "preview";
+		try {
+			expect(await teardownSandbox(input)).toBe("skipped");
+		} finally {
+			process.env.VERCEL_ENV = "production";
+		}
+		expect(calls).toEqual([]);
+	});
+
 	test("stops, then deletes a box no row names", async () => {
 		expect(await teardownSandbox(input)).toBe("deleted");
 		expect(calls).toEqual(["stop:ws-old", "delete:ws-old"]);

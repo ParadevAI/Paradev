@@ -805,8 +805,11 @@ only thing that deletes for age. It applies three rules from one table:
    stopped ones included, mounts it.
 
 Everything else only sets a status: archive (its 60 s stop stays), a failed
-create and a 410 on wake. Only production deletes: `deleteSandbox` and
-`deleteDrive` log "would delete" unless `VERCEL_ENV` is `production`, because
+create and a 410 on wake. Only production deletes: `sandboxDeletesAllowed`
+(`lib/sandbox/deletes.ts`), checked by the teardown job, the drive delete and a
+replaced golden's delete, logs "would delete" unless `VERCEL_ENV` is
+`production`. `deleteSandbox` itself stays unchecked so a job still deletes the
+temporary boxes it made (the release probe, real-sandbox). This is because
 every deployment shares one Vercel project and a preview database copied from
 production names production's boxes. Staging deploys as production on the
 production database, so it counts. The job reads the whole box and drive
