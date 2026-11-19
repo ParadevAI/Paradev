@@ -1,4 +1,3 @@
-import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { PostHog } from "posthog-node";
 
 type Flags = Pick<PostHog, "isFeatureEnabled">;
@@ -16,24 +15,4 @@ export async function organizationFlagEnabled(
 		})
 		.catch(() => undefined);
 	return enabled === true;
-}
-
-/** Both switches must be on; the organization's flag is asked only while the fleet switch is. */
-export async function boxLogsEnabled(
-	flags: Flags,
-	organizationId: string,
-): Promise<boolean> {
-	const fleet = await flags
-		.isFeatureEnabled(FEATURE_FLAGS.SANDBOX_BOX_LOGS_FLEET, "sandbox-fleet", {
-			sendFeatureFlagEvents: false,
-		})
-		.catch(() => undefined);
-	return (
-		fleet === true &&
-		organizationFlagEnabled(
-			flags,
-			FEATURE_FLAGS.SANDBOX_BOX_LOGS,
-			organizationId,
-		)
-	);
 }

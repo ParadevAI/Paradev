@@ -1,12 +1,7 @@
 import * as Sentry from "@sentry/core";
 import type { CloudWorkspaceBootPhase } from "@superset/db/schema";
+import type { BootStamp } from "@superset/shared/sandbox/boot-stamps";
 import { z } from "zod";
-
-/** A phase of the box's boot: `at` is epoch ms on the box's own clock. */
-export interface BootStamp {
-	phase: string;
-	at: number;
-}
 
 /** What host-service said the first time it answered: the current boot's stamps so far. */
 export interface HostAnswer {

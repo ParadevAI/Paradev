@@ -12,6 +12,10 @@
 
 import * as Sentry from "@sentry/core";
 import {
+	type BootStamp,
+	parseBootStamps,
+} from "@superset/shared/sandbox/boot-stamps";
+import {
 	renderSandboxConf,
 	SANDBOX_PATHS,
 	SANDBOX_PORTS,
@@ -379,11 +383,31 @@ export async function provisionSandbox(args: {
 const HOST_READY_TIMEOUT_MS = 60_000;
 const HOST_READY_POLL_MS = 100;
 
+/** The boot's phases only: the lines between the stamps are step output. */
 export class SandboxNotReadyError extends Error {
-	constructor(providerSandboxId: string) {
-		super(`host-service in ${providerSandboxId} did not answer in time`);
+	constructor(providerSandboxId: string, bootStamps: BootStamp[] | null) {
+		const start = bootStamps?.[0]?.at ?? 0;
+		const reached = bootStamps
+			? bootStamps
+					.map((stamp) => `${stamp.phase} +${stamp.at - start}ms`)
+					.join(", ") || "no phase"
+			: "an unreadable boot log";
+		super(
+			`host-service in ${providerSandboxId} did not answer in time; the boot reached ${reached}`,
+		);
 		this.name = "SandboxNotReadyError";
 	}
+}
+
+async function readBoxBootStamps(name: string): Promise<BootStamp[] | null> {
+	const sandbox = await getSandbox(name);
+	const log = await sandbox
+		?.currentSession()
+		.readFileToBuffer(
+			{ path: SANDBOX_PATHS.bootLog },
+			{ signal: AbortSignal.timeout(10_000) },
+		);
+	return log ? parseBootStamps(log.toString("utf8")) : null;
 }
 
 async function waitForHostService(
@@ -404,7 +428,10 @@ async function waitForHostService(
 		}
 		await new Promise((resolve) => setTimeout(resolve, HOST_READY_POLL_MS));
 	}
-	throw new SandboxNotReadyError(providerSandboxId);
+	throw new SandboxNotReadyError(
+		providerSandboxId,
+		await readBoxBootStamps(providerSandboxId).catch(() => null),
+	);
 }
 
 /**
