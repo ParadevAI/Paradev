@@ -23,6 +23,7 @@ import {
 	runBuildCommand,
 	snapshotBuildBox,
 } from "../vercel";
+import { isProductionDeployment } from "./deployment";
 import {
 	type BuildCheckout,
 	checkoutScript,
@@ -266,19 +267,36 @@ export async function pruneGoldens(args: {
 	environmentId: string;
 	activeRef: string;
 }): Promise<void> {
-	const stale = goldensToDelete(
-		await finishedBuilds(args.environmentId),
-		args.activeRef,
+	await deleteGoldens(
+		goldensToDelete(await finishedBuilds(args.environmentId), args.activeRef),
 	);
+}
+
+/**
+ * The one place a build's golden is deleted. Only production deletes: a
+ * preview shares production's sandboxes, so it logs what it would delete.
+ */
+export async function deleteGoldens(
+	builds: ReadonlyArray<{ id: string; goldenRef: string | null }>,
+): Promise<void> {
+	const goldens = builds.flatMap((build) =>
+		build.goldenRef ? [{ id: build.id, goldenRef: build.goldenRef }] : [],
+	);
+	if (goldens.length === 0) return;
+	if (!isProductionDeployment()) {
+		console.log(
+			`[environment-build] not a production deployment: would delete ${goldens.map((golden) => golden.goldenRef).join(", ")}`,
+		);
+		return;
+	}
 	const deleted: string[] = [];
-	for (const build of stale) {
-		if (!build.goldenRef) continue;
+	for (const golden of goldens) {
 		try {
-			await deleteSandbox(build.goldenRef);
-			deleted.push(build.id);
+			await deleteSandbox(golden.goldenRef);
+			deleted.push(golden.id);
 		} catch (error) {
 			console.error(
-				`[environment-build] could not delete old golden ${build.goldenRef}`,
+				`[environment-build] could not delete old golden ${golden.goldenRef}`,
 				error,
 			);
 		}

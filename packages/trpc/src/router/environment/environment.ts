@@ -37,7 +37,10 @@ import {
 	activateGolden,
 	type BuildRefusalReason,
 	BuildRefused,
+	deleteGoldens,
+	finishedBuilds,
 	isStale,
+	keptGoldenRefs,
 	pruneGoldens,
 	startEnvironmentBuild,
 } from "../../lib/sandbox/environment-build";
@@ -295,8 +298,15 @@ function buildRefusalError(error: BuildRefused) {
 	return userError({ ...BUILD_REFUSALS[error.reason], message: error.message });
 }
 
-/** What a client sees of a build; a running build whose job died reads as failed. */
-function toBuildView(build: SelectEnvironmentBuild, activeSourceRef: string) {
+/**
+ * What a client sees of a build; a running build whose job died reads as
+ * failed. Only a kept golden (see `keptGoldenRefs`) is restorable.
+ */
+function toBuildView(
+	build: SelectEnvironmentBuild,
+	activeSourceRef: string,
+	kept: ReadonlySet<string>,
+) {
 	const stale = isStale(build);
 	return {
 		id: build.id,
@@ -311,7 +321,7 @@ function toBuildView(build: SelectEnvironmentBuild, activeSourceRef: string) {
 		restorable:
 			build.status === "succeeded" &&
 			build.goldenRef !== null &&
-			build.goldenDeletedAt === null &&
+			kept.has(build.goldenRef) &&
 			build.goldenRef !== activeSourceRef,
 	};
 }
@@ -780,7 +790,7 @@ export const environmentRouter = {
 					environmentId: environment.id,
 					trigger: "manual",
 				});
-				return toBuildView(build, environment.sourceRef);
+				return toBuildView(build, environment.sourceRef, new Set());
 			} catch (error) {
 				if (error instanceof BuildRefused) throw buildRefusalError(error);
 				throw error;
@@ -820,9 +830,12 @@ export const environmentRouter = {
 				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
 				.limit(limit + 1);
 			const page = rows.slice(0, limit);
+			const kept = keptGoldenRefs(await finishedBuilds(environment.id));
 			const last = page.at(-1);
 			return {
-				builds: page.map((build) => toBuildView(build, environment.sourceRef)),
+				builds: page.map((build) =>
+					toBuildView(build, environment.sourceRef, kept),
+				),
 				nextCursor:
 					rows.length > limit && last ? encodeBuildCursor(last) : null,
 			};
@@ -846,11 +859,12 @@ export const environmentRouter = {
 				),
 			});
 			const goldenRef = build?.goldenRef;
+			const kept = keptGoldenRefs(await finishedBuilds(environment.id));
 			if (
 				!build ||
 				build.status !== "succeeded" ||
 				!goldenRef ||
-				build.goldenDeletedAt
+				!kept.has(goldenRef)
 			) {
 				throw userError({
 					code: "PRECONDITION_FAILED",
@@ -875,7 +889,7 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.changedDuringRestore",
 				});
 			}
-			return toBuildView(build, restored.sourceRef);
+			return toBuildView(build, restored.sourceRef, kept);
 		}),
 
 	update: personProcedure
@@ -1007,34 +1021,20 @@ export const environmentRouter = {
 			if (archived?.sourceKind === "fork") {
 				await deleteSandbox(archived.sourceRef);
 			}
-			const kept = await db
-				.select({
-					id: environmentBuilds.id,
-					goldenRef: environmentBuilds.goldenRef,
-				})
-				.from(environmentBuilds)
-				.where(
-					and(
-						eq(environmentBuilds.environmentId, environment.id),
-						isNull(environmentBuilds.goldenDeletedAt),
-					),
-				);
-			for (const build of kept) {
-				if (!build.goldenRef || build.goldenRef === archived?.sourceRef)
-					continue;
-				await deleteSandbox(build.goldenRef);
-			}
-			if (kept.length) {
+			await deleteGoldens(
 				await db
-					.update(environmentBuilds)
-					.set({ goldenDeletedAt: new Date() })
+					.select({
+						id: environmentBuilds.id,
+						goldenRef: environmentBuilds.goldenRef,
+					})
+					.from(environmentBuilds)
 					.where(
-						inArray(
-							environmentBuilds.id,
-							kept.map((build) => build.id),
+						and(
+							eq(environmentBuilds.environmentId, environment.id),
+							isNull(environmentBuilds.goldenDeletedAt),
 						),
-					);
-			}
+					),
+			);
 			return { archived: true };
 		}),
 } satisfies TRPCRouterRecord;

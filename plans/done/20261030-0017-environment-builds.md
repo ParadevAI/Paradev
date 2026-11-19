@@ -82,6 +82,7 @@ None blocking. Reviewers should check decision D3 (time budget) in the Decision 
   Date/Author: 2026-10-29, Satya.
 
 - D7. Decision: keep the last five successful goldens per environment. "Restore" makes an older one active again with no build. Older goldens are deleted, snapshots included, after each successful build; archiving an environment deletes all of them.
+  - 2026-11-19, revised to match rule 2 of the sandbox lifecycle page: keep the 3 newest (`KEPT_GOLDENS`), and Restore picks only from those. Only a production deployment (`VERCEL_ENV=production`) deletes a golden; a preview or local build logs what it would delete, because previews share production's sandboxes.
   Rationale: the user wants Cursor's "Environment history" with a restore button. It also settles SUPER-2461 (goldens never cleaned up) with an explicit rule.
   Date/Author: 2026-10-30, Satya.
 

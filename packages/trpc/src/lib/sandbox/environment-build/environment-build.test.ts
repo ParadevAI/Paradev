@@ -6,6 +6,7 @@ import * as credentials from "../credentials";
 import * as repoHooks from "../repo-hooks";
 import * as repositories from "../repositories";
 import * as vercel from "../vercel";
+import * as deployment from "./deployment";
 import * as store from "./store";
 
 const ENVIRONMENT_ID = "00000000-0000-0000-0000-0000000000e1";
@@ -52,6 +53,8 @@ let swapAllowed: boolean;
 let install: vercel.BuildCommandResult;
 let installCommands: string[] | null;
 let afterInstall: () => void;
+let production: boolean;
+let deleteFails: Set<string>;
 
 const ok = (output = ""): vercel.BuildCommandResult => ({
 	exitCode: 0,
@@ -103,6 +106,7 @@ stub(vercel, {
 		calls.push("snapshot");
 	},
 	deleteSandbox: async (name: string) => {
+		if (deleteFails.has(name)) throw new Error(`could not delete ${name}`);
 		calls.push(`remove:${name}`);
 	},
 });
@@ -132,6 +136,8 @@ stub(credentials, {
 	}),
 });
 
+stub(deployment, { isProductionDeployment: () => production });
+
 const { rebuildEnvironment } = await import("./environment-build");
 
 beforeEach(() => {
@@ -142,6 +148,8 @@ beforeEach(() => {
 	install = ok();
 	installCommands = ["bun install"];
 	afterInstall = () => {};
+	production = true;
+	deleteFails = new Set();
 });
 
 afterEach(() => {
@@ -156,7 +164,6 @@ describe("rebuildEnvironment", () => {
 			"checkout",
 			"install:/workspace",
 			"snapshot",
-			"marked:",
 		]);
 		expect(build).toMatchObject({
 			status: "succeeded",
@@ -223,11 +230,35 @@ describe("rebuildEnvironment", () => {
 		expect(calls).toEqual([]);
 	});
 
-	test("deletes goldens past the newest five once the new one is active", async () => {
-		history = ["g5", "g4", "g3", "g2", "g1"].map((goldenRef, index) =>
-			makeBuild({ id: `old-${index}`, status: "succeeded", goldenRef }),
-		);
-		await rebuildEnvironment({ buildId: BUILD_ID });
-		expect(calls.slice(-2)).toEqual(["remove:g1", "marked:old-4"]);
+	describe("old goldens", () => {
+		beforeEach(() => {
+			history = ["g3", "g2", "g1"].map((goldenRef, index) =>
+				makeBuild({ id: `old-${index}`, status: "succeeded", goldenRef }),
+			);
+		});
+
+		test("keeps three goldens", async () => {
+			history = history.slice(0, 2);
+			await rebuildEnvironment({ buildId: BUILD_ID });
+			expect(calls.some((call) => call.startsWith("remove:g"))).toBe(false);
+		});
+
+		test("deletes the fourth once the new one is active", async () => {
+			await rebuildEnvironment({ buildId: BUILD_ID });
+			expect(calls.slice(-2)).toEqual(["remove:g1", "marked:old-2"]);
+		});
+
+		test("a failed delete is not marked and does not fail the build", async () => {
+			deleteFails = new Set(["g1"]);
+			expect(await rebuildEnvironment({ buildId: BUILD_ID })).toBe("succeeded");
+			expect(calls.at(-1)).toBe("marked:");
+		});
+
+		test("a non-production build deletes nothing", async () => {
+			production = false;
+			expect(await rebuildEnvironment({ buildId: BUILD_ID })).toBe("succeeded");
+			expect(calls.some((call) => call.startsWith("remove:g"))).toBe(false);
+			expect(calls.some((call) => call.startsWith("marked"))).toBe(false);
+		});
 	});
 });

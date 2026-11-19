@@ -5,7 +5,8 @@ import {
 	sandboxRepositoryPath,
 } from "@superset/shared/sandbox/contract";
 
-const KEPT_GOLDENS = 5;
+/** Goldens each environment keeps: restore picks from these. */
+export const KEPT_GOLDENS = 3;
 export const STALE_BUILD_MS = 10 * 60 * 1000;
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 
@@ -55,21 +56,36 @@ export function isStale(build: {
 	);
 }
 
-/** Kept goldens past the newest five, never the active one. Builds newest first. */
-export function goldensToDelete<
-	T extends {
-		status: EnvironmentBuildStatus;
-		goldenRef: string | null;
-		goldenDeletedAt: Date | null;
-	},
->(builds: readonly T[], activeRef: string): T[] {
-	const kept = builds.filter(
+type GoldenBuild = {
+	status: EnvironmentBuildStatus;
+	goldenRef: string | null;
+	goldenDeletedAt: Date | null;
+};
+
+function undeletedGoldens<T extends GoldenBuild>(builds: readonly T[]): T[] {
+	return builds.filter(
 		(build) =>
 			build.status === "succeeded" &&
 			build.goldenRef !== null &&
 			build.goldenDeletedAt === null,
 	);
-	return kept
+}
+
+/** The newest `KEPT_GOLDENS` goldens. Builds newest first. */
+export function keptGoldenRefs(builds: readonly GoldenBuild[]): Set<string> {
+	return new Set(
+		undeletedGoldens(builds)
+			.slice(0, KEPT_GOLDENS)
+			.flatMap((build) => (build.goldenRef ? [build.goldenRef] : [])),
+	);
+}
+
+/** Goldens past the newest `KEPT_GOLDENS`, never the active one. Builds newest first. */
+export function goldensToDelete<T extends GoldenBuild>(
+	builds: readonly T[],
+	activeRef: string,
+): T[] {
+	return undeletedGoldens(builds)
 		.slice(KEPT_GOLDENS)
 		.filter((build) => build.goldenRef !== activeRef);
 }

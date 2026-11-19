@@ -5,6 +5,7 @@ import {
 	dailyBuildsPaused,
 	goldensToDelete,
 	isStale,
+	keptGoldenRefs,
 	removedCheckoutPaths,
 	STALE_BUILD_MS,
 } from "./policy";
@@ -26,33 +27,36 @@ describe("goldensToDelete", () => {
 		goldenDeletedAt: null,
 	});
 
-	test("keeps the newest five and deletes the rest", () => {
-		const builds = ["g7", "g6", "g5", "g4", "g3", "g2", "g1"].map(built);
-		expect(goldensToDelete(builds, "g7").map((b) => b.goldenRef)).toEqual([
-			"g2",
-			"g1",
-		]);
-	});
-
 	test("never deletes the active golden, even when it is old", () => {
-		const builds = ["g6", "g5", "g4", "g3", "g2", "g1"].map(built);
+		const builds = ["g4", "g3", "g2", "g1"].map(built);
 		expect(goldensToDelete(builds, "g1")).toEqual([]);
 	});
 
-	test("failed and already deleted builds do not count toward the five", () => {
+	test("failed and already deleted builds do not count toward the three", () => {
 		const builds = [
-			built("g6"),
-			{ status: "failed" as const, goldenRef: null, goldenDeletedAt: null },
-			built("g5"),
-			{ ...built("g0"), goldenDeletedAt: new Date(0) },
 			built("g4"),
+			{ status: "failed" as const, goldenRef: null, goldenDeletedAt: null },
 			built("g3"),
+			{ ...built("g0"), goldenDeletedAt: new Date(0) },
 			built("g2"),
 			built("g1"),
 		];
-		expect(goldensToDelete(builds, "g6").map((b) => b.goldenRef)).toEqual([
+		expect(goldensToDelete(builds, "g4").map((b) => b.goldenRef)).toEqual([
 			"g1",
 		]);
+	});
+});
+
+describe("keptGoldenRefs", () => {
+	test("restore picks from the three newest goldens only", () => {
+		const built = (goldenRef: string) => ({
+			status: "succeeded" as const,
+			goldenRef,
+			goldenDeletedAt: null,
+		});
+		expect(keptGoldenRefs(["g4", "g3", "g2", "g1"].map(built))).toEqual(
+			new Set(["g4", "g3", "g2"]),
+		);
 	});
 });
 
