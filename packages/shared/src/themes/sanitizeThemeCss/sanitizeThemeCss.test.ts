@@ -1,4 +1,7 @@
 import { describe, expect, it } from "bun:test";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { MAX_THEME_CSS_LENGTH, sanitizeThemeCss } from "./sanitizeThemeCss";
 
 describe("sanitizeThemeCss", () => {
@@ -89,4 +92,20 @@ it("bounds output expanded by custom property namespacing", () => {
 	const output = sanitizeThemeCss(css);
 	expect(output).toBe("");
 	expect(sanitizeThemeCss(output)).toBe(output);
+});
+
+it("runs from a Bun bundle, as in the compiled CLI", async () => {
+	const outdir = await mkdtemp(join(tmpdir(), "sanitize-theme-css-"));
+	try {
+		const build = await Bun.build({
+			entrypoints: [join(import.meta.dir, "sanitizeThemeCss.ts")],
+			target: "bun",
+			outdir,
+		});
+		expect(build.success).toBe(true);
+		const bundled = await import(join(outdir, "sanitizeThemeCss.js"));
+		expect(bundled.sanitizeThemeCss("a { color: red; }")).toBe("a{color:red}");
+	} finally {
+		await rm(outdir, { recursive: true, force: true });
+	}
 });
