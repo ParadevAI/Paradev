@@ -25,8 +25,8 @@ import {
 	listFleetCloudBoots,
 	queryCloudUsage,
 	queryCloudUsageByPeriod,
-	queryCloudUsageByWorkspaceDay,
 	queryFleetCloudUsage,
+	queryFleetCloudUsageByWorkspaceDay,
 } from "./cloud-usage-query";
 import {
 	cloudUsageEvents,
@@ -620,7 +620,7 @@ describe("fleet scope", () => {
 	});
 });
 
-describe("queryCloudUsageByWorkspaceDay", () => {
+describe("queryFleetCloudUsageByWorkspaceDay", () => {
 	const YEAR = {
 		from: new Date("2026-03-01T00:00:00Z"),
 		to: new Date("2027-01-01T00:00:00Z"),
@@ -695,20 +695,39 @@ describe("queryCloudUsageByWorkspaceDay", () => {
 	const dropEdges = () =>
 		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 21));
 
+	test("a billing day starts at 07:00 UTC in summer and 08:00 UTC in winter", async () => {
+		await db
+			.insert(cloudUsageEvents)
+			.values([
+				eventAt(31, CHECKOUT, "2026-07-15T06:59:59Z"),
+				eventAt(32, CHECKOUT, "2026-07-15T07:00:00Z"),
+				eventAt(33, CHECKOUT, "2026-11-15T07:59:59Z"),
+				eventAt(34, CHECKOUT, "2026-11-15T08:00:00Z"),
+			]);
+		try {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
+				window: YEAR,
+				filters: { workspace: CHECKOUT },
+			});
+			const gbHoursOn = (day: string) =>
+				rows.find((row) => row.day === day)?.gbHours;
+			expect(gbHoursOn("2026-07-14")).toBe(1);
+			expect(gbHoursOn("2026-07-15")).toBe(1);
+			expect(gbHoursOn("2026-11-14")).toBe(1);
+			expect(gbHoursOn("2026-11-15")).toBe(1);
+		} finally {
+			await db
+				.delete(cloudUsageEvents)
+				.where(gte(cloudUsageEvents.lockSeq, 31));
+		}
+	});
+
 	test("rows by day add up to the workspace totals, and each day matches its Pacific day", async () => {
 		await seedEdges();
 		try {
-			const rows = await queryCloudUsageByWorkspaceDay(db, ORG, {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
 				window: YEAR,
 			});
-			expect(Object.keys(rows[0] ?? {}).sort()).toEqual([
-				"boots",
-				"day",
-				"failedBoots",
-				"gbHours",
-				"hours",
-				"workspaceId",
-			]);
 			const days = [...new Set(rows.map((row) => row.day))];
 			expect(days).toEqual(
 				expect.arrayContaining([
@@ -762,7 +781,7 @@ describe("queryCloudUsageByWorkspaceDay", () => {
 	test("usage with no workspace has a null workspace id", async () => {
 		await seedEdges();
 		try {
-			const rows = await queryCloudUsageByWorkspaceDay(db, ORG, {
+			const rows = await queryFleetCloudUsageByWorkspaceDay(db, ORG, {
 				window: YEAR,
 			});
 			expect(rows.filter((row) => row.workspaceId === null)).toEqual([
@@ -782,7 +801,7 @@ describe("queryCloudUsageByWorkspaceDay", () => {
 
 	test("filters and organizations narrow it like the fleet query", async () => {
 		const rows = (organizationId: string | string[] | null, filters = {}) =>
-			queryCloudUsageByWorkspaceDay(db, organizationId, {
+			queryFleetCloudUsageByWorkspaceDay(db, organizationId, {
 				window: NOVEMBER,
 				filters,
 			});

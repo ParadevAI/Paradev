@@ -750,20 +750,11 @@ export function queryFleetCloudUsage(
  * `queryFleetCloudUsage` grouped by workspace and Pacific billing day in one query: a row for each
  * pair with a fact, no limit, so the caller windows it. Staff only, like `queryFleetCloudUsage`.
  */
-export async function queryCloudUsageByWorkspaceDay(
+export async function queryFleetCloudUsageByWorkspaceDay(
 	db: Db,
 	organizationId: string | string[] | null,
 	options: { window: CloudUsageWindow; filters?: CloudUsageFilters },
-): Promise<
-	Array<{
-		workspaceId: string | null;
-		day: string;
-		boots: number;
-		failedBoots: number;
-		hours: number;
-		gbHours: number;
-	}>
-> {
+) {
 	const facts = usageFacts(
 		db,
 		{ organizationId },
@@ -787,10 +778,11 @@ export async function queryCloudUsageByWorkspaceDay(
 		.groupBy(facts.key, facts.secondKey)
 		.orderBy(asc(facts.key), asc(facts.secondKey));
 	return rows.map(({ workspaceId, day, ...row }) => {
+		if (day === null) throw new Error("A usage fact has no billing day.");
 		const { boots, failedBoots, hours, gbHours } = toMetrics(row, null);
 		return {
 			workspaceId,
-			day: day ?? "",
+			day,
 			boots,
 			failedBoots,
 			hours,
