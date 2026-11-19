@@ -126,40 +126,47 @@ export interface CloudBootCursor {
 	id: string;
 }
 
-/**
- * Autumn resets the GB-minute balance monthly on a fixed day of the month, on the last day of a
- * shorter month, at the time of day of `resetsAt`. `previousResetAt` is the reset that opened the
- * period, when the caller knows it: it settles the day when `resetsAt` is a short month's last day.
- */
+/** Autumn resets the GB-minute balance monthly on `day`, or a shorter month's last day, at the time of day of `resetsAt`. */
 export interface CloudBillingAnchor {
 	resetsAt: Date;
-	previousResetAt: Date | null;
+	day: number;
 }
 
 function lastDayOfMonth(year: number, month: number): number {
 	return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
-function anchorDay({ resetsAt, previousResetAt }: CloudBillingAnchor): number {
-	const day = resetsAt.getUTCDate();
-	const isMonthEnd =
-		day === lastDayOfMonth(resetsAt.getUTCFullYear(), resetsAt.getUTCMonth());
-	return isMonthEnd && previousResetAt
-		? Math.max(day, previousResetAt.getUTCDate())
-		: day;
+function monthsAfter(date: Date, months: number, day: number): Date {
+	const moved = new Date(date);
+	moved.setUTCDate(1);
+	moved.setUTCMonth(moved.getUTCMonth() + months);
+	moved.setUTCDate(
+		Math.min(day, lastDayOfMonth(moved.getUTCFullYear(), moved.getUTCMonth())),
+	);
+	return moved;
 }
 
-function resetMonthsBefore(anchor: CloudBillingAnchor, months: number): Date {
-	const reset = new Date(anchor.resetsAt);
-	reset.setUTCDate(1);
-	reset.setUTCMonth(reset.getUTCMonth() - months);
-	reset.setUTCDate(
-		Math.min(
-			anchorDay(anchor),
-			lastDayOfMonth(reset.getUTCFullYear(), reset.getUTCMonth()),
-		),
-	);
-	return reset;
+/**
+ * Autumn anchors the monthly reset on the subscription's start, to the millisecond. A start that
+ * does not land on `resetsAt` (a plan change, a trial) says nothing, so `resetsAt`'s day is used.
+ */
+export function cloudBillingAnchor(
+	resetsAt: Date,
+	startedAt: Date | null,
+): CloudBillingAnchor {
+	const months = startedAt
+		? (resetsAt.getUTCFullYear() - startedAt.getUTCFullYear()) * 12 +
+			resetsAt.getUTCMonth() -
+			startedAt.getUTCMonth()
+		: 0;
+	const proven =
+		startedAt !== null &&
+		monthsAfter(startedAt, months, startedAt.getUTCDate()).getTime() ===
+			resetsAt.getTime();
+	return {
+		resetsAt,
+		day: proven ? startedAt.getUTCDate() : resetsAt.getUTCDate(),
+	};
 }
 
 /** Period 0 is the open one, ending at `resetsAt`; period n ends n resets earlier. */
@@ -168,8 +175,8 @@ export function cloudBillingPeriod(
 	index: number,
 ): CloudUsageWindow {
 	return {
-		from: resetMonthsBefore(anchor, index + 1),
-		to: resetMonthsBefore(anchor, index),
+		from: monthsAfter(anchor.resetsAt, -(index + 1), anchor.day),
+		to: monthsAfter(anchor.resetsAt, -index, anchor.day),
 	};
 }
 

@@ -1,6 +1,5 @@
 import { billingUsesAutumn } from "@superset/auth/autumn";
 import {
-	type CloudUsage,
 	listRatePerGbHour,
 	type OrganizationBilling,
 	organizationBilling,
@@ -10,6 +9,7 @@ import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
 	type CloudUsageScope,
+	cloudBillingAnchor,
 	cloudBillingPeriod,
 	cloudBillingPeriodIndex,
 	listCloudBoots,
@@ -48,7 +48,10 @@ export interface CloudDeps {
 	/** Null when billing is not Autumn. */
 	billing: (
 		organizationId: string,
-	) => Promise<Pick<OrganizationBilling, "tier" | "cloudUsage"> | null>;
+	) => Promise<Pick<
+		OrganizationBilling,
+		"tier" | "cloudUsage" | "startedAt"
+	> | null>;
 	/** For an organization with no paid plan; null when the price cannot be known. */
 	listRatePerGbHour: () => Promise<number | null>;
 	flags: Parameters<typeof organizationFlagEnabled>[0];
@@ -61,12 +64,6 @@ const PRESET_MS: Record<RangePreset, number> = {
 	"30d": 30 * 24 * HOUR_MS,
 	"90d": 90 * 24 * HOUR_MS,
 };
-
-function anchorOf(cloudUsage: CloudUsage | null): CloudBillingAnchor | null {
-	return cloudUsage?.resetsAt
-		? { resetsAt: new Date(cloudUsage.resetsAt), previousResetAt: null }
-		: null;
-}
 
 function noAllowance(reason: "closed_period" | "owners_and_admins_only") {
 	return {
@@ -192,7 +189,13 @@ export function cloudRouterWith(deps: CloudDeps) {
 		const scope: CloudUsageScope = isAdmin
 			? { organizationId }
 			: { organizationId, userId: ctx.session.user.id };
-		return next({ ctx: { scope, isAdmin, cloudUsage, rate } });
+		const anchor = cloudUsage?.resetsAt
+			? cloudBillingAnchor(
+					new Date(cloudUsage.resetsAt),
+					billing?.startedAt ? new Date(billing.startedAt) : null,
+				)
+			: null;
+		return next({ ctx: { scope, isAdmin, cloudUsage, rate, anchor } });
 	});
 
 	return {
@@ -216,7 +219,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						input,
 						usageKeysetSchemas[keysetSort],
 					);
-					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
+					const window = windowFor(input.range, ctx.anchor);
 					const { nextCursor, ...result } = await queryCloudUsage(
 						deps.db,
 						ctx.scope,
@@ -267,7 +270,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.output(cloudBootsOutputSchema)
 				.query(async ({ ctx, input }) => {
 					const keyset = readCursor(input, bootKeysetSchema);
-					const window = windowFor(input.range, anchorOf(ctx.cloudUsage));
+					const window = windowFor(input.range, ctx.anchor);
 					const { nextCursor, ...result } = await listCloudBoots(
 						deps.db,
 						ctx.scope,
@@ -305,8 +308,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudPeriodsInputSchema)
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
-					const { cloudUsage } = ctx;
-					const anchor = anchorOf(cloudUsage);
+					const { cloudUsage, anchor } = ctx;
 					if (!cloudUsage || !anchor) return { items: [], nextCursor: null };
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
