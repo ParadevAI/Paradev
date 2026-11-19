@@ -4863,6 +4863,15 @@ msgstr "Cloud usage"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Cloud usage is not enabled for this organization."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Cloud usage is used up for this period."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 
@@ -23154,15 +23163,6 @@ msgstr "Your organization has reached its environment limit ({0}). Archive an en
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Your organization has used all its cloud usage for this period."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

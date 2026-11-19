@@ -4863,6 +4863,15 @@ msgstr "Využití cloudu"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Využití cloudu není pro tuto organizaci zapnuto."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Cloudové využití je pro toto období vyčerpáno."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Vlastník může dokoupit další v Nastavení, Fakturace."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Vlastník může přejít na Team nebo Ultra v Nastavení, Fakturace."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Cloudové využití je pro toto období vyčerpáno. Tento pracovní prostor se zastaví za 10 minut. Vlastník může dokoupit další, aby běžel dál."
 
@@ -23154,15 +23163,6 @@ msgstr "Vaše organizace dosáhla limitu prostředí ({0}). Archivujte některé
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Vaše organizace dosáhla limitu {reachedLimit} prostředí. Jedno archivujte, abyste uvolnili místo."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. Vlastník může dokoupit další v Nastavení, Fakturace."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Vaše organizace v tomto období vyčerpala veškeré využití cloudu. Vlastník může přejít na Team nebo Ultra v Nastavení, Fakturace."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

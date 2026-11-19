@@ -4863,6 +4863,15 @@ msgstr "雲端用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "此組織未啟用雲端用量。"
 
+msgid "Cloud usage is used up for this period."
+msgstr "本週期的雲端用量已用完。"
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "本週期的雲端用量已用完。擁有者可以在設定的帳單中購買更多。"
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "本週期的雲端用量已用完。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "本週期的雲端用量已用完。此工作區將在 10 分鐘後停止。擁有者可以購買更多以讓它繼續執行。"
 
@@ -23154,15 +23163,6 @@ msgstr "你的組織已達到環境數量上限（{0}）。請封存一個環境
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "你的組織已達到 {reachedLimit} 個環境的上限。封存一個環境以騰出空間。"
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "你的組織已用完本週期的全部雲端用量。"
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在設定的帳單中購買更多。"
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "你的組織已用完本週期的全部雲端用量。擁有者可以在設定的帳單中升級到 Team 或 Ultra。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

@@ -4863,11 +4863,20 @@ msgstr "Cloud-Nutzung"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Cloud-Nutzung ist für diese Organisation nicht aktiviert."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Ein Inhaber kann in Einstellungen, Abrechnung mehr kaufen."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Ein Inhaber kann in Einstellungen, Abrechnung zu Team oder Ultra wechseln."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
-msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Dieser Workspace stoppt in 10 Minuten. Ein Owner kann mehr kaufen, damit er weiterläuft."
+msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Dieser Workspace stoppt in 10 Minuten. Ein Inhaber kann mehr kaufen, damit er weiterläuft."
 
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
-msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Dieser Workspace stoppt in 10 Minuten. Ein Owner kann auf Team oder Ultra upgraden, damit er weiterläuft."
+msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Dieser Workspace stoppt in 10 Minuten. Ein Inhaber kann auf Team oder Ultra upgraden, damit er weiterläuft."
 
 msgid "Cloud usage is used up for this period. Workspaces cannot start."
 msgstr "Die Cloud-Nutzung für diesen Zeitraum ist aufgebraucht. Workspaces können nicht starten."
@@ -23154,15 +23163,6 @@ msgstr "Deine Organisation hat ihr Limit für Umgebungen ({0}) erreicht. Archivi
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Ihre Organisation hat ihr Limit von {reachedLimit} Umgebungen erreicht. Archivieren Sie eine, um Platz zu schaffen."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Ihre Organisation hat in diesem Zeitraum ihre gesamte Cloud-Nutzung verbraucht."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Ihre Organisation hat in diesem Zeitraum ihre gesamte Cloud-Nutzung verbraucht. Ein Inhaber kann in Einstellungen, Abrechnung mehr kaufen."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Ihre Organisation hat in diesem Zeitraum ihre gesamte Cloud-Nutzung verbraucht. Ein Inhaber kann in Einstellungen, Abrechnung zu Team oder Ultra wechseln."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

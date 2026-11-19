@@ -4863,6 +4863,15 @@ msgstr "Uso de la nube"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "El uso de la nube no está activado para esta organización."
 
+msgid "Cloud usage is used up for this period."
+msgstr "El uso de la nube de este periodo se ha agotado."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "El uso de la nube de este periodo se ha agotado. Un propietario puede comprar más en Configuración, Facturación."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "El uso de la nube de este periodo se ha agotado. Un propietario puede cambiar a Team o Ultra en Configuración, Facturación."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "El uso de la nube de este periodo se ha agotado. Este espacio de trabajo se detendrá en 10 minutos. Un propietario puede comprar más para que siga funcionando."
 
@@ -23154,15 +23163,6 @@ msgstr "Tu organización alcanzó su límite de entornos ({0}). Archiva un entor
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Tu organización alcanzó su límite de {reachedLimit} entornos. Archiva uno para hacer espacio."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Tu organización ha usado todo su uso en la nube de este periodo."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Un propietario puede comprar más en Configuración, Facturación."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Un propietario puede cambiar a Team o Ultra en Configuración, Facturación."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

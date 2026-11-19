@@ -14,7 +14,7 @@ const COPY: Record<BillingRefusalKey, MessageDescriptor> = {
 	"serverError.cloudWorkspace.cloudNeedsPaidPlan": NOT_INCLUDED,
 	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": NOT_INCLUDED,
 	"serverError.cloudWorkspace.usageLimitReached": msg({
-		message: "Your organization has used all its cloud usage for this period.",
+		message: "Cloud usage is used up for this period.",
 	}),
 	"serverError.environment.notIncluded": msg({
 		message: "Cloud environments are not included in your plan.",

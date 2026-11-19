@@ -4857,6 +4857,15 @@ msgstr "Використання хмари"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Використання хмари не ввімкнено для цієї організації."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Хмарне використання за цей період вичерпано."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Хмарне використання за цей період вичерпано. Власник може докупити ще в розділі Налаштування, Оплата."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Хмарне використання за цей період вичерпано. Власник може перейти на Team або Ultra в розділі Налаштування, Оплата."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Хмарне використання за цей період вичерпано. Цей робочий простір зупиниться через 10 хвилин. Власник може докупити, щоб він працював далі."
 
@@ -23148,15 +23157,6 @@ msgstr "Ваша організація досягла ліміту середо
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Ваша організація досягла ліміту середовищ ({reachedLimit}). Архівуйте одне, щоб звільнити місце."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Ваша організація використала все хмарне використання за цей період."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Ваша організація використала все хмарне використання за цей період. Власник може докупити ще в розділі Налаштування, Оплата."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Ваша організація використала все хмарне використання за цей період. Власник може перейти на Team або Ultra в розділі Налаштування, Оплата."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

@@ -438,13 +438,13 @@ export const serverErrorMessages: Record<
 			? i18n._(
 					msg({
 						message:
-							"Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
+							"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
 					}),
 				)
 			: i18n._(
 					msg({
 						message:
-							"Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing.",
+							"Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
 					}),
 				),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>

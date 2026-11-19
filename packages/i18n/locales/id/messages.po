@@ -4863,6 +4863,15 @@ msgstr "Penggunaan cloud"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Penggunaan cloud tidak diaktifkan untuk organisasi ini."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Penggunaan cloud untuk periode ini sudah habis."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Penggunaan cloud untuk periode ini sudah habis. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Penggunaan cloud untuk periode ini sudah habis. Workspace ini berhenti dalam 10 menit. Pemilik dapat membeli lagi agar tetap berjalan."
 
@@ -23154,15 +23163,6 @@ msgstr "Organisasi Anda telah mencapai batas lingkungan ({0}). Arsipkan satu lin
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Organisasi Anda telah mencapai batas {reachedLimit} environment. Arsipkan satu untuk memberi ruang."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Pemilik dapat membeli lagi di Pengaturan, Penagihan."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Organisasi Anda telah memakai seluruh penggunaan cloud untuk periode ini. Pemilik dapat upgrade ke Team atau Ultra di Pengaturan, Penagihan."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

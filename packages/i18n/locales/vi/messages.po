@@ -4863,6 +4863,15 @@ msgstr "Mức sử dụng đám mây"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Mức sử dụng đám mây chưa được bật cho tổ chức này."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể mua thêm trong Cài đặt, Thanh toán."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể nâng cấp lên Team hoặc Ultra trong Cài đặt, Thanh toán."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Đã dùng hết mức sử dụng đám mây của kỳ này. Workspace này sẽ dừng sau 10 phút. Chủ sở hữu có thể mua thêm để nó tiếp tục chạy."
 
@@ -23154,15 +23163,6 @@ msgstr "Tổ chức của bạn đã đạt giới hạn môi trường ({0}). H
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Tổ chức của bạn đã đạt giới hạn {reachedLimit} environment. Hãy lưu trữ một environment để có chỗ trống."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Tổ chức của bạn đã dùng hết mức sử dụng đám mây của kỳ này."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Tổ chức của bạn đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể mua thêm trong Cài đặt, Thanh toán."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Tổ chức của bạn đã dùng hết mức sử dụng đám mây của kỳ này. Chủ sở hữu có thể nâng cấp lên Team hoặc Ultra trong Cài đặt, Thanh toán."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

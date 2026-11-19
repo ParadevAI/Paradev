@@ -4863,6 +4863,15 @@ msgstr "Cloudgebruik"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Cloudgebruik is niet ingeschakeld voor deze organisatie."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Het cloudgebruik voor deze periode is op."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Het cloudgebruik voor deze periode is op. Een eigenaar kan meer kopen in Instellingen, Facturering."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Het cloudgebruik voor deze periode is op. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Het cloudgebruik voor deze periode is op. Deze workspace stopt over 10 minuten. Een eigenaar kan meer kopen om hem te laten doordraaien."
 
@@ -23154,15 +23163,6 @@ msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archivee
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Je organisatie heeft de limiet van {reachedLimit} omgevingen bereikt. Archiveer er een om ruimte te maken."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Een eigenaar kan meer kopen in Instellingen, Facturering."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Een eigenaar kan overstappen op Team of Ultra in Instellingen, Facturering."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

@@ -91,9 +91,9 @@ export function refusalFor(result: {
 }
 
 const LIMIT_MESSAGES = {
-	buy: "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing.",
+	buy: "Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
 	upgrade:
-		"Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
+		"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
 };
 
 async function refusalError(refusal: Refusal, organizationId: string) {

@@ -4863,6 +4863,15 @@ msgstr "クラウド使用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "この組織ではクラウド使用量が有効になっていません。"
 
+msgid "Cloud usage is used up for this period."
+msgstr "この期間のクラウド使用量を使い切りました。"
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "この期間のクラウド使用量を使い切りました。オーナーは設定の請求から追加購入できます。"
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "この期間のクラウド使用量を使い切りました。オーナーは設定の請求から Team または Ultra にアップグレードできます。"
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "この期間のクラウド使用量を使い切りました。このワークスペースは 10 分後に停止します。オーナーが追加購入すれば実行を続けられます。"
 
@@ -23154,15 +23163,6 @@ msgstr "組織が環境数の上限（{0}）に達しました。環境をアー
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "組織の環境数が上限の {reachedLimit} に達しました。空きを作るには 1 つアーカイブしてください。"
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。"
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。オーナーは設定の請求から追加購入できます。"
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。オーナーは設定の請求から Team または Ultra にアップグレードできます。"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

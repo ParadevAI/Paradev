@@ -4863,6 +4863,15 @@ msgstr "Utilizzo del cloud"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "L’utilizzo del cloud non è attivo per questa organizzazione."
 
+msgid "Cloud usage is used up for this period."
+msgstr "L’utilizzo cloud di questo periodo è esaurito."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "L’utilizzo cloud di questo periodo è esaurito. Un proprietario può acquistarne altro in Impostazioni, Fatturazione."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "L’utilizzo cloud di questo periodo è esaurito. Un proprietario può passare a Team o Ultra in Impostazioni, Fatturazione."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "L’utilizzo cloud di questo periodo è esaurito. Questo spazio di lavoro si fermerà tra 10 minuti. Un proprietario può acquistarne altro per mantenerlo attivo."
 
@@ -23154,15 +23163,6 @@ msgstr "La tua organizzazione ha raggiunto il limite di ambienti ({0}). Archivia
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "La tua organizzazione ha raggiunto il limite di {reachedLimit} ambienti. Archiviane uno per fare spazio."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo. Un proprietario può acquistarne altro in Impostazioni, Fatturazione."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "La tua organizzazione ha usato tutto il suo utilizzo cloud per questo periodo. Un proprietario può passare a Team o Ultra in Impostazioni, Fatturazione."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"

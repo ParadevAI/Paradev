@@ -4863,6 +4863,15 @@ msgstr "Использование облака"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Использование облака не включено для этой организации."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Облачное использование за этот период исчерпано."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Облачное использование за этот период исчерпано. Владелец может докупить ещё в разделе Настройки, Оплата."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Облачное использование за этот период исчерпано. Владелец может перейти на Team или Ultra в разделе Настройки, Оплата."
+
 msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
 msgstr "Облачное использование за этот период исчерпано. Это рабочее пространство остановится через 10 минут. Владелец может докупить, чтобы оно продолжило работать."
 
@@ -23154,15 +23163,6 @@ msgstr "Ваша организация достигла лимита окруж
 
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Ваша организация достигла лимита в {reachedLimit} окружений. Архивируйте одно, чтобы освободить место."
-
-msgid "Your organization has used all its cloud usage for this period."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can buy more in Settings, Billing."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Владелец может докупить ещё в разделе Настройки, Оплата."
-
-msgid "Your organization has used all its cloud usage for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
-msgstr "Ваша организация израсходовала всё облачное использование за этот период. Владелец может перейти на Team или Ultra в разделе Настройки, Оплата."
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
