@@ -11,7 +11,6 @@ import type {
 	WorkspaceRef,
 } from "../types";
 import { type Priced, priced } from "../utils/priced";
-import RECORDED from "./allowances.json";
 
 /**
  * Story data in the router's output shapes, for states the router can return. Each allowance
@@ -360,29 +359,178 @@ const LAST_30_DAYS: Range = {
 	to: new Date(TODAY_START + DAY_MS),
 };
 
-/**
- * Each billing state, recorded from the real billing reader and the router's mapping (a test in
- * packages/auth recomputes each one); the period's usage events are `eventsGbHours`, which can run
- * past what billing counted.
- */
-const STATES = RECORDED as unknown as Record<
-	| "northwind"
-	| "trial"
-	| "prepaid"
-	| "limitReached"
-	| "percentCap"
-	| "notRead"
-	| "unbilled",
+const PERIOD_END = new Date("2026-11-27T00:00:00Z");
+
+/** The open period of each billing state, as the router returns it; `eventsGbHours` can run past what billing counted. */
+const STATES = {
+	northwind: {
+		eventsGbHours: 15200,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: 14,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 2000,
+				totalGbHours: 2000,
+				usedUsd: 120,
+				totalUsd: 120,
+			},
+			extraUsageLimit: { gbHours: 27000, usd: 1620 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	trial: {
+		eventsGbHours: 3100,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 3100,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 186,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	prepaid: {
+		eventsGbHours: 21400,
+		allowance: {
+			includedGbHours: 38000,
+			usedGbHours: 21400,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 5000,
+			usedUsd: 1284,
+			includedUsd: 2280,
+			overageUsd: 0,
+			seats: 38,
+			bought: { usedGbHours: 0, totalGbHours: 5000, usedUsd: 0, totalUsd: 300 },
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 129000, usd: 7740 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	limitReached: {
+		eventsGbHours: 4650,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 4650,
+			overageGbHours: 150,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 279,
+			includedUsd: 270,
+			overageUsd: 9,
+			seats: 9,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: true,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	percentCap: {
+		eventsGbHours: 15200,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: 14,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 2000,
+				totalGbHours: 2000,
+				usedUsd: 120,
+				totalUsd: 120,
+			},
+			extraUsageLimit: null,
+			limitReached: null,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [
+			{ field: "extraUsageLimit", reason: "percent_of_allowance" },
+			{ field: "limitReached", reason: "not_tracked" },
+		],
+	},
+	notRead: {
+		eventsGbHours: 15200,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: null,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: null,
+			limitReached: null,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [
+			{ field: "seats", reason: "not_read" },
+			{ field: "bought", reason: "not_read" },
+			{ field: "freeCredits", reason: "not_read" },
+			{ field: "extraUsageLimit", reason: "not_read" },
+			{ field: "limitReached", reason: "not_read" },
+		],
+	},
+	unbilled: {
+		eventsGbHours: 15800,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: 14,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 2000,
+				totalGbHours: 2000,
+				usedUsd: 120,
+				totalUsd: 120,
+			},
+			extraUsageLimit: { gbHours: 27000, usd: 1620 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+} satisfies Record<
+	string,
 	{
 		eventsGbHours: number;
-		allowance: Omit<NonNullable<CloudPeriod["allowance"]>, "resetsAt"> & {
-			resetsAt: string;
-		};
+		allowance: NonNullable<CloudPeriod["allowance"]>;
 		unavailable: CloudPeriod["unavailable"];
 	}
 >;
 
 export type BillingState = keyof typeof STATES;
+export const BILLING_STATES = Object.keys(STATES) as BillingState[];
 
 const eventsOf = (state: BillingState) => STATES[state].eventsGbHours;
 
@@ -397,14 +545,7 @@ const fleetIn = (state: BillingState, back: number, seeds = NORTHWIND_SEEDS) =>
 
 /** The router's period list for a state, newest first; the earlier periods are closed. A member gets no allowance and their own metrics. */
 function periodList(state: BillingState, member = false): CloudPeriods {
-	const recorded = STATES[state];
-	const current = {
-		allowance: {
-			...recorded.allowance,
-			resetsAt: new Date(recorded.allowance.resetsAt),
-		},
-		unavailable: recorded.unavailable,
-	};
+	const current = STATES[state];
 	const items: CloudPeriod[] = PERIOD_SHARE.map((_, back) => {
 		const range = periodRange(back);
 		const rows = fleetIn(state, back).rows;

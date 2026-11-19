@@ -17,6 +17,11 @@ import {
 	queryCloudUsageByPeriod,
 } from "@superset/db/cloud-usage-query";
 import { organizations } from "@superset/db/schema";
+import {
+	cloudBootsOutputSchema,
+	cloudPeriodsOutputSchema,
+	cloudUsageOutputSchema,
+} from "@superset/shared/cloud-usage-api";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -32,11 +37,8 @@ import {
 	type CloudListFilters,
 	type CloudRange,
 	cloudBootsInputSchema,
-	cloudBootsOutputSchema,
 	cloudPeriodsInputSchema,
-	cloudPeriodsOutputSchema,
 	cloudUsageInputSchema,
-	cloudUsageOutputSchema,
 	type RangePreset,
 	type UsageKeyset,
 	usageKeysetSchemas,

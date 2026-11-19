@@ -11,7 +11,7 @@ export {
 	cloudWorkspaceFailureReasonValues,
 	cloudWorkspaceStatusEnum,
 	cloudWorkspaceStatusValues,
-} from "@superset/shared/cloud-usage-api";
+} from "@superset/shared/cloud-workspace-status";
 
 export const taskStatusEnumValues = [
 	"backlog",
