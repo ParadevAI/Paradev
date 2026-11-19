@@ -76,3 +76,10 @@ test("a session refused again within a minute goes back to the composer", () => 
 	advance(60_000);
 	expect(hand([second])).toBe(true);
 });
+
+test("switching to another chat does not keep it held", () => {
+	const { view, hand } = setup();
+	hand([first]);
+	view.rerender({ sessionId: "chat-b", checking: false, checkedAt: 60 });
+	expect(view.result.current.holding).toBe(false);
+});

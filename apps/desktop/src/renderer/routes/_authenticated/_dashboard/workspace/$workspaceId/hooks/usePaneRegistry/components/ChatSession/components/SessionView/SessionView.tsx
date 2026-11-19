@@ -17,6 +17,7 @@ import type {
 	UserContent,
 	UserMessage,
 } from "@superset/chat/protocol";
+import { notRunningSessionId } from "@superset/chat/protocol";
 import {
 	useApprovals,
 	useChatSession,
@@ -91,7 +92,6 @@ import { useStoredHistory } from "./hooks/useStoredHistory";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
-import { isSessionNotRunning } from "./utils/isSessionNotRunning";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 import { subagentsInTurn } from "./utils/subagentsInTurn";
@@ -226,9 +226,11 @@ export function SessionView({
 		[draftKey],
 	);
 	const sentDrafts = useRef(new Map<string, ComposerDraft>());
+	const handedOverDrafts = useRef(new Map<string, ComposerDraft>());
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>
-			sentDrafts.current.get(entry.clientId) ?? {
+			sentDrafts.current.get(entry.clientId) ??
+			handedOverDrafts.current.get(JSON.stringify(entry.content)) ?? {
 				segments: [{ type: "text", text: contentText(entry.content) }],
 				attachments: [],
 			},
@@ -237,7 +239,9 @@ export function SessionView({
 	useEffect(() => {
 		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
-		const gone = failed.filter((entry) => isSessionNotRunning(entry.lastError));
+		const gone = failed.filter(
+			(entry) => notRunningSessionId(entry.lastError) !== null,
+		);
 		const handedOver =
 			gone.length > 0 &&
 			onSessionGone?.(gone.map((entry) => entry.content)) === true;
@@ -246,7 +250,13 @@ export function SessionView({
 			: failed;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			if (restored.includes(entry)) restoreDraft(draftOf(entry), draftKey);
+			const contentKey = JSON.stringify(entry.content);
+			if (restored.includes(entry)) {
+				restoreDraft(draftOf(entry), draftKey);
+				handedOverDrafts.current.delete(contentKey);
+			} else {
+				handedOverDrafts.current.set(contentKey, draftOf(entry));
+			}
 			sentDrafts.current.delete(entry.clientId);
 		}
 		if (restored.length === 0) return;

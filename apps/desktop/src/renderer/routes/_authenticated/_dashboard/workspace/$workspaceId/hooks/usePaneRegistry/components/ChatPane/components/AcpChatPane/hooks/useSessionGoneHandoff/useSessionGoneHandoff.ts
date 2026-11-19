@@ -58,10 +58,12 @@ export function useSessionGoneHandoff({
 	}, [hold, toQueue, onQueuePrompt]);
 
 	useEffect(() => {
-		if (!hold || toQueue.length > 0 || checking || checkedAt < hold.at) return;
+		if (!hold || toQueue.length > 0) return;
+		const answered = !checking && checkedAt >= hold.at;
+		if (hold.sessionId === sessionId && !answered) return;
 		holdRef.current = null;
 		setHold(null);
-	}, [hold, toQueue, checking, checkedAt]);
+	}, [hold, toQueue, checking, checkedAt, sessionId]);
 
-	return { holding: hold !== null, onSessionGone };
+	return { holding: hold?.sessionId === sessionId, onSessionGone };
 }
