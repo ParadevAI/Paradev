@@ -208,7 +208,7 @@
 		"resend": "6.18.0",
 		"semver": "7.7.4",
 		"superjson": "2.2.6",
-		"undici": "7.30.0",
+		"undici": "7.30.1",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
