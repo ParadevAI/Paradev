@@ -221,7 +221,7 @@ describe("a failed create of a workspace without a drive", () => {
 	test("hands its box to the retried teardown under the name it had, and deletes nothing inline", async () => {
 		await provisionCloudWorkspace({ cloudWorkspaceId: "ws_1" });
 		expect(tornDown).toEqual([
-			{ providerSandboxId: "ws-box", driveName: null },
+			{ providerSandboxId: "ws-box", driveName: null, keepDrive: true },
 		]);
 		expect(deleted).toEqual([]);
 	});

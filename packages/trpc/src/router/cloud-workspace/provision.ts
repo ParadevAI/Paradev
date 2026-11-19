@@ -175,8 +175,6 @@ async function provision(
 				);
 	let bootId: string | null = null;
 	let driveName = row.driveName;
-	// Only a drive this provision forked may go with a failed box; an unarchived workspace's is its work.
-	let forkedDrive = false;
 	// Another delivery on the same box name, or a wake, may have brought the row up: only this job's own row is its to fail.
 	let madeAwake = false;
 	try {
@@ -210,10 +208,7 @@ async function provision(
 			span.setAttribute("boot.id", bootId);
 		}
 		driveName = claimedDrive;
-		if (driveName) {
-			forkedDrive =
-				(await claimWorkspaceDrive(row, driveName, environment)) === "forked";
-		}
+		if (driveName) await claimWorkspaceDrive(row, driveName, environment);
 		const sandbox = await Sentry.startSpan(
 			{ name: "create", op: "sandbox" },
 			() =>
@@ -375,17 +370,14 @@ async function provision(
 		const keepForDiagnosis =
 			error instanceof SandboxNotReadyError ||
 			error instanceof SandboxDriveRefusedError;
-		// A box that goes is retired with the transition, so nothing can wake it while it is deleted.
+		// A box that goes is retired with the transition, so nothing can wake it while it is deleted; its drive stays on the failed row.
 		const changed = await failCloudWorkspace({
 			scope,
 			from: madeAwake ? ["provisioning", "awake", "asleep"] : ["provisioning"],
 			onBox: providerSandboxId,
 			set: keepForDiagnosis
 				? { providerSandboxId }
-				: {
-						providerSandboxId: nextSandboxNameFor(row.id),
-						...(forkedDrive ? { driveName: null, driveLaidOutAt: null } : {}),
-					},
+				: { providerSandboxId: nextSandboxNameFor(row.id) },
 			reason: provisionFailureReason(error),
 			error,
 		});
@@ -400,7 +392,8 @@ async function provision(
 		if (changed && !keepForDiagnosis) {
 			await deleteSandboxAndDriveLater({
 				providerSandboxId,
-				driveName: forkedDrive ? driveName : null,
+				driveName: driveName ?? null,
+				keepDrive: true,
 			}).catch(teardownFailed);
 		}
 		if (changed) {

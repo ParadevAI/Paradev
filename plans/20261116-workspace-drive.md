@@ -245,6 +245,10 @@ Documented by Vercel or the SDK, not measured:
   Supersedes the 2026-11-18 decision to delete the drive at the 410. Rationale: in the lifecycle
   end state only the cleanup job deletes; everything else sets a status. Date/Author: 2026-11-19,
   Satya.
+- Decision: a failed create deletes no drive; the drive stays on the failed row, and the
+  cleanup job's rule 1 (#9987) deletes it with the row's box 30 days later. Only the box goes at
+  once, as on main; #9987 owns turning main's failed-create delete into a status. Date/Author:
+  2026-11-19, Satya.
 - Decision: teardown and every drive delete do nothing outside production (`VERCEL_ENV` is not
   `production`): they log "would delete" and stop. Production and staging share a database with
   previews and local dev, which must not delete production's boxes and drives. A job's own
@@ -516,7 +520,7 @@ never shown as their work.
 | A provision fails or stops only its own row: one still `provisioning`, or one this job itself made `awake`. A row another delivery or a wake brought up is never failed, stopped or torn down by it. | `madeAwake` and the `from` of the failure transition in `provision.ts`; the stop, teardown and failed chat moves follow only a transition it won | `provision.test.ts` "a second delivery on the same box that fails after the first brought the row up leaves the live workspace alone" |
 | A provision that finds the box's lock held is retried, never failed or stopped for it. | `SandboxBusyError` from `sandboxResumeLock`; `provision.ts` requeues itself every 15 s, at most 10 times, then fails only a row still `provisioning` | `provision.test.ts` "a lock held by another caller requeues the provision…", "a lock still held after the last retry fails only a row still provisioning" |
 | A lost provision's box is deleted even while the row's live box holds the kept drive. | `teardownSandbox` with `keepDrive` waits only for the drive to leave this box | `teardown.test.ts` "a lost box goes even while the row's live box holds the kept drive" |
-| A failed provision deletes only a drive it forked. | `forkedDrive` in `provision.ts` | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |
+| A failed create deletes no drive: the drive stays on the failed row until the cleanup job's rule 1 (#9987). | `provision.ts` failure path: `keepDrive: true`, `driveName` kept on the row | `provision-drive.test.ts` "a failed create leaves its drive on the failed row for the cleanup job" |
 | No teardown failure is silent. | `teardownSandbox` reports to Sentry and requeues any failure; giving up is a Sentry error | `teardown.test.ts` "any other failure is retried, not dropped", "gives up after the last attempt…" |
 | A failed promote leaks neither the golden nor its drive. | `abandonGolden` (`environment.ts`) | `environment.test.ts` "hands the golden and its forked drive to the retried teardown" |
 | A golden carries no workspace identity, on the root disk or the drive, and is stripped only with its drive mounted. | `inheritedIdentityPaths` (includes `SANDBOX_PATHS.driveState`); `stripWorkspaceIdentity` checks `mountpoint` and the exit code | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive", "a golden whose drive did not mount is not stripped and fails the promote" |
