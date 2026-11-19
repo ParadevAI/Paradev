@@ -1,3 +1,4 @@
+/// <reference path="./css-tree-esm.d.ts" />
 import {
 	type CssNode,
 	generate,
@@ -6,7 +7,7 @@ import {
 	type ListItem,
 	parse,
 	walk,
-} from "css-tree";
+} from "css-tree/dist/csstree.esm";
 
 export const MAX_THEME_CSS_LENGTH = 64 * 1024;
 
