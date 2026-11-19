@@ -17,6 +17,7 @@ afterEach(() => {
 function startFakeVercel(
 	initial: Env[],
 	onPost: (envs: Env[], body: Record<string, unknown>) => void,
+	options: { listExtra?: object; failed?: object[] } = {},
 ) {
 	const envs = [...initial];
 	const seen: Seen[] = [];
@@ -36,11 +37,11 @@ function startFakeVercel(
 			if (request.method === "POST") {
 				onPost(envs, JSON.parse(body));
 				return Response.json(
-					{ created: envs.at(-1), failed: [] },
+					{ created: envs.at(-1), failed: options.failed ?? [] },
 					{ status: 201 },
 				);
 			}
-			return Response.json({ envs });
+			return Response.json({ envs, ...options.listExtra });
 		},
 	});
 	return { seen, url: `http://localhost:${server.port}` };
@@ -138,9 +139,88 @@ describe("copy-secret-to-vercel-project.sh", () => {
 
 	it("rejects a project input that is not an id or name", async () => {
 		const fake = startFakeVercel(OTHERS, upsertSensitive);
-		const { code } = await run(fake.url, { PROJECT: "../other?x=1" });
+		for (const project of ["../other?x=1", "..", "."]) {
+			const { code } = await run(fake.url, { PROJECT: project });
+			expect(code).not.toBe(0);
+		}
+		expect(fake.seen).toHaveLength(0);
+	});
+
+	it("refuses the VERCEL_API override on GitHub Actions", async () => {
+		const fake = startFakeVercel(OTHERS, upsertSensitive);
+		const { code } = await run(fake.url, { GITHUB_ACTIONS: "true" });
 		expect(code).not.toBe(0);
 		expect(fake.seen).toHaveLength(0);
+	});
+
+	it("stops before apply when the list is paged or hides variables", async () => {
+		for (const listExtra of [
+			{ pagination: { count: 2, next: 123, prev: null } },
+			{ hiddenProductionEnvCount: 3 },
+		]) {
+			const fake = startFakeVercel(OTHERS, upsertSensitive, { listExtra });
+			const { output, code } = await run(fake.url, { APPLY: "true" });
+			expect(code).not.toBe(0);
+			expect(output).toContain("cannot be trusted");
+			expect(fake.seen.map((r) => r.method)).toEqual(["GET"]);
+			server?.stop(true);
+		}
+	});
+
+	describe("when the key already exists", () => {
+		const EXISTING: Env[] = [
+			...OTHERS,
+			{
+				key: "BETTER_AUTH_SECRET",
+				type: "encrypted",
+				target: ["production"],
+				value: "old-ciphertext",
+			},
+		];
+		const replace = (envs: Env[], body: Record<string, unknown>) => {
+			envs.splice(
+				envs.findIndex((e) => e.key === "BETTER_AUTH_SECRET"),
+				1,
+			);
+			upsertSensitive(envs, body);
+		};
+
+		it("dry run says apply will refuse", async () => {
+			const fake = startFakeVercel(EXISTING, replace);
+			const { output, code } = await run(fake.url, { APPLY: "false" });
+			expect(code).toBe(0);
+			expect(output).toContain("apply will refuse unless overwrite");
+			expect(output).not.toContain("old-ciphertext");
+		});
+
+		it("apply refuses without overwrite and writes nothing", async () => {
+			const fake = startFakeVercel(EXISTING, replace);
+			const { output, code } = await run(fake.url, { APPLY: "true" });
+			expect(code).not.toBe(0);
+			expect(output).toContain("already exists");
+			expect(fake.seen.map((r) => r.method)).toEqual(["GET"]);
+		});
+
+		it("apply replaces it when overwrite is set", async () => {
+			const fake = startFakeVercel(EXISTING, replace);
+			const { code } = await run(fake.url, {
+				APPLY: "true",
+				OVERWRITE: "true",
+			});
+			expect(code).toBe(0);
+			expect(fake.seen.filter((r) => r.method === "POST")).toHaveLength(1);
+		});
+	});
+
+	it("stops on a failed entry and never prints the value it echoes", async () => {
+		const failed = [
+			{ error: { code: "bad", message: "no", value: FAKE_SECRET } },
+		];
+		const fake = startFakeVercel(OTHERS, upsertSensitive, { failed });
+		const { output, code } = await run(fake.url, { APPLY: "true" });
+		expect(code).not.toBe(0);
+		expect(output).toContain("Failed entries: 1");
+		expect(output).not.toContain(FAKE_SECRET);
 	});
 
 	it("fails when the count of other variables changes", async () => {
@@ -160,9 +240,7 @@ describe("copy-secret-to-vercel-project.sh", () => {
 		});
 		const { output, code } = await run(fake.url, { APPLY: "true" });
 		expect(code).not.toBe(0);
-		expect(output).toContain(
-			"not a sensitive variable on both production and preview",
-		);
+		expect(output).toContain("not sensitive on exactly production and preview");
 	});
 
 	it("reports only the error code when Vercel refuses", async () => {

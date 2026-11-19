@@ -32,12 +32,14 @@ Anything that needs a production secret must run as an Actions workflow with
 `environment: production`. `.github/workflows/backfill-connections.yml` is the pattern: manual
 dispatch, dry run by default, writes only when the `apply` input is checked.
 
-`copy-secret-to-vercel-project.yml` copies `BETTER_AUTH_SECRET` from the GitHub `production`
-environment to one Vercel project (type `sensitive`, production and preview), when an app that
-must share the product's sessions needs the same value and nobody holds it in plaintext. Run the
-dry run first: it prints only whether the key exists, its targets, and the count of other
-variables. It fails if the count changes or the key is not sensitive on both targets. It copies
-this one secret only; do not extend it to other names.
+`copy-secret-to-vercel-project.yml` is for one run and is deleted after it. It copies
+`BETTER_AUTH_SECRET` from the GitHub `production` environment to the Vercel project
+`paradev-admin` (type `sensitive`, production and preview), because nobody holds the value in
+plaintext. The project is fixed in the file; there is no project input, so it cannot send the
+secret to another project. Run the dry run first: it prints only whether the key exists, its
+targets, and the count of other variables. Apply refuses if the key already exists, unless
+`overwrite` is checked. It fails if the env list is paged, if the count of other variables
+changes, or if the key is not sensitive on exactly production and preview.
 
 ## One run shows about ten deployment rows
 
