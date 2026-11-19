@@ -11,6 +11,7 @@ import * as store from "./store";
 
 const ENVIRONMENT_ID = "00000000-0000-0000-0000-0000000000e1";
 const BUILD_ID = "00000000-0000-0000-0000-0000000000b1";
+const SECOND_BUILD_ID = "10000000-0000-0000-0000-0000000000b2";
 const BOX = "envb-000000000000000000000000";
 const COMMIT = "a".repeat(40);
 
@@ -36,7 +37,7 @@ function makeBuild(
 	};
 }
 
-const environment = {
+const baseEnvironment = {
 	id: ENVIRONMENT_ID,
 	organizationId: "org",
 	sourceKind: "fork",
@@ -45,6 +46,7 @@ const environment = {
 } as unknown as NonNullable<
 	Awaited<ReturnType<typeof store.loadBuild>>
 >["environment"];
+let environment = baseEnvironment;
 
 let build: SelectEnvironmentBuild;
 let history: SelectEnvironmentBuild[];
@@ -79,6 +81,9 @@ stub(store, {
 	finishedBuilds: async () => history,
 	markGoldensDeleted: async (ids: readonly string[]) => {
 		calls.push(`marked:${ids.join(",")}`);
+		history = history.map((row) =>
+			ids.includes(row.id) ? { ...row, goldenDeletedAt: new Date(0) } : row,
+		);
 	},
 });
 stub(vercel, {
@@ -138,9 +143,12 @@ stub(credentials, {
 
 stub(deployment, { isProductionDeployment: () => production });
 
-const { rebuildEnvironment } = await import("./environment-build");
+const { pruneGoldens, rebuildEnvironment } = await import(
+	"./environment-build"
+);
 
 beforeEach(() => {
+	environment = baseEnvironment;
 	build = makeBuild();
 	history = [];
 	calls = [];
@@ -252,6 +260,25 @@ describe("rebuildEnvironment", () => {
 			deleteFails = new Set(["g1"]);
 			expect(await rebuildEnvironment({ buildId: BUILD_ID })).toBe("succeeded");
 			expect(calls.at(-1)).toBe("marked:");
+		});
+
+		test("a restored golden is kept while active and deleted once it is not", async () => {
+			const environmentRef = (sourceRef: string) =>
+				({ ...environment, sourceRef }) as typeof environment;
+			environment = environmentRef("g1");
+			await pruneGoldens({ environmentId: ENVIRONMENT_ID, activeRef: "g1" });
+			expect(calls).toEqual([]);
+
+			await rebuildEnvironment({ buildId: BUILD_ID });
+			expect(calls).toContain("remove:g1");
+
+			calls = [];
+			environment = environmentRef(BOX);
+			build = makeBuild({ id: SECOND_BUILD_ID });
+			await rebuildEnvironment({ buildId: SECOND_BUILD_ID });
+			expect(calls.filter((call) => call.startsWith("remove:g"))).toEqual([
+				"remove:g2",
+			]);
 		});
 
 		test("a non-production build deletes nothing", async () => {

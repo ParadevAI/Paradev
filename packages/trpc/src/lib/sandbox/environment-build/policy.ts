@@ -71,23 +71,29 @@ function undeletedGoldens<T extends GoldenBuild>(builds: readonly T[]): T[] {
 	);
 }
 
-/** The newest `KEPT_GOLDENS` goldens. Builds newest first. */
-export function keptGoldenRefs(builds: readonly GoldenBuild[]): Set<string> {
-	return new Set(
-		undeletedGoldens(builds)
-			.slice(0, KEPT_GOLDENS)
-			.flatMap((build) => (build.goldenRef ? [build.goldenRef] : [])),
-	);
+/**
+ * The active golden plus the newest others, `KEPT_GOLDENS` in total; the
+ * active one may be older than the rest after a restore. Builds newest first.
+ */
+export function keptGoldenRefs(
+	builds: readonly GoldenBuild[],
+	activeRef: string,
+): Set<string> {
+	const others = undeletedGoldens(builds)
+		.flatMap((build) => (build.goldenRef ? [build.goldenRef] : []))
+		.filter((ref) => ref !== activeRef);
+	return new Set([activeRef, ...others.slice(0, KEPT_GOLDENS - 1)]);
 }
 
-/** Goldens past the newest `KEPT_GOLDENS`, never the active one. Builds newest first. */
+/** Undeleted goldens outside `keptGoldenRefs`, so never the active one. Builds newest first. */
 export function goldensToDelete<T extends GoldenBuild>(
 	builds: readonly T[],
 	activeRef: string,
 ): T[] {
-	return undeletedGoldens(builds)
-		.slice(KEPT_GOLDENS)
-		.filter((build) => build.goldenRef !== activeRef);
+	const kept = keptGoldenRefs(builds, activeRef);
+	return undeletedGoldens(builds).filter(
+		(build) => build.goldenRef !== null && !kept.has(build.goldenRef),
+	);
 }
 
 /** Finished builds, newest first. */

@@ -27,9 +27,11 @@ describe("goldensToDelete", () => {
 		goldenDeletedAt: null,
 	});
 
-	test("never deletes the active golden, even when it is old", () => {
+	test("keeps an old active golden plus the two newest others", () => {
 		const builds = ["g4", "g3", "g2", "g1"].map(built);
-		expect(goldensToDelete(builds, "g1")).toEqual([]);
+		expect(goldensToDelete(builds, "g1").map((b) => b.goldenRef)).toEqual([
+			"g2",
+		]);
 	});
 
 	test("failed and already deleted builds do not count toward the three", () => {
@@ -48,13 +50,13 @@ describe("goldensToDelete", () => {
 });
 
 describe("keptGoldenRefs", () => {
-	test("restore picks from the three newest goldens only", () => {
+	test("restore picks from the active golden and the two newest others", () => {
 		const built = (goldenRef: string) => ({
 			status: "succeeded" as const,
 			goldenRef,
 			goldenDeletedAt: null,
 		});
-		expect(keptGoldenRefs(["g4", "g3", "g2", "g1"].map(built))).toEqual(
+		expect(keptGoldenRefs(["g4", "g3", "g2", "g1"].map(built), "g4")).toEqual(
 			new Set(["g4", "g3", "g2"]),
 		);
 	});

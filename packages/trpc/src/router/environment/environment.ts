@@ -830,7 +830,10 @@ export const environmentRouter = {
 				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
 				.limit(limit + 1);
 			const page = rows.slice(0, limit);
-			const kept = keptGoldenRefs(await finishedBuilds(environment.id));
+			const kept = keptGoldenRefs(
+				await finishedBuilds(environment.id),
+				environment.sourceRef,
+			);
 			const last = page.at(-1);
 			return {
 				builds: page.map((build) =>
@@ -859,7 +862,10 @@ export const environmentRouter = {
 				),
 			});
 			const goldenRef = build?.goldenRef;
-			const kept = keptGoldenRefs(await finishedBuilds(environment.id));
+			const kept = keptGoldenRefs(
+				await finishedBuilds(environment.id),
+				environment.sourceRef,
+			);
 			if (
 				!build ||
 				build.status !== "succeeded" ||
