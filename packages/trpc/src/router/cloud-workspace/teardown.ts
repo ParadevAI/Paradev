@@ -104,16 +104,18 @@ export async function deleteSandboxAndDriveLater(args: {
 /**
  * Takes the row's box name out of use in the same write that commits to
  * deleting the box, then queues its teardown. A wake after it finds a name
- * that does not exist, never the box being deleted. Returns false when the
- * row no longer matches `condition` or names another box.
+ * that does not exist, never the box being deleted. `set` changes the row in
+ * that same write, such as the status a retired row ends in. Returns false
+ * when the row no longer matches `condition` or names another box.
  */
 export async function retireAndTearDown(
 	row: { id: string; providerSandboxId: string; driveName: string | null },
 	condition: SQL | undefined,
+	set: Partial<typeof cloudWorkspaces.$inferInsert> = {},
 ): Promise<boolean> {
 	const [retired] = await db
 		.update(cloudWorkspaces)
-		.set({ providerSandboxId: nextSandboxNameFor(row.id) })
+		.set({ ...set, providerSandboxId: nextSandboxNameFor(row.id) })
 		.where(
 			and(
 				eq(cloudWorkspaces.id, row.id),

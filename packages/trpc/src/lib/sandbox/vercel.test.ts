@@ -11,11 +11,14 @@ import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
 	applySandboxPolicy,
+	canDelete,
+	deleteDrive,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
+	listWhole,
 	promoteSandboxToEnvironment,
 	provisionSandbox,
 	type SandboxClaim,
@@ -305,6 +308,79 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+});
+
+describe("only production deletes", () => {
+	stub(Sandbox, {
+		get: async () => {
+			throw new Error("reached Vercel");
+		},
+	});
+	stub(Drive, {
+		get: async () => {
+			throw new Error("reached Vercel");
+		},
+	});
+
+	test("outside production a box or drive delete logs and returns without reaching Vercel", async () => {
+		const vercelEnv = process.env.VERCEL_ENV;
+		process.env.VERCEL_ENV = "preview";
+		try {
+			await deleteSandbox("ws-box");
+			await deleteDrive("drive-1");
+		} finally {
+			process.env.VERCEL_ENV = vercelEnv;
+		}
+		expect(canDelete("production")).toBe(true);
+		expect(canDelete("preview")).toBe(false);
+		expect(canDelete(undefined)).toBe(false);
+	});
+});
+
+describe("listWhole", () => {
+	const pages = (...list: Array<{ items: string[]; next: string | null }>) => {
+		let index = 0;
+		return async () => {
+			const page = list[index++];
+			if (!page) throw new Error("no such page");
+			return { items: page.items.map((name) => ({ name })), next: page.next };
+		};
+	};
+
+	test("returns every page, and throws on a repeated cursor, a missing known name or an empty listing", async () => {
+		expect(
+			await listWhole({
+				fetchPage: pages(
+					{ items: ["a"], next: "c1" },
+					{ items: ["b"], next: null },
+				),
+				expected: ["b"],
+				nonEmpty: true,
+			}),
+		).toEqual([{ name: "a" }, { name: "b" }]);
+		await expect(
+			listWhole({
+				fetchPage: pages(
+					{ items: ["a"], next: "c1" },
+					{ items: ["b"], next: "c1" },
+				),
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("repeated cursor");
+		await expect(
+			listWhole({
+				fetchPage: pages({ items: ["a"], next: null }),
+				expected: ["ws-running"],
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("lacks ws-running");
+		await expect(
+			listWhole({
+				fetchPage: pages({ items: [], next: null }),
+				nonEmpty: true,
+			}),
+		).rejects.toThrow("empty");
 	});
 });
 

@@ -10,18 +10,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
 	type AgentToolsManifest,
-	agentToolsDrivesToPrune,
 	agentToolsGaps,
 	agentToolsManifest,
 	type DriveHost,
 	describeAgentToolsPublish,
 	parseAgentToolsManifest,
 	parseBuilderResults,
-	pruneAgentToolsDrives,
 	publishAgentToolsDrive,
 	publishAgentToolsDrives,
 	type RegionPublish,
-	referencedAgentToolsDrives,
 	renderBuilderScript,
 } from "./agent-tools";
 import { type Assets, loadAssets, sha256 } from "./manifest";
@@ -384,59 +381,6 @@ describe("agentToolsGaps", () => {
 			{ region: "fra1", error: new Error("builder exited 1") },
 		];
 		expect(agentToolsGaps(results, new Set(["sfo1"]))).toEqual([]);
-	});
-});
-
-test("referenced drives: every row's bundle in its region, and the recent bundles in every region", () => {
-	const older = "1".repeat(64);
-	expect(
-		[
-			...referencedAgentToolsDrives({
-				rows: [
-					{ region: "iad1", bundleSha: older },
-					{ region: "fra1", bundleSha: null },
-				],
-				recentBundles: [BUNDLE],
-				regions: ["sfo1", "iad1"],
-			}),
-		].sort(),
-	).toEqual([
-		"agent-tools-iad1-0123456789ab",
-		"agent-tools-iad1-111111111111",
-		"agent-tools-sfo1-0123456789ab",
-	]);
-});
-
-describe("pruning", () => {
-	test("deletes only agent-tools drives no environment references", () => {
-		expect(
-			agentToolsDrivesToPrune(
-				[
-					"agent-tools-sfo1-0123456789ab",
-					"agent-tools-sfo1-aaaaaaaaaaaa",
-					"agent-tools-iad1-0123456789ab",
-					"agent-tools-sfo1",
-					"agent-tools-builder-sfo1-xyz",
-				],
-				new Set(["agent-tools-sfo1-0123456789ab"]),
-			),
-		).toEqual([
-			"agent-tools-sfo1-aaaaaaaaaaaa",
-			"agent-tools-iad1-0123456789ab",
-		]);
-	});
-
-	test("keeps a drive a sandbox holds for the next release", async () => {
-		const { host } = fakeHost({
-			"agent-tools-sfo1-aaaaaaaaaaaa": {},
-			"agent-tools-sfo1-bbbbbbbbbbbb": { attachedTo: "box" },
-		});
-		expect(
-			await pruneAgentToolsDrives({ host, referenced: new Set() }),
-		).toEqual({
-			deleted: ["agent-tools-sfo1-aaaaaaaaaaaa"],
-			kept: ["agent-tools-sfo1-bbbbbbbbbbbb"],
-		});
 	});
 });
 

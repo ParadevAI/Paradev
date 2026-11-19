@@ -785,38 +785,36 @@ never opens.
 
 **Vercel's snapshot expiry was silent, so we own retention now.** The app
 assumed a stopped box keeps its disk until someone deletes it. In fact Vercel
-expired a workspace box's snapshot 30 days after its last use. Nothing told us:
-the row learned only from the 410 that its next wake, agent turn or automation
-dispatch got. A workspace nobody opened again stayed `asleep` over a box that
-could not resume, and the box itself stayed in Vercel. New workspace boxes are
-now created with `snapshotExpiration: 0`. The `reap-retention` job, every 6 hours,
-(`router/cloud-workspace/retention.ts`) does three things. It moves a workspace
-that is asleep and unused for 30 days to `failed`/`snapshot_expired`, the same
-state as the 410. First `retireAndTearDown` gives the row a new box name and
-queues `teardownSandbox`, which deletes the box only if no row names it; then
-the row fails. A wake between the two finds no box and fails the row itself. "Unused"
-means no boot started or stopped since then, with `sandbox_expires_at` and
-`created_at` older too, so a wake in flight (its boot row is written before
-Vercel resumes) keeps the box. Archive deletes its box at the end of the
-7-day grace through one delayed QStash message, and Vercel's 30-day expiry used
-to clean up after a lost one. That backstop is gone, so in production the job
-also deletes an archived box still listed a day after its grace, through the
-archive's own delete stage (`reapUndatedArchivedCloudWorkspace` for the rows
-archived before `deleted_at` existed). It matches rows against one listing of
-every box, so a box already gone costs no provider call. It also takes the box
-from a row failed 30 days ago whose box is still listed, and from a row stuck
-in `provisioning` for a day (every delivery of its job died), which then fails
-as `create_failed`. A retired name is in no listing and a failed row is no
-longer provisioning, so these rows leave the selection. In production only,
-the same job also tears down
-tagged boxes that no row and no unarchived environment names, once they are
-7 days old: every deployment shares one Vercel project, so a dev or preview
-database would see production's boxes as orphans. Boxes created before this
+expired a workspace box's snapshot 30 days after its last use, and nothing told
+us: the row learned only from the 410 its next wake got. New workspace boxes
+are now created with `snapshotExpiration: 0`, and one cleanup job
+(`router/cloud-workspace/retention.ts`, every 6 hours, production only) is the
+only thing that deletes for age. It applies three rules from one table:
+
+1. A workspace not in use is retired after its wait: asleep 30 days after last
+   use, archived 7 days, failed 30 days, stuck creating with no boot 1 day.
+   Retiring is one conditional write (still in that status, still past the
+   wait) that takes the box name off the row, then the retried teardown job
+   deletes the box. A wake that lands first wins. An unarchive after the 7 days
+   is refused even before the job runs.
+2. An environment keeps its active golden and its newest others, 3 in all; an
+   archived environment keeps none. On main an environment records only its
+   active golden, so the job deletes archived environments' goldens.
+3. A box, drive or golden no production row names goes 7 days after it was
+   made; an agents drive goes once it is not the current release's and no box,
+   stopped ones included, mounts it.
+
+Everything else only sets a status: archive (its 60 s stop stays), a failed
+create and a 410 on wake. Only production deletes: `deleteSandbox` and
+`deleteDrive` log "would delete" unless `VERCEL_ENV` is `production`, because
+every deployment shares one Vercel project and a preview database copied from
+production names production's boxes. Staging deploys as production on the
+production database, so it counts. The job reads the whole box and drive
+listing first and deletes nothing if it cannot. Boxes created before this
 change keep a 30-day expiry until `bun run backfill-snapshot-expiration
---apply` (`packages/sandbox`) is run. That run changes only snapshots taken
-afterwards, so until a box's next stop the 410 path stays its fallback.
-**Open:** drives are not reaped yet. No row names a workspace drive on main,
-so that half waits for the drive columns (#9847).
+--apply` (`packages/sandbox`) is run by hand. **Open:** no row names a
+workspace drive on main; #9847's `drive_name` and `golden_drive_name` must
+join rule 3's names when it lands.
 
 **Any call on a `Sandbox` object resumes a stopped session.** The SDK wraps
 `runCommand`, `writeFiles`, `extendTimeout` and the rest in `withResume`: on a

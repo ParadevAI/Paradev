@@ -17,6 +17,7 @@ let deleteFails = false;
 let queued: Array<{ path: string; body: unknown; delaySeconds?: number }> = [];
 let updateMatches = true;
 let renamedTo: unknown;
+let written: unknown;
 
 stub(guard, {
 	liveReferences: async () => ({ sandbox: namedOnRead.shift() ?? false }),
@@ -35,6 +36,7 @@ stub(db, {
 	update: () => ({
 		set: (values: { providerSandboxId: string }) => {
 			renamedTo = values.providerSandboxId;
+			written = values;
 			return {
 				where: () => ({
 					returning: async () => (updateMatches ? [{ id: "ws_1" }] : []),
@@ -96,13 +98,16 @@ describe("teardownSandbox", () => {
 describe("retireAndTearDown", () => {
 	const row = { id: "ws_1", providerSandboxId: "ws-old", driveName: null };
 
-	test("gives the row a new box name and queues the old box's teardown only when the update matched", async () => {
+	test("gives the row a new box name, and its status in the same write, and queues the old box's teardown only when the update matched", async () => {
 		updateMatches = false;
 		expect(await retireAndTearDown(row, undefined)).toBe(false);
 		expect(queued).toEqual([]);
 		updateMatches = true;
-		expect(await retireAndTearDown(row, undefined)).toBe(true);
+		expect(await retireAndTearDown(row, undefined, { status: "failed" })).toBe(
+			true,
+		);
 		expect(renamedTo).toMatch(/^ws-ws_1[0-9a-f]{8}$/);
+		expect(written).toMatchObject({ status: "failed" });
 		expect(queued).toMatchObject([
 			{ path: "/api/cloud-workspaces/teardown", body: input },
 		]);

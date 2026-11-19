@@ -992,27 +992,143 @@ export interface ListedSandbox {
 	/** Our `kind` tag; absent on a box made before tags or not made by us. */
 	kind: string | undefined;
 	createdAt: number;
-	statusUpdatedAt: number;
 	status: string;
+	/** What it mounts, running or stopped: a stopped box mounts it again on its next boot. */
+	mounts: string[];
 }
 
-/** Every box in the project, whatever its age or tags. */
-export async function listAllSandboxes(): Promise<ListedSandbox[]> {
-	const found: ListedSandbox[] = [];
-	for await (const sandbox of await Sandbox.list(credentials())) {
-		found.push({
-			name: sandbox.name,
-			kind: sandbox.tags?.kind,
-			createdAt: sandbox.createdAt,
-			statusUpdatedAt: sandbox.statusUpdatedAt ?? sandbox.updatedAt,
-			status: sandbox.status,
-		});
+export interface ListedDrive {
+	name: string;
+	createdAt: number;
+	attachedTo: string | undefined;
+}
+
+export interface ListingPage<T> {
+	items: T[];
+	next: string | null;
+}
+
+export const MAX_LISTING_PAGES = 10_000;
+
+/**
+ * Every page of a listing, or a throw: each page answered, no cursor seen
+ * twice, and the names the caller knows exist all in it. A deleter that acts
+ * on a partial listing deletes what it did not see named.
+ */
+export async function listWhole<T extends { name: string }>({
+	fetchPage,
+	expected = [],
+	nonEmpty,
+}: {
+	fetchPage: (cursor: string | null) => Promise<ListingPage<T>>;
+	expected?: readonly string[];
+	nonEmpty: boolean;
+}): Promise<T[]> {
+	const items: T[] = [];
+	const seen = new Set<string>();
+	let cursor: string | null = null;
+	for (let pages = 0; ; pages++) {
+		if (pages >= MAX_LISTING_PAGES) {
+			throw new Error(`listing has more than ${pages} pages`);
+		}
+		const page = await fetchPage(cursor);
+		items.push(...page.items);
+		if (page.next === null) break;
+		if (seen.has(page.next)) {
+			throw new Error(`listing repeated cursor ${page.next.slice(0, 16)}`);
+		}
+		seen.add(page.next);
+		cursor = page.next;
 	}
-	return found;
+	if (nonEmpty && items.length === 0) throw new Error("listing is empty");
+	const names = new Set(items.map((item) => item.name));
+	const missing = expected.filter((name) => !names.has(name));
+	if (missing.length) throw new Error(`listing lacks ${missing.join(", ")}`);
+	return items;
+}
+
+/** The page size #9943 used against the same endpoint. */
+const LISTING_PAGE_SIZE = 50;
+
+/** Every box in the project, whatever its status, tags or database; throws unless whole. */
+export function listProjectSandboxes(
+	expected: readonly string[],
+): Promise<ListedSandbox[]> {
+	return listWhole({
+		expected,
+		nonEmpty: true,
+		fetchPage: async (cursor) => {
+			const page = await Sandbox.list({
+				...credentials(),
+				limit: LISTING_PAGE_SIZE,
+				...(cursor ? { cursor } : {}),
+			});
+			return {
+				items: page.sandboxes.map((sandbox) => ({
+					name: sandbox.name,
+					kind: sandbox.tags?.kind,
+					createdAt: sandbox.createdAt,
+					status: sandbox.status,
+					mounts: Object.values(sandbox.mounts ?? {}).map(
+						(mount) => mount.drive,
+					),
+				})),
+				next: page.pagination.next,
+			};
+		},
+	});
+}
+
+/** Every drive in the project; throws unless whole. */
+export function listProjectDrives(): Promise<ListedDrive[]> {
+	return listWhole({
+		nonEmpty: false,
+		fetchPage: async (cursor) => {
+			const page = await Drive.list({
+				...credentials(),
+				limit: LISTING_PAGE_SIZE,
+				...(cursor ? { cursor } : {}),
+			});
+			return {
+				items: page.drives.map((drive) => ({
+					name: drive.name,
+					createdAt: drive.createdAt.getTime(),
+					attachedTo: drive.currentSandboxName,
+				})),
+				next: page.pagination.next,
+			};
+		},
+	});
+}
+
+/**
+ * Only production deletes. Staging deploys as production on the same
+ * database, so it counts; a preview or local database, copied from
+ * production, names production's boxes and only logs.
+ */
+export function canDelete(vercelEnv = process.env.VERCEL_ENV): boolean {
+	return vercelEnv === "production";
+}
+
+function wouldDelete(kind: string, name: string): boolean {
+	if (canDelete()) return false;
+	console.log(`[sandbox] would delete ${kind} ${name}: not production`);
+	return true;
+}
+
+/** Throws while a box holds it; a drive already gone is the state we wanted. */
+export async function deleteDrive(name: string): Promise<void> {
+	if (wouldDelete("drive", name)) return;
+	const drive = await Drive.get({ ...credentials(), name }).catch((error) => {
+		if (isNotFound(error)) return null;
+		throw error;
+	});
+	await drive?.delete();
 }
 
 /** Best-effort: a sandbox already gone is the state we wanted. */
 export async function deleteSandbox(providerSandboxId: string): Promise<void> {
+	if (wouldDelete("sandbox", providerSandboxId)) return;
 	const sandbox = await getSandbox(providerSandboxId);
 	if (!sandbox) return;
 	// Snapshots outlive a sandbox by default and keep billing storage.

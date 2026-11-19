@@ -452,58 +452,6 @@ export function agentToolsGaps(
 	});
 }
 
-/**
- * Every drive a box may still mount: each environment row's bundle in its
- * region, and the newest released bundles in every region, so a rollback and
- * an environment created mid-release still find theirs.
- */
-export function referencedAgentToolsDrives(args: {
-	rows: readonly { region: string; bundleSha: string | null }[];
-	recentBundles: readonly string[];
-	regions: readonly string[];
-}): Set<string> {
-	return new Set([
-		...args.rows.flatMap((row) =>
-			row.bundleSha ? [sandboxAgentToolsDrive(row.region, row.bundleSha)] : [],
-		),
-		...args.recentBundles.flatMap((sha) =>
-			args.regions.map((region) => sandboxAgentToolsDrive(region, sha)),
-		),
-	]);
-}
-
-/** Agent-tools drives no environment row's bundle and region name any more. */
-export function agentToolsDrivesToPrune(
-	drives: readonly string[],
-	referenced: ReadonlySet<string>,
-): string[] {
-	return drives.filter(
-		(name) =>
-			SANDBOX_AGENT_TOOLS_DRIVE_PATTERN.test(name) && !referenced.has(name),
-	);
-}
-
-/** Returns the drives it could not delete; a drive a sandbox holds is retried next release. */
-export async function pruneAgentToolsDrives(args: {
-	host: DriveHost;
-	referenced: ReadonlySet<string>;
-}): Promise<{ deleted: string[]; kept: string[] }> {
-	const deleted: string[] = [];
-	const kept: string[] = [];
-	for (const name of agentToolsDrivesToPrune(
-		(await args.host.list("agent-tools-")).map((drive) => drive.name),
-		args.referenced,
-	)) {
-		try {
-			await args.host.remove(name);
-			deleted.push(name);
-		} catch {
-			kept.push(name);
-		}
-	}
-	return { deleted, kept };
-}
-
 interface VercelCredentials {
 	token: string;
 	teamId: string;

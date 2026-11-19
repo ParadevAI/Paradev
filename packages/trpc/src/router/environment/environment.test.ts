@@ -58,7 +58,13 @@ stub(access, {
 		branch: "main",
 	}),
 });
-stub(sandbox, { workspaceRepositories: async () => [] });
+let deletedBoxes: string[] = [];
+stub(sandbox, {
+	workspaceRepositories: async () => [],
+	deleteSandbox: async (name: string) => {
+		deletedBoxes.push(name);
+	},
+});
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
 		name === "large" || name == null
@@ -95,6 +101,22 @@ beforeEach(() => {
 	};
 	isAdmin = false;
 	written = [];
+	deletedBoxes = [];
+});
+
+describe("environment.archive", () => {
+	test("only sets a status: the cleanup job deletes its golden (rule 2)", async () => {
+		environment = {
+			...environment,
+			sourceKind: "fork",
+			sourceRef: "env-golden",
+		};
+		expect(await caller.environment.archive({ id: ENVIRONMENT_ID })).toEqual({
+			archived: true,
+		});
+		expect(written).toEqual([{ archivedAt: expect.any(Date) }]);
+		expect(deletedBoxes).toEqual([]);
+	});
 });
 
 describe("environment.update machineSize", () => {
