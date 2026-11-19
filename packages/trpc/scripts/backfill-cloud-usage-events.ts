@@ -225,6 +225,12 @@ console.log(
 if (!values.apply) process.exit(0);
 
 let written = 0;
+rows.sort(
+	(a, b) =>
+		a.organizationId.localeCompare(b.organizationId) ||
+		(a.sentAt as Date).getTime() - (b.sentAt as Date).getTime() ||
+		(a.userId ?? "").localeCompare(b.userId ?? ""),
+);
 for (let index = 0; index < rows.length; index += BATCH) {
 	const batch = rows.slice(index, index + BATCH);
 	const inserted = await db

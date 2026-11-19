@@ -1415,6 +1415,13 @@
       "when": 1795116914925,
       "tag": "0201_cloud_usage_daily_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1795117964138,
+      "tag": "0202_cloud_usage_daily_backfill",
+      "breakpoints": true
     }
   ]
 }
