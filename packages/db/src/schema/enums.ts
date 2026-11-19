@@ -1,6 +1,18 @@
 import type { TriggerConfigInput } from "@superset/shared/automation-triggers";
 import { z } from "zod";
 
+export {
+	type CloudWorkspaceBootEndReason,
+	type CloudWorkspaceFailureReason,
+	type CloudWorkspaceStatus,
+	cloudWorkspaceBootEndReasonEnum,
+	cloudWorkspaceBootEndReasonValues,
+	cloudWorkspaceFailureReasonEnum,
+	cloudWorkspaceFailureReasonValues,
+	cloudWorkspaceStatusEnum,
+	cloudWorkspaceStatusValues,
+} from "@superset/shared/cloud-workspace-status";
+
 export const taskStatusEnumValues = [
 	"backlog",
 	"todo",
@@ -66,17 +78,6 @@ export type CommandStatus = z.infer<typeof commandStatusEnum>;
  * of `awake` and `archived`: no row holds them, and Postgres cannot drop an
  * enum value without rebuilding the type.
  */
-export const cloudWorkspaceStatusValues = [
-	"provisioning",
-	"ready",
-	"failed",
-	"deleted",
-	"awake",
-	"asleep",
-	"archived",
-] as const;
-export const cloudWorkspaceStatusEnum = z.enum(cloudWorkspaceStatusValues);
-export type CloudWorkspaceStatus = z.infer<typeof cloudWorkspaceStatusEnum>;
 
 /** Who else can open a cloud workspace besides its creator and the people it is shared with. `just_me` predates sharing: it means no one else. */
 export const cloudWorkspaceVisibilityValues = ["just_me", "org"] as const;
@@ -95,24 +96,6 @@ export const cloudUsageFeatureValues = [
 export const cloudUsageFeatureEnum = z.enum(cloudUsageFeatureValues);
 export type CloudUsageFeature = z.infer<typeof cloudUsageFeatureEnum>;
 
-export const cloudWorkspaceBootEndReasonValues = [
-	"idle",
-	"user",
-	"usage_limit",
-	"archived",
-	"restarted",
-	"failed",
-	"released",
-	"crashed",
-	"unknown",
-] as const;
-export const cloudWorkspaceBootEndReasonEnum = z.enum(
-	cloudWorkspaceBootEndReasonValues,
-);
-export type CloudWorkspaceBootEndReason = z.infer<
-	typeof cloudWorkspaceBootEndReasonEnum
->;
-
 /** Who inserted a boot row: a create or a wake that authorized it, or the reconcile that found its session unmetered. */
 export const cloudWorkspaceBootOriginValues = [
 	"create",
@@ -124,22 +107,6 @@ export const cloudWorkspaceBootOriginEnum = z.enum(
 );
 export type CloudWorkspaceBootOrigin = z.infer<
 	typeof cloudWorkspaceBootOriginEnum
->;
-
-export const cloudWorkspaceFailureReasonValues = [
-	"usage_limit",
-	"needs_paid_plan",
-	"host_not_ready",
-	"create_failed",
-	"queue_failed",
-	"sandbox_gone",
-	"snapshot_expired",
-] as const;
-export const cloudWorkspaceFailureReasonEnum = z.enum(
-	cloudWorkspaceFailureReasonValues,
-);
-export type CloudWorkspaceFailureReason = z.infer<
-	typeof cloudWorkspaceFailureReasonEnum
 >;
 
 /** Who made a change: a person (bot accounts included) or Superset itself. */
