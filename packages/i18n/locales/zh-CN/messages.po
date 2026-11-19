@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {此工作区中有 # 个文件更改} other {�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {编辑了 # 个文件} other {编辑了 # 个文件}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "第 {first}–{last} 条，共 {total} 条"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}聚焦"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount}项已开启"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {此工作区中还有更改：# 个文件} other {此工作区中还有更改：# 个文件}}"
 
+msgid "{over} overage"
+msgstr "超额 {over}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} 可以以你的身份读取和更改你的 {pluginLabel} 账户中的数据，包括此页面的未来版本。它可以把读取的内容发送到其他网站。只允许你信任的页面。"
 
@@ -1350,9 +1356,6 @@ msgstr "剩余 {remaining} 个 token"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {已撤销 # 个文件的更改。} other {已撤销 # 个文件的更改。}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {共 # 行，第 {first}–{last} 行}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {# 个席位包含}}"
@@ -1658,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "由 Union Square Ventures 领投的 1150 万美元种子轮"
-
-msgid "0 rows"
-msgstr "0 行"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "正在构建中。"
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "再往后：F5不是近期的主张"
 
+msgid "Billed hours"
+msgstr "计费时长"
+
 msgid "Billed monthly"
 msgstr "按月计费"
 
@@ -4863,6 +4866,9 @@ msgstr "云端用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "此组织未启用云端用量。"
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "本周期的云用量已用完。工作区无法启动。"
+
 msgid "Cloud workspace"
 msgstr "云端工作区"
 
@@ -4890,9 +4896,6 @@ msgstr "{account} 未开通云工作区。云工作区包含在 Team 和 Ultra �
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "您的方案不包含云工作区。"
-
-msgid "Cloud workspaces cannot start."
-msgstr "云工作区无法启动。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "云工作区以你的身份提交、推送并创建拉取请求"
@@ -9325,10 +9328,6 @@ msgstr "创始工程师"
 msgid "Free"
 msgstr "免费版"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "免费"
-
 msgid "Free credits"
 msgstr "免费额度"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "每小时"
-
-msgid "Hours"
-msgstr "小时"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "时长由整个团队共享。以标准 {vcpus} vCPU / {memoryGb} GB 工作区计算，更大的机器消耗更快。"
@@ -11511,9 +11507,6 @@ msgstr "正在加载更多..."
 msgid "Loading more…"
 msgstr "正在加载更多…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "正在加载第 {loadingPage} 页，共 {targetPage} 页..."
-
 msgid "Loading project…"
 msgstr "正在加载项目…"
 
@@ -12806,9 +12799,6 @@ msgstr "这台机器上还没有发现Claude或Codex的用量。现在加入，�
 msgid "No cloud environment opens {repository}."
 msgstr "没有云环境打开 {repository}。"
 
-msgid "No cloud usage in this period."
-msgstr "此周期内没有云端用量。"
-
 msgid "No cloud workspaces"
 msgstr "没有云工作区"
 
@@ -13466,6 +13456,10 @@ msgstr "不在此版本中"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒绝了通知订阅。请检查应用的管理员同意和受保护API的审批，然后重新连接。"
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "未记录"
 
 msgid "Not reported yet"
 msgstr "尚未报告"
@@ -14546,9 +14540,6 @@ msgstr "输出已截断"
 msgid "Outside these hours, channels do not notify you."
 msgstr "在这些时间以外，频道不会通知你。"
 
-msgid "over by {over}"
-msgstr "超出 {over}"
-
 msgid "Overflow Fade"
 msgstr "溢出渐隐"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "页面"
-
-msgid "Page {page} of {pages}"
-msgstr "第 {page} / {pages} 页"
 
 msgid "Page actions"
 msgstr "页面操作"
@@ -14648,10 +14636,6 @@ msgstr "分页"
 
 msgid "Pagination"
 msgstr "分页"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "付费"
 
 msgid "Paid plans"
 msgstr "付费套餐"
@@ -16431,9 +16415,6 @@ msgstr "移除智能体"
 msgid "remove the PR link"
 msgstr "移除PR链接"
 
-msgid "Remove this filter"
-msgstr "移除此筛选"
-
 msgid "Remove trigger"
 msgstr "移除触发器"
 
@@ -17292,6 +17273,9 @@ msgstr "在终端中运行以下命令，然后继续："
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "在终端中运行此命令，然后粘贴它输出的令牌："
+
+msgid "Run time"
+msgstr "运行时长"
 
 msgid "Run workspace command"
 msgstr "运行工作区命令"
@@ -21555,10 +21539,6 @@ msgstr "未知"
 msgid "Unknown"
 msgstr "未知"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "未知"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "未知"
@@ -21886,17 +21866,11 @@ msgstr "用量"
 msgid "Usage is out of date"
 msgstr "用量数据已过时"
 
-msgid "usage limit"
-msgstr "使用上限"
-
 msgid "Usage limit"
 msgstr "使用上限"
 
 msgid "Usage limit reached"
 msgstr "已达到使用上限"
-
-msgid "Usage limit reached."
-msgstr "已达到使用上限。"
 
 msgid "Usage sections"
 msgstr "用量分区"
@@ -23030,9 +23004,6 @@ msgstr "你没有此终端的访问权限。"
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
 
-msgid "You have no cloud usage in this period."
-msgstr "你在此周期内没有云端用量。"
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未保存的环境变量。确定要关闭吗？"
 
@@ -23219,9 +23190,6 @@ msgstr "您的组织已达到环境数量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接你自己的账户后，Paradev 为你完成的工作会以你的名义显示。"
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "仅显示你自己的用量。组织的总量、额度和按人员的用量仅对所有者和管理员可见。"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"

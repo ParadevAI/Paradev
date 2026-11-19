@@ -50,6 +50,7 @@ export function CloudWorkspaceSettings({
 	return (
 		<CloudWorkspacePage
 			Link={CloudUsageLink}
+			workspaceId={workspaceId}
 			periods={periods}
 			period={period}
 			workspace={workspace}

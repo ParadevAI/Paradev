@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Upraven # soubor} few {Upraveny # soubory} many {Upraveno # souboru} other {Upraveno # souborů}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} z {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pro zaměření"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount} otevřených"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {V tomto pracovním prostoru se změnil i # soubor} few {V tomto pracovním prostoru se změnily i # soubory} many {V tomto pracovním prostoru se změnilo i # souboru} other {V tomto pracovním prostoru se změnilo i # souborů}}"
 
+msgid "{over} overage"
+msgstr "{over} nad limit"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} může vaším jménem číst a měnit data ve vašem účtu {pluginLabel}, a to i v budoucích verzích této stránky. Co načte, může odeslat na jiné weby. Povolte jen stránky, kterým důvěřujete."
 
@@ -1350,9 +1356,6 @@ msgstr "Zbývající tokeny: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} z # řádku} few {{first}–{last} z # řádků} many {{first}–{last} z # řádku} other {{first}–{last} z # řádků}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Zahrnuto s # místem} few {Zahrnuto se # místy} many {Zahrnuto s # místa} other {Zahrnuto s # místy}}"
@@ -1658,9 +1661,6 @@ msgstr "0 $"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Seed kolo 11,5 mil. USD pod vedením Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 řádků"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "Právě se staví."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Za obzorem: F5 není tvrzení o blízké budoucnosti"
 
+msgid "Billed hours"
+msgstr "Účtované hodiny"
+
 msgid "Billed monthly"
 msgstr "Účtováno měsíčně"
 
@@ -4863,6 +4866,9 @@ msgstr "Využití cloudu"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Využití cloudu není pro tuto organizaci zapnuto."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Pracovní prostory nelze spustit."
+
 msgid "Cloud workspace"
 msgstr "Cloudový pracovní prostor"
 
@@ -4890,9 +4896,6 @@ msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součá
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Cloudové pracovní prostory se nemohou spustit."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
@@ -9325,10 +9328,6 @@ msgstr "Zakládající inženýr"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Zdarma"
-
 msgid "Free credits"
 msgstr "Kredity zdarma"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Každou hodinu"
-
-msgid "Hours"
-msgstr "Hodiny"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Hodiny sdílí celý tým. Počítají se standardním pracovním prostorem {vcpus} vCPU / {memoryGb} GB a větší stroje je spotřebují rychleji."
@@ -11511,9 +11507,6 @@ msgstr "Načítám další..."
 msgid "Loading more…"
 msgstr "Načítám další…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Načítání stránky {loadingPage} z {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Načítám projekt…"
 
@@ -12806,9 +12799,6 @@ msgstr "Na tomto počítači zatím nebylo nalezeno žádné využití Claude an
 msgid "No cloud environment opens {repository}."
 msgstr "Žádné cloudové prostředí neotevírá {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "V tomto období žádné využití cloudu."
-
 msgid "No cloud workspaces"
 msgstr "Žádné cloudové pracovní prostory"
 
@@ -13466,6 +13456,10 @@ msgstr "Není v této verzi"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Zatím nepřicházejí žádné události: Microsoft Graph odmítl odběry oznámení. Zkontrolujte souhlas administrátora a schválení chráněného API, pak se připojte znovu."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Nezaznamenáno"
 
 msgid "Not reported yet"
 msgstr "Zatím nenahlášeno"
@@ -14546,9 +14540,6 @@ msgstr "Výstup zkrácen"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Mimo tyto hodiny vás kanály neupozorňují."
 
-msgid "over by {over}"
-msgstr "překročeno o {over}"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Stránka"
-
-msgid "Page {page} of {pages}"
-msgstr "Stránka {page} z {pages}"
 
 msgid "Page actions"
 msgstr "Akce stránky"
@@ -14648,10 +14636,6 @@ msgstr "stránkování"
 
 msgid "Pagination"
 msgstr "Stránkování"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Placené"
 
 msgid "Paid plans"
 msgstr "Placené tarify"
@@ -16431,9 +16415,6 @@ msgstr "odebrat agenta"
 msgid "remove the PR link"
 msgstr "odebrat propojení s PR"
 
-msgid "Remove this filter"
-msgstr "Odebrat tento filtr"
-
 msgid "Remove trigger"
 msgstr "Odebrat spouštěč"
 
@@ -17292,6 +17273,9 @@ msgstr "Spusťte toto v terminálu a pak pokračujte:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Spusťte tento příkaz v terminálu a pak vložte token, který vypíše:"
+
+msgid "Run time"
+msgstr "Doba běhu"
 
 msgid "Run workspace command"
 msgstr "Spustit příkaz pracovního prostoru"
@@ -21555,10 +21539,6 @@ msgstr "neznámý"
 msgid "Unknown"
 msgstr "Neznámá"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Neznámé"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Neznámá"
@@ -21886,17 +21866,11 @@ msgstr "Využití"
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
-msgid "usage limit"
-msgstr "limit využití"
-
 msgid "Usage limit"
 msgstr "Limit využití"
 
 msgid "Usage limit reached"
 msgstr "Dosažen limit využití"
-
-msgid "Usage limit reached."
-msgstr "Dosažen limit využití."
 
 msgid "Usage sections"
 msgstr "Sekce využití"
@@ -23030,9 +23004,6 @@ msgstr "K tomuto terminálu nemáte přístup."
 msgid "You don't have permission to remove this member"
 msgstr "Nemáte oprávnění tohoto člena odebrat"
 
-msgid "You have no cloud usage in this period."
-msgstr "V tomto období nemáte žádné využití cloudu."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Máte neuložené proměnné prostředí. Opravdu chcete zavřít?"
 
@@ -23219,9 +23190,6 @@ msgstr "Vaše organizace dosáhla limitu prostředí."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Pouze vaše vlastní využití. Souhrny organizace, její kvóta a využití podle osob jsou pro vlastníky a administrátory."
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."

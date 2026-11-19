@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {このワークスペースで変更された�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {#件のファイルを編集} other {#件のファイルを編集}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{total} 件中 {first}–{last}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText}でフォーカス"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount}件通過"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {このワークスペースで他にも変更: #件のファイル} other {このワークスペースで他にも変更: #件のファイル}}"
 
+msgid "{over} overage"
+msgstr "超過 {over}"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} は、あなたとして {pluginLabel} アカウントのデータを読み取り、変更できます。このページの今後のバージョンも含みます。読み取った内容を他のウェブサイトに送信できます。信頼できるページだけを許可してください。"
 
@@ -1350,9 +1356,6 @@ msgstr "残り {remaining} トークン"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {#件のファイルの変更を取り消しました。} other {#件のファイルの変更を取り消しました。}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, other {# 行中 {first}–{last}}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, other {# シート分に含まれる}}"
@@ -1658,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures がリードしたシードラウンドで 1,150 万ドル"
-
-msgid "0 rows"
-msgstr "0 行"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "いま作っています。"
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "その先:F5は近い将来の主張ではない"
 
+msgid "Billed hours"
+msgstr "課金対象時間"
+
 msgid "Billed monthly"
 msgstr "月払い"
 
@@ -4863,6 +4866,9 @@ msgstr "クラウド使用量"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "この組織ではクラウド使用量が有効になっていません。"
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "この期間のクラウド使用量を使い切りました。ワークスペースを起動できません。"
+
 msgid "Cloud workspace"
 msgstr "クラウドワークスペース"
 
@@ -4890,9 +4896,6 @@ msgstr "{account} ではクラウドワークスペースが有効になって�
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "クラウドワークスペースはご利用のプランに含まれていません。"
-
-msgid "Cloud workspaces cannot start."
-msgstr "クラウドワークスペースを起動できません。"
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "クラウドワークスペースがあなたとしてコミット、プッシュし、プルリクエストを作成します"
@@ -9325,10 +9328,6 @@ msgstr "創業エンジニア"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "無料"
-
 msgid "Free credits"
 msgstr "無料クレジット"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "毎時"
-
-msgid "Hours"
-msgstr "時間"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "時間はチーム全体で共有されます。標準の {vcpus} vCPU / {memoryGb} GB ワークスペースを基準にしており、大きいマシンほど早く消費します。"
@@ -11511,9 +11507,6 @@ msgstr "さらに読み込み中..."
 msgid "Loading more…"
 msgstr "さらに読み込み中…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "{targetPage} ページ中 {loadingPage} ページ目を読み込んでいます..."
-
 msgid "Loading project…"
 msgstr "プロジェクトを読み込み中…"
 
@@ -12806,9 +12799,6 @@ msgstr "このマシンでClaudeやCodexの使用がまだ見つかりません�
 msgid "No cloud environment opens {repository}."
 msgstr "{repository} を開くクラウド環境がありません。"
 
-msgid "No cloud usage in this period."
-msgstr "この期間のクラウド使用量はありません。"
-
 msgid "No cloud workspaces"
 msgstr "クラウドワークスペースはありません"
 
@@ -13466,6 +13456,10 @@ msgstr "このバージョンにはありません"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "記録なし"
 
 msgid "Not reported yet"
 msgstr "まだ報告されていません"
@@ -14546,9 +14540,6 @@ msgstr "出力は省略されました"
 msgid "Outside these hours, channels do not notify you."
 msgstr "この時間外はチャンネルから通知されません。"
 
-msgid "over by {over}"
-msgstr "{over} 超過"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "ページ"
-
-msgid "Page {page} of {pages}"
-msgstr "{page} / {pages} ページ"
 
 msgid "Page actions"
 msgstr "ページの操作"
@@ -14648,10 +14636,6 @@ msgstr "ページネーション"
 
 msgid "Pagination"
 msgstr "Pagination"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "有料"
 
 msgid "Paid plans"
 msgstr "有料プラン"
@@ -16431,9 +16415,6 @@ msgstr "エージェントを削除する"
 msgid "remove the PR link"
 msgstr "PRリンクを削除する"
 
-msgid "Remove this filter"
-msgstr "このフィルターを解除"
-
 msgid "Remove trigger"
 msgstr "トリガーを削除"
 
@@ -17292,6 +17273,9 @@ msgstr "ターミナルでこれを実行してから続行してください:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "これをターミナルで実行し、表示されたトークンを貼り付けてください："
+
+msgid "Run time"
+msgstr "稼働時間"
 
 msgid "Run workspace command"
 msgstr "ワークスペースのコマンドを実行"
@@ -21555,10 +21539,6 @@ msgstr "不明"
 msgid "Unknown"
 msgstr "不明"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "不明"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "不明"
@@ -21886,17 +21866,11 @@ msgstr "使用量"
 msgid "Usage is out of date"
 msgstr "使用状況が古くなっています"
 
-msgid "usage limit"
-msgstr "使用量の上限"
-
 msgid "Usage limit"
 msgstr "使用量の上限"
 
 msgid "Usage limit reached"
 msgstr "使用量の上限に達しました"
-
-msgid "Usage limit reached."
-msgstr "使用量の上限に達しました。"
 
 msgid "Usage sections"
 msgstr "使用量セクション"
@@ -23030,9 +23004,6 @@ msgstr "このターミナルへのアクセス権がありません。"
 msgid "You don't have permission to remove this member"
 msgstr "このメンバーを削除する権限がありません"
 
-msgid "You have no cloud usage in this period."
-msgstr "この期間のクラウド使用量はありません。"
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "保存していない環境変数があります。閉じてもよろしいですか？"
 
@@ -23219,9 +23190,6 @@ msgstr "組織が環境の上限に達しました。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "あなた自身のアカウントです。組織の連携は Paradev がそのツールにアクセスするためのもので、あなたのアカウントを接続すると、Paradev があなたのために行った作業があなたの名前で表示されます。"
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "あなた自身の使用量のみです。組織の合計、割り当て、人別の使用量はオーナーと管理者のみが表示できます。"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradevのダウンロードを開始しています。"

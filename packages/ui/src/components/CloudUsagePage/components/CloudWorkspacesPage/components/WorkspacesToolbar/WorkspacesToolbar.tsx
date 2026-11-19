@@ -1,10 +1,11 @@
 "use client";
 
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { MACHINE_SIZES } from "@superset/shared/billing";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import { useEffect, useState } from "react";
 import { LuSearch, LuX } from "react-icons/lu";
+import { Button } from "../../../../../ui/button";
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -98,6 +99,18 @@ export function WorkspacesToolbar({
 						onChange={(status) => onChange({ ...filters, status })}
 					/>
 				</>
+			)}
+			{(filters.q || filters.user || filters.size || filters.status) && (
+				<Button
+					variant="outline"
+					size="sm"
+					onClick={() => {
+						setText("");
+						onChange({ rows: filters.rows, sort: filters.sort });
+					}}
+				>
+					<Trans>Clear all</Trans>
+				</Button>
 			)}
 		</div>
 	);

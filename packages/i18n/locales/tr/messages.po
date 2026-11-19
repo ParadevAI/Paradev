@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {Bu çalışma alanında # dosya değişti} othe
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {# dosya düzenlendi} other {# dosya düzenlendi}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{total} içinde {first}–{last}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "Odaklanmak için {focusShortcutText}"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount} açık"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Bu çalışma alanında ayrıca değişen: # dosya} other {Bu çalışma alanında ayrıca değişen: # dosya}}"
 
+msgid "{over} overage"
+msgstr "{over} aşım"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle}, sizin adınıza {pluginLabel} hesabınızdaki verileri okuyabilir ve değiştirebilir; bu, sayfanın gelecek sürümlerini de kapsar. Okuduklarını başka web sitelerine gönderebilir. Yalnızca güvendiğiniz sayfalara izin verin."
 
@@ -1350,9 +1356,6 @@ msgstr "{remaining} token kaldı"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {# dosyadaki değişiklikler geri alındı.} other {# dosyadaki değişiklikler geri alındı.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {# satırdan {first}–{last}} other {# satırdan {first}–{last}}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {# koltukla dahil} other {# koltukla dahil}}"
@@ -1658,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Union Square Ventures liderliğinde 11,5 milyon $ tohum yatırım"
-
-msgid "0 rows"
-msgstr "0 satır"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "Şu anda geliştiriliyor."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Ötesi: F5 yakın vadeli bir iddia değil"
 
+msgid "Billed hours"
+msgstr "Faturalanan saatler"
+
 msgid "Billed monthly"
 msgstr "Aylık faturalandırılır"
 
@@ -4863,6 +4866,9 @@ msgstr "Bulut kullanımı"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Bu kuruluş için bulut kullanımı açık değil."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Bu dönemin bulut kullanımı tükendi. Çalışma alanları başlatılamaz."
+
 msgid "Cloud workspace"
 msgstr "Bulut çalışma alanı"
 
@@ -4890,9 +4896,6 @@ msgstr "Bulut çalışma alanları {account} için etkin değil. Team ve Ultra p
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Bulut çalışma alanları planınıza dahil değil."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Bulut çalışma alanları başlatılamıyor."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Bulut çalışma alanları sizin adınıza commit, push yapar ve pull request açar"
@@ -9325,10 +9328,6 @@ msgstr "Kurucu Mühendis"
 msgid "Free"
 msgstr "Ücretsiz"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Ücretsiz"
-
 msgid "Free credits"
 msgstr "Ücretsiz krediler"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Saatlik"
-
-msgid "Hours"
-msgstr "Saat"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Saatler tüm ekibinizle paylaşılır. Standart {vcpus} vCPU / {memoryGb} GB çalışma alanına göre hesaplanır ve daha büyük makineler onları daha hızlı tüketir."
@@ -11511,9 +11507,6 @@ msgstr "Daha fazlası yükleniyor..."
 msgid "Loading more…"
 msgstr "Daha fazlası yükleniyor…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Sayfa {loadingPage}/{targetPage} yükleniyor..."
-
 msgid "Loading project…"
 msgstr "Proje yükleniyor…"
 
@@ -12806,9 +12799,6 @@ msgstr "Bu makinede henüz Claude veya Codex kullanımı bulunamadı. Şimdi kat
 msgid "No cloud environment opens {repository}."
 msgstr "Hiçbir bulut ortamı {repository} deposunu açmıyor."
 
-msgid "No cloud usage in this period."
-msgstr "Bu dönemde bulut kullanımı yok."
-
 msgid "No cloud workspaces"
 msgstr "Bulut çalışma alanı yok"
 
@@ -13466,6 +13456,10 @@ msgstr "Bu sürümde yok"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Henüz olay alınmıyor: Microsoft Graph bildirim aboneliklerini reddetti. Uygulamanın yönetici onayını ve korumalı API onayını kontrol edip yeniden bağlanın."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Kaydedilmedi"
 
 msgid "Not reported yet"
 msgstr "Henüz bildirilmedi"
@@ -14546,9 +14540,6 @@ msgstr "Çıktı kısaltıldı"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Bu saatlerin dışında kanallar sana bildirim göndermez."
 
-msgid "over by {over}"
-msgstr "{over} aşıldı"
-
 msgid "Overflow Fade"
 msgstr "Taşma solması"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Sayfa"
-
-msgid "Page {page} of {pages}"
-msgstr "Sayfa {page} / {pages}"
 
 msgid "Page actions"
 msgstr "Sayfa işlemleri"
@@ -14648,10 +14636,6 @@ msgstr "sayfalama"
 
 msgid "Pagination"
 msgstr "Sayfalama"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Ücretli"
 
 msgid "Paid plans"
 msgstr "Ücretli planlar"
@@ -16431,9 +16415,6 @@ msgstr "ajanı kaldırma"
 msgid "remove the PR link"
 msgstr "PR bağlantısını kaldırma"
 
-msgid "Remove this filter"
-msgstr "Bu filtreyi kaldır"
-
 msgid "Remove trigger"
 msgstr "Tetikleyiciyi kaldır"
 
@@ -17292,6 +17273,9 @@ msgstr "Bunu bir terminalde çalıştırın, ardından devam edin:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Bunu bir terminalde çalıştırın, ardından yazdırdığı belirteci yapıştırın:"
+
+msgid "Run time"
+msgstr "Çalışma süresi"
 
 msgid "Run workspace command"
 msgstr "Çalışma alanı komutunu çalıştır"
@@ -21555,10 +21539,6 @@ msgstr "bilinmiyor"
 msgid "Unknown"
 msgstr "Bilinmiyor"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Bilinmiyor"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Bilinmiyor"
@@ -21886,17 +21866,11 @@ msgstr "Kullanım"
 msgid "Usage is out of date"
 msgstr "Kullanım verileri güncel değil"
 
-msgid "usage limit"
-msgstr "kullanım sınırı"
-
 msgid "Usage limit"
 msgstr "Kullanım sınırı"
 
 msgid "Usage limit reached"
 msgstr "Kullanım sınırına ulaşıldı"
-
-msgid "Usage limit reached."
-msgstr "Kullanım sınırına ulaşıldı."
 
 msgid "Usage sections"
 msgstr "Kullanım bölümleri"
@@ -23030,9 +23004,6 @@ msgstr "Bu terminale erişiminiz yok."
 msgid "You don't have permission to remove this member"
 msgstr "Bu üyeyi kaldırma izniniz yok"
 
-msgid "You have no cloud usage in this period."
-msgstr "Bu dönemde bulut kullanımınız yok."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Kaydedilmemiş ortam değişkenleriniz var. Kapatmak istediğinizden emin misiniz?"
 
@@ -23219,9 +23190,6 @@ msgstr "Kuruluşunuz ortam sınırına ulaştı."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlarına erişmesini sağlar; kendi hesaplarını bağladığında Paradev'in senin için yaptığı işler senin adınla görünür."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Yalnızca kendi kullanımınız. Kuruluşun toplamları, kotası ve kişiye göre kullanım sahipler ve yöneticiler içindir."
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."

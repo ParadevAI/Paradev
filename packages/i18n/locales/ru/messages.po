@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {В этой рабочей области из�
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Изменён # файл} few {Изменено # файла} many {Изменено # файлов} other {Изменено # файла}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} из {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} — фокус"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount} открыто"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Также изменён в этой рабочей области: # файл} few {Также изменены в этой рабочей области: # файла} many {Также изменены в этой рабочей области: # файлов} other {Также изменены в этой рабочей области: # файла}}"
 
+msgid "{over} overage"
+msgstr "{over} сверх лимита"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} может от вашего имени читать и изменять данные в вашем аккаунте {pluginLabel}, в том числе в будущих версиях этой страницы. Прочитанное она может отправить на другие сайты. Разрешайте только страницам, которым доверяете."
 
@@ -1350,9 +1356,6 @@ msgstr "Осталось токенов: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} из # строки} few {{first}–{last} из # строк} many {{first}–{last} из # строк} other {{first}–{last} из # строки}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Входит в # место} few {Входит в # места} many {Входит в # мест} other {Входит в # места}}"
@@ -1658,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Посевной раунд на 11,5 млн $ под руководством Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 строк"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "Делается прямо сейчас."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Дальше: F5 — не заявка на ближайшее будущее"
 
+msgid "Billed hours"
+msgstr "Оплачиваемые часы"
+
 msgid "Billed monthly"
 msgstr "Оплата помесячно"
 
@@ -4863,6 +4866,9 @@ msgstr "Использование облака"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Использование облака не включено для этой организации."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Облачное использование за этот период исчерпано. Рабочие пространства не могут запуститься."
+
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
@@ -4890,9 +4896,6 @@ msgstr "Облачные рабочие пространства не включ
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Облачные рабочие пространства не входят в ваш тариф."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Облачные рабочие области не могут запуститься."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
@@ -9325,10 +9328,6 @@ msgstr "Инженер-основатель"
 msgid "Free"
 msgstr "Бесплатно"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Бесплатно"
-
 msgid "Free credits"
 msgstr "Бесплатные кредиты"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Ежечасно"
-
-msgid "Hours"
-msgstr "Часы"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Часы общие для всей команды. Они рассчитаны на стандартную рабочую область {vcpus} vCPU / {memoryGb} ГБ, а более мощные машины расходуют их быстрее."
@@ -11511,9 +11507,6 @@ msgstr "Загружаем ещё..."
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Загрузка страницы {loadingPage} из {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
 
@@ -12806,9 +12799,6 @@ msgstr "На этой машине пока нет данных об испол�
 msgid "No cloud environment opens {repository}."
 msgstr "Ни одна облачная среда не открывает {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "За этот период облако не использовалось."
-
 msgid "No cloud workspaces"
 msgstr "Нет облачных рабочих пространств"
 
@@ -13466,6 +13456,10 @@ msgstr "Нет в этой версии"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "События пока не приходят: Microsoft Graph отклонил подписки на уведомления. Проверьте согласие администратора и одобрение защищённого API, затем переподключитесь."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Не записано"
 
 msgid "Not reported yet"
 msgstr "Пока нет данных"
@@ -14546,9 +14540,6 @@ msgstr "Вывод обрезан"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Вне этих часов каналы вас не уведомляют."
 
-msgid "over by {over}"
-msgstr "превышение на {over}"
-
 msgid "Overflow Fade"
 msgstr "Затухание переполнения"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Страница"
-
-msgid "Page {page} of {pages}"
-msgstr "Страница {page} из {pages}"
 
 msgid "Page actions"
 msgstr "Действия со страницей"
@@ -14648,10 +14636,6 @@ msgstr "постраничная навигация"
 
 msgid "Pagination"
 msgstr "Постраничная навигация"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Платно"
 
 msgid "Paid plans"
 msgstr "Платные тарифы"
@@ -16431,9 +16415,6 @@ msgstr "удалить агента"
 msgid "remove the PR link"
 msgstr "отвязать PR"
 
-msgid "Remove this filter"
-msgstr "Убрать этот фильтр"
-
 msgid "Remove trigger"
 msgstr "Удалить триггер"
 
@@ -17292,6 +17273,9 @@ msgstr "Выполните это в терминале, затем продол
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Выполните это в терминале, затем вставьте токен, который он выведет:"
+
+msgid "Run time"
+msgstr "Время работы"
 
 msgid "Run workspace command"
 msgstr "Запустить команду рабочей области"
@@ -21555,10 +21539,6 @@ msgstr "неизвестно"
 msgid "Unknown"
 msgstr "Неизвестно"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Неизвестно"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -21886,17 +21866,11 @@ msgstr "Использование"
 msgid "Usage is out of date"
 msgstr "Данные об использовании устарели"
 
-msgid "usage limit"
-msgstr "лимит использования"
-
 msgid "Usage limit"
 msgstr "Лимит использования"
 
 msgid "Usage limit reached"
 msgstr "Достигнут лимит использования"
-
-msgid "Usage limit reached."
-msgstr "Достигнут лимит использования."
 
 msgid "Usage sections"
 msgstr "Разделы использования"
@@ -23030,9 +23004,6 @@ msgstr "У вас нет доступа к этому терминалу."
 msgid "You don't have permission to remove this member"
 msgstr "У вас нет прав удалить этого участника"
 
-msgid "You have no cloud usage in this period."
-msgstr "В этом периоде вы не использовали облако."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас есть несохранённые переменные окружения. Точно закрыть?"
 
@@ -23219,9 +23190,6 @@ msgstr "Ваша организация достигла лимита окруж
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваши собственные учётные записи. Интеграции вашей организации дают Paradev доступ к её инструментам; подключив свои, вы увидите работу, которую Paradev делает для вас, под своим именем."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Только ваше собственное использование. Итоги организации, её лимит и использование по людям доступны владельцам и администраторам."
 
 msgid "Your Paradev download is starting."
 msgstr "Загрузка Paradev начинается."

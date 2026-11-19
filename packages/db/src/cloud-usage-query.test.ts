@@ -144,6 +144,7 @@ describe("queryCloudUsage", () => {
 				id: BROKEN,
 				name: "broken-env",
 				status: "failed",
+				deleted: false,
 				size: "large",
 				owner: {
 					id: MAYA,

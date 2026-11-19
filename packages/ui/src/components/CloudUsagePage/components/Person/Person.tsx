@@ -19,7 +19,7 @@ export function Person({
 			)}
 		>
 			<Avatar
-				size="xs"
+				size="sm"
 				fullName={name}
 				image={image}
 				className="mt-0.5 shrink-0"

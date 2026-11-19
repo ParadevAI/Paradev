@@ -1029,6 +1029,9 @@ msgstr "{fileCount, plural, one {# file changed in this workspace} other {# file
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} of {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} to focus"
 
@@ -1227,6 +1230,9 @@ msgstr "{openCount} open"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 
+msgid "{over} overage"
+msgstr "{over} overage"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 
@@ -1350,9 +1356,6 @@ msgstr "{remaining} tokens left"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Included with # seat} other {Included with # seats}}"
@@ -1658,9 +1661,6 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "$11.5M seed led by Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 rows"
 
 msgid "1"
 msgstr "1"
@@ -3603,6 +3603,9 @@ msgstr "Being built right now."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Beyond: F5 is not a near-term claim"
 
+msgid "Billed hours"
+msgstr "Billed hours"
+
 msgid "Billed monthly"
 msgstr "Billed monthly"
 
@@ -4863,6 +4866,9 @@ msgstr "Cloud usage"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Cloud usage is not enabled for this organization."
 
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Cloud usage is used up for this period. Workspaces cannot start."
+
 msgid "Cloud workspace"
 msgstr "Cloud workspace"
 
@@ -4890,9 +4896,6 @@ msgstr "Cloud workspaces are not enabled for {account}. They come with the Team 
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloud workspaces are not included in your plan."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Cloud workspaces cannot start."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloud workspaces commit, push and open pull requests as you"
@@ -9325,10 +9328,6 @@ msgstr "Founding Engineer"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Free"
-
 msgid "Free credits"
 msgstr "Free credits"
 
@@ -9986,9 +9985,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Hourly"
-
-msgid "Hours"
-msgstr "Hours"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
@@ -11511,9 +11507,6 @@ msgstr "Loading more..."
 msgid "Loading more…"
 msgstr "Loading more…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Loading page {loadingPage} of {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Loading project…"
 
@@ -12806,9 +12799,6 @@ msgstr "No Claude or Codex usage found on this machine yet. Join now and you'll 
 msgid "No cloud environment opens {repository}."
 msgstr "No cloud environment opens {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "No cloud usage in this period."
-
 msgid "No cloud workspaces"
 msgstr "No cloud workspaces"
 
@@ -13466,6 +13456,10 @@ msgstr "Not on this version"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Not recorded"
 
 msgid "Not reported yet"
 msgstr "Not reported yet"
@@ -14546,9 +14540,6 @@ msgstr "Output truncated"
 msgid "Outside these hours, channels do not notify you."
 msgstr "Outside these hours, channels do not notify you."
 
-msgid "over by {over}"
-msgstr "over by {over}"
-
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
 
@@ -14588,9 +14579,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 
 msgid "Page"
 msgstr "Page"
-
-msgid "Page {page} of {pages}"
-msgstr "Page {page} of {pages}"
 
 msgid "Page actions"
 msgstr "Page actions"
@@ -14648,10 +14636,6 @@ msgstr "pagination"
 
 msgid "Pagination"
 msgstr "Pagination"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Paid"
 
 msgid "Paid plans"
 msgstr "Paid plans"
@@ -16431,9 +16415,6 @@ msgstr "remove the agent"
 msgid "remove the PR link"
 msgstr "remove the PR link"
 
-msgid "Remove this filter"
-msgstr "Remove this filter"
-
 msgid "Remove trigger"
 msgstr "Remove trigger"
 
@@ -17292,6 +17273,9 @@ msgstr "Run this in a terminal, then continue:"
 
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Run this in a terminal, then paste the token it prints:"
+
+msgid "Run time"
+msgstr "Run time"
 
 msgid "Run workspace command"
 msgstr "Run workspace command"
@@ -21555,10 +21539,6 @@ msgstr "unknown"
 msgid "Unknown"
 msgstr "Unknown"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Unknown"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Unknown"
@@ -21886,17 +21866,11 @@ msgstr "Usage"
 msgid "Usage is out of date"
 msgstr "Usage is out of date"
 
-msgid "usage limit"
-msgstr "usage limit"
-
 msgid "Usage limit"
 msgstr "Usage limit"
 
 msgid "Usage limit reached"
 msgstr "Usage limit reached"
-
-msgid "Usage limit reached."
-msgstr "Usage limit reached."
 
 msgid "Usage sections"
 msgstr "Usage sections"
@@ -23030,9 +23004,6 @@ msgstr "You don't have access to this terminal."
 msgid "You don't have permission to remove this member"
 msgstr "You don't have permission to remove this member"
 
-msgid "You have no cloud usage in this period."
-msgstr "You have no cloud usage in this period."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "You have unsaved environment variables. Are you sure you want to close?"
 
@@ -23219,9 +23190,6 @@ msgstr "Your organization reached its environment limit."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
 
 msgid "Your Paradev download is starting."
 msgstr "Your Paradev download is starting."

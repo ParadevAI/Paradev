@@ -2,8 +2,7 @@
 
 import { Trans } from "@lingui/react/macro";
 import { PageLink } from "../PageLink";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Empty, EmptyDescription, EmptyHeader } from "../ui/empty";
+import { Alert, AlertTitle } from "../ui/alert";
 import { AllowanceCard } from "./components/AllowanceCard";
 import { MemberSummary } from "./components/MemberSummary";
 import { PageHeader } from "./components/PageHeader";
@@ -61,13 +60,13 @@ export function CloudUsagePage({
 				title={
 					isAdmin ? <Trans>Cloud usage</Trans> : <Trans>Your cloud usage</Trans>
 				}
-				actions={
-					period &&
+				period={
 					periods.data && (
 						<PeriodStepper
 							Link={Link}
 							periods={periods.data.items}
 							period={period}
+							to={(id) => ({ view: "overview", period: id })}
 						/>
 					)
 				}
@@ -83,13 +82,13 @@ export function CloudUsagePage({
 			) : (
 				<>
 					{period?.allowance?.limitReached && !period.closed && (
-						<Alert className="border-warning/50">
-							<AlertTitle className="text-warning">
-								<Trans>Usage limit reached.</Trans>
+						<Alert variant="warning">
+							<AlertTitle className="line-clamp-none">
+								<Trans>
+									Cloud usage is used up for this period. Workspaces cannot
+									start.
+								</Trans>
 							</AlertTitle>
-							<AlertDescription>
-								<Trans>Cloud workspaces cannot start.</Trans>
-							</AlertDescription>
 						</Alert>
 					)}
 					{isAdmin ? (
@@ -116,19 +115,7 @@ export function CloudUsagePage({
 							isPeriod={period !== undefined}
 						/>
 					)}
-					{!hasUsage(byDay.data.total) ? (
-						<Empty>
-							<EmptyHeader>
-								<EmptyDescription>
-									{isAdmin ? (
-										<Trans>No cloud usage in this period.</Trans>
-									) : (
-										<Trans>You have no cloud usage in this period.</Trans>
-									)}
-								</EmptyDescription>
-							</EmptyHeader>
-						</Empty>
-					) : (
+					{hasUsage(byDay.data.total) && (
 						<>
 							<UsageByDay
 								today={today}

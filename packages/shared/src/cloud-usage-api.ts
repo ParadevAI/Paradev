@@ -54,6 +54,7 @@ export const cloudUsageOutputSchema = z.object({
 						id: z.string(),
 						name: z.string(),
 						status: cloudWorkspaceStatusEnum,
+						deleted: z.boolean(),
 						size: machineSizeSchema,
 						owner: userRefSchema.nullable(),
 						failure: z

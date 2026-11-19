@@ -1,15 +1,14 @@
 import type { ReactNode } from "react";
-import { cn } from "../../../../lib/utils";
 import { Badge } from "../../../ui/badge";
 import type { Tone } from "../../constants";
 
-const TONES: Record<Tone, string> = {
-	ok: "border-success/40 bg-success/10 text-success",
-	warn: "border-warning/50 bg-warning/10 text-warning",
-	bad: "border-destructive/50 bg-destructive/10 text-destructive",
-	idle: "border-foreground/25 bg-foreground/5 text-foreground",
-};
+const VARIANTS = {
+	ok: "success",
+	warn: "warning",
+	bad: "destructive",
+} as const;
 
+/** Exceptions get a badge; a quiet state is plain text, so the one that matters stands out. */
 export function ToneBadge({
 	tone,
 	children,
@@ -17,9 +16,8 @@ export function ToneBadge({
 	tone: Tone;
 	children: ReactNode;
 }) {
-	return (
-		<Badge variant="outline" className={cn("whitespace-nowrap", TONES[tone])}>
-			{children}
-		</Badge>
-	);
+	if (tone === "idle") {
+		return <span className="text-xs whitespace-nowrap">{children}</span>;
+	}
+	return <Badge variant={VARIANTS[tone]}>{children}</Badge>;
 }

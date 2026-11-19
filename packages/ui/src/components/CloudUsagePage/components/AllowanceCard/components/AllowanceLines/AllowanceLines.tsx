@@ -38,11 +38,6 @@ export function AllowanceLines({ lines, seats, format }: AllowanceLinesProps) {
 				return <Trans>Bought credits</Trans>;
 		}
 	};
-	const heading = (text: ReactNode) => (
-		<p className="pt-2 text-xs tracking-wide text-muted-foreground uppercase">
-			{text}
-		</p>
-	);
 	const row = (line: HeldLine) => {
 		const used = format(line.used.usd);
 		const total = format(line.total.usd);
@@ -65,16 +60,5 @@ export function AllowanceLines({ lines, seats, format }: AllowanceLinesProps) {
 			</Item>
 		);
 	};
-	const free = lines.filter((line) => line.kind !== "bought");
-	const paid = lines.filter((line) => line.kind === "bought");
-	const grouped = paid.length > 0;
-
-	return (
-		<ItemGroup>
-			{grouped && heading(<Trans context="cloud allowance group">Free</Trans>)}
-			{free.map(row)}
-			{grouped && heading(<Trans context="cloud allowance group">Paid</Trans>)}
-			{paid.map(row)}
-		</ItemGroup>
-	);
+	return <ItemGroup>{lines.map(row)}</ItemGroup>;
 }

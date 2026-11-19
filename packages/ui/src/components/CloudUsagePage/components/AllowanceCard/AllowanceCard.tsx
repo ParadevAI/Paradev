@@ -7,7 +7,6 @@ import {
 	cloudUsageDisplay,
 } from "@superset/shared/cloud-usage-display";
 import type { ReactNode } from "react";
-import { cn } from "../../../../lib/utils";
 import { Badge } from "../../../ui/badge";
 import {
 	Card,
@@ -63,8 +62,8 @@ export function AllowanceCard({
 	const scale = Math.max(shown.held?.usd ?? 0, shown.used.usd) || 1;
 
 	return (
-		<Card className={cn("gap-4 py-5", BOX)}>
-			<CardHeader className="items-center px-5">
+		<Card className={BOX}>
+			<CardHeader className="items-center">
 				<CardTitle
 					role="heading"
 					aria-level={3}
@@ -83,18 +82,15 @@ export function AllowanceCard({
 						)}
 					</span>
 					{over && (
-						<Badge
-							variant="outline"
-							className="self-center border-warning/50 text-warning"
-						>
-							<Trans>over by {over}</Trans>
+						<Badge variant="warning" className="self-center">
+							<Trans>{over} overage</Trans>
 						</Badge>
 					)}
 				</CardTitle>
 				<CardAction>{billing}</CardAction>
 			</CardHeader>
 			{shown.held && (
-				<CardContent className="space-y-3 px-5">
+				<CardContent className="space-y-3">
 					<div
 						role="img"
 						aria-label={`${used} / ${held}`}
@@ -108,7 +104,13 @@ export function AllowanceCard({
 							/>
 						))}
 					</div>
-					<AllowanceLines lines={shown.lines} seats={seats} format={dollars} />
+					{shown.lines.length > 1 && (
+						<AllowanceLines
+							lines={shown.lines}
+							seats={seats}
+							format={dollars}
+						/>
+					)}
 				</CardContent>
 			)}
 		</Card>

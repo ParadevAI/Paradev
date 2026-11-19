@@ -1,8 +1,7 @@
 "use client";
 
 import { Plural, Trans } from "@lingui/react/macro";
-import { cn } from "../../../../lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../ui/card";
+import { Card, CardHeader, CardTitle } from "../../../ui/card";
 import { BOX } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type { PricedMetrics } from "../../utils/priced";
@@ -19,8 +18,8 @@ export function MemberSummary({
 	const count = total.workspaces;
 
 	return (
-		<Card className={cn("gap-2 py-5", BOX)}>
-			<CardHeader className="px-5">
+		<Card className={BOX}>
+			<CardHeader>
 				<CardTitle
 					role="heading"
 					aria-level={3}
@@ -46,12 +45,6 @@ export function MemberSummary({
 					</span>
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="px-5 text-xs text-muted-foreground">
-				<Trans>
-					Your own usage only. The organization's totals, its allowance and
-					usage by person are for owners and admins.
-				</Trans>
-			</CardContent>
 		</Card>
 	);
 }

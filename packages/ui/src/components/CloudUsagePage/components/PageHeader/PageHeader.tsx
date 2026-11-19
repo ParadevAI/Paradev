@@ -2,6 +2,7 @@ import { Fragment, type ReactNode } from "react";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
+	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
@@ -18,6 +19,8 @@ interface PageHeaderProps {
 	/** Beside the title, such as a status pill. */
 	badge?: ReactNode;
 	actions?: ReactNode;
+	/** The period control, always the header's top right. */
+	period?: ReactNode;
 }
 
 export function PageHeader({
@@ -27,6 +30,7 @@ export function PageHeader({
 	current = title,
 	badge,
 	actions,
+	period,
 }: PageHeaderProps) {
 	return (
 		<header className="space-y-2">
@@ -36,12 +40,9 @@ export function PageHeader({
 						{crumbs.map((crumb) => (
 							<Fragment key={crumb.to.view}>
 								<BreadcrumbItem>
-									<Link
-										to={crumb.to}
-										className="transition-colors hover:text-foreground"
-									>
-										{crumb.label}
-									</Link>
+									<BreadcrumbLink asChild>
+										<Link to={crumb.to}>{crumb.label}</Link>
+									</BreadcrumbLink>
 								</BreadcrumbItem>
 								<BreadcrumbSeparator />
 							</Fragment>
@@ -58,10 +59,13 @@ export function PageHeader({
 				</Breadcrumb>
 			)}
 			<div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-				<h2 className="min-w-0 text-2xl font-semibold break-words">{title}</h2>
+				<h2 className="min-w-0 text-xl font-semibold break-words">{title}</h2>
 				{badge}
-				{actions && (
-					<div className="ml-auto flex items-center gap-2">{actions}</div>
+				{(actions || period) && (
+					<div className="ml-auto flex items-center gap-2">
+						{actions}
+						{period}
+					</div>
 				)}
 			</div>
 		</header>

@@ -461,6 +461,8 @@ interface WorkspaceRef {
 	id: string;
 	name: string;
 	status: CloudWorkspaceStatus;
+	/** Deleted workspaces keep the status they had; this says they are gone. */
+	deleted: boolean;
 	size: MachineSize;
 	owner: UserRef | null;
 	failure: { reason: CloudWorkspaceFailureReason; at: Date } | null;
@@ -528,6 +530,7 @@ async function refsFor(
 				id: workspaces.id,
 				name: workspaces.name,
 				status: workspaces.status,
+				deleted: sql<boolean>`${workspaces.deletedAt} is not null`,
 				machineSize: workspaces.machineSize,
 				failureReason: workspaces.failureReason,
 				failedAt: workspaces.failedAt,

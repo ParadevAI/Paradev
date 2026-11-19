@@ -138,6 +138,7 @@ function workspaceSeeds(count: number, names?: string[]): Seed[] {
 			id: `ws-${i + 1}`,
 			name: names?.[i] ?? `${pick(WORDS)}-${pick(WORDS)}-${pick(WORDS)}`,
 			status,
+			deleted: false,
 			size: pick(SIZES),
 			owner: i === 0 ? SAM : pick([PRIYA, PRIYA, INES, SAM, THEO, MAYA]),
 			failure:
@@ -578,6 +579,7 @@ export function workspaceArgs(which: WorkspaceRef["status"] | "long") {
 	) as Row;
 	const one = query(usage([row], [row], CURRENT));
 	return {
+		workspaceId: row.key ?? "",
 		periods: query(workspacesPeriods),
 		period: workspacesPeriods.items[0],
 		workspace: one,
