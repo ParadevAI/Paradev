@@ -1952,6 +1952,7 @@ export class AcpAdapter implements HarnessAdapter {
 		open = false,
 	): void {
 		run.stream.flush();
+		run.stream.cancelCompactions();
 		this.cancelSubagentApprovals(sessionId, run);
 		this.endSubagentTasks(sessionId);
 		this.backgroundTasks.end(run.item.id);

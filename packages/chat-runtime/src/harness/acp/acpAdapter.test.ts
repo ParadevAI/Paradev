@@ -4881,6 +4881,39 @@ describe("AcpAdapter on protocol v2", () => {
 		await adapter.dispose();
 	});
 
+	it("cancels a subagent's running compaction when the subagent ends", async () => {
+		const agent = new FakeAcpAgent();
+		const { adapter, events } = startAdapter(agent);
+		await flush();
+
+		agent.notify("sess-1", {
+			sessionUpdate: "subagent_spawned",
+			subagentSessionId: "child-1",
+			name: "Review",
+		});
+		agent.notify("child-1", {
+			sessionUpdate: "compaction_update",
+			compactionId: "c1",
+			status: "in_progress",
+		});
+		await flush();
+		agent.exit(1);
+		await flush();
+
+		const compaction = itemsOf(events).filter((i) =>
+			i.id.endsWith("compaction:c1"),
+		);
+		expect(compaction[0]).toMatchObject({
+			parentItemId: "subagent:child-1",
+			text: "Compacting conversation history",
+		});
+		expect(compaction.at(-1)).toMatchObject({
+			text: "Conversation history compaction was canceled",
+			completedAtMs: expect.any(Number),
+		});
+		await adapter.dispose();
+	});
+
 	it("takes the chat title only from its own session", async () => {
 		const agent = new FakeAcpAgent();
 		const { adapter, events } = startAdapter(agent);

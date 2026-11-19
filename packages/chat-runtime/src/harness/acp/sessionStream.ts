@@ -210,6 +210,10 @@ export class SessionStream {
 		);
 	}
 
+	cancelCompactions(): void {
+		for (const itemId of this.compactions.keys()) this.cancelCompaction(itemId);
+	}
+
 	cancelCompaction(itemId: string): void {
 		const compaction = this.compactions.get(itemId);
 		if (!compaction || compaction.notice.completedAtMs !== undefined) return;
