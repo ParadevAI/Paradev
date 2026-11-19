@@ -1082,7 +1082,7 @@ export function ComposerBody({
 			className={cn(
 				inline
 					? "relative min-w-24 flex-1 py-[3px]"
-					: "relative px-4 pt-3.5 pb-1",
+					: "relative px-4 pt-3.5 pb-1 @max-[240px]/composer:[--prompt-input-max-height:20vh]",
 				inline && dictating && "hidden",
 			)}
 		>
@@ -1102,7 +1102,7 @@ export function ComposerBody({
 							"pointer-events-none absolute text-sm leading-[1.625]",
 							inline
 								? "top-[3px] left-0 text-muted-foreground"
-								: "top-3.5 left-4 text-muted-foreground/70",
+								: "top-3.5 right-4 left-4 text-muted-foreground/70 @max-[240px]/composer:line-clamp-2",
 						)}
 					>
 						{placeholder}
@@ -1410,7 +1410,7 @@ export function ComposerBody({
 		<>
 			{editorBlock}
 			<div
-				className="flex min-h-12 items-center gap-2 px-3 pb-2.5"
+				className="flex min-h-12 flex-wrap items-center gap-2 px-3 pb-2.5 @[240px]/composer:flex-nowrap [&>*]:max-w-full"
 				data-composer-footer
 			>
 				<ContextButton onClick={toggleBrowseMenu} disabled={dictating} />
@@ -1432,7 +1432,7 @@ export function ComposerBody({
 			<div
 				ref={rootRef}
 				className={cn(
-					"relative flex flex-col bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
+					"@container/composer relative flex min-w-0 flex-col bg-card ring-1 ring-border transition-shadow focus-within:ring-ring/40",
 					inline ? "rounded-[22px]" : "rounded-2xl",
 				)}
 				onDragOver={(event) => {

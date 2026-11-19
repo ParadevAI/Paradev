@@ -81,30 +81,28 @@ export function TitleBar() {
 		const leading = leadingRef.current;
 		if (!contentCard || !leading) return;
 		const align = () => {
-			leading.style.minWidth = `${contentCard.getBoundingClientRect().left}px`;
+			leading.style.width = `${contentCard.getBoundingClientRect().left}px`;
 		};
 		align();
 		const observer = new ResizeObserver(align);
 		observer.observe(contentCard);
 		return () => {
 			observer.disconnect();
-			leading.style.minWidth = "";
+			leading.style.width = "";
 		};
 	}, [contentCard]);
 	const slotStyle = isMac
 		? {
 				zoom: 1 / zoomFactor,
-				width: `${zoomFactor * 100}%`,
-				height: `${zoomFactor * 100}%`,
 			}
 		: undefined;
 
 	return (
 		<div
-			className="flex h-11 shrink-0 items-stretch [--header-tab-selected:var(--shell-tab-selected)]"
+			className="hide-scrollbar flex h-11 shrink-0 items-stretch overflow-x-auto [--header-tab-selected:var(--shell-tab-selected)]"
 			style={isMac ? { height: `${ROW_HEIGHT / zoomFactor}px` } : undefined}
 		>
-			<div ref={leadingRef} className="flex shrink-0 items-stretch">
+			<div ref={leadingRef} className="flex min-w-min items-stretch">
 				{isMac ? (
 					<div
 						className="drag h-full shrink-0"
@@ -138,20 +136,20 @@ export function TitleBar() {
 			</div>
 			<div
 				className={cn(
-					"relative min-w-0 flex-1 overflow-hidden",
+					"flex min-w-min flex-1 overflow-hidden",
 					mainClaims === 0 && "hidden",
 				)}
 			>
 				<div
 					ref={setMain}
-					className="absolute top-0 left-0 flex size-full"
+					className="flex h-full min-w-0 flex-1"
 					style={slotStyle}
 				/>
 			</div>
 			{mainClaims === 0 && <div className="drag h-full min-w-0 flex-1" />}
 			<div
 				className={cn(
-					"relative min-w-0 overflow-hidden",
+					"flex min-w-min overflow-hidden",
 					sideWidth === null && "hidden",
 				)}
 				style={
@@ -164,7 +162,7 @@ export function TitleBar() {
 			>
 				<div
 					ref={setSide}
-					className="absolute top-0 left-0 flex size-full"
+					className="flex h-full min-w-0 flex-1"
 					style={slotStyle}
 				/>
 			</div>
