@@ -194,9 +194,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const prevIndex = index <= 0 ? navigationWorkspaces.length - 1 : index - 1;
 		const target = navigationWorkspaces[prevIndex];
-		void navigateToWorkspaceAndThen(target.id, router, () =>
-			revealWorkspace(target.id),
-		).catch(reportRendererError);
+		void navigateToWorkspaceAndThen(target.id, router, () => {
+			if (revealCollapsed) revealWorkspace(target.id);
+		}).catch(reportRendererError);
 	});
 
 	useHotkey("NEXT_WORKSPACE", () => {
@@ -206,9 +206,9 @@ export function useDashboardSidebarShortcuts(
 		);
 		const nextIndex = index >= navigationWorkspaces.length - 1 ? 0 : index + 1;
 		const target = navigationWorkspaces[nextIndex];
-		void navigateToWorkspaceAndThen(target.id, router, () =>
-			revealWorkspace(target.id),
-		).catch(reportRendererError);
+		void navigateToWorkspaceAndThen(target.id, router, () => {
+			if (revealCollapsed) revealWorkspace(target.id);
+		}).catch(reportRendererError);
 	});
 
 	return workspaceShortcutLabels;

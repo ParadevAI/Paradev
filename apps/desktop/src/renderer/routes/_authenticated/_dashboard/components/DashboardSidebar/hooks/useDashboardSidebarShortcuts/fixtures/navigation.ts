@@ -310,3 +310,21 @@ test.each([
 	expect(expandProject).toHaveBeenCalledWith("project");
 	expect(expandSection).toHaveBeenCalledWith("section");
 });
+
+test.each([
+	"JUMP_TO_WORKSPACE_2",
+	"PREV_WORKSPACE",
+	"NEXT_WORKSPACE",
+])("%s preserves collapse preferences when reveal is disabled", async (key) => {
+	currentWorkspaceId = "session";
+	renderHook(() =>
+		useDashboardSidebarShortcuts(groups, sessions, [], {
+			revealCollapsed: false,
+		}),
+	);
+	press(key);
+	expectTarget("project-workspace");
+	await flushNavigationEffects();
+	expect(expandProject).not.toHaveBeenCalled();
+	expect(expandSection).not.toHaveBeenCalled();
+});
