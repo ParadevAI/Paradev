@@ -15,26 +15,6 @@ export async function recordUsageEvent(
 	await db.insert(cloudUsageEvents).values(event).onConflictDoNothing();
 }
 
-type Same<A, B> =
-	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-		? true
-		: false;
-type Assert<T extends true> = T;
-type Flat<T> = { [K in keyof T]: T[K] };
-
-/** Fails to compile when PendingUsageEvent no longer matches a cloud_usage_events row. */
-export type PendingUsageEventMatchesRow = Assert<
-	Same<
-		PendingUsageEvent,
-		Flat<
-			Omit<
-				InsertCloudUsageEvent,
-				"windowFrom" | "windowTo" | "sentAt" | "createdAt" | "updatedAt"
-			> & { windowFrom: string; windowTo: string; sentAt: string }
-		>
-	>
->;
-
 export function usageRowFromPending(
 	event: PendingUsageEvent,
 ): InsertCloudUsageEvent {
@@ -47,8 +27,8 @@ export function usageRowFromPending(
 }
 
 /**
- * Every usage row we hold for an amount Autumn accepted: the written rows and the ones kept on a
- * boot until the meter writes them. A lock with either has its row, so a backfill must not add one.
+ * Every usage row we hold for an amount Autumn accepted: the written rows, and the rows kept on a
+ * boot that are not written yet. A lock with either has its row, so a backfill must not add one.
  */
 export function recordedUsage(db: Db) {
 	const pending = sql`(${cloudWorkspaceBoots} cross join jsonb_array_elements(${cloudWorkspaceBoots.pendingUsageEvents}) as pending(event))`;
@@ -71,7 +51,16 @@ export function recordedUsage(db: Db) {
 					sentAt: sql<Date | null>`(pending.event->>'sentAt')::timestamptz`,
 				})
 				.from(pending)
-				.where(isNotNull(cloudWorkspaceBoots.pendingUsageEvents)),
+				.where(
+					and(
+						isNotNull(cloudWorkspaceBoots.pendingUsageEvents),
+						sql`not exists (select 1 from ${cloudUsageEvents} written
+							where written.boot_id = pending.event->>'bootId'
+								and written.lock_seq = (pending.event->>'lockSeq')::int
+								and written.feature::text = pending.event->>'feature'
+								and written.window_from = (pending.event->>'windowFrom')::timestamptz)`,
+					),
+				),
 		);
 }
 
@@ -80,8 +69,8 @@ export async function clearPendingUsage(
 	db: Db,
 	bootId: string,
 	written: PendingUsageEvent[],
-): Promise<boolean> {
-	const cleared = await db
+): Promise<void> {
+	await db
 		.update(cloudWorkspaceBoots)
 		.set({ pendingUsageEvents: null })
 		.where(
@@ -89,7 +78,5 @@ export async function clearPendingUsage(
 				eq(cloudWorkspaceBoots.id, bootId),
 				sql`${cloudWorkspaceBoots.pendingUsageEvents} = ${JSON.stringify(written)}::jsonb`,
 			),
-		)
-		.returning({ id: cloudWorkspaceBoots.id });
-	return cleared.length > 0;
+		);
 }

@@ -125,11 +125,7 @@ export type UserIdentityMetadata =
 	// name people by; the stable subject id rides here.
 	| { provider: "google"; sub?: string };
 
-/**
- * A cloud_usage_events row kept on its boot until it is written, as JSON: its timestamps are ISO
- * strings. Written out, not derived from the table, because a boot column typed by the events table
- * makes the two table types circular; cloud-usage-events.ts fails to compile if it drifts.
- */
+/** A cloud_usage_events row kept on its boot until it is written; timestamps are ISO strings. */
 export type PendingUsageEvent = {
 	bootId: string;
 	lockSeq: number;

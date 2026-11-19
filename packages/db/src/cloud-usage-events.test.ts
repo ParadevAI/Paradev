@@ -110,17 +110,29 @@ describe("recordedUsage", () => {
 		).toBeGreaterThan(0);
 		await keep(null);
 	});
+
+	test("a kept row that is also written is listed once", async () => {
+		const written = {
+			...kept(1, "480"),
+			bootId: "boot_1",
+			windowFrom: "2026-11-10T09:00:00.000Z",
+		};
+		const before = (await recordedUsage(db)).length;
+		await keep([written]);
+		expect(await recordedUsage(db)).toHaveLength(before);
+		await keep(null);
+	});
 });
 
 describe("clearPendingUsage", () => {
 	test("clears the list it wrote, and leaves a list a settle added to meanwhile", async () => {
 		const written = [kept(7, "16")];
 		await keep([...written, kept(8, "4.5")]);
-		expect(await clearPendingUsage(db, "boot_2", written)).toBe(false);
+		await clearPendingUsage(db, "boot_2", written);
 		expect(await keptOnBoot()).toEqual([kept(7, "16"), kept(8, "4.5")]);
 
 		await keep(written);
-		expect(await clearPendingUsage(db, "boot_2", written)).toBe(true);
+		await clearPendingUsage(db, "boot_2", written);
 		expect(await keptOnBoot()).toBeNull();
 	});
 });

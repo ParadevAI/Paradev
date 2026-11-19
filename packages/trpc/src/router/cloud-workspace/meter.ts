@@ -363,6 +363,14 @@ type UsageWindow = {
 	user: UsageUser | null;
 };
 
+function usageTags(bootId: string, feature: string, lockSeq: number) {
+	return {
+		"boot.id": bootId,
+		"usage.feature": feature,
+		"lock.seq": String(lockSeq),
+	};
+}
+
 /** Writes the row for an amount Autumn accepted; returns it when the write failed, so it is kept. */
 async function recordSentUsage(
 	boot: Boot,
@@ -386,8 +394,10 @@ async function recordSentUsage(
 		return null;
 	} catch (error) {
 		Sentry.captureException(error, {
-			tags: bootTags(boot),
-			extra: { feature, lockSeq: boot.lockSeq },
+			tags: {
+				...bootTags(boot),
+				...usageTags(boot.id, feature, boot.lockSeq),
+			},
 		});
 		return event;
 	}
@@ -415,21 +425,24 @@ async function writePendingUsage(): Promise<void> {
 		.from(cloudWorkspaceBoots)
 		.where(isNotNull(cloudWorkspaceBoots.pendingUsageEvents));
 	for (const { id, pendingUsageEvents: events } of pending) {
-		let writing: PendingUsageEvent | null = null;
-		try {
-			for (const event of events) {
-				writing = event;
-				await recordUsageEvent(db, usageRowFromPending(event));
-			}
-			writing = null;
-			await clearPendingUsage(db, id, events);
-		} catch (error) {
-			Sentry.captureException(error, {
-				tags: { "boot.id": id },
-				extra: writing
-					? { feature: writing.feature, lockSeq: writing.lockSeq }
-					: undefined,
-			});
+		const written: boolean[] = [];
+		for (const event of events) {
+			written.push(
+				await recordUsageEvent(db, usageRowFromPending(event)).then(
+					() => true,
+					(error) => {
+						Sentry.captureException(error, {
+							tags: usageTags(id, event.feature, event.lockSeq),
+						});
+						return false;
+					},
+				),
+			);
+		}
+		if (written.every(Boolean)) {
+			await clearPendingUsage(db, id, events).catch((error) =>
+				Sentry.captureException(error, { tags: { "boot.id": id } }),
+			);
 		}
 	}
 }
