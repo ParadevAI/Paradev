@@ -259,7 +259,8 @@ if __name__ == "__main__":
     }
     tpl = (Path(__file__).parent / "template.html").read_text()
     r2 = (Path(__file__).parent / "round2.html").read_text()
-    tpl = tpl.replace("<h2>What has to change to adopt it</h2>", r2 + "\n<h2>What has to change to adopt it</h2>")
+    r3 = (Path(__file__).parent / "round3.html").read_text()
+    tpl = tpl.replace("<h2>What has to change to adopt it</h2>", r2 + "\n" + r3 + "\n<h2>What has to change to adopt it</h2>")
     status = json.loads((Path(__file__).parent / "status.json").read_text())
     for k, v in status.items():
         tpl = tpl.replace("{{" + k + "}}", v)

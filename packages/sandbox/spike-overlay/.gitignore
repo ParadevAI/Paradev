@@ -2,3 +2,8 @@ page/*.html
 page/status.json
 data/inventory-summary.txt
 data/envdays.txt
+data/inventory-r3.json
+data/ws-all.csv
+data/snaphist.jsonl
+data/diskmeter-*.csv
+data/model-r3.json
