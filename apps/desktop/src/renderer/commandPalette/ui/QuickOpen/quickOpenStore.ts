@@ -1,4 +1,4 @@
-import type { RecentFile } from "renderer/routes/_authenticated/_dashboard/v2-workspace/$workspaceId/hooks/useRecentlyViewedFiles";
+import type { RecentFile } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRecentlyViewedFiles";
 import { create } from "zustand";
 
 export interface QuickOpenFileMatch {

@@ -1,4 +1,5 @@
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
+import * as Sentry from "@sentry/node";
 import { BOX_PRESSURE_HEARTBEAT_MS } from "@superset/shared/box-pressure";
 import type { BoxResources } from "../box-resources";
 import { startSandboxBoxPressureReporter } from "./sandbox-box-pressure";
@@ -64,4 +65,19 @@ test("backs off after a failed report instead of retrying every sample", async (
 	expect(bodies).toHaveLength(1);
 	await step(31_000);
 	expect(bodies).toHaveLength(2);
+});
+
+test("logs each memory guard reap once, with sizes and no process name", async () => {
+	const warn = spyOn(Sentry.logger, "warn").mockImplementation(() => {});
+	const { step } = harness();
+	const reaped = {
+		...calm,
+		recentReap: { at: 1_000, processName: "node", rssMb: 5100 },
+	};
+	await step(0, reaped);
+	await step(5_000, reaped);
+	expect(warn.mock.calls).toEqual([
+		["box.reaped", { "reap.rss_mb": 5100, "memory.limit_mb": 8192 }],
+	]);
+	warn.mockRestore();
 });

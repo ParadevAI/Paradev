@@ -19,7 +19,7 @@ import { HotkeyLabel } from "renderer/hotkeys";
 import { usePullRequestLinkPolicy } from "renderer/lib/clickPolicy";
 import { openPullRequestLink } from "renderer/lib/github/openPullRequestLink";
 import { useDashboardSidebarWorkspacePorts } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/DashboardSidebarPortsProvider";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ProjectThumbnail } from "renderer/routes/_authenticated/components/ProjectThumbnail";
 import { getStatusTooltip } from "renderer/screens/main/components/StatusIndicator";
 import { RenameInput } from "renderer/screens/main/components/WorkspaceSidebar/RenameInput";
@@ -230,7 +230,7 @@ export const DashboardSidebarExpandedWorkspaceRow = forwardRef<
 											...ref,
 											placement,
 										});
-										void navigateToV2Workspace(workspace.id, navigate);
+										void navigateToWorkspace(workspace.id, navigate);
 									},
 								);
 							}}

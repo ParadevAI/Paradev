@@ -39,7 +39,7 @@
 		"drizzle-orm": "0.45.2",
 		"import-in-the-middle": "2.0.1",
 		"jose": "6.2.13",
-		"next": "16.4.1",
+		"next": "16.4.5",
 		"posthog-node": "5.28.8",
 		"react": "19.3.0",
 		"react-dom": "19.3.0",

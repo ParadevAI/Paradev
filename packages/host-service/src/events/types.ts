@@ -56,6 +56,8 @@ interface TerminalLifecycleBase {
 }
 
 export type TerminalLifecycleMessage =
+	/** The terminal now appears in `terminal.list`, whoever started it. */
+	| (TerminalLifecycleBase & { eventType: "listed" })
 	| (TerminalLifecycleBase & {
 			eventType: "exit";
 			exitCode: number;

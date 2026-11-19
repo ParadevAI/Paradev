@@ -4,13 +4,16 @@ import { createIgnoreMatcher } from "./ignore-matcher";
 import { rewatchRecreatedDirectories } from "./recreated-directories";
 import type { NativeWatchBackend, NativeWatchEvent } from "./types";
 
-const EVENT_TYPES = {
-	add: "create",
-	addDir: "create",
-	change: "update",
-	unlink: "delete",
-	unlinkDir: "delete",
-} as const satisfies Record<string, NativeWatchEvent["type"]>;
+const EVENTS = {
+	add: { type: "create", isDirectory: false },
+	addDir: { type: "create", isDirectory: true },
+	change: { type: "update", isDirectory: false },
+	unlink: { type: "delete", isDirectory: false },
+	unlinkDir: { type: "delete", isDirectory: true },
+} as const satisfies Record<
+	string,
+	Required<Pick<NativeWatchEvent, "type" | "isDirectory">>
+>;
 
 /**
  * Watches through Node's own `fs.watch`, so every event is delivered by libuv
@@ -22,7 +25,8 @@ export function createChokidarWatchBackend({
 } = {}): NativeWatchBackend {
 	return {
 		name: "chokidar",
-		subscribe({ rootPath, ignore, onEvents, onError }) {
+		watchesEachEntry: true,
+		subscribe({ rootPath, ignore, isPruned, onEvents, onError }) {
 			const isIgnored = createIgnoreMatcher(rootPath, ignore);
 			const directories = new Set<string>();
 			const watcher = watch(rootPath, {
@@ -32,9 +36,13 @@ export function createChokidarWatchBackend({
 				// Atomic-write folding would hide the delete half of a rename from
 				// the rename reconciliation in watch-event-coalescing.ts.
 				atomic: false,
+				// Also asked when a recreated directory is added again, so a pruned
+				// one stays unwatched.
 				ignored: (candidate, stats) => {
 					const isDirectory = stats?.isDirectory();
-					if (isIgnored(candidate, isDirectory)) return true;
+					if (isIgnored(candidate, isDirectory) || isPruned?.(candidate)) {
+						return true;
+					}
 					// On Windows chokidar passes `ignored` forward slashes.
 					if (isDirectory) directories.add(path.normalize(candidate));
 					return false;
@@ -46,9 +54,11 @@ export function createChokidarWatchBackend({
 				recreatedDirectorySettleMs,
 			);
 
-			for (const [chokidarEvent, type] of Object.entries(EVENT_TYPES)) {
-				watcher.on(chokidarEvent as keyof typeof EVENT_TYPES, (eventPath) => {
-					onEvents([{ type, path: eventPath }]);
+			for (const [chokidarEvent, { type, isDirectory }] of Object.entries(
+				EVENTS,
+			)) {
+				watcher.on(chokidarEvent as keyof typeof EVENTS, (eventPath) => {
+					onEvents([{ type, path: eventPath, isDirectory }]);
 				});
 			}
 			watcher.on("error", onError);

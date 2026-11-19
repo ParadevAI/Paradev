@@ -1373,6 +1373,27 @@
       "when": 1794806184119,
       "tag": "0195_cloud_workspace_status_archived",
       "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1794970769952,
+      "tag": "0196_cloud_usage_events_and_boot_facts",
+      "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1794980472136,
+      "tag": "0197_cloud_usage_events_amount_and_key",
+      "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1794982413384,
+      "tag": "0198_cloud_workspace_boot_origin",
+      "breakpoints": true
     }
   ]
 }

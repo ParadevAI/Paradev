@@ -256,6 +256,16 @@
 			"category": "productivity",
 			"source": "./plugins/wispr",
 			"version": "1.0.0"
+		},
+		{
+			"name": "planetscale",
+			"description": "Work with your PlanetScale databases: inspect organizations, databases, and branches, read schemas, run SQL, and review query insights.",
+			"author": {
+				"name": "Paradev"
+			},
+			"category": "data & apis",
+			"source": "./plugins/planetscale",
+			"version": "1.0.0"
 		}
 	],
 	"featured": ["github", "linear"],

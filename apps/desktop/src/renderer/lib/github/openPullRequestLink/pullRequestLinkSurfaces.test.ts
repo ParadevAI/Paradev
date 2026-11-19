@@ -4,7 +4,7 @@ import { describe, expect, test } from "bun:test";
 // click policy, so modifier-click can never reach GitHub again.
 const RENDERER_ROOT = import.meta.dir.split("/").slice(0, -3).join("/");
 const DASHBOARD = "routes/_authenticated/_dashboard";
-const V2_WORKSPACE = `${DASHBOARD}/v2-workspace/$workspaceId`;
+const V2_WORKSPACE = `${DASHBOARD}/workspace/$workspaceId`;
 const SIDEBAR_ROWS = `${DASHBOARD}/components/DashboardSidebar/components/DashboardSidebarWorkspaceItem/components`;
 
 const SURFACES = [

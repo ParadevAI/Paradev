@@ -123,3 +123,11 @@ export type UserIdentityMetadata =
 	// The external id is the account address, since that is what mail headers
 	// name people by; the stable subject id rides here.
 	| { provider: "google"; sub?: string };
+
+/** One phase of a boot: API spans first, then the box's stamps. `at` is epoch ms on the source's own clock. */
+export type CloudWorkspaceBootPhase = {
+	name: string;
+	source: "api" | "box";
+	at: number;
+	ms: number;
+};

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  VERCEL_CLI_VERSION: 50.22.1
+  VERCEL_CLI_VERSION: 50.31.0
 
 jobs:
   deploy-database:

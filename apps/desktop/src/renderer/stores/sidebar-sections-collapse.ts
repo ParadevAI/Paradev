@@ -9,8 +9,7 @@ export type SidebarSectionKey =
 	| "sessions"
 	| "workspaces";
 
-export const SIDEBAR_SECTIONS_COLLAPSE_STORAGE_KEY =
-	"sidebar-workspaces-collapse";
+const SIDEBAR_SECTIONS_COLLAPSE_STORAGE_KEY = "sidebar-workspaces-collapse";
 
 interface SidebarSectionsCollapseState {
 	collapsed: Record<SidebarSectionKey, boolean>;

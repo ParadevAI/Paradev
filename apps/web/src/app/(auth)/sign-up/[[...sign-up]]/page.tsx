@@ -19,6 +19,7 @@ export default function SignUpPage() {
 		redirect: searchParams.get("redirect"),
 		webUrl: env.NEXT_PUBLIC_WEB_URL,
 		trustedOrigins: [env.NEXT_PUBLIC_API_URL],
+		adminUrl: env.NEXT_PUBLIC_ADMIN_URL,
 	});
 	const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
 	const [isLoadingGithub, setIsLoadingGithub] = useState(false);

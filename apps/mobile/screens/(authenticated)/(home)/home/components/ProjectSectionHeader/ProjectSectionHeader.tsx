@@ -8,6 +8,9 @@ import { Text } from "@/components/ui/text";
 import { useEnlargedText } from "@/hooks/useEnlargedText";
 import { useTheme } from "@/hooks/useTheme";
 import { ProjectAvatar } from "@/screens/(authenticated)/(home)/filter/components/ProjectAvatar";
+import { useAttentionLabel } from "../../hooks/useAttentionLabel";
+import type { TerminalAttention } from "../../hooks/useHostTerminals/attention";
+import { AttentionMark } from "../AttentionMark";
 
 interface ProjectSectionHeaderProps {
 	name: string;
@@ -18,6 +21,8 @@ interface ProjectSectionHeaderProps {
 	collapsed: boolean;
 	onToggle: () => void;
 	onNewWorkspace?: () => void;
+	/** The most urgent state of the rows a collapsed project hides. */
+	attention?: TerminalAttention | null;
 }
 
 /**
@@ -34,7 +39,9 @@ export function ProjectSectionHeader({
 	collapsed,
 	onToggle,
 	onNewWorkspace,
+	attention,
 }: ProjectSectionHeaderProps) {
+	const attentionLabel = useAttentionLabel();
 	const { t } = useLingui();
 	const theme = useTheme();
 	const enlargedText = useEnlargedText();
@@ -46,7 +53,12 @@ export function ProjectSectionHeader({
 		<View className="flex-row items-center px-4 pb-1 pt-4">
 			<Pressable
 				onPress={onToggle}
-				accessibilityLabel={`${name}, ${count} ${count === 1 ? "workspace" : "workspaces"}`}
+				accessibilityLabel={[
+					`${name}, ${count} ${count === 1 ? "workspace" : "workspaces"}`,
+					attention ? attentionLabel(attention) : null,
+				]
+					.filter(Boolean)
+					.join(", ")}
 				accessibilityState={{ expanded: !collapsed }}
 				className="web:hover:opacity-80 flex-1 flex-row items-center gap-2.5 active:opacity-60"
 			>
@@ -66,6 +78,7 @@ export function ProjectSectionHeader({
 				<Text className="text-muted-foreground font-mono text-[13px]">
 					{count}
 				</Text>
+				{attention ? <AttentionMark attention={attention} /> : null}
 			</Pressable>
 			{onNewWorkspace ? (
 				<Button

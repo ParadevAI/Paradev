@@ -7,6 +7,7 @@ import {
 	hostServiceUrl,
 } from "@/lib/host-service/client";
 import { useTerminalSeenStore } from "@/screens/(authenticated)/stores/terminalSeenStore";
+import { ATTENTION_PRIORITY, type TerminalAttention } from "./attention";
 import { listOpenChats, type OpenChat } from "./utils/listOpenChats";
 
 export interface TerminalsHost {
@@ -23,17 +24,6 @@ export interface TerminalsHost {
 	/** Lists only this workspace's chats, as desktop does for an open workspace. */
 	workspaceId?: string;
 }
-
-export type TerminalAttention = "working" | "permission" | "failed" | "review";
-
-// Desktop's STATUS_PRIORITY: a live permission prompt is actionable right
-// now; a failure is terminal; review is the least urgent.
-const ATTENTION_PRIORITY: Record<TerminalAttention, number> = {
-	review: 1,
-	working: 2,
-	failed: 3,
-	permission: 4,
-};
 
 export interface TerminalRowData {
 	/** A chat has no PTY: `terminalId` is its chat session id. */

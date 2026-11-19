@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
 import { cloudWorkspaces } from "@superset/db/schema";
 import { and, eq, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
+import { logControl } from "../../lib/control-log";
 import { nudge } from "../../lib/realtime";
 import {
 	type ActiveWorkspaceSandbox,
@@ -10,18 +11,18 @@ import {
 	SandboxUnavailableError,
 } from "../../lib/sandbox";
 import { publishCloudWorkspaceJob } from "./jobs";
-import {
-	queueSettleWorkspace,
-	RECONCILE_LOOKBACK_MS,
-	reconcileCloudWorkspaceUsage,
-} from "./meter";
+import { queueSettleWorkspace, reconcileCloudWorkspaceUsage } from "./meter";
 import {
 	keepUpdatedAt,
+	recordBoxStopped,
 	recordSandboxAsleep,
+	recordStopSeen,
 	reportSleepWriteFailure,
 } from "./sandbox-sleep";
 
 const WATCH_AFTER_EXPIRY_MS = 5_000;
+// The meter adopts only boxes this listing returns: keep it at least its ADOPT_LOOKBACK_MS.
+const LISTING_LOOKBACK_MS = 2 * 60 * 60 * 1000;
 
 export interface WatchSandboxExpiryInput {
 	cloudWorkspaceId: string;
@@ -89,6 +90,10 @@ async function markAwake(
 		return;
 	}
 	nudge(woke.organizationId, "cloud_workspaces");
+	logControl("workspace.awake", {
+		cloudWorkspaceId,
+		organizationId: woke.organizationId,
+	});
 	await queueWatch(cloudWorkspaceId, expiresAt);
 }
 
@@ -119,6 +124,7 @@ export async function watchSandboxExpiry({
 	const row = await db.query.cloudWorkspaces.findFirst({
 		where: eq(cloudWorkspaces.id, cloudWorkspaceId),
 		columns: {
+			organizationId: true,
 			providerSandboxId: true,
 			sandboxExpiresAt: true,
 			sandboxSessionId: true,
@@ -140,9 +146,15 @@ export async function watchSandboxExpiry({
 		});
 		return "rewatched";
 	}
-	await recordSandboxAsleep(cloudWorkspaceId, {
-		sessionId: live?.sessionId ?? row.sandboxSessionId,
-	});
+	const sessionId = live?.sessionId ?? row.sandboxSessionId;
+	if (live) {
+		await recordBoxStopped(
+			{ cloudWorkspaceId, organizationId: row.organizationId },
+			{ sessionId, reason: "idle" },
+		);
+	} else {
+		await recordSandboxAsleep(cloudWorkspaceId, { sessionId });
+	}
 	await queueSettleWorkspace(cloudWorkspaceId);
 	return "asleep";
 }
@@ -160,7 +172,9 @@ export async function syncSandboxExpiries(
 	const rows = await db
 		.select({
 			id: cloudWorkspaces.id,
+			organizationId: cloudWorkspaces.organizationId,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
+			sandboxExpiresAt: cloudWorkspaces.sandboxExpiresAt,
 		})
 		.from(cloudWorkspaces)
 		.where(
@@ -178,7 +192,7 @@ export async function syncSandboxExpiries(
 			await recordSandboxAwake(row.id, { expiresAt, sessionId });
 			await queueWatch(row.id, expiresAt);
 		} else if (sessionId) {
-			await recordSandboxAsleep(row.id, { sessionId });
+			await recordStopSeen(row, { sessionId });
 		}
 	}
 }
@@ -186,7 +200,7 @@ export async function syncSandboxExpiries(
 /** The 30-minute reconcile: sleep state on every stack, then the meter where billing runs. */
 export async function reconcileCloudWorkspaces() {
 	const active = await listActiveWorkspaceSandboxes(
-		Date.now() - RECONCILE_LOOKBACK_MS,
+		Date.now() - LISTING_LOOKBACK_MS,
 	).catch((error) => {
 		Sentry.captureException(error);
 		return null;

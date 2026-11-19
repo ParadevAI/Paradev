@@ -16,6 +16,10 @@
 			"types": "./src/lib/billing/plan.ts",
 			"default": "./src/lib/billing/plan.ts"
 		},
+		"./feature-flags": {
+			"types": "./src/lib/feature-flags.ts",
+			"default": "./src/lib/feature-flags.ts"
+		},
 		"./sync-policy": {
 			"types": "./src/lib/sync-policy/syncPolicy.ts",
 			"default": "./src/lib/sync-policy/syncPolicy.ts"
@@ -208,6 +212,7 @@
 		"zod": "4.6.6"
 	},
 	"devDependencies": {
+		"@better-auth/api-key": "1.6.22",
 		"@microsoft/microsoft-graph-types": "2.43.1",
 		"@superset/typescript": "workspace:*",
 		"@types/node": "24.12.0",

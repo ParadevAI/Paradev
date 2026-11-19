@@ -1,6 +1,4 @@
 export {
-	type BootStamp,
-	parseBootStamps,
 	processStartedAt,
 	readBootStamps,
 	recordBootStamp,

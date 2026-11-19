@@ -4,7 +4,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import { CommandEmpty, CommandGroup, CommandList } from "@superset/ui/command";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/v2-workspaces/hooks/useAccessibleV2Workspaces";
+import type { AccessibleV2Workspace } from "renderer/routes/_authenticated/_dashboard/workspaces/hooks/useAccessibleWorkspaces";
 import { useSwitcherGroups } from "../../hooks/useSwitcherGroups";
 import { useSwitchToWorkspace } from "../../hooks/useSwitchToWorkspace";
 import {

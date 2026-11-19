@@ -53,7 +53,7 @@ const MODE_MAP: Record<number, keyof TerminalModes> = {
 // Headless Emulator Class
 // =============================================================================
 
-export interface HeadlessEmulatorOptions {
+interface HeadlessEmulatorOptions {
 	cols?: number;
 	rows?: number;
 	scrollback?: number;
@@ -66,8 +66,6 @@ export class HeadlessEmulator {
 	private cwd: string | null = null;
 	private disposed = false;
 
-	// Pending output buffer for query responses
-	private pendingOutput: string[] = [];
 	private onDataCallback?: (data: string) => void;
 
 	// Buffer for partial escape sequences that span chunk boundaries
@@ -101,7 +99,6 @@ export class HeadlessEmulator {
 
 		// Listen for terminal output (query responses)
 		this.terminal.onData((data) => {
-			this.pendingOutput.push(data);
 			this.onDataCallback?.(data);
 		});
 	}
@@ -111,15 +108,6 @@ export class HeadlessEmulator {
 	 */
 	onData(callback: (data: string) => void): void {
 		this.onDataCallback = callback;
-	}
-
-	/**
-	 * Get and clear pending output (query responses)
-	 */
-	flushPendingOutput(): string[] {
-		const output = this.pendingOutput;
-		this.pendingOutput = [];
-		return output;
 	}
 
 	/**
@@ -599,16 +587,6 @@ function escapeRegex(str: string): string {
 /**
  * Apply a snapshot to a headless emulator (for testing round-trip)
  */
-export function applySnapshot(
-	emulator: HeadlessEmulator,
-	snapshot: TerminalSnapshot,
-): void {
-	// First, write the rehydrate sequences to restore mode state
-	emulator.write(snapshot.rehydrateSequences);
-
-	// Then write the serialized screen content
-	emulator.write(snapshot.snapshotAnsi);
-}
 
 /**
  * Compare two mode states for equality
