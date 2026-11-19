@@ -16,6 +16,7 @@ import {
 } from "../repositories";
 import { deleteSandbox } from "../vercel";
 import { environmentBuildWorkflow } from "./build-workflow";
+import { isProductionDeployment } from "./deployment";
 import { buildBoxName, freshBuildBoxName } from "./environment-build";
 import {
 	MANUAL_BUILD_WINDOW_MS,
@@ -50,7 +51,7 @@ export async function organizationMayBuild(
 	return (await organizationPlan(organizationId)) !== "free";
 }
 
-/** A running build whose workflow died is failed here, and its box deleted. */
+/** A running build whose workflow died is failed here, and its boxes deleted. */
 export async function expireStaleBuilds(environmentId: string): Promise<void> {
 	const now = Date.now();
 	const expired = await db
@@ -68,15 +69,31 @@ export async function expireStaleBuilds(environmentId: string): Promise<void> {
 			),
 		)
 		.returning({ id: environmentBuilds.id });
-	for (const { id } of expired) {
-		for (const name of [buildBoxName(id), freshBuildBoxName(id)]) {
-			await deleteSandbox(name).catch((error: unknown) =>
-				console.error(
-					`[environment-build] could not delete box of ${id}`,
-					error,
-				),
-			);
-		}
+	await deleteStaleBuildBoxes(expired.map((build) => build.id));
+}
+
+/**
+ * Only production deletes: in a preview a stale row can be a copy of a
+ * production build whose box is by now production's golden.
+ */
+export async function deleteStaleBuildBoxes(
+	buildIds: readonly string[],
+): Promise<void> {
+	const names = buildIds.flatMap((id) => [
+		buildBoxName(id),
+		freshBuildBoxName(id),
+	]);
+	if (names.length === 0) return;
+	if (!isProductionDeployment()) {
+		console.log(
+			`[environment-build] not a production deployment: would delete ${names.join(", ")}`,
+		);
+		return;
+	}
+	for (const name of names) {
+		await deleteSandbox(name).catch((error: unknown) =>
+			console.error(`[environment-build] could not delete box ${name}`, error),
+		);
 	}
 }
 

@@ -237,7 +237,10 @@ export async function pruneOldGoldens(buildId: string): Promise<void> {
 	}
 }
 
-/** Never deletes the box of a build that succeeded: that box is the golden. */
+/**
+ * Never deletes the box of a build that succeeded: that box is the golden.
+ * Runs only in a workflow this deployment started, so the boxes are its own.
+ */
 export async function failBuildAndCleanUp(
 	buildId: string,
 	reason: string,
