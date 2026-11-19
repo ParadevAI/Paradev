@@ -71,6 +71,7 @@ import type {
 	AutomationEventDispatchInput,
 	CloudWorkspaceBootPhase,
 	IntegrationConfig,
+	PendingUsageEvent,
 	TriggerConfig,
 	UserIdentityMetadata,
 } from "./types";
@@ -1226,6 +1227,10 @@ export const cloudWorkspaceBoots = pgTable(
 		egressBytes: bigint("egress_bytes", { mode: "number" }),
 		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),
 		traceId: text("trace_id"),
+		/** Usage rows Autumn accepted that could not be written; the meter's reconcile writes them. */
+		pendingUsageEvents: jsonb("pending_usage_events").$type<
+			PendingUsageEvent[]
+		>(),
 		// No foreign key, like organization_id: the boot keeps who it bills after the user is deleted.
 		createdByUserId: uuid("created_by_user_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
@@ -1241,6 +1246,9 @@ export const cloudWorkspaceBoots = pgTable(
 			table.cloudWorkspaceId,
 		),
 		index("cloud_workspace_boots_organization_id_idx").on(table.organizationId),
+		index("cloud_workspace_boots_pending_usage_idx")
+			.on(table.id)
+			.where(sql`${table.pendingUsageEvents} is not null`),
 		index("cloud_workspace_boots_open_idx")
 			.on(table.startedAt)
 			.where(

@@ -1422,6 +1422,13 @@
       "when": 1795117964138,
       "tag": "0202_cloud_usage_daily_backfill",
       "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1795120757281,
+      "tag": "0203_cloud_workspace_boot_pending_usage",
+      "breakpoints": true
     }
   ]
 }

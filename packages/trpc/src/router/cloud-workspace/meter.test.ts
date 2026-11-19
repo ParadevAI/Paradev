@@ -222,6 +222,14 @@ stub(autumnClient.balances, {
 
 const dialect = new PgDialect();
 
+/** The usage rows a write appends to the boot's pending list. */
+function pendingOf(write: Record<string, unknown> | undefined) {
+	const value = write?.pendingUsageEvents;
+	if (value === undefined) return undefined;
+	const { params } = dialect.sqlToQuery(value as SQL);
+	return JSON.parse(String(params.at(-1)));
+}
+
 /** The end reason a write sets: a value, or the SQL that keeps one already written. */
 function endReasonOf(write: Record<string, unknown> | undefined) {
 	const value = write?.endReason;
@@ -626,7 +634,7 @@ describe("settleBoot", () => {
 		expect(usageRows()).toEqual([]);
 	});
 
-	test("a usage row that fails to write is reported and the settle goes on unchanged", async () => {
+	test("a usage row that fails to write is reported and kept on the boot, and the settle goes on", async () => {
 		usageRowError = new Error("db down");
 		expect(await settleBoot("boot_1")).toBe("renewed");
 		expect(reported).toEqual([usageRowError]);
@@ -634,15 +642,60 @@ describe("settleBoot", () => {
 			"finalize",
 			"check",
 		]);
-		expect(writes).toContainEqual(
-			expect.objectContaining({ finalizedThrough: expect.any(Date) }),
-		);
+		const settled = writes.find((write) => "finalizedThrough" in write);
+		const kept = pendingOf(settled);
+		expect(kept).toEqual([
+			expect.objectContaining({
+				bootId: "boot_1",
+				feature: "box_gb_minutes",
+				amount: String(usageRows()[0]?.amount),
+				windowFrom: (usageRows()[0]?.windowFrom as Date).toISOString(),
+			}),
+		]);
 	});
 
 	test("a boot another run is settling is left alone", async () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("the reconcile writes the usage rows a settle could not", () => {
+	const pending = {
+		bootId: "boot_1",
+		lockSeq: 3,
+		feature: "box_gb_minutes",
+		organizationId: "org_1",
+		cloudWorkspaceId: "ws_1",
+		userId: "user_1",
+		windowFrom: new Date(NOW - 30 * MINUTE).toISOString(),
+		windowTo: new Date(NOW).toISOString(),
+		amount: "480",
+		sentAt: new Date(NOW).toISOString(),
+	};
+
+	test("a kept row is written with its own amount and window, and the list is cleared", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(usageRows()).toEqual([
+			{
+				...pending,
+				windowFrom: new Date(pending.windowFrom),
+				windowTo: new Date(pending.windowTo),
+				sentAt: new Date(pending.sentAt),
+			},
+		]);
+		expect(writes).toContainEqual({ pendingUsageEvents: null });
+		expect(autumnCalls.filter((call) => call.method !== "check")).toEqual([]);
+	});
+
+	test("a kept row that still fails to write stays on the boot", async () => {
+		boot = { ...boot, pendingUsageEvents: [pending] };
+		usageRowError = new Error("db down");
+		await reconcileCloudWorkspaceUsage({ billingEnabled: true });
+		expect(reported).toEqual([usageRowError]);
+		expect(writes).not.toContainEqual({ pendingUsageEvents: null });
 	});
 });
 
