@@ -1,0 +1,1 @@
+export { nameParts } from "./nameParts";

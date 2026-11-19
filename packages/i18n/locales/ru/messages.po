@@ -916,6 +916,12 @@ msgstr "{count, plural, one {загружена # страница} few {заг�
 msgid "{count, plural, one {Import # worktree} other {Import # worktrees}}"
 msgstr "{count, plural, one {Импортировать # worktree} few {Импортировать # worktree} many {Импортировать # worktree} other {Импортировать # worktree}}"
 
+msgid "{count, plural, one {in # workspace in the last 30 days} other {in # workspaces in the last 30 days}}"
+msgstr "{count, plural, one {в # рабочей области за последние 30 дней} few {в # рабочих областях за последние 30 дней} many {в # рабочих областях за последние 30 дней} other {в # рабочей области за последние 30 дней}}"
+
+msgid "{count, plural, one {in # workspace this period} other {in # workspaces this period}}"
+msgstr "{count, plural, one {в # рабочей области за этот период} few {в # рабочих областях за этот период} many {в # рабочих областях за этот период} other {в # рабочей области за этот период}}"
+
 msgid "{count, plural, one {Merge # pull request?} other {Merge # pull requests?}}"
 msgstr "{count, plural, one {Объединить # пул-реквест?} few {Объединить # пул-реквеста?} many {Объединить # пул-реквестов?} other {Объединить # пул-реквеста?}}"
 
@@ -1042,9 +1048,6 @@ msgstr "{gate} · {statusLabel}"
 
 msgid "{gate}: {statusLabel}"
 msgstr "{gate}: {statusLabel}"
-
-msgid "{gbHours} GB-hours"
-msgstr "{gbHours} ГБ-часов"
 
 msgid "{hidden, plural, one {# hidden line} other {# hidden lines}}"
 msgstr "{hidden, plural, one {# скрытая строка} few {# скрытые строки} many {# скрытых строк} other {# скрытой строки}}"
@@ -1347,6 +1350,12 @@ msgstr "Осталось токенов: {remaining}"
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Изменения в # файле отменены.} few {Изменения в # файлах отменены.} many {Изменения в # файлах отменены.} other {Изменения в # файла отменены.}}"
 
+msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
+msgstr "{rowCount, plural, one {{first}–{last} из # строки} few {{first}–{last} из # строк} many {{first}–{last} из # строк} other {{first}–{last} из # строки}}"
+
+msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
+msgstr "{seats, plural, one {Входит в # место} few {Входит в # места} many {Входит в # мест} other {Входит в # места}}"
+
 msgid "{seconds}s"
 msgstr "{seconds} с"
 
@@ -1364,17 +1373,17 @@ msgstr "{shown} из {total}"
 msgid "{shownCount} shown · {0} · {1} tokens"
 msgstr "Показано: {shownCount} · {0} · {1} токенов"
 
+msgid "{size}, {memory} GB"
+msgstr "{size}, {memory} ГБ"
+
 msgid "{skipped, plural, one {# skipped} other {# skipped}}"
 msgstr "{skipped, plural, one {# пропущено} few {# пропущено} many {# пропущено} other {# пропущено}}"
 
 msgid "{starCount} stars and counting"
 msgstr "{starCount} звёзд и продолжаем"
 
-msgid "{start} to {end}"
-msgstr "С {start} по {end}"
-
-msgid "{start} to {end} (current)"
-msgstr "С {start} по {end} (текущий)"
+msgid "{start} – {end}"
+msgstr "{start} – {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущена # автоматизация} few {Запущено # автоматизации} many {Запущено # автоматизаций} other {Запущено # автоматизаций}}"
@@ -1433,8 +1442,14 @@ msgstr "{used} из {limit} окружений"
 msgid "{used} of {size} tokens"
 msgstr "{used} из {size} токенов"
 
+msgid "{used} of {total}"
+msgstr "{used} из {total}"
+
 msgid "{used} used"
 msgstr "Использовано {used}"
+
+msgid "{used} used by you"
+msgstr "Вы использовали {used}"
 
 msgid "{user} and {others} joined and left."
 msgstr "{user} и {others} присоединились и вышли."
@@ -1462,9 +1477,6 @@ msgstr "{user} снова присоединился(-ась)."
 
 msgid "{vcpuCount} vCPU · {memory} GB"
 msgstr "{vcpuCount} vCPU · {memory} ГБ"
-
-msgid "{vcpus} vCPU, {memory} GB"
-msgstr "{vcpus} vCPU, {memory} ГБ"
 
 msgid "{waiting} Waiting"
 msgstr "Ожидают: {waiting}"
@@ -1645,6 +1657,9 @@ msgstr "$0"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Посевной раунд на 11,5 млн $ под руководством Union Square Ventures"
+
+msgid "0 rows"
+msgstr "0 строк"
 
 msgid "1"
 msgstr "1"
@@ -2888,6 +2903,9 @@ msgstr "Любое название"
 msgid "Any page"
 msgstr "Любая страница"
 
+msgid "Any person"
+msgstr "Все люди"
+
 msgid "Any project"
 msgstr "Любой проект"
 
@@ -2902,6 +2920,9 @@ msgstr "Любой рецензент"
 
 msgid "any sender"
 msgstr "любой отправитель"
+
+msgid "Any size"
+msgstr "Любой размер"
 
 msgid "Any status"
 msgstr "Любой статус"
@@ -3462,6 +3483,10 @@ msgstr "Ожидает вашего ревью"
 msgid "Awaiting review from you or your team"
 msgstr "Ожидает ревью от вас или вашей команды"
 
+msgctxt "cloud workspace status"
+msgid "Awake"
+msgstr "Работает"
+
 msgid "Away"
 msgstr "Отошёл"
 
@@ -3589,9 +3614,6 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платёжные данные"
 
-msgid "Billing period"
-msgstr "Расчётный период"
-
 msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
 msgstr "Биллинг отказался запустить облачное рабочее пространство: план организации не включает облачные рабочие пространства, или достигнут лимит использования облака. Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план или увеличьте лимит в разделе Настройки > Оплата, либо запустите автоматизацию на устройстве."
 
@@ -3671,6 +3693,9 @@ msgstr "Заимствовано из того, как оценивают бес
 
 msgid "Bottom drawer, swipe-friendly on touch devices."
 msgstr "Нижняя шторка, удобная для свайпов на сенсорных устройствах."
+
+msgid "Bought credits"
+msgstr "Купленные кредиты"
 
 msgid "Bought GB-hours left: {prepaid}"
 msgstr "Осталось купленных ГБ-часов: {prepaid}"
@@ -3895,6 +3920,12 @@ msgstr "Авторизуя, вы разрешаете этому приложе�
 
 msgid "By clicking continue, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
 msgstr "Нажимая «Продолжить», вы соглашаетесь с <0>Условиями использования</0> и <1>Политикой конфиденциальности</1>."
+
+msgid "By day"
+msgstr "По дням"
+
+msgid "By person"
+msgstr "По людям"
 
 msgid "By signing in, you agree to our\n"
 "<0>Terms of Service</0> and <1>Privacy Policy</1>"
@@ -4831,9 +4862,6 @@ msgstr "Использование облака не включено для э�
 msgid "Cloud workspace"
 msgstr "Облачная рабочая область"
 
-msgid "Cloud workspace usage for the whole organization."
-msgstr "Использование облачных рабочих областей во всей организации."
-
 msgid "Cloud workspace: asleep"
 msgstr "Облачная рабочая область: в спящем режиме"
 
@@ -4858,6 +4886,9 @@ msgstr "Облачные рабочие пространства не включ
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Облачные рабочие пространства не входят в ваш тариф."
+
+msgid "Cloud workspaces cannot start."
+msgstr "Облачные рабочие области не могут запуститься."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Облачные рабочие области делают коммиты, пуши и открывают pull request от вашего имени"
@@ -5815,9 +5846,6 @@ msgstr "Не удалось прочитать содержимое папки"
 msgid "Could not load agents from {0}"
 msgstr "Не удалось загрузить агентов с {0}"
 
-msgid "Could not load cloud usage."
-msgstr "Не удалось загрузить использование облака."
-
 msgid "Could not load environments"
 msgstr "Не удалось загрузить окружения"
 
@@ -5997,6 +6025,9 @@ msgstr "Не удалось запустить сессию"
 
 msgid "Could not start the chat"
 msgstr "Не удалось начать чат"
+
+msgid "Could not start."
+msgstr "Не удалось запустить."
 
 msgid "Could not steer"
 msgstr "Не удалось направить агента"
@@ -7776,6 +7807,9 @@ msgstr "У каждой поверхности своя типографика. 
 msgid "Each workspace gets its own cloud machine and keeps working when your laptop is closed. Check in from desktop, iPhone, or iPad."
 msgstr "Каждая рабочая область получает свою облачную машину и продолжает работать, когда ноутбук закрыт. Следите за ней с компьютера, iPhone или iPad."
 
+msgid "Earlier period"
+msgstr "Предыдущий период"
+
 msgid "Early 2024"
 msgstr "Начало 2024"
 
@@ -8301,6 +8335,9 @@ msgstr "Очень высокий"
 msgid "Extra small"
 msgstr "Очень маленький"
 
+msgid "Extra usage"
+msgstr "Дополнительное использование"
+
 msgid "Extra usage limit reached"
 msgstr "Достигнут лимит дополнительного использования"
 
@@ -8335,9 +8372,6 @@ msgstr "Ошибка"
 msgctxt "cloud workspace status"
 msgid "Failed"
 msgstr "Ошибка"
-
-msgid "Failed {failedAt}"
-msgstr "Ошибка: {failedAt}"
 
 msgid "Failed runs <0>· 7d</0>"
 msgstr "Неудачные запуски <0>· 7 дн.</0>"
@@ -8531,6 +8565,9 @@ msgstr "Не удалось загрузить изображение"
 
 msgid "Failed to load repositories. Please try again."
 msgstr "Не удалось загрузить репозитории. Попробуйте ещё раз."
+
+msgid "Failed to load usage"
+msgstr "Не удалось загрузить использование"
 
 msgid "Failed to log out. Please try again."
 msgstr "Не удалось выйти. Попробуйте ещё раз."
@@ -9019,6 +9056,9 @@ msgstr "завершил · работал 7 с"
 msgid "Finishing the move…"
 msgstr "Завершение переноса…"
 
+msgid "First page"
+msgstr "Первая страница"
+
 msgid "First time? Turn on device code sign-in in <0>ChatGPT settings</0>."
 msgstr "Впервые? Включите вход по коду устройства в <0>настройках ChatGPT</0>."
 
@@ -9283,6 +9323,13 @@ msgstr "Инженер-основатель"
 
 msgid "Free"
 msgstr "Бесплатно"
+
+msgctxt "cloud allowance group"
+msgid "Free"
+msgstr "Бесплатно"
+
+msgid "Free credits"
+msgstr "Бесплатные кредиты"
 
 msgid "Free for everyone"
 msgstr "Бесплатно для всех"
@@ -10110,6 +10157,10 @@ msgstr "Идентификация"
 msgid "Idle"
 msgstr "Простаивает"
 
+msgctxt "cloud workspace boot"
+msgid "Idle"
+msgstr "Простой"
+
 msgid "Idle · branch pushed"
 msgstr "Простаивает · ветка отправлена"
 
@@ -10303,6 +10354,9 @@ msgstr "На ревью"
 msgid "In the {appName} desktop app, open Settings → Remote Access and turn on “Allow remote access to this device via relay”."
 msgstr "В десктопном приложении {appName} откройте Настройки → Удалённый доступ и включите «Разрешить удалённый доступ к этому устройству через реле»."
 
+msgid "in the last 30 days"
+msgstr "за последние 30 дней"
+
 msgid "In the merge queue"
 msgstr "В очереди объединения"
 
@@ -10311,6 +10365,9 @@ msgstr "В очереди объединения. GitHub объединит ег
 
 msgid "In the Paradev desktop app, open <0>Settings → Appearance → Theme</0>."
 msgstr "В приложении Paradev откройте <0>Настройки → Внешний вид → Тема</0>."
+
+msgid "in this period"
+msgstr "за этот период"
 
 msgid "In under a year, more than 145,000 developers across 180 countries have run {productName} and created over 1.85 million agent workspaces."
 msgstr "Меньше чем за год более 145 000 разработчиков из 180 стран запускали {productName} и создали более 1,85 млн рабочих областей агентов."
@@ -10341,6 +10398,9 @@ msgstr "Входит в Enterprise"
 
 msgid "Included with Team and Ultra."
 msgstr "Входит в Team и Ultra."
+
+msgid "Included with the plan"
+msgstr "Входит в тариф"
 
 msgid "Includes the Paradev-specific box variant"
 msgstr "Включает специфичный для Paradev вариант box"
@@ -10963,6 +11023,9 @@ msgstr "Последние 3 месяца"
 msgid "last 30 days"
 msgstr "за последние 30 дней"
 
+msgid "Last 30 days"
+msgstr "Последние 30 дней"
+
 msgid "Last 4 weeks"
 msgstr "Последние 4 недели"
 
@@ -11036,6 +11099,9 @@ msgstr "Задержка"
 
 msgid "Later messages are removed."
 msgstr "Последующие сообщения будут удалены."
+
+msgid "Later period"
+msgstr "Следующий период"
 
 msgid "Latest"
 msgstr "Последняя"
@@ -11443,6 +11509,9 @@ msgstr "Загружаем ещё..."
 
 msgid "Loading more…"
 msgstr "Загружаем ещё…"
+
+msgid "Loading page {loadingPage} of {targetPage}..."
+msgstr "Загрузка страницы {loadingPage} из {targetPage}..."
 
 msgid "Loading project…"
 msgstr "Загрузка проекта…"
@@ -12570,6 +12639,9 @@ msgstr "Следующее изображение"
 msgid "Next match"
 msgstr "Следующее совпадение"
 
+msgid "Next page"
+msgstr "Следующая страница"
+
 msgid "Next Right Sidebar Tab"
 msgstr "Следующая вкладка правой боковой панели"
 
@@ -13292,6 +13364,9 @@ msgstr "На этом хосте пока нет рабочих областей
 msgid "No workspaces yet"
 msgstr "Рабочих областей пока нет"
 
+msgid "No workspaces."
+msgstr "Нет рабочих областей."
+
 msgid "No. {companyName} never proxies model calls. Agents use your own subscriptions and keys."
 msgstr "Нет. {companyName} никогда не проксирует вызовы моделей. Агенты используют ваши подписки и ключи."
 
@@ -13340,6 +13415,9 @@ msgstr "Недоступно на этом сервере"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Не назначено · настройте в Настройки → Ссылки"
 
+msgid "Not broken down yet"
+msgstr "Ещё не разбито по статьям"
+
 msgid "Not configured"
 msgstr "Не настроено"
 
@@ -13351,6 +13429,9 @@ msgstr "Не подключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не подключено · облачные рабочие области пушат как GitHub App вашей организации"
+
+msgid "Not counted by billing yet"
+msgstr "Ещё не учтено в счёте"
 
 msgid "Not demoed here"
 msgstr "Здесь не показано"
@@ -13522,6 +13603,12 @@ msgstr "Предметы"
 #. placeholder {0}: formatNumber(participants)
 msgid "of {0}"
 msgstr "из {0}"
+
+msgid "of {cap} included"
+msgstr "из {cap} по тарифу"
+
+msgid "of {cap} limit"
+msgstr "из лимита {cap}"
 
 msgid "of {total}"
 msgstr "из {total}"
@@ -13803,9 +13890,6 @@ msgstr "Только вы можете использовать это подк�
 
 msgid "Only you. Teammates forward their own."
 msgstr "Только для вас. Коллеги перенаправляют свои сами."
-
-msgid "Only your own workspaces. Organization totals are for owners and admins."
-msgstr "Только ваши рабочие области. Итоги организации доступны владельцам и администраторам."
 
 msgid "open"
 msgstr "открыть"
@@ -14398,6 +14482,10 @@ msgstr "Оригиналы"
 msgid "Other"
 msgstr "Прочее"
 
+msgctxt "cloud allowance group"
+msgid "Other"
+msgstr "Прочее"
+
 msgid "Other apps"
 msgstr "Другие приложения"
 
@@ -14510,6 +14598,9 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Страница"
 
+msgid "Page {page} of {pages}"
+msgstr "Страница {page} из {pages}"
+
 msgid "Page actions"
 msgstr "Действия со страницей"
 
@@ -14566,6 +14657,10 @@ msgstr "постраничная навигация"
 
 msgid "Pagination"
 msgstr "Постраничная навигация"
+
+msgctxt "cloud allowance group"
+msgid "Paid"
+msgstr "Платно"
 
 msgid "Paid plans"
 msgstr "Платные тарифы"
@@ -15340,6 +15435,9 @@ msgstr "Предыдущее изображение"
 msgid "Previous match"
 msgstr "Предыдущее совпадение"
 
+msgid "Previous page"
+msgstr "Предыдущая страница"
+
 msgid "Previous prompts"
 msgstr "Предыдущие промпты"
 
@@ -15575,6 +15673,10 @@ msgstr "Свойства"
 
 msgid "Provide either id or slug"
 msgstr "Укажите id или slug"
+
+msgctxt "cloud workspace status"
+msgid "Provisioning"
+msgstr "Подготовка"
 
 msgid "Provisioning failed and the sandbox was torn down. Nothing is running, and this workspace can't be opened. Create a new one to try again."
 msgstr "Создание не удалось, песочница снесена. Ничего не работает, и эту рабочую область нельзя открыть. Создайте новую, чтобы попробовать снова."
@@ -16338,6 +16440,9 @@ msgstr "удалить агента"
 msgid "remove the PR link"
 msgstr "отвязать PR"
 
+msgid "Remove this filter"
+msgstr "Убрать этот фильтр"
+
 msgid "Remove trigger"
 msgstr "Удалить триггер"
 
@@ -17075,6 +17180,9 @@ msgstr "Действия со строкой"
 msgid "Rows changed"
 msgstr "Строки изменены"
 
+msgid "Rows per page"
+msgstr "Строк на странице"
+
 msgid "Rule"
 msgstr "Правило"
 
@@ -17215,7 +17323,7 @@ msgstr "работает"
 msgid "Running"
 msgstr "Выполняется"
 
-msgctxt "cloud workspace status"
+msgctxt "cloud workspace boot"
 msgid "Running"
 msgstr "Работает"
 
@@ -17666,6 +17774,9 @@ msgstr "Ищем использования Kbd"
 #. placeholder {0}: formatDate(periodEnd)
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Места, удалённые в середине периода, остаются активными до {0}."
+
+msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
+msgstr "Места, кредиты и лимит дополнительного использования ещё не загружены. Они появятся при следующем обновлении платёжных данных."
 
 msgid "Secondary"
 msgstr "Вторичная"
@@ -19154,10 +19265,6 @@ msgstr "запускается"
 msgid "Starting"
 msgstr "Запуск"
 
-msgctxt "cloud workspace status"
-msgid "Starting"
-msgstr "Запускается"
-
 msgid "Starting {agentLabel}"
 msgstr "Запуск {agentLabel}"
 
@@ -19306,22 +19413,20 @@ msgstr "остановлена"
 msgid "Stopped"
 msgstr "Остановлено"
 
+msgctxt "cloud workspace boot"
+msgid "Stopped"
+msgstr "Остановлена"
+
 #. placeholder {0}: pressure.reap.processName
 #. placeholder {1}: gb(pressure.reap.rssMb)
 msgid "Stopped {0} ({1} GB) to free memory"
 msgstr "Остановлен {0} ({1} ГБ), чтобы освободить память"
-
-msgid "Stopped by a person"
-msgstr "Остановлено человеком"
 
 msgid "Stopped by the usage limit"
 msgstr "Остановлено лимитом использования"
 
 msgid "Stopped moving {name}"
 msgstr "Перенос {name} остановлен"
-
-msgid "Stopped when idle"
-msgstr "Остановлено при простое"
 
 msgid "Stopping the agent in {what}"
 msgstr "Остановка агента в {what}"
@@ -20003,6 +20108,9 @@ msgstr "Лучший агент будет меняться.<0/>Ваш проц�
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Машина запустилась с {actual} vCPU вместо {wanted}. Перезапустите её, чтобы попробовать снова."
 
+msgid "The breakdown by plan is kept for the current period only."
+msgstr "Разбивка по тарифу хранится только для текущего периода."
+
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Теперь кнопка выделяется. Я проверил это в вашей панели."
 
@@ -20074,6 +20182,9 @@ msgstr "Окружение, из которого эта автоматизац�
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Расширение и его локальные данные удаляются из этого браузера."
+
+msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
+msgstr "Лимит дополнительного использования задан процентом от тарифа, поэтому его сумма не показана."
 
 msgid "The factory"
 msgstr "Фабрика"
@@ -20150,9 +20261,6 @@ msgstr "Человек читает каждую строку перед сли�
 
 msgid "The image upload expired — attach it again"
 msgstr "Срок загрузки изображения истёк — прикрепите его снова"
-
-msgid "The included and overage GB-hours are kept for the current period only."
-msgstr "Включённые ГБ-часы и ГБ-часы сверх тарифа хранятся только для текущего периода."
 
 msgid "The job description shifts. Engineers stop being typists with taste and become dispatchers with taste: decomposing work, routing it to fleets, arbitrating conflicts between agents that both touched the same module."
 msgstr "Описание работы меняется. Инженеры перестают быть машинистками со вкусом и становятся диспетчерами со вкусом: декомпозируют работу, раздают её флотам, разрешают конфликты между агентами, которые оба тронули один модуль."
@@ -20662,14 +20770,14 @@ msgstr "Это меняет только отображаемое имя, а н�
 msgid "this organization"
 msgstr "эта организация"
 
-msgid "This organization has no billing periods, so this page shows the last 30 days."
-msgstr "У этой организации нет расчётных периодов, поэтому на странице показаны последние 30 дней."
-
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "У этой организации нет расчётных периодов. Выберите временной диапазон."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Эта организация на бесплатном тарифе. {appName} Mobile доступен организациям на тарифе Pro."
+
+msgid "This page cannot tell when the usage limit is reached."
+msgstr "Эта страница не может определить, когда достигнут лимит использования."
 
 msgid "This page could not be loaded"
 msgstr "Не удалось загрузить эту страницу"
@@ -20875,6 +20983,9 @@ msgstr "Эта рабочая область"
 
 msgid "This workspace has no project to branch from"
 msgstr "В этом рабочем пространстве нет проекта для ответвления"
+
+msgid "This workspace has no usage in this period."
+msgstr "У этой рабочей области нет использования за этот период."
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Возможно, эта рабочая область удалена или у вас больше нет к ней доступа."
@@ -21458,6 +21569,10 @@ msgstr "неизвестно"
 msgid "Unknown"
 msgstr "Неизвестно"
 
+msgctxt "boot end"
+msgid "Unknown"
+msgstr "Неизвестно"
+
 msgctxt "person"
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -21782,20 +21897,20 @@ msgstr "Идентификатор для URL, уникальный внутри
 msgid "Usage"
 msgstr "Использование"
 
-msgid "Usage by day"
-msgstr "Использование по дням"
-
-msgid "Usage by person"
-msgstr "Использование по людям"
-
 msgid "Usage is out of date"
 msgstr "Данные об использовании устарели"
 
-msgid "Usage is shown on the UTC day it was billed, which can be a little after the workspace ran."
-msgstr "Использование показано в день (UTC), когда оно было выставлено в счёт; это может быть немного позже работы рабочей области."
+msgid "usage limit"
+msgstr "лимит использования"
+
+msgid "Usage limit"
+msgstr "Лимит использования"
 
 msgid "Usage limit reached"
 msgstr "Достигнут лимит использования"
+
+msgid "Usage limit reached."
+msgstr "Достигнут лимит использования."
 
 msgid "Usage sections"
 msgstr "Разделы использования"
@@ -23119,6 +23234,9 @@ msgstr "Ваша организация достигла лимита окруж
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваши собственные учётные записи. Интеграции вашей организации дают Paradev доступ к её инструментам; подключив свои, вы увидите работу, которую Paradev делает для вас, под своим именем."
 
+msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
+msgstr "Только ваше собственное использование. Итоги организации, её лимит и использование по людям доступны владельцам и администраторам."
+
 msgid "Your Paradev download is starting."
 msgstr "Загрузка Paradev начинается."
 
@@ -23133,9 +23251,6 @@ msgstr "Ваш тариф не включает облачные окружен�
 
 msgid "Your plan does not include cloud environments. Upgrade in Settings, Billing to create one."
 msgstr "Ваш тариф не включает облачные окружения. Чтобы создать окружение, перейдите на другой тариф в разделе Настройки, Оплата."
-
-msgid "Your plan includes no cloud GB-hours."
-msgstr "Ваш тариф не включает облачные ГБ-часы."
 
 msgid "Your plan switches to {planName} on {startDate}. Nothing is charged today."
 msgstr "Ваш план перейдёт на {planName} {startDate}. Сегодня ничего не списывается."

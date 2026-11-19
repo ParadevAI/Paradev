@@ -13,7 +13,11 @@ import {
 	cloudWorkspaceFailureReasonEnum,
 	cloudWorkspaceStatusEnum,
 } from "@superset/db/enums";
-import { machineSizeSchema } from "@superset/shared/billing";
+import {
+	ALLOWANCE_UNAVAILABLE_FIELDS,
+	ALLOWANCE_UNAVAILABLE_REASONS,
+	machineSizeSchema,
+} from "@superset/shared/billing";
 import { z } from "zod";
 
 const rangePresetSchema = z.enum(["24h", "7d", "30d", "90d"]);
@@ -187,20 +191,11 @@ export const cloudBootsOutputSchema = z.object({
 
 /** A value the page shows that billing does not hold for this period, and why. */
 const periodUnavailableSchema = z.object({
-	field: z.enum([
-		"allowance",
-		"seats",
-		"bought",
-		"freeCredits",
-		"extraUsageLimit",
-		"limitReached",
-	]),
+	field: z.enum(["allowance", ...ALLOWANCE_UNAVAILABLE_FIELDS]),
 	reason: z.enum([
 		"closed_period",
 		"owners_and_admins_only",
-		"not_read",
-		"percent_of_allowance",
-		"not_tracked",
+		...ALLOWANCE_UNAVAILABLE_REASONS,
 	]),
 });
 
