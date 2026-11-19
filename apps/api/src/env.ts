@@ -73,6 +73,21 @@ export const env = createEnv({
 		YC_BOOKFACE_DEAL_ID: z.coerce.number().default(13843),
 		YC_BOOKFACE_REWARD_ID: z.string().min(1).default("yc-bookface-3mo-team"),
 		SLACK_BILLING_WEBHOOK_URL: z.string().url(),
+		// Bot in the internal Slack workspace that opens a shared channel for each
+		// new Team-plan customer. Unset skips the channel; #stripe still flags it.
+		SLACK_CUSTOMER_CHANNELS_BOT_TOKEN: z
+			.string()
+			.startsWith("xoxb-")
+			.optional(),
+		SLACK_CUSTOMER_CHANNEL_TEAMMATE_IDS: z
+			.string()
+			.default("")
+			.transform((value) =>
+				value
+					.split(",")
+					.map((id) => id.trim())
+					.filter(Boolean),
+			),
 		SENTRY_AUTH_TOKEN: z.string().optional(),
 		// Public Sentry integration (OAuth app). Optional: unset where the app
 		// is not registered yet, in which case the connect flow 400s.

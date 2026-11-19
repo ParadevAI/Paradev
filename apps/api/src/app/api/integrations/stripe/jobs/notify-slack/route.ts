@@ -2,12 +2,15 @@ import { organizationBilling, seatItem } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import * as authSchema from "@superset/db/schema/auth";
+import { Client } from "@upstash/qstash";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { z } from "zod";
 
 import { env } from "@/env";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
+
+import { customerChannelName } from "../utils/customer-channel-name";
 
 import {
 	type EnrichedSubscription,
@@ -18,16 +21,15 @@ import {
 	formatSeatRemoved,
 	formatSubscriptionCancelled,
 	formatSubscriptionStarted,
+	formatTeamSubscriptionStarted,
 	getDiscountInfo,
+	isTeamPlan,
 	type PreviousPlan,
 	planLabel,
 } from "./slack-blocks";
 
-// --- QStash verification ---
-
-// --- Stripe client ---
-
 const stripeClient = new Stripe(env.STRIPE_SECRET_KEY);
+const qstash = new Client({ token: env.QSTASH_TOKEN, baseUrl: env.QSTASH_URL });
 
 // --- Payload schemas ---
 
@@ -127,6 +129,8 @@ async function enrichFromSubscription(
 		planName: planLabel(
 			planTier && planTier !== "free" ? planTier : dbSub?.plan,
 		),
+		planTier:
+			planTier && planTier !== "free" ? planTier : (dbSub?.plan ?? null),
 		stripeCustomerId: customerId,
 		stripeSubscriptionId,
 		seatCount: seat?.quantity ?? 1,
@@ -165,6 +169,48 @@ async function previousPlanFromPrice(
 			error,
 		);
 		return null;
+	}
+}
+
+async function queueTeamOnboarding(
+	enriched: EnrichedSubscription,
+): Promise<boolean> {
+	if (!env.SLACK_CUSTOMER_CHANNELS_BOT_TOKEN) return false;
+	const url = `${env.NEXT_PUBLIC_API_URL}/api/integrations/stripe/jobs/team-onboarding`;
+	const body = {
+		stripeSubscriptionId: enriched.stripeSubscriptionId,
+		stripeCustomerId: enriched.stripeCustomerId,
+		organizationName: enriched.organizationName,
+		customerEmail: enriched.customerEmail,
+	};
+	try {
+		if (env.NODE_ENV === "development") {
+			void fetch(url, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(body),
+			}).catch((error) => {
+				console.error(
+					"[stripe/notify-slack] dev team onboarding failed:",
+					error,
+				);
+			});
+			return true;
+		}
+		await qstash.publishJSON({
+			url,
+			body,
+			retries: 3,
+			delay: 10,
+			deduplicationId: `team-onboarding-${enriched.stripeSubscriptionId}`,
+		});
+		return true;
+	} catch (error) {
+		console.error(
+			"[stripe/notify-slack] Failed to queue team onboarding:",
+			error,
+		);
+		return false;
 	}
 }
 
@@ -207,7 +253,15 @@ export async function POST(request: Request) {
 
 	switch (payload.eventType) {
 		case "subscription_started":
-			blocks = formatSubscriptionStarted(enriched);
+			blocks = isTeamPlan(enriched)
+				? formatTeamSubscriptionStarted(enriched, {
+						name: customerChannelName(
+							enriched.organizationName,
+							enriched.stripeCustomerId,
+						),
+						automated: await queueTeamOnboarding(enriched),
+					})
+				: formatSubscriptionStarted(enriched);
 			break;
 		case "subscription_cancelled": {
 			// Prefer fresh fields: the portal attaches feedback after the queued webhook snapshot
