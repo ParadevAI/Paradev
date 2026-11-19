@@ -419,19 +419,18 @@ async function writePendingUsage(): Promise<void> {
 		if (!events) continue;
 		try {
 			for (const event of events) await recordUsageEvent(db, rowOf(event));
+			await db
+				.update(cloudWorkspaceBoots)
+				.set({ pendingUsageEvents: null })
+				.where(
+					and(
+						eq(cloudWorkspaceBoots.id, id),
+						sql`${cloudWorkspaceBoots.pendingUsageEvents} = ${JSON.stringify(events)}::jsonb`,
+					),
+				);
 		} catch (error) {
 			Sentry.captureException(error, { tags: { "boot.id": id } });
-			continue;
 		}
-		await db
-			.update(cloudWorkspaceBoots)
-			.set({ pendingUsageEvents: null })
-			.where(
-				and(
-					eq(cloudWorkspaceBoots.id, id),
-					sql`${cloudWorkspaceBoots.pendingUsageEvents} = ${JSON.stringify(events)}::jsonb`,
-				),
-			);
 	}
 }
 
