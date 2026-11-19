@@ -22,13 +22,11 @@ export type RulesScope =
 type Box = typeof cloudWorkspaces.$inferSelect;
 
 const REFRESH_MARGIN_MS = 15 * 60_000;
+// Every apply mints a new App token, so each event would start its own chain
+// of refreshes; on this grid the chains share job ids and QStash drops copies.
 const REFRESH_GRID_MS = 30 * 60_000;
 
-/**
- * 15 to 45 min before the expiry. An App token is new on every apply, so its
- * expiry is too; on a fixed grid, every chain of refreshes of one box lands
- * on the same job id, and QStash drops the copies.
- */
+/** 15 to 45 min before the expiry, on the grid. */
 export function rulesRefreshAt(expiresAt: Date): Date {
 	const at = expiresAt.getTime() - REFRESH_MARGIN_MS;
 	return new Date(Math.floor(at / REFRESH_GRID_MS) * REFRESH_GRID_MS);
