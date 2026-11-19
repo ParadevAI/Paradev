@@ -1,32 +1,52 @@
-import { beforeAll, expect, test } from "bun:test";
-import type { CloudUsage } from "@superset/auth/billing";
-import { ADA, MAYA, ORG, SAM, seedCloudUsage } from "@superset/db/testing";
-import { organizationCloudUsage } from "./billing";
+import { describe, expect, test } from "bun:test";
+import * as autumnBilling from "@superset/auth/billing";
+import { db } from "@superset/db/client";
+import { stub } from "../../../test/stub";
 
-let database: Awaited<ReturnType<typeof seedCloudUsage>>;
+const ORGANIZATION_ID = "a0000000-0000-4000-8000-000000000001";
+let role: "owner" | "admin" | "member" | null = null;
+let billingReads = 0;
 
-beforeAll(async () => {
-	database = await seedCloudUsage();
+stub(db.query.members, {
+	findFirst: async () => (role ? { role } : undefined),
+});
+stub(autumnBilling, {
+	organizationBilling: async () => {
+		billingReads += 1;
+		return { cloudUsage: { usedGbMinutes: 60 } };
+	},
 });
 
-const VALUE = { usedGbMinutes: 60 } as CloudUsage;
+const { billingRouter } = await import("./billing");
+const { createCallerFactory, createTRPCContext, createTRPCRouter } =
+	await import("../../trpc");
 
-const read = (userId: string) =>
-	organizationCloudUsage(
-		{
-			session: { user: { id: userId } },
-			activeOrganizationId: ORG,
+const caller = createCallerFactory(
+	createTRPCRouter({ billing: billingRouter }),
+)(
+	createTRPCContext({
+		session: {
+			user: { id: "user-1", email: "user@example.com" },
+			session: { activeOrganizationId: ORGANIZATION_ID },
 		} as never,
-		{ database, billing: async () => ({ cloudUsage: VALUE }), enabled: true },
-	);
+		auth: {} as never,
+		headers: new Headers(),
+		sandboxCaller: null,
+	}),
+);
 
-test.each([
-	["an owner", MAYA],
-	["an admin", ADA],
-])("%s gets the organization's cloud usage", async (_, userId) => {
-	expect(await read(userId)).toBe(VALUE);
-});
+describe("billing.cloudUsage", () => {
+	test("a member gets none of the organization's cloud usage, and billing is not read", async () => {
+		role = "member";
+		billingReads = 0;
+		expect(await caller.billing.cloudUsage()).toBeNull();
+		expect(billingReads).toBe(0);
+	});
 
-test("a member gets none of the organization's cloud usage", async () => {
-	expect(await read(SAM)).toBeNull();
+	test("someone outside the organization is FORBIDDEN", async () => {
+		role = null;
+		await expect(caller.billing.cloudUsage()).rejects.toMatchObject({
+			code: "FORBIDDEN",
+		});
+	});
 });

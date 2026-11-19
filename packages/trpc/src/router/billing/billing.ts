@@ -137,29 +137,6 @@ async function isBillingOwner(userId: string, organizationId: string) {
 	return member?.role === "owner";
 }
 
-/** Owners and admins only: a member sees their own usage on the cloud usage page, not the organization's. */
-export async function organizationCloudUsage(
-	ctx: Parameters<typeof requireActiveOrgRole>[0] & {
-		activeOrganizationId: string | null;
-	},
-	{
-		database = db,
-		billing = organizationBilling,
-		enabled = billingUsesAutumn,
-	}: {
-		database?: Parameters<typeof requireActiveOrgRole>[1];
-		billing?: (
-			organizationId: string,
-		) => Promise<{ cloudUsage?: CloudUsage | null }>;
-		enabled?: boolean;
-	} = {},
-): Promise<CloudUsage | null> {
-	const activeOrgId = ctx.activeOrganizationId;
-	if (!enabled || !activeOrgId) return null;
-	if (!(await requireActiveOrgRole(ctx, database)).isAdmin) return null;
-	return (await billing(activeOrgId)).cloudUsage ?? null;
-}
-
 export const billingRouter = {
 	recordUpgradeIntent: personProcedure
 		.input(z.object({ feature: z.string().trim().min(1).max(64) }))
@@ -250,7 +227,15 @@ export const billingRouter = {
 		};
 	}),
 
-	cloudUsage: personProcedure.query(({ ctx }) => organizationCloudUsage(ctx)),
+	cloudUsage: personProcedure.query(
+		async ({ ctx }): Promise<CloudUsage | null> => {
+			const activeOrgId = ctx.activeOrganizationId;
+			if (!activeOrgId) return null;
+			if (!(await requireActiveOrgRole(ctx)).isAdmin) return null;
+			if (!billingUsesAutumn) return null;
+			return (await organizationBilling(activeOrgId)).cloudUsage ?? null;
+		},
+	),
 
 	environmentUsage: personProcedure.query(
 		async ({ ctx }): Promise<{ used: number; limit: number | null } | null> => {
