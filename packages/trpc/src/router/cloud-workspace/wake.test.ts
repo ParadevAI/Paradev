@@ -442,63 +442,33 @@ describe("markSandboxUnavailable", () => {
 	});
 });
 
-describe("a workspace whose snapshot expired", () => {
-	const retired: Array<{
-		providerSandboxId: string;
-		driveName: string | null;
-	}> = [];
+describe("a workspace on a drive whose snapshot expired", () => {
+	const retired: unknown[] = [];
+	const failed: unknown[] = [];
 	stub(realtime, { nudge: () => {} });
-	stub(db, rowUpdate(true));
+	stub(db, rowUpdate(true, failed));
 	stub(Sentry, { captureException: () => "" });
 	stub(teardown, {
-		retireAndTearDown: async (row: {
-			providerSandboxId: string;
-			driveName: string | null;
-		}) => {
-			retired.push({
-				providerSandboxId: row.providerSandboxId,
-				driveName: row.driveName,
-			});
+		retireAndTearDown: async (row: unknown) => {
+			retired.push(row);
 			return true;
 		},
 	});
-	beforeEach(() => {
-		retired.length = 0;
-	});
-	const row = { ...ROW, driveName: "drive-ws-box" } as Row;
-	const unavailable = (status: number) =>
-		new sandbox.SandboxUnavailableError(
-			"ws-box",
-			new APIError(new Response(null, { status })),
-		);
 
-	test("retires its names and queues the teardown of its box and drive", async () => {
-		await markSandboxUnavailable(row, unavailable(410));
-		expect(retired).toEqual([
-			{ providerSandboxId: "ws-box", driveName: "drive-ws-box" },
-		]);
-	});
-
-	test("a box deleted out from under the row keeps the drive", async () => {
-		await markSandboxUnavailable(row, unavailable(404));
-		expect(retired).toEqual([]);
-	});
-
-	test("a drive refused for good is kept for diagnosis", async () => {
+	test("is only marked failed; its box and drive stay for the cleanup job", async () => {
 		await markSandboxUnavailable(
-			row,
-			new sandbox.SandboxDriveRefusedError(
+			{ ...ROW, driveName: "drive-ws-box" } as Row,
+			new sandbox.SandboxUnavailableError(
 				"ws-box",
-				"drive-ws-box",
-				"drive.foreign",
-				3,
+				new APIError(new Response(null, { status: 410 })),
 			),
 		);
-		expect(retired).toEqual([]);
-	});
-
-	test("a workspace without a drive is left as it was", async () => {
-		await markSandboxUnavailable({ ...row, driveName: null }, unavailable(410));
+		expect(failed).toEqual([
+			expect.objectContaining({
+				status: "failed",
+				failureReason: "snapshot_expired",
+			}),
+		]);
 		expect(retired).toEqual([]);
 	});
 });

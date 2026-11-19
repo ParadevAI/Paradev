@@ -8,7 +8,7 @@ import {
 	CLOUD_WORKSPACE_WAKE_TRANSACTION,
 } from "@superset/shared/constants";
 import { waitUntil } from "@vercel/functions";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
 	type ControlScope,
 	controlTags,
@@ -39,7 +39,6 @@ import {
 	recordBoxStopped,
 	recordSandboxAsleep,
 } from "./sandbox-sleep";
-import { retireAndTearDown } from "./teardown";
 import { failCloudWorkspace } from "./transition";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
@@ -271,18 +270,4 @@ export async function markSandboxUnavailable(
 		reason: unavailableReason(error),
 		error,
 	});
-	if (row.driveName && error.snapshotExpired) {
-		await retireAndTearDown(
-			row,
-			and(
-				eq(cloudWorkspaces.status, "failed"),
-				eq(cloudWorkspaces.driveName, row.driveName),
-			),
-		).catch((teardownError) =>
-			console.error(
-				`[cloud-workspace] ${row.id} teardown after snapshot expiry`,
-				teardownError,
-			),
-		);
-	}
 }
