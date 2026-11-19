@@ -25,10 +25,9 @@ export function CloudUsageCard({
 	const trpc = useTRPC();
 	const queryClient = useQueryClient();
 	const { data: usage } = useQuery(trpc.billing.cloudUsage.queryOptions());
-	const { data: periods } = useQuery({
-		...trpc.cloud.periods.list.queryOptions({ limit: 1 }),
-		enabled: showUsageLink,
-	});
+	const { data: periods } = useQuery(
+		trpc.cloud.periods.list.queryOptions({ limit: 1 }),
+	);
 	if (!usage) return null;
 
 	return (
@@ -36,11 +35,13 @@ export function CloudUsageCard({
 			<BillingUsageCard
 				period={periods?.items[0]}
 				link={
-					<PageLink>
-						<Link href="/settings/cloud-usage">
-							<Trans>Cloud usage</Trans>
-						</Link>
-					</PageLink>
+					showUsageLink && (
+						<PageLink>
+							<Link href="/settings/cloud-usage">
+								<Trans>Cloud usage</Trans>
+							</Link>
+						</PageLink>
+					)
 				}
 			/>
 			{canBuy && usage.pack && organizationId && (

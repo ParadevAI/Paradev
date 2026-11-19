@@ -8,7 +8,7 @@ import { AllowanceCard } from "../AllowanceCard";
 interface BillingUsageCardProps {
 	/** The open period from `cloud.periods.list`; it has no allowance for a member. */
 	period: CloudPeriod | undefined;
-	/** The link to the cloud usage page. */
+	/** The link to the cloud usage page; absent where the organization has no such page. */
 	link: ReactNode;
 }
 
