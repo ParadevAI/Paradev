@@ -11,14 +11,36 @@ if (!GlobalRegistrator.isRegistered) GlobalRegistrator.register();
 ).IS_REACT_ACT_ENVIRONMENT = true;
 const hotkeys = new Map<string, () => void>();
 let currentWorkspaceId: string | null = null;
-const navigate = mock(() => Promise.resolve());
+let destinationWorkspaceId: string | null = null;
+const navigate = mock(
+	async ({ params }: { params: { workspaceId: string } }) => {
+		destinationWorkspaceId = params.workspaceId;
+	},
+);
+const router = {
+	navigate,
+	buildLocation: ({ params }: { params: { workspaceId: string } }) => ({
+		pathname: `/workspace/${params.workspaceId}`,
+	}),
+	history: { subscribe: () => () => {} },
+	get state() {
+		return {
+			isLoading: false,
+			matches: [
+				{ status: "success", params: { workspaceId: destinationWorkspaceId } },
+			],
+		};
+	},
+};
+const frames: FrameRequestCallback[] = [];
+const originalFrame = globalThis.requestAnimationFrame;
 const toggleProjectCollapsed = mock(() => {});
 const toggleSectionCollapsed = mock(() => {});
 mock.module("renderer/hotkeys", () => ({
 	useHotkey: (id: string, callback: () => void) => hotkeys.set(id, callback),
 }));
 mock.module("@tanstack/react-router", () => ({
-	useNavigate: () => navigate,
+	useRouter: () => router,
 	useRouterState: () => "",
 	useMatchRoute: () => () =>
 		currentWorkspaceId ? { workspaceId: currentWorkspaceId } : false,
@@ -102,6 +124,9 @@ const groups: DashboardSidebarProject[] = [
 
 beforeEach(() => {
 	currentWorkspaceId = null;
+	destinationWorkspaceId = null;
+	frames.length = 0;
+	globalThis.requestAnimationFrame = (callback) => frames.push(callback);
 	hotkeys.clear();
 	navigate.mockClear();
 	toggleProjectCollapsed.mockClear();
@@ -118,7 +143,29 @@ beforeEach(() => {
 		},
 	});
 });
-afterEach(cleanup);
+afterEach(() => {
+	cleanup();
+	globalThis.requestAnimationFrame = originalFrame;
+});
+
+async function flushNavigationEffects() {
+	await act(async () => {
+		await Promise.resolve();
+		const tasks: (() => void)[] = [];
+		const originalTimeout = globalThis.setTimeout;
+		globalThis.setTimeout = ((callback: () => void) => {
+			tasks.push(callback);
+			return 1;
+		}) as unknown as typeof setTimeout;
+		try {
+			for (const callback of frames.splice(0)) callback(0);
+		} finally {
+			globalThis.setTimeout = originalTimeout;
+		}
+		for (const callback of tasks) callback();
+		await Promise.resolve();
+	});
+}
 
 function press(id: string) {
 	const callback = hotkeys.get(id);
@@ -152,7 +199,7 @@ test.each([
 	expectTarget(to);
 });
 
-test("navigates when every workspace is pinned and reveals collapsed pins", () => {
+test("navigates when every workspace is pinned and reveals collapsed pins", async () => {
 	currentWorkspaceId = "pinned-project";
 	useSidebarSectionsCollapseStore.getState().toggle("pinned");
 	renderHook(() =>
@@ -161,12 +208,16 @@ test("navigates when every workspace is pinned and reveals collapsed pins", () =
 	press("NEXT_WORKSPACE");
 	expectTarget("pinned-session");
 	expect(useSidebarSectionsCollapseStore.getState().collapsed.pinned).toBe(
+		true,
+	);
+	await flushNavigationEffects();
+	expect(useSidebarSectionsCollapseStore.getState().collapsed.pinned).toBe(
 		false,
 	);
 	expect(toggleProjectCollapsed).not.toHaveBeenCalled();
 });
 
-test("leaves a collapsed Projects section collapsed for a pinned target", () => {
+test("leaves a collapsed Projects section collapsed for a pinned target", async () => {
 	currentWorkspaceId = "project-workspace";
 	useSidebarSectionsCollapseStore.setState({
 		collapsed: {
@@ -183,6 +234,7 @@ test("leaves a collapsed Projects section collapsed for a pinned target", () => 
 	);
 	press("NEXT_WORKSPACE");
 	expectTarget("pinned-project");
+	await flushNavigationEffects();
 	expect(useSidebarSectionsCollapseStore.getState().collapsed.workspaces).toBe(
 		true,
 	);
@@ -198,7 +250,7 @@ test("skips a pinned workspace being deleted", () => {
 	expectTarget("session");
 });
 
-test("pin changes update navigation without renumbering regular workspace shortcuts", () => {
+test("pin changes update navigation without renumbering regular workspace shortcuts", async () => {
 	currentWorkspaceId = "session";
 	const { result, rerender } = renderHook(
 		({ pins }) =>
@@ -218,5 +270,7 @@ test("pin changes update navigation without renumbering regular workspace shortc
 	rerender({ pins: [] });
 	press("PREV_WORKSPACE");
 	expectTarget("project-workspace");
+	expect(toggleProjectCollapsed).not.toHaveBeenCalled();
+	await flushNavigationEffects();
 	expect(toggleProjectCollapsed).toHaveBeenCalledWith("project");
 });
