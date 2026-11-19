@@ -512,7 +512,6 @@ never shown as their work.
 | A lost provision's box is deleted even while the row's live box holds the kept drive. | `teardownSandbox` with `keepDrive` waits only for the drive to leave this box | `teardown.test.ts` "a lost box goes even while the row's live box holds the kept drive" |
 | A failed provision deletes only a drive it forked. | `forkedDrive` in `provision.ts` | `provision.test.ts` "a failed create deletes a drive it forked, never one it found" |
 | No teardown failure is silent. | `teardownSandbox` reports to Sentry and requeues any failure; giving up is a Sentry error | `teardown.test.ts` "any other failure is retried, not dropped", "gives up after the last attempt…" |
-| A drive nothing names is found and, on request, deleted; the sweep never deletes a drive any row names, archived or not, and checks each again just before its delete. | `drive-sweep.ts` (`orphanCandidates`, `sweepDrives`, `stillOrphaned`), Sandbox workflow `run: drive-sweep`, dry run unless `drive_sweep_delete` | `drive-sweep.test.ts` "any row that names a drive keeps it…", "a drive an unarchive named after the listing is kept…" |
 | A failed promote leaks neither the golden nor its drive. | `abandonGolden` (`environment.ts`) | `environment.test.ts` "hands the golden and its forked drive to the retried teardown" |
 | A golden carries no workspace identity, on the root disk or the drive, and is stripped only with its drive mounted. | `inheritedIdentityPaths` (includes `SANDBOX_PATHS.driveState`); `stripWorkspaceIdentity` checks `mountpoint` and the exit code | `vercel.test.ts` "forks the source's drive once it is released and strips identity on the drive", "a golden whose drive did not mount is not stripped and fails the promote" |
 | Turning the flag off stops new drives. | `buildSandboxClaim` (provision) and `environment.promote` consult `workspaceDrivesEnabled`; the release writes `golden_drive_name = null` | `claim.test.ts` "with the organization's flag off…"; `environment.test.ts` "a workspace whose files are on a drive does not spread drive mode…" |
@@ -530,8 +529,7 @@ never shown as their work.
 2. Existing workspaces with a drive keep it and keep working: their data lives there. Nothing
    moves it back to the root disk; such a workspace is archived and recreated if it must leave
    drive mode.
-3. Drives that nothing names any more: dispatch the Sandbox workflow with `run: drive-sweep`,
-   read the list, then run it again with `drive_sweep_delete`.
+3. Drives that nothing names any more are left to the cleanup job's rule 3 (#9987).
 4. Code rollback: revert the branch's commits. Rows with `drive_name` keep their column, and no
    pre-drive boot script may run over a laid-out drive (`drive.downgrade`), so workspaces with a
    drive refuse to boot instead of showing an empty `/workspace`. Archive them before such a
@@ -540,10 +538,8 @@ never shown as their work.
 
 ## Before customers
 
-- Schedule the drive sweep and let it delete. Today it is a `workflow_dispatch` job only, dry run
-  unless `drive_sweep_delete` is set, so a drive whose teardown gave up stays until someone runs it
-  (the model's NoOrphanForever holds only if it is run). Once it has run dry in production a few
-  times and listed nothing it should not, run it on a schedule without the dry run.
+- Ship the cleanup job (#9987) with rule 3 for drives. Until it runs in production, a drive whose
+  teardown gave up stays (the model's NoOrphanForever holds only once it runs).
 
 
 ## Follow-ups (out of scope)
@@ -560,7 +556,7 @@ never shown as their work.
 - Environment builds (#9282): `activateGolden` must move `source_ref` and `golden_drive_name`
   together, in one row update, the way promote and the release do. A golden and a drive from two
   different builds would give every new workspace a checkout that does not match its root disk.
-- A sweep of drives named `drive-ws-*` whose sandbox no longer exists.
+- Leftover drives (named `drive-ws-*`, no row names them): the cleanup job's rule 3 (#9987).
 
 
 ## Validation and Acceptance
