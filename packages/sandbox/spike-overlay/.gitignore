@@ -1,3 +1,4 @@
 page/*.html
+page/status.json
 data/inventory-summary.txt
 data/envdays.txt

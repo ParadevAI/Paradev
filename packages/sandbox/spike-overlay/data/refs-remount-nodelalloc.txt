@@ -1,0 +1,15 @@
+== rep 1
+after reset:
+V1-overlay-lower packed-refs=0 refs=0 fsck=error: refs/remotes/origin/HEAD: invalid sha1 pointer 0000000000000000
+V3-overlay-upper packed-refs=340 refs=6 fsck=
+V2-plain-ext4 packed-refs=340 refs=6 fsck=
+== rep 2
+after reset:
+V1-overlay-lower packed-refs=0 refs=0 fsck=error: refs/remotes/origin/HEAD: invalid sha1 pointer 0000000000000000
+V3-overlay-upper packed-refs=340 refs=6 fsck=
+V2-plain-ext4 packed-refs=340 refs=6 fsck=
+== rep 3
+after reset:
+V1-overlay-lower packed-refs=0 refs=0 fsck=notice: HEAD points to an unborn branch (main)
+V3-overlay-upper packed-refs=340 refs=6 fsck=
+V2-plain-ext4 packed-refs=340 refs=6 fsck=

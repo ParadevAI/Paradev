@@ -148,9 +148,9 @@ async function main() {
 			const d = await box.runCommand({ cmd: "bash", args: ["/tmp/deploy.sh", ws, flag("overlay", "1")!, flag("runner", "ovl")!, flag("drive", "-")!], sudo: true });
 			mark("prototype.installed");
 			if (d.exitCode !== 0 && d.exitCode !== 2) console.error(await d.stderr());
-			await box.runCommand({ cmd: "sudo", args: ["--preserve-env=HOST_SERVICE_SECRET", "/usr/local/bin/superset-boot"], detached: true, env: { HOST_SERVICE_SECRET: "ovl-spike-secret" } } as any);
+			await box.runCommand({ cmd: "sudo", args: ["--preserve-env=HOST_SERVICE_SECRET", "/usr/local/bin/superset-boot"], detached: true, env: { HOST_SERVICE_SECRET: flag("secret", "ovl-spike-secret")! } } as any);
 			mark("boot.started");
-			const url = box.domain(4879); const auth = { authorization: "Bearer ovl-spike-secret", "content-type": "application/json" };
+			const url = box.domain(4879); const auth = { authorization: `Bearer ${flag("secret", "ovl-spike-secret")}`, "content-type": "application/json" };
 			for (;;) {
 				const r = await fetch(`${url}/trpc/health.check`, { signal: AbortSignal.timeout(5000) }).then((x) => x.status).catch(() => 0);
 				if (r === 200) break;

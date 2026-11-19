@@ -14,7 +14,7 @@ LOWER="${STATE}/lower"
 UPPER_HOME="${STATE}/u"
 # Kernel 6.18 hands out mount namespace ids out of order, so binding a namespace
 # to a file is refused at random (the loop check compares ids); a process is the handle.
-HOLDER=/run/superset-ovl.pid
+HOLDER="${SUPERSET_OVERLAY_HOLDER:-/run/superset-ovl.pid}"
 OPTS="${SUPERSET_OVERLAY_OPTS:-redirect_dir=on,index=on,metacopy=on,xino=auto}"
 
 holder() {
@@ -34,12 +34,21 @@ platform_files() {
 	done
 }
 
-bind_ro() {
-	local src="$1" dst="${MERGED}$1"
-	[ -e "$src" ] || return 0
-	if [ -d "$src" ]; then mkdir -p "$dst"; else [ -e "$dst" ] || { mkdir -p "${dst%/*}"; : > "$dst"; }; fi
-	mount --bind "$src" "$dst"
-	mount -o remount,bind,ro "$dst"
+# Platform paths always come from the lower: before the overlay is mounted, drop
+# whatever in the upper would hide them (a copy, a whiteout, an opaque parent).
+scrub_upper() {
+	{ printf '%s\n' /opt/superset /usr/local/share/superset /etc/superset; platform_files; } | python3 -I -c '
+import os, shutil, sys
+upper = sys.argv[1]
+for path in filter(None, sys.stdin.read().split("\n")):
+    target = upper + path
+    if os.path.isdir(target) and not os.path.islink(target): shutil.rmtree(target)
+    elif os.path.lexists(target): os.unlink(target)
+    d = os.path.dirname(path)
+    while d != "/":
+        try: os.removexattr(upper + d, "trusted.overlay.opaque")
+        except OSError: pass
+        d = os.path.dirname(d)' "$1"
 }
 
 inner() {
@@ -53,19 +62,29 @@ inner() {
 	local target
 	while read -r target; do
 		case "$target" in
-			/ | "$STATE" | "$STATE"/* | "$DRIVE" | "$DRIVE"/* | /run | /tmp) continue ;;
+			/ | "$STATE" | "$STATE"/* | "$DRIVE" | "$DRIVE"/* | /run | /run/* | /tmp) continue ;;
 		esac
 		[ -e "${MERGED}${target}" ] || { [ -d "$target" ] && mkdir -p "${MERGED}${target}" || : > "${MERGED}${target}"; }
 		mount --bind "$target" "${MERGED}${target}"
 		findmnt -no OPTIONS "$target" | grep -qE '(^|,)ro(,|$)' && mount -o remount,bind,ro "${MERGED}${target}"
 	done < <(findmnt -rn -o TARGET | sort -u | awk '{print length, $0}' | sort -n | cut -d' ' -f2-)
 
-	mount -t tmpfs -o mode=1777,nosuid,nodev tmpfs "${MERGED}/tmp"
-	mount --rbind /run "${MERGED}/run"
-	for path in /etc/superset /opt/superset /usr/local/share/superset; do bind_ro "$path"; done
-	while read -r path; do bind_ro "$path"; done < <(platform_files)
-	mkdir -p "${MERGED}/var/log/superset"
-	mount --bind /var/log/superset "${MERGED}/var/log/superset"
+	mount -t tmpfs -o "mode=1777,nosuid,nodev,size=${SUPERSET_TMP_SIZE:-4g}" tmpfs "${MERGED}/tmp"
+	if [ "${SUPERSET_OVERLAY_SHARE:-run}" = run-only ]; then
+		# Only this boot's state is shared with outside, from a tmpfs, so no line names the root disk.
+		mount -t tmpfs -o mode=0755,nosuid,nodev,size=64m tmpfs "${MERGED}/run"
+		mkdir -p "${MERGED}/run/superset"
+		mount --bind /run/superset "${MERGED}/run/superset"
+	else
+		mount --rbind /run "${MERGED}/run"
+		# The control plane rewrites the identity from outside while the box serves.
+		mount --bind /etc/superset "${MERGED}/etc/superset"
+		mount -o remount,bind,ro "${MERGED}/etc/superset"
+	fi
+	if [ "${SUPERSET_OVERLAY_SHARE:-run}" != run-only ]; then
+		mkdir -p "${MERGED}/var/log/superset"
+		mount --bind /var/log/superset "${MERGED}/var/log/superset"
+	fi
 
 	mkdir "${MERGED}/tmp/.oldroot"
 	cd "$MERGED"
@@ -88,6 +107,7 @@ case "${1:-}" in
 		# a second overlay on the same upper would be refused (index=on) or corrupt it.
 		if pid="$(holder)"; then exec nsenter --target "$pid" --mount --wdns=/ -- "$@"; fi
 		install -d -m 0755 "${DRIVE}/overlay/upper" "${DRIVE}/overlay/work"
+		scrub_upper "${DRIVE}/overlay/upper"
 		exec unshare --mount --propagation unchanged -- "$0" __inner "$@"
 		;;
 	__inner) shift; inner "$@" ;;

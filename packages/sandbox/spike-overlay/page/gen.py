@@ -193,6 +193,45 @@ def devices():
     return "\n".join(out)
 
 
+def upperbench():
+    rows = rows_of("upperbench.csv")
+    by = defaultdict(list)
+    for r in rows:
+        if r["exit"] == "0":
+            by[(r["item"], r["layout"])].append(float(r["seconds"]))
+    names = {"A": "A · today", "C": "C · upper on the drive", "CL": "C · upper on own ext4 (nodelalloc)"}
+    items = [("first-reinstall-CI", "first full reinstall after create (CI=1)"), ("warm-reinstall-CI", "warm reinstall (CI=1)"),
+             ("cold-install-CI", "cold install (CI=1)"), ("first-reinstall-postinstall", "first full reinstall with the postinstall"),
+             ("warm-reinstall-postinstall", "warm reinstall with the postinstall"), ("git-status-dirty", "git status, 300 files dirty"),
+             ("rg-all-files", "rg -uu, cold cache"), ("write-2GB-fsync", "write 2 GB with fsync"), ("fsync-4k-x2000", "2,000 × (4 KiB write + fsync)")]
+    out = ["<div class=wrap><table><thead><tr><th>bun · this repo, and I/O</th>" + "".join(f"<th>{names[l]}</th>" for l in ("A", "C", "CL")) + "</tr></thead><tbody>"]
+    for k, label in items:
+        out.append(f"<tr><td>{label}</td>" + "".join(cell(by.get((k, l), []), "s", 2) for l in ("A", "C", "CL")) + "</tr>")
+    out.append("</tbody></table></div><p class=sm>Round 2, boxes run at the same time, 8 vCPU, each C run from an empty upper; median of 3 (the postinstall first reinstall: 1 run).</p>")
+    return "\n".join(out)
+
+
+def coldwake():
+    rows = []
+    p = DATA / "coldwake.csv"
+    if not p.exists():
+        return ""
+    for line in p.read_text().splitlines():
+        r, i, kind, js = line.split(",", 3)
+        j = json.loads(js)
+        rows.append((r, kind, j["first.command"] / 1000, j["terminal.first.output"] / 1000))
+    def p90(x):
+        x = sorted(x); return x[min(len(x) - 1, int(round(0.9 * (len(x) - 1))))]
+    out = ["<div class=wrap><table><thead><tr><th>Region</th><th>Restore</th><th>Samples</th><th>Box ready to run a command: median / p90 (range)</th><th>First terminal output: median / p90 (range)</th></tr></thead><tbody>"]
+    for r in ("sfo1", "iad1"):
+        for k in ("cold", "warm"):
+            a = [x[2] for x in rows if x[0] == r and x[1] == k]; b = [x[3] for x in rows if x[0] == r and x[1] == k]
+            if a:
+                out.append(f"<tr><td>{r}</td><td>{k}</td><td>{len(a)}</td><td><b>{statistics.median(a):.1f}</b> / {p90(a):.1f} s <span class=rg>{min(a):.1f}–{max(a):.1f}</span></td><td><b>{statistics.median(b):.1f}</b> / {p90(b):.1f} s <span class=rg>{min(b):.1f}–{max(b):.1f}</span></td></tr>")
+    out.append("</tbody></table></div>")
+    return "\n".join(out)
+
+
 def resources():
     p = DATA / "resources.txt"
     if not p.exists():
@@ -215,8 +254,15 @@ if __name__ == "__main__":
         "DEVICES_TABLE": devices(),
         "SWITCH_TABLE": switch(),
         "RESOURCES": resources(),
+        "UPPERBENCH_TABLE": upperbench(),
+        "COLDWAKE_TABLE": coldwake(),
     }
     tpl = (Path(__file__).parent / "template.html").read_text()
+    r2 = (Path(__file__).parent / "round2.html").read_text()
+    tpl = tpl.replace("<h2>What has to change to adopt it</h2>", r2 + "\n<h2>What has to change to adopt it</h2>")
+    status = json.loads((Path(__file__).parent / "status.json").read_text())
+    for k, v in status.items():
+        tpl = tpl.replace("{{" + k + "}}", v)
     for k, v in parts.items():
         tpl = tpl.replace("{{" + k + "}}", v)
     (Path(__file__).parent / "overlay-root-spike.html").write_text(tpl)

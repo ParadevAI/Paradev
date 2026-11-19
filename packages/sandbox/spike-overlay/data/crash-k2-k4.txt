@@ -1,0 +1,61 @@
+===== k2
+after reset: {"status":"running"}
+STOP {"stopMs":2268,"status":"stopped","snapshot":null,"snapshotSize":null} took 2669 ms
+DETACH {"detachedAfterMs":147}
+WAKE {"name":"ovl-spike-k1","mode":"wake","provider.get":190,"first.command":2404,"prototype.installed":3243,"boot.started":3545,"host.answers":6217,"terminal.created":6840,"rootfs":1,"terminal.first.output":8244}
+== kernel on mount
+[  152.113297] EXT4-fs (vdc): recovery complete
+[  154.544927] overlayfs: "xino" feature enabled using 2 upper inode bits.
+== workdir leftovers: 851  index entries: 851
+record: durable eae6c8db7ac8dc15;staged 20000;
+fsync'd 64 MB file: intact
+unsynced file: cat: /home/ubuntu/crash/unsynced-k2.txt: No such file or dir
+branch: crash-k2 head: 8e173a94 fix(cloud): billing periods on the 29th, 30th and 31st (#9997)
+index.lock left: no
+fsck: 
+status lines: 20000
+files on disk: 20000
+commit after crash: ok,  20000 files changed, 20000 insertions(+)
+walk errors (not permission): 0
+== kernel after walk
+[  154.544927] overlayfs: "xino" feature enabled using 2 upper inode bits.
+
+@@ exit=0 ms=8426
+===== k3
+after reset: {"status":"running"}
+STOP {"stopMs":1250,"status":"stopped","snapshot":null,"snapshotSize":null} took 1614 ms
+DETACH {"detachedAfterMs":136}
+WAKE {"name":"ovl-spike-k1","mode":"wake","provider.get":180,"first.command":4675,"prototype.installed":5279,"boot.started":5573,"host.answers":8551,"terminal.created":9144,"rootfs":1,"terminal.first.output":10380}
+== kernel on mount
+[  197.036070] EXT4-fs (vdc): recovery complete
+[  202.276217] overlayfs: "xino" feature enabled using 2 upper inode bits.
+== workdir leftovers: 851  index entries: 851
+record: itted 45050;committed 45100;committed 45150;committed 45200;committed 45250;committed 45300;committed 45350;committed 45400;committed 45450;committed 45500;committed 45550;committed 45600;committed 45650;committed 45700;committed 45750;committed 45800;committed 45850;committed 45900;committed 45950;
+fsync'd 64 MB file: intact
+unsynced file: k3 unsynced
+last fsync'd record: committed 45950
+rows in db: 45952  integrity: ok
+walk errors (not permission): 0
+== kernel after walk
+[  202.276217] overlayfs: "xino" feature enabled using 2 upper inode bits.
+
+@@ exit=0 ms=8988
+===== k4
+after reset: {"status":"running"}
+STOP {"stopMs":1230,"status":"stopped","snapshot":null,"snapshotSize":null} took 1627 ms
+DETACH {"detachedAfterMs":229}
+WAKE {"name":"ovl-spike-k1","mode":"wake","provider.get":166,"first.command":1919,"prototype.installed":2685,"boot.started":2989,"host.answers":5625,"terminal.created":6074,"rootfs":1,"terminal.first.output":7297}
+== kernel on mount
+[    0.497193] EXT4-fs (vdc): recovery complete
+[    2.754683] overlayfs: "xino" feature enabled using 2 upper inode bits.
+== workdir leftovers: 851  index entries: 851
+record: durable 9069351cb9c75404;copyup /workspace/node_modules/.bun/lightningcss-linux-x64-gnu@1.32.0/node_modules/lightningcss-linux-x64-gnu/lightningcss.linux-x64-gnu.node 10040456;lowersha 2024f99789a601c7;
+fsync'd 64 MB file: intact
+unsynced file: cat: /home/ubuntu/crash/unsynced-k4.txt: No such file or dir
+file: 10040456 bytes (was 10040456), sha now 2024f99789a601c7, lower sha 2024f99789a601c7
+rename: old=ls: cannot access 'packages/sandbox': No such file new=8 entries
+walk errors (not permission): 0
+== kernel after walk
+[    2.754683] overlayfs: "xino" feature enabled using 2 upper inode bits.
+
+@@ exit=0 ms=6690

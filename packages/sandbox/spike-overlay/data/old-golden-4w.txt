@@ -1,0 +1,83 @@
+old golden snapshot snap_nnhRBgFfHZ9w35qDha1ACEVmJLV1
+{"name":"ovl-spike-old-a1c208","createMs":1809,"firstCommandMs":2128,"exit":0,"snapshot":"snap_nnhRBgFfHZ9w35qDha1ACEVmJLV1"}
+=== release-a1c2085e5979 session 1
+image bundle before boot: a1c2085e5979
+    0.0s boot.start pid=802 bundle=a1c2085e5979
+    0.0s bundle.fetching 46b0f9720162
+    0.1s bundle.installed 46b0f9720162 was a1c2085e5979
+    0.1s rootfs.start
+    0.2s setup apply-rootfs installed=8 skipped=22
+    0.3s rootfs.end
+    0.3s boot.reexec into the installed bundle's script
+    0.3s boot.start pid=802 bundle=46b0f9720162
+    0.3s bundle.current 46b0f9720162 matches pin
+    0.3s rootfs.start
+    0.4s setup apply-rootfs installed=0 skipped=30
+    0.4s rootfs.end
+    0.4s steps.host.start
+    0.4s setup step install-host running (a01885c1355b)
+    2.3s setup step install-host done in 1874ms
+    2.3s steps.host.end
+    2.3s boot.done
+    2.3s assets.start
+    2.8s host.ready
+   10.2s checkout.end
+   12.2s setup sync-assets done in 9898ms
+   12.2s assets.end
+   12.2s steps.start
+   12.2s setup step install-chrome running (ce2b59489f73)
+   24.1s setup step install-chrome done in 11855ms
+   24.1s setup step configure-chrome running (c534308ec837)
+   24.1s setup step configure-chrome done in 19ms
+   24.1s setup step install-themes at ce7441d1eb0f, skipping
+   24.1s setup step install-locales at eb955077e034, skipping
+   24.1s setup step write-desktop-config running (77aeb3b918fd)
+   24.2s setup step write-desktop-config done in 45ms
+   24.2s setup step install-cli running (054546b0fb05)
+   24.2s setup step install-cli done in 15ms
+   24.2s setup step install-agent-clis running (2067875857bb)
+   28.7s setup step install-agent-clis done in 4480ms
+   28.7s steps.end
+@@ exit=0 ms=29408
+=== release-a1c2085e5979 session 2
+image bundle before boot: a1c2085e5979
+    0.0s boot.start pid=799 bundle=a1c2085e5979
+    0.0s bundle.fetching 46b0f9720162
+    0.2s bundle.installed 46b0f9720162 was a1c2085e5979
+    0.2s rootfs.start
+    0.3s setup apply-rootfs installed=8 skipped=22
+    0.3s rootfs.end
+    0.3s boot.reexec into the installed bundle's script
+    0.3s boot.start pid=799 bundle=46b0f9720162
+    0.3s bundle.current 46b0f9720162 matches pin
+    0.3s rootfs.start
+    0.4s setup apply-rootfs installed=0 skipped=30
+    0.4s rootfs.end
+    0.4s steps.host.start
+    0.4s setup step install-host running (a01885c1355b)
+    2.5s setup step install-host done in 2046ms
+    2.5s steps.host.end
+    2.5s boot.done
+    2.5s assets.start
+    3.1s host.ready
+   10.6s checkout.end
+   13.9s setup sync-assets done in 11322ms
+   13.9s assets.end
+   13.9s steps.start
+   13.9s setup step install-chrome running (ce2b59489f73)
+   27.4s setup step install-chrome done in 13485ms
+   27.4s setup step configure-chrome running (c534308ec837)
+   27.4s setup step configure-chrome done in 19ms
+   27.4s setup step install-themes at ce7441d1eb0f, skipping
+   27.4s setup step install-locales at eb955077e034, skipping
+   27.4s setup step write-desktop-config running (77aeb3b918fd)
+   27.5s setup step write-desktop-config done in 49ms
+   27.5s setup step install-cli running (054546b0fb05)
+   27.5s setup step install-cli done in 15ms
+   27.5s setup step install-agent-clis running (2067875857bb)
+   32.1s setup step install-agent-clis done in 4570ms
+   32.1s steps.end
+@@ exit=0 ms=33376
+deleted box ovl-spike-old-a1c208
+deleted snapshot snap_nnhRBgFfHZ9w35qDha1ACEVmJLV1 2243797314
+deleted box ovl-spike-og-a1c208

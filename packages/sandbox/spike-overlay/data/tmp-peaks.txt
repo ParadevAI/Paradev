@@ -1,0 +1,12 @@
+Per-second samples were lost with the box (ovl-spike-t1); these are the peaks printed by tmpstress.sh at the time.
+cap 16g (no practical cap):
+  bun-install-in-tmp     tmp=6428 MB  cgroup=14582 MB  (of 16384 MB)
+  clone-install-in-tmp   tmp= 813 MB  cgroup= 3965 MB
+  pip-wheels             tmp=  69 MB  cgroup=  995 MB
+  go-build               tmp=  60 MB  cgroup=  980 MB
+  chrome                 tmp=   1 MB  cgroup= 1255 MB
+  after the session (idle) tmp stayed at 6430 MB until deleted
+cap 1g:
+  bun-install-in-tmp exit=128: git "error: unable to write file apps/marketing/public/changelog/..." (tmp full at 1024 MB)
+  clone-install-in-tmp exit=0 (800 MB peak)
+  go-build exit=0 (64 MB); pip-wheels exit=1 (Cython source build failed; 69 MB peak, not the cap); chrome exit=124 (dbus timeout; 1 MB)

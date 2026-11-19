@@ -1,0 +1,44 @@
+{"name":"ovl-spike-old-73d13e","createMs":8798,"firstCommandMs":9107,"exit":0,"snapshot":null}
+=== release-73d13ed6b502 session 1
+image bundle before boot: 73d13ed6b502
+    0.0s boot.start pid=1122 bundle=73d13ed6b502
+    0.0s bundle.fetching 46b0f9720162
+    0.1s bundle.installed 46b0f9720162 was 73d13ed6b502
+    0.1s rootfs.start
+    0.2s setup apply-rootfs installed=6 skipped=24
+    0.2s rootfs.end
+    0.2s boot.reexec into the installed bundle's script
+    0.2s boot.start pid=1122 bundle=46b0f9720162
+    0.2s bundle.current 46b0f9720162 matches pin
+    0.2s rootfs.start
+    0.3s setup apply-rootfs installed=0 skipped=30
+    0.3s rootfs.end
+    0.3s steps.host.start
+    0.3s setup step install-host running (a01885c1355b)
+    2.2s setup step install-host done in 1820ms
+    2.2s steps.host.end
+    2.2s boot.done
+    2.2s assets.start
+    2.8s host.ready
+    9.3s setup sync-assets done in 7122ms
+    9.3s assets.end
+    9.3s steps.start
+    9.3s setup step install-chrome running (ce2b59489f73)
+   10.8s checkout.end
+   21.5s setup step install-chrome done in 12150ms
+   21.5s setup step configure-chrome running (c534308ec837)
+   21.5s setup step configure-chrome done in 18ms
+   21.5s setup step install-themes at ce7441d1eb0f, skipping
+   21.5s setup step install-locales at eb955077e034, skipping
+   21.5s setup step write-desktop-config running (77aeb3b918fd)
+   21.6s setup step write-desktop-config done in 40ms
+   21.6s setup step install-cli running (054546b0fb05)
+   21.6s setup step install-cli done in 13ms
+   21.6s setup step install-agent-clis running (2067875857bb)
+   25.3s setup step install-agent-clis done in 3696ms
+   25.3s steps.end
+@@ exit=0 ms=26351
+=== release-73d13ed6b502 session 2
+ERR Status code 400 is not ok: Cannot resume sandbox: no snapshot available. {"error":{"code":"snapshot_not_found","message":"Cannot resume sandbox: no snapshot available."}}
+ERR Status code 400 is not ok: Cannot resume sandbox: no snapshot available. {"error":{"code":"snapshot_not_found","message":"Cannot resume sandbox: no snapshot available."}}
+deleted box ovl-spike-old-73d13e

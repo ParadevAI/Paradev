@@ -1,0 +1,16 @@
+===== k5
+after reset: {"status":"running"}
+STOP {"stopMs":1216,"status":"stopped","snapshot":null,"snapshotSize":null} took 1588 ms
+DETACH {"detachedAfterMs":135}
+WAKE {"name":"ovl-spike-k1","mode":"wake","provider.get":165,"first.command":2006,"prototype.installed":2794,"boot.started":3103,"host.answers":6130,"terminal.created":6739,"rootfs":1,"terminal.first.output":8121}
+== kernel on mount
+== workdir leftovers: 851  index entries: 851
+record: durable d3e34a84371df67b;copyup /workspace/.git/objects/pack/pack-1b48eb1b86d6df956c6c2f8872956e1fd01edc9e.pack 145554994;lowersha 551a665e2cd64769;
+fsync'd 64 MB file: intact
+unsynced file: cat: /home/ubuntu/crash/unsynced-k5.txt: No such file or dir
+pack: 145554994 bytes (was 145554994), sha now 551a665e2cd64769, lower sha 551a665e2cd64769
+git fsck: error: refs/remotes/origin/HEAD: invalid sha1 pointer 0000000000000000000000000000000000000000|notice: HEAD points to an unborn branch (crash-k2)|notice: No default references|ok-if-empty
+walk errors (not permission): 0
+== kernel after walk
+
+@@ exit=0 ms=11274

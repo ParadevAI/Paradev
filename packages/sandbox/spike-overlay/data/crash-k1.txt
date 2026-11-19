@@ -1,0 +1,16 @@
+== kernel on mount
+[    1.531620] EXT4-fs (vdc): 1 orphan inode deleted
+[    1.531626] EXT4-fs (vdc): recovery complete
+[    4.072948] overlayfs: "xino" feature enabled using 2 upper inode bits.
+== workdir leftovers: 851  index entries: 851
+record: durable b8697460b9d6136a;
+fsync'd 64 MB file: intact
+unsynced file: cat: /home/ubuntu/crash/unsynced-k1.txt: No such file or dir
+node_modules entries: 0  cache entries: 164
+bun install after crash: exit=0 73s 2782 packages installed [72.44s]
+modules resolve
+walk errors (not permission): 0
+== kernel after walk
+[    4.072948] overlayfs: "xino" feature enabled using 2 upper inode bits.
+
+@@ exit=0 ms=76708

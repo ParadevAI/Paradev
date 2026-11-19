@@ -1,0 +1,6 @@
+{"name":"ovl-spike-dk1","id":"drive_Xrva6j90LPpG4wmqOeXT9mC0Wuq7","region":"sfo1","maxSize":1099511627776,"ms":469}
+CREATE {"name":"ovl-spike-k1","mode":"create","provider.create":1288,"first.command":1592,"prototype.installed":2344,"boot.started":2637,"host.answers":4332,"terminal.created":5048,"rootfs":1,"terminal.first.output":6422}
+===== k1
+arm call ended after 120009 ms
+box status after reset: running (after 264270 ms)
+{"name":"ovl-spike-dk1","sandbox":"ovl-spike-k1","session":"sbx_esEnypJODXoA0W6J93t0tPieeX3p","updated":"2026-11-19T03:21:48.525Z"}
