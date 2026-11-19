@@ -27,6 +27,7 @@ const QUOTA_NOTICE_MODE: QuotaNoticeMode = "offer-reclaim";
 const TOAST_ID = "localstorage-quota-exhausted";
 
 const warnedStorageKeys = new Set<string>();
+const writesToRetry = new Map<string, () => boolean>();
 
 /**
  * Warns once per storage key. The loop this replaces fired ~40x a second, so an
@@ -53,10 +54,17 @@ export function describeClearedSnapshots(cleared: number): string {
 }
 
 function reclaimFromToast(): void {
-	toast.success(describeClearedSnapshots(clearAllTerminalState()), {
+	const cleared = clearAllTerminalState();
+	for (const [key, retry] of [...writesToRetry]) {
+		if (retry()) writesToRetry.delete(key);
+	}
+	toast.success(describeClearedSnapshots(cleared), {
 		id: TOAST_ID,
+		action: writesToRetry.size > 0 ? reclaimAction : undefined,
 	});
 }
+
+const reclaimAction = { label: "Free up space", onClick: reclaimFromToast };
 
 /**
  * `mode` defaults to the configured `QUOTA_NOTICE_MODE`; it is a parameter so
@@ -65,17 +73,17 @@ function reclaimFromToast(): void {
 export function notifyQuotaExhausted(
 	storageKey: string,
 	mode: QuotaNoticeMode = QUOTA_NOTICE_MODE,
+	retryWrite?: () => boolean,
 ): void {
 	warnOnce(storageKey);
 	if (mode === "silent") return;
+	if (mode === "offer-reclaim" && retryWrite)
+		writesToRetry.set(storageKey, retryWrite);
 
 	toast.warning("Storage is full", {
 		id: TOAST_ID,
 		description:
 			"Layout and sidebar changes are kept for this session but revert when Paradev restarts.",
-		action:
-			mode === "offer-reclaim"
-				? { label: "Free up space", onClick: reclaimFromToast }
-				: undefined,
+		action: mode === "offer-reclaim" ? reclaimAction : undefined,
 	});
 }

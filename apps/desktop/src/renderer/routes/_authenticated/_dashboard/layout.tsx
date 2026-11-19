@@ -35,6 +35,7 @@ import { RestoreCloudWorkspaceMount } from "./components/RestoreCloudWorkspaceMo
 import { SaveAsEnvironmentMount } from "./components/SaveAsEnvironmentMount";
 import { TitleBar } from "./components/TitleBar";
 import { TitleBarSlotsProvider } from "./providers/TitleBarSlotsProvider";
+import { useActivityPanelVisibilityStore } from "./workspace/$workspaceId/components/WorkspaceActivityMenu/stores/activityPanelStore";
 import { browserRuntimeRegistry } from "./workspace/$workspaceId/hooks/usePaneRegistry/components/BrowserPane/browserRuntimeRegistry";
 
 export const Route = createFileRoute("/_authenticated/_dashboard")({
@@ -66,6 +67,9 @@ function DashboardLayout() {
 			useAutomationFailuresStore,
 		);
 		const stopChatTabsSync = syncPersistedStoreAcrossWindows(useChatTabsStore);
+		const stopActivityPanelSync = syncPersistedStoreAcrossWindows(
+			useActivityPanelVisibilityStore,
+		);
 
 		return () => {
 			stopWorkspaceSidebarSync();
@@ -74,6 +78,7 @@ function DashboardLayout() {
 			stopCloudSidebarSync();
 			stopAutomationFailuresSync();
 			stopChatTabsSync();
+			stopActivityPanelSync();
 		};
 	}, []);
 	// Get current workspace from route to pre-select project in new workspace modal

@@ -1,4 +1,7 @@
+import { notifyQuotaExhausted } from "renderer/routes/_authenticated/providers/CollectionsProvider/notifyQuotaExhausted";
+import { isQuotaExceeded } from "renderer/routes/_authenticated/providers/CollectionsProvider/withQuotaGuard";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const FINISHED_LIMIT = 20;
 
@@ -18,8 +21,6 @@ interface ActivityPanelStore {
 	asideNodes: Record<string, HTMLElement>;
 	fits: Record<string, true>;
 	setFits: (workspaceId: string, fits: boolean) => void;
-	hidden: Record<string, true>;
-	setHidden: (workspaceId: string, hidden: boolean) => void;
 	floatingOpen: Record<string, true>;
 	setFloatingOpen: (workspaceId: string, open: boolean) => void;
 	subagentsCollapsed: Record<string, true>;
@@ -47,13 +48,6 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 			if ((state.fits[workspaceId] === true) === fits) return state;
 			const { [workspaceId]: _previous, ...rest } = state.fits;
 			return { fits: fits ? { ...rest, [workspaceId]: true } : rest };
-		}),
-	hidden: {},
-	setHidden: (workspaceId, hidden) =>
-		set((state) => {
-			if ((state.hidden[workspaceId] === true) === hidden) return state;
-			const { [workspaceId]: _previous, ...rest } = state.hidden;
-			return { hidden: hidden ? { ...rest, [workspaceId]: true } : rest };
 		}),
 	floatingOpen: {},
 	setFloatingOpen: (workspaceId, open) =>
@@ -127,3 +121,77 @@ export const useActivityPanelStore = create<ActivityPanelStore>()((set) => ({
 
 export const useFinishedSubagents = (workspaceId: string) =>
 	useActivityPanelStore((state) => state.finished[workspaceId] ?? NO_FINISHED);
+
+interface ActivityPanelVisibilityState {
+	hidden: boolean;
+	changedAt: number;
+	setHidden: (hidden: boolean) => void;
+}
+
+let retryingVisibilityWrite = false;
+let visibilityWritePending = false;
+
+function retryVisibilityWrite(): boolean {
+	const store = useActivityPanelVisibilityStore;
+	if (!visibilityWritePending) return true;
+	// Read the shared storage before retrying in case its event is still queued.
+	void store.persist.rehydrate();
+	if (!visibilityWritePending) return true;
+	retryingVisibilityWrite = true;
+	try {
+		store.setState((state) => state);
+		return !visibilityWritePending;
+	} finally {
+		retryingVisibilityWrite = false;
+	}
+}
+
+export const useActivityPanelVisibilityStore =
+	create<ActivityPanelVisibilityState>()(
+		persist(
+			(set) => ({
+				hidden: false,
+				changedAt: 0,
+				setHidden: (hidden) =>
+					set((state) => ({
+						hidden,
+						changedAt: Math.max(Date.now(), state.changedAt + 1),
+					})),
+			}),
+			{
+				name: "workspace-activity-panel",
+				partialize: ({ hidden, changedAt }) => ({ hidden, changedAt }),
+				merge: (persisted, current) => {
+					const saved = persisted as
+						| Partial<ActivityPanelVisibilityState>
+						| undefined;
+					if (typeof saved?.hidden !== "boolean") return current;
+					const changedAt =
+						typeof saved.changedAt === "number" ? saved.changedAt : 0;
+					if (visibilityWritePending && changedAt <= current.changedAt)
+						return current;
+					visibilityWritePending = false;
+					return { ...current, hidden: saved.hidden, changedAt };
+				},
+				storage: createJSONStorage(() => ({
+					getItem: (name) => localStorage.getItem(name),
+					removeItem: (name) => localStorage.removeItem(name),
+					setItem: (name, value) => {
+						try {
+							localStorage.setItem(name, value);
+							visibilityWritePending = false;
+						} catch (error) {
+							visibilityWritePending = true;
+							if (!retryingVisibilityWrite && isQuotaExceeded(error))
+								notifyQuotaExhausted(name, undefined, retryVisibilityWrite);
+							else
+								console.warn(
+									"[activity-panel] Failed to persist visibility:",
+									error,
+								);
+						}
+					},
+				})),
+			},
+		),
+	);
