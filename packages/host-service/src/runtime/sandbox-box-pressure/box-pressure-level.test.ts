@@ -60,6 +60,18 @@ describe("nextBoxPressure", () => {
 		expect(stalled.pressure?.reap).toEqual(reap);
 	});
 
+	test("clears once memory recovers after a kill, without waiting for the kill to age out", () => {
+		const reap = { processName: "next-server", rssMb: 4700, at: 0 };
+		const critical = nextBoxPressure(start, { ...calm, recentReap: reap }, 0);
+		expect(
+			nextBoxPressure(
+				critical,
+				{ ...calm, recentReap: reap },
+				BOX_PRESSURE_MIN_DWELL_MS,
+			).pressure,
+		).toBeNull();
+	});
+
 	test("a heartbeat sample with the same state keeps its start time", () => {
 		const busy = nextBoxPressure(start, { ...calm, cpuWaitingPercent: 45 }, 0);
 		const again = nextBoxPressure(

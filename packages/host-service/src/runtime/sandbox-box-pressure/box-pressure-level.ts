@@ -43,7 +43,10 @@ export function nextBoxPressure(
 		BOX_PRESSURE_THRESHOLDS.memoryCritical,
 		was?.level === "critical",
 	);
-	const critical = sample.recentReap !== null || memoryCritical;
+	const freshReap =
+		sample.recentReap !== null &&
+		now - sample.recentReap.at < BOX_PRESSURE_MIN_DWELL_MS;
+	const critical = freshReap || memoryCritical;
 	const limitedBy: BoxResource[] = [];
 	if (cpu) limitedBy.push("cpu");
 	if (critical || memoryStalled) limitedBy.push("memory");
