@@ -10,8 +10,14 @@ import {
 	buildProcessTrees,
 	getListeningPortsForPids,
 	type PortInfo,
+	type ProcessTableEntry,
 	readProcessTable,
 } from "./scanner.ts";
+import {
+	readAgentLaunchIdsFromEnv,
+	readProcessStartTimes,
+	readTerminalIdsFromEnv,
+} from "./terminal-env.ts";
 import type { DetectedPort } from "./types.ts";
 
 /** How often to poll for port changes (in ms) */
@@ -32,6 +38,18 @@ const HINT_SCAN_DELAY_MS = 500;
 
 /** Ports to ignore (common privileged/system ports that are usually not dev servers) */
 const IGNORED_PORTS = new Set([22, 80, 443]);
+
+/**
+ * A wrapper reads the launch id's time after its process starts, and a slow
+ * wrapper reads it late, so the start time may be this much earlier.
+ */
+const AGENT_START_EARLY_S = 30;
+
+/**
+ * A reused pid starts after the launch, so this side stays strict. It only
+ * allows for a small clock adjustment.
+ */
+const AGENT_START_LATE_S = 5;
 
 const PORT_HINT_PATTERNS = [
 	/listening\s+on\s+(?:port\s+)?(\d+)/i,
@@ -123,6 +141,7 @@ interface ScanState {
 	pidOwnerMap: Map<number, { terminalId: string; workspaceId: string }>;
 	allPids: Set<number>;
 	emptyTreeTerminals: Map<string, SessionEntry>;
+	table: ProcessTableEntry[];
 }
 
 /**
@@ -295,6 +314,7 @@ export class PortManager extends EventEmitter {
 			>(),
 			allPids: new Set<number>(),
 			emptyTreeTerminals: new Map<string, SessionEntry>(),
+			table: [],
 		};
 	}
 
@@ -326,6 +346,7 @@ export class PortManager extends EventEmitter {
 		if (dueSessions.length === 0) return;
 
 		const table = await readProcessTable();
+		scanState.table = table;
 		const trees = buildProcessTrees(
 			table,
 			dueSessions.map((session) => session.pid),
@@ -403,22 +424,111 @@ export class PortManager extends EventEmitter {
 		}
 	}
 
+	/**
+	 * The given pids that are an agent or one of its ancestors: their own tree
+	 * holds an agent process. A server the agent started is not one.
+	 *
+	 * A launch id is "<launch pid>-<epoch seconds>". A wrapper that execs the
+	 * agent makes the launch pid the agent. The Codex wrapper stays alive and
+	 * runs the agent as its child, so there the agent is the child of the
+	 * launch pid that carries the id.
+	 */
+	private async findAgentPids(
+		table: ProcessTableEntry[],
+		pids: number[],
+		signal: AbortSignal,
+	): Promise<Set<number>> {
+		const agentPids = new Set<number>();
+		if (pids.length === 0) return agentPids;
+		const trees = buildProcessTrees(table, pids);
+		const launchIds = await readAgentLaunchIdsFromEnv(
+			[...new Set([...trees.values()].flat())],
+			signal,
+		);
+		const launches = new Map<number, [launchPid: number, launchedAt: number]>();
+		for (const [member, launchId] of launchIds) {
+			const [launchPid, launchedAt] = (launchId ?? "").split("-").map(Number);
+			if (launchPid)
+				launches.set(member, [launchPid, launchedAt ?? Number.NaN]);
+		}
+		const startTimes = await readProcessStartTimes(
+			[...new Set([...launches.values()].map(([launchPid]) => launchPid))],
+			signal,
+		);
+		const parents = new Map(table.map(({ pid, ppid }) => [pid, ppid]));
+		const wrapperPids = await this.findLiveWrapperPids(
+			[...launches]
+				.filter(([member, [launchPid]]) => parents.get(member) === launchPid)
+				.map(([, [launchPid]]) => launchPid),
+			signal,
+		);
+		for (const [pid, tree] of trees) {
+			const holdsAgent = tree.some((member) => {
+				const [launchPid, launchedAt] = launches.get(member) ?? [];
+				if (launchPid === undefined) return false;
+				// A reused pid started long after the launch. An unreadable time
+				// is NaN, which compares false and keeps the pid-only match.
+				const startedAt = startTimes.get(launchPid) ?? Number.NaN;
+				const late = startedAt - Number(launchedAt);
+				if (late > AGENT_START_LATE_S || late < -AGENT_START_EARLY_S)
+					return false;
+				return (
+					tree.includes(launchPid) ||
+					(parents.get(member) === launchPid && wrapperPids.has(launchPid))
+				);
+			});
+			if (holdsAgent) agentPids.add(pid);
+		}
+		return agentPids;
+	}
+
+	/**
+	 * The given launch pids that are a wrapper still running, not an agent. A
+	 * process's readable environment is the one it started with: an agent that
+	 * the wrapper exec'd has the launch id there, and a live wrapper does not.
+	 * The terminal id shows that the environment could be read at all.
+	 */
+	private async findLiveWrapperPids(
+		launchPids: number[],
+		signal: AbortSignal,
+	): Promise<Set<number>> {
+		const wrapperPids = new Set<number>();
+		if (launchPids.length === 0) return wrapperPids;
+		const pids = [...new Set(launchPids)];
+		const launchIds = await readAgentLaunchIdsFromEnv(pids, signal);
+		const terminalIds = await readTerminalIdsFromEnv(pids, signal);
+		for (const launchPid of pids) {
+			if (
+				terminalIds.get(launchPid) != null &&
+				!launchIds.get(launchPid)?.startsWith(`${launchPid}-`)
+			)
+				wrapperPids.add(launchPid);
+		}
+		return wrapperPids;
+	}
+
 	private async buildPortsByTerminal({
 		allPids,
 		pidOwnerMap,
+		table,
 	}: {
 		allPids: Set<number>;
 		pidOwnerMap: ScanState["pidOwnerMap"];
+		table: ProcessTableEntry[];
 	}): Promise<Map<string, PortInfo[]>> {
 		const portsByTerminal = new Map<string, PortInfo[]>();
 		const allPidList = Array.from(allPids);
 		if (allPidList.length === 0) return portsByTerminal;
 
-		const portInfos = await getListeningPortsForPids(
-			allPidList,
-			this.ensureScanAbort().signal,
+		const signal = this.ensureScanAbort().signal;
+		const portInfos = await getListeningPortsForPids(allPidList, signal);
+		const agentPids = await this.findAgentPids(
+			table,
+			portInfos.map((info) => info.pid),
+			signal,
 		);
 		for (const info of portInfos) {
+			if (agentPids.has(info.pid)) continue;
 			const owner = pidOwnerMap.get(info.pid);
 			if (!owner) continue;
 			const existing = portsByTerminal.get(owner.terminalId);
@@ -483,6 +593,7 @@ export class PortManager extends EventEmitter {
 			const portsByTerminal = await this.buildPortsByTerminal({
 				allPids: scanState.allPids,
 				pidOwnerMap: scanState.pidOwnerMap,
+				table: scanState.table,
 			});
 
 			this.updatePortsFromScan({
@@ -691,6 +802,12 @@ export class PortManager extends EventEmitter {
 				if (owners.get(detectedPort.pid) !== terminalId)
 					return { success: false };
 			}
+			const agentPids = await this.findAgentPids(
+				table,
+				[detectedPort.pid],
+				signal,
+			);
+			if (agentPids.has(detectedPort.pid)) return { success: false };
 			const listeners = await getListeningPortsForPids(
 				[detectedPort.pid],
 				signal,
