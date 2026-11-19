@@ -3,14 +3,13 @@ import { readFileSync } from "node:fs";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import {
 	CHECKOUT,
-	CLOUD_USAGE_DAILY_MIGRATIONS,
 	MAYA,
 	ORG,
 	SAM,
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import { recordUsageEvent } from "./cloud-usage-events";
-import { BILLED_FEATURE, pacificDay } from "./cloud-usage-query";
+import { BILLED_FEATURE, billingDay } from "./cloud-usage-query";
 import { cloudUsageDaily, cloudUsageEvents } from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
@@ -46,7 +45,7 @@ async function rollup() {
 
 async function fromEvents() {
 	const { rows } = await db.execute<Row>(sql`
-		select e.organization_id, ${pacificDay(sql`e.sent_at`)}::text as day, e.user_id, b.vcpus,
+		select e.organization_id, ${billingDay(sql`e.sent_at`)}::text as day, e.user_id, b.vcpus,
 			sum(e.amount) as gb_minutes, sum(extract(epoch from e.window_to - e.window_from)) as seconds,
 			count(*)::int as events
 		from cloud_usage_events e join cloud_workspace_boots b on b.id = e.boot_id
@@ -219,9 +218,15 @@ describe("cloud_usage_daily trigger", () => {
 		);
 		expect(await rollup()).not.toEqual(await fromEvents());
 
-		const backfill = CLOUD_USAGE_DAILY_MIGRATIONS.at(-1);
-		if (!backfill) throw new Error("no backfill migration");
-		await db.$client.exec(readFileSync(backfill, "utf8"));
+		await db.$client.exec(
+			readFileSync(
+				new URL(
+					"../drizzle/0202_cloud_usage_daily_backfill.sql",
+					import.meta.url,
+				),
+				"utf8",
+			),
+		);
 
 		expect(await rollup()).toEqual(await fromEvents());
 		const { rows } = await db.execute<{ n: number }>(

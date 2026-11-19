@@ -32,7 +32,7 @@ export const NOVEMBER = {
 };
 export const RATE = 0.06;
 
-export const CLOUD_USAGE_DAILY_MIGRATIONS = [
+const CLOUD_USAGE_DAILY_MIGRATIONS = [
 	"0201_cloud_usage_daily_trigger.sql",
 	"0202_cloud_usage_daily_backfill.sql",
 ].map((name) => new URL(`../drizzle/${name}`, import.meta.url));
