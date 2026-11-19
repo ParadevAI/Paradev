@@ -848,6 +848,8 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
+		/** The Vercel drive a workspace's drive is forked from; null when the environment has none. */
+		goldenDriveName: text("golden_drive_name"),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
@@ -1011,6 +1013,10 @@ export const cloudWorkspaces = pgTable(
 		sandboxSessionId: text("sandbox_session_id"),
 		/** Null on workspaces made before sizes existed; they run large. */
 		machineSize: text("machine_size"),
+		/** The Vercel drive mounted on every session of the box; null when it has none. */
+		driveName: text("drive_name"),
+		/** When a boot first answered with the drive laid out; a wake then expects the drive to name this workspace. */
+		driveLaidOutAt: timestamp("drive_laid_out_at", { withTimezone: true }),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
 		}),
