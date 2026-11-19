@@ -28,9 +28,9 @@ import {
 import { BUILD_LIMIT_MS } from "./limits";
 import { checkoutScript, goldensToDelete } from "./policy";
 import {
-	claimFreshRebuild,
 	failBuild,
 	loadBuild,
+	markBuildFresh,
 	markGoldenDeleted,
 	recordBuildCommit,
 	succeedBuild,
@@ -103,12 +103,9 @@ export async function deleteFork(buildId: string): Promise<void> {
 	await deleteSandbox(buildBoxName(buildId));
 }
 
-/** Makes the build fresh if a slot is free; false keeps its fork. */
-export async function claimFreshBuild(buildId: string): Promise<boolean> {
+export async function makeFresh(buildId: string): Promise<void> {
 	"use step";
-	const claimed = await claimFreshRebuild(buildId);
-	if (claimed === null) throw new FatalError(NOT_RUNNING);
-	return claimed;
+	if (!(await markBuildFresh(buildId))) throw new FatalError(NOT_RUNNING);
 }
 
 export async function startCommand(

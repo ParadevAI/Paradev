@@ -20677,6 +20677,10 @@ msgstr "此目录不存在。终端脚本将回退到工作区根目录。"
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此邮箱已通过其他登录方式注册，且提供方未将其确认为已验证。请使用你之前使用的方式登录。"
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "此环境每小时最多可手动启动 3 次构建。请在 {0} 分钟后重试。"
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "此环境没有可构建的 [install]。请在其基础分支的 .paradev/config.toml 中添加。"
 

@@ -77,7 +77,6 @@ let install: { durationMs: number; exitCode: number; output: string };
 let failNext: Partial<Record<string, number>>;
 let swapAllowed: boolean;
 let rootDiskAgents: string;
-let freeSlot: boolean;
 let production: boolean;
 let goldens: Array<{ id: string; goldenRef: string }>;
 let deleteFails: Set<string>;
@@ -177,10 +176,10 @@ stub(store, {
 	markGoldenDeleted: async (id: string) => {
 		goldensDeleted.push(id);
 	},
-	claimFreshRebuild: async () => {
-		calls.push(`claim:${freeSlot}`);
-		if (freeSlot) build = { ...build, kind: "fresh" };
-		return freeSlot;
+	markBuildFresh: async () => {
+		calls.push("fresh");
+		build = { ...build, kind: "fresh" };
+		return true;
 	},
 });
 stub(repositories, {
@@ -254,7 +253,6 @@ beforeEach(() => {
 	failNext = {};
 	swapAllowed = true;
 	rootDiskAgents = "";
-	freeSlot = true;
 	production = true;
 	goldens = [];
 	deleteFails = new Set();
@@ -353,7 +351,7 @@ describe("environmentBuildWorkflow", () => {
 		rootDiskAgents = "/opt/codex";
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
 		expect(calls[0]).toBe(`create:image:${BOX}-fresh`);
-		expect(calls.some((call) => call.startsWith("claim"))).toBe(false);
+		expect(calls).not.toContain("fresh");
 		expect(build.goldenRef).toBe(`${BOX}-fresh`);
 	});
 
@@ -363,7 +361,7 @@ describe("environmentBuildWorkflow", () => {
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
 		expect(calls.slice(0, 5)).toEqual([
 			"create",
-			"claim:true",
+			"fresh",
 			`delete:${BOX}`,
 			`create:image:${BOX}-fresh`,
 			"start:checkout",
@@ -377,20 +375,8 @@ describe("environmentBuildWorkflow", () => {
 
 	test("a clean fork stays incremental", async () => {
 		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
-		expect(calls.some((call) => call.startsWith("claim"))).toBe(false);
+		expect(calls).not.toContain("fresh");
 		expect(build.kind).toBe("incremental");
-	});
-
-	test("with no free fresh slot the build keeps its fork", async () => {
-		rootDiskAgents = "/opt/codex";
-		freeSlot = false;
-		expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
-		expect(calls.slice(0, 3)).toEqual([
-			"create",
-			"claim:false",
-			"start:checkout",
-		]);
-		expect(build).toMatchObject({ kind: "incremental", goldenRef: BOX });
 	});
 
 	describe("old goldens", () => {

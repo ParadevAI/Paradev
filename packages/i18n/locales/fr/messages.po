@@ -20677,6 +20677,10 @@ msgstr "Ce répertoire n'existe pas. Le script de terminal se rabattra sur la ra
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Cet e-mail est déjà enregistré avec une autre méthode de connexion et le fournisseur ne l'a pas confirmé comme vérifié. Connectez-vous avec la méthode utilisée précédemment."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "Cet environnement peut lancer 3 builds manuels par heure. Réessayez dans {0} minutes."
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Cet environnement n'a pas de [install] à compiler. Ajoutez-en un à .paradev/config.toml sur sa branche de base."
 

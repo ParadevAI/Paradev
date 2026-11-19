@@ -20677,6 +20677,10 @@ msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak mengonfirmasinya sebagai terverifikasi. Masuk dengan metode yang Anda gunakan sebelumnya."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "Lingkungan ini dapat memulai 3 build manual per jam. Coba lagi dalam {0} menit."
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "Environment ini tidak memiliki [install] untuk di-build. Tambahkan di .paradev/config.toml pada branch dasarnya."
 

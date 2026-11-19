@@ -9,5 +9,6 @@ export const STALE_BUILD_MS = 20 * 60 * 1000;
 /** Goldens kept per environment: the active one and the newest ones before it. */
 export const KEPT_GOLDENS = 3;
 
-/** Goldens rebuilt from the image at once because their disk holds agent CLIs. */
-export const FRESH_REBUILDS_AT_ONCE = 10;
+/** Manual builds an environment may start in any rolling hour; daily builds are not counted. */
+export const MANUAL_BUILDS_PER_HOUR = 3;
+export const MANUAL_BUILD_WINDOW_MS = 60 * 60 * 1000;

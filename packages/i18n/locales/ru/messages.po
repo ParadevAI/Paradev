@@ -20677,6 +20677,10 @@ msgstr "Такой папки не существует. Скрипт терми
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Этот адрес электронной почты уже зарегистрирован с другим способом входа, и провайдер не подтвердил его как проверенный. Войдите тем способом, которым пользовались раньше."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "В этой среде можно запустить не более 3 ручных сборок в час. Повторите попытку через {0} мин."
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "У этого окружения нет [install] для сборки. Добавьте его в .paradev/config.toml в базовой ветке."
 

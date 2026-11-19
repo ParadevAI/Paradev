@@ -20677,6 +20677,10 @@ msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其確認為已驗證。請使用你先前使用的方式登入。"
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "此環境每小時最多可手動啟動 3 次建置。請在 {0} 分鐘後再試一次。"
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "此環境沒有可建置的 [install]。請在其基礎分支的 .paradev/config.toml 中新增。"
 

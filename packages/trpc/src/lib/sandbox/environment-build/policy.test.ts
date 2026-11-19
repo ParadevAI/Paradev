@@ -5,6 +5,7 @@ import {
 	dailyBuildsPaused,
 	goldensToDelete,
 	isStale,
+	nextManualBuildAt,
 } from "./policy";
 
 describe("isStale", () => {
@@ -72,5 +73,15 @@ describe("checkoutScript", () => {
 			checkouts: [{ url: "u", branch: "it's", path: "." }],
 		});
 		expect(script).toContain(`origin 'it'\\''s'`);
+	});
+});
+
+describe("nextManualBuildAt", () => {
+	test("a fourth manual build in an hour waits for the oldest of the three to age out", () => {
+		const at = (minutes: number) => new Date(Date.UTC(2026, 0, 1, 12, minutes));
+		expect(nextManualBuildAt([at(10), at(40)])).toBeNull();
+		expect(nextManualBuildAt([at(40), at(10), at(25)])).toEqual(
+			new Date(Date.UTC(2026, 0, 1, 13, 10)),
+		);
 	});
 });

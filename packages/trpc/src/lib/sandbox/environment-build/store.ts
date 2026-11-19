@@ -5,18 +5,7 @@ import {
 	environments,
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
-import {
-	and,
-	count,
-	desc,
-	eq,
-	gt,
-	isNotNull,
-	isNull,
-	ne,
-	sql,
-} from "drizzle-orm";
-import { FRESH_REBUILDS_AT_ONCE, STALE_BUILD_MS } from "./limits";
+import { and, desc, eq, isNotNull, isNull, ne } from "drizzle-orm";
 
 type EnvironmentRow = typeof environments.$inferSelect;
 
@@ -201,45 +190,17 @@ export async function activeEnvironments(): Promise<
 		.where(isNull(environments.archivedAt));
 }
 
-/**
- * Makes a running build fresh while fewer than `FRESH_REBUILDS_AT_ONCE` are;
- * null when the build is no longer running. The lock makes the count and the
- * update one decision across builds.
- */
-export async function claimFreshRebuild(
-	buildId: string,
-): Promise<boolean | null> {
-	return dbWs.transaction(async (tx) => {
-		await tx.execute(
-			sql`select pg_advisory_xact_lock(hashtext('environment_builds.fresh_rebuild'))`,
-		);
-		const [build] = await tx
-			.select({
-				status: environmentBuilds.status,
-				kind: environmentBuilds.kind,
-			})
-			.from(environmentBuilds)
-			.where(eq(environmentBuilds.id, buildId));
-		if (!build || build.status !== "running") return null;
-		if (build.kind === "fresh") return true;
-		const [fresh] = await tx
-			.select({ running: count() })
-			.from(environmentBuilds)
-			.where(
-				and(
-					eq(environmentBuilds.kind, "fresh"),
-					eq(environmentBuilds.status, "running"),
-					gt(
-						environmentBuilds.startedAt,
-						new Date(Date.now() - STALE_BUILD_MS),
-					),
-				),
-			);
-		if ((fresh?.running ?? 0) >= FRESH_REBUILDS_AT_ONCE) return false;
-		await tx
-			.update(environmentBuilds)
-			.set({ kind: "fresh" })
-			.where(eq(environmentBuilds.id, buildId));
-		return true;
-	});
+/** False when the build is no longer running. */
+export async function markBuildFresh(buildId: string): Promise<boolean> {
+	const rows = await db
+		.update(environmentBuilds)
+		.set({ kind: "fresh" })
+		.where(
+			and(
+				eq(environmentBuilds.id, buildId),
+				eq(environmentBuilds.status, "running"),
+			),
+		)
+		.returning({ id: environmentBuilds.id });
+	return rows.length > 0;
 }

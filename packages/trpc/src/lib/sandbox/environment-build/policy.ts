@@ -1,6 +1,11 @@
 import type { EnvironmentBuildStatus } from "@superset/db/schema";
 import { sandboxCheckoutDir } from "@superset/shared/sandbox/contract";
-import { KEPT_GOLDENS, STALE_BUILD_MS } from "./limits";
+import {
+	KEPT_GOLDENS,
+	MANUAL_BUILD_WINDOW_MS,
+	MANUAL_BUILDS_PER_HOUR,
+	STALE_BUILD_MS,
+} from "./limits";
 
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 
@@ -26,6 +31,20 @@ export function goldensToDelete<T extends { goldenRef: string }>(
 	return goldens
 		.filter((golden) => golden.goldenRef !== activeRef)
 		.slice(KEPT_GOLDENS - 1);
+}
+
+/**
+ * When the next manual build may start, or null for now. Takes the start
+ * times of the environment's manual builds in the last hour.
+ */
+export function nextManualBuildAt(recentStarts: readonly Date[]): Date | null {
+	if (recentStarts.length < MANUAL_BUILDS_PER_HOUR) return null;
+	const oldestCounted = [...recentStarts]
+		.map((start) => start.getTime())
+		.sort((a, b) => b - a)[MANUAL_BUILDS_PER_HOUR - 1];
+	return oldestCounted === undefined
+		? null
+		: new Date(oldestCounted + MANUAL_BUILD_WINDOW_MS);
 }
 
 /** Finished builds, newest first. */

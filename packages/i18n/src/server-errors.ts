@@ -521,6 +521,12 @@ export const serverErrorMessages: Record<
 					"This environment has no [install] to build. Add one to .paradev/config.toml on its base branch.",
 			}),
 		),
+	"serverError.environment.manualBuildsRateLimited": (params) =>
+		i18n._(
+			msg({
+				message: `This environment can start 3 manual builds an hour. Try again in ${params?.minutes} minutes.`,
+			}),
+		),
 	"serverError.environment.buildAlreadyRunning": () =>
 		i18n._(
 			msg({

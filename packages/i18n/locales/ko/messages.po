@@ -20677,6 +20677,10 @@ msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있으며, 제공자가 이를 인증된 것으로 확인하지 않았습니다. 이전에 사용한 방법으로 로그인하세요."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "이 환경은 한 시간에 수동 빌드를 3번까지 시작할 수 있습니다. {0}분 후에 다시 시도하세요."
+
 msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
 msgstr "이 환경에는 빌드할 [install]이 없습니다. 기본 브랜치의 .paradev/config.toml에 추가하세요."
 

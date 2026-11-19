@@ -5,7 +5,7 @@ import {
 	environments,
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
-import { and, eq, isNull, lt } from "drizzle-orm";
+import { and, eq, gt, isNull, lt } from "drizzle-orm";
 import { start } from "workflow/api";
 import { organizationPlan } from "../../billing/plan";
 import { readRepoHooks } from "../repo-hooks";
@@ -17,19 +17,26 @@ import {
 import { deleteSandbox } from "../vercel";
 import { environmentBuildWorkflow } from "./build-workflow";
 import { buildBoxName, freshBuildBoxName } from "./environment-build";
-import { STALE_BUILD_MS } from "./limits";
+import {
+	MANUAL_BUILD_WINDOW_MS,
+	MANUAL_BUILDS_PER_HOUR,
+	STALE_BUILD_MS,
+} from "./limits";
+import { nextManualBuildAt } from "./policy";
 
 export type BuildRefusalReason =
 	| "not-found"
 	| "not-paid"
 	| "no-repositories"
 	| "no-install"
-	| "already-running";
+	| "already-running"
+	| "rate-limited";
 
 export class BuildRefused extends Error {
 	constructor(
 		readonly reason: BuildRefusalReason,
 		message: string,
+		readonly retryAt?: Date,
 	) {
 		super(message);
 		this.name = "BuildRefused";
@@ -105,6 +112,29 @@ export async function startEnvironmentBuild(args: {
 		);
 	}
 	await expireStaleBuilds(environment.id);
+	if (args.trigger === "manual") {
+		const recent = await db
+			.select({ startedAt: environmentBuilds.startedAt })
+			.from(environmentBuilds)
+			.where(
+				and(
+					eq(environmentBuilds.environmentId, environment.id),
+					eq(environmentBuilds.trigger, "manual"),
+					gt(
+						environmentBuilds.startedAt,
+						new Date(Date.now() - MANUAL_BUILD_WINDOW_MS),
+					),
+				),
+			);
+		const retryAt = nextManualBuildAt(recent.map((row) => row.startedAt));
+		if (retryAt) {
+			throw new BuildRefused(
+				"rate-limited",
+				`This environment has had ${MANUAL_BUILDS_PER_HOUR} manual builds in the last hour; the next one can start at ${retryAt.toISOString()}`,
+				retryAt,
+			);
+		}
+	}
 
 	const repositories = await environmentRepositoryRows(environment.id);
 	const primary = primaryRepository(

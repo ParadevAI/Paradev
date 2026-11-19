@@ -5,10 +5,10 @@ import {
 	type BuildCommandKey,
 	beginBuild,
 	boxSnapshotId,
-	claimFreshBuild,
 	createBox,
 	deleteFork,
 	failBuildAndCleanUp,
+	makeFresh,
 	pruneOldGoldens,
 	readCommand,
 	snapshotTaken,
@@ -24,9 +24,7 @@ export type BuildOutcome = "succeeded" | "failed" | "skipped";
  * workspaces start from. The box does the long work; each step only starts
  * or checks it. A failure leaves the current golden in place; a success
  * deletes the goldens past `KEPT_GOLDENS`, last. A fork whose
- * disk holds agent CLIs is rebuilt from the image while fewer than
- * `FRESH_REBUILDS_AT_ONCE` are; otherwise it is forked as before and
- * checked again next time.
+ * disk holds agent CLIs is rebuilt from the image.
  */
 export async function environmentBuildWorkflow(
 	buildId: string,
@@ -60,10 +58,8 @@ export async function environmentBuildWorkflow(
 	try {
 		const sourceRef = await beginBuild(buildId);
 		if (sourceRef === null) return "skipped";
-		if (
-			(await createBox(buildId, sourceRef, true)) === "root-disk-agents" &&
-			(await claimFreshBuild(buildId))
-		) {
+		if ((await createBox(buildId, sourceRef, true)) === "root-disk-agents") {
+			await makeFresh(buildId);
 			await deleteFork(buildId);
 			await createBox(buildId, sourceRef, false);
 		}

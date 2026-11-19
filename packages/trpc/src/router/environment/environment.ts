@@ -262,7 +262,12 @@ async function loadPromotable(
 const BUILD_REFUSALS: Record<
 	BuildRefusalReason,
 	{
-		code: "NOT_FOUND" | "FORBIDDEN" | "PRECONDITION_FAILED" | "CONFLICT";
+		code:
+			| "NOT_FOUND"
+			| "FORBIDDEN"
+			| "PRECONDITION_FAILED"
+			| "CONFLICT"
+			| "TOO_MANY_REQUESTS";
 		i18nKey: string;
 	}
 > = {
@@ -285,6 +290,10 @@ const BUILD_REFUSALS: Record<
 	"already-running": {
 		code: "CONFLICT",
 		i18nKey: "serverError.environment.buildAlreadyRunning",
+	},
+	"rate-limited": {
+		code: "TOO_MANY_REQUESTS",
+		i18nKey: "serverError.environment.manualBuildsRateLimited",
 	},
 };
 
@@ -707,6 +716,18 @@ export const environmentRouter = {
 					throw userError({
 						...BUILD_REFUSALS[error.reason],
 						message: error.message,
+						...(error.retryAt
+							? {
+									params: {
+										minutes: Math.max(
+											1,
+											Math.ceil(
+												(error.retryAt.getTime() - Date.now()) / 60_000,
+											),
+										),
+									},
+								}
+							: {}),
 					});
 				}
 				throw error;
