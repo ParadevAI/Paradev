@@ -13,8 +13,11 @@ export {
 	vellumTheme,
 } from "./built-in";
 export { getEditorTheme } from "./editor-theme";
-export { parseThemeConfigFile, type ThemeConfigParseResult } from "./import";
-export { MAX_THEME_CSS_LENGTH, sanitizeThemeCss } from "./sanitizeThemeCss";
+export {
+	MAX_THEME_CSS_LENGTH,
+	parseThemeConfigFile,
+	type ThemeConfigParseResult,
+} from "./import";
 export type {
 	EditorColors,
 	EditorSyntaxColors,
