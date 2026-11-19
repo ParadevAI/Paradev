@@ -31,9 +31,9 @@ export function CloudUsageSettings({
 		},
 	);
 	const byPersonDays = cloudTrpc.cloud.usage.query.useQuery(
-		queries.byPersonDays.input,
+		queries.byPersonDays(byPerson.data).input,
 		{
-			enabled: queries.byPersonDays.enabled,
+			enabled: queries.byPersonDays(byPerson.data).enabled,
 		},
 	);
 	const workspaces = cloudTrpc.cloud.usage.query.useQuery(

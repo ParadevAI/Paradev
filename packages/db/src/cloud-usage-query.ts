@@ -85,7 +85,7 @@ const workspaceOf = (scope: Scope, column: AnyPgColumn) =>
 	);
 
 export interface CloudUsageFilters {
-	user?: string;
+	user?: string | string[];
 	workspace?: string | string[];
 	size?: MachineSize;
 	status?: CloudWorkspaceStatus[];
@@ -216,7 +216,13 @@ function scopeConditions(
 ): SQL[] {
 	const conditions: SQL[] = [];
 	if (scope.userId) conditions.push(eq(columns.user, scope.userId));
-	if (filters.user) conditions.push(eq(columns.user, filters.user));
+	if (filters.user) {
+		conditions.push(
+			Array.isArray(filters.user)
+				? inArray(columns.user, filters.user)
+				: eq(columns.user, filters.user),
+		);
+	}
 	if (filters.workspace) {
 		conditions.push(
 			Array.isArray(filters.workspace)
@@ -639,14 +645,7 @@ async function usageRows(
 
 	if (groupBy === "userDay") {
 		return {
-			...(await userDayRows(
-				db,
-				scope,
-				filters,
-				window,
-				limit,
-				overagePerGbHour,
-			)),
+			...(await userDayRows(db, scope, filters, window, overagePerGbHour)),
 			total: toMetrics(await totalRow, overagePerGbHour),
 		};
 	}
@@ -751,41 +750,27 @@ async function usageRows(
 }
 
 /** One page, no cursor: each person's days, people with the most usage first. */
+/** Every day of the filtered people, one row per person and day, in one page. */
 async function userDayRows(
 	db: Db,
 	scope: Scope,
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
-	limit: number,
 	overagePerGbHour: number | null,
 ) {
 	const facts = usageFacts(db, scope, filters, window, groupKeys.userDay);
-	const metrics = metricColumns(facts);
-	const user = sql`split_part(${facts.key}, '|', 1)`;
 	const rows = await db
 		.with(facts)
-		.select({ key: facts.key, ...metrics })
+		.select({ key: facts.key, ...metricColumns(facts) })
 		.from(facts)
 		.groupBy(facts.key)
-		.orderBy(
-			desc(sql`sum(sum(${facts.gbMinutes})) over (partition by ${user})`),
-			asc(user),
-			asc(facts.key),
-		)
-		.limit(limit + 1);
+		.orderBy(asc(facts.key));
 	const userOf = (key: string | null) => key?.split("|")[0] || null;
-	// A page cut inside the last person's days would read their missing days as zero, so it drops that person.
-	const cut =
-		rows.length > limit ? userOf(rows[limit - 1]?.key ?? null) : undefined;
-	const page =
-		cut === undefined
-			? rows
-			: rows.slice(0, limit).filter((row) => userOf(row.key) !== cut);
 	const refs = await refsFor(db, scope, "user", [
 		...new Set(rows.flatMap((row) => userOf(row.key) ?? [])),
 	]);
 	return {
-		items: page.map(({ key, ...row }) => {
+		items: rows.map(({ key, ...row }) => {
 			const userId = userOf(key);
 			return {
 				key: userId,
@@ -794,7 +779,7 @@ async function userDayRows(
 				...toMetrics(row, overagePerGbHour),
 			};
 		}),
-		rowCount: page.length,
+		rowCount: rows.length,
 		nextCursor: null,
 	};
 }

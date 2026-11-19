@@ -32,7 +32,7 @@ export function AllowanceCard({
 	allowance,
 	billing,
 }: AllowanceCardProps) {
-	const { dollars } = useUsageFormat();
+	const { dollarsFor } = useUsageFormat();
 	const notRead = period?.unavailable.some(
 		(item) => item.reason === "not_read",
 	);
@@ -40,6 +40,12 @@ export function AllowanceCard({
 		gbHours: total.gbHours,
 		usd: total.usageUsd,
 	});
+	const dollars = dollarsFor([
+		shown.used.usd,
+		...(shown.held ? [shown.held.usd] : []),
+		...(shown.over ? [shown.over.usd] : []),
+		...shown.lines.flatMap((line) => [line.used.usd, line.total.usd]),
+	]);
 	const used = dollars(shown.used.usd);
 	const held = shown.held && dollars(shown.held.usd);
 	const over = shown.over && dollars(shown.over.usd);

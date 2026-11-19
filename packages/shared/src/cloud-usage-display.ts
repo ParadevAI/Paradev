@@ -1,28 +1,15 @@
+import type { z } from "zod";
+import type { cloudPeriodsOutputSchema } from "./cloud-usage-api";
+
 export interface Amount {
 	gbHours: number;
 	usd: number;
 }
 
-interface Credit {
-	usedGbHours: number;
-	totalGbHours: number;
-	usedUsd: number;
-	totalUsd: number;
-}
-
-/** The period's allowance as the cloud router gives it, every dollar field priced. */
-export interface PricedAllowanceAmounts {
-	includedGbHours: number | null;
-	includedUsd: number | null;
-	/** Billing's monthly usage: the seats' amount, then the priced row. */
-	usedGbHours: number;
-	usedUsd: number;
-	/** Usage on the priced row: what billing charges at the period end. */
-	overageGbHours: number;
-	overageUsd: number;
-	freeCredits: Credit | null;
-	bought: Credit | null;
-}
+/** The period's allowance, as the cloud router returns it. */
+export type CloudAllowance = NonNullable<
+	z.output<typeof cloudPeriodsOutputSchema>["items"][number]["allowance"]
+>;
 
 export interface HeldLine {
 	kind: "included" | "freeCredits" | "bought";
@@ -45,28 +32,39 @@ const sum = (amounts: Amount[]): Amount => ({
 });
 
 /**
- * Billing's own numbers, as they are: what the organization holds, what it drew from it, and what
- * will be charged. docs/cloud-usage-display.md is generated from its scenario table.
+ * The card's figures for one billing period. `metered` is the period's usage from the usage
+ * events, the page's own total: what billing drew from credits this period is the part of it past
+ * billing's monthly usage, so a credit line counts this period and what was left at its start.
  */
 export function cloudUsageDisplay(
-	allowance: PricedAllowanceAmounts | null,
+	allowance: CloudAllowance | null,
 	metered: Amount,
 ): CloudUsageDisplay {
-	if (allowance?.includedGbHours == null || allowance.includedUsd === null) {
+	if (
+		allowance?.includedGbHours == null ||
+		allowance.includedUsd === null ||
+		allowance.usedUsd === null ||
+		allowance.overageUsd === null
+	) {
 		return { used: metered, held: null, over: null, lines: [] };
 	}
 	const over = { gbHours: allowance.overageGbHours, usd: allowance.overageUsd };
+	let toDraw = Math.max(0, metered.gbHours - allowance.usedGbHours);
 	const credits = (["freeCredits", "bought"] as const).flatMap((kind) => {
 		const credit = allowance[kind];
-		return credit
-			? [
-					{
-						kind,
-						used: { gbHours: credit.usedGbHours, usd: credit.usedUsd },
-						total: { gbHours: credit.totalGbHours, usd: credit.totalUsd },
-					},
-				]
-			: [];
+		if (!credit || credit.totalUsd === null) return [];
+		const drawn = Math.min(toDraw, credit.usedGbHours);
+		toDraw -= drawn;
+		const perGbHour = credit.totalUsd / credit.totalGbHours;
+		const available = credit.totalGbHours - credit.usedGbHours + drawn;
+		if (available <= 0) return [];
+		return [
+			{
+				kind,
+				used: { gbHours: drawn, usd: drawn * perGbHour },
+				total: { gbHours: available, usd: available * perGbHour },
+			},
+		];
 	});
 	const lines: HeldLine[] = [
 		{

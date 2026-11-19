@@ -20,6 +20,7 @@ const userRefSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	email: z.string(),
+	image: z.string().nullable(),
 });
 
 export const metricsSchema = z.object({
@@ -100,6 +101,8 @@ const periodUnavailableSchema = z.object({
 		...ALLOWANCE_UNAVAILABLE_REASONS,
 	]),
 });
+
+export type CloudPeriodUnavailable = z.infer<typeof periodUnavailableSchema>;
 
 /** Null when there is none of it. */
 const creditLineSchema = z

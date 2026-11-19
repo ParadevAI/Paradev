@@ -123,6 +123,9 @@ export function UsageByPerson({
 					</TableBody>
 				</Table>
 			)}
+			{byPerson.data && byPersonDays.isError && (
+				<QueryStatus isError onRetry={() => byPersonDays.refetch()} />
+			)}
 		</Section>
 	);
 }

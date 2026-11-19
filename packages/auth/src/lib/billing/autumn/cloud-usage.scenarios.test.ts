@@ -1,36 +1,47 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync, writeFileSync } from "node:fs";
 import { cloudUsageDisplay } from "@superset/shared/cloud-usage-display";
 import { allowanceOf, cloudUsageFromBalances } from "./cloud-usage";
+import SANDBOX from "./cloud-usage.sandbox.json";
 
 /**
- * The cloud usage card across billing periods. The fake ledger follows what Autumn's sandbox did
- * with the meter's own calls (see the "Cloud usage: states, display and the invariant" page): usage
- * draws the seats' amount, then credits, then the priced monthly row, which fills only while
- * overage is allowed; past that, usage is dropped. A reset invoices the priced row and starts the
- * monthly rows at 0; credits carry. The test writes docs/cloud-usage-display.md from this table.
+ * The cloud usage card across billing periods: the specification. Steps marked `sandbox` start from
+ * a balance Autumn's sandbox returned for the meter's own calls (cloud-usage.sandbox.json). The
+ * other steps use a small ledger that follows what the sandbox did: usage draws the seats' amount,
+ * then credits, then the priced row while overage is allowed, and past that is dropped; a reset
+ * invoices the priced row and starts the monthly rows at 0; credits carry over.
  */
 
 const PER_SEAT = 72_000;
 const RATE = 0.06;
-const DOC = new URL(
-	"../../../../../../docs/cloud-usage-display.md",
-	import.meta.url,
-);
 
 type Plan = "team" | "pro" | "enterprise";
+type Kind = "seats" | "priced" | "free" | "bought";
 interface Row {
-	kind: "seats" | "priced" | "free" | "bought";
+	kind: Kind;
 	included: number;
 	prepaid: number;
 	usage: number;
 }
+type Balance = Parameters<typeof cloudUsageFromBalances>[0][string];
+type Controls = NonNullable<Parameters<typeof cloudUsageFromBalances>[1]>;
+type Snapshot = Exclude<keyof typeof SANDBOX, "_source">;
+
+const kindOf = (row: Balance["breakdown"][number]): Kind =>
+	row.price?.billingMethod === "usage_based"
+		? "priced"
+		: row.reset?.interval === "one_off"
+			? row.price
+				? "bought"
+				: "free"
+			: "seats";
 
 class Ledger {
 	rows: Row[];
 	overage: boolean;
+	/** This period's usage events: what the meter sent, before billing drops any of it. */
+	metered = 0;
 	constructor(
-		readonly plan: Plan,
+		public plan: Plan,
 		seats = 1,
 	) {
 		this.overage = plan !== "team";
@@ -42,20 +53,32 @@ class Ledger {
 					]
 				: [{ kind: "priced", included: 50_000, prepaid: 0, usage: 0 }];
 	}
+	load(name: Snapshot, metered: number) {
+		const { plan, overage, balance } = SANDBOX[name];
+		this.plan = plan as Plan;
+		this.overage = overage;
+		this.metered = metered;
+		this.rows = (balance as unknown as Balance).breakdown.map((row) => ({
+			kind: kindOf(row),
+			included: row.includedGrant,
+			prepaid: row.prepaidGrant,
+			usage: row.usage,
+		}));
+	}
 	private room(row: Row): number {
-		const held = row.included + row.prepaid - row.usage;
-		if (row.kind !== "priced" || !this.overage) return Math.max(0, held);
+		const held = Math.max(0, row.included + row.prepaid - row.usage);
+		if (row.kind !== "priced" || !this.overage) return held;
 		const cap =
 			this.plan === "pro" ? 3 * row.included : Number.POSITIVE_INFINITY;
-		return Math.max(0, held) + cap - Math.max(0, row.usage - row.included);
-	}
-	private ordered(): Row[] {
-		const rank = { seats: 0, free: 1, bought: 2, priced: 3 };
-		return [...this.rows].sort((a, b) => rank[a.kind] - rank[b.kind]);
+		return held + cap - Math.max(0, row.usage - row.included);
 	}
 	track(gbMinutes: number) {
+		this.metered += gbMinutes;
+		const rank = { seats: 0, free: 1, bought: 2, priced: 3 };
 		let left = gbMinutes;
-		for (const row of this.ordered()) {
+		for (const row of [...this.rows].sort(
+			(a, b) => rank[a.kind] - rank[b.kind],
+		)) {
 			const drawn = Math.min(left, this.room(row));
 			row.usage += drawn;
 			left -= drawn;
@@ -66,13 +89,15 @@ class Ledger {
 	}
 	credit(kind: "free" | "bought", gbMinutes: number) {
 		const row = this.rows.find((item) => item.kind === kind);
-		if (row) row[kind === "free" ? "included" : "prepaid"] += gbMinutes;
+		const field = kind === "free" ? "included" : "prepaid";
+		if (row) row[field] += gbMinutes;
 		else
 			this.rows.push({
 				kind,
-				included: kind === "free" ? gbMinutes : 0,
-				prepaid: kind === "bought" ? gbMinutes : 0,
+				included: 0,
+				prepaid: 0,
 				usage: 0,
+				[field]: gbMinutes,
 			});
 	}
 	seats(seats: number) {
@@ -84,111 +109,110 @@ class Ledger {
 		const row = this.rows.find((item) => item.kind === "seats") as Row;
 		row.included = (row.included / PER_SEAT) * perSeat;
 		for (const item of this.rows)
-			if (item.kind !== "free" && item.kind !== "bought") item.usage = 0;
+			if (item.kind === "seats" || item.kind === "priced") item.usage = 0;
 	}
-	/** Closes the period: returns the dollars billing charges for usage. */
+	/** Closes the period; returns the dollars billing charges for usage. */
 	reset(): number {
 		const charged = this.rows
 			.filter((row) => row.kind === "priced")
 			.reduce((total, row) => total + Math.max(0, row.usage - row.included), 0);
 		for (const row of this.rows)
 			if (row.kind === "seats" || row.kind === "priced") row.usage = 0;
+		this.metered = 0;
 		return (charged / 60) * RATE;
 	}
-	balances() {
+	balance(): Balance {
 		const granted = this.rows.reduce(
 			(total, row) => total + row.included + row.prepaid,
 			0,
 		);
 		const usage = this.rows.reduce((total, row) => total + row.usage, 0);
 		return {
-			box_gb_minutes: {
-				featureId: "box_gb_minutes",
-				granted,
-				usage,
-				remaining: Math.max(0, granted - usage),
+			featureId: "box_gb_minutes",
+			granted,
+			usage,
+			remaining: Math.max(0, granted - usage),
+			unlimited: false,
+			overageAllowed: true,
+			maxPurchase: null,
+			nextResetAt: Date.UTC(2026, 11, 7),
+			breakdown: this.rows.map((row, i) => ({
+				id: `row-${i}`,
+				planId: row.kind === "seats" ? null : this.plan,
+				includedGrant: row.included,
+				prepaidGrant: row.prepaid,
+				remaining: Math.max(0, row.included + row.prepaid - row.usage),
+				usage: row.usage,
 				unlimited: false,
-				overageAllowed: true,
-				maxPurchase: null,
-				nextResetAt: Date.UTC(2026, 11, 7),
-				breakdown: this.rows.map((row, i) => ({
-					id: `row-${i}`,
-					planId: row.kind === "seats" ? null : this.plan,
-					includedGrant: row.included,
-					prepaidGrant: row.prepaid,
-					remaining: Math.max(0, row.included + row.prepaid - row.usage),
-					usage: row.usage,
-					unlimited: false,
-					reset: {
-						interval:
-							row.kind === "free" || row.kind === "bought"
-								? "one_off"
-								: "month",
-						resetsAt: null,
-					},
-					price:
-						row.kind === "priced"
+				reset: {
+					interval:
+						row.kind === "free" || row.kind === "bought" ? "one_off" : "month",
+					resetsAt: null,
+				},
+				price:
+					row.kind === "priced"
+						? {
+								amount: 1,
+								billingUnits: 1000,
+								billingMethod: "usage_based",
+								maxPurchase: null,
+							}
+						: row.kind === "bought"
 							? {
-									amount: 1,
-									billingUnits: 1000,
-									billingMethod: "usage_based",
+									amount: RATE,
+									billingUnits: 60,
+									billingMethod: "prepaid",
 									maxPurchase: null,
 								}
-							: row.kind === "bought"
-								? {
-										amount: RATE,
-										billingUnits: 60,
-										billingMethod: "prepaid",
-										maxPurchase: null,
-									}
-								: null,
-					expiresAt: null,
-				})),
-			},
-		} as unknown as Parameters<typeof cloudUsageFromBalances>[0];
+							: null,
+				expiresAt: null,
+			})),
+		} as unknown as Balance;
 	}
-	controls() {
+	controls(): Controls {
 		const feature = { featureId: "box_gb_minutes" };
+		if (this.plan === "enterprise") return {};
+		if (this.plan === "pro" && this.overage)
+			return {
+				spendLimits: [
+					{
+						...feature,
+						enabled: true,
+						limitType: "usage_percentage",
+						overageLimit: 300,
+					},
+				],
+			} as Controls;
 		return (
-			this.plan === "enterprise"
-				? {}
-				: this.plan === "pro" && this.overage
-					? {
-							spendLimits: [
-								{
-									...feature,
-									enabled: true,
-									limitType: "usage_percentage",
-									overageLimit: 300,
-								},
-							],
-						}
-					: this.overage
-						? { overageAllowed: [{ ...feature, enabled: true }] }
-						: {
-								overageAllowed: [{ ...feature, enabled: false }],
-								spendLimits: [
-									{
-										...feature,
-										enabled: true,
-										limitType: "absolute",
-										overageLimit: 0,
-									},
-								],
-							}
-		) as Parameters<typeof cloudUsageFromBalances>[1];
+			this.overage
+				? { overageAllowed: [{ ...feature, enabled: true }] }
+				: {
+						overageAllowed: [{ ...feature, enabled: false }],
+						spendLimits: [
+							{
+								...feature,
+								enabled: true,
+								limitType: "absolute",
+								overageLimit: 0,
+							},
+						],
+					}
+		) as Controls;
 	}
-	/** What the card shows, in dollars. */
-	sees() {
+	/** What the card shows, in dollars, through the reader, the router's mapping and the display rule. */
+	card() {
 		const usage = cloudUsageFromBalances(
-			this.balances(),
+			{ box_gb_minutes: this.balance() },
 			this.controls(),
 			null,
 			RATE,
 		);
 		if (!usage) throw new Error("no balance");
 		const { allowance } = allowanceOf(usage, new Date(), RATE);
-		const shown = cloudUsageDisplay(allowance as never, { gbHours: 0, usd: 0 });
+		const shown = cloudUsageDisplay(allowance, {
+			gbHours: this.metered / 60,
+			usd: (this.metered / 60) * RATE,
+		});
 		const $ = (usd: number) => Math.round(usd * 100) / 100;
 		return {
 			used: $(shown.used.usd),
@@ -208,6 +232,7 @@ type Step =
 	| { seats: number }
 	| { upgradeToUltra: true }
 	| { overage: boolean }
+	| { sandbox: Snapshot; metered: number }
 	| { reset: true };
 interface Expect {
 	used: number;
@@ -218,18 +243,17 @@ interface Expect {
 	/** Dollars for usage on the invoice at the reset just before. */
 	charged?: number;
 }
-interface Scenario {
-	name: string;
-	plan: Plan;
-	seats?: number;
-	steps: [Step, Expect][];
-}
 
 const t = (track: number): Step => ({ track });
 const RESET: Step = { reset: true };
 
-/** The specification. Team: 1 seat holds $72 (72,000 GB-minutes). Pro and enterprise hold $50. */
-const SCENARIOS: Scenario[] = [
+/** Team: 1 seat holds $72 (72,000 GB-minutes at $0.06 a GB-hour). Pro and the contract hold $50. */
+const SCENARIOS: {
+	name: string;
+	plan: Plan;
+	seats?: number;
+	steps: [Step, Expect][];
+}[] = [
 	{
 		name: "Under the allowance, then a reset",
 		plan: "team",
@@ -271,11 +295,11 @@ const SCENARIOS: Scenario[] = [
 		],
 	},
 	{
-		name: "Overage off, no top-up, 102% used: billing stops at 100%",
+		name: "Overage off, 102% used: billing stops at 100% and charges nothing past it",
 		plan: "team",
 		steps: [
 			[
-				t(73_440),
+				{ sandbox: "team-at-limit-past-it-dropped", metered: 73_440 },
 				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
 			],
 			[
@@ -315,9 +339,9 @@ const SCENARIOS: Scenario[] = [
 			[
 				RESET,
 				{
-					used: 1.44,
-					held: 144,
-					lines: ["included 0 of 72", "bought 1.44 of 72"],
+					used: 0,
+					held: 142.56,
+					lines: ["included 0 of 72", "bought 0 of 70.56"],
 					mayStart: true,
 					charged: 0,
 				},
@@ -351,7 +375,31 @@ const SCENARIOS: Scenario[] = [
 		],
 	},
 	{
-		name: "A bought credit lasts three periods, drawn after each period's seats",
+		name: "A bought pack across a reset: the new period counts from its first day",
+		plan: "team",
+		steps: [
+			[
+				{ sandbox: "team-pack-before-reset", metered: 75_000 },
+				{
+					used: 75,
+					held: 78,
+					lines: ["included 72 of 72", "bought 3 of 6"],
+					mayStart: true,
+				},
+			],
+			[
+				{ sandbox: "team-pack-after-reset", metered: 1_000 },
+				{
+					used: 1,
+					held: 75,
+					lines: ["included 1 of 72", "bought 0 of 3"],
+					mayStart: true,
+				},
+			],
+		],
+	},
+	{
+		name: "A bought credit over three periods: spent credit leaves what is held",
 		plan: "team",
 		steps: [
 			[
@@ -375,9 +423,9 @@ const SCENARIOS: Scenario[] = [
 			[
 				RESET,
 				{
-					used: 28,
-					held: 144,
-					lines: ["included 0 of 72", "bought 28 of 72"],
+					used: 0,
+					held: 116,
+					lines: ["included 0 of 72", "bought 0 of 44"],
 					mayStart: true,
 					charged: 0,
 				},
@@ -385,18 +433,18 @@ const SCENARIOS: Scenario[] = [
 			[
 				t(80_000),
 				{
-					used: 108,
-					held: 144,
-					lines: ["included 72 of 72", "bought 36 of 72"],
+					used: 80,
+					held: 116,
+					lines: ["included 72 of 72", "bought 8 of 44"],
 					mayStart: true,
 				},
 			],
 			[
 				RESET,
 				{
-					used: 36,
-					held: 144,
-					lines: ["included 0 of 72", "bought 36 of 72"],
+					used: 0,
+					held: 108,
+					lines: ["included 0 of 72", "bought 0 of 36"],
 					mayStart: true,
 					charged: 0,
 				},
@@ -404,7 +452,7 @@ const SCENARIOS: Scenario[] = [
 		],
 	},
 	{
-		name: "A free credit, used past the seats, carried into the next period",
+		name: "A free credit used past the seats, carried into the next period",
 		plan: "team",
 		steps: [
 			[
@@ -428,9 +476,9 @@ const SCENARIOS: Scenario[] = [
 			[
 				RESET,
 				{
-					used: 3,
-					held: 82,
-					lines: ["included 0 of 72", "freeCredits 3 of 10"],
+					used: 0,
+					held: 79,
+					lines: ["included 0 of 72", "freeCredits 0 of 7"],
 					mayStart: true,
 					charged: 0,
 				},
@@ -457,7 +505,7 @@ const SCENARIOS: Scenario[] = [
 		],
 	},
 	{
-		name: "The seats' amount and a pack both used up",
+		name: "The seats' amount and a pack both used up; the spent pack leaves the next period",
 		plan: "team",
 		steps: [
 			[
@@ -481,9 +529,9 @@ const SCENARIOS: Scenario[] = [
 			[
 				RESET,
 				{
-					used: 6,
-					held: 78,
-					lines: ["included 0 of 72", "bought 6 of 6"],
+					used: 0,
+					held: 72,
+					lines: ["included 0 of 72"],
 					mayStart: true,
 					charged: 0,
 				},
@@ -495,7 +543,7 @@ const SCENARIOS: Scenario[] = [
 		plan: "team",
 		steps: [
 			[
-				t(72_300),
+				{ sandbox: "team-at-limit-past-it-dropped", metered: 72_300 },
 				{ used: 72, held: 72, lines: ["included 72 of 72"], mayStart: false },
 			],
 			[
@@ -519,21 +567,7 @@ const SCENARIOS: Scenario[] = [
 		plan: "team",
 		steps: [
 			[
-				{ overage: true },
-				{ used: 0, held: 72, lines: ["included 0 of 72"], mayStart: true },
-			],
-			[
-				t(80_000),
-				{
-					used: 80,
-					held: 72,
-					over: 8,
-					lines: ["included 72 of 72"],
-					mayStart: true,
-				},
-			],
-			[
-				{ overage: false },
+				{ sandbox: "team-priced-row-then-overage-off", metered: 80_000 },
 				{
 					used: 80,
 					held: 72,
@@ -594,7 +628,7 @@ const SCENARIOS: Scenario[] = [
 		],
 	},
 	{
-		name: "An upgrade to Ultra mid-period starts usage at 0",
+		name: "An upgrade to Ultra mid-period: billing starts its usage at 0",
 		plan: "team",
 		steps: [
 			[
@@ -612,7 +646,7 @@ const SCENARIOS: Scenario[] = [
 		plan: "pro",
 		steps: [
 			[
-				t(210_000),
+				{ sandbox: "pro-at-cap", metered: 210_000 },
 				{
 					used: 200,
 					held: 50,
@@ -675,102 +709,24 @@ const SCENARIOS: Scenario[] = [
 	},
 ];
 
-function run(scenario: Scenario) {
-	const ledger = new Ledger(scenario.plan, scenario.seats);
-	return scenario.steps.map(([step, expected]) => {
-		let charged: number | undefined;
-		if ("track" in step) ledger.track(step.track);
-		if ("buy" in step) ledger.credit("bought", step.buy);
-		if ("free" in step) ledger.credit("free", step.free);
-		if ("seats" in step) ledger.seats(step.seats);
-		if ("upgradeToUltra" in step) ledger.upgrade(240_000);
-		if ("overage" in step) ledger.overage = step.overage;
-		if ("reset" in step) charged = Math.round(ledger.reset() * 100) / 100;
-		return {
-			actual: {
-				...ledger.sees(),
+describe("cloud usage card across billing periods", () => {
+	test.each(SCENARIOS)("$name", ({ plan, seats, steps }) => {
+		const ledger = new Ledger(plan, seats);
+		for (const [step, expected] of steps) {
+			let charged: number | undefined;
+			if ("track" in step) ledger.track(step.track);
+			if ("buy" in step) ledger.credit("bought", step.buy);
+			if ("free" in step) ledger.credit("free", step.free);
+			if ("seats" in step) ledger.seats(step.seats);
+			if ("upgradeToUltra" in step) ledger.upgrade(240_000);
+			if ("overage" in step) ledger.overage = step.overage;
+			if ("sandbox" in step) ledger.load(step.sandbox, step.metered);
+			if ("reset" in step) charged = Math.round(ledger.reset() * 100) / 100;
+			expect({
+				...ledger.card(),
 				mayStart: ledger.mayStart(),
 				...(charged === undefined ? {} : { charged }),
-			},
-			expected: { over: null, ...expected },
-		};
-	});
-}
-
-const stepText = (step: Step) =>
-	"track" in step
-		? `${step.track.toLocaleString("en-US")} GB-min used`
-		: "buy" in step
-			? `${step.buy.toLocaleString("en-US")} GB-min pack bought`
-			: "free" in step
-				? `${step.free.toLocaleString("en-US")} GB-min free credit`
-				: "seats" in step
-					? `seats set to ${step.seats}`
-					: "upgradeToUltra" in step
-						? "upgrade to Ultra"
-						: "overage" in step
-							? `overage turned ${step.overage ? "on" : "off"}`
-							: "period ends";
-
-function doc() {
-	const money = (usd: number) =>
-		`$${Number.isInteger(usd) ? usd : usd.toFixed(2)}`;
-	const rows = SCENARIOS.flatMap((scenario) =>
-		scenario.steps.map(([step, e], i) => {
-			const head = `${money(e.used)} used of ${money(e.held)}${e.over ? `, over by ${money(e.over)}` : ""}`;
-			const lines = e.lines
-				.map((line) =>
-					line.replace(
-						/^(\w+) ([\d.]+) of ([\d.]+)$/,
-						(_, k, u, tot) =>
-							`${{ included: "Included", freeCredits: "Free credits", bought: "Bought credits" }[k as "included"]} ${money(Number(u))} of ${money(Number(tot))}`,
-					),
-				)
-				.join("; ");
-			return `| ${i === 0 ? `**${scenario.name}** (${scenario.plan})` : ""} | ${stepText(step)} | ${head} | ${lines} | ${e.charged === undefined ? "" : money(e.charged)} | ${e.mayStart ? "yes" : "no"} |`;
-		}),
-	);
-	return [
-		"# What the cloud usage card shows",
-		"",
-		"Generated by `packages/auth/src/lib/billing/autumn/cloud-usage.scenarios.test.ts`. Do not edit:",
-		"change the scenarios and run the test.",
-		"",
-		"The card shows billing's own numbers, as they are:",
-		"",
-		'- One line for each thing the organization holds, as "X of Y": the amount included with its',
-		"  seats, free credits and bought credits. Usage draws the seats' amount first, then credits.",
-		'- "Over" is the usage on billing\'s priced monthly row, which billing charges at the period end.',
-		"  With overage off, billing stops at what is held and charges nothing past it. Usage recorded",
-		"  on the priced row while overage was on is still charged when overage is turned off.",
-		"- The seats' amount starts again each period. Credits never expire and carry over; their line",
-		"  counts use since they were given.",
-		"- Our own usage tables can show a few minutes more than the card: workspaces stop a few minutes",
-		"  after the limit, and billing does not count those minutes. The card does not explain the gap.",
-		"- A past period, or billing data not loaded yet, shows the period's usage only, with no lines.",
-		"",
-		'Team holds $72 per seat (72,000 GB-minutes at $0.06 a GB-hour). "Charged" is the usage on',
-		"the invoice at the period end; seats are billed apart.",
-		"",
-		"| Scenario | Step | Card headline | Lines | Charged | New workspaces may start |",
-		"| --- | --- | --- | --- | --- | --- |",
-		...rows,
-		"",
-	].join("\n");
-}
-
-describe("cloud usage card scenarios", () => {
-	for (const scenario of SCENARIOS) {
-		test(scenario.name, () => {
-			for (const { actual, expected } of run(scenario))
-				expect(actual).toEqual(expected);
-		});
-	}
-
-	test("docs/cloud-usage-display.md is the table above", () => {
-		const text = doc();
-		const current = readFileSync(DOC, "utf8");
-		if (current !== text) writeFileSync(DOC, text);
-		expect(current).toBe(text);
+			}).toEqual({ over: null, ...expected });
+		}
 	});
 });

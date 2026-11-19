@@ -27,7 +27,8 @@
 		"./*": "./src/components/ui/*.tsx",
 		"./app-store-qr": "./src/components/AppStoreQr/index.ts",
 		"./pro-features-dialog": "./src/components/ProFeaturesDialog/index.ts",
-		"./cloud-usage-page": "./src/components/CloudUsagePage/index.ts"
+		"./cloud-usage-page": "./src/components/CloudUsagePage/index.ts",
+		"./page-link": "./src/components/PageLink/index.ts"
 	},
 	"scripts": {
 		"clean": "git clean -xdf .cache .turbo dist node_modules",

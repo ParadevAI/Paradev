@@ -111,8 +111,11 @@ describe("queryCloudUsage", () => {
 		]);
 	});
 
-	test("groups by person and day, people with the most usage first", async () => {
-		const { items, nextCursor } = await usage({ groupBy: "userDay" });
+	test("groups the given people by day, every day in one page", async () => {
+		const { items, nextCursor } = await usage({
+			groupBy: "userDay",
+			filters: { user: [MAYA, SAM] },
+		});
 		expect(
 			items.map((item) => [item.ref?.name, item.label, item.gbHours]),
 		).toEqual([
@@ -123,14 +126,10 @@ describe("queryCloudUsage", () => {
 			["Sam", "2026-11-17", 0],
 		]);
 		expect(nextCursor).toBeNull();
-	});
-
-	test("a page of person-by-day rows leaves out a person it would cut short", async () => {
-		const { items } = await usage({ groupBy: "userDay", limit: 4 });
-		expect(items.map((item) => [item.ref?.name, item.label])).toEqual([
-			["Maya", "2026-11-10"],
-			["Maya", "2026-11-12"],
-			["Maya", "2026-11-16"],
+		const sam = await usage({ groupBy: "userDay", filters: { user: [SAM] } });
+		expect(sam.items.map((item) => item.label)).toEqual([
+			"2026-11-01",
+			"2026-11-17",
 		]);
 	});
 

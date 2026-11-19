@@ -246,11 +246,11 @@ describe("scope", () => {
 	});
 
 	test.each([
-		"user",
-		"userDay",
-	] as const)("a member cannot group by person (%s)", async (groupBy) => {
+		["user", {}],
+		["userDay", { users: [MAYA] }],
+	] as const)("a member cannot group by person (%s)", async (groupBy, extra) => {
 		await expect(
-			caller(SAM).usage.query({ range: NOVEMBER, groupBy }),
+			caller(SAM).usage.query({ range: NOVEMBER, groupBy, ...extra }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 	});
 

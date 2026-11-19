@@ -98,6 +98,7 @@ const CURSOR_FILTER_KEYS = Object.keys({
 	sort: true,
 	status: true,
 	user: true,
+	users: true,
 	workspace: true,
 } satisfies Record<keyof CloudListFilters, true>) as (keyof CloudListFilters)[];
 
@@ -232,7 +233,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 							window,
 							filters: {
 								workspace: input.workspace,
-								user: ctx.isAdmin ? input.user : undefined,
+								user: ctx.isAdmin ? (input.users ?? input.user) : undefined,
 								size: input.size,
 								status: input.status,
 								search: input.search,
