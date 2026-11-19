@@ -388,7 +388,10 @@ const STATES = RECORDED as unknown as Record<
 	| "freeCredit"
 	| "contractOver"
 	| "notRead"
-	| "unbilled",
+	| "unbilled"
+	| "reattached"
+	| "raisedByHand"
+	| "overageOffBilled",
 	{
 		eventsGbHours: number;
 		allowance: Omit<NonNullable<CloudPeriod["allowance"]>, "resetsAt"> & {

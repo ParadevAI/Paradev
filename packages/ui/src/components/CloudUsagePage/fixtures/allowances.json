@@ -857,5 +857,280 @@
 			"limitReached": false
 		},
 		"unavailable": []
+	},
+	"reattached": {
+		"eventsGbHours": 17159.5,
+		"seats": 5,
+		"cached": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 781555.8,
+			"usage": 550684.8,
+			"remaining": 230871,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1795737600000,
+			"breakdown": [
+				{
+					"id": "seats",
+					"planId": null,
+					"includedGrant": 360000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 360000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "priced",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "pack",
+					"planId": "team",
+					"includedGrant": 121555.8,
+					"prepaidGrant": 300000,
+					"remaining": 230871,
+					"usage": 190684.8,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		},
+		"controls": {
+			"overageAllowed": [
+				{
+					"featureId": "box_gb_minutes",
+					"enabled": false
+				}
+			]
+		},
+		"allowance": {
+			"includedGbHours": 6000,
+			"usedGbHours": 6000,
+			"overageGbHours": 0,
+			"prepaidRemainingGbHours": 3847.85,
+			"resetsAt": "2026-11-27T00:00:00.000Z",
+			"usedUsd": 360,
+			"includedUsd": 360,
+			"overageUsd": 0,
+			"seats": 5,
+			"bought": {
+				"usedGbHours": 3178.08,
+				"totalGbHours": 7025.929999999999,
+				"usedUsd": 190.68,
+				"totalUsd": 421.56
+			},
+			"freeCredits": null,
+			"extraUsageLimit": {
+				"gbHours": 0,
+				"usd": 0
+			},
+			"limitReached": false
+		},
+		"unavailable": []
+	},
+	"raisedByHand": {
+		"eventsGbHours": 3000,
+		"seats": 1,
+		"cached": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 49999.8,
+			"usage": -51058.8,
+			"remaining": 101059.2,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1795737600000,
+			"breakdown": [
+				{
+					"id": "seats",
+					"planId": null,
+					"includedGrant": 49999.8,
+					"prepaidGrant": 0,
+					"remaining": 101059.2,
+					"usage": -51058.8,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		},
+		"controls": {
+			"spendLimits": [
+				{
+					"featureId": "box_gb_minutes",
+					"enabled": true,
+					"limitType": "usage_percentage",
+					"overageLimit": 300
+				}
+			]
+		},
+		"allowance": {
+			"includedGbHours": 833.33,
+			"usedGbHours": -850.98,
+			"overageGbHours": 0,
+			"prepaidRemainingGbHours": 0,
+			"resetsAt": "2026-11-27T00:00:00.000Z",
+			"usedUsd": -51.06,
+			"includedUsd": 50,
+			"overageUsd": 0,
+			"seats": 1,
+			"bought": null,
+			"freeCredits": null,
+			"extraUsageLimit": null,
+			"limitReached": null
+		},
+		"unavailable": [
+			{
+				"field": "extraUsageLimit",
+				"reason": "percent_of_allowance"
+			},
+			{
+				"field": "limitReached",
+				"reason": "not_tracked"
+			}
+		]
+	},
+	"overageOffBilled": {
+		"eventsGbHours": 2732.54,
+		"seats": 1,
+		"cached": false,
+		"balance": {
+			"featureId": "box_gb_minutes",
+			"granted": 72000,
+			"usage": 163952.4,
+			"remaining": 0,
+			"unlimited": false,
+			"overageAllowed": true,
+			"maxPurchase": null,
+			"nextResetAt": 1795737600000,
+			"breakdown": [
+				{
+					"id": "seats",
+					"planId": null,
+					"includedGrant": 72000,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 72000,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": null,
+					"expiresAt": null
+				},
+				{
+					"id": "priced",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 91952.4,
+					"unlimited": false,
+					"reset": {
+						"interval": "month",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 1,
+						"billingUnits": 1000,
+						"billingMethod": "usage_based",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				},
+				{
+					"id": "pack",
+					"planId": "team",
+					"includedGrant": 0,
+					"prepaidGrant": 0,
+					"remaining": 0,
+					"usage": 0,
+					"unlimited": false,
+					"reset": {
+						"interval": "one_off",
+						"resetsAt": null
+					},
+					"price": {
+						"amount": 0.06,
+						"billingUnits": 60,
+						"billingMethod": "prepaid",
+						"maxPurchase": null
+					},
+					"expiresAt": null
+				}
+			]
+		},
+		"controls": {
+			"overageAllowed": [
+				{
+					"featureId": "box_gb_minutes",
+					"enabled": false
+				}
+			]
+		},
+		"allowance": {
+			"includedGbHours": 1200,
+			"usedGbHours": 2732.54,
+			"overageGbHours": 1532.54,
+			"prepaidRemainingGbHours": 0,
+			"resetsAt": "2026-11-27T00:00:00.000Z",
+			"usedUsd": 163.95,
+			"includedUsd": 72,
+			"overageUsd": 91.95,
+			"seats": 1,
+			"bought": null,
+			"freeCredits": null,
+			"extraUsageLimit": {
+				"gbHours": 0,
+				"usd": 0
+			},
+			"limitReached": true
+		},
+		"unavailable": []
 	}
 }

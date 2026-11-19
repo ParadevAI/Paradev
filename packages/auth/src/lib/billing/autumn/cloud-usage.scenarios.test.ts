@@ -563,15 +563,14 @@ const SCENARIOS: {
 		],
 	},
 	{
-		name: "Usage recorded while overage was allowed, then overage turned off",
+		name: "Usage recorded while overage was allowed, then overage turned off: billing still invoices it, the card shows none over",
 		plan: "team",
 		steps: [
 			[
 				{ sandbox: "team-priced-row-then-overage-off", metered: 80_000 },
 				{
-					used: 80,
+					used: 72,
 					held: 72,
-					over: 8,
 					lines: ["included 72 of 72"],
 					mayStart: false,
 				},
@@ -628,7 +627,7 @@ const SCENARIOS: {
 		],
 	},
 	{
-		name: "An upgrade to Ultra mid-period: billing starts its usage at 0",
+		name: "An upgrade to Ultra mid-period: billing starts its usage at 0, the card keeps the period's",
 		plan: "team",
 		steps: [
 			[
@@ -637,7 +636,7 @@ const SCENARIOS: {
 			],
 			[
 				{ upgradeToUltra: true },
-				{ used: 0, held: 240, lines: ["included 0 of 240"], mayStart: true },
+				{ used: 50, held: 240, lines: ["included 50 of 240"], mayStart: true },
 			],
 		],
 	},

@@ -39,3 +39,9 @@ export const NotRead: Story = { args: cardArgs("notRead") };
 export const Unbilled: Story = { args: cardArgs("unbilled") };
 export const PastPeriod: Story = { args: cardArgs("northwind", 1) };
 export const LastThirtyDays: Story = { args: lastThirtyDaysCardArgs() };
+/** Packs bought in the period: each purchase restarts billing's count on the carried pack. */
+export const PacksBought: Story = { args: cardArgs("reattached") };
+/** A monthly row raised by hand above its grant: the period's usage only. */
+export const RaisedByHand: Story = { args: cardArgs("raisedByHand") };
+/** Overage off, but billing put usage on the priced row: nothing shown over. */
+export const OverageOffBilled: Story = { args: cardArgs("overageOffBilled") };

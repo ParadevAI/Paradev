@@ -33,8 +33,10 @@ const sum = (amounts: Amount[]): Amount => ({
 
 /**
  * The card's figures for one billing period. `metered` is the period's usage from the usage
- * events, the page's own total: what billing drew from credits this period is the part of it past
- * billing's monthly usage, so a credit line counts this period and what was left at its start.
+ * events, the page's own total, so the headline matches the page unless billing dropped usage
+ * past a limit. Usage past the included amount is drawn from free credits, then bought ones; a
+ * credit billing has drawn from and that still has some left takes all the rest, because buying a
+ * pack restarts billing's count on the carried credit. With overage off nothing is shown over.
  */
 export function cloudUsageDisplay(
 	allowance: CloudAllowance | null,
@@ -44,44 +46,68 @@ export function cloudUsageDisplay(
 		allowance?.includedGbHours == null ||
 		allowance.includedUsd === null ||
 		allowance.usedUsd === null ||
-		allowance.overageUsd === null
+		allowance.overageUsd === null ||
+		allowance.usedGbHours < 0
 	) {
-		return { used: metered, held: null, over: null, lines: [] };
-	}
-	const over = { gbHours: allowance.overageGbHours, usd: allowance.overageUsd };
-	let toDraw = Math.max(0, metered.gbHours - allowance.usedGbHours);
-	const credits = (["freeCredits", "bought"] as const).flatMap((kind) => {
-		const credit = allowance[kind];
-		if (!credit || credit.totalUsd === null) return [];
-		const drawn = Math.min(toDraw, credit.usedGbHours);
-		toDraw -= drawn;
-		const perGbHour = credit.totalUsd / credit.totalGbHours;
-		const available = credit.totalGbHours - credit.usedGbHours + drawn;
-		if (available <= 0) return [];
-		return [
-			{
-				kind,
-				used: { gbHours: drawn, usd: drawn * perGbHour },
-				total: { gbHours: available, usd: available * perGbHour },
+		return {
+			used: {
+				gbHours: Math.max(0, metered.gbHours),
+				usd: Math.max(0, metered.usd),
 			},
-		];
+			held: null,
+			over: null,
+			lines: [],
+		};
+	}
+	const perGbHour =
+		metered.gbHours > 0
+			? metered.usd / metered.gbHours
+			: allowance.includedGbHours > 0
+				? allowance.includedUsd / allowance.includedGbHours
+				: 0;
+	const amount = (gbHours: number): Amount => ({
+		gbHours,
+		usd: gbHours * perGbHour,
+	});
+	const billedOver = allowance.overageGbHours;
+	const includedUsed = Math.min(
+		Math.max(0, metered.gbHours - billedOver),
+		allowance.includedGbHours,
+	);
+	let rest = Math.max(0, metered.gbHours - billedOver - includedUsed);
+	const held = (["freeCredits", "bought"] as const).flatMap((kind) => {
+		const credit = allowance[kind];
+		return credit && credit.totalGbHours > 0 ? [{ kind, credit }] : [];
+	});
+	const lastWithAny = [...held]
+		.reverse()
+		.find(
+			({ credit }) =>
+				credit.usedGbHours > 0 && credit.totalGbHours > credit.usedGbHours,
+		);
+	const credits = held.flatMap(({ kind, credit }) => {
+		const drawn =
+			kind === lastWithAny?.kind ? rest : Math.min(rest, credit.usedGbHours);
+		rest -= drawn;
+		const available =
+			Math.max(0, credit.totalGbHours - credit.usedGbHours) + drawn;
+		if (available <= 0) return [];
+		return [{ kind, used: amount(drawn), total: amount(available) }];
 	});
 	const lines: HeldLine[] = [
 		{
 			kind: "included",
-			used: {
-				gbHours: allowance.usedGbHours - over.gbHours,
-				usd: allowance.usedUsd - over.usd,
-			},
-			total: { gbHours: allowance.includedGbHours, usd: allowance.includedUsd },
+			used: amount(includedUsed),
+			total: amount(allowance.includedGbHours),
 		},
 		...credits,
 	];
-	const isOver = over.gbHours > 0;
+	const overageOff = allowance.extraUsageLimit?.gbHours === 0;
+	const over = overageOff ? 0 : billedOver;
 	return {
-		used: sum([...lines.map((line) => line.used), ...(isOver ? [over] : [])]),
+		used: sum([...lines.map((line) => line.used), amount(over)]),
 		held: sum(lines.map((line) => line.total)),
-		over: isOver ? over : null,
+		over: over > 0 ? amount(over) : null,
 		lines,
 	};
 }
