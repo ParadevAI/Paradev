@@ -1,6 +1,7 @@
 import { EventEmitter } from "node:events";
 import type { BackgroundTask } from "@superset/chat/protocol";
 import type { AgentDefinitionId } from "@superset/shared/agent-catalog";
+import { logBoxEvent } from "../sentry";
 import {
 	getSubagentHarness,
 	readSubagentTranscript,
@@ -655,6 +656,13 @@ export class TerminalAgentStore extends EventEmitter {
 		const existing = this.byTerminal.get(terminalId);
 		this.byTerminal.delete(terminalId);
 		this.subagentsByTerminal.delete(terminalId);
+		if (existing) {
+			logBoxEvent("agent.ended", {
+				"agent.id": existing.agentId,
+				"agent.end_reason": reason,
+				ms: endedAt - existing.startedAt,
+			});
+		}
 
 		let marked: { workspaceId: string } | undefined;
 		if (this.persistence?.markEnded) {

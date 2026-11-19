@@ -11,8 +11,18 @@ export function initSentry(options: { organizationId?: string }): void {
 	if (initialized) return;
 	const dsn = process.env.HOST_SERVICE_SENTRY_DSN;
 	if (!dsn) return;
+	const tags = {
+		service: "host-service",
+		organization_id: options.organizationId,
+		run_mode: process.env.SUPERSET_HOST_RUN_MODE,
+		cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
+		image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
+		provider: process.env.SUPERSET_SANDBOX_PROVIDER,
+	};
 	Sentry.init({
 		dsn,
+		// Explicit: from SDK 10.71 logs are on unless this says otherwise.
+		enableLogs: process.env.SUPERSET_SANDBOX_BOX_LOGS === "1",
 		release: process.env.HOST_SERVICE_SENTRY_RELEASE,
 		environment: process.env.HOST_SERVICE_SENTRY_ENVIRONMENT,
 		// A host that fails once usually fails in a loop: git.getStatus alone
@@ -25,18 +35,31 @@ export function initSentry(options: { organizationId?: string }): void {
 				exitEvenIfOtherHandlersAreRegistered: false,
 			}),
 		],
-		initialScope: {
-			tags: {
-				service: "host-service",
-				organization_id: options.organizationId,
-				run_mode: process.env.SUPERSET_HOST_RUN_MODE,
-				cloud_workspace_id: process.env.SUPERSET_SANDBOX_WORKSPACE_ID,
-				image_tag: process.env.SUPERSET_SANDBOX_IMAGE_TAG,
-				provider: process.env.SUPERSET_SANDBOX_PROVIDER,
-			},
-		},
+		initialScope: { tags, attributes: tags },
 	});
 	initialized = true;
+}
+
+type BoxEvent =
+	| "host.started"
+	| "host.start_failed"
+	| "host.uncaught"
+	| "agent.started"
+	| "agent.ended"
+	| "box.reaped";
+
+/** Fixed names and attributes only: Sentry Logs is not a place for customer text. */
+export function logBoxEvent(
+	event: BoxEvent,
+	attributes: Record<string, string | number | boolean>,
+	level: "info" | "warn" | "error" = "info",
+): void {
+	Sentry.logger[level](event, attributes);
+}
+
+/** The class name only: a message can carry paths and commands. */
+export function errorType(error: unknown): string {
+	return error instanceof Error ? error.name : typeof error;
 }
 
 /** A file a user attached that the agent did not get. */
