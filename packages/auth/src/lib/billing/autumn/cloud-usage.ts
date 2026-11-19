@@ -129,15 +129,26 @@ export function cloudUsageFromBalances(
 	};
 }
 
+/** The allowance fields a billing value can fail to give; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_FIELDS = [
+	"seats",
+	"bought",
+	"freeCredits",
+	"extraUsageLimit",
+	"limitReached",
+] as const;
+
+/** Why a billing value cannot give a field; the router's output lists them. */
+export const ALLOWANCE_UNAVAILABLE_REASONS = [
+	"not_read",
+	"percent_of_allowance",
+	"not_tracked",
+] as const;
+
 /** A field of the period's allowance this value cannot give, and why. */
 export interface AllowanceUnavailable {
-	field:
-		| "seats"
-		| "bought"
-		| "freeCredits"
-		| "extraUsageLimit"
-		| "limitReached";
-	reason: "not_read" | "percent_of_allowance" | "not_tracked";
+	field: (typeof ALLOWANCE_UNAVAILABLE_FIELDS)[number];
+	reason: (typeof ALLOWANCE_UNAVAILABLE_REASONS)[number];
 }
 
 function creditLine(credit: CloudUsage["bought"], rate: number | null) {
@@ -160,15 +171,10 @@ export function allowanceOf(
 	const limit = cloudUsage.overageLimit;
 	const unavailable: AllowanceUnavailable[] =
 		cloudUsage.bought === null
-			? (
-					[
-						"seats",
-						"bought",
-						"freeCredits",
-						"extraUsageLimit",
-						"limitReached",
-					] as const
-				).map((field) => ({ field, reason: "not_read" }))
+			? ALLOWANCE_UNAVAILABLE_FIELDS.map((field) => ({
+					field,
+					reason: "not_read",
+				}))
 			: [];
 	if (limit?.type === "usage_percentage") {
 		unavailable.push({

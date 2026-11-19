@@ -11,16 +11,10 @@ const kinds = (lines: Lines["lines"]) => lines.map((line) => line.kind);
 const near = (a: number, b: number) =>
 	expect(Math.abs(a - b)).toBeLessThan(0.01);
 
-/** The headline is the sum of the lines, in GB-hours and in dollars. */
-function expectLinesAddUp({ lines, used }: Lines) {
-	near(
-		lines.reduce((sum, line) => sum + line.used.gbHours, 0),
-		used.gbHours,
-	);
-	near(
-		lines.reduce((sum, line) => sum + line.used.usd, 0),
-		used.usd,
-	);
+/** The headline's usage, in GB-hours and in dollars at the stories' rate. */
+function expectHeadline({ used }: Lines, gbHours: number) {
+	near(used.gbHours, gbHours);
+	near(used.usd, gbHours * RATE);
 }
 
 /** The card's lines for a story state, whose allowance comes from the billing reader and the router's mapping. */
@@ -94,10 +88,9 @@ describe("allowanceLines on story data", () => {
 	it("holds what billing counted in the included, credit and extra lines, in the design's order", () => {
 		const result = linesOf("northwind");
 		expect(kinds(result.lines)).toEqual(["included", "freeCredits", "extra"]);
-		near(result.used.gbHours, 15200);
 		expect(result.hasCap).toBe(true);
 		near(result.cap.gbHours, 7000 + 2000 + 27000);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15200);
 	});
 
 	it("shows usage the events hold past billing's own total as Not counted by billing yet", () => {
@@ -106,7 +99,7 @@ describe("allowanceLines on story data", () => {
 			result.lines.find((line) => line.kind === "beyond")?.used.gbHours ?? 0,
 			600,
 		);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15800);
 	});
 
 	it("never calls credit usage unbilled when the credits are not read", () => {
@@ -117,8 +110,7 @@ describe("allowanceLines on story data", () => {
 				.gbHours ?? 0,
 			2000,
 		);
-		near(result.used.gbHours, 15200);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15200);
 	});
 
 	it("with extra usage off, the included total is the cap: no extra line and no open bar", () => {
@@ -126,9 +118,8 @@ describe("allowanceLines on story data", () => {
 		expect(kinds(trial.lines)).toEqual(["included"]);
 		expect(trial.hasCap).toBe(false);
 		near(trial.cap.usd, 270);
-		near(trial.used.usd, 186);
 		expect(trial.scale).toEqual(trial.cap);
-		expectLinesAddUp(trial);
+		expectHeadline(trial, 3100);
 	});
 
 	it("reports the limit reached when extra usage is off and the allowance is used up", () => {
@@ -136,7 +127,7 @@ describe("allowanceLines on story data", () => {
 		expect(result.allowance.limitReached).toBe(true);
 		expect(kinds(result.lines)).toEqual(["included"]);
 		expect(result.scale).toEqual(result.cap);
-		expectLinesAddUp(result);
+		expectHeadline(result, 4500);
 	});
 
 	it("leaves the bar open when the cap is not known and the limit is not reached", () => {
@@ -144,7 +135,7 @@ describe("allowanceLines on story data", () => {
 		expect(result.lines.at(-1)).toMatchObject({ kind: "extra", total: null });
 		expect(result.hasCap).toBe(false);
 		expect(result.scale.usd).toBeGreaterThan(result.cap.usd);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15200);
 	});
 });
 
@@ -152,11 +143,11 @@ describe("allowanceLines on hand-built values", () => {
 	it("all lines read: billing's own total is the lines, and only events past it are unbilled", () => {
 		const counted = lines(NORTHWIND, 15200);
 		expect(kinds(counted.lines)).toEqual(["included", "freeCredits", "extra"]);
-		expectLinesAddUp(counted);
+		expectHeadline(counted, 15200);
 		const ahead = lines(NORTHWIND, 15500);
 		near(ahead.lines.at(-1)?.used.gbHours ?? 0, 300);
 		expect(ahead.lines.at(-1)?.kind).toBe("beyond");
-		expectLinesAddUp(ahead);
+		expectHeadline(ahead, 15500);
 	});
 
 	it("credits not read: what the lines cannot place is Not broken down yet, never unbilled", () => {
@@ -167,7 +158,7 @@ describe("allowanceLines on hand-built values", () => {
 		);
 		expect(kinds(result.lines)).toEqual(["included", "extra", "notBrokenDown"]);
 		near(result.lines.at(-1)?.used.gbHours ?? 0, 2300);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15500);
 	});
 
 	it("everything not read: the same, and the bar stays open with no known cap", () => {
@@ -175,12 +166,21 @@ describe("allowanceLines on hand-built values", () => {
 		expect(kinds(result.lines)).not.toContain("beyond");
 		expect(kinds(result.lines)).toContain("notBrokenDown");
 		expect(result.scale.gbHours).toBeGreaterThan(result.used.gbHours);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15200);
 	});
 
 	it("events below what billing counted add no line, and the lines still add up", () => {
 		const result = lines(NORTHWIND, 14000);
 		expect(kinds(result.lines)).toEqual(["included", "freeCredits", "extra"]);
-		expectLinesAddUp(result);
+		expectHeadline(result, 15200);
+	});
+
+	it("names the cap in the headline only when it is known", () => {
+		expect(linesOf("northwind").headline).toBe("limit");
+		expect(linesOf("trial").headline).toBe("included");
+		expect(linesOf("limitReached").headline).toBe("included");
+		expect(linesOf("percentCap").headline).toBe("period");
+		expect(linesOf("notRead").headline).toBe("period");
+		expect(lines(CACHED, 15200, ALL_UNREAD).headline).toBe("period");
 	});
 });

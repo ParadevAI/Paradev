@@ -130,8 +130,17 @@ export function allowanceLines(
 	const capKnown = limit !== null;
 	const leaveOpen =
 		!capKnown && open.length > 0 && allowance.limitReached !== true;
+	const openExtra = lines.some((item) => item.kind === "extra" && !item.total);
 	return {
 		lines,
+		/**
+		 * What the headline measures usage against: the cap when it is known, the included total
+		 * when nothing goes past it, else nothing, as "of $X included" would read as over it.
+		 */
+		headline: (hasCap ? "limit" : openExtra ? "period" : "included") as
+			| "limit"
+			| "period"
+			| "included",
 		used: sum(lines.map((line) => line.used)),
 		cap: hasCap
 			? sum(totalsOf(lines))

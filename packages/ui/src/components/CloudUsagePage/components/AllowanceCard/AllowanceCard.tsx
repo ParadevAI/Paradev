@@ -87,9 +87,9 @@ export function AllowanceCard({
 						<Trans>{used} used</Trans>
 					</span>{" "}
 					<span className="text-muted-foreground">
-						{summary?.hasCap ? (
+						{summary?.headline === "limit" ? (
 							<Trans>of {cap} limit</Trans>
-						) : summary ? (
+						) : summary?.headline === "included" ? (
 							<Trans>of {cap} included</Trans>
 						) : period ? (
 							<Trans>in this period</Trans>
