@@ -220,6 +220,8 @@ export type AcpImageStoreContext = {
 
 const STARTUP_TIMEOUT_MS = 120_000;
 const START_OPTIONS_GRACE_MS = 1_000;
+// claude-agent-acp reports the default or settings model for the fresh context these plan approvals start, whatever it runs.
+const CONTEXT_RESET_OPTION = /^exit-plan-clear-/;
 const REQUEST_TIMEOUT_MS = 30_000;
 const STDERR_TAIL_CHARS = 4000;
 const ASK_MODE_ID = "default";
@@ -491,6 +493,7 @@ export class AcpAdapter implements HarnessAdapter {
 		},
 	);
 	private configOptions: SessionConfigOption[] = [];
+	private picksBeforeContextReset: ChatSelections | null = null;
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
@@ -685,10 +688,11 @@ export class AcpAdapter implements HarnessAdapter {
 			return;
 		}
 		this.pendingApprovals.delete(approvalId);
-		this.client.respond(
-			pending.requestId,
-			this.approvalOutcome(pending, decision),
-		);
+		const outcome = this.approvalOutcome(pending, decision);
+		if (CONTEXT_RESET_OPTION.test(selectedOptionId(outcome) ?? "")) {
+			this.picksBeforeContextReset = this.modelAndEffort();
+		}
+		this.client.respond(pending.requestId, outcome);
 		if (this.currentTurn?.status !== "running") this.sendCustomAnswer();
 		this.emitItem(
 			{
@@ -769,6 +773,12 @@ export class AcpAdapter implements HarnessAdapter {
 		const sessionId = this.sessionId;
 		if (!client || !sessionId) return Promise.resolve(false);
 		const previous = this.configOptions;
+		const changed = previous.find((option) => option.id === configId);
+		const category = changed && selectionCategoryOf(changed);
+		if (this.picksBeforeContextReset && category === "model")
+			this.picksBeforeContextReset.modelId = value;
+		if (this.picksBeforeContextReset && category === "thought_level")
+			this.picksBeforeContextReset.effortId = value;
 		const previousModeId =
 			configId === this.modeConfigId ? this.modeId : undefined;
 		this.configOptions = previous.map((option) =>
@@ -1285,6 +1295,7 @@ export class AcpAdapter implements HarnessAdapter {
 		usage?: AcpPromptUsage,
 	): void {
 		this.endCompactions();
+		this.picksBeforeContextReset = null;
 		this.main.flush();
 		this.emitTurn({
 			id: turnId,
@@ -1323,6 +1334,7 @@ export class AcpAdapter implements HarnessAdapter {
 	private failTurn(turnId: string, error: TurnError): void {
 		this.endCompactions();
 		this.customAnswer = null;
+		this.picksBeforeContextReset = null;
 		this.main.flush();
 		this.cancelPendingApprovals(turnId);
 		this.emitTurn({
@@ -1479,6 +1491,7 @@ export class AcpAdapter implements HarnessAdapter {
 				return;
 			case "config_option_update":
 				this.handleConfigOptions(outer.data.update);
+				this.restorePicksAfterContextReset();
 				return;
 			case "state_update":
 				this.handleStateUpdate(outer.data.update);
@@ -2146,6 +2159,28 @@ export class AcpAdapter implements HarnessAdapter {
 		if (this.pendingStart && this.configOptions.length > 0) {
 			this.pendingStart.apply(true);
 		}
+	}
+
+	private modelAndEffort(): ChatSelections {
+		const current = (category: SelectionCategory) =>
+			this.configOptions.find(
+				(option) => selectionCategoryOf(option) === category,
+			)?.currentValue;
+		const modelId = current("model");
+		const effortId = current("thought_level");
+		return {
+			...(modelId ? { modelId } : {}),
+			...(effortId ? { effortId } : {}),
+		};
+	}
+
+	private restorePicksAfterContextReset(): void {
+		const picks = this.picksBeforeContextReset;
+		if (!picks) return;
+		this.picksBeforeContextReset = null;
+		const now = this.modelAndEffort();
+		if (now.modelId !== picks.modelId || now.effortId !== picks.effortId)
+			void this.applyConfigSelections(picks);
 	}
 
 	private startModeId(
@@ -2995,6 +3030,12 @@ function listedSessions(response: unknown): DiscoverSessionsResult {
 		})),
 		...(nextCursor ? { nextCursor } : {}),
 	};
+}
+
+function selectedOptionId(outcome: unknown): string | undefined {
+	const optionId = (outcome as { outcome?: { optionId?: unknown } }).outcome
+		?.optionId;
+	return typeof optionId === "string" ? optionId : undefined;
 }
 
 function flattenSelectOptions(
