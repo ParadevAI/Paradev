@@ -7,7 +7,11 @@ import {
 	ensureAutumnCustomer,
 } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
-import { recordUsageEvent } from "@superset/db/cloud-usage-events";
+import {
+	clearPendingUsage,
+	recordUsageEvent,
+	usageRowFromPending,
+} from "@superset/db/cloud-usage-events";
 import type {
 	CloudUsageFeature,
 	CloudWorkspaceBootEndReason,
@@ -378,7 +382,7 @@ async function recordSentUsage(
 		sentAt: new Date().toISOString(),
 	};
 	try {
-		await recordUsageEvent(db, rowOf(event));
+		await recordUsageEvent(db, usageRowFromPending(event));
 		return null;
 	} catch (error) {
 		Sentry.captureException(error, {
@@ -387,15 +391,6 @@ async function recordSentUsage(
 		});
 		return event;
 	}
-}
-
-function rowOf(event: PendingUsageEvent) {
-	return {
-		...event,
-		windowFrom: new Date(event.windowFrom),
-		windowTo: new Date(event.windowTo),
-		sentAt: new Date(event.sentAt),
-	};
 }
 
 function keepPending(events: (PendingUsageEvent | null)[]) {
@@ -411,25 +406,30 @@ async function writePendingUsage(): Promise<void> {
 	const pending = await db
 		.select({
 			id: cloudWorkspaceBoots.id,
-			pendingUsageEvents: cloudWorkspaceBoots.pendingUsageEvents,
+			pendingUsageEvents: sql<
+				PendingUsageEvent[]
+			>`${cloudWorkspaceBoots.pendingUsageEvents}`.mapWith(
+				cloudWorkspaceBoots.pendingUsageEvents,
+			),
 		})
 		.from(cloudWorkspaceBoots)
 		.where(isNotNull(cloudWorkspaceBoots.pendingUsageEvents));
 	for (const { id, pendingUsageEvents: events } of pending) {
-		if (!events) continue;
+		let writing: PendingUsageEvent | null = null;
 		try {
-			for (const event of events) await recordUsageEvent(db, rowOf(event));
-			await db
-				.update(cloudWorkspaceBoots)
-				.set({ pendingUsageEvents: null })
-				.where(
-					and(
-						eq(cloudWorkspaceBoots.id, id),
-						sql`${cloudWorkspaceBoots.pendingUsageEvents} = ${JSON.stringify(events)}::jsonb`,
-					),
-				);
+			for (const event of events) {
+				writing = event;
+				await recordUsageEvent(db, usageRowFromPending(event));
+			}
+			writing = null;
+			await clearPendingUsage(db, id, events);
 		} catch (error) {
-			Sentry.captureException(error, { tags: { "boot.id": id } });
+			Sentry.captureException(error, {
+				tags: { "boot.id": id },
+				extra: writing
+					? { feature: writing.feature, lockSeq: writing.lockSeq }
+					: undefined,
+			});
 		}
 	}
 }

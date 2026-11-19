@@ -23,7 +23,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { invitations, organizations, teams, users } from "./auth";
 import { channels } from "./channels";
-import type { CloudUsageFeature, PageReportReason } from "./enums";
+import type { PageReportReason } from "./enums";
 import {
 	actorKindValues,
 	agentCredentialKindValues,
@@ -71,6 +71,7 @@ import type {
 	AutomationEventDispatchInput,
 	CloudWorkspaceBootPhase,
 	IntegrationConfig,
+	PendingUsageEvent,
 	TriggerConfig,
 	UserIdentityMetadata,
 } from "./types";
@@ -1201,20 +1202,6 @@ export const cloudWorkspaceTags = pgTable(
 		}),
 	],
 );
-
-/** A cloud_usage_events row as JSON: its timestamps are ISO strings. */
-export interface PendingUsageEvent {
-	bootId: string;
-	lockSeq: number;
-	feature: CloudUsageFeature;
-	organizationId: string;
-	cloudWorkspaceId: string | null;
-	userId: string | null;
-	windowFrom: string;
-	windowTo: string;
-	amount: string;
-	sentAt: string;
-}
 
 export const cloudWorkspaceBoots = pgTable(
 	"cloud_workspace_boots",
