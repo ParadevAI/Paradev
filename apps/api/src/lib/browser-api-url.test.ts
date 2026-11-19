@@ -127,6 +127,7 @@ for (const browserUrl of [
 			`${identityUrl}/`,
 			`${identityUrl}/api/v2/agent/mcp`,
 			`${identityUrl}/mcp`,
+			"https://admin.paradev.com/api/mcp/cloud",
 		]);
 		expect(config.connectorRedirect).toBe(
 			`${expectedUrl}/api/connectors/callback/test`,

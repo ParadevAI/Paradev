@@ -1276,6 +1276,41 @@
 					}
 				}
 			]
+		},
+		"paradev_admin_mcp": {
+			"displayName": "Paradev admin",
+			"icon": "superset",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "Paradev account",
+					"client": "dynamic",
+					"authorization_url": "https://admin.paradev.com/api/mcp/cloud",
+					"scopes": ["openid", "email", "profile", "offline_access"],
+					"identity": {
+						"url": "https://api.superset.sh/api/auth/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
 		}
 	}
 }
