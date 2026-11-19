@@ -151,10 +151,14 @@ export class LocalGitCredentialProvider implements GitCredentialProvider {
 	private async fetchTokenViaGhCli(): Promise<string | null> {
 		const env = await this.envResolver();
 		try {
-			const { stdout } = await execFileAsync("gh", ["auth", "token"], {
-				timeout: 10_000,
-				env,
-			});
+			const { stdout } = await execFileAsync(
+				resolveCommand("gh", { env }),
+				["auth", "token"],
+				{
+					timeout: 10_000,
+					env,
+				},
+			);
 			return stdout.trim() || null;
 		} catch {
 			return null;
