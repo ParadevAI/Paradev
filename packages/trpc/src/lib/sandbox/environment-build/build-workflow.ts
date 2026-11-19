@@ -9,6 +9,7 @@ import {
 	createBox,
 	deleteFork,
 	failBuildAndCleanUp,
+	pruneOldGoldens,
 	readCommand,
 	snapshotTaken,
 	startCommand,
@@ -27,7 +28,8 @@ export type BuildOutcome = "succeeded" | "failed" | "skipped";
 /**
  * Builds an environment's golden from `[install]` and makes it the one new
  * workspaces start from. The box does the long work; each step only starts
- * or checks it. A failure leaves the current golden in place. A fork whose
+ * or checks it. A failure leaves the current golden in place; a success
+ * deletes the goldens past `KEPT_GOLDENS`, last. A fork whose
  * disk holds agent CLIs is rebuilt from the image within the caps in
  * `limits.ts`; past them it is forked as before and checked again next time.
  */
@@ -105,6 +107,14 @@ export async function environmentBuildWorkflow(
 			FatalError.is(error) ? error.message : "The build stopped unexpectedly",
 		);
 		return "failed";
+	}
+	try {
+		await pruneOldGoldens(buildId);
+	} catch (error) {
+		console.error(
+			`[environment-build] ${buildId}: old goldens not deleted; the next build tries again`,
+			error,
+		);
 	}
 	return "succeeded";
 }

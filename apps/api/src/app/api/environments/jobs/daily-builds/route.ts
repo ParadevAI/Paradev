@@ -1,9 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
 import {
-	dailyBuildsEnabled,
+	isProductionDeployment,
 	queueDailyBuilds,
 } from "@superset/trpc/environment-build";
-import { env } from "@/env";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 export const dynamic = "force-dynamic";
@@ -21,12 +20,8 @@ export async function POST(request: Request): Promise<Response> {
 		"/api/environments/jobs/daily-builds",
 	);
 	if (rejected) return rejected;
-	if (
-		!dailyBuildsEnabled({
-			vercelEnv: env.VERCEL_ENV,
-			flag: env.ENVIRONMENT_DAILY_BUILDS,
-		})
-	) {
+	// A preview would build production's environments on the copy of its data.
+	if (!isProductionDeployment()) {
 		return Response.json({ ok: true, enabled: false });
 	}
 

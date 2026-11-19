@@ -1,4 +1,5 @@
-export { dailyBuildsEnabled, queueDailyBuilds } from "./daily";
+export { queueDailyBuilds } from "./daily";
+export { isProductionDeployment } from "./deployment";
 export { isStale } from "./policy";
 export {
 	type BuildRefusalReason,

@@ -15,6 +15,7 @@ import {
 	startBuildCommand,
 	stopBuildBox,
 } from "../vercel";
+import { isProductionDeployment } from "./deployment";
 import {
 	BOX_READY_MS,
 	BuildFailure,
@@ -25,13 +26,19 @@ import {
 	within,
 } from "./environment-build";
 import { BUILD_LIMIT_MS } from "./limits";
-import { checkoutScript, type FreshRebuildClaim } from "./policy";
+import {
+	checkoutScript,
+	type FreshRebuildClaim,
+	goldensToDelete,
+} from "./policy";
 import {
 	claimFreshRebuild,
 	failBuild,
 	loadBuild,
+	markGoldenDeleted,
 	recordBuildCommit,
 	succeedBuild,
+	undeletedGoldens,
 } from "./store";
 
 export type BuildCommandKey = "checkout" | "install";
@@ -210,6 +217,39 @@ export async function activateBuild(
 		previousSourceRef,
 		goldenRef: name,
 	});
+}
+
+/**
+ * After the swap: deletes the goldens past `KEPT_GOLDENS`. A delete that fails
+ * is logged and tried again by the next build. Only a production deployment
+ * deletes: a preview shares production's sandboxes.
+ */
+export async function pruneOldGoldens(buildId: string): Promise<void> {
+	"use step";
+	const loaded = await loadBuild(buildId);
+	if (!loaded) return;
+	if (!isProductionDeployment()) {
+		console.log(
+			`[environment-build] ${buildId}: not a production deployment, so no old golden is deleted`,
+		);
+		return;
+	}
+	const { environment } = loaded;
+	const stale = goldensToDelete(
+		await undeletedGoldens(environment.id),
+		environment.sourceRef,
+	);
+	for (const golden of stale) {
+		try {
+			await deleteSandbox(golden.goldenRef);
+			await markGoldenDeleted(golden.id);
+		} catch (error) {
+			console.error(
+				`[environment-build] could not delete old golden ${golden.goldenRef} of ${environment.id}`,
+				error,
+			);
+		}
+	}
 }
 
 /** Never deletes the box of a build that succeeded: that box is the golden. */

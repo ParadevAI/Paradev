@@ -210,7 +210,12 @@ export const environmentBuildStatusValues = [
 export type EnvironmentBuildStatus =
 	(typeof environmentBuildStatusValues)[number];
 
-export const environmentBuildTriggerValues = ["manual", "daily"] as const;
+/** `promote` records a golden saved from a workspace that a build replaced, so retention can delete it. */
+export const environmentBuildTriggerValues = [
+	"manual",
+	"daily",
+	"promote",
+] as const;
 export type EnvironmentBuildTrigger =
 	(typeof environmentBuildTriggerValues)[number];
 

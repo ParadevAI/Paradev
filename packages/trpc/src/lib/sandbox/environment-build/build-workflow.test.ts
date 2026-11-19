@@ -11,6 +11,7 @@ import * as repoHooks from "../repo-hooks";
 import * as repositories from "../repositories";
 import * as vercel from "../vercel";
 import * as steps from "./build-steps";
+import * as deployment from "./deployment";
 import {
 	BUILD_LIMIT_MESSAGE,
 	BUILD_LIMIT_MS,
@@ -82,6 +83,10 @@ let failNext: Partial<Record<string, number>>;
 let swapAllowed: boolean;
 let rootDiskAgents: string;
 let claims: FreshRebuildClaim[];
+let production: boolean;
+let goldens: Array<{ id: string; goldenRef: string }>;
+let deleteFails: Set<string>;
+let goldensDeleted: string[];
 
 function failOnce(name: string): void {
 	const left = failNext[name] ?? 0;
@@ -149,6 +154,7 @@ stub(vercel, {
 	buildBoxSnapshotTaken: async () =>
 		stoppedAt !== null && now - stoppedAt >= STOP_MS,
 	deleteSandbox: async (name: string) => {
+		if (deleteFails.has(name)) throw new Error(`could not delete ${name}`);
 		if (!boxes.has(name)) return;
 		calls.push(`delete:${name}`);
 		boxes.delete(name);
@@ -171,6 +177,10 @@ stub(store, {
 		build = { ...build, status: "succeeded", goldenRef };
 		failOnce("activate");
 		return true;
+	},
+	undeletedGoldens: async () => goldens,
+	markGoldenDeleted: async (id: string) => {
+		goldensDeleted.push(id);
 	},
 	claimFreshRebuild: async () => {
 		const claim = claims.shift() ?? "wait";
@@ -202,6 +212,8 @@ stub(credentials, {
 		files: [],
 	}),
 });
+
+stub(deployment, { isProductionDeployment: () => production });
 
 stub(workflow, {
 	sleep: async (ms: number) => {
@@ -249,6 +261,10 @@ beforeEach(() => {
 	swapAllowed = true;
 	rootDiskAgents = "";
 	claims = [];
+	production = true;
+	goldens = [];
+	deleteFails = new Set();
+	goldensDeleted = [];
 });
 
 afterEach(() => {
@@ -393,5 +409,40 @@ describe("environmentBuildWorkflow", () => {
 			"start:checkout",
 		]);
 		expect(now - started).toBeLessThan(FRESH_REBUILD_WAIT_MS);
+	});
+
+	describe("old goldens", () => {
+		const fourGoldens = () => [
+			{ id: "b4", goldenRef: "env-new" },
+			{ id: "b3", goldenRef: "env-old" },
+			{ id: "b2", goldenRef: "env-older" },
+			{ id: "b1", goldenRef: "env-oldest" },
+		];
+
+		beforeEach(() => {
+			environment = { ...environment, sourceRef: "env-new" };
+			goldens = fourGoldens();
+			for (const golden of goldens) boxes.add(golden.goldenRef);
+		});
+
+		test("a build deletes the golden past the three it keeps, last", async () => {
+			expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+			expect(goldensDeleted).toEqual(["b1"]);
+			expect(calls.slice(-2)).toEqual(["activate", "delete:env-oldest"]);
+		});
+
+		test("a failed delete is not marked and does not fail the build", async () => {
+			deleteFails = new Set(["env-oldest"]);
+			expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+			expect(goldensDeleted).toEqual([]);
+			expect(build.status).toBe("succeeded");
+		});
+
+		test("a non-production build deletes nothing", async () => {
+			production = false;
+			expect(await environmentBuildWorkflow(BUILD_ID)).toBe("succeeded");
+			expect(goldensDeleted).toEqual([]);
+			expect(calls.some((call) => call === "delete:env-oldest")).toBe(false);
+		});
 	});
 });

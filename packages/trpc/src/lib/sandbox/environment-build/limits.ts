@@ -6,6 +6,9 @@ export const BUILD_LIMIT_MESSAGE = `The build ran for more than ${BUILD_LIMIT_MS
 /** Past the build limit, so only a build whose workflow died is stale. */
 export const STALE_BUILD_MS = 20 * 60 * 1000;
 
+/** Goldens kept per environment: the active one and the newest ones before it. */
+export const KEPT_GOLDENS = 3;
+
 /** Caps on goldens rebuilt from the image because their disk holds agent CLIs. */
 export const FRESH_REBUILDS_AT_ONCE = 10;
 export const FRESH_REBUILDS_PER_HOUR = 40;

@@ -6,6 +6,7 @@ import { sandboxCheckoutDir } from "@superset/shared/sandbox/contract";
 import {
 	FRESH_REBUILDS_AT_ONCE,
 	FRESH_REBUILDS_PER_HOUR,
+	KEPT_GOLDENS,
 	STALE_BUILD_MS,
 } from "./limits";
 
@@ -20,6 +21,19 @@ export function isStale(build: {
 		build.status === "running" &&
 		Date.now() - build.startedAt.getTime() > STALE_BUILD_MS
 	);
+}
+
+/**
+ * Goldens past the active one and the `KEPT_GOLDENS - 1` newest others.
+ * Takes undeleted goldens, newest first; never returns the active one.
+ */
+export function goldensToDelete<T extends { goldenRef: string }>(
+	goldens: readonly T[],
+	activeRef: string,
+): T[] {
+	return goldens
+		.filter((golden) => golden.goldenRef !== activeRef)
+		.slice(KEPT_GOLDENS - 1);
 }
 
 /** Finished builds, newest first. */

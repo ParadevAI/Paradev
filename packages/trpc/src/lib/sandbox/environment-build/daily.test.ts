@@ -25,7 +25,7 @@ stub(start, {
 	},
 });
 
-const { dailyBuildsEnabled, queueDailyBuilds } = await import("./daily");
+const { queueDailyBuilds } = await import("./daily");
 
 beforeEach(() => {
 	environments = [
@@ -68,17 +68,5 @@ describe("queueDailyBuilds", () => {
 			skipped: { "no-install": 1 },
 			failed: 0,
 		});
-	});
-});
-
-describe("dailyBuildsEnabled", () => {
-	test("runs only in production with the flag set", () => {
-		expect(dailyBuildsEnabled({ vercelEnv: "production", flag: "1" })).toBe(
-			true,
-		);
-		expect(
-			dailyBuildsEnabled({ vercelEnv: "production", flag: undefined }),
-		).toBe(false);
-		expect(dailyBuildsEnabled({ vercelEnv: "preview", flag: "1" })).toBe(false);
 	});
 });

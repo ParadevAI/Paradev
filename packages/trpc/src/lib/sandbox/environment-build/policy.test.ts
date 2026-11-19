@@ -4,6 +4,7 @@ import {
 	checkoutScript,
 	dailyBuildsPaused,
 	freshRebuildClaim,
+	goldensToDelete,
 	isStale,
 } from "./policy";
 
@@ -14,6 +15,24 @@ describe("isStale", () => {
 		expect(isStale({ status: "running", startedAt: old })).toBe(true);
 		expect(isStale({ status: "running", startedAt: recent })).toBe(false);
 		expect(isStale({ status: "failed", startedAt: old })).toBe(false);
+	});
+});
+
+describe("goldensToDelete", () => {
+	const goldens = (...refs: string[]) =>
+		refs.map((goldenRef) => ({ goldenRef }));
+
+	test("keeps three goldens", () => {
+		expect(goldensToDelete(goldens("c", "b", "a"), "c")).toEqual([]);
+	});
+
+	test("deletes the fourth, and never the active one", () => {
+		expect(goldensToDelete(goldens("d", "c", "b", "a"), "d")).toEqual(
+			goldens("a"),
+		);
+		expect(goldensToDelete(goldens("d", "c", "b", "a"), "a")).toEqual(
+			goldens("b"),
+		);
 	});
 });
 

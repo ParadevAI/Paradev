@@ -7,17 +7,6 @@ import {
 } from "./start";
 import { activeEnvironments, finishedBuilds } from "./store";
 
-/**
- * Off until old goldens have a cleanup rule: every daily build leaves the
- * golden it replaced. Only a production deployment with the flag set runs them.
- */
-export function dailyBuildsEnabled(args: {
-	vercelEnv: string | undefined;
-	flag: string | undefined;
-}): boolean {
-	return args.vercelEnv === "production" && args.flag === "1";
-}
-
 export interface DailyBuildOutcome {
 	queued: number;
 	skipped: Partial<Record<BuildRefusalReason | "paused", number>>;

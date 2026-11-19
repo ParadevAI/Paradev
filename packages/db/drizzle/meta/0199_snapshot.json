@@ -1,5 +1,5 @@
 {
-  "id": "07ac6033-4aec-4320-ba36-b26c80be5158",
+  "id": "b92e73aa-4ca2-4840-ae8f-7dc6008d61a7",
   "prevId": "6330e502-5955-4c44-b22b-ff26051a9209",
   "version": "7",
   "dialect": "postgresql",
@@ -11496,6 +11496,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "golden_deleted_at": {
+          "name": "golden_deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "error": {
           "name": "error",
           "type": "text",
@@ -18012,7 +18018,8 @@
       "schema": "public",
       "values": [
         "manual",
-        "daily"
+        "daily",
+        "promote"
       ]
     },
     "public.environment_scope": {

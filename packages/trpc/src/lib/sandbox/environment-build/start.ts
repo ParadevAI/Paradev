@@ -87,7 +87,7 @@ function isUniqueViolation(error: unknown): boolean {
  */
 export async function startEnvironmentBuild(args: {
 	environmentId: string;
-	trigger: EnvironmentBuildTrigger;
+	trigger: Exclude<EnvironmentBuildTrigger, "promote">;
 }): Promise<SelectEnvironmentBuild> {
 	const environment = await db.query.environments.findFirst({
 		where: and(

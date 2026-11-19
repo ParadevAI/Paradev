@@ -982,7 +982,8 @@ export const environmentSecrets = pgTable(
 
 /**
  * One build of an environment's golden from `[install]`. The running row is
- * the lock: at most one per environment.
+ * the lock: at most one per environment. A build keeps the newest goldens
+ * and deletes older ones, setting `golden_deleted_at`.
  */
 export const environmentBuilds = pgTable(
 	"environment_builds",
@@ -1000,6 +1001,7 @@ export const environmentBuilds = pgTable(
 		primaryRepositoryId: uuid("primary_repository_id"),
 		commitSha: text("commit_sha"),
 		goldenRef: text("golden_ref"),
+		goldenDeletedAt: timestamp("golden_deleted_at", { withTimezone: true }),
 		error: text(),
 		startedAt: timestamp("started_at", { withTimezone: true })
 			.notNull()
