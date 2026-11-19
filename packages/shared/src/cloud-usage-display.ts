@@ -1,4 +1,9 @@
 import type { z } from "zod";
+import {
+	ALLOWANCE_UNAVAILABLE_FIELDS,
+	type ALLOWANCE_UNAVAILABLE_REASONS,
+	gbMinutesUsd,
+} from "./billing";
 import type { cloudPeriodsOutputSchema } from "./cloud-usage-api";
 
 export interface Amount {
@@ -111,5 +116,94 @@ export function cloudUsageDisplay(
 		held: sum(lines.map((line) => line.total)),
 		over: over > 0 ? amount(over) : null,
 		lines,
+	};
+}
+
+interface BillingCredit {
+	grantedGbMinutes: number;
+	remainingGbMinutes: number;
+}
+
+/** The parts of the billing reader's value (`CloudUsage` in packages/auth) the allowance reads. */
+export interface BillingCloudUsage {
+	includedGbMinutes: number | null;
+	usedGbMinutes: number;
+	overageGbMinutes: number;
+	prepaidGbMinutes: number;
+	bought: BillingCredit | null;
+	freeCredits: BillingCredit | null;
+	seats: number | null;
+	overageLimit:
+		| { type: "none" }
+		| { type: "absolute"; gbMinutes: number }
+		| { type: "usage_percentage"; percent: number }
+		| null;
+	limitReached: boolean | null;
+}
+
+/** A field of the period's allowance this value cannot give, and why. */
+export interface AllowanceUnavailable {
+	field: (typeof ALLOWANCE_UNAVAILABLE_FIELDS)[number];
+	reason: (typeof ALLOWANCE_UNAVAILABLE_REASONS)[number];
+}
+
+function creditLine(credit: BillingCredit | null, rate: number | null) {
+	if (!credit?.grantedGbMinutes) return null;
+	const used = credit.grantedGbMinutes - credit.remainingGbMinutes;
+	return {
+		usedGbHours: used / 60,
+		totalGbHours: credit.grantedGbMinutes / 60,
+		usedUsd: gbMinutesUsd(used, rate),
+		totalUsd: gbMinutesUsd(credit.grantedGbMinutes, rate),
+	};
+}
+
+/** The router's mapping of the billing reader's value to the period's allowance. */
+export function allowanceOf(
+	cloudUsage: BillingCloudUsage,
+	resetsAt: Date,
+	rate: number | null,
+) {
+	const included = cloudUsage.includedGbMinutes;
+	const limit = cloudUsage.overageLimit;
+	const unavailable: AllowanceUnavailable[] =
+		cloudUsage.bought === null
+			? ALLOWANCE_UNAVAILABLE_FIELDS.map((field) => ({
+					field,
+					reason: "not_read",
+				}))
+			: [];
+	if (limit?.type === "usage_percentage") {
+		unavailable.push({
+			field: "extraUsageLimit",
+			reason: "percent_of_allowance",
+		});
+	}
+	if (cloudUsage.bought !== null && cloudUsage.limitReached === null) {
+		unavailable.push({ field: "limitReached", reason: "not_tracked" });
+	}
+	return {
+		allowance: {
+			includedGbHours: included === null ? null : included / 60,
+			usedGbHours: cloudUsage.usedGbMinutes / 60,
+			overageGbHours: cloudUsage.overageGbMinutes / 60,
+			prepaidRemainingGbHours: cloudUsage.prepaidGbMinutes / 60,
+			resetsAt,
+			usedUsd: gbMinutesUsd(cloudUsage.usedGbMinutes, rate),
+			includedUsd: included === null ? null : gbMinutesUsd(included, rate),
+			overageUsd: gbMinutesUsd(cloudUsage.overageGbMinutes, rate),
+			seats: cloudUsage.seats,
+			bought: creditLine(cloudUsage.bought, rate),
+			freeCredits: creditLine(cloudUsage.freeCredits, rate),
+			extraUsageLimit:
+				limit?.type === "absolute"
+					? {
+							gbHours: limit.gbMinutes / 60,
+							usd: gbMinutesUsd(limit.gbMinutes, rate),
+						}
+					: null,
+			limitReached: cloudUsage.limitReached,
+		},
+		unavailable,
 	};
 }

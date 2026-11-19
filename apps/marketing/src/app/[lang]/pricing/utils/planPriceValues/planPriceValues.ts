@@ -27,8 +27,6 @@ export interface FamilyPriceSet {
 	hasYearlyDiscount: boolean;
 	gbHours: string | null;
 	hours: string | null;
-	overage: string | null;
-	overageRate: string | null;
 	environments: string | null;
 	pack: string | null;
 	previousName: string | null;
@@ -41,7 +39,6 @@ export interface PlanPriceValues {
 	fromPrice: string | null;
 	planPrices: string;
 	allowanceItems: string[];
-	overagePrice: string | null;
 	packPrice: string | null;
 }
 
@@ -91,14 +88,6 @@ export function planPriceValues(
 			hours: gbMinutesPerSeat
 				? number(gbMinutesPerSeat / 60 / standardBox.memoryGb, 0)
 				: null,
-			overage:
-				family.overagePerGbHour == null
-					? null
-					: currency(family.overagePerGbHour),
-			overageRate:
-				gbMinutesPerSeat && family.overagePerGbHour != null
-					? perGbHour(family.overagePerGbHour)
-					: null,
 			environments: family.environments ? number(family.environments, 0) : null,
 			pack:
 				gbMinutesPerSeat && family.pack
@@ -141,10 +130,6 @@ export function planPriceValues(
 					values: { hours: set.hours, gbHours: set.gbHours, name: set.name },
 				}),
 			),
-		overagePrice:
-			families.find((set) => set.gbHours)?.overage ??
-			families[0]?.overage ??
-			null,
 		packPrice: firstPack ? currency(gbHourPackPricePerGbHour(firstPack)) : null,
 	};
 }
@@ -174,7 +159,6 @@ export function faqValues(values: PlanPriceValues) {
 		vcpus: standardBox.vcpus,
 		memoryGb: standardBox.memoryGb,
 		planPrices: values.planPrices,
-		overagePrice: values.overagePrice,
 		packPrice: values.packPrice,
 		trustHost: new URL(COMPANY.TRUST_URL).host,
 	};

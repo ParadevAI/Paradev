@@ -1,3 +1,5 @@
+"use client";
+
 import { Trans, useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
@@ -8,7 +10,9 @@ import {
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
+import { useState } from "react";
+import { cn } from "../../../../../../lib/utils";
+import { Button } from "../../../../../ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -16,16 +20,14 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@superset/ui/dialog";
+} from "../../../../../ui/dialog";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 	InputGroupText,
-} from "@superset/ui/input-group";
-import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
-import { useState } from "react";
+} from "../../../../../ui/input-group";
+import { toast } from "../../../../../ui/sonner";
 import { PRESET_GB_HOURS, PRICE_FORMAT } from "../../constants";
 
 interface BuyGbHoursDialogProps {

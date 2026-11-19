@@ -8,7 +8,8 @@ import {
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
+import { useEffect, useState } from "react";
+import { Button } from "../../../../../ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -16,16 +17,15 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@superset/ui/dialog";
-import { Label } from "@superset/ui/label";
+} from "../../../../../ui/dialog";
+import { Label } from "../../../../../ui/label";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@superset/ui/select";
-import { useEffect, useState } from "react";
+} from "../../../../../ui/select";
 import {
 	PRESET_GB_HOURS,
 	PRICE_FORMAT,

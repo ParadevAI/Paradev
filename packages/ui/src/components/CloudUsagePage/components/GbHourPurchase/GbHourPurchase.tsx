@@ -1,7 +1,6 @@
 "use client";
 
 import { Trans, useLingui } from "@lingui/react/macro";
-import { authClient } from "@superset/auth/client";
 import { errorMessage } from "@superset/i18n/errors";
 import { useFormat } from "@superset/i18n/react";
 import {
@@ -10,12 +9,10 @@ import {
 	gbHourPurchase,
 	PLAN_PRICE_CURRENCY,
 } from "@superset/shared/billing";
-import { Button } from "@superset/ui/button";
-import { toast } from "@superset/ui/sonner";
-import { Switch } from "@superset/ui/switch";
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useTRPC } from "@/trpc/react";
+import { Button } from "../../../ui/button";
+import { toast } from "../../../ui/sonner";
+import { Switch } from "../../../ui/switch";
 import { AutoTopupDialog } from "./components/AutoTopupDialog";
 import { BuyGbHoursDialog } from "./components/BuyGbHoursDialog";
 import { DEFAULT_TOPUP, PRICE_FORMAT } from "./constants";
@@ -28,6 +25,10 @@ interface GbHourPurchaseProps {
 		thresholdGbMinutes: number;
 		quantityGbMinutes: number;
 	} | null;
+	/** The app's auth client call to a billing endpoint. */
+	post: (path: string, body: Record<string, unknown>) => Promise<unknown>;
+	/** Refetches the app's billing queries after a change. */
+	refresh: () => Promise<unknown>;
 }
 
 interface TopupSettings {
@@ -40,20 +41,11 @@ export function GbHourPurchase({
 	organizationId,
 	pack,
 	autoTopup,
+	post,
+	refresh,
 }: GbHourPurchaseProps) {
 	const { t } = useLingui();
 	const { formatNumber, formatCurrency } = useFormat();
-	const trpc = useTRPC();
-	const queryClient = useQueryClient();
-	const refresh = () =>
-		Promise.all([
-			queryClient.invalidateQueries({
-				queryKey: trpc.billing.cloudUsage.queryKey(),
-			}),
-			queryClient.invalidateQueries({
-				queryKey: trpc.billing.activePlan.queryKey(),
-			}),
-		]);
 	const [isBuyOpen, setIsBuyOpen] = useState(false);
 	const [isTopupOpen, setIsTopupOpen] = useState(false);
 	const [topup, setTopup] = useState<TopupSettings>(
@@ -79,11 +71,7 @@ export function GbHourPurchase({
 
 	const buy = async (gbHours: number) => {
 		const bought = formatNumber(gbHours);
-		await authClient.$fetch("/autumn/buyGbHours", {
-			method: "POST",
-			body: { organizationId, gbHours },
-			throw: true,
-		});
+		await post("/autumn/buyGbHours", { organizationId, gbHours });
 		toast.success(t`Added ${bought} GB-hours.`);
 		await refresh();
 	};
@@ -92,15 +80,11 @@ export function GbHourPurchase({
 		const previous = topup;
 		setTopup(next);
 		try {
-			await authClient.$fetch("/autumn/setAutoTopup", {
-				method: "POST",
-				body: {
-					organizationId,
-					enabled: next.enabled,
-					thresholdGbHours: next.thresholdGbHours,
-					gbHours: next.gbHours,
-				},
-				throw: true,
+			await post("/autumn/setAutoTopup", {
+				organizationId,
+				enabled: next.enabled,
+				thresholdGbHours: next.thresholdGbHours,
+				gbHours: next.gbHours,
 			});
 			await refresh();
 		} catch (error) {

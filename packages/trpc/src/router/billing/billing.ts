@@ -12,6 +12,7 @@ import { env } from "../../env";
 import { organizationEnvironmentLimit } from "../../lib/billing/plan";
 import { personProcedure, userError } from "../../trpc";
 import { countEnvironments } from "../environment/limit";
+import { requireActiveOrgRole } from "../utils/active-org";
 import { recordUpgradeIntent } from "./upgrade-nudge";
 import { upgradeNudgeDeps } from "./upgrade-nudge-deps";
 
@@ -226,10 +227,12 @@ export const billingRouter = {
 		};
 	}),
 
+	/** Owners and admins only: a member sees their own usage on the cloud usage page, not the organization's. */
 	cloudUsage: personProcedure.query(
 		async ({ ctx }): Promise<CloudUsage | null> => {
 			const activeOrgId = ctx.activeOrganizationId;
 			if (!billingUsesAutumn || !activeOrgId) return null;
+			if (!(await requireActiveOrgRole(ctx)).isAdmin) return null;
 			const billing = await organizationBilling(activeOrgId);
 			return billing.cloudUsage ?? null;
 		},

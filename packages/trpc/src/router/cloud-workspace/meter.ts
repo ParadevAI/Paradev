@@ -64,7 +64,7 @@ export function boxFor(vcpus: number): { memoryMb: number; vcpus: number } {
 
 type Boot = typeof cloudWorkspaceBoots.$inferSelect;
 type UsageUser = { id: string; name: string | null; email: string | null };
-type Refusal = "cloudNeedsPaidPlan" | "usageLimitReached";
+type Refusal = "cloudNeedsPaidPlan" | "usageLimitReached" | "usageLimitUpgrade";
 
 export function gbMinutes({
 	ms,
@@ -82,24 +82,39 @@ export function lockIdFor(bootId: string, seq: number): string {
 
 export function refusalFor(result: {
 	allowed: boolean;
-	balance: unknown;
+	balance: {
+		breakdown?: { price?: { billingMethod?: string } | null }[];
+	} | null;
 }): Refusal | null {
 	if (result.allowed) return null;
-	return result.balance ? "usageLimitReached" : "cloudNeedsPaidPlan";
+	if (!result.balance) return "cloudNeedsPaidPlan";
+	return result.balance.breakdown?.some(
+		(row) => row.price?.billingMethod === "prepaid",
+	)
+		? "usageLimitReached"
+		: "usageLimitUpgrade";
 }
 
 const REFUSAL_MESSAGES: Record<Refusal, string> = {
 	cloudNeedsPaidPlan:
 		"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 	usageLimitReached:
-		"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
+		"Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace.",
+	usageLimitUpgrade:
+		"Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace.",
 };
 
+/** Both limit refusals share one key, which released clients already know; `next` picks the sentence. */
 function refusalError(refusal: Refusal) {
 	return userError({
 		code: "FORBIDDEN",
 		message: REFUSAL_MESSAGES[refusal],
-		i18nKey: `serverError.cloudWorkspace.${refusal}`,
+		...(refusal === "cloudNeedsPaidPlan"
+			? { i18nKey: "serverError.cloudWorkspace.cloudNeedsPaidPlan" }
+			: {
+					i18nKey: "serverError.cloudWorkspace.usageLimitReached",
+					params: { next: refusal === "usageLimitReached" ? "buy" : "upgrade" },
+				}),
 	});
 }
 

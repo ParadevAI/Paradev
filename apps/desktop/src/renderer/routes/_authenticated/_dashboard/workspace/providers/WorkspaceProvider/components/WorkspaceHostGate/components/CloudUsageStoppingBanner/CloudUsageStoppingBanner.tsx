@@ -1,9 +1,14 @@
 import { useLingui } from "@lingui/react/macro";
+import { PageLink } from "@superset/ui/page-link";
 import { Link } from "@tanstack/react-router";
 import { LuTriangleAlert } from "react-icons/lu";
+import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
 
 export function CloudUsageStoppingBanner() {
 	const { t } = useLingui();
+	const { activePlan } = useCurrentPlan();
+	const canBuy =
+		activePlan?.planTier === "team" || activePlan?.planTier === "ultra";
 
 	return (
 		<div
@@ -15,17 +20,19 @@ export function CloudUsageStoppingBanner() {
 				aria-hidden="true"
 			/>
 			<span className="min-w-0 flex-1 select-text">
-				{t({
-					message:
-						"Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised.",
-				})}
+				{canBuy
+					? t({
+							message:
+								"Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running.",
+						})
+					: t({
+							message:
+								"Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running.",
+						})}
 			</span>
-			<Link
-				to="/settings/billing"
-				className="shrink-0 font-medium underline underline-offset-4"
-			>
-				{t({ message: "Open billing" })}
-			</Link>
+			<PageLink>
+				<Link to="/settings/billing">{t({ message: "Billing" })}</Link>
+			</PageLink>
 		</div>
 	);
 }

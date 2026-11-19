@@ -957,8 +957,12 @@ describe("meter", () => {
 		expect(refusalFor({ allowed: false, balance: null })).toBe(
 			"cloudNeedsPaidPlan",
 		);
-		expect(refusalFor({ allowed: false, balance: { remaining: 0 } })).toBe(
+		const pack = { price: { billingMethod: "prepaid" } };
+		expect(refusalFor({ allowed: false, balance: { breakdown: [pack] } })).toBe(
 			"usageLimitReached",
+		);
+		expect(refusalFor({ allowed: false, balance: { breakdown: [] } })).toBe(
+			"usageLimitUpgrade",
 		);
 	});
 

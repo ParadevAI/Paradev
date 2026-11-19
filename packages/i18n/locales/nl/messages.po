@@ -3621,8 +3621,8 @@ msgstr "Facturering"
 msgid "Billing details"
 msgstr "Factuurgegevens"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Facturering weigerde een cloudwerkruimte te starten: het abonnement van de organisatie bevat geen cloudwerkruimtes, of de limiet voor cloudgebruik is bereikt. Cloudwerkruimtes vereisen het Team- of Ultra-abonnement. Upgrade of verhoog de limiet in Instellingen > Facturering, of voer de automatisering uit op een apparaat."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Facturering weigerde een cloudwerkruimte te starten: het abonnement bevat geen cloudwerkruimtes, of de organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Bekijk Instellingen, Facturering, of voer de automatisering uit op een apparaat."
 
 msgid "Binary"
 msgstr "Binair"
@@ -3703,9 +3703,6 @@ msgstr "Lade onderaan, swipevriendelijk op touchapparaten."
 
 msgid "Bought credits"
 msgstr "Gekocht tegoed"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Gekochte GB-uren over: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dock-symbool laten stuiteren"
@@ -9429,18 +9426,6 @@ msgstr "Open drempels"
 
 msgid "GB-hours"
 msgstr "GB-uren"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-uren boven het abonnement: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-uren boven de pool"
-
-msgid "GB-hours used: {used}"
-msgstr "Gebruikte GB-uren: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Gebruikte GB-uren: {used} van {included}"
 
 msgid "General"
 msgstr "Algemeen"
@@ -16709,9 +16694,6 @@ msgstr "Zoom resetten"
 msgid "Reset Zoom"
 msgstr "Zoom resetten"
 
-msgid "Resets {resetDate}"
-msgstr "Wordt gereset op {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Reset om {until}"
 
@@ -17815,9 +17797,6 @@ msgstr "Bekijk de openstaande vacatures, of probeer Paradev eerst."
 
 msgid "See this gate on the scorecard"
 msgstr "Bekijk deze drempel op de scorekaart"
-
-msgid "See usage"
-msgstr "Gebruik bekijken"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Zie wat er veranderd is, geef feedback en merge het werk als het klaar is."
@@ -20352,8 +20331,8 @@ msgstr "Het pad moet binnen de repository blijven"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "De pluginwijziging is niet binnen {seconds} seconden voltooid."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "De pool wordt elke maand vernieuwd. Gebruik daarboven wordt per GB-uur gefactureerd tegen het tarief bij elk abonnement."
+msgid "The pool resets every month."
+msgstr "De pool wordt elke maand opnieuw ingesteld."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "De primaire repository moet een van de repository's van de omgeving zijn"
@@ -23162,9 +23141,6 @@ msgstr "Je naam <0>(als we je prompt gebruiken, vermelden we je in de changelog)
 msgid "Your organization"
 msgstr "Je organisatie"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Verhoog de limiet of upgrade in Instellingen, Facturering om deze werkruimte te starten."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archiveer een omgeving of upgrade in Instellingen, Facturering om er meer toe te voegen."
@@ -23172,18 +23148,27 @@ msgstr "Je organisatie heeft haar limiet voor omgevingen ({0}) bereikt. Archivee
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Je organisatie heeft de limiet van {reachedLimit} omgevingen bereikt. Archiveer er een om ruimte te maken."
 
+msgid "Your organization has used all its cloud usage for this period."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt."
+
+msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Koop meer in Instellingen, Facturering om deze werkruimte te starten."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Koop meer in Instellingen, Facturering om hem te laten draaien."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Deze werkruimte stopt over een paar minuten. Stap over op Team of Ultra in Instellingen, Facturering om hem te laten draaien."
+
+msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
+msgstr "Je organisatie heeft al haar cloudgebruik voor deze periode verbruikt. Stap over op Team of Ultra in Instellingen, Facturering om deze werkruimte te starten."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Je organisatie installeert {plugin} voor je, dus het kan niet worden verwijderd. Je kunt het uitschakelen."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Je organisatie installeert deze plugin voor je. Je kunt hem uitschakelen, maar niet verwijderen."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Je organisatie heeft de limiet voor cloudgebruik bereikt."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Je organisatie heeft haar limiet voor cloudgebruik bereikt. Deze werkruimte stopt over een paar minuten, tenzij de limiet wordt verhoogd."
 
 msgid "Your organization reached its environment limit."
 msgstr "Je organisatie heeft de limiet voor omgevingen bereikt."

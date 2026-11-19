@@ -433,13 +433,20 @@ export const serverErrorMessages: Record<
 					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 			}),
 		),
-	"serverError.cloudWorkspace.usageLimitReached": () =>
-		i18n._(
-			msg({
-				message:
-					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
-			}),
-		),
+	"serverError.cloudWorkspace.usageLimitReached": (params) =>
+		params?.next === "upgrade"
+			? i18n._(
+					msg({
+						message:
+							"Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace.",
+					}),
+				)
+			: i18n._(
+					msg({
+						message:
+							"Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace.",
+					}),
+				),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
 		i18n._(
 			msg({

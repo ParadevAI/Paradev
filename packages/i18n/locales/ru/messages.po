@@ -3621,8 +3621,8 @@ msgstr "Оплата"
 msgid "Billing details"
 msgstr "Платёжные данные"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Биллинг отказался запустить облачное рабочее пространство: план организации не включает облачные рабочие пространства, или достигнут лимит использования облака. Облачным рабочим пространствам нужен план Team или Ultra. Повысьте план или увеличьте лимит в разделе Настройки > Оплата, либо запустите автоматизацию на устройстве."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Оплата не позволила запустить облачное рабочее пространство: план не включает облачные рабочие пространства, или организация израсходовала всё облачное использование за этот период. Откройте Настройки, Оплата или запустите автоматизацию на устройстве."
 
 msgid "Binary"
 msgstr "Бинарный"
@@ -3703,9 +3703,6 @@ msgstr "Нижняя шторка, удобная для свайпов на с�
 
 msgid "Bought credits"
 msgstr "Купленные кредиты"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Осталось купленных ГБ-часов: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Подпрыгивание значка в Dock"
@@ -9429,18 +9426,6 @@ msgstr "Шлюзов открыто"
 
 msgid "GB-hours"
 msgstr "ГБ-часы"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "ГБ-часы сверх тарифа: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "ГБ-часы сверх пула"
-
-msgid "GB-hours used: {used}"
-msgstr "Использовано ГБ-часов: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Использовано ГБ-часов: {used} из {included}"
 
 msgid "General"
 msgstr "Общие"
@@ -16709,9 +16694,6 @@ msgstr "Сбросить масштаб"
 msgid "Reset Zoom"
 msgstr "Сбросить масштаб"
 
-msgid "Resets {resetDate}"
-msgstr "Сброс {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Сброс в {until}"
 
@@ -17815,9 +17797,6 @@ msgstr "Посмотрите вакансии или сначала попроб
 
 msgid "See this gate on the scorecard"
 msgstr "Посмотреть этот шлюз в таблице"
-
-msgid "See usage"
-msgstr "Посмотреть использование"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Посмотрите, что изменилось, дайте обратную связь и объедините работу, когда она готова."
@@ -20352,8 +20331,8 @@ msgstr "Путь должен оставаться внутри репозито
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Изменение плагина не завершилось за {seconds} с."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Пул обновляется каждый месяц. Использование сверх него оплачивается за ГБ-час по ставке, указанной в каждом тарифе."
+msgid "The pool resets every month."
+msgstr "Пул обновляется каждый месяц."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Основной репозиторий должен быть одним из репозиториев окружения"
@@ -23162,9 +23141,6 @@ msgstr "Ваше имя <0>(если возьмём ваш промпт, ука�
 msgid "Your organization"
 msgstr "Ваша организация"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Ваша организация достигла лимита использования облака. Увеличьте лимит или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы запустить эту рабочую область."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Ваша организация достигла лимита окружений ({0}). Архивируйте окружение или перейдите на другой тариф в разделе «Настройки», «Оплата», чтобы добавить ещё."
@@ -23172,18 +23148,27 @@ msgstr "Ваша организация достигла лимита окруж
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Ваша организация достигла лимита в {reachedLimit} окружений. Архивируйте одно, чтобы освободить место."
 
+msgid "Your organization has used all its cloud usage for this period."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период."
+
+msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Докупите ещё в разделе Настройки, Оплата, чтобы запустить это рабочее пространство."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Докупите ещё в разделе Настройки, Оплата, чтобы оно продолжило работать."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Это рабочее пространство остановится через несколько минут. Перейдите на Team или Ultra в разделе Настройки, Оплата, чтобы оно продолжило работать."
+
+msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
+msgstr "Ваша организация израсходовала всё облачное использование за этот период. Перейдите на Team или Ultra в разделе Настройки, Оплата, чтобы запустить это рабочее пространство."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Ваша организация устанавливает {plugin} для вас, поэтому его нельзя удалить. Его можно отключить."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Ваша организация устанавливает этот плагин для вас. Его можно отключить, но нельзя удалить."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Ваша организация достигла лимита использования облака."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Ваша организация достигла лимита использования облака. Эта рабочая область остановится через несколько минут, если лимит не увеличить."
 
 msgid "Your organization reached its environment limit."
 msgstr "Ваша организация достигла лимита окружений."

@@ -3621,8 +3621,8 @@ msgstr "Facturación"
 msgid "Billing details"
 msgstr "Datos de facturación"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "La facturación rechazó iniciar un espacio de trabajo en la nube: el plan de la organización no incluye espacios en la nube, o alcanzó su límite de uso en la nube. Los espacios en la nube necesitan el plan Team o Ultra. Mejora el plan o sube el límite en Configuración > Facturación, o ejecuta la automatización en un dispositivo."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Facturación se negó a iniciar un espacio de trabajo en la nube: el plan no incluye espacios de trabajo en la nube, o la organización ha usado todo su uso en la nube de este periodo. Consulta Configuración, Facturación, o ejecuta la automatización en un dispositivo."
 
 msgid "Binary"
 msgstr "Binario"
@@ -3703,9 +3703,6 @@ msgstr "Panel inferior, cómodo de deslizar en dispositivos táctiles."
 
 msgid "Bought credits"
 msgstr "Créditos comprados"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "GB-horas compradas restantes: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Hacer rebotar el icono del Dock"
@@ -9429,18 +9426,6 @@ msgstr "Metas abiertas"
 
 msgid "GB-hours"
 msgstr "GB-horas"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-horas por encima del plan: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-horas más allá del fondo"
-
-msgid "GB-hours used: {used}"
-msgstr "GB-horas usadas: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "GB-horas usadas: {used} de {included}"
 
 msgid "General"
 msgstr "General"
@@ -16709,9 +16694,6 @@ msgstr "Restablecer el zoom"
 msgid "Reset Zoom"
 msgstr "Restablecer el zoom"
 
-msgid "Resets {resetDate}"
-msgstr "Se restablece el {resetDate}"
-
 msgid "Resets at {until}"
 msgstr "Se restablece a las {until}"
 
@@ -17815,9 +17797,6 @@ msgstr "Mira las vacantes o prueba Paradev primero."
 
 msgid "See this gate on the scorecard"
 msgstr "Ver esta meta en el cuadro de resultados"
-
-msgid "See usage"
-msgstr "Ver uso"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Mira qué cambió, da tu opinión y fusiona el trabajo cuando esté listo."
@@ -20352,8 +20331,8 @@ msgstr "La ruta debe quedar dentro del repositorio"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "El cambio del plugin no terminó en {seconds} segundos."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "El fondo se renueva cada mes. El uso que lo supere se cobra por GB-hora a la tarifa indicada en cada plan."
+msgid "The pool resets every month."
+msgstr "El fondo se reinicia cada mes."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "El repositorio principal debe ser uno de los repositorios del entorno"
@@ -23162,9 +23141,6 @@ msgstr "Tu nombre <0>(si usamos tu prompt, te acreditaremos en el registro de ca
 msgid "Your organization"
 msgstr "Tu organización"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Tu organización alcanzó su límite de uso en la nube. Aumenta el límite o mejora el plan en Configuración, Facturación para iniciar este espacio de trabajo."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Tu organización alcanzó su límite de entornos ({0}). Archiva un entorno o mejora el plan en Configuración, Facturación para añadir más."
@@ -23172,18 +23148,27 @@ msgstr "Tu organización alcanzó su límite de entornos ({0}). Archiva un entor
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "Tu organización alcanzó su límite de {reachedLimit} entornos. Archiva uno para hacer espacio."
 
+msgid "Your organization has used all its cloud usage for this period."
+msgstr "Tu organización ha usado todo su uso en la nube de este periodo."
+
+msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
+msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Compra más en Configuración, Facturación para iniciar este espacio de trabajo."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
+msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Este espacio de trabajo se detendrá en unos minutos. Compra más en Configuración, Facturación para que siga funcionando."
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
+msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Este espacio de trabajo se detendrá en unos minutos. Cambia a Team o Ultra en Configuración, Facturación para que siga funcionando."
+
+msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
+msgstr "Tu organización ha usado todo su uso en la nube de este periodo. Cambia a Team o Ultra en Configuración, Facturación para iniciar este espacio de trabajo."
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "Tu organización instala {plugin} por ti, así que no se puede desinstalar. Puedes desactivarlo."
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Tu organización instala este plugin por ti. Puedes desactivarlo, pero no quitarlo."
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "Tu organización alcanzó su límite de uso de la nube."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Tu organización alcanzó su límite de uso en la nube. Este espacio de trabajo se detendrá en unos minutos si no se aumenta el límite."
 
 msgid "Your organization reached its environment limit."
 msgstr "Tu organización alcanzó su límite de entornos."

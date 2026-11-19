@@ -1,5 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { errorMessage } from "@superset/i18n/errors";
+import { PageLink } from "@superset/ui/page-link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { LuTriangleAlert } from "react-icons/lu";
@@ -24,12 +25,9 @@ export function CloudUsageRefusedBanner({
 				aria-hidden="true"
 			/>
 			<span className="min-w-0 flex-1 select-text">{errorMessage(error)}</span>
-			<Link
-				to="/settings/billing"
-				className="shrink-0 font-medium underline underline-offset-4"
-			>
-				{t({ message: "Open billing" })}
-			</Link>
+			<PageLink>
+				<Link to="/settings/billing">{t({ message: "Billing" })}</Link>
+			</PageLink>
 			<button
 				type="button"
 				onClick={() =>

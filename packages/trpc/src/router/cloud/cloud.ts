@@ -4,7 +4,6 @@ import {
 	type OrganizationBilling,
 	organizationBilling,
 } from "@superset/auth/billing";
-import { allowanceOf } from "@superset/auth/billing/cloud-usage";
 import { db } from "@superset/db/client";
 import {
 	type CloudBillingAnchor,
@@ -22,6 +21,7 @@ import {
 	cloudPeriodsOutputSchema,
 	cloudUsageOutputSchema,
 } from "@superset/shared/cloud-usage-api";
+import { allowanceOf } from "@superset/shared/cloud-usage-display";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { eq } from "drizzle-orm";

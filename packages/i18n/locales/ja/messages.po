@@ -3621,8 +3621,8 @@ msgstr "請求"
 msgid "Billing details"
 msgstr "請求先情報"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "課金によりクラウドワークスペースの起動が拒否されました。組織のプランにクラウドワークスペースが含まれていないか、クラウド利用上限に達しています。クラウドワークスペースには Team または Ultra プランが必要です。設定 > 請求でアップグレードするか上限を上げてください。またはデバイスで自動化を実行してください。"
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "請求によりクラウドワークスペースの起動が拒否されました。プランにクラウドワークスペースが含まれていないか、組織がこの期間のクラウド使用量をすべて使い切っています。設定の請求を確認するか、デバイスでオートメーションを実行してください。"
 
 msgid "Binary"
 msgstr "バイナリ"
@@ -3703,9 +3703,6 @@ msgstr "下部ドロワー。タッチデバイスではスワイプで操作で
 
 msgid "Bought credits"
 msgstr "購入したクレジット"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "購入済み GB 時間の残り: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Dockアイコンを弾ませる"
@@ -9429,18 +9426,6 @@ msgstr "通過したゲート"
 
 msgid "GB-hours"
 msgstr "GB 時間"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "プランを超えた GB 時間: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "プールを超えた GB 時間"
-
-msgid "GB-hours used: {used}"
-msgstr "使用した GB 時間: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "使用した GB 時間: {included} のうち {used}"
 
 msgid "General"
 msgstr "全般"
@@ -16709,9 +16694,6 @@ msgstr "ズームをリセット"
 msgid "Reset Zoom"
 msgstr "ズームをリセット"
 
-msgid "Resets {resetDate}"
-msgstr "{resetDate} にリセット"
-
 msgid "Resets at {until}"
 msgstr "{until} にリセット"
 
@@ -17815,9 +17797,6 @@ msgstr "募集中のポジションを見るか、まずはParadevを試して�
 
 msgid "See this gate on the scorecard"
 msgstr "このゲートをスコアカードで見る"
-
-msgid "See usage"
-msgstr "使用量を見る"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "変更内容を確認し、フィードバックを送り、準備ができたら成果をマージします。"
@@ -20352,8 +20331,8 @@ msgstr "パスはリポジトリ内にある必要があります"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "プラグインの変更が {seconds} 秒以内に完了しませんでした。"
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "プールは毎月リセットされます。超過分は各プランに表示された GB 時間あたりの料金で請求されます。"
+msgid "The pool resets every month."
+msgstr "プールは毎月リセットされます。"
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "プライマリリポジトリは環境のリポジトリのいずれかである必要があります"
@@ -23162,9 +23141,6 @@ msgstr "お名前 <0>(プロンプトを採用した場合、changelogでクレ�
 msgid "Your organization"
 msgstr "あなたの組織"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "組織がクラウドの利用上限に達しました。このワークスペースを起動するには、「設定」の「請求」で上限を引き上げるかアップグレードしてください。"
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "組織が環境数の上限（{0}）に達しました。環境をアーカイブするか、「設定」の「請求」でアップグレードして追加してください。"
@@ -23172,18 +23148,27 @@ msgstr "組織が環境数の上限（{0}）に達しました。環境をアー
 msgid "Your organization has reached its limit of {reachedLimit} environments. Archive one to make room."
 msgstr "組織の環境数が上限の {reachedLimit} に達しました。空きを作るには 1 つアーカイブしてください。"
 
+msgid "Your organization has used all its cloud usage for this period."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。"
+
+msgid "Your organization has used all its cloud usage for this period. Buy more in Settings, Billing to start this workspace."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースを起動するには、設定の請求から追加購入してください。"
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Buy more in Settings, Billing to keep it running."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。動かし続けるには、設定の請求から追加購入してください。"
+
+msgid "Your organization has used all its cloud usage for this period. This workspace stops in a few minutes. Upgrade to Team or Ultra in Settings, Billing to keep it running."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースは数分後に停止します。動かし続けるには、設定の請求から Team または Ultra にアップグレードしてください。"
+
+msgid "Your organization has used all its cloud usage for this period. Upgrade to Team or Ultra in Settings, Billing to start this workspace."
+msgstr "組織はこの期間のクラウド使用量をすべて使い切りました。このワークスペースを起動するには、設定の請求から Team または Ultra にアップグレードしてください。"
+
 #. js-lingui-explicit-id
 msgid "serverError.plugins.managedByOrganization"
 msgstr "{plugin} は組織によってインストールされているため、アンインストールできません。無効にすることはできます。"
 
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "このプラグインは組織によってインストールされています。無効にはできますが、削除はできません。"
-
-msgid "Your organization reached its cloud usage limit."
-msgstr "組織がクラウドの使用上限に達しました。"
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "組織がクラウドの利用上限に達しました。上限を引き上げない限り、このワークスペースは数分後に停止します。"
 
 msgid "Your organization reached its environment limit."
 msgstr "組織が環境の上限に達しました。"
