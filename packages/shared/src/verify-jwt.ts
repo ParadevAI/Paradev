@@ -1,4 +1,4 @@
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import { createRemoteJWKSet, type JWTPayload, jwtVerify } from "jose";
 
 /** The claims the Workers act on. `scope` is set only on tokens the API mints for itself. */
 export interface AuthContext {
@@ -23,29 +23,21 @@ function getJWKS(authUrl: string): ReturnType<typeof createRemoteJWKSet> {
 }
 
 /**
- * Verify a user JWT the API issued, for a Worker fronting it. Hourly
+ * Verify a user JWT the API issued, addressed to one of `audience`. Hourly
  * rotation expiries are expected and silent; anything else is logged tersely,
  * never with the decoded payload (it carries plaintext emails).
  */
-export async function verifyJWT(
+export async function verifyUserBearer(
 	token: string,
 	authUrl: string,
-): Promise<AuthContext | null> {
+	audience: string[],
+): Promise<(JWTPayload & { sub: string }) | null> {
 	try {
 		const { payload } = await jwtVerify(token, getJWKS(authUrl), {
 			issuer: authUrl,
-			audience: authUrl,
+			audience,
 		});
-		const sub = payload.sub;
-		const organizationIds = payload.organizationIds as string[] | undefined;
-		if (!sub || !organizationIds) return null;
-		const teamIds = Array.isArray(payload.teamIds)
-			? payload.teamIds.filter((id): id is string => typeof id === "string")
-			: [];
-		const scope = typeof payload.scope === "string" ? payload.scope : undefined;
-		const name = typeof payload.name === "string" ? payload.name : null;
-		const image = typeof payload.image === "string" ? payload.image : null;
-		return { sub, organizationIds, teamIds, scope, name, image };
+		return payload.sub ? { ...payload, sub: payload.sub } : null;
 	} catch (error) {
 		const code =
 			error instanceof Error && "code" in error
@@ -57,4 +49,21 @@ export async function verifyJWT(
 		}
 		return null;
 	}
+}
+
+/** The claims a Worker acts on, from a user JWT addressed to the API itself. */
+export async function verifyJWT(
+	token: string,
+	authUrl: string,
+): Promise<AuthContext | null> {
+	const payload = await verifyUserBearer(token, authUrl, [authUrl]);
+	const organizationIds = payload?.organizationIds as string[] | undefined;
+	if (!payload || !organizationIds) return null;
+	const teamIds = Array.isArray(payload.teamIds)
+		? payload.teamIds.filter((id): id is string => typeof id === "string")
+		: [];
+	const scope = typeof payload.scope === "string" ? payload.scope : undefined;
+	const name = typeof payload.name === "string" ? payload.name : null;
+	const image = typeof payload.image === "string" ? payload.image : null;
+	return { sub: payload.sub, organizationIds, teamIds, scope, name, image };
 }

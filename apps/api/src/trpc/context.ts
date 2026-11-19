@@ -3,13 +3,13 @@ import { auth, getRequestSession, type Session } from "@superset/auth/server";
 import { db } from "@superset/db/client";
 import * as authSchema from "@superset/db/schema/auth";
 import { SANDBOX_API_CREDENTIAL_HEADER } from "@superset/shared/sandbox/gate";
+import { verifyUserBearer } from "@superset/shared/verify-jwt";
 import { createTRPCContext } from "@superset/trpc";
 import {
 	resolveSandboxCaller,
 	type SandboxCaller,
 	sandboxCredentialWorkspaceId,
 } from "@superset/trpc/lib/sandbox";
-import { verifyAccessToken } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import { env } from "@/env";
 
@@ -30,18 +30,8 @@ async function sessionFromOAuthBearer(
 	const token = match?.[1];
 	if (!token || !looksLikeJwt(token)) return null;
 
-	let payload: Record<string, unknown>;
-	try {
-		payload = (await verifyAccessToken(token, {
-			jwksUrl: `${apiUrl}/api/auth/jwks`,
-			verifyOptions: {
-				issuer: apiUrl,
-				audience: [apiUrl, `${apiUrl}/`],
-			},
-		})) as Record<string, unknown>;
-	} catch {
-		return null;
-	}
+	const payload = await verifyUserBearer(token, apiUrl, [apiUrl, `${apiUrl}/`]);
+	if (!payload) return null;
 
 	const authorizedClientId =
 		typeof payload.azp === "string" ? payload.azp : null;
@@ -49,9 +39,7 @@ async function sessionFromOAuthBearer(
 		return null;
 	}
 
-	const userId = typeof payload.sub === "string" ? payload.sub : null;
-	if (!userId) return null;
-
+	const userId = payload.sub;
 	const user = await db.query.users.findFirst({
 		where: eq(authSchema.users.id, userId),
 	});
