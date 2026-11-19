@@ -3906,9 +3906,6 @@ msgstr "ボタン、トグル、キーボード操作の手がかり"
 msgid "Buy"
 msgstr "購入"
 
-msgid "Buy extra GB-hours"
-msgstr "GB 時間を追加購入"
-
 msgid "Buy for {total}"
 msgstr "{total} で購入"
 
@@ -8341,9 +8338,6 @@ msgstr "外部ブラウザ"
 
 msgid "extra ${used} of ${limit}"
 msgstr "追加分 ${limit}中${used}"
-
-msgid "Extra GB-hours"
-msgstr "追加の GB 時間"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "必要に応じて購入できる追加 GB 時間"

@@ -3906,9 +3906,6 @@ msgstr "Кнопки, переключатели и клавиатурные п�
 msgid "Buy"
 msgstr "Купить"
 
-msgid "Buy extra GB-hours"
-msgstr "Купить дополнительные ГБ-часы"
-
 msgid "Buy for {total}"
 msgstr "Купить за {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Внешний браузер"
 
 msgid "extra ${used} of ${limit}"
 msgstr "сверх лимита ${used} из ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Дополнительные ГБ-часы"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Дополнительные ГБ-часы по мере необходимости"

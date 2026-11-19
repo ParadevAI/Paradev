@@ -101,7 +101,7 @@ export function GbHourPurchase({
 			<Item size="sm" className="px-0">
 				<ItemContent>
 					<ItemTitle className="font-normal">
-						<Trans>Extra GB-hours</Trans>
+						<Trans>Bought credits</Trans>
 					</ItemTitle>
 				</ItemContent>
 				<ItemActions>
@@ -115,7 +115,7 @@ export function GbHourPurchase({
 					<ItemTitle className="font-normal">
 						<Trans>Auto top-up</Trans>
 					</ItemTitle>
-					<ItemDescription>
+					<ItemDescription className="line-clamp-none">
 						{topup.enabled ? (
 							<Trans>
 								When fewer than {topupThreshold} GB-hours remain, add{" "}

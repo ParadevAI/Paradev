@@ -3906,9 +3906,6 @@ msgstr "Botones, alternadores y elementos de teclado"
 msgid "Buy"
 msgstr "Comprar"
 
-msgid "Buy extra GB-hours"
-msgstr "Comprar GB-horas adicionales"
-
 msgid "Buy for {total}"
 msgstr "Comprar por {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Navegador externo"
 
 msgid "extra ${used} of ${limit}"
 msgstr "extra: ${used} de ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "GB-horas extra"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-horas adicionales, compradas según se necesiten"

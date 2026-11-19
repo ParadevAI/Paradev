@@ -3906,9 +3906,6 @@ msgstr "버튼, 토글, 키보드 어포던스"
 msgid "Buy"
 msgstr "구매"
 
-msgid "Buy extra GB-hours"
-msgstr "추가 GB 시간 구매"
-
 msgid "Buy for {total}"
 msgstr "{total}에 구매"
 
@@ -8341,9 +8338,6 @@ msgstr "외부 브라우저"
 
 msgid "extra ${used} of ${limit}"
 msgstr "${limit} 중 추가 ${used}"
-
-msgid "Extra GB-hours"
-msgstr "추가 GB 시간"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "필요할 때 구매하는 추가 GB 시간"

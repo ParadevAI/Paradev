@@ -10,8 +10,9 @@ export function CloudUsageStoppingBanner() {
 	const { t } = useLingui();
 	const { activePlan } = useCurrentPlan();
 	const { data: catalog } = usePlanCatalog();
+	if (!catalog || !activePlan) return null;
 	const canBuy = offersGbHourPack(
-		catalog?.find((family) => family.family === activePlan?.planTier),
+		catalog.find((family) => family.family === activePlan.planTier),
 	);
 
 	return (

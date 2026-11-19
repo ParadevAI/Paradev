@@ -3906,9 +3906,6 @@ msgstr "Tlačítka, přepínače a klávesové prvky"
 msgid "Buy"
 msgstr "Koupit"
 
-msgid "Buy extra GB-hours"
-msgstr "Koupit další GB-hodiny"
-
 msgid "Buy for {total}"
 msgstr "Koupit za {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Externí prohlížeč"
 
 msgid "extra ${used} of ${limit}"
 msgstr "navíc {used} $ z {limit} $"
-
-msgid "Extra GB-hours"
-msgstr "Další GB-hodiny"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Další GB-hodiny, kupované podle potřeby"

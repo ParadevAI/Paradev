@@ -3906,9 +3906,6 @@ msgstr "Pulsanti, interruttori e affordance da tastiera"
 msgid "Buy"
 msgstr "Acquista"
 
-msgid "Buy extra GB-hours"
-msgstr "Acquista GB-ore extra"
-
 msgid "Buy for {total}"
 msgstr "Acquista per {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Browser esterno"
 
 msgid "extra ${used} of ${limit}"
 msgstr "extra ${used} di ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "GB-ore extra"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-ore extra, acquistate quando servono"

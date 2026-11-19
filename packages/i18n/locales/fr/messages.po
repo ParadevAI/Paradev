@@ -3906,9 +3906,6 @@ msgstr "Boutons, bascules et affordances clavier"
 msgid "Buy"
 msgstr "Acheter"
 
-msgid "Buy extra GB-hours"
-msgstr "Acheter des Go-heures supplémentaires"
-
 msgid "Buy for {total}"
 msgstr "Acheter pour {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Navigateur externe"
 
 msgid "extra ${used} of ${limit}"
 msgstr "supplément de {used} $ sur {limit} $"
-
-msgid "Extra GB-hours"
-msgstr "Go-heures supplémentaires"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Go-heures supplémentaires, achetées selon les besoins"

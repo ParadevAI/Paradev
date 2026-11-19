@@ -3906,9 +3906,6 @@ msgstr "Przyciski, przełączniki i elementy obsługi klawiatury"
 msgid "Buy"
 msgstr "Kup"
 
-msgid "Buy extra GB-hours"
-msgstr "Kup dodatkowe GB-godziny"
-
 msgid "Buy for {total}"
 msgstr "Kup za {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Zewnętrzna przeglądarka"
 
 msgid "extra ${used} of ${limit}"
 msgstr "dodatkowo ${used} z ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Dodatkowe GB-godziny"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Dodatkowe GB-godziny kupowane w razie potrzeby"

@@ -3906,9 +3906,6 @@ msgstr "Tombol, toggle, dan afordansi keyboard"
 msgid "Buy"
 msgstr "Beli"
 
-msgid "Buy extra GB-hours"
-msgstr "Beli GB-jam tambahan"
-
 msgid "Buy for {total}"
 msgstr "Beli seharga {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Browser Eksternal"
 
 msgid "extra ${used} of ${limit}"
 msgstr "tambahan ${used} dari ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "GB-jam tambahan"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-jam tambahan, dibeli sesuai kebutuhan"

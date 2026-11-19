@@ -3906,9 +3906,6 @@ msgstr "Nút, công tắc và gợi ý phím"
 msgid "Buy"
 msgstr "Mua"
 
-msgid "Buy extra GB-hours"
-msgstr "Mua thêm GB-giờ"
-
 msgid "Buy for {total}"
 msgstr "Mua với giá {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Trình duyệt ngoài"
 
 msgid "extra ${used} of ${limit}"
 msgstr "dùng thêm ${used} trên ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "GB-giờ bổ sung"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "GB-giờ bổ sung, mua khi cần"

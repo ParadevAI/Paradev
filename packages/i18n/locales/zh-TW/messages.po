@@ -3906,9 +3906,6 @@ msgstr "按鈕、切換控制項和鍵盤提示"
 msgid "Buy"
 msgstr "購買"
 
-msgid "Buy extra GB-hours"
-msgstr "購買額外 GB 小時"
-
 msgid "Buy for {total}"
 msgstr "以 {total} 購買"
 
@@ -8341,9 +8338,6 @@ msgstr "外部瀏覽器"
 
 msgid "extra ${used} of ${limit}"
 msgstr "額外用量${used}/${limit}"
-
-msgid "Extra GB-hours"
-msgstr "額外 GB 小時"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "依需求購買的額外 GB 小時"

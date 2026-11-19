@@ -3906,9 +3906,6 @@ msgstr "Buttons, toggles, and keyboard affordances"
 msgid "Buy"
 msgstr "Buy"
 
-msgid "Buy extra GB-hours"
-msgstr "Buy extra GB-hours"
-
 msgid "Buy for {total}"
 msgstr "Buy for {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "External Browser"
 
 msgid "extra ${used} of ${limit}"
 msgstr "extra ${used} of ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Extra GB-hours"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Extra GB-hours, bought as needed"

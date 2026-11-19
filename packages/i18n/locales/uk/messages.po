@@ -3900,9 +3900,6 @@ msgstr "Кнопки, перемикачі та клавіатурні підк�
 msgid "Buy"
 msgstr "Купити"
 
-msgid "Buy extra GB-hours"
-msgstr "Купити додаткові ГБ-години"
-
 msgid "Buy for {total}"
 msgstr "Купити за {total}"
 
@@ -8335,9 +8332,6 @@ msgstr "Зовнішній браузер"
 
 msgid "extra ${used} of ${limit}"
 msgstr "додатково ${used} з ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Додаткові ГБ-години"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Додаткові ГБ-години, за потреби"

@@ -3906,9 +3906,6 @@ msgstr "Düğmeler, anahtarlar ve klavye ipuçları"
 msgid "Buy"
 msgstr "Satın al"
 
-msgid "Buy extra GB-hours"
-msgstr "Ek GB-saat satın al"
-
 msgid "Buy for {total}"
 msgstr "{total} karşılığında satın al"
 
@@ -8341,9 +8338,6 @@ msgstr "Harici Tarayıcı"
 
 msgid "extra ${used} of ${limit}"
 msgstr "ek ${used}/${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Ek GB-saat"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "İhtiyaç duyuldukça satın alınan ek GB-saat"

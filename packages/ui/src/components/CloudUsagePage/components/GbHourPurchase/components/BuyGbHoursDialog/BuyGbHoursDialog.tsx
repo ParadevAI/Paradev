@@ -94,7 +94,7 @@ export function BuyGbHoursDialog({
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>
-						<Trans>Buy extra GB-hours</Trans>
+						<Trans>Buy GB-hours</Trans>
 					</DialogTitle>
 					<DialogDescription>
 						<Trans>

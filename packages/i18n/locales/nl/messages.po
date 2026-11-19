@@ -3906,9 +3906,6 @@ msgstr "Knoppen, toggles en toetsenbordaanwijzingen"
 msgid "Buy"
 msgstr "Kopen"
 
-msgid "Buy extra GB-hours"
-msgstr "Extra GB-uren kopen"
-
 msgid "Buy for {total}"
 msgstr "Kopen voor {total}"
 
@@ -8341,9 +8338,6 @@ msgstr "Externe browser"
 
 msgid "extra ${used} of ${limit}"
 msgstr "extra ${used} van ${limit}"
-
-msgid "Extra GB-hours"
-msgstr "Extra GB-uren"
 
 msgid "Extra GB-hours, bought as needed"
 msgstr "Extra GB-uren, gekocht wanneer nodig"
