@@ -91,6 +91,7 @@ import { useStoredHistory } from "./hooks/useStoredHistory";
 import { useSubagentNavigation } from "./hooks/useSubagentNavigation";
 import { useSubagentTarget } from "./hooks/useSubagentTarget";
 import { escapeBack } from "./utils/escapeBack";
+import { isSessionNotRunning } from "./utils/isSessionNotRunning";
 import { settledToolCalls } from "./utils/settledToolCalls";
 import { setupEnvironmentId } from "./utils/setupEnvironmentLink";
 import { subagentsInTurn } from "./utils/subagentsInTurn";
@@ -124,6 +125,7 @@ export function SessionView({
 	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
+	onSessionGone,
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
@@ -171,6 +173,8 @@ export function SessionView({
 	onEditMessage?: (request: ChatEditRequest) => void;
 	/** Restarts the agent and sends `prompt` once it is back. */
 	onRestartAndContinue?: (prompt: string) => Promise<boolean>;
+	/** Takes prompts the host refused because the chat's agent is gone; false leaves them to the composer. */
+	onSessionGone?: (prompts: UserContent[][]) => boolean;
 	/** Resolves false when the new chat could not be started. */
 	onStartNewChat?: () => Promise<boolean>;
 	/** Called when the user sends a message, as opposed to anything sent for them. */
@@ -233,15 +237,31 @@ export function SessionView({
 	useEffect(() => {
 		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
+		const gone = failed.filter((entry) => isSessionNotRunning(entry.lastError));
+		const handedOver =
+			gone.length > 0 &&
+			onSessionGone?.(gone.map((entry) => entry.content)) === true;
+		const restored = handedOver
+			? failed.filter((entry) => !gone.includes(entry))
+			: failed;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			restoreDraft(draftOf(entry), draftKey);
+			if (restored.includes(entry)) restoreDraft(draftOf(entry), draftKey);
 			sentDrafts.current.delete(entry.clientId);
 		}
+		if (restored.length === 0) return;
 		toast.error(
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
-	}, [outbox, discardPrompt, restoreDraft, draftOf, draftKey, t]);
+	}, [
+		outbox,
+		discardPrompt,
+		restoreDraft,
+		draftOf,
+		draftKey,
+		onSessionGone,
+		t,
+	]);
 	useEffect(() => {
 		const live = new Set(outbox.map((entry) => entry.clientId));
 		for (const clientId of sentDrafts.current.keys()) {

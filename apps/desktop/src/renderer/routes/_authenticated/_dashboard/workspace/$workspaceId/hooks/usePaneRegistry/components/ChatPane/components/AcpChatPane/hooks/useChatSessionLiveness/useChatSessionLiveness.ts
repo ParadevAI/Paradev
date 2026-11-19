@@ -90,5 +90,9 @@ export function useChatSessionLiveness({
 
 	const checking =
 		sessionId !== null && (connection.state !== "open" || !query.isSuccess);
-	return { stored: checking ? undefined : query.data, checking };
+	return {
+		stored: checking ? undefined : query.data,
+		checking,
+		checkedAt: query.dataUpdatedAt,
+	};
 }
