@@ -754,7 +754,7 @@ async function usageRows(
 async function userDayRows(
 	db: Db,
 	scope: Scope,
-	filters: CloudFleetFilters,
+	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
 	limit: number,
 	overagePerGbHour: number | null,
