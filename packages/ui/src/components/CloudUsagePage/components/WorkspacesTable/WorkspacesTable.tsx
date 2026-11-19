@@ -36,7 +36,7 @@ interface WorkspacesTableProps {
 }
 
 /** Folding, by the table's own width: owner and hours go first, then size, then GB-hours. */
-const WIDE = "hidden @2xl:table-cell";
+const WIDE = "hidden @3xl:table-cell";
 const MEDIUM = "hidden @xl:table-cell";
 const NARROW = "hidden @md:table-cell";
 
@@ -124,7 +124,7 @@ export function WorkspacesTable({
 											<Trans>Deleted workspace</Trans>
 										</span>
 									)}
-									<div className="flex min-w-0 flex-wrap gap-x-3 text-xs text-muted-foreground @2xl:hidden">
+									<div className="flex min-w-0 flex-wrap gap-x-3 text-xs text-muted-foreground @3xl:hidden">
 										{isAdmin && owner && (
 											<span className="break-words">{owner}</span>
 										)}
