@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"backfill-snapshot-expiration": "bun run src/backfill-snapshot-expiration.ts",
 		"build": "bun run src/build.ts",
 		"image": "bun run src/image.ts",
 		"pin": "bun run src/pin.ts",
