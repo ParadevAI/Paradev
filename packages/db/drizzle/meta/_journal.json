@@ -1394,6 +1394,20 @@
       "when": 1794982413384,
       "tag": "0198_cloud_workspace_boot_origin",
       "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1795113689858,
+      "tag": "0199_cloud_usage_daily",
+      "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1795113694222,
+      "tag": "0200_cloud_usage_daily_trigger",
+      "breakpoints": true
     }
   ]
 }

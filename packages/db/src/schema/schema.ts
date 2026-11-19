@@ -1235,6 +1235,25 @@ export const cloudUsageEvents = pgTable(
 export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
 export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
 
+/** Billed box_gb_minutes events per UTC day of sent_at. Written only by the trigger in drizzle/0200_cloud_usage_daily_trigger.sql. */
+export const cloudUsageDaily = pgTable(
+	"cloud_usage_daily",
+	{
+		organizationId: uuid("organization_id").notNull(),
+		day: date({ mode: "string" }).notNull(),
+		userId: uuid("user_id"),
+		vcpus: integer().notNull(),
+		gbMinutes: numeric("gb_minutes").notNull(),
+		seconds: numeric().notNull(),
+		events: integer().notNull(),
+	},
+	(table) => [
+		unique("cloud_usage_daily_key")
+			.on(table.organizationId, table.day, table.userId, table.vcpus)
+			.nullsNotDistinct(),
+	],
+);
+
 export const cloudWorkspacePullRequests = pgTable(
 	"cloud_workspace_pull_requests",
 	{
