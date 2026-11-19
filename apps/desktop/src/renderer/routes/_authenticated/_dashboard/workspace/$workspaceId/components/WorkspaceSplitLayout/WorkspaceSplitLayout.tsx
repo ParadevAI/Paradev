@@ -126,7 +126,7 @@ export function WorkspaceSplitLayout({
 						width={clamped.width}
 						onWidthChange={onWidthChange}
 						onResizingChange={onResizingChange}
-						minWidth={minWidth}
+						minWidth={Math.min(minWidth, clamped.maxWidth)}
 						maxWidth={clamped.maxWidth}
 						handleSide="left"
 						className={sidePanelClassName}

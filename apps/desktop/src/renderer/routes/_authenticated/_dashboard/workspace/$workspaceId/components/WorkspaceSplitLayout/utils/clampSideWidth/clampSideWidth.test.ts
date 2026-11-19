@@ -25,14 +25,14 @@ describe("clampSideWidth", () => {
 		});
 	});
 
-	test("the side's minimum wins when the container is too narrow for both", () => {
+	test("shares a narrow container without hiding the center", () => {
 		expect(
 			clampSideWidth({
 				width: 500,
 				minWidth: 262,
 				maxWidth: Number.POSITIVE_INFINITY,
-				containerWidth: 400,
+				containerWidth: 240,
 			}),
-		).toEqual({ width: 262, maxWidth: 262 });
+		).toEqual({ width: 120, maxWidth: 120 });
 	});
 });
