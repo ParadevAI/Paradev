@@ -7,6 +7,7 @@ import * as reap from "./reap";
 import {
 	type EnvironmentGoldens,
 	LEFTOVER_AGE_MS,
+	MUTATING_DEPS,
 	RETIRE_BATCH,
 	type RetentionDeps,
 	RUN_BUDGET_MS,
@@ -30,6 +31,7 @@ const row = (n: number, status: WaitStatus = "asleep"): WaitingWorkspace => ({
 	organizationId: "org_1",
 	providerSandboxId: `ws-box${n}`,
 	status,
+	createdAt: new Date(NOW - 90 * DAY),
 });
 
 const box = (
@@ -41,6 +43,7 @@ const box = (
 	createdAt: NOW - 60 * DAY,
 	status: "stopped",
 	mounts: [],
+	tags: {},
 	...overrides,
 });
 
@@ -100,6 +103,39 @@ const run = (deps: RetentionDeps, clock?: () => number) =>
 	reapCloudWorkspaceRetention({ now: NOW, production: true, deps, clock });
 
 describe("the cleanup job", () => {
+	test("a dry run reads everything, reaches no write or delete, and logs what it would delete", async () => {
+		const reached = () => {
+			throw new Error("a dry run reached a write or a delete");
+		};
+		const { deps, decisions } = fakeDeps({
+			listSandboxes: async () => [box("ws-orphan"), box("env-old")],
+			namedByAnyRow: async () => new Set(),
+			findPastWait: async () => [row(1)],
+			listDrives: async () => [drive("drive-orphan")],
+			listEnvironmentGoldens: async () => [
+				{ id: "e", archived: true, activeRef: "env-old", goldens: ["env-old"] },
+			],
+		});
+		const trapped = {
+			...deps,
+			...Object.fromEntries(MUTATING_DEPS.map((key) => [key, reached])),
+		} as RetentionDeps;
+		const result = await reapCloudWorkspaceRetention({
+			now: NOW,
+			production: true,
+			deps: trapped,
+			dryRun: true,
+		});
+		expect(result).toMatchObject({
+			rule1: { failed: 0 },
+			rule2: { deleted: 1, failed: 0 },
+			rule3: { boxes: { deleted: 1, failed: 0 }, drives: { deleted: 1 } },
+		});
+		const actions = new Set(decisions().map((d) => d.action));
+		expect(actions.has("delete")).toBe(false);
+		expect(actions.has("would delete")).toBe(true);
+	});
+
 	test("runs only in production", async () => {
 		let listed = false;
 		const { deps } = fakeDeps({

@@ -182,6 +182,7 @@ export interface WaitingWorkspace {
 	organizationId: string;
 	providerSandboxId: string;
 	status: WaitStatus;
+	createdAt: Date;
 }
 
 async function findPastWait(args: {
@@ -195,6 +196,7 @@ async function findPastWait(args: {
 			organizationId: cloudWorkspaces.organizationId,
 			providerSandboxId: cloudWorkspaces.providerSandboxId,
 			status: cloudWorkspaces.status,
+			createdAt: cloudWorkspaces.createdAt,
 		})
 		.from(cloudWorkspaces)
 		.where(waitOverWhere(args))
@@ -333,7 +335,7 @@ export interface RetentionDeps {
 	log: (line: string) => void;
 }
 
-const defaultDeps: RetentionDeps = {
+export const defaultRetentionDeps: RetentionDeps = {
 	boxesRunningNow,
 	listSandboxes: listProjectSandboxes,
 	listDrives: listProjectDrives,
@@ -350,6 +352,25 @@ const defaultDeps: RetentionDeps = {
 	pause: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 	log: (line) => console.log(line),
 };
+
+/** Every dependency that writes a row or deletes in Vercel; a dry run replaces each one. */
+export const MUTATING_DEPS = [
+	"retireWorkspace",
+	"tearDownBox",
+	"deleteDrive",
+	"pause",
+] as const satisfies readonly (keyof RetentionDeps)[];
+
+/** The job's reads, unchanged; its writes and deletes only recorded as if they had worked. */
+export function dryRunDeps(deps: RetentionDeps): RetentionDeps {
+	const replaced: Pick<RetentionDeps, (typeof MUTATING_DEPS)[number]> = {
+		retireWorkspace: async () => true,
+		tearDownBox: async () => {},
+		deleteDrive: async () => {},
+		pause: async () => {},
+	};
+	return { ...deps, ...replaced };
+}
 
 type Counts = {
 	kept: number;
@@ -385,7 +406,7 @@ type Decision = {
 	rule: 1 | 2 | 3;
 	kind: "workspace" | "box" | "golden" | "drive" | "agents drive";
 	name: string;
-	action: "keep" | "delete";
+	action: "keep" | "delete" | "would delete";
 	reason: string;
 };
 
@@ -399,14 +420,18 @@ type Decision = {
 export async function reapCloudWorkspaceRetention({
 	now = Date.now(),
 	production,
-	deps = defaultDeps,
+	deps: given = defaultRetentionDeps,
 	clock = Date.now,
+	dryRun = false,
 }: {
 	now?: number;
 	production: boolean;
 	deps?: RetentionDeps;
 	clock?: () => number;
+	/** Reads everything, writes and deletes nothing, and logs "would delete". */
+	dryRun?: boolean;
 }): Promise<RetentionRun> {
+	const deps = dryRun ? dryRunDeps(given) : given;
 	if (!production) {
 		deps.log("[cleanup] skipped: only production runs the cleanup job");
 		return { skipped: "not production" };
@@ -414,7 +439,13 @@ export async function reapCloudWorkspaceRetention({
 	const startedAt = clock();
 	const outOfTime = () => clock() - startedAt > RUN_BUDGET_MS;
 	const decide = (decision: Decision) =>
-		deps.log(`[cleanup] ${JSON.stringify(decision)}`);
+		deps.log(
+			`[cleanup] ${JSON.stringify(
+				dryRun && decision.action === "delete"
+					? { ...decision, action: "would delete" }
+					: decision,
+			)}`,
+		);
 	let boxes: ListedSandbox[];
 	let drives: ListedDrive[];
 	try {

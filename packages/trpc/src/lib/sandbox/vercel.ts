@@ -996,6 +996,7 @@ export interface ListedSandbox {
 	status: string;
 	/** What it mounts, running or stopped: a stopped box mounts it again on its next boot. */
 	mounts: string[];
+	tags: Record<string, string>;
 }
 
 export interface ListedDrive {
@@ -1073,6 +1074,7 @@ export function listProjectSandboxes(
 					mounts: Object.values(sandbox.mounts ?? {}).map(
 						(mount) => mount.drive,
 					),
+					tags: sandbox.tags ?? {},
 				})),
 				next: page.pagination.next,
 			};
