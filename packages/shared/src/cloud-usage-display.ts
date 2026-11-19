@@ -36,7 +36,8 @@ const sum = (amounts: Amount[]): Amount => ({
  * events, the page's own total, so the headline matches the page unless billing dropped usage
  * past a limit. Usage past the included amount is drawn from free credits, then bought ones; a
  * credit billing has drawn from and that still has some left takes all the rest, because buying a
- * pack restarts billing's count on the carried credit. With overage off nothing is shown over.
+ * pack restarts billing's count on the carried credit, or, before any recorded draw, the first
+ * credit with room does. With overage off nothing is shown over.
  */
 export function cloudUsageDisplay(
 	allowance: CloudAllowance | null,
@@ -79,15 +80,16 @@ export function cloudUsageDisplay(
 		const credit = allowance[kind];
 		return credit && credit.totalGbHours > 0 ? [{ kind, credit }] : [];
 	});
-	const lastWithAny = [...held]
-		.reverse()
-		.find(
-			({ credit }) =>
-				credit.usedGbHours > 0 && credit.totalGbHours > credit.usedGbHours,
-		);
+	const hasRoom = ({ credit }: (typeof held)[number]) =>
+		credit.totalGbHours > credit.usedGbHours;
+	const takesRest =
+		[...held]
+			.reverse()
+			.find((entry) => entry.credit.usedGbHours > 0 && hasRoom(entry)) ??
+		held.find(hasRoom);
 	const credits = held.flatMap(({ kind, credit }) => {
 		const drawn =
-			kind === lastWithAny?.kind ? rest : Math.min(rest, credit.usedGbHours);
+			kind === takesRest?.kind ? rest : Math.min(rest, credit.usedGbHours);
 		rest -= drawn;
 		const available =
 			Math.max(0, credit.totalGbHours - credit.usedGbHours) + drawn;

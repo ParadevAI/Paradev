@@ -233,6 +233,8 @@ type Step =
 	| { upgradeToUltra: true }
 	| { overage: boolean }
 	| { sandbox: Snapshot; metered: number }
+	/** Usage in the events that billing has not counted yet. */
+	| { notCounted: number }
 	| { reset: true };
 interface Expect {
 	used: number;
@@ -486,7 +488,7 @@ const SCENARIOS: {
 		],
 	},
 	{
-		name: "Limit reached, then a pack bought: the dropped usage is not taken from it",
+		name: "Limit reached, then a pack bought: the card never reads lower than the page, so the dropped usage counts against the pack",
 		plan: "team",
 		steps: [
 			[
@@ -496,9 +498,42 @@ const SCENARIOS: {
 			[
 				{ buy: 6_000 },
 				{
+					used: 72.6,
+					held: 78.6,
+					lines: ["included 72 of 72", "bought 0.6 of 6.6"],
+					mayStart: true,
+				},
+			],
+		],
+	},
+	{
+		name: "A pack with no draw counted yet takes the usage past the included amount",
+		plan: "team",
+		steps: [
+			[
+				{ buy: 6_000 },
+				{
+					used: 0,
+					held: 78,
+					lines: ["included 0 of 72", "bought 0 of 6"],
+					mayStart: true,
+				},
+			],
+			[
+				t(72_000),
+				{
 					used: 72,
 					held: 78,
 					lines: ["included 72 of 72", "bought 0 of 6"],
+					mayStart: true,
+				},
+			],
+			[
+				{ notCounted: 1_200 },
+				{
+					used: 73.2,
+					held: 79.2,
+					lines: ["included 72 of 72", "bought 1.2 of 7.2"],
 					mayStart: true,
 				},
 			],
@@ -720,6 +755,7 @@ describe("cloud usage card across billing periods", () => {
 			if ("upgradeToUltra" in step) ledger.upgrade(240_000);
 			if ("overage" in step) ledger.overage = step.overage;
 			if ("sandbox" in step) ledger.load(step.sandbox, step.metered);
+			if ("notCounted" in step) ledger.metered += step.notCounted;
 			if ("reset" in step) charged = Math.round(ledger.reset() * 100) / 100;
 			expect({
 				...ledger.card(),
