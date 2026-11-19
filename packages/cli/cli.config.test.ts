@@ -1,13 +1,9 @@
 import { expect, it } from "bun:test";
-import { resolve } from "node:path";
-import { createCommandsPlugin } from "@superset/cli-framework";
-import config from "./cli.config";
+import { buildOptions, loadConfig } from "@superset/cli-framework";
 
-it("keeps browser-only parsers out of the CLI bundle", async () => {
-	const commandsDir = resolve(import.meta.dir, config.commandsDir);
+it("keeps css-tree out of the compiled CLI", async () => {
 	const build = await Bun.build({
-		entrypoints: [`${commandsDir}/index.ts`],
-		plugins: [createCommandsPlugin({ commandsDir }), ...(config.plugins ?? [])],
+		...buildOptions(await loadConfig(import.meta.dir)),
 		target: "bun",
 		metafile: true,
 	});
