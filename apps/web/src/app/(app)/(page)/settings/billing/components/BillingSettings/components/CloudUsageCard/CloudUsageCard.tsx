@@ -59,6 +59,9 @@ export function CloudUsageCard({
 							queryClient.invalidateQueries({
 								queryKey: trpc.billing.activePlan.queryKey(),
 							}),
+							queryClient.invalidateQueries({
+								queryKey: trpc.cloud.periods.list.queryKey(),
+							}),
 						])
 					}
 				/>

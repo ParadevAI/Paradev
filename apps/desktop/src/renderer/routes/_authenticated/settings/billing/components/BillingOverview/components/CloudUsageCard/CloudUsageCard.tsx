@@ -51,6 +51,7 @@ export function CloudUsageCard({
 						Promise.all([
 							utils.billing.cloudUsage.invalidate(),
 							utils.billing.activePlan.invalidate(),
+							utils.cloud.periods.list.invalidate(),
 						])
 					}
 				/>
