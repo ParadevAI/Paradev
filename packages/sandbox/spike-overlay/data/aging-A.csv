@@ -1,0 +1,5 @@
+layout,iteration,device_written_gb,layer_used_gb,iteration_s
+A,0,0,36.76,0
+A,1,10.2,36.76,51
+A,2,20.4,36.76,52
+A,3,30.6,36.76,52

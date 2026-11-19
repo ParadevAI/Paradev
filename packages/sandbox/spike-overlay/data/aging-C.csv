@@ -1,0 +1,6 @@
+layout,iteration,device_written_gb,layer_used_gb,iteration_s
+C,0,0,29.37,0
+C,1,9.4,29.37,44
+C,2,19.0,29.37,42
+C,3,28.5,29.37,41
+C,4,37.9,29.37,41

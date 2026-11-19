@@ -1,0 +1,3 @@
+device,write_MBps,read_MBps,fsync_4k_per_s
+/dev/vdb,4.0GB/s,4.2GB/s,41449
+/dev/vdc,3.8GB/s,4.3GB/s,32885

@@ -1,0 +1,25 @@
+written
+STOP 11 {"stopMs":5266,"status":"stopped","snapshot":null,"snapshotSize":null}
+DETACH 11 {"detachedAfterMs":148}
+WAKE 11 {"name":"ovl-spike-b2","mode":"wake","provider.get":167,"first.command":1491,"prototype.installed":2190,"boot.started":2534,"host.answers":4771,"terminal.created":5791,"rootfs":1,"terminal.first.output":7292}
+CHECK 11 RESULT ok=10 bad=0 
+written
+STOP 12 {"stopMs":5257,"status":"stopped","snapshot":null,"snapshotSize":null}
+DETACH 12 {"detachedAfterMs":281}
+WAKE 12 {"name":"ovl-spike-b2","mode":"wake","provider.get":171,"first.command":1315,"prototype.installed":2050,"boot.started":2338,"host.answers":4078,"terminal.created":4785,"rootfs":1,"terminal.first.output":6020}
+CHECK 12 RESULT ok=10 bad=0 
+written
+STOP 13 {"stopMs":5304,"status":"stopped","snapshot":null,"snapshotSize":null}
+DETACH 13 {"detachedAfterMs":136}
+WAKE 13 {"name":"ovl-spike-b2","mode":"wake","provider.get":300,"first.command":1549,"prototype.installed":2239,"boot.started":2538,"host.answers":4550,"terminal.created":5292,"rootfs":1,"terminal.first.output":6606}
+CHECK 13 RESULT ok=10 bad=0 
+written
+STOP 14 {"stopMs":5270,"status":"stopped","snapshot":null,"snapshotSize":null}
+DETACH 14 {"detachedAfterMs":136}
+WAKE 14 {"name":"ovl-spike-b2","mode":"wake","provider.get":158,"first.command":4544,"prototype.installed":5235,"boot.started":5517,"host.answers":7385,"terminal.created":8124,"rootfs":1,"terminal.first.output":9461}
+CHECK 14 RESULT ok=10 bad=0 
+written
+STOP 15 {"stopMs":5281,"status":"stopped","snapshot":null,"snapshotSize":null}
+DETACH 15 {"detachedAfterMs":155}
+WAKE 15 {"name":"ovl-spike-b2","mode":"wake","provider.get":164,"first.command":5385,"prototype.installed":6055,"boot.started":6346,"host.answers":8370,"terminal.created":9014,"rootfs":1,"terminal.first.output":10362}
+CHECK 15 RESULT ok=10 bad=0 

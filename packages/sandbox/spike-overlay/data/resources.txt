@@ -1,0 +1,9 @@
+All in Vercel project "sandboxes" (prj_mvHI…), region sfo1, named ovl-spike-*. All deleted on 2026-11-19; checked against the snapshot inventory afterwards.
+Nothing in Neon, GitHub or any other Vercel resource was created, changed or deleted. Production database: read-only queries only.
+
+Boxes (19): ovl-spike-b1 b2 b3 b4 f1 f3 x1 g2 la la2 la3 lb lb2 lb3 gb gb2 pa pb pc
+  (ovl-spike-f2 was never created: Vercel refused it with 409 drive_attached)
+Drives (12): ovl-spike-d1 d2 d3 d4 dx dgb dgb2 dlb dlb2 dlb3 dpb dpc
+Snapshots made by those boxes (24, each deleted or evicted):
+snap_2vJAyhjq7AXrwQEYSjbs0DtgUnFI snap_5TFPNHv3rIDH9ajaxnJjfc1t7rpY snap_9WSPs8ysXDxuwLrEKJZAFWsbd65T snap_9y1i5NpVQcMVbfqfdJYyHJrj7Jj7 snap_FLbQsLF0CDA2GO2znoY7OPYQzGlD snap_JhuViSjmMyU5RlUz9Tzu5HzSpsby snap_Ke0O60w3X9J4udpb6Ge9MRf5Ykih snap_MQkg1HxADR3uV1tlWn0QEDMmAIrG snap_QH2RGAYTMbrvUpjWju6TxRntJsZN snap_Ru3RCxdhahTq9wsk4ARmd6SD6uOX snap_SL2fMZfBzF91K4PfE9zQJmch9XtD snap_YHdmIEtSwfVGRuvCWheZPuCcDEvR snap_bAOrnFMKn6NvQdQWScSwWZJkFJAp snap_cAKJ5qoVEv1PJUJM8otAhxIbxw6K snap_dL8EI9cFJNhwbFzXq9cpzE07deol snap_daCnqLTk7kX8PoQ0CLgc6L7ryrdh snap_hhya6ZzfFp3XqoYJ5eT6kWU4Uwkd snap_j6SKLs8SgpV78Jj4Ic9UBzUEENkS snap_jbHFTgjJMHXxd6PHv458GS9dVIGG snap_nVcUf8l5tmo9j6iucMJdgiwevVDN snap_sLNK3Csq1dxph6wm65G1LULLsNmn snap_ureHt18zKe3PUlZqvAR0lyxeByQ7 snap_wF0T5XrY8ijQ6K6Wqq5xRmx2LBs0 snap_wQNWr3oHCYZQRGFkVXrF4L574diL 
+Not touched: the golden env-internal-mwlwpcj7 and its snapshot snap_GOHUP7…, the agents drive agent-tools-sfo1-46b0f9720162 (mounted read-only).

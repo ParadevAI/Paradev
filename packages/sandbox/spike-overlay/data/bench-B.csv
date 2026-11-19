@@ -1,0 +1,76 @@
+layout,tool,mode,run,seconds,exit,root_kb_delta,drive_kb_delta,warnings
+B,bun,cold,1,13.38,0,4,5430544,
+B,bun,warm,1,8.67,0,0,102464,
+B,bun,cold,2,14.38,0,0,5430532,
+B,bun,warm,2,5.84,0,0,102476,
+B,bun,cold,3,13.63,0,0,5430552,
+B,bun,warm,3,6.18,0,0,102464,
+B,pnpm,cold,1,5.25,0,0,1220908,
+B,pnpm,warm,1,1.03,0,0,28216,
+B,pnpm,cold,2,2.29,0,0,765036,
+B,pnpm,warm,2,0.98,0,0,28188,
+B,pnpm,cold,3,2.06,0,0,765072,
+B,pnpm,warm,3,0.99,0,0,28184,
+B,yarn1,cold,1,37.29,0,4,3233396,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn1,warm,1,13.20,0,0,1178932,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn1,cold,2,32.35,0,0,3199236,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn1,warm,2,12.80,0,0,1178940,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn1,cold,3,33.26,0,0,3199240,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn1,warm,3,12.78,0,0,1178960,warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled in private projects. warning Workspaces can only be enabled i
+B,yarn4-nm,cold,1,22.14,0,177488,799604,➤ YN0000: · Done with warnings in 21s 229ms 
+B,yarn4-nm,warm,1,11.23,0,0,796972,➤ YN0000: · Done with warnings in 10s 368ms 
+B,yarn4-nm,cold,2,20.68,0,177252,796980,➤ YN0000: · Done with warnings in 19s 712ms 
+B,yarn4-nm,warm,2,10.53,0,0,796972,➤ YN0000: · Done with warnings in 9s 691ms 
+B,yarn4-nm,cold,3,20.63,0,177228,796980,➤ YN0000: · Done with warnings in 19s 542ms 
+B,yarn4-nm,warm,3,10.39,0,0,796976,➤ YN0000: · Done with warnings in 9s 513ms 
+B,npm,cold,1,5.53,0,13720,610612,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,npm,warm,1,3.93,0,0,505344,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,npm,cold,2,5.19,0,0,610616,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,npm,warm,2,4.10,0,0,505344,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,npm,cold,3,5.32,0,0,610612,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,npm,warm,3,4.27,0,0,505344,npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options. 
+B,pip,cold,1,50.13,0,0,909640,
+B,pip,warm,1,42.08,0,0,712552,
+B,pip,cold,2,51.63,0,0,909636,
+B,pip,warm,2,45.11,0,0,712552,
+B,pip,cold,3,47.81,0,0,909636,
+B,pip,warm,3,43.43,0,0,712548,
+B,uv,cold,1,6.32,0,-4,1289696,
+B,uv,warm,1,1.85,0,0,579396,
+B,uv,cold,2,4.30,0,0,1289704,
+B,uv,warm,2,1.89,0,0,579396,
+B,uv,cold,3,4.41,0,0,1289704,
+B,uv,warm,3,1.88,0,0,579392,
+B,poetry,cold,1,5.14,0,24,225100,
+B,poetry,warm,1,2.78,0,0,135976,
+B,poetry,cold,2,4.99,0,0,217812,
+B,poetry,warm,2,2.74,0,0,135976,
+B,poetry,cold,3,4.91,0,0,217812,
+B,poetry,warm,3,2.59,0,0,135976,
+B,go,cold,1,6.30,0,8292,85616,
+B,go,warm,1,6.13,0,-4,67168,
+B,go,cold,2,6.29,0,24,85336,
+B,go,warm,2,5.95,0,11752,67168,
+B,go,cold,3,6.01,0,24,85336,
+B,go,warm,3,5.91,0,-4,67168,
+B,git-status,dirty,1,1.16,0,24,0,
+B,git-checkout,far,1,1.07,0,-4,-1456,
+B,git-clone,depth1,1,6.28,0,0,433260,
+B,rg,repo,1,1.21,0,24,0,
+B,rg,all-files,1,7.74,0,0,0,
+B,typecheck,sandbox,1,7.34,0,4,5956,
+B,test,sandbox,1,6.69,0,4184,0,
+B,git-status,dirty,2,0.10,0,0,0,
+B,git-checkout,far,2,1.06,0,-4,0,
+B,git-clone,depth1,2,17.57,0,0,433260,
+B,rg,repo,2,1.15,0,24,0,
+B,rg,all-files,2,8.11,0,0,0,
+B,typecheck,sandbox,2,5.10,0,0,0,
+B,test,sandbox,2,6.55,0,408,0,
+B,git-status,dirty,3,0.13,0,0,0,
+B,git-checkout,far,3,1.01,0,-4,0,
+B,git-clone,depth1,3,6.38,0,0,433260,
+B,rg,repo,3,1.17,0,24,0,
+B,rg,all-files,3,8.06,0,0,0,
+B,typecheck,sandbox,3,5.17,0,0,0,
+B,test,sandbox,3,6.59,0,412,0,

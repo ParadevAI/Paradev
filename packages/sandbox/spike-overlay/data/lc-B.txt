@@ -1,0 +1,18 @@
+CREATE {"name":"ovl-spike-lb","mode":"create","provider.create":4682,"first.command":4972,"prototype.installed":5710,"boot.started":6129,"host.answers":7330,"terminal.created":7924,"rootfs":0,"terminal.first.output":11251}
+STOP 1 {"stopMs":13365,"status":"stopped","snapshot":"snap_wF0T5XrY8ijQ6K6Wqq5xRmx2LBs0","snapshotSize":4594357341}
+DETACH 1 {"detachedAfterMs":144}
+WAKE 1 {"name":"ovl-spike-lb","mode":"wake","provider.get":171,"first.command":3597,"prototype.installed":4325,"boot.started":4607,"host.answers":6025,"terminal.created":6478,"rootfs":0,"terminal.first.output":7759}
+STOP 2 {"stopMs":13374,"status":"stopped","snapshot":"snap_jbHFTgjJMHXxd6PHv458GS9dVIGG","snapshotSize":4594235317}
+DETACH 2 {"detachedAfterMs":164}
+WAKE 2 {"name":"ovl-spike-lb","mode":"wake","provider.get":163,"first.command":5322,"prototype.installed":6048,"boot.started":6339,"host.answers":7613,"terminal.created":8193,"rootfs":0,"terminal.first.output":9411}
+STOP 3 {"stopMs":13295,"status":"stopped","snapshot":"snap_2vJAyhjq7AXrwQEYSjbs0DtgUnFI","snapshotSize":4594280265}
+DETACH 3 {"detachedAfterMs":134}
+WAKE 3 {"name":"ovl-spike-lb","mode":"wake","provider.get":178,"first.command":4648,"prototype.installed":5360,"boot.started":5645,"host.answers":6813,"terminal.created":7435,"rootfs":0,"terminal.first.output":8814}
+STOP 4 {"stopMs":13358,"status":"stopped","snapshot":"snap_wQNWr3oHCYZQRGFkVXrF4L574diL","snapshotSize":4594281355}
+DETACH 4 {"detachedAfterMs":144}
+WAKE 4 {"name":"ovl-spike-lb","mode":"wake","provider.get":179,"first.command":4476,"prototype.installed":5224,"boot.started":5517,"host.answers":6710,"terminal.created":7272,"rootfs":0,"terminal.first.output":8528}
+STOP 5 {"stopMs":13320,"status":"stopped","snapshot":"snap_daCnqLTk7kX8PoQ0CLgc6L7ryrdh","snapshotSize":4594267361}
+DETACH 5 {"detachedAfterMs":175}
+WAKE 5 {"name":"ovl-spike-lb","mode":"wake","provider.get":179,"first.command":4963,"prototype.installed":5678,"boot.started":5988,"host.answers":6966,"terminal.created":7435,"rootfs":0,"terminal.first.output":8563}
+CREATE {"name":"ovl-spike-lb2","mode":"create","provider.create":1600,"first.command":1906,"prototype.installed":2639,"boot.started":2941,"host.answers":3990,"terminal.created":4604,"rootfs":0,"terminal.first.output":8004}
+CREATE {"name":"ovl-spike-lb3","mode":"create","provider.create":1353,"first.command":1674,"prototype.installed":2350,"boot.started":2645,"host.answers":3659,"terminal.created":4117,"rootfs":0,"terminal.first.output":6752}
