@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { generateDrizzleJson, generateMigration } from "drizzle-kit/api";
 import {
@@ -43,6 +44,7 @@ export async function seedCloudUsage() {
 	};
 	withParents(schema.cloudUsageEvents);
 	withParents(schema.members);
+	withParents(schema.cloudUsageDaily);
 	const types = Object.values(schema).filter(
 		(value) => isPgEnum(value) || isPgSchema(value),
 	);
@@ -57,6 +59,12 @@ export async function seedCloudUsage() {
 	);
 	const client = new PGlite();
 	await client.exec(ddl.join(";\n"));
+	await client.exec(
+		readFileSync(
+			new URL("../drizzle/0201_cloud_usage_daily_trigger.sql", import.meta.url),
+			"utf8",
+		),
+	);
 	const db = drizzle({ client, schema, casing: "snake_case" });
 
 	await db.insert(schema.organizations).values([
