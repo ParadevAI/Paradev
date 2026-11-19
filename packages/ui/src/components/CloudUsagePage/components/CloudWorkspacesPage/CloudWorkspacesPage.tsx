@@ -2,6 +2,7 @@
 
 import { Trans } from "@lingui/react/macro";
 import { useEffect } from "react";
+import { Empty, EmptyDescription, EmptyHeader } from "../../../ui/empty";
 import { usePeriodLabel } from "../../hooks/usePeriodLabel";
 import type {
 	CloudPages,
@@ -17,7 +18,6 @@ import { periodParam } from "../../utils/periodParam";
 import { pricedPages } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { ROWS_PER_PAGE } from "../../utils/workspacesFilters";
-import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
 import { QueryStatus } from "../QueryStatus";
 import { WorkspacesTable } from "../WorkspacesTable";
@@ -120,11 +120,15 @@ export function CloudWorkspacesPage({
 				to={to}
 			/>
 			{walking ? (
-				<Notice>
-					<Trans>
-						Loading page {loadingPage} of {targetPage}...
-					</Trans>
-				</Notice>
+				<Empty>
+					<EmptyHeader>
+						<EmptyDescription>
+							<Trans>
+								Loading page {loadingPage} of {targetPage}...
+							</Trans>
+						</EmptyDescription>
+					</EmptyHeader>
+				</Empty>
 			) : !periods.data || !workspaces.data ? (
 				<QueryStatus
 					isError={periods.isError || workspaces.isError}

@@ -8332,9 +8332,6 @@ msgstr "Дуже високий"
 msgid "Extra small"
 msgstr "Дуже малий"
 
-msgid "Extra usage"
-msgstr "Додаткове використання"
-
 msgid "Extra usage limit reached"
 msgstr "Досягнуто ліміту додаткового використання"
 
@@ -13412,9 +13409,6 @@ msgstr "Недоступно на цьому сервері"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Не прив'язано · налаштуйте в Налаштування → Посилання"
 
-msgid "Not broken down yet"
-msgstr "Ще не розбито за статтями"
-
 msgid "Not configured"
 msgstr "Не налаштовано"
 
@@ -13426,9 +13420,6 @@ msgstr "Не підключено"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Не підключено · хмарні робочі простори пушать від імені GitHub App вашої організації"
-
-msgid "Not counted by billing yet"
-msgstr "Ще не враховано в рахунку"
 
 msgid "Not demoed here"
 msgstr "Тут не демонструється"
@@ -13601,11 +13592,8 @@ msgstr "Об'єкти"
 msgid "of {0}"
 msgstr "з {0}"
 
-msgid "of {cap} included"
-msgstr "з {cap} за тарифом"
-
-msgid "of {cap} limit"
-msgstr "з ліміту {cap}"
+msgid "of {held}"
+msgstr "з {held}"
 
 msgid "of {total}"
 msgstr "з {total}"
@@ -14479,10 +14467,6 @@ msgstr "Оригінали"
 msgid "Other"
 msgstr "Інше"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Інше"
-
 msgid "Other apps"
 msgstr "Інші застосунки"
 
@@ -14554,6 +14538,9 @@ msgstr "Вивід обрізано"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "Поза цими годинами канали не надсилають вам сповіщень."
+
+msgid "over by {over}"
+msgstr "перевищено на {over}"
 
 msgid "Overflow Fade"
 msgstr "Згасання при переповненні"
@@ -17772,9 +17759,6 @@ msgstr "Шукаємо використання Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Місця, прибрані посеред розрахункового періоду, залишаються активними до {0}."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Місця, кредити й ліміт додаткового використання ще не завантажено. Вони з'являться після наступного оновлення платіжних даних."
-
 msgid "Secondary"
 msgstr "Другорядний"
 
@@ -20105,9 +20089,6 @@ msgstr "Найкращий агент зміниться.<0/>Ваш робочи
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Машина запустилася з {actual} vCPU замість {wanted}. Перезапустіть її, щоб спробувати знову."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Розбивка за тарифом зберігається лише для поточного періоду."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Тепер кнопка помітніша. Я перевірив її у вашій панелі."
 
@@ -20179,9 +20160,6 @@ msgstr "Середовище, з якого ця автоматизація за
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Розширення та його локальні дані буде видалено з цього браузера."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Ліміт додаткового використання задано відсотком від тарифу, тому його сума не показується."
 
 msgid "The factory"
 msgstr "Фабрика"
@@ -20779,9 +20757,6 @@ msgstr "Ця організація не має розрахункових пе�
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Ця організація на тарифі Free. {appName} Mobile доступний для організацій на тарифі Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Ця сторінка не може визначити, коли досягнуто ліміту використання."
 
 msgid "This page could not be loaded"
 msgstr "Не вдалося завантажити цю сторінку"
@@ -23237,9 +23212,6 @@ msgstr "Ваша організація досягла ліміту середо
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Ваші власні облікові записи. Інтеграції вашої організації дають Paradev доступ до її інструментів; якщо підключити власні, робота, яку Paradev виконує для вас, відображатиметься від вашого імені."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Лише ваше власне використання. Підсумки організації, її ліміт і використання за людьми доступні власникам і адміністраторам."
 
 msgid "Your Paradev download is starting."
 msgstr "Завантаження Paradev починається."

@@ -22,7 +22,7 @@ import type {
 import type { PricedRow } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
 import { Person } from "../Person";
-import { StatusPill } from "../StatusPill";
+import { StatusBadge } from "../StatusBadge";
 import { nameParts } from "./utils/nameParts";
 
 interface WorkspacesTableProps {
@@ -50,8 +50,7 @@ export function WorkspacesTable({
 }: WorkspacesTableProps) {
 	const { i18n } = useLingui();
 	const { formatNumber } = useFormat();
-	const { dollarsFor, formatGbHours } = useUsageFormat();
-	const dollars = dollarsFor(rows.map((row) => row.usageUsd));
+	const { dollars, formatGbHours } = useUsageFormat();
 	const head = (by: WorkspacesSort, label: ReactNode, marked = true) =>
 		sort ? (
 			<Link to={sort.to(by)} className="hover:text-foreground">
@@ -148,7 +147,7 @@ export function WorkspacesTable({
 							<TableCell>
 								{workspace && (
 									<span className="inline-flex flex-wrap items-center gap-x-2 gap-y-0.5">
-										<StatusPill status={workspace.status} />
+										<StatusBadge status={workspace.status} />
 										{workspace.status === "asleep" &&
 											workspace.lastBoot?.endReason === "usage_limit" && (
 												<span className="text-xs text-warning">

@@ -8338,9 +8338,6 @@ msgstr "Çok yüksek"
 msgid "Extra small"
 msgstr "Çok küçük"
 
-msgid "Extra usage"
-msgstr "Ek kullanım"
-
 msgid "Extra usage limit reached"
 msgstr "Ek kullanım sınırına ulaşıldı"
 
@@ -13418,9 +13415,6 @@ msgstr "Bu sunucuda kullanılamıyor"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Atanmadı · Ayarlar → Bağlantılar bölümünden yapılandırın"
 
-msgid "Not broken down yet"
-msgstr "Henüz ayrıntılandırılmadı"
-
 msgid "Not configured"
 msgstr "Yapılandırılmadı"
 
@@ -13432,9 +13426,6 @@ msgstr "Bağlı değil"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Bağlı değil · bulut çalışma alanları organizasyonunun GitHub App'i olarak push yapar"
-
-msgid "Not counted by billing yet"
-msgstr "Henüz faturalandırmaya yansımadı"
 
 msgid "Not demoed here"
 msgstr "Burada gösterilmiyor"
@@ -13607,11 +13598,8 @@ msgstr "Nesneler"
 msgid "of {0}"
 msgstr "{0} içinde"
 
-msgid "of {cap} included"
-msgstr "/ {cap} dahil"
-
-msgid "of {cap} limit"
-msgstr "/ {cap} sınır"
+msgid "of {held}"
+msgstr "/ {held}"
 
 msgid "of {total}"
 msgstr "{total} içinde"
@@ -14485,10 +14473,6 @@ msgstr "Özgünler"
 msgid "Other"
 msgstr "Diğer"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Diğer"
-
 msgid "Other apps"
 msgstr "Diğer uygulamalar"
 
@@ -14560,6 +14544,9 @@ msgstr "Çıktı kısaltıldı"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "Bu saatlerin dışında kanallar sana bildirim göndermez."
+
+msgid "over by {over}"
+msgstr "{over} aşıldı"
 
 msgid "Overflow Fade"
 msgstr "Taşma solması"
@@ -17778,9 +17765,6 @@ msgstr "Kbd kullanımları aranıyor"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Dönem ortasında kaldırılan koltuklar {0} tarihine kadar aktif kalır."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Koltuklar, krediler ve ek kullanım sınırı henüz yüklenmedi. Faturalandırma verileri bir sonraki yenilendiğinde görünürler."
-
 msgid "Secondary"
 msgstr "İkincil"
 
@@ -20111,9 +20095,6 @@ msgstr "En iyi ajan değişecek.<0/>İş akışınız değişmemeli."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Makine {wanted} yerine {actual} vCPU ile açıldı. Yeniden denemek için yeniden başlatın."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Plana göre döküm yalnızca geçerli dönem için tutulur."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Düğme artık öne çıkıyor. Bölmenizde kontrol ettim."
 
@@ -20185,9 +20166,6 @@ msgstr "Bu otomasyonun bulut çalışma alanlarını başlattığı ortam arşiv
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Uzantı ve yerel verileri bu tarayıcıdan silinir."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Ek kullanım sınırı planın bir yüzdesi olduğundan tutarı gösterilmez."
 
 msgid "The factory"
 msgstr "Fabrika"
@@ -20785,9 +20763,6 @@ msgstr "Bu kuruluşun faturalama dönemi yok. Bunun yerine bir zaman aralığı 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Bu kuruluş Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Bu sayfa kullanım sınırına ne zaman ulaşıldığını bilemez."
 
 msgid "This page could not be loaded"
 msgstr "Bu sayfa yüklenemedi"
@@ -23243,9 +23218,6 @@ msgstr "Kuruluşunuz ortam sınırına ulaştı."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Kendi hesapların. Organizasyonunun entegrasyonları Paradev'in araçlarına erişmesini sağlar; kendi hesaplarını bağladığında Paradev'in senin için yaptığı işler senin adınla görünür."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Yalnızca kendi kullanımınız. Kuruluşun toplamları, kotası ve kişiye göre kullanım sahipler ve yöneticiler içindir."
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev indirmeniz başlıyor."

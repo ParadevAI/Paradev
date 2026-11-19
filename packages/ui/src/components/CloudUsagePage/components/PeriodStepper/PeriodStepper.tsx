@@ -4,6 +4,7 @@ import { useLingui } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { Button } from "../../../ui/button";
+import { ButtonGroup, ButtonGroupText } from "../../../ui/button-group";
 import { usePeriodLabel } from "../../hooks/usePeriodLabel";
 import type { CloudPeriod, CloudUsageLink } from "../../types";
 
@@ -43,12 +44,12 @@ export function PeriodStepper({ Link, periods, period }: PeriodStepperProps) {
 	};
 
 	return (
-		<div className="flex items-center gap-1.5">
+		<ButtonGroup>
 			{step(1, t({ message: "Earlier period" }), <LuChevronLeft />)}
-			<span className="min-w-32 text-center text-sm font-semibold tabular-nums">
+			<ButtonGroupText className="min-w-32 justify-center tabular-nums">
 				{label(period)}
-			</span>
+			</ButtonGroupText>
 			{step(-1, t({ message: "Later period" }), <LuChevronRight />)}
-		</div>
+		</ButtonGroup>
 	);
 }

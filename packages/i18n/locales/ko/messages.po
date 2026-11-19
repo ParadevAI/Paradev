@@ -8338,9 +8338,6 @@ msgstr "매우 높음"
 msgid "Extra small"
 msgstr "아주 작음"
 
-msgid "Extra usage"
-msgstr "추가 사용량"
-
 msgid "Extra usage limit reached"
 msgstr "추가 사용량 한도에 도달했습니다"
 
@@ -13418,9 +13415,6 @@ msgstr "이 서버에서는 사용할 수 없습니다"
 msgid "Not bound · configure in Settings → Links"
 msgstr "지정되지 않음 · 설정 → 링크에서 구성하세요"
 
-msgid "Not broken down yet"
-msgstr "아직 세부 내역 없음"
-
 msgid "Not configured"
 msgstr "구성되지 않음"
 
@@ -13432,9 +13426,6 @@ msgstr "연결 안 됨"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "연결되지 않음 · 클라우드 워크스페이스가 조직의 GitHub App으로 푸시합니다"
-
-msgid "Not counted by billing yet"
-msgstr "아직 청구에 반영되지 않음"
 
 msgid "Not demoed here"
 msgstr "여기서는 시연하지 않음"
@@ -13607,11 +13598,8 @@ msgstr "사물"
 msgid "of {0}"
 msgstr "{0} 중"
 
-msgid "of {cap} included"
-msgstr "({cap} 포함)"
-
-msgid "of {cap} limit"
-msgstr "(한도 {cap})"
+msgid "of {held}"
+msgstr "/ {held}"
 
 msgid "of {total}"
 msgstr "{total}명 중"
@@ -14485,10 +14473,6 @@ msgstr "오리지널"
 msgid "Other"
 msgstr "기타"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "기타"
-
 msgid "Other apps"
 msgstr "다른 앱"
 
@@ -14560,6 +14544,9 @@ msgstr "출력이 잘렸습니다"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "이 시간 외에는 채널 알림을 받지 않습니다."
+
+msgid "over by {over}"
+msgstr "{over} 초과"
 
 msgid "Overflow Fade"
 msgstr "오버플로 페이드"
@@ -17778,9 +17765,6 @@ msgstr "Kbd 사용처를 검색하는 중"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "주기 중간에 제거한 좌석은 {0}까지 활성 상태로 유지됩니다."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "좌석, 크레딧, 추가 사용량 한도가 아직 로드되지 않았습니다. 다음에 결제 데이터가 새로 고쳐지면 표시됩니다."
-
 msgid "Secondary"
 msgstr "보조"
 
@@ -20111,9 +20095,6 @@ msgstr "최고의 에이전트는 바뀝니다.<0/>워크플로는 그럴 필요
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "머신이 {wanted} vCPU가 아닌 {actual} vCPU로 시작되었습니다. 다시 시작해 보세요."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "요금제별 내역은 현재 기간에만 보관됩니다."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "버튼이 이제 눈에 띕니다. 패널에서 확인했습니다."
 
@@ -20185,9 +20166,6 @@ msgstr "이 자동화가 클라우드 워크스페이스를 시작하는 환경�
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "확장 프로그램과 로컬 데이터가 이 브라우저에서 삭제됩니다."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "추가 사용량 한도는 요금제에 대한 비율이므로 금액이 표시되지 않습니다."
 
 msgid "The factory"
 msgstr "공장"
@@ -20785,9 +20763,6 @@ msgstr "이 조직에는 청구 기간이 없습니다. 대신 시간 범위를 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "이 페이지에서는 사용량 한도에 도달했는지 알 수 없습니다."
 
 msgid "This page could not be loaded"
 msgstr "이 페이지를 불러올 수 없습니다"
@@ -23243,9 +23218,6 @@ msgstr "조직이 환경 한도에 도달했습니다."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "본인의 계정입니다. 조직의 통합은 Paradev가 해당 도구에 접근하게 하며, 본인 계정을 연결하면 Paradev가 대신 한 작업이 본인 이름으로 표시됩니다."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "내 사용량만 표시됩니다. 조직의 합계, 할당량, 사람별 사용량은 소유자와 관리자만 볼 수 있습니다."
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 다운로드가 시작됩니다."

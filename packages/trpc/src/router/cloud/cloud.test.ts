@@ -245,10 +245,30 @@ describe("scope", () => {
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
 	});
 
-	test("a member cannot group by person", async () => {
+	test.each([
+		"user",
+		"userDay",
+	] as const)("a member cannot group by person (%s)", async (groupBy) => {
 		await expect(
-			caller(SAM).usage.query({ range: NOVEMBER, groupBy: "user" }),
+			caller(SAM).usage.query({ range: NOVEMBER, groupBy }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
+	});
+
+	test("a member opening another person's workspace by id gets nothing of it", async () => {
+		const member = caller(SAM);
+		const usage = await member.usage.query({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+			groupBy: "workspace",
+			limit: 1,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+		const boots = await member.boots.list({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+		});
+		expect(boots.items).toEqual([]);
 	});
 });
 

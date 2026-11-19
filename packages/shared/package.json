@@ -24,6 +24,7 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./cloud-usage-display": "./src/cloud-usage-display.ts",
 		"./slack-links": {
 			"types": "./src/slack-links.ts",
 			"default": "./src/slack-links.ts"

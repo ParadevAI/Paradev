@@ -43,10 +43,22 @@ export const cloudUsageInputSchema = cloudListInputSchema
 		sort: z.enum(cloudUsageSortValues).optional(),
 		order: z.enum(["asc", "desc"]).optional(),
 	})
+	.extend({
+		/** Up to 1,000 rows grouped by person and day, which come as one page. */
+		limit: z.number().int().min(1).max(1000).default(25),
+	})
 	.refine(
 		({ sort, groupBy }) =>
 			(sort !== "name" && sort !== "status") || groupBy === "workspace",
 		"sort by name or status needs groupBy workspace",
+	)
+	.refine(
+		({ limit, groupBy }) => limit <= 100 || groupBy === "userDay",
+		"limit is at most 100, or 1,000 grouped by person and day",
+	)
+	.refine(
+		({ cursor, groupBy }) => !cursor || groupBy !== "userDay",
+		"grouped by person and day, usage comes as one page",
 	);
 
 const decimalSchema = z.string().regex(/^\d+(\.\d+)?$/);

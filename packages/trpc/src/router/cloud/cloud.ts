@@ -206,7 +206,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.input(cloudUsageInputSchema)
 				.output(cloudUsageOutputSchema)
 				.query(async ({ ctx, input }) => {
-					if (input.groupBy === "user" && !ctx.isAdmin) {
+					if (
+						(input.groupBy === "user" || input.groupBy === "userDay") &&
+						!ctx.isAdmin
+					) {
 						throw userError({
 							code: "FORBIDDEN",
 							message: "Only owners and admins can see usage by person.",

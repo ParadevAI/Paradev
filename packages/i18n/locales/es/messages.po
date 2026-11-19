@@ -8338,9 +8338,6 @@ msgstr "Muy alto"
 msgid "Extra small"
 msgstr "Muy pequeño"
 
-msgid "Extra usage"
-msgstr "Uso adicional"
-
 msgid "Extra usage limit reached"
 msgstr "Límite de uso adicional alcanzado"
 
@@ -13418,9 +13415,6 @@ msgstr "No disponible en este servidor"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Sin asignar · configurar en Configuración → Enlaces"
 
-msgid "Not broken down yet"
-msgstr "Aún sin desglosar"
-
 msgid "Not configured"
 msgstr "Sin configurar"
 
@@ -13432,9 +13426,6 @@ msgstr "Sin conectar"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "No conectado · los espacios de trabajo en la nube hacen push como la GitHub App de tu organización"
-
-msgid "Not counted by billing yet"
-msgstr "Aún no contabilizado en la facturación"
 
 msgid "Not demoed here"
 msgstr "No se muestra aquí"
@@ -13607,11 +13598,8 @@ msgstr "Objetos"
 msgid "of {0}"
 msgstr "de {0}"
 
-msgid "of {cap} included"
-msgstr "de {cap} incluidos"
-
-msgid "of {cap} limit"
-msgstr "de un límite de {cap}"
+msgid "of {held}"
+msgstr "de {held}"
 
 msgid "of {total}"
 msgstr "de {total}"
@@ -14485,10 +14473,6 @@ msgstr "Originales"
 msgid "Other"
 msgstr "Otros"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Otro"
-
 msgid "Other apps"
 msgstr "Otras apps"
 
@@ -14560,6 +14544,9 @@ msgstr "Salida truncada"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "Fuera de este horario, los canales no te notifican."
+
+msgid "over by {over}"
+msgstr "excedido en {over}"
 
 msgid "Overflow Fade"
 msgstr "Desvanecido por desbordamiento"
@@ -17778,9 +17765,6 @@ msgstr "Buscando usos de Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Los puestos eliminados a mitad del ciclo siguen activos hasta el {0}."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Los puestos, los créditos y el límite de uso adicional aún no se han cargado. Aparecerán la próxima vez que se actualicen los datos de facturación."
-
 msgid "Secondary"
 msgstr "Secundario"
 
@@ -20111,9 +20095,6 @@ msgstr "El mejor agente cambiará.<0/>Tu flujo de trabajo, no."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "La máquina volvió con {actual} vCPU en lugar de {wanted}. Reiníciala para intentarlo de nuevo."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "El desglose por plan solo se guarda para el periodo actual."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "El botón ahora destaca. Lo he comprobado en tu panel."
 
@@ -20185,9 +20166,6 @@ msgstr "El entorno desde el que esta automatización inicia espacios de trabajo 
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "La extensión y sus datos locales se eliminan de este navegador."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "El límite de uso adicional es un porcentaje del plan, así que su importe no se muestra."
 
 msgid "The factory"
 msgstr "La fábrica"
@@ -20785,9 +20763,6 @@ msgstr "Esta organización no tiene períodos de facturación. Elige un interval
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Esta organización tiene el plan Gratis. {appName} Mobile está disponible para organizaciones con el plan Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Esta página no puede saber cuándo se alcanza el límite de uso."
 
 msgid "This page could not be loaded"
 msgstr "No se pudo cargar esta página"
@@ -23243,9 +23218,6 @@ msgstr "Tu organización alcanzó su límite de entornos."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Tus propias cuentas. Las integraciones de tu organización permiten a Paradev acceder a sus herramientas; conectar las tuyas hace que el trabajo que Paradev hace por ti aparezca a tu nombre."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Solo tu propio uso. Los totales de la organización, su asignación y el uso por persona son para propietarios y administradores."
 
 msgid "Your Paradev download is starting."
 msgstr "Tu descarga de Paradev está comenzando."

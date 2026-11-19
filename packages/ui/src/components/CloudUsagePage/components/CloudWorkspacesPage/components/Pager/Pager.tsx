@@ -5,6 +5,11 @@ import { useFormat } from "@superset/i18n/react";
 import { LuChevronLeft, LuChevronRight, LuChevronsLeft } from "react-icons/lu";
 import { Button } from "../../../../../ui/button";
 import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+} from "../../../../../ui/pagination";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -92,35 +97,43 @@ export function Pager({
 						Page {page} of {pages}
 					</Trans>
 				</span>
-				<div className="flex gap-1">
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={index === 0}
-						onClick={() => onPage(0)}
-						aria-label={t({ message: "First page" })}
-					>
-						<LuChevronsLeft />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={index === 0}
-						onClick={() => onPage(index - 1)}
-						aria-label={t({ message: "Previous page" })}
-					>
-						<LuChevronLeft />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon-sm"
-						disabled={!canGoOn || isFetchingNextPage}
-						onClick={() => onPage(index + 1)}
-						aria-label={t({ message: "Next page" })}
-					>
-						<LuChevronRight />
-					</Button>
-				</div>
+				<Pagination className="mx-0 w-auto">
+					<PaginationContent>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={index === 0}
+								onClick={() => onPage(0)}
+								aria-label={t({ message: "First page" })}
+							>
+								<LuChevronsLeft />
+							</Button>
+						</PaginationItem>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={index === 0}
+								onClick={() => onPage(index - 1)}
+								aria-label={t({ message: "Previous page" })}
+							>
+								<LuChevronLeft />
+							</Button>
+						</PaginationItem>
+						<PaginationItem>
+							<Button
+								variant="outline"
+								size="icon-sm"
+								disabled={!canGoOn || isFetchingNextPage}
+								onClick={() => onPage(index + 1)}
+								aria-label={t({ message: "Next page" })}
+							>
+								<LuChevronRight />
+							</Button>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
 			</div>
 		</div>
 	);

@@ -8338,9 +8338,6 @@ msgstr "Velmi vysoké"
 msgid "Extra small"
 msgstr "Velmi malé"
 
-msgid "Extra usage"
-msgstr "Využití navíc"
-
 msgid "Extra usage limit reached"
 msgstr "Dosažen limit dodatečného využití"
 
@@ -13418,9 +13415,6 @@ msgstr "Na tomto serveru není k dispozici"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Nepřiřazeno · nastavte v Nastavení → Odkazy"
 
-msgid "Not broken down yet"
-msgstr "Zatím nerozepsáno"
-
 msgid "Not configured"
 msgstr "Nenastaveno"
 
@@ -13432,9 +13426,6 @@ msgstr "Nepřipojeno"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App vaší organizace"
-
-msgid "Not counted by billing yet"
-msgstr "Zatím nezapočteno ve vyúčtování"
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
@@ -13607,11 +13598,8 @@ msgstr "Předměty"
 msgid "of {0}"
 msgstr "z {0}"
 
-msgid "of {cap} included"
-msgstr "z {cap} v plánu"
-
-msgid "of {cap} limit"
-msgstr "z limitu {cap}"
+msgid "of {held}"
+msgstr "z {held}"
 
 msgid "of {total}"
 msgstr "z {total}"
@@ -14485,10 +14473,6 @@ msgstr "Originály"
 msgid "Other"
 msgstr "Ostatní"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Ostatní"
-
 msgid "Other apps"
 msgstr "Ostatní aplikace"
 
@@ -14560,6 +14544,9 @@ msgstr "Výstup zkrácen"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "Mimo tyto hodiny vás kanály neupozorňují."
+
+msgid "over by {over}"
+msgstr "překročeno o {over}"
 
 msgid "Overflow Fade"
 msgstr "Overflow Fade"
@@ -17778,9 +17765,6 @@ msgstr "Hledám použití Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Místa odebraná v průběhu období zůstanou aktivní do {0}."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Místa, kredity a limit využití navíc zatím nejsou načteny. Zobrazí se po příští aktualizaci fakturačních údajů."
-
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -20111,9 +20095,6 @@ msgstr "Nejlepší agent se změní.<0/>Vaše workflow ne."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Stroj se spustil s {actual} vCPU místo {wanted}. Restartujte ho a zkuste to znovu."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Rozpis podle plánu se uchovává jen pro aktuální období."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 
@@ -20185,9 +20166,6 @@ msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Rozšíření a jeho místní data se z tohoto prohlížeče smažou."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Limit využití navíc je procento z plánu, proto se jeho částka nezobrazuje."
 
 msgid "The factory"
 msgstr "Továrna"
@@ -20785,9 +20763,6 @@ msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Tato stránka nepozná, kdy je dosažen limit využití."
 
 msgid "This page could not be loaded"
 msgstr "Tuto stránku se nepodařilo načíst"
@@ -23243,9 +23218,6 @@ msgstr "Vaše organizace dosáhla limitu prostředí."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Pouze vaše vlastní využití. Souhrny organizace, její kvóta a využití podle osob jsou pro vlastníky a administrátory."
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."

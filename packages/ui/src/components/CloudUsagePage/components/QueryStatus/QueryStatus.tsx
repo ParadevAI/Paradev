@@ -2,7 +2,13 @@
 
 import { Trans } from "@lingui/react/macro";
 import { Button } from "../../../ui/button";
-import { Notice } from "../Notice";
+import {
+	Empty,
+	EmptyContent,
+	EmptyHeader,
+	EmptyTitle,
+} from "../../../ui/empty";
+import { Skeleton } from "../../../ui/skeleton";
 
 interface QueryStatusProps {
 	isError: boolean;
@@ -12,19 +18,25 @@ interface QueryStatusProps {
 export function QueryStatus({ isError, onRetry }: QueryStatusProps) {
 	if (!isError) {
 		return (
-			<Notice>
-				<Trans>Loading...</Trans>
-			</Notice>
+			<div className="space-y-2" aria-busy>
+				<Skeleton className="h-6 w-1/3" />
+				<Skeleton className="h-4 w-full" />
+				<Skeleton className="h-4 w-2/3" />
+			</div>
 		);
 	}
 	return (
-		<Notice>
-			<span className="flex flex-wrap items-center justify-center gap-3">
-				<Trans>Failed to load usage</Trans>
+		<Empty>
+			<EmptyHeader>
+				<EmptyTitle>
+					<Trans>Failed to load usage</Trans>
+				</EmptyTitle>
+			</EmptyHeader>
+			<EmptyContent>
 				<Button size="sm" variant="outline" onClick={onRetry}>
 					<Trans>Retry</Trans>
 				</Button>
-			</span>
-		</Notice>
+			</EmptyContent>
+		</Empty>
 	);
 }

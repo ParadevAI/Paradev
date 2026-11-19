@@ -5,6 +5,9 @@ import { useFormat } from "@superset/i18n/react";
 import { machineSpec } from "@superset/shared/billing";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import type { ReactNode } from "react";
+import { Alert, AlertDescription, AlertTitle } from "../../../ui/alert";
+import { Card } from "../../../ui/card";
+import { Empty, EmptyDescription, EmptyHeader } from "../../../ui/empty";
 import { FAILURE_REASONS } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
 import type {
@@ -19,12 +22,11 @@ import type {
 import { periodParam } from "../../utils/periodParam";
 import { pricedPages, pricedQuery } from "../../utils/priced";
 import { workspaceOf } from "../../utils/workspaceOf";
-import { Notice } from "../Notice";
 import { PageHeader } from "../PageHeader";
 import { Person } from "../Person";
 import { QueryStatus } from "../QueryStatus";
 import { Section } from "../Section";
-import { StatusPill } from "../StatusPill";
+import { StatusBadge } from "../StatusBadge";
 import { BootsTable } from "./components/BootsTable";
 
 interface CloudWorkspacePageProps {
@@ -88,12 +90,16 @@ export function CloudWorkspacePage({
 							/>
 						)
 					}
-					badge={ref && <StatusPill status={ref.status} />}
+					badge={ref && <StatusBadge status={ref.status} />}
 				/>
 				{periods.data && query.data ? (
-					<Notice>
-						<Trans>This workspace has no usage in this period.</Trans>
-					</Notice>
+					<Empty>
+						<EmptyHeader>
+							<EmptyDescription>
+								<Trans>This workspace has no usage in this period.</Trans>
+							</EmptyDescription>
+						</EmptyHeader>
+					</Empty>
 				) : (
 					<QueryStatus
 						isError={periods.isError || query.isError}
@@ -138,7 +144,7 @@ export function CloudWorkspacePage({
 					Link={Link}
 					crumbs={crumbs}
 					title={workspace.name}
-					badge={<StatusPill status={workspace.status} />}
+					badge={<StatusBadge status={workspace.status} />}
 					actions={openWorkspace?.(workspace.id)}
 				/>
 				<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
@@ -152,23 +158,25 @@ export function CloudWorkspacePage({
 				</div>
 			</div>
 			{workspace.failure && (
-				<div className="rounded-lg border border-destructive/50 px-4 py-3 text-sm">
-					<span className="font-semibold">
+				<Alert variant="destructive">
+					<AlertTitle>
 						<Trans>Could not start.</Trans>
-					</span>{" "}
-					{i18n._(FAILURE_REASONS[workspace.failure.reason])}
-				</div>
+					</AlertTitle>
+					<AlertDescription>
+						{i18n._(FAILURE_REASONS[workspace.failure.reason])}
+					</AlertDescription>
+				</Alert>
 			)}
 			<dl className="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
 				{tiles.map((tile) => (
-					<div key={tile.key} className="rounded-lg bg-muted/60 p-4">
+					<Card key={tile.key} className="gap-1 p-4">
 						<dt className="text-xs tracking-wide text-muted-foreground uppercase">
 							{tile.label}
 						</dt>
-						<dd className="mt-1 text-2xl font-semibold tabular-nums">
+						<dd className="text-2xl font-semibold tabular-nums">
 							{tile.value}
 						</dd>
-					</div>
+					</Card>
 				))}
 			</dl>
 			<Section title={<Trans>Boots</Trans>}>

@@ -111,6 +111,20 @@ describe("queryCloudUsage", () => {
 		]);
 	});
 
+	test("groups by person and day, people with the most usage first", async () => {
+		const { items, nextCursor } = await usage({ groupBy: "userDay" });
+		expect(
+			items.map((item) => [item.ref?.name, item.label, item.gbHours]),
+		).toEqual([
+			["Maya", "2026-11-10", 18],
+			["Maya", "2026-11-12", 0],
+			["Maya", "2026-11-16", 0],
+			["Sam", "2026-11-01", 16],
+			["Sam", "2026-11-17", 0],
+		]);
+		expect(nextCursor).toBeNull();
+	});
+
 	test("a workspace that failed with no boot appears with its failure", async () => {
 		const { items } = await usage({
 			groupBy: "workspace",

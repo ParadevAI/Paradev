@@ -8338,9 +8338,6 @@ msgstr "极高"
 msgid "Extra small"
 msgstr "超小"
 
-msgid "Extra usage"
-msgstr "额外用量"
-
 msgid "Extra usage limit reached"
 msgstr "已达到额外用量上限"
 
@@ -13418,9 +13415,6 @@ msgstr "此服务器不可用"
 msgid "Not bound · configure in Settings → Links"
 msgstr "未绑定 · 在设置→链接中配置"
 
-msgid "Not broken down yet"
-msgstr "尚未细分"
-
 msgid "Not configured"
 msgstr "未配置"
 
@@ -13432,9 +13426,6 @@ msgstr "未连接"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "未连接 · 云端工作区以组织的 GitHub App 身份推送"
-
-msgid "Not counted by billing yet"
-msgstr "尚未计入账单"
 
 msgid "Not demoed here"
 msgstr "此处未做演示"
@@ -13607,11 +13598,8 @@ msgstr "物品"
 msgid "of {0}"
 msgstr "共{0}人"
 
-msgid "of {cap} included"
-msgstr "（共包含 {cap}）"
-
-msgid "of {cap} limit"
-msgstr "（上限 {cap}）"
+msgid "of {held}"
+msgstr "／{held}"
 
 msgid "of {total}"
 msgstr "共{total}名"
@@ -14485,10 +14473,6 @@ msgstr "原创组件"
 msgid "Other"
 msgstr "其他"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "其他"
-
 msgid "Other apps"
 msgstr "其他应用"
 
@@ -14560,6 +14544,9 @@ msgstr "输出已截断"
 
 msgid "Outside these hours, channels do not notify you."
 msgstr "在这些时间以外，频道不会通知你。"
+
+msgid "over by {over}"
+msgstr "超出 {over}"
 
 msgid "Overflow Fade"
 msgstr "溢出渐隐"
@@ -17778,9 +17765,6 @@ msgstr "正在搜索Kbd的使用处"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "周期中途移除的席位在 {0} 前仍然有效。"
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "席位、额度和额外用量上限尚未加载。下次账单数据刷新后会显示。"
-
 msgid "Secondary"
 msgstr "次要"
 
@@ -20111,9 +20095,6 @@ msgstr "最好的智能体会变。<0/>你的工作流不该变。"
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "机器以 {actual} vCPU 启动，而不是 {wanted} vCPU。请重启后重试。"
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "按套餐的明细只保留当前周期。"
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "按钮现在更醒目了。我已在你的窗格中确认过。"
 
@@ -20185,9 +20166,6 @@ msgstr "该自动化用于启动云端工作区的环境已被归档或没有仓
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "该扩展程序及其本地数据将从此浏览器中删除。"
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "额外用量上限是套餐的一个百分比，因此不显示金额。"
 
 msgid "The factory"
 msgstr "工厂"
@@ -20785,9 +20763,6 @@ msgstr "此组织没有结算周期。请改为选择一个时间范围。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "此页面无法判断何时达到使用上限。"
 
 msgid "This page could not be loaded"
 msgstr "无法加载这个页面"
@@ -23243,9 +23218,6 @@ msgstr "您的组织已达到环境数量上限。"
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "你自己的账户。组织的集成让 Paradev 访问其工具；连接你自己的账户后，Paradev 为你完成的工作会以你的名义显示。"
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "仅显示你自己的用量。组织的总量、额度和按人员的用量仅对所有者和管理员可见。"
 
 msgid "Your Paradev download is starting."
 msgstr "Paradev 下载即将开始。"

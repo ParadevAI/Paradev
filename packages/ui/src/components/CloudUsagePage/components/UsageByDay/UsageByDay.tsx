@@ -45,7 +45,7 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 	const config = {
 		value: {
 			label: t({ message: "Usage" }),
-			color: "var(--muted-foreground)",
+			color: "var(--primary)",
 		},
 	} satisfies ChartConfig;
 	const formatDay = (day: string) =>

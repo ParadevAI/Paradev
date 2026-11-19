@@ -45,7 +45,12 @@ export { gbMinutesUsd };
 
 export type Db = PgDatabase<PgQueryResultHKT, Record<string, unknown>>;
 
-export const cloudUsageGroupByValues = ["user", "day", "workspace"] as const;
+export const cloudUsageGroupByValues = [
+	"user",
+	"day",
+	"workspace",
+	"userDay",
+] as const;
 export type CloudUsageGroupBy = (typeof cloudUsageGroupByValues)[number];
 
 export const cloudFleetGroupByValues = [
@@ -273,6 +278,12 @@ const groupKeys = {
 		event: utcDay(events.sentAt),
 		boot: utcDay(boots.startedAt),
 		failed: utcDay(workspaces.failedAt),
+	},
+	/** `user id|YYYY-MM-DD`, split again before rows are returned. */
+	userDay: {
+		event: sql`coalesce(${events.userId}::text, '') || '|' || ${utcDay(events.sentAt)}`,
+		boot: sql`coalesce(${boots.createdByUserId}::text, '') || '|' || ${utcDay(boots.startedAt)}`,
+		failed: sql`coalesce(${workspaces.createdByUserId}::text, '') || '|' || ${utcDay(workspaces.failedAt)}`,
 	},
 	workspace: {
 		event: sql`${events.cloudWorkspaceId}`,
@@ -615,6 +626,20 @@ async function usageRows(
 		};
 	}
 
+	if (groupBy === "userDay") {
+		return {
+			...(await userDayRows(
+				db,
+				scope,
+				filters,
+				window,
+				limit,
+				overagePerGbHour,
+			)),
+			total: toMetrics(await totalRow, overagePerGbHour),
+		};
+	}
+
 	const sort =
 		options.sort ??
 		(groupBy === "day" ? null : { by: "gbHours", order: "desc" });
@@ -711,6 +736,48 @@ async function usageRows(
 			rows.length > limit && last
 				? { value: last.sortValue, key: last.sortKey }
 				: null,
+	};
+}
+
+/** One page, no cursor: each person's days, people with the most usage first. */
+async function userDayRows(
+	db: Db,
+	scope: Scope,
+	filters: CloudFleetFilters,
+	window: CloudUsageWindow,
+	limit: number,
+	overagePerGbHour: number | null,
+) {
+	const facts = usageFacts(db, scope, filters, window, groupKeys.userDay);
+	const metrics = metricColumns(facts);
+	const user = sql`split_part(${facts.key}, '|', 1)`;
+	const rows = await db
+		.with(facts)
+		.select({ key: facts.key, ...metrics })
+		.from(facts)
+		.groupBy(facts.key)
+		.orderBy(
+			desc(sql`sum(sum(${facts.gbMinutes})) over (partition by ${user})`),
+			asc(user),
+			asc(facts.key),
+		)
+		.limit(limit);
+	const userOf = (key: string | null) => key?.split("|")[0] || null;
+	const refs = await refsFor(db, scope, "user", [
+		...new Set(rows.flatMap((row) => userOf(row.key) ?? [])),
+	]);
+	return {
+		items: rows.map(({ key, ...row }) => {
+			const userId = userOf(key);
+			return {
+				key: userId,
+				label: key?.split("|")[1] ?? null,
+				ref: (userId && refs.get(userId)) || null,
+				...toMetrics(row, overagePerGbHour),
+			};
+		}),
+		rowCount: rows.length,
+		nextCursor: null,
 	};
 }
 

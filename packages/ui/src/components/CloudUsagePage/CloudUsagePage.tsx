@@ -1,10 +1,11 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { PageLink } from "../PageLink";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Empty, EmptyDescription, EmptyHeader } from "../ui/empty";
 import { AllowanceCard } from "./components/AllowanceCard";
 import { MemberSummary } from "./components/MemberSummary";
-import { MoreLink } from "./components/MoreLink";
-import { Notice } from "./components/Notice";
 import { PageHeader } from "./components/PageHeader";
 import { PeriodStepper } from "./components/PeriodStepper";
 import { QueryStatus } from "./components/QueryStatus";
@@ -30,6 +31,8 @@ interface CloudUsagePageProps {
 	period: CloudPeriod | undefined;
 	byDay: CloudQuery<CloudUsage>;
 	byPerson: CloudQuery<CloudUsage>;
+	/** Each person's usage by day: `groupBy: "userDay"`. */
+	byPersonDays: CloudQuery<CloudUsage>;
 	/** The top workspaces; the Workspaces page has the rest. */
 	workspaces: CloudQuery<CloudUsage>;
 	/** The UTC day the page counts as today; the current day by default. */
@@ -43,12 +46,14 @@ export function CloudUsagePage({
 	period,
 	byDay: unpricedByDay,
 	byPerson: unpricedByPerson,
+	byPersonDays: unpricedByPersonDays,
 	workspaces: unpricedWorkspaces,
 	today = new Date().toISOString().slice(0, 10),
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
 	const byDay = pricedQuery(unpricedByDay);
 	const byPerson = pricedQuery(unpricedByPerson);
+	const byPersonDays = pricedQuery(unpricedByPersonDays);
 	const workspaces = pricedQuery(unpricedWorkspaces);
 	const allowance = period?.allowance ? priced(period.allowance) : null;
 	const unpriced = Boolean(period?.allowance) && allowance === null;
@@ -82,12 +87,14 @@ export function CloudUsagePage({
 			) : (
 				<>
 					{period?.allowance?.limitReached && !period.closed && (
-						<div className="rounded-lg border border-warning/60 px-4 py-3 text-sm">
-							<span className="font-semibold text-warning">
+						<Alert className="border-warning/50">
+							<AlertTitle className="text-warning">
 								<Trans>Usage limit reached.</Trans>
-							</span>{" "}
-							<Trans>Cloud workspaces cannot start.</Trans>
-						</div>
+							</AlertTitle>
+							<AlertDescription>
+								<Trans>Cloud workspaces cannot start.</Trans>
+							</AlertDescription>
+						</Alert>
 					)}
 					{isAdmin ? (
 						<AllowanceCard
@@ -95,9 +102,11 @@ export function CloudUsagePage({
 							period={period}
 							allowance={allowance}
 							billing={
-								<MoreLink Link={Link} to={{ view: "billing" }}>
-									<Trans>Billing</Trans>
-								</MoreLink>
+								<PageLink>
+									<Link to={{ view: "billing" }}>
+										<Trans>Billing</Trans>
+									</Link>
+								</PageLink>
 							}
 						/>
 					) : (
@@ -107,13 +116,17 @@ export function CloudUsagePage({
 						/>
 					)}
 					{!hasUsage(byDay.data.total) ? (
-						<Notice>
-							{isAdmin ? (
-								<Trans>No cloud usage in this period.</Trans>
-							) : (
-								<Trans>You have no cloud usage in this period.</Trans>
-							)}
-						</Notice>
+						<Empty>
+							<EmptyHeader>
+								<EmptyDescription>
+									{isAdmin ? (
+										<Trans>No cloud usage in this period.</Trans>
+									) : (
+										<Trans>You have no cloud usage in this period.</Trans>
+									)}
+								</EmptyDescription>
+							</EmptyHeader>
+						</Empty>
 					) : (
 						<>
 							<UsageByDay
@@ -128,7 +141,12 @@ export function CloudUsagePage({
 								}
 							/>
 							{isAdmin && (
-								<UsageByPerson Link={Link} byPerson={byPerson} period={param} />
+								<UsageByPerson
+									Link={Link}
+									byPerson={byPerson}
+									byPersonDays={byPersonDays}
+									period={param}
+								/>
 							)}
 							<Section
 								title={
@@ -139,12 +157,11 @@ export function CloudUsagePage({
 									)
 								}
 								action={
-									<MoreLink
-										Link={Link}
-										to={{ view: "workspaces", period: param }}
-									>
-										<Trans>View all</Trans>
-									</MoreLink>
+									<PageLink>
+										<Link to={{ view: "workspaces", period: param }}>
+											<Trans>All workspaces</Trans>
+										</Link>
+									</PageLink>
 								}
 							>
 								{!workspaces.data ? (

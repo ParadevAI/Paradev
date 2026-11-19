@@ -5,6 +5,8 @@ import { ROWS_PER_PAGE } from "../workspacesFilters";
 const PAGE_SIZE = 25;
 const CHART_LIMIT = 100;
 const TOP_WORKSPACES = 8;
+/** The router's most for one page of person-by-day rows. */
+const PERSON_DAYS_LIMIT = 1000;
 /** Before any cloud workspace existed. */
 const ALL_TIME_FROM = "2024-01-01T00:00:00.000Z";
 
@@ -32,6 +34,10 @@ export function cloudUsageQueries({
 		},
 		byPerson: {
 			input: { range, groupBy: "user", limit: CHART_LIMIT } as const,
+			enabled: periodsLoaded && isAdmin,
+		},
+		byPersonDays: {
+			input: { range, groupBy: "userDay", limit: PERSON_DAYS_LIMIT } as const,
 			enabled: periodsLoaded && isAdmin,
 		},
 		topWorkspaces: {

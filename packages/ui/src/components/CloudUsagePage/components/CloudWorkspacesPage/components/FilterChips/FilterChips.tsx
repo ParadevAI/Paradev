@@ -4,7 +4,9 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { MACHINE_SIZE_NAMES } from "@superset/shared/machine-size-names";
 import type { ReactNode } from "react";
 import { LuX } from "react-icons/lu";
-import { STATUS_PILLS } from "../../../../constants";
+import { Badge } from "../../../../../ui/badge";
+import { Button } from "../../../../../ui/button";
+import { STATUS_BADGES } from "../../../../constants";
 import type {
 	CloudUsageLink,
 	CloudUsageTarget,
@@ -55,7 +57,7 @@ export function FilterChips({
 					{
 						key: "status" as const,
 						label: <Trans>Status</Trans>,
-						value: i18n._(STATUS_PILLS[filters.status].label),
+						value: i18n._(STATUS_BADGES[filters.status].label),
 					},
 				]
 			: []),
@@ -68,20 +70,18 @@ export function FilterChips({
 	return (
 		<div className="flex flex-wrap items-center gap-2 text-sm">
 			{chips.map((chip) => (
-				<span
-					key={chip.key}
-					className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1"
-				>
+				<Badge key={chip.key} variant="secondary" className="gap-1.5 pr-1">
 					<span className="text-muted-foreground">{chip.label}</span>
 					{chip.value}
-					<Link
-						to={to({ ...filters, [chip.key]: undefined })}
-						aria-label={t({ message: "Remove this filter" })}
-						className="text-muted-foreground hover:text-foreground"
-					>
-						<LuX className="size-3.5" />
-					</Link>
-				</span>
+					<Button variant="ghost" size="icon-xs" className="size-4" asChild>
+						<Link
+							to={to({ ...filters, [chip.key]: undefined })}
+							aria-label={t({ message: "Remove this filter" })}
+						>
+							<LuX />
+						</Link>
+					</Button>
+				</Badge>
 			))}
 			<Link
 				to={to({ sort: filters.sort, rows: filters.rows })}

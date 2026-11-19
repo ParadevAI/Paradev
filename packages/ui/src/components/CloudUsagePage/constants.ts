@@ -2,11 +2,11 @@ import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type { WorkspaceRef } from "./types";
 
-export type PillTone = "ok" | "warn" | "bad" | "idle";
+export type Tone = "ok" | "warn" | "bad" | "idle";
 
-export const STATUS_PILLS: Record<
+export const STATUS_BADGES: Record<
 	WorkspaceRef["status"],
-	{ label: MessageDescriptor; tone: PillTone }
+	{ label: MessageDescriptor; tone: Tone }
 > = {
 	provisioning: {
 		label: msg({ message: "Provisioning", context: "cloud workspace status" }),
