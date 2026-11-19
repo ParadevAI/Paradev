@@ -42,8 +42,6 @@ CONSTANTS
   WakeClaimFromEnv,    \* broken only: a wake's claim names the environment's drive
   WakeWritesDrive,     \* broken only: a wake writes a drive name to the row
   \* Fixes the code does not have. FALSE is the code.
-  FixCronStranded,     \* the expiry probe also takes a provisioning row whose box expired, and
-                       \* fails it (onBox) before the retire
 
   \* Bounds
   RefusalLimit,  \* DRIVE_REFUSAL_LIMIT
@@ -97,7 +95,7 @@ workVars == <<hasWork, workDrive, workBox>>
 ghostVars == <<hasWork, workDrive, workBox, doubleMount, badDel, failedTransient>>
 budgetVars == <<sessions, mfail, redeliveries, envCh, bundleCh, wakes, aborts, sweeps, fetchFails>>
 expVars == <<expD, expiries, gone, uv>>
-IdleUv == [ph |-> "idle", b |-> 0, d |-> 0, c |-> FALSE]
+IdleUv == [ph |-> "idle", b |-> 0, d |-> 0]
 
 NoBox == [ex |-> FALSE, run |-> FALSE, mount |-> 0, next |-> 0, cD |-> 0, cL |-> FALSE,
           boot |-> "none", why |-> "none", bound |-> FALSE, lay |-> FALSE, fresh |-> FALSE,
@@ -639,7 +637,7 @@ WakeDie(w) ==
 \* asleep) and finds its box gone (404) or expired (410): SandboxUnavailableError.
 UnavailRead ==
   /\ uv.ph = "idle" /\ status = "awake" /\ ~boxes[rowBox].ex
-  /\ uv' = [ph |-> "read", b |-> rowBox, d |-> rowDrive, c |-> FALSE]
+  /\ uv' = [ph |-> "read", b |-> rowBox, d |-> rowDrive]
   /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
                  budgetVars, locked, reprovs, expD, expiries, gone>>
 
@@ -647,8 +645,7 @@ UnavailRead ==
 \* asleep to failed, with no onBox; the row it was given is the caller's read.
 UnavailFail ==
   /\ uv.ph = "read"
-  /\ status' = IF status = "awake" \/ (FixCronStranded /\ uv.c /\ status = "provisioning" /\ rowBox = uv.b)
-                THEN "failed" ELSE status
+  /\ status' = IF status = "awake" THEN "failed" ELSE status
   /\ uv' = IF uv.d # 0 /\ uv.b \in gone THEN [uv EXCEPT !.ph = "failed"] ELSE IdleUv
   /\ UNCHANGED <<rowBox, rowDrive, rowLaid, epoch, graceOver, pj, wk, boxes, drives, reapQ,
                  tdQ, sweepD, envVars, ghostVars, budgetVars, locked, reprovs, expD, expiries, gone>>
@@ -667,17 +664,6 @@ UnavailRetire ==
        ELSE UNCHANGED <<rowBox, rowDrive, rowLaid, tdQ>>
   /\ UNCHANGED <<status, epoch, graceOver, pj, wk, boxes, drives, reapQ, sweepD, envVars,
                  ghostVars, budgetVars, locked, reprovs, expD, expiries, gone>>
-
-\* expireWorkspaceDrives (drive-expiry.ts), daily: a row asleep or failed that names a drive,
-\* its box stopped over 30 days ago (workspaceDriveExpiryCandidates); describeSandbox, and a
-\* 410 goes to markSandboxUnavailable with the row as read. Any other answer: nothing.
-CronRead ==
-  /\ uv.ph = "idle"
-  /\ status \in {"awake", "failed"} \cup (IF FixCronStranded THEN {"provisioning"} ELSE {})
-  /\ rowDrive # 0 /\ rowBox \in gone
-  /\ uv' = [ph |-> "read", b |-> rowBox, d |-> rowDrive, c |-> TRUE]
-  /\ UNCHANGED <<rowVars, pj, wk, boxes, drives, reapQ, tdQ, sweepD, envVars, ghostVars,
-                 budgetVars, locked, reprovs, expD, expiries, gone>>
 
 \* The function dies, or retireAndTearDown throws (caught and logged): nothing retries it.
 UnavailDie ==
@@ -858,7 +844,7 @@ Next ==
                          \/ ProvSettle(j) \/ ProvDie(j) \/ ProvDup(j)
   \/ \E w \in Wakers : WakeStart(w) \/ WakeWaitDone(w) \/ WakeResume(w) \/ WakeSettle(w)
                        \/ WakeDie(w)
-  \/ UnavailRead \/ CronRead \/ UnavailFail \/ UnavailRetire \/ UnavailDie
+  \/ UnavailRead \/ UnavailFail \/ UnavailRetire \/ UnavailDie
   \/ \E b \in Boxes : Boot1(b) \/ Boot2(b) \/ SessionEnds(b) \/ Abort(b)
   \/ \E d \in DriveIds : Detach(d) \/ SweepList(d)
   \/ SweepDelete
@@ -877,11 +863,6 @@ FairSpec == /\ Spec
             /\ WF_vars(\E j \in reapQ : ReapRun(j))
             /\ WF_vars(\E d \in DriveIds : Detach(d))
             /\ WF_vars(GraceEnds)   \* time passes
-\* And the daily expiry probe runs: it reaches every candidate, and a call it keeps
-\* retrying does not die every time.
-FairSpecCron == /\ FairSpec
-                /\ WF_vars(CronRead) /\ SF_vars(UnavailFail) /\ SF_vars(UnavailRetire)
-
 WakerSymmetry == Permutations(Wakers)
 
 Bound == sessions <= MaxSessions
@@ -934,8 +915,8 @@ Mountable(d) == rowDrive = d /\ ~(status = "archived" /\ graceOver)
 NoDeleteWhileMountable ==
   [][\A d \in DriveIds : (drives[d].ex /\ ~drives'[d].ex) => ~Mountable(d)]_vars
 
-\* Under FairSpecCron: the drive of a workspace whose snapshot expired is deleted, unless
-\* the workspace mounts it again first.
+\* Under FairSpec: the drive of a workspace whose snapshot expired is deleted, unless the
+\* workspace mounts it again first.
 ExpiredDriveDeleted ==
   \A d \in DriveIds :
     (expD = d) ~> (~drives[d].ex \/ (boxes[rowBox].run /\ boxes[rowBox].mount = d))

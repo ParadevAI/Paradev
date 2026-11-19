@@ -53,7 +53,7 @@ A pass of `./run.sh` takes about 5 minutes on 8 cores and finds, per scenario:
 | `Drive-env.cfg` | environment change with archive and unarchive | 381,744 |
 | `Drive-twoprov.cfg` | two provision jobs for one row: a delivery still queued from before an archive plus the unarchive's, or a QStash duplicate | 2,267,702 |
 | `Drive-fresh.cfg` | a fresh fork whose first fetch fails | 35,990 |
-| `Drive-expiry.cfg` | lifecycle with one snapshot expiry, the 410 path from a wake or the daily probe, and the eventual deletion under `FairSpecCron` | 4,265,568 |
+| `Drive-expiry.cfg` | lifecycle with one snapshot expiry and the 410 path, under `FairSpec` | 3,944,490 |
 
 Deeper bounds, run by hand at `1a96ee6b`, every rule, no error: `Drive-twoprov.cfg` with
 `MaxRedeliveries = 2` (a duplicate and an error in one run; 8,780,864 states),
@@ -99,58 +99,53 @@ Deeper bounds, run by hand at `1a96ee6b`, every rule, no error: `Drive-twoprov.c
   through unarchive). A golden drive is kept by `liveReferences`; the model's drives are never one.
   Harm if broken: a workspace the user can still open loses its drive.
 - **ExpiredDriveDeleted**: the drive of a workspace whose snapshot expired is eventually deleted,
-  unless the workspace mounts it again first. This assumes the cleanup is retried and the daily
-  expiry probe runs. Harm if broken: drives of workspaces nobody can resume bill storage for ever.
+  unless the workspace mounts it again first, with the cleanup retried (`FairSpec`). Harm if broken: drives of workspaces nobody can resume bill storage for ever.
 - **NoOrphanForever**: every drive that exists is owned by a row, by a queued teardown or provision,
   or else the sweep will delete it. Harm if broken: drives no one can reach bill storage for ever.
 
-## Status at head `a29d6f17`
+## Status at head `bf7543b4`
 
-The model was re-derived from the code at `a29d6f17`. That commit adds the snapshot-expiry
-cleanup and its daily probe, on a newer main whose M9 change leaves only a wake or a create able
-to resume a box. Per rule:
+The model was re-derived from the code at `5c03bd9c`, which is #9847 on a newer main, and checked again at `bf7543b4`, which only adds environment variables to `superset-boot`. On that
+main, M9 leaves only a wake or a create able to resume a box. A subagent re-checked every guard
+and action below against the code. None changed; only line numbers moved. `a29d6f17` added a
+daily expiry probe, and `5c03bd9c` dropped it: retention is to be the reaper of #9987 (every 6 h), which calls
+`retireAndTearDown`. Per rule:
 
 - **The ten earlier rules and NoDeleteWhileMountable hold at the code** (`./run.sh head`), in
   every scenario. The seven earlier scenarios find the same states as at `1a96ee6b`.
-- **ExpiredDriveDeleted fails at the code in one case**: a row left in `provisioning`. If every
-  delivery of its provision job dies after the fork (QStash retries twice, `jobs.ts:44`), the row
-  stays `provisioning`. When its box expires, the probe does not take it, because
-  `workspaceDriveExpiryCandidates` takes only `asleep` and `failed` rows
-  (`packages/db/src/workspace-drive-expiry.ts:24`), and `markSandboxUnavailable` fails only from
-  `awake` and `asleep`. The drive is then kept for ever, unless the row is a pinned automation's,
-  which `cloudDispatch.ts:269-277` fails after 10 minutes. With that case excluded, the rule holds
-  (4,217,074 states). `FixCronStranded` lets the probe take such a row and fail it (`onBox`); the
-  rule then holds (`./run.sh`).
-- **The probe closes two cases the 410 path alone left open at `592bc80e`.**
-  - A workspace that nobody opens again.
-  - A row left `failed` with its drive because the function died after `→ failed`, or the retire
-    write threw and was only logged (`wake.ts:283-286`). The probe takes `failed` rows too, and
-    `retireAndTearDown` runs on them (`wake.ts:274-287`).
+- **ExpiredDriveDeleted fails at the code.** The only trigger is a 410 seen by a wake, an agent
+  turn or an automation dispatch, and each of those reads only an `awake` or `asleep` row. The
+  plan says so ("until it ships, a drive goes only when someone opens its workspace"). Measured
+  against this code, the drive stays for ever in three cases:
+  1. **Nobody opens the workspace again.** This is the shortest trace in `./run.sh head`.
+  2. **The row was `failed` before its box expired.** A failed provision or a refusal keeps the
+     drive, and no caller reads a failed row.
+  3. **The 410 path stopped halfway.** The function died after `→ failed`
+     (`wake.ts:267-273`), or the retire write threw and was only logged (`:283-286`). The row
+     is then `failed` and still names its drive. This happens even if the user opens the
+     workspace again (checked at `592bc80e`, whose path is the same code).
 
-What ExpiredDriveDeleted assumes (`FairSpecCron`):
+  A row left in `provisioning`, whose every delivery died after the fork (QStash retries twice,
+  `jobs.ts:44`), is a fourth case, unless it is a pinned automation's
+  (`cloudDispatch.ts:269-277`). **The reaper still to come must cover all four:** take `asleep`,
+  `failed` and stranded `provisioning` rows that still name a drive, and not rely on one call
+  finishing.
+  - With `a29d6f17`'s probe (`asleep` and `failed` rows), cases 1 to 3 were closed. The rule
+    failed only for the stranded `provisioning` row. With that case excluded it held (4,217,074
+    states).
+  - The probe also had a stall: it took the oldest 25 rows a day and skipped a box that answered
+    anything but 410. A `failed` row whose box is gone (404) keeps its drive name, so 25 such rows
+    would have filled every batch for ever. A reaper that orders by age should not repeat this.
+
+What ExpiredDriveDeleted assumes (`FairSpec`):
 - a queued teardown or reap runs again until it is done;
 - a stopped box's drive detaches;
-- an archive's grace ends;
-- the daily probe reaches every candidate, and a call that it retries every day does not die every
-  time.
-
-`Drive-broken-ExpiredDriveDeleted.cfg` drops the probe's fairness, and the rule fails.
+- an archive's grace ends.
 
 The teardown gives up after 20 attempts (`teardown.ts:27`). The model gives up only while the
 drive is still attached. After an expiry the drive is detached and nothing mounts it again, so that
-give-up does not occur. Other provider errors are not modeled: the rules assume they stop within 20
+give-up does not occur. Other provider errors are not modeled: the rule assumes they stop within 20
 attempts, about 10 minutes.
-
-**Found in the code, outside a one-workspace model:**
-- **The probe's batch can stall.** It takes the oldest 25 candidates every day
-  (`DRIVE_EXPIRY_BATCH`, `drive-expiry.ts:11`) and leaves alone a box that answers anything but
-  410. A `failed` row whose box is gone (404) keeps its drive name, because the retire is only for a
-  410, so it stays a candidate for ever, and it is among the oldest. Once 25 such rows exist, no
-  other workspace is ever probed, and ExpiredDriveDeleted fails for all of them. Ordering by a
-  last-probed time, or not taking a row a probe found gone, would avoid it.
-- **The probe's schedule is not in the repo.** It lives in the Upstash console
-  (`expire-drives/route.ts`). Until it is created, ExpiredDriveDeleted fails as in the broken
-  config.
 
 ### What this guarantee covers, and what it does not
 
@@ -173,7 +168,7 @@ re-archive) is not covered. Beyond the bounds, and outside the model:
   (`.github/workflows/sandbox.yml:196-198`), dry run unless `drive_sweep_delete` is set. Until it is
   scheduled, an abandoned teardown's drive bills until someone runs it.
 - **Git in the checkout.** "Untouched golden copy" is `HEAD` at the recorded commit, a clean
-  `git status --porcelain`, and the branch absent or at that commit (`superset-boot:388-398`).
+  `git status --porcelain`, and the branch absent or at that commit (`superset-boot:390-400`).
   Files ignored by `.gitignore` do not show in that status, so a user's ignored file at a path the
   fetched base commit tracks could be overwritten by `checkout -B` on such a boot. Not modeled.
 - **A user working while the first checkout still runs.** The checkout runs in the background after
@@ -189,6 +184,7 @@ re-archive) is not covered. Beyond the bounds, and outside the model:
   without the lock (`wake.ts:153-173`), and so do the meter's cap stops (`meter.ts`). The model's
   stops are platform steps open to any box. A stop mounts nothing, so no drive rule depends on the
   lock there.
+- **The reaper is not modeled.** It is not in the code yet.
 - **Not modeled at all:** the sleep state machine (`verify-sandbox-asleep`); the agent-tools drive,
   home subtrees and Docker on the drive (swap is gone, #9924); regions; more than one workspace or
   environment; promote of the source workspace itself; the deletion of a golden drive itself; a second boot in one
@@ -197,7 +193,7 @@ re-archive) is not covered. Beyond the bounds, and outside the model:
 
 ## Coverage record
 
-Synced with commit `a29d6f17` of `superset/thin-workspace-drive-draft-c4ad5f56`. Paths are under
+Synced with commit `bf7543b4` of `superset/thin-workspace-drive-draft-c4ad5f56`. Paths are under
 `packages/trpc/src/` unless they start with `packages/`, `apps/` or `.github/`.
 
 ### The code's guards
@@ -209,7 +205,7 @@ it off, and the code that enforces it.
 | --- | --- |
 | `FailOwnOnly` | `madeAwake` is set from this execution's own `→ awake` transition (`router/cloud-workspace/provision.ts:183`, `:243`); the failure is `failCloudWorkspace` with `from: madeAwake ? ["provisioning", "awake", "asleep"] : ["provisioning"]` and `onBox` (`:381-384`), and the stop, the teardown and the failed chat moves follow only a transition it won (`:399-418`). A redelivery is a new execution (`madeAwake` false) and returns `skipped` at once if the row is not `provisioning` (`:162`). |
 | `ProvLockRetry` | a held lock throws `SandboxBusyError` (`lib/sandbox/vercel.ts:461`, `router/cloud-workspace/resume-lock.ts:30`, `:38`); the provision requeues itself with `lockRetries + 1` every 15 s, touching nothing but the boot it authorized (`provision.ts:316-337`, `apps/api/src/app/api/cloud-workspaces/provision/route.ts:21`) |
-| `FetchIfUntouched` | `state/golden-head` recorded at a fresh fork's first attempt; `untouched_golden` (`superset-boot:388-398`, `:410-418`, `:429-434`); a failed fetch on a laid-out drive keeps the checkout, never recloning; the record goes after a success |
+| `FetchIfUntouched` | `state/golden-head` recorded at a fresh fork's first attempt; `untouched_golden` (`superset-boot:390-400`, `:412-420`, `:431-436`); a failed fetch on a laid-out drive keeps the checkout, never recloning; the record goes after a success |
 | `KeepDriveWaitsOwnBox` | a `keepDrive` teardown waits only for the drive to leave its own box (`teardown.ts:58-62`) |
 | `WaitDetach` | `waitForDriveDetached` before a stopped box resumes: `vercel.ts:378-385` (provision), `:934-941` (the wake's stopped path), and `withLiveSession` (`:852-858`) |
 | `CreateWaitsDetach` | `if (drive) await waitForDriveDetached(drive)` before a create (`vercel.ts:388`) |
@@ -224,7 +220,7 @@ it off, and the code that enforces it.
 | `SweepKeepsNamed` | `orphanCandidates` keeps every named drive (`packages/sandbox/src/drive-sweep.ts:31`), and `stillOrphaned` checks again before each delete (`:78`, `:182`) |
 | `SweepRuns` | the sweep is a `workflow_dispatch` job (`.github/workflows/sandbox.yml:196-198`); nothing schedules it |
 | `ReapChecksEpoch` | `isStillArchived` (`reap.ts:32`, checked at `:88`) |
-| `FreshByLayout`, `FreshOnDrive`, `FreshClearedOnAttempt` | `state/fresh` written with the sentinel (`superset-boot:132`), read by `drive_has_work` (`:385`), removed after the first attempt (`:480-481`) |
+| `FreshByLayout`, `FreshOnDrive`, `FreshClearedOnAttempt` | `state/fresh` written with the sentinel (`superset-boot:132`), read by `drive_has_work` (`:387`), removed after the first attempt (`:482-483`) |
 | `BootRefusesMissing`, `DowngradeRefused` | `layout_drive`'s `drive.missing`; `drive.downgrade` before a re-exec (`superset-boot`) |
 | `SettleNeedsLayout`, `RefusalLimitOn` | `settleSandbox`'s `drive.layout` check; `persistentDriveRefusals` and `SandboxDriveRefusedError` (`vercel.ts`) |
 | `ProvRetriesMissing` | `SandboxDriveMissingError` after this job's own `→ awake` leaves the row asleep (`provision.ts:339-363`) |
@@ -253,7 +249,7 @@ it off, and the code that enforces it.
 | `WakeSettle` | `settleSandbox`; a refusal stops the session under the lock (`vercel.ts:1075`); terminal refusals fail the row | `vercel.test.ts` |
 | `WakeDie` | a failed wake | none for drives |
 | `SnapshotExpires` | Vercel: 30 days after the box's last use (`WORKSPACE_SNAPSHOT_EXPIRATION_MS`, `vercel.ts:59`) the box answers 410 | platform fact (below) |
-| `UnavailRead` / `CronRead` / `UnavailFail` / `UnavailRetire` / `UnavailDie` | a wake (`cloud-workspace.ts:183`), an agent turn (`router/agent/turn-host.ts:82`) or an automation dispatch (`router/automation/cloudDispatch.ts:289`) reads an `awake` or `asleep` row and gets `SandboxUnavailableError`. Or the daily probe (`expireWorkspaceDrives`, `drive-expiry.ts:19-48`) reads an `asleep` or `failed` row with a drive whose box stopped over 30 days ago, and `describeSandbox` answers 410. Then `markSandboxUnavailable` (`wake.ts:262`): `failCloudWorkspace` by id from `awake` or `asleep`, with no `onBox` (`:267-273`), and on a 410 with a drive, the retire (`:274-287`). The function can die, or the retire can throw and be logged, between them | `wake.test.ts` "a workspace whose snapshot expired …"; `drive-expiry.test.ts`; `vercel.test.ts` |
+| `UnavailRead` / `UnavailFail` / `UnavailRetire` / `UnavailDie` | a wake (`cloud-workspace.ts:183`), an agent turn (`router/agent/turn-host.ts:82`) or an automation dispatch (`router/automation/cloudDispatch.ts:289`) reads an `awake` or `asleep` row and gets `SandboxUnavailableError`. Then `markSandboxUnavailable` (`wake.ts:262`): `failCloudWorkspace` by id from `awake` or `asleep`, with no `onBox` (`:267-273`), and on a 410 with a drive, the retire (`:274-287`). The function can die, or the retire can throw and be logged, between them | `wake.test.ts` "a workspace whose snapshot expired …"; `vercel.test.ts` |
 | `Boot1` / `Boot2` | `superset-boot`: the first `layout_drive`, then `apply-rootfs`, `drive.downgrade`, the re-exec, `checkout_one` with `drive_has_work` and `untouched_golden`, `checkout()`'s removal of `state/fresh`, host-service; a fetch can fail | `packages/sandbox/src/boot-twice.ts` (the "fresh fork, …" and "drive, …" checks) |
 | `SessionEnds` / `Abort` / `Detach` | Vercel | platform facts (below) |
 | `UserWork` | the user writes under `/workspace` of a ready box | none |
@@ -309,8 +305,10 @@ Model errors found and fixed:
   `Sandbox.update` does not. A model patch from #9847's branch was reviewed and taken in part (the
   guards the code had); its narrowed `head_of` and its `MaxRedeliveries = 0` two-provision
   scenario were rejected.
-- (`a29d6f17`) A check at `592bc80e` proposed `FixRetireOnFail`: retire in the same write as
-  `→ failed`. The daily probe makes it unnecessary, and it is dropped.
+- (`5c03bd9c`) A check at `592bc80e` proposed `FixRetireOnFail` (retire in the same write as
+  `→ failed`), and one at `a29d6f17` proposed `FixCronStranded` (the probe also takes a stranded
+  `provisioning` row). Both are dropped with the probe, and their cases go to the reaper (status
+  above).
 - (`592bc80e`) A first expiry step let a box expire while a provision job of its row was still
   queued for redelivery, which QStash does within minutes; it also kept an archive in its grace
   from expiring, although archiving does not use the box. Both are fixed. `WakeUnavailable` read
@@ -336,7 +334,8 @@ report every one failing:
 | `Drive-broken-TransientIsRetried.cfg` | `ProvRetriesMissing = FALSE` | 7 states |
 | `Drive-broken-NoOrphanForever.cfg` | `SweepRuns = FALSE` | 10 states |
 | `Drive-broken-NoDeleteWhileMountable.cfg` | `RetireNames = FALSE`, `GuardAnyRow = FALSE` | 9 states |
-| `Drive-broken-ExpiredDriveDeleted.cfg` | no daily probe (`FairSpec`, not `FairSpecCron`) | 13 states |
+
+ExpiredDriveDeleted needs no broken config: it fails at the code itself (`./run.sh head`).
 
 
 Two guards in one config where the rule has two independent guards (either keeps it).
