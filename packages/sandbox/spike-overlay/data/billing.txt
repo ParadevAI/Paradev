@@ -1,1 +1,2 @@
 billing lines at 04:33 UTC: sfo1 deleted drive storage 0.0006 GB writes 9.60 GB; iad1 kept drive storage 25.33 GB writes 12.35 GB
+billing lines at 05:02 UTC (unchanged from 04:33): sfo1 deleted drive storage 0.0006319 GB $0.0000012, writes 9.596 GB $0.0422; iad1 kept drive storage 25.3286 GB $0.0416, writes 12.346 GB $0.0494
