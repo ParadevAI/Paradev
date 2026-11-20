@@ -1021,7 +1021,7 @@ export async function reconcileCloudWorkspaceUsage({
 	let failed = 0;
 	for (let i = 0; i < ids.length; i += RECONCILE_CONCURRENCY) {
 		const results = await Promise.allSettled(
-			ids.slice(i, i + RECONCILE_CONCURRENCY).map(queueSettle),
+			ids.slice(i, i + RECONCILE_CONCURRENCY).map((id) => queueSettle(id)),
 		);
 		for (const result of results) {
 			if (result.status === "rejected") {
