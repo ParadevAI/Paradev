@@ -37,15 +37,22 @@ describe("proxy", () => {
 			"codex-cli-worktrees",
 		]) {
 			const path = `/land/${slug}`;
-			expect((await run(`${path}?utm_source=test`)).rewrite).toBe(
-				`/en/en${path}?utm_source=test`,
+			const query = "?utm_source=test&utm_campaign=landing&gclid=a%2Bb";
+			expect((await run(`${path}${query}`)).rewrite).toBe(
+				`/en/en${path}${query}`,
 			);
+			expect(await run(`${path}/${query}`)).toMatchObject({
+				status: 308,
+				location: `${path}${query}`,
+			});
 			expect((await run(`/en${path}`)).location).toBe(path);
 			expect((await run(`/en/en${path}`)).location).toBe(`/en${path}`);
 			expect((await run(`/fr${path}`)).rewrite).toBeUndefined();
 		}
 		expect((await run("/land")).rewrite).toBe("/en/user/land");
+		expect((await run("/land/")).rewrite).toBe("/en/user/land/");
 		expect((await run("/land/other")).rewrite).toBe("/en/land/other");
+		expect((await run("/land/other/")).rewrite).toBe("/en/land/other/");
 	});
 
 	test("serves canonical paths without a redirect", async () => {
