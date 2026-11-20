@@ -108,7 +108,6 @@ class Ledger {
 		for (const item of this.rows)
 			if (item.kind === "seats" || item.kind === "priced") item.usage = 0;
 	}
-	/** Closes the period. */
 	reset() {
 		for (const row of this.rows)
 			if (row.kind === "seats" || row.kind === "priced") row.usage = 0;
