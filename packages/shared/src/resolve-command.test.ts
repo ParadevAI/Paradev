@@ -4,6 +4,8 @@ import {
 	mkdirSync,
 	mkdtempSync,
 	rmSync,
+	statSync,
+	symlinkSync,
 	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -88,5 +90,18 @@ describe.skipIf(process.platform === "win32")("resolveCommand", () => {
 			resolveCommand("tool-f", { env: { PATH: join(root, "f-hit") } }),
 		).toBe(hit);
 		expect(resolveCommand("tool-f", { env: {} })).toBe("tool-f");
+	});
+
+	it("follows a symlink before '..' the way the kernel does", () => {
+		const real = executable(join(dir("g-real/bin"), "tool-g"));
+		executable(join(dir("bin"), "tool-g"));
+		mkdirSync(join(root, "g-real", "sub"));
+		symlinkSync(join(root, "g-real", "sub"), join(root, "g-link"));
+
+		const resolved = resolveCommand("tool-g", {
+			env: { PATH: `${root}/g-link/../bin` },
+		});
+
+		expect(statSync(resolved).ino).toBe(statSync(real).ino);
 	});
 });

@@ -1,5 +1,5 @@
 import { accessSync, constants, statSync } from "node:fs";
-import { delimiter, isAbsolute, join } from "node:path";
+import { delimiter, isAbsolute } from "node:path";
 
 type Env = Record<string, string | undefined>;
 
@@ -18,7 +18,8 @@ function searchPath(name: string, pathValue: string): string | null {
 		// execvp resolves "" and relative entries against the child's cwd.
 		// Hand those back to it rather than guess which file it would pick.
 		if (!isAbsolute(dir)) return null;
-		const candidate = join(dir, name);
+		// Not path.join: it folds "link/.." as text, the kernel follows the link.
+		const candidate = `${dir}/${name}`;
 		if (isExecutableFile(candidate)) return candidate;
 	}
 	return null;

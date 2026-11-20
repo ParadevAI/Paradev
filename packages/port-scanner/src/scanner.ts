@@ -26,8 +26,9 @@ export interface ProcessTableEntry {
 
 /**
  * One system-wide process-table read. Each read spawns a full `ps` (or
- * `wmic` through pidtree on Windows), so a scan reads the table once and derives everything (session
- * trees, detached-process attribution) from that single snapshot.
+ * `wmic` through pidtree on Windows), so a scan reads the table once and
+ * derives everything (session trees, detached-process attribution) from that
+ * single snapshot.
  *
  * Throws when the table can't be read, so callers can keep previous state
  * instead of treating every session as exited.
