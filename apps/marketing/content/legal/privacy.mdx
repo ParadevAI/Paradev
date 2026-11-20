@@ -1,7 +1,7 @@
 ---
 title: Privacy Policy
 description: Learn how Paradev collects, uses, and protects your personal information.
-lastUpdated: 2026-11-18
+lastUpdated: 2026-11-20
 ---
 
 ## 1. Introduction
@@ -69,7 +69,7 @@ If you sign in with Google, we receive your Google account identifier, email add
 
 ### 5.2 Connecting a Google Account
 
-Connecting a Google Account is optional and separate from signing in. You connect it so that Paradev can work with your Gmail for you: to start an automation when mail arrives, and to let an AI agent read, search, organize, draft, and send mail when you ask it to.
+Connecting a Google Account is optional and separate from signing in. You connect it so that Paradev can work with your Gmail and Google Calendar for you: to start an automation when mail arrives, and to let an AI agent read, search, organize, draft, and send mail or manage calendar events when you ask it to.
 
 We request these Google API scopes, and we use each one only for the purpose listed:
 
@@ -80,7 +80,8 @@ We request these Google API scopes, and we use each one only for the purpose lis
 - `gmail.settings.basic`: read and manage the Gmail filters you ask an agent to set up.
 - `https://mail.google.com/`: Google grants some mailbox operations only under full mail access, including permanently deleting a message or a thread.
 
-Our Google consent screen also requests read-only Calendar access (`calendar.readonly`). Paradev does not read your calendar, and we will update this policy before any feature does.
+- `calendar.readonly`: list your calendars, read event details, and check availability when you ask an agent to.
+- `calendar.events`: create, update, and delete calendar events when you ask an agent to.
 
 ### 5.3 Google Data We Store
 
@@ -94,6 +95,7 @@ Our Google consent screen also requests read-only Calendar access (`calendar.rea
 
 - We use Google data only to run the features you turn on. We do not use it for any other purpose.
 - When you ask an AI agent to work with your mail, the message content and attachments it fetches are sent to our AI provider to carry out your request, and are returned to you in that conversation. Our AI providers do not use this data to train their models. Section 4 and our [Subprocessors](/subprocessors) page describe the providers we use.
+- When you ask an AI agent to work with your calendar, we send the calendar and event details it fetches to our AI provider to carry out your request and return them to you in that conversation.
 - Mail from a connected account is scoped to the person who connected it. Only that member's automations can match its messages.
 - No one at Paradev reads your Google data, except where you ask us to fix a problem, where it is needed to investigate abuse or a security incident, or where the law requires it.
 
