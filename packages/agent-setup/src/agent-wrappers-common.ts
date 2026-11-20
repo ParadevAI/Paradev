@@ -201,6 +201,11 @@ export interface BuildWrapperScriptOptions {
 	 */
 	agentId?: string;
 	beforeLaunch?: string;
+	/**
+	 * Subcommands that never host a session (`claude auth login`), so they
+	 * skip the launch report. Matched on `$1` only: later args can be prompt text.
+	 */
+	nonSessionSubcommands?: readonly string[];
 }
 
 /**
@@ -215,9 +220,20 @@ export interface BuildWrapperScriptOptions {
  * Harnesses with working native SessionStart hooks fire too; the host upsert
  * makes the duplicate harmless and lets them attach the real session id.
  */
-function buildLaunchReportBlock(): string {
+function buildLaunchReportBlock(
+	nonSessionSubcommands: readonly string[] = [],
+): string {
+	const subcommandSkip =
+		nonSessionSubcommands.length > 0
+			? `case "$1" in
+  ${nonSessionSubcommands.join("|")})
+    _superset_skip_launch_report="1"
+    ;;
+esac
+`
+			: "";
 	return `_superset_skip_launch_report=""
-for _superset_arg in "$@"; do
+${subcommandSkip}for _superset_arg in "$@"; do
   # Tokens past \`--\` are prompt text, never flags.
   [ "$_superset_arg" = "--" ] && break
   case "$_superset_arg" in
@@ -251,7 +267,7 @@ export function buildWrapperScript(
 export SUPERSET_AGENT_ID="${options.agentId}"
 export SUPERSET_AGENT_LAUNCH_ID="$$-$(date +%s)"
 
-${buildLaunchReportBlock()}fi
+${buildLaunchReportBlock(options.nonSessionSubcommands)}fi
 
 `
 		: "";

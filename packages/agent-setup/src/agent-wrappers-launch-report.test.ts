@@ -26,7 +26,10 @@ interface Scenario {
  * Builds an isolated scenario: a fake agent binary on PATH, a fake
  * notify.sh that records its payload, and a generated wrapper for it.
  */
-function setupScenario(binaryBody: string): Scenario {
+function setupScenario(
+	binaryBody: string,
+	nonSessionSubcommands?: readonly string[],
+): Scenario {
 	const root = mkdtempSync(path.join(tmpdir(), "wrapper-launch-report-"));
 	const binDir = path.join(root, "bin");
 	const supersetHome = path.join(root, "superset-home");
@@ -51,6 +54,7 @@ function setupScenario(binaryBody: string): Scenario {
 		wrapperPath,
 		buildWrapperScript("testagent", `exec "$REAL_BIN" "$@"`, {
 			agentId: "testagent",
+			nonSessionSubcommands,
 		}),
 		0o755,
 	);
@@ -91,7 +95,7 @@ function readNotifyLog(scenario: Scenario): string {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe("wrapper launch report", () => {
-	it("emits SessionStart at launch and skips help/version/fast-exit/non-Paradev runs", async () => {
+	it("emits SessionStart at launch and skips help/version/non-session/fast-exit/non-Paradev runs", async () => {
 		// The report is liveness-gated behind a real 2s delay, so run every
 		// scenario concurrently to keep the suite fast.
 		const longRun = `sleep ${(REPORT_DELAY_MS + 1200) / 1000}`;
@@ -100,6 +104,8 @@ describe("wrapper launch report", () => {
 		const helpFlag = setupScenario(longRun);
 		const afterDashDash = setupScenario(longRun);
 		const outsideSuperset = setupScenario(longRun);
+		const nonSession = setupScenario(longRun, ["auth"]);
+		const nonSessionAsPrompt = setupScenario(longRun, ["auth"]);
 
 		await Promise.all([
 			runWrapper(running, ["chat"]),
@@ -107,6 +113,8 @@ describe("wrapper launch report", () => {
 			runWrapper(helpFlag, ["--help"]),
 			// Tokens past `--` are prompt text, never flags.
 			runWrapper(afterDashDash, ["--", "--help"]),
+			runWrapper(nonSession, ["auth", "login"]),
+			runWrapper(nonSessionAsPrompt, ["fix", "auth"]),
 			runWrapper(outsideSuperset, [], {
 				SUPERSET_TERMINAL_ID: "",
 				SUPERSET_TAB_ID: "",
@@ -122,6 +130,10 @@ describe("wrapper launch report", () => {
 		expect(readNotifyLog(afterDashDash)).toContain(
 			'testagent|{"hook_event_name":"SessionStart"}',
 		);
+		expect(readNotifyLog(nonSessionAsPrompt)).toContain(
+			'testagent|{"hook_event_name":"SessionStart"}',
+		);
+		expect(readNotifyLog(nonSession)).toBe("");
 		expect(readNotifyLog(fastExit)).toBe("");
 		expect(readNotifyLog(helpFlag)).toBe("");
 		expect(readNotifyLog(outsideSuperset)).toBe("");
