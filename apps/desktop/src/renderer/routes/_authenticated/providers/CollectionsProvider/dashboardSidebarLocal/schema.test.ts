@@ -124,6 +124,36 @@ describe("healUserPreferences", () => {
 
 		expect(healed.urlLinks).toEqual(customized);
 	});
+
+	it("carries the retired pageOpenAction into the page links cmd-click tier", () => {
+		const healed = healV2UserPreferences({ pageOpenAction: "external" });
+
+		expect(healed.pageLinks).toEqual({
+			...DEFAULT_V2_USER_PREFERENCES.pageLinks,
+			meta: "external",
+		});
+	});
+
+	it("ignores the retired pageOpenAction once page links are stored", () => {
+		const stored = {
+			plain: null,
+			shift: "newTab",
+			meta: "pane",
+			metaShift: null,
+		} as const;
+		const healed = healV2UserPreferences({
+			pageOpenAction: "external",
+			pageLinks: stored,
+		});
+
+		expect(healed.pageLinks).toEqual(stored);
+	});
+
+	it("falls back to default page links for an unknown pageOpenAction", () => {
+		const healed = healV2UserPreferences({ pageOpenAction: "updated" });
+
+		expect(healed.pageLinks).toEqual(DEFAULT_V2_USER_PREFERENCES.pageLinks);
+	});
 });
 
 describe("healUserPreferences sidebarProjectSortMode", () => {
