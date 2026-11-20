@@ -6902,6 +6902,9 @@ msgstr "Day of the month"
 msgid "Day One"
 msgstr "Day One"
 
+msgid "Days are in Pacific time."
+msgstr "Days are in Pacific time."
+
 msgid "days running three agents at once"
 msgstr "days running three agents at once"
 

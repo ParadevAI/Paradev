@@ -4,6 +4,16 @@ import { cloudUsageQueries } from "./cloudUsageQueries";
 const range = { period: "2026-10-27" };
 
 describe("cloudUsageQueries", () => {
+	it("asks for usage by billing day; by person stays on UTC days", () => {
+		const queries = cloudUsageQueries({
+			range,
+			periodsLoaded: true,
+			isAdmin: true,
+		});
+		expect(queries.byDay.input.groupBy).toBe("billingDay");
+		expect(queries.byPerson.input.groupBy).toBe("user");
+	});
+
 	it("waits for periods, asks by person only for admins, and a workspace's data only for a workspace", () => {
 		const member = cloudUsageQueries({
 			range,

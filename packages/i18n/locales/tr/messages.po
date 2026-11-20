@@ -6902,6 +6902,9 @@ msgstr "Ayın günü"
 msgid "Day One"
 msgstr "Birinci gün"
 
+msgid "Days are in Pacific time."
+msgstr "Günler Pasifik saatine göredir."
+
 msgid "days running three agents at once"
 msgstr "aynı anda üç ajan çalıştırılan gün sayısı"
 

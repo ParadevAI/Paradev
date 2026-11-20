@@ -6902,6 +6902,9 @@ msgstr "Hari dalam bulan"
 msgid "Day One"
 msgstr "Hari pertama"
 
+msgid "Days are in Pacific time."
+msgstr "Hari mengikuti waktu Pasifik."
+
 msgid "days running three agents at once"
 msgstr "hari menjalankan tiga agen sekaligus"
 

@@ -19,6 +19,7 @@ import type {
 	CloudUsage,
 	CloudUsageLink,
 } from "./types";
+import { billingDate } from "./utils/billingDay";
 import { hasUsage } from "./utils/hasUsage";
 import { periodParam } from "./utils/periodParam";
 import { priced, pricedQuery } from "./utils/priced";
@@ -32,7 +33,7 @@ interface CloudUsagePageProps {
 	byPerson: CloudQuery<CloudUsage>;
 	/** The top workspaces; the Workspaces page has the rest. */
 	workspaces: CloudQuery<CloudUsage>;
-	/** The UTC day the page counts as today; the current day by default. */
+	/** The billing day (Pacific) the page counts as today; the current one by default. */
 	today?: string;
 }
 
@@ -44,7 +45,7 @@ export function CloudUsagePage({
 	byDay: unpricedByDay,
 	byPerson: unpricedByPerson,
 	workspaces: unpricedWorkspaces,
-	today = new Date().toISOString().slice(0, 10),
+	today = billingDate(new Date()),
 }: CloudUsagePageProps) {
 	const param = periodParam(periods.data?.items, period);
 	const byDay = pricedQuery(unpricedByDay);
@@ -52,6 +53,8 @@ export function CloudUsagePage({
 	const workspaces = pricedQuery(unpricedWorkspaces);
 	const allowance = period?.allowance ? priced(period.allowance) : null;
 	const unpriced = Boolean(period?.allowance) && allowance === null;
+	// By billing day there is no workspaces count; the workspaces query counts the same window.
+	const workspaceCount = workspaces.data?.total.workspaces ?? null;
 
 	return (
 		<div className="@container space-y-6">
@@ -112,10 +115,11 @@ export function CloudUsagePage({
 					) : (
 						<MemberSummary
 							total={byDay.data.total}
+							workspaces={workspaceCount}
 							isPeriod={period !== undefined}
 						/>
 					)}
-					{hasUsage(byDay.data.total) && (
+					{hasUsage({ ...byDay.data.total, workspaces: workspaceCount }) && (
 						<>
 							<UsageByDay
 								today={today}
