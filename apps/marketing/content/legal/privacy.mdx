@@ -73,7 +73,7 @@ Paradev's Gmail and Google Calendar plugins are optional. Creating a Paradev acc
 
 The Gmail plugin lets an AI agent read, search, organize, draft, send, and delete mail at your request. The Google Calendar plugin lets an agent read calendars, check availability, and create, update, or delete events at your request. Both plugins use Paradev's shared Google connection, whose authorization screen requests Gmail and Calendar permissions together.
 
-You can also connect Google to use Gmail automations. When you configure an automation, Paradev checks incoming mail against your filters and can start the automation in the background, without a new chat request for each message. The Gmail automation connection flow requests read-only mail access.
+You can also connect Google to use Gmail automations. The Gmail automation connection flow requests read-only mail access. When a Google connection grants Gmail read access, Paradev subscribes to new-mail notifications and records incoming-message metadata in the background to support automations. This can happen before you configure an automation or when no automation matches a message. Your configured filters determine which messages start automation runs; a new chat request is not required for each message.
 
 The permissions below support these optional features. The permissions requested depend on the connection flow; Google's authorization screen shows the access you are being asked to grant. We use each permission only for the purpose listed:
 
@@ -88,18 +88,20 @@ The permissions below support these optional features. The permissions requested
 
 ### 5.3 Google Data We Store
 
-- **Credentials:** The access token and refresh token for the connected account. We encrypt them with AES-256-GCM before we write them to our database, and we use them only to call the Google APIs listed in Section 5.2.
+- **Credentials:** The access token and refresh token for the connected account. We encrypt them before we write them to our database and use them to maintain the connection and call the Google APIs listed in Section 5.2.
 - **Account details:** The connected mailbox address, your Google account identifier, your Google profile name, and the scopes you granted, so we can show you which account is connected and keep the connection working.
-- **Mail metadata for automations:** When a message starts an automation, we record its subject, sender, To and Cc addresses, date, message and thread identifiers, Gmail labels, and whether it has an attachment.
+- **Mail metadata for automations:** For incoming messages processed by mailbox monitoring, we record the subject, sender, To and Cc addresses, date, message and thread identifiers, Gmail labels, and whether the message has an attachment. We record this metadata before checking whether an automation matches.
+- **Plugin results and agent history:** When an agent uses a Google plugin, retrieved message content, attachments, or calendar details can become part of tool results, conversations, agent session files, or files the agent saves. Depending on where the agent runs and the features you use, these records can reside on your machine or in our hosted workspaces and cloud chat history.
 
-**We do not store the body of your messages, and we do not store your attachments.** An agent fetches that content from Gmail when you ask it to, and it stays in your mailbox.
+Mailbox monitoring stores the metadata described above, not message bodies or attachment contents. This is separate from plugin use: content retrieved by an agent can remain in its history or saved files even after you disconnect Google.
 
 ### 5.4 How We Use and Share Google Data
 
 - We use Google data only to run the features you turn on. We do not use it for any other purpose.
-- When you use the Gmail or Google Calendar plugin with an AI agent, we send the mail, attachments, or calendar details the agent retrieves to the AI provider to carry out your request and return the results in that conversation. Our AI providers do not use this data to train their models. Section 4 and our [Subprocessors](/subprocessors) page describe the providers we use.
+- When you use the Gmail or Google Calendar plugin with an AI agent, the agent sends the mail, attachments, or calendar details it retrieves to its AI provider to carry out your request and returns the results in that conversation. Section 4 and our [Subprocessors](/subprocessors) page describe the service providers we engage.
+- If you use an agent through your own provider account or a provider endpoint you configure, that provider also processes the data under your agreement and settings with it. Review that provider's retention and model-training controls before connecting Google data to the agent. Our Limited Use commitments below continue to apply to Paradev's handling of Google data.
 - Mail from a connected account is scoped to the person who connected it. Only that member's automations can match its messages.
-- No one at Paradev reads your Google data, except where you ask us to fix a problem, where it is needed to investigate abuse or a security incident, or where the law requires it.
+- No one at Paradev reads your Google data unless you explicitly agree to our viewing specific data for support, access is necessary for security purposes such as investigating abuse, or the law requires it.
 
 ### 5.5 Limited Use
 
@@ -109,13 +111,14 @@ Paradev's use of data received from Google APIs follows the [Google API Services
 - Sell or transfer Google user data to data brokers, information resellers, or any other party that resells data.
 - Use Google user data for credit assessment, lending, or any similar decision.
 - Use Google user data to train or improve generalized or non-personalized artificial intelligence or machine learning models.
-- Transfer Google user data to anyone except as needed to provide or improve the features you use, to comply with the law, or as part of a merger or acquisition, after we give you notice and obtain your consent where that is required.
+- Transfer Google user data to anyone except with your consent to provide or improve the features you use, as necessary for security or legal compliance, or as part of a merger, acquisition, or sale of assets after obtaining your explicit prior consent.
 
 ### 5.6 Retention and Deletion of Google Data
 
-- You can disconnect a Google Account at any time, from Settings → Integrations in the desktop app or the Integrations page on the web app. When you disconnect, we revoke our access with Google, stop watching the mailbox, and delete the stored tokens.
-- You can also remove our access directly at [myaccount.google.com/permissions](https://myaccount.google.com/permissions). Our access ends immediately, and we stop receiving mail notifications.
-- The mail metadata described in Section 5.3 stays with your organization's records until the organization or your account is deleted. Sections 6 and 8 describe that. To have it deleted sooner, email [privacy@paradev.com](mailto:privacy@paradev.com).
+- You can disconnect Google in Paradev's connection settings. Disconnecting disables future access through that connection. It does not necessarily revoke the grant at Google or erase stored credentials: a disconnected plugin connection can retain encrypted tokens until its connection record is deleted. Other active connections to the same Google account can continue to operate.
+- You can revoke Paradev's grant directly in your [Google Account permissions](https://myaccount.google.com/permissions). Revocation prevents further authorized access under that grant. Google may still deliver notifications already in transit.
+- Disconnecting or revoking access does not erase Google data already included in conversations, agent session files, saved files, or automation records. Remove local copies on the machine where the agent runs. Contact [privacy@paradev.com](mailto:privacy@paradev.com) to request deletion of hosted copies and other Google data held by Paradev.
+- Mail event metadata supports filter evaluation, delivery retries, and automation history. Event intake records undergo scheduled cleanup; copies included in conversations or automation runs follow the retention of those records. Account deletion does not automatically erase all Google data in a shared organization's records. Sections 6 and 8 describe our general retention and account-deletion practices.
 
 ## 6. Data Retention
 
@@ -135,7 +138,7 @@ Depending on your location, you may have certain rights regarding your personal 
 - The right to restrict or object to certain processing
 - The right to data portability
 
-You can delete your account at any time from Settings in our mobile application, from Settings → Account → Delete account in our desktop application, or from your account settings on our website. Your account is deactivated immediately and permanently deleted after a 30-day recovery period, during which you can restore it by signing back in. After deletion, content you created in shared organizations is retained in de-identified form as part of those organizations' records. To exercise your other rights, please contact us using the information provided below.
+You can delete your account at any time from Settings in our mobile application, from Settings → Account → Delete account in our desktop application, or from your account settings on our website. Your account is deactivated immediately and permanently deleted after a 30-day recovery period, during which you can restore it by signing back in. Deleting your account removes identifying information from your account profile, but content you created in shared organizations can remain in those organizations' records and may still contain personal information. To request deletion of that information or exercise your other rights, please contact us using the information provided below.
 
 ## 9. Cookies and Tracking Technologies
 

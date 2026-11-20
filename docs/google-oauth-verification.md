@@ -21,6 +21,11 @@ and [Audience](https://console.cloud.google.com/auth/audience?project=fair-scout
 
 ## Before submission
 
+Review the [implementation and disclosure audit](google-data-review.md) first.
+It identifies unresolved consent, credential deletion, shared-organization
+retention, and provider-control questions. A complete form alone does not make
+the integration ready for approval.
+
 1. Publish the privacy-policy correction in
    `apps/marketing/content/legal/privacy.mdx`. The existing text says Paradev
    does not read calendars; the Calendar plugin reads and changes events.
@@ -81,9 +86,9 @@ behavior or a substitute for Google's review.
 
 Paradev's wording reflects its own implementation: Gmail and Calendar plugins
 share a Google connector with combined scopes; the separate Gmail automation
-connection requests read-only mail access. Configured automations can process mail
-in the background. Do not promise separate authorization per plugin or access only
-during an active chat.
+connection requests read-only mail access. Mailbox monitoring starts after a
+connection with Gmail read access, even before an automation matches. Do not
+promise separate authorization per plugin or access only during an active chat.
 
 The console's lifetime unverified-user cap cannot be reset. Saving this draft
 does not unblock new accounts; the requested restricted scopes need approval.
