@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { acpHarnessForPreset } from "@superset/chat/core";
 import { errorMessage } from "@superset/i18n/errors";
-import type { WorkspaceStore } from "@superset/panes";
+import type { CreatePaneInput, WorkspaceStore } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { useWorkspaceClient, workspaceTrpc } from "@superset/workspace-client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -43,6 +43,7 @@ export type OpenAgentChat = (
 		prompt?: string;
 		presetId?: string;
 	},
+	place?: (pane: CreatePaneInput<ChatPaneData>) => void,
 ) => Promise<{ terminalId: string } | null>;
 
 interface UseAgentSessionLauncherOptions {
@@ -68,7 +69,7 @@ export function useAgentSessionLauncher({
 	const queryClient = useQueryClient();
 
 	const openChatPane = useCallback<OpenAgentChat>(
-		async (input) => {
+		async (input, place) => {
 			const configs = await queryClient
 				.ensureQueryData(v2AgentConfigsQueryOptions(hostUrl))
 				.catch(() => agentConfigs ?? []);
@@ -95,7 +96,9 @@ export function useAgentSessionLauncher({
 					...(input.modeId ? { chatModeId: input.modeId } : {}),
 				} satisfies ChatPaneData,
 			};
-			if (input.placement === "split-pane" && state.activeTabId) {
+			if (place) {
+				place(pane);
+			} else if (input.placement === "split-pane" && state.activeTabId) {
 				state.addPane({ tabId: state.activeTabId, pane });
 			} else {
 				state.addTab({ panes: [pane] });
@@ -106,8 +109,8 @@ export function useAgentSessionLauncher({
 	);
 
 	const openAgentChat = useCallback<OpenAgentChat>(
-		async (input) =>
-			(await resolveAcpChatEnabled()) ? openChatPane(input) : null,
+		async (input, place) =>
+			(await resolveAcpChatEnabled()) ? openChatPane(input, place) : null,
 		[resolveAcpChatEnabled, openChatPane],
 	);
 
