@@ -23,6 +23,8 @@ export const SANDBOX_PATHS = {
 	/** `<hostRoot>/<sha256>/` per runtime, `current` symlink, `current.version`. */
 	hostRoot: "/opt/superset/host",
 	conf: "/etc/superset/sandbox.conf",
+	/** The environment's `config.toml`, rewritten on every create and wake; empty when it has none. */
+	environmentConfig: "/etc/superset/environment.toml",
 	contract: "/etc/superset/contract.sh",
 	state: "/var/lib/superset",
 	hostDb: "/var/lib/superset/host.db",

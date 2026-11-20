@@ -19,18 +19,17 @@ import { LuArchive, LuContainer } from "react-icons/lu";
 import { useNow } from "renderer/hooks/useNow";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
 import { ArchiveEnvironmentDialog } from "../ArchiveEnvironmentDialog";
-import { CreateEnvironmentFlow } from "../CreateEnvironmentFlow";
-import { EnvironmentPropertyRow } from "../EnvironmentPropertyRow";
-import { EnvironmentBuilds } from "./components/EnvironmentBuilds";
+import {
+	EnvironmentPropertyRow,
+	PROPERTY_ROW_CONTROL,
+} from "../EnvironmentPropertyRow";
+import { EnvironmentConfig } from "./components/EnvironmentConfig";
 import { EnvironmentHistory } from "./components/EnvironmentHistory";
 import { EnvironmentMachineSize } from "./components/EnvironmentMachineSize";
 import { EnvironmentProjectLinks } from "./components/EnvironmentProjectLinks";
 import { EnvironmentVariables } from "./components/EnvironmentVariables";
 
 type EnvironmentScope = "organization" | "personal";
-
-const ROW_CONTROL =
-	"h-10 w-full rounded-none border-0 bg-transparent px-3 shadow-none focus-visible:ring-0 dark:bg-transparent dark:hover:bg-transparent";
 
 interface EnvironmentViewProps {
 	environmentId: string;
@@ -48,7 +47,6 @@ export function EnvironmentView({
 		id: environmentId,
 	});
 	const [confirmingArchive, setConfirmingArchive] = useState(false);
-	const [editingRepositories, setEditingRepositories] = useState(false);
 
 	const update = cloudTrpc.environment.update.useMutation({
 		onSuccess: async () => {
@@ -131,7 +129,10 @@ export function EnvironmentView({
 						}
 						value={row.scope}
 					>
-						<SelectTrigger className={ROW_CONTROL} id="environment-view-scope">
+						<SelectTrigger
+							className={PROPERTY_ROW_CONTROL}
+							id="environment-view-scope"
+						>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
@@ -157,7 +158,7 @@ export function EnvironmentView({
 					label={<Trans>Machine size</Trans>}
 				>
 					<EnvironmentMachineSize
-						className={ROW_CONTROL}
+						className={PROPERTY_ROW_CONTROL}
 						disabled={update.isPending}
 						id="environment-view-machine-size"
 						machineSize={row.machineSize}
@@ -188,14 +189,6 @@ export function EnvironmentView({
 								)}
 							</span>
 						))}
-						<Button
-							className="ml-auto text-muted-foreground"
-							onClick={() => setEditingRepositories(true)}
-							size="xs"
-							variant="ghost"
-						>
-							<Trans>Edit</Trans>
-						</Button>
 					</div>
 				</EnvironmentPropertyRow>
 				<EnvironmentPropertyRow
@@ -209,27 +202,9 @@ export function EnvironmentView({
 						repositories={row.repositories}
 					/>
 				</EnvironmentPropertyRow>
-				<EnvironmentPropertyRow
-					htmlFor="environment-view-snapshot"
-					label={<Trans>Snapshot</Trans>}
-				>
-					<span
-						className="px-3 text-sm text-muted-foreground"
-						id="environment-view-snapshot"
-					>
-						{row.sourceKind === "fork" ? (
-							<Trans>
-								Checkpoint saved{" "}
-								{formatRelativeTime(new Date(row.updatedAt), now)}
-							</Trans>
-						) : (
-							<Trans>Base image · no checkpoint yet</Trans>
-						)}
-					</span>
-				</EnvironmentPropertyRow>
 			</div>
 
-			<EnvironmentBuilds environmentId={row.id} />
+			<EnvironmentConfig environment={row} />
 			<EnvironmentHistory environmentId={row.id} />
 			<EnvironmentVariables environmentId={row.id} />
 
@@ -244,16 +219,6 @@ export function EnvironmentView({
 					<Trans>Archive environment</Trans>
 				</Button>
 			</div>
-			<CreateEnvironmentFlow
-				editing={{
-					environmentId: row.id,
-					repositoryIds: row.repositories.map((repository) => repository.id),
-					primaryRepositoryId: row.repositories[0]?.id ?? null,
-				}}
-				onOpenChange={setEditingRepositories}
-				open={editingRepositories}
-				organizationId={row.organizationId}
-			/>
 			<ArchiveEnvironmentDialog
 				environmentName={confirmingArchive ? row.name : null}
 				onConfirm={() => archive.mutate({ id: row.id })}

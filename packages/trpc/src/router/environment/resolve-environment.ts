@@ -12,6 +12,7 @@ export interface ResolvedEnvironment {
 	region: string;
 	bundleSha: string;
 	primaryRepositoryId: string | null;
+	config: string | null;
 	envs: Record<string, string>;
 }
 
@@ -60,6 +61,7 @@ export async function resolveEnvironment(
 		region: row.region,
 		bundleSha: row.bundleSha,
 		primaryRepositoryId: row.primaryRepositoryId,
+		config: row.config,
 		envs,
 	};
 }

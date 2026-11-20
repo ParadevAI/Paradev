@@ -2145,8 +2145,8 @@ msgstr "Ajouter une description"
 msgid "Add description..."
 msgstr "Ajouter une description..."
 
-msgid "Add Environment Variable"
-msgstr "Ajouter une variable d’environnement"
+msgid "Add environment variables"
+msgstr "Ajouter des variables d'environnement"
 
 msgid "Add extension"
 msgstr "Ajouter l'extension"
@@ -2185,9 +2185,6 @@ msgstr "Ajouter d’autres personnes…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Ajoutez-en un depuis le menu de la barre latérale pour commencer."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Ajoutez une ou plusieurs variables d’environnement. Vous pouvez aussi glisser-déposer un fichier .env."
-
 msgid "Add people"
 msgstr "Ajouter des personnes"
 
@@ -2199,6 +2196,9 @@ msgstr "Ajouter des personnes au canal"
 
 msgid "Add photos or files"
 msgstr "Ajouter des photos ou des fichiers"
+
+msgid "Add port"
+msgstr "Ajouter un port"
 
 msgid "Add project"
 msgstr "Ajouter un projet"
@@ -2235,6 +2235,9 @@ msgstr "Ajouter un identifiant fiscal"
 
 msgid "Add team member..."
 msgstr "Ajouter un membre d'équipe..."
+
+msgid "Add terminal"
+msgstr "Ajouter un terminal"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Ajoute des tests pour le code non testé le plus risqué…"
@@ -2274,6 +2277,9 @@ msgstr "Ajouter à la barre latérale"
 
 msgid "Add to workspace"
 msgstr "Ajouter à un espace de travail"
+
+msgid "Add variables"
+msgstr "Ajouter des variables"
 
 msgid "Add what it does"
 msgstr "Ajouter ce qu’il fait"
@@ -2624,6 +2630,9 @@ msgstr "Toutes les pages"
 msgid "All plans"
 msgstr "Tous les forfaits"
 
+msgid "All plugins"
+msgstr "Tous les plugins"
+
 msgid "All posts"
 msgstr "Tous les articles"
 
@@ -2713,6 +2722,9 @@ msgstr "Autorisé"
 
 msgid "Allowed for session"
 msgstr "Autorisé pour la session"
+
+msgid "Allowed plugins"
+msgstr "Plugins autorisés"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Déjà transféré dans une autre organisation. Passez à celle-ci pour voir ce projet."
@@ -2804,6 +2816,9 @@ msgstr "Une automatisation ne peut utiliser qu'un espace de travail cloud que vo
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Un environnement contient vos dépôts, variables et région. Lancez-en autant d'espaces de travail que nécessaire."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Les dépôts d'un environnement ne peuvent pas changer. Créez un nouvel environnement pour d'autres dépôts."
+
 msgid "An error occurred"
 msgstr "Une erreur s'est produite"
 
@@ -2854,6 +2869,9 @@ msgstr "Un autre assistant IA"
 
 msgid "another device"
 msgstr "un autre appareil"
+
+msgid "Another row already uses this name."
+msgstr "Une autre ligne utilise déjà ce nom."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Répondez aux questions dans le terminal ci-dessous, comme un mot de passe."
@@ -3572,9 +3590,6 @@ msgstr "Répertoire de base des nouveaux espaces de travail worktree sur cet hô
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Répertoire de base des nouveaux worktrees sur {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image de base · aucun point de contrôle"
-
 msgid "Base URL"
 msgstr "URL de base"
 
@@ -3838,9 +3853,6 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Signalements de bugs"
 
-msgid "Build ID"
-msgstr "ID de compilation"
-
 msgid "Build in public"
 msgstr "Construire en public"
 
@@ -3853,17 +3865,11 @@ msgstr "Construire le dernier logiciel"
 msgid "Building the last piece of software."
 msgstr "Construire le dernier logiciel."
 
-msgid "Building with the new repositories"
-msgstr "Compilation avec les nouveaux dépôts"
-
 msgid "Building…"
 msgstr "Compilation…"
 
-msgid "Builds"
-msgstr "Compilations"
-
-msgid "Built"
-msgstr "Compilé"
+msgid "Builds fail until there is an install script."
+msgstr "Les compilations échouent tant qu'il n'y a pas de script d'installation."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Vous avez créé un plugin ? Proposez-le ici."
@@ -4409,13 +4415,6 @@ msgstr "Point de contrôle"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Point de contrôle · avant le refactor du tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Point de contrôle enregistré {0}"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Point de contrôle enregistré dans {name}"
-
 msgid "Checks"
 msgstr "Vérifications"
 
@@ -4853,6 +4852,9 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Les agents cloud n'ont aucun serveur MCP dans cet environnement."
+
 msgid "Cloud environment setup"
 msgstr "Configuration de l'environnement cloud"
 
@@ -5163,6 +5165,9 @@ msgstr "Conductor est une marque de son propriétaire. {0} n'est ni affilié à 
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Les espaces de travail Conductor sont de simples worktrees Git. {0} les utilise là où ils sont."
+
+msgid "Config"
+msgstr "Configuration"
 
 msgid "Config file contents"
 msgstr "Contenu du fichier de configuration"
@@ -6952,6 +6957,9 @@ msgstr "Modèle par défaut"
 msgid "Default team for new tasks"
 msgstr "Équipe par défaut pour les nouvelles tâches"
 
+msgid "Default terminal"
+msgstr "Terminal par défaut"
+
 msgid "Default terminal theme"
 msgstr "Thème de terminal par défaut"
 
@@ -7402,6 +7410,9 @@ msgstr "Répertoire"
 msgid "Disable"
 msgstr "Désactiver"
 
+msgid "Disable MCP servers"
+msgstr "Désactiver les serveurs MCP"
+
 msgid "Disable skill"
 msgstr "Désactiver la compétence"
 
@@ -7819,6 +7830,9 @@ msgstr "Chaque siège ajoute les heures de son forfait à une réserve unique pa
 msgid "Each session resumes where it left off."
 msgstr "Chaque session reprend là où elle s'était arrêtée."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Chaque build réussi enregistre un instantané. Les nouveaux espaces de travail partent de l'instantané actuel, et vous pouvez en restaurer un plus ancien."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Chaque surface a sa propre typographie. Les changements apparaissent immédiatement dans les aperçus en direct."
 
@@ -7859,6 +7873,12 @@ msgstr "Modifier"
 msgid "Edit {selectedName}"
 msgstr "Modifier {selectedName}"
 
+msgid "Edit as form"
+msgstr "Modifier en mode formulaire"
+
+msgid "Edit as TOML"
+msgstr "Modifier en TOML"
+
 msgid "Edit Channel Name"
 msgstr "Modifier le nom du canal"
 
@@ -7888,9 +7908,6 @@ msgstr "Modifier sur GitHub"
 
 msgid "Edit queued message"
 msgstr "Modifier le message en file"
-
-msgid "Edit repositories"
-msgstr "Modifier les dépôts"
 
 msgid "Edit routine"
 msgstr "Modifier la routine"
@@ -8029,6 +8046,9 @@ msgstr "Fin de l’appel"
 msgid "Ensure no regression"
 msgstr "Vérifier l'absence de régression"
 
+msgid "Enter a command."
+msgstr "Saisissez une commande."
+
 msgid "Enter a full email address"
 msgstr "Saisissez une adresse e-mail complète"
 
@@ -8040,6 +8060,9 @@ msgstr "Saisissez un répertoire parent sur {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Saisissez un chemin sur {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Saisissez un port entre 1 et 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Saisissez une URL dans la barre de recherche ci-dessus."
@@ -10541,6 +10564,9 @@ msgstr "Installer Paradev MCP dans votre client"
 msgid "Install plugin"
 msgstr "Installer le plugin"
 
+msgid "Install script"
+msgstr "Script d'installation"
+
 msgid "Install the desktop app"
 msgstr "Installer l'application de bureau"
 
@@ -11322,7 +11348,9 @@ msgstr "Limiter aux personnes invitées ?"
 msgid "Line {0}"
 msgstr "Ligne {0}"
 
+#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
+#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Ligne {0} : {1}"
@@ -11653,6 +11681,9 @@ msgstr "La fiabilité sur longue durée franchit un seuil. Le travail confié à
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Infobulle de raccourci seul au survol prolongé ; son style de puce est désormais la valeur par défaut de TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Commandes de longue durée, comme un serveur de dev. Chaque espace de travail ouvre le terminal par défaut au démarrage."
+
 msgid "Looking at {what}"
 msgstr "Consultation de {what}"
 
@@ -11893,6 +11924,9 @@ msgstr "La taille maximale est de 256 Ko."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Liste d'autorisation MCP"
 
 msgid "MCP manager"
 msgstr "Gestionnaire MCP"
@@ -12907,9 +12941,6 @@ msgstr "Aucune variable d’environnement pour l’instant"
 msgid "No environments available"
 msgstr "Aucun environnement disponible"
 
-msgid "No environments built yet"
-msgstr "Aucun environnement compilé pour l'instant"
-
 msgid "No environments found."
 msgstr "Aucun environnement trouvé."
 
@@ -13143,6 +13174,9 @@ msgstr "Aucune personne enregistrée"
 
 msgid "No plugins available yet."
 msgstr "Aucun plugin disponible pour le moment."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Aucun plugin installé : les agents cloud n'ont donc aucun serveur MCP ici."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13900,6 +13934,9 @@ msgstr "Seule la personne qui a créé cette page peut les modifier."
 msgid "Only the person who created this workspace can change these."
 msgstr "Seule la personne qui a créé cet espace de travail peut modifier ces paramètres."
 
+msgid "Only the plugins below"
+msgstr "Seulement les plugins ci-dessous"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Seul l'auteur du fil ou le propriétaire de la page peut le supprimer"
 
@@ -14468,9 +14505,6 @@ msgstr "L'organisation existe déjà"
 
 msgid "Organization created successfully!"
 msgstr "Organisation créée avec succès !"
-
-msgid "Organization default ({defaultName})"
-msgstr "Par défaut de l’organisation ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Organisation supprimée"
@@ -15169,9 +15203,6 @@ msgstr "Choisissez le dossier des worktrees du projet sur {hostName}."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Choisissez les dépôts qu’il récupère. Un agent dans un espace de travail cloud détermine ce qu’il faut installer et le fait fonctionner."
 
-msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
-msgstr "Choisissez les dépôts que cet environnement récupère. L'enregistrement lance une nouvelle compilation ; les espaces de travail continuent de démarrer depuis l'actuelle jusqu'à sa réussite."
-
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Choisissez le dossier des worktrees sur {hostName}."
 
@@ -15312,6 +15343,18 @@ msgstr "Populaire"
 msgid "Popular models"
 msgstr "Modèles populaires"
 
+msgid "Port"
+msgstr "Port"
+
+msgid "Port label"
+msgstr "Libellé du port"
+
+msgid "Port name"
+msgstr "Nom du port"
+
+msgid "Port number"
+msgstr "Numéro de port"
+
 msgid "Ports"
 msgstr "Ports"
 
@@ -15323,6 +15366,9 @@ msgstr "Ports sur les hôtes distants"
 
 msgid "Ports on this computer"
 msgstr "Ports sur cet ordinateur"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Ports sur lesquels l'application écoute. Les ports en aperçu obtiennent un lien que vous pouvez ouvrir depuis l'espace de travail."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Ports : {totalPortCount} actifs"
@@ -16452,6 +16498,9 @@ msgstr "Retirer la mention {path}"
 msgid "Remove pasted text"
 msgstr "Retirer le texte collé"
 
+msgid "Remove port"
+msgstr "Retirer le port"
+
 msgid "Remove PR Link"
 msgstr "Retirer le lien de la PR"
 
@@ -16466,6 +16515,9 @@ msgstr "Retirer le script"
 
 msgid "Remove team member?"
 msgstr "Retirer ce membre de l'équipe ?"
+
+msgid "Remove terminal"
+msgstr "Retirer le terminal"
 
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Supprimer le terminal {createdAtLabel}"
@@ -17384,6 +17436,12 @@ msgstr "Exécute une commande locale sur votre machine"
 msgid "Runs appear here once an automation fires."
 msgstr "Les exécutions apparaissent ici dès qu'une automatisation se déclenche."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "S'exécute comme script bash dans chaque nouvel espace de travail cloud, avant le démarrage des agents."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "S'exécute comme script bash lors de la compilation de l'environnement. Les nouveaux espaces de travail partent du résultat."
+
 msgid "Runs in"
 msgstr "S'exécute dans"
 
@@ -17429,14 +17487,8 @@ msgstr "Le bac à sable ne répond plus"
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Enregistrer un point de contrôle dans {name} ?"
-
 msgid "Save All"
 msgstr "Tout enregistrer"
-
-msgid "Save and build"
-msgstr "Enregistrer et compiler"
 
 msgid "Save and continue"
 msgstr "Enregistrer et continuer"
@@ -17449,9 +17501,6 @@ msgstr "Enregistrer comme vue"
 
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
-
-msgid "Save checkpoint"
-msgstr "Enregistrer un point de contrôle"
 
 msgid "Save edits"
 msgstr "Enregistrer les modifications"
@@ -17505,11 +17554,8 @@ msgstr "Enregistré depuis un espace de travail"
 msgid "Saved to Downloads"
 msgstr "Enregistré dans Téléchargements"
 
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Enregistre cet espace de travail tel qu’il est, avec tout ce qui y est installé. Les nouveaux espaces de travail de {name} partiront de ce point de contrôle. L’espace de travail s’arrête un instant pendant l’enregistrement."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Enregistrement d’un point de contrôle dans {name}..."
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Enregistré. Les nouveaux espaces de travail et la prochaine compilation l'utiliseront ; les espaces de travail en cours la prendront en compte au redémarrage."
 
 msgid "Saving as an environment..."
 msgstr "Enregistrement comme environnement..."
@@ -18897,9 +18943,6 @@ msgstr "Smileys et personnes"
 msgid "Smoother onboarding"
 msgstr "Prise en main plus fluide"
 
-msgid "Snapshot"
-msgstr "Instantané"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Prend un instantané du worktree avant et après chaque tour du chat, pour que sa carte liste chaque fichier modifié, y compris les modifications faites dans le shell, et puisse les annuler. Chaque prompt attend d'abord son instantané."
 
@@ -19285,6 +19328,9 @@ msgstr "Démarrez-en une avec + dans la barre d'onglets."
 
 msgid "Start or stop the workspace run command"
 msgstr "Démarrer ou arrêter la commande de l'espace de travail"
+
+msgid "Start script"
+msgstr "Script de démarrage"
 
 msgid "Start voice mode"
 msgstr "Démarrer le mode vocal"
@@ -19963,6 +20009,9 @@ msgstr "Terminal"
 msgid "Terminal agent launch configuration"
 msgstr "Configuration de lancement de l'agent de terminal"
 
+msgid "Terminal command"
+msgstr "Commande du terminal"
+
 msgid "Terminal connection: {label}"
 msgstr "Connexion du terminal : {label}"
 
@@ -19977,6 +20026,9 @@ msgstr "Taille de police du terminal quand un terminal a le focus, zoom de page 
 
 msgid "Terminal input"
 msgstr "Saisie du terminal"
+
+msgid "Terminal name"
+msgstr "Nom du terminal"
 
 msgid "Terminal removed"
 msgstr "Terminal supprimé"
@@ -20698,6 +20750,10 @@ msgstr "Impossible de démarrer cet espace de travail cloud"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Cet espace de travail cloud est en train de se réveiller, ce qui peut prendre jusqu’à 30 secondes après une période d’inactivité."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Cette configuration n'est pas valide : {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Cette conversation est trop longue pour le modèle"
 
@@ -20725,8 +20781,8 @@ msgstr "Ce répertoire n'existe pas. Le script de terminal se rabattra sur la ra
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Cet e-mail est déjà enregistré avec une autre méthode de connexion et le fournisseur ne l'a pas confirmé comme vérifié. Connectez-vous avec la méthode utilisée précédemment."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Cet environnement n'a pas de [install] à compiler. Ajoutez-en un à .paradev/config.toml sur sa branche de base."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Cet environnement n'a pas de [install] à compiler. Ajoutez-en un à sa configuration dans Paramètres, Environnements."
 
 msgid "This environment has no repositories to build"
 msgstr "Cet environnement n'a aucun dépôt à compiler"
@@ -20736,9 +20792,6 @@ msgstr "Cet environnement n'a aucun dépôt. Créez un environnement avec des d�
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Cet environnement ouvre {environmentRepository}, et non {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Les dépôts de cet environnement sont figés ; promouvez à nouveau un espace de travail pour les modifier"
 
 msgid "this file"
 msgstr "ce fichier"
@@ -22018,6 +22071,9 @@ msgstr "Utiliser pour les nouveaux agents"
 msgid "Use global default"
 msgstr "Utiliser la valeur globale par défaut"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Utilisez des minuscules, des chiffres et des tirets bas, en commençant par une lettre."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Utilisez des minuscules, des chiffres, des tirets et des tirets bas"
 
@@ -22453,6 +22509,9 @@ msgstr "Nous recrutons des ingénieurs à San Francisco. Venez construire les ou
 msgid "We're hiring in San Francisco"
 msgstr "Nous recrutons à San Francisco"
 
+msgid "Web app"
+msgstr "Application web"
+
 msgid "Web Fetch"
 msgstr "Récupération web"
 
@@ -22595,6 +22654,9 @@ msgstr "Ce que les équipes automatisent"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Ce à quoi ils se rapportaient ne figure plus sur la page, ils n’ont donc pas de repère."
 
+msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Ce qu'exécutent les compilations et les espaces de travail cloud de cet environnement. Le config.toml propre à un dépôt n'est pas utilisé dans le cloud."
+
 msgid "What we believe"
 msgstr "Ce en quoi nous croyons"
 
@@ -22681,6 +22743,9 @@ msgstr "Quels agents de code IA sont pris en charge ?"
 
 msgid "Which plans include automations?"
 msgstr "Quels plans incluent les automatisations ?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
+msgstr "Les plugins dont les agents cloud peuvent utiliser les serveurs MCP dans cet environnement. Un plugin retiré cesse aussi de fonctionner dans les espaces de travail en cours."
 
 msgid "Who can open it"
 msgstr "Qui peut l’ouvrir"

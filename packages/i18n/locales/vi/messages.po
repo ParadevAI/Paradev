@@ -2145,7 +2145,7 @@ msgstr "Thêm mô tả"
 msgid "Add description..."
 msgstr "Thêm mô tả..."
 
-msgid "Add Environment Variable"
+msgid "Add environment variables"
 msgstr "Thêm biến môi trường"
 
 msgid "Add extension"
@@ -2185,9 +2185,6 @@ msgstr "Thêm nữa…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Thêm một agent từ menu ở thanh bên để bắt đầu."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Thêm một hoặc nhiều biến môi trường. Bạn cũng có thể kéo thả tệp .env."
-
 msgid "Add people"
 msgstr "Thêm người"
 
@@ -2199,6 +2196,9 @@ msgstr "Thêm người vào kênh"
 
 msgid "Add photos or files"
 msgstr "Thêm ảnh hoặc tệp"
+
+msgid "Add port"
+msgstr "Thêm cổng"
 
 msgid "Add project"
 msgstr "Thêm dự án"
@@ -2235,6 +2235,9 @@ msgstr "Thêm mã số thuế"
 
 msgid "Add team member..."
 msgstr "Thêm thành viên nhóm..."
+
+msgid "Add terminal"
+msgstr "Thêm terminal"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Thêm test cho phần code rủi ro nhất chưa được test…"
@@ -2274,6 +2277,9 @@ msgstr "Thêm vào thanh bên"
 
 msgid "Add to workspace"
 msgstr "Thêm vào workspace"
+
+msgid "Add variables"
+msgstr "Thêm biến"
 
 msgid "Add what it does"
 msgstr "Thêm việc nó làm"
@@ -2624,6 +2630,9 @@ msgstr "Tất cả các trang"
 msgid "All plans"
 msgstr "Tất cả các gói"
 
+msgid "All plugins"
+msgstr "Tất cả plugin"
+
 msgid "All posts"
 msgstr "Tất cả bài viết"
 
@@ -2713,6 +2722,9 @@ msgstr "Đã cho phép"
 
 msgid "Allowed for session"
 msgstr "Đã cho phép trong phiên này"
+
+msgid "Allowed plugins"
+msgstr "Plugin được phép"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Đã được chuyển sang một tổ chức khác. Hãy chuyển sang tổ chức đó để xem dự án này."
@@ -2804,6 +2816,9 @@ msgstr "Tự động hóa chỉ có thể dùng workspace cloud do bạn tạo"
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Một môi trường chứa các kho mã, biến và vùng của bạn. Khởi tạo bao nhiêu không gian làm việc từ đó tùy bạn."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Không thể thay đổi repository của environment. Hãy tạo environment mới cho các repository khác."
+
 msgid "An error occurred"
 msgstr "Đã xảy ra lỗi"
 
@@ -2854,6 +2869,9 @@ msgstr "Trợ lý AI khác"
 
 msgid "another device"
 msgstr "thiết bị khác"
+
+msgid "Another row already uses this name."
+msgstr "Một hàng khác đã dùng tên này."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Trả lời các câu hỏi trong terminal bên dưới, chẳng hạn mật khẩu."
@@ -3572,9 +3590,6 @@ msgstr "Thư mục gốc cho workspace worktree mới trên host này."
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Thư mục gốc cho worktree mới trên {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Image cơ sở · chưa có checkpoint"
-
 msgid "Base URL"
 msgstr "URL gốc"
 
@@ -3838,9 +3853,6 @@ msgstr "Bug"
 msgid "Bug reports"
 msgstr "Báo cáo lỗi"
 
-msgid "Build ID"
-msgstr "ID bản build"
-
 msgid "Build in public"
 msgstr "Xây dựng công khai"
 
@@ -3853,17 +3865,11 @@ msgstr "Xây phần mềm cuối cùng"
 msgid "Building the last piece of software."
 msgstr "Xây phần mềm cuối cùng."
 
-msgid "Building with the new repositories"
-msgstr "Đang build với các repository mới"
-
 msgid "Building…"
 msgstr "Đang build…"
 
-msgid "Builds"
-msgstr "Bản build"
-
-msgid "Built"
-msgstr "Đã build"
+msgid "Builds fail until there is an install script."
+msgstr "Build sẽ thất bại cho đến khi có script cài đặt."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Bạn đã tạo plugin? Gửi tại đây."
@@ -4409,13 +4415,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Checkpoint · trước khi refactor tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Đã lưu checkpoint {0}"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Đã lưu checkpoint vào {name}"
-
 msgid "Checks"
 msgstr "Check"
 
@@ -4853,6 +4852,9 @@ msgstr "Cloud"
 msgid "Cloud · us-east"
 msgstr "Cloud · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Agent cloud không có server MCP trong môi trường này."
+
 msgid "Cloud environment setup"
 msgstr "Thiết lập environment đám mây"
 
@@ -5163,6 +5165,9 @@ msgstr "Conductor là nhãn hiệu của chủ sở hữu. {0} không liên kế
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Workspace của Conductor chỉ là Git worktree thông thường. {0} dùng chúng ngay tại chỗ."
+
+msgid "Config"
+msgstr "Cấu hình"
 
 msgid "Config file contents"
 msgstr "Nội dung tệp cấu hình"
@@ -6952,6 +6957,9 @@ msgstr "Mô hình mặc định"
 msgid "Default team for new tasks"
 msgstr "Nhóm mặc định cho tác vụ mới"
 
+msgid "Default terminal"
+msgstr "Terminal mặc định"
+
 msgid "Default terminal theme"
 msgstr "Theme terminal mặc định"
 
@@ -7402,6 +7410,9 @@ msgstr "Thư mục"
 msgid "Disable"
 msgstr "Tắt"
 
+msgid "Disable MCP servers"
+msgstr "Tắt server MCP"
+
 msgid "Disable skill"
 msgstr "Tắt skill"
 
@@ -7819,6 +7830,9 @@ msgstr "Mỗi người dùng thêm số giờ của gói mình vào một quỹ 
 msgid "Each session resumes where it left off."
 msgstr "Mỗi phiên sẽ tiếp tục từ chỗ đang dở."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Mỗi lần build thành công sẽ lưu một ảnh chụp. Workspace mới bắt đầu từ ảnh chụp hiện tại, và bạn có thể khôi phục một ảnh chụp trước đó."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "Mỗi bề mặt có kiểu chữ riêng. Thay đổi hiện ra ngay trong phần xem trước trực tiếp."
 
@@ -7859,6 +7873,12 @@ msgstr "Sửa"
 msgid "Edit {selectedName}"
 msgstr "Chỉnh sửa {selectedName}"
 
+msgid "Edit as form"
+msgstr "Sửa dạng biểu mẫu"
+
+msgid "Edit as TOML"
+msgstr "Sửa dạng TOML"
+
 msgid "Edit Channel Name"
 msgstr "Sửa tên kênh"
 
@@ -7888,9 +7908,6 @@ msgstr "Sửa trên GitHub"
 
 msgid "Edit queued message"
 msgstr "Sửa tin nhắn trong hàng đợi"
-
-msgid "Edit repositories"
-msgstr "Sửa repository"
 
 msgid "Edit routine"
 msgstr "Chỉnh sửa quy trình"
@@ -8029,6 +8046,9 @@ msgstr "Đang kết thúc cuộc gọi"
 msgid "Ensure no regression"
 msgstr "Đảm bảo không có hồi quy"
 
+msgid "Enter a command."
+msgstr "Hãy nhập một lệnh."
+
 msgid "Enter a full email address"
 msgstr "Nhập địa chỉ email đầy đủ"
 
@@ -8040,6 +8060,9 @@ msgstr "Hãy nhập một thư mục cha trên {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Hãy nhập một đường dẫn trên {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Hãy nhập cổng từ 1 đến 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Nhập một URL vào thanh tìm kiếm phía trên."
@@ -10541,6 +10564,9 @@ msgstr "Cài Paradev MCP vào client của bạn"
 msgid "Install plugin"
 msgstr "Cài đặt plugin"
 
+msgid "Install script"
+msgstr "Script cài đặt"
+
 msgid "Install the desktop app"
 msgstr "Cài ứng dụng máy tính"
 
@@ -11322,7 +11348,9 @@ msgstr "Chỉ cho những người được mời?"
 msgid "Line {0}"
 msgstr "Dòng {0}"
 
+#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
+#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Dòng {0}: {1}"
@@ -11653,6 +11681,9 @@ msgstr "Độ tin cậy dài hạn vượt một ngưỡng. Việc giao lúc 6 g
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Tooltip chỉ hiện phím tắt khi di chuột lâu; kiểu chip của nó giờ là mặc định của TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Các lệnh chạy lâu dài, như dev server. Mỗi workspace mở terminal mặc định khi khởi động."
+
 msgid "Looking at {what}"
 msgstr "Đang xem {what}"
 
@@ -11893,6 +11924,9 @@ msgstr "Kích thước tối đa là 256 KB."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Danh sách cho phép MCP"
 
 msgid "MCP manager"
 msgstr "Trình quản lý MCP"
@@ -12907,9 +12941,6 @@ msgstr "Chưa có biến môi trường nào"
 msgid "No environments available"
 msgstr "Không có environment nào"
 
-msgid "No environments built yet"
-msgstr "Chưa có environment nào được build"
-
 msgid "No environments found."
 msgstr "Không tìm thấy environment nào."
 
@@ -13143,6 +13174,9 @@ msgstr "Không ghi nhận người dùng"
 
 msgid "No plugins available yet."
 msgstr "Chưa có plugin nào."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Chưa cài plugin nào, nên agent cloud không có server MCP ở đây."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13900,6 +13934,9 @@ msgstr "Chỉ người tạo trang này mới có thể thay đổi."
 msgid "Only the person who created this workspace can change these."
 msgstr "Chỉ người tạo không gian làm việc này mới có thể thay đổi các mục này."
 
+msgid "Only the plugins below"
+msgstr "Chỉ các plugin bên dưới"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Chỉ tác giả của luồng hoặc chủ sở hữu trang mới xóa được"
 
@@ -14468,9 +14505,6 @@ msgstr "Tổ chức đã tồn tại"
 
 msgid "Organization created successfully!"
 msgstr "Đã tạo tổ chức thành công!"
-
-msgid "Organization default ({defaultName})"
-msgstr "Mặc định của tổ chức ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Đã xóa tổ chức"
@@ -15169,9 +15203,6 @@ msgstr "Chọn thư mục worktree của dự án trên {hostName}."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Chọn các repository cần checkout. Một agent trong workspace trên cloud sẽ tìm ra những gì cần cài và giúp mọi thứ chạy được."
 
-msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
-msgstr "Chọn các repository mà environment này checkout. Lưu sẽ bắt đầu một bản build mới; workspace vẫn khởi động từ bản hiện tại cho đến khi bản mới thành công."
-
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Chọn thư mục worktree trên {hostName}."
 
@@ -15312,6 +15343,18 @@ msgstr "Phổ biến"
 msgid "Popular models"
 msgstr "Mô hình phổ biến"
 
+msgid "Port"
+msgstr "Cổng"
+
+msgid "Port label"
+msgstr "Nhãn cổng"
+
+msgid "Port name"
+msgstr "Tên cổng"
+
+msgid "Port number"
+msgstr "Số cổng"
+
 msgid "Ports"
 msgstr "Cổng"
 
@@ -15323,6 +15366,9 @@ msgstr "Cổng trên host từ xa"
 
 msgid "Ports on this computer"
 msgstr "Cổng trên máy tính này"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Các cổng mà ứng dụng lắng nghe. Cổng xem trước có liên kết bạn mở được từ workspace."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Cổng: {totalPortCount} đang mở"
@@ -16452,6 +16498,9 @@ msgstr "Xóa nhắc đến {path}"
 msgid "Remove pasted text"
 msgstr "Xóa văn bản đã dán"
 
+msgid "Remove port"
+msgstr "Gỡ cổng"
+
 msgid "Remove PR Link"
 msgstr "Gỡ liên kết PR"
 
@@ -16466,6 +16515,9 @@ msgstr "Gỡ script"
 
 msgid "Remove team member?"
 msgstr "Gỡ thành viên khỏi nhóm?"
+
+msgid "Remove terminal"
+msgstr "Gỡ terminal"
 
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Gỡ terminal {createdAtLabel}"
@@ -17384,6 +17436,12 @@ msgstr "Chạy một lệnh cục bộ trên máy bạn"
 msgid "Runs appear here once an automation fires."
 msgstr "Các lần chạy sẽ xuất hiện ở đây khi một tự động hóa được kích hoạt."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Chạy dưới dạng script bash trong mỗi workspace cloud mới trước khi agent bắt đầu."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Chạy dưới dạng script bash khi build môi trường. Workspace mới bắt đầu từ kết quả đó."
+
 msgid "Runs in"
 msgstr "Chạy trong"
 
@@ -17429,14 +17487,8 @@ msgstr "Sandbox đã ngừng phản hồi"
 msgid "Save"
 msgstr "Lưu"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Lưu checkpoint vào {name}?"
-
 msgid "Save All"
 msgstr "Lưu tất cả"
-
-msgid "Save and build"
-msgstr "Lưu và build"
 
 msgid "Save and continue"
 msgstr "Lưu và tiếp tục"
@@ -17449,9 +17501,6 @@ msgstr "Lưu thành chế độ xem"
 
 msgid "Save Changes"
 msgstr "Lưu thay đổi"
-
-msgid "Save checkpoint"
-msgstr "Lưu checkpoint"
 
 msgid "Save edits"
 msgstr "Lưu chỉnh sửa"
@@ -17505,11 +17554,8 @@ msgstr "Được lưu từ một workspace"
 msgid "Saved to Downloads"
 msgstr "Đã lưu vào Downloads"
 
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Lưu workspace này ở trạng thái hiện tại, cùng mọi thứ đã cài trong đó. Các workspace mới từ {name} sẽ bắt đầu từ checkpoint này. Workspace sẽ dừng một lúc trong khi lưu."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Đang lưu checkpoint vào {name}..."
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Đã lưu. Workspace mới và lần build tiếp theo sẽ dùng nó; workspace đang chạy sẽ áp dụng khi khởi động lại."
 
 msgid "Saving as an environment..."
 msgstr "Đang lưu làm môi trường..."
@@ -18897,9 +18943,6 @@ msgstr "Mặt cười & Con người"
 msgid "Smoother onboarding"
 msgstr "Onboarding mượt hơn"
 
-msgid "Snapshot"
-msgstr "Snapshot"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Chụp ảnh worktree trước và sau mỗi lượt chat, để thẻ của lượt liệt kê mọi tệp đã thay đổi, kể cả sửa đổi bằng shell, và có thể hoàn tác chúng. Mỗi prompt sẽ chờ ảnh chụp của nó xong trước."
 
@@ -19285,6 +19328,9 @@ msgstr "Bắt đầu một phiên bằng dấu + trên thanh tab."
 
 msgid "Start or stop the workspace run command"
 msgstr "Bắt đầu hoặc dừng lệnh chạy của workspace"
+
+msgid "Start script"
+msgstr "Script khởi động"
 
 msgid "Start voice mode"
 msgstr "Bắt đầu chế độ giọng nói"
@@ -19963,6 +20009,9 @@ msgstr "Terminal"
 msgid "Terminal agent launch configuration"
 msgstr "Cấu hình khởi chạy agent terminal"
 
+msgid "Terminal command"
+msgstr "Lệnh terminal"
+
 msgid "Terminal connection: {label}"
 msgstr "Kết nối terminal: {label}"
 
@@ -19977,6 +20026,9 @@ msgstr "Cỡ chữ terminal khi terminal đang được focus, thu phóng trang 
 
 msgid "Terminal input"
 msgstr "Ô nhập terminal"
+
+msgid "Terminal name"
+msgstr "Tên terminal"
 
 msgid "Terminal removed"
 msgstr "Đã gỡ terminal"
@@ -20698,6 +20750,10 @@ msgstr "Không thể khởi động workspace cloud này"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Cấu hình này không hợp lệ: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Cuộc trò chuyện này quá dài đối với mô hình"
 
@@ -20725,8 +20781,8 @@ msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư 
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Email này đã được đăng ký bằng phương thức đăng nhập khác và nhà cung cấp chưa xác nhận email đã được xác minh. Hãy đăng nhập bằng phương thức bạn đã dùng trước đây."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "Environment này không có [install] để build. Hãy thêm vào .paradev/config.toml trên nhánh gốc của nó."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "Environment này không có [install] để build. Hãy thêm vào cấu hình của nó trong Cài đặt, Môi trường."
 
 msgid "This environment has no repositories to build"
 msgstr "Environment này không có repository nào để build"
@@ -20736,9 +20792,6 @@ msgstr "Environment này không có repository nào. Hãy tạo một environmen
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Môi trường này mở {environmentRepository}, không phải {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
 
 msgid "this file"
 msgstr "tệp này"
@@ -22018,6 +22071,9 @@ msgstr "Dùng cho agent mới"
 msgid "Use global default"
 msgstr "Dùng mặc định toàn cục"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Dùng chữ thường, chữ số và dấu gạch dưới, bắt đầu bằng một chữ cái."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Dùng chữ thường, số, dấu gạch ngang và gạch dưới"
 
@@ -22453,6 +22509,9 @@ msgstr "Chúng tôi đang tuyển kỹ sư tại San Francisco. Hãy cùng xây 
 msgid "We're hiring in San Francisco"
 msgstr "Chúng tôi đang tuyển tại San Francisco"
 
+msgid "Web app"
+msgstr "Ứng dụng web"
+
 msgid "Web Fetch"
 msgstr "Tải nội dung web"
 
@@ -22595,6 +22654,9 @@ msgstr "Các nhóm tự động hóa những gì"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Nội dung mà chúng được viết cho đã không còn trên trang, nên chúng không có ghim."
 
+msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Những gì các bản build và workspace cloud của environment này chạy. Tệp config.toml riêng của repository không được dùng trên cloud."
+
 msgid "What we believe"
 msgstr "Điều chúng tôi tin"
 
@@ -22681,6 +22743,9 @@ msgstr "Những coding agent AI nào được hỗ trợ?"
 
 msgid "Which plans include automations?"
 msgstr "Gói nào có automation?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
+msgstr "Các plugin có server MCP mà agent cloud được dùng trong environment này. Plugin bạn gỡ cũng ngừng hoạt động trong các workspace đang chạy."
 
 msgid "Who can open it"
 msgstr "Ai có thể mở"

@@ -23,12 +23,6 @@ interface CreateEnvironmentFlowProps {
 	onStarted?: () => void;
 	agent?: string;
 	setupPrompt?: (environmentUrl: string) => string;
-	/** Change this environment's repositories, which builds it, instead of creating one. */
-	editing?: {
-		environmentId: string;
-		repositoryIds: readonly string[];
-		primaryRepositoryId: string | null;
-	};
 }
 
 export function CreateEnvironmentFlow({
@@ -39,7 +33,6 @@ export function CreateEnvironmentFlow({
 	onStarted,
 	agent,
 	setupPrompt = environmentSetupAgentPrompt,
-	editing,
 }: CreateEnvironmentFlowProps) {
 	const { t } = useLingui();
 	const utils = cloudTrpc.useUtils();
@@ -64,12 +57,9 @@ export function CreateEnvironmentFlow({
 		name: string;
 		fullName: string;
 	}> | null>(null);
-	const [pickedIds, setPickedIds] = useState<string[]>([
-		...(editing?.repositoryIds ?? []),
-	]);
+	const [pickedIds, setPickedIds] = useState<string[]>([]);
 	const inFlightRef = useRef(false);
 	const create = cloudTrpc.environment.create.useMutation();
-	const update = cloudTrpc.environment.update.useMutation();
 	const { start: startSetupAgent, isPending: isLaunching } =
 		useStartSetupAgent();
 
@@ -85,7 +75,7 @@ export function CreateEnvironmentFlow({
 		!appInstalled || (accountAvailable && !accountConnected && !skippedAccount);
 
 	const reachedLimit =
-		!editing && usage.data?.limit != null && usage.data.used >= usage.data.limit
+		usage.data?.limit != null && usage.data.used >= usage.data.limit
 			? usage.data.limit
 			: null;
 
@@ -111,23 +101,6 @@ export function CreateEnvironmentFlow({
 			(repository) => repository.id === primaryId,
 		);
 		if (!primary || inFlightRef.current) return;
-		if (editing) {
-			try {
-				await update.mutateAsync({
-					id: editing.environmentId,
-					repositoryIds: repositories.map((repository) => repository.id),
-					primaryRepositoryId: primary.id,
-					startBuild: true,
-				});
-				await utils.environment.invalidate();
-				toast.success(t({ message: "Building with the new repositories" }));
-				setPicked(null);
-				onOpenChange(false);
-			} catch (error) {
-				toast.error(errorMessage(error));
-			}
-			return;
-		}
 		inFlightRef.current = true;
 		const projectId = projectToLink(project, primary.fullName);
 		let environment: Awaited<ReturnType<typeof create.mutateAsync>>;
@@ -209,9 +182,7 @@ export function CreateEnvironmentFlow({
 					/>
 				) : picked ? (
 					<ChoosePrimaryStep
-						editing={Boolean(editing)}
-						initialPrimaryId={editing?.primaryRepositoryId}
-						isStarting={create.isPending || update.isPending || isLaunching}
+						isStarting={create.isPending || isLaunching}
 						onBack={() => setPicked(null)}
 						onGetStarted={(primaryId) => getStarted(picked, primaryId)}
 						onSkip={(primaryId) =>
@@ -221,11 +192,10 @@ export function CreateEnvironmentFlow({
 					/>
 				) : (
 					<PickRepositoriesStep
-						editing={Boolean(editing)}
 						initialSelectedIds={pickedIds}
 						accountLogin={githubUser.data?.connection?.login ?? null}
 						installation={activeInstallation}
-						isStarting={create.isPending || update.isPending || isLaunching}
+						isStarting={create.isPending || isLaunching}
 						reachedLimit={reachedLimit}
 						onManageEnvironments={() => {
 							handleOpenChange(false);

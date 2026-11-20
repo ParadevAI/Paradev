@@ -14,6 +14,8 @@ import * as limit from "./limit";
 const ENVIRONMENT_ID = "6f7a8b9c-0d1e-4f2a-8b3c-4d5e6f7a8b9c";
 const ORGANIZATION_ID = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d";
 const WORKSPACE_ID = "2b3c4d5e-6f7a-4b8c-9d0e-1f2a3b4c5d6e";
+const REPOSITORY_ID = "3c4d5e6f-7a8b-4c9d-8e1f-2a3b4c5d6e7f";
+const OTHER_REPOSITORY_ID = "4d5e6f7a-8b9c-4d0e-9f2a-3b4c5d6e7f8a";
 
 let environment: Record<string, unknown> = {};
 let isAdmin = false;
@@ -58,7 +60,10 @@ stub(access, {
 		branch: "main",
 	}),
 });
-stub(sandbox, { workspaceRepositories: async () => [] });
+stub(sandbox, {
+	workspaceRepositories: async () => [],
+	environmentRepositoryRows: async () => [{ id: REPOSITORY_ID }] as never,
+});
 stub(plan, {
 	resolveMachineSize: async (_: string, name: string | null | undefined) =>
 		name === "large" || name == null
@@ -92,6 +97,7 @@ beforeEach(() => {
 		createdByUserId: "someone-else",
 		sourceKind: "image",
 		machineSize: "large",
+		primaryRepositoryId: REPOSITORY_ID,
 	};
 	isAdmin = false;
 	written = [];
@@ -117,6 +123,31 @@ describe("environment.update machineSize", () => {
 			caller.environment.update({ id: ENVIRONMENT_ID, machineSize: "2xlarge" }),
 		).rejects.toMatchObject({ code: "BAD_REQUEST" });
 		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.update repositories", () => {
+	test("refuses a different set or primary; the same set goes through", async () => {
+		environment.createdByUserId = "user-1";
+		await expect(
+			caller.environment.update({
+				id: ENVIRONMENT_ID,
+				repositoryIds: [REPOSITORY_ID, OTHER_REPOSITORY_ID],
+			}),
+		).rejects.toMatchObject({ code: "FORBIDDEN" });
+		await expect(
+			caller.environment.update({
+				id: ENVIRONMENT_ID,
+				primaryRepositoryId: OTHER_REPOSITORY_ID,
+			}),
+		).rejects.toMatchObject({ code: "FORBIDDEN" });
+		await caller.environment.update({
+			id: ENVIRONMENT_ID,
+			repositoryIds: [REPOSITORY_ID],
+			primaryRepositoryId: REPOSITORY_ID,
+			name: "renamed",
+		});
+		expect(written).toEqual([{ name: "renamed" }]);
 	});
 });
 

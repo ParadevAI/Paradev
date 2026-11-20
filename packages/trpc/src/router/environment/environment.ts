@@ -12,6 +12,7 @@ import {
 } from "@superset/db/schema";
 import { isCloudUsageRefusal, MACHINE_SIZES } from "@superset/shared/billing";
 import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
+import { parseProjectConfig } from "@superset/shared/project-config";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, desc, eq, inArray, isNull, lt, or } from "drizzle-orm";
@@ -73,6 +74,28 @@ async function assertCanChangeForEveryone(
 	) {
 		await verifyOrgAdmin(ctx.principal.userId, environment.organizationId);
 	}
+}
+
+const CONFIG_MAX_LENGTH = 64 * 1024;
+
+/** Blank clears the config; anything else must parse as a `config.toml`. */
+function validConfig(text: string | null): string | null {
+	if (text === null || text.trim().length === 0) return null;
+	const parsed = parseProjectConfig(text);
+	if (!parsed.ok) {
+		const details = parsed.errors
+			.map((error) =>
+				error.line ? `line ${error.line}: ${error.message}` : error.message,
+			)
+			.join("; ");
+		throw userError({
+			code: "BAD_REQUEST",
+			message: `This config is invalid: ${details}`,
+			i18nKey: "serverError.environment.invalidConfig",
+			params: { details },
+		});
+	}
+	return text;
 }
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
@@ -232,6 +255,34 @@ async function setEnvironmentRepositories(args: {
 		.where(eq(environments.id, args.environmentId));
 }
 
+/** A box is built for its repositories, so an environment keeps the ones it was created with. */
+async function assertRepositoriesUnchanged(
+	current: { id: string; primaryRepositoryId: string | null },
+	input: { repositoryIds?: readonly string[]; primaryRepositoryId?: string },
+): Promise<void> {
+	const changesPrimary =
+		input.primaryRepositoryId !== undefined &&
+		input.primaryRepositoryId !== current.primaryRepositoryId;
+	let changesRepositories = false;
+	if (input.repositoryIds) {
+		const currentIds = new Set(
+			(await environmentRepositoryRows(current.id)).map((row) => row.id),
+		);
+		const nextIds = new Set(input.repositoryIds);
+		changesRepositories =
+			nextIds.size !== currentIds.size ||
+			[...nextIds].some((id) => !currentIds.has(id));
+	}
+	if (changesPrimary || changesRepositories) {
+		throw userError({
+			code: "FORBIDDEN",
+			message:
+				"An environment's repositories can't change. Create a new environment for other repositories.",
+			i18nKey: "serverError.environment.repositoriesFixed",
+		});
+	}
+}
+
 function primaryNotIncluded() {
 	return userError({
 		code: "BAD_REQUEST",
@@ -324,25 +375,6 @@ function toBuildView(
 			kept.has(build.goldenRef) &&
 			build.goldenRef !== activeSourceRef,
 	};
-}
-
-async function startRepositoriesBuild(args: {
-	environmentId: string;
-	repositoryIds?: readonly string[];
-	primaryRepositoryId?: string;
-}): Promise<string> {
-	try {
-		const build = await startEnvironmentBuild({
-			environmentId: args.environmentId,
-			trigger: "repositories",
-			repositoryIds: args.repositoryIds,
-			primaryRepositoryId: args.primaryRepositoryId,
-		});
-		return build.id;
-	} catch (error) {
-		if (error instanceof BuildRefused) throw buildRefusalError(error);
-		throw error;
-	}
 }
 
 const BUILD_PAGE_MAX = 100;
@@ -908,105 +940,41 @@ export const environmentRouter = {
 				scope: z.enum(environmentScopeValues).optional(),
 				/** Null goes back to the organization's default. */
 				machineSize: z.enum(MACHINE_SIZES).nullable().optional(),
-				/**
-				 * Build the environment with the new repositories instead of
-				 * refusing to change them once it has a snapshot.
-				 */
-				startBuild: z.boolean().optional(),
+				/** The environment's `config.toml`; null clears it. */
+				config: z.string().max(CONFIG_MAX_LENGTH).nullable().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
-			if (input.machineSize !== undefined) {
+			if (input.machineSize !== undefined || input.config !== undefined) {
 				await assertCanChangeForEveryone(current, ctx);
 			}
+			const config =
+				input.config === undefined ? undefined : validConfig(input.config);
 			await assertMachineSizeOffered(current.organizationId, input.machineSize);
+			await assertRepositoriesUnchanged(current, input);
 
-			// A golden was built for its repositories and set up by its primary.
-			// Changing either means a different golden, so it is promoted again.
-			const changesPrimary =
-				input.primaryRepositoryId !== undefined &&
-				input.primaryRepositoryId !== current.primaryRepositoryId;
-			const changesRepositories =
-				Boolean(input.repositoryIds) || changesPrimary;
-			let pendingBuildId: string | null = null;
-			if (changesRepositories && current.sourceKind !== "image") {
-				if (!input.startBuild) {
-					throw userError({
-						code: "FORBIDDEN",
-						message:
-							"This environment's repositories are fixed; promote a workspace again to change them",
-						i18nKey: "serverError.environment.repositoriesFrozen",
-					});
-				}
-				const repositoryIds =
-					input.repositoryIds ??
-					(await environmentRepositoryRows(current.id)).map((row) => row.id);
-				const primaryRepositoryId =
-					input.primaryRepositoryId ?? current.primaryRepositoryId;
-				if (
-					!primaryRepositoryId ||
-					!repositoryIds.includes(primaryRepositoryId)
-				) {
-					throw primaryNotIncluded();
-				}
-				pendingBuildId = await startRepositoriesBuild({
-					environmentId: current.id,
-					repositoryIds,
-					primaryRepositoryId,
-				});
-			} else if (input.repositoryIds) {
-				const primaryRepositoryId =
-					input.primaryRepositoryId ?? current.primaryRepositoryId;
-				if (!primaryRepositoryId) throw primaryNotIncluded();
-				await setEnvironmentRepositories({
-					environmentId: input.id,
-					organizationId: current.organizationId,
-					repositoryIds: input.repositoryIds,
-					primaryRepositoryId,
-				});
-			} else if (input.primaryRepositoryId !== undefined) {
-				const included = await db.query.environmentRepositories.findFirst({
-					where: and(
-						eq(environmentRepositories.environmentId, input.id),
-						eq(environmentRepositories.repositoryId, input.primaryRepositoryId),
-					),
-				});
-				if (!included) throw primaryNotIncluded();
-				await db
-					.update(environments)
-					.set({ primaryRepositoryId: input.primaryRepositoryId })
-					.where(eq(environments.id, input.id));
-			}
 			const patch = {
 				...(input.name ? { name: input.name } : {}),
 				...(input.scope ? { scope: input.scope } : {}),
 				...(input.machineSize !== undefined
 					? { machineSize: input.machineSize }
 					: {}),
+				...(config !== undefined ? { config } : {}),
 				...(input.scope === "personal"
 					? { createdByUserId: personalOwner(current, ctx.principal.userId) }
 					: {}),
 			};
-			if (
-				changesRepositories &&
-				current.sourceKind === "image" &&
-				input.startBuild
-			) {
-				pendingBuildId = await startRepositoriesBuild({
-					environmentId: current.id,
-				});
-			}
 			if (Object.keys(patch).length === 0) {
-				return { ...(await loadEnvironment(input.id, ctx)), pendingBuildId };
+				return await loadEnvironment(input.id, ctx);
 			}
 			const [row] = await db
 				.update(environments)
 				.set(patch)
 				.where(eq(environments.id, input.id))
 				.returning();
-			return row && { ...row, pendingBuildId };
+			return row;
 		}),
 
 	archive: personProcedure

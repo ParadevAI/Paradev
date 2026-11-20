@@ -5,6 +5,12 @@ export {
 	PROJECT_LOCAL_CONFIG_FILE,
 } from "./constants";
 export {
+	type McpPlugin,
+	mcpAllowlist,
+	mcpAllows,
+	mcpPluginEntry,
+} from "./mcp";
+export {
 	type ConfigError,
 	type ParseProjectConfigResult,
 	parseProjectConfig,
@@ -21,6 +27,7 @@ export {
 	CONFIG_NAME_PATTERN,
 	type ConfigEnvironment,
 	MAX_PREVIEW_PORTS,
+	MCP_PLUGIN_PATTERN,
 	type PhaseName,
 	type ProjectConfig,
 	projectConfigSchema,

@@ -10,6 +10,7 @@ import {
 	buildPluginServer,
 	PluginTargetError,
 	resolveTarget,
+	sandboxAllowsPlugin,
 } from "@superset/trpc/plugins-proxy";
 import { z } from "zod";
 import { env } from "@/env";
@@ -103,6 +104,24 @@ async function handle(
 				"INVALID_CONNECTION",
 				"connection must be a connection id.",
 				400,
+			),
+			rateLimitState,
+		);
+	}
+
+	if (
+		ctx.sandboxWorkspaceId &&
+		!(await sandboxAllowsPlugin({
+			workspaceId: ctx.sandboxWorkspaceId,
+			marketplace,
+			plugin,
+		}))
+	) {
+		return withRateLimitHeaders(
+			errorResponse(
+				"PLUGIN_NOT_ALLOWED",
+				`This environment does not allow the ${plugin} plugin.`,
+				403,
 			),
 			rateLimitState,
 		);

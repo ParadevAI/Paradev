@@ -31,8 +31,6 @@ interface PickRepositoriesStepProps {
 	accountLogin: string | null;
 	isStarting: boolean;
 	reachedLimit?: number | null;
-	/** Changing an existing environment's repositories rather than creating one. */
-	editing?: boolean;
 	onManageEnvironments: () => void;
 	onUpgrade: () => void;
 	/** Picked earlier, when coming back from choosing the primary. */
@@ -52,7 +50,6 @@ export function PickRepositoriesStep({
 	accountLogin,
 	isStarting,
 	reachedLimit = null,
-	editing = false,
 	onManageEnvironments,
 	onUpgrade,
 	initialSelectedIds = [],
@@ -101,25 +98,13 @@ export function PickRepositoriesStep({
 		<>
 			<DialogHeader className="px-5 pt-5 pb-4 text-left">
 				<DialogTitle className="text-base leading-tight">
-					{editing ? (
-						<Trans>Edit repositories</Trans>
-					) : (
-						<Trans>Create a cloud environment</Trans>
-					)}
+					<Trans>Create a cloud environment</Trans>
 				</DialogTitle>
 				<DialogDescription className="text-sm leading-snug">
-					{editing ? (
-						<Trans>
-							Pick the repositories this environment checks out. Saving starts a
-							new build; workspaces keep starting from the current one until it
-							succeeds.
-						</Trans>
-					) : (
-						<Trans>
-							Pick the repositories it checks out. An agent in a cloud workspace
-							works out what to install and gets it running.
-						</Trans>
-					)}
+					<Trans>
+						Pick the repositories it checks out. An agent in a cloud workspace
+						works out what to install and gets it running.
+					</Trans>
 				</DialogDescription>
 				{accountLogin && (
 					<p className="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -222,7 +207,7 @@ export function PickRepositoriesStep({
 					)}
 				</div>
 			)}
-			{isLastStep && !editing && <SetupAgentNote />}
+			{isLastStep && <SetupAgentNote />}
 			<DialogFooter className="items-center border-t border-border/70 bg-muted/20 px-5 py-3">
 				<span className="flex-1 text-xs text-muted-foreground">
 					{selected.length === 0 ? (
@@ -234,7 +219,7 @@ export function PickRepositoriesStep({
 				<Button onClick={onCancel} size="sm" variant="ghost">
 					<Trans>Cancel</Trans>
 				</Button>
-				{isLastStep && !editing && (
+				{isLastStep && (
 					<Button
 						disabled={
 							selected.length === 0 || isStarting || reachedLimit !== null
@@ -254,15 +239,9 @@ export function PickRepositoriesStep({
 					size="sm"
 				>
 					{isStarting ? (
-						editing ? (
-							<Trans>Saving…</Trans>
-						) : (
-							<Trans>Starting…</Trans>
-						)
+						<Trans>Starting…</Trans>
 					) : selected.length > 1 ? (
 						<Trans>Next</Trans>
-					) : editing ? (
-						<Trans>Save and build</Trans>
 					) : (
 						<Trans>Start agent</Trans>
 					)}

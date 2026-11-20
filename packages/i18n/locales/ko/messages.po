@@ -2145,7 +2145,7 @@ msgstr "설명 추가"
 msgid "Add description..."
 msgstr "설명 추가..."
 
-msgid "Add Environment Variable"
+msgid "Add environment variables"
 msgstr "환경 변수 추가"
 
 msgid "Add extension"
@@ -2185,9 +2185,6 @@ msgstr "더 추가…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "사이드바 메뉴에서 하나 추가해 시작하세요."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "환경 변수를 하나 이상 추가하세요. .env 파일을 끌어다 놓을 수도 있습니다."
-
 msgid "Add people"
 msgstr "사람 추가"
 
@@ -2199,6 +2196,9 @@ msgstr "채널에 사람 추가"
 
 msgid "Add photos or files"
 msgstr "사진 또는 파일 추가"
+
+msgid "Add port"
+msgstr "포트 추가"
 
 msgid "Add project"
 msgstr "프로젝트 추가"
@@ -2235,6 +2235,9 @@ msgstr "세금 ID 추가"
 
 msgid "Add team member..."
 msgstr "팀 멤버 추가..."
+
+msgid "Add terminal"
+msgstr "터미널 추가"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "테스트가 없는 가장 위험한 코드에 테스트 추가…"
@@ -2274,6 +2277,9 @@ msgstr "사이드바에 추가"
 
 msgid "Add to workspace"
 msgstr "워크스페이스에 추가"
+
+msgid "Add variables"
+msgstr "변수 추가"
 
 msgid "Add what it does"
 msgstr "하는 일 추가"
@@ -2624,6 +2630,9 @@ msgstr "모든 페이지"
 msgid "All plans"
 msgstr "전체 플랜"
 
+msgid "All plugins"
+msgstr "모든 플러그인"
+
 msgid "All posts"
 msgstr "모든 게시물"
 
@@ -2713,6 +2722,9 @@ msgstr "허용됨"
 
 msgid "Allowed for session"
 msgstr "세션 동안 허용됨"
+
+msgid "Allowed plugins"
+msgstr "허용된 플러그인"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "이미 다른 조직으로 옮겨졌습니다. 이 프로젝트를 보려면 해당 조직으로 전환하세요."
@@ -2804,6 +2816,9 @@ msgstr "자동화는 내가 만든 클라우드 워크스페이스만 사용할 
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "환경에는 저장소, 변수, 리전이 담깁니다. 필요한 만큼 워크스페이스를 시작하세요."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "환경의 리포지토리는 변경할 수 없습니다. 다른 리포지토리에는 새 환경을 만드세요."
+
 msgid "An error occurred"
 msgstr "오류가 발생했습니다"
 
@@ -2854,6 +2869,9 @@ msgstr "다른 AI 어시스턴트"
 
 msgid "another device"
 msgstr "다른 기기"
+
+msgid "Another row already uses this name."
+msgstr "다른 행에서 이미 이 이름을 사용합니다."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "아래 터미널에서 비밀번호 등 질문에 답하세요."
@@ -3572,9 +3590,6 @@ msgstr "이 호스트에서 새 worktree 워크스페이스가 만들어질 기�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}에서 새 worktree를 만들 기본 디렉터리입니다."
 
-msgid "Base image · no checkpoint yet"
-msgstr "기본 이미지 · 아직 체크포인트 없음"
-
 msgid "Base URL"
 msgstr "기본 URL"
 
@@ -3838,9 +3853,6 @@ msgstr "버그"
 msgid "Bug reports"
 msgstr "버그 신고"
 
-msgid "Build ID"
-msgstr "빌드 ID"
-
 msgid "Build in public"
 msgstr "공개적으로 개발합니다"
 
@@ -3853,17 +3865,11 @@ msgstr "마지막 소프트웨어를 만듭니다"
 msgid "Building the last piece of software."
 msgstr "마지막 소프트웨어를 만듭니다."
 
-msgid "Building with the new repositories"
-msgstr "새 리포지토리로 빌드 중"
-
 msgid "Building…"
 msgstr "빌드 중…"
 
-msgid "Builds"
-msgstr "빌드"
-
-msgid "Built"
-msgstr "빌드 시각"
+msgid "Builds fail until there is an install script."
+msgstr "설치 스크립트가 없으면 빌드가 실패합니다."
 
 msgid "Built a plugin? Submit it here."
 msgstr "플러그인을 만드셨나요? 여기에서 제출하세요."
@@ -4409,13 +4415,6 @@ msgstr "체크포인트"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "체크포인트 · 툴팁 리팩터링 전"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "체크포인트 저장됨 {0}"
-
-msgid "Checkpoint saved to {name}"
-msgstr "{name}에 체크포인트를 저장했습니다"
-
 msgid "Checks"
 msgstr "검사"
 
@@ -4853,6 +4852,9 @@ msgstr "클라우드"
 msgid "Cloud · us-east"
 msgstr "클라우드 · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "이 환경에서는 클라우드 에이전트가 MCP 서버를 사용할 수 없습니다."
+
 msgid "Cloud environment setup"
 msgstr "클라우드 환경 설정"
 
@@ -5163,6 +5165,9 @@ msgstr "Conductor는 해당 소유자의 상표입니다. {0}는 Conductor 또�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor 워크스페이스는 일반 Git worktree입니다. {0}는 그 자리 그대로 사용합니다."
+
+msgid "Config"
+msgstr "구성"
 
 msgid "Config file contents"
 msgstr "설정 파일 내용"
@@ -6952,6 +6957,9 @@ msgstr "기본 모델"
 msgid "Default team for new tasks"
 msgstr "새 작업의 기본 팀"
 
+msgid "Default terminal"
+msgstr "기본 터미널"
+
 msgid "Default terminal theme"
 msgstr "기본 터미널 테마"
 
@@ -7402,6 +7410,9 @@ msgstr "디렉터리"
 msgid "Disable"
 msgstr "비활성화"
 
+msgid "Disable MCP servers"
+msgstr "MCP 서버 비활성화"
+
 msgid "Disable skill"
 msgstr "스킬 비활성화"
 
@@ -7819,6 +7830,9 @@ msgstr "각 좌석은 플랜의 시간을 팀 전체가 공유하는 하나의 �
 msgid "Each session resumes where it left off."
 msgstr "각 세션은 중단된 지점부터 이어집니다."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "빌드가 성공할 때마다 스냅샷이 저장됩니다. 새 워크스페이스는 현재 스냅샷에서 시작하며, 이전 스냅샷으로 복원할 수 있습니다."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "각 화면마다 타이포그래피를 따로 설정합니다. 변경 사항은 실시간 미리보기에 바로 반영됩니다."
 
@@ -7859,6 +7873,12 @@ msgstr "편집"
 msgid "Edit {selectedName}"
 msgstr "{selectedName} 편집"
 
+msgid "Edit as form"
+msgstr "양식으로 편집"
+
+msgid "Edit as TOML"
+msgstr "TOML로 편집"
+
 msgid "Edit Channel Name"
 msgstr "채널 이름 편집"
 
@@ -7888,9 +7908,6 @@ msgstr "GitHub에서 편집"
 
 msgid "Edit queued message"
 msgstr "대기 중인 메시지 편집"
-
-msgid "Edit repositories"
-msgstr "리포지토리 편집"
 
 msgid "Edit routine"
 msgstr "루틴 편집"
@@ -8029,6 +8046,9 @@ msgstr "통화 종료 중"
 msgid "Ensure no regression"
 msgstr "회귀가 없는지 확인해 주세요"
 
+msgid "Enter a command."
+msgstr "명령을 입력하세요."
+
 msgid "Enter a full email address"
 msgstr "전체 이메일 주소를 입력하세요"
 
@@ -8040,6 +8060,9 @@ msgstr "{hostName}의 상위 디렉터리를 입력하세요"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName}의 경로를 입력하세요"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "1~65535 사이의 포트를 입력하세요."
 
 msgid "Enter a URL into the search bar above."
 msgstr "위 검색 바에 URL을 입력하세요."
@@ -10541,6 +10564,9 @@ msgstr "클라이언트에 Paradev MCP 설치하기"
 msgid "Install plugin"
 msgstr "플러그인 설치"
 
+msgid "Install script"
+msgstr "설치 스크립트"
+
 msgid "Install the desktop app"
 msgstr "데스크톱 앱 설치"
 
@@ -11322,7 +11348,9 @@ msgstr "초대된 사람으로 제한할까요?"
 msgid "Line {0}"
 msgstr "{0}번 줄"
 
+#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
+#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "{0}번째 줄: {1}"
@@ -11653,6 +11681,9 @@ msgstr "장시간 작업의 신뢰성이 임계점을 넘습니다. 오후 6시�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "오래 호버하면 단축키만 보여 주는 툴팁이며, 그 칩 스타일이 이제 TooltipContent 기본값입니다"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "개발 서버처럼 계속 실행되는 명령입니다. 각 워크스페이스는 시작할 때 기본 터미널을 엽니다."
+
 msgid "Looking at {what}"
 msgstr "{what} 확인 중"
 
@@ -11893,6 +11924,9 @@ msgstr "최대 크기는 256 KB입니다."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "MCP 허용 목록"
 
 msgid "MCP manager"
 msgstr "MCP 관리자"
@@ -12907,9 +12941,6 @@ msgstr "아직 환경 변수가 없습니다"
 msgid "No environments available"
 msgstr "사용 가능한 환경 없음"
 
-msgid "No environments built yet"
-msgstr "아직 빌드된 환경이 없습니다"
-
 msgid "No environments found."
 msgstr "환경을 찾을 수 없습니다."
 
@@ -13143,6 +13174,9 @@ msgstr "기록된 사용자 없음"
 
 msgid "No plugins available yet."
 msgstr "아직 사용할 수 있는 플러그인이 없습니다."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "설치된 플러그인이 없어 여기서는 클라우드 에이전트가 MCP 서버를 사용할 수 없습니다."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13900,6 +13934,9 @@ msgstr "이 페이지를 만든 사람만 변경할 수 있습니다."
 msgid "Only the person who created this workspace can change these."
 msgstr "이 워크스페이스를 만든 사람만 변경할 수 있습니다."
 
+msgid "Only the plugins below"
+msgstr "아래 플러그인만"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "스레드 작성자 또는 페이지 소유자만 삭제할 수 있습니다"
 
@@ -14468,9 +14505,6 @@ msgstr "조직이 이미 존재합니다"
 
 msgid "Organization created successfully!"
 msgstr "조직을 만들었습니다!"
-
-msgid "Organization default ({defaultName})"
-msgstr "조직 기본값 ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "조직을 삭제했습니다"
@@ -15169,9 +15203,6 @@ msgstr "{hostName}에서 프로젝트 worktree 폴더를 선택하세요."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "체크아웃할 저장소를 선택하세요. 클라우드 워크스페이스의 에이전트가 설치할 항목을 파악하고 실행되도록 합니다."
 
-msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
-msgstr "이 환경이 체크아웃할 리포지토리를 선택하세요. 저장하면 새 빌드가 시작되며, 성공할 때까지 워크스페이스는 현재 빌드에서 시작합니다."
-
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}에서 worktree 폴더를 선택하세요."
 
@@ -15312,6 +15343,18 @@ msgstr "인기"
 msgid "Popular models"
 msgstr "인기 모델"
 
+msgid "Port"
+msgstr "포트"
+
+msgid "Port label"
+msgstr "포트 레이블"
+
+msgid "Port name"
+msgstr "포트 이름"
+
+msgid "Port number"
+msgstr "포트 번호"
+
 msgid "Ports"
 msgstr "포트"
 
@@ -15323,6 +15366,9 @@ msgstr "원격 호스트의 포트"
 
 msgid "Ports on this computer"
 msgstr "이 컴퓨터의 포트"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "앱이 수신 대기하는 포트입니다. 미리 보기 포트에는 워크스페이스에서 열 수 있는 링크가 생깁니다."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "포트: {totalPortCount}개 활성"
@@ -16452,6 +16498,9 @@ msgstr "{path} 멘션 제거"
 msgid "Remove pasted text"
 msgstr "붙여넣은 텍스트 제거"
 
+msgid "Remove port"
+msgstr "포트 제거"
+
 msgid "Remove PR Link"
 msgstr "PR 링크 제거"
 
@@ -16466,6 +16515,9 @@ msgstr "스크립트 제거"
 
 msgid "Remove team member?"
 msgstr "팀 멤버를 제거할까요?"
+
+msgid "Remove terminal"
+msgstr "터미널 제거"
 
 msgid "Remove terminal {createdAtLabel}"
 msgstr "{createdAtLabel} 터미널 제거"
@@ -17384,6 +17436,12 @@ msgstr "내 컴퓨터에서 로컬 명령을 실행합니다"
 msgid "Runs appear here once an automation fires."
 msgstr "자동화가 실행되면 여기에 표시됩니다."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "에이전트가 시작되기 전에 새 클라우드 워크스페이스마다 bash 스크립트로 실행됩니다."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "환경을 빌드할 때 bash 스크립트로 실행됩니다. 새 워크스페이스는 그 결과에서 시작합니다."
+
 msgid "Runs in"
 msgstr "실행 위치"
 
@@ -17429,14 +17487,8 @@ msgstr "샌드박스가 응답하지 않습니다"
 msgid "Save"
 msgstr "저장"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "{name}에 체크포인트를 저장할까요?"
-
 msgid "Save All"
 msgstr "모두 저장"
-
-msgid "Save and build"
-msgstr "저장하고 빌드"
 
 msgid "Save and continue"
 msgstr "저장하고 계속"
@@ -17449,9 +17501,6 @@ msgstr "뷰로 저장"
 
 msgid "Save Changes"
 msgstr "변경사항 저장"
-
-msgid "Save checkpoint"
-msgstr "체크포인트 저장"
 
 msgid "Save edits"
 msgstr "편집 저장"
@@ -17505,11 +17554,8 @@ msgstr "워크스페이스에서 저장됨"
 msgid "Saved to Downloads"
 msgstr "다운로드 폴더에 저장했습니다"
 
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "설치된 모든 것을 포함해 이 워크스페이스의 현재 상태를 저장합니다. {name}에서 만드는 새 워크스페이스는 이 체크포인트에서 시작합니다. 저장하는 동안 워크스페이스가 잠시 멈춥니다."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "{name}에 체크포인트 저장 중..."
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "저장했습니다. 새 워크스페이스와 다음 빌드에 적용되며, 실행 중인 워크스페이스는 다시 시작할 때 적용됩니다."
 
 msgid "Saving as an environment..."
 msgstr "환경으로 저장하는 중..."
@@ -18897,9 +18943,6 @@ msgstr "스마일리 및 사람"
 msgid "Smoother onboarding"
 msgstr "더 매끄러운 온보딩"
 
-msgid "Snapshot"
-msgstr "스냅샷"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "각 채팅 턴 전후로 worktree 스냅샷을 만들어, 카드에 셸 편집을 포함한 모든 변경된 파일을 표시하고 되돌릴 수 있게 합니다. 각 프롬프트는 먼저 스냅샷이 끝나기를 기다립니다."
 
@@ -19285,6 +19328,9 @@ msgstr "탭 막대의 +로 시작하세요."
 
 msgid "Start or stop the workspace run command"
 msgstr "워크스페이스 실행 명령을 시작하거나 중지합니다"
+
+msgid "Start script"
+msgstr "시작 스크립트"
 
 msgid "Start voice mode"
 msgstr "음성 모드 시작"
@@ -19963,6 +20009,9 @@ msgstr "터미널"
 msgid "Terminal agent launch configuration"
 msgstr "터미널 에이전트 실행 구성"
 
+msgid "Terminal command"
+msgstr "터미널 명령"
+
 msgid "Terminal connection: {label}"
 msgstr "터미널 연결: {label}"
 
@@ -19977,6 +20026,9 @@ msgstr "터미널에 포커스가 있으면 터미널 글꼴 크기, 브라우�
 
 msgid "Terminal input"
 msgstr "터미널 입력"
+
+msgid "Terminal name"
+msgstr "터미널 이름"
 
 msgid "Terminal removed"
 msgstr "터미널을 제거했습니다"
@@ -20698,6 +20750,10 @@ msgstr "이 클라우드 워크스페이스를 시작할 수 없습니다"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "이 클라우드 워크스페이스를 깨우는 중입니다. 한동안 사용하지 않았다면 최대 30초가 걸릴 수 있습니다."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "이 구성이 올바르지 않습니다: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "이 대화는 모델이 처리하기에 너무 깁니다"
 
@@ -20725,8 +20781,8 @@ msgstr "이 디렉터리가 없습니다. 터미널 스크립트는 워크스페
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "이 이메일은 이미 다른 로그인 방법으로 등록되어 있으며, 제공자가 이를 인증된 것으로 확인하지 않았습니다. 이전에 사용한 방법으로 로그인하세요."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "이 환경에는 빌드할 [install]이 없습니다. 기본 브랜치의 .paradev/config.toml에 추가하세요."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "이 환경에는 빌드할 [install]이 없습니다. 설정의 환경에서 이 환경의 구성에 추가하세요."
 
 msgid "This environment has no repositories to build"
 msgstr "이 환경에는 빌드할 리포지토리가 없습니다"
@@ -20736,9 +20792,6 @@ msgstr "이 환경에는 저장소가 없습니다. 설정에서 저장소가 �
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "이 환경은 {repository}이(가) 아니라 {environmentRepository}을(를) 엽니다"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "이 환경의 리포지토리는 고정되어 있습니다. 변경하려면 워크스페이스를 다시 승격하세요"
 
 msgid "this file"
 msgstr "이 파일"
@@ -22018,6 +22071,9 @@ msgstr "새 에이전트에 사용"
 msgid "Use global default"
 msgstr "전역 기본값 사용"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "영문 소문자, 숫자, 밑줄을 사용하고 문자로 시작하세요."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "소문자, 숫자, 하이픈, 밑줄을 사용하세요"
 
@@ -22453,6 +22509,9 @@ msgstr "샌프란시스코에서 엔지니어를 채용하고 있습니다. 엔�
 msgid "We're hiring in San Francisco"
 msgstr "샌프란시스코에서 채용하고 있습니다"
 
+msgid "Web app"
+msgstr "웹 앱"
+
 msgid "Web Fetch"
 msgstr "웹 가져오기"
 
@@ -22595,6 +22654,9 @@ msgstr "팀이 자동화하는 일"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "작성 기준이 된 대상이 페이지에 더 이상 없어 핀이 없습니다."
 
+msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "이 환경의 빌드와 클라우드 워크스페이스에서 실행되는 내용입니다. 리포지토리 자체의 config.toml은 클라우드에서 사용되지 않습니다."
+
 msgid "What we believe"
 msgstr "우리가 믿는 것"
 
@@ -22681,6 +22743,9 @@ msgstr "어떤 AI 코딩 에이전트를 지원하나요?"
 
 msgid "Which plans include automations?"
 msgstr "어떤 플랜에 자동화가 포함되나요?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
+msgstr "이 환경에서 클라우드 에이전트가 MCP 서버를 사용할 수 있는 플러그인입니다. 제거한 플러그인은 실행 중인 워크스페이스에서도 작동하지 않습니다."
 
 msgid "Who can open it"
 msgstr "열 수 있는 사람"

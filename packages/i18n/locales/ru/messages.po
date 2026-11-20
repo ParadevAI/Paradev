@@ -2145,8 +2145,8 @@ msgstr "Добавить описание"
 msgid "Add description..."
 msgstr "Добавьте описание..."
 
-msgid "Add Environment Variable"
-msgstr "Добавить переменную окружения"
+msgid "Add environment variables"
+msgstr "Добавить переменные окружения"
 
 msgid "Add extension"
 msgstr "Добавить расширение"
@@ -2185,9 +2185,6 @@ msgstr "Добавить ещё…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "Добавьте агента из меню в боковой панели, чтобы начать."
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "Добавьте одну или несколько переменных окружения. Можно также перетащить файл .env."
-
 msgid "Add people"
 msgstr "Добавить людей"
 
@@ -2199,6 +2196,9 @@ msgstr "Добавить людей в канал"
 
 msgid "Add photos or files"
 msgstr "Добавить фото или файлы"
+
+msgid "Add port"
+msgstr "Добавить порт"
 
 msgid "Add project"
 msgstr "Добавить проект"
@@ -2235,6 +2235,9 @@ msgstr "Добавить налоговый номер"
 
 msgid "Add team member..."
 msgstr "Добавить участника команды..."
+
+msgid "Add terminal"
+msgstr "Добавить терминал"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "Добавь тесты для самого рискованного непокрытого кода…"
@@ -2274,6 +2277,9 @@ msgstr "Добавить на боковую панель"
 
 msgid "Add to workspace"
 msgstr "Добавить в рабочую область"
+
+msgid "Add variables"
+msgstr "Добавить переменные"
 
 msgid "Add what it does"
 msgstr "Добавить, что он делает"
@@ -2624,6 +2630,9 @@ msgstr "Все страницы"
 msgid "All plans"
 msgstr "Все тарифы"
 
+msgid "All plugins"
+msgstr "Все плагины"
+
 msgid "All posts"
 msgstr "Все посты"
 
@@ -2713,6 +2722,9 @@ msgstr "Разрешено"
 
 msgid "Allowed for session"
 msgstr "Разрешено на сессию"
+
+msgid "Allowed plugins"
+msgstr "Разрешённые плагины"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "Уже перенесено в другую организацию. Переключитесь на неё, чтобы увидеть этот проект."
@@ -2804,6 +2816,9 @@ msgstr "Автоматизация может использовать толь�
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "Окружение хранит репозитории, переменные и регион. Запускайте из него столько рабочих областей, сколько нужно."
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "Репозитории окружения нельзя изменить. Для других репозиториев создайте новое окружение."
+
 msgid "An error occurred"
 msgstr "Произошла ошибка"
 
@@ -2854,6 +2869,9 @@ msgstr "Другой ИИ-ассистент"
 
 msgid "another device"
 msgstr "другое устройство"
+
+msgid "Another row already uses this name."
+msgstr "Это имя уже используется в другой строке."
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "Отвечайте на вопросы в терминале ниже, например введите пароль."
@@ -3572,9 +3590,6 @@ msgstr "Базовая папка для новых рабочих област�
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "Базовая папка для новых worktree на {selectedHostName}."
 
-msgid "Base image · no checkpoint yet"
-msgstr "Базовый образ · контрольных точек пока нет"
-
 msgid "Base URL"
 msgstr "Базовый URL"
 
@@ -3838,9 +3853,6 @@ msgstr "Жук"
 msgid "Bug reports"
 msgstr "Отчёты о багах"
 
-msgid "Build ID"
-msgstr "ID сборки"
-
 msgid "Build in public"
 msgstr "Работаем открыто"
 
@@ -3853,17 +3865,11 @@ msgstr "Строим последнюю программу"
 msgid "Building the last piece of software."
 msgstr "Строим последнюю программу."
 
-msgid "Building with the new repositories"
-msgstr "Идёт сборка с новыми репозиториями"
-
 msgid "Building…"
 msgstr "Идёт сборка…"
 
-msgid "Builds"
-msgstr "Сборки"
-
-msgid "Built"
-msgstr "Собрано"
+msgid "Builds fail until there is an install script."
+msgstr "Без скрипта установки сборки завершаются с ошибкой."
 
 msgid "Built a plugin? Submit it here."
 msgstr "Создали плагин? Отправьте его здесь."
@@ -4409,13 +4415,6 @@ msgstr "Контрольная точка"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "Контрольная точка · до рефакторинга tooltip"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "Контрольная точка сохранена {0}"
-
-msgid "Checkpoint saved to {name}"
-msgstr "Контрольная точка сохранена в {name}"
-
 msgid "Checks"
 msgstr "Проверки"
 
@@ -4853,6 +4852,9 @@ msgstr "Облако"
 msgid "Cloud · us-east"
 msgstr "Облако · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "Облачные агенты не получают серверов MCP в этом окружении."
+
 msgid "Cloud environment setup"
 msgstr "Настройка облачного окружения"
 
@@ -5163,6 +5165,9 @@ msgstr "Conductor — товарный знак его владельца. {0} �
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Рабочие области Conductor — это обычные Git worktree. {0} использует их там, где они лежат."
+
+msgid "Config"
+msgstr "Конфигурация"
 
 msgid "Config file contents"
 msgstr "Содержимое файла конфигурации"
@@ -6952,6 +6957,9 @@ msgstr "Модель по умолчанию"
 msgid "Default team for new tasks"
 msgstr "Команда по умолчанию для новых задач"
 
+msgid "Default terminal"
+msgstr "Терминал по умолчанию"
+
 msgid "Default terminal theme"
 msgstr "Тема терминала по умолчанию"
 
@@ -7402,6 +7410,9 @@ msgstr "Папка"
 msgid "Disable"
 msgstr "Отключить"
 
+msgid "Disable MCP servers"
+msgstr "Отключить серверы MCP"
+
 msgid "Disable skill"
 msgstr "Отключить навык"
 
@@ -7819,6 +7830,9 @@ msgstr "Каждое место добавляет часы своего тар�
 msgid "Each session resumes where it left off."
 msgstr "Каждая сессия продолжит с того места, где остановилась."
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "Каждая успешная сборка сохраняет снимок. Новые рабочие области запускаются с текущего, а более ранний можно восстановить."
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "У каждой поверхности своя типографика. Изменения сразу видны в живом предпросмотре."
 
@@ -7859,6 +7873,12 @@ msgstr "Изменить"
 msgid "Edit {selectedName}"
 msgstr "Изменить {selectedName}"
 
+msgid "Edit as form"
+msgstr "Изменить в форме"
+
+msgid "Edit as TOML"
+msgstr "Изменить как TOML"
+
 msgid "Edit Channel Name"
 msgstr "Изменить название канала"
 
@@ -7888,9 +7908,6 @@ msgstr "Изменить на GitHub"
 
 msgid "Edit queued message"
 msgstr "Изменить сообщение в очереди"
-
-msgid "Edit repositories"
-msgstr "Изменить репозитории"
 
 msgid "Edit routine"
 msgstr "Изменить рутину"
@@ -8029,6 +8046,9 @@ msgstr "Завершение звонка"
 msgid "Ensure no regression"
 msgstr "Убедись, что нет регрессии"
 
+msgid "Enter a command."
+msgstr "Введите команду."
+
 msgid "Enter a full email address"
 msgstr "Введите полный адрес email"
 
@@ -8040,6 +8060,9 @@ msgstr "Введите родительскую папку на {hostName}"
 
 msgid "Enter a path on {hostName}"
 msgstr "Введите путь на {hostName}"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "Введите порт от 1 до 65535."
 
 msgid "Enter a URL into the search bar above."
 msgstr "Введите URL в строку поиска выше."
@@ -10541,6 +10564,9 @@ msgstr "Установите Paradev MCP в своём клиенте"
 msgid "Install plugin"
 msgstr "Установить плагин"
 
+msgid "Install script"
+msgstr "Скрипт установки"
+
 msgid "Install the desktop app"
 msgstr "Установите десктопное приложение"
 
@@ -11322,7 +11348,9 @@ msgstr "Оставить доступ только приглашённым?"
 msgid "Line {0}"
 msgstr "Строка {0}"
 
+#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
+#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Строка {0}: {1}"
@@ -11653,6 +11681,9 @@ msgstr "Надёжность на длинной дистанции перехо
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "Подсказка только с сочетанием клавиш при долгом наведении; её стиль чипа теперь по умолчанию для TooltipContent"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "Долго работающие команды, например dev-сервер. Каждая рабочая область при запуске открывает терминал по умолчанию."
+
 msgid "Looking at {what}"
 msgstr "Смотрю {what}"
 
@@ -11893,6 +11924,9 @@ msgstr "Максимальный размер — 256 КБ."
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "Список разрешённых MCP"
 
 msgid "MCP manager"
 msgstr "Менеджер MCP"
@@ -12907,9 +12941,6 @@ msgstr "Переменных окружения пока нет"
 msgid "No environments available"
 msgstr "Нет доступных окружений"
 
-msgid "No environments built yet"
-msgstr "Окружения ещё не собирались"
-
 msgid "No environments found."
 msgstr "Окружения не найдены."
 
@@ -13143,6 +13174,9 @@ msgstr "Человек не записан"
 
 msgid "No plugins available yet."
 msgstr "Плагинов пока нет."
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "Плагины не установлены, поэтому облачные агенты не получают здесь серверов MCP."
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13900,6 +13934,9 @@ msgstr "Изменить это может только тот, кто созд�
 msgid "Only the person who created this workspace can change these."
 msgstr "Изменить это может только создатель этого рабочего пространства."
 
+msgid "Only the plugins below"
+msgstr "Только плагины ниже"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "Удалить может только автор ветки или владелец страницы"
 
@@ -14468,9 +14505,6 @@ msgstr "Организация уже существует"
 
 msgid "Organization created successfully!"
 msgstr "Организация успешно создана!"
-
-msgid "Organization default ({defaultName})"
-msgstr "По умолчанию для организации ({defaultName})"
 
 msgid "Organization deleted"
 msgstr "Организация удалена"
@@ -15169,9 +15203,6 @@ msgstr "Выберите папку worktree проекта на {hostName}."
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "Выберите репозитории для загрузки. Агент в облачном рабочем пространстве определит, что установить, и запустит окружение."
 
-msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
-msgstr "Выберите репозитории, которые загружает это окружение. Сохранение запускает новую сборку; рабочие области запускаются из текущей, пока новая не завершится успешно."
-
 msgid "Pick the worktree folder on {hostName}."
 msgstr "Выберите папку worktree на {hostName}."
 
@@ -15312,6 +15343,18 @@ msgstr "Популярный"
 msgid "Popular models"
 msgstr "Популярные модели"
 
+msgid "Port"
+msgstr "Порт"
+
+msgid "Port label"
+msgstr "Подпись порта"
+
+msgid "Port name"
+msgstr "Имя порта"
+
+msgid "Port number"
+msgstr "Номер порта"
+
 msgid "Ports"
 msgstr "Порты"
 
@@ -15323,6 +15366,9 @@ msgstr "Порты на удалённых хостах"
 
 msgid "Ports on this computer"
 msgstr "Порты на этом компьютере"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "Порты, которые слушает приложение. Порты с предпросмотром получают ссылку, которую можно открыть из рабочей области."
 
 msgid "Ports: {totalPortCount} live"
 msgstr "Активных портов: {totalPortCount}"
@@ -16452,6 +16498,9 @@ msgstr "Удалить упоминание {path}"
 msgid "Remove pasted text"
 msgstr "Удалить вставленный текст"
 
+msgid "Remove port"
+msgstr "Удалить порт"
+
 msgid "Remove PR Link"
 msgstr "Отвязать PR"
 
@@ -16466,6 +16515,9 @@ msgstr "Удалить скрипт"
 
 msgid "Remove team member?"
 msgstr "Удалить участника команды?"
+
+msgid "Remove terminal"
+msgstr "Удалить терминал"
 
 msgid "Remove terminal {createdAtLabel}"
 msgstr "Удалить терминал {createdAtLabel}"
@@ -17384,6 +17436,12 @@ msgstr "Запускает локальную команду на вашей м�
 msgid "Runs appear here once an automation fires."
 msgstr "Запуски появятся здесь, как только сработает автоматизация."
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "Запускается как bash-скрипт в каждом новом облачном рабочем пространстве до запуска агентов."
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "Запускается как bash-скрипт при сборке окружения. Новые рабочие пространства начинаются с её результата."
+
 msgid "Runs in"
 msgstr "Где работает"
 
@@ -17429,14 +17487,8 @@ msgstr "Песочница перестала отвечать"
 msgid "Save"
 msgstr "Сохранить"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "Сохранить контрольную точку в {name}?"
-
 msgid "Save All"
 msgstr "Сохранить всё"
-
-msgid "Save and build"
-msgstr "Сохранить и собрать"
 
 msgid "Save and continue"
 msgstr "Сохранить и продолжить"
@@ -17449,9 +17501,6 @@ msgstr "Сохранить как вид"
 
 msgid "Save Changes"
 msgstr "Сохранить изменения"
-
-msgid "Save checkpoint"
-msgstr "Сохранить контрольную точку"
 
 msgid "Save edits"
 msgstr "Сохранить правки"
@@ -17505,11 +17554,8 @@ msgstr "Сохранено из рабочей области"
 msgid "Saved to Downloads"
 msgstr "Сохранено в «Загрузки»"
 
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "Сохраняет это рабочее пространство в текущем виде со всем, что в нём установлено. Новые рабочие пространства из {name} будут начинаться с этой контрольной точки. Во время сохранения рабочее пространство ненадолго остановится."
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "Сохранение контрольной точки в {name}..."
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "Сохранено. Новые рабочие области и следующая сборка будут её использовать; запущенные рабочие области применят её после перезапуска."
 
 msgid "Saving as an environment..."
 msgstr "Сохранение как среда..."
@@ -18897,9 +18943,6 @@ msgstr "Смайлики и люди"
 msgid "Smoother onboarding"
 msgstr "Более гладкий онбординг"
 
-msgid "Snapshot"
-msgstr "Снимок"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "Делать снимок worktree до и после каждого хода чата, чтобы его карточка показывала каждый изменённый файл, включая правки из оболочки, и могла их отменить. Каждый промпт сначала ждёт свой снимок."
 
@@ -19285,6 +19328,9 @@ msgstr "Запустите сессию кнопкой + в полосе вкл�
 
 msgid "Start or stop the workspace run command"
 msgstr "Запустить или остановить команду запуска рабочей области"
+
+msgid "Start script"
+msgstr "Скрипт запуска"
 
 msgid "Start voice mode"
 msgstr "Запустить голосовой режим"
@@ -19963,6 +20009,9 @@ msgstr "Терминал"
 msgid "Terminal agent launch configuration"
 msgstr "Конфигурация запуска терминального агента"
 
+msgid "Terminal command"
+msgstr "Команда терминала"
+
 msgid "Terminal connection: {label}"
 msgstr "Соединение терминала: {label}"
 
@@ -19977,6 +20026,9 @@ msgstr "Размер шрифта терминала, когда термина�
 
 msgid "Terminal input"
 msgstr "Ввод в терминал"
+
+msgid "Terminal name"
+msgstr "Имя терминала"
 
 msgid "Terminal removed"
 msgstr "Терминал удалён"
@@ -20698,6 +20750,10 @@ msgstr "Не удаётся запустить эту облачную рабо�
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "Эта конфигурация недействительна: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "Этот разговор слишком длинный для модели"
 
@@ -20725,8 +20781,8 @@ msgstr "Такой папки не существует. Скрипт терми
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Этот адрес электронной почты уже зарегистрирован с другим способом входа, и провайдер не подтвердил его как проверенный. Войдите тем способом, которым пользовались раньше."
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "У этого окружения нет [install] для сборки. Добавьте его в .paradev/config.toml в базовой ветке."
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "В этом окружении нет [install] для сборки. Добавьте его в конфигурацию в разделе Настройки, Окружения."
 
 msgid "This environment has no repositories to build"
 msgstr "У этого окружения нет репозиториев для сборки"
@@ -20736,9 +20792,6 @@ msgstr "В этом окружении нет репозиториев. Созд
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "Это окружение открывает {environmentRepository}, а не {repository}"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "Репозитории этого окружения зафиксированы; чтобы изменить их, снова повысьте рабочую область"
 
 msgid "this file"
 msgstr "этот файл"
@@ -22018,6 +22071,9 @@ msgstr "Использовать для новых агентов"
 msgid "Use global default"
 msgstr "Использовать общий по умолчанию"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "Используйте строчные буквы, цифры и подчёркивания; первым символом должна быть буква."
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "Используйте строчные буквы, цифры, дефисы и подчёркивания"
 
@@ -22453,6 +22509,9 @@ msgstr "Мы нанимаем инженеров в Сан-Франциско. �
 msgid "We're hiring in San Francisco"
 msgstr "Мы нанимаем в Сан-Франциско"
 
+msgid "Web app"
+msgstr "Веб-приложение"
+
 msgid "Web Fetch"
 msgstr "Загрузка веб-страницы"
 
@@ -22595,6 +22654,9 @@ msgstr "Что автоматизируют команды"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "Того, к чему они были написаны, больше нет на странице, поэтому у них нет метки."
 
+msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "Что запускают сборки и облачные рабочие области этого окружения. Собственный config.toml репозитория в облаке не используется."
+
 msgid "What we believe"
 msgstr "Во что мы верим"
 
@@ -22681,6 +22743,9 @@ msgstr "Какие AI-агенты для кода поддерживаются?
 
 msgid "Which plans include automations?"
 msgstr "В какие планы входят автоматизации?"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
+msgstr "Плагины, чьи серверы MCP облачные агенты могут использовать в этом окружении. Удалённый плагин перестаёт работать и в запущенных рабочих областях."
 
 msgid "Who can open it"
 msgstr "Кто может открыть"

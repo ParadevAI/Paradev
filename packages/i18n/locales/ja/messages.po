@@ -2145,7 +2145,7 @@ msgstr "説明を追加"
 msgid "Add description..."
 msgstr "説明を追加..."
 
-msgid "Add Environment Variable"
+msgid "Add environment variables"
 msgstr "環境変数を追加"
 
 msgid "Add extension"
@@ -2185,9 +2185,6 @@ msgstr "さらに追加…"
 msgid "Add one from the menu in the sidebar to get started."
 msgstr "サイドバーのメニューから追加して始めましょう。"
 
-msgid "Add one or more environment variables. You can also drag and drop a .env file."
-msgstr "1 つ以上の環境変数を追加します。.env ファイルをドラッグ＆ドロップすることもできます。"
-
 msgid "Add people"
 msgstr "ユーザーを追加"
 
@@ -2199,6 +2196,9 @@ msgstr "チャンネルにメンバーを追加"
 
 msgid "Add photos or files"
 msgstr "写真やファイルを追加"
+
+msgid "Add port"
+msgstr "ポートを追加"
 
 msgid "Add project"
 msgstr "プロジェクトを追加"
@@ -2235,6 +2235,9 @@ msgstr "税IDを追加"
 
 msgid "Add team member..."
 msgstr "チームメンバーを追加..."
+
+msgid "Add terminal"
+msgstr "ターミナルを追加"
 
 msgid "Add tests for the riskiest untested code…"
 msgstr "テストのない危険なコードにテストを追加…"
@@ -2274,6 +2277,9 @@ msgstr "サイドバーに追加"
 
 msgid "Add to workspace"
 msgstr "ワークスペースに追加"
+
+msgid "Add variables"
+msgstr "変数を追加"
 
 msgid "Add what it does"
 msgstr "役割を追加"
@@ -2624,6 +2630,9 @@ msgstr "すべてのページ"
 msgid "All plans"
 msgstr "すべてのプラン"
 
+msgid "All plugins"
+msgstr "すべてのプラグイン"
+
 msgid "All posts"
 msgstr "すべての投稿"
 
@@ -2713,6 +2722,9 @@ msgstr "許可済み"
 
 msgid "Allowed for session"
 msgstr "セッション中は許可"
+
+msgid "Allowed plugins"
+msgstr "許可するプラグイン"
 
 msgid "Already brought over to another organization. Switch to it to see this project."
 msgstr "すでに別の組織に移行済みです。このプロジェクトを表示するには、その組織に切り替えてください。"
@@ -2804,6 +2816,9 @@ msgstr "オートメーションで使用できるのは、自分が作成した
 msgid "An environment holds your repositories, variables, and region. Start as many workspaces from it as you need."
 msgstr "環境にはリポジトリ、変数、リージョンを保存します。そこから必要なだけワークスペースを起動できます。"
 
+msgid "An environment's repositories can't change. Create a new environment for other repositories."
+msgstr "環境のリポジトリは変更できません。別のリポジトリには新しい環境を作成してください。"
+
 msgid "An error occurred"
 msgstr "エラーが発生しました"
 
@@ -2854,6 +2869,9 @@ msgstr "その他の AI アシスタント"
 
 msgid "another device"
 msgstr "別のデバイス"
+
+msgid "Another row already uses this name."
+msgstr "この名前はほかの行で使われています。"
 
 msgid "Answer any questions in the terminal below, such as a password."
 msgstr "パスワードなど、下のターミナルでの質問に答えてください。"
@@ -3572,9 +3590,6 @@ msgstr "このホストの新規ワークツリーワークスペースのベー
 msgid "Base directory for new worktrees on {selectedHostName}."
 msgstr "{selectedHostName}の新規ワークツリーのベースディレクトリ。"
 
-msgid "Base image · no checkpoint yet"
-msgstr "ベースイメージ · チェックポイントはまだありません"
-
 msgid "Base URL"
 msgstr "ベースURL"
 
@@ -3838,9 +3853,6 @@ msgstr "バグ"
 msgid "Bug reports"
 msgstr "バグ報告"
 
-msgid "Build ID"
-msgstr "ビルド ID"
-
 msgid "Build in public"
 msgstr "オープンに開発"
 
@@ -3853,17 +3865,11 @@ msgstr "最後のソフトウェアを作る"
 msgid "Building the last piece of software."
 msgstr "最後のソフトウェアを作る。"
 
-msgid "Building with the new repositories"
-msgstr "新しいリポジトリでビルド中"
-
 msgid "Building…"
 msgstr "ビルド中…"
 
-msgid "Builds"
-msgstr "ビルド"
-
-msgid "Built"
-msgstr "ビルド日時"
+msgid "Builds fail until there is an install script."
+msgstr "インストールスクリプトがないとビルドは失敗します。"
 
 msgid "Built a plugin? Submit it here."
 msgstr "プラグインを作りましたか？ここから送信してください。"
@@ -4409,13 +4415,6 @@ msgstr "Checkpoint"
 msgid "Checkpoint · before tooltip refactor"
 msgstr "チェックポイント · tooltipリファクタリング前"
 
-#. placeholder {0}: formatRelativeTime(new Date(row.updatedAt), now)
-msgid "Checkpoint saved {0}"
-msgstr "チェックポイント保存 {0}"
-
-msgid "Checkpoint saved to {name}"
-msgstr "{name} にチェックポイントを保存しました"
-
 msgid "Checks"
 msgstr "チェック"
 
@@ -4853,6 +4852,9 @@ msgstr "クラウド"
 msgid "Cloud · us-east"
 msgstr "クラウド · us-east"
 
+msgid "Cloud agents get no MCP servers in this environment."
+msgstr "この環境ではクラウドエージェントはMCPサーバーを使えません。"
+
 msgid "Cloud environment setup"
 msgstr "クラウド環境のセットアップ"
 
@@ -5163,6 +5165,9 @@ msgstr "Conductor はその所有者の商標です。{0} は Conductor およ�
 #. placeholder {0}: BRAND.NAME
 msgid "Conductor workspaces are plain Git worktrees. {0} uses them where they are."
 msgstr "Conductor のワークスペースはただの Git ワークツリーです。{0} はそのままの場所で使います。"
+
+msgid "Config"
+msgstr "設定"
 
 msgid "Config file contents"
 msgstr "設定ファイルの内容"
@@ -6952,6 +6957,9 @@ msgstr "デフォルトのモデル"
 msgid "Default team for new tasks"
 msgstr "新しいタスクの既定チーム"
 
+msgid "Default terminal"
+msgstr "デフォルトのターミナル"
+
 msgid "Default terminal theme"
 msgstr "既定のターミナルテーマ"
 
@@ -7402,6 +7410,9 @@ msgstr "ディレクトリ"
 msgid "Disable"
 msgstr "無効にする"
 
+msgid "Disable MCP servers"
+msgstr "MCPサーバーを無効にする"
+
 msgid "Disable skill"
 msgstr "スキルを無効にする"
 
@@ -7819,6 +7830,9 @@ msgstr "各席はプランの時間をチーム全体で共有する 1 つのプ
 msgid "Each session resumes where it left off."
 msgstr "各セッションは中断したところから再開します。"
 
+msgid "Each successful build saves a snapshot. New workspaces start from the current one, and you can restore an earlier one."
+msgstr "ビルドが成功するたびにスナップショットが保存されます。新しいワークスペースは現在のスナップショットから開始し、以前のものに復元することもできます。"
+
 msgid "Each surface has its own typography. Changes appear immediately in the live previews."
 msgstr "サーフェスごとに独自のタイポグラフィがあります。変更はライブプレビューに即座に反映されます。"
 
@@ -7859,6 +7873,12 @@ msgstr "編集"
 msgid "Edit {selectedName}"
 msgstr "{selectedName} を編集"
 
+msgid "Edit as form"
+msgstr "フォームで編集"
+
+msgid "Edit as TOML"
+msgstr "TOML で編集"
+
 msgid "Edit Channel Name"
 msgstr "チャンネル名を編集"
 
@@ -7888,9 +7908,6 @@ msgstr "GitHubで編集"
 
 msgid "Edit queued message"
 msgstr "キューのメッセージを編集"
-
-msgid "Edit repositories"
-msgstr "リポジトリを編集"
 
 msgid "Edit routine"
 msgstr "ルーティンを編集"
@@ -8029,6 +8046,9 @@ msgstr "通話を終了中"
 msgid "Ensure no regression"
 msgstr "デグレがないことを確認して"
 
+msgid "Enter a command."
+msgstr "コマンドを入力してください。"
+
 msgid "Enter a full email address"
 msgstr "完全なメールアドレスを入力してください"
 
@@ -8040,6 +8060,9 @@ msgstr "{hostName}の親ディレクトリを入力してください"
 
 msgid "Enter a path on {hostName}"
 msgstr "{hostName}のパスを入力してください"
+
+msgid "Enter a port from 1 to 65535."
+msgstr "1〜65535 のポートを入力してください。"
 
 msgid "Enter a URL into the search bar above."
 msgstr "上の検索バーにURLを入力してください。"
@@ -10541,6 +10564,9 @@ msgstr "クライアントにParadev MCPをインストール"
 msgid "Install plugin"
 msgstr "プラグインをインストール"
 
+msgid "Install script"
+msgstr "インストールスクリプト"
+
 msgid "Install the desktop app"
 msgstr "デスクトップアプリをインストール"
 
@@ -11322,7 +11348,9 @@ msgstr "招待したユーザーのみに制限しますか？"
 msgid "Line {0}"
 msgstr "{0}行目"
 
+#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
+#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "{0} 行目: {1}"
@@ -11653,6 +11681,9 @@ msgstr "長時間にわたる信頼性がしきい値を超えます。18時に�
 msgid "Long-hover shortcut-only tooltip; its chip style is now the TooltipContent default"
 msgstr "長めのホバーでショートカットだけを出すtooltip。そのチップスタイルが現在のTooltipContentのデフォルトです"
 
+msgid "Long-running commands, such as a dev server. Each workspace opens the default one when it starts."
+msgstr "開発サーバーなど、実行し続けるコマンドです。各ワークスペースは起動時にデフォルトのターミナルを開きます。"
+
 msgid "Looking at {what}"
 msgstr "{what} を確認中"
 
@@ -11893,6 +11924,9 @@ msgstr "最大サイズは256 KBです。"
 
 msgid "MCP"
 msgstr "MCP"
+
+msgid "MCP allowlist"
+msgstr "MCP許可リスト"
 
 msgid "MCP manager"
 msgstr "MCPマネージャー"
@@ -12907,9 +12941,6 @@ msgstr "環境変数はまだありません"
 msgid "No environments available"
 msgstr "利用可能な環境はありません"
 
-msgid "No environments built yet"
-msgstr "まだビルドされた環境がありません"
-
 msgid "No environments found."
 msgstr "環境が見つかりません。"
 
@@ -13143,6 +13174,9 @@ msgstr "記録された人物なし"
 
 msgid "No plugins available yet."
 msgstr "利用できるプラグインはまだありません。"
+
+msgid "No plugins installed, so cloud agents get no MCP servers here."
+msgstr "プラグインがインストールされていないため、ここではクラウドエージェントはMCPサーバーを使えません。"
 
 #. placeholder {0}: search.trim()
 msgid "No plugins match \"{0}\""
@@ -13900,6 +13934,9 @@ msgstr "このページを作成した人だけが変更できます。"
 msgid "Only the person who created this workspace can change these."
 msgstr "このワークスペースを作成した人だけが変更できます。"
 
+msgid "Only the plugins below"
+msgstr "以下のプラグインのみ"
+
 msgid "Only the thread's author or the page's owner can delete it"
 msgstr "スレッドを削除できるのはスレッドの投稿者かページのオーナーのみです"
 
@@ -14468,9 +14505,6 @@ msgstr "組織はすでに存在します"
 
 msgid "Organization created successfully!"
 msgstr "組織を作成しました!"
-
-msgid "Organization default ({defaultName})"
-msgstr "組織のデフォルト（{defaultName}）"
 
 msgid "Organization deleted"
 msgstr "組織を削除しました"
@@ -15169,9 +15203,6 @@ msgstr "{hostName}のプロジェクトのワークツリーフォルダを選�
 msgid "Pick the repositories it checks out. An agent in a cloud workspace works out what to install and gets it running."
 msgstr "チェックアウトするリポジトリを選択します。クラウドワークスペースのエージェントが、インストールが必要なものを判断して動作させます。"
 
-msgid "Pick the repositories this environment checks out. Saving starts a new build; workspaces keep starting from the current one until it succeeds."
-msgstr "この環境がチェックアウトするリポジトリを選択します。保存すると新しいビルドが始まり、成功するまでワークスペースは現在のものから起動します。"
-
 msgid "Pick the worktree folder on {hostName}."
 msgstr "{hostName}のワークツリーフォルダを選択してください。"
 
@@ -15312,6 +15343,18 @@ msgstr "人気"
 msgid "Popular models"
 msgstr "人気のモデル"
 
+msgid "Port"
+msgstr "ポート"
+
+msgid "Port label"
+msgstr "ポートのラベル"
+
+msgid "Port name"
+msgstr "ポート名"
+
+msgid "Port number"
+msgstr "ポート番号"
+
 msgid "Ports"
 msgstr "ポート"
 
@@ -15323,6 +15366,9 @@ msgstr "リモートホストのポート"
 
 msgid "Ports on this computer"
 msgstr "このコンピューターのポート"
+
+msgid "Ports the app listens on. Preview ports get a link you can open from the workspace."
+msgstr "アプリが待ち受けるポートです。プレビューポートには、ワークスペースから開けるリンクが付きます。"
 
 msgid "Ports: {totalPortCount} live"
 msgstr "ポート：{totalPortCount}個がライブ"
@@ -16452,6 +16498,9 @@ msgstr "メンション{path}を削除"
 msgid "Remove pasted text"
 msgstr "貼り付けたテキストを削除"
 
+msgid "Remove port"
+msgstr "ポートを削除"
+
 msgid "Remove PR Link"
 msgstr "PRリンクを解除"
 
@@ -16466,6 +16515,9 @@ msgstr "スクリプトを削除"
 
 msgid "Remove team member?"
 msgstr "チームメンバーを削除しますか?"
+
+msgid "Remove terminal"
+msgstr "ターミナルを削除"
 
 msgid "Remove terminal {createdAtLabel}"
 msgstr "ターミナル{createdAtLabel}を削除"
@@ -17384,6 +17436,12 @@ msgstr "マシン上でローカルコマンドを実行します"
 msgid "Runs appear here once an automation fires."
 msgstr "オートメーションが起動すると、ここに実行が表示されます。"
 
+msgid "Runs as a bash script in each new cloud workspace before agents start."
+msgstr "エージェントが起動する前に、新しいクラウドワークスペースごとにbashスクリプトとして実行されます。"
+
+msgid "Runs as a bash script when the environment builds. New workspaces start from the result."
+msgstr "環境のビルド時にbashスクリプトとして実行されます。新しいワークスペースはその結果から始まります。"
+
 msgid "Runs in"
 msgstr "実行場所"
 
@@ -17429,14 +17487,8 @@ msgstr "サンドボックスが応答しなくなりました"
 msgid "Save"
 msgstr "保存"
 
-msgid "Save a checkpoint to {name}?"
-msgstr "{name} にチェックポイントを保存しますか？"
-
 msgid "Save All"
 msgstr "すべて保存"
-
-msgid "Save and build"
-msgstr "保存してビルド"
 
 msgid "Save and continue"
 msgstr "保存して続行"
@@ -17449,9 +17501,6 @@ msgstr "ビューとして保存"
 
 msgid "Save Changes"
 msgstr "変更を保存"
-
-msgid "Save checkpoint"
-msgstr "チェックポイントを保存"
 
 msgid "Save edits"
 msgstr "編集を保存"
@@ -17505,11 +17554,8 @@ msgstr "ワークスペースから保存"
 msgid "Saved to Downloads"
 msgstr "ダウンロードフォルダに保存しました"
 
-msgid "Saves this workspace as it is now, with everything installed in it. New workspaces from {name} start from this checkpoint. The workspace stops for a moment while it saves."
-msgstr "このワークスペースを、インストール済みのものも含めて現在の状態で保存します。{name} から作成する新しいワークスペースはこのチェックポイントから始まります。保存中、ワークスペースは少しの間停止します。"
-
-msgid "Saving a checkpoint to {name}..."
-msgstr "{name} にチェックポイントを保存中..."
+msgid "Saved. New workspaces and the next build use it; running workspaces pick it up when they restart."
+msgstr "保存しました。新しいワークスペースと次回のビルドで使われます。実行中のワークスペースには再起動時に反映されます。"
 
 msgid "Saving as an environment..."
 msgstr "環境として保存しています..."
@@ -18897,9 +18943,6 @@ msgstr "スマイリーと人"
 msgid "Smoother onboarding"
 msgstr "よりスムーズなオンボーディング"
 
-msgid "Snapshot"
-msgstr "スナップショット"
-
 msgid "Snapshot the worktree before and after each chat turn, so its card lists every changed file, shell edits included, and can undo them. Each prompt waits for its snapshot first."
 msgstr "チャットの各ターンの前後でワークツリーのスナップショットを作成し、カードに変更されたすべてのファイル（シェルによる編集を含む）を表示して元に戻せるようにします。各プロンプトは先にスナップショットの完了を待ちます。"
 
@@ -19285,6 +19328,9 @@ msgstr "タブバーの+から開始できます。"
 
 msgid "Start or stop the workspace run command"
 msgstr "ワークスペースの実行コマンドを開始または停止する"
+
+msgid "Start script"
+msgstr "起動スクリプト"
 
 msgid "Start voice mode"
 msgstr "音声モードを開始"
@@ -19963,6 +20009,9 @@ msgstr "ターミナル"
 msgid "Terminal agent launch configuration"
 msgstr "ターミナルエージェントの起動設定"
 
+msgid "Terminal command"
+msgstr "ターミナルのコマンド"
+
 msgid "Terminal connection: {label}"
 msgstr "ターミナル接続: {label}"
 
@@ -19977,6 +20026,9 @@ msgstr "ターミナルにフォーカスがあるときはターミナルのフ
 
 msgid "Terminal input"
 msgstr "ターミナル入力"
+
+msgid "Terminal name"
+msgstr "ターミナル名"
 
 msgid "Terminal removed"
 msgstr "ターミナルを削除しました"
@@ -20698,6 +20750,10 @@ msgstr "このクラウドワークスペースを起動できません"
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
 
+#. placeholder {0}: params?.details
+msgid "This config is invalid: {0}"
+msgstr "この設定は無効です: {0}"
+
 msgid "This conversation is too long for the model"
 msgstr "この会話はモデルには長すぎます"
 
@@ -20725,8 +20781,8 @@ msgstr "このディレクトリは存在しません。ターミナルスクリ
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "このメールアドレスは別のサインイン方法で既に登録されており、プロバイダーが確認済みとして認証しませんでした。以前使用した方法でサインインしてください。"
 
-msgid "This environment has no [install] to build. Add one to .paradev/config.toml on its base branch."
-msgstr "この環境にはビルドする [install] がありません。ベースブランチの .paradev/config.toml に追加してください。"
+msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
+msgstr "この環境にはビルドする [install] がありません。設定の環境で、この環境の設定に追加してください。"
 
 msgid "This environment has no repositories to build"
 msgstr "この環境にはビルドするリポジトリがありません"
@@ -20736,9 +20792,6 @@ msgstr "この環境にはリポジトリがありません。設定でリポジ
 
 msgid "This environment opens {environmentRepository}, not {repository}"
 msgstr "この環境は {repository} ではなく {environmentRepository} を開きます"
-
-msgid "This environment's repositories are fixed; promote a workspace again to change them"
-msgstr "この環境のリポジトリは固定されています。変更するにはワークスペースを再度昇格してください"
 
 msgid "this file"
 msgstr "このファイル"
@@ -22018,6 +22071,9 @@ msgstr "新規エージェントに使用"
 msgid "Use global default"
 msgstr "グローバルのデフォルトを使用"
 
+msgid "Use lowercase letters, digits and underscores, starting with a letter."
+msgstr "小文字、数字、アンダースコアを使い、先頭は文字にしてください。"
+
 msgid "Use lowercase letters, numbers, dashes and underscores"
 msgstr "小文字、数字、ハイフン、アンダースコアを使用してください"
 
@@ -22453,6 +22509,9 @@ msgstr "サンフランシスコでエンジニアを募集中。エンジニア
 msgid "We're hiring in San Francisco"
 msgstr "サンフランシスコで採用中"
 
+msgid "Web app"
+msgstr "Webアプリ"
+
 msgid "Web Fetch"
 msgstr "ウェブ取得"
 
@@ -22595,6 +22654,9 @@ msgstr "チームが自動化していること"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "これらが書かれた対象はページ上に存在しないため、ピンがありません。"
 
+msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
+msgstr "この環境のビルドとクラウドワークスペースで実行される内容です。リポジトリ自身の config.toml はクラウドでは使われません。"
+
 msgid "What we believe"
 msgstr "私たちが大切にしていること"
 
@@ -22681,6 +22743,9 @@ msgstr "どのAIコーディングエージェントに対応していますか?
 
 msgid "Which plans include automations?"
 msgstr "オートメーションはどのプランに含まれますか？"
+
+msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
+msgstr "この環境でクラウドエージェントが使えるプラグインのMCPサーバーです。削除したプラグインは、実行中のワークスペースでも使えなくなります。"
 
 msgid "Who can open it"
 msgstr "開ける人"

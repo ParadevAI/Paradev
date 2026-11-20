@@ -170,9 +170,9 @@ export interface SandboxClaim {
 	hostSecret: string;
 	managedEnv: Record<string, string>;
 	networkPolicy: NetworkPolicy;
-	/** The creator's agent login files; a golden under construction has none. */
+	/** Written before every boot: the creator's agent login files and the environment's config. */
 	files?: SandboxFile[];
-	/** Ports the workspace's repository asks to publish, beside the platform's. */
+	/** Ports the environment's config asks to publish, beside the platform's. */
 	ports?: readonly number[];
 	vcpus: number;
 	/** Mount the bundle's agent-tools drive read-only; absent keeps the image's agents. */
@@ -269,11 +269,12 @@ async function writeIdentity(
 }
 
 /**
- * The agents' login files, on every wake including one that finds the box
- * serving: a sign-in made since the last boot has to reach the next agent
- * started there. They hold placeholders only.
+ * The agents' login files and the environment's config, on every wake
+ * including one that finds the box serving: a sign-in or config saved since
+ * the last boot has to reach the next agent or terminal started there. The
+ * login files hold placeholders only.
  */
-async function writeSignInFiles(
+async function writeClaimFiles(
 	sandbox: Sandbox,
 	files: SandboxFile[] = [],
 ): Promise<void> {
@@ -367,7 +368,7 @@ export async function provisionSandbox(args: {
 		));
 	await Sentry.startSpan({ name: "start boot", op: "sandbox" }, async () => {
 		await writeIdentity(sandbox, args.claim.identity);
-		await writeSignInFiles(sandbox, args.claim.files);
+		await writeClaimFiles(sandbox, args.claim.files);
 		await runBoot(sandbox, args.claim.hostSecret);
 	});
 	return {
@@ -651,7 +652,7 @@ export async function wakeSandbox(args: {
 							),
 						),
 					serving ? null : writeIdentity(sandbox, args.claim.identity),
-					writeSignInFiles(sandbox, args.claim.files),
+					writeClaimFiles(sandbox, args.claim.files),
 				]),
 		);
 		if (!serving) {

@@ -8,10 +8,9 @@ import {
 import { and, eq, isNull, lt } from "drizzle-orm";
 import { publishCloudWorkspaceJob } from "../../../router/cloud-workspace/jobs";
 import { organizationPlan } from "../../billing/plan";
-import { readRepoHooks } from "../repo-hooks";
+import { configHooks } from "../config-hooks";
 import {
 	environmentRepositoryRows,
-	installationTokenFor,
 	loadRepositories,
 	primaryRepository,
 } from "../repositories";
@@ -121,15 +120,10 @@ export async function startEnvironmentBuild(args: {
 			"This environment has no repositories to build",
 		);
 	}
-	const hooks = await readRepoHooks({
-		repo: primary,
-		branch: primary.defaultBranch,
-		token: await installationTokenFor(repositories),
-	});
-	if (!hooks?.install) {
+	if (!configHooks(environment.config)?.install) {
 		throw new BuildRefused(
 			"no-install",
-			`This environment has no [install] to build: add one to .paradev/config.toml on ${primary.fullName}@${primary.defaultBranch}`,
+			"This environment has no [install] to build. Add one to its config in Settings, Environments.",
 		);
 	}
 

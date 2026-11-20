@@ -36,6 +36,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+	delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
 	rmSync(root, { recursive: true, force: true });
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
@@ -112,13 +113,17 @@ describe("loadProjectConfig with config.toml", () => {
 		});
 	});
 
-	it("the cloud reads the cloud tables, without the personal file", () => {
+	it("the cloud reads the environment's config with its cloud tables, not the repository's files", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
-		write(
-			repoPath,
-			"config.toml",
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(
+			join(root, "environment.toml"),
 			'[setup]\nrun = "local-setup"\n[setup.cloud]\nrun = "cloud-setup"\n',
 		);
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
 		write(repoPath, "config.local.toml", '[setup]\nrun = "personal"\n');
 		expect(resolved({ repoPath, projectId }).setup.commands).toEqual([
 			"cloud-setup",
@@ -148,18 +153,22 @@ describe("loadProjectConfig with config.toml", () => {
 	});
 });
 
-describe("loadProjectConfig with v1 in the cloud", () => {
-	it("keeps v1's cloud behavior: only start runs, and no teardown", () => {
+describe("loadProjectConfig in the cloud without an environment config", () => {
+	it("runs nothing: neither the repository's config.toml nor a v1 config.json", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
 		write(
 			repoPath,
 			"config.json",
 			JSON.stringify({ setup: ["local"], teardown: ["down"], run: ["dev"] }),
 		);
-		const config = resolved({ repoPath, projectId });
-		expect(config.setup.commands).toEqual([]);
-		expect(config.archive.commands).toEqual([]);
-		expect(getDefaultTerminal(config)).toBeNull();
+		expect(loadProjectConfig({ repoPath, projectId, appHomeDir })).toBeNull();
+		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(false);
 	});
 });
 
