@@ -71,11 +71,11 @@ export function useLaunchModels({
 		storageKey,
 		knownSupport ? selectedPresetId : null,
 	);
-	// A remembered model stays offered until a reported list says it is gone.
+	// A remembered model stays offered while its list is still on the way.
 	const pickUnverified =
 		selectedModel !== null &&
 		discovered !== undefined &&
-		discovered.availability !== "reported" &&
+		!discovered.settled &&
 		!knownSupport?.models.some((entry) => entry.id === selectedModel);
 	const modelSupport = useMemo(
 		() =>

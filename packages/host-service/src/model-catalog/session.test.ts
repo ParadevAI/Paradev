@@ -15,7 +15,6 @@ test("active session options are scoped to their workspace and an empty list is 
 	};
 	expect(sessionModelCatalog(session, "workspace-a")).toMatchObject({
 		models: [],
-		source: "runtime",
 		availability: "reported",
 	});
 	expect(sessionModelCatalog(session, "workspace-b")).toBeUndefined();

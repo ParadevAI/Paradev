@@ -317,22 +317,36 @@ describe("buildTerminalAgentLaunch", () => {
 			.run();
 	}
 
-	it("uses only the discovery result passed to this launch", () => {
+	it("passes an unlisted model to an agent that lists its own models", () => {
 		const db = createTestDb();
 		seedConfig(db);
-		const input = {
-			workspaceId: "workspace",
-			agent: "claude",
-			prompt: "p",
-			model: "private/new",
-		};
-		const launch = buildTerminalAgentLaunch(db, input, [
-			{ id: "private/new", label: "New" },
-		]);
-		expect(launch.fullCommand).toContain("--model private/new");
-		expect(() => buildTerminalAgentLaunch(db, input)).toThrow(
-			/Unsupported model/,
+		db.insert(schema.hostAgentConfigs)
+			.values({
+				id: "00000000-0000-0000-0000-00000000000b",
+				presetId: "opencode",
+				label: "OpenCode",
+				command: "opencode",
+				argsJson: "[]",
+				promptTransport: "argv",
+				promptArgsJson: "[]",
+				resumeArgsJson: "[]",
+				forkArgsJson: "[]",
+				envJson: "{}",
+				displayOrder: 1,
+			})
+			.run();
+		const launch = (agent: string, model: string) =>
+			buildTerminalAgentLaunch(db, {
+				workspaceId: "workspace",
+				agent,
+				prompt: "p",
+				model,
+			});
+		expect(launch("opencode", "private/new").fullCommand).toContain(
+			"--model private/new",
 		);
+		expect(() => launch("opencode", "bad id")).toThrow(/Unsupported model/);
+		expect(() => launch("claude", "private/new")).toThrow(/Unsupported model/);
 	});
 
 	it("resolves the agent config to a runnable command without a terminal", () => {

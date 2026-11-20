@@ -854,6 +854,22 @@ export function isCuratedAgentModel(presetId: string, model: string): boolean {
 	);
 }
 
+const LISTS_OWN_MODELS = new Set(["codex", "opencode", "cursor-agent"]);
+
+/**
+ * True for a bundled model, and for any well-formed id on an agent that lists
+ * its own models: the CLI decides whether that id exists.
+ */
+export function isLaunchableAgentModel(
+	presetId: string,
+	model: string,
+): boolean {
+	return (
+		isCuratedAgentModel(presetId, model) ||
+		(LISTS_OWN_MODELS.has(presetId) && /^[^\s\p{Cc}]{1,200}$/u.test(model))
+	);
+}
+
 /**
  * Argv tokens that select `model` for the given preset, e.g.
  * `["--model", "sonnet"]`. Returns `[]` for unknown presets, presets without
@@ -868,16 +884,11 @@ export function buildAgentModelArgs(
 	presetId: string,
 	model: string | undefined,
 	effort?: string,
-	discoveredModels: readonly AgentModelOption[] = [],
 ): string[] {
 	if (!model) return [];
 	const support = getAgentModelSupport(presetId);
 	if (!support?.modelFlag) return [];
-	if (
-		!isCuratedAgentModel(presetId, model) &&
-		!discoveredModels.some((option) => option.id === model)
-	)
-		return [];
+	if (!isLaunchableAgentModel(presetId, model)) return [];
 	const variant = effort
 		? getAgentEffortSupport(presetId)?.modelVariants?.[model]?.[effort]
 		: undefined;

@@ -33,18 +33,11 @@ import {
 } from "../terminal-agents/agent-config";
 import { ModelCatalogCache } from "./cache";
 import { discoverCodexModels } from "./codex";
-import {
-	abortable,
-	DISCOVERY_DEADLINE_MS,
-	DiscoveryError,
-	DiscoveryScheduler,
-	discoveryFailure,
-} from "./discovery";
+import { abortable, DISCOVERY_DEADLINE_MS, NoModelListing } from "./discovery";
 import { enrichModels, refreshModelMetadata } from "./metadata";
 
 const execFileAsync = promisify(execFile);
 const caches = new WeakMap<HostDb, ModelCatalogCache>();
-const scheduler = new DiscoveryScheduler();
 
 async function context(
 	db: HostDb,
@@ -151,17 +144,14 @@ type Context = Awaited<ReturnType<typeof context>>;
 function bundledCatalog(presetId: string): AgentModelCatalog {
 	return {
 		models: getAgentModelSupport(presetId)?.models ?? [],
-		source: "bundled",
 		availability: "unknown",
-		stale: true,
-		fetchedAt: Date.now(),
 	};
 }
 
 function fromConfigOptions(options: SessionConfigOption[]): Discovered {
 	const model = options.find((entry) => entry.category === "model");
 	const effort = options.find((entry) => entry.category === "thought_level");
-	if (!model) throw new DiscoveryError("unsupported");
+	if (!model) throw new NoModelListing();
 	return {
 		models: model.options,
 		defaultModel: runtimeDefaultOption(model.options, model.currentValue),
@@ -210,7 +200,7 @@ async function discover(
 				startupTimeoutMs: DISCOVERY_DEADLINE_MS,
 			},
 		)?.(ctx.options);
-		if (!adapter) throw new DiscoveryError("unsupported");
+		if (!adapter) throw new NoModelListing();
 		return fromAcp(adapter, ctx.cwd, signal);
 	}
 	if (surface === "terminal" && ctx.presetId === "opencode")
@@ -251,7 +241,7 @@ async function discover(
 		if (!models.length) throw new Error("Model listing was not recognized");
 		return { models };
 	}
-	throw new DiscoveryError("unsupported");
+	throw new NoModelListing();
 }
 
 export async function discoverAgentModels(
@@ -261,78 +251,55 @@ export async function discoverAgentModels(
 		surface: "chat" | "terminal";
 		workspaceId?: string;
 		projectId?: string;
-		refresh?: boolean;
 	},
 ): Promise<AgentModelCatalog> {
+	const signal = AbortSignal.timeout(DISCOVERY_DEADLINE_MS);
+	let presetId =
+		resolveHostAgentConfig(db, input.agent)?.presetId ?? input.agent;
+	let cache = caches.get(db);
+	if (!cache) {
+		cache = new ModelCatalogCache();
+		caches.set(db, cache);
+	}
 	try {
-		return await scheduler.run(async (signal) => {
-			const ctx = await abortable(
-				context(
-					db,
-					input.agent,
-					input.surface,
-					input.workspaceId,
-					input.projectId,
-					signal,
-				),
+		const ctx = await abortable(
+			context(
+				db,
+				input.agent,
+				input.surface,
+				input.workspaceId,
+				input.projectId,
 				signal,
-			);
-			signal.throwIfAborted();
-			refreshModelMetadata();
-			let cache = caches.get(db);
-			if (!cache) {
-				cache = new ModelCatalogCache();
-				caches.set(db, cache);
+			),
+			signal,
+		);
+		presetId = ctx.presetId;
+		refreshModelMetadata();
+		const catalog = await cache.get(ctx.key, async () => {
+			try {
+				const found = await discover(db, ctx, input.surface, signal);
+				return {
+					...found,
+					models: withoutDefaultAlias(uniqueModels(found.models)),
+					availability: "reported",
+				};
+			} catch (error) {
+				if (!(error instanceof NoModelListing))
+					console.warn("[model-discovery] failed", {
+						agent: input.agent,
+						surface: input.surface,
+						error,
+					});
+				return bundledCatalog(ctx.presetId);
 			}
-			const catalog = await cache.get(
-				ctx.key,
-				async () => {
-					try {
-						const found = await discover(db, ctx, input.surface, signal);
-						return {
-							...found,
-							models: withoutDefaultAlias(uniqueModels(found.models)),
-							source:
-								input.surface === "chat" || ctx.presetId === "opencode"
-									? ("runtime" as const)
-									: ("cli" as const),
-							availability: "reported" as const,
-							fetchedAt: Date.now(),
-							stale: false,
-						};
-					} catch (error) {
-						if (discoveryFailure(error) !== "unsupported")
-							console.warn("[model-discovery] failed", {
-								agent: input.agent,
-								surface: input.surface,
-								error,
-							});
-						throw error;
-					}
-				},
-				() => bundledCatalog(ctx.presetId),
-				input.refresh,
-			);
-			if (catalog.failure)
-				console.warn("[model-discovery] unavailable", {
-					agent: input.agent,
-					surface: input.surface,
-					reason: catalog.failure,
-				});
-			return { ...catalog, models: enrichModels(catalog.models, ctx.presetId) };
 		});
+		return { ...catalog, models: enrichModels(catalog.models, ctx.presetId) };
 	} catch (error) {
-		const failure = error instanceof DiscoveryError ? error.reason : "failed";
-		console.warn("[model-discovery] unavailable", {
+		console.warn("[model-discovery] failed", {
 			agent: input.agent,
 			surface: input.surface,
-			reason: failure,
+			error,
 		});
-		return {
-			...bundledCatalog(
-				resolveHostAgentConfig(db, input.agent)?.presetId ?? input.agent,
-			),
-			failure,
-		};
+		return bundledCatalog(presetId);
 	}
 }

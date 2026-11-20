@@ -25,9 +25,6 @@ export function sessionModelCatalog(
 			models ?? [],
 			presetForAcpHarness(session.harness) ?? session.harness,
 		),
-		source: "runtime",
 		availability: models ? "reported" : "unknown",
-		stale: false,
-		fetchedAt: Date.now(),
 	};
 }

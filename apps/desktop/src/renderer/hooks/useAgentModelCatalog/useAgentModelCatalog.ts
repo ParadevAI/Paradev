@@ -7,7 +7,7 @@ import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
 const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
-	query.state.data?.failure ? 0 : 60_000;
+	query.state.data?.availability === "reported" ? 60_000 : 0;
 
 type Surface = "chat" | "terminal";
 type Agent = {
@@ -20,6 +20,8 @@ type Agent = {
 };
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
+	/** The host has answered, or failed to, at least once. */
+	settled: boolean;
 	key: string;
 	load: () => void;
 };
@@ -34,10 +36,7 @@ function bundledCatalog(agent: Agent): AgentModelCatalog {
 						agent.command ?? agent.presetId ?? agent.id,
 					),
 			)?.models ?? [],
-		source: "bundled",
 		availability: "unknown",
-		stale: true,
-		fetchedAt: 0,
 	};
 }
 
@@ -96,6 +95,7 @@ export function useAgentModelCatalog(
 				{
 					...(query?.data ?? bundledCatalog(agent)),
 					loading: query?.isFetching ?? false,
+					settled: query?.isFetched ?? false,
 					key: JSON.stringify(queryKey(agent)),
 					load,
 				},

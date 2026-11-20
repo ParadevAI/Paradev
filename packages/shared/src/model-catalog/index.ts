@@ -20,15 +20,12 @@ export type CatalogModel = {
 
 export type AgentModelCatalog = {
 	models: CatalogModel[];
-	source: "runtime" | "cli" | "bundled";
+	/** "reported" when the agent listed these itself; "unknown" for the bundled list. */
 	availability: "reported" | "unknown";
-	fetchedAt: number;
-	stale: boolean;
 	/** The model a launch without a model override runs on, when the runtime says. */
 	defaultModel?: { id: string; label: string };
 	/** The reasoning effort a launch without an effort override runs at. */
 	defaultEffort?: { id: string; label: string };
-	failure?: "unsupported" | "timeout" | "busy" | "failed";
 };
 
 export type ModelFilters = {

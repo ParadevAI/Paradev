@@ -41,7 +41,6 @@ import {
 } from "../../index";
 import {
 	buildTerminalAgentLaunch,
-	prepareAgentModelCatalog,
 	trackTerminalAgentLaunched,
 	validateAgentLaunchOptions,
 } from "../agents";
@@ -678,7 +677,7 @@ export const workspacesRouter = router({
 		})
 		.mutation(async ({ ctx, input }) => {
 			for (const launch of input.agents ?? []) {
-				validateAgentLaunchOptions(ctx.db, launch, "deferred");
+				validateAgentLaunchOptions(ctx.db, launch);
 			}
 
 			const localProject = requireLocalProject(ctx, input.projectId);
@@ -1321,23 +1320,15 @@ export const workspacesRouter = router({
 				soleLaunch.surface !== "chat"
 			) {
 				try {
-					const models = await prepareAgentModelCatalog(ctx.db, {
-						...soleLaunch,
+					chainAgent = buildTerminalAgentLaunch(ctx.db, {
 						workspaceId: workspaceRow.id,
+						agent: soleLaunch.agent,
+						prompt: soleLaunch.prompt,
+						attachmentIds: soleLaunch.attachmentIds,
+						model: soleLaunch.model,
+						effort: soleLaunch.effort,
+						mode: soleLaunch.mode,
 					});
-					chainAgent = buildTerminalAgentLaunch(
-						ctx.db,
-						{
-							workspaceId: workspaceRow.id,
-							agent: soleLaunch.agent,
-							prompt: soleLaunch.prompt,
-							attachmentIds: soleLaunch.attachmentIds,
-							model: soleLaunch.model,
-							effort: soleLaunch.effort,
-							mode: soleLaunch.mode,
-						},
-						models,
-					);
 				} catch (err) {
 					console.warn(
 						"[workspaces.create] wait-for-setup chain unavailable, dispatching agent in parallel:",
@@ -1460,7 +1451,7 @@ export const workspacesRouter = router({
 	 */
 	createEnqueued: protectedProcedure
 		.input(createInputSchema)
-		.mutation(async ({ ctx, input }) => {
+		.mutation(({ ctx, input }) => {
 			const workspaceId = input.id;
 			if (!workspaceId) {
 				throw new TRPCError({
@@ -1469,7 +1460,7 @@ export const workspacesRouter = router({
 				});
 			}
 			for (const launch of input.agents ?? []) {
-				validateAgentLaunchOptions(ctx.db, launch, "deferred");
+				validateAgentLaunchOptions(ctx.db, launch);
 			}
 			requireProjectRepoPath(requireLocalProject(ctx, input.projectId));
 

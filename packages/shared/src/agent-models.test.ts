@@ -107,7 +107,7 @@ describe("buildAgentModelArgs", () => {
 
 	it("returns [] for model ids outside the preset's curated list", () => {
 		expect(buildAgentModelArgs("claude", "bad-model")).toEqual([]);
-		expect(buildAgentModelArgs("codex", "sonnet")).toEqual([]);
+		expect(buildAgentModelArgs("gemini", "sonnet")).toEqual([]);
 	});
 
 	it("returns [] for superset (model travels via chat metadata)", () => {
@@ -149,9 +149,13 @@ describe("buildAgentModelArgs", () => {
 		expect(models.find((model) => model.id === "opus")?.label).toBe("Opus");
 	});
 
-	it("drops codex models that left the live catalog", () => {
-		for (const model of ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex"]) {
-			expect(buildAgentModelArgs("codex", model)).toEqual([]);
+	it("passes an unlisted id to an agent that lists its own models", () => {
+		for (const presetId of ["codex", "opencode", "cursor-agent"]) {
+			expect(buildAgentModelArgs(presetId, "vendor/new-model")).toEqual([
+				"--model",
+				"vendor/new-model",
+			]);
+			expect(buildAgentModelArgs(presetId, "bad id")).toEqual([]);
 		}
 	});
 
@@ -627,9 +631,6 @@ describe("buildAgentModelArgs with effort", () => {
 			"--model",
 			"claude-opus-4-8-low",
 		]);
-		expect(
-			buildAgentModelArgs("cursor-agent", "claude-opus-4-8-bogus"),
-		).toEqual([]);
 		expect(isCuratedAgentModel("cursor-agent", "gpt-5.5-extra-high")).toBe(
 			true,
 		);
@@ -758,17 +759,4 @@ describe("September 2026 model launches", () => {
 			expect(new Set(models.map(({ id }) => id)).size).toBe(models.length);
 		}
 	});
-});
-
-it("passes a newly discovered model to its CLI without admitting arbitrary IDs", () => {
-	expect(
-		buildAgentModelArgs("opencode", "private/new-model", undefined, [
-			{ id: "private/new-model", label: "Private" },
-		]),
-	).toEqual(["--model", "private/new-model"]);
-	expect(
-		buildAgentModelArgs("opencode", "private/other", undefined, [
-			{ id: "private/new-model", label: "Private" },
-		]),
-	).toEqual([]);
 });

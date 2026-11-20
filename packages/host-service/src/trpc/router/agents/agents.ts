@@ -2,7 +2,6 @@ import { acpStartModes, presetForAcpHarness } from "@superset/chat/core";
 import { attachedFilesBlock } from "@superset/chat-runtime";
 import { isBuiltinAgentId } from "@superset/shared/agent-catalog";
 import { FORK_SESSION_ID_TOKEN } from "@superset/shared/agent-definition";
-import type { CatalogModel } from "@superset/shared/agent-models";
 import {
 	buildAgentEffortArgs,
 	buildAgentModeArgs,
@@ -12,7 +11,7 @@ import {
 	getAgentEfforts,
 	getAgentModelSupport,
 	getAgentModeSupport,
-	isCuratedAgentModel,
+	isLaunchableAgentModel,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
@@ -202,7 +201,7 @@ export function validateAgentModelSelection(
 		});
 	}
 
-	if (!isCuratedAgentModel(presetId, model)) {
+	if (!isLaunchableAgentModel(presetId, model)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Unsupported model "${model}" for ${label}. Choose one of: ${support.models.map((option) => option.id).join(", ")}.`,
@@ -366,33 +365,6 @@ function validateForkSessionIsResolvable(
 	}
 }
 
-export async function prepareAgentModelCatalog(
-	db: HostDb,
-	input: Pick<AgentRunInput, "agent" | "model" | "surface"> & {
-		workspaceId?: string;
-		projectId?: string;
-	},
-): Promise<CatalogModel[]> {
-	if (!input.model) return [];
-	const config = resolveHostAgentConfig(db, input.agent);
-	if (!config) return [];
-	if (
-		input.surface === "chat" &&
-		acpHarnessForPreset(chatLaunchPresetId(config))
-	)
-		return [];
-	const presetId = resolveAgentLaunchPresetId(config.presetId, config.command);
-	if (isCuratedAgentModel(presetId, input.model)) return [];
-	const catalog = await discoverAgentModels(db, {
-		agent: input.agent,
-		surface: "terminal",
-		workspaceId: input.workspaceId,
-		projectId: input.projectId,
-		refresh: true,
-	});
-	return catalog.availability === "reported" ? catalog.models : [];
-}
-
 /**
  * Preflight a host-scoped launch before any larger workflow (such as
  * workspace creation) performs side effects.
@@ -400,7 +372,6 @@ export async function prepareAgentModelCatalog(
 export function validateAgentLaunchOptions(
 	db: HostDb,
 	input: Pick<AgentRunInput, "agent" | "model" | "effort" | "mode" | "surface">,
-	modelValidation: readonly CatalogModel[] | "deferred" = [],
 ): void {
 	if (!input.model && !input.effort && !input.mode) return;
 
@@ -418,15 +389,8 @@ export function validateAgentLaunchOptions(
 	const chat =
 		input.surface === "chat" &&
 		!!acpHarnessForPreset(chatLaunchPresetId(config));
-	if (
-		!chat &&
-		(modelValidation !== "deferred" || !getAgentModelSupport(launchPresetId)) &&
-		!(modelValidation === "deferred" ? [] : modelValidation).some(
-			(model) => model.id === input.model,
-		)
-	) {
+	if (!chat)
 		validateAgentModelSelection(launchPresetId, config.label, input.model);
-	}
 	if (!chat)
 		validateAgentEffortSelection(
 			launchPresetId,
@@ -451,7 +415,6 @@ export function validateAgentLaunchOptions(
 export function buildTerminalAgentLaunch(
 	db: HostDb,
 	input: AgentRunInput,
-	discoveredModels: readonly CatalogModel[] = [],
 ): { fullCommand: string; label: string; config: ResolvedHostAgentConfig } {
 	const config = resolveHostAgentConfig(db, input.agent);
 	if (!config) {
@@ -467,9 +430,7 @@ export function buildTerminalAgentLaunch(
 		config.presetId,
 		config.command,
 	);
-	if (!discoveredModels.some((model) => model.id === input.model)) {
-		validateAgentModelSelection(launchPresetId, config.label, input.model);
-	}
+	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentEffortSelection(
 		launchPresetId,
 		config.label,
@@ -509,7 +470,6 @@ export function buildTerminalAgentLaunch(
 		launchPresetId,
 		input.model,
 		input.effort,
-		discoveredModels,
 	);
 	const effortArgs = buildAgentEffortArgs(
 		launchPresetId,
@@ -594,7 +554,6 @@ async function runTerminalAgent(
 	const { fullCommand, label, config } = buildTerminalAgentLaunch(
 		ctx.db,
 		input,
-		await prepareAgentModelCatalog(ctx.db, input),
 	);
 
 	const result = await createTerminalSessionInternal({
@@ -947,7 +906,6 @@ export const agentsRouter = router({
 				workspaceId: z.string().optional(),
 				projectId: z.string().optional(),
 				sessionId: z.string().optional(),
-				refresh: z.boolean().optional(),
 			}),
 		)
 		.query(({ ctx, input }) => {
