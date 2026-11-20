@@ -44,32 +44,15 @@ describe("nextBoxPressure", () => {
 		expect(nextBoxPressure(busy, calm, 10_000)).toBe(busy);
 	});
 
-	test("a memguard kill is critical and the kill is kept while critical", () => {
-		const reap = { processName: "tsc", rssMb: 3100, at: 5 };
-		const critical = nextBoxPressure(start, { ...calm, recentReap: reap }, 0);
-		expect(critical.pressure).toMatchObject({
-			level: "critical",
-			limitedBy: ["memory"],
-			reap,
-		});
-		const stalled = nextBoxPressure(
-			critical,
-			{ ...calm, memoryStalledNowPercent: 20 },
-			BOX_PRESSURE_MIN_DWELL_MS * 2,
-		);
-		expect(stalled.pressure?.reap).toEqual(reap);
-	});
-
-	test("clears once memory recovers after a kill, without waiting for the kill to age out", () => {
+	test("goes critical on a memory stall and ignores a process kill", () => {
 		const reap = { processName: "next-server", rssMb: 4700, at: 0 };
-		const critical = nextBoxPressure(start, { ...calm, recentReap: reap }, 0);
 		expect(
-			nextBoxPressure(
-				critical,
-				{ ...calm, recentReap: reap },
-				BOX_PRESSURE_MIN_DWELL_MS,
-			).pressure,
+			nextBoxPressure(start, { ...calm, recentReap: reap }, 0).pressure,
 		).toBeNull();
+		expect(
+			nextBoxPressure(start, { ...calm, memoryStalledNowPercent: 35 }, 0)
+				.pressure,
+		).toMatchObject({ level: "critical", limitedBy: ["memory"] });
 	});
 
 	test("a heartbeat sample with the same state keeps its start time", () => {

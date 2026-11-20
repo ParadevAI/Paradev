@@ -14526,11 +14526,6 @@ msgstr "Sin memoria"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Sin memoria: la máquina está a punto de dejar de responder. {sizeName} tiene {memoryGb} GB."
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Sin memoria: la máquina detuvo {0} ({1} GB) para seguir funcionando. {sizeName} tiene {memoryGb} GB."
-
 msgid "Out of scope"
 msgstr "Fuera de alcance"
 
@@ -19416,11 +19411,6 @@ msgstr "Detenido"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Detenido"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Se detuvo {0} ({1} GB) para liberar memoria"
 
 msgid "Stopped by the usage limit"
 msgstr "Detenido por el límite de uso"

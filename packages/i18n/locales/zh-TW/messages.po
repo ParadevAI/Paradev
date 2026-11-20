@@ -14526,11 +14526,6 @@ msgstr "記憶體不足"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "記憶體不足：機器即將沒有回應。{sizeName} 有 {memoryGb} GB 記憶體。"
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "記憶體不足：為了繼續運作，機器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 記憶體。"
-
 msgid "Out of scope"
 msgstr "超出範圍"
 
@@ -19416,11 +19411,6 @@ msgstr "已停止"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "已停止"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "已停止 {0}（{1} GB）以釋放記憶體"
 
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"

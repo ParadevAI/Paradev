@@ -38,15 +38,11 @@ export function nextBoxPressure(
 		BOX_PRESSURE_THRESHOLDS.memoryBusy,
 		was?.limitedBy.includes("memory") ?? false,
 	);
-	const memoryCritical = limited(
+	const critical = limited(
 		sample.memoryStalledNowPercent,
 		BOX_PRESSURE_THRESHOLDS.memoryCritical,
 		was?.level === "critical",
 	);
-	const freshReap =
-		sample.recentReap !== null &&
-		now - sample.recentReap.at < BOX_PRESSURE_MIN_DWELL_MS;
-	const critical = freshReap || memoryCritical;
 	const limitedBy: BoxResource[] = [];
 	if (cpu) limitedBy.push("cpu");
 	if (critical || memoryStalled) limitedBy.push("memory");
@@ -60,18 +56,10 @@ export function nextBoxPressure(
 	}
 
 	const pressure: BoxPressure | null = level
-		? {
-				level,
-				limitedBy,
-				reap:
-					sample.recentReap ??
-					(level === "critical" ? (was?.reap ?? null) : null),
-				at: now,
-			}
+		? { level, limitedBy, at: now }
 		: null;
 	const changed =
 		pressure?.level !== was?.level ||
-		pressure?.limitedBy.join() !== was?.limitedBy.join() ||
-		pressure?.reap?.at !== was?.reap?.at;
+		pressure?.limitedBy.join() !== was?.limitedBy.join();
 	return { pressure, since: changed ? now : previous.since };
 }

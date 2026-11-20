@@ -14526,11 +14526,6 @@ msgstr "メモリ不足"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "メモリ不足: マシンが応答しなくなりかけています。{sizeName} のメモリは {memoryGb} GB です。"
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "メモリ不足: マシンは動作を続けるため {0} ({1} GB) を停止しました。{sizeName} のメモリは {memoryGb} GB です。"
-
 msgid "Out of scope"
 msgstr "スコープ外"
 
@@ -19416,11 +19411,6 @@ msgstr "停止しました"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "停止"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "メモリを確保するため {0} ({1} GB) を停止しました"
 
 msgid "Stopped by the usage limit"
 msgstr "使用量の上限により停止"

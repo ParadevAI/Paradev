@@ -104,13 +104,6 @@ export function BoxResourcesSection({ workspaceId }: { workspaceId: string }) {
 						/>
 					</>
 				) : null}
-				{pressure?.reap ? (
-					<p className="text-xs text-destructive">
-						{t({
-							message: `Stopped ${pressure.reap.processName} (${gb(pressure.reap.rssMb)} GB) to free memory`,
-						})}
-					</p>
-				) : null}
 				<DropdownMenu>
 					<DropdownMenuTrigger className="text-xs font-medium underline underline-offset-4 hover:text-foreground">
 						{t({ message: "Change machine size" })}

@@ -14526,11 +14526,6 @@ msgstr "Arbeitsspeicher voll"
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Arbeitsspeicher voll: Die Maschine reagiert bald nicht mehr. {sizeName} hat {memoryGb} GB."
 
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Arbeitsspeicher voll: Die Maschine hat {0} ({1} GB) beendet, um weiterzulaufen. {sizeName} hat {memoryGb} GB."
-
 msgid "Out of scope"
 msgstr "Nicht im Umfang"
 
@@ -19416,11 +19411,6 @@ msgstr "Gestoppt"
 msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Gestoppt"
-
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "{0} ({1} GB) beendet, um Speicher freizugeben"
 
 msgid "Stopped by the usage limit"
 msgstr "Durch das Nutzungslimit gestoppt"

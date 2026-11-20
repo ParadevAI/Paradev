@@ -6,9 +6,9 @@ import { create } from "zustand";
 
 interface BoxPressureState {
 	workspaces: Record<string, BoxPressure>;
-	dismissed: Record<string, string>;
+	dismissed: Record<string, true>;
 	apply: (message: BoxPressureMessage) => void;
-	dismiss: (workspaceId: string, episode: string) => void;
+	dismiss: (workspaceId: string) => void;
 	clear: () => void;
 }
 
@@ -31,9 +31,9 @@ export const useBoxPressureStore = create<BoxPressureState>()((set) => ({
 			);
 			return { workspaces: next, dismissed };
 		}),
-	dismiss: (workspaceId, episode) =>
+	dismiss: (workspaceId) =>
 		set((state) => ({
-			dismissed: { ...state.dismissed, [workspaceId]: episode },
+			dismissed: { ...state.dismissed, [workspaceId]: true },
 		})),
 	clear: () => set({ workspaces: {} }),
 }));
@@ -42,8 +42,4 @@ export function useBoxPressure(workspaceId: string | null): BoxPressure | null {
 	return useBoxPressureStore((state) =>
 		workspaceId ? (state.workspaces[workspaceId] ?? null) : null,
 	);
-}
-
-export function boxPressureEpisode(pressure: BoxPressure): string {
-	return pressure.reap ? `reap:${pressure.reap.at}` : "stall";
 }
