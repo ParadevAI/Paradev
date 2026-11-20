@@ -9,6 +9,7 @@ function family(
 	key: string,
 	seatPrice: number,
 	gbMinutesPerSeat: number | null,
+	advertisedGbHoursPerSeat: number | null,
 	environments: number | null,
 ) {
 	return {
@@ -19,6 +20,7 @@ function family(
 		yearly: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat,
 		overagePerGbHour: 0.06,
 		pack: gbMinutesPerSeat ? { gbMinutes: 1000, price: 1 } : null,
 		environments,
@@ -26,9 +28,9 @@ function family(
 }
 mock.module("@/app/[lang]/pricing/utils/fetchPlanCatalog", () => ({
 	fetchPlanCatalog: async () => [
-		family("pro", 20, null, null),
-		family("team", 60, 72000, 5),
-		family("ultra", 200, 240000, 10),
+		family("pro", 20, null, null, null),
+		family("team", 60, 72000, 1200, 5),
+		family("ultra", 200, 240000, 4000, 10),
 	],
 }));
 const { GET } = await import("./route");

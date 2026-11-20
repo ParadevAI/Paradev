@@ -1,11 +1,11 @@
 import {
 	ALLOWANCE_UNAVAILABLE_FIELDS,
 	type ALLOWANCE_UNAVAILABLE_REASONS,
+	BOX_GB_MINUTES_FEATURE_ID,
 	type GbHourPack,
 	gbMinutesUsd,
 } from "@superset/shared/billing";
 import type { getAutumnCustomer } from "./customer";
-import { BOX_GB_MINUTES_FEATURE_ID } from "./features";
 
 export interface CloudAutoTopup {
 	enabled: boolean;
