@@ -3512,6 +3512,9 @@ msgstr "Actief"
 msgid "Away"
 msgstr "Afwezig"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace reageert niet. Probeer het over een paar minuten opnieuw."
+
 msgid "Back"
 msgstr "Terug"
 
@@ -4489,6 +4492,9 @@ msgstr "Kies er een"
 msgid "Choose the model"
 msgstr "Model kiezen"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Kies de organisatie die AWS Marketplace factureert. Elk abonnement is gekoppeld aan één organisatie."
+
 msgid "Choose the primary repository"
 msgstr "Kies de primaire repository"
 
@@ -5325,6 +5331,9 @@ msgstr "Koppel om pull requests met je eigen account te beheren in plaats van vi
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Verbind je {pluginLabel}-account en laad deze pagina daarna opnieuw."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Je AWS Marketplace-abonnement koppelen"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "Dit kan niet ongedaan worden gemaakt."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "De cookies uit je profiel \"{profileName}\" worden gekopieerd naar de browser in de app. Agents kunnen dan handelen op de sites waar je bent ingelogd."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Het is al gekoppeld aan een organisatie waarvan je geen lid bent. Vraag de eigenaar om je uit te nodigen."
+
+msgid "It is linked to {organization}."
+msgstr "Het is gekoppeld aan {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "De titel uit je prompt blijft staan."
 
@@ -11376,6 +11391,9 @@ msgstr "link gekopieerd"
 msgid "Link copied"
 msgstr "Link gekopieerd"
 
+msgid "Link organization"
+msgstr "Organisatie koppelen"
+
 msgid "Link task"
 msgstr "Taak koppelen"
 
@@ -11384,6 +11402,9 @@ msgstr "Deze taak koppelen"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} gekoppeld aan werkruimte"
+
+msgid "Linking..."
+msgstr "Koppelen..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "Alleen beheerders van {organizationName} kunnen nieuwe personen uitnodig
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Alleen een eigenaar van de organisatie kan het plan wijzigen. Vraag de jouwe om te upgraden."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Alleen een eigenaar of beheerder kan deze organisatie koppelen."
 
 msgid "Only available on macOS."
 msgstr "Alleen beschikbaar op macOS."
@@ -20716,6 +20740,12 @@ msgstr "Deze Linear-werkruimte is al gekoppeld door {owner}. Vraag hen om eerst 
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Deze Linear-werkruimte is al gekoppeld door een andere Paradev-organisatie."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Deze link is verlopen. Open Paradev opnieuw vanuit je AWS Marketplace-abonnement."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Deze link is ongeldig. Open Paradev opnieuw vanuit je AWS Marketplace-abonnement."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Dit lijkt een binair bestand. Als tekst openen kan onleesbare uitvoer geven of de editor bij grote bestanden laten vastlopen."
 
@@ -20755,8 +20785,14 @@ msgstr "Dit verandert alleen de weergavenaam, niet de branch."
 msgid "this organization"
 msgstr "deze organisatie"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Deze organisatie betaalt al met een kaart. Zeg dat abonnement eerst op of kies een andere organisatie."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Deze organisatie heeft geen factuurperiodes. Kies in plaats daarvan een tijdsbereik."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Deze organisatie is al gekoppeld aan een ander AWS Marketplace-abonnement."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Deze organisatie zit op het Free-plan. {appName} Mobile is beschikbaar voor organisaties met Pro."
@@ -20877,6 +20913,9 @@ msgstr "Deze subagent kan nu niet naar de achtergrond"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Deze subagent wordt niet meer gevolgd door de host. Het transcript blijft op schijf in de sessiemap van de agent."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Dit abonnement is al gekoppeld aan een andere organisatie."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Deze terminal heeft nog geen uitvoer om over te dragen."
@@ -22326,6 +22365,9 @@ msgstr "We konden de betaalmethode van deze organisatie niet belasten. Vraag een
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "We konden je betaalmethode niet belasten. Werk die bij om dit plan te behouden."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "We konden je AWS Marketplace-abonnement niet bevestigen"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "We konden {appName} niet bereiken om te zien of hij online is. Controleer je verbinding en probeer het opnieuw."
 
@@ -23025,6 +23067,9 @@ msgstr "Je hebt geen toegang tot deze terminal."
 msgid "You don't have permission to remove this member"
 msgstr "Je hebt geen rechten om dit lid te verwijderen"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Je bent nog geen eigenaar of beheerder van een organisatie. Maak er een aan en open deze link daarna opnieuw."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Je hebt niet-opgeslagen omgevingsvariabelen. Weet je zeker dat je wilt sluiten?"
 
@@ -23130,6 +23175,9 @@ msgstr "Je agentabonnementen en sleutels"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Jouw agents, jouw accounts"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Je AWS Marketplace-abonnement is actief"
 
 msgid "Your changes"
 msgstr "Jouw wijzigingen"

@@ -3512,6 +3512,9 @@ msgstr "Çalışıyor"
 msgid "Away"
 msgstr "Uzakta"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace yanıt vermedi. Birkaç dakika sonra tekrar deneyin."
+
 msgid "Back"
 msgstr "Geri"
 
@@ -4489,6 +4492,9 @@ msgstr "Birini seçin"
 msgid "Choose the model"
 msgstr "Modeli seç"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "AWS Marketplace'in faturalandıracağı kuruluşu seçin. Her abonelik tek bir kuruluşa bağlanır."
+
 msgid "Choose the primary repository"
 msgstr "Birincil depoyu seçin"
 
@@ -5325,6 +5331,9 @@ msgstr "Pull request'lerde çalışma alanı yerine kendi adınıza işlem yapma
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} hesabınızı bağlayın, ardından bu sayfayı yeniden yükleyin."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "AWS Marketplace aboneliğinizi bağlayın"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "Geri getirilemez."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "\"{profileName}\" profilinizdeki çerezleri uygulama içi tarayıcıya kopyalar. Ajanlar böylece oturum açtığınız sitelerde işlem yapabilir."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Zaten üyesi olmadığınız bir kuruluşa bağlı. Sahibinden sizi davet etmesini isteyin."
+
+msgid "It is linked to {organization}."
+msgstr "{organization} kuruluşuna bağlı."
+
 msgid "It keeps the title from your prompt."
 msgstr "İsteminizdeki başlık korunur."
 
@@ -11376,6 +11391,9 @@ msgstr "bağlantı kopyalandı"
 msgid "Link copied"
 msgstr "Bağlantı kopyalandı"
 
+msgid "Link organization"
+msgstr "Kuruluşu bağla"
+
 msgid "Link task"
 msgstr "Görev bağla"
 
@@ -11384,6 +11402,9 @@ msgstr "Bu görevi bağla"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} çalışma alanına bağlandı"
+
+msgid "Linking..."
+msgstr "Bağlanıyor..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "Yeni kişileri yalnızca {organizationName} yöneticileri davet edebilir
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Planı yalnızca kuruluş sahibi değiştirebilir. Yükseltme için sahibinize başvurun."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Bu kuruluşu yalnızca bir sahip veya yönetici bağlayabilir."
 
 msgid "Only available on macOS."
 msgstr "Yalnızca macOS'ta kullanılabilir."
@@ -20716,6 +20740,12 @@ msgstr "Bu Linear çalışma alanı {owner} tarafından zaten bağlanmış. Önc
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Bu Linear çalışma alanı başka bir Paradev kuruluşu tarafından zaten bağlanmış."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Bu bağlantının süresi doldu. Paradev'i AWS Marketplace aboneliğinizden yeniden açın."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Bu bağlantı geçerli değil. Paradev'i AWS Marketplace aboneliğinizden yeniden açın."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Bu bir ikili dosyaya benziyor. Metin olarak açmak bozuk çıktı gösterebilir veya büyük dosyalarda düzenleyiciyi dondurabilir."
 
@@ -20755,8 +20785,14 @@ msgstr "Bu yalnızca görünen adı değiştirir, dalı değil."
 msgid "this organization"
 msgstr "bu kuruluş"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Bu kuruluş zaten kartla ödeme yapıyor. Önce o planı iptal edin veya başka bir kuruluş seçin."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Bu kuruluşun faturalama dönemi yok. Bunun yerine bir zaman aralığı seçin."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Bu kuruluş zaten başka bir AWS Marketplace aboneliğine bağlı."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Bu kuruluş Ücretsiz planda. {appName} Mobile, Pro planındaki kuruluşlar için kullanılabilir."
@@ -20877,6 +20913,9 @@ msgstr "Bu alt ajan şu anda arka plana taşınamıyor"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Bu alt ajan artık ana makine tarafından izlenmiyor. Dökümü, ajanın oturum dizininde diskte kalır."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Bu abonelik zaten başka bir kuruluşa bağlı."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Bu terminalde henüz devredilecek çıktı yok."
@@ -22326,6 +22365,9 @@ msgstr "Bu kuruluşun ödeme yönteminden tahsilat yapamadık. Bir sahipten gün
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Ödeme yönteminizden tahsilat yapamadık. Bu planı sürdürmek için güncelleyin."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "AWS Marketplace aboneliğiniz doğrulanamadı"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Çevrimiçi olup olmadığını görmek için {appName}'e ulaşamadık. Bağlantınızı kontrol edip tekrar deneyin."
 
@@ -23025,6 +23067,9 @@ msgstr "Bu terminale erişiminiz yok."
 msgid "You don't have permission to remove this member"
 msgstr "Bu üyeyi kaldırma izniniz yok"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Henüz sahibi veya yöneticisi olduğunuz bir kuruluş yok. Bir tane oluşturun, ardından bu bağlantıyı yeniden açın."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Kaydedilmemiş ortam değişkenleriniz var. Kapatmak istediğinizden emin misiniz?"
 
@@ -23130,6 +23175,9 @@ msgstr "Ajan abonelikleriniz ve anahtarlarınız"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Sizin ajanlarınız, sizin hesaplarınız"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "AWS Marketplace aboneliğiniz etkin"
 
 msgid "Your changes"
 msgstr "Değişiklikleriniz"

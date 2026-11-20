@@ -12,6 +12,7 @@ import { analyticsRouter } from "./router/analytics";
 import { apiKeyRouter } from "./router/api-key";
 import { attachmentRouter } from "./router/attachment";
 import { automationRouter } from "./router/automation";
+import { awsMarketplaceRouter } from "./router/aws-marketplace";
 import { billingRouter } from "./router/billing";
 import {
 	channelMessageRouter,
@@ -63,6 +64,7 @@ export const appRouter = createTRPCRouter({
 	analytics: analyticsRouter,
 	attachment: attachmentRouter,
 	automation: automationRouter,
+	awsMarketplace: awsMarketplaceRouter,
 	billing: billingRouter,
 	chat: chatRouter,
 	chatHistory: chatHistoryRouter,

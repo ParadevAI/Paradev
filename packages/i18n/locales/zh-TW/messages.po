@@ -3512,6 +3512,9 @@ msgstr "執行中"
 msgid "Away"
 msgstr "離開"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace 沒有回應。請幾分鐘後再試一次。"
+
 msgid "Back"
 msgstr "返回"
 
@@ -4489,6 +4492,9 @@ msgstr "請選擇"
 msgid "Choose the model"
 msgstr "選擇模型"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "選擇由 AWS Marketplace 計費的組織。每個訂閱只能連結一個組織。"
+
 msgid "Choose the primary repository"
 msgstr "選擇主要儲存庫"
 
@@ -5325,6 +5331,9 @@ msgstr "連接後，將以你自己的身分而非工作區的身分處理拉取
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "連線你的 {pluginLabel} 帳戶，然後重新載入此頁面。"
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "連結你的 AWS Marketplace 訂閱"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "刪除後無法復原。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "將你的「{profileName}」設定檔中的 Cookie 複製到應用程式內建瀏覽器中。之後代理程式可以在你已登入的網站上執行操作。"
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "此訂閱已連結到你不是成員的組織。請該組織的擁有者邀請你。"
+
+msgid "It is linked to {organization}."
+msgstr "已連結到 {organization}。"
+
 msgid "It keeps the title from your prompt."
 msgstr "將保留根據你的提示產生的標題。"
 
@@ -11376,6 +11391,9 @@ msgstr "連結已複製"
 msgid "Link copied"
 msgstr "連結已複製"
 
+msgid "Link organization"
+msgstr "連結組織"
+
 msgid "Link task"
 msgstr "關聯任務"
 
@@ -11384,6 +11402,9 @@ msgstr "連結此任務"
 
 msgid "Linked {slug} to workspace"
 msgstr "已將{slug}關聯到工作區"
+
+msgid "Linking..."
+msgstr "正在連結..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "只有 {organizationName} 的管理員可以邀請新成員"
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "只有組織擁有者才能變更方案，請聯絡擁有者升級。"
+
+msgid "Only an owner or admin can link this organization."
+msgstr "只有擁有者或管理員可以連結此組織。"
 
 msgid "Only available on macOS."
 msgstr "僅在macOS上可用。"
@@ -20716,6 +20740,12 @@ msgstr "這個Linear工作區已被{owner}連線。請讓對方先斷開連線�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "這個Linear工作區已被另一個Paradev組織連線。"
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此連結已過期。請從你的 AWS Marketplace 訂閱再次開啟 Paradev。"
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此連結無效。請從你的 AWS Marketplace 訂閱再次開啟 Paradev。"
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "這看起來是二進位檔案。以文字方式開啟可能顯示亂碼，檔案較大時還可能讓編輯器卡死。"
 
@@ -20755,8 +20785,14 @@ msgstr "這只會更改顯示名稱，不會更改分支。"
 msgid "this organization"
 msgstr "此組織"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "此組織已在使用信用卡付款。請先取消該方案，或選擇其他組織。"
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "此組織沒有帳單週期。請改為選擇一個時間範圍。"
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "此組織已連結到另一個 AWS Marketplace 訂閱。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此組織使用的是免費版。{appName} Mobile面向使用專業版的組織開放。"
@@ -20877,6 +20913,9 @@ msgstr "此子代理程式目前無法移到背景"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主機已不再追蹤此子代理程式。其逐字稿仍保留在磁碟上的代理程式工作階段目錄中。"
+
+msgid "This subscription is already linked to another organization."
+msgstr "此訂閱已連結到另一個組織。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "這個終端還沒有可交接的輸出。"
@@ -22326,6 +22365,9 @@ msgstr "我們無法從此組織的支付方式扣款。請讓擁有者更新它
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "我們無法從你的支付方式扣款。請更新支付方式以保留此方案。"
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "無法確認你的 AWS Marketplace 訂閱"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "無法連線到{appName}以確認它是否在線上。請檢查網路連線後再試一次。"
 
@@ -23025,6 +23067,9 @@ msgstr "你沒有此終端的存取權限。"
 msgid "You don't have permission to remove this member"
 msgstr "你沒有移除該成員的權限"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "你還沒有自己擁有或管理的組織。請先建立一個，然後再次開啟此連結。"
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未儲存的環境變數。確定要關閉嗎？"
 
@@ -23130,6 +23175,9 @@ msgstr "你的代理程式訂閱和金鑰"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的代理程式，你的帳號"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "你的 AWS Marketplace 訂閱已生效"
 
 msgid "Your changes"
 msgstr "你的變更"

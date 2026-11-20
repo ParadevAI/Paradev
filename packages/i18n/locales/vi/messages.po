@@ -3512,6 +3512,9 @@ msgstr "Đang chạy"
 msgid "Away"
 msgstr "Vắng mặt"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace không phản hồi. Hãy thử lại sau vài phút."
+
 msgid "Back"
 msgstr "Quay lại"
 
@@ -4489,6 +4492,9 @@ msgstr "Chọn một"
 msgid "Choose the model"
 msgstr "Chọn mô hình"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Chọn tổ chức mà AWS Marketplace sẽ tính phí. Mỗi gói đăng ký chỉ liên kết với một tổ chức."
+
 msgid "Choose the primary repository"
 msgstr "Chọn repository chính"
 
@@ -5325,6 +5331,9 @@ msgstr "Kết nối để thao tác với pull request dưới tên của bạn 
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Kết nối tài khoản {pluginLabel} của bạn, sau đó tải lại trang này."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Kết nối gói đăng ký AWS Marketplace của bạn"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "Không thể khôi phục."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Sao chép cookie từ hồ sơ \"{profileName}\" của bạn vào trình duyệt trong ứng dụng. Sau đó các agent có thể thao tác trên các trang bạn đã đăng nhập."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Gói này đã được liên kết với một tổ chức mà bạn không phải là thành viên. Hãy nhờ chủ sở hữu mời bạn."
+
+msgid "It is linked to {organization}."
+msgstr "Đã được liên kết với {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Tiêu đề từ lời nhắc của bạn sẽ được giữ nguyên."
 
@@ -11376,6 +11391,9 @@ msgstr "đã sao chép liên kết"
 msgid "Link copied"
 msgstr "Đã sao chép liên kết"
 
+msgid "Link organization"
+msgstr "Liên kết tổ chức"
+
 msgid "Link task"
 msgstr "Liên kết tác vụ"
 
@@ -11384,6 +11402,9 @@ msgstr "Liên kết tác vụ này"
 
 msgid "Linked {slug} to workspace"
 msgstr "Đã liên kết {slug} với workspace"
+
+msgid "Linking..."
+msgstr "Đang liên kết..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "Chỉ quản trị viên của {organizationName} mới có thể mời 
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Chỉ chủ sở hữu tổ chức mới đổi được gói. Hãy nhờ chủ sở hữu nâng cấp."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Chỉ chủ sở hữu hoặc quản trị viên mới có thể liên kết tổ chức này."
 
 msgid "Only available on macOS."
 msgstr "Chỉ có trên macOS."
@@ -20716,6 +20740,12 @@ msgstr "Workspace Linear này đã được {owner} kết nối. Hãy nhờ họ
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Workspace Linear này đã được một tổ chức Paradev khác kết nối."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Liên kết này đã hết hạn. Hãy mở lại Paradev từ gói đăng ký AWS Marketplace của bạn."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Liên kết này không hợp lệ. Hãy mở lại Paradev từ gói đăng ký AWS Marketplace của bạn."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Đây có vẻ là tệp nhị phân. Mở dưới dạng văn bản có thể hiện ra ký tự lỗi hoặc làm treo trình soạn thảo với tệp lớn."
 
@@ -20755,8 +20785,14 @@ msgstr "Việc này chỉ đổi tên hiển thị, không đổi nhánh."
 msgid "this organization"
 msgstr "tổ chức này"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Tổ chức này đã thanh toán bằng thẻ. Hãy hủy gói đó trước hoặc chọn tổ chức khác."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Tổ chức này không có kỳ thanh toán nào. Hãy chọn một khoảng thời gian."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Tổ chức này đã được liên kết với một gói đăng ký AWS Marketplace khác."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tổ chức này đang dùng gói Free. {appName} Mobile chỉ dành cho tổ chức dùng gói Pro."
@@ -20877,6 +20913,9 @@ msgstr "Không thể chuyển agent con này sang chạy nền lúc này"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Máy chủ không còn theo dõi agent con này. Bản ghi vẫn nằm trên đĩa trong thư mục phiên của agent."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Gói đăng ký này đã được liên kết với một tổ chức khác."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Terminal này chưa có kết quả nào để bàn giao."
@@ -22326,6 +22365,9 @@ msgstr "Chúng tôi không thể trừ tiền từ phương thức thanh toán c
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Chúng tôi không thể trừ tiền từ phương thức thanh toán của bạn. Hãy cập nhật để giữ gói này."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Không thể xác nhận gói đăng ký AWS Marketplace của bạn"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Chúng tôi không thể kết nối tới {appName} để xem máy có trực tuyến không. Hãy kiểm tra kết nối và thử lại."
 
@@ -23025,6 +23067,9 @@ msgstr "Bạn không có quyền truy cập terminal này."
 msgid "You don't have permission to remove this member"
 msgstr "Bạn không có quyền gỡ thành viên này"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Bạn chưa sở hữu hoặc quản trị tổ chức nào. Hãy tạo một tổ chức, rồi mở lại liên kết này."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Bạn có biến môi trường chưa lưu. Bạn có chắc muốn đóng?"
 
@@ -23130,6 +23175,9 @@ msgstr "Gói đăng ký và khóa agent của bạn"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Agent của bạn, tài khoản của bạn"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Gói đăng ký AWS Marketplace của bạn đang hoạt động"
 
 msgid "Your changes"
 msgstr "Các thay đổi của bạn"

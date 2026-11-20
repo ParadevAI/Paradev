@@ -1,5 +1,6 @@
 import { AutumnError } from "autumn-js";
 import { autumnClient, autumnRest } from "../../../autumn";
+import { isAwsMarketplaceOrganization } from "../aws-marketplace/organization";
 import { LEGACY_CLIENT_PLAN_IDS } from "../legacy/plan-ids";
 import { alertBilling } from "./alert";
 import { seatLicenseFor } from "./catalog";
@@ -139,6 +140,7 @@ export async function setAutumnSeats(
 	if (!customer) return false;
 	const planId = paidPlanIdFromFlags(customer.flags);
 	if (!planId) return false;
+	if (await isAwsMarketplaceOrganization(organizationId)) return true;
 	try {
 		const license = await seatLicenseFor(planId);
 		if (license) {

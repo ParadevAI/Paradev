@@ -3506,6 +3506,9 @@ msgstr "Працює"
 msgid "Away"
 msgstr "Відсутній"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace не відповідає. Спробуйте ще раз за кілька хвилин."
+
 msgid "Back"
 msgstr "Назад"
 
@@ -4483,6 +4486,9 @@ msgstr "Виберіть варіант"
 msgid "Choose the model"
 msgstr "Виберіть модель"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Виберіть організацію, якій AWS Marketplace виставлятиме рахунки. Кожна підписка прив’язується до однієї організації."
+
 msgid "Choose the primary repository"
 msgstr "Виберіть основний репозиторій"
 
@@ -5319,6 +5325,9 @@ msgstr "Підключіться, щоб працювати з пул-рекве
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Підключіть свій обліковий запис {pluginLabel}, а потім перезавантажте цю сторінку."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Підключіть підписку AWS Marketplace"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10765,6 +10774,12 @@ msgstr "Відновити його не вийде."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Файли cookie з вашого профілю «{profileName}» буде скопійовано у вбудований браузер застосунку. Після цього агенти зможуть діяти на сайтах, де ви ввійшли в обліковий запис."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Вона вже прив’язана до організації, у якій ви не перебуваєте. Попросіть власника запросити вас."
+
+msgid "It is linked to {organization}."
+msgstr "Вона прив’язана до {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Назва з вашого промпту залишиться."
 
@@ -11370,6 +11385,9 @@ msgstr "посилання скопійовано"
 msgid "Link copied"
 msgstr "Посилання скопійовано"
 
+msgid "Link organization"
+msgstr "Прив’язати організацію"
+
 msgid "Link task"
 msgstr "Прив'язати завдання"
 
@@ -11378,6 +11396,9 @@ msgstr "Прив'язати це завдання"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} прив'язано до робочого простору"
+
+msgid "Linking..."
+msgstr "Прив’язування..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13772,6 +13793,9 @@ msgstr "Лише адміністратори {organizationName} можуть з
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Змінити тариф може лише власник організації. Попросіть свого власника перейти на вищий тариф."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Прив’язати цю організацію може лише власник або адміністратор."
 
 msgid "Only available on macOS."
 msgstr "Доступно лише на macOS."
@@ -20710,6 +20734,12 @@ msgstr "Цей робочий простір Linear уже підключив {o
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Цей робочий простір Linear уже підключено до іншої організації Paradev."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Термін дії посилання минув. Знову відкрийте Paradev із підписки AWS Marketplace."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Посилання недійсне. Знову відкрийте Paradev із підписки AWS Marketplace."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Схоже, це бінарний файл. Якщо відкрити його як текст, вміст може відобразитися некоректно, а великі файли можуть спричинити зависання редактора."
 
@@ -20749,8 +20779,14 @@ msgstr "Це змінює лише відображувану назву, а н�
 msgid "this organization"
 msgstr "ця організація"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Ця організація вже платить карткою. Спершу скасуйте цей тариф або виберіть іншу організацію."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Ця організація не має розрахункових періодів. Виберіть часовий діапазон."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Ця організація вже прив’язана до іншої підписки AWS Marketplace."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Ця організація на тарифі Free. {appName} Mobile доступний для організацій на тарифі Pro."
@@ -20871,6 +20907,9 @@ msgstr "Цей субагент зараз не може перейти у фо�
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Хост більше не відстежує цього субагента. Його журнал розмови залишається на диску в папці сеансу агента."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Ця підписка вже прив’язана до іншої організації."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Цей термінал ще не має виводу, який можна передати."
@@ -22320,6 +22359,9 @@ msgstr "Не вдалося здійснити списання зі спосо�
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Не вдалося здійснити списання з вашого способу оплати. Оновіть його, щоб зберегти цей тариф."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Не вдалося підтвердити підписку AWS Marketplace"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Не вдалося зв'язатися з {appName}, щоб перевірити, чи він онлайн. Перевірте з'єднання та спробуйте ще раз."
 
@@ -23019,6 +23061,9 @@ msgstr "У вас немає доступу до цього термінала."
 msgid "You don't have permission to remove this member"
 msgstr "У вас немає дозволу видалити цього учасника"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "У вас ще немає організації, якою ви володієте або керуєте. Створіть її та знову відкрийте це посилання."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "У вас є незбережені змінні середовища. Справді закрити?"
 
@@ -23124,6 +23169,9 @@ msgstr "Ваші підписки та ключі для агентів"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Ваші агенти, ваші облікові записи"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Підписка AWS Marketplace активна"
 
 msgid "Your changes"
 msgstr "Ваші зміни"
