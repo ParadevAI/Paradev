@@ -1,8 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test";
 import {
 	existsSync,
 	mkdirSync,
 	mkdtempSync,
+	readdirSync,
 	rmSync,
 	symlinkSync,
 	writeFileSync,
@@ -14,6 +15,11 @@ import {
 	removeClaudeProfile,
 	removeCodexHome,
 } from "./profile-remove";
+import { keychainServicesForConfigDir } from "./profiles";
+
+// The add-account command writes this, holding the agent id, into each
+// profile dir it creates.
+const CREATED_MARKER = ".superset-created";
 
 // These guard a recursive delete — every rejection here is load-bearing.
 describe("assertRemovableProfileDir", () => {
@@ -121,6 +127,89 @@ describe("remove functions refuse protected dirs before touching the disk", () =
 	});
 });
 
+// Discovery lists any signed-in dot-dir, including homes the user or another
+// tool made and still uses. Remove must leave those, and their Keychain
+// items, alone.
+describe("remove functions delete only profiles Paradev created", () => {
+	const profiles: string[] = [];
+	afterEach(() => {
+		for (const dir of profiles.splice(0)) {
+			rmSync(dir, { recursive: true, force: true });
+		}
+	});
+
+	// Under the home dir so the path guards accept it.
+	function makeProfile(prefix: string, files: Record<string, string>): string {
+		const dir = mkdtempSync(join(homedir(), prefix));
+		profiles.push(dir);
+		for (const [name, content] of Object.entries(files)) {
+			writeFileSync(join(dir, name), content);
+		}
+		return dir;
+	}
+
+	it("keeps a Codex home it did not create", async () => {
+		const dir = makeProfile(".codex-remove-test-", {
+			"auth.json": '{"tokens":{"access_token":"token"}}',
+		});
+
+		await expect(removeCodexHome(dir)).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+			message: expect.stringContaining(dir),
+		});
+		expect(readdirSync(dir)).toEqual(["auth.json"]);
+	});
+
+	it("keeps a Claude profile it did not create, and its Keychain items", async () => {
+		const dir = makeProfile(".claude-remove-test-", {
+			".claude.json": '{"oauthAccount":{"emailAddress":"me@example.com"}}',
+		});
+		const deleteKeychainItem = mock(async (_service: string) => {});
+
+		await expect(
+			removeClaudeProfile(dir, deleteKeychainItem),
+		).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+		expect(deleteKeychainItem).not.toHaveBeenCalled();
+		expect(readdirSync(dir)).toEqual([".claude.json"]);
+	});
+
+	it("keeps a home marked as created for the other agent", async () => {
+		const dir = makeProfile(".codex-remove-test-", {
+			[CREATED_MARKER]: "claude",
+		});
+
+		await expect(removeCodexHome(dir)).rejects.toMatchObject({
+			code: "PRECONDITION_FAILED",
+		});
+		expect(existsSync(dir)).toBe(true);
+	});
+
+	it("deletes a Codex home it created", async () => {
+		const dir = makeProfile(".codex-remove-test-", {
+			[CREATED_MARKER]: "codex",
+			"auth.json": '{"tokens":{"access_token":"token"}}',
+		});
+
+		await removeCodexHome(dir);
+
+		expect(existsSync(dir)).toBe(false);
+	});
+
+	it("deletes a Claude profile it created, with its Keychain items", async () => {
+		const dir = makeProfile(".claude-remove-test-", {
+			[CREATED_MARKER]: "claude",
+		});
+		const deleted: string[] = [];
+
+		await removeClaudeProfile(dir, async (service) => {
+			deleted.push(service);
+		});
+
+		expect(existsSync(dir)).toBe(false);
+		expect(deleted).toEqual(keychainServicesForConfigDir(dir));
+	});
+});
+
 // A provisioned profile links its capability dirs at the default account's
 // (packages/agent-setup/src/provider-profiles.ts). Removing the profile must
 // unlink those, never delete through them.
@@ -135,9 +224,10 @@ describe("removeClaudeProfile with shared-config links", () => {
 			// Under the home dir so the removal guards accept it.
 			const profile = mkdtempSync(join(homedir(), ".claude-remove-test-"));
 			try {
+				writeFileSync(join(profile, CREATED_MARKER), "claude");
 				symlinkSync(sharedSkills, join(profile, "skills"), "dir");
 
-				await removeClaudeProfile(profile);
+				await removeClaudeProfile(profile, async () => {});
 
 				expect(existsSync(profile)).toBe(false);
 				expect(existsSync(join(sharedSkills, "redesign", "SKILL.md"))).toBe(

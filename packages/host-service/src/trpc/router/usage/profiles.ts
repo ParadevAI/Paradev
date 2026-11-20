@@ -23,6 +23,7 @@
 
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
+import type { Stats } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { homedir, platform, userInfo } from "node:os";
 import { join } from "node:path";
@@ -42,6 +43,12 @@ const MAX_STATE_FILE_BYTES = 50 * 1024 * 1024;
  * mtime is the login fingerprint, since a re-login rewrites it.
  */
 export const API_BILLING_MARKER = ".superset-api-billing";
+/**
+ * Written by the renderer's addAccountCommand into each profile dir it
+ * creates, before the login runs, holding the agent id. Remove deletes only
+ * dirs that carry it (profile-remove.ts).
+ */
+export const PROFILE_CREATED_MARKER = ".superset-created";
 const MAX_MARKER_BYTES = 64;
 
 export type ProfileCredentialKind = "subscription" | "api_key";
@@ -136,20 +143,51 @@ async function readClaudeIdentity(
 	}
 }
 
+/** A marker file's stats, or null unless it exists and names `agent`. */
+async function readAgentMarker(
+	profileDir: string,
+	marker: string,
+	agent: "claude" | "codex",
+): Promise<Stats | null> {
+	const markerPath = join(profileDir, marker);
+	try {
+		const info = await stat(markerPath);
+		if (!info.isFile() || info.size > MAX_MARKER_BYTES) return null;
+		const content = (await readFile(markerPath, "utf-8")).trim();
+		return content === agent ? info : null;
+	} catch {
+		return null;
+	}
+}
+
 /** The marker's mtime, or null when the dir is not API-billed for `agent`. */
 export async function readApiBillingFingerprint(
 	profileDir: string,
 	agent: "claude" | "codex",
 ): Promise<string | null> {
-	const markerPath = join(profileDir, API_BILLING_MARKER);
-	try {
-		const info = await stat(markerPath);
-		if (!info.isFile() || info.size > MAX_MARKER_BYTES) return null;
-		const content = (await readFile(markerPath, "utf-8")).trim();
-		return content === agent ? `${info.mtimeMs}` : null;
-	} catch {
-		return null;
+	const marker = await readAgentMarker(profileDir, API_BILLING_MARKER, agent);
+	return marker ? `${marker.mtimeMs}` : null;
+}
+
+export async function hasProfileCreatedMarker(
+	profileDir: string,
+	agent: "claude" | "codex",
+): Promise<boolean> {
+	return (
+		(await readAgentMarker(profileDir, PROFILE_CREATED_MARKER, agent)) !== null
+	);
+}
+
+/** Whether `selection` is a profile dir Paradev created for `agent`. The
+ * system default (null) and other agents' logins never are. */
+export async function isCreatedProfile(
+	agent: string,
+	selection: string | null,
+): Promise<boolean> {
+	if (selection === null || (agent !== "claude" && agent !== "codex")) {
+		return false;
 	}
+	return hasProfileCreatedMarker(selection, agent);
 }
 
 /**
