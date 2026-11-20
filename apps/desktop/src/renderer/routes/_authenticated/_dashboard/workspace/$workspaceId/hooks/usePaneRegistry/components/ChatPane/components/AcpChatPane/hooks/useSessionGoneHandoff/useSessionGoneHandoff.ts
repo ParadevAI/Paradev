@@ -54,6 +54,7 @@ export function useSessionGoneHandoff({
 		[sessionId, recheck, now],
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: appended is the trigger to flush prompts queued during a hold
 	useEffect(() => {
 		if (!hold) return;
 		for (const prompt of pending.current.splice(0)) onQueuePrompt(prompt);
