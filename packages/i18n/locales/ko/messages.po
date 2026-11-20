@@ -3512,6 +3512,9 @@ msgstr "실행 중"
 msgid "Away"
 msgstr "자리 비움"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace에서 응답이 없습니다. 몇 분 후에 다시 시도하세요."
+
 msgid "Back"
 msgstr "뒤로"
 
@@ -4489,6 +4492,9 @@ msgstr "선택하세요"
 msgid "Choose the model"
 msgstr "모델 선택"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "AWS Marketplace가 청구할 조직을 선택하세요. 구독 하나에는 조직 하나만 연결할 수 있습니다."
+
 msgid "Choose the primary repository"
 msgstr "기본 리포지토리 선택"
 
@@ -5325,6 +5331,9 @@ msgstr "연결하면 워크스페이스가 아닌 본인 계정으로 풀 리퀘
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "{pluginLabel} 계정을 연결한 다음 이 페이지를 새로 고치세요."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "AWS Marketplace 구독 연결"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "되돌릴 수 없습니다."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "\"{profileName}\" 프로필의 쿠키를 앱 내 브라우저로 복사합니다. 그러면 에이전트가 로그인된 사이트에서 작업할 수 있습니다."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "이 구독은 회원이 아닌 조직에 이미 연결되어 있습니다. 조직 소유자에게 초대를 요청하세요."
+
+msgid "It is linked to {organization}."
+msgstr "{organization}에 연결되어 있습니다."
+
 msgid "It keeps the title from your prompt."
 msgstr "프롬프트에서 가져온 제목이 유지됩니다."
 
@@ -11376,6 +11391,9 @@ msgstr "링크를 복사했습니다"
 msgid "Link copied"
 msgstr "링크 복사됨"
 
+msgid "Link organization"
+msgstr "조직 연결"
+
 msgid "Link task"
 msgstr "작업 연결"
 
@@ -11384,6 +11402,9 @@ msgstr "이 작업 연결"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug}을(를) 워크스페이스에 연결했습니다"
+
+msgid "Linking..."
+msgstr "연결 중..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "{organizationName} 관리자만 새 사람을 초대할 수 있습니다
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "플랜은 조직 소유자만 변경할 수 있습니다. 소유자에게 업그레이드를 요청하세요."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "소유자 또는 관리자만 이 조직을 연결할 수 있습니다."
 
 msgid "Only available on macOS."
 msgstr "macOS에서만 사용할 수 있습니다."
@@ -20716,6 +20740,12 @@ msgstr "이 Linear 워크스페이스는 이미 {owner}이(가) 연결했습니�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "이 Linear 워크스페이스는 이미 다른 Paradev 조직이 연결했습니다."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "이 링크는 만료되었습니다. AWS Marketplace 구독에서 Paradev를 다시 여세요."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "이 링크는 유효하지 않습니다. AWS Marketplace 구독에서 Paradev를 다시 여세요."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "바이너리 파일로 보입니다. 텍스트로 열면 깨진 내용이 표시되거나, 파일이 크면 에디터가 멈출 수 있습니다."
 
@@ -20755,8 +20785,14 @@ msgstr "표시 이름만 변경되며 브랜치는 바뀌지 않습니다."
 msgid "this organization"
 msgstr "이 조직"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "이 조직은 이미 카드로 결제하고 있습니다. 먼저 해당 플랜을 취소하거나 다른 조직을 선택하세요."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "이 조직에는 청구 기간이 없습니다. 대신 시간 범위를 선택하세요."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "이 조직은 이미 다른 AWS Marketplace 구독에 연결되어 있습니다."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "이 조직은 Free 플랜을 사용 중입니다. {appName} Mobile은 Pro 플랜 조직에서 사용할 수 있습니다."
@@ -20877,6 +20913,9 @@ msgstr "이 서브 에이전트는 지금 백그라운드로 옮길 수 없습�
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "이 서브 에이전트는 더 이상 호스트에서 추적되지 않습니다. 기록은 에이전트의 세션 디렉터리에 디스크로 남아 있습니다."
+
+msgid "This subscription is already linked to another organization."
+msgstr "이 구독은 이미 다른 조직에 연결되어 있습니다."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "이 터미널에는 아직 넘길 출력이 없습니다."
@@ -22326,6 +22365,9 @@ msgstr "이 조직의 결제 수단으로 청구하지 못했습니다. 소유�
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "결제 수단으로 청구하지 못했습니다. 이 플랜을 유지하려면 결제 수단을 업데이트하세요."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "AWS Marketplace 구독을 확인할 수 없습니다"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "온라인 상태인지 확인하기 위해 {appName}에 연결하지 못했습니다. 연결을 확인하고 다시 시도하세요."
 
@@ -23025,6 +23067,9 @@ msgstr "이 터미널에 접근할 권한이 없습니다."
 msgid "You don't have permission to remove this member"
 msgstr "이 멤버를 제거할 권한이 없습니다"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "아직 소유하거나 관리하는 조직이 없습니다. 조직을 만든 다음 이 링크를 다시 여세요."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "저장하지 않은 환경 변수가 있습니다. 정말 닫을까요?"
 
@@ -23130,6 +23175,9 @@ msgstr "에이전트 구독과 키"
 
 msgid "Your Agents, Your Accounts"
 msgstr "당신의 에이전트, 당신의 계정"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "AWS Marketplace 구독이 활성화되었습니다"
 
 msgid "Your changes"
 msgstr "내 변경 내용"

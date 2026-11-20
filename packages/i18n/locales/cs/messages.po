@@ -3512,6 +3512,9 @@ msgstr "Běží"
 msgid "Away"
 msgstr "Nepřítomen"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace neodpovídá. Zkuste to znovu za několik minut."
+
 msgid "Back"
 msgstr "Zpět"
 
@@ -4489,6 +4492,9 @@ msgstr "Vyberte"
 msgid "Choose the model"
 msgstr "Vybrat model"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "Vyberte organizaci, které bude AWS Marketplace účtovat. Každé předplatné je propojeno s jednou organizací."
+
 msgid "Choose the primary repository"
 msgstr "Vyberte hlavní repozitář"
 
@@ -5325,6 +5331,9 @@ msgstr "Připojte se, abyste s pull requesty pracovali sami za sebe, ne jako pra
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "Připojte svůj účet {pluginLabel} a pak tuto stránku znovu načtěte."
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "Propojte předplatné AWS Marketplace"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "Nepůjde ho obnovit."
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "Zkopíruje soubory cookie z vašeho profilu „{profileName}“ do prohlížeče v aplikaci. Agenti pak mohou jednat na webech, kde jste přihlášeni."
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "Je už propojeno s organizací, jejímž nejste členem. Požádejte jejího vlastníka o pozvánku."
+
+msgid "It is linked to {organization}."
+msgstr "Je propojeno s {organization}."
+
 msgid "It keeps the title from your prompt."
 msgstr "Zůstane mu název z vašeho zadání."
 
@@ -11376,6 +11391,9 @@ msgstr "odkaz zkopírován"
 msgid "Link copied"
 msgstr "Odkaz zkopírován"
 
+msgid "Link organization"
+msgstr "Propojit organizaci"
+
 msgid "Link task"
 msgstr "Propojit úkol"
 
@@ -11384,6 +11402,9 @@ msgstr "Propojit tento úkol"
 
 msgid "Linked {slug} to workspace"
 msgstr "{slug} propojeno s pracovním prostorem"
+
+msgid "Linking..."
+msgstr "Propojování..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "Nové lidi mohou zvát jen správci {organizationName}"
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "Tarif může změnit jen vlastník organizace. Požádejte ho o přechod na Pro."
+
+msgid "Only an owner or admin can link this organization."
+msgstr "Tuto organizaci může propojit jen vlastník nebo správce."
 
 msgid "Only available on macOS."
 msgstr "Dostupné jen na macOS."
@@ -20716,6 +20740,12 @@ msgstr "Tento Linear workspace už připojil {owner}. Požádejte je, ať ho nej
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "Tento Linear workspace už připojila jiná organizace Paradev."
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Platnost tohoto odkazu vypršela. Otevřete Paradev znovu z předplatného AWS Marketplace."
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "Tento odkaz není platný. Otevřete Paradev znovu z předplatného AWS Marketplace."
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "Vypadá to na binární soubor. Otevření jako text může zobrazit nesmyslný výstup nebo u velkých souborů zamrznout editor."
 
@@ -20755,8 +20785,14 @@ msgstr "Změní se jen zobrazovaný název, ne větev."
 msgid "this organization"
 msgstr "této organizace"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "Tato organizace už platí kartou. Nejdřív tento tarif zrušte, nebo vyberte jinou organizaci."
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho časový rozsah."
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "Tato organizace je už propojena s jiným předplatným AWS Marketplace."
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
@@ -20877,6 +20913,9 @@ msgstr "Tento subagent se teď nedá přesunout na pozadí"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "Tento subagent už není hostitelem sledován. Jeho přepis zůstává na disku v adresáři relace agenta."
+
+msgid "This subscription is already linked to another organization."
+msgstr "Toto předplatné je už propojeno s jinou organizací."
 
 msgid "This terminal has no output to hand over yet."
 msgstr "Tento terminál zatím nemá žádný výstup k předání."
@@ -22326,6 +22365,9 @@ msgstr "Nepodařilo se strhnout platbu ze způsobu platby této organizace. Pož
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "Nepodařilo se strhnout platbu z vašeho způsobu platby. Aktualizujte ho, ať vám tarif zůstane."
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "Předplatné AWS Marketplace se nepodařilo potvrdit"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "Nepodařilo se spojit se {appName}em a zjistit, jestli je online. Zkontrolujte připojení a zkuste to znovu."
 
@@ -23025,6 +23067,9 @@ msgstr "K tomuto terminálu nemáte přístup."
 msgid "You don't have permission to remove this member"
 msgstr "Nemáte oprávnění tohoto člena odebrat"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "Zatím nevlastníte ani nespravujete žádnou organizaci. Vytvořte ji a pak tento odkaz otevřete znovu."
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Máte neuložené proměnné prostředí. Opravdu chcete zavřít?"
 
@@ -23130,6 +23175,9 @@ msgstr "Vaše předplatná agentů a klíče"
 
 msgid "Your Agents, Your Accounts"
 msgstr "Vaši agenti, vaše účty"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "Vaše předplatné AWS Marketplace je aktivní"
 
 msgid "Your changes"
 msgstr "Vaše změny"

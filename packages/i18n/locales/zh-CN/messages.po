@@ -3512,6 +3512,9 @@ msgstr "运行中"
 msgid "Away"
 msgstr "离开"
 
+msgid "AWS Marketplace did not respond. Try again in a few minutes."
+msgstr "AWS Marketplace 没有响应。请几分钟后重试。"
+
 msgid "Back"
 msgstr "返回"
 
@@ -4489,6 +4492,9 @@ msgstr "请选择"
 msgid "Choose the model"
 msgstr "选择模型"
 
+msgid "Choose the organization that AWS Marketplace will bill. Each subscription links to one organization."
+msgstr "选择由 AWS Marketplace 计费的组织。每个订阅只能关联一个组织。"
+
 msgid "Choose the primary repository"
 msgstr "选择主仓库"
 
@@ -5325,6 +5331,9 @@ msgstr "连接后，将以你自己的身份而非工作区的身份处理拉取
 
 msgid "Connect your {pluginLabel} account, then reload this page."
 msgstr "连接你的 {pluginLabel} 账户，然后重新加载此页面。"
+
+msgid "Connect your AWS Marketplace subscription"
+msgstr "关联你的 AWS Marketplace 订阅"
 
 #. js-lingui-explicit-id
 msgid "serverError.plugins.pluginSourceNeedsGithub"
@@ -10771,6 +10780,12 @@ msgstr "删除后无法恢复。"
 msgid "It copies the cookies from your \"{profileName}\" profile into the in-app browser. Agents can then act on the sites you are signed in to."
 msgstr "将你的 \"{profileName}\" 配置文件中的 Cookie 复制到应用内浏览器中。之后智能体可以在你已登录的网站上执行操作。"
 
+msgid "It is already linked to an organization you are not a member of. Ask its owner to invite you."
+msgstr "该订阅已关联到你不是成员的组织。请让该组织的所有者邀请你。"
+
+msgid "It is linked to {organization}."
+msgstr "已关联到 {organization}。"
+
 msgid "It keeps the title from your prompt."
 msgstr "将保留根据你的提示生成的标题。"
 
@@ -11376,6 +11391,9 @@ msgstr "链接已复制"
 msgid "Link copied"
 msgstr "链接已复制"
 
+msgid "Link organization"
+msgstr "关联组织"
+
 msgid "Link task"
 msgstr "关联任务"
 
@@ -11384,6 +11402,9 @@ msgstr "关联此任务"
 
 msgid "Linked {slug} to workspace"
 msgstr "已将{slug}关联到工作区"
+
+msgid "Linking..."
+msgstr "正在关联..."
 
 msgid "Liquid Glass"
 msgstr "Liquid Glass"
@@ -13778,6 +13799,9 @@ msgstr "只有 {organizationName} 的管理员可以邀请新成员"
 
 msgid "Only an organization owner can change the plan. Ask yours to upgrade."
 msgstr "只有组织所有者才能更改方案，请联系所有者升级。"
+
+msgid "Only an owner or admin can link this organization."
+msgstr "只有所有者或管理员可以关联此组织。"
 
 msgid "Only available on macOS."
 msgstr "仅在macOS上可用。"
@@ -20716,6 +20740,12 @@ msgstr "这个Linear工作区已被{owner}连接。请让对方先断开连接�
 msgid "This Linear workspace is already connected by another Paradev organization."
 msgstr "这个Linear工作区已被另一个Paradev组织连接。"
 
+msgid "This link has expired. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接已过期。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
+msgid "This link is not valid. Open Paradev again from your AWS Marketplace subscription."
+msgstr "此链接无效。请从你的 AWS Marketplace 订阅再次打开 Paradev。"
+
 msgid "This looks like a binary file. Opening it as text may show garbled output or freeze the editor for large files."
 msgstr "这看起来是二进制文件。以文本方式打开可能显示乱码，文件较大时还可能让编辑器卡死。"
 
@@ -20755,8 +20785,14 @@ msgstr "这只会更改显示名称，不会更改分支。"
 msgid "this organization"
 msgstr "此组织"
 
+msgid "This organization already pays by card. Cancel that plan first, or choose another organization."
+msgstr "此组织已在使用银行卡付款。请先取消该套餐，或选择其他组织。"
+
 msgid "This organization has no billing periods. Choose a time range instead."
 msgstr "此组织没有结算周期。请改为选择一个时间范围。"
+
+msgid "This organization is already linked to another AWS Marketplace subscription."
+msgstr "此组织已关联到另一个 AWS Marketplace 订阅。"
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "此组织使用的是免费版。{appName} Mobile面向使用专业版的组织开放。"
@@ -20877,6 +20913,9 @@ msgstr "此子智能体现在无法移到后台"
 
 msgid "This subagent is no longer tracked by the host. Its transcript stays on disk under the agent's session directory."
 msgstr "主机不再跟踪该子智能体。其记录仍保存在磁盘上的智能体会话目录中。"
+
+msgid "This subscription is already linked to another organization."
+msgstr "此订阅已关联到另一个组织。"
 
 msgid "This terminal has no output to hand over yet."
 msgstr "该终端还没有可交接的输出。"
@@ -22326,6 +22365,9 @@ msgstr "我们无法从此组织的支付方式扣款。请让所有者更新它
 msgid "We couldn't charge your payment method. Update it to keep this plan."
 msgstr "我们无法从你的支付方式扣款。请更新支付方式以保留此方案。"
 
+msgid "We couldn't confirm your AWS Marketplace subscription"
+msgstr "无法确认你的 AWS Marketplace 订阅"
+
 msgid "We couldn’t reach {appName} to see if it’s online. Check your connection and try again."
 msgstr "无法连接到{appName}以确认它是否在线。请检查网络连接后重试。"
 
@@ -23025,6 +23067,9 @@ msgstr "你没有此终端的访问权限。"
 msgid "You don't have permission to remove this member"
 msgstr "你没有移除该成员的权限"
 
+msgid "You don't own or administer an organization yet. Create one, then open this link again."
+msgstr "你还没有自己拥有或管理的组织。请先创建一个，然后再次打开此链接。"
+
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "你有未保存的环境变量。确定要关闭吗？"
 
@@ -23130,6 +23175,9 @@ msgstr "你的智能体订阅和密钥"
 
 msgid "Your Agents, Your Accounts"
 msgstr "你的智能体，你的账号"
+
+msgid "Your AWS Marketplace subscription is active"
+msgstr "你的 AWS Marketplace 订阅已生效"
 
 msgid "Your changes"
 msgstr "你的更改"
