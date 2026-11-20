@@ -87,6 +87,16 @@ Missing values fall back to Paradev defaults for the selected theme type.
 }
 ```
 
+## CSS Hooks
+
+A theme's `css` can target these stable attributes. Other selectors may change between releases.
+
+- `[data-workspace-sidebar]`: wraps the workspace sidebar (it has no box of its own, so style its children)
+- `[data-chat-transcript]`: the chat message area
+- `[data-chat-composer]`: the chat composer
+- `[data-user-message]`: your message bubbles
+- `[data-chat-code-block]`: code blocks in chat
+
 ## Notes
 
 - Theme IDs must be unique and not reserved (`system`, built-in theme IDs like `dark`/`light`).
