@@ -784,6 +784,9 @@ msgstr "{actor} desvinculou o espaço de trabalho {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} até agora · ~{projected} projetadas"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} não permite que você envie mensagens aos subagentes dele."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "As sessões de {agents} são retomadas quando você abre o workspace delas."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} pergunta"
 msgid "{name} can't be messaged"
 msgstr "Não é possível enviar mensagens para {name}"
 
+msgid "{name} can't take messages now."
+msgstr "{name} não pode receber mensagens agora."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} não pode receber mensagens. Seu texto voltou para o chat principal."
+
 msgid "{name} failed"
 msgstr "{name} falhou"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} falhou e não pode receber mensagens."
 
 msgid "{name} finished"
 msgstr "{name} terminou"
@@ -1205,6 +1217,9 @@ msgstr "{name} começou a trabalhar"
 
 msgid "{name} stopped"
 msgstr "{name} foi interrompido"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} parou e não pode receber mensagens."
 
 msgid "{name} wants more access"
 msgstr "{name} quer mais acesso"
@@ -3503,6 +3518,9 @@ msgstr "Voltar"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Voltar"
+
+msgid "Back to {parentTitle}"
+msgstr "Voltar para {parentTitle}"
 
 msgid "Back to About"
 msgstr "Voltar para Sobre"
@@ -9649,6 +9667,12 @@ msgstr "Voltar ao início"
 msgid "Go back to {appName} and sign in again."
 msgstr "Volte para o {appName} e entre novamente."
 
+msgid "Go back to {parentTitle}."
+msgstr "Volte para {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Volte para falar com o agente principal."
+
 msgid "Go back to the previous page in history"
 msgstr "Voltar para a página anterior do histórico"
 
@@ -12039,6 +12063,9 @@ msgstr "Mensagens"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Mensagens com estas palavras notificam você como uma menção. Separe-as com vírgulas."
+
+msgid "Messages you send go to {name}."
+msgstr "As mensagens que você enviar vão para {name}."
 
 msgid "Microphone"
 msgstr "Microfone"
@@ -20516,6 +20543,9 @@ msgstr "Este agente não pode ramificar uma conversa"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Este agente não pode ser executado em uma área de trabalho na nuvem"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Este agente não permite que você envie mensagens aos subagentes dele."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Este agente não existe mais no dispositivo selecionado (os agentes podem ter sido redefinidos). As execuções vão falhar até você escolher outro."
 
@@ -21755,6 +21785,12 @@ msgstr "Atualize o valor de <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Atualize este host para enviar mensagens aos subagentes"
 
+msgid "Update this host to message subagents."
+msgstr "Atualize este host para enviar mensagens aos subagentes."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Atualize este host para enviar mensagens aos subagentes. Seu texto voltou para o chat principal."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Atualize este host para mover subagentes para segundo plano"
 
@@ -22163,6 +22199,9 @@ msgstr "Ver uso"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Visualizando"
+
+msgid "Viewing subagent {name}"
+msgstr "Visualizando o subagente {name}"
 
 msgid "Violence or harassment"
 msgstr "Violência ou assédio"

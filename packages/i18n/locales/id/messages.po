@@ -784,6 +784,9 @@ msgstr "{actor} melepas tautan workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} sejauh ini · ~{projected} diperkirakan"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} tidak mengizinkan Anda mengirim pesan ke subagennya."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Sesi {agents} dilanjutkan saat Anda membuka workspace-nya."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} bertanya"
 msgid "{name} can't be messaged"
 msgstr "{name} tidak bisa dikirimi pesan"
 
+msgid "{name} can't take messages now."
+msgstr "{name} tidak dapat menerima pesan sekarang."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} tidak dapat menerima pesan. Teks Anda kembali ke obrolan utama."
+
 msgid "{name} failed"
 msgstr "{name} gagal"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} gagal dan tidak dapat menerima pesan."
 
 msgid "{name} finished"
 msgstr "{name} selesai"
@@ -1205,6 +1217,9 @@ msgstr "{name} mulai bekerja"
 
 msgid "{name} stopped"
 msgstr "{name} dihentikan"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} berhenti dan tidak dapat menerima pesan."
 
 msgid "{name} wants more access"
 msgstr "{name} meminta akses lebih"
@@ -3503,6 +3518,9 @@ msgstr "Kembali"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Kembali"
+
+msgid "Back to {parentTitle}"
+msgstr "Kembali ke {parentTitle}"
 
 msgid "Back to About"
 msgstr "Kembali ke Tentang"
@@ -9649,6 +9667,12 @@ msgstr "Kembali ke beranda"
 msgid "Go back to {appName} and sign in again."
 msgstr "Kembali ke {appName} dan masuk lagi."
 
+msgid "Go back to {parentTitle}."
+msgstr "Kembali ke {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Kembali untuk mengirim pesan ke agen utama."
+
 msgid "Go back to the previous page in history"
 msgstr "Kembali ke halaman sebelumnya di riwayat"
 
@@ -12039,6 +12063,9 @@ msgstr "Pesan"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Pesan dengan kata-kata ini memberi notifikasi seperti sebutan. Pisahkan dengan koma."
+
+msgid "Messages you send go to {name}."
+msgstr "Pesan yang Anda kirim akan masuk ke {name}."
 
 msgid "Microphone"
 msgstr "Mikrofon"
@@ -20516,6 +20543,9 @@ msgstr "Agen ini tidak dapat mencabangkan percakapan"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agen ini tidak bisa berjalan di workspace cloud"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Agen ini tidak mengizinkan Anda mengirim pesan ke subagennya."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agen ini sudah tidak ada di perangkat yang dipilih (agennya mungkin telah direset). Run akan gagal sampai Anda memilih yang baru."
 
@@ -21755,6 +21785,12 @@ msgstr "Perbarui nilai untuk <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Perbarui host ini untuk mengirim pesan ke subagen"
 
+msgid "Update this host to message subagents."
+msgstr "Perbarui host ini untuk mengirim pesan ke subagen."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Perbarui host ini untuk mengirim pesan ke subagen. Teks Anda kembali ke obrolan utama."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Perbarui host ini untuk memindahkan subagen ke latar belakang"
 
@@ -22163,6 +22199,9 @@ msgstr "Lihat penggunaan"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Dilihat"
+
+msgid "Viewing subagent {name}"
+msgstr "Melihat subagen {name}"
 
 msgid "Violence or harassment"
 msgstr "Kekerasan atau pelecehan"

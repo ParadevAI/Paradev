@@ -784,6 +784,9 @@ msgstr "{actor}がワークスペース {workspace} のリンクを解除しま�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "現時点で{actual} · 予測は約{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} では、サブエージェントにメッセージを送れません。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} のセッションは、そのワークスペースを開くと再開されます。"
 
@@ -1170,8 +1173,17 @@ msgstr "{name} が確認を求めています"
 msgid "{name} can't be messaged"
 msgstr "{name} にはメッセージを送れません"
 
+msgid "{name} can't take messages now."
+msgstr "{name} は現在メッセージを受け取れません。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} はメッセージを受け取れません。テキストはメインチャットに戻しました。"
+
 msgid "{name} failed"
 msgstr "{name} が失敗しました"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} は失敗したため、メッセージを受け取れません。"
 
 msgid "{name} finished"
 msgstr "{name} が完了しました"
@@ -1205,6 +1217,9 @@ msgstr "{name} が作業を開始しました"
 
 msgid "{name} stopped"
 msgstr "{name} が停止しました"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} は停止したため、メッセージを受け取れません。"
 
 msgid "{name} wants more access"
 msgstr "{name} がより多くのアクセスを求めています"
@@ -3503,6 +3518,9 @@ msgstr "戻る"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "戻る"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle} に戻る"
 
 msgid "Back to About"
 msgstr "会社概要に戻る"
@@ -9649,6 +9667,12 @@ msgstr "ホームに戻る"
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName} に戻って、もう一度サインインしてください。"
 
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle} に戻ってください。"
+
+msgid "Go back to message the main agent."
+msgstr "メインエージェントにメッセージを送るには戻ってください。"
+
 msgid "Go back to the previous page in history"
 msgstr "履歴の前のページに戻る"
 
@@ -12039,6 +12063,9 @@ msgstr "メッセージ"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "これらの語句を含むメッセージはメンションと同様に通知されます。カンマで区切って入力してください。"
+
+msgid "Messages you send go to {name}."
+msgstr "送信したメッセージは {name} に届きます。"
 
 msgid "Microphone"
 msgstr "マイク"
@@ -20516,6 +20543,9 @@ msgstr "このエージェントは会話を分岐できません"
 msgid "This agent can't run in a cloud workspace"
 msgstr "このエージェントはクラウドワークスペースで実行できません"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "このエージェントでは、サブエージェントにメッセージを送れません。"
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "選択したデバイスにこのエージェントは存在しません(エージェントがリセットされた可能性があります)。新しいエージェントを選ぶまで実行は失敗します。"
 
@@ -21755,6 +21785,12 @@ msgstr "<0>{key}</0> の値を更新"
 msgid "Update this host to message subagents"
 msgstr "サブエージェントにメッセージを送るには、このホストを更新してください"
 
+msgid "Update this host to message subagents."
+msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "サブエージェントにメッセージを送るには、このホストを更新してください。テキストはメインチャットに戻しました。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "サブエージェントをバックグラウンドに移動するには、このホストを更新してください"
 
@@ -22163,6 +22199,9 @@ msgstr "使用量を表示"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "表示中"
+
+msgid "Viewing subagent {name}"
+msgstr "サブエージェント {name} を表示中"
 
 msgid "Violence or harassment"
 msgstr "暴力または嫌がらせ"

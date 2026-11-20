@@ -784,6 +784,9 @@ msgstr "{actor} отвязал(а) рабочее пространство {work
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} на данный момент · прогноз ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} не позволяет отправлять сообщения своим субагентам."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеансы {agents} возобновятся, когда вы откроете их рабочее пространство."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} спрашивает"
 msgid "{name} can't be messaged"
 msgstr "{name} не может получать сообщения"
 
+msgid "{name} can't take messages now."
+msgstr "{name} сейчас не может получать сообщения."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} не может получать сообщения. Ваш текст снова в основном чате."
+
 msgid "{name} failed"
 msgstr "{name}: ошибка"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} завершился с ошибкой и не может получать сообщения."
 
 msgid "{name} finished"
 msgstr "{name} завершил работу"
@@ -1205,6 +1217,9 @@ msgstr "{name} начал работу"
 
 msgid "{name} stopped"
 msgstr "{name} остановлен"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} остановлен и не может получать сообщения."
 
 msgid "{name} wants more access"
 msgstr "{name} запрашивает больше доступа"
@@ -3503,6 +3518,9 @@ msgstr "Назад"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Назад"
+
+msgid "Back to {parentTitle}"
+msgstr "Вернуться к {parentTitle}"
 
 msgid "Back to About"
 msgstr "К разделу «О нас»"
@@ -9649,6 +9667,12 @@ msgstr "Вернуться на главную"
 msgid "Go back to {appName} and sign in again."
 msgstr "Вернитесь в {appName} и войдите снова."
 
+msgid "Go back to {parentTitle}."
+msgstr "Вернитесь к {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Вернитесь, чтобы написать основному агенту."
+
 msgid "Go back to the previous page in history"
 msgstr "Вернуться на предыдущую страницу в истории"
 
@@ -12039,6 +12063,9 @@ msgstr "Сообщения"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Сообщения с этими словами уведомляют вас как упоминание. Разделяйте их запятыми."
+
+msgid "Messages you send go to {name}."
+msgstr "Ваши сообщения получит {name}."
 
 msgid "Microphone"
 msgstr "Микрофон"
@@ -20516,6 +20543,9 @@ msgstr "Этот агент не может ответвить разговор"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Этот агент не позволяет отправлять сообщения своим субагентам."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
 
@@ -21755,6 +21785,12 @@ msgstr "Обновите значение <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
 
+msgid "Update this host to message subagents."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам. Ваш текст снова в основном чате."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Обновите этот хост, чтобы переводить субагентов в фон"
 
@@ -22163,6 +22199,9 @@ msgstr "Посмотреть использование"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Открыт"
+
+msgid "Viewing subagent {name}"
+msgstr "Просмотр субагента {name}"
 
 msgid "Violence or harassment"
 msgstr "Насилие или травля"

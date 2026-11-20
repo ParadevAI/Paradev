@@ -784,6 +784,9 @@ msgstr "{actor} {workspace} çalışma alanının bağlantısını kaldırdı"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "şu ana kadar {actual} · ~{projected} öngörülüyor"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel}, alt ajanlarına mesaj göndermenize izin vermiyor."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} oturumları, çalışma alanlarını açtığınızda devam eder."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} soruyor"
 msgid "{name} can't be messaged"
 msgstr "{name} mesaj alamıyor"
 
+msgid "{name} can't take messages now."
+msgstr "{name} şu anda mesaj alamıyor."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} mesaj alamıyor. Metniniz ana sohbete geri kondu."
+
 msgid "{name} failed"
 msgstr "{name} başarısız oldu"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} başarısız oldu ve mesaj alamıyor."
 
 msgid "{name} finished"
 msgstr "{name} bitti"
@@ -1205,6 +1217,9 @@ msgstr "{name} çalışmaya başladı"
 
 msgid "{name} stopped"
 msgstr "{name} durduruldu"
+
+msgid "{name} stopped and can't take messages."
+msgstr "{name} durdu ve mesaj alamıyor."
 
 msgid "{name} wants more access"
 msgstr "{name} daha fazla erişim istiyor"
@@ -3503,6 +3518,9 @@ msgstr "Geri"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Geri"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle} öğesine dön"
 
 msgid "Back to About"
 msgstr "Hakkımızda sayfasına dön"
@@ -9649,6 +9667,12 @@ msgstr "Ana sayfaya dön"
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName} uygulamasına dönüp tekrar giriş yapın."
 
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle} öğesine geri dön."
+
+msgid "Go back to message the main agent."
+msgstr "Ana ajana yazmak için geri dönün."
+
 msgid "Go back to the previous page in history"
 msgstr "Geçmişte önceki sayfaya dön"
 
@@ -12039,6 +12063,9 @@ msgstr "Mesajlar"
 
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Bu kelimeleri içeren mesajlar seni bir bahsetme gibi bilgilendirir. Kelimeleri virgülle ayır."
+
+msgid "Messages you send go to {name}."
+msgstr "Gönderdiğiniz mesajlar {name} alt ajanına gider."
 
 msgid "Microphone"
 msgstr "Mikrofon"
@@ -20516,6 +20543,9 @@ msgstr "Bu aracı bir konuşmayı çatallayamaz"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Bu ajan bir bulut çalışma alanında çalışamaz"
 
+msgid "This agent doesn't let you message its subagents."
+msgstr "Bu ajan, alt ajanlarına mesaj göndermenize izin vermiyor."
+
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir). Yeni bir tane seçene kadar çalıştırmalar başarısız olacak."
 
@@ -21755,6 +21785,12 @@ msgstr "<0>{key}</0> değerini güncelleyin"
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
 
+msgid "Update this host to message subagents."
+msgstr "Alt ajanlara mesaj göndermek için bu host'u güncelleyin."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Alt ajanlara mesaj göndermek için bu host'u güncelleyin. Metniniz ana sohbete geri kondu."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Alt ajanları arka plana taşımak için bu ana makineyi güncelleyin"
 
@@ -22163,6 +22199,9 @@ msgstr "Kullanımı görüntüle"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Görüntüleniyor"
+
+msgid "Viewing subagent {name}"
+msgstr "{name} alt ajanı görüntüleniyor"
 
 msgid "Violence or harassment"
 msgstr "Şiddet veya taciz"

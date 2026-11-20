@@ -28,6 +28,7 @@ import { MessageScroller } from "@superset/chat-ui/MessageScroller";
 import type { ComposerDraft } from "@superset/chat-ui/PromptInput";
 import { ChatHistorySidebarScroller } from "@superset/ui/chat-history-sidebar";
 import { toast } from "@superset/ui/sonner";
+import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -76,6 +77,7 @@ import {
 	type WorkDrawerHandle,
 } from "../WorkDrawer";
 import { ComposerChips } from "./components/ComposerChips";
+import { SubagentNotice } from "./components/SubagentNotice";
 import {
 	type SwitchAccount,
 	type SwitchableAgent,
@@ -512,18 +514,13 @@ export function SessionView({
 	});
 	const {
 		focusedId: focusedSubagentId,
+		parentTitle: subagentParentTitle,
 		openSubagent,
 		goBack,
 	} = useSubagentNavigation({
 		chatKey,
 		items: session.snapshot.items,
 	});
-	const shownSubagentId = useRef(focusedSubagentId);
-	useEffect(() => {
-		if (shownSubagentId.current === focusedSubagentId) return;
-		shownSubagentId.current = focusedSubagentId;
-		focusComposer();
-	}, [focusedSubagentId, focusComposer]);
 	const restoreUnsent = useCallback(
 		(content: UserContent[], originKey: string) =>
 			restoreDraft(
@@ -557,6 +554,39 @@ export function SessionView({
 		onUnsent: restoreUnsent,
 	});
 	openDraftKey.current = subagent.draftKey;
+	const subagentBackRef = useRef<HTMLButtonElement>(null);
+	const subagentBlocked = subagent.target?.blockedBy !== undefined;
+	const shownSubagent = useRef<{ id: string | null; blocked: boolean } | null>(
+		null,
+	);
+	useEffect(() => {
+		const shown = shownSubagent.current;
+		shownSubagent.current = { id: focusedSubagentId, blocked: subagentBlocked };
+		const active = document.activeElement;
+		const focusLost = active === document.body || !!active?.closest("[inert]");
+		if (shown?.id !== focusedSubagentId) {
+			if (!isActive && !focusLost && !paneRef.current?.contains(active)) return;
+			if (subagentBlocked) subagentBackRef.current?.focus();
+			else if (shown) focusComposer();
+			return;
+		}
+		if (subagentBlocked && !shown.blocked && focusLost)
+			subagentBackRef.current?.focus();
+	}, [focusedSubagentId, focusComposer, subagentBlocked, isActive]);
+
+	const subagentName = subagent.target?.name ?? "";
+	const onSubagentDraftBlocked = useCallback(
+		(draft: ComposerDraft) => {
+			const name = subagentName;
+			restoreDraft(draft, draftKey);
+			toast.info(
+				t({
+					message: `${name} can't take messages. Your text is back in the main chat.`,
+				}),
+			);
+		},
+		[restoreDraft, draftKey, subagentName, t],
+	);
 
 	const onBackgroundSubagent = useMoveToBackground(client);
 	const plugins = usePluginMentionOptions();
@@ -705,6 +735,27 @@ export function SessionView({
 	const composerQueue = held ? undefined : promptQueue;
 	const drawerQueue = subagent.target === undefined ? composerQueue : undefined;
 
+	const subagentNotice = subagent.target && (
+		<SubagentNotice
+			agentLabel={agentLabel}
+			backRef={subagentBackRef}
+			onBack={goBack}
+			parentTitle={subagentParentTitle}
+			target={subagent.target}
+		/>
+	);
+	const usageLimitNotice = usageLimit && !held && (
+		<UsageLimitNotice
+			agent={usageLimit.agent}
+			hostUrl={usageLimit.hostUrl}
+			limit={usageLimit.limit}
+			modelLabel={usageLimit.modelLabel}
+			onRespond={usageLimit.respond}
+			onSwitchAccount={usageLimit.onSwitchAccount}
+			sessionAccount={usageLimit.sessionAccount}
+		/>
+	);
+
 	// w-full because the pane lays its children out in a row: without it this
 	// sizes to its content and leaves the right of the pane empty.
 	return (
@@ -806,18 +857,20 @@ export function SessionView({
 				)}
 				<WorkDrawer
 					notice={
-						usageLimit &&
-						!held && (
-							<UsageLimitNotice
-								agent={usageLimit.agent}
-								hostUrl={usageLimit.hostUrl}
-								limit={usageLimit.limit}
-								modelLabel={usageLimit.modelLabel}
-								onRespond={usageLimit.respond}
-								onSwitchAccount={usageLimit.onSwitchAccount}
-								sessionAccount={usageLimit.sessionAccount}
-							/>
-						)
+						subagentNotice || usageLimitNotice ? (
+							<>
+								{subagentNotice}
+								{usageLimitNotice && (
+									<div
+										className={cn(
+											subagentNotice && "border-border/60 border-t",
+										)}
+									>
+										{usageLimitNotice}
+									</div>
+								)}
+							</>
+						) : undefined
 					}
 					onExit={returnToComposer}
 					paneRef={paneRef}
@@ -845,6 +898,7 @@ export function SessionView({
 					onEnterDrawer={enterDrawer}
 					onSend={subagent.onSend}
 					target={subagent.target}
+					onDraftBlocked={subagent.target ? onSubagentDraftBlocked : undefined}
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
