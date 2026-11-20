@@ -6902,6 +6902,9 @@ msgstr "Den v měsíci"
 msgid "Day One"
 msgstr "První den"
 
+msgid "Days are in Pacific time."
+msgstr "Dny jsou v tichomořském čase."
+
 msgid "days running three agents at once"
 msgstr "dní se třemi agenty najednou"
 

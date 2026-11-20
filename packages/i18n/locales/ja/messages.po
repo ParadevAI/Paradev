@@ -6902,6 +6902,9 @@ msgstr "日にち"
 msgid "Day One"
 msgstr "デイワン"
 
+msgid "Days are in Pacific time."
+msgstr "日付は太平洋時間です。"
+
 msgid "days running three agents at once"
 msgstr "エージェントを同時に3つ動かした日数"
 

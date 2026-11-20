@@ -6902,6 +6902,9 @@ msgstr "Ngày trong tháng"
 msgid "Day One"
 msgstr "Ngày đầu"
 
+msgid "Days are in Pacific time."
+msgstr "Ngày được tính theo giờ Thái Bình Dương."
+
 msgid "days running three agents at once"
 msgstr "số ngày chạy ba agent cùng lúc"
 

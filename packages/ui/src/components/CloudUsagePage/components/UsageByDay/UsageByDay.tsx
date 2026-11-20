@@ -1,6 +1,6 @@
 "use client";
 
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useFormat } from "@superset/i18n/react";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
@@ -13,9 +13,9 @@ import {
 } from "../../../ui/chart";
 import { CHART_BAR } from "../../constants";
 import { useUsageFormat } from "../../hooks/useUsageFormat";
+import { billingDays } from "../../utils/billingDay";
 import type { PricedUsage } from "../../utils/priced";
 import { Section } from "../Section";
-import { utcDays } from "./utils/utcDays";
 
 const TICK_STEP_DAYS = 5;
 /** No tick on the last bars, where its label would run past the chart's edge. */
@@ -24,7 +24,7 @@ const LAST_TICK_GAP_DAYS = 2;
 interface UsageByDayProps {
 	usage: PricedUsage;
 	title: ReactNode;
-	/** The UTC day the chart counts as today; days after it have no value. */
+	/** The billing day (Pacific) the chart counts as today; days after it have no value. */
 	today: string;
 }
 
@@ -33,7 +33,7 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 	const { formatCurrency, formatDate } = useFormat();
 	const { dollars } = useUsageFormat();
 	const byDay = new Map(usage.items.map((item) => [item.key, item]));
-	const data = utcDays(usage.range).map((day) => {
+	const data = billingDays(usage.range).map((day) => {
 		const item = byDay.get(day);
 		const value = item?.usageUsd ?? 0;
 		return { day, value: day > today ? null : value };
@@ -103,6 +103,9 @@ export function UsageByDay({ usage, title, today }: UsageByDayProps) {
 					<Bar dataKey="value" fill="var(--color-value)" radius={2} />
 				</BarChart>
 			</ChartContainer>
+			<p className="text-muted-foreground text-xs">
+				<Trans>Days are in Pacific time.</Trans>
+			</p>
 		</Section>
 	);
 }

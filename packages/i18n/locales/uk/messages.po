@@ -6896,6 +6896,9 @@ msgstr "День місяця"
 msgid "Day One"
 msgstr "Перший день"
 
+msgid "Days are in Pacific time."
+msgstr "Дні вказано за тихоокеанським часом."
+
 msgid "days running three agents at once"
 msgstr "днів із трьома агентами одночасно"
 

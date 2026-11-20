@@ -6902,6 +6902,9 @@ msgstr "每月的日期"
 msgid "Day One"
 msgstr "元老"
 
+msgid "Days are in Pacific time."
+msgstr "日期按太平洋时间计算。"
+
 msgid "days running three agents at once"
 msgstr "同时运行三个智能体的天数"
 

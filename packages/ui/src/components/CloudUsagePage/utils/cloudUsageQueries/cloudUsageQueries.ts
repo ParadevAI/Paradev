@@ -27,7 +27,7 @@ export function cloudUsageQueries({
 	const { user, size, status, q, sort, rows } = filters;
 	return {
 		byDay: {
-			input: { range, groupBy: "day", limit: CHART_LIMIT } as const,
+			input: { range, groupBy: "billingDay", limit: CHART_LIMIT } as const,
 			enabled: periodsLoaded,
 		},
 		byPerson: {

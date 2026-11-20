@@ -6902,6 +6902,9 @@ msgstr "날짜(일)"
 msgid "Day One"
 msgstr "데이 원"
 
+msgid "Days are in Pacific time."
+msgstr "날짜는 태평양 시간 기준입니다."
+
 msgid "days running three agents at once"
 msgstr "에이전트 세 개를 동시에 돌린 일수"
 
