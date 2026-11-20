@@ -9,7 +9,6 @@ import { Button } from "@superset/ui/button";
 import { toast } from "@superset/ui/sonner";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cloudTrpc } from "renderer/lib/cloud-trpc";
-import { CodeEditor } from "renderer/routes/_authenticated/components/CodeEditor";
 import { McpAllowlistField } from "./components/McpAllowlistField";
 import { PortsField } from "./components/PortsField";
 import { ScriptField } from "./components/ScriptField";
@@ -27,54 +26,40 @@ import {
 type Environment = RouterOutputs["environment"]["get"];
 
 interface EditorState {
-	mode: "form" | "toml";
+	/** False when this version can't read the saved config, so the form must not overwrite it. */
+	readable: boolean;
 	base: ProjectConfig;
 	form: ConfigForm;
-	text: string;
 	/** The saved config this state was read from. */
 	origin: string | null;
 	changedElsewhere: boolean;
 }
 
-function initialState(
-	saved: string | null,
-	mode: EditorState["mode"] = "form",
-): EditorState {
+function initialState(saved: string | null): EditorState {
 	const parsed = saved
 		? parseProjectConfig(saved)
 		: { ok: true as const, config: {} };
 	const base = parsed.ok ? parsed.config : {};
 	return {
-		mode: parsed.ok ? mode : "toml",
+		readable: parsed.ok,
 		base,
 		form: toConfigForm(base),
-		text: saved ?? "",
 		origin: saved,
 		changedElsewhere: false,
 	};
 }
 
-function serialize(base: ProjectConfig, form: ConfigForm): string | null {
-	return configText(fromConfigForm(base, form));
-}
-
 function draftOf(state: EditorState): string | null {
-	if (state.mode === "form") return serialize(state.base, state.form);
-	return state.text.trim() ? state.text : null;
+	return configText(fromConfigForm(state.base, state.form));
 }
 
-/** What the form writes for a saved config nobody edited; the saved text itself when the form can't read it. */
+/** What the form writes for a saved config nobody edited. */
 function normalized(saved: string | null): string | null {
-	const initial = initialState(saved);
-	return initial.mode === "form"
-		? serialize(initial.base, initial.form)
-		: saved;
+	return draftOf(initialState(saved));
 }
 
 function hasEdits(state: EditorState): boolean {
-	return state.mode === "toml"
-		? state.text !== (state.origin ?? "")
-		: draftOf(state) !== normalized(state.origin);
+	return draftOf(state) !== normalized(state.origin);
 }
 
 interface EnvironmentConfigProps {
@@ -94,7 +79,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 			setState((current) => {
 				if (current.origin === saved) return current;
 				if (!hasEdits(current) || draftOf(current) === saved) {
-					return initialState(saved, current.mode);
+					return initialState(saved);
 				}
 				return {
 					...current,
@@ -115,21 +100,12 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 		onError: (error) => toast.error(errorMessage(error)),
 	});
 
-	const { mode, form, text, changedElsewhere } = state;
+	const { readable, form, changedElsewhere } = state;
 	const terminals = terminalProblems(form.terminals);
 	const ports = portProblems(form.ports);
-	const tomlParse = useMemo(
-		() => (mode === "toml" && text.trim() ? parseProjectConfig(text) : null),
-		[mode, text],
-	);
-	const tomlErrors = tomlParse && !tomlParse.ok ? tomlParse.errors : [];
-	const hasProblems =
-		mode === "form"
-			? terminals.size > 0 || ports.size > 0
-			: tomlErrors.length > 0;
+	const hasProblems = terminals.size > 0 || ports.size > 0;
 	const draft = draftOf(state);
-	const changed =
-		mode === "form" ? draft !== savedNormalized : text !== (saved ?? "");
+	const changed = readable && draft !== savedNormalized;
 	const canSave = changed && !hasProblems && !update.isPending;
 
 	const save = () => {
@@ -148,48 +124,15 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 		}));
 	};
 
-	const switchMode = () => {
-		if (hasProblems) return;
-		if (mode === "form") {
-			setState((current) => ({
-				...current,
-				mode: "toml",
-				text: changed ? (draft ?? "") : (saved ?? ""),
-			}));
-			return;
-		}
-		const config = tomlParse?.ok ? tomlParse.config : {};
-		setState((current) => ({
-			...current,
-			mode: "form",
-			base: config,
-			form: toConfigForm(config),
-		}));
-	};
-
 	return (
 		<div>
 			<div className="mb-1 flex items-center justify-between gap-4">
 				<span className="text-xs font-medium">
 					<Trans>Config</Trans>
 				</span>
-				<div className="flex items-center gap-1.5">
-					<Button
-						disabled={hasProblems}
-						onClick={switchMode}
-						size="xs"
-						variant="ghost"
-					>
-						{mode === "form" ? (
-							<Trans>Edit as TOML</Trans>
-						) : (
-							<Trans>Edit as form</Trans>
-						)}
-					</Button>
-					<Button disabled={!canSave} onClick={save} size="xs">
-						{update.isPending ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
-					</Button>
-				</div>
+				<Button disabled={!canSave} onClick={save} size="xs">
+					{update.isPending ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
+				</Button>
 			</div>
 			<p className="mb-2 text-xs text-muted-foreground">
 				<Trans>
@@ -208,7 +151,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 					<Button
 						onClick={() => {
 							setJustSaved(false);
-							setState(initialState(saved, mode));
+							setState(initialState(saved));
 						}}
 						size="xs"
 						variant="outline"
@@ -217,7 +160,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 					</Button>
 				</div>
 			)}
-			{mode === "form" ? (
+			{readable ? (
 				<div className="divide-y divide-border/70 overflow-hidden rounded-lg border border-border/70">
 					<ScriptField
 						ariaLabel={t({ message: "Install script" })}
@@ -274,35 +217,13 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 					/>
 				</div>
 			) : (
-				<div className="flex flex-col gap-1.5">
-					<div className="h-96 overflow-hidden rounded-lg border border-border/70">
-						<CodeEditor
-							ariaLabel={t({ message: "Config" })}
-							filePath="config.toml"
-							language="toml"
-							onChange={(next) => {
-								setJustSaved(false);
-								setState((current) => ({ ...current, text: next }));
-							}}
-							onSave={save}
-							value={text}
-						/>
-					</div>
-					{tomlErrors.map((error) => (
-						<p
-							className="text-xs text-destructive"
-							key={`${error.line ?? 0}:${error.message}`}
-						>
-							{error.line ? (
-								<Trans>
-									Line {error.line}: {error.message}
-								</Trans>
-							) : (
-								error.message
-							)}
-						</p>
-					))}
-				</div>
+				<p className="rounded-md border border-border/70 px-3 py-2 text-xs text-muted-foreground">
+					<Trans>
+						This config has settings this version of Paradev can't show, so it
+						can't be edited here. Update Paradev, or change it with superset
+						environments update.
+					</Trans>
+				</p>
 			)}
 			{justSaved && !changed && (
 				<p className="mt-1.5 text-xs text-muted-foreground">

@@ -7895,12 +7895,6 @@ msgstr "Edit"
 msgid "Edit {selectedName}"
 msgstr "Edit {selectedName}"
 
-msgid "Edit as form"
-msgstr "Edit sebagai formulir"
-
-msgid "Edit as TOML"
-msgstr "Edit sebagai TOML"
-
 msgid "Edit Channel Name"
 msgstr "Edit Nama Saluran"
 
@@ -11342,9 +11336,7 @@ msgstr "Batasi ke orang yang diundang?"
 msgid "Line {0}"
 msgstr "Baris {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Baris {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Workspace cloud ini tidak dapat dimulai"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Workspace cloud ini sedang dibangunkan, yang bisa memakan waktu hingga 30 detik setelah tidak aktif."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Konfigurasi ini berisi pengaturan yang tidak bisa ditampilkan versi Paradev ini, jadi tidak bisa diedit di sini. Perbarui Paradev, atau ubah dengan superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

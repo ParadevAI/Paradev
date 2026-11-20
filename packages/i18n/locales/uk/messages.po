@@ -7889,12 +7889,6 @@ msgstr "Редагувати"
 msgid "Edit {selectedName}"
 msgstr "Редагувати {selectedName}"
 
-msgid "Edit as form"
-msgstr "Редагувати як форму"
-
-msgid "Edit as TOML"
-msgstr "Редагувати як TOML"
-
 msgid "Edit Channel Name"
 msgstr "Змінити назву каналу"
 
@@ -11336,9 +11330,7 @@ msgstr "Лише для запрошених?"
 msgid "Line {0}"
 msgstr "Рядок {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Рядок {0}: {1}"
@@ -20694,6 +20686,9 @@ msgstr "Цей хмарний робочий простір не може зап
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Цей хмарний робочий простір прокидається; після простою це може тривати до 30 секунд."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "У цій конфігурації є налаштування, які ця версія Paradev не може показати, тому її не можна змінити тут. Оновіть Paradev або змініть її командою superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

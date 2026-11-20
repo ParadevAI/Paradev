@@ -7895,12 +7895,6 @@ msgstr "Изменить"
 msgid "Edit {selectedName}"
 msgstr "Изменить {selectedName}"
 
-msgid "Edit as form"
-msgstr "Изменить в форме"
-
-msgid "Edit as TOML"
-msgstr "Изменить как TOML"
-
 msgid "Edit Channel Name"
 msgstr "Изменить название канала"
 
@@ -11342,9 +11336,7 @@ msgstr "Оставить доступ только приглашённым?"
 msgid "Line {0}"
 msgstr "Строка {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Строка {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Не удаётся запустить эту облачную рабо�
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Облачное рабочее пространство запускается. После простоя это может занять до 30 секунд."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "В этой конфигурации есть настройки, которые эта версия Paradev не может показать, поэтому её нельзя изменить здесь. Обновите Paradev или измените её командой superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

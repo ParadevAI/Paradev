@@ -7895,12 +7895,6 @@ msgstr "Editar"
 msgid "Edit {selectedName}"
 msgstr "Editar {selectedName}"
 
-msgid "Edit as form"
-msgstr "Editar como formulário"
-
-msgid "Edit as TOML"
-msgstr "Editar como TOML"
-
 msgid "Edit Channel Name"
 msgstr "Editar nome do canal"
 
@@ -11342,9 +11336,7 @@ msgstr "Limitar às pessoas convidadas?"
 msgid "Line {0}"
 msgstr "Linha {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Linha {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Não é possível iniciar esta área de trabalho na nuvem"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Este workspace na nuvem está sendo ativado, o que pode levar até 30 segundos depois de um período inativo."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Esta configuração tem ajustes que esta versão do Paradev não consegue mostrar, então não pode ser editada aqui. Atualize o Paradev ou altere-a com superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

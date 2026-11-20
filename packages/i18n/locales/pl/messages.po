@@ -7895,12 +7895,6 @@ msgstr "Edytuj"
 msgid "Edit {selectedName}"
 msgstr "Edytuj {selectedName}"
 
-msgid "Edit as form"
-msgstr "Edytuj jako formularz"
-
-msgid "Edit as TOML"
-msgstr "Edytuj jako TOML"
-
 msgid "Edit Channel Name"
 msgstr "Edytuj nazwę kanału"
 
@@ -11342,9 +11336,7 @@ msgstr "Ograniczyć do zaproszonych osób?"
 msgid "Line {0}"
 msgstr "Wiersz {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Wiersz {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Nie można uruchomić tego obszaru roboczego w chmurze"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Ten obszar roboczy w chmurze jest wybudzany. Po okresie bezczynności może to potrwać do 30 sekund."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Ta konfiguracja zawiera ustawienia, których ta wersja Paradev nie potrafi wyświetlić, więc nie można jej tu edytować. Zaktualizuj Paradev lub zmień ją poleceniem superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

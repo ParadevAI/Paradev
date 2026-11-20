@@ -7895,12 +7895,6 @@ msgstr "Sửa"
 msgid "Edit {selectedName}"
 msgstr "Chỉnh sửa {selectedName}"
 
-msgid "Edit as form"
-msgstr "Sửa dạng biểu mẫu"
-
-msgid "Edit as TOML"
-msgstr "Sửa dạng TOML"
-
 msgid "Edit Channel Name"
 msgstr "Sửa tên kênh"
 
@@ -11342,9 +11336,7 @@ msgstr "Chỉ cho những người được mời?"
 msgid "Line {0}"
 msgstr "Dòng {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Dòng {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Không thể khởi động workspace cloud này"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Không gian làm việc đám mây này đang được đánh thức, có thể mất tới 30 giây sau một thời gian không hoạt động."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Cấu hình này có các thiết lập mà phiên bản Paradev này không hiển thị được, nên không thể sửa ở đây. Hãy cập nhật Paradev, hoặc thay đổi bằng superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

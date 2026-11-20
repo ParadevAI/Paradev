@@ -7895,12 +7895,6 @@ msgstr "Düzenle"
 msgid "Edit {selectedName}"
 msgstr "{selectedName} ortamını düzenle"
 
-msgid "Edit as form"
-msgstr "Form olarak düzenle"
-
-msgid "Edit as TOML"
-msgstr "TOML olarak düzenle"
-
 msgid "Edit Channel Name"
 msgstr "Kanal Adını Düzenle"
 
@@ -11342,9 +11336,7 @@ msgstr "Davet edilen kişilerle sınırlansın mı?"
 msgid "Line {0}"
 msgstr "{0}. satır"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Satır {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Bu bulut çalışma alanı başlatılamıyor"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Bu bulut çalışma alanı uyandırılıyor; bir süre kullanılmadıysa bu işlem 30 saniyeye kadar sürebilir."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Bu yapılandırma, Paradev'in bu sürümünün gösteremediği ayarlar içerdiğinden burada düzenlenemez. Paradev'i güncelleyin veya superset environments update ile değiştirin."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

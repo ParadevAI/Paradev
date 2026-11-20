@@ -7895,12 +7895,6 @@ msgstr "編集"
 msgid "Edit {selectedName}"
 msgstr "{selectedName} を編集"
 
-msgid "Edit as form"
-msgstr "フォームで編集"
-
-msgid "Edit as TOML"
-msgstr "TOML で編集"
-
 msgid "Edit Channel Name"
 msgstr "チャンネル名を編集"
 
@@ -11342,9 +11336,7 @@ msgstr "招待したユーザーのみに制限しますか？"
 msgid "Line {0}"
 msgstr "{0}行目"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "{0} 行目: {1}"
@@ -20700,6 +20692,9 @@ msgstr "このクラウドワークスペースを起動できません"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "このクラウドワークスペースを起動しています。しばらく使われていなかった場合は、最大30秒かかることがあります。"
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "この設定には、このバージョンの Paradev では表示できない項目が含まれているため、ここでは編集できません。Paradev を更新するか、superset environments update で変更してください。"
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

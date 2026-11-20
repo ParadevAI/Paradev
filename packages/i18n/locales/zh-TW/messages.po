@@ -7895,12 +7895,6 @@ msgstr "編輯"
 msgid "Edit {selectedName}"
 msgstr "編輯 {selectedName}"
 
-msgid "Edit as form"
-msgstr "以表單編輯"
-
-msgid "Edit as TOML"
-msgstr "以 TOML 編輯"
-
 msgid "Edit Channel Name"
 msgstr "編輯頻道名稱"
 
@@ -11342,9 +11336,7 @@ msgstr "限制為僅受邀者？"
 msgid "Line {0}"
 msgstr "第{0}行"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "第 {0} 行：{1}"
@@ -20700,6 +20692,9 @@ msgstr "無法啟動此雲端工作區"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "正在喚醒此雲端工作區。如果它已閒置一段時間，可能需要最多 30 秒。"
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "此設定包含此版本的 Paradev 無法顯示的設定，因此無法在這裡編輯。請更新 Paradev，或使用 superset environments update 修改。"
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

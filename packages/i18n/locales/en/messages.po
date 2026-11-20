@@ -7895,12 +7895,6 @@ msgstr "Edit"
 msgid "Edit {selectedName}"
 msgstr "Edit {selectedName}"
 
-msgid "Edit as form"
-msgstr "Edit as form"
-
-msgid "Edit as TOML"
-msgstr "Edit as TOML"
-
 msgid "Edit Channel Name"
 msgstr "Edit Channel Name"
 
@@ -11342,9 +11336,7 @@ msgstr "Limit to people invited?"
 msgid "Line {0}"
 msgstr "Line {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Line {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "This cloud workspace can't start"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"

@@ -7895,12 +7895,6 @@ msgstr "Upravit"
 msgid "Edit {selectedName}"
 msgstr "Upravit {selectedName}"
 
-msgid "Edit as form"
-msgstr "Upravit ve formuláři"
-
-msgid "Edit as TOML"
-msgstr "Upravit jako TOML"
-
 msgid "Edit Channel Name"
 msgstr "Upravit název kanálu"
 
@@ -11342,9 +11336,7 @@ msgstr "Omezit na pozvané lidi?"
 msgid "Line {0}"
 msgstr "Řádek {0}"
 
-#. placeholder {0}: error.line
 #. placeholder {0}: problem.line
-#. placeholder {1}: error.message
 #. placeholder {1}: problem.message
 msgid "Line {0}: {1}"
 msgstr "Řádek {0}: {1}"
@@ -20700,6 +20692,9 @@ msgstr "Tento cloudový pracovní prostor nelze spustit"
 
 msgid "This cloud workspace is waking up, which can take up to 30 seconds after it has been idle."
 msgstr "Tento cloudový workspace se probouzí, což může po nečinnosti trvat až 30 sekund."
+
+msgid "This config has settings this version of Paradev can't show, so it can't be edited here. Update Paradev, or change it with superset environments update."
+msgstr "Tato konfigurace obsahuje nastavení, která tato verze Paradev nedokáže zobrazit, takže ji zde nelze upravit. Aktualizujte Paradev, nebo ji změňte příkazem superset environments update."
 
 #. placeholder {0}: params?.details
 msgid "This config is invalid: {0}"
