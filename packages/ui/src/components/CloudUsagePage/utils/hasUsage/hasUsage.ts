@@ -2,7 +2,7 @@
 export function hasUsage(total: {
 	gbHours: number;
 	boots: number;
-	workspaces: number;
+	workspaces: number | null;
 }): boolean {
-	return total.gbHours > 0 || total.boots > 0 || total.workspaces > 0;
+	return total.gbHours > 0 || total.boots > 0 || (total.workspaces ?? 0) > 0;
 }

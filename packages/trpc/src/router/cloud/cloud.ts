@@ -219,7 +219,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort =
-						input.sort ?? (input.groupBy === "day" ? null : "gbHours");
+						input.sort ??
+						(input.groupBy === "day" || input.groupBy === "billingDay"
+							? null
+							: "gbHours");
 					const keysetSort =
 						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(

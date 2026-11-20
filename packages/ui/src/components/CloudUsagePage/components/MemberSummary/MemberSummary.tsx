@@ -15,7 +15,7 @@ export function MemberSummary({
 }) {
 	const { dollars } = useUsageFormat();
 	const used = dollars(total.usageUsd);
-	const count = total.workspaces;
+	const count = total.workspaces ?? 0;
 
 	return (
 		<Card className={BOX}>
