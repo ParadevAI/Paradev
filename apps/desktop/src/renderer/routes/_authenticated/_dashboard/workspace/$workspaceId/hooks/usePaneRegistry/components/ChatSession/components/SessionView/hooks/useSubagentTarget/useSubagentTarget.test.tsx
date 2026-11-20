@@ -198,6 +198,44 @@ test("a refused steer gives the text back where it can still be sent", async () 
 	expect(ended.onUnsent).toHaveBeenCalledWith(typed, "chat-v3-draft:t1");
 });
 
+test("a steer that fails after the host refused steering goes back to the main chat", async () => {
+	const replies: Array<(result: SteerSubagentResult) => void> = [];
+	const steerSubagent = mock(
+		(_taskId: string, _content: UserContent[]) =>
+			new Promise<SteerSubagentResult>((resolve) => replies.push(resolve)),
+	);
+	const onUnsent = mock((_content: UserContent[], _draftKey: string) => {});
+	const hook = renderHook(() =>
+		useSubagentTarget({
+			client: { steerSubagent },
+			draftKey: "chat-v3-draft:t1",
+			focusedId: explore.id,
+			items: itemsOf(explore),
+			onSend: () => {},
+			onStop: () => {},
+			onUnsent,
+		}),
+	);
+	const send = hook.result.current.onSend;
+	const options = { steer: false, draft: textDraft("") };
+	let first: unknown;
+	let second: unknown;
+	act(() => {
+		first = send(typed, options);
+		second = send(typed, options);
+	});
+	await act(async () => {
+		replies[0]?.("unsupported");
+		await first;
+		replies[1]?.("finished");
+		await second;
+	});
+	expect(onUnsent.mock.calls.map(([, key]) => key)).toEqual([
+		"chat-v3-draft:t1",
+		"chat-v3-draft:t1",
+	]);
+});
+
 test("drafts are kept per target", () => {
 	const hook = renderHook(
 		({ focusedId }: { focusedId: string | null }) => {

@@ -63,6 +63,7 @@ export function useSubagentTarget({
 } {
 	const { t } = useLingui();
 	const [hostCannotSteer, setHostCannotSteer] = useState(false);
+	const hostCannotSteerRef = useRef(false);
 	const [steers, setSteers] = useState<QueuedSteer[]>([]);
 	const steerCount = useRef(0);
 	const itemsRef = useRef(items);
@@ -140,7 +141,9 @@ export function useSubagentTarget({
 			const stillSteerable = () => {
 				const current = subagentItem(itemsRef.current, itemId);
 				return (
-					current?.canSteer === true && subagentOutcome(current) !== "stopped"
+					!hostCannotSteerRef.current &&
+					current?.canSteer === true &&
+					subagentOutcome(current) !== "stopped"
 				);
 			};
 			const giveBack = (toMainChat: boolean, message: string) => {
@@ -165,6 +168,7 @@ export function useSubagentTarget({
 					return;
 				}
 				if (result === "unsupported") {
+					hostCannotSteerRef.current = true;
 					setHostCannotSteer(true);
 					giveBack(
 						true,

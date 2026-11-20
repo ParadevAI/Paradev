@@ -783,8 +783,8 @@ msgstr "{actor} 取消關聯工作區 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 預計約{projected}"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "{agentLabel} 不允許你傳送訊息給其子代理程式。返回以傳送訊息給主代理程式。"
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} 不允許你傳送訊息給其子代理程式。"
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "開啟對應工作區時，{agents} 工作階段會恢復。"
@@ -1163,8 +1163,8 @@ msgstr "{name} 請求確認"
 msgid "{name} can't be messaged"
 msgstr "無法傳送訊息給 {name}"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} 目前無法接收訊息。返回以傳送訊息給主代理程式。"
+msgid "{name} can't take messages now."
+msgstr "{name} 目前無法接收訊息。"
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} 無法接收訊息。你的文字已放回主聊天。"
@@ -1172,8 +1172,8 @@ msgstr "{name} 無法接收訊息。你的文字已放回主聊天。"
 msgid "{name} failed"
 msgstr "{name} 失敗"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} 已失敗，無法接收訊息。返回以傳送訊息給主代理程式。"
+msgid "{name} failed and can't take messages."
+msgstr "{name} 已失敗，無法接收訊息。"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
@@ -1208,8 +1208,8 @@ msgstr "{name} 開始工作"
 msgid "{name} stopped"
 msgstr "{name} 已停止"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} 已停止，無法接收訊息。返回以傳送訊息給主代理程式。"
+msgid "{name} stopped and can't take messages."
+msgstr "{name} 已停止，無法接收訊息。"
 
 msgid "{name} wants more access"
 msgstr "{name} 要求更多存取權限"
@@ -9616,6 +9616,12 @@ msgstr "返回首頁"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "請返回 {appName} 並重新登入。"
+
+msgid "Go back to {parentTitle}."
+msgstr "返回 {parentTitle}。"
+
+msgid "Go back to message the main agent."
+msgstr "返回以傳送訊息給主代理程式。"
 
 msgid "Go back to the previous page in history"
 msgstr "返回歷史記錄中的上一頁"
@@ -20475,8 +20481,8 @@ msgstr "此代理無法分叉對話"
 msgid "This agent can't run in a cloud workspace"
 msgstr "此代理程式無法在雲端工作區中執行"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "此代理程式不允許你傳送訊息給其子代理程式。返回以傳送訊息給主代理程式。"
+msgid "This agent doesn't let you message its subagents."
+msgstr "此代理程式不允許你傳送訊息給其子代理程式。"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"
@@ -21707,8 +21713,8 @@ msgstr "更新 <0>{key}</0> 的值"
 msgid "Update this host to message subagents"
 msgstr "請更新此主機以傳送訊息給子代理程式"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "更新此主機以傳送訊息給子代理程式。返回以傳送訊息給主代理程式。"
+msgid "Update this host to message subagents."
+msgstr "更新此主機以傳送訊息給子代理程式。"
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "更新此主機以傳送訊息給子代理程式。你的文字已放回主聊天。"

@@ -16,6 +16,7 @@ test("a subagent that takes messages says where they go and offers the way back"
 	const text = view.container.textContent ?? "";
 	expect(text).toContain("Viewing subagent Explore");
 	expect(text).toContain("Messages you send go to Explore.");
+	expect(text).not.toContain("Go back");
 	expect(view.queryByText("Stop")).toBeNull();
 	fireEvent.click(view.getByText("Back to main chat"));
 	expect(onBack).toHaveBeenCalledTimes(1);
@@ -37,7 +38,7 @@ test("an agent that can't steer its subagents explains why and still offers Stop
 		/>,
 	);
 	expect(view.container.textContent).toContain(
-		"Claude doesn't let you message its subagents.",
+		"Claude doesn't let you message its subagents. Go back to Plan the work.",
 	);
 	expect(view.getByText("Back to Plan the work")).toBeTruthy();
 	fireEvent.click(view.getByText("Stop"));

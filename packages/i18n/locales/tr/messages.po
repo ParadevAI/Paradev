@@ -783,8 +783,8 @@ msgstr "{actor} {workspace} çalışma alanının bağlantısını kaldırdı"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "şu ana kadar {actual} · ~{projected} öngörülüyor"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "{agentLabel}, alt ajanlarına mesaj göndermenize izin vermiyor. Ana ajana yazmak için geri dönün."
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel}, alt ajanlarına mesaj göndermenize izin vermiyor."
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} oturumları, çalışma alanlarını açtığınızda devam eder."
@@ -1163,8 +1163,8 @@ msgstr "{name} soruyor"
 msgid "{name} can't be messaged"
 msgstr "{name} mesaj alamıyor"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} şu anda mesaj alamıyor. Ana ajana yazmak için geri dönün."
+msgid "{name} can't take messages now."
+msgstr "{name} şu anda mesaj alamıyor."
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} mesaj alamıyor. Metniniz ana sohbete geri kondu."
@@ -1172,8 +1172,8 @@ msgstr "{name} mesaj alamıyor. Metniniz ana sohbete geri kondu."
 msgid "{name} failed"
 msgstr "{name} başarısız oldu"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} başarısız oldu ve mesaj alamıyor. Ana ajana yazmak için geri dönün."
+msgid "{name} failed and can't take messages."
+msgstr "{name} başarısız oldu ve mesaj alamıyor."
 
 msgid "{name} finished"
 msgstr "{name} bitti"
@@ -1208,8 +1208,8 @@ msgstr "{name} çalışmaya başladı"
 msgid "{name} stopped"
 msgstr "{name} durduruldu"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} durdu ve mesaj alamıyor. Ana ajana yazmak için geri dönün."
+msgid "{name} stopped and can't take messages."
+msgstr "{name} durdu ve mesaj alamıyor."
 
 msgid "{name} wants more access"
 msgstr "{name} daha fazla erişim istiyor"
@@ -9616,6 +9616,12 @@ msgstr "Ana sayfaya dön"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName} uygulamasına dönüp tekrar giriş yapın."
+
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle} öğesine geri dön."
+
+msgid "Go back to message the main agent."
+msgstr "Ana ajana yazmak için geri dönün."
 
 msgid "Go back to the previous page in history"
 msgstr "Geçmişte önceki sayfaya dön"
@@ -20475,8 +20481,8 @@ msgstr "Bu aracı bir konuşmayı çatallayamaz"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Bu ajan bir bulut çalışma alanında çalışamaz"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Bu ajan, alt ajanlarına mesaj göndermenize izin vermiyor. Ana ajana yazmak için geri dönün."
+msgid "This agent doesn't let you message its subagents."
+msgstr "Bu ajan, alt ajanlarına mesaj göndermenize izin vermiyor."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Bu ajan seçili cihazda artık yok (ajanları sıfırlanmış olabilir). Yeni bir tane seçene kadar çalıştırmalar başarısız olacak."
@@ -21707,8 +21713,8 @@ msgstr "<0>{key}</0> değerini güncelleyin"
 msgid "Update this host to message subagents"
 msgstr "Alt ajanlara mesaj göndermek için bu ana makineyi güncelleyin"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "Alt ajanlara mesaj göndermek için bu host'u güncelleyin. Ana ajana yazmak için geri dönün."
+msgid "Update this host to message subagents."
+msgstr "Alt ajanlara mesaj göndermek için bu host'u güncelleyin."
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "Alt ajanlara mesaj göndermek için bu host'u güncelleyin. Metniniz ana sohbete geri kondu."

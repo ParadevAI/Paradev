@@ -783,8 +783,8 @@ msgstr "{actor} zrušil(a) propojení pracovního prostoru {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "zatím {actual} · odhad ~{projected}"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "{agentLabel} vám nedovolí posílat zprávy svým subagentům. Vraťte se a napište hlavnímu agentovi."
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} vám nedovolí posílat zprávy svým subagentům."
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Relace {agents} se obnoví, když otevřete jejich pracovní prostor."
@@ -1163,8 +1163,8 @@ msgstr "{name} se ptá"
 msgid "{name} can't be messaged"
 msgstr "{name} nemůže přijímat zprávy"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} teď nemůže přijímat zprávy. Vraťte se a napište hlavnímu agentovi."
+msgid "{name} can't take messages now."
+msgstr "{name} teď nemůže přijímat zprávy."
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} nemůže přijímat zprávy. Váš text je zpět v hlavním chatu."
@@ -1172,8 +1172,8 @@ msgstr "{name} nemůže přijímat zprávy. Váš text je zpět v hlavním chatu
 msgid "{name} failed"
 msgstr "{name} selhal"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} selhal a nemůže přijímat zprávy. Vraťte se a napište hlavnímu agentovi."
+msgid "{name} failed and can't take messages."
+msgstr "{name} selhal a nemůže přijímat zprávy."
 
 msgid "{name} finished"
 msgstr "{name} skončil"
@@ -1208,8 +1208,8 @@ msgstr "{name} začal pracovat"
 msgid "{name} stopped"
 msgstr "{name} byl zastaven"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} se zastavil a nemůže přijímat zprávy. Vraťte se a napište hlavnímu agentovi."
+msgid "{name} stopped and can't take messages."
+msgstr "{name} se zastavil a nemůže přijímat zprávy."
 
 msgid "{name} wants more access"
 msgstr "{name} chce rozšířený přístup"
@@ -9616,6 +9616,12 @@ msgstr "Zpět na úvod"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Vraťte se do {appName} a přihlaste se znovu."
+
+msgid "Go back to {parentTitle}."
+msgstr "Vraťte se na {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Vraťte se a napište hlavnímu agentovi."
 
 msgid "Go back to the previous page in history"
 msgstr "Přejít zpět na předchozí stránku v historii"
@@ -20475,8 +20481,8 @@ msgstr "Tento agent neumí rozvětvit konverzaci"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Tento agent nemůže běžet v cloudovém pracovním prostoru"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Tento agent vám nedovolí posílat zprávy svým subagentům. Vraťte se a napište hlavnímu agentovi."
+msgid "This agent doesn't let you message its subagents."
+msgstr "Tento agent vám nedovolí posílat zprávy svým subagentům."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Tento agent už na vybraném zařízení neexistuje (jeho agenti mohli být resetováni). Běhy budou selhávat, dokud nevyberete jiného."
@@ -21707,8 +21713,8 @@ msgstr "Aktualizujte hodnotu <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Aktualizujte tohoto hostitele, abyste mohli psát subagentům"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům. Vraťte se a napište hlavnímu agentovi."
+msgid "Update this host to message subagents."
+msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům."
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "Aktualizujte tohoto hostitele, abyste mohli posílat zprávy subagentům. Váš text je zpět v hlavním chatu."

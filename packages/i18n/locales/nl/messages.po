@@ -783,8 +783,8 @@ msgstr "{actor} heeft de koppeling met workspace {workspace} verwijderd"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} tot nu toe · ~{projected} verwacht"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Met {agentLabel} kun je geen berichten naar subagents sturen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "Met {agentLabel} kun je geen berichten naar subagents sturen."
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-sessies worden hervat wanneer je hun workspace opent."
@@ -1163,8 +1163,8 @@ msgstr "{name} vraagt"
 msgid "{name} can't be messaged"
 msgstr "{name} kan geen berichten ontvangen"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} kan nu geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "{name} can't take messages now."
+msgstr "{name} kan nu geen berichten ontvangen."
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} kan geen berichten ontvangen. Je tekst staat weer in de hoofdchat."
@@ -1172,8 +1172,8 @@ msgstr "{name} kan geen berichten ontvangen. Je tekst staat weer in de hoofdchat
 msgid "{name} failed"
 msgstr "{name} is mislukt"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} is mislukt en kan geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "{name} failed and can't take messages."
+msgstr "{name} is mislukt en kan geen berichten ontvangen."
 
 msgid "{name} finished"
 msgstr "{name} is klaar"
@@ -1208,8 +1208,8 @@ msgstr "{name} is begonnen"
 msgid "{name} stopped"
 msgstr "{name} is gestopt"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} is gestopt en kan geen berichten ontvangen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "{name} stopped and can't take messages."
+msgstr "{name} is gestopt en kan geen berichten ontvangen."
 
 msgid "{name} wants more access"
 msgstr "{name} wil meer toegang"
@@ -9616,6 +9616,12 @@ msgstr "Terug naar home"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Ga terug naar {appName} en log opnieuw in."
+
+msgid "Go back to {parentTitle}."
+msgstr "Ga terug naar {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Ga terug om de hoofdagent een bericht te sturen."
 
 msgid "Go back to the previous page in history"
 msgstr "Terug naar de vorige pagina in de geschiedenis"
@@ -20475,8 +20481,8 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Met deze agent kun je geen berichten naar subagents sturen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "This agent doesn't let you message its subagents."
+msgstr "Met deze agent kun je geen berichten naar subagents sturen."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
@@ -21707,8 +21713,8 @@ msgstr "Werk de waarde van <0>{key}</0> bij"
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "Werk deze host bij om subagents berichten te sturen. Ga terug om de hoofdagent een bericht te sturen."
+msgid "Update this host to message subagents."
+msgstr "Werk deze host bij om subagents berichten te sturen."
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "Werk deze host bij om subagents berichten te sturen. Je tekst staat weer in de hoofdchat."

@@ -526,23 +526,23 @@ export function SessionView({
 	openDraftKey.current = subagent.draftKey;
 	const subagentBackRef = useRef<HTMLButtonElement>(null);
 	const subagentBlocked = subagent.target?.blockedBy !== undefined;
-	const shownSubagent = useRef({
-		id: focusedSubagentId,
-		blocked: subagentBlocked,
-	});
+	const shownSubagent = useRef<{ id: string | null; blocked: boolean } | null>(
+		null,
+	);
 	useEffect(() => {
 		const shown = shownSubagent.current;
 		shownSubagent.current = { id: focusedSubagentId, blocked: subagentBlocked };
-		if (shown.id !== focusedSubagentId) {
+		const active = document.activeElement;
+		const focusLost = active === document.body || !!active?.closest("[inert]");
+		if (shown?.id !== focusedSubagentId) {
+			if (!isActive && !focusLost && !paneRef.current?.contains(active)) return;
 			if (subagentBlocked) subagentBackRef.current?.focus();
-			else focusComposer();
+			else if (shown) focusComposer();
 			return;
 		}
-		if (!subagentBlocked || shown.blocked) return;
-		const active = document.activeElement;
-		if (active === document.body || active?.closest("[inert]"))
+		if (subagentBlocked && !shown.blocked && focusLost)
 			subagentBackRef.current?.focus();
-	}, [focusedSubagentId, focusComposer, subagentBlocked]);
+	}, [focusedSubagentId, focusComposer, subagentBlocked, isActive]);
 
 	const subagentName = subagent.target?.name ?? "";
 	const onSubagentDraftBlocked = useCallback(

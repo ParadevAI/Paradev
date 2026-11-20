@@ -783,8 +783,8 @@ msgstr "{actor} ha scollegato il workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} finora · ~{projected} previste"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "{agentLabel} non ti permette di inviare messaggi ai suoi sottoagenti. Torna indietro per scrivere all'agente principale."
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} non ti permette di inviare messaggi ai suoi sottoagenti."
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Le sessioni di {agents} riprendono quando apri il loro workspace."
@@ -1163,8 +1163,8 @@ msgstr "{name} chiede"
 msgid "{name} can't be messaged"
 msgstr "Impossibile inviare messaggi a {name}"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} non può ricevere messaggi ora. Torna indietro per scrivere all'agente principale."
+msgid "{name} can't take messages now."
+msgstr "{name} non può ricevere messaggi ora."
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} non può ricevere messaggi. Il tuo testo è di nuovo nella chat principale."
@@ -1172,8 +1172,8 @@ msgstr "{name} non può ricevere messaggi. Il tuo testo è di nuovo nella chat p
 msgid "{name} failed"
 msgstr "{name} non è riuscito"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} non è riuscito e non può ricevere messaggi. Torna indietro per scrivere all'agente principale."
+msgid "{name} failed and can't take messages."
+msgstr "{name} non è riuscito e non può ricevere messaggi."
 
 msgid "{name} finished"
 msgstr "{name} ha finito"
@@ -1208,8 +1208,8 @@ msgstr "{name} ha iniziato a lavorare"
 msgid "{name} stopped"
 msgstr "{name} è stato interrotto"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} si è fermato e non può ricevere messaggi. Torna indietro per scrivere all'agente principale."
+msgid "{name} stopped and can't take messages."
+msgstr "{name} si è fermato e non può ricevere messaggi."
 
 msgid "{name} wants more access"
 msgstr "{name} chiede più accesso"
@@ -9616,6 +9616,12 @@ msgstr "Torna alla home"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Torna a {appName} e accedi di nuovo."
+
+msgid "Go back to {parentTitle}."
+msgstr "Torna a {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Torna indietro per scrivere all'agente principale."
 
 msgid "Go back to the previous page in history"
 msgstr "Torna alla pagina precedente nella cronologia"
@@ -20475,8 +20481,8 @@ msgstr "Questo agente non può diramare una conversazione"
 msgid "This agent can't run in a cloud workspace"
 msgstr "Questo agente non può essere eseguito in un workspace cloud"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Questo agente non ti permette di inviare messaggi ai suoi sottoagenti. Torna indietro per scrivere all'agente principale."
+msgid "This agent doesn't let you message its subagents."
+msgstr "Questo agente non ti permette di inviare messaggi ai suoi sottoagenti."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Questo agente non esiste più sul dispositivo selezionato (i suoi agenti potrebbero essere stati reimpostati). Le esecuzioni falliranno finché non ne scegli uno nuovo."
@@ -21707,8 +21713,8 @@ msgstr "Aggiorna il valore di <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti. Torna indietro per scrivere all'agente principale."
+msgid "Update this host to message subagents."
+msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti."
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti. Il tuo testo è di nuovo nella chat principale."

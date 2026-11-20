@@ -777,8 +777,8 @@ msgstr "{actor} відв'язав(-ла) робочий простір {workspac
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} наразі · прогноз ~{projected}"
 
-msgid "{agentLabel} doesn't let you message its subagents. Go back to message the main agent."
-msgstr "{agentLabel} не дозволяє надсилати повідомлення своїм субагентам. Поверніться, щоб написати основному агенту."
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} не дозволяє надсилати повідомлення своїм субагентам."
 
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеанси {agents} відновляться, коли ви відкриєте їхній робочий простір."
@@ -1157,8 +1157,8 @@ msgstr "{name} запитує"
 msgid "{name} can't be messaged"
 msgstr "{name} не може отримувати повідомлення"
 
-msgid "{name} can't take messages now. Go back to message the main agent."
-msgstr "{name} зараз не може отримувати повідомлення. Поверніться, щоб написати основному агенту."
+msgid "{name} can't take messages now."
+msgstr "{name} зараз не може отримувати повідомлення."
 
 msgid "{name} can't take messages. Your text is back in the main chat."
 msgstr "{name} не може отримувати повідомлення. Ваш текст знову в основному чаті."
@@ -1166,8 +1166,8 @@ msgstr "{name} не може отримувати повідомлення. Ва
 msgid "{name} failed"
 msgstr "{name}: помилка"
 
-msgid "{name} failed and can't take messages. Go back to message the main agent."
-msgstr "{name} завершився з помилкою і не може отримувати повідомлення. Поверніться, щоб написати основному агенту."
+msgid "{name} failed and can't take messages."
+msgstr "{name} завершився з помилкою і не може отримувати повідомлення."
 
 msgid "{name} finished"
 msgstr "{name}: роботу завершено"
@@ -1202,8 +1202,8 @@ msgstr "{name}: роботу розпочато"
 msgid "{name} stopped"
 msgstr "{name}: зупинено"
 
-msgid "{name} stopped and can't take messages. Go back to message the main agent."
-msgstr "{name} зупинено, і він не може отримувати повідомлення. Поверніться, щоб написати основному агенту."
+msgid "{name} stopped and can't take messages."
+msgstr "{name} зупинено, і він не може отримувати повідомлення."
 
 msgid "{name} wants more access"
 msgstr "{name} запитує більше доступу"
@@ -9610,6 +9610,12 @@ msgstr "Повернутися на головну"
 
 msgid "Go back to {appName} and sign in again."
 msgstr "Поверніться в {appName} та увійдіть знову."
+
+msgid "Go back to {parentTitle}."
+msgstr "Поверніться до {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Поверніться, щоб написати основному агенту."
 
 msgid "Go back to the previous page in history"
 msgstr "Повернутися на попередню сторінку в історії"
@@ -20469,8 +20475,8 @@ msgstr "Цей агент не може створити гілку розмов
 msgid "This agent can't run in a cloud workspace"
 msgstr "Цей агент не може працювати в хмарному робочому просторі"
 
-msgid "This agent doesn't let you message its subagents. Go back to message the main agent."
-msgstr "Цей агент не дозволяє надсилати повідомлення своїм субагентам. Поверніться, щоб написати основному агенту."
+msgid "This agent doesn't let you message its subagents."
+msgstr "Цей агент не дозволяє надсилати повідомлення своїм субагентам."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Цього агента більше немає на вибраному пристрої (можливо, агентів пристрою скинули). Запуски завершуватимуться помилкою, доки ви не виберете іншого."
@@ -21701,8 +21707,8 @@ msgstr "Оновіть значення <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам"
 
-msgid "Update this host to message subagents. Go back to message the main agent."
-msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам. Поверніться, щоб написати основному агенту."
+msgid "Update this host to message subagents."
+msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам."
 
 msgid "Update this host to message subagents. Your text is back in the main chat."
 msgstr "Оновіть цей хост, щоб надсилати повідомлення субагентам. Ваш текст знову в основному чаті."

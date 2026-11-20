@@ -24,34 +24,28 @@ export function SubagentNotice({
 	const { t } = useLingui();
 	const { name, blockedBy } = target;
 	const onStop = blockedBy ? target.onStop : undefined;
-	const detail =
+	const reason =
 		blockedBy === "agent"
 			? agentLabel
 				? t({
-						message: `${agentLabel} doesn't let you message its subagents. Go back to message the main agent.`,
+						message: `${agentLabel} doesn't let you message its subagents.`,
 					})
-				: t({
-						message:
-							"This agent doesn't let you message its subagents. Go back to message the main agent.",
-					})
+				: t({ message: "This agent doesn't let you message its subagents." })
 			: blockedBy === "ended"
-				? t({
-						message: `${name} can't take messages now. Go back to message the main agent.`,
-					})
+				? t({ message: `${name} can't take messages now.` })
 				: blockedBy === "stopped"
-					? t({
-							message: `${name} stopped and can't take messages. Go back to message the main agent.`,
-						})
+					? t({ message: `${name} stopped and can't take messages.` })
 					: blockedBy === "failed"
-						? t({
-								message: `${name} failed and can't take messages. Go back to message the main agent.`,
-							})
+						? t({ message: `${name} failed and can't take messages.` })
 						: blockedBy === "host"
-							? t({
-									message:
-										"Update this host to message subagents. Go back to message the main agent.",
-								})
-							: t({ message: `Messages you send go to ${name}.` });
+							? t({ message: "Update this host to message subagents." })
+							: undefined;
+	const goBack = parentTitle
+		? t({ message: `Go back to ${parentTitle}.` })
+		: t({ message: "Go back to message the main agent." });
+	const detail = reason
+		? `${reason} ${goBack}`
+		: t({ message: `Messages you send go to ${name}.` });
 	const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
 		if (event.key !== "Escape") return;
 		if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
@@ -75,7 +69,7 @@ export function SubagentNotice({
 				</output>
 				<div className="text-[12px] text-muted-foreground">{detail}</div>
 			</div>
-			<div className="ml-auto flex items-center gap-0.5">
+			<div className="ml-auto flex min-w-0 max-w-full items-center gap-0.5">
 				{onStop && (
 					<button className={PILL_TRIGGER_CLASS} onClick={onStop} type="button">
 						<Square className="size-3.5" />
@@ -88,11 +82,13 @@ export function SubagentNotice({
 					ref={backRef}
 					type="button"
 				>
-					<ArrowLeft className="size-3.5" />
-					{parentTitle
-						? t({ message: `Back to ${parentTitle}` })
-						: t({ message: "Back to main chat" })}
-					<Kbd className="ml-0.5">{BACK_KEYS}</Kbd>
+					<ArrowLeft className="size-3.5 shrink-0" />
+					<span className="truncate">
+						{parentTitle
+							? t({ message: `Back to ${parentTitle}` })
+							: t({ message: "Back to main chat" })}
+					</span>
+					<Kbd className="ml-0.5 shrink-0">{BACK_KEYS}</Kbd>
 				</button>
 			</div>
 		</div>
