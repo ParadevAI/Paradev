@@ -9,12 +9,14 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
 	query.state.data?.failure ? 0 : 60_000;
 
+type Surface = "chat" | "terminal";
 type Agent = {
 	id: string;
 	presetId?: string;
 	launchPresetId?: string;
 	command?: string;
-	surface?: "chat" | "terminal";
+	/** Overrides the hook's surface for an agent that launches elsewhere. */
+	surface?: Surface;
 };
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
@@ -24,36 +26,55 @@ type Catalog = AgentModelCatalog & {
 	refresh: () => void;
 	load: () => void;
 };
+
+function bundledCatalog(agent: Agent): AgentModelCatalog {
+	return {
+		models:
+			getAgentModelSupport(
+				agent.launchPresetId ??
+					resolveAgentLaunchPresetId(
+						agent.presetId ?? agent.id,
+						agent.command ?? agent.presetId ?? agent.id,
+					),
+			)?.models ?? [],
+		source: "bundled",
+		availability: "unknown",
+		stale: true,
+		fetchedAt: 0,
+	};
+}
+
 export function useAgentModelCatalog(
 	hostUrl: string | null,
 	agents: readonly Agent[],
-	surface: "chat" | "terminal",
+	surface: Surface,
 	workspaceId?: string,
 	projectId?: string,
 	session?: { id: string; presetId: string },
 ): Record<string, Catalog> {
 	const queryClient = useQueryClient();
-	const key = (id: string) => [
+	const queryKey = (agent: Agent) => [
 		"agent-model-catalog",
 		hostUrl,
-		id,
-		agents.find((agent) => agent.id === id)?.surface ?? surface,
+		agent.id,
+		agent.surface ?? surface,
 		workspaceId,
 		projectId,
 		session?.id,
 	];
+	const queryFn = (agent: Agent, refresh?: boolean) => () =>
+		getHostServiceClientByUrl(hostUrl as string).agents.models.query({
+			agent: agent.id,
+			surface: agent.surface ?? surface,
+			workspaceId,
+			projectId,
+			sessionId: agent.presetId === session?.presetId ? session?.id : undefined,
+			refresh,
+		});
 	const queries = useQueries({
 		queries: agents.map((agent) => ({
-			queryKey: key(agent.id),
-			queryFn: () =>
-				getHostServiceClientByUrl(hostUrl as string).agents.models.query({
-					agent: agent.id,
-					surface: agent.surface ?? surface,
-					workspaceId,
-					projectId,
-					sessionId:
-						agent.presetId === session?.presetId ? session?.id : undefined,
-				}),
+			queryKey: queryKey(agent),
+			queryFn: queryFn(agent),
 			enabled: false,
 			staleTime: freshFor,
 			gcTime: 5 * 60_000,
@@ -62,37 +83,13 @@ export function useAgentModelCatalog(
 	});
 	return Object.fromEntries(
 		agents.map((agent, index): [string, Catalog] => {
-			const fallback: AgentModelCatalog = {
-				models:
-					getAgentModelSupport(
-						agent.launchPresetId ??
-							resolveAgentLaunchPresetId(
-								agent.presetId ?? agent.id,
-								agent.command ?? agent.presetId ?? agent.id,
-							),
-					)?.models ?? [],
-				source: "bundled",
-				availability: "unknown",
-				stale: true,
-				fetchedAt: 0,
-			};
+			const query = queries[index];
 			const fetch = (refresh: boolean) => {
 				if (!hostUrl) return;
 				void queryClient
 					.fetchQuery({
-						queryKey: key(agent.id),
-						queryFn: () =>
-							getHostServiceClientByUrl(hostUrl).agents.models.query({
-								agent: agent.id,
-								surface: agent.surface ?? surface,
-								workspaceId,
-								projectId,
-								sessionId:
-									agent.presetId === session?.presetId
-										? session?.id
-										: undefined,
-								refresh,
-							}),
+						queryKey: queryKey(agent),
+						queryFn: queryFn(agent, refresh),
 						staleTime: refresh ? 0 : freshFor,
 						retry: false,
 					})
@@ -101,12 +98,11 @@ export function useAgentModelCatalog(
 			return [
 				agent.id,
 				{
-					...(queries[index]?.data ?? fallback),
-					loading: queries[index]?.isFetching ?? false,
+					...(query?.data ?? bundledCatalog(agent)),
+					loading: query?.isFetching ?? false,
 					unverifiable:
-						queries[index]?.data?.failure === "unsupported" ||
-						(queries[index]?.isError ?? false),
-					key: JSON.stringify(key(agent.id)),
+						query?.data?.failure === "unsupported" || (query?.isError ?? false),
+					key: JSON.stringify(queryKey(agent)),
 					refresh: () => fetch(true),
 					load: () => fetch(false),
 				},

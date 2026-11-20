@@ -15,7 +15,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { LuCheck, LuSearch, LuStar } from "react-icons/lu";
+import { LuCheck, LuLoaderCircle, LuSearch, LuStar } from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -386,25 +386,6 @@ export function ModelPanel({
 					</OverflowFadeContainer>
 				</div>
 			) : null}
-			{tabAgent && !runtimeModels && tabAgent.availability === "unknown" ? (
-				<div className="flex items-center gap-2 border-b px-2.5 py-2 text-xs text-muted-foreground">
-					<span className="flex-1">
-						{tabAgent.loading
-							? t({ message: "Loading..." })
-							: t({ message: "Model availability could not be verified." })}
-					</span>
-					{tabAgent.onRefresh ? (
-						<button
-							type="button"
-							disabled={tabAgent.loading}
-							onClick={tabAgent.onRefresh}
-							className="underline disabled:opacity-50"
-						>
-							{t({ message: "Refresh" })}
-						</button>
-					) : null}
-				</div>
-			) : null}
 			<label className="flex shrink-0 items-center gap-2 border-b px-2.5 text-muted-foreground">
 				<LuSearch className="size-3.5 shrink-0 text-muted-foreground/60" />
 				<input
@@ -490,6 +471,31 @@ export function ModelPanel({
 					</DropdownMenuItem>
 				) : null}
 			</div>
+			{tabAgent && !runtimeModels && tabAgent.availability === "unknown" ? (
+				<div className="flex h-7 shrink-0 items-center gap-1.5 border-t px-2.5 text-[11px] text-muted-foreground/70">
+					{tabAgent.loading ? (
+						<>
+							<LuLoaderCircle className="size-3 animate-spin" />
+							{t({ message: "Loading..." })}
+						</>
+					) : (
+						<>
+							<span className="min-w-0 flex-1 truncate">
+								{t({ message: "Model availability could not be verified." })}
+							</span>
+							{tabAgent.onRefresh ? (
+								<button
+									type="button"
+									onClick={tabAgent.onRefresh}
+									className="underline"
+								>
+									{t({ message: "Refresh" })}
+								</button>
+							) : null}
+						</>
+					)}
+				</div>
+			) : null}
 		</div>
 	);
 }

@@ -142,6 +142,118 @@ export function parseCursorModels(output: string): CatalogModel[] {
 	);
 }
 
+type Discovered = Pick<
+	AgentModelCatalog,
+	"models" | "defaultModel" | "defaultEffort"
+>;
+type Context = Awaited<ReturnType<typeof context>>;
+
+function bundledCatalog(presetId: string): AgentModelCatalog {
+	return {
+		models: getAgentModelSupport(presetId)?.models ?? [],
+		source: "bundled",
+		availability: "unknown",
+		stale: true,
+		fetchedAt: Date.now(),
+	};
+}
+
+function fromConfigOptions(options: SessionConfigOption[]): Discovered {
+	const model = options.find((entry) => entry.category === "model");
+	const effort = options.find((entry) => entry.category === "thought_level");
+	if (!model) throw new DiscoveryError("unsupported");
+	return {
+		models: model.options,
+		defaultModel: runtimeDefaultOption(model.options, model.currentValue),
+		defaultEffort: effort
+			? runtimeDefaultOption(effort.options, effort.currentValue)
+			: undefined,
+	};
+}
+
+async function fromAcp(
+	adapter: Pick<
+		ReturnType<typeof createAcpAdapter>,
+		"discoverModels" | "dispose"
+	>,
+	cwd: string,
+	signal: AbortSignal,
+): Promise<Discovered> {
+	try {
+		return fromConfigOptions(
+			await abortable(
+				adapter.discoverModels?.(cwd) ?? Promise.resolve([]),
+				signal,
+			),
+		);
+	} finally {
+		await adapter.dispose();
+	}
+}
+
+async function discover(
+	db: HostDb,
+	ctx: Context,
+	surface: "chat" | "terminal",
+	signal: AbortSignal,
+): Promise<Discovered> {
+	const command = agentCliCommand(ctx.config.command, ctx.env);
+	const harness = acpHarnessForPreset(ctx.presetId);
+	if (surface === "chat" && harness && ctx.launch) {
+		const adapter = acpHarnessFactory(
+			harness,
+			db,
+			async () => null,
+			undefined,
+			{
+				launch: ctx.launch,
+				startupTimeoutMs: DISCOVERY_DEADLINE_MS,
+			},
+		)?.(ctx.options);
+		if (!adapter) throw new DiscoveryError("unsupported");
+		return fromAcp(adapter, ctx.cwd, signal);
+	}
+	if (surface === "terminal" && ctx.presetId === "opencode")
+		return fromAcp(
+			createAcpAdapter({
+				command,
+				args: ["acp"],
+				env: ctx.env,
+				cwd: ctx.cwd,
+				startupTimeoutMs: DISCOVERY_DEADLINE_MS,
+			}),
+			ctx.cwd,
+			signal,
+		);
+	if (ctx.presetId === "codex") {
+		const bundled = getAgentModelSupport("codex")?.models ?? [];
+		const models = await discoverCodexModels(
+			{ command, env: ctx.env, cwd: ctx.cwd },
+			signal,
+		);
+		return {
+			models: models.map((model) => ({
+				...model,
+				label:
+					bundled.find((entry) => entry.id === model.id)?.label ?? model.label,
+			})),
+		};
+	}
+	if (surface === "terminal" && ctx.presetId === "cursor-agent") {
+		const { stdout } = await execFileAsync(command, ["--list-models"], {
+			env: ctx.env,
+			cwd: ctx.cwd,
+			timeout: 10_000,
+			maxBuffer: 4 * 1024 * 1024,
+			signal,
+		});
+		const models = parseCursorModels(stdout);
+		if (!models.length) throw new Error("Model listing was not recognized");
+		return { models };
+	}
+	throw new DiscoveryError("unsupported");
+}
+
 export async function discoverAgentModels(
 	db: HostDb,
 	input: {
@@ -152,16 +264,6 @@ export async function discoverAgentModels(
 		refresh?: boolean;
 	},
 ): Promise<AgentModelCatalog> {
-	const fallback = (): AgentModelCatalog => ({
-		models:
-			getAgentModelSupport(
-				resolveHostAgentConfig(db, input.agent)?.presetId ?? input.agent,
-			)?.models ?? [],
-		source: "bundled",
-		availability: "unknown",
-		stale: true,
-		fetchedAt: Date.now(),
-	});
 	try {
 		return await scheduler.run(async (signal) => {
 			const ctx = await abortable(
@@ -184,135 +286,31 @@ export async function discoverAgentModels(
 			}
 			const catalog = await cache.get(
 				ctx.key,
-				() =>
-					(async (): Promise<AgentModelCatalog> => {
-						let models: CatalogModel[] | undefined;
-						let defaultModel: AgentModelCatalog["defaultModel"];
-						let defaultEffort: AgentModelCatalog["defaultEffort"];
-						const readModelOption = (options: SessionConfigOption[]) => {
-							const option = options.find(
-								(entry) => entry.category === "model",
-							);
-							const effort = options.find(
-								(entry) => entry.category === "thought_level",
-							);
-							models = option?.options;
-							defaultModel = option
-								? runtimeDefaultOption(option.options, option.currentValue)
-								: undefined;
-							defaultEffort = effort
-								? runtimeDefaultOption(effort.options, effort.currentValue)
-								: undefined;
-						};
-						const harness = acpHarnessForPreset(ctx.presetId);
-						if (input.surface === "chat" && harness && ctx.launch) {
-							const factory = acpHarnessFactory(
-								harness,
-								db,
-								async () => null,
-								undefined,
-								{ launch: ctx.launch, startupTimeoutMs: DISCOVERY_DEADLINE_MS },
-							);
-							const adapter = factory?.(ctx.options);
-							if (adapter) {
-								try {
-									readModelOption(
-										await abortable(
-											adapter.discoverModels?.(ctx.cwd) ?? Promise.resolve([]),
-											signal,
-										),
-									);
-								} finally {
-									await adapter.dispose();
-								}
-							}
-						} else if (
-							input.surface === "terminal" &&
-							ctx.presetId === "opencode"
-						) {
-							const adapter = createAcpAdapter({
-								command: agentCliCommand(ctx.config.command, ctx.env),
-								args: ["acp"],
-								env: ctx.env,
-								cwd: ctx.cwd,
-								startupTimeoutMs: DISCOVERY_DEADLINE_MS,
-							});
-							try {
-								readModelOption(
-									await abortable(
-										adapter.discoverModels?.(ctx.cwd) ?? Promise.resolve([]),
-										signal,
-									),
-								);
-							} finally {
-								await adapter.dispose();
-							}
-						} else if (ctx.presetId === "codex") {
-							const bundled = getAgentModelSupport("codex")?.models ?? [];
-							models = (
-								await discoverCodexModels(
-									{
-										command: agentCliCommand(ctx.config.command, ctx.env),
-										env: ctx.env,
-										cwd: ctx.cwd,
-									},
-									signal,
-								)
-							).map((model) => ({
-								...model,
-								label:
-									bundled.find((entry) => entry.id === model.id)?.label ??
-									model.label,
-							}));
-						} else if (
-							input.surface === "terminal" &&
-							ctx.presetId === "cursor-agent"
-						) {
-							const command = agentCliCommand(ctx.config.command, ctx.env);
-							const { stdout } = await execFileAsync(
-								command,
-								["--list-models"],
-								{
-									env: ctx.env,
-									cwd: ctx.cwd,
-									timeout: 10_000,
-									maxBuffer: 4 * 1024 * 1024,
-									signal,
-								},
-							);
-							models = parseCursorModels(stdout);
-							if (!models.length)
-								throw new Error("Model listing was not recognized");
-						}
-						if (models === undefined) throw new DiscoveryError("unsupported");
+				async () => {
+					try {
+						const found = await discover(db, ctx, input.surface, signal);
 						return {
-							models: withoutDefaultAlias(uniqueModels(models)),
-							defaultModel,
-							defaultEffort,
+							...found,
+							models: withoutDefaultAlias(uniqueModels(found.models)),
 							source:
 								input.surface === "chat" || ctx.presetId === "opencode"
-									? "runtime"
-									: "cli",
-							availability: "reported",
+									? ("runtime" as const)
+									: ("cli" as const),
+							availability: "reported" as const,
 							fetchedAt: Date.now(),
 							stale: false,
 						};
-					})().catch((error) => {
-						if (discoveryFailure(error) === "unsupported") throw error;
-						console.warn("[model-discovery] failed", {
-							agent: input.agent,
-							surface: input.surface,
-							error,
-						});
+					} catch (error) {
+						if (discoveryFailure(error) !== "unsupported")
+							console.warn("[model-discovery] failed", {
+								agent: input.agent,
+								surface: input.surface,
+								error,
+							});
 						throw error;
-					}),
-				() => ({
-					models: getAgentModelSupport(ctx.presetId)?.models ?? [],
-					source: "bundled",
-					availability: "unknown",
-					fetchedAt: Date.now(),
-					stale: true,
-				}),
+					}
+				},
+				() => bundledCatalog(ctx.presetId),
 				input.refresh,
 			);
 			if (catalog.failure)
@@ -324,14 +322,17 @@ export async function discoverAgentModels(
 			return { ...catalog, models: enrichModels(catalog.models, ctx.presetId) };
 		});
 	} catch (error) {
+		const failure = error instanceof DiscoveryError ? error.reason : "failed";
 		console.warn("[model-discovery] unavailable", {
 			agent: input.agent,
 			surface: input.surface,
-			reason: error instanceof DiscoveryError ? error.reason : "failed",
+			reason: failure,
 		});
 		return {
-			...fallback(),
-			failure: error instanceof DiscoveryError ? error.reason : "failed",
+			...bundledCatalog(
+				resolveHostAgentConfig(db, input.agent)?.presetId ?? input.agent,
+			),
+			failure,
 		};
 	}
 }

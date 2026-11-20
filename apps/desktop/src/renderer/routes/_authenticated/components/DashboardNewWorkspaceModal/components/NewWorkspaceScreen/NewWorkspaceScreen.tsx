@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
+import { acpStartModes } from "@superset/chat/core";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { draftText } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
@@ -23,21 +23,15 @@ import { HistoryIcon, Settings2Icon } from "lucide-react";
 import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LuGitPullRequest } from "react-icons/lu";
-import type { AgentSelectAgent } from "renderer/components/AgentSelect";
 import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
-import {
-	useAcpChatEnabled,
-	useAcpChatSettled,
-} from "renderer/hooks/useAcpChatEnabled";
+import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
 import { useAgentLaunchPreferences } from "renderer/hooks/useAgentLaunchPreferences";
-import { useAgentModelCatalog } from "renderer/hooks/useAgentModelCatalog";
-import { useAgentModelPreference } from "renderer/hooks/useAgentModelPreference";
 import { useAgentModePreference } from "renderer/hooks/useAgentModePreference";
 import { useCloudAgentChoices } from "renderer/hooks/useCloudAgentChoices";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -101,6 +95,7 @@ import { SupersetIcon } from "./components/SupersetIcon";
 import { useConsumeHostIntent } from "./hooks/useConsumeHostIntent";
 import { useCreateProjectEnvironment } from "./hooks/useCreateProjectEnvironment";
 import { useGitHubRepositoryProjects } from "./hooks/useGitHubRepositoryProjects";
+import { useLaunchModels } from "./hooks/useLaunchModels";
 import { useLinkedIssueNaming } from "./hooks/useLinkedIssueNaming";
 import { useSamplePromptSelection } from "./hooks/useSamplePromptSelection";
 import { useWorkspaceSettingMentionProviders } from "./hooks/useWorkspaceSettingMentionProviders";
@@ -111,6 +106,7 @@ import {
 	launchConfigOptions,
 	launchOptionValue,
 } from "./utils/launchConfigOptions";
+import { launchPresetIdOf } from "./utils/launchPresetIdOf";
 import {
 	type PendingEnvironmentSetup,
 	planEnvironmentSetup,
@@ -139,10 +135,6 @@ interface NewWorkspaceScreenProps {
  * The workspace-creation surface: heading, sample prompts, and a minimal
  * composer, filling the window rather than a dialog.
  */
-function launchPresetIdOf(agent: AgentSelectAgent): string {
-	return agent.launchPresetId ?? agent.presetId ?? agent.iconId ?? agent.id;
-}
-
 export function NewWorkspaceScreen({
 	isOpen,
 	preSelectedProjectId,
@@ -623,64 +615,21 @@ export function NewWorkspaceScreen({
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
 	const acpChatEnabled = useAcpChatEnabled();
-	const acpChatSettled = useAcpChatSettled();
-	const modelAgents = useMemo(
-		() =>
-			agentConfigs.flatMap((agent) => {
-				const presetId = launchPresetIdOf(agent);
-				const chat = acpChatEnabled && Boolean(acpHarnessForPreset(presetId));
-				if (!chat && !getAgentModelSupport(presetId)) return [];
-				return [
-					{
-						...agent,
-						surface: chat ? ("chat" as const) : ("terminal" as const),
-					},
-				];
-			}),
-		[agentConfigs, acpChatEnabled],
-	);
-	const catalogs = useAgentModelCatalog(
-		acpChatSettled ? launchHostUrl : null,
-		modelAgents,
-		acpChatEnabled ? "chat" : "terminal",
-		undefined,
-		isCloudHost ? undefined : (projectId ?? undefined),
-	);
-	const bundledSupport = selectedPresetId
-		? getAgentModelSupport(selectedPresetId)
-		: undefined;
-	const discovered = catalogs[selectedAgent];
-	const knownSupport =
-		discovered &&
-		(discovered.models.length > 0 || discovered.availability === "reported")
-			? {
-					presetId: selectedPresetId ?? selectedAgent,
-					modelFlag: bundledSupport?.modelFlag ?? null,
-					models: discovered.models,
-				}
-			: bundledSupport;
-	const { selectedModel, setSelectedModel } = useAgentModelPreference(
-		MODEL_STORAGE_KEY,
-		knownSupport ? selectedPresetId : null,
-	);
-	const pickUnverified =
-		selectedModel !== null &&
-		discovered !== undefined &&
-		discovered.availability !== "reported" &&
-		!knownSupport?.models.some((entry) => entry.id === selectedModel);
-	const modelSupport = useMemo(
-		() =>
-			knownSupport && pickUnverified && selectedModel
-				? {
-						...knownSupport,
-						models: [
-							...knownSupport.models,
-							{ id: selectedModel, label: selectedModel },
-						],
-					}
-				: knownSupport,
-		[knownSupport, pickUnverified, selectedModel],
-	);
+	const {
+		catalogs,
+		defaultEffortLabel,
+		modelSupport,
+		selectedModel,
+		setSelectedModel,
+		modelForLaunch,
+	} = useLaunchModels({
+		agents: agentConfigs,
+		selectedAgent,
+		selectedPresetId,
+		hostUrl: launchHostUrl,
+		projectId: isCloudHost ? undefined : (projectId ?? undefined),
+		storageKey: MODEL_STORAGE_KEY,
+	});
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
 		: undefined;
@@ -704,17 +653,6 @@ export function NewWorkspaceScreen({
 				: [],
 		[selectedPresetId, selectedModel],
 	);
-	const modelForLaunch = modelSupport?.models.some(
-		(entry) => entry.id === selectedModel,
-	)
-		? selectedModel
-		: null;
-	const loadSelectedCatalog = useRef(discovered?.load);
-	loadSelectedCatalog.current = discovered?.load;
-	const selectedCatalogKey = discovered?.key;
-	useEffect(() => {
-		if (selectedCatalogKey) loadSelectedCatalog.current?.();
-	}, [selectedCatalogKey]);
 	const effortForLaunch = effortOptions.some(
 		(option) => option.id === selectedEffort,
 	)
@@ -757,9 +695,7 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
-				defaultEffortLabel: selectedModel
-					? undefined
-					: discovered?.defaultEffort?.label,
+				defaultEffortLabel: selectedModel ? undefined : defaultEffortLabel,
 				labels: {
 					model: t({ message: "Model" }),
 					defaultModel: t({ message: "Default" }),
@@ -772,7 +708,7 @@ export function NewWorkspaceScreen({
 			modelSupport,
 			selectedEffort,
 			selectedModel,
-			discovered?.defaultEffort?.label,
+			defaultEffortLabel,
 			t,
 		],
 	);
