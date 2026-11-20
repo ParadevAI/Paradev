@@ -44,7 +44,7 @@ export const connectionStatusProcedure = personProcedure
 		async ({ ctx, input }): Promise<Record<string, ProviderConnection>> => {
 			await verifyOrgMembership(ctx.session.user.id, input.organizationId);
 
-			const [connectorRows, installation] = await Promise.all([
+			const [connectorRows, activeInstallation] = await Promise.all([
 				db.query.connections.findMany({
 					// Oldest first, and stable: the editor pins a new trigger to the
 					// first account, and an unordered read returns heap order, which
@@ -68,8 +68,11 @@ export const connectionStatusProcedure = personProcedure
 					},
 				}),
 				db.query.githubInstallations.findFirst({
-					where: eq(githubInstallations.organizationId, input.organizationId),
-					columns: { suspended: true },
+					where: and(
+						eq(githubInstallations.organizationId, input.organizationId),
+						eq(githubInstallations.suspended, false),
+					),
+					columns: { id: true },
 				}),
 			]);
 
@@ -101,9 +104,8 @@ export const connectionStatusProcedure = personProcedure
 				entry.needsReauth = needsReauth;
 			}
 
-			// A suspended installation still has a row, and delivers nothing.
 			connected.github = {
-				connected: installation !== undefined && !installation.suspended,
+				connected: activeInstallation !== undefined,
 				needsReauth: false,
 				accounts: [],
 			};

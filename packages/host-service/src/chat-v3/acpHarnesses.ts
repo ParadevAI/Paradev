@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { presetForAcpHarness } from "@superset/chat/core";
 import type { HarnessFactory, ResolveAttachment } from "@superset/chat-runtime";
 import { createAcpAdapter } from "@superset/chat-runtime";
 import type { HostDb } from "../db";
@@ -46,6 +47,9 @@ export function acpHarnessFactory(
 				: {}),
 			...(entry.clientApprovalModes ? { clientApprovalModes: true } : {}),
 			...(entry.forkAtMessage ? { forkAtMessage: true } : {}),
+			...(entry.protocolVersion
+				? { protocolVersion: entry.protocolVersion }
+				: {}),
 			onSpawn: (pid) => agents?.spawned(options.sessionId, pid),
 			launch: async () => {
 				const cli = await resolveAgentCli({
@@ -58,6 +62,8 @@ export function acpHarnessFactory(
 							cwd: options.cwd,
 							workspaceId: options.scopeId,
 							terminalId: options.terminalId,
+							agentConfigId: options.agentConfigId,
+							presetId: presetForAcpHarness(options.harness) ?? entry.binary,
 						}),
 				});
 				const env = cli.env;
@@ -90,6 +96,7 @@ export function acpHarnessFactory(
 					args: [adapterEntry, ...(entry.args ?? [])],
 					env: {
 						...env,
+						...entry.adapterEnv,
 						ELECTRON_RUN_AS_NODE: "1",
 						[entry.executableEnv]: cli.command,
 					},

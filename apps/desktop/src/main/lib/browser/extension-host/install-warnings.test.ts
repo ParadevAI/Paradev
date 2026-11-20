@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { addedAccess, installWarnings } from "./install-warnings";
+import { accessDetail, addedAccess, installWarnings } from "./install-warnings";
 
 test("the install question names what a password manager can reach, as Chrome does", () => {
 	expect(
@@ -25,8 +25,24 @@ test("the install question names what a password manager can reach, as Chrome do
 
 test("an API with no warning line of its own still shows in the install question", () => {
 	expect(
-		installWarnings({ permissions: ["storage", "alarms", "debugger"] }),
-	).toEqual(["Use more browser features: debugger"]);
+		installWarnings({ permissions: ["storage", "alarms", "pageCapture"] }),
+	).toEqual(["Use more browser features: pageCapture"]);
+});
+
+test("a content blocker's install question reads as Chrome's, one bullet per line", () => {
+	const warnings = installWarnings({
+		permissions: ["declarativeNetRequest", "userScripts", "debugger"],
+		host_permissions: ["<all_urls>"],
+	});
+	expect(accessDetail("It can:", warnings)).toBe(
+		[
+			"It can:",
+			"• Read and change all your data on all websites",
+			"• Block content on any page",
+			"• Run scripts you add on websites",
+			"• Access the page debugger backend",
+		].join("\n"),
+	);
 });
 
 test("content scripts on a few sites count as access to those sites", () => {

@@ -1,5 +1,9 @@
-import { isMissingProcedure } from "./relay-client";
-import type { AgentRunResult, PreviousRunSession } from "./run";
+import { isMissingProcedure, RelayDispatchError } from "./relay-client";
+import {
+	type AgentRunResult,
+	describeError,
+	type PreviousRunSession,
+} from "./run";
 
 /** One host-service, reached through the relay or directly for a sandbox. */
 export type HostCaller = {
@@ -32,6 +36,8 @@ export type LaunchAgentSessionArgs = {
 	chat: boolean;
 	/** See {@link PreviousRunSession}. Omit when nothing may be continued. */
 	previous?: PreviousRunSession;
+	/** Show a chat it starts in a background tab of the host's desktop app. */
+	openTab?: boolean;
 };
 
 /**
@@ -40,6 +46,35 @@ export type LaunchAgentSessionArgs = {
  * predates `sessions` gets the `agents.run` chat request it always got.
  */
 export async function launchAgentSession(
+	host: HostCaller,
+	args: LaunchAgentSessionArgs,
+): Promise<AgentRunResult> {
+	const result = await startAgentSession(host, args);
+	if (args.openTab && result.kind === "chat") {
+		// The run has started either way; a host with no desktop, or one too old
+		// for chat tabs, only leaves the chat without a tab.
+		await host
+			.mutation("panes.newTab", {
+				workspaceId: args.workspaceId,
+				sessionId: result.sessionId,
+			})
+			.catch((err: unknown) => {
+				if (
+					isMissingProcedure(err, "panes.newTab") ||
+					(err instanceof RelayDispatchError && err.status === 412)
+				) {
+					return;
+				}
+				console.warn(
+					`[automations] could not open chat ${result.sessionId} in a desktop tab for workspace ${args.workspaceId}:`,
+					describeError(err, "panes.newTab"),
+				);
+			});
+	}
+	return result;
+}
+
+async function startAgentSession(
 	host: HostCaller,
 	args: LaunchAgentSessionArgs,
 ): Promise<AgentRunResult> {

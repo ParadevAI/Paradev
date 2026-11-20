@@ -4,6 +4,9 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./legacy-integration-connect": "./src/legacy-integration-connect/index.ts",
+		"./domain-move": "./src/domain-move/index.ts",
+		"./browser-api-url": "./src/browser-api-url.ts",
 		"./agent-routines": {
 			"types": "./src/agent-routines.ts",
 			"default": "./src/agent-routines.ts"
@@ -21,6 +24,7 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./cloud-usage-display": "./src/cloud-usage-display.ts",
 		"./slack-links": {
 			"types": "./src/slack-links.ts",
 			"default": "./src/slack-links.ts"
@@ -36,6 +40,10 @@
 		"./account-labels": {
 			"types": "./src/account-labels.ts",
 			"default": "./src/account-labels.ts"
+		},
+		"./machine-size-names": {
+			"types": "./src/machine-size-names.ts",
+			"default": "./src/machine-size-names.ts"
 		},
 		"./html-preview": {
 			"types": "./src/html-preview.ts",
@@ -72,6 +80,10 @@
 		"./page-tools-runtime": {
 			"types": "./src/page-tools-runtime.ts",
 			"default": "./src/page-tools-runtime.ts"
+		},
+		"./move-book": {
+			"types": "./src/move-book/index.ts",
+			"default": "./src/move-book/index.ts"
 		},
 		"./page-storage-hub": {
 			"types": "./src/page-storage-hub.ts",
@@ -185,13 +197,17 @@
 			"types": "./src/plugins/index.ts",
 			"default": "./src/plugins/index.ts"
 		},
-		"./sandbox-regions": {
-			"types": "./src/sandbox-regions.ts",
-			"default": "./src/sandbox-regions.ts"
+		"./sandbox/regions": {
+			"types": "./src/sandbox/regions.ts",
+			"default": "./src/sandbox/regions.ts"
 		},
-		"./sandbox-contract": {
-			"types": "./src/sandbox-contract.ts",
-			"default": "./src/sandbox-contract.ts"
+		"./sandbox/boot-stamps": {
+			"types": "./src/sandbox/boot-stamps.ts",
+			"default": "./src/sandbox/boot-stamps.ts"
+		},
+		"./sandbox/contract": {
+			"types": "./src/sandbox/contract.ts",
+			"default": "./src/sandbox/contract.ts"
 		},
 		"./pull-request-diff": {
 			"types": "./src/pull-request-diff/index.ts",
@@ -201,6 +217,10 @@
 			"types": "./src/pull-request.ts",
 			"default": "./src/pull-request.ts"
 		},
+		"./github-attachment": {
+			"types": "./src/github-attachment/index.ts",
+			"default": "./src/github-attachment/index.ts"
+		},
 		"./pull-request-github": {
 			"types": "./src/pull-request-github/index.ts",
 			"default": "./src/pull-request-github/index.ts"
@@ -208,6 +228,18 @@
 		"./pull-request-detail": {
 			"types": "./src/pull-request-detail/index.ts",
 			"default": "./src/pull-request-detail/index.ts"
+		},
+		"./pull-request-merge-methods": {
+			"types": "./src/pull-request-merge-methods/index.ts",
+			"default": "./src/pull-request-merge-methods/index.ts"
+		},
+		"./pull-request-stack": {
+			"types": "./src/pull-request-stack/index.ts",
+			"default": "./src/pull-request-stack/index.ts"
+		},
+		"./pull-request-async-merge": {
+			"types": "./src/pull-request-async-merge/index.ts",
+			"default": "./src/pull-request-async-merge/index.ts"
 		},
 		"./pull-request-checks": {
 			"types": "./src/pull-request-checks/index.ts",
@@ -217,9 +249,21 @@
 			"types": "./src/pull-request-threads/index.ts",
 			"default": "./src/pull-request-threads/index.ts"
 		},
-		"./sandbox-gate": {
-			"types": "./src/sandbox-gate.ts",
-			"default": "./src/sandbox-gate.ts"
+		"./sandbox/gate": {
+			"types": "./src/sandbox/gate.ts",
+			"default": "./src/sandbox/gate.ts"
+		},
+		"./sandbox/access": {
+			"types": "./src/sandbox/access.ts",
+			"default": "./src/sandbox/access.ts"
+		},
+		"./sandbox/reach": {
+			"types": "./src/sandbox/reach.ts",
+			"default": "./src/sandbox/reach.ts"
+		},
+		"./sandbox/watch": {
+			"types": "./src/sandbox/watch.ts",
+			"default": "./src/sandbox/watch.ts"
 		},
 		"./sentry": {
 			"types": "./src/sentry.ts",
@@ -349,6 +393,14 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./cloud-usage-api": {
+			"types": "./src/cloud-usage-api.ts",
+			"default": "./src/cloud-usage-api.ts"
+		},
+		"./box-pressure": {
+			"types": "./src/box-pressure.ts",
+			"default": "./src/box-pressure.ts"
+		},
 		"./workspace-launch": {
 			"types": "./src/workspace-launch/index.ts",
 			"default": "./src/workspace-launch/index.ts"
@@ -373,6 +425,14 @@
 			"types": "./src/workspace-tags.ts",
 			"default": "./src/workspace-tags.ts"
 		},
+		"./project-colors": {
+			"types": "./src/project-colors.ts",
+			"default": "./src/project-colors.ts"
+		},
+		"./workspace-tag-folders": {
+			"types": "./src/workspace-tag-folders.ts",
+			"default": "./src/workspace-tag-folders.ts"
+		},
 		"./workspace-attachments": {
 			"types": "./src/workspace-attachments.ts",
 			"default": "./src/workspace-attachments.ts"
@@ -396,6 +456,10 @@
 		"./claude-command": {
 			"types": "./src/claude-command.ts",
 			"default": "./src/claude-command.ts"
+		},
+		"./origin-list": {
+			"types": "./src/origin-list.ts",
+			"default": "./src/origin-list.ts"
 		},
 		"./vercel-preview-origins": {
 			"types": "./src/vercel-preview-origins.ts",
@@ -457,6 +521,10 @@
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
 		},
+		"./resolve-command": {
+			"types": "./src/resolve-command.ts",
+			"default": "./src/resolve-command.ts"
+		},
 		"./simple-git-options": {
 			"types": "./src/simple-git-options.ts",
 			"default": "./src/simple-git-options.ts"
@@ -493,6 +561,10 @@
 			"types": "./src/plugins/manifest-schema.ts",
 			"default": "./src/plugins/manifest-schema.ts"
 		},
+		"./cloud-workspace-status": {
+			"types": "./src/cloud-workspace-status.ts",
+			"default": "./src/cloud-workspace-status.ts"
+		},
 		"./cloud-workspace-groups": {
 			"types": "./src/cloud-workspace-groups.ts",
 			"default": "./src/cloud-workspace-groups.ts"
@@ -525,7 +597,7 @@
 	},
 	"dependencies": {
 		"@date-fns/tz": "1.4.1",
-		"@lingui/core": "6.8.0",
+		"@lingui/core": "6.12.0",
 		"@superset/i18n": "workspace:*",
 		"culori": "4.0.2",
 		"drizzle-orm": "0.45.2",
@@ -533,14 +605,16 @@
 		"jose": "6.2.13",
 		"rrule": "2.8.1",
 		"semver": "7.7.4",
+		"shell-quote": "1.11.0",
 		"smol-toml": "1.9.1",
-		"zod": "4.6.5"
+		"zod": "4.6.6"
 	},
 	"devDependencies": {
 		"@superset/typescript": "workspace:*",
 		"@types/culori": "4.0.1",
 		"@types/friendly-words": "1.2.2",
 		"@types/semver": "7.7.1",
+		"@types/shell-quote": "1.7.5",
 		"@xterm/xterm": "6.1.0-beta.315",
 		"bun-types": "1.4.3",
 		"typescript": "7.0.2"

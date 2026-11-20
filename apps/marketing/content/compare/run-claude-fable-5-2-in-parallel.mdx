@@ -1,0 +1,146 @@
+---
+title: "How to Run Claude Fable 5.2 in Parallel with Claude Code"
+description: "Claude Fable 5.2 shipped on November 9, 2026. How to pick it in Claude Code, run several Fable 5.2 sessions at once in separate Git worktrees, and do the same in Paradev."
+date: 2026-11-10
+lastUpdated: 2026-11-10
+type: "tutorial"
+competitors:
+  - claude-code
+  - git-worktrees
+keywords:
+  - claude fable 5.2
+  - fable 5.2 claude code
+  - run claude fable 5.2 in parallel
+  - claude-fable-5-2
+  - parallel claude code sessions
+  - claude code worktrees
+---
+
+To run Claude Fable 5.2 in parallel, start one Claude Code session per task, each in its own Git worktree and branch, and launch each with `claude --model fable` (or the pinned id `claude-fable-5-2`). In Paradev, create one workspace per task, choose Claude Code as the agent and Fable 5.2 in the model picker, or pass `--agent claude --model claude-fable-5-2` to `superset ws create`. Review each diff before you merge. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+
+## What shipped
+
+On November 9, 2026, Anthropic released [Claude Fable 5.2 and Claude Mythos 5.2](https://www.anthropic.com/claude-fable-and-mythos-5-2). Anthropic says they are the same underlying model: Fable 5.2 is available to everyone, with stronger cyber and biology safeguards, and Mythos 5.2 is limited to vetted organizations.
+
+| | Claude Fable 5.2 |
+|---|---|
+| **Released** | November 9, 2026 |
+| **Where** | Claude apps, Claude Code, the Claude Platform, Amazon Web Services, Google Cloud, and Microsoft Azure |
+| **API model id** | `claude-fable-5-2` |
+| **API price** | $8 per million input tokens, $40 per million output tokens; fast mode is $16 and $80 |
+| **Context window** | 1M tokens, per the [Claude Code 2.1.321 release notes](https://github.com/anthropics/claude-code/releases/tag/v2.1.321) |
+| **Default effort** | Medium in Claude apps and Claude Code |
+| **Claude Code** | Added in [2.1.321](https://github.com/anthropics/claude-code/releases/tag/v2.1.321) (November 9); [2.1.322](https://github.com/anthropics/claude-code/releases/tag/v2.1.322) adds fast mode on Vertex AI |
+
+Anthropic reports 69.9% on FrontierSWE v2 against 62.3% for Opus 5.5, output up to 30% faster than Fable 5.1, and fewer tokens than Fable 5.1 on hard tasks at Medium effort. These figures come from Anthropic and are not independently checked.
+
+In Claude Code, the `fable` alias now resolves to Fable 5.2, except in Claude apps gateway sessions, where it still resolves to Fable 5 (see the [model configuration docs](https://code.claude.com/docs/en/model-config)). Anthropic is also giving eligible paid plans extra Fable usage.
+
+## Why Fable 5.2 fits parallel work
+
+Anthropic's examples are long, many-agent jobs: a team of agents moving a production service from Python to Rust, and a security audit at Uber with about 170 reviewer agents. You do not need that scale to benefit. Fable 5.2 is the model to give your hardest, longest tasks, and those are the tasks you least want to wait on one at a time. At $8 and $40 per million tokens it costs more than Opus or Sonnet, so a common split is Fable 5.2 on the one or two hard tasks and a cheaper model on the bounded ones next to it.
+
+## Pick Fable 5.2 in Claude Code
+
+Update Claude Code to 2.1.321 or later, then choose the model when you start a session:
+
+```bash
+claude --version
+claude --model fable
+```
+
+Use `claude --model claude-fable-5-2` to pin this release, so the session stays on 5.2 when the alias moves. Inside a running session, `/model fable` switches models, and `/effort` changes effort (`low`, `medium`, `high`, `xhigh`, or `max`).
+
+## Run several Fable 5.2 sessions at once
+
+Give each task its own worktree and branch, so two sessions never edit the same working files. Claude Code can create the worktree itself:
+
+```bash
+claude --worktree fable-migration --model claude-fable-5-2
+claude --worktree fable-audit --model claude-fable-5-2
+```
+
+Each command creates a worktree under `.claude/worktrees/` on a new branch and starts the session in it (see the [worktree docs](https://code.claude.com/docs/en/worktrees)). Run them in separate terminals. You can also make the worktrees with plain Git:
+
+```bash
+git worktree add -b ai/fable-migration ../repo-fable-migration
+cd ../repo-fable-migration && claude --model claude-fable-5-2
+```
+
+Long tasks need a clear stop condition, or a session keeps going and keeps spending:
+
+```text
+Task A: Move the billing module from callbacks to async/await. Keep the
+public API the same. Run the billing tests after each file. Stop and
+report when all billing tests pass. Do not commit.
+
+Task B: Review the auth package for missing input validation. Write
+findings to REVIEW.md with file and line. Do not change source files.
+```
+
+Check each session with `git branch --show-current` before it starts editing.
+
+### What worktrees do not separate
+
+Worktrees share repository history and run as your user. They do not give each task its own ports, database, credentials, or API quota. Two sessions can still change the same external service, and their branches can still conflict when you merge. Rerun your checks on the combined branch.
+
+## Run Claude Fable 5.2 in Paradev
+
+Paradev is a desktop app that runs Claude Code and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev does not proxy model calls: Claude Code runs on your own Claude plan or API key. Paradev is open source under the MIT License.
+
+From the app:
+
+1. Create a new workspace for each task.
+2. In the composer, choose **Claude Code** as the agent and **Fable 5.2** in the model picker. It is listed under **Pinned releases**; **Fable** under **Latest** follows the `fable` alias instead.
+3. Write the task prompt and start it. Repeat for the next task.
+4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+
+From the `superset` CLI, start a batch of Fable 5.2 workspaces and group them with a tag:
+
+```bash
+superset ws create --local --project PROJECT_ID --name fable-migration \
+  --branch ai/fable-migration --tag fable \
+  --agent claude --model claude-fable-5-2 \
+  --prompt "Move the billing module from callbacks to async/await"
+
+superset ws create --local --project PROJECT_ID --name fable-audit \
+  --branch ai/fable-audit --tag fable \
+  --agent claude --model claude-fable-5-2 \
+  --prompt "Review the auth package for missing input validation"
+
+superset ws list --local --tag fable
+```
+
+Tagged workspaces collect in a sidebar folder with the tag's name. `--effort` sets reasoning effort for the launch; omit it to use the Claude Code default. If you leave out `--model`, Claude Code starts on its own default model.
+
+To see whether Fable 5.2 is worth its price on your code, create two workspaces with the same prompt, one with `--model claude-fable-5-2` and one with `--model opus`, and compare the diffs. Long Fable runs do not need your laptop open: run them on a host you added through Remote Access, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud), and check on them from the [iPhone and iPad app](/mobile).
+
+## Frequently Asked Questions
+
+### Which Claude Code version do I need for Fable 5.2?
+
+Claude Code 2.1.321, released November 9, 2026. Run `claude --version` to check, then `claude --model fable` or `/model fable`.
+
+### Does the fable alias point to Fable 5.2?
+
+Yes, in most setups. Anthropic's docs say the `fable` alias resolves to Fable 5.2, except in Claude apps gateway sessions, where it resolves to Fable 5. Use `claude-fable-5-2` to pin the version.
+
+### How much does Claude Fable 5.2 cost?
+
+On the API, $8 per million input tokens and $40 per million output tokens, or $16 and $80 in fast mode. On Claude plans it counts toward your plan limits, and Anthropic is giving eligible paid plans extra Fable usage.
+
+### What is the difference between Fable 5.2 and Mythos 5.2?
+
+Anthropic says they are the same model. Fable 5.2 has stronger cyber and biology safeguards and is open to everyone. Mythos 5.2 is restricted to organizations in Anthropic's Cyber and Life Sciences Verification Programs.
+
+### Do parallel Fable 5.2 sessions share files?
+
+Not if each runs in its own Git worktree. They still share ports, databases, credentials, and your plan's usage limits, and their branches can conflict when merged.
+
+### Can I mix Fable 5.2 with Codex or other agents?
+
+Yes. In Paradev, each workspace runs the agent and model you choose, so a Claude Code session on Fable 5.2 can run next to Codex, OpenCode, or Gemini CLI on the same repository.
+
+### Where can I read more about running Claude Code in parallel?
+
+See [How to run multiple Claude Code agents in parallel](/compare/multiple-claude-code-agents-parallel), [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents), and [How to run GPT-6.1 Terra in parallel](/compare/run-gpt-6-1-terra-in-parallel).

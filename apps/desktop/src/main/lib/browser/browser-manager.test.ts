@@ -2,6 +2,7 @@ import {
 	afterAll,
 	afterEach,
 	beforeAll,
+	beforeEach,
 	describe,
 	expect,
 	mock,
@@ -649,6 +650,30 @@ describe("window.open handling", () => {
 		expect(emitted).toEqual([]);
 	});
 
+	test("an opened popup is announced, so extensions can hold it as a tab", () => {
+		const wc = register("pane-popup-tab");
+		const announced: unknown[] = [];
+		const listener = ({ window }: { window: unknown }) =>
+			announced.push(window);
+		browserManager.on("popup-created", listener);
+		try {
+			const popup = { webContents: makeWc().wc, on: () => {} };
+			const nested = { webContents: makeWc().wc, on: () => {} };
+			for (const created of wc.listeners.get("did-create-window") ?? [])
+				created(popup);
+			// Google opens a consent window from inside the sign-in popup; it is
+			// a tab of its own too.
+			for (const created of popup.webContents.listeners.get(
+				"did-create-window",
+			) ?? [])
+				created(nested);
+
+			expect(announced).toEqual([popup, nested]);
+		} finally {
+			browserManager.off("popup-created", listener);
+		}
+	});
+
 	test("a disallowed scheme is denied outright, popup or not", () => {
 		const wc = register("pane-scheme");
 		const emitted: string[] = [];
@@ -822,37 +847,58 @@ describe("CDP session and browser extensions", () => {
 });
 
 describe("right-click menu", () => {
-	test("lists the items extensions add, and only for the pane they asked about", () => {
-		const { Menu } = require("electron") as typeof import("electron");
-		const build = Menu.buildFromTemplate as unknown as ReturnType<typeof mock>;
-		const popup = mock();
+	const { Menu } = require("electron") as typeof import("electron");
+	const build = Menu.buildFromTemplate as unknown as ReturnType<typeof mock>;
+	const popup = mock();
+	const params = {
+		linkURL: "",
+		pageURL: "https://example.com",
+		selectionText: "bonjour",
+		editFlags: { canCopy: true, canPaste: false, canSelectAll: false },
+	};
+	const rightClick = (paneId: string) => {
+		const wc = Object.assign(register(paneId), {
+			canGoBack: () => false,
+			canGoForward: () => false,
+		});
+		for (const listener of wc.listeners.get("context-menu") ?? []) {
+			listener({}, params);
+		}
+		return wc;
+	};
+
+	beforeEach(() => {
+		popup.mockClear();
 		build.mockImplementation(() => ({ popup }));
+	});
+	afterEach(() => {
+		browserManager.setExtensionMenuItems(() => []);
+		build.mockImplementation(() => ({}));
+	});
+
+	test("lists the items extensions add, and only for the pane they asked about", () => {
 		const translate = { label: "Google Translate" } as Electron.MenuItem;
 		const asked: Electron.WebContents[] = [];
 		browserManager.setExtensionMenuItems((contents) => {
 			asked.push(contents);
 			return [translate];
 		});
-		const wc = Object.assign(register("pane-context-menu"), {
-			canGoBack: () => false,
-			canGoForward: () => false,
-		});
-		const params = {
-			linkURL: "",
-			pageURL: "https://example.com",
-			selectionText: "bonjour",
-			editFlags: { canCopy: true, canPaste: false, canSelectAll: false },
-		};
 
-		for (const listener of wc.listeners.get("context-menu") ?? []) {
-			listener({}, params);
-		}
+		const wc = rightClick("pane-context-menu");
 
 		const template = build.mock.calls.at(-1)?.[0] as unknown[];
 		expect(template).toContain(translate);
 		expect(asked).toEqual([wc as unknown as Electron.WebContents]);
 		expect(popup).toHaveBeenCalled();
-		browserManager.setExtensionMenuItems(() => []);
-		build.mockImplementation(() => ({}));
+	});
+
+	test("still opens when an extension's items throw", () => {
+		browserManager.setExtensionMenuItems(() => {
+			throw new Error("broken extension");
+		});
+
+		rightClick("pane-context-menu-broken");
+
+		expect(popup).toHaveBeenCalled();
 	});
 });

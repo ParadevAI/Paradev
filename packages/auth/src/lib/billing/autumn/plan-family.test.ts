@@ -2,7 +2,12 @@ import { describe, expect, test } from "bun:test";
 import type { PlanFamily } from "@superset/shared/billing";
 import { emailPlanFor, upgradedFrom } from "./plan-family";
 
-function family(key: string, name: string, gbMinutesPerSeat: number | null) {
+function family(
+	key: string,
+	name: string,
+	gbMinutesPerSeat: number | null,
+	advertisedGbHoursPerSeat: number | null,
+) {
 	return {
 		family: key,
 		name,
@@ -11,6 +16,7 @@ function family(key: string, name: string, gbMinutesPerSeat: number | null) {
 		yearly: null,
 		legacy: [],
 		gbMinutesPerSeat,
+		advertisedGbHoursPerSeat,
 		overagePerGbHour: null,
 		pack: null,
 		environments: null,
@@ -18,10 +24,17 @@ function family(key: string, name: string, gbMinutesPerSeat: number | null) {
 }
 
 const catalog = [
-	family("pro", "Pro", null),
-	family("team", "Team", 9600),
-	family("ultra", "Ultra", 48000),
+	family("pro", "Pro", 19200, null),
+	family("team", "Team", 9600, 160),
+	family("ultra", "Ultra", 48000, 800),
 ];
+
+describe("emailPlanFor", () => {
+	test("Pro emails leave out cloud hours that Pro still has", () => {
+		expect(emailPlanFor(catalog, "pro_monthly")?.cloudHoursPerSeat).toBeNull();
+		expect(emailPlanFor(catalog, "team_monthly")?.cloudHoursPerSeat).toBe(20);
+	});
+});
 
 describe("upgradedFrom", () => {
 	const team = emailPlanFor(catalog, "team_monthly");

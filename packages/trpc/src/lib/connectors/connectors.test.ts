@@ -508,6 +508,32 @@ describe("probeIdentity", () => {
 		expect(identity.user).toEqual({ id: "org_01", label: "Tegon" });
 	});
 
+	test("planetscale_mcp keys on email, since PlanetScale's sub is pairwise per client", async () => {
+		const calls = respond({ sub: "pairwise_01", email: "h@paradev.com" });
+
+		const identity = await probeIdentity(
+			"planetscale_mcp",
+			connectorMethod(requireConnector("planetscale_mcp")),
+			"oauth-test",
+		);
+
+		expect(calls).toEqual([
+			{
+				url: "https://auth.planetscale.com/oauth/userinfo",
+				method: "GET",
+				auth: "Bearer oauth-test",
+			},
+		]);
+		expect(identity.account).toEqual({
+			id: "h@paradev.com",
+			label: "h@paradev.com",
+		});
+		expect(identity.user).toEqual({
+			id: "h@paradev.com",
+			label: "h@paradev.com",
+		});
+	});
+
 	test("firecrawl_mcp takes the team and user from the token response", async () => {
 		const identity = await probeIdentity(
 			"firecrawl_mcp",
@@ -519,6 +545,19 @@ describe("probeIdentity", () => {
 
 		expect(identity.account).toEqual({ id: "team_01", label: null });
 		expect(identity.user).toEqual({ id: "user_01", label: null });
+	});
+
+	test("ahrefs_mcp keys on token_type, the one field a token response must carry", async () => {
+		const identity = await probeIdentity(
+			"ahrefs_mcp",
+			connectorMethod(requireConnector("ahrefs_mcp")),
+			"ahrefs_test",
+			undefined,
+			{ access_token: "ahrefs_test", token_type: "Bearer" },
+		);
+
+		expect(identity.account).toEqual({ id: "Bearer", label: null });
+		expect(identity.user).toEqual({ id: "Bearer", label: null });
 	});
 
 	test("stripe survives an account with no name", async () => {
@@ -835,10 +874,10 @@ describe("authorization response issuer (RFC 9207)", () => {
 
 describe("authorizeUrl for a dynamic client", () => {
 	const realFetch = globalThis.fetch;
-	const realBase = process.env.PLUGIN_CLIENT_METADATA_BASE_URL;
+	const realBrowser = process.env.BROWSER_API_URL;
 
 	beforeEach(() => {
-		process.env.PLUGIN_CLIENT_METADATA_BASE_URL = "https://api.test";
+		process.env.BROWSER_API_URL = "https://api.test";
 		const routes: Record<string, unknown> = {
 			"https://mcp.granola.ai/.well-known/oauth-protected-resource/mcp": {
 				resource: "https://mcp.granola.ai/mcp",
@@ -889,9 +928,8 @@ describe("authorizeUrl for a dynamic client", () => {
 
 	afterEach(() => {
 		globalThis.fetch = realFetch;
-		if (realBase === undefined)
-			delete process.env.PLUGIN_CLIENT_METADATA_BASE_URL;
-		else process.env.PLUGIN_CLIENT_METADATA_BASE_URL = realBase;
+		if (realBrowser === undefined) delete process.env.BROWSER_API_URL;
+		else process.env.BROWSER_API_URL = realBrowser;
 	});
 
 	test("granola_mcp names the resource and asks for its scopes", async () => {

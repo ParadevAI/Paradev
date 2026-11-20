@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import {
 	buildFixFindingsPrompt,
 	buildResolveConflictsPrompt,
+	buildRestackPrompt,
 } from "./buildPullRequestRepairPrompts";
 
 const detail = {
@@ -89,5 +90,20 @@ describe("buildResolveConflictsPrompt", () => {
 		const prompt = buildResolveConflictsPrompt(detail);
 		expect(prompt).toContain("conflicts with its base branch `main`");
 		expect(prompt).toContain("`feat/x`");
+	});
+});
+
+describe("buildRestackPrompt", () => {
+	it("gives the rebase boundary and the branch to land on", () => {
+		const prompt = buildRestackPrompt({
+			number: 12,
+			url: "https://github.com/o/r/pull/12",
+			headRefName: "feat/top",
+			baseRefName: "main",
+			merged: { number: 11, headRefOid: "abc123" },
+		});
+		expect(prompt).toContain("was stacked on PR #11");
+		expect(prompt).toContain("git rebase --onto <remote>/main abc123");
+		expect(prompt).toContain("--force-with-lease");
 	});
 });

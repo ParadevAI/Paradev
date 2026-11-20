@@ -53,11 +53,14 @@ describe("AGENT_MODEL_SUPPORT", () => {
 });
 
 describe("SUPERSET_CHAT_MODELS", () => {
-	it("includes opus 5, fable 5.1, and the current OpenAI models", () => {
+	it("includes opus 5, fable 5.2, fable 5.1, and the current OpenAI models", () => {
 		const ids = SUPERSET_CHAT_MODELS.map((model) => model.id);
 		expect(ids).toContain("anthropic/claude-opus-5-5");
 		expect(ids).toContain("anthropic/claude-opus-5");
+		expect(ids).toContain("anthropic/claude-fable-5-2");
 		expect(ids).toContain("anthropic/claude-fable-5-1");
+		expect(ids).toContain("openai/gpt-6.2-astra");
+		expect(ids).toContain("openai/gpt-6.2-sol");
 		expect(ids).toContain("openai/gpt-6.1-sol");
 		expect(ids).toContain("openai/gpt-6-astra");
 		expect(ids).toContain("openai/gpt-6-sol");
@@ -125,6 +128,7 @@ describe("buildAgentModelArgs", () => {
 		// Aliases follow the CLI's newest model; teams standardising on one
 		// release need an id that stays put.
 		expect(ids).toContain("opus");
+		expect(ids).toContain("claude-fable-5-2");
 		expect(ids).toContain("claude-fable-5-1");
 		expect(ids).toContain("claude-opus-4-8");
 		expect(ids).toContain("claude-opus-4-7");
@@ -139,6 +143,7 @@ describe("buildAgentModelArgs", () => {
 			models.find((model) => model.id === id)?.group;
 		expect(groupOf("opus")).toBe("Latest");
 		expect(groupOf("claude-opus-4-8")).toBe("Pinned releases");
+		expect(groupOf("claude-fable-5-2")).toBe("Pinned releases");
 		expect(groupOf("claude-fable-5-1")).toBe("Pinned releases");
 		// The header carries the distinction, so labels stay bare.
 		expect(models.find((model) => model.id === "opus")?.label).toBe("Opus");
@@ -203,6 +208,13 @@ describe("buildAgentModelArgs", () => {
 		}
 	});
 
+	it("offers fable 5.2 in omp, whose catalog already lists it", () => {
+		expect(buildAgentModelArgs("omp", "anthropic/claude-fable-5-2")).toEqual([
+			"--model",
+			"anthropic/claude-fable-5-2",
+		]);
+	});
+
 	it("includes every GPT-5.6 Codex model", () => {
 		for (const model of ["gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"]) {
 			expect(buildAgentModelArgs("codex", model)).toEqual(["--model", model]);
@@ -211,6 +223,8 @@ describe("buildAgentModelArgs", () => {
 
 	it("offers every GPT-6 Codex model", () => {
 		for (const model of [
+			"gpt-6.2-sol",
+			"gpt-6.2-astra",
 			"gpt-6.1-sol",
 			"gpt-6-astra",
 			"gpt-6.1-terra",
@@ -399,6 +413,32 @@ describe("buildAgentEffortArgs", () => {
 		expect(
 			buildAgentEffortArgs("cursor-agent", "low", "claude-opus-5-high"),
 		).toEqual([]);
+	});
+
+	it("offers ultra on GPT-6.2 Astra and Sol", () => {
+		for (const model of ["gpt-6.2-astra", "gpt-6.2-sol"]) {
+			expect(buildAgentEffortArgs("codex", "ultra", model)).toEqual([
+				"-c",
+				"model_reasoning_effort=ultra",
+			]);
+		}
+	});
+
+	it("offers fable 5.2 and gpt-6.2 in opencode, and fable 5.2 in copilot", () => {
+		for (const model of [
+			"anthropic/claude-fable-5-2",
+			"openai/gpt-6.2-astra",
+			"openai/gpt-6.2-sol",
+		]) {
+			expect(buildAgentModelArgs("opencode", model)).toEqual([
+				"--model",
+				model,
+			]);
+		}
+		expect(buildAgentModelArgs("copilot", "claude-fable-5.2")).toEqual([
+			"--model",
+			"claude-fable-5.2",
+		]);
 	});
 
 	it("builds every GPT-6.1 Sol reasoning effort", () => {

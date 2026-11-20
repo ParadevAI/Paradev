@@ -293,7 +293,7 @@ export function ImportHistoryDialog({
 												{source.browserName}
 												<span className="text-muted-foreground">
 													{" "}
-													— {source.profileName}
+													· {source.profileName}
 												</span>
 											</span>
 										</Label>

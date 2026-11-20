@@ -51,7 +51,7 @@ export default command({
 				"Machine size of each run's new cloud workspace: `small`, `medium` (the default) or `large`; `xlarge` and `2xlarge` where your plan includes them. Implies --cloud",
 			),
 		continueSession: boolean().desc(
-			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Requires --workspace",
+			"Deliver each run's prompt into the agent session the previous run left, instead of starting another. Without --workspace, the first run's workspace is kept for the next runs",
 		),
 		host: string().desc(
 			"Host the target project/workspace lives on, or `cloud` for --cloud (default: this machine)",

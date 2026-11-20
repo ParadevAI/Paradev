@@ -89,6 +89,8 @@ export type PromptInputCommand = {
 	searchAliases?: string[];
 	// Tab inserts this chip in place of the typed command instead of selecting.
 	completion?: ComposerChip;
+	// Offered mid-sentence too, not only when the command starts the message.
+	inline?: boolean;
 	onSelect(ctx: ComposerActionContext): void | Promise<void>;
 };
 
@@ -175,7 +177,8 @@ export type PromptInputProps = {
 	layout?: PromptInputLayout;
 	mentionProviders: ComposerMentionProvider[];
 	commands: PromptInputCommand[];
-	status?: "ready" | "streaming";
+	// "background": a turn runs but offers no Stop; Enter queues, ⌘↩ steers.
+	status?: "ready" | "streaming" | "background";
 	// Enables the mic button; the app owns speech-to-text.
 	dictation?: PromptInputDictation;
 	toolbar?: ReactNode;

@@ -37,9 +37,10 @@ import type { Hono } from "hono";
 import { getSupervisor } from "../daemon/index.ts";
 import { isProcessAlive, readPtyDaemonManifest } from "../daemon/manifest.ts";
 import type { HostDb } from "../db/index.ts";
-import { projects, terminalSessions, workspaces } from "../db/schema.ts";
+import { terminalSessions, workspaces } from "../db/schema.ts";
 import type { EventBus } from "../events/index.ts";
 import { chatPortTerminalIds, portManager } from "../ports/port-manager.ts";
+import { getProjectIncludingDeleted } from "../projects/local-project-store.ts";
 import {
 	getPathState,
 	inaccessiblePathMessage,
@@ -894,7 +895,9 @@ export type TerminalSessionErrorKind =
 	 * Retrying will fail the same way; this is the only kind that means "we
 	 * have a bug or a broken install".
 	 */
-	| "TERMINAL_START_FAILED";
+	| "TERMINAL_START_FAILED"
+	/** The target is a chat, which has no input to hold unsent or empty text. */
+	| "CHAT_NEEDS_SUBMITTED_TEXT";
 
 export type TerminalSessionError = {
 	inputStaged?: true;
@@ -2969,6 +2972,15 @@ export function getPendingTerminalWorkspaceId(
 	return lifecycleOperations.getWorkspaceId(terminalId);
 }
 
+function announceListed(session: TerminalSession): void {
+	session.eventBus?.broadcastTerminalLifecycle({
+		workspaceId: session.workspaceId,
+		terminalId: session.terminalId,
+		eventType: "listed",
+		occurredAt: Date.now(),
+	});
+}
+
 export function createTerminalSessionInternal(
 	options: CreateTerminalSessionOptions,
 ): Promise<TerminalSession | CreateSessionError> {
@@ -3031,7 +3043,10 @@ async function createTerminalSessionUnlocked({
 		if (mismatchError)
 			return { kind: "SESSION_WRONG_WORKSPACE", error: mismatchError };
 
-		if (listed) existing.listed = true;
+		if (listed && !existing.listed) {
+			existing.listed = true;
+			announceListed(existing);
+		}
 		if (initialCommand) queueInitialCommand(existing, initialCommand);
 		return existing;
 	}
@@ -3069,9 +3084,7 @@ async function createTerminalSessionUnlocked({
 	// (null projectId) have no main repo; the session dir is the only root.
 	let rootPath = "";
 	const project = workspace.projectId
-		? db.query.projects
-				.findFirst({ where: eq(projects.id, workspace.projectId) })
-				.sync()
+		? getProjectIncludingDeleted(db, workspace.projectId)
 		: undefined;
 	if (project?.repoPath) {
 		rootPath = project.repoPath;
@@ -3344,6 +3357,7 @@ async function createTerminalSessionUnlocked({
 	reclaimSession = session;
 	sessions.set(terminalId, session);
 	portManager.upsertSession(terminalId, workspaceId, pty.pid);
+	if (session.listed) announceListed(session);
 
 	if (session.shellReadyState === "pending") {
 		// Size the wait to observed reality: on machines whose profile never

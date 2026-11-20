@@ -43,6 +43,8 @@ import {
 	gte,
 	ilike,
 	inArray,
+	isNotNull,
+	isNull,
 	notInArray,
 	sql,
 } from "drizzle-orm";
@@ -50,11 +52,17 @@ import { z } from "zod";
 import { env } from "../../env";
 import { assertCloudAccess } from "../../lib/cloud-guards";
 import { nudge } from "../../lib/realtime";
-import { personProcedure, planRequiredError, userError } from "../../trpc";
+import {
+	personProcedure,
+	planRequiredError,
+	type TRPCContext,
+	userError,
+} from "../../trpc";
 import {
 	assertMachineSizeOffered,
 	loadUsableEnvironment,
 } from "../cloud-workspace/start";
+import { findHostForCloudWorkspace } from "../host/findHostForCloudWorkspace";
 import { joinSlackTriggerChannels } from "../integration/slack/joinChannels";
 import {
 	requireActiveOrgMembership,
@@ -62,6 +70,7 @@ import {
 } from "../utils/active-org";
 import { dispatchAutomation } from "./dispatch";
 import {
+	assertNotArchived,
 	automationBaseColumns,
 	automationNotFound,
 	getAutomationForUser,
@@ -69,12 +78,13 @@ import {
 	promptSourceFromSession,
 	recordPromptVersion,
 	refreshScheduleNextRuns,
-	requireAutomationDeleteAccess,
+	requireAutomationArchiveAccess,
 	resolveAutomationGroup,
 	scheduleSummariesFor,
 	summarizeSchedules,
 	syncScheduleTrigger,
 } from "./helpers";
+import { assertSandboxTargetAccess } from "./sandboxTargetAccess";
 import {
 	createAutomationSchema,
 	listOrgRunsSchema,
@@ -167,6 +177,20 @@ async function verifyHostAccess(
 	}
 }
 
+async function archiveAutomation(
+	ctx: Parameters<typeof requireActiveOrgMembership>[0],
+	id: string,
+) {
+	const organizationId = await requireActiveOrgMembership(ctx);
+	await requireAutomationArchiveAccess(ctx.session.user.id, organizationId, id);
+
+	await db
+		.update(automations)
+		.set({ archivedAt: new Date(), enabled: false })
+		.where(and(eq(automations.id, id), isNull(automations.archivedAt)));
+	nudge(organizationId, "automation_runs");
+}
+
 /**
  * The one run query. Both run lists read through this: All runs org-wide, and
  * an automation's own history as the same list filtered to it. Two queries
@@ -215,7 +239,7 @@ function selectRuns(args: {
 				eq(automationRuns.organizationId, args.organizationId),
 				args.automationId
 					? eq(automationRuns.automationId, args.automationId)
-					: undefined,
+					: isNull(automations.archivedAt),
 				args.status === "failed"
 					? inArray(automationRuns.status, [...FAILED_RUN_STATUSES])
 					: args.status === "missed"
@@ -270,7 +294,9 @@ function assertPromptFitsTarget(targetHostId: string | null, prompt: string) {
 
 /** Looks up what the input names, plans the target, then runs the checks the plan asks for. */
 async function resolveTarget(
-	ctx: { session: { user: { id: string; email: string } } },
+	ctx: Pick<TRPCContext, "sandboxCaller"> & {
+		session: { user: { id: string; email: string } };
+	},
 	organizationId: string,
 	existing: AutomationTarget,
 	input: TargetInput,
@@ -294,6 +320,11 @@ async function resolveTarget(
 	}
 
 	const plan = planTarget(existing, input, lookups);
+	await assertSandboxTargetAccess(
+		ctx.sandboxCaller,
+		plan.target.targetHostId,
+		findHostForCloudWorkspace,
+	);
 	for (const hostId of plan.hostsToVerify) {
 		await verifyHostAccess(userId, organizationId, hostId);
 	}
@@ -330,7 +361,7 @@ async function ownCloudWorkspaceEnvironment(
 		where: and(
 			eq(cloudWorkspaces.id, cloudWorkspaceId),
 			eq(cloudWorkspaces.organizationId, organizationId),
-			notInArray(cloudWorkspaces.status, ["deleted", "failed"]),
+			notInArray(cloudWorkspaces.status, ["archived", "failed"]),
 		),
 		columns: { environmentId: true, createdByUserId: true },
 	});
@@ -454,6 +485,10 @@ export const automationRouter = {
 						.min(1)
 						.optional()
 						.describe("Case-insensitive substring match on automation name."),
+					archived: z
+						.boolean()
+						.optional()
+						.describe("List archived automations instead of active ones."),
 				})
 				.optional(),
 		)
@@ -466,6 +501,9 @@ export const automationRouter = {
 				.where(
 					and(
 						eq(automations.organizationId, organizationId),
+						input?.archived
+							? isNotNull(automations.archivedAt)
+							: isNull(automations.archivedAt),
 						input?.name
 							? ilike(automations.name, `%${escapeLikePattern(input.name)}%`)
 							: undefined,
@@ -561,6 +599,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent,
 			);
@@ -682,6 +721,7 @@ export const automationRouter = {
 					cloudWorkspaceId: input.cloudWorkspaceId,
 					environmentId: input.environmentId,
 					continueAgentSession: input.continueAgentSession,
+					reuseWorkspace: input.reuseWorkspace,
 				},
 				input.agent ?? existing.agent,
 			);
@@ -826,13 +866,39 @@ export const automationRouter = {
 		.input(setAutomationGroupSchema)
 		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await getAutomationForUser(ctx.session.user.id, organizationId, input.id);
+			const existing = await getAutomationForUser(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
+			);
 
 			const group = await resolveAutomationGroup(organizationId, input.group);
-			await db
+			const [updated] = await db
 				.update(automations)
 				.set({ group })
-				.where(eq(automations.id, input.id));
+				.where(
+					and(
+						eq(automations.id, input.id),
+						ctx.sandboxCaller
+							? existing.targetHostId === null
+								? isNull(automations.targetHostId)
+								: eq(automations.targetHostId, existing.targetHostId)
+							: undefined,
+					),
+				)
+				.returning({ id: automations.id });
+			if (ctx.sandboxCaller && !updated) {
+				throw userError({
+					code: "NOT_FOUND",
+					message: "Automation not found",
+					i18nKey: "serverError.automation.automationNotFound",
+				});
+			}
 
 			return { id: input.id, group };
 		}),
@@ -846,6 +912,11 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
+			);
 
 			if (existing.prompt === input.prompt) {
 				return { ...existing, scheduleText: safeDescribeRrule(existing) };
@@ -856,7 +927,16 @@ export const automationRouter = {
 				const [row] = await tx
 					.update(automations)
 					.set({ prompt: input.prompt })
-					.where(eq(automations.id, input.id))
+					.where(
+						and(
+							eq(automations.id, input.id),
+							ctx.sandboxCaller
+								? existing.targetHostId === null
+									? isNull(automations.targetHostId)
+									: eq(automations.targetHostId, existing.targetHostId)
+								: undefined,
+						),
+					)
 					.returning();
 
 				if (!row) {
@@ -888,17 +968,65 @@ export const automationRouter = {
 			};
 		}),
 
+	/** @deprecated Archives; use `archive`. Released clients still call it. */
 	delete: personProcedure
 		.input(z.object({ id: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	/** Archive an automation: it stops firing and leaves the list. `unarchive` restores it, paused. */
+	archive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			await archiveAutomation(ctx, input.id);
+			return { ok: true };
+		}),
+
+	unarchive: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
 			const organizationId = await requireActiveOrgMembership(ctx);
-			await requireAutomationDeleteAccess(
+			await requireAutomationArchiveAccess(
 				ctx.session.user.id,
 				organizationId,
 				input.id,
 			);
 
-			await db.delete(automations).where(eq(automations.id, input.id));
+			await db
+				.update(automations)
+				.set({ archivedAt: null })
+				.where(eq(automations.id, input.id));
+			nudge(organizationId, "automation_runs");
+
+			return { ok: true };
+		}),
+
+	/** Permanently delete an archived automation and its run history. */
+	deleteArchived: personProcedure
+		.input(z.object({ id: z.string().uuid() }))
+		.mutation(async ({ ctx, input }) => {
+			const organizationId = await requireActiveOrgMembership(ctx);
+			await requireAutomationArchiveAccess(
+				ctx.session.user.id,
+				organizationId,
+				input.id,
+			);
+
+			const [deleted] = await db
+				.delete(automations)
+				.where(
+					and(eq(automations.id, input.id), isNotNull(automations.archivedAt)),
+				)
+				.returning({ id: automations.id });
+			if (!deleted) {
+				throw userError({
+					code: "PRECONDITION_FAILED",
+					message: "Archive this automation before you delete it.",
+					i18nKey: "serverError.automation.archiveBeforeDelete",
+				});
+			}
 			nudge(organizationId, "automation_runs");
 
 			return { ok: true };
@@ -916,14 +1044,29 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+			await assertSandboxTargetAccess(
+				ctx.sandboxCaller,
+				existing.targetHostId,
+				findHostForCloudWorkspace,
+			);
 
+			if (input.enabled) assertNotArchived(existing);
 			const resuming = input.enabled && !existing.enabled;
 
 			const updated = await dbWs.transaction(async (tx) => {
 				const [row] = await tx
 					.update(automations)
 					.set({ enabled: input.enabled })
-					.where(eq(automations.id, input.id))
+					.where(
+						and(
+							eq(automations.id, input.id),
+							ctx.sandboxCaller
+								? existing.targetHostId === null
+									? isNull(automations.targetHostId)
+									: eq(automations.targetHostId, existing.targetHostId)
+								: undefined,
+						),
+					)
 					.returning();
 
 				if (!row) {
@@ -962,6 +1105,8 @@ export const automationRouter = {
 				organizationId,
 				input.id,
 			);
+
+			assertNotArchived(automation);
 
 			// The dispatcher refuses this too, but through runNow it would surface
 			// as a 500 — an expected user state, not a server fault.
@@ -1270,10 +1415,12 @@ export const automationRouter = {
 				count: sql<number>`count(*)::int`,
 			})
 			.from(automationRuns)
+			.innerJoin(automations, eq(automations.id, automationRuns.automationId))
 			.where(
 				and(
 					eq(automationRuns.organizationId, organizationId),
 					gte(automationRuns.createdAt, since),
+					isNull(automations.archivedAt),
 				),
 			)
 			.groupBy(sql`1`, automationRuns.status);

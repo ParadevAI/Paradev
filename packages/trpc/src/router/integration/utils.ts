@@ -7,8 +7,12 @@ import { userError } from "../../i18n-error";
 export async function verifyOrgMembership(
 	userId: string,
 	organizationId: string,
+	database?: Parameters<typeof findOrgMembership>[1],
 ) {
-	const membership = await findOrgMembership({ userId, organizationId });
+	const membership = await findOrgMembership(
+		{ userId, organizationId },
+		database,
+	);
 
 	if (!membership) {
 		throw userError({

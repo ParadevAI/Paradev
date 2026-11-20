@@ -34,11 +34,11 @@ create_reward() {
 echo "== checking the Autumn key"
 autumn rewards.list '{}' >/dev/null
 
-create_reward yc-bookface-6mo-pro '{"coupon":{
-	"id":"yc-bookface-6mo-pro","name":"YC Bookface: 6 months Pro free",
+create_reward yc-bookface-3mo-team '{"coupon":{
+	"id":"yc-bookface-3mo-team","name":"YC Bookface: 3 months Team free",
 	"type":"percentage_discount","value":100,
-	"duration":{"type":"months","length":6},
-	"plan_ids":["pro_seat"],"promo_codes":[]}}'
+	"duration":{"type":"months","length":3},
+	"plan_ids":["team_seat"],"promo_codes":[]}}'
 
 create_reward startup-1-month-free '{"coupon":{
 	"id":"startup-1-month-free","name":"Startup 1 month free",
@@ -79,4 +79,4 @@ stripe promotion_codes list -d code=SHORTLISTMCR --live |
 
 echo "== rewards.list (new rewards only)"
 autumn rewards.list '{}' | jq '[.coupons[] |
-	select(.id | IN("yc-bookface-6mo-pro","startup-1-month-free","student-free-pro","shortlist-manchester-2026-1-month"))]'
+	select(.id | IN("yc-bookface-3mo-team","startup-1-month-free","student-free-pro","shortlist-manchester-2026-1-month"))]'

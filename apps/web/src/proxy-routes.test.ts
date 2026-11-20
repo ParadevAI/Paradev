@@ -1,6 +1,9 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+	adminReturnUrl,
+	agentsRewriteUrl,
+	isAgentsRoute,
 	isAuthPageRoute,
 	isInternalRoute,
 	isPublicRoute,
@@ -13,6 +16,7 @@ describe("isPublicRoute", () => {
 		"/sign-in/callback",
 		"/sign-up",
 		"/auth/desktop",
+		"/auth/integration-connect",
 		"/auth/desktop/success",
 		"/api/auth/desktop",
 		"/api/auth/desktop/callback",
@@ -40,6 +44,7 @@ describe("isPublicRoute", () => {
 		"/sign-internal/settings",
 		"/sign-upgrade",
 		"/auth/desktopish",
+		"/auth/integration-connect-other",
 		"/api/auth/desktopish",
 		"/accept-invitation-list",
 		"/cli/auth/codegen",
@@ -118,5 +123,91 @@ describe("safeRedirectUrl", () => {
 	test("rejects auth pages so a signed-in redirect cannot loop", () => {
 		expect(safeRedirectUrl("/sign-in?redirect=/x", origin)).toBeNull();
 		expect(safeRedirectUrl("/sign-up", origin)).toBeNull();
+	});
+});
+
+describe("isAgentsRoute", () => {
+	test.each([
+		"/agents",
+		"/agents/",
+		"/agents/workspace/abc",
+	])("matches %s", (pathname: string) => {
+		expect(isAgentsRoute(pathname)).toBe(true);
+	});
+
+	test.each([
+		"/agentsy",
+		"/",
+		"/workspaces/abc",
+	])("does not match %s", (pathname: string) => {
+		expect(isAgentsRoute(pathname)).toBe(false);
+	});
+});
+
+describe("agentsRewriteUrl", () => {
+	test("keeps the path and query on the agents deployment", () => {
+		const url = agentsRewriteUrl(
+			new URL("https://app.superset.sh/agents/workspace/abc?tab=chat"),
+			"https://superset-agents.vercel.app",
+		);
+		expect(url.href).toBe(
+			"https://superset-agents.vercel.app/agents/workspace/abc?tab=chat",
+		);
+	});
+});
+
+describe("adminReturnUrl", () => {
+	const admin = "https://admin.example.com";
+
+	test("keeps a URL on exactly the admin origin, path and query", () => {
+		expect(adminReturnUrl(`${admin}/hiring/1?tab=x`, admin)?.href).toBe(
+			`${admin}/hiring/1?tab=x`,
+		);
+		expect(
+			adminReturnUrl(`${admin}/hiring`, `${admin}/ignored/path`),
+		).not.toBeNull();
+	});
+
+	test.each([
+		null,
+		"",
+		"/hiring",
+		"//admin.example.com/x",
+		"https://evil.example/x",
+		"https://evil.example@admin.example.com/x",
+		"https://admin.example.com@evil.example/x",
+		"https://admin.example.com:8443/x",
+		"http://admin.example.com/x",
+		"https://admin.example.com.evil.example/x",
+		"https://evil-admin.example.com/x",
+		"https://sub.admin.example.com/x",
+		"https://other.example.com/x",
+		"https:\\\\evil.example\\x",
+		"https:/\\evil.example/x",
+		"javascript:alert(1)",
+		"data:text/html,x",
+	])("rejects %s", (redirect) => {
+		expect(adminReturnUrl(redirect, admin)).toBeNull();
+	});
+
+	test("a backslash after the host stays on the admin origin", () => {
+		const url = adminReturnUrl(
+			"https://admin.example.com\\@evil.example/x",
+			admin,
+		);
+		expect(url?.href).toBe(`${admin}/@evil.example/x`);
+	});
+
+	test("matches nothing when the admin URL is malformed", () => {
+		expect(adminReturnUrl(`${admin}/x`, "not a url")).toBeNull();
+	});
+
+	test("matches nothing when the admin URL is not http or https", () => {
+		expect(adminReturnUrl("data:text/html,x", "data:text/html,y")).toBeNull();
+		expect(adminReturnUrl("file:///etc/passwd", "file:///tmp")).toBeNull();
+	});
+
+	test("matches nothing when no admin URL is configured", () => {
+		expect(adminReturnUrl(`${admin}/x`, undefined)).toBeNull();
 	});
 });

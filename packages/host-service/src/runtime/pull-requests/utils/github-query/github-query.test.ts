@@ -228,6 +228,35 @@ describe("GitHub pull request REST queries", () => {
 		expect(result?.headRepository?.name).toBe("fork-repo");
 	});
 
+	test("prefers an open PR over a more recently updated merged one on the same head", async () => {
+		const pr = (number: number, state: string, mergedAt: string | null) => ({
+			number,
+			title: `PR ${number}`,
+			html_url: `https://github.com/superset-sh/superset/pull/${number}`,
+			state,
+			draft: false,
+			merged_at: mergedAt,
+			updated_at: "2026-05-08T12:00:00Z",
+			head: {
+				ref: "fix/sidebar",
+				sha: `sha-${number}`,
+				repo: { name: "superset", owner: { login: "superset-sh" } },
+			},
+			base: { repo: { full_name: "superset-sh/superset" } },
+		});
+		const { execGh } = createExecGh([
+			[pr(350, "closed", "2026-01-05T10:00:00Z"), pr(5700, "open", null)],
+		]);
+
+		const result = await fetchPullRequestByHeadFromGh(
+			execGh,
+			{ owner: "superset-sh", name: "superset" },
+			{ owner: "superset-sh", repo: "superset", branch: "fix/sidebar" },
+		);
+
+		expect(result?.number).toBe(5700);
+	});
+
 	// The per-head candidate filter is exact on the branch: it must NOT match a
 	// case-variant head, so distinct case-variant branches never cross-match
 	// here. Case drift is recovered by the runtime's open-PR sweep instead.

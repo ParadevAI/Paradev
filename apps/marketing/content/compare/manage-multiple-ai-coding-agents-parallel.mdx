@@ -2,7 +2,7 @@
 title: "How to Run and Manage Multiple AI Coding Agents in Parallel"
 description: "Run several AI coding agents at once with Git worktrees and persistent terminals: set up separate workspaces, orchestrate the sessions, and switch tasks without losing context."
 date: 2026-10-14
-lastUpdated: 2026-10-21
+lastUpdated: 2026-11-05
 type: "tutorial"
 competitors:
   - claude-code
@@ -25,7 +25,7 @@ Running one coding agent is easy. Running four at once, on the same repository, 
 2. Orchestrate the agent sessions
 3. Manage context and switch between tasks
 
-It works with any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, OpenCode, and others. Each step shows the manual way and the way it works in [Paradev](/), a desktop workspace for running CLI coding agents in parallel.
+It works with any CLI agent: Claude Code, Codex, Cursor's agent, Antigravity CLI, OpenCode, and others. Each step shows the manual way and the way it works in [Paradev](/), an open-source (MIT) desktop workspace for running CLI coding agents in parallel.
 
 ---
 
@@ -101,7 +101,7 @@ In Paradev, each task is a workspace with its own terminals, Changes pane, and b
 
 ## Other Tools for Parallel Agents
 
-- **Conductor:** a Mac app for Claude Code, Codex, Cursor, and OpenCode, with managed cloud workspaces on paid plans
+- **Conductor:** a Mac app for Claude Code, Codex, Cursor, and OpenCode. It is joining Meta and is closed to new users, and Conductor Cloud shuts down on November 20, 2026. Existing users can move to Paradev from the [Mac app](https://docs.paradev.com/migrate-from-conductor) or from [Conductor Cloud](https://docs.paradev.com/migrate-from-conductor-cloud).
 - **Orca:** a free, open-source environment for macOS, Windows, and Linux
 - **Herdr:** a terminal runtime where agents keep running when clients disconnect
 - **Do it yourself:** Git worktrees plus tmux, which works anywhere but leaves setup, status, and review to you
@@ -132,7 +132,7 @@ Yes. Paradev starts each agent's own CLI with your own login or API key and does
 
 ### Is there a desktop app for running Claude Code and Codex side by side with a visual diff review?
 
-Yes. Paradev is a desktop app for macOS, with an experimental Linux build. Each agent runs in its own workspace, and the Changes pane shows that workspace's diff, so you review each agent's work on its own. Conductor and Orca are other desktop options.
+Yes. Paradev is a desktop app for macOS, with an experimental Linux build. Agents can also run on a Remote Access host, on your own Linux server with [Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud), or in [cloud workspaces](https://docs.paradev.com/cloud-workspaces). Each agent runs in its own workspace, and the Changes pane shows that workspace's diff, so you review each agent's work on its own. Conductor and Orca are other desktop options.
 
 ### How do I see which agents need input across several repositories?
 

@@ -39,16 +39,17 @@ export function ExtensionToolbarButton({
 							aria-expanded={popupOpen}
 							onClick={(event) => onActivate(event.currentTarget)}
 							className={cn(
-								"shrink-0 rounded-md p-1 transition-colors",
+								"shrink-0 rounded-md p-[5px] transition-colors",
 								popupOpen
 									? "bg-accent text-accent-foreground"
 									: "text-muted-foreground/70 hover:bg-muted/50 hover:text-foreground",
 							)}
 						>
-							<span className="relative block size-3.5">
-								<ExtensionIcon extension={extension} className="size-3.5" />
+							<span className="relative block size-3">
+								<ExtensionIcon extension={extension} className="size-3" />
 								{badge && (
 									<CountBadge
+										size="sm"
 										aria-hidden="true"
 										style={
 											color

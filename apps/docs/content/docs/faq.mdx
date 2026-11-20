@@ -11,7 +11,7 @@ import { COMPANY, SOCIAL } from "@superset/shared/constants";
 macOS (Apple Silicon and Intel) is the supported target. A Linux x64 AppImage ships with each release but is experimental and untested. Windows is planned with no date. The CLI also supports Linux x64 and arm64.
 
 **Is Paradev a terminal app?**
-No. It's a desktop app with a full interface. Agents run in terminals, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
+No. Agents run in terminals, and next to them you get the [Changes pane](/diff-viewer), [pull requests](/pull-requests) with checks and review threads, an [in-app browser](/browser) with Design Mode, and a [file editor](/editor).
 
 **Is there a mobile app or web dashboard?**
 Yes, [Paradev for iPhone and iPad](/install#iphone-and-ipad) is on the App Store. It needs iOS 26 or iPadOS 26 or later and Paradev Pro. Push notifications are coming. Android is not available yet; join the [Android waitlist](https://paradev.com/mobile#android). There's no supported web dashboard today.
@@ -40,7 +40,7 @@ No. Paradev never proxies model calls. Agents use your own subscriptions and API
 Open **Settings → Billing**. From there you can cancel or restore your plan, switch between monthly and yearly billing, and open the billing portal to update your payment method or download invoices.
 
 **How do I get a refund, or ask a billing question?**
-Email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>. Refunds are handled promptly.
+Email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>.
 
 **How do I delete my account, change my email, or move projects between orgs?**
 These aren't self-serve yet; email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EMAIL}</a>.
@@ -48,7 +48,7 @@ These aren't self-serve yet; email <a href={COMPANY.MAIL_TO}>{COMPANY.SUPPORT_EM
 ## Workspaces and Git
 
 **Do I need a git repo?**
-For projects, yes: every project must be a git repository, and its workspaces are git worktrees. For a fresh folder, run `git init && git add -A && git commit -m "init"` first. If you just want a scratch space without setting up a repo, create a [session](/workspaces#sessions) instead.
+For projects, yes: every project must be a git repository, and its workspaces are git worktrees. For a fresh folder, run `git init && git add -A && git commit -m "init"` first. For a scratch space without a repo, create a [session](/workspaces#sessions).
 
 **Is each worktree a sandbox?**
 No. A worktree gives each task its own working files and branch. Agents still run on the same machine, so they share processes, the network, and files outside the worktree. Worktrees also don't prevent merge conflicts.
@@ -66,7 +66,7 @@ Paradev moves its folder from `~/.superset` to `~/.paradev` the first time an up
 No. Paradev still reads a repo's config from `.superset/` and keeps editing it there. New repos get `.paradev/`. To move an existing one, once everyone on the team runs a current Paradev, do it in one commit: move the files from `.superset/` into `.paradev/` (keep anything already in `.paradev/`, such as pdev's `settings.json`; `git mv .superset .paradev` is only right when `.paradev/` doesn't exist yet), and change any `./.superset/` paths in your config commands and scripts to `./.paradev/`.
 
 **I already have worktrees from another tool.**
-Use the **Import** tab in the New Workspace modal to bring existing worktrees in. See [Workspaces](/workspaces).
+Use the **Import** tab in the New Workspace modal to bring existing worktrees in. See [Workspaces](/workspaces). Coming from Conductor? Follow [Migrate from Conductor](/migrate-from-conductor) or [Migrate from Conductor Cloud](/migrate-from-conductor-cloud).
 
 **Why did my branch get a random name like `interesting-forest`?**
 Branch names are generated from your prompt by a small model. When no usable model credential is available, naming falls back to random words; check your connected models in Settings.
@@ -80,7 +80,7 @@ It removes that worktree and runs your [lifecycle teardown scripts](/setup-teard
 See [AI Agents](/agent-integration) for the full list. If an installed agent doesn't appear in launchers, check it's **Enabled** under **Settings → Agents**.
 
 **Where do I set the model or reasoning effort an agent launches with?**
-Under **Settings → Agents**, per agent. Preset-level tweaks don't override the agent's own launch settings.
+Under **Settings → Agents**, per agent. Preset-level tweaks do not override the agent's own launch settings.
 
 **Why did Paradev add hooks to my agent configs?**
 Paradev installs lifecycle hooks and command wrappers (in `~/.paradev/bin`) so it can show agent status and send finished/waiting notifications. Removing them disables those features.

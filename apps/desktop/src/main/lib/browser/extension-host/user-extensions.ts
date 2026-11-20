@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import { relative, sep } from "node:path";
 
 /**
@@ -11,4 +12,16 @@ export function isUserExtension(
 ): boolean {
 	const rel = relative(installRoot, extension.path);
 	return rel !== "" && !rel.startsWith("..") && !rel.startsWith(sep);
+}
+
+/** IDs of the extensions installed under the install folder, one folder each. */
+export function installedExtensionIds(installRoot: string): string[] {
+	try {
+		return readdirSync(installRoot, { withFileTypes: true })
+			.filter((entry) => entry.isDirectory() && /^[a-p]{32}$/.test(entry.name))
+			.map((entry) => entry.name);
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+		throw error;
+	}
 }

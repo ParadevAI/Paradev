@@ -156,7 +156,7 @@ function readFields(message: Buffer): Map<number, Buffer[]> {
 	return fields;
 }
 
-function toExtensionId(crxId: Buffer): string {
+export function toExtensionId(crxId: Buffer): string {
 	return [...crxId.toString("hex")]
 		.map((digit) => String.fromCharCode(97 + Number.parseInt(digit, 16)))
 		.join("");

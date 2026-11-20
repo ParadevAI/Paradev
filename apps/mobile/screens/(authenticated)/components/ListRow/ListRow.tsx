@@ -7,6 +7,7 @@ export function ListRow({
 	icon,
 	label,
 	subtitle,
+	subtitleLines = 1,
 	trailing,
 	onPress,
 	isLast,
@@ -15,6 +16,7 @@ export function ListRow({
 	icon?: ReactNode;
 	label: string;
 	subtitle?: string;
+	subtitleLines?: number;
 	trailing?: ReactNode;
 	onPress?: () => void;
 	isLast?: boolean;
@@ -27,7 +29,7 @@ export function ListRow({
 			disabled={!onPress}
 			// Not the row's own label: some of these are host names.
 			ph-label="list-row"
-			className="flex-row items-center gap-3 py-4"
+			className="web:hover:opacity-80 flex-row items-center gap-3 py-4"
 			style={
 				isLast
 					? undefined
@@ -51,7 +53,7 @@ export function ListRow({
 					<Text
 						className="text-sm"
 						style={{ color: theme.mutedForeground }}
-						numberOfLines={1}
+						numberOfLines={subtitleLines}
 					>
 						{subtitle}
 					</Text>

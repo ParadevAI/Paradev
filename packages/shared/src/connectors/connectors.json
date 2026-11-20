@@ -70,17 +70,10 @@
 					"label": "OAuth 2.0",
 					"authorization_url": "https://linear.app/oauth/authorize",
 					"token_url": "https://api.linear.app/oauth/token",
-					"scopes": [
-						"read",
-						"write",
-						"issues:create"
-					],
+					"scopes": ["read", "write", "issues:create"],
 					"scope_separator": ",",
 					"token_request_auth_method": "client_secret_post",
-					"requires_env": [
-						"LINEAR_CLIENT_ID",
-						"LINEAR_CLIENT_SECRET"
-					],
+					"requires_env": ["LINEAR_CLIENT_ID", "LINEAR_CLIENT_SECRET"],
 					"identity": {
 						"url": "https://api.linear.app/graphql",
 						"method": "POST",
@@ -158,16 +151,11 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.linear.app/mcp",
-					"scopes": [
-						"read",
-						"write"
-					],
+					"scopes": ["read", "write"],
 					"identity": {
 						"mcp": "https://mcp.linear.app/mcp",
 						"tool": "get_user",
-						"arguments": {
-							"query": "me"
-						},
+						"arguments": { "query": "me" },
 						"account": {
 							"id": "$.id",
 							"label": "$.email"
@@ -200,9 +188,7 @@
 					"identity": {
 						"mcp": "https://mcp.linear.app/mcp",
 						"tool": "get_user",
-						"arguments": {
-							"query": "me"
-						},
+						"arguments": { "query": "me" },
 						"account": {
 							"id": "$.id",
 							"label": "$.email"
@@ -233,10 +219,7 @@
 					"token_url": "https://api.notion.com/v1/oauth/token",
 					"scopes": [],
 					"token_request_auth_method": "client_secret_basic",
-					"requires_env": [
-						"NOTION_CLIENT_ID",
-						"NOTION_CLIENT_SECRET"
-					],
+					"requires_env": ["NOTION_CLIENT_ID", "NOTION_CLIENT_SECRET"],
 					"authorization_params": {
 						"owner": "user"
 					},
@@ -271,7 +254,6 @@
 					"client": "dynamic",
 					"authorization_url": "https://mcp.notion.com/mcp",
 					"scopes": [],
-					"token_request_auth_method": "client_secret_basic",
 					"authorization_params": {
 						"owner": "user"
 					},
@@ -307,10 +289,7 @@
 					"scope_separator": ",",
 					"scope_identifier": "user_scope",
 					"token_request_auth_method": "client_secret_post",
-					"requires_env": [
-						"SLACK_CLIENT_ID",
-						"SLACK_CLIENT_SECRET"
-					],
+					"requires_env": ["SLACK_CLIENT_ID", "SLACK_CLIENT_SECRET"],
 					"scopes": [
 						"channels:history",
 						"channels:read",
@@ -382,11 +361,7 @@
 						"SENTRY_CLIENT_SECRET",
 						"SENTRY_APP_SLUG"
 					],
-					"callback_params": [
-						"code",
-						"installationId",
-						"orgSlug"
-					],
+					"callback_params": ["code", "installationId", "orgSlug"],
 					"identity": {
 						"url": "https://sentry.io/api/0/sentry-app-installations/${params.installationId}/",
 						"method": "GET",
@@ -503,25 +478,13 @@
 					"consent_url": "https://login.microsoftonline.com/organizations/v2.0/adminconsent",
 					"token_url": "https://login.microsoftonline.com/${config.tenant_id}/oauth2/v2.0/token",
 					"grant_type": "client_credentials",
-					"scopes": [
-						"https://graph.microsoft.com/.default"
-					],
+					"scopes": ["https://graph.microsoft.com/.default"],
 					"scope_separator": " ",
-					"requires_env": [
-						"MICROSOFT_CLIENT_ID",
-						"MICROSOFT_CLIENT_SECRET"
-					],
-					"callback_params": [
-						"tenant",
-						"admin_consent"
-					],
+					"requires_env": ["MICROSOFT_CLIENT_ID", "MICROSOFT_CLIENT_SECRET"],
+					"callback_params": ["tenant", "admin_consent"],
 					"identity_signin": {
 						"authorization_url": "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize",
-						"scopes": [
-							"openid",
-							"profile",
-							"email"
-						],
+						"scopes": ["openid", "profile", "email"],
 						"scope_separator": " "
 					},
 					"identity": {
@@ -554,17 +517,10 @@
 					"label": "OAuth 2.0",
 					"authorization_url": "https://github.com/login/oauth/authorize",
 					"token_url": "https://github.com/login/oauth/access_token",
-					"scopes": [
-						"repo",
-						"read:org",
-						"workflow"
-					],
+					"scopes": ["repo", "read:org", "workflow"],
 					"scope_separator": " ",
 					"token_request_auth_method": "client_secret_post",
-					"requires_env": [
-						"GH_APP_CLIENT_ID",
-						"GH_APP_CLIENT_SECRET"
-					],
+					"requires_env": ["GH_APP_CLIENT_ID", "GH_APP_CLIENT_SECRET"],
 					"identity": {
 						"url": "https://api.github.com/user",
 						"method": "GET",
@@ -600,13 +556,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.granola.ai/mcp",
-					"scopes": [
-						"mcp",
-						"openid",
-						"email",
-						"profile",
-						"offline_access"
-					],
+					"scopes": ["mcp", "openid", "email", "profile", "offline_access"],
 					"identity": {
 						"url": "https://mcp-auth.granola.ai/oauth2/userinfo",
 						"method": "POST",
@@ -641,10 +591,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://circleback.ai/api/mcp",
-					"scopes": [
-						"user",
-						"user:write"
-					],
+					"scopes": ["user", "user:write"],
 					"identity": {
 						"url": "https://circleback.ai/api/user",
 						"method": "GET",
@@ -720,9 +667,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.stripe.com",
-					"scopes": [
-						"mcp"
-					],
+					"scopes": ["mcp"],
 					"identity": {
 						"mcp": "https://mcp.stripe.com",
 						"tool": "list_available_accounts_or_orgs",
@@ -755,12 +700,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.mail.superhuman.com/mcp",
-					"scopes": [
-						"openid",
-						"email",
-						"profile",
-						"offline_access"
-					],
+					"scopes": ["openid", "email", "profile", "offline_access"],
 					"identity": {
 						"mcp": "https://mcp.mail.superhuman.com/mcp",
 						"tool": "list_accounts",
@@ -792,9 +732,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.resend.com/mcp",
-					"scopes": [
-						"full_access"
-					],
+					"scopes": ["full_access"],
 					"identity": {
 						"url": "https://api.resend.com/me",
 						"method": "GET",
@@ -822,8 +760,8 @@
 						{
 							"name": "api_key",
 							"label": "Resend API key",
-							"placeholder": "re_\u2026",
-							"description": "Resend \u2192 API Keys \u2192 Create API key, with Full access",
+							"placeholder": "re_…",
+							"description": "Resend → API Keys → Create API key, with Full access",
 							"required": true,
 							"secret": true
 						}
@@ -860,10 +798,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.neon.tech/mcp",
-					"scopes": [
-						"read",
-						"write"
-					],
+					"scopes": ["read", "write"],
 					"identity": {
 						"mcp": "https://mcp.neon.tech/mcp",
 						"tool": "list_organizations",
@@ -959,9 +894,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://api.peec.ai/mcp",
-					"scopes": [
-						"default"
-					],
+					"scopes": ["default"],
 					"identity": {
 						"mcp": "https://api.peec.ai/mcp",
 						"tool": "list_projects",
@@ -988,7 +921,7 @@
 						{
 							"name": "api_key",
 							"label": "Peec AI personal access token",
-							"description": "Peec AI \u2192 API Keys \u2192 Personal Access Tokens \u2192 Create",
+							"description": "Peec AI → API Keys → Personal Access Tokens → Create",
 							"required": true,
 							"secret": true
 						}
@@ -1024,13 +957,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.sazabi.com/mcp",
-					"scopes": [
-						"openid",
-						"profile",
-						"email",
-						"offline_access",
-						"mcp"
-					],
+					"scopes": ["openid", "profile", "email", "offline_access", "mcp"],
 					"identity": {
 						"url": "https://api.platform.sazabi.com/api/auth/oauth2/userinfo",
 						"method": "GET",
@@ -1099,12 +1026,7 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.vercel.com",
-					"scopes": [
-						"openid",
-						"email",
-						"profile",
-						"offline_access"
-					],
+					"scopes": ["openid", "email", "profile", "offline_access"],
 					"identity": {
 						"url": "https://api.vercel.com/login/oauth/userinfo",
 						"method": "GET",
@@ -1240,16 +1162,76 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://mcp.firecrawl.dev/v2/mcp-oauth",
-					"scopes": [
-						"firecrawl:global",
-						"offline_access"
-					],
+					"scopes": ["firecrawl:global", "offline_access"],
 					"identity": {
 						"account": {
 							"id": "$.team_id"
 						},
 						"user": {
 							"id": "$.user_id"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"ahrefs_mcp": {
+			"displayName": "Ahrefs",
+			"icon": "ahrefs",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://api.ahrefs.com/mcp/mcp",
+					"scopes": ["apiv3-mcp"],
+					"token_request_auth_method": "client_secret_post",
+					"identity": {
+						"account": {
+							"id": "$.token_type"
+						},
+						"user": {
+							"id": "$.token_type"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"planetscale_mcp": {
+			"displayName": "PlanetScale",
+			"icon": "planetscale",
+			"category": "Data & APIs",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "OAuth 2.0",
+					"client": "dynamic",
+					"authorization_url": "https://mcp.pscale.dev/mcp/planetscale",
+					"identity": {
+						"url": "https://auth.planetscale.com/oauth/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.email",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.email",
+							"label": "$.email"
 						}
 					},
 					"bind": {
@@ -1271,14 +1253,44 @@
 					"label": "OAuth 2.0",
 					"client": "dynamic",
 					"authorization_url": "https://api.wisprflow.ai/connect/mcp",
-					"scopes": [
-						"openid",
-						"email",
-						"profile",
-						"offline_access"
-					],
+					"scopes": ["openid", "email", "profile", "offline_access"],
 					"identity": {
 						"url": "https://mcp-auth.wisprflow.com/oauth2/userinfo",
+						"method": "GET",
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						},
+						"account": {
+							"id": "$.sub",
+							"label": "$.email"
+						},
+						"user": {
+							"id": "$.sub",
+							"label": "$.email"
+						}
+					},
+					"bind": {
+						"headers": {
+							"Authorization": "Bearer ${config.access_token}"
+						}
+					}
+				}
+			]
+		},
+		"paradev_admin_mcp": {
+			"displayName": "Paradev admin",
+			"icon": "superset",
+			"category": "Developer tools",
+			"scope": "user",
+			"methods": [
+				{
+					"type": "oauth2",
+					"label": "Paradev account",
+					"client": "dynamic",
+					"authorization_url": "https://admin.paradev.com/api/mcp/cloud",
+					"scopes": ["openid", "email", "profile", "offline_access"],
+					"identity": {
+						"url": "https://api.superset.sh/api/auth/oauth2/userinfo",
 						"method": "GET",
 						"headers": {
 							"Authorization": "Bearer ${config.access_token}"
@@ -1314,8 +1326,8 @@
 						{
 							"name": "api_key",
 							"label": "Keenable API key",
-							"placeholder": "keen_\u2026",
-							"description": "Keenable console \u2192 API keys \u2192 Create (https://app.keenable.ai/console)",
+							"placeholder": "keen_…",
+							"description": "Keenable console → API keys → Create (https://app.keenable.ai/console)",
 							"required": true,
 							"secret": true
 						}

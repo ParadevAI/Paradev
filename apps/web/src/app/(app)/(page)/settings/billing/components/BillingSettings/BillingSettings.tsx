@@ -37,12 +37,14 @@ interface BillingSettingsProps {
 	 * organization, and the two sessions do not share that choice.
 	 */
 	organizationId?: string;
+	cloudUsageEnabled: boolean;
 	selectedPlan?: string;
 	yearly?: boolean;
 }
 
 export function BillingSettings({
 	organizationId,
+	cloudUsageEnabled,
 	selectedPlan,
 	yearly,
 }: BillingSettingsProps) {
@@ -280,6 +282,7 @@ export function BillingSettings({
 			<CloudUsageCard
 				organizationId={activeOrganizationId ?? null}
 				canBuy={isOwner}
+				showUsageLink={cloudUsageEnabled}
 			/>
 
 			{(plan === "free" || (plan === "pro" && usesAutumn && !cancelAt)) &&
@@ -334,8 +337,8 @@ export function BillingSettings({
 									PLAN_PRICE_CURRENCY,
 									{ minimumFractionDigits: 0 },
 								);
-								const gbHours = family.gbMinutesPerSeat
-									? formatNumber(family.gbMinutesPerSeat / 60)
+								const gbHours = family.advertisedGbHoursPerSeat
+									? formatNumber(family.advertisedGbHoursPerSeat)
 									: null;
 								const isCurrent =
 									family.family === currentFamily?.family &&

@@ -102,6 +102,7 @@ function createTestSession(shell: string): {
 		rows: 24,
 		cwd: "/tmp",
 		shell,
+		killProcessTree: async () => {},
 		spawnProcess: () => proc as unknown as ChildProcess,
 	});
 	return { session, proc };

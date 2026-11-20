@@ -14,8 +14,17 @@ export const createSessionInputSchema = z.object({
 	commandId: z.uuid(),
 	workspaceId: z.string().min(1),
 	harness: z.string().min(1),
+	/** The host agent config to launch with, so its env (account, config dir) applies. */
+	agentConfigId: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
+	/** `on` or `off`, carried by a fork or rewind from the chat it came from. */
+	fast: z.string().optional(),
+	/** The model, effort and mode sent here are the user's own picks, so later chats start on them too. */
+	rememberSelections: z.boolean().optional(),
+	/** The mode to start in when neither the request nor the user's remembered picks name one. */
+	fallbackModeId: z.string().optional(),
 	resume: z
 		.object({
 			harnessSessionId: z.string().min(1),
@@ -162,6 +171,7 @@ export const rewindSessionInputSchema = z.object({
 	handoffPrompt: z.string().min(1).optional(),
 	modeId: z.string().optional(),
 	modelId: z.string().optional(),
+	effortId: z.string().optional(),
 	snapshotWorktree: z.boolean().optional(),
 });
 export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
@@ -173,6 +183,8 @@ export type RewindSessionInput = z.infer<typeof rewindSessionInputSchema>;
  */
 export const closeSessionInputSchema = z.object({
 	sessionId: z.string().min(1),
+	/** A person closed the chat, not a restart or cleanup: other clients drop its tabs instead of restarting it. */
+	userClosed: z.boolean().optional(),
 });
 export type CloseSessionInput = z.infer<typeof closeSessionInputSchema>;
 
@@ -213,6 +225,8 @@ export type ListSessionsInput = z.infer<typeof listSessionsInputSchema>;
 export const discoverSessionsInputSchema = z.object({
 	workspaceId: z.string().min(1),
 	harness: z.string().min(1),
+	/** The host agent config whose account the native history belongs to. */
+	agentConfigId: z.string().min(1).optional(),
 	/** Opaque page token from a previous `nextCursor`. Not a journal cursor. */
 	cursor: z.string().min(1).optional(),
 });

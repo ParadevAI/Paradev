@@ -3,11 +3,14 @@ import type { AppRouter as HostServiceRouter } from "@superset/host-service/trpc
 import { getHostId } from "@superset/shared/host-info";
 import {
 	buildHostRoutingKey,
+	CLOUD_HOST_ID,
+	SUPERSET_LAUNCH_SOURCE_HEADER,
 	SUPERSET_USER_ID_HEADER,
 } from "@superset/shared/host-routing";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import SuperJSON from "superjson";
 import type { ApiClient } from "../api-client";
+import { jwtForApiKey } from "../api-key-jwt";
 import { isProcessAlive, readManifest } from "../host/manifest";
 import { getRelayUrl } from "../host/relay-url";
 import { readJwtSubject } from "./readJwtSubject";
@@ -43,6 +46,8 @@ export interface ResolveHostTargetOptions {
 	userJwt: string;
 	/** Resolves the relay a remote host is on; unused for local targets. */
 	api: ApiClient;
+	/** Trades an API key for the JWT the relay takes. */
+	fetchImpl?: typeof fetch;
 }
 
 export async function resolveHostTarget(
@@ -77,6 +82,7 @@ export async function resolveHostTarget(
 						headers: {
 							Authorization: `Bearer ${manifest.authToken}`,
 							"x-superset-client-machine-id": localHostId,
+							[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 							// Names the user to the local host so it can stamp
 							// createdByUserId; the relay does this for remote hosts.
 							...(userId ? { [SUPERSET_USER_ID_HEADER]: userId } : {}),
@@ -91,8 +97,16 @@ export async function resolveHostTarget(
 		};
 	}
 
+	if (targetHostId.toLowerCase() === CLOUD_HOST_ID) {
+		throw new CLIError(
+			"`--host cloud` is not one host: each cloud workspace runs its own",
+			"Name the workspace: `superset snapshot --host cloud --workspace <id>`, or a workspace command such as `superset sessions list --workspace <id>`",
+		);
+	}
+
 	const routingKey = buildHostRoutingKey(options.organizationId, targetHostId);
 	const relayUrl = await getRelayUrl(options.api);
+	const userJwt = await jwtForApiKey(options.userJwt, options.fetchImpl);
 	return {
 		kind: "remote",
 		hostId: targetHostId,
@@ -101,16 +115,18 @@ export async function resolveHostTarget(
 				httpBatchLink({
 					url: `${relayUrl}/hosts/${routingKey}/trpc`,
 					transformer: SuperJSON,
+					// A cloud workspace has no bearer; its firewall adds its credential.
 					headers: {
-						Authorization: `Bearer ${options.userJwt}`,
+						...(userJwt ? { Authorization: `Bearer ${userJwt}` } : {}),
 						"x-superset-client-machine-id": localHostId,
+						[SUPERSET_LAUNCH_SOURCE_HEADER]: "cli",
 					},
 				}),
 			],
 		}),
 		ws: {
 			baseWsUrl: `${relayUrl.replace(/^http/, "ws")}/hosts/${routingKey}`,
-			token: options.userJwt,
+			token: userJwt,
 		},
 	};
 }

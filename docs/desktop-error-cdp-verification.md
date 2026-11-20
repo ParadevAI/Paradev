@@ -100,10 +100,9 @@ Raw scripts, per-case JSON measurements, and screenshots are in
 | `/settings/hosts` | UI navigation | Rendered without a renderer crash |
 | `/settings/projects` | UI navigation | Rendered without a renderer crash |
 | `/settings/usage` | UI navigation | Rendered without a renderer crash |
-| `/v2-workspace/$workspaceId` | UI navigation | Rendered without a renderer crash |
+| `/workspace/$workspaceId` | UI navigation | Rendered without a renderer crash |
 | `/new-workspace` | UI navigation | Rendered without a renderer crash |
-| `/v2-workspaces` | UI navigation | Rendered without a renderer crash |
-| `/workspace` | Programmatic route smoke | Legacy route redirected to the v2 entry page |
+| `/workspaces` | UI navigation | Rendered without a renderer crash |
 | `/workspaces` | Programmatic route smoke | Rendered without a renderer crash |
 | `/onboarding/project` | Programmatic route smoke | Redirected for the existing signed-in account; first-run/signed-out form not exercised |
 | `/settings/account` | UI navigation | Rendered without a renderer crash |

@@ -111,6 +111,92 @@ describe("deriveTimeline", () => {
 		if (firstEntry?.kind !== "item") throw new Error("expected item entry");
 		expect(firstEntry.item.id).toBe("m1");
 	});
+
+	test("a replayed Claude Code stop is a user_stop entry, not a prompt", () => {
+		seq = 0;
+		const prompt = (id: string, text: string, startedAtMs: number): Item => ({
+			id,
+			kind: "user_message",
+			startedAtMs,
+			content: [{ type: "text", text }],
+		});
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(prompt("p1", "refactor the parser", 10), "h1"),
+			env(message("partial", 11), "h1"),
+			env(prompt("stop", "[Request interrupted by user]\n", 12), "h2"),
+			env(prompt("p2", "only rename it", 13), "h2"),
+			env(message("reply", 14), "h2"),
+		]);
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
+		expect(groups[1]?.entries).toEqual([
+			{
+				kind: "user_stop",
+				item: prompt("stop", "[Request interrupted by user]\n", 12),
+				stop: "response",
+			},
+			{ kind: "item", item: prompt("p2", "only rename it", 13) },
+			{ kind: "item", item: message("reply", 14) },
+		]);
+	});
+
+	test("a Claude Code stop at a tool call reads as stopped, without its canned reply", () => {
+		seq = 0;
+		const stop: Item = {
+			id: "stop",
+			kind: "user_message",
+			startedAtMs: 12,
+			content: [
+				{ type: "text", text: "[Request interrupted by user for tool use]" },
+			],
+		};
+		const cannedReply: Item = {
+			id: "canned",
+			kind: "agent_message",
+			startedAtMs: 13,
+			text: "No response requested.",
+		};
+		const snapshot = reduceMany(emptySnapshot(), [
+			env(toolCall("sleep", "failed", 11), "h1"),
+			env(stop, "h1"),
+			env(cannedReply, "h1"),
+		]);
+
+		const groups = deriveTimeline(snapshot, { harness: "claude-acp" });
+		expect(groups[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+			{ kind: "user_stop", item: stop as UserMessage, stop: "tool_use" },
+		]);
+
+		const split = deriveTimeline(
+			reduceMany(emptySnapshot(), [
+				env(toolCall("sleep", "failed", 11), "h1"),
+				env(stop, "h2"),
+			]),
+			{ harness: "claude-acp" },
+		);
+		expect(split[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+		]);
+
+		const hiddenStop = deriveTimeline(
+			reduceMany(emptySnapshot(), [
+				env(toolCall("sleep", "canceled", 11), "h1"),
+				env({ ...stop, discarded: true } as Item, "h1"),
+				env(cannedReply, "h1"),
+			]),
+			{ harness: "claude-acp" },
+		);
+		expect(hiddenStop[0]?.entries).toEqual([
+			{ kind: "item", item: toolCall("sleep", "canceled", 11) },
+		]);
+
+		const elsewhere = deriveTimeline(snapshot, { harness: "codex" });
+		expect(elsewhere[0]?.entries.map((entry) => entry.kind)).toEqual([
+			"item",
+			"item",
+			"item",
+		]);
+	});
 });
 
 describe("deriveTimeline with nested items", () => {

@@ -19,6 +19,7 @@ import {
 	keychainServicesForConfigDir,
 	readKeychainSecrets,
 } from "./profiles";
+import { readClaudeQuotaIdentity } from "./read-claude-quota-identity";
 import type {
 	UsageAccount,
 	UsageAccountStatus,
@@ -521,6 +522,7 @@ async function fetchClaudeAccount(
 		agent: "claude" as const,
 		credentialKind: "subscription" as const,
 		accountKey: credential.accountKey,
+		quotaIdentity: await readClaudeQuotaIdentity(credential.selection),
 		sourceLabel: credential.sourceLabel,
 		plan: credential.subscriptionType,
 		creditsBalance: null,

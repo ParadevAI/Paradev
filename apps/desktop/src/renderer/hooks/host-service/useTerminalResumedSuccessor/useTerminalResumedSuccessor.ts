@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { hostQueryFn } from "renderer/lib/hostQueryFn";
 import { useWorkspaceHostUrl } from "../useWorkspaceHostUrl";
 
-export interface TerminalResumedSuccessor {
+interface TerminalResumedSuccessor {
 	terminalId: string;
 	label: string;
 }
 
-export function getTerminalResumedSuccessorQueryKey(
+function getTerminalResumedSuccessorQueryKey(
 	workspaceId: string,
 	terminalId: string,
 ) {
@@ -38,12 +39,12 @@ export function useTerminalResumedSuccessor(
 	const { data } = useQuery({
 		queryKey: getTerminalResumedSuccessorQueryKey(workspaceId, terminalId),
 		enabled,
-		queryFn: () => {
-			if (!hostUrl) return null;
-			return getHostServiceClientByUrl(
-				hostUrl,
-			).terminalAgents.resumedSuccessor.query({ workspaceId, terminalId });
-		},
+		queryFn: hostQueryFn(hostUrl, (url) =>
+			getHostServiceClientByUrl(url).terminalAgents.resumedSuccessor.query({
+				workspaceId,
+				terminalId,
+			}),
+		),
 		staleTime: 0,
 	});
 

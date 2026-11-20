@@ -1,11 +1,12 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, mock, test } from "bun:test";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { app } from "electron";
 import { downloadExtensionFromURL } from "electron-chrome-web-store";
-import { enableCrxVerification } from "./web-store";
+import { enableCrxVerification, installBrowserWebStore } from "./web-store";
 
 const JSON_FORMATTER_ID = "bcjindcccaagfpapjjmafapmmgkkhgoa";
 const webStoreCrx = readFileSync(
@@ -173,4 +174,22 @@ test("the Web Store page names the app only on its add and remove buttons", () =
 		"Remove from Superset",
 		"Install Chrome",
 	]);
+});
+
+test("turned-off extensions are reported even when the store then fails to start", async () => {
+	const ready = app as unknown as { whenReady?: () => Promise<void> };
+	ready.whenReady ??= async () => {};
+	const session = {
+		extensions: { on: () => {}, getExtension: () => undefined },
+	} as unknown as Electron.Session;
+	const onTurnedOff = mock(() => {});
+
+	await expect(
+		installBrowserWebStore(session, {
+			removeExtension: async () => {},
+			onTurnedOff,
+		}),
+	).rejects.toThrow();
+
+	expect(onTurnedOff).toHaveBeenCalledWith([]);
 });

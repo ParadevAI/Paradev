@@ -219,24 +219,96 @@ describe("planTarget for a new automation", () => {
 		expect(plan.target).toEqual(pinnedInCloud);
 	});
 
-	it("refuses continuing a session with no pin", () => {
-		expect(() =>
-			planTarget(
-				NO_TARGET,
-				{
-					targetHostId: CLOUD_HOST_ID,
-					environmentId: ENV,
-					continueAgentSession: true,
-				},
-				{},
-			),
-		).toThrow("requires a pinned workspace");
-		expect(() =>
-			planTarget(
-				NO_TARGET,
-				{ targetHostId: HOST, continueAgentSession: true },
-				{},
-			),
-		).toThrow("requires a pinned workspace");
+	it("reads continuing with no pin as reusing the first run's workspace", () => {
+		const cloud = planTarget(
+			NO_TARGET,
+			{
+				targetHostId: CLOUD_HOST_ID,
+				environmentId: ENV,
+				continueAgentSession: true,
+			},
+			{},
+		);
+		expect(cloud.target).toMatchObject({
+			cloudWorkspaceId: null,
+			reuseWorkspace: true,
+			continueAgentSession: true,
+		});
+		const host = planTarget(
+			NO_TARGET,
+			{ targetHostId: HOST, continueAgentSession: true },
+			{},
+		);
+		expect(host.target).toMatchObject({
+			v2WorkspaceId: null,
+			reuseWorkspace: true,
+			continueAgentSession: true,
+		});
+	});
+
+	it("reuses a workspace and starts fresh each run", () => {
+		const plan = planTarget(
+			NO_TARGET,
+			{ targetHostId: HOST, reuseWorkspace: true },
+			{},
+		);
+		expect(plan.target).toMatchObject({
+			reuseWorkspace: true,
+			continueAgentSession: false,
+		});
+	});
+
+	it("drops continuing when there is neither a pin nor reuse", () => {
+		const plan = planTarget(
+			NO_TARGET,
+			{ targetHostId: HOST, reuseWorkspace: false, continueAgentSession: true },
+			{},
+		);
+		expect(plan.target).toMatchObject({
+			reuseWorkspace: false,
+			continueAgentSession: false,
+		});
+	});
+});
+
+describe("planTarget with a reused workspace", () => {
+	const reusing: AutomationTarget = {
+		...onHost,
+		reuseWorkspace: true,
+	};
+
+	it("keeps reusing when a client sends the kept pin back", () => {
+		const plan = planTarget(
+			reusing,
+			{ targetHostId: HOST, v2WorkspaceId: WORKSPACE, v2ProjectId: PROJECT },
+			{},
+		);
+		expect(plan.target).toEqual(reusing);
+	});
+
+	it("stops reusing when a different workspace is picked", () => {
+		const plan = planTarget(
+			reusing,
+			{
+				targetHostId: HOST,
+				v2WorkspaceId: "workspace-2",
+				v2ProjectId: PROJECT,
+			},
+			{},
+		);
+		expect(plan.target).toMatchObject({
+			v2WorkspaceId: "workspace-2",
+			reuseWorkspace: false,
+			continueAgentSession: true,
+		});
+	});
+
+	it("keeps reusing and continuing across a host change", () => {
+		const plan = planTarget(reusing, { targetHostId: OTHER_HOST }, {});
+		expect(plan.target).toMatchObject({
+			v2WorkspaceId: null,
+			reuseWorkspace: true,
+			continueAgentSession: true,
+		});
 	});
 });

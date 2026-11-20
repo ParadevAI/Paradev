@@ -7,6 +7,7 @@ import { COMPANY } from "@superset/shared/constants";
 import { m } from "framer-motion";
 import type { ReactNode } from "react";
 import {
+	HiArrowUpRight,
 	HiOutlineCodeBracket,
 	HiOutlineServerStack,
 	HiOutlineSignal,
@@ -18,17 +19,22 @@ const SECURITY_FEATURES: {
 	icon: ReactNode;
 	title: MessageDescriptor;
 	description: MessageDescriptor;
+	link?: { href: string; label: MessageDescriptor };
 }[] = [
 	{
-		id: "source-available",
+		id: "open-source",
 		icon: <HiOutlineCodeBracket className="w-5 h-5 text-foreground/70" />,
 		title: msg({
-			message: "Source Available",
+			message: "Open Source",
 		}),
 		description: msg({
 			message:
-				"Full source available on GitHub under Elastic License 2.0 (ELv2). Inspect, audit, and contribute to the code. No black boxes, no hidden functionality.",
+				"Paradev is MIT licensed, so you're never locked in. Read or change the code on GitHub.",
 		}),
+		link: {
+			href: COMPANY.GITHUB_URL,
+			label: msg({ message: "View on GitHub" }),
+		},
 	},
 	{
 		id: "local-first",
@@ -38,7 +44,7 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Repos, worktrees, terminal output, and agent sessions stay on your machine. Cloud sync covers account and organization metadata only.",
+				"In local workspaces, your code and agent sessions stay on your machine. Cloud workspaces run in a sandbox.",
 		}),
 	},
 	{
@@ -49,7 +55,7 @@ const SECURITY_FEATURES: {
 		}),
 		description: msg({
 			message:
-				"Use your existing agent subscriptions and API keys. Paradev never proxies model calls or locks your workflow to one provider.",
+				"Use the agent plans and API keys you already have. Model calls go straight to your provider.",
 		}),
 	},
 ];
@@ -81,8 +87,8 @@ export function SecuritySection() {
 						</h2>
 						<p className="text-base sm:text-lg font-light text-muted-foreground max-w-[700px]">
 							<Trans>
-								Your code stays local by default, with explicit control over
-								connected services.
+								Local workspaces run on your machine. You decide what connects
+								to them.
 							</Trans>
 						</p>
 					</div>
@@ -125,6 +131,17 @@ export function SecuritySection() {
 							<p className="text-sm leading-relaxed text-muted-foreground">
 								{t(feature.description)}
 							</p>
+							{feature.link && (
+								<a
+									href={feature.link.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mt-4 inline-flex items-center gap-1 text-sm text-foreground/80 underline-offset-4 transition-colors hover:text-foreground hover:underline"
+								>
+									{t(feature.link.label)}
+									<HiArrowUpRight className="size-3.5" />
+								</a>
+							)}
 						</m.div>
 					))}
 				</m.div>

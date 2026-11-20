@@ -4,9 +4,8 @@
  * No credential enters the box. Every outbound credential is a header rule
  * on the sandbox firewall: the agent sends a placeholder, the firewall swaps
  * the header on the way out, and the value lives only here. The rules are
- * re-derived and re-applied on every wake and keepalive, so a token that
- * expires (the GitHub installation token lasts an hour) is never stale for
- * longer than one keepalive.
+ * re-derived and re-applied on every wake, when anything in them changes, and
+ * before a token in them expires (`reapply-rules.ts`).
  *
  * What does reach the box is the managed environment: the environment's own
  * variables minus any provider credential, which a cloud workspace ignores,
@@ -18,11 +17,11 @@ import {
 	CLOUD_WORKSPACE_IGNORED_ENV_NAMES,
 } from "@superset/shared/agent-credentials";
 import { SANDBOX_CREDENTIAL_PLACEHOLDER } from "@superset/shared/constants";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox-contract";
+import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
 import {
 	SANDBOX_API_CREDENTIAL_HEADER,
 	sandboxApiCredential,
-} from "@superset/shared/sandbox-gate";
+} from "@superset/shared/sandbox/gate";
 import type { NetworkPolicy, NetworkPolicyRule } from "@vercel/sandbox";
 import { env } from "../../env";
 import type { CodexChatgptSignIn } from "../../router/agent-credential";
@@ -44,6 +43,14 @@ export interface SandboxCredentialInputs {
 	githubToken: string | null;
 	/** Who commits made on the box are by. */
 	gitAuthor: GitAuthor;
+}
+
+function relayHost(): string | null {
+	try {
+		return new URL(env.RELAY_URL).host;
+	} catch {
+		return null;
+	}
 }
 
 export interface GitAuthor {
@@ -115,6 +122,21 @@ requires_openai_auth = true
 supports_websockets = false
 supports_standalone_web_search = true
 `;
+
+/** The same fix for an API key: the built-in `openai` provider is reserved, so this is a copy. */
+function codexApiKeyProviderConfig(baseUrl: string | undefined): string {
+	return `model_provider = "openai-api-key"
+
+[model_providers.openai-api-key]
+name = "OpenAI"
+base_url = ${JSON.stringify(baseUrl || "https://api.openai.com/v1")}
+wire_api = "responses"
+env_key = "OPENAI_API_KEY"
+env_http_headers = { "OpenAI-Organization" = "OPENAI_ORGANIZATION", "OpenAI-Project" = "OPENAI_PROJECT" }
+supports_websockets = false
+supports_standalone_web_search = true
+`;
+}
 
 function unsignedJwt(claims: Record<string, unknown>): string {
 	const part = (value: unknown) =>
@@ -272,7 +294,11 @@ export async function deriveSandboxCredentials(
 	}
 	files.push({
 		path: CODEX_SYSTEM_CONFIG_PATH,
-		content: inputs.codexChatgpt ? CODEX_CHATGPT_PROVIDER_CONFIG : "",
+		content: inputs.codexChatgpt
+			? CODEX_CHATGPT_PROVIDER_CONFIG
+			: signIn.OPENAI_API_KEY
+				? codexApiKeyProviderConfig(signIn.OPENAI_BASE_URL)
+				: "",
 	});
 
 	// GitHub: git speaks Basic with the token as the password, gh and the
@@ -310,6 +336,10 @@ export async function deriveSandboxCredentials(
 		// PDEV_TOKEN keeps pdev from asking `superset auth`, which a box refuses.
 		allow[PDEV_ROUTER_HOST] = boxCredential;
 		managedEnv.PDEV_TOKEN = SANDBOX_CREDENTIAL_PLACEHOLDER;
+		// The firewall refuses WebSocket upgrades on a host it rewrites, so a
+		// box reaches hosts over HTTP only.
+		const relay = relayHost();
+		if (relay) allow[relay] = boxCredential;
 	}
 
 	// The catch-all keeps the rest of the internet reachable; without it a

@@ -4,9 +4,12 @@ import { dialog } from "electron";
 export async function confirm(
 	window: Electron.BrowserWindow | undefined,
 	options: Omit<Electron.MessageBoxOptions, "type" | "defaultId" | "cancelId">,
+	signal?: AbortSignal,
 ): Promise<boolean> {
+	if (signal?.aborted) return false;
 	const box: Electron.MessageBoxOptions = {
 		...options,
+		signal,
 		type: "question",
 		defaultId: 1,
 		cancelId: 1,

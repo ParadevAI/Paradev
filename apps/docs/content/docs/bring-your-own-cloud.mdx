@@ -1,0 +1,104 @@
+---
+title: Bring Your Own Cloud
+description: Run Paradev on a server in your own cloud and open it from the desktop or phone app
+pro: true
+---
+
+## Overview
+
+Paradev can run agents on a Linux server in your own cloud account. Your repos and agent sign-ins are stored on that server. You open its workspaces from the desktop or phone app, the same as workspaces on your laptop.
+
+What still leaves the server, besides normal calls to GitHub and the Paradev API:
+
+- The host keeps a connection to the Paradev relay, so your devices can find it.
+- Agents send what they read to their model provider, using your keys.
+- When you open a workspace from another device, its terminal and port traffic passes through the relay.
+
+This is different from [cloud workspaces](/cloud-workspaces), where Paradev runs the machine for you. Pick it when your repos must be stored in your own account, or when you want to control the machine.
+
+The host binds to `127.0.0.1` and reaches your devices through the Paradev relay, so the server needs no open inbound ports.
+
+## Requirements
+
+- **A paid plan.** The server is a [Remote Access](/remote-access) host.
+- **A Linux server**, x64 or arm64. If your project runs well on an 8 GB laptop, a server with 4 vCPU and 8 GB is enough.
+- **`git` and `gh`** on the server, and the agent CLIs you want to run. See [Host Server prerequisites](/cli/host-server#prerequisites).
+
+## 1. Install the CLI
+
+On the server:
+
+```bash
+curl -fsSL https://paradev.com/cli/install.sh | sh
+```
+
+This installs Paradev under `~/superset` and adds `~/superset/bin` to `PATH` for new shells. For the current session, run:
+
+```bash
+export PATH="$HOME/superset/bin:$PATH"
+```
+
+See [Getting Started](/cli/getting-started#standalone-install).
+
+## 2. Sign in to GitHub and your agents
+
+```bash
+gh auth login
+```
+
+For a server without a browser, set `GH_TOKEN` instead. Then start each agent CLI once over SSH (for example `claude`) and sign in, so it can run later without you.
+
+## 3. Start the host
+
+Create an API key in **Settings → API Keys**, then:
+
+```bash
+export SUPERSET_API_KEY=sk_live_…
+superset start --daemon --org <id|slug|name>
+superset status
+```
+
+`--org` is needed only if the key belongs to more than one organization. See [Headless hosts](/remote-access#headless-sandbox-ci-or-server).
+
+To keep the host running across reboots, run it under systemd instead: [Run it under systemd](/cli/host-server#run-it-under-systemd). First stop the host you started above:
+
+```bash
+superset stop --org <id|slug|name>
+```
+
+Use the same `--org` you passed to `superset start`, or leave it out if you did.
+
+systemd does not see variables you exported in your shell. Put them in a file only root can read, such as `/etc/superset/host.env`:
+
+```bash
+SUPERSET_API_KEY=sk_live_…
+# Only if the key belongs to more than one organization:
+SUPERSET_ORGANIZATION_ID=<id>
+# Only if you used GH_TOKEN instead of gh auth login:
+GH_TOKEN=…
+```
+
+Then add `EnvironmentFile=/etc/superset/host.env` to the unit's `[Service]` section.
+
+## 4. Add your repos
+
+Clone a repo onto the server:
+
+```bash
+superset projects create --name "My Project" --local \
+  --clone https://github.com/org/repo.git --parent-dir ~/code
+```
+
+If the project already exists on another machine, attach this server to it with `projects setup` instead. See [Create or adopt a project](/cli/host-server#create-or-adopt-a-project).
+
+## 5. Work on it
+
+- **Desktop:** press **⌘N**, pick the server in the device picker, and start a workspace. The ports its dev servers open are [forwarded to your machine](/remote-access#ports-on-a-remote-host).
+- **iPhone and iPad:** the server appears next to your other hosts in the [mobile app](/mobile).
+- **Teammates:** [grant them access](/remote-access#grant-teammates-access) to the host.
+
+## Security
+
+- Use a server for Paradev only. Anyone you grant access to can reach everything the host can, including its agent sign-ins.
+- Keep only the repos and credentials you mean to share on it.
+- Agents still use your own subscriptions and keys. Paradev does not proxy model calls.

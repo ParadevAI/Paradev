@@ -15,8 +15,8 @@ interface PageFrameProps {
 /**
  * The page is served from its own origin, so `allow-same-origin` gives it a
  * real origin of its own (storage, cookies scoped to that one page) without
- * ever being ours. The omissions are the policy: no top navigation, no
- * downloads, and popups stay sandboxed.
+ * ever being ours. The omissions are the policy: no top navigation, and
+ * popups stay sandboxed.
  */
 export function PageFrame({ src, title, ref, onLoad, ready }: PageFrameProps) {
 	const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export function PageFrame({ src, title, ref, onLoad, ready }: PageFrameProps) {
 				}}
 				title={title}
 				src={src}
-				sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+				sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
 				referrerPolicy="no-referrer"
 				allow="fullscreen"
 				className={cn(

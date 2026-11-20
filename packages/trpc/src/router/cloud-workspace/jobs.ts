@@ -22,6 +22,8 @@ export async function publishCloudWorkspaceJob<Body>(args: {
 	path: string;
 	body: Body;
 	delaySeconds?: number;
+	/** QStash drops a second message with the same id; local runs do not dedupe. */
+	deduplicationId?: string;
 	runLocally: (body: Body) => Promise<unknown>;
 }): Promise<void> {
 	if (isLocalApi) {
@@ -41,6 +43,7 @@ export async function publishCloudWorkspaceJob<Body>(args: {
 		headers: traceHeaders(),
 		retries: 2,
 		...(args.delaySeconds ? { delay: args.delaySeconds } : {}),
+		...(args.deduplicationId ? { deduplicationId: args.deduplicationId } : {}),
 	});
 }
 

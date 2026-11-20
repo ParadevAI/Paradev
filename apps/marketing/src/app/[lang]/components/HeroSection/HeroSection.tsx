@@ -77,7 +77,8 @@ export function HeroSection() {
 								className="text-base sm:text-xl font-light text-muted-foreground max-w-4xl mx-auto"
 							>
 								<Trans>
-									One workspace for Claude Code, Codex, and any coding agent.
+									The open-source workspace for Claude Code, Codex, and any
+									coding agent.
 								</Trans>
 							</p>
 						</div>

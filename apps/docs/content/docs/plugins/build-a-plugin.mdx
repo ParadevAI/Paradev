@@ -1,6 +1,6 @@
 ---
 title: Build a Plugin
-description: Write a plugin, test it on your machine, share it with your team, and submit it to the Paradev marketplace
+description: Write a plugin, test it, share it with your team, and submit it to the Paradev marketplace
 ---
 
 A plugin is a folder with a `plugin.json` manifest and, optionally, a `skills/` folder. Its tools come from an MCP server that already exists, and Paradev proxies each call to it. The plugin does not include that server, but a skill can include `scripts/` files, which are installed on the user's machine. See [Overview](/plugins/overview) for what a plugin does once it is installed.
@@ -62,7 +62,7 @@ The name must be lowercase letters, digits, dots, and hyphens. The category is o
 			"interface": {
 				"displayName": "Acme",
 				"category": "Developer tools",
-				"icon": "acme"
+				"icon": "./assets/icon.svg"
 			},
 			"mcp": {
 				"type": "streamable-http",
@@ -75,10 +75,12 @@ The name must be lowercase letters, digits, dots, and hyphens. The category is o
 
 | Field | What it does |
 |:------|:-------------|
-| `interface` | The name, category, and icon shown in the Plugins page |
+| `interface` | The name, category, and icon shown in the Plugins page. `icon` is a path to an image in the plugin folder, or the key of an icon built into Paradev |
 | `mcp` | The MCP server the tools come from. Streamable HTTP only. Omit it for a skills-only plugin |
 | `connector` | The account connection the tools need, as `{ "slug": "..." }`. Omit it when the tools need no account |
 | `bind` | How the connection's credential is added to each call, such as `"headers": { "Authorization": "Bearer ${config.access_token}" }` |
+
+Put the image in the plugin folder, here at `plugins/acme/assets/icon.svg`. It must be an SVG, PNG, WebP, or JPEG file of 256 KB or less. URLs, absolute paths, and symlinks out of the folder are not used. The Plugins page shows the image after the plugin is installed. A built-in icon key shows at all times. When neither can be used, the page shows a generic icon.
 
 The full schema is at [paradev.com/schemas/plugin/1.0.0.json](https://paradev.com/schemas/plugin/1.0.0.json). Your editor uses it to complete and check the file.
 
@@ -166,7 +168,7 @@ To make a plugin available to every Paradev user, open a pull request that adds 
 
 7. Open the pull request. Say what the plugin does, and show it working in an agent session.
 
-An icon and a guide under [Available Plugins](/plugins/available) are welcome but not required. We can add them before the plugin is listed.
+An icon and a guide under [Available Plugins](/plugins/available) are optional. We can add them before the plugin is listed.
 
 ## Release a New Version
 

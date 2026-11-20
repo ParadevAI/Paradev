@@ -1,6 +1,11 @@
 import * as Sentry from "@sentry/core";
 import { db } from "@superset/db/client";
-import { cloudWorkspaces, environments, tasks } from "@superset/db/schema";
+import {
+	cloudWorkspaces,
+	cloudWorkspaceTags,
+	environments,
+	tasks,
+} from "@superset/db/schema";
 import {
 	type CloudAgentLaunch,
 	describeCloudAgentLaunch,
@@ -11,6 +16,7 @@ import { waitUntil } from "@vercel/functions";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { anchorAttachments } from "../../lib/attachments";
 import { resolveMachineSize } from "../../lib/billing/plan";
+import { logControl } from "../../lib/control-log";
 import {
 	githubRepositoriesOutOfReach,
 	githubUserTokenFor,
@@ -24,6 +30,7 @@ import {
 } from "../../lib/sandbox";
 import { pushWorkspaceAccess } from "../../lib/workspace-access";
 import { userError } from "../../trpc";
+import { failChatMovesTo } from "../chat-move/utils/queueChatMove";
 import { recordCloudWorkspaceActivity } from "./activity";
 import { publishCloudWorkspaceJob } from "./jobs";
 import { assertMayBoot } from "./meter";
@@ -33,8 +40,9 @@ import {
 	provisionCloudWorkspace,
 	sandboxNameFor,
 } from "./provision";
+import { queuedLaunch } from "./queued-launch";
 import { linkTask } from "./record";
-import { transitionCloudWorkspace } from "./transition";
+import { failCloudWorkspace, transitionCloudWorkspace } from "./transition";
 
 /** An environment this user may start a workspace from, or a user-facing NOT_FOUND. */
 export async function loadUsableEnvironment(args: {
@@ -129,6 +137,8 @@ export interface StartCloudWorkspaceInput {
 	taskIds?: string[];
 	attachmentFileIds?: string[];
 	machineSize?: string;
+	/** Normalized workspace tags, filed under `userId`. */
+	tags?: string[];
 	beforeProvision?: (workspaceId: string) => Promise<void>;
 }
 
@@ -136,7 +146,14 @@ async function start(args: StartCloudWorkspaceInput) {
 	const openAsChat =
 		args.chat === true && supportsCloudAgentChat(args.launch?.agent);
 	const environment = await loadUsableEnvironment(args);
-	const size = await resolveMachineSize(args.organizationId, args.machineSize);
+	const size =
+		(await resolveMachineSize(
+			args.organizationId,
+			args.machineSize ?? environment.machineSize,
+		)) ??
+		(args.machineSize
+			? null
+			: await resolveMachineSize(args.organizationId, undefined));
 	if (!size) throw machineSizeNotAvailable(args.machineSize);
 	const machineSize = size.name;
 	await assertMayBoot(args.organizationId, size.vcpus);
@@ -209,6 +226,15 @@ async function start(args: StartCloudWorkspaceInput) {
 		cloudWorkspaceId: row.id,
 		repositories,
 	});
+	if (args.tags?.length) {
+		await db.insert(cloudWorkspaceTags).values(
+			args.tags.map((tag) => ({
+				cloudWorkspaceId: row.id,
+				tag,
+				createdByUserId: args.userId,
+			})),
+		);
+	}
 	const actor = { kind: "user" as const, userId: args.userId };
 	await recordCloudWorkspaceActivity(db, row.id, actor, { event: "created" });
 	if (args.taskIds?.length) {
@@ -242,29 +268,29 @@ async function start(args: StartCloudWorkspaceInput) {
 	const job = {
 		cloudWorkspaceId: row.id,
 		...(args.name ? {} : { namingPrompt: args.prompt ?? "" }),
-		...(args.launch
-			? {
-					launch: {
-						...args.launch,
-						surface: openAsChat ? ("chat" as const) : undefined,
-					},
-				}
-			: {}),
+		...(args.launch ? { launch: queuedLaunch(args.launch, openAsChat) } : {}),
 	};
 
 	pushWorkspaceAccess(row.organizationId, row.id);
 	try {
 		await args.beforeProvision?.(row.id);
 	} catch (error) {
-		await transitionCloudWorkspace({
+		const archived = await transitionCloudWorkspace({
 			id: row.id,
 			from: ["provisioning"],
-			to: "deleted",
+			to: "archived",
 		});
+		if (archived) {
+			logControl(
+				"workspace.archived",
+				{ cloudWorkspaceId: row.id, organizationId: row.organizationId },
+				{ trigger: "move_failed" },
+			);
+		}
 		throw error;
 	}
 	nudge(row.organizationId, "cloud_workspaces");
-	await queueProvision(job);
+	await queueProvision(job, row.organizationId);
 	return {
 		...row,
 		initialLaunch: await describeCloudAgentLaunch(job.launch),
@@ -277,6 +303,7 @@ async function start(args: StartCloudWorkspaceInput) {
  */
 export async function queueProvision(
 	job: ProvisionCloudWorkspaceInput,
+	organizationId: string,
 ): Promise<void> {
 	try {
 		await publishCloudWorkspaceJob({
@@ -287,11 +314,21 @@ export async function queueProvision(
 	} catch (error) {
 		// Nothing was provisioned, so there is no sandbox to tear down —
 		// but the row must not sit in `provisioning` with no job coming.
-		await transitionCloudWorkspace({
-			id: job.cloudWorkspaceId,
+		await failCloudWorkspace({
+			scope: { cloudWorkspaceId: job.cloudWorkspaceId, organizationId },
 			from: ["provisioning"],
-			to: "failed",
+			reason: "queue_failed",
+			error,
 		});
+		await failChatMovesTo(
+			job.cloudWorkspaceId,
+			"The cloud workspace could not start",
+		).catch((moveError) =>
+			console.error(
+				`[cloud-workspace] could not fail the chat moves into ${job.cloudWorkspaceId}`,
+				moveError,
+			),
+		);
 		console.error(
 			`[cloud-workspace] could not queue provisioning for ${job.cloudWorkspaceId}`,
 			error,
