@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "bun:test";
 import type { ChildProcess } from "node:child_process";
 import { EventEmitter } from "node:events";
 import path from "node:path";
+import { PassThrough } from "node:stream";
 import { TERMINAL_ATTACH_CANCELED_MESSAGE } from "../lib/terminal/errors";
 import {
 	createFrameHeader,
@@ -11,6 +12,7 @@ import {
 import "./xterm-env-polyfill";
 
 const { Session } = await import("./session");
+const { TerminalHost } = await import("./terminal-host");
 
 class FakeStdout extends EventEmitter {
 	pauseCalls = 0;
@@ -49,6 +51,177 @@ class FakeChildProcess extends EventEmitter {
 
 let fakeChildProcess: FakeChildProcess;
 let spawnCalls: Array<{ command: string; args: string[] }> = [];
+
+it("blocks new and queued stdin frames after the PTY Exit frame", async () => {
+	const child = Object.assign(new EventEmitter(), {
+		stdout: new FakeStdout(),
+		stdin: new FakeStdin(),
+	});
+	const session = new Session({
+		sessionId: "session-pty-exit-input",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+		spawnProcess: () => child as unknown as ChildProcess,
+	});
+	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
+	child.stdout.emit("data", createFrameHeader(PtySubprocessIpcType.Ready, 0));
+	const writesBeforeInput = child.stdin.writes.length;
+	session.write("live input");
+	expect(child.stdin.writes.length).toBeGreaterThan(writesBeforeInput);
+	const writesBeforeResize = child.stdin.writes.length;
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBeGreaterThan(writesBeforeResize);
+	const exit = Buffer.alloc(4);
+	exit.writeInt32LE(3);
+	child.stdout.emit(
+		"data",
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Exit, exit.length),
+			exit,
+		]),
+	);
+	const writesAtExit = child.stdin.writes.length;
+	session.write("late input");
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBe(writesAtExit);
+	const internals = session as unknown as {
+		subprocessStdinQueue: Buffer[];
+		subprocessStdinQueuedBytes: number;
+		flushSubprocessStdinQueue: () => void;
+	};
+	expect(internals.subprocessStdinQueue).toEqual([]);
+	expect(internals.subprocessStdinQueuedBytes).toBe(0);
+	const queued = createFrameHeader(PtySubprocessIpcType.Resize, 0);
+	internals.subprocessStdinQueue.push(queued);
+	internals.subprocessStdinQueuedBytes += queued.length;
+	internals.flushSubprocessStdinQueue();
+	expect(child.stdin.writes.length).toBe(writesAtExit);
+	await session.dispose();
+});
+
+it("drains paused output and the PTY exit frame before closing the subprocess", async () => {
+	const child = Object.assign(new EventEmitter(), {
+		stdout: new PassThrough(),
+		stdin: new FakeStdin(),
+	});
+	const session = new Session({
+		sessionId: "session-exit-drain",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+		spawnProcess: () => child as unknown as ChildProcess,
+	});
+	const exits: number[] = [];
+	session.onExit((_id, code) => exits.push(code));
+	session.spawn({ cwd: "/tmp", cols: 80, rows: 24, env: {} });
+	child.stdout.write(createFrameHeader(PtySubprocessIpcType.Ready, 0));
+	const socket = Object.assign(new EventEmitter(), {
+		write: () => true,
+	}) as unknown as import("node:net").Socket;
+	const internals = session as unknown as {
+		handleClientBackpressure: (socket: import("node:net").Socket) => void;
+		emulator: { flush: () => Promise<void> };
+	};
+	internals.handleClientBackpressure(socket);
+	const output = Buffer.from("final output\r\n");
+	child.stdout.write(
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Data, output.length),
+			output,
+		]),
+	);
+	const exit = Buffer.alloc(4);
+	exit.writeInt32LE(3);
+	child.stdout.write(
+		Buffer.concat([
+			createFrameHeader(PtySubprocessIpcType.Exit, exit.length),
+			exit,
+		]),
+	);
+	const writesBeforeExit = child.stdin.writes.length;
+	child.emit("exit", 0);
+	expect(exits).toEqual([]);
+	expect(session.isAlive).toBe(false);
+	session.resize(90, 25);
+	expect(child.stdin.writes.length).toBe(writesBeforeExit);
+	expect(child.stdout.isPaused()).toBe(false);
+	await new Promise<void>((resolve) => {
+		child.stdout.once("end", resolve);
+		child.stdout.end();
+	});
+	expect(exits).toEqual([]);
+	const host = new TerminalHost();
+	const hostSessions = (
+		host as unknown as { sessions: Map<string, typeof session> }
+	).sessions;
+	hostSessions.set(session.sessionId, session);
+	host.detach(socket, { sessionId: session.sessionId });
+	expect(hostSessions.get(session.sessionId)).toBe(session);
+	host.detachFromAllSessions(socket);
+	expect(hostSessions.get(session.sessionId)).toBe(session);
+	const flush = internals.emulator.flush.bind(internals.emulator);
+	let releaseFlush!: () => void;
+	const pendingFlush = new Promise<void>((resolve) => {
+		releaseFlush = resolve;
+	});
+	internals.emulator.flush = async () => {
+		await pendingFlush;
+		await flush();
+	};
+	const reconnect = host.createOrAttach(socket, {
+		sessionId: session.sessionId,
+		workspaceId: session.workspaceId,
+		paneId: session.paneId,
+		tabId: session.tabId,
+		cols: 80,
+		rows: 24,
+	});
+	child.emit("close", 0);
+	await new Promise<void>((resolve) => setImmediate(resolve));
+	expect(exits).toEqual([]);
+	releaseFlush();
+	await internals.emulator.flush();
+	await new Promise<void>((resolve) => setImmediate(resolve));
+	const reattached = await reconnect;
+	expect(reattached.isNew).toBe(false);
+	expect(reattached.snapshot.snapshotAnsi).toContain("final output");
+	expect(exits).toEqual([3]);
+	expect(session.getSnapshot().snapshotAnsi).toContain("final output");
+	await session.dispose();
+});
+
+it("does not notify exit if disposed while final output is draining", async () => {
+	const session = new Session({
+		sessionId: "session-disposed-drain",
+		workspaceId: "workspace-1",
+		paneId: "pane-1",
+		tabId: "tab-1",
+		cols: 80,
+		rows: 24,
+		cwd: "/tmp",
+		shell: "/bin/sh",
+	});
+	const exits: number[] = [];
+	session.onExit((_id, code) => exits.push(code));
+	const internals = session as unknown as {
+		enqueueEmulatorWrite: (data: string) => void;
+		finishSubprocessExit: (code: number) => Promise<void>;
+	};
+	internals.enqueueEmulatorWrite("last output");
+	const finishing = internals.finishSubprocessExit(0);
+	await session.dispose();
+	await finishing;
+	expect(exits).toEqual([]);
+});
 
 function sendFrame(
 	proc: FakeChildProcess,
