@@ -96,6 +96,7 @@ import {
 	PANEL_MAX_HEIGHT_PX,
 	VIEW_ENTER_CLASSNAME,
 } from "./constants";
+import { useActivityPanelVisibility } from "./hooks/useActivityPanelVisibility";
 import { useAgentWork } from "./hooks/useAgentWork";
 import { useAgentWorkActions } from "./hooks/useAgentWorkActions";
 import { useWorkspacePullRequests } from "./hooks/useWorkspacePullRequests";
@@ -172,10 +173,7 @@ export function WorkspaceActivityMenu({
 	const fits = useActivityPanelStore(
 		(state) => state.fits[workspaceId] === true,
 	);
-	const hidden = useActivityPanelStore(
-		(state) => state.hidden[workspaceId] === true,
-	);
-	const setHidden = useActivityPanelStore((state) => state.setHidden);
+	const { hidden, setHidden } = useActivityPanelVisibility(workspaceId);
 	const subagentsCollapsed = useActivityPanelStore(
 		(state) => state.subagentsCollapsed[workspaceId] === true,
 	);
@@ -566,7 +564,7 @@ export function WorkspaceActivityMenu({
 				: null;
 	const onTriggerClick = () => {
 		if (fits) {
-			setHidden(workspaceId, !hidden);
+			setHidden(!hidden);
 			return;
 		}
 		setFloating(!popoverOpen);
