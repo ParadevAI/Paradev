@@ -1,7 +1,10 @@
 import { describe, expect, test } from "bun:test";
+import type { Octokit } from "@octokit/rest";
 import {
 	fetchOpenPullRequestsFromGh,
 	fetchPullRequestByHeadFromGh,
+	fetchPullRequestByNumber,
+	fetchPullRequestByNumberFromGh,
 	fetchPullRequestChecksFromGh,
 	fetchPullRequestMergeQueueStateFromGh,
 	fetchPullRequestReviewDecisionFromGh,
@@ -25,6 +28,55 @@ function createExecGh(responses: unknown[]) {
 }
 
 describe("GitHub pull request REST queries", () => {
+	test("normalizes a numbered merged PR lookup through gh and Octokit", async () => {
+		const raw = {
+			number: 42,
+			title: "Deleted branch",
+			html_url: "https://github.com/owner/repo/pull/42",
+			state: "closed",
+			merged_at: "2026-05-01T10:00:00Z",
+			head: {
+				ref: "deleted-feature",
+				sha: "abc123",
+				repo: { name: "repo", owner: { login: "owner" } },
+			},
+		};
+		const repo = { owner: "owner", name: "repo" };
+		const { execGh, calls } = createExecGh([raw]);
+		const fromGh = await fetchPullRequestByNumberFromGh(execGh, repo, 42);
+		const octokit = {
+			rest: {
+				pulls: {
+					get: async (params: unknown) => {
+						expect(params).toEqual({
+							owner: "owner",
+							repo: "repo",
+							pull_number: 42,
+						});
+						return { data: raw };
+					},
+				},
+			},
+		} as unknown as Octokit;
+
+		const fromOctokit = await fetchPullRequestByNumber(octokit, repo, 42);
+
+		expect(fromGh).toMatchObject({
+			number: 42,
+			state: "MERGED",
+			headRefName: "deleted-feature",
+			headRefOid: "abc123",
+			mergedAt: Date.parse(raw.merged_at),
+		});
+		expect(fromOctokit).toEqual(fromGh);
+		expect(calls[0]?.args).toEqual([
+			"api",
+			"--method",
+			"GET",
+			"repos/owner/repo/pulls/42",
+		]);
+	});
+
 	test("fetches only the PR matching the requested upstream head", async () => {
 		const { calls, execGh } = createExecGh([
 			[
