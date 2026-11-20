@@ -134,7 +134,7 @@ describe("released clients keep the same routes", () => {
 			expect(after.path).toBe(before.path);
 			expect(after.options.method).toEqual(before.options.method);
 			const bodyOf = (options: object) =>
-				"body" in options ? String(options.body) : undefined;
+				"body" in options ? options.body : undefined;
 			const middlewareOf = (options: object) =>
 				"use" in options && Array.isArray(options.use)
 					? options.use.length
