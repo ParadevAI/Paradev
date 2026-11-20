@@ -355,6 +355,7 @@ export const FULL_WIDTH_SECTION_PATHS: readonly string[] =
 	);
 
 export interface SettingsSectionVisibility {
+	hasNavigationRail?: boolean;
 	isMac: boolean;
 	isAdmin: boolean;
 	pluginsEnabled: boolean;

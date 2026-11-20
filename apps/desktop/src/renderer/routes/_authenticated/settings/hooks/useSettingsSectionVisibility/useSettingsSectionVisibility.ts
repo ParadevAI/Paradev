@@ -4,11 +4,13 @@ import { useMemo } from "react";
 import { env } from "renderer/env.renderer";
 import { useCloudUsageEnabled } from "renderer/hooks/useCloudUsageEnabled";
 import { useIsOrganizationAdmin } from "renderer/hooks/useIsOrganizationAdmin";
+import { useParadevShell } from "renderer/hooks/useParadevShell";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { getOfferedSections } from "../../utils/settings-search";
 import type { SettingsSectionVisibility } from "../../utils/settingsSections";
 
 export function useSettingsSectionVisibility(): SettingsSectionVisibility {
+	const hasNavigationRail = useParadevShell();
 	const pluginsFlag = useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS);
 	const pluginsEnabled = env.NODE_ENV === "development" || pluginsFlag === true;
 	const isAdmin = useIsOrganizationAdmin() === true;
@@ -24,11 +26,19 @@ export function useSettingsSectionVisibility(): SettingsSectionVisibility {
 	return useMemo(
 		() => ({
 			isMac,
+			hasNavigationRail,
 			isAdmin,
 			pluginsEnabled,
 			cloudUsageEnabled,
 			allowedSections,
 		}),
-		[isMac, isAdmin, pluginsEnabled, cloudUsageEnabled, allowedSections],
+		[
+			isMac,
+			hasNavigationRail,
+			isAdmin,
+			pluginsEnabled,
+			cloudUsageEnabled,
+			allowedSections,
+		],
 	);
 }

@@ -147,6 +147,18 @@ describe("settings search - mobile", () => {
 });
 
 describe("settings search - visibility", () => {
+	it("offers sidebar sections only with the navigation rail", () => {
+		expect(
+			getVisibleMatchCountBySection("sidebar sections", visible()).appearance,
+		).toBeUndefined();
+		expect(
+			getVisibleMatchCountBySection(
+				"sidebar sections",
+				visible({ hasNavigationRail: true }),
+			).appearance,
+		).toBe(1);
+	});
+
 	it("counts matches only in sections the settings nav shows", () => {
 		expect(
 			getVisibleMatchCountBySection("marketplace", visible()).plugins,

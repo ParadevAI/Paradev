@@ -18952,6 +18952,9 @@ msgstr "Порядок в боковой панели"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Плашка в боковой панели, появляется, когда обновление приложения готово к установке"
 
+msgid "Sidebar sections"
+msgstr "Разделы левой панели"
+
 msgid "Sign in"
 msgstr "Войти"
 

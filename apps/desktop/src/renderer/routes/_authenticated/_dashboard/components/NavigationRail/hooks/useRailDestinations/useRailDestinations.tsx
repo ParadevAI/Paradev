@@ -9,7 +9,9 @@ import { env } from "renderer/env.renderer";
 import type { useDashboardNavigation } from "renderer/routes/_authenticated/_dashboard/hooks/useDashboardNavigation";
 import { useFailedAutomations } from "renderer/routes/_authenticated/_dashboard/hooks/useFailedAutomations";
 import { SolarCheckCircleIcon } from "../../components/SolarCheckCircleIcon";
+import { RAIL_DESTINATION_LABELS } from "../../railDestinationLabels";
 import {
+	DEFAULT_RAIL_ORDER,
 	isRailDestinationPinned,
 	type RailDestinationId,
 	resolveRailOrder,
@@ -27,12 +29,7 @@ export interface RailDestination {
 	onClick: () => void;
 }
 
-export function useRailDestinations(
-	navigation: ReturnType<typeof useDashboardNavigation>,
-): RailDestination[] {
-	const { t } = useLingui();
-	const pinOverrides = useRailPinsStore((state) => state.pinOverrides);
-	const railOrder = resolveRailOrder(useRailPinsStore((state) => state.order));
+export function useAvailableRailDestinationIds(): RailDestinationId[] {
 	const isChannelsEnabled =
 		useFeatureFlagEnabled(FEATURE_FLAGS.CHANNELS) === true;
 	// `?? false`: the hook returns undefined until PostHog flags resolve.
@@ -41,46 +38,54 @@ export function useRailDestinations(
 	const isPluginsEnabled =
 		(useFeatureFlagEnabled(FEATURE_FLAGS.PLUGINS) ?? false) ||
 		env.NODE_ENV === "development";
+	return DEFAULT_RAIL_ORDER.filter(
+		(id) =>
+			(id !== "chat" || isChannelsEnabled) &&
+			(id !== "plugins" || isPluginsEnabled),
+	);
+}
+
+export function useRailDestinations(
+	navigation: ReturnType<typeof useDashboardNavigation>,
+): RailDestination[] {
+	const { i18n, t } = useLingui();
+	const pinOverrides = useRailPinsStore((state) => state.pinOverrides);
+	const railOrder = resolveRailOrder(useRailPinsStore((state) => state.order));
+	const hiddenDestinationIds = useRailPinsStore(
+		(state) => state.hiddenDestinationIds,
+	);
+	const availableDestinationIds = useAvailableRailDestinationIds();
 	const { myFailedCount } = useFailedAutomations();
 
-	const destinations: (Omit<RailDestination, "isPinned"> & {
-		isAvailable?: boolean;
-	})[] = [
+	const destinations: Omit<RailDestination, "label" | "isPinned">[] = [
 		{
 			id: "workspaces",
-			label: t({ message: "Workspaces" }),
 			icon: TbStack2,
 			isActive: navigation.isWorkspacesOpen,
 			onClick: navigation.openWorkspaces,
 		},
 		{
 			id: "chat",
-			label: t({ message: "Chat" }),
 			icon: PiChatsCircle,
 			isIconFilled: true,
 			isActive: navigation.isChannelsOpen,
 			onClick: navigation.openChannels,
-			isAvailable: isChannelsEnabled,
 		},
 		{
 			id: "pages",
-			label: t({ message: "Pages" }),
 			icon: TbNote,
 			isActive: navigation.isPagesOpen,
 			onClick: navigation.openPages,
 		},
 		{
 			id: "plugins",
-			label: t({ message: "Plugins" }),
 			icon: VscExtensions,
 			isIconFilled: true,
 			isActive: navigation.isPluginsOpen,
 			onClick: navigation.openPlugins,
-			isAvailable: isPluginsEnabled,
 		},
 		{
 			id: "automations",
-			label: t({ message: "Automations" }),
 			alertLabel:
 				myFailedCount > 0
 					? t({ message: `Automations (${myFailedCount} failing)` })
@@ -95,14 +100,12 @@ export function useRailDestinations(
 		},
 		{
 			id: "tasks",
-			label: t({ message: "Tasks" }),
 			icon: SolarCheckCircleIcon,
 			isActive: navigation.isTasksOpen,
 			onClick: navigation.openTasks,
 		},
 		{
 			id: "pullRequests",
-			label: t({ message: "Pull requests" }),
 			icon: TbGitPullRequest,
 			isActive: navigation.isPullRequestsOpen,
 			onClick: navigation.openPullRequests,
@@ -110,10 +113,15 @@ export function useRailDestinations(
 	];
 
 	return destinations
-		.filter(({ isAvailable = true }) => isAvailable)
+		.filter(
+			({ id }) =>
+				availableDestinationIds.includes(id) &&
+				!hiddenDestinationIds.includes(id),
+		)
 		.sort((a, b) => railOrder.indexOf(a.id) - railOrder.indexOf(b.id))
-		.map(({ isAvailable: _isAvailable, ...destination }) => ({
+		.map((destination) => ({
 			...destination,
+			label: i18n._(RAIL_DESTINATION_LABELS[destination.id]),
 			isPinned: isRailDestinationPinned(pinOverrides, destination.id),
 		}));
 }
