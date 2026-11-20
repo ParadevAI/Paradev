@@ -12,6 +12,7 @@ const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
 type Agent = {
 	id: string;
 	presetId?: string;
+	launchPresetId?: string;
 	command?: string;
 	surface?: "chat" | "terminal";
 };
@@ -64,10 +65,11 @@ export function useAgentModelCatalog(
 			const fallback: AgentModelCatalog = {
 				models:
 					getAgentModelSupport(
-						resolveAgentLaunchPresetId(
-							agent.presetId ?? agent.id,
-							agent.command ?? agent.presetId ?? agent.id,
-						),
+						agent.launchPresetId ??
+							resolveAgentLaunchPresetId(
+								agent.presetId ?? agent.id,
+								agent.command ?? agent.presetId ?? agent.id,
+							),
 					)?.models ?? [],
 				source: "bundled",
 				availability: "unknown",

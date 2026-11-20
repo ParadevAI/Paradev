@@ -122,8 +122,16 @@ export function ModelPanel({
 	const loadRef = useRef(tabAgent?.onLoad);
 	loadRef.current = tabAgent?.onLoad;
 	const catalogKey = tabAgent?.catalogKey;
+	const favoriteLoadsRef = useRef<Array<(() => void) | undefined>>([]);
+	favoriteLoadsRef.current = (agentSwitcher?.agents ?? [])
+		.filter((agent) =>
+			favorites.some((favorite) => favorite.presetId === agent.presetId),
+		)
+		.map((agent) => agent.onLoad);
 	useEffect(() => {
-		if (catalogKey && tab !== FAVORITES_TAB) loadRef.current?.();
+		if (tab === FAVORITES_TAB)
+			for (const load of favoriteLoadsRef.current) load?.();
+		else if (catalogKey) loadRef.current?.();
 	}, [tab, catalogKey]);
 	const rows: Row[] = onFavoritesTab
 		? favorites.flatMap((favorite) => {
@@ -154,6 +162,7 @@ export function ModelPanel({
 			rows.flatMap((row) => (row.metadata ? [row.metadata.provider] : [])),
 		),
 	].sort();
+	const activeProvider = providers.includes(provider) ? provider : "";
 	const needle = query.trim().toLowerCase();
 	const matchingRows = (includeAll: boolean) =>
 		rows.filter(
@@ -168,7 +177,7 @@ export function ModelPanel({
 					],
 					{
 						query: needle,
-						providers: provider ? [provider] : undefined,
+						providers: activeProvider ? [activeProvider] : undefined,
 						requireTools: !includeAll,
 						requireTextOutput: !includeAll,
 						includeDeprecated: includeAll,
@@ -428,10 +437,10 @@ export function ModelPanel({
 						<button
 							key={value}
 							type="button"
-							aria-pressed={provider === value}
+							aria-pressed={activeProvider === value}
 							className={cn(
 								"rounded px-2 py-1 text-xs",
-								provider === value
+								activeProvider === value
 									? "bg-accent text-accent-foreground"
 									: "text-muted-foreground",
 							)}

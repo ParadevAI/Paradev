@@ -84,7 +84,7 @@ async function probeVersion(
 	} catch {
 		version = null;
 	}
-	cache.set(command, { at: Date.now(), version });
+	if (!signal?.aborted) cache.set(command, { at: Date.now(), version });
 	return version;
 }
 
