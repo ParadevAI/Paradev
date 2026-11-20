@@ -99,6 +99,7 @@ export function CloudUsagePage({
 								gbHours: byDay.data.total.gbHours,
 								usd: byDay.data.total.usageUsd,
 							}}
+							ratePerGbHour={periods.data.ratePerGbHour}
 							allowance={allowance}
 							unavailable={period?.unavailable ?? []}
 							isPeriod={period !== undefined}

@@ -34,6 +34,7 @@ export function CloudUsageCard({
 		<div className="space-y-3 border-t pt-6">
 			<BillingUsageCard
 				period={periods?.items[0]}
+				ratePerGbHour={periods?.ratePerGbHour ?? null}
 				link={
 					showUsageLink && (
 						<PageLink>
