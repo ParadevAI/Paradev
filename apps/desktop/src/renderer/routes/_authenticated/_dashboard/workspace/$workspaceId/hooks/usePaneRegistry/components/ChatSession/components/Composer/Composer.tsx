@@ -130,6 +130,8 @@ export type ComposerProps = {
 	disabled?: boolean;
 	onCancelTurn?: (() => void) | null;
 	target?: ComposerTarget;
+	/** Takes text left in the composer when it becomes read-only. */
+	onDraftBlocked?: (draft: ComposerDraft) => void;
 	escapeGoesBack?: boolean;
 	onEnterDrawer?: (options: { actionableOnly: boolean }) => boolean;
 	sessionUsage?: SessionUsage | null;
@@ -206,6 +208,7 @@ export const Composer = memo(function Composer({
 	placeholder,
 	sessionUsage,
 	target,
+	onDraftBlocked,
 	turnRunning = false,
 	promptPending = false,
 	awaitingBackground = false,
@@ -238,10 +241,16 @@ export const Composer = memo(function Composer({
 		),
 	);
 	const uploadAttachments = useUploadAttachments(workspaceId);
-	const { storedDraft, onDraftChange, clearDraft } = useComposerDraft(
-		draftKey,
-		draftPersisted,
-	);
+	const { storedDraft, onDraftChange, clearDraft, takeDraft } =
+		useComposerDraft(draftKey, draftPersisted);
+	const [editorResets, setEditorResets] = useState(0);
+	useLayoutEffect(() => {
+		if (!readOnly || !onDraftBlocked) return;
+		const draft = takeDraft();
+		if (!draft) return;
+		onDraftBlocked(draft);
+		setEditorResets((count) => count + 1);
+	}, [readOnly, takeDraft, onDraftBlocked]);
 	const promptInputRef = useRef<PromptInputHandle>(null);
 	const focusInput = useCallback(() => {
 		if (!readOnly) promptInputRef.current?.focus();
@@ -672,7 +681,7 @@ export const Composer = memo(function Composer({
 					chipForPaste={linkChips.chipForPaste}
 					renderChip={linkChips.renderChip}
 					history={history}
-					key={draftKey}
+					key={`${draftKey}#${editorResets}`}
 					mentionProviders={mentionProviders}
 					onDraftChange={onDraftChange}
 					onStop={stop}

@@ -164,3 +164,19 @@ test("a recovered draft remembers that dictation wrote part of it", () => {
 		true,
 	);
 });
+
+test("taking a draft hands over what was typed and leaves the composer empty", () => {
+	const view = renderHook(() =>
+		useComposerDraft("chat-v3-draft:subagent:take", false),
+	);
+	act(() => view.result.current.onDraftChange(text("typed to a subagent")));
+
+	let taken: ComposerDraft | null = null;
+	act(() => {
+		taken = view.result.current.takeDraft();
+	});
+
+	expect(taken).toEqual(text("typed to a subagent"));
+	expect(view.result.current.storedDraft).toBeUndefined();
+	expect(view.result.current.takeDraft()).toBeNull();
+});

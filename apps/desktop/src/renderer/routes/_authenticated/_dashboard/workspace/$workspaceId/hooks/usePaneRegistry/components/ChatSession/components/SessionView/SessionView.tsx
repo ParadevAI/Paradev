@@ -540,9 +540,23 @@ export function SessionView({
 		}
 		if (!subagentBlocked || shown.blocked) return;
 		const active = document.activeElement;
-		if (active === document.body || paneRef.current?.contains(active))
+		if (active === document.body || active?.closest("[inert]"))
 			subagentBackRef.current?.focus();
 	}, [focusedSubagentId, focusComposer, subagentBlocked]);
+
+	const subagentName = subagent.target?.name ?? "";
+	const onSubagentDraftBlocked = useCallback(
+		(draft: ComposerDraft) => {
+			const name = subagentName;
+			restoreDraft(draft, draftKey);
+			toast.info(
+				t({
+					message: `${name} can't take messages. Your text is back in the main chat.`,
+				}),
+			);
+		},
+		[restoreDraft, draftKey, subagentName, t],
+	);
 
 	const onBackgroundSubagent = useMoveToBackground(client);
 	const plugins = usePluginMentionOptions();
@@ -854,6 +868,7 @@ export function SessionView({
 					onEnterDrawer={enterDrawer}
 					onSend={subagent.onSend}
 					target={subagent.target}
+					onDraftBlocked={subagent.target ? onSubagentDraftBlocked : undefined}
 					onOpenHistory={onOpenHistory}
 					sessionUsage={sessionUsage}
 					turnRunning={runningTurnId !== null}
