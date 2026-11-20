@@ -471,6 +471,7 @@ export class Server {
 				trustdHealthy: this.trustdHealthy,
 				supportsModeSnapshots: true,
 				supportsColorQueries: true,
+				supportsListRequestIds: true,
 			});
 			return;
 		}
@@ -512,7 +513,7 @@ export class Server {
 				return;
 			}
 			case "list": {
-				conn.send(handleList(ctx));
+				conn.send({ ...handleList(ctx), requestId: msg.requestId });
 				return;
 			}
 			case "subscribe": {
