@@ -784,6 +784,12 @@ msgstr "{actor} melepas tautan workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} sejauh ini · ~{projected} diperkirakan"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} belum masuk di workspace cloud. Masuk sekali agar agen langsung siap saat dimulai."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} sudah masuk di mesin ini sebagai {localAccountLabel}, tetapi belum di workspace cloud. Masuk sekali untuk cloud agar agen langsung siap saat dimulai."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Sesi {agents} dilanjutkan saat Anda membuka workspace-nya."
 
@@ -1994,6 +2000,9 @@ msgstr "Akun menunggu penghapusan"
 msgid "Account usage: {percent} used"
 msgstr "Penggunaan akun: {percent} terpakai"
 
+msgid "Accounts"
+msgstr "Akun"
+
 msgid "Achievements"
 msgstr "Pencapaian"
 
@@ -2368,9 +2377,6 @@ msgstr "Terhadap Main"
 
 msgid "Agent"
 msgstr "Agen"
-
-msgid "Agent commands"
-msgstr "Perintah agen"
 
 msgid "Agent Configs"
 msgstr "Konfigurasi Agen"
@@ -3461,6 +3467,9 @@ msgstr "Tersedia"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Tersedia"
+
+msgid "Available in cloud workspaces"
+msgstr "Tersedia di workspace cloud"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Plugin yang tersedia muncul di halaman Plugin setiap peran. Plugin yang terpasang dipasang untuk semua orang dalam peran itu, yang bisa menonaktifkannya tetapi tidak bisa menghapusnya."
@@ -4909,6 +4918,10 @@ msgstr "Ruang kerja cloud tidak termasuk dalam paket Anda."
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Workspace cloud belum menyertakan {0}."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Workspace cloud mengabaikan variabel ini. Agen masuk melalui Pengaturan › Agen sebagai gantinya."
 
@@ -5362,12 +5375,6 @@ msgstr "Terhubung ke {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Terhubung ke GitHub sebagai {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Terhubung lewat langganan"
-
-msgid "Connected with API key"
-msgstr "Terhubung dengan kunci API"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Terhubung, tapi Microsoft Graph menolak langganan notifikasinya."
@@ -10085,9 +10092,6 @@ msgstr "Cara kami bekerja"
 msgid "How you run agents"
 msgstr "Cara Anda menjalankan agen"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Cara agen Anda masuk di dalam workspace cloud. Orang lain menghubungkan langganan atau kunci API mereka sendiri; di mesin ini setiap agen tetap memakai login yang sudah ada."
-
 msgid "HTML preview"
 msgstr "Pratinjau HTML"
 
@@ -11780,9 +11784,6 @@ msgstr "Urutan manual"
 msgid "manual sign-in"
 msgstr "login manual"
 
-msgid "Manual sign-in"
-msgstr "Login manual"
-
 msgid "Mark all read"
 msgstr "Tandai semua dibaca"
 
@@ -12461,6 +12462,9 @@ msgstr "Agen {providerLabel} yang baru akan memakai {accountLabel}."
 
 msgid "New agent"
 msgstr "Agen baru"
+
+msgid "New agent launches use the default account."
+msgstr "Agen yang baru dijalankan memakai akun default."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Peluncuran agen baru memakai akun ini. Jalankan ulang agen yang sedang berjalan untuk menggantinya."
@@ -18168,6 +18172,9 @@ msgstr "Siapkan"
 msgid "Set up {0}"
 msgstr "Siapkan {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Siapkan {agentLabel} untuk workspace cloud?"
+
 msgid "Set up a host over SSH"
 msgstr "Siapkan host lewat SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Sinkronkan Repositori"
 
 msgid "Sync started"
 msgstr "Sinkronisasi dimulai"
+
+msgid "Sync to cloud"
+msgstr "Sinkronkan ke cloud"
 
 msgid "Synced {syncedAgo}"
 msgstr "Disinkronkan {syncedAgo}"

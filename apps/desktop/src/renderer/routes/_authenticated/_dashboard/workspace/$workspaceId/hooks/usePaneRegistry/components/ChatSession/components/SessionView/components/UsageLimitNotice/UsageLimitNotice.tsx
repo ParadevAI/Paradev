@@ -34,7 +34,7 @@ import {
 	PILL_CHEVRON_CLASS,
 	PILL_TRIGGER_CLASS,
 } from "renderer/routes/_authenticated/components/AgentComposer/constants";
-import { useSetDefaultUsageAccount } from "renderer/routes/_authenticated/settings/usage/hooks/useSetDefaultUsageAccount";
+import { useSetDefaultUsageAccount } from "renderer/routes/_authenticated/settings/components/AgentAccounts/hooks/useSetDefaultUsageAccount";
 import { formatResetLabel } from "renderer/utils/usage/formatResetIn";
 
 const TICK_MS = 30_000;

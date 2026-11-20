@@ -23,9 +23,9 @@ import {
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { CommandTerminal } from "renderer/routes/_authenticated/components/CommandTerminal";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider/LocalHostServiceProvider";
-import type { UsageLogins } from "../../../../hooks/useHostUsageLogins";
-import { useHostUsageLogins } from "../../../../hooks/useHostUsageLogins";
-import { useSetDefaultUsageAccount } from "../../../../hooks/useSetDefaultUsageAccount";
+import type { UsageLogins } from "../../hooks/useHostUsageLogins";
+import { useHostUsageLogins } from "../../hooks/useHostUsageLogins";
+import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
 import { addAccountCommand } from "../../utils/addAccountCommand";
 import type { AccountCredentialKind } from "../../utils/apiBilling";
 import {

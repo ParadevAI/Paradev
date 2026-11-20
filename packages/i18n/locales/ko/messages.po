@@ -784,6 +784,12 @@ msgstr "{actor} 님이 워크스페이스 {workspace}의 연결을 해제했습�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "현재 {actual} · 예상 ~{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel}은(는) 아직 클라우드 워크스페이스에 로그인되어 있지 않습니다. 한 번 로그인하면 에이전트가 바로 사용할 수 있는 상태로 시작됩니다."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel}은(는) 이 컴퓨터에서 {localAccountLabel}(으)로 로그인되어 있지만 클라우드 워크스페이스에는 로그인되어 있지 않습니다. 클라우드용으로 한 번 로그인하면 에이전트가 바로 사용할 수 있는 상태로 시작됩니다."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} 세션은 해당 워크스페이스를 열면 재개됩니다."
 
@@ -1994,6 +2000,9 @@ msgstr "삭제 예정 계정"
 msgid "Account usage: {percent} used"
 msgstr "계정 사용량: {percent} 사용"
 
+msgid "Accounts"
+msgstr "계정"
+
 msgid "Achievements"
 msgstr "업적"
 
@@ -2368,9 +2377,6 @@ msgstr "main 기준"
 
 msgid "Agent"
 msgstr "에이전트"
-
-msgid "Agent commands"
-msgstr "에이전트 명령"
 
 msgid "Agent Configs"
 msgstr "에이전트 설정"
@@ -3461,6 +3467,9 @@ msgstr "사용 가능"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "사용 가능"
+
+msgid "Available in cloud workspaces"
+msgstr "클라우드 워크스페이스에서 사용 가능"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "사용 가능한 플러그인은 각 역할의 플러그인 페이지에 표시됩니다. 설치된 플러그인은 해당 역할의 모든 사람에게 설치되며, 비활성화할 수는 있지만 제거할 수는 없습니다."
@@ -4909,6 +4918,10 @@ msgstr "클라우드 워크스페이스는 현재 플랜에 포함되어 있지 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "클라우드 워크스페이스가 사용자 본인으로 커밋, 푸시하고 풀 리퀘스트를 엽니다"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "클라우드 워크스페이스에는 아직 {0}이(가) 포함되어 있지 않습니다."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "클라우드 워크스페이스는 이 변수를 무시합니다. 에이전트는 대신 설정 › 에이전트에서 로그인합니다."
 
@@ -5362,12 +5375,6 @@ msgstr "{connectedOrgName}에 연결됨"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "{accountLogin}(으)로 GitHub에 연결됨"
-
-msgid "Connected via subscription"
-msgstr "구독으로 연결됨"
-
-msgid "Connected with API key"
-msgstr "API 키로 연결됨"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "연결되었지만 Microsoft Graph가 알림 구독을 거부했습니다."
@@ -10085,9 +10092,6 @@ msgstr "일하는 방식"
 msgid "How you run agents"
 msgstr "에이전트 실행 방식"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "클라우드 워크스페이스 안에서 에이전트가 로그인하는 방식입니다. 다른 사람은 각자의 구독이나 API 키를 연결하며, 이 컴퓨터에서는 각 에이전트가 이미 있는 로그인을 계속 사용합니다."
-
 msgid "HTML preview"
 msgstr "HTML 미리보기"
 
@@ -11780,9 +11784,6 @@ msgstr "수동 정렬"
 msgid "manual sign-in"
 msgstr "수동 로그인"
 
-msgid "Manual sign-in"
-msgstr "수동 로그인"
-
 msgid "Mark all read"
 msgstr "모두 읽음으로 표시"
 
@@ -12461,6 +12462,9 @@ msgstr "새 {providerLabel} 에이전트는 {accountLabel}을(를) 사용합니�
 
 msgid "New agent"
 msgstr "새 에이전트"
+
+msgid "New agent launches use the default account."
+msgstr "새로 실행하는 에이전트는 기본 계정을 사용합니다."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "새 에이전트는 이 계정으로 실행됩니다. 실행 중인 에이전트는 다시 실행해야 바뀝니다."
@@ -18168,6 +18172,9 @@ msgstr "설정"
 msgid "Set up {0}"
 msgstr "{0} 설정"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "클라우드 워크스페이스용 {agentLabel}을(를) 설정할까요?"
+
 msgid "Set up a host over SSH"
 msgstr "SSH로 호스트 설정"
 
@@ -19663,6 +19670,9 @@ msgstr "리포지토리 동기화"
 
 msgid "Sync started"
 msgstr "동기화를 시작했습니다"
+
+msgid "Sync to cloud"
+msgstr "클라우드에 동기화"
 
 msgid "Synced {syncedAgo}"
 msgstr "{syncedAgo} 동기화됨"

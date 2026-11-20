@@ -39,9 +39,12 @@ function methodOf(credential: {
 	return credential.provider ? "custom" : "api_key";
 }
 
-export function useAgentCredential(presetId: string) {
+export function useAgentCredential(
+	presetId: string,
+	{ enabled = true }: { enabled?: boolean } = {},
+) {
 	const utils = cloudTrpc.useUtils();
-	const query = cloudTrpc.agentCredential.list.useQuery();
+	const query = cloudTrpc.agentCredential.list.useQuery(undefined, { enabled });
 	const credential = query.data?.find((row) => row.agent === presetId) ?? null;
 	const stored = credential ? methodOf(credential) : null;
 

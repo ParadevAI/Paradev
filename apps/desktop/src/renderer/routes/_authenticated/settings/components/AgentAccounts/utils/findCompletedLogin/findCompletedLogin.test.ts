@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { UsageLogins } from "../../../../hooks/useHostUsageLogins";
+import type { UsageLogins } from "../../hooks/useHostUsageLogins";
 import { findCompletedLogin } from "./findCompletedLogin";
 
 const selection = "/home/test/.claude-work";

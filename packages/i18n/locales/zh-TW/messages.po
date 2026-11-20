@@ -784,6 +784,12 @@ msgstr "{actor} 取消關聯工作區 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 預計約{projected}"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} 尚未在雲端工作區中登入。登入一次，代理程式啟動後即可直接使用。"
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} 已在本機以 {localAccountLabel} 登入，但尚未在雲端工作區中登入。為雲端登入一次，代理程式啟動後即可直接使用。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "開啟對應工作區時，{agents} 工作階段會恢復。"
 
@@ -1994,6 +2000,9 @@ msgstr "帳戶待刪除"
 msgid "Account usage: {percent} used"
 msgstr "帳戶用量：已使用 {percent}"
 
+msgid "Accounts"
+msgstr "帳戶"
+
 msgid "Achievements"
 msgstr "成就"
 
@@ -2368,9 +2377,6 @@ msgstr "對比main"
 
 msgid "Agent"
 msgstr "代理程式"
-
-msgid "Agent commands"
-msgstr "代理程式指令"
 
 msgid "Agent Configs"
 msgstr "代理程式配置"
@@ -3461,6 +3467,9 @@ msgstr "可用"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "可用"
+
+msgid "Available in cloud workspaces"
+msgstr "可在雲端工作區中使用"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "可用的外掛會顯示在各角色的外掛頁面上。已安裝的外掛會為該角色的所有人安裝，他們可以停用但不能移除。"
@@ -4909,6 +4918,10 @@ msgstr "您的方案不包含雲端工作區。"
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "雲端工作區會以你的身分提交、推送並建立提取要求"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "雲端工作區尚未包含 {0}。"
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "雲端工作區會忽略此變數。代理程式改為在「設定 › 代理程式」中登入。"
 
@@ -5362,12 +5375,6 @@ msgstr "已連線到{connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "已以 {accountLogin} 身分連結 GitHub"
-
-msgid "Connected via subscription"
-msgstr "已透過訂閱連線"
-
-msgid "Connected with API key"
-msgstr "已用API金鑰連線"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "已連線，但Microsoft Graph拒絕了通知訂閱。"
@@ -10085,9 +10092,6 @@ msgstr "我們的工作方式"
 msgid "How you run agents"
 msgstr "執行代理程式的方式"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "你的代理程式在雲端工作區中如何登入。其他人連接各自的訂閱或API金鑰；在這台機器上，每個代理程式繼續使用它上面已有的登入。"
-
 msgid "HTML preview"
 msgstr "HTML 預覽"
 
@@ -11780,9 +11784,6 @@ msgstr "手動排序"
 msgid "manual sign-in"
 msgstr "手動登入"
 
-msgid "Manual sign-in"
-msgstr "手動登入"
-
 msgid "Mark all read"
 msgstr "全部標示為已讀"
 
@@ -12461,6 +12462,9 @@ msgstr "新的{providerLabel}代理程式將使用{accountLabel}。"
 
 msgid "New agent"
 msgstr "新建代理程式"
+
+msgid "New agent launches use the default account."
+msgstr "新啟動的代理程式會使用預設帳戶。"
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "新啟動的代理程式使用此帳戶。重新啟動執行中的代理程式才能切換。"
@@ -18168,6 +18172,9 @@ msgstr "設定"
 msgid "Set up {0}"
 msgstr "設定 {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "要為雲端工作區設定 {agentLabel} 嗎？"
+
 msgid "Set up a host over SSH"
 msgstr "透過 SSH 設定主機"
 
@@ -19663,6 +19670,9 @@ msgstr "同步儲存庫"
 
 msgid "Sync started"
 msgstr "同步已開始"
+
+msgid "Sync to cloud"
+msgstr "同步到雲端"
 
 msgid "Synced {syncedAgo}"
 msgstr "上次同步：{syncedAgo}"

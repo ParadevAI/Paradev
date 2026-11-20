@@ -784,6 +784,12 @@ msgstr "{actor} heeft de koppeling met workspace {workspace} verwijderd"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} tot nu toe · ~{projected} verwacht"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} is nog niet aangemeld in cloudwerkruimtes. Meld je één keer aan zodat agents meteen klaar starten."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} is op deze computer aangemeld als {localAccountLabel}, maar niet in cloudwerkruimtes. Meld je één keer aan voor de cloud zodat agents meteen klaar starten."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-sessies worden hervat wanneer je hun workspace opent."
 
@@ -1994,6 +2000,9 @@ msgstr "Account wordt verwijderd"
 msgid "Account usage: {percent} used"
 msgstr "Accountgebruik: {percent} gebruikt"
 
+msgid "Accounts"
+msgstr "Accounts"
+
 msgid "Achievements"
 msgstr "Prestaties"
 
@@ -2368,9 +2377,6 @@ msgstr "Ten opzichte van main"
 
 msgid "Agent"
 msgstr "Agent"
-
-msgid "Agent commands"
-msgstr "Agentcommando's"
 
 msgid "Agent Configs"
 msgstr "Agentconfiguraties"
@@ -3461,6 +3467,9 @@ msgstr "Beschikbaar"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Beschikbaar"
+
+msgid "Available in cloud workspaces"
+msgstr "Beschikbaar in cloudwerkruimtes"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Beschikbare plugins verschijnen op de Plugins-pagina van elke rol. Geïnstalleerde plugins worden voor iedereen in de rol geïnstalleerd; zij kunnen ze uitschakelen, maar niet verwijderen."
@@ -4909,6 +4918,10 @@ msgstr "Cloudwerkruimtes zijn niet inbegrepen in je plan."
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudwerkruimtes committen, pushen en openen pull requests als jou"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Cloudwerkruimtes bevatten {0} nog niet."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloudworkspaces negeren deze variabele. Agents melden zich in plaats daarvan aan via Instellingen › Agents."
 
@@ -5362,12 +5375,6 @@ msgstr "Verbonden met {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Verbonden met GitHub als {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Verbonden via abonnement"
-
-msgid "Connected with API key"
-msgstr "Verbonden met API-sleutel"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Verbonden, maar Microsoft Graph heeft de meldingsabonnementen geweigerd."
@@ -10085,9 +10092,6 @@ msgstr "Hoe we werken"
 msgid "How you run agents"
 msgstr "Hoe je agents uitvoert"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Hoe je agents inloggen binnen cloudwerkruimtes. Anderen koppelen hun eigen abonnementen of API-sleutels; op deze machine blijft elke agent de login gebruiken die er al op staat."
-
 msgid "HTML preview"
 msgstr "HTML-voorbeeld"
 
@@ -11780,9 +11784,6 @@ msgstr "Handmatige volgorde"
 msgid "manual sign-in"
 msgstr "handmatig inloggen"
 
-msgid "Manual sign-in"
-msgstr "Handmatig inloggen"
-
 msgid "Mark all read"
 msgstr "Alles als gelezen markeren"
 
@@ -12461,6 +12462,9 @@ msgstr "Nieuwe {providerLabel}-agents gebruiken {accountLabel}."
 
 msgid "New agent"
 msgstr "Nieuwe agent"
+
+msgid "New agent launches use the default account."
+msgstr "Nieuw gestarte agents gebruiken het standaardaccount."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Nieuwe agentstarts gebruiken dit account. Herstart een draaiende agent om te wisselen."
@@ -18168,6 +18172,9 @@ msgstr "Instellen"
 msgid "Set up {0}"
 msgstr "{0} instellen"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "{agentLabel} instellen voor cloudwerkruimtes?"
+
 msgid "Set up a host over SSH"
 msgstr "Host instellen via SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Repository's synchroniseren"
 
 msgid "Sync started"
 msgstr "Synchronisatie gestart"
+
+msgid "Sync to cloud"
+msgstr "Synchroniseren met de cloud"
 
 msgid "Synced {syncedAgo}"
 msgstr "Gesynchroniseerd {syncedAgo}"

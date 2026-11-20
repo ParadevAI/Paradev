@@ -10,6 +10,7 @@ import {
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
 import { isCloudUsageRefusal } from "@superset/shared/billing";
+import { isCloudAgentId } from "@superset/shared/cloud-agent-launch";
 import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { CLOUD_HOST_ID } from "@superset/shared/host-routing";
@@ -28,6 +29,7 @@ import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
+import { useHostUsageQuota } from "renderer/hooks/host-service/useHostUsageQuota";
 import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
@@ -51,9 +53,14 @@ import {
 import { ModePicker } from "renderer/routes/_authenticated/components/AgentComposer/components/ModePicker";
 import { useGitHubMentionProviders } from "renderer/routes/_authenticated/components/AgentComposer/hooks/useGitHubMentionProviders";
 import { draftLinkedContext } from "renderer/routes/_authenticated/components/AgentComposer/utils/linkedContextChips";
+import { CloudAuthDialog } from "renderer/routes/_authenticated/components/CloudAuthDialog";
 import { CreateEnvironmentFlow } from "renderer/routes/_authenticated/components/CreateEnvironmentFlow";
 import { EnvironmentPickerPill } from "renderer/routes/_authenticated/components/EnvironmentPickerPill";
 import { SetUpEnvironmentButton } from "renderer/routes/_authenticated/components/SetUpEnvironmentButton";
+import {
+	isConfigured,
+	useAgentCredential,
+} from "renderer/routes/_authenticated/hooks/useAgentCredential";
 import { useDefaultCloudAgent } from "renderer/routes/_authenticated/hooks/useDefaultCloudAgent";
 import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -91,6 +98,7 @@ import {
 	MODEL_STORAGE_KEY,
 	type WorkspaceCreateAgent,
 } from "../DashboardNewWorkspaceForm/PromptGroup/types";
+import { CloudSignInPrompt } from "./components/CloudSignInPrompt";
 import { SamplePrompts } from "./components/SamplePrompts";
 import { PROMPT_PLACEHOLDERS } from "./components/SamplePrompts/constants";
 import { SupersetIcon } from "./components/SupersetIcon";
@@ -117,6 +125,7 @@ import {
 	resolveLaunchProject,
 	toLaunchProject,
 } from "./utils/resolveLaunchProject";
+import { shouldOfferCloudSignIn } from "./utils/shouldOfferCloudSignIn";
 
 const NO_HIDDEN_MODES: ReadonlySet<string> = new Set();
 
@@ -615,6 +624,39 @@ export function NewWorkspaceScreen({
 	const modelSupport = selectedPresetId
 		? getAgentModelSupport(selectedPresetId)
 		: undefined;
+
+	const cloudPresetId =
+		isCloudHost &&
+		cloudEnabled === true &&
+		selectedPresetId &&
+		selectedPresetId !== "pdev" &&
+		isCloudAgentId(selectedPresetId)
+			? selectedPresetId
+			: null;
+	const cloudCredential = useAgentCredential(cloudPresetId ?? "", {
+		enabled: cloudPresetId !== null,
+	});
+	const cloudConfigured = isConfigured(cloudCredential.state);
+	const cloudSignInDeclined = useWorkspaceCreateDefaultsStore(
+		(state) => state.cloudSignInDeclined,
+	);
+	const declineCloudSignIn = useWorkspaceCreateDefaultsStore(
+		(state) => state.declineCloudSignIn,
+	);
+	const localQuota = useHostUsageQuota(cloudPresetId ? activeHostUrl : null);
+	const localCloudAgentAccount = useMemo(() => {
+		const accounts = (localQuota.data ?? []).filter(
+			(account) => account.agent === cloudPresetId && account.email,
+		);
+		return accounts.find((account) => account.isDefault) ?? accounts[0] ?? null;
+	}, [localQuota.data, cloudPresetId]);
+	const cloudAgentLabel =
+		agentConfigs.find((agent) => agent.id === selectedAgent)?.label ??
+		cloudPresetId ??
+		"";
+	const [cloudPromptOpen, setCloudPromptOpen] = useState(false);
+	const [cloudDialogOpen, setCloudDialogOpen] = useState(false);
+	const [pendingCloudCreate, setPendingCloudCreate] = useState(false);
 	const { selectedModel, setSelectedModel } = useAgentModelPreference(
 		MODEL_STORAGE_KEY,
 		modelSupport ? selectedPresetId : null,
@@ -948,43 +990,112 @@ export function NewWorkspaceScreen({
 	);
 
 	const isStarting = isCreating || isCreatingProjectEnvironment;
-	const handleSubmit = useCallback(() => {
-		if (isStarting) return;
-		if (needsSetup) {
-			handleGoToSetup();
-			return;
-		}
-		if (submitBlocker) {
-			if (hostId === machineId && !activeHostUrl) {
-				showHostServiceUnavailableToast(hostService, {
-					action: "createWorkspace",
-				});
-			} else {
-				toast.error(submitBlocker);
+	const handleSubmit = useCallback(
+		({ skipCloudSignIn = false }: { skipCloudSignIn?: boolean } = {}) => {
+			if (isStarting) return;
+			if (needsSetup) {
+				handleGoToSetup();
+				return;
 			}
-			return;
-		}
-		if (setupPlan) {
-			void runEnvironmentSetup({
-				cloudPrompt: withEnvironmentSetupSkill,
-				ignoreDraft: false,
-			});
-			return;
-		}
-		void createWorkspace();
-	}, [
-		activeHostUrl,
-		createWorkspace,
-		isStarting,
-		setupPlan,
-		runEnvironmentSetup,
-		hostId,
-		handleGoToSetup,
-		hostService,
-		machineId,
-		needsSetup,
-		submitBlocker,
-	]);
+			if (submitBlocker) {
+				if (hostId === machineId && !activeHostUrl) {
+					showHostServiceUnavailableToast(hostService, {
+						action: "createWorkspace",
+					});
+				} else {
+					toast.error(submitBlocker);
+				}
+				return;
+			}
+			if (
+				!skipCloudSignIn &&
+				shouldOfferCloudSignIn({
+					cloudPresetId,
+					credentialsLoaded: !cloudCredential.isLoading,
+					configured: cloudConfigured,
+					declined: cloudSignInDeclined,
+				})
+			) {
+				setCloudPromptOpen(true);
+				return;
+			}
+			if (setupPlan) {
+				void runEnvironmentSetup({
+					cloudPrompt: withEnvironmentSetupSkill,
+					ignoreDraft: false,
+				});
+				return;
+			}
+			void createWorkspace();
+		},
+		[
+			activeHostUrl,
+			cloudPresetId,
+			cloudCredential.isLoading,
+			cloudConfigured,
+			cloudSignInDeclined,
+			createWorkspace,
+			isStarting,
+			setupPlan,
+			runEnvironmentSetup,
+			hostId,
+			handleGoToSetup,
+			hostService,
+			machineId,
+			needsSetup,
+			submitBlocker,
+		],
+	);
+
+	useEffect(() => {
+		if (!pendingCloudCreate || !cloudConfigured) return;
+		setPendingCloudCreate(false);
+		setCloudDialogOpen(false);
+		handleSubmit();
+	}, [pendingCloudCreate, cloudConfigured, handleSubmit]);
+
+	const cloudSignInDialogs = cloudPresetId ? (
+		<>
+			<CloudSignInPrompt
+				open={cloudPromptOpen}
+				agentLabel={cloudAgentLabel}
+				localAccountLabel={localCloudAgentAccount?.email ?? null}
+				onOpenChange={setCloudPromptOpen}
+				onNotNow={() => {
+					setCloudPromptOpen(false);
+					declineCloudSignIn(cloudPresetId);
+					handleSubmit({ skipCloudSignIn: true });
+				}}
+				onSetUp={() => {
+					setCloudPromptOpen(false);
+					setPendingCloudCreate(true);
+					setCloudDialogOpen(true);
+				}}
+			/>
+			<CloudAuthDialog
+				accountLabel={cloudCredential.accountLabel}
+				chooseMethod={cloudCredential.chooseMethod}
+				disconnect={cloudCredential.disconnect}
+				label={cloudAgentLabel}
+				onOpenChange={(open) => {
+					setCloudDialogOpen(open);
+					if (!open) setPendingCloudCreate(false);
+				}}
+				open={cloudDialogOpen}
+				presetId={cloudPresetId}
+				save={(input) =>
+					cloudCredential.save({
+						...input,
+						accountLabel:
+							input.accountLabel ?? localCloudAgentAccount?.email ?? undefined,
+					})
+				}
+				setManual={cloudCredential.setManual}
+				signedIn={cloudCredential.signedIn}
+				state={cloudCredential.state}
+			/>
+		</>
+	) : null;
 
 	useEffect(() => {
 		if (!isOpen) return;
@@ -1192,6 +1303,7 @@ export function NewWorkspaceScreen({
 				data-theme-surface="new-workspace"
 				className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background"
 			>
+				{cloudSignInDialogs}
 				{isParadevShell ? (
 					<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
 						{headerActions}
@@ -1298,6 +1410,7 @@ export function NewWorkspaceScreen({
 			data-theme-surface="new-workspace"
 			className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background"
 		>
+			{cloudSignInDialogs}
 			<PageHeader
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}

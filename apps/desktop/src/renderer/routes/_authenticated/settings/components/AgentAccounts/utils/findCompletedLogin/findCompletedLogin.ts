@@ -1,4 +1,4 @@
-import type { UsageLogins } from "../../../../hooks/useHostUsageLogins";
+import type { UsageLogins } from "../../hooks/useHostUsageLogins";
 import type { AccountCredentialKind } from "../apiBilling";
 import type { ManagedAgent } from "../visibleQuotaAgents";
 

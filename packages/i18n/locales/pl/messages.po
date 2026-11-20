@@ -784,6 +784,12 @@ msgstr "{actor} odłączył(a) obszar roboczy {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} dotąd · ~{projected} prognozowane"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} nie jest jeszcze zalogowany w chmurowych obszarach roboczych. Zaloguj się raz, aby agenci startowali gotowi do pracy."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} jest zalogowany na tym komputerze jako {localAccountLabel}, ale nie w chmurowych obszarach roboczych. Zaloguj się raz dla chmury, aby agenci startowali gotowi do pracy."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Sesje {agents} wznowią się po otwarciu ich obszaru roboczego."
 
@@ -1994,6 +2000,9 @@ msgstr "Konto oczekuje na usunięcie"
 msgid "Account usage: {percent} used"
 msgstr "Użycie konta: wykorzystano {percent}"
 
+msgid "Accounts"
+msgstr "Konta"
+
 msgid "Achievements"
 msgstr "Osiągnięcia"
 
@@ -2368,9 +2377,6 @@ msgstr "Względem main"
 
 msgid "Agent"
 msgstr "Agent"
-
-msgid "Agent commands"
-msgstr "Polecenia agentów"
 
 msgid "Agent Configs"
 msgstr "Konfiguracje agentów"
@@ -3461,6 +3467,9 @@ msgstr "Dostępny"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Dostępna"
+
+msgid "Available in cloud workspaces"
+msgstr "Dostępne w chmurowych obszarach roboczych"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Dostępne wtyczki pojawiają się na stronie Wtyczki każdej roli. Zainstalowane wtyczki są instalowane dla wszystkich w roli, którzy mogą je wyłączyć, ale nie usunąć."
@@ -4909,6 +4918,10 @@ msgstr "Obszary robocze w chmurze nie są objęte Twoim planem."
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Obszary robocze w chmurze commitują, pushują i otwierają pull requesty w Twoim imieniu"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Chmurowe obszary robocze nie obejmują jeszcze {0}."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Chmurowe przestrzenie robocze ignorują tę zmienną. Agenci logują się zamiast tego w Ustawienia › Agenci."
 
@@ -5362,12 +5375,6 @@ msgstr "Połączono z {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Połączono z GitHubem jako {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Połączono przez subskrypcję"
-
-msgid "Connected with API key"
-msgstr "Połączono kluczem API"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Połączono, ale Microsoft Graph odrzucił subskrypcje powiadomień."
@@ -10085,9 +10092,6 @@ msgstr "Jak pracujemy"
 msgid "How you run agents"
 msgstr "Jak uruchamiasz agentów"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "Jak twoi agenci logują się w obszarach roboczych w chmurze. Inne osoby podłączają własne subskrypcje lub klucze API; na tej maszynie każdy agent nadal korzysta z logowania, które już na niej jest."
-
 msgid "HTML preview"
 msgstr "Podgląd HTML"
 
@@ -11780,9 +11784,6 @@ msgstr "Kolejność ręczna"
 msgid "manual sign-in"
 msgstr "logowanie ręczne"
 
-msgid "Manual sign-in"
-msgstr "Logowanie ręczne"
-
 msgid "Mark all read"
 msgstr "Oznacz wszystko jako przeczytane"
 
@@ -12461,6 +12462,9 @@ msgstr "Nowi agenci {providerLabel} będą korzystać z {accountLabel}."
 
 msgid "New agent"
 msgstr "Nowy agent"
+
+msgid "New agent launches use the default account."
+msgstr "Nowo uruchamiani agenci używają konta domyślnego."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "Nowe uruchomienia agentów korzystają z tego konta. Uruchom ponownie działającego agenta, aby go przełączyć."
@@ -18168,6 +18172,9 @@ msgstr "Skonfiguruj"
 msgid "Set up {0}"
 msgstr "Skonfiguruj {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Skonfigurować {agentLabel} dla chmurowych obszarów roboczych?"
+
 msgid "Set up a host over SSH"
 msgstr "Skonfiguruj host przez SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Synchronizuj repozytoria"
 
 msgid "Sync started"
 msgstr "Rozpoczęto synchronizację"
+
+msgid "Sync to cloud"
+msgstr "Synchronizuj z chmurą"
 
 msgid "Synced {syncedAgo}"
 msgstr "Zsynchronizowano {syncedAgo}"

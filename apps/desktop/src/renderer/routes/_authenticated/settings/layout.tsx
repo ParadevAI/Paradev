@@ -42,7 +42,6 @@ const SECTION_ORDER: SettingsSection[] = [
 	"files",
 	"browser",
 	"environments",
-	"agentAccounts",
 	"organization",
 	"teams",
 	"project",

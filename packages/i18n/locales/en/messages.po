@@ -784,6 +784,12 @@ msgstr "{actor} unlinked the workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} so far · ~{projected} projected"
 
+msgid "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+msgstr "{agentLabel} is not signed in for cloud workspaces yet. Sign in once so agents start ready."
+
+msgid "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+msgstr "{agentLabel} is signed in on this machine as {localAccountLabel}, but not in cloud workspaces. Sign in once for cloud so agents start ready."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} sessions resume when you open their workspace."
 
@@ -1994,6 +2000,9 @@ msgstr "Account pending deletion"
 msgid "Account usage: {percent} used"
 msgstr "Account usage: {percent} used"
 
+msgid "Accounts"
+msgstr "Accounts"
+
 msgid "Achievements"
 msgstr "Achievements"
 
@@ -2368,9 +2377,6 @@ msgstr "Against Main"
 
 msgid "Agent"
 msgstr "Agent"
-
-msgid "Agent commands"
-msgstr "Agent commands"
 
 msgid "Agent Configs"
 msgstr "Agent Configs"
@@ -3461,6 +3467,9 @@ msgstr "Available"
 msgctxt "plugin access"
 msgid "Available"
 msgstr "Available"
+
+msgid "Available in cloud workspaces"
+msgstr "Available in cloud workspaces"
 
 msgid "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
 msgstr "Available plugins show on each role's Plugins page. Installed plugins are installed for everyone in the role, who can disable but not remove them."
@@ -4909,6 +4918,10 @@ msgstr "Cloud workspaces are not included in your plan."
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloud workspaces commit, push and open pull requests as you"
 
+#. placeholder {0}: config.label
+msgid "Cloud workspaces don't include {0} yet."
+msgstr "Cloud workspaces don't include {0} yet."
+
 msgid "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 msgstr "Cloud workspaces ignore this variable. Agents sign in under Settings › Agents instead."
 
@@ -5362,12 +5375,6 @@ msgstr "Connected to {connectedOrgName}"
 
 msgid "Connected to GitHub as {accountLogin}"
 msgstr "Connected to GitHub as {accountLogin}"
-
-msgid "Connected via subscription"
-msgstr "Connected via subscription"
-
-msgid "Connected with API key"
-msgstr "Connected with API key"
 
 msgid "Connected, but Microsoft Graph refused the notification subscriptions."
 msgstr "Connected, but Microsoft Graph refused the notification subscriptions."
@@ -10085,9 +10092,6 @@ msgstr "How we work"
 msgid "How you run agents"
 msgstr "How you run agents"
 
-msgid "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-msgstr "How your agents sign in inside cloud workspaces. Other people connect their own subscriptions or API keys; on this machine each agent keeps using the login already on it."
-
 msgid "HTML preview"
 msgstr "HTML preview"
 
@@ -11780,9 +11784,6 @@ msgstr "Manual order"
 msgid "manual sign-in"
 msgstr "manual sign-in"
 
-msgid "Manual sign-in"
-msgstr "Manual sign-in"
-
 msgid "Mark all read"
 msgstr "Mark all read"
 
@@ -12461,6 +12462,9 @@ msgstr "New {providerLabel} agents will use {accountLabel}."
 
 msgid "New agent"
 msgstr "New agent"
+
+msgid "New agent launches use the default account."
+msgstr "New agent launches use the default account."
 
 msgid "New agent launches use this account. Relaunch a running agent to switch it."
 msgstr "New agent launches use this account. Relaunch a running agent to switch it."
@@ -18168,6 +18172,9 @@ msgstr "Set up"
 msgid "Set up {0}"
 msgstr "Set up {0}"
 
+msgid "Set up {agentLabel} for cloud workspaces?"
+msgstr "Set up {agentLabel} for cloud workspaces?"
+
 msgid "Set up a host over SSH"
 msgstr "Set up a host over SSH"
 
@@ -19663,6 +19670,9 @@ msgstr "Sync Repositories"
 
 msgid "Sync started"
 msgstr "Sync started"
+
+msgid "Sync to cloud"
+msgstr "Sync to cloud"
 
 msgid "Synced {syncedAgo}"
 msgstr "Synced {syncedAgo}"

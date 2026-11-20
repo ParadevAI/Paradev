@@ -78,6 +78,8 @@ interface WorkspaceCreateDefaultsState {
 	cloudChoices: Record<string, CloudCreateChoice>;
 	/** User closed the sample-prompt suggestions on the create surface. */
 	samplePromptsDismissed: boolean;
+	/** Cloud agent preset ids whose "set up for cloud" prompt the user declined. */
+	cloudSignInDeclined: string[];
 
 	setLastProjectId: (projectId: string | null) => void;
 	setLastProjectChoice: (
@@ -97,6 +99,7 @@ interface WorkspaceCreateDefaultsState {
 		patch: Partial<Omit<CloudCreateChoice, "usedAt">>,
 	) => void;
 	setSamplePromptsDismissed: (dismissed: boolean) => void;
+	declineCloudSignIn: (presetId: string) => void;
 }
 
 export const useWorkspaceCreateDefaultsStore =
@@ -111,6 +114,7 @@ export const useWorkspaceCreateDefaultsStore =
 					checkout: "worktree",
 					cloudChoices: {},
 					samplePromptsDismissed: false,
+					cloudSignInDeclined: [],
 
 					setLastProjectId: (projectId) => set({ lastProjectId: projectId }),
 
@@ -157,6 +161,18 @@ export const useWorkspaceCreateDefaultsStore =
 
 					setSamplePromptsDismissed: (dismissed) =>
 						set({ samplePromptsDismissed: dismissed }),
+
+					declineCloudSignIn: (presetId) =>
+						set((state) =>
+							state.cloudSignInDeclined.includes(presetId)
+								? state
+								: {
+										cloudSignInDeclined: [
+											...state.cloudSignInDeclined,
+											presetId,
+										],
+									},
+						),
 				}),
 				{
 					name: "v2-workspace-create-defaults",

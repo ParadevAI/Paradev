@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { AgentAccountsSettings } from "./components/AgentAccountsSettings";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
 	"/_authenticated/settings/agent-accounts/",
 )({
-	component: AgentAccountsSettings,
+	beforeLoad: () => {
+		throw redirect({ to: "/settings/agents", replace: true });
+	},
 });
