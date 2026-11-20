@@ -86,26 +86,30 @@ export function ModelPanel({
 				favorite.presetId === row.presetId && favorite.id === row.id,
 		);
 	const rowsFor = (presetId: string): Row[] => {
+		const agent = agentSwitcher?.agents.find(
+			(entry) => entry.presetId === presetId,
+		);
 		if (presetId === currentPresetId && model) {
-			const catalog = agentSwitcher?.agents.find(
-				(agent) => agent.presetId === presetId,
-			)?.models;
 			return model.options.map((option) => ({
-				...catalog?.find((entry) => entry.id === option.id),
+				...agent?.models.find((entry) => entry.id === option.id),
 				...option,
 				...(option.id === DEFAULT_ALIAS_MODEL_ID
 					? { label: t({ message: "Default" }), hint: option.description }
 					: {}),
+				...(option.id === agentSwitcher?.defaultOptionId
+					? { hint: agent?.defaultModelLabel }
+					: {}),
 				presetId,
 			}));
 		}
-		const models =
-			presetId === currentPresetId
-				? []
-				: (agentSwitcher?.agents.find((agent) => agent.presetId === presetId)
-						?.models ?? []);
+		const models = presetId === currentPresetId ? [] : (agent?.models ?? []);
 		return [
-			{ presetId, id: null, label: t({ message: "Default" }) },
+			{
+				presetId,
+				id: null,
+				label: t({ message: "Default" }),
+				hint: agent?.defaultModelLabel,
+			},
 			...models.map((entry) => ({ ...entry, presetId })),
 		];
 	};
@@ -262,12 +266,12 @@ export function ModelPanel({
 				onSelect={() => pickRow(row)}
 				title={row.description}
 			>
-				<span className="min-w-0 flex-1 truncate">{row.label}</span>
-				{row.hint ? (
-					<span className="max-w-32 shrink-0 truncate text-[11px] text-muted-foreground">
-						{row.hint}
-					</span>
-				) : null}
+				<span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+					<span className="truncate">{row.label}</span>
+					{row.hint ? (
+						<span className="truncate text-muted-foreground">{row.hint}</span>
+					) : null}
+				</span>
 				{row.agentLabel ? (
 					<span className="max-w-24 shrink-0 truncate text-[11px] text-muted-foreground">
 						{row.agentLabel}

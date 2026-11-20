@@ -401,6 +401,7 @@ export function AcpChatPane({
 					onRefresh: catalog?.refresh,
 					onLoad: catalog?.load,
 					catalogKey: catalog?.key,
+					defaultModelLabel: catalog?.defaultModel?.label,
 					label: config?.label ?? presetId,
 					models:
 						catalog?.models ?? getAgentModelSupport(presetId)?.models ?? [],

@@ -12,7 +12,7 @@ export function acpHarnessFactory(
 	db: HostDb,
 	resolveAttachment: ResolveAttachment,
 	agents?: ChatAgentBridge,
-	discovery?: { launch: AcpLaunch },
+	discovery?: { launch: AcpLaunch; startupTimeoutMs: number },
 ): HarnessFactory | null {
 	const entry = ACP_HARNESSES[harness];
 	if (!entry) return null;
@@ -20,7 +20,7 @@ export function acpHarnessFactory(
 	return (options) =>
 		createAcpAdapter({
 			command: entry.binary,
-			...(discovery ? { startupTimeoutMs: 10_000 } : {}),
+			...(discovery ? { startupTimeoutMs: discovery.startupTimeoutMs } : {}),
 			cwd: options.cwd,
 			resolveAttachment,
 			storeImage: storeAgentImage,

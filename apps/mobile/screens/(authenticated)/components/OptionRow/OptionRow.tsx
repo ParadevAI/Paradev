@@ -6,11 +6,13 @@ import { useTheme } from "@/hooks/useTheme";
 /** One pick in an option list, drawn like the new-session agent rows. */
 export function OptionRow({
 	label,
+	detail,
 	isSelected,
 	onPress,
 	phLabel,
 }: {
 	label: string;
+	detail?: string;
 	isSelected: boolean;
 	onPress: () => void;
 	phLabel: string;
@@ -30,6 +32,11 @@ export function OptionRow({
 			>
 				{label}
 			</Text>
+			{detail ? (
+				<Text className="text-sm" style={{ color: theme.mutedForeground }}>
+					{detail}
+				</Text>
+			) : null}
 			{isSelected ? (
 				<Ionicons name="checkmark-circle" size={18} color={theme.primary} />
 			) : null}

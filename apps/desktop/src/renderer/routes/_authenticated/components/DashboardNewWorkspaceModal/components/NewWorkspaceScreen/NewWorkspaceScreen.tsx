@@ -745,6 +745,7 @@ export function NewWorkspaceScreen({
 		if (selectedAgent === "none") return undefined;
 		return {
 			currentPresetId: selectedAgent,
+			defaultOptionId: AGENT_DEFAULT_OPTION_ID,
 			agents: modelAgents.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
@@ -754,6 +755,7 @@ export function NewWorkspaceScreen({
 				onRefresh: catalogs[agent.id]?.refresh,
 				onLoad: catalogs[agent.id]?.load,
 				catalogKey: catalogs[agent.id]?.key,
+				defaultModelLabel: catalogs[agent.id]?.defaultModel?.label,
 				models: (
 					catalogs[agent.id]?.models ??
 					getAgentModelSupport(launchPresetIdOf(agent))?.models ??

@@ -24,6 +24,8 @@ export type AgentModelCatalog = {
 	availability: "reported" | "unknown";
 	fetchedAt: number;
 	stale: boolean;
+	/** The model a launch without a model override runs on, when the runtime says. */
+	defaultModel?: { id: string; label: string };
 	failure?: "unsupported" | "timeout" | "busy" | "failed";
 };
 
@@ -74,6 +76,19 @@ export function filterModelCatalog(
 
 /** The id a runtime uses for "whatever model the agent picks itself". */
 export const DEFAULT_ALIAS_MODEL_ID = "default";
+
+export function runtimeDefaultModel(
+	models: readonly CatalogModel[],
+	currentId: string | undefined,
+): AgentModelCatalog["defaultModel"] {
+	const current = models.find((model) => model.id === currentId);
+	if (!current) return undefined;
+	if (current.id !== DEFAULT_ALIAS_MODEL_ID)
+		return { id: current.id, label: current.label };
+	return current.description
+		? { id: current.id, label: current.description }
+		: undefined;
+}
 
 export function uniqueModels(models: readonly CatalogModel[]): CatalogModel[] {
 	const seen = new Set<string>();

@@ -44,10 +44,8 @@ export function AgentOptionsScreen({
 			agentLabel?: string;
 		}>();
 	const launchPresetId = presetId || null;
-	const { models, model, efforts, effort } = useAgentLaunchPreferences(
-		launchPresetId,
-		{ hostUrl, agent, projectId },
-	);
+	const { models, model, efforts, effort, defaultModelLabel } =
+		useAgentLaunchPreferences(launchPresetId, { hostUrl, agent, projectId });
 	const setModel = useNewSessionPreferencesStore((state) => state.setModel);
 	const setEffort = useNewSessionPreferencesStore((state) => state.setEffort);
 	const { inline, groups } = splitModelCatalog(models ?? []);
@@ -92,6 +90,7 @@ export function AgentOptionsScreen({
 					<SectionLabel label={t({ message: "Model" })} />
 					<OptionRow
 						label={t({ message: "Default" })}
+						detail={defaultModelLabel}
 						isSelected={model === null}
 						onPress={() => pickModel(null)}
 						phLabel="new-session-model-row"

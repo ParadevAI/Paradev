@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { type CatalogModel, filterModelCatalog, uniqueModels } from "./index";
+import {
+	type CatalogModel,
+	filterModelCatalog,
+	runtimeDefaultModel,
+	uniqueModels,
+} from "./index";
 
 const models: CatalogModel[] = [
 	{
@@ -29,9 +34,9 @@ test("visibility and provider filters preserve the selected model", () => {
 	).toEqual(["provider/image", "private/custom"]);
 });
 test("search matches exact IDs and labels without merging provider identities", () => {
-	expect(filterModelCatalog(models, { query: "PRIVATE/" })).toEqual([
-		models[2],
-	]);
+	expect(
+		filterModelCatalog(models, { query: "PRIVATE/" }).map((model) => model.id),
+	).toEqual(["private/custom"]);
 	expect(
 		uniqueModels([
 			{ id: "a/model", label: "Model" },
@@ -62,4 +67,23 @@ test("coding pickers exclude known non-text models but keep an existing selectio
 			selectedId: "image",
 		}),
 	).toEqual([image]);
+});
+
+test("the runtime default names the model it resolves to", () => {
+	const models = [
+		{ id: "default", label: "Default (recommended)", description: "Opus" },
+		{ id: "sonnet", label: "Sonnet" },
+	];
+	expect(runtimeDefaultModel(models, "default")).toEqual({
+		id: "default",
+		label: "Opus",
+	});
+	expect(runtimeDefaultModel(models, "sonnet")).toEqual({
+		id: "sonnet",
+		label: "Sonnet",
+	});
+	expect(
+		runtimeDefaultModel([{ id: "default", label: "Default" }], "default"),
+	).toBeUndefined();
+	expect(runtimeDefaultModel(models, undefined)).toBeUndefined();
 });

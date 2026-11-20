@@ -3,9 +3,12 @@ import {
 	type SpawnAcpOptions,
 	spawnAcpTransport,
 } from "@superset/chat-runtime/acp-client";
-import type { CatalogModel } from "@superset/shared/agent-models";
+import type {
+	AgentModelCatalog,
+	CatalogModel,
+} from "@superset/shared/agent-models";
 import { z } from "zod";
-import { abortable } from "./discovery";
+import { abortable, DISCOVERY_DEADLINE_MS } from "./discovery";
 
 const pageSchema = z.object({
 	data: z.array(
@@ -14,6 +17,7 @@ const pageSchema = z.object({
 			model: z.string(),
 			displayName: z.string(),
 			hidden: z.boolean().optional(),
+			isDefault: z.boolean().optional(),
 		}),
 	),
 	nextCursor: z.string().nullish(),
@@ -21,8 +25,11 @@ const pageSchema = z.object({
 
 export async function discoverCodexModels(
 	launch: SpawnAcpOptions,
-	signal = AbortSignal.timeout(20_000),
-): Promise<CatalogModel[]> {
+	signal = AbortSignal.timeout(DISCOVERY_DEADLINE_MS),
+): Promise<{
+	models: CatalogModel[];
+	defaultModel: AgentModelCatalog["defaultModel"];
+}> {
 	const client = new AcpRpcClient({
 		createTransport: (handlers) =>
 			spawnAcpTransport({ ...launch, args: ["app-server"] }, handlers),
@@ -48,6 +55,7 @@ export async function discoverCodexModels(
 		);
 		client.notify("initialized", {});
 		const models: CatalogModel[] = [];
+		let defaultModel: AgentModelCatalog["defaultModel"];
 		let cursor: string | undefined;
 		const cursors = new Set<string>();
 		do {
@@ -61,6 +69,9 @@ export async function discoverCodexModels(
 					signal,
 				),
 			);
+			const preferred = page.data.find((model) => model.isDefault);
+			if (preferred)
+				defaultModel = { id: preferred.model, label: preferred.displayName };
 			models.push(
 				...page.data
 					.filter((model) => !model.hidden)
@@ -72,7 +83,7 @@ export async function discoverCodexModels(
 			if (cursor) cursors.add(cursor);
 			if (cursors.size > 100) throw new Error("Model catalog is too large");
 		} while (cursor);
-		return models;
+		return { models, defaultModel };
 	} finally {
 		await client.close();
 	}

@@ -1,3 +1,5 @@
+export const DISCOVERY_DEADLINE_MS = 20_000;
+
 export type DiscoveryFailure = "unsupported" | "timeout" | "busy" | "failed";
 
 export class DiscoveryError extends Error {
@@ -44,7 +46,7 @@ export class DiscoveryScheduler {
 	}
 	async run<T>(
 		work: (signal: AbortSignal) => Promise<T>,
-		signal = AbortSignal.timeout(20_000),
+		signal = AbortSignal.timeout(DISCOVERY_DEADLINE_MS),
 	): Promise<T> {
 		if (this.waiting.length >= this.capacity) throw new DiscoveryError("busy");
 		if (signal.aborted) throw new DiscoveryError("timeout");

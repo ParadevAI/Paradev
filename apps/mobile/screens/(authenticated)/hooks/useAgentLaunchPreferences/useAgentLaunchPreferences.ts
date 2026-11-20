@@ -22,6 +22,8 @@ export interface AgentLaunchPreferences {
 	/** The remembered pick, or null for the agent's own default. */
 	model: AgentModelOption | null;
 	effort: AgentEffortOption | null;
+	/** The model the agent runs with no pick, when its runtime says. */
+	defaultModelLabel?: string;
 }
 
 const NO_PREFERENCES: AgentLaunchPreferences = {
@@ -124,6 +126,7 @@ export function useAgentLaunchPreferences(
 		retry: false,
 	});
 	const discoveredModels = catalog.data?.models;
+	const defaultModelLabel = catalog.data?.defaultModel?.label;
 	const modelByAgent = useNewSessionPreferencesStore(
 		(state) => state.modelByAgent,
 	);
@@ -131,13 +134,21 @@ export function useAgentLaunchPreferences(
 		(state) => state.effortByAgent,
 	);
 	return useMemo(
-		() =>
-			resolveAgentLaunchPreferences(
+		() => ({
+			...resolveAgentLaunchPreferences(
 				presetId,
 				modelByAgent,
 				effortByAgent,
 				discoveredModels,
 			),
-		[presetId, modelByAgent, effortByAgent, discoveredModels],
+			defaultModelLabel,
+		}),
+		[
+			presetId,
+			modelByAgent,
+			effortByAgent,
+			discoveredModels,
+			defaultModelLabel,
+		],
 	);
 }

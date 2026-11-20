@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { statSync } from "node:fs";
 import { homedir } from "node:os";
 import { promisify, stripVTControlCharacters } from "node:util";
+import type { SessionConfigOption } from "@superset/chat/protocol";
 import { createAcpAdapter } from "@superset/chat-runtime";
 import type {
 	AgentModelCatalog,
@@ -12,6 +13,7 @@ import {
 	DEFAULT_ALIAS_MODEL_ID,
 	getAgentModelSupport,
 	resolveAgentLaunchPresetId,
+	runtimeDefaultModel,
 	uniqueModels,
 } from "@superset/shared/agent-models";
 import { eq } from "drizzle-orm";
@@ -31,7 +33,12 @@ import {
 } from "../terminal-agents/agent-config";
 import { ModelCatalogCache } from "./cache";
 import { discoverCodexModels } from "./codex";
-import { abortable, DiscoveryError, DiscoveryScheduler } from "./discovery";
+import {
+	abortable,
+	DISCOVERY_DEADLINE_MS,
+	DiscoveryError,
+	DiscoveryScheduler,
+} from "./discovery";
 import { enrichModels, refreshModelMetadata } from "./metadata";
 
 const execFileAsync = promisify(execFile);
@@ -179,6 +186,16 @@ export async function discoverAgentModels(
 				() =>
 					(async (): Promise<AgentModelCatalog> => {
 						let models: CatalogModel[] | undefined;
+						let defaultModel: AgentModelCatalog["defaultModel"];
+						const readModelOption = (options: SessionConfigOption[]) => {
+							const option = options.find(
+								(entry) => entry.category === "model",
+							);
+							models = option?.options;
+							defaultModel = option
+								? runtimeDefaultModel(option.options, option.currentValue)
+								: undefined;
+						};
 						const harness = acpHarnessForPreset(ctx.presetId);
 						if (input.surface === "chat" && harness && ctx.launch) {
 							const factory = acpHarnessFactory(
@@ -186,18 +203,17 @@ export async function discoverAgentModels(
 								db,
 								async () => null,
 								undefined,
-								{ launch: ctx.launch },
+								{ launch: ctx.launch, startupTimeoutMs: DISCOVERY_DEADLINE_MS },
 							);
 							const adapter = factory?.(ctx.options);
 							if (adapter) {
 								try {
-									const options = await abortable(
-										adapter.discoverModels?.(ctx.cwd) ?? Promise.resolve([]),
-										signal,
+									readModelOption(
+										await abortable(
+											adapter.discoverModels?.(ctx.cwd) ?? Promise.resolve([]),
+											signal,
+										),
 									);
-									models = options?.find(
-										(option) => option.category === "model",
-									)?.options;
 								} finally {
 									await adapter.dispose();
 								}
@@ -211,27 +227,27 @@ export async function discoverAgentModels(
 								args: ["acp"],
 								env: ctx.env,
 								cwd: ctx.cwd,
-								startupTimeoutMs: 10_000,
+								startupTimeoutMs: DISCOVERY_DEADLINE_MS,
 							});
 							try {
-								models = (
+								readModelOption(
 									await abortable(
 										adapter.discoverModels?.(ctx.cwd) ?? Promise.resolve([]),
 										signal,
-									)
-								)?.find((option) => option.category === "model")?.options;
+									),
+								);
 							} finally {
 								await adapter.dispose();
 							}
 						} else if (ctx.presetId === "codex") {
-							models = await discoverCodexModels(
+							({ models, defaultModel } = await discoverCodexModels(
 								{
 									command: agentCliCommand(ctx.config.command, ctx.env),
 									env: ctx.env,
 									cwd: ctx.cwd,
 								},
 								signal,
-							);
+							));
 						} else if (
 							input.surface === "terminal" &&
 							ctx.presetId === "cursor-agent"
@@ -255,6 +271,7 @@ export async function discoverAgentModels(
 						if (models === undefined) throw new DiscoveryError("unsupported");
 						return {
 							models: withoutDefaultAlias(uniqueModels(models)),
+							defaultModel,
 							source:
 								input.surface === "chat" || ctx.presetId === "opencode"
 									? "runtime"
@@ -263,7 +280,14 @@ export async function discoverAgentModels(
 							fetchedAt: Date.now(),
 							stale: false,
 						};
-					})(),
+					})().catch((error) => {
+						console.warn("[model-discovery] failed", {
+							agent: input.agent,
+							surface: input.surface,
+							error,
+						});
+						throw error;
+					}),
 				() => ({
 					models: getAgentModelSupport(ctx.presetId)?.models ?? [],
 					source: "bundled",
