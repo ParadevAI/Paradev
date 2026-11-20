@@ -1155,6 +1155,9 @@ msgstr "{monthlyPrice} за користувача на місяць. Мобіл
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваших автоматизацій з помилкою під час останнього запуску: {myFailedCount}"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · з {from} по {to}"
+
 msgid "{name} accounts"
 msgstr "Облікові записи {name}"
 
@@ -1382,6 +1385,9 @@ msgstr "{starCount} зірок, і це не межа"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "з {start} по {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущено # автоматизацію} few {Запущено # автоматизації} many {Запущено # автоматизацій} other {Запущено # автоматизації}}"
@@ -6807,6 +6813,9 @@ msgstr "Індивідуальні ціни"
 
 msgid "Custom provider"
 msgstr "Власний провайдер"
+
+msgid "Custom range…"
+msgstr "Власний діапазон…"
 
 msgid "Custom themes"
 msgstr "Власні теми"
@@ -12828,6 +12837,9 @@ msgstr "Учасників не знайдено."
 
 msgid "No credit card required."
 msgstr "Кредитна картка не потрібна."
+
+msgid "No days available"
+msgstr "Немає доступних днів"
 
 msgid "No description"
 msgstr "Немає опису"

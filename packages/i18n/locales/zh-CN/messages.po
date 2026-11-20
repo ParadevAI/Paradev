@@ -1161,6 +1161,9 @@ msgstr "每用户每月 {monthlyPrice}。移动端、自动化、优先支持。
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "你有{myFailedCount}个自动化上次运行失败"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} 至 {to}"
+
 msgid "{name} accounts"
 msgstr "{name} 账号"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount}个星标，还在增长"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} 至 {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {已启动 # 个自动化} other {已启动 # 个自动化}}"
@@ -6813,6 +6819,9 @@ msgstr "定制价格"
 
 msgid "Custom provider"
 msgstr "自定义提供商"
+
+msgid "Custom range…"
+msgstr "自定义范围…"
 
 msgid "Custom themes"
 msgstr "自定义主题"
@@ -12834,6 +12843,9 @@ msgstr "未找到贡献者。"
 
 msgid "No credit card required."
 msgstr "无需信用卡。"
+
+msgid "No days available"
+msgstr "没有可用的日期"
 
 msgid "No description"
 msgstr "无描述"

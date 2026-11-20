@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} за пользователя в месяц. Мобиль
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Ваши автоматизации с ошибкой при последнем запуске: {myFailedCount}"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · с {from} по {to}"
+
 msgid "{name} accounts"
 msgstr "Аккаунты {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} звёзд и продолжаем"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "с {start} по {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Запущена # автоматизация} few {Запущено # автоматизации} many {Запущено # автоматизаций} other {Запущено # автоматизаций}}"
@@ -6813,6 +6819,9 @@ msgstr "Цена по договорённости"
 
 msgid "Custom provider"
 msgstr "Свой провайдер"
+
+msgid "Custom range…"
+msgstr "Свой диапазон…"
 
 msgid "Custom themes"
 msgstr "Свои темы"
@@ -12834,6 +12843,9 @@ msgstr "Контрибьюторы не найдены."
 
 msgid "No credit card required."
 msgstr "Карта не нужна."
+
+msgid "No days available"
+msgstr "Нет доступных дней"
 
 msgid "No description"
 msgstr "Без описания"

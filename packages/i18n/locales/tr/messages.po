@@ -1161,6 +1161,9 @@ msgstr "Kullanıcı başına aylık {monthlyPrice}. Mobil, otomasyonlar, önceli
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Otomasyonlarınızdan {myFailedCount} tanesi son çalıştırmasında başarısız oldu"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} - {to}"
+
 msgid "{name} accounts"
 msgstr "{name} hesapları"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} yıldız ve artıyor"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} - {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomasyon başlatıldı} other {# otomasyon başlatıldı}}"
@@ -6813,6 +6819,9 @@ msgstr "Özel fiyatlandırma"
 
 msgid "Custom provider"
 msgstr "Özel sağlayıcı"
+
+msgid "Custom range…"
+msgstr "Özel aralık…"
 
 msgid "Custom themes"
 msgstr "Özel temalar"
@@ -12834,6 +12843,9 @@ msgstr "Katkıda bulunan bulunamadı."
 
 msgid "No credit card required."
 msgstr "Kredi kartı gerekmez."
+
+msgid "No days available"
+msgstr "Kullanılabilir gün yok"
 
 msgid "No description"
 msgstr "Açıklama yok"

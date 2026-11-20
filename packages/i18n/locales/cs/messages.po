@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} za uživatele/měs. Mobilní aplikace, automatizace, prio
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Vaše automatizace s neúspěšným posledním během: {myFailedCount}"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} až {to}"
+
 msgid "{name} accounts"
 msgstr "Účty {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} hvězd a přibývá"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} až {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Spuštěna # automatizace} few {Spuštěny # automatizace} many {Spuštěno # automatizace} other {Spuštěno # automatizací}}"
@@ -6813,6 +6819,9 @@ msgstr "Cena na míru"
 
 msgid "Custom provider"
 msgstr "Vlastní poskytovatel"
+
+msgid "Custom range…"
+msgstr "Vlastní rozsah…"
 
 msgid "Custom themes"
 msgstr "Vlastní motivy"
@@ -12834,6 +12843,9 @@ msgstr "Nenalezeni žádní přispěvatelé."
 
 msgid "No credit card required."
 msgstr "Bez platební karty."
+
+msgid "No days available"
+msgstr "Žádné dny k dispozici"
 
 msgid "No description"
 msgstr "Bez popisu"

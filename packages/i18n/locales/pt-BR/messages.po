@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} por usuário/mês. App móvel, automações, suporte prio
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Suas automações com falha na última execução: {myFailedCount}"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} a {to}"
+
 msgid "{name} accounts"
 msgstr "Contas do {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} estrelas e subindo"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} a {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# automação iniciada} other {# automações iniciadas}}"
@@ -6813,6 +6819,9 @@ msgstr "Preço sob consulta"
 
 msgid "Custom provider"
 msgstr "Provedor personalizado"
+
+msgid "Custom range…"
+msgstr "Intervalo personalizado…"
 
 msgid "Custom themes"
 msgstr "Temas personalizados"
@@ -12834,6 +12843,9 @@ msgstr "Nenhum contribuidor encontrado."
 
 msgid "No credit card required."
 msgstr "Sem cartão de crédito."
+
+msgid "No days available"
+msgstr "Nenhum dia disponível"
 
 msgid "No description"
 msgstr "Sem descrição"

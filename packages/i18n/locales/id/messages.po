@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} per pengguna/bulan. Seluler, otomatisasi, dukungan priori
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} otomatisasi Anda gagal pada run terakhirnya"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} hingga {to}"
+
 msgid "{name} accounts"
 msgstr "Akun {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} star dan terus bertambah"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} hingga {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# otomatisasi dimulai} other {# otomatisasi dimulai}}"
@@ -6813,6 +6819,9 @@ msgstr "Harga khusus"
 
 msgid "Custom provider"
 msgstr "Penyedia kustom"
+
+msgid "Custom range…"
+msgstr "Rentang kustom…"
 
 msgid "Custom themes"
 msgstr "Tema kustom"
@@ -12834,6 +12843,9 @@ msgstr "Tidak ada kontributor ditemukan."
 
 msgid "No credit card required."
 msgstr "Tanpa kartu kredit."
+
+msgid "No days available"
+msgstr "Tidak ada hari tersedia"
 
 msgid "No description"
 msgstr "Tidak ada deskripsi"

@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} pro Nutzer/Monat. Mobile, Automatisierungen, bevorzugter 
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Bei {myFailedCount} deiner Automatisierungen ist der letzte Lauf fehlgeschlagen"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} bis {to}"
+
 msgid "{name} accounts"
 msgstr "{name}-Konten"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} Stars und es werden mehr"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} bis {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {# Automatisierung gestartet} other {# Automatisierungen gestartet}}"
@@ -6813,6 +6819,9 @@ msgstr "Individueller Preis"
 
 msgid "Custom provider"
 msgstr "Eigener Anbieter"
+
+msgid "Custom range…"
+msgstr "Eigener Zeitraum…"
 
 msgid "Custom themes"
 msgstr "Eigene Themes"
@@ -12834,6 +12843,9 @@ msgstr "Keine Mitwirkenden gefunden."
 
 msgid "No credit card required."
 msgstr "Ohne Kreditkarte."
+
+msgid "No days available"
+msgstr "Keine Tage verfügbar"
 
 msgid "No description"
 msgstr "Keine Beschreibung"

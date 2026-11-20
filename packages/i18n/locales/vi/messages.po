@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} mỗi người dùng/tháng. Di động, tự động hó
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "{myFailedCount} tự động hóa của bạn thất bại ở lần chạy gần nhất"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from} đến {to}"
+
 msgid "{name} accounts"
 msgstr "Tài khoản {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} star và còn tăng"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} đến {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Đã khởi chạy # tự động hóa} other {Đã khởi chạy # tự động hóa}}"
@@ -6813,6 +6819,9 @@ msgstr "Giá tùy chỉnh"
 
 msgid "Custom provider"
 msgstr "Nhà cung cấp tùy chỉnh"
+
+msgid "Custom range…"
+msgstr "Phạm vi tùy chỉnh…"
 
 msgid "Custom themes"
 msgstr "Theme tùy chỉnh"
@@ -12834,6 +12843,9 @@ msgstr "Không tìm thấy người đóng góp nào."
 
 msgid "No credit card required."
 msgstr "Không cần thẻ tín dụng."
+
+msgid "No days available"
+msgstr "Không có ngày nào"
 
 msgid "No description"
 msgstr "Không có mô tả"

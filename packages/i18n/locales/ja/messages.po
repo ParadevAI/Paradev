@@ -1161,6 +1161,9 @@ msgstr "1ユーザーあたり月額 {monthlyPrice}。モバイル、オート�
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "自分のオートメーションのうち{myFailedCount}件が前回の実行に失敗しました"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · {from}から{to}"
+
 msgid "{name} accounts"
 msgstr "{name} のアカウント"
 
@@ -1388,6 +1391,9 @@ msgstr "スター{starCount}件、まだ増えています"
 
 msgid "{start} – {end}"
 msgstr "{start}～{end}"
+
+msgid "{start} to {end}"
+msgstr "{start}から{end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {#件のオートメーションを開始しました} other {#件のオートメーションを開始しました}}"
@@ -6813,6 +6819,9 @@ msgstr "個別見積もり"
 
 msgid "Custom provider"
 msgstr "カスタムプロバイダー"
+
+msgid "Custom range…"
+msgstr "カスタム範囲…"
 
 msgid "Custom themes"
 msgstr "カスタムテーマ"
@@ -12834,6 +12843,9 @@ msgstr "コントリビューターが見つかりません。"
 
 msgid "No credit card required."
 msgstr "クレジットカードは不要です。"
+
+msgid "No days available"
+msgstr "利用できる日がありません"
 
 msgid "No description"
 msgstr "説明なし"

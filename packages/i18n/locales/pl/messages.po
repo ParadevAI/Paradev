@@ -1161,6 +1161,9 @@ msgstr "{monthlyPrice} za użytkownika/mies. Aplikacja mobilna, automatyzacje, p
 msgid "{myFailedCount} of your automations failed their last run"
 msgstr "Twoje automatyzacje z nieudanym ostatnim uruchomieniem: {myFailedCount}"
 
+msgid "{name} · {from} to {to}"
+msgstr "{name} · od {from} do {to}"
+
 msgid "{name} accounts"
 msgstr "Konta {name}"
 
@@ -1388,6 +1391,9 @@ msgstr "{starCount} gwiazdek i rośnie"
 
 msgid "{start} – {end}"
 msgstr "{start} – {end}"
+
+msgid "{start} to {end}"
+msgstr "{start} do {end}"
 
 msgid "{started, plural, one {Started # automation} other {Started # automations}}"
 msgstr "{started, plural, one {Uruchomiono # automatyzację} few {Uruchomiono # automatyzacje} many {Uruchomiono # automatyzacji} other {Uruchomiono # automatyzacji}}"
@@ -6813,6 +6819,9 @@ msgstr "Cena indywidualna"
 
 msgid "Custom provider"
 msgstr "Własny dostawca"
+
+msgid "Custom range…"
+msgstr "Zakres niestandardowy…"
 
 msgid "Custom themes"
 msgstr "Własne motywy"
@@ -12834,6 +12843,9 @@ msgstr "Nie znaleziono współtwórców."
 
 msgid "No credit card required."
 msgstr "Bez karty kredytowej."
+
+msgid "No days available"
+msgstr "Brak dostępnych dni"
 
 msgid "No description"
 msgstr "Brak opisu"
