@@ -15,7 +15,14 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { LuCheck, LuLoaderCircle, LuSearch, LuStar } from "react-icons/lu";
+import {
+	LuCheck,
+	LuLoaderCircle,
+	LuRefreshCw,
+	LuSearch,
+	LuStar,
+	LuX,
+} from "react-icons/lu";
 import {
 	getPresetIcon,
 	useIsDarkTheme,
@@ -477,35 +484,39 @@ export function ModelPanel({
 			!runtimeModels &&
 			tabAgent.availability === "unknown" &&
 			(tabAgent.loading || !dismissedNotices.has(catalogKey ?? "")) ? (
-				<div className="flex min-h-7 shrink-0 flex-wrap items-center gap-x-2 px-2.5 pb-1.5 text-[11px] text-muted-foreground/70">
+				<div className="flex h-7 shrink-0 items-center gap-0.5 pr-1.5 pl-2.5 text-[11px] text-muted-foreground/70">
 					{tabAgent.loading ? (
 						<>
-							<LuLoaderCircle className="size-3 animate-spin" />
+							<LuLoaderCircle className="mr-1 size-3 animate-spin" />
 							{t({ message: "Loading..." })}
 						</>
 					) : (
 						<>
-							<span className="w-full">
+							<span className="min-w-0 flex-1 truncate">
 								{t({ message: "Model availability could not be verified." })}
 							</span>
 							{tabAgent.onRefresh ? (
 								<button
 									type="button"
+									aria-label={t({ message: "Refresh" })}
+									title={t({ message: "Refresh" })}
 									onClick={tabAgent.onRefresh}
-									className="underline"
+									className="rounded p-1 hover:bg-accent hover:text-foreground"
 								>
-									{t({ message: "Refresh" })}
+									<LuRefreshCw className="size-3" />
 								</button>
 							) : null}
 							<button
 								type="button"
+								aria-label={t({ message: "Dismiss" })}
+								title={t({ message: "Dismiss" })}
 								onClick={() => {
 									dismissedNotices.add(catalogKey ?? "");
 									setNoticeRevision((revision) => revision + 1);
 								}}
-								className="underline"
+								className="rounded p-1 hover:bg-accent hover:text-foreground"
 							>
-								{t({ message: "Dismiss" })}
+								<LuX className="size-3" />
 							</button>
 						</>
 					)}
