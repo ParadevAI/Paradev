@@ -32,13 +32,9 @@ export const metricsSchema = z.object({
 	usageUsd: z.number().nullable(),
 });
 
-/**
- * Usage metrics as `usage.query` returns them. Grouped by `billingDay` there is no `workspaces`: the
- * daily rollup has no workspace. That grouping says how many workspaces booted or failed instead.
- */
+/** Usage metrics as `usage.query` returns them: `workspaces` is null when grouped by `billingDay`, whose daily rollup has no workspace. */
 const usageMetricsSchema = metricsSchema.extend({
-	workspaces: z.number().optional(),
-	workspacesBootedOrFailed: z.number().optional(),
+	workspaces: z.number().nullable(),
 });
 
 export const cloudUsageOutputSchema = z.object({

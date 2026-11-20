@@ -29,6 +29,7 @@ import {
 	queryFleetCloudUsageByWorkspaceDay,
 } from "./cloud-usage-query";
 import {
+	cloudUsageDaily,
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
@@ -946,32 +947,131 @@ describe("grouped by billing day", () => {
 		}
 	});
 
-	test("there is no workspaces count by billing day, only the workspaces that booted or failed, by that name", async () => {
+	test("workspaces is null by billing day, in the rows and the total; day keeps it", async () => {
 		const byBillingDay = await usage({ groupBy: "billingDay" });
+		expect(byBillingDay.items.length).toBeGreaterThan(0);
 		for (const metrics of [byBillingDay.total, ...byBillingDay.items]) {
-			expect(metrics).not.toHaveProperty("workspaces");
-			expect(typeof metrics.workspacesBootedOrFailed).toBe("number");
+			expect(metrics.workspaces).toBeNull();
 		}
 		const byDay = await usage({ groupBy: "day" });
 		for (const metrics of [byDay.total, ...byDay.items]) {
 			expect(typeof metrics.workspaces).toBe("number");
-			expect(metrics).not.toHaveProperty("workspacesBootedOrFailed");
 		}
 	});
 
-	test("a filter the rollup cannot apply reads events, with the same rows", async () => {
+	// 2026-03-08 springs forward (23 hours); 2026-11-01 falls back (25 hours).
+	const seedSpring = () =>
+		db
+			.insert(cloudUsageEvents)
+			.values([
+				at(51, "2026-03-07T07:30:00Z"),
+				at(52, "2026-03-08T07:59:00Z"),
+				at(53, "2026-03-08T08:00:00Z", SAM),
+				at(54, "2026-03-09T06:59:00Z"),
+				at(55, "2026-03-09T07:00:00Z"),
+				at(56, "2026-03-10T09:00:00Z"),
+			]);
+	const dropSpring = () =>
+		db.delete(cloudUsageEvents).where(gte(cloudUsageEvents.lockSeq, 51));
+	/** A rollup row whose events were all taken back: it adds nothing and makes no row. */
+	const zeroRow = () =>
+		db.insert(cloudUsageDaily).values({
+			organizationId: ORG,
+			day: "2026-11-05",
+			userId: MAYA,
+			vcpus: 4,
+			gbMinutes: "0",
+			seconds: "0",
+			events: 0,
+		});
+	const dropZeroRow = () =>
+		db.delete(cloudUsageDaily).where(eq(cloudUsageDaily.events, 0));
+	const SPRING = {
+		from: new Date("2026-03-07T12:00:00Z"),
+		to: new Date("2026-03-10T12:00:00Z"),
+	};
+	const cases: {
+		name: string;
+		window: { from: Date; to: Date };
+		filters?: Parameters<typeof queryCloudUsage>[2]["filters"];
+		userId?: string;
+	}[] = [
+		{ name: "spring forward, partial edge days", window: SPRING },
+		{ name: "fall back, partial edge days", window: PARTIAL },
+		{ name: "a whole month", window: NOVEMBER },
+		{ name: "another month", window: OCTOBER },
+		{ name: "a member", window: NOVEMBER, userId: SAM },
+		{ name: "a size", window: NOVEMBER, filters: { size: "medium" } },
+		{
+			name: "a workspace (events only)",
+			window: NOVEMBER,
+			filters: { workspace: CHECKOUT },
+		},
+		{
+			name: "a status (events only)",
+			window: NOVEMBER,
+			filters: { status: ["awake", "failed"] },
+		},
+	];
+	const rowsOf = async (
+		{ window, filters, userId }: (typeof cases)[number],
+		fromEvents: boolean,
+	) => {
+		const result = await queryCloudUsage(
+			db,
+			{ organizationId: ORG, userId },
+			{
+				window,
+				filters,
+				groupBy: "billingDay",
+				limit: 100,
+				overagePerGbHour: RATE,
+				fromEvents,
+			},
+		);
+		const brief = (metrics: (typeof result)["total"]) => [
+			Math.round(metrics.gbHours * 1e6) / 1e6,
+			Math.round(metrics.hours * 1e6) / 1e6,
+			metrics.boots,
+			metrics.failedBoots,
+			metrics.workspaces,
+		];
+		return {
+			rows: result.items.map((item) => [item.key, ...brief(item)]),
+			total: brief(result.total),
+			rowCount: result.rowCount,
+		};
+	};
+
+	test("every row from the rollup equals the row from events: both daylight-saving changes, an events = 0 row, an empty rollup day, members, sizes, workspaces and statuses", async () => {
+		await seedSpring();
 		await seedFallBack();
+		await zeroRow();
 		try {
-			const rows = async (search?: string) =>
-				(
-					await usage({ groupBy: "billingDay", window: PARTIAL, search })
-				).items.map((item) => [item.key, item.gbHours, item.boots]);
-			const all = await rows();
-			const searched = await rows("checkout");
-			expect(searched.length).toBeGreaterThan(0);
-			for (const row of searched) expect(all).toContainEqual(row);
+			for (const testCase of cases) {
+				const fromRollup = await rowsOf(testCase, false);
+				expect({ case: testCase.name, ...fromRollup }).toEqual({
+					case: testCase.name,
+					...(await rowsOf(testCase, true)),
+				});
+			}
+			const november = (await rowsOf(cases[2] as (typeof cases)[number], false))
+				.rows;
+			// 2026-11-12 has boots and no usage: a row from the boots alone.
+			expect(november.find(([key]) => key === "2026-11-12")).toBeDefined();
+			expect(november.find(([key]) => key === "2026-11-05")).toBeUndefined();
+			const spring = (await rowsOf(cases[0] as (typeof cases)[number], false))
+				.rows;
+			expect(spring.map(([key]) => key)).toEqual([
+				"2026-03-10",
+				"2026-03-09",
+				"2026-03-08",
+				"2026-03-07",
+			]);
 		} finally {
+			await dropSpring();
 			await dropFallBack();
+			await dropZeroRow();
 		}
 	});
 });

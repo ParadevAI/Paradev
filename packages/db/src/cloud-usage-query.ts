@@ -336,35 +336,20 @@ function usageFacts(
 	window: CloudUsageWindow,
 	keys: FactKeys,
 	secondKeys: FactKeys = NO_KEY,
-) {
-	const { sent, started, failed } = factParts(
-		db,
-		scope,
-		filters,
-		window,
-		keys,
-		secondKeys,
-	);
-	return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
-}
-
-function factParts(
-	db: Db,
-	scope: Scope,
-	filters: CloudUsageFilters,
-	window: CloudUsageWindow,
-	keys: FactKeys,
-	secondKeys: FactKeys = NO_KEY,
-	sentOnly?: { where: SQL; workspaces: false },
+	options: {
+		/** Narrows the sent events, for the days the rollup does not cover. */
+		sentWhere?: SQL;
+		/** Usage rows from the daily rollup, in the facts' shape. */
+		days?: ReturnType<typeof rollupDays>;
+	} = {},
 ) {
 	const sent = db
 		.select({
 			key: sql<string | null>`${keys.event}::text`.as("key"),
 			secondKey: sql<string | null>`${secondKeys.event}::text`.as("second_key"),
-			workspaceId: (sentOnly
-				? sql<string | null>`null::uuid`
-				: sql<string | null>`${events.cloudWorkspaceId}`
-			).as("workspace_id"),
+			workspaceId: sql<string | null>`${events.cloudWorkspaceId}`.as(
+				"workspace_id",
+			),
 			gbMinutes: sql<string>`${events.amount}`.as("gb_minutes"),
 			seconds:
 				sql<string>`extract(epoch from ${events.windowTo} - ${events.windowFrom})`.as(
@@ -383,7 +368,7 @@ function factParts(
 				eq(events.feature, BILLED_FEATURE),
 				gte(events.sentAt, window.from),
 				lt(events.sentAt, window.to),
-				sentOnly?.where,
+				options.sentWhere,
 				...scopeConditions(scope, filters, {
 					user: events.userId,
 					workspace: events.cloudWorkspaceId,
@@ -442,62 +427,54 @@ function factParts(
 				}),
 			),
 		);
-	return { sent, started, failed };
+	const facts = sent.unionAll(started).unionAll(failed);
+	return db
+		.$with("facts")
+		.as(options.days ? facts.unionAll(options.days) : facts);
 }
 
-const LA = sql.raw("'America/Los_Angeles'");
-const dayStart = (date: SQL) => sql`((${date})::timestamp at time zone ${LA})`;
-
 /**
- * The facts grouped by billing day, with usage from the daily rollup for the billing days wholly
- * inside the window and from events for the partial days at its edges. The rollup has no workspace,
- * so here `workspaces` counts the workspaces that booted or failed in the window, on both paths.
- * Filters the rollup cannot apply (workspace, status, search) read every day from events.
+ * Usage by billing day from the daily rollup: its rows for the billing days wholly inside the
+ * window, and `sentWhere` for the events of the partial days at the window's edges. Each event
+ * lands in exactly one part. Null when a filter the rollup cannot apply (workspace, status, search)
+ * is set: then every day reads events.
  */
-function billingDayFacts(
+function billingDayRollup(
 	db: Db,
 	scope: Scope,
 	filters: CloudUsageFilters,
 	window: CloudUsageWindow,
-	keys: FactKeys,
 ) {
+	if (filters.workspace || filters.status?.length || filters.search) {
+		return null;
+	}
 	const from = sql`${window.from.toISOString()}::timestamptz`;
 	const to = sql`${window.to.toISOString()}::timestamptz`;
-	const firstDay = sql`public.cloud_billing_day(${from})`;
-	const firstWhole = sql`(case when ${dayStart(firstDay)} = ${from} then ${firstDay} else ${firstDay} + 1 end)`;
+	const fromDay = sql`public.cloud_billing_day(${from})`;
+	const firstWhole = sql`(case when public.cloud_billing_day_start(${fromDay}) = ${from} then ${fromDay} else ${fromDay} + 1 end)`;
 	const endWhole = sql`public.cloud_billing_day(${to})`;
-	const rollupServes =
-		!filters.workspace && !filters.status?.length && !filters.search;
-	const { sent, started, failed } = factParts(
-		db,
-		scope,
-		filters,
-		window,
-		keys,
-		NO_KEY,
-		{
-			where: rollupServes
-				? sql`(${events.sentAt} < ${dayStart(firstWhole)} or ${events.sentAt} >= ${dayStart(endWhole)})`
-				: sql`true`,
-			workspaces: false,
-		},
-	);
-	if (!rollupServes) {
-		return db.$with("facts").as(sent.unionAll(started).unionAll(failed));
-	}
-	const dayText = sql`to_char(${daily.day}::date, 'YYYY-MM-DD')`;
-	const whole = db
+	return {
+		sentWhere: sql`(${events.sentAt} < public.cloud_billing_day_start(${firstWhole}) or ${events.sentAt} >= public.cloud_billing_day_start(${endWhole}))`,
+		days: rollupDays(db, scope, filters, { firstWhole, endWhole }),
+	};
+}
+
+function rollupDays(
+	db: Db,
+	scope: Scope,
+	filters: CloudUsageFilters,
+	{ firstWhole, endWhole }: { firstWhole: SQL; endWhole: SQL },
+) {
+	return db
 		.select({
-			key: sql<
-				string | null
-			>`${keys === NO_KEY ? sql`null` : dayText}::text`.as("key"),
-			secondKey: sql<string | null>`null::text`.as("second_key"),
-			workspaceId: sql<string | null>`null::uuid`.as("workspace_id"),
-			gbMinutes: sql<string>`${daily.gbMinutes}`.as("gb_minutes"),
-			seconds: sql<string>`${daily.seconds}`.as("seconds"),
-			bootId: sql<string | null>`null::text`.as("boot_id"),
-			failed: sql<boolean>`false`.as("failed"),
-			day: sql<string>`${dayText}`.as("day"),
+			key: sql<string | null>`to_char(${daily.day}::date, 'YYYY-MM-DD')`,
+			secondKey: sql<string | null>`null::text`,
+			workspaceId: sql<string | null>`null::uuid`,
+			gbMinutes: sql<string>`${daily.gbMinutes}`,
+			seconds: sql<string>`${daily.seconds}`,
+			bootId: sql<string | null>`null::text`,
+			failed: sql<boolean>`false`,
+			day: sql<string>`null::text`,
 		})
 		.from(daily)
 		.where(
@@ -513,9 +490,6 @@ function billingDayFacts(
 					: undefined,
 			),
 		);
-	return db
-		.$with("facts")
-		.as(whole.unionAll(sent).unionAll(started).unionAll(failed));
 }
 
 interface DayRow {
@@ -554,17 +528,12 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 
 export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
-/** Grouped by billing day the rollup has no workspace: the count is of workspaces that booted or failed, under its own name. */
+/** Grouped by billing day there is no workspaces count: the rollup has no workspace. */
 function usageMetrics(
 	metrics: CloudUsageMetrics,
 	byBillingDay: boolean,
-): Omit<CloudUsageMetrics, "workspaces"> & {
-	workspaces?: number;
-	workspacesBootedOrFailed?: number;
-} {
-	if (!byBillingDay) return metrics;
-	const { workspaces, ...rest } = metrics;
-	return { ...rest, workspacesBootedOrFailed: workspaces };
+): Omit<CloudUsageMetrics, "workspaces"> & { workspaces: number | null } {
+	return byBillingDay ? { ...metrics, workspaces: null } : metrics;
 }
 
 /** These groupings have no entity behind the key: the key is the label. */
@@ -717,6 +686,8 @@ interface CloudUsageOptions<GroupBy> {
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
+	/** Grouped by billing day, read every day from events instead of the rollup: what the rollup is checked against. */
+	fromEvents?: boolean;
 }
 
 type CloudFleetUsageOptions = CloudUsageOptions<CloudFleetGroupBy> & {
@@ -829,9 +800,19 @@ async function usageRows(
 		overagePerGbHour,
 	} = options;
 	const byBillingDay = groupBy === "billingDay";
-	const totalFacts = byBillingDay
-		? billingDayFacts(db, scope, filters, window, NO_KEY)
-		: usageFacts(db, scope, filters, window, NO_KEY);
+	const rollup =
+		byBillingDay && !options.fromEvents
+			? billingDayRollup(db, scope, filters, window)
+			: null;
+	const totalFacts = usageFacts(
+		db,
+		scope,
+		filters,
+		window,
+		NO_KEY,
+		NO_KEY,
+		rollup ?? {},
+	);
 	const totalRow = db
 		.with(totalFacts)
 		.select(metricColumns(totalFacts))
@@ -864,9 +845,15 @@ async function usageRows(
 	) {
 		throw new Error(`Sorting by ${sort.by} needs grouping by workspace`);
 	}
-	const facts = byBillingDay
-		? billingDayFacts(db, scope, filters, window, groupKeys.billingDay)
-		: usageFacts(db, scope, filters, window, groupKeys[groupBy]);
+	const facts = usageFacts(
+		db,
+		scope,
+		filters,
+		window,
+		groupKeys[groupBy],
+		NO_KEY,
+		rollup ?? {},
+	);
 	const metrics = metricColumns(facts);
 	const withDays = groupBy === "user";
 	const sortKey = sql<string>`coalesce(${facts.key}, '')`;
