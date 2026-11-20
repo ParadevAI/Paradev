@@ -1,8 +1,27 @@
-import { describe, expect, it, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { ILinkProvider, Terminal as XTerm } from "@xterm/xterm";
+import type { StatCallback } from "./links";
 import { TerminalLinkManager } from "./terminal-link-manager";
 
-function createMockTerminal() {
+const COLS = 80;
+const APP_LINKS = new Set(["superset://v2-workspace/abc"]);
+const isOscAppLink = (uri: string) => APP_LINKS.has(uri);
+
+function bufferLine(text: string) {
+	return {
+		translateToString: (_trim?: boolean, start = 0, end = COLS) =>
+			text.substring(start, end),
+		isWrapped: false,
+		length: COLS,
+		getCell: (x: number) => ({
+			getChars: () => text[x] ?? " ",
+			getWidth: () => 1,
+		}),
+	};
+}
+
+function createMockTerminal(lines: string[] = []) {
+	const bufferLines = lines.map(bufferLine);
 	const registeredProviders: ILinkProvider[] = [];
 	const disposedProviders: ILinkProvider[] = [];
 	const terminal = {
@@ -19,10 +38,12 @@ function createMockTerminal() {
 		},
 		buffer: {
 			active: {
-				getLine: () => null,
+				length: bufferLines.length,
+				viewportY: 0,
+				getLine: (index: number) => bufferLines[index] ?? null,
 			},
 		},
-		cols: 80,
+		cols: COLS,
 	} as unknown as XTerm;
 
 	return { terminal, registeredProviders, disposedProviders };
@@ -67,6 +88,362 @@ describe("TerminalLinkManager", () => {
 			url: "https://example.com",
 		});
 		expect(onLinkLeave).toHaveBeenCalled();
+	});
+
+	describe("with an OSC 8 app link check", () => {
+		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
+		const event = {} as MouseEvent;
+		let terminal: XTerm;
+		let onUrlClick: ReturnType<typeof mock>;
+		let onLinkHover: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal().terminal;
+			onUrlClick = mock();
+			onLinkHover = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat: async () => null,
+				onUrlClick,
+				onLinkHover,
+				isOscAppLink,
+			});
+		});
+
+		it("lets xterm create non-http OSC 8 links", () => {
+			expect(terminal.options.linkHandler?.allowNonHttpProtocols).toBe(true);
+		});
+
+		it.each([
+			"superset://v2-workspace/abc",
+			"https://example.com",
+			"http://example.com",
+		])("activates %s", (uri) => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+
+			expect(onUrlClick).toHaveBeenCalledWith(event, uri);
+		});
+
+		it.each([
+			"https://example.com",
+			"http://example.com",
+		])("reports hover on %s", (uri) => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+
+			expect(onLinkHover).toHaveBeenCalledWith(event, {
+				kind: "url",
+				url: uri,
+			});
+		});
+
+		it("reports no hover on an app link", () => {
+			terminal.options.linkHandler?.hover?.(
+				event,
+				"superset://v2-workspace/abc",
+				range,
+			);
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			"file:///etc/passwd",
+			"javascript:alert(1)",
+			"superset-dev://v2-workspace/abc",
+			"not a url",
+		])("ignores %s", (uri) => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("with a file: OSC 8 link", () => {
+		const range = { start: { x: 1, y: 1 }, end: { x: 20, y: 1 } };
+		const event = {} as MouseEvent;
+		const uri = "file://host/Users/me/repo/src/index.ts";
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		let terminal: XTerm;
+		let manager: TerminalLinkManager;
+		let stat: ReturnType<typeof mock>;
+		let onUrlClick: ReturnType<typeof mock>;
+		let onFileLinkClick: ReturnType<typeof mock>;
+		let onLinkHover: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal().terminal;
+			stat = mock(async () => ({
+				isDirectory: false,
+				resolvedPath: "/Users/me/repo/src/index.ts",
+			}));
+			onUrlClick = mock();
+			onFileLinkClick = mock();
+			onLinkHover = mock();
+			manager = new TerminalLinkManager(terminal);
+			manager.setHandlers({
+				stat,
+				onUrlClick,
+				onFileLinkClick,
+				onLinkHover,
+				isOscAppLink,
+			});
+		});
+
+		it("opens it through the file link handler", async () => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/Users/me/repo/src/index.ts");
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({
+					resolvedPath: "/Users/me/repo/src/index.ts",
+					isDirectory: false,
+				}),
+			);
+		});
+
+		it("reports it as a file on hover", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			await flush();
+
+			expect(onLinkHover).toHaveBeenCalledWith(event, {
+				kind: "file",
+				isDirectory: false,
+				resolvedPath: "/Users/me/repo/src/index.ts",
+			});
+		});
+
+		it("reports no hover once the pointer has left", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			terminal.options.linkHandler?.leave?.(event, uri, range);
+			await flush();
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it.each([
+			"FILE:///Users/me/repo/src/index.ts",
+			"file:/Users/me/repo/src/index.ts",
+			"file:///Users/me/repo/src/index%2Ets",
+		])("passes the decoded path of %s to stat", async (variant) => {
+			terminal.options.linkHandler?.activate(event, variant, range);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/Users/me/repo/src/index.ts");
+		});
+
+		it("keeps an encoded ? in the file name", async () => {
+			terminal.options.linkHandler?.activate(
+				event,
+				"file:///tmp/report%3Fdraft.txt",
+				range,
+			);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/tmp/report?draft.txt");
+		});
+
+		it("keeps a line-like suffix in the file name", async () => {
+			terminal.options.linkHandler?.activate(
+				event,
+				"file:///tmp/report:42",
+				range,
+			);
+			await flush();
+
+			expect(stat).toHaveBeenCalledWith("/tmp/report:42");
+		});
+
+		it("ignores a file URL whose path does not decode", async () => {
+			terminal.options.linkHandler?.activate(
+				event,
+				"file:///tmp/report%ZZ.txt",
+				range,
+			);
+			await flush();
+
+			expect(stat).not.toHaveBeenCalled();
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+		});
+
+		it("drops a pending hover when the handlers are replaced without stat", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			manager.setHandlers({});
+			await flush();
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it("drops a pending hover when the handlers are replaced", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			manager.setHandlers({ stat, onLinkHover: mock() });
+			await flush();
+
+			expect(onLinkHover).not.toHaveBeenCalled();
+		});
+
+		it("drops a click whose stat returns after dispose", async () => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			manager.dispose();
+			await flush();
+
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+		});
+
+		it("reports only the latest hover of the same link", async () => {
+			terminal.options.linkHandler?.hover?.(event, uri, range);
+			terminal.options.linkHandler?.leave?.(event, uri, range);
+			const latestEvent = { clientX: 5 } as MouseEvent;
+			terminal.options.linkHandler?.hover?.(latestEvent, uri, range);
+			await flush();
+
+			expect(onLinkHover).toHaveBeenCalledTimes(1);
+			expect(onLinkHover).toHaveBeenCalledWith(
+				latestEvent,
+				expect.objectContaining({ kind: "file" }),
+			);
+		});
+
+		it("does nothing when the path does not exist", async () => {
+			stat.mockImplementation(async () => null);
+			terminal.options.linkHandler?.activate(event, uri, range);
+			await flush();
+
+			expect(onFileLinkClick).not.toHaveBeenCalled();
+			expect(onUrlClick).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("with an OSC 8 link over a visible file path", () => {
+		const event = {} as MouseEvent;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		const visiblePath = "/Users/me/repo/src/index.ts:12:3";
+		const range = { start: { x: 1, y: 1 }, end: { x: 32, y: 1 } };
+		let terminal: XTerm;
+		let onUrlClick: ReturnType<typeof mock>;
+		let onFileLinkClick: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal([visiblePath]).terminal;
+			onUrlClick = mock();
+			onFileLinkClick = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat: async () => ({
+					isDirectory: false,
+					resolvedPath: "/Users/me/repo/src/index.ts",
+				}),
+				onUrlClick,
+				onFileLinkClick,
+				isOscAppLink,
+			});
+		});
+
+		it.each([
+			"cursor:///Users/me/repo/src/index.ts",
+			"file:///Users/me/repo/src/index.ts",
+			"superset://tasks/abc",
+		])("opens the visible path with its position for %s", async (uri) => {
+			terminal.options.linkHandler?.activate(event, uri, range);
+			await flush();
+
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({
+					resolvedPath: "/Users/me/repo/src/index.ts",
+					row: 12,
+					col: 3,
+				}),
+			);
+		});
+	});
+
+	describe("with an OSC 8 file link over two visible paths", () => {
+		const event = {} as MouseEvent;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		const range = { start: { x: 1, y: 1 }, end: { x: 40, y: 1 } };
+		let terminal: XTerm;
+		let onFileLinkClick: ReturnType<typeof mock>;
+
+		beforeEach(() => {
+			terminal = createMockTerminal(["/tmp/a.ts:12:3 /tmp/b.ts:20:4"]).terminal;
+			onFileLinkClick = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat: async (path) => ({ isDirectory: false, resolvedPath: path }),
+				onUrlClick: mock(),
+				onFileLinkClick,
+				isOscAppLink,
+			});
+		});
+
+		it("opens the link target instead of guessing a visible path", async () => {
+			terminal.options.linkHandler?.activate(event, "file:///tmp/c.ts", range);
+			await flush();
+
+			expect(onFileLinkClick).toHaveBeenCalledTimes(1);
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({ resolvedPath: "/tmp/c.ts" }),
+			);
+		});
+	});
+
+	describe("with an OSC 8 link over several visible rows", () => {
+		const event = {} as MouseEvent;
+		const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+		let onUrlClick: ReturnType<typeof mock>;
+		let onFileLinkClick: ReturnType<typeof mock>;
+
+		function setUp(lines: string[], stat: StatCallback): XTerm {
+			const { terminal } = createMockTerminal(lines);
+			onUrlClick = mock();
+			onFileLinkClick = mock();
+			new TerminalLinkManager(terminal).setHandlers({
+				stat,
+				onUrlClick,
+				onFileLinkClick,
+				isOscAppLink,
+			});
+			return terminal;
+		}
+
+		it("finds a visible link on a later row of the OSC range", async () => {
+			const terminal = setUp(
+				["see", "https://example.com/page"],
+				async () => null,
+			);
+			terminal.options.linkHandler?.activate(event, "cursor:///x", {
+				start: { x: 1, y: 1 },
+				end: { x: 24, y: 2 },
+			});
+			await flush();
+
+			expect(onUrlClick).toHaveBeenCalledWith(
+				expect.anything(),
+				"https://example.com/page",
+			);
+		});
+
+		it("opens its own target when links from two providers overlap it", async () => {
+			const terminal = setUp(
+				["/tmp/a.ts:12:3 https://example.com"],
+				async (path) => ({ isDirectory: false, resolvedPath: path }),
+			);
+			terminal.options.linkHandler?.activate(event, "file:///tmp/c.ts", {
+				start: { x: 1, y: 1 },
+				end: { x: 34, y: 1 },
+			});
+			await flush();
+
+			expect(onUrlClick).not.toHaveBeenCalled();
+			expect(onFileLinkClick).toHaveBeenCalledWith(
+				event,
+				expect.objectContaining({ resolvedPath: "/tmp/c.ts" }),
+			);
+		});
 	});
 
 	it("clears only the OSC link handler it installed", () => {

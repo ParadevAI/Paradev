@@ -7,7 +7,13 @@
  *  resolver caching, and priority ordering.
  *--------------------------------------------------------------------------------------------*/
 
-import type { ILinkHandler, Terminal as XTerm } from "@xterm/xterm";
+import type {
+	IBufferRange,
+	ILink,
+	ILinkHandler,
+	ILinkProvider,
+	Terminal as XTerm,
+} from "@xterm/xterm";
 import type { DetectedLink } from "./links";
 import {
 	LinkDetectorAdapter,
@@ -36,6 +42,12 @@ export interface TerminalLinkHandlers {
 	onFileLinkClick?: (event: MouseEvent, link: DetectedLink) => void;
 	/** Called when a URL link is activated. */
 	onUrlClick?: (event: MouseEvent, url: string) => void;
+	/**
+	 * Recognizes a non-http(s) OSC 8 link the app opens itself, e.g. a
+	 * workspace link. It goes to `onUrlClick` with no hover info; any other
+	 * non-http(s) OSC 8 link defers to the text link under it.
+	 */
+	isOscAppLink?: (uri: string) => boolean;
 	/** Called when the mouse enters a detected link (file path or URL). */
 	onLinkHover?: (event: MouseEvent, info: LinkHoverInfo) => void;
 	/** Called when the mouse leaves a previously hovered link. */
@@ -45,6 +57,46 @@ export interface TerminalLinkHandlers {
 	 * which handles all path resolution (relative, tilde, etc.) server-side.
 	 */
 	stat?: StatCallback;
+}
+
+function fileUrlPath(uri: string): string | null {
+	try {
+		const url = new URL(uri);
+		return url.protocol === "file:" ? decodeURIComponent(url.pathname) : null;
+	} catch {
+		return null;
+	}
+}
+
+function comparePositions(
+	a: IBufferRange["start"],
+	b: IBufferRange["start"],
+): number {
+	return a.y - b.y || a.x - b.x;
+}
+
+function rangesOverlap(a: IBufferRange, b: IBufferRange): boolean {
+	return (
+		comparePositions(a.start, b.end) <= 0 &&
+		comparePositions(b.start, a.end) <= 0
+	);
+}
+
+function fileLink(
+	uri: string,
+	resolved: { path: string; isDirectory: boolean },
+): DetectedLink {
+	return {
+		text: uri,
+		startIndex: 0,
+		endIndex: 0,
+		resolvedPath: resolved.path,
+		isDirectory: resolved.isDirectory,
+		row: undefined,
+		col: undefined,
+		rowEnd: undefined,
+		colEnd: undefined,
+	};
 }
 
 interface LinkProviderDisposable {
@@ -64,6 +116,8 @@ export class TerminalLinkManager {
 	private _resolver: TerminalLinkResolver | null = null;
 	private _handlers: TerminalLinkHandlers | null = null;
 	private _oscLinkHandler: ILinkHandler | null = null;
+	private _hoverRequest = 0;
+	private _textProviders: ILinkProvider[] = [];
 
 	constructor(private readonly _terminal: XTerm) {}
 
@@ -88,12 +142,36 @@ export class TerminalLinkManager {
 	}
 
 	dispose(): void {
+		this._hoverRequest++;
 		for (const d of this._disposables) d.dispose();
 		this._disposables = [];
 		this._clearOscLinkHandler();
 		this._resolver?.clearCache();
 		this._resolver = null;
 		this._handlers = null;
+	}
+
+	private async _textLinkUnder(
+		range: IBufferRange,
+	): Promise<ILink | undefined> {
+		// Providers run in priority order; overlapping detections are one
+		// visible link, separate ones make the OSC span ambiguous.
+		const distinct: ILink[] = [];
+		for (const provider of this._textProviders) {
+			for (let y = range.start.y; y <= range.end.y; y++) {
+				const links = await new Promise<ILink[] | undefined>((resolve) =>
+					provider.provideLinks(y, resolve),
+				);
+				for (const link of links ?? []) {
+					if (!rangesOverlap(link.range, range)) continue;
+					const known = distinct.some((seen) =>
+						rangesOverlap(seen.range, link.range),
+					);
+					if (!known) distinct.push(link);
+				}
+			}
+		}
+		return distinct.length === 1 ? distinct[0] : undefined;
 	}
 
 	private _clearOscLinkHandler(): void {
@@ -104,12 +182,14 @@ export class TerminalLinkManager {
 	}
 
 	private _register(): void {
+		this._hoverRequest++;
 		const handlers = this._handlers;
 		if (!handlers?.stat) return;
 
 		// Dispose old providers to prevent duplicates
 		for (const d of this._disposables) d.dispose();
 		this._disposables = [];
+		this._textProviders = [];
 		this._clearOscLinkHandler();
 
 		// Reuse resolver to preserve stat cache across re-registrations.
@@ -139,6 +219,7 @@ export class TerminalLinkManager {
 			onLinkLeave,
 		);
 		this._disposables.push(this._terminal.registerLinkProvider(adapter));
+		this._textProviders.push(adapter);
 
 		// 2. URL link provider (handles terminal-wrapped URLs)
 		if (handlers.onUrlClick) {
@@ -154,19 +235,81 @@ export class TerminalLinkManager {
 				onLinkLeave,
 			);
 			this._disposables.push(this._terminal.registerLinkProvider(urlProvider));
+			this._textProviders.push(urlProvider);
 
 			// xterm always registers its own OSC 8 hyperlink provider first. Without
 			// this, OSC 8 links use xterm's default confirm() + window.open() path,
 			// which is blocked in Electron and also bypasses our link preferences.
+			const isOscAppLink = handlers.isOscAppLink;
+			const hasProtocol = (uri: string, protocols: readonly string[]) => {
+				try {
+					return protocols.includes(new URL(uri).protocol);
+				} catch {
+					return false;
+				}
+			};
+			const webProtocols = ["http:", "https:"];
+			const opensAsUrl = (uri: string) =>
+				hasProtocol(uri, webProtocols) || Boolean(isOscAppLink?.(uri));
+			const resolver = this._resolver;
+			const onFileLinkClick = handlers.onFileLinkClick;
+			// xterm drops non-http(s) OSC 8 links unless this is true, and then
+			// hands every scheme to activate/hover, so those filter them again.
+			// Its OSC provider also runs before ours, so an OSC link we do not
+			// open as a URL defers to the text link under it, then to its file:
+			// target. App links get no hover: it feeds the URL hint and the
+			// "Open in" menu.
 			this._oscLinkHandler = {
-				allowNonHttpProtocols: false,
-				activate: (event, uri) => {
-					onUrlClick(event, uri);
+				allowNonHttpProtocols: isOscAppLink !== undefined,
+				activate: (event, uri, range) => {
+					if (opensAsUrl(uri)) {
+						onUrlClick(event, uri);
+						return;
+					}
+					void this._textLinkUnder(range).then(async (textLink) => {
+						if (!this._handlers) return;
+						if (textLink) {
+							textLink.activate(event, textLink.text);
+							return;
+						}
+						const path = fileUrlPath(uri);
+						if (!path || !onFileLinkClick) return;
+						const resolved = await resolver.resolvePath(path);
+						if (!resolved || !this._handlers) return;
+						onFileLinkClick(event, fileLink(uri, resolved));
+					});
 				},
 				hover: onLinkHover
-					? (event, uri) => onLinkHover(event, { kind: "url", url: uri })
+					? (event, uri, range) => {
+							const request = ++this._hoverRequest;
+							if (hasProtocol(uri, webProtocols)) {
+								onLinkHover(event, { kind: "url", url: uri });
+								return;
+							}
+							if (isOscAppLink?.(uri)) return;
+							const isCurrent = () => request === this._hoverRequest;
+							void this._textLinkUnder(range).then(async (textLink) => {
+								if (!isCurrent()) return;
+								if (textLink) {
+									textLink.hover?.(event, textLink.text);
+									return;
+								}
+								const path = fileUrlPath(uri);
+								if (!path) return;
+								const resolved = await resolver.resolvePath(path);
+								if (!resolved || !isCurrent()) return;
+								onLinkHover(event, {
+									kind: "file",
+									isDirectory: resolved.isDirectory,
+									resolvedPath: resolved.path,
+								});
+							});
+						}
 					: undefined,
-				leave: onLinkLeave ? () => onLinkLeave() : undefined,
+				leave: () => {
+					this._hoverRequest++;
+					onLinkLeave?.();
+				},
 			};
 			this._terminal.options.linkHandler = this._oscLinkHandler;
 		}
@@ -206,6 +349,7 @@ export class TerminalLinkManager {
 				onLinkLeave,
 			);
 			this._disposables.push(this._terminal.registerLinkProvider(wordDetector));
+			this._textProviders.push(wordDetector);
 		}
 	}
 }

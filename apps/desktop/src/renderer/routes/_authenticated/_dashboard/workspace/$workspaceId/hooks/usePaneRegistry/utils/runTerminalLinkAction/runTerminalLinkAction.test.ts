@@ -4,13 +4,17 @@ import {
 	type WorkspaceState,
 	type WorkspaceStore,
 } from "@superset/panes";
+import { env } from "renderer/env.renderer";
 import { type LinkTierMap, tierFor } from "renderer/lib/clickPolicy";
+import { PROTOCOL_SCHEME } from "shared/constants";
 import type { StoreApi } from "zustand/vanilla";
 import type { PaneViewerData } from "../../../../types";
 import {
+	isAppDeepLink,
 	runChatPullRequestLink,
 	runUrlLinkAction,
 	terminalUrlLinkAction,
+	terminalWorkspaceLinkTarget,
 } from "./runTerminalLinkAction";
 
 const PR_URL = "https://github.com/superset-sh/superset/pull/8412";
@@ -220,5 +224,87 @@ describe("terminalUrlLinkAction", () => {
 		expect(terminalUrlLinkAction(ctrl, PR_URL, defaultMap)).toBe("pane");
 		expect(terminalUrlLinkAction(click, FILES_URL, unbound)).toBeNull();
 		expect(terminalUrlLinkAction(click, FILES_URL, external)).toBe("external");
+	});
+});
+
+describe("workspace links", () => {
+	const WORKSPACE_ID = "eb417a4d-96f9-4f29-89ad-5cefe15e869a";
+	const DEEP_LINK = `${PROTOCOL_SCHEME}://v2-workspace/${WORKSPACE_ID}`;
+	const WEB_LINK = new URL(
+		`/workspaces/${WORKSPACE_ID}`,
+		env.NEXT_PUBLIC_WEB_URL,
+	).toString();
+	const click = { metaKey: false, ctrlKey: false, shiftKey: false, button: 0 };
+	const shift = { ...click, shiftKey: true };
+	const meta = { ...click, metaKey: true };
+	const ctrl = { ...click, ctrlKey: true };
+	const metaShift = { ...meta, shiftKey: true };
+	const unbound = () => null;
+
+	it.each([
+		["a plain click", click],
+		["shift-click", shift],
+		["cmd-click", meta],
+		["ctrl-click", ctrl],
+		["cmd-shift-click", metaShift],
+	])("switches to the workspace of a deep link on %s", (_name, event) => {
+		expect(terminalWorkspaceLinkTarget(event, DEEP_LINK)).toBe(WORKSPACE_ID);
+	});
+
+	it.each([
+		["a deep link", DEEP_LINK],
+		["a web link", WEB_LINK],
+	])("ignores a right-click on %s", (_name, url) => {
+		expect(
+			terminalWorkspaceLinkTarget({ ...click, button: 2 }, url),
+		).toBeNull();
+	});
+
+	it("switches to the workspace of a web link on a plain click", () => {
+		expect(terminalWorkspaceLinkTarget(click, WEB_LINK)).toBe(WORKSPACE_ID);
+	});
+
+	it.each([
+		["shift-click", shift],
+		["cmd-click", meta],
+		["ctrl-click", ctrl],
+		["cmd-shift-click", metaShift],
+	])("leaves a web link to the URL actions on %s", (_name, event) => {
+		expect(terminalWorkspaceLinkTarget(event, WEB_LINK)).toBeNull();
+	});
+
+	it("reads the app scheme case-insensitively", () => {
+		const upperDeepLink = DEEP_LINK.replace(
+			PROTOCOL_SCHEME,
+			PROTOCOL_SCHEME.toUpperCase(),
+		);
+		expect(terminalWorkspaceLinkTarget(shift, upperDeepLink)).toBe(
+			WORKSPACE_ID,
+		);
+		expect(terminalUrlLinkAction(shift, upperDeepLink, unbound)).toBeNull();
+	});
+
+	it.each([
+		[DEEP_LINK, true],
+		[`${PROTOCOL_SCHEME}://tasks/abc`, true],
+		[WEB_LINK, false],
+		["not a url", false],
+	])("isAppDeepLink(%s) is %p", (url, expected) => {
+		expect(isAppDeepLink(url)).toBe(expected);
+	});
+
+	it("leaves other URLs to the URL actions", () => {
+		expect(
+			terminalWorkspaceLinkTarget(click, "https://example.com/workspaces/x"),
+		).toBeNull();
+	});
+
+	it("opens a web link in the system browser on shift-click", () => {
+		expect(terminalUrlLinkAction(shift, WEB_LINK, unbound)).toBe("external");
+	});
+
+	it("leaves cmd-clicks on a web link to the URL link settings", () => {
+		expect(terminalUrlLinkAction(meta, WEB_LINK, unbound)).toBeNull();
+		expect(terminalUrlLinkAction(metaShift, WEB_LINK, unbound)).toBeNull();
 	});
 });

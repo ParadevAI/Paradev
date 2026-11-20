@@ -109,22 +109,39 @@ export class TerminalLinkResolver {
 			}
 		}
 
-		// Pass the path to the stat callback. The host service handles all
-		// resolution (relative → workspace root, ~ → $HOME, etc.)
+		return this._statAndCache(link, linkPath);
+	}
+
+	/**
+	 * Resolve a literal path, keeping any `:line` or `?` it contains.
+	 */
+	async resolvePath(path: string): Promise<ResolvedLink | null> {
+		if (!path) return null;
+		const key = `\u0000${path}`;
+		const cached = this._cache.get(key);
+		if (cached !== undefined) return cached.value;
+		return this._statAndCache(key, path);
+	}
+
+	// The host service resolves relative, ~ and workspace-root paths.
+	private async _statAndCache(
+		key: string,
+		path: string,
+	): Promise<ResolvedLink | null> {
 		try {
-			const stat = await this._stat(linkPath);
+			const stat = await this._stat(path);
 			if (stat) {
 				const result: ResolvedLink = {
-					path: stat.resolvedPath ?? linkPath,
+					path: stat.resolvedPath ?? path,
 					isDirectory: stat.isDirectory,
 				};
-				this._cacheSet(link, result);
+				this._cacheSet(key, result);
 				return result;
 			}
-			this._cacheSet(link, null);
+			this._cacheSet(key, null);
 			return null;
 		} catch {
-			this._cacheSet(link, null);
+			this._cacheSet(key, null);
 			return null;
 		}
 	}

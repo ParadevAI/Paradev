@@ -3,6 +3,7 @@ import { type RendererContext, usePaneFocus } from "@superset/panes";
 import { toast } from "@superset/ui/sonner";
 import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
+import { useNavigate } from "@tanstack/react-router";
 import { terminalQueryColors } from "renderer/lib/terminal/terminal-query-colors";
 import type { OpenFile } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/types";
 import "@xterm/xterm/css/xterm.css";
@@ -32,6 +33,7 @@ import {
 	terminalRuntimeRegistry,
 } from "renderer/lib/terminal/terminal-runtime-registry";
 import { usePaneHotkeyEnabled } from "renderer/routes/_authenticated/_dashboard/hooks/usePaneHotkeyEnabled";
+import { navigateToWorkspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useOpenInExternalEditor } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useOpenInExternalEditor";
 import { useRevealInFinder } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/hooks/useRevealInFinder";
 import { useRightPaneLinkTarget } from "renderer/routes/_authenticated/_dashboard/workspace/$workspaceId/providers/RightPaneLinkTargetProvider";
@@ -50,11 +52,14 @@ import { isWithinWorkspacePath } from "shared/absolute-paths";
 import { useLinkClickHint } from "../../hooks/useLinkClickHint";
 import { useSendAttachments } from "../../hooks/useSendAttachments";
 import {
+	isAppDeepLink,
+	isWorkspaceLink,
 	runFileLinkAction,
 	runFolderLinkAction,
 	runUrlLinkAction,
 	type TerminalLinkActionDeps,
 	terminalUrlLinkAction,
+	terminalWorkspaceLinkTarget,
 } from "../../utils/runTerminalLinkAction";
 import { AttachmentLimitError } from "../../utils/sendAttachmentsToWorkspace";
 import { LinkActionMenu } from "./components/LinkActionMenu";
@@ -334,6 +339,7 @@ export function TerminalPane({
 	const statPathMutation = workspaceTrpc.filesystem.statPath.useMutation();
 	const statPathRef = useRef(statPathMutation.mutateAsync);
 	statPathRef.current = statPathMutation.mutateAsync;
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		terminalRuntimeRegistry.setLinkHandlers(
@@ -382,7 +388,15 @@ export function TerminalPane({
 						action,
 					);
 				},
+				isOscAppLink: isWorkspaceLink,
 				onUrlClick: (event, url) => {
+					const linkedWorkspaceId = terminalWorkspaceLinkTarget(event, url);
+					if (linkedWorkspaceId) {
+						event.preventDefault();
+						void navigateToWorkspace(linkedWorkspaceId, navigate);
+						return;
+					}
+					if (isAppDeepLink(url)) return;
 					const action = terminalUrlLinkAction(event, url, getUrlAction);
 					if (action === null) {
 						if (tierFor(event, "4-tier") === "plain") {
@@ -412,6 +426,7 @@ export function TerminalPane({
 		filePolicy,
 		getUrlAction,
 		folderPolicy,
+		navigate,
 	]);
 
 	// Publish what a right-click landed on so the pane context menu (built in

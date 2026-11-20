@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useUserPreferences } from "renderer/hooks/useUserPreferences";
 import type { ModifierEvent } from "../types";
 import {
@@ -20,5 +20,5 @@ export function useTerminalFolderPolicy(): FolderClickPolicy {
 		(event: ModifierEvent) => folderIntentForMap(event, map),
 		[map],
 	);
-	return { getIntent, map };
+	return useMemo(() => ({ getIntent, map }), [getIntent, map]);
 }
