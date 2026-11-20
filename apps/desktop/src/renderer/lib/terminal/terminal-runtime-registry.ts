@@ -57,8 +57,6 @@ interface RegistryEntry {
 	pendingLinkHandlers: TerminalLinkHandlers | null;
 	/** Survives runtime eviction/rebuild (the override outlives any one xterm). */
 	imagePasteOverride: ImagePasteOverride | null;
-	/** Stops the alternate/normal buffer observer installed with the runtime. */
-	disposeBufferChangeListener: (() => void) | null;
 	/** Monotonic use counter; bumped on mount/detach, drives parked-LRU eviction. */
 	lastUsedAt: number;
 }
@@ -105,7 +103,6 @@ class TerminalRuntimeRegistryImpl {
 			linkManager: null,
 			pendingLinkHandlers: null,
 			imagePasteOverride: null,
-			disposeBufferChangeListener: null,
 			lastUsedAt: 0,
 		};
 
@@ -214,7 +211,6 @@ class TerminalRuntimeRegistryImpl {
 				}
 			}
 			entry.runtime.imagePasteOverride = entry.imagePasteOverride;
-			this.observeBufferChanges(entry);
 			entry.linkManager = new TerminalLinkManager(entry.runtime.terminal);
 			if (entry.pendingLinkHandlers) {
 				entry.linkManager.setHandlers(entry.pendingLinkHandlers);
@@ -234,22 +230,6 @@ class TerminalRuntimeRegistryImpl {
 			},
 			{ focus: false },
 		);
-	}
-
-	private observeBufferChanges(entry: RegistryEntry) {
-		entry.disposeBufferChangeListener?.();
-		entry.disposeBufferChangeListener = null;
-		const runtime = entry.runtime;
-		if (!runtime) return;
-
-		const subscription = runtime.terminal.buffer.onBufferChange(() => {
-			// Exempt alternate-screen TUIs may put the registry over cap. As soon as
-			// a parked TUI returns to its normal buffer, reconsider it for eviction.
-			if (entry.runtime?.container === null) {
-				this.scheduleParkedEviction();
-			}
-		});
-		entry.disposeBufferChangeListener = () => subscription.dispose();
 	}
 
 	/**
@@ -379,8 +359,8 @@ class TerminalRuntimeRegistryImpl {
 		);
 
 		// A pane can detach before the animation-frame output batch has reached
-		// xterm. Flush it, then wait for xterm's parser callback before checking
-		// alternate-screen mode or serializing the buffer.
+		// xterm. Flush it, then wait for xterm's parser callback before
+		// serializing the buffer.
 		for (const entry of parkedEntries) {
 			entry.transport._writeCoalescer?.flushSync();
 		}
@@ -400,8 +380,6 @@ class TerminalRuntimeRegistryImpl {
 		const victims = selectRuntimesToEvict(
 			this.entries.values(),
 			this.parkedRuntimeCap,
-			// Alternate-screen TUIs restore as a garbled static snapshot — never evict them.
-			(entry) => entry.runtime?.terminal.buffer.active.type === "alternate",
 		);
 		for (const entry of victims) {
 			if (!entry.runtime || !tryPersistRuntimeState(entry.runtime)) {
@@ -466,8 +444,6 @@ class TerminalRuntimeRegistryImpl {
 		entry: RegistryEntry,
 		options: { persistedState?: "clear" | "preserve" } = {},
 	) {
-		entry.disposeBufferChangeListener?.();
-		entry.disposeBufferChangeListener = null;
 		entry.linkManager?.dispose();
 		disposeTransport(entry.transport);
 		if (entry.runtime) {
