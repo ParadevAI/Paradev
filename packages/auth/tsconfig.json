@@ -2,10 +2,11 @@
 	"extends": "@superset/typescript/internal-package.json",
 	"compilerOptions": {
 		"rootDir": ".",
+		"types": ["bun"],
 		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false
 	},
 	"include": ["src", "scripts"],
-	"exclude": ["node_modules", "dist", "src/**/*.test.ts"]
+	"exclude": ["node_modules", "dist"]
 }

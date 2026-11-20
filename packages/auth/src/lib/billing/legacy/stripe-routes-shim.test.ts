@@ -133,8 +133,14 @@ describe("released clients keep the same routes", () => {
 			expect(after).not.toBe(before);
 			expect(after.path).toBe(before.path);
 			expect(after.options.method).toEqual(before.options.method);
-			expect(String(after.options.body)).toBe(String(before.options.body));
-			expect(after.options.use?.length).toBe(before.options.use?.length);
+			const bodyOf = (options: object) =>
+				"body" in options ? String(options.body) : undefined;
+			const middlewareOf = (options: object) =>
+				"use" in options && Array.isArray(options.use)
+					? options.use.length
+					: undefined;
+			expect(bodyOf(after.options)).toBe(bodyOf(before.options));
+			expect(middlewareOf(after.options)).toBe(middlewareOf(before.options));
 		});
 	}
 
