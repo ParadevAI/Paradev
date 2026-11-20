@@ -1,5 +1,3 @@
-import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationBilling } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	members,
@@ -66,18 +64,6 @@ export async function POST(request: Request) {
 		});
 		if (!organization)
 			return Response.json({ skipped: "organization missing" });
-		if (billingUsesAutumn) {
-			const billing = await organizationBilling(organization.id);
-			if (
-				billing.tier !== "free" &&
-				(billing.cancelAt === null ||
-					(billing.startedAt &&
-						new Date(billing.startedAt).getTime() > payload.canceledAt * 1000))
-			) {
-				return Response.json({ skipped: "resubscribed" });
-			}
-		}
-
 		for await (const other of stripe.subscriptions.list({
 			customer: customerId,
 			status: "all",

@@ -2,28 +2,22 @@ import { db } from "@superset/db/client";
 import { connections, githubInstallations } from "@superset/db/schema";
 import { revokeLinearConnection } from "@superset/trpc/integrations/linear";
 import {
+	organizationSyncs,
 	organizationSyncsNow,
-	syncingOrganizationIds,
 } from "@superset/trpc/sync-policy";
 import { Client } from "@upstash/qstash";
-import { Redis } from "@upstash/redis";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, not } from "drizzle-orm";
 import { env } from "@/env";
 import {
 	appPlacedSuspension,
 	suspendInstallation,
 } from "@/lib/github/suspension";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
-import { sweepConnections } from "./sweepConnections/sweepConnections";
 
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
-const redis = new Redis({
-	url: env.KV_REST_API_URL,
-	token: env.KV_REST_API_TOKEN,
-});
 
 // api.superset.sh answers through Cloudflare, which returns 524 to the caller
 // once the origin has been silent for ~100s; QStash then retries and a second
@@ -33,7 +27,7 @@ const redis = new Redis({
 const RUN_BUDGET_MS = 60_000;
 
 /**
- * Hourly: bring every provider into line with `organizationSyncsNow`, so the
+ * Hourly: bring every provider into line with `organizationSyncs`, so the
  * traffic of an iced organization stops at the provider instead of being
  * accepted and dropped here.
  *
@@ -66,67 +60,78 @@ export async function POST(request: Request) {
 }
 
 async function githubPass(deadline: number) {
-	const rows = await db
-		.select({
-			id: githubInstallations.id,
-			installationId: githubInstallations.installationId,
-			organizationId: githubInstallations.organizationId,
-			suspended: githubInstallations.suspended,
-		})
-		.from(githubInstallations)
-		.orderBy(githubInstallations.id);
-	const key = "integrations:suspend:github:cursor";
-	const outcomes = {
-		candidates: 0,
-		suspended: 0,
-		gone: 0,
-		rate_limited: 0,
-		failed: 0,
-		resumed: 0,
+	const columns = {
+		id: githubInstallations.id,
+		installationId: githubInstallations.installationId,
+		organizationId: githubInstallations.organizationId,
 	};
-	const progress = await sweepConnections({
-		rows,
-		deadline,
-		cursor: await redis.get<string>(key),
-		syncing: syncingOrganizationIds,
-		checkpoint: (cursor) => (cursor ? redis.set(key, cursor) : redis.del(key)),
-		visit: async (installation, allowed) => {
-			if (!installation.suspended && !allowed) {
-				outcomes.candidates++;
-				if (await organizationSyncsNow(installation.organizationId))
-					return true;
-				const outcome = await suspendInstallation(installation);
-				outcomes[outcome]++;
-				return outcome !== "rate_limited";
-			}
-			if (installation.suspended && allowed) {
-				try {
-					if (!(await appPlacedSuspension(installation))) return true;
-					await qstash.publishJSON({
-						url: `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`,
-						body: {
-							installationDbId: installation.id,
-							organizationId: installation.organizationId,
-						},
-						retries: 3,
-					});
-					outcomes.resumed++;
-				} catch (error) {
-					console.error(
-						`[integrations/suspend] github resume failed for installation ${installation.installationId}:`,
-						error,
-					);
-					outcomes.failed++;
-				}
-			}
-			return true;
-		},
-	});
-	return { ...outcomes, ...progress };
+
+	const [toSuspend, toResume] = await Promise.all([
+		db
+			.select(columns)
+			.from(githubInstallations)
+			.where(
+				and(
+					eq(githubInstallations.suspended, false),
+					not(organizationSyncs(githubInstallations.organizationId)),
+				),
+			),
+		db
+			.select(columns)
+			.from(githubInstallations)
+			.where(
+				and(
+					eq(githubInstallations.suspended, true),
+					organizationSyncs(githubInstallations.organizationId),
+				),
+			),
+	]);
+
+	const outcomes = { suspended: 0, gone: 0, rate_limited: 0, failed: 0 };
+	let processed = 0;
+	for (const installation of toSuspend) {
+		if (Date.now() > deadline) break;
+		const outcome = await suspendInstallation(installation);
+		outcomes[outcome] += 1;
+		processed += 1;
+		if (outcome === "rate_limited") break;
+	}
+
+	// The backfill job lifts the suspension itself, so it is queued first: a
+	// publish that fails leaves the row suspended for the next run, rather than
+	// an installation delivering again with the gap never filled.
+	let resumed = 0;
+	for (const installation of toResume) {
+		if (Date.now() > deadline) break;
+		try {
+			if (!(await appPlacedSuspension(installation))) continue;
+			await qstash.publishJSON({
+				url: `${env.NEXT_PUBLIC_API_URL}/api/github/jobs/initial-sync`,
+				body: {
+					installationDbId: installation.id,
+					organizationId: installation.organizationId,
+				},
+				retries: 3,
+			});
+			resumed += 1;
+		} catch (error) {
+			console.error(
+				`[integrations/suspend] github resume failed for installation ${installation.installationId}:`,
+				error,
+			);
+		}
+	}
+
+	return {
+		candidates: toSuspend.length,
+		...outcomes,
+		deferred: toSuspend.length - processed,
+		resumed,
+	};
 }
 
 async function linearPass(deadline: number) {
-	const rows = await db
+	const toRevoke = await db
 		.select()
 		.from(connections)
 		.where(
@@ -134,33 +139,32 @@ async function linearPass(deadline: number) {
 				eq(connections.connector, "linear"),
 				eq(connections.authMethod, "oauth2"),
 				isNull(connections.disconnectedAt),
+				not(organizationSyncs(connections.organizationId)),
 			),
-		)
-		.orderBy(connections.id);
-	const key = "integrations:suspend:linear:cursor";
-	const outcomes = { candidates: 0, revoked: 0, rate_limited: 0, failed: 0 };
-	const progress = await sweepConnections({
-		rows,
-		deadline,
-		cursor: await redis.get<string>(key),
-		syncing: syncingOrganizationIds,
-		checkpoint: (cursor) => (cursor ? redis.set(key, cursor) : redis.del(key)),
-		visit: async (connection, allowed) => {
-			if (allowed) return true;
-			outcomes.candidates++;
-			if (await organizationSyncsNow(connection.organizationId)) return true;
-			const outcome = await revokeLinearConnection(connection).catch(
-				(error) => {
-					console.error(
-						`[integrations/suspend] linear revoke failed for connection ${connection.id}:`,
-						error,
-					);
-					return "failed" as const;
-				},
+		);
+
+	const outcomes = { revoked: 0, rate_limited: 0, failed: 0 };
+	let processed = 0;
+	for (const connection of toRevoke) {
+		if (Date.now() > deadline) break;
+		// Revocation costs the org a reconnect, so an org that paid since the
+		// candidates were selected is left alone.
+		if (await organizationSyncsNow(connection.organizationId)) continue;
+		const outcome = await revokeLinearConnection(connection).catch((error) => {
+			console.error(
+				`[integrations/suspend] linear revoke failed for connection ${connection.id}:`,
+				error,
 			);
-			outcomes[outcome]++;
-			return outcome !== "rate_limited";
-		},
-	});
-	return { ...outcomes, ...progress };
+			return "failed" as const;
+		});
+		outcomes[outcome] += 1;
+		processed += 1;
+		if (outcome === "rate_limited") break;
+	}
+
+	return {
+		candidates: toRevoke.length,
+		...outcomes,
+		deferred: toRevoke.length - processed,
+	};
 }

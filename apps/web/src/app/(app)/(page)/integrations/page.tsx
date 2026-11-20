@@ -59,12 +59,11 @@ export default function IntegrationsPage() {
 	// The Linear and GitHub pages and connect routes send a free organization
 	// here with ?pro=<provider>.
 	useEffect(() => {
-		if (syncAllowed === undefined) return;
 		const pro = new URLSearchParams(window.location.search).get("pro");
 		if (!isProGated(pro)) return;
-		if (!syncAllowed) setPaywallFor(pro);
+		setPaywallFor(pro);
 		window.history.replaceState({}, "", "/integrations");
-	}, [syncAllowed]);
+	}, []);
 
 	// Before the flag resolves this is the standalone set, which is what
 	// everyone outside the flag sees anyway; the trigger-only providers join

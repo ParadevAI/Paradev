@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationBilling } from "@superset/auth/billing";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import {
 	members,
@@ -125,11 +125,11 @@ export async function GET(request: Request): Promise<Response> {
 	const actualSeats = new Map(
 		seatCounts.map((s) => [s.organizationId, s.seats]),
 	);
-	const autumnBilling = billingUsesAutumn
+	const autumnPlans = billingUsesAutumn
 		? new Map(
 				await Promise.all(
 					[...byOrg.keys()].map(
-						async (id) => [id, await organizationBilling(id)] as const,
+						async (id) => [id, await organizationPlanFromAutumn(id)] as const,
 					),
 				),
 			)
@@ -138,41 +138,26 @@ export async function GET(request: Request): Promise<Response> {
 	return Response.json({
 		found: true,
 		user,
-		organizations: [...byOrg.values()].map((m) => {
-			const billing = autumnBilling?.get(m.organizationId);
-			return {
-				id: m.organizationId,
-				name: m.organizationName,
-				slug: m.organizationSlug,
-				role: m.role,
-				stripeCustomerId: m.stripeCustomerId,
-				plan: billing?.tier ?? m.subscription?.plan ?? "free",
-				subscription: billing
-					? billing.tier === "free"
-						? null
-						: {
-								status: billing.status,
-								billingInterval: billing.billingInterval,
-								periodEnd: billing.periodEnd,
-								cancelAtPeriodEnd: billing.cancelAt !== null,
-								trialEnd: billing.trialEnd ?? null,
-								seatsBilled: billing.seatsBilled ?? null,
-								stripeSubscriptionId:
-									m.subscription?.stripeSubscriptionId ?? null,
-							}
-					: m.subscription
-						? {
-								status: m.subscription.status,
-								billingInterval: m.subscription.billingInterval,
-								periodEnd: m.subscription.periodEnd,
-								cancelAtPeriodEnd: m.subscription.cancelAtPeriodEnd,
-								trialEnd: m.subscription.trialEnd,
-								seatsBilled: m.subscription.seats,
-								stripeSubscriptionId: m.subscription.stripeSubscriptionId,
-							}
-						: null,
-				seatsActual: actualSeats.get(m.organizationId) ?? 0,
-			};
-		}),
+		organizations: [...byOrg.values()].map((m) => ({
+			id: m.organizationId,
+			name: m.organizationName,
+			slug: m.organizationSlug,
+			role: m.role,
+			stripeCustomerId: m.stripeCustomerId,
+			plan:
+				autumnPlans?.get(m.organizationId) ?? m.subscription?.plan ?? "free",
+			subscription: m.subscription
+				? {
+						status: m.subscription.status,
+						billingInterval: m.subscription.billingInterval,
+						periodEnd: m.subscription.periodEnd,
+						cancelAtPeriodEnd: m.subscription.cancelAtPeriodEnd,
+						trialEnd: m.subscription.trialEnd,
+						seatsBilled: m.subscription.seats,
+						stripeSubscriptionId: m.subscription.stripeSubscriptionId,
+					}
+				: null,
+			seatsActual: actualSeats.get(m.organizationId) ?? 0,
+		})),
 	});
 }

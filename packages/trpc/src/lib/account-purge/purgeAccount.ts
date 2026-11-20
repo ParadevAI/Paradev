@@ -1,6 +1,6 @@
 import { autumnClient, billingUsesAutumn } from "@superset/auth/autumn";
 import {
-	heldAutumnPlanId,
+	paidAutumnPlanId,
 	seatItem,
 	setAutumnSeats,
 } from "@superset/auth/billing";
@@ -78,11 +78,6 @@ export async function purgeAccount(userId: string): Promise<void> {
 		const remainingSeats = otherMembers?.value ?? 0;
 
 		if (remainingSeats > 0) {
-			if (
-				billingUsesAutumn &&
-				(await setAutumnSeats(membership.organizationId, remainingSeats))
-			)
-				continue;
 			const subscription = await db.query.subscriptions.findFirst({
 				where: and(
 					eq(subscriptions.referenceId, membership.organizationId),
@@ -94,18 +89,23 @@ export async function purgeAccount(userId: string): Promise<void> {
 				subscription?.stripeSubscriptionId &&
 				subscription.plan !== "enterprise"
 			) {
-				const stripeSub = await stripeClient.subscriptions.retrieve(
-					subscription.stripeSubscriptionId,
-				);
-				const itemId = seatItem(stripeSub)?.id;
-				if (itemId) {
-					await stripeClient.subscriptions.update(
+				const seatsOwnedByAutumn =
+					billingUsesAutumn &&
+					(await setAutumnSeats(membership.organizationId, remainingSeats));
+				if (!seatsOwnedByAutumn) {
+					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
-						{
-							items: [{ id: itemId, quantity: remainingSeats }],
-							proration_behavior: "create_prorations",
-						},
 					);
+					const itemId = seatItem(stripeSub)?.id;
+					if (itemId) {
+						await stripeClient.subscriptions.update(
+							subscription.stripeSubscriptionId,
+							{
+								items: [{ id: itemId, quantity: remainingSeats }],
+								proration_behavior: "create_prorations",
+							},
+						);
+					}
 				}
 			}
 			continue;
@@ -122,7 +122,7 @@ export async function purgeAccount(userId: string): Promise<void> {
 			),
 		);
 		const autumnPlanId = billingUsesAutumn
-			? await heldAutumnPlanId(membership.organizationId)
+			? await paidAutumnPlanId(membership.organizationId).catch(() => null)
 			: null;
 		if (autumnPlanId) {
 			await autumnClient.billing.update({

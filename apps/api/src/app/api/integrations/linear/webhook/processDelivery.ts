@@ -3,7 +3,10 @@ import { db } from "@superset/db/client";
 import type { SelectConnection } from "@superset/db/schema";
 import { connections, webhookEvents } from "@superset/db/schema";
 import { accountConnections } from "@superset/trpc/connectors";
-import { syncingOrganizationIds } from "@superset/trpc/sync-policy";
+import {
+	organizationSyncs,
+	syncingOrganizationIds,
+} from "@superset/trpc/sync-policy";
 import { and, eq, isNull } from "drizzle-orm";
 import { ingestAutomationEvent } from "@/lib/automations/ingestAutomationEvent";
 import { recordWebhookDelivery } from "@/lib/ingest/recordWebhookDelivery";
@@ -26,23 +29,33 @@ export interface DeliveryResult {
 	results: ConnectionResult[];
 }
 
+/**
+ * Whether any syncing Superset organization is still connected to this Linear
+ * organization.
+ *
+ * The accept path keeps this one indexed lookup so a delivery nobody
+ * subscribes to costs what it always did — a query and nothing else. Both
+ * halves of the condition drop a large share of the traffic: a third of the
+ * Linear organizations on record have disconnected every one of their
+ * connections, and most of the rest belong to organizations on the free plan,
+ * where Linear automations are behind the paywall.
+ */
 export async function hasActiveSubscriber(
 	externalOrgId: string,
 ): Promise<boolean> {
-	const subscribers = await db
-		.selectDistinct({ organizationId: connections.organizationId })
+	const [subscriber] = await db
+		.select({ id: connections.id })
 		.from(connections)
 		.where(
 			and(
 				eq(connections.connector, "linear"),
 				eq(connections.externalAccountId, externalOrgId),
 				isNull(connections.disconnectedAt),
+				organizationSyncs(connections.organizationId),
 			),
-		);
-	return (
-		(await syncingOrganizationIds(subscribers.map((row) => row.organizationId)))
-			.size > 0
-	);
+		)
+		.limit(1);
+	return subscriber !== undefined;
 }
 
 /**

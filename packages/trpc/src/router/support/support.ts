@@ -1,15 +1,20 @@
-import { organizationActivePlan } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
-import { organizations, submittedPrompts, users } from "@superset/db/schema";
+import {
+	organizations,
+	submittedPrompts,
+	subscriptions,
+	users,
+} from "@superset/db/schema";
 import {
 	FeedbackReportEmail,
 	feedbackReportText,
 } from "@superset/email/emails/feedback-report";
 import { NOREPLY_FROM } from "@superset/email/sender";
+import { ACTIVE_SUBSCRIPTION_STATUSES } from "@superset/shared/billing";
 import { COMPANY } from "@superset/shared/constants";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { Resend } from "resend";
 import { z } from "zod";
 import { env } from "../../env";
@@ -146,7 +151,15 @@ export const supportRouter = createTRPCRouter({
 							columns: { name: true, createdAt: true },
 						})
 					: Promise.resolve(undefined),
-				organizationActivePlan(organizationId),
+				organizationId
+					? db.query.subscriptions.findFirst({
+							where: and(
+								eq(subscriptions.referenceId, organizationId),
+								inArray(subscriptions.status, ACTIVE_SUBSCRIPTION_STATUSES),
+							),
+							columns: { plan: true, status: true },
+						})
+					: Promise.resolve(undefined),
 				db.query.users.findFirst({
 					where: eq(users.id, user.id),
 					columns: { createdAt: true },
@@ -154,10 +167,9 @@ export const supportRouter = createTRPCRouter({
 			]);
 
 			const safeName = user.name ? sanitizeEmailBodyLine(user.name) : "";
-			const planLabel =
-				subscriptionRow.plan !== "free"
-					? `${subscriptionRow.plan} (${subscriptionRow.status})`
-					: "free (no active subscription)";
+			const planLabel = subscriptionRow
+				? `${subscriptionRow.plan} (${subscriptionRow.status})`
+				: "free (no active subscription)";
 			const safeTitle = sanitizeEmailBodyLine(input.title);
 
 			// Strip anything path-like so a crafted filename can't smuggle headers
