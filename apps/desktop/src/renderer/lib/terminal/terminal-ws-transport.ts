@@ -46,7 +46,7 @@ type TerminalServerMessage =
 	// `code: "session-gone"` = the server says the session is permanently
 	// destroyed (not found / disposed / exited), not a transient attach failure.
 	| { type: "error"; message: string; code?: string }
-	| { type: "exit"; exitCode: number; signal: number }
+	| { type: "exit"; exitCode: number; signal: number; shellExited?: boolean }
 	| { type: "title"; title: string | null }
 	// The PTY's size: the smallest box across the clients showing it. Sent
 	// after each of our resizes and whenever it changes.
@@ -96,7 +96,12 @@ export interface TerminalTransport {
 	 */
 	sessionEnded: boolean;
 	/** Set by a live `exit`; null when the session ended without one (`session-gone`). */
-	exitStatus: { exitCode: number; signal: number } | null;
+	exitStatus: {
+		exitCode: number;
+		signal: number;
+		/** The interactive shell ended by itself; absent from older hosts. */
+		shellExited?: boolean;
+	} | null;
 	/**
 	 * True while the PTY is narrower than this pane because a smaller client
 	 * (another device, or a narrower split) is showing the same terminal.
@@ -929,6 +934,7 @@ function attachSocketListeners(
 			markSessionEnded(transport, {
 				exitCode: message.exitCode,
 				signal: message.signal,
+				shellExited: message.shellExited,
 			});
 			transport.lastDiagnosis = {
 				category: "unknown",
