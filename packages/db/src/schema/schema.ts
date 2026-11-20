@@ -1,5 +1,5 @@
 import type { ActiveAgentStatus } from "@superset/shared/agent-status";
-import { desc, sql } from "drizzle-orm";
+import { desc, type SQL, sql } from "drizzle-orm";
 import {
 	type AnyPgColumn,
 	bigint,
@@ -1203,6 +1203,15 @@ export const cloudWorkspaceTags = pgTable(
 	],
 );
 
+/** A boot with usage left to finalize or a lock left to give back: the reconcile's open set. */
+export function openBoot(boot: {
+	stoppedAt: AnyPgColumn;
+	finalizedThrough: AnyPgColumn;
+	lockOpen: AnyPgColumn;
+}): SQL {
+	return sql`(${boot.stoppedAt} is null or ${boot.finalizedThrough} is null or ${boot.finalizedThrough} < ${boot.stoppedAt} or ${boot.lockOpen})`;
+}
+
 export const cloudWorkspaceBoots = pgTable(
 	"cloud_workspace_boots",
 	{
@@ -1249,11 +1258,9 @@ export const cloudWorkspaceBoots = pgTable(
 		index("cloud_workspace_boots_pending_usage_idx")
 			.on(table.id)
 			.where(sql`${table.pendingUsageEvents} is not null`),
-		index("cloud_workspace_boots_open_idx")
+		index("cloud_workspace_boots_open_or_locked_idx")
 			.on(table.startedAt)
-			.where(
-				sql`${table.stoppedAt} is null or ${table.finalizedThrough} is null or ${table.finalizedThrough} < ${table.stoppedAt}`,
-			),
+			.where(openBoot(table)),
 	],
 );
 
