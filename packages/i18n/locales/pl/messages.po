@@ -18563,6 +18563,9 @@ msgstr "Kolejność paska bocznego"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Plakietka na pasku bocznym, gdy aktualizacja aplikacji jest gotowa do instalacji"
 
+msgid "Sidebar sections"
+msgstr "Sekcje paska bocznego"
+
 msgid "Sign in"
 msgstr "Zaloguj się"
 

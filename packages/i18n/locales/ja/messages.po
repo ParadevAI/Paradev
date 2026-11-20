@@ -18563,6 +18563,9 @@ msgstr "サイドバー順"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "アプリの更新をインストールできるときにサイドバーに出るピル"
 
+msgid "Sidebar sections"
+msgstr "サイドバーのセクション"
+
 msgid "Sign in"
 msgstr "サインイン"
 

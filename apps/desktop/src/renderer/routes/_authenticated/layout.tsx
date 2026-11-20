@@ -29,6 +29,7 @@ import { dragDropManager } from "renderer/lib/dnd";
 import { electronTrpc } from "renderer/lib/electron-trpc";
 import { reportRendererError } from "renderer/lib/report-renderer-error";
 import { terminalRuntimeRegistry } from "renderer/lib/terminal/terminal-runtime-registry";
+import { useRailPinsStore } from "renderer/routes/_authenticated/_dashboard/components/NavigationRail/stores/railPinsStore";
 import { navigateToWorkspaceAndThen } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { ChannelsRealtime } from "renderer/routes/_authenticated/components/ChannelsRealtime";
 import { DaemonAutoUpdateFailureDialog } from "renderer/routes/_authenticated/components/DaemonAutoUpdateFailureDialog";
@@ -54,6 +55,7 @@ import { V1ImportModal } from "renderer/routes/_authenticated/components/V1Impor
 import { useForwardedHotkeys } from "renderer/routes/_authenticated/hooks/useForwardedHotkeys";
 import { useZoomHotkeys } from "renderer/routes/_authenticated/hooks/useZoomHotkeys";
 import { useSettingsStore } from "renderer/stores/settings-state";
+import { syncPersistedStoreAcrossWindows } from "renderer/stores/syncPersistedStoreAcrossWindows";
 import { MOCK_ORG_ID, NOTIFICATION_EVENTS } from "shared/constants";
 import { AgentHooks } from "./components/AgentHooks";
 import { DockBadgeController } from "./components/DockBadgeController";
@@ -119,6 +121,7 @@ function AuthenticatedLayout() {
 		select: (state) => state.matches[state.matches.length - 1]?.pathname ?? "",
 	});
 	const setOriginRoute = useSettingsStore((s) => s.setOriginRoute);
+	useEffect(() => syncPersistedStoreAcrossWindows(useRailPinsStore), []);
 
 	const isSignedIn = env.SKIP_ENV_VALIDATION || !!session?.user;
 	const activeOrganizationId = env.SKIP_ENV_VALIDATION

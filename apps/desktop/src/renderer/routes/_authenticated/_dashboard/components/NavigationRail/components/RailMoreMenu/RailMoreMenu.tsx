@@ -131,7 +131,7 @@ export function RailMoreMenu({ destinations, isActive }: RailMoreMenuProps) {
 						))}
 					</SortableContext>
 				</DndContext>
-				<DropdownMenuSeparator />
+				{destinations.length > 0 && <DropdownMenuSeparator />}
 				<DropdownMenuSub>
 					<DropdownMenuSubTrigger>
 						<FolderPlus className="size-4" />

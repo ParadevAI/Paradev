@@ -18563,6 +18563,9 @@ msgstr "侧边栏顺序"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "应用更新可安装时显示在侧边栏的胶囊提示"
 
+msgid "Sidebar sections"
+msgstr "侧边栏分区"
+
 msgid "Sign in"
 msgstr "登录"
 

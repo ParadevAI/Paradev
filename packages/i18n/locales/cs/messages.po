@@ -18563,6 +18563,9 @@ msgstr "Pořadí v panelu"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Štítek v postranním panelu, když je připravená aktualizace aplikace"
 
+msgid "Sidebar sections"
+msgstr "Sekce postranního panelu"
+
 msgid "Sign in"
 msgstr "Přihlásit se"
 

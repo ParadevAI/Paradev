@@ -18563,6 +18563,9 @@ msgstr "Urutan sidebar"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Pil sidebar yang muncul saat pembaruan aplikasi siap dipasang"
 
+msgid "Sidebar sections"
+msgstr "Bagian bilah samping"
+
 msgid "Sign in"
 msgstr "Masuk"
 

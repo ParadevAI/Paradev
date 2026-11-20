@@ -18563,6 +18563,9 @@ msgstr "Reihenfolge der Seitenleiste"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Pille in der Seitenleiste, wenn ein App-Update installiert werden kann"
 
+msgid "Sidebar sections"
+msgstr "Bereiche der Seitenleiste"
+
 msgid "Sign in"
 msgstr "Anmelden"
 

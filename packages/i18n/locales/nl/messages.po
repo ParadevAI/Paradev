@@ -18563,6 +18563,9 @@ msgstr "Volgorde zijbalk"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Zijbalkpil die verschijnt als een app-update klaarstaat"
 
+msgid "Sidebar sections"
+msgstr "Secties in de zijbalk"
+
 msgid "Sign in"
 msgstr "Inloggen"
 

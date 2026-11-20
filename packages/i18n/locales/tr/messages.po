@@ -18563,6 +18563,9 @@ msgstr "Kenar çubuğu sırası"
 msgid "Sidebar pill shown when an app update is ready to install"
 msgstr "Bir uygulama güncellemesi kurulmaya hazır olduğunda gösterilen kenar çubuğu rozeti"
 
+msgid "Sidebar sections"
+msgstr "Kenar çubuğu bölümleri"
+
 msgid "Sign in"
 msgstr "Oturum aç"
 
