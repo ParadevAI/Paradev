@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: ${config.*} is the manifest placeholder syntax, not a template literal
 import { beforeEach, describe, expect, test } from "bun:test";
+import { at } from "../../../../test/at";
 import { setTestEnv } from "../../../../test/env";
 import { stub } from "../../../../test/stub";
 import * as lookup from "../../../lib/connectors/lookup";
@@ -113,7 +114,8 @@ describe("resolveTarget", () => {
 		await expect(resolveTarget(request)).rejects.toThrow(PluginTargetError);
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => expect(error.status).toBe(404),
+			(error: InstanceType<typeof PluginTargetError>) =>
+				expect(error.status).toBe(404),
 		);
 		expect(installedCalls[0]).toEqual(["user-1", "acme", "superset"]);
 	});
@@ -122,7 +124,7 @@ describe("resolveTarget", () => {
 		install = installed("superset", {});
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => {
+			(error: InstanceType<typeof PluginTargetError>) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(404);
 				expect(error.message).toContain("exposes no tools");
@@ -251,7 +253,7 @@ describe("resolveTarget", () => {
 			plugin: "gmail",
 		}).then(
 			() => expect.unreachable("a foreign gmail must not get the real server"),
-			(error: PluginTargetError) => {
+			(error: InstanceType<typeof PluginTargetError>) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(403);
 			},
@@ -354,7 +356,7 @@ describe("resolveTarget", () => {
 
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: PluginTargetError) => {
+			(error: InstanceType<typeof PluginTargetError>) => {
 				expect(error.status).toBe(501);
 			},
 		);
@@ -383,9 +385,9 @@ describe("resolveTarget with several accounts", () => {
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
 		accounts = [
-			twoAccounts[0],
+			at(twoAccounts, 0),
 			{
-				...twoAccounts[1],
+				...at(twoAccounts, 1),
 				disconnectedAt: new Date(),
 				disconnectReason: "needs_reauth",
 			},
@@ -435,7 +437,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [twoAccounts[1], twoAccounts[0]];
+		accounts = [at(twoAccounts, 1), at(twoAccounts, 0)];
 
 		const target = await resolveTarget(request);
 		if (target.kind !== "multi") return expect.unreachable("expected multi");
@@ -451,7 +453,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [twoAccounts[0]];
+		accounts = [at(twoAccounts, 0)];
 
 		const target = await resolveTarget(request);
 
