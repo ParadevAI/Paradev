@@ -20285,6 +20285,9 @@ msgstr "Liên kết có thể sai, trang có thể đã bị xóa, hoặc bạn 
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Agent được liên kết không còn hoặc đã bị tắt. Đang hiện bản lưu tạm."
 
+msgid "The linked workspace changed"
+msgstr "Không gian làm việc được liên kết đã thay đổi"
+
 msgid "The local change was rolled back."
 msgstr "Thay đổi cục bộ đã được hoàn tác."
 

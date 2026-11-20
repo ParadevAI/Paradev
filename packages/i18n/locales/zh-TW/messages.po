@@ -20285,6 +20285,9 @@ msgstr "連結可能有誤、頁面可能已被刪除，或者你沒有存取權
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "關聯的代理程式已丟失或被停用。正在顯示快照。"
 
+msgid "The linked workspace changed"
+msgstr "連結的工作區已變更"
+
 msgid "The local change was rolled back."
 msgstr "本機變更已復原。"
 

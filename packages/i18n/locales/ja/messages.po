@@ -20285,6 +20285,9 @@ msgstr "リンクが間違っているか、ページが削除されたか、ア
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "リンクされたエージェントが見つからないか無効です。スナップショットを表示しています。"
 
+msgid "The linked workspace changed"
+msgstr "リンクされたワークスペースが変更されました"
+
 msgid "The local change was rolled back."
 msgstr "ローカルの変更は元に戻されました。"
 

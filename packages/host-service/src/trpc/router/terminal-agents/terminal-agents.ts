@@ -21,6 +21,7 @@ import { resolveHostAgentConfig } from "../../../terminal-agents/agent-config";
 import { terminalHarnessSession } from "../../../terminal-agents/harness-session-ref";
 import { hasHarnessSession } from "../../../terminal-agents/harness-sessions";
 import { readHarnessTranscriptOffLoop } from "../../../terminal-agents/harness-sessions/read-off-loop";
+import { matchesAgentBinding } from "../../../terminal-agents/matches-agent-binding";
 import {
 	claimResumeCandidateBinding,
 	findResumeCandidateBinding,
@@ -31,6 +32,7 @@ import {
 	seedEndedTerminalAgentBinding,
 	unclaimResumeCandidateBinding,
 } from "../../../terminal-agents/persistence";
+import { sendToAgent } from "../../../terminal-agents/send-to-agent";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import { type AgentRunResult, runAgentInWorkspace } from "../agents/agents";
@@ -394,6 +396,70 @@ export const terminalAgentsRouter = router({
 				...(agentId ? { agentId } : {}),
 				...(definitionId ? { definitionId } : {}),
 			});
+		}),
+
+	/** Deliver only to a live agent. An ambiguous automatic handoff returns the
+	 * candidates so the user can explicitly pick one, including a busy agent. */
+	handOffPrompt: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				prompt: z.string().trim().min(1),
+				selected: z
+					.object({ terminalId: z.string(), startedAt: z.number() })
+					.optional(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const store = ctx.terminalAgentStore;
+			const sessions = store.listByWorkspace(input.workspaceId);
+			const selected = input.selected;
+			const session = selected
+				? sessions.find(
+						(s) =>
+							s.terminalId === selected.terminalId &&
+							s.startedAt === selected.startedAt,
+					)
+				: sessions[0];
+			if (selected && !session) {
+				throw new TRPCError({
+					code: "CONFLICT",
+					message: "The selected agent session has ended",
+				});
+			}
+			if (!session) return { kind: "empty" as const };
+			const ready = (s: TerminalAgentBinding) =>
+				s.lastEventType === "Stop" && !s.queuedPrompts;
+			if (!selected && (sessions.length !== 1 || !ready(session))) {
+				return { kind: "choose" as const, sessions };
+			}
+			const result = await sendToAgent({
+				db: ctx.db,
+				eventBus: ctx.eventBus,
+				terminalAgentStore: store,
+				workspaceId: input.workspaceId,
+				terminalId: session.terminalId,
+				expectedAgent: session,
+				text: input.prompt,
+				submit: true,
+				chatRuntime: () => ctx.runtime.chat?.(),
+				acquireDelivery: async () => ({
+					isValid: () => {
+						const current = store.getChatOrTerminalAgent(session.terminalId);
+						return (
+							!!current &&
+							matchesAgentBinding(current, session) &&
+							(!!selected || ready(current))
+						);
+					},
+				}),
+			});
+			if ("error" in result) throw toTerminalSessionError(result);
+			return {
+				kind: "sent" as const,
+				terminalId: session.terminalId,
+				chatSessionId: session.chatSessionId,
+			};
 		}),
 
 	/**

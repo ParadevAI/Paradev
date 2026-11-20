@@ -20285,6 +20285,9 @@ msgstr "O link pode estar errado, a página pode ter sido excluída ou você pod
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "O agente vinculado está ausente ou desativado. Exibindo o snapshot."
 
+msgid "The linked workspace changed"
+msgstr "O espaço de trabalho vinculado mudou"
+
 msgid "The local change was rolled back."
 msgstr "A alteração local foi revertida."
 

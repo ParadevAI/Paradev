@@ -20285,6 +20285,9 @@ msgstr "Puede que el enlace esté mal, que la página se haya eliminado o que no
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "El agente enlazado falta o está desactivado. Se muestra la instantánea."
 
+msgid "The linked workspace changed"
+msgstr "El espacio de trabajo vinculado ha cambiado"
+
 msgid "The local change was rolled back."
 msgstr "El cambio local se revirtió."
 

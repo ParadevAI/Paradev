@@ -20285,6 +20285,9 @@ msgstr "Возможно, ссылка неверна, страница удал
 msgid "The linked agent is missing or disabled. Showing the snapshot."
 msgstr "Связанный агент отсутствует или отключён. Показан снимок."
 
+msgid "The linked workspace changed"
+msgstr "Связанная рабочая область изменилась"
+
 msgid "The local change was rolled back."
 msgstr "Локальное изменение отменено."
 
