@@ -386,7 +386,7 @@ export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	);
 	return {
 		gbMinutes: units * pack.gbMinutes,
-		price: Math.round(units * pack.price * 100) / 100,
+		price: units * pack.price,
 	};
 }
 
@@ -406,13 +406,12 @@ export const ALLOWANCE_UNAVAILABLE_REASONS = [
 	"not_tracked",
 ] as const;
 
+/** Exact: rounding is the formatter's, at display. */
 export function gbMinutesUsd(
 	gbMinutes: number,
 	overagePerGbHour: number | null,
 ) {
-	return overagePerGbHour === null
-		? null
-		: Math.round((gbMinutes / 60) * overagePerGbHour * 100) / 100;
+	return overagePerGbHour === null ? null : (gbMinutes / 60) * overagePerGbHour;
 }
 
 export function gbHourPackPricePerGbHour(pack: GbHourPack): number {

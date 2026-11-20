@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { eq, gte } from "drizzle-orm";
+import { eq, gte, inArray } from "drizzle-orm";
 import {
 	BEN,
 	BILLING_PAGE,
@@ -223,6 +223,42 @@ test("usage by period in one query matches each period's total", async () => {
 		{ periods: [NOVEMBER], overagePerGbHour: RATE },
 	);
 	expect(own?.metrics).toEqual((await usage({}, SAM)).total);
+});
+
+test("a table's dollars are exact: each row is its GB-hours at the rate, and the rows add up to the total", async () => {
+	const window = {
+		from: new Date("2026-02-10T00:00:00Z"),
+		to: new Date("2026-02-11T00:00:00Z"),
+	};
+	const fiveGbMinutes = [CHECKOUT, BILLING_PAGE, BROKEN].map(
+		(cloudWorkspaceId, i) => ({
+			bootId: "boot_1",
+			lockSeq: 61 + i,
+			feature: "box_gb_minutes" as const,
+			organizationId: ORG,
+			cloudWorkspaceId,
+			userId: MAYA,
+			windowFrom: new Date("2026-02-10T12:00:00Z"),
+			windowTo: new Date("2026-02-10T12:05:00Z"),
+			amount: "5",
+			sentAt: new Date("2026-02-10T12:05:00Z"),
+		}),
+	);
+	await db.insert(cloudUsageEvents).values(fiveGbMinutes);
+	try {
+		const { items, total } = await usage({ window, groupBy: "workspace" });
+		expect(items).toHaveLength(3);
+		for (const item of items) {
+			expect(item.usageUsd).toBeCloseTo((5 / 60) * RATE, 15);
+		}
+		const rows = items.reduce((sum, item) => sum + (item.usageUsd ?? 0), 0);
+		expect(total.usageUsd).toBeCloseTo((15 / 60) * RATE, 15);
+		expect(rows).toBeCloseTo(total.usageUsd ?? Number.NaN, 15);
+	} finally {
+		await db
+			.delete(cloudUsageEvents)
+			.where(inArray(cloudUsageEvents.lockSeq, [61, 62, 63]));
+	}
 });
 
 describe("listCloudBoots", () => {
