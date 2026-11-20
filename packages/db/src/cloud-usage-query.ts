@@ -340,7 +340,7 @@ function usageFacts(
 		/** Narrows the sent events, for the days the rollup does not cover. */
 		sentWhere?: SQL;
 		/** Usage rows from the daily rollup, in the facts' shape. */
-		days?: ReturnType<typeof rollupDays>;
+		days?: NonNullable<ReturnType<typeof billingDayRollup>>["days"];
 	} = {},
 ) {
 	const sent = db
@@ -455,41 +455,32 @@ function billingDayRollup(
 	const endWhole = sql`public.cloud_billing_day(${to})`;
 	return {
 		sentWhere: sql`(${events.sentAt} < public.cloud_billing_day_start(${firstWhole}) or ${events.sentAt} >= public.cloud_billing_day_start(${endWhole}))`,
-		days: rollupDays(db, scope, filters, { firstWhole, endWhole }),
-	};
-}
-
-function rollupDays(
-	db: Db,
-	scope: Scope,
-	filters: CloudUsageFilters,
-	{ firstWhole, endWhole }: { firstWhole: SQL; endWhole: SQL },
-) {
-	return db
-		.select({
-			key: sql<string | null>`to_char(${daily.day}::date, 'YYYY-MM-DD')`,
-			secondKey: sql<string | null>`null::text`,
-			workspaceId: sql<string | null>`null::uuid`,
-			gbMinutes: sql<string>`${daily.gbMinutes}`,
-			seconds: sql<string>`${daily.seconds}`,
-			bootId: sql<string | null>`null::text`,
-			failed: sql<boolean>`false`,
-			day: sql<string>`null::text`,
-		})
-		.from(daily)
-		.where(
-			and(
-				inOrganization(scope, daily.organizationId),
-				sql`${daily.day} >= ${firstWhole}`,
-				sql`${daily.day} < ${endWhole}`,
-				sql`${daily.events} <> 0`,
-				scope.userId ? eq(daily.userId, scope.userId) : undefined,
-				filters.user ? eq(daily.userId, filters.user) : undefined,
-				filters.size
-					? eq(daily.vcpus, MACHINE_SIZE_VCPUS[filters.size])
-					: undefined,
+		days: db
+			.select({
+				key: sql<string | null>`to_char(${daily.day}::date, 'YYYY-MM-DD')`,
+				secondKey: sql<string | null>`null::text`,
+				workspaceId: sql<string | null>`null::uuid`,
+				gbMinutes: sql<string>`${daily.gbMinutes}`,
+				seconds: sql<string>`${daily.seconds}`,
+				bootId: sql<string | null>`null::text`,
+				failed: sql<boolean>`false`,
+				day: sql<string>`null::text`,
+			})
+			.from(daily)
+			.where(
+				and(
+					inOrganization(scope, daily.organizationId),
+					sql`${daily.day} >= ${firstWhole}`,
+					sql`${daily.day} < ${endWhole}`,
+					sql`${daily.events} <> 0`,
+					scope.userId ? eq(daily.userId, scope.userId) : undefined,
+					filters.user ? eq(daily.userId, filters.user) : undefined,
+					filters.size
+						? eq(daily.vcpus, MACHINE_SIZE_VCPUS[filters.size])
+						: undefined,
+				),
 			),
-		);
+	};
 }
 
 interface DayRow {
@@ -686,7 +677,7 @@ interface CloudUsageOptions<GroupBy> {
 	limit: number;
 	cursor?: CloudUsageCursor;
 	overagePerGbHour: number | null;
-	/** Grouped by billing day, read every day from events instead of the rollup: what the rollup is checked against. */
+	/** By billing day, read every day from events, not the rollup. */
 	fromEvents?: boolean;
 }
 

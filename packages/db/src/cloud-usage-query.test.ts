@@ -990,15 +990,22 @@ describe("grouped by billing day", () => {
 		from: new Date("2026-03-07T12:00:00Z"),
 		to: new Date("2026-03-10T12:00:00Z"),
 	};
-	const cases: {
+	type Case = {
 		name: string;
 		window: { from: Date; to: Date };
 		filters?: Parameters<typeof queryCloudUsage>[2]["filters"];
 		userId?: string;
-	}[] = [
-		{ name: "spring forward, partial edge days", window: SPRING },
+		fleet?: true;
+	};
+	const springForward: Case = {
+		name: "spring forward, partial edge days",
+		window: SPRING,
+	};
+	const wholeMonth: Case = { name: "a whole month", window: NOVEMBER };
+	const cases: Case[] = [
+		springForward,
 		{ name: "fall back, partial edge days", window: PARTIAL },
-		{ name: "a whole month", window: NOVEMBER },
+		wholeMonth,
 		{ name: "another month", window: OCTOBER },
 		{ name: "a member", window: NOVEMBER, userId: SAM },
 		{ name: "a size", window: NOVEMBER, filters: { size: "medium" } },
@@ -1012,23 +1019,23 @@ describe("grouped by billing day", () => {
 			window: NOVEMBER,
 			filters: { status: ["awake", "failed"] },
 		},
+		{ name: "the fleet", window: NOVEMBER, fleet: true },
 	];
 	const rowsOf = async (
-		{ window, filters, userId }: (typeof cases)[number],
+		{ window, filters, userId, fleet }: Case,
 		fromEvents: boolean,
 	) => {
-		const result = await queryCloudUsage(
-			db,
-			{ organizationId: ORG, userId },
-			{
-				window,
-				filters,
-				groupBy: "billingDay",
-				limit: 100,
-				overagePerGbHour: RATE,
-				fromEvents,
-			},
-		);
+		const options = {
+			window,
+			filters,
+			groupBy: "billingDay" as const,
+			limit: 100,
+			overagePerGbHour: RATE,
+			fromEvents,
+		};
+		const result = fleet
+			? await queryFleetCloudUsage(db, null, { ...options, refs: false })
+			: await queryCloudUsage(db, { organizationId: ORG, userId }, options);
 		const brief = (metrics: (typeof result)["total"]) => [
 			Math.round(metrics.gbHours * 1e6) / 1e6,
 			Math.round(metrics.hours * 1e6) / 1e6,
@@ -1055,13 +1062,11 @@ describe("grouped by billing day", () => {
 					...(await rowsOf(testCase, true)),
 				});
 			}
-			const november = (await rowsOf(cases[2] as (typeof cases)[number], false))
-				.rows;
+			const november = (await rowsOf(wholeMonth, false)).rows;
 			// 2026-11-12 has boots and no usage: a row from the boots alone.
 			expect(november.find(([key]) => key === "2026-11-12")).toBeDefined();
 			expect(november.find(([key]) => key === "2026-11-05")).toBeUndefined();
-			const spring = (await rowsOf(cases[0] as (typeof cases)[number], false))
-				.rows;
+			const spring = (await rowsOf(springForward, false)).rows;
 			expect(spring.map(([key]) => key)).toEqual([
 				"2026-03-10",
 				"2026-03-09",
