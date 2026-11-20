@@ -181,7 +181,7 @@ function priorityRank(): SQL<number> {
 export function buildTaskListOrderBy(
 	sortBy: TaskListSortBy = "createdAt",
 	sortOrder: TaskListSortOrder = "desc",
-): SQL<unknown>[] {
+): [SQL<unknown>, SQL<unknown>] {
 	const dir = sortOrder === "asc" ? asc : desc;
 	const primary = (() => {
 		switch (sortBy) {
