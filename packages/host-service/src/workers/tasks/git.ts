@@ -328,7 +328,12 @@ export const gitWorktreeStateTask = defineWorkerTask<
 	type: "git/worktreeState",
 	handler: async ({ worktreePath, gitEnv, ignoreInitialCommit }) => {
 		const git = createUserSimpleGit(worktreePath, { env: gitEnv });
-		const status = await git.status();
+		// Not `git.status()`: its `-u` lists every file in untracked directories.
+		const status = await git.raw([
+			"status",
+			"--porcelain",
+			"--untracked-files=normal",
+		]);
 		let hasUnpushedCommits = false;
 		try {
 			const result = await git.raw([
@@ -344,7 +349,7 @@ export const gitWorktreeStateTask = defineWorkerTask<
 		} catch {
 			// Leave false — `rev-list` failure isn't a signal we can act on.
 		}
-		return { hasChanges: !status.isClean(), hasUnpushedCommits };
+		return { hasChanges: status.trim() !== "", hasUnpushedCommits };
 	},
 });
 

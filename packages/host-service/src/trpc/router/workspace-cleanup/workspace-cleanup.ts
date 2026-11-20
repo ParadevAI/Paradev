@@ -16,6 +16,7 @@ import {
 import { disposeSessionsByWorkspaceId } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import type { GitTaskEnv } from "../../../workers/tasks/git";
+import { WorkerTaskAbortedError } from "../../../workers/WorkerTaskRunner";
 import {
 	archiveLocalWorkspace,
 	trackWorkspaceDeleted,
@@ -30,7 +31,11 @@ import { protectedProcedure, router } from "../../index";
 import { getHostWorktreeBaseDir } from "../settings/worktree-location";
 import { isInsideSessionsRoot } from "../workspace-creation/shared/session-paths";
 import { isInsideProjectWorktreesRoot } from "../workspace-creation/shared/worktree-paths";
-import { cleanupGitOps, isIndeterminateGitTaskFailure } from "./git-ops";
+import {
+	cleanupGitOps,
+	INSPECT_WORKTREE_STATE_TIMEOUT_MS,
+	isIndeterminateGitTaskFailure,
+} from "./git-ops";
 import { isLocalCheckoutWorkspace } from "./is-local-checkout-workspace";
 import { removeDirectoryTree } from "./remove-directory-tree";
 
@@ -86,6 +91,12 @@ export interface DestroyWorkspaceInput {
 	 *   - "skip":        don't run — the interactive force-retry contract.
 	 */
 	teardownMode: "blocking" | "best-effort" | "skip";
+	/**
+	 * The caller does not wait on a relay or show an unchecked dialog, so the
+	 * dirty check may take minutes. Released desktops silently force-retry any
+	 * CONFLICT, so without this the check keeps the dialog's budget.
+	 */
+	longPreflight?: boolean;
 }
 
 /**
@@ -121,6 +132,7 @@ export const workspaceCleanupRouter = router({
 	 *   - hasChanges/Unpushed   → render as warnings; user can still confirm.
 	 *   - git failures (missing worktree, broken repo) → return as canDelete
 	 *     with no warnings; the destroy saga handles those states best-effort.
+	 *   - timeout / pool failure → throw: the state is unknown, not clean.
 	 *
 	 * The git reads run in the host worker pool (gitWorktreeStateTask) so a
 	 * slow status on a large worktree can't block the event loop.
@@ -155,7 +167,7 @@ export const workspaceCleanupRouter = router({
 						gitEnv,
 						ignoreInitialCommit: local.type === "session",
 					},
-					signal,
+					{ timeoutMs: INSPECT_WORKTREE_STATE_TIMEOUT_MS, signal },
 				);
 				return {
 					canDelete: true,
@@ -164,7 +176,16 @@ export const workspaceCleanupRouter = router({
 					hasUnpushedCommits: state.hasUnpushedCommits,
 					sharesProjectCheckout: false,
 				};
-			} catch {
+			} catch (err) {
+				if (err instanceof WorkerTaskAbortedError && err.kind === "cancelled") {
+					throw new TRPCError({ code: "CLIENT_CLOSED_REQUEST", cause: err });
+				}
+				if (isIndeterminateGitTaskFailure(err)) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: `Couldn't verify worktree state at ${local.worktreePath}: ${err instanceof Error ? err.message : String(err)}`,
+					});
+				}
 				return {
 					canDelete: true,
 					reason: null,
@@ -232,6 +253,7 @@ export const workspaceCleanupRouter = router({
 				// anyway" must still run teardown, otherwise editing any
 				// tracked file silently disables the user's cleanup script.
 				skipTeardown: z.boolean().default(false),
+				longPreflight: z.boolean().default(false),
 			}),
 		)
 		.mutation(async ({ ctx, input }) =>
@@ -240,6 +262,7 @@ export const workspaceCleanupRouter = router({
 				deleteBranch: input.deleteBranch,
 				force: input.force,
 				teardownMode: input.skipTeardown ? "skip" : "blocking",
+				longPreflight: input.longPreflight,
 			}),
 		),
 });
@@ -317,10 +340,15 @@ async function runDestroy(
 					ctx,
 					local.worktreePath,
 				);
-				const state = await cleanupGitOps.readWorktreeState({
-					worktreePath: local.worktreePath,
-					gitEnv,
-				});
+				const state = input.longPreflight
+					? await cleanupGitOps.readWorktreeStateUnattended({
+							worktreePath: local.worktreePath,
+							gitEnv,
+						})
+					: await cleanupGitOps.readWorktreeState(
+							{ worktreePath: local.worktreePath, gitEnv },
+							{ timeoutMs: INSPECT_WORKTREE_STATE_TIMEOUT_MS },
+						);
 				if (state.hasChanges) {
 					throw new TRPCError({
 						code: "CONFLICT",
@@ -411,7 +439,14 @@ async function runDestroy(
 		if (marked && local) trackWorkspaceDeleted(ctx, local);
 		return result;
 	} catch (err) {
-		if (marked) unarchiveLocalWorkspace(ctx, input.workspaceId);
+		if (marked) {
+			console.warn("[workspace-cleanup] delete failed; restoring workspace", {
+				workspaceId: input.workspaceId,
+				code: err instanceof TRPCError ? err.code : undefined,
+				error: err instanceof Error ? err.message : String(err),
+			});
+			unarchiveLocalWorkspace(ctx, input.workspaceId);
+		}
 		throw err;
 	}
 }
