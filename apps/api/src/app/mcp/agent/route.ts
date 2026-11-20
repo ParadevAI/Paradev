@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import { CHANNEL_MESSAGE_MAX_LENGTH } from "@superset/shared/channels";
 import { createCaller } from "@superset/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -35,9 +36,11 @@ function devToolsServer(caller: Caller): McpServer {
 	server.registerTool(
 		"reply",
 		{
-			description:
-				"Post a message as yourself. `target` is the reply_to of the message you are answering (channel:<id> or channel:<id>/thread:<id>). Use it for every answer; people see nothing else you write.",
-			inputSchema: { target: z.string(), body: z.string() },
+			description: `Post a message as yourself. \`target\` is the reply_to of the message you are answering (channel:<id> or channel:<id>/thread:<id>). Use it for every answer; people see nothing else you write. \`body\` holds at most ${CHANNEL_MESSAGE_MAX_LENGTH} characters; post a longer answer as several replies.`,
+			inputSchema: {
+				target: z.string(),
+				body: z.string().max(CHANNEL_MESSAGE_MAX_LENGTH),
+			},
 		},
 		(args) => result(() => tools.reply(args)),
 	);
