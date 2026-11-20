@@ -1,0 +1,179 @@
+---
+title: "How to Run Codex CLI Sessions in Parallel: Terminal Workspace, Subagents, and Remote Control"
+description: "Codex CLI 0.171.0 shipped on November 20, 2026 with the terminal workspace on by default, /rc for remote control, and codex exec --remote. How to use them to run several Codex sessions at once, and how to do the same in Paradev."
+date: 2026-11-20
+type: "tutorial"
+competitors:
+  - codex
+  - git-worktrees
+keywords:
+  - codex cli parallel sessions
+  - codex cli 0.171.0
+  - codex terminal workspace
+  - codex remote control
+  - codex /rc
+  - codex exec --remote
+  - codex subagents
+  - run codex in parallel
+---
+
+To run several Codex CLI sessions in parallel, give each task its own Git worktree and branch and start one `codex` session in each. From Codex CLI 0.171.0, the terminal workspace is on by default: `/agents` opens the agent command center, `/side` opens a side chat, and the sidebar lists each subagent with its status. `/rc` turns on remote control so a paired device can reach sessions on your computer. In Paradev, create one workspace per task with Codex as the agent, or run `superset ws create --agent codex` once per task. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+
+## What shipped
+
+OpenAI released [Codex CLI 0.171.0](https://github.com/openai/codex/releases/tag/rust-v0.171.0) on November 20, 2026. Three changes in its release notes affect how you run more than one session:
+
+| Change | What the release notes say |
+|---|---|
+| **Terminal workspace** | "Enabled the TUI workspace by default, with searchable document previews, image previews, and subagent transcripts alongside the main conversation." |
+| **Remote control** | "Added `/rc` and `/remote` to manage local remote control and display device pairing codes from the TUI." |
+| **Remote `codex exec`** | "Added `codex exec --remote <ADDR>` to start or resume noninteractive sessions on an existing app server." |
+
+The same release adds GPT-6.2 Sol and GPT-6.2 Astra to the model catalogs, "with Sol as the default catalog selection." For the models themselves, see [How to run GPT-6.2 Astra and Sol in parallel](/compare/run-gpt-6-2-astra-sol-in-parallel).
+
+Update and check your version before you try any of this:
+
+```bash
+npm install -g @openai/codex@0.171.0
+codex --version
+```
+
+## The terminal workspace
+
+The workspace was opt-in until this release. [Codex CLI 0.169.0](https://github.com/openai/codex/releases/tag/rust-v0.169.0), on November 13, 2026, gave it several side-chat tabs and a search over older tasks in the agent command center. In 0.171.0 the feature is marked stable and on for everyone.
+
+These slash commands are the ones that matter for parallel work. The descriptions are the ones Codex shows in its own command list:
+
+| Command | What it does |
+|---|---|
+| `/agents` | "open the agent command center" |
+| `/subagents` | "switch between this session's subagents" |
+| `/side` | "start a side conversation" |
+| `/worktree` | "start or continue a conversation in a new worktree" |
+| `/rc` or `/remote` | "manage remote control for the local background server" |
+
+The sidebar chooser lists side chats, files, and a **Subagents** section with each agent's name and status. Select a subagent to open its transcript in a sidebar tab next to the parent conversation. The transcript is watch-only, with search, and `Esc` returns to the list. This comes from the pull requests that added it: [#62149](https://github.com/openai/codex/pull/62149) and [#62157](https://github.com/openai/codex/pull/62157).
+
+The feature key is `features.tui_workspace`. To go back to the single-conversation view, turn it off in `~/.codex/config.toml`:
+
+```toml
+[features]
+tui_workspace = false
+```
+
+## Run several Codex sessions at once
+
+There are three ways to do more than one thing with Codex, and they fit different work.
+
+### Subagents inside one session
+
+[Subagent workflows are on by default](https://learn.chatgpt.com/docs/agent-configuration/subagents) in current Codex releases. There is no spawn command: you ask for it in the prompt.
+
+```text
+Spawn one agent per failing test file, wait for all of them, and
+summarize what each one changed.
+```
+
+Subagents share the parent session's checkout, so they suit work that splits into parts that do not touch the same files: research, test triage, review. Watch them in the sidebar or with `/subagents`.
+
+### One session per worktree
+
+For tasks that each change code, give each one its own worktree and branch so two sessions never edit the same working files:
+
+```bash
+git worktree add -b ai/parser-tests ../repo-parser-tests
+git worktree add -b ai/billing-refactor ../repo-billing-refactor
+```
+
+Open a terminal in each directory, install dependencies, and start `codex` there. Inside a session, `/worktree` starts or continues a conversation in a new worktree, and `/new` and `/fork` can offer the same choice. `/agents` then shows every task in one list, and you can search older ones by name, prompt, or working directory.
+
+Worktrees share repository history and run as your user. They do not give each task its own ports, database, credentials, or model quota, and their branches can still conflict when you merge. Rerun your checks on the combined branch.
+
+### Noninteractive runs with `codex exec --remote`
+
+`codex exec` runs one prompt without the interactive UI. With `--remote`, it runs that turn on an app server that is already running, using the server's configuration and credentials. Per the [pull request](https://github.com/openai/codex/pull/61707), it can start a new thread or resume one by ID, print plain text or JSON, and read a bearer token from an environment variable you name with `--remote-auth-token-env`.
+
+```bash
+codex app-server --listen ws://127.0.0.1:4500
+codex exec --remote ws://127.0.0.1:4500 "Run the test suite and report failures"
+```
+
+This suits scripts and CI jobs that send work to one long-running Codex server. OpenAI's [app server docs](https://learn.chatgpt.com/docs/app-server) describe the WebSocket listener as experimental, so do not build a production pipeline on it yet.
+
+## Remote control with `/rc`
+
+Type `/rc` (or `/remote`) in the Codex terminal UI. Per the [pull request](https://github.com/openai/codex/pull/62121), the menu turns remote control on or off for the local background server and saves the choice for the next restart. Once it is on, **Add device** shows a pairing code. The actions apply to local sessions only, even if you open the menu while viewing a cloud session.
+
+What a paired device can do is described in OpenAI's [remote connections docs](https://learn.chatgpt.com/docs/remote-connections): the ChatGPT app on a phone, or another computer, reaches work that runs on the host. The host must stay awake, online, and signed in to the same account. When this was written, that page still described setup in the ChatGPT desktop app and did not mention `/rc`, so check it for the current pairing steps.
+
+Remote control lets you reach sessions from another device. It does not start more of them or keep them apart: that is still the job of worktrees and the command center.
+
+## Run parallel Codex sessions in Paradev
+
+Paradev is a desktop app that runs Codex and other CLI agents side by side. Each task runs in its own Git worktree and branch, with a terminal, a Changes pane, and a pull request pane next to it. Paradev runs the real `codex` CLI in a terminal, so the workspace sidebar, `/agents`, `/side`, and subagents work there as they do in any terminal. Codex runs on your own ChatGPT plan or API key; Paradev does not proxy model calls. Paradev is open source under the MIT License.
+
+What it adds on top of the Codex CLI: it creates and names the worktrees for you, shows sessions from Codex next to Claude Code, OpenCode, or any other CLI agent in one sidebar, and puts the diff and the pull request for each task beside its terminal.
+
+From the app:
+
+1. Create a new workspace for each task.
+2. In the composer, choose **Codex** as the agent and a model in the model picker.
+3. Write the task prompt and start it. Repeat for the next task.
+4. Review each diff in the **Changes** pane, then commit, push, and open a pull request from there.
+
+From the `superset` CLI, start a batch of workspaces and group them with a tag:
+
+```bash
+superset ws create --local --project PROJECT_ID --name parser-tests \
+  --branch ai/parser-tests --tag codex-batch \
+  --agent codex --model gpt-6.2-sol --prompt "Add regression tests for the input parser"
+
+superset ws create --local --project PROJECT_ID --name billing-refactor \
+  --branch ai/billing-refactor --tag codex-batch \
+  --agent codex --model gpt-6.2-astra --prompt "Move the billing logic out of the request handlers into one module"
+
+superset ws list --local --tag codex-batch
+```
+
+Tagged workspaces collect in a sidebar folder with the tag's name. To add a second agent to a workspace that already exists, or to read what an agent is doing without opening the app:
+
+```bash
+superset agents create --local --workspace WORKSPACE_ID --agent codex --prompt "Review the diff and list risks"
+superset terminals read --local --workspace WORKSPACE_ID --terminal TERMINAL_ID
+```
+
+To check on sessions away from your desk, Paradev's [iPhone and iPad app](/mobile) shows the terminals and diffs of every agent, not only Codex, and lets you reply and review. It needs a Pro plan. Sessions keep running on your machine, a host you added through Remote Access, your own Linux server ([Bring Your Own Cloud](https://docs.paradev.com/bring-your-own-cloud)), or a [cloud workspace](/cloud). A machine you own must stay awake and online; a cloud workspace does not need your computer. Codex remote control and the Paradev app do not conflict: one covers Codex sessions on a paired computer, the other covers every agent you run in Paradev.
+
+## Frequently Asked Questions
+
+### What changed in Codex CLI 0.171.0?
+
+Released on November 20, 2026, it turns the terminal workspace on by default, adds `/rc` and `/remote` to manage remote control and show device pairing codes, adds `codex exec --remote <ADDR>` for noninteractive runs on an existing app server, and adds GPT-6.2 Sol and Astra to the model catalogs.
+
+### How do I turn off the Codex terminal workspace?
+
+Set `tui_workspace = false` under `[features]` in `~/.codex/config.toml`, then start a new session.
+
+### Do Codex subagents run in separate worktrees?
+
+Not by default. Subagents work in the parent session's checkout. For tasks that edit code at the same time, start separate sessions in separate worktrees, with `git worktree add` or `/worktree`.
+
+### What does `/rc` do in Codex?
+
+It opens a menu to turn remote control on or off for the local Codex background server. When it is on, **Add device** shows a pairing code for another device. It applies to local sessions, and the computer must stay awake and online.
+
+### Is `codex exec --remote` the same as remote control?
+
+No. `codex exec --remote` sends one noninteractive turn from a script to a Codex app server you started. Remote control pairs another device with the sessions on your computer.
+
+### Can I use Codex remote control and Paradev together?
+
+Yes. Paradev runs the real `codex` CLI, so `/rc` is available in a session you start there. The Paradev mobile app is separate: it shows every agent in your workspaces, with diffs, on iPhone and iPad.
+
+### Do parallel Codex sessions share files?
+
+Not if each runs in its own Git worktree. They still share ports, databases, credentials, and your model quota, and their branches can conflict when merged.
+
+### Where can I read more about running Codex in parallel?
+
+See the [best IDE for Codex](/compare/best-ide-for-codex), [Paradev vs Codex](/compare/superset-vs-codex), [coding agent mobile apps](/compare/coding-agent-mobile-apps), and [Git worktrees for AI agents](/compare/git-worktrees-for-ai-agents).
