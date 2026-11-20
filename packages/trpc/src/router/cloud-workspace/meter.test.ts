@@ -335,6 +335,13 @@ describe("releaseBoot", () => {
 		]);
 	});
 
+	test("a release of a lock Autumn no longer has closes it, with no Sentry event", async () => {
+		finalizeError = autumnError(404, "Lock not found");
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
 	test("a release Autumn refuses is reported and leaves the lock open, and the next settle releases it", async () => {
 		finalizeError = autumnError(503);
 		await releaseBoot("boot_1", "never_attached");

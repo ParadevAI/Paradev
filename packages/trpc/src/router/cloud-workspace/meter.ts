@@ -20,6 +20,7 @@ import {
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
 	cloudWorkspaces,
+	openBoot,
 	type PendingUsageEvent,
 	users,
 } from "@superset/db/schema";
@@ -166,12 +167,7 @@ async function usageUser(userId: string | null): Promise<UsageUser | null> {
 	return { id: userId, name: user?.name ?? null, email: user?.email ?? null };
 }
 
-const OPEN_BOOT = or(
-	isNull(cloudWorkspaceBoots.stoppedAt),
-	isNull(cloudWorkspaceBoots.finalizedThrough),
-	lt(cloudWorkspaceBoots.finalizedThrough, cloudWorkspaceBoots.stoppedAt),
-	eq(cloudWorkspaceBoots.lockOpen, true),
-);
+const OPEN_BOOT = openBoot(cloudWorkspaceBoots);
 
 async function checkOrFailOpen<T>(
 	organizationId: string,
@@ -315,8 +311,13 @@ export async function releaseBoot(
 	}
 }
 
-/** False when Autumn still holds the lock: the boot stays open and the next settle releases it. */
-async function releaseLock(boot: Boot): Promise<boolean> {
+/** False when Autumn still holds the lock. */
+async function releaseLock(
+	boot: Pick<
+		Boot,
+		"id" | "lockSeq" | "lockOpen" | "organizationId" | "cloudWorkspaceId"
+	>,
+): Promise<boolean> {
 	if (!boot.lockOpen) return true;
 	try {
 		await autumnClient.balances.finalize({
@@ -326,8 +327,8 @@ async function releaseLock(boot: Boot): Promise<boolean> {
 		return true;
 	} catch (error) {
 		if (
-			error instanceof AutumnError &&
-			(error.statusCode === 409 || error.body.includes("Lock not found"))
+			(error instanceof AutumnError && error.statusCode === 409) ||
+			lockNotFound(error)
 		) {
 			return true;
 		}
@@ -373,7 +374,9 @@ export async function attachBootSession(args: {
 	await releaseBoot(args.bootId, "session_taken");
 }
 
-function bootTags(boot: Boot): Record<string, string> {
+function bootTags(
+	boot: Pick<Boot, "id" | "organizationId" | "cloudWorkspaceId">,
+): Record<string, string> {
 	return {
 		"organization.id": boot.organizationId,
 		"boot.id": boot.id,
@@ -481,9 +484,13 @@ async function writePendingUsage(): Promise<void> {
 function confirmedEarlier(boot: Boot, error: AutumnError): boolean {
 	const takenAt = boot.finalizedThrough ?? boot.createdAt;
 	return (
-		error.body.includes("Lock not found") &&
+		lockNotFound(error) &&
 		Date.now() < takenAt.getTime() + LOCK_TTL_MS - LOCK_WINDOW_MS
 	);
+}
+
+function lockNotFound(error: unknown): boolean {
+	return error instanceof AutumnError && error.body.includes("Lock not found");
 }
 
 async function recordUsage(
@@ -969,10 +976,13 @@ async function adoptRunningBoxes(
 					.onConflictDoNothing({ target: cloudWorkspaceBoots.vercelSessionId })
 					.returning({ id: cloudWorkspaceBoots.id });
 			} finally {
-				if (inserted.length === 0 && lockOpen) {
-					await autumnClient.balances.finalize({
-						lockId: lockIdFor(bootId, 0),
-						action: "release",
+				if (inserted.length === 0) {
+					await releaseLock({
+						id: bootId,
+						lockSeq: 0,
+						lockOpen,
+						organizationId: workspace.organizationId,
+						cloudWorkspaceId: workspace.id,
 					});
 				}
 			}
