@@ -113,8 +113,8 @@ Leave it unset in the existing stack and local development. It selects auth's
 base URL, integration OAuth redirect URIs, state-cookie transport, and browser
 account-link URLs. OAuth token exchanges must send that same redirect URI.
 `NEXT_PUBLIC_API_URL` remains the JWT issuer/audience, MCP resource identity, and
-server job/callback origin. `PLUGIN_CLIENT_METADATA_BASE_URL` still controls
-where providers fetch connector client metadata.
+server job/callback origin. It is also the origin of connector client
+metadata, so a connector's client ID and its callback are on one host.
 
 The API and web preview workflows pass the optional setting through. Production
 workflow wiring is deferred to the separate-deployment change, so this preparation
@@ -127,11 +127,10 @@ endpoints (authorize, token, JWKS, registration, introspection, revocation,
 userinfo, logout) on the deployment's browser base URL. With no override these
 are unchanged. The MCP resource is always `${NEXT_PUBLIC_API_URL}/mcp`, including
 root and plugin discovery, while discovery URLs can use the request host.
-Connector client metadata is served on the browser API origin when that origin is
-an own-domain twin of `PLUGIN_CLIENT_METADATA_BASE_URL`, and lists only the
-callback on that origin: some providers (Firecrawl) reject a document whose
-redirect URIs are on another origin than its client ID. Grants issued to the
-twin's client ID keep refreshing as it. Existing dynamic-client grants look up their original client
+Connector client metadata lists only the callback on its own origin: Firecrawl
+and Resend reject a document whose redirect URIs are on another host than its
+client ID. Grants issued to the client ID on the other own domain keep
+refreshing as it. Existing dynamic-client grants look up their original client
 across those callback twins, scoped to the same issuer and connector; new grants
 still select registrations for the current callback only.
 

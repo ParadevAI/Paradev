@@ -82,7 +82,7 @@ connections use `https://api.stage.paradev.com/api/connectors/callback/google`
 and their own `GOOGLE_CONNECTIONS_CLIENT_ID`. Final vendor registrations for
 `api.paradev.com` or `api.superset.sh` may not cover stage hosts. Do not infer
 connector readiness from working sign-in or change registrations during these
-restricted tests. `PLUGIN_CLIENT_METADATA_BASE_URL` remains its production value.
+restricted tests. Connector client metadata is served from the stage API host.
 
 Use a fresh, isolated browser profile for the explicit PostHog test journey:
 visit `paradev.com`, then open `app.stage.paradev.com` and sign in with the

@@ -3,10 +3,7 @@ import { pluginOauthClients } from "@superset/db/schema";
 import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import type { ConnectorMethod } from "@superset/shared/connectors";
 import { CANONICAL_URLS } from "@superset/shared/constants";
-import {
-	isOwnOriginTwin,
-	withOwnDomainTwins,
-} from "@superset/shared/own-domains";
+import { withOwnDomainTwins } from "@superset/shared/own-domains";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { env } from "../../env";
 import { decryptOptional, encryptOptional } from "../../router/plugins/crypto";
@@ -34,16 +31,10 @@ export class ForgottenClientError extends Error {
 	}
 }
 
-// Firecrawl rejects a metadata document whose redirect URIs are on another
-// origin than its client_id, so the client_id follows the callback's own domain.
-function clientMetadataBase(): string {
-	const base = env.PLUGIN_CLIENT_METADATA_BASE_URL ?? env.NEXT_PUBLIC_API_URL;
-	const browserOrigin = new URL(getBrowserApiUrl(env)).origin;
-	return isOwnOriginTwin(browserOrigin, base) ? browserOrigin : base;
-}
-
+// Firecrawl and Resend reject a metadata document whose redirect URIs are on
+// another host than its client_id, so both live on the browser API origin.
 export function clientMetadataUrl(connectorSlug: string): string {
-	return `${clientMetadataBase()}/api/connectors/${connectorSlug}/client-metadata`;
+	return `${getBrowserApiUrl(env)}/api/connectors/${connectorSlug}/client-metadata`;
 }
 
 export function redirectUriFor(connectorSlug: string): string {
