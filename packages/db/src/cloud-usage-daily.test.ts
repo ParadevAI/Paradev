@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
+import { BOX_GB_MINUTES_FEATURE_ID } from "@superset/shared/billing";
+import { BILLING_TIME_ZONE } from "@superset/shared/cloud-usage-api";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import {
 	CHECKOUT,
@@ -9,7 +11,7 @@ import {
 	seedCloudUsage,
 } from "../test/cloud-usage-fixture";
 import { recordUsageEvent } from "./cloud-usage-events";
-import { BILLED_FEATURE, billingDay } from "./cloud-usage-query";
+import { billingDay } from "./cloud-usage-query";
 import { cloudUsageDaily, cloudUsageEvents } from "./schema";
 
 let db: Awaited<ReturnType<typeof seedCloudUsage>>;
@@ -49,7 +51,7 @@ async function fromEvents() {
 			sum(e.amount) as gb_minutes, sum(extract(epoch from e.window_to - e.window_from)) as seconds,
 			count(*)::int as events
 		from cloud_usage_events e join cloud_workspace_boots b on b.id = e.boot_id
-		where e.feature = ${BILLED_FEATURE} and e.sent_at is not null
+		where e.feature = ${BOX_GB_MINUTES_FEATURE_ID} and e.sent_at is not null
 		group by 1, 2, 3, 4
 		order by 1, 2, 3, 4`);
 	return asNumbers(rows);
@@ -78,7 +80,7 @@ const event = (
 	from: string,
 	to: string,
 	amount: string,
-	feature: "box_gb_minutes" | "active_cpu_minutes" = BILLED_FEATURE,
+	feature: "box_gb_minutes" | "active_cpu_minutes" = BOX_GB_MINUTES_FEATURE_ID,
 ) => ({
 	bootId: "boot_1",
 	lockSeq,
@@ -241,7 +243,7 @@ describe("cloud_usage_daily trigger", () => {
 			await tx.query(
 				`insert into cloud_usage_events (boot_id, lock_seq, feature, organization_id, cloud_workspace_id, user_id, window_from, window_to, amount, sent_at)
 				values ('boot_1', 50, $1, $2, $3, $4, '2026-11-18T07:00Z', '2026-11-18T07:30Z', 240, '2026-11-18T07:30Z')`,
-				[BILLED_FEATURE, ORG, CHECKOUT, MAYA],
+				[BOX_GB_MINUTES_FEATURE_ID, ORG, CHECKOUT, MAYA],
 			);
 		});
 		expect(await dayOf("2026-11-17")).toEqual([
@@ -258,7 +260,7 @@ describe("cloud_usage_daily trigger", () => {
 			await tx.query(
 				`insert into cloud_usage_events (boot_id, lock_seq, feature, organization_id, cloud_workspace_id, user_id, window_from, window_to, amount, sent_at)
 				values ('boot_1', 40, $1, $2, $3, $4, '2026-11-16T19:00Z', '2026-11-16T19:30Z', 240, '2026-11-16T19:30Z')`,
-				[BILLED_FEATURE, ORG, CHECKOUT, MAYA],
+				[BOX_GB_MINUTES_FEATURE_ID, ORG, CHECKOUT, MAYA],
 				{ onNotice: (notice) => notices.push(notice.message ?? "") },
 			);
 			const saved = await tx.query(
@@ -275,5 +277,49 @@ describe("cloud_usage_daily trigger", () => {
 		expect(notices).toEqual([
 			`cloud_usage_daily not updated: organization ${ORG} day 2026-11-16 sqlstate 23514`,
 		]);
+	});
+});
+
+describe("cloud_billing_day_start", () => {
+	test("is Pacific midnight on both sides of each daylight-saving change, and cloud_billing_day undoes it", async () => {
+		const { rows } = await db.execute<{
+			day: string;
+			start: string;
+			back: string;
+		}>(sql`
+			select d::text as day,
+				to_char(public.cloud_billing_day_start(d) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI') as start,
+				public.cloud_billing_day(public.cloud_billing_day_start(d))::text as back
+			from unnest(array['2026-03-07', '2026-03-08', '2026-03-09', '2026-10-31', '2026-11-01', '2026-11-02']::date[]) d
+			order by d`);
+		expect(rows.map(({ day, start }) => [day, start])).toEqual([
+			["2026-03-07", "2026-03-07T08:00"],
+			["2026-03-08", "2026-03-08T08:00"],
+			["2026-03-09", "2026-03-09T07:00"],
+			["2026-10-31", "2026-10-31T07:00"],
+			["2026-11-01", "2026-11-01T07:00"],
+			["2026-11-02", "2026-11-02T08:00"],
+		]);
+		for (const { day, back } of rows) expect(back).toBe(day);
+	});
+
+	test("the SQL billing day is the date in BILLING_TIME_ZONE on both sides of each change day's midnight", async () => {
+		const { rows } = await db.execute<{
+			at: string;
+			day: string;
+			zone: string;
+		}>(sql`
+			select to_char(t at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI') as at,
+				public.cloud_billing_day(t)::text as day,
+				(t at time zone ${BILLING_TIME_ZONE})::date::text as zone
+			from unnest(array['2026-03-08T07:59:00Z', '2026-03-08T08:00:00Z', '2026-11-01T06:59:00Z', '2026-11-01T07:00:00Z']::timestamptz[]) t
+			order by t`);
+		expect(rows.map(({ at, day }) => [at, day])).toEqual([
+			["2026-03-08T07:59", "2026-03-07"],
+			["2026-03-08T08:00", "2026-03-08"],
+			["2026-11-01T06:59", "2026-10-31"],
+			["2026-11-01T07:00", "2026-11-01"],
+		]);
+		for (const { day, zone } of rows) expect(zone).toBe(day);
 	});
 });

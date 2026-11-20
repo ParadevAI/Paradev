@@ -784,6 +784,9 @@ msgstr "{actor} ha scollegato il workspace {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} finora · ~{projected} previste"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} non ti permette di inviare messaggi ai suoi sottoagenti."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Le sessioni di {agents} riprendono quando apri il loro workspace."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} chiede"
 msgid "{name} can't be messaged"
 msgstr "Impossibile inviare messaggi a {name}"
 
+msgid "{name} can't take messages now."
+msgstr "{name} non può ricevere messaggi ora."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} non può ricevere messaggi. Il tuo testo è di nuovo nella chat principale."
+
 msgid "{name} failed"
 msgstr "{name} non è riuscito"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} non è riuscito e non può ricevere messaggi."
 
 msgid "{name} finished"
 msgstr "{name} ha finito"
@@ -1206,6 +1218,9 @@ msgstr "{name} ha iniziato a lavorare"
 msgid "{name} stopped"
 msgstr "{name} è stato interrotto"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} si è fermato e non può ricevere messaggi."
+
 msgid "{name} wants more access"
 msgstr "{name} chiede più accesso"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}: {monthly} per utente/mese"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per utente/mese, o {yearly} con fatturazione annuale"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} usa ancora il tuo accesso precedente. Riavvia per usare quello nuovo."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Specifica almeno una persona, oppure scegli {choice}.} sender {Specifica almeno un mittente, oppure scegli {choice}.} other {Specifica almeno una voce, oppure scegli {choice}.}}"
@@ -2375,9 +2393,6 @@ msgstr "Comandi degli agenti"
 msgid "Agent Configs"
 msgstr "Configurazioni degli agenti"
 
-msgid "Agent credentials changed"
-msgstr "Le credenziali dell'agente sono cambiate"
-
 msgid "Agent finished"
 msgstr "Agente terminato"
 
@@ -3503,6 +3518,9 @@ msgstr "Indietro"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Indietro"
+
+msgid "Back to {parentTitle}"
+msgstr "Torna a {parentTitle}"
 
 msgid "Back to About"
 msgstr "Torna a Chi siamo"
@@ -6814,6 +6832,9 @@ msgstr "Prezzo personalizzato"
 msgid "Custom provider"
 msgstr "Provider personalizzato"
 
+msgid "Custom range…"
+msgstr "Intervallo personalizzato…"
+
 msgid "Custom themes"
 msgstr "Temi personalizzati"
 
@@ -6898,6 +6919,9 @@ msgstr "Giorno del mese"
 
 msgid "Day One"
 msgstr "Giorno uno"
+
+msgid "Days are in Pacific time."
+msgstr "I giorni sono nell'ora del Pacifico."
 
 msgid "days running three agents at once"
 msgstr "giorni con tre agenti in parallelo"
@@ -9643,6 +9667,12 @@ msgstr "Torna alla home"
 msgid "Go back to {appName} and sign in again."
 msgstr "Torna a {appName} e accedi di nuovo."
 
+msgid "Go back to {parentTitle}."
+msgstr "Torna a {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Torna indietro per scrivere all'agente principale."
+
 msgid "Go back to the previous page in history"
 msgstr "Torna alla pagina precedente nella cronologia"
 
@@ -12034,6 +12064,9 @@ msgstr "Messaggi"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "I messaggi con queste parole ti notificano come una menzione. Separale con virgole."
 
+msgid "Messages you send go to {name}."
+msgstr "I messaggi che invii vanno a {name}."
+
 msgid "Microphone"
 msgstr "Microfono"
 
@@ -12837,6 +12870,9 @@ msgstr "Nessun contributore trovato."
 
 msgid "No credit card required."
 msgstr "Nessuna carta di credito richiesta."
+
+msgid "No days available"
+msgstr "Nessun giorno disponibile"
 
 msgid "No description"
 msgstr "Nessuna descrizione"
@@ -14505,11 +14541,6 @@ msgstr "Memoria esaurita"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Memoria esaurita: la macchina sta per smettere di rispondere. {sizeName} ha {memoryGb} GB."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Memoria esaurita: la macchina ha fermato {0} ({1} GB) per continuare a funzionare. {sizeName} ha {memoryGb} GB."
 
 msgid "Out of scope"
 msgstr "Fuori ambito"
@@ -16795,9 +16826,6 @@ msgstr "Ricomincia l'introduzione"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Riavviare gli agenti {providerLabel} in esecuzione?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Riavvia gli spazi di lavoro in esecuzione perché i loro agenti applichino la modifica."
-
 msgid "Restart terminal daemon?"
 msgstr "Riavviare il daemon del terminale?"
 
@@ -16806,9 +16834,6 @@ msgstr "Riavvia i terminali"
 
 msgid "Restart workspace"
 msgstr "Riavvia il workspace"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Riavvia i workspace per applicare le nuove credenziali dell'agente."
 
 msgid "Restarted"
 msgstr "Riavviato"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Arrestato"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "{0} ({1} GB) fermato per liberare memoria"
-
 msgid "Stopped by the usage limit"
 msgstr "Fermato dal limite di utilizzo"
 
@@ -20528,6 +20548,9 @@ msgstr "Questo agente non può diramare una conversazione"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Questo agente non può essere eseguito in un workspace cloud"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "Questo agente non ti permette di inviare messaggi ai suoi sottoagenti."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Questo agente non esiste più sul dispositivo selezionato (i suoi agenti potrebbero essere stati reimpostati). Le esecuzioni falliranno finché non ne scegli uno nuovo."
@@ -21768,6 +21791,12 @@ msgstr "Aggiorna il valore di <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti"
 
+msgid "Update this host to message subagents."
+msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Aggiorna questo host per inviare messaggi ai sottoagenti. Il tuo testo è di nuovo nella chat principale."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Aggiorna questo host per spostare i sottoagenti in background"
 
@@ -22176,6 +22205,9 @@ msgstr "Vedi utilizzo"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Visualizzata"
+
+msgid "Viewing subagent {name}"
+msgstr "Stai visualizzando il sottoagente {name}"
 
 msgid "Violence or harassment"
 msgstr "Violenza o molestie"

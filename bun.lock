@@ -100,7 +100,7 @@
     },
     "apps/desktop": {
       "name": "@superset/desktop",
-      "version": "2.0.10",
+      "version": "2.0.11",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.107.0",
         "@agentclientprotocol/codex-acp": "2.1.0",
@@ -805,6 +805,7 @@
       "devDependencies": {
         "@superset/typescript": "workspace:*",
         "@types/node": "24.12.0",
+        "bun-types": "1.4.3",
         "typescript": "7.0.2",
       },
     },
@@ -901,7 +902,7 @@
     },
     "packages/cli": {
       "name": "@superset/cli",
-      "version": "2.0.10",
+      "version": "2.0.11",
       "dependencies": {
         "@clack/prompts": "0.10.1",
         "@modelcontextprotocol/sdk": "1.32.0",
@@ -1028,7 +1029,7 @@
     },
     "packages/host-service": {
       "name": "@superset/host-service",
-      "version": "2.0.10",
+      "version": "2.0.11",
       "dependencies": {
         "@agentclientprotocol/claude-agent-acp": "0.107.0",
         "@agentclientprotocol/codex-acp": "2.1.0",
@@ -1179,6 +1180,7 @@
       "name": "@superset/port-scanner",
       "version": "0.1.0",
       "dependencies": {
+        "@superset/shared": "workspace:*",
         "pidtree": "0.6.0",
       },
       "devDependencies": {
@@ -1311,6 +1313,7 @@
         "@superset/typescript": "workspace:*",
         "@types/node": "24.12.0",
         "@types/semver": "7.7.1",
+        "bun-types": "1.4.3",
         "typescript": "7.0.2",
       },
     },

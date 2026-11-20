@@ -505,6 +505,19 @@ describe("deriveTagFolders with host settings and hidden folders", () => {
 		});
 	});
 
+	it("clears a saved local color when the host color is null", () => {
+		const stored = makeSection({
+			sectionId: buildSidebarFolderKey(PROJECT_A, "perf"),
+			tag: "perf",
+			color: "#00ff00",
+		});
+		const folders = deriveTagFolders([stored], [], {
+			tagSettings: [{ projectId: PROJECT_A, tag: "perf", color: null }],
+			hiddenTagsByProject: new Map(),
+		});
+		expect(folders[0]?.color).toBeNull();
+	});
+
 	it("keeps a saved drag order across host refreshes and reloads", () => {
 		const stored = makeSection({
 			sectionId: buildSidebarFolderKey(PROJECT_A, "perf"),

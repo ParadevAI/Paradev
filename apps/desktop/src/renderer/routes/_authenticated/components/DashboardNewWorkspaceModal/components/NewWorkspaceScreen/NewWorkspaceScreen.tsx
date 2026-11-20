@@ -1222,7 +1222,10 @@ export function NewWorkspaceScreen({
 
 	if (isNewPage) {
 		return (
-			<ComposerDropZone className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background">
+			<ComposerDropZone
+				data-theme-surface="new-workspace"
+				className="absolute inset-0 z-40 flex flex-col overflow-y-auto bg-background"
+			>
 				{isParadevShell ? (
 					<div className="absolute top-2 right-2 z-10 flex items-center gap-0.5">
 						{headerActions}
@@ -1325,7 +1328,10 @@ export function NewWorkspaceScreen({
 
 	// ── Render ───────────────────────────────────────────────────────
 	return (
-		<ComposerDropZone className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background">
+		<ComposerDropZone
+			data-theme-surface="new-workspace"
+			className="absolute inset-0 z-40 flex flex-col items-center overflow-y-auto bg-background"
+		>
 			<PageHeader
 				className="sticky top-0 z-10 w-full bg-background"
 				end={<div className="flex items-center gap-0.5">{headerActions}</div>}

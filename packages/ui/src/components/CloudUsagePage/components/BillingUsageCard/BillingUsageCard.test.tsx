@@ -12,7 +12,7 @@ describe("BillingUsageCard", () => {
 		const { period } = overviewArgs("northwind");
 		const html = renderToStaticMarkup(
 			<I18nProvider i18n={i18n}>
-				<BillingUsageCard period={period} link={false} />
+				<BillingUsageCard period={period} ratePerGbHour={0.06} link={false} />
 			</I18nProvider>,
 		);
 		expect(html).toContain("used");

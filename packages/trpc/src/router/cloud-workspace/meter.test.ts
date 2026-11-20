@@ -31,6 +31,8 @@ const MINUTE = 60_000;
 const NOW = Date.now();
 
 let boot: Record<string, unknown> | null;
+/** Open boots a select returns; the one `boot` when null. */
+let openBoots: Record<string, unknown>[] | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
@@ -103,7 +105,9 @@ stub(db, {
 		let source: unknown;
 		return chain(
 			() => {
-				if (source === cloudWorkspaceBoots) return boot ? [boot] : [];
+				if (source === cloudWorkspaceBoots) {
+					return openBoots ?? (boot ? [boot] : []);
+				}
 				if (source === users) {
 					return [{ name: "Ada Lovelace", email: "ada@example.com" }];
 				}
@@ -284,6 +288,7 @@ beforeEach(() => {
 	usageStopAt = null;
 	creatorId = "user_1";
 	delayedSettles = [];
+	openBoots = null;
 	updateMatches = true;
 	insertConflicts = false;
 	insertError = null;
@@ -328,6 +333,30 @@ describe("releaseBoot", () => {
 			'coalesce("cloud_workspace_boots"."end_reason", $1) ["failed"]',
 			'coalesce("cloud_workspace_boots"."end_reason", $1) ["released"]',
 		]);
+	});
+
+	test("a release of a lock Autumn no longer has closes it, with no Sentry event", async () => {
+		finalizeError = autumnError(404, "Lock not found");
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
+	test("a release Autumn refuses is reported and leaves the lock open, and the next settle releases it", async () => {
+		finalizeError = autumnError(503);
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([finalizeError]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: true });
+
+		finalizeError = null;
+		const stoppedAt = new Date(NOW - MINUTE);
+		boot = { ...boot, stoppedAt, finalizedThrough: stoppedAt, lockOpen: true };
+		autumnCalls = [];
+		expect(await settleBoot("boot_1")).toBe("closed");
+		expect(
+			autumnCalls.filter((call) => call.method === "finalize"),
+		).toMatchObject([{ params: { action: "release" } }]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
 	});
 
 	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
@@ -661,6 +690,17 @@ describe("settleBoot", () => {
 	});
 });
 
+describe("the reconcile queues a settle for every open boot", () => {
+	test("each settle is queued now, with no delay, whatever its place in the batch", async () => {
+		openBoots = ["boot_1", "boot_2", "boot_3"].map((id) => ({ ...boot, id }));
+		expect(
+			await reconcileCloudWorkspaceUsage({ billingEnabled: true }),
+		).toEqual({ adopted: 0, queued: 3, failed: 0 });
+		expect(queuedSettles).toEqual(["boot_1", "boot_2", "boot_3"]);
+		expect(delayedSettles).toEqual([0, 0, 0]);
+	});
+});
+
 describe("the reconcile writes the usage rows a settle could not", () => {
 	const pending = {
 		bootId: "boot_1",
@@ -790,7 +830,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		listed = [resumed(NOW - 2 * MINUTE), timedOut];
 		await reconcile();
 		const adoptedId = adoptedBoot()?.id;
-		expect(adoptedId).toEqual(expect.any(String));
+		if (typeof adoptedId !== "string") throw new Error("no adopted boot");
 		expect(queuedSettles).toEqual(["boot_1", adoptedId]);
 	});
 

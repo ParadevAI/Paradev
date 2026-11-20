@@ -46,6 +46,11 @@ function drawnTabWidth(track: HTMLElement): number {
 	);
 }
 
+function layoutTabWidth(track: HTMLElement): number {
+	const slot = track.querySelector<HTMLElement>("[data-tab-slot]");
+	return slot ? Number.parseFloat(getComputedStyle(slot).width) : TAB_MAX_WIDTH;
+}
+
 interface TabBarProps<TData> {
 	/** Classes for the bar row, merged over its defaults. */
 	className?: string;
@@ -178,7 +183,7 @@ export function TabBar<TData>({
 		const reveal = (behavior: ScrollBehavior) => {
 			const next = scrollLeftToRevealTab({
 				index: activeTabIndex,
-				tabWidth: heldTabWidth ?? drawnTabWidth(track),
+				tabWidth: heldTabWidth ?? layoutTabWidth(track),
 				scrollLeft: scroller.scrollLeft,
 				viewportWidth: scroller.clientWidth,
 				endInset: TAB_BAR_FADE_WIDTH,
@@ -209,7 +214,7 @@ export function TabBar<TData>({
 		const track = tabsTrackRef.current;
 		if (track && rootRef.current?.matches(":hover")) {
 			setTabWidthHold({
-				width: drawnTabWidth(track),
+				width: layoutTabWidth(track),
 				tabCount: tabs.length - 1,
 			});
 		}
@@ -232,7 +237,7 @@ export function TabBar<TData>({
 					tabWidth,
 				);
 				insertIndexRef.current = idx;
-				setInsertLineLeft(idx * tabWidth);
+				setInsertLineLeft(idx * layoutTabWidth(track));
 			},
 			drop: (item: TabDragItem | PaneDragItem, monitor) => {
 				const idx = insertIndexRef.current;
@@ -338,8 +343,11 @@ export function TabBar<TData>({
 			<OverflowFadeContainer
 				observeChildren
 				onOverflowChange={handleOverflowChange}
+				style={
+					isCards ? { minWidth: TAB_MIN_WIDTH + TAB_BAR_FADE_WIDTH } : undefined
+				}
 				className={cn(
-					"hide-scrollbar flex min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
+					"hide-scrollbar flex w-0 min-w-0 flex-1 items-stretch overflow-x-auto overflow-y-hidden",
 					isCards && "pl-1.5",
 				)}
 			>

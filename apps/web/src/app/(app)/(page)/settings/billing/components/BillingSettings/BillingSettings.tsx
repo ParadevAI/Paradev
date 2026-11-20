@@ -8,7 +8,6 @@ import {
 	formatNumber,
 } from "@superset/i18n/format";
 import {
-	advertisedGbMinutesPerSeat,
 	familyForPlan,
 	isPaymentFailingStatus,
 	offersYearlyDiscount,
@@ -338,8 +337,9 @@ export function BillingSettings({
 									PLAN_PRICE_CURRENCY,
 									{ minimumFractionDigits: 0 },
 								);
-								const gbMinutes = advertisedGbMinutesPerSeat(family);
-								const gbHours = gbMinutes ? formatNumber(gbMinutes / 60) : null;
+								const gbHours = family.advertisedGbHoursPerSeat
+									? formatNumber(family.advertisedGbHoursPerSeat)
+									: null;
 								const isCurrent =
 									family.family === currentFamily?.family &&
 									(subscriptionInterval === null ||

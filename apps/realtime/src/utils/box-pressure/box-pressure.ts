@@ -7,11 +7,7 @@ export type BoxPressureMap = Record<string, BoxPressure>;
 
 function sameState(a: BoxPressure | undefined, b: BoxPressure | null): boolean {
 	if (!a || !b) return !a && !b;
-	return (
-		a.level === b.level &&
-		a.limitedBy.join() === b.limitedBy.join() &&
-		a.reap?.at === b.reap?.at
-	);
+	return a.level === b.level && a.limitedBy.join() === b.limitedBy.join();
 }
 
 /** A heartbeat that only refreshes `at` is not a change. */

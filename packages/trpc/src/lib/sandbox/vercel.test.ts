@@ -10,10 +10,11 @@ import { APIError, Drive, Sandbox } from "@vercel/sandbox";
 import { stub } from "../../../test/stub";
 import {
 	agentToolsMounts,
-	applySandboxPolicy,
+	applyClaimInPlace,
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
@@ -83,8 +84,8 @@ stub(Sandbox, {
 		const ordered = options.tags
 			? sandboxes
 					.filter((sandbox) => sandbox.tags?.kind === "workspace")
-					.toSorted((a, b) => b.createdAt - a.createdAt)
-			: sandboxes.toSorted((a, b) => b.statusUpdatedAt - a.statusUpdatedAt);
+					.sort((a, b) => b.createdAt - a.createdAt)
+			: [...sandboxes].sort((a, b) => b.statusUpdatedAt - a.statusUpdatedAt);
 		return (async function* () {
 			yield* ordered;
 		})();
@@ -193,16 +194,19 @@ describe("listSandboxSessions", () => {
  * it first, which `resumes` records.
  */
 function fakeBox(read: "running" | "stopped") {
-	const box = {
-		live: read,
-		snapshotId: "snap_stop_0",
-		resumes: [] as string[],
-	};
+	const box: {
+		live: typeof read;
+		snapshotId: string | undefined;
+		resumes: string[];
+	} = { live: read, snapshotId: "snap_stop_0", resumes: [] };
 	const stoppedError = () => new APIError(new Response(null, { status: 410 }));
 	const session = {
 		sessionId: "sess_A",
 		vcpus: 4,
 		update: async () => {
+			if (box.live !== "running") throw stoppedError();
+		},
+		writeFiles: async () => {
 			if (box.live !== "running") throw stoppedError();
 		},
 		extendTimeout: async () => {
@@ -274,7 +278,7 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 	let fake = fakeBox("stopped");
 	stub(Sandbox, { get: async () => fake.get() });
 
-	test("reads, stops, deletes, session lists, policy and top-up", async () => {
+	test("reads, stops, deletes, session lists, claim and top-up", async () => {
 		fake = fakeBox("stopped");
 		await describeSandbox("ws-box");
 		await sandboxExists("ws-box");
@@ -282,9 +286,9 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		await listSandboxSessions("ws-box", NOW - HOUR);
 		await findSandboxSession("ws-box", null);
 		expect(
-			await applySandboxPolicy({
+			await applyClaimInPlace({
 				providerSandboxId: "ws-box",
-				networkPolicy: {},
+				claim: { networkPolicy: {}, managedEnv: {}, hostSecret: "s" },
 			}),
 		).toBe("not-running");
 		expect(await topUpSandboxSession("ws-box")).toBeNull();
@@ -292,18 +296,40 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 
-	test("policy and top-up find the box stopped since they read it running", async () => {
+	test("claim and top-up find the box stopped since they read it running", async () => {
 		fake = stopsAfterRead(fakeBox("running"));
 		expect(
-			await applySandboxPolicy({
+			await applyClaimInPlace({
 				providerSandboxId: "ws-box",
-				networkPolicy: {},
+				claim: { networkPolicy: {}, managedEnv: {}, hostSecret: "s" },
 			}),
 		).toBe("not-running");
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 
 		fake = stopsAfterRead(fakeBox("running"));
-		expect(await topUpSandboxSession("ws-box")).toBeNull();
+		expect(await topUpSandboxSession("ws-box", HOUR)).toBeNull();
+		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
+	});
+
+	test("a box that stops between the policy and its files is left stopped", async () => {
+		fake = fakeBox("running");
+		const session = (await fake.get()).currentSession();
+		const update = session.update;
+		session.update = async () => {
+			await update();
+			fake.stopNow();
+		};
+		expect(
+			await applyClaimInPlace({
+				providerSandboxId: "ws-box",
+				claim: {
+					networkPolicy: {},
+					files: [{ path: "/a", content: "" }],
+					managedEnv: {},
+					hostSecret: "s",
+				},
+			}),
+		).toBe("not-running");
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 });
@@ -375,7 +401,6 @@ describe("promoteSandboxToEnvironment", () => {
 });
 
 describe("wakeSandbox", () => {
-	type Box = { memoryMb: number; vcpus: number };
 	let running: boolean;
 	let onResume: (sandbox: unknown) => Promise<void>;
 	const calls: string[] = [];
@@ -421,8 +446,11 @@ describe("wakeSandbox", () => {
 		SUPERSET_SANDBOX_PROVIDER: "vercel",
 		SUPERSET_BUNDLE_SHA: "a".repeat(64),
 	};
-	async function wake(): Promise<Box[]> {
-		const authorized: Box[] = [];
+	type Resumed = Parameters<
+		NonNullable<Parameters<typeof wakeSandbox>[0]["beforeResume"]>
+	>[0];
+	async function wake(): Promise<Resumed[]> {
+		const authorized: Resumed[] = [];
 		await wakeSandbox({
 			providerSandboxId: "ws-box",
 			claim: { vcpus: 4, identity, networkPolicy: {} } as never,
@@ -516,6 +544,14 @@ describe("topUpSandboxSession", () => {
 	});
 });
 
+describe("keepaliveWindowMs", () => {
+	test("outlives the box's next ping, and never exceeds what a legacy box gets", () => {
+		expect(keepaliveWindowMs(5 * 60_000)).toBe(SESSION_TIMEOUT_MS);
+		expect(keepaliveWindowMs()).toBe(20 * 60_000);
+		expect(keepaliveWindowMs(24 * 60 * 60_000)).toBe(20 * 60_000);
+	});
+});
+
 describe("agentToolsMounts", () => {
 	const detached = () => Promise.resolve({ currentSandboxName: undefined });
 
@@ -538,7 +574,7 @@ describe("agentToolsMounts", () => {
 		const want = {
 			"/opt/agents": {
 				drive: "agent-tools-iad1-0123456789ab",
-				mode: "snapshot",
+				mode: "snapshot" as const,
 			},
 		};
 		expect(
@@ -574,11 +610,13 @@ describe("agentToolsMounts", () => {
 describe("wakeSandbox", () => {
 	const asked: string[] = [];
 	const updates: unknown[] = [];
+	let savedTimeout = SESSION_TIMEOUT_MS;
 	stub(Sandbox, {
 		get: async () => ({
 			status: "stopped",
 			region: "iad1",
 			vcpus: 2,
+			timeout: savedTimeout,
 			mounts: {},
 			domain: () => "https://host.example",
 			update: async (patch: unknown) => {
@@ -617,6 +655,20 @@ describe("wakeSandbox", () => {
 				},
 			},
 		]);
+	});
+
+	test("gives a box created with an older timeout the current one before it resumes", async () => {
+		savedTimeout = HOUR;
+		updates.length = 0;
+		const stop = new Error("stop before resume");
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: { vcpus: 2, identity: {} } as unknown as SandboxClaim,
+				beforeResume: () => Promise.reject(stop),
+			}),
+		).rejects.toBe(stop);
+		expect(updates).toEqual([{ timeout: SESSION_TIMEOUT_MS }]);
 	});
 });
 

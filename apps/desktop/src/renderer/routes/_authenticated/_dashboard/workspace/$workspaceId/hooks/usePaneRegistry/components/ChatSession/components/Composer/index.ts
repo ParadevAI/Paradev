@@ -6,5 +6,6 @@ export {
 	Composer,
 	type ComposerHandle,
 	type ComposerTarget,
+	type SubagentBlock,
 } from "./Composer";
 export { prependToDraft } from "./hooks/useComposerDraft";

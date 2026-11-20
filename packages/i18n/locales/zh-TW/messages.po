@@ -784,6 +784,9 @@ msgstr "{actor} 取消關聯工作區 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 預計約{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} 不允許你傳送訊息給其子代理程式。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "開啟對應工作區時，{agents} 工作階段會恢復。"
 
@@ -1170,8 +1173,17 @@ msgstr "{name} 請求確認"
 msgid "{name} can't be messaged"
 msgstr "無法傳送訊息給 {name}"
 
+msgid "{name} can't take messages now."
+msgstr "{name} 目前無法接收訊息。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} 無法接收訊息。你的文字已放回主聊天。"
+
 msgid "{name} failed"
 msgstr "{name} 失敗"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} 已失敗，無法接收訊息。"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
@@ -1206,6 +1218,9 @@ msgstr "{name} 開始工作"
 msgid "{name} stopped"
 msgstr "{name} 已停止"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} 已停止，無法接收訊息。"
+
 msgid "{name} wants more access"
 msgstr "{name} 要求更多存取權限"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}：每位使用者每月 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每位使用者每月 {monthly}，或按年計費 {yearly}"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} 仍在使用你先前的登入。重新啟動以使用新的登入。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {請至少指定一個人員，或選擇{choice}。} sender {請至少指定一個寄件者，或選擇{choice}。} other {請至少指定一個項目，或選擇{choice}。}}"
@@ -2375,9 +2393,6 @@ msgstr "代理程式指令"
 msgid "Agent Configs"
 msgstr "代理程式配置"
 
-msgid "Agent credentials changed"
-msgstr "代理憑證已變更"
-
 msgid "Agent finished"
 msgstr "代理程式已完成"
 
@@ -3503,6 +3518,9 @@ msgstr "返回"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
+
+msgid "Back to {parentTitle}"
+msgstr "返回 {parentTitle}"
 
 msgid "Back to About"
 msgstr "返回關於頁"
@@ -6814,6 +6832,9 @@ msgstr "定製價格"
 msgid "Custom provider"
 msgstr "自訂提供商"
 
+msgid "Custom range…"
+msgstr "自訂範圍…"
+
 msgid "Custom themes"
 msgstr "自訂主題"
 
@@ -6898,6 +6919,9 @@ msgstr "每月的日期"
 
 msgid "Day One"
 msgstr "元老"
+
+msgid "Days are in Pacific time."
+msgstr "日期以太平洋時間計算。"
 
 msgid "days running three agents at once"
 msgstr "同時執行三個代理程式的天數"
@@ -9643,6 +9667,12 @@ msgstr "返回首頁"
 msgid "Go back to {appName} and sign in again."
 msgstr "請返回 {appName} 並重新登入。"
 
+msgid "Go back to {parentTitle}."
+msgstr "返回 {parentTitle}。"
+
+msgid "Go back to message the main agent."
+msgstr "返回以傳送訊息給主代理程式。"
+
 msgid "Go back to the previous page in history"
 msgstr "返回歷史記錄中的上一頁"
 
@@ -12034,6 +12064,9 @@ msgstr "訊息"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "包含這些字詞的訊息會像提及一樣通知你。請以逗號分隔。"
 
+msgid "Messages you send go to {name}."
+msgstr "你傳送的訊息將送給 {name}。"
+
 msgid "Microphone"
 msgstr "麥克風"
 
@@ -12837,6 +12870,9 @@ msgstr "未找到貢獻者。"
 
 msgid "No credit card required."
 msgstr "無需信用卡。"
+
+msgid "No days available"
+msgstr "沒有可用的日期"
 
 msgid "No description"
 msgstr "無描述"
@@ -14505,11 +14541,6 @@ msgstr "記憶體不足"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "記憶體不足：機器即將沒有回應。{sizeName} 有 {memoryGb} GB 記憶體。"
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "記憶體不足：為了繼續運作，機器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 記憶體。"
 
 msgid "Out of scope"
 msgstr "超出範圍"
@@ -16795,9 +16826,6 @@ msgstr "重新開始導覽"
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新啟動執行中的{providerLabel}代理程式嗎？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "重新啟動執行中的工作區，讓其中的代理程式套用此變更。"
-
 msgid "Restart terminal daemon?"
 msgstr "重啟終端守護程式？"
 
@@ -16806,9 +16834,6 @@ msgstr "重啟終端"
 
 msgid "Restart workspace"
 msgstr "重新啟動工作區"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "重新啟動工作區以套用新的代理憑證。"
 
 msgid "Restarted"
 msgstr "已重新啟動"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "已停止"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "已停止 {0}（{1} GB）以釋放記憶體"
-
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
@@ -20528,6 +20548,9 @@ msgstr "此代理無法分叉對話"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "此代理程式無法在雲端工作區中執行"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "此代理程式不允許你傳送訊息給其子代理程式。"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所選裝置上已不存在這個代理程式（它的代理程式可能被重置過）。在你選擇新的代理程式之前，執行都會失敗。"
@@ -21768,6 +21791,12 @@ msgstr "更新 <0>{key}</0> 的值"
 msgid "Update this host to message subagents"
 msgstr "請更新此主機以傳送訊息給子代理程式"
 
+msgid "Update this host to message subagents."
+msgstr "更新此主機以傳送訊息給子代理程式。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "更新此主機以傳送訊息給子代理程式。你的文字已放回主聊天。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "請更新此主機以將子代理程式移到背景"
 
@@ -22176,6 +22205,9 @@ msgstr "檢視用量"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "正在檢視"
+
+msgid "Viewing subagent {name}"
+msgstr "正在檢視子代理程式 {name}"
 
 msgid "Violence or harassment"
 msgstr "暴力或騷擾"

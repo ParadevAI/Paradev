@@ -219,7 +219,10 @@ export function cloudRouterWith(deps: CloudDeps) {
 						});
 					}
 					const sort =
-						input.sort ?? (input.groupBy === "day" ? null : "gbHours");
+						input.sort ??
+						(input.groupBy === "day" || input.groupBy === "billingDay"
+							? null
+							: "gbHours");
 					const keysetSort =
 						sort === null ? "key" : sort === "gbHours" ? "gbMinutes" : sort;
 					const keyset = readCursor<UsageKeyset>(
@@ -316,7 +319,9 @@ export function cloudRouterWith(deps: CloudDeps) {
 				.output(cloudPeriodsOutputSchema)
 				.query(async ({ ctx, input }) => {
 					const { cloudUsage, anchor } = ctx;
-					if (!cloudUsage || !anchor) return { items: [], nextCursor: null };
+					if (!cloudUsage || !anchor) {
+						return { items: [], nextCursor: null, ratePerGbHour: ctx.rate };
+					}
 					const first = input.cursor
 						? cloudBillingPeriodIndex(anchor, input.cursor)
 						: -1;
@@ -352,6 +357,7 @@ export function cloudRouterWith(deps: CloudDeps) {
 						}),
 						nextCursor:
 							periods.length > input.limit && last ? periodId(last.from) : null,
+						ratePerGbHour: ctx.rate,
 					};
 				}),
 		},

@@ -784,6 +784,9 @@ msgstr "{actor} heeft de koppeling met workspace {workspace} verwijderd"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} tot nu toe · ~{projected} verwacht"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "Met {agentLabel} kun je geen berichten naar subagents sturen."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents}-sessies worden hervat wanneer je hun workspace opent."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} vraagt"
 msgid "{name} can't be messaged"
 msgstr "{name} kan geen berichten ontvangen"
 
+msgid "{name} can't take messages now."
+msgstr "{name} kan nu geen berichten ontvangen."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} kan geen berichten ontvangen. Je tekst staat weer in de hoofdchat."
+
 msgid "{name} failed"
 msgstr "{name} is mislukt"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} is mislukt en kan geen berichten ontvangen."
 
 msgid "{name} finished"
 msgstr "{name} is klaar"
@@ -1206,6 +1218,9 @@ msgstr "{name} is begonnen"
 msgid "{name} stopped"
 msgstr "{name} is gestopt"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} is gestopt en kan geen berichten ontvangen."
+
 msgid "{name} wants more access"
 msgstr "{name} wil meer toegang"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}: {monthly} per gebruiker/maand"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} per gebruiker/maand, of {yearly} bij jaarlijkse facturering"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} gebruikt nog je vorige aanmelding. Herstart om de nieuwe te gebruiken."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Geef minstens één persoon op, of kies {choice}.} sender {Geef minstens één afzender op, of kies {choice}.} other {Geef minstens één item op, of kies {choice}.}}"
@@ -2375,9 +2393,6 @@ msgstr "Agentcommando's"
 msgid "Agent Configs"
 msgstr "Agentconfiguraties"
 
-msgid "Agent credentials changed"
-msgstr "Agentgegevens gewijzigd"
-
 msgid "Agent finished"
 msgstr "Agent klaar"
 
@@ -3503,6 +3518,9 @@ msgstr "Terug"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Terug"
+
+msgid "Back to {parentTitle}"
+msgstr "Terug naar {parentTitle}"
 
 msgid "Back to About"
 msgstr "Terug naar Over ons"
@@ -6814,6 +6832,9 @@ msgstr "Prijs op maat"
 msgid "Custom provider"
 msgstr "Eigen provider"
 
+msgid "Custom range…"
+msgstr "Aangepast bereik…"
+
 msgid "Custom themes"
 msgstr "Eigen thema's"
 
@@ -6898,6 +6919,9 @@ msgstr "Dag van de maand"
 
 msgid "Day One"
 msgstr "Dag één"
+
+msgid "Days are in Pacific time."
+msgstr "Dagen zijn in Pacific-tijd."
 
 msgid "days running three agents at once"
 msgstr "dagen met drie agents tegelijk"
@@ -9643,6 +9667,12 @@ msgstr "Terug naar home"
 msgid "Go back to {appName} and sign in again."
 msgstr "Ga terug naar {appName} en log opnieuw in."
 
+msgid "Go back to {parentTitle}."
+msgstr "Ga terug naar {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Ga terug om de hoofdagent een bericht te sturen."
+
 msgid "Go back to the previous page in history"
 msgstr "Terug naar de vorige pagina in de geschiedenis"
 
@@ -12034,6 +12064,9 @@ msgstr "Berichten"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Berichten met deze woorden geven je een melding zoals een vermelding. Scheid ze met komma's."
 
+msgid "Messages you send go to {name}."
+msgstr "Berichten die je stuurt gaan naar {name}."
+
 msgid "Microphone"
 msgstr "Microfoon"
 
@@ -12837,6 +12870,9 @@ msgstr "Geen contributors gevonden."
 
 msgid "No credit card required."
 msgstr "Geen creditcard nodig."
+
+msgid "No days available"
+msgstr "Geen dagen beschikbaar"
 
 msgid "No description"
 msgstr "Geen beschrijving"
@@ -14505,11 +14541,6 @@ msgstr "Geheugen vol"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Geheugen vol: de machine reageert bijna niet meer. {sizeName} heeft {memoryGb} GB."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Geheugen vol: de machine heeft {0} ({1} GB) gestopt om te blijven draaien. {sizeName} heeft {memoryGb} GB."
 
 msgid "Out of scope"
 msgstr "Buiten scope"
@@ -16795,9 +16826,6 @@ msgstr "Onboarding opnieuw starten"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Draaiende {providerLabel}-agents herstarten?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Herstart draaiende werkruimtes zodat hun agents de wijziging oppikken."
-
 msgid "Restart terminal daemon?"
 msgstr "Terminal-daemon herstarten?"
 
@@ -16806,9 +16834,6 @@ msgstr "Terminals herstarten"
 
 msgid "Restart workspace"
 msgstr "Werkruimte herstarten"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Herstart workspaces om de nieuwe agentgegevens op te pakken."
 
 msgid "Restarted"
 msgstr "Herstart"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Gestopt"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "{0} ({1} GB) gestopt om geheugen vrij te maken"
-
 msgid "Stopped by the usage limit"
 msgstr "Gestopt door de gebruikslimiet"
 
@@ -20528,6 +20548,9 @@ msgstr "Deze agent kan een gesprek niet afsplitsen"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Deze agent kan niet in een cloudwerkruimte draaien"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "Met deze agent kun je geen berichten naar subagents sturen."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Deze agent bestaat niet meer op het gekozen apparaat (de agents zijn mogelijk gereset). Runs mislukken totdat je een nieuwe kiest."
@@ -21768,6 +21791,12 @@ msgstr "Werk de waarde van <0>{key}</0> bij"
 msgid "Update this host to message subagents"
 msgstr "Werk deze host bij om subagents berichten te sturen"
 
+msgid "Update this host to message subagents."
+msgstr "Werk deze host bij om subagents berichten te sturen."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Werk deze host bij om subagents berichten te sturen. Je tekst staat weer in de hoofdchat."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Werk deze host bij om subagents naar de achtergrond te verplaatsen"
 
@@ -22176,6 +22205,9 @@ msgstr "Gebruik bekijken"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Bekeken"
+
+msgid "Viewing subagent {name}"
+msgstr "Je bekijkt subagent {name}"
 
 msgid "Violence or harassment"
 msgstr "Geweld of intimidatie"

@@ -1429,6 +1429,20 @@
       "when": 1795120757281,
       "tag": "0203_cloud_workspace_boot_pending_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1795149908647,
+      "tag": "0204_cloud_billing_day_start",
+      "breakpoints": true
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1795176188571,
+      "tag": "0205_cloud_workspace_boots_open_or_locked_idx",
+      "breakpoints": true
     }
   ]
 }

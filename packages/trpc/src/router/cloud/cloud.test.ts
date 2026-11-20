@@ -149,6 +149,36 @@ describe("scope", () => {
 		});
 	});
 
+	test("billingDay pages Pacific days newest first, one at a time, and day is still the UTC day", async () => {
+		const pages: (string | null)[] = [];
+		let cursor: string | undefined;
+		do {
+			const page = await caller(MAYA).usage.query({
+				range: NOVEMBER,
+				groupBy: "billingDay",
+				limit: 1,
+				cursor,
+			});
+			pages.push(...page.items.map((item) => item.key));
+			cursor = page.nextCursor ?? undefined;
+		} while (cursor);
+		expect(pages).toEqual([...pages].sort().reverse());
+		expect(new Set(pages).size).toBe(pages.length);
+		const byDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "day",
+		});
+		const byBillingDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "billingDay",
+		});
+		expect(byBillingDay.total.gbHours).toBe(byDay.total.gbHours);
+		expect(byBillingDay.total.workspaces).toBeNull();
+		expect(byBillingDay.items[0]?.workspaces).toBeNull();
+		expect(typeof byDay.total.workspaces).toBe("number");
+		expect(byDay.items.map((item) => item.key)).toContain("2026-11-01");
+	});
+
 	test("a workspace in another organization returns nothing", async () => {
 		const usage = await caller(MAYA).usage.query({
 			range: NOVEMBER,
@@ -332,7 +362,7 @@ test("a cursor read with other filters, or made before cursors held them, is BAD
 		{ range: NOVEMBER, groupBy: "workspace", search: "e" },
 		{ range: NOVEMBER, groupBy: "workspace", sort: "hours" },
 		{ range: NOVEMBER, groupBy: "workspace", order: "asc" },
-	] as const) {
+	] satisfies Parameters<typeof owner.usage.query>[0][]) {
 		await expect(
 			owner.usage.query({ ...input, limit: 1, cursor: usageCursor }),
 		).rejects.toMatchObject(notValid);
@@ -474,7 +504,11 @@ test("with billing off there are no periods and no prices", async () => {
 		billingOff: true,
 		listRatePerGbHour: async () => 0.06,
 	});
-	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
+	expect(await owner.periods.list({})).toEqual({
+		items: [],
+		nextCursor: null,
+		ratePerGbHour: null,
+	});
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
@@ -492,7 +526,9 @@ test("the open period's allowance is in dollars at the usage rate, with bought a
 			overageLimit: { type: "absolute", gbMinutes: 6000 },
 		}),
 	});
-	const [open] = (await owner.periods.list({})).items;
+	const { items, ratePerGbHour } = await owner.periods.list({});
+	expect(ratePerGbHour).toBe(0.06);
+	const [open] = items;
 	expect(open?.allowance).toMatchObject({
 		usedUsd: 2.04,
 		includedUsd: 1.2,
@@ -562,9 +598,15 @@ test("a billing value cached before the credit, seat and limit fields says not_r
 		limitReached: null,
 	});
 	expect(open?.unavailable).toEqual(
-		["seats", "bought", "freeCredits", "extraUsageLimit", "limitReached"].map(
-			(field) => ({ field, reason: "not_read" }),
-		),
+		(
+			[
+				"seats",
+				"bought",
+				"freeCredits",
+				"extraUsageLimit",
+				"limitReached",
+			] as const
+		).map((field) => ({ field, reason: "not_read" })),
 	);
 });
 

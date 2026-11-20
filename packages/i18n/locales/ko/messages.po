@@ -784,6 +784,9 @@ msgstr "{actor} 님이 워크스페이스 {workspace}의 연결을 해제했습�
 msgid "{actual} so far · ~{projected} projected"
 msgstr "현재 {actual} · 예상 ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel}에서는 서브 에이전트에게 메시지를 보낼 수 없습니다."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "{agents} 세션은 해당 워크스페이스를 열면 재개됩니다."
 
@@ -1170,8 +1173,17 @@ msgstr "{name}이(가) 요청함"
 msgid "{name} can't be messaged"
 msgstr "{name}에게 메시지를 보낼 수 없습니다"
 
+msgid "{name} can't take messages now."
+msgstr "{name}은(는) 지금 메시지를 받을 수 없습니다."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name}은(는) 메시지를 받을 수 없습니다. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
+
 msgid "{name} failed"
 msgstr "{name} 실패"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name}이(가) 실패하여 메시지를 받을 수 없습니다."
 
 msgid "{name} finished"
 msgstr "{name} 완료"
@@ -1206,6 +1218,9 @@ msgstr "{name} 작업 시작"
 msgid "{name} stopped"
 msgstr "{name} 중지됨"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name}이(가) 중지되어 메시지를 받을 수 없습니다."
+
 msgid "{name} wants more access"
 msgstr "{name}에서 더 많은 접근 권한을 요청합니다"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}: 사용자당 월 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: 사용자당 월 {monthly}, 또는 연간 결제 시 {yearly}"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names}은(는) 아직 이전 로그인을 사용 중입니다. 새 로그인을 사용하려면 다시 시작하세요."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {사람을 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} sender {발신자를 한 명 이상 지정하거나 {choice} 옵션을 선택하세요.} other {항목을 하나 이상 지정하거나 {choice} 옵션을 선택하세요.}}"
@@ -2375,9 +2393,6 @@ msgstr "에이전트 명령"
 msgid "Agent Configs"
 msgstr "에이전트 설정"
 
-msgid "Agent credentials changed"
-msgstr "에이전트 자격 증명이 변경됨"
-
 msgid "Agent finished"
 msgstr "에이전트 완료"
 
@@ -3503,6 +3518,9 @@ msgstr "뒤로"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "뒤로"
+
+msgid "Back to {parentTitle}"
+msgstr "{parentTitle}(으)로 돌아가기"
 
 msgid "Back to About"
 msgstr "소개로 돌아가기"
@@ -6814,6 +6832,9 @@ msgstr "맞춤 가격"
 msgid "Custom provider"
 msgstr "사용자 지정 제공사"
 
+msgid "Custom range…"
+msgstr "사용자 지정 범위…"
+
 msgid "Custom themes"
 msgstr "사용자 지정 테마"
 
@@ -6898,6 +6919,9 @@ msgstr "날짜(일)"
 
 msgid "Day One"
 msgstr "데이 원"
+
+msgid "Days are in Pacific time."
+msgstr "날짜는 태평양 시간 기준입니다."
 
 msgid "days running three agents at once"
 msgstr "에이전트 세 개를 동시에 돌린 일수"
@@ -9643,6 +9667,12 @@ msgstr "홈으로 돌아가기"
 msgid "Go back to {appName} and sign in again."
 msgstr "{appName}(으)로 돌아가서 다시 로그인하세요."
 
+msgid "Go back to {parentTitle}."
+msgstr "{parentTitle}(으)로 돌아가세요."
+
+msgid "Go back to message the main agent."
+msgstr "기본 에이전트에게 메시지를 보내려면 돌아가세요."
+
 msgid "Go back to the previous page in history"
 msgstr "기록에서 이전 페이지로 돌아갑니다"
 
@@ -12034,6 +12064,9 @@ msgstr "메시지"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "이 단어가 포함된 메시지는 멘션처럼 알림을 보냅니다. 쉼표로 구분하세요."
 
+msgid "Messages you send go to {name}."
+msgstr "보내는 메시지는 {name}에게 전달됩니다."
+
 msgid "Microphone"
 msgstr "마이크"
 
@@ -12837,6 +12870,9 @@ msgstr "기여자를 찾을 수 없습니다."
 
 msgid "No credit card required."
 msgstr "신용카드가 필요 없습니다."
+
+msgid "No days available"
+msgstr "사용 가능한 날짜 없음"
 
 msgid "No description"
 msgstr "설명 없음"
@@ -14505,11 +14541,6 @@ msgstr "메모리 부족"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "메모리 부족: 머신이 곧 응답하지 않을 수 있습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "메모리 부족: 머신이 계속 실행되도록 {0}({1} GB)을(를) 중지했습니다. {sizeName}의 메모리는 {memoryGb} GB입니다."
 
 msgid "Out of scope"
 msgstr "범위를 벗어남"
@@ -16795,9 +16826,6 @@ msgstr "온보딩 다시 시작"
 msgid "Restart running {providerLabel} agents?"
 msgstr "실행 중인 {providerLabel} 에이전트를 다시 시작할까요?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "실행 중인 워크스페이스를 재시작하면 에이전트에 변경 사항이 반영됩니다."
-
 msgid "Restart terminal daemon?"
 msgstr "터미널 데몬을 다시 시작할까요?"
 
@@ -16806,9 +16834,6 @@ msgstr "터미널 다시 시작"
 
 msgid "Restart workspace"
 msgstr "워크스페이스 다시 시작"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "새 에이전트 자격 증명을 적용하려면 워크스페이스를 다시 시작하세요."
 
 msgid "Restarted"
 msgstr "다시 시작됨"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "중지됨"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "메모리를 확보하려고 {0}({1} GB)을(를) 중지했습니다"
-
 msgid "Stopped by the usage limit"
 msgstr "사용량 한도로 중단됨"
 
@@ -20528,6 +20548,9 @@ msgstr "이 에이전트는 대화를 분기할 수 없습니다"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "이 에이전트는 클라우드 워크스페이스에서 실행할 수 없습니다"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "이 에이전트에서는 서브 에이전트에게 메시지를 보낼 수 없습니다."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "이 에이전트는 선택한 기기에 더 이상 존재하지 않습니다 (에이전트가 초기화되었을 수 있습니다). 새 에이전트를 선택할 때까지 실행이 실패합니다."
@@ -21768,6 +21791,12 @@ msgstr "<0>{key}</0>의 값 업데이트"
 msgid "Update this host to message subagents"
 msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요"
 
+msgid "Update this host to message subagents."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "서브 에이전트에게 메시지를 보내려면 이 호스트를 업데이트하세요. 입력한 텍스트는 기본 채팅으로 돌아갔습니다."
+
 msgid "Update this host to move subagents to the background"
 msgstr "서브 에이전트를 백그라운드로 옮기려면 이 호스트를 업데이트하세요"
 
@@ -22176,6 +22205,9 @@ msgstr "사용량 보기"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "보는 중"
+
+msgid "Viewing subagent {name}"
+msgstr "서브 에이전트 {name} 보는 중"
 
 msgid "Violence or harassment"
 msgstr "폭력 또는 괴롭힘"

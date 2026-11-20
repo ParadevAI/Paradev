@@ -784,6 +784,9 @@ msgstr "{actor} отвязал(а) рабочее пространство {work
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} на данный момент · прогноз ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} не позволяет отправлять сообщения своим субагентам."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Сеансы {agents} возобновятся, когда вы откроете их рабочее пространство."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} спрашивает"
 msgid "{name} can't be messaged"
 msgstr "{name} не может получать сообщения"
 
+msgid "{name} can't take messages now."
+msgstr "{name} сейчас не может получать сообщения."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} не может получать сообщения. Ваш текст снова в основном чате."
+
 msgid "{name} failed"
 msgstr "{name}: ошибка"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} завершился с ошибкой и не может получать сообщения."
 
 msgid "{name} finished"
 msgstr "{name} завершил работу"
@@ -1206,6 +1218,9 @@ msgstr "{name} начал работу"
 msgid "{name} stopped"
 msgstr "{name} остановлен"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} остановлен и не может получать сообщения."
+
 msgid "{name} wants more access"
 msgstr "{name} запрашивает больше доступа"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}: {monthly} за пользователя в месяц"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} за пользователя в месяц или {yearly} при оплате за год"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} всё ещё использует ваш предыдущий вход. Перезапустите, чтобы использовать новый."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Укажите хотя бы одного человека или выберите {choice}.} sender {Укажите хотя бы одного отправителя или выберите {choice}.} other {Укажите хотя бы одно значение или выберите {choice}.}}"
@@ -2375,9 +2393,6 @@ msgstr "Команды агентов"
 msgid "Agent Configs"
 msgstr "Конфигурации агентов"
 
-msgid "Agent credentials changed"
-msgstr "Учётные данные агента изменились"
-
 msgid "Agent finished"
 msgstr "Агент завершил"
 
@@ -3503,6 +3518,9 @@ msgstr "Назад"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Назад"
+
+msgid "Back to {parentTitle}"
+msgstr "Вернуться к {parentTitle}"
 
 msgid "Back to About"
 msgstr "К разделу «О нас»"
@@ -6814,6 +6832,9 @@ msgstr "Цена по договорённости"
 msgid "Custom provider"
 msgstr "Свой провайдер"
 
+msgid "Custom range…"
+msgstr "Свой диапазон…"
+
 msgid "Custom themes"
 msgstr "Свои темы"
 
@@ -6898,6 +6919,9 @@ msgstr "День месяца"
 
 msgid "Day One"
 msgstr "Первый день"
+
+msgid "Days are in Pacific time."
+msgstr "Дни указаны по тихоокеанскому времени."
 
 msgid "days running three agents at once"
 msgstr "дней с тремя агентами одновременно"
@@ -9643,6 +9667,12 @@ msgstr "Вернуться на главную"
 msgid "Go back to {appName} and sign in again."
 msgstr "Вернитесь в {appName} и войдите снова."
 
+msgid "Go back to {parentTitle}."
+msgstr "Вернитесь к {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Вернитесь, чтобы написать основному агенту."
+
 msgid "Go back to the previous page in history"
 msgstr "Вернуться на предыдущую страницу в истории"
 
@@ -12034,6 +12064,9 @@ msgstr "Сообщения"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Сообщения с этими словами уведомляют вас как упоминание. Разделяйте их запятыми."
 
+msgid "Messages you send go to {name}."
+msgstr "Ваши сообщения получит {name}."
+
 msgid "Microphone"
 msgstr "Микрофон"
 
@@ -12837,6 +12870,9 @@ msgstr "Контрибьюторы не найдены."
 
 msgid "No credit card required."
 msgstr "Карта не нужна."
+
+msgid "No days available"
+msgstr "Нет доступных дней"
 
 msgid "No description"
 msgstr "Без описания"
@@ -14505,11 +14541,6 @@ msgstr "Нехватка памяти"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Нехватка памяти: машина вот-вот перестанет отвечать. У {sizeName} {memoryGb} ГБ."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Нехватка памяти: машина остановила {0} ({1} ГБ), чтобы продолжить работу. У {sizeName} {memoryGb} ГБ."
 
 msgid "Out of scope"
 msgstr "Вне рамок"
@@ -16795,9 +16826,6 @@ msgstr "Пройти онбординг заново"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Перезапустить работающих агентов {providerLabel}?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Перезапустите работающие рабочие области, чтобы их агенты применили изменение."
-
 msgid "Restart terminal daemon?"
 msgstr "Перезапустить демон терминала?"
 
@@ -16806,9 +16834,6 @@ msgstr "Перезапустить терминалы"
 
 msgid "Restart workspace"
 msgstr "Перезапустить рабочую область"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Перезапустите рабочие пространства, чтобы применить новые учётные данные агента."
 
 msgid "Restarted"
 msgstr "Перезапущено"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Остановлена"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Остановлен {0} ({1} ГБ), чтобы освободить память"
-
 msgid "Stopped by the usage limit"
 msgstr "Остановлено лимитом использования"
 
@@ -20528,6 +20548,9 @@ msgstr "Этот агент не может ответвить разговор"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Этот агент не может работать в облачной рабочей области"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "Этот агент не позволяет отправлять сообщения своим субагентам."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Этого агента больше нет на выбранном устройстве (возможно, его агенты были сброшены). Запуски будут падать, пока не выберете нового."
@@ -21768,6 +21791,12 @@ msgstr "Обновите значение <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Обновите этот хост, чтобы писать субагентам"
 
+msgid "Update this host to message subagents."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Обновите этот хост, чтобы отправлять сообщения субагентам. Ваш текст снова в основном чате."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Обновите этот хост, чтобы переводить субагентов в фон"
 
@@ -22176,6 +22205,9 @@ msgstr "Посмотреть использование"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Открыт"
+
+msgid "Viewing subagent {name}"
+msgstr "Просмотр субагента {name}"
 
 msgid "Violence or harassment"
 msgstr "Насилие или травля"

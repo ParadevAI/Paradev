@@ -784,6 +784,9 @@ msgstr "{actor} 取消关联工作区 {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "目前{actual} · 预计约{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} 不允许你向其子智能体发送消息。"
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "打开对应工作区时，{agents} 会话会恢复。"
 
@@ -1170,8 +1173,17 @@ msgstr "{name} 请求确认"
 msgid "{name} can't be messaged"
 msgstr "无法向 {name} 发送消息"
 
+msgid "{name} can't take messages now."
+msgstr "{name} 目前无法接收消息。"
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} 无法接收消息。你的文本已放回主聊天。"
+
 msgid "{name} failed"
 msgstr "{name} 失败"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} 已失败，无法接收消息。"
 
 msgid "{name} finished"
 msgstr "{name} 已完成"
@@ -1206,6 +1218,9 @@ msgstr "{name} 开始工作"
 msgid "{name} stopped"
 msgstr "{name} 已停止"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} 已停止，无法接收消息。"
+
 msgid "{name} wants more access"
 msgstr "{name} 请求更多访问权限"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}：每用户每月 {monthly}"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}：每用户每月 {monthly}，或按年计费 {yearly}"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} 仍在使用你之前的登录。重启以使用新的登录。"
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {请至少指定一个人员，或选择{choice}。} sender {请至少指定一个发件人，或选择{choice}。} other {请至少指定一个条目，或选择{choice}。}}"
@@ -2375,9 +2393,6 @@ msgstr "智能体命令"
 msgid "Agent Configs"
 msgstr "智能体配置"
 
-msgid "Agent credentials changed"
-msgstr "智能体凭据已更改"
-
 msgid "Agent finished"
 msgstr "智能体已完成"
 
@@ -3503,6 +3518,9 @@ msgstr "返回"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "返回"
+
+msgid "Back to {parentTitle}"
+msgstr "返回 {parentTitle}"
 
 msgid "Back to About"
 msgstr "返回关于页"
@@ -6814,6 +6832,9 @@ msgstr "定制价格"
 msgid "Custom provider"
 msgstr "自定义提供商"
 
+msgid "Custom range…"
+msgstr "自定义范围…"
+
 msgid "Custom themes"
 msgstr "自定义主题"
 
@@ -6898,6 +6919,9 @@ msgstr "每月的日期"
 
 msgid "Day One"
 msgstr "元老"
+
+msgid "Days are in Pacific time."
+msgstr "日期按太平洋时间计算。"
 
 msgid "days running three agents at once"
 msgstr "同时运行三个智能体的天数"
@@ -9643,6 +9667,12 @@ msgstr "返回首页"
 msgid "Go back to {appName} and sign in again."
 msgstr "请返回 {appName} 并重新登录。"
 
+msgid "Go back to {parentTitle}."
+msgstr "返回 {parentTitle}。"
+
+msgid "Go back to message the main agent."
+msgstr "返回以向主智能体发送消息。"
+
 msgid "Go back to the previous page in history"
 msgstr "返回历史记录中的上一页"
 
@@ -12034,6 +12064,9 @@ msgstr "消息"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "包含这些词的消息会像提及一样通知你。用逗号分隔。"
 
+msgid "Messages you send go to {name}."
+msgstr "你发送的消息将发给 {name}。"
+
 msgid "Microphone"
 msgstr "麦克风"
 
@@ -12837,6 +12870,9 @@ msgstr "未找到贡献者。"
 
 msgid "No credit card required."
 msgstr "无需信用卡。"
+
+msgid "No days available"
+msgstr "没有可用的日期"
 
 msgid "No description"
 msgstr "无描述"
@@ -14505,11 +14541,6 @@ msgstr "内存不足"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "内存不足：机器即将无响应。{sizeName} 有 {memoryGb} GB 内存。"
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "内存不足：为保持运行，机器已停止 {0}（{1} GB）。{sizeName} 有 {memoryGb} GB 内存。"
 
 msgid "Out of scope"
 msgstr "超出范围"
@@ -16795,9 +16826,6 @@ msgstr "重新开始引导"
 msgid "Restart running {providerLabel} agents?"
 msgstr "要重新启动运行中的{providerLabel}智能体吗？"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "重启正在运行的工作区，让其中的智能体应用此更改。"
-
 msgid "Restart terminal daemon?"
 msgstr "重启终端守护进程？"
 
@@ -16806,9 +16834,6 @@ msgstr "重启终端"
 
 msgid "Restart workspace"
 msgstr "重启工作区"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "重启工作区以使用新的代理凭据。"
 
 msgid "Restarted"
 msgstr "已重启"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "已停止"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "已停止 {0}（{1} GB）以释放内存"
-
 msgid "Stopped by the usage limit"
 msgstr "因使用上限而停止"
 
@@ -20528,6 +20548,9 @@ msgstr "该智能体无法分叉对话"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "此智能体无法在云端工作区中运行"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "此智能体不允许你向其子智能体发送消息。"
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "所选设备上已不存在这个智能体（它的智能体可能被重置过）。在你选择新的智能体之前，运行都会失败。"
@@ -21768,6 +21791,12 @@ msgstr "更新 <0>{key}</0> 的值"
 msgid "Update this host to message subagents"
 msgstr "请更新此主机以向子智能体发送消息"
 
+msgid "Update this host to message subagents."
+msgstr "更新此主机以向子智能体发送消息。"
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "更新此主机以向子智能体发送消息。你的文本已放回主聊天。"
+
 msgid "Update this host to move subagents to the background"
 msgstr "请更新此主机以将子智能体移到后台"
 
@@ -22176,6 +22205,9 @@ msgstr "查看用量"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "正在查看"
+
+msgid "Viewing subagent {name}"
+msgstr "正在查看子智能体 {name}"
 
 msgid "Violence or harassment"
 msgstr "暴力或骚扰"

@@ -784,6 +784,9 @@ msgstr "{actor} đã hủy liên kết không gian làm việc {workspace}"
 msgid "{actual} so far · ~{projected} projected"
 msgstr "{actual} đến hiện tại · dự kiến ~{projected}"
 
+msgid "{agentLabel} doesn't let you message its subagents."
+msgstr "{agentLabel} không cho phép bạn nhắn tin cho các agent con của nó."
+
 msgid "{agents} sessions resume when you open their workspace."
 msgstr "Các phiên {agents} sẽ tiếp tục khi bạn mở workspace của chúng."
 
@@ -1170,8 +1173,17 @@ msgstr "{name} hỏi"
 msgid "{name} can't be messaged"
 msgstr "Không thể nhắn tin cho {name}"
 
+msgid "{name} can't take messages now."
+msgstr "{name} hiện không thể nhận tin nhắn."
+
+msgid "{name} can't take messages. Your text is back in the main chat."
+msgstr "{name} không thể nhận tin nhắn. Văn bản của bạn đã quay lại cuộc trò chuyện chính."
+
 msgid "{name} failed"
 msgstr "{name} đã thất bại"
+
+msgid "{name} failed and can't take messages."
+msgstr "{name} đã thất bại và không thể nhận tin nhắn."
 
 msgid "{name} finished"
 msgstr "{name} đã xong"
@@ -1206,6 +1218,9 @@ msgstr "{name} đã bắt đầu làm việc"
 msgid "{name} stopped"
 msgstr "{name} đã dừng"
 
+msgid "{name} stopped and can't take messages."
+msgstr "{name} đã dừng và không thể nhận tin nhắn."
+
 msgid "{name} wants more access"
 msgstr "{name} muốn có thêm quyền truy cập"
 
@@ -1217,6 +1232,9 @@ msgstr "{name}: {monthly} mỗi người dùng/tháng"
 
 msgid "{name}: {monthly} per user/month, or {yearly} billed yearly"
 msgstr "{name}: {monthly} mỗi người dùng/tháng, hoặc {yearly} khi thanh toán theo năm"
+
+msgid "{names} still uses your previous sign-in. Restart to use the new one."
+msgstr "{names} vẫn dùng thông tin đăng nhập trước đây của bạn. Hãy khởi động lại để dùng thông tin mới."
 
 msgid "{noun, select, person {Specify at least one person, or choose {choice}.} sender {Specify at least one sender, or choose {choice}.} other {Specify at least one entry, or choose {choice}.}}"
 msgstr "{noun, select, person {Hãy chỉ định ít nhất một người, hoặc chọn {choice}.} sender {Hãy chỉ định ít nhất một người gửi, hoặc chọn {choice}.} other {Hãy chỉ định ít nhất một mục, hoặc chọn {choice}.}}"
@@ -2375,9 +2393,6 @@ msgstr "Lệnh của agent"
 msgid "Agent Configs"
 msgstr "Cấu hình agent"
 
-msgid "Agent credentials changed"
-msgstr "Thông tin xác thực của agent đã thay đổi"
-
 msgid "Agent finished"
 msgstr "Agent đã xong"
 
@@ -3503,6 +3518,9 @@ msgstr "Quay lại"
 msgctxt "Android back button"
 msgid "Back"
 msgstr "Quay lại"
+
+msgid "Back to {parentTitle}"
+msgstr "Quay lại {parentTitle}"
 
 msgid "Back to About"
 msgstr "Quay lại Giới thiệu"
@@ -6814,6 +6832,9 @@ msgstr "Giá tùy chỉnh"
 msgid "Custom provider"
 msgstr "Nhà cung cấp tùy chỉnh"
 
+msgid "Custom range…"
+msgstr "Phạm vi tùy chỉnh…"
+
 msgid "Custom themes"
 msgstr "Theme tùy chỉnh"
 
@@ -6898,6 +6919,9 @@ msgstr "Ngày trong tháng"
 
 msgid "Day One"
 msgstr "Ngày đầu"
+
+msgid "Days are in Pacific time."
+msgstr "Ngày được tính theo giờ Thái Bình Dương."
 
 msgid "days running three agents at once"
 msgstr "số ngày chạy ba agent cùng lúc"
@@ -9643,6 +9667,12 @@ msgstr "Quay về trang chủ"
 msgid "Go back to {appName} and sign in again."
 msgstr "Quay lại {appName} và đăng nhập lại."
 
+msgid "Go back to {parentTitle}."
+msgstr "Quay lại {parentTitle}."
+
+msgid "Go back to message the main agent."
+msgstr "Quay lại để nhắn tin cho agent chính."
+
 msgid "Go back to the previous page in history"
 msgstr "Quay lại trang trước trong lịch sử"
 
@@ -12034,6 +12064,9 @@ msgstr "Tin nhắn"
 msgid "Messages with these words notify you like a mention. Separate them with commas."
 msgstr "Tin nhắn chứa các từ này sẽ thông báo cho bạn như khi được nhắc. Phân tách bằng dấu phẩy."
 
+msgid "Messages you send go to {name}."
+msgstr "Tin nhắn bạn gửi sẽ đến {name}."
+
 msgid "Microphone"
 msgstr "Micrô"
 
@@ -12837,6 +12870,9 @@ msgstr "Không tìm thấy người đóng góp nào."
 
 msgid "No credit card required."
 msgstr "Không cần thẻ tín dụng."
+
+msgid "No days available"
+msgstr "Không có ngày nào"
 
 msgid "No description"
 msgstr "Không có mô tả"
@@ -14505,11 +14541,6 @@ msgstr "Hết bộ nhớ"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Hết bộ nhớ: máy sắp ngừng phản hồi. {sizeName} có {memoryGb} GB."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Hết bộ nhớ: máy đã dừng {0} ({1} GB) để tiếp tục chạy. {sizeName} có {memoryGb} GB."
 
 msgid "Out of scope"
 msgstr "Ngoài phạm vi"
@@ -16795,9 +16826,6 @@ msgstr "Bắt đầu lại phần hướng dẫn"
 msgid "Restart running {providerLabel} agents?"
 msgstr "Khởi động lại các agent {providerLabel} đang chạy?"
 
-msgid "Restart running workspaces so their agents pick up the change."
-msgstr "Hãy khởi động lại các không gian làm việc đang chạy để agent áp dụng thay đổi."
-
 msgid "Restart terminal daemon?"
 msgstr "Khởi động lại daemon terminal?"
 
@@ -16806,9 +16834,6 @@ msgstr "Khởi động lại terminal"
 
 msgid "Restart workspace"
 msgstr "Khởi động lại workspace"
-
-msgid "Restart workspaces to pick up new agent credentials."
-msgstr "Khởi động lại workspace để áp dụng thông tin xác thực mới của agent."
 
 msgid "Restarted"
 msgstr "Đã khởi động lại"
@@ -19384,11 +19409,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Đã dừng"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Đã dừng {0} ({1} GB) để giải phóng bộ nhớ"
-
 msgid "Stopped by the usage limit"
 msgstr "Đã dừng do giới hạn sử dụng"
 
@@ -20528,6 +20548,9 @@ msgstr "Tác nhân này không thể tạo nhánh hội thoại"
 
 msgid "This agent can't run in a cloud workspace"
 msgstr "Agent này không thể chạy trong workspace cloud"
+
+msgid "This agent doesn't let you message its subagents."
+msgstr "Agent này không cho phép bạn nhắn tin cho các agent con của nó."
 
 msgid "This agent no longer exists on the selected device (its agents may have been reset). Runs will fail until you pick a new one."
 msgstr "Agent này không còn tồn tại trên thiết bị đã chọn (agent trên đó có thể đã bị đặt lại). Các lần chạy sẽ thất bại cho đến khi bạn chọn agent khác."
@@ -21768,6 +21791,12 @@ msgstr "Cập nhật giá trị cho <0>{key}</0>"
 msgid "Update this host to message subagents"
 msgstr "Cập nhật máy chủ này để nhắn tin cho agent con"
 
+msgid "Update this host to message subagents."
+msgstr "Cập nhật host này để nhắn tin cho agent con."
+
+msgid "Update this host to message subagents. Your text is back in the main chat."
+msgstr "Cập nhật host này để nhắn tin cho agent con. Văn bản của bạn đã quay lại cuộc trò chuyện chính."
+
 msgid "Update this host to move subagents to the background"
 msgstr "Cập nhật máy chủ này để chuyển agent con sang chạy nền"
 
@@ -22176,6 +22205,9 @@ msgstr "Xem mức sử dụng"
 msgctxt "stack layer"
 msgid "Viewing"
 msgstr "Đang xem"
+
+msgid "Viewing subagent {name}"
+msgstr "Đang xem agent con {name}"
 
 msgid "Violence or harassment"
 msgstr "Bạo lực hoặc quấy rối"

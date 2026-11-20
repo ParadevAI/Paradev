@@ -234,9 +234,9 @@ firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran.
 
 An hourly QStash job (`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`)
-renews every session near expiry, also with no box running, and re-applies
-the rules on the running boxes of every sign-in saved in the last three
-hours. Not yet verified on a real box. Only a refusal that names a dead
+renews every session near expiry, also with no box running. Each renewal
+queues a re-apply of the claim on that person's awake boxes. Not yet verified
+on a real box. Only a refusal that names a dead
 session (`refresh_token_expired`, `refresh_token_reused`,
 `refresh_token_invalidated`, `invalid_grant`) removes the sign-in; any other
 failure keeps it and goes to Sentry, tagged `chatgpt_refresh_code`. **Open:** Codex in the box cannot recover
@@ -248,7 +248,7 @@ model credential. Some teams run their own script that rotates Claude or Codex l
 placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
 `~/.claude/.credentials.json` in Claude Code. A Manual row (`agent_credentials.provider =
 "manual"`, no secret) makes `resolveAgentSignIns` skip that agent, so create, wake and the
-credential-refresh timer hand the box no variable, firewall rule or login file for it. The box
+every claim re-apply hand the box no variable, firewall rule or login file for it. The box
 reaches the provider through the `"*"` catch-all with whatever the script wrote. **Open:** a
 `~/.codex/auth.json` of placeholders written by an earlier ChatGPT sign-in stays on the box until
 the script replaces it; the auth-failure card knows about Manual only in the viewer's own box.
@@ -745,7 +745,7 @@ why `cloudWorkspace.setMachineSize` restarts a running box, and why
 `describeSandbox` reports the session's vCPUs.
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
+(`SESSION_TIMEOUT_MS`, fifteen minutes, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
@@ -753,9 +753,13 @@ the idle stop must not fire on a workspace someone is using — which is what
 the open workspace's `wake` on every token refresh is for — nor under an
 agent that is still working. For that the box itself asks: on agent activity
 (any hook event from a terminal agent or one of its subagents, any item of a
-chat turn), at most every fifteen minutes, `sandbox-keepalive` in host-service
-calls `sandbox.keepalive`, and the API tops the session up to a full timeout
-(`topUpSandboxSession`). The box then stops a
+chat turn), at most every five minutes, `sandbox-keepalive` in host-service
+calls `sandbox.keepalive` with that interval, and the API tops the session up
+past the next ping (`topUpSandboxSession`, `keepaliveWindowMs`): a full
+timeout for a box that pings every five minutes, twenty minutes for a bundle
+that does not send the interval and pings every fifteen. The timeout is saved
+on the sandbox at create and reused on every resume, so `wakeSandbox` resets
+it on a stopped box made with an older one. The box then stops a
 session timeout after its agent last did anything. An agent waiting on a
 permission prompt, a hung one, and a background shell or dev server left
 running after the turn all count as idle. A single tool call that runs longer
@@ -798,7 +802,7 @@ get a full handle (`getSandboxToWake` in `vercel.ts`). Every other caller gets
 `getSandbox`, typed to the members that cannot resume (`stop`, `update`,
 `delete`, `listSessions`, `currentSession()` and reads), and acts on a running
 box through the session, whose calls answer 410 or 422 on a stopped one
-instead. Top-up and the credential refresh treat that answer as "not
+instead. Top-up and a claim re-apply treat that answer as "not
 running"; promote builds a stopped source's golden from the snapshot its
 stop took (measured: a create from that automatic snapshot has the stopped
 box's files). An HTTP request to a stopped box's port does not resume it
@@ -828,6 +832,22 @@ unless overridden. Both Blaxel limitations — routing fixed at creation, forks
 unable to have the proxy at all — are gone, which is why every sandbox now
 brokers its model credentials at the firewall. A custom policy denies everything it doesn't
 list: the `"*": []` catch-all is what keeps npm, git and the rest reachable.
+
+**A firewall rule binds to a connection when it opens.** A policy update
+reaches the next connection, not the ones already open: a running agent keeps
+the value it connected with. Measured 2026-11-19 on a real box (Claude Code
+2.1.280, Codex 0.162.1). Codex opened a new connection per request and used a
+new value on its next request. Claude Code kept about seven connections to
+Anthropic and used the old value until they closed, about 5 min after its last
+request, and longer while it stayed busy. So a disconnect does not stop a busy
+Claude at once: it keeps working on the open connections for up to about 5 min
+idle. The secret still never enters the box. We accept that; only a restart
+cuts it off at once. A change of credential *kind* (an API key to a
+subscription, an API key to ChatGPT) needs a restart of that agent: each CLI
+fixes the variable, provider and login file it reads at start, and ignores
+rewritten files. The API pushes the claim to awake boxes when something in it
+changes or a token in it nears expiry (`lib/sandbox/reapply-rules.ts`), and
+asks for a restart only for an agent whose kind changed.
 
 **A fork copies the source's config; every field we pass is an override.**
 Resources, timeout, ports, tags, network policy, persistence and env are all

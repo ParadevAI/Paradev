@@ -51,12 +51,20 @@ const callerFor = (userId: string) =>
 
 const caller = callerFor(USER);
 
-/** id of each page, keyed by the label the test refers to it by. */
-const pageIds: Record<string, string> = {};
-const threadIds: Record<string, string> = {};
+const seeded = (label: string) => ({
+	label,
+	pageId: crypto.randomUUID(),
+	threadId: crypto.randomUUID(),
+});
+const shared = seeded("shared");
+const mine = seeded("mine");
+const theirs = seeded("theirs");
+const linked = seeded("linked");
+const resolved = seeded("resolved");
+const activated = seeded("activated");
 
 async function seedPage(
-	label: string,
+	{ label, pageId, threadId }: ReturnType<typeof seeded>,
 	{
 		visibility,
 		owner,
@@ -70,6 +78,7 @@ async function seedPage(
 	const [page] = await db
 		.insert(pages)
 		.values({
+			id: pageId,
 			slug: `comment-sweep-${suffix}-${label}`,
 			organizationId: ORG,
 			createdByUserId: owner,
@@ -78,7 +87,6 @@ async function seedPage(
 		})
 		.returning({ id: pages.id });
 	if (!page) throw new Error("failed to insert page");
-	pageIds[label] = page.id;
 
 	const [version] = await db
 		.insert(pageVersions)
@@ -105,6 +113,7 @@ async function seedPage(
 	const [thread] = await db
 		.insert(pageCommentThreads)
 		.values({
+			id: threadId,
 			pageId: page.id,
 			pageVersionId: version.id,
 			anchorKind: "page",
@@ -115,7 +124,6 @@ async function seedPage(
 		})
 		.returning({ id: pageCommentThreads.id });
 	if (!thread) throw new Error("failed to insert thread");
-	threadIds[label] = thread.id;
 
 	await db.insert(pageComments).values({
 		threadId: thread.id,
@@ -162,16 +170,16 @@ beforeAll(async () => {
 		},
 	]);
 
-	await seedPage("shared", { visibility: "org", owner: OTHER_USER });
-	await seedPage("mine", { visibility: "just_me", owner: USER });
-	await seedPage("theirs", { visibility: "just_me", owner: OTHER_USER });
-	await seedPage("linked", {
+	await seedPage(shared, { visibility: "org", owner: OTHER_USER });
+	await seedPage(mine, { visibility: "just_me", owner: USER });
+	await seedPage(theirs, { visibility: "just_me", owner: OTHER_USER });
+	await seedPage(linked, {
 		visibility: "org",
 		owner: USER,
 		inWorkspace: true,
 	});
-	await seedPage("resolved", { visibility: "org", owner: USER });
-	await seedPage("activated", { visibility: "org", owner: USER });
+	await seedPage(resolved, { visibility: "org", owner: USER });
+	await seedPage(activated, { visibility: "org", owner: USER });
 });
 
 afterAll(async () => {
@@ -188,9 +196,9 @@ describe("pageComment.listForOrganization", () => {
 		const threads = await caller.pageComment.listForOrganization({});
 		const ids = threads.map((thread) => thread.id);
 
-		expect(ids).toContain(threadIds.shared);
-		expect(ids).toContain(threadIds.mine);
-		expect(ids).toContain(threadIds.linked);
+		expect(ids).toContain(shared.threadId);
+		expect(ids).toContain(mine.threadId);
+		expect(ids).toContain(linked.threadId);
 	});
 
 	test("applies the same visibility rule page.list does", async () => {
@@ -198,28 +206,28 @@ describe("pageComment.listForOrganization", () => {
 		const ids = threads.map((thread) => thread.id);
 
 		// A colleague's `just_me` page is unreadable, so its thread is not listed.
-		expect(ids).not.toContain(threadIds.theirs);
+		expect(ids).not.toContain(theirs.threadId);
 		// ...and it is listed for the person who owns it.
-		const theirs = await callerFor(OTHER_USER).pageComment.listForOrganization(
-			{},
-		);
-		expect(theirs.map((thread) => thread.id)).toContain(threadIds.theirs);
+		const ownersThreads = await callerFor(
+			OTHER_USER,
+		).pageComment.listForOrganization({});
+		expect(ownersThreads.map((thread) => thread.id)).toContain(theirs.threadId);
 	});
 
 	test("names the page each thread belongs to, so a sweep can be grouped", async () => {
 		const threads = await caller.pageComment.listForOrganization({});
-		const shared = threads.find((thread) => thread.id === threadIds.shared);
+		const found = threads.find((thread) => thread.id === shared.threadId);
 
-		expect(shared?.pageTitle).toBe("Page shared");
-		expect(shared?.pageSlug).toBe(`comment-sweep-${suffix}-shared`);
-		expect(shared?.pageId).toBe(pageIds.shared);
+		expect(found?.pageTitle).toBe("Page shared");
+		expect(found?.pageSlug).toBe(`comment-sweep-${suffix}-shared`);
+		expect(found?.pageId).toBe(shared.pageId);
 	});
 
 	test("carries the comments, not just the threads", async () => {
 		const threads = await caller.pageComment.listForOrganization({});
-		const shared = threads.find((thread) => thread.id === threadIds.shared);
+		const found = threads.find((thread) => thread.id === shared.threadId);
 
-		expect(shared?.comments.map((comment) => comment.body)).toEqual([
+		expect(found?.comments.map((comment) => comment.body)).toEqual([
 			"comment on shared",
 		]);
 	});
@@ -229,7 +237,7 @@ describe("pageComment.listForOrganization", () => {
 			workspaceId: WORKSPACE,
 		});
 
-		expect(threads.map((thread) => thread.id)).toEqual([threadIds.linked]);
+		expect(threads.map((thread) => thread.id)).toEqual([linked.threadId]);
 	});
 
 	test("narrows to unresolved threads", async () => {
@@ -238,8 +246,8 @@ describe("pageComment.listForOrganization", () => {
 		});
 		const ids = threads.map((thread) => thread.id);
 
-		expect(ids).not.toContain(threadIds.resolved);
-		expect(ids).toContain(threadIds.shared);
+		expect(ids).not.toContain(resolved.threadId);
+		expect(ids).toContain(shared.threadId);
 	});
 
 	test("narrows to the threads an agent was activated on", async () => {
@@ -247,7 +255,7 @@ describe("pageComment.listForOrganization", () => {
 			activatedOnly: true,
 		});
 
-		expect(threads.map((thread) => thread.id)).toEqual([threadIds.activated]);
+		expect(threads.map((thread) => thread.id)).toEqual([activated.threadId]);
 	});
 
 	test("orders oldest first, the way the per-page list did", async () => {
