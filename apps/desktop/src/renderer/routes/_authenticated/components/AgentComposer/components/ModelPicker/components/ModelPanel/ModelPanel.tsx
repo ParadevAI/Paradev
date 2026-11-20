@@ -209,6 +209,7 @@ export function ModelPanel({
 		if (next === tab) return;
 		setTab(next);
 		setShowAllModels(false);
+		listRef.current?.scrollTo({ top: 0 });
 		setProvider("");
 		setQuery("");
 	};

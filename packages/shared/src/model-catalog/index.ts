@@ -47,26 +47,27 @@ export function filterModelCatalog(
 ): CatalogModel[] {
 	const query = filters.query?.trim().toLowerCase();
 	return models.filter((model) => {
-		if (model.id === filters.selectedId) return true;
-		if (filters.hiddenIds?.includes(model.id)) return false;
 		const metadata = model.metadata;
-		if (
-			filters.providers?.length &&
-			(!metadata || !filters.providers.includes(metadata.provider))
-		)
-			return false;
-		if (filters.requireTools && metadata?.toolCall === false) return false;
-		if (
-			filters.requireTextOutput &&
-			metadata?.outputModalities &&
-			!metadata.outputModalities.includes("text")
-		)
-			return false;
-		if (
-			filters.includeDeprecated === false &&
-			metadata?.status === "deprecated"
-		)
-			return false;
+		if (model.id !== filters.selectedId) {
+			if (filters.hiddenIds?.includes(model.id)) return false;
+			if (
+				filters.providers?.length &&
+				(!metadata || !filters.providers.includes(metadata.provider))
+			)
+				return false;
+			if (filters.requireTools && metadata?.toolCall === false) return false;
+			if (
+				filters.requireTextOutput &&
+				metadata?.outputModalities &&
+				!metadata.outputModalities.includes("text")
+			)
+				return false;
+			if (
+				filters.includeDeprecated === false &&
+				metadata?.status === "deprecated"
+			)
+				return false;
+		}
 		return (
 			!query ||
 			`${model.id} ${model.label} ${metadata?.provider ?? ""}`

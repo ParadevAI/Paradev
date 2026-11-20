@@ -639,7 +639,7 @@ export function NewWorkspaceScreen({
 		? getAgentModelSupport(selectedPresetId)
 		: undefined;
 	const discovered = catalogs[selectedAgent];
-	const modelSupport =
+	const knownSupport =
 		discovered &&
 		(discovered.models.length > 0 || discovered.availability === "reported")
 			? {
@@ -650,7 +650,25 @@ export function NewWorkspaceScreen({
 			: bundledSupport;
 	const { selectedModel, setSelectedModel } = useAgentModelPreference(
 		MODEL_STORAGE_KEY,
-		modelSupport ? selectedPresetId : null,
+		knownSupport ? selectedPresetId : null,
+	);
+	const pickUnverified =
+		selectedModel !== null &&
+		discovered !== undefined &&
+		discovered.availability !== "reported" &&
+		!knownSupport?.models.some((entry) => entry.id === selectedModel);
+	const modelSupport = useMemo(
+		() =>
+			knownSupport && pickUnverified && selectedModel
+				? {
+						...knownSupport,
+						models: [
+							...knownSupport.models,
+							{ id: selectedModel, label: selectedModel },
+						],
+					}
+				: knownSupport,
+		[knownSupport, pickUnverified, selectedModel],
 	);
 	const effortSupport = selectedPresetId
 		? getAgentEffortSupport(selectedPresetId)
@@ -771,11 +789,13 @@ export function NewWorkspaceScreen({
 		return {
 			currentPresetId: selectedAgent,
 			defaultOptionId: AGENT_DEFAULT_OPTION_ID,
-			agents: modelAgents.map((agent) => ({
+			agents: agentConfigs.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
-				availability: catalogs[agent.id]?.availability,
+				availability: catalogs[agent.id]?.unverifiable
+					? undefined
+					: catalogs[agent.id]?.availability,
 				loading: catalogs[agent.id]?.loading,
 				onRefresh: catalogs[agent.id]?.refresh,
 				onLoad: catalogs[agent.id]?.load,
@@ -795,7 +815,7 @@ export function NewWorkspaceScreen({
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, modelAgents, catalogs]);
+	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(

@@ -12,6 +12,8 @@ const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
 type Agent = { id: string; presetId?: string; command?: string };
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
+	/** No list can come: the host predates discovery, or the agent has no listing. */
+	unverifiable: boolean;
 	key: string;
 	refresh: () => void;
 	load: () => void;
@@ -85,6 +87,7 @@ export function useAgentModelCatalog(
 								refresh,
 							}),
 						staleTime: refresh ? 0 : freshFor,
+						retry: false,
 					})
 					.catch(() => undefined);
 			};
@@ -93,6 +96,9 @@ export function useAgentModelCatalog(
 				{
 					...(queries[index]?.data ?? fallback),
 					loading: queries[index]?.isFetching ?? false,
+					unverifiable:
+						queries[index]?.data?.failure === "unsupported" ||
+						(queries[index]?.isError ?? false),
 					key: JSON.stringify(key(agent.id)),
 					refresh: () => fetch(true),
 					load: () => fetch(false),

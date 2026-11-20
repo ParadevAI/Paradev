@@ -67,6 +67,9 @@ test("coding pickers exclude known non-text models but keep an existing selectio
 			selectedId: "image",
 		}),
 	).toEqual([image]);
+	expect(
+		filterModelCatalog([image], { query: "other", selectedId: "image" }),
+	).toEqual([]);
 });
 
 test("the runtime default names the model it resolves to", () => {
