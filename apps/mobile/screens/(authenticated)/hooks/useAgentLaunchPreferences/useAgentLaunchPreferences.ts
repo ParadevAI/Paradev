@@ -54,6 +54,7 @@ export function resolveAgentLaunchPreferences(
 	modelByAgent: Record<string, string>,
 	effortByAgent: Record<string, string>,
 	discoveredModels?: CatalogModel[],
+	settled = false,
 ): AgentLaunchPreferences {
 	if (!presetId) return NO_PREFERENCES;
 	const models = discoveredModels
@@ -66,7 +67,7 @@ export function resolveAgentLaunchPreferences(
 		: getAgentModelSupport(presetId)?.models;
 	const model =
 		models?.find((option) => option.id === modelByAgent[presetId]) ??
-		(modelByAgent[presetId]
+		(modelByAgent[presetId] && !settled
 			? { id: modelByAgent[presetId], label: modelByAgent[presetId] }
 			: null);
 	const efforts =
@@ -137,6 +138,7 @@ export function useAgentLaunchPreferences(
 		retry: false,
 	});
 	const discoveredModels = catalog.data?.models;
+	const settled = catalog.isFetched;
 	const defaultModelLabel = catalog.data?.defaultModel?.label;
 	const defaultEffortLabel = catalog.data?.defaultEffort?.label;
 	return useMemo(
@@ -146,6 +148,7 @@ export function useAgentLaunchPreferences(
 				modelByAgent,
 				effortByAgent,
 				discoveredModels,
+				settled,
 			),
 			defaultModelLabel,
 			defaultEffortLabel,
@@ -155,6 +158,7 @@ export function useAgentLaunchPreferences(
 			modelByAgent,
 			effortByAgent,
 			discoveredModels,
+			settled,
 			defaultModelLabel,
 			defaultEffortLabel,
 		],

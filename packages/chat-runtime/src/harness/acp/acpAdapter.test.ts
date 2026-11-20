@@ -7255,6 +7255,45 @@ it("does not prompt a default model when the requested model is unavailable", as
 	await adapter.dispose();
 });
 
+it("keeps a model chosen while the start selections were still pending", async () => {
+	const agent = new FakeAcpAgent();
+	agent.newSessionConfigOptions = [
+		{
+			id: "model",
+			name: "Model",
+			category: "model",
+			currentValue: "available",
+			options: [{ value: "available", name: "Available" }],
+		},
+		{
+			id: "mode",
+			name: "Mode",
+			category: "mode",
+			currentValue: "default",
+			options: [
+				{ value: "default", name: "Default" },
+				{ value: "plan", name: "Plan" },
+			],
+		},
+	];
+	agent.holdSelections = true;
+	const { adapter } = startAdapter(agent, undefined, {
+		modelId: "removed",
+		modeId: "plan",
+	});
+	await flush();
+	agent.holdSelections = false;
+	expect(await adapter.setConfigOption("model", "available")).toBe(true);
+	agent.releaseSelections();
+	await flush();
+	adapter.prompt([{ type: "text", text: "hello" }]);
+	await flush();
+	expect(agent.sent.some((frame) => frame.method === "session/prompt")).toBe(
+		true,
+	);
+	await adapter.dispose();
+});
+
 it("discovers model options announced after the native session opens", async () => {
 	const agent = new FakeAcpAgent();
 	const adapter = new AcpAdapter({

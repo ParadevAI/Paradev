@@ -492,6 +492,7 @@ export class AcpAdapter implements HarnessAdapter {
 	);
 	private configOptions: SessionConfigOption[] = [];
 	private unavailableStartModel: string | undefined;
+	private modelSetSinceStart = false;
 	private replaying = false;
 	private agentName: string | null = null;
 	private quietReplay = false;
@@ -825,7 +826,10 @@ export class AcpAdapter implements HarnessAdapter {
 			});
 		return request.then(
 			() => {
-				if (changesModel) this.unavailableStartModel = undefined;
+				if (changesModel) {
+					this.unavailableStartModel = undefined;
+					this.modelSetSinceStart = true;
+				}
 				return true;
 			},
 			() => false,
@@ -2282,9 +2286,11 @@ export class AcpAdapter implements HarnessAdapter {
 				: Object.keys(wanted).length > 0
 					? this.awaitStartOptions(wanted)
 					: Promise.resolve({});
+		this.modelSetSinceStart = false;
 		const confirmed = configured.then((taken) => {
-			this.unavailableStartModel =
-				wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
+			if (!this.modelSetSinceStart)
+				this.unavailableStartModel =
+					wanted.modelId && !taken.modelId ? wanted.modelId : undefined;
 			return taken;
 		});
 		this.trackSelection(confirmed);
