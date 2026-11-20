@@ -14,14 +14,12 @@ import {
 	resolveAmbientCodexHome,
 } from "@superset/agent-setup";
 import type { HostDb } from "../../../db/index.ts";
+import { getHostWorkerPool } from "../../../workers/host-worker-pool.ts";
+import { shareSessionStateTask } from "../../../workers/tasks/accounts.ts";
 import {
 	getDefaultAccountSelections,
 	syncDefaultAccountPointers,
 } from "./default-account.ts";
-import {
-	shareClaudeSessionState,
-	shareCodexSessionState,
-} from "./session-share.ts";
 
 /**
  * Everything a Claude account needs on this host: the shared session state
@@ -29,7 +27,7 @@ import {
  * config surfaces agent-setup owns (skills, plugins, settings, MCP servers).
  */
 export async function provisionClaudeAccount(configDir: string): Promise<void> {
-	shareClaudeSessionState(configDir, join(homedir(), ".claude"));
+	await shareSessionState("claude", configDir, join(homedir(), ".claude"));
 	await provisionClaudeProfile(configDir);
 }
 
@@ -40,8 +38,35 @@ export async function provisionClaudeAccount(configDir: string): Promise<void> {
  * default, so the account the UI labels default is the one sessions pool into.
  */
 export async function provisionCodexAccount(codexHome: string): Promise<void> {
-	shareCodexSessionState(codexHome, resolveAmbientCodexHome());
+	await shareSessionState("codex", codexHome, resolveAmbientCodexHome());
 	await provisionCodexProfile(codexHome);
+}
+
+let shareQueue: Promise<void> = Promise.resolve();
+
+/** Runs one share at a time: two moves into the same home could each see a
+ * path free and then overwrite each other's file. Never throws; an
+ * interrupted share finishes on the next run. */
+function shareSessionState(
+	agent: "claude" | "codex",
+	profileDir: string,
+	mainHome: string,
+): Promise<void> {
+	shareQueue = shareQueue.then(() =>
+		getHostWorkerPool()
+			.run(
+				shareSessionStateTask,
+				{ agent, profileDir, mainHome },
+				{ timeoutMs: 10 * 60 * 1000 },
+			)
+			.catch((error) => {
+				console.warn(
+					`[host-service] sharing session state for ${profileDir} failed:`,
+					error,
+				);
+			}),
+	);
+	return shareQueue;
 }
 
 /**
