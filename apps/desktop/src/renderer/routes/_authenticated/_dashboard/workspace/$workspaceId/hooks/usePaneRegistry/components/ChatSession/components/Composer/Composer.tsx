@@ -245,7 +245,9 @@ export const Composer = memo(function Composer({
 		useComposerDraft(draftKey, draftPersisted);
 	const [editorResets, setEditorResets] = useState(0);
 	const blockedDraftSink = useRef(onDraftBlocked);
-	blockedDraftSink.current = readOnly ? onDraftBlocked : undefined;
+	useLayoutEffect(() => {
+		blockedDraftSink.current = readOnly ? onDraftBlocked : undefined;
+	}, [readOnly, onDraftBlocked]);
 	useLayoutEffect(() => {
 		if (!readOnly || !onDraftBlocked) return;
 		const draft = takeDraft();
