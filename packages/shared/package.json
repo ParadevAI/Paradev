@@ -533,6 +533,10 @@
 			"types": "./src/shell-ready-scanner.ts",
 			"default": "./src/shell-ready-scanner.ts"
 		},
+		"./shell-exit-marker": {
+			"types": "./src/shell-exit-marker.ts",
+			"default": "./src/shell-exit-marker.ts"
+		},
 		"./leaked-input-mode-reclaim": {
 			"types": "./src/leaked-input-mode-reclaim.ts",
 			"default": "./src/leaked-input-mode-reclaim.ts"
