@@ -8,6 +8,44 @@ import {
 import { and, desc, eq, isNotNull, isNull, ne } from "drizzle-orm";
 
 type EnvironmentRow = typeof environments.$inferSelect;
+type Transaction = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
+
+/**
+ * Records a golden the environment is leaving that no build made (one saved
+ * from a workspace), so retention can delete it and history can restore it.
+ */
+async function recordReplacedGolden(
+	tx: Transaction,
+	args: {
+		build: SelectEnvironmentBuild;
+		previousSourceRef: string;
+		replacedAt: Date;
+	},
+): Promise<void> {
+	const [recorded] = await tx
+		.select({ id: environmentBuilds.id })
+		.from(environmentBuilds)
+		.where(
+			and(
+				eq(environmentBuilds.environmentId, args.build.environmentId),
+				eq(environmentBuilds.goldenRef, args.previousSourceRef),
+			),
+		)
+		.limit(1);
+	if (recorded) return;
+	await tx.insert(environmentBuilds).values({
+		environmentId: args.build.environmentId,
+		organizationId: args.build.organizationId,
+		status: "succeeded",
+		trigger: "promote",
+		kind: "incremental",
+		repositoryIds: args.build.repositoryIds,
+		primaryRepositoryId: args.build.primaryRepositoryId,
+		goldenRef: args.previousSourceRef,
+		startedAt: args.replacedAt,
+		finishedAt: args.replacedAt,
+	});
+}
 
 export async function loadBuild(buildId: string): Promise<{
 	build: SelectEnvironmentBuild;
@@ -80,31 +118,11 @@ export async function succeedBuild(args: {
 			.returning({ id: environments.id });
 		if (!row) return false;
 		if (before?.sourceKind === "fork") {
-			const [recorded] = await tx
-				.select({ id: environmentBuilds.id })
-				.from(environmentBuilds)
-				.where(
-					and(
-						eq(environmentBuilds.environmentId, args.build.environmentId),
-						eq(environmentBuilds.goldenRef, args.previousSourceRef),
-					),
-				)
-				.limit(1);
-			if (!recorded) {
-				const replacedAt = new Date(args.build.startedAt.getTime() - 1);
-				await tx.insert(environmentBuilds).values({
-					environmentId: args.build.environmentId,
-					organizationId: args.build.organizationId,
-					status: "succeeded",
-					trigger: "promote",
-					kind: "incremental",
-					repositoryIds: args.build.repositoryIds,
-					primaryRepositoryId: args.build.primaryRepositoryId,
-					goldenRef: args.previousSourceRef,
-					startedAt: replacedAt,
-					finishedAt: replacedAt,
-				});
-			}
+			await recordReplacedGolden(tx, {
+				build: args.build,
+				previousSourceRef: args.previousSourceRef,
+				replacedAt: new Date(args.build.startedAt.getTime() - 1),
+			});
 		}
 		await tx
 			.delete(environmentRepositories)
@@ -139,6 +157,10 @@ export async function restoreGolden(args: {
 	previousSourceRef: string;
 }): Promise<boolean> {
 	return dbWs.transaction(async (tx) => {
+		const [before] = await tx
+			.select({ sourceKind: environments.sourceKind })
+			.from(environments)
+			.where(eq(environments.id, args.build.environmentId));
 		const [row] = await tx
 			.update(environments)
 			.set({
@@ -155,6 +177,13 @@ export async function restoreGolden(args: {
 			)
 			.returning({ id: environments.id });
 		if (!row) return false;
+		if (before?.sourceKind === "fork") {
+			await recordReplacedGolden(tx, {
+				build: args.build,
+				previousSourceRef: args.previousSourceRef,
+				replacedAt: new Date(),
+			});
+		}
 		await tx
 			.delete(environmentRepositories)
 			.where(
@@ -210,6 +239,23 @@ export async function undeletedGoldens(
 	return rows.flatMap((row) =>
 		row.goldenRef ? [{ id: row.id, goldenRef: row.goldenRef }] : [],
 	);
+}
+
+/** Marks every build of the environment whose golden is `goldenRef` as deleted. */
+export async function markGoldenRefDeleted(
+	environmentId: string,
+	goldenRef: string,
+): Promise<void> {
+	await db
+		.update(environmentBuilds)
+		.set({ goldenDeletedAt: new Date() })
+		.where(
+			and(
+				eq(environmentBuilds.environmentId, environmentId),
+				eq(environmentBuilds.goldenRef, goldenRef),
+				isNull(environmentBuilds.goldenDeletedAt),
+			),
+		);
 }
 
 export async function markGoldenDeleted(buildId: string): Promise<void> {

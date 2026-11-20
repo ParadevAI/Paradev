@@ -37,6 +37,8 @@ beforeEach(() => {
 
 afterEach(() => {
 	delete process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH;
+	delete process.env.SUPERSET_SANDBOX_WORKSPACE_PATH;
+	delete process.env.SUPERSET_SANDBOX_REPOSITORIES;
 	rmSync(root, { recursive: true, force: true });
 	delete process.env.SUPERSET_HOST_RUN_MODE;
 	delete process.env.IS_SANDBOX;
@@ -130,6 +132,37 @@ describe("loadProjectConfig with config.toml", () => {
 		]);
 	});
 
+	it("in a box with several repositories, only the primary takes the environment's config", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		process.env.SUPERSET_SANDBOX_WORKSPACE_PATH = root;
+		process.env.SUPERSET_SANDBOX_REPOSITORIES = JSON.stringify([
+			{ url: "https://github.com/acme/web", branch: "main", path: "repo" },
+			{ url: "https://github.com/acme/docs", branch: "main", path: "docs" },
+		]);
+		writeFileSync(join(root, "environment.toml"), '[setup]\nrun = "env"\n');
+		const docsPath = join(root, "docs");
+		write(docsPath, "config.toml", '[setup]\nrun = "docs"\n');
+		expect(resolved({ repoPath, projectId }).setup.commands).toEqual(["env"]);
+		expect(resolved({ repoPath: docsPath, projectId }).setup.commands).toEqual([
+			"docs",
+		]);
+	});
+
+	it("an environment config that does not parse runs nothing and says why", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
+			root,
+			"environment.toml",
+		);
+		writeFileSync(join(root, "environment.toml"), "[setup\n");
+		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
+		expect(loadProjectConfig({ repoPath, projectId })?.kind).toBe("invalid");
+	});
+
 	it("a local app launched from a sandbox terminal still resolves as local", () => {
 		process.env.IS_SANDBOX = "1";
 		write(
@@ -166,6 +199,19 @@ describe("loadProjectConfig in the cloud without an environment config", () => {
 		expect(loaded?.kind === "ok" && loaded.resolved.setup.commands).toEqual([
 			"repository",
 		]);
+	});
+
+	it("keeps v1's cloud behavior: only start runs, and no teardown", () => {
+		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
+		write(
+			repoPath,
+			"config.json",
+			JSON.stringify({ setup: ["local"], teardown: ["down"], run: ["dev"] }),
+		);
+		const config = resolved({ repoPath, projectId });
+		expect(config.setup.commands).toEqual([]);
+		expect(config.archive.commands).toEqual([]);
+		expect(getDefaultTerminal(config)).toBeNull();
 	});
 });
 

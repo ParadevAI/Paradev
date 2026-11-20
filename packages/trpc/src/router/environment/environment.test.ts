@@ -20,8 +20,13 @@ const OTHER_REPOSITORY_ID = "4d5e6f7a-8b9c-4d0e-9f2a-3b4c5d6e7f8a";
 let environment: Record<string, unknown> = {};
 let isAdmin = false;
 let written: Record<string, unknown>[] = [];
+let runningBuilds: Record<string, unknown>[] = [];
 
 stub(db.query.environments, { findFirst: async () => environment });
+stub(db.query.environmentBuilds, {
+	findMany: async () => runningBuilds,
+	findFirst: async () => undefined,
+});
 stub(db, {
 	update: () => ({
 		set: (values: Record<string, unknown>) => {
@@ -101,6 +106,7 @@ beforeEach(() => {
 	};
 	isAdmin = false;
 	written = [];
+	runningBuilds = [];
 });
 
 describe("environment.update machineSize", () => {
@@ -123,6 +129,44 @@ describe("environment.update machineSize", () => {
 			caller.environment.update({ id: ENVIRONMENT_ID, machineSize: "2xlarge" }),
 		).rejects.toMatchObject({ code: "BAD_REQUEST" });
 		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.update config", () => {
+	test("a config with only comments is stored as no config, so the repository's file still applies", async () => {
+		environment.createdByUserId = "user-1";
+		await caller.environment.update({
+			id: ENVIRONMENT_ID,
+			config: "# nothing yet\n",
+		});
+		expect(written).toEqual([{ config: null }]);
+	});
+});
+
+describe("environment.update scope", () => {
+	test("a member who neither created nor administers a shared environment cannot take it private", async () => {
+		await expect(
+			caller.environment.update({ id: ENVIRONMENT_ID, scope: "personal" }),
+		).rejects.toMatchObject({ code: "FORBIDDEN" });
+		expect(written).toEqual([]);
+	});
+});
+
+describe("environment.restore", () => {
+	const restore = () =>
+		caller.environment.restore({
+			environmentId: ENVIRONMENT_ID,
+			buildId: "5e6f7a8b-9c0d-4e1f-8a2b-3c4d5e6f7a8b",
+		});
+
+	test("a member who neither created nor administers a shared environment cannot restore it", async () => {
+		await expect(restore()).rejects.toMatchObject({ code: "FORBIDDEN" });
+	});
+
+	test("refuses while a build is running, so the build is not failed by the swap", async () => {
+		isAdmin = true;
+		runningBuilds = [{ status: "running", startedAt: new Date() }];
+		await expect(restore()).rejects.toMatchObject({ code: "CONFLICT" });
 	});
 });
 

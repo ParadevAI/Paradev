@@ -12,7 +12,7 @@ export default command({
 		name: string().desc("New name"),
 		scope: string().enum("organization", "personal").desc("Who can use it"),
 		config: string().desc(
-			"Path to a config.toml to store as the environment's config; without one, the cloud reads the primary repository's .paradev/config.toml",
+			"Path to a config.toml to store as the environment's config; without one, the cloud reads the primary repository's own .paradev/config.toml",
 		),
 		clearConfig: boolean().desc("Remove the environment's config"),
 	},
@@ -51,12 +51,16 @@ export default command({
 			scope: options.scope,
 			config,
 		});
+		const name = updated?.name ?? environment.name;
+		const rebuild = `superset environments rebuild ${environment.id}`;
 		return {
 			data: updated,
 			message:
 				config === undefined
-					? `Updated ${updated?.name ?? environment.name}`
-					: `Updated ${updated?.name ?? environment.name}; run superset environments rebuild ${environment.id} to build it with this config`,
+					? `Updated ${name}`
+					: updated?.config
+						? `Updated ${name}; run ${rebuild} to build it with this config`
+						: `Cleared ${name}'s config; the cloud reads the primary repository's .paradev/config.toml again. Run ${rebuild} to build from it`,
 		};
 	},
 });

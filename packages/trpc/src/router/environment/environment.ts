@@ -31,6 +31,7 @@ import {
 	primaryRepository,
 	promoteSandboxToEnvironment,
 	RepositoryError,
+	sandboxExists,
 	sortRepositories,
 	workspaceRepositories,
 } from "../../lib/sandbox";
@@ -39,6 +40,8 @@ import {
 	BuildRefused,
 	isStale,
 	keptGoldenRefs,
+	markGoldenDeleted,
+	markGoldenRefDeleted,
 	restoreGolden,
 	startEnvironmentBuild,
 	undeletedGoldens,
@@ -76,7 +79,7 @@ async function assertCanChangeForEveryone(
 
 const CONFIG_MAX_LENGTH = 64 * 1024;
 
-/** Blank clears the config; anything else must parse as a `config.toml`. */
+/** A config with no settings clears it; anything else must parse as a `config.toml`. */
 function validConfig(text: string | null): string | null {
 	if (text === null || text.trim().length === 0) return null;
 	const parsed = parseProjectConfig(text);
@@ -93,7 +96,7 @@ function validConfig(text: string | null): string | null {
 			params: { details },
 		});
 	}
-	return text;
+	return Object.keys(parsed.config).length === 0 ? null : text;
 }
 
 /** An environment the caller may see; another member's personal one does not exist to them. */
@@ -756,12 +759,14 @@ export const environmentRouter = {
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
-				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
-					console.error(
-						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
-						error,
-					),
-				);
+				await deleteSandbox(target.sourceRef)
+					.then(() => markGoldenRefDeleted(target.id, target.sourceRef))
+					.catch((error: unknown) =>
+						console.error(
+							`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
+							error,
+						),
+					);
 			}
 			await restart();
 			return row;
@@ -844,6 +849,19 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const environment = await loadEnvironment(input.environmentId, ctx);
 			await assertCloudAccess(ctx, environment.organizationId);
+			await assertCanChangeForEveryone(environment, ctx);
+			const running = await db.query.environmentBuilds.findMany({
+				where: and(
+					eq(environmentBuilds.environmentId, environment.id),
+					eq(environmentBuilds.status, "running"),
+				),
+			});
+			if (running.some((build) => !isStale(build))) {
+				throw userError({
+					...BUILD_REFUSALS["already-running"],
+					message: "A build of this environment is already running",
+				});
+			}
 			const build = await db.query.environmentBuilds.findFirst({
 				where: and(
 					eq(environmentBuilds.id, input.buildId),
@@ -855,6 +873,12 @@ export const environmentRouter = {
 				await undeletedGoldens(environment.id),
 				environment.sourceRef,
 			);
+			const notRestorable = () =>
+				userError({
+					code: "PRECONDITION_FAILED",
+					message: "This build has no snapshot to restore",
+					i18nKey: "serverError.environment.buildNotRestorable",
+				});
 			if (
 				!build ||
 				build.status !== "succeeded" ||
@@ -862,11 +886,11 @@ export const environmentRouter = {
 				goldenRef === environment.sourceRef ||
 				!kept.has(goldenRef)
 			) {
-				throw userError({
-					code: "PRECONDITION_FAILED",
-					message: "This build has no snapshot to restore",
-					i18nKey: "serverError.environment.buildNotRestorable",
-				});
+				throw notRestorable();
+			}
+			if (!(await sandboxExists(goldenRef))) {
+				await markGoldenDeleted(build.id);
+				throw notRestorable();
 			}
 			const restored = await restoreGolden({
 				build,
@@ -877,7 +901,7 @@ export const environmentRouter = {
 				throw userError({
 					code: "CONFLICT",
 					message:
-						"The environment changed while it was being restored; try again",
+						"The environment changed while it was being restored. Try again.",
 					i18nKey: "serverError.environment.changedDuringRestore",
 				});
 			}
@@ -901,7 +925,11 @@ export const environmentRouter = {
 		.mutation(async ({ ctx, input }) => {
 			const current = await loadEnvironment(input.id, ctx);
 			await assertCloudAccess(ctx, current.organizationId);
-			if (input.machineSize !== undefined || input.config !== undefined) {
+			if (
+				input.machineSize !== undefined ||
+				input.config !== undefined ||
+				(input.scope !== undefined && input.scope !== current.scope)
+			) {
 				await assertCanChangeForEveryone(current, ctx);
 			}
 			const config =

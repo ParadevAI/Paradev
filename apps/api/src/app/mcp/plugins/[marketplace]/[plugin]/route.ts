@@ -110,12 +110,15 @@ async function handle(
 	}
 
 	if (
-		ctx.sandboxWorkspaceId &&
-		!(await sandboxAllowsPlugin({
-			workspaceId: ctx.sandboxWorkspaceId,
-			marketplace,
-			plugin,
-		}))
+		ctx.source === "sandbox" &&
+		!(
+			ctx.sandboxWorkspaceId &&
+			(await sandboxAllowsPlugin({
+				workspaceId: ctx.sandboxWorkspaceId,
+				marketplace,
+				plugin,
+			}))
+		)
 	) {
 		return withRateLimitHeaders(
 			errorResponse(

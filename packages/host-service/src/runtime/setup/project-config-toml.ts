@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { BRAND } from "@superset/shared/brand";
 import {
 	type ConfigEnvironment,
@@ -12,7 +12,11 @@ import {
 	resolveProjectConfig,
 } from "@superset/shared/project-config";
 import { resolveProjectConfigDir } from "@superset/shared/project-config/dir";
-import { SANDBOX_PATHS } from "@superset/shared/sandbox/contract";
+import {
+	SANDBOX_PATHS,
+	sandboxCheckoutDir,
+	sandboxRepositoriesSchema,
+} from "@superset/shared/sandbox/contract";
 
 export type TomlConfigLoad =
 	| { kind: "ok"; path: string; resolved: ResolvedProjectConfig }
@@ -37,15 +41,16 @@ export function getLocalTomlConfigPath(repoPath: string): string {
 
 /**
  * In the cloud the environment's config, which the API writes into the box,
- * wins when it has one. Otherwise the shared file comes from the workspace's
- * checkout, else the main checkout's.
+ * wins for the primary repository when it has one. Otherwise the shared file
+ * comes from the workspace's checkout, else the main checkout's.
  */
 export function findTomlConfigPath(args: {
 	repoPath: string;
 	worktreePath?: string;
 }): string | null {
-	const environmentPath =
-		configEnvironment() === "cloud" ? environmentConfigPath() : null;
+	const environmentPath = isEnvironmentConfigTarget(args)
+		? environmentConfigPath()
+		: null;
 	if (environmentPath) return environmentPath;
 	const roots = args.worktreePath
 		? [args.worktreePath, args.repoPath]
@@ -55,6 +60,34 @@ export function findTomlConfigPath(args: {
 		if (existsSync(path)) return path;
 	}
 	return null;
+}
+
+/** The environment's config is for the primary checkout; the others keep their own files. */
+function isEnvironmentConfigTarget(args: {
+	repoPath: string;
+	worktreePath?: string;
+}): boolean {
+	if (configEnvironment() !== "cloud") return false;
+	const primary = sandboxPrimaryCheckout();
+	if (!primary) return true;
+	return [args.repoPath, args.worktreePath].some(
+		(path) => path !== undefined && resolve(path) === primary,
+	);
+}
+
+function sandboxPrimaryCheckout(): string | null {
+	const root = process.env.SUPERSET_SANDBOX_WORKSPACE_PATH;
+	const raw = process.env.SUPERSET_SANDBOX_REPOSITORIES;
+	if (!root || !raw) return null;
+	let json: unknown;
+	try {
+		json = JSON.parse(raw);
+	} catch {
+		return null;
+	}
+	const parsed = sandboxRepositoriesSchema.safeParse(json);
+	const primary = parsed.success ? parsed.data[0] : undefined;
+	return primary ? resolve(sandboxCheckoutDir(root, primary.path)) : null;
 }
 
 function environmentConfigPath(): string | null {

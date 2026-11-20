@@ -1264,6 +1264,31 @@ Rename an environment, change who can use it, or set the config.toml its builds 
 </Command>
 
 <Command
+	name="superset environments rebuild <environment>"
+	options={[
+		{ flag: "--wait", description: "Wait for the build to finish; exit 1 if it fails." },
+	]}
+>
+Build an environment's snapshot again from its `[install]`. New workspaces keep starting from the current snapshot until the build succeeds.
+</Command>
+
+<Command
+	name="superset environments builds <environment>"
+	options={[
+		{ flag: "--limit <n>", description: "How many builds to show. Default: 20." },
+	]}
+>
+List an environment's builds, newest first, with each failure's reason.
+</Command>
+
+<Command
+	name="superset environments restore <environment> <build>"
+	options={[]}
+>
+Make an earlier build's snapshot the one new workspaces start from, without building. The current snapshot and the 2 newest others are kept and can be restored.
+</Command>
+
+<Command
 	name="superset environments save"
 	options={[
 		{ flag: "--workspace <id>", description: "Cloud workspace ID. Required." },

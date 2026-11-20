@@ -645,10 +645,11 @@ set up until its config change merged. An environment can now store its own
 `config.toml` (`environments.config`). When it has one, builds read `[install]`
 from it, a create publishes its `preview = true` ports from it, and every
 create and wake writes it to `SANDBOX_PATHS.environmentConfig` before boot,
-where host-service reads it instead of the repository's files. When it has
-none, that file is empty and everything reads the primary repository's file
-on the base branch, as before. `[mcp]` is read only from the environment's
-config. **Open:** a saved config reaches a running box only on its next wake
+where host-service reads it for the primary checkout instead of that
+repository's files; other checkouts in a multi-repository box keep their own.
+When it has none, that file is empty and everything reads the repository's
+own files as before: builds and ports from the base branch, a box from its
+checkout. `[mcp]` is read only from the environment's config. **Open:** a saved config reaches a running box only on its next wake
 or restart. The desktop's project settings still edit the repository file on a
 cloud host, where it no longer applies once the environment has a config.
 

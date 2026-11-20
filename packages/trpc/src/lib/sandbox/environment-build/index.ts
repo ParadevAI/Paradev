@@ -6,4 +6,9 @@ export {
 	BuildRefused,
 	startEnvironmentBuild,
 } from "./start";
-export { restoreGolden, undeletedGoldens } from "./store";
+export {
+	markGoldenDeleted,
+	markGoldenRefDeleted,
+	restoreGolden,
+	undeletedGoldens,
+} from "./store";

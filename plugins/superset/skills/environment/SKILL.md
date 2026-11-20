@@ -7,14 +7,25 @@ allowed-tools: Bash(superset:*)
 
 # Cloud environment setup
 
-Goal: a cloud environment that new cloud workspaces boot straight into, with dependencies installed, variables set, and services starting on boot. You run on the user's machine with their Paradev login. You build the environment by driving a cloud box from here.
+Goal: a cloud environment that new cloud workspaces boot straight into, with dependencies installed, variables set, and services starting on boot. Usually you run on the user's machine with their Paradev login and build the environment by driving a cloud box from there. If you are already inside a cloud box on the environment, read "Inside a cloud box" first: several steps work differently there.
 
 Terms you will use with the user:
 
 - **Environment**: what a cloud workspace boots from. It has repositories (the first is primary), variables, a region, and a visibility.
 - **Box**: one cloud workspace running on the environment.
-- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud. While an environment has none, they read the primary repository's `.paradev/config.toml` on its base branch instead. `superset environments update --config` sets it.
+- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud. While an environment has none, they read the primary repository's own `.paradev/config.toml` instead. `superset environments update --config` sets it.
 - **Build**: runs the config's `[install]` on a fresh box and saves the result as the snapshot new workspaces start from. `superset environments rebuild` starts one.
+
+## Inside a cloud box
+
+A setup session often starts you in a box on the environment; its prompt says so. There the `superset` CLI acts for the box, and a box can't change environments: `superset environments` offers only `list` and `secrets list`. Follow the steps below with these changes:
+
+- Steps 0 and 1: skip them. GitHub access already works in the box, and you were given the environment.
+- Step 3: you can't set variables. List the keys the code needs and where it reads them, and ask the user to add them under Variables on the environment's page (Settings, Environments).
+- Step 4: don't create another box. Work in this one with your own terminal.
+- Storing the config: show the user the file and ask them to paste it into the environment's Config, or commit it as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request. The cloud reads the repository's file only while the environment has no config of its own.
+- Step 5: once the config is stored or merged, ask the user to press Rebuild environment on the environment's page.
+- Step 6: ask the user to rename the environment and choose who can use it on its page. **Never archive this box: it is the one you are running in.** Skip starting a fresh workspace, and write **Try it:** in the final message as what the user does next.
 
 ## What a box already has
 
@@ -106,7 +117,7 @@ superset environments update <environment-id> --config path/to/config.toml
 
 The server refuses a file that does not parse and says why. New workspaces and the next build use the stored config; a running box picks it up when it restarts.
 
-If you are working inside a cloud box, `superset environments update` and `superset environments rebuild` are not available there. Commit the file instead as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request: once it is on the base branch, the environment uses it as long as it has no config of its own. Ask the user to start the build with Rebuild environment on the environment's page.
+Inside a cloud box you can't run this; see "Inside a cloud box".
 
 ## 5. Build
 
