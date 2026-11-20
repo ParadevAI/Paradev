@@ -1,4 +1,5 @@
 import type {
+	DashboardSidebarHiddenProject,
 	DashboardSidebarProject,
 	DashboardSidebarProjectChild,
 } from "../../types";
@@ -79,4 +80,18 @@ export function filterDashboardSidebarProjects(
 		if (childrenUnchanged) return [expandProject(project)];
 		return [{ ...project, isCollapsed: false, children }];
 	});
+}
+
+/**
+ * The same filter over the hidden-projects restore list, so a search still
+ * finds a hidden project. Names only: a hidden project's workspaces are never
+ * built, so there is nothing else to match.
+ */
+export function filterDashboardSidebarHiddenProjects(
+	projects: DashboardSidebarHiddenProject[],
+	query: string,
+): DashboardSidebarHiddenProject[] {
+	const normalizedQuery = query.trim().toLowerCase();
+	if (normalizedQuery === "") return projects;
+	return projects.filter((project) => matches(project.name, normalizedQuery));
 }
