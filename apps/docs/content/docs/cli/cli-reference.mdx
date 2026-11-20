@@ -866,8 +866,9 @@ superset workspaces create --project prj_… --name "perf-spike" --branch perf/s
 	options={[
 		{ flag: "--host <id>", description: "Host the workspaces live on, or `cloud`." },
 		{ flag: "--local", description: "Target this machine." },
+		{ flag: "--delete-branch", description: "Also delete each workspace's local branch. Host workspaces only." },
 	]}
-	output={`{ deleted: string[]; notFound: string[]; failed: { id: string; reason: string }[]; warnings: string[] }`}
+	output={`{ deleted: string[]; branchesDeleted?: string[]; notFound: string[]; failed: { id: string; reason: string }[]; warnings: string[] }`}
 >
 Archive one or more workspaces. Without `--host` or `--local`, this targets
 cloud workspaces if your account has them, else this machine. The old name
@@ -877,16 +878,23 @@ cloud workspaces if your account has them, else this machine. The old name
   7 days. A restore within those 7 days keeps its disk; after that, the
   workspace starts again from a fresh sandbox.
 - **Worktree workspace on a host:** its folder is removed, with any uncommitted
-  changes. Its branch stays, so a restore brings back only committed work. A
-  workspace that shares the project's own checkout keeps that folder.
+  changes. Its branch stays unless you pass `--delete-branch`, so a restore
+  brings back only committed work. A workspace that shares the project's own
+  checkout keeps that folder.
 
 `deleted` lists the archived IDs; the field keeps its old name so existing
 scripts still work. Each ID is reported on its own: unknown IDs land in
 `notFound`, errors land in `failed` with a reason, and the rest of the batch
 still runs. The command exits non-zero if either list is not empty.
 
+`--delete-branch` runs `git branch -D`, so commits that are not pushed are
+lost; there is no confirmation. A branch that cannot be deleted lands in
+`warnings`, and `branchesDeleted` lists the workspaces whose branch is gone.
+Cloud workspaces have no local branch, so the flag is rejected for them.
+
 ```bash
 superset workspaces archive ws_a ws_b ws_c
+superset workspaces archive --local ws_a --delete-branch
 ```
 </Command>
 

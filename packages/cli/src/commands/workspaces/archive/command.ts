@@ -11,12 +11,15 @@ import {
 
 export default command({
 	description:
-		"Archive workspaces by ID: cloud workspaces by default if your account has them, else on this machine; --local or --host picks a host. A cloud sandbox stops within a minute and is deleted after 7 days; a restore before then keeps its disk. On a host, a worktree's folder is removed with any uncommitted changes; its branch stays, so a restore brings back only committed work",
+		"Archive workspaces by ID: cloud workspaces by default if your account has them, else on this machine; --local or --host picks a host. A cloud sandbox stops within a minute and is deleted after 7 days; a restore before then keeps its disk. On a host, a worktree's folder is removed with any uncommitted changes; its branch stays unless --delete-branch, so a restore brings back only committed work",
 	aliases: ["delete"],
 	args: [positional("ids").required().variadic().desc("Workspace IDs")],
 	options: {
 		host: string().desc("Host the workspaces live on, or `cloud`"),
 		local: boolean().desc("The workspaces are on this machine"),
+		deleteBranch: boolean().desc(
+			"Also delete each workspace's local branch (git branch -D, so unpushed commits are lost); host workspaces only",
+		),
 	},
 	run: async ({ ctx, args, options }) => {
 		const ids = args.ids as string[];
@@ -31,6 +34,12 @@ export default command({
 			organizationId,
 		);
 		if (!hostId) {
+			if (options.deleteBranch) {
+				throw new CLIError(
+					"--delete-branch only applies to workspaces on a host",
+					"Pass --local or --host <id> if the workspaces live on a machine",
+				);
+			}
 			const archived: string[] = [];
 			const missing: string[] = [];
 			const failed: DeleteReport["failed"] = [];
@@ -82,7 +91,7 @@ export default command({
 		});
 
 		return reportHostOutcomes(
-			await archiveOnHost(target.client, ids),
+			await archiveOnHost(target.client, ids, options.deleteBranch ?? false),
 			target.hostId,
 		);
 	},

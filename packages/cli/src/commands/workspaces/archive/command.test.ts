@@ -122,6 +122,34 @@ describe("workspaces archive", () => {
 		);
 	});
 
+	test("rejects --delete-branch for cloud workspaces before archiving", async () => {
+		const archivedIds: string[] = [];
+		const ctx = {
+			api: {
+				cloudWorkspace: {
+					available: { query: async () => ({ available: true }) },
+					delete: {
+						mutate: async ({ id }: { id: string }) => {
+							archivedIds.push(id);
+							return { deleted: true };
+						},
+					},
+				},
+			},
+			config: { organizationId: "org-archive-test" },
+		} as never;
+
+		await expect(
+			archiveCommand.run({
+				ctx,
+				args: { ids: ["ws-1"] } as never,
+				options: { deleteBranch: true } as never,
+				signal: new AbortController().signal,
+			}),
+		).rejects.toThrow("--delete-branch only applies to workspaces on a host");
+		expect(archivedIds).toEqual([]);
+	});
+
 	test("delete still routes to archive", () => {
 		const { root, commandMap } = buildTree(
 			[{ path: ["workspaces"], ...workspacesMeta }],
