@@ -4954,6 +4954,12 @@ msgstr "Blok kódu"
 msgid "Code Block"
 msgstr "Blok kódu"
 
+msgid "Codex button"
+msgstr "Tlačítko Codex"
+
+msgid "Codex usage indicator"
+msgstr "Ukazatel využití Codexu"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Kódovacích agentů"
@@ -13845,6 +13851,9 @@ msgstr "Jen pozvaní lidé"
 msgid "Only people who opted in appear here."
 msgstr "Objevují se tu jen lidé, kteří se sami přihlásili."
 
+msgid "Only show at or above a threshold"
+msgstr "Zobrazit až od prahové hodnoty"
+
 msgid "Only the author can change a comment"
 msgstr "Komentář může upravit jen jeho autor"
 
@@ -18131,6 +18140,9 @@ msgstr "Relace skončila"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Relace skončila. Stiskněte Enter a spustí se nový shell."
 
+msgid "Session header"
+msgstr "Záhlaví relace"
+
 msgid "Session name"
 msgstr "Název relace"
 
@@ -21013,6 +21025,9 @@ msgstr "Tři kroky · dotýká se packages/ui a apps/desktop"
 
 msgid "Threshold"
 msgstr "Práh"
+
+msgid "Threshold (%)"
+msgstr "Prahová hodnota (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Od ticketu do produkce pod jeden den, medián"

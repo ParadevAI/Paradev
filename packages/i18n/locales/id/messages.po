@@ -4954,6 +4954,12 @@ msgstr "Blok kode"
 msgid "Code Block"
 msgstr "Blok Kode"
 
+msgid "Codex button"
+msgstr "Tombol Codex"
+
+msgid "Codex usage indicator"
+msgstr "Indikator penggunaan Codex"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Agen Coding"
@@ -13845,6 +13851,9 @@ msgstr "Hanya orang yang diundang"
 msgid "Only people who opted in appear here."
 msgstr "Hanya orang yang memilih ikut serta yang muncul di sini."
 
+msgid "Only show at or above a threshold"
+msgstr "Tampilkan hanya saat mencapai ambang batas"
+
 msgid "Only the author can change a comment"
 msgstr "Hanya penulis yang bisa mengubah komentar"
 
@@ -18131,6 +18140,9 @@ msgstr "Sesi berakhir"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Sesi berakhir. Tekan Enter untuk memulai shell baru."
 
+msgid "Session header"
+msgstr "Header sesi"
+
 msgid "Session name"
 msgstr "Nama sesi"
 
@@ -21013,6 +21025,9 @@ msgstr "Tiga langkah · menyentuh packages/ui dan apps/desktop"
 
 msgid "Threshold"
 msgstr "Ambang batas"
+
+msgid "Threshold (%)"
+msgstr "Ambang batas (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Tiket ke produksi di bawah satu hari, median"

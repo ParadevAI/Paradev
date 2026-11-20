@@ -4954,6 +4954,12 @@ msgstr "Codeblok"
 msgid "Code Block"
 msgstr "Codeblok"
 
+msgid "Codex button"
+msgstr "Codex-knop"
+
+msgid "Codex usage indicator"
+msgstr "Indicator voor Codex-gebruik"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Coding agents"
@@ -13845,6 +13851,9 @@ msgstr "Alleen uitgenodigde personen"
 msgid "Only people who opted in appear here."
 msgstr "Alleen mensen die zich hebben aangemeld verschijnen hier."
 
+msgid "Only show at or above a threshold"
+msgstr "Pas vanaf een drempelwaarde tonen"
+
 msgid "Only the author can change a comment"
 msgstr "Alleen de auteur kan een reactie wijzigen"
 
@@ -18131,6 +18140,9 @@ msgstr "Sessie beëindigd"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Sessie beëindigd. Druk op Enter om een nieuwe shell te starten."
 
+msgid "Session header"
+msgstr "Sessiekop"
+
 msgid "Session name"
 msgstr "Sessienaam"
 
@@ -21013,6 +21025,9 @@ msgstr "Drie stappen · raakt packages/ui en apps/desktop"
 
 msgid "Threshold"
 msgstr "Drempel"
+
+msgid "Threshold (%)"
+msgstr "Drempelwaarde (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Ticket tot productie onder één dag, mediaan"

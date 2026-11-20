@@ -4954,6 +4954,12 @@ msgstr "Blocco di codice"
 msgid "Code Block"
 msgstr "Code Block"
 
+msgid "Codex button"
+msgstr "Pulsante Codex"
+
+msgid "Codex usage indicator"
+msgstr "Indicatore di utilizzo di Codex"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Agenti di coding"
@@ -13845,6 +13851,9 @@ msgstr "Solo le persone invitate"
 msgid "Only people who opted in appear here."
 msgstr "Qui compaiono solo le persone che hanno scelto di partecipare."
 
+msgid "Only show at or above a threshold"
+msgstr "Mostra solo al raggiungimento della soglia"
+
 msgid "Only the author can change a comment"
 msgstr "Solo l’autore può modificare un commento"
 
@@ -18131,6 +18140,9 @@ msgstr "Sessione terminata"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Sessione terminata. Premi Invio per avviare una nuova shell."
 
+msgid "Session header"
+msgstr "Intestazione della sessione"
+
 msgid "Session name"
 msgstr "Nome della sessione"
 
@@ -21013,6 +21025,9 @@ msgstr "Tre passaggi · tocca packages/ui e apps/desktop"
 
 msgid "Threshold"
 msgstr "Soglia"
+
+msgid "Threshold (%)"
+msgstr "Soglia (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Dal ticket alla produzione in meno di un giorno, mediana"

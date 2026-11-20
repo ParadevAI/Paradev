@@ -19,6 +19,7 @@ import {
 	useIsDarkTheme,
 } from "renderer/assets/app-icons/preset-icons";
 import { HotkeyMenuShortcut } from "renderer/components/HotkeyMenuShortcut";
+import { useWorkspaceHostUrl } from "renderer/hooks/host-service/useWorkspaceHostUrl";
 import { useAgentConfigs } from "renderer/hooks/useAgentConfigs";
 import { useBuiltinPresets } from "renderer/hooks/useBuiltinPresets";
 import { useParadevShell } from "renderer/hooks/useParadevShell";
@@ -33,6 +34,7 @@ import { BuiltinPresetBarItem } from "./components/BuiltinPresetBarItem";
 import { PresetBarItem } from "./components/PresetBarItem";
 
 interface PresetsBarProps {
+	workspaceId: string;
 	matchedPresets: TerminalPresetRow[];
 	executePreset: (preset: TerminalPresetRow) => void | Promise<void>;
 	showPresetsBar: boolean;
@@ -74,6 +76,7 @@ function getVisiblePresetOrder(
 }
 
 export function PresetsBar({
+	workspaceId,
 	matchedPresets,
 	executePreset,
 	showPresetsBar,
@@ -83,6 +86,7 @@ export function PresetsBar({
 	const isDark = useIsDarkTheme();
 	const isParadevShell = useParadevShell();
 	const collections = useCollections();
+	const hostUrl = useWorkspaceHostUrl(workspaceId);
 	const { activeHostUrl } = useLocalHostService();
 	const { data: agents } = useAgentConfigs(activeHostUrl);
 	const builtinPresets = useBuiltinPresets();
@@ -354,12 +358,19 @@ export function PresetsBar({
 					<PresetBarItem
 						key={preset.id}
 						preset={preset}
+						hostUrl={hostUrl}
 						visibleIndex={visibleIndex}
 						hotkeyId={hotkeyId}
 						isDark={isDark}
 						agents={agents}
 						onExecutePreset={executePreset}
 						onEdit={(presetToEdit) => handleEditPreset(presetToEdit.id)}
+						onViewUsage={(accountKey) =>
+							navigate({
+								to: "/settings/usage",
+								search: { workspaceId, agent: "codex", accountKey },
+							})
+						}
 						onLocalReorder={handleLocalVisibleReorder}
 						onPersistReorder={handlePersistVisibleReorder}
 					/>

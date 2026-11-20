@@ -4954,6 +4954,12 @@ msgstr "Блок кода"
 msgid "Code Block"
 msgstr "Блок кода"
 
+msgid "Codex button"
+msgstr "Кнопка Codex"
+
+msgid "Codex usage indicator"
+msgstr "Индикатор использования Codex"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "Агентов-программистов"
@@ -13845,6 +13851,9 @@ msgstr "Только приглашённые"
 msgid "Only people who opted in appear here."
 msgstr "Здесь показаны только те, кто согласился участвовать."
 
+msgid "Only show at or above a threshold"
+msgstr "Показывать только при достижении порога"
+
 msgid "Only the author can change a comment"
 msgstr "Изменить комментарий может только автор"
 
@@ -18131,6 +18140,9 @@ msgstr "Сеанс завершён"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Сеанс завершён. Нажмите Enter, чтобы запустить новую оболочку."
 
+msgid "Session header"
+msgstr "Заголовок сессии"
+
 msgid "Session name"
 msgstr "Имя сессии"
 
@@ -21013,6 +21025,9 @@ msgstr "Три шага · затрагивает packages/ui и apps/desktop"
 
 msgid "Threshold"
 msgstr "Порог"
+
+msgid "Threshold (%)"
+msgstr "Порог (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "От тикета до продакшена меньше суток, медиана"

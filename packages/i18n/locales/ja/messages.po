@@ -4954,6 +4954,12 @@ msgstr "コードブロック"
 msgid "Code Block"
 msgstr "Code Block"
 
+msgid "Codex button"
+msgstr "Codex ボタン"
+
+msgid "Codex usage indicator"
+msgstr "Codex の使用量インジケーター"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "コードを書こう"
@@ -13845,6 +13851,9 @@ msgstr "招待したユーザーのみ"
 msgid "Only people who opted in appear here."
 msgstr "参加を選んだ人だけがここに表示されます。"
 
+msgid "Only show at or above a threshold"
+msgstr "しきい値以上の場合のみ表示"
+
 msgid "Only the author can change a comment"
 msgstr "コメントを変更できるのは作成者だけです"
 
@@ -18131,6 +18140,9 @@ msgstr "セッション終了"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "セッションが終了しました。Enter キーを押すと新しいシェルを起動します。"
 
+msgid "Session header"
+msgstr "セッションヘッダー"
+
 msgid "Session name"
 msgstr "セッション名"
 
@@ -21013,6 +21025,9 @@ msgstr "3ステップ · packages/uiとapps/desktopに変更"
 
 msgid "Threshold"
 msgstr "しきい値"
+
+msgid "Threshold (%)"
+msgstr "しきい値（%）"
 
 msgid "Ticket to production under one day, median"
 msgstr "チケットから本番まで中央値1日未満"

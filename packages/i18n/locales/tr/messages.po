@@ -4954,6 +4954,12 @@ msgstr "Kod bloğu"
 msgid "Code Block"
 msgstr "Kod bloğu"
 
+msgid "Codex button"
+msgstr "Codex düğmesi"
+
+msgid "Codex usage indicator"
+msgstr "Codex kullanım göstergesi"
+
 #. Homepage headline, line 2 of 2, after “Run an Army of”.
 msgid "Coding Agents"
 msgstr "bir ordu çalıştırın"
@@ -13845,6 +13851,9 @@ msgstr "Yalnızca davet edilen kişiler"
 msgid "Only people who opted in appear here."
 msgstr "Burada yalnızca katılmayı seçenler görünür."
 
+msgid "Only show at or above a threshold"
+msgstr "Yalnızca eşik değerine ulaşıldığında göster"
+
 msgid "Only the author can change a comment"
 msgstr "Yorumu yalnızca yazarı değiştirebilir"
 
@@ -18131,6 +18140,9 @@ msgstr "Oturum sona erdi"
 msgid "Session ended. Press Enter to start a new shell."
 msgstr "Oturum sona erdi. Yeni bir kabuk başlatmak için Enter tuşuna basın."
 
+msgid "Session header"
+msgstr "Oturum başlığı"
+
 msgid "Session name"
 msgstr "Oturum adı"
 
@@ -21013,6 +21025,9 @@ msgstr "Üç adım · packages/ui ve apps/desktop dizinlerine dokunur"
 
 msgid "Threshold"
 msgstr "Eşik"
+
+msgid "Threshold (%)"
+msgstr "Eşik (%)"
 
 msgid "Ticket to production under one day, median"
 msgstr "Biletten üretime bir günün altında, medyan"

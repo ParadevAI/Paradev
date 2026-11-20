@@ -2,6 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type ChangesOpenTarget = "pane" | "tab";
+export type CodexUsageLocation = "session" | "preset";
+
+export const DEFAULT_USAGE_WARNING_THRESHOLD = 70;
 
 interface Settings {
 	diffStyle: "split" | "unified";
@@ -13,6 +16,9 @@ interface Settings {
 	dictationEnabled: boolean;
 	showParadevAnywhereButton: boolean;
 	showRailUsage: boolean;
+	codexUsageLocation: CodexUsageLocation;
+	codexUsageThresholdEnabled: boolean;
+	codexUsageThreshold: number;
 }
 
 interface SettingsStore extends Settings {
@@ -29,6 +35,9 @@ export const useSettings = create<SettingsStore>()(
 			dictationEnabled: true,
 			showParadevAnywhereButton: true,
 			showRailUsage: true,
+			codexUsageLocation: "session",
+			codexUsageThresholdEnabled: true,
+			codexUsageThreshold: DEFAULT_USAGE_WARNING_THRESHOLD,
 			update: (key, value) => set({ [key]: value }),
 		}),
 		{ name: "settings" },
