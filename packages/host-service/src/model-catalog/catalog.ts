@@ -13,7 +13,7 @@ import {
 	DEFAULT_ALIAS_MODEL_ID,
 	getAgentModelSupport,
 	resolveAgentLaunchPresetId,
-	runtimeDefaultModel,
+	runtimeDefaultOption,
 	uniqueModels,
 } from "@superset/shared/agent-models";
 import { eq } from "drizzle-orm";
@@ -188,13 +188,20 @@ export async function discoverAgentModels(
 					(async (): Promise<AgentModelCatalog> => {
 						let models: CatalogModel[] | undefined;
 						let defaultModel: AgentModelCatalog["defaultModel"];
+						let defaultEffort: AgentModelCatalog["defaultEffort"];
 						const readModelOption = (options: SessionConfigOption[]) => {
 							const option = options.find(
 								(entry) => entry.category === "model",
 							);
+							const effort = options.find(
+								(entry) => entry.category === "thought_level",
+							);
 							models = option?.options;
 							defaultModel = option
-								? runtimeDefaultModel(option.options, option.currentValue)
+								? runtimeDefaultOption(option.options, option.currentValue)
+								: undefined;
+							defaultEffort = effort
+								? runtimeDefaultOption(effort.options, effort.currentValue)
 								: undefined;
 						};
 						const harness = acpHarnessForPreset(ctx.presetId);
@@ -273,6 +280,7 @@ export async function discoverAgentModels(
 						return {
 							models: withoutDefaultAlias(uniqueModels(models)),
 							defaultModel,
+							defaultEffort,
 							source:
 								input.surface === "chat" || ctx.presetId === "opencode"
 									? "runtime"

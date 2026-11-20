@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import {
 	type CatalogModel,
 	filterModelCatalog,
-	runtimeDefaultModel,
+	runtimeDefaultOption,
 	uniqueModels,
 } from "./index";
 
@@ -74,16 +74,16 @@ test("the runtime default names the model it resolves to", () => {
 		{ id: "default", label: "Default (recommended)", description: "Opus" },
 		{ id: "sonnet", label: "Sonnet" },
 	];
-	expect(runtimeDefaultModel(models, "default")).toEqual({
+	expect(runtimeDefaultOption(models, "default")).toEqual({
 		id: "default",
 		label: "Opus",
 	});
-	expect(runtimeDefaultModel(models, "sonnet")).toEqual({
+	expect(runtimeDefaultOption(models, "sonnet")).toEqual({
 		id: "sonnet",
 		label: "Sonnet",
 	});
 	expect(
-		runtimeDefaultModel([{ id: "default", label: "Default" }], "default"),
+		runtimeDefaultOption([{ id: "default", label: "Default" }], "default"),
 	).toBeUndefined();
-	expect(runtimeDefaultModel(models, undefined)).toBeUndefined();
+	expect(runtimeDefaultOption(models, undefined)).toBeUndefined();
 });

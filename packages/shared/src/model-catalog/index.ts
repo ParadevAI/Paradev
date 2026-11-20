@@ -26,6 +26,8 @@ export type AgentModelCatalog = {
 	stale: boolean;
 	/** The model a launch without a model override runs on, when the runtime says. */
 	defaultModel?: { id: string; label: string };
+	/** The reasoning effort a launch without an effort override runs at. */
+	defaultEffort?: { id: string; label: string };
 	failure?: "unsupported" | "timeout" | "busy" | "failed";
 };
 
@@ -77,8 +79,8 @@ export function filterModelCatalog(
 /** The id a runtime uses for "whatever model the agent picks itself". */
 export const DEFAULT_ALIAS_MODEL_ID = "default";
 
-export function runtimeDefaultModel(
-	models: readonly CatalogModel[],
+export function runtimeDefaultOption(
+	models: readonly Omit<CatalogModel, "metadata">[],
 	currentId: string | undefined,
 ): AgentModelCatalog["defaultModel"] {
 	const current = models.find((model) => model.id === currentId);

@@ -684,8 +684,8 @@ export function NewWorkspaceScreen({
 	loadSelectedCatalog.current = discovered?.load;
 	const selectedCatalogKey = discovered?.key;
 	useEffect(() => {
-		if (selectedCatalogKey && selectedModel) loadSelectedCatalog.current?.();
-	}, [selectedCatalogKey, selectedModel]);
+		if (selectedCatalogKey) loadSelectedCatalog.current?.();
+	}, [selectedCatalogKey]);
 	const effortForLaunch = effortOptions.some(
 		(option) => option.id === selectedEffort,
 	)
@@ -728,6 +728,9 @@ export function NewWorkspaceScreen({
 				selectedModel,
 				efforts: effortOptions,
 				selectedEffort,
+				defaultEffortLabel: selectedModel
+					? undefined
+					: discovered?.defaultEffort?.label,
 				labels: {
 					model: t({ message: "Model" }),
 					defaultModel: t({ message: "Default" }),
@@ -735,7 +738,14 @@ export function NewWorkspaceScreen({
 					defaultEffort: t({ message: "Default" }),
 				},
 			}),
-		[effortOptions, modelSupport, selectedEffort, selectedModel, t],
+		[
+			effortOptions,
+			modelSupport,
+			selectedEffort,
+			selectedModel,
+			discovered?.defaultEffort?.label,
+			t,
+		],
 	);
 	const [modelPickerOpen, setModelPickerOpen] = useState(false);
 	const selectLaunchOption = useCallback(

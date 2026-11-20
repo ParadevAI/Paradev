@@ -113,7 +113,13 @@ export function ModelPicker({
 		model?.label ??
 		currentAgentLabel ??
 		settings[0]?.label;
-	const currentEffortLabel = currentLabel(effort);
+	const currentEffort = effort?.options.find(
+		(entry) => entry.id === effort.currentValue,
+	);
+	const currentEffortLabel =
+		currentEffort?.id === agentSwitcher?.defaultOptionId
+			? (currentEffort?.description ?? currentEffort?.label)
+			: currentEffort?.label;
 	const effortLabel =
 		currentEffortLabel === pillLabel ? undefined : currentEffortLabel;
 	const modelLabelHidden = Boolean(hideModelLabel && agentIcon);

@@ -24,6 +24,8 @@ export interface AgentLaunchPreferences {
 	effort: AgentEffortOption | null;
 	/** The model the agent runs with no pick, when its runtime says. */
 	defaultModelLabel?: string;
+	/** The effort the agent's default model runs at, when its runtime says. */
+	defaultEffortLabel?: string;
 }
 
 const NO_PREFERENCES: AgentLaunchPreferences = {
@@ -136,6 +138,7 @@ export function useAgentLaunchPreferences(
 	});
 	const discoveredModels = catalog.data?.models;
 	const defaultModelLabel = catalog.data?.defaultModel?.label;
+	const defaultEffortLabel = catalog.data?.defaultEffort?.label;
 	return useMemo(
 		() => ({
 			...resolveAgentLaunchPreferences(
@@ -145,6 +148,7 @@ export function useAgentLaunchPreferences(
 				discoveredModels,
 			),
 			defaultModelLabel,
+			defaultEffortLabel,
 		}),
 		[
 			presetId,
@@ -152,6 +156,7 @@ export function useAgentLaunchPreferences(
 			effortByAgent,
 			discoveredModels,
 			defaultModelLabel,
+			defaultEffortLabel,
 		],
 	);
 }
