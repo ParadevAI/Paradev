@@ -149,6 +149,36 @@ describe("scope", () => {
 		});
 	});
 
+	test("billingDay pages Pacific days newest first, one at a time, and day is still the UTC day", async () => {
+		const pages: (string | null)[] = [];
+		let cursor: string | undefined;
+		do {
+			const page = await caller(MAYA).usage.query({
+				range: NOVEMBER,
+				groupBy: "billingDay",
+				limit: 1,
+				cursor,
+			});
+			pages.push(...page.items.map((item) => item.key));
+			cursor = page.nextCursor ?? undefined;
+		} while (cursor);
+		expect(pages).toEqual([...pages].sort().reverse());
+		expect(new Set(pages).size).toBe(pages.length);
+		const byDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "day",
+		});
+		const byBillingDay = await caller(MAYA).usage.query({
+			range: NOVEMBER,
+			groupBy: "billingDay",
+		});
+		expect(byBillingDay.total.gbHours).toBe(byDay.total.gbHours);
+		expect(byBillingDay.total.workspaces).toBeNull();
+		expect(byBillingDay.items[0]?.workspaces).toBeNull();
+		expect(typeof byDay.total.workspaces).toBe("number");
+		expect(byDay.items.map((item) => item.key)).toContain("2026-11-01");
+	});
+
 	test("a workspace in another organization returns nothing", async () => {
 		const usage = await caller(MAYA).usage.query({
 			range: NOVEMBER,
