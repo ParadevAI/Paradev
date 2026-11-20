@@ -171,7 +171,7 @@ test("taking a draft hands over what was typed and leaves the composer empty", (
 	);
 	act(() => view.result.current.onDraftChange(text("typed to a subagent")));
 
-	let taken: ComposerDraft | null = null;
+	let taken = null as ComposerDraft | null;
 	act(() => {
 		taken = view.result.current.takeDraft();
 	});
