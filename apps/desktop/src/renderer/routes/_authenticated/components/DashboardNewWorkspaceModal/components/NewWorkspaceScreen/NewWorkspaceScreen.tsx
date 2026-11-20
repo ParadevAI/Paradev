@@ -595,7 +595,13 @@ export function NewWorkspaceScreen({
 		useAgentChoices(launchHostUrl);
 	const cloudAgents = useCloudAgentChoices();
 	// Under Cloud the built-in presets stand in for a host's agent list.
-	const agentConfigs = isCloudHost ? cloudAgents : hostAgents;
+	const agentConfigs = useMemo(
+		() =>
+			(isCloudHost ? cloudAgents : hostAgents).filter(
+				(agent) => launchPresetIdOf(agent) !== "mastracode",
+			),
+		[isCloudHost, cloudAgents, hostAgents],
+	);
 	const agentsFetched = isCloudHost || hostAgentsFetched;
 	const selectableAgentIds = useMemo(
 		() => agentConfigs.map((agent) => agent.id),
