@@ -173,6 +173,10 @@ describe("scope", () => {
 			groupBy: "billingDay",
 		});
 		expect(byBillingDay.total.gbHours).toBe(byDay.total.gbHours);
+		expect(byBillingDay.total.workspaces).toBeUndefined();
+		expect(byBillingDay.items[0]?.workspaces).toBeUndefined();
+		expect(typeof byBillingDay.total.workspacesBootedOrFailed).toBe("number");
+		expect(typeof byDay.total.workspaces).toBe("number");
 		expect(byDay.items.map((item) => item.key)).toContain("2026-11-01");
 	});
 

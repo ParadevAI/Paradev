@@ -554,6 +554,19 @@ function toMetrics(row: MetricRow, overagePerGbHour: number | null) {
 
 export type CloudUsageMetrics = ReturnType<typeof toMetrics>;
 
+/** Grouped by billing day the rollup has no workspace: the count is of workspaces that booted or failed, under its own name. */
+function usageMetrics(
+	metrics: CloudUsageMetrics,
+	byBillingDay: boolean,
+): Omit<CloudUsageMetrics, "workspaces"> & {
+	workspaces?: number;
+	workspacesBootedOrFailed?: number;
+} {
+	if (!byBillingDay) return metrics;
+	const { workspaces, ...rest } = metrics;
+	return { ...rest, workspacesBootedOrFailed: workspaces };
+}
+
 /** These groupings have no entity behind the key: the key is the label. */
 const isPlainKey = (groupBy: CloudFleetGroupBy) =>
 	groupBy === "day" ||
@@ -831,7 +844,10 @@ async function usageRows(
 	if (!groupBy) {
 		return {
 			items: [],
-			total: toMetrics(await totalRow, overagePerGbHour),
+			total: usageMetrics(
+				toMetrics(await totalRow, overagePerGbHour),
+				byBillingDay,
+			),
 			rowCount: 0,
 			nextCursor: null,
 		};
@@ -934,7 +950,7 @@ async function usageRows(
 				key,
 				label: ref ? ref.name : isPlainKey(groupBy) ? key : null,
 				ref,
-				...toMetrics(metricRow, overagePerGbHour),
+				...usageMetrics(toMetrics(metricRow, overagePerGbHour), byBillingDay),
 				...(withDays && {
 					days: (days ?? []).map((day) => ({
 						day: day.day,
@@ -944,7 +960,7 @@ async function usageRows(
 				}),
 			};
 		}),
-		total: toMetrics(total, overagePerGbHour),
+		total: usageMetrics(toMetrics(total, overagePerGbHour), byBillingDay),
 		rowCount,
 		nextCursor:
 			rows.length > limit && last

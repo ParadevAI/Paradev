@@ -946,6 +946,19 @@ describe("grouped by billing day", () => {
 		}
 	});
 
+	test("there is no workspaces count by billing day, only the workspaces that booted or failed, by that name", async () => {
+		const byBillingDay = await usage({ groupBy: "billingDay" });
+		for (const metrics of [byBillingDay.total, ...byBillingDay.items]) {
+			expect(metrics).not.toHaveProperty("workspaces");
+			expect(typeof metrics.workspacesBootedOrFailed).toBe("number");
+		}
+		const byDay = await usage({ groupBy: "day" });
+		for (const metrics of [byDay.total, ...byDay.items]) {
+			expect(typeof metrics.workspaces).toBe("number");
+			expect(metrics).not.toHaveProperty("workspacesBootedOrFailed");
+		}
+	});
+
 	test("a filter the rollup cannot apply reads events, with the same rows", async () => {
 		await seedFallBack();
 		try {
