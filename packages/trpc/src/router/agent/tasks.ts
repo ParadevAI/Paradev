@@ -257,20 +257,25 @@ export async function fillSlots(
 			.update(agentSessions)
 			.set({ taskStatus: "running" })
 			.where(
-				eq(
-					agentSessions.id,
-					db
-						.select({ id: agentSessions.id })
-						.from(agentSessions)
-						.where(
-							and(
-								eq(agentSessions.agentId, agentId),
-								eq(agentSessions.kind, "task"),
-								eq(agentSessions.taskStatus, "queued"),
-							),
-						)
-						.orderBy(asc(agentSessions.createdAt))
-						.limit(1),
+				and(
+					// Under read committed, a second claim waiting on this row rechecks
+					// only the outer filter, so the status must be in it too.
+					eq(agentSessions.taskStatus, "queued"),
+					eq(
+						agentSessions.id,
+						db
+							.select({ id: agentSessions.id })
+							.from(agentSessions)
+							.where(
+								and(
+									eq(agentSessions.agentId, agentId),
+									eq(agentSessions.kind, "task"),
+									eq(agentSessions.taskStatus, "queued"),
+								),
+							)
+							.orderBy(asc(agentSessions.createdAt))
+							.limit(1),
+					),
 				),
 			)
 			.returning();
