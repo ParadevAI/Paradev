@@ -73,8 +73,6 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			tier: "pro",
 			autumnPlanId: "pro",
 			status: "active",
-			trialEnd: null,
-			seatsBilled: null,
 			cancelAt: null,
 			scheduledPlanId: null,
 			scheduledAt: null,
@@ -296,18 +294,4 @@ test.each([
 		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
 	} as never;
 	expect(billingFromCustomer(source, NOW).cloudUsage?.seats).toBe(expected);
-});
-
-test("support billing includes Autumn-only trial dates and license seats without usage balances", () => {
-	const source = customer({
-		flags: pro,
-		subscription: { trialEndsAt: NOW + DAY },
-	});
-	source.licenses = [
-		{ parentPlanId: "pro", granted: 3 },
-	] as Customer["licenses"];
-	const billing = billingFromCustomer(source, NOW);
-	expect(billing.trialEnd).toBe(new Date(NOW + DAY).toISOString());
-	expect(billing.seatsBilled).toBe(3);
-	expect(billing.cloudUsage).toBeNull();
 });

@@ -38,15 +38,14 @@ import {
 } from "better-auth/plugins";
 import { jwt } from "better-auth/plugins/jwt";
 import { and, asc, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
-import { autumnClient, billingUsesAutumn } from "./autumn";
+import { billingUsesAutumn } from "./autumn";
 import { env } from "./env";
 import { acceptInvitationEndpoint } from "./lib/accept-invitation-endpoint";
 import {
 	autumnBillingDeps,
 	autumnBillingRoutes,
 	handleStripeBillingEvent,
-	heldAutumnPlanId,
-	organizationPlan,
+	organizationPlanFromAutumn,
 	seatItem,
 	setAutumnSeats,
 	withAutumnBilling,
@@ -689,15 +688,6 @@ export const auth = betterAuth({
 				},
 
 				beforeDeleteOrganization: async ({ organization }) => {
-					const planId = billingUsesAutumn
-						? await heldAutumnPlanId(organization.id)
-						: null;
-					if (planId)
-						await autumnClient.billing.update({
-							customerId: organization.id,
-							planId,
-							cancelAction: "cancel_immediately",
-						});
 					if (!organization.stripeCustomerId) return;
 
 					const subs = await stripeClient.subscriptions.list({
@@ -740,7 +730,14 @@ export const auth = betterAuth({
 						}
 					}
 
-					const paying = (await organizationPlan(organization.id)) !== "free";
+					const paying = billingUsesAutumn
+						? (await organizationPlanFromAutumn(organization.id)) !== "free"
+						: !!(await db.query.subscriptions.findFirst({
+								where: and(
+									eq(subscriptions.referenceId, organization.id),
+									eq(subscriptions.status, "active"),
+								),
+							}));
 
 					if (paying) return;
 
@@ -797,14 +794,6 @@ export const auth = betterAuth({
 							.onConflictDoNothing();
 					}
 
-					const quantity = Math.max(
-						1,
-						await countBillableSeats(organization.id),
-					);
-					const seatsOwnedByAutumn =
-						billingUsesAutumn &&
-						(await setAutumnSeats(organization.id, quantity));
-
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
@@ -840,6 +829,10 @@ export const auth = betterAuth({
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
+					const quantity = Math.max(
+						1,
+						await countBillableSeats(organization.id),
+					);
 
 					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
@@ -847,6 +840,9 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
+					const seatsOwnedByAutumn =
+						billingUsesAutumn &&
+						(await setAutumnSeats(organization.id, quantity));
 					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
 					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
@@ -953,14 +949,6 @@ export const auth = betterAuth({
 						}),
 					});
 
-					const quantity = Math.max(
-						1,
-						await countBillableSeats(organization.id),
-					);
-					const seatsOwnedByAutumn =
-						billingUsesAutumn &&
-						(await setAutumnSeats(organization.id, quantity));
-
 					const subscription = await db.query.subscriptions.findFirst({
 						where: and(
 							eq(subscriptions.referenceId, organization.id),
@@ -970,6 +958,10 @@ export const auth = betterAuth({
 
 					if (!subscription?.stripeSubscriptionId) return;
 					if (subscription.plan === "enterprise") return;
+					const quantity = Math.max(
+						1,
+						await countBillableSeats(organization.id),
+					);
 
 					const stripeSub = await stripeClient.subscriptions.retrieve(
 						subscription.stripeSubscriptionId,
@@ -977,6 +969,9 @@ export const auth = betterAuth({
 					const seat = seatItem(stripeSub);
 					const itemId = seat?.id;
 
+					const seatsOwnedByAutumn =
+						billingUsesAutumn &&
+						(await setAutumnSeats(organization.id, quantity));
 					// TODO(2027-01-31): drop the direct Stripe write once every paid org is imported into Autumn.
 					if (!seatsOwnedByAutumn && itemId) {
 						await stripeClient.subscriptions.update(
@@ -1121,7 +1116,7 @@ export const auth = betterAuth({
 				let plan: string | null = null;
 				if (billingUsesAutumn) {
 					const tier = activeOrganizationId
-						? await organizationPlan(activeOrganizationId)
+						? await organizationPlanFromAutumn(activeOrganizationId)
 						: "free";
 					plan = tier === "free" ? null : tier;
 				} else if (activeOrganizationId === data.planOrganizationId) {
@@ -1193,8 +1188,17 @@ export const auth = betterAuth({
 							action === "cancel-subscription" ||
 							action === "restore-subscription"
 						) {
-							const enterprise =
-								(await organizationPlan(referenceId)) === "enterprise";
+							const enterprise = billingUsesAutumn
+								? (await organizationPlanFromAutumn(referenceId)) ===
+									"enterprise"
+								: (
+										await db.query.subscriptions.findFirst({
+											where: and(
+												eq(subscriptions.referenceId, referenceId),
+												eq(subscriptions.status, "active"),
+											),
+										})
+									)?.plan === "enterprise";
 							if (enterprise) return false;
 						}
 

@@ -32,6 +32,7 @@ stub(connectors, {
 // The plan gate is exercised on the route, not here: these cases are about
 // how one delivery fans out across connections.
 stub(syncPolicy, {
+	organizationSyncs: mock(() => undefined),
 	organizationSyncsNow: mock(async () => true),
 	syncingOrganizationIds: mock(
 		async (organizationIds: string[]) => new Set(organizationIds),

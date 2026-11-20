@@ -1,5 +1,5 @@
 import { beforeEach, expect, mock, test } from "bun:test";
-import * as billing from "@superset/auth/billing";
+import { db } from "@superset/db/client";
 import * as connectors from "@superset/trpc/connectors";
 import { Client } from "@upstash/qstash";
 import { posthog } from "@/lib/analytics";
@@ -46,7 +46,9 @@ const findLink = mock(
 		userId: "linked-user",
 	}),
 );
-stub(billing, { organizationPlan: async () => "pro" });
+stub(db.query.subscriptions, {
+	findFirst: async () => ({ id: "subscription" }),
+});
 stub(connectors, {
 	accountConnection: async () => ({ organizationId: "org" }),
 	accountConnections: async () => [{ organizationId: "org" }],
