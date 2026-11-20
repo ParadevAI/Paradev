@@ -2,7 +2,7 @@
 	"extends": "@superset/typescript/internal-package.json",
 	"compilerOptions": {
 		"rootDir": ".",
-		"types": ["bun"],
+		"types": ["bun-types"],
 		"jsx": "react-jsx",
 		"declaration": false,
 		"declarationMap": false
