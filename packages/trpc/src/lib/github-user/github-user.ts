@@ -12,15 +12,15 @@ import { getBrowserApiUrl } from "@superset/shared/browser-api-url";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { env } from "../../env";
-import { queueGithubTokenReapply } from "../sandbox/reapply-github-token";
+import { queueRulesReapply } from "../sandbox/reapply-rules";
 import { open, seal } from "../secret-box";
 
 const STATE_TTL_MS = 10 * 60_000;
 /**
- * Longer than a box's 30-minute credential refresh, so a refresh never puts a
- * token in the rule that expires before the next one.
+ * Longer than the most a scheduled rule refresh runs before expiry (45 min),
+ * so that refresh always renews the token and moves the next one on.
  */
-export const GITHUB_USER_TOKEN_REFRESH_MARGIN_MS = 40 * 60_000;
+export const GITHUB_USER_TOKEN_REFRESH_MARGIN_MS = 50 * 60_000;
 const STATE_AAD = "github-user-connect";
 
 export class GithubUserConnectionError extends Error {
@@ -195,6 +195,7 @@ export async function completeGithubUserConnection(args: {
 			target: githubUserConnections.userId,
 			set: { ...identity, ...columns },
 		});
+	await queueRulesReapply({ userId });
 	return { login: identity.login };
 }
 
@@ -202,10 +203,16 @@ export async function githubUserConnectionFor(userId: string): Promise<{
 	githubUserId: string;
 	login: string;
 	name: string | null;
+	accessTokenExpiresAt: Date | null;
 } | null> {
 	const row = await db.query.githubUserConnections.findFirst({
 		where: eq(githubUserConnections.userId, userId),
-		columns: { githubUserId: true, login: true, name: true },
+		columns: {
+			githubUserId: true,
+			login: true,
+			name: true,
+			accessTokenExpiresAt: true,
+		},
 	});
 	return row ?? null;
 }
@@ -289,7 +296,7 @@ export async function githubUserTokenFor(
 	});
 	// GitHub revoked the old token, which the person's other boxes still hold.
 	if (result.rotated) {
-		await queueGithubTokenReapply(userId);
+		await queueRulesReapply({ userId });
 	}
 	return result.token;
 }
@@ -303,6 +310,7 @@ export async function disconnectGithubUser(userId: string): Promise<void> {
 	await db
 		.delete(githubUserConnections)
 		.where(eq(githubUserConnections.userId, userId));
+	await queueRulesReapply({ userId });
 	if (!githubUserConnectionConfigured()) return;
 	const { clientId, clientSecret } = clientCredentials();
 	await fetch(`https://api.github.com/applications/${clientId}/grant`, {

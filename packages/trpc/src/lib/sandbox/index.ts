@@ -1,4 +1,6 @@
+export { renewChatgptSignIns } from "../../router/agent-credential";
 export { mintSandboxGateAccess, sandboxHostSecretFor } from "./access";
+export { agentsToRestart } from "./agent-sign-in-kinds";
 export {
 	type ReportSandboxAgentStatusOutcome,
 	reportSandboxAgentStatus,
@@ -32,14 +34,16 @@ export {
 	type RemoteBranchPage,
 } from "./list-branches";
 export {
-	REAPPLY_GITHUB_TOKEN_JOB_PATH,
-	reapplyGithubTokenOnBoxes,
-} from "./reapply-github-token";
+	queueRulesReapply,
+	REAPPLY_RULES_JOB_PATH,
+	type RulesScope,
+	reapplyRulesFor,
+	scheduleRulesRefresh,
+} from "./reapply-rules";
 export {
 	type RefreshSandboxCredentialsOutcome,
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
-export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
 export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,

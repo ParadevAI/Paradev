@@ -4,7 +4,6 @@
  * its identity file, the credential rules for the firewall, the managed
  * environment to push after boot, and the host secret for the boot command.
  */
-import { createHmac } from "node:crypto";
 import { db } from "@superset/db/client";
 import { type cloudWorkspaces, users } from "@superset/db/schema";
 import {
@@ -24,16 +23,15 @@ import {
 } from "@superset/shared/sandbox/contract";
 import { eq } from "drizzle-orm";
 import { env } from "../../env";
-import {
-	type AgentSignIns,
-	resolveAgentSignIns,
-} from "../../router/agent-credential";
+import { resolveAgentSignIns } from "../../router/agent-credential";
+import { accessTokenExpiresAt } from "../../router/agent-credential/utils/chatgpt";
 import { resolveEnvironment } from "../../router/environment/resolve-environment";
 import { posthog } from "../analytics";
 import { resolveMachineSize } from "../billing/plan";
 import { organizationFlagEnabled } from "../feature-flags";
 import { githubUserConnectionFor, githubUserTokenFor } from "../github-user";
 import { sandboxHostSecretFor } from "./access";
+import { agentSignInKinds } from "./agent-sign-in-kinds";
 import { deriveSandboxCredentials, gitAuthorFor } from "./credentials";
 import { creatorPlugins } from "./plugins";
 import { readRepoHooks } from "./repo-hooks";
@@ -45,26 +43,6 @@ import {
 import type { SandboxClaim, SandboxEnvironment } from "./vercel";
 
 type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
-
-/**
- * A ChatGPT sign-in counts by its account, not its access token: the API
- * renews that token every few days and the firewall carries the new one, so a
- * renewal is not a change a running agent has to restart for.
- */
-function agentCredentialDigest(signIns: AgentSignIns): string {
-	const values: Record<string, string> = {
-		...signIns.env,
-		...(signIns.codexChatgpt
-			? { CODEX_CHATGPT_ACCOUNT: signIns.codexChatgpt.accountId }
-			: {}),
-	};
-	const sorted = Object.keys(values)
-		.sort()
-		.map((key) => [key, values[key]]);
-	return createHmac("sha256", env.SANDBOX_GATE_SECRET)
-		.update(`agent-credentials:${JSON.stringify(sorted)}`)
-		.digest("hex");
-}
 
 /** Commits by a workspace nobody created, such as an automation's. */
 const SUPERSET_GIT_AUTHOR = { name: BRAND.NAME, email: "noreply@superset.sh" };
@@ -92,6 +70,8 @@ export async function buildSandboxClaim(args: {
 	environment: SandboxEnvironment;
 	repositories: SandboxRepository[];
 	agentCredentialDigest: string;
+	/** When the first token in the rules expires; null when none does. */
+	rulesExpireAt: Date | null;
 }> {
 	const [environment, signIns, boxLogs] = await Promise.all([
 		resolveEnvironment(args.row.environmentId, args.row.organizationId),
@@ -127,9 +107,16 @@ export async function buildSandboxClaim(args: {
 	const plugins = await creatorPlugins(creator, args.row.organizationId);
 	// The creator's own token when they have connected GitHub: pushes and pull
 	// requests are theirs. The App's installation token otherwise.
-	const token =
-		userToken ??
-		(await installationTokenFor(checkouts.map((entry) => entry.repository)));
+	const installation = userToken
+		? null
+		: await installationTokenFor(checkouts.map((entry) => entry.repository));
+	const token = userToken ?? installation?.token ?? null;
+	const expiries = [
+		userToken ? githubAccount?.accessTokenExpiresAt : installation?.expiresAt,
+		signIns.codexChatgpt
+			? accessTokenExpiresAt(signIns.codexChatgpt.accessToken)
+			: null,
+	].filter((at): at is Date => at instanceof Date);
 	const primaryCheckout = checkouts[0];
 	const repoHooks =
 		args.withRepoHooks && primaryCheckout
@@ -200,6 +187,9 @@ export async function buildSandboxClaim(args: {
 			region: environment.region,
 		},
 		repositories,
-		agentCredentialDigest: agentCredentialDigest(signIns),
+		agentCredentialDigest: agentSignInKinds(signIns),
+		rulesExpireAt: expiries.length
+			? new Date(Math.min(...expiries.map((at) => at.getTime())))
+			: null,
 	};
 }

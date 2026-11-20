@@ -20,6 +20,8 @@ export interface AgentSignIns {
 	/** What each signed-in agent reads from its environment. */
 	env: Record<string, string>;
 	codexChatgpt: CodexChatgptSignIn | null;
+	/** Agents the person keeps signed in themselves; the box gets nothing for them. */
+	manual?: string[];
 }
 
 export interface SignInRow {
@@ -38,8 +40,12 @@ export async function signInsFromRows<Row extends SignInRow>(
 ): Promise<AgentSignIns> {
 	const env: Record<string, string> = {};
 	let codexChatgpt: CodexChatgptSignIn | null = null;
+	const manual: string[] = [];
 	for (const row of rows) {
-		if (isManualSignIn(row)) continue;
+		if (isManualSignIn(row)) {
+			manual.push(row.agent);
+			continue;
+		}
 		if (row.agent === "codex" && row.provider === CHATGPT_PROVIDER) {
 			const tokens = await deps.chatgptTokens(row);
 			if (!tokens) continue;
@@ -61,5 +67,5 @@ export async function signInsFromRows<Row extends SignInRow>(
 			}),
 		);
 	}
-	return { env, codexChatgpt };
+	return { env, codexChatgpt, manual };
 }

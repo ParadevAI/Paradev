@@ -1,24 +1,17 @@
 /**
- * A running box's request for fresh credential rules. host-service calls it
- * on a timer with the host secret it was booted with, which the API derives
- * rather than stores, so the box proves which workspace it is without holding
- * anything the API does not already know. The token itself never leaves the
- * API: the answer is a firewall policy update, not a value.
+ * What host-service from before event-driven rules still calls every 30
+ * minutes. Boxes awake when that change shipped have no scheduled refresh
+ * yet; this reapply schedules one. Removed with the host-service poll.
  */
 
 import { timingSafeEqual } from "node:crypto";
-import { db } from "@superset/db/client";
-import { cloudWorkspaces } from "@superset/db/schema";
-import { eq } from "drizzle-orm";
 import { sandboxHostSecretFor } from "./access";
-import { buildSandboxClaim } from "./claim";
-import { applySandboxPolicy } from "./vercel";
+import { reapplyRulesFor } from "./reapply-rules";
 
 export type RefreshSandboxCredentialsOutcome =
 	| "applied"
 	| "not-running"
-	| "unauthorized"
-	| "not-ready";
+	| "unauthorized";
 
 export async function refreshSandboxCredentials(args: {
 	workspaceId: string;
@@ -32,13 +25,11 @@ export async function refreshSandboxCredentials(args: {
 	) {
 		return "unauthorized";
 	}
-	const row = await db.query.cloudWorkspaces.findFirst({
-		where: eq(cloudWorkspaces.id, args.workspaceId),
-	});
-	if (!row?.providerSandboxId || row.status !== "awake") return "not-ready";
-	const { claim } = await buildSandboxClaim({ row });
-	return applySandboxPolicy({
-		providerSandboxId: row.providerSandboxId,
-		networkPolicy: claim.networkPolicy,
-	});
+	const { applied, failed } = await reapplyRulesFor(
+		{ cloudWorkspaceId: args.workspaceId },
+		{ deadline: Date.now() + 30_000 },
+	);
+	if (failed)
+		throw new Error(`re-applying the claim on ${args.workspaceId} failed`);
+	return applied ? "applied" : "not-running";
 }

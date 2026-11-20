@@ -145,6 +145,7 @@ async function addressSandbox(
 ): Promise<{
 	hostTarget: string;
 	running: boolean;
+	agentsToRestart: string[];
 	agentCredentialsChanged: boolean;
 	vcpus?: number;
 }> {
@@ -163,6 +164,7 @@ async function addressSandbox(
 				hostTarget: described.hostTarget,
 				running: described.running,
 				vcpus: described.vcpus,
+				agentsToRestart: [],
 				agentCredentialsChanged: false,
 			};
 		}
@@ -652,6 +654,7 @@ export const cloudWorkspaceRouter = {
 				token: host.token,
 				expiresAt: host.expiresAt,
 				running: address.running,
+				agentsToRestart: address.agentsToRestart,
 				agentCredentialsChanged: address.agentCredentialsChanged,
 				// The display is served by host-service too: same address, same
 				// ticket. The sandbox's own desktop port is not published.

@@ -14,6 +14,7 @@ import {
 import type { TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
+import { queueRulesReapply } from "../../lib/sandbox/reapply-rules";
 import { personProcedure, userError } from "../../trpc";
 import {
 	accessTokenExpiresAt,
@@ -189,6 +190,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent, kind: input.kind };
 		}),
 
@@ -265,6 +267,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { status: "connected" as const, accountLabel };
 		}),
 
@@ -296,6 +299,7 @@ export const agentCredentialRouter = {
 						lastValidatedAt: row.lastValidatedAt,
 					},
 				});
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent };
 		}),
 
@@ -310,6 +314,7 @@ export const agentCredentialRouter = {
 						eq(agentCredentials.agent, input.agent),
 					),
 				);
+			await queueRulesReapply({ userId: ctx.principal.userId });
 			return { agent: input.agent };
 		}),
 } satisfies TRPCRouterRecord;
@@ -351,8 +356,9 @@ async function currentChatgptTokens(
 		lastValidatedAt: new Date(),
 	});
 	let renewed: ChatgptTokens | null = null;
+	let removed = false;
 	try {
-		return await dbWs.transaction(async (tx) => {
+		const current = await dbWs.transaction(async (tx) => {
 			const [locked] = await tx
 				.select()
 				.from(agentCredentials)
@@ -382,6 +388,7 @@ async function currentChatgptTokens(
 				await tx
 					.delete(agentCredentials)
 					.where(eq(agentCredentials.id, locked.id));
+				removed = true;
 				return null;
 			}
 			await tx
@@ -390,6 +397,8 @@ async function currentChatgptTokens(
 				.where(eq(agentCredentials.id, locked.id));
 			return renewed;
 		});
+		if (renewed || removed) await queueRulesReapply({ userId: row.userId });
+		return current;
 	} catch (error) {
 		if (renewed) {
 			await dbWs
@@ -405,6 +414,7 @@ async function currentChatgptTokens(
 						extra: { credentialId: row.id },
 					});
 				});
+			await queueRulesReapply({ userId: row.userId });
 			return renewed;
 		}
 		console.warn("[agent-credential] ChatGPT sign-in was not renewed", error);

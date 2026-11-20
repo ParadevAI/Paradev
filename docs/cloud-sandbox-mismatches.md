@@ -234,9 +234,9 @@ firewall swaps the bearer on `chatgpt.com`. Verified 2026-10-21 on a real box,
 including a forced rotation while it ran.
 
 An hourly QStash job (`/api/cloud-workspaces/jobs/renew-chatgpt-sign-ins`)
-renews every session near expiry, also with no box running, and re-applies
-the rules on the running boxes of every sign-in saved in the last three
-hours. Not yet verified on a real box. Only a refusal that names a dead
+renews every session near expiry, also with no box running. Each renewal
+queues a re-apply of the claim on that person's awake boxes. Not yet verified
+on a real box. Only a refusal that names a dead
 session (`refresh_token_expired`, `refresh_token_reused`,
 `refresh_token_invalidated`, `invalid_grant`) removes the sign-in; any other
 failure keeps it and goes to Sentry, tagged `chatgpt_refresh_code`. **Open:** Codex in the box cannot recover
@@ -248,7 +248,7 @@ model credential. Some teams run their own script that rotates Claude or Codex l
 placeholder overrides it: `CLAUDE_CODE_OAUTH_TOKEN` and `ANTHROPIC_API_KEY` take precedence over
 `~/.claude/.credentials.json` in Claude Code. A Manual row (`agent_credentials.provider =
 "manual"`, no secret) makes `resolveAgentSignIns` skip that agent, so create, wake and the
-credential-refresh timer hand the box no variable, firewall rule or login file for it. The box
+every claim re-apply hand the box no variable, firewall rule or login file for it. The box
 reaches the provider through the `"*"` catch-all with whatever the script wrote. **Open:** a
 `~/.codex/auth.json` of placeholders written by an earlier ChatGPT sign-in stays on the box until
 the script replaces it; the auth-failure card knows about Manual only in the viewer's own box.
@@ -832,6 +832,22 @@ unless overridden. Both Blaxel limitations — routing fixed at creation, forks
 unable to have the proxy at all — are gone, which is why every sandbox now
 brokers its model credentials at the firewall. A custom policy denies everything it doesn't
 list: the `"*": []` catch-all is what keeps npm, git and the rest reachable.
+
+**A firewall rule binds to a connection when it opens.** A policy update
+reaches the next connection, not the ones already open: a running agent keeps
+the value it connected with. Measured 2026-11-19 on a real box (Claude Code
+2.1.280, Codex 0.162.1). Codex opened a new connection per request and used a
+new value on its next request. Claude Code kept about seven connections to
+Anthropic and used the old value until they closed, about 5 min after its last
+request, and longer while it stayed busy. So a disconnect does not stop a busy
+Claude at once: it keeps working on the open connections for up to about 5 min
+idle. The secret still never enters the box. We accept that; only a restart
+cuts it off at once. A change of credential *kind* (an API key to a
+subscription, an API key to ChatGPT) needs a restart of that agent: each CLI
+fixes the variable, provider and login file it reads at start, and ignores
+rewritten files. The API pushes the claim to awake boxes when something in it
+changes or a token in it nears expiry (`lib/sandbox/reapply-rules.ts`), and
+asks for a restart only for an agent whose kind changed.
 
 **A fork copies the source's config; every field we pass is an override.**
 Resources, timeout, ports, tags, network policy, persistence and env are all

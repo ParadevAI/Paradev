@@ -90,7 +90,7 @@ async function readBuildInputs(
 		...repositories.filter((row) => row.id !== primary.id),
 	];
 	const baseBranch = primary.defaultBranch;
-	const token = await installationTokenFor(ordered);
+	const token = (await installationTokenFor(ordered))?.token ?? null;
 	const [hooks, environment] = await Promise.all([
 		readRepoHooks({ repo: primary, branch: baseBranch, token }),
 		resolveEnvironment(build.environmentId, build.organizationId),
