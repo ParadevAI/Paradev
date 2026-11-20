@@ -248,14 +248,22 @@ export async function discoverAgentModels(
 								await adapter.dispose();
 							}
 						} else if (ctx.presetId === "codex") {
-							models = await discoverCodexModels(
-								{
-									command: agentCliCommand(ctx.config.command, ctx.env),
-									env: ctx.env,
-									cwd: ctx.cwd,
-								},
-								signal,
-							);
+							const bundled = getAgentModelSupport("codex")?.models ?? [];
+							models = (
+								await discoverCodexModels(
+									{
+										command: agentCliCommand(ctx.config.command, ctx.env),
+										env: ctx.env,
+										cwd: ctx.cwd,
+									},
+									signal,
+								)
+							).map((model) => ({
+								...model,
+								label:
+									bundled.find((entry) => entry.id === model.id)?.label ??
+									model.label,
+							}));
 						} else if (
 							input.surface === "terminal" &&
 							ctx.presetId === "cursor-agent"
