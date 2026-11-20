@@ -35,7 +35,7 @@ export const useBoxPressureStore = create<BoxPressureState>()((set) => ({
 		set((state) => ({
 			dismissed: { ...state.dismissed, [workspaceId]: true },
 		})),
-	clear: () => set({ workspaces: {} }),
+	clear: () => set({ workspaces: {}, dismissed: {} }),
 }));
 
 export function useBoxPressure(workspaceId: string | null): BoxPressure | null {

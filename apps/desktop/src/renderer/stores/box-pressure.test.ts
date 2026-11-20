@@ -49,3 +49,17 @@ test("a dismissal lasts while the box is critical and is forgotten when it ends"
 	apply({ type: "box-pressure", snapshot: false, workspaces: { a: null } });
 	expect(useBoxPressureStore.getState().dismissed).toEqual({});
 });
+
+test("clear forgets dismissals, so a new subscription shows a critical box again", () => {
+	const { apply, dismiss, clear } = useBoxPressureStore.getState();
+	const critical: BoxPressure = {
+		level: "critical",
+		limitedBy: ["memory"],
+		at: 1,
+	};
+	apply({ type: "box-pressure", snapshot: true, workspaces: { a: critical } });
+	dismiss("a");
+	clear();
+	apply({ type: "box-pressure", snapshot: true, workspaces: { a: critical } });
+	expect(useBoxPressureStore.getState().dismissed).toEqual({});
+});
