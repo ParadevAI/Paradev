@@ -1,3 +1,5 @@
+import { billingUsesAutumn } from "@superset/auth/autumn";
+import { organizationPlanFromAutumn } from "@superset/auth/billing";
 import { db } from "@superset/db/client";
 import { subscriptions } from "@superset/db/schema";
 import { organizations } from "@superset/db/schema/auth";
@@ -16,6 +18,7 @@ import {
 	type SQLWrapper,
 	sql,
 } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 /**
  * How long a lapsed subscription keeps its integrations. An organization that
@@ -29,33 +32,49 @@ const LAPSE_GRACE = sql`now() - interval '7 days'`;
  * Whether an organization's integrations sync at all: webhooks accepted,
  * tokens refreshed, backfills run, GitHub App installation unsuspended.
  *
- * Today that is "on a paying plan, or was until less than a week ago". This
+ * Today that is "on a paying plan, or was until less than a week ago". A
+ * paying plan is the tier Autumn grants, stored on the organization, or a
+ * paying Stripe subscription row; a plan granted in Autumn alone has no row. This
  * is the one place to add a rule such as recent activity; every consumer takes
  * the predicate from here, so the suspend cron and the accept paths cannot
  * disagree about who is iced.
  */
 export function organizationSyncs(organizationId: SQLWrapper): SQL {
-	return exists(
-		db
-			.select({ id: subscriptions.id })
-			.from(subscriptions)
-			.where(
-				and(
-					eq(subscriptions.referenceId, organizationId),
-					inArray(subscriptions.plan, [...PAID_PLAN_TIERS]),
-					or(
-						inArray(subscriptions.status, [...ACTIVE_SUBSCRIPTION_STATUSES]),
-						and(
-							eq(subscriptions.status, "canceled"),
-							gt(
-								sql`coalesce(${subscriptions.endedAt}, ${subscriptions.periodEnd}, ${subscriptions.updatedAt})`,
-								LAPSE_GRACE,
+	const granted = alias(organizations, "plan_tier_organizations");
+	return or(
+		exists(
+			db
+				.select({ id: granted.id })
+				.from(granted)
+				.where(
+					and(
+						eq(granted.id, organizationId),
+						inArray(granted.planTier, [...PAID_PLAN_TIERS]),
+					),
+				),
+		),
+		exists(
+			db
+				.select({ id: subscriptions.id })
+				.from(subscriptions)
+				.where(
+					and(
+						eq(subscriptions.referenceId, organizationId),
+						inArray(subscriptions.plan, [...PAID_PLAN_TIERS]),
+						or(
+							inArray(subscriptions.status, [...ACTIVE_SUBSCRIPTION_STATUSES]),
+							and(
+								eq(subscriptions.status, "canceled"),
+								gt(
+									sql`coalesce(${subscriptions.endedAt}, ${subscriptions.periodEnd}, ${subscriptions.updatedAt})`,
+									LAPSE_GRACE,
+								),
 							),
 						),
 					),
 				),
-			),
-	);
+		),
+	) as SQL;
 }
 
 export async function syncingOrganizationIds(
@@ -77,5 +96,11 @@ export async function syncingOrganizationIds(
 export async function organizationSyncsNow(
 	organizationId: string,
 ): Promise<boolean> {
+	if (
+		billingUsesAutumn &&
+		(await organizationPlanFromAutumn(organizationId)) !== "free"
+	) {
+		return true;
+	}
 	return (await syncingOrganizationIds([organizationId])).has(organizationId);
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "auth"."organizations" ADD COLUMN "plan_tier" text;

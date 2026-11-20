@@ -7,6 +7,7 @@ import {
 } from "@superset/shared/billing";
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type Stripe from "stripe";
+import { billingUsesAutumn } from "../../../autumn";
 import { env } from "../../../env";
 import { stripeClient } from "../../../stripe";
 import { planFromStripePrice } from "../legacy/plan-ids";
@@ -24,6 +25,7 @@ import {
 import { paidPlanIdFromFlags, tierFromFlags } from "./entitlements";
 import { emailPlanFor, upgradedFrom } from "./plan-family";
 import { invalidateOrganizationBilling } from "./plan-state";
+import { recordPlanTier } from "./plan-tier";
 import { billingRedis } from "./redis";
 import {
 	seatItem,
@@ -176,6 +178,7 @@ export async function syncOrganizationSubscription(
 	organizationId: string,
 ): Promise<void> {
 	await invalidateOrganizationBilling(organizationId);
+	if (billingUsesAutumn) await recordPlanTier(organizationId);
 	const stripeCustomerId = await resolveStripeCustomerId(organizationId);
 	if (!stripeCustomerId) return;
 

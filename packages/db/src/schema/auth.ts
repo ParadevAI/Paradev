@@ -128,6 +128,7 @@ export const organizations = authSchema.table(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		metadata: text("metadata"),
 		stripeCustomerId: text("stripe_customer_id"),
+		planTier: text("plan_tier"),
 		allowedDomains: text("allowed_domains").array().default([]).notNull(),
 		taskTracker: taskTracker("task_tracker").notNull().default("superset"),
 	},
