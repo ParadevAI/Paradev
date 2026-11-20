@@ -13,6 +13,7 @@ import {
 	claudeKeychainAccounts,
 	discoverClaudeProfiles,
 	readCodexProfileKind,
+	scanClaudeProfiles,
 } from "./profiles";
 
 // Claude Code keys its Keychain items on these names; a miss reads a sibling
@@ -156,5 +157,31 @@ describe("discoverClaudeProfiles", () => {
 			credentialKind: "subscription",
 			loginFingerprint: null,
 		});
+	});
+});
+
+describe("scanClaudeProfiles", () => {
+	it("says when it stopped at its time budget", async () => {
+		const dirs = [tempProfile(), tempProfile()];
+		for (const dir of dirs) {
+			writeFileSync(
+				join(dir, ".claude.json"),
+				JSON.stringify({ oauthAccount: { emailAddress: "a@b.c" } }),
+			);
+		}
+		// Clock reads: the start, before the first dir, then past the budget.
+		const clock = [0, 0];
+		const stopped = await scanClaudeProfiles(
+			dirs,
+			() => clock.shift() ?? 60_000,
+		);
+		expect(stopped.profiles.map((profile) => profile.configDir)).toEqual(
+			dirs.slice(0, 1),
+		);
+		expect(stopped.partial).toBe(true);
+
+		const complete = await scanClaudeProfiles(dirs, () => 0);
+		expect(complete.profiles.map((profile) => profile.configDir)).toEqual(dirs);
+		expect(complete.partial).toBe(false);
 	});
 });
