@@ -63,6 +63,7 @@ export {
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,

@@ -14,6 +14,7 @@ import {
 	deleteSandbox,
 	describeSandbox,
 	findSandboxSession,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	promoteSandboxToEnvironment,
@@ -303,7 +304,7 @@ describe("a caller that is not a wake leaves a stopped box stopped", () => {
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 
 		fake = stopsAfterRead(fakeBox("running"));
-		expect(await topUpSandboxSession("ws-box")).toBeNull();
+		expect(await topUpSandboxSession("ws-box", HOUR)).toBeNull();
 		expect(fake.box).toMatchObject({ live: "stopped", resumes: [] });
 	});
 });
@@ -516,6 +517,14 @@ describe("topUpSandboxSession", () => {
 	});
 });
 
+describe("keepaliveWindowMs", () => {
+	test("outlives the box's next ping, and never exceeds what a legacy box gets", () => {
+		expect(keepaliveWindowMs(5 * 60_000)).toBe(SESSION_TIMEOUT_MS);
+		expect(keepaliveWindowMs()).toBe(20 * 60_000);
+		expect(keepaliveWindowMs(24 * 60 * 60_000)).toBe(20 * 60_000);
+	});
+});
+
 describe("agentToolsMounts", () => {
 	const detached = () => Promise.resolve({ currentSandboxName: undefined });
 
@@ -574,11 +583,13 @@ describe("agentToolsMounts", () => {
 describe("wakeSandbox", () => {
 	const asked: string[] = [];
 	const updates: unknown[] = [];
+	let savedTimeout = SESSION_TIMEOUT_MS;
 	stub(Sandbox, {
 		get: async () => ({
 			status: "stopped",
 			region: "iad1",
 			vcpus: 2,
+			timeout: savedTimeout,
 			mounts: {},
 			domain: () => "https://host.example",
 			update: async (patch: unknown) => {
@@ -617,6 +628,20 @@ describe("wakeSandbox", () => {
 				},
 			},
 		]);
+	});
+
+	test("gives a box created with an older timeout the current one before it resumes", async () => {
+		savedTimeout = HOUR;
+		updates.length = 0;
+		const stop = new Error("stop before resume");
+		await expect(
+			wakeSandbox({
+				providerSandboxId: "sbx",
+				claim: { vcpus: 2, identity: {} } as unknown as SandboxClaim,
+				beforeResume: () => Promise.reject(stop),
+			}),
+		).rejects.toBe(stop);
+		expect(updates).toEqual([{ timeout: SESSION_TIMEOUT_MS }]);
 	});
 });
 

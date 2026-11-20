@@ -745,7 +745,7 @@ why `cloudWorkspace.setMachineSize` restarts a running box, and why
 `describeSandbox` reports the session's vCPUs.
 
 **A session ends; the sandbox does not.** A session stops at its timeout
-(`SESSION_TIMEOUT_MS`, one hour, extended while in use) or on
+(`SESSION_TIMEOUT_MS`, fifteen minutes, extended while in use) or on
 `stop()`, and the platform snapshots the filesystem. The next wake boots a
 new session from that snapshot with *no processes*: uncommitted files survive,
 a running agent does not. Blaxel froze the VM instead, processes intact. So
@@ -753,9 +753,13 @@ the idle stop must not fire on a workspace someone is using — which is what
 the open workspace's `wake` on every token refresh is for — nor under an
 agent that is still working. For that the box itself asks: on agent activity
 (any hook event from a terminal agent or one of its subagents, any item of a
-chat turn), at most every fifteen minutes, `sandbox-keepalive` in host-service
-calls `sandbox.keepalive`, and the API tops the session up to a full timeout
-(`topUpSandboxSession`). The box then stops a
+chat turn), at most every five minutes, `sandbox-keepalive` in host-service
+calls `sandbox.keepalive` with that interval, and the API tops the session up
+past the next ping (`topUpSandboxSession`, `keepaliveWindowMs`): a full
+timeout for a box that pings every five minutes, twenty minutes for a bundle
+that does not send the interval and pings every fifteen. The timeout is saved
+on the sandbox at create and reused on every resume, so `wakeSandbox` resets
+it on a stopped box made with an older one. The box then stops a
 session timeout after its agent last did anything. An agent waiting on a
 permission prompt, a hung one, and a background shell or dev server left
 running after the turn all count as idle. A single tool call that runs longer
