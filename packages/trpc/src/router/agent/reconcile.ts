@@ -1,7 +1,7 @@
 import { sessionWorkflowId, stateQuery } from "@superset/agent-harness/session";
 import { db } from "@superset/db/client";
 import { agents, agentTurns } from "@superset/db/schema";
-import type { Client } from "@temporalio/client";
+import { type Client, WorkflowNotFoundError } from "@temporalio/client";
 import { and, eq, sql } from "drizzle-orm";
 import { posthog } from "../../lib/analytics";
 import { afterTaskTurn } from "./tasks";
@@ -173,13 +173,18 @@ function staleRunningTurns(organizationId: string | undefined) {
 type StaleTurn = Awaited<ReturnType<typeof staleRunningTurns>>[number];
 type Workflow = ReturnType<Client["workflow"]["getHandle"]>;
 
-/** Healthy when the workflow is running this turn or may still start it. */
-async function workflowState(
-	workflow: Workflow,
+/** Healthy when the workflow is running this turn, may still start it, or Temporal could not say. */
+export async function workflowState(
+	workflow: Pick<Workflow, "describe" | "query">,
 	turnId: string,
 ): Promise<"healthy" | "wedged" | "lost"> {
-	const description = await workflow.describe().catch(() => null);
-	if (description?.status.name !== "RUNNING") return "lost";
+	let description: Awaited<ReturnType<Workflow["describe"]>>;
+	try {
+		description = await workflow.describe();
+	} catch (error) {
+		return error instanceof WorkflowNotFoundError ? "lost" : "healthy";
+	}
+	if (description.status.name !== "RUNNING") return "lost";
 	const attempt = description.raw.pendingWorkflowTask?.attempt ?? 0;
 	if (attempt >= WEDGED_ATTEMPTS) return "wedged";
 	const state = await workflow.query(stateQuery).catch(() => null);
