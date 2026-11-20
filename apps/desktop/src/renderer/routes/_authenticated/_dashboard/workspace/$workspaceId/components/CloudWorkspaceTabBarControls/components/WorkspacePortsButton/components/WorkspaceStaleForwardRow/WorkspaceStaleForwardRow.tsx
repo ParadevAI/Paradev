@@ -4,6 +4,7 @@ import { CloudPortForwardActions } from "renderer/routes/_authenticated/_dashboa
 import { usePortOpener } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/usePortOpenActions";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
 import type { PortForward } from "shared/types";
+import { PortForwardStatusDot } from "../PortForwardStatusDot";
 
 interface WorkspaceStaleForwardRowProps {
 	forward: PortForward;
@@ -17,7 +18,7 @@ export function WorkspaceStaleForwardRow({
 	const localPort = forward.localPort;
 	return (
 		<div className="flex items-center gap-2 rounded-sm px-2 py-1.5 hover:bg-fill-hover">
-			<span className="size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+			<PortForwardStatusDot status={forward.status} />
 			<span className="w-12 shrink-0 font-mono text-xs tabular-nums">
 				{forward.target.remotePort}
 			</span>

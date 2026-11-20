@@ -1,5 +1,6 @@
 import { CountBadge } from "@superset/ui/count-badge";
 import { cn } from "@superset/ui/utils";
+import type { IconType } from "react-icons";
 import { LuRadioTower } from "react-icons/lu";
 
 const MAX_BADGE_COUNT = 9;
@@ -12,18 +13,20 @@ const SIZES = {
 interface PortsCountIconProps {
 	count: number;
 	size?: keyof typeof SIZES;
+	icon?: IconType;
 }
 
 export function PortsCountIcon({
 	count,
 	size = "default",
+	icon: Icon = LuRadioTower,
 }: PortsCountIconProps) {
 	const sizing = SIZES[size];
 	return (
 		<span
 			className={cn("relative flex items-center justify-center", sizing.box)}
 		>
-			<LuRadioTower className={sizing.icon} strokeWidth={1.75} />
+			<Icon className={sizing.icon} strokeWidth={1.75} />
 			{count > 0 && (
 				<CountBadge
 					size={size}

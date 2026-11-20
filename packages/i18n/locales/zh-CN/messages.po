@@ -15313,6 +15313,9 @@ msgstr "远程主机上的端口"
 msgid "Ports on this computer"
 msgstr "此计算机上的端口"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "此计算机上的端口：已转发 {forwardedCount} 个"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "端口：{totalPortCount}个活动"
 

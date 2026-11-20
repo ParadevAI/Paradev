@@ -1,5 +1,4 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { cn } from "@superset/ui/utils";
 import { LuExternalLink } from "react-icons/lu";
 import { CloudPortForwardActions } from "renderer/routes/_authenticated/_dashboard/components/CloudPortForwardActions";
 import type { DashboardSidebarPort } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/hooks/useDashboardSidebarPortsData";
@@ -7,6 +6,7 @@ import { usePortOpener } from "renderer/routes/_authenticated/_dashboard/compone
 import { usePortForward } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/providers/PortForwardsProvider";
 import { PortForwardBusyActions } from "renderer/routes/_authenticated/_dashboard/components/PortForwardBusyActions";
 import { STROKE_WIDTH } from "renderer/screens/main/components/WorkspaceSidebar/constants";
+import { PortForwardStatusDot } from "../PortForwardStatusDot";
 
 interface WorkspacePortRowProps {
 	port: DashboardSidebarPort;
@@ -23,15 +23,7 @@ export function WorkspacePortRow({ port }: WorkspacePortRowProps) {
 	return (
 		<div className="rounded-sm px-2 py-1.5 hover:bg-fill-hover">
 			<div className="flex items-center gap-2">
-				<span
-					className={cn(
-						"size-1.5 shrink-0 rounded-full",
-						!status && "bg-muted-foreground/40",
-						status?.state === "active" && "bg-green-500",
-						status?.state === "busy" && "bg-amber-500",
-						status?.state === "error" && "bg-red-500",
-					)}
-				/>
+				<PortForwardStatusDot status={status} />
 				<span className="w-12 shrink-0 font-mono text-xs tabular-nums">
 					{port.port}
 				</span>

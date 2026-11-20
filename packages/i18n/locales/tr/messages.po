@@ -15313,6 +15313,9 @@ msgstr "Uzak host'lardaki portlar"
 msgid "Ports on this computer"
 msgstr "Bu bilgisayardaki portlar"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Bu bilgisayardaki portlar: {forwardedCount} yönlendirildi"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Portlar: {totalPortCount} canlı"
 

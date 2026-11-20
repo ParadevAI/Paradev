@@ -15313,6 +15313,9 @@ msgstr "Porte sugli host remoti"
 msgid "Ports on this computer"
 msgstr "Porte su questo computer"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Porte su questo computer: {forwardedCount} inoltrate"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Porte: {totalPortCount} attive"
 

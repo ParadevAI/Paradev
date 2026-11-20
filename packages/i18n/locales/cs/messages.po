@@ -15313,6 +15313,9 @@ msgstr "Porty na vzdálených hostech"
 msgid "Ports on this computer"
 msgstr "Porty na tomto počítači"
 
+msgid "Ports on this computer: {forwardedCount} forwarded"
+msgstr "Porty na tomto počítači: přesměrováno {forwardedCount}"
+
 msgid "Ports: {totalPortCount} live"
 msgstr "Porty: aktivních: {totalPortCount}"
 
