@@ -9,7 +9,12 @@ import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
 	query.state.data?.failure ? 0 : 60_000;
 
-type Agent = { id: string; presetId?: string; command?: string };
+type Agent = {
+	id: string;
+	presetId?: string;
+	command?: string;
+	surface?: "chat" | "terminal";
+};
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
 	/** No list can come: the host predates discovery, or the agent has no listing. */
@@ -31,7 +36,7 @@ export function useAgentModelCatalog(
 		"agent-model-catalog",
 		hostUrl,
 		id,
-		surface,
+		agents.find((agent) => agent.id === id)?.surface ?? surface,
 		workspaceId,
 		projectId,
 		session?.id,
@@ -42,7 +47,7 @@ export function useAgentModelCatalog(
 			queryFn: () =>
 				getHostServiceClientByUrl(hostUrl as string).agents.models.query({
 					agent: agent.id,
-					surface,
+					surface: agent.surface ?? surface,
 					workspaceId,
 					projectId,
 					sessionId:
@@ -77,7 +82,7 @@ export function useAgentModelCatalog(
 						queryFn: () =>
 							getHostServiceClientByUrl(hostUrl).agents.models.query({
 								agent: agent.id,
-								surface,
+								surface: agent.surface ?? surface,
 								workspaceId,
 								projectId,
 								sessionId:

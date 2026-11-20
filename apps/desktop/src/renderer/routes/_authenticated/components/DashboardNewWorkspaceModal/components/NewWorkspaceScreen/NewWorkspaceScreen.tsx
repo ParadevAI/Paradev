@@ -626,11 +626,16 @@ export function NewWorkspaceScreen({
 	const acpChatSettled = useAcpChatSettled();
 	const modelAgents = useMemo(
 		() =>
-			agentConfigs.filter((agent) => {
+			agentConfigs.flatMap((agent) => {
 				const presetId = launchPresetIdOf(agent);
-				return acpChatEnabled
-					? Boolean(acpHarnessForPreset(presetId))
-					: Boolean(getAgentModelSupport(presetId));
+				const chat = acpChatEnabled && Boolean(acpHarnessForPreset(presetId));
+				if (!chat && !getAgentModelSupport(presetId)) return [];
+				return [
+					{
+						...agent,
+						surface: chat ? ("chat" as const) : ("terminal" as const),
+					},
+				];
 			}),
 		[agentConfigs, acpChatEnabled],
 	);

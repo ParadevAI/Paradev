@@ -132,7 +132,7 @@ export function parseCursorModels(output: string): CatalogModel[] {
 						{
 							id: match[1] ?? "",
 							label: (match[2] ?? match[1] ?? "").replace(
-								/\s+\(current\)$/,
+								/\s+\((?:current|default)(?:, (?:current|default))*\)$/,
 								"",
 							),
 						},

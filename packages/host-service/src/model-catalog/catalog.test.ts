@@ -4,7 +4,7 @@ import { parseCursorModels, withoutDefaultAlias } from "./catalog";
 test("Cursor model listings preserve effort-specific IDs", () => {
 	expect(
 		parseCursorModels(
-			"Available models\nmodel-high - Model High\nauto - Auto (current)\n",
+			"Available models\nmodel-high - Model High (default)\nauto - Auto (current, default)\n",
 		),
 	).toEqual([
 		{ id: "model-high", label: "Model High" },
