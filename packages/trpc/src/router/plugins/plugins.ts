@@ -16,6 +16,7 @@ import type { TRPCError, TRPCRouterRecord } from "@trpc/server";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { userError } from "../../i18n-error";
+import { disconnectConnections } from "../../lib/connectors/disconnect";
 import { AmbiguousConnectionError } from "../../lib/connectors/lookup";
 import {
 	accessiblePlugin,
@@ -41,7 +42,7 @@ import {
 	supersetExtension,
 } from "./manifest";
 import { organizationPluginsRouter } from "./organization";
-import { forgetUpstreamTools, resolveTarget } from "./proxy";
+import { resolveTarget } from "./proxy";
 import { slack } from "./servers/slack/tools";
 import { createSlackLinkPreviewLoader } from "./slack-link-preview";
 
@@ -292,17 +293,14 @@ const connectionsRouter = {
 	disconnect: personProcedure
 		.input(z.object({ connectionId: z.uuid() }))
 		.mutation(async ({ ctx, input }) => {
-			const [row] = await db
-				.update(connections)
-				.set({ disconnectedAt: new Date(), disconnectReason: "user" })
-				.where(
-					and(
-						eq(connections.id, input.connectionId),
-						eq(connections.connectedByUserId, ctx.session.user.id),
-						isNull(connections.disconnectedAt),
-					),
-				)
-				.returning({ id: connections.id });
+			const [row] = await disconnectConnections(
+				[
+					eq(connections.id, input.connectionId),
+					eq(connections.connectedByUserId, ctx.session.user.id),
+					isNull(connections.disconnectedAt),
+				],
+				"user",
+			);
 
 			if (!row) {
 				throw userError({
@@ -311,7 +309,6 @@ const connectionsRouter = {
 					i18nKey: "serverError.plugins.connectionNotFound",
 				});
 			}
-			forgetUpstreamTools(row.id);
 			return { disconnected: input.connectionId };
 		}),
 } satisfies TRPCRouterRecord;
@@ -736,24 +733,16 @@ export const pluginsRouter = createTRPCRouter({
 
 			const disconnected =
 				connector && !stillShared
-					? await db
-							.update(connections)
-							.set({
-								disconnectedAt: new Date(),
-								disconnectReason: "plugin_uninstalled",
-							})
-							.where(
-								and(
-									eq(connections.connector, connector),
-									eq(connections.ownerKind, "user"),
-									eq(connections.connectedByUserId, ctx.session.user.id),
-									isNull(connections.disconnectedAt),
-								),
-							)
-							.returning({ id: connections.id })
+					? await disconnectConnections(
+							[
+								eq(connections.connector, connector),
+								eq(connections.ownerKind, "user"),
+								eq(connections.connectedByUserId, ctx.session.user.id),
+								isNull(connections.disconnectedAt),
+							],
+							"plugin_uninstalled",
+						)
 					: [];
-
-			for (const row of disconnected) forgetUpstreamTools(row.id);
 
 			return {
 				uninstalled: input.name,

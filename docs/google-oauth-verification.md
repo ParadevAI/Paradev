@@ -22,11 +22,11 @@ and [Audience](https://console.cloud.google.com/auth/audience?project=fair-scout
 ## Before submission
 
 Review the [implementation and disclosure audit](google-data-review.md) first.
-It identifies unresolved consent, credential deletion, shared-organization
+It records the credential-deletion fixes in this PR and unresolved consent,
 retention, and provider-control questions. A complete form alone does not make
 the integration ready for approval.
 
-1. Publish the privacy-policy correction in
+1. Deploy the credential-deletion fixes and publish the privacy-policy correction in
    `apps/marketing/content/legal/privacy.mdx`. The existing text says Paradev
    does not read calendars; the Calendar plugin reads and changes events.
 2. Review minimum scope needs. The draft matches the current connector, including
