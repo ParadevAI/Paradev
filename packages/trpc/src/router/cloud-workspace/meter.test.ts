@@ -830,7 +830,7 @@ describe("the reconcile adopts sessions no boot meters", () => {
 		listed = [resumed(NOW - 2 * MINUTE), timedOut];
 		await reconcile();
 		const adoptedId = adoptedBoot()?.id;
-		expect(adoptedId).toEqual(expect.any(String));
+		if (typeof adoptedId !== "string") throw new Error("no adopted boot");
 		expect(queuedSettles).toEqual(["boot_1", adoptedId]);
 	});
 

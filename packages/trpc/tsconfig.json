@@ -1,8 +1,9 @@
 {
 	"extends": "@superset/typescript/base.json",
 	"compilerOptions": {
+		"types": ["bun-types"],
 		"jsx": "react-jsx"
 	},
 	"include": ["src"],
-	"exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.integration.ts"]
+	"exclude": ["node_modules", "src/**/*.integration.ts"]
 }

@@ -36,8 +36,7 @@ describe("transcribeAudio", () => {
 	});
 
 	test("surfaces an upstream failure with its status", async () => {
-		const fetchImpl = (async () =>
-			new Response("rate limited", { status: 429 })) as typeof fetch;
+		const fetchImpl = async () => new Response("rate limited", { status: 429 });
 		const failure = await transcribeAudio(input, fetchImpl).catch(
 			(error: unknown) => error,
 		);
@@ -46,8 +45,8 @@ describe("transcribeAudio", () => {
 	});
 
 	test("rejects a response without text", async () => {
-		const fetchImpl = (async () =>
-			new Response(JSON.stringify({}), { status: 200 })) as typeof fetch;
+		const fetchImpl = async () =>
+			new Response(JSON.stringify({}), { status: 200 });
 		await expect(transcribeAudio(input, fetchImpl)).rejects.toThrow(
 			/missing text/,
 		);
