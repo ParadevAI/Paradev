@@ -512,10 +512,7 @@ export async function describeSandbox(providerSandboxId: string): Promise<{
 }
 
 /** How much to extend a session by so it ends `windowMs` from now; 0 when it nearly does already. */
-function extensionToEnd(
-	expiresAt: Date | undefined,
-	windowMs: number,
-): number {
+function extensionToEnd(expiresAt: Date | undefined, windowMs: number): number {
 	const extension = Date.now() + windowMs - (expiresAt?.getTime() ?? 0);
 	return extension > MIN_TOP_UP_MS ? extension : 0;
 }
@@ -622,6 +619,17 @@ export async function wakeSandbox(args: {
 						),
 					),
 			);
+		}
+		if (!wasRunning && sandbox.timeout !== SESSION_TIMEOUT_MS) {
+			// A resume reuses the timeout saved at create, so older boxes keep theirs.
+			try {
+				await sandbox.update({ timeout: SESSION_TIMEOUT_MS });
+			} catch (error) {
+				console.warn(
+					`[sandbox] timeout update failed for ${args.providerSandboxId}`,
+					error,
+				);
+			}
 		}
 		if (!wasRunning) {
 			const { [SANDBOX_PATHS.agents]: previous, ...others } =

@@ -17,8 +17,8 @@ function httpStatus(error: unknown): number | undefined {
 
 /**
  * Asks the API for more session time while the box's agents are active. The
- * API tops the session up to a full timeout, so the box stops a timeout after
- * the last activity, whether or not anyone has the workspace open.
+ * API tops the session up past the next ping, so the box stops soon after the
+ * last activity, whether or not anyone has the workspace open.
  */
 export function startSandboxKeepalive(args: {
 	keepalive: (pingsEveryMs: number) => Promise<unknown>;
