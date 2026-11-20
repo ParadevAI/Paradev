@@ -26,7 +26,7 @@ type Balance = Parameters<typeof cloudUsageFromBalances>[0][string];
 type Controls = NonNullable<Parameters<typeof cloudUsageFromBalances>[1]>;
 type Snapshot = Exclude<keyof typeof SANDBOX, "_source">;
 
-const kindOf = (row: Balance["breakdown"][number]): Kind =>
+const kindOf = (row: NonNullable<Balance["breakdown"]>[number]): Kind =>
 	row.price?.billingMethod === "usage_based"
 		? "priced"
 		: row.reset?.interval === "one_off"
@@ -58,7 +58,9 @@ class Ledger {
 		this.plan = plan as Plan;
 		this.overage = overage;
 		this.metered = metered;
-		this.rows = (balance as unknown as Balance).breakdown.map((row) => ({
+		const { breakdown } = balance as unknown as Balance;
+		if (!breakdown) throw new Error(`${name} has no breakdown`);
+		this.rows = breakdown.map((row) => ({
 			kind: kindOf(row),
 			included: row.includedGrant,
 			prepaid: row.prepaidGrant,
