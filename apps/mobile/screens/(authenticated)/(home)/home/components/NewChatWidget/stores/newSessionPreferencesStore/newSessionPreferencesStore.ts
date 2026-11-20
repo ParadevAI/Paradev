@@ -5,8 +5,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 export const DEFAULT_AGENT_ID = "claude";
 
 interface NewSessionPreferencesStore {
-	/** Host agent config id (e.g. "claude", "codex") the next session launches. */
+	/** Preset (e.g. "claude", "codex") the next session launches; resolves on any host. */
 	agentId: string;
+	/** Row picked per machine id: two rows can share a preset, and row ids exist on one host only. */
+	agentConfigIdByHost: Record<string, string>;
 	/** "projectId:machineId" of the last used target. */
 	targetKey: string | null;
 	/** Draft base branch for the next session; null = default branch. */
@@ -23,7 +25,10 @@ interface NewSessionPreferencesStore {
 	effortByAgent: Record<string, string>;
 	/** False until AsyncStorage has answered — the saved picks aren't here yet. */
 	hasHydrated: boolean;
-	setAgentId: (agentId: string) => void;
+	setAgentId: (
+		agentId: string,
+		hostPick?: { machineId: string; configId: string },
+	) => void;
 	setTargetKey: (targetKey: string) => void;
 	setBaseBranch: (baseBranch: string | null) => void;
 	setEnvironmentId: (environmentId: string) => void;
@@ -48,13 +53,23 @@ export const useNewSessionPreferencesStore =
 		persist(
 			(set) => ({
 				agentId: DEFAULT_AGENT_ID,
+				agentConfigIdByHost: {},
 				targetKey: null,
 				baseBranch: null,
 				environmentId: null,
 				modelByAgent: {},
 				effortByAgent: {},
 				hasHydrated: false,
-				setAgentId: (agentId) => set({ agentId }),
+				setAgentId: (agentId, hostPick) =>
+					set((state) => ({
+						agentId,
+						agentConfigIdByHost: hostPick
+							? {
+									...state.agentConfigIdByHost,
+									[hostPick.machineId]: hostPick.configId,
+								}
+							: state.agentConfigIdByHost,
+					})),
 				setTargetKey: (targetKey) => set({ targetKey, baseBranch: null }),
 				setBaseBranch: (baseBranch) => set({ baseBranch }),
 				// A picked branch belongs to the repository it was listed from.
@@ -74,6 +89,7 @@ export const useNewSessionPreferencesStore =
 				storage: createJSONStorage(() => AsyncStorage),
 				partialize: (state) => ({
 					agentId: state.agentId,
+					agentConfigIdByHost: state.agentConfigIdByHost,
 					targetKey: state.targetKey,
 					environmentId: state.environmentId,
 					modelByAgent: state.modelByAgent,

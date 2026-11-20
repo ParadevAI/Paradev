@@ -12,11 +12,9 @@ import {
 } from "@/lib/host-service/client";
 import { useNewSessionPreferencesStore } from "@/screens/(authenticated)/(home)/home/components/NewChatWidget/stores/newSessionPreferencesStore";
 import { getHostTerminalsQueryKey } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
-import {
-	agentLaunchPresetId,
-	useAgentLaunchPreferences,
-} from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
+import { agentLaunchPreferencesFor } from "@/screens/(authenticated)/hooks/useAgentLaunchPreferences";
 import { useHostAgentConfigs } from "@/screens/(authenticated)/hooks/useHostAgentConfigs";
+import { resolveAgentConfig } from "@/screens/(authenticated)/utils/resolveAgentConfig";
 import type { PullRequestDetail } from "../../../../utils/pullRequest";
 import { agentPrompt } from "../../utils/agentPrompt";
 import type { AgentActionId } from "../../utils/pullRequestState";
@@ -36,12 +34,8 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 		machineId: host?.machineId ?? null,
 		hostUrl: host ? hostServiceUrl(host.organizationId, host.machineId) : null,
 	});
-	const agentConfig = agentConfigs.data?.find(
-		(config) => config.presetId === agentId,
-	);
-	// The preset id stands in until the configs answer (see NewChatWidget).
-	const launch = useAgentLaunchPreferences(
-		agentConfig ? agentLaunchPresetId(agentConfig) : agentId,
+	const pickedConfigId = useNewSessionPreferencesStore((state) =>
+		host ? state.agentConfigIdByHost[host.machineId] : undefined,
 	);
 	const [busyAction, setBusyAction] = useState<AgentActionId | null>(null);
 
@@ -50,10 +44,16 @@ export function useAskAgent({ workspaceId }: { workspaceId: string | null }) {
 		mutationFn: async (prompt: string) => {
 			if (!workspace || !host) throw new Error("Workspace is not available");
 			const hostUrl = hostServiceUrl(host.organizationId, host.machineId);
+			const launched = await resolveAgentConfig(
+				agentConfigs,
+				agentId,
+				pickedConfigId,
+			);
+			const launch = agentLaunchPreferencesFor(launched, agentId);
 			const result = await getHostServiceClientByUrl(hostUrl).agents.run.mutate(
 				{
 					workspaceId: workspace.id,
-					agent: agentId,
+					agent: launched?.id ?? agentId,
 					prompt,
 					model: launch.model?.id ?? undefined,
 					effort: launch.effort?.id ?? undefined,
