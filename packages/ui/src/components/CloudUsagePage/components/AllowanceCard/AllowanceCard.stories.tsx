@@ -5,6 +5,7 @@ import {
 	cardArgs,
 	lastThirtyDaysCardArgs,
 	StoryLink,
+	tinyUsageCardArgs,
 	withSettingsShell,
 } from "../../fixtures";
 import { AllowanceCard } from "./AllowanceCard";
@@ -30,6 +31,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Northwind: Story = {};
 export const Trial: Story = { args: cardArgs("trial") };
+/** Under a cent of usage: "<$0.01", not "$0.00". */
+export const TinyUsage: Story = { args: tinyUsageCardArgs() };
+/** No GB-hour rate: the card shows the metered usage only. */
+export const NoRate: Story = {
+	args: { ...cardArgs("northwind"), ratePerGbHour: null },
+};
 export const Prepaid: Story = { args: cardArgs("prepaid") };
 export const LimitReached: Story = { args: cardArgs("limitReached") };
 export const ToppedUp: Story = { args: cardArgs("toppedUp") };

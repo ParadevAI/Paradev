@@ -201,10 +201,11 @@ class Ledger {
 		);
 		if (!usage) throw new Error("no balance");
 		const { allowance } = allowanceOf(usage, new Date(), RATE);
-		const shown = cloudUsageDisplay(allowance, {
-			gbHours: this.metered / 60,
-			usd: (this.metered / 60) * RATE,
-		});
+		const shown = cloudUsageDisplay(
+			allowance,
+			{ gbHours: this.metered / 60, usd: (this.metered / 60) * RATE },
+			RATE,
+		);
 		const $ = (usd: number) => Math.round(usd * 100) / 100;
 		return {
 			used: $(shown.used.usd),

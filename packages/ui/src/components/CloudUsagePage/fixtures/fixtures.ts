@@ -768,6 +768,7 @@ export function cardArgs(state: BillingState, back = 0) {
 	const allowance = priced(args.period?.allowance ?? null);
 	return {
 		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		ratePerGbHour: RATE,
 		allowance,
 		unavailable: args.period?.unavailable ?? [],
 		isPeriod: true,
@@ -775,10 +776,29 @@ export function cardArgs(state: BillingState, back = 0) {
 	};
 }
 
+/** Under a cent of usage in the open period: a few minutes on a small box. */
+export function tinyUsageCardArgs() {
+	const args = cardArgs("trial");
+	if (!args.allowance) throw new Error("the trial state has an allowance");
+	const gbHours = 0.07;
+	return {
+		...args,
+		metered: { gbHours, usd: gbHours * RATE },
+		allowance: {
+			...args.allowance,
+			usedGbHours: gbHours,
+			usedUsd: gbHours * RATE,
+			overageGbHours: 0,
+			overageUsd: 0,
+		},
+	};
+}
+
 export function lastThirtyDaysCardArgs() {
 	const { total } = noPeriodsArgs().byDay.data as Usage;
 	return {
 		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		ratePerGbHour: RATE,
 		allowance: null,
 		unavailable: [],
 		isPeriod: false,
