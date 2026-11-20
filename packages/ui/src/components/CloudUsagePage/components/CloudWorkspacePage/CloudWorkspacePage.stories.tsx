@@ -1,7 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { LuArrowUpRight } from "react-icons/lu";
-import { Button } from "../../../ui/button";
+import { PageLink } from "../../../PageLink";
 import {
 	emptyUsage,
 	pagesQuery,
@@ -14,13 +13,14 @@ import type { CloudBoots, CloudUsage } from "../../types";
 import { CloudWorkspacePage } from "./CloudWorkspacePage";
 
 const openWorkspace = () => (
-	<Button variant="outline" size="sm">
-		<Trans>Open workspace</Trans>
-		<LuArrowUpRight />
-	</Button>
+	<PageLink>
+		<a href="#workspace">
+			<Trans>Workspace</Trans>
+		</a>
+	</PageLink>
 );
 
-/** Stories render as on the web, with no "Open workspace", unless named for desktop. */
+/** Stories render as on the web, with no workspace link, unless named for desktop. */
 const meta = {
 	title: "Cloud usage/Workspace",
 	component: CloudWorkspacePage,

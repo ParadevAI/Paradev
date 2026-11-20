@@ -14,11 +14,13 @@ import {
 	logControl,
 } from "../../lib/control-log";
 import {
+	agentsToRestart,
 	bootBeganSince,
 	bootPhases,
 	buildSandboxClaim,
 	describeSandbox,
 	type SandboxUnavailableError,
+	scheduleRulesRefresh,
 	stopAndSnapshot,
 	stopSandbox,
 	wakeSandbox,
@@ -40,7 +42,9 @@ type CloudWorkspaceRow = typeof cloudWorkspaces.$inferSelect;
 
 export interface WokenCloudWorkspace {
 	hostTarget: string;
-	/** The creator's agent sign-ins changed after the box booted; only a restart hands them to running agents. */
+	/** Agents whose sign-in kind changed since the box booted; only a restart hands it to them. */
+	agentsToRestart: string[];
+	/** For desktops from before agentsToRestart. */
 	agentCredentialsChanged: boolean;
 }
 
@@ -93,10 +97,10 @@ async function wake(
 ): Promise<
 	(WokenCloudWorkspace & { booted: boolean; rebooted: boolean }) | null
 > {
-	const { claim, agentCredentialDigest } = await Sentry.startSpan(
-		{ name: "claim", op: "sandbox" },
-		() => buildSandboxClaim({ row }),
-	);
+	const { claim, agentCredentialDigest, rulesExpireAt } =
+		await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
+			buildSandboxClaim({ row }),
+		);
 	const scope: ControlScope = {
 		cloudWorkspaceId: row.id,
 		organizationId: row.organizationId,
@@ -193,21 +197,23 @@ async function wake(
 			.where(eq(cloudWorkspaces.id, row.id));
 	}
 	if (expiresAt) await recordSandboxAwake(row.id, { expiresAt, sessionId });
+	await scheduleRulesRefresh(row.id, rulesExpireAt);
 	if (rebooted) {
 		logControl("wake.completed", scope, {
 			ms: Date.now() - wakeStartedAt,
 			"box.resumed": booted,
 		});
 	}
+	const restart =
+		booted || adoptSignIns
+			? []
+			: agentsToRestart(row.bootAgentCredentialDigest, agentCredentialDigest);
 	return {
 		hostTarget,
 		booted,
 		rebooted,
-		agentCredentialsChanged:
-			!booted &&
-			!adoptSignIns &&
-			row.bootAgentCredentialDigest !== null &&
-			row.bootAgentCredentialDigest !== agentCredentialDigest,
+		agentsToRestart: restart,
+		agentCredentialsChanged: restart.length > 0,
 	};
 }
 

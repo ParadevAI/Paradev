@@ -24,6 +24,7 @@
 			"default": "./src/oauth-refresh.ts"
 		},
 		"./terminal-colors": "./src/terminal-colors.ts",
+		"./cloud-usage-display": "./src/cloud-usage-display.ts",
 		"./slack-links": {
 			"types": "./src/slack-links.ts",
 			"default": "./src/slack-links.ts"
@@ -199,6 +200,10 @@
 		"./sandbox/regions": {
 			"types": "./src/sandbox/regions.ts",
 			"default": "./src/sandbox/regions.ts"
+		},
+		"./sandbox/boot-stamps": {
+			"types": "./src/sandbox/boot-stamps.ts",
+			"default": "./src/sandbox/boot-stamps.ts"
 		},
 		"./sandbox/contract": {
 			"types": "./src/sandbox/contract.ts",
@@ -388,6 +393,10 @@
 			"types": "./src/billing.ts",
 			"default": "./src/billing.ts"
 		},
+		"./cloud-usage-api": {
+			"types": "./src/cloud-usage-api.ts",
+			"default": "./src/cloud-usage-api.ts"
+		},
 		"./box-pressure": {
 			"types": "./src/box-pressure.ts",
 			"default": "./src/box-pressure.ts"
@@ -511,6 +520,10 @@
 		"./github-remote": {
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
+		},
+		"./resolve-command": {
+			"types": "./src/resolve-command.ts",
+			"default": "./src/resolve-command.ts"
 		},
 		"./simple-git-options": {
 			"types": "./src/simple-git-options.ts",

@@ -154,7 +154,7 @@ describe("loadProjectConfig with config.toml", () => {
 });
 
 describe("loadProjectConfig in the cloud without an environment config", () => {
-	it("runs nothing: neither the repository's config.toml nor a v1 config.json", () => {
+	it("reads the repository's config, as before environments had their own", () => {
 		process.env.SUPERSET_HOST_RUN_MODE = "sandbox";
 		process.env.SUPERSET_ENVIRONMENT_CONFIG_PATH = join(
 			root,
@@ -162,13 +162,10 @@ describe("loadProjectConfig in the cloud without an environment config", () => {
 		);
 		writeFileSync(join(root, "environment.toml"), "\n");
 		write(repoPath, "config.toml", '[setup]\nrun = "repository"\n');
-		write(
-			repoPath,
-			"config.json",
-			JSON.stringify({ setup: ["local"], teardown: ["down"], run: ["dev"] }),
-		);
-		expect(loadProjectConfig({ repoPath, projectId, appHomeDir })).toBeNull();
-		expect(hasProjectConfig({ repoPath, projectId, appHomeDir })).toBe(false);
+		const loaded = loadProjectConfig({ repoPath, projectId, appHomeDir });
+		expect(loaded?.kind === "ok" && loaded.resolved.setup.commands).toEqual([
+			"repository",
+		]);
 	});
 });
 

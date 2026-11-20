@@ -1,66 +1,52 @@
 import type { SelectEnvironmentBuild } from "@superset/db/schema";
 import type { ResolvedPhase } from "@superset/shared/project-config";
-import {
-	SANDBOX_PATHS,
-	sandboxCheckoutDir,
-	sandboxRepositoryPath,
-} from "@superset/shared/sandbox/contract";
+import { sandboxRepositoryPath } from "@superset/shared/sandbox/contract";
 import type { NetworkPolicy } from "@vercel/sandbox";
+import { FatalError } from "workflow";
 import { resolveEnvironment } from "../../../router/environment/resolve-environment";
-import { configHooks } from "../config-hooks";
 import { deriveSandboxCredentials } from "../credentials";
+import { environmentHooks } from "../repo-hooks";
 import {
 	cloneUrl,
-	environmentRepositoryRows,
 	installationTokenFor,
 	loadRepositories,
 	RepositoryError,
 } from "../repositories";
-import {
-	type BuildBoxSource,
-	createBuildBox,
-	deleteSandbox,
-	runBuildCommand,
-	snapshotBuildBox,
-} from "../vercel";
-import { isProductionDeployment } from "./deployment";
-import {
-	type BuildCheckout,
-	checkoutScript,
-	goldensToDelete,
-	removedCheckoutPaths,
-} from "./policy";
-import {
-	failBuild,
-	finishedBuilds,
-	loadBuild,
-	markGoldensDeleted,
-	recordBuildCommit,
-	succeedBuild,
-} from "./store";
+import type { BuildCheckout } from "./policy";
 
 const BUILD_AUTHOR = { name: "Superset", email: "noreply@superset.sh" };
-const BOX_READY_MS = 45_000;
-const INSTALL_MS = 180_000;
-/** Inside the job's 300 s; the checkout and the snapshot get what is left. */
-const JOB_MS = 285_000;
-const FAILURE_TAIL_LINES = 40;
+export const BOX_READY_MS = 45_000;
 
 export function buildBoxName(buildId: string): string {
 	return `envb-${buildId.replaceAll("-", "").slice(0, 24)}`;
 }
 
-interface BuildInputs {
+/** A fresh build has its own box name, so a fork of it still being deleted cannot collide. */
+export function freshBuildBoxName(buildId: string): string {
+	return `${buildBoxName(buildId)}-fresh`;
+}
+
+export function buildBoxNameFor(build: {
+	id: string;
+	kind: SelectEnvironmentBuild["kind"];
+}): string {
+	return build.kind === "fresh"
+		? freshBuildBoxName(build.id)
+		: buildBoxName(build.id);
+}
+
+export interface BuildInputs {
 	install: ResolvedPhase | null;
+	installSource: string;
 	checkouts: BuildCheckout[];
-	removedPaths: string[];
 	networkPolicy: NetworkPolicy;
 	env: Record<string, string>;
 }
 
-class BuildFailure extends Error {}
+/** A failure with a reason a person can act on; the workflow does not retry it. */
+export class BuildFailure extends FatalError {}
 
-async function within<T>(
+export async function within<T>(
 	work: Promise<T>,
 	timeoutMs: number,
 	reason: string,
@@ -76,16 +62,19 @@ async function within<T>(
 	}
 }
 
-function seconds(ms: number): number {
-	return Math.round(ms / 1000);
-}
-
-function failureTail(output: string): string {
-	return output.trimEnd().split("\n").slice(-FAILURE_TAIL_LINES).join("\n");
-}
-
 /** The primary repository first, each at the path a workspace has it. */
-async function prepareBuild(
+export async function prepareBuild(
+	build: SelectEnvironmentBuild,
+): Promise<BuildInputs> {
+	try {
+		return await readBuildInputs(build);
+	} catch (error) {
+		if (error instanceof RepositoryError) throw new BuildFailure(error.message);
+		throw error;
+	}
+}
+
+async function readBuildInputs(
 	build: SelectEnvironmentBuild,
 ): Promise<BuildInputs> {
 	const repositories = await loadRepositories({
@@ -101,11 +90,18 @@ async function prepareBuild(
 		...repositories.filter((row) => row.id !== primary.id),
 	];
 	const baseBranch = primary.defaultBranch;
-	const token = await installationTokenFor(ordered);
-	const [environment, current] = await Promise.all([
-		resolveEnvironment(build.environmentId, build.organizationId),
-		environmentRepositoryRows(build.environmentId),
-	]);
+	const token = (await installationTokenFor(ordered))?.token ?? null;
+	const environment = await resolveEnvironment(
+		build.environmentId,
+		build.organizationId,
+	);
+	const config = environment?.config ?? null;
+	const hooks = await environmentHooks({
+		config,
+		repo: primary,
+		branch: baseBranch,
+		token,
+	});
 	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
 		workspaceId: build.id,
 		environmentEnv: environment?.envs ?? {},
@@ -114,187 +110,16 @@ async function prepareBuild(
 		gitAuthor: BUILD_AUTHOR,
 	});
 	return {
-		install: configHooks(environment?.config ?? null)?.install ?? null,
+		install: hooks?.install ?? null,
+		installSource: config?.trim()
+			? "the environment's config"
+			: `.paradev/config.toml on ${primary.fullName}@${baseBranch}`,
 		checkouts: ordered.map((repository) => ({
 			url: cloneUrl(repository),
-			branch:
-				repository.id === primary.id ? baseBranch : repository.defaultBranch,
+			branch: repository.defaultBranch,
 			path: sandboxRepositoryPath(repository, ordered),
 		})),
-		removedPaths:
-			build.kind === "incremental"
-				? removedCheckoutPaths({ current, nextIds: build.repositoryIds })
-				: [],
 		networkPolicy,
 		env: { ...managedEnv, SUPERSET_ENV: "cloud" },
 	};
-}
-
-/**
- * Builds an environment's golden from `[install]` and makes it the one new
- * workspaces start from. A failure leaves the current golden in place.
- */
-export async function rebuildEnvironment(args: {
-	buildId: string;
-}): Promise<"succeeded" | "failed" | "skipped"> {
-	const loaded = await loadBuild(args.buildId);
-	if (!loaded || loaded.build.status !== "running") return "skipped";
-	const { build, environment } = loaded;
-	const name = buildBoxName(build.id);
-	const deadline = Date.now() + JOB_MS;
-	const remaining = (step: string) => {
-		const left = deadline - Date.now();
-		if (left <= 0) {
-			throw new BuildFailure(
-				`The build ran out of time before ${step} (${seconds(JOB_MS)} seconds)`,
-			);
-		}
-		return left;
-	};
-	let boxCreated = false;
-	try {
-		const inputs = await prepareBuild(build);
-		if (!inputs.install) {
-			throw new BuildFailure("No [install] in the environment's config");
-		}
-		const source: BuildBoxSource =
-			build.kind === "incremental" && environment.sourceKind === "fork"
-				? { kind: "fork", golden: environment.sourceRef }
-				: { kind: "image", region: environment.region };
-		boxCreated = true;
-		await within(
-			createBuildBox({
-				name,
-				source,
-				networkPolicy: inputs.networkPolicy,
-				organizationId: build.organizationId,
-				sessionTimeoutMs: JOB_MS,
-			}),
-			BOX_READY_MS,
-			`The box was not ready within ${seconds(BOX_READY_MS)} seconds`,
-		);
-
-		const checkout = await runBuildCommand({
-			name,
-			script: checkoutScript({
-				root: SANDBOX_PATHS.workspace,
-				checkouts: inputs.checkouts,
-				remove: inputs.removedPaths,
-			}),
-			env: inputs.env,
-			timeoutMs: remaining("the checkout"),
-		});
-		if (checkout.exitCode !== 0) {
-			throw new BuildFailure(
-				`Could not fetch the repositories:\n${failureTail(checkout.output)}`,
-			);
-		}
-		const commitSha = checkout.output.trim().split("\n").at(-1) ?? "";
-		if (/^[0-9a-f]{40}$/.test(commitSha)) {
-			await recordBuildCommit(build.id, commitSha);
-		}
-
-		const primaryDir = sandboxCheckoutDir(
-			SANDBOX_PATHS.workspace,
-			inputs.checkouts[0]?.path ?? ".",
-		);
-		const installMs = Math.min(INSTALL_MS, remaining("[install]"));
-		const install = await runBuildCommand({
-			name,
-			script: ["set -euo pipefail", ...inputs.install.commands].join("\n"),
-			env: inputs.env,
-			cwd: inputs.install.cwd
-				? `${primaryDir}/${inputs.install.cwd}`
-				: primaryDir,
-			timeoutMs: installMs,
-		});
-		if (install.timedOut) {
-			throw new BuildFailure(
-				`[install] ran for more than ${seconds(installMs)} seconds and was stopped:\n${failureTail(install.output)}`,
-			);
-		}
-		if (install.exitCode !== 0) {
-			throw new BuildFailure(
-				`[install] exited with ${install.exitCode}:\n${failureTail(install.output)}`,
-			);
-		}
-
-		const snapshotMs = remaining("the snapshot");
-		await within(
-			snapshotBuildBox({ name, timeoutMs: snapshotMs }),
-			snapshotMs,
-			"The snapshot did not finish before the build ran out of time",
-		);
-		const swapped = await succeedBuild({
-			build,
-			previousSourceRef: environment.sourceRef,
-			goldenRef: name,
-		});
-		if (!swapped) {
-			throw new BuildFailure(
-				"The environment changed during the build; its current snapshot was kept",
-			);
-		}
-		await pruneGoldens({ environmentId: build.environmentId, activeRef: name });
-		return "succeeded";
-	} catch (error) {
-		const expected =
-			error instanceof BuildFailure || error instanceof RepositoryError;
-		const reason = expected ? error.message : "The build stopped unexpectedly";
-		if (!expected) {
-			console.error(`[environment-build] ${build.id} failed`, error);
-		}
-		await failBuild(build.id, reason);
-		if (boxCreated) {
-			await deleteSandbox(name).catch((cleanup: unknown) =>
-				console.error(
-					`[environment-build] could not delete build box ${name}`,
-					cleanup,
-				),
-			);
-		}
-		return "failed";
-	}
-}
-
-/** Keeps the newest goldens; a golden that cannot be deleted now is tried again next time. */
-export async function pruneGoldens(args: {
-	environmentId: string;
-	activeRef: string;
-}): Promise<void> {
-	await deleteGoldens(
-		goldensToDelete(await finishedBuilds(args.environmentId), args.activeRef),
-	);
-}
-
-/**
- * The one place a build's golden is deleted. Only production deletes: a
- * preview shares production's sandboxes, so it logs what it would delete.
- */
-export async function deleteGoldens(
-	builds: ReadonlyArray<{ id: string; goldenRef: string | null }>,
-): Promise<void> {
-	const goldens = builds.flatMap((build) =>
-		build.goldenRef ? [{ id: build.id, goldenRef: build.goldenRef }] : [],
-	);
-	if (goldens.length === 0) return;
-	if (!isProductionDeployment()) {
-		console.log(
-			`[environment-build] not a production deployment: would delete ${goldens.map((golden) => golden.goldenRef).join(", ")}`,
-		);
-		return;
-	}
-	const deleted: string[] = [];
-	for (const golden of goldens) {
-		try {
-			await deleteSandbox(golden.goldenRef);
-			deleted.push(golden.id);
-		} catch (error) {
-			console.error(
-				`[environment-build] could not delete old golden ${golden.goldenRef}`,
-				error,
-			);
-		}
-	}
-	await markGoldensDeleted(deleted);
 }

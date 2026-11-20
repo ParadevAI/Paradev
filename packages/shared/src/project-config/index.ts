@@ -27,7 +27,6 @@ export {
 	CONFIG_NAME_PATTERN,
 	type ConfigEnvironment,
 	MAX_PREVIEW_PORTS,
-	MCP_PLUGIN_PATTERN,
 	type PhaseName,
 	type ProjectConfig,
 	projectConfigSchema,

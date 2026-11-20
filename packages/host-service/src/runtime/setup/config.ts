@@ -287,7 +287,6 @@ export function loadProjectConfig(args: {
 	const toml = loadTomlConfig(args);
 	if (toml?.kind === "invalid") return toml;
 	if (toml) return { kind: "ok", format: "toml", resolved: toml.resolved };
-	if (configEnvironment() === "cloud") return null;
 
 	const v1 = withScriptFallbacks(loadSetupConfig(args) ?? {}, args);
 	if (!hasConfiguredScripts(v1)) return null;
@@ -370,7 +369,6 @@ export function hasProjectConfig(args: {
 	appHomeDir?: string;
 }): boolean {
 	if (findTomlConfigPath(args)) return true;
-	if (configEnvironment() === "cloud") return false;
 	return hasConfiguredScripts(loadSetupConfig(args));
 }
 
@@ -393,8 +391,6 @@ export function describeProjectConfigSources(args: {
 	appHomeDir?: string;
 }): { format: "toml" | "json" | "none"; legacySources: LegacyConfigSource[] } {
 	if (findTomlConfigPath(args)) return { format: "toml", legacySources: [] };
-	if (configEnvironment() === "cloud")
-		return { format: "none", legacySources: [] };
 
 	const sources = new Set<LegacyConfigSource>();
 	const roots = args.worktreePath

@@ -193,7 +193,7 @@ export function deriveTagFolders(
 		return {
 			...folder,
 			name: setting.displayName ?? folder.name,
-			color: setting.color ?? folder.color,
+			color: setting.color !== undefined ? setting.color : folder.color,
 			tabOrder: folder.isDerived
 				? (setting.tabOrder ?? folder.tabOrder)
 				: folder.tabOrder,

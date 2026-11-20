@@ -433,13 +433,20 @@ export const serverErrorMessages: Record<
 					"Cloud workspaces need the Team or Ultra plan. Upgrade in Settings, Billing to start one.",
 			}),
 		),
-	"serverError.cloudWorkspace.usageLimitReached": () =>
-		i18n._(
-			msg({
-				message:
-					"Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace.",
-			}),
-		),
+	"serverError.cloudWorkspace.usageLimitReached": (params) =>
+		params?.next === "upgrade"
+			? i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing.",
+					}),
+				)
+			: i18n._(
+					msg({
+						message:
+							"Cloud usage is used up for this period. An owner can buy more in Settings, Billing.",
+					}),
+				),
 	"serverError.cloudWorkspace.machineSizeNotAvailable": () =>
 		i18n._(
 			msg({
@@ -520,24 +527,17 @@ export const serverErrorMessages: Record<
 				message: "Could not record environment",
 			}),
 		),
-	"serverError.environment.buildsNotIncluded": () =>
-		i18n._(
-			msg({
-				message:
-					"Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing.",
-			}),
-		),
-	"serverError.environment.noRepositoriesToBuild": () =>
-		i18n._(
-			msg({
-				message: "This environment has no repositories to build",
-			}),
-		),
 	"serverError.environment.noInstall": () =>
 		i18n._(
 			msg({
 				message:
 					"This environment has no [install] to build. Add one to its config in Settings, Environments.",
+			}),
+		),
+	"serverError.environment.manualBuildsRateLimited": (params) =>
+		i18n._(
+			msg({
+				message: `This environment can start 3 manual builds an hour. Try again in ${params?.minutes} minutes.`,
 			}),
 		),
 	"serverError.environment.buildAlreadyRunning": () =>

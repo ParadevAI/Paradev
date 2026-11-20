@@ -15,6 +15,7 @@ import {
 	deleteSandbox,
 	provisionSandbox,
 	SandboxNotReadyError,
+	scheduleRulesRefresh,
 	settleSandbox,
 	stopSandbox,
 } from "../../lib/sandbox";
@@ -129,9 +130,9 @@ async function provision(
 				);
 	let bootId: string | null = null;
 	try {
-		const { claim, environment, agentCredentialDigest } =
+		const { claim, environment, agentCredentialDigest, rulesExpireAt } =
 			await Sentry.startSpan({ name: "claim", op: "sandbox" }, () =>
-				buildSandboxClaim({ row, launch: input.launch }),
+				buildSandboxClaim({ row, launch: input.launch, withRepoHooks: true }),
 			);
 		({ bootId } = await Sentry.startSpan(
 			{ name: "authorize boot", op: "billing" },
@@ -184,6 +185,7 @@ async function provision(
 			return "skipped";
 		}
 		nudge(row.organizationId, "cloud_workspaces");
+		await scheduleRulesRefresh(row.id, rulesExpireAt);
 		if (sandbox.expiresAt) {
 			await recordSandboxAwake(row.id, {
 				expiresAt: sandbox.expiresAt,

@@ -1,51 +1,15 @@
 import type { EnvironmentBuildStatus } from "@superset/db/schema";
+import { sandboxCheckoutDir } from "@superset/shared/sandbox/contract";
 import {
-	SANDBOX_ROOT_CHECKOUT,
-	sandboxCheckoutDir,
-	sandboxRepositoryPath,
-} from "@superset/shared/sandbox/contract";
+	KEPT_GOLDENS,
+	MANUAL_BUILD_WINDOW_MS,
+	MANUAL_BUILDS_PER_HOUR,
+	STALE_BUILD_MS,
+} from "./limits";
 
-/** Goldens each environment keeps: restore picks from these. */
-export const KEPT_GOLDENS = 3;
-export const STALE_BUILD_MS = 10 * 60 * 1000;
 export const DAILY_PAUSE_AFTER_FAILURES = 3;
 
-type CheckoutRepository = { id: string; owner: string; name: string };
-
-/**
- * A repository change a fork cannot absorb: another primary, or a kept
- * repository whose checkout moves (one repository sits at the root, several
- * in subdirectories, and a name clash adds the owner).
- */
-export function checkoutLayoutMoves(args: {
-	current: readonly CheckoutRepository[];
-	currentPrimaryId: string | null;
-	next: readonly CheckoutRepository[];
-	nextPrimaryId: string;
-}): boolean {
-	if (args.currentPrimaryId !== args.nextPrimaryId) return true;
-	return args.next.some((repository) => {
-		const before = args.current.find((row) => row.id === repository.id);
-		return (
-			before !== undefined &&
-			sandboxRepositoryPath(before, args.current) !==
-				sandboxRepositoryPath(repository, args.next)
-		);
-	});
-}
-
-/** Checkout paths of repositories the build no longer checks out. */
-export function removedCheckoutPaths(args: {
-	current: readonly CheckoutRepository[];
-	nextIds: readonly string[];
-}): string[] {
-	return args.current
-		.filter((repository) => !args.nextIds.includes(repository.id))
-		.map((repository) => sandboxRepositoryPath(repository, args.current))
-		.filter((path) => path !== SANDBOX_ROOT_CHECKOUT);
-}
-
-/** A running build whose job died never finishes on its own. */
+/** A running build whose workflow died never finishes on its own. */
 export function isStale(build: {
 	status: EnvironmentBuildStatus;
 	startedAt: Date;
@@ -56,44 +20,47 @@ export function isStale(build: {
 	);
 }
 
-type GoldenBuild = {
-	status: EnvironmentBuildStatus;
-	goldenRef: string | null;
-	goldenDeletedAt: Date | null;
-};
+/**
+ * Goldens past the active one and the `KEPT_GOLDENS - 1` newest others.
+ * Takes undeleted goldens, newest first; never returns the active one.
+ */
+export function goldensToDelete<T extends { goldenRef: string }>(
+	goldens: readonly T[],
+	activeRef: string,
+): T[] {
+	return goldens
+		.filter((golden) => golden.goldenRef !== activeRef)
+		.slice(KEPT_GOLDENS - 1);
+}
 
-function undeletedGoldens<T extends GoldenBuild>(builds: readonly T[]): T[] {
-	return builds.filter(
-		(build) =>
-			build.status === "succeeded" &&
-			build.goldenRef !== null &&
-			build.goldenDeletedAt === null,
+/** The goldens retention keeps, the active one included; the complement of `goldensToDelete`. */
+export function keptGoldenRefs(
+	goldens: readonly { goldenRef: string }[],
+	activeRef: string,
+): Set<string> {
+	const deleted = new Set(
+		goldensToDelete(goldens, activeRef).map((golden) => golden.goldenRef),
 	);
+	return new Set([
+		activeRef,
+		...goldens
+			.map((golden) => golden.goldenRef)
+			.filter((ref) => !deleted.has(ref)),
+	]);
 }
 
 /**
- * The active golden plus the newest others, `KEPT_GOLDENS` in total; the
- * active one may be older than the rest after a restore. Builds newest first.
+ * When the next manual build may start, or null for now. Takes the start
+ * times of the environment's manual builds in the last hour.
  */
-export function keptGoldenRefs(
-	builds: readonly GoldenBuild[],
-	activeRef: string,
-): Set<string> {
-	const others = undeletedGoldens(builds)
-		.flatMap((build) => (build.goldenRef ? [build.goldenRef] : []))
-		.filter((ref) => ref !== activeRef);
-	return new Set([activeRef, ...others.slice(0, KEPT_GOLDENS - 1)]);
-}
-
-/** Undeleted goldens outside `keptGoldenRefs`, so never the active one. Builds newest first. */
-export function goldensToDelete<T extends GoldenBuild>(
-	builds: readonly T[],
-	activeRef: string,
-): T[] {
-	const kept = keptGoldenRefs(builds, activeRef);
-	return undeletedGoldens(builds).filter(
-		(build) => build.goldenRef !== null && !kept.has(build.goldenRef),
-	);
+export function nextManualBuildAt(recentStarts: readonly Date[]): Date | null {
+	if (recentStarts.length < MANUAL_BUILDS_PER_HOUR) return null;
+	const oldestCounted = [...recentStarts]
+		.map((start) => start.getTime())
+		.sort((a, b) => b - a)[MANUAL_BUILDS_PER_HOUR - 1];
+	return oldestCounted === undefined
+		? null
+		: new Date(oldestCounted + MANUAL_BUILD_WINDOW_MS);
 }
 
 /** Finished builds, newest first. */
@@ -125,12 +92,8 @@ export interface BuildCheckout {
 export function checkoutScript(args: {
 	root: string;
 	checkouts: readonly BuildCheckout[];
-	remove?: readonly string[];
 }): string {
 	const lines = ["set -euo pipefail"];
-	for (const path of args.remove ?? []) {
-		lines.push(`rm -rf ${quote(sandboxCheckoutDir(args.root, path))}`);
-	}
 	for (const checkout of args.checkouts) {
 		const dir = quote(sandboxCheckoutDir(args.root, checkout.path));
 		const url = quote(checkout.url);

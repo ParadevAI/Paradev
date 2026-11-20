@@ -1,6 +1,6 @@
 CREATE TYPE "public"."environment_build_kind" AS ENUM('incremental', 'fresh');--> statement-breakpoint
 CREATE TYPE "public"."environment_build_status" AS ENUM('running', 'succeeded', 'failed');--> statement-breakpoint
-CREATE TYPE "public"."environment_build_trigger" AS ENUM('manual', 'daily', 'repositories', 'promote');--> statement-breakpoint
+CREATE TYPE "public"."environment_build_trigger" AS ENUM('manual', 'daily', 'promote');--> statement-breakpoint
 CREATE TABLE "environment_builds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"environment_id" uuid NOT NULL,

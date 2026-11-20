@@ -370,6 +370,13 @@ export function gbHourPack(plan: AutumnCatalogPlan): GbHourPack | null {
 export const GB_HOUR_PURCHASE = { min: 100, max: 30_000 };
 export const AUTO_TOPUP_MONTHLY_LIMIT = 10;
 
+/** The limit's next step: buy more GB-hours when the organization's plan sells a pack, else upgrade. */
+export function offersGbHourPack(
+	plan: { pack: GbHourPack | null } | null | undefined,
+): boolean {
+	return Boolean(plan?.pack);
+}
+
 /** What buying about `gbHours` costs: whole pack units, never past the maximum. */
 export function gbHourPurchase(pack: GbHourPack, gbHours: number): GbHourPack {
 	const unitsFor = (hours: number) => (hours * 60) / pack.gbMinutes;

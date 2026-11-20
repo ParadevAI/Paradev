@@ -1,5 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
-import { queueDailyBuilds } from "@superset/trpc/environment-build";
+import {
+	isProductionDeployment,
+	queueDailyBuilds,
+} from "@superset/trpc/environment-build";
 import { verifyQstashRequest } from "@/lib/verifyQstash";
 
 export const dynamic = "force-dynamic";
@@ -17,11 +20,17 @@ export async function POST(request: Request): Promise<Response> {
 		"/api/environments/jobs/daily-builds",
 	);
 	if (rejected) return rejected;
+	// A preview would build production's environments on the copy of its data.
+	if (!isProductionDeployment()) {
+		return Response.json({ ok: true, enabled: false });
+	}
 
 	const outcome = await Sentry.withMonitor(
 		"environment-daily-builds",
-		() => queueDailyBuilds(),
+		queueDailyBuilds,
 		{ schedule: { type: "crontab", value: "0 9 * * *" } },
 	);
-	return Response.json({ ok: true, ...outcome });
+	// Turbopack builds do not wrap route handlers, so nothing else flushes the closing check-in.
+	await Sentry.flush(2_000).catch(() => false);
+	return Response.json({ ok: true, enabled: true, ...outcome });
 }

@@ -1,31 +1,39 @@
 import { useLingui } from "@lingui/react/macro";
+import { offersGbHourPack } from "@superset/shared/billing";
+import { PageLink } from "@superset/ui/page-link";
 import { Link } from "@tanstack/react-router";
-import { LuTriangleAlert } from "react-icons/lu";
+import { useCurrentPlan } from "renderer/hooks/useCurrentPlan";
+import { usePlanCatalog } from "renderer/hooks/usePlanCatalog";
+import { CloudUsageBanner } from "../CloudUsageBanner";
 
 export function CloudUsageStoppingBanner() {
 	const { t } = useLingui();
+	const { activePlan } = useCurrentPlan();
+	const { data: catalog } = usePlanCatalog();
+	if (!catalog || !activePlan) return null;
+	const canBuy = offersGbHourPack(
+		catalog.find((family) => family.family === activePlan.planTier),
+	);
 
 	return (
-		<div
-			role="alert"
-			className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 border-t border-warning/40 bg-warning/10 px-3 py-2 text-sm text-foreground/85"
-		>
-			<LuTriangleAlert
-				className="size-4 shrink-0 text-foreground/85"
-				aria-hidden="true"
-			/>
-			<span className="min-w-0 flex-1 select-text">
-				{t({
-					message:
-						"Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised.",
-				})}
-			</span>
-			<Link
-				to="/settings/billing"
-				className="shrink-0 font-medium underline underline-offset-4"
-			>
-				{t({ message: "Open billing" })}
-			</Link>
-		</div>
+		<CloudUsageBanner
+			tone="warning"
+			message={
+				canBuy
+					? t({
+							message:
+								"Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running.",
+						})
+					: t({
+							message:
+								"Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running.",
+						})
+			}
+			actions={
+				<PageLink>
+					<Link to="/settings/billing">{t({ message: "Billing" })}</Link>
+				</PageLink>
+			}
+		/>
 	);
 }

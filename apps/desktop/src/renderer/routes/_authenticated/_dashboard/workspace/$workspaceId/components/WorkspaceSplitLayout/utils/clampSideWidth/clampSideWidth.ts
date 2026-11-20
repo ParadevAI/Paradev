@@ -11,9 +11,10 @@ export function clampSideWidth({
 	maxWidth: number;
 	containerWidth: number;
 }): { width: number; maxWidth: number } {
-	const max = Math.max(
-		minWidth,
-		Math.min(maxWidth, containerWidth - PREFERRED_CENTER_WIDTH),
+	const max = Math.min(
+		maxWidth,
+		Math.max(containerWidth / 2, containerWidth - PREFERRED_CENTER_WIDTH, 0),
 	);
-	return { width: Math.max(minWidth, Math.min(width, max)), maxWidth: max };
+	const min = Math.min(minWidth, max);
+	return { width: Math.max(min, Math.min(width, max)), maxWidth: max };
 }

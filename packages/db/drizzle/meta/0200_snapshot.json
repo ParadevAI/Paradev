@@ -1,6 +1,6 @@
 {
-  "id": "a22a701a-7675-4bc1-8047-65c7d3ba3a38",
-  "prevId": "ebaf2399-2935-422e-8b6a-ea1530c0e4c5",
+  "id": "8aa52f70-8e69-48e3-b18f-02c74e82f1e9",
+  "prevId": "b92e73aa-4ca2-4840-ae8f-7dc6008d61a7",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -9115,6 +9115,72 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.cloud_usage_daily": {
+      "name": "cloud_usage_daily",
+      "schema": "",
+      "columns": {
+        "organization_id": {
+          "name": "organization_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vcpus": {
+          "name": "vcpus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gb_minutes": {
+          "name": "gb_minutes",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seconds": {
+          "name": "seconds",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "events": {
+          "name": "events",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cloud_usage_daily_key": {
+          "name": "cloud_usage_daily_key",
+          "nullsNotDistinct": true,
+          "columns": [
+            "organization_id",
+            "day",
+            "user_id",
+            "vcpus"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.cloud_usage_events": {
       "name": "cloud_usage_events",
       "schema": "",
@@ -11989,12 +12055,6 @@
         },
         "machine_size": {
           "name": "machine_size",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "config": {
-          "name": "config",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -18025,7 +18085,6 @@
       "values": [
         "manual",
         "daily",
-        "repositories",
         "promote"
       ]
     },

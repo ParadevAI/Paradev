@@ -1,4 +1,6 @@
+export { renewChatgptSignIns } from "../../router/agent-credential";
 export { mintSandboxGateAccess, sandboxHostSecretFor } from "./access";
+export { agentsToRestart } from "./agent-sign-in-kinds";
 export {
 	type ReportSandboxAgentStatusOutcome,
 	reportSandboxAgentStatus,
@@ -25,7 +27,6 @@ export {
 	reportSandboxBoxPressure,
 } from "./box-pressure";
 export { buildSandboxClaim } from "./claim";
-export { type ConfigHooks, configHooks } from "./config-hooks";
 export { deriveSandboxCredentials } from "./credentials";
 export {
 	listRemoteBranches,
@@ -33,10 +34,17 @@ export {
 	type RemoteBranchPage,
 } from "./list-branches";
 export {
+	queueRulesReapply,
+	REAPPLY_RULES_JOB_PATH,
+	type RulesScope,
+	reapplyRulesFor,
+	scheduleRulesRefresh,
+} from "./reapply-rules";
+export {
 	type RefreshSandboxCredentialsOutcome,
 	refreshSandboxCredentials,
 } from "./refresh-credentials";
-export { renewChatgptSignInsAndBoxes } from "./renew-chatgpt-sign-ins";
+export { readRepoHooks } from "./repo-hooks";
 export {
 	cloneUrl,
 	environmentRepositoryRows,
@@ -59,6 +67,7 @@ export {
 	describeSandbox,
 	findSandboxSession,
 	HOST_SERVICE_PORT,
+	keepaliveWindowMs,
 	listActiveWorkspaceSandboxes,
 	listSandboxSessions,
 	MEMORY_MB_PER_VCPU,

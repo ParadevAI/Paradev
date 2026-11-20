@@ -469,6 +469,7 @@ msgstr "{0} končící na {1}"
 msgid "{0} files already exist in {where}. Do you want to replace them?"
 msgstr "V {where} už existuje {0} souborů. Chcete je nahradit?"
 
+#. placeholder {0}: formatGbHours(item.gbHours)
 #. placeholder {0}: formatNumber(hours)
 msgid "{0} GB-hours"
 msgstr "{0} GB-hodin"
@@ -1028,6 +1029,9 @@ msgstr "{fileCount, plural, one {V tomto pracovním prostoru se změnil # soubor
 msgid "{fileCount, plural, one {Edited # file} other {Edited # files}}"
 msgstr "{fileCount, plural, one {Upraven # soubor} few {Upraveny # soubory} many {Upraveno # souboru} other {Upraveno # souborů}}"
 
+msgid "{first}–{last} of {total}"
+msgstr "{first}–{last} z {total}"
+
 msgid "{focusShortcutText} to focus"
 msgstr "{focusShortcutText} pro zaměření"
 
@@ -1226,6 +1230,9 @@ msgstr "{openCount} otevřených"
 msgid "{othersCount, plural, one {Also changed in this workspace: # file} other {Also changed in this workspace: # files}}"
 msgstr "{othersCount, plural, one {V tomto pracovním prostoru se změnil i # soubor} few {V tomto pracovním prostoru se změnily i # soubory} many {V tomto pracovním prostoru se změnilo i # souboru} other {V tomto pracovním prostoru se změnilo i # souborů}}"
 
+msgid "{over} overage"
+msgstr "{over} nad limit"
+
 msgid "{pageTitle} can read and change data in your {pluginLabel} account as you, including in future versions of this page. It can send what it reads to other websites. Only allow pages you trust."
 msgstr "{pageTitle} může vaším jménem číst a měnit data ve vašem účtu {pluginLabel}, a to i v budoucích verzích této stránky. Co načte, může odeslat na jiné weby. Povolte jen stránky, kterým důvěřujete."
 
@@ -1327,8 +1334,8 @@ msgstr "{pullRequests} · cíl {base}"
 msgid "{queued, plural, one {# message waiting in the queue} other {# messages waiting in the queue}}"
 msgstr "{queued, plural, one {# zpráva čeká ve frontě} few {# zprávy čekají ve frontě} many {# zprávy čeká ve frontě} other {# zpráv čeká ve frontě}}"
 
-msgid "{rate} per GB-hour. Used after the monthly pool, and never expire."
-msgstr "{rate} za GB-hodinu. Čerpají se po měsíčním fondu a nikdy nevyprší."
+msgid "{rate} per GB-hour. Used after the plan's included usage, and never expire."
+msgstr "{rate} za GB-hodinu. Použijí se po využití zahrnutém v plánu a nikdy nevyprší."
 
 msgid "{readPercent}% read"
 msgstr "přečteno {readPercent} %"
@@ -1349,9 +1356,6 @@ msgstr "Zbývající tokeny: {remaining}"
 
 msgid "{restoredCount, plural, one {Undid the changes to # file.} other {Undid the changes to # files.}}"
 msgstr "{restoredCount, plural, one {Změny v # souboru byly vráceny.} few {Změny v # souborech byly vráceny.} many {Změny v # souboru byly vráceny.} other {Změny v # souborech byly vráceny.}}"
-
-msgid "{rowCount, plural, one {{first}–{last} of # row} other {{first}–{last} of # rows}}"
-msgstr "{rowCount, plural, one {{first}–{last} z # řádku} few {{first}–{last} z # řádků} many {{first}–{last} z # řádku} other {{first}–{last} z # řádků}}"
 
 msgid "{seats, plural, one {Included with # seat} other {Included with # seats}}"
 msgstr "{seats, plural, one {Zahrnuto s # místem} few {Zahrnuto se # místy} many {Zahrnuto s # místa} other {Zahrnuto s # místy}}"
@@ -1657,9 +1661,6 @@ msgstr "0 $"
 
 msgid "$11.5M seed led by Union Square Ventures"
 msgstr "Seed kolo 11,5 mil. USD pod vedením Union Square Ventures"
-
-msgid "0 rows"
-msgstr "0 řádků"
 
 msgid "1"
 msgstr "1"
@@ -2795,6 +2796,9 @@ msgstr "Také: @superset/ui/spinner"
 msgid "Always know which agent needs you, with notifications that deep-link straight to the blocked agent."
 msgstr "Vždy víte, který agent vás potřebuje — oznámení vedou přímo na zablokovaného agenta."
 
+msgid "Amount of GB-hours"
+msgstr "Množství GB-hodin"
+
 msgid "An agent completes multi-file changes end to end."
 msgstr "Agent dokončí změnu napříč více soubory od začátku do konce."
 
@@ -3617,6 +3621,9 @@ msgstr "Právě se staví."
 msgid "Beyond: F5 is not a near-term claim"
 msgstr "Za obzorem: F5 není tvrzení o blízké budoucnosti"
 
+msgid "Billed hours"
+msgstr "Účtované hodiny"
+
 msgid "Billed monthly"
 msgstr "Účtováno měsíčně"
 
@@ -3632,8 +3639,8 @@ msgstr "Fakturace"
 msgid "Billing details"
 msgstr "Fakturační údaje"
 
-msgid "Billing refused to start a cloud workspace: the organization's plan does not include cloud workspaces, or it reached its cloud usage limit. Cloud workspaces need the Team or Ultra plan. Upgrade or raise the limit in Settings > Billing, or run the automation on a device."
-msgstr "Fakturace odmítla spustit cloudový pracovní prostor: plán organizace nezahrnuje cloudové pracovní prostory, nebo organizace dosáhla limitu využití cloudu. Cloudové pracovní prostory vyžadují plán Team nebo Ultra. Přejděte na vyšší plán nebo zvyšte limit v Nastavení > Fakturace, nebo spusťte automatizaci na zařízení."
+msgid "Billing refused to start a cloud workspace: the plan does not include cloud workspaces, or the organization has used all its cloud usage for this period. See Settings, Billing, or run the automation on a device."
+msgstr "Fakturace odmítla spustit cloudový pracovní prostor: plán nezahrnuje cloudové pracovní prostory, nebo organizace v tomto období vyčerpala veškeré využití cloudu. Podívejte se do Nastavení, Fakturace, nebo spusťte automatizaci na zařízení."
 
 msgid "Binary"
 msgstr "Binární"
@@ -3714,9 +3721,6 @@ msgstr "Spodní drawer, na dotykových zařízeních ovladatelný přejetím prs
 
 msgid "Bought credits"
 msgstr "Zakoupené kredity"
-
-msgid "Bought GB-hours left: {prepaid}"
-msgstr "Zbývající zakoupené GB-hodiny: {prepaid}"
 
 msgid "Bounce the Dock icon"
 msgstr "Poskakovat ikonou v Docku"
@@ -3922,9 +3926,6 @@ msgstr "Tlačítka, přepínače a klávesové prvky"
 
 msgid "Buy"
 msgstr "Koupit"
-
-msgid "Buy extra GB-hours"
-msgstr "Koupit další GB-hodiny"
 
 msgid "Buy for {total}"
 msgstr "Koupit za {total}"
@@ -4296,9 +4297,6 @@ msgstr "Možnosti kanálu"
 
 msgid "Channels"
 msgstr "Kanály"
-
-msgid "Charge your saved card for more GB-hours when bought GB-hours run low."
-msgstr "Strhne z uložené karty další GB-hodiny, když koupené GB-hodiny docházejí."
 
 msgid "Chat"
 msgstr "Chat"
@@ -4879,6 +4877,24 @@ msgstr "Využití cloudu"
 msgid "Cloud usage is not enabled for this organization."
 msgstr "Využití cloudu není pro tuto organizaci zapnuto."
 
+msgid "Cloud usage is used up for this period."
+msgstr "Cloudové využití je pro toto období vyčerpáno."
+
+msgid "Cloud usage is used up for this period. An owner can buy more in Settings, Billing."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Vlastník může dokoupit další v Nastavení, Fakturace."
+
+msgid "Cloud usage is used up for this period. An owner can upgrade to Team or Ultra in Settings, Billing."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Vlastník může přejít na Team nebo Ultra v Nastavení, Fakturace."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can buy more to keep it running."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Tento pracovní prostor se zastaví za 10 minut. Vlastník může dokoupit další, aby běžel dál."
+
+msgid "Cloud usage is used up for this period. This workspace stops in 10 minutes. An owner can upgrade to Team or Ultra to keep it running."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Tento pracovní prostor se zastaví za 10 minut. Vlastník může přejít na Team nebo Ultra, aby běžel dál."
+
+msgid "Cloud usage is used up for this period. Workspaces cannot start."
+msgstr "Cloudové využití je pro toto období vyčerpáno. Pracovní prostory nelze spustit."
+
 msgid "Cloud workspace"
 msgstr "Cloudový pracovní prostor"
 
@@ -4906,9 +4922,6 @@ msgstr "Cloudové pracovní prostory nejsou pro {account} zapnuté. Jsou součá
 
 msgid "Cloud workspaces are not included in your plan."
 msgstr "Cloudové pracovní prostory nejsou součástí vašeho tarifu."
-
-msgid "Cloud workspaces cannot start."
-msgstr "Cloudové pracovní prostory se nemohou spustit."
 
 msgid "Cloud workspaces commit, push and open pull requests as you"
 msgstr "Cloudové pracovní prostory commitují, pushují a otevírají pull requesty vaším jménem"
@@ -6821,6 +6834,9 @@ msgstr "Cena na míru"
 msgid "Custom provider"
 msgstr "Vlastní poskytovatel"
 
+msgid "Custom range…"
+msgstr "Vlastní rozsah…"
+
 msgid "Custom themes"
 msgstr "Vlastní motivy"
 
@@ -8109,9 +8125,6 @@ msgstr "Prostředí"
 msgid "Environment archived"
 msgstr "Prostředí archivováno"
 
-msgid "Environment builds come with the Team and Ultra plans. Upgrade in Settings, Billing."
-msgstr "Sestavení prostředí jsou součástí plánů Team a Ultra. Přejděte na vyšší plán v Nastavení, Fakturace."
-
 msgid "Environment history"
 msgstr "Historie prostředí"
 
@@ -8373,9 +8386,6 @@ msgstr "Externí prohlížeč"
 msgid "extra ${used} of ${limit}"
 msgstr "navíc {used} $ z {limit} $"
 
-msgid "Extra GB-hours"
-msgstr "Další GB-hodiny"
-
 msgid "Extra GB-hours, bought as needed"
 msgstr "Další GB-hodiny, kupované podle potřeby"
 
@@ -8384,9 +8394,6 @@ msgstr "Velmi vysoké"
 
 msgid "Extra small"
 msgstr "Velmi malé"
-
-msgid "Extra usage"
-msgstr "Využití navíc"
 
 msgid "Extra usage limit reached"
 msgstr "Dosažen limit dodatečného využití"
@@ -9374,10 +9381,6 @@ msgstr "Zakládající inženýr"
 msgid "Free"
 msgstr "Free"
 
-msgctxt "cloud allowance group"
-msgid "Free"
-msgstr "Zdarma"
-
 msgid "Free credits"
 msgstr "Kredity zdarma"
 
@@ -9479,18 +9482,6 @@ msgstr "Otevřené brány"
 
 msgid "GB-hours"
 msgstr "GB-hodiny"
-
-msgid "GB-hours over the plan: {overage}"
-msgstr "GB-hodiny nad rámec plánu: {overage}"
-
-msgid "GB-hours past the pool"
-msgstr "GB-hodiny nad fond"
-
-msgid "GB-hours used: {used}"
-msgstr "Využité GB-hodiny: {used}"
-
-msgid "GB-hours used: {used} of {included}"
-msgstr "Využité GB-hodiny: {used} z {included}"
 
 msgid "General"
 msgstr "Obecné"
@@ -10035,9 +10026,6 @@ msgstr "HotkeyTooltip.tsx"
 
 msgid "Hourly"
 msgstr "Každou hodinu"
-
-msgid "Hours"
-msgstr "Hodiny"
 
 msgid "Hours are shared across your team. They assume a standard {vcpus} vCPU / {memoryGb} GB workspace, and bigger machines use them faster."
 msgstr "Hodiny sdílí celý tým. Počítají se standardním pracovním prostorem {vcpus} vCPU / {memoryGb} GB a větší stroje je spotřebují rychleji."
@@ -11565,9 +11553,6 @@ msgstr "Načítám další..."
 msgid "Loading more…"
 msgstr "Načítám další…"
 
-msgid "Loading page {loadingPage} of {targetPage}..."
-msgstr "Načítání stránky {loadingPage} z {targetPage}..."
-
 msgid "Loading project…"
 msgstr "Načítám projekt…"
 
@@ -12869,9 +12854,6 @@ msgstr "Na tomto počítači zatím nebylo nalezeno žádné využití Claude an
 msgid "No cloud environment opens {repository}."
 msgstr "Žádné cloudové prostředí neotevírá {repository}."
 
-msgid "No cloud usage in this period."
-msgstr "V tomto období žádné využití cloudu."
-
 msgid "No cloud workspaces"
 msgstr "Žádné cloudové pracovní prostory"
 
@@ -12913,6 +12895,9 @@ msgstr "Nenalezeni žádní přispěvatelé."
 
 msgid "No credit card required."
 msgstr "Bez platební karty."
+
+msgid "No days available"
+msgstr "Žádné dny k dispozici"
 
 msgid "No description"
 msgstr "Bez popisu"
@@ -13482,9 +13467,6 @@ msgstr "Na tomto serveru není k dispozici"
 msgid "Not bound · configure in Settings → Links"
 msgstr "Nepřiřazeno · nastavte v Nastavení → Odkazy"
 
-msgid "Not broken down yet"
-msgstr "Zatím nerozepsáno"
-
 msgid "Not configured"
 msgstr "Nenastaveno"
 
@@ -13496,9 +13478,6 @@ msgstr "Nepřipojeno"
 
 msgid "Not connected · cloud workspaces push as your organization's GitHub App"
 msgstr "Nepřipojeno · cloudové pracovní prostory pushují jako GitHub App vaší organizace"
-
-msgid "Not counted by billing yet"
-msgstr "Zatím nezapočteno ve vyúčtování"
 
 msgid "Not demoed here"
 msgstr "Tady se neukazuje"
@@ -13538,6 +13517,10 @@ msgstr "Není v této verzi"
 
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "Zatím nepřicházejí žádné události: Microsoft Graph odmítl odběry oznámení. Zkontrolujte souhlas administrátora a schválení chráněného API, pak se připojte znovu."
+
+msgctxt "boot end"
+msgid "Not recorded"
+msgstr "Nezaznamenáno"
 
 msgid "Not reported yet"
 msgstr "Zatím nenahlášeno"
@@ -13671,11 +13654,8 @@ msgstr "Předměty"
 msgid "of {0}"
 msgstr "z {0}"
 
-msgid "of {cap} included"
-msgstr "z {cap} v plánu"
-
-msgid "of {cap} limit"
-msgstr "z limitu {cap}"
+msgid "of {held}"
+msgstr "z {held}"
 
 msgid "of {total}"
 msgstr "z {total}"
@@ -13689,8 +13669,9 @@ msgstr "ze všech tokenů"
 msgid "Off"
 msgstr "Vypnuto"
 
-msgid "Off. Buys more GB-hours when they run low."
-msgstr "Vypnuto. Koupí další GB-hodiny, když docházejí."
+msgctxt "auto top-up"
+msgid "Off"
+msgstr "Vypnuto"
 
 #. placeholder {0}: BRAND.INTRO_NAME
 msgid "Official documentation for {0}, the app for running 100+ coding agents in parallel."
@@ -14549,10 +14530,6 @@ msgstr "Originály"
 msgid "Other"
 msgstr "Ostatní"
 
-msgctxt "cloud allowance group"
-msgid "Other"
-msgstr "Ostatní"
-
 msgid "Other apps"
 msgstr "Ostatní aplikace"
 
@@ -14592,11 +14569,6 @@ msgstr "Nedostatek paměti"
 
 msgid "Out of memory: the box is close to not responding. {sizeName} has {memoryGb} GB."
 msgstr "Nedostatek paměti: stroj brzy přestane reagovat. {sizeName} má {memoryGb} GB."
-
-#. placeholder {0}: reap.processName
-#. placeholder {1}: formatNumber(reap.rssMb / MB_PER_GB, { maximumFractionDigits: 1 })
-msgid "Out of memory: the box stopped {0} ({1} GB) to keep running. {sizeName} has {memoryGb} GB."
-msgstr "Nedostatek paměti: stroj zastavil {0} ({1} GB), aby mohl dál běžet. {sizeName} má {memoryGb} GB."
 
 msgid "Out of scope"
 msgstr "Mimo rozsah"
@@ -14665,9 +14637,6 @@ msgstr "packages/ui/src/components/ui/kbd.tsx"
 msgid "Page"
 msgstr "Stránka"
 
-msgid "Page {page} of {pages}"
-msgstr "Stránka {page} z {pages}"
-
 msgid "Page actions"
 msgstr "Akce stránky"
 
@@ -14724,10 +14693,6 @@ msgstr "stránkování"
 
 msgid "Pagination"
 msgstr "Stránkování"
-
-msgctxt "cloud allowance group"
-msgid "Paid"
-msgstr "Placené"
 
 msgid "Paid plans"
 msgstr "Placené tarify"
@@ -16531,9 +16496,6 @@ msgstr "odebrat agenta"
 msgid "remove the PR link"
 msgstr "odebrat propojení s PR"
 
-msgid "Remove this filter"
-msgstr "Odebrat tento filtr"
-
 msgid "Remove trigger"
 msgstr "Odebrat spouštěč"
 
@@ -16827,9 +16789,6 @@ msgstr "Obnovit přiblížení"
 
 msgid "Reset Zoom"
 msgstr "Obnovit přiblížení"
-
-msgid "Resets {resetDate}"
-msgstr "Obnoví se {resetDate}"
 
 msgid "Resets at {until}"
 msgstr "Obnoví se v {until}"
@@ -17393,6 +17352,9 @@ msgstr "Spusťte toto v terminálu a pak pokračujte:"
 msgid "Run this in a terminal, then paste the token it prints:"
 msgstr "Spusťte tento příkaz v terminálu a pak vložte token, který vypíše:"
 
+msgid "Run time"
+msgstr "Doba běhu"
+
 msgid "Run workspace command"
 msgstr "Spustit příkaz pracovního prostoru"
 
@@ -17866,9 +17828,6 @@ msgstr "Hledám použití Kbd"
 msgid "Seats removed mid-cycle stay active until {0}."
 msgstr "Místa odebraná v průběhu období zůstanou aktivní do {0}."
 
-msgid "Seats, credits and the extra-usage limit are not loaded yet. They show after billing data next refreshes."
-msgstr "Místa, kredity a limit využití navíc zatím nejsou načteny. Zobrazí se po příští aktualizaci fakturačních údajů."
-
 msgid "Secondary"
 msgstr "Secondary"
 
@@ -17934,9 +17893,6 @@ msgstr "Podívejte se na otevřené pozice, nebo si nejdřív vyzkoušejte Parad
 
 msgid "See this gate on the scorecard"
 msgstr "Zobrazit tuto bránu v hodnoticí tabulce"
-
-msgid "See usage"
-msgstr "Zobrazit využití"
 
 msgid "See what changed, give feedback, and merge the work when it's ready."
 msgstr "Podívejte se, co se změnilo, dejte zpětnou vazbu a slučte práci, až bude hotová."
@@ -19508,11 +19464,6 @@ msgctxt "cloud workspace boot"
 msgid "Stopped"
 msgstr "Zastaveno"
 
-#. placeholder {0}: pressure.reap.processName
-#. placeholder {1}: gb(pressure.reap.rssMb)
-msgid "Stopped {0} ({1} GB) to free memory"
-msgstr "Zastaveno {0} ({1} GB) pro uvolnění paměti"
-
 msgid "Stopped by the usage limit"
 msgstr "Zastaveno limitem využití"
 
@@ -20205,9 +20156,6 @@ msgstr "Nejlepší agent se změní.<0/>Vaše workflow ne."
 msgid "The box came back at {actual} vCPU instead of {wanted}. Restart it to try again."
 msgstr "Stroj se spustil s {actual} vCPU místo {wanted}. Restartujte ho a zkuste to znovu."
 
-msgid "The breakdown by plan is kept for the current period only."
-msgstr "Rozpis podle plánu se uchovává jen pro aktuální období."
-
 msgid "The button now stands out. I checked it in your pane."
 msgstr "Tlačítko je teď výrazné. Zkontroloval jsem to ve vašem panelu."
 
@@ -20282,9 +20230,6 @@ msgstr "Prostředí, ze kterého tato automatizace spouští cloudové pracovní
 
 msgid "The extension and its local data are deleted from this browser."
 msgstr "Rozšíření a jeho místní data se z tohoto prohlížeče smažou."
-
-msgid "The extra-usage limit is a percentage of the plan, so its amount is not shown."
-msgstr "Limit využití navíc je procento z plánu, proto se jeho částka nezobrazuje."
 
 msgid "The factory"
 msgstr "Továrna"
@@ -20486,8 +20431,8 @@ msgstr "Cesta musí zůstat uvnitř repozitáře"
 msgid "The plugin change did not finish in {seconds} seconds."
 msgstr "Změna pluginu nebyla dokončena do {seconds} sekund."
 
-msgid "The pool resets every month. Usage past it is billed per GB-hour at the rate shown on each plan."
-msgstr "Fond se každý měsíc obnovuje. Využití nad jeho rámec se účtuje za GB-hodinu podle sazby uvedené u každého plánu."
+msgid "The pool resets every month."
+msgstr "Fond se každý měsíc obnoví."
 
 msgid "The primary repository must be one of the environment's repositories"
 msgstr "Primární repozitář musí být jedním z repozitářů prostředí"
@@ -20781,11 +20726,12 @@ msgstr "Tento adresář neexistuje. Terminálový skript se vrátí ke kořeni p
 msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
 msgstr "Tento e-mail je již zaregistrován jiným způsobem přihlášení a poskytovatel jej nepotvrdil jako ověřený. Přihlaste se způsobem, který jste použili dříve."
 
+#. placeholder {0}: params?.minutes
+msgid "This environment can start 3 manual builds an hour. Try again in {0} minutes."
+msgstr "Toto prostředí může spustit 3 ruční sestavení za hodinu. Zkuste to znovu za {0} min."
+
 msgid "This environment has no [install] to build. Add one to its config in Settings, Environments."
 msgstr "Toto prostředí nemá žádnou sekci [install] k sestavení. Přidejte ji do jeho konfigurace v Nastavení, Prostředí."
-
-msgid "This environment has no repositories to build"
-msgstr "Toto prostředí nemá žádné repozitáře k sestavení"
 
 msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
 msgstr "Toto prostředí nemá žádné repozitáře. V Nastavení vytvořte prostředí s repozitáři a pracovní prostor spusťte z něj"
@@ -20885,9 +20831,6 @@ msgstr "Tato organizace nemá žádná fakturační období. Zvolte místo toho 
 
 msgid "This organization is on the Free plan. {appName} Mobile is available for organizations on Pro."
 msgstr "Tato organizace má tarif Free. {appName} Mobile je dostupný pro organizace s tarifem Pro."
-
-msgid "This page cannot tell when the usage limit is reached."
-msgstr "Tato stránka nepozná, kdy je dosažen limit využití."
 
 msgid "This page could not be loaded"
 msgstr "Tuto stránku se nepodařilo načíst"
@@ -21679,10 +21622,6 @@ msgstr "neznámý"
 msgid "Unknown"
 msgstr "Neznámá"
 
-msgctxt "boot end"
-msgid "Unknown"
-msgstr "Neznámé"
-
 msgctxt "person"
 msgid "Unknown"
 msgstr "Neznámá"
@@ -22010,17 +21949,11 @@ msgstr "Využití"
 msgid "Usage is out of date"
 msgstr "Údaje o využití jsou zastaralé"
 
-msgid "usage limit"
-msgstr "limit využití"
-
 msgid "Usage limit"
 msgstr "Limit využití"
 
 msgid "Usage limit reached"
 msgstr "Dosažen limit využití"
-
-msgid "Usage limit reached."
-msgstr "Dosažen limit využití."
 
 msgid "Usage sections"
 msgstr "Sekce využití"
@@ -22654,8 +22587,8 @@ msgstr "Co týmy automatizují"
 msgid "What these were written against is no longer on the page, so they have no pin."
 msgstr "To, k čemu byly napsané, už na stránce není, takže nemají značku."
 
-msgid "What this environment's builds and cloud workspaces run. A repository's own config.toml is not used in the cloud."
-msgstr "Co spouštějí sestavení a cloudové pracovní prostory tohoto prostředí. Vlastní config.toml repozitáře se v cloudu nepoužívá."
+msgid "What this environment's builds and cloud workspaces run. Without one, the cloud reads the primary repository's .paradev/config.toml."
+msgstr "Co spouštějí sestavení a cloudové pracovní prostory tohoto prostředí. Bez něj cloud čte .paradev/config.toml hlavního repozitáře."
 
 msgid "What we believe"
 msgstr "Čemu věříme"
@@ -22744,8 +22677,8 @@ msgstr "Kteří AI kódovací agenti jsou podporovaní?"
 msgid "Which plans include automations?"
 msgstr "Které plány zahrnují automatizace?"
 
-msgid "Which plugins' MCP servers cloud agents can use in this environment. A plugin you remove stops working in running workspaces too."
-msgstr "Pluginy, jejichž MCP servery mohou cloudoví agenti v tomto prostředí používat. Odebraný plugin přestane fungovat i v běžících pracovních prostorech."
+msgid "Which plugins' MCP servers cloud agents can use in this environment."
+msgstr "Pluginy, jejichž MCP servery mohou cloudoví agenti v tomto prostředí používat."
 
 msgid "Who can open it"
 msgstr "Kdo to může otevřít"
@@ -23166,9 +23099,6 @@ msgstr "K tomuto terminálu nemáte přístup."
 msgid "You don't have permission to remove this member"
 msgstr "Nemáte oprávnění tohoto člena odebrat"
 
-msgid "You have no cloud usage in this period."
-msgstr "V tomto období nemáte žádné využití cloudu."
-
 msgid "You have unsaved environment variables. Are you sure you want to close?"
 msgstr "Máte neuložené proměnné prostředí. Opravdu chcete zavřít?"
 
@@ -23327,9 +23257,6 @@ msgstr "Vaše jméno <0>(pokud váš prompt použijeme, uvedeme vás v changelog
 msgid "Your organization"
 msgstr "Vaše organizace"
 
-msgid "Your organization has reached its cloud usage limit. Raise the limit or upgrade in Settings, Billing to start this workspace."
-msgstr "Vaše organizace dosáhla limitu využití cloudu. Pro spuštění tohoto pracovního prostoru zvyšte limit nebo přejděte na vyšší tarif v Nastavení, Fakturace."
-
 #. placeholder {0}: params?.limit
 msgid "Your organization has reached its environment limit ({0}). Archive an environment, or upgrade in Settings, Billing to add more."
 msgstr "Vaše organizace dosáhla limitu prostředí ({0}). Archivujte některé prostředí, nebo přejděte na vyšší tarif v Nastavení, Fakturace a přidejte další."
@@ -23344,20 +23271,11 @@ msgstr "Vaše organizace pro vás instaluje {plugin}, proto jej nelze odinstalov
 msgid "Your organization installs this plugin for you. You can disable it, but not remove it."
 msgstr "Vaše organizace pro vás instaluje tento plugin. Můžete jej zakázat, ale ne odebrat."
 
-msgid "Your organization reached its cloud usage limit."
-msgstr "Vaše organizace dosáhla limitu využití cloudu."
-
-msgid "Your organization reached its cloud usage limit. This workspace stops in a few minutes unless the limit is raised."
-msgstr "Vaše organizace dosáhla limitu využití cloudu. Tento pracovní prostor se za několik minut zastaví, pokud limit nezvýšíte."
-
 msgid "Your organization reached its environment limit."
 msgstr "Vaše organizace dosáhla limitu prostředí."
 
 msgid "Your own accounts. Your organization's integrations let Paradev reach its tools; connecting yours makes the work Paradev does for you show up as you."
 msgstr "Vaše vlastní účty. Integrace vaší organizace umožňují Paradevu přístup k jejím nástrojům; když připojíte své účty, práce, kterou pro vás Paradev udělá, se zobrazí pod vaším jménem."
-
-msgid "Your own usage only. The organization's totals, its allowance and usage by person are for owners and admins."
-msgstr "Pouze vaše vlastní využití. Souhrny organizace, její kvóta a využití podle osob jsou pro vlastníky a administrátory."
 
 msgid "Your Paradev download is starting."
 msgstr "Vaše stahování Paradevu se spouští."

@@ -196,7 +196,8 @@ async function main(): Promise<void> {
 				read: readSandboxBoxResources,
 			});
 			startSandboxKeepalive({
-				keepalive: () => api.sandbox.keepalive.mutate(),
+				keepalive: (pingsEveryMs) =>
+					api.sandbox.keepalive.mutate({ pingsEveryMs }),
 				store: terminalAgentStore,
 			});
 			startSandboxPullRequestReporter({

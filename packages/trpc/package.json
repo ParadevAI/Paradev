@@ -213,6 +213,7 @@
 		"semver": "7.7.4",
 		"superjson": "2.2.6",
 		"undici": "7.30.0",
+		"workflow": "5.5.0",
 		"zod": "4.6.6"
 	},
 	"devDependencies": {

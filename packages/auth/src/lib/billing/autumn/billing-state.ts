@@ -38,6 +38,8 @@ export interface OrganizationBilling {
 	scheduledAt: string | null;
 	periodStart: string | null;
 	periodEnd: string | null;
+	/** Autumn anchors the monthly GB-minute reset on it. */
+	startedAt: string | null;
 	billingInterval: string | null;
 	lapsed: boolean;
 	paymentState: PaymentState;
@@ -130,6 +132,7 @@ export function billingFromCustomer(
 						currency: unpaidInvoice?.currency ?? null,
 					}
 				: { kind: "ok" };
+	const pack = paid?.plan ? gbHourPack(paid.plan) : null;
 	return {
 		tier,
 		autumnPlanId: paidPlanId,
@@ -139,6 +142,7 @@ export function billingFromCustomer(
 		scheduledAt:
 			next && next.planId !== paidPlanId ? iso(next.startedAt) : null,
 		periodStart: iso(paid?.currentPeriodStart),
+		startedAt: iso(paid?.startedAt),
 		periodEnd: iso(
 			seatRenewal({
 				startedAt: paid?.startedAt,
@@ -157,8 +161,9 @@ export function billingFromCustomer(
 		cloudUsage: cloudUsageFromBalances(
 			customer.balances,
 			customer.billingControls,
-			paid?.plan ? gbHourPack(paid.plan) : null,
-			paid?.plan ? overagePerGbHour(paid.plan) : null,
+			pack,
+			(paid?.plan && overagePerGbHour(paid.plan)) ??
+				(pack && (pack.price * 60) / pack.gbMinutes),
 			seatCount(customer, paidPlanId),
 		),
 		planTier: planTierOf(paid?.plan?.metadata, tier),

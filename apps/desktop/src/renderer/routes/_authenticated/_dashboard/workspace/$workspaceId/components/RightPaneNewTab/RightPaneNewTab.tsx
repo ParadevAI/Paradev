@@ -42,7 +42,7 @@ export function RightPaneNewTab({ onOpen }: RightPaneNewTabProps) {
 		<div className="flex h-full w-full overflow-y-auto">
 			<div className="mx-auto w-full max-w-[640px] space-y-4 p-4">
 				<CloudSection title={<Trans>Tools</Trans>}>
-					<div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2 px-1">
+					<div className="grid grid-cols-[repeat(auto-fill,minmax(min(220px,100%),1fr))] gap-2 px-1">
 						{options.map((option) => (
 							<EmptyTabActionButton
 								key={option.kind}
@@ -51,7 +51,7 @@ export function RightPaneNewTab({ onOpen }: RightPaneNewTabProps) {
 								display={
 									option.hotkeyId ? (hotkeyKeys[option.hotkeyId] ?? []) : []
 								}
-								className="bg-muted/40 hover:bg-accent/60"
+								className="h-auto min-h-9 min-w-0 flex-wrap gap-y-1 bg-muted/40 py-1.5 hover:bg-accent/60 [&>span:first-child]:min-w-0 [&>span:first-child]:max-w-full [&>span:first-child>span:last-child]:whitespace-normal [&>span:first-child>span:last-child]:break-words [&>span:last-child]:ml-auto"
 								onClick={() =>
 									onOpen(
 										createRightPane(option.kind, {

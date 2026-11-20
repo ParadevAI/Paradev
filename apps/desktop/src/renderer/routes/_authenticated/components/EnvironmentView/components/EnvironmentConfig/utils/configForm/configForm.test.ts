@@ -67,8 +67,71 @@ cwd = "app"
 		expect(form.start).toBe("./cloud-setup.sh");
 		form.start = "./setup.sh";
 		expect(fromConfigForm(base, form).setup).toEqual({
-			run: "./setup.sh",
-			cloud: { cwd: "app" },
+			run: "./local-setup.sh",
+			cloud: { run: "./setup.sh", cwd: "app" },
+		});
+	});
+
+	test("a terminal's edited command and default go where the cloud reads them", () => {
+		const base = parse(`
+[terminals.dev]
+run = "bun dev"
+default = true
+
+[terminals.dev.cloud]
+run = "bun dev:cloud"
+default = false
+
+[terminals.web]
+run = "bun web"
+`);
+		const form = toConfigForm(base);
+		const [dev, web] = form.terminals;
+		if (!dev || !web) throw new Error("expected two terminals");
+		dev.command = "bun start";
+		dev.isDefault = true;
+		expect(fromConfigForm(base, form).terminals).toEqual({
+			dev: {
+				run: "bun dev",
+				default: true,
+				cloud: { run: "bun start", default: true },
+			},
+			web: { run: "bun web" },
+		});
+	});
+
+	test("fields the user did not change stay as they were, cloud overrides included", () => {
+		const base = parse(`
+[install]
+run = "bun install"
+
+[install.cloud]
+run = []
+
+[setup]
+run = "./local.sh"
+
+[setup.cloud]
+run = "./cloud.sh"
+
+[terminals.dev]
+run = "bun dev"
+default = true
+
+[terminals.dev.cloud]
+default = false
+`);
+		const form = toConfigForm(base);
+		form.ports.push({
+			key: "new",
+			name: "web",
+			port: "3000",
+			label: "",
+			preview: true,
+		});
+		expect(fromConfigForm(base, form)).toEqual({
+			...base,
+			ports: { web: { default: 3000, preview: true } },
 		});
 	});
 

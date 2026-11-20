@@ -77,6 +77,7 @@ describe("activePlan read from Autumn keeps the shape released clients read", ()
 			scheduledPlanId: null,
 			scheduledAt: null,
 			periodStart: new Date(NOW - 10 * DAY).toISOString(),
+			startedAt: new Date(NOW - 40 * DAY).toISOString(),
 			periodEnd: new Date(NOW + 20 * DAY).toISOString(),
 			billingInterval: "month",
 			lapsed: false,
@@ -247,26 +248,28 @@ describe("environment limit", () => {
 	});
 });
 
-test("cloud usage carries the plan's overage price per GB-hour", () => {
+test.each([
+	[
+		"the plan's monthly price",
+		{ amount: 0.25, interval: "month", billingUnits: 250 },
+	],
+	[
+		"the pack price, with no monthly price",
+		{ amount: 0.06, interval: "one_off", billingUnits: 60 },
+	],
+])("cloud usage is priced per GB-hour from %s", (_, price) => {
 	const source = customer({
 		flags: pro,
 		subscription: {
-			plan: {
-				items: [
-					{
-						featureId: "box_gb_minutes",
-						price: { amount: 0.25, interval: "month", billingUnits: 250 },
-					},
-				],
-			},
+			plan: { items: [{ featureId: "box_gb_minutes", price }] },
 		} as never,
 	});
 	source.balances = {
 		box_gb_minutes: { granted: 0, remaining: 0, usage: 0, unlimited: false },
 	} as never;
-	expect(billingFromCustomer(source, NOW).cloudUsage?.overagePerGbHour).toBe(
-		0.06,
-	);
+	expect(
+		billingFromCustomer(source, NOW).cloudUsage?.overagePerGbHour,
+	).toBeCloseTo(0.06);
 });
 
 test.each([

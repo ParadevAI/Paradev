@@ -12,7 +12,7 @@ export default command({
 		name: string().desc("New name"),
 		scope: string().enum("organization", "personal").desc("Who can use it"),
 		config: string().desc(
-			"Path to a config.toml to store as the environment's config; a repository's own file is not used in the cloud",
+			"Path to a config.toml to store as the environment's config; without one, the cloud reads the primary repository's .paradev/config.toml",
 		),
 		clearConfig: boolean().desc("Remove the environment's config"),
 	},

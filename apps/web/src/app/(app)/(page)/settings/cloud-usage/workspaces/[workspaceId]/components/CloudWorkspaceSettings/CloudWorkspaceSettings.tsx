@@ -41,6 +41,7 @@ export function CloudWorkspaceSettings({
 		<div className="mx-auto max-w-5xl">
 			<CloudWorkspacePage
 				Link={CloudUsageLink}
+				workspaceId={workspaceId}
 				periods={periods}
 				period={period}
 				workspace={workspace}

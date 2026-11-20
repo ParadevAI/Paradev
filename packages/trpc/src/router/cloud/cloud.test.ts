@@ -51,19 +51,23 @@ function caller(
 		tier = "pro",
 		billingOff = false,
 		listRatePerGbHour = async () => null,
+		startedAt = null,
 	}: {
 		enabled?: boolean;
 		readCloudUsage?: () => Promise<CloudUsage | null>;
 		tier?: PlanTier;
 		billingOff?: boolean;
 		listRatePerGbHour?: CloudDeps["listRatePerGbHour"];
+		startedAt?: string | null;
 	} = {},
 ) {
 	const router = createTRPCRouter({
 		cloud: cloudRouterWith({
 			db,
 			billing: async () =>
-				billingOff ? null : { tier, cloudUsage: await readCloudUsage() },
+				billingOff
+					? null
+					: { tier, startedAt, cloudUsage: await readCloudUsage() },
 			listRatePerGbHour,
 			flags: { isFeatureEnabled: async () => enabled },
 		}),
@@ -101,6 +105,11 @@ describe("scope", () => {
 			groupBy: "user",
 		});
 		expect(byUser.items.map((item) => item.key)).toEqual([MAYA, SAM]);
+		expect(byUser.items[1]?.days?.[0]).toEqual({
+			day: "2026-11-01",
+			gbHours: 16,
+			usageUsd: 0.96,
+		});
 		const [open] = (await owner.periods.list({})).items;
 		expect(open?.allowance).toMatchObject({
 			includedGbHours: 20,
@@ -245,6 +254,23 @@ describe("scope", () => {
 		await expect(
 			caller(SAM).usage.query({ range: NOVEMBER, groupBy: "user" }),
 		).rejects.toMatchObject({ code: "FORBIDDEN" });
+	});
+
+	test("a member opening another person's workspace by id gets nothing of it", async () => {
+		const member = caller(SAM);
+		const usage = await member.usage.query({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+			groupBy: "workspace",
+			limit: 1,
+		});
+		expect(usage.items).toEqual([]);
+		expect(usage.total).toMatchObject({ gbHours: 0, boots: 0, workspaces: 0 });
+		const boots = await member.boots.list({
+			range: NOVEMBER,
+			workspace: CHECKOUT,
+		});
+		expect(boots.items).toEqual([]);
 	});
 });
 
@@ -396,17 +422,24 @@ test("sorting by name or status needs grouping by workspace", async () => {
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
 });
 
-test("with the flag off every procedure is FORBIDDEN and billing is not read", async () => {
+test("with the flag off the usage pages are FORBIDDEN and billing is not read", async () => {
 	const readCloudUsage = mock(async () => CLOUD_USAGE);
 	const off = caller(MAYA, { enabled: false, readCloudUsage });
 	for (const call of [
 		() => off.usage.query({ range: "7d" }),
 		() => off.boots.list({ range: "7d" }),
-		() => off.periods.list({}),
 	]) {
 		await expect(call()).rejects.toMatchObject({ code: "FORBIDDEN" });
 	}
 	expect(readCloudUsage).not.toHaveBeenCalled();
+});
+
+test("with the flag off Billing still reads the open period and its allowance", async () => {
+	const [open] = (await caller(MAYA, { enabled: false }).periods.list({}))
+		.items;
+	expect(open?.closed).toBe(false);
+	expect(open?.allowance).toMatchObject({ includedGbHours: 20 });
+	expect(open?.metrics.gbHours).toBe(34);
 });
 
 test("periods run from the open one back to the one the organization was created in", async () => {
@@ -606,4 +639,19 @@ describe("the list rate", () => {
 		expect(usage.total.usageUsd).toBeCloseTo(3.4);
 		expect(listRatePerGbHour).not.toHaveBeenCalled();
 	});
+});
+
+test("an organization billed on the 31st sees its period start on the 31st", async () => {
+	const owner = caller(MAYA, {
+		startedAt: "2026-08-31T05:00:00.000Z",
+		readCloudUsage: async () => ({
+			...CLOUD_USAGE,
+			resetsAt: "2026-11-30T05:00:00.000Z",
+		}),
+	});
+	const [open] = (await owner.periods.list({})).items;
+	expect(open?.id).toBe("2026-10-31");
+	await expect(
+		owner.usage.query({ range: { period: "2026-10-31" } }),
+	).resolves.toBeDefined();
 });

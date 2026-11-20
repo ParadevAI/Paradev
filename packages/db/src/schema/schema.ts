@@ -71,6 +71,7 @@ import type {
 	AutomationEventDispatchInput,
 	CloudWorkspaceBootPhase,
 	IntegrationConfig,
+	PendingUsageEvent,
 	TriggerConfig,
 	UserIdentityMetadata,
 } from "./types";
@@ -863,7 +864,7 @@ export const environments = pgTable(
 		scope: environmentScope().notNull().default("organization"),
 		/** The size a workspace boots at when its create names none; null means the organization's default. */
 		machineSize: text("machine_size"),
-		/** The `config.toml` its builds and boxes run; a repository's own file is not read in the cloud. */
+		/** The `config.toml` its builds and boxes run; null falls back to the primary repository's own file. */
 		config: text(),
 		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
 			onDelete: "set null",
@@ -984,8 +985,9 @@ export const environmentSecrets = pgTable(
 
 /**
  * One build of an environment's golden from `[install]`. The running row is
- * the lock: at most one per environment. A succeeded row keeps its golden
- * until retention deletes it, so it can be restored.
+ * the lock: at most one per environment. A build keeps the newest goldens
+ * and deletes older ones, setting `golden_deleted_at`; a kept one can be
+ * restored.
  */
 export const environmentBuilds = pgTable(
 	"environment_builds",
@@ -1228,6 +1230,10 @@ export const cloudWorkspaceBoots = pgTable(
 		egressBytes: bigint("egress_bytes", { mode: "number" }),
 		phases: jsonb().$type<CloudWorkspaceBootPhase[]>(),
 		traceId: text("trace_id"),
+		/** Usage rows Autumn accepted that could not be written; the meter's reconcile writes them. */
+		pendingUsageEvents: jsonb("pending_usage_events").$type<
+			PendingUsageEvent[]
+		>(),
 		// No foreign key, like organization_id: the boot keeps who it bills after the user is deleted.
 		createdByUserId: uuid("created_by_user_id"),
 		createdAt: timestamp("created_at", { withTimezone: true })
@@ -1243,6 +1249,9 @@ export const cloudWorkspaceBoots = pgTable(
 			table.cloudWorkspaceId,
 		),
 		index("cloud_workspace_boots_organization_id_idx").on(table.organizationId),
+		index("cloud_workspace_boots_pending_usage_idx")
+			.on(table.id)
+			.where(sql`${table.pendingUsageEvents} is not null`),
 		index("cloud_workspace_boots_open_idx")
 			.on(table.startedAt)
 			.where(
@@ -1292,6 +1301,30 @@ export const cloudUsageEvents = pgTable(
 
 export type InsertCloudUsageEvent = typeof cloudUsageEvents.$inferInsert;
 export type SelectCloudUsageEvent = typeof cloudUsageEvents.$inferSelect;
+
+/**
+ * Billed box_gb_minutes events per billing day of sent_at: Vercel's day, Pacific time with daylight saving.
+ * Written only by the trigger cloud_usage_daily on cloud_usage_events, through cloud_usage_daily_apply and
+ * cloud_usage_daily_add. It keys on the boot's vcpus when the event is written, so a boot's vcpus must not
+ * change after its first event.
+ */
+export const cloudUsageDaily = pgTable(
+	"cloud_usage_daily",
+	{
+		organizationId: uuid("organization_id").notNull(),
+		day: date({ mode: "string" }).notNull(),
+		userId: uuid("user_id"),
+		vcpus: integer().notNull(),
+		gbMinutes: numeric("gb_minutes").notNull(),
+		seconds: numeric().notNull(),
+		events: integer().notNull(),
+	},
+	(table) => [
+		unique("cloud_usage_daily_key")
+			.on(table.organizationId, table.day, table.userId, table.vcpus)
+			.nullsNotDistinct(),
+	],
+);
 
 export const cloudWorkspacePullRequests = pgTable(
 	"cloud_workspace_pull_requests",

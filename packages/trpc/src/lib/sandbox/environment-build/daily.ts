@@ -14,9 +14,9 @@ export interface DailyBuildOutcome {
 }
 
 /**
- * Starts a build of every environment that can have one: not archived, on a
- * paid plan, with `[install]`, and not paused by three failures in a row. No
- * change check: an unchanged environment is built too.
+ * Starts a build of every environment that can have one, busiest first: not
+ * archived, on a paid plan, with `[install]`, and not paused by three
+ * failures in a row. No change check: an unchanged environment is built too.
  */
 export async function queueDailyBuilds(): Promise<DailyBuildOutcome> {
 	const outcome: DailyBuildOutcome = { queued: 0, skipped: {}, failed: 0 };

@@ -37,14 +37,16 @@ export function getLocalTomlConfigPath(repoPath: string): string {
 
 /**
  * In the cloud the environment's config, which the API writes into the box,
- * is the only source; a repository's own file is not read. Locally the shared
- * file comes from the workspace's checkout, else the main checkout's.
+ * wins when it has one. Otherwise the shared file comes from the workspace's
+ * checkout, else the main checkout's.
  */
 export function findTomlConfigPath(args: {
 	repoPath: string;
 	worktreePath?: string;
 }): string | null {
-	if (configEnvironment() === "cloud") return environmentConfigPath();
+	const environmentPath =
+		configEnvironment() === "cloud" ? environmentConfigPath() : null;
+	if (environmentPath) return environmentPath;
 	const roots = args.worktreePath
 		? [args.worktreePath, args.repoPath]
 		: [args.repoPath];

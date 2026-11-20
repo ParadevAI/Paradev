@@ -1,26 +1,17 @@
 import { describe, expect, it } from "bun:test";
 import type { WorkspaceRef } from "../types";
 import {
-	type BillingState,
+	BILLING_STATES,
 	overviewArgs,
 	workspaceArgs,
 	workspacePages,
 } from "./fixtures";
 
-const STATES: BillingState[] = [
-	"northwind",
-	"trial",
-	"prepaid",
-	"limitReached",
-	"percentCap",
-	"notRead",
-	"unbilled",
-];
 const refOf = (row: { ref: unknown }) => row.ref as WorkspaceRef;
 
 describe("story fixtures hold only states the router can return", () => {
 	it("stops workspaces at the usage limit only in the state that reached it", () => {
-		for (const state of STATES) {
+		for (const state of BILLING_STATES) {
 			const rows = overviewArgs(state).workspaces.data?.items ?? [];
 			const atLimit = rows.filter(
 				(row) => refOf(row).lastBoot?.endReason === "usage_limit",

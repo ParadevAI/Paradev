@@ -16,26 +16,23 @@ import {
 import { useUsageFormat } from "../../../../hooks/useUsageFormat";
 import type { CloudPages } from "../../../../types";
 import type { PricedBoots } from "../../../../utils/priced";
-import { Pill } from "../../../Pill";
 import { QueryStatus } from "../../../QueryStatus";
-import { END_PILLS } from "./constants";
+import { ToneBadge } from "../../../ToneBadge";
+import { END_BADGES } from "./constants";
 import { bootEnd } from "./utils/bootEnd";
 
 interface BootsTableProps {
 	pages: CloudPages<PricedBoots>;
 }
 
-const HEAD =
-	"h-9 text-xs font-medium tracking-wide text-muted-foreground uppercase";
 const MEDIUM = "hidden @xl:table-cell";
 const NARROW = "hidden @md:table-cell";
 
 export function BootsTable({ pages }: BootsTableProps) {
 	const { i18n } = useLingui();
 	const { formatDateTime, formatList, formatNumber } = useFormat();
-	const { dollarsFor, formatGbHours } = useUsageFormat();
+	const { dollars, formatGbHours } = useUsageFormat();
 	const boots = pages.data?.pages.flatMap((page) => page.items) ?? [];
-	const dollars = dollarsFor(boots.map((boot) => boot.usageUsd));
 	const unit = (value: number, name: "hour" | "minute" | "second") =>
 		formatNumber(value, { style: "unit", unit: name, unitDisplay: "narrow" });
 	const duration = (minutes: number) => {
@@ -61,22 +58,22 @@ export function BootsTable({ pages }: BootsTableProps) {
 			<Table>
 				<TableHeader>
 					<TableRow className="hover:bg-transparent">
-						<TableHead className={HEAD}>
+						<TableHead>
 							<Trans>Started</Trans>
 						</TableHead>
-						<TableHead className={cn(HEAD, MEDIUM)}>
-							<Trans>Duration</Trans>
+						<TableHead className={MEDIUM}>
+							<Trans>Run time</Trans>
 						</TableHead>
-						<TableHead className={cn(HEAD, MEDIUM)}>
+						<TableHead className={MEDIUM}>
 							<Trans>Size</Trans>
 						</TableHead>
-						<TableHead className={HEAD}>
+						<TableHead>
 							<Trans>Ended</Trans>
 						</TableHead>
-						<TableHead className={cn(HEAD, "text-right", NARROW)}>
+						<TableHead className={cn("text-right", NARROW)}>
 							<Trans>GB-hours</Trans>
 						</TableHead>
-						<TableHead className={cn(HEAD, "text-right")}>
+						<TableHead className="text-right">
 							<Trans>Usage</Trans>
 						</TableHead>
 					</TableRow>
@@ -86,7 +83,7 @@ export function BootsTable({ pages }: BootsTableProps) {
 						<TableRow className="hover:bg-transparent">
 							<TableCell
 								colSpan={6}
-								className="py-8 text-center text-muted-foreground"
+								className="py-6 text-center text-sm text-muted-foreground"
 							>
 								<Trans>No boots in this period.</Trans>
 							</TableCell>
@@ -94,7 +91,7 @@ export function BootsTable({ pages }: BootsTableProps) {
 					)}
 					{boots.map((boot) => {
 						const end = bootEnd(boot);
-						const pill = end && END_PILLS[end];
+						const pill = end && END_BADGES[end];
 						const length = end === "running" ? "—" : duration(boot.minutes);
 						return (
 							<TableRow key={boot.id}>
@@ -117,15 +114,20 @@ export function BootsTable({ pages }: BootsTableProps) {
 								</TableCell>
 								<TableCell>
 									{pill ? (
-										<Pill tone={pill.tone}>{i18n._(pill.label)}</Pill>
+										<ToneBadge tone={pill.tone}>{i18n._(pill.label)}</ToneBadge>
 									) : (
 										<span className="text-muted-foreground">
-											<Trans context="boot end">Unknown</Trans>
+											<Trans context="boot end">Not recorded</Trans>
 										</span>
 									)}
 								</TableCell>
 								<TableCell className={cn("text-right tabular-nums", NARROW)}>
-									{formatGbHours(boot.gbHours)}
+									{boot.gbHours < 100
+										? formatNumber(boot.gbHours, {
+												minimumFractionDigits: 1,
+												maximumFractionDigits: 1,
+											})
+										: formatGbHours(boot.gbHours)}
 								</TableCell>
 								<TableCell className="text-right tabular-nums">
 									{dollars(boot.usageUsd)}

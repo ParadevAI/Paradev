@@ -1,13 +1,9 @@
 export { queueDailyBuilds } from "./daily";
-export {
-	deleteGoldens,
-	pruneGoldens,
-	rebuildEnvironment,
-} from "./environment-build";
+export { isProductionDeployment } from "./deployment";
 export { isStale, keptGoldenRefs } from "./policy";
 export {
 	type BuildRefusalReason,
 	BuildRefused,
 	startEnvironmentBuild,
 } from "./start";
-export { activateGolden, finishedBuilds } from "./store";
+export { restoreGolden, undeletedGoldens } from "./store";

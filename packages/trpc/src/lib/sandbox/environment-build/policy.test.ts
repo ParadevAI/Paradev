@@ -1,17 +1,16 @@
 import { describe, expect, test } from "bun:test";
+import { STALE_BUILD_MS } from "./limits";
 import {
-	checkoutLayoutMoves,
 	checkoutScript,
 	dailyBuildsPaused,
 	goldensToDelete,
 	isStale,
 	keptGoldenRefs,
-	removedCheckoutPaths,
-	STALE_BUILD_MS,
+	nextManualBuildAt,
 } from "./policy";
 
 describe("isStale", () => {
-	test("a running build past the limit is stale; a finished one never is", () => {
+	test("a running build past the stale limit is stale; a finished one never is", () => {
 		const old = new Date(Date.now() - STALE_BUILD_MS - 1000);
 		const recent = new Date(Date.now() - 1000);
 		expect(isStale({ status: "running", startedAt: old })).toBe(true);
@@ -21,43 +20,25 @@ describe("isStale", () => {
 });
 
 describe("goldensToDelete", () => {
-	const built = (goldenRef: string) => ({
-		status: "succeeded" as const,
-		goldenRef,
-		goldenDeletedAt: null,
+	const goldens = (...refs: string[]) =>
+		refs.map((goldenRef) => ({ goldenRef }));
+
+	test("keeps three goldens", () => {
+		expect(goldensToDelete(goldens("c", "b", "a"), "c")).toEqual([]);
 	});
 
-	test("keeps an old active golden plus the two newest others", () => {
-		const builds = ["g4", "g3", "g2", "g1"].map(built);
-		expect(goldensToDelete(builds, "g1").map((b) => b.goldenRef)).toEqual([
-			"g2",
-		]);
+	test("deletes the fourth, and never the active one", () => {
+		expect(goldensToDelete(goldens("d", "c", "b", "a"), "d")).toEqual(
+			goldens("a"),
+		);
+		expect(goldensToDelete(goldens("d", "c", "b", "a"), "a")).toEqual(
+			goldens("b"),
+		);
 	});
 
-	test("failed and already deleted builds do not count toward the three", () => {
-		const builds = [
-			built("g4"),
-			{ status: "failed" as const, goldenRef: null, goldenDeletedAt: null },
-			built("g3"),
-			{ ...built("g0"), goldenDeletedAt: new Date(0) },
-			built("g2"),
-			built("g1"),
-		];
-		expect(goldensToDelete(builds, "g4").map((b) => b.goldenRef)).toEqual([
-			"g1",
-		]);
-	});
-});
-
-describe("keptGoldenRefs", () => {
-	test("restore picks from the active golden and the two newest others", () => {
-		const built = (goldenRef: string) => ({
-			status: "succeeded" as const,
-			goldenRef,
-			goldenDeletedAt: null,
-		});
-		expect(keptGoldenRefs(["g4", "g3", "g2", "g1"].map(built), "g4")).toEqual(
-			new Set(["g4", "g3", "g2"]),
+	test("what it keeps can be restored: the active golden plus the 2 newest others", () => {
+		expect(keptGoldenRefs(goldens("d", "c", "b", "a"), "a")).toEqual(
+			new Set(["a", "d", "c"]),
 		);
 	});
 });
@@ -93,16 +74,6 @@ describe("checkoutScript", () => {
 		);
 	});
 
-	test("a lone repository is the workspace root", () => {
-		const script = checkoutScript({
-			root: "/workspace",
-			checkouts: [
-				{ url: "https://github.com/a/web.git", branch: "main", path: "." },
-			],
-		});
-		expect(script).toContain("git -C '/workspace' rev-parse HEAD");
-	});
-
 	test("quotes a branch name with a quote in it", () => {
 		const script = checkoutScript({
 			root: "/workspace",
@@ -112,62 +83,12 @@ describe("checkoutScript", () => {
 	});
 });
 
-describe("checkoutLayoutMoves", () => {
-	const web = { id: "web", owner: "acme", name: "web" };
-	const api = { id: "api", owner: "acme", name: "api" };
-	const docs = { id: "docs", owner: "acme", name: "docs" };
-	const otherWeb = { id: "other-web", owner: "other", name: "web" };
-
-	test("adding a repository beside others keeps every checkout in place", () => {
-		expect(
-			checkoutLayoutMoves({
-				current: [web, api],
-				currentPrimaryId: "web",
-				next: [web, api, docs],
-				nextPrimaryId: "web",
-			}),
-		).toBe(false);
-	});
-
-	test("a second repository moves the lone one out of the root", () => {
-		expect(
-			checkoutLayoutMoves({
-				current: [web],
-				currentPrimaryId: "web",
-				next: [web, api],
-				nextPrimaryId: "web",
-			}),
-		).toBe(true);
-	});
-
-	test("another primary, or a name clash that renames a checkout, moves it", () => {
-		expect(
-			checkoutLayoutMoves({
-				current: [web, api],
-				currentPrimaryId: "web",
-				next: [web, api],
-				nextPrimaryId: "api",
-			}),
-		).toBe(true);
-		expect(
-			checkoutLayoutMoves({
-				current: [web, api],
-				currentPrimaryId: "api",
-				next: [web, api, otherWeb],
-				nextPrimaryId: "api",
-			}),
-		).toBe(true);
-	});
-});
-
-describe("removedCheckoutPaths", () => {
-	test("names the directories of repositories that are dropped", () => {
-		const current = [
-			{ id: "web", owner: "acme", name: "web" },
-			{ id: "api", owner: "acme", name: "api" },
-		];
-		expect(removedCheckoutPaths({ current, nextIds: ["web"] })).toEqual([
-			"api",
-		]);
+describe("nextManualBuildAt", () => {
+	test("a fourth manual build in an hour waits for the oldest of the three to age out", () => {
+		const at = (minutes: number) => new Date(Date.UTC(2026, 0, 1, 12, minutes));
+		expect(nextManualBuildAt([at(10), at(40)])).toBeNull();
+		expect(nextManualBuildAt([at(40), at(10), at(25)])).toEqual(
+			new Date(Date.UTC(2026, 0, 1, 13, 10)),
+		);
 	});
 });

@@ -3,12 +3,12 @@ import { command } from "../../../lib/command";
 import { resolveEnvironment } from "../../../lib/environments";
 
 const POLL_MS = 5_000;
-const WAIT_MS = 10 * 60_000;
+const WAIT_MS = 15 * 60_000;
 
 export default command({
 	sandbox: false,
 	description:
-		"Build an environment's snapshot again from the [install] in its config; new workspaces keep starting from the current one until it succeeds",
+		"Build an environment's snapshot again from its [install]; new workspaces keep starting from the current one until it succeeds",
 	args: [positional("environment").required().desc("Environment ID")],
 	options: {
 		wait: boolean().desc("Wait for the build to finish; exit 1 if it fails"),
@@ -27,10 +27,7 @@ export default command({
 			environmentId: id,
 		});
 		if (!options.wait) {
-			return {
-				data: build,
-				message: `Build ${build.id} started. Follow it with: superset environments builds ${id}`,
-			};
+			return { data: build, message: `Build ${build.id} started` };
 		}
 		const deadline = Date.now() + WAIT_MS;
 		let finished: typeof build | undefined;
@@ -46,10 +43,7 @@ export default command({
 			);
 		}
 		if (!finished) {
-			throw new CLIError(
-				`Build ${build.id} is still running`,
-				`Check it with: superset environments builds ${id}`,
-			);
+			throw new CLIError(`Build ${build.id} is still running`);
 		}
 		if (finished.status === "failed") {
 			throw new CLIError(

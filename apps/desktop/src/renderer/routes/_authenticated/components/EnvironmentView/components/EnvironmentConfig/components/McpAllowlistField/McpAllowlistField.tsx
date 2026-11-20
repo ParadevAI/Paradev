@@ -60,8 +60,7 @@ export function McpAllowlistField({
 			</span>
 			<p className="text-xs text-muted-foreground">
 				<Trans>
-					Which plugins' MCP servers cloud agents can use in this environment. A
-					plugin you remove stops working in running workspaces too.
+					Which plugins' MCP servers cloud agents can use in this environment.
 				</Trans>
 			</p>
 			<div className="divide-y divide-border/70 overflow-hidden rounded-md border border-border/70">

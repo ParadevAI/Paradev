@@ -1398,15 +1398,43 @@
     {
       "idx": 199,
       "version": "7",
-      "when": 1795027648882,
+      "when": 1795061707634,
       "tag": "0199_environment_builds",
       "breakpoints": true
     },
     {
       "idx": 200,
       "version": "7",
-      "when": 1795046246600,
-      "tag": "0200_environment_config",
+      "when": 1795116912668,
+      "tag": "0200_cloud_usage_daily",
+      "breakpoints": true
+    },
+    {
+      "idx": 201,
+      "version": "7",
+      "when": 1795116914925,
+      "tag": "0201_cloud_usage_daily_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1795117964138,
+      "tag": "0202_cloud_usage_daily_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1795120757281,
+      "tag": "0203_cloud_workspace_boot_pending_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1795150029619,
+      "tag": "0204_environment_config",
       "breakpoints": true
     }
   ]

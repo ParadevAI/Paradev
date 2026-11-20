@@ -10,4 +10,8 @@ describe("bootEnd", () => {
 		expect(bootEnd({ stoppedAt, endReason: "unknown" })).toBeNull();
 		expect(bootEnd({ stoppedAt, endReason: "idle" })).toBe("idle");
 	});
+
+	it("shows a recorded reason even before the stop is written", () => {
+		expect(bootEnd({ stoppedAt: null, endReason: "idle" })).toBe("idle");
+	});
 });

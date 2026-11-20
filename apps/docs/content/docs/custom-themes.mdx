@@ -112,3 +112,27 @@ a third-party theme looks.
 CSS Tree handles parsing, not the security policy. Filtering reduces risk; it
 does not certify themes or protect against every browser vulnerability. T3 skins
 use their own color schema and selectors; this is not a complete T3 skin importer.
+
+## Stable background selectors
+
+Use these desktop hooks instead of layout classes or DOM relationships:
+
+| Selector | Surface |
+| --- | --- |
+| `[data-theme-surface="chat"]` | The non-scrolling container around the message viewport, including subagent chats |
+| `[data-theme-surface="new-workspace"]` | The New Workspace screen, including its project selection layout |
+
+For example, add this stylesheet as the theme's `css` string:
+
+```css
+[data-theme-surface="chat"],
+[data-theme-surface="new-workspace"] {
+  background-image: radial-gradient(ellipse at top, #314b73, transparent 70%);
+}
+```
+
+The chat hook keeps artwork outside the scrolling message content. The New
+Workspace surface itself can scroll. Preserve each surface's positioning and
+scroll behavior when styling it. These hooks are part of the custom theme
+contract and should remain available when the layout changes. Older desktop
+versions without these attributes need their existing fallback selectors.

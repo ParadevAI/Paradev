@@ -159,8 +159,8 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 			</div>
 			<p className="mb-2 text-xs text-muted-foreground">
 				<Trans>
-					What this environment's builds and cloud workspaces run. A
-					repository's own config.toml is not used in the cloud.
+					What this environment's builds and cloud workspaces run. Without one,
+					the cloud reads the primary repository's .paradev/config.toml.
 				</Trans>
 			</p>
 			{mode === "form" ? (
@@ -176,7 +176,7 @@ export function EnvironmentConfig({ environment }: EnvironmentConfigProps) {
 						fileName="install.sh"
 						label={<Trans>Install script</Trans>}
 						notice={
-							form.install.trim() ? null : (
+							form.install.trim() || draft === null ? null : (
 								<p className="text-xs text-amber-600 dark:text-amber-500">
 									<Trans>Builds fail until there is an install script.</Trans>
 								</p>

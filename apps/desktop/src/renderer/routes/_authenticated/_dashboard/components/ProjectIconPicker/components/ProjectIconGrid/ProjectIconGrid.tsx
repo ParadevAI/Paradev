@@ -1,8 +1,15 @@
 import { cn } from "@superset/ui/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { type ComponentType, type MouseEvent, useRef } from "react";
+import {
+	type ComponentType,
+	type MouseEvent,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from "react";
 
-const COLUMNS = 12;
+const MAX_COLUMNS = 12;
+const COLUMN_WIDTH = 34;
 const ROW_HEIGHT = 34;
 const OVERSCAN = 4;
 
@@ -22,7 +29,26 @@ export function ProjectIconGrid({
 	onPick,
 }: ProjectIconGridProps) {
 	const scrollRef = useRef<HTMLDivElement>(null);
-	const rowCount = Math.ceil(names.length / COLUMNS);
+	const [columns, setColumns] = useState(MAX_COLUMNS);
+	useLayoutEffect(() => {
+		const element = scrollRef.current;
+		if (!element) return;
+		const observer = new ResizeObserver(([entry]) => {
+			if (!entry) return;
+			setColumns(
+				Math.max(
+					1,
+					Math.min(
+						MAX_COLUMNS,
+						Math.floor((entry.contentRect.width + 2) / COLUMN_WIDTH),
+					),
+				),
+			);
+		});
+		observer.observe(element);
+		return () => observer.disconnect();
+	}, []);
+	const rowCount = Math.ceil(names.length / columns);
 	const virtualizer = useVirtualizer({
 		count: rowCount,
 		getScrollElement: () => scrollRef.current,
@@ -31,7 +57,7 @@ export function ProjectIconGrid({
 	});
 
 	return (
-		<div ref={scrollRef} className="max-h-[320px] overflow-y-auto p-2">
+		<div ref={scrollRef} className="min-h-0 max-h-[320px] overflow-y-auto p-2">
 			<div
 				className="relative w-full"
 				style={{ height: virtualizer.getTotalSize() }}
@@ -39,11 +65,15 @@ export function ProjectIconGrid({
 				{virtualizer.getVirtualItems().map((row) => (
 					<div
 						key={row.key}
-						className="absolute inset-x-0 grid grid-cols-12 gap-0.5"
-						style={{ top: row.start, height: ROW_HEIGHT }}
+						className="absolute inset-x-0 grid gap-0.5"
+						style={{
+							top: row.start,
+							height: ROW_HEIGHT,
+							gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+						}}
 					>
 						{names
-							.slice(row.index * COLUMNS, (row.index + 1) * COLUMNS)
+							.slice(row.index * columns, (row.index + 1) * columns)
 							.map((name) => {
 								const Icon = icons[name];
 								if (!Icon) return null;

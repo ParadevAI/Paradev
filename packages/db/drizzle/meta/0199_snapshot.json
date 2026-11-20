@@ -1,5 +1,5 @@
 {
-  "id": "ebaf2399-2935-422e-8b6a-ea1530c0e4c5",
+  "id": "b92e73aa-4ca2-4840-ae8f-7dc6008d61a7",
   "prevId": "6330e502-5955-4c44-b22b-ff26051a9209",
   "version": "7",
   "dialect": "postgresql",
@@ -18019,7 +18019,6 @@
       "values": [
         "manual",
         "daily",
-        "repositories",
         "promote"
       ]
     },

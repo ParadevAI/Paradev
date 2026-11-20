@@ -13,7 +13,7 @@ Terms you will use with the user:
 
 - **Environment**: what a cloud workspace boots from. It has repositories (the first is primary), variables, a region, and a visibility.
 - **Box**: one cloud workspace running on the environment.
-- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud; a repository's `.paradev/config.toml` is not read there. `superset environments update --config` sets it.
+- **Config**: the environment's own `config.toml`, stored on Paradev. It is what builds and boxes run in the cloud. While an environment has none, they read the primary repository's `.paradev/config.toml` on its base branch instead. `superset environments update --config` sets it.
 - **Build**: runs the config's `[install]` on a fresh box and saves the result as the snapshot new workspaces start from. `superset environments rebuild` starts one.
 
 ## What a box already has
@@ -51,12 +51,12 @@ Read each repository before asking anything. Use the local clone when there is o
 
 - the README, package manifests and lockfiles (they decide the package manager and install command);
 - CI config (it is the most honest list of what a working build needs);
-- `.env.example` and the repository's config folder (`.paradev/`, or `.superset/` in repos set up before the rename): a `config.toml` there is a good start for the environment's config, but the cloud does not read it;
+- `.env.example` and the repository's config folder (`.paradev/`, or `.superset/` in repos set up before the rename): a `config.toml` there is a good start for the environment's config, and the cloud reads it only while the environment has no config of its own;
 - services the project expects, such as Postgres, Redis or Docker Compose.
 
 Then ask only what you could not infer: missing secret values and extra repositories. Check extra repositories against `superset environments repos` as in step 0.
 
-**Confirm the repository list with the user before the first build in step 5.** Changing it afterwards starts a new build.
+**Confirm the repository list with the user before the first build in step 5.** An environment's repositories can't change after it is created; other repositories need a new environment.
 
 ## 3. Variables
 
@@ -96,7 +96,7 @@ Write what worked into a `config.toml` on this machine, starting from the reposi
 - `[setup]`, with `[setup.cloud]` for cloud-only steps, runs on every boot and resume, so it must be safe to run again.
 - `[terminals.<name>]` with `default = true` start on boot, after `setup`.
 - `[ports.<name>]` with `preview = true` get a preview URL.
-- `[mcp] allow = ["linear@superset"]` limits cloud agents to the plugins it lists, as `name@marketplace`. Without it they get every plugin their creator has; `[mcp] enabled = false` gives them none.
+- `[mcp] allow = ["linear@superset"]` limits cloud agents to the plugins it lists, as `name@marketplace`. Without it they get every plugin their creator has; `[mcp] enabled = false` gives them none. `[mcp]` belongs in the environment's config only: older Paradev versions refuse a repository file that has it.
 
 Show the user the file, then store it as the environment's config:
 
@@ -105,6 +105,8 @@ superset environments update <environment-id> --config path/to/config.toml
 ```
 
 The server refuses a file that does not parse and says why. New workspaces and the next build use the stored config; a running box picks it up when it restarts.
+
+If you are working inside a cloud box, `superset environments update` and `superset environments rebuild` are not available there. Commit the file instead as the primary repository's `.paradev/config.toml` (without `[mcp]`) and open a pull request: once it is on the base branch, the environment uses it as long as it has no config of its own. Ask the user to start the build with Rebuild environment on the environment's page.
 
 ## 5. Build
 
@@ -120,7 +122,7 @@ A build checks out the repositories on a fresh box, runs `[install]`, and saves 
 
 1. Name it. Propose a short name from what you learned (what the project is, not the repository slug alone), ask the user to confirm or change it, then run `superset environments update <environment-id> --name "<name>"`.
 2. Ask whether to keep the environment private (only the user) or share it with the organization. To share it: `superset environments update <environment-id> --scope organization`. To keep it private: `superset environments update <environment-id> --scope personal` (an environment you were given may already be shared).
-3. The environment's config drives only the cloud. Offer to commit the same file as the repository's `.paradev/config.toml` so local workspaces get it too, and ask before pushing.
+3. The environment's config drives only the cloud. Offer to commit the same file, without its `[mcp]` table, as the repository's `.paradev/config.toml` so local workspaces get it too, and ask before pushing.
 4. Archive the setup box: `superset workspaces archive <workspace-id>`.
 5. Start a fresh workspace from the environment, to show it comes up ready: `superset workspaces create --environment <environment-id> --name "<name>"`. Poll until it is `awake` (or `ready`; stop and report if it is `failed`), then check that `setup` finished and the default terminals run. Get its `webUrl` from `superset workspaces get <new-workspace-id> --json`, which opens it in the desktop app; the final message links it.
 6. End with a final message in this structure, and nothing after it. Keep each section short. Write "none" for an empty section; do not drop it.

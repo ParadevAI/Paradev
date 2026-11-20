@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CONFIG_NAME_PATTERN = /^[a-z][a-z0-9_]*$/;
 export const MAX_PREVIEW_PORTS = 13;
-export const MCP_PLUGIN_PATTERN = /^[^@\s]+@[^@\s]+$/;
+const MCP_PLUGIN_PATTERN = /^[^@\s]+@[^@\s]+$/;
 
 const commandSchema = z.union([z.string(), z.array(z.string())]);
 const cwdSchema = z.string().trim().min(1);

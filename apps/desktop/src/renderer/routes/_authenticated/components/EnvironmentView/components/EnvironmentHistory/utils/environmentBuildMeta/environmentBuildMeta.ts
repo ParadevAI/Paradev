@@ -12,7 +12,6 @@ export const BUILD_TRIGGER_LABELS: Record<
 > = {
 	manual: msg({ message: "Manual" }),
 	daily: msg({ message: "Daily" }),
-	repositories: msg({ message: "Manual" }),
 	promote: msg({ message: "Manual" }),
 };
 

@@ -53,7 +53,10 @@ export function SubagentView({
 				scrollEdgeThreshold={RESUME_FOLLOW_PX}
 				scrollPreviousItemPeek={0}
 			>
-				<MessageScroller.Root className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+				<MessageScroller.Root
+					data-theme-surface="chat"
+					className="relative flex min-h-0 min-w-0 flex-1 flex-col"
+				>
 					<MessageScroller.Viewport
 						aria-label={t({ message: "Messages" })}
 						className={cn(

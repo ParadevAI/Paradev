@@ -1,10 +1,10 @@
 "use client";
 
 import { Trans } from "@lingui/react/macro";
+import { PageLink } from "../PageLink";
+import { Alert, AlertTitle } from "../ui/alert";
 import { AllowanceCard } from "./components/AllowanceCard";
 import { MemberSummary } from "./components/MemberSummary";
-import { MoreLink } from "./components/MoreLink";
-import { Notice } from "./components/Notice";
 import { PageHeader } from "./components/PageHeader";
 import { PeriodStepper } from "./components/PeriodStepper";
 import { QueryStatus } from "./components/QueryStatus";
@@ -60,13 +60,13 @@ export function CloudUsagePage({
 				title={
 					isAdmin ? <Trans>Cloud usage</Trans> : <Trans>Your cloud usage</Trans>
 				}
-				actions={
-					period &&
+				period={
 					periods.data && (
 						<PeriodStepper
 							Link={Link}
 							periods={periods.data.items}
 							period={period}
+							to={(id) => ({ view: "overview", period: id })}
 						/>
 					)
 				}
@@ -82,22 +82,31 @@ export function CloudUsagePage({
 			) : (
 				<>
 					{period?.allowance?.limitReached && !period.closed && (
-						<div className="rounded-lg border border-warning/60 px-4 py-3 text-sm">
-							<span className="font-semibold text-warning">
-								<Trans>Usage limit reached.</Trans>
-							</span>{" "}
-							<Trans>Cloud workspaces cannot start.</Trans>
-						</div>
+						<Alert variant="warning">
+							<AlertTitle className="line-clamp-none">
+								<Trans>
+									Cloud usage is used up for this period. Workspaces cannot
+									start.
+								</Trans>
+							</AlertTitle>
+						</Alert>
 					)}
 					{isAdmin ? (
 						<AllowanceCard
-							total={byDay.data.total}
-							period={period}
+							metered={{
+								gbHours: byDay.data.total.gbHours,
+								usd: byDay.data.total.usageUsd,
+							}}
 							allowance={allowance}
+							unavailable={period?.unavailable ?? []}
+							isPeriod={period !== undefined}
+							seats={allowance?.seats ?? null}
 							billing={
-								<MoreLink Link={Link} to={{ view: "billing" }}>
-									<Trans>Billing</Trans>
-								</MoreLink>
+								<PageLink>
+									<Link to={{ view: "billing" }}>
+										<Trans>Billing</Trans>
+									</Link>
+								</PageLink>
 							}
 						/>
 					) : (
@@ -106,15 +115,7 @@ export function CloudUsagePage({
 							isPeriod={period !== undefined}
 						/>
 					)}
-					{!hasUsage(byDay.data.total) ? (
-						<Notice>
-							{isAdmin ? (
-								<Trans>No cloud usage in this period.</Trans>
-							) : (
-								<Trans>You have no cloud usage in this period.</Trans>
-							)}
-						</Notice>
-					) : (
+					{hasUsage(byDay.data.total) && (
 						<>
 							<UsageByDay
 								today={today}
@@ -139,12 +140,11 @@ export function CloudUsagePage({
 									)
 								}
 								action={
-									<MoreLink
-										Link={Link}
-										to={{ view: "workspaces", period: param }}
-									>
-										<Trans>View all</Trans>
-									</MoreLink>
+									<PageLink>
+										<Link to={{ view: "workspaces", period: param }}>
+											<Trans>All workspaces</Trans>
+										</Link>
+									</PageLink>
 								}
 							>
 								{!workspaces.data ? (

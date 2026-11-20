@@ -1,8 +1,3 @@
-import {
-	allowanceOf,
-	type CloudUsage as BillingValue,
-	cloudUsageFromBalances,
-} from "@superset/auth/billing/cloud-usage";
 import { type MachineSize, machineSpec } from "@superset/shared/billing";
 import type {
 	CloudBoot,
@@ -29,7 +24,6 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 /** The stories' clock, so captures do not change from day to day. */
 export const STORY_NOW = new Date("2026-11-18T14:00:00Z");
 export const STORY_TODAY = "2026-11-18";
-const PERIOD_END = new Date("2026-11-27T00:00:00Z");
 /** The share of the open period's usage each earlier period had, newest first. */
 const PERIOD_SHARE = [1, 0.86, 0.71, 0.58, 0.44, 0];
 
@@ -59,6 +53,7 @@ export const PEOPLE: PersonRef[] = [
 	id: `00000000-0000-4000-8000-00000000000${i + 1}`,
 	name,
 	email: `${name.split(" ")[0]?.toLowerCase()}@example.com`,
+	image: null,
 }));
 const [PRIYA, INES, SAM, THEO, MAYA] = PEOPLE as [
 	PersonRef,
@@ -142,6 +137,7 @@ function workspaceSeeds(count: number, names?: string[]): Seed[] {
 			id: `ws-${i + 1}`,
 			name: names?.[i] ?? `${pick(WORDS)}-${pick(WORDS)}-${pick(WORDS)}`,
 			status,
+			deleted: false,
 			size: pick(SIZES),
 			owner: i === 0 ? SAM : pick([PRIYA, PRIYA, INES, SAM, THEO, MAYA]),
 			failure:
@@ -318,12 +314,26 @@ function byDay({ rows, boots }: Fleet, range: Range): Usage {
 	return usage(items, rows, range);
 }
 
-function byPerson({ rows }: Fleet, range: Range): Usage {
+/** `groupBy: "user"`, with each person's days. */
+function byPerson({ rows, boots }: Fleet, range: Range): Usage {
+	const daysOf = (personId: string) => {
+		const days = new Map<string, Boot[]>();
+		for (const boot of boots)
+			if (boot.user?.id === personId) {
+				const key = day(boot.startedAt);
+				days.set(key, [...(days.get(key) ?? []), boot]);
+			}
+		return [...days].sort().map(([key, list]) => {
+			const { gbHours, usageUsd } = metricsOf(list);
+			return { day: key, gbHours, usageUsd };
+		});
+	};
 	const items = PEOPLE.map((person) => ({
 		key: person.id,
 		label: person.name,
 		ref: person,
 		...total(rows.filter((row) => workspaceRef(row)?.owner?.id === person.id)),
+		days: daysOf(person.id),
 	}))
 		.filter((item) => item.gbHours > 0)
 		.sort((a, b) => b.gbHours - a.gbHours);
@@ -332,8 +342,6 @@ function byPerson({ rows }: Fleet, range: Range): Usage {
 
 const TOP_WORKSPACES = 8;
 
-// The organizations of the design's Customer tab: their seats, seat grant and usage.
-const NORTHWIND = { seats: 14, perSeatGbHours: 500, usedGbHours: 15200 };
 const NORTHWIND_SEEDS = workspaceSeeds(43);
 const LONG_SEEDS = workspaceSeeds(12, [
 	"migrate-the-whole-billing-pipeline-to-the-new-event-store-without-downtime",
@@ -366,175 +374,285 @@ const LAST_30_DAYS: Range = {
 	to: new Date(TODAY_START + DAY_MS),
 };
 
-type Extra = "off" | { capGbHours: number } | { percent: number };
+const PERIOD_END = new Date("2026-11-27T00:00:00Z");
 
-interface Billing {
-	seats: number;
-	perSeatGbHours: number;
-	usedGbHours: number;
-	freeCreditGbHours?: number;
-	boughtGbHours?: number;
-	extra: Extra;
-	/** A value cached before seats, credits and the cap were read. */
-	cached?: boolean;
-}
-
-type Balance = Parameters<typeof cloudUsageFromBalances>[0][string];
-type Controls = NonNullable<Parameters<typeof cloudUsageFromBalances>[1]>;
-const FEATURE = "box_gb_minutes";
-
-/** Autumn's balance for a billing state: usage draws the seats' pool, then free credit, then bought credit, then extra usage. */
-function autumnBalance(billing: Billing) {
-	const pool = billing.seats * billing.perSeatGbHours;
-	const free = billing.freeCreditGbHours ?? 0;
-	const bought = billing.boughtGbHours ?? 0;
-	let left = billing.usedGbHours;
-	const draw = (amount: number) => {
-		const drawn = Math.min(left, amount);
-		left -= drawn;
-		return drawn;
-	};
-	const inPool = draw(pool);
-	const freeUsed = draw(free);
-	const boughtUsed = draw(bought);
-	const row = (
-		id: string,
-		included: number,
-		prepaid: number,
-		used: number,
-		oneOff: boolean,
-	) => ({
-		id,
-		planId: null,
-		includedGrant: included * MINUTES,
-		prepaidGrant: prepaid * MINUTES,
-		remaining: (included + prepaid - used) * MINUTES,
-		usage: used * MINUTES,
-		unlimited: false,
-		reset: oneOff
-			? { interval: "one_off", resetsAt: null }
-			: { interval: "month", resetsAt: PERIOD_END.getTime() },
-		price:
-			oneOff && prepaid > 0
-				? {
-						amount: RATE,
-						billingUnits: MINUTES,
-						billingMethod: "prepaid",
-						maxPurchase: null,
-					}
-				: null,
-		expiresAt: null,
-	});
-	const granted = pool + free + bought;
-	const balance = {
-		featureId: FEATURE,
-		granted: granted * MINUTES,
-		usage: billing.usedGbHours * MINUTES,
-		remaining: (granted - billing.usedGbHours) * MINUTES,
-		unlimited: false,
-		overageAllowed: billing.extra !== "off",
-		maxPurchase: null,
-		nextResetAt: PERIOD_END.getTime(),
-		breakdown: [
-			row("monthly", pool, 0, inPool + left, false),
-			...(free > 0 ? [row("credit", free, 0, freeUsed, true)] : []),
-			...(bought > 0 ? [row("pack", 0, bought, boughtUsed, true)] : []),
-		],
-	} as Balance;
-	const { extra } = billing;
-	const controls = (
-		extra === "off"
-			? { overageAllowed: [{ featureId: FEATURE, enabled: false }] }
-			: {
-					spendLimits: [
-						"capGbHours" in extra
-							? {
-									featureId: FEATURE,
-									enabled: true,
-									overageLimit: extra.capGbHours * MINUTES,
-								}
-							: {
-									featureId: FEATURE,
-									enabled: true,
-									limitType: "usage_percentage",
-									overageLimit: extra.percent,
-								},
-					],
-				}
-	) as Controls;
-	return { balance, controls };
-}
-
-/** The open period's allowance and unavailable reasons, as the router returns them for `billing`. */
-function billingPeriod(billing: Billing) {
-	const { balance, controls } = autumnBalance(billing);
-	const value = cloudUsageFromBalances(
-		{ [FEATURE]: balance },
-		controls,
-		null,
-		RATE,
-		billing.seats,
-	) as BillingValue;
-	return allowanceOf(
-		billing.cached
-			? {
-					...value,
-					bought: null,
-					freeCredits: null,
-					seats: null,
-					overageLimit: null,
-					limitReached: null,
-				}
-			: value,
-		PERIOD_END,
-		RATE,
-	);
-}
-
-const NORTHWIND_BILLING: Billing = {
-	...NORTHWIND,
-	freeCreditGbHours: 2000,
-	extra: { capGbHours: 27000 },
-};
-
-/** Each billing state; the period's usage events equal what billing counted unless `eventsGbHours` says otherwise. */
+/** The open period of each billing state, as the router returns it; `eventsGbHours` can run past what billing counted. */
 const STATES = {
-	/** Northwind Labs: seats, a used-up free credit, then extra usage under an absolute cap. */
-	northwind: { billing: NORTHWIND_BILLING },
-	/** Birchwood Health, on a trial: seats only, extra usage off, under its allowance. */
-	trial: {
-		billing: { seats: 9, perSeatGbHours: 500, usedGbHours: 3100, extra: "off" },
-	},
-	/** Acme Robotics: a bought pack not drawn yet, and extra usage under an absolute cap. */
-	prepaid: {
-		billing: {
-			seats: 38,
-			perSeatGbHours: 1000,
-			usedGbHours: 21400,
-			boughtGbHours: 5000,
-			extra: { capGbHours: 129000 },
+	northwind: {
+		eventsGbHours: 15200,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: 14,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 2000,
+				totalGbHours: 2000,
+				usedUsd: 120,
+				totalUsd: 120,
+			},
+			extraUsageLimit: { gbHours: 27000, usd: 1620 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
 		},
+		unavailable: [],
 	},
-	/** Seats only with extra usage off, the allowance used up, and usage past it before the workspaces stopped. */
+	trial: {
+		eventsGbHours: 3100,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 3100,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 186,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	prepaid: {
+		eventsGbHours: 21400,
+		allowance: {
+			includedGbHours: 38000,
+			usedGbHours: 21400,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 5000,
+			usedUsd: 1284,
+			includedUsd: 2280,
+			overageUsd: 0,
+			seats: 38,
+			bought: { usedGbHours: 0, totalGbHours: 5000, usedUsd: 0, totalUsd: 300 },
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 129000, usd: 7740 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
 	limitReached: {
-		billing: { seats: 9, perSeatGbHours: 500, usedGbHours: 4650, extra: "off" },
+		eventsGbHours: 4590,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 4500,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 270,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: true,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
 	},
-	/** Northwind's own cap in the design, 300% of its allowance: the router cannot give its amount. */
-	percentCap: {
-		billing: { ...NORTHWIND_BILLING, extra: { percent: 300 } },
+	toppedUp: {
+		eventsGbHours: 4590,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 4500,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 4410,
+			usedUsd: 270,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: {
+				usedGbHours: 90,
+				totalGbHours: 4500,
+				usedUsd: 5.4,
+				totalUsd: 270,
+			},
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
 	},
-	/** Northwind, from a billing value cached before seats, credits and the cap were read. */
-	notRead: { billing: { ...NORTHWIND_BILLING, cached: true } },
-	/** Northwind, with usage events billing has not counted yet. */
-	unbilled: { billing: NORTHWIND_BILLING, eventsGbHours: 15800 },
-} satisfies Record<string, { billing: Billing; eventsGbHours?: number }>;
+	freeCredit: {
+		eventsGbHours: 4800,
+		allowance: {
+			includedGbHours: 4500,
+			usedGbHours: 4500,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 700,
+			usedUsd: 270,
+			includedUsd: 270,
+			overageUsd: 0,
+			seats: 9,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 300,
+				totalGbHours: 1000,
+				usedUsd: 18,
+				totalUsd: 60,
+			},
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	contractOver: {
+		eventsGbHours: 9000,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 9000,
+			overageGbHours: 2000,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 540,
+			includedUsd: 420,
+			overageUsd: 120,
+			seats: 14,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 1000000, usd: 60000 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	notRead: {
+		eventsGbHours: 15200,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: null,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: null,
+			limitReached: null,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [
+			{ field: "seats", reason: "not_read" },
+			{ field: "bought", reason: "not_read" },
+			{ field: "freeCredits", reason: "not_read" },
+			{ field: "extraUsageLimit", reason: "not_read" },
+			{ field: "limitReached", reason: "not_read" },
+		],
+	},
+	unbilled: {
+		eventsGbHours: 15800,
+		allowance: {
+			includedGbHours: 7000,
+			usedGbHours: 13200,
+			overageGbHours: 6200,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 792,
+			includedUsd: 420,
+			overageUsd: 372,
+			seats: 14,
+			bought: null,
+			freeCredits: {
+				usedGbHours: 2000,
+				totalGbHours: 2000,
+				usedUsd: 120,
+				totalUsd: 120,
+			},
+			extraUsageLimit: { gbHours: 27000, usd: 1620 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	reattached: {
+		eventsGbHours: 17159.5,
+		allowance: {
+			includedGbHours: 6000,
+			usedGbHours: 6000,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 3847.85,
+			usedUsd: 360,
+			includedUsd: 360,
+			overageUsd: 0,
+			seats: 5,
+			bought: {
+				usedGbHours: 3178.08,
+				totalGbHours: 7025.929999999999,
+				usedUsd: 190.68,
+				totalUsd: 421.56,
+			},
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: false,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+	raisedByHand: {
+		eventsGbHours: 3000,
+		allowance: {
+			includedGbHours: 833.33,
+			usedGbHours: -850.98,
+			overageGbHours: 0,
+			prepaidRemainingGbHours: 0,
+			usedUsd: -51.06,
+			includedUsd: 50,
+			overageUsd: 0,
+			seats: 1,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: null,
+			limitReached: null,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [
+			{ field: "extraUsageLimit", reason: "percent_of_allowance" },
+			{ field: "limitReached", reason: "not_tracked" },
+		],
+	},
+	overageOffBilled: {
+		eventsGbHours: 2732.54,
+		allowance: {
+			includedGbHours: 1200,
+			usedGbHours: 2732.54,
+			overageGbHours: 1532.54,
+			prepaidRemainingGbHours: 0,
+			usedUsd: 163.95,
+			includedUsd: 72,
+			overageUsd: 91.95,
+			seats: 1,
+			bought: null,
+			freeCredits: null,
+			extraUsageLimit: { gbHours: 0, usd: 0 },
+			limitReached: true,
+			resetsAt: PERIOD_END,
+		},
+		unavailable: [],
+	},
+} satisfies Record<
+	string,
+	{
+		eventsGbHours: number;
+		allowance: NonNullable<CloudPeriod["allowance"]>;
+		unavailable: CloudPeriod["unavailable"];
+	}
+>;
 
 export type BillingState = keyof typeof STATES;
+export const BILLING_STATES = Object.keys(STATES) as BillingState[];
 
-const eventsOf = (state: BillingState) => {
-	const entry: { billing: Billing; eventsGbHours?: number } = STATES[state];
-	return entry.eventsGbHours ?? entry.billing.usedGbHours;
-};
+const eventsOf = (state: BillingState) => STATES[state].eventsGbHours;
 
 /** A state's fleet `back` periods ago; only the open period of the limit-reached state is at its limit. */
 const fleetIn = (state: BillingState, back: number, seeds = NORTHWIND_SEEDS) =>
@@ -547,7 +665,7 @@ const fleetIn = (state: BillingState, back: number, seeds = NORTHWIND_SEEDS) =>
 
 /** The router's period list for a state, newest first; the earlier periods are closed. A member gets no allowance and their own metrics. */
 function periodList(state: BillingState, member = false): CloudPeriods {
-	const current = billingPeriod(STATES[state].billing);
+	const current = STATES[state];
 	const items: CloudPeriod[] = PERIOD_SHARE.map((_, back) => {
 		const range = periodRange(back);
 		const rows = fleetIn(state, back).rows;
@@ -639,19 +757,25 @@ export function noPeriodsArgs() {
 /** The allowance card's arguments in a billing state. */
 export function cardArgs(state: BillingState, back = 0) {
 	const args = overviewArgs(state, { back });
+	const { total } = args.byDay.data as Usage;
+	const allowance = priced(args.period?.allowance ?? null);
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: args.period,
-		allowance: priced(args.period?.allowance ?? null),
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
+		allowance,
+		unavailable: args.period?.unavailable ?? [],
+		isPeriod: true,
+		seats: allowance?.seats ?? null,
 	};
 }
 
 export function lastThirtyDaysCardArgs() {
-	const args = noPeriodsArgs();
+	const { total } = noPeriodsArgs().byDay.data as Usage;
 	return {
-		total: (args.byDay.data as Usage).total,
-		period: undefined,
+		metered: { gbHours: total.gbHours, usd: total.usageUsd },
 		allowance: null,
+		unavailable: [],
+		isPeriod: false,
+		seats: null,
 	};
 }
 
@@ -696,6 +820,7 @@ export function workspaceArgs(which: WorkspaceRef["status"] | "long") {
 	) as Row;
 	const one = query(usage([row], [row], CURRENT));
 	return {
+		workspaceId: row.key ?? "",
 		periods: query(workspacesPeriods),
 		period: workspacesPeriods.items[0],
 		workspace: one,

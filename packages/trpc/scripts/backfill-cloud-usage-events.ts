@@ -6,6 +6,7 @@ import {
 	autumnUsageByLock,
 	LOCK_SETTLED_MS,
 } from "@superset/db/cloud-usage-autumn";
+import { recordedUsage } from "@superset/db/cloud-usage-events";
 import {
 	cloudUsageEvents,
 	cloudWorkspaceBoots,
@@ -76,17 +77,7 @@ const boots = await db
 const bootById = new Map(boots.map((boot) => [boot.id, boot]));
 const lockKey = (lock: { bootId: string; lockSeq: number; feature: string }) =>
 	`${lock.bootId}:${lock.lockSeq}:${lock.feature}`;
-const recorded = new Set(
-	(
-		await db
-			.selectDistinct({
-				bootId: cloudUsageEvents.bootId,
-				lockSeq: cloudUsageEvents.lockSeq,
-				feature: cloudUsageEvents.feature,
-			})
-			.from(cloudUsageEvents)
-	).map(lockKey),
-);
+const recorded = new Set((await recordedUsage(db)).map(lockKey));
 const { locks, untied } = autumnUsageByLock(
 	events,
 	new Map(boots.map((boot) => [boot.id, boot.lockSeq])),

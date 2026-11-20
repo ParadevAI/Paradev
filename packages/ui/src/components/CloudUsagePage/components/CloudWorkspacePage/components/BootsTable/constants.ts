@@ -1,11 +1,11 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { PillTone } from "../../../../constants";
+import type { Tone } from "../../../../constants";
 import type { bootEnd } from "./utils/bootEnd";
 
-export const END_PILLS: Record<
+export const END_BADGES: Record<
 	NonNullable<ReturnType<typeof bootEnd>>,
-	{ label: MessageDescriptor; tone: PillTone }
+	{ label: MessageDescriptor; tone: Tone }
 > = {
 	running: {
 		label: msg({ message: "Running", context: "cloud workspace boot" }),

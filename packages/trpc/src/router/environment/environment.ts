@@ -15,7 +15,7 @@ import { SANDBOX_IMAGE_NAME } from "@superset/shared/constants";
 import { parseProjectConfig } from "@superset/shared/project-config";
 import { SANDBOX_REGION_IDS } from "@superset/shared/sandbox/regions";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { and, asc, desc, eq, inArray, isNull, lt, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import {
 	assertCloudAccess,
@@ -35,15 +35,13 @@ import {
 	workspaceRepositories,
 } from "../../lib/sandbox";
 import {
-	activateGolden,
 	type BuildRefusalReason,
 	BuildRefused,
-	deleteGoldens,
-	finishedBuilds,
 	isStale,
 	keptGoldenRefs,
-	pruneGoldens,
+	restoreGolden,
 	startEnvironmentBuild,
+	undeletedGoldens,
 } from "../../lib/sandbox/environment-build";
 import { personProcedure, userError } from "../../trpc";
 import { loadVisibleWorkspace } from "../cloud-workspace/access";
@@ -319,7 +317,12 @@ async function loadPromotable(
 const BUILD_REFUSALS: Record<
 	BuildRefusalReason,
 	{
-		code: "NOT_FOUND" | "FORBIDDEN" | "PRECONDITION_FAILED" | "CONFLICT";
+		code:
+			| "NOT_FOUND"
+			| "FORBIDDEN"
+			| "PRECONDITION_FAILED"
+			| "CONFLICT"
+			| "TOO_MANY_REQUESTS";
 		i18nKey: string;
 	}
 > = {
@@ -329,11 +332,11 @@ const BUILD_REFUSALS: Record<
 	},
 	"not-paid": {
 		code: "FORBIDDEN",
-		i18nKey: "serverError.environment.buildsNotIncluded",
+		i18nKey: "serverError.environment.notIncluded",
 	},
 	"no-repositories": {
 		code: "PRECONDITION_FAILED",
-		i18nKey: "serverError.environment.noRepositoriesToBuild",
+		i18nKey: "serverError.cloudWorkspace.environmentHasNoRepositories",
 	},
 	"no-install": {
 		code: "PRECONDITION_FAILED",
@@ -343,19 +346,19 @@ const BUILD_REFUSALS: Record<
 		code: "CONFLICT",
 		i18nKey: "serverError.environment.buildAlreadyRunning",
 	},
+	"rate-limited": {
+		code: "TOO_MANY_REQUESTS",
+		i18nKey: "serverError.environment.manualBuildsRateLimited",
+	},
 };
 
-function buildRefusalError(error: BuildRefused) {
-	return userError({ ...BUILD_REFUSALS[error.reason], message: error.message });
-}
-
 /**
- * What a client sees of a build; a running build whose job died reads as
- * failed. Only a kept golden (see `keptGoldenRefs`) is restorable.
+ * What a client sees of a build; a running build whose workflow died reads as
+ * failed. Only a golden retention keeps (`keptGoldenRefs`) is restorable.
  */
 function toBuildView(
 	build: SelectEnvironmentBuild,
-	activeSourceRef: string,
+	activeRef: string,
 	kept: ReadonlySet<string>,
 ) {
 	const stale = isStale(build);
@@ -368,34 +371,13 @@ function toBuildView(
 		error: stale ? "The build stopped unexpectedly" : build.error,
 		startedAt: build.startedAt,
 		finishedAt: build.finishedAt,
-		active: build.goldenRef !== null && build.goldenRef === activeSourceRef,
+		active: build.goldenRef !== null && build.goldenRef === activeRef,
 		restorable:
 			build.status === "succeeded" &&
 			build.goldenRef !== null &&
 			kept.has(build.goldenRef) &&
-			build.goldenRef !== activeSourceRef,
+			build.goldenRef !== activeRef,
 	};
-}
-
-const BUILD_PAGE_MAX = 100;
-
-function encodeBuildCursor(build: { startedAt: Date; id: string }): string {
-	return Buffer.from(
-		JSON.stringify([build.startedAt.toISOString(), build.id]),
-	).toString("base64url");
-}
-
-function decodeBuildCursor(
-	cursor: string,
-): { startedAt: Date; id: string } | null {
-	try {
-		const [startedAt, id] = JSON.parse(
-			Buffer.from(cursor, "base64url").toString(),
-		) as [string, string];
-		return { startedAt: new Date(startedAt), id };
-	} catch {
-		return null;
-	}
 }
 
 export const environmentRouter = {
@@ -716,6 +698,7 @@ export const environmentRouter = {
 									...fromGolden,
 									scope: input.scope ?? source?.scope ?? "organization",
 									machineSize: source?.machineSize ?? null,
+									config: source?.config ?? null,
 									createdByUserId: ctx.principal.userId,
 								})
 								.returning();
@@ -760,17 +743,6 @@ export const environmentRouter = {
 							i18nKey: "serverError.environment.changedDuringPromote",
 						});
 					}
-					await tx.insert(environmentBuilds).values({
-						environmentId,
-						organizationId: workspace.organizationId,
-						status: "succeeded",
-						trigger: "promote",
-						kind: "incremental",
-						repositoryIds: checkouts.map((entry) => entry.repository.id),
-						primaryRepositoryId,
-						goldenRef: goldenName,
-						finishedAt: new Date(),
-					});
 					return saved;
 				})
 				.catch(async (error: unknown) => {
@@ -784,21 +756,9 @@ export const environmentRouter = {
 					throw error;
 				});
 			if (target?.sourceKind === "fork") {
-				// A golden with a build behind it stays restorable until retention
-				// drops it; one from before builds were recorded has no history.
-				const recorded = await db.query.environmentBuilds.findFirst({
-					where: and(
-						eq(environmentBuilds.environmentId, target.id),
-						eq(environmentBuilds.goldenRef, target.sourceRef),
-					),
-					columns: { id: true },
-				});
-				await (recorded
-					? pruneGoldens({ environmentId: target.id, activeRef: goldenName })
-					: deleteSandbox(target.sourceRef)
-				).catch((error: unknown) =>
+				await deleteSandbox(target.sourceRef).catch((error: unknown) =>
 					console.error(
-						`[environment/promote] ${target.id} replaced; could not clean up its previous golden ${target.sourceRef}`,
+						`[environment/promote] ${target.id} replaced; could not delete its previous golden ${target.sourceRef}`,
 						error,
 					),
 				);
@@ -809,70 +769,67 @@ export const environmentRouter = {
 
 	/** Builds the environment's golden from `[install]`; returns the running build at once. */
 	rebuild: personProcedure
-		.input(
-			z.object({
-				environmentId: z.string().uuid(),
-			}),
-		)
+		.input(z.object({ environmentId: z.string().uuid() }))
 		.mutation(async ({ ctx, input }) => {
 			const environment = await loadEnvironment(input.environmentId, ctx);
 			await assertCloudAccess(ctx, environment.organizationId);
 			try {
-				const build = await startEnvironmentBuild({
-					environmentId: environment.id,
-					trigger: "manual",
-				});
-				return toBuildView(build, environment.sourceRef, new Set());
+				return toBuildView(
+					await startEnvironmentBuild({
+						environmentId: environment.id,
+						trigger: "manual",
+					}),
+					environment.sourceRef,
+					new Set(),
+				);
 			} catch (error) {
-				if (error instanceof BuildRefused) throw buildRefusalError(error);
+				if (error instanceof BuildRefused) {
+					throw userError({
+						...BUILD_REFUSALS[error.reason],
+						message: error.message,
+						...(error.retryAt
+							? {
+									params: {
+										minutes: Math.max(
+											1,
+											Math.ceil(
+												(error.retryAt.getTime() - Date.now()) / 60_000,
+											),
+										),
+									},
+								}
+							: {}),
+					});
+				}
 				throw error;
 			}
 		}),
 
+	/** The environment's builds, newest first, each with its failure reason. */
 	builds: personProcedure
 		.input(
 			z.object({
 				environmentId: z.string().uuid(),
-				cursor: z.string().optional(),
-				limit: z.number().int().min(1).max(BUILD_PAGE_MAX).optional(),
+				limit: z.number().int().min(1).max(100).optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const environment = await loadEnvironment(input.environmentId, ctx);
 			await assertCloudAccess(ctx, environment.organizationId);
-			const limit = input.limit ?? 20;
-			const after = input.cursor ? decodeBuildCursor(input.cursor) : null;
 			const rows = await db
 				.select()
 				.from(environmentBuilds)
-				.where(
-					and(
-						eq(environmentBuilds.environmentId, environment.id),
-						after
-							? or(
-									lt(environmentBuilds.startedAt, after.startedAt),
-									and(
-										eq(environmentBuilds.startedAt, after.startedAt),
-										lt(environmentBuilds.id, after.id),
-									),
-								)
-							: undefined,
-					),
-				)
+				.where(eq(environmentBuilds.environmentId, environment.id))
 				.orderBy(desc(environmentBuilds.startedAt), desc(environmentBuilds.id))
-				.limit(limit + 1);
-			const page = rows.slice(0, limit);
+				.limit(input.limit ?? 20);
 			const kept = keptGoldenRefs(
-				await finishedBuilds(environment.id),
+				await undeletedGoldens(environment.id),
 				environment.sourceRef,
 			);
-			const last = page.at(-1);
 			return {
-				builds: page.map((build) =>
+				builds: rows.map((build) =>
 					toBuildView(build, environment.sourceRef, kept),
 				),
-				nextCursor:
-					rows.length > limit && last ? encodeBuildCursor(last) : null,
 			};
 		}),
 
@@ -895,13 +852,14 @@ export const environmentRouter = {
 			});
 			const goldenRef = build?.goldenRef;
 			const kept = keptGoldenRefs(
-				await finishedBuilds(environment.id),
+				await undeletedGoldens(environment.id),
 				environment.sourceRef,
 			);
 			if (
 				!build ||
 				build.status !== "succeeded" ||
 				!goldenRef ||
+				goldenRef === environment.sourceRef ||
 				!kept.has(goldenRef)
 			) {
 				throw userError({
@@ -910,15 +868,11 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.buildNotRestorable",
 				});
 			}
-			const restored = await dbWs.transaction((tx) =>
-				activateGolden(tx, {
-					environmentId: environment.id,
-					previousSourceRef: environment.sourceRef,
-					goldenRef,
-					repositoryIds: build.repositoryIds,
-					primaryRepositoryId: build.primaryRepositoryId,
-				}),
-			);
+			const restored = await restoreGolden({
+				build,
+				goldenRef,
+				previousSourceRef: environment.sourceRef,
+			});
 			if (!restored) {
 				throw userError({
 					code: "CONFLICT",
@@ -927,7 +881,7 @@ export const environmentRouter = {
 					i18nKey: "serverError.environment.changedDuringRestore",
 				});
 			}
-			return toBuildView(build, restored.sourceRef, kept);
+			return toBuildView(build, goldenRef, kept);
 		}),
 
 	update: personProcedure
@@ -967,7 +921,7 @@ export const environmentRouter = {
 					: {}),
 			};
 			if (Object.keys(patch).length === 0) {
-				return await loadEnvironment(input.id, ctx);
+				return loadEnvironment(input.id, ctx);
 			}
 			const [row] = await db
 				.update(environments)
@@ -995,20 +949,6 @@ export const environmentRouter = {
 			if (archived?.sourceKind === "fork") {
 				await deleteSandbox(archived.sourceRef);
 			}
-			await deleteGoldens(
-				await db
-					.select({
-						id: environmentBuilds.id,
-						goldenRef: environmentBuilds.goldenRef,
-					})
-					.from(environmentBuilds)
-					.where(
-						and(
-							eq(environmentBuilds.environmentId, environment.id),
-							isNull(environmentBuilds.goldenDeletedAt),
-						),
-					),
-			);
 			return { archived: true };
 		}),
 } satisfies TRPCRouterRecord;

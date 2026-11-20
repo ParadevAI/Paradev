@@ -210,6 +210,7 @@ export const workspaceLocalStateSchema = z.object({
 	paneLayout: paneWorkspaceStateSchema,
 	rightPaneLayout: paneWorkspaceStateSchema.optional(),
 	rightSidebarOpen: z.boolean().optional(),
+	activityPanelHidden: z.boolean().optional(),
 	// TODO(2027-01-31): delete with useRestoreExpandedPaneArea / restoreExpandedPaneArea once builds that wrote it are gone.
 	rightPaneAreaExpansion: z
 		.object({
@@ -518,7 +519,7 @@ export const userPreferencesSchema = z.object({
 	changesFileListWidth: z.number().optional(),
 	changesFileListOpen: z.boolean().default(true),
 	deleteLocalBranch: z.boolean().default(false),
-	showPresetsBar: z.boolean().default(true),
+	showPresetsBar: z.boolean().default(false),
 	changesViewMode: changesViewModeSchema.default("folders"),
 	// Ordering of the dashboard sidebar's Projects list; manual = drag order.
 	sidebarProjectSortMode: persistedSidebarProjectSortModeSchema,
@@ -562,7 +563,7 @@ export const DEFAULT_V2_USER_PREFERENCES: UserPreferencesRow = {
 	rightSidebarWidth: 340,
 	changesFileListOpen: true,
 	deleteLocalBranch: false,
-	showPresetsBar: true,
+	showPresetsBar: false,
 	changesViewMode: "folders",
 	sidebarProjectSortMode: "manual",
 	sidebarProjectHostFilter: "all",

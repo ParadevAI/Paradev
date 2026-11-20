@@ -1468,7 +1468,7 @@ const SETTINGS_ITEMS: SettingsItem[] = [
 		id: SETTING_ITEM_ID.CLOUD_USAGE,
 		section: "cloudUsage",
 		title: "Cloud usage",
-		description: "GB-hours used by cloud workspaces",
+		description: "Cloud usage by day, person and workspace",
 		keywords: ["cloud", "usage", "gb-hours", "workspaces", "boots", "billing"],
 	},
 	{

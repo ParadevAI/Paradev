@@ -215,6 +215,15 @@ describe("a connection that cannot be refreshed", () => {
 	});
 });
 
+describe("a fixed client's refresh", () => {
+	test("names no resource", async () => {
+		response = { ok: true, status: 200, body: { access_token: "new-access" } };
+
+		await ensureFreshConnection(connection());
+		expect(tokenRequests[0]?.has("resource")).toBe(false);
+	});
+});
+
 describe("two processes refreshing a rotating refresh token at once", () => {
 	test("the loser adopts the winner's tokens instead of disconnecting", async () => {
 		const winner = connection({
@@ -494,6 +503,15 @@ describe("a dynamic client's connection", () => {
 		await ensureFreshConnection(autumn({ oauthClientId: "scoped-client" }));
 		expect(tokenRequests[0]?.get("client_id")).toBe("scoped-client");
 		expect(tokenRequests[0]?.get("client_secret")).toBe("scoped-client-secret");
+	});
+
+	test("refreshes for the resource its grant was issued for", async () => {
+		stored = autumn({ oauthClientId: "scoped-client" });
+
+		await ensureFreshConnection(autumn({ oauthClientId: "scoped-client" }));
+		expect(tokenRequests[0]?.get("resource")).toBe(
+			"https://mcp.useautumn.com/mcp",
+		);
 	});
 
 	test("from before client ids were recorded refreshes as the oldest client", async () => {

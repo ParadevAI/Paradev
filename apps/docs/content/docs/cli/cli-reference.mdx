@@ -1256,7 +1256,7 @@ Create an environment for cloud workspaces to start from.
 	options={[
 		{ flag: "--name <name>", description: "New name." },
 		{ flag: "--scope <personal|organization>", description: "Who can use it." },
-		{ flag: "--config <path>", description: "A config.toml to store as the environment's config. A repository's own config.toml is not used in the cloud." },
+		{ flag: "--config <path>", description: "A config.toml to store as the environment's config. Without one, the cloud reads the primary repository's .paradev/config.toml." },
 		{ flag: "--clear-config", description: "Remove the environment's config." },
 	]}
 >

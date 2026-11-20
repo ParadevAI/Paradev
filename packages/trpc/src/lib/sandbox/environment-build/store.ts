@@ -5,53 +5,9 @@ import {
 	environments,
 	type SelectEnvironmentBuild,
 } from "@superset/db/schema";
-import { and, desc, eq, inArray, isNull, ne } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, ne } from "drizzle-orm";
 
 type EnvironmentRow = typeof environments.$inferSelect;
-type Transaction = Parameters<Parameters<typeof dbWs.transaction>[0]>[0];
-
-/**
- * Makes `goldenRef` the golden new workspaces fork, with the repositories it
- * was built with. Guarded on the golden read before, so a concurrent promote,
- * build or restore wins and this returns null.
- */
-export async function activateGolden(
-	tx: Transaction,
-	args: {
-		environmentId: string;
-		previousSourceRef: string;
-		goldenRef: string;
-		repositoryIds: readonly string[];
-		primaryRepositoryId: string | null;
-	},
-): Promise<EnvironmentRow | null> {
-	const [row] = await tx
-		.update(environments)
-		.set({
-			sourceKind: "fork",
-			sourceRef: args.goldenRef,
-			primaryRepositoryId: args.primaryRepositoryId,
-		})
-		.where(
-			and(
-				eq(environments.id, args.environmentId),
-				eq(environments.sourceRef, args.previousSourceRef),
-				isNull(environments.archivedAt),
-			),
-		)
-		.returning();
-	if (!row) return null;
-	await tx
-		.delete(environmentRepositories)
-		.where(eq(environmentRepositories.environmentId, args.environmentId));
-	await tx.insert(environmentRepositories).values(
-		args.repositoryIds.map((repositoryId) => ({
-			environmentId: args.environmentId,
-			repositoryId,
-		})),
-	);
-	return row;
-}
 
 export async function loadBuild(buildId: string): Promise<{
 	build: SelectEnvironmentBuild;
@@ -90,21 +46,77 @@ export async function failBuild(buildId: string, error: string): Promise<void> {
 		);
 }
 
-/** False when the environment moved to another golden during the build. */
+/**
+ * Makes `goldenRef` the golden new workspaces fork, with the repositories it
+ * was built with. Guarded on the golden the build started from, so a promote
+ * or archive during the build wins and this returns false. A replaced golden
+ * no build made (one saved from a workspace) gets a `promote` row, so
+ * retention can delete it later.
+ */
 export async function succeedBuild(args: {
 	build: SelectEnvironmentBuild;
 	previousSourceRef: string;
 	goldenRef: string;
 }): Promise<boolean> {
 	return dbWs.transaction(async (tx) => {
-		const activated = await activateGolden(tx, {
-			environmentId: args.build.environmentId,
-			previousSourceRef: args.previousSourceRef,
-			goldenRef: args.goldenRef,
-			repositoryIds: args.build.repositoryIds,
-			primaryRepositoryId: args.build.primaryRepositoryId,
-		});
-		if (!activated) return false;
+		const [before] = await tx
+			.select({ sourceKind: environments.sourceKind })
+			.from(environments)
+			.where(eq(environments.id, args.build.environmentId));
+		const [row] = await tx
+			.update(environments)
+			.set({
+				sourceKind: "fork",
+				sourceRef: args.goldenRef,
+				primaryRepositoryId: args.build.primaryRepositoryId,
+			})
+			.where(
+				and(
+					eq(environments.id, args.build.environmentId),
+					eq(environments.sourceRef, args.previousSourceRef),
+					isNull(environments.archivedAt),
+				),
+			)
+			.returning({ id: environments.id });
+		if (!row) return false;
+		if (before?.sourceKind === "fork") {
+			const [recorded] = await tx
+				.select({ id: environmentBuilds.id })
+				.from(environmentBuilds)
+				.where(
+					and(
+						eq(environmentBuilds.environmentId, args.build.environmentId),
+						eq(environmentBuilds.goldenRef, args.previousSourceRef),
+					),
+				)
+				.limit(1);
+			if (!recorded) {
+				const replacedAt = new Date(args.build.startedAt.getTime() - 1);
+				await tx.insert(environmentBuilds).values({
+					environmentId: args.build.environmentId,
+					organizationId: args.build.organizationId,
+					status: "succeeded",
+					trigger: "promote",
+					kind: "incremental",
+					repositoryIds: args.build.repositoryIds,
+					primaryRepositoryId: args.build.primaryRepositoryId,
+					goldenRef: args.previousSourceRef,
+					startedAt: replacedAt,
+					finishedAt: replacedAt,
+				});
+			}
+		}
+		await tx
+			.delete(environmentRepositories)
+			.where(
+				eq(environmentRepositories.environmentId, args.build.environmentId),
+			);
+		await tx.insert(environmentRepositories).values(
+			args.build.repositoryIds.map((repositoryId) => ({
+				environmentId: args.build.environmentId,
+				repositoryId,
+			})),
+		);
 		await tx
 			.update(environmentBuilds)
 			.set({
@@ -117,12 +129,53 @@ export async function succeedBuild(args: {
 	});
 }
 
+/**
+ * Makes a kept build's golden the environment's again, with the repositories
+ * it was built for. False when the environment changed since it was read.
+ */
+export async function restoreGolden(args: {
+	build: SelectEnvironmentBuild;
+	goldenRef: string;
+	previousSourceRef: string;
+}): Promise<boolean> {
+	return dbWs.transaction(async (tx) => {
+		const [row] = await tx
+			.update(environments)
+			.set({
+				sourceKind: "fork",
+				sourceRef: args.goldenRef,
+				primaryRepositoryId: args.build.primaryRepositoryId,
+			})
+			.where(
+				and(
+					eq(environments.id, args.build.environmentId),
+					eq(environments.sourceRef, args.previousSourceRef),
+					isNull(environments.archivedAt),
+				),
+			)
+			.returning({ id: environments.id });
+		if (!row) return false;
+		await tx
+			.delete(environmentRepositories)
+			.where(
+				eq(environmentRepositories.environmentId, args.build.environmentId),
+			);
+		await tx.insert(environmentRepositories).values(
+			args.build.repositoryIds.map((repositoryId) => ({
+				environmentId: args.build.environmentId,
+				repositoryId,
+			})),
+		);
+		return true;
+	});
+}
+
 /** Finished builds, newest first. */
 export async function finishedBuilds(
 	environmentId: string,
-	limit?: number,
+	limit: number,
 ): Promise<SelectEnvironmentBuild[]> {
-	const query = db
+	return db
 		.select()
 		.from(environmentBuilds)
 		.where(
@@ -131,18 +184,39 @@ export async function finishedBuilds(
 				ne(environmentBuilds.status, "running"),
 			),
 		)
-		.orderBy(desc(environmentBuilds.startedAt));
-	return limit ? query.limit(limit) : query;
+		.orderBy(desc(environmentBuilds.startedAt))
+		.limit(limit);
 }
 
-export async function markGoldensDeleted(
-	buildIds: readonly string[],
-): Promise<void> {
-	if (buildIds.length === 0) return;
+/** Goldens of succeeded builds not deleted yet, newest first. */
+export async function undeletedGoldens(
+	environmentId: string,
+): Promise<Array<{ id: string; goldenRef: string }>> {
+	const rows = await db
+		.select({
+			id: environmentBuilds.id,
+			goldenRef: environmentBuilds.goldenRef,
+		})
+		.from(environmentBuilds)
+		.where(
+			and(
+				eq(environmentBuilds.environmentId, environmentId),
+				eq(environmentBuilds.status, "succeeded"),
+				isNotNull(environmentBuilds.goldenRef),
+				isNull(environmentBuilds.goldenDeletedAt),
+			),
+		)
+		.orderBy(desc(environmentBuilds.startedAt));
+	return rows.flatMap((row) =>
+		row.goldenRef ? [{ id: row.id, goldenRef: row.goldenRef }] : [],
+	);
+}
+
+export async function markGoldenDeleted(buildId: string): Promise<void> {
 	await db
 		.update(environmentBuilds)
 		.set({ goldenDeletedAt: new Date() })
-		.where(inArray(environmentBuilds.id, [...buildIds]));
+		.where(eq(environmentBuilds.id, buildId));
 }
 
 export async function activeEnvironments(): Promise<
@@ -155,4 +229,19 @@ export async function activeEnvironments(): Promise<
 		})
 		.from(environments)
 		.where(isNull(environments.archivedAt));
+}
+
+/** False when the build is no longer running. */
+export async function markBuildFresh(buildId: string): Promise<boolean> {
+	const rows = await db
+		.update(environmentBuilds)
+		.set({ kind: "fresh" })
+		.where(
+			and(
+				eq(environmentBuilds.id, buildId),
+				eq(environmentBuilds.status, "running"),
+			),
+		)
+		.returning({ id: environmentBuilds.id });
+	return rows.length > 0;
 }
