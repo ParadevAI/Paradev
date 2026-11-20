@@ -1,5 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { acpStartModes } from "@superset/chat/core";
+import { acpHarnessForPreset, acpStartModes } from "@superset/chat/core";
 import { ComposerDropZone } from "@superset/chat-ui/ComposerDropZone";
 import { draftText } from "@superset/chat-ui/PromptInput";
 import { errorMessage } from "@superset/i18n/errors";
@@ -614,9 +614,19 @@ export function NewWorkspaceScreen({
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
 	const acpChatEnabled = useAcpChatEnabled();
+	const modelAgents = useMemo(
+		() =>
+			agentConfigs.filter((agent) => {
+				const presetId = launchPresetIdOf(agent);
+				return acpChatEnabled
+					? Boolean(acpHarnessForPreset(presetId))
+					: Boolean(getAgentModelSupport(presetId));
+			}),
+		[agentConfigs, acpChatEnabled],
+	);
 	const catalogs = useAgentModelCatalog(
 		launchHostUrl,
-		agentConfigs,
+		modelAgents,
 		acpChatEnabled ? "chat" : "terminal",
 		undefined,
 		isCloudHost ? undefined : (projectId ?? undefined),
@@ -735,7 +745,7 @@ export function NewWorkspaceScreen({
 		if (selectedAgent === "none") return undefined;
 		return {
 			currentPresetId: selectedAgent,
-			agents: agentConfigs.map((agent) => ({
+			agents: modelAgents.map((agent) => ({
 				presetId: agent.id,
 				iconId: agent.iconId ?? agent.presetId,
 				label: agent.label,
@@ -757,7 +767,7 @@ export function NewWorkspaceScreen({
 				setSelectedAgent(agentId);
 			},
 		};
-	}, [selectedAgent, setSelectedAgent, agentConfigs, catalogs]);
+	}, [selectedAgent, setSelectedAgent, modelAgents, catalogs]);
 
 	const { otherHosts, hostsSettled } = useWorkspaceHostOptions();
 	const selectedRemoteHostPresence = useMemo(

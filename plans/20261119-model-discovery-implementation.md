@@ -61,3 +61,7 @@ A cached list is advisory: it does not authorize a launch. File-based logins and
 Local and remote machines execute the same host-owned path. A running cloud sandbox uses that path after its managed environment is ready; sandbox bootstrap routes terminal launches through `runAgentInWorkspace`. Before provisioning, no runtime exists: cloud creation offers unverified bundled choices and validates at actual startup. The older hosted-chat backend remains separate. No remote relay or cloud sleep/wake end-to-end run has been performed.
 
 After refactoring, desktop CDP captured exactly one model-query POST on opening the Codex tab, followed by its eight native models. Reopening an already-fresh OpenCode tab issued no additional model query. This verifies demand-driven client behavior locally, not cloud lifecycle behavior.
+
+## Agent eligibility
+
+Workspace model discovery and picker tabs use the active surface’s capabilities: the existing ACP harness registry for chat and shared model-selection support for terminals. Mastracode has neither capability and is excluded. Existing terminal agent configuration is unchanged. Verified the local desktop picker has Favorites, Claude, OpenCode, Pi, and Codex tabs and loads eight Codex runtime options. Desktop type checking and Biome passed.
