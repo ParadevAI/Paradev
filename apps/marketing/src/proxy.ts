@@ -76,7 +76,13 @@ function route(request: NextRequest) {
 	}
 
 	const url = request.nextUrl.clone();
-	url.pathname = `/en${pathname}`;
+	// Keep /land available as a profile handle. Only these English child URLs
+	// use the internal /en/en tree; direct /en URLs still canonicalize above.
+	const landingPage =
+		pathname === "/land/claude-code-parallel-sessions" ||
+		pathname === "/land/claude-code-worktrees" ||
+		pathname === "/land/codex-cli-worktrees";
+	url.pathname = landingPage ? `/en/en${pathname}` : `/en${pathname}`;
 	return NextResponse.rewrite(url);
 }
 
