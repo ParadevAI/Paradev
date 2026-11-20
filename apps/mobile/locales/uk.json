@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev використовує розпізнавання мовлення, щоб перетворювати ваш голос на текст.",
 		"NSPhotoLibraryUsageDescription": "Paradev потрібен доступ до вашої фотобібліотеки, щоб ви могли прикріплювати зображення до повідомлень у чаті.",
 		"NSCameraUsageDescription": "Paradev використовує камеру, щоб ви могли прикріплювати фото до повідомлень у чаті.",
-		"NSMicrophoneUsageDescription": "Paradev використовує мікрофон, щоб ви могли диктувати повідомлення в чаті."
+		"NSMicrophoneUsageDescription": "Paradev використовує мікрофон для голосового режиму та диктування повідомлень у чаті."
 	}
 }

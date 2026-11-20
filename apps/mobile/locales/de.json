@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev verwendet Spracherkennung, um Ihre Stimme in Text umzuwandeln.",
 		"NSPhotoLibraryUsageDescription": "Paradev benötigt Zugriff auf Ihre Fotomediathek, um Bilder an Chatnachrichten anzuhängen.",
 		"NSCameraUsageDescription": "Paradev verwendet die Kamera, um Fotos an Chatnachrichten anzuhängen.",
-		"NSMicrophoneUsageDescription": "Paradev verwendet das Mikrofon, damit Sie Chatnachrichten diktieren können."
+		"NSMicrophoneUsageDescription": "Paradev verwendet das Mikrofon für den Sprachmodus und zum Diktieren von Chatnachrichten."
 	}
 }

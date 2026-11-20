@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev utilise la reconnaissance vocale pour convertir votre voix en texte.",
 		"NSPhotoLibraryUsageDescription": "Paradev a besoin de votre photothèque pour joindre des images aux messages.",
 		"NSCameraUsageDescription": "Paradev utilise l’appareil photo pour joindre des photos aux messages.",
-		"NSMicrophoneUsageDescription": "Paradev utilise le microphone pour dicter des messages."
+		"NSMicrophoneUsageDescription": "Paradev utilise le microphone pour le mode vocal et pour dicter des messages."
 	}
 }

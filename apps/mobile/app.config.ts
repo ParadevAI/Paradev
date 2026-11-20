@@ -19,6 +19,11 @@ if (process.env.MOBILE_EAS_BUILD !== "1") {
 	});
 }
 
+// expo-image-picker and react-native-webrtc both write this key, and which
+// one wins is not their order in `plugins`, so both get the same string.
+const MICROPHONE_PERMISSION =
+	"Paradev uses the microphone for voice mode and to dictate chat messages.";
+
 const webUrl = new URL(
 	process.env.EXPO_PUBLIC_WEB_URL || "https://app.superset.sh",
 );
@@ -172,20 +177,16 @@ export default ({ config }: ConfigContext) => ({
 					"Paradev needs access to your photo library so you can attach images to chat messages.",
 				cameraPermission:
 					"Paradev uses the camera so you can attach photos to chat messages.",
-				microphonePermission:
-					"Paradev uses the microphone so you can dictate chat messages.",
+				microphonePermission: MICROPHONE_PERMISSION,
 			},
 		],
 		"expo-document-picker",
-		// Listed after expo-image-picker on purpose: both write the microphone
-		// string and the last one wins, so this names both uses.
 		[
 			"@config-plugins/react-native-webrtc",
 			{
 				cameraPermission:
 					"Paradev uses the camera so you can attach photos to chat messages.",
-				microphonePermission:
-					"Paradev uses the microphone for voice mode and to dictate chat messages.",
+				microphonePermission: MICROPHONE_PERMISSION,
 			},
 		],
 		["expo-notifications", { enableBackgroundRemoteNotifications: false }],
@@ -209,7 +210,9 @@ export default ({ config }: ConfigContext) => ({
 		"expo-asset",
 		"expo-font",
 		"expo-image",
-		"expo-secure-store",
+		// Nothing reads the keychain behind Face ID, so the plugin's default
+		// Face ID prompt (which names the Xcode target, "Superset") is dropped.
+		["expo-secure-store", { faceIDPermission: false }],
 		"expo-status-bar",
 		"expo-updates",
 		"expo-web-browser",

@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradev menggunakan pengenalan ucapan untuk mengubah suara Anda menjadi teks.",
 		"NSPhotoLibraryUsageDescription": "Paradev memerlukan akses ke pustaka foto agar Anda dapat melampirkan gambar ke pesan obrolan.",
 		"NSCameraUsageDescription": "Paradev menggunakan kamera agar Anda dapat melampirkan foto ke pesan obrolan.",
-		"NSMicrophoneUsageDescription": "Paradev menggunakan mikrofon agar Anda dapat mendikte pesan obrolan."
+		"NSMicrophoneUsageDescription": "Paradev menggunakan mikrofon untuk mode suara dan untuk mendikte pesan obrolan."
 	}
 }

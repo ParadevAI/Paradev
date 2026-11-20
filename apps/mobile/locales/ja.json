@@ -3,6 +3,6 @@
 		"NSSpeechRecognitionUsageDescription": "Paradevは音声認識を使用して音声をテキストに変換します。",
 		"NSPhotoLibraryUsageDescription": "Paradevはチャットメッセージに画像を添付するために写真ライブラリへのアクセスを必要とします。",
 		"NSCameraUsageDescription": "Paradevはチャットメッセージに写真を添付するためにカメラを使用します。",
-		"NSMicrophoneUsageDescription": "Paradevはチャットメッセージを音声入力するためにマイクを使用します。"
+		"NSMicrophoneUsageDescription": "Paradevは音声モードとチャットメッセージの音声入力にマイクを使用します。"
 	}
 }
