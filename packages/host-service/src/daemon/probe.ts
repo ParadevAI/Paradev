@@ -9,6 +9,9 @@ import {
 export interface DaemonProbeResult {
 	daemonVersion: string;
 	daemonPid?: number;
+	daemonExecPath?: string;
+	daemonScriptPath?: string;
+	daemonBundleId?: string;
 	trustdHealthy?: boolean;
 }
 
@@ -95,6 +98,9 @@ export function probeDaemonHello(
 						cleanup({
 							daemonVersion,
 							daemonPid: msg.daemonPid,
+							daemonExecPath: msg.daemonExecPath,
+							daemonScriptPath: msg.daemonScriptPath,
+							daemonBundleId: msg.daemonBundleId,
 							trustdHealthy: msg.trustdHealthy,
 						});
 						return;

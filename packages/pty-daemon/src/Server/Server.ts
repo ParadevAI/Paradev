@@ -17,10 +17,12 @@ import {
 import { adoptFromFd } from "../Pty/index.ts";
 import {
 	type ClientMessage,
+	type DaemonRuntimeIdentity,
 	encodeFrame,
 	FrameDecoder,
 	type HandoffMessage,
 	type HelloMessage,
+	readDaemonRuntimeIdentity,
 	type ServerMessage,
 	SUPPORTED_PROTOCOL_VERSIONS,
 } from "../protocol/index.ts";
@@ -52,6 +54,8 @@ export interface ServerOptions {
 	 * they can drive sessions deterministically without a real shell.
 	 */
 	spawnPty?: HandlerCtx["spawnPty"];
+	/** Override runtime bundle identity surfaced in `hello-ack` (tests). */
+	runtimeIdentity?: DaemonRuntimeIdentity;
 }
 
 const DEFAULT_OUTBOUND_BUFFER_CAP_BYTES = 8 * 1024 * 1024;
@@ -88,6 +92,7 @@ export class Server {
 	private readonly store: SessionStore;
 	private readonly conns = new Set<ConnState>();
 	private readonly opts: ServerOptions;
+	private readonly runtimeIdentity: DaemonRuntimeIdentity | undefined;
 	/**
 	 * macOS trustd reachability, surfaced in the hello-ack. Mutable so the
 	 * probe can run AFTER the socket binds / handoff-ack is sent rather than
@@ -99,6 +104,9 @@ export class Server {
 	constructor(opts: ServerOptions) {
 		this.opts = opts;
 		this.trustdHealthy = opts.trustdHealthy;
+		this.runtimeIdentity =
+			opts.runtimeIdentity ??
+			readDaemonRuntimeIdentity(process.argv[1], process.execPath);
 		this.store = new SessionStore({ bufferCap: opts.bufferCap });
 		this.server = net.createServer((socket) => this.onConnection(socket));
 	}
@@ -220,7 +228,10 @@ export class Server {
 	 * a single Promise resolution (or rejection) for the supervisor to relay
 	 * back to the user.
 	 */
-	async prepareUpgrade(): Promise<
+	async prepareUpgrade(target?: {
+		execPath?: string;
+		scriptPath?: string;
+	}): Promise<
 		{ ok: true; successorPid: number } | { ok: false; reason: string }
 	> {
 		const liveSessions = [...this.store.all()].filter((s) => !s.exited);
@@ -244,6 +255,41 @@ export class Server {
 			stdio.push(session.pty.getMasterFd());
 		}
 
+		// Prefer supervisor-supplied target paths when present: if our own bundle
+		// moved or was deleted (e.g. macOS Squirrel ShipIt), spawning our stale
+		// process.execPath / process.argv[1] would either fail ENOENT or relaunch
+		// the old bundle instead of the updated one.
+		const requestedExecPath = target?.execPath;
+		const requestedScriptPath = target?.scriptPath;
+		if (requestedExecPath !== undefined) {
+			if (
+				!path.isAbsolute(requestedExecPath) ||
+				!fs.existsSync(requestedExecPath)
+			) {
+				return {
+					ok: false,
+					reason: `target execPath missing: ${requestedExecPath}`,
+				};
+			}
+		}
+		if (requestedScriptPath !== undefined) {
+			if (
+				!path.isAbsolute(requestedScriptPath) ||
+				!fs.existsSync(requestedScriptPath)
+			) {
+				return {
+					ok: false,
+					reason: `target scriptPath missing: ${requestedScriptPath}`,
+				};
+			}
+		}
+
+		const execPath = requestedExecPath ?? process.execPath;
+		const scriptPath = requestedScriptPath ?? process.argv[1];
+		if (!scriptPath) {
+			return { ok: false, reason: "process.argv[1] empty — can't self-spawn" };
+		}
+
 		const snapshotPath = path.join(
 			os.tmpdir(),
 			`pty-daemon-handoff-${process.pid}-${Date.now()}.snap`,
@@ -263,20 +309,17 @@ export class Server {
 			};
 		}
 
-		// process.argv[1] is the daemon script path. The supervisor that
-		// originally spawned us decided that path; for an upgrade, the bundle
-		// at that path has already been replaced by the desktop installer
-		// (or a dev rebuild), so spawning it again loads the new bytecode.
-		const scriptPath = process.argv[1];
-		if (!scriptPath) {
-			return { ok: false, reason: "process.argv[1] empty — can't self-spawn" };
-		}
-
-		// Forward process.execArgv (--experimental-strip-types etc.) so the
-		// successor loads the same way we did. In tests and dev we run TS
-		// directly; in production (built bundle) execArgv is typically empty.
+		// Forward process.execArgv (--experimental-strip-types etc.) when using
+		// the same executable or a TS script; when switching executables to a
+		// bundled JS target, don't carry over old executable flags.
+		const execArgv =
+			!requestedExecPath ||
+			requestedExecPath === process.execPath ||
+			scriptPath.endsWith(".ts")
+				? process.execArgv
+				: [];
 		process.stderr.write(
-			`[pty-daemon prep-upgrade pid=${process.pid}] spawning successor: ${process.execPath} ${[...process.execArgv, scriptPath].join(" ")} (sessions=${liveSessions.length}, ptyFds=${liveSessions.map((s) => s.pty.getMasterFd()).join(",")})\n`,
+			`[pty-daemon prep-upgrade pid=${process.pid}] spawning successor: ${execPath} ${[...execArgv, scriptPath].join(" ")} (sessions=${liveSessions.length}, ptyFds=${liveSessions.map((s) => s.pty.getMasterFd()).join(",")})\n`,
 		);
 		// Don't pass our own pinned version through to the successor — it
 		// would report it as its running version, and the supervisor would
@@ -287,9 +330,9 @@ export class Server {
 		let child: childProcess.ChildProcess;
 		try {
 			child = childProcess.spawn(
-				process.execPath,
+				execPath,
 				[
-					...process.execArgv,
+					...execArgv,
 					scriptPath,
 					"--handoff",
 					`--snapshot=${snapshotPath}`,
@@ -468,6 +511,15 @@ export class Server {
 				protocol: negotiated,
 				daemonVersion: this.opts.daemonVersion,
 				daemonPid: process.pid,
+				...(this.runtimeIdentity
+					? {
+							daemonExecPath: this.runtimeIdentity.execPath,
+							daemonScriptPath: this.runtimeIdentity.scriptPath,
+							...(this.runtimeIdentity.bundleId
+								? { daemonBundleId: this.runtimeIdentity.bundleId }
+								: {}),
+						}
+					: {}),
 				trustdHealthy: this.trustdHealthy,
 				supportsModeSnapshots: true,
 				supportsColorQueries: true,
@@ -526,7 +578,10 @@ export class Server {
 			case "prepare-upgrade": {
 				// Run the handoff and reply once we know the result. The reply
 				// must reach the supervisor before this process exits.
-				this.prepareUpgrade()
+				this.prepareUpgrade({
+					execPath: msg.execPath,
+					scriptPath: msg.scriptPath,
+				})
 					.then((result) => {
 						conn.send({ type: "upgrade-prepared", result });
 					})

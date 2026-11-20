@@ -30,6 +30,11 @@ export type {
 	UpgradePreparedMessage,
 } from "./messages.ts";
 export {
+	type DaemonRuntimeIdentity,
+	readDaemonRuntimeIdentity,
+	resolveCanonicalPath,
+} from "./runtime-identity.ts";
+export {
 	CURRENT_PROTOCOL_VERSION,
 	SUPPORTED_PROTOCOL_VERSIONS,
 } from "./version.ts";
