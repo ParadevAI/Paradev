@@ -504,7 +504,11 @@ test("with billing off there are no periods and no prices", async () => {
 		billingOff: true,
 		listRatePerGbHour: async () => 0.06,
 	});
-	expect(await owner.periods.list({})).toEqual({ items: [], nextCursor: null });
+	expect(await owner.periods.list({})).toEqual({
+		items: [],
+		nextCursor: null,
+		ratePerGbHour: null,
+	});
 	await expect(
 		owner.usage.query({ range: { period: "current" } }),
 	).rejects.toMatchObject({ code: "BAD_REQUEST" });
@@ -522,7 +526,9 @@ test("the open period's allowance is in dollars at the usage rate, with bought a
 			overageLimit: { type: "absolute", gbMinutes: 6000 },
 		}),
 	});
-	const [open] = (await owner.periods.list({})).items;
+	const { items, ratePerGbHour } = await owner.periods.list({});
+	expect(ratePerGbHour).toBe(0.06);
+	const [open] = items;
 	expect(open?.allowance).toMatchObject({
 		usedUsd: 2.04,
 		includedUsd: 1.2,
