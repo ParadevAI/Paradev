@@ -17,6 +17,7 @@ import type {
 	UserContent,
 	UserMessage,
 } from "@superset/chat/protocol";
+import { notRunningSessionId } from "@superset/chat/protocol";
 import {
 	useApprovals,
 	useChatSession,
@@ -124,6 +125,7 @@ export function SessionView({
 	sessionAccount,
 	onEditMessage,
 	onRestartAndContinue,
+	onSessionGone,
 	onStartNewChat,
 	onUserPrompt,
 	onSessionState,
@@ -171,6 +173,8 @@ export function SessionView({
 	onEditMessage?: (request: ChatEditRequest) => void;
 	/** Restarts the agent and sends `prompt` once it is back. */
 	onRestartAndContinue?: (prompt: string) => Promise<boolean>;
+	/** Takes prompts the host refused because the chat's agent is gone; false leaves them to the composer. */
+	onSessionGone?: (prompts: UserContent[][]) => boolean;
 	/** Resolves false when the new chat could not be started. */
 	onStartNewChat?: () => Promise<boolean>;
 	/** Called when the user sends a message, as opposed to anything sent for them. */
@@ -222,9 +226,11 @@ export function SessionView({
 		[draftKey],
 	);
 	const sentDrafts = useRef(new Map<string, ComposerDraft>());
+	const handedOverDrafts = useRef(new Map<string, ComposerDraft>());
 	const draftOf = useCallback(
 		(entry: OutboxEntry): ComposerDraft =>
-			sentDrafts.current.get(entry.clientId) ?? {
+			sentDrafts.current.get(entry.clientId) ??
+			handedOverDrafts.current.get(JSON.stringify(entry.content)) ?? {
 				segments: [{ type: "text", text: contentText(entry.content) }],
 				attachments: [],
 			},
@@ -233,15 +239,39 @@ export function SessionView({
 	useEffect(() => {
 		const failed = outbox.filter((entry) => entry.state === "failed");
 		if (failed.length === 0) return;
+		const gone = failed.filter(
+			(entry) => notRunningSessionId(entry.lastError) !== null,
+		);
+		const handedOver =
+			gone.length > 0 &&
+			onSessionGone?.(gone.map((entry) => entry.content)) === true;
+		const restored = handedOver
+			? failed.filter((entry) => !gone.includes(entry))
+			: failed;
 		for (const entry of failed) {
 			discardPrompt(entry.clientId);
-			restoreDraft(draftOf(entry), draftKey);
+			const contentKey = JSON.stringify(entry.content);
+			if (restored.includes(entry)) {
+				restoreDraft(draftOf(entry), draftKey);
+				handedOverDrafts.current.delete(contentKey);
+			} else {
+				handedOverDrafts.current.set(contentKey, draftOf(entry));
+			}
 			sentDrafts.current.delete(entry.clientId);
 		}
+		if (restored.length === 0) return;
 		toast.error(
 			t({ message: "Couldn't send your message. It's back in the composer." }),
 		);
-	}, [outbox, discardPrompt, restoreDraft, draftOf, draftKey, t]);
+	}, [
+		outbox,
+		discardPrompt,
+		restoreDraft,
+		draftOf,
+		draftKey,
+		onSessionGone,
+		t,
+	]);
 	useEffect(() => {
 		const live = new Set(outbox.map((entry) => entry.clientId));
 		for (const clientId of sentDrafts.current.keys()) {

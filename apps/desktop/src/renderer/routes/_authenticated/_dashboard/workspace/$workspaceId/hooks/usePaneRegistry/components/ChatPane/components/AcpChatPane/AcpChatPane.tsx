@@ -48,6 +48,7 @@ import { DraftChat } from "./components/DraftChat";
 import { MoveProgress } from "./components/MoveProgress";
 import { useChatSessionLiveness } from "./hooks/useChatSessionLiveness";
 import { useReplacementSession } from "./hooks/useReplacementSession";
+import { useSessionGoneHandoff } from "./hooks/useSessionGoneHandoff";
 import { useStoredChatSnapshot } from "./hooks/useStoredChatSnapshot";
 import { closeChatForAccountSwitch } from "./utils/closeChatForAccountSwitch";
 import { createWhenReachable } from "./utils/createWhenReachable";
@@ -173,12 +174,24 @@ export function AcpChatPane({
 			.catch(() => undefined);
 	});
 
-	const { stored, checking } = useChatSessionLiveness({
+	const { stored, checking, checkedAt } = useChatSessionLiveness({
 		hostUrl,
 		sessionId,
 		transport: wiring.transport,
 	});
 	const queryClient = useQueryClient();
+	const checkSession = useCallback(() => {
+		void queryClient.invalidateQueries({
+			queryKey: ["acp-chat-session", sessionId],
+		});
+	}, [queryClient, sessionId]);
+	const sessionGone = useSessionGoneHandoff({
+		sessionId,
+		checking,
+		checkedAt,
+		recheck: checkSession,
+		onQueuePrompt,
+	});
 	useWorkspaceEvent(
 		"chat:sessions-changed",
 		workspaceId,
@@ -486,11 +499,6 @@ export function AcpChatPane({
 	// This host may still hold an older copy of the chat, so only the move
 	// reaching `ready` means it arrived.
 	const waitingForMove = awaitingMove === true;
-	const checkSession = useCallback(() => {
-		void queryClient.invalidateQueries({
-			queryKey: ["acp-chat-session", sessionId],
-		});
-	}, [queryClient, sessionId]);
 	const moveArrived = useCallback(() => {
 		checkSession();
 		onMoveArrived?.();
@@ -821,7 +829,10 @@ export function AcpChatPane({
 			presetId={agent?.id}
 			client={client}
 			draftKey={draftKey}
-			{...(recovering || checking || transferredFrom === sessionId
+			{...(recovering ||
+			checking ||
+			sessionGone.holding ||
+			transferredFrom === sessionId
 				? {
 						held: {
 							queued: pendingPrompts,
@@ -844,6 +855,7 @@ export function AcpChatPane({
 			onFork={fork}
 			onEditMessage={onRewound ? onEditMessage : undefined}
 			onRestartAndContinue={harness ? restartAndContinue : undefined}
+			onSessionGone={sessionGone.onSessionGone}
 			onStartNewChat={harness ? startNewChat : undefined}
 			onUserPrompt={agent ? () => saveLastChatAgent(agent.id) : undefined}
 			onSwitchAccount={switchAccount}
