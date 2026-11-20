@@ -1,12 +1,13 @@
-/** Vercel bills by the Pacific day; the usage rollup and `groupBy: "billingDay"` use the same day. */
+import { BILLING_TIME_ZONE } from "@superset/shared/cloud-usage-api";
+
 const PACIFIC = new Intl.DateTimeFormat("en-CA", {
-	timeZone: "America/Los_Angeles",
+	timeZone: BILLING_TIME_ZONE,
 	year: "numeric",
 	month: "2-digit",
 	day: "2-digit",
 });
 const PACIFIC_HOUR = new Intl.DateTimeFormat("en-US", {
-	timeZone: "America/Los_Angeles",
+	timeZone: BILLING_TIME_ZONE,
 	hour: "numeric",
 	hourCycle: "h23",
 });

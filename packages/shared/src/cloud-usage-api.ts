@@ -32,6 +32,9 @@ export const metricsSchema = z.object({
 	usageUsd: z.number().nullable(),
 });
 
+/** The zone of a billing day, `groupBy: "billingDay"`: Vercel bills by the Pacific day. */
+export const BILLING_TIME_ZONE = "America/Los_Angeles";
+
 /** Usage metrics as `usage.query` returns them: `workspaces` is null when grouped by `billingDay`, whose daily rollup has no workspace. */
 const usageMetricsSchema = metricsSchema.extend({
 	workspaces: z.number().nullable(),

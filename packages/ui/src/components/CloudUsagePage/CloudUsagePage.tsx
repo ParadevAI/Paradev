@@ -53,7 +53,6 @@ export function CloudUsagePage({
 	const workspaces = pricedQuery(unpricedWorkspaces);
 	const allowance = period?.allowance ? priced(period.allowance) : null;
 	const unpriced = Boolean(period?.allowance) && allowance === null;
-	// By billing day there is no workspaces count; the workspaces query counts the same window.
 	const workspaceCount = workspaces.data?.total.workspaces ?? null;
 
 	return (
