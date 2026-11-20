@@ -17,7 +17,7 @@ keywords:
   - run codex in parallel
 ---
 
-To run several Codex CLI sessions in parallel, give each task its own Git worktree and branch and start one `codex` session in each. From Codex CLI 0.171.0, the terminal workspace is on by default: `/agents` opens the agent command center, `/side` opens a side chat, and the sidebar lists each subagent with its status. `/rc` turns on remote control so a paired device can reach sessions on your computer. In Paradev, create one workspace per task with Codex as the agent, or run `superset ws create --agent codex` once per task. Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
+To run several Codex CLI sessions in parallel, give each task its own Git worktree and branch and start one `codex` session in each. From Codex CLI 0.171.0, the terminal workspace is on by default: `/agents` opens the agent command center, `/side` opens a side chat, and the sidebar lists each subagent with its status. `/rc` turns on remote control so a paired device can reach sessions on your computer. In Paradev, create one workspace per task with Codex as the agent, or run `superset ws create` with `--agent codex` and a `--prompt` once per task ([full commands below](#run-parallel-codex-sessions-in-paradev)). Worktrees separate working files; they do not sandbox processes or prevent merge conflicts.
 
 ## What shipped
 
@@ -93,8 +93,15 @@ Worktrees share repository history and run as your user. They do not give each t
 
 `codex exec` runs one prompt without the interactive UI. With `--remote`, it runs that turn on an app server that is already running, using the server's configuration and credentials. Per the [pull request](https://github.com/openai/codex/pull/61707), it can start a new thread or resume one by ID, print plain text or JSON, and read a bearer token from an environment variable you name with `--remote-auth-token-env`.
 
+Start the server in one terminal and leave it running:
+
 ```bash
 codex app-server --listen ws://127.0.0.1:4500
+```
+
+Then send the turn from a second terminal:
+
+```bash
 codex exec --remote ws://127.0.0.1:4500 "Run the test suite and report failures"
 ```
 
