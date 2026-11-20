@@ -63,12 +63,13 @@ export async function fetchStats(
 export async function fetchParticipant(
 	handle: string,
 	options: RangeQuery = {},
+	signal?: AbortSignal,
 ): Promise<ParticipantProfile | null> {
 	try {
-		return await leaderboardClient.leaderboard.public.participant.query({
-			handle,
-			...options,
-		});
+		return await leaderboardClient.leaderboard.public.participant.query(
+			{ handle, ...options },
+			{ signal },
+		);
 	} catch (error) {
 		if (error instanceof TRPCClientError && error.data?.code === "NOT_FOUND") {
 			return null;
