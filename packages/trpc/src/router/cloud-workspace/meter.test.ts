@@ -335,6 +335,23 @@ describe("releaseBoot", () => {
 		]);
 	});
 
+	test("a release Autumn refuses is reported and leaves the lock open, and the next settle releases it", async () => {
+		finalizeError = autumnError(503);
+		await releaseBoot("boot_1", "never_attached");
+		expect(reported).toEqual([finalizeError]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: true });
+
+		finalizeError = null;
+		const stoppedAt = new Date(NOW - MINUTE);
+		boot = { ...boot, stoppedAt, finalizedThrough: stoppedAt, lockOpen: true };
+		autumnCalls = [];
+		expect(await settleBoot("boot_1")).toBe("closed");
+		expect(
+			autumnCalls.filter((call) => call.method === "finalize"),
+		).toMatchObject([{ params: { action: "release" } }]);
+		expect(writes.at(-1)).toMatchObject({ lockOpen: false });
+	});
+
 	test("a reason a stop site writes during the Autumn release stays, and the log says it", async () => {
 		duringFinalize = () => {
 			boot = { ...boot, endReason: "archived" };

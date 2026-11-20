@@ -170,6 +170,7 @@ const OPEN_BOOT = or(
 	isNull(cloudWorkspaceBoots.stoppedAt),
 	isNull(cloudWorkspaceBoots.finalizedThrough),
 	lt(cloudWorkspaceBoots.finalizedThrough, cloudWorkspaceBoots.stoppedAt),
+	eq(cloudWorkspaceBoots.lockOpen, true),
 );
 
 async function checkOrFailOpen<T>(
@@ -286,26 +287,14 @@ export async function releaseBoot(
 		.from(cloudWorkspaceBoots)
 		.where(eq(cloudWorkspaceBoots.id, bootId));
 	if (!boot || boot.stoppedAt) return;
-	if (boot.lockOpen) {
-		await autumnClient.balances
-			.finalize({
-				lockId: lockIdFor(boot.id, boot.lockSeq),
-				action: "release",
-			})
-			.catch((error) =>
-				console.error(
-					`[cloud-workspace/meter] release of ${bootId} failed`,
-					error,
-				),
-			);
-	}
+	const lockReleased = await releaseLock(boot);
 	const now = new Date();
 	const [released] = await db
 		.update(cloudWorkspaceBoots)
 		.set({
 			stoppedAt: now,
 			finalizedThrough: now,
-			lockOpen: false,
+			lockOpen: !lockReleased,
 			settleLeaseUntil: null,
 			endReason: sql`coalesce(${cloudWorkspaceBoots.endReason}, ${cause === "provision_failed" ? "failed" : "released"})`,
 		})
@@ -323,6 +312,27 @@ export async function releaseBoot(
 			},
 			{ "end.reason": released.endReason, "release.cause": cause },
 		);
+	}
+}
+
+/** False when Autumn still holds the lock: the boot stays open and the next settle releases it. */
+async function releaseLock(boot: Boot): Promise<boolean> {
+	if (!boot.lockOpen) return true;
+	try {
+		await autumnClient.balances.finalize({
+			lockId: lockIdFor(boot.id, boot.lockSeq),
+			action: "release",
+		});
+		return true;
+	} catch (error) {
+		if (
+			error instanceof AutumnError &&
+			(error.statusCode === 409 || error.body.includes("Lock not found"))
+		) {
+			return true;
+		}
+		Sentry.captureException(error, { tags: bootTags(boot) });
+		return false;
 	}
 }
 
@@ -577,6 +587,18 @@ export async function settleBoot(
 ): Promise<"renewed" | "warned" | "stopped" | "closed" | "skipped"> {
 	const boot = await claimSettle(bootId);
 	if (!boot) return "skipped";
+	if (
+		boot.stoppedAt &&
+		boot.finalizedThrough &&
+		boot.finalizedThrough >= boot.stoppedAt
+	) {
+		const lockReleased = await releaseLock(boot);
+		await db
+			.update(cloudWorkspaceBoots)
+			.set({ lockOpen: !lockReleased, settleLeaseUntil: null })
+			.where(eq(cloudWorkspaceBoots.id, bootId));
+		return "closed";
+	}
 	try {
 		const [workspace] = boot.cloudWorkspaceId
 			? await db
