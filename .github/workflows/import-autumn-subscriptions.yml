@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       apply:
-        description: Link the subscriptions in Autumn. Leave unchecked for a dry run that only reports.
+        description: Link the subscriptions in Autumn. Leave unchecked for a dry run that only reports. Scheduled runs always link.
         type: boolean
         default: false
       reimport:
@@ -57,7 +57,8 @@ jobs:
           STRIPE_PRO_YEARLY_PRICE_ID: ${{ secrets.STRIPE_PRO_YEARLY_PRICE_ID }}
           STRIPE_ENTERPRISE_YEARLY_PRICE_ID: ${{ secrets.STRIPE_ENTERPRISE_YEARLY_PRICE_ID }}
           AUTUMN_SECRET_KEY: ${{ secrets.AUTUMN_SECRET_KEY }}
-          APPLY: ${{ inputs.apply }}
+          # Scheduled runs link new subscriptions. Re-imaging stays manual (reimport).
+          APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           REIMPORT: ${{ inputs.reimport }}
         run: |
           args=()
