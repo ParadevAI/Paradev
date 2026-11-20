@@ -472,7 +472,7 @@ export function ModelPanel({
 				) : null}
 			</div>
 			{tabAgent && !runtimeModels && tabAgent.availability === "unknown" ? (
-				<div className="flex h-7 shrink-0 items-center gap-1.5 border-t px-2.5 text-[11px] text-muted-foreground/70">
+				<div className="flex h-7 shrink-0 items-center gap-1.5 px-2.5 text-[11px] text-muted-foreground/70">
 					{tabAgent.loading ? (
 						<>
 							<LuLoaderCircle className="size-3 animate-spin" />
