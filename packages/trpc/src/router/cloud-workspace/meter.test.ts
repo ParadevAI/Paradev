@@ -31,6 +31,8 @@ const MINUTE = 60_000;
 const NOW = Date.now();
 
 let boot: Record<string, unknown> | null;
+/** Open boots a select returns; the one `boot` when null. */
+let openBoots: Record<string, unknown>[] | null;
 let session: BoxSession | null;
 let renewalAllowed: boolean;
 let finalizeError: Error | null;
@@ -103,7 +105,9 @@ stub(db, {
 		let source: unknown;
 		return chain(
 			() => {
-				if (source === cloudWorkspaceBoots) return boot ? [boot] : [];
+				if (source === cloudWorkspaceBoots) {
+					return openBoots ?? (boot ? [boot] : []);
+				}
 				if (source === users) {
 					return [{ name: "Ada Lovelace", email: "ada@example.com" }];
 				}
@@ -284,6 +288,7 @@ beforeEach(() => {
 	usageStopAt = null;
 	creatorId = "user_1";
 	delayedSettles = [];
+	openBoots = null;
 	updateMatches = true;
 	insertConflicts = false;
 	insertError = null;
@@ -658,6 +663,17 @@ describe("settleBoot", () => {
 		boot = null;
 		expect(await settleBoot("boot_1")).toBe("skipped");
 		expect(autumnCalls).toEqual([]);
+	});
+});
+
+describe("the reconcile queues a settle for every open boot", () => {
+	test("each settle is queued now, with no delay, whatever its place in the batch", async () => {
+		openBoots = ["boot_1", "boot_2", "boot_3"].map((id) => ({ ...boot, id }));
+		expect(
+			await reconcileCloudWorkspaceUsage({ billingEnabled: true }),
+		).toEqual({ adopted: 0, queued: 3, failed: 0 });
+		expect(queuedSettles).toEqual(["boot_1", "boot_2", "boot_3"]);
+		expect(delayedSettles).toEqual([0, 0, 0]);
 	});
 });
 
