@@ -27,6 +27,7 @@ export interface ReconcileReport {
 	dequeued: number;
 	terminated: number;
 	lost: number;
+	failed: number;
 }
 
 /**
@@ -46,6 +47,7 @@ export async function reconcileDevs(
 		dequeued: 0,
 		terminated: 0,
 		lost: 0,
+		failed: 0,
 	};
 	const count = (fix: ReconcileFix, details: Record<string, unknown>) => {
 		report[fix] += 1;
@@ -56,39 +58,85 @@ export async function reconcileDevs(
 			properties: { fix, ...details },
 		});
 	};
-
-	for (const message of await undeliveredMessages({ organizationId })) {
-		await startTurnsForMessage(
-			{ id: message.channelId, kind: message.channelKind },
-			message,
-			message.authorId,
+	const fail = (
+		step: ReconcileFix,
+		details: Record<string, unknown>,
+		error: unknown,
+	) => {
+		report.failed += 1;
+		console.error(
+			"[devs-reconcile] failed",
+			step,
+			JSON.stringify(details),
+			error,
 		);
-		count("redelivered", { messageId: message.id });
-	}
+		posthog.capture({
+			distinctId: "devs-reconciler",
+			event: "dev_reconciler_failed",
+			properties: { step, ...details, error: String(error) },
+		});
+	};
 
-	for (const sessionId of await strandedQueues(organizationId)) {
-		if (await startNextQueued(sessionId)) {
-			count("dequeued", { sessionId });
-		}
-	}
+	await eachApart(
+		await undeliveredMessages({ organizationId }),
+		async (message) => {
+			await startTurnsForMessage(
+				{ id: message.channelId, kind: message.channelKind },
+				message,
+				message.authorId,
+			);
+			count("redelivered", { messageId: message.id });
+		},
+		(message, error) => fail("redelivered", { messageId: message.id }, error),
+	);
 
-	for (const turn of await staleRunningTurns(organizationId)) {
-		const workflow = temporal.workflow.getHandle(
-			sessionWorkflowId(turn.sessionId),
-		);
-		const state = await workflowState(workflow, turn.id);
-		if (state === "wedged") {
-			await workflow.terminate("devs-reconcile: workflow task keeps failing");
-			count("terminated", { sessionId: turn.sessionId });
-		}
-		if (state === "healthy") continue;
-		if (await settleLost(turn.id)) {
-			if (turn.recent) await sendAgain(turn);
-			await afterTaskTurn(turn.id);
-			count("lost", { turnId: turn.id, sessionId: turn.sessionId });
-		}
-	}
+	await eachApart(
+		await strandedQueues(organizationId),
+		async (sessionId) => {
+			if (await startNextQueued(sessionId)) {
+				count("dequeued", { sessionId });
+			}
+		},
+		(sessionId, error) => fail("dequeued", { sessionId }, error),
+	);
+
+	await eachApart(
+		await staleRunningTurns(organizationId),
+		async (turn) => {
+			const workflow = temporal.workflow.getHandle(
+				sessionWorkflowId(turn.sessionId),
+			);
+			const state = await workflowState(workflow, turn.id);
+			if (state === "wedged") {
+				await workflow.terminate("devs-reconcile: workflow task keeps failing");
+				count("terminated", { sessionId: turn.sessionId });
+			}
+			if (state === "healthy") return;
+			if (await settleLost(turn.id)) {
+				if (turn.recent) await sendAgain(turn);
+				await afterTaskTurn(turn.id);
+				count("lost", { turnId: turn.id, sessionId: turn.sessionId });
+			}
+		},
+		(turn, error) =>
+			fail("lost", { turnId: turn.id, sessionId: turn.sessionId }, error),
+	);
 	return report;
+}
+
+/** Repairs each item on its own, so one that throws does not stop the others. */
+export async function eachApart<T>(
+	items: T[],
+	repair: (item: T) => Promise<void>,
+	onError: (item: T, error: unknown) => void,
+) {
+	for (const item of items) {
+		try {
+			await repair(item);
+		} catch (error) {
+			onError(item, error);
+		}
+	}
 }
 
 async function undeliveredMessages({
