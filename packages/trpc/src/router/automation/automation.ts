@@ -1,5 +1,4 @@
-import { billingUsesAutumn } from "@superset/auth/autumn";
-import { organizationPlanFromAutumn } from "@superset/auth/billing";
+import { organizationPlan } from "@superset/auth/billing";
 import { db, dbWs } from "@superset/db/client";
 import {
 	automationEvents,
@@ -16,7 +15,6 @@ import type { DraftTrigger } from "@superset/shared/automation-triggers";
 import {
 	AUTOMATIONS_REQUIRED_PLAN,
 	planAllowsAutomations,
-	planTierFromSubscription,
 } from "@superset/shared/billing";
 import {
 	CLOUD_AGENT_PROMPT_MAX_LENGTH,
@@ -64,10 +62,7 @@ import {
 } from "../cloud-workspace/start";
 import { findHostForCloudWorkspace } from "../host/findHostForCloudWorkspace";
 import { joinSlackTriggerChannels } from "../integration/slack/joinChannels";
-import {
-	requireActiveOrgMembership,
-	requireActiveOrgMembershipWithSubscription,
-} from "../utils/active-org";
+import { requireActiveOrgMembership } from "../utils/active-org";
 import { dispatchAutomation } from "./dispatch";
 import {
 	assertNotArchived,
@@ -116,13 +111,10 @@ import { generateWebhookToken, hashWebhookToken } from "./webhookSecret";
  * those rows simply stop firing (the dispatchers apply the same tier map).
  */
 async function requireAutomationsPlan(
-	ctx: Parameters<typeof requireActiveOrgMembershipWithSubscription>[0],
+	ctx: Parameters<typeof requireActiveOrgMembership>[0],
 ): Promise<string> {
-	const { organizationId, subscription } =
-		await requireActiveOrgMembershipWithSubscription(ctx);
-	const plan = billingUsesAutumn
-		? await organizationPlanFromAutumn(organizationId)
-		: planTierFromSubscription(subscription);
+	const organizationId = await requireActiveOrgMembership(ctx);
+	const plan = await organizationPlan(organizationId);
 	if (!planAllowsAutomations(plan)) {
 		throw planRequiredError({
 			message: "Automations require the Pro plan.",

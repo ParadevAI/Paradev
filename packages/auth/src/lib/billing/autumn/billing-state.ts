@@ -33,6 +33,8 @@ export interface OrganizationBilling {
 	tier: PlanTier;
 	autumnPlanId: string | null;
 	status: "active" | "trialing" | "past_due" | null;
+	trialEnd?: string | null;
+	seatsBilled?: number | null;
 	cancelAt: string | null;
 	scheduledPlanId: string | null;
 	scheduledAt: string | null;
@@ -137,6 +139,8 @@ export function billingFromCustomer(
 		tier,
 		autumnPlanId: paidPlanId,
 		status,
+		trialEnd: iso(paid?.trialEndsAt),
+		seatsBilled: seatCount(customer, paidPlanId),
 		cancelAt: next ? null : iso(paid?.expiresAt),
 		scheduledPlanId: next && next.planId !== paidPlanId ? next.planId : null,
 		scheduledAt:

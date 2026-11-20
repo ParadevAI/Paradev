@@ -175,7 +175,17 @@ export async function cancelWithAutumn(
 ): Promise<{ url: string; redirect: boolean }> {
 	const live = await deps.findLiveSubscription(args.referenceId);
 	const subscription = live && stripeRef(live);
-	if (!subscription) throw billingError("SUBSCRIPTION_NOT_FOUND");
+	if (!subscription) {
+		const planId = await deps.currentPlanId(args.referenceId);
+		if (!planId) throw billingError("SUBSCRIPTION_NOT_FOUND");
+		await deps.update({
+			customerId: args.referenceId,
+			planId,
+			cancelAction: "cancel_end_of_cycle",
+		});
+		await deps.sync(args.referenceId);
+		return { url: args.body.returnUrl, redirect: !args.body.disableRedirect };
+	}
 	return {
 		url: await deps.cancelPortalUrl(subscription, args.body.returnUrl),
 		redirect: !args.body.disableRedirect,
@@ -194,7 +204,7 @@ export async function restoreWithAutumn(
 }> {
 	const live = await deps.findLiveSubscription(args.referenceId);
 	const subscription = live && stripeRef(live);
-	if (!live || !subscription) throw billingError("SUBSCRIPTION_NOT_FOUND");
+	if (!live) throw billingError("SUBSCRIPTION_NOT_FOUND");
 	if (live.status !== "active" && live.status !== "trialing") {
 		throw billingError("SUBSCRIPTION_NOT_ACTIVE");
 	}
@@ -209,6 +219,7 @@ export async function restoreWithAutumn(
 			cancelAction: "uncancel",
 		});
 	} else {
+		if (!subscription) throw billingError("SUBSCRIPTION_NOT_FOUND");
 		await deps.restoreInStripe(subscription);
 	}
 	await deps.sync(args.referenceId);
