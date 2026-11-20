@@ -155,8 +155,11 @@ export const terminalRouter = router({
 				workspaceId: z.string(),
 			}),
 		)
-		.query(({ input }) => ({
-			running: sessionHasRunningProcess(input.terminalId, input.workspaceId),
+		.query(async ({ input }) => ({
+			running: await sessionHasRunningProcess(
+				input.terminalId,
+				input.workspaceId,
+			),
 		})),
 
 	writeInput: protectedProcedure

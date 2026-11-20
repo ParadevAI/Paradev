@@ -24,15 +24,15 @@ after(() => {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function waitFor(
-	predicate: () => boolean,
+	predicate: () => Promise<boolean> | boolean,
 	timeoutMs: number,
 ): Promise<boolean> {
 	const deadline = Date.now() + timeoutMs;
 	while (Date.now() < deadline) {
-		if (predicate()) return true;
+		if (await predicate()) return true;
 		await sleep(50);
 	}
-	return predicate();
+	return await predicate();
 }
 
 test("idle prompt -> running command -> idle again", async () => {
@@ -49,7 +49,10 @@ test("idle prompt -> running command -> idle again", async () => {
 	pty.onData(() => {});
 
 	// Shell needs a moment to take the foreground process group.
-	const idle = await waitFor(() => !hasRunningForegroundProcess(pty.pid), 4000);
+	const idle = await waitFor(
+		async () => !(await hasRunningForegroundProcess(pty.pid)),
+		4000,
+	);
 	assert.equal(idle, true, "idle shell should report no running process");
 
 	pty.write(Buffer.from("sleep 3\n", "utf8"));
@@ -61,7 +64,7 @@ test("idle prompt -> running command -> idle again", async () => {
 
 	// `sleep 3` finishes; the shell reclaims the foreground group.
 	const backToIdle = await waitFor(
-		() => !hasRunningForegroundProcess(pty.pid),
+		async () => !(await hasRunningForegroundProcess(pty.pid)),
 		6000,
 	);
 	assert.equal(
