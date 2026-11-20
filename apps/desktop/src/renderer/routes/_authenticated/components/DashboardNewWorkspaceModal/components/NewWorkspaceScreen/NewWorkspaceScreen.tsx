@@ -28,7 +28,10 @@ import { GitHubStarPill } from "renderer/components/GitHubStarPill";
 import { env } from "renderer/env.renderer";
 import { useHostProjects } from "renderer/hooks/host-projects/useHostProjects";
 import { resolveHostUrl } from "renderer/hooks/host-service/useHostTargetUrl";
-import { useAcpChatEnabled } from "renderer/hooks/useAcpChatEnabled";
+import {
+	useAcpChatEnabled,
+	useAcpChatSettled,
+} from "renderer/hooks/useAcpChatEnabled";
 import { useActiveOrganizationId } from "renderer/hooks/useActiveOrganizationId";
 import { useAgentChoices } from "renderer/hooks/useAgentChoices";
 import { useAgentEffortPreference } from "renderer/hooks/useAgentEffortPreference";
@@ -614,6 +617,7 @@ export function NewWorkspaceScreen({
 		return agent ? launchPresetIdOf(agent) : null;
 	}, [agentConfigs, selectedAgent]);
 	const acpChatEnabled = useAcpChatEnabled();
+	const acpChatSettled = useAcpChatSettled();
 	const modelAgents = useMemo(
 		() =>
 			agentConfigs.filter((agent) => {
@@ -625,7 +629,7 @@ export function NewWorkspaceScreen({
 		[agentConfigs, acpChatEnabled],
 	);
 	const catalogs = useAgentModelCatalog(
-		launchHostUrl,
+		acpChatSettled ? launchHostUrl : null,
 		modelAgents,
 		acpChatEnabled ? "chat" : "terminal",
 		undefined,
@@ -671,6 +675,17 @@ export function NewWorkspaceScreen({
 				: [],
 		[selectedPresetId, selectedModel],
 	);
+	const modelForLaunch = modelSupport?.models.some(
+		(entry) => entry.id === selectedModel,
+	)
+		? selectedModel
+		: null;
+	const loadSelectedCatalog = useRef(discovered?.load);
+	loadSelectedCatalog.current = discovered?.load;
+	const selectedCatalogKey = discovered?.key;
+	useEffect(() => {
+		if (selectedCatalogKey && selectedModel) loadSelectedCatalog.current?.();
+	}, [selectedCatalogKey, selectedModel]);
 	const effortForLaunch = effortOptions.some(
 		(option) => option.id === selectedEffort,
 	)
@@ -823,7 +838,7 @@ export function NewWorkspaceScreen({
 		projectId,
 		selectedAgent,
 		selectedPresetId,
-		modelSupport ? selectedModel : null,
+		modelForLaunch,
 		effortForLaunch,
 		modeForLaunch,
 		uploadAttachments,

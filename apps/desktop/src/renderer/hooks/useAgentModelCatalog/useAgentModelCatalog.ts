@@ -6,6 +6,9 @@ import {
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 
+const freshFor = (query: { state: { data?: AgentModelCatalog } }) =>
+	query.state.data?.failure ? 0 : 60_000;
+
 type Agent = { id: string; presetId?: string; command?: string };
 type Catalog = AgentModelCatalog & {
 	loading: boolean;
@@ -44,7 +47,7 @@ export function useAgentModelCatalog(
 						agent.presetId === session?.presetId ? session?.id : undefined,
 				}),
 			enabled: false,
-			staleTime: 60_000,
+			staleTime: freshFor,
 			gcTime: 5 * 60_000,
 			retry: false,
 		})),
@@ -81,7 +84,7 @@ export function useAgentModelCatalog(
 										: undefined,
 								refresh,
 							}),
-						staleTime: refresh ? 0 : 60_000,
+						staleTime: refresh ? 0 : freshFor,
 					})
 					.catch(() => undefined);
 			};

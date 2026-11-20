@@ -95,7 +95,8 @@ export function useAgentLaunchPreferences(
 	target?: {
 		hostUrl?: string | null;
 		projectId?: string;
-		enabled?: boolean;
+		/** Ask the host only when a remembered pick needs its label. */
+		onlyForPick?: boolean;
 		agent?: string;
 		surface?: "chat" | "terminal";
 	},
@@ -106,12 +107,19 @@ export function useAgentLaunchPreferences(
 		(chatEnabled && acpHarnessForPreset(presetId ?? undefined)
 			? "chat"
 			: "terminal");
+	const modelByAgent = useNewSessionPreferencesStore(
+		(state) => state.modelByAgent,
+	);
+	const effortByAgent = useNewSessionPreferencesStore(
+		(state) => state.effortByAgent,
+	);
+	const hasPick = Boolean(presetId && modelByAgent[presetId]);
 	const catalog = useQuery({
 		queryKey: [
 			"agent-model-catalog",
 			target?.hostUrl,
 			target?.agent ?? presetId,
-			target?.projectId,
+			target?.projectId || undefined,
 			surface,
 		],
 		queryFn: () =>
@@ -120,19 +128,14 @@ export function useAgentLaunchPreferences(
 				surface: surface,
 				projectId: target?.projectId || undefined,
 			}),
-		enabled: target?.enabled !== false && !!target?.hostUrl && !!presetId,
+		enabled:
+			(!target?.onlyForPick || hasPick) && !!target?.hostUrl && !!presetId,
 		staleTime: 60_000,
 		gcTime: 5 * 60_000,
 		retry: false,
 	});
 	const discoveredModels = catalog.data?.models;
 	const defaultModelLabel = catalog.data?.defaultModel?.label;
-	const modelByAgent = useNewSessionPreferencesStore(
-		(state) => state.modelByAgent,
-	);
-	const effortByAgent = useNewSessionPreferencesStore(
-		(state) => state.effortByAgent,
-	);
 	return useMemo(
 		() => ({
 			...resolveAgentLaunchPreferences(

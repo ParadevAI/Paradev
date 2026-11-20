@@ -156,7 +156,7 @@ export function NewChatWidget({
 		projectId: isCloudTarget
 			? undefined
 			: (selectedTarget?.projectId ?? undefined),
-		enabled: false,
+		onlyForPick: true,
 		agent:
 			selectedAgent && "id" in selectedAgent ? selectedAgent.id : undefined,
 	});

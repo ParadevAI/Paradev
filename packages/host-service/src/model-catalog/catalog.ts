@@ -38,6 +38,7 @@ import {
 	DISCOVERY_DEADLINE_MS,
 	DiscoveryError,
 	DiscoveryScheduler,
+	discoveryFailure,
 } from "./discovery";
 import { enrichModels, refreshModelMetadata } from "./metadata";
 
@@ -240,14 +241,14 @@ export async function discoverAgentModels(
 								await adapter.dispose();
 							}
 						} else if (ctx.presetId === "codex") {
-							({ models, defaultModel } = await discoverCodexModels(
+							models = await discoverCodexModels(
 								{
 									command: agentCliCommand(ctx.config.command, ctx.env),
 									env: ctx.env,
 									cwd: ctx.cwd,
 								},
 								signal,
-							));
+							);
 						} else if (
 							input.surface === "terminal" &&
 							ctx.presetId === "cursor-agent"
@@ -281,6 +282,7 @@ export async function discoverAgentModels(
 							stale: false,
 						};
 					})().catch((error) => {
+						if (discoveryFailure(error) === "unsupported") throw error;
 						console.warn("[model-discovery] failed", {
 							agent: input.agent,
 							surface: input.surface,
