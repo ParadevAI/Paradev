@@ -672,9 +672,12 @@ superset hosts list
 }`}
 >
 Set up a machine you can SSH into as a host, with nothing typed on it:
-installs this CLI's version there, signs it in with a new API key sent over
+installs the CLI there, signs it in with a new API key sent over
 ssh stdin, runs it as a user service, and waits for it to come online.
 Running it again on the same target repairs only what is wrong.
+
+It prefers this CLI's version. If that release's archive is unavailable,
+it warns and installs the latest published CLI instead.
 
 The remote must be macOS or glibc Linux on x64 or arm64 (not Alpine or
 Windows) and have `curl`. On Linux it also needs a valid `/etc/machine-id`,
