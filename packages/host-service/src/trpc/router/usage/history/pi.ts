@@ -11,12 +11,14 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { UsageAgent } from "../types";
+import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { LogFile } from "./logs";
 import { collectLogFiles } from "./logs";
-import type { UsageLogEntry } from "./parse";
+import type { SessionFileResult, UsageLogEntry } from "./parse";
 import {
+	appendSessionFile,
+	dropBefore,
 	entryTimestamp,
-	forEachLine,
 	num,
 	sessionIdForFile,
 	toSessionLabel,
@@ -45,17 +47,18 @@ interface PiLine {
 	};
 }
 
-async function parsePiLogFile(
+interface PiFileState extends SessionFileResult {
+	sessionCwd: string | null;
+}
+
+function piFileParser(
 	agent: UsageAgent,
 	file: LogFile,
-	cutoffMs: number,
-	out: UsageLogEntry[],
-	sessionLabels?: Map<string, string>,
-): Promise<void> {
+	state: PiFileState = { entries: [], label: null, sessionCwd: null },
+): LineParser<SessionFileResult, PiFileState> {
 	const sessionId = sessionIdForFile(file.path);
-	let sessionCwd: string | null = null;
-	await forEachLine(file.path, (line) => {
-		const wantLabel = sessionLabels ? !sessionLabels.has(sessionId) : false;
+	const onLine = (line: string) => {
+		const wantLabel = state.label === null;
 		if (
 			!line.includes('"session"') &&
 			!line.includes('"assistant"') &&
@@ -70,7 +73,7 @@ async function parsePiLogFile(
 			return;
 		}
 		if (parsed.type === "session") {
-			if (typeof parsed.cwd === "string") sessionCwd = parsed.cwd;
+			if (typeof parsed.cwd === "string") state.sessionCwd = parsed.cwd;
 			return;
 		}
 		if (parsed.type !== "message") return;
@@ -83,8 +86,7 @@ async function parsePiLogFile(
 				typeof content === "string"
 					? content
 					: content?.find((block) => block.type === "text")?.text;
-			const label = toSessionLabel(text);
-			if (label) sessionLabels?.set(sessionId, label);
+			state.label = toSessionLabel(text);
 			return;
 		}
 		if (message.role !== "assistant") return;
@@ -95,14 +97,12 @@ async function parsePiLogFile(
 			typeof message.timestamp === "number" && message.timestamp > 0
 				? message.timestamp
 				: entryTimestamp(parsed.timestamp, file.mtimeMs);
-		if (timestampMs < cutoffMs) return;
-
 		const cost = num(usage.cost?.total);
-		out.push({
+		state.entries.push({
 			agent,
 			model: message.model,
 			timestampMs,
-			cwd: sessionCwd,
+			cwd: state.sessionCwd,
 			sessionId,
 			// Pi stores the agent-reported input count, which excludes the
 			// cache fields it tracks separately.
@@ -114,7 +114,14 @@ async function parsePiLogFile(
 			reasoningOutput: 0,
 			...(cost > 0 ? { costUsd: cost } : {}),
 		});
-	});
+	};
+	return {
+		state,
+		onLine,
+		result: () => state,
+		prune: (cutoffMs) =>
+			dropBefore(state.entries, cutoffMs, (entry) => entry.timestampMs),
+	};
 }
 
 /** Returns the number of session files scanned. */
@@ -125,10 +132,23 @@ export async function collectPiEntries(
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	root: string = piSessionsRoot(agent),
+	parseLines: ParseLines = parseWholeFile,
 ): Promise<number> {
 	const files = await collectLogFiles(root, days + 1);
 	for (const file of files) {
-		await parsePiLogFile(agent, file, cutoffMs, out, sessionLabels);
+		const result = await parseLines(
+			agent,
+			file.path,
+			(state?: PiFileState) => piFileParser(agent, file, state),
+			cutoffMs,
+		);
+		appendSessionFile(
+			result,
+			sessionIdForFile(file.path),
+			cutoffMs,
+			out,
+			sessionLabels,
+		);
 	}
 	return files.length;
 }

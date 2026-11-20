@@ -38,8 +38,8 @@ export function devinRowsToEntries(
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
+	seen: { has(key: string): boolean; add(key: string): void } = new Set(),
 ): void {
-	const seen = new Set<string>();
 	for (const row of rows) {
 		if (!row.chat_message) continue;
 		let message: DevinChatMessage;

@@ -13,7 +13,7 @@ import {
 	type HermesSessionRow,
 	hermesRowsToEntries,
 } from "./hermes-rows";
-import type { UsageLogEntry } from "./parse";
+import { MAX_SQL_TEXT_LENGTH, type UsageLogEntry } from "./parse";
 
 const ACTIVITY_AT =
 	"MAX(started_at, COALESCE(ended_at, 0), COALESCE(last_activity_at, 0))";
@@ -43,7 +43,7 @@ export function collectHermesEntries(
 		const readSnapshot = conn.transaction(() => ({
 			sessions: conn
 				.prepare(
-					`SELECT id, model, cwd, title, ${ACTIVITY_AT} AS activity_at,
+					`SELECT id, model, cwd, substr(title, 1, ${MAX_SQL_TEXT_LENGTH}) AS title, ${ACTIVITY_AT} AS activity_at,
 					        input_tokens, output_tokens, cache_read_tokens,
 					        cache_write_tokens, reasoning_tokens,
 					        estimated_cost_usd, actual_cost_usd

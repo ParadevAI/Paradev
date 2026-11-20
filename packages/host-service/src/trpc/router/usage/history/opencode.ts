@@ -7,11 +7,12 @@
  * counted and is skipped.
  */
 
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { type OpencodeMessage, opencodeMessageToEntry } from "./opencode-rows";
-import type { UsageLogEntry } from "./parse";
+import { readJsonFile, type UsageLogEntry } from "./parse";
+import type { SqliteStates } from "./sqlite-tail";
 
 export function opencodeDataDir(): string {
 	const dataHome =
@@ -57,17 +58,11 @@ async function readSessionTitles(
 			if (!wantedSessions.has(sessionId) || sessionLabels.has(sessionId)) {
 				continue;
 			}
-			try {
-				const raw = await readFile(
-					join(sessionRoot, projectDir, file),
-					"utf-8",
-				);
-				const session = JSON.parse(raw) as { title?: string };
-				if (typeof session.title === "string" && session.title) {
-					sessionLabels.set(sessionId, session.title);
-				}
-			} catch {
-				// Unreadable session metadata — the entries stay unlabeled.
+			const session = (await readJsonFile(
+				join(sessionRoot, projectDir, file),
+			)) as { title?: string } | null;
+			if (typeof session?.title === "string" && session.title) {
+				sessionLabels.set(sessionId, session.title);
 			}
 		}
 	}
@@ -111,12 +106,10 @@ async function collectLegacyStorageEntries(
 		for (const file of files) {
 			if (!file.endsWith(".json")) continue;
 			scanned++;
-			let message: OpencodeMessage;
-			try {
-				message = JSON.parse(await readFile(join(dirPath, file), "utf-8"));
-			} catch {
-				continue;
-			}
+			const message = (await readJsonFile(
+				join(dirPath, file),
+			)) as OpencodeMessage | null;
+			if (!message) continue;
 			const sessionId = message.sessionID ?? sessionDir;
 			const entry = opencodeMessageToEntry(message, sessionId, cutoffMs);
 			if (!entry) continue;
@@ -137,6 +130,7 @@ export async function collectOpencodeEntries(
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dataDir: string = opencodeDataDir(),
+	states?: SqliteStates,
 ): Promise<number> {
 	const dbPath = opencodeDbPath(dataDir);
 	let hasDb = false;
@@ -147,7 +141,13 @@ export async function collectOpencodeEntries(
 	}
 	if (hasDb) {
 		const { collectOpencodeDbEntries } = await import("./opencode-db");
-		return collectOpencodeDbEntries(dbPath, cutoffMs, out, sessionLabels);
+		return collectOpencodeDbEntries(
+			dbPath,
+			cutoffMs,
+			out,
+			sessionLabels,
+			states,
+		);
 	}
 	return collectLegacyStorageEntries(
 		opencodeStorageDir(dataDir),

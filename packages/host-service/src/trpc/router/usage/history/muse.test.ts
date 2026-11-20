@@ -1,7 +1,14 @@
 import { afterAll, describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+	appendFileSync,
+	mkdirSync,
+	mkdtempSync,
+	rmSync,
+	writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { LineFileCache } from "./line-cache";
 import { collectMuseEntries, parseMuseLine } from "./muse";
 import type { UsageLogEntry } from "./parse";
 
@@ -251,5 +258,40 @@ describe("collectMuseEntries", () => {
 		);
 		expect(scanned).toBe(0);
 		expect(out).toHaveLength(0);
+	});
+});
+
+describe("collectMuseEntries with a resumed parse", () => {
+	test("matches a fresh parse after lines that re-stamp the session", async () => {
+		const resumeRoot = join(tmp, ".local", "share", "muse-resume", "sessions");
+		const dir = join(resumeRoot, "2026", "09", "12", SESSION);
+		const usage = (input: number) =>
+			runEvent(
+				{
+					kind: "model_completed",
+					usage: { input_tokens: input, output_tokens: 10 },
+				},
+				`resume-${input}`,
+			);
+		writeSession(dir, [usage(100)]);
+		const cache = new LineFileCache();
+		const collect = async (parseLines?: LineFileCache["parse"]) => {
+			const out: UsageLogEntry[] = [];
+			const labels = new Map<string, string>();
+			await collectMuseEntries(90, 0, out, labels, resumeRoot, parseLines);
+			return { out, labels };
+		};
+		await collect(cache.parse);
+
+		appendFileSync(
+			join(dir, "session.jsonl"),
+			`${[metadata, usage(200)].join("\n")}\n`,
+		);
+		const resumed = await collect(cache.parse);
+		expect(resumed).toEqual(await collect());
+		expect(resumed.out.map((entry) => [entry.model, entry.cwd])).toEqual([
+			["muse-spark-1.2", "/Users/me/proj"],
+			["muse-spark-1.2", "/Users/me/proj"],
+		]);
 	});
 });

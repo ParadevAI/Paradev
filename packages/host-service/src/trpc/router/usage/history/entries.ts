@@ -4,18 +4,26 @@ import { join } from "node:path";
 import { discoverClaudeProfiles, discoverCodexHomes } from "../profiles";
 import { collectAgyEntries } from "./agy";
 import { collectCopilotEntries } from "./copilot";
-import { collectCursorEntries } from "./cursor";
 import { collectDevinEntries } from "./devin";
 import { collectFxEntries } from "./fx";
 import { collectGrokEntries, grokHomes } from "./grok";
 import { collectHermesEntries } from "./hermes";
 import { hermesHomes } from "./hermes-homes";
+import { LineFileCache, parseWholeFile } from "./line-cache";
 import { collectLogFiles, dedupeLogFiles } from "./logs";
 import { collectMuseEntries } from "./muse";
 import { collectOpencodeEntries } from "./opencode";
 import type { UsageLogEntry } from "./parse";
-import { parseClaudeLogFile, parseCodexLogFile } from "./parse";
+import {
+	appendSessionFile,
+	type ClaudeFileResult,
+	type CodexFileState,
+	claudeFileParser,
+	codexFileParser,
+	sessionIdForFile,
+} from "./parse";
 import { collectPiEntries } from "./pi";
+import { MemoryStateStore, type UsageStateStore } from "./usage-store";
 
 export interface CollectedUsage {
 	entries: UsageLogEntry[];
@@ -25,12 +33,24 @@ export interface CollectedUsage {
 	scannedFiles: number;
 }
 
-export interface CollectUsageOptions {
-	/** Known workspace/project roots — cursor's only way to attribute a cwd
-	 * (its chat dirs are keyed by md5 of the launch cwd). */
-	cwdCandidates?: readonly string[];
+/** Parse state kept between scans, so a scan reads only what changed. */
+export interface UsageScanCaches {
+	store: UsageStateStore;
+	lines: LineFileCache;
 }
 
+export function createUsageScanCaches(
+	store: UsageStateStore = new MemoryStateStore(),
+): UsageScanCaches {
+	return { store, lines: new LineFileCache(store) };
+}
+
+export interface CollectUsageOptions {
+	caches?: UsageScanCaches;
+}
+
+/** Every agent read from local files. Cursor has no local token counts; its
+ * collector runs per request (see usage-index.ts). */
 export async function collectUsageEntries(
 	days: number,
 	cutoffMs: number,
@@ -86,17 +106,31 @@ export async function collectUsageEntries(
 	const claudeFiles = dedupeLogFiles(claudeFileGroups.flat());
 	const codexFiles = dedupeLogFiles(codexFileGroups.flat());
 
+	const parseLines = options.caches?.lines.parse ?? parseWholeFile;
+	const sqliteStates = options.caches?.store;
 	const entries: UsageLogEntry[] = [];
 	const claudeEntriesByMessage = new Map<string, UsageLogEntry>();
 	const sessionLabels = new Map<string, string>();
 	for (const file of claudeFiles) {
-		await parseClaudeLogFile(
-			file,
-			claudeEntriesByMessage,
+		const { byMessage, unkeyed, label } = await parseLines(
+			"claude",
+			file.path,
+			(state?: ClaudeFileResult) => claudeFileParser(file, state),
+			cutoffMs,
+		);
+		appendSessionFile(
+			{ entries: unkeyed, label },
+			sessionIdForFile(file.path),
 			cutoffMs,
 			entries,
 			sessionLabels,
 		);
+		for (const key in byMessage) {
+			const entry = byMessage[key];
+			if (entry && entry.timestampMs >= cutoffMs) {
+				claudeEntriesByMessage.set(key, entry);
+			}
+		}
 	}
 	// Appended one at a time — spreading into push() passes every entry as a
 	// call argument, which throws RangeError past V8's argument limit on
@@ -105,7 +139,19 @@ export async function collectUsageEntries(
 		entries.push(entry);
 	}
 	for (const file of codexFiles) {
-		await parseCodexLogFile(file, cutoffMs, entries, sessionLabels);
+		const result = await parseLines(
+			"codex",
+			file.path,
+			(state?: CodexFileState) => codexFileParser(file, state),
+			cutoffMs,
+		);
+		appendSessionFile(
+			result,
+			sessionIdForFile(file.path),
+			cutoffMs,
+			entries,
+			sessionLabels,
+		);
 	}
 
 	// The remaining agents are independent of each other and of the two
@@ -117,36 +163,80 @@ export async function collectUsageEntries(
 	}> = [
 		{
 			run: (out: UsageLogEntry[]) =>
-				collectAgyEntries(cutoffMs, out, sessionLabels),
+				collectAgyEntries(cutoffMs, out, sessionLabels, parseLines),
 		},
 		...grokHomes().map((grokHome) => ({
 			run: (out: UsageLogEntry[]) =>
-				collectGrokEntries(grokHome, cutoffMs, out, sessionLabels),
+				collectGrokEntries(grokHome, cutoffMs, out, sessionLabels, parseLines),
 		})),
 		{
 			run: (out: UsageLogEntry[]) =>
-				collectOpencodeEntries(cutoffMs, out, sessionLabels),
+				collectOpencodeEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					sqliteStates,
+				),
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				collectPiEntries("pi", days, cutoffMs, out, sessionLabels),
+				collectPiEntries(
+					"pi",
+					days,
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					parseLines,
+				),
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				collectPiEntries("omp", days, cutoffMs, out, sessionLabels),
+				collectPiEntries(
+					"omp",
+					days,
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					parseLines,
+				),
 		},
-		{ run: (out: UsageLogEntry[]) => collectFxEntries(cutoffMs, out) },
 		{
 			run: (out: UsageLogEntry[]) =>
-				collectMuseEntries(days, cutoffMs, out, sessionLabels),
+				collectFxEntries(cutoffMs, out, undefined, parseLines),
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				Promise.resolve(collectCopilotEntries(cutoffMs, out, sessionLabels)),
+				collectMuseEntries(
+					days,
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					parseLines,
+				),
 		},
 		{
 			run: (out: UsageLogEntry[]) =>
-				Promise.resolve(collectDevinEntries(cutoffMs, out, sessionLabels)),
+				collectCopilotEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					sqliteStates,
+				),
+		},
+		{
+			run: (out: UsageLogEntry[]) =>
+				collectDevinEntries(
+					cutoffMs,
+					out,
+					sessionLabels,
+					undefined,
+					sqliteStates,
+				),
 		},
 		...hermesHomes().map((hermesHome) => ({
 			run: (out: UsageLogEntry[]) =>
@@ -154,19 +244,6 @@ export async function collectUsageEntries(
 					collectHermesEntries(hermesHome, cutoffMs, out, sessionLabels),
 				),
 		})),
-		{
-			// Cursor is the one networked collector (no local token counts
-			// exist) — a signed-out CLI or an offline host contributes nothing.
-			run: async (out: UsageLogEntry[]) => {
-				await collectCursorEntries(
-					cutoffMs,
-					out,
-					sessionLabels,
-					options.cwdCandidates ?? [],
-				);
-				return 0;
-			},
-		},
 	];
 	const results = await Promise.allSettled(
 		collectors.map(async ({ run }) => {

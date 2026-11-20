@@ -11,6 +11,12 @@ import { join } from "node:path";
 import Database from "better-sqlite3";
 import { type DevinMessageRow, devinRowsToEntries } from "./devin-rows";
 import type { UsageLogEntry } from "./parse";
+import {
+	appendWithSessionCwd,
+	readAppendOnly,
+	type SqliteStates,
+	setSessionLabels,
+} from "./sqlite-tail";
 
 export function devinDbPath(): string {
 	const dataHome =
@@ -19,44 +25,63 @@ export function devinDbPath(): string {
 }
 
 /** Returns 1 when the database was scanned, 0 when absent/unreadable. */
-export function collectDevinEntries(
+export async function collectDevinEntries(
 	cutoffMs: number,
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	dbPath: string = devinDbPath(),
-): number {
+	states?: SqliteStates,
+): Promise<number> {
 	let db: InstanceType<typeof Database> | null = null;
 	try {
-		db = new Database(dbPath, { readonly: true, fileMustExist: true });
+		const conn = new Database(dbPath, { readonly: true, fileMustExist: true });
+		db = conn;
 		// `chat_message` holds the full reply text and can total gigabytes, so
 		// only the usage fields leave SQLite, one row at a time.
-		const rows = db
-			.prepare(
-				`SELECT m.session_id, m.created_at,
-				        json_object(
-				          'message_id', json_extract(m.chat_message, '$.message_id'),
-				          'role', 'assistant',
-				          'metadata', json_object(
-				            'request_id', json_extract(m.chat_message, '$.metadata.request_id'),
-				            'generation_model', json_extract(m.chat_message, '$.metadata.generation_model'),
-				            'created_at', json_extract(m.chat_message, '$.metadata.created_at'),
-				            'metrics', json(json_extract(m.chat_message, '$.metadata.metrics'))
-				          )
-				        ) AS chat_message,
-				        s.working_directory, s.model, s.title
-				 FROM message_nodes m
-				 LEFT JOIN sessions s ON s.id = m.session_id
-				 WHERE m.created_at >= ?
-				   AND CASE WHEN json_valid(m.chat_message)
-				         THEN json_extract(m.chat_message, '$.role') = 'assistant'
-				              AND json_type(m.chat_message, '$.metadata.metrics') = 'object'
-				       END`,
-			)
-			.iterate(Math.floor(cutoffMs / 1000)) as Iterable<DevinMessageRow>;
-		// Added only once the read finishes: an error mid-stream adds nothing.
-		const entries: UsageLogEntry[] = [];
-		devinRowsToEntries(rows, cutoffMs, entries, sessionLabels);
-		for (const entry of entries) out.push(entry);
+		const rows = conn.prepare(
+			`SELECT m.session_id, m.created_at,
+			        json_object(
+			          'message_id', json_extract(m.chat_message, '$.message_id'),
+			          'role', 'assistant',
+			          'metadata', json_object(
+			            'request_id', json_extract(m.chat_message, '$.metadata.request_id'),
+			            'generation_model', json_extract(m.chat_message, '$.metadata.generation_model'),
+			            'created_at', json_extract(m.chat_message, '$.metadata.created_at'),
+			            'metrics', json(json_extract(m.chat_message, '$.metadata.metrics'))
+			          )
+			        ) AS chat_message,
+			        s.working_directory, s.model, NULL AS title
+			 FROM message_nodes m
+			 LEFT JOIN sessions s ON s.id = m.session_id
+			 WHERE m.rowid > ? AND m.rowid <= ?
+			   AND m.created_at >= ?
+			   AND CASE WHEN json_valid(m.chat_message)
+			         THEN json_extract(m.chat_message, '$.role') = 'assistant'
+			              AND json_type(m.chat_message, '$.metadata.metrics') = 'object'
+			       END`,
+		);
+		const entries = await readAppendOnly({
+			db: conn,
+			dbPath,
+			table: "message_nodes",
+			stateKey: `devin:${dbPath}`,
+			cutoffMs,
+			states,
+			readRows: (afterRowId, upToRowId, into, seen) =>
+				devinRowsToEntries(
+					rows.iterate(
+						afterRowId,
+						upToRowId,
+						Math.floor(cutoffMs / 1000),
+					) as Iterable<DevinMessageRow>,
+					cutoffMs,
+					into,
+					undefined,
+					seen,
+				),
+		});
+		appendWithSessionCwd(conn, "sessions", "working_directory", entries, out);
+		setSessionLabels(conn, "sessions", "title", entries, sessionLabels);
 		return 1;
 	} catch {
 		return 0;

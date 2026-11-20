@@ -13,10 +13,11 @@
 
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, sep } from "node:path";
+import { type LineParser, type ParseLines, parseWholeFile } from "./line-cache";
 import type { LogFile } from "./logs";
 import { collectLogFiles } from "./logs";
 import type { UsageLogEntry } from "./parse";
-import { forEachLine, num, toSessionLabel } from "./parse";
+import { dropBefore, num, rememberLabel, toSessionLabel } from "./parse";
 
 export function museSessionsRoot(): string {
 	const dataHome =
@@ -121,19 +122,31 @@ export function parseMuseLine(line: string): ParsedMuseEnvelope | null {
 	};
 }
 
-async function parseMuseLogFile(
+interface MuseFileResult {
+	sessionId: string;
+	entries: Array<{ recordId: string | null; entry: UsageLogEntry }>;
+	label: string | null;
+}
+
+interface MuseFileState {
+	sessionId: string;
+	cwd: string | null;
+	model: string | null;
+	label: string | null;
+	pending: Array<{ recordId: string | null; entry: UsageLogEntry }>;
+}
+
+function museFileParser(
 	file: LogFile,
-	cutoffMs: number,
-	out: UsageLogEntry[],
-	seenRecords: Set<string>,
-	sessionLabels?: Map<string, string>,
-): Promise<void> {
-	let sessionId = basename(dirname(file.path));
-	let cwd: string | null = null;
-	let model: string | null = null;
-	let label: string | null = null;
-	const pending: UsageLogEntry[] = [];
-	await forEachLine(file.path, (line) => {
+	state: MuseFileState = {
+		sessionId: basename(dirname(file.path)),
+		cwd: null,
+		model: null,
+		label: null,
+		pending: [],
+	},
+): LineParser<MuseFileResult, MuseFileState> {
+	const onLine = (line: string) => {
 		if (
 			!line.includes('"model_completed"') &&
 			!line.includes('"runtime.session.metadata"') &&
@@ -143,19 +156,15 @@ async function parseMuseLogFile(
 		}
 		const parsed = parseMuseLine(line);
 		if (!parsed) return;
-		if (parsed.sessionId) sessionId = parsed.sessionId;
-		if (parsed.workspaceRoot && !cwd) cwd = parsed.workspaceRoot;
-		if (parsed.modelId && !model) model = parsed.modelId;
-		if (parsed.prompt && !label) label = toSessionLabel(parsed.prompt);
+		if (parsed.sessionId) state.sessionId = parsed.sessionId;
+		if (parsed.workspaceRoot && !state.cwd) state.cwd = parsed.workspaceRoot;
+		if (parsed.modelId && !state.model) state.model = parsed.modelId;
+		if (parsed.prompt && !state.label) {
+			state.label = toSessionLabel(parsed.prompt);
+		}
 		if (!parsed.usage) return;
 		const usage = parsed.usage;
 		const timestampMs = parsed.timestampMs || file.mtimeMs;
-		if (timestampMs < cutoffMs) return;
-		const recordId = parsed.recordId;
-		if (recordId) {
-			if (seenRecords.has(recordId)) return;
-			seenRecords.add(recordId);
-		}
 		const input = num(usage.input_tokens ?? usage.prompt_tokens);
 		const cachedInput =
 			num(usage.cached_tokens) || num(usage.cache_read_tokens);
@@ -164,32 +173,48 @@ async function parseMuseLogFile(
 		const output = num(usage.output_tokens);
 		if (uncachedInput + cachedInput + cacheWrite + output === 0) return;
 		const costMicros = num(usage.cost_micros);
-		pending.push({
-			agent: "muse",
-			model: parsed.completedModel ?? model ?? "unknown",
-			timestampMs,
-			cwd,
-			sessionId,
-			uncachedInput,
-			cachedInput,
-			cacheWrite5m: cacheWrite,
-			cacheWrite1h: 0,
-			output,
-			reasoningOutput: num(usage.reasoning_tokens),
-			...(costMicros > 0 ? { costUsd: costMicros / 1e6 } : {}),
+		state.pending.push({
+			recordId: parsed.recordId ?? null,
+			entry: {
+				agent: "muse",
+				model: parsed.completedModel ?? state.model ?? "unknown",
+				timestampMs,
+				cwd: state.cwd,
+				sessionId: state.sessionId,
+				uncachedInput,
+				cachedInput,
+				cacheWrite5m: cacheWrite,
+				cacheWrite1h: 0,
+				output,
+				reasoningOutput: num(usage.reasoning_tokens),
+				...(costMicros > 0 ? { costUsd: costMicros / 1e6 } : {}),
+			},
 		});
-	});
+	};
 	// Metadata precedes the first model call, but a resumed log can re-stamp
-	// the session id and cwd later — settle every entry once the file is read.
-	for (const entry of pending) {
-		entry.sessionId = sessionId;
-		entry.cwd = entry.cwd ?? cwd;
-		if (entry.model === "unknown" && model) entry.model = model;
-		out.push(entry);
-	}
-	if (label && sessionLabels && !sessionLabels.has(sessionId)) {
-		sessionLabels.set(sessionId, label);
-	}
+	// the session id and cwd later — settle every entry against what has been
+	// read so far, on copies so later lines can still re-stamp.
+	const result = (): MuseFileResult => ({
+		sessionId: state.sessionId,
+		label: state.label,
+		entries: state.pending.map(({ recordId, entry }) => ({
+			recordId,
+			entry: {
+				...entry,
+				sessionId: state.sessionId,
+				cwd: entry.cwd ?? state.cwd,
+				model:
+					entry.model === "unknown" && state.model ? state.model : entry.model,
+			},
+		})),
+	});
+	return {
+		state,
+		onLine,
+		result,
+		prune: (cutoffMs) =>
+			dropBefore(state.pending, cutoffMs, ({ entry }) => entry.timestampMs),
+	};
 }
 
 /** Returns the number of session logs scanned. */
@@ -199,6 +224,7 @@ export async function collectMuseEntries(
 	out: UsageLogEntry[],
 	sessionLabels?: Map<string, string>,
 	root: string = museSessionsRoot(),
+	parseLines: ParseLines = parseWholeFile,
 ): Promise<number> {
 	const files = (await collectLogFiles(root, days + 1)).filter(
 		(file) =>
@@ -212,7 +238,21 @@ export async function collectMuseEntries(
 	);
 	const seenRecords = new Set<string>();
 	for (const file of files) {
-		await parseMuseLogFile(file, cutoffMs, out, seenRecords, sessionLabels);
+		const { sessionId, entries, label } = await parseLines(
+			"muse",
+			file.path,
+			(state?: MuseFileState) => museFileParser(file, state),
+			cutoffMs,
+		);
+		for (const { recordId, entry } of entries) {
+			if (entry.timestampMs < cutoffMs) continue;
+			if (recordId) {
+				if (seenRecords.has(recordId)) continue;
+				seenRecords.add(recordId);
+			}
+			out.push(entry);
+		}
+		rememberLabel(sessionLabels, sessionId, label);
 	}
 	return files.length;
 }
