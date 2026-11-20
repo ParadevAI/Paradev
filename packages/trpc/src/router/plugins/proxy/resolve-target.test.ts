@@ -1,6 +1,5 @@
 // biome-ignore-all lint/suspicious/noTemplateCurlyInString: ${config.*} is the manifest placeholder syntax, not a template literal
 import { beforeEach, describe, expect, test } from "bun:test";
-import { at } from "../../../../test/at";
 import { setTestEnv } from "../../../../test/env";
 import { stub } from "../../../../test/stub";
 import * as lookup from "../../../lib/connectors/lookup";
@@ -52,6 +51,7 @@ stub(refresh, {
 const { PluginTargetError, resolveTarget, targetKey } = await import(
 	"./resolve-target"
 );
+type TargetError = InstanceType<typeof PluginTargetError>;
 
 interface ManifestOptions {
 	name?: string;
@@ -114,8 +114,7 @@ describe("resolveTarget", () => {
 		await expect(resolveTarget(request)).rejects.toThrow(PluginTargetError);
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: InstanceType<typeof PluginTargetError>) =>
-				expect(error.status).toBe(404),
+			(error: TargetError) => expect(error.status).toBe(404),
 		);
 		expect(installedCalls[0]).toEqual(["user-1", "acme", "superset"]);
 	});
@@ -124,7 +123,7 @@ describe("resolveTarget", () => {
 		install = installed("superset", {});
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: InstanceType<typeof PluginTargetError>) => {
+			(error: TargetError) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(404);
 				expect(error.message).toContain("exposes no tools");
@@ -253,7 +252,7 @@ describe("resolveTarget", () => {
 			plugin: "gmail",
 		}).then(
 			() => expect.unreachable("a foreign gmail must not get the real server"),
-			(error: InstanceType<typeof PluginTargetError>) => {
+			(error: TargetError) => {
 				expect(error).toBeInstanceOf(PluginTargetError);
 				expect(error.status).toBe(403);
 			},
@@ -356,7 +355,7 @@ describe("resolveTarget", () => {
 
 		await resolveTarget(request).then(
 			() => expect.unreachable("should have thrown"),
-			(error: InstanceType<typeof PluginTargetError>) => {
+			(error: TargetError) => {
 				expect(error.status).toBe(501);
 			},
 		);
@@ -364,20 +363,19 @@ describe("resolveTarget", () => {
 });
 
 describe("resolveTarget with several accounts", () => {
-	const twoAccounts = [
-		{
-			id: "conn-work",
-			authMethod: "oauth2",
-			externalUserLabel: "satya@superset.sh",
-			externalAccountLabel: null,
-		},
-		{
-			id: "conn-personal",
-			authMethod: "oauth2",
-			externalUserLabel: "satya.personal@gmail.com",
-			externalAccountLabel: null,
-		},
-	];
+	const work = {
+		id: "conn-work",
+		authMethod: "oauth2",
+		externalUserLabel: "satya@superset.sh",
+		externalAccountLabel: null,
+	};
+	const personal = {
+		id: "conn-personal",
+		authMethod: "oauth2",
+		externalUserLabel: "satya.personal@gmail.com",
+		externalAccountLabel: null,
+	};
+	const twoAccounts = [work, personal];
 
 	test("keeps an account that needs reconnecting, so naming it is not rerouted", async () => {
 		install = installed("superset", {
@@ -385,9 +383,9 @@ describe("resolveTarget with several accounts", () => {
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
 		accounts = [
-			at(twoAccounts, 0),
+			work,
 			{
-				...at(twoAccounts, 1),
+				...personal,
 				disconnectedAt: new Date(),
 				disconnectReason: "needs_reauth",
 			},
@@ -437,7 +435,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [at(twoAccounts, 1), at(twoAccounts, 0)];
+		accounts = [personal, work];
 
 		const target = await resolveTarget(request);
 		if (target.kind !== "multi") return expect.unreachable("expected multi");
@@ -453,7 +451,7 @@ describe("resolveTarget with several accounts", () => {
 			connector: "acme-crm",
 			mcpUrl: "https://mcp.acme.test/mcp",
 		});
-		accounts = [at(twoAccounts, 0)];
+		accounts = [work];
 
 		const target = await resolveTarget(request);
 
