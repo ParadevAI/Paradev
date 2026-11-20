@@ -404,10 +404,16 @@ async function execute(
 		}
 	}
 
+	const positionalConfigs = ((cmd.args ?? []) as GenericBuilderInternals[]).map(
+		(builder) => builder._.config,
+	);
 	const parsed = parseArgv(
 		["", "", ...remainingArgs],
 		optionConfigs,
 		globalConfigs,
+		positionalConfigs.some((config) => config.isVariadic)
+			? Number.POSITIVE_INFINITY
+			: positionalConfigs.length,
 	);
 
 	if (parsed.options._help) {
@@ -422,11 +428,7 @@ async function execute(
 	// Positional args
 	const argsResult: Record<string, unknown> = {};
 	if (cmd.args) {
-		const positionalConfigs = (cmd.args as GenericBuilderInternals[]).map(
-			(builder) => builder._.config,
-		);
 		let posIdx = 0;
-		let consumedVariadic = false;
 		for (const posConfig of positionalConfigs) {
 			const argName = posConfig.name ?? `arg${posIdx}`;
 			if (posConfig.isVariadic) {
@@ -435,7 +437,6 @@ async function execute(
 					assertEnumValue(`${argName}...`, value, posConfig);
 				}
 				argsResult[argName] = values;
-				consumedVariadic = true;
 				if (posConfig.isRequired && values.length === 0) {
 					throw new CLIError(`Missing required argument: <${argName}...>`);
 				}
@@ -448,9 +449,6 @@ async function execute(
 			if (value !== undefined) assertEnumValue(argName, value, posConfig);
 			argsResult[argName] = value;
 			posIdx++;
-		}
-		if (!consumedVariadic && parsed.positionals.length > posIdx) {
-			throw new CLIError(`Unexpected argument: ${parsed.positionals[posIdx]}`);
 		}
 	}
 
