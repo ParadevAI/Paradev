@@ -19,7 +19,7 @@ export function openPullRequestPaneInStore(
 	placement: "split" | "tab" = "split",
 ): void {
 	const data: PullRequestPaneData = {
-		repoFullName: ref.repoFullName,
+		...ref,
 		number: ref.number,
 	};
 	const state = store.getState();
