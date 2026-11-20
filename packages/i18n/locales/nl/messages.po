@@ -18397,6 +18397,9 @@ msgstr "Alle opmerkingen tonen"
 msgid "Show all lines"
 msgstr "Alle regels tonen"
 
+msgid "Show all models"
+msgstr "Alle modellen tonen"
+
 msgid "Show Apple's installer"
 msgstr "Toon het installatieprogramma van Apple"
 

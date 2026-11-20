@@ -18397,6 +18397,9 @@ msgstr "Показать все комментарии"
 msgid "Show all lines"
 msgstr "Показать все строки"
 
+msgid "Show all models"
+msgstr "Показать все модели"
+
 msgid "Show Apple's installer"
 msgstr "Показать установщик Apple"
 

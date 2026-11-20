@@ -11,7 +11,7 @@ import {
 	getAgentEfforts,
 	getAgentModelSupport,
 	getAgentModeSupport,
-	isCuratedAgentModel,
+	isLaunchableAgentModel,
 	resolveAgentLaunchPresetId,
 } from "@superset/shared/agent-models";
 import {
@@ -32,6 +32,9 @@ import { trackAgentLaunched } from "../../../agent-launch-analytics";
 import { acpHarnessForPreset } from "../../../chat-v3/acpCatalogue";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
+import { discoverAgentModels } from "../../../model-catalog/catalog";
+import { refreshModelMetadata } from "../../../model-catalog/metadata";
+import { sessionModelCatalog } from "../../../model-catalog/session";
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type {
 	TerminalAgentBinding,
@@ -39,6 +42,7 @@ import type {
 } from "../../../terminal-agents";
 import {
 	agentLaunchEnv,
+	chatLaunchPresetId,
 	type ResolvedHostAgentConfig,
 	resolveHostAgentConfig,
 } from "../../../terminal-agents/agent-config";
@@ -197,7 +201,7 @@ export function validateAgentModelSelection(
 		});
 	}
 
-	if (!isCuratedAgentModel(presetId, model)) {
+	if (!isLaunchableAgentModel(presetId, model)) {
 		throw new TRPCError({
 			code: "BAD_REQUEST",
 			message: `Unsupported model "${model}" for ${label}. Choose one of: ${support.models.map((option) => option.id).join(", ")}.`,
@@ -382,13 +386,18 @@ export function validateAgentLaunchOptions(
 		config.presetId,
 		config.command,
 	);
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
-	validateAgentEffortSelection(
-		launchPresetId,
-		config.label,
-		input.effort,
-		input.model,
-	);
+	const chat =
+		input.surface === "chat" &&
+		!!acpHarnessForPreset(chatLaunchPresetId(config));
+	if (!chat)
+		validateAgentModelSelection(launchPresetId, config.label, input.model);
+	if (!chat)
+		validateAgentEffortSelection(
+			launchPresetId,
+			config.label,
+			input.effort,
+			input.model,
+		);
 	validateAgentModeSelection(
 		launchPresetId,
 		config.label,
@@ -729,7 +738,6 @@ export function chatLaunchTarget(
 	const launchPresetId = chatLaunchPresetId(config);
 	const harness = acpHarnessForPreset(launchPresetId);
 	if (!harness) return null;
-	validateAgentModelSelection(launchPresetId, config.label, input.model);
 	validateAgentModeSelection(launchPresetId, config.label, input.mode, "chat");
 	return {
 		harness,
@@ -745,22 +753,7 @@ export function chatLaunchTarget(
  * A chat takes only the config's env: its args and executable path apply to
  * terminal launches, and the chat runs the CLI the ACP harness resolves.
  */
-export function chatLaunchPresetId(
-	config: Pick<ResolvedHostAgentConfig, "presetId" | "command">,
-): string {
-	const launchPresetId = resolveAgentLaunchPresetId(
-		config.presetId,
-		config.command,
-	);
-	if (!config.presetId.startsWith("custom")) return launchPresetId;
-	const [commandToken = ""] = config.command.trim().split(/\s+/);
-	const executable = (commandToken.split(/[\\/]/).pop() ?? "")
-		.toLowerCase()
-		.replace(/\.exe$/, "");
-	return executable === "claude" || executable === "codex"
-		? executable
-		: launchPresetId;
-}
+export { chatLaunchPresetId } from "../../../terminal-agents/agent-config";
 
 /**
  * The agent config a stored chat ran under, and whether it still runs that
@@ -905,6 +898,32 @@ export async function runAgentInWorkspace(
 }
 
 export const agentsRouter = router({
+	models: protectedProcedure
+		.input(
+			z.object({
+				agent: z.string().min(1),
+				surface: z.enum(["chat", "terminal"]).default("chat"),
+				workspaceId: z.string().optional(),
+				projectId: z.string().optional(),
+				sessionId: z.string().optional(),
+			}),
+		)
+		.query(({ ctx, input }) => {
+			if (input.sessionId) {
+				const catalog = sessionModelCatalog(
+					ctx.runtime.chat?.().live.get(input.sessionId) ?? null,
+					input.workspaceId,
+				);
+				if (!catalog)
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Chat session is not active in this workspace",
+					});
+				refreshModelMetadata();
+				return catalog;
+			}
+			return discoverAgentModels(ctx.db, input);
+		}),
 	run: protectedProcedure
 		.input(
 			z.object({

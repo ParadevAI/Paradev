@@ -18397,6 +18397,9 @@ msgstr "显示全部评论"
 msgid "Show all lines"
 msgstr "显示所有行"
 
+msgid "Show all models"
+msgstr "显示所有模型"
+
 msgid "Show Apple's installer"
 msgstr "显示 Apple 安装器"
 

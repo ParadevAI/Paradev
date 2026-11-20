@@ -18397,6 +18397,9 @@ msgstr "Pokaż wszystkie komentarze"
 msgid "Show all lines"
 msgstr "Pokaż wszystkie wiersze"
 
+msgid "Show all models"
+msgstr "Pokaż wszystkie modele"
+
 msgid "Show Apple's installer"
 msgstr "Pokaż instalator Apple"
 

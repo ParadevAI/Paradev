@@ -18397,6 +18397,9 @@ msgstr "모든 댓글 표시"
 msgid "Show all lines"
 msgstr "모든 줄 표시"
 
+msgid "Show all models"
+msgstr "모든 모델 보기"
+
 msgid "Show Apple's installer"
 msgstr "Apple 설치 프로그램 보기"
 

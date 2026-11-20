@@ -18397,6 +18397,9 @@ msgstr "Hiển thị tất cả bình luận"
 msgid "Show all lines"
 msgstr "Hiện tất cả các dòng"
 
+msgid "Show all models"
+msgstr "Hiển thị tất cả mô hình"
+
 msgid "Show Apple's installer"
 msgstr "Hiện trình cài đặt của Apple"
 

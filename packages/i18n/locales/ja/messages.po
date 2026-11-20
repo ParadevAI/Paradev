@@ -18397,6 +18397,9 @@ msgstr "すべてのコメントを表示"
 msgid "Show all lines"
 msgstr "すべての行を表示"
 
+msgid "Show all models"
+msgstr "すべてのモデルを表示"
+
 msgid "Show Apple's installer"
 msgstr "Apple のインストーラを表示"
 
