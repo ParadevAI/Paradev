@@ -1,6 +1,7 @@
 import type { AppRouter } from "@superset/host-service/trpc";
 import {
 	httpBatchStreamLink,
+	httpLink,
 	retryLink,
 	splitLink,
 	TRPCClientError,
@@ -69,6 +70,12 @@ export function createHostServiceLinks(
 ): TRPCLink<AppRouter>[] {
 	const { url, headers } = options;
 	const shared = { url, transformer: superjson, headers };
+	const transport = (methodOverride?: "POST") =>
+		splitLink<AppRouter>({
+			condition: (op) => op.context.skipBatch === true,
+			true: httpLink({ ...shared, methodOverride }),
+			false: httpBatchStreamLink({ ...shared, methodOverride }),
+		});
 	return [
 		retryLink({
 			retry: ({ op, error, attempts }) => {
@@ -84,8 +91,8 @@ export function createHostServiceLinks(
 		}),
 		splitLink({
 			condition: () => legacyGetEndpoints.has(url),
-			true: httpBatchStreamLink(shared),
-			false: httpBatchStreamLink({ ...shared, methodOverride: "POST" }),
+			true: transport(),
+			false: transport("POST"),
 		}),
 	];
 }

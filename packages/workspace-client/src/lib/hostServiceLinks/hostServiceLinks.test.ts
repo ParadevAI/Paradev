@@ -83,15 +83,78 @@ describe("createHostServiceLinks", () => {
 		expect(methods).toEqual(["POST"]);
 	});
 
-	test("replays a query over GET when a pre-1.24 host rejects the POST", async () => {
-		const { client, methods } = fakeHost("http://legacy.test", {
-			allowMethodOverride: false,
-		});
+	for (const skipBatch of [false, true]) {
+		test(`replays a query over GET when a pre-1.24 host rejects the POST (skipBatch=${skipBatch})`, async () => {
+			const { client, methods } = fakeHost(`http://legacy-${skipBatch}.test`, {
+				allowMethodOverride: false,
+			});
 
-		expect(await client.settings.agentConfigs.list.query()).toEqual([
-			{ id: "claude" },
-		]);
-		expect(methods).toEqual(["POST", "GET"]);
+			expect(
+				await client.settings.agentConfigs.list.query(undefined, {
+					context: { skipBatch },
+				}),
+			).toEqual([{ id: "claude" }]);
+			expect(methods).toEqual(["POST", "GET"]);
+		});
+	}
+
+	test("aborts an isolated query while a same-tick sibling stays active", async () => {
+		const hostUrl = "http://isolated-abort.test";
+		const requests: Request[] = [];
+		const dispatched = Promise.withResolvers<void>();
+		const release = Promise.withResolvers<void>();
+		hosts.set(hostUrl, async (req) => {
+			requests.push(req);
+			if (requests.length === 2 || new URL(req.url).pathname.includes(",")) {
+				dispatched.resolve();
+			}
+			await new Promise<void>((resolve, reject) => {
+				release.promise.then(resolve);
+				req.signal.addEventListener("abort", () => reject(req.signal.reason), {
+					once: true,
+				});
+			});
+			return fetchRequestHandler({
+				endpoint: "/trpc",
+				req,
+				router,
+				allowMethodOverride: true,
+			});
+		});
+		const client = createTRPCClient<TestRouter>({
+			links: createHostServiceLinks({
+				url: `${hostUrl}/trpc`,
+			}) as unknown as TRPCLink<TestRouter>[],
+		});
+		const controller = new AbortController();
+		let probeAborted = false;
+		let siblingSettled = false;
+		const probe = client.settings.agentConfigs.list
+			.query(undefined, {
+				signal: controller.signal,
+				context: { skipBatch: true },
+			})
+			.catch(() => {
+				probeAborted = true;
+			});
+		const sibling = client.settings.agentConfigs.echo
+			.query({ n: 42 })
+			.finally(() => {
+				siblingSettled = true;
+			});
+		try {
+			await dispatched.promise;
+			controller.abort();
+			await Bun.sleep(0);
+			expect(probeAborted).toBe(true);
+			expect(siblingSettled).toBe(false);
+			expect(requests).toHaveLength(2);
+			expect(requests.filter((req) => req.signal.aborted)).toHaveLength(1);
+		} finally {
+			release.resolve();
+			await Promise.allSettled([probe, sibling]);
+		}
+		expect(await sibling).toEqual({ n: 42 });
 	});
 
 	test("remembers a legacy host so later queries skip the failing POST", async () => {
