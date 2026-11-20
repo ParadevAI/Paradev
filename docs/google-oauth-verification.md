@@ -67,5 +67,23 @@ testing or rotate production clients to bypass the cap.
 - [Restricted-scope verification and security assessment](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification)
 - [Gmail scopes and permanent deletion](https://developers.google.com/workspace/gmail/api/auth/scopes)
 
+### Disclosure structure reviewed
+
+OpenAI separates connecting an account and granting permissions from installing a
+plugin, and documents Google-specific data use separately from its general privacy
+policy. Anthropic describes each Google connector's capabilities, account access,
+and data handling. These are useful disclosure patterns, not evidence of Paradev's
+behavior or a substitute for Google's review.
+
+- [OpenAI: connecting and managing app accounts](https://help.openai.com/en/articles/20001494-connecting-and-managing-app-accounts-in-chatgpt)
+- [OpenAI: Google app data controls](https://help.openai.com/en/articles/10408842-google-app-data-controls-faq)
+- [Anthropic: Google Workspace connectors](https://support.claude.com/en/articles/10166901-use-google-workspace-connectors)
+
+Paradev's wording reflects its own implementation: Gmail and Calendar plugins
+share a Google connector with combined scopes; the separate Gmail automation
+connection requests read-only mail access. Configured automations can process mail
+in the background. Do not promise separate authorization per plugin or access only
+during an active chat.
+
 The console's lifetime unverified-user cap cannot be reset. Saving this draft
 does not unblock new accounts; the requested restricted scopes need approval.
