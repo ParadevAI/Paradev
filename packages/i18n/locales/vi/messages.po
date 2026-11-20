@@ -2378,6 +2378,9 @@ msgstr "Cấu hình agent"
 msgid "Agent credentials changed"
 msgstr "Thông tin xác thực của agent đã thay đổi"
 
+msgid "Agent default"
+msgstr "Mô hình mặc định của tác nhân"
+
 msgid "Agent finished"
 msgstr "Agent đã xong"
 

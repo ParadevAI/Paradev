@@ -167,7 +167,7 @@ export function NewChatWidget({
 	// and one with neither shows nothing.
 	const launchOptionLabel =
 		launch.models !== undefined
-			? (launch.model?.label ?? t({ message: "Default model" }))
+			? (launch.model?.label ?? t({ message: "Agent default" }))
 			: launch.efforts.length > 0
 				? (launch.effort?.label ?? t({ message: "Default effort" }))
 				: null;

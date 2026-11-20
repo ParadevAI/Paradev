@@ -715,7 +715,7 @@ export function NewWorkspaceScreen({
 				selectedEffort,
 				labels: {
 					model: t({ message: "Model" }),
-					defaultModel: t({ message: "Default model" }),
+					defaultModel: t({ message: "Agent default" }),
 					effort: t({ message: "Effort" }),
 					defaultEffort: t({ message: "Default" }),
 				},

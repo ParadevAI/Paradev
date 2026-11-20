@@ -2378,6 +2378,9 @@ msgstr "エージェント設定"
 msgid "Agent credentials changed"
 msgstr "エージェントの認証情報が変更されました"
 
+msgid "Agent default"
+msgstr "エージェントの既定モデル"
+
 msgid "Agent finished"
 msgstr "エージェントが完了しました"
 

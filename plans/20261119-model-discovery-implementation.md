@@ -65,3 +65,7 @@ After refactoring, desktop CDP captured exactly one model-query POST on opening 
 ## Agent eligibility
 
 Workspace model discovery and picker tabs use the active surface’s capabilities: the existing ACP harness registry for chat and shared model-selection support for terminals. Mastracode has neither capability and is excluded. Existing terminal agent configuration is unchanged. Verified the local desktop picker has Favorites, Claude, OpenCode, Pi, and Codex tabs and loads eight Codex runtime options. Desktop type checking and Biome passed.
+
+## Default model wording
+
+Desktop and mobile pre-launch controls say “Agent default” when no model override is selected. This leaves selection to the agent. Active desktop chat already renders the label matching the ACP session’s current model value. Verified the pre-launch label in the local desktop; launch-option tests (4), the existing selected-model ACP test (1), Biome, and all 18 locale checks passed.

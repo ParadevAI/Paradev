@@ -7,7 +7,7 @@ import {
 
 const labels = {
 	model: "Model",
-	defaultModel: "Default model",
+	defaultModel: "Agent default",
 	effort: "Effort",
 	defaultEffort: "Default effort",
 };

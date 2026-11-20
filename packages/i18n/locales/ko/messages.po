@@ -2378,6 +2378,9 @@ msgstr "에이전트 설정"
 msgid "Agent credentials changed"
 msgstr "에이전트 자격 증명이 변경됨"
 
+msgid "Agent default"
+msgstr "에이전트 기본 모델"
+
 msgid "Agent finished"
 msgstr "에이전트 완료"
 

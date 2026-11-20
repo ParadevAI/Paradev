@@ -2378,6 +2378,9 @@ msgstr "Конфигурации агентов"
 msgid "Agent credentials changed"
 msgstr "Учётные данные агента изменились"
 
+msgid "Agent default"
+msgstr "Модель агента по умолчанию"
+
 msgid "Agent finished"
 msgstr "Агент завершил"
 

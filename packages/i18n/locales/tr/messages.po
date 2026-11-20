@@ -2378,6 +2378,9 @@ msgstr "Ajan yapılandırmaları"
 msgid "Agent credentials changed"
 msgstr "Ajan kimlik bilgileri değişti"
 
+msgid "Agent default"
+msgstr "Ajanın varsayılan modeli"
+
 msgid "Agent finished"
 msgstr "Ajan bitirdi"
 

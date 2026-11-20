@@ -2378,6 +2378,9 @@ msgstr "Konfigurace agentů"
 msgid "Agent credentials changed"
 msgstr "Přihlašovací údaje agenta se změnily"
 
+msgid "Agent default"
+msgstr "Výchozí model agenta"
+
 msgid "Agent finished"
 msgstr "Agent dokončil"
 

@@ -2378,6 +2378,9 @@ msgstr "代理程式配置"
 msgid "Agent credentials changed"
 msgstr "代理憑證已變更"
 
+msgid "Agent default"
+msgstr "代理程式預設模型"
+
 msgid "Agent finished"
 msgstr "代理程式已完成"
 

@@ -2378,6 +2378,9 @@ msgstr "Konfigurasi Agen"
 msgid "Agent credentials changed"
 msgstr "Kredensial agen berubah"
 
+msgid "Agent default"
+msgstr "Model bawaan agen"
+
 msgid "Agent finished"
 msgstr "Agen selesai"
 

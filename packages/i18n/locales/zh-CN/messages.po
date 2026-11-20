@@ -2378,6 +2378,9 @@ msgstr "智能体配置"
 msgid "Agent credentials changed"
 msgstr "智能体凭据已更改"
 
+msgid "Agent default"
+msgstr "智能体默认模型"
+
 msgid "Agent finished"
 msgstr "智能体已完成"
 
